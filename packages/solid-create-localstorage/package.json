@@ -1,0 +1,73 @@
+{
+  "name": "react-use-localstorage",
+  "version": "3.5.3",
+  "description": "Use Local Storage with React hooks",
+  "author": "Sung Kim <sungmkim80@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dance2die/react-use-localstorage.git"
+  },
+  "homepage": "https://github.com/dance2die/react-use-localstorage",
+  "main": "dist/react-use-localstorage.esm.js",
+  "umd:main": "dist/react-use-localstorage.umd.production.js",
+  "module": "dist/react-use-localstorage.esm.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test --env=jsdom",
+    "version:alpha": "npm version prerelease --preid=alpha",
+    "publish:alpha": "npm publish --tag alpha",
+    "prepublishOnly": "tsdx build"
+  },
+  "keywords": [
+    "localStorage",
+    "react",
+    "hooks"
+  ],
+  "devDependencies": {
+    "@testing-library/react-hooks": "^3.4.1",
+    "@types/jest": "^26.0.10",
+    "@types/react": "^16.9.46",
+    "@types/react-dom": "^16.9.8",
+    "husky": "^4.2.5",
+    "prettier": "^2.0.5",
+    "pretty-quick": "^3.0.0",
+    "react": "^16.8.1",
+    "react-dom": "^16.8.1",
+    "react-test-renderer": "^16.10.2",
+    "tsdx": "^0.13.2",
+    "tslib": "^2.0.1",
+    "typescript": "^4.0.2"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "jest": {
+    "setupFiles": [
+      "./test/setup.ts"
+    ]
+  },
+  "contributors": [
+    {
+      "name": "lilasquared",
+      "email": "aaronmroberts1@gmail.com"
+    },
+    {
+      "name": "TheAifam5",
+      "email": "theaifam5@gmail.com",
+      "url": "https://theaifam5.eu/"
+    },
+    {
+      "name": "VitorLuizC",
+      "email": "vitorluizc@outlook.com",
+      "url": "http://vitorluizc.github.io/"
+    }
+  ]
+}

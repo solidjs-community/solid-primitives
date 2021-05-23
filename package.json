@@ -1,0 +1,13 @@
+{
+  "name": "solid-primitives",
+  "version": "0.26.0",
+  "description": "A collection of high-quality, community contributed primitives.",
+  "main": "index.ts",
+  "repository": "https://davedbase@github.com/davedbase/solid-primitives.git",
+  "author": "David Di Biase <david@pilotinterative.ca>",
+  "license": "MIT",
+  "dependencies": {
+    "solid-js": "^0.26.5",
+    "solid-testing-library": "^0.1.2"
+  }
+}
