@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="75px" src="./src/assets/logo.png" alt="Solid logo">
+  <img width="75px" src="https://raw.githubusercontent.com/solidjs/solid-site/dev/src/assets/logo.png" alt="Solid logo">
 </p>
 
 # Solid Primitives
