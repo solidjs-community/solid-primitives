@@ -1,7 +1,8 @@
 import { render } from 'solid-testing-library';
-import createLocalStorage from '../src/index';
+import createStorage from '../src/index';
 
 describe('createLocalStorage', (): void => {
+
   const KEY = 'key';
   const VALUE = {
     INITIAL: 'initial value',
@@ -11,23 +12,23 @@ describe('createLocalStorage', (): void => {
 
   describe('Setup', () => {
     it('Returns initial value', () => {
-      const { result } = render(() => createLocalStorage(KEY, VALUE.INITIAL));
-      expect(result.current[0]).toMatch(VALUE.INITIAL);
+      const { result } = render(() => createStorage(VALUE.INITIAL));
+      expect(result())).toMatch(VALUE.INITIAL);
     });
 
     it('When no initial value is passed, returns an empty string', () => {
-      const { result } = render(() => createLocalStorage(KEY));
+      const { result } = render(() => createStorage());
       expect(result.current[0]).toMatch(VALUE.NONE);
     });
 
     it('Returns setValue function', () => {
-      const { result } = render(() => createLocalStorage(KEY, VALUE.INITIAL));
+      const { result } = render(() => createStorage(VALUE.INITIAL));
       expect(typeof result.current[1]).toMatch('function');
     });
   });
 
   it('When `setValue()` is called, the `value` updates', () => {
-    const { result } = render(() => createLocalStorage(KEY, VALUE.INITIAL));
+    const { result } = render(() => createStorage(VALUE.INITIAL));
 
     act(() => {
       result.current[1](VALUE.CHANGED);
@@ -37,7 +38,7 @@ describe('createLocalStorage', (): void => {
   });
 
   it('When `value` changes, `localStorage` is updated', () => {
-    const { result } = render(() => createLocalStorage(KEY, VALUE.INITIAL));
+    const { result } = render(() => createStorage(VALUE.INITIAL));
 
     act(() => {
       result.current[1](VALUE.CHANGED);

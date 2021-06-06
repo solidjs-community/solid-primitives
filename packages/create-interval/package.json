@@ -1,23 +1,20 @@
 {
-  "name": "solid-create-localstorage",
+  "name": "solid-create-interval",
   "version": "1.0.0",
-  "description": "Primitive to setup local storage",
+  "description": "Primitive to create an interval",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "typings": "dist/index.d.ts",
   "scripts": {
   },
   "keywords": [
-    "localStorage",
+    "setInterval",
+    "setTimeout",
     "solid",
     "primitives"
   ],
   "devDependencies": {
-    "@testing-library/react-hooks": "^3.4.1",
     "@types/jest": "^26.0.10",
-    "@types/react": "^16.9.46",
-    "@types/react-dom": "^16.9.8",
-    "husky": "^4.2.5",
     "prettier": "^2.0.5",
     "pretty-quick": "^3.0.0",
     "tslib": "^2.0.1",

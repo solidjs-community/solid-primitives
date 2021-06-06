@@ -1,0 +1,30 @@
+{
+  "name": "solid-create-listener",
+  "version": "1.0.0",
+  "description": "Primitive to manage creating event listeners.",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "license": "MIT",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+  },
+  "keywords": [
+    "event-listener",
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "@types/jest": "^26.0.10",
+    "prettier": "^2.0.5",
+    "pretty-quick": "^3.0.0",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "solid-js": "^0.26.5",
+    "solid-testing-library": "^0.1.2"
+  },
+  "jest": {
+    "setupFiles": [
+      "./test/setup.ts"
+    ]
+  }
+}
