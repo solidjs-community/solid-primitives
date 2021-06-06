@@ -1,7 +1,7 @@
 {
-  "name": "solid-create-interval",
+  "name": "solid-create-timer",
   "version": "1.0.0",
-  "description": "Primitive to create an interval",
+  "description": "Primitive to create an timer (interval or timeout)",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "typings": "dist/index.d.ts",

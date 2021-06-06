@@ -1,6 +1,6 @@
-# solid-create-listener
+# solid-create-timer
 
-A helpful event listener primitive.
+A timer wrapper to handle setTimeouot and setInterval.
 
 ## How to use it
 
