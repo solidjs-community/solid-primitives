@@ -6,8 +6,6 @@ A timer wrapper to handle setTimeouot and setInterval.
 
 ## Demo
 
-![demo](https://github.com/dance2die/react-use-localstorage/raw/master/react-use-localstorage.gif)
-
 ## Changelog
 
 <details>

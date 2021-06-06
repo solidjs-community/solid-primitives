@@ -6,8 +6,6 @@ Creates a genereal storage handler for LocalStorage, SessionStorage and your own
 
 ## Demo
 
-![demo](https://github.com/dance2die/react-use-localstorage/raw/master/react-use-localstorage.gif)
-
 ## Changelog
 
 <details>

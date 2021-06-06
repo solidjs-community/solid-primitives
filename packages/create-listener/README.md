@@ -6,8 +6,6 @@ A helpful event listener primitive.
 
 ## Demo
 
-![demo](https://github.com/dance2die/react-use-localstorage/raw/master/react-use-localstorage.gif)
-
 ## Changelog
 
 <details>
@@ -15,7 +13,7 @@ A helpful event listener primitive.
 
 1.0.0
 
-First ported commit from react-use-localstorage.
+First ported commit from react-use-event-listener.
 
 </details>
 
