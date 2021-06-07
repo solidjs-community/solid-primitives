@@ -1,4 +1,4 @@
-import { onMount, createSignal, onCleanup } from 'solid-js'
+import { createEffect, createSignal, onCleanup } from 'solid-js'
 
 /**
  * Primitive for wrapping Intersection Observer.
@@ -11,10 +11,10 @@ import { onMount, createSignal, onCleanup } from 'solid-js'
  * 
  * @example
  * ```ts
- * createEventListener("mouseDown", () => console.log("Click"), document.getElementById("mybutton"))
+ * createIntersectionObserver(document.getElementById("mydiv"))
  * ```
  */
-const useIntersectionObserver = (
+const createIntersectionObserver = (
   elementRef: HTMLElement,
   threshold: number = 0,
   root: HTMLElement | null = null,
@@ -23,23 +23,23 @@ const useIntersectionObserver = (
 ): () => IntersectionObserverEntry | undefined => {
   let observer: IntersectionObserver;
   const [entry, setEntry] = createSignal<IntersectionObserverEntry>();
-  const frozen = entry?.isIntersecting && freezeOnceVisible;
   const updateEntry = ([entry]: IntersectionObserverEntry[]): void => {
     setEntry(entry)
   }
 
   // Bind and then release the observer
-  onMount(() => {
+  createEffect(() => {
     const node = elementRef;
-    const hasIOSupport = !!window.IntersectionObserver
-    if (!hasIOSupport || frozen || !node) return
+    const frozen = entry()?.isIntersecting && freezeOnceVisible;
+    const canUse = globalThis.IntersectionObserver
+    if (!canUse || frozen || !node) return
     const observerParams = { threshold, root, rootMargin }
     observer = new IntersectionObserver(updateEntry, observerParams)
-    observer.observe(node)
+    observer.observe(node);
+    onCleanup(() => observer.disconnect());
   });
-  onCleanup(() => observer.disconnect());
 
   return entry;
 }
 
-export default useIntersectionObserver;
+export default createIntersectionObserver;
