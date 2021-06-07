@@ -15,11 +15,11 @@ import { createEffect, onCleanup } from 'solid-js';
 const createListener = <T extends HTMLElement = HTMLDivElement>(
    eventName: keyof WindowEventMap,
    handler: (event: Event) => void,
-   element?: T | HTMLElement | Window,
+   elements: T | Window | [T | Window] = window,
 ) => {
   // Create a ref that stores handler
   let savedHandler: (event: Event) => void;
-  let targetElement: T | HTMLElement | Window;
+  let targetElements: Array<T|Window>;
   
   // Create event listener that calls handler function stored in ref
   const eventListener = (event: Event) => {
@@ -31,17 +31,19 @@ const createListener = <T extends HTMLElement = HTMLDivElement>(
 
   createEffect(() => {
     // Define the listening target
-    targetElement = element || window;
-    if (!targetElement?.addEventListener) {
-      return
-    }
+    targetElements = Array.isArray(elements) ? elements : [elements];
+    
     // Update saved handler if necessary
     if (savedHandler !== handler) {
       savedHandler = handler
     }
-    targetElement.addEventListener(eventName, eventListener);
+    targetElements.map(
+      (element) => !element?.addEventListener && addEventListener(eventName, eventListener)
+    );
   });
-  onCleanup(() => targetElement.removeEventListener(eventName, eventListener));
+  onCleanup(() => targetElements.map(
+    (element) => element.removeEventListener(eventName, eventListener)
+  ));
 
 }
  
