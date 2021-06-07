@@ -30,16 +30,16 @@ const createListener = <T extends HTMLElement = HTMLDivElement>(
   }
 
   createEffect(() => {
-     // Define the listening target
-     targetElement = element || window;
-     if (!(targetElement && targetElement.addEventListener)) {
-       return
-     }
-     // Update saved handler if necessary
-     if (savedHandler !== handler) {
-       savedHandler = handler
-     }
-     targetElement.addEventListener(eventName, eventListener);
+    // Define the listening target
+    targetElement = element || window;
+    if (!targetElement?.addEventListener) {
+      return
+    }
+    // Update saved handler if necessary
+    if (savedHandler !== handler) {
+      savedHandler = handler
+    }
+    targetElement.addEventListener(eventName, eventListener);
   });
   onCleanup(() => targetElement.removeEventListener(eventName, eventListener));
 
