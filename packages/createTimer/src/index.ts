@@ -23,7 +23,6 @@ export enum Schedule {
  * return <h1>Counting up: {count()}</h1>;
  * ```
  */
-
 const createTimer = (
   callback: (...args: any[]) => void,
   delay: number | null,
