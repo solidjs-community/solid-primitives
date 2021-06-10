@@ -6,26 +6,30 @@ import { createEffect, createSignal, onCleanup } from 'solid-js';
  * Ported from https://github.com/imbhargav5/rooks/blob/main/src/hooks/useGeolocation.ts
  *
  * @param watchPosition - Specify if the location should be updated periodically
- * @param enableHighAccuracy - Enable if the locator should be very accurate
- * @param maximumAge - Maximum cached position age
- * @param timeout - Amount of time before the error callback is envoked, if 0 then never
+ * @param options - @type PositionOptions
+ * @param options.enableHighAccuracy - Enable if the locator should be very accurate
+ * @param options.maximumAge - Maximum cached position age
+ * @param options.timeout - Amount of time before the error callback is envoked, if 0 then never
  * @return Returns a location signal and one-off async query callback
  * 
  * @example
  * ```ts
  * let [location] = createGeolocation(true);
- * let [location, getLocation] = createGeolocation(true, true, 0, 100);
+ * let [location, getLocation] = createGeolocation(true, {true, 0, 100});
  * ```
  */
 const createGeolocation = (
-  watchPosition: boolean,
-  enableHighAccuracy = false,
-  maximumAge = 0,
-  timeout = Number.POSITIVE_INFINITY
+  watchPosition: boolean | (() => boolean),
+  options: PositionOptions = {},
 ): [
-  location: () => GeolocationCoordinates | null,
-  getLocation: () => Promise<GeolocationCoordinates>
-] => {
+    location: () => GeolocationCoordinates | null,
+    getLocation: () => Promise<GeolocationCoordinates>
+  ] => {
+  options = Object.assign({
+    enableHighAccuracy: false,
+    maximumAge: 0,
+    timeout: Number.POSITIVE_INFINITY
+  }, options);
   let registeredHandlerID: number | null;
   const [location, setLocation] = createSignal<GeolocationCoordinates | null>(
     null
@@ -41,11 +45,7 @@ const createGeolocation = (
             resolve(res.coords);
           },
           (error) => reject({ isError: true, message: error.message }),
-          {
-            enableHighAccuracy,
-            timeout,
-            maximumAge
-          }
+          options
         );
       } else {
         reject({
@@ -56,25 +56,24 @@ const createGeolocation = (
     });
   // Helper to clear the geolocator
   const clearGeolocator = () =>
-    navigator.geolocation.clearWatch(registeredHandlerID!);
+    registeredHandlerID && navigator.geolocation.clearWatch(registeredHandlerID);
 
   // Implement as an effect to allow switching locator on/off
   createEffect(() => {
-    if (watchPosition === true) {
+    if (
+      (typeof watchPosition === "function" && watchPosition()) ||
+      (typeof watchPosition !== "function" && watchPosition)
+    ) {
       registeredHandlerID = navigator.geolocation.watchPosition(
         (res) => setLocation(res.coords),
         () => setLocation(null), // Maybe we should throw an error as well?
-        {
-          enableHighAccuracy,
-          timeout,
-          maximumAge
-        }
+        options
       );
-    } else if (watchPosition === false && registeredHandlerID === null) {
+    } else {
       clearGeolocator();
     }
   });
-  onCleanup(() => registeredHandlerID != null && clearGeolocator());
+  onCleanup(clearGeolocator);
 
   return [location, getLocation];
 };
