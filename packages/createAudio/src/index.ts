@@ -41,18 +41,6 @@ const AudioState = Object.freeze({
   const seek = (time: number) => player.fastSeek(time);
   const setVolume = (volume: number) => (player.volume = volume);
 
-  // Handle events from the player
-  const handleLoaded = () =>
-    batch(() => {
-      setState(AudioState.READY);
-      setDuration(player.duration);
-    });
-  const handleTime = () =>
-    batch(() => {
-      setState(AudioState.PLAYING);
-      setCurrentTime(player.currentTime);
-    });
-
   // Handle option changes separtely
   createEffect(() => {
     if (typeof path === "function" && path()) {
@@ -60,16 +48,26 @@ const AudioState = Object.freeze({
     } else {
       player.src = path as string;
     }
+    batch(() => {
+      setState(AudioState.LOADING);
+      setDuration(0);
+      setCurrentTime(0);
+    });
   });
   createEffect(() => (player.volume = volume));
 
   // Bind recording events to the player
   const handlers: Array<[string, EventListener]> = [
-    ["loadeddata", handleLoaded],
+    [
+      "loadeddata", () => batch(() => {
+        setState(AudioState.READY);
+        setDuration(player.duration);
+      })
+    ],
     ["loadstart", () => setState(AudioState.LOADING)],
     ["playing", () => setState(AudioState.PLAYING)],
     ["pause", () => setState(AudioState.PAUSED)],
-    ["timeupdate", handleTime]
+    ["timeupdate", () => setCurrentTime(player.currentTime)]
   ];
   onMount(() =>
     handlers.forEach(([evt, handler]) => player.addEventListener(evt, handler))
