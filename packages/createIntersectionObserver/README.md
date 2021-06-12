@@ -1,6 +1,6 @@
-# solid-create-timer
+# solid-create-intersection-observer
 
-A timer wrapper to handle setTimeouot and setInterval.
+Creates a helper to manage IntersectionObserver.
 
 ## How to use it
 

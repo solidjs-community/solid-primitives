@@ -1,6 +1,6 @@
-# solid-create-geolocation
+# solid-create-worker
 
-Primitive to manage geolocation requests.
+Primitive to create a worker helper.
 
 ## How to use it
 
