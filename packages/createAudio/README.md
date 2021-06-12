@@ -1,12 +1,12 @@
-# solid-create-geolocation
+# solid-create-audio
 
-Primitive to manage geolocation requests.
+Primitive to manage audio and sound.
 
 ## How to use it
 
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-create-geolocation-fhzu4?file=/src/index.tsx
+You may view a working example here: https://codesandbox.io/s/solid-create-audio-6wc4c?file=/src/index.tsx
 
 ## Changelog
 
