@@ -17,7 +17,13 @@ import { createComputed, createSignal, onCleanup } from "solid-js";
  * ```
  */
 
-export const createGeolocationQuery = (options: PositionOptions = {}) => {
+export const createGeolocationQuery = (
+  options: PositionOptions = {}
+): {
+  location: () => GeolocationCoordinates|null,
+  getLocation: () => Promise<GeolocationCoordinates>
+} => {
+  const [location, setLocation] = createSignal<GeolocationCoordinates|null>(null);
   options = Object.assign(
     {
       enableHighAccuracy: false,
@@ -31,6 +37,7 @@ export const createGeolocationQuery = (options: PositionOptions = {}) => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (res) => {
+            setLocation(res.coords);
             resolve(res.coords);
           },
           (error) => reject({ isError: true, message: error.message }),
@@ -43,7 +50,7 @@ export const createGeolocationQuery = (options: PositionOptions = {}) => {
         });
       }
     });
-  return getLocation;
+  return { getLocation, location };
 };
 
 /**
@@ -67,7 +74,7 @@ export const createGeolocationQuery = (options: PositionOptions = {}) => {
 export const createGeolocationWatcher = (
   watchPosition: boolean | (() => boolean) = true,
   options: PositionOptions = {}
-) => {
+): () => GeolocationCoordinates | null => {
   options = Object.assign(
     {
       enableHighAccuracy: false,

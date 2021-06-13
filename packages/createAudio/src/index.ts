@@ -22,7 +22,11 @@ export const createBaseAudio = (
   path: string | (() => string),
   handlers: Array<[string, EventListener]>,
   audioEngine?: typeof Audio
-) => {
+): {
+  player: HTMLAudioElement,
+  state: () => AudioState,
+  setState: (state: AudioState) => void
+} => {
   let player: HTMLAudioElement = new (audioEngine || Audio)();
   const [state, setState] = createSignal<AudioState>(AudioState.LOADING);
   // Handle option changes separately
@@ -60,7 +64,9 @@ export const createBaseAudio = (
  * const [start, pause] = createAudio('./example1.mp3);
  * ```
  */
-export const createAudio = (path: string | (() => string)) => {
+export const createAudio = (path: string | (() => string)): {
+  play: () => void, pause: () => void, state: () => AudioState
+} => {
   const { player, state, setState } = createBaseAudio(path, [
     ["loadeddata", () => batch(() => setState(AudioState.READY))],
     ["loadstart", () => setState(AudioState.LOADING)],
@@ -96,7 +102,15 @@ export const createAudio = (path: string | (() => string)) => {
 export const createAudioManager = (
   path: string | (() => string),
   volume: number = 1
-) => {
+): {
+  play: () => void,
+  pause: () => void,
+  state: () => AudioState,
+  currentTime: () => number,
+  duration: () => number,
+  setVolume: (volume: number) => void,
+  seek: (position: number) => void
+} => {
   const [currentTime, setCurrentTime] = createSignal<number>(0);
   const [duration, setDuration] = createSignal<number>(0);
   // Bind recording events to the player
