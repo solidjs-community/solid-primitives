@@ -11,13 +11,13 @@ The primitives are easily composable and extended. To create your own audio elem
 ## How to use it
 
 ```ts
-const [play, pause] = createAudio('example.js')
+const { play, pause } = createAudio('example.js')
 ```
 
 or
 
 ```ts
-const [play, duration, currentTime, seek, setVolume, pause] =
+const { play, duration, currentTime, seek, setVolume, pause } =
     createAudioManager('example.js')
 ```
 

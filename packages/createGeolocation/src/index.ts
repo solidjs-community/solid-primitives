@@ -17,7 +17,7 @@ import { createComputed, createSignal, onCleanup } from "solid-js";
  * ```
  */
 
-export const createGeolocationQuery = (
+export const createGeolocation = (
   options: PositionOptions = {}
 ): {
   location: () => GeolocationCoordinates|null,

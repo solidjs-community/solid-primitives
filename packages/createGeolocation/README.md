@@ -1,8 +1,21 @@
 # solid-create-geolocation
 
-Primitive to manage geolocation requests.
+Primitive to manage geolocation requests. Geolocation is segmented into two primitives.
+
+`createGeolocation` - Used as a one-off geolocation query and storage utility.
+`createGeolocationWatcher` - Creates a watcher and updates a signal with the latest geolocation values.
 
 ## How to use it
+
+```ts
+const { location, getLocation } = createGeolocation()
+```
+
+or
+
+```ts
+const location = createGeolocation()
+```
 
 ## Demo
 
