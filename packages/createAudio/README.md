@@ -1,8 +1,25 @@
 # solid-create-audio
 
-Primitive to manage audio and sound.
+Primitive to manage audio playback in the browser. This primitive is comprised of three composed primitives:
+
+`createBaseAudio` - Provides a very basic interface for wrapping listeners to a supplied or default audio player.
+`createAudio` - Creates a very basic audio/sound player.
+`createAudioManager` - Creates a full featured audio manager.
+
+The primitives are easily composable and extended. To create your own audio element, consider using createBaseAudio which allows you to supply a player instance that matches the built-in standard Audio API.
 
 ## How to use it
+
+```ts
+const [play, pause] = createAudio('example.js')
+```
+
+or
+
+```ts
+const [play, duration, currentTime, seek, setVolume, pause] =
+    createAudioManager('example.js')
+```
 
 ## Demo
 
