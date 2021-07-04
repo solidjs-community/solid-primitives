@@ -16,7 +16,6 @@ import { createComputed, createSignal, onCleanup } from "solid-js";
  * const getLocation = createGeolocation({true, 0, 100});
  * ```
  */
-
 export const createGeolocation = (
   options: PositionOptions = {}
 ): {

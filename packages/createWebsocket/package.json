@@ -1,0 +1,29 @@
+{
+  "name": "solid-create-worker",
+  "version": "1.0.0",
+  "description": "Primitive to create a worker helper",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "license": "MIT",
+  "typings": "dist/index.d.ts",
+  "scripts": {},
+  "keywords": [
+    "worker",
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "@types/jest": "^26.0.10",
+    "prettier": "^2.0.5",
+    "tslib": "^2.0.1",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "solid-js": "^0.26.5",
+    "solid-testing-library": "^0.1.2"
+  },
+  "jest": {
+    "setupFiles": [
+      "./test/setup.ts"
+    ]
+  }
+}

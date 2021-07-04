@@ -1,4 +1,4 @@
-import { createEffect, onCleanup } from 'solid-js';
+import { onMount, onCleanup } from "solid-js";
 
 /**
  * Create event listenere is a helper primitiive for binding events.
@@ -6,45 +6,36 @@ import { createEffect, onCleanup } from 'solid-js';
  * @param eventName - Event name to bind to
  * @param handler - Function handler to trigger
  * @param element - HTML element to bind the event to
- * 
+ *
  * @example
  * ```ts
  * createEventListener("mouseDown", () => console.log("Click"), document.getElementById("mybutton"))
  * ```
  */
-const createListener = <T extends HTMLElement = HTMLDivElement>(
-   eventName: keyof WindowEventMap,
-   handler: (event: Event) => void,
-   elements: T | Window | [T | Window] = window,
+const createEventListener = <T extends HTMLElement = HTMLDivElement>(
+  eventName: keyof WindowEventMap,
+  handler: (event: Event) => void,
+  targets: T | Window | [T | Window] = window
 ) => {
   // Create a ref that stores handler
-  let savedHandler: (event: Event) => void;
-  let targetElements: Array<T|Window>;
-  
-  // Create event listener that calls handler function stored in ref
-  const eventListener = (event: Event) => {
-    // eslint-disable-next-line no-extra-boolean-cast
-    if (!!savedHandler) {
-      savedHandler(event)
-    }
-  }
+  let targetElements: Array<T | Window> = Array.isArray(targets)
+    ? targets
+    : [targets];
 
-  createEffect(() => {
-    // Define the listening target
-    targetElements = Array.isArray(elements) ? elements : [elements];
-    
-    // Update saved handler if necessary
-    if (savedHandler !== handler) {
-      savedHandler = handler
-    }
+  // Define the listening target
+  onMount(() =>
     targetElements.map(
-      (element) => !element?.addEventListener && addEventListener(eventName, eventListener)
-    );
-  });
-  onCleanup(() => targetElements.map(
-    (element) => element.removeEventListener(eventName, eventListener)
-  ));
+      (target) =>
+        target?.addEventListener && target?.addEventListener(eventName, handler)
+    )
+  );
+  onCleanup(() =>
+    targetElements.map(
+      (target) =>
+        target?.addEventListener &&
+        target?.removeEventListener(eventName, handler)
+    )
+  );
+};
 
-}
- 
-export default createListener;
+export default createEventListener;

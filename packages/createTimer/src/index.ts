@@ -30,7 +30,7 @@ const createTimer = (
 ): Function => {
   let savedCallback: TimerHandler;
   let intervalId: ReturnType<typeof setTimeout>;
-  const endInterval = () => clearInterval(intervalId);
+  const endTimer = () => clearInterval(intervalId);
   const scheduler =
     typeof schedule === "function"
       ? schedule
@@ -45,13 +45,13 @@ const createTimer = (
   createEffect(() => {
     const handler = (...args: any[]) => savedCallback(...args);
     if (delay !== null) {
-      endInterval();
+      endTimer();
       intervalId = scheduler(handler, delay);
     }
   });
-  onCleanup(() => endInterval);
+  onCleanup(() => endTimer);
 
-  return endInterval;
+  return endTimer;
 };
 
 export default createTimer;

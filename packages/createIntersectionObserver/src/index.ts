@@ -1,45 +1,101 @@
-import { createEffect, createSignal, onCleanup } from 'solid-js'
+import { onMount, onCleanup } from 'solid-js';
 
 /**
- * Primitive for wrapping Intersection Observer.
+ * Creates a very basic Intersection Observer.
  *
- * @param elementRef - Element that should be targetted
- * @param threshold - Indicates at what percentage of the target's visibility the observer's callback should be executed
- * @param root - Root element to target
- * @param rootMargin - Margin around the root. Can have values similar to the CSS margin property
- * @param freezeOnceVisible - Deterines to freeze the observer
- * 
+ * @param elements - A list of elements to watch
+ * @param onChange - An event handler that returns an array of observer entires
+ * @param threshold - Threshold of when to detect above a particular point
+ * @param root - Root element used as viewport for checking visibility
+ * @param rootMarigin - Root margin around theoot
+ *
  * @example
  * ```ts
- * createIntersectionObserver(document.getElementById("mydiv"))
+ * const [ add, remove, start, stop ] = createIntersectionObserver(els);
  * ```
  */
-const createIntersectionObserver = (
-  elementRef: HTMLElement,
+export const createIntersectionObserver = (
+  elements: Array<HTMLElement>,
+  onChange: (entries: Array<IntersectionObserverEntry>) => void,
+  threshold: number = 0,
+  root: Element | null = null,
+  rootMargin: string = '0%',
+): [
+  add: (el: HTMLElement) => void,
+  remove: (el: HTMLElement) => void,
+  start: () => void,
+  stop: () => void,
+  observer: IntersectionObserver
+] => {
+  // If not supported, skip
+  const observer = new IntersectionObserver(
+    onChange,
+    { threshold, root, rootMargin }
+  );
+  const add = (el: Element) => observer.observe(el);
+  const remove = (el: Element) => observer.unobserve(el);
+  const start = () => elements.forEach((el) => add(el));
+  const stop = () => observer.takeRecords().forEach(
+    (entry) => remove(entry.target)
+  );
+  onMount(start);
+  onCleanup(stop);
+  return [
+    add,
+    remove,
+    start,
+    stop,
+    observer
+  ];
+};
+
+type SetEntry = (
+  v: IntersectionObserverEntry | ((prev: IntersectionObserverEntry
+) => IntersectionObserverEntry)) => IntersectionObserverEntry;
+
+/**
+ * Creates a more advanced viewport observer for complex tracking.
+ *
+ * @param elements - A list of elements to watch
+ * @param threshold - Threshold of when to detect above a particular point
+ * @param root - Root element used as viewport for checking visibility
+ * @param rootMarigin - Root margin around theoot
+ *
+ * @example
+ * ```ts
+ * const [ add, remove, start, stop ] = createIntersectionObserver(els);
+ * ```
+ */
+export const createViewportObserver = (
+  elements: Array<HTMLElement>,
   threshold: number = 0,
   root: HTMLElement | null = null,
   rootMargin: string = '0%',
-  freezeOnceVisible = false,
-): () => IntersectionObserverEntry | undefined => {
-  let observer: IntersectionObserver;
-  const [entry, setEntry] = createSignal<IntersectionObserverEntry>();
-  const updateEntry = ([entry]: IntersectionObserverEntry[]): void => {
-    setEntry(entry)
-  }
-
-  // Bind and then release the observer
-  createEffect(() => {
-    const node = elementRef;
-    const frozen = entry()?.isIntersecting && freezeOnceVisible;
-    const canUse = globalThis.IntersectionObserver
-    if (!canUse || frozen || !node) return
-    const observerParams = { threshold, root, rootMargin }
-    observer = new IntersectionObserver(updateEntry, observerParams)
-    observer.observe(node);
-    onCleanup(() => observer.disconnect());
-  });
-
-  return entry;
-}
-
-export default createIntersectionObserver;
+): [
+  addEntry: (el: HTMLElement, setter: SetEntry) => void,
+  removeEntry: (el: HTMLElement) => void,
+  start: () => void,
+  stop: () => void,
+] => {
+  const setterStore = new Map<Element, SetEntry>();
+  const onChange = (entries: Array<IntersectionObserverEntry>) => entries.forEach(
+    (entry) => setterStore.get(entry.target)!(() => entry)
+  );
+  const [add, remove, start, stop] = createIntersectionObserver(
+    elements,
+    onChange,
+    threshold,
+    root,
+    rootMargin
+  );
+  const addEntry = (el: HTMLElement, setter: SetEntry): void => {
+    add(el);
+    setterStore.set(el, setter);
+  };
+  const removeEntry = (el: HTMLElement) => {
+    setterStore.delete(el);
+    remove(el);
+  };
+  onMount(start)
+  return [addEntry, removeEntry, start, stop];
+};
