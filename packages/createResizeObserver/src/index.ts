@@ -8,11 +8,11 @@ type ObservedSize = {
 type ResizeHandler = (size: ObservedSize, ref: Element) => void;
 
 /**
- * Create event listenere is a helper primitiive for binding events.
+ * Create resize observer is a helper primitive for binding resize events.
  *
  * @param opts.refs - Either an `HTMLElement`, an array of `HTMLElement`s, or a signal returning one of these.
  * @param opts.onResize - Function handler to trigger on resize
- * @return A callback that can be used to add refs to observe
+ * @return A callback that can be used to add refs to observe resizing
  *
  */
 function createResizeObserver<T extends HTMLElement>(
