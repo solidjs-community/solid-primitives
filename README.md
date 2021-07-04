@@ -4,7 +4,7 @@
 
 # Solid Primitives
 
-This is a monorepo containing high-quality, community contributed Solid primitives. All primitives include well tested and continuously updated and managed primitive types. Every contribution to the repository is checked for quality and maintained by the highest degree of excellence.
+This is a monorepo containing high-quality, community contributed Solid primitives. All primitives are well tested and continuously updated and managed. Every contribution to the repository is checked for quality and maintained by the highest degree of excellence. The ultimate goal is to provide a properly reactive layer for browser APIs and common helpers.
 
 ## Philosophy
 
@@ -14,7 +14,7 @@ ie. Consider covalent bonds that share electron pairs between atoms. Primitives 
 
 Ultimately the more rooted these primitives are within Solid's the smaller (aggregate tree-shaking benefits), more concise (readability) and stable (consistent and managed testing + maintenance) applications can be.
 
-## Quality Design Rules
+## Design Maxims
 
 All Solid Primitive packages follow a single consistency and promise. We guarentee that each is created with the utmost care, providing primitivates that are:
 
@@ -25,7 +25,7 @@ All Solid Primitive packages follow a single consistency and promise. We guarent
 5. As few, if none, dependencies as possible
 6. SSR safe entries provided
 
-## Composable vs. Segmented Primitives
+## Compound vs. Isolated Primitives
 
 Each primitive is designed with composition or segmentation in mind. To align with the goal of being small and concise a major rule to designing our primitives is deciding if the interface for primitives should be: composable or segmented. For this reason every API is intricately studied and considered to be composed (stacked with features) or composed into smaller units.
 
