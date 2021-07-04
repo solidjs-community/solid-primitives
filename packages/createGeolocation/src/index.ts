@@ -1,5 +1,11 @@
-import { createComputed, createSignal, onCleanup } from "solid-js";
-
+import {
+  createComputed,
+  createSignal,
+  onCleanup,
+  createResource,
+} from "solid-js";
+import type { Resource } from "solid-js";
+export declare type LocationResourceReturn<T> = [Resource<T>, () => void];
 /**
  * Provides a function for querying the current geolocation in browser.
  * Ported from https://github.com/imbhargav5/rooks/blob/main/src/hooks/useGeolocation.ts
@@ -8,21 +14,17 @@ import { createComputed, createSignal, onCleanup } from "solid-js";
  * @param options.enableHighAccuracy - Enable if the locator should be very accurate
  * @param options.maximumAge - Maximum cached position age
  * @param options.timeout - Amount of time before the error callback is envoked, if 0 then never
- * @return Returns a one-off async query callback
+ * @return Returns a tuple containing a `Resource` resolving to the location coordinates, and a refetch function
  *
  * @example
  * ```ts
- * const getLocation = createGeolocation(true);
- * const getLocation = createGeolocation({true, 0, 100});
+ * const [location, getLocation] = createGeolocation();
+ * const [location] = createGeolocation({true, 0, 100});
  * ```
  */
 export const createGeolocation = (
   options: PositionOptions = {}
-): {
-  location: () => GeolocationCoordinates|null,
-  getLocation: () => Promise<GeolocationCoordinates>
-} => {
-  const [location, setLocation] = createSignal<GeolocationCoordinates|null>(null);
+): LocationResourceReturn<GeolocationCoordinates> => {
   options = Object.assign(
     {
       enableHighAccuracy: false,
@@ -31,25 +33,26 @@ export const createGeolocation = (
     },
     options
   );
-  const getLocation = (): Promise<GeolocationCoordinates> =>
-    new Promise((resolve, reject) => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (res) => {
-            setLocation(res.coords);
-            resolve(res.coords);
-          },
-          (error) => reject({ isError: true, message: error.message }),
-          options
-        );
-      } else {
-        reject({
-          isError: true,
-          message: "Geolocation is not supported for this Browser/OS.",
-        });
-      }
-    });
-  return { getLocation, location };
+  const [resource, { refetch }] = createResource(
+    () =>
+      new Promise<GeolocationCoordinates>((resolve, reject) => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (res) => {
+              resolve(res.coords);
+            },
+            (error) => reject({ isError: true, message: error.message }),
+            options
+          );
+        } else {
+          reject({
+            isError: true,
+            message: "Geolocation is not supported for this Browser/OS.",
+          });
+        }
+      })
+  );
+  return [resource, refetch];
 };
 
 /**
@@ -73,7 +76,7 @@ export const createGeolocation = (
 export const createGeolocationWatcher = (
   watchPosition: boolean | (() => boolean) = true,
   options: PositionOptions = {}
-): () => GeolocationCoordinates | null => {
+): (() => GeolocationCoordinates | null) => {
   options = Object.assign(
     {
       enableHighAccuracy: false,
