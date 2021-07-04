@@ -10,7 +10,9 @@ This is a monorepo containing high-quality, community contributed Solid primitiv
 
 The goal of Solid Primitive is to be an official aggregation of primitive utilities. Each primitive is designed to act as a building block or keystone, the goal being to DRY up logic so that apps built within the Solid ecosystem don't have to depend on dispersed and highly decentralised logic.
 
-ie. This is similar to covalent bonds which share electron pairs between atoms. Primitives are similar in the sense that there's an optimal orchestration of atoms that create increasing complex compounds. Our philosophy is to define a base set of atoms that naturally create covalent properties and efficiencies in systemic logic.
+ie. Consider covalent bonds that share electron pairs between atoms. Primitives are similar in the sense that there's an optimal and natural orchestration of structure that create increasingly complex compounded logic. Our philosophy is to define a base set of atoms that naturally create covalent properties and efficiencies in systemic logic.
+
+Ultimately the more rooted these primitives are within Solid's the smaller (aggregate tree-shaking benefits), more concise (readability) and stable (consistent and managed testing + maintenance) applications can be.
 
 ## Quality Design Rules
 
