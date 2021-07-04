@@ -17,24 +17,16 @@ const createEventListener = <T extends HTMLElement = HTMLDivElement>(
   handler: (event: Event) => void,
   targets: T | Window | [T | Window] = window
 ) => {
-  // Create a ref that stores handler
-  let targetElements: Array<T | Window> = Array.isArray(targets)
-    ? targets
-    : [targets];
+  const add = (target: T | Window | [T | Window]): void =>
+    target.addEventListener && target.addEventListener(eventName, handler);
+  const remove = (target: T | Window | [T | Window]): void =>
+    target.removeEventListener &&
+    target.removeEventListener(eventName, handler);
 
   // Define the listening target
-  onMount(() =>
-    targetElements.map(
-      (target) =>
-        target?.addEventListener && target?.addEventListener(eventName, handler)
-    )
-  );
+  onMount(() => (Array.isArray(targets) ? targets.forEach(add) : add(targets)));
   onCleanup(() =>
-    targetElements.map(
-      (target) =>
-        target?.addEventListener &&
-        target?.removeEventListener(eventName, handler)
-    )
+    Array.isArray(targets) ? targets.forEach(remove) : remove(targets)
   );
 };
 
