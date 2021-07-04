@@ -6,6 +6,12 @@
 
 This is a monorepo containing high-quality, community contributed Solid primitives. All primitives include well tested and continuously updated and managed primitive types. Every contribution to the repository is checked for quality and maintained by the highest degree of excellence.
 
+## Philosophy
+
+The goal of Solid Primitive is to be an official aggregation of primitive utilities. Each primitive is designed to act as a building block or keystone, the goal being to DRY up logic so that apps built within the Solid ecosystem don't have to depend on dispersed and highly decentralised logic.
+
+ie. This is similar to covalent bonds which share electron pairs between atoms. Primitives are similar in the sense that there's an optimal orchestration of atoms that create increasing complex compounds. Our philosophy is to define a base set of atoms that naturally create covalent properties and efficiencies in systemic logic.
+
 ## Quality Design Rules
 
 All Solid Primitive packages follow a single consistency and promise. We guarentee that each is created with the utmost care, providing primitivates that are:
@@ -34,3 +40,10 @@ Designing our primitives in this manner allows for better tree shaking. Why ship
 -   createGeolocation
 -   createWorker
 -   createListener
+
+## Upcoming Primitives
+
+-   createMediaQuery
+-   createRAF
+-   createThrottle
+-   createHistory
