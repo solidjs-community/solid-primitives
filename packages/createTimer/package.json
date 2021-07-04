@@ -15,12 +15,12 @@
   "devDependencies": {
     "@types/jest": "^26.0.10",
     "prettier": "^2.0.5",
+    "solid-testing-library": "^0.2.0",
     "tslib": "^2.0.1",
     "typescript": "^4.0.2"
   },
   "dependencies": {
-    "solid-js": "^0.26.5",
-    "solid-testing-library": "^0.1.2"
+    "solid-js": "^1.0.0"
   },
   "jest": {
     "setupFiles": [
