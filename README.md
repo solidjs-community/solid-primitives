@@ -25,8 +25,12 @@ Designing our primitives in this manner allows for better tree shaking. Why ship
 
 ## Current Primitives
 
-- createStorage
-- createIntersectionObserver
-- createTimer
-- createGeolocation
-- createWorker
+-   createAudio
+-   createStorage
+-   createIntersectionObserver
+-   createResizeObserver
+-   createWebsocket
+-   createTimer
+-   createGeolocation
+-   createWorker
+-   createListener
