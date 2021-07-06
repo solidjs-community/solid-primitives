@@ -6,12 +6,6 @@
 
 A project to aggregate and develop high-quality, community contributed Solid primitives, components and directives. All utilities are well tested and continuously maintained. Every contribution to the repository is checked for quality and maintained by the highest degree of excellence. The ultimate goal is to provide a properly reactive layer for browser APIs and common helpers.
 
-## Install
-
-```bash
-> npm i solid-compounds/primitives # or yarn or pnpm
-```
-
 ## Philosophy
 
 The goal of Solid Compounds is to be an official aggregation of utilities that wrap core logic on the client and server. Each primitive is designed to act as a building block or keystone, the goal being to DRY up source as much as possible and fit together logic as a compact system of parts.
