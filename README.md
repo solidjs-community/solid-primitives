@@ -2,21 +2,35 @@
   <img width="75px" src="https://raw.githubusercontent.com/solidjs/solid-site/dev/src/assets/logo.png" alt="Solid logo">
 </p>
 
-# Solid Primitives
+# Solid Compounds
 
-This is a monorepo containing high-quality, community contributed Solid primitives. All primitives are well tested and continuously updated and managed. Every contribution to the repository is checked for quality and maintained by the highest degree of excellence. The ultimate goal is to provide a properly reactive layer for browser APIs and common helpers.
+A project to aggregate and develop high-quality, community contributed Solid primitives, components and directives. All utilities are well tested and continuously maintained. Every contribution to the repository is checked for quality and maintained by the highest degree of excellence. The ultimate goal is to provide a properly reactive layer for browser APIs and common helpers.
+
+## Install
+
+```bash
+> npm i solid-compounds/primitives # or yarn or pnpm
+```
 
 ## Philosophy
 
-The goal of Solid Primitive is to be an official aggregation of primitive utilities. Each primitive is designed to act as a building block or keystone, the goal being to DRY up logic so that apps built within the Solid ecosystem don't have to depend on dispersed and highly decentralised logic.
+The goal of Solid Compounds is to be an official aggregation of utilities that wrap core logic on the client and server. Each primitive is designed to act as a building block or keystone, the goal being to DRY up source as much as possible and fit together logic as a compact system of parts.
 
-ie. Consider covalent bonds that share electron pairs between atoms. Primitives are similar in the sense that there's an optimal and natural orchestration of structure that create increasingly complex compounded logic. Our philosophy is to define a base set of atoms that naturally create covalent properties and efficiencies in systemic logic.
+ie. Consider covalent bonds that share electron pairs between atoms. Primitives are similar in the sense that there's an optimal and natural orchestration of structure that create increasingly complex compounded logic. Our philosophy is to define a base set of atoms that naturally create covalent properties and efficiencies in layered and complex UIs.
 
-Ultimately the more rooted these primitives are within Solid's the smaller (aggregate tree-shaking benefits), more concise (readability) and stable (consistent and managed testing + maintenance) applications can be.
+Ultimately the more rooted these primitives are, the better they act as foundation within Solid's base ecosystem. With well built and re-used foundations, the smaller (aggregate tree-shaking benefits), more concise (readability) and stable (consistent and managed testing + maintenance) applications can be overall.
+
+## A Rallying Call
+
+Other frameworks have large and extremely well established ecosystems. Notably React which has a vast array of component and hooks. The amount of choice within the ecosystem is great but often these tools are built as one-offs resulting in often un-tested logic or are designed with narrow needs. Over time the less concise these building blocks are the more they tend to repeat themselves.
+
+Our goal with Compounds is to bring the community together to contribute, evolve and use a base set of foundations in their work. The more we work together, the stronger and richer of an ecosystem we can build and the more we all benefit.
+
+We aren't trying to replace the ecosystem of React and other libraries with a monosolution, but merely offer a consistent and tightly defined set of tools. A community ecosystem will and should continue offering alternatives to expand a users choice. It's this fine balance we as maintainers of Compounds need to juggle.
 
 ## Design Maxims
 
-All Solid Primitive packages follow a single consistency and promise. We guarentee that each is created with the utmost care, providing primitivates that are:
+All Compounds packages follow a single consistency and promise. We guarentee that each is created with the utmost care, providing primitivates that are:
 
 1. Documented and follow a consistent style guide
 2. Are well tested
@@ -24,14 +38,15 @@ All Solid Primitive packages follow a single consistency and promise. We guarent
 4. A single primitive for a single purpose
 5. As few, if none, dependencies as possible
 6. SSR safe entries provided
+7. Wrap base level Browser APIs in a rational and future-ready way
 
-## Compound vs. Isolated Primitives
+## Compounded vs. Isolated Primitives
 
 Each primitive is designed with composition or segmentation in mind. To align with the goal of being small and concise a major rule to designing our primitives is deciding if the interface for primitives should be: composable or segmented. For this reason every API is intricately studied and considered to be composed (stacked with features) or composed into smaller units.
 
-Designing our primitives in this manner allows for better tree shaking. Why ship a createStorage primitive with a storage listener when you can easily augment the base storage mechanic with listener rider.
+Designing our primitives in this manner allows for better tree shaking and very layering complexity as needed. Only ship what you have to by picking from existing primitives as your foundational building blocks.
 
-## Current Primitives
+## Primitives
 
 -   createAudio
 -   createStorage
@@ -42,10 +57,15 @@ Designing our primitives in this manner allows for better tree shaking. Why ship
 -   createGeolocation
 -   createWorker
 -   createListener
+-   createMediaQuery [in progress]
+-   createRAF [in progress]
+-   createThrottle [in progress]
+-   createHistory [in progress]
 
-## Upcoming Primitives
+## Directives
 
--   createMediaQuery
--   createRAF
--   createThrottle
--   createHistory
+We're working on designing our directives library.
+
+## Components
+
+We're working on building out our components library.

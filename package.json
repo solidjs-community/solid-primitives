@@ -1,10 +1,10 @@
 {
-  "name": "solid-primitives",
-  "version": "0.26.0",
-  "description": "A collection of high-quality, community contributed primitives.",
+  "name": "solid-compounds",
+  "version": "0.50.0",
+  "description": "A collection of high-quality, community contributed building blocks.",
   "main": "index.ts",
-  "repository": "https://davedbase@github.com/davedbase/solid-primitives.git",
-  "author": "David Di Biase <david@pilotinterative.ca>",
+  "repository": "https://davedbase@github.com/davedbase/solid-compounds.git",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "solid-js": "^1.0.0"
