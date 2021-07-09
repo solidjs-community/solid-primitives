@@ -1,5 +1,5 @@
 {
-  "name": "solid-create-worker",
+  "name": "@solid-primitives/worker",
   "version": "1.0.0",
   "description": "Primitive to create a worker helper",
   "author": "David Di Biase <dave.dibiase@gmail.com>",

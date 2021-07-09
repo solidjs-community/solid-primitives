@@ -1,6 +1,8 @@
-# solid-create-worker
+# @solid-primitives/websocket
 
-Primitive to create a worker helper.
+Primitive to help establish, maintain and operate a websocket connection.
+
+`createWebsocket` - Core primitive that setups up a basic outbound connection.
 
 ## How to use it
 

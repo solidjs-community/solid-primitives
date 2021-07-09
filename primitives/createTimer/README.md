@@ -1,6 +1,8 @@
-# solid-create-timer
+# @solid-primitives/timer
 
-A timer wrapper to handle setTimeouot and setInterval.
+A timer wrapper to handle setTimeout and setInterval.
+
+`createTimer` - A single timer that can handle timeouts and intervals.
 
 ## How to use it
 

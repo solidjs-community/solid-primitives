@@ -1,22 +1,21 @@
 {
-  "name": "@solid-primitives/resize-observer",
+  "name": "@solid-primitives/cookies",
   "version": "1.0.0",
-  "description": "Primitive to setup browser storage",
-  "author": "Moshe Udimar",
+  "description": "Primitive that manages browser cookies",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "typings": "dist/index.d.ts",
   "scripts": {},
   "keywords": [
-    "resize",
-    "observer",
+    "cookies",
     "solid",
     "primitives"
   ],
   "devDependencies": {
     "@types/jest": "^26.0.10",
     "prettier": "^2.0.5",
-    "typescript": "^4.0.2",
-    "solid-testing-library": "^0.2.0"
+    "solid-testing-library": "^0.2.0",
+    "typescript": "^4.0.2"
   },
   "dependencies": {
     "solid-js": "^1.0.0"

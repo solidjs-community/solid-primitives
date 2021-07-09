@@ -1,9 +1,9 @@
 {
-  "name": "solid-compounds",
+  "name": "solid-primitives",
   "version": "0.50.0",
   "description": "A collection of high-quality, community contributed building blocks.",
   "main": "index.ts",
-  "repository": "https://davedbase@github.com/davedbase/solid-compounds.git",
+  "repository": "https://davedbase@github.com/davedbase/solid-primitives.git",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "dependencies": {

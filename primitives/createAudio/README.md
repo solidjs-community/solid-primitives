@@ -1,4 +1,4 @@
-# solid-create-audio
+# @solid-primitives/audio
 
 Primitive to manage audio playback in the browser. This primitive is comprised of three composed primitives:
 

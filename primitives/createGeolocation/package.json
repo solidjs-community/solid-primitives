@@ -1,5 +1,5 @@
 {
-  "name": "solid-create-geolocation",
+  "name": "@solid-primitives/geolocation",
   "version": "1.0.0",
   "description": "Primitive to manage geolocation requests",
   "author": "David Di Biase <dave.dibiase@gmail.com>",

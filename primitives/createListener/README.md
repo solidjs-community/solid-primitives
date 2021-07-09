@@ -1,6 +1,8 @@
-# solid-create-listener
+# @solid-primitives/event-listener
 
-A helpful event listener primitive.
+A helpful event listener primitive that binds window and any element supplied.
+
+`createEventListener` - Very basic and straightforward primitive that handles multiple elements according to a single event binding.
 
 ## How to use it
 

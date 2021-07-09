@@ -1,5 +1,5 @@
 {
-  "name": "solid-create-timer",
+  "name": "@solid-primitives/intersection-observer",
   "version": "1.0.0",
   "description": "Primitive to create an timer (interval or timeout)",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
@@ -7,8 +7,8 @@
   "typings": "dist/index.d.ts",
   "scripts": {},
   "keywords": [
-    "setInterval",
-    "setTimeout",
+    "intersection",
+    "observer",
     "solid",
     "primitives"
   ],

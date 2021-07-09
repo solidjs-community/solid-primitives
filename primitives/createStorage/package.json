@@ -1,5 +1,5 @@
 {
-  "name": "solid-create-localstorage",
+  "name": "@solid-primitives/storage",
   "version": "1.0.0",
   "description": "Primitive to setup browser storage",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
@@ -8,6 +8,10 @@
   "scripts": {},
   "keywords": [
     "localStorage",
+    "sessionStorage",
+    "storage",
+    "local",
+    "session",
     "solid",
     "primitives"
   ],

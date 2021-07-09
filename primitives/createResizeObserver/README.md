@@ -1,6 +1,8 @@
-# solid-create-storage
+# solid-primitives/resize-observer
 
-Creates a genereal storage handler for LocalStorage, SessionStorage and your own engine.
+Provides a reactive resize observer wrapper.
+
+`createResizeObserver` - Main resize observer primitive.
 
 ## How to use it
 

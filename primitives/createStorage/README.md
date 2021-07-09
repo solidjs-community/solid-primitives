@@ -1,6 +1,12 @@
-# solid-create-storage
+# @solid-primitives/storage
 
-Creates a genereal storage handler for LocalStorage, SessionStorage and your own engine.
+Creates a general storage handler for LocalStorage, SessionStorage and your own engine.
+
+`createStorage` - A single primitive can handle localStorage and localSession.
+
+## Proposed Additions
+
+`createStorageWatcher` - A primitive that watches for changes in the storage facility.
 
 ## How to use it
 

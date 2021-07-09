@@ -1,6 +1,6 @@
-# solid-create-worker
+# @solid-primitives/worker
 
-Primitive to create a worker helper.
+Primitive to create a worker helper with very basic functionality to complex support facilities.
 
 ## How to use it
 

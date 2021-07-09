@@ -1,4 +1,4 @@
-# solid-create-geolocation
+# @solid-primitives/geolocation
 
 Primitive to manage geolocation requests. Geolocation is segmented into two primitives.
 

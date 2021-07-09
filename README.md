@@ -2,13 +2,13 @@
   <img width="75px" src="https://raw.githubusercontent.com/solidjs/solid-site/dev/src/assets/logo.png" alt="Solid logo">
 </p>
 
-# Solid Compounds
+# Solid Primitives
 
 A project to aggregate and develop high-quality, community contributed Solid primitives, components and directives. All utilities are well tested and continuously maintained. Every contribution to the repository is checked for quality and maintained by the highest degree of excellence. The ultimate goal is to provide a properly reactive layer for browser APIs and common helpers.
 
 ## Philosophy
 
-The goal of Solid Compounds is to be an official aggregation of utilities that wrap core logic on the client and server. Each primitive is designed to act as a building block or keystone, the goal being to DRY up source as much as possible and fit together logic as a compact system of parts.
+The goal of Solid Primitives is to be an official aggregation of utilities that wrap core logic on the client and server. Each primitive is designed to act as a building block or keystone, the goal being to DRY up source as much as possible and fit together logic as a compact system of parts.
 
 ie. Consider covalent bonds that share electron pairs between atoms. Primitives are similar in the sense that there's an optimal and natural orchestration of structure that create increasingly complex compounded logic. Our philosophy is to define a base set of atoms that naturally create covalent properties and efficiencies in layered and complex UIs.
 
@@ -18,21 +18,26 @@ Ultimately the more rooted these primitives are, the better they act as foundati
 
 Other frameworks have large and extremely well established ecosystems. Notably React which has a vast array of component and hooks. The amount of choice within the ecosystem is great but often these tools are built as one-offs resulting in often un-tested logic or are designed with narrow needs. Over time the less concise these building blocks are the more they tend to repeat themselves.
 
-Our goal with Compounds is to bring the community together to contribute, evolve and use a base set of foundations in their work. The more we work together, the stronger and richer of an ecosystem we can build and the more we all benefit.
+Our goal with Primitives is to bring the community together to contribute, evolve and use a base set of foundations in their work. The more we work together, the stronger and richer of an ecosystem we can build and the more we all benefit.
 
-We aren't trying to replace the ecosystem of React and other libraries with a monosolution, but merely offer a consistent and tightly defined set of tools. A community ecosystem will and should continue offering alternatives to expand a users choice. It's this fine balance we as maintainers of Compounds need to juggle.
+We aren't trying to replace the ecosystem of React and other libraries with a monosolution, but merely offer a consistent and tightly defined set of tools. A community ecosystem will and should continue offering alternatives to expand a users choice. It's this fine balance we as maintainers of Primitives need to juggle.
 
 ## Design Maxims
 
-All Compounds packages follow a single consistency and promise. We guarentee that each is created with the utmost care, providing primitivates that are:
+All Primitives packages follow a single consistency and promise. We guarentee that each is created with the utmost care, providing primitivates that are:
 
 1. Documented and follow a consistent style guide
-2. Are well tested
-3. As small, concise and practical as possible
+2. Be well tested
+3. Small, concise and practical as possible
 4. A single primitive for a single purpose
 5. As few, if none, dependencies as possible
 6. SSR safe entries provided
-7. Wrap base level Browser APIs in a rational and future-ready way
+7. Wrap base level Browser APIs
+8. Should be progressively improved for future features
+9. Be focused on composition vs. isolation of logic
+10. Community voice and needs guide roadmap and planning
+11. Strong TypeScript support
+12. Performance!
 
 ## Compounded vs. Isolated Primitives
 

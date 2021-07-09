@@ -1,5 +1,5 @@
 {
-  "name": "solid-create-listener",
+  "name": "@solid-primitives/event-listener",
   "version": "1.0.0",
   "description": "Primitive to manage creating event listeners.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",

@@ -1,6 +1,9 @@
-# solid-create-intersection-observer
+# @solid-primitives/intersection-observer
 
 Creates a helper to manage IntersectionObserver.
+
+`createIntersectionObserver` - Creates a basic intersection observer exposing methods to manage the observable.
+`createViewportObserver` - More advanced tracker that creates a store of element signals.
 
 ## How to use it
 

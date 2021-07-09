@@ -1,13 +1,13 @@
 {
-  "name": "solid-create-worker",
+  "name": "@solid-primitives/websocket",
   "version": "1.0.0",
-  "description": "Primitive to create a worker helper",
+  "description": "Primitive to create a websocket connection and manage it.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "typings": "dist/index.d.ts",
   "scripts": {},
   "keywords": [
-    "worker",
+    "websocket",
     "solid",
     "primitives"
   ],
