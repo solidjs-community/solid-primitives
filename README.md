@@ -10,8 +10,6 @@ A project to aggregate and develop high-quality, community contributed Solid pri
 
 The goal of Solid Primitives is to be an official aggregation of utilities that wrap core logic on the client and server. Each primitive is designed to act as a building block or keystone, the goal being to DRY up source as much as possible and fit together logic as a compact system of parts.
 
-ie. Consider covalent bonds that share electron pairs between atoms. Primitives are similar in the sense that there's an optimal and natural orchestration of structure that create increasingly complex compounded logic. Our philosophy is to define a base set of atoms that naturally create covalent properties and efficiencies in layered and complex UIs.
-
 Ultimately the more rooted these primitives are, the better they act as foundation within Solid's base ecosystem. With well built and re-used foundations, the smaller (aggregate tree-shaking benefits), more concise (readability) and stable (consistent and managed testing + maintenance) applications can be overall.
 
 ## A Rallying Call
@@ -39,7 +37,7 @@ All Primitives packages follow a single consistency and promise. We guarentee th
 11. Strong TypeScript support
 12. Performance!
 
-## Compounded vs. Isolated Primitives
+## Compound vs. Isolated Primitives
 
 Each primitive is designed with composition or segmentation in mind. To align with the goal of being small and concise a major rule to designing our primitives is deciding if the interface for primitives should be: composable or segmented. For this reason every API is intricately studied and considered to be composed (stacked with features) or composed into smaller units.
 
