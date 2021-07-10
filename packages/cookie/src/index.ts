@@ -14,6 +14,8 @@ import { isServer } from 'solid-js/web';
  * console.log(value());
  * ```
  */
+
+// @TODO: Look at refactoring with something like: https://davidwalsh.name/javascript-proxy-with-storage
  const createCookie = <T extends string | number | boolean>(
   key: string,
   initialValue = '',

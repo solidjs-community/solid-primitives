@@ -77,7 +77,7 @@ export const createViewportObserver = (
   start: () => void,
   stop: () => void,
 ] => {
-  const setterStore = new Map<Element, SetEntry>();
+  const setterStore = new WeakMap<Element, SetEntry>();
   const onChange = (entries: Array<IntersectionObserverEntry>) => entries.forEach(
     (entry) => setterStore.get(entry.target)!(() => entry)
   );

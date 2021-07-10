@@ -1,5 +1,5 @@
 {
-  "name": "@solid-primitives/storage",
+  "name": "@solid-primitives/local-store",
   "version": "1.0.0",
   "description": "Primitive to setup browser storage",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
@@ -11,6 +11,7 @@
     "sessionStorage",
     "storage",
     "local",
+    "store",
     "session",
     "solid",
     "primitives"
