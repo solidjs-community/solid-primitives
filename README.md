@@ -51,12 +51,13 @@ Designing our primitives in this manner allows for better tree shaking and very 
 -   createResizeObserver
 -   createWebsocket
 -   createTimer
+-   createThrottle
+-   createDebounce
 -   createGeolocation
 -   createWorker
 -   createListener
 -   createMediaQuery [in progress]
 -   createRAF [in progress]
--   createThrottle [in progress]
 -   createHistory [in progress]
 
 ## Directives
