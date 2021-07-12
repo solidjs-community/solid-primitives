@@ -1,10 +1,9 @@
 /**
- * Creates a method that is called.
+ * Creates a method that is debounced and cancellable.
  *
-
-  * @param {Function} callback The callback to debounce
-  * @param {number} wait The duration to debounce
-  * @returns {Function} The debounced callback
+ * @param callback The callback to debounce
+ * @param wait The duration to debounce
+ * @returns The debounced callback
  * 
  * @example
  * ```ts
@@ -13,7 +12,7 @@
  * console.log(value());
  * ```
  */
- const createDebounce = (
+const createDebounce = (
   func: Function,
   wait: number,
   immediate: boolean = false
