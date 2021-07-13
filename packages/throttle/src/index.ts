@@ -14,22 +14,25 @@
  */
 const createThrottle = <T extends (...args: any[]) => void>(
   func: T,
-  wait?: number
-): [
-  trigger: (...args: Parameters<T>) => void,
-  clear: () => void
-] => {
-  let timeoutId: number | undefined;
-  const clear = () => clearTimeout(timeoutId);
-  const trigger = (...args: Parameters<T>) => {
-    if (timeoutId === undefined) {
-      timeoutId = setTimeout(() => {
+  wait: number
+): [T] => {
+  let shouldThrottle: boolean = false,
+    timerId: number;
+  return [
+    // @ts-ignore
+    (...args: Parameters<T>) => {
+      // Reject calls during the throttle period
+      if (shouldThrottle) {
+        return;
+      }
+      shouldThrottle = true;
+      timerId = setTimeout(() => {
         func(...args);
-        timeoutId = undefined;
+        shouldThrottle = false;
       }, wait);
-    }
-  };
-  return [trigger, clear];
+    },
+    () => clearTimeout(timerId)
+  ];
 };
 
 export default createThrottle;
