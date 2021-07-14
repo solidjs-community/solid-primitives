@@ -1,7 +1,7 @@
 import { onMount, onCleanup } from "solid-js";
 
 /**
- * Create event listenere is a helper primitiive for binding events.
+ * Creates an event listener helper primitive.
  *
  * @param eventName - Event name to bind to
  * @param handler - Function handler to trigger
@@ -12,22 +12,26 @@ import { onMount, onCleanup } from "solid-js";
  * createEventListener("mouseDown", () => console.log("Click"), document.getElementById("mybutton"))
  * ```
  */
-const createEventListener = <T extends HTMLElement = HTMLDivElement>(
+const createEventListener = <T extends HTMLElement>(
   eventName: keyof WindowEventMap,
   handler: (event: Event) => void,
-  targets: T | Window | [T | Window] = window
-) => {
-  const add = (target: T | Window | [T | Window]): void =>
+  targets: T | Window = window
+): [
+  add: (el: T | Window) => void,
+  remove: (el: T | Window) => void,
+] => {
+  const add = (target: T | Window): void =>
     target.addEventListener && target.addEventListener(eventName, handler);
-  const remove = (target: T | Window | [T | Window]): void =>
+  const remove = (target: T | Window): void =>
     target.removeEventListener &&
     target.removeEventListener(eventName, handler);
 
   // Define the listening target
-  onMount(() => (Array.isArray(targets) ? targets.forEach(add) : add(targets)));
+  onMount(() => Array.isArray(targets) ? targets.forEach(add) : add(targets));
   onCleanup(() =>
     Array.isArray(targets) ? targets.forEach(remove) : remove(targets)
   );
+  return [add, remove];
 };
 
 export default createEventListener;

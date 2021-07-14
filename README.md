@@ -56,6 +56,7 @@ Designing our primitives in this manner allows for better tree shaking and very 
 -   createGeolocation
 -   createWorker
 -   createListener
+-   createScrollObserver
 -   createMediaQuery [in progress]
 -   createRAF [in progress]
 -   createHistory [in progress]
