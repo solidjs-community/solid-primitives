@@ -1,0 +1,30 @@
+{
+  "name": "@solid-primitives/gestures",
+  "version": "1.0.0",
+  "description": "Directives to react to gestures",
+  "author": "Moshe Uminer",
+  "license": "MIT",
+  "typings": "dist/index.d.ts",
+  "scripts": {},
+  "keywords": [
+    "gesture",
+    "gestures",
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "@types/jest": "^26.0.10",
+    "prettier": "^2.0.5",
+    "solid-testing-library": "^0.2.0",
+    "tslib": "^2.0.1",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "solid-js": "^1.0.0"
+  },
+  "jest": {
+    "setupFiles": [
+      "./test/setup.ts"
+    ]
+  }
+}
