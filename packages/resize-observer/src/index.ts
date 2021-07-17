@@ -22,15 +22,13 @@ function createResizeObserver<T extends HTMLElement>(
   }
 ): (arg: T) => void {
   const [otherRefs, setOtherRefs] = createSignal<T[]>([]);
-  const refCallback = (e: T) => setOtherRefs((l) => l.concat(e));
-
+  // @ts-ignore
+  const refCallback = (e: T) => setOtherRefs((l: T[]) => l.concat(e));
   const previousMap = new Map<Element, ObservedSize>();
-
   const resizeObserver = new ResizeObserver((entries) => {
     if (!Array.isArray(entries)) {
       return;
     }
-
     for (const entry of entries) {
       const newWidth = Math.round(entry.contentRect.width);
       const newHeight = Math.round(entry.contentRect.height);
@@ -42,7 +40,6 @@ function createResizeObserver<T extends HTMLElement>(
       }
     }
   });
-
   createEffect((oldRefs?: T[]) => {
     let refs: T[] = [];
     if (opts.refs) {
@@ -66,11 +63,7 @@ function createResizeObserver<T extends HTMLElement>(
     });
     return refs;
   });
-
-  onCleanup(() => {
-    resizeObserver.disconnect();
-  })
-
+  onCleanup(() => resizeObserver.disconnect());
   return refCallback;
 }
 

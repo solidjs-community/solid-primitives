@@ -4,21 +4,17 @@ Provides a reactive resize observer wrapper.
 
 `createResizeObserver` - Main resize observer primitive.
 
-## How to use it
-
-## Demo
-
 ## Changelog
 
 <details>
 <summary><b>Expand Changelog</b></summary>
 
-1.0.0
+0.0.100
 
-First ported commit from react-use-localstorage.
+Initial commit of the resize observer.
 
 </details>
 
 ## Contributors
 
-Ported from the amazing work by at https://github.com/dance2die/react-use-localstorage.
+Thanks to Moshe Udimar for this contribution!

@@ -48,13 +48,13 @@ Designing our primitives in this manner allows for better tree shaking and very 
 - createAudio [published]
 - createLocalStore [published]
 - createIntersectionObserver [published]
-- createResizeObserver
-- createWebsocket
+- createResizeObserver [published]
+- createWebsocket [in progress]
 - createTimer [published]
-- createThrottle
-- createDebounce
+- createThrottle [published]
+- createDebounce [published]
 - createGeolocation [published]
-- createWorker
+- createWorker [in progress]
 - createListener [published]
 - createScrollObserver [published]
 - createMediaQuery [in progress]
