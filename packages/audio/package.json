@@ -1,11 +1,23 @@
 {
   "name": "@solid-primitives/audio",
-  "version": "1.0.0",
+  "version": "0.0.100",
   "description": "Primitive to manage audio and sound",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
-  "typings": "dist/index.d.ts",
-  "scripts": {},
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/audio",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc"
+  },
   "keywords": [
     "audio",
     "solid",

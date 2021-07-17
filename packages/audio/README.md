@@ -1,5 +1,7 @@
 # @solid-primitives/audio
 
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+
 Primitive to manage audio playback in the browser. This primitive is comprised of three composed primitives:
 
 `createBaseAudio` - Provides a very basic interface for wrapping listeners to a supplied or default audio player.
@@ -11,31 +13,27 @@ The primitives are easily composable and extended. To create your own audio elem
 ## How to use it
 
 ```ts
-const { play, pause } = createAudio('example.js')
+const { play, pause } = createAudio('example.wav')
 ```
 
-or
+and
 
 ```ts
 const { play, duration, currentTime, seek, setVolume, pause } =
-    createAudioManager('example.js')
+    createAudioManager('example.wav')
 ```
 
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-create-audio-6wc4c?file=/src/index.tsx
+You may view a working example here: https://codesandbox.io/s/solid-primitives-audio-6wc4c
 
 ## Changelog
 
 <details>
 <summary><b>Expand Changelog</b></summary>
 
-1.0.0
+0.0.100
 
-First ported commit from react-use-localstorage.
+Pulling an early release of the package together and preparing for 1.0.0 release. No changes.
 
 </details>
-
-## Contributors
-
-Ported from the amazing work by at https://github.com/dance2die/react-use-localstorage.
