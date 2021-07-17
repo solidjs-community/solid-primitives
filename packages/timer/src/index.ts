@@ -1,4 +1,3 @@
-
 import { createEffect, onCleanup } from 'solid-js';
 
 export type TimerHandler = (...args: any[]) => void;
@@ -30,7 +29,7 @@ const createTimer = (
 ): Function => {
   let savedCallback: TimerHandler;
   let intervalId: ReturnType<typeof setTimeout>;
-  const endTimer = () => clearInterval(intervalId);
+  const clear = () => clearInterval(intervalId);
   const scheduler =
     typeof schedule === "function"
       ? schedule
@@ -45,13 +44,13 @@ const createTimer = (
   createEffect(() => {
     const handler = (...args: any[]) => savedCallback(...args);
     if (delay !== null) {
-      endTimer();
+      clear();
       intervalId = scheduler(handler, delay);
     }
   });
-  onCleanup(() => endTimer);
+  onCleanup(() => clear);
 
-  return endTimer;
+  return clear;
 };
 
 export default createTimer;

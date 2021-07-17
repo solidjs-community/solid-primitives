@@ -1,11 +1,23 @@
 {
   "name": "@solid-primitives/timer",
-  "version": "1.0.0",
-  "description": "Primitive to create an timer (interval or timeout)",
+  "version": "0.0.105",
+  "description": "Primitive to manage audio and sound",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
-  "typings": "dist/index.d.ts",
-  "scripts": {},
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/timer",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc"
+  },
   "keywords": [
     "setInterval",
     "setTimeout",
@@ -21,7 +33,7 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
-    "solid-js": "^1.0.0"
+    "solid-js": "^1.0.3"
   },
   "jest": {
     "setupFiles": [
