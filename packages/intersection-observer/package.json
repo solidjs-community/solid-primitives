@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/intersection-observer",
   "version": "0.0.107",
-  "description": "Primitive to support using the intersection observer API.",
+  "description": "Primitives to support using the intersection observer API.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/intersection-observer",

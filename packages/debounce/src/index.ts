@@ -25,6 +25,7 @@ const createDebounce = <T extends (...args: any[]) => void>(
     if (timeoutId !== undefined) {
       clear();
     }
+    // @ts-ignore
     timeoutId = setTimeout(() => func(...args), wait);
   };
   return [trigger, clear];

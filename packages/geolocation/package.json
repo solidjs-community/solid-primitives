@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/geolocation",
   "version": "0.0.105",
-  "description": "Primitive to manage geolocation requests",
+  "description": "Primitives to query geolocation and observe changes.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/geolocation",

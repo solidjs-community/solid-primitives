@@ -4,8 +4,20 @@
   "description": "Primitive that creates a throttle function",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
-  "typings": "dist/index.d.ts",
-  "scripts": {},
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/audio",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc"
+  },
   "keywords": [
     "throttle",
     "solid",
@@ -15,10 +27,11 @@
     "@types/jest": "^26.0.10",
     "prettier": "^2.0.5",
     "solid-testing-library": "^0.2.0",
+    "tslib": "^2.0.1",
     "typescript": "^4.0.2"
   },
   "dependencies": {
-    "solid-js": "^1.0.0"
+    "solid-js": "^1.0.3"
   },
   "jest": {
     "setupFiles": [

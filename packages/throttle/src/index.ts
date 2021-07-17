@@ -17,7 +17,7 @@ const createThrottle = <T extends (...args: any[]) => void>(
   wait: number
 ): [T] => {
   let shouldThrottle: boolean = false,
-    timerId: number;
+    timerId: NodeJS.Timer;
   return [
     // @ts-ignore
     (...args: Parameters<T>) => {
