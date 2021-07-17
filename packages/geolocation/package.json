@@ -19,8 +19,9 @@
     "build": "tsc"
   },
   "keywords": [
-    "audio",
-    "solid",
+    "geolocation",
+    "location",
+    "coordinates",
     "primitives"
   ],
   "devDependencies": {

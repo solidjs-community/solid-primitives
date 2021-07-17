@@ -15,7 +15,7 @@ import { onMount, onCleanup } from "solid-js";
 const createEventListener = <T extends HTMLElement>(
   eventName: keyof WindowEventMap,
   handler: (event: Event) => void,
-  targets: T | Window = window
+  targets: T | Array<T> | Window = window
 ): [
   add: (el: T | Window) => void,
   remove: (el: T | Window) => void,
@@ -25,8 +25,6 @@ const createEventListener = <T extends HTMLElement>(
   const remove = (target: T | Window): void =>
     target.removeEventListener &&
     target.removeEventListener(eventName, handler);
-
-  // Define the listening target
   onMount(() => Array.isArray(targets) ? targets.forEach(add) : add(targets));
   onCleanup(() =>
     Array.isArray(targets) ? targets.forEach(remove) : remove(targets)

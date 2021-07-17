@@ -1,14 +1,26 @@
 {
   "name": "@solid-primitives/event-listener",
-  "version": "1.0.0",
+  "version": "0.0.100",
   "description": "Primitive to manage creating event listeners.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
-  "typings": "dist/index.d.ts",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": "false",
   "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc"
   },
   "keywords": [
-    "event-listener",
+    "event",
+    "listener",
     "solid",
     "primitives"
   ],
@@ -16,11 +28,11 @@
     "@types/jest": "^26.0.10",
     "prettier": "^2.0.5",
     "solid-testing-library": "^0.2.0",
-    "pretty-quick": "^3.0.0",
+    "tslib": "^2.0.1",
     "typescript": "^4.0.2"
   },
   "dependencies": {
-    "solid-js": "^1.0.0"
+    "solid-js": "^1.0.3"
   },
   "jest": {
     "setupFiles": [
