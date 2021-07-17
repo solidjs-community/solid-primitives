@@ -1,5 +1,7 @@
 # @solid-primitives/local-store
 
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+
 Creates a general local storage handler for LocalStorage, SessionStorage or your own engine.
 
 `createLocalStore` - A single primitive can handle localStorage and localSession.

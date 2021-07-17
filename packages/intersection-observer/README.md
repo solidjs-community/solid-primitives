@@ -7,7 +7,14 @@ Creates a helper to manage IntersectionObserver.
 
 ## How to use it
 
+```ts
+const [ add, remove, start, stop ] = createIntersectionObserver(el);
+add(el, (entry) => console.log(entry.isIntersecting);
+```
+
 ## Demo
+
+You may view a working example here: https://codesandbox.io/s/solid-primitives-intersection-observer-h22it?file=/src/index.tsx
 
 ## Changelog
 
@@ -16,10 +23,6 @@ Creates a helper to manage IntersectionObserver.
 
 1.0.0
 
-First ported commit from react-use-localstorage.
+Committing first version of primitive.
 
 </details>
-
-## Contributors
-
-Ported from the amazing work by at https://github.com/dance2die/react-use-localstorage.

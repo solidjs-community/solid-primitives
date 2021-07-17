@@ -63,11 +63,11 @@ type SetEntry = (
  *
  * @example
  * ```ts
- * const [ add, remove, start, stop ] = createIntersectionObserver(els);
+ * const [ add, remove, start, stop ] = createIntersectionObserver(el);
  * ```
  */
 export const createViewportObserver = (
-  elements: Array<HTMLElement>,
+  elements: Array<HTMLElement> = [],
   threshold: number = 0,
   root: HTMLElement | null = null,
   rootMargin: string = '0%',
@@ -77,9 +77,9 @@ export const createViewportObserver = (
   start: () => void,
   stop: () => void,
 ] => {
-  const setterStore = new WeakMap<Element, SetEntry>();
+  const setters = new WeakMap<Element, SetEntry>();
   const onChange = (entries: Array<IntersectionObserverEntry>) => entries.forEach(
-    (entry) => setterStore.get(entry.target)!(() => entry)
+    (entry) => setters.get(entry.target)!(entry)
   );
   const [add, remove, start, stop] = createIntersectionObserver(
     elements,
@@ -90,10 +90,10 @@ export const createViewportObserver = (
   );
   const addEntry = (el: HTMLElement, setter: SetEntry): void => {
     add(el);
-    setterStore.set(el, setter);
+    setters.set(el, setter);
   };
   const removeEntry = (el: HTMLElement) => {
-    setterStore.delete(el);
+    setters.delete(el);
     remove(el);
   };
   onMount(start)
