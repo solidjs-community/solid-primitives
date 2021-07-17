@@ -1,11 +1,17 @@
+import type { Resource } from "solid-js";
 import {
   createComputed,
   createSignal,
   onCleanup,
   createResource,
 } from "solid-js";
-import type { Resource } from "solid-js";
-export declare type LocationResourceReturn<T> = [Resource<T>, () => void];
+
+export declare type LocationResourceReturn<T> = [
+  Resource<T>,
+  () => void,
+  () => boolean
+];
+
 /**
  * Provides a function for querying the current geolocation in browser.
  * Ported from https://github.com/imbhargav5/rooks/blob/main/src/hooks/useGeolocation.ts
@@ -14,17 +20,17 @@ export declare type LocationResourceReturn<T> = [Resource<T>, () => void];
  * @param options.enableHighAccuracy - Enable if the locator should be very accurate
  * @param options.maximumAge - Maximum cached position age
  * @param options.timeout - Amount of time before the error callback is envoked, if 0 then never
- * @return Returns a tuple containing a `Resource` resolving to the location coordinates, and a refetch function
+ * @return Returns arrays containing a `Resource` resolving to the location coordinates, refetch function and loading value.
  *
  * @example
  * ```ts
- * const [location, getLocation] = createGeolocation();
+ * const [location, getLocation, isLoading] = createGeolocation();
  * const [location] = createGeolocation({true, 0, 100});
  * ```
  */
 export const createGeolocation = (
   options: PositionOptions = {}
-): LocationResourceReturn<GeolocationCoordinates> => {
+): LocationResourceReturn<GeolocationCoordinates | undefined> => {
   options = Object.assign(
     {
       enableHighAccuracy: false,
@@ -38,9 +44,7 @@ export const createGeolocation = (
       new Promise<GeolocationCoordinates>((resolve, reject) => {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
-            (res) => {
-              resolve(res.coords);
-            },
+            (res) => resolve(res.coords),
             (error) => reject({ isError: true, message: error.message }),
             options
           );
@@ -52,7 +56,7 @@ export const createGeolocation = (
         }
       })
   );
-  return [resource, refetch];
+  return [resource, refetch, () => resource.loading];
 };
 
 /**
@@ -110,6 +114,5 @@ export const createGeolocationWatcher = (
     }
   });
   onCleanup(clearGeolocator);
-
   return location;
 };

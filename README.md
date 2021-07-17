@@ -45,21 +45,21 @@ Designing our primitives in this manner allows for better tree shaking and very 
 
 ## Primitives
 
--   createAudio
--   createStorage
--   createIntersectionObserver
--   createResizeObserver
--   createWebsocket
--   createTimer
--   createThrottle
--   createDebounce
--   createGeolocation
--   createWorker
--   createListener
--   createScrollObserver
--   createMediaQuery [in progress]
--   createRAF [in progress]
--   createHistory [in progress]
+- createAudio [published]
+- createStorage
+- createIntersectionObserver
+- createResizeObserver
+- createWebsocket
+- createTimer
+- createThrottle
+- createDebounce
+- createGeolocation [published]
+- createWorker
+- createListener
+- createScrollObserver
+- createMediaQuery [in progress]
+- createRAF [in progress]
+- createHistory [in progress]
 
 ## Directives
 

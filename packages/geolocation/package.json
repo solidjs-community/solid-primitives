@@ -1,13 +1,25 @@
 {
   "name": "@solid-primitives/geolocation",
-  "version": "1.0.0",
+  "version": "0.0.105",
   "description": "Primitive to manage geolocation requests",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
-  "typings": "dist/index.d.ts",
-  "scripts": {},
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/geolocation",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc"
+  },
   "keywords": [
-    "geolocation",
+    "audio",
     "solid",
     "primitives"
   ],
@@ -19,7 +31,7 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
-    "solid-js": "^1.0.0"
+    "solid-js": "^1.0.3"
   },
   "jest": {
     "setupFiles": [
