@@ -15,6 +15,7 @@ import { createSignal, onCleanup, createEffect } from 'solid-js';
   target: () => T | Window = () => window
 ): (() => number | null) => {
   const getPosition = (): number | null =>
+    // @ts-ignore
     target && typeof target() !== "undefined" ? target().pageYOffset : null;
   const [position, setPosition] = createSignal<number | null>(getPosition());
   const handleScroll = () => setPosition(getPosition());

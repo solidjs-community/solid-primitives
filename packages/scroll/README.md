@@ -1,5 +1,7 @@
 # @solid-primitives/scroll
 
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+
 Helpful primitives to manage browser scrolling.
 
 `createScrollObserver` - Helpful monitor that reports the current position of an element or window.
@@ -24,16 +26,16 @@ const position = createScrollObserver(() => ref);
 
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-create-audio-6wc4c?file=/src/index.tsx
+You may view a working example here: https://codesandbox.io/s/solid-primitives-scroll-csg7f
 
 ## Changelog
 
 <details>
 <summary><b>Expand Changelog</b></summary>
 
-1.0.0
+0.0.100
 
-First ported commit from react-use-localstorage.
+Initial porting of the scroll primitive.
 
 </details>
 
