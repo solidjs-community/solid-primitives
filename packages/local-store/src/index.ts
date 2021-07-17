@@ -32,6 +32,7 @@ function createLocalStore<T>(
         if (getListener()) {
           let node = signals.get(key);
           if (!node) {
+            // @ts-ignore
             node = createSignal(undefined, { equals: false });
             signals.set(key, node);
           }
