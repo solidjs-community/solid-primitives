@@ -57,6 +57,6 @@ Designing our primitives in this manner allows for better tree shaking and very 
 - [x] createScrollObserver
 - [x] createWebsocket
 - [x] createRAF
+- [x] createMediaQuery
 - [ ] createWorker (in progress)
-- [ ] createMediaQuery (need contribution)
 - [ ] createHistory (need contribution)
