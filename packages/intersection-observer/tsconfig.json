@@ -4,7 +4,5 @@
     "outDir": "./dist",
     "emitDeclarationOnly": false
   },
-  "include": [
-    "./src"
-  ]
+  "include": ["./src"]
 }

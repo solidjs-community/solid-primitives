@@ -4,7 +4,7 @@
  * @param callback The callback to debounce
  * @param wait The duration to debounce
  * @returns The debounced callback trigger
- * 
+ *
  * @example
  * ```ts
  * const [trigger, clear] = createDebounce(() => console.log('hi'), 250));
@@ -15,10 +15,7 @@
 const createDebounce = <T extends (...args: any[]) => void>(
   func: T,
   wait?: number
-): [
-  trigger: (...args: Parameters<T>) => void,
-  clear: () => void
-] => {
+): [trigger: (...args: Parameters<T>) => void, clear: () => void] => {
   let timeoutId: number | undefined;
   const clear = () => clearTimeout(timeoutId);
   const trigger = (...args: Parameters<T>) => {

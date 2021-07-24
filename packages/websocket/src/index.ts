@@ -64,7 +64,7 @@ const createWebsocket = (
     socket.onmessage = onData;
   };
   onCleanup(() => disconnect);
-  return [ connect, disconnect, send, state, () => socket ];
+  return [connect, disconnect, send, state, () => socket];
 };
 
 export default createWebsocket;

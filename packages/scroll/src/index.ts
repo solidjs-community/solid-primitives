@@ -1,4 +1,4 @@
-import { createSignal, onCleanup, createEffect } from 'solid-js';
+import { createSignal, onCleanup, createEffect } from "solid-js";
 
 /**
  * Create a primitive for monitoring scrolling.
@@ -11,7 +11,7 @@ import { createSignal, onCleanup, createEffect } from 'solid-js';
  * const position = createScrollObserver(() => ref)
  * ```
  */
- const createScrollObserver = <T extends HTMLElement>(
+const createScrollObserver = <T extends HTMLElement>(
   target: () => T | Window = () => window
 ): (() => number | null) => {
   const getPosition = (): number | null =>

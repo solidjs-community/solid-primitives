@@ -17,7 +17,7 @@ function getPointersAngleDeg(activeEvents: PointerEvent[]) {
   // instead of hell lot of conditions we use an object mapping
   const quadrantsMap = {
     left: { top: 360, bottom: 180 },
-    right: { top: 0, bottom: 180 },
+    right: { top: 0, bottom: 180 }
   };
 
   const width = activeEvents[1].clientX - activeEvents[0].clientX;
@@ -35,8 +35,7 @@ function getPointersAngleDeg(activeEvents: PointerEvent[]) {
   const angle = Math.atan(width / height) / (Math.PI / 180);
 
   const halfQuadrant = width > 0 ? quadrantsMap.right : quadrantsMap.left;
-  const quadrantAngleBonus =
-    height > 0 ? halfQuadrant.top : halfQuadrant.bottom;
+  const quadrantAngleBonus = height > 0 ? halfQuadrant.top : halfQuadrant.bottom;
 
   return angle + quadrantAngleBonus;
 }

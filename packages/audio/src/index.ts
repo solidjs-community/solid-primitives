@@ -1,4 +1,4 @@
-import { createSignal, batch, onMount, onCleanup, createEffect } from 'solid-js';
+import { createSignal, batch, onMount, onCleanup, createEffect } from "solid-js";
 
 // Set of control enums
 enum AudioState {
@@ -23,9 +23,9 @@ export const createBaseAudio = (
   handlers: Array<[string, EventListener]>,
   audioEngine?: typeof Audio
 ): {
-  player: HTMLAudioElement,
-  state: () => AudioState,
-  setState: (state: AudioState) => void
+  player: HTMLAudioElement;
+  state: () => AudioState;
+  setState: (state: AudioState) => void;
 } => {
   let player: HTMLAudioElement = new (audioEngine || Audio)();
   const [state, setState] = createSignal<AudioState>(AudioState.LOADING);
@@ -38,14 +38,8 @@ export const createBaseAudio = (
     }
   });
   // Handle management on create and clean-up
-  onMount(() =>
-    handlers.forEach(([evt, handler]) => player.addEventListener(evt, handler))
-  );
-  onCleanup(() =>
-    handlers.forEach(([evt, handler]) =>
-      player.removeEventListener(evt, handler)
-    )
-  );
+  onMount(() => handlers.forEach(([evt, handler]) => player.addEventListener(evt, handler)));
+  onCleanup(() => handlers.forEach(([evt, handler]) => player.removeEventListener(evt, handler)));
   return { player, state, setState };
 };
 
@@ -64,8 +58,12 @@ export const createBaseAudio = (
  * const [start, pause] = createAudio('./example1.mp3);
  * ```
  */
-export const createAudio = (path: string | (() => string)): {
-  play: () => void, pause: () => void, state: () => AudioState
+export const createAudio = (
+  path: string | (() => string)
+): {
+  play: () => void;
+  pause: () => void;
+  state: () => AudioState;
 } => {
   const { player, state, setState } = createBaseAudio(path, [
     ["loadeddata", () => batch(() => setState(AudioState.READY))],
@@ -103,13 +101,13 @@ export const createAudioManager = (
   path: string | (() => string),
   volume: number = 1
 ): {
-  play: () => void,
-  pause: () => void,
-  state: () => AudioState,
-  currentTime: () => number,
-  duration: () => number,
-  setVolume: (volume: number) => void,
-  seek: (position: number) => void
+  play: () => void;
+  pause: () => void;
+  state: () => AudioState;
+  currentTime: () => number;
+  duration: () => number;
+  setVolume: (volume: number) => void;
+  seek: (position: number) => void;
 } => {
   const [currentTime, setCurrentTime] = createSignal<number>(0);
   const [duration, setDuration] = createSignal<number>(0);

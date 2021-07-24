@@ -1,9 +1,8 @@
-import { render } from 'solid-testing-library';
-import createInterval from '../src/index';
+import { render } from "solid-testing-library";
+import createInterval from "../src/index";
 
-describe('createInterval', (): void => {
-
-  test('is passed a `handler` and a `delay`', () => {
+describe("createInterval", (): void => {
+  test("is passed a `handler` and a `delay`", () => {
     const handler = jest.fn();
 
     createInterval(handler, 1000);
@@ -22,7 +21,7 @@ describe('createInterval', (): void => {
     expect(handler).toHaveBeenCalledTimes(0);
   });
 
-  test('if you pass a new `handler`, the timer will not restart ', () => {
+  test("if you pass a new `handler`, the timer will not restart ", () => {
     const handler1 = jest.fn();
     const handler2 = jest.fn();
     let handler = handler1;
@@ -38,7 +37,7 @@ describe('createInterval', (): void => {
     expect(handler2).toHaveBeenCalledTimes(1);
   });
 
-  test('if you pass a new `delay`, it will cancel the current timer and start a new one', () => {
+  test("if you pass a new `delay`, it will cancel the current timer and start a new one", () => {
     const handler = jest.fn();
     let delay = 500;
 
@@ -66,7 +65,7 @@ describe('createInterval', (): void => {
     expect(handler).toHaveBeenCalledTimes(2);
   });
 
-  test('passing the same parameters causes no change in the timer', () => {
+  test("passing the same parameters causes no change in the timer", () => {
     const handler = jest.fn();
 
     createInterval(handler, 1000);
@@ -76,5 +75,4 @@ describe('createInterval', (): void => {
     jest.advanceTimersByTime(500);
     expect(handler).toHaveBeenCalledTimes(1);
   });
-
 });

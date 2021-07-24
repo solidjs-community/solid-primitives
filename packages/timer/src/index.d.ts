@@ -1,7 +1,7 @@
 export declare type TimerHandler = (...args: any[]) => void;
 export declare enum Schedule {
-    Timeout = 0,
-    Interval = 1
+  Timeout = 0,
+  Interval = 1
 }
 /**
  * Provides a declarative useInterval primitive. Ported from
@@ -19,5 +19,9 @@ export declare enum Schedule {
  * return <h1>Counting up: {count()}</h1>;
  * ```
  */
-declare const createTimer: (callback: (...args: any[]) => void, delay: number | null, schedule?: Function | Schedule | undefined) => Function;
+declare const createTimer: (
+  callback: (...args: any[]) => void,
+  delay: number | null,
+  schedule?: Function | Schedule | undefined
+) => Function;
 export default createTimer;

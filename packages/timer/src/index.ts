@@ -1,10 +1,10 @@
-import { createEffect, onCleanup } from 'solid-js';
+import { createEffect, onCleanup } from "solid-js";
 
 export type TimerHandler = (...args: any[]) => void;
 export enum Schedule {
   Timeout,
-  Interval, 
-};
+  Interval
+}
 
 /**
  * Provides a declarative useInterval primitive. Ported from
@@ -14,7 +14,7 @@ export enum Schedule {
  * @param delay - Number representing the delay in ms
  * @param schedule - Specify the schedule you'd like to use or supply a custom function
  * @return Provides a manual clear/end function.
- * 
+ *
  * @example
  * ```ts
  * let [count, setCount] = createSignal(0);

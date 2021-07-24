@@ -1,7 +1,7 @@
 import { registerPointerListener, getCenterOfTwoPoints } from "./core";
 
 type Props = {
-  callback: (scale: number, pinchCenter: { x: number, y: number }) => any;
+  callback: (scale: number, pinchCenter: { x: number; y: number }) => any;
 };
 
 declare module "solid-js" {

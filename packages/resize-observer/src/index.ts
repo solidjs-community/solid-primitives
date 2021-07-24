@@ -15,17 +15,15 @@ type ResizeHandler = (size: ObservedSize, ref: Element) => void;
  * @return A callback that can be used to add refs to observe resizing
  *
  */
-function createResizeObserver<T extends HTMLElement>(
-  opts: {
-    onResize: ResizeHandler;
-    refs?: T | T[] | (() => T | T[]);
-  }
-): (arg: T) => void {
+function createResizeObserver<T extends HTMLElement>(opts: {
+  onResize: ResizeHandler;
+  refs?: T | T[] | (() => T | T[]);
+}): (arg: T) => void {
   const [otherRefs, setOtherRefs] = createSignal<T[]>([]);
   // @ts-ignore
   const refCallback = (e: T) => setOtherRefs((l: T[]) => l.concat(e));
   const previousMap = new Map<Element, ObservedSize>();
-  const resizeObserver = new ResizeObserver((entries) => {
+  const resizeObserver = new ResizeObserver(entries => {
     if (!Array.isArray(entries)) {
       return;
     }
@@ -44,19 +42,18 @@ function createResizeObserver<T extends HTMLElement>(
     let refs: T[] = [];
     if (opts.refs) {
       const optsRefs = typeof opts.refs === "function" ? opts.refs() : opts.refs;
-      if (Array.isArray(optsRefs))
-        refs = refs.concat(optsRefs);
-      else refs.push(optsRefs)
+      if (Array.isArray(optsRefs)) refs = refs.concat(optsRefs);
+      else refs.push(optsRefs);
     }
     refs = refs.concat(otherRefs());
     oldRefs = oldRefs || [];
-    oldRefs.forEach((oldRef) => {
+    oldRefs.forEach(oldRef => {
       if (!(oldRef in refs)) {
         resizeObserver.unobserve(oldRef);
         previousMap.delete(oldRef);
       }
     });
-    refs.forEach((ref) => {
+    refs.forEach(ref => {
       if (!(ref in oldRefs!)) {
         resizeObserver.observe(ref);
       }

@@ -1,8 +1,4 @@
-import {
-  registerPointerListener,
-  DEFAULT_DELAY,
-  DEFAULT_MIN_SWIPE_DISTANCE,
-} from "./core";
+import { registerPointerListener, DEFAULT_DELAY, DEFAULT_MIN_SWIPE_DISTANCE } from "./core";
 
 type Props = {
   callback: (direction: "top" | "right" | "bottom" | "left") => any;
@@ -21,10 +17,7 @@ declare module "solid-js" {
   }
 }
 
-export function swipe(
-  node: HTMLElement,
-  props: () => Props,
-) {
+export function swipe(node: HTMLElement, props: () => Props) {
   let startTime: number;
   let clientX: number;
   let clientY: number;
@@ -38,10 +31,7 @@ export function swipe(
   function onUp(activeEvents: PointerEvent[], event: PointerEvent) {
     let timeframe = props().parameters?.timeframe;
     if (timeframe === undefined) timeframe = DEFAULT_DELAY;
-    if (
-      activeEvents.length === 0 &&
-      Date.now() - startTime < timeframe
-    ) {
+    if (activeEvents.length === 0 && Date.now() - startTime < timeframe) {
       const x = event.clientX - clientX;
       const y = event.clientY - clientY;
       const absX = Math.abs(x);

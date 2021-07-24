@@ -4,7 +4,7 @@
  * @param callback The callback to debounce
  * @param wait The duration to debounce
  * @returns The throttled callback trigger
- * 
+ *
  * @example
  * ```ts
  * const [trigger, clear] = createThrottle(() => console.log('hi'), 250));
@@ -12,10 +12,7 @@
  * console.log(value());
  * ```
  */
-const createThrottle = <T extends (...args: any[]) => void>(
-  func: T,
-  wait: number
-): [T] => {
+const createThrottle = <T extends (...args: any[]) => void>(func: T, wait: number): [T] => {
   let shouldThrottle: boolean = false,
     timerId: NodeJS.Timer;
   return [

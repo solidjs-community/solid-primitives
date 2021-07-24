@@ -1,7 +1,4 @@
-import { render } from 'solid-testing-library';
-import createResizeObserver from '../src/index';
+import { render } from "solid-testing-library";
+import createResizeObserver from "../src/index";
 
-describe('createResizeObserver', (): void => {
-
-
-});
+describe("createResizeObserver", (): void => {});

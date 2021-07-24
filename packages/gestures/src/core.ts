@@ -1,8 +1,5 @@
 import { onCleanup } from "solid-js";
-export type PointerCallback = (
-  activeEvents: PointerEvent[],
-  event: PointerEvent
-) => void;
+export type PointerCallback = (activeEvents: PointerEvent[], event: PointerEvent) => void;
 
 function downHandler(
   downEvent: PointerEvent,
@@ -50,8 +47,7 @@ export function registerPointerListener(
 
   const handler = (downEvent: PointerEvent) => {
     downHandler(downEvent, activeEvents, downCallback);
-    const moveHandlerWrapper = (e: PointerEvent) =>
-      moveHandler(e, activeEvents, moveCallback);
+    const moveHandlerWrapper = (e: PointerEvent) => moveHandler(e, activeEvents, moveCallback);
     const upHandlerWrapper = (e: PointerEvent) =>
       upHandler(e, downEvent, activeEvents, upCallback, () => {
         node.removeEventListener("pointermove", moveHandlerWrapper);
@@ -72,10 +68,7 @@ export function registerPointerListener(
 export const DEFAULT_DELAY = 300;
 export const DEFAULT_MIN_SWIPE_DISTANCE = 60; // in pixels
 
-export function getCenterOfTwoPoints(
-  node: HTMLElement,
-  activeEvents: PointerEvent[]
-) {
+export function getCenterOfTwoPoints(node: HTMLElement, activeEvents: PointerEvent[]) {
   const rect = node.getBoundingClientRect();
   const xDistance = Math.abs(activeEvents[0].clientX - activeEvents[1].clientX);
   const yDistance = Math.abs(activeEvents[0].clientY - activeEvents[1].clientY);

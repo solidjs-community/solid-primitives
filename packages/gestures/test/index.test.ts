@@ -1,6 +1,3 @@
-import { render } from 'solid-testing-library';
+import { render } from "solid-testing-library";
 
-describe('', (): void => {
-
-
-});
+describe("", (): void => {});

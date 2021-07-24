@@ -6,10 +6,11 @@
   "repository": "https://davedbase@github.com/davedbase/solid-primitives.git",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "solid-js": "^1.0.0"
+  "scripts": {
+    "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx}\""
   },
   "devDependencies": {
+    "prettier": "^2.3.2",
     "jest": "^26.6.3",
     "lerna": "^4.0.0",
     "solid-testing-library": "^0.2.0"

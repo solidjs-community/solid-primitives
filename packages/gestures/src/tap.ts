@@ -37,8 +37,7 @@ export const tap = (node: HTMLElement, props: () => Props) => {
       Math.abs(event.y - y) < 4 &&
       time &&
       now - time > (props().minimumTapLength ?? 0) &&
-      (props().maximumTapLength === undefined ||
-        now - time < props().maximumTapLength!)
+      (props().maximumTapLength === undefined || now - time < props().maximumTapLength!)
     ) {
       const rect = node.getBoundingClientRect();
       const x = Math.round(event.clientX - rect.left);

@@ -1,16 +1,7 @@
 import type { Resource } from "solid-js";
-import {
-  createComputed,
-  createSignal,
-  onCleanup,
-  createResource,
-} from "solid-js";
+import { createComputed, createSignal, onCleanup, createResource } from "solid-js";
 
-export declare type LocationResourceReturn<T> = [
-  Resource<T>,
-  () => void,
-  () => boolean
-];
+export declare type LocationResourceReturn<T> = [Resource<T>, () => void, () => boolean];
 
 /**
  * Provides a function for querying the current geolocation in browser.
@@ -35,7 +26,7 @@ export const createGeolocation = (
     {
       enableHighAccuracy: false,
       maximumAge: 0,
-      timeout: Number.POSITIVE_INFINITY,
+      timeout: Number.POSITIVE_INFINITY
     },
     options
   );
@@ -44,14 +35,14 @@ export const createGeolocation = (
       new Promise<GeolocationCoordinates>((resolve, reject) => {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
-            (res) => resolve(res.coords),
-            (error) => reject({ isError: true, message: error.message }),
+            res => resolve(res.coords),
+            error => reject({ isError: true, message: error.message }),
             options
           );
         } else {
           reject({
             isError: true,
-            message: "Geolocation is not supported for this Browser/OS.",
+            message: "Geolocation is not supported for this Browser/OS."
           });
         }
       })
@@ -85,18 +76,16 @@ export const createGeolocationWatcher = (
     {
       enableHighAccuracy: false,
       maximumAge: 0,
-      timeout: Number.POSITIVE_INFINITY,
+      timeout: Number.POSITIVE_INFINITY
     },
     options
   );
   let registeredHandlerID: number | null;
-  const [location, setLocation] =
-    createSignal<GeolocationCoordinates | null>(null);
+  const [location, setLocation] = createSignal<GeolocationCoordinates | null>(null);
 
   // Helper to clear the geolocator
   const clearGeolocator = () =>
-    registeredHandlerID &&
-    navigator.geolocation.clearWatch(registeredHandlerID);
+    registeredHandlerID && navigator.geolocation.clearWatch(registeredHandlerID);
 
   // Implement as an effect to allow switching locator on/off
   createComputed(() => {
@@ -105,7 +94,7 @@ export const createGeolocationWatcher = (
       (typeof watchPosition !== "function" && watchPosition)
     ) {
       registeredHandlerID = navigator.geolocation.watchPosition(
-        (res) => setLocation(res.coords),
+        res => setLocation(res.coords),
         () => setLocation(null),
         options
       );
