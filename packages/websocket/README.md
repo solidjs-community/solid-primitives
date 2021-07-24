@@ -6,19 +6,21 @@ Primitive to help establish, maintain and operate a websocket connection.
 
 ## How to use it
 
+```ts
+const [ connect, disconnect ] = createWebsocket('http://localhost', '', 3, 5000);
+```
+
 ## Demo
+
+You may find a semi-functional example here: https://codesandbox.io/s/solid-websocket-65ynu?file=/src/index.tsx
 
 ## Changelog
 
 <details>
 <summary><b>Expand Changelog</b></summary>
 
-1.0.0
+0.0.100
 
-First ported commit from react-use-localstorage.
+Initial release.
 
 </details>
-
-## Contributors
-
-Ported from the amazing work by at https://github.com/dance2die/react-use-localstorage.

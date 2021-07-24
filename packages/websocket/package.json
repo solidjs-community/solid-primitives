@@ -1,13 +1,26 @@
 {
   "name": "@solid-primitives/websocket",
-  "version": "1.0.0",
-  "description": "Primitive to create a websocket connection and manage it.",
+  "version": "0.0.100",
+  "description": "Primitive to create a worker helper",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
-  "typings": "dist/index.d.ts",
-  "scripts": {},
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/websocket",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc"
+  },
   "keywords": [
     "websocket",
+    "socket",
     "solid",
     "primitives"
   ],
@@ -19,7 +32,7 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
-    "solid-js": "^1.0.0"
+    "solid-js": "^1.0.3"
   },
   "jest": {
     "setupFiles": [

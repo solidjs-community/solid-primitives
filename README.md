@@ -45,29 +45,18 @@ Designing our primitives in this manner allows for better tree shaking and very 
 
 ## Primitives
 
-- createAudio [published]
-- createLocalStore [published]
-- createIntersectionObserver [published]
-- createResizeObserver [published]
-- createTimer [published]
-- createThrottle [published]
-- createDebounce [published]
-- createGeolocation [published]
-- createListener [published]
-- createScrollObserver [published]
-
-## Primitives In Progress
-
-- createWorker [in progress]
-- createWebsocket [in progress]
-- createMediaQuery [in progress]
-- createRAF [in progress]
-- createHistory [in progress]
-
-## Directives
-
-We're working on designing our directives library.
-
-## Components
-
-We're working on building out our components library.
+- [x] createAudio
+- [x] createLocalStore
+- [x] createIntersectionObserver
+- [x] createResizeObserver
+- [x] createTimer
+- [x] createThrottle
+- [x] createDebounce
+- [x] createGeolocation
+- [x] createListener
+- [x] createScrollObserver
+- [x] createWebsocket
+- [ ] createWorker (in progress)
+- [ ] createMediaQuery (need contribution)
+- [ ] createRAF (need contribution)
+- [ ] createHistory (need contribution)

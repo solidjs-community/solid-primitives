@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/resize-observer",
-  "version": "0.0.100",
-  "description": "Primitive to setup browser storage",
+  "version": "0.0.105",
+  "description": "Primitive to observer browser resizes",
   "author": "Moshe Udimar",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/audio",

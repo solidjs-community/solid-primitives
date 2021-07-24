@@ -1,63 +1,70 @@
-import { onMount, createMemo, createSignal, onCleanup } from 'solid-js';
-
-enum WebsocketState {
-  CONNECTED = 'connected',
-  CLOSED = 'closed',
-  OPEN = 'open',
-  CLOSING = 'closing',
-};
+import { createSignal, onCleanup } from "solid-js";
 
 /**
- * Handles managing a workers input and output.
- * Ported from: https://github.com/alibaba/hooks/blob/master/packages/hooks/src/useWebSocket/index.ts
+ * Handles opening managing and reconnecting to a Websocket.
  *
- * @param path - String to the worker
- * @param options - Optiions to supply the worker
- * @param input - Input to supply thee worker
- * @return Returned statate from the worker
- * 
+ * @param url - Path to the websocket server
+ * @param onData - A function supplied that messages will be reported to
+ * @param onError - A function supplied that errors will be reported to
+ * @param procotols - List of protocols to support
+ * @param reconnectLimit - Amount of reconnection attempts
+ * @param reconnectInterval - Time in between connection attempts
+ * @return Returns an array containing websocket management options
+ *
  * @example
  * ```ts
- * const output = createWorker('./worker.js', { hello: 'world' });
+ * const [ connect, disconnect ] = createWebsocket('http://localhost', '', 3, 5000);
  * ```
  */
 const createWebsocket = (
   url: string,
-  protocols?: string|Array<string>,
-  options: {
-    reconnectLimit: number;
-    reconnectInterval: number;
-    manual: boolean;
-    events: {}
-  }
-) => {
-  const [state, setState] = createSignal(WebsocketState.CLOSED);
-
-  const handleConnected = () => setState(WebsocketState.CONNECTED);
-  const handleDisconnected = () => setState(WebsocketState.CLOSED);
-  const handleMessage = createMemo(() => new WebSocket(url, protocols));
-  
-  const socket = createMemo(() => new WebSocket(url, protocols));
-
-  const send = () => {};
-  const disconnect = () => {};
-
-  const events = [
-    ...options.events,
-
-  ];
-
-  onMount(() => {
-    socket().addEventListener('open', handleConnected);
-    socket().addEventListener('close', handleDisconnected);
-    socket().addEventListener('message', handleMessage);
-  });
-  onCleanup(() => {
-    socket().addEventListener('open', handleConnected);
-    socket().addEventListener('close', handleDisconnected);
-    socket().addEventListener('message', handleMessage);
-  });
-  return { state, send, disconnect };
+  onData: (message: MessageEvent) => void,
+  onError: (message: Event) => void,
+  protocols?: string | Array<string>,
+  reconnectLimit?: number,
+  reconnectInterval?: number
+): [
+  connect: () => void,
+  disconnect: () => void,
+  send: (message: string) => void,
+  state: () => number,
+  socket: () => WebSocket
+] => {
+  let socket: WebSocket;
+  let reconnections = 0;
+  let reconnectId: NodeJS.Timer;
+  const [state, setState] = createSignal(WebSocket.CLOSED);
+  const send = (data: string | ArrayBuffer) => socket.send(data);
+  const cancelReconnect = () => {
+    if (reconnectId) {
+      clearTimeout(reconnectId);
+    }
+  };
+  const disconnect = () => {
+    cancelReconnect();
+    reconnectLimit = Number.POSITIVE_INFINITY;
+    if (socket) {
+      socket.close();
+    }
+  };
+  // Connect the socket to the server
+  const connect = () => {
+    cancelReconnect();
+    setState(WebSocket.CONNECTING);
+    socket = new WebSocket(url, protocols);
+    socket.onopen = () => setState(WebSocket.OPEN);
+    socket.onclose = () => {
+      setState(WebSocket.CLOSED);
+      if (reconnectLimit && reconnectLimit > reconnections) {
+        reconnections += 1;
+        reconnectId = setTimeout(connect, reconnectInterval);
+      }
+    };
+    socket.onerror = onError;
+    socket.onmessage = onData;
+  };
+  onCleanup(() => disconnect);
+  return [ connect, disconnect, send, state, () => socket ];
 };
 
 export default createWebsocket;
