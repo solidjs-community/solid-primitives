@@ -1,5 +1,7 @@
 # @solid-primitives/websocket
 
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+
 Primitive to help establish, maintain and operate a websocket connection.
 
 `createWebsocket` - Core primitive that setups up a basic outbound connection.
@@ -7,7 +9,7 @@ Primitive to help establish, maintain and operate a websocket connection.
 ## How to use it
 
 ```ts
-const [ connect, disconnect ] = createWebsocket('http://localhost', '', 3, 5000);
+const [connect, disconnect] = createWebsocket("http://localhost", "", 3, 5000);
 ```
 
 ## Demo

@@ -1,0 +1,43 @@
+{
+  "name": "@solid-primitives/raf",
+  "version": "1.0.2",
+  "description": "Primitive that a RAF management function",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/raf",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc"
+  },
+  "keywords": [
+    "raf",
+    "animation",
+    "requestAnimationFrame",
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "@types/jest": "^26.0.10",
+    "prettier": "^2.0.5",
+    "solid-testing-library": "^0.2.0",
+    "tslib": "^2.0.1",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "solid-js": "^1.0.3"
+  },
+  "jest": {
+    "setupFiles": [
+      "./test/setup.ts"
+    ]
+  }
+}
