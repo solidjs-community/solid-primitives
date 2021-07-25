@@ -45,37 +45,54 @@ Designing our primitives in this manner allows for better tree shaking and very 
 
 ## Primitives
 
-### Display/Media
+### Display & Media
 
-- [x] createAudio
-- [x] createMediaQuery
-- [x] createRAF
-- [x] createResizeObserver
-- [x] createIntersectionObserver
+- [x] [createAudio](https://github.com/davedbase/solid-primitives/tree/main/packages/audio)
+- [x] [createMediaQuery](https://github.com/davedbase/solid-primitives/tree/main/packages/media)
+- [x] [createRAF](https://github.com/davedbase/solid-primitives/tree/main/packages/raf)
+- [x] [createResizeObserver](https://github.com/davedbase/solid-primitives/tree/main/packages/resize-observer)
+- [x] [createIntersectionObserver](https://github.com/davedbase/solid-primitives/tree/main/packages/intersection-observer)
+- [ ] createDragAndDrop
+- [ ] createPageVisibilityObserver
+
+### Device
+
+- [ ] createOnlineOffline
+- [ ] createBatteryObserver
+- [ ] createFullscreen
+- [ ] createAccelerometer
+- [ ] createGyroscope
 
 ### Browser
 
-- [x] createLocalStore
-- [x] createGeolocation
-- [x] createWebsocket
-- [x] createListener
+- [x] [createLocalStore](https://github.com/davedbase/solid-primitives/tree/main/packages/local-store)
+- [x] [createCookieStore](https://github.com/davedbase/solid-primitives/tree/main/packages/cookie-store)
+- [x] [createGeolocation](https://github.com/davedbase/solid-primitives/tree/main/packages/geolocation)
+- [x] [createEventListener](https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener)
 - [ ] createClipboard
 - [ ] createHistory
 
+### Network
+
+- [x] [createWebsocket](https://github.com/davedbase/solid-primitives/tree/main/packages/websocket)
+- [ ] createNotification
+- [ ] createPush
+
 ### Inputs
 
-- [x] createScrollObserver
+- [x] [createScrollObserver](https://github.com/davedbase/solid-primitives/tree/main/packages/scroll-observer)
 - [ ] createKeyboard
 - [ ] createForm
 - [ ] createGesture (in progress)
+- [ ] createTouch
 
 ### Utilities
 
-- [x] createThrottle
-- [x] createDebounce
-- [x] createTimer
+- [x] [createThrottle](https://github.com/davedbase/solid-primitives/tree/main/packages/throttle)
+- [x] [createDebounce](https://github.com/davedbase/solid-primitives/tree/main/packages/debounce)
+- [x] [createTimer](https://github.com/davedbase/solid-primitives/tree/main/packages/timer)
+- [ ] createURL
 - [ ] createWorker (in progress)
 - [ ] createQueue
-- [ ] createOnlineOffline
 - [ ] createDateDifference
 - [ ] createEffectWhen

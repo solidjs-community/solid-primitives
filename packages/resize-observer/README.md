@@ -1,5 +1,7 @@
 # solid-primitives/resize-observer
 
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+
 Provides a reactive resize observer wrapper.
 
 `createResizeObserver` - Main resize observer primitive.

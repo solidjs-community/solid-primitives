@@ -1,5 +1,7 @@
 # @solid-primitives/intersection-observer
 
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+
 Creates a helper to manage IntersectionObserver.
 
 `createIntersectionObserver` - Creates a basic intersection observer exposing methods to manage the observable.
