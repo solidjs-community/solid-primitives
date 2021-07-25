@@ -57,8 +57,7 @@ Designing our primitives in this manner allows for better tree shaking and very 
 
 ### Device
 
-- [ ] createOnlineOffline
-- [ ] createBatteryObserver
+- [ ] createBattery
 - [ ] createFullscreen
 - [ ] createAccelerometer
 - [ ] createGyroscope
@@ -69,21 +68,24 @@ Designing our primitives in this manner allows for better tree shaking and very 
 - [x] [createCookieStore](https://github.com/davedbase/solid-primitives/tree/main/packages/cookie-store)
 - [x] [createGeolocation](https://github.com/davedbase/solid-primitives/tree/main/packages/geolocation)
 - [x] [createEventListener](https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener)
+- [ ] createURL
 - [ ] createClipboard
 - [ ] createHistory
+- [ ] createLocale
 
 ### Network
 
 - [x] [createWebsocket](https://github.com/davedbase/solid-primitives/tree/main/packages/websocket)
 - [ ] createNotification
 - [ ] createPush
+- [ ] createConnectionObserver
 
 ### Inputs
 
 - [x] [createScrollObserver](https://github.com/davedbase/solid-primitives/tree/main/packages/scroll-observer)
+- [ ] createGesture (in progress)
 - [ ] createKeyboard
 - [ ] createForm
-- [ ] createGesture (in progress)
 - [ ] createTouch
 
 ### Utilities
@@ -91,7 +93,6 @@ Designing our primitives in this manner allows for better tree shaking and very 
 - [x] [createThrottle](https://github.com/davedbase/solid-primitives/tree/main/packages/throttle)
 - [x] [createDebounce](https://github.com/davedbase/solid-primitives/tree/main/packages/debounce)
 - [x] [createTimer](https://github.com/davedbase/solid-primitives/tree/main/packages/timer)
-- [ ] createURL
 - [ ] createWorker (in progress)
 - [ ] createQueue
 - [ ] createDateDifference
