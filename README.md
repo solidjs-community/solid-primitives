@@ -45,18 +45,37 @@ Designing our primitives in this manner allows for better tree shaking and very 
 
 ## Primitives
 
+### Display/Media
+
 - [x] createAudio
-- [x] createLocalStore
-- [x] createIntersectionObserver
+- [x] createMediaQuery
+- [x] createRAF
 - [x] createResizeObserver
-- [x] createTimer
+- [x] createIntersectionObserver
+
+### Browser
+
+- [x] createLocalStore
+- [x] createGeolocation
+- [x] createWebsocket
+- [x] createListener
+- [ ] createClipboard
+- [ ] createHistory
+
+### Inputs
+
+- [x] createScrollObserver
+- [ ] createKeyboard
+- [ ] createForm
+- [ ] createGesture (in progress)
+
+### Utilities
+
 - [x] createThrottle
 - [x] createDebounce
-- [x] createGeolocation
-- [x] createListener
-- [x] createScrollObserver
-- [x] createWebsocket
-- [x] createRAF
-- [x] createMediaQuery
+- [x] createTimer
 - [ ] createWorker (in progress)
-- [ ] createHistory (need contribution)
+- [ ] createQueue
+- [ ] createOnlineOffline
+- [ ] createDateDifference
+- [ ] createEffectWhen
