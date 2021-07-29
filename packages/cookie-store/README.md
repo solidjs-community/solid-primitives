@@ -1,5 +1,7 @@
 # @solid-primitives/cookies
 
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+
 A cookies storage facility.
 
 `createCookieStore` - Handles creating and managing a single cookie action.

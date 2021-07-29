@@ -1,4 +1,4 @@
-import { isServer } from 'solid-js/web';
+import { isServer } from "solid-js/web";
 import createLocalStore from "@solid-primitives/local-store";
 
 export enum CookieSitePolicy {
@@ -15,7 +15,7 @@ export interface CookieOptions {
   httpOnly?: boolean;
   maxAge?: number;
   sameSite?: CookieSitePolicy;
-};
+}
 
 /**
  * Create a new one off cookie storage facility.
@@ -51,7 +51,7 @@ function createCookieStore<T>(
   };
   const getItem = (key: string) => {
     if (isServer) {
-      return '';
+      return "";
     }
     const reKey = new RegExp(`(?:^|; )${escape(key)}(?:=([^;]*))?(?:;|$)`);
     const match = reKey.exec(document.cookie);
@@ -59,11 +59,7 @@ function createCookieStore<T>(
     return serializer ? serializer(match[1]) : match[1];
   };
   const removeItem = (key: string) => {
-    return setItem(
-      key,
-      "a",
-      convert({ ...options, ...{ expires: -1 } })
-    );
+    return setItem(key, "a", convert({ ...options, ...{ expires: -1 } }));
   };
   const clear = () => {
     if (isServer) {
@@ -78,10 +74,10 @@ function createCookieStore<T>(
 const escape = (str: string) => str.replace(/[.*+?^$|[\](){}\\-]/g, "\\$&");
 
 const convert = (opts: CookieOptions) => {
-  let memo = '';
+  let memo = "";
   for (const [key, value] of Object.entries(opts)) {
     if (key === "expires") {
-      if (typeof value === 'function') {
+      if (typeof value === "function") {
         memo += `; ${key}=${value.toUTCString()}`;
       } else {
         memo += `; ${key}=${value}`;
@@ -93,6 +89,6 @@ const convert = (opts: CookieOptions) => {
     }
   }
   return memo;
-}
+};
 
 export default createCookieStore;

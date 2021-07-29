@@ -1,4 +1,4 @@
-import { createSignal, onMount, onCleanup } from 'solid-js';
+import { createSignal, onMount, onCleanup } from "solid-js";
 
 /**
  * Creates a very simple and straightforward media query monitor.
@@ -14,7 +14,7 @@ import { createSignal, onMount, onCleanup } from 'solid-js';
  * console.log(isSmall());
  * ```
  */
- const createMediaQuery = (
+const createMediaQuery = (
   query: string,
   initialState: boolean = false,
   watchChange: boolean = true

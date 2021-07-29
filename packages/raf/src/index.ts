@@ -60,6 +60,6 @@ const createRAF = (
   onMount(() => runImmediately && start());
   onCleanup(stop);
   return [running, start, stop];
-}
+};
 
 export default createRAF;
