@@ -1,4 +1,4 @@
-# @solid-primitives/cookie-store
+# @solid-primitives/cookies
 
 A cookies storage facility.
 
@@ -6,19 +6,23 @@ A cookies storage facility.
 
 ## How to use it
 
+```ts
+const [value, setValue] = createCookieStore("my-cookie", "derp");
+setValue("my-new-value");
+console.log(value());
+```
+
 ## Demo
+
+You may find a working example on CSB here: https://codesandbox.io/s/solid-create-cookie-store-uh192?file=/src/index.tsx
 
 ## Changelog
 
 <details>
 <summary><b>Expand Changelog</b></summary>
 
-1.0.0
+0.0.100
 
-First ported commit from react-use-localstorage.
+Initial release.
 
 </details>
-
-## Contributors
-
-Ported from the amazing work by at https://github.com/dance2die/react-use-localstorage.

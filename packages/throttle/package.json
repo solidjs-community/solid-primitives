@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/throttle",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Primitive that creates a throttle function",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -30,8 +30,8 @@
     "tslib": "^2.0.1",
     "typescript": "^4.0.2"
   },
-  "dependencies": {
-    "solid-js": "^1.0.3"
+  "peerDependencies": {
+    "solid-js": "^1.0.6"
   },
   "jest": {
     "setupFiles": [
