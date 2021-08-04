@@ -20,9 +20,9 @@ const createGraphQLClient = (
   url: string | Accessor<string>,
   headers: Headers = {},
   fetcher = fetch
- ) => {
+) => {
   return (query: string, variables: Accessor<QueryVariables>) => {
-    return createResource(variables, async (variables) =>
+    return createResource(variables, async variables =>
       fetcher(typeof url === "function" ? url() : url, {
         method: "POST",
         body: JSON.stringify({ query, variables }),
@@ -31,7 +31,7 @@ const createGraphQLClient = (
           ...headers
         }
       })
-        .then((r) => r.json())
+        .then(r => r.json())
         .then(({ data, errors }) => {
           if (errors) {
             throw errors;
@@ -48,5 +48,5 @@ export const gql = (query: Array<string>) =>
     .replace(/\r?\n|\r/g, "")
     .replace(/\s{2,}/g, " ")
     .trim();
- 
+
 export default createGraphQLClient;
