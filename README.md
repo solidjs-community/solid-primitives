@@ -76,6 +76,7 @@ Designing our primitives in this manner allows for better tree shaking and very 
 ### Network
 
 - [x] [createWebsocket](https://github.com/davedbase/solid-primitives/tree/main/packages/websocket)
+- [x] [createGraphQLClient](https://github.com/davedbase/solid-primitives/tree/main/packages/graphql)
 - [ ] createNotification
 - [ ] createPush
 - [ ] createConnectionObserver
@@ -93,6 +94,7 @@ Designing our primitives in this manner allows for better tree shaking and very 
 - [x] [createThrottle](https://github.com/davedbase/solid-primitives/tree/main/packages/throttle)
 - [x] [createDebounce](https://github.com/davedbase/solid-primitives/tree/main/packages/debounce)
 - [x] [createTimer](https://github.com/davedbase/solid-primitives/tree/main/packages/timer)
+- [x] [createTween](https://github.com/davedbase/solid-primitives/tree/main/packages/tween)
 - [ ] createWorker (in progress)
 - [ ] createQueue
 - [ ] createDateDifference
