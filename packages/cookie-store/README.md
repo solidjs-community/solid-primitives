@@ -27,4 +27,12 @@ You may find a working example on CSB here: https://codesandbox.io/s/solid-creat
 
 Initial release.
 
+1.1.3
+
+Official release.
+
+1.1.4
+
+Patched incorrect use of serialize for the deserialize method.
+
 </details>

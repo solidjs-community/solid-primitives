@@ -22,7 +22,8 @@ export interface CookieOptions {
  *
  * @param prefix - Key prefix to store the cookie as
  * @param options - Starting value of the cookie
- * @param serializer - A function
+ * @param serializer - A function used for serializing to cookie store
+ * @param deserializer - A function used for deserializing from the cookie store
  *
  * @example
  * ```ts
@@ -34,7 +35,8 @@ export interface CookieOptions {
 function createCookieStore<T>(
   prefix: string | null = null,
   options?: CookieOptions,
-  serializer: Function | null = encodeURIComponent
+  serializer: Function | null = encodeURIComponent,
+  deserializer: Function | null = decodeURIComponent,
 ): [
   store: T,
   setter: (key: string, value: string | number) => void,
@@ -56,7 +58,7 @@ function createCookieStore<T>(
     const reKey = new RegExp(`(?:^|; )${escape(key)}(?:=([^;]*))?(?:;|$)`);
     const match = reKey.exec(document.cookie);
     if (match === null) return null;
-    return serializer ? serializer(match[1]) : match[1];
+    return deserializer ? deserializer(match[1]) : match[1];
   };
   const removeItem = (key: string) => {
     return setItem(key, "a", convert({ ...options, ...{ expires: -1 } }));
