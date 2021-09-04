@@ -94,6 +94,7 @@ Designing our primitives in this manner allows for better tree shaking and very 
 - [x] [createThrottle](https://github.com/davedbase/solid-primitives/tree/main/packages/throttle)
 - [x] [createDebounce](https://github.com/davedbase/solid-primitives/tree/main/packages/debounce)
 - [x] [createTimer](https://github.com/davedbase/solid-primitives/tree/main/packages/timer)
+- [x] [createCountdown](https://github.com/davedbase/solid-primitives/tree/main/packages/countdown)
 - [x] [createTween](https://github.com/davedbase/solid-primitives/tree/main/packages/tween)
 - [ ] createWorker (in progress)
 - [ ] createQueue

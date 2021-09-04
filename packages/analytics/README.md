@@ -1,8 +1,8 @@
-# @solid-primitives/raf
+# @solid-primitives/analytics
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
-Creates a primitive to support requestAnimationFrame.
+Creates a primitive for analytics management.
 
 ## How to use it
 
@@ -13,7 +13,7 @@ start();
 
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-create-raf-czd1e?file=/src/index.tsx
+You may view a working example here: https://codesandbox.io/s/solid-create-analytics?file=/src/index.tsx
 
 ## Changelog
 
@@ -21,7 +21,5 @@ You may view a working example here: https://codesandbox.io/s/solid-create-raf-c
 <summary><b>Expand Changelog</b></summary>
 
 0.0.100
-
-Initial release ported from https://github.com/microcipcip/vue-use-kit/blob/master/src/functions/useRafFn/useRafFn.ts.
 
 </details>
