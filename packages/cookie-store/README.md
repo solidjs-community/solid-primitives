@@ -35,4 +35,8 @@ Official release.
 
 Patched incorrect use of serialize for the deserialize method.
 
+1.1.5
+
+Patched issue with deleting and added strinfication ability.
+
 </details>

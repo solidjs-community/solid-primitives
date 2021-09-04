@@ -9,9 +9,9 @@ Creates a general local storage handler for LocalStorage, SessionStorage or your
 ## How to use it
 
 ```ts
- const [value, setValue] = createStorage('app');
- setValue('foo', 'bar');
- console.log(value.foo);
+const [value, setValue] = createStorage("app");
+setValue("foo", "bar");
+console.log(value.foo);
 ```
 
 ## Demo
@@ -26,5 +26,9 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-l
 0.0.100
 
 First developed commit.
+
+1.1.4
+
+Added ability to stringify storage.
 
 </details>

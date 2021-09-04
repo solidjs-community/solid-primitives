@@ -31,6 +31,9 @@ function createLocalStore<T>(
       {},
       {
         get(_, key: string) {
+          if (key === "toJSON") {
+            return storage.getAll ? () => storage.getAll() : () => storage;
+          }
           if (getListener()) {
             let node = signals.get(key);
             if (!node) {
