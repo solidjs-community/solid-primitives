@@ -96,6 +96,7 @@ Designing our primitives in this manner allows for better tree shaking and very 
 - [x] [createTimer](https://github.com/davedbase/solid-primitives/tree/main/packages/timer)
 - [x] [createCountdown](https://github.com/davedbase/solid-primitives/tree/main/packages/countdown)
 - [x] [createTween](https://github.com/davedbase/solid-primitives/tree/main/packages/tween)
+- [x] [usei18n](https://github.com/davedbase/solid-primitives/tree/main/packages/i18n)
 - [ ] createWorker (in progress)
 - [ ] createQueue
 - [ ] createDateDifference
