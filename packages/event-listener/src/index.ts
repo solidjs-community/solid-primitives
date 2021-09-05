@@ -16,7 +16,10 @@ const createEventListener = <T extends HTMLElement>(
   eventName: keyof WindowEventMap,
   handler: (event: Event) => void,
   targets: T | Array<T> | Window = window
-): [add: (el: T | Window) => void, remove: (el: T | Window) => void] => {
+): readonly [
+  add: (el: T | Window) => void,
+  remove: (el: T | Window) => void
+] => {
   const add = (target: T | Window): void =>
     target.addEventListener && target.addEventListener(eventName, handler);
   const remove = (target: T | Window): void =>

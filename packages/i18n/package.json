@@ -1,0 +1,44 @@
+{
+  "name": "@solid-primitives/i18n",
+  "version": "0.0.100",
+  "description": "Primitive to create and use i18n primitives.",
+  "author": "Alexandre Mouton-Brady <amoutonbrady@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/i18n",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc"
+  },
+  "keywords": [
+    "i18m",
+    "internationalization",
+    "language",
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "@types/jest": "^26.0.10",
+    "prettier": "^2.0.5",
+    "solid-testing-library": "^0.2.0",
+    "tslib": "^2.0.1",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "@solid-primitives/timer": "^0.0.106",
+    "solid-js": "^1.0.3"
+  },
+  "jest": {
+    "setupFiles": [
+      "./test/setup.ts"
+    ]
+  }
+}
