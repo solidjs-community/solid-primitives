@@ -75,6 +75,7 @@ Designing our primitives in this manner allows for better tree shaking and very 
 
 ### Network
 
+- [ ] createFetch
 - [x] [createWebsocket](https://github.com/davedbase/solid-primitives/tree/main/packages/websocket)
 - [x] [createGraphQLClient](https://github.com/davedbase/solid-primitives/tree/main/packages/graphql)
 - [ ] createNotification
