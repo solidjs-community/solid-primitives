@@ -10,6 +10,7 @@
     "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx}\""
   },
   "devDependencies": {
+    "@types/jest": "27.0.1",
     "prettier": "^2.3.2",
     "jest": "^26.6.3",
     "lerna": "^4.0.0",
