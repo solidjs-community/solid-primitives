@@ -30,7 +30,7 @@ if (!window.Response) {
     }
     get arrayBuffer() {
       return () => {
-        const bodyArray = this.body.toString().split("");
+        const bodyArray = (this.body ?? '').toString().split("");
         const buffer = new ArrayBuffer(bodyArray.length);
         const view = new Uint8Array(buffer);
         bodyArray.forEach((char, index) => {
@@ -48,16 +48,16 @@ if (!window.Response) {
     get blob() {
       return () =>
         Promise.resolve(
-          new Blob([this.body.toString()], {
+          new Blob([(this.body ?? '').toString()], {
             type: this.headers.get("content-type") || "text/plain"
           })
         );
     }
     get text() {
-      return () => Promise.resolve(this.body.toString());
+      return () => Promise.resolve((this.body ?? '').toString());
     }
     get json() {
-      return () => Promise.resolve(JSON.parse(this.body.toString()));
+      return () => Promise.resolve(JSON.parse((this.body ?? '').toString()));
     }
   }
   (window as any).Response = ResponseMock;
