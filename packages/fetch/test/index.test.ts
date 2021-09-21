@@ -44,5 +44,38 @@ describe('createFetch', () => {
         }
       });
     });
-  }));  
+  }));
+
+  test('will fetch text data', () => new Promise<void>((resolve) => {
+    createRoot((dispose) => {
+      const [ready] = createFetch<typeof mockResponseBody, undefined>(mockUrl, { fetch: fetchMock, responseHandler: (res) => res.text() });
+      createEffect(() => {
+        const answer = ready()
+        if (ready.error) {
+          throw ready.error;
+        }
+        if (typeof answer !== "undefined") {
+          expect(answer).toBe(JSON.stringify(mockResponseBody));
+          dispose();
+          resolve();
+        }
+      });
+    });
+  }));
+
+  test('will abort a request without an error', () =>
+    createRoot((dispose) => {
+      const [ready, { abort }] = createFetch<typeof mockResponseBody, undefined>(mockUrl, { fetch: fetchMock });
+      abort();
+      expect(ready.aborted).toBe(true);
+      createEffect(() => {
+        if (ready.error) {
+          throw ready.error;
+        }
+      });
+      return new Promise<void>((resolve) => window.setTimeout(() => {
+        dispose();
+        resolve();
+      }, 500));
+    }));
 });

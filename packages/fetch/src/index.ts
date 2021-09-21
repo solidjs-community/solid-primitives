@@ -80,33 +80,23 @@ export function createFetch<T, I>(
   requestInit?: Accessor<RequestInit> | RequestInit | FetchOptions<I>,
   options?: FetchOptions<I>
 ): FetchReturn<T, I> {
-  let abort: AbortController = new AbortController();
-  let resourceReturn: FetchReturn<T, I> = [Object.assign(() => (undefined as unknown) as T | I, {
-    aborted: false,
-    error: undefined,
-    loading: false,
-    status: null,
-    response: null
-  }), {
-    abort: abort.abort.bind(abort),
-    refetch: () => undefined,
-    mutate: (v: T | I) => v
-  }];
+  let abort: AbortController;
+  let resourceReturn: FetchReturn<T, I>;
+  
   if (isOptions(requestInit)) {
     options = requestInit;
     requestInit = undefined;
   }
   
-  onCleanup(() => abort?.abort());
-  
   const fetcher = (
     [requestInfo, requestInit]: [requestInfo: RequestInfo, requestInit?: RequestInit],
     getPrev: () => T | I
-  ): Promise<T | I> => {
-    if (!abort.signal.aborted) {
-      abort.abort()
+  ): Promise<T | I> => {    
+    if (!abort || !abort.signal.aborted && resourceReturn?.[0].loading) {
+      abort?.abort()
+      abort = new AbortController();
     }
-    abort = new AbortController();
+    Promise.resolve().then(() => { resourceReturn[0].aborted = false; });
     return (options?.fetch ?? fetch)(requestInfo, requestInit)
       .then((response: Response) => {
         resourceReturn[0].status = response.status;
@@ -123,9 +113,10 @@ export function createFetch<T, I>(
           return response.blob()
         }
       }).catch((err) => {
+        console.warn(err)
         if (err?.name === abortError) {
           resourceReturn[0].aborted = true;
-          return getPrev();
+          return Promise.resolve(getPrev());
         }
         throw err;
       });
@@ -135,10 +126,12 @@ export function createFetch<T, I>(
     typeof requestInit === 'function' ? requestInit() : requestInit as RequestInit | undefined
   ]), fetcher, options as any) as unknown) as FetchReturn<T, I>;
   Object.assign(resourceReturn[0], {
-    aborted: abort.signal.aborted,
     status: null,
     response: null
   });
-  resourceReturn[1].abort = abort.abort.bind(abort);
+  Object.defineProperty(resourceReturn[1], 'abort', { get: () => () => { resourceReturn[0].aborted = true; abort?.abort() } });
+
+  onCleanup(() => { abort?.abort(); });
+
   return resourceReturn;
 }
