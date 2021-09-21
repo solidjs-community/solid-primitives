@@ -52,11 +52,8 @@ const deepReadObject = <T = any>(
  * // => 'Hello Tom'
  * ```
  */
-const template = (
-  str: string,
-  params: Record<string, string>,
-  reg: RegExp = /{{(.*?)}}/g
-): string => str.replace(reg, (_, key) => deepReadObject(params, key, ""));
+const template = (str: string, params: Record<string, string>, reg: RegExp = /{{(.*?)}}/g): any =>
+  str.replace(reg, (_, key) => deepReadObject(params, key, ""));
 
 /**
  * This creates a I18nContext. It's extracted into a function to be able to type the Context
@@ -67,16 +64,10 @@ const template = (
  */
 export const createI18nContext = (
   init: Record<string, Record<string, any>> = {},
-  lang: string = navigator.language in init
-    ? navigator.language
-    : Object.keys(init)[0]
-): readonly [
-  (
-    key: string,
-    params?: Record<string, string>,
-    defaultValue?: string
-  ) => string,
-  {
+  lang: string = navigator.language in init ? navigator.language : Object.keys(init)[0]
+): [
+  template: (key: string, params?: Record<string, string>, defaultValue?: string) => any,
+  actions: {
     add(lang: string, table: Record<string, any>): void;
     locale: (lang?: string) => string;
     dict: (lang: string) => Record<string, Record<string, any>>;
@@ -136,7 +127,7 @@ export const createI18nContext = (
      * ```
      */
     add(lang: string, table: Record<string, any>) {
-      setDict(lang, (t) => Object.assign(t || {}, table));
+      setDict(lang, t => Object.assign(t || {}, table));
     },
     /**
      * Switch to the language in the parameters.
@@ -164,11 +155,9 @@ export const createI18nContext = (
      */
     dict: (lang: string) => deepReadObject(dict, lang)
   };
-  return [translate, actions] as const;
+  return [translate, actions];
 };
 
-export const I18nContext = createContext<
-  ReturnType<typeof createI18nContext>
->();
+export const I18nContext = createContext<ReturnType<typeof createI18nContext>>();
 
 export const useI18n = () => useContext(I18nContext);
