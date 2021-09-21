@@ -1,4 +1,4 @@
-import { render } from 'solid-testing-library';
+import { createRoot, createEffect } from 'solid-js';
 import { createFetch } from '../src';
 
 describe('createFetch', () => {
@@ -13,25 +13,69 @@ describe('createFetch', () => {
     input: mockUrl,
     init: undefined,
   };
-  const fetchMock: typeof fetch = (input: RequestInfo, init?: RequestInit): Promise<Response> => {
+  const fetchMock: typeof fetch = (
+    input: RequestInfo,
+    init?: RequestInit
+  ): Promise<Response> => new Promise((resolve, reject) => {
     if (expected.input) {
       expect(input).toEqual(expected.input);
     }
     if (expected.init) {
       expect(init).toEqual(expected.init);
-    }    
-    return mockError ? Promise.reject(mockError) : Promise.resolve(mockResponse);
-  }
-  test('will fetch json data', async () => {
-    const Component = () => {
-      const [ready] = createFetch<typeof mockResponseBody, undefined>(mockUrl, { fetch: fetchMock });
-      return ready()?.ready
     }
-    const container = document.createElement('div');
-    document.body.appendChild(container);
-    render(<Component />, container);
-    await new Promise(r => setTimeout(r, 200));
-    expect(container.innerHTML).toBe('true');
-  });  
+    if (mockError) {
+      reject(mockError);
+    } else {
+      resolve(mockResponse);
+    }
+  });
+  test('will fetch json data', () => new Promise<void>((resolve) => {
+    createRoot((dispose) => {
+      const [ready] = createFetch<typeof mockResponseBody, undefined>(mockUrl, { fetch: fetchMock });
+      createEffect(() => {
+        const isReady = ready()?.ready
+        if (ready.error) {
+          throw ready.error;
+        }
+        if (typeof isReady !== "undefined") {
+          expect(isReady).toBe(true);
+          dispose();
+          resolve();
+        }
+      });
+    });
+  }));
 
+  test('will fetch text data', () => new Promise<void>((resolve) => {
+    createRoot((dispose) => {
+      const [ready] = createFetch<typeof mockResponseBody, undefined>(mockUrl, { fetch: fetchMock, responseHandler: (res) => res.text() });
+      createEffect(() => {
+        const answer = ready()
+        if (ready.error) {
+          throw ready.error;
+        }
+        if (typeof answer !== "undefined") {
+          expect(answer).toBe(JSON.stringify(mockResponseBody));
+          dispose();
+          resolve();
+        }
+      });
+    });
+  }));
+
+  test('will abort a request without an error', () =>
+    createRoot((dispose) => {
+      const [ready, { abort }] = createFetch<typeof mockResponseBody, undefined>(mockUrl, { fetch: fetchMock });
+      abort();
+      expect(ready.aborted).toBe(true);
+      createEffect(() => {
+        if (ready.error) {
+          throw ready.error;
+        }
+      });
+      return new Promise<void>((resolve) => window.setTimeout(() => {
+        dispose();
+        resolve();
+      }, 500));
+    }));
 });

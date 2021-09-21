@@ -52,6 +52,14 @@ Designing our primitives in this manner allows for better tree shaking and very 
 - [x] [createRAF](https://github.com/davedbase/solid-primitives/tree/main/packages/raf)
 - [x] [createResizeObserver](https://github.com/davedbase/solid-primitives/tree/main/packages/resize-observer)
 - [x] [createIntersectionObserver](https://github.com/davedbase/solid-primitives/tree/main/packages/intersection-observer)
+- [ ] [createPermission](https://github.com/davedbase/solid-primitives/tree/main/packages/permission)
+- [ ] [createDevices](https://github.com/davedbase/solid-primitives/tree/main/packages/devices)
+- [ ] [createMicrophones](https://github.com/davedbase/solid-primitives/tree/main/packages/devices)
+- [ ] [createSpeakers](https://github.com/davedbase/solid-primitives/tree/main/packages/devices)
+- [ ] [createCameras](https://github.com/davedbase/solid-primitives/tree/main/packages/devices)
+- [ ] [createStream](https://github.com/davedbase/solid-primitives/tree/main/packages/stream)
+- [ ] [createAmplitudeStream](https://github.com/davedbase/solid-primitives/tree/main/packages/stream)
+- [ ] [createMediaPermissionRequest](https://github.com/davedbase/solid-primitives/tree/main/packages/stream)
 - [ ] createDragAndDrop
 - [ ] createPageVisibilityObserver
 
@@ -75,7 +83,7 @@ Designing our primitives in this manner allows for better tree shaking and very 
 
 ### Network
 
-- [ ] createFetch
+- [x] [createFetch](https://github.com/davedbase/solid-primitives/tree/main/packages/fetch)
 - [x] [createWebsocket](https://github.com/davedbase/solid-primitives/tree/main/packages/websocket)
 - [x] [createGraphQLClient](https://github.com/davedbase/solid-primitives/tree/main/packages/graphql)
 - [ ] createNotification
