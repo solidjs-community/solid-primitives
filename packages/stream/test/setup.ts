@@ -1,30 +1,35 @@
 if (!window.AudioContext) {
   class AudioContextMock {
-    public state: AudioContextState = 'running';
+    public state: AudioContextState = "running";
     constructor(private options: AudioContextOptions) {}
-    
-    createAnalyser() {      
-      return Object.assign({        
-        frequencyBinCount: 128,
-        getByteFrequencyData: (array) => {
-          array.set([...array].map(() => Math.random() * 255 | 0));
+
+    createAnalyser() {
+      return Object.assign(
+        {
+          frequencyBinCount: 128,
+          getByteFrequencyData: array => {
+            array.set([...array].map(() => (Math.random() * 255) | 0));
+          }
+        } as AnalyserNode,
+        {
+          connect: () => null,
+          disconnect: () => null
         }
-      } as AnalyserNode, {
-        connect: () => null,
-        disconnect: () => null
-      });
+      );
     }
     createMediaStreamSource(mediaStream) {
-      return Object.assign({
-        mediaStream,
-      } as MediaStreamAudioSourceNode, 
-      { connect: () => null, disconnect: () => null });
+      return Object.assign(
+        {
+          mediaStream
+        } as MediaStreamAudioSourceNode,
+        { connect: () => null, disconnect: () => null }
+      );
     }
     close() {
-      if (this.state === 'closed') {
-        return Promise.reject(new Error('Closing an already closed AudioContext'));
+      if (this.state === "closed") {
+        return Promise.reject(new Error("Closing an already closed AudioContext"));
       }
-      this.state = 'closed'
+      this.state = "closed";
       return Promise.resolve();
     }
   }
@@ -39,7 +44,7 @@ if (!window.AudioContext) {
 
 (navigator as any).mediaDevices = {
   getUserMedia: (constraints: MediaStreamConstraints) => {
-    const fakeMediaStream: MediaStream = (window as any).__mockstream__
+    const fakeMediaStream: MediaStream = (window as any).__mockstream__;
     return Promise.resolve(Object.assign(fakeMediaStream, constraints));
   }
-}
+};
