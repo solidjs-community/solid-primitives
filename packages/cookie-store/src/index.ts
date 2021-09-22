@@ -85,7 +85,7 @@ function createCookieStore<T>(
   const getAll = () =>
     document.cookie.split(";").reduce((memo: { [key: string]: string }, item: string) => {
       if (item === "") return memo;
-      const value = item.trim().split(/(=)/);
+      const value = item.trim().split(/(=)/, 1);
       memo[value[0]] = deserializer ? deserializer(value[2]) : value[2];
       return memo;
     }, {});

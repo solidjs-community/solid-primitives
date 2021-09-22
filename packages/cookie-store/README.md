@@ -39,4 +39,8 @@ Patched incorrect use of serialize for the deserialize method.
 
 Patched issue with deleting and added strinfication ability.
 
+1.1.6
+
+Fixed an issue with `=` in values
+
 </details>
