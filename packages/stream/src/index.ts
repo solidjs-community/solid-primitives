@@ -75,11 +75,11 @@ export const createStream = (
 /**
  * Creates a reactive signal containing the amplitude of a microphone
  * ```typescript
- * [amplitude, { mutate, refetch, stop }] = createAmplitudeStream(device);
+ * [amplitude, { stream, mutate, refetch, stop }] = createAmplitudeStream(device);
  * ```
  * @param device MediaDeviceInfo | Accessor<MediaDeviceInfo>
  * @param constraints MediaDeviceInfo | MediaStreamConstraints | Accessor<MediaDeviceInfo | MediaStreamConstraints>
- * @property `amplitude()` allows access to the media stream (or undefined if none is present)
+ * @property `amplitude()` allows access the amplitude as a number between 0 and 100
  * @property `amplitude.loading` is a boolean indicator for the loading state of the underlying stream
  * @property `amplitude.error` contains any error getting the stream encountered
  * @method `mutate` allows to manually overwrite the microphone stream
@@ -123,7 +123,10 @@ export const createAmplitudeStream = (
   const buffer = new Uint8Array(analyser.frequencyBinCount);
   const read = () => {
     analyser.getByteFrequencyData(buffer);
-    setAmplitude(Math.sqrt(buffer.reduce((sum, v) => sum + v * v, 0) / buffer.length));
+    const rootMeanSquare = Math.sqrt(buffer.reduce((sum, v) => sum + v * v, 0) / buffer.length) | 0;
+    setAmplitude(
+      rootMeanSquare > 100 ? 100 : rootMeanSquare
+    );
   };
   let id: number;
   const loop = () => {
