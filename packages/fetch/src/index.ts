@@ -137,7 +137,6 @@ export function createFetch<T, I>(
         }
       })
       .catch(err => {
-        console.warn(err);
         if (err?.name === abortError) {
           resourceReturn[0].aborted = true;
           return Promise.resolve(getPrev());

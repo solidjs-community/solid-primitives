@@ -33,4 +33,12 @@ TODO
 
 Initial release adapted from https://github.com/microcipcip/vue-use-kit/blob/master/src/functions/useFetch/useFetch.ts.
 
+0.0.105
+
+Improve test setup
+
+0.0.106
+
+Add tests for error case, remove stray console.warn
+
 </details>

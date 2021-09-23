@@ -84,7 +84,22 @@ describe("createFetch", () => {
         window.setTimeout(() => {
           dispose();
           resolve();
-        }, 500)
+        }, 20)
       );
     }));
+
+  test("will make a request error accessible otherwise", () => new Promise<void>(resolve =>
+    createRoot(dispose => {
+      const fetchError = new Error('TypeError: failed to fetch');
+      const [ready] = createFetch<typeof mockResponseBody, undefined>(mockUrl, {
+        fetch: () => Promise.reject(fetchError)
+      });      
+      createEffect(() => {
+        if (ready.error) {
+          expect(ready.error).toBe(fetchError);
+          dispose();
+          resolve();
+        }
+      });
+    })));
 });
