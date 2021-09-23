@@ -1,49 +1,50 @@
+import { createRoot } from 'solid-js';
 import { render } from 'solid-testing-library';
-import createStorage from '../src/index';
+import { createCookieStore } from '../src';
 
-describe('createLocalStorage', (): void => {
-
+describe('createCookieStore', () => {
   const KEY = 'key';
+  const PREFIX = 'prefix';
   const VALUE = {
     INITIAL: 'initial value',
     CHANGED: 'changed value',
+    WITH_EQUALS: 'with equal (=) sign',
     NONE: '',
   };
 
-  describe('Setup', () => {
-    it('Returns initial value', () => {
-      const { result } = render(() => createStorage(VALUE.INITIAL));
-      expect(result())).toMatch(VALUE.INITIAL);
-    });
+  it('works without prefix', () => createRoot((dispose) => {
+    document.cookie = `${KEY}=${VALUE.INITIAL};`
+    const [store] = createCookieStore<{ key: string }>();
+    expect(store.key).toEqual(VALUE.INITIAL);
+    dispose();
+  }));
 
-    it('When no initial value is passed, returns an empty string', () => {
-      const { result } = render(() => createStorage());
-      expect(result.current[0]).toMatch(VALUE.NONE);
-    });
+  it('uses prefix', () => createRoot((dispose) => {
+    document.cookie = `${PREFIX}.${KEY}=${VALUE.INITIAL};`
+    const [store] = createCookieStore<{ key: string }>(PREFIX);
+    expect(store.key).toEqual(VALUE.INITIAL);
+    dispose();
+  }));
 
-    it('Returns setValue function', () => {
-      const { result } = render(() => createStorage(VALUE.INITIAL));
-      expect(typeof result.current[1]).toMatch('function');
-    });
-  });
+  it('returns "" for unset values', () => createRoot((dispose) => {
+    document.cookie = `${PREFIX}.${KEY}=${VALUE.INITIAL};`
+    const [store] = createCookieStore<{ [key: string]: string }>();
+    expect(store.none).toEqual(VALUE.NONE);
+    dispose();
+  }));
 
-  it('When `setValue()` is called, the `value` updates', () => {
-    const { result } = render(() => createStorage(VALUE.INITIAL));
+  it('updates values via `setValue(key, value)', () => createRoot((dispose) => {
+    document.cookie = '';
+    const [store, setValue] = createCookieStore<{ key: string }>();
+    setValue(KEY, VALUE.CHANGED);
+    expect(document.cookie).toMatch(`${KEY}=${escape(VALUE.CHANGED)}`);
+    dispose();
+  }));
 
-    act(() => {
-      result.current[1](VALUE.CHANGED);
-    });
-
-    expect(result.current[0]).toMatch(VALUE.CHANGED);
-  });
-
-  it('When `value` changes, `localStorage` is updated', () => {
-    const { result } = render(() => createStorage(VALUE.INITIAL));
-
-    act(() => {
-      result.current[1](VALUE.CHANGED);
-    });
-
-    expect(localStorage.getItem(KEY)).toBe(VALUE.CHANGED);
-  });
+  it('toJSON will return all cookies and handle values with "=" correctly', () => createRoot((dispose) => {
+    document.cookie = `${KEY}=${VALUE.WITH_EQUALS};`
+    const [store] = createCookieStore<{ key: string, toJSON: () => ({ key: string }) }>();
+    expect(store.toJSON()).toMatchObject({ key: VALUE.WITH_EQUALS });
+    dispose();
+  }));
 });

@@ -51,7 +51,7 @@ const convert = (opts: CookieOptions) => {
  * console.log(value());
  * ```
  */
-function createCookieStore<T>(
+export function createCookieStore<T>(
   prefix: string | null = null,
   options?: CookieOptions,
   serializer: Function | null = encodeURIComponent,
@@ -82,7 +82,19 @@ function createCookieStore<T>(
       convert({ ...options, ...{ expires: "Thu, 01 Jan 1970 00:00:00 GMT" } })
     );
   };
-  const getAll = () =>
+  const getAll = () => {
+    const all: { [key: string]: string } = {};
+    document.cookie.replace(
+      /(?:^|;)\s*(.+?)\s*=\s*([^;]+)/g,
+      (_: string, key?: string, value?: string) => {
+        if (key && value) {
+          all[key] = deserializer ? deserializer(value) : value;
+        }
+        return ''
+      }
+    );
+    return all;
+  }
     document.cookie.split(";").reduce((memo: { [key: string]: string }, item: string) => {
       if (item === "") return memo;
       const value = item.trim().split(/(=)/, 1);
