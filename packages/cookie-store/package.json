@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/cookies-store",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "Primitive that manages browser cookies",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
