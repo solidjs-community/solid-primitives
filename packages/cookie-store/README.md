@@ -2,6 +2,8 @@
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
+## WARNING!: This primitive is deprecated in favour of the new/incoming Storage primitive. This package will be available but unmaintained.
+
 A cookies storage facility.
 
 `createCookieStore` - Handles creating and managing a single cookie action.

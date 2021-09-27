@@ -67,11 +67,11 @@ export function createCookieStore<T>(
   const setItem = (key: string, value: string, atts?: string) => {
     if (isServer) return;
     const valueStr = serializer ? serializer(value) : value;
-    document.cookie = `${key}=${valueStr}${atts || attrs}`;
+    globalThis.document.cookie = `${key}=${valueStr}${atts || attrs}`;
   };
   const getItem = (key: string) => {
     if (isServer) return;
-    const value = document.cookie.match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")?.pop() || "";
+    const value = globalThis.document.cookie.match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")?.pop() || "";
     return deserializer ? deserializer(value) : value;
   };
   const removeItem = (key: string) => {
@@ -84,7 +84,7 @@ export function createCookieStore<T>(
   };
   const getAll = () => {
     const all: { [key: string]: string } = {};
-    document.cookie.replace(
+    globalThis.document.cookie.replace(
       /(?:^|;)\s*(.+?)\s*=\s*([^;]+)/g,
       (_: string, key?: string, value?: string) => {
         if (key && value) {
@@ -95,7 +95,7 @@ export function createCookieStore<T>(
     );
     return all;
   }
-    document.cookie.split(";").reduce((memo: { [key: string]: string }, item: string) => {
+    globalThis.document.cookie.split(";").reduce((memo: { [key: string]: string }, item: string) => {
       if (item === "") return memo;
       const value = item.trim().split(/(=)/, 1);
       memo[value[0]] = deserializer ? deserializer(value[2]) : value[2];
