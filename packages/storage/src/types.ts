@@ -36,6 +36,12 @@ export type StorageObject<T> = Record<string, T>;
 
 export type StorageSetter<T, O> = (key: string, value: T, options?: O) => void;
 
+export type StorageActions<T> = {
+  remove: (key: string) => void;
+  clear: () => void;
+  toJSON: () => { [key: string]: T };
+}
+
 export type AsyncStorage = {
   clear?: () => Promise<void> | void;
   getItem: (key: string) => Promise<string | null> | string | null;
@@ -45,7 +51,6 @@ export type AsyncStorage = {
   readonly length: number | undefined;
   [key: string]: any;
 };
-
 export type AsyncStorageWithOptions<O> = {
   clear?: () => Promise<void> | void;
   getItem: (key: string, options?: O) => Promise<string | null> | string | null;
@@ -59,6 +64,12 @@ export type AsyncStorageWithOptions<O> = {
 export type AsyncStorageObject<T> = Record<string, Promise<T | null>>;
 
 export type AsyncStorageSetter<T, O> = (key: string, value: T, options?: O) => Promise<void> | void;
+
+export type AsyncStorageActions<T> = {
+  remove: (key: string) => Promise<void> | void;
+  clear: () => Promise<void> | void;
+  toJSON: () => Promise<{ [key: string]: T }>;
+}
 
 export type StorageSignalProps<T, A, O> = StorageProps<T, A, O> & {
   equals?: false | ((prev: T, next: T) => boolean) | undefined;

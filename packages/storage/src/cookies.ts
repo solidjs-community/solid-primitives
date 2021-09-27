@@ -32,6 +32,25 @@ const serializeCookieOptions = (options?: CookieOptions) => {
   return memo;
 };
 
+<<<<<<< HEAD
+=======
+/**
+ * handle cookies exactly like you would handle localStorage
+ * 
+ * the main change is that setItem accepts the following options:
+ * ```typescript
+ * export type CookieOptions = {
+ *   domain?: string;
+ *   expires?: Date | number | String;
+ *   path?: string;
+ *   secure?: boolean;
+ *   httpOnly?: boolean;
+ *   maxAge?: number;
+ *   sameSite?: "None" | "Lax" | "Strict";
+ * };
+ * ```
+ */
+>>>>>>> 34e82ae1598a3f44a03939374c1417955c02ce82
 export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   getItem: (key: string) =>
     document.cookie.match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")?.pop() ?? null,
@@ -62,10 +81,22 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   }
 });
 
+<<<<<<< HEAD
+=======
+/**
+ * creates a reactive store but bound to document.cookie
+ */
+>>>>>>> 34e82ae1598a3f44a03939374c1417955c02ce82
 export const createCookieStorage = <T, O = CookieOptions, A = StorageWithOptions<CookieOptions>>(
   props?: Omit<StorageProps<T, A, O>, "api">
 ) => createStorage<O, T>({ ...props, api: cookieStorage } as any);
 
+<<<<<<< HEAD
+=======
+/**
+ * creates a reactive signal, but bound to document.cookie
+ */
+>>>>>>> 34e82ae1598a3f44a03939374c1417955c02ce82
 export const createCookieStorageSignal = <
   T,
   O = CookieOptions,
