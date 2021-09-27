@@ -34,7 +34,7 @@ const serializeCookieOptions = (options?: CookieOptions) => {
 
 /**
  * handle cookies exactly like you would handle localStorage
- * 
+ *
  * the main change is that setItem accepts the following options:
  * ```typescript
  * export type CookieOptions = {
@@ -49,31 +49,44 @@ const serializeCookieOptions = (options?: CookieOptions) => {
  * ```
  */
 export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
+  _cookies: [globalThis.document, "cookie"],
   getItem: (key: string) =>
-    document.cookie.match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")?.pop() ?? null,
+    cookieStorage._cookies[0][cookieStorage._cookies[1]]
+      .match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")
+      ?.pop() ?? null,
   setItem: (key: string, value: string, options?: CookieOptions) => {
-    document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
+    cookieStorage._cookies[0][cookieStorage._cookies[1]] = `${key}=${value}${serializeCookieOptions(
+      options
+    )}`;
   },
   removeItem: (key: string) => {
-    document.cookie = `${key}=deleted${serializeCookieOptions({ expires: new Date(0) })}`;
+    cookieStorage._cookies[0][cookieStorage._cookies[1]] = `${key}=deleted${serializeCookieOptions({
+      expires: new Date(0)
+    })}`;
   },
   key: (index: number) => {
     let key: string | null = null;
     let count = 0;
-    document.cookie.replace(/(?:^|;)\s*(.+?)\s*=\s*[^;]+/g, (_, found) => {
-      if (!key && found && count++ === index) {
-        key = found;
+    cookieStorage._cookies[0][cookieStorage._cookies[1]].replace(
+      /(?:^|;)\s*(.+?)\s*=\s*[^;]+/g,
+      (_: string, found: string) => {
+        if (!key && found && count++ === index) {
+          key = found;
+        }
+        return "";
       }
-      return "";
-    });
+    );
     return key;
   },
   get length() {
     let length = 0;
-    document.cookie.replace(/(?:^|;)\s*.+?\s*=\s*[^;]+/g, found => {
-      length += found ? 1 : 0;
-      return "";
-    });
+    cookieStorage._cookies[0][cookieStorage._cookies[1]].replace(
+      /(?:^|;)\s*.+?\s*=\s*[^;]+/g,
+      (found: string) => {
+        length += found ? 1 : 0;
+        return "";
+      }
+    );
     return length;
   }
 });

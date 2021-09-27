@@ -58,7 +58,7 @@ export function createStorage<O, T>(
   setter: StorageSetter<T, O>,
   actions: StorageActions<T>
 ] {
-  const apis = props?.api ? (Array.isArray(props.api) ? props.api : [props.api]) : [localStorage];
+  const apis = props?.api ? (Array.isArray(props.api) ? props.api : [props.api]) : [globalThis.localStorage].filter(Boolean);
   const prefix = props?.prefix ? `${props.prefix}.` : "";
   const signals = new Map<string, ReturnType<typeof createSignal>>();
   const store = new Proxy(
@@ -103,18 +103,29 @@ export function createStorage<O, T>(
   const clear = () => apis.forEach(api => api?.clear?.());
   const toJSON = (): StorageObject<T> => {
     const result: StorageObject<T> = {};
+    const addValue = (key: string, value: any) => {
+      if (!result.hasOwnProperty(key)) {
+        const filteredValue: T | null =
+          value && props?.deserializer
+            ? (props.deserializer(value, key, props?.options) as T)
+            : (value as T | null);
+        if (filteredValue) {
+          result[key] = filteredValue;
+        }
+      }
+    }
     apis.forEach(api => {
-      let index = 0,
-        key: string | null;
-      while ((key = api.key(index++))) {
-        if (!result.hasOwnProperty(key)) {
-          const value = api.getItem(key);
-          const filteredValue: T | null =
-            value && props?.deserializer
-              ? (props.deserializer(value, key, props?.options) as T)
-              : (value as T | null);
-          if (filteredValue) {
-            result[key] = filteredValue;
+      if (typeof api.getAll === 'function') {
+        const values = api.getAll();
+        for (const key of values) {
+          addValue(key, values[key]);
+        }
+      } else {
+        let index = 0,
+          key: string | null;
+        while ((key = api.key(index++))) {
+          if (!result.hasOwnProperty(key)) {
+            addValue(key, api.getItem(key));
           }
         }
       }
@@ -177,7 +188,7 @@ export function createAsyncStorage<O, T>(
   setter: AsyncStorageSetter<T, O>,
   actions: AsyncStorageActions<T>
 ] {
-  const apis = props?.api ? (Array.isArray(props.api) ? props.api : [props.api]) : [localStorage];
+  const apis = props?.api ? (Array.isArray(props.api) ? props.api : [props.api]) : [];
   const prefix = props?.prefix ? `${props.prefix}.` : "";
   const signals = new Map<string, ReturnType<typeof createSignal>>();
   const store: AsyncStorageObject<T> = new Proxy({} as AsyncStorageObject<T>, {
@@ -236,20 +247,29 @@ export function createAsyncStorage<O, T>(
     });
   const toJSON = async () => {
     const result: StorageObject<T> = {};
+    const addValue = (key: string, value: any) => {
+      if (!result.hasOwnProperty(key)) {
+        const filteredValue: T | null =
+          value && props?.deserializer
+            ? (props.deserializer(value, key, props?.options) as T)
+            : (value as T | null);
+        if (filteredValue) {
+          result[key] = filteredValue;
+        }
+      }
+    }
     await Promise.all(
-      apis.map(async api => {
-        let index = 0,
-          key: string | null;
-        while ((key = await api.key(index++))) {
-          if (!result.hasOwnProperty(key)) {
-            const value = await api.getItem(key);
-            const filteredValue: T | null =
-              value && props?.deserializer
-                ? (props.deserializer(value, key, props?.options) as T)
-                : (value as T | null);
-            if (filteredValue) {
-              result[key] = filteredValue;
-            }
+      apis.map(async api => {        
+        if (typeof api.getAll === 'function') {
+          const values = await api.getAll();
+          for (const key of values) {
+            addValue(key, values[key]);
+          }
+        } else {
+          let index = 0,
+            key: string | null;
+          while ((key = await api.key(index++))) {
+            addValue(key, await api.getItem(key));
           }
         }
       })
@@ -291,7 +311,7 @@ export function createStorageSignal<T extends any, O extends any>(
   initialValue?: T,
   props?: StorageSignalProps<T, Storage | StorageWithOptions<O>, O>
 ): [accessor: Accessor<T | null>, setter: Setter<T | null>, refetch: () => void] {
-  const apis = props?.api ? (Array.isArray(props.api) ? props.api : [props.api]) : [localStorage];
+  const apis = props?.api ? (Array.isArray(props.api) ? props.api : [props.api]) : [globalThis.localStorage].filter(Boolean);
   const prefix = props?.prefix ? `${props.prefix}.` : "";
   const read = () =>
     apis.reduce<T | null>((result: T | null, api: StorageWithOptions<O> | Storage | undefined) => {
@@ -329,4 +349,4 @@ export function createStorageSignal<T extends any, O extends any>(
 export const createLocalStorage = createStorage;
 
 export const createSessionStorage = <T, O>(props: StorageProps<T, Storage, O>) =>
-  createStorage({ ...props, api: sessionStorage } as any);
+  createStorage({ ...props, api: globalThis.sessionStorage } as any);
