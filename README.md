@@ -72,8 +72,10 @@ Designing our primitives in this manner allows for better tree shaking and very 
 
 ### Browser
 
-- [x] [createLocalStore](https://github.com/davedbase/solid-primitives/tree/main/packages/local-store)
-- [x] [createCookieStore](https://github.com/davedbase/solid-primitives/tree/main/packages/cookie-store)
+- [x] [createStorage](https://github.com/davedbase/solid-primitives/tree/main/packages/storage)
+- [x] [createLocalStorage](https://github.com/davedbase/solid-primitives/tree/main/packages/storage)
+- [x] [createCookieStorage](https://github.com/davedbase/solid-primitives/tree/main/packages/storage)
+- [x] [createSessionStorage](https://github.com/davedbase/solid-primitives/tree/main/packages/storage)
 - [x] [createGeolocation](https://github.com/davedbase/solid-primitives/tree/main/packages/geolocation)
 - [x] [createEventListener](https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener)
 - [ ] createURL
