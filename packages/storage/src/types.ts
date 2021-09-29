@@ -1,10 +1,6 @@
 export type StorageWithOptions<O> = {
   clear: () => void;
   getItem: (key: string, options?: O) => string | null;
-<<<<<<< HEAD
-=======
-  getAll?: () => {[key: string]: any },
->>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
   setItem: (key: string, value: string, options?: O) => void;
   removeItem: (key: string) => void;
   key: (index: number) => string | null;
@@ -49,10 +45,6 @@ export type StorageActions<T> = {
 export type AsyncStorage = {
   clear?: () => Promise<void> | void;
   getItem: (key: string) => Promise<string | null> | string | null;
-<<<<<<< HEAD
-=======
-  getAll?: () => Promise<any>;
->>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
   setItem: (key: string, value: string) => Promise<void> | void;
   removeItem: (key: string) => Promise<void> | void;
   key: (index: number) => Promise<string | null> | string | null;
@@ -62,10 +54,6 @@ export type AsyncStorage = {
 export type AsyncStorageWithOptions<O> = {
   clear?: () => Promise<void> | void;
   getItem: (key: string, options?: O) => Promise<string | null> | string | null;
-<<<<<<< HEAD
-=======
-  getAll?: () => Promise<any>;
->>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
   setItem: (key: string, value: string, options?: O) => Promise<void> | void;
   removeItem: (key: string) => Promise<void> | void;
   key: (index: number) => Promise<string | null> | string | null;

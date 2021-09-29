@@ -3,11 +3,9 @@ import { Accessor, createEffect, createSignal, Setter } from "solid-js";
 import type {
   AnyStorageProps,
   AsyncStorage,
-  AsyncStorageActions,
   AsyncStorageObject,
   AsyncStorageSetter,
   AsyncStorageWithOptions,
-  StorageActions,
   StorageObject,
   StorageProps,
   StorageSetter,
@@ -16,53 +14,38 @@ import type {
   StringStorageProps
 } from "./types";
 
-/**
- * like createStore, but bound to a localStorage-like API
- * ```typescript
- * type StorageWithOptions<O> = Storage; // but with options added to setItem
- * type StorageProps<T extends string, O> = {
- *   api?: Storage | StorageWithOptions;
- *   // or an array thereof, default will be localStorage
- *   deserializer?: (value: string, key: string, options?: O) => T;
- *   serializer?: (value: T, key: string, options?: O) => string;
- *   options?: O; // options
- *   prefix?: string // will be prefixed to the key
- * };
- * createStorage(props?: StorageProps) => [
- *   store: StorageObject<T>, // basically like `Store<T>`
- *   setter: StorageSetter<T>, // like `setStoreFunction<T>`
- *   actions: {
- *     remove: (key: string) => void;
- *     clear: () => void;
- *     toJSON: () => { [key: string]: T };
- *   }
- * ]
- * ```
- */
 export function createStorage<O>(props?: StringStorageProps<Storage | StorageWithOptions<O>, O>): [
   store: StorageObject<string>,
   setter: StorageSetter<string, O>,
-  actions: StorageActions<string>
+  controls: {
+    remove: (key: string) => void;
+    clear: () => void;
+    toJSON: () => { [key: string]: string };
+  }
 ];
 export function createStorage<O, T>(
   props?: AnyStorageProps<Storage | StorageWithOptions<O>, O, T>
 ): [
   store: StorageObject<T>,
   setter: StorageSetter<T, O>,
-  actions: StorageActions<T>
+  controls: {
+    remove: (key: string) => void;
+    clear: () => void;
+    toJSON: () => { [key: string]: T };
+  }
 ];
 export function createStorage<O, T>(
   props?: StorageProps<T, Storage | StorageWithOptions<O>, O>
 ): [
   store: StorageObject<T>,
   setter: StorageSetter<T, O>,
-  actions: StorageActions<T>
+  controls: {
+    remove: (key: string) => void;
+    clear: () => void;
+    toJSON: () => { [key: string]: T };
+  }
 ] {
-<<<<<<< HEAD
   const apis = props?.api ? (Array.isArray(props.api) ? props.api : [props.api]) : [localStorage];
-=======
-  const apis = props?.api ? (Array.isArray(props.api) ? props.api : [props.api]) : [globalThis.localStorage].filter(Boolean);
->>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
   const prefix = props?.prefix ? `${props.prefix}.` : "";
   const signals = new Map<string, ReturnType<typeof createSignal>>();
   const store = new Proxy(
@@ -107,7 +90,6 @@ export function createStorage<O, T>(
   const clear = () => apis.forEach(api => api?.clear?.());
   const toJSON = (): StorageObject<T> => {
     const result: StorageObject<T> = {};
-<<<<<<< HEAD
     apis.forEach(api => {
       let index = 0,
         key: string | null;
@@ -120,31 +102,6 @@ export function createStorage<O, T>(
               : (value as T | null);
           if (filteredValue) {
             result[key] = filteredValue;
-=======
-    const addValue = (key: string, value: any) => {
-      if (!result.hasOwnProperty(key)) {
-        const filteredValue: T | null =
-          value && props?.deserializer
-            ? (props.deserializer(value, key, props?.options) as T)
-            : (value as T | null);
-        if (filteredValue) {
-          result[key] = filteredValue;
-        }
-      }
-    }
-    apis.forEach(api => {
-      if (typeof api.getAll === 'function') {
-        const values = api.getAll();
-        for (const key of values) {
-          addValue(key, values[key]);
-        }
-      } else {
-        let index = 0,
-          key: string | null;
-        while ((key = api.key(index++))) {
-          if (!result.hasOwnProperty(key)) {
-            addValue(key, api.getItem(key));
->>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
           }
         }
       }
@@ -162,56 +119,40 @@ export function createStorage<O, T>(
   ];
 }
 
-/**
- * like createStore, but bound to an asynchronous localStorage-like API
- * ```typescript
- * type AsyncStorage = Storage // but returns everything wrapped in Promises
- * type AsyncStorageWithOptions<O> = Storage; // but with options added to setItem
- * type AsyncStorageProps<T extends string, O> = {
- *   api?: AsyncStorage | AsyncStorageWithOptions;
- *   // or an array thereof, default will be localStorage
- *   deserializer?: (value: string, key: string, options?: O) => T;
- *   serializer?: (value: T, key: string, options?: O) => string;
- *   options?: O; // options
- *   prefix?: string // will be prefixed to the key
- * };
- * createStorage(props?: AsyncStorageProps) => [
- *   store: AsyncStorageObject<T>, // basically like `Store<T>`
- *   setter: AsyncStorageSetter<T>, // like `setStoreFunction<T>`
- *   actions: {
- *     remove: (key: string) => Promise<void>;
- *     clear: () => Promise<void>;
- *     toJSON: () => Promise<{ [key: string]: T }>;
- *   }
- * ]
- * ```
- */
 export function createAsyncStorage<O>(
   props?: StringStorageProps<AsyncStorage | AsyncStorageWithOptions<O>, O>
 ): [
   store: AsyncStorageObject<string>,
   setter: AsyncStorageSetter<string, O>,
-  actions: AsyncStorageActions<string>
+  controls: {
+    remove: (key: string) => Promise<void> | void;
+    clear: () => Promise<void> | void;
+    toJSON: () => Promise<{ [key: string]: string }> | { [key: string]: string };
+  }
 ];
 export function createAsyncStorage<O, T>(
   props?: AnyStorageProps<T, AsyncStorage | AsyncStorageWithOptions<O>, O>
 ): [
   store: AsyncStorageObject<T>,
   setter: AsyncStorageSetter<T, O>,
-  actions: AsyncStorageActions<T>
+  controls: {
+    remove: (key: string) => void;
+    clear: () => void;
+    toJSON: () => Promise<{ [key: string]: T }> | { [key: string]: T };
+  }
 ];
 export function createAsyncStorage<O, T>(
   props?: StorageProps<T, AsyncStorage | AsyncStorageWithOptions<O>, O>
 ): [
   store: AsyncStorageObject<T>,
   setter: AsyncStorageSetter<T, O>,
-  actions: AsyncStorageActions<T>
+  controls: {
+    remove: (key: string) => void;
+    clear: () => void;
+    toJSON: () => Promise<{ [key: string]: T }> | { [key: string]: T };
+  }
 ] {
-<<<<<<< HEAD
   const apis = props?.api ? (Array.isArray(props.api) ? props.api : [props.api]) : [localStorage];
-=======
-  const apis = props?.api ? (Array.isArray(props.api) ? props.api : [props.api]) : [];
->>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
   const prefix = props?.prefix ? `${props.prefix}.` : "";
   const signals = new Map<string, ReturnType<typeof createSignal>>();
   const store: AsyncStorageObject<T> = new Proxy({} as AsyncStorageObject<T>, {
@@ -270,7 +211,6 @@ export function createAsyncStorage<O, T>(
     });
   const toJSON = async () => {
     const result: StorageObject<T> = {};
-<<<<<<< HEAD
     await Promise.all(
       apis.map(async api => {
         let index = 0,
@@ -285,31 +225,6 @@ export function createAsyncStorage<O, T>(
             if (filteredValue) {
               result[key] = filteredValue;
             }
-=======
-    const addValue = (key: string, value: any) => {
-      if (!result.hasOwnProperty(key)) {
-        const filteredValue: T | null =
-          value && props?.deserializer
-            ? (props.deserializer(value, key, props?.options) as T)
-            : (value as T | null);
-        if (filteredValue) {
-          result[key] = filteredValue;
-        }
-      }
-    }
-    await Promise.all(
-      apis.map(async api => {        
-        if (typeof api.getAll === 'function') {
-          const values = await api.getAll();
-          for (const key of values) {
-            addValue(key, values[key]);
-          }
-        } else {
-          let index = 0,
-            key: string | null;
-          while ((key = await api.key(index++))) {
-            addValue(key, await api.getItem(key));
->>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
           }
         }
       })
@@ -327,35 +242,12 @@ export function createAsyncStorage<O, T>(
   ];
 }
 
-/**
- * like createSignal, but bound to a localStorage-like API
- * ```typescript
- * type StorageWithOptions<O> = Storage; // but with options added to setItem
- * type StorageProps<T extends string, O> = {
- *   api?: Storage | StorageWithOptions;
- *   // or an array thereof, default will be localStorage
- *   deserializer?: (value: string, key: string, options?: O) => T;
- *   serializer?: (value: T, key: string, options?: O) => string;
- *   options?: O; // options
- *   prefix?: string // will be prefixed to the key
- * };
- * createStorage<T extends string>(key: string, props?: StorageProps<T>) => [
- *   accessor: Accessor<T>, // basically like `value()`
- *   setter: Setter<T>, // like `setValue()`
- *   refetch: () => void // reloads from storage
- * ]
- * ```
- */
 export function createStorageSignal<T extends any, O extends any>(
   key: string,
   initialValue?: T,
   props?: StorageSignalProps<T, Storage | StorageWithOptions<O>, O>
-): [accessor: Accessor<T | null>, setter: Setter<T | null>, refetch: () => void] {
-<<<<<<< HEAD
+): [Accessor<T>, Setter<T>] {
   const apis = props?.api ? (Array.isArray(props.api) ? props.api : [props.api]) : [localStorage];
-=======
-  const apis = props?.api ? (Array.isArray(props.api) ? props.api : [props.api]) : [globalThis.localStorage].filter(Boolean);
->>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
   const prefix = props?.prefix ? `${props.prefix}.` : "";
   const read = () =>
     apis.reduce<T | null>((result: T | null, api: StorageWithOptions<O> | Storage | undefined) => {
@@ -368,33 +260,18 @@ export function createStorageSignal<T extends any, O extends any>(
       }
       return value;
     }, null);
-  const [accessor, setter] = createSignal<T | null>(read() ?? initialValue as T);
+  const signal = createSignal<T>(initialValue as T);
   createEffect(() => {
-    const value = accessor();
+    const value = signal[0]();
     const filteredValue = props?.serializer
       ? props.serializer(value as string & T, key, props?.options)
       : (value as string);
-    if (value === null) {
-      apis.forEach(api => api.removeItem(`${prefix}${key}`));
-    } else {
-      apis.forEach(api => api.setItem(`${prefix}${key}`, filteredValue, props?.options));
-    }
+    apis.forEach(api => api.setItem(`${prefix}${key}`, filteredValue, props?.options));
   });
-  return [
-    accessor,
-    setter,
-    () => {
-      const value = read();
-      setter(value as any);
-    }
-  ];
+  return signal;
 }
 
 export const createLocalStorage = createStorage;
 
 export const createSessionStorage = <T, O>(props: StorageProps<T, Storage, O>) =>
-<<<<<<< HEAD
   createStorage({ ...props, api: sessionStorage } as any);
-=======
-  createStorage({ ...props, api: globalThis.sessionStorage } as any);
->>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
