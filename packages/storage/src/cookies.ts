@@ -32,6 +32,8 @@ const serializeCookieOptions = (options?: CookieOptions) => {
   return memo;
 };
 
+<<<<<<< HEAD
+=======
 /**
  * handle cookies exactly like you would handle localStorage
  *
@@ -48,6 +50,7 @@ const serializeCookieOptions = (options?: CookieOptions) => {
  * };
  * ```
  */
+>>>>>>> 34e82ae1598a3f44a03939374c1417955c02ce82
 export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   _cookies: [globalThis.document, "cookie"],
   getItem: (key: string) =>
@@ -91,16 +94,22 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   }
 });
 
+<<<<<<< HEAD
+=======
 /**
  * creates a reactive store but bound to document.cookie
  */
+>>>>>>> 34e82ae1598a3f44a03939374c1417955c02ce82
 export const createCookieStorage = <T, O = CookieOptions, A = StorageWithOptions<CookieOptions>>(
   props?: Omit<StorageProps<T, A, O>, "api">
 ) => createStorage<O, T>({ ...props, api: cookieStorage } as any);
 
+<<<<<<< HEAD
+=======
 /**
  * creates a reactive signal, but bound to document.cookie
  */
+>>>>>>> 34e82ae1598a3f44a03939374c1417955c02ce82
 export const createCookieStorageSignal = <
   T,
   O = CookieOptions,

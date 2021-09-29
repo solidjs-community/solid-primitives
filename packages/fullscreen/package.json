@@ -1,14 +1,10 @@
 {
-  "name": "@solid-primitives/cookies-store",
-<<<<<<< HEAD
-  "version": "1.1.11",
-=======
-  "version": "1.1.8",
->>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
-  "description": "Primitive that manages browser cookies",
-  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "name": "@solid-primitives/fullscreen",
+  "version": "0.0.100",
+  "description": "Primitive that wraps the fullscreen api",
+  "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/cookies",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/fetch",
   "private": false,
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -24,8 +20,8 @@
     "test": "jest"
   },
   "keywords": [
-    "cookies",
-    "storage",
+    "fullscreen",
+    "display",
     "solid",
     "primitives"
   ],
@@ -39,12 +35,8 @@
     "tslib": "^2.0.1",
     "typescript": "^4.0.2"
   },
-  "peerDependencies": {
-    "solid-js": "^1.0.7"
-  },
   "dependencies": {
-    "solid-js": "^1.0.7",
-    "@solid-primitives/local-store": "^1.1.2"
+    "solid-js": "^1.1.4"
   },
   "jest": {
     "preset": "ts-jest",
@@ -59,12 +51,10 @@
     "setupFiles": [
       "./test/setup.ts"
     ],
-    "transformIgnorePatterns": ["node_modules/(?!@solid-primitives)/"],
     "testEnvironment": "jsdom",
     "moduleNameMapper": {
       "solid-js/web": "<rootDir>/node_modules/solid-js/web/dist/web.cjs",
-      "solid-js": "<rootDir>/node_modules/solid-js/dist/solid.cjs",
-      "@solid-primitives/local-store": "<rootDir>/../local-store/src/index.ts"
+      "solid-js": "<rootDir>/node_modules/solid-js/dist/solid.cjs"
     }
   }
 }
