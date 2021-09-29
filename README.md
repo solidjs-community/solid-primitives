@@ -65,8 +65,8 @@ Designing our primitives in this manner allows for better tree shaking and very 
 
 ### Device
 
+- [x] [createFullscreen](https://github.com/davedbase/solid-primitives/tree/main/packages/fullscreen)
 - [ ] createBattery
-- [ ] createFullscreen
 - [ ] createAccelerometer
 - [ ] createGyroscope
 
