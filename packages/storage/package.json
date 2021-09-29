@@ -1,5 +1,5 @@
 {
-  "name": "@solid-primitives/fetch",
+  "name": "@solid-primitives/storage",
   "version": "0.0.106",
   "description": "Primitive that provides reactive wrappers for storage access",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
@@ -37,7 +37,7 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
-    "solid-js": "^1.1.4"
+    "solid-js": "^1.1.5"
   },
   "jest": {
     "preset": "ts-jest",
@@ -45,7 +45,10 @@
       "ts-jest": {
         "tsconfig": "tsconfig.json",
         "babelConfig": {
-          "presets": ["babel-preset-solid", "@babel/preset-env"]
+          "presets": [
+            "babel-preset-solid",
+            "@babel/preset-env"
+          ]
         }
       }
     },
