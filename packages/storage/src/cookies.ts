@@ -34,7 +34,11 @@ const serializeCookieOptions = (options?: CookieOptions) => {
 
 /**
  * handle cookies exactly like you would handle localStorage
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
  * the main change is that setItem accepts the following options:
  * ```typescript
  * export type CookieOptions = {
@@ -49,6 +53,7 @@ const serializeCookieOptions = (options?: CookieOptions) => {
  * ```
  */
 export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
+<<<<<<< HEAD
   getItem: (key: string) =>
     document.cookie.match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")?.pop() ?? null,
   setItem: (key: string, value: string, options?: CookieOptions) => {
@@ -56,24 +61,62 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   },
   removeItem: (key: string) => {
     document.cookie = `${key}=deleted${serializeCookieOptions({ expires: new Date(0) })}`;
+=======
+  _cookies: [globalThis.document, "cookie"],
+  getItem: (key: string) =>
+    cookieStorage._cookies[0][cookieStorage._cookies[1]]
+      .match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")
+      ?.pop() ?? null,
+  setItem: (key: string, value: string, options?: CookieOptions) => {
+    cookieStorage._cookies[0][cookieStorage._cookies[1]] = `${key}=${value}${serializeCookieOptions(
+      options
+    )}`;
+  },
+  removeItem: (key: string) => {
+    cookieStorage._cookies[0][cookieStorage._cookies[1]] = `${key}=deleted${serializeCookieOptions({
+      expires: new Date(0)
+    })}`;
+>>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
   },
   key: (index: number) => {
     let key: string | null = null;
     let count = 0;
+<<<<<<< HEAD
     document.cookie.replace(/(?:^|;)\s*(.+?)\s*=\s*[^;]+/g, (_, found) => {
       if (!key && found && count++ === index) {
         key = found;
       }
       return "";
     });
+=======
+    cookieStorage._cookies[0][cookieStorage._cookies[1]].replace(
+      /(?:^|;)\s*(.+?)\s*=\s*[^;]+/g,
+      (_: string, found: string) => {
+        if (!key && found && count++ === index) {
+          key = found;
+        }
+        return "";
+      }
+    );
+>>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
     return key;
   },
   get length() {
     let length = 0;
+<<<<<<< HEAD
     document.cookie.replace(/(?:^|;)\s*.+?\s*=\s*[^;]+/g, found => {
       length += found ? 1 : 0;
       return "";
     });
+=======
+    cookieStorage._cookies[0][cookieStorage._cookies[1]].replace(
+      /(?:^|;)\s*.+?\s*=\s*[^;]+/g,
+      (found: string) => {
+        length += found ? 1 : 0;
+        return "";
+      }
+    );
+>>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
     return length;
   }
 });
