@@ -1,11 +1,11 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
 
-type ObservedSize = {
+export type ObservedSize = {
   width: number | undefined;
   height: number | undefined;
 };
 
-type ResizeHandler = (size: ObservedSize, ref: Element) => void;
+export type ResizeHandler = (size: ObservedSize, ref: Element) => void;
 
 /**
  * Create resize observer is a helper primitive for binding resize events.
