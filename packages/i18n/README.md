@@ -15,9 +15,9 @@ yarn add @solid-primitives/i18n
 Use it:
 
 ```tsx
-import { render } from "solid-js/dom";
+import { render } from "solid-js/web";
 import { Component, createSignal } from "solid-js";
-import { I18nProvider, useI18n } from "@amoutonbrady/solid-i18n";
+import { I18nProvider, createI18nContext, useI18n } from "@solid-primitives/solid-i18n";
 
 const App: Component = () => {
   const [t, { add, locale, dict }] = useI18n();
@@ -53,12 +53,13 @@ const dict = {
     hello: "hello {{ name }}, how are you?"
   }
 };
+const value = createI18nContext(dict, "fr");
 
 render(
   () => (
-    <I18nProvider dict={dict} locale="fr">
+    <I18nContext.Provider value={value}>
       <App />
-    </I18nProvider>
+    </I18nContext.Provider>
   ),
   document.getElementById("app")
 );
