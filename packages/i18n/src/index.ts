@@ -158,6 +158,7 @@ export const createI18nContext = (
   return [translate, actions];
 };
 
-export const I18nContext = createContext<ReturnType<typeof createI18nContext>>();
+type I18nContextInterface = ReturnType<typeof createI18nContext>;
 
+export const I18nContext = createContext<I18nContextInterface>({} as I18nContextInterface);
 export const useI18n = () => useContext(I18nContext);

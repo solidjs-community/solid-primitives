@@ -1,4 +1,4 @@
-# @solid-primitives/timer
+# @solid-primitives/countdown
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
@@ -23,6 +23,6 @@ You may view a working example here: https://codesandbox.io/s/create-countdown-s
 
 0.0.100
 
-First commit of the timer primitive.
+First commit of the countdown primitive.
 
 </details>

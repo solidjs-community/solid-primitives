@@ -24,7 +24,7 @@
     "primitives"
   ],
   "devDependencies": {
-    "@types/jest": "^26.0.10",
+    "@types/jest": "^27.0.2",
     "prettier": "^2.0.5",
     "solid-testing-library": "^0.2.0",
     "tslib": "^2.0.1",
@@ -34,8 +34,25 @@
     "solid-js": "^1.0.6"
   },
   "jest": {
+    "preset": "ts-jest",
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "tsconfig.json",
+        "babelConfig": {
+          "presets": [
+            "babel-preset-solid",
+            "@babel/preset-env"
+          ]
+        }
+      }
+    },
     "setupFiles": [
       "./test/setup.ts"
-    ]
+    ],
+    "testEnvironment": "jsdom",
+    "moduleNameMapper": {
+      "solid-js/web": "<rootDir>/node_modules/solid-js/web/dist/web.cjs",
+      "solid-js": "<rootDir>/node_modules/solid-js/dist/solid.cjs"
+    }
   }
 }
