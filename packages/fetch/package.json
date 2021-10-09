@@ -45,7 +45,10 @@
       "ts-jest": {
         "tsconfig": "tsconfig.json",
         "babelConfig": {
-          "presets": ["babel-preset-solid", "@babel/preset-env"]
+          "presets": [
+            "babel-preset-solid",
+            "@babel/preset-env"
+          ]
         }
       }
     },

@@ -1,7 +1,7 @@
 export type StorageWithOptions<O> = {
   clear: () => void;
   getItem: (key: string, options?: O) => string | null;
-  getAll?: () => {[key: string]: any },
+  getAll?: () => { [key: string]: any };
   setItem: (key: string, value: string, options?: O) => void;
   removeItem: (key: string) => void;
   key: (index: number) => string | null;
@@ -41,7 +41,7 @@ export type StorageActions<T> = {
   remove: (key: string) => void;
   clear: () => void;
   toJSON: () => { [key: string]: T };
-}
+};
 
 export type AsyncStorage = {
   clear?: () => Promise<void> | void;
@@ -72,7 +72,7 @@ export type AsyncStorageActions<T> = {
   remove: (key: string) => Promise<void> | void;
   clear: () => Promise<void> | void;
   toJSON: () => Promise<{ [key: string]: T }>;
-}
+};
 
 export type StorageSignalProps<T, A, O> = StorageProps<T, A, O> & {
   equals?: false | ((prev: T, next: T) => boolean) | undefined;

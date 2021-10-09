@@ -124,9 +124,7 @@ export const createAmplitudeStream = (
   const read = () => {
     analyser.getByteFrequencyData(buffer);
     const rootMeanSquare = Math.sqrt(buffer.reduce((sum, v) => sum + v * v, 0) / buffer.length) | 0;
-    setAmplitude(
-      rootMeanSquare > 100 ? 100 : rootMeanSquare
-    );
+    setAmplitude(rootMeanSquare > 100 ? 100 : rootMeanSquare);
   };
   let id: number;
   const loop = () => {

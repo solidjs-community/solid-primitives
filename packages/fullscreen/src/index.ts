@@ -39,7 +39,7 @@ export const createFullscreen = (
   };
   document.addEventListener("fullscreenchange", listener);
   onCleanup(() => {
-    document.removeEventListener("fullscreenchange", listener)
+    document.removeEventListener("fullscreenchange", listener);
     if (isActive()) {
       document.exitFullscreen();
     }

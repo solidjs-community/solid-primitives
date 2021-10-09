@@ -1,10 +1,6 @@
 {
   "name": "@solid-primitives/cookies-store",
-<<<<<<< HEAD
   "version": "1.1.11",
-=======
-  "version": "1.1.8",
->>>>>>> e9b8e860fa8e51c5aed8c1610ed0417446e31e52
   "description": "Primitive that manages browser cookies",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -52,14 +48,19 @@
       "ts-jest": {
         "tsconfig": "tsconfig.json",
         "babelConfig": {
-          "presets": ["babel-preset-solid", "@babel/preset-env"]
+          "presets": [
+            "babel-preset-solid",
+            "@babel/preset-env"
+          ]
         }
       }
     },
     "setupFiles": [
       "./test/setup.ts"
     ],
-    "transformIgnorePatterns": ["node_modules/(?!@solid-primitives)/"],
+    "transformIgnorePatterns": [
+      "node_modules/(?!@solid-primitives)/"
+    ],
     "testEnvironment": "jsdom",
     "moduleNameMapper": {
       "solid-js/web": "<rootDir>/node_modules/solid-js/web/dist/web.cjs",

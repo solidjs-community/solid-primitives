@@ -11,10 +11,10 @@
  * trigger('my-new-value');
  * ```
  */
-const createThrottle = <T extends (...args: any[]) => void>(func: T, wait: number): [
-  fn: T,
-  clear: () => void
-] => {
+const createThrottle = <T extends (...args: any[]) => void>(
+  func: T,
+  wait: number
+): [fn: T, clear: () => void] => {
   let shouldThrottle: boolean = false,
     timerId: NodeJS.Timer;
   return [

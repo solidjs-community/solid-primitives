@@ -71,7 +71,8 @@ export function createCookieStore<T>(
   };
   const getItem = (key: string) => {
     if (isServer) return;
-    const value = (globalThis.document || {}).cookie.match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")?.pop() || "";
+    const value =
+      (globalThis.document || {}).cookie.match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")?.pop() || "";
     return deserializer ? deserializer(value) : value;
   };
   const removeItem = (key: string) => {
@@ -90,11 +91,11 @@ export function createCookieStore<T>(
         if (key && value) {
           all[key] = deserializer ? deserializer(value) : value;
         }
-        return ''
+        return "";
       }
     );
     return all;
-  }
+  };
   const clear = (keys?: string[]) => {
     if (isServer) return;
     (keys || Object.keys(getAll())).forEach(key => removeItem(key));

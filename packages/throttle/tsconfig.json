@@ -6,7 +6,5 @@
   },
   "include": ["./src"],
   "types": ["jest", "node", "@types/jest"],
-  "typeRoots": [      
-    "./node-modules/@types/"
-  ]
+  "typeRoots": ["./node-modules/@types/"]
 }
