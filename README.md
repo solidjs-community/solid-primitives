@@ -4,25 +4,19 @@
 
 # Solid Primitives
 
-A project to aggregate and develop high-quality, community contributed Solid primitives, components and directives. All utilities are well tested and continuously maintained. Every contribution to the repository is checked for quality and maintained by the highest degree of excellence. The ultimate goal is to provide a properly reactive layer for browser APIs and common helpers.
+A project that strives to develop high-quality, community contributed Solid primitives. All utilities are well tested and continuously maintained. Every contribution to the repository is checked for quality and maintained by the highest degree of excellence. The ultimate goal is to extend Solid's primary and secondary primitives with a set of tertiary primitives.
 
 ## Philosophy
 
-The goal of Solid Primitives is to be an official aggregation of utilities that wrap core logic on the client and server. Each primitive is designed to act as a building block or keystone, the goal being to DRY up source as much as possible and fit together logic as a compact system of parts.
-
-Ultimately the more rooted these primitives are, the better they act as foundation within Solid's base ecosystem. With well built and re-used foundations, the smaller (aggregate tree-shaking benefits), more concise (readability) and stable (consistent and managed testing + maintenance) applications can be overall.
+The goal of Solid Primitives is to wrap client and server side functionality to provide a fully reactive API layer. Ultimately the more rooted our tertiary primitives are, the more they act as foundation within Solid's base ecosystem. With well built and re-used foundations, the smaller (aggregate tree-shaking benefits), more concise (readability) and stable (consistent and managed testing + maintenance) applications can be overall.
 
 ## A Rallying Call
 
-Other frameworks have large and extremely well established ecosystems. Notably React which has a vast array of component and hooks. The amount of choice within the ecosystem is great but often these tools are built as one-offs resulting in often un-tested logic or are designed with narrow needs. Over time the less concise these building blocks are the more they tend to repeat themselves.
-
-Our goal with Primitives is to bring the community together to contribute, evolve and use a base set of foundations in their work. The more we work together, the stronger and richer of an ecosystem we can build and the more we all benefit.
-
-We aren't trying to replace the ecosystem of React and other libraries with a monosolution, but merely offer a consistent and tightly defined set of tools. A community ecosystem will and should continue offering alternatives to expand a users choice. It's this fine balance we as maintainers of Primitives need to juggle.
+Other frameworks have large and extremely well established ecosystems. Notably React which has a vast array of component and hooks. The amount of choice within the ecosystem is great but often these tools are built as one-offs resulting in often un-tested logic or are designed with narrow needs. Over time the less concise these building blocks are the more they tend to repeat themselves. Our goal with Primitives is to bring the community together to contribute, evolve and utilize a powerful centralize primitive foundation.
 
 ## Design Maxims
 
-All Primitives packages follow a single consistency and promise. We guarentee that each is created with the utmost care, providing primitivates that are:
+All our primitives are meant to be consistent and sustain a level of quality. We guarentee that each is created with the utmost care. Our primitivates are:
 
 1. Documented and follow a consistent style guide
 2. Be well tested
@@ -39,7 +33,7 @@ All Primitives packages follow a single consistency and promise. We guarentee th
 
 ## Compound vs. Isolated Primitives
 
-Each primitive is designed with composition or segmentation in mind. To align with the goal of being small and concise a major rule to designing our primitives is deciding if the interface for primitives should be: composable or segmented. For this reason every API is intricately studied and considered to be composed (stacked with features) or composed into smaller units.
+Each primitive is designed with composition in mind. To align with the goal of being small and concise a major rule to designing our primitives is deciding if the interface for primitives should be: composable or segmented. For this reason every API is intricately studied and considered to be composed (stacked with features) or composed into smaller units.
 
 Designing our primitives in this manner allows for better tree shaking and very layering complexity as needed. Only ship what you have to by picking from existing primitives as your foundational building blocks.
 

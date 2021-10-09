@@ -1,36 +1,34 @@
 import createThrottle from "../src/index";
 
-describe("cookieStorage", () => {
-  test("adds/gets/removes an item", () => {
-    expect(cookieStorage.getItem("test")).toBe(null);
-    cookieStorage.setItem("test", "1");
-    expect(cookieStorage.getItem("test")).toBe("1");
-    cookieStorage.removeItem("test");
-    expect(cookieStorage.getItem("test")).toBe(null);
-  });
-});
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
 
-describe("createCookieStorage", () => {
-  test("creates a storage", () => {
-    cookieStorage.clear();
-    const [storage, setStorage, { remove, clear }] = createCookieStorage();
-    setStorage("test", "1");
-    cookieStorage.setItem("test2", "2");
-    expect(storage.test).toBe(cookieStorage.getItem("test"));
-    expect(storage.test).toBe("1");
-    expect(storage.test2).toBe("2");
-    remove("test2");
-    expect(storage.test2).toBe(null);
+describe("createThrottle", () => {
+  test("setup and trigger throttle", async () => {
+    let val = 0;
+    const [trigger] = createThrottle((current) => val = current, 150);
+    expect(val).toBe(0);
+    trigger(5);
+    await sleep(300);
+    expect(val).toBe(5);
+  });
+  test("trigger multiple throttles", async () => {
+    let val = 0;
+    const [trigger] = createThrottle((current) => val = current, 150);
+    expect(val).toBe(0);
+    trigger(5);
+    trigger(1);
+    await sleep(300);
+    expect(val).toBe(5);
+  });
+  test("test clearing throttle", async () => {
+    let val = 0;
+    const [trigger, clear] = createThrottle((current) => val = current, 150);
+    expect(val).toBe(0);
+    trigger(5);
     clear();
-    expect(cookieStorage.length).toBe(0);
-  });
-});
-
-describe("createCookieSignal", () => {
-  test("creates a signal", () => {
-    const [getter, setter] = createCookieStorageSignal("test3");
-    expect(getter()).toBe(undefined);
-    setter("3");
-    expect(getter()).toBe("3");
+    await sleep(300);
+    expect(val).toBe(0);
   });
 });

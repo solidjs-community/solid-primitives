@@ -7,12 +7,14 @@
  *
  * @example
  * ```ts
- * const [trigger, clear] = createThrottle(() => console.log('hi'), 250));
+ * const [trigger, clear] = createThrottle((val) => console.log(val), 250));
  * trigger('my-new-value');
- * console.log(value());
  * ```
  */
-const createThrottle = <T extends (...args: any[]) => void>(func: T, wait: number): [T] => {
+const createThrottle = <T extends (...args: any[]) => void>(func: T, wait: number): [
+  fn: T,
+  clear: () => void
+] => {
   let shouldThrottle: boolean = false,
     timerId: NodeJS.Timer;
   return [
