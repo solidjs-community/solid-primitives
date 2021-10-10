@@ -1,7 +1,7 @@
-import { createSignal, batch, onMount, onCleanup, createEffect } from "solid-js";
+import { createSignal, batch, on, onMount, onCleanup, createEffect } from "solid-js";
 
 // Set of control enums
-enum AudioState {
+export enum AudioState {
   LOADING = "loading",
   PLAYING = "playing",
   PAUSED = "paused",
@@ -16,7 +16,6 @@ enum AudioState {
  * @param path URL to the audio file that is to be played
  * @param handlers An array of handlers to bind against the player
  * @return
- *
  */
 export const createBaseAudio = (
   path: string | (() => string),
@@ -28,15 +27,13 @@ export const createBaseAudio = (
   setState: (state: AudioState) => void;
 } => {
   let player: HTMLAudioElement = new (audioEngine || Audio)();
-  const [state, setState] = createSignal<AudioState>(AudioState.LOADING);
-  // Handle option changes separately
-  createEffect(() => {
-    if (typeof path === "function" && path()) {
-      player.src = path();
-    } else {
-      player.src = path as string;
-    }
-  });
+  const [state, setState] = createSignal<AudioState>(AudioState.STOPPED);
+  if (typeof path === "function" && path()) {
+    player.src = path();
+    createEffect(() => player.src = path());
+  } else {
+    player.src = path as string;
+  }
   // Handle management on create and clean-up
   onMount(() => handlers.forEach(([evt, handler]) => player.addEventListener(evt, handler)));
   onCleanup(() => handlers.forEach(([evt, handler]) => player.removeEventListener(evt, handler)));
@@ -59,22 +56,28 @@ export const createBaseAudio = (
  * ```
  */
 export const createAudio = (
-  path: string | (() => string)
+  path: string | (() => string),
+  audioEngine?: typeof Audio
 ): {
   play: () => void;
   pause: () => void;
   state: () => AudioState;
+  player: HTMLAudioElement;
 } => {
-  const { player, state, setState } = createBaseAudio(path, [
-    ["loadeddata", () => batch(() => setState(AudioState.READY))],
-    ["loadstart", () => setState(AudioState.LOADING)],
-    ["playing", () => setState(AudioState.PLAYING)],
-    ["pause", () => setState(AudioState.PAUSED)]
-  ]);
+  const { player, state, setState } = createBaseAudio(
+    path,
+    [
+      ["loadeddata", () => batch(() => setState(AudioState.READY))],
+      ["loadstart", () => setState(AudioState.LOADING)],
+      ["playing", () => setState(AudioState.PLAYING)],
+      ["pause", () => setState(AudioState.PAUSED)]
+    ],
+    audioEngine
+  );
   // Audio controls
   const play = () => player.play();
   const pause = () => player.pause();
-  return { play, pause, state };
+  return { play, pause, state, player };
 };
 
 /**

@@ -15,14 +15,13 @@ The primitives are easily composable and extended. To create your own audio elem
 ## How to use it
 
 ```ts
-const { play, pause } = createAudio('example.wav')
+const { play, pause } = createAudio("example.wav");
 ```
 
 and
 
 ```ts
-const { play, duration, currentTime, seek, setVolume, pause } =
-    createAudioManager('example.wav')
+const { play, duration, currentTime, seek, setVolume, pause } = createAudioManager("example.wav");
 ```
 
 ## Demo
@@ -37,5 +36,9 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-a
 0.0.100
 
 Pulling an early release of the package together and preparing for 1.0.0 release. No changes.
+
+1.0.0
+
+Minor clean-up, added tests and released.
 
 </details>

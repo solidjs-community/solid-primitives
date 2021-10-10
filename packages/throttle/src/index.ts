@@ -14,16 +14,17 @@
 const createThrottle = <T extends (...args: any[]) => void>(
   func: T,
   wait: number
-): [fn: T, clear: () => void] => {
+): [
+  fn: T,
+  clear: () => void
+] => {
   let shouldThrottle: boolean = false,
     timerId: NodeJS.Timer;
   return [
     // @ts-ignore
     (...args: Parameters<T>) => {
       // Reject calls during the throttle period
-      if (shouldThrottle) {
-        return;
-      }
+      if (shouldThrottle) return;
       shouldThrottle = true;
       timerId = setTimeout(() => {
         func(...args);

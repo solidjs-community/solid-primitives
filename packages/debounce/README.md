@@ -7,9 +7,8 @@ Creates a helpful debounce function.
 ## How to use it
 
 ```ts
-const [trigger, clear] = createDebounce(() => console.log('hi'), 250));
-trigger('my-new-value');
-console.log(value());
+const [fn, clear] = createDebounce(() => console.log('hi'), 250));
+fn('my-new-value');
 ```
 
 ## Demo
