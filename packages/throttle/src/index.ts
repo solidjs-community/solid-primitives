@@ -11,18 +11,17 @@
  * trigger('my-new-value');
  * ```
  */
-const createThrottle = <T extends (...args: any[]) => void>(
+const createThrottle = <T extends (...args: any[]) => void, A = Parameters<T>>(
   func: T,
   wait: number
 ): [
-  fn: T,
+  fn: (...args: A extends any[] ? A : never) => void,
   clear: () => void
 ] => {
   let shouldThrottle: boolean = false,
-    timerId: NodeJS.Timer;
+    timerId: ReturnType<typeof setTimeout>;
   return [
-    // @ts-ignore
-    (...args: Parameters<T>) => {
+    (...args: A extends any[] ? A : never) => {
       // Reject calls during the throttle period
       if (shouldThrottle) return;
       shouldThrottle = true;
