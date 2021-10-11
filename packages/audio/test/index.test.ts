@@ -12,12 +12,11 @@ class MockAudio extends Audio {
   }
   play = (): Promise<void> => {
     this.playing = true;
-    this.dispatchEvent(new CustomEvent('playing'));
-    return Promise.resolve();
+    return super.play();
   }
   pause = (): void => {
     this.playing = false;
-    this.dispatchEvent(new CustomEvent('pause'));
+    return super.pause();
   }
 }
 

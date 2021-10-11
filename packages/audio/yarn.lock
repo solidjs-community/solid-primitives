@@ -3054,7 +3054,7 @@ slash@^3.0.0:
   resolved "https://registry.yarnpkg.com/slash/-/slash-3.0.0.tgz#6539be870c165adbd5240220dbe361f1bc4d4634"
   integrity sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
 
-solid-js@^1.0.3:
+solid-js@^1.1.6:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/solid-js/-/solid-js-1.1.6.tgz#83076ed9d3a85312549636e79858ad1daba267d8"
   integrity sha512-o7Nm654Q9vF+W293P1pxr2uv1dYhTjDM0tsYnmQTcNCvUcGMlW947SE3fx4pvH1Rcrjm549HkNy50Ors3D4+zQ==

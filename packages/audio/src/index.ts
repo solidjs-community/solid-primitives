@@ -1,4 +1,10 @@
-import { createSignal, batch, on, onMount, onCleanup, createEffect } from "solid-js";
+import {
+  createSignal,
+  batch,
+  onMount,
+  onCleanup,
+  createEffect
+} from "solid-js";
 
 // Set of control enums
 export enum AudioState {
@@ -30,13 +36,19 @@ export const createBaseAudio = (
   const [state, setState] = createSignal<AudioState>(AudioState.STOPPED);
   if (typeof path === "function" && path()) {
     player.src = path();
-    createEffect(() => player.src = path());
+    createEffect(() => (player.src = path()));
   } else {
     player.src = path as string;
   }
   // Handle management on create and clean-up
-  onMount(() => handlers.forEach(([evt, handler]) => player.addEventListener(evt, handler)));
-  onCleanup(() => handlers.forEach(([evt, handler]) => player.removeEventListener(evt, handler)));
+  onMount(() =>
+    handlers.forEach(([evt, handler]) => player.addEventListener(evt, handler))
+  );
+  onCleanup(() =>
+    handlers.forEach(([evt, handler]) =>
+      player.removeEventListener(evt, handler)
+    )
+  );
   return { player, state, setState };
 };
 
@@ -69,6 +81,7 @@ export const createAudio = (
     [
       ["loadeddata", () => batch(() => setState(AudioState.READY))],
       ["loadstart", () => setState(AudioState.LOADING)],
+      ["playing", (evt) => console.log("YAR", evt, AudioState.PLAYING)],
       ["playing", () => setState(AudioState.PLAYING)],
       ["pause", () => setState(AudioState.PAUSED)]
     ],

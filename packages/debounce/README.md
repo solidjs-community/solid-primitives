@@ -24,4 +24,8 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-d
 
 Initial commit and publish of debounce primitive.
 
+1.0.1
+
+Improved types, minor clean-up and added tests.
+
 </details>

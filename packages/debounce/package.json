@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/debounce",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Primitive that creates a debounce function",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -16,7 +16,8 @@
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest"
   },
   "keywords": [
     "debounce",
@@ -24,17 +25,17 @@
     "primitives"
   ],
   "peerDependencies": {
-    "solid-js": "^1.0.6"
+    "solid-js": "^1.1.6"
   },
   "devDependencies": {
     "@babel/preset-env": "7.15.6",
     "@types/jest": "27.0.1",
     "babel-preset-solid": "1.1.5",
+    "jest": "^27.2.5",
     "prettier": "^2.0.5",
-    "jest": "27.0.1",
-    "ts-jest": "27.0.5",
     "solid-jest": "0.2.0",
     "solid-testing-library": "^0.2.0",
+    "ts-jest": "27.0.5",
     "tslib": "^2.0.1",
     "typescript": "^4.0.2"
   },
