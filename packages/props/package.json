@@ -1,0 +1,51 @@
+{
+  "name": "@solid-primitives/props",
+  "version": "0.0.100",
+  "description": "Primitive that provides controllable props signals like knobs/controls",
+  "author": "Alex Lohr <alex.lohr@logmein.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/props",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc",
+    "test": "jest"
+  },
+  "keywords": [
+    "props",
+    "knobs",
+    "controls",
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "@babel/core": "7.14.8",
+    "@babel/preset-env": "7.14.8",
+    "@babel/preset-typescript": "7.14.5",
+    "@types/jest": "27.0.1",
+    "babel-preset-solid": "1.1.3",
+    "jest": "27.0.1",
+    "prettier": "^2.0.5",
+    "solid-testing-library": "^0.2.0",
+    "solid-jest": "0.2.0",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.3"
+  },
+  "dependencies": {
+    "solid-js": "^1.1.6"
+  },
+  "jest": {
+    "preset": "solid-jest/preset/browser",
+    "setupFiles": [
+      "./test/setup.ts"
+    ]
+  }
+}
