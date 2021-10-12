@@ -1,4 +1,4 @@
-import { createSignal, batch, on, onMount, onCleanup, createEffect } from "solid-js";
+import { createSignal, batch, onMount, onCleanup, createEffect } from "solid-js";
 
 // Set of control enums
 export enum AudioState {

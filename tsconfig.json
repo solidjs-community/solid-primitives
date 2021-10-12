@@ -5,8 +5,10 @@
       "target": "esnext",
       "newLine": "LF",
       "moduleResolution": "node",
+      "allowSyntheticDefaultImports": true,
       "strict": true,
-      "jsx": "preserve"
+      "jsx": "preserve",
+      "jsxImportSource": "solid-js"
     },
     "exclude": ["node_modules"]
   }
