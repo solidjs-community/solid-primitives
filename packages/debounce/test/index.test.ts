@@ -24,7 +24,7 @@ describe("createDebounce", () => {
   });
   test("test clearing debounce", async () => {
     let val = 0;
-    const [trigger, clear] = createDebounce(current => (val = current), 150);
+    const [trigger, clear] = createDebounce(current => (val = current), 500);
     expect(val).toBe(0);
     trigger(5);
     clear();

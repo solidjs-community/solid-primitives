@@ -26,7 +26,7 @@ const { play, duration, currentTime, seek, setVolume, pause } = createAudioManag
 
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-primitives-audio-6wc4c
+You may view a working example here: https://codesandbox.io/s/solid-primitives-audio-5c9f3
 
 ## Changelog
 

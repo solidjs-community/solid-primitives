@@ -24,7 +24,7 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-t
 
 First version of the throttle primitive.
 
-1.0.1
+1.0.3
 
 Cleaned up return types and documentation.
 
