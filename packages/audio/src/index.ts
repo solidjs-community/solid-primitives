@@ -121,6 +121,7 @@ export const createAudioManager = (
   duration: () => number;
   setVolume: (volume: number) => void;
   seek: (position: number) => void;
+  player: HTMLAudioElement;
 } => {
   const [currentTime, setCurrentTime] = createSignal<number>(0);
   const [duration, setDuration] = createSignal<number>(0);
@@ -130,6 +131,7 @@ export const createAudioManager = (
       "loadeddata",
       () =>
         batch(() => {
+          console.log('TRIGGER', player.duration);
           setState(AudioState.READY);
           setDuration(player.duration);
         })
@@ -150,5 +152,5 @@ export const createAudioManager = (
 
   createEffect(() => (player.volume = volume));
 
-  return { play, pause, currentTime, state, duration, seek, setVolume };
+  return { play, pause, currentTime, state, duration, seek, setVolume, player };
 };
