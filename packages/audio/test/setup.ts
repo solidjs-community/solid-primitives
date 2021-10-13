@@ -23,4 +23,7 @@ export class MockAudio extends Audio {
   }
 }
 
+HTMLMediaElement.prototype.pause = () => Promise.resolve();
+HTMLMediaElement.prototype.play = () => Promise.resolve();
+
 window.Audio = MockAudio;
