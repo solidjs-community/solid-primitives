@@ -26,13 +26,12 @@ export enum AudioState {
 export const createBaseAudio = (
   path: string | (() => string),
   handlers: Array<[string, EventListener]>,
-  audioEngine?: typeof Audio
 ): {
   player: HTMLAudioElement;
   state: () => AudioState;
   setState: (state: AudioState) => void;
 } => {
-  let player: HTMLAudioElement = new (audioEngine || Audio)();
+  let player: HTMLAudioElement = new Audio();
   const [state, setState] = createSignal<AudioState>(AudioState.STOPPED);
   if (typeof path === "function" && path()) {
     player.src = path();
@@ -69,7 +68,6 @@ export const createBaseAudio = (
  */
 export const createAudio = (
   path: string | (() => string),
-  audioEngine?: typeof Audio
 ): {
   play: () => void;
   pause: () => void;
@@ -84,8 +82,7 @@ export const createAudio = (
       ["playing", (evt) => console.log("YAR", evt, AudioState.PLAYING)],
       ["playing", () => setState(AudioState.PLAYING)],
       ["pause", () => setState(AudioState.PAUSED)]
-    ],
-    audioEngine
+    ]
   );
   // Audio controls
   const play = () => player.play();
