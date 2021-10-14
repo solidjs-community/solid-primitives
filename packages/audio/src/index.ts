@@ -40,7 +40,7 @@ export const createBaseAudio = (
     player.src = path as string;
   }
   // Handle management on create and clean-up
-  onMount(() =>
+  onMount(() => 
     handlers.forEach(([evt, handler]) => player.addEventListener(evt, handler))
   );
   onCleanup(() =>
@@ -77,9 +77,9 @@ export const createAudio = (
   const { player, state, setState } = createBaseAudio(
     path,
     [
-      ["loadeddata", () => batch(() => setState(AudioState.READY))],
+      ["loadeddata", (evt) => console.log("YAR", evt, AudioState.PLAYING)],
+      ["loadeddata", () => setState(AudioState.READY)],
       ["loadstart", () => setState(AudioState.LOADING)],
-      ["playing", (evt) => console.log("YAR", evt, AudioState.PLAYING)],
       ["playing", () => setState(AudioState.PLAYING)],
       ["pause", () => setState(AudioState.PAUSED)]
     ]

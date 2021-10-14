@@ -6,16 +6,24 @@ export class MockAudio extends Audio {
   state: AudioState;
   duration: number;
   playing: boolean;
+  listeners: { [key: string]: (evt: Event) => void };
   constructor() {
     super();
     this.playing = false;
-    this.duration = 0;
+    this.duration = NaN;
     this.state = AudioState.STOPPED;
     this.src = '';
+    this.listeners = {};
   }
-  markLoaded = () => {
-    this.duration = 50000;
-    this.dispatchEvent(new Event('loadeddata'));
+  emit = (evt: Event) => {
+    this.listeners[evt.type](evt);
+  }
+  addEventListener = <K extends keyof HTMLMediaElementEventMap>(
+    key: K,
+    listener: (ev: Event) => void
+  ) => {
+    this.listeners[key] = listener;
+    console.log(this.listeners);
   }
   fastSeek = (time: number): Promise<void> => {
     this.currentTime = time;
@@ -33,6 +41,7 @@ export class MockAudio extends Audio {
   }
 }
 
+HTMLMediaElement.prototype.addEventListener = () => Promise.resolve();
 HTMLMediaElement.prototype.pause = () => Promise.resolve();
 HTMLMediaElement.prototype.play = () => Promise.resolve();
 

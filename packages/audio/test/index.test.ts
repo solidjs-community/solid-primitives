@@ -49,8 +49,11 @@ describe("createAudioManager", () => {
       expect(mocked.playing).toBe(false);
       expect(mocked.state).toBe(AudioState.STOPPED);
 
-      mocked.markLoaded();
-      // expect(duration()).toBe(50000);
+      mocked.duration = 50000;
+      console.log('BEGIN -> ', mocked);
+      mocked.emit(new Event('loadeddata'));
+ 
+      expect(duration()).toBe(50000);
 
       await play();
       expect(mocked.playing).toBe(true);

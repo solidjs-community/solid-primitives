@@ -6116,10 +6116,10 @@ solid-js@1.1.4:
   resolved "https://registry.yarnpkg.com/solid-js/-/solid-js-1.1.4.tgz#ceba54d6b60f66692f8a072fb7419e94cfbcdd65"
   integrity sha512-u3rvemWTQQ1ab9YrrRR+bUi7Daq5ZRVlR6gEDsHrRYC5uYFkFGGRt/ibjo+OsBxjbPRxGzy7jel3mfTZiiuNzA==
 
-solid-testing-library@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.npmjs.org/solid-testing-library/-/solid-testing-library-0.2.0.tgz"
-  integrity sha512-ZP/z2xZ4qefBUGhQdLCn52P+rgQ/0dqHkZoQTCs2aVQCUJzxcX7omgBSvtqGxopck9v/wws+KbO8eAUIXY91/w==
+solid-testing-library@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/solid-testing-library/-/solid-testing-library-0.2.1.tgz#f5df6a5f8fec061ea383680a30f032b51b10d932"
+  integrity sha512-r56W42vDfphLJEXAwb+Wo8FVpRNCBwSYwxokZTkaAvC0pRAK4Vd4sI/sGQI8vqoaaK7/KKHQIfDF461S6Qwk3g==
   dependencies:
     "@testing-library/dom" "^7.29.4"
 
