@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-listener",
-  "version": "1.1.3",
+  "version": "1.2.3",
   "description": "Primitive to manage creating event listeners.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -16,7 +16,8 @@
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest"
   },
   "keywords": [
     "event",
@@ -25,18 +26,41 @@
     "primitives"
   ],
   "devDependencies": {
-    "@types/jest": "^26.0.10",
+    "@babel/preset-env": "7.15.6",
+    "@types/jest": "27.0.1",
+    "babel-preset-solid": "1.1.5",
+    "jest": "27.0.1",
     "prettier": "^2.0.5",
-    "solid-testing-library": "^0.2.0",
+    "ts-jest": "27.0.5",
     "tslib": "^2.0.1",
-    "typescript": "^4.0.2"
+    "typescript": "^4.4.3"
+  },
+  "dependencies": {
+    "solid-js": "^1.1.6"
   },
   "peerDependencies": {
-    "solid-js": "^1.0.7"
+    "solid-js": "^1.1.6"
   },
   "jest": {
+    "preset": "ts-jest",
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "tsconfig.json",
+        "babelConfig": {
+          "presets": [
+            "babel-preset-solid",
+            "@babel/preset-env"
+          ]
+        }
+      }
+    },
     "setupFiles": [
       "./test/setup.ts"
-    ]
+    ],
+    "testEnvironment": "jsdom",
+    "moduleNameMapper": {
+      "solid-js/web": "<rootDir>/node_modules/solid-js/web/dist/web.cjs",
+      "solid-js": "<rootDir>/node_modules/solid-js/dist/solid.cjs"
+    }
   }
 }
