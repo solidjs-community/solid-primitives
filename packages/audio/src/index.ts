@@ -16,28 +16,31 @@ export enum AudioState {
   READY = "ready"
 }
 
+type AudioSource = string | MediaSource | string & MediaSource | (() => string | MediaSource | string & MediaSource)
+
 /**
  * Creates an extremely basic audio generator method.
  *
- * @param path URL to the audio file that is to be played
+ * @param src Path or object of the audio file that to be played
  * @param handlers An array of handlers to bind against the player
  * @return
  */
 export const createAudioPlayer = (
-  path: string | (() => string),
+  src: AudioSource,
   handlers: Array<[string, EventListener]>,
 ): {
   player: HTMLAudioElement;
   state: () => AudioState;
   setState: (state: AudioState) => void;
 } => {
-  let player: HTMLAudioElement = new Audio();
   const [state, setState] = createSignal<AudioState>(AudioState.STOPPED);
-  if (typeof path === "function" && path()) {
-    player.src = path();
-    createEffect(() => (player.src = path()));
+  const player: HTMLAudioElement = new Audio();
+  const srcKey = typeof src === 'object' ? 'srcObject' : 'src';
+  if (src instanceof Function) {
+    player[srcKey] = src() as string & MediaSource;
+    createEffect(() => (player[srcKey] = src() as string & MediaSource));
   } else {
-    player.src = path as string;
+    player[srcKey] = src as string & MediaSource;
   }
   // Handle management on create and clean-up
   onMount(() => 
@@ -67,7 +70,7 @@ export const createAudioPlayer = (
  * ```
  */
 export const createAudio = (
-  path: string | (() => string),
+  src: AudioSource,
 ): {
   play: () => void;
   pause: () => void;
@@ -75,7 +78,7 @@ export const createAudio = (
   player: HTMLAudioElement;
 } => {
   const { player, state, setState } = createAudioPlayer(
-    path,
+    src,
     [
       ["loadeddata", () => setState(AudioState.READY)],
       ["loadstart", () => setState(AudioState.LOADING)],
@@ -110,7 +113,7 @@ export const createAudio = (
  * ```
  */
 export const createAudioManager = (
-  path: string | (() => string),
+  src: AudioSource,
   volume: number = 1
 ): {
   play: () => void;
@@ -125,7 +128,7 @@ export const createAudioManager = (
   const [currentTime, setCurrentTime] = createSignal<number>(0);
   const [duration, setDuration] = createSignal<number>(0);
   // Bind recording events to the player
-  const { player, state, setState } = createAudioPlayer(path, [
+  const { player, state, setState } = createAudioPlayer(src, [
     [
       "loadeddata",
       () =>

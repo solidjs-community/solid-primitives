@@ -1,6 +1,6 @@
 import { createRoot } from "solid-js";
 import { createAudioPlayer, createAudio, createAudioManager, AudioState } from "../src/index";
-import { MockAudio } from './setup';
+import { MockAudio, MockMediaSource } from './setup';
 
 describe("createBasicAudio", () => {
   test("test static string path", async () => {
@@ -14,6 +14,10 @@ describe("createBasicAudio", () => {
   test("test reactive value path", async () => {
     const { player } = createAudioPlayer(() => 'test.mp3', []);
     expect(player.src).toBe('test.mp3');
+  });
+  test("test srcObject value path", async () => {
+    const { player } = createAudioPlayer(new MockMediaSource(), []);
+    // expect(player.srcObject).toBe('test.mp3');
   });
 });
 

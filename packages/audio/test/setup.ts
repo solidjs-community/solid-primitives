@@ -33,3 +33,5 @@ HTMLMediaElement.prototype.pause = () => Promise.resolve();
 HTMLMediaElement.prototype.play = () => Promise.resolve();
 
 window.Audio = MockAudio;
+
+export class MockMediaSource extends window.MediaSource {}
