@@ -23,7 +23,7 @@ export enum AudioState {
  * @param handlers An array of handlers to bind against the player
  * @return
  */
-export const createBaseAudio = (
+export const createAudioPlayer = (
   path: string | (() => string),
   handlers: Array<[string, EventListener]>,
 ): {
@@ -74,10 +74,9 @@ export const createAudio = (
   state: () => AudioState;
   player: HTMLAudioElement;
 } => {
-  const { player, state, setState } = createBaseAudio(
+  const { player, state, setState } = createAudioPlayer(
     path,
     [
-      ["loadeddata", (evt) => console.log("YAR", evt, AudioState.PLAYING)],
       ["loadeddata", () => setState(AudioState.READY)],
       ["loadstart", () => setState(AudioState.LOADING)],
       ["playing", () => setState(AudioState.PLAYING)],
@@ -126,12 +125,11 @@ export const createAudioManager = (
   const [currentTime, setCurrentTime] = createSignal<number>(0);
   const [duration, setDuration] = createSignal<number>(0);
   // Bind recording events to the player
-  const { player, state, setState } = createBaseAudio(path, [
+  const { player, state, setState } = createAudioPlayer(path, [
     [
       "loadeddata",
       () =>
         batch(() => {
-          console.log('TRIGGER', player.duration);
           setState(AudioState.READY);
           setDuration(player.duration);
         })

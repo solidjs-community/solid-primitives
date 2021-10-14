@@ -4,7 +4,7 @@
 
 Primitive to manage audio playback in the browser. This primitive is comprised of three composed primitives:
 
-`createBaseAudio` - Provides a very basic interface for wrapping listeners to a supplied or default audio player.
+`createAudioPlayer` - Provides a very basic interface for wrapping listeners to a supplied or default audio player.
 
 `createAudio` - Creates a very basic audio/sound player.
 
