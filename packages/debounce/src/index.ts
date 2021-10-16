@@ -14,10 +14,7 @@
 const createDebounce = <T extends (...args: any[]) => void, A = Parameters<T>>(
   func: T,
   wait?: number
-): [
-  fn: (...args: A extends any[] ? A : never) => void,
-  clear: () => void
-] => {
+): [fn: (...args: A extends any[] ? A : never) => void, clear: () => void] => {
   let timeoutId: ReturnType<typeof setTimeout>;
   const clear = () => clearTimeout(timeoutId);
   return [

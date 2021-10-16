@@ -14,10 +14,7 @@
 const createThrottle = <T extends (...args: any[]) => void, A = Parameters<T>>(
   func: T,
   wait: number
-): [
-  fn: (...args: A extends any[] ? A : never) => void,
-  clear: () => void
-] => {
+): [fn: (...args: A extends any[] ? A : never) => void, clear: () => void] => {
   let shouldThrottle: boolean = false,
     timerId: ReturnType<typeof setTimeout>;
   return [

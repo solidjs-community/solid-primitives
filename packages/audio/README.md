@@ -41,4 +41,8 @@ Pulling an early release of the package together and preparing for 1.0.0 release
 
 Minor clean-up, added tests and released.
 
+1.0.1
+
+Added testing and support for srcObject.
+
 </details>

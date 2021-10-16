@@ -1,10 +1,4 @@
-import {
-  createSignal,
-  batch,
-  onMount,
-  onCleanup,
-  createEffect
-} from "solid-js";
+import { createSignal, batch, onMount, onCleanup, createEffect } from "solid-js";
 
 // Set of control enums
 export enum AudioState {
@@ -16,18 +10,22 @@ export enum AudioState {
   READY = "ready"
 }
 
-type AudioSource = string | MediaSource | string & MediaSource | (() => string | MediaSource | string & MediaSource)
+type AudioSource =
+  | string
+  | MediaSource
+  | (string & MediaSource)
+  | (() => string | MediaSource | (string & MediaSource));
 
 /**
  * Creates an extremely basic audio generator method.
  *
- * @param src Path or object of the audio file that to be played
+ * @param src Audio file path or MediaSource to be played
  * @param handlers An array of handlers to bind against the player
  * @return
  */
 export const createAudioPlayer = (
   src: AudioSource,
-  handlers: Array<[string, EventListener]>,
+  handlers: Array<[string, EventListener]>
 ): {
   player: HTMLAudioElement;
   state: () => AudioState;
@@ -35,29 +33,23 @@ export const createAudioPlayer = (
 } => {
   const [state, setState] = createSignal<AudioState>(AudioState.STOPPED);
   const player: HTMLAudioElement = new Audio();
-  const srcKey = typeof src === 'object' ? 'srcObject' : 'src';
   if (src instanceof Function) {
+    const srcKey = typeof src() === "string" ? "src" : "srcObject";
     player[srcKey] = src() as string & MediaSource;
     createEffect(() => (player[srcKey] = src() as string & MediaSource));
   } else {
-    player[srcKey] = src as string & MediaSource;
+    player[typeof src === "string" ? "src" : "srcObject"] = src as string & MediaSource;
   }
   // Handle management on create and clean-up
-  onMount(() => 
-    handlers.forEach(([evt, handler]) => player.addEventListener(evt, handler))
-  );
-  onCleanup(() =>
-    handlers.forEach(([evt, handler]) =>
-      player.removeEventListener(evt, handler)
-    )
-  );
+  onMount(() => handlers.forEach(([evt, handler]) => player.addEventListener(evt, handler)));
+  onCleanup(() => handlers.forEach(([evt, handler]) => player.removeEventListener(evt, handler)));
   return { player, state, setState };
 };
 
 /**
  * Creates a simple audio manager with basic pause and play.
  *
- * @param path URL to the audio file that is to be played
+ * @param src Audio file path or MediaSource to be played
  * @return options - @type Object
  * @return options.start - Start playing
  * @return options.stop - Stop playing
@@ -70,22 +62,19 @@ export const createAudioPlayer = (
  * ```
  */
 export const createAudio = (
-  src: AudioSource,
+  src: AudioSource
 ): {
   play: () => void;
   pause: () => void;
   state: () => AudioState;
   player: HTMLAudioElement;
 } => {
-  const { player, state, setState } = createAudioPlayer(
-    src,
-    [
-      ["loadeddata", () => setState(AudioState.READY)],
-      ["loadstart", () => setState(AudioState.LOADING)],
-      ["playing", () => setState(AudioState.PLAYING)],
-      ["pause", () => setState(AudioState.PAUSED)]
-    ]
-  );
+  const { player, state, setState } = createAudioPlayer(src, [
+    ["loadeddata", () => setState(AudioState.READY)],
+    ["loadstart", () => setState(AudioState.LOADING)],
+    ["playing", () => setState(AudioState.PLAYING)],
+    ["pause", () => setState(AudioState.PAUSED)]
+  ]);
   // Audio controls
   const play = () => player.play();
   const pause = () => player.pause();
@@ -95,7 +84,7 @@ export const createAudio = (
 /**
  * Creates a simple audio manager with most control actions.
  *
- * @param path URL to the audio file that is to be played
+ * @param src Audio file path or MediaSource to be played
  * @param volume Volume setting for the audio file
  * @return options - @type Object
  * @return options.start - Start playing
