@@ -5,30 +5,30 @@
 Primitive to manage geolocation requests. Geolocation is segmented into two primitives.
 
 `createGeolocation` - Used as a one-off geolocation query and storage utility.
-`createGeolocationMonitor` - Creates a watcher and updates a signal with the latest geolocation values.
+`createGeolocationWatcher` - Creates a geolocation watcher and updates a signal with the latest values.
 
 ## How to use it
 
+Basic use with refetch and loading:
+
 ```ts
-const { location, getLocation, isLoading } = createGeolocation();
+const [location, refetch] = createGeolocation();
 ```
 
-or
+or with options:
 
 ```ts
-const location = createGeolocation();
-```
-
-or
-
-```ts
-const [location] = createGeolocation({true, 0, 100});
+const [location] = createGeolocation({
+  enableHighAccuracy: false,
+  maximumAge: 0,
+  timeout: 200
+});
 ```
 
 or with location monitoring:
 
 ```ts
-const location = createGeolocationMonitor(true);
+const location = createGeolocationWatcher(true);
 ```
 
 ## Demo

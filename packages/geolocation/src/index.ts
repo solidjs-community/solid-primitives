@@ -1,9 +1,14 @@
 import type { Accessor, Resource } from "solid-js";
-import { createComputed, createSignal, onCleanup, createResource } from "solid-js";
+import { createComputed, batch, createSignal, onCleanup, createResource } from "solid-js";
+
+const geolocationDefaults: PositionOptions = {
+  enableHighAccuracy: false,
+  maximumAge: 0,
+  timeout: Number.POSITIVE_INFINITY
+};
 
 /**
- * Provides a function for querying the current geolocation in browser.
- * Ported from https://github.com/imbhargav5/rooks/blob/main/src/hooks/useGeolocation.ts
+ * Creates a primitive to perform unary geolocation querying and updating.
  *
  * @param options - @type PositionOptions
  * @param options.enableHighAccuracy - Enable if the locator should be very accurate
@@ -13,51 +18,35 @@ import { createComputed, createSignal, onCleanup, createResource } from "solid-j
  *
  * @example
  * ```ts
- * const [location, getLocation, isLoading] = createGeolocation();
+ * const [location, refetch, loading] = createGeolocation();
  * ```
  */
 export const createGeolocation = (
   options: PositionOptions = {}
 ): [
   location: Resource<GeolocationCoordinates | undefined>,
-  refetch: Accessor<void>,
-  loading: Accessor<boolean>
+  refetch: Accessor<void>
 ] => {
-  options = Object.assign(
-    {
-      enableHighAccuracy: false,
-      maximumAge: 0,
-      timeout: Number.POSITIVE_INFINITY
-    },
-    options
-  );
-  const [resource, { refetch }] = createResource(
+  options = Object.assign(geolocationDefaults, options);
+  const [location, { refetch }] = createResource(
     () =>
       new Promise<GeolocationCoordinates>((resolve, reject) => {
-        if (navigator.geolocation) {
-           navigator.geolocation.getCurrentPosition(
-            res => resolve(res.coords),
-            reject,
-            options
-          );
-        }
-        reject({
-          code: null,
-          message: "Geolocation is not defined."
-        });
+        if (!navigator.geolocation)
+          return reject({ code: null, message: "Geolocation is not defined." });
+        navigator.geolocation.getCurrentPosition(
+          res => resolve(res.coords),
+          reject,
+          options
+        );
       })
   );
-  return [
-    resource,
-    refetch,
-    () => resource.loading
-  ];
+  return [location, refetch];
 };
 
 /**
- * Provides a position watcher geolocation tracking in browser.
+ * Creates a primitive that allows for real-time geolocation watching.
  *
- * @param enabled - Specify if the location should be updated periodically (used to temporarialy disable location monitoring)
+ * @param enabled - Specify if the location should be updated periodically (used to temporarialy disable location watching)
  * @param options - @type PositionOptions
  * @param options.enableHighAccuracy - Enable if the locator should be very accurate
  * @param options.maximumAge - Maximum cached position age
@@ -66,25 +55,20 @@ export const createGeolocation = (
  *
  * @example
  * ```ts
- * const location = createGeolocationMonitor();
+ * const location = createGeolocationWatcher();
  * ```
  */
-export const createGeolocationMonitor = (
+export const createGeolocationWatcher = (
   enabled: boolean | (() => boolean) = true,
   options: PositionOptions = {}
-): (Accessor<GeolocationCoordinates | null>) => {
-  options = Object.assign(
-    {
-      enableHighAccuracy: false,
-      maximumAge: 0,
-      timeout: Number.POSITIVE_INFINITY
-    },
-    options
-  );
-  let registeredHandlerID: number | null;
+): [
+  location: Accessor<GeolocationCoordinates | null>,
+  error: Accessor<GeolocationPositionError | null>
+] => {
+  options = Object.assign(geolocationDefaults, options);
   const [location, setLocation] = createSignal<GeolocationCoordinates | null>(null);
-
-  // Helper to clear the geolocator
+  const [error, setError] = createSignal<GeolocationPositionError | null>(null);
+  let registeredHandlerID: number | null;
   const clearGeolocator = () =>
     registeredHandlerID && navigator.geolocation.clearWatch(registeredHandlerID);
 
@@ -94,14 +78,14 @@ export const createGeolocationMonitor = (
       (typeof enabled === "function" && enabled()) ||
       (typeof enabled !== "function" && enabled)
     ) {
-      return registeredHandlerID = navigator.geolocation.watchPosition(
-        res => setLocation(res.coords),
-        () => setLocation(null),
+      return (registeredHandlerID = navigator.geolocation.watchPosition(
+        res => batch(() => [setLocation(res.coords), error() && setError(null)]),
+        error => batch(() => [setLocation(null), setError(error)]),
         options
-      );
+      ));
     }
     clearGeolocator();
   });
   onCleanup(clearGeolocator);
-  return location;
+  return [location, error];
 };
