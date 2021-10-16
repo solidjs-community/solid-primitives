@@ -1,29 +1,32 @@
 import "regenerator-runtime/runtime";
 
-export const mockNavigatorGeolocation = () => {
-  const getCurrentPositionMock = jest.fn().mockImplementation(
-    (success) => Promise.resolve(
+const getCurrentPositionMock = jest.fn(
+  (success, error, options) => {
+    // @ts-ignore
+    if (global.navigator.isErrorMode) {
+      error({
+        code: 1,
+        message: 'GeoLocation Error'
+      });
+    } else {
       success({
         coords: {
-          latitude: 10,
-          longitude: 10
+          latitude: 43.651070,
+          longitude: -79.3470150
         }
       })
-    )
-  );
-  const clearWatchMock = jest.fn();
-  const watchPositionMock = jest.fn();
-  const geolocation = {
-    clearWatch: clearWatchMock,
-    getCurrentPosition: getCurrentPositionMock,
-    watchPosition: watchPositionMock,
-  };
-  Object.defineProperty(global.navigator, 'geolocation', {
-    value: geolocation,
-  });
-  return {
-    clearWatchMock,
-    getCurrentPositionMock,
-    watchPositionMock
-  };
+    }
+  }
+);
+const clearWatchMock = jest.fn();
+const watchPositionMock = jest.fn();
+const geolocation = {
+  // @ts-ignore
+  errorMode: (toggle) => { global.navigator.isErrorMode = toggle; },
+  clearWatch: clearWatchMock,
+  getCurrentPosition: getCurrentPositionMock,
+  watchPosition: watchPositionMock,
 };
+Object.defineProperty(global.navigator, 'geolocation', {
+  value: geolocation,
+});

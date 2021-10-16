@@ -29,15 +29,16 @@
     "@types/jest": "^26.0.10",
     "prettier": "^2.0.5",
     "solid-testing-library": "^0.2.0",
+    "ts-jest": "^27.0.6",
     "tslib": "^2.0.1",
-    "typescript": "^4.0.2"
-  },
-  "dependencies": {
     "@babel/preset-env": "^7.15.8",
     "babel-preset-solid": "^1.1.5",
     "jest": "^27.2.5",
-    "solid-js": "^1.0.3",
-    "ts-jest": "^27.0.6"
+    "wait-for-expect": "^3.0.2",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "solid-js": "^1.0.3"
   },
   "jest": {
     "preset": "ts-jest",

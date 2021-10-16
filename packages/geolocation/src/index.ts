@@ -35,17 +35,16 @@ export const createGeolocation = (
     () =>
       new Promise<GeolocationCoordinates>((resolve, reject) => {
         if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
+           navigator.geolocation.getCurrentPosition(
             res => resolve(res.coords),
-            error => reject({ isError: true, message: error.message }),
+            reject,
             options
           );
-        } else {
-          reject({
-            isError: true,
-            message: "Geolocation is not supported for this Browser/OS."
-          });
         }
+        reject({
+          code: null,
+          message: "Geolocation is not defined."
+        });
       })
   );
   return [
