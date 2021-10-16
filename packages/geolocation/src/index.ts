@@ -1,7 +1,5 @@
-import type { Resource } from "solid-js";
+import type { Accessor, Resource } from "solid-js";
 import { createComputed, createSignal, onCleanup, createResource } from "solid-js";
-
-export declare type LocationResourceReturn<T> = [Resource<T>, () => void, () => boolean];
 
 /**
  * Provides a function for querying the current geolocation in browser.
@@ -16,12 +14,15 @@ export declare type LocationResourceReturn<T> = [Resource<T>, () => void, () => 
  * @example
  * ```ts
  * const [location, getLocation, isLoading] = createGeolocation();
- * const [location] = createGeolocation({true, 0, 100});
  * ```
  */
 export const createGeolocation = (
   options: PositionOptions = {}
-): LocationResourceReturn<GeolocationCoordinates | undefined> => {
+): [
+  location: Resource<GeolocationCoordinates | undefined>,
+  refetch: Accessor<void>,
+  loading: Accessor<boolean>
+] => {
   options = Object.assign(
     {
       enableHighAccuracy: false,
@@ -47,14 +48,17 @@ export const createGeolocation = (
         }
       })
   );
-  return [resource, refetch, () => resource.loading];
+  return [
+    resource,
+    refetch,
+    () => resource.loading
+  ];
 };
 
 /**
  * Provides a position watcher geolocation tracking in browser.
- * Ported from https://github.com/imbhargav5/rooks/blob/main/src/hooks/useGeolocation.ts
  *
- * @param watchPosition - Specify if the location should be updated periodically (used to temporarialy disable location watching)
+ * @param enabled - Specify if the location should be updated periodically (used to temporarialy disable location monitoring)
  * @param options - @type PositionOptions
  * @param options.enableHighAccuracy - Enable if the locator should be very accurate
  * @param options.maximumAge - Maximum cached position age
@@ -63,15 +67,13 @@ export const createGeolocation = (
  *
  * @example
  * ```ts
- * let location = createGeolocation();
- * let location = createGeolocation(watchLocationSignal());
- * let location = createGeolocation(true, {true, 0, 100});
+ * const location = createGeolocationMonitor();
  * ```
  */
-export const createGeolocationWatcher = (
-  watchPosition: boolean | (() => boolean) = true,
+export const createGeolocationMonitor = (
+  enabled: boolean | (() => boolean) = true,
   options: PositionOptions = {}
-): (() => GeolocationCoordinates | null) => {
+): (Accessor<GeolocationCoordinates | null>) => {
   options = Object.assign(
     {
       enableHighAccuracy: false,
@@ -90,17 +92,16 @@ export const createGeolocationWatcher = (
   // Implement as an effect to allow switching locator on/off
   createComputed(() => {
     if (
-      (typeof watchPosition === "function" && watchPosition()) ||
-      (typeof watchPosition !== "function" && watchPosition)
+      (typeof enabled === "function" && enabled()) ||
+      (typeof enabled !== "function" && enabled)
     ) {
-      registeredHandlerID = navigator.geolocation.watchPosition(
+      return registeredHandlerID = navigator.geolocation.watchPosition(
         res => setLocation(res.coords),
         () => setLocation(null),
         options
       );
-    } else {
-      clearGeolocator();
     }
+    clearGeolocator();
   });
   onCleanup(clearGeolocator);
   return location;

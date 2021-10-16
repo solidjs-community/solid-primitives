@@ -5,7 +5,7 @@
 Primitive to manage geolocation requests. Geolocation is segmented into two primitives.
 
 `createGeolocation` - Used as a one-off geolocation query and storage utility.
-`createGeolocationWatcher` - Creates a watcher and updates a signal with the latest geolocation values.
+`createGeolocationMonitor` - Creates a watcher and updates a signal with the latest geolocation values.
 
 ## How to use it
 
@@ -25,6 +25,12 @@ or
 const [location] = createGeolocation({true, 0, 100});
 ```
 
+or with location monitoring:
+
+```ts
+const location = createGeolocationMonitor(true);
+```
+
 ## Demo
 
 You may view a working example here: https://codesandbox.io/s/solid-primitives-geolocation-fhzu4?file=/src/index.tsx
@@ -37,5 +43,9 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-g
 0.0.100
 
 Pulling an early release of the package together and preparing for 1.0.0 release. No changes.
+
+1.0.0
+
+Added testing, improved types, changed name of createGeolocationWatcher to createGeolocationMonitor.
 
 </details>
