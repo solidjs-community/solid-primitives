@@ -31,8 +31,9 @@ export const createGeolocation = (
   const [location, { refetch }] = createResource(
     () =>
       new Promise<GeolocationCoordinates>((resolve, reject) => {
-        if (!navigator.geolocation)
+        if (!('geolocation' in navigator)) {
           return reject({ code: null, message: "Geolocation is not defined." });
+        }
         navigator.geolocation.getCurrentPosition(
           res => resolve(res.coords),
           reject,
@@ -55,7 +56,7 @@ export const createGeolocation = (
  *
  * @example
  * ```ts
- * const location = createGeolocationWatcher();
+ * const [location, error] = createGeolocationWatcher();
  * ```
  */
 export const createGeolocationWatcher = (

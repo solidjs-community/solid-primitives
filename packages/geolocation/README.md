@@ -2,14 +2,15 @@
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
-Primitive to manage geolocation requests. Geolocation is segmented into two primitives.
+Primitives to query and watch geolocation information.
 
-`createGeolocation` - Used as a one-off geolocation query and storage utility.
-`createGeolocationWatcher` - Creates a geolocation watcher and updates a signal with the latest values.
+`createGeolocation` - Used to fetch current geolocation data as a resource.
+
+`createGeolocationWatcher` - Creates a geolocation watcher and updates a signal with the latest coordinates.
 
 ## How to use it
 
-Basic use with refetch and loading:
+Basic use with refetch:
 
 ```ts
 const [location, refetch] = createGeolocation();
@@ -18,17 +19,17 @@ const [location, refetch] = createGeolocation();
 or with options:
 
 ```ts
-const [location] = createGeolocation({
+const [location, refetch] = createGeolocation({
   enableHighAccuracy: false,
   maximumAge: 0,
   timeout: 200
 });
 ```
 
-or with location monitoring:
+or to watch geolocation:
 
 ```ts
-const location = createGeolocationWatcher(true);
+const [location, error] = createGeolocationWatcher(true);
 ```
 
 ## Demo
