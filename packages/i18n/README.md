@@ -17,7 +17,7 @@ Use it:
 ```tsx
 import { render } from "solid-js/web";
 import { Component, createSignal } from "solid-js";
-import { I18nProvider, createI18nContext, useI18n } from "@solid-primitives/solid-i18n";
+import { I18nProvider, createI18nContext, useI18n } from "@solid-primitives/i18n";
 
 const App: Component = () => {
   const [t, { add, locale, dict }] = useI18n();
@@ -77,5 +77,9 @@ You may view a working example here: https://codesandbox.io/s/use-i18n-rd7jq?fil
 0.0.100
 
 First commit of the i18n primitive.
+
+1.0.0
+
+General package clean-up and added testing facility.
 
 </details>
