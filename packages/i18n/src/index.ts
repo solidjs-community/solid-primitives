@@ -76,14 +76,14 @@ export const createI18nContext = (
   const [locale, setLocale] = createSignal(lang);
   const [dict, setDict] = createStore(init);
   /**
-   * The main translation function of the library, given a key, it will look into its
-   * dictionnaries to find th right translationb for that key and fallback to the default
+   * The main translation function of the library. Given a key, it will look into its
+   * dictionaries to find the right translation for that key and fallback to the default
    * translation provided in last argument (if provided).
    *
    * You can additionally give as a second arguments dynamic parameters to inject into the
    * the translation.
    *
-   * @param key {string} - The key to look translation for
+   * @param key {string} - The key to look up a translation for
    * @param [params] {Record<string, string>} - Parameters to pass into the translation template
    * @param [defaultValue] {string} - Default value if the translation isn't found
    *
@@ -93,13 +93,13 @@ export const createI18nContext = (
    * ```tsx
    * const [t] = useI18n();
    *
-   * const dict = { fr: 'Bonjour {{ name }} !' }
-   *
-   * t('hello', { name: 'John' }, 'Hello, {{ name }}!');
+   * const dict = { fr: { hello: 'Bonjour {{ name }} !' } }
    * locale('fr')
+   * t('hello', { name: 'John' }, 'Hello, {{ name }}!');
    * // => 'Bonjour John !'
    * locale('unknown')
-   * // => 'Hello, John!'
+   * t('hello', { name: 'Joe' }, 'Hello, {{ name }}!');
+   * // => 'Hello, Joe!'
    * ```
    */
   const translate = (
