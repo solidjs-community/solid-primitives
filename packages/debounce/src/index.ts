@@ -11,16 +11,16 @@
  * fn('my-new-value');
  * ```
  */
-const createDebounce = <T extends (...args: any[]) => void, A = Parameters<T>>(
+const createDebounce = <T extends (...args: unknown[]) => void, A = Parameters<T>>(
   func: T,
   wait?: number
-): [fn: (...args: A extends any[] ? A : never) => void, clear: () => void] => {
+): [fn: (...args: A extends unknown[] ? A : never) => void, clear: () => void] => {
   let timeoutId: ReturnType<typeof setTimeout>;
   const clear = () => clearTimeout(timeoutId);
   return [
-    (...args: A extends any[] ? A : never) => {
+    (...args: A extends unknown[] ? A : never) => {
       if (timeoutId !== undefined) clear();
-      setTimeout(() => func(...args), wait);
+      timeoutId = setTimeout(() => func(...args), wait);
     },
     clear
   ];
