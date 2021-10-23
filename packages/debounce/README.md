@@ -28,4 +28,8 @@ Initial commit and publish of debounce primitive.
 
 Improved types, minor clean-up and added tests.
 
+1.0.2
+
+Changed any to unknown type and applied patch from high1.
+
 </details>

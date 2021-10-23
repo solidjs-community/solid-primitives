@@ -6,7 +6,7 @@ function sleep(ms: number) {
 
 describe("createDebounce", () => {
   test("setup and trigger debounce", async () => {
-    let val = 0;
+    let val: unknown = 0;
     const [trigger] = createDebounce(current => (val = current), 150);
     expect(val).toBe(0);
     trigger(5);
@@ -14,7 +14,7 @@ describe("createDebounce", () => {
     expect(val).toBe(5);
   });
   test("trigger multiple debounce", async () => {
-    let val = 0;
+    let val: unknown = 0;
     const [trigger] = createDebounce(current => (val = current), 150);
     expect(val).toBe(0);
     trigger(5);
@@ -23,7 +23,7 @@ describe("createDebounce", () => {
     expect(val).toBe(1);
   });
   test("test clearing debounce", async () => {
-    let val = 0;
+    let val: unknown = 0;
     const [trigger, clear] = createDebounce(current => (val = current), 500);
     expect(val).toBe(0);
     trigger(5);
