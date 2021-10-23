@@ -48,7 +48,7 @@ const createTimer = (
       intervalId = scheduler(handler, delay);
     }
   });
-  onCleanup(() => clear);
+  onCleanup(() => clear());
 
   return clear;
 };

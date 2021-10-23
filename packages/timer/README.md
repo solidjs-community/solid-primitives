@@ -27,5 +27,8 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-t
 
 First commit of the timer primitive.
 
-</details>
+0.0.107
 
+Patched an issue with clear on clean-up.
+
+</details>
