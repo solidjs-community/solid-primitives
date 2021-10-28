@@ -1,0 +1,46 @@
+{
+  "name": "@solid-primitives/stream",
+  "version": "0.0.105",
+  "description": "Primitive to load scripts dynamically",
+  "author": "Alex Lohr <alex.lohr@logmein.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/script",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc",
+    "test": "uvu -r solid-register test"
+  },
+  "keywords": [
+    "script",
+    "jsonp",
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "prettier": "^2.0.5",
+    "solid-testing-library": "^0.2.0",
+    "solid-register": "^0.0.5",
+    "jsdom": "^18.0.0",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.3",
+    "uvu": "^0.5.2"
+  },
+  "dependencies": {
+    "solid-js": "^1.2.0"
+  },
+  "jest": {
+    "preset": "solid-jest/preset/browser",
+    "setupFiles": [
+      "./test/setup.ts"
+    ]
+  }
+}
