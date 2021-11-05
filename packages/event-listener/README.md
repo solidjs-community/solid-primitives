@@ -12,9 +12,13 @@ A helpful event listener primitive that binds window and any element supplied.
 const [add, remove] = createEventListener(document.getElementById("mybutton"), "mouseDown", () =>
   console.log("Click")
 );
-// or as a directive
+```
+
+or as a directive
+
+```ts
 <MyButton use:createEventListener={() => ["click", () => console.log("Click")]}>Click!</MyButton>;
-// you can provide your own event map type:
+// you can provide your own event map type as well:
 createEventListener<{ myCustomEvent: Event }>(window, "myCustomEvent", () => console.log("yup!"));
 ```
 
