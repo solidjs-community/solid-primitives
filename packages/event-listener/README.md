@@ -6,6 +6,14 @@ A helpful event listener primitive that binds window and any element supplied.
 
 `createEventListener` - Very basic and straightforward primitive that handles multiple elements according to a single event binding.
 
+## Installation
+
+```bash
+npm install @solid-primitives/event-listener
+// or
+yarn add @solid-primitives/event-listener
+```
+
 ## How to use it
 
 ```ts
