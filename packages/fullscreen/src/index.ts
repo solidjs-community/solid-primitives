@@ -4,7 +4,7 @@ import type { Accessor } from "solid-js";
 declare module "solid-js" {
   namespace JSX {
     interface Directives {
-      createFullscreen: (ref?: HTMLElement, active?: Accessor<boolean>) => Accessor<boolean>;
+      createFullscreen: (ref?: HTMLElement, active?: Accessor<FullscreenOptions | boolean>) => Accessor<boolean>;
     }
   }
 }
