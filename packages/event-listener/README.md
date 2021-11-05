@@ -8,17 +8,15 @@ A helpful event listener primitive that binds window and any element supplied.
 
 ## How to use it
 
- ```ts
-const [add, remove] = createEventListener(
-  document.getElementById("mybutton"),
-  "mouseDown",
-  () => console.log("Click")
+```ts
+const [add, remove] = createEventListener(document.getElementById("mybutton"), "mouseDown", () =>
+  console.log("Click")
 );
 // or as a directive
-<MyButton use:createEventListener={() => ['click', () => console.log("Click")]}>Click!</MyButton>
+<MyButton use:createEventListener={() => ["click", () => console.log("Click")]}>Click!</MyButton>;
 // you can provide your own event map type:
-createEventListener<{ myCustomEvent: Event }>(window, 'myCustomEvent', () => console.log("yup!"));
- ```
+createEventListener<{ myCustomEvent: Event }>(window, "myCustomEvent", () => console.log("yup!"));
+```
 
 ## Demo
 
@@ -32,6 +30,10 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-e
 0.0.100
 
 First ported commit from react-use-event-listener.
+
+1.1.4
+
+Released a version with type mostly cleaned up.
 
 1.2.3
 
