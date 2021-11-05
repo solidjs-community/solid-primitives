@@ -9,12 +9,20 @@ type ValidAddEventListenerProps = [
 ];
 
 export type EventHandler<
-  E extends WindowEventMap | Record<string, Event> = WindowEventMap,
+  E extends
+    | HTMLElementEventMap
+    | WindowEventMap
+    | DocumentEventMap
+    | Record<string, Event> = HTMLElementEventMap,
   K extends keyof E = keyof E
 > = (event: E[K]) => void;
 
 export type EventListenerProps<
-  E extends WindowEventMap | Record<string, Event> = WindowEventMap,
+  E extends
+    | HTMLElementEventMap
+    | WindowEventMap
+    | DocumentEventMap
+    | Record<string, Event> = HTMLElementEventMap,
   K extends keyof E = keyof E
 > = [name: K, handler: EventHandler<E, K> | null, options?: boolean | AddEventListenerOptions];
 
@@ -55,8 +63,32 @@ export type E = JSX.Element;
  * createEventListener<{ myCustomEvent: Event }>(window, 'myCustomEvent', () => console.log("yup!"));
  * ```
  */
+
+// Overload 1: window target
 export function createEventListener<
-  E extends WindowEventMap | Record<string, Event> = WindowEventMap,
+  E extends WindowEventMap = WindowEventMap,
+  K extends keyof E = keyof E
+>(
+  target: Window,
+  eventName: K,
+  handler: EventHandler<E, K> | null,
+  options?: boolean | AddEventListenerOptions
+): readonly [add: (el: Window) => void, remove: (el: Window) => void];
+
+// Overload 2: document target
+export function createEventListener<
+  E extends DocumentEventMap = DocumentEventMap,
+  K extends keyof E = keyof E
+>(
+  target: Document,
+  eventName: K,
+  handler: EventHandler<E, K> | null,
+  options?: boolean | AddEventListenerOptions
+): readonly [add: (el: Document) => void, remove: (el: Document) => void];
+
+// Overload 3: custom event target
+export function createEventListener<
+  E extends HTMLElementEventMap | Record<string, Event> = HTMLElementEventMap,
   K extends keyof E = keyof E
 >(
   target: EventTarget | EventTarget[],
@@ -65,8 +97,9 @@ export function createEventListener<
   options?: boolean | AddEventListenerOptions
 ): readonly [add: (el: EventTarget) => void, remove: (el: EventTarget) => void];
 
+// Overload 3: directive usage
 export function createEventListener<
-  E extends WindowEventMap | Record<string, Event> = WindowEventMap,
+  E extends HTMLElementEventMap | Record<string, Event> = HTMLElementEventMap,
   K extends keyof E = keyof E
 >(
   ref: EventTarget | EventTarget[],
@@ -74,7 +107,11 @@ export function createEventListener<
 ): readonly [add: (el: EventTarget) => void, remove: (el: EventTarget) => void];
 
 export function createEventListener<
-  E extends WindowEventMap | Record<string, Event> = WindowEventMap,
+  E extends
+    | HTMLElementEventMap
+    | WindowEventMap
+    | DocumentEventMap
+    | Record<string, Event> = HTMLElementEventMap,
   K extends keyof E = keyof E
 >(
   target: EventTarget | EventTarget[],
