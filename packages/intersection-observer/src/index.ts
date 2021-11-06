@@ -3,7 +3,7 @@ import { onMount, onCleanup, createSignal, Accessor } from "solid-js";
 export interface IntersetionObserverOptions {
   readonly root?: Element | Document | null;
   readonly rootMargin?: string;
-  readonly thresholds?: number | number[];
+  readonly threshold?: number | number[];
 }
 
 /**
