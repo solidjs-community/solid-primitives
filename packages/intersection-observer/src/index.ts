@@ -18,7 +18,7 @@ export interface IntersetionObserverOptions {
  *
  * @example
  * ```ts
- * const { add, remove, start, stop, observer } = createIntersectionObserver(els, entry => 
+ * const { add, remove, start, stop, observer } = createIntersectionObserver(els, entry =>
  *   console.log(entry)
  * );
  * ```

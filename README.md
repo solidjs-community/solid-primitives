@@ -72,8 +72,8 @@ Designing our primitives in this manner allows for better tree shaking and very 
 - [x] [createSessionStorage](https://github.com/davedbase/solid-primitives/tree/main/packages/storage)
 - [x] [createGeolocation](https://github.com/davedbase/solid-primitives/tree/main/packages/geolocation)
 - [x] [createEventListener](https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener)
+- [x] [createClipboard](https://github.com/davedbase/solid-primitives/tree/main/packages/clipboard)
 - [ ] createURL
-- [ ] createClipboard
 - [ ] createHistory
 - [ ] createLocale
 

@@ -1,0 +1,42 @@
+{
+  "name": "@solid-primitives/clipboard",
+  "version": "1.0.0",
+  "description": "Primitives to that make reading and writing to clipboard easy.",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/clipboard",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc"
+  },
+  "keywords": [
+    "intersection",
+    "observer",
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "@types/jest": "^26.0.10",
+    "prettier": "^2.0.5",
+    "solid-testing-library": "^0.2.0",
+    "tslib": "^2.0.1",
+    "typescript": "^4.0.2"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.0.6"
+  },
+  "jest": {
+    "setupFiles": [
+      "./test/setup.ts"
+    ]
+  }
+}
