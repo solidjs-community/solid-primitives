@@ -10,8 +10,10 @@ export type EventListenerProps<E extends Record<string, Event> = {}> = [
 declare module "solid-js" {
   namespace JSX {
     interface Directives {
-      createEventListener: (ref: HTMLElement, props: Accessor<EventListenerProps<{}>>) =>
-        [add: (target: EventTarget) => void, remove: (target: EventTarget) => void];
+      createEventListener: (
+        ref: HTMLElement,
+        props: Accessor<EventListenerProps<{}>>
+      ) => [add: (target: EventTarget) => void, remove: (target: EventTarget) => void];
     }
   }
 }
@@ -58,21 +60,24 @@ export function createEventListener<E extends Record<string, Event> = {}>(
 ): readonly [add: (el: EventTarget) => void, remove: (el: EventTarget) => void] {
   const targets = Array.isArray(target) ? target : [target];
   const props: Accessor<EventListenerProps<E>> =
-    typeof nameOrProps === 'function' ? nameOrProps : () => [nameOrProps ?? '', handler ?? null, options];
+    typeof nameOrProps === "function"
+      ? nameOrProps
+      : () => [nameOrProps ?? "", handler ?? null, options];
   const add = (target: EventTarget) => {
     targets.includes(target) || targets.push(target);
     target.addEventListener.apply(target, props());
-  }
+  };
   const remove = (target: EventTarget) => {
     targets.forEach((t, index) => t === target && targets.splice(index, 1));
     target.removeEventListener.apply(target, props());
-  }
+  };
   // we need to directly add the event, otherwise we cannot dispatch it before the next effect runs
   targets.forEach(add);
   createEffect((previousProps?: EventListenerProps<E>) => {
     const currentProps = props();
     if (previousProps !== currentProps) {
-      previousProps && targets.forEach((target) => target.removeEventListener.apply(target, previousProps));
+      previousProps &&
+        targets.forEach(target => target.removeEventListener.apply(target, previousProps));
       targets.forEach(add);
     }
     return currentProps;
@@ -81,6 +86,6 @@ export function createEventListener<E extends Record<string, Event> = {}>(
     targets.forEach(remove);
   });
   return [add, remove];
-};
+}
 
 export default createEventListener;

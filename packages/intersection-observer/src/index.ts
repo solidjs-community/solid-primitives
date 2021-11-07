@@ -18,10 +18,11 @@ export interface IntersetionObserverOptions {
  *
  * @example
  * ```ts
- * const { add, remove, start, stop, observer } = createIntersectionObserver(els);
+ * const { add, remove, start, stop, observer } = createIntersectionObserver(els, entry => 
+ *   console.log(entry)
+ * );
  * ```
  */
-
 export const createIntersectionObserver = (
   elements: Element[] | Accessor<Element[]>,
   onChange: IntersectionObserverCallback,
