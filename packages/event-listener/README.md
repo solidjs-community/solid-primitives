@@ -10,7 +10,7 @@ A helpful event listener primitive that binds window and any element supplied.
 
 ```bash
 npm install @solid-primitives/event-listener
-// or
+# or
 yarn add @solid-primitives/event-listener
 ```
 

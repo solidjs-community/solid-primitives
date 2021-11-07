@@ -1,10 +1,10 @@
 {
-  "name": "@solid-primitives/intersection-observer",
+  "name": "@solid-primitives/clipboard",
   "version": "1.0.0",
-  "description": "Primitives to support using the intersection observer API.",
+  "description": "Primitives to that make reading and writing to clipboard easy.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/intersection-observer",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/clipboard",
   "private": false,
   "main": "dist/index.js",
   "module": "dist/index.js",
