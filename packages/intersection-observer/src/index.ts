@@ -10,8 +10,8 @@ export interface IntersectionObserverOptions {
   readonly threshold?: number | number[];
 }
 
-export type AddIntersectionObserverEntry = (el: MaybeAccessor<Element>) => void;
-export type RemoveIntersectionObserverEntry = (el: MaybeAccessor<Element>) => void;
+export type AddIntersectionObserverEntry = (el: Element) => void;
+export type RemoveIntersectionObserverEntry = (el: Element) => void;
 
 /**
  * Creates a very basic Intersection Observer.
@@ -53,11 +53,8 @@ export const createIntersectionObserver = (
 };
 
 export type EntryCallback = (entry: IntersectionObserverEntry) => void;
-export type AddViewportObserverEntry = (
-  el: MaybeAccessor<Element>,
-  callback: EntryCallback
-) => void;
-export type RemoveViewportObserverEntry = (el: MaybeAccessor<Element>) => void;
+export type AddViewportObserverEntry = (el: Element, callback: EntryCallback) => void;
+export type RemoveViewportObserverEntry = (el: Element) => void;
 
 type CreateViewportObserverReturnValue = {
   add: AddViewportObserverEntry;
@@ -83,13 +80,13 @@ type CreateViewportObserverReturnValue = {
  * ```
  */
 export function createViewportObserver(
-  elements: MaybeAccessor<Element>[],
+  elements: Element[],
   callback: EntryCallback,
   options?: IntersectionObserverOptions
 ): CreateViewportObserverReturnValue;
 
 export function createViewportObserver(
-  initial: [MaybeAccessor<Element>, EntryCallback][],
+  initial: [Element, EntryCallback][],
   options?: IntersectionObserverOptions
 ): CreateViewportObserverReturnValue;
 
@@ -98,7 +95,7 @@ export function createViewportObserver(
 ): CreateViewportObserverReturnValue;
 
 export function createViewportObserver(...a: any) {
-  let initial: [MaybeAccessor<Element>, EntryCallback][] = [];
+  let initial: [Element, EntryCallback][] = [];
   let options: IntersectionObserverOptions = {};
   if (Array.isArray(a[0])) {
     if (typeof a[1] === "function") {
@@ -115,10 +112,10 @@ export function createViewportObserver(...a: any) {
   const { add, remove, start, stop } = createIntersectionObserver([], onChange, options);
   const addEntry: AddViewportObserverEntry = (el, callback) => {
     add(el);
-    callbacks.set(read(el), callback);
+    callbacks.set(el, callback);
   };
   const removeEntry: RemoveViewportObserverEntry = el => {
-    callbacks.delete(read(el));
+    callbacks.delete(el);
     remove(el);
   };
   initial.forEach(([el, cb]) => addEntry(el, cb));
