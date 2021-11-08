@@ -1,10 +1,17 @@
 import { onMount, onCleanup, createSignal, Accessor } from "solid-js";
 
+type MaybeAccessor<T> = T | Accessor<T>;
+const read = <T>(val: MaybeAccessor<T>): T =>
+  typeof val === "function" ? (val as Function)() : val;
+
 export interface IntersectionObserverOptions {
   readonly root?: Element | Document | null;
   readonly rootMargin?: string;
   readonly threshold?: number | number[];
 }
+
+export type AddIntersectionObserverEntry = (el: MaybeAccessor<Element>) => void;
+export type RemoveIntersectionObserverEntry = (el: MaybeAccessor<Element>) => void;
 
 /**
  * Creates a very basic Intersection Observer.
@@ -24,22 +31,21 @@ export interface IntersectionObserverOptions {
  * ```
  */
 export const createIntersectionObserver = (
-  elements: Element[] | Accessor<Element[]>,
+  elements: MaybeAccessor<Element[]>,
   onChange: IntersectionObserverCallback,
   options?: IntersectionObserverOptions
 ): {
-  add: (el: Element) => void;
-  remove: (el: Element) => void;
+  add: AddIntersectionObserverEntry;
+  remove: RemoveIntersectionObserverEntry;
   start: () => void;
   stop: () => void;
   observer: IntersectionObserver;
 } => {
   // If not supported, skip
   const observer = new IntersectionObserver(onChange, options);
-  const getElements = typeof elements === "function" ? elements : () => elements;
-  const add = (el: Element) => observer.observe(el);
-  const remove = (el: Element) => observer.unobserve(el);
-  const start = () => getElements().forEach(el => add(el));
+  const add: AddIntersectionObserverEntry = el => observer.observe(read(el));
+  const remove: RemoveIntersectionObserverEntry = el => observer.unobserve(read(el));
+  const start = () => read(elements).forEach(el => add(el));
   const stop = () => observer.takeRecords().forEach(entry => remove(entry.target));
   onMount(start);
   onCleanup(stop);
@@ -47,12 +53,24 @@ export const createIntersectionObserver = (
 };
 
 export type EntryCallback = (entry: IntersectionObserverEntry) => void;
-export type AddViewportObserverEntry = (el: Element, setter: EntryCallback) => void;
-export type RemoveViewportObserverEntry = (el: Element) => void;
+export type AddViewportObserverEntry = (
+  el: MaybeAccessor<Element>,
+  callback: EntryCallback
+) => void;
+export type RemoveViewportObserverEntry = (el: MaybeAccessor<Element>) => void;
+
+type CreateViewportObserverReturnValue = {
+  add: AddViewportObserverEntry;
+  remove: RemoveViewportObserverEntry;
+  start: () => void;
+  stop: () => void;
+};
 
 /**
  * Creates a more advanced viewport observer for complex tracking.
  *
+ * @param elements - A list of elements to watch
+ * @param callback - Element intersection change event handler
  * @param options - IntersectionObserver constructor options:
  * - `root` — The Element or Document whose bounds are used as the bounding box when testing for intersection.
  * - `rootMargin` — A string which specifies a set of offsets to add to the root's bounding_box when calculating intersections, effectively shrinking or growing the root for calculation purposes.
@@ -60,33 +78,52 @@ export type RemoveViewportObserverEntry = (el: Element) => void;
  *
  * @example
  * ```ts
- * const { add, remove, start, stop } = createViewportObserver();
+ * const { add, remove, start, stop } = createViewportObserver(els, e => {...});
  * add(el, e => console.log(e.isIntersecting))
  * ```
  */
-export const createViewportObserver = (
+export function createViewportObserver(
+  elements: MaybeAccessor<Element>[],
+  callback: EntryCallback,
   options?: IntersectionObserverOptions
-): {
-  add: AddViewportObserverEntry;
-  remove: RemoveViewportObserverEntry;
-  start: () => void;
-  stop: () => void;
-} => {
+): CreateViewportObserverReturnValue;
+
+export function createViewportObserver(
+  initial: [MaybeAccessor<Element>, EntryCallback][],
+  options?: IntersectionObserverOptions
+): CreateViewportObserverReturnValue;
+
+export function createViewportObserver(
+  options?: IntersectionObserverOptions
+): CreateViewportObserverReturnValue;
+
+export function createViewportObserver(...a: any) {
+  let initial: [MaybeAccessor<Element>, EntryCallback][] = [];
+  let options: IntersectionObserverOptions = {};
+  if (Array.isArray(a[0])) {
+    if (typeof a[1] === "function") {
+      initial = a[0].map(el => [el, a[1]]);
+      options = a[2];
+    } else {
+      initial = a[0];
+      options = a[1];
+    }
+  }
   const callbacks = new WeakMap<Element, EntryCallback>();
-  const onChange = (entries: Array<IntersectionObserverEntry>) =>
+  const onChange: IntersectionObserverCallback = entries =>
     entries.forEach(entry => callbacks.get(entry.target)!(entry));
   const { add, remove, start, stop } = createIntersectionObserver([], onChange, options);
-  const addEntry: AddViewportObserverEntry = (el, setter) => {
+  const addEntry: AddViewportObserverEntry = (el, callback) => {
     add(el);
-    callbacks.set(el, setter);
+    callbacks.set(read(el), callback);
   };
   const removeEntry: RemoveViewportObserverEntry = el => {
-    callbacks.delete(el);
+    callbacks.delete(read(el));
     remove(el);
   };
-  onMount(start);
+  initial.forEach(([el, cb]) => addEntry(el, cb));
   return { add: addEntry, remove: removeEntry, start, stop };
-};
+}
 
 /**
  * Creates reactive signal that changes when element's visibility changes
@@ -106,16 +143,15 @@ export const createViewportObserver = (
  * ```
  */
 export const createVisibilityObserver = (
-  element: Element | Accessor<Element>,
+  element: MaybeAccessor<Element>,
   options?: IntersectionObserverOptions & {
     initialValue?: boolean;
     once?: boolean;
   }
 ): [Accessor<boolean>, { start: () => void; stop: () => void }] => {
   const [isVisible, setVisible] = createSignal(options?.initialValue || false);
-  const getEl = typeof element === "function" ? element : () => element;
   const { start, stop } = createIntersectionObserver(
-    () => [getEl()],
+    () => [read(element)],
     ([entry]) => {
       setVisible(entry.isIntersecting);
       if (options?.once && entry.isIntersecting !== !!options?.initialValue) stop();
