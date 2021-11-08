@@ -16,7 +16,7 @@ const createScrollObserver = <T extends HTMLElement>(
 ): (() => number | null) => {
   const getPosition = (): number | null =>
     // @ts-ignore
-    target && typeof target() !== "undefined" ? target().pageYOffset : null;
+    target && typeof target() !== "undefined" ? target().pageYOffset ?? target().scrollTop : null;
   const [position, setPosition] = createSignal<number | null>(getPosition());
   const handleScroll = () => setPosition(getPosition());
   const remove = () => target() && target().removeEventListener("scroll", handleScroll);
