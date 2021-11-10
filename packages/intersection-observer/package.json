@@ -16,7 +16,8 @@
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "uvu -r solid-register"
   },
   "keywords": [
     "intersection",
@@ -25,18 +26,14 @@
     "primitives"
   ],
   "devDependencies": {
-    "@types/jest": "^26.0.10",
+    "uvu": "^0.5.2",
+    "jsdom": "^18.0.1",
+    "solid-register": "^0.0.10",
     "prettier": "^2.0.5",
-    "solid-testing-library": "^0.2.0",
     "tslib": "^2.0.1",
-    "typescript": "^4.0.2"
+    "typescript": "^4.4.4"
   },
   "peerDependencies": {
-    "solid-js": "^1.0.6"
-  },
-  "jest": {
-    "setupFiles": [
-      "./test/setup.ts"
-    ]
+    "solid-js": "^1.2.2"
   }
 }
