@@ -47,6 +47,8 @@ export const createIntersectionObserver = (
 };
 
 export type EntryCallback = (entry: IntersectionObserverEntry) => void;
+export type AddViewportObserverEntry = (el: Element, setter: EntryCallback) => void;
+export type RemoveViewportObserverEntry = (el: Element) => void;
 
 /**
  * Creates a more advanced viewport observer for complex tracking.
@@ -65,8 +67,8 @@ export type EntryCallback = (entry: IntersectionObserverEntry) => void;
 export const createViewportObserver = (
   options?: IntersectionObserverOptions
 ): {
-  add: (el: HTMLElement, setter: EntryCallback) => void;
-  remove: (el: HTMLElement) => void;
+  add: AddViewportObserverEntry;
+  remove: RemoveViewportObserverEntry;
   start: () => void;
   stop: () => void;
 } => {
@@ -74,11 +76,11 @@ export const createViewportObserver = (
   const onChange = (entries: Array<IntersectionObserverEntry>) =>
     entries.forEach(entry => callbacks.get(entry.target)!(entry));
   const { add, remove, start, stop } = createIntersectionObserver([], onChange, options);
-  const addEntry = (el: HTMLElement, setter: EntryCallback): void => {
+  const addEntry: AddViewportObserverEntry = (el, setter) => {
     add(el);
     callbacks.set(el, setter);
   };
-  const removeEntry = (el: HTMLElement) => {
+  const removeEntry: RemoveViewportObserverEntry = el => {
     callbacks.delete(el);
     remove(el);
   };
