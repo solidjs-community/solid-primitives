@@ -1,4 +1,5 @@
-import { onMount, onCleanup, createSignal, Accessor } from "solid-js";
+import { onMount, onCleanup, createSignal } from "solid-js";
+import type { JSX, Accessor } from "solid-js";
 
 type MaybeAccessor<T> = T | Accessor<T>;
 const read = <T>(val: MaybeAccessor<T>): T =>
@@ -13,6 +14,34 @@ export interface IntersectionObserverOptions {
 export type AddIntersectionObserverEntry = (el: Element) => void;
 export type RemoveIntersectionObserverEntry = (el: Element) => void;
 
+export type EntryCallback = (
+  entry: IntersectionObserverEntry,
+  observer: IntersectionObserver
+) => void;
+export type AddViewportObserverEntry = (
+  el: Element,
+  callback: MaybeAccessor<EntryCallback>
+) => void;
+export type RemoveViewportObserverEntry = (el: Element) => void;
+
+type CreateViewportObserverReturnValue = {
+  add: AddViewportObserverEntry;
+  remove: RemoveViewportObserverEntry;
+  start: () => void;
+  stop: () => void;
+  observer: IntersectionObserver;
+};
+
+declare module "solid-js" {
+  namespace JSX {
+    interface Directives {
+      observer: true | EntryCallback;
+    }
+  }
+}
+// this ensures the `JSX` import won't fall victim to tree shaking before typescript can use it
+export type E = JSX.Element;
+
 /**
  * Creates a very basic Intersection Observer.
  *
@@ -24,10 +53,14 @@ export type RemoveIntersectionObserverEntry = (el: Element) => void;
  * - `threshold` — Either a single number or an array of numbers between 0.0 and 1.0, specifying a ratio of intersection area to total bounding box area for the observed target.
  *
  * @example
- * ```ts
+ * ```tsx
  * const { add, remove, start, stop, observer } = createIntersectionObserver(els, entries =>
  *   console.log(entries)
  * );
+ *
+ * // directive usage:
+ * const { add: observer } = createIntersectionObserver(els, () => {...})
+ * <div use:observer></div>
  * ```
  */
 export const createIntersectionObserver = (
@@ -52,17 +85,6 @@ export const createIntersectionObserver = (
   return { add, remove, start, stop, observer };
 };
 
-export type EntryCallback = (entry: IntersectionObserverEntry) => void;
-export type AddViewportObserverEntry = (el: Element, callback: EntryCallback) => void;
-export type RemoveViewportObserverEntry = (el: Element) => void;
-
-type CreateViewportObserverReturnValue = {
-  add: AddViewportObserverEntry;
-  remove: RemoveViewportObserverEntry;
-  start: () => void;
-  stop: () => void;
-};
-
 /**
  * Creates a more advanced viewport observer for complex tracking.
  *
@@ -74,9 +96,13 @@ type CreateViewportObserverReturnValue = {
  * - `threshold` — Either a single number or an array of numbers between 0.0 and 1.0, specifying a ratio of intersection area to total bounding box area for the observed target.
  *
  * @example
- * ```ts
+ * ```tsx
  * const { add, remove, start, stop } = createViewportObserver(els, e => {...});
  * add(el, e => console.log(e.isIntersecting))
+ *
+ * // directive usage:
+ * const { add: observer } = createIntersectionObserver()
+ * <div use:observer={(e) => console.log(e.isIntersecting)}></div>
  * ```
  */
 export function createViewportObserver(
@@ -106,10 +132,10 @@ export function createViewportObserver(...a: any) {
       options = a[1];
     }
   }
-  const callbacks = new WeakMap<Element, EntryCallback>();
-  const onChange: IntersectionObserverCallback = entries =>
-    entries.forEach(entry => callbacks.get(entry.target)!(entry));
-  const { add, remove, start, stop } = createIntersectionObserver([], onChange, options);
+  const callbacks = new WeakMap<Element, MaybeAccessor<EntryCallback>>();
+  const onChange: IntersectionObserverCallback = (entries, observer) =>
+    entries.forEach(entry => callbacks.get(entry.target)?.(entry, observer)?.(entry, observer));
+  const { add, remove, start, stop, observer } = createIntersectionObserver([], onChange, options);
   const addEntry: AddViewportObserverEntry = (el, callback) => {
     add(el);
     callbacks.set(el, callback);
@@ -119,7 +145,7 @@ export function createViewportObserver(...a: any) {
     remove(el);
   };
   initial.forEach(([el, cb]) => addEntry(el, cb));
-  return { add: addEntry, remove: removeEntry, start, stop };
+  return { add: addEntry, remove: removeEntry, start, stop, observer };
 }
 
 /**
