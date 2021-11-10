@@ -16,7 +16,7 @@ export type RemoveIntersectionObserverEntry = (el: Element) => void;
 
 export type EntryCallback = (
   entry: IntersectionObserverEntry,
-  observer: IntersectionObserver
+  instance: IntersectionObserver
 ) => void;
 export type AddViewportObserverEntry = (
   el: Element,
@@ -24,13 +24,15 @@ export type AddViewportObserverEntry = (
 ) => void;
 export type RemoveViewportObserverEntry = (el: Element) => void;
 
-type CreateViewportObserverReturnValue = {
-  add: AddViewportObserverEntry;
-  remove: RemoveViewportObserverEntry;
-  start: () => void;
-  stop: () => void;
-  observer: IntersectionObserver;
-};
+type CreateViewportObserverReturnValue = [
+  AddViewportObserverEntry,
+  {
+    remove: RemoveViewportObserverEntry;
+    start: () => void;
+    stop: () => void;
+    instance: IntersectionObserver;
+  }
+];
 
 declare module "solid-js" {
   namespace JSX {
@@ -54,12 +56,12 @@ export type E = JSX.Element;
  *
  * @example
  * ```tsx
- * const { add, remove, start, stop, observer } = createIntersectionObserver(els, entries =>
+ * const [add, { remove, start, stop, instance }] = createIntersectionObserver(els, entries =>
  *   console.log(entries)
  * );
  *
  * // directive usage:
- * const { add: observer } = createIntersectionObserver(els, () => {...})
+ * const [observer] = createIntersectionObserver(els, () => {...})
  * <div use:observer></div>
  * ```
  */
@@ -67,22 +69,24 @@ export const createIntersectionObserver = (
   elements: MaybeAccessor<Element[]>,
   onChange: IntersectionObserverCallback,
   options?: IntersectionObserverOptions
-): {
-  add: AddIntersectionObserverEntry;
-  remove: RemoveIntersectionObserverEntry;
-  start: () => void;
-  stop: () => void;
-  observer: IntersectionObserver;
-} => {
+): [
+  AddIntersectionObserverEntry,
+  {
+    remove: RemoveIntersectionObserverEntry;
+    start: () => void;
+    stop: () => void;
+    instance: IntersectionObserver;
+  }
+] => {
   // If not supported, skip
-  const observer = new IntersectionObserver(onChange, options);
-  const add: AddIntersectionObserverEntry = el => observer.observe(read(el));
-  const remove: RemoveIntersectionObserverEntry = el => observer.unobserve(read(el));
+  const instance = new IntersectionObserver(onChange, options);
+  const add: AddIntersectionObserverEntry = el => instance.observe(read(el));
+  const remove: RemoveIntersectionObserverEntry = el => instance.unobserve(read(el));
   const start = () => read(elements).forEach(el => add(el));
-  const stop = () => observer.takeRecords().forEach(entry => remove(entry.target));
+  const stop = () => instance.takeRecords().forEach(entry => remove(entry.target));
   onMount(start);
   onCleanup(stop);
-  return { add, remove, start, stop, observer };
+  return [add, { remove, start, stop, instance }];
 };
 
 /**
@@ -97,11 +101,11 @@ export const createIntersectionObserver = (
  *
  * @example
  * ```tsx
- * const { add, remove, start, stop } = createViewportObserver(els, e => {...});
+ * const [add, { remove, start, stop, instance }] = createViewportObserver(els, e => {...});
  * add(el, e => console.log(e.isIntersecting))
  *
  * // directive usage:
- * const { add: observer } = createIntersectionObserver()
+ * const [observer] = createIntersectionObserver()
  * <div use:observer={(e) => console.log(e.isIntersecting)}></div>
  * ```
  */
@@ -133,9 +137,17 @@ export function createViewportObserver(...a: any) {
     }
   }
   const callbacks = new WeakMap<Element, MaybeAccessor<EntryCallback>>();
-  const onChange: IntersectionObserverCallback = (entries, observer) =>
-    entries.forEach(entry => callbacks.get(entry.target)?.(entry, observer)?.(entry, observer));
-  const { add, remove, start, stop, observer } = createIntersectionObserver([], onChange, options);
+  const onChange: IntersectionObserverCallback = (entries, instance) =>
+    entries.forEach(entry => {
+      const cb = callbacks.get(entry.target)?.(entry, instance);
+      // additional check to prevent errors when the user use "observe" directive without providing a callback
+      typeof cb === "function" && cb(entry, instance);
+    });
+  const [add, { remove, start, stop, instance }] = createIntersectionObserver(
+    [],
+    onChange,
+    options
+  );
   const addEntry: AddViewportObserverEntry = (el, callback) => {
     add(el);
     callbacks.set(el, callback);
@@ -145,7 +157,7 @@ export function createViewportObserver(...a: any) {
     remove(el);
   };
   initial.forEach(([el, cb]) => addEntry(el, cb));
-  return { add: addEntry, remove: removeEntry, start, stop, observer };
+  return [addEntry, { remove: removeEntry, start, stop, instance }];
 }
 
 /**
@@ -173,7 +185,7 @@ export const createVisibilityObserver = (
   }
 ): [Accessor<boolean>, { start: () => void; stop: () => void }] => {
   const [isVisible, setVisible] = createSignal(options?.initialValue || false);
-  const { start, stop } = createIntersectionObserver(
+  const [, { start, stop }] = createIntersectionObserver(
     () => [read(element)],
     ([entry]) => {
       setVisible(entry.isIntersecting);
