@@ -17,7 +17,8 @@ Use it:
 ```tsx
 import { render } from "solid-js/web";
 import { Component, createSignal } from "solid-js";
-import { I18nProvider, createI18nContext, useI18n } from "@solid-primitives/i18n";
+
+import { I18nContext, createI18nContext, useI18n } from "@solid-primitives/i18n";
 
 const App: Component = () => {
   const [t, { add, locale, dict }] = useI18n();
