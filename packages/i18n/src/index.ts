@@ -48,7 +48,7 @@ const deepReadObject = <T = any>(
  *
  * @example
  * ```js
- * const txt = templat('Hello {{ name }}', { name: 'Tom' });
+ * const txt = template('Hello {{ name }}', { name: 'Tom' });
  * // => 'Hello Tom'
  * ```
  */
