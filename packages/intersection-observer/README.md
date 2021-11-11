@@ -1,8 +1,9 @@
 # @solid-primitives/intersection-observer
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![npm](https://img.shields.io/npm/v/@solid-primitives/intersection-observer))](https://www.npmjs.com/package/@solid-primitives/intersection-observer)
 
-A range of utilities built around the IntersectionObserver API. Each primitive is designed to be compatible with directives or used on their own.
+A range of IntersectionObserver API utilities great for different types of usecases.
 
 `createIntersectionObserver` - Creates a basic intersection observer exposing methods to manage the observable.
 
@@ -34,6 +35,8 @@ const [observer] = createIntersectionObserver()
 ```
 
 ### createViewportObserver
+
+This primitive comes with a number of flexible options. You can specify a callback at the root with an array of elements or individual callbacks for individual elements.
 
 ```ts
 // Basic usage:
