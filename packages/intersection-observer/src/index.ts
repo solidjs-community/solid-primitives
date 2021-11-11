@@ -5,12 +5,6 @@ type MaybeAccessor<T> = T | Accessor<T>;
 const read = <T>(val: MaybeAccessor<T>): T =>
   typeof val === "function" ? (val as Function)() : val;
 
-export interface IntersectionObserverOptions {
-  readonly root?: Element | Document | null;
-  readonly rootMargin?: string;
-  readonly threshold?: number | number[];
-}
-
 export type AddIntersectionObserverEntry = (el: Element) => void;
 export type RemoveIntersectionObserverEntry = (el: Element) => void;
 
@@ -68,7 +62,7 @@ export type E = JSX.Element;
 export const createIntersectionObserver = (
   elements: MaybeAccessor<Element[]>,
   onChange: IntersectionObserverCallback,
-  options?: IntersectionObserverOptions
+  options?: IntersectionObserverInit
 ): [
   AddIntersectionObserverEntry,
   {
@@ -112,21 +106,21 @@ export const createIntersectionObserver = (
 export function createViewportObserver(
   elements: Element[],
   callback: EntryCallback,
-  options?: IntersectionObserverOptions
+  options?: IntersectionObserverInit
 ): CreateViewportObserverReturnValue;
 
 export function createViewportObserver(
   initial: [Element, EntryCallback][],
-  options?: IntersectionObserverOptions
+  options?: IntersectionObserverInit
 ): CreateViewportObserverReturnValue;
 
 export function createViewportObserver(
-  options?: IntersectionObserverOptions
+  options?: IntersectionObserverInit
 ): CreateViewportObserverReturnValue;
 
 export function createViewportObserver(...a: any) {
   let initial: [Element, EntryCallback][] = [];
-  let options: IntersectionObserverOptions = {};
+  let options: IntersectionObserverInit = {};
   if (Array.isArray(a[0])) {
     if (typeof a[1] === "function") {
       initial = a[0].map(el => [el, a[1]]);
@@ -135,7 +129,7 @@ export function createViewportObserver(...a: any) {
       initial = a[0];
       options = a[1];
     }
-  }
+  } else options = a[0];
   const callbacks = new WeakMap<Element, MaybeAccessor<EntryCallback>>();
   const onChange: IntersectionObserverCallback = (entries, instance) =>
     entries.forEach(entry => {
@@ -179,13 +173,13 @@ export function createViewportObserver(...a: any) {
  */
 export const createVisibilityObserver = (
   element: MaybeAccessor<Element>,
-  options?: IntersectionObserverOptions & {
+  options?: IntersectionObserverInit & {
     initialValue?: boolean;
     once?: boolean;
   }
-): [Accessor<boolean>, { start: () => void; stop: () => void }] => {
-  const [isVisible, setVisible] = createSignal(options?.initialValue || false);
-  const [, { start, stop }] = createIntersectionObserver(
+): [Accessor<boolean>, { start: () => void; stop: () => void; instance: IntersectionObserver }] => {
+  const [isVisible, setVisible] = createSignal(options?.initialValue ?? false);
+  const [, { start, stop, instance }] = createIntersectionObserver(
     () => [read(element)],
     ([entry]) => {
       setVisible(entry.isIntersecting);
@@ -193,5 +187,5 @@ export const createVisibilityObserver = (
     },
     options
   );
-  return [isVisible, { start, stop }];
+  return [isVisible, { start, stop, instance }];
 };
