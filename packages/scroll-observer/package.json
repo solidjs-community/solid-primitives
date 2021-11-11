@@ -28,7 +28,7 @@
   ],
   "devDependencies": {
     "jsdom": "^18.0.1",
-    "uvu": "^0.5.2",    
+    "uvu": "^0.5.2",
     "prettier": "^2.0.5",
     "solid-register": "^0.0.10",
     "tslib": "^2.0.1",
