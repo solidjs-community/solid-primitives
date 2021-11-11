@@ -1,15 +1,13 @@
 # @solid-primitives/intersection-observer
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![npm](https://img.shields.io/npm/v/@solid-primitives/intersection-observer))](https://www.npmjs.com/package/@solid-primitives/intersection-observer)
+[![npm](https://img.shields.io/npm/v/@solid-primitives/intersection-observer)](https://www.npmjs.com/package/@solid-primitives/intersection-observer)
 
-A range of IntersectionObserver API utilities great for different types of usecases.
+A range of IntersectionObserver API utilities great for different types of usecases:
 
-`createIntersectionObserver` - Creates a basic intersection observer exposing methods to manage the observable.
-
-`createViewportObserver` - More advanced tracker that creates a store of element signals.
-
-`createVisibilityObserver` - Basic visibility observer using a signal.
+- `createIntersectionObserver` - Creates a basic intersection observer exposing methods to manage the observable.
+- `createViewportObserver` - More advanced tracker that creates a store of element signals.
+- `createVisibilityObserver` - Basic visibility observer using a signal.
 
 ## Installation
 
