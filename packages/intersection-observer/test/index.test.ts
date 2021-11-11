@@ -1,4 +1,4 @@
-import { createRoot } from "solid-js";
+import { createRoot, createSignal } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
@@ -208,6 +208,22 @@ cio("onChange callback", ({ div, img }) => {
   });
 });
 
+cio("add function works as a directive", () => {
+  createRoot(dispose => {
+    const el = document.createElement("div");
+    const [observe, { instance }] = createIntersectionObserver([], e => {
+      assert.is(e[0].target, el);
+    });
+    const [props] = createSignal(true);
+    // @ts-ignore
+    observe(el, props);
+
+    (instance as IntersectionObserver).__TEST__onChange();
+
+    dispose();
+  });
+});
+
 cio.run();
 
 const cvo = suite("createViewportObserver");
@@ -376,6 +392,30 @@ cvo("calls onChange callback for elements with individual callbacks", ({ div, im
     assert.is(cbEntries.img.target, img, "Second initial element doesn't match the entry target");
 
     assert.is(cbEntries.span.target, span, "Added element doesn't match the entry target");
+
+    dispose();
+  });
+});
+
+cvo("add function works as a directive", () => {
+  createRoot(dispose => {
+    const el = document.createElement("div");
+    const el2 = document.createElement("div");
+    const [observe, { instance }] = createViewportObserver();
+
+    let cbEntry;
+
+    // the correct usage
+    const [props] = createSignal(e => (cbEntry = e));
+    observe(el, props);
+
+    // the incorrect usage (just shouldn't cause an error)
+    const [props2] = createSignal(true);
+    observe(el2, props2);
+
+    (instance as IntersectionObserver).__TEST__onChange();
+
+    assert.is(cbEntry.target, el);
 
     dispose();
   });
