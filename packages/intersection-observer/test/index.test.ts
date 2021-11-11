@@ -10,13 +10,16 @@ import {
 
 const intersectionObserverInstances = [];
 
-const createMockIOEntry = (target: Element): IntersectionObserverEntry => ({
+const createMockIOEntry = (
+  target: Element,
+  isIntersecting = Math.random() > 0.5
+): IntersectionObserverEntry => ({
   target,
   time: Date.now(),
   rootBounds: {} as any,
-  isIntersecting: Math.random() > 0.5,
+  isIntersecting,
   intersectionRect: {} as any,
-  intersectionRatio: {} as any,
+  intersectionRatio: Math.random(),
   boundingClientRect: target.getBoundingClientRect()
 });
 
@@ -44,7 +47,12 @@ class IntersectionObserver {
     }
   }
   takeRecords() {
-    return this.elements.map(createMockIOEntry);
+    return this.elements.map(el => createMockIOEntry(el));
+  }
+  // simulates intersection change and calls onChange callback
+  __TEST__onChange(isIntersecting?: boolean) {
+    const entries = this.elements.map(el => createMockIOEntry(el, isIntersecting));
+    this.onChange(entries, this);
   }
 }
 global.IntersectionObserver = IntersectionObserver;
@@ -176,14 +184,38 @@ cio("stop function unobserves all elements", ({ div, img }) => {
   });
 });
 
+cio("onChange callback", ({ div, img }) => {
+  createRoot(dispose => {
+    let cbEntries: IntersectionObserverEntry[];
+    let cbInstance: IntersectionObserver;
+    const [, { instance, start }] = createIntersectionObserver([div, img], (entries, observer) => {
+      cbEntries = entries;
+      cbInstance = observer as IntersectionObserver;
+    });
+    start();
+
+    (instance as IntersectionObserver).__TEST__onChange();
+
+    assert.is(cbInstance, instance, "IntersectionObserver instance is not passed to the callback");
+
+    assert.is(cbEntries.length, 2, "IntersectionObserver Entries are not passed to the callback");
+
+    assert.type(cbEntries[0].isIntersecting, "boolean", "Entry is missing isIntersecting property");
+
+    assert.is(cbEntries[0].target, div, "Entry target doesn't match the correct element");
+
+    dispose();
+  });
+});
+
 cio.run();
 
 const cvo = suite("createViewportObserver");
 
 cvo.before(context => {
-  context.elements = [document.createElement("div"), document.createElement("span")];
   context.div = document.createElement("div");
   context.img = document.createElement("img");
+  context.span = document.createElement("span");
 });
 
 cvo("creates a new IntersectionObserver instance", () => {
@@ -303,6 +335,52 @@ cvo("stop function unobserves all elements", ({ div, img }) => {
   });
 });
 
+cvo("calls onChange callback for initial elements with common callback", ({ div, img }) => {
+  createRoot(dispose => {
+    const cbEntries: IntersectionObserverEntry[] = [];
+    let cbInstance: IntersectionObserver;
+    const [, { instance, start }] = createViewportObserver([div, img], (entry, observer) => {
+      cbEntries.push(entry);
+      cbInstance = observer as IntersectionObserver;
+    });
+    start();
+
+    (instance as IntersectionObserver).__TEST__onChange();
+
+    assert.is(cbInstance, instance, "IntersectionObserver instance is not passed to the callback");
+
+    assert.is(cbEntries.length, 2, "IntersectionObserver Entries are not passed to the callback");
+
+    assert.type(cbEntries[0].isIntersecting, "boolean", "Entry is missing isIntersecting property");
+
+    assert.is(cbEntries[0].target, div, "Entry target doesn't match the correct element");
+
+    dispose();
+  });
+});
+
+cvo("calls onChange callback for elements with individual callbacks", ({ div, img, span }) => {
+  createRoot(dispose => {
+    const cbEntries: Record<string, IntersectionObserverEntry> = {};
+    const [add, { instance, start }] = createViewportObserver([
+      [div, e => (cbEntries.div = e)],
+      [img, e => (cbEntries.img = e)]
+    ]);
+    start();
+    add(span, e => (cbEntries.span = e));
+
+    (instance as IntersectionObserver).__TEST__onChange();
+
+    assert.is(cbEntries.div.target, div, "First initial element doesn't match the entry target");
+
+    assert.is(cbEntries.img.target, img, "Second initial element doesn't match the entry target");
+
+    assert.is(cbEntries.span.target, span, "Added element doesn't match the entry target");
+
+    dispose();
+  });
+});
+
 cvo.run();
 
 const cviso = suite("createVisibilityObserver");
@@ -389,14 +467,31 @@ cviso("returns signal", ({ div }) => {
   createRoot(dispose => {
     const [isVisible] = createVisibilityObserver(div);
 
-    assert.is(isVisible(), false, "signal returns default initialValue");
+    assert.is(isVisible(), false, "signal doesn't return default initialValue");
 
     const options = {
       initialValue: true
     };
     const [isVisible2] = createVisibilityObserver(div, options);
 
-    assert.is(isVisible2(), true, "signal returns custom initialValue");
+    assert.is(isVisible2(), true, "signal doesn't return custom initialValue");
+
+    dispose();
+  });
+});
+
+cviso("signal changes state when intersection changes", ({ div }) => {
+  createRoot(dispose => {
+    const [isVisible, { instance, start }] = createVisibilityObserver(div);
+    start();
+
+    (instance as IntersectionObserver).__TEST__onChange(true);
+
+    assert.is(isVisible(), true, "signal returns incorrect value");
+
+    (instance as IntersectionObserver).__TEST__onChange(false);
+
+    assert.is(isVisible(), false, "signal returns incorrect value");
 
     dispose();
   });

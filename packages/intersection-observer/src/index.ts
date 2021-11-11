@@ -168,7 +168,7 @@ export function createViewportObserver(...a: any) {
  * @example
  * ```ts
  * let el!: HTMLElement
- * const [isVisible, { start, stop }] = createVisibilityObserver(() => el, { once: true })
+ * const [isVisible, { start, stop, instance }] = createVisibilityObserver(() => el, { once: true })
  * ```
  */
 export const createVisibilityObserver = (
