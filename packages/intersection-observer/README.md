@@ -21,22 +21,23 @@ yarn add @solid-primitives/intersection-observer
 
 ### createIntersectionObserver
 
-```ts
+```tsx
 // Basic usage:
-const [add, { remove, start, stop }] = createIntersectionObserver(el, entries => {
-  console.log(entry.isIntersecting);
+const [add, { remove, start, stop, instance }] = createIntersectionObserver(els, entries => {
+  entries.forEach(e => console.log(e.isIntersecting));
 });
+add(el)
 
 // Directive usage:
 const [observer] = createIntersectionObserver()
-<div use:observer={(e) => console.log(e.isIntersecting)}></div>
+<div use:observer></div>
 ```
 
 ### createViewportObserver
 
 This primitive comes with a number of flexible options. You can specify a callback at the root with an array of elements or individual callbacks for individual elements.
 
-```ts
+```tsx
 // Basic usage:
 const [add, { remove, start, stop, instance }] = createViewportObserver(els, e => {...});
 add(el, e => console.log(e.isIntersecting))
