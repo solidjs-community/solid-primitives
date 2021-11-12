@@ -143,13 +143,22 @@ cio("remove function removes observed element", ({ div }) => {
 
 cio("start function observes initial elements", ({ div, img }) => {
   createRoot(dispose => {
-    const [, { start, instance }] = createIntersectionObserver([div, img], () => {});
+    const [, { start, instance, stop }] = createIntersectionObserver([div, img], () => {});
     start();
 
     assert.is(
       (instance as IntersectionObserver).elements.length,
       2,
       "elements in array were not added to the IntersectionObserver"
+    );
+
+    stop();
+    start();
+
+    assert.is(
+      (instance as IntersectionObserver).elements.length,
+      2,
+      "elements were not added to the IntersectionObserver on restart"
     );
 
     const [, { start: start2, instance: instance2 }] = createIntersectionObserver(
@@ -310,13 +319,22 @@ cvo("remove function removes observed element", ({ div }) => {
 
 cvo("start function observes initial elements", ({ div, img }) => {
   createRoot(dispose => {
-    const [, { start, instance }] = createViewportObserver([div, img], () => {});
+    const [, { start, instance, stop }] = createViewportObserver([div, img], () => {});
     start();
 
     assert.is(
       (instance as IntersectionObserver).elements.length,
       2,
       "elements in array were not added to the IntersectionObserver"
+    );
+
+    stop();
+    start();
+
+    assert.is(
+      (instance as IntersectionObserver).elements.length,
+      2,
+      "elements were not added to the IntersectionObserver on restart"
     );
 
     const [, { start: start2, instance: instance2 }] = createViewportObserver([
@@ -329,6 +347,30 @@ cvo("start function observes initial elements", ({ div, img }) => {
       (instance2 as IntersectionObserver).elements.length,
       2,
       "elements in array of tuples were not added to the IntersectionObserver"
+    );
+
+    const [, { start: start3, instance: instance3 }] = createViewportObserver(
+      () => [div, img],
+      () => {}
+    );
+    start3();
+
+    assert.is(
+      (instance3 as IntersectionObserver).elements.length,
+      2,
+      "elements in array accessor were not added to the IntersectionObserver"
+    );
+
+    const [, { start: start4, instance: instance4 }] = createViewportObserver(() => [
+      [div, () => {}],
+      [img, () => {}]
+    ]);
+    start4();
+
+    assert.is(
+      (instance4 as IntersectionObserver).elements.length,
+      2,
+      "elements in an accessor od array of tuples were not added to the IntersectionObserver"
     );
 
     dispose();

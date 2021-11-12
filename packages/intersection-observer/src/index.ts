@@ -104,13 +104,13 @@ export const createIntersectionObserver = (
  * ```
  */
 export function createViewportObserver(
-  elements: Element[],
+  elements: MaybeAccessor<Element[]>,
   callback: EntryCallback,
   options?: IntersectionObserverInit
 ): CreateViewportObserverReturnValue;
 
 export function createViewportObserver(
-  initial: [Element, EntryCallback][],
+  initial: MaybeAccessor<[Element, EntryCallback][]>,
   options?: IntersectionObserverInit
 ): CreateViewportObserverReturnValue;
 
@@ -121,12 +121,12 @@ export function createViewportObserver(
 export function createViewportObserver(...a: any) {
   let initial: [Element, EntryCallback][] = [];
   let options: IntersectionObserverInit = {};
-  if (Array.isArray(a[0])) {
+  if (Array.isArray(a[0]) || typeof a[0] === "function") {
     if (typeof a[1] === "function") {
-      initial = a[0].map(el => [el, a[1]]);
+      initial = read<Element[]>(a[0]).map(el => [el, a[1]]);
       options = a[2];
     } else {
-      initial = a[0];
+      initial = read(a[0]);
       options = a[1];
     }
   } else options = a[0];
@@ -137,11 +137,7 @@ export function createViewportObserver(...a: any) {
       // additional check to prevent errors when the user use "observe" directive without providing a callback
       typeof cb === "function" && cb(entry, instance);
     });
-  const [add, { remove, start, stop, instance }] = createIntersectionObserver(
-    [],
-    onChange,
-    options
-  );
+  const [add, { remove, stop, instance }] = createIntersectionObserver([], onChange, options);
   const addEntry: AddViewportObserverEntry = (el, callback) => {
     add(el);
     callbacks.set(el, callback);
@@ -150,7 +146,8 @@ export function createViewportObserver(...a: any) {
     callbacks.delete(el);
     remove(el);
   };
-  initial.forEach(([el, cb]) => addEntry(el, cb));
+  const start = () => initial.forEach(([el, cb]) => addEntry(el, cb));
+  onMount(start);
   return [addEntry, { remove: removeEntry, start, stop, instance }];
 }
 
