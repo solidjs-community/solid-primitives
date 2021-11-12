@@ -1,0 +1,44 @@
+{
+  "name": "@solid-primitives/watch",
+  "version": "0.0.1",
+  "description": "Reactive helpers built around watching signal changes.",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/watch",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc",
+    "test": "uvu -r solid-register"
+  },
+  "keywords": [
+    "watch",
+    "effect",
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "@types/lodash": "^4.14.176",
+    "jsdom": "^18.0.1",
+    "prettier": "^2.0.5",
+    "solid-register": "^0.0.10",
+    "tslib": "^2.0.1",
+    "typescript": "^4.4.4",
+    "uvu": "^0.5.2"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.2.3"
+  },
+  "dependencies": {
+    "lodash.debounce": "^4.0.8",
+    "lodash.throttle": "^4.1.1"
+  }
+}
