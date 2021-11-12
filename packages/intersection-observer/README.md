@@ -74,4 +74,8 @@ Minor improvements to structure.
 
 Major improvements to types and breaking changes of the interface.
 
+1.1.1
+
+Minor type adjustments.
+
 </details>
