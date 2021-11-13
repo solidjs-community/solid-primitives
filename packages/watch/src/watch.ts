@@ -1,4 +1,4 @@
-import { createEffect, createRoot, on, onCleanup, ReturnTypes } from "solid-js";
+import { createEffect, createRoot, on, onCleanup } from "solid-js";
 import {
   StopWatch,
   ValidWatchCallback,
