@@ -193,7 +193,7 @@ export function watchAtMost(
 
 type IgnorableWatchReturn = {
   stop: Fn;
-  ignore: () => void | Setter<boolean>;
+  ignoreNext: () => void | Setter<boolean>;
   ignoring: (updater: Fn) => void;
 };
 
@@ -215,7 +215,7 @@ export function ignorableWatch(
   const [ignore, setIgnore] = createSignal(false);
   const _fn = (...a: [any, any, any]) => (ignore() ? setIgnore(false) : fn(...a));
   return {
-    ignore: (a?: Parameters<Setter<boolean>>[0]) => {
+    ignoreNext: (a?: Parameters<Setter<boolean>>[0]) => {
       typeof a === "undefined" ? setIgnore(true) : setIgnore(a);
     },
     ignoring: updater => {
