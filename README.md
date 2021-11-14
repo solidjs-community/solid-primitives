@@ -90,6 +90,7 @@ Designing our primitives in this manner allows for better tree shaking and very 
 
 - [x] [createScrollObserver](https://github.com/davedbase/solid-primitives/tree/main/packages/scroll-observer)
 - [ ] createGesture (in progress)
+- [ ] createCompositionObserver (CompositionEvent observer)
 - [ ] createKeyboard
 - [ ] createForm
 - [ ] createInput
