@@ -92,7 +92,9 @@ Designing our primitives in this manner allows for better tree shaking and very 
 - [ ] createGesture (in progress)
 - [ ] createKeyboard
 - [ ] createForm
+- [ ] createInput
 - [ ] createTouch
+- [ ] createMouse
 
 ### Utilities
 
