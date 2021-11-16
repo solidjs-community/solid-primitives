@@ -26,7 +26,7 @@ test("watching signal", async () =>
 
     // all changes in the same effect will be batched
     setCounter(9);
-    assert.is.not(watchCounter[0], 9, "assign in the same effect");
+    assert.is(watchCounter[0], undefined, "assign in the same effect");
 
     // some function call in the future
     setTimeout(() => {
