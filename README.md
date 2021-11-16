@@ -6,9 +6,25 @@
 
 A project that strives to develop high-quality, community contributed Solid primitives. All utilities are well tested and continuously maintained. Every contribution to the repository is checked for quality and maintained by the highest degree of excellence. The ultimate goal is to extend Solid's primary and secondary primitives with a set of tertiary primitives.
 
+While Solid Primitives is not a SolidJS Core Team maintained project is managed by members of the SolidJS core and ecosystem members. This separation allows the core library to iterate independently while allowing Solid Primitives to remain in-sync with future plans.
+
 ## Philosophy
 
 The goal of Solid Primitives is to wrap client and server side functionality to provide a fully reactive API layer. Ultimately the more rooted our tertiary primitives are, the more they act as foundation within Solid's base ecosystem. With well built and re-used foundations, the smaller (aggregate tree-shaking benefits), more concise (readability) and stable (consistent and managed testing + maintenance) applications can be overall.
+
+## Contribution Process
+
+Solid Primitives strives to provide idiomatic Solid principles but also allow for an element of innovation. In a growing community many opinions and patterns merge together to produce a de facto standard. Managing opinions and expectations can be difficult to as of November 2021 Solid Primitives implement a rating/approval process roughly modelled on [TC39 Proposal Stage Process](https://tc39.es/process-document/). The following summarizes these stages briefly:
+
+| Stage | Description                 |
+|-------|-----------------------------|
+| 0     | Initial Submission          |
+| 1     | Demonstrations and examples |
+| 2     | Experimental for eneral use |
+| 3     | General adoption            |
+| 4     | Shipped                     |
+
+More details regarding these stages to be provided. Everything below Stage 2 should be used with caution and the understand the the design or implementation may change.
 
 ## A Rallying Call
 
