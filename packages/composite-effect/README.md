@@ -61,8 +61,9 @@ function createEffectModifier<Config, Returns, RequireStop>(
 // modifier that doesn't use "stop()"
 const yourModifier = createEffectModifier<{ myOption: boolean }, { value: string }>(
   (source, callback, config) => {
-    const modifiedCallback = () => {
-      /*...*/
+    const modifiedCallback = (...a) => {
+      // is's important to run the previous callback here (modified callback of previous modifier)
+      callback(...a);
     };
     return [modifiedCallback, { value: "this will get returned" }];
   }
@@ -72,9 +73,11 @@ const yourModifier = createEffectModifier<{ myOption: boolean }, { value: string
 // notice the double "true" to use stop()
 const yourModifier = createEffectModifier<void, { value: string }, true>(
   (source, callback, config, stop) => {
-    const modifiedCallback = () => {
+    const modifiedCallback = (...a) => {
       /* here you can use stop() */
+      callback(...a);
     };
+
     return [modifiedCallback, { value: "this will get returned" }];
   },
   true
