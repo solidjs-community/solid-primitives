@@ -4,7 +4,7 @@ Package: "@solid-primitives/script-loader"
 Primitives: createScriptLoader
 ---
 
-# @solid-primitives/script
+# @solid-primitives/script-loader
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/script-loader)](https://bundlephobia.com/package/@solid-primitives/script-loader)
