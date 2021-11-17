@@ -1,3 +1,9 @@
+---
+name: audio
+package: @solid-primitives/audio
+list: createAudio, createAudioPlayer, createAudioManager
+---
+
 # @solid-primitives/audio
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)

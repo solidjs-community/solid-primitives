@@ -14,23 +14,21 @@ The goal of Solid Primitives is to wrap client and server side functionality to 
 
 ## Contribution Process
 
-Solid Primitives strives to provide idiomatic Solid principles but also allow for an element of innovation. In a growing community many opinions and patterns merge together to produce a de facto standard. Managing opinions and expectations can be difficult to as of November 2021 Solid Primitives implement a rating/approval process roughly modelled on [TC39 Proposal Stage Process](https://tc39.es/process-document/). The following summarizes these stages briefly:
+Solid Primitives strives to provide idiomatic Solid principles but also allow room for innovation and experimentation. In a growing community many opinions and patterns merge together to produce a de facto standard. Managing opinions and expectations can be difficult. As a result, in November 2021 Solid Primitives implemented a ratification/approval tracking process roughly modelled on [TC39 Proposal Stage Process](https://tc39.es/process-document/). The following summarizes these stages briefly:
 
 | Stage | Description                 |
-|-------|-----------------------------|
-| 0     | Initial Submission          |
+| ----- | --------------------------- |
+| 0     | Initial submission          |
 | 1     | Demonstrations and examples |
-| 2     | Experimental for eneral use |
-| 3     | General adoption            |
-| 4     | Shipped                     |
+| 2     | General use (experimental)  |
+| 3     | Pre-shipping (final effort) |
+| 4     | Accepted/shipped            |
 
-More details regarding these stages to be provided. Everything below Stage 2 should be used with caution and the understand the the design or implementation may change.
-
-## A Rallying Call
-
-Other frameworks have large and extremely well established ecosystems. Notably React which has a vast array of component and hooks. The amount of choice within the ecosystem is great but often these tools are built as one-offs resulting in often un-tested logic or are designed with narrow needs. Over time the less concise these building blocks are the more they tend to repeat themselves. Our goal with Primitives is to bring the community together to contribute, evolve and utilize a powerful centralize primitive foundation.
+Any primitive Stage 0-1 should be used with caution and with the understanding the the design or implementation may change. Beyond Stage 2 we make an effort to mitigate changes. If a primitive reaches Stage 2 it's likely to remain an official package with additional approvements until fully accepted and shipped.
 
 ## Design Maxims
+
+Other frameworks have large and extremely well established ecosystems. Notably React which has a vast array of component and hooks. The amount of choice within the ecosystem is great but often these tools are built as one-offs resulting in often un-tested logic or are designed with narrow needs. Over time the less concise these building blocks are the more they tend to repeat themselves. Our goal with Primitives is to bring the community together to contribute, evolve and utilize a powerful centralize primitive foundation.
 
 All our primitives are meant to be consistent and sustain a level of quality. We guarentee that each is created with the utmost care. Our primitivates are:
 
