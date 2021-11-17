@@ -1,6 +1,6 @@
 ---
 name: audio
-package: @solid-primitives/audio
+package: \@solid-primitives/audio
 list: createAudio, createAudioPlayer, createAudioManager
 ---
 
