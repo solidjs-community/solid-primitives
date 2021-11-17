@@ -2,11 +2,11 @@
 
 Helpful directives to react to user gestures.
 
-`pan` - 
-`pinch` - 
-`rotate` - 
-`swipe` - 
-`tap` - 
+`pan` -
+`pinch` -
+`rotate` -
+`swipe` -
+`tap` -
 
 ## Changelog
 

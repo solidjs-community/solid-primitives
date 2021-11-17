@@ -1,6 +1,14 @@
+---
+Name: storage
+Package: "@solid-primitives/storage"
+Primitives: createStorage
+---
+
 # @solid-primitives/storage
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/storage)](https://bundlephobia.com/package/@solid-primitives/storage)
+[![size](https://img.shields.io/npm/v/@solid-primitives/storage)](https://www.npmjs.com/package/@solid-primitives/storage)
 
 Creates a primitive to reactively access both synchronous and asynchronous persistent storage APIs similar to localStorage.
 
@@ -14,9 +22,9 @@ Creates a primitive to reactively access both synchronous and asynchronous persi
 
 ```ts
 const [store, setStore, {
-    remove: (key: string) => void;
-    clear: () => void;
-    toJSON: () => ({ [key: string]: string });
+  remove: (key: string) => void;
+  clear: () => void;
+  toJSON: () => ({ [key: string]: string });
 }] = createStorage({ api: sessionStorage, prefix: 'my-app' });
 
 setStore('key', 'value');
@@ -118,9 +126,9 @@ cookieStorage._cookies = [CookieAbstraction, 'cookie'];
 `createStorageSignal` is meant for those cases when you only need to conveniently access a single value instead of full access to the storage API:
 
 ```ts
-const [value, setValue] = createStorageSignal('value', { api: cookieStorage });
+const [value, setValue] = createStorageSignal("value", { api: cookieStorage });
 
-setValue('value');
+setValue("value");
 value(); // 'value'
 ```
 

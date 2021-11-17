@@ -1,6 +1,14 @@
+---
+Name: cookies-store
+Package: "@solid-primitives/cookies-store"
+Primitives: createCookieStore, createAudioPlayer, createAudioManager
+---
+
 # @solid-primitives/cookies
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/cookies-store)](https://bundlephobia.com/package/@solid-primitives/cookies-store)
+[![size](https://img.shields.io/npm/v/@solid-primitives/cookies-store)](https://www.npmjs.com/package/@solid-primitives/cookies-store)
 
 ## WARNING!: This primitive is deprecated in favour of the new/incoming Storage primitive. This package will be available but unmaintained.
 

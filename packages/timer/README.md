@@ -1,6 +1,14 @@
+---
+Name: timer
+Package: "@solid-primitives/timer"
+Primitives: createTimer
+---
+
 # @solid-primitives/timer
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/timer)](https://bundlephobia.com/package/@solid-primitives/timer)
+[![size](https://img.shields.io/npm/v/@solid-primitives/timer)](https://www.npmjs.com/package/@solid-primitives/timer)
 
 A timer wrapper to handle setTimeout and setInterval.
 

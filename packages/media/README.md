@@ -1,6 +1,14 @@
+---
+Name: media
+Package: "@solid-primitives/media"
+Primitives: createMediaQuery
+---
+
 # @solid-primitives/media
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/media)](https://bundlephobia.com/package/@solid-primitives/media)
+[![size](https://img.shields.io/npm/v/@solid-primitives/media)](https://www.npmjs.com/package/@solid-primitives/media)
 
 Creates a very simple and straightforward media query monitor.
 

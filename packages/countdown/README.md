@@ -1,6 +1,14 @@
+---
+Name: countdown
+Package: "@solid-primitives/countdown"
+Primitives: createCountdown
+---
+
 # @solid-primitives/countdown
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/countdown)](https://bundlephobia.com/package/@solid-primitives/countdown)
+[![size](https://img.shields.io/npm/v/@solid-primitives/countdown)](https://www.npmjs.com/package/@solid-primitives/countdown)
 
 Creates a countdown primitive based on supplied dates and interval.
 

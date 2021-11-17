@@ -1,6 +1,14 @@
+---
+Name: fetch
+Package: "@solid-primitives/fetch"
+Primitives: createFetch
+---
+
 # @solid-primitives/fetch
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/fetch)](https://bundlephobia.com/package/@solid-primitives/fetch)
+[![size](https://img.shields.io/npm/v/@solid-primitives/fetch)](https://www.npmjs.com/package/@solid-primitives/fetch)
 
 Creates a primitive to support abortable HTTP requests. If any reactive request options changes, the request is aborted automatically.
 

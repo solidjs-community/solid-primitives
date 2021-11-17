@@ -1,6 +1,14 @@
+---
+Name: tween
+Package: "@solid-primitives/tween"
+Primitives: createTween
+---
+
 # @solid-primitives/tween
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/tween)](https://bundlephobia.com/package/@solid-primitives/tween)
+[![size](https://img.shields.io/npm/v/@solid-primitives/tween)](https://www.npmjs.com/package/@solid-primitives/tween)
 
 Creates an efficient tweening function.
 

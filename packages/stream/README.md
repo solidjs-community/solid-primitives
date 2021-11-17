@@ -1,6 +1,14 @@
+---
+Name: stream
+Package: "@solid-primitives/stream"
+Primitives: createStream, createAmplitudeStream
+---
+
 # @solid-primitives/stream
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/stream)](https://bundlephobia.com/package/@solid-primitives/stream)
+[![size](https://img.shields.io/npm/v/@solid-primitives/stream)](https://www.npmjs.com/package/@solid-primitives/stream)
 
 Creates primitives to work with media streams from microphones, cameras or the screen.
 

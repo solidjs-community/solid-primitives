@@ -1,6 +1,14 @@
+---
+Name: throttle
+Package: "@solid-primitives/throttle"
+Primitives: createThrottle
+---
+
 # @solid-primitives/throttle
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/throttle)](https://bundlephobia.com/package/@solid-primitives/throttle)
+[![size](https://img.shields.io/npm/v/@solid-primitives/throttle)](https://www.npmjs.com/package/@solid-primitives/throttle)
 
 Creates a throttled function that invokes at most once per specified time.
 

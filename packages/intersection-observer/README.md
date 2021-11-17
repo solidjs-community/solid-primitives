@@ -1,7 +1,14 @@
+---
+Name: intersection-observer
+Package: "@solid-primitives/intersection-observer"
+Primitives: createIntersectionObserver, createViewportObserver, createVisibilityObserver
+---
+
 # @solid-primitives/intersection-observer
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![npm](https://img.shields.io/npm/v/@solid-primitives/intersection-observer)](https://www.npmjs.com/package/@solid-primitives/intersection-observer)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/intersection-observer)](https://bundlephobia.com/package/@solid-primitives/intersection-observer)
+[![size](https://img.shields.io/npm/v/@solid-primitives/intersection-observer)](https://www.npmjs.com/package/@solid-primitives/intersection-observer)
 
 A range of IntersectionObserver API utilities great for different types of usecases:
 
