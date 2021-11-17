@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/composite-effect",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Reactive helpers built around watching computation changes.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
