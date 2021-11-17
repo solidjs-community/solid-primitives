@@ -1,10 +1,14 @@
 {
-  "name": "@solid-primitives/watch",
+  "name": "@solid-primitives/composite-effect",
   "version": "0.0.1",
   "description": "Reactive helpers built around watching computation changes.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/watch",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
   "private": false,
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -13,6 +17,7 @@
     "dist"
   ],
   "sideEffects": "false",
+  "type": "module",
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
