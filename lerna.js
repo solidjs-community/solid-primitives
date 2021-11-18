@@ -26,7 +26,7 @@ async function updateReadme(log) {
         data.Size = `[![SIZE](${sizeShield}${lernaPackage.name})](${bundlephobiaURL}${lernaPackage.name})`;
         data.NPM = `[![VERSION](${npmShield}${lernaPackage.name})](${npmURL}${lernaPackage.name})`;
         if (! data.Stage) {
-          data.Stage = 'Stage-2';
+          data.Stage = '2';
         }
         if (data.Primitives.includes(',')) {
           data.Primitives = data.Primitives

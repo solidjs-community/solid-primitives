@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/throttle",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Primitive that creates a throttle function",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
