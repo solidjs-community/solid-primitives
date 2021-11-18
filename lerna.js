@@ -16,11 +16,11 @@ async function updateReadme(log) {
   const npmShield = 'https://img.shields.io/npm/v/';
   const npmURL = 'https://www.npmjs.com/package/';
   let categories = {};
+  // Retrieve packages managed by Lerna
   await iter.forEach(await loadPackages())(
     async (lernaPackage) => {
       const md = await fs.readFile(`${lernaPackage.location}/README.md`, 'binary');
       const { data } = frontmatter(md);
-      console.log(lernaPackage.version);
       if (data.Name) {
         data.Name = `[${data.Name}](${githubURL}${data.Name})`;
         data.Size = `[![SIZE](${sizeShield}${lernaPackage.name})](${bundlephobiaURL}${lernaPackage.name})`;
@@ -29,15 +29,20 @@ async function updateReadme(log) {
           data.Stage = 'Stage-2';
         }
         if (data.Primitives.includes(',')) {
-          data.Primitives = data.Primitives.split(',').map((item) => item.trim()).join('<br />');
+          data.Primitives = data.Primitives
+            .split(',')
+            .map((item) => item.trim()).join('<br />');
         } else {
           data.Primitives = data.Primitives;
         }
         const category = data.Category || 'Misc';
-        categories[category] = Array.isArray(categories[category]) ? [ ...categories[category], data ] : [ data ];
+        categories[category] = Array.isArray(categories[category]) ?
+          [ ...categories[category], data ] :
+          [ data ];
       }
     }
   );
+  // Generate and insert collected package data into Markdown
   return new Promise((resolve) => {
     markdownMagic(path.join(__dirname, 'README.md'), {
       transforms: {
