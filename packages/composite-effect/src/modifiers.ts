@@ -133,7 +133,7 @@ export const pausable = createEffectModifier<
       pause: () => toggle(false),
       resume: () => toggle(true),
       toggle: v => {
-        if (v) toggle(v);
+        if (typeof v !== 'undefined') toggle(v);
         else toggle(p => !p);
         return active();
       }
@@ -164,13 +164,18 @@ export const ignorable = createEffectModifier<
   }
 >((s, fn) => {
   const [ignore, setIgnore] = createSignal(false);
-  const _fn = (...a: [any, any, any]) => (ignore() ? setIgnore(false) : fn(...a));
+  let usesIgnoring = false
+  const _fn = (...a: [any, any, any]) => {
+    if (usesIgnoring) return
+    ignore() ? setIgnore(false) : fn(...a)
+  };
   const ignoreNext = (a?: Parameters<Setter<boolean>>[0]) => {
     typeof a === "undefined" ? setIgnore(true) : setIgnore(a);
   };
   const ignoring = (updater: Fn) => {
-    setIgnore(true);
+    usesIgnoring = true
     updater();
+    usesIgnoring = false
   };
   return [_fn, { ignoreNext, ignoring }];
 });

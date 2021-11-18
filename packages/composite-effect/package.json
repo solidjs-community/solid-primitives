@@ -16,12 +16,17 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/index.js",
+    "default": "./dist/index.js"
+  },
   "sideEffects": "false",
   "type": "module",
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc",
+    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
     "test": "uvu -r solid-register"
   },
   "keywords": [
@@ -33,6 +38,7 @@
   "devDependencies": {
     "jsdom": "^18.0.1",
     "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
     "solid-register": "^0.0.10",
     "tslib": "^2.0.1",
     "typescript": "^4.5.2",
@@ -42,7 +48,7 @@
     "solid-js": "^1.2.3"
   },
   "dependencies": {
-    "@solid-primitives/debounce": "^1.0.2",
-    "@solid-primitives/throttle": "^1.0.3"
+    "@solid-primitives/debounce": "^1.0.3",
+    "@solid-primitives/throttle": "^1.0.4"
   }
 }
