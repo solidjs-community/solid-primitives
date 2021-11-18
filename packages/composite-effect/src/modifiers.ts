@@ -5,11 +5,27 @@ import { type Accessor, createMemo, createSignal, onCleanup, type Setter } from 
 import { access, type Fn, type MaybeAccessor } from "./common";
 import type { StopEffect } from "./types";
 
+/**
+ * returns `{ stop: StopEffect }`, that can be used to manually dispose of the effects.
+ * 
+ * @example
+ * ```ts
+ * const { stop } = createCompositeEffect(stoppable(source, () => {}));
+ * ```
+ */
 export const stoppable = createEffectModifier<void, { stop: StopEffect }, true>(
   (s, callback, o, stop) => [callback, { stop }],
   true
 );
 
+/**
+ * disposes itself on the first captured change. **Set the defer option to true**, otherwise the callback will run and dispose itself on the initial setup.
+ * 
+ * @example
+ * ```ts
+ * createCompositeEffect(once(source, () => {}),{ defer: true });
+ * ```
+ */
 export const once = createEffectModifier<void, {}, true>(
   (s, callback, o, stop) => [
     (...a) => {
@@ -21,6 +37,14 @@ export const once = createEffectModifier<void, {}, true>(
   true
 );
 
+/**
+ * Specify the number of times it can triggered, until disposes itself.
+ * 
+ * @example
+ * ```ts
+const { count } = createCompositeEffect(atMost(source, () => {}, { limit: 8 }));
+```
+ */
 export const atMost = createEffectModifier<
   { limit: MaybeAccessor<number> },
   { count: Accessor<number> },
@@ -35,6 +59,15 @@ export const atMost = createEffectModifier<
   return [_fn, { count }];
 }, true);
 
+
+/**
+ * debounces callback by specified time
+ * 
+ * @example
+ * ```ts
+ * createCompositeEffect(debounce(source, () => {}, { wait: 300 }));
+ * ```
+ */
 export const debounce = createEffectModifier<{
   wait: number;
 }>((s, fn, options) => {
@@ -43,6 +76,14 @@ export const debounce = createEffectModifier<{
   return [_fn, {}];
 });
 
+/**
+ * throttles callback by specified time
+ * 
+ * @example
+ * ```ts
+ * createCompositeEffect(throttle(source, () => {}, { wait: 300 }));
+ * ```
+ */
 export const throttle = createEffectModifier<{
   wait: number;
 }>((s, fn, options) => {
@@ -51,6 +92,14 @@ export const throttle = createEffectModifier<{
   return [_fn, {}];
 });
 
+/**
+ * Runs callback only when the source is truthy.
+ * 
+ * @example
+ * ```ts
+ * createCompositeEffect(whenever(() => count() > 5, () => {}));
+ * ```
+ */
 export const whenever = createEffectModifier<void>((source, fn) => {
   const isArray = Array.isArray(source);
   const isTrue = createMemo(() => (isArray ? source.every(a => !!a()) : !!source()));
@@ -58,6 +107,17 @@ export const whenever = createEffectModifier<void>((source, fn) => {
   return [_fn, {}];
 });
 
+
+/**
+ * Manually controll if the callback gets to be executed.
+ * 
+ * @example
+ * ```ts
+ * const { pause, resume, toggle } = createCompositeEffect(
+ *   pausable(source, () => {}, { active: false })
+ * );
+ * ```
+ */
 export const pausable = createEffectModifier<
   { active?: boolean } | void,
   {
@@ -81,6 +141,21 @@ export const pausable = createEffectModifier<
   ];
 });
 
+/**
+ * Let's you ignore changes for them to not cause the next effect to run.
+ * 
+ * @returns `ignoreNext` - ignores the next effect
+ * @returns `ignoring` - ignores the updates made inside
+ * 
+ * @example
+ * ```ts
+ * const { ignoreNext, ignoring } = createCompositeEffect(
+ *   ignorable(source, () => {})
+ * );
+ * ```
+ * 
+ * *See [the readme](https://github.com/davedbase/solid-primitives/blob/main/packages/composite-effect#ignorable) for better usage examples*
+ */
 export const ignorable = createEffectModifier<
   void,
   {
