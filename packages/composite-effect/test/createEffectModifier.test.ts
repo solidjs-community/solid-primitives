@@ -1,4 +1,4 @@
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, onCleanup } from "solid-js";
 import { test } from "uvu";
 import * as assert from "uvu/assert";
 
@@ -185,6 +185,60 @@ test("nested modifiers", () => {
       setCount(7);
       assert.is(cb_1_test, 2, "mod 1 callback should run twice");
       assert.is(cb_2_test, 2, "mod 2 callback should run twice");
+      dispose();
+    }, 0);
+  });
+});
+
+test("disposing root immediately", () => {
+  createRoot(dispose => {
+    const [counter, setCounter] = createSignal(0);
+
+    const captures1 = [];
+    let test_cleanup;
+
+    const mod1 = createEffectModifier((source, callback, config, stop) => {
+      onCleanup(() => (test_cleanup = "ok"));
+      stop();
+      return [callback, {}];
+    }, true);
+
+    createCompositeEffect(mod1(counter, x => captures1.push(x)));
+
+    assert.is(test_cleanup, "ok", "cleanup should happen immediately");
+
+    setTimeout(() => {
+      assert.is(captures1.length, 0, "initial state shouldn't get captured");
+      setCounter(7);
+      assert.equal(captures1.length, 0, "next change shouldn't get captured");
+      setTimeout(dispose, 0);
+    }, 0);
+  });
+});
+
+test("disposing root in callback", () => {
+  createRoot(dispose => {
+    const [counter, setCounter] = createSignal(0);
+
+    const captures1 = [];
+    let test_cleanup;
+
+    const mod1 = createEffectModifier((s, callback, c, stop) => {
+      onCleanup(() => (test_cleanup = "ok"));
+      const _fn = (...a: [any, any, any]) => {
+        stop();
+        callback(...a);
+      };
+      return [_fn, {}];
+    }, true);
+
+    createCompositeEffect(mod1(counter, x => captures1.push(x)));
+
+    setTimeout(() => {
+      assert.equal(captures1, [0], "initial state should get captured");
+      assert.is(test_cleanup, "ok", "cleanup should happen after initial effect");
+      setCounter(7);
+      assert.equal(captures1, [0], "next change shouldn't get captured");
       dispose();
     }, 0);
   });

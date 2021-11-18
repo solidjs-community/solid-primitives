@@ -1,9 +1,9 @@
 import { createEffectModifier } from "./createEffectModifier";
 import _debounce from "@solid-primitives/debounce";
 import _throttle from "@solid-primitives/throttle";
-import { Accessor, createMemo, createSignal, onCleanup, Setter } from "solid-js";
-import { access, Fn, MaybeAccessor } from "./common";
-import { StopEffect } from "./types";
+import { type Accessor, createMemo, createSignal, onCleanup, type Setter } from "solid-js";
+import { access, type Fn, type MaybeAccessor } from "./common";
+import type { StopEffect } from "./types";
 
 export const stoppable = createEffectModifier<void, { stop: StopEffect }, true>(
   (s, callback, o, stop) => [callback, { stop }],

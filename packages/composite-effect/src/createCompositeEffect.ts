@@ -1,7 +1,6 @@
 import { createEffect, createRoot, on, onCleanup } from "solid-js";
-import { StopEffect } from ".";
+import type { StopEffect, WatchOptions, ModifierReturn, CallbackModifier, EffectCallback } from ".";
 import { Fn, withAccess } from "./common";
-import type { WatchOptions, ModifierReturn, CallbackModifier, EffectCallback } from "./types";
 
 export function createCompositeEffect<Source extends Fn<any>[] | Fn<any>, U, Returns extends {}>(
   filter: ModifierReturn<Source, U, Returns>,
@@ -44,12 +43,14 @@ export function createCompositeEffect(...a: any): Object {
 
   const returns: Record<string, any> = {};
   const createWatcher = (stop?: StopEffect) => {
+    let disposed = false;
+    onCleanup(() => (disposed = true));
     const fn = modifyers.reduce((fn, modifier) => {
       const [_fn, _returns] = modifier(fn, stop);
       Object.assign(returns, _returns);
       return _fn;
     }, initialCallback);
-    createEffect(on(source, fn, { defer }));
+    createEffect(on(source, (...a: [any, any, any]) => disposed || fn(...a), { defer }));
   };
 
   if (stopRequired) {
