@@ -25,6 +25,9 @@ async function updateReadme(log) {
         data.Name = `[${data.Name}](${githubURL}${data.Name})`;
         data.Size = `[![SIZE](${sizeShield}${lernaPackage.name})](${bundlephobiaURL}${lernaPackage.name})`;
         data.NPM = `[![VERSION](${npmShield}${lernaPackage.name})](${npmURL}${lernaPackage.name})`;
+        if (! data.Stage) {
+          data.Stage = 'Stage-2';
+        }
         if (data.Primitives.includes(',')) {
           data.Primitives = data.Primitives.split(',').map((item) => item.trim()).join('<br />');
         } else {
@@ -41,9 +44,9 @@ async function updateReadme(log) {
         GENERATE_PRIMITIVES_TABLE: () => {
           return Object.entries(categories).reduce((md, [cateogry, items]) => {
             md += `### ${cateogry}\n\n`;
-            md += tablemark(items, [ 'Name', 'Primitives', 'Size', 'NPM' ])
+            md += tablemark(items, [ 'Name', 'Stage', 'Primitives', 'Size', 'NPM' ])
             return md;
-          }, '<style>table thead tr th { width: 25% }</style>\n\n');
+          }, '');
         }
       }
     }, resolve)
