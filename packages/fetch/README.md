@@ -2,6 +2,7 @@
 Name: fetch
 Package: "@solid-primitives/fetch"
 Primitives: createFetch
+Category: Fetch
 ---
 
 # @solid-primitives/fetch

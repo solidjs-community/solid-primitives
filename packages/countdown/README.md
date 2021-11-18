@@ -2,6 +2,7 @@
 Name: countdown
 Package: "@solid-primitives/countdown"
 Primitives: createCountdown
+Category: Utilities
 ---
 
 # @solid-primitives/countdown

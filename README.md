@@ -18,6 +18,7 @@ Solid Primitives strives to provide idiomatic Solid principles but also allow ro
 
 | Stage | Description                 |
 | ----- | --------------------------- |
+| X     | Deprecated or rejected      |
 | 0     | Initial submission          |
 | 1     | Demonstrations and examples |
 | 2     | General use (experimental)  |
@@ -53,73 +54,95 @@ Designing our primitives in this manner allows for better tree shaking and very 
 
 ## Primitives
 
+<!-- ⛔️ AUTO-GENERATED-CONTENT:START (GENERATE_PRIMITIVES_TABLE)
+- Do not remove or modify this section. -->
+<style>table thead tr th { width: 25% }</style>
+
 ### Display & Media
 
-- [x] [createAudio](https://github.com/davedbase/solid-primitives/tree/main/packages/audio)
-- [x] [createMediaQuery](https://github.com/davedbase/solid-primitives/tree/main/packages/media)
-- [x] [createRAF](https://github.com/davedbase/solid-primitives/tree/main/packages/raf)
-- [x] [createResizeObserver](https://github.com/davedbase/solid-primitives/tree/main/packages/resize-observer)
-- [x] [createIntersectionObserver](https://github.com/davedbase/solid-primitives/tree/main/packages/intersection-observer)
-- [x] [createStream](https://github.com/davedbase/solid-primitives/tree/main/packages/stream)
-- [x] [createDevices](https://github.com/davedbase/solid-primitives/tree/main/packages/devices)
-- [x] [createMicrophones](https://github.com/davedbase/solid-primitives/tree/main/packages/devices)
-- [x] [createCameras](https://github.com/davedbase/solid-primitives/tree/main/packages/devices)
-- [x] [createSpeakers](https://github.com/davedbase/solid-primitives/tree/main/packages/devices)
-- [x] [createAmplitudeStream](https://github.com/davedbase/solid-primitives/tree/main/packages/stream)
-- [x] [createMediaPermissionRequest](https://github.com/davedbase/solid-primitives/tree/main/packages/stream)
-- [ ] [createPermission](https://github.com/davedbase/solid-primitives/tree/main/packages/permission)
-- [ ] createDragAndDrop
-- [ ] createPageVisibilityObserver
+|Name|Primitives|Size|NPM|
+|----|----|----|----|
+|[audio](https://github.com/davedbase/solid-primitives/tree/main/packages/audio)|createAudio<br />createAudioPlayer<br />createAudioManager|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/audio)](https://bundlephobia.com/package/@solid-primitives/audio)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/audio)](https://www.npmjs.com/package/@solid-primitives/audio)|
+|[devices](https://github.com/davedbase/solid-primitives/tree/main/packages/devices)|createDevices<br />createMicrophones<br />createSpeakers<br />createCameras|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/devices)](https://bundlephobia.com/package/@solid-primitives/devices)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/devices)](https://www.npmjs.com/package/@solid-primitives/devices)|
+|[intersection-observer](https://github.com/davedbase/solid-primitives/tree/main/packages/intersection-observer)|createIntersectionObserver<br />createViewportObserver<br />createVisibilityObserver|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/intersection-observer)](https://bundlephobia.com/package/@solid-primitives/intersection-observer)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/intersection-observer)](https://www.npmjs.com/package/@solid-primitives/intersection-observer)|
+|[media](https://github.com/davedbase/solid-primitives/tree/main/packages/media)|createMediaQuery|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/media)](https://bundlephobia.com/package/@solid-primitives/media)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/media)](https://www.npmjs.com/package/@solid-primitives/media)|
+|[raf](https://github.com/davedbase/solid-primitives/tree/main/packages/raf)|createRAF|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/raf)](https://bundlephobia.com/package/@solid-primitives/raf)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/raf)](https://www.npmjs.com/package/@solid-primitives/raf)|
+|[resize-observer](https://github.com/davedbase/solid-primitives/tree/main/packages/resize-observer)|createResizeObserver|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/resize-observer)](https://bundlephobia.com/package/@solid-primitives/resize-observer)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/resize-observer)](https://www.npmjs.com/package/@solid-primitives/resize-observer)|
+|[scroll](https://github.com/davedbase/solid-primitives/tree/main/packages/scroll)|createScrollObserver|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/scroll)](https://bundlephobia.com/package/@solid-primitives/scroll)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/scroll)](https://www.npmjs.com/package/@solid-primitives/scroll)|
+|[stream](https://github.com/davedbase/solid-primitives/tree/main/packages/stream)|createStream<br />createAmplitudeStream|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/stream)](https://bundlephobia.com/package/@solid-primitives/stream)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/stream)](https://www.npmjs.com/package/@solid-primitives/stream)|
+|[tween](https://github.com/davedbase/solid-primitives/tree/main/packages/tween)|createTween|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/tween)](https://bundlephobia.com/package/@solid-primitives/tween)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/tween)](https://www.npmjs.com/package/@solid-primitives/tween)|
+### Utilities
+
+|Name|Primitives|Size|NPM|
+|----|----|----|----|
+|[countdown](https://github.com/davedbase/solid-primitives/tree/main/packages/countdown)|createCountdown|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/countdown)](https://bundlephobia.com/package/@solid-primitives/countdown)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/countdown)](https://www.npmjs.com/package/@solid-primitives/countdown)|
+|[debounce](https://github.com/davedbase/solid-primitives/tree/main/packages/debounce)|createDebounce|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/debounce)](https://bundlephobia.com/package/@solid-primitives/debounce)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/debounce)](https://www.npmjs.com/package/@solid-primitives/debounce)|
+|[i18n](https://github.com/davedbase/solid-primitives/tree/main/packages/i18n)|createI18nContext<br />useI18n|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/i18n)](https://bundlephobia.com/package/@solid-primitives/i18n)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/i18n)](https://www.npmjs.com/package/@solid-primitives/i18n)|
+|[throttle](https://github.com/davedbase/solid-primitives/tree/main/packages/throttle)|createThrottle|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/throttle)](https://bundlephobia.com/package/@solid-primitives/throttle)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/throttle)](https://www.npmjs.com/package/@solid-primitives/throttle)|
+### Browser APIs
+
+|Name|Primitives|Size|NPM|
+|----|----|----|----|
+|[event-listener](https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener)|createEventListener|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/event-listener)](https://bundlephobia.com/package/@solid-primitives/event-listener)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/event-listener)](https://www.npmjs.com/package/@solid-primitives/event-listener)|
+|[fullscreen](https://github.com/davedbase/solid-primitives/tree/main/packages/fullscreen)|createFullscreen|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/fullscreen)](https://bundlephobia.com/package/@solid-primitives/fullscreen)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/fullscreen)](https://www.npmjs.com/package/@solid-primitives/fullscreen)|
+|[geolocation](https://github.com/davedbase/solid-primitives/tree/main/packages/geolocation)|createGeolocation<br />createGeolocationWatcher|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/geolocation)](https://bundlephobia.com/package/@solid-primitives/geolocation)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/geolocation)](https://www.npmjs.com/package/@solid-primitives/geolocation)|
+|[permission](https://github.com/davedbase/solid-primitives/tree/main/packages/permission)|createPermission|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/permission)](https://bundlephobia.com/package/@solid-primitives/permission)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/permission)](https://www.npmjs.com/package/@solid-primitives/permission)|
+|[storage](https://github.com/davedbase/solid-primitives/tree/main/packages/storage)|createStorage|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/storage)](https://bundlephobia.com/package/@solid-primitives/storage)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/storage)](https://www.npmjs.com/package/@solid-primitives/storage)|
+|[cookies-store](https://github.com/davedbase/solid-primitives/tree/main/packages/cookies-store)|createCookieStore<br />createAudioPlayer<br />createAudioManager|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/cookies-store)](https://bundlephobia.com/package/@solid-primitives/cookies-store)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/cookies-store)](https://www.npmjs.com/package/@solid-primitives/cookies-store)|
+### Fetch
+
+|Name|Primitives|Size|NPM|
+|----|----|----|----|
+|[fetch](https://github.com/davedbase/solid-primitives/tree/main/packages/fetch)|createFetch|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/fetch)](https://bundlephobia.com/package/@solid-primitives/fetch)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/fetch)](https://www.npmjs.com/package/@solid-primitives/fetch)|
+|[graphql](https://github.com/davedbase/solid-primitives/tree/main/packages/graphql)|createGraphQLClient|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/graphql)](https://bundlephobia.com/package/@solid-primitives/graphql)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/graphql)](https://www.npmjs.com/package/@solid-primitives/graphql)|
+### Misc
+
+|Name|Primitives|Size|NPM|
+|----|----|----|----|
+|[props](https://github.com/davedbase/solid-primitives/tree/main/packages/props)|createProps|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/props)](https://bundlephobia.com/package/@solid-primitives/props)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/props)](https://www.npmjs.com/package/@solid-primitives/props)|
+|[script-loader](https://github.com/davedbase/solid-primitives/tree/main/packages/script-loader)|createScriptLoader|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/script-loader)](https://bundlephobia.com/package/@solid-primitives/script-loader)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/script-loader)](https://www.npmjs.com/package/@solid-primitives/script-loader)|
+|[timer](https://github.com/davedbase/solid-primitives/tree/main/packages/timer)|createTimer|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/timer)](https://bundlephobia.com/package/@solid-primitives/timer)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/timer)](https://www.npmjs.com/package/@solid-primitives/timer)|
+
+<!-- ⛔️ AUTO-GENERATED-CONTENT:END - Do not remove or modify this section. -->
+
+## Planned Primitives
+
+### Display & Media
+
+- createDragAndDrop
+- createPageVisibilityObserver
 
 ### Device
 
-- [x] [createFullscreen](https://github.com/davedbase/solid-primitives/tree/main/packages/fullscreen)
-- [ ] createBattery
-- [ ] createAccelerometer
-- [ ] createGyroscope
+- createBattery
+- createAccelerometer
+- createGyroscope
 
 ### Browser
 
-- [x] [createStorage](https://github.com/davedbase/solid-primitives/tree/main/packages/storage)
-- [x] [createLocalStorage](https://github.com/davedbase/solid-primitives/tree/main/packages/storage)
-- [x] [createCookieStorage](https://github.com/davedbase/solid-primitives/tree/main/packages/storage)
-- [x] [createSessionStorage](https://github.com/davedbase/solid-primitives/tree/main/packages/storage)
-- [x] [createGeolocation](https://github.com/davedbase/solid-primitives/tree/main/packages/geolocation)
-- [x] [createEventListener](https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener)
-- [x] [createClipboard](https://github.com/davedbase/solid-primitives/tree/main/packages/clipboard)
-- [ ] createURL
-- [ ] createHistory
-- [ ] createLocale
+- createURL
+- createHistory
+- createLocale
 
 ### Network
 
-- [x] [createFetch](https://github.com/davedbase/solid-primitives/tree/main/packages/fetch)
-- [x] [createWebsocket](https://github.com/davedbase/solid-primitives/tree/main/packages/websocket)
-- [x] [createGraphQLClient](https://github.com/davedbase/solid-primitives/tree/main/packages/graphql)
-- [ ] createNotification
-- [ ] createPush
-- [ ] createConnectionObserver
+- createNotification
+- createPush
+- createConnectionObserver
 
 ### Inputs
 
-- [x] [createScrollObserver](https://github.com/davedbase/solid-primitives/tree/main/packages/scroll-observer)
-- [ ] createGesture (in progress)
-- [ ] createCompositionObserver (CompositionEvent observer)
-- [ ] createKeyboard
-- [ ] createForm
-- [ ] createInput
-- [ ] createTouch
-- [ ] createMouse
+- createGesture (in progress)
+- createCompositionObserver (CompositionEvent observer)
+- createKeyboard
+- createForm
+- createInput
+- createTouch
+- createMouse
 
 ### Utilities
 
-- [x] [createThrottle](https://github.com/davedbase/solid-primitives/tree/main/packages/throttle)
-- [x] [createDebounce](https://github.com/davedbase/solid-primitives/tree/main/packages/debounce)
-- [x] [createTimer](https://github.com/davedbase/solid-primitives/tree/main/packages/timer)
-- [x] [createCountdown](https://github.com/davedbase/solid-primitives/tree/main/packages/countdown)
-- [x] [createTween](https://github.com/davedbase/solid-primitives/tree/main/packages/tween)
-- [x] [usei18n](https://github.com/davedbase/solid-primitives/tree/main/packages/i18n)
-- [ ] createWorker (in progress)
-- [ ] createQueue
-- [ ] createDateDifference
-- [ ] createEffectWhen
+- createWorker (in progress)
+- createQueue
+- createDateDifference
+- createEffectWhen

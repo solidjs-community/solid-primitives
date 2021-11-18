@@ -2,6 +2,7 @@
 Name: debounce
 Package: "@solid-primitives/debounce"
 Primitives: createDebounce
+Category: Utilities
 ---
 
 # @solid-primitives/debounce

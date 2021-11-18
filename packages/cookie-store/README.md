@@ -2,6 +2,7 @@
 Name: cookies-store
 Package: "@solid-primitives/cookies-store"
 Primitives: createCookieStore, createAudioPlayer, createAudioManager
+Category: Browser APIs
 ---
 
 # @solid-primitives/cookies

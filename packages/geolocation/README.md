@@ -2,6 +2,7 @@
 Name: geolocation
 Package: "@solid-primitives/geolocation"
 Primitives: createGeolocation, createGeolocationWatcher
+Category: Browser APIs
 ---
 
 # @solid-primitives/geolocation

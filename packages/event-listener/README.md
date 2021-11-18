@@ -2,6 +2,7 @@
 Name: event-listener
 Package: "@solid-primitives/event-listener"
 Primitives: createEventListener
+Category: Browser APIs
 ---
 
 # @solid-primitives/event-listener

@@ -2,6 +2,7 @@
 Name: intersection-observer
 Package: "@solid-primitives/intersection-observer"
 Primitives: createIntersectionObserver, createViewportObserver, createVisibilityObserver
+Category: Display & Media
 ---
 
 # @solid-primitives/intersection-observer

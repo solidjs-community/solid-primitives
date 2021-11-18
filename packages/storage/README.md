@@ -2,6 +2,7 @@
 Name: storage
 Package: "@solid-primitives/storage"
 Primitives: createStorage
+Category: Browser APIs
 ---
 
 # @solid-primitives/storage

@@ -2,6 +2,7 @@
 Name: throttle
 Package: "@solid-primitives/throttle"
 Primitives: createThrottle
+Category: Utilities
 ---
 
 # @solid-primitives/throttle

@@ -2,6 +2,7 @@
 Name: raf
 Package: "@solid-primitives/raf"
 Primitives: createRAF
+Category: Display & Media
 ---
 
 # @solid-primitives/raf

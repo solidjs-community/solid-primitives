@@ -2,6 +2,7 @@
 Name: permission
 Package: "@solid-primitives/permission"
 Primitives: createPermission
+Category: Browser APIs
 ---
 
 # @solid-primitives/permission

@@ -2,6 +2,7 @@
 Name: audio
 Package: "@solid-primitives/audio"
 Primitives: createAudio, createAudioPlayer, createAudioManager
+Category: Display & Media
 ---
 
 # @solid-primitives/audio

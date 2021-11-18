@@ -2,6 +2,7 @@
 Name: fullscreen
 Package: "@solid-primitives/fullscreen"
 Primitives: createFullscreen
+Category: Browser APIs
 ---
 
 # @solid-primitives/fullscreen

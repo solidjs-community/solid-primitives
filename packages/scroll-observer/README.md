@@ -2,6 +2,7 @@
 Name: scroll
 Package: "@solid-primitives/scroll"
 Primitives: createScrollObserver
+Category: Display & Media
 ---
 
 # @solid-primitives/scroll

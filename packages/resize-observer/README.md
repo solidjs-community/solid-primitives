@@ -2,6 +2,7 @@
 Name: resize-observer
 Package: "@solid-primitives/resize-observer"
 Primitives: createResizeObserver
+Category: Display & Media
 ---
 
 # solid-primitives/resize-observer

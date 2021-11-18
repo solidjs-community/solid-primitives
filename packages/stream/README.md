@@ -2,6 +2,7 @@
 Name: stream
 Package: "@solid-primitives/stream"
 Primitives: createStream, createAmplitudeStream
+Category: Display & Media
 ---
 
 # @solid-primitives/stream

@@ -2,6 +2,7 @@
 Name: i18n
 Package: "@solid-primitives/i18n"
 Primitives: createI18nContext, useI18n
+Category: Utilities
 ---
 
 # @solid-primitives/i18n

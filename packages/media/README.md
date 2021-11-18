@@ -2,6 +2,7 @@
 Name: media
 Package: "@solid-primitives/media"
 Primitives: createMediaQuery
+Category: Display & Media
 ---
 
 # @solid-primitives/media

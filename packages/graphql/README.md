@@ -2,6 +2,7 @@
 Name: graphql
 Package: "@solid-primitives/graphql"
 Primitives: createGraphQLClient
+Category: Fetch
 ---
 
 # @solid-primitives/graphql

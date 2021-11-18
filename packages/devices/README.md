@@ -2,6 +2,7 @@
 Name: devices
 Package: "@solid-primitives/devices"
 Primitives: createDevices, createMicrophones, createSpeakers, createCameras
+Category: Display & Media
 ---
 
 # @solid-primitives/devices

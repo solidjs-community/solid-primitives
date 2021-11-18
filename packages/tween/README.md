@@ -2,6 +2,7 @@
 Name: tween
 Package: "@solid-primitives/tween"
 Primitives: createTween
+Category: Display & Media
 ---
 
 # @solid-primitives/tween
