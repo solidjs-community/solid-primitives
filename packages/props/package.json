@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/props",
-  "version": "0.0.100",
+  "version": "0.0.110",
   "description": "Primitive that provides controllable props signals like knobs/controls",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",

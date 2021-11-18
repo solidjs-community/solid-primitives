@@ -87,7 +87,7 @@ Designing our primitives in this manner allows for better tree shaking and very 
 |[permission](https://github.com/davedbase/solid-primitives/tree/main/packages/permission)|Stage-2|createPermission|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/permission)](https://bundlephobia.com/package/@solid-primitives/permission)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/permission)](https://www.npmjs.com/package/@solid-primitives/permission)|
 |[storage](https://github.com/davedbase/solid-primitives/tree/main/packages/storage)|Stage-2|createStorage|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/storage)](https://bundlephobia.com/package/@solid-primitives/storage)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/storage)](https://www.npmjs.com/package/@solid-primitives/storage)|
 |[cookies-store](https://github.com/davedbase/solid-primitives/tree/main/packages/cookies-store)|Stage-2|createCookieStore<br />createAudioPlayer<br />createAudioManager|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/cookies-store)](https://bundlephobia.com/package/@solid-primitives/cookies-store)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/cookies-store)](https://www.npmjs.com/package/@solid-primitives/cookies-store)|
-### Fetch
+### Network
 
 |Name|Stage|Primitives|Size|NPM|
 |----|----|----|----|----|
