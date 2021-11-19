@@ -149,7 +149,7 @@ export const pausable = createModifier<
  * );
  * ```
  * 
- * *See [the readme](https://github.com/davedbase/solid-primitives/blob/main/packages/composite-effect#ignorable) for better usage examples*
+ * *See [the readme](https://github.com/davedbase/solid-primitives/blob/main/packages/composite#ignorable) for better usage examples*
  */
 export const ignorable = createModifier<
   void,

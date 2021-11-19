@@ -14,7 +14,7 @@ import type { Fn } from "./common";
  * @param callbackModifier function that is executed when your modifier gets attached to the `createCompositeEffect`. Here you get to modify the effect callback by attatching your logic to it.
  * @param requireStop Set to true `true` if you want to require the usage of inner `createRoot` to provide a `stop()` function for disposing of the effect permanently.
  *
- * *See [the implementation of official modifiers](https://github.com/davedbase/solid-primitives/blob/main/packages/composite-effect/src/modifiers.ts) for better reference*
+ * *See [the implementation of official modifiers](https://github.com/davedbase/solid-primitives/blob/main/packages/composite/src/modifiers.ts) for better reference*
  *
  */
 export function createModifier<

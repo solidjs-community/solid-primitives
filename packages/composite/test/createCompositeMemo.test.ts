@@ -24,7 +24,7 @@ test("options are passed to createMemo", () => {
 
     const catchPrev = [];
 
-    const double = createCompositeMemo(
+    createCompositeMemo(
       count,
       (a, b, c) => {
         catchPrev.push(c);

@@ -1,6 +1,12 @@
-import type { Accessor } from "solid-js";
+import { Accessor, createComputed, createEffect, createMemo, on, onCleanup } from "solid-js";
 import { WatchOptions } from ".";
-import type { CallbackModifier, ModifierReturn } from "./types";
+import type {
+  CallbackModifier,
+  EffectCallback,
+  EffectSource,
+  ModifierReturn,
+  StopEffect
+} from "./types";
 
 //
 // GENERAL HELPERS:
@@ -66,4 +72,26 @@ export const parseCompositeArgs = <O extends {}>(a: [any, any, any]) => {
     stopRequired,
     modifyers
   };
+};
+
+export const createComputationWatcher = <O extends Object>(
+  computation: Function,
+  source: EffectSource<any, any>,
+  initialCallback: EffectCallback<any, any>,
+  modifyers: CallbackModifier<any, any, Object>[],
+  options: WatchOptions<any> & O,
+  stop?: StopEffect
+) => {
+  const returns: Record<string, any> = {};
+  // Callbacks needs to be additionally stopped after root disposal
+  // because the effects tent to keep going when the reference to a source is active
+  let disposed = false;
+  onCleanup(() => (disposed = true));
+  const fn = modifyers.reduce((fn, modifier) => {
+    const [_fn, _returns] = modifier(fn, stop);
+    Object.assign(returns, _returns);
+    return _fn;
+  }, initialCallback);
+  const _fn: EffectCallback<any, any> = (a, b, c) => (!disposed ? fn(a, b, c) : c);
+  return [returns, computation(on(source, _fn, options), options.value, options)];
 };

@@ -1,6 +1,6 @@
-import { Accessor, createMemo, createRoot, on, onCleanup } from "solid-js";
+import { Accessor, createMemo, createRoot, onCleanup } from "solid-js";
 import type { StopEffect, WatchOptions, ModifierReturn, EffectCallback } from ".";
-import { Fn, parseCompositeArgs } from "./common";
+import { createComputationWatcher, Fn, parseCompositeArgs } from "./common";
 
 type CustomEquals<T> = false | ((prev: T, next: T) => boolean);
 interface MemoOptions<T> {
@@ -60,40 +60,26 @@ export function createCompositeMemo<Source extends Fn<any>, U>(
 ): Accessor<U>;
 
 export function createCompositeMemo(...a: any): Object {
-  const {
-    source,
-    initialCallback,
-    options: { defer, value, equals, name },
-    stopRequired,
-    modifyers
-  } = parseCompositeArgs<MemoOptions<any>>(a);
+  const { source, initialCallback, options, stopRequired, modifyers } = parseCompositeArgs(a);
 
-  const returns: Record<string, any> = {};
-  const createWatcher = (stop?: StopEffect): Accessor<any> => {
-    // Callbacks needs to be additionally stopped after root disposal
-    // because the effects tent to keep going when the reference to a source is active
-    let disposed = false;
-    onCleanup(() => (disposed = true));
-    const fn = modifyers.reduce((fn, modifier) => {
-      const [_fn, _returns] = modifier(fn, stop);
-      Object.assign(returns, _returns);
-      return _fn;
-    }, initialCallback);
-    const _fn: EffectCallback<any, any> = (a, b, c) => (!disposed ? fn(a, b, c) : c);
-    return createMemo(on(source, _fn, { defer }), value, { equals, name });
-  };
+  const createWatcher = (stop?: StopEffect) =>
+    createComputationWatcher(createMemo, source, initialCallback, modifyers, options, stop);
 
   let memo: Accessor<any>;
+  let returns: Record<string, any>;
 
   if (stopRequired) {
-    const [_memo, stop] = createRoot(stop => {
-      const _memo = createWatcher(stop);
-      return [_memo, stop];
+    const [_memo, stop, r] = createRoot(stop => {
+      const [r, _memo] = createWatcher(stop);
+      return [_memo, stop, r];
     });
     onCleanup(stop);
+    returns = r;
     memo = _memo;
   } else {
-    memo = createWatcher();
+    const [r, _memo] = createWatcher();
+    memo = _memo;
+    returns = r;
   }
 
   return modifyers.length ? [memo, returns] : memo;

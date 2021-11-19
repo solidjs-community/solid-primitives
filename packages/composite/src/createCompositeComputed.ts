@@ -1,6 +1,6 @@
-import { createComputed, createRoot, on, onCleanup } from "solid-js";
+import { createComputed, createRoot, onCleanup } from "solid-js";
 import type { StopEffect, WatchOptions, ModifierReturn, EffectCallback } from ".";
-import { Fn, parseCompositeArgs } from "./common";
+import { createComputationWatcher, Fn, parseCompositeArgs } from "./common";
 
 /**
  * A reactive primitive, extending the `createComputed` behavior with composable and reusable modifiers.
@@ -55,37 +55,22 @@ export function createCompositeComputed<Source extends Fn<any>, U>(
 ): void;
 
 export function createCompositeComputed(...a: any): Object {
-  const {
-    source,
-    initialCallback,
-    options: { defer, value, name },
-    stopRequired,
-    modifyers
-  } = parseCompositeArgs(a);
+  const { source, initialCallback, options, stopRequired, modifyers } = parseCompositeArgs(a);
 
-  const returns: Record<string, any> = {};
-  const createWatcher = (stop?: StopEffect) => {
-    // Callbacks needs to be additionally stopped after root disposal
-    // because the effects tent to keep going when the reference to a source is active
-    let disposed = false;
-    onCleanup(() => (disposed = true));
-    const fn = modifyers.reduce((fn, modifier) => {
-      const [_fn, _returns] = modifier(fn, stop);
-      Object.assign(returns, _returns);
-      return _fn;
-    }, initialCallback);
-    const _fn: EffectCallback<any, any> = (a, b, c) => disposed || fn(a, b, c);
-    createComputed(on(source, _fn, { defer }), value, { name });
-  };
+  const createWatcher = (stop?: StopEffect) =>
+    createComputationWatcher(createComputed, source, initialCallback, modifyers, options, stop);
 
+  let returns: Record<string, any>;
   if (stopRequired) {
-    const stop = createRoot(stop => {
-      createWatcher(stop);
-      return stop;
+    const [stop, r] = createRoot(stop => {
+      const [r] = createWatcher(stop);
+      return [stop, r];
     });
+    returns = r;
     onCleanup(stop);
   } else {
-    createWatcher();
+    const [r] = createWatcher();
+    returns = r;
   }
 
   return returns;

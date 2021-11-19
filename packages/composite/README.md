@@ -1,24 +1,26 @@
 ---
-Name: composite-effect
-Package: "@solid-primitives/composite-effect"
-Primitives: createCompositeEffect, createCompositeComputed, createCompositeMemo, createModifier
+Name: composite
+Package: "@solid-primitives/composite"
+Primitives: createCompositeEffect, createCompositeComputed, createCompositeMemo, createCompositeRenderEffect, createModifier
 ---
 
-# @solid-primitives/composite-effect
+# @solid-primitives/composite
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/composite-effect)](https://bundlephobia.com/package/@solid-primitives/composite-effect)
-[![size](https://img.shields.io/npm/v/@solid-primitives/composite-effect)](https://www.npmjs.com/package/@solid-primitives/composite-effect)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/composite)](https://bundlephobia.com/package/@solid-primitives/composite)
+[![size](https://img.shields.io/npm/v/@solid-primitives/composite)](https://www.npmjs.com/package/@solid-primitives/composite)
 
-A reactive primitive, that helps extend the `createEffect` behavior using composable and reusable modifiers.
+A reactive primitives, extending the `createEffect`, `createComputed`, `createMemo` behaviors using composable and reusable **modifiers**.
 
-`createCompositeEffect` - When used alone, it works as `createEffect(on())`. But it can be combined with a set of Modifiers extending it's functionality.
+- `createCompositeEffect` - When used alone, it works as `createEffect(on())`. But it can be combined with a set of Modifiers extending it's functionality.
 
-`createCompositeComputed` - Similar to `createCompositeEffect`, but it uses `createComputed` instead.
+- `createCompositeComputed` - Similar to `createCompositeEffect`, but it uses `createComputed` instead.
 
-`createCompositeMemo` - Apply the same modifiers to `createMemo`.
+- `createCompositeMemo` - Apply the same modifiers to `createMemo`.
 
-`createModifier` - A utility for creating your own custom modifiers. Each available modifier has been made using this.
+- `createCompositeRenderEffect` - A `createCompositeEffect` that runs during the render phase as DOM elements are created and updated but not necessarily connected.
+
+- `createModifier` - A utility for creating your own custom modifiers. Each available modifier has been made using it.
 
 [**List of officially available modifiers**](#available-modifiers)
 
@@ -57,7 +59,7 @@ const { ignoring } = createCompositeComputed(
 
 Works simmilary to the ones above, but there are some differences:
 
-- The returned value will be: `Accessor` if you don't use modifiers, or `[Accessor, ModifierReturns]` if you do
+- The returned value will be: `Accessor` if you don't use modifiers, or `[Accessor, ModifierReturns]` if you do.
 - Accepts additional `equals` in options - a custom comparison function
 
 ```ts
@@ -70,53 +72,13 @@ const [double, { pause, resume }] = createCompositeMemo(
 );
 ```
 
-### createModifier
-
-createModifier accepts two arguments:
-
-1. A callback modifier — function that is executed when your modifier gets attached to the `createComposite___`. Here you get to modify the effect callback by attatching your logic to it.
-
-2. A `boolean`, that if `true` requires the usage of inner `createRoot` to provide a `stop()` function for disposing of the effect permanently.
+### createCompositeRenderEffect
 
 ```ts
-// types:
-function createModifier<Config, Returns, RequireStop>(
-  cb_modifier: (
-    source: Fn<any> | Fn<any>[], // like source of "on"
-    callback: EffectCallback, // like callback of "on"
-    config: Config, // config for your modifier
-    stop: StopEffect | undefined // a StopEffect if RequireStop
-  ) => [CustomCallback, Returns], // return your modified callback and custom return values
-  requireStop?: RequireStop // true if you want to use StopEffect
-): Filter {}
-
-// modifier that doesn't use "stop()"
-const yourModifier = createModifier<{ myOption: boolean }, { value: string }>(
-  (source, callback, config) => {
-    const modifiedCallback = (...a) => {
-      // is's important to run the previous callback here (modified callback of previous modifier)
-      callback(...a);
-    };
-    return [modifiedCallback, { value: "this will get returned" }];
-  }
-);
-
-// modifier that does require "stop()"
-// notice the double "true" to use stop()
-const yourModifier = createModifier<void, { value: string }, true>(
-  (source, callback, config, stop) => {
-    const modifiedCallback = (...a) => {
-      /* here you can use stop() */
-      callback(...a);
-    };
-
-    return [modifiedCallback, { value: "this will get returned" }];
-  },
-  true
-);
+const { ignore } = createCompositeRenderEffect(stoppable(ignorable(counter, n => n * 2)));
 ```
 
-See the [implementations of official modifiers](https://github.com/davedbase/solid-primitives/blob/main/packages/composite-effect/src/modifiers.ts) for better reference.
+See the [implementations of official modifiers](https://github.com/davedbase/solid-primitives/blob/main/packages/composite/src/modifiers.ts) for better reference.
 
 ### Available Modifiers
 
@@ -130,7 +92,7 @@ import {
   whenever,
   pausable,
   ignorable
-} from "@solid-primitives/composite-effect";
+} from "@solid-primitives/composite";
 ```
 
 ### stoppable
@@ -220,9 +182,7 @@ const { pause, resume, toggle } = createCompositeEffect(
 
 Somewhat similar to `pausable`, but ignore changes that would cause the next effect to run.
 
-Preferably use this with `createCompositComputed`.
-
-As for `createCompositEffect`: since Solid batches together changes made in effects, the usage inside and outside effects will differ.
+Preferably use this with `createCompositComputed`. As for `createCompositEffect`: since Solid batches together changes made in effects, the usage inside and outside effects will differ.
 
 ```ts
 const { ignoreNext, ignore } = createCompositComputed(ignorable(
@@ -254,6 +214,53 @@ const ignoreMe = () => {
 createCompositeEffect(counter, () => {...})
 ```
 
+### createModifier
+
+A utility for creating your own modifiers, it accepts two arguments:
+
+1. A callback modifier — function that is executed when your modifier gets attached to the `createComposite___`. Here you get to modify the effect callback by attatching your logic to it.
+
+2. A `boolean`, that if `true` requires the usage of inner `createRoot` to provide a `stop()` function for disposing of the effect permanently.
+
+```ts
+// types:
+function createModifier<Config, Returns, RequireStop>(
+  cb_modifier: (
+    source: Fn<any> | Fn<any>[], // like source of "on"
+    callback: EffectCallback, // like callback of "on"
+    config: Config, // config for your modifier
+    stop: StopEffect | undefined // a StopEffect if RequireStop
+  ) => [CustomCallback, Returns], // return your modified callback and custom return values
+  requireStop?: RequireStop // true if you want to use StopEffect
+): Modifier {}
+
+// modifier that doesn't use "stop()"
+const yourModifier = createModifier<{ myOption: boolean }, { value: string }>(
+  (source, callback, config) => {
+    const modifiedCallback = (...a) => {
+      // is's important to run the previous callback here (modified callback of previous modifier)
+      // also to be compatable with `createCompositeMemo` this should return a value
+      return callback(...a);
+    };
+    return [modifiedCallback, { value: "this will get returned" }];
+  }
+);
+
+// modifier that does require "stop()"
+// notice the double "true" to use stop()
+const yourModifier = createModifier<void, { value: string }, true>(
+  (source, callback, config, stop) => {
+    const modifiedCallback = (...a) => {
+      /* here you can use stop() */
+      return callback(...a);
+    };
+
+    return [modifiedCallback, { value: "this will get returned" }];
+  },
+  true
+);
+```
+
 ## Changelog
 
 <details>
@@ -265,6 +272,7 @@ Initial realease
 
 </details>
 
-## Acknowledgement
+## Acknowledgements
 
 - [VueUse](https://vueuse.org)
+- [solid-rx](https://www.npmjs.com/package/solid-rx)
