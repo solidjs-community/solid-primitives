@@ -135,7 +135,7 @@ debounces callback
 ```ts
 const position = createScrollObserver();
 
-createCompositeEffect(debounce(position, x => console.log(x), { wait: 300 }));
+createCompositeEffect(debounce(position, x => console.log(x), 300));
 ```
 
 ### throttle
@@ -145,7 +145,7 @@ The callback is throttled
 ```ts
 const position = createScrollObserver();
 
-createCompositeEffect(throttle(position, x => console.log(x), { wait: 300 }));
+createCompositeEffect(throttle(position, x => console.log(x), 300));
 ```
 
 ### whenever

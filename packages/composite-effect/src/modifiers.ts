@@ -65,13 +65,11 @@ export const atMost = createEffectModifier<
  * 
  * @example
  * ```ts
- * createCompositeEffect(debounce(source, () => {}, { wait: 300 }));
+ * createCompositeEffect(debounce(source, () => {}, 300));
  * ```
  */
-export const debounce = createEffectModifier<{
-  wait: number;
-}>((s, fn, options) => {
-  const [_fn, clear] = _debounce(fn, options.wait);
+export const debounce = createEffectModifier<number>((s, fn, wait) => {
+  const [_fn, clear] = _debounce(fn, wait);
   onCleanup(clear);
   return [_fn, {}];
 });
@@ -81,13 +79,11 @@ export const debounce = createEffectModifier<{
  * 
  * @example
  * ```ts
- * createCompositeEffect(throttle(source, () => {}, { wait: 300 }));
+ * createCompositeEffect(throttle(source, () => {}, 300));
  * ```
  */
-export const throttle = createEffectModifier<{
-  wait: number;
-}>((s, fn, options) => {
-  const [_fn, clear] = _throttle(fn, options.wait);
+export const throttle = createEffectModifier<number>((s, fn, wait) => {
+  const [_fn, clear] = _throttle(fn, wait);
   onCleanup(clear);
   return [_fn, {}];
 });

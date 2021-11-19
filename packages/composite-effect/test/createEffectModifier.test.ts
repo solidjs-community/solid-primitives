@@ -15,13 +15,15 @@ test("creating a modifier", () => {
     const _cb = () => {};
     const _source = () => 0;
 
-    const testModifier = createEffectModifier((source, callback, config, stop) => {
-      captures.push("mod_cb");
-      captured_config = config;
-      captured_source = source;
-      captured_stop = stop;
-      return [callback, { test_return: "test" }];
-    });
+    const testModifier = createEffectModifier<void, any, false>(
+      (source, callback, config, stop) => {
+        captures.push("mod_cb");
+        captured_config = config;
+        captured_source = source;
+        captured_stop = stop;
+        return [callback, { test_return: "test" }];
+      }
+    );
 
     const x = testModifier(_source, _cb);
 
@@ -54,10 +56,11 @@ test("creating a modifier", () => {
       "modifiers returns should be returned from the createCompositeEffect"
     );
     assert.is(captures.length, 2, "callback modifier should be called twice at this point");
-    assert.equal(captured_config, {}, "no config should be passed");
+    assert.is(captured_config, undefined, "no config should be passed");
     assert.equal(captured_source, _source, "captured source should math the passed source");
     assert.is(captured_stop, undefined, "stop() shouldn't be passed to modifier");
 
+    // @ts-ignore
     createCompositeEffect(testModifier(_source, _cb, { test_config: 123 }));
 
     assert.equal(
@@ -124,7 +127,7 @@ test("creating a modifier with stop() available", () => {
       "stop() should not be returned from the createCompositeEffect"
     );
     assert.is(captures.length, 2, "callback modifier should be called twice at this point");
-    assert.equal(captured_config, {}, "no config should be passed");
+    assert.is(captured_config, undefined, "no config should be passed");
     assert.equal(captured_source, _source, "captured source should math the passed source");
     assert.type(captured_stop, "function", "stop() should be passed to modifier");
 
@@ -197,7 +200,7 @@ test("disposing root immediately", () => {
     const captures1 = [];
     let test_cleanup;
 
-    const mod1 = createEffectModifier((source, callback, config, stop) => {
+    const mod1 = createEffectModifier<void, {}, true>((s, callback, c, stop) => {
       onCleanup(() => (test_cleanup = "ok"));
       stop();
       return [callback, {}];
@@ -223,7 +226,7 @@ test("disposing root in callback", () => {
     const captures1 = [];
     let test_cleanup;
 
-    const mod1 = createEffectModifier((s, callback, c, stop) => {
+    const mod1 = createEffectModifier<void, {}, true>((s, callback, c, stop) => {
       onCleanup(() => (test_cleanup = "ok"));
       const _fn = (...a: [any, any, any]) => {
         stop();
@@ -241,6 +244,23 @@ test("disposing root in callback", () => {
       assert.equal(captures1, [0], "next change shouldn't get captured");
       dispose();
     }, 0);
+  });
+});
+
+test("passing non-object config", () => {
+  createRoot(dispose => {
+    const [counter, setCounter] = createSignal(0);
+
+    let test_config;
+
+    const mod = createEffectModifier<number, {}>((s, callback, c) => {
+      test_config = c;
+      return [callback, {}];
+    });
+
+    createCompositeEffect(mod(counter, x => {}, 123));
+    assert.is(test_config, 123, "non-object config should be passed without issues");
+    dispose();
   });
 });
 

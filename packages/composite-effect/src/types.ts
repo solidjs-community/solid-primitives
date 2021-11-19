@@ -31,7 +31,7 @@ export type EffectSource<Source extends Fn<any> | Fn<any>[], U> = Source extends
   ? Source
   : never;
 
-export interface Modifier<Config extends {} | void, Returns extends {}> {
+export interface Modifier<Config extends unknown, Returns extends {}> {
   <Source extends Fn<any>[] | Fn<any>, U, NestedReturns extends {}>(
     filter: ModifierReturn<Source, U, NestedReturns>,
     options: Config

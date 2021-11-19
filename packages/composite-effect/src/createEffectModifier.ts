@@ -18,7 +18,7 @@ import type { Fn } from "./common";
  *
  */
 export function createEffectModifier<
-  Config extends {} | void,
+  Config extends unknown,
   Returns extends {} = {},
   RequireStop extends boolean = false
 >(
@@ -41,14 +41,14 @@ export function createEffectModifier<
       // passed normal arguments
       source = a;
       initialCallback = b;
-      config = c ?? {};
+      config = c;
     } else {
       const returned = a as ModifierReturn<any, any, Object>;
       // passed nested filter
       source = returned.initialSource;
       initialCallback = returned.initialCallback;
       modifyers = returned.modifyers;
-      config = b ?? {};
+      config = b;
     }
 
     const filterModifier: CallbackModifier<any, any, Returns> = (callback, stop) =>
