@@ -1,7 +1,7 @@
 ---
 Name: composite-effect
 Package: "@solid-primitives/composite-effect"
-Primitives: createCompositeEffect, createCompositeComputed, createModifier
+Primitives: createCompositeEffect, createCompositeComputed, createCompositeMemo, createModifier
 ---
 
 # @solid-primitives/composite-effect
@@ -15,6 +15,8 @@ A reactive primitive, that helps extend the `createEffect` behavior using compos
 `createCompositeEffect` - When used alone, it works as `createEffect(on())`. But it can be combined with a set of Modifiers extending it's functionality.
 
 `createCompositeComputed` - Similar to `createCompositeEffect`, but it uses `createComputed` instead.
+
+`createCompositeMemo` - Apply the same modifiers to `createMemo`.
 
 `createModifier` - A utility for creating your own custom modifiers. Each available modifier has been made using this.
 
@@ -48,6 +50,23 @@ The usage is the same as [`createCompositeEffect`](#createcompositeeffect)
 const { ignoring } = createCompositeComputed(
   ignorable(counter, n => console.log(n)),
   { defer: true }
+);
+```
+
+### createCompositeMemo
+
+Works simmilary to the ones above, but there are some differences:
+
+- The returned value will be: `Accessor` if you don't use modifiers, or `[Accessor, ModifierReturns]` if you do
+- Accepts additional `equals` in options - a custom comparison function
+
+```ts
+const double = createCompositeMemo(counter, n => n * 2, { value: 0 });
+
+// if you don't set the "value" option, the memo might return undefined
+const [double, { pause, resume }] = createCompositeMemo(
+  pausable(counter, n => n * 2),
+  { value: 0 }
 );
 ```
 
@@ -201,24 +220,27 @@ const { pause, resume, toggle } = createCompositeEffect(
 
 Somewhat similar to `pausable`, but ignore changes that would cause the next effect to run.
 
-Because Solid batches together changes made in effects, the usage inside and outside effects will differ.
+Preferably use this with `createCompositComputed`.
+
+As for `createCompositEffect`: since Solid batches together changes made in effects, the usage inside and outside effects will differ.
 
 ```ts
-const { ignoreNext, ignoring } = createCompositeEffect(ignorable(
+const { ignoreNext, ignore } = createCompositComputed(ignorable(
    counter,
    x => {
       // next effect will be ignored:
       ignoreNext()
       setCounter(p => p + 1)
 
-      // this change happens in the same effect, so it will also be ignored
+      // is using createCompositEffect, this also will be ignored
+      // but in createCompositComputed it won't be
       setCounter(5)
    }
 ));
 
 
 const ignoreMe = () => {
-   ignoring(() => {
+   ignore(() => {
       // both changes will be ignored:
       setCounter(420)
       setCounter(69)
@@ -228,7 +250,7 @@ const ignoreMe = () => {
 }
 
 // this watcher will work normally,
-// ignoring only affects the ignorableWatch above
+// ignoring only affects the one above
 createCompositeEffect(counter, () => {...})
 ```
 

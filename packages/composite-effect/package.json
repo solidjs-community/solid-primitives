@@ -32,6 +32,8 @@
   "keywords": [
     "watch",
     "effect",
+    "computed",
+    "memo",
     "solid",
     "primitives"
   ],

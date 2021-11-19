@@ -3,8 +3,10 @@ import type { Fn } from "./common";
 
 export type StopEffect = Fn;
 
-export interface WatchOptions {
+export interface WatchOptions<U> {
   defer?: boolean; // for "on"
+  name?: string; // for "createEffect", "createComputed", "createMemo", etc. (for debugging)
+  value?: U; // for "createEffect", "createComputed", "createMemo", etc. (initial value)
 }
 
 export type EffectArrayCallback<Source extends Fn<any>[], U> = (

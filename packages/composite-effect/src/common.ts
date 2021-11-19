@@ -1,4 +1,5 @@
 import type { Accessor } from "solid-js";
+import { WatchOptions } from ".";
 import type { CallbackModifier, ModifierReturn } from "./types";
 
 //
@@ -36,10 +37,10 @@ export const promiseTimeout = (
 //
 // PRIMITIVE SPECIFIC HELPERS:
 //
-export const parseCompositeArgs = (a: [any, any, any]) => {
+export const parseCompositeArgs = <O extends {}>(a: [any, any, any]) => {
   let source: any,
     initialCallback: (a: any, b: any, c: any) => void,
-    defer = false,
+    options = {} as WatchOptions<any> & O,
     stopRequired = false,
     modifyers: CallbackModifier<any, any, Object>[] = [];
 
@@ -50,18 +51,18 @@ export const parseCompositeArgs = (a: [any, any, any]) => {
     initialCallback = filter.initialCallback;
     source = filter.initialSource;
     modifyers = filter.modifyers;
-    withAccess(a[1]?.defer, v => (defer = v));
+    withAccess(a[1], o => (options = o));
   } else {
     // passed normal arguments
     source = a[0];
     initialCallback = a[1];
-    withAccess(a[2]?.defer, v => (defer = v));
+    withAccess(a[2], o => (options = o));
   }
 
   return {
     source,
     initialCallback,
-    defer,
+    options,
     stopRequired,
     modifyers
   };

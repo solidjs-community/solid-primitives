@@ -83,7 +83,7 @@ test("debounce", () => {
 
     const captured: number[] = [];
 
-    createCompositeEffect(debounce(counter, x => captured.push(x), { wait: 10 }));
+    createCompositeEffect(debounce(counter, x => captured.push(x), 10));
 
     setTimeout(() => {
       assert.equal(captured, [], "initial state should not be captured immediately");
@@ -109,7 +109,7 @@ test("throttle", () => {
 
     const captured: number[] = [];
 
-    createCompositeEffect(throttle(counter, x => captured.push(x), { wait: 10 }));
+    createCompositeEffect(throttle(counter, x => captured.push(x), 10));
 
     setTimeout(() => {
       assert.equal(captured, [], "initial state should not be captured immediately");
@@ -213,7 +213,7 @@ test("ignorable", () => {
 
     const captured: number[] = [];
 
-    const { ignoreNext, ignoring } = createCompositeEffect(
+    const { ignoreNext, ignore } = createCompositeEffect(
       ignorable(counter, x => {
         captured.push(x);
         // next effect will be ignored:
@@ -228,16 +228,16 @@ test("ignorable", () => {
     setTimeout(() => {
       assert.equal(captured, [0], "initial state should be captured");
       assert.is(counter(), 5, "although it wasn't captured, the counter should be 5");
-      ignoring(() => {
+      ignore(() => {
         // both changes will be ignored:
         setCounter(420);
         setCounter(69);
       });
-      assert.equal(captured, [0], "changes in ignoring() should not be captured");
-      assert.equal(counter(), 69, "changes in ignoring() were executed applied");
+      assert.equal(captured, [0], "changes in ignore() should not be captured");
+      assert.equal(counter(), 69, "changes in ignore() were executed applied");
       // but not this one:
       setCounter(p => 111);
-      assert.equal(captured, [0, 111], "changes after ignoring() should be captured");
+      assert.equal(captured, [0, 111], "changes after ignore() should be captured");
       dispose();
     }, 0);
   });

@@ -3,7 +3,7 @@ import _debounce from "@solid-primitives/debounce";
 import _throttle from "@solid-primitives/throttle";
 import { type Accessor, createMemo, createSignal, onCleanup, type Setter } from "solid-js";
 import { access, type Fn, type MaybeAccessor } from "./common";
-import type { StopEffect } from "./types";
+import type { EffectCallback, StopEffect } from "./types";
 
 /**
  * returns `{ stop: StopEffect }`, that can be used to manually dispose of the effects.
@@ -30,7 +30,7 @@ export const once = createModifier<void, {}, true>(
   (s, callback, o, stop) => [
     (...a) => {
       stop();
-      callback(...a);
+      return callback(...a);
     },
     {}
   ],
@@ -51,10 +51,10 @@ export const atMost = createModifier<
   true
 >((s, callback, config, stop) => {
   const [count, setCount] = createSignal(0);
-  const _fn = (...a: [any, any, any]) => {
+  const _fn:EffectCallback<any, any> = (a,b,c) => {
     setCount(p => p + 1);
     count() + 1 >= access(config.limit) && stop();
-    callback(...a);
+    return callback(a,b,c);
   };
   return [_fn, { count }];
 }, true);
@@ -99,8 +99,7 @@ export const throttle = createModifier<number>((s, fn, wait) => {
 export const whenever = createModifier<void>((source, fn) => {
   const isArray = Array.isArray(source);
   const isTrue = createMemo(() => (isArray ? source.every(a => !!a()) : !!source()));
-  const _fn = (...a: [any, any, any]) => isTrue() && fn(...a);
-  return [_fn, {}];
+  return [(a,b,c) => isTrue() ? fn(a,b,c) : c, {}];
 });
 
 
@@ -124,7 +123,7 @@ export const pausable = createModifier<
 >((s, fn, options) => {
   const [active, toggle] = createSignal(options?.active ?? true);
   return [
-    (...a: [any, any, any]) => active() && fn(...a),
+    (a,b,c) => active() ? fn(a,b,c) : c,
     {
       pause: () => toggle(false),
       resume: () => toggle(true),
@@ -145,7 +144,7 @@ export const pausable = createModifier<
  * 
  * @example
  * ```ts
- * const { ignoreNext, ignoring } = createCompositeEffect(
+ * const { ignoreNext, ignore } = createCompositeEffect(
  *   ignorable(source, () => {})
  * );
  * ```
@@ -155,23 +154,27 @@ export const pausable = createModifier<
 export const ignorable = createModifier<
   void,
   {
-    ignoreNext: () => void | Setter<boolean>;
-    ignoring: (updater: Fn) => void;
+    ignoreNext: () => void | Setter<number>;
+    ignore: (updater: Fn) => void;
   }
 >((s, fn) => {
-  const [ignore, setIgnore] = createSignal(false);
-  let usesIgnoring = false
-  const _fn = (...a: [any, any, any]) => {
-    if (usesIgnoring) return
-    ignore() ? setIgnore(false) : fn(...a)
+  const [ignoringNext, setIgnoringNext] = createSignal(0);
+  let ignoring = false
+  const _fn:EffectCallback<any,any> = (a,b,c) => {
+    if (ignoring) return c
+    if (ignoringNext() > 0) {
+      setIgnoringNext(p => p -1)
+      return c
+    }
+    return fn(a,b,c)
   };
-  const ignoreNext = (a?: Parameters<Setter<boolean>>[0]) => {
-    typeof a === "undefined" ? setIgnore(true) : setIgnore(a);
+  const ignoreNext = (a?: Parameters<Setter<number>>[0]) => {
+    typeof a === "undefined" ? setIgnoringNext(1) : setIgnoringNext(a);
   };
-  const ignoring = (updater: Fn) => {
-    usesIgnoring = true
+  const ignore = (updater: Fn) => {
+    ignoring = true
     updater();
-    usesIgnoring = false
+    ignoring = false
   };
-  return [_fn, { ignoreNext, ignoring }];
+  return [_fn, { ignoreNext, ignore }];
 });

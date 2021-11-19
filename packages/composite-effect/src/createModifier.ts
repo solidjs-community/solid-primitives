@@ -27,13 +27,13 @@ export function createModifier<
     callback: EffectArrayCallback<Fn<any>[], unknown> & EffectSignalCallback<Fn<any>, unknown>,
     config: Config,
     stop: RequireStop extends true ? StopEffect : undefined
-  ) => [(input: any, prevInput: any, prevValue?: unknown) => void, Returns],
+  ) => [(input: unknown, prevInput: unknown, prevValue?: unknown) => unknown, Returns],
   requireStop?: RequireStop
 ): Modifier<Config, Returns> {
   return (a: any, b?: any, c?: any): ModifierReturn<any, any, Returns> => {
     const stopRequired = (requireStop as boolean) ?? false;
     let source: any,
-      initialCallback: (a: any, b: any, c: any) => void,
+      initialCallback: (input: unknown, prevInput: unknown, prevValue?: unknown) => unknown,
       config: Config,
       modifyers: CallbackModifier<any, any, Object>[] = [];
 

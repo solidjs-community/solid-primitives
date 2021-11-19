@@ -5,7 +5,7 @@ import { Fn, parseCompositeArgs } from "./common";
 /**
  * A reactive primitive, extending the `createEffect` behavior with composable and reusable modifiers.
  *
- * @param modifier A function extending effect behavior. Created with `createEffectModifier`.
+ * @param modifier A function extending effect behavior. Created with `createModifier`.
  * @param options - Options for the `on()` function: `{ defer:booelan }`
  *
  * @example
@@ -15,7 +15,7 @@ import { Fn, parseCompositeArgs } from "./common";
  */
 export function createCompositeEffect<Source extends Fn<any>[] | Fn<any>, U, Returns extends {}>(
   modifier: ModifierReturn<Source, U, Returns>,
-  options?: WatchOptions
+  options?: WatchOptions<U>
 ): Returns;
 
 /**
@@ -33,7 +33,7 @@ export function createCompositeEffect<Source extends Fn<any>[] | Fn<any>, U, Ret
 export function createCompositeEffect<Source extends Fn<any>[], U>(
   source: [...Source],
   callback: EffectCallback<Source, U>,
-  options?: WatchOptions
+  options?: WatchOptions<U>
 ): void;
 
 /**
@@ -51,11 +51,17 @@ export function createCompositeEffect<Source extends Fn<any>[], U>(
 export function createCompositeEffect<Source extends Fn<any>, U>(
   source: Source,
   callback: EffectCallback<Source, U>,
-  options?: WatchOptions
+  options?: WatchOptions<U>
 ): void;
 
 export function createCompositeEffect(...a: any): Object {
-  const { source, initialCallback, defer, stopRequired, modifyers } = parseCompositeArgs(a);
+  const {
+    source,
+    initialCallback,
+    options: { defer, value, name },
+    stopRequired,
+    modifyers
+  } = parseCompositeArgs(a);
 
   const returns: Record<string, any> = {};
   const createWatcher = (stop?: StopEffect) => {
@@ -68,7 +74,11 @@ export function createCompositeEffect(...a: any): Object {
       Object.assign(returns, _returns);
       return _fn;
     }, initialCallback);
-    createEffect(on(source, (...a: [any, any, any]) => disposed || fn(...a), { defer }));
+    createEffect(
+      on(source, (...a: [any, any, any]) => disposed || fn(...a), { defer }),
+      value,
+      { name }
+    );
   };
 
   if (stopRequired) {

@@ -2,8 +2,7 @@ import { createRoot, createSignal, onCleanup } from "solid-js";
 import { test } from "uvu";
 import * as assert from "uvu/assert";
 
-import { createEffectModifier } from "../src/createEffectModifier";
-import { createCompositeEffect } from "../src/createCompositeEffect";
+import { createModifier, createCompositeEffect } from "../src";
 
 test("creating a modifier", () => {
   createRoot(dispose => {
@@ -15,15 +14,13 @@ test("creating a modifier", () => {
     const _cb = () => {};
     const _source = () => 0;
 
-    const testModifier = createEffectModifier<void, any, false>(
-      (source, callback, config, stop) => {
-        captures.push("mod_cb");
-        captured_config = config;
-        captured_source = source;
-        captured_stop = stop;
-        return [callback, { test_return: "test" }];
-      }
-    );
+    const testModifier = createModifier<void, any, false>((source, callback, config, stop) => {
+      captures.push("mod_cb");
+      captured_config = config;
+      captured_source = source;
+      captured_stop = stop;
+      return [callback, { test_return: "test" }];
+    });
 
     const x = testModifier(_source, _cb);
 
@@ -83,7 +80,7 @@ test("creating a modifier with stop() available", () => {
     const _cb = () => {};
     const _source = () => 0;
 
-    const testModifier = createEffectModifier<any, any, true>((source, callback, config, stop) => {
+    const testModifier = createModifier<any, any, true>((source, callback, config, stop) => {
       captures.push("mod_cb");
       captured_config = config;
       captured_source = source;
@@ -152,7 +149,7 @@ test("nested modifiers", () => {
 
     let cb_1_test = 0;
 
-    const modifier1 = createEffectModifier<any, any, true>((s, callback, config, stop) => {
+    const modifier1 = createModifier<any, any, true>((s, callback, config, stop) => {
       assert.type(stop, "function", "stop() should be a function");
       assert.is(config.val1, 1, "config wasn't passed to mod 1");
       const _fn = (...a: [any, any, any]) => {
@@ -165,7 +162,7 @@ test("nested modifiers", () => {
 
     let cb_2_test = 0;
 
-    const modifier2 = createEffectModifier<any, any, true>((s, callback, config, stop) => {
+    const modifier2 = createModifier<any, any, true>((s, callback, config, stop) => {
       assert.type(stop, "function", "stop() should be a function");
       assert.is(config.val2, 2, "config wasn't passed to mod 2");
       const _fn = (...a: [any, any, any]) => {
@@ -200,7 +197,7 @@ test("disposing root immediately", () => {
     const captures1 = [];
     let test_cleanup;
 
-    const mod1 = createEffectModifier<void, {}, true>((s, callback, c, stop) => {
+    const mod1 = createModifier<void, {}, true>((s, callback, c, stop) => {
       onCleanup(() => (test_cleanup = "ok"));
       stop();
       return [callback, {}];
@@ -226,7 +223,7 @@ test("disposing root in callback", () => {
     const captures1 = [];
     let test_cleanup;
 
-    const mod1 = createEffectModifier<void, {}, true>((s, callback, c, stop) => {
+    const mod1 = createModifier<void, {}, true>((s, callback, c, stop) => {
       onCleanup(() => (test_cleanup = "ok"));
       const _fn = (...a: [any, any, any]) => {
         stop();
@@ -253,7 +250,7 @@ test("passing non-object config", () => {
 
     let test_config;
 
-    const mod = createEffectModifier<number, {}>((s, callback, c) => {
+    const mod = createModifier<number, {}>((s, callback, c) => {
       test_config = c;
       return [callback, {}];
     });
