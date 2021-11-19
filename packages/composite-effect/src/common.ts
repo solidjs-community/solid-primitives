@@ -1,4 +1,9 @@
 import type { Accessor } from "solid-js";
+import type { CallbackModifier, ModifierReturn } from "./types";
+
+//
+// GENERAL HELPERS:
+//
 
 export type Fn<R = void> = () => R;
 /**
@@ -27,3 +32,37 @@ export const promiseTimeout = (
   new Promise((resolve, reject) =>
     throwOnTimeout ? setTimeout(() => reject(reason), ms) : setTimeout(resolve, ms)
   );
+
+//
+// PRIMITIVE SPECIFIC HELPERS:
+//
+export const parseCompositeArgs = (a: [any, any, any]) => {
+  let source: any,
+    initialCallback: (a: any, b: any, c: any) => void,
+    defer = false,
+    stopRequired = false,
+    modifyers: CallbackModifier<any, any, Object>[] = [];
+
+  if (typeof a[1] !== "function") {
+    // passed a filter
+    const filter = a[0] as ModifierReturn<any, any, Object>;
+    stopRequired = filter.stopRequired;
+    initialCallback = filter.initialCallback;
+    source = filter.initialSource;
+    modifyers = filter.modifyers;
+    withAccess(a[1]?.defer, v => (defer = v));
+  } else {
+    // passed normal arguments
+    source = a[0];
+    initialCallback = a[1];
+    withAccess(a[2]?.defer, v => (defer = v));
+  }
+
+  return {
+    source,
+    initialCallback,
+    defer,
+    stopRequired,
+    modifyers
+  };
+};

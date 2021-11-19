@@ -17,7 +17,7 @@ import type { Fn } from "./common";
  * *See [the implementation of official modifiers](https://github.com/davedbase/solid-primitives/blob/main/packages/composite-effect/src/modifiers.ts) for better reference*
  *
  */
-export function createEffectModifier<
+export function createModifier<
   Config extends unknown,
   Returns extends {} = {},
   RequireStop extends boolean = false

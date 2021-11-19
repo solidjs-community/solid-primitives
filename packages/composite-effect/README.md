@@ -1,7 +1,7 @@
 ---
 Name: composite-effect
 Package: "@solid-primitives/composite-effect"
-Primitives: createCompositeEffect, createEffectModifier
+Primitives: createCompositeEffect, createCompositeComputed, createModifier
 ---
 
 # @solid-primitives/composite-effect
@@ -14,7 +14,9 @@ A reactive primitive, that helps extend the `createEffect` behavior using compos
 
 `createCompositeEffect` - When used alone, it works as `createEffect(on())`. But it can be combined with a set of Modifiers extending it's functionality.
 
-`createEffectModifier` - A utility for creating your own custom modifiers. Each available modifier has been made using this.
+`createCompositeComputed` - Similar to `createCompositeEffect`, but it uses `createComputed` instead.
+
+`createModifier` - A utility for creating your own custom modifiers. Each available modifier has been made using this.
 
 [**List of officially available modifiers**](#available-modifiers)
 
@@ -38,17 +40,28 @@ createCompositeEffect(debounced(counter, n => console.log(n), { wait: 300 }));
 const { stop, pause } = createCompositeEffect(stoppable(pausable(counter, n => console.log(n))));
 ```
 
-### createEffectModifier
+### createCompositeComputed
 
-createEffectModifier accepts two arguments:
+The usage is the same as [`createCompositeEffect`](#createcompositeeffect)
 
-1. A callback modifier — function that is executed when your modifier gets attached to the `createCompositeEffect`. Here you get to modify the effect callback by attatching your logic to it.
+```ts
+const { ignoring } = createCompositeComputed(
+  ignorable(counter, n => console.log(n)),
+  { defer: true }
+);
+```
+
+### createModifier
+
+createModifier accepts two arguments:
+
+1. A callback modifier — function that is executed when your modifier gets attached to the `createComposite___`. Here you get to modify the effect callback by attatching your logic to it.
 
 2. A `boolean`, that if `true` requires the usage of inner `createRoot` to provide a `stop()` function for disposing of the effect permanently.
 
 ```ts
 // types:
-function createEffectModifier<Config, Returns, RequireStop>(
+function createModifier<Config, Returns, RequireStop>(
   cb_modifier: (
     source: Fn<any> | Fn<any>[], // like source of "on"
     callback: EffectCallback, // like callback of "on"
@@ -59,7 +72,7 @@ function createEffectModifier<Config, Returns, RequireStop>(
 ): Filter {}
 
 // modifier that doesn't use "stop()"
-const yourModifier = createEffectModifier<{ myOption: boolean }, { value: string }>(
+const yourModifier = createModifier<{ myOption: boolean }, { value: string }>(
   (source, callback, config) => {
     const modifiedCallback = (...a) => {
       // is's important to run the previous callback here (modified callback of previous modifier)
@@ -71,7 +84,7 @@ const yourModifier = createEffectModifier<{ myOption: boolean }, { value: string
 
 // modifier that does require "stop()"
 // notice the double "true" to use stop()
-const yourModifier = createEffectModifier<void, { value: string }, true>(
+const yourModifier = createModifier<void, { value: string }, true>(
   (source, callback, config, stop) => {
     const modifiedCallback = (...a) => {
       /* here you can use stop() */

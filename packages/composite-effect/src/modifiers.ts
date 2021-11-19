@@ -1,4 +1,4 @@
-import { createEffectModifier } from "./createEffectModifier";
+import { createModifier } from "./createModifier";
 import _debounce from "@solid-primitives/debounce";
 import _throttle from "@solid-primitives/throttle";
 import { type Accessor, createMemo, createSignal, onCleanup, type Setter } from "solid-js";
@@ -13,7 +13,7 @@ import type { StopEffect } from "./types";
  * const { stop } = createCompositeEffect(stoppable(source, () => {}));
  * ```
  */
-export const stoppable = createEffectModifier<void, { stop: StopEffect }, true>(
+export const stoppable = createModifier<void, { stop: StopEffect }, true>(
   (s, callback, o, stop) => [callback, { stop }],
   true
 );
@@ -26,7 +26,7 @@ export const stoppable = createEffectModifier<void, { stop: StopEffect }, true>(
  * createCompositeEffect(once(source, () => {}),{ defer: true });
  * ```
  */
-export const once = createEffectModifier<void, {}, true>(
+export const once = createModifier<void, {}, true>(
   (s, callback, o, stop) => [
     (...a) => {
       stop();
@@ -45,7 +45,7 @@ export const once = createEffectModifier<void, {}, true>(
 const { count } = createCompositeEffect(atMost(source, () => {}, { limit: 8 }));
 ```
  */
-export const atMost = createEffectModifier<
+export const atMost = createModifier<
   { limit: MaybeAccessor<number> },
   { count: Accessor<number> },
   true
@@ -68,7 +68,7 @@ export const atMost = createEffectModifier<
  * createCompositeEffect(debounce(source, () => {}, 300));
  * ```
  */
-export const debounce = createEffectModifier<number>((s, fn, wait) => {
+export const debounce = createModifier<number>((s, fn, wait) => {
   const [_fn, clear] = _debounce(fn, wait);
   onCleanup(clear);
   return [_fn, {}];
@@ -82,7 +82,7 @@ export const debounce = createEffectModifier<number>((s, fn, wait) => {
  * createCompositeEffect(throttle(source, () => {}, 300));
  * ```
  */
-export const throttle = createEffectModifier<number>((s, fn, wait) => {
+export const throttle = createModifier<number>((s, fn, wait) => {
   const [_fn, clear] = _throttle(fn, wait);
   onCleanup(clear);
   return [_fn, {}];
@@ -96,7 +96,7 @@ export const throttle = createEffectModifier<number>((s, fn, wait) => {
  * createCompositeEffect(whenever(() => count() > 5, () => {}));
  * ```
  */
-export const whenever = createEffectModifier<void>((source, fn) => {
+export const whenever = createModifier<void>((source, fn) => {
   const isArray = Array.isArray(source);
   const isTrue = createMemo(() => (isArray ? source.every(a => !!a()) : !!source()));
   const _fn = (...a: [any, any, any]) => isTrue() && fn(...a);
@@ -114,7 +114,7 @@ export const whenever = createEffectModifier<void>((source, fn) => {
  * );
  * ```
  */
-export const pausable = createEffectModifier<
+export const pausable = createModifier<
   { active?: boolean } | void,
   {
     pause: Fn;
@@ -152,7 +152,7 @@ export const pausable = createEffectModifier<
  * 
  * *See [the readme](https://github.com/davedbase/solid-primitives/blob/main/packages/composite-effect#ignorable) for better usage examples*
  */
-export const ignorable = createEffectModifier<
+export const ignorable = createModifier<
   void,
   {
     ignoreNext: () => void | Setter<boolean>;
