@@ -33,4 +33,12 @@ You may view a working example here: https://codesandbox.io/s/solid-media-query-
 
 Initial release.
 
+1.0.0
+
+Shipped first stable version.
+
+1.1.4
+
+Published with CJS export.
+
 </details>
