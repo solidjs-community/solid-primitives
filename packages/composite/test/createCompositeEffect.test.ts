@@ -5,7 +5,6 @@ import * as assert from "uvu/assert";
 import { promiseTimeout } from "../src/common";
 
 import { createCompositeEffect } from "../src/createCompositeEffect";
-import { AsyncTest } from "./async-test";
 
 test("initial effect", () => {
   createRoot(dispose => {
@@ -92,8 +91,8 @@ test("watching array of signals", () => {
   });
 });
 
-test("watching memo", async () =>
-  AsyncTest(resolve => {
+test("watching memo", () => {
+  createRoot(dispose => {
     const [counter, setCounter] = createSignal(0);
     const aboveFive = createMemo(() => counter() > 5);
 
@@ -110,30 +109,32 @@ test("watching memo", async () =>
       assert.is(captured[0], true, "third");
       setCounter(7);
       assert.is(captured.length, 1, "fourth");
-      resolve();
+      dispose();
     }, 0);
-  }));
+  });
+});
 
-test("dispose onCleanup", async () =>
-  AsyncTest(resolve => {
+test("dispose onCleanup", () => {
+  createRoot(dispose1 => {
     const [counter, setCounter] = createSignal(0);
 
     const captured: number[] = [];
 
-    const dispose = createRoot(dispose => {
+    const dispose2 = createRoot(dispose2 => {
       createCompositeEffect(counter, x => captured.push(x));
-      return dispose;
+      return dispose2;
     });
 
     setTimeout(() => {
       assert.is(captured[0], 0, "onCleanup: initial value");
       setCounter(1);
       assert.is(captured[1], 1, "add before cleanup");
-      dispose();
+      dispose2();
       setCounter(2);
       assert.is(captured[2], undefined, "change after cleanup");
-      resolve();
+      dispose1();
     }, 0);
-  }));
+  });
+});
 
 test.run();

@@ -1,4 +1,4 @@
-import { Accessor, createComputed, createEffect, createMemo, on, onCleanup } from "solid-js";
+import { Accessor, on, onCleanup } from "solid-js";
 import { WatchOptions } from ".";
 import type {
   CallbackModifier,

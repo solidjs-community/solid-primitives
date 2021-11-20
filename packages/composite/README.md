@@ -78,8 +78,6 @@ const [double, { pause, resume }] = createCompositeMemo(
 const { ignore } = createCompositeRenderEffect(stoppable(ignorable(counter, n => n * 2)));
 ```
 
-See the [implementations of official modifiers](https://github.com/davedbase/solid-primitives/blob/main/packages/composite/src/modifiers.ts) for better reference.
-
 ### Available Modifiers
 
 ```ts
@@ -260,6 +258,8 @@ const yourModifier = createModifier<void, { value: string }, true>(
   true
 );
 ```
+
+See the [implementations of official modifiers](https://github.com/davedbase/solid-primitives/blob/main/packages/composite/src/modifiers.ts) for better reference.
 
 ## Changelog
 
