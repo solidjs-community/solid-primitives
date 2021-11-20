@@ -1,7 +1,8 @@
 ---
 Name: storage
+Stage: 3
 Package: "@solid-primitives/storage"
-Primitives: createStorage
+Primitives: createStorage, createAsyncStorage, createStorageSignal, createLocalStorage, createSessionStorage
 Category: Browser APIs
 ---
 
@@ -157,5 +158,9 @@ TODO
 0.0.100
 
 Initial release
+
+1.0.0
+
+First proper release of storage engine with CJS support.
 
 </details>

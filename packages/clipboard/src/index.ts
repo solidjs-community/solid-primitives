@@ -34,26 +34,11 @@ const createClipboard = (): [
     newItem: (data: ClipboardItemData, type: string) => ClipboardItem;
   }
 ] => {
-  const permission = async (perm: string = "write") => {
-    if (navigator.permissions && navigator.clipboard) {
-      const result = await navigator.permissions.query({
-        name: `clipboard-${perm}` as PermissionName
-      });
-      if (["granted", "prompt"].includes(result.state)) {
-        return true;
-      }
-      throw new Error("Permission to access Clipboard not granted.");
-    }
-  };
-  const read = async () => {
-    if (!(await permission("read"))) return;
-    return await navigator.clipboard.read();
-  };
-  const write = async (data: string | ClipboardItem[]) => {
-    if (!(await permission())) return;
+  const read = async () => navigator.clipboard.read();
+  const write = async (data: string | ClipboardItem[]) => (
     // @ts-ignore
-    await navigator.clipboard[typeof data === "string" ? "writeText" : "write"](data);
-  };
+    await navigator.clipboard[typeof data === "string" ? "writeText" : "write"](data)
+  );
   const newItem = (data: ClipboardItemData, type: string) => new ClipboardItem({ [type]: data });
   return [write, read, { newItem }];
 };

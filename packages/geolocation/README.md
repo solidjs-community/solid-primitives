@@ -1,5 +1,6 @@
 ---
 Name: geolocation
+Stage: 3
 Package: "@solid-primitives/geolocation"
 Primitives: createGeolocation, createGeolocationWatcher
 Category: Browser APIs
@@ -57,5 +58,9 @@ Pulling an early release of the package together and preparing for 1.0.0 release
 1.0.0
 
 Added testing, improved types, changed name of createGeolocationWatcher to createGeolocationMonitor.
+
+1.0.1
+
+Published with CJS support.
 
 </details>

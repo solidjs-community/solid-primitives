@@ -1,5 +1,6 @@
 ---
 Name: fullscreen
+Stage: 3
 Package: "@solid-primitives/fullscreen"
 Primitives: createFullscreen
 Category: Browser APIs
@@ -57,5 +58,9 @@ TODO
 0.0.100
 
 Initial release
+
+1.0.0
+
+Published with CJS and SSR protection.
 
 </details>

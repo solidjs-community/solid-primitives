@@ -1,5 +1,6 @@
 ---
 Name: permission
+Stage: 3
 Package: "@solid-primitives/permission"
 Primitives: createPermission
 Category: Browser APIs
@@ -31,5 +32,9 @@ TODO
 0.0.100
 
 Initial release adapted from https://github.com/microcipcip/vue-use-kit/blob/master/src/functions/useFetch/useFetch.ts.
+
+1.0.0
+
+Minor clean-up and added CJS support.
 
 </details>

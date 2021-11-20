@@ -1,5 +1,6 @@
 ---
 Name: timer
+Stage: 3
 Package: "@solid-primitives/timer"
 Primitives: createTimer
 ---
@@ -38,5 +39,9 @@ First commit of the timer primitive.
 0.0.107
 
 Patched an issue with clear on clean-up.
+
+1.0.0
+
+Release official version with CJS support.
 
 </details>

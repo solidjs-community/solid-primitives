@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/scroll",
-  "version": "0.0.100",
+  "version": "1.0.1",
   "description": "Primitive to manage scrolling",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -12,11 +12,16 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/index.js",
+    "default": "./dist/index.js"
+  },
   "sideEffects": "false",
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc",
+    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
     "test": "uvu -r solid-register -r test/setup.ts -i test/setup.ts"
   },
   "keywords": [
@@ -35,6 +40,6 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
-    "solid-js": "^1.2.2"
+    "solid-js": "^1.2.5"
   }
 }

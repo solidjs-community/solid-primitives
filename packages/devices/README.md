@@ -1,5 +1,6 @@
 ---
 Name: devices
+Stage: 3
 Package: "@solid-primitives/devices"
 Primitives: createDevices, createMicrophones, createSpeakers, createCameras
 Category: Display & Media
@@ -37,5 +38,9 @@ TODO
 0.0.100
 
 Initial release loosely adapted from https://github.com/microcipcip/vue-use-kit/blob/master/src/functions/useMediaDevices/useMediaDevices.ts.
+
+1.0.0
+
+Released official version, CJS and updated to Stage 3
 
 </details>

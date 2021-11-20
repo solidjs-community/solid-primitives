@@ -1,5 +1,6 @@
 ---
 Name: graphql
+Stage: 3
 Package: "@solid-primitives/graphql"
 Primitives: createGraphQLClient
 Category: Network
@@ -43,5 +44,9 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-g
 1.0.0
 
 Initial commit and publish of primitive.
+
+1.0.1
+
+Released with CJS support.
 
 </details>

@@ -1,5 +1,6 @@
 ---
 Name: i18n
+Stage: 3
 Package: "@solid-primitives/i18n"
 Primitives: createI18nContext, useI18n
 Category: Utilities
@@ -91,5 +92,9 @@ First commit of the i18n primitive.
 1.0.0
 
 General package clean-up and added testing facility.
+
+1.0.01
+
+Releasd with CJS support.
 
 </details>

@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/fullscreen",
-  "version": "0.0.100",
-  "description": "Primitive that wraps the fullscreen api",
+  "version": "1.0.0",
+  "description": "Primitive that wraps the fullscreen API.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/fetch",
@@ -12,11 +12,16 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/index.js",
+    "default": "./dist/index.js"
+  },
   "sideEffects": "false",
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc",
+    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
     "test": "jest"
   },
   "keywords": [

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/raf",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Primitive that facilitates RAF functionality",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -12,11 +12,16 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/index.js",
+    "default": "./dist/index.js"
+  },
   "sideEffects": "false",
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc"
+    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs"
   },
   "keywords": [
     "raf",
@@ -33,7 +38,7 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
-    "solid-js": "^1.0.3"
+    "solid-js": "^1.2.1"
   },
   "jest": {
     "setupFiles": [

@@ -1,3 +1,11 @@
+---
+Name: analytics
+Stage: 0
+Package: "@solid-primitives/analytics"
+Primitives: createAnalytics
+Category: Utilities
+---
+
 # @solid-primitives/analytics
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)

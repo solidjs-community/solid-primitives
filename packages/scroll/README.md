@@ -1,5 +1,6 @@
 ---
 Name: scroll
+Stage: 3
 Package: "@solid-primitives/scroll"
 Primitives: createScrollObserver
 Category: Display & Media
@@ -45,6 +46,10 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-s
 0.0.100
 
 Initial porting of the scroll primitive.
+
+1.0.1
+
+Released new version with CJS support.
 
 </details>
 

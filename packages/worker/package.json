@@ -5,12 +5,23 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "typings": "dist/index.d.ts",
-  "scripts": {},
-  "keywords": [
-    "worker",
-    "solid",
-    "primitives"
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
   ],
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/index.js",
+    "default": "./dist/index.js"
+  },
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs"
+  },
   "devDependencies": {
     "@types/jest": "^26.0.10",
     "prettier": "^2.0.5",
@@ -19,7 +30,7 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
-    "solid-js": "^1.0.0"
+    "solid-js": "^1.2.5"
   },
   "jest": {
     "setupFiles": [

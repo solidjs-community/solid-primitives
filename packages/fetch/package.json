@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/fetch",
-  "version": "0.0.110",
+  "version": "1.0.0",
   "description": "Primitive that wraps fetch requests",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
@@ -12,11 +12,16 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/index.js",
+    "default": "./dist/index.js"
+  },
   "sideEffects": "false",
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc",
+    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
     "test": "jest"
   },
   "keywords": [

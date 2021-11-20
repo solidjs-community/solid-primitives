@@ -1,5 +1,6 @@
 ---
 Name: stream
+Stage: 3
 Package: "@solid-primitives/stream"
 Primitives: createStream, createAmplitudeStream
 Category: Display & Media
@@ -44,5 +45,9 @@ TODO
 0.0.100
 
 Initial release.
+
+0.0.150
+
+Released a version with CJS.
 
 </details>

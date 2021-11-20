@@ -1,5 +1,6 @@
 ---
 Name: resize-observer
+Stage: 3
 Package: "@solid-primitives/resize-observer"
 Primitives: createResizeObserver
 Category: Display & Media
@@ -23,6 +24,10 @@ Provides a reactive resize observer wrapper.
 0.0.100
 
 Initial commit of the resize observer.
+
+1.0.0
+
+Release initial version for CJS support.
 
 </details>
 

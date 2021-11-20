@@ -1,5 +1,6 @@
 ---
 Name: fetch
+Stage: 3
 Package: "@solid-primitives/fetch"
 Primitives: createFetch
 Category: Network

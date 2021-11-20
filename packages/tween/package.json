@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/tween",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Primitive that creates tween functions",
   "author": "Ryan Carniato <ryancarniato@gmail.com>",
   "license": "MIT",
@@ -12,11 +12,16 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/index.js",
+    "default": "./dist/index.js"
+  },
   "sideEffects": "false",
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc"
+    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs"
   },
   "keywords": [
     "animate",
@@ -32,7 +37,7 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
-    "solid-js": "^1.0.8"
+    "solid-js": "^1.2.5"
   },
   "jest": {
     "setupFiles": [

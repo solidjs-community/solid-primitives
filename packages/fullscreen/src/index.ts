@@ -1,4 +1,5 @@
 import { createEffect, createSignal, onCleanup, JSX } from "solid-js";
+import { isServer } from "solid-js/web";
 import type { Accessor } from "solid-js";
 
 declare module "solid-js" {
@@ -20,8 +21,8 @@ export const createFullscreen = (
   active?: Accessor<FullscreenOptions | boolean>,
   options?: FullscreenOptions
 ): Accessor<boolean> => {
+  if (isServer) return () => false;
   const [isActive, setActive] = createSignal(false);
-
   createEffect(() => {
     if (ref) {
       const activeOutput = active?.() ?? true;
@@ -36,10 +37,7 @@ export const createFullscreen = (
       }
     }
   });
-
-  const listener = () => {
-    setActive(document.fullscreenElement === ref);
-  };
+  const listener = () => setActive(document.fullscreenElement === ref);
   document.addEventListener("fullscreenchange", listener);
   onCleanup(() => {
     document.removeEventListener("fullscreenchange", listener);

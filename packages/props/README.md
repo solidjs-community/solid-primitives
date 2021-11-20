@@ -1,5 +1,6 @@
 ---
 Name: props
+Stage: 3
 Package: "@solid-primitives/props"
 Primitives: createProps
 ---
@@ -17,13 +18,13 @@ Creates a primitive to provide props signals for simple component testing
 You can either create a single prop:
 
 ```ts
-// second argument can be initialValue for boolean, number, string:
+// Second argument can be initialValue for boolean, number, string:
 const [string, setString, stringField] = createProp("stringValue", "test");
-// arrays or enums can be provided in an options object:
+// Arrays or enums can be provided in an options object:
 const [language, setLanguage, languageField] = createProp(
   "language",
   { initialValue: "en", options: ["de", "en", "fr", "it"] as const }
-  // if you want your array to be able to influence the setter/getter types, use `as const`.
+  // If you want your array to be able to influence the setter/getter types, use `as const`.
 );
 enum Currency {
   AUD,
@@ -83,5 +84,9 @@ TODO
 0.0.100
 
 Initial release
+
+1.0.0
+
+Release initial version with CJS support.
 
 </details>

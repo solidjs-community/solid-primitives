@@ -1,5 +1,6 @@
 ---
 Name: countdown
+Stage: 3
 Package: "@solid-primitives/countdown"
 Primitives: createCountdown
 Category: Utilities
@@ -33,5 +34,9 @@ You may view a working example here: https://codesandbox.io/s/create-countdown-s
 0.0.100
 
 First commit of the countdown primitive.
+
+1.0.0
+
+Updated to Stage 3 and published CJS.
 
 </details>

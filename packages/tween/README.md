@@ -1,5 +1,6 @@
 ---
 Name: tween
+Stage: 3
 Package: "@solid-primitives/tween"
 Primitives: createTween
 Category: Display & Media
@@ -27,5 +28,13 @@ const tweenedValue = createTween(myNumber, { duration: 500 });
 1.0.0
 
 Initial commit and publish of debounce primitive.
+
+1.0.1
+
+Released a new version with CJS support.
+
+1.0.2
+
+Shipping a tighter and CJS supported version.
 
 </details>

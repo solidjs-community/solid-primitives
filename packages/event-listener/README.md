@@ -1,5 +1,6 @@
 ---
 Name: event-listener
+Stage: 3
 Package: "@solid-primitives/event-listener"
 Primitives: createEventListener
 Category: Browser APIs
@@ -59,5 +60,9 @@ Released a version with type mostly cleaned up.
 1.2.3
 
 Switched to a more idiomatic pattern: Warning: incompatible with the previous version!
+
+1.2.4
+
+Added CJS build.
 
 </details>

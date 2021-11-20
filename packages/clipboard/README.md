@@ -1,3 +1,11 @@
+---
+Name: clipboard
+Stage: 3
+Package: "@solid-primitives/clipboard"
+Primitives: createClipboard, copyToClipboard
+Category: Browser APIs
+---
+
 # @solid-primitives/clipboard
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
@@ -37,5 +45,9 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-c
 1.0.0
 
 Committing first version of primitive.
+
+1.0.2
+
+Added CJS export and removed outdated permision structure.
 
 </details>

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/i18n",
-  "version": "0.0.250",
+  "version": "1.0.1",
   "description": "Primitive to create and use i18n primitives.",
   "author": "Alexandre Mouton-Brady <amoutonbrady@gmail.com>",
   "license": "MIT",
@@ -12,11 +12,16 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/index.js",
+    "default": "./dist/index.js"
+  },
   "sideEffects": "false",
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc",
+    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
     "test": "jest"
   },
   "keywords": [

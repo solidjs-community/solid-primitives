@@ -1,5 +1,6 @@
 ---
 Name: script-loader
+Stage: 3
 Package: "@solid-primitives/script-loader"
 Primitives: createScriptLoader
 ---
@@ -45,5 +46,9 @@ TODO
 0.0.100
 
 Initial release.
+
+1.0.0
+
+Release first first with CJS support.
 
 </details>

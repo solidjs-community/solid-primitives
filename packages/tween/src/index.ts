@@ -17,14 +17,15 @@ export default function createTween<T extends number>(
   { ease = (t: T) => t, duration = 100 }
 ) {
   const [start, setStart] = createSignal(document.timeline.currentTime);
-  const [current, setCurrent] = createSignal(target());
+  const [current, setCurrent] = createSignal<T>(target());
   createEffect(on(target, () => setStart(document.timeline.currentTime), { defer: true }));
   createEffect(
     on([start, current], () => {
       const cancelId = requestAnimationFrame(t => {
-        const elapsed = t - start() + 1;
+        const elapsed = t - (start() || 0) + 1;
+        // @ts-ignore
         setCurrent(c =>
-          elapsed < duration ? (target() - c) * ease(elapsed / duration) + c : target()
+          elapsed < duration ? (target() - c) * ease(elapsed / duration as T) + c : target()
         );
       });
       onCleanup(() => cancelAnimationFrame(cancelId));

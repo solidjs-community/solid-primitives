@@ -1,5 +1,6 @@
 ---
 Name: intersection-observer
+Stage: 3
 Package: "@solid-primitives/intersection-observer"
 Primitives: createIntersectionObserver, createViewportObserver, createVisibilityObserver
 Category: Display & Media
@@ -85,5 +86,9 @@ Major improvements to types and breaking changes of the interface.
 1.1.1
 
 Minor type adjustments.
+
+1.1.2
+
+Released with CJS support.
 
 </details>

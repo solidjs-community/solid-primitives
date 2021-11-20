@@ -1,3 +1,11 @@
+---
+Name: websocket
+Stage: 0
+Package: "@solid-primitives/websocket"
+Primitives: createWebsocket
+Category: Network
+---
+
 # @solid-primitives/websocket
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
@@ -23,6 +31,6 @@ You may find a semi-functional example here: https://codesandbox.io/s/solid-webs
 
 0.0.100
 
-Initial release.
+Initial version. Proposed and waiting for feedback.
 
 </details>

@@ -1,5 +1,6 @@
 ---
 Name: debounce
+Stage: 3
 Package: "@solid-primitives/debounce"
 Primitives: createDebounce
 Category: Utilities

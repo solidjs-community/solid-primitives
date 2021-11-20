@@ -1,3 +1,11 @@
+---
+Name: worker
+Stage: 0
+Package: "@solid-primitives/worker"
+Primitives: createWorker
+Category: Browser APIs
+---
+
 # @solid-primitives/worker
 
 Primitive to create a worker helper with very basic functionality to complex support facilities.
@@ -11,12 +19,8 @@ Primitive to create a worker helper with very basic functionality to complex sup
 <details>
 <summary><b>Expand Changelog</b></summary>
 
-1.0.0
+0.0.100
 
-First ported commit from react-use-localstorage.
+Initial proposal.
 
 </details>
-
-## Contributors
-
-Ported from the amazing work by at https://github.com/dance2die/react-use-localstorage.

@@ -1,5 +1,6 @@
 ---
 Name: audio
+Stage: 3
 Package: "@solid-primitives/audio"
 Primitives: createAudio, createAudioPlayer, createAudioManager
 Category: Display & Media
