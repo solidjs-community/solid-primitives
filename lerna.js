@@ -23,8 +23,14 @@ async function updateReadme(log) {
       const { data } = frontmatter(md);
       if (data.Name) {
         data.Name = `[${data.Name}](${githubURL}${data.Name})`;
-        data.Size = `[![SIZE](${sizeShield}${lernaPackage.name})](${bundlephobiaURL}${lernaPackage.name})`;
-        data.NPM = `[![VERSION](${npmShield}${lernaPackage.name})](${npmURL}${lernaPackage.name})`;
+        console.log(data.Stage)
+        if (data.Stage == 'X' || data.Stage == 0) {
+          data.Size = '';
+          data.NPM = '';
+        } else {
+          data.Size = `[![SIZE](${sizeShield}${lernaPackage.name})](${bundlephobiaURL}${lernaPackage.name})`;
+          data.NPM = `[![VERSION](${npmShield}${lernaPackage.name})](${npmURL}${lernaPackage.name})`;
+        }
         if (typeof data.Stage === 'undefined') {
           data.Stage = '2';
         }
