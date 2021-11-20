@@ -1,33 +1,56 @@
 import { Component, createMemo, createSignal, on } from "solid-js";
 import { render } from "solid-js/web";
-import { valToPwMid, clamp } from "../src/common";
-import createDateDifference from "../src";
+import { valToPwMid, clamp, valToP, pToVal } from "./utils";
+import createDateDifference, { createDateNow } from "../src";
 import listen from "@solid-primitives/event-listener";
 import "./tailwind.css";
 import { createEffect } from "solid-js";
+import { format } from "date-fns";
+import { onMount } from "solid-js";
+import { MaybeAccessor } from "../src/common";
+import {
+  createCompositeEffect,
+  createCompositeMemo,
+  createModifier
+} from "@solid-primitives/composites";
 
-const Slider: Component<{ ondrag: (p: number) => void }> = props => {
+const withMounted = createModifier<void>((s, cb) => {
+  onMount(() => {
+    cb(s(), undefined, undefined);
+  });
+  return [cb, {}];
+});
+
+const Slider: Component<{
+  ondrag: (value: number) => void;
+  value?: number;
+  min: number;
+  max: number;
+}> = props => {
   const [pageX, setPageX] = createSignal(0);
+  const [p, setP] = createSignal(clamp(valToP(props.value, props.min, props.max), 0, 1));
   const [dragging, setDragging] = createSignal(false);
 
   let bar!: HTMLDivElement;
 
-  const value = createMemo(
-    on(pageX, pageX => {
-      if (!bar) return 0;
-      const x = pageX - bar.offsetLeft;
-      const w = bar.offsetWidth;
-      return clamp(valToPwMid(x, 0, w), -1, 1);
-    })
-  );
-  const left = createMemo(
-    on(value, p => {
-      if (!bar) return 0;
-      return p * ((bar.offsetWidth - 24) / 2);
-    })
+  const [left, setLeft] = createSignal(0);
+  createCompositeEffect(
+    withMounted(p, () => setLeft((p() * 2 - 1) * ((bar.offsetWidth - 12) / 2)))
   );
 
-  createEffect(() => props.ondrag(value()));
+  const value = createMemo(on(p, p => pToVal(p, props.min, props.max)));
+  createEffect(
+    on(
+      pageX,
+      pageX => {
+        const x = pageX - bar.offsetLeft;
+        const w = bar.offsetWidth;
+        setP(clamp(valToP(x, 0, w), 0, 1));
+      },
+      { defer: true }
+    )
+  );
+  createEffect(() => props.ondrag(Math.round(value())));
 
   listen(window, "mousemove", (e: MouseEvent) => dragging() && setPageX(e.pageX));
   listen(window, "mouseup", () => setDragging(false));
@@ -36,7 +59,7 @@ const Slider: Component<{ ondrag: (p: number) => void }> = props => {
     <div ref={bar} class="h-6 my-2 relative bg-blue-100 rounded-full" style={{ width: "80vw" }}>
       <div
         class="w-6 h-6 border-2 border-blue-400 box-content absolute bg-blue-400 rounded-full select-none left-1/2 -top-0.5 -ml-3"
-        style={{ transform: `translateX(${left() - 2}px)` }}
+        style={{ transform: `translateX(${left() ?? 0 - 2}px)` }}
         onmousedown={e => {
           setPageX(e.pageX);
           setDragging(true);
@@ -49,16 +72,24 @@ const Slider: Component<{ ondrag: (p: number) => void }> = props => {
 const App: Component = () => {
   const timeRange = 50000000000;
 
-  const [p, setP] = createSignal(0);
-  const inputValueMs = createMemo(() => Math.round(p() * timeRange));
-  const targetTimestamp = createMemo(() => Date.now() + inputValueMs());
+  const [updateNowInterval, setUpdateNowInterval] = createSignal(1_000);
 
-  const [timeago, { date, timestamp }] = createDateDifference(targetTimestamp);
+  const [inputTimeMs, setInputTimeMs] = createSignal(0);
+  const targetTimestamp = createMemo(() => Date.now() + inputTimeMs());
+
+  const [timeago, { date, time: timestamp }] = createDateDifference(targetTimestamp);
+
+  const [dateNow] = createDateNow(updateNowInterval);
 
   return (
-    <div class="w-screen min-h-screen flex flex-col justify-center items-center">
-      <p>{inputValueMs()}ms</p>
-      <Slider ondrag={setP} />
+    <div class="w-screen min-h-screen overflow-hidden flex flex-col justify-center items-center">
+      <div class="mb-4">
+        NOW: <span>{format(dateNow(), "d MMM yyyy — HH:mm:ss:SSS")}</span>
+      </div>
+      <p>Update "now" every {updateNowInterval()}ms</p>
+      <Slider ondrag={setUpdateNowInterval} min={200} max={10_000} value={updateNowInterval()} />
+      <p>{inputTimeMs()}ms</p>
+      <Slider ondrag={setInputTimeMs} value={0} min={-timeRange} max={timeRange} />
       <p>{targetTimestamp()}</p>
       <p>{timeago()}</p>
     </div>

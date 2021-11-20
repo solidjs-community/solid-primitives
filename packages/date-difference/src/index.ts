@@ -1,5 +1,5 @@
-import { Accessor, createMemo, createSignal, Setter } from "solid-js";
-import { access, MaybeAccessor } from "./common";
+import { Accessor, createEffect, createMemo, createSignal } from "solid-js";
+import { access, Fn, MaybeAccessor } from "./common";
 
 export type MessageFormatter<T = number> = (value: T, isPast: boolean) => string;
 
@@ -50,24 +50,44 @@ const DEFAULT_MESSAGES: TimeAgoMessages = {
 
 const DEFAULT_FORMATTER = (date: Date) => date.toISOString().slice(0, 10);
 
+export function createDateNow(
+  updateInterval: MaybeAccessor<number> = 30_000
+): [Accessor<Date>, { time: Accessor<number>; update: Fn }] {
+  const [nowDate, setNowDate] = createSignal(new Date());
+  const update = () => setNowDate(new Date());
+  let interval: NodeJS.Timer;
+  createEffect(() => {
+    clearInterval(interval);
+    interval = setInterval(update, access(updateInterval));
+  });
+  return [
+    nowDate,
+    {
+      time: createMemo(() => nowDate().getTime()),
+      update
+    }
+  ];
+}
+
 export default function createDateDifference(date: MaybeAccessor<number | Date | string>): [
   Accessor<string>,
   {
     date: Accessor<Date>;
-    timestamp: Accessor<number>;
+    time: Accessor<number>;
+    nowDate: Accessor<Date>;
+    nowTime: Accessor<number>;
   }
 ] {
   const targetDate = createMemo(() => new Date(access(date)));
-  const [now, setNow] = createSignal(new Date());
-  setInterval(() => {
-    setNow(new Date());
-  }, 10000);
+  const [nowDate, { time: nowTime, update }] = createDateNow();
 
   return [
     () => "nothing yet",
     {
       date: targetDate,
-      timestamp: createMemo(() => targetDate().getTime())
+      time: createMemo(() => targetDate().getTime()),
+      nowDate,
+      nowTime
     }
   ];
 }
