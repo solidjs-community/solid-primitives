@@ -2,7 +2,7 @@
 Name: storage
 Stage: 3
 Package: "@solid-primitives/storage"
-Primitives: createStorage, createAsyncStorage, createStorageSignal, createLocalStorage, createSessionStorage
+Primitives: createStorage, createCookieStorage, createAsyncStorage, createStorageSignal, createLocalStorage, createSessionStorage
 Category: Browser APIs
 ---
 

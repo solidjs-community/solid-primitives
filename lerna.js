@@ -25,7 +25,7 @@ async function updateReadme(log) {
         data.Name = `[${data.Name}](${githubURL}${data.Name})`;
         data.Size = `[![SIZE](${sizeShield}${lernaPackage.name})](${bundlephobiaURL}${lernaPackage.name})`;
         data.NPM = `[![VERSION](${npmShield}${lernaPackage.name})](${npmURL}${lernaPackage.name})`;
-        if (! data.Stage) {
+        if (typeof data.Stage === 'undefined') {
           data.Stage = '2';
         }
         if (data.Primitives.includes(',')) {
