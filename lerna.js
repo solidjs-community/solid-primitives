@@ -23,7 +23,6 @@ async function updateReadme(log) {
       const { data } = frontmatter(md);
       if (data.Name) {
         data.Name = `[${data.Name}](${githubURL}${data.Name})`;
-        console.log(data.Stage)
         if (data.Stage == 'X' || data.Stage == 0) {
           data.Size = '';
           data.NPM = '';
