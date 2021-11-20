@@ -1,7 +1,7 @@
 ---
 Name: composites
 Stage: 2
-Package: "@solid-primitives/composite"
+Package: "@solid-primitives/composites"
 Primitives: createCompositeEffect, createCompositeComputed, createCompositeMemo, createCompositeRenderEffect, createModifier
 Category: Reactivity
 ---
@@ -9,8 +9,8 @@ Category: Reactivity
 # @solid-primitives/composites
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/composite)](https://bundlephobia.com/package/@solid-primitives/composite)
-[![size](https://img.shields.io/npm/v/@solid-primitives/composite)](https://www.npmjs.com/package/@solid-primitives/composite)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/composites)](https://bundlephobia.com/package/@solid-primitives/composites)
+[![size](https://img.shields.io/npm/v/@solid-primitives/composites)](https://www.npmjs.com/package/@solid-primitives/composites)
 
 Composable reactive primitives, extending the `createEffect`, `createComputed`, `createMemo` behaviors using composable and reusable **modifiers**.
 
@@ -92,7 +92,7 @@ import {
   whenever,
   pausable,
   ignorable
-} from "@solid-primitives/composite";
+} from "@solid-primitives/composites";
 ```
 
 ### stoppable
