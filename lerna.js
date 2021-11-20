@@ -47,11 +47,13 @@ async function updateReadme(log) {
     markdownMagic(path.join(__dirname, 'README.md'), {
       transforms: {
         GENERATE_PRIMITIVES_TABLE: () => {
-          return Object.entries(categories).reduce((md, [cateogry, items]) => {
-            md += `### ${cateogry}\n\n`;
+          return Object.entries(categories).reduce((md, [category, items]) => {
+            md += `|<br />*${category}*<br /><br />|\n`;
             md += tablemark(items, [ 'Name', 'Stage', 'Primitives', 'Size', 'NPM' ])
+              .replace('|Name|Stage|Primitives|Size|NPM|\n', '')
+              .replace('|----|----|----|----|----|\n', '');
             return md;
-          }, '');
+          }, '|Name|Stage|Primitives|Size|NPM|\n|----|----|----|----|----|\n');
         }
       }
     }, resolve)
