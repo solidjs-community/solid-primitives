@@ -1,16 +1,18 @@
 ---
-Name: composite
+Name: composites
+Stage: 2
 Package: "@solid-primitives/composite"
 Primitives: createCompositeEffect, createCompositeComputed, createCompositeMemo, createCompositeRenderEffect, createModifier
+Category: Reactivity
 ---
 
-# @solid-primitives/composite
+# @solid-primitives/composites
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/composite)](https://bundlephobia.com/package/@solid-primitives/composite)
 [![size](https://img.shields.io/npm/v/@solid-primitives/composite)](https://www.npmjs.com/package/@solid-primitives/composite)
 
-A reactive primitives, extending the `createEffect`, `createComputed`, `createMemo` behaviors using composable and reusable **modifiers**.
+Composable reactive primitives, extending the `createEffect`, `createComputed`, `createMemo` behaviors using composable and reusable **modifiers**.
 
 - `createCompositeEffect` - When used alone, it works as `createEffect(on())`. But it can be combined with a set of Modifiers extending it's functionality.
 
@@ -273,6 +275,8 @@ Initial realease
 </details>
 
 ## Acknowledgements
+
+Designed and developed by [thetarnav](https://github.com/thetarnav) based on:
 
 - [VueUse](https://vueuse.org)
 - [solid-rx](https://www.npmjs.com/package/solid-rx)

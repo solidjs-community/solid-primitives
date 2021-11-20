@@ -1,10 +1,10 @@
 {
   "name": "@solid-primitives/composite",
   "version": "1.0.0",
-  "description": "Reactive helpers built around watching computation changes.",
-  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "description": "Composable reactive helpers built around watching computation changes.",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/watch",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/composites",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
@@ -32,6 +32,7 @@
   "keywords": [
     "watch",
     "effect",
+    "composites",
     "computed",
     "memo",
     "solid",
@@ -47,7 +48,7 @@
     "uvu": "^0.5.2"
   },
   "peerDependencies": {
-    "solid-js": "^1.2.3"
+    "solid-js": "^1.2.5"
   },
   "dependencies": {
     "@solid-primitives/debounce": "^1.0.3",
