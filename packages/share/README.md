@@ -23,7 +23,13 @@ A portion of this primitive was built off of https://github.com/nicolasbeauvais/
 ```ts
 import createSocialShare from "@solid-promitives/share";
 import { facebook } from "@solid-promitives/share/networks";
-const [share, close] = createSocialShare(facebook);
+
+const [share, close] = createSocialShare({
+  title: 'SolidJS.com',
+  url: 'https://www.solidjs.com',
+  description: 'Simple and performant reactivity!' 
+});
+share(facebook);
 ```
 
 ## Demo
