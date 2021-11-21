@@ -10,9 +10,9 @@ Category: Display & Media
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/template-primitive)](https://bundlephobia.com/package/@solid-primitives/template-primitive)
-[![size](https://img.shields.io/npm/v/@solid-primitives/audio)](https://www.npmjs.com/package/@solid-primitives/template-primitive)
+[![size](https://img.shields.io/npm/v/@solid-primitives/template-primitive)](https://www.npmjs.com/package/@solid-primitives/template-primitive)
 
-Primitive to manage audio playback in the browser. This primitive is comprised of three composed primitives:
+A sample primitive that is made up for templating with the following options:
 
 `createPrimitiveTemplate` - Provides a getter and setter for the primitive.
 

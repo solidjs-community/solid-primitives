@@ -1,0 +1,43 @@
+{
+  "name": "@solid-primitives/share",
+  "version": "0.0.100",
+  "description": "Primitives to help with sharing content on social media and beyond.",
+  "author": "David Di Biase <dave.dibiase@gmail.com",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/share",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/index.js",
+    "default": "./dist/index.js"
+  },
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
+    "test": "uvu -r solid-register"
+  },
+  "keywords": [
+    "template",
+    "primitives"
+  ],
+  "devDependencies": {
+    "jsdom": "^18.0.1",
+    "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
+    "solid-register": "^0.0.10",
+    "tslib": "^2.0.1",
+    "typescript": "^4.5.2",
+    "uvu": "^0.5.2"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.2.5"
+  }
+}
