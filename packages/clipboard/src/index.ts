@@ -35,10 +35,9 @@ const createClipboard = (): [
   }
 ] => {
   const read = async () => navigator.clipboard.read();
-  const write = async (data: string | ClipboardItem[]) => (
+  const write = async (data: string | ClipboardItem[]) =>
     // @ts-ignore
-    await navigator.clipboard[typeof data === "string" ? "writeText" : "write"](data)
-  );
+    await navigator.clipboard[typeof data === "string" ? "writeText" : "write"](data);
   const newItem = (data: ClipboardItemData, type: string) => new ClipboardItem({ [type]: data });
   return [write, read, { newItem }];
 };

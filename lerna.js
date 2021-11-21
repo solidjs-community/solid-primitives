@@ -1,4 +1,4 @@
-const { loadPackages, iter, exec } = require('lerna-script');
+const { loadPackages, iter } = require('lerna-script');
 const fs = require('fs').promises;
 const path = require('path')
 
@@ -23,6 +23,7 @@ async function updateReadme(log) {
       const { data } = frontmatter(md);
       if (data.Name) {
         data.Name = `[${data.Name}](${githubURL}${data.Name})`;
+        // Detect the stage and build size/version only if needed
         if (data.Stage == 'X' || data.Stage == 0) {
           data.Size = '';
           data.NPM = '';
@@ -40,6 +41,7 @@ async function updateReadme(log) {
         } else {
           data.Primitives = data.Primitives;
         }
+        // Merge the package into the correct category
         const category = data.Category || 'Misc';
         categories[category] = Array.isArray(categories[category]) ?
           [ ...categories[category], data ] :
@@ -53,6 +55,8 @@ async function updateReadme(log) {
       transforms: {
         GENERATE_PRIMITIVES_TABLE: () => {
           return Object.entries(categories).reduce((md, [category, items]) => {
+            // Some MD jousting to get the table to render nicely
+            // with consistent columns
             md += `|<br />*${category}*<br /><br />|\n`;
             md += tablemark(items, [ 'Name', 'Stage', 'Primitives', 'Size', 'NPM' ])
               .replace('|Name|Stage|Primitives|Size|NPM|\n', '')
@@ -65,4 +69,18 @@ async function updateReadme(log) {
   });
 }
 
+// ------------------------------------------------------------
+// Create a new primitive folder based on the default template
+// ------------------------------------------------------------
+async function createPrimitive(log) {
+  const shell = require('child_process').execSync;
+  const { join } = require('path');
+  const packageName = process.argv.pop();
+  const src = join(__dirname, 'template');
+  const dest = join(__dirname, 'packages', packageName);
+  shell(`mkdir -p ${dest}`);
+  shell(`cp -r ${src}/* ${dest}`);
+}
+
 module.exports.updateReadme = updateReadme;
+module.exports.createPrimitive = createPrimitive;

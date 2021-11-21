@@ -1,14 +1,10 @@
 {
-  "name": "@solid-primitives/composites",
-  "version": "1.0.1",
-  "description": "Composable reactive helpers built around watching computation changes.",
-  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
+  "name": "@solid-primitives/template-primitive",
+  "version": "0.0.100",
+  "description": "A template primitive example.",
+  "author": "Your Name <you@youremail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/composites",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/davedbase/solid-primitives.git"
-  },
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/template-primitive",
   "private": false,
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -22,7 +18,6 @@
     "default": "./dist/index.js"
   },
   "sideEffects": "false",
-  "type": "module",
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
@@ -30,12 +25,7 @@
     "test": "uvu -r solid-register"
   },
   "keywords": [
-    "watch",
-    "effect",
-    "composites",
-    "computed",
-    "memo",
-    "solid",
+    "template",
     "primitives"
   ],
   "devDependencies": {
@@ -49,9 +39,5 @@
   },
   "peerDependencies": {
     "solid-js": "^1.2.5"
-  },
-  "dependencies": {
-    "@solid-primitives/debounce": "^1.0.3",
-    "@solid-primitives/throttle": "^1.0.4"
   }
 }

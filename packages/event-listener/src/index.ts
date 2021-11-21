@@ -1,8 +1,7 @@
 import { Accessor, createEffect, onCleanup } from "solid-js";
 import type { JSX } from "solid-js";
 
-export type EventMapOf<T> =
-  T extends Window
+export type EventMapOf<T> = T extends Window
   ? WindowEventMap
   : T extends Document
   ? DocumentEventMap
@@ -12,26 +11,35 @@ export type EventMapOf<T> =
   ? MediaQueryListEventMap
   : {};
 
-export type EventMapOfMultiple<T> =
-  T extends EventTarget
+export type EventMapOfMultiple<T> = T extends EventTarget
   ? EventMapOf<T>
   : T extends EventTarget[]
   ? EventMapOf<T[number]>
   : never;
 
-export type EventListenerProps<T extends EventTarget | EventTarget[], E extends Record<string, Event> = {}> = [
-  name: [{}, {}] extends [EventMapOfMultiple<T>, E] ? string : string & (keyof EventMapOfMultiple<T> | keyof E),
+export type EventListenerProps<
+  T extends EventTarget | EventTarget[],
+  E extends Record<string, Event> = {}
+> = [
+  name: [{}, {}] extends [EventMapOfMultiple<T>, E]
+    ? string
+    : string & (keyof EventMapOfMultiple<T> | keyof E),
   handler: EventListenerOrEventListenerObject | null,
   options?: AddEventListenerOptions
 ];
 
-export type CreateEventListenerReturn = [add: (el: EventTarget) => void, remove: (el: EventTarget) => void];
+export type CreateEventListenerReturn = [
+  add: (el: EventTarget) => void,
+  remove: (el: EventTarget) => void
+];
 
 declare module "solid-js" {
   namespace JSX {
     interface Directives {
-      createEventListener: (ref: HTMLElement, props: Accessor<EventListenerProps<HTMLElement, {}>>) =>
-        [add: (target: EventTarget) => void, remove: (target: EventTarget) => void];
+      createEventListener: (
+        ref: HTMLElement,
+        props: Accessor<EventListenerProps<HTMLElement, {}>>
+      ) => [add: (target: EventTarget) => void, remove: (target: EventTarget) => void];
     }
   }
 }
@@ -39,11 +47,13 @@ declare module "solid-js" {
 // only here so the `JSX` import won't be shaken off the tree:
 export type E = JSX.Element;
 
-type CreateEventListenerFn = 
-  <EventMap extends Record<string, Event>, Target extends EventTarget | EventTarget[]>(
-    target: Target,
-    ...props: [Accessor<EventListenerProps<Target, EventMap>>] | EventListenerProps<Target, EventMap>
-  ) => CreateEventListenerReturn;
+type CreateEventListenerFn = <
+  EventMap extends Record<string, Event>,
+  Target extends EventTarget | EventTarget[]
+>(
+  target: Target,
+  ...props: [Accessor<EventListenerProps<Target, EventMap>>] | EventListenerProps<Target, EventMap>
+) => CreateEventListenerReturn;
 
 /**
  * Creates an event listener helper primitive.
@@ -68,23 +78,33 @@ type CreateEventListenerFn =
  */
 export const createEventListener: CreateEventListenerFn = (target, ...propsArray) => {
   const targets: EventTarget[] = Array.isArray(target) ? target : [target];
-  type EventProps = [name: string, handler: EventListenerOrEventListenerObject | null, options?: EventListenerOptions];
+  type EventProps = [
+    name: string,
+    handler: EventListenerOrEventListenerObject | null,
+    options?: EventListenerOptions
+  ];
   const props: Accessor<EventProps> =
-    typeof propsArray[0] === 'function' ? propsArray[0] : ((props) => () => props)(propsArray.slice(1) as EventProps);
+    typeof propsArray[0] === "function"
+      ? propsArray[0]
+      : (
+          props => () =>
+            props
+        )(propsArray.slice(1) as EventProps);
   const add = (target: EventTarget) => {
     targets.includes(target) || targets.push(target);
     target.addEventListener.apply(target, props());
-  }
+  };
   const remove = (target: EventTarget) => {
     targets.forEach((t, index) => t === target && targets.splice(index, 1));
     target.removeEventListener.apply(target, props());
-  }
+  };
   // we need to directly add the event, otherwise we cannot dispatch it before the next effect runs
   targets.forEach(add);
-  createEffect((previousProps) => {
+  createEffect(previousProps => {
     const currentProps = props();
     if (previousProps !== currentProps) {
-      previousProps && targets.forEach((target) => target.removeEventListener.apply(target, previousProps));
+      previousProps &&
+        targets.forEach(target => target.removeEventListener.apply(target, previousProps));
       targets.forEach(add);
     }
     return currentProps;

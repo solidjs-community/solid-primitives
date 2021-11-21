@@ -9,7 +9,7 @@ import { Accessor, createSignal, onCleanup } from "solid-js";
 export const createPermission = (
   name: PermissionDescriptor | PermissionName
 ): Accessor<PermissionState | "unknown"> => {
-  const [ permission, setPermission ] = createSignal<PermissionState | "unknown">("unknown");
+  const [permission, setPermission] = createSignal<PermissionState | "unknown">("unknown");
   navigator.permissions.query(typeof name === "string" ? { name } : name).then(status => {
     setPermission(status.state);
     const listener = () => setPermission(status.state);

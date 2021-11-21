@@ -55,4 +55,8 @@ Minor clean-up, added tests and released.
 
 Added testing and support for srcObject.
 
+1.0.2
+
+Added CJS support.
+
 </details>

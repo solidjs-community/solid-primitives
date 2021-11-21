@@ -1,5 +1,6 @@
 ---
 Name: throttle
+Stage: 3
 Package: "@solid-primitives/throttle"
 Primitives: createThrottle
 Category: Utilities

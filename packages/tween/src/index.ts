@@ -25,7 +25,7 @@ export default function createTween<T extends number>(
         const elapsed = t - (start() || 0) + 1;
         // @ts-ignore
         setCurrent(c =>
-          elapsed < duration ? (target() - c) * ease(elapsed / duration as T) + c : target()
+          elapsed < duration ? (target() - c) * ease((elapsed / duration) as T) + c : target()
         );
       });
       onCleanup(() => cancelAnimationFrame(cancelId));
