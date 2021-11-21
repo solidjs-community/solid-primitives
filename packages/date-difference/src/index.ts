@@ -22,7 +22,7 @@ interface Unit {
   name: keyof DateDifferenceMessages;
 }
 
-interface DateDifferenceOptions {
+export interface DateDifferenceOptions {
   /**
    * Intervals to update, set 0 to disable auto update
    *
@@ -40,7 +40,7 @@ interface DateDifferenceOptions {
   /**
    * Maximum diff in milliseconds to display the full date instead of relative
    *
-   * @default undefined
+   * @default Infinite
    */
   max?: number;
 
@@ -52,7 +52,7 @@ interface DateDifferenceOptions {
   /**
    * Formatter for full date
    */
-  fullDateFormatter?: (date: Date) => string;
+  absoluteFormatter?: (date: Date) => string;
 
   /**
    * Relative time formatter
@@ -60,13 +60,13 @@ interface DateDifferenceOptions {
   relativeFormatter?: (target: Date, now: Date, diff: number) => string;
 }
 
-const SECOND = 1000,
-  MINUTE = 60000,
-  HOUR = 3600000,
-  DAY = 86400000,
-  WEEK = 604800000,
-  MONTH = 2592000000,
-  YEAR = 31536000000;
+export const SECOND = 1000,
+  MINUTE = 60_000,
+  HOUR = 3_600_000,
+  DAY = 86_400_000,
+  WEEK = 604_800_000,
+  MONTH = 2_592_000_000,
+  YEAR = 31_536_000_000;
 
 const UNITS: Unit[] = [
   { max: 60000, value: SECOND, name: "second" },
@@ -98,56 +98,86 @@ const DEFAULT_FORMATTER = (date: Date) => date.toISOString().slice(0, 10);
 
 const DEFAULT_UPDATE_INTERVAL = (abs_diff: number) => (abs_diff <= HOUR ? MINUTE / 2 : HOUR / 2);
 
-export function createDateNow(
-  interval: MaybeAccessor<number> = MINUTE / 2
-): [Accessor<Date>, { time: Accessor<number>; update: Fn }] {
-  const [nowDate, setNowDate] = createSignal(new Date());
-  const update = () => setNowDate(new Date());
+/**
+ * Creates an autoupdating and reactive `new Date()`
+ *
+ * @param interval delay in ms for updating the date. Set to `0` to disable autoupdating. *Default = `30000`*
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/date-difference
+ *
+ * @example
+ * ```ts
+ * // updates every second:
+ * const [now] = createDateNow(1000);
+ *
+ * // won't autoupdate:
+ * const [now, update] = createDateNow(0);
+ *
+ * // update manually:
+ * update()
+ * ```
+ */
+export function createDateNow(interval: MaybeAccessor<number> = MINUTE / 2): [Accessor<Date>, Fn] {
+  const [now, setNow] = createSignal(new Date());
+  const update = () => setNow(new Date());
   let timer: NodeJS.Timer;
   createEffect(() => {
     clearInterval(timer);
-    const _interval = access(interval);
-    if (_interval) timer = setInterval(update, _interval);
+    const ms = access(interval);
+    // if interval === 0 the date won't update automatically
+    if (ms) timer = setInterval(update, ms);
   });
   onCleanup(() => clearInterval(timer));
-  return [
-    nowDate,
-    {
-      time: createMemo(() => nowDate().getTime()),
-      update
-    }
-  ];
+  return [now, update];
 }
 
+/**
+ * Provides a reactive, formatted date difference in relation to now.
+ *
+ * @param date target date
+ * @param options
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/date-difference
+ *
+ * @example
+ * ```ts
+ * const [myDate, setMyDate] = createSignal(new Date('Jun 28, 2021'))
+ * const [timeago, { target, now, update }] = createDateDifference();
+ * // => 5 months ago
+ *
+ * // use custom libraries to change formatting:
+ * import { formatRelative } from "date-fns";
+ * const [timeago] = createDateDifference(1577836800000, {
+ *   min: 10000,
+ *   updateInterval: 30000,
+ *   relativeFormatter: (target, now) => formatRelative(target, now)
+ * });
+ * // => last Monday at 9:25 AM
+ * ```
+ */
 export default function createDateDifference(
   date: MaybeAccessor<number | Date | string>,
   options: DateDifferenceOptions = {}
 ): [
   Accessor<string>,
   {
-    targetDate: Accessor<Date>;
-    targetTime: Accessor<number>;
-    nowDate: Accessor<Date>;
-    nowTime: Accessor<number>;
+    target: Accessor<Date>;
+    now: Accessor<Date>;
     update: Fn;
   }
 ] {
-  const { abs, round } = Math;
   const {
     min = MINUTE,
     messages = DEFAULT_MESSAGES,
     max = Infinity,
     updateInterval = DEFAULT_UPDATE_INTERVAL,
-    fullDateFormatter = DEFAULT_FORMATTER,
+    absoluteFormatter = DEFAULT_FORMATTER,
     relativeFormatter
   } = options;
 
-  const targetDate = createMemo(() => new Date(access(date)));
-  const targetTime = createMemo(() => targetDate().getTime());
+  const target = createMemo(() => new Date(access(date)));
   const [interval, setInterval] = createSignal(0);
-  const [nowDate, { time: nowTime, update }] = createDateNow(interval);
-  const diff = createMemo(on([targetTime, nowTime], ([target, now]) => target - now));
-  const absDiff = createMemo(() => abs(diff()));
+  const [now, update] = createDateNow(interval);
+  const diff = createMemo(() => target().getTime() - now().getTime());
+  const absDiff = createMemo(() => Math.abs(diff()));
 
   if (typeof updateInterval === "number") setInterval(updateInterval);
   else createEffect(on(absDiff, diff => setInterval(updateInterval(diff))));
@@ -155,9 +185,9 @@ export default function createDateDifference(
   const timeAgo = createMemo(() => {
     if (absDiff() < min) return messages.justNow;
 
-    if (absDiff() > max) return fullDateFormatter(targetDate());
+    if (absDiff() > max) return absoluteFormatter(target());
 
-    if (relativeFormatter) return relativeFormatter(targetDate(), nowDate(), diff());
+    if (relativeFormatter) return relativeFormatter(target(), now(), diff());
 
     for (const unit of UNITS) {
       if (absDiff() < unit.max) return format(unit);
@@ -172,7 +202,7 @@ export default function createDateDifference(
   }
 
   function format(unit: Unit) {
-    const val = round(absDiff() / unit.value);
+    const val = Math.round(absDiff() / unit.value);
     const past = diff() < 0;
 
     const str = applyFormat(unit.name, val, past);
@@ -182,10 +212,8 @@ export default function createDateDifference(
   return [
     timeAgo,
     {
-      targetDate,
-      targetTime,
-      nowDate,
-      nowTime,
+      target,
+      now,
       update
     }
   ];

@@ -1,7 +1,7 @@
 import { Component, createMemo, createSignal, on } from "solid-js";
 import { render } from "solid-js/web";
 import { clamp, valToP, pToVal } from "./utils";
-import createDateDifference, { createDateNow } from "../src";
+import createDateDifference, { createDateNow, HOUR, MINUTE, SECOND, WEEK, YEAR } from "../src";
 import listen from "@solid-primitives/event-listener";
 import "./tailwind.css";
 import { createEffect } from "solid-js";
@@ -67,26 +67,26 @@ const Slider: Component<{
 };
 
 const App: Component = () => {
-  const timeRange = 10_000_000_000;
+  const timeRange = YEAR;
 
-  const [updateNowInterval, setUpdateNowInterval] = createSignal(1_000);
+  const [updateNowInterval, setUpdateNowInterval] = createSignal(SECOND);
 
   const [inputTimeMs, setInputTimeMs] = createSignal(0);
   const targetTimestamp = createMemo(() => Date.now() + inputTimeMs());
 
-  const [timeago, { targetDate, targetTime }] = createDateDifference(targetTimestamp);
+  const [timeago, { target }] = createDateDifference(targetTimestamp);
 
   const [customTimeago] = createDateDifference(targetTimestamp, {
-    min: 10000,
-    updateInterval: 30_000,
+    min: SECOND * 10,
+    updateInterval: MINUTE / 2,
     relativeFormatter: (target, now) => formatRelative(target, now)
   });
 
   const [customTimeago2] = createDateDifference(targetTimestamp, {
     min: 0,
-    max: 1_000_000_000,
-    updateInterval: diff => (diff <= 60_000 ? 1000 : diff <= 3600_000 ? 30_000 : 1800_000),
-    fullDateFormatter: date => format(date, "d MMM yyyy — HH:mm")
+    max: WEEK * 2,
+    updateInterval: diff => (diff <= MINUTE ? SECOND : diff <= HOUR ? MINUTE / 2 : HOUR / 2),
+    absoluteFormatter: date => format(date, "d MMM yyyy — HH:mm")
   });
 
   const [dateNow] = createDateNow(updateNowInterval);
@@ -103,7 +103,7 @@ const App: Component = () => {
       <div class="flex flex-col items-center p-8 bg-white rounded-3xl shadow-lg">
         <p>{inputTimeMs()}ms</p>
         <Slider ondrag={setInputTimeMs} value={0} min={-timeRange} max={timeRange} />
-        <p>TARGET: {format(targetTime(), "d MMM yyyy — HH:mm")}</p>
+        <p>TARGET: {format(target(), "d MMM yyyy — HH:mm")}</p>
         <p>DEFAULT: {timeago()}</p>
         <p>CUSTOM: {customTimeago()}</p>
         <p>CUSTOM2: {customTimeago2()}</p>
