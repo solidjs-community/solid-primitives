@@ -1,5 +1,5 @@
 /**
- * We use shorter names to reduce the final bundle size
+ * The below uses short replacement Markers to reduce the final bundle size.
  *
  * Properties:
  * @u = url

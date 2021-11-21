@@ -1,6 +1,6 @@
 type Network = string;
 
-interface ShareWindowOptions {
+interface SharePopupOptions {
   height?: number;
   width?: number;
   popupLeft?: number;

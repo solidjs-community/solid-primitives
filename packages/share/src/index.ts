@@ -12,7 +12,7 @@ import { Accessor, createSignal } from "solid-js";
  * @param {twitterUser} string Name of the twitter user
  * @param {media} string Associated media
  * @param {tag} string A tag to associate with the share
- * @param {tag} ShareWindowOptions An object representing the pop-up window controls
+ * @param {popup} SharePopupOptions An object representing the pop-up window controls
  * @param {controller} Window Controller to bind the share to
  * @return Returns a share, close and is sharing signal.
  */
@@ -27,7 +27,7 @@ const createSocialShare = (
     twitterUser?: string;
     media?: string;
     tag?: string;
-    popup?: ShareWindowOptions;
+    popup?: SharePopupOptions;
   } = () => ({
     url: "",
     title: "",
