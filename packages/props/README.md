@@ -7,9 +7,9 @@ Primitives: createProps
 
 # @solid-primitives/props
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/props)](https://bundlephobia.com/package/@solid-primitives/props)
-[![size](https://img.shields.io/npm/v/@solid-primitives/props)](https://www.npmjs.com/package/@solid-primitives/props)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/props?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/props)
+[![size](https://img.shields.io/npm/v/@solid-primitives/props?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/props)
 
 Creates a primitive to provide props signals for simple component testing
 

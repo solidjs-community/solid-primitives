@@ -8,9 +8,9 @@ Category: Browser APIs
 
 # @solid-primitives/geolocation
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/geolocation)](https://bundlephobia.com/package/@solid-primitives/geolocation)
-[![size](https://img.shields.io/npm/v/@solid-primitives/geolocation)](https://www.npmjs.com/package/@solid-primitives/geolocation)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/geolocation?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/geolocation)
+[![size](https://img.shields.io/npm/v/@solid-primitives/geolocation?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/geolocation)
 
 Primitives to query and watch geolocation information.
 

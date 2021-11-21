@@ -8,9 +8,9 @@ Category: Browser APIs
 
 # @solid-primitives/storage
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/storage)](https://bundlephobia.com/package/@solid-primitives/storage)
-[![size](https://img.shields.io/npm/v/@solid-primitives/storage)](https://www.npmjs.com/package/@solid-primitives/storage)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/storage?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/storage)
+[![size](https://img.shields.io/npm/v/@solid-primitives/storage?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/storage)
 
 Creates a primitive to reactively access both synchronous and asynchronous persistent storage APIs similar to localStorage.
 

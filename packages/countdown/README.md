@@ -8,9 +8,9 @@ Category: Utilities
 
 # @solid-primitives/countdown
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/countdown)](https://bundlephobia.com/package/@solid-primitives/countdown)
-[![size](https://img.shields.io/npm/v/@solid-primitives/countdown)](https://www.npmjs.com/package/@solid-primitives/countdown)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/countdown?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/countdown)
+[![size](https://img.shields.io/npm/v/@solid-primitives/countdown?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/countdown)
 
 Creates a countdown primitive based on supplied dates and interval.
 

@@ -8,9 +8,9 @@ Category: Utilities
 
 # @solid-primitives/share
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/share)](https://bundlephobia.com/package/@solid-primitives/share)
-[![size](https://img.shields.io/npm/v/@solid-primitives/share)](https://www.npmjs.com/package/@solid-primitives/share)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/share?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/share)
+[![size](https://img.shields.io/npm/v/@solid-primitives/share?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/share)
 
 Primitives for supporting sharing of resources on social media and beyond.
 

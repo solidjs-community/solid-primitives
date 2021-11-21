@@ -8,9 +8,9 @@ Category: Utilities
 
 # @solid-primitives/i18n
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/i18n)](https://bundlephobia.com/package/@solid-primitives/i18n)
-[![size](https://img.shields.io/npm/v/@solid-primitives/i18n)](https://www.npmjs.com/package/@solid-primitives/i18n)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/i18n?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/i18n)
+[![size](https://img.shields.io/npm/v/@solid-primitives/i18n?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/i18n)
 
 Creates a method for internationalization support. This primitive set is largely inspired by [dlv](https://github.com/developit/dlv/blob/master/index.js) and passes all its tests.
 

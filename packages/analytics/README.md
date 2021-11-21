@@ -8,7 +8,7 @@ Category: Utilities
 
 # @solid-primitives/analytics
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 
 Creates a primitive for analytics management.
 

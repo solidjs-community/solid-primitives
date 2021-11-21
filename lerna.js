@@ -28,8 +28,8 @@ async function updateReadme(log) {
           data.Size = '';
           data.NPM = '';
         } else {
-          data.Size = `[![SIZE](${sizeShield}${lernaPackage.name})](${bundlephobiaURL}${lernaPackage.name})`;
-          data.NPM = `[![VERSION](${npmShield}${lernaPackage.name})](${npmURL}${lernaPackage.name})`;
+          data.Size = `[![SIZE](${sizeShield}${lernaPackage.name}?style=for-the-badge)](${bundlephobiaURL}${lernaPackage.name})`;
+          data.NPM = `[![VERSION](${npmShield}${lernaPackage.name}?style=for-the-badge)](${npmURL}${lernaPackage.name})`;
         }
         if (typeof data.Stage === 'undefined') {
           data.Stage = '2';

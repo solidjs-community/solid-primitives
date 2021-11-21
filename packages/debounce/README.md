@@ -8,9 +8,9 @@ Category: Utilities
 
 # @solid-primitives/debounce
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/debounce)](https://bundlephobia.com/package/@solid-primitives/debounce)
-[![size](https://img.shields.io/npm/v/@solid-primitives/debounce)](https://www.npmjs.com/package/@solid-primitives/debounce)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/debounce?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/debounce)
+[![size](https://img.shields.io/npm/v/@solid-primitives/debounce?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/debounce)
 
 Creates a helpful debounce function.
 

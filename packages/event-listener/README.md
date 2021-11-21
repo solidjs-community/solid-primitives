@@ -8,9 +8,9 @@ Category: Browser APIs
 
 # @solid-primitives/event-listener
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/event-listener)](https://bundlephobia.com/package/@solid-primitives/event-listener)
-[![size](https://img.shields.io/npm/v/@solid-primitives/event-listener)](https://www.npmjs.com/package/@solid-primitives/event-listener)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/event-listener?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/event-listener)
+[![size](https://img.shields.io/npm/v/@solid-primitives/event-listener?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/event-listener)
 
 A helpful event listener primitive that binds window and any element supplied.
 

@@ -8,9 +8,9 @@ Category: Browser APIs
 
 # @solid-primitives/fullscreen
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/fullscreen)](https://bundlephobia.com/package/@solid-primitives/fullscreen)
-[![size](https://img.shields.io/npm/v/@solid-primitives/fullscreen)](https://www.npmjs.com/package/@solid-primitives/fullscreen)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/fullscreen?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/fullscreen)
+[![size](https://img.shields.io/npm/v/@solid-primitives/fullscreen?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/fullscreen)
 
 Creates a primitive wrapper around the Fullscreen API that can either be used as a directive or a primitive.
 

@@ -7,9 +7,9 @@ Primitives: createScriptLoader
 
 # @solid-primitives/script-loader
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/script-loader)](https://bundlephobia.com/package/@solid-primitives/script-loader)
-[![size](https://img.shields.io/npm/v/@solid-primitives/script-loader)](https://www.npmjs.com/package/@solid-primitives/script-loader)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/script-loader?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/script-loader)
+[![size](https://img.shields.io/npm/v/@solid-primitives/script-loader?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/script-loader)
 
 Creates a primitive to load scripts dynamically, either for external services or jsonp requests
 

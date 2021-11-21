@@ -8,9 +8,9 @@ Category: Display & Media
 
 # @solid-primitives/raf
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/raf)](https://bundlephobia.com/package/@solid-primitives/raf)
-[![size](https://img.shields.io/npm/v/@solid-primitives/raf)](https://www.npmjs.com/package/@solid-primitives/raf)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/raf?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/raf)
+[![size](https://img.shields.io/npm/v/@solid-primitives/raf?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/raf)
 
 Creates a primitive to support requestAnimationFrame.
 

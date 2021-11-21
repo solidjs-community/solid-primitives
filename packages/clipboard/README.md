@@ -8,7 +8,7 @@ Category: Browser APIs
 
 # @solid-primitives/clipboard
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 
 Primitives to that make reading and writing to clipboard easy.
 

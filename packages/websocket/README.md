@@ -8,7 +8,7 @@ Category: Network
 
 # @solid-primitives/websocket
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 
 Primitive to help establish, maintain and operate a websocket connection.
 

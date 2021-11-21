@@ -8,9 +8,9 @@ Category: Display & Media
 
 # @solid-primitives/devices
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/devices)](https://bundlephobia.com/package/@solid-primitives/devices)
-[![size](https://img.shields.io/npm/v/@solid-primitives/devices)](https://www.npmjs.com/package/@solid-primitives/devices)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/devices?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/devices)
+[![size](https://img.shields.io/npm/v/@solid-primitives/devices?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/devices)
 
 Creates a primitive to get a list of media devices (microphones, speakers, cameras). There are filtered primitives for convenience reasons.
 

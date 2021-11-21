@@ -8,9 +8,9 @@ Category: Display & Media
 
 # @solid-primitives/scroll
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/scroll)](https://bundlephobia.com/package/@solid-primitives/scroll)
-[![size](https://img.shields.io/npm/v/@solid-primitives/scroll)](https://www.npmjs.com/package/@solid-primitives/scroll)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/scroll?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/scroll)
+[![size](https://img.shields.io/npm/v/@solid-primitives/scroll?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/scroll)
 
 Helpful primitives to manage browser scrolling.
 

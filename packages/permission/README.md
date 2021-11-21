@@ -8,9 +8,9 @@ Category: Browser APIs
 
 # @solid-primitives/permission
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/permission)](https://bundlephobia.com/package/@solid-primitives/permission)
-[![size](https://img.shields.io/npm/v/@solid-primitives/permission)](https://www.npmjs.com/package/@solid-primitives/permission)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/permission?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/permission)
+[![size](https://img.shields.io/npm/v/@solid-primitives/permission?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/permission)
 
 Creates a primitive to query user permissions.
 

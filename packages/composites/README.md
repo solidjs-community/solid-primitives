@@ -8,9 +8,9 @@ Category: Reactivity
 
 # @solid-primitives/composites
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/composites)](https://bundlephobia.com/package/@solid-primitives/composites)
-[![size](https://img.shields.io/npm/v/@solid-primitives/composites)](https://www.npmjs.com/package/@solid-primitives/composites)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/composites?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/composites)
+[![size](https://img.shields.io/npm/v/@solid-primitives/composites?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/composites)
 
 Composable reactive primitives, extending the `createEffect`, `createComputed`, `createMemo` behaviors using composable and reusable **modifiers**.
 
