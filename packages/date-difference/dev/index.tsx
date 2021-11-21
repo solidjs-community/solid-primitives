@@ -1,21 +1,17 @@
 import { Component, createMemo, createSignal, on } from "solid-js";
 import { render } from "solid-js/web";
-import { valToPwMid, clamp, valToP, pToVal } from "./utils";
+import { clamp, valToP, pToVal } from "./utils";
 import createDateDifference, { createDateNow } from "../src";
 import listen from "@solid-primitives/event-listener";
 import "./tailwind.css";
 import { createEffect } from "solid-js";
-import { format } from "date-fns";
+import { format, formatRelative } from "date-fns";
 import { onMount } from "solid-js";
-import { MaybeAccessor } from "../src/common";
-import {
-  createCompositeEffect,
-  createCompositeMemo,
-  createModifier
-} from "@solid-primitives/composites";
+import { createCompositeEffect, createModifier } from "@solid-primitives/composites";
 
 const withMounted = createModifier<void>((s, cb) => {
   onMount(() => {
+    // @ts-ignore
     cb(s(), undefined, undefined);
   });
   return [cb, {}];
@@ -28,8 +24,8 @@ const Slider: Component<{
   max: number;
 }> = props => {
   const [pageX, setPageX] = createSignal(0);
-  const [p, setP] = createSignal(clamp(valToP(props.value, props.min, props.max), 0, 1));
   const [dragging, setDragging] = createSignal(false);
+  const [p, setP] = createSignal(clamp(valToP(props.value, props.min, props.max), 0, 1));
 
   let bar!: HTMLDivElement;
 
@@ -38,7 +34,8 @@ const Slider: Component<{
     withMounted(p, () => setLeft((p() * 2 - 1) * ((bar.offsetWidth - 12) / 2)))
   );
 
-  const value = createMemo(on(p, p => pToVal(p, props.min, props.max)));
+  const bezier = t => t * t * t;
+  const value = createMemo(on(p, p => pToVal((bezier(p * 2 - 1) + 1) / 2, props.min, props.max)));
   createEffect(
     on(
       pageX,
@@ -56,7 +53,7 @@ const Slider: Component<{
   listen(window, "mouseup", () => setDragging(false));
 
   return (
-    <div ref={bar} class="h-6 my-2 relative bg-blue-100 rounded-full" style={{ width: "80vw" }}>
+    <div ref={bar} class="h-6 my-4 relative bg-gray-100 rounded-full" style={{ width: "80vw" }}>
       <div
         class="w-6 h-6 border-2 border-blue-400 box-content absolute bg-blue-400 rounded-full select-none left-1/2 -top-0.5 -ml-3"
         style={{ transform: `translateX(${left() ?? 0 - 2}px)` }}
@@ -70,28 +67,47 @@ const Slider: Component<{
 };
 
 const App: Component = () => {
-  const timeRange = 50000000000;
+  const timeRange = 10_000_000_000;
 
   const [updateNowInterval, setUpdateNowInterval] = createSignal(1_000);
 
   const [inputTimeMs, setInputTimeMs] = createSignal(0);
   const targetTimestamp = createMemo(() => Date.now() + inputTimeMs());
 
-  const [timeago, { date, time: timestamp }] = createDateDifference(targetTimestamp);
+  const [timeago, { targetDate, targetTime }] = createDateDifference(targetTimestamp);
+
+  const [customTimeago] = createDateDifference(targetTimestamp, {
+    min: 10000,
+    updateInterval: 30_000,
+    relativeFormatter: (target, now) => formatRelative(target, now)
+  });
+
+  const [customTimeago2] = createDateDifference(targetTimestamp, {
+    min: 0,
+    max: 1_000_000_000,
+    updateInterval: diff => (diff <= 60_000 ? 1000 : diff <= 3600_000 ? 30_000 : 1800_000),
+    fullDateFormatter: date => format(date, "d MMM yyyy — HH:mm")
+  });
 
   const [dateNow] = createDateNow(updateNowInterval);
 
   return (
-    <div class="w-screen min-h-screen overflow-hidden flex flex-col justify-center items-center">
-      <div class="mb-4">
-        NOW: <span>{format(dateNow(), "d MMM yyyy — HH:mm:ss:SSS")}</span>
+    <div class="w-screen min-h-screen overflow-hidden flex flex-col justify-center items-center space-y-12 bg-gray-50">
+      <div class="flex flex-col items-center p-8 bg-white rounded-3xl shadow-lg">
+        <div>
+          NOW: <span>{format(dateNow(), "d MMM yyyy — HH:mm:ss:SSS")}</span>
+        </div>
+        <p>Update "now" every {updateNowInterval()}ms</p>
+        <Slider ondrag={setUpdateNowInterval} min={200} max={10_000} value={updateNowInterval()} />
       </div>
-      <p>Update "now" every {updateNowInterval()}ms</p>
-      <Slider ondrag={setUpdateNowInterval} min={200} max={10_000} value={updateNowInterval()} />
-      <p>{inputTimeMs()}ms</p>
-      <Slider ondrag={setInputTimeMs} value={0} min={-timeRange} max={timeRange} />
-      <p>{targetTimestamp()}</p>
-      <p>{timeago()}</p>
+      <div class="flex flex-col items-center p-8 bg-white rounded-3xl shadow-lg">
+        <p>{inputTimeMs()}ms</p>
+        <Slider ondrag={setInputTimeMs} value={0} min={-timeRange} max={timeRange} />
+        <p>TARGET: {format(targetTime(), "d MMM yyyy — HH:mm")}</p>
+        <p>DEFAULT: {timeago()}</p>
+        <p>CUSTOM: {customTimeago()}</p>
+        <p>CUSTOM2: {customTimeago2()}</p>
+      </div>
     </div>
   );
 };
