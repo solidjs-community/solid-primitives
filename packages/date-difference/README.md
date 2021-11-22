@@ -105,7 +105,7 @@ interface DateDifferenceOptions {
   /**
    * Messages for formating the string
    */
-  messages?: DateDifferenceMessages;
+  messages?: Partial<DateDifferenceMessages>;
 
   /**
    * Formatter for full date

@@ -47,7 +47,7 @@ export interface DateDifferenceOptions {
   /**
    * Messages for formating the string
    */
-  messages?: DateDifferenceMessages;
+  messages?: Partial<DateDifferenceMessages>;
 
   /**
    * Formatter for full date
@@ -140,7 +140,7 @@ export function createDateNow(interval: MaybeAccessor<number> = MINUTE / 2): [Ac
  * @example
  * ```ts
  * const [myDate, setMyDate] = createSignal(new Date('Jun 28, 2021'))
- * const [timeago, { target, now, update }] = createDateDifference();
+ * const [timeago, { target, now, update }] = createDateDifference(myDate);
  * // => 5 months ago
  *
  * // use custom libraries to change formatting:
@@ -166,12 +166,13 @@ export function createDateDifference(
 ] {
   const {
     min = MINUTE,
-    messages = DEFAULT_MESSAGES,
     max = Infinity,
     updateInterval = DEFAULT_UPDATE_INTERVAL,
     absoluteFormatter = DEFAULT_FORMATTER,
     relativeFormatter
   } = options;
+  // users don't need to set the whole messages object
+  const messages: DateDifferenceMessages = Object.assign(DEFAULT_MESSAGES, options.messages);
 
   const target = createMemo(() => new Date(access(date)));
   const [interval, setInterval] = createSignal(0);
