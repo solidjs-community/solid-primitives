@@ -153,7 +153,7 @@ export function createDateNow(interval: MaybeAccessor<number> = MINUTE / 2): [Ac
  * // => last Monday at 9:25 AM
  * ```
  */
-export default function createDateDifference(
+export function createDateDifference(
   date: MaybeAccessor<number | Date | string>,
   options: DateDifferenceOptions = {}
 ): [

@@ -1,13 +1,14 @@
+import { createDateDifference, createDateNow, HOUR, MINUTE, SECOND, WEEK, YEAR } from "../src";
 import { Component, createMemo, createSignal, on } from "solid-js";
 import { render } from "solid-js/web";
 import { clamp, valToP, pToVal } from "./utils";
-import createDateDifference, { createDateNow, HOUR, MINUTE, SECOND, WEEK, YEAR } from "../src";
 import listen from "@solid-primitives/event-listener";
-import "./tailwind.css";
 import { createEffect } from "solid-js";
 import { format, formatRelative } from "date-fns";
 import { onMount } from "solid-js";
 import { createCompositeEffect, createModifier } from "@solid-primitives/composites";
+
+import "uno.css";
 
 const withMounted = createModifier<void>((s, cb) => {
   onMount(() => {
@@ -53,7 +54,7 @@ const Slider: Component<{
   listen(window, "mouseup", () => setDragging(false));
 
   return (
-    <div ref={bar} class="h-6 my-4 relative bg-gray-100 rounded-full" style={{ width: "80vw" }}>
+    <div ref={bar} class="w-[80vw] h-6 my-4 relative bg-gray-100 rounded-full">
       <div
         class="w-6 h-6 border-2 border-blue-400 box-content absolute bg-blue-400 rounded-full select-none left-1/2 -top-0.5 -ml-3"
         style={{ transform: `translateX(${left() ?? 0 - 2}px)` }}

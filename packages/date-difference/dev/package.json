@@ -17,10 +17,6 @@
   },
   "keywords": [],
   "devDependencies": {
-    "autoprefixer": "^10.4.0",
-    "postcss": "^8.3.11",
-    "tailwindcss": "^2.2.19",
-    "vite-plugin-windicss": "^1.5.1",
-    "windicss": "^3.2.1"
+    "unocss": "^0.12.1"
   }
 }

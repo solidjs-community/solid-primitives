@@ -24,6 +24,8 @@ Creates an autoupdating and reactive `new Date()`
 ### Usage
 
 ```ts
+import { createDateNow } from "@solid-primitives/date-difference";
+
 // updates every second:
 const [now] = createDateNow(1000);
 
@@ -47,6 +49,8 @@ Provides a reactive, formatted date difference in relation to now.
 ### Usage
 
 ```ts
+import { createDateDifference } from "@solid-primitives/date-difference";
+
 const [myDate, setMyDate] = createSignal(new Date("Jun 28, 2021"));
 const [timeago, { target, now, update }] = createDateDifference();
 // => 5 months ago
@@ -72,7 +76,7 @@ function createDateDifference(
   {
     target: Accessor<Date>;
     now: Accessor<Date>;
-    update: Fn;
+    update: Function;
   }
 ];
 
@@ -112,6 +116,21 @@ interface DateDifferenceOptions {
    * Relative time formatter
    */
   relativeFormatter?: (target: Date, now: Date, diff: number) => string;
+}
+
+type MessageFormatter<T = number> = (value: T, isPast: boolean) => string;
+
+interface DateDifferenceMessages {
+  justNow: string;
+  past: string | MessageFormatter<string>;
+  future: string | MessageFormatter<string>;
+  year: string | MessageFormatter<number>;
+  month: string | MessageFormatter<number>;
+  day: string | MessageFormatter<number>;
+  week: string | MessageFormatter<number>;
+  hour: string | MessageFormatter<number>;
+  minute: string | MessageFormatter<number>;
+  second: string | MessageFormatter<number>;
 }
 ```
 
