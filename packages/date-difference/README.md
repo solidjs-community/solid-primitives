@@ -52,7 +52,7 @@ Provides a reactive, formatted date difference in relation to now.
 import { createDateDifference } from "@solid-primitives/date-difference";
 
 const [myDate, setMyDate] = createSignal(new Date("Jun 28, 2021"));
-const [timeago, { target, now, update }] = createDateDifference();
+const [timeago, { target, now, update }] = createDateDifference(myDate);
 // => 5 months ago
 
 // use custom libraries to change formatting:
