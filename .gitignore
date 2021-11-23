@@ -160,3 +160,9 @@ temp/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,node
 .vscode/settings.json
+
+##################################################################################
+
+# Packages don't need lock files, only apps do.
+*lock.json
+*.lock
