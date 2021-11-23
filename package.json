@@ -7,6 +7,7 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "install": "lerna bootstrap --concurrency 4",
     "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx}\"",
     "ls": "lerna-script"
   },
