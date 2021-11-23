@@ -7,7 +7,7 @@ describe("createEventListener", () => {
       createRoot(dispose => {
         const target = new EventTarget();
         const testEvent = new Event("test");
-        createEventListener<{ test: Event }>(target, "test", ev => {
+        createEventListener<{ test: Event }, EventTarget>(target, "test", ev => {
           expect(ev).toBe(testEvent);
           dispose();
           resolve();
@@ -22,7 +22,7 @@ describe("createEventListener", () => {
         const target = new EventTarget();
         const testEvent = new Event("test");
         let count = 0;
-        createEventListener<{ test: Event }>(target, "test", () => {
+        createEventListener<{ test: Event }, EventTarget>(target, "test", () => {
           count++;
         });
         target.dispatchEvent(testEvent);
@@ -40,7 +40,7 @@ describe("createEventListener", () => {
         const targets = [new EventTarget(), new EventTarget()];
         const testEvent = new Event("test");
         let count = 0;
-        createEventListener<{ test: Event }>(targets, "test", () => {
+        createEventListener<{ test: Event }, EventTarget[]>(targets, "test", () => {
           count++;
         });
         targets.forEach(target => target.dispatchEvent(testEvent));
@@ -57,7 +57,7 @@ describe("createEventListener", () => {
       createRoot(dispose => {
         const target = document.createElement("div");
         const testEvent = new Event("load");
-        const [props, setProps] = createSignal<EventListenerProps>([
+        const [props, setProps] = createSignal<EventListenerProps<HTMLDivElement>>([
           "load",
           (ev: Event) => expect(ev).toBe(testEvent)
         ]);
