@@ -31,7 +31,7 @@
     "primitives"
   ],
   "devDependencies": {
-    "@types/jest": "^26.0.10",
+    "@types/jest": "^27.0.0",
     "prettier": "^2.0.5",
     "solid-testing-library": "^0.2.0",
     "ts-jest": "^27.0.6",
