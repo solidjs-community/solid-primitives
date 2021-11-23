@@ -92,6 +92,7 @@ export const createEventListener: CreateEventListenerFn = (target, ...propsArray
         )(propsArray.slice(1) as EventProps);
   const add = (target: EventTarget) => {
     targets.includes(target) || targets.push(target);
+    console.log("#############################################");
     target.addEventListener.apply(target, props());
   };
   const remove = (target: EventTarget) => {
