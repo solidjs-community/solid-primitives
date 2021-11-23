@@ -9,8 +9,8 @@ Category: Utilities
 # @solid-primitives/date-difference
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/date-difference?style=for-the-badge?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/date-difference)
-[![size](https://img.shields.io/npm/v/@solid-primitives/date-difference?style=for-the-badge?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/date-difference)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/date-difference?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/date-difference)
+[![size](https://img.shields.io/npm/v/@solid-primitives/date-difference?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/date-difference)
 
 Two reactive primitives that provide autoupdating, relative date features.
 
