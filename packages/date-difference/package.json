@@ -24,6 +24,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
+    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
     "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
@@ -36,15 +37,21 @@
     "primitives"
   ],
   "devDependencies": {
-    "jsdom": "^18.0.1",
-    "prettier": "^2.0.5",
+    "jsdom": "^18.1.1",
+    "prettier": "^2.4.1",
     "rimraf": "^3.0.2",
-    "solid-register": "^0.0.10",
-    "tslib": "^2.0.1",
+    "solid-register": "^0.0.15",
+    "tslib": "^2.3.1",
     "typescript": "^4.5.2",
-    "uvu": "^0.5.2"
+    "uvu": "^0.5.2",
+    "@solid-primitives/composites": "^1.0.1",
+    "@solid-primitives/event-listener": "^1.2.4",
+    "date-fns": "^2.26.0",
+    "vite": "2.6.14",
+    "vite-plugin-solid": "2.1.2",
+    "unocss": "^0.12.4"
   },
   "peerDependencies": {
-    "solid-js": "^1.2.3"
+    "solid-js": "^1.2.5"
   }
 }

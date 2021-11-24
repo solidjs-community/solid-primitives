@@ -1,6 +1,6 @@
 ---
 Name: date-difference
-Stage: 1
+Stage: 2
 Package: "@solid-primitives/date-difference"
 Primitives: createDateNow, createDateDifference
 Category: Utilities
@@ -115,10 +115,17 @@ interface DateDifferenceOptions {
   /**
    * Relative time formatter
    */
-  relativeFormatter?: (target: Date, now: Date, diff: number) => string;
+  relativeFormatter?: RelativeFormatter;
 }
 
 type MessageFormatter<T = number> = (value: T, isPast: boolean) => string;
+
+type RelativeFormatter = (
+  target: Date,
+  now: Date,
+  diff: number,
+  messages: DateDifferenceMessages
+) => string;
 
 interface DateDifferenceMessages {
   justNow: string;
@@ -146,6 +153,10 @@ https://codesandbox.io/s/solid-date-difference-hjxui?file=/index.tsx
 0.0.100
 
 Initial release as a Stage-0 primitive.
+
+1.0.0
+
+Stage-2 realease.
 
 </details>
 
