@@ -3,6 +3,13 @@ import { access, Fn, MaybeAccessor } from "./common";
 
 export type MessageFormatter<T = number> = (value: T, isPast: boolean) => string;
 
+export type RelativeFormatter = (
+  target: Date,
+  now: Date,
+  diff: number,
+  messages: DateDifferenceMessages
+) => string;
+
 export interface DateDifferenceMessages {
   justNow: string;
   past: string | MessageFormatter<string>;
@@ -57,7 +64,7 @@ export interface DateDifferenceOptions {
   /**
    * Relative time formatter
    */
-  relativeFormatter?: (target: Date, now: Date, diff: number) => string;
+  relativeFormatter?: RelativeFormatter;
 }
 
 export const SECOND = 1000,
@@ -97,6 +104,29 @@ const DEFAULT_MESSAGES: DateDifferenceMessages = {
 const DEFAULT_FORMATTER = (date: Date) => date.toISOString().slice(0, 10);
 
 const DEFAULT_UPDATE_INTERVAL = (abs_diff: number) => (abs_diff <= HOUR ? MINUTE / 2 : HOUR / 2);
+
+const DEFAULT_RELATIVE_FORMATTER: RelativeFormatter = (target, now, diff, messages) => {
+  const absDiff = Math.abs(diff);
+
+  for (const unit of UNITS) {
+    if (absDiff < unit.max) return format(unit);
+  }
+  return messages.justNow;
+
+  function applyFormat(name: keyof DateDifferenceMessages, val: number | string, isPast: boolean) {
+    const formatter = messages[name];
+    if (typeof formatter === "function") return formatter(val as never, isPast);
+    return formatter.replace("{0}", val.toString());
+  }
+
+  function format(unit: Unit) {
+    const val = Math.round(absDiff / unit.value);
+    const past = diff < 0;
+
+    const str = applyFormat(unit.name, val, past);
+    return applyFormat(past ? "past" : "future", str, past);
+  }
+};
 
 /**
  * Creates an autoupdating and reactive `new Date()`
@@ -169,7 +199,7 @@ export function createDateDifference(
     max = Infinity,
     updateInterval = DEFAULT_UPDATE_INTERVAL,
     absoluteFormatter = DEFAULT_FORMATTER,
-    relativeFormatter
+    relativeFormatter = DEFAULT_RELATIVE_FORMATTER
   } = options;
   // users don't need to set the whole messages object
   const messages: DateDifferenceMessages = Object.assign(DEFAULT_MESSAGES, options.messages);
@@ -185,30 +215,9 @@ export function createDateDifference(
 
   const timeAgo = createMemo(() => {
     if (absDiff() < min) return messages.justNow;
-
     if (absDiff() > max) return absoluteFormatter(target());
-
-    if (relativeFormatter) return relativeFormatter(target(), now(), diff());
-
-    for (const unit of UNITS) {
-      if (absDiff() < unit.max) return format(unit);
-    }
-    return messages.justNow;
+    return relativeFormatter(target(), now(), diff(), messages);
   });
-
-  function applyFormat(name: keyof DateDifferenceMessages, val: number | string, isPast: boolean) {
-    const formatter = messages[name];
-    if (typeof formatter === "function") return formatter(val as never, isPast);
-    return formatter.replace("{0}", val.toString());
-  }
-
-  function format(unit: Unit) {
-    const val = Math.round(absDiff() / unit.value);
-    const past = diff() < 0;
-
-    const str = applyFormat(unit.name, val, past);
-    return applyFormat(past ? "past" : "future", str, past);
-  }
 
   return [
     timeAgo,
