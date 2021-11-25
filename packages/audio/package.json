@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/audio",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Primitives to manage audio and single sounds.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -8,6 +8,7 @@
   "private": false,
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "type": "module",
   "types": "dist/index.d.ts",
   "files": [
     "dist"

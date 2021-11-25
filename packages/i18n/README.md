@@ -93,8 +93,12 @@ First commit of the i18n primitive.
 
 General package clean-up and added testing facility.
 
-1.0.01
+1.0.1
 
 Releasd with CJS support.
+
+1.0.2
+
+Patch CJS support release.
 
 </details>

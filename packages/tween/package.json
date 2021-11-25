@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/tween",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Primitive that creates tween functions",
   "author": "Ryan Carniato <ryancarniato@gmail.com>",
   "license": "MIT",
@@ -9,6 +9,7 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "files": [
     "dist"
   ],

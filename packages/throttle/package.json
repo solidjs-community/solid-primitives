@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/throttle",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Primitive that creates a throttle function",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -11,6 +11,7 @@
   },
   "private": false,
   "main": "dist/index.js",
+  "type": "module",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

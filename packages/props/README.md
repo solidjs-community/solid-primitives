@@ -85,7 +85,7 @@ TODO
 
 Initial release
 
-1.0.0
+1.0.1
 
 Release initial version with CJS support.
 

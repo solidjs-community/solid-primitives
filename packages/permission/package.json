@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/permission",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Primitive that wraps permission queries",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
@@ -8,6 +8,7 @@
   "private": false,
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "type": "module",
   "types": "dist/index.d.ts",
   "files": [
     "dist"

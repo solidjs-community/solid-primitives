@@ -163,4 +163,8 @@ Initial release
 
 First proper release of storage engine with CJS support.
 
+1.0.1
+
+Patch CJS support.
+
 </details>

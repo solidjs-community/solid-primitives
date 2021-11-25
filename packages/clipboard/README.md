@@ -46,7 +46,7 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-c
 
 Committing first version of primitive.
 
-1.0.2
+1.0.4
 
 Added CJS export and removed outdated permision structure.
 

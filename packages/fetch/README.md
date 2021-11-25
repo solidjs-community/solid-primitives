@@ -51,4 +51,8 @@ Improve test setup
 
 Add tests for error case, remove stray console.warn
 
+1.0.2
+
+Released CJS support.
+
 </details>

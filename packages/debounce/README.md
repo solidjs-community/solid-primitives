@@ -42,7 +42,7 @@ Improved types, minor clean-up and added tests.
 
 Changed any to unknown type and applied patch from high1.
 
-1.0.3
+1.0.4
 
 Adding CJS support to package.
 

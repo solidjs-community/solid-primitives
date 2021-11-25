@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/countdown",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Primitive to create a countdown timer",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -9,6 +9,7 @@
   "files": [
     "dist"
   ],
+  "type": "module",
   "exports": {
     "require": "./dist/cjs/index.js",
     "import": "./dist/index.js",

@@ -38,7 +38,7 @@ First version of the throttle primitive.
 
 Cleaned up return types and documentation.
 
-1.0.4
+1.0.5
 
 Adding CJS support to package.
 

@@ -59,7 +59,7 @@ Pulling an early release of the package together and preparing for 1.0.0 release
 
 Added testing, improved types, changed name of createGeolocationWatcher to createGeolocationMonitor.
 
-1.0.1
+1.0.2
 
 Published with CJS support.
 

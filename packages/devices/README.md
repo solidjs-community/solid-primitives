@@ -39,7 +39,7 @@ TODO
 
 Initial release loosely adapted from https://github.com/microcipcip/vue-use-kit/blob/master/src/functions/useMediaDevices/useMediaDevices.ts.
 
-1.0.0
+1.0.1
 
 Released official version, CJS and updated to Stage 3
 

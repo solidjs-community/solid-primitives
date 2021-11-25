@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/storage",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Primitive that provides reactive wrappers for storage access",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
@@ -9,6 +9,7 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "files": [
     "dist"
   ],

@@ -25,9 +25,9 @@ import createSocialShare from "@solid-promitives/share";
 import { facebook } from "@solid-promitives/share/networks";
 
 const [share, close] = createSocialShare({
-  title: 'SolidJS.com',
-  url: 'https://www.solidjs.com',
-  description: 'Simple and performant reactivity!' 
+  title: "SolidJS.com",
+  url: "https://www.solidjs.com",
+  description: "Simple and performant reactivity!"
 });
 share(facebook);
 ```
@@ -44,5 +44,9 @@ You may view a working example here: [ link to Stackblize or CodeSandBox ]
 0.0.100
 
 Initial release as a Stage-0 primitive.
+
+0.0.101
+
+Added CJS support.
 
 </details>

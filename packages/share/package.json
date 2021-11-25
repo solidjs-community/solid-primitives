@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/share",
-  "version": "0.0.100",
+  "version": "0.0.101",
   "description": "Primitives to help with sharing content on social media and beyond.",
   "author": "David Di Biase <dave.dibiase@gmail.com",
   "license": "MIT",
@@ -9,6 +9,7 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "files": [
     "dist"
   ],

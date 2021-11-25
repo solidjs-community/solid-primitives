@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/clipboard",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Primitives for reading and writing to clipboard.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -9,6 +9,7 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "files": [
     "dist"
   ],

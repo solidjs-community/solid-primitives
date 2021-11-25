@@ -25,7 +25,7 @@ Provides a reactive resize observer wrapper.
 
 Initial commit of the resize observer.
 
-1.0.0
+1.0.1
 
 Release initial version for CJS support.
 
