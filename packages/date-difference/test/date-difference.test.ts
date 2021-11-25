@@ -1,7 +1,16 @@
 import { createRoot, createSignal } from "solid-js";
 import { test } from "uvu";
 import * as assert from "uvu/assert";
-import { createDateDifference, HOUR, MINUTE, MONTH, WEEK, YEAR } from "../src";
+import {
+  createDateDifference,
+  DateDifferenceMessages,
+  DAY,
+  HOUR,
+  MINUTE,
+  MONTH,
+  WEEK,
+  YEAR
+} from "../src";
 
 test("returns correct values", () => {
   createRoot(dispose => {
@@ -104,6 +113,49 @@ test("custom absolute formatter", () => {
     setDate(p => p - 2 * HOUR);
     assert.is(timeago(), "absolute", "absolute formatter should be appled");
     assert.is(capturedDate, target(), "captured date should math the target()");
+
+    dispose();
+  });
+});
+
+test("custom messages", () => {
+  createRoot(dispose => {
+    const [date, setDate] = createSignal<number>(Date.now());
+
+    const messages: Partial<DateDifferenceMessages> = {
+      justNow: "NOW",
+      future: n => `in the next ${n}`,
+      day: (n, past) => `${n} DAY${n > 1 ? "S" : ""}`,
+      week: (n, past) => (n === 1 ? "week" : `${n} weeks`)
+    };
+
+    const [timeago] = createDateDifference(date, {
+      updateInterval: 0,
+      messages
+    });
+
+    assert.is(timeago(), "NOW");
+
+    setDate(p => p - 3 * MINUTE);
+    assert.is(timeago(), "3 minutes ago");
+
+    setDate(p => p - 2 * DAY);
+    assert.is(timeago(), "2 DAYS ago");
+
+    setDate(p => p + 1 * WEEK + 2 * DAY);
+    assert.is(timeago(), "in the next week");
+
+    setDate(p => p + 1 * WEEK);
+    assert.is(timeago(), "in the next 2 weeks");
+
+    setDate(p => p + 2 * MONTH);
+    assert.is(timeago(), "in the next 2 months");
+
+    setDate(p => p - YEAR - 2 * MONTH);
+    assert.is(timeago(), "last year");
+
+    setDate(p => p - YEAR);
+    assert.is(timeago(), "2 years ago");
 
     dispose();
   });

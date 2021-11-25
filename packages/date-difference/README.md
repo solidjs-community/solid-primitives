@@ -1,6 +1,6 @@
 ---
 Name: date-difference
-Stage: 1
+Stage: 2
 Package: "@solid-primitives/date-difference"
 Primitives: createDateNow, createDateDifference
 Category: Utilities
@@ -9,8 +9,8 @@ Category: Utilities
 # @solid-primitives/date-difference
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/date-difference?style=for-the-badge?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/date-difference)
-[![size](https://img.shields.io/npm/v/@solid-primitives/date-difference?style=for-the-badge?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/date-difference)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/date-difference?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/date-difference)
+[![size](https://img.shields.io/npm/v/@solid-primitives/date-difference?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/date-difference)
 
 Two reactive primitives that provide autoupdating, relative date features.
 
@@ -115,10 +115,17 @@ interface DateDifferenceOptions {
   /**
    * Relative time formatter
    */
-  relativeFormatter?: (target: Date, now: Date, diff: number) => string;
+  relativeFormatter?: RelativeFormatter;
 }
 
 type MessageFormatter<T = number> = (value: T, isPast: boolean) => string;
+
+type RelativeFormatter = (
+  target: Date,
+  now: Date,
+  diff: number,
+  messages: DateDifferenceMessages
+) => string;
 
 interface DateDifferenceMessages {
   justNow: string;
@@ -146,6 +153,10 @@ https://codesandbox.io/s/solid-date-difference-hjxui?file=/index.tsx
 0.0.100
 
 Initial release as a Stage-0 primitive.
+
+1.0.0
+
+Stage-2 realease.
 
 </details>
 
