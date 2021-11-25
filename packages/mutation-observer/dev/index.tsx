@@ -150,7 +150,7 @@ const OneParentManyChildrenIndex: Component = () => {
       const removed: string[] = [];
       e.forEach(record => {
         if (record.addedNodes.length) added.push(record.addedNodes[0].textContent);
-        else removed.push(record.removedNodes[0].textContent);
+        if (record.removedNodes.length) removed.push(record.removedNodes[0].textContent);
       });
       setLast({ added, removed });
     }

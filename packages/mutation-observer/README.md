@@ -12,7 +12,7 @@ Category: Browser APIs
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/mutation-observer?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/mutation-observer)
 [![size](https://img.shields.io/npm/v/@solid-primitives/mutation-observer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/mutation-observer)
 
-Primitive providing the ability to watch for changes being made to the DOM tree.
+Primitive providing the ability to watch for changes being made to the DOM tree. A wrapper for Browser's [MutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver).
 
 ## Usage
 
@@ -89,6 +89,7 @@ type MutationObserverReturn = [
     start: Fn;
     stop: Fn;
     instance: MutationObserver;
+    isSupported: boolean;
   }
 ];
 

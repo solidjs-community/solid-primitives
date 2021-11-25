@@ -13,6 +13,7 @@ export type MutationObserverReturn = [
     start: Fn;
     stop: Fn;
     instance: MutationObserver;
+    isSupported: boolean;
   }
 ];
 
@@ -39,7 +40,7 @@ export type E = JSX.Element;
  * @param callback function called by MutationObserver when DOM tree mutation is triggered
  * 
  * @see https://github.com/davedbase/solid-primitives/tree/main/packages/mutation-observer
- * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver#constructor
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
  * 
  * @example
  * ```ts
@@ -73,6 +74,7 @@ export function createMutationObserver(
   c?: MutationCallback
 ): MutationObserverReturn {
   let defaultOptions: MutationObserverInit, callback: MutationCallback;
+  const isSupported = window && "MutationObserver" in window;
   if (typeof b === "function") {
     defaultOptions = {};
     callback = b;
@@ -80,14 +82,14 @@ export function createMutationObserver(
     defaultOptions = b;
     callback = c as MutationCallback;
   }
-  const instance = new MutationObserver(callback);
-  const add: MutationObserverAdd = (el, options) => instance.observe(el, access(options));
+  const instance = isSupported ? new MutationObserver(callback) : undefined;
+  const add: MutationObserverAdd = (el, options) => instance?.observe(el, access(options));
   const start = () => {
     accessAsArray(initial).forEach(item => {
       item instanceof Node ? add(item, defaultOptions) : add(item[0], item[1]);
     });
   };
-  const stop = () => instance.takeRecords().length && instance.disconnect();
+  const stop = () => instance?.takeRecords().length && instance?.disconnect();
   onMount(start);
   onCleanup(stop);
   return [
@@ -95,7 +97,8 @@ export function createMutationObserver(
     {
       start,
       stop,
-      instance
+      instance: instance as MutationObserver,
+      isSupported
     }
   ];
 }
@@ -107,7 +110,7 @@ export function createMutationObserver(
  * @param props [MutationObserver options, callback]
  *
  * @see https://github.com/davedbase/solid-primitives/tree/main/packages/mutation-observer
- * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver#constructor
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
  *
  * @example
  * ```tsx
