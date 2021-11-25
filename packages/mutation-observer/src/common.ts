@@ -13,8 +13,9 @@ export type MaybeAccessor<T> = T | Accessor<T>;
 
 export const access = <T>(v: MaybeAccessor<T>): T => (typeof v === "function" ? (v as any)() : v);
 
-export const accessAsArray = <T>(value: MaybeAccessor<T[] | T>): T[] => {
+export const accessAsArray = <T>(value: MaybeAccessor<T>): T extends Array<any> ? T : T[] => {
   const _value = access(value);
+  // @ts-ignore
   return Array.isArray(_value) ? _value : [_value];
 };
 

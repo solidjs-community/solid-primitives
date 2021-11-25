@@ -1,5 +1,15 @@
 import { createMutationObserver } from "../src";
-import { Component, createEffect, createSignal, For, Index, onMount, Show } from "solid-js";
+import {
+  Component,
+  createEffect,
+  createSignal,
+  For,
+  Index,
+  JSX,
+  onMount,
+  Show,
+  splitProps
+} from "solid-js";
 import { render } from "solid-js/web";
 import { createCompositeEffect, debounce } from "@solid-primitives/composites";
 import "uno.css";
@@ -11,16 +21,41 @@ const toggleItems = (array: readonly boolean[], toggle: number[]): boolean[] => 
   return copy;
 };
 
-const TestNode: Component = props => {
+const TestingNode: Component<{ output?: JSX.Element; heading?: string }> = props => {
   return (
-    <div class="bg-gray-900 p-6 rounded-lg border-1 border-gray-800 flex flex-col items-center space-y-2">
-      {props.children}
+    <div class="bg-gray-900 rounded-lg border-1 border-gray-800">
+      <Show when={props.heading}>
+        <div class="border-0 border-b border-gray-800 py-3 px-6 center-child">
+          <h5>{props.heading}</h5>
+        </div>
+      </Show>
+      <div class="p-6 flex flex-col items-center space-y-2">{props.children}</div>
+      <Show when={props.output}>
+        <div class="border-0 border-t border-gray-800 p-3 flex flex-col items-center space-y-1 text-xs font-mono text-gray-500 leading-tight">
+          {props.output}
+        </div>
+      </Show>
     </div>
   );
 };
 
+const ToggleBtn: Component<{ state: boolean } & JSX.HTMLAttributes<HTMLButtonElement>> = props => {
+  const [, attrs] = splitProps(props, ["children", "state"]);
+  return (
+    <button
+      class="bg-gray-700 text-gray-100 w-6 h-6 center-child select-none cursor-pointer rounded border-1 border-gray-600 hover:bg-gray-600"
+      classList={{
+        "!bg-green-700 border-green-600 !hover:bg-green-600": props.state
+      }}
+      {...attrs}
+    >
+      {props.children}
+    </button>
+  );
+};
+
 const DisplayRecord: Component<{ record: Record<string, any> }> = props => (
-  <div class="text-xs font-mono text-gray-500">
+  <div>
     <For each={Object.keys(props.record)}>
       {k => (
         <p>
@@ -68,34 +103,74 @@ const SingleParentTest: Component = () => {
   let log!: (e: MutationRecord) => void;
   let ref!: HTMLDivElement;
 
-  onMount(() => {
-    createMutationObserver([[ref, { childList: true }]], ([e]) => {
-      console.log(e);
-      log(e);
-    });
-  });
+  createMutationObserver(
+    () => ref,
+    { childList: true },
+    e => log(e[0])
+  );
   return (
-    <>
-      <h5>One Parent - One Child</h5>
-      <div class="flex flex-wrap justify-center gap-4 max-w-42">
-        <div ref={ref} class="w-14 h-10 relative bg-gray-800" onclick={() => setShow(p => !p)}>
-          <Show when={show()}>
-            <div class="absolute inset-0 bg-teal-600"></div>
-          </Show>
-        </div>
+    <TestingNode
+      heading="One Parent - One Child"
+      output={<LogMutationRecord setupLogFunc={fn => (log = fn)} />}
+    >
+      <div
+        ref={ref}
+        class="w-14 h-10 relative bg-gray-800 border-1 border-gray-700 hover:bg-gray-700 rounded cursor-pointer"
+        onclick={() => setShow(p => !p)}
+      >
+        <Show when={show()}>
+          <div class="absolute -inset-1px bg-teal-600 border-1 border-teal-500 hover:bg-teal-500 rounded cursor-pointer"></div>
+        </Show>
       </div>
-      <LogMutationRecord setupLogFunc={fn => (log = fn)} />
-    </>
+    </TestingNode>
+  );
+};
+
+const ManyParents: Component = () => {
+  const [list, setList] = createSignal([true, true, true, true]);
+  const toggle = (i: number) => setList(toggleItems(list(), [i]));
+  const [parents, setParents] = createSignal<HTMLDivElement[]>([]);
+  const [message, setMessage] = createSignal("initial state");
+
+  createMutationObserver(parents, { childList: true }, ([record]) => {
+    if (record.removedNodes.length) {
+      setMessage(`Removed Node with index: ${record.removedNodes[0].textContent}`);
+    } else {
+      setMessage(`Added Node with index: ${record.addedNodes[0].textContent}`);
+    }
+  });
+
+  return (
+    <TestingNode heading="Many Parents - One Child" output={message}>
+      <p class="caption">Using {"<Index/>"}</p>
+      <div class="flex flex-wrap justify-center gap-4 max-w-42">
+        <Index each={list()}>
+          {(show, i) => (
+            <div
+              ref={el => setParents(p => [...p, el])}
+              class="w-14 h-10 relative bg-gray-800 border-1 border-gray-700 hover:bg-gray-700 rounded cursor-pointer"
+              onclick={() => toggle(i)}
+            >
+              <Show when={show()}>
+                <div class="absolute -inset-1px bg-teal-600 border-1 border-teal-500 hover:bg-teal-500 rounded cursor-pointer center-child select-none">
+                  {i}
+                </div>
+              </Show>
+            </div>
+          )}
+        </Index>
+      </div>
+    </TestingNode>
   );
 };
 
 const OneParentManyChildren: Component = () => {
-  const [show, setShow] = createSignal([true, true, true, true, true]);
+  const [show, setShow] = createSignal([true, true, true, true]);
   let parent!: HTMLDivElement;
 
   const [toggleQueue, setToggleQueue] = createSignal<number[]>([]);
   const toggle = (i: number) => setToggleQueue(p => [...p, i]);
-  const [lastRecords, setLastRectods] = createSignal<Object[]>([]);
+  const [last, setLast] = createSignal({ added: 0, removed: 0 });
 
   createCompositeEffect(
     debounce(
@@ -108,38 +183,33 @@ const OneParentManyChildren: Component = () => {
     )
   );
 
-  onMount(() =>
-    createMutationObserver([[parent, { childList: true }]], e =>
-      setLastRectods(
-        e.map(r => ({
-          type: r.type,
-          removedNodes: r.removedNodes.length,
-          addedNodes: r.addedNodes.length
-        }))
+  createMutationObserver(
+    () => parent,
+    { childList: true },
+    e =>
+      setLast(
+        e.reduce(
+          (t, c) => ({
+            added: t.added + c.addedNodes.length,
+            removed: t.removed + c.removedNodes.length
+          }),
+          { added: 0, removed: 0 }
+        )
       )
-    )
   );
   return (
-    <>
-      <h5>One Parent - Many Children</h5>
+    <TestingNode heading="One Parent - Many Children" output={<DisplayRecord record={last()} />}>
       <div class="flex space-x-1">
         <For each={show()}>
           {(s, i) => (
-            <div
-              class="bg-gray-700 w-6 h-6 flex justify-center items-center select-none"
-              classList={{ "bg-green-600": show()[i()] }}
-              onclick={() => toggle(i())}
-            >
+            <ToggleBtn state={show()[i()]} onClick={() => toggle(i())}>
               {i()}
-            </div>
+            </ToggleBtn>
           )}
         </For>
       </div>
       <p class="text-xs text-gray-500">using {"<For>"}</p>
-      <div
-        ref={parent}
-        class="!mt-4 flex flex-wrap justify-center content-start gap-4 max-w-42 min-h-42"
-      >
+      <div ref={parent} class="flex flex-wrap justify-center content-start gap-4 max-w-42 min-h-24">
         <For each={show()}>
           {(show, i) => (
             <Show when={show}>
@@ -148,18 +218,17 @@ const OneParentManyChildren: Component = () => {
           )}
         </For>
       </div>
-      <For each={lastRecords()}>{record => <DisplayRecord record={record} />}</For>
-    </>
+    </TestingNode>
   );
 };
 
 const OneParentManyChildrenIndex: Component = () => {
-  const [show, setShow] = createSignal([true, true, true, true, true]);
+  const [show, setShow] = createSignal([true, true, true, true]);
   let parent!: HTMLDivElement;
 
   const [toggleQueue, setToggleQueue] = createSignal<number[]>([]);
   const toggle = (i: number) => setToggleQueue(p => [...p, i]);
-  const [lastRecords, setLastRectods] = createSignal<Object[]>([]);
+  const [last, setLast] = createSignal({ added: 0, removed: 0 });
 
   createCompositeEffect(
     debounce(
@@ -172,38 +241,33 @@ const OneParentManyChildrenIndex: Component = () => {
     )
   );
 
-  onMount(() =>
-    createMutationObserver([[parent, { childList: true }]], e =>
-      setLastRectods(
-        e.map(r => ({
-          type: r.type,
-          removedNodes: r.removedNodes.length,
-          addedNodes: r.addedNodes.length
-        }))
+  createMutationObserver(
+    () => parent,
+    { childList: true },
+    e =>
+      setLast(
+        e.reduce(
+          (t, c) => ({
+            added: t.added + c.addedNodes.length,
+            removed: t.removed + c.removedNodes.length
+          }),
+          { added: 0, removed: 0 }
+        )
       )
-    )
   );
   return (
-    <>
-      <h5>One Parent - Many Children</h5>
+    <TestingNode heading="One Parent - Many Children" output={<DisplayRecord record={last()} />}>
       <div class="flex space-x-1">
         <For each={show()}>
           {(s, i) => (
-            <div
-              class="bg-gray-700 w-6 h-6 center-child select-none"
-              classList={{ "bg-green-600": show()[i()] }}
-              onclick={() => toggle(i())}
-            >
+            <ToggleBtn state={show()[i()]} onClick={() => toggle(i())}>
               {i()}
-            </div>
+            </ToggleBtn>
           )}
         </For>
       </div>
       <p class="caption">using {"<Index>"}</p>
-      <div
-        ref={parent}
-        class="!mt-4 flex flex-wrap justify-center content-start gap-4 max-w-42 min-h-42"
-      >
+      <div ref={parent} class="flex flex-wrap justify-center content-start gap-4 max-w-42 min-h-24">
         <Index each={show()}>
           {(show, i) => (
             <Show when={show()}>
@@ -212,23 +276,17 @@ const OneParentManyChildrenIndex: Component = () => {
           )}
         </Index>
       </div>
-      <For each={lastRecords()}>{record => <DisplayRecord record={record} />}</For>
-    </>
+    </TestingNode>
   );
 };
 
 const App: Component = () => {
   return (
     <div class="p-24 box-border w-full min-h-screen bg-black text-white flex justify-center items-center flex-wrap gap-12">
-      <TestNode>
-        <SingleParentTest />
-      </TestNode>
-      <TestNode>
-        <OneParentManyChildren />
-      </TestNode>
-      <TestNode>
-        <OneParentManyChildrenIndex />
-      </TestNode>
+      <SingleParentTest />
+      <ManyParents />
+      <OneParentManyChildren />
+      <OneParentManyChildrenIndex />
     </div>
   );
 };
