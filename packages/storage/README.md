@@ -16,7 +16,7 @@ Creates a primitive to reactively access both synchronous and asynchronous persi
 
 ## How to use it
 
-`createStorage` is meant to wrap any localStorage-like API to be as accessible as a [solid store](https://www.solidjs.com/docs/latest/api#createstore). The main differences are
+`createStorage` is meant to wrap any localStorage-like API to be as accessible as a [Solid Store](https://www.solidjs.com/docs/latest/api#createstore). The main differences are
 
 - that this store is persisted in whatever API is used,
 - that you can only use the topmost layer of the object and
