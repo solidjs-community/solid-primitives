@@ -10,18 +10,24 @@ export type Fn<R = void> = () => R;
  */
 export type ElementOf<T> = T extends (infer E)[] ? E : never;
 export type MaybeAccessor<T> = T | Accessor<T>;
+export type MaybeAccessorValue<T extends MaybeAccessor<any>> = T extends Fn ? ReturnType<T> : T;
 
-export const access = <T>(v: MaybeAccessor<T>): T => (typeof v === "function" ? (v as any)() : v);
+export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
+  typeof v === "function" ? (v as any)() : v;
 
-export const accessAsArray = <T>(value: MaybeAccessor<T>): T extends Array<any> ? T : T[] => {
+export const accessAsArray = <T extends MaybeAccessor<any>, V = MaybeAccessorValue<T>>(
+  value: T
+): V extends any[] ? V : V[] => {
   const _value = access(value);
-  // @ts-ignore
-  return Array.isArray(_value) ? _value : [_value];
+  return Array.isArray(_value) ? (_value as any) : [_value];
 };
 
-export const withAccess = <T>(value: MaybeAccessor<T>, fn: (value: NonNullable<T>) => void) => {
+export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue<A>>(
+  value: A,
+  fn: (value: NonNullable<V>) => void
+) => {
   const _value = access(value);
-  if (typeof _value !== "undefined" && _value !== null) fn(_value as NonNullable<T>);
+  if (typeof _value !== "undefined" && _value !== null) fn(_value as NonNullable<V>);
 };
 
 export const promiseTimeout = (

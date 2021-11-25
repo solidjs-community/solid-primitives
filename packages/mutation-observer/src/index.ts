@@ -1,15 +1,61 @@
-import { createEffect, createSignal, on, onCleanup, onMount } from "solid-js";
-import { createMutable } from "solid-js/store";
+import { onCleanup, onMount } from "solid-js";
+import type { JSX } from "solid-js";
 import { access, accessAsArray, Fn, MaybeAccessor } from "./common";
 
-type MutationObserverAdd = (target: Node, options: MutationObserverInit) => void;
+export type MutationObserverAdd = (
+  target: Node,
+  options: MaybeAccessor<MutationObserverInit>
+) => void;
 
-type MutationObserverReturn = {
-  add: MutationObserverAdd;
-  start: Fn;
-  stop: Fn;
-};
+export type MutationObserverReturn = [
+  add: MutationObserverAdd,
+  rest: {
+    start: Fn;
+    stop: Fn;
+    instance: MutationObserver;
+  }
+];
 
+export type MutationObserverStandaloneDirectiveProps = [
+  options: MutationObserverInit,
+  callback: MutationCallback
+];
+
+declare module "solid-js" {
+  namespace JSX {
+    interface Directives {
+      mutationObserver: MutationObserverInit | MutationObserverStandaloneDirectiveProps;
+    }
+  }
+}
+// this ensures the `JSX` import won't fall victim to tree shaking before typescript can use it
+export type E = JSX.Element;
+
+/**
+ * Primitive providing the ability to watch for changes being made to the DOM tree.
+ * 
+ * @param initial html elements to be observed by the MutationObserver
+ * @param options MutationObserver options
+ * @param callback function called by MutationObserver when DOM tree mutation is triggered
+ * 
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/mutation-observer
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver#constructor
+ * 
+ * @example
+ * ```ts
+ * let ref: !HTMLElement;
+ * const [observe, { start, stop, instance }] = createMutationObserver(
+ *   () => ref,
+ *   { attributes: true, subtree: true },
+ *   records => console.log(records)
+ * );
+ * 
+ * // Usage as a directive
+ * const [mutationObserver] = createMutationObserver([], e => {...})
+
+<div use:mutationObserver={{ childList: true }}>...</div>
+ * ```
+ */
 export function createMutationObserver(
   initial: MaybeAccessor<Node | Node[]>,
   options: MutationObserverInit,
@@ -35,7 +81,7 @@ export function createMutationObserver(
     callback = c as MutationCallback;
   }
   const instance = new MutationObserver(callback);
-  const add: MutationObserverAdd = (el, options) => instance.observe(el, options);
+  const add: MutationObserverAdd = (el, options) => instance.observe(el, access(options));
   const start = () => {
     accessAsArray(initial).forEach(item => {
       item instanceof Node ? add(item, defaultOptions) : add(item[0], item[1]);
@@ -43,10 +89,34 @@ export function createMutationObserver(
   };
   const stop = () => instance.takeRecords().length && instance.disconnect();
   onMount(start);
-  onCleanup(() => instance.disconnect());
-  return {
+  onCleanup(stop);
+  return [
     add,
-    start,
-    stop
-  };
+    {
+      start,
+      stop,
+      instance
+    }
+  ];
 }
+
+/**
+ * Primitive providing the ability to watch for changes being made to the DOM tree.
+ * A Standalone Directive.
+ *
+ * @param props [MutationObserver options, callback]
+ *
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/mutation-observer
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver#constructor
+ *
+ * @example
+ * ```tsx
+ * <div use:mutationObserver={[{ childList: true }, e => {...}]}></div>
+ * ```
+ */
+export const mutationObserver = (
+  target: Element,
+  props: () => MutationObserverStandaloneDirectiveProps
+): void => {
+  createMutationObserver(target, ...props());
+};
