@@ -122,6 +122,7 @@ This package comes with a number of support utilities built with Lerna Scripts.
 - createURL
 - createHistory
 - createLocale
+- createUpload (https://github.com/Marvinified/use-file-upload)
 
 ### Network
 
