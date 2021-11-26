@@ -1,11 +1,10 @@
 {
-  "name": "@solid-primitives/mutation-observer",
-  "version": "1.0.0",
-  "description": "Primitive providing the ability to watch for changes made to the DOM tree.",
+  "name": "@solid-primitives/utils",
+  "version": "0.0.150",
+  "description": "A bunch of reactive utility types and functions, for building primitives with Solid.js",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/mutation-observer",
-  "type": "module",
+  "homepage": "https://github.com/davedbase/solid-primitives/utils#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
@@ -24,35 +23,27 @@
   },
   "sideEffects": false,
   "scripts": {
-    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
+    "build": "tsc && tsc -p ./tsconfig-cjs.json",
     "test": "uvu -r solid-register"
   },
   "keywords": [
-    "mutationObserver",
-    "DOM",
+    "utilities",
+    "reactivity",
     "solid",
     "primitives"
   ],
   "devDependencies": {
-    "@solid-primitives/composites": "^1.0.1",
     "jsdom": "^18.1.1",
     "prettier": "^2.4.1",
     "rimraf": "^3.0.2",
-    "solid-register": "^0.0.15",
+    "solid-register": "^0.0.18",
     "tslib": "^2.3.1",
     "typescript": "^4.5.2",
-    "unocss": "^0.12.4",
-    "uvu": "^0.5.2",
-    "vite": "2.6.14",
-    "vite-plugin-solid": "2.1.2"
+    "uvu": "^0.5.2"
   },
   "peerDependencies": {
     "solid-js": "^1.2.5"
-  },
-  "dependencies": {
-    "@solid-primitives/utils": "^0.0.150"
   }
 }
