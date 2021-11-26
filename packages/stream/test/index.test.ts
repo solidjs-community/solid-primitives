@@ -1,5 +1,5 @@
-import { suite } from 'uvu';
-import * as assert from 'uvu/assert';
+import { suite } from "uvu";
+import * as assert from "uvu/assert";
 import { createEffect, createRoot } from "solid-js";
 import { createStream, createAmplitudeStream, createMediaPermissionRequest } from "../src";
 
@@ -19,7 +19,8 @@ testCreateStream("gets a stream", () =>
           }
         });
       })
-  ));
+  )
+);
 
 testCreateStream.run();
 
@@ -46,26 +47,27 @@ testCreateAmplitudeStream("gets an amplitude", () =>
           }
         });
       })
-  ));
+  )
+);
 
 testCreateAmplitudeStream.run();
 
 const testCreateMediaPermissionRequest = suite("createMediaPermissionRequest");
 
-testCreateMediaPermissionRequest.before((context) => {
+testCreateMediaPermissionRequest.before(context => {
   context.constraints = [];
   context.originalGetUserMedia = navigator.mediaDevices.getUserMedia;
-  navigator.mediaDevices.getUserMedia = (constraints) => {
+  navigator.mediaDevices.getUserMedia = constraints => {
     context.constraints.push(constraints);
     return context.originalGetUserMedia(constraints);
   };
 });
 
-testCreateMediaPermissionRequest.after((context) => {
+testCreateMediaPermissionRequest.after(context => {
   navigator.mediaDevices.getUserMedia = context.originalGetUserMedia;
 });
 
-testCreateMediaPermissionRequest("requests a media stream", (context) => {
+testCreateMediaPermissionRequest("requests a media stream", context => {
   createMediaPermissionRequest();
   assert.equal(context.constraints, [{ audio: true, video: true }]);
 });

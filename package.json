@@ -7,7 +7,7 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx}\"",
+    "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx}\" \"utils/**/*.{js,ts,json,css,tsx,jsx}\"",
     "ls": "lerna-script"
   },
   "devDependencies": {

@@ -5,6 +5,7 @@
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/mutation-observer",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
@@ -50,8 +51,5 @@
   },
   "peerDependencies": {
     "solid-js": "^1.2.5"
-  },
-  "dependencies": {
-    "solid-fns": "^0.0.150"
   }
 }
