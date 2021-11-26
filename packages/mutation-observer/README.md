@@ -2,7 +2,7 @@
 Name: mutation-observer
 Stage: 2
 Package: "@solid-primitives/mutation-observer"
-Primitives: createMutationObserver, mutationObserver
+Primitives: createMutationObserver
 Category: Browser APIs
 ---
 
