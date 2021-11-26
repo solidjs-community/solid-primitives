@@ -96,6 +96,10 @@ type MutationObserverReturn = [
 type MutationObserverAdd = (target: Node, options?: MaybeAccessor<MutationObserverInit>) => void;
 ```
 
+## Demo
+
+https://codesandbox.io/s/solid-mutation-observer-p59tu?file=/index.tsx
+
 ## Changelog
 
 <details>
