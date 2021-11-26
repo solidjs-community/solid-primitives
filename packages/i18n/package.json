@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/i18n",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Primitive to create and use i18n primitives.",
   "author": "Alexandre Mouton-Brady <amoutonbrady@gmail.com>",
   "license": "MIT",
@@ -26,7 +26,7 @@
     "test": "jest"
   },
   "keywords": [
-    "i18m",
+    "i18n",
     "internationalization",
     "language",
     "solid",
@@ -43,8 +43,8 @@
     "tslib": "^2.0.1",
     "typescript": "^4.0.2"
   },
-  "dependencies": {
-    "solid-js": "^1.1.6"
+  "peerDependencies": {
+    "solid-js": "^1.2.5"
   },
   "jest": {
     "preset": "ts-jest",
