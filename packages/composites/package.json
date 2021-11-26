@@ -21,8 +21,7 @@
     "import": "./dist/index.js",
     "default": "./dist/index.js"
   },
-  "sideEffects": "false",
-  "type": "module",
+  "sideEffects": false,
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
