@@ -21,13 +21,14 @@ import {
   createLocalStorage,
   createSessionStorage
 } from "./storage";
-import { CookieOptions, cookieStorage } from "./cookies";
+import { CookieOptions, cookieStorage, createCookieStorage } from "./cookies";
 import { addClearMethod } from "./tools";
 export {
   createStorage,
   createAsyncStorage,
   createStorageSignal,
   createLocalStorage,
+  createCookieStorage,
   createSessionStorage,
   CookieOptions,
   cookieStorage,
