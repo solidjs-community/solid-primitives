@@ -20,21 +20,21 @@ Primitive providing the ability to watch for changes made to the DOM tree. A wra
 import { createMutationObserver } from "@solid-primitives/mutation-observer";
 
 // Simple usage with on a single parent element.
-let ref: !HTMLElement;
+let ref!: HTMLElement;
 createMutationObserver(
   () => ref,
   { attributes: true, subtree: true },
   records => console.log(records)
 );
 
-// You can use watch multiple parent elements:
+// Observing multiple parent elements:
 createMutationObserver(
   () => [el1, el2, el3],
   { attributes: true, subtree: true },
   e => {...}
 );
 
-// And set individual MutationObserver options:
+// Set individual MutationObserver options:
 createMutationObserver(
   [
     [el, { attributes: true, subtree: true }],
