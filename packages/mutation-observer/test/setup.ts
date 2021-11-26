@@ -32,7 +32,7 @@ const createMockMutationRecord = (
 
 // @ts-ignore
 export class MutationObserver {
-  records: [Node, MutationObserverInit][] = [];
+  public records: [Node, MutationObserverInit][] = [];
   constructor(public callback: MutationCallback) {
     instances.push(this);
   }

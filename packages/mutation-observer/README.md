@@ -1,6 +1,6 @@
 ---
 Name: mutation-observer
-Stage: 0
+Stage: 2
 Package: "@solid-primitives/mutation-observer"
 Primitives: createMutationObserver, mutationObserver
 Category: Browser APIs
@@ -12,7 +12,7 @@ Category: Browser APIs
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/mutation-observer?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/mutation-observer)
 [![size](https://img.shields.io/npm/v/@solid-primitives/mutation-observer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/mutation-observer)
 
-Primitive providing the ability to watch for changes being made to the DOM tree. A wrapper for Browser's [MutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver).
+Primitive providing the ability to watch for changes made to the DOM tree. A wrapper for Browser's [MutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) API.
 
 ## Usage
 
@@ -93,7 +93,7 @@ type MutationObserverReturn = [
   }
 ];
 
-type MutationObserverAdd = (target: Node, options: MaybeAccessor<MutationObserverInit>) => void;
+type MutationObserverAdd = (target: Node, options?: MaybeAccessor<MutationObserverInit>) => void;
 ```
 
 ## Changelog
@@ -101,8 +101,8 @@ type MutationObserverAdd = (target: Node, options: MaybeAccessor<MutationObserve
 <details>
 <summary><b>Expand Changelog</b></summary>
 
-0.0.100
+1.0.0
 
-Initial release as a Stage-0 primitive.
+Initial release as a Stage-2 primitive.
 
 </details>

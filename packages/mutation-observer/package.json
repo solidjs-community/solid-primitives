@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/mutation-observer",
-  "version": "0.0.100",
-  "description": "Primitive providing the ability to watch for changes being made to the DOM tree.",
+  "version": "1.0.0",
+  "description": "Primitive providing the ability to watch for changes made to the DOM tree.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/mutation-observer",
@@ -22,7 +22,6 @@
     "default": "./dist/index.js"
   },
   "sideEffects": false,
-  "type": "module",
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "prebuild": "npm run clean",
@@ -51,5 +50,8 @@
   },
   "peerDependencies": {
     "solid-js": "^1.2.5"
+  },
+  "dependencies": {
+    "solid-fns": "^0.0.150"
   }
 }
