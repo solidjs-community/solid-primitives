@@ -1,6 +1,6 @@
 import { onCleanup, onMount } from "solid-js";
 import type { JSX } from "solid-js";
-import { access, accessAsArray, Fn, MaybeAccessor } from "../../../utils/helpers";
+import { access, accessAsArray, Fn, MaybeAccessor } from "@solid-primitives/utils";
 
 export type MutationObserverAdd = (
   target: Node,
