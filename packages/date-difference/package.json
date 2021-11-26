@@ -22,7 +22,6 @@
     "default": "./dist/index.js"
   },
   "sideEffects": false,
-  "type": "module",
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "prebuild": "npm run clean",
