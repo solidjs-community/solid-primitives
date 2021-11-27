@@ -15,6 +15,7 @@ Category: Browser APIs
 A set of utility to support using Web Workers and Shared Workers:
 
 `createWebWorker` - Provides a getter and setter for the primitive.
+
 `createWorkerPool` - Creates a pool of workers and round-robins requests between each.
 
 ## How to use it
@@ -53,3 +54,7 @@ You may view a working example here: [ link to Stackblize or CodeSandBox ]
 Initial release as a Stage-1 primitive.
 
 </details>
+
+## Inspiration
+
+Inspired by Jason Miller's worker project and borrows function exporting and RPC exchange with postMessage between threads as a concept.
