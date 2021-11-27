@@ -53,6 +53,7 @@ export function setup(
   };
   ctx.addEventListener("message", handler);
 }
+
 /**
  * Converst raw code to CJS useable output.
  *
