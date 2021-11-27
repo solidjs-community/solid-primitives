@@ -2,7 +2,7 @@ import { Component, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
 
-import createWorker from "../src/index";
+import createWorker, { createWorkerPool } from "../src/index";
 
 const App: Component = () => {
   const [worker] = createWorker(
@@ -10,7 +10,16 @@ const App: Component = () => {
       return a + b;
     },
     function subtract(a, b) {
+      return a - b;
+    }
+  );
+  const [pool] = createWorkerPool(
+    4,
+    function add(a, b) {
       return a + b;
+    },
+    function subtract(a, b) {
+      return a - b;
     }
   );
   const [values, setValues] = createSignal([1, 1]);

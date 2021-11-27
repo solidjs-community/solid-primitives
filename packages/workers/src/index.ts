@@ -5,13 +5,13 @@ import { cjs, setup, KILL, RPC } from "./utils";
 /**
  * Creates a very basic WebWorker based on provided code.
  *
- * @param code Code to be used inside the Web Worker.
+ * @param Functions A set of functions to expose via the worker.
  * @param options Web worker options to control the instance.
  * @returns An array with worker, start and stop methods
  */
-function createWebWorker(
+function createWorker(
   ...args: (Function | object)[]
-): [worker: Worker, start: () => void, stop: () => void] {
+): WorkerExports {
   const exports = new Set<string>();
   let code = "";
   let options = {};
@@ -56,7 +56,47 @@ function createWebWorker(
   }
   start();
   onCleanup(terminate);
-  return [worker, start, stop];
+  return [worker, start, stop, exports];
 }
 
-export default createWebWorker;
+/**
+ * Creates a worker pool that round-robins work between worker sets.
+ *
+ * @param number Amount of workers to establish in the pool.
+ * @param Functions A set of functions to expose via the worker.
+ * @param options Web worker options to control the instance.
+ * @returns An array with worker, start and stop methods
+ */
+export function createWorkerPool(
+  concurrency: number = 1,
+  ...args: (Function | object)[]
+): WorkerExports {
+  let current = -1;
+  let workers: WorkerExports[] = [];
+  const start = () => {
+    for (let i = 0; i < concurrency; i += 1) {
+      workers.push(createWorker(...arguments));
+    }
+  };
+  const stop = () => workers.forEach((worker) => worker[2]());
+  start();
+  return [
+    // @ts-ignore
+    new Proxy({}, {
+      get: function(_, method) {
+        if (current + 1 > workers.length) {
+          current = 0
+        } else {
+          current += 1;
+        }
+        return function () {
+          return workers[current][0][method].apply(this, arguments);
+        }
+      }
+    }),
+    start,
+    stop
+  ];
+}
+
+export default createWorker;

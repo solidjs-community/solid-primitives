@@ -11,3 +11,10 @@ declare type WorkerMessage = {
   result?: string;
   params?: any;
 };
+
+declare type WorkerExports = [
+  worker: Worker,
+  start: () => void,
+  stop: () => void,
+  exports?: Set<string>
+];
