@@ -136,7 +136,7 @@ This package comes with a number of support utilities built with Lerna Scripts.
 
 - createGesture (in progress)
 - createCompositionObserver (CompositionEvent observer)
-- createKeyboard
+- createKeyboard (in progress)
 - createForm
 - createInput
 - createTouch
