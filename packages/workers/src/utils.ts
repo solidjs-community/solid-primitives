@@ -1,4 +1,3 @@
-// Ported from Workerize by Jason Miller
 
 export const KILL: WorkerSignal = 0;
 export const RPC: WorkerSignal = 1;

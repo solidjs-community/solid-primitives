@@ -57,4 +57,4 @@ Initial release as a Stage-1 primitive.
 
 ## Inspiration
 
-Inspired by Jason Miller's worker project and borrows function exporting and RPC exchange with postMessage between threads as a concept.
+Inspired by Jason Miller's worker function. Borrows the RPC and function export method.
