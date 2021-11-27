@@ -28,21 +28,14 @@ export function setup(
         });
       } else {
         const post = (result?: string, error?: string) =>
-          ctx.postMessage({
-            id,
-            type: 1,
-            result,
-            error
-          });
+          ctx.postMessage({ id, type: 1, result, error });
         Promise.resolve()
           .then(() => method.apply(null, data.params))
           .then(result => post(result))
           .catch(err => post(undefined, `${err}`));
       }
     } else {
-      if (!callbacks.get(id)) {
-        throw Error(`Unknown callback ${id}`);
-      }
+      if (!callbacks.get(id)) return;
       if (data.error) {
         callbacks.get(id)![1](Error(data.error));
       } else {
@@ -62,19 +55,11 @@ export function setup(
  * @param exports Actual export values
  * @returns String to return with CJS values.
  */
-export function cjs(
-  code: string,
-  exportsObjName: string,
-  exports: { [key: string]: boolean }
-): string {
-  code = code.replace(/^(\s*)export\s+default\s+/m, (_, before) => {
-    exports.default = true;
-    return `${before}${exportsObjName}.default=`;
-  });
+export function cjs(code: string, exportsObjName: string, exports: Set<string>): string {
   code = code.replace(
     /^(\s*)export\s+((?:async\s*)?function(?:\s*\*)?|const|let|var)(\s+)([a-zA-Z$_][a-zA-Z0-9$_]*)/gm,
     (_, before, type, ws, name) => {
-      exports[name] = true;
+      exports.add(name);
       return `${before}${exportsObjName}.${name}=${type}${ws}${name}`;
     }
   );

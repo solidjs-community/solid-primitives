@@ -9,20 +9,22 @@ import { cjs, setup, KILL, RPC } from "./utils";
  * @param options Web worker options to control the instance.
  * @returns An array with worker, start and stop methods
  */
-export function createWebWorker(
-  code: Function | string,
-  options: WorkerOptions = {}
+function createWebWorker(
+  ...args: (Function | object)[]
 ): [worker: Worker, start: () => void, stop: () => void] {
-  const exports = {};
-  const exportObj = `__xpo${Math.random().toString().substring(2)}__`;
-  if (typeof code === "function") {
-    code = `(${Function.prototype.toString.call(code)})(${exportObj})`;
+  const exports = new Set<string>();
+  let code = "";
+  let options = {};
+  for (let i in arguments) {
+    if (typeof arguments[i] === "object") {
+      options = arguments[i];
+      continue;
+    }
+    const exportObj = `__xpo${Math.random().toString().substring(2)}__`;
+    code += cjs(`export ${arguments[i]}`, exportObj, exports);
+    code += `\n(${Function.prototype.toString.call(setup)})(self,${exportObj},{})\n`;
   }
-  code = cjs(code, exportObj, exports);
-  code += `\n(${Function.prototype.toString.call(setup)})(self,${exportObj},{})`;
-  const url = URL.createObjectURL(
-    new Blob([code], { type: "text/javascript" })
-  );
+  const url = URL.createObjectURL(new Blob([code], { type: "text/javascript" }));
   const worker = new Worker(url, options);
   let callbacks: WorkerCallbacks = new Map();
   let counter = 0;
@@ -45,11 +47,13 @@ export function createWebWorker(
   const start = () => setup(worker, {}, callbacks);
   const expose = (methodName: string) => {
     // @ts-ignore
-    worker[methodName] = function() {
+    worker[methodName] = function () {
       return call(methodName, [].slice.call(arguments));
     };
   };
-  for (let i in exports) if (!(i in worker)) expose(i);
+  for (var it = exports.values(), val = null; (val = it.next().value); ) {
+    if (!(val in worker)) expose(val);
+  }
   start();
   onCleanup(terminate);
   return [worker, start, stop];

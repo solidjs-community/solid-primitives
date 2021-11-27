@@ -2,13 +2,16 @@ import { Component, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
 
-import createWebWorker from "../src/index";
+import createWorker from "../src/index";
 
 const App: Component = () => {
-  const [worker] = createWebWorker(
-    `export function add(a, b) {
+  const [worker] = createWorker(
+    function add(a, b) {
       return a + b;
-    }`
+    },
+    function subtract(a, b) {
+      return a + b;
+    }
   );
   const [values, setValues] = createSignal([1, 1]);
   const [result, setResult] = createSignal(0);
