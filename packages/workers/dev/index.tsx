@@ -19,6 +19,7 @@ const App: Component = () => {
       <h3>Basic Web Worker Test</h3>
       <input
         type="number"
+        class="p-3 text-2xl w-30"
         onInput={evt => {
           setValues(vals => [parseInt(evt.currentTarget.value), vals[1]]);
           calculate();
@@ -28,13 +29,14 @@ const App: Component = () => {
       +
       <input
         type="number"
+        class="p-3 text-2xl w-30"
         onInput={evt => {
           setValues(vals => [vals[0], parseInt(evt.currentTarget.value)]);
           calculate();
         }}
         value={values()[1]}
       />
-      = &nbsp; {result()}
+      = <div class="text-2xl">{result()}</div>
     </div>
   );
 };

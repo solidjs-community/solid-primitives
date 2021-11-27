@@ -14,22 +14,24 @@ export function createWebWorker(
   options: WorkerOptions = {}
 ): [worker: Worker, start: () => void, stop: () => void] {
   const exports = {};
-  const exportsObjName = `__xpo${Math.random().toString().substring(2)}__`;
+  const exportObj = `__xpo${Math.random().toString().substring(2)}__`;
   if (typeof code === "function") {
-    code = `(${Function.prototype.toString.call(code)})(${exportsObjName})`;
+    code = `(${Function.prototype.toString.call(code)})(${exportObj})`;
   }
-  code = cjs(code, exportsObjName, exports);
-  code += `\n(${Function.prototype.toString.call(setup)})(self,${exportsObjName},{})`;
-  const url = URL.createObjectURL(new Blob([code], { type: "text/javascript" }));
+  code = cjs(code, exportObj, exports);
+  code += `\n(${Function.prototype.toString.call(setup)})(self,${exportObj},{})`;
+  const url = URL.createObjectURL(
+    new Blob([code], { type: "text/javascript" })
+  );
   const worker = new Worker(url, options);
   let callbacks: WorkerCallbacks = new Map();
   let counter = 0;
-  const send = (message: WorkerMessage, options?: PostMessageOptions) =>
-    worker.postMessage(message, options);
   const terminate = () => {
     URL.revokeObjectURL(url);
     worker.terminate.call(worker);
   };
+  const send = (message: WorkerMessage, options?: PostMessageOptions) =>
+    worker.postMessage(message, options);
   const stop = () => {
     send({ type: KILL, signal: 0 });
     terminate();
@@ -43,7 +45,7 @@ export function createWebWorker(
   const start = () => setup(worker, {}, callbacks);
   const expose = (methodName: string) => {
     // @ts-ignore
-    worker[methodName] = function () {
+    worker[methodName] = function() {
       return call(methodName, [].slice.call(arguments));
     };
   };
