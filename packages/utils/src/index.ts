@@ -13,6 +13,8 @@ export type ItemsOf<T> = T extends (infer E)[] ? E : never;
 export type MaybeAccessor<T> = T | Accessor<T>;
 export type MaybeAccessorValue<T extends MaybeAccessor<any>> = T extends Fn ? ReturnType<T> : T;
 
+export const isClient = typeof window !== "undefined";
+
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
   typeof v === "function" ? (v as any)() : v;
 
