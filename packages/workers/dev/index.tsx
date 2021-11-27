@@ -24,7 +24,7 @@ const App: Component = () => {
   );
   const [values, setValues] = createSignal([1, 1]);
   const [result, setResult] = createSignal(0);
-  const calculate = async () => setResult(await worker.add(...values()));
+  const calculate = async () => setResult(await pool.add(...values()));
   calculate();
   return (
     <div class="p-24 box-border w-full min-h-screen text-white flex justify-center items-center flex-wrap gap-12">

@@ -75,7 +75,7 @@ export function createWorkerPool(
   let workers: WorkerExports[] = [];
   const start = () => {
     for (let i = 0; i < concurrency; i += 1) {
-      workers.push(createWorker(...arguments));
+      workers.push(createWorker(...args));
     }
   };
   const stop = () => workers.forEach((worker) => worker[2]());
@@ -84,12 +84,8 @@ export function createWorkerPool(
     // @ts-ignore
     new Proxy({}, {
       get: function(_, method) {
-        if (current + 1 > workers.length) {
-          current = 0
-        } else {
-          current += 1;
-        }
-        return function () {
+        current = current + 1 >= workers.length ? 0 : current + 1;
+        return function() {
           return workers[current][0][method].apply(this, arguments);
         }
       }
