@@ -25,16 +25,18 @@ Create a basic web worker:
 const [worker, start, stop] = createWebWorker(function add(a, b) {
   return a + b;
 });
-worker.add();
+console.log(await worker.add(1, 2));
+// output: 3
 ```
 
 Create a worker pool with a set concurrency:
 
 ```ts
-const [pool, start, stop] = createWebWorker(4, function add(a, b) {
+const [pool, start, stop] = createWorkerPool(4, function add(a, b) {
   return a + b;
 });
-pool.add();
+console.log(await pool.add(1, 2));
+// output: 3
 ```
 
 ## Demo
