@@ -32,7 +32,7 @@ function createWorker(
     URL.revokeObjectURL(url);
     worker.terminate.call(worker);
   };
-  const send = (message: WorkerMessage, options?: PostMessageOptions) =>
+  const send = (message: WorkerMessage, options: PostMessageOptions = {}) =>
     worker.postMessage(message, options);
   const stop = () => {
     send({ type: KILL, signal: 0 });
@@ -86,6 +86,7 @@ export function createWorkerPool(
       get: function(_, method) {
         current = current + 1 >= workers.length ? 0 : current + 1;
         return function() {
+          // @ts-ignore
           return workers[current][0][method].apply(this, arguments);
         }
       }

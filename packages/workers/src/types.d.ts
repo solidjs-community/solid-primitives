@@ -18,3 +18,7 @@ declare type WorkerExports = [
   stop: () => void,
   exports?: Set<string>
 ];
+
+declare interface PostMessageOptions {
+  transfer?: any[] | undefined
+}

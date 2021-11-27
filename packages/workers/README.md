@@ -1,8 +1,8 @@
 ---
 Name: workers
-Stage: 0
+Stage: 1
 Package: "@solid-primitives/workers"
-Primitives: createWebWorker
+Primitives: createWebWorker,createWorkerPool
 Category: Browser APIs
 ---
 
@@ -15,12 +15,26 @@ Category: Browser APIs
 A set of utility to support using Web Workers and Shared Workers:
 
 `createWebWorker` - Provides a getter and setter for the primitive.
+`createWorkerPool` - Creates a pool of workers and round-robins requests between each.
 
 ## How to use it
 
+Create a basic web worker:
+
 ```ts
-const [worker] = createWebWorker(`export function add(a, b) { return a + b; }`);
+const [worker, start, stop] = createWebWorker(function add(a, b) {
+  return a + b;
+});
 worker.add();
+```
+
+Create a worker pool with a set concurrency:
+
+```ts
+const [pool, start, stop] = createWebWorker(4, function add(a, b) {
+  return a + b;
+});
+pool.add();
 ```
 
 ## Demo
@@ -34,6 +48,6 @@ You may view a working example here: [ link to Stackblize or CodeSandBox ]
 
 0.0.100
 
-Initial release as a Stage-0 primitive.
+Initial release as a Stage-1 primitive.
 
 </details>

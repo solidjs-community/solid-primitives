@@ -1,10 +1,10 @@
 {
-  "name": "@solid-primitives/template-primitive",
+  "name": "@solid-primitives/workers",
   "version": "0.0.100",
-  "description": "A template primitive example.",
-  "author": "Your Name <you@youremail.com>",
+  "description": "Primitives that support creating Web Workers.",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/template-primitive",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/workers",
   "private": false,
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -27,7 +27,9 @@
     "test": "uvu -r solid-register"
   },
   "keywords": [
-    "template",
+    "worker",
+    "web worker",
+    "shared worker",
     "primitives"
   ],
   "devDependencies": {
