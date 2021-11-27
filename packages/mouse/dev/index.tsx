@@ -1,22 +1,25 @@
-import { createMouse, createMouseOnScreen } from "../src";
-import { Component, createSignal } from "solid-js";
+import { createMouse, createMouseOnScreen, createRelativeToElement } from "../src";
+import { Component, createEffect, createSignal } from "solid-js";
 import { render } from "solid-js/web";
-import { createCompositeMemo } from "@solid-primitives/composites";
 import createRaf from "@solid-primitives/raf";
-import {} from "./components";
-import { lerp, myThrottle, withDefault } from "./utils";
+import { lerp, objectOmit } from "./utils";
 import "uno.css";
+import { DisplayRecord } from "./components";
 
 const App: Component = () => {
-  const rawPoz = createMouse();
-  const [poz, setPoz] = createSignal({ x: 0, y: 0 });
-
+  const mouse = createMouse();
+  const [poz, setPoz] = createSignal({ x: 0, y: 0, elX: 0, elY: 0 });
   const onScreen = createMouseOnScreen(false);
+
+  let ref!: HTMLDivElement;
+  const relative = createRelativeToElement(() => ref, mouse.x, mouse.y);
 
   createRaf(() => {
     setPoz(p => ({
-      x: lerp(p.x, rawPoz.x(), 0.1),
-      y: lerp(p.y, rawPoz.y(), 0.1)
+      x: lerp(p.x, mouse.x(), 0.1),
+      y: lerp(p.y, mouse.y(), 0.1),
+      elX: lerp(p.elX, relative.x(), 0.2),
+      elY: lerp(p.elY, relative.y(), 0.2)
     }));
   });
 
@@ -33,8 +36,22 @@ const App: Component = () => {
           transform: `translate(${poz().x - 81}px, ${poz().y - 81}px)`
         }}
       ></div>
-      <div class="fixed z-10 top-25vh left-25vw w-50vw h-50vh bg-gray-400 bg-opacity-20 backdrop-filter backdrop-blur border-1 border-gray-400 border-opacity-40 rounded-3xl overflow-hidden">
-        <div class="w-24 h-24 rounded-full bg-amber-500 bg-opacity-80"></div>
+      <div
+        ref={ref}
+        class="fixed z-10 top-25vh left-25vw w-50vw h-50vh bg-gray-300 bg-opacity-15 backdrop-filter backdrop-blur border-1 border-gray-400 border-opacity-40 rounded-3xl overflow-hidden"
+      >
+        <div
+          class="w-24 h-24 rounded-full bg-amber-500 bg-opacity-80"
+          style={{
+            transform: `translate(${poz().elX - 54}px, ${poz().elY - 54}px)`
+          }}
+        ></div>
+        <div class="absolute bottom-4 left-4 caption select-none">
+          <DisplayRecord record={objectOmit(relative, "update")} />
+        </div>
+      </div>
+      <div class="fixed top-6 left-6 caption select-none">
+        <DisplayRecord record={mouse} />
       </div>
     </div>
   );

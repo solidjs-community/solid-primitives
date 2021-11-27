@@ -1,4 +1,5 @@
-import { Accessor, batch, createMemo, createSignal, onCleanup } from "solid-js";
+import { Accessor, batch, createSignal, onCleanup } from "solid-js";
+import { isClient } from "./common";
 
 export interface Position {
   x: number;
@@ -23,7 +24,11 @@ export interface MouseOptions {
 
 export type MouseSourceType = "mouse" | "touch" | null;
 
-export function createMouse(options: MouseOptions = {}) {
+export function createMouse(options: MouseOptions = {}): {
+  x: Accessor<number>;
+  y: Accessor<number>;
+  sourceType: Accessor<MouseSourceType>;
+} {
   const { touch = true, initialValue = { x: 0, y: 0 } } = options;
   const listenerOptions = { passive: true };
 
@@ -47,7 +52,7 @@ export function createMouse(options: MouseOptions = {}) {
     });
   };
 
-  if (window) {
+  if (isClient) {
     addEventListener("mousemove", mouseHandler, listenerOptions);
     addEventListener("dragover", mouseHandler, listenerOptions);
     // createEventListener(window, "mousemove", mouseHandler, { passive: true });

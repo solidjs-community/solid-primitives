@@ -1,4 +1,5 @@
 import { Accessor, createMemo, createSignal, onCleanup } from "solid-js";
+import { isClient } from "./common";
 
 export interface MouseOnScreenOptions {
   /**
@@ -40,7 +41,7 @@ export function createMouseOnScreen(a: MouseOnScreenOptions | boolean = {}) {
   const handleStart = () => setTouchOnScreen(true);
   const handleEnd = () => setTouchOnScreen(false);
 
-  if (document && "addEventListener" in document) {
+  if (isClient && "addEventListener" in document) {
     document.addEventListener("mouseenter", handleEnter);
     document.addEventListener("mouseleave", handleLeave);
 

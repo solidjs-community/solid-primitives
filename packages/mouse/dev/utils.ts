@@ -1,25 +1,15 @@
-import { createModifier } from "@solid-primitives/composites";
+import { ItemsOf } from "@solid-primitives/utils";
 
 export const lerp = (current: number, goal: number, p: number): number =>
   (1 - p) * current + p * goal;
 
-export const withDefault = createModifier<any>((source, cb, fallback) => {
-  const _fn = (a: any, b: any, c: any) => {
-    const value = cb(a, b, c);
-    console.log(value);
-
-    return typeof value === "undefined" || value === null ? fallback : value;
-  };
-  return [_fn, {}];
-});
-
-export const myThrottle = createModifier<number>((source, cb, wait) => {
-  let lastExecuted = 0;
-  const _fn = (a: any, b: any, c: any) => {
-    if (lastExecuted + wait <= performance.now()) {
-      lastExecuted = performance.now();
-      return cb(a, b, c);
-    } else return c;
-  };
-  return [_fn, {}];
-});
+export const objectOmit = <T extends Object, K extends Array<keyof T>>(
+  object: T,
+  ...keys: K
+): Omit<T, ItemsOf<K>> => {
+  const copy = Object.assign({}, object);
+  for (const key of keys) {
+    delete copy[key];
+  }
+  return copy;
+};
