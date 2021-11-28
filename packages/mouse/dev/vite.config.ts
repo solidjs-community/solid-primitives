@@ -8,7 +8,7 @@ export default defineConfig({
     Unocss({
       shortcuts: {
         "center-child": "flex justify-center items-center",
-        caption: "text-sm text-white opacity-60 font-mono leading-tight"
+        caption: "text-sm font-mono leading-tight"
       }
     })
   ],

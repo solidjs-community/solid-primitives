@@ -1,5 +1,5 @@
-import { Accessor, createMemo, createSignal, onCleanup } from "solid-js";
-import { isClient } from "./common";
+import { Accessor, createMemo, createSignal } from "solid-js";
+import { addListener, isClient } from "./common";
 
 export interface MouseOnScreenOptions {
   /**
@@ -36,26 +36,13 @@ export function createMouseOnScreen(a: MouseOnScreenOptions | boolean = {}) {
     touch ? () => mouseOnScreen() || touchOnScreen() : () => mouseOnScreen()
   );
 
-  const handleEnter = () => setMouseOnScreen(true);
-  const handleLeave = () => setMouseOnScreen(false);
-  const handleStart = () => setTouchOnScreen(true);
-  const handleEnd = () => setTouchOnScreen(false);
-
-  if (isClient && "addEventListener" in document) {
-    document.addEventListener("mouseenter", handleEnter);
-    document.addEventListener("mouseleave", handleLeave);
-
+  if (isClient) {
+    addListener(document, "mouseenter", () => setMouseOnScreen(true), { passive: true });
+    addListener(document, "mouseleave", () => setMouseOnScreen(false), { passive: true });
     if (touch) {
-      addEventListener("touchstart", handleStart);
-      addEventListener("touchend", handleEnd);
+      addListener(window, "mouseenter", () => setTouchOnScreen(true), { passive: true });
+      addListener(window, "mouseleave", () => setTouchOnScreen(false), { passive: true });
     }
-
-    onCleanup(() => {
-      document.removeEventListener("mouseenter", handleEnter);
-      document.removeEventListener("mouseleave", handleLeave);
-      removeEventListener("touchstart", handleStart);
-      removeEventListener("touchend", handleEnd);
-    });
   }
 
   return onScreen;

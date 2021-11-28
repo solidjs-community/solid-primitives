@@ -1,5 +1,5 @@
 import { access, MaybeAccessor } from "@solid-primitives/utils";
-import { Accessor, Component, For } from "solid-js";
+import { Component, For } from "solid-js";
 
 export const DisplayRecord: Component<{ record: Record<string, MaybeAccessor<any>> }> = props => (
   <For each={Object.keys(props.record)}>
