@@ -1,26 +1,21 @@
-import { Fn } from "@solid-primitives/utils";
+import { Fn, isClient } from "@solid-primitives/utils";
 import { Accessor, batch, createSignal } from "solid-js";
 import { Position } from ".";
-import { addListener, isClient } from "./common";
+import { addListener } from "./common";
 
 export interface MouseOptions {
   /**
    * Listen to `touchmove` events
-   *
    * @default true
    */
   touch?: boolean;
-
   /**
    * Initial values
-   *
    * @default { x:0, y:0 }
    */
   initialValue?: Position;
-
   /**
    * If enabled, position will be updated on touchmove event.
-   *
    * @default true
    */
   followTouch?: boolean;

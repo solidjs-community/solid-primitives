@@ -1,4 +1,4 @@
-import { access, Fn, MaybeAccessor } from "@solid-primitives/utils";
+import { access, Fn, MaybeAccessor, isClient, objectOmit } from "@solid-primitives/utils";
 import { Accessor, batch, createComputed, createMemo, createSignal, onMount } from "solid-js";
 import {
   createMousePosition,
@@ -7,20 +7,6 @@ import {
   posRelativeToElement,
   RelativeToElementValues
 } from ".";
-import { isClient, objectOmit } from "./common";
-
-export type RelativeToElement = [
-  getters: {
-    x: Accessor<number>;
-    y: Accessor<number>;
-    top: Accessor<number>;
-    left: Accessor<number>;
-    width: Accessor<number>;
-    height: Accessor<number>;
-    isInside: Accessor<boolean>;
-  },
-  update: Fn
-];
 
 export type InitialValues = Partial<RelativeToElementValues>;
 
@@ -45,7 +31,18 @@ export function createMouseToElement(
   element: MaybeAccessor<Element>,
   pos?: Accessor<Position> | { x: MaybeAccessor<number>; y: MaybeAccessor<number> },
   options: PositionToElementOptions = {}
-): RelativeToElement {
+): [
+  getters: {
+    x: Accessor<number>;
+    y: Accessor<number>;
+    top: Accessor<number>;
+    left: Accessor<number>;
+    width: Accessor<number>;
+    height: Accessor<number>;
+    isInside: Accessor<boolean>;
+  },
+  update: Fn
+] {
   const { initialValue = {} } = options;
 
   let pageX: Accessor<number>;

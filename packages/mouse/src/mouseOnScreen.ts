@@ -1,18 +1,15 @@
-import { Fn } from "@solid-primitives/utils";
+import { Fn, isClient } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal } from "solid-js";
-import { addListener, isClient } from "./common";
+import { addListener } from "./common";
 
 export interface MouseOnScreenOptions {
   /**
    * Listen to touch events
-   *
    * @default true
    */
   touch?: boolean;
-
   /**
    * Initial value
-   *
    * @default false
    */
   initialValue?: boolean;

@@ -1,7 +1,7 @@
-import { access, Fn, MaybeAccessor } from "@solid-primitives/utils";
+import { access, Fn, MaybeAccessor, isClient } from "@solid-primitives/utils";
 import { Accessor, createEffect, createSignal, onMount } from "solid-js";
 import { MouseOptions, MouseSourceType } from ".";
-import { addListener, isClient } from "./common";
+import { addListener } from "./common";
 
 /**
  * Listens to mouse (and touch) events inside the element.

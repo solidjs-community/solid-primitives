@@ -7,17 +7,16 @@ import {
 import { Component, createSignal, Show } from "solid-js";
 import { render } from "solid-js/web";
 import createRaf from "@solid-primitives/raf";
+import { objectOmit } from "@solid-primitives/utils";
 import { lerp } from "./utils";
-import { objectOmit } from "../src/common";
 import "uno.css";
 import { DisplayRecord } from "./components";
 
 const App: Component = () => {
-  const [mouse] = createMousePosition();
-  const [pos, setPos] = createSignal({ x: 0, y: 0, elX: 0, elY: 0 });
-  const onScreen = createMouseOnScreen(false);
   const [showContainer, setShowContainer] = createSignal(true);
 
+  const [mouse] = createMousePosition();
+  const onScreen = createMouseOnScreen(false);
   const [ref, setRef] = createSignal<HTMLDivElement>();
   const [relative] = createMouseToElement(ref, mouse);
   const {
@@ -26,6 +25,7 @@ const App: Component = () => {
     isInside: isHovering
   } = createMouseInElement(ref, { followTouch: false });
 
+  const [pos, setPos] = createSignal({ x: 0, y: 0, elX: 0, elY: 0 });
   createRaf(() => {
     setPos(p => ({
       x: lerp(p.x, mouse.x(), 0.1),
