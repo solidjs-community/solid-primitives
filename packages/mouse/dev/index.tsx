@@ -1,13 +1,14 @@
 import {
   createMousePosition,
   createMouseOnScreen,
-  createRelativeToElement,
+  createMouseToElement,
   createMouseInElement
 } from "../src";
 import { Component, createSignal, Show } from "solid-js";
 import { render } from "solid-js/web";
 import createRaf from "@solid-primitives/raf";
-import { lerp, objectOmit } from "./utils";
+import { lerp } from "./utils";
+import { objectOmit } from "../src/common";
 import "uno.css";
 import { DisplayRecord } from "./components";
 
@@ -18,7 +19,7 @@ const App: Component = () => {
   const [showContainer, setShowContainer] = createSignal(true);
 
   const [ref, setRef] = createSignal<HTMLDivElement>();
-  const [relative] = createRelativeToElement(ref, mouse.x, mouse.y);
+  const [relative] = createMouseToElement(ref, mouse);
   const {
     x: hoverX,
     y: hoverY,
@@ -61,7 +62,7 @@ const App: Component = () => {
         </div>
       </Show>
       <div
-        class="fixed z-20 top-25vh left-25vw p-6 py-4 rounded-2xl bg-white bg-opacity-10 border-1 border-white border-opacity-20 pointer-events-none text-opacity-50 text-white transition-opacity"
+        class="fixed z-20 top-25vh left-25vw p-6 py-4 rounded-2xl rounded-lt bg-white bg-opacity-10 border-1 border-white border-opacity-20 pointer-events-none text-opacity-50 text-white transition-opacity"
         style={{
           transform: `translate(${hoverX()}px, ${hoverY()}px)`,
           opacity: isHovering() ? 1 : 0

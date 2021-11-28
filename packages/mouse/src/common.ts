@@ -1,7 +1,18 @@
-import { Fn } from "@solid-primitives/utils";
+import { Fn, ItemsOf } from "@solid-primitives/utils";
 import { onCleanup } from "solid-js";
 
 export const isClient = typeof window !== "undefined";
+
+export const objectOmit = <T extends Object, K extends Array<keyof T>>(
+  object: T,
+  ...keys: K
+): Omit<T, ItemsOf<K>> => {
+  const copy = Object.assign({}, object);
+  for (const key of keys) {
+    delete copy[key];
+  }
+  return copy;
+};
 
 // Had to create my own createEventListener, because  @solid-primitives/event-listener had some troubles working
 export const addListener = (

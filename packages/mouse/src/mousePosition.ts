@@ -1,11 +1,7 @@
 import { Fn } from "@solid-primitives/utils";
 import { Accessor, batch, createSignal } from "solid-js";
+import { Position } from ".";
 import { addListener, isClient } from "./common";
-
-export interface Position {
-  x: number;
-  y: number;
-}
 
 export interface MouseOptions {
   /**

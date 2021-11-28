@@ -1,8 +1,20 @@
 import { access, Fn, MaybeAccessor } from "@solid-primitives/utils";
-import { Accessor, batch, createEffect, createSignal, on, onMount } from "solid-js";
+import { Accessor, createEffect, createSignal, onMount } from "solid-js";
 import { MouseOptions, MouseSourceType } from ".";
 import { addListener, isClient } from "./common";
 
+/**
+ * Listens to mouse (and touch) events inside the element.
+ *
+ * @param element target element *— if passed as a signal, will update on change*
+ * @param options
+ * @returns Autoupdating position of cursor inside the element; source of the last cursor movement
+ *
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/mouse#createmouseinelement
+ *
+ * @example
+ * const { x, y, sourceType, isInside } = createMouseInElement(() => myRef, { touch: true })
+ */
 export function createMouseInElement(
   element: MaybeAccessor<HTMLElement>,
   options: MouseOptions = {}

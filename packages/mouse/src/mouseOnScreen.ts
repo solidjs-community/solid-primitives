@@ -18,6 +18,16 @@ export interface MouseOnScreenOptions {
   initialValue?: boolean;
 }
 
+/**
+ * Is cursor on screen?
+ *
+ * @param options -
+ * - touch - *Listen to touch events*
+ * - initialValue
+ *
+ * @example
+ * const isMouseOnScreen = createMouseOnScreen(true)
+ */
 export function createMouseOnScreen(initialValue?: boolean): Accessor<boolean>;
 export function createMouseOnScreen(options?: MouseOnScreenOptions): Accessor<boolean>;
 export function createMouseOnScreen(a: MouseOnScreenOptions | boolean = {}) {
@@ -36,15 +46,6 @@ export function createMouseOnScreen(a: MouseOnScreenOptions | boolean = {}) {
   const onScreen = createMemo(
     touch ? () => mouseOnScreen() || touchOnScreen() : () => mouseOnScreen()
   );
-
-  if (isClient) {
-    addListener(document, "mouseenter", () => setMouseOnScreen(true));
-    addListener(document, "mouseleave", () => setMouseOnScreen(false));
-    if (touch) {
-      addListener(window, "mouseenter", () => setTouchOnScreen(true));
-      addListener(window, "mouseleave", () => setTouchOnScreen(false));
-    }
-  }
 
   let cleanupList: Fn[] = [];
   const start = () => {
