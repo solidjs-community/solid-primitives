@@ -1,3 +1,4 @@
+import { Fn } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal } from "solid-js";
 import { addListener, isClient } from "./common";
 
@@ -37,13 +38,31 @@ export function createMouseOnScreen(a: MouseOnScreenOptions | boolean = {}) {
   );
 
   if (isClient) {
-    addListener(document, "mouseenter", () => setMouseOnScreen(true), { passive: true });
-    addListener(document, "mouseleave", () => setMouseOnScreen(false), { passive: true });
+    addListener(document, "mouseenter", () => setMouseOnScreen(true));
+    addListener(document, "mouseleave", () => setMouseOnScreen(false));
     if (touch) {
-      addListener(window, "mouseenter", () => setTouchOnScreen(true), { passive: true });
-      addListener(window, "mouseleave", () => setTouchOnScreen(false), { passive: true });
+      addListener(window, "mouseenter", () => setTouchOnScreen(true));
+      addListener(window, "mouseleave", () => setTouchOnScreen(false));
     }
   }
+
+  let cleanupList: Fn[] = [];
+  const start = () => {
+    stop();
+    if (isClient) {
+      cleanupList.push(addListener(document, "mouseenter", () => setMouseOnScreen(true)));
+      cleanupList.push(addListener(document, "mouseleave", () => setMouseOnScreen(false)));
+      if (touch) {
+        cleanupList.push(addListener(window, "mouseenter", () => setTouchOnScreen(true)));
+        cleanupList.push(addListener(window, "mouseleave", () => setTouchOnScreen(false)));
+      }
+    }
+  };
+  const stop = () => {
+    cleanupList.forEach(fn => fn());
+    cleanupList = [];
+  };
+  start();
 
   return onScreen;
 }

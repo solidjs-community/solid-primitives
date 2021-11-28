@@ -12,8 +12,7 @@ export function createMouseInElement(
   sourceType: Accessor<MouseSourceType>;
   isInside: Accessor<boolean>;
 } {
-  const listenerOptions = { passive: true };
-  const { touch = true, initialValue = { x: 0, y: 0 } } = options;
+  const { touch = true, followTouch = true, initialValue = { x: 0, y: 0 } } = options;
   const [x, setX] = createSignal(initialValue.x);
   const [y, setY] = createSignal(initialValue.y);
   const [sourceType, setSourceType] = createSignal<MouseSourceType>(null);
@@ -21,49 +20,48 @@ export function createMouseInElement(
 
   const handleMouseMove = (e: MouseEvent, el: HTMLElement) => {
     const { top, left } = el.getBoundingClientRect();
-    batch(() => {
-      setX(e.pageX - left - window.pageXOffset);
-      setY(e.pageY - top - window.pageYOffset);
-      setSourceType("mouse");
-    });
+    setX(e.pageX - left - window.pageXOffset);
+    setY(e.pageY - top - window.pageYOffset);
+    setSourceType("mouse");
   };
   const handleTouchMove = (e: TouchEvent, el: HTMLElement) => {
     const { top, left } = el.getBoundingClientRect();
-    batch(() => {
-      if (!e.touches.length) return;
-      setX(e.touches[0].clientX - left - window.pageXOffset);
-      setY(e.touches[0].clientY - top - window.pageYOffset);
-      setSourceType("touch");
-    });
+    if (!e.touches.length) return;
+    setX(e.touches[0].clientX - left - window.pageXOffset);
+    setY(e.touches[0].clientY - top - window.pageYOffset);
+    setSourceType("touch");
   };
 
-  if (isClient) {
-    const setup = () =>
-      createEffect(
-        on(
-          () => access(element),
-          (el, p, toCleanup: Fn[] = []) => {
-            toCleanup.forEach(fn => fn());
-            if (!el) return [];
-            const fnList = [
-              addListener(el, "mouseover", () => setIsInside(true), listenerOptions),
-              addListener(el, "mouseout", () => setIsInside(false), listenerOptions),
-              addListener(el, "mousemove", e => handleMouseMove(e, el), listenerOptions)
-            ];
-            if (touch)
-              fnList.push(
-                addListener(el, "touchstart", () => setIsInside(true), listenerOptions),
-                addListener(el, "touchend", () => setIsInside(false), listenerOptions),
-                addListener(el, "touchmove", e => handleTouchMove(e, el), listenerOptions)
-              );
-            return fnList;
-          }
-        )
+  let cleanupList: Fn[] = [];
+  const start = (el: HTMLElement) => {
+    stop();
+    if (isClient) {
+      cleanupList.push(
+        addListener(el, "mouseover", () => setIsInside(true)),
+        addListener(el, "mouseout", () => setIsInside(false)),
+        addListener(el, "mousemove", e => handleMouseMove(e, el))
       );
+      if (touch) {
+        cleanupList.push(
+          addListener(el, "touchstart", e => {
+            setIsInside(true);
+            handleTouchMove(e, el);
+          }),
+          addListener(el, "touchend", () => setIsInside(false))
+        );
+        if (followTouch)
+          cleanupList.push(addListener(el, "touchmove", e => handleTouchMove(e, el)));
+      }
+    }
+  };
+  const stop = () => {
+    cleanupList.forEach(fn => fn());
+    cleanupList = [];
+  };
 
-    if (access(element)) setup();
-    else onMount(setup);
-  }
+  const setup = () => createEffect(() => start(access(element)));
+  if (access(element)) setup();
+  else onMount(setup);
 
   return {
     x,

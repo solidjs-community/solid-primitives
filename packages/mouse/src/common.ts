@@ -8,7 +8,7 @@ export const addListener = (
   el: Element | Window | Document,
   ev: string,
   cb: (e: any) => void,
-  options?: boolean | AddEventListenerOptions
+  options: boolean | AddEventListenerOptions = { passive: true }
 ): Fn => {
   el.addEventListener(ev, cb, options);
   let disposed = false;

@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/mouse",
   "version": "1.0.0",
-  "description": "A collection of Solid Primitives, build around listening to mouse (and touch) events.",
+  "description": "A collection of Solid Primitives, that capture current mouse cursor position, and help to deal with common related usecases.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/mouse",
@@ -10,14 +10,15 @@
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
   "private": false,
-  "main": "dist/index.js",
+  "main": "dist/cjs/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "type": "module",
   "exports": {
-    "require": "./dist/cjs/index.js",
+    "require": "./dist/cjs/index.cjs",
     "import": "./dist/index.js",
     "default": "./dist/index.js"
   },
@@ -32,6 +33,8 @@
   "keywords": [
     "mouse",
     "touch",
+    "event",
+    "cursor",
     "solid",
     "primitives"
   ],

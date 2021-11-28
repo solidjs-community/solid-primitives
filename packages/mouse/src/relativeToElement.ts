@@ -3,16 +3,18 @@ import { Accessor, batch, createComputed, createMemo, createSignal, onMount } fr
 import { createMousePosition, Position } from ".";
 import { isClient } from "./common";
 
-export type RelativeToElement = {
-  x: Accessor<number>;
-  y: Accessor<number>;
-  top: Accessor<number>;
-  left: Accessor<number>;
-  width: Accessor<number>;
-  height: Accessor<number>;
-  isInside: Accessor<boolean>;
-  update: Fn;
-};
+export type RelativeToElement = [
+  getters: {
+    x: Accessor<number>;
+    y: Accessor<number>;
+    top: Accessor<number>;
+    left: Accessor<number>;
+    width: Accessor<number>;
+    height: Accessor<number>;
+    isInside: Accessor<boolean>;
+  },
+  update: Fn
+];
 
 export type InitialValues = {
   x?: number;
@@ -58,7 +60,7 @@ export function createRelativeToElement(
     if (b) initialValues = b;
   } else {
     // overload 2. - create mouse position internally
-    const mouse = createMousePosition();
+    const [mouse] = createMousePosition();
     pageX = mouse.x;
     pageY = mouse.y;
   }
@@ -89,14 +91,16 @@ export function createRelativeToElement(
 
   if (isClient) onMount(() => createComputed(update));
 
-  return {
-    x,
-    y,
-    top,
-    left,
-    width,
-    height,
-    isInside,
+  return [
+    {
+      x,
+      y,
+      top,
+      left,
+      width,
+      height,
+      isInside
+    },
     update
-  };
+  ];
 }
