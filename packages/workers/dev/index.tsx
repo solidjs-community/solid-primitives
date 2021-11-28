@@ -13,6 +13,10 @@ const App: Component = () => {
       return a - b;
     }
   );
+  const [values, setValues] = createSignal([1, 1]);
+  const [result, setResult] = createSignal(0);
+  const calculate = async () => setResult(await worker.add(...values()));
+
   const [pool] = createWorkerPool(
     4,
     function add(a, b) {
@@ -22,10 +26,6 @@ const App: Component = () => {
       return a - b;
     }
   );
-  const [values, setValues] = createSignal([1, 1]);
-  const [result, setResult] = createSignal(0);
-  const calculate = async () => setResult(await worker.add(...values()));
-
   const [poolValues, setPoolValues] = createSignal([1, 1]);
   const [poolResult, setPoolResult] = createSignal(0);
   const calculatePooled = async () => setPoolResult(await pool.add(...poolValues()));

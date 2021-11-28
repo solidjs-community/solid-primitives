@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/countdown",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Primitive to create a countdown timer",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -11,7 +11,7 @@
   ],
   "type": "module",
   "exports": {
-    "require": "./dist/cjs/index.js",
+    "require": "./dist/cjs/index.cjs",
     "import": "./dist/index.js",
     "default": "./dist/index.js"
   },
@@ -34,9 +34,9 @@
     "tslib": "^2.0.1",
     "typescript": "^4.0.2"
   },
-  "dependencies": {
-    "@solid-primitives/timer": "^0.0.106",
-    "solid-js": "^1.0.3"
+  "peerDependencies": {
+    "@solid-primitives/timer": "^1.0.2",
+    "solid-js": "^1.2.5"
   },
   "jest": {
     "setupFiles": [
