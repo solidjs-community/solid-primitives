@@ -73,7 +73,7 @@ type CreateEventListenerFn = <
  * // or as a directive
  * <MyButton use:createEventListener={() => ['click', () => console.log("Click")]}>Click!</MyButton>
  * // you can provide your own event map type:
- * createEventListener<{ myCustomEvent: Event }>(window, 'myCustomEvent', () => console.log("yup!"));
+ * createEventListener<{ myCustomEvent: Event }, Window>(window, 'myCustomEvent', () => console.log("yup!"));
  * ```
  */
 export const createEventListener: CreateEventListenerFn = (target, ...propsArray) => {
@@ -86,13 +86,13 @@ export const createEventListener: CreateEventListenerFn = (target, ...propsArray
   const props: Accessor<EventProps> =
     typeof propsArray[0] === "function"
       ? propsArray[0]
-      : (
-          props => () =>
-            props
-        )(propsArray.slice(1) as EventProps);
+      : () => propsArray as EventProps;
   const add = (target: EventTarget) => {
     targets.includes(target) || targets.push(target);
-    target.addEventListener.apply(target, props());
+    const [name, handler, options] = props();
+    if (name && handler !== undefined) {
+      target.addEventListener.apply(target, props());
+    }
   };
   const remove = (target: EventTarget) => {
     targets.forEach((t, index) => t === target && targets.splice(index, 1));
