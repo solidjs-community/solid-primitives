@@ -61,4 +61,5 @@ if (!window.Response) {
     }
   }
   (window as any).Response = ResponseMock;
+  (globalThis as any).Response = ResponseMock;
 }

@@ -33,7 +33,7 @@ TODO
 
 Initial release adapted from https://github.com/microcipcip/vue-use-kit/blob/master/src/functions/useFetch/useFetch.ts.
 
-1.0.0
+1.0.1
 
 Minor clean-up and added CJS support.
 

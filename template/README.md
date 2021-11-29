@@ -9,8 +9,8 @@ Category: Display & Media
 # @solid-primitives/template-primitive
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/template-primitive?style=for-the-badge?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/template-primitive)
-[![size](https://img.shields.io/npm/v/@solid-primitives/template-primitive?style=for-the-badge?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/template-primitive)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/template-primitive?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/template-primitive)
+[![size](https://img.shields.io/npm/v/@solid-primitives/template-primitive?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/template-primitive)
 
 A sample primitive that is made up for templating with the following options:
 

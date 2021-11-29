@@ -1,9 +1,13 @@
+import { suite } from "uvu";
+import * as assert from "uvu/assert";
 import { createAsyncStorage, createStorage, createStorageSignal } from "../src/storage";
 import { AsyncStorage } from "../src/types";
 
-describe("createStorage", () => {
+const testCreateStorage = suite("createStorage");
+
+testCreateStorage.before(context => {
   let data: Record<string, string> = {};
-  const mockStorage = {
+  context.mockStorage = {
     getItem: (key: string): string | null => data[key] ?? null,
     setItem: (key: string, value: string): void => {
       data[key] = value;
@@ -19,24 +23,30 @@ describe("createStorage", () => {
       return Object.keys(data).length;
     }
   };
-
-  test("creates a storage", () => {
-    const [storage, setStorage, { remove, clear }] = createStorage({ api: mockStorage });
-    setStorage("test", "1");
-    mockStorage.setItem("test2", "2");
-    expect(storage.test).toBe(mockStorage.getItem("test"));
-    expect(storage.test).toBe("1");
-    expect(storage.test2).toBe("2");
-    remove("test2");
-    expect(storage.test2).toBe(null);
-    clear();
-    expect(mockStorage.length).toBe(0);
-  });
 });
 
-describe("createAsyncStorage", () => {
+testCreateStorage("creates a storage", ({ mockStorage }) => {
+  const [storage, setStorage, { remove, clear }] = createStorage({ api: mockStorage });
+  setStorage("test", "1");
+  mockStorage.setItem("test2", "2");
+  assert.is(storage.test, mockStorage.getItem("test"));
+  assert.is(storage.test, "1");
+  assert.is(storage.test2, "2");
+  remove("test2");
+  assert.is(storage.test2, null);
+  clear();
+  assert.is(mockStorage.length, 0);
+});
+
+testCreateStorage.run();
+
+const testCreateAsyncStorage = suite<{
+  mockAsyncStorage: AsyncStorage;
+}>("createAsyncStorage");
+
+testCreateStorage.before(context => {
   let data: Record<string, string> = {};
-  const mockAsyncStorage: AsyncStorage = {
+  context.mockAsyncStorage = {
     getItem: (key: string) => Promise.resolve(data[key] ?? null),
     setItem: (key: string, value: string) => {
       data[key] = value;
@@ -55,24 +65,26 @@ describe("createAsyncStorage", () => {
       return Object.keys(data).length;
     }
   };
-
-  test("creates an async storage", async () => {
-    const [storage, setStorage, { remove, clear }] = createAsyncStorage({ api: mockAsyncStorage });
-    await setStorage("test", "1");
-    await mockAsyncStorage.setItem("test2", "2");
-    expect(await storage.test).toBe(await mockAsyncStorage.getItem("test"));
-    expect(await storage.test).toBe("1");
-    expect(await storage.test2).toBe("2");
-    await remove("test2");
-    expect(await storage.test2).toBe(null);
-    await clear();
-    expect(mockAsyncStorage.length).toBe(0);
-  });
 });
 
-describe("createStorageSignal", () => {
+testCreateStorage("creates an async storage", async ({ mockAsyncStorage }) => {
+  const [storage, setStorage, { remove, clear }] = createAsyncStorage({ api: mockAsyncStorage });
+  await setStorage("test", "1");
+  await mockAsyncStorage.setItem("test2", "2");
+  assert.is(await storage.test, await mockAsyncStorage.getItem("test"));
+  assert.is(await storage.test, "1");
+  assert.is(await storage.test2, "2");
+  await remove("test2");
+  assert.is(await storage.test2, null);
+  await clear();
+  assert.is(mockAsyncStorage.length, 0);
+});
+
+const testCreateStorageSignal = suite("createStorageSignal");
+
+testCreateStorageSignal.before(context => {
   let data: Record<string, string> = {};
-  const mockStorage = {
+  context.mockStorage = {
     getItem: (key: string): string | null => data[key] ?? null,
     setItem: (key: string, value: string): void => {
       data[key] = value;
@@ -88,15 +100,15 @@ describe("createStorageSignal", () => {
       return Object.keys(data).length;
     }
   };
+});
 
-  test("creates a signal", () => {
-    const [storageItem, setStorageItem] = createStorageSignal<string | null, undefined>(
-      "test",
-      null,
-      { api: mockStorage }
-    );
-    expect(storageItem()).toBe(null);
-    setStorageItem("1");
-    expect(storageItem()).toBe("1");
-  });
+testCreateStorageSignal("creates a signal", ({ mockStorage }) => {
+  const [storageItem, setStorageItem] = createStorageSignal<string | null, undefined>(
+    "test",
+    null,
+    { api: mockStorage }
+  );
+  assert.is(storageItem(), null);
+  setStorageItem("1");
+  assert.is(storageItem(), "1");
 });

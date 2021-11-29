@@ -45,7 +45,7 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-g
 
 Initial commit and publish of primitive.
 
-1.0.1
+1.0.2
 
 Released with CJS support.
 

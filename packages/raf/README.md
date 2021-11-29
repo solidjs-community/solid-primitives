@@ -34,7 +34,7 @@ You may view a working example here: https://codesandbox.io/s/solid-create-raf-c
 
 Initial release ported from https://github.com/microcipcip/vue-use-kit/blob/master/src/functions/useRafFn/useRafFn.ts.
 
-1.0.4
+1.0.5
 
 Released official version with CJS support.
 

@@ -34,6 +34,7 @@ if (!window.AudioContext) {
     }
   }
   (window as any).AudioContext = AudioContextMock;
+  (globalThis as any).AudioContext = AudioContextMock;
 }
 
 (window as any).__mockstream__ = Object.assign(new EventTarget(), {
