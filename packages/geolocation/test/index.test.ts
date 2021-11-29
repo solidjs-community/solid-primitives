@@ -20,7 +20,7 @@ describe("createGeolocation", () => {
     const geoSpy = jest.spyOn(navigator.geolocation, "getCurrentPosition");
     geoSpy.mockImplementation(
       jest.fn((_, error) =>
-        error!({ code: 1, message: "Geolocation error" } as GeolocationPositionError)
+        error!({ code: 1, message: "GeoLocation error" } as GeolocationPositionError)
       )
     );
     const [location] = createRoot(() => createGeolocation());
