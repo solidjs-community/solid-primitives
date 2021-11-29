@@ -14,9 +14,14 @@
     "dist"
   ],
   "exports": {
-    "require": "./dist/cjs/index.cjs",
-    "import": "./dist/index.js",
-    "default": "./dist/index.js"
+    "import": {
+      "node": "./dist/server.js",
+      "default": "./dist/index.js"
+    },
+    "require": {
+      "node":  "./dist/cjs/server.js",
+      "default": "./dist/cjs/index.js"
+    }
   },
   "sideEffects": "false",
   "scripts": {

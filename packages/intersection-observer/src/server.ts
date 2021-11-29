@@ -1,45 +1,29 @@
-import { onMount, onCleanup, createSignal } from "solid-js";
-import type { JSX, Accessor } from "solid-js";
+import { Accessor } from "solid-js";
 
-export type MaybeAccessor<T> = T | Accessor<T>;
-const read = <T>(val: MaybeAccessor<T>): T =>
-  typeof val === "function" ? (val as Function)() : val;
-
-export type AddIntersectionObserverEntry = (el: Element) => void;
-export type RemoveIntersectionObserverEntry = (el: Element) => void;
-
-export type EntryCallback = (
-  entry: IntersectionObserverEntry,
-  instance: IntersectionObserver
-) => void;
-export type AddViewportObserverEntry = (
-  el: Element,
-  callback: MaybeAccessor<EntryCallback>
-) => void;
-export type RemoveViewportObserverEntry = (el: Element) => void;
-
-export type CreateViewportObserverReturnValue = [
+import {
+  AddIntersectionObserverEntry,
   AddViewportObserverEntry,
-  {
-    remove: RemoveViewportObserverEntry;
-    start: () => void;
-    stop: () => void;
-    instance: IntersectionObserver;
-  }
-];
+  CreateViewportObserverReturnValue,
+  EntryCallback,
+  MaybeAccessor,
+  RemoveIntersectionObserverEntry,
+  RemoveViewportObserverEntry
+} from "./index";
 
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      observer: true | EntryCallback;
-    }
-  }
-}
-// this ensures the `JSX` import won't fall victim to tree shaking before typescript can use it
-export type E = JSX.Element;
+export {
+  AddIntersectionObserverEntry,
+  AddViewportObserverEntry,
+  CreateViewportObserverReturnValue,
+  EntryCallback,
+  MaybeAccessor,
+  RemoveIntersectionObserverEntry,
+  RemoveViewportObserverEntry
+};
 
 /**
  * Creates a very basic Intersection Observer.
+ * 
+ * > ⚠️ this server api is defunct
  *
  * @param elements - A list of elements to watch
  * @param onChange - An event handler that returns an array of observer entires
@@ -59,10 +43,10 @@ export type E = JSX.Element;
  * <div use:observer></div>
  * ```
  */
-export const createIntersectionObserver = (
-  elements: MaybeAccessor<Element[]>,
-  onChange: IntersectionObserverCallback,
-  options?: IntersectionObserverInit
+ export const createIntersectionObserver = (
+  _elements: MaybeAccessor<Element[]>,
+  _onChange: IntersectionObserverCallback,
+  _options?: IntersectionObserverInit
 ): [
   AddIntersectionObserverEntry,
   {
@@ -71,21 +55,21 @@ export const createIntersectionObserver = (
     stop: () => void;
     instance: IntersectionObserver;
   }
-] => {
-  // If not supported, skip
-  const instance = new IntersectionObserver(onChange, options);
-  const add: AddIntersectionObserverEntry = el => instance.observe(read(el));
-  const remove: RemoveIntersectionObserverEntry = el => instance.unobserve(read(el));
-  const start = () => read(elements).forEach(el => add(el));
-  const stop = () => instance.takeRecords().forEach(entry => remove(entry.target));
-  onMount(start);
-  onCleanup(stop);
-  return [add, { remove, start, stop, instance }];
-};
+] => [
+  (_el) => {/* noop */},
+  {
+    remove: (_el) => {/* noop */},
+    start: () => {/* noop */},
+    stop: () => {/* noop */},
+    instance: ({} as unknown) as IntersectionObserver
+  }
+];
 
 /**
  * Creates a more advanced viewport observer for complex tracking.
- *
+ * 
+ * > ⚠️ this server api is defunct
+ * 
  * @param elements - A list of elements to watch
  * @param callback - Element intersection change event handler
  * @param options - IntersectionObserver constructor options:
@@ -118,41 +102,22 @@ export function createViewportObserver(
   options?: IntersectionObserverInit
 ): CreateViewportObserverReturnValue;
 
-export function createViewportObserver(...a: any) {
-  let initial: [Element, EntryCallback][] = [];
-  let options: IntersectionObserverInit = {};
-  if (Array.isArray(a[0]) || typeof a[0] === "function") {
-    if (typeof a[1] === "function") {
-      initial = read<Element[]>(a[0]).map(el => [el, a[1]]);
-      options = a[2];
-    } else {
-      initial = read(a[0]);
-      options = a[1];
+export function createViewportObserver(...a: any): CreateViewportObserverReturnValue {
+  return [
+    (_el: Element) => {/* void */},
+    {
+      remove: (_el: Element) => {/* void */},
+      start: () => {/* void */},
+      stop: () => {/* void */},
+      instance: ({} as unknown) as IntersectionObserver
     }
-  } else options = a[0];
-  const callbacks = new WeakMap<Element, MaybeAccessor<EntryCallback>>();
-  const onChange: IntersectionObserverCallback = (entries, instance) =>
-    entries.forEach(entry => {
-      const cb = callbacks.get(entry.target)?.(entry, instance);
-      // additional check to prevent errors when the user use "observe" directive without providing a callback
-      typeof cb === "function" && cb(entry, instance);
-    });
-  const [add, { remove, stop, instance }] = createIntersectionObserver([], onChange, options);
-  const addEntry: AddViewportObserverEntry = (el, callback) => {
-    add(el);
-    callbacks.set(el, callback);
-  };
-  const removeEntry: RemoveViewportObserverEntry = el => {
-    callbacks.delete(el);
-    remove(el);
-  };
-  const start = () => initial.forEach(([el, cb]) => addEntry(el, cb));
-  onMount(start);
-  return [addEntry, { remove: removeEntry, start, stop, instance }];
-}
+  ];
+};
 
 /**
  * Creates reactive signal that changes when element's visibility changes
+ * 
+ * > ⚠️ this server api is defunct
  *
  * @param element - An element to watch
  * @param options - A Primitive and IntersectionObserver constructor options:
@@ -168,21 +133,19 @@ export function createViewportObserver(...a: any) {
  * const [isVisible, { start, stop, instance }] = createVisibilityObserver(() => el, { once: true })
  * ```
  */
-export const createVisibilityObserver = (
-  element: MaybeAccessor<Element>,
-  options?: IntersectionObserverInit & {
+ export const createVisibilityObserver = (
+  _element: MaybeAccessor<Element>,
+  _options?: IntersectionObserverInit & {
     initialValue?: boolean;
     once?: boolean;
   }
 ): [Accessor<boolean>, { start: () => void; stop: () => void; instance: IntersectionObserver }] => {
-  const [isVisible, setVisible] = createSignal(options?.initialValue ?? false);
-  const [, { start, stop, instance }] = createIntersectionObserver(
-    () => [read(element)],
-    ([entry]) => {
-      setVisible(entry.isIntersecting);
-      if (options?.once && entry.isIntersecting !== !!options?.initialValue) stop();
-    },
-    options
-  );
-  return [isVisible, { start, stop, instance }];
+  return [
+    () => false,
+    {
+      start: () => {/* noop */},
+      stop: () => {/* noop */},
+      instance: ({} as unknown) as IntersectionObserver
+    }
+  ];
 };
