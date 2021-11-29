@@ -16,18 +16,24 @@ export interface MouseOnScreenOptions {
 }
 
 /**
- * Is cursor on screen?
+ * *Is the cursor on screen?*
  *
  * @param options -
  * - touch - *Listen to touch events*
  * - initialValue
  *
  * @example
- * const isMouseOnScreen = createMouseOnScreen(true)
+ * const [isMouseOnScreen, { start, stop }] = createMouseOnScreen(true);
  */
-export function createMouseOnScreen(initialValue?: boolean): Accessor<boolean>;
-export function createMouseOnScreen(options?: MouseOnScreenOptions): Accessor<boolean>;
-export function createMouseOnScreen(a: MouseOnScreenOptions | boolean = {}) {
+export function createMouseOnScreen(
+  initialValue?: boolean
+): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
+export function createMouseOnScreen(
+  options?: MouseOnScreenOptions
+): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
+export function createMouseOnScreen(
+  a: MouseOnScreenOptions | boolean = {}
+): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }] {
   let touch: boolean;
   let initialValue: boolean;
   if (typeof a === "object") {
@@ -48,12 +54,20 @@ export function createMouseOnScreen(a: MouseOnScreenOptions | boolean = {}) {
   const start = () => {
     stop();
     if (isClient) {
-      cleanupList.push(addListener(document, "mouseenter", () => setMouseOnScreen(true)));
-      cleanupList.push(addListener(document, "mouseleave", () => setMouseOnScreen(false)));
-      if (touch) {
-        cleanupList.push(addListener(window, "mouseenter", () => setTouchOnScreen(true)));
-        cleanupList.push(addListener(window, "mouseleave", () => setTouchOnScreen(false)));
-      }
+      cleanupList.push(
+        addListener(document, "mouseenter", () => setMouseOnScreen(true)),
+        // mousemove with once is for the situations where the cursor has entered the screen before the listeners could attach
+        addListener(document, "mousemove", () => setMouseOnScreen(true), {
+          passive: true,
+          once: true
+        }),
+        addListener(document, "mouseleave", () => setMouseOnScreen(false))
+      );
+      if (touch)
+        cleanupList.push(
+          addListener(window, "touchstart", () => setTouchOnScreen(true)),
+          addListener(window, "touchend", () => setTouchOnScreen(false))
+        );
     }
   };
   const stop = () => {
@@ -62,5 +76,5 @@ export function createMouseOnScreen(a: MouseOnScreenOptions | boolean = {}) {
   };
   start();
 
-  return onScreen;
+  return [onScreen, { start, stop }];
 }

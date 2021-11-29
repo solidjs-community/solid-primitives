@@ -2,7 +2,7 @@
 Name: mouse
 Stage: 2
 Package: "@solid-primitives/mouse"
-Primitives: createMousePosition, createMouseOnScreen, createMouseToElement, createMouseInElement
+Primitives: createMousePosition, createMouseToElement, createMouseInElement, createMouseOnScreen
 Category: Inputs
 ---
 
@@ -27,6 +27,7 @@ Listens to the global mouse events, providing a reactive up-to-date position of 
 
 ```ts
 const [{ x, y, sourceType }, { stop, start }] = createMousePosition({ touch: false });
+// listening to touch events is enabled by default
 ```
 
 ### Types
@@ -77,6 +78,19 @@ Provides an autoupdating position relative to a provided element. It can be used
 const [{ x, y, top, left, width, height, isInside }, manualUpdate] = createMouseToElement(
   () => myRef
 );
+// If position argument is left undefined, it will use
+// createMousePosition internally to track the cursor position.
+
+// But if you are already tracking the mouse position yourself, or with createMousePosition.
+// You can pass it to createMouseToElement to avoid additional performance payload.
+const [mouse] = createMousePosition();
+const [{ x, y, isInside }] = createMouseToElement(el, mouse);
+
+// This also works when you are applying some transformations to the position, or debouncing it.
+const myPos = createMemo(() => {
+  /* do sth with the mouse position */
+});
+const [{ x, y, isInside }] = createMouseToElement(el, myPos);
 ```
 
 ### Types
@@ -116,12 +130,16 @@ interface PositionToElementOptions extends MouseOptions {
 
 ## `createMouseInElement`
 
-An alternative to [`createMouseToElement`](#createMouseToElement), that listens to mouse (and touch) events only inside the element. Provides information of position and if is the element being currently hovered.
+An alternative to [`createMouseToElement`](#createMouseToElement), that listens to mouse _(and touch)_ events only inside the element. Provides information of position and if is the element being currently hovered.
 
 ### Usage
 
 ```ts
-const { x, y, sourceType, isInside } = createMouseInElement(() => myRef, { touch: true });
+const [{ x, y, sourceType, isInside }, { stop, start }] = createMouseInElement(() => myRef, {
+  followTouch: false
+});
+// Same way as createMousePosition:
+// the "touch", and "foullowTouch" settings are enabled by default
 ```
 
 ### Types
@@ -130,12 +148,18 @@ const { x, y, sourceType, isInside } = createMouseInElement(() => myRef, { touch
 function createMouseInElement(
   element: MaybeAccessor<HTMLElement>,
   options: MouseOptions = {}
-): {
-  x: Accessor<number>;
-  y: Accessor<number>;
-  sourceType: Accessor<MouseSourceType>;
-  isInside: Accessor<boolean>;
-};
+): [
+  getters: {
+    x: Accessor<number>;
+    y: Accessor<number>;
+    sourceType: Accessor<MouseSourceType>;
+    isInside: Accessor<boolean>;
+  },
+  actions: {
+    stop: Fn;
+    start: Fn;
+  }
+];
 type MouseSourceType = "mouse" | "touch" | null;
 ```
 
@@ -146,14 +170,18 @@ Answers the question: _Is the cursor on screen?_
 ### Usage
 
 ```ts
-const isMouseOnScreen = createMouseOnScreen(true);
+const [isMouseOnScreen, { start, stop }] = createMouseOnScreen(true);
 ```
 
 ### Types
 
 ```ts
-function createMouseOnScreen(initialValue?: boolean): Accessor<boolean>;
-function createMouseOnScreen(options?: MouseOnScreenOptions): Accessor<boolean>;
+function createMouseOnScreen(
+  initialValue?: boolean
+): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
+function createMouseOnScreen(
+  options?: MouseOnScreenOptions
+): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
 
 interface MouseOnScreenOptions {
   /**

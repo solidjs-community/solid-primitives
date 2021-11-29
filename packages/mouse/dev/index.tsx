@@ -16,14 +16,12 @@ const App: Component = () => {
   const [showContainer, setShowContainer] = createSignal(true);
 
   const [mouse] = createMousePosition();
-  const onScreen = createMouseOnScreen(false);
+  const [onScreen] = createMouseOnScreen(false);
   const [ref, setRef] = createSignal<HTMLDivElement>();
   const [relative] = createMouseToElement(ref, mouse);
-  const {
-    x: hoverX,
-    y: hoverY,
-    isInside: isHovering
-  } = createMouseInElement(ref, { followTouch: false });
+  const [{ x: hoverX, y: hoverY, isInside: isHovering }] = createMouseInElement(ref, {
+    followTouch: false
+  });
 
   const [pos, setPos] = createSignal({ x: 0, y: 0, elX: 0, elY: 0 });
   createRaf(() => {

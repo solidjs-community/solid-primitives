@@ -13,17 +13,23 @@ import { addListener } from "./common";
  * @see https://github.com/davedbase/solid-primitives/tree/main/packages/mouse#createmouseinelement
  *
  * @example
- * const { x, y, sourceType, isInside } = createMouseInElement(() => myRef, { touch: true })
+ * const [{ x, y, sourceType, isInside }, { stop, start }] = createMouseInElement(() => myRef, { followTouch: false })
  */
 export function createMouseInElement(
   element: MaybeAccessor<HTMLElement>,
   options: MouseOptions = {}
-): {
-  x: Accessor<number>;
-  y: Accessor<number>;
-  sourceType: Accessor<MouseSourceType>;
-  isInside: Accessor<boolean>;
-} {
+): [
+  getters: {
+    x: Accessor<number>;
+    y: Accessor<number>;
+    sourceType: Accessor<MouseSourceType>;
+    isInside: Accessor<boolean>;
+  },
+  actions: {
+    stop: Fn;
+    start: Fn;
+  }
+] {
   const { touch = true, followTouch = true, initialValue = { x: 0, y: 0 } } = options;
   const [x, setX] = createSignal(initialValue.x);
   const [y, setY] = createSignal(initialValue.y);
@@ -45,7 +51,7 @@ export function createMouseInElement(
   };
 
   let cleanupList: Fn[] = [];
-  const start = (el: HTMLElement) => {
+  const start = (el: HTMLElement = access(element)) => {
     stop();
     if (isClient) {
       cleanupList.push(
@@ -75,10 +81,13 @@ export function createMouseInElement(
   if (access(element)) setup();
   else onMount(setup);
 
-  return {
-    x,
-    y,
-    sourceType,
-    isInside
-  };
+  return [
+    {
+      x,
+      y,
+      sourceType,
+      isInside
+    },
+    { stop, start }
+  ];
 }
