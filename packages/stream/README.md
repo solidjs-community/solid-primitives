@@ -46,7 +46,7 @@ TODO
 
 Initial release.
 
-0.0.150
+0.0.160
 
 Released a version with CJS.
 

@@ -61,7 +61,7 @@ Released a version with type mostly cleaned up.
 
 Switched to a more idiomatic pattern: Warning: incompatible with the previous version!
 
-1.2.4
+1.2.5
 
 Added CJS build.
 

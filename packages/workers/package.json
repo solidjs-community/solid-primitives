@@ -1,0 +1,50 @@
+{
+  "name": "@solid-primitives/workers",
+  "version": "0.0.100",
+  "description": "Primitives that support creating Web Workers.",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/workers",
+  "private": false,
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "require": "./dist/cjs/index.cjs",
+    "import": "./dist/index.js",
+    "default": "./dist/index.js"
+  },
+  "sideEffects": "false",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
+    "clean": "rimraf dist/",
+    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
+    "test": "uvu -r solid-register"
+  },
+  "keywords": [
+    "worker",
+    "web worker",
+    "shared worker",
+    "primitives"
+  ],
+  "devDependencies": {
+    "jsdom": "^18.0.1",
+    "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
+    "solid-register": "^0.0.10",
+    "tslib": "^2.0.1",
+    "typescript": "^4.5.2",
+    "uvu": "^0.5.2",
+    "unocss": "^0.12.4",
+    "vite": "2.6.14",
+    "vite-plugin-solid": "2.1.2"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.2.5"
+  }
+}

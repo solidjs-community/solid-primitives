@@ -25,6 +25,7 @@ The goal of Solid Primitives is to wrap client and server side functionality to 
 |[i18n](https://github.com/davedbase/solid-primitives/tree/main/packages/i18n)|3|createI18nContext<br />useI18n|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/i18n?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/i18n)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/i18n?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/i18n)|
 |[share](https://github.com/davedbase/solid-primitives/tree/main/packages/share)|2|createSocialShare|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/share?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/share)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/share?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/share)|
 |[throttle](https://github.com/davedbase/solid-primitives/tree/main/packages/throttle)|3|createThrottle|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/throttle?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/throttle)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/throttle?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/throttle)|
+|[date-difference](https://github.com/davedbase/solid-primitives/tree/main/packages/date-difference)|2|createDateNow<br />createDateDifference|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/date-difference?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/date-difference)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/date-difference?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/date-difference)|
 |<br />*Display & Media*<br /><br />|
 |[audio](https://github.com/davedbase/solid-primitives/tree/main/packages/audio)|3|createAudio<br />createAudioPlayer<br />createAudioManager|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/audio?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/audio)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/audio?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/audio)|
 |[devices](https://github.com/davedbase/solid-primitives/tree/main/packages/devices)|3|createDevices<br />createMicrophones<br />createSpeakers<br />createCameras|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/devices?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/devices)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/devices?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/devices)|
@@ -42,7 +43,8 @@ The goal of Solid Primitives is to wrap client and server side functionality to 
 |[geolocation](https://github.com/davedbase/solid-primitives/tree/main/packages/geolocation)|3|createGeolocation<br />createGeolocationWatcher|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/geolocation?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/geolocation)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/geolocation?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/geolocation)|
 |[permission](https://github.com/davedbase/solid-primitives/tree/main/packages/permission)|3|createPermission|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/permission?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/permission)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/permission?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/permission)|
 |[storage](https://github.com/davedbase/solid-primitives/tree/main/packages/storage)|3|createStorage<br />createCookieStorage<br />createAsyncStorage<br />createStorageSignal<br />createLocalStorage<br />createSessionStorage|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/storage?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/storage)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/storage?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/storage)|
-|[worker](https://github.com/davedbase/solid-primitives/tree/main/packages/worker)|0|createWorker|||
+|[workers](https://github.com/davedbase/solid-primitives/tree/main/packages/workers)|0|createWebWorker|||
+|[mutation-observer](https://github.com/davedbase/solid-primitives/tree/main/packages/mutation-observer)|2|createMutationObserver|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/mutation-observer?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/mutation-observer)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/mutation-observer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/mutation-observer)|
 |<br />*Network*<br /><br />|
 |[fetch](https://github.com/davedbase/solid-primitives/tree/main/packages/fetch)|3|createFetch|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/fetch?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/fetch)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/fetch?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/fetch)|
 |[graphql](https://github.com/davedbase/solid-primitives/tree/main/packages/graphql)|3|createGraphQLClient|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/graphql?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/graphql)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/graphql?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/graphql)|
@@ -88,7 +90,8 @@ All our primitives are meant to be consistent and sustain a level of quality. We
 9. Be focused on composition vs. isolation of logic
 10. Community voice and needs guide roadmap and planning
 11. Strong TypeScript support
-12. Performance!
+12. Export support for ESM & CJS
+13. Solid performance!
 
 ## Compound vs. Isolated Primitives
 
@@ -121,6 +124,7 @@ This package comes with a number of support utilities built with Lerna Scripts.
 - createURL
 - createHistory
 - createLocale
+- createUpload (https://github.com/Marvinified/use-file-upload)
 
 ### Network
 
@@ -132,7 +136,7 @@ This package comes with a number of support utilities built with Lerna Scripts.
 
 - createGesture (in progress)
 - createCompositionObserver (CompositionEvent observer)
-- createKeyboard
+- createKeyboard (in progress)
 - createForm
 - createInput
 - createTouch

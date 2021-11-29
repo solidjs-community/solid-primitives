@@ -40,7 +40,7 @@ First commit of the timer primitive.
 
 Patched an issue with clear on clean-up.
 
-1.0.0
+1.0.2
 
 Release official version with CJS support.
 

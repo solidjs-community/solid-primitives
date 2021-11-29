@@ -37,7 +37,7 @@ Initial release.
 
 Shipped first stable version.
 
-1.1.4
+1.1.5
 
 Published with CJS export.
 

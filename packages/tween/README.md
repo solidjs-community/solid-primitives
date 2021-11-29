@@ -33,7 +33,7 @@ Initial commit and publish of debounce primitive.
 
 Released a new version with CJS support.
 
-1.0.2
+1.0.3
 
 Shipping a tighter and CJS supported version.
 

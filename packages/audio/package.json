@@ -1,19 +1,20 @@
 {
   "name": "@solid-primitives/audio",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Primitives to manage audio and single sounds.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/audio",
   "private": false,
-  "main": "dist/index.js",
+  "main": "dist/cjs/index.cjs",
   "module": "dist/index.js",
+  "type": "module",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "exports": {
-    "require": "./dist/cjs/index.js",
+    "require": "./dist/cjs/index.cjs",
     "import": "./dist/index.js",
     "default": "./dist/index.js"
   },

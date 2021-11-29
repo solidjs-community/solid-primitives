@@ -1,53 +1,75 @@
+import { suite } from "uvu";
+import * as assert from "uvu/assert";
 import { createEffect, createRoot } from "solid-js";
 import { createStream, createAmplitudeStream, createMediaPermissionRequest } from "../src";
 
-describe("createStream", () => {
-  test("gets a stream", () =>
-    createRoot(
-      dispose =>
-        new Promise<void>(resolve => {
-          const [stream] = createStream({ video: true });
-          const expectations = [undefined, (window as any).__mockstream__];
-          createEffect(() => {
-            expect(stream()).toBe(expectations.shift());
-            if (!expectations.length) {
-              dispose();
-              resolve();
-            }
-          });
-        })
-    ));
+const testCreateStream = suite("createStream");
+
+testCreateStream("gets a stream", () =>
+  createRoot(
+    dispose =>
+      new Promise<void>(resolve => {
+        const [stream] = createStream({ video: true });
+        const expectations = [undefined, (window as any).__mockstream__];
+        createEffect(() => {
+          assert.is(stream(), expectations.shift());
+          if (!expectations.length) {
+            dispose();
+            resolve();
+          }
+        });
+      })
+  )
+);
+
+testCreateStream.run();
+
+const testCreateAmplitudeStream = suite("createAmplitudeStream");
+
+testCreateAmplitudeStream("gets an amplitude", () =>
+  createRoot(
+    dispose =>
+      new Promise<void>(resolve => {
+        const mockDevice: MediaDeviceInfo = {
+          deviceId: "mock-device-id",
+          groupId: "mock-group-id",
+          label: "mock-device-label",
+          kind: "audioinput",
+          toJSON: function () {
+            return JSON.stringify(this);
+          }
+        };
+        const [amplitude] = createAmplitudeStream(mockDevice);
+        createEffect(() => {
+          if (amplitude() > 0) {
+            dispose();
+            resolve();
+          }
+        });
+      })
+  )
+);
+
+testCreateAmplitudeStream.run();
+
+const testCreateMediaPermissionRequest = suite("createMediaPermissionRequest");
+
+testCreateMediaPermissionRequest.before(context => {
+  context.constraints = [];
+  context.originalGetUserMedia = navigator.mediaDevices.getUserMedia;
+  navigator.mediaDevices.getUserMedia = constraints => {
+    context.constraints.push(constraints);
+    return context.originalGetUserMedia(constraints);
+  };
 });
 
-describe("createAmplitudeStream", () => {
-  test("gets an amplitude", () =>
-    createRoot(
-      dispose =>
-        new Promise<void>(resolve => {
-          const mockDevice: MediaDeviceInfo = {
-            deviceId: "mock-device-id",
-            groupId: "mock-group-id",
-            label: "mock-device-label",
-            kind: "audioinput",
-            toJSON: function () {
-              return JSON.stringify(this);
-            }
-          };
-          const [amplitude] = createAmplitudeStream(mockDevice);
-          createEffect(() => {
-            if (amplitude() > 0) {
-              dispose();
-              resolve();
-            }
-          });
-        })
-    ));
+testCreateMediaPermissionRequest.after(context => {
+  navigator.mediaDevices.getUserMedia = context.originalGetUserMedia;
 });
 
-describe("createMediaPermissionRequest", () => {
-  const requestSpy = jest.spyOn(navigator.mediaDevices, "getUserMedia");
-  test("requests a media stream", () => {
-    createMediaPermissionRequest();
-    expect(requestSpy).toHaveBeenCalledWith({ audio: true, video: true });
-  });
+testCreateMediaPermissionRequest("requests a media stream", context => {
+  createMediaPermissionRequest();
+  assert.equal(context.constraints, [{ audio: true, video: true }]);
 });
+
+testCreateMediaPermissionRequest.run();
