@@ -25,7 +25,9 @@
   },
   "scripts": {
     "build": "tsup src/index.ts src/server.ts --format cjs,esm --dts src/index.ts --clean",
-    "test": "uvu -r solid-register"
+    "test": "uvu -r solid-register",
+    "watch": "npm run build -- --watch src",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "intersection",
