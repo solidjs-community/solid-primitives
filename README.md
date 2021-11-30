@@ -140,11 +140,12 @@ This package comes with a number of support utilities built with Lerna Scripts.
 - createForm
 - createInput
 - createTouch
-- createMouse
+- createMouse (in progress)
+- createActiveElement (in progress)
 
 ### Utilities
 
 - createWorker (in progress)
 - createQueue
-- createDateDifference
 - createEffectWhen
+- createEventBus
