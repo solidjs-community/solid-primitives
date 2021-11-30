@@ -1,9 +1,9 @@
-import { defineConfig } from 'tsup';
-import defaultConfig from '../../tsup.config';
+import { defineConfig } from "tsup";
+import defaultConfig from "../../tsup.config";
 
-export default defineConfig((options) => {
+export default defineConfig(() => {
   return {
-      ...defaultConfig,
-      clean: false
-  }
+    ...defaultConfig,
+    clean: false
+  };
 });
