@@ -1,33 +1,28 @@
 {
   "name": "@solid-primitives/intersection-observer",
-  "version": "1.1.4",
+  "version": "1.1.8",
   "description": "Primitives to support using the intersection observer API.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/intersection-observer",
-  "private": false,
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "files": [
     "dist"
   ],
   "exports": {
-    "import": {
-      "node": "./dist/server.js",
-      "default": "./dist/index.js"
-    },
-    "require": {
-      "node": "./dist/cjs/server.js",
-      "default": "./dist/cjs/index.js"
+    ".": {
+      "require": "./dist/server.cjs",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
-  "sideEffects": "false",
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
+    "build": "tsup src/index.ts src/server.ts --format cjs,esm --dts --clean",
     "test": "uvu -r solid-register"
   },
   "keywords": [
@@ -37,14 +32,16 @@
     "primitives"
   ],
   "devDependencies": {
-    "uvu": "^0.5.2",
     "jsdom": "^18.0.1",
-    "solid-register": "^0.0.10",
     "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
+    "solid-register": "^0.0.10",
     "tslib": "^2.0.1",
-    "typescript": "^4.4.4"
+    "tsup": "^5.10.0",
+    "typescript": "^4.4.4",
+    "uvu": "^0.5.2"
   },
   "peerDependencies": {
-    "solid-js": "^1.2.2"
+    "solid-js": "^1.2.5"
   }
 }

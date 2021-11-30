@@ -91,8 +91,8 @@ Minor type adjustments.
 
 Released with CJS support.
 
-1.1.4
+1.1.8
 
-Patch CJS support.
+After a couple rounds, patched CJS support.
 
 </details>

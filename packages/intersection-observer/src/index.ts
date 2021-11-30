@@ -72,7 +72,6 @@ export const createIntersectionObserver = (
     instance: IntersectionObserver;
   }
 ] => {
-  // If not supported, skip
   const instance = new IntersectionObserver(onChange, options);
   const add: AddIntersectionObserverEntry = el => instance.observe(read(el));
   const remove: RemoveIntersectionObserverEntry = el => instance.unobserve(read(el));
