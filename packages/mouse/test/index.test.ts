@@ -1,12 +1,17 @@
-import { createRoot, createSignal } from "solid-js";
+import { createRoot } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
-import { createMousePosition, createMouseToElement } from "../src";
+import {
+  createMouseInElement,
+  createMouseOnScreen,
+  createMousePosition,
+  createMouseToElement
+} from "../src";
 
-const cmp = suite("createMousePosition");
+const mp = suite("createMousePosition");
 
-cmp("returns correct values", () =>
+mp("returns correct values", () =>
   createRoot(dispose => {
     const [{ x, y, sourceType }, { stop, start }] = createMousePosition();
 
@@ -23,7 +28,7 @@ cmp("returns correct values", () =>
   })
 );
 
-cmp("initial values can be changed", () =>
+mp("initial values can be changed", () =>
   createRoot(dispose => {
     const [{ x, y }] = createMousePosition({
       initialValue: { x: 69, y: 420 }
@@ -34,14 +39,14 @@ cmp("initial values can be changed", () =>
   })
 );
 
-cmp.run();
+mp.run();
 
-const cte = suite("createMouseToElement");
+const mte = suite("createMouseToElement");
 
-cte("returns correct values", () =>
+mte("returns correct values", () =>
   createRoot(dispose => {
     const el = document.createElement("div");
-    const [{ x, y, width, height, top, left }, update] = createMouseToElement(el);
+    const [{ x, y, width, height, top, left, isInside }, update] = createMouseToElement(el);
 
     assert.type(x, "function");
     assert.is(x(), 0);
@@ -55,18 +60,22 @@ cte("returns correct values", () =>
     assert.is(top(), 0);
     assert.type(left, "function");
     assert.is(left(), 0);
+    assert.type(isInside, "function");
+    // isInside is calculated with position and element bounds,
+    // so x is greater or equal to 0
+    assert.is(isInside(), true);
 
     assert.type(update, "function");
     dispose();
   })
 );
 
-cte("initial values can be changed", () =>
+mte("initial values can be changed", () =>
   createRoot(dispose => {
     const el = document.createElement("div");
-    const [{ x, y, width, height, top, left }] = createMouseToElement(el, undefined, {
+    const [{ x, y, width, height, top, left, isInside }] = createMouseToElement(el, undefined, {
       initialValue: {
-        x: 1,
+        x: -1,
         y: 2,
         width: 3,
         height: 4,
@@ -75,15 +84,82 @@ cte("initial values can be changed", () =>
       }
     });
 
-    assert.is(x(), 1);
+    assert.is(x(), -1);
     assert.is(y(), 2);
     assert.is(width(), 3);
     assert.is(height(), 4);
     assert.is(top(), 5);
     assert.is(left(), 6);
+    assert.is(isInside(), false, "x is smaller than 0");
 
     dispose();
   })
 );
 
-cte.run();
+mte.run();
+
+const mie = suite("createMouseInElement");
+
+mie("returns correct values", () =>
+  createRoot(dispose => {
+    const el = document.createElement("div");
+    const [{ x, y, isInside }, { stop, start }] = createMouseInElement(el);
+
+    assert.type(x, "function");
+    assert.is(x(), 0);
+    assert.type(y, "function");
+    assert.is(y(), 0);
+    assert.type(isInside, "function");
+    // isInside is captured by mouseenter and mouseleave events
+    // none of these happened yet, so it defaults to false
+    assert.is(isInside(), false);
+
+    assert.type(stop, "function");
+    assert.type(start, "function");
+    dispose();
+  })
+);
+
+mie("initial values can be changed", () =>
+  createRoot(dispose => {
+    const el = document.createElement("div");
+    const [{ x, y }] = createMouseInElement(el, {
+      initialValue: {
+        x: 69,
+        y: 420
+      }
+    });
+
+    assert.is(x(), 69);
+    assert.is(y(), 420);
+
+    dispose();
+  })
+);
+
+mie.run();
+
+const mos = suite("createMouseOnScreen");
+
+mos("returns correct values", () =>
+  createRoot(dispose => {
+    const [onScreen, { stop, start }] = createMouseOnScreen();
+
+    assert.type(onScreen, "function");
+    assert.is(onScreen(), false);
+
+    assert.type(stop, "function");
+    assert.type(start, "function");
+    dispose();
+  })
+);
+
+mos("initial value can be changed", () =>
+  createRoot(dispose => {
+    const [onScreen] = createMouseOnScreen(true);
+    assert.is(onScreen(), true);
+    dispose();
+  })
+);
+
+mos.run();
