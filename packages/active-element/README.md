@@ -66,6 +66,8 @@ function createIsElementActive(
 
 ## Demo
 
+https://codesandbox.io/s/solid-primitives-active-element-q4kul?file=/index.tsx
+
 ## Changelog
 
 <details>
