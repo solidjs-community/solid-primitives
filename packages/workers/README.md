@@ -18,6 +18,8 @@ A set of utility to support using Web Workers and Shared Workers:
 
 `createWorkerPool` - Creates a pool of workers and round-robins requests between each.
 
+`createSignaledWorker` - Creates a work with that reads and writes to signals.
+
 ## How to use it
 
 Create a basic web worker:
@@ -40,6 +42,23 @@ console.log(await pool.add(1, 2));
 // output: 3
 ```
 
+Create a more advanced worker that accepts multiple instructional inputs:
+
+```ts
+const [input, setInput] = createSignal([1, 1]);
+const [output, setOutput] = createSignal([1, 1]);
+createSignaledWorker({
+  input,
+  output: setOutput,
+  func: function add([a, b]) {
+    return a + b;
+  }
+});
+setInput([1, 2]);
+console.log(output());
+// output: 3
+```
+
 ## Demo
 
 You may view a working example here: [ link to Stackblize or CodeSandBox ]
@@ -52,6 +71,10 @@ You may view a working example here: [ link to Stackblize or CodeSandBox ]
 0.0.100
 
 Initial release as a Stage-1 primitive.
+
+0.0.150
+
+Added signaled workers.
 
 </details>
 

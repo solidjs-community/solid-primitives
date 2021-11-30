@@ -20,5 +20,5 @@ declare type WorkerExports = [
 ];
 
 declare interface PostMessageOptions {
-  transfer?: any[] | undefined
+  transfer?: any[] | undefined;
 }

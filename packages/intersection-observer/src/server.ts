@@ -22,7 +22,7 @@ export {
 
 /**
  * Creates a very basic Intersection Observer.
- * 
+ *
  * > ⚠️ this server api is defunct
  *
  * @param elements - A list of elements to watch
@@ -43,7 +43,7 @@ export {
  * <div use:observer></div>
  * ```
  */
- export const createIntersectionObserver = (
+export const createIntersectionObserver = (
   _elements: MaybeAccessor<Element[]>,
   _onChange: IntersectionObserverCallback,
   _options?: IntersectionObserverInit
@@ -56,20 +56,28 @@ export {
     instance: IntersectionObserver;
   }
 ] => [
-  (_el) => {/* noop */},
+  _el => {
+    /* noop */
+  },
   {
-    remove: (_el) => {/* noop */},
-    start: () => {/* noop */},
-    stop: () => {/* noop */},
-    instance: ({} as unknown) as IntersectionObserver
+    remove: _el => {
+      /* noop */
+    },
+    start: () => {
+      /* noop */
+    },
+    stop: () => {
+      /* noop */
+    },
+    instance: {} as unknown as IntersectionObserver
   }
 ];
 
 /**
  * Creates a more advanced viewport observer for complex tracking.
- * 
+ *
  * > ⚠️ this server api is defunct
- * 
+ *
  * @param elements - A list of elements to watch
  * @param callback - Element intersection change event handler
  * @param options - IntersectionObserver constructor options:
@@ -104,19 +112,27 @@ export function createViewportObserver(
 
 export function createViewportObserver(...a: any): CreateViewportObserverReturnValue {
   return [
-    (_el: Element) => {/* void */},
+    (_el: Element) => {
+      /* void */
+    },
     {
-      remove: (_el: Element) => {/* void */},
-      start: () => {/* void */},
-      stop: () => {/* void */},
-      instance: ({} as unknown) as IntersectionObserver
+      remove: (_el: Element) => {
+        /* void */
+      },
+      start: () => {
+        /* void */
+      },
+      stop: () => {
+        /* void */
+      },
+      instance: {} as unknown as IntersectionObserver
     }
   ];
-};
+}
 
 /**
  * Creates reactive signal that changes when element's visibility changes
- * 
+ *
  * > ⚠️ this server api is defunct
  *
  * @param element - An element to watch
@@ -133,7 +149,7 @@ export function createViewportObserver(...a: any): CreateViewportObserverReturnV
  * const [isVisible, { start, stop, instance }] = createVisibilityObserver(() => el, { once: true })
  * ```
  */
- export const createVisibilityObserver = (
+export const createVisibilityObserver = (
   _element: MaybeAccessor<Element>,
   _options?: IntersectionObserverInit & {
     initialValue?: boolean;
@@ -143,9 +159,13 @@ export function createViewportObserver(...a: any): CreateViewportObserverReturnV
   return [
     () => false,
     {
-      start: () => {/* noop */},
-      stop: () => {/* noop */},
-      instance: ({} as unknown) as IntersectionObserver
+      start: () => {
+        /* noop */
+      },
+      stop: () => {
+        /* noop */
+      },
+      instance: {} as unknown as IntersectionObserver
     }
   ];
 };

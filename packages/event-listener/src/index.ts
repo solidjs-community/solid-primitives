@@ -84,9 +84,7 @@ export const createEventListener: CreateEventListenerFn = (target, ...propsArray
     options?: EventListenerOptions
   ];
   const props: Accessor<EventProps> =
-    typeof propsArray[0] === "function"
-      ? propsArray[0]
-      : () => propsArray as EventProps;
+    typeof propsArray[0] === "function" ? propsArray[0] : () => propsArray as EventProps;
   const add = (target: EventTarget) => {
     targets.includes(target) || targets.push(target);
     const [name, handler, options] = props();
