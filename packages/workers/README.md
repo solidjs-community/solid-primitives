@@ -2,7 +2,7 @@
 Name: workers
 Stage: 1
 Package: "@solid-primitives/workers"
-Primitives: createWorker, createWorkerPool
+Primitives: createWorker, createWorkerPool, createSignaledWorker
 Category: Browser APIs
 ---
 
