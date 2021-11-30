@@ -1,14 +1,14 @@
 {
-    "compilerOptions": {
-      "emitDeclarationOnly": true,
-      "declaration": true,
-      "target": "esnext",
-      "newLine": "LF",
-      "moduleResolution": "node",
-      "allowSyntheticDefaultImports": true,
-      "strict": true,
-      "jsx": "preserve",
-      "jsxImportSource": "solid-js"
-    },
-    "exclude": ["node_modules"]
-  }
+  "compilerOptions": {
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "target": "esnext",
+    "newLine": "LF",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js"
+  },
+  "exclude": ["node_modules"]
+}
