@@ -1,5 +1,5 @@
 import { access, Fn, isClient, MaybeAccessor } from "solid-fns";
-import { Accessor, createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 
 /**
  * A reactive `document.activeElement`. Check which element is currently focused.
@@ -19,11 +19,12 @@ export function createActiveElement(): [
   const start = () => {
     stop();
     if (isClient) {
-      addEventListener("blur", handleChange, true);
-      addEventListener("focus", handleChange, true);
+      window.addEventListener("blur", handleChange, true);
+      window.addEventListener("focus", handleChange, true);
       stop = () => {
-        removeEventListener("blur", handleChange, true);
-        removeEventListener("focus", handleChange, true);
+        window.removeEventListener("blur", handleChange, true);
+        window.removeEventListener("focus", handleChange, true);
+        stop = () => {};
       };
     }
   };
@@ -51,11 +52,9 @@ export function createIsElementActive(
 ): [getter: Accessor<boolean>, actions: { stop: Fn; start: Fn }] {
   const [active, actions] = createActiveElement();
   const [isActive, setIsActive] = createSignal(false);
-  onMount(() =>
-    createEffect(() => {
-      const el = access(target);
-      setIsActive(!!el && active() === el);
-    })
-  );
+  createEffect(() => {
+    const el = access(target);
+    setIsActive(!!el && active() === el);
+  });
   return [isActive, actions];
 }

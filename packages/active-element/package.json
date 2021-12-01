@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/active-element",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "A reactive document.activeElement. Check which element is currently focused.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -27,7 +27,7 @@
   },
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
-    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "build": "tsup",
     "test": "uvu -r solid-register",
     "watch": "npm run build -- --watch src",
     "prepublishOnly": "npm run build"
@@ -41,13 +41,13 @@
   "devDependencies": {
     "jsdom": "^18.1.1",
     "prettier": "^2.5.0",
-    "solid-register": "^0.1.1",
+    "solid-register": "0.0.18",
     "tslib": "^2.3.1",
+    "tsup": "^5.10.0",
     "unocss": "^0.12.15",
     "uvu": "^0.5.2",
     "vite": "2.6.14",
-    "vite-plugin-solid": "2.1.2",
-    "tsup": "^5.10.0"
+    "vite-plugin-solid": "2.1.2"
   },
   "peerDependencies": {
     "solid-js": "^1.2.5"
