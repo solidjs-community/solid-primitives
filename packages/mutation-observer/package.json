@@ -5,29 +5,22 @@
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/mutation-observer",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
   "private": false,
-  "main": "dist/cjs/index.cjs",
+  "sideEffects": false,
+  "type": "module",
+  "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "exports": {
-    "require": "./dist/cjs/index.cjs",
-    "import": "./dist/index.js",
-    "default": "./dist/index.js"
-  },
-  "sideEffects": false,
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
+    "build": "tsup",
     "test": "uvu -r solid-register"
   },
   "keywords": [
@@ -40,14 +33,13 @@
     "@solid-primitives/composites": "^1.0.1",
     "jsdom": "^18.1.1",
     "prettier": "^2.4.1",
-    "rimraf": "^3.0.2",
-    "solid-register": "^0.0.15",
+    "solid-register": "^0.0.18",
     "tslib": "^2.3.1",
-    "typescript": "^4.5.2",
     "unocss": "^0.12.4",
     "uvu": "^0.5.2",
     "vite": "2.6.14",
-    "vite-plugin-solid": "2.1.2"
+    "vite-plugin-solid": "2.1.2",
+    "tsup": "^5.10.0"
   },
   "peerDependencies": {
     "solid-js": "^1.2.5"
