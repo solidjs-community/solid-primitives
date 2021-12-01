@@ -5,22 +5,30 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/intersection-observer",
-  "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "private": false,
+  "sideEffects": false,
   "type": "module",
   "files": [
     "dist"
   ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
+    "node": {
       "require": "./dist/server.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+      "import": "./dist/server.js"
+    },
+    "require": "./dist/index.cjs",
+    "import": "./dist/index.js",
+    "default": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "tsup src/index.ts --clean --format esm && tsup src/server.ts --format cjs",
+    "build": "tsup",
     "test": "uvu -r solid-register"
   },
   "keywords": [
