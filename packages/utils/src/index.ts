@@ -1,8 +1,8 @@
 import type { Accessor } from "solid-js";
 
-// --------------------------------------------------------------------
-//  General Helpers
-// --------------------------------------------------------------------
+//
+// GENERAL HELPERS:
+//
 
 export type Fn<R = void> = () => R;
 export type Many<T> = T | T[];
@@ -12,6 +12,8 @@ export type Many<T> = T | T[];
 export type ItemsOf<T> = T extends (infer E)[] ? E : never;
 export type MaybeAccessor<T> = T | Accessor<T>;
 export type MaybeAccessorValue<T extends MaybeAccessor<any>> = T extends Fn ? ReturnType<T> : T;
+
+export const isClient = typeof window !== "undefined";
 
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
   typeof v === "function" ? (v as any)() : v;
@@ -40,9 +42,20 @@ export const promiseTimeout = (
     throwOnTimeout ? setTimeout(() => reject(reason), ms) : setTimeout(resolve, ms)
   );
 
-// --------------------------------------------------------------------
-//  Signal Helpers
-// --------------------------------------------------------------------
+export const objectOmit = <T extends Object, K extends Array<keyof T>>(
+  object: T,
+  ...keys: K
+): Omit<T, ItemsOf<K>> => {
+  const copy = Object.assign({}, object);
+  for (const key of keys) {
+    delete copy[key];
+  }
+  return copy;
+};
+
+//
+// SIGNAL BUILDERS:
+//
 
 export const stringConcat = (...a: MaybeAccessor<any>[]): string =>
   a.reduce((t: string, c) => t + access(c), "") as string;

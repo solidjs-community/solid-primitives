@@ -6,7 +6,7 @@
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener",
   "private": false,
-  "main": "dist/index.js",
+  "main": "dist/cjs/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -14,7 +14,7 @@
     "dist"
   ],
   "exports": {
-    "require": "./dist/cjs/index.js",
+    "require": "./dist/cjs/index.cjs",
     "import": "./dist/index.js",
     "default": "./dist/index.js"
   },
@@ -23,7 +23,7 @@
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
     "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
-    "test": "jest"
+    "test": "uvu -r solid-register"
   },
   "keywords": [
     "event",
@@ -32,41 +32,17 @@
     "primitives"
   ],
   "devDependencies": {
-    "@babel/preset-env": "7.15.6",
-    "@types/jest": "27.0.1",
-    "babel-preset-solid": "1.1.5",
-    "jest": "27.0.1",
-    "prettier": "^2.0.5",
-    "ts-jest": "27.0.5",
-    "tslib": "^2.0.1",
-    "typescript": "^4.4.4"
+    "jsdom": "^18.1.1",
+    "prettier": "^2.5.0",
+    "solid-register": "^0.1.1",
+    "tslib": "^2.3.1",
+    "typescript": "^4.5.2",
+    "uvu": "^0.5.2"
   },
   "dependencies": {
-    "solid-js": "^1.1.6"
+    "solid-js": "^1.2.5"
   },
   "peerDependencies": {
-    "solid-js": "^1.1.6"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "tsconfig.json",
-        "babelConfig": {
-          "presets": [
-            "babel-preset-solid",
-            "@babel/preset-env"
-          ]
-        }
-      }
-    },
-    "setupFiles": [
-      "./test/setup.ts"
-    ],
-    "testEnvironment": "jsdom",
-    "moduleNameMapper": {
-      "solid-js/web": "<rootDir>/node_modules/solid-js/web/dist/web.cjs",
-      "solid-js": "<rootDir>/node_modules/solid-js/dist/solid.cjs"
-    }
+    "solid-js": "^1.2.5"
   }
 }

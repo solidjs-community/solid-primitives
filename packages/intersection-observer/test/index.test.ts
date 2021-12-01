@@ -2,13 +2,9 @@ import { createRoot, createSignal } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
-import {
-  createIntersectionObserver,
-  createViewportObserver,
-  createVisibilityObserver
-} from "../src/";
+import { createIntersectionObserver, createViewportObserver, createVisibilityObserver } from "..";
 
-const intersectionObserverInstances = [];
+const intersectionObserverInstances: any[] = [];
 
 const createMockIOEntry = (
   target: Element,
@@ -55,9 +51,10 @@ class IntersectionObserver {
     this.onChange(entries, this);
   }
 }
+// @ts-ignore
 global.IntersectionObserver = IntersectionObserver;
 
-const runOnChangeOnLastObserver = payload =>
+const runOnChangeOnLastObserver = (payload: any) =>
   intersectionObserverInstances[intersectionObserverInstances.length - 1].onChange(payload);
 
 const cio = suite("createIntersectionObserver");
@@ -195,8 +192,8 @@ cio("stop function unobserves all elements", ({ div, img }) => {
 
 cio("onChange callback", ({ div, img }) => {
   createRoot(dispose => {
-    let cbEntries: IntersectionObserverEntry[];
-    let cbInstance: IntersectionObserver;
+    let cbEntries!: IntersectionObserverEntry[];
+    let cbInstance!: IntersectionObserver;
     const [, { instance, start }] = createIntersectionObserver([div, img], (entries, observer) => {
       cbEntries = entries;
       cbInstance = observer as IntersectionObserver;
@@ -396,7 +393,7 @@ cvo("stop function unobserves all elements", ({ div, img }) => {
 cvo("calls onChange callback for initial elements with common callback", ({ div, img }) => {
   createRoot(dispose => {
     const cbEntries: IntersectionObserverEntry[] = [];
-    let cbInstance: IntersectionObserver;
+    let cbInstance!: IntersectionObserver;
     const [, { instance, start }] = createViewportObserver([div, img], (entry, observer) => {
       cbEntries.push(entry);
       cbInstance = observer as IntersectionObserver;
@@ -445,10 +442,10 @@ cvo("add function works as a directive", () => {
     const el2 = document.createElement("div");
     const [observe, { instance }] = createViewportObserver();
 
-    let cbEntry;
+    let cbEntry: any;
 
     // the correct usage
-    const [props] = createSignal(e => (cbEntry = e));
+    const [props] = createSignal((e: any) => (cbEntry = e));
     observe(el, props);
 
     // the incorrect usage (just shouldn't cause an error)
@@ -457,7 +454,7 @@ cvo("add function works as a directive", () => {
 
     (instance as IntersectionObserver).__TEST__onChange();
 
-    assert.is(cbEntry.target, el);
+    assert.is(cbEntry?.target, el);
 
     dispose();
   });

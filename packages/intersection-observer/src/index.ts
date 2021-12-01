@@ -1,7 +1,7 @@
 import { onMount, onCleanup, createSignal } from "solid-js";
 import type { JSX, Accessor } from "solid-js";
 
-type MaybeAccessor<T> = T | Accessor<T>;
+export type MaybeAccessor<T> = T | Accessor<T>;
 const read = <T>(val: MaybeAccessor<T>): T =>
   typeof val === "function" ? (val as Function)() : val;
 
@@ -18,7 +18,7 @@ export type AddViewportObserverEntry = (
 ) => void;
 export type RemoveViewportObserverEntry = (el: Element) => void;
 
-type CreateViewportObserverReturnValue = [
+export type CreateViewportObserverReturnValue = [
   AddViewportObserverEntry,
   {
     remove: RemoveViewportObserverEntry;
@@ -72,7 +72,6 @@ export const createIntersectionObserver = (
     instance: IntersectionObserver;
   }
 ] => {
-  // If not supported, skip
   const instance = new IntersectionObserver(onChange, options);
   const add: AddIntersectionObserverEntry = el => instance.observe(read(el));
   const remove: RemoveIntersectionObserverEntry = el => instance.unobserve(read(el));

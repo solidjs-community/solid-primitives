@@ -1,6 +1,6 @@
 import { onCleanup, onMount } from "solid-js";
 import type { JSX } from "solid-js";
-import { access, accessAsArray, Fn, MaybeAccessor } from "../../../utils/helpers";
+import { access, accessAsArray, Fn, MaybeAccessor } from "@solid-primitives/utils";
 
 export type MutationObserverAdd = (
   target: Node,
@@ -74,7 +74,7 @@ export function createMutationObserver(
   c?: MutationCallback
 ): MutationObserverReturn {
   let defaultOptions: MutationObserverInit, callback: MutationCallback;
-  const isSupported = window && "MutationObserver" in window;
+  const isSupported = typeof window !== "undefined" && "MutationObserver" in window;
   if (typeof b === "function") {
     defaultOptions = {};
     callback = b;

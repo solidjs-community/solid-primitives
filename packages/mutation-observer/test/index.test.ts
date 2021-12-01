@@ -1,6 +1,6 @@
 import { MutationObserver, instances } from "./setup";
-import { createMutationObserver, mutationObserver } from "../src";
-import { createRoot, createSignal } from "solid-js";
+import { createMutationObserver, mutationObserver } from "..";
+import { createRoot } from "solid-js";
 import { test } from "uvu";
 import * as assert from "uvu/assert";
 
