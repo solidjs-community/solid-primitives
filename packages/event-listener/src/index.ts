@@ -1,4 +1,4 @@
-import { accessAsArray, Fn, Many, MaybeAccessor } from "solid-fns";
+import { accessAsArray, Fn, isClient, Many, MaybeAccessor } from "solid-fns";
 import { createEffect, JSX, onCleanup } from "solid-js";
 
 export type EventMapOf<Target> = Target extends Window
@@ -38,6 +38,25 @@ declare module "solid-js" {
 
 // only here so the `JSX` import won't be shaken off the tree:
 export type E = JSX.Element;
+
+/**
+ * Creates an event listener, that will be automatically disposed on cleanup.
+ *
+ * @param target - ref to HTMLElement, EventTarget or Array thereof
+ * @param eventName - name of the handled event
+ * @param handler - event handler
+ * @param options - addEventListener options
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#readme
+ *
+ * @example
+ * const [stop, start] = createEventListener(
+ *   document.querySelector('.myEl'),
+ *   'click',
+ *   e => { ... }
+ * )
+ */
 
 // DOM Events
 export function createEventListener<
@@ -95,6 +114,7 @@ export function createEventListener(
     toCleanup = [];
   };
   const start = () => {
+    if (!isClient) return;
     stop();
     accessAsArray(target).forEach(target => {
       target.addEventListener(eventName, handler, options);

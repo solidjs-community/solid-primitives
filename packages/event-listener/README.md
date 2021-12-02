@@ -26,23 +26,37 @@ yarn add @solid-primitives/event-listener
 
 ## How to use it
 
+`createEventListener` can be used to listen to DOM or Custom Events on window, document, list of HTML elements or any EventTarget. The target prop can be reactive.
+
 ```ts
-const [add, remove] = createEventListener(document.getElementById("mybutton"), "mouseDown", () =>
-  console.log("Click")
+import { createEventListener } from "@solid-primitives/event-listener";
+
+const [stop, start] = createEventListener(
+  document.getElementById("mybutton"),
+  "mousemove",
+  e => console.log("x:", e.pageX, "y:", e.pageY),
+  { passive: true }
 );
+
+// if you use signal as a target, then the event listener
+// will be removed for previous and added to the new element
+const [ref, setRef] = createSignal<HTMLElement>();
+createEventListener(ref, "click", e => {});
+
+// you can provide your own event map type as well:
+createEventListener<{ myCustomEvent: Event }>(window, "myCustomEvent", () => console.log("yup!"));
+// just don't use interfaces as EventMaps!
 ```
 
 or as a directive
 
 ```ts
-<MyButton use:createEventListener={() => ["click", () => console.log("Click")]}>Click!</MyButton>;
-// you can provide your own event map type as well:
-createEventListener<{ myCustomEvent: Event }>(window, "myCustomEvent", () => console.log("yup!"));
+<button use:createEventListener={["click", () => console.log("Click")]}>Click!</button>
 ```
 
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-primitives-event-listener-8mm77
+You may view a working example here: https://codesandbox.io/s/solid-primitives-event-listener-elti5
 
 ## Changelog
 
@@ -64,5 +78,9 @@ Switched to a more idiomatic pattern: Warning: incompatible with the previous ve
 1.2.5
 
 Added CJS build.
+
+1.3.0
+
+Primitive rewritten to provide better types and more reliable usage. **(breaking changes to type generics and returned functions)**
 
 </details>
