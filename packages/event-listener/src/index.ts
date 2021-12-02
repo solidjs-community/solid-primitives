@@ -1,4 +1,4 @@
-import { accessAsArray, Fn, ItemsOf, Many, MaybeAccessor } from "solid-fns";
+import { accessAsArray, Fn, Many, MaybeAccessor } from "solid-fns";
 import { createEffect, JSX, onCleanup } from "solid-js";
 
 export type EventMapOf<Target> = Target extends Window
@@ -39,7 +39,7 @@ declare module "solid-js" {
 // only here so the `JSX` import won't be shaken off the tree:
 export type E = JSX.Element;
 
-// typical dom events
+// DOM Events
 export function createEventListener<
   Target extends Window | Document | HTMLElement | MediaQueryList,
   EventMap extends EventMapOf<Target>,
@@ -51,21 +51,9 @@ export function createEventListener<
   options?: boolean | AddEventListenerOptions
 ): EventListenerReturn;
 
-// custom events - passed EventMap as the first Generic
+// Custom Events
 export function createEventListener<
   EventMap extends Record<string, Event>,
-  EventName extends keyof EventMap = keyof EventMap
->(
-  target: MaybeAccessor<Many<EventTarget>>,
-  eventName: EventName,
-  handler: (e: EventMap[EventName]) => void,
-  options?: boolean | AddEventListenerOptions
-): EventListenerReturn;
-
-// custom events - passed EventNames as the first Generic
-export function createEventListener<
-  EventNames extends string,
-  EventMap extends Record<string, Event> = Record<ItemsOf<[EventNames]>, Event>,
   EventName extends keyof EventMap = keyof EventMap
 >(
   target: MaybeAccessor<Many<EventTarget>>,
@@ -74,12 +62,11 @@ export function createEventListener<
   options?: boolean | AddEventListenerOptions
 ): EventListenerReturn;
 
-// directive usage
-export function createEventListener<
-  EventNames extends string,
-  EventMap extends Record<string, Event> = Record<ItemsOf<[EventNames]>, Event>,
-  EventName extends keyof EventMap = keyof EventMap
->(target: Element, props: () => EventListenerDirectiveProps): EventListenerReturn;
+// Directive usage
+export function createEventListener(
+  target: Element,
+  props: () => EventListenerDirectiveProps
+): EventListenerReturn;
 
 export function createEventListener(
   target: MaybeAccessor<Many<EventTarget>>,
@@ -131,7 +118,6 @@ export function createEventListener(
 // createEventListener(el, "mousemove", mouseHandler);
 // createEventListener(() => el, "touchstart", touchHandler);
 // // custom events
-// createEventListener<"custom" | "test">(el, "test", e => {});
 // createEventListener<{ test: Event }>(window, "test", e => {});
 // createEventListener<{ test: Event; custom: MouseEvent }, "custom">(
 //   () => el,
