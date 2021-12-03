@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/intersection-observer",
-  "version": "1.1.9",
+  "version": "1.1.8",
   "description": "Primitives to support using the intersection observer API.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -11,16 +11,21 @@
   },
   "private": false,
   "sideEffects": false,
+  "type": "module",
   "files": [
     "dist"
   ],
-  "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    "node": "./dist/server.js",
-    "import": "./dist/index.js"
+    "node": {
+      "require": "./dist/server.cjs",
+      "import": "./dist/server.js"
+    },
+    "require": "./dist/index.cjs",
+    "import": "./dist/index.js",
+    "default": "./dist/index.cjs"
   },
   "scripts": {
     "build": "tsup",
