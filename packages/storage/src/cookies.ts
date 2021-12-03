@@ -55,9 +55,22 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
       .match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")
       ?.pop() ?? null,
   setItem: (key: string, value: string, options?: CookieOptions) => {
+    const oldValue = cookieStorage.getItem(key)
     cookieStorage._cookies[0][cookieStorage._cookies[1]] = `${key}=${value}${serializeCookieOptions(
       options
     )}`;
+    const storageEvent = new StorageEvent('storage');
+    storageEvent.initStorageEvent(
+      'storage',
+      undefined,
+      false,
+      key,
+      oldValue,
+      value,
+      window.document.URL,
+      cookieStorage as Storage
+    );
+    window.dispatchEvent(storageEvent);
   },
   removeItem: (key: string) => {
     cookieStorage._cookies[0][cookieStorage._cookies[1]] = `${key}=deleted${serializeCookieOptions({
