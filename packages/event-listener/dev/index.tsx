@@ -1,16 +1,28 @@
-import { createEventListener } from "../src";
-import { Component, createSignal, For, onMount } from "solid-js";
+import { createEventListener, GlobalEventListener } from "../src";
+import { Component, createSignal, For, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
 import { DisplayRecord } from "./components";
 import "uno.css";
 
 const App: Component = () => {
+  const [handleMouse, setHandleMouse] = createSignal((e: MouseEvent) => {
+    console.log(e.pageX, e.pageY);
+  });
+  const [show, setShow] = createSignal(true);
+
   return (
     <div class="p-24 box-border w-full min-h-screen overflow-hidden bg-indigo-800 text-white flex flex-col justify-center items-center space-y-16">
       <WindowMousemove />
       <List />
       <CustomEvents />
       <DirectiveUsage />
+      <Show when={show()}>
+        <GlobalEventListener
+          onmousemove={handleMouse()}
+          onwheel={() => setHandleMouse(() => e => console.log(e))}
+        />
+      </Show>
+      <GlobalEventListener onclick={e => setShow(p => !p)} />
     </div>
   );
 };

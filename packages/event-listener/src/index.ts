@@ -1,5 +1,6 @@
 import { accessAsArray, Fn, isClient, Many, MaybeAccessor } from "solid-fns";
 import { Accessor, createEffect, JSX, onCleanup } from "solid-js";
+export * from "./component";
 
 export type EventMapOf<Target> = Target extends Window
   ? WindowEventMap
@@ -103,6 +104,7 @@ export function createEventListener(
     stop();
     const [eventName, handler, options] = getProps();
     accessAsArray(target).forEach(target => {
+      if (!target) return;
       target.addEventListener(eventName, handler, options);
       toCleanup.push(() => target.removeEventListener(eventName, handler, options));
     });

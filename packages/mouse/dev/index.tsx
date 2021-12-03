@@ -7,7 +7,7 @@ import {
 import { Component, createSignal, Show } from "solid-js";
 import { render } from "solid-js/web";
 import createRaf from "@solid-primitives/raf";
-import { objectOmit } from "@solid-primitives/utils";
+import { objectOmit } from "solid-fns";
 import { lerp } from "./utils";
 import "uno.css";
 import { DisplayRecord } from "./components";
