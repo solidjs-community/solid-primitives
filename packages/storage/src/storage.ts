@@ -144,8 +144,13 @@ export function createStorage<O, T>(
       });
       changed && ev.key && signals.get(ev.key)?.[1]();
     };
-    globalThis.addEventListener?.("storage", listener);
-    onCleanup(() => globalThis.removeEventListener?.("storage", listener));
+    if ('addEventListener' in globalThis) {
+      globalThis.addEventListener("storage", listener);
+      onCleanup(() => globalThis.removeEventListener("storage", listener));
+    } else {
+      apis.forEach((api) => api.addEventListener?.("storage", listener));
+      onCleanup(() => apis.forEach((api) => api.removeEventListener?.("storage", listener)));
+    }
   });
   return [
     store,
@@ -305,8 +310,13 @@ export function createAsyncStorage<O, T>(
       });
       changed && ev.key && signals.get(ev.key)?.[1]();
     };
-    globalThis.addEventListener('storage', listener);
-    onCleanup(() => globalThis.removeEventListener?.("storage", listener));
+    if ('addEventListener' in globalThis) {
+      globalThis.addEventListener("storage", listener);
+      onCleanup(() => globalThis.removeEventListener("storage", listener));
+    } else {
+      apis.forEach((api) => api.addEventListener?.("storage", listener));
+      onCleanup(() => apis.forEach((api) => api.removeEventListener?.("storage", listener)));
+    }
   });
   return [
     store,
@@ -390,8 +400,13 @@ export function createStorageSignal<T extends any, O extends any>(
       });
       changed && refetch();
     };
-    globalThis.addEventListener("storage", listener);
-    onCleanup(() => globalThis.removeEventListener("storage", listener));
+    if ('addEventListener' in globalThis) {
+      globalThis.addEventListener("storage", listener);
+      onCleanup(() => globalThis.removeEventListener("storage", listener));
+    } else {
+      apis.forEach((api) => api.addEventListener?.("storage", listener));
+      onCleanup(() => apis.forEach((api) => api.removeEventListener?.("storage", listener)));
+    }
   });
   return [
     accessor,
