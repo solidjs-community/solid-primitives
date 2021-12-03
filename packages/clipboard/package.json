@@ -1,32 +1,38 @@
 {
   "name": "@solid-primitives/clipboard",
-  "version": "1.0.5",
+  "version": "1.0.8",
   "description": "Primitives for reading and writing to clipboard.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/clipboard",
-  "private": false,
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davedbase/solid-primitives/tree/main/packages/clipboard"
+  },
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "files": [
     "dist"
   ],
   "exports": {
-    "require": "./dist/cjs/index.cjs",
-    "import": "./dist/index.js",
-    "default": "./dist/index.js"
+    ".": {
+      "require": "./dist/server.cjs",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
-  "sideEffects": "false",
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs"
+    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
+    "build": "tsup",
+    "test": "uvu -r solid-register"
   },
   "keywords": [
-    "intersection",
-    "observer",
+    "clipboard",
+    "copy",
+    "paste",
+    "clipboard data",
     "solid",
     "primitives"
   ],
@@ -34,6 +40,7 @@
     "@types/jest": "^26.0.10",
     "prettier": "^2.0.5",
     "solid-testing-library": "^0.2.0",
+    "tsup": "^5.10.0",
     "tslib": "^2.0.1",
     "typescript": "^4.0.2"
   },

@@ -1,28 +1,31 @@
 {
   "name": "@solid-primitives/geolocation",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Primitives to query geolocation and observe changes.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/geolocation",
-  "private": false,
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davedbase/solid-primitives/tree/main/packages/geolocation"
+  },
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
-  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "exports": {
-    "require": "./dist/cjs/index.cjs",
-    "import": "./dist/index.js",
-    "default": "./dist/index.js"
+    ".": {
+      "require": "./dist/server.cjs",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
-  "sideEffects": "false",
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
+    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
+    "build": "tsup",
     "test": "jest"
   },
   "keywords": [
@@ -37,6 +40,7 @@
     "solid-testing-library": "^0.2.0",
     "ts-jest": "^27.0.6",
     "tslib": "^2.0.1",
+    "tsup": "^5.10.0",
     "@babel/preset-env": "^7.15.8",
     "babel-preset-solid": "^1.1.5",
     "jest": "^27.2.5",

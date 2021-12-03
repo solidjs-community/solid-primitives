@@ -1,4 +1,5 @@
 import { onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
 
 declare module "solid-js" {
   namespace JSX {
@@ -38,7 +39,8 @@ const createClipboard = (): [
   const write = async (data: string | ClipboardItem[]) =>
     // @ts-ignore
     await navigator.clipboard[typeof data === "string" ? "writeText" : "write"](data);
-  const newItem = (data: ClipboardItemData, type: string) => new ClipboardItem({ [type]: data });
+  const newItem = (data: ClipboardItemData, type: string) =>
+    !isServer ? new ClipboardItem({ [type]: data }) : ({} as ClipboardItem);
   return [write, read, { newItem }];
 };
 
@@ -67,7 +69,18 @@ export const copyToClipboard = (
 ) => {
   function highlightText(node: Element, start: number, end: number) {
     const text = node.childNodes[0];
-    const range = new Range();
+    // SSR protected value
+    const range = !isServer
+      ? new Range()
+      : // @ts-ignore
+        ({
+          setStart: () => {
+            /*noop*/
+          },
+          setEnd: () => {
+            /*noop*/
+          }
+        } as Range);
     const selection = document.getSelection();
     range.setStart(text, start);
     range.setEnd(text, end);

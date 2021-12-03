@@ -97,7 +97,7 @@ General package clean-up and added testing facility.
 
 Releasd with CJS support.
 
-1.0.6
+1.0.7
 
 Patch CJS support release.
 

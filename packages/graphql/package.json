@@ -5,24 +5,28 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/graphql",
-  "private": false,
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davedbase/solid-primitives/tree/main/packages/graphql"
+  },
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "files": [
     "dist"
   ],
   "exports": {
-    "require": "./dist/cjs/index.cjs",
-    "import": "./dist/index.js",
-    "default": "./dist/index.js"
+    ".": {
+      "require": "./dist/server.cjs",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
-  "sideEffects": "false",
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs"
+    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
+    "build": "tsup",
+    "test": "uvu -r solid-register"
   },
   "keywords": [
     "graphql",
@@ -35,14 +39,18 @@
     "prettier": "^2.0.5",
     "solid-testing-library": "^0.2.0",
     "tslib": "^2.0.1",
+    "tsup": "^5.10.0",
     "typescript": "^4.0.2"
   },
-  "dependencies": {
-    "solid-js": "^1.0.8"
+  "peerDependencies": {
+    "solid-js": "^1.2.5"
   },
   "jest": {
     "setupFiles": [
       "./test/setup.ts"
     ]
+  },
+  "dependencies": {
+    "node-fetch": "^3.1.0"
   }
 }
