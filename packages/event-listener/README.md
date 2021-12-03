@@ -48,7 +48,9 @@ createEventListener<{ myCustomEvent: Event }>(window, "myCustomEvent", () => con
 // just don't use interfaces as EventMaps!
 ```
 
-or as a directive
+#### Or as a directive:
+
+props passed to the directive are also reactive, so you can change handlers on the fly.
 
 ```ts
 <button use:createEventListener={["click", () => console.log("Click")]}>Click!</button>

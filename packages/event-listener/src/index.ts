@@ -1,5 +1,5 @@
 import { accessAsArray, Fn, isClient, Many, MaybeAccessor } from "solid-fns";
-import { createEffect, JSX, onCleanup } from "solid-js";
+import { Accessor, createEffect, JSX, onCleanup } from "solid-js";
 
 export type EventMapOf<Target> = Target extends Window
   ? WindowEventMap
@@ -23,7 +23,7 @@ export type EventHandler<
 
 export type EventListenerReturn = [stop: Fn, start: Fn];
 
-type EventListenerDirectiveProps =
+export type EventListenerDirectiveProps =
   | [string, (e: any) => void, boolean | AddEventListenerOptions]
   | [string, (e: any) => void];
 
@@ -83,32 +83,17 @@ export function createEventListener<
 
 // Directive usage
 export function createEventListener(
-  target: Element,
-  props: () => EventListenerDirectiveProps
+  target: MaybeAccessor<Many<EventTarget>>,
+  props: Accessor<EventListenerDirectiveProps>
 ): EventListenerReturn;
 
 export function createEventListener(
   target: MaybeAccessor<Many<EventTarget>>,
-  ...rest: any[]
+  ...rest: any
 ): EventListenerReturn {
-  let eventName: string,
-    handler: (e: any) => void,
-    options: boolean | AddEventListenerOptions | undefined;
-
-  if (rest.length > 1) {
-    // function usage
-    eventName = rest[0];
-    handler = rest[1];
-    options = rest[2];
-  } else {
-    // directive usage
-    const props = rest[0]();
-    eventName = props[0];
-    handler = props[1];
-    options = props[2];
-  }
-
+  const getProps: Accessor<EventListenerDirectiveProps> = rest.length > 1 ? () => rest : rest[0];
   let toCleanup: Fn[] = [];
+
   const stop = () => {
     toCleanup.forEach(fn => fn());
     toCleanup = [];
@@ -116,6 +101,7 @@ export function createEventListener(
   const start = () => {
     if (!isClient) return;
     stop();
+    const [eventName, handler, options] = getProps();
     accessAsArray(target).forEach(target => {
       target.addEventListener(eventName, handler, options);
       toCleanup.push(() => target.removeEventListener(eventName, handler, options));
