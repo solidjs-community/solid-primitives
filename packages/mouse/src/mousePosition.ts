@@ -1,4 +1,4 @@
-import { Fn, isClient } from "@solid-primitives/utils";
+import { Fn } from "solid-fns";
 import { Accessor, batch, createSignal } from "solid-js";
 import { Position } from ".";
 import { addListener } from "./common";
@@ -69,13 +69,11 @@ export function createMousePosition(options: MouseOptions = {}): [
   let cleanupList: Fn[] = [];
   const start = () => {
     stop();
-    if (isClient) {
-      cleanupList.push(addListener(window, "mousemove", mouseHandler));
-      cleanupList.push(addListener(window, "dragover", mouseHandler));
-      if (touch) {
-        cleanupList.push(addListener(window, "touchstart", touchHandler));
-        if (followTouch) cleanupList.push(addListener(window, "touchmove", touchHandler));
-      }
+    cleanupList.push(addListener(window, "mousemove", mouseHandler));
+    cleanupList.push(addListener(window, "dragover", mouseHandler));
+    if (touch) {
+      cleanupList.push(addListener(window, "touchstart", touchHandler));
+      if (followTouch) cleanupList.push(addListener(window, "touchmove", touchHandler));
     }
   };
   const stop = () => {

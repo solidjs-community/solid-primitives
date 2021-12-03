@@ -1,4 +1,4 @@
-import { Fn, isClient } from "@solid-primitives/utils";
+import { Fn } from "solid-fns";
 import { Accessor, createMemo, createSignal } from "solid-js";
 import { addListener } from "./common";
 
@@ -53,22 +53,20 @@ export function createMouseOnScreen(
   let cleanupList: Fn[] = [];
   const start = () => {
     stop();
-    if (isClient) {
+    cleanupList.push(
+      addListener(document, "mouseenter", () => setMouseOnScreen(true)),
+      // mousemove with once is for the situations where the cursor has entered the screen before the listeners could attach
+      addListener(document, "mousemove", () => setMouseOnScreen(true), {
+        passive: true,
+        once: true
+      }),
+      addListener(document, "mouseleave", () => setMouseOnScreen(false))
+    );
+    if (touch)
       cleanupList.push(
-        addListener(document, "mouseenter", () => setMouseOnScreen(true)),
-        // mousemove with once is for the situations where the cursor has entered the screen before the listeners could attach
-        addListener(document, "mousemove", () => setMouseOnScreen(true), {
-          passive: true,
-          once: true
-        }),
-        addListener(document, "mouseleave", () => setMouseOnScreen(false))
+        addListener(window, "touchstart", () => setTouchOnScreen(true)),
+        addListener(window, "touchend", () => setTouchOnScreen(false))
       );
-      if (touch)
-        cleanupList.push(
-          addListener(window, "touchstart", () => setTouchOnScreen(true)),
-          addListener(window, "touchend", () => setTouchOnScreen(false))
-        );
-    }
   };
   const stop = () => {
     cleanupList.forEach(fn => fn());

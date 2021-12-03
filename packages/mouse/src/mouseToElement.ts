@@ -1,5 +1,5 @@
-import { access, Fn, MaybeAccessor, isClient, objectOmit } from "@solid-primitives/utils";
-import { Accessor, batch, createComputed, createMemo, createSignal, onMount } from "solid-js";
+import { access, Fn, MaybeAccessor, objectOmit } from "solid-fns";
+import { Accessor, batch, createEffect, createMemo, createSignal } from "solid-js";
 import {
   createMousePosition,
   MouseOptions,
@@ -81,7 +81,7 @@ export function createMouseToElement(
     });
   };
 
-  if (isClient) onMount(() => createComputed(update));
+  createEffect(update);
 
   return [
     {
