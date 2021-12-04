@@ -9,6 +9,15 @@
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
+  "primitive": {
+    "name": "event-listener",
+    "stage": 3,
+    "list": [
+      "createEventListener",
+      "GlobalEventListener"
+    ],
+    "category": "Browser APIs"
+  },
   "private": false,
   "sideEffects": false,
   "type": "module",
@@ -19,7 +28,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
+    "dev": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "build": "tsup",
     "test": "uvu -r solid-register",
     "watch-test": "watchlist src test -- npm test"

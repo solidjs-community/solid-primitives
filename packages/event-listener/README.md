@@ -1,11 +1,3 @@
----
-Name: event-listener
-Stage: 3
-Package: "@solid-primitives/event-listener"
-Primitives: createEventListener
-Category: Browser APIs
----
-
 # @solid-primitives/event-listener
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -14,7 +6,9 @@ Category: Browser APIs
 
 A helpful event listener primitive that binds window and any element supplied.
 
-`createEventListener` - Very basic and straightforward primitive that handles multiple elements according to a single event binding.
+[`createEventListener`](#createEventListener) - Very basic and straightforward primitive that handles multiple elements according to a single event binding.
+
+[`GlobalEventListener`](#GlobalEventListener) - Listen to the `window` DOM Events, using a component.
 
 ## Installation
 
@@ -24,9 +18,11 @@ npm install @solid-primitives/event-listener
 yarn add @solid-primitives/event-listener
 ```
 
-## How to use it
+## `createEventListener`
 
-`createEventListener` can be used to listen to DOM or Custom Events on window, document, list of HTML elements or any EventTarget. The target prop can be reactive.
+Can be used to listen to DOM or Custom Events on window, document, list of HTML elements or any EventTarget. The target prop can be reactive.
+
+### Usage
 
 ```ts
 import { createEventListener } from "@solid-primitives/event-listener";
@@ -38,8 +34,7 @@ const [stop, start] = createEventListener(
   { passive: true }
 );
 
-// if you use signal as a target, then the event listener
-// will be removed for previous and added to the new element
+// target element can be a reactive signal
 const [ref, setRef] = createSignal<HTMLElement>();
 createEventListener(ref, "click", e => {});
 
@@ -48,12 +43,59 @@ createEventListener<{ myCustomEvent: Event }>(window, "myCustomEvent", () => con
 // just don't use interfaces as EventMaps!
 ```
 
-#### Or as a directive:
+### Directive Usage
 
 props passed to the directive are also reactive, so you can change handlers on the fly.
 
 ```ts
 <button use:createEventListener={["click", () => console.log("Click")]}>Click!</button>
+```
+
+### Types
+
+```ts
+type EventListenerReturn = [stop: Fn, start: Fn];
+
+// DOM Events
+function createEventListener(
+  target: MaybeAccessor<Many<EventTarget>>,
+  eventName: EventName,
+  handler: EventHandler<EventMap, EventName>,
+  options?: boolean | AddEventListenerOptions
+): EventListenerReturn;
+
+// Custom Events
+function createEventListener<
+  EventMap extends Record<string, Event>,
+  EventName extends keyof EventMap = keyof EventMap
+>(
+  target: MaybeAccessor<Many<EventTarget>>,
+  eventName: EventName,
+  handler: EventHandler<EventMap, EventName>,
+  options?: boolean | AddEventListenerOptions
+): EventListenerReturn;
+
+// Directive usage
+function createEventListener(
+  target: MaybeAccessor<Many<EventTarget>>,
+  props: Accessor<EventListenerDirectiveProps>
+): EventListenerReturn;
+```
+
+## `GlobalEventListener`
+
+Listen to the `window` DOM Events, using a component.
+
+You can use it with any Solid's Control-Flow components, e.g. `<Show/>` or `<Switch/>`.
+
+The event handler prop is reactive, so you can use it with signals.
+
+### Usage
+
+```tsx
+import { GlobalEventListener } from "@solid-primitives/event-listener";
+
+<GlobalEventListener onMouseMove={e => console.log(e.x, e.y)} />;
 ```
 
 ## Demo
@@ -83,6 +125,6 @@ Added CJS build.
 
 1.3.0
 
-Primitive rewritten to provide better types and more reliable usage. **(breaking changes to type generics and returned functions)**
+Primitive rewritten to provide better types and more reliable usage. **(minor breaking changes to type generics and returned functions)**
 
 </details>

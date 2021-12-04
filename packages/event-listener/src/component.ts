@@ -2,28 +2,24 @@ import { isClient } from "solid-fns";
 import { Component, JSX } from "solid-js";
 import { createEventListener } from ".";
 
-type HTMLEventAttributes<T> = {
-  [K in keyof JSX.HTMLAttributes<T>]: `${K}` extends `on${string}`
-    ? JSX.HTMLAttributes<T>[K]
-    : never;
+type EventAttributes<T> = {
+  [K in keyof JSX.DOMAttributes<T>]: `${K}` extends `on${string}` ? JSX.DOMAttributes<T>[K] : never;
 };
 
 /**
- * Listen to the `window` Events.
+ * Listen to the `window` DOM Events, using a component.
+ *
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#GlobalEventListener
+ *
+ * @example
+ * <GlobalEventListener onMouseMove={e => console.log(e.x, e.y)} />
  */
-export const GlobalEventListener: Component<HTMLEventAttributes<Window>> = props => {
+export const GlobalEventListener: Component<EventAttributes<null>> = props => {
   if (isClient) {
-    const modifyHandler = (handler: (e: Event) => void) => (e: Event) => {
-      // JSX Event Attributes have modify the event's "currentTarget"
-      Object.defineProperty(e, "currentTarget", {
-        get: () => window
-      });
-      handler(e);
-    };
     Object.keys(props).forEach(attr => {
       if (!attr.startsWith("on")) return;
       const eventName = attr.substring(2).toLowerCase();
-      createEventListener(window, () => [eventName, modifyHandler((props as any)[attr])]);
+      createEventListener(window, () => [eventName, (props as any)[attr]]);
     });
   }
   return undefined;

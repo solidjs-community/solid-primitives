@@ -5,9 +5,6 @@ import { DisplayRecord } from "./components";
 import "uno.css";
 
 const App: Component = () => {
-  const [handleMouse, setHandleMouse] = createSignal((e: MouseEvent) => {
-    console.log(e.pageX, e.pageY);
-  });
   const [show, setShow] = createSignal(true);
 
   return (
@@ -17,10 +14,7 @@ const App: Component = () => {
       <CustomEvents />
       <DirectiveUsage />
       <Show when={show()}>
-        <GlobalEventListener
-          onmousemove={handleMouse()}
-          onwheel={() => setHandleMouse(() => e => console.log(e))}
-        />
+        <GlobalEventListener onmousemove={e => console.log(e.x, e.y)} />
       </Show>
       <GlobalEventListener onclick={e => setShow(p => !p)} />
     </div>

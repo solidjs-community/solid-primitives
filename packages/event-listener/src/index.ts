@@ -49,7 +49,7 @@ export type E = JSX.Element;
  * @param options - addEventListener options
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#readme
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#createEventListener
  *
  * @example
  * const [stop, start] = createEventListener(
