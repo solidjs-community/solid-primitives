@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/composites",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Composable reactive helpers built around watching computation changes.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",

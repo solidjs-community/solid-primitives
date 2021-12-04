@@ -268,9 +268,9 @@ See the [implementations of official modifiers](https://github.com/davedbase/sol
 
 Initial realease
 
-1.0.2
+1.0.3
 
-Adjusted documentation.
+Adjusted documentation and published CJS support.
 
 </details>
 
