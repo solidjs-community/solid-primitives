@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/countdown",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Primitive to create a countdown timer",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
