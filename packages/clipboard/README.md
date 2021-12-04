@@ -4,7 +4,7 @@
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/clipboard?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/clipboard)
 [![size](https://img.shields.io/npm/v/@solid-primitives/clipboard?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/clipboard)
 
-Primitive to that make reading and writing to clipboard easy.
+Primitive to that make reading and writing to single or multiple values to clipboard easy. It also comes with a convenient directive to write to clipboard.
 
 ## Installation
 
@@ -25,9 +25,9 @@ const [setClipboard, clipboard] = createClipboard();
 setClipboard("foobar");
 ```
 
-### Directive
+### copyToClipboard
 
-You can also use clipboard as a convenient directive.
+You can also use clipboard as a convenient directive for setting the clipboard value.
 
 ```ts
 import { copyToClipboard } from "@solid-primitives/clipboard";
