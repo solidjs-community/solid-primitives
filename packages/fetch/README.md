@@ -1,11 +1,3 @@
----
-Name: fetch
-Stage: 3
-Package: "@solid-primitives/fetch"
-Primitives: createFetch
-Category: Network
----
-
 # @solid-primitives/fetch
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -13,6 +5,14 @@ Category: Network
 [![size](https://img.shields.io/npm/v/@solid-primitives/fetch?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/fetch)
 
 Creates a primitive to support abortable HTTP requests. If any reactive request options changes, the request is aborted automatically.
+
+## Installation
+
+```bash
+npm install @solid-primitives/fetch
+# or
+yarn add @solid-primitives/fetch
+```
 
 ## How to use it
 
@@ -51,7 +51,7 @@ Improve test setup
 
 Add tests for error case, remove stray console.warn
 
-1.0.2
+1.0.3
 
 Released CJS support.
 

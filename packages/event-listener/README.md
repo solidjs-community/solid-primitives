@@ -14,8 +14,6 @@ Category: Browser APIs
 
 A helpful event listener primitive that binds window and any element supplied.
 
-`createEventListener` - Very basic and straightforward primitive that handles multiple elements according to a single event binding.
-
 ## Installation
 
 ```bash
@@ -26,13 +24,17 @@ yarn add @solid-primitives/event-listener
 
 ## How to use it
 
+### createEventListener
+
+A very straightforward primitive that handles multiple elements according to a single event binding.
+
 ```ts
 const [add, remove] = createEventListener(document.getElementById("mybutton"), "mouseDown", () =>
   console.log("Click")
 );
 ```
 
-or as a directive
+### Directive
 
 ```ts
 <MyButton use:createEventListener={() => ["click", () => console.log("Click")]}>Click!</MyButton>;
