@@ -63,8 +63,8 @@ Minor clean-up, added tests and released.
 
 Added testing and support for srcObject.
 
-1.1.5
+1.1.6
 
-Added proper SSR support.
+Added proper SSR and CJS support.
 
 </details>
