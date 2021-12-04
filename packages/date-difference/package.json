@@ -9,24 +9,35 @@
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
-  "private": false,
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "primitive": {
+    "name": "date-difference",
+    "stage": 0,
+    "list": [
+      "createDateNow",
+      "createDateDifference"
+    ],
+    "category": "Utilities"
+  },
   "files": [
     "dist"
   ],
-  "exports": {
-    "require": "./dist/cjs/index.cjs",
-    "import": "./dist/index.js",
-    "default": "./dist/index.js"
-  },
+  "private": false,
   "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "node": {
+      "import": "./dist/index.js"
+    },
+    "import": "./dist/index.js"
+  },
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
+    "build": "tsup",
     "test": "uvu -r solid-register"
   },
   "keywords": [
@@ -36,21 +47,24 @@
     "primitives"
   ],
   "devDependencies": {
+    "@solid-primitives/composites": "^1.0.1",
+    "@solid-primitives/event-listener": "^1.2.4",
+    "date-fns": "^2.26.0",
     "jsdom": "^18.1.1",
     "prettier": "^2.4.1",
     "rimraf": "^3.0.2",
     "solid-register": "^0.0.15",
     "tslib": "^2.3.1",
     "typescript": "^4.5.2",
+    "unocss": "^0.12.4",
     "uvu": "^0.5.2",
-    "@solid-primitives/composites": "^1.0.1",
-    "@solid-primitives/event-listener": "^1.2.4",
-    "date-fns": "^2.26.0",
     "vite": "2.6.14",
-    "vite-plugin-solid": "2.1.2",
-    "unocss": "^0.12.4"
+    "vite-plugin-solid": "2.1.2"
   },
   "peerDependencies": {
     "solid-js": "^1.2.5"
+  },
+  "dependencies": {
+    "tsup": "^5.10.1"
   }
 }

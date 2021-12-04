@@ -1,11 +1,3 @@
----
-Name: date-difference
-Stage: 2
-Package: "@solid-primitives/date-difference"
-Primitives: createDateNow, createDateDifference
-Category: Utilities
----
-
 # @solid-primitives/date-difference
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -14,14 +6,19 @@ Category: Utilities
 
 Two reactive primitives that provide autoupdating, relative date features.
 
-- [`createDateNow`](#createdatenow) - Creates an autoupdating and reactive `new Date()`
-- [`createDateDifference`](#createdatedifference) - Provides a reactive, formatted date difference in relation to now.
+## Installation
 
-## `createDateNow`
+```
+npm install @solid-primitives/date-difference
+# or
+yarn add @solid-primitives/date-difference
+```
 
-Creates an autoupdating and reactive `new Date()`
+## How to use it
 
-### Usage
+### createDateNow
+
+Creates an autoupdating and reactive `new Date()`.
 
 ```ts
 import { createDateNow } from "@solid-primitives/date-difference";
@@ -36,7 +33,7 @@ const [now, update] = createDateNow(0);
 update();
 ```
 
-### Types
+The types are:
 
 ```ts
 function createDateNow(interval?: MaybeAccessor<number>): [Accessor<Date>, Function];
@@ -45,8 +42,6 @@ function createDateNow(interval?: MaybeAccessor<number>): [Accessor<Date>, Funct
 ## `createDateDifference`
 
 Provides a reactive, formatted date difference in relation to now.
-
-### Usage
 
 ```ts
 import { createDateDifference } from "@solid-primitives/date-difference";
@@ -65,7 +60,7 @@ const [timeago] = createDateDifference(1577836800000, {
 // => last Monday at 9:25 AM
 ```
 
-### Types
+The types are:
 
 ```ts
 function createDateDifference(
@@ -157,6 +152,10 @@ Initial release as a Stage-0 primitive.
 1.0.0
 
 Stage-2 realease.
+
+1.0.1
+
+Updated build process and documentation.
 
 </details>
 
