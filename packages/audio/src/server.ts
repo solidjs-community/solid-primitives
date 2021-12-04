@@ -9,7 +9,7 @@ export const createAudioPlayer = (
 } => {
   return {
     player: {} as HTMLAudioElement,
-    state: () => ({} as AudioState),
+    state: () => AudioState.LOADING,
     setState: (_state: AudioState) => {
       /*noop*/
     }
@@ -31,7 +31,7 @@ export const createAudio = (
     pause: () => {
       /* noop */
     },
-    state: () => ({} as AudioState),
+    state: () => AudioState.LOADING,
     player: {} as HTMLAudioElement
   };
 };
@@ -57,7 +57,7 @@ export const createAudioManager = (
       /* noop */
     },
     currentTime: () => 0,
-    state: () => ({} as AudioState),
+    state: () => AudioState.LOADING,
     duration: () => 0,
     seek: () => {
       /* noop */

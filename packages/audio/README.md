@@ -6,6 +6,8 @@
 
 Primitive to manage audio playback in the browser. The primitives are easily composable and extended. To create your own audio element, consider using createAudioPlayer which allows you to supply a player instance that matches the built-in standard Audio API.
 
+Each primitive also exposes the audio instance for further custom extensions. Within an SSR context this audio primitive performs noops but never interrupts the process. Time values and durations are zero'd and in LOADING state.
+
 ## Installation
 
 ```
@@ -29,15 +31,15 @@ const { player } = createAudioPlayer("example.wav");
 Provides a very basic interface for wrapping listeners to a supplied or default audio player.
 
 ```ts
-const { play, duration, currentTime, seek, setVolume, pause } = createAudioManager("example.wav");
+const { play, pause } = createAudioManager("example.wav");
 ```
 
-### createAudioManager
+### createAIdop
 
 Creates a very basic audio/sound player.
 
 ```ts
-const { play, duration, currentTime, seek, setVolume, pause } = createAudioManager("example.wav");
+const { play, pause, duration, currentTime, seek, setVolume } = createAudioManager("example.wav");
 ```
 
 ## Demo
@@ -61,7 +63,7 @@ Minor clean-up, added tests and released.
 
 Added testing and support for srcObject.
 
-1.1.0
+1.1.5
 
 Added proper SSR support.
 
