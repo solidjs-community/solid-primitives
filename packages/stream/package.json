@@ -16,7 +16,7 @@
       "createStream",
       "createAmplitudeStream"
     ],
-    "category": "Display & Media"
+    "category": "Network"
   },
   "files": [
     "dist"
