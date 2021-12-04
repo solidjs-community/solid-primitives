@@ -16,7 +16,7 @@ yarn add @solid-primitives/audio
 
 ## How to use it
 
-## createAudioPlayer
+### createAudioPlayer
 
 A foundational primitive with no player controls but exposes the raw player object.
 
@@ -24,7 +24,7 @@ A foundational primitive with no player controls but exposes the raw player obje
 const { player } = createAudioPlayer("example.wav");
 ```
 
-## createAudio
+### createAudio
 
 Provides a very basic interface for wrapping listeners to a supplied or default audio player.
 
@@ -32,7 +32,7 @@ Provides a very basic interface for wrapping listeners to a supplied or default 
 const { play, duration, currentTime, seek, setVolume, pause } = createAudioManager("example.wav");
 ```
 
-## createAudioManager
+### createAudioManager
 
 Creates a very basic audio/sound player.
 
