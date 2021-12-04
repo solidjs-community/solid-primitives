@@ -24,18 +24,10 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": {
-    "node": {
-      "import": "./dist/index.js"
-    },
-    "import": "./dist/index.js"
-  },
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
     "build": "tsup",
     "test": "uvu -r solid-register"
   },
@@ -51,18 +43,17 @@
   "devDependencies": {
     "jsdom": "^18.0.1",
     "prettier": "^2.0.5",
-    "rimraf": "^3.0.2",
     "solid-register": "^0.0.10",
     "tslib": "^2.0.1",
     "typescript": "^4.5.2",
-    "uvu": "^0.5.2"
+    "uvu": "^0.5.2",
+    "tsup": "^5.10.1"
   },
   "peerDependencies": {
     "solid-js": "^1.2.5"
   },
   "dependencies": {
     "@solid-primitives/debounce": "^1.0.3",
-    "@solid-primitives/throttle": "^1.0.4",
-    "tsup": "^5.10.1"
+    "@solid-primitives/throttle": "^1.0.4"
   }
 }
