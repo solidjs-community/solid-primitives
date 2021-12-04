@@ -1,28 +1,38 @@
 {
   "name": "@solid-primitives/throttle",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Primitive that creates a throttle function",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/throttle",
   "repository": {
     "type": "git",
-    "url": "https://github.com/davedbase/solid-primitives/tree/main/packages/throttle"
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
-  "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
-  "tsup": "^5.10.0",
+  "primitive": {
+    "name": "throttle",
+    "stage": 3,
+    "list": [
+      "createThrottle"
+    ],
+    "category": "Utilities"
+  },
   "files": [
     "dist"
   ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "require": "./dist/server.cjs",
+    "node": {
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+      "require": "./dist/index.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
   },
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
