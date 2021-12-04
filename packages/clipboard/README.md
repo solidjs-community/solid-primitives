@@ -1,16 +1,8 @@
----
-Name: clipboard
-Stage: 3
-Package: "@solid-primitives/clipboard"
-Primitives: createClipboard, copyToClipboard
-Category: Browser APIs
----
-
 # @solid-primitives/clipboard
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 
-Primitives to that make reading and writing to clipboard easy.
+Primitive to that make reading and writing to clipboard easy.
 
 ## Installation
 
@@ -22,11 +14,18 @@ yarn add @solid-primitives/clipboard
 
 ## How to use it
 
+### createClipboard
+
+Clipboard exports a read and write function. Note the write function is exported first for convenience as the most common use case for this primitive.
+
 ```ts
-const [clipboard, setClipboard] = createClipboard();
+const [setClipboard, clipboard] = createClipboard();
+setClipboard("foobar");
 ```
 
-or using a directive:
+### Directive
+
+You can also use clipboard as a convenient directive.
 
 ```ts
 import { copyToClipboard } from "@solid-primitives/clipboard";
@@ -46,8 +45,8 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-c
 
 Committing first version of primitive.
 
-1.0.6
+1.2.5
 
-Added CJS export and removed outdated permision structure.
+Added proper SSR support and modified documentation.
 
 </details>

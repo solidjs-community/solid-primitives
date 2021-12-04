@@ -12,8 +12,6 @@ declare module "solid-js" {
   }
 }
 
-type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
-
 /**
  * Primitives to that make reading and writing to clipboard easy.
  *
