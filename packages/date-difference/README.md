@@ -153,7 +153,7 @@ Initial release as a Stage-0 primitive.
 
 Stage-2 realease.
 
-1.0.1
+1.0.2
 
 Updated build process and documentation.
 
