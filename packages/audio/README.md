@@ -31,10 +31,10 @@ const { player } = createAudioPlayer("example.wav");
 Provides a very basic interface for wrapping listeners to a supplied or default audio player.
 
 ```ts
-const { play, pause } = createAudioManager("example.wav");
+const { play, pause } = createAudio("example.wav");
 ```
 
-### createAIdop
+### createAudioManager
 
 Creates a very basic audio/sound player.
 
