@@ -65,7 +65,7 @@ TODO
 
 Initial release
 
-1.0.3
+1.0.4
 
 Published with CJS and SSR protection.
 
