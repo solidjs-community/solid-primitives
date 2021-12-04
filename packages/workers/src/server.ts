@@ -1,18 +1,18 @@
-import type { WorkerInstruction } from './index';
+import type { WorkerInstruction } from "./index";
 
 export const createWorker = (..._args: (Function | object)[]): WorkerExports => {
   return [
-      // @ts-ignore
-      () => new Proxy({}, {}),
-      () => {
-        /*noop*/
-      },
-      () => {
-        /*noop*/
-      },
-      undefined
-    ];
-}
+    // @ts-ignore
+    () => new Proxy({}, {}),
+    () => {
+      /*noop*/
+    },
+    () => {
+      /*noop*/
+    },
+    undefined
+  ];
+};
 
 export const createWorkerPool = (
   _concurrency: number = 1,

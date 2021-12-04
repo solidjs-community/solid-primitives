@@ -18,8 +18,5 @@ export const createGeolocationWatcher = (
   location: Accessor<GeolocationCoordinates | null>,
   error: Accessor<GeolocationPositionError | null>
 ] => {
-  return [
-    () => null,
-    () => null
-  ];
+  return [() => null, () => null];
 };

@@ -12,7 +12,11 @@
   "primitives": {
     "name": "audio",
     "stage": 3,
-    "list": ["createAudio", "createAudioPlayer", "createAudioManager"],
+    "list": [
+      "createAudio",
+      "createAudioPlayer",
+      "createAudioManager"
+    ],
     "category": "Display & Media"
   },
   "files": [
@@ -31,7 +35,8 @@
     },
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
-  },  "scripts": {
+  },
+  "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "build": "tsup",
     "test": "jest"

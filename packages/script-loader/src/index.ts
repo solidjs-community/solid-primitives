@@ -2,12 +2,12 @@ import { Accessor, createEffect, onCleanup } from "solid-js";
 
 /**
  * Creates a convenient script loader utility
- * 
+ *
  * @param string URL of the script to load.
  * @param type Type value to put in the script attribute.
  * @param function Callback to trigger onLoad.
  * @param function callback on error.
- * @returns 
+ * @returns
  */
 export const createScriptLoader = (opts: {
   src: string | Accessor<string>;

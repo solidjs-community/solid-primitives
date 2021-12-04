@@ -1,4 +1,4 @@
-import type { ClipboardSetter } from './index';
+import type { ClipboardSetter } from "./index";
 
 export const createClipboard = (): [
   write: ClipboardSetter,
@@ -32,4 +32,4 @@ export const copyToClipboard = (
   }
 ) => {
   /*noop*/
-}
+};

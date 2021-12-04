@@ -121,7 +121,7 @@ export function createFetch<T, I>(
     let value = options?.initialValue as T | I;
     let aborted = false;
     return [
-      Object.assign(() => value, { 
+      Object.assign(() => value, {
         aborted,
         error: undefined,
         loading: false,
@@ -129,11 +129,15 @@ export function createFetch<T, I>(
         response: null
       }),
       {
-        abort: () => { aborted = true; },
+        abort: () => {
+          aborted = true;
+        },
         mutate: (v: T | I) => (value = v),
-        refetch: () => { aborted = false; }
+        refetch: () => {
+          aborted = false;
+        }
       }
-    ]
+    ];
   }
 
   const fetcher = (

@@ -12,7 +12,7 @@ const createRAF = (
     },
     () => {
       /*noop*/
-    }, 
+    }
   ];
 };
 

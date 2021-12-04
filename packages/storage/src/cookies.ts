@@ -55,11 +55,11 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
       .match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")
       ?.pop() ?? null,
   setItem: (key: string, value: string, options?: CookieOptions) => {
-    const oldValue = cookieStorage.getItem(key)
+    const oldValue = cookieStorage.getItem(key);
     cookieStorage._cookies[0][cookieStorage._cookies[1]] = `${key}=${value}${serializeCookieOptions(
       options
     )}`;
-    const storageEvent = Object.assign(new Event('storage'), {
+    const storageEvent = Object.assign(new Event("storage"), {
       key,
       oldValue,
       newValue: value,

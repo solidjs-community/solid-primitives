@@ -12,7 +12,9 @@
   "primitive": {
     "name": "graphql",
     "stage": 3,
-    "list": ["createGraphQLClient"],
+    "list": [
+      "createGraphQLClient"
+    ],
     "category": "Network"
   },
   "files": [

@@ -1,6 +1,6 @@
 import { Accessor } from "solid-js";
 import { default as createGraphQL } from "./index";
-import nodeFetch from 'node-fetch';
+import nodeFetch from "node-fetch";
 
 const createGraphQLClient = (
   url: string | Accessor<string>,
@@ -10,10 +10,7 @@ const createGraphQLClient = (
   return createGraphQL(
     url,
     headers,
-    fetcher as (
-      input: RequestInfo,
-      init?: RequestInit | undefined
-    ) => Promise<Response>
+    fetcher as (input: RequestInfo, init?: RequestInit | undefined) => Promise<Response>
   );
 };
 

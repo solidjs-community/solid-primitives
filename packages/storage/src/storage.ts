@@ -131,25 +131,22 @@ export function createStorage<O, T>(
     return result;
   };
   onMount(() => {
-    const listener = (ev: StorageEvent) => {      
-      let changed = false;    
-      apis.forEach((api) => {
-        if (
-          api !== ev.storageArea && ev.key &&
-          ev.newValue !== api.getItem(ev.key)
-        ) {
+    const listener = (ev: StorageEvent) => {
+      let changed = false;
+      apis.forEach(api => {
+        if (api !== ev.storageArea && ev.key && ev.newValue !== api.getItem(ev.key)) {
           ev.newValue ? api.setItem(ev.key, ev.newValue) : api.removeItem(ev.key);
           changed = true;
-        } 
+        }
       });
       changed && ev.key && signals.get(ev.key)?.[1]();
     };
-    if ('addEventListener' in globalThis) {
+    if ("addEventListener" in globalThis) {
       globalThis.addEventListener("storage", listener);
       onCleanup(() => globalThis.removeEventListener("storage", listener));
     } else {
-      apis.forEach((api) => api.addEventListener?.("storage", listener));
-      onCleanup(() => apis.forEach((api) => api.removeEventListener?.("storage", listener)));
+      apis.forEach(api => api.addEventListener?.("storage", listener));
+      onCleanup(() => apis.forEach(api => api.removeEventListener?.("storage", listener)));
     }
   });
   return [
@@ -297,25 +294,22 @@ export function createAsyncStorage<O, T>(
     return result;
   };
   onMount(() => {
-    const listener = (ev: StorageEvent) => {  
-      let changed = false;    
-      apis.forEach(async (api) => {
-        if (
-          api !== ev.storageArea && ev.key &&
-          ev.newValue !== await api.getItem(ev.key)
-        ) {
+    const listener = (ev: StorageEvent) => {
+      let changed = false;
+      apis.forEach(async api => {
+        if (api !== ev.storageArea && ev.key && ev.newValue !== (await api.getItem(ev.key))) {
           ev.newValue ? api.setItem(ev.key, ev.newValue) : api.removeItem(ev.key);
           changed = true;
-        } 
+        }
       });
       changed && ev.key && signals.get(ev.key)?.[1]();
     };
-    if ('addEventListener' in globalThis) {
+    if ("addEventListener" in globalThis) {
       globalThis.addEventListener("storage", listener);
       onCleanup(() => globalThis.removeEventListener("storage", listener));
     } else {
-      apis.forEach((api) => api.addEventListener?.("storage", listener));
-      onCleanup(() => apis.forEach((api) => api.removeEventListener?.("storage", listener)));
+      apis.forEach(api => api.addEventListener?.("storage", listener));
+      onCleanup(() => apis.forEach(api => api.removeEventListener?.("storage", listener)));
     }
   });
   return [
@@ -385,34 +379,27 @@ export function createStorageSignal<T extends any, O extends any>(
   const refetch = () => {
     const value = read();
     setter(value as any);
-  }
+  };
   onMount(() => {
     const listener = (ev: StorageEvent) => {
-      let changed = false;     
-      apis.forEach((api) => {
-        if (
-          api !== ev.storageArea && ev.key &&
-          ev.newValue !== api.getItem(ev.key)
-        ) {
+      let changed = false;
+      apis.forEach(api => {
+        if (api !== ev.storageArea && ev.key && ev.newValue !== api.getItem(ev.key)) {
           ev.newValue ? api.setItem(ev.key, ev.newValue) : api.removeItem(ev.key);
           changed = true;
-        } 
+        }
       });
       changed && refetch();
     };
-    if ('addEventListener' in globalThis) {
+    if ("addEventListener" in globalThis) {
       globalThis.addEventListener("storage", listener);
       onCleanup(() => globalThis.removeEventListener("storage", listener));
     } else {
-      apis.forEach((api) => api.addEventListener?.("storage", listener));
-      onCleanup(() => apis.forEach((api) => api.removeEventListener?.("storage", listener)));
+      apis.forEach(api => api.addEventListener?.("storage", listener));
+      onCleanup(() => apis.forEach(api => api.removeEventListener?.("storage", listener)));
     }
   });
-  return [
-    accessor,
-    setter,
-    refetch
-  ];
+  return [accessor, setter, refetch];
 }
 
 export const createLocalStorage = createStorage;

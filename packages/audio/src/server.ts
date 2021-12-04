@@ -1,4 +1,3 @@
-
 export const createAudioPlayer = (
   _src: AudioSource,
   _handlers: Array<[string, EventListener]>

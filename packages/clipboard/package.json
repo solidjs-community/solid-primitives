@@ -12,7 +12,10 @@
   "primitive": {
     "name": "clipboard",
     "stage": 3,
-    "list": ["createClipboard", "copyToClipboard"],
+    "list": [
+      "createClipboard",
+      "copyToClipboard"
+    ],
     "category": "Browser APIs"
   },
   "files": [

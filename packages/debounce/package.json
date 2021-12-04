@@ -12,7 +12,9 @@
   "primitive": {
     "name": "debounce",
     "stage": 3,
-    "list": ["createDebounce"],
+    "list": [
+      "createDebounce"
+    ],
     "category": "Utilities"
   },
   "files": [

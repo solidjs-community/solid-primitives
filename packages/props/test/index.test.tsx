@@ -1,5 +1,5 @@
-import { suite } from 'uvu';
-import * as assert from 'uvu/assert';
+import { suite } from "uvu";
+import * as assert from "uvu/assert";
 import { createRoot } from "solid-js";
 import { createProp, createProps } from "../src";
 

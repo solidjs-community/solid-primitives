@@ -1,5 +1,5 @@
 import type { Accessor, Resource } from "solid-js";
-import type { StreamReturn } from './index';
+import type { StreamReturn } from "./index";
 
 const noop = {
   stream: new Proxy({}, {}) as Resource<undefined>,
@@ -18,10 +18,7 @@ export const createStream = (
     | MediaStreamConstraints
     | Accessor<MediaDeviceInfo | MediaStreamConstraints>
 ): StreamReturn => {
-  return [
-    new Proxy({}, {}) as Resource<undefined>,
-    noop
-  ]
+  return [new Proxy({}, {}) as Resource<undefined>, noop];
 };
 
 export const createAmplitudeStream = (
@@ -35,10 +32,7 @@ export const createAmplitudeStream = (
     stop: () => void;
   }
 ] => {
-  return [
-    new Proxy({}, {}) as Resource<number>,
-    noop
-  ];
+  return [new Proxy({}, {}) as Resource<number>, noop];
 };
 
 export const createMediaPermissionRequest = (

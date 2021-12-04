@@ -12,13 +12,15 @@ testCreateStorage.before(context => {
     setItem: (key: string, value: string): void => {
       const oldValue = data[key];
       data[key] = value;
-      window.dispatchEvent(Object.assign(new Event('storage'), {
-        key,
-        newValue: value,
-        oldValue,
-        storageArea: context.mockStorage,
-        url: window.document.URL
-      }));
+      window.dispatchEvent(
+        Object.assign(new Event("storage"), {
+          key,
+          newValue: value,
+          oldValue,
+          storageArea: context.mockStorage,
+          url: window.document.URL
+        })
+      );
     },
     clear: () => {
       data = {};
@@ -59,13 +61,15 @@ testCreateStorage.before(context => {
     setItem: (key: string, value: string): Promise<void> => {
       const oldValue = data[key];
       data[key] = value;
-      window.dispatchEvent(Object.assign(new Event('storage'), {
-        key,
-        newValue: value,
-        oldValue,
-        storageArea: context.mockStorage,
-        url: window.document.URL
-      }));
+      window.dispatchEvent(
+        Object.assign(new Event("storage"), {
+          key,
+          newValue: value,
+          oldValue,
+          storageArea: context.mockStorage,
+          url: window.document.URL
+        })
+      );
       return Promise.resolve();
     },
     clear: () => {
