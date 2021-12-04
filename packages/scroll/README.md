@@ -39,8 +39,8 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-s
 
 Initial porting of the scroll primitive.
 
-1.0.3
+1.0.4
 
-Released new version with CJS support.
+Released new version with CJS and SSR support.
 
 </details>
