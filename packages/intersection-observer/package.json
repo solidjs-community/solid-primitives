@@ -15,14 +15,16 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/server.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     "node": {
-      "import": "./dist/server.js"
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
     },
-    "import": "./dist/index.js"
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
   },
   "scripts": {
     "build": "tsup",
