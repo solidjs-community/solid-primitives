@@ -1,6 +1,8 @@
 import { onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 
+export type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
+
 declare module "solid-js" {
   namespace JSX {
     interface Directives {

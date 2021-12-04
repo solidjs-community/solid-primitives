@@ -47,7 +47,7 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-c
 
 Committing first version of primitive.
 
-1.2.5
+1.2.6
 
 Added proper SSR support and modified documentation.
 

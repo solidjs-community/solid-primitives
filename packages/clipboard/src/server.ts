@@ -1,4 +1,6 @@
-const createClipboard = (): [
+import type { ClipboardSetter } from './index';
+
+export const createClipboard = (): [
   write: ClipboardSetter,
   read: () => Promise<ClipboardItems | undefined>,
   helpers: {
@@ -20,3 +22,14 @@ const createClipboard = (): [
     }
   ];
 };
+
+export const copyToClipboard = (
+  _el: Element,
+  _options: () => {
+    value?: any;
+    setter?: ClipboardSetter;
+    highlight: boolean;
+  }
+) => {
+  /*noop*/
+}
