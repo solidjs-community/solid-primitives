@@ -7,7 +7,6 @@ const path = require('path')
 // ------------------------------------------------------------
 async function updateReadme(log) {
   log.info('updateReadme', 'Updating README documentation');
-  const frontmatter = require('@github-docs/frontmatter');
   const markdownMagic = require('markdown-magic');
   const tablemark = require('json-to-markdown-table');
   const githubURL = 'https://github.com/davedbase/solid-primitives/tree/main/packages/';

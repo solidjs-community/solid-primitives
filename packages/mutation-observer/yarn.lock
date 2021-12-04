@@ -974,10 +974,10 @@
   resolved "https://registry.yarnpkg.com/@solid-primitives/throttle/-/throttle-1.0.5.tgz#bf88c64d79120019c7a382d5ce74b19dbd5fbf73"
   integrity sha512-iINoTFoAieIKeLSmYcNZ0+Fnfo9XWGJ8VxzmDiRJ7e9K5uUZO+Hhqb6mLi/454N9edfM5IBSEwHkH6omJlZ5fw==
 
-"@solid-primitives/utils@^0.0.150":
-  version "0.0.150"
-  resolved "https://registry.yarnpkg.com/@solid-primitives/utils/-/utils-0.0.150.tgz#7c496df40c60f9aff9f20fc0625d3689407c88d0"
-  integrity sha512-LbT+T1g3QQp1vwssasEAgx2MiiQl/BDqbUjbLIKaNCBfkFIxMxJWfwiV9BRE+ntsLOUs+8LlP2oHnBNY60pqXA==
+"@solid-primitives/utils@^0.0.200":
+  version "0.0.200"
+  resolved "https://registry.yarnpkg.com/@solid-primitives/utils/-/utils-0.0.200.tgz#cf80c4c3901ffb6149aa4ce02881adc5b9099394"
+  integrity sha512-ZnfK9CtaTMab3wmgeaBuM6FC9IjF+PjrqjHHst22wSCUEtpc8ABzLu7E5GKt98SUStZgjBkYr46PMNliWAnwCQ==
 
 "@tootallnate/once@2":
   version "2.0.0"

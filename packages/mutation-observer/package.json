@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mutation-observer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Primitive providing the ability to watch for changes made to the DOM tree.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -53,6 +53,6 @@
     "solid-js": "^1.2.5"
   },
   "dependencies": {
-    "@solid-primitives/utils": "^0.0.150"
+    "@solid-primitives/utils": "^0.0.200"
   }
 }

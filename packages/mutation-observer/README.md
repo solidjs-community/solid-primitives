@@ -115,4 +115,8 @@ Initial release as a Stage-2 primitive.
 
 Added support for CJS and cleaned up docs.
 
+1.0.3
+
+Updated utility package dependency.
+
 </details>
