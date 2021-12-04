@@ -54,7 +54,7 @@
     "typescript": "^4.5.2",
     "uvu": "^0.5.2"
   },
-  "dependencies": {
+  "peerDependencies": {
     "solid-js": "^1.2.5"
   }
 }
