@@ -1,28 +1,42 @@
 {
   "name": "@solid-primitives/stream",
-  "version": "0.0.160",
+  "version": "0.0.180",
   "description": "Primitive that gets a user media stream from microphone, camera or screen",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/stream",
-  "private": false,
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "stream",
+    "stage": 3,
+    "list": [
+      "createStream",
+      "createAmplitudeStream"
+    ],
+    "category": "Display & Media"
+  },
   "files": [
     "dist"
   ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "require": "./dist/cjs/index.cjs",
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
     "import": "./dist/index.js",
-    "default": "./dist/index.js"
+    "require": "./dist/index.cjs"
   },
-  "sideEffects": "false",
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
+    "build": "tsup",
     "test": "uvu -r solid-register -r test/setup.ts -i test/setup.ts"
   },
   "keywords": [
@@ -33,11 +47,12 @@
   ],
   "devDependencies": {
     "jsdom": "^18.1.1",
-    "uvu": "^0.5.2",
-    "solid-register": "^0.0.18",
     "prettier": "^2.0.5",
+    "solid-register": "^0.0.18",
     "tslib": "^2.3.1",
-    "typescript": "^4.5.2"
+    "tsup": "^5.10.1",
+    "typescript": "^4.5.2",
+    "uvu": "^0.5.2"
   },
   "dependencies": {
     "solid-js": "^1.2.5"
