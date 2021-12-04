@@ -70,6 +70,13 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@solid-primitives/timer@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@solid-primitives/timer/-/timer-1.0.2.tgz#f10f6846fa748b79d3ac4045a75f068136e3f43d"
+  integrity sha512-RTpmgkc4jzG3vGLL5DRlp5jNeSerz5ZV1J0y15wUi2wjQi8FOX38n1VqYvJWzD3hucjaRMYBdR2aPbl6IlAgkA==
+  dependencies:
+    solid-js "^1.2.5"
+
 "@testing-library/dom@^7.29.4":
   version "7.31.2"
   resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-7.31.2.tgz#df361db38f5212b88555068ab8119f5d841a8c4a"
@@ -835,6 +842,11 @@ slash@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/slash/-/slash-3.0.0.tgz#6539be870c165adbd5240220dbe361f1bc4d4634"
   integrity sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
+
+solid-js@^1.2.5:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/solid-js/-/solid-js-1.2.5.tgz#26175228ae562c95e92f476c73db744b6b36fc2c"
+  integrity sha512-XcPEULgqd/XbBu8LwtGWs5RGowvIpq88/ZNI/xgJ9PaxRJWwbVlSNsS+ywUWncxRdKsPoVe8vdcIsH4gBJjh3Q==
 
 solid-testing-library@^0.2.0:
   version "0.2.1"

@@ -1,32 +1,40 @@
 {
   "name": "@solid-primitives/countdown",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Primitive to create a countdown timer",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/countdown",
   "repository": {
     "type": "git",
-    "url": "https://github.com/davedbase/solid-primitives/tree/main/packages/countdown"
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
-  "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
+  "primitive": {
+    "name": "countdown",
+    "stage": 3,
+    "list": [
+      "createCountdown"
+    ],
+    "category": "Utilities"
+  },
   "files": [
     "dist"
   ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "require": "./dist/server.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+    "node": {
+      "import": "./dist/index.js"
+    },
+    "import": "./dist/index.js"
   },
   "scripts": {
-    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "build": "tsup",
-    "test": "uvu -r solid-register"
+    "test": "jest"
   },
   "keywords": [
     "countdown",
@@ -43,8 +51,10 @@
     "typescript": "^4.0.2"
   },
   "peerDependencies": {
-    "@solid-primitives/timer": "^1.0.2",
     "solid-js": "^1.2.5"
+  },
+  "dependencies": {
+    "@solid-primitives/timer": "^1.0.2"
   },
   "jest": {
     "setupFiles": [
