@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/date-difference",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Reactive primitives that provide autoupdating, relative date features.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
