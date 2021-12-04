@@ -1,31 +1,38 @@
 {
   "name": "@solid-primitives/audio",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Primitives to manage audio and single sounds.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/audio",
   "repository": {
     "type": "git",
-    "url": "https://github.com/davedbase/solid-primitives/tree/main/packages/template-primitive"
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
-  "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
+  "primitives": {
+    "name": "audio",
+    "stage": 3,
+    "list": ["createAudio", "createAudioPlayer", "createAudioManager"],
+    "category": "Display & Media"
+  },
   "files": [
     "dist"
   ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "require": "./dist/server.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+    "node": {
+      "import": "./dist/server.js"
+    },
+    "import": "./dist/index.js"
   },
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
-    "build": "tsup src/index.ts --clean --format esm && tsup src/server.ts --format cjs",
+    "build": "tsup",
     "test": "jest"
   },
   "keywords": [

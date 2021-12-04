@@ -4,6 +4,6 @@ import defaultConfig from "../../tsup.config";
 export default defineConfig(() => {
   return {
     ...defaultConfig,
-    clean: false
+    entryPoints: ["src/index.ts", "src/server.ts"]
   };
 });

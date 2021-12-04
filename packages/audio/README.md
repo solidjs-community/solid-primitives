@@ -1,34 +1,40 @@
----
-Name: audio
-Stage: 3
-Package: "@solid-primitives/audio"
-Primitives: createAudio, createAudioPlayer, createAudioManager
-Category: Display & Media
----
-
 # @solid-primitives/audio
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/audio?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/audio)
 [![size](https://img.shields.io/npm/v/@solid-primitives/audio?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/audio)
 
-Primitive to manage audio playback in the browser. This primitive is comprised of three composed primitives:
+Primitive to manage audio playback in the browser. The primitives are easily composable and extended. To create your own audio element, consider using createAudioPlayer which allows you to supply a player instance that matches the built-in standard Audio API.
 
-`createAudioPlayer` - Provides a very basic interface for wrapping listeners to a supplied or default audio player.
+## Installation
 
-`createAudio` - Creates a very basic audio/sound player.
-
-`createAudioManager` - Creates a full featured audio manager.
-
-The primitives are easily composable and extended. To create your own audio element, consider using createBaseAudio which allows you to supply a player instance that matches the built-in standard Audio API.
+```
+npm install @solid-primitives/audio
+# or
+yarn add @solid-primitives/audio
+```
 
 ## How to use it
 
+## createAudioPlayer
+
+A foundational primitive with no player controls but exposes the raw player object.
+
 ```ts
-const { play, pause } = createAudio("example.wav");
+const { player } = createAudioPlayer("example.wav");
 ```
 
-and
+## createAudio
+
+Provides a very basic interface for wrapping listeners to a supplied or default audio player.
+
+```ts
+const { play, duration, currentTime, seek, setVolume, pause } = createAudioManager("example.wav");
+```
+
+## createAudioManager
+
+Creates a very basic audio/sound player.
 
 ```ts
 const { play, duration, currentTime, seek, setVolume, pause } = createAudioManager("example.wav");
@@ -55,8 +61,8 @@ Minor clean-up, added tests and released.
 
 Added testing and support for srcObject.
 
-1.0.8
+1.1.0
 
-Added CJS support.
+Added proper SSR support.
 
 </details>
