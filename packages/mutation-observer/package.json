@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mutation-observer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Primitive providing the ability to watch for changes made to the DOM tree.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -9,15 +9,23 @@
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
-  "private": false,
-  "sideEffects": false,
-  "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "primitive": {
+    "name": "mutation-observer",
+    "stage": 3,
+    "list": [
+      "createMutationObserver"
+    ],
+    "category": "Browser APIs"
+  },
   "files": [
     "dist"
   ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "build": "tsup",
@@ -35,11 +43,11 @@
     "prettier": "^2.4.1",
     "solid-register": "^0.0.18",
     "tslib": "^2.3.1",
+    "tsup": "^5.10.1",
     "unocss": "^0.12.4",
     "uvu": "^0.5.2",
     "vite": "2.6.14",
-    "vite-plugin-solid": "2.1.2",
-    "tsup": "^5.10.0"
+    "vite-plugin-solid": "2.1.2"
   },
   "peerDependencies": {
     "solid-js": "^1.2.5"
