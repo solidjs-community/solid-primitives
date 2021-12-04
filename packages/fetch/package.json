@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/fetch",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Primitive that wraps fetch requests",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
@@ -23,7 +23,7 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.cjs",
+  "main": "./dist/server.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

@@ -53,8 +53,8 @@ Improve test setup
 
 Add tests for error case, remove stray console.warn
 
-1.0.3
+1.0.5
 
-Released CJS support.
+Released CJS and SSR support.
 
 </details>
