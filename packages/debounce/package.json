@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/debounce",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "Primitive that creates a debounce function",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -21,14 +21,16 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     "node": {
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
-    "import": "./dist/index.js"
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
   },
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",

@@ -46,7 +46,7 @@ Changed any to unknown type and applied patch from high1.
 
 Adding CJS support to package.
 
-1.0.6
+1.0.8
 
 Cleaned up documentation
 
