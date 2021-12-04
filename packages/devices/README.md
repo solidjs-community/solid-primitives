@@ -43,8 +43,8 @@ Initial release loosely adapted from https://github.com/microcipcip/vue-use-kit/
 
 Released official version, CJS and updated to Stage 3
 
-1.0.2
+1.0.3
 
-Add proper build process and clean up docs. Added SSR support.
+Add proper build process and clean up docs. Added SSR and CJS support.
 
 </details>

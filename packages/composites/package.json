@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/composites",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Composable reactive helpers built around watching computation changes.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -56,7 +56,7 @@
     "solid-js": "^1.2.5"
   },
   "dependencies": {
-    "@solid-primitives/debounce": "^1.0.3",
-    "@solid-primitives/throttle": "^1.0.4"
+    "@solid-primitives/debounce": "^1.0.8",
+    "@solid-primitives/throttle": "^1.0.8"
   }
 }
