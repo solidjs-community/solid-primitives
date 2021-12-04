@@ -10,7 +10,7 @@
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
   "primitive": {
-    "name": "resiz-observer",
+    "name": "resize-observer",
     "stage": 3,
     "list": [
       "createResizeObserver"

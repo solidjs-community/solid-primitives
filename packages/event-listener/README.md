@@ -1,11 +1,3 @@
----
-Name: event-listener
-Stage: 3
-Package: "@solid-primitives/event-listener"
-Primitives: createEventListener
-Category: Browser APIs
----
-
 # @solid-primitives/event-listener
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -66,5 +58,9 @@ Switched to a more idiomatic pattern: Warning: incompatible with the previous ve
 1.2.5
 
 Added CJS build.
+
+1.2.6
+
+Migrated to new build process.
 
 </details>
