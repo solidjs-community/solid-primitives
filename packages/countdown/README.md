@@ -37,7 +37,7 @@ You may view a working example here: https://codesandbox.io/s/create-countdown-s
 
 First commit of the countdown primitive.
 
-1.0.5
+1.0.7
 
 Updated to Stage 3 and published CJS.
 

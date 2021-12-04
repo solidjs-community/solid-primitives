@@ -29,9 +29,11 @@
   "types": "./dist/index.d.ts",
   "exports": {
     "node": {
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
-    "import": "./dist/index.js"
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
   },
   "scripts": {
     "prebuild": "npm run clean",
