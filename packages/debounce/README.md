@@ -1,11 +1,3 @@
----
-Name: debounce
-Stage: 3
-Package: "@solid-primitives/debounce"
-Primitives: createDebounce
-Category: Utilities
----
-
 # @solid-primitives/debounce
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -13,6 +5,14 @@ Category: Utilities
 [![size](https://img.shields.io/npm/v/@solid-primitives/debounce?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/debounce)
 
 Creates a helpful debounce function.
+
+## Installation
+
+```
+npm install @solid-primitives/debounce
+# or
+yarn add @solid-primitives/debounce
+```
 
 ## How to use it
 
@@ -45,5 +45,9 @@ Changed any to unknown type and applied patch from high1.
 1.0.5
 
 Adding CJS support to package.
+
+1.0.6
+
+Cleaned up documentation
 
 </details>

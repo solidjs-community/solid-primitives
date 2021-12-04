@@ -1,27 +1,34 @@
 {
   "name": "@solid-primitives/debounce",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Primitive that creates a debounce function",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/debounce",
   "repository": {
     "type": "git",
-    "url": "https://github.com/davedbase/solid-primitives/tree/main/packages/debounce"
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
-  "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
+  "primitive": {
+    "name": "debounce",
+    "stage": 3,
+    "list": ["createDebounce"],
+    "category": "Utilities"
+  },
   "files": [
     "dist"
   ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "require": "./dist/server.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+    "node": {
+      "import": "./dist/index.js"
+    },
+    "import": "./dist/index.js"
   },
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
