@@ -1,28 +1,32 @@
 {
   "name": "@solid-primitives/i18n",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Primitive to create and use i18n primitives.",
   "author": "Alexandre Mouton-Brady <amoutonbrady@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/i18n",
   "repository": {
     "type": "git",
-    "url": "https://github.com/davedbase/solid-primitives/tree/main/packages/i18n"
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
-  "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
+  "primitive": {
+    "name": "i18n",
+    "stage": 3,
+    "list": [
+      "createI18nContext",
+      "useI18n"
+    ],
+    "category": "Utilities"
+  },
   "files": [
     "dist"
   ],
-  "exports": {
-    ".": {
-      "require": "./dist/server.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "build": "tsup",
