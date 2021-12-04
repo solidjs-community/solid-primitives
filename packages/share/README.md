@@ -11,6 +11,7 @@ Primitives for supporting sharing of resources on social media and beyond.
 ```
 npm install @solid-primitives/share
 # or
+yarn add @solid-primitives/share
 ```
 
 ## How to use it
