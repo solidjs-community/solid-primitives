@@ -1,10 +1,3 @@
----
-Name: props
-Stage: 3
-Package: "@solid-primitives/props"
-Primitives: createProps
----
-
 # @solid-primitives/props
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -12,6 +5,14 @@ Primitives: createProps
 [![size](https://img.shields.io/npm/v/@solid-primitives/props?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/props)
 
 Creates a primitive to provide props signals for simple component testing
+
+## Installation
+
+```
+npm install @solid-primitives/props
+# or
+yarn add @solid-primitives/props
+```
 
 ## How to use it
 
@@ -85,7 +86,7 @@ TODO
 
 Initial release
 
-1.0.1
+1.0.2
 
 Release initial version with CJS support.
 
