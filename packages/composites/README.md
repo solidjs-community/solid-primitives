@@ -8,6 +8,14 @@ Composable reactive primitives, extending the `createEffect`, `createComputed`, 
 
 [**List of officially available modifiers**](#available-modifiers)
 
+## Installation
+
+```bash
+npm install @solid-primitives/composites
+# or
+yarn add @solid-primitives/composites
+```
+
 ## How to use it
 
 ### createCompositeEffect
