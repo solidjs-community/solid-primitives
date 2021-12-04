@@ -91,7 +91,8 @@ All our primitives are meant to be consistent and sustain a level of quality. We
 9. Be focused on composition vs. isolation of logic
 10. Community voice and needs guide roadmap and planning
 11. Strong TypeScript support
-12. Solid performance!
+12. Support for both CJS and ESM
+13. Solid performance!
 
 ## Compound vs. Isolated Primitives
 
