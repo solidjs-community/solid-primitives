@@ -45,6 +45,6 @@ Released official version, CJS and updated to Stage 3
 
 1.0.2
 
-Add proper build process and clean up docs.
+Add proper build process and clean up docs. Added SSR support.
 
 </details>
