@@ -59,17 +59,13 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
     cookieStorage._cookies[0][cookieStorage._cookies[1]] = `${key}=${value}${serializeCookieOptions(
       options
     )}`;
-    const storageEvent = new StorageEvent('storage');
-    storageEvent.initStorageEvent(
-      'storage',
-      undefined,
-      false,
+    const storageEvent = Object.assign(new Event('storage'), {
       key,
       oldValue,
-      value,
-      window.document.URL,
-      cookieStorage as Storage
-    );
+      newValue: value,
+      url: globalThis.document?.URL,
+      storageArea: cookieStorage
+    });
     window.dispatchEvent(storageEvent);
   },
   removeItem: (key: string) => {
