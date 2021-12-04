@@ -1,10 +1,3 @@
----
-Name: media
-Package: "@solid-primitives/media"
-Primitives: createMediaQuery
-Category: Display & Media
----
-
 # @solid-primitives/media
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -12,6 +5,14 @@ Category: Display & Media
 [![size](https://img.shields.io/npm/v/@solid-primitives/media?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/media)
 
 Creates a very simple and straightforward media query monitor.
+
+## Installation
+
+```
+npm install @solid-primitives/media
+# or
+yarn add @solid-primitives/media
+```
 
 ## How to use it
 
@@ -37,8 +38,8 @@ Initial release.
 
 Shipped first stable version.
 
-1.1.5
+1.1.6
 
-Published with CJS export.
+Published with CJS and SSR support.
 
 </details>
