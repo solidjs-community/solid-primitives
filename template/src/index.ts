@@ -6,11 +6,11 @@ import { Accessor, Setter, createSignal } from 'solid-js';
  * @param param An example of an introductory parameter
  * @return Returns the same parameter as an accessor
  */
-const createPrimitiveTemplate = (param: boolean): [
-  get: Accessor<boolean>,
-  set: Setter<boolean>
+const createPrimitiveTemplate = (init: string): [
+  get: Accessor<string>,
+  set: Setter<string>
 ] => {
-  const [value, setValue] = createSignal(param);
+  const [value, setValue] = createSignal(init);
   return [value, setValue];
 };
 
