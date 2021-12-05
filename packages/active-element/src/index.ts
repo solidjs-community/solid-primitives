@@ -1,5 +1,16 @@
-import { access, Fn, isClient, MaybeAccessor } from "@solid-primitives/utils";
-import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
+import { access, Fn, MaybeAccessor } from "@solid-primitives/utils";
+import { Accessor, createComputed, createEffect, createSignal, JSX, onCleanup } from "solid-js";
+
+export type IsActiveProps = (isActive: boolean) => void;
+declare module "solid-js" {
+  namespace JSX {
+    interface Directives {
+      isActive: IsActiveProps;
+    }
+  }
+}
+// This ensures the `JSX` import won't fall victim to tree shaking
+export type E = JSX.Element;
 
 /**
  * A reactive `document.activeElement`. Check which element is currently focused.
@@ -18,16 +29,14 @@ export function createActiveElement(): [
   let stop: Fn = () => {};
   const start = () => {
     stop();
-    if (isClient) {
-      handleChange();
-      window.addEventListener("blur", handleChange, true);
-      window.addEventListener("focus", handleChange, true);
-      stop = () => {
-        window.removeEventListener("blur", handleChange, true);
-        window.removeEventListener("focus", handleChange, true);
-        stop = () => {};
-      };
-    }
+    handleChange();
+    window.addEventListener("blur", handleChange, true);
+    window.addEventListener("focus", handleChange, true);
+    stop = () => {
+      window.removeEventListener("blur", handleChange, true);
+      window.removeEventListener("focus", handleChange, true);
+      stop = () => {};
+    };
   };
   start();
   onCleanup(stop);
@@ -51,11 +60,47 @@ export function createActiveElement(): [
 export function createIsElementActive(
   target: MaybeAccessor<Element>
 ): [getter: Accessor<boolean>, actions: { stop: Fn; start: Fn }] {
-  const [active, actions] = createActiveElement();
   const [isActive, setIsActive] = createSignal(false);
-  createEffect(() => {
+  const handleFocus = () => setIsActive(true);
+  const handleBlur = () => setIsActive(false);
+
+  let stop: Fn = () => {};
+  const start = () => {
+    stop();
     const el = access(target);
-    setIsActive(!!el && active() === el);
-  });
-  return [isActive, actions];
+    if (!el) {
+      setIsActive(false);
+      return;
+    }
+    setIsActive(window.document.activeElement === el);
+    el.addEventListener("blur", handleBlur, true);
+    el.addEventListener("focus", handleFocus, true);
+    stop = () => {
+      el.removeEventListener("blur", handleBlur, true);
+      el.removeEventListener("focus", handleFocus, true);
+      stop = () => {};
+    };
+  };
+
+  const el = access(target);
+  setIsActive(!!el && window.document.activeElement === el);
+
+  createEffect(start);
+  onCleanup(stop);
+
+  return [isActive, { stop, start }];
+}
+
+/**
+ * Use as a directive. Notifies you when the element becomes active or inactive.
+ *
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/active-element#createIsElementActive
+ *
+ * @example
+ * const [active, setActive] = createSignal(false)
+ * <input use:isActive={setActive} />
+ */
+export function isActive(target: Element, callback: Accessor<IsActiveProps>): void {
+  const [isFocused] = createIsElementActive(target);
+  createComputed(() => callback()(isFocused()));
 }

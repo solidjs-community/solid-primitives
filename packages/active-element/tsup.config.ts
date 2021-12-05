@@ -1,2 +1,9 @@
+import { defineConfig } from "tsup";
 import defaultConfig from "../../tsup.config";
-export default defaultConfig;
+
+export default defineConfig(() => {
+  return {
+    ...defaultConfig,
+    entryPoints: ["src/index.ts", "src/server.ts"]
+  };
+});

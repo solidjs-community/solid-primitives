@@ -1,7 +1,7 @@
 import { createRoot } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
-import { createActiveElement, createIsElementActive } from "..";
+import { createActiveElement, createIsElementActive } from "../src";
 
 let listiners = 0;
 window.addEventListener = (...a: any[]) => {

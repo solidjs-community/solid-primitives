@@ -48,12 +48,26 @@ const [isFocused] = createIsElementActive(ref);
 // the "isFocused" will start checking the new element
 ```
 
+### Directive Usage
+
+```tsx
+import { isActive } from "@solid-primitives/active-element";
+// prevent tree-shaking
+isActive;
+
+const [active, setActive] = createSignal(false)
+
+<input use:isActive={setActive} />
+```
+
 ### Types
 
 ```ts
 function createIsElementActive(
   target: MaybeAccessor<Element>
 ): [getter: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
+
+type IsActiveProps = (isActive: boolean) => void;
 ```
 
 ## Demo
