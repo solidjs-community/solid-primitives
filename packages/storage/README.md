@@ -169,4 +169,8 @@ First proper release of storage engine with CJS support.
 
 Patch CJS support.
 
+1.0.10
+
+Minor patch fixed missing types.
+
 </details>
