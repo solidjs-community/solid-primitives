@@ -1,24 +1,31 @@
 {
   "name": "@solid-primitives/media",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Primitives for media query and device features",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/media",
-  "private": false,
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/index.js",
-  "type": "module",
-  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "media",
+    "stage": 3,
+    "list": [
+      "createMediaQuery"
+    ],
+    "category": "Display & Media"
+  },
   "files": [
     "dist"
   ],
-  "exports": {
-    "require": "./dist/cjs/index.cjs",
-    "import": "./dist/index.js",
-    "default": "./dist/index.js"
-  },
-  "sideEffects": "false",
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
@@ -36,10 +43,11 @@
     "prettier": "^2.0.5",
     "solid-testing-library": "^0.2.0",
     "tslib": "^2.0.1",
+    "tsup": "^5.10.1",
     "typescript": "^4.0.2"
   },
   "peerDependencies": {
-    "solid-js": "^1.0.7"
+    "solid-js": "^1.2.5"
   },
   "jest": {
     "setupFiles": [

@@ -1,11 +1,3 @@
----
-Name: workers
-Stage: 1
-Package: "@solid-primitives/workers"
-Primitives: createWorker, createWorkerPool, createSignaledWorker
-Category: Browser APIs
----
-
 # @solid-primitives/workers
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -22,6 +14,8 @@ A set of utility to support using Web Workers and Shared Workers:
 
 ## How to use it
 
+### createWorker
+
 Create a basic web worker:
 
 ```ts
@@ -32,6 +26,8 @@ console.log(await worker.add(1, 2));
 // output: 3
 ```
 
+### createWorkerPool
+
 Create a worker pool with a set concurrency:
 
 ```ts
@@ -41,6 +37,8 @@ const [pool, start, stop] = createWorkerPool(4, function add(a, b) {
 console.log(await pool.add(1, 2));
 // output: 3
 ```
+
+### createSignaledWprler
 
 Create a more advanced worker that accepts multiple instructional inputs:
 
@@ -75,6 +73,10 @@ Initial release as a Stage-1 primitive.
 0.0.150
 
 Added signaled workers.
+
+0.0.160
+
+Add CJS and SSR support as well as better building process.
 
 </details>
 

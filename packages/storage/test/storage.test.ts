@@ -10,7 +10,17 @@ testCreateStorage.before(context => {
   context.mockStorage = {
     getItem: (key: string): string | null => data[key] ?? null,
     setItem: (key: string, value: string): void => {
+      const oldValue = data[key];
       data[key] = value;
+      window.dispatchEvent(
+        Object.assign(new Event("storage"), {
+          key,
+          newValue: value,
+          oldValue,
+          storageArea: context.mockStorage,
+          url: window.document.URL
+        })
+      );
     },
     clear: () => {
       data = {};
@@ -48,8 +58,18 @@ testCreateStorage.before(context => {
   let data: Record<string, string> = {};
   context.mockAsyncStorage = {
     getItem: (key: string) => Promise.resolve(data[key] ?? null),
-    setItem: (key: string, value: string) => {
+    setItem: (key: string, value: string): Promise<void> => {
+      const oldValue = data[key];
       data[key] = value;
+      window.dispatchEvent(
+        Object.assign(new Event("storage"), {
+          key,
+          newValue: value,
+          oldValue,
+          storageArea: context.mockStorage,
+          url: window.document.URL
+        })
+      );
       return Promise.resolve();
     },
     clear: () => {

@@ -7,7 +7,6 @@ const path = require('path')
 // ------------------------------------------------------------
 async function updateReadme(log) {
   log.info('updateReadme', 'Updating README documentation');
-  const frontmatter = require('@github-docs/frontmatter');
   const markdownMagic = require('markdown-magic');
   const tablemark = require('json-to-markdown-table');
   const githubURL = 'https://github.com/davedbase/solid-primitives/tree/main/packages/';
@@ -19,10 +18,15 @@ async function updateReadme(log) {
   // Retrieve packages managed by Lerna
   await iter.forEach(await loadPackages())(
     async (lernaPackage) => {
-      const md = await fs.readFile(`${lernaPackage.location}/README.md`, 'binary');
-      const { data } = frontmatter(md);
-      if (data.Name) {
-        data.Name = `[${data.Name}](${githubURL}${data.Name})`;
+      const pkgData = await fs.readFile(`${lernaPackage.location}/package.json`, 'utf8');
+      const package = JSON.parse(pkgData);
+      if (!package.primitive) {
+        return;
+      }
+      const { name, list, category, stage } = package.primitive;
+      if (name) {
+        let data = {};
+        data.Name = `[${name}](${githubURL}${name})`;
         // Detect the stage and build size/version only if needed
         if (data.Stage == 'X' || data.Stage == 0) {
           data.Size = '';
@@ -31,20 +35,12 @@ async function updateReadme(log) {
           data.Size = `[![SIZE](${sizeShield}${lernaPackage.name}?style=for-the-badge)](${bundlephobiaURL}${lernaPackage.name})`;
           data.NPM = `[![VERSION](${npmShield}${lernaPackage.name}?style=for-the-badge)](${npmURL}${lernaPackage.name})`;
         }
-        if (typeof data.Stage === 'undefined') {
-          data.Stage = '2';
-        }
-        if (data.Primitives.includes(',')) {
-          data.Primitives = data.Primitives
-            .split(',')
-            .map((item) => item.trim()).join('<br />');
-        } else {
-          data.Primitives = data.Primitives;
-        }
+        data.Stage = stage ? stage.toString() : '2';
+        data.Primitives = list.join('<br />');
         // Merge the package into the correct category
-        const category = data.Category || 'Misc';
-        categories[category] = Array.isArray(categories[category]) ?
-          [ ...categories[category], data ] :
+        let cat = category || 'Misc';
+        categories[cat] = Array.isArray(categories[cat]) ?
+          [ ...categories[cat], data ] :
           [ data ];
       }
     }

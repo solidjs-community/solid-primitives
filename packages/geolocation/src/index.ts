@@ -25,15 +25,14 @@ export const createGeolocation = (
   options: PositionOptions = {}
 ): [location: Resource<GeolocationCoordinates | undefined>, refetch: Accessor<void>] => {
   options = Object.assign(geolocationDefaults, options);
-  const [location, { refetch }] = createResource(
-    () =>
-      new Promise<GeolocationCoordinates>((resolve, reject) => {
-        if (!("geolocation" in navigator)) {
-          return reject({ code: null, message: "Geolocation is not defined." });
-        }
-        navigator.geolocation.getCurrentPosition(res => resolve(res.coords), reject, options);
-      })
-  );
+  const [location, { refetch }] = createResource(() => {
+    return new Promise<GeolocationCoordinates>((resolve, reject) => {
+      if (!("geolocation" in navigator)) {
+        return reject({ code: null, message: "Geolocation is not defined." });
+      }
+      navigator.geolocation.getCurrentPosition(res => resolve(res.coords), reject, options);
+    });
+  });
   return [location, refetch];
 };
 
@@ -65,7 +64,6 @@ export const createGeolocationWatcher = (
   let registeredHandlerID: number | null;
   const clearGeolocator = () =>
     registeredHandlerID && navigator.geolocation.clearWatch(registeredHandlerID);
-
   // Implement as an effect to allow switching locator on/off
   createComputed(() => {
     if (

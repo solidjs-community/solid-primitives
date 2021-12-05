@@ -97,7 +97,7 @@ export const createWorkerPool = (
   ];
 };
 
-type WorkerInstruction = {
+export type WorkerInstruction = {
   func: Function;
   input?: Accessor<any>;
   output?: Setter<any>;

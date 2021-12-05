@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/composites",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "Composable reactive helpers built around watching computation changes.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -9,23 +9,29 @@
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
+  "primitive": {
+    "name": "composites",
+    "stage": 2,
+    "list": [
+      "createCompositeEffect",
+      "createCompositeComputed",
+      "createCompositeMemo",
+      "createCompositeRenderEffect",
+      "createModifier"
+    ],
+    "category": "Reactivity"
+  },
   "private": false,
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "sideEffects": false,
   "files": [
     "dist"
   ],
-  "exports": {
-    "require": "./dist/cjs/index.cjs",
-    "import": "./dist/index.js",
-    "default": "./dist/index.js"
-  },
-  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
+    "build": "tsup",
     "test": "uvu -r solid-register"
   },
   "keywords": [
@@ -40,17 +46,17 @@
   "devDependencies": {
     "jsdom": "^18.0.1",
     "prettier": "^2.0.5",
-    "rimraf": "^3.0.2",
     "solid-register": "^0.0.10",
     "tslib": "^2.0.1",
     "typescript": "^4.5.2",
-    "uvu": "^0.5.2"
+    "uvu": "^0.5.2",
+    "tsup": "^5.10.1"
   },
   "peerDependencies": {
     "solid-js": "^1.2.5"
   },
   "dependencies": {
-    "@solid-primitives/debounce": "^1.0.3",
-    "@solid-primitives/throttle": "^1.0.4"
+    "@solid-primitives/debounce": "^1.0.8",
+    "@solid-primitives/throttle": "^1.0.8"
   }
 }

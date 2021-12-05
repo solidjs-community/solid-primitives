@@ -1,11 +1,3 @@
----
-Name: tween
-Stage: 3
-Package: "@solid-primitives/tween"
-Primitives: createTween
-Category: Display & Media
----
-
 # @solid-primitives/tween
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -13,6 +5,14 @@ Category: Display & Media
 [![size](https://img.shields.io/npm/v/@solid-primitives/tween?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/tween)
 
 Creates an efficient tweening function.
+
+## Installation
+
+```
+npm install @solid-primitives/tween
+# or
+yarn add @solid-primitives/tween
+```
 
 ## How to use it
 
@@ -33,8 +33,8 @@ Initial commit and publish of debounce primitive.
 
 Released a new version with CJS support.
 
-1.0.3
+1.0.4
 
-Shipping a tighter and CJS supported version.
+Shipping a tighter and better CJS supported version.
 
 </details>

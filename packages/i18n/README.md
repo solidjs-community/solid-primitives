@@ -1,11 +1,3 @@
----
-Name: i18n
-Stage: 3
-Package: "@solid-primitives/i18n"
-Primitives: createI18nContext, useI18n
-Category: Utilities
----
-
 # @solid-primitives/i18n
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -97,7 +89,7 @@ General package clean-up and added testing facility.
 
 Releasd with CJS support.
 
-1.0.6
+1.0.8
 
 Patch CJS support release.
 

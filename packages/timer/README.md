@@ -1,10 +1,3 @@
----
-Name: timer
-Stage: 3
-Package: "@solid-primitives/timer"
-Primitives: createTimer
----
-
 # @solid-primitives/timer
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -13,7 +6,13 @@ Primitives: createTimer
 
 A timer wrapper to handle setTimeout and setInterval.
 
-`createTimer` - A single timer that can handle timeouts and intervals.
+## Installation
+
+```
+npm install @solid-primitives/timer
+# or
+yarn add @solid-primitives/timer
+```
 
 ## How to use it
 
@@ -40,7 +39,7 @@ First commit of the timer primitive.
 
 Patched an issue with clear on clean-up.
 
-1.0.2
+1.0.3
 
 Release official version with CJS support.
 

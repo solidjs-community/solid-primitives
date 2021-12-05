@@ -74,7 +74,7 @@ export function createMutationObserver(
   c?: MutationCallback
 ): MutationObserverReturn {
   let defaultOptions: MutationObserverInit, callback: MutationCallback;
-  const isSupported = typeof window !== 'undefined' && "MutationObserver" in window;
+  const isSupported = typeof window !== "undefined" && "MutationObserver" in window;
   if (typeof b === "function") {
     defaultOptions = {};
     callback = b;

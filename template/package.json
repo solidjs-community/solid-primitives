@@ -5,38 +5,45 @@
   "author": "Your Name <you@youremail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/template-primitive",
-  "private": false,
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "template-primitive",
+    "stage": 0,
+    "list": ["createPrimitiveTemplate"],
+    "category": "Display & Media"
+  },
   "files": [
     "dist"
   ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "require": "./dist/cjs/index.cjs",
-    "import": "./dist/index.js",
-    "default": "./dist/index.js"
+    "node": {
+      "import": "./dist/index.js"
+    },
+    "import": "./dist/index.js"
   },
-  "sideEffects": "false",
   "scripts": {
-    "prebuild": "npm run clean",
-    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
+    "build": "tsup",
     "test": "uvu -r solid-register"
   },
   "keywords": [
-    "template",
     "primitives"
   ],
   "devDependencies": {
     "jsdom": "^18.0.1",
     "prettier": "^2.0.5",
-    "rimraf": "^3.0.2",
     "solid-register": "^0.0.10",
     "tslib": "^2.0.1",
     "typescript": "^4.5.2",
+    "tsup": "^5.10.0",
     "uvu": "^0.5.2",
     "unocss": "^0.12.4",
     "vite": "2.6.14",

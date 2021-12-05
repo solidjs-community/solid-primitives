@@ -1,1 +1,1 @@
-import { render } from "solid-testing-library";
+import "regenerator-runtime/runtime";

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/intersection-observer",
-  "version": "1.1.8",
+  "version": "1.1.19",
   "description": "Primitives to support using the intersection observer API.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -9,25 +9,36 @@
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
-  "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
   "files": [
     "dist"
   ],
+  "primitive": {
+    "name": "intersection-observer",
+    "stage": 3,
+    "list": [
+      "createIntersectionObserver",
+      "createViewportObserver",
+      "createVisibilityObserver"
+    ],
+    "category": "Display & Media"
+  },
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "require": "./dist/server.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --clean && tsup src/server.ts --format cjs",
-    "test": "uvu -r solid-register",
-    "watch": "npm run build -- --watch src",
-    "prepublishOnly": "npm run build"
+    "build": "tsup",
+    "test": "uvu -r solid-register"
   },
   "keywords": [
     "intersection",
@@ -36,11 +47,12 @@
     "primitives"
   ],
   "devDependencies": {
-    "jsdom": "^18.1.1",
-    "prettier": "^2.5.5",
-    "solid-register": "^0.1.1",
-    "tslib": "^2.3.1",
+    "jsdom": "^18.0.1",
+    "prettier": "^2.0.5",
+    "solid-register": "^0.0.10",
+    "tslib": "^2.0.1",
     "tsup": "^5.10.0",
+    "typescript": "^4.4.4",
     "uvu": "^0.5.2"
   },
   "peerDependencies": {

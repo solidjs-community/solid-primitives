@@ -1,11 +1,3 @@
----
-Name: scroll
-Stage: 3
-Package: "@solid-primitives/scroll"
-Primitives: createScrollObserver
-Category: Display & Media
----
-
 # @solid-primitives/scroll
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -15,11 +7,6 @@ Category: Display & Media
 Helpful primitives to manage browser scrolling.
 
 `createScrollObserver` - Helpful monitor that reports the current position of an element or window.
-
-## Primitive ideas:
-
-`createScrollTo` - A primitive to support scroll to a target
-`createHashScroll` - A primitive to support scrolling based on a hashtag change
 
 ## How to use it
 
@@ -38,6 +25,11 @@ const position = createScrollObserver(() => ref);
 
 You may view a working example here: https://codesandbox.io/s/solid-primitives-scroll-csg7f
 
+### Primitive ideas:
+
+`createScrollTo` - A primitive to support scroll to a target
+`createHashScroll` - A primitive to support scrolling based on a hashtag change
+
 ## Changelog
 
 <details>
@@ -47,12 +39,8 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-s
 
 Initial porting of the scroll primitive.
 
-1.0.2
+1.0.4
 
-Released new version with CJS support.
+Released new version with CJS and SSR support.
 
 </details>
-
-## Contributors
-
-Ported from the amazing work by at https://github.com/dance2die/react-use-localstorage.

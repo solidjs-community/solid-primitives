@@ -1,25 +1,42 @@
 {
   "name": "@solid-primitives/countdown",
-  "version": "1.0.3",
+  "version": "1.0.7",
   "description": "Primitive to create a countdown timer",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/countdown",
-  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "countdown",
+    "stage": 3,
+    "list": [
+      "createCountdown"
+    ],
+    "category": "Utilities"
+  },
   "files": [
     "dist"
   ],
+  "private": false,
+  "sideEffects": false,
   "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "require": "./dist/cjs/index.cjs",
+    "node": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
     "import": "./dist/index.js",
-    "default": "./dist/index.js"
+    "require": "./dist/index.cjs"
   },
-  "sideEffects": "false",
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs"
+    "build": "tsup",
+    "test": "jest"
   },
   "keywords": [
     "countdown",
@@ -32,11 +49,14 @@
     "prettier": "^2.0.5",
     "solid-testing-library": "^0.2.0",
     "tslib": "^2.0.1",
+    "tsup": "^5.10.0",
     "typescript": "^4.0.2"
   },
   "peerDependencies": {
-    "@solid-primitives/timer": "^1.0.2",
     "solid-js": "^1.2.5"
+  },
+  "dependencies": {
+    "@solid-primitives/timer": "^1.0.2"
   },
   "jest": {
     "setupFiles": [

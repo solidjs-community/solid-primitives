@@ -9,12 +9,14 @@ type FetchOptions<I> = I extends undefined
       name?: string;
       fetch?: typeof fetch;
       responseHandler?: (response: Response) => any;
+      disable?: boolean;
     }
   : {
       initialValue: I;
       name?: string;
       fetch?: typeof fetch;
       responseHandler?: (response: Response) => any;
+      disable?: boolean;
     };
 
 export type FetchReturn<T, I> = [
@@ -54,7 +56,13 @@ const isOptions = <I>(
  * createFetch<T>(
  *  requestInfo: RequestInfo,
  *  requestInit?: RequestInit,
- *  options?: { initialValue?: T, name?: string, fetch?: typeof fetch }
+ *  options?: {
+ *    initialValue?: T,
+ *    name?: string,
+ *    fetch?: typeof fetch,
+ *    // disable fetching, e.g. in SSR situations (use `isServer`)
+ *    disabled?: boolean
+ *  }
  * ): [
  *   Resource<T> & {
  *     aborted: boolean,
@@ -109,6 +117,29 @@ export function createFetch<T, I>(
     requestInit = undefined;
   }
 
+  if (options?.disable) {
+    let value = options?.initialValue as T | I;
+    let aborted = false;
+    return [
+      Object.assign(() => value, {
+        aborted,
+        error: undefined,
+        loading: false,
+        status: 201,
+        response: null
+      }),
+      {
+        abort: () => {
+          aborted = true;
+        },
+        mutate: (v: T | I) => (value = v),
+        refetch: () => {
+          aborted = false;
+        }
+      }
+    ];
+  }
+
   const fetcher = (
     [requestInfo, requestInit]: [requestInfo: RequestInfo, requestInit?: RequestInit],
     getPrev: () => T | I
@@ -159,6 +190,7 @@ export function createFetch<T, I>(
   Object.defineProperty(resourceReturn[1], "abort", {
     get: () => () => {
       resourceReturn[0].aborted = true;
+      resourceReturn[0].error = false;
       abort?.abort();
     }
   });
