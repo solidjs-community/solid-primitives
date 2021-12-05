@@ -1,4 +1,5 @@
 import { createSignal, onMount, onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
 
 /**
  * Creates a very simple and straightforward media query monitor.
@@ -23,6 +24,7 @@ const createMediaQuery = (
   const [state, setState] = createSignal(initialState);
   const onChange = () => setState(mql.matches);
   onMount(() => {
+    if (isServer) return false;
     mql = window.matchMedia(query);
     if (watchChange) {
       mql.addEventListener("change", onChange);

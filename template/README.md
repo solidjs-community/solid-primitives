@@ -1,11 +1,3 @@
----
-Name: template-primitive
-Stage: 0
-Package: "@solid-primitives/template-primitive"
-Primitives: createPrimitiveTemplate
-Category: Display & Media
----
-
 # @solid-primitives/template-primitive
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)

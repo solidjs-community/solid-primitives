@@ -1,4 +1,4 @@
-import { Accessor, createEffect, createSignal, Setter } from "solid-js";
+import { Accessor, createEffect, createSignal, onCleanup, onMount, Setter } from "solid-js";
 
 import type {
   AnyStorageProps,
@@ -59,7 +59,7 @@ export function createStorage<O, T>(
     : [globalThis.localStorage].filter(Boolean);
   const prefix = props?.prefix ? `${props.prefix}.` : "";
   const signals = new Map<string, ReturnType<typeof createSignal>>();
-  const store = new Proxy(
+  const store = new Proxy<Record<string, T>>(
     {},
     {
       get(_, key: string) {
@@ -130,6 +130,25 @@ export function createStorage<O, T>(
     });
     return result;
   };
+  onMount(() => {
+    const listener = (ev: StorageEvent) => {
+      let changed = false;
+      apis.forEach(api => {
+        if (api !== ev.storageArea && ev.key && ev.newValue !== api.getItem(ev.key)) {
+          ev.newValue ? api.setItem(ev.key, ev.newValue) : api.removeItem(ev.key);
+          changed = true;
+        }
+      });
+      changed && ev.key && signals.get(ev.key)?.[1]();
+    };
+    if ("addEventListener" in globalThis) {
+      globalThis.addEventListener("storage", listener);
+      onCleanup(() => globalThis.removeEventListener("storage", listener));
+    } else {
+      apis.forEach(api => api.addEventListener?.("storage", listener));
+      onCleanup(() => apis.forEach(api => api.removeEventListener?.("storage", listener)));
+    }
+  });
   return [
     store,
     setter,
@@ -274,6 +293,25 @@ export function createAsyncStorage<O, T>(
     );
     return result;
   };
+  onMount(() => {
+    const listener = (ev: StorageEvent) => {
+      let changed = false;
+      apis.forEach(async api => {
+        if (api !== ev.storageArea && ev.key && ev.newValue !== (await api.getItem(ev.key))) {
+          ev.newValue ? api.setItem(ev.key, ev.newValue) : api.removeItem(ev.key);
+          changed = true;
+        }
+      });
+      changed && ev.key && signals.get(ev.key)?.[1]();
+    };
+    if ("addEventListener" in globalThis) {
+      globalThis.addEventListener("storage", listener);
+      onCleanup(() => globalThis.removeEventListener("storage", listener));
+    } else {
+      apis.forEach(api => api.addEventListener?.("storage", listener));
+      onCleanup(() => apis.forEach(api => api.removeEventListener?.("storage", listener)));
+    }
+  });
   return [
     store,
     setter,
@@ -338,14 +376,30 @@ export function createStorageSignal<T extends any, O extends any>(
       apis.forEach(api => api.setItem(`${prefix}${key}`, filteredValue, props?.options));
     }
   });
-  return [
-    accessor,
-    setter,
-    () => {
-      const value = read();
-      setter(value as any);
+  const refetch = () => {
+    const value = read();
+    setter(value as any);
+  };
+  onMount(() => {
+    const listener = (ev: StorageEvent) => {
+      let changed = false;
+      apis.forEach(api => {
+        if (api !== ev.storageArea && ev.key && ev.newValue !== api.getItem(ev.key)) {
+          ev.newValue ? api.setItem(ev.key, ev.newValue) : api.removeItem(ev.key);
+          changed = true;
+        }
+      });
+      changed && refetch();
+    };
+    if ("addEventListener" in globalThis) {
+      globalThis.addEventListener("storage", listener);
+      onCleanup(() => globalThis.removeEventListener("storage", listener));
+    } else {
+      apis.forEach(api => api.addEventListener?.("storage", listener));
+      onCleanup(() => apis.forEach(api => api.removeEventListener?.("storage", listener)));
     }
-  ];
+  });
+  return [accessor, setter, refetch];
 }
 
 export const createLocalStorage = createStorage;

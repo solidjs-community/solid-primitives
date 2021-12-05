@@ -55,6 +55,7 @@
     "solid-js": "^1.2.5"
   },
   "dependencies": {
-    "solid-fns": "^0.0.154"
+    ,
+    "@solid-primitives/utils": "^0.0.250"
   }
 }

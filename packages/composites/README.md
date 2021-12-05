@@ -1,11 +1,3 @@
----
-Name: composites
-Stage: 2
-Package: "@solid-primitives/composites"
-Primitives: createCompositeEffect, createCompositeComputed, createCompositeMemo, createCompositeRenderEffect, createModifier
-Category: Reactivity
----
-
 # @solid-primitives/composites
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -14,21 +6,21 @@ Category: Reactivity
 
 Composable reactive primitives, extending the `createEffect`, `createComputed`, `createMemo` behaviors using composable and reusable **modifiers**.
 
-- `createCompositeEffect` - When used alone, it works as `createEffect(on())`. But it can be combined with a set of Modifiers extending it's functionality.
-
-- `createCompositeComputed` - Similar to `createCompositeEffect`, but it uses `createComputed` instead.
-
-- `createCompositeMemo` - Apply the same modifiers to `createMemo`.
-
-- `createCompositeRenderEffect` - A `createCompositeEffect` that runs during the render phase as DOM elements are created and updated but not necessarily connected.
-
-- `createModifier` - A utility for creating your own custom modifiers. Each available modifier has been made using it.
-
 [**List of officially available modifiers**](#available-modifiers)
+
+## Installation
+
+```bash
+npm install @solid-primitives/composites
+# or
+yarn add @solid-primitives/composites
+```
 
 ## How to use it
 
 ### createCompositeEffect
+
+When used alone, it works as `createEffect(on())`. But it can be combined with a set of Modifiers extending it's functionality.
 
 ```ts
 const [counter, setCounter] = createSignal(0);
@@ -48,6 +40,8 @@ const { stop, pause } = createCompositeEffect(stoppable(pausable(counter, n => c
 
 ### createCompositeComputed
 
+Similar to `createCompositeEffect`, but it uses `createComputed` instead.
+
 The usage is the same as [`createCompositeEffect`](#createcompositeeffect)
 
 ```ts
@@ -59,7 +53,7 @@ const { ignoring } = createCompositeComputed(
 
 ### createCompositeMemo
 
-Works simmilary to the ones above, but there are some differences:
+Apply the same modifiers to `createMemo`. Works simmilary to the ones above, but there are some differences:
 
 - The returned value will be: `Accessor` if you don't use modifiers, or `[Accessor, ModifierReturns]` if you do.
 - Accepts additional `equals` in options - a custom comparison function
@@ -75,6 +69,8 @@ const [double, { pause, resume }] = createCompositeMemo(
 ```
 
 ### createCompositeRenderEffect
+
+A `createCompositeEffect` that runs during the render phase as DOM elements are created and updated but not necessarily connected.
 
 ```ts
 const { ignore } = createCompositeRenderEffect(stoppable(ignorable(counter, n => n * 2)));
@@ -216,7 +212,7 @@ createCompositeEffect(counter, () => {...})
 
 ### createModifier
 
-A utility for creating your own modifiers, it accepts two arguments:
+A utility for creating your own modifiers. Each available modifier has been made using it. It accepts two arguments:
 
 1. A callback modifier — function that is executed when your modifier gets attached to the `createComposite___`. Here you get to modify the effect callback by attatching your logic to it.
 
@@ -271,6 +267,10 @@ See the [implementations of official modifiers](https://github.com/davedbase/sol
 1.0.0
 
 Initial realease
+
+1.0.4
+
+Adjusted documentation and published CJS support.
 
 </details>
 

@@ -35,7 +35,8 @@ declare module "solid-js" {
     }
   }
 }
-// this ensures the `JSX` import won't fall victim to tree shaking before typescript can use it
+// This ensures the `JSX` import won't fall victim to tree shaking before
+// TypesScript can use it
 export type E = JSX.Element;
 
 /**

@@ -1,11 +1,3 @@
----
-Name: intersection-observer
-Stage: 3
-Package: "@solid-primitives/intersection-observer"
-Primitives: createIntersectionObserver, createViewportObserver, createVisibilityObserver
-Category: Display & Media
----
-
 # @solid-primitives/intersection-observer
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -91,7 +83,7 @@ Minor type adjustments.
 
 Released with CJS support.
 
-1.1.8
+1.1.11
 
 After a couple rounds, patched CJS support.
 

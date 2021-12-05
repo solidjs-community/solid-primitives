@@ -1,11 +1,3 @@
----
-Name: raf
-stage: 3
-Package: "@solid-primitives/raf"
-Primitives: createRAF
-Category: Display & Media
----
-
 # @solid-primitives/raf
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -13,6 +5,14 @@ Category: Display & Media
 [![size](https://img.shields.io/npm/v/@solid-primitives/raf?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/raf)
 
 Creates a primitive to support requestAnimationFrame.
+
+## Installation
+
+```
+npm install @solid-primitives/raf
+# or
+yarn add @solid-primitives/raf
+```
 
 ## How to use it
 
@@ -34,8 +34,8 @@ You may view a working example here: https://codesandbox.io/s/solid-create-raf-c
 
 Initial release ported from https://github.com/microcipcip/vue-use-kit/blob/master/src/functions/useRafFn/useRafFn.ts.
 
-1.0.5
+1.0.6
 
-Released official version with CJS support.
+Released official version with CJS and SSR support.
 
 </details>

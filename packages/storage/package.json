@@ -1,28 +1,38 @@
 {
   "name": "@solid-primitives/storage",
-  "version": "1.0.4",
+  "version": "1.0.10",
   "description": "Primitive that provides reactive wrappers for storage access",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/storage",
-  "private": false,
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "storage",
+    "stage": 3,
+    "list": [
+      "createStorage",
+      "createCookieStorage",
+      "createAsyncStorage",
+      "createStorageSignal",
+      "createLocalStorage",
+      "createSessionStorage"
+    ],
+    "category": "Browser APIs"
+  },
   "files": [
     "dist"
   ],
-  "exports": {
-    "require": "./dist/cjs/index.cjs",
-    "import": "./dist/index.js",
-    "default": "./dist/index.js"
-  },
-  "sideEffects": "false",
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
+    "build": "tsup",
     "test": "uvu -r solid-register"
   },
   "keywords": [
@@ -36,10 +46,11 @@
     "jsdom": "^18.1.1",
     "prettier": "^2.0.5",
     "solid-register": "^0.0.18",
+    "tsup": "^5.10.1",
     "typescript": "^4.5.2",
     "uvu": "^0.5.2"
   },
-  "dependencies": {
+  "peerDependencies": {
     "solid-js": "^1.2.5"
   },
   "jest": {

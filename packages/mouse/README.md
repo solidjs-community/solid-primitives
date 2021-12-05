@@ -1,11 +1,3 @@
----
-Name: mouse
-Stage: 2
-Package: "@solid-primitives/mouse"
-Primitives: createMousePosition, createMouseToElement, createMouseInElement, createMouseOnScreen
-Category: Inputs
----
-
 # @solid-primitives/mouse
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -15,8 +7,8 @@ Category: Inputs
 A collection of primitives, capturing current mouse cursor position, and helping to deal with common usecases:
 
 - [`createMousePosition`](#createMousePosition) - Listens to the global mouse events, providing a reactive up-to-date position of the cursor on the page.
-- [`createMouseToElement`](#createMouseToElement) - Provides an autoupdating position relative to a provided element. It can be used with existing position signals, or left to get the current cursor position itself.
-- [`createMouseInElement`](#createMouseInElement) - An alternative to `createMouseToElement`, that listens to mouse (and touch) events only inside the element. Provides information of position and if is the element being currently hovered.
+- [`createMouseToElement`](#createMouseToElement) - Provides an auto-updating position relative to a provided element. It can be used with existing position signals or left to get the current cursor position itself.
+- [`createMouseInElement`](#createMouseInElement) - An alternative to `createMouseToElement`, that listens to mouse (and touch) events only inside the element. Provides information of position and if the element is being hovered.
 - [`createMouseOnScreen`](#createMouseOnScreen) - Answers the question: _Is the cursor on screen?_
 
 ## `createMousePosition`

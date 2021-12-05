@@ -1,11 +1,3 @@
----
-Name: resize-observer
-Stage: 3
-Package: "@solid-primitives/resize-observer"
-Primitives: createResizeObserver
-Category: Display & Media
----
-
 # solid-primitives/resize-observer
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -14,7 +6,23 @@ Category: Display & Media
 
 Provides a reactive resize observer wrapper.
 
-`createResizeObserver` - Main resize observer primitive.
+## Installation
+
+```
+npm install @solid-primitives/resize-observer
+# or
+yarn add @solid-primitives/resize-observer
+```
+
+## How to use it
+
+### createResizeObserver
+
+Main resize observer primitive.
+
+```ts
+const [refCallback] = createResizeObserver(() => console.log("resized"));
+```
 
 ## Changelog
 
@@ -25,9 +33,9 @@ Provides a reactive resize observer wrapper.
 
 Initial commit of the resize observer.
 
-1.0.1
+1.0.3
 
-Release initial version for CJS support.
+Release initial version for CJS and SSR support.
 
 </details>
 

@@ -24,6 +24,10 @@ Can be used to listen to DOM or Custom Events on window, document, list of HTML 
 
 ### Usage
 
+### createEventListener
+
+A very straightforward primitive that handles multiple elements according to a single event binding.
+
 ```ts
 import { createEventListener } from "@solid-primitives/event-listener";
 
@@ -123,8 +127,13 @@ Switched to a more idiomatic pattern: Warning: incompatible with the previous ve
 
 Added CJS build.
 
+1.2.6
+
+Migrated to new build process.
+
 1.3.0
 
 Primitive rewritten to provide better types and more reliable usage. **(minor breaking changes to type generics and returned functions)**
+
 
 </details>

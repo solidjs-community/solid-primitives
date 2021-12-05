@@ -1,11 +1,3 @@
----
-Name: throttle
-Stage: 3
-Package: "@solid-primitives/throttle"
-Primitives: createThrottle
-Category: Utilities
----
-
 # @solid-primitives/throttle
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -38,7 +30,7 @@ First version of the throttle primitive.
 
 Cleaned up return types and documentation.
 
-1.0.6
+1.0.8
 
 Adding CJS support to package.
 
