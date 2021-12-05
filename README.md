@@ -139,8 +139,6 @@ This package comes with a number of support utilities built with Lerna Scripts.
 - createForm
 - createInput
 - createTouch
-- createMouse (in progress)
-- createActiveElement (in progress)
 
 ### Utilities
 
