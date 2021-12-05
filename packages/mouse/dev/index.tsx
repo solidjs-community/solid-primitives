@@ -6,7 +6,7 @@ import {
 } from "../src";
 import { Component, createSignal, Show } from "solid-js";
 import { render } from "solid-js/web";
-import createRaf from "@solid-primitives/raf";
+import createRAF from "@solid-primitives/raf";
 import { objectOmit } from "@solid-primitives/utils";
 import { lerp } from "./utils";
 import "uno.css";
@@ -24,7 +24,7 @@ const App: Component = () => {
   });
 
   const [pos, setPos] = createSignal({ x: 0, y: 0, elX: 0, elY: 0 });
-  createRaf(() => {
+  createRAF(() => {
     setPos(p => ({
       x: lerp(p.x, mouse.x(), 0.1),
       y: lerp(p.y, mouse.y(), 0.1),
