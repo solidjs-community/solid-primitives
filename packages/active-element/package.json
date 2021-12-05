@@ -4,10 +4,19 @@
   "description": "A reactive document.activeElement. Check which element is currently focused.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/active-element",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/active-element#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "active-element",
+    "stage": 2,
+    "list": [
+      "createActiveElement",
+      "createIsElementActive"
+    ],
+    "category": "Inputs"
   },
   "private": false,
   "sideEffects": false,
@@ -18,18 +27,10 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "build": "tsup",
     "test": "uvu -r solid-register",
-    "watch": "npm run build -- --watch src",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -53,7 +54,6 @@
     "solid-js": "^1.2.5"
   },
   "dependencies": {
-    "@solid-primitives/utils": "^0.0.150",
-    "solid-fns": "^0.0.153"
+    "@solid-primitives/utils": "^0.0.200"
   }
 }

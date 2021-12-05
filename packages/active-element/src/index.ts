@@ -1,4 +1,4 @@
-import { access, Fn, isClient, MaybeAccessor } from "solid-fns";
+import { access, Fn, isClient, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 
 /**
@@ -13,12 +13,13 @@ export function createActiveElement(): [
   actions: { stop: Fn; start: Fn }
 ] {
   const [active, setActive] = createSignal<Element | null>(null);
-  const handleChange = isClient ? () => setActive(window.document.activeElement) : () => {};
+  const handleChange = () => setActive(window.document.activeElement);
 
   let stop: Fn = () => {};
   const start = () => {
     stop();
     if (isClient) {
+      handleChange();
       window.addEventListener("blur", handleChange, true);
       window.addEventListener("focus", handleChange, true);
       stop = () => {

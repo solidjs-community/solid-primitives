@@ -1,11 +1,3 @@
----
-Name: active-element
-Stage: 2
-Package: "@solid-primitives/active-element"
-Primitives: createActiveElement, createIsElementActive
-Category: Inputs
----
-
 # @solid-primitives/active-element
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
