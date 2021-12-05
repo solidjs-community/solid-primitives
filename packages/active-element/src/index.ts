@@ -39,7 +39,7 @@ export function createActiveElement(): [
     };
   };
   start();
-  onCleanup(stop);
+  onCleanup(() => stop());
 
   return [
     active,
@@ -86,7 +86,7 @@ export function createIsElementActive(
   setIsActive(!!el && window.document.activeElement === el);
 
   createEffect(start);
-  onCleanup(stop);
+  onCleanup(() => stop());
 
   return [isActive, { stop, start }];
 }

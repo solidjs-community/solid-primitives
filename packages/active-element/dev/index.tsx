@@ -7,7 +7,6 @@ import { genNodeList } from "./utils";
 isElementActive;
 
 const Node: Component<{ x: number; y: number; size: number }> = props => {
-  let ref!: HTMLButtonElement;
   const [isFocused, setIsFocused] = createSignal(false);
 
   return (

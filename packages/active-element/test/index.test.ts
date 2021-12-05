@@ -3,12 +3,12 @@ import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createActiveElement, createIsElementActive } from "../src";
 
-let listiners = 0;
+let listeners = 0;
 window.addEventListener = (...a: any[]) => {
-  listiners++;
+  listeners++;
 };
 window.removeEventListener = (...a: any[]) => {
-  listiners--;
+  listeners--;
 };
 
 const cae = suite("createActiveElement");
@@ -18,7 +18,10 @@ cae("returns correct values", () =>
     const [activeEl, { stop, start }] = createActiveElement();
 
     assert.type(activeEl, "function");
-    assert.is(activeEl(), null);
+    assert.ok(
+      () => activeEl() === null || activeEl() === document.body,
+      "no element should be active"
+    );
     assert.type(stop, "function");
     assert.type(start, "function");
 
@@ -29,16 +32,16 @@ cae("returns correct values", () =>
 cae("event listeners are created and disposed", () =>
   createRoot(dispose => {
     const [, { stop, start }] = createActiveElement();
-    assert.is(listiners, 2, "number of listeners after using primitive should be 2");
+    assert.is(listeners, 2, "number of listeners after using primitive should be 2");
 
     stop();
-    assert.is(listiners, 0, "all listeners should be removed after calling stop()");
+    assert.is(listeners, 0, "all listeners should be removed after calling stop()");
 
     start();
-    assert.is(listiners, 2, "both listeners should be added again after calling start()");
+    assert.is(listeners, 2, "both listeners should be added again after calling start()");
 
     dispose();
-    assert.is(listiners, 0, "all listeners should be removed after disposing of root");
+    assert.is(listeners, 0, "all listeners should be removed after disposing of root");
   })
 );
 
@@ -77,17 +80,22 @@ iea("target can be an accessor", () =>
 iea("event listeners are created and disposed", () =>
   createRoot(dispose => {
     const el = document.createElement("div");
-    const [, { stop, start }] = createIsElementActive(el);
-    assert.is(listiners, 2, "number of listeners after using primitive should be 2");
+    let listeners = 0;
+    el.addEventListener = () => {
+      listeners++;
+    };
+    el.removeEventListener = () => {
+      listeners--;
+    };
 
-    stop();
-    assert.is(listiners, 0, "all listeners should be removed after calling stop()");
+    const [, { start }] = createIsElementActive(el);
+    assert.is(listeners, 0, "number of listeners after using primitive should be 0");
 
     start();
-    assert.is(listiners, 2, "both listeners should be added again after calling start()");
+    assert.is(listeners, 2, "both listeners should be added after calling start()");
 
     dispose();
-    assert.is(listiners, 0, "all listeners should be removed after disposing of root");
+    assert.is(listeners, 0, "all listeners should be removed after disposing of root");
   })
 );
 

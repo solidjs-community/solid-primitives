@@ -11,7 +11,7 @@
 
 A reactive `document.activeElement`. Check which element is currently focused.
 
-### Usage
+### How to use it
 
 ```ts
 import { createActiveElement } from "@solid-primitives/active-element";
@@ -33,7 +33,7 @@ function createActiveElement(): [
 
 Pass in an element, and see if it's focused.
 
-### Usage
+### How to use it
 
 ```ts
 import { createIsElementActive } from "@solid-primitives/active-element";
@@ -48,7 +48,7 @@ const [isFocused] = createIsElementActive(ref);
 // the "isFocused" will start checking the new element
 ```
 
-### Directive Usage
+### As Directive
 
 ```tsx
 import { isElementActive } from "@solid-primitives/active-element";
