@@ -51,6 +51,8 @@ The goal of Solid Primitives is to wrap client and server side functionality to 
 |[stream](https://github.com/davedbase/solid-primitives/tree/main/packages/stream)|3|createStream<br />createAmplitudeStream|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/stream?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/stream)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/stream?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/stream)|
 |<br />*Reactivity*<br /><br />|
 |[composites](https://github.com/davedbase/solid-primitives/tree/main/packages/composites)|2|createCompositeEffect<br />createCompositeComputed<br />createCompositeMemo<br />createCompositeRenderEffect<br />createModifier|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/composites?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/composites)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/composites?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/composites)|
+|<br />*Inputs*<br /><br />|
+|[mouse](https://github.com/davedbase/solid-primitives/tree/main/packages/mouse)|2|createMousePosition<br />createMouseToElement<br />createMouseInElement<br />createMouseOnScreen|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/mouse?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/mouse)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/mouse?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/mouse)|
 
 <!-- ⛔️ AUTO-GENERATED-CONTENT:END - Do not remove or modify this section. -->
 
