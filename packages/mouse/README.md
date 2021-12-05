@@ -1,11 +1,3 @@
----
-Name: mouse
-Stage: 2
-Package: "@solid-primitives/mouse"
-Primitives: createMousePosition, createMouseToElement, createMouseInElement, createMouseOnScreen
-Category: Inputs
----
-
 # @solid-primitives/mouse
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
