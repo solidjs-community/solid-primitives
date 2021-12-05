@@ -14,4 +14,4 @@ export const createIsElementActive = () => [
   }
 ];
 
-export const isActive = () => {};
+export const isElementActive = () => {};

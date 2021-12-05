@@ -1,10 +1,10 @@
-import { createActiveElement, isActive } from "../src";
+import { createActiveElement, isElementActive } from "../src";
 import { Component, createSignal, Index } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
 import { genNodeList } from "./utils";
 // prevent tree-shaking
-isActive;
+isElementActive;
 
 const Node: Component<{ x: number; y: number; size: number }> = props => {
   let ref!: HTMLButtonElement;
@@ -12,7 +12,7 @@ const Node: Component<{ x: number; y: number; size: number }> = props => {
 
   return (
     <button
-      use:isActive={setIsFocused}
+      use:isElementActive={setIsFocused}
       class="fixed top-0 left-0 w-48 h-48 rounded-full bg-orange-700 border-none cursor-pointer hover:bg-orange-600 text-4xl font-extrabold text-gray-900"
       classList={{
         "!bg-indigo-700 !hover:bg-indigo-600": isFocused()

@@ -1,11 +1,11 @@
 import { access, Fn, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createComputed, createEffect, createSignal, JSX, onCleanup } from "solid-js";
 
-export type IsActiveProps = (isActive: boolean) => void;
+export type IsElementActiveProps = (isActive: boolean) => void;
 declare module "solid-js" {
   namespace JSX {
     interface Directives {
-      isActive: IsActiveProps;
+      isElementActive: IsElementActiveProps;
     }
   }
 }
@@ -98,9 +98,9 @@ export function createIsElementActive(
  *
  * @example
  * const [active, setActive] = createSignal(false)
- * <input use:isActive={setActive} />
+ * <input use:isElementActive={setActive} />
  */
-export function isActive(target: Element, callback: Accessor<IsActiveProps>): void {
+export function isElementActive(target: Element, callback: Accessor<IsElementActiveProps>): void {
   const [isFocused] = createIsElementActive(target);
   createComputed(() => callback()(isFocused()));
 }

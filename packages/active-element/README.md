@@ -51,13 +51,13 @@ const [isFocused] = createIsElementActive(ref);
 ### Directive Usage
 
 ```tsx
-import { isActive } from "@solid-primitives/active-element";
+import { isElementActive } from "@solid-primitives/active-element";
 // prevent tree-shaking
-isActive;
+isElementActive;
 
 const [active, setActive] = createSignal(false)
 
-<input use:isActive={setActive} />
+<input use:isElementActive={setActive} />
 ```
 
 ### Types
@@ -67,7 +67,7 @@ function createIsElementActive(
   target: MaybeAccessor<Element>
 ): [getter: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
 
-type IsActiveProps = (isActive: boolean) => void;
+type IsElementActiveProps = (isActive: boolean) => void;
 ```
 
 ## Demo
