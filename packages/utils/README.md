@@ -11,7 +11,7 @@ Solid Primitives Utilities is a support and helper package for a number of primi
 
 First commit of the timer primitive.
 
-1.0.0
+0.0.250
 
 Republished version with better ESM support and build tooling.
 
