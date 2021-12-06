@@ -1,4 +1,4 @@
-import { access, MaybeAccessor } from "solid-fns";
+import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Component, For } from "solid-js";
 
 export const DisplayRecord: Component<{ record: Record<string, MaybeAccessor<any>> }> = props => (

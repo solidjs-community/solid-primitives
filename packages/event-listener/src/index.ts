@@ -1,5 +1,6 @@
-import { accessAsArray, Fn, isClient, Many, MaybeAccessor } from "solid-fns";
+import { accessAsArray, Fn, isClient, Many, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createEffect, JSX, onCleanup } from "solid-js";
+import { createCallbackStack } from "./common";
 export * from "./component";
 
 export type EventMapOf<Target> = Target extends Window
@@ -92,17 +93,13 @@ export function createEventListener(
   target: MaybeAccessor<Many<EventTarget>>,
   ...rest: any
 ): EventListenerReturn {
-  const getProps: Accessor<EventListenerDirectiveProps> = rest.length > 1 ? () => rest : rest[0];
-  let toCleanup: Fn[] = [];
+  const props: Accessor<EventListenerDirectiveProps> = rest.length > 1 ? () => rest : rest[0];
 
-  const stop = () => {
-    toCleanup.forEach(fn => fn());
-    toCleanup = [];
-  };
+  const toCleanup = createCallbackStack();
   const start = () => {
     if (!isClient) return;
-    stop();
-    const [eventName, handler, options] = getProps();
+    toCleanup.execute();
+    const [eventName, handler, options] = props();
     accessAsArray(target).forEach(target => {
       if (!target) return;
       target.addEventListener(eventName, handler, options);
@@ -111,9 +108,9 @@ export function createEventListener(
   };
 
   createEffect(start);
-  onCleanup(stop);
+  onCleanup(toCleanup.execute);
 
-  return [stop, start];
+  return [toCleanup.execute, start];
 }
 
 // // /* TypeCheck */

@@ -1,6 +1,6 @@
-import { Fn } from "solid-fns";
+import { Fn, isClient } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal } from "solid-js";
-import { addListener } from "./common";
+import { addListener, createCallbackStack } from "./common";
 
 export interface MouseOnScreenOptions {
   /**
@@ -50,10 +50,11 @@ export function createMouseOnScreen(
     touch ? () => mouseOnScreen() || touchOnScreen() : () => mouseOnScreen()
   );
 
-  let cleanupList: Fn[] = [];
+  const toCleanup = createCallbackStack();
   const start = () => {
-    stop();
-    cleanupList.push(
+    if (!isClient) return;
+    toCleanup.execute();
+    toCleanup.push(
       addListener(document, "mouseenter", () => setMouseOnScreen(true)),
       // mousemove with once is for the situations where the cursor has entered the screen before the listeners could attach
       addListener(document, "mousemove", () => setMouseOnScreen(true), {
@@ -63,16 +64,12 @@ export function createMouseOnScreen(
       addListener(document, "mouseleave", () => setMouseOnScreen(false))
     );
     if (touch)
-      cleanupList.push(
+      toCleanup.push(
         addListener(window, "touchstart", () => setTouchOnScreen(true)),
         addListener(window, "touchend", () => setTouchOnScreen(false))
       );
   };
-  const stop = () => {
-    cleanupList.forEach(fn => fn());
-    cleanupList = [];
-  };
   start();
 
-  return [onScreen, { start, stop }];
+  return [onScreen, { start, stop: toCleanup.execute }];
 }

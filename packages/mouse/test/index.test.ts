@@ -72,17 +72,21 @@ mte("returns correct values", () =>
 
 mte("initial values can be changed", () =>
   createRoot(dispose => {
-    const el = document.createElement("div");
-    const [{ x, y, width, height, top, left, isInside }] = createMouseToElement(el, undefined, {
-      initialValue: {
-        x: -1,
-        y: 2,
-        width: 3,
-        height: 4,
-        top: 5,
-        left: 6
+    const [{ x, y, width, height, top, left, isInside }] = createMouseToElement(
+      // passed target must behave like an ref (initially undefined) for initial values to matter
+      () => undefined,
+      undefined,
+      {
+        initialValue: {
+          x: -1,
+          y: 2,
+          width: 3,
+          height: 4,
+          top: 5,
+          left: 6
+        }
       }
-    });
+    );
 
     assert.is(x(), -1);
     assert.is(y(), 2);

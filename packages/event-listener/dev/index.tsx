@@ -5,18 +5,30 @@ import { DisplayRecord } from "./components";
 import "uno.css";
 
 const App: Component = () => {
-  const [show, setShow] = createSignal(true);
-
   return (
     <div class="p-24 box-border w-full min-h-screen overflow-hidden bg-indigo-800 text-white flex flex-col justify-center items-center space-y-16">
       <WindowMousemove />
       <List />
       <CustomEvents />
       <DirectiveUsage />
-      <Show when={show()}>
-        <GlobalEventListener onmousemove={e => console.log(e.x, e.y)} />
+    </div>
+  );
+};
+
+const WindowMousemove: Component = () => {
+  const [listen, setListen] = createSignal(true);
+  const [mouse, setMouse] = createSignal({ x: 0, y: 0 });
+
+  return (
+    <div class="fixed top-4 left-4">
+      <Show when={listen()}>
+        <GlobalEventListener onmousemove={({ x, y }) => setMouse({ x, y })} />
       </Show>
-      <GlobalEventListener onclick={e => setShow(p => !p)} />
+      <h4>Window target, stop() & start()</h4>
+      <DisplayRecord record={mouse()}></DisplayRecord>
+      <button class="cursor-pointer" onclick={() => setListen(p => !p)}>
+        Toggle mousemove event
+      </button>
     </div>
   );
 };
@@ -48,34 +60,6 @@ const List: Component = () => {
         </For>
       </div>
       <button onclick={() => setN(p => p + 1)}>Add one more</button>
-    </div>
-  );
-};
-
-const WindowMousemove: Component = () => {
-  const [mouse, setMouse] = createSignal({ x: 0, y: 0 });
-  let active = true;
-  const [stop, start] = createEventListener(window, "mousemove", e => {
-    setMouse({
-      x: e.pageX,
-      y: e.pageY
-    });
-  });
-
-  return (
-    <div class="fixed top-4 left-4">
-      <h4>Window target, stop() & start()</h4>
-      <DisplayRecord record={mouse()}></DisplayRecord>
-      <button
-        class="cursor-pointer"
-        onclick={() => {
-          if (active) stop();
-          else start();
-          active = !active;
-        }}
-      >
-        Toggle mousemove event
-      </button>
     </div>
   );
 };

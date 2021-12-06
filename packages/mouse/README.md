@@ -11,6 +11,14 @@ A collection of primitives, capturing current mouse cursor position, and helping
 - [`createMouseInElement`](#createMouseInElement) - An alternative to `createMouseToElement`, that listens to mouse (and touch) events only inside the element. Provides information of position and if the element is being hovered.
 - [`createMouseOnScreen`](#createMouseOnScreen) - Answers the question: _Is the cursor on screen?_
 
+## Installation
+
+```bash
+npm install @solid-primitives/mouse
+# or
+yarn add @solid-primitives/mouse
+```
+
 ## `createMousePosition`
 
 Listens to the global mouse events, providing a reactive up-to-date position of the cursor on the page.

@@ -1,7 +1,7 @@
-import { access, Fn, MaybeAccessor } from "solid-fns";
-import { Accessor, createEffect, createSignal } from "solid-js";
+import { access, Fn, MaybeAccessor } from "@solid-primitives/utils";
+import { Accessor, createComputed, createSignal, onMount } from "solid-js";
 import { MouseOptions, MouseSourceType } from ".";
-import { addListener } from "./common";
+import { addListener, createCallbackStack } from "./common";
 
 /**
  * Listens to mouse (and touch) events inside the element.
@@ -50,31 +50,28 @@ export function createMouseInElement(
     setSourceType("touch");
   };
 
-  let cleanupList: Fn[] = [];
+  const toCleanup = createCallbackStack();
   const start = (el: HTMLElement = access(element)) => {
-    stop();
-    cleanupList.push(
+    toCleanup.execute();
+    if (!el) return;
+    toCleanup.push(
       addListener(el, "mouseover", () => setIsInside(true)),
       addListener(el, "mouseout", () => setIsInside(false)),
       addListener(el, "mousemove", e => handleMouseMove(e, el))
     );
     if (touch) {
-      cleanupList.push(
+      toCleanup.push(
         addListener(el, "touchstart", e => {
           setIsInside(true);
           handleTouchMove(e, el);
         }),
         addListener(el, "touchend", () => setIsInside(false))
       );
-      if (followTouch) cleanupList.push(addListener(el, "touchmove", e => handleTouchMove(e, el)));
+      if (followTouch) toCleanup.push(addListener(el, "touchmove", e => handleTouchMove(e, el)));
     }
   };
-  const stop = () => {
-    cleanupList.forEach(fn => fn());
-    cleanupList = [];
-  };
 
-  createEffect(() => start(access(element)));
+  access(element) ? createComputed(() => start()) : onMount(() => createComputed(() => start()));
 
   return [
     {
@@ -83,6 +80,6 @@ export function createMouseInElement(
       sourceType,
       isInside
     },
-    { stop, start }
+    { stop: toCleanup.execute, start }
   ];
 }

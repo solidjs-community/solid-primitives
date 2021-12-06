@@ -1,4 +1,4 @@
-import { isClient } from "solid-fns";
+import { isClient } from "@solid-primitives/utils";
 import { Component, JSX } from "solid-js";
 import { createEventListener } from ".";
 

@@ -1,5 +1,6 @@
 import { access, Fn, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createComputed, createEffect, createSignal, JSX, onCleanup } from "solid-js";
+import { addListener, createCallbackStack } from "./common";
 
 export type IsElementActiveProps = (isActive: boolean) => void;
 declare module "solid-js" {
@@ -26,25 +27,21 @@ export function createActiveElement(): [
   const [active, setActive] = createSignal<Element | null>(null);
   const handleChange = () => setActive(window.document.activeElement);
 
-  let stop: Fn = () => {};
+  const toCleanup = createCallbackStack();
   const start = () => {
-    stop();
+    toCleanup.execute();
     handleChange();
-    window.addEventListener("blur", handleChange, true);
-    window.addEventListener("focus", handleChange, true);
-    stop = () => {
-      window.removeEventListener("blur", handleChange, true);
-      window.removeEventListener("focus", handleChange, true);
-      stop = () => {};
-    };
+    toCleanup.push(
+      addListener(window, "blur", handleChange),
+      addListener(window, "focus", handleChange)
+    );
   };
   start();
-  onCleanup(() => stop());
 
   return [
     active,
     {
-      stop,
+      stop: toCleanup.execute,
       start
     }
   ];
@@ -64,31 +61,21 @@ export function createIsElementActive(
   const handleFocus = () => setIsActive(true);
   const handleBlur = () => setIsActive(false);
 
-  let stop: Fn = () => {};
+  const toCleanup = createCallbackStack();
   const start = () => {
-    stop();
+    toCleanup.execute();
     const el = access(target);
-    if (!el) {
-      setIsActive(false);
-      return;
-    }
+    if (!el) return setIsActive(false);
     setIsActive(window.document.activeElement === el);
-    el.addEventListener("blur", handleBlur, true);
-    el.addEventListener("focus", handleFocus, true);
-    stop = () => {
-      el.removeEventListener("blur", handleBlur, true);
-      el.removeEventListener("focus", handleFocus, true);
-      stop = () => {};
-    };
+    toCleanup.push(addListener(el, "blur", handleBlur), addListener(el, "focus", handleFocus));
   };
 
   const el = access(target);
   setIsActive(!!el && window.document.activeElement === el);
 
   createEffect(start);
-  onCleanup(() => stop());
 
-  return [isActive, { stop, start }];
+  return [isActive, { stop: toCleanup.execute, start }];
 }
 
 /**

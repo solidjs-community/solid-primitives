@@ -7,6 +7,14 @@
 - [`createActiveElement`](#createActiveElement) - A reactive `document.activeElement`. Check which element is currently focused.
 - [`createIsElementActive`](#createIsElementActive) - Pass in an element, and see if it's focused.
 
+## Installation
+
+```bash
+npm install @solid-primitives/active-element
+# or
+yarn add @solid-primitives/active-element
+```
+
 ## `createActiveElement`
 
 A reactive `document.activeElement`. Check which element is currently focused.
