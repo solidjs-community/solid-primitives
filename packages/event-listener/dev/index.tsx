@@ -1,4 +1,4 @@
-import { createEventListener, GlobalEventListener } from "../src";
+import { createEventListener, WindowEventListener } from "../src";
 import { Component, createSignal, For, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
 import { DisplayRecord } from "./components";
@@ -22,7 +22,7 @@ const WindowMousemove: Component = () => {
   return (
     <div class="fixed top-4 left-4">
       <Show when={listen()}>
-        <GlobalEventListener onmousemove={({ x, y }) => setMouse({ x, y })} />
+        <WindowEventListener onmousemove={({ x, y }) => setMouse({ x, y })} />
       </Show>
       <h4>Window target, stop() & start()</h4>
       <DisplayRecord record={mouse()}></DisplayRecord>

@@ -1,8 +1,10 @@
 import { dispatchFakeEvent } from "./setup";
-import { test } from "uvu";
+import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createRoot, createSignal, onMount } from "solid-js";
 import { createEventListener, EventListenerDirectiveProps } from "../src";
+
+const test = suite("createEventListener");
 
 test("it will add an event", () => {
   createRoot(dispose => {

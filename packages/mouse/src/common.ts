@@ -10,16 +10,3 @@ export const addListener = (
   const [stop] = createEventListener(el, ev, cb, options);
   return stop;
 };
-
-export const createCallbackStack = () => {
-  let stack: Fn[] = [];
-  const push = (...callback: Fn[]) => stack.push(...callback);
-  const execute = () => {
-    stack.forEach(cb => cb());
-    stack = [];
-  };
-  return {
-    push,
-    execute
-  };
-};

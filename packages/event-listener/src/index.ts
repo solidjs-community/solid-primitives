@@ -1,6 +1,12 @@
-import { accessAsArray, Fn, isClient, Many, MaybeAccessor } from "@solid-primitives/utils";
+import {
+  accessAsArray,
+  createCallbackStack,
+  isClient,
+  Fn,
+  Many,
+  MaybeAccessor
+} from "@solid-primitives/utils";
 import { Accessor, createEffect, JSX, onCleanup } from "solid-js";
-import { createCallbackStack } from "./common";
 export * from "./component";
 
 export type EventMapOf<Target> = Target extends Window
@@ -25,9 +31,11 @@ export type EventHandler<
 
 export type EventListenerReturn = [stop: Fn, start: Fn];
 
-export type EventListenerDirectiveProps =
-  | [string, (e: any) => void, boolean | AddEventListenerOptions]
-  | [string, (e: any) => void];
+export type EventListenerDirectiveProps = [
+  name: string,
+  handler: (e: any) => void,
+  options?: AddEventListenerOptions | boolean
+];
 
 declare module "solid-js" {
   namespace JSX {
@@ -53,11 +61,15 @@ export type E = JSX.Element;
  * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#createEventListener
  *
  * @example
+ * ```tsx
  * const [stop, start] = createEventListener(
  *   document.querySelector('.myEl'),
  *   'click',
  *   e => { ... }
  * )
+ * // as directive:
+ * <button use:createEventListener={["click", () => {...}]}>Click me!</button>
+ * ```
  */
 
 // DOM Events

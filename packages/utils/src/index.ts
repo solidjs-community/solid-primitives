@@ -53,6 +53,23 @@ export const objectOmit = <T extends Object, K extends Array<keyof T>>(
   return copy;
 };
 
+export const createCallbackStack = <Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void>(): {
+  push: (...callbacks: Fn[]) => void;
+  execute: (arg0: Arg0, arg1: Arg1, arg2: Arg2, arg3: Arg3) => void;
+  clear: Fn;
+} => {
+  let stack: Array<(arg0: Arg0, arg1: Arg1, arg2: Arg2, arg3: Arg3) => void> = [];
+  const clear: Fn = () => (stack = []);
+  return {
+    push: (...callbacks) => stack.push(...callbacks),
+    execute: (arg0, arg1, arg2, arg3) => {
+      stack.forEach(cb => cb(arg0, arg1, arg2, arg3));
+      clear();
+    },
+    clear
+  };
+};
+
 //
 // SIGNAL BUILDERS:
 //

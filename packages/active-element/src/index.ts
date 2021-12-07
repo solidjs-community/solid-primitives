@@ -1,6 +1,6 @@
-import { access, Fn, MaybeAccessor } from "@solid-primitives/utils";
-import { Accessor, createComputed, createEffect, createSignal, JSX, onCleanup } from "solid-js";
-import { addListener, createCallbackStack } from "./common";
+import { access, Fn, MaybeAccessor, createCallbackStack } from "@solid-primitives/utils";
+import { Accessor, createComputed, createEffect, createSignal, JSX } from "solid-js";
+import { addListener } from "./common";
 
 export type IsElementActiveProps = (isActive: boolean) => void;
 declare module "solid-js" {

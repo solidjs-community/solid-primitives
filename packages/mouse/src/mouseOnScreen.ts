@@ -1,6 +1,6 @@
-import { Fn, isClient } from "@solid-primitives/utils";
+import { Fn, isClient, createCallbackStack } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal } from "solid-js";
-import { addListener, createCallbackStack } from "./common";
+import { addListener } from "./common";
 
 export interface MouseOnScreenOptions {
   /**
