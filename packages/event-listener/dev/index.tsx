@@ -1,8 +1,14 @@
-import { createEventListener, WindowEventListener } from "../src";
+import {
+  createEventListener,
+  createEventListenerMap,
+  WindowEventListener,
+  eventListener
+} from "../src";
 import { Component, createSignal, For, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
 import { DisplayRecord } from "./components";
 import "uno.css";
+eventListener;
 
 const App: Component = () => {
   return (
@@ -11,6 +17,7 @@ const App: Component = () => {
       <List />
       <CustomEvents />
       <DirectiveUsage />
+      <EventMap />
     </div>
   );
 };
@@ -108,9 +115,39 @@ const DirectiveUsage: Component = () => {
   return (
     <div class="flex flex-col items-center space-y-2">
       <h4>Directive Usage</h4>
-      <button class="p-4" use:createEventListener={["click", () => setCount(p => p + 1)]}>
+      <button class="p-4" use:eventListener={["click", () => setCount(p => p + 1)]}>
         Count: {count()}
       </button>
+    </div>
+  );
+};
+
+const EventMap: Component = () => {
+  const [lastEvent, setLastEvent] = createSignal("");
+  const handleEvent = (e: Event) => setLastEvent(e.type);
+
+  let ref!: HTMLDivElement;
+  createEventListenerMap(
+    () => ref,
+    {
+      mouseenter: handleEvent,
+      mouseleave: handleEvent,
+      click: handleEvent,
+      wheel: handleEvent
+    },
+    { passive: true }
+  );
+
+  return (
+    <div class="flex flex-col items-center space-y-2">
+      <h4>Event Map</h4>
+      <p>Last event: {lastEvent()}</p>
+      <div
+        ref={ref}
+        class="w-46 h-32 bg-green-500 bg-opacity-70 rounded-lg select-none center-child"
+      >
+        <p>TARGET</p>
+      </div>
     </div>
   );
 };

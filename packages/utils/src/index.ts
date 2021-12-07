@@ -6,6 +6,10 @@ import type { Accessor } from "solid-js";
 
 export type Fn<R = void> = () => R;
 export type Many<T> = T | T[];
+
+export type Keys<O extends Object> = keyof O;
+export type Values<O extends Object> = O[Keys<O>];
+
 /**
  * Infers the element type of an array
  */
@@ -32,6 +36,10 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
   const _value = access(value);
   if (typeof _value !== "undefined" && _value !== null) fn(_value as NonNullable<V>);
 };
+
+export const entries = <A extends MaybeAccessor<Object>, V = MaybeAccessorValue<A>>(
+  object: A
+): [string, Values<V>][] => Object.entries(access(object));
 
 export const promiseTimeout = (
   ms: number,

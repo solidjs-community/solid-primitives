@@ -1,4 +1,5 @@
-import { isClient } from "@solid-primitives/utils";
+import { Fn, isClient } from "@solid-primitives/utils";
+import { createEffect, on } from "solid-js";
 import { Component, JSX } from "solid-js";
 import { createEventListener } from ".";
 
@@ -28,7 +29,7 @@ const forEachEventAttr = (
 export const WindowEventListener: Component<EventAttributes<null>> = props => {
   if (isClient)
     forEachEventAttr(props, (eventName, attr) => {
-      createEventListener(window, () => [eventName, (props as any)[attr]]);
+      createEventListener(window, eventName, e => (props as any)[attr](e));
     });
   return undefined;
 };
@@ -44,7 +45,7 @@ export const WindowEventListener: Component<EventAttributes<null>> = props => {
 export const DocumentEventListener: Component<EventAttributes<null>> = props => {
   if (isClient)
     forEachEventAttr(props, (eventName, attr) => {
-      createEventListener(document, () => [eventName, (props as any)[attr]]);
+      createEventListener(document, eventName, e => (props as any)[attr](e));
     });
   return undefined;
 };
