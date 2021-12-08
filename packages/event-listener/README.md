@@ -29,7 +29,7 @@ const [add, remove] = createEventListener(document.getElementById("mybutton"), "
 ### Directive
 
 ```ts
-<MyButton use:createEventListener={() => ["click", () => console.log("Click")]}>Click!</MyButton>;
+<button use:createEventListener={() => ["click", () => console.log("Click")]}>Click!</button>;
 // you can provide your own event map type as well:
 createEventListener<{ myCustomEvent: Event }>(window, "myCustomEvent", () => console.log("yup!"));
 ```
