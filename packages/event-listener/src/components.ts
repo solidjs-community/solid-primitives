@@ -1,5 +1,4 @@
-import { Fn, isClient } from "@solid-primitives/utils";
-import { createEffect, on } from "solid-js";
+import { isClient } from "@solid-primitives/utils";
 import { Component, JSX } from "solid-js";
 import { createEventListener } from ".";
 

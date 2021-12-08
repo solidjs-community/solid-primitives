@@ -1,4 +1,4 @@
 export * from "./eventListener";
 export * from "./eventListenerMap";
-export * from "./component";
+export * from "./components";
 export * from "./types";

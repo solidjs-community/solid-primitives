@@ -1,10 +1,10 @@
 import {
   access,
-  accessAsArray,
   createCallbackStack,
   isClient,
   Many,
-  MaybeAccessor
+  MaybeAccessor,
+  forEach
 } from "@solid-primitives/utils";
 import { createSignal } from "solid-js";
 import { Accessor, createEffect, onCleanup } from "solid-js";
@@ -49,25 +49,24 @@ export function createEventListener<
 ): void;
 
 export function createEventListener(
-  target: MaybeAccessor<Many<EventTarget>>,
+  targets: MaybeAccessor<Many<EventTarget>>,
   eventName: MaybeAccessor<string>,
   handler: (event: Event) => void,
   options?: MaybeAccessor<boolean | AddEventListenerOptions>
 ): void {
-  if (isClient) {
-    const toCleanup = createCallbackStack();
-    createEffect(() => {
-      toCleanup.execute();
-      const _eventName = access(eventName);
-      const _options = access(options);
-      accessAsArray(target).forEach(target => {
-        if (!target) return;
-        target.addEventListener(_eventName, handler, _options);
-        toCleanup.push(() => target.removeEventListener(_eventName, handler, _options));
-      });
+  if (!isClient) return;
+  const toCleanup = createCallbackStack();
+  createEffect(() => {
+    toCleanup.execute();
+    const _eventName = access(eventName);
+    const _options = access(options);
+    forEach(targets, el => {
+      if (!el) return;
+      el.addEventListener(_eventName, handler, _options);
+      toCleanup.push(() => el.removeEventListener(_eventName, handler, _options));
     });
-    onCleanup(toCleanup.execute);
-  }
+  });
+  onCleanup(toCleanup.execute);
 }
 
 /**
@@ -124,7 +123,6 @@ export function createEventSignal(
  * <button use:eventListener={["click", () => {...}]}>Click me!</button>
  */
 export function eventListener(target: Element, props: Accessor<EventListenerDirectiveProps>): void {
-  if (!target) return;
   const toCleanup = createCallbackStack();
   createEffect(() => {
     toCleanup.execute();

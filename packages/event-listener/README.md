@@ -8,6 +8,8 @@ A helpful event listener primitive that binds window and any element supplied.
 
 - [`createEventListener`](#createEventListener) - Very basic and straightforward primitive that handles multiple elements according to a single event binding.
 - [`createEventSignal`](#createEventListener) - Like `createEventListener`, but events are handled with the returned signal, instead of with a callback.
+- [`createEventListenerMap`](#createEventListenerMap) - A helpful primitive that listens to a map of events. Handle them by individual callbacks.
+- [`createEventStore`](#createEventStore) - Similar to `createEventListenerMap`, but provides a reactive store with the latest captured events.
 - [`WindowEventListener`](#WindowEventListener) - Listen to the `window` DOM Events, using a component.
 - [`DocumentEventListener`](#DocumentEventListener) - The same as [`WindowEventListener`](#WindowEventListener), but listens to `document` events.
 
@@ -24,8 +26,6 @@ yarn add @solid-primitives/event-listener
 Can be used to listen to DOM or Custom Events on window, document, list of HTML elements or any EventTarget. The target prop can be reactive.
 
 ### How to use it
-
-A very straightforward primitive that handles multiple elements according to a single event binding.
 
 ```ts
 import { createEventListener } from "@solid-primitives/event-listener";
@@ -110,6 +110,87 @@ createEffect(() => {
 });
 ```
 
+## `createEventListenerMap`
+
+A helpful primitive that listens to a map of events. Handle them by individual callbacks.
+
+### How to use it
+
+```ts
+import { createEventListenerMap } from "@solid-primitives/event-listener";
+
+createEventListenerMap(element, {
+  mousemove: mouseHandler,
+  mouseenter: e => {},
+  touchend: touchHandler
+});
+```
+
+### Directive usage
+
+```tsx
+import { eventListenerMap } from "@solid-primitives/event-listener";
+// prevent tree-shaking:
+eventListenerMap;
+
+<div
+  use:eventListenerMap={{
+    mousemove: e => {},
+    click: clickHandler,
+    touchstart: () => {}
+  }}
+></div>;
+```
+
+### Types
+
+```ts
+function createEventListenerMap<
+  EventMap extends Record<string, Event>,
+  UsedEvents extends keyof EventMap = keyof EventMap
+>(
+  target: MaybeAccessor<Many<EventTarget>>,
+  handlersMap: EventHandlersMap,
+  options?: MaybeAccessor<boolean | AddEventListenerOptions>
+): void;
+```
+
+## `createEventStore`
+
+Similar to [`createEventListenerMap`](#createEventListenerMap), but provides a reactive store with the latest captured events.
+
+### How to use it
+
+```ts
+const lastEvents = createEventStore(el, "mousemove", "touchend", "click");
+
+createEffect(() => {
+  console.log(lastEvents.mousemove.x);
+});
+```
+
+### types
+
+```ts
+function createEventStore<
+  EventMap extends Record<string, Event>,
+  UsedEvents extends keyof EventMap = keyof EventMap
+>(
+  target: MaybeAccessor<Many<EventTarget>>,
+  ...eventNames: UsedEvents[]
+): Store<Partial<Pick<EventMap, UsedEvents>>>;
+
+// with options:
+function createEventStore<
+  EventMap extends Record<string, Event>,
+  UsedEvents extends keyof EventMap = keyof EventMap
+>(
+  target: MaybeAccessor<Many<EventTarget>>,
+  options: MaybeAccessor<boolean | AddEventListenerOptions>,
+  ...eventNames: UsedEvents[]
+): Store<Partial<Pick<EventMap, UsedEvents>>>;
+```
+
 ## `WindowEventListener`
 
 Listen to the `window` DOM Events, using a component.
@@ -170,6 +251,6 @@ Migrated to new build process.
 1.3.0
 
 **(minor breaking changes to type generics and returned functions)**
-Primitive rewritten to provide better types and more reliable usage. Added DocumentEventListener & WindowEventListener components.
+Primitive rewritten to provide better types and more reliable usage. Added more primitives.
 
 </details>

@@ -37,6 +37,15 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
   if (typeof _value !== "undefined" && _value !== null) fn(_value as NonNullable<V>);
 };
 
+export const forEach = <A extends MaybeAccessor<any>, V = MaybeAccessorValue<A>>(
+  array: A,
+  iterator: (
+    item: V extends any[] ? ItemsOf<V> : V,
+    index: number,
+    array: V extends any[] ? V : V[]
+  ) => void
+): void => accessAsArray(array).forEach(iterator as any);
+
 export const entries = <A extends MaybeAccessor<Object>, V = MaybeAccessorValue<A>>(
   object: A
 ): [string, Values<V>][] => Object.entries(access(object));

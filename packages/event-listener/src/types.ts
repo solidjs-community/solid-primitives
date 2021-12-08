@@ -18,11 +18,16 @@ export type EventListenerDirectiveProps = [
   options?: AddEventListenerOptions | boolean
 ];
 
+export type EventListenerMapDirectiveProps =
+  | [handlerMap: Record<string, (e: any) => void>, options?: AddEventListenerOptions | boolean]
+  | Record<string, (e: any) => void>;
+
 declare module "solid-js" {
   namespace JSX {
     interface Directives {
       // directive types are very premissive to prevent type errors from incompatible types, since props cannot be generic
       eventListener: EventListenerDirectiveProps;
+      eventListenerMap: EventListenerMapDirectiveProps;
     }
   }
 }

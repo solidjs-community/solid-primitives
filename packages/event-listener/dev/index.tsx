@@ -2,7 +2,8 @@ import {
   createEventListener,
   createEventListenerMap,
   WindowEventListener,
-  eventListener
+  eventListener,
+  createEventSignal
 } from "../src";
 import { Component, createSignal, For, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
@@ -43,17 +44,14 @@ const WindowMousemove: Component = () => {
 const List: Component = () => {
   const [n, setN] = createSignal(5);
   const [items, setItems] = createSignal<HTMLDivElement[]>([]);
-  const [lastClicked, setLastClicked] = createSignal<string>(null);
 
   // new event listeners are automatically added to the new items
-  createEventListener(items, "click", e => {
-    setLastClicked((e.target as HTMLElement).textContent);
-  });
+  const lastEvent = createEventSignal(items, "click");
 
   return (
     <div class="flex flex-col items-center space-y-6">
       <h4>Multiple Reactive Targets</h4>
-      <p>Clicked: {lastClicked()}</p>
+      <p>Clicked: {(lastEvent()?.target as any)?.textContent}</p>
       <div class="flex flex-wrap justify-center gap-4">
         <For each={Array.from({ length: n() }, (_, i) => i)}>
           {i => (
