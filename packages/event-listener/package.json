@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-listener",
-  "version": "1.3.2",
+  "version": "1.3.4",
   "description": "Primitive to manage creating event listeners.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
