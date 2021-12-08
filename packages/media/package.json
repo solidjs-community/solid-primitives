@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/media",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Primitives for media query and device features",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -27,9 +27,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs"
+    "build": "tsup"
   },
   "keywords": [
     "media",
@@ -43,7 +41,7 @@
     "prettier": "^2.0.5",
     "solid-testing-library": "^0.2.0",
     "tslib": "^2.0.1",
-    "tsup": "^5.10.1",
+    "tsup": "^5.10.3",
     "typescript": "^4.0.2"
   },
   "peerDependencies": {
