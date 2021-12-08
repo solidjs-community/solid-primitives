@@ -37,9 +37,11 @@ createEventListener(
   { passive: true }
 );
 
-// target element can be a reactive signal
+// target element, event name and options can be reactive signals
 const [ref, setRef] = createSignal<HTMLElement>();
-createEventListener(ref, "click", e => {});
+const [name, setName] = createSignal("mousemove");
+const [options, setOptions] = createSignal({ passive: true });
+createEventListener(ref, name, e => {}, options);
 
 // you can provide your own event map type as well:
 createEventListener<{ myCustomEvent: Event }>(window, "myCustomEvent", () => console.log("yup!"));
@@ -61,15 +63,6 @@ eventListener;
 ### Types
 
 ```ts
-// DOM Events
-function (
-  target: MaybeAccessor<Many<Target>>,
-  eventName: MaybeAccessor<EventName>,
-  handler: (event: EventMap[EventName]) => void,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): void;
-
-// Custom Events
 function createEventListener<
   EventMap extends Record<string, Event>,
   EventName extends keyof EventMap
@@ -106,7 +99,7 @@ import { createEventSignal } from "@solid-primitives/event-listener";
 const lastEvent = createEventSignal(el, "mousemove", { passive: true });
 
 createEffect(() => {
-  console.log(lastEvent().x, lastEvent().y);
+  console.log(lastEvent()?.x, lastEvent()?.y);
 });
 ```
 
@@ -124,6 +117,31 @@ createEventListenerMap(element, {
   mouseenter: e => {},
   touchend: touchHandler
 });
+
+// both target and options args can be reactive:
+const [target, setTarget] = createSignal(document.getElementById("abc"));
+const [options, setOptions] = createSignal({ passive: true });
+createEventListenerMap(
+  target,
+  {
+    mousemove: e => {},
+    touchstart: e => {}
+  },
+  options
+);
+
+// createEventListenerMap can be used to listen to custom events
+createEventListenerMap<
+  {
+    myEvent: MyEvent;
+    custom: Event;
+    other: Event;
+  },
+  "myEvent" | "custom"
+>(target, {
+  myEvent: e => {},
+  custom: e => {}
+});
 ```
 
 ### Directive usage
@@ -137,7 +155,8 @@ eventListenerMap;
   use:eventListenerMap={{
     mousemove: e => {},
     click: clickHandler,
-    touchstart: () => {}
+    touchstart: () => {},
+    myCustomEvent: e => {}
   }}
 ></div>;
 ```
@@ -165,8 +184,26 @@ Similar to [`createEventListenerMap`](#createEventListenerMap), but provides a r
 const lastEvents = createEventStore(el, "mousemove", "touchend", "click");
 
 createEffect(() => {
-  console.log(lastEvents.mousemove.x);
+  console.log(lastEvents?.mousemove.x);
 });
+
+// both target and options args can be reactive:
+const [target, setTarget] = createSignal(document.getElementById("abc"));
+const [options, setOptions] = createSignal({ passive: true });
+const lastEvents = createEventStore(target, options, "mousemove", "touchmove");
+
+// createEventStore can be used to listen to custom events
+const lastEvents = createEventStore<
+  {
+    myEvent: MyEvent;
+    custom: Event;
+  },
+  "myEvent" | "custom"
+>(target, "myEvent", "custom");
+
+// DON'T DO THIS:
+const { mousemove } = createEventStore(target, "mousemove", ...);
+// the store cannot be destructured
 ```
 
 ### types

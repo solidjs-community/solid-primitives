@@ -2,7 +2,12 @@ import { dispatchFakeEvent } from "./setup";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createRoot, createSignal, onMount } from "solid-js";
-import { createEventListener, EventListenerDirectiveProps } from "../src";
+import {
+  createEventListener,
+  createEventSignal,
+  eventListener,
+  EventListenerDirectiveProps
+} from "../src";
 
 const test = suite("createEventListener");
 
@@ -36,33 +41,53 @@ test("it will only add the event once", () => {
   });
 });
 
-test("returned stop() and start() functions", () =>
+test("disposing on cleanup", () =>
   createRoot(dispose => {
     const testEvent = new Event("test3");
     let count = 0;
-    const [stop, start] = createEventListener<{ test3: Event }>(window, "test3", () => {
+    createEventListener<{ test3: Event }>(window, "test3", () => {
       count++;
     });
-    assert.type(stop, "function");
-    assert.type(start, "function");
 
     onMount(() => {
       dispatchFakeEvent("test3", testEvent);
       assert.is(count, 1, "captured count on mount should be 1");
 
-      stop();
-      dispatchFakeEvent("test3", testEvent);
-      assert.is(count, 1, "count after stop() should not change");
-
-      start();
-      dispatchFakeEvent("test3", testEvent);
-      assert.is(count, 2, "count after start() should go up again");
-
       dispose();
+
+      dispatchFakeEvent("test3", testEvent);
+      assert.is(count, 1, "captured count after disposing should still be 1");
     });
   }));
 
-test("will work as directive and update the event", () =>
+const signalTest = suite("createEventSignal");
+
+signalTest("return autoupdating signal", () =>
+  createRoot(dispose => {
+    const testEvent = new Event("sig_test");
+    const lastEvent = createEventSignal<{ sig_test: Event }>(window, "sig_test");
+    assert.type(lastEvent, "function", "returned value is an accessor");
+    assert.type(lastEvent(), "undefined", "returned value is undefined");
+
+    onMount(() => {
+      dispatchFakeEvent("sig_test", testEvent);
+      assert.type(
+        lastEvent(),
+        "undefined",
+        "lastEvent will shouldn't be available in the same effect"
+      );
+
+      setTimeout(() => {
+        assert.is(lastEvent(), testEvent);
+        dispose();
+      }, 0);
+    });
+  })
+);
+
+const directiveTest = suite("eventListener");
+
+directiveTest("will work as directive and update the event", () =>
   createRoot(dispose => {
     const testEvent = new Event("load");
     const captured: any[] = [];
@@ -71,7 +96,7 @@ test("will work as directive and update the event", () =>
       "load",
       e => captured.push(e)
     ]);
-    createEventListener(window, props);
+    eventListener(window as any, props);
     dispatchFakeEvent("load", testEvent);
     assert.is(captured.length, 0, "event are not listened before the first effect");
 
@@ -96,6 +121,9 @@ test("will work as directive and update the event", () =>
         dispose();
       }, 10);
     });
-  }));
+  })
+);
 
 test.run();
+signalTest.run();
+directiveTest.run();
