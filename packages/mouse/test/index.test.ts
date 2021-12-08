@@ -13,7 +13,7 @@ const mp = suite("createMousePosition");
 
 mp("returns correct values", () =>
   createRoot(dispose => {
-    const [{ x, y, sourceType }, { stop, start }] = createMousePosition();
+    const [{ x, y, sourceType }, stop] = createMousePosition();
 
     assert.type(x, "function");
     assert.is(x(), 0);
@@ -23,7 +23,6 @@ mp("returns correct values", () =>
     assert.is(sourceType(), null);
 
     assert.type(stop, "function");
-    assert.type(start, "function");
     dispose();
   })
 );
@@ -107,7 +106,7 @@ const mie = suite("createMouseInElement");
 mie("returns correct values", () =>
   createRoot(dispose => {
     const el = document.createElement("div");
-    const [{ x, y, isInside }, { stop, start }] = createMouseInElement(el);
+    const [{ x, y, isInside }, stop] = createMouseInElement(el);
 
     assert.type(x, "function");
     assert.is(x(), 0);
@@ -119,7 +118,6 @@ mie("returns correct values", () =>
     assert.is(isInside(), false);
 
     assert.type(stop, "function");
-    assert.type(start, "function");
     dispose();
   })
 );
@@ -147,13 +145,12 @@ const mos = suite("createMouseOnScreen");
 
 mos("returns correct values", () =>
   createRoot(dispose => {
-    const [onScreen, { stop, start }] = createMouseOnScreen();
+    const [onScreen, stop] = createMouseOnScreen();
 
     assert.type(onScreen, "function");
     assert.is(onScreen(), false);
 
     assert.type(stop, "function");
-    assert.type(start, "function");
     dispose();
   })
 );

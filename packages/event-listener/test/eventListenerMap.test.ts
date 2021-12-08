@@ -74,7 +74,7 @@ testStore("returns autoupdating store", () =>
   createRoot(dispose => {
     const testEvent = new Event("map_0");
     const testEvent1 = new Event("map_1");
-    const store = createEventStore(window, "map_0", "map_1");
+    const [store] = createEventStore(window, "map_0", "map_1");
     assert.type(store, "object");
     assert.type(store.map_0, "undefined");
     assert.type(store.map_1, "undefined");
@@ -98,7 +98,7 @@ testStore("store cannot be destructured", () =>
   createRoot(dispose => {
     const testEvent = new Event("map_3");
     const testEvent1 = new Event("map_4");
-    const { map_3, map_4 } = createEventStore(window, "map_3", "map_4");
+    const [{ map_3, map_4 }] = createEventStore(window, "map_3", "map_4");
     assert.type(map_3, "undefined");
     assert.type(map_4, "undefined");
 

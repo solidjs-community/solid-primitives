@@ -1,4 +1,7 @@
+import { Fn } from "@solid-primitives/utils";
 import { JSX } from "solid-js";
+
+export type ClearListeners = Fn;
 
 export type TargetWithEventMap = Window | Document | HTMLElement | MediaQueryList;
 

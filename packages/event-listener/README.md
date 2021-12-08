@@ -4,7 +4,7 @@
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/event-listener?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/event-listener)
 [![size](https://img.shields.io/npm/v/@solid-primitives/event-listener?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/event-listener)
 
-A helpful event listener primitive that binds window and any element supplied.
+A set of primitives that help with listening to DOM and Custom Events.
 
 - [`createEventListener`](#createEventListener) - Very basic and straightforward primitive that handles multiple elements according to a single event binding.
 - [`createEventSignal`](#createEventListener) - Like `createEventListener`, but events are handled with the returned signal, instead of with a callback.
@@ -30,12 +30,15 @@ Can be used to listen to DOM or Custom Events on window, document, list of HTML 
 ```ts
 import { createEventListener } from "@solid-primitives/event-listener";
 
-createEventListener(
-  document.getElementById("mybutton"),
+const clear = createEventListener(
+  document.getElementById("myButton"),
   "mousemove",
   e => console.log("x:", e.pageX, "y:", e.pageY),
   { passive: true }
 );
+
+// to clear all of the event listeners
+clear();
 
 // target element, event name and options can be reactive signals
 const [ref, setRef] = createSignal<HTMLElement>();
@@ -71,7 +74,7 @@ function createEventListener<
   eventName: MaybeAccessor<EventName>,
   handler: (event: EventMap[EventName]) => void,
   options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): void;
+): ClearListeners;
 
 // Directive
 function eventListener(
@@ -96,11 +99,32 @@ Like [`createEventListener`](#createEventListener), but events are handled with 
 import { createEventSignal } from "@solid-primitives/event-listener";
 
 // all arguments can be reactive signals
-const lastEvent = createEventSignal(el, "mousemove", { passive: true });
+const [lastEvent, clear] = createEventSignal(el, "mousemove", { passive: true });
 
 createEffect(() => {
   console.log(lastEvent()?.x, lastEvent()?.y);
 });
+
+// to clear all the event listeners
+clear();
+```
+
+### Types
+
+```ts
+function createEventSignal<
+  EventMap extends Record<string, Event>,
+  EventName extends keyof EventMap = keyof EventMap
+>(
+  target: MaybeAccessor<Many<EventTarget>>,
+  eventName: MaybeAccessor<EventName>,
+  options?: MaybeAccessor<boolean | AddEventListenerOptions>
+): EventListenerSignalReturns<EventMap[EventName]>;
+
+type EventListenerSignalReturns<Event> = [
+  lastEvent: Accessor<Event | undefined>,
+  clear: ClearListeners
+];
 ```
 
 ## `createEventListenerMap`
@@ -112,11 +136,14 @@ A helpful primitive that listens to a map of events. Handle them by individual c
 ```ts
 import { createEventListenerMap } from "@solid-primitives/event-listener";
 
-createEventListenerMap(element, {
+const clear = createEventListenerMap(element, {
   mousemove: mouseHandler,
   mouseenter: e => {},
   touchend: touchHandler
 });
+
+// to clear all the event listeners
+clear();
 
 // both target and options args can be reactive:
 const [target, setTarget] = createSignal(document.getElementById("abc"));
@@ -171,7 +198,7 @@ function createEventListenerMap<
   target: MaybeAccessor<Many<EventTarget>>,
   handlersMap: EventHandlersMap,
   options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): void;
+): ClearListeners;
 ```
 
 ## `createEventStore`
@@ -181,19 +208,22 @@ Similar to [`createEventListenerMap`](#createEventListenerMap), but provides a r
 ### How to use it
 
 ```ts
-const lastEvents = createEventStore(el, "mousemove", "touchend", "click");
+const [lastEvents, clear] = createEventStore(el, "mousemove", "touchend", "click");
 
 createEffect(() => {
   console.log(lastEvents?.mousemove.x);
 });
 
+// to clear all the event listeners
+clear()
+
 // both target and options args can be reactive:
 const [target, setTarget] = createSignal(document.getElementById("abc"));
 const [options, setOptions] = createSignal({ passive: true });
-const lastEvents = createEventStore(target, options, "mousemove", "touchmove");
+const [lastEvents] = createEventStore(target, options, "mousemove", "touchmove");
 
 // createEventStore can be used to listen to custom events
-const lastEvents = createEventStore<
+const [lastEvents] = createEventStore<
   {
     myEvent: MyEvent;
     custom: Event;
@@ -202,7 +232,7 @@ const lastEvents = createEventStore<
 >(target, "myEvent", "custom");
 
 // DON'T DO THIS:
-const { mousemove } = createEventStore(target, "mousemove", ...);
+const [{ mousemove }] = createEventStore(target, "mousemove", ...);
 // the store cannot be destructured
 ```
 
@@ -215,7 +245,7 @@ function createEventStore<
 >(
   target: MaybeAccessor<Many<EventTarget>>,
   ...eventNames: UsedEvents[]
-): Store<Partial<Pick<EventMap, UsedEvents>>>;
+): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
 
 // with options:
 function createEventStore<
@@ -225,7 +255,9 @@ function createEventStore<
   target: MaybeAccessor<Many<EventTarget>>,
   options: MaybeAccessor<boolean | AddEventListenerOptions>,
   ...eventNames: UsedEvents[]
-): Store<Partial<Pick<EventMap, UsedEvents>>>;
+): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
+
+type EventListnenerStoreReturns<E> = [lastEvents: Store<Partial<E>>, clear: ClearListeners];
 ```
 
 ## `WindowEventListener`
@@ -288,6 +320,6 @@ Migrated to new build process.
 1.3.0
 
 **(minor breaking changes to type generics and returned functions)**
-Primitive rewritten to provide better types and more reliable usage. Added more primitives.
+Primitive rewritten to provide better types and more reliable usage. Added a lot more primitives.
 
 </details>

@@ -65,7 +65,7 @@ const signalTest = suite("createEventSignal");
 signalTest("return autoupdating signal", () =>
   createRoot(dispose => {
     const testEvent = new Event("sig_test");
-    const lastEvent = createEventSignal<{ sig_test: Event }>(window, "sig_test");
+    const [lastEvent] = createEventSignal<{ sig_test: Event }>(window, "sig_test");
     assert.type(lastEvent, "function", "returned value is an accessor");
     assert.type(lastEvent(), "undefined", "returned value is undefined");
 

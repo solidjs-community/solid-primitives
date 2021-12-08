@@ -14,7 +14,11 @@
     "stage": 3,
     "list": [
       "createEventListener",
-      "GlobalEventListener"
+      "createEventSignal",
+      "createEventListenerMap",
+      "createEventStore",
+      "WindowEventListener",
+      "DocumentEventListener"
     ],
     "category": "Browser APIs"
   },
@@ -55,6 +59,6 @@
     "solid-js": "^1.2.5"
   },
   "dependencies": {
-    "@solid-primitives/utils": "^0.0.250"
+    "@solid-primitives/utils": "^0.0.255"
   }
 }

@@ -2,7 +2,6 @@ export * from "./mousePosition";
 export * from "./mouseOnScreen";
 export * from "./mouseInElement";
 export * from "./mouseToElement";
-
 export interface Position {
   x: number;
   y: number;

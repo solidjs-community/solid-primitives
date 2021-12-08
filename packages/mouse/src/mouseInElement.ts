@@ -1,4 +1,5 @@
-import { access, createCallbackStack, Fn, MaybeAccessor } from "@solid-primitives/utils";
+import { ClearListeners } from "@solid-primitives/event-listener";
+import { access, createCallbackStack, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createComputed, createSignal, onMount } from "solid-js";
 import { MouseOptions, MouseSourceType } from ".";
 import { addListener } from "./common";
@@ -25,10 +26,7 @@ export function createMouseInElement(
     sourceType: Accessor<MouseSourceType>;
     isInside: Accessor<boolean>;
   },
-  actions: {
-    stop: Fn;
-    start: Fn;
-  }
+  clear: ClearListeners
 ] {
   const { touch = true, followTouch = true, initialValue = { x: 0, y: 0 } } = options;
   const [x, setX] = createSignal(initialValue.x);
@@ -80,6 +78,6 @@ export function createMouseInElement(
       sourceType,
       isInside
     },
-    { stop: toCleanup.execute, start }
+    toCleanup.execute
   ];
 }

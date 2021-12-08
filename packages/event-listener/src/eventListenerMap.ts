@@ -2,6 +2,7 @@ import { Many, MaybeAccessor, entries, createCallbackStack } from "@solid-primit
 import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 import { Store } from "solid-js/store";
 import {
+  ClearListeners,
   createEventListener,
   EventListenerMapDirectiveProps,
   EventMapOf,
@@ -12,6 +13,8 @@ export type EventHandlersMap<EventMap> = {
   [EventName in keyof EventMap]: (event: EventMap[EventName]) => void;
 };
 
+export type EventListnenerStoreReturns<E> = [lastEvents: Store<Partial<E>>, clear: ClearListeners];
+
 /**
  * A helpful primitive that listens to a map of events. Handle them by individual callbacks.
  *
@@ -19,11 +22,13 @@ export type EventHandlersMap<EventMap> = {
  * @param handlersMap e.g. `{ mousemove: e => {}, click: e => {} }`
  * @param options e.g. `{ passive: true }`
  *
+ * @returns Function clearing all event listeners form targets
+ *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
  * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#createEventListenerMap
  *
  * @example
- * createEventListenerMap(element, {
+ * const clear = createEventListenerMap(element, {
  *   mousemove: mouseHandler,
  *   mouseenter: e => {},
  *   touchend: touchHandler
@@ -38,7 +43,7 @@ export function createEventListenerMap<
   target: MaybeAccessor<Many<EventTarget>>,
   handlersMap: Partial<Pick<EventHandlersMap<EventMap>, UsedEvents>>,
   options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): void;
+): ClearListeners;
 
 // DOM Events
 export function createEventListenerMap<
@@ -49,16 +54,18 @@ export function createEventListenerMap<
   target: MaybeAccessor<Many<Target>>,
   handlersMap: HandlersMap,
   options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): void;
+): ClearListeners;
 
 export function createEventListenerMap(
   targets: MaybeAccessor<Many<EventTarget>>,
   handlersMap: Record<string, any>,
   options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): void {
+): ClearListeners {
+  const { push, execute } = createCallbackStack();
   entries(handlersMap).forEach(([eventName, handler]) => {
-    createEventListener(targets, eventName, e => handler?.(e), options);
+    push(createEventListener(targets, eventName, e => handler?.(e), options));
   });
+  return execute;
 }
 
 /**
@@ -68,13 +75,13 @@ export function createEventListenerMap(
  * @param options e.g. `{ passive: true }` *(can be omited)*
  * @param eventNames names of events you want to listen to, e.g. `"mousemove", "touchend", "click"`
  *
- * @returns reactive store with the latest captured events
+ * @returns reactive store with the latest captured events & clear function
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
  * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#createEventStore
  *
  * @example
- * const lastEvents = createEventStore(el, "mousemove", "touchend", "click");
+ * const [lastEvents, clear] = createEventStore(el, "mousemove", "touchend", "click");
  *
  * createEffect(() => {
  *   console.log(lastEvents.mousemove.x)
@@ -89,7 +96,7 @@ export function createEventStore<
 >(
   target: MaybeAccessor<Many<Target>>,
   ...eventNames: UsedEvents[]
-): Store<Partial<Pick<EventMap, UsedEvents>>>;
+): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
 
 // DOM Events - with options
 export function createEventStore<
@@ -100,7 +107,7 @@ export function createEventStore<
   target: MaybeAccessor<Many<Target>>,
   options: MaybeAccessor<boolean | AddEventListenerOptions>,
   ...eventNames: UsedEvents[]
-): Store<Partial<Pick<EventMap, UsedEvents>>>;
+): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
 
 // Custom Events - without options
 export function createEventStore<
@@ -109,7 +116,7 @@ export function createEventStore<
 >(
   target: MaybeAccessor<Many<EventTarget>>,
   ...eventNames: UsedEvents[]
-): Store<Partial<Pick<EventMap, UsedEvents>>>;
+): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
 
 // Custom Events - with options
 export function createEventStore<
@@ -119,12 +126,12 @@ export function createEventStore<
   target: MaybeAccessor<Many<EventTarget>>,
   options: MaybeAccessor<boolean | AddEventListenerOptions>,
   ...eventNames: UsedEvents[]
-): Store<Partial<Pick<EventMap, UsedEvents>>>;
+): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
 
 export function createEventStore(
   targets: MaybeAccessor<Many<EventTarget>>,
   ...rest: any[]
-): Store<Record<string, Event>> {
+): EventListnenerStoreReturns<Record<string, Event>> {
   let options: boolean | AddEventListenerOptions | undefined = undefined;
   let names: string[];
   if (typeof rest[0] === "string") names = rest;
@@ -133,13 +140,15 @@ export function createEventStore(
     options = _options;
     names = _events;
   }
+
   const store = {};
+  const { push, execute } = createCallbackStack();
   names.forEach(eventName => {
     const [accessor, setter] = createSignal<Event>();
     Object.defineProperty(store, eventName, { get: accessor, set: setter, enumerable: true });
-    createEventListener(targets, eventName, setter, options);
+    push(createEventListener(targets, eventName, setter, options));
   });
-  return store;
+  return [store, execute];
 }
 
 /**

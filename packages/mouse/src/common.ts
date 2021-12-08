@@ -6,7 +6,4 @@ export const addListener = (
   ev: string,
   cb: (e: any) => void,
   options: boolean | AddEventListenerOptions = { passive: true }
-): Fn => {
-  const [stop] = createEventListener(el, ev, cb, options);
-  return stop;
-};
+): Fn => createEventListener(el, ev, cb, options);

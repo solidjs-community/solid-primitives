@@ -7,7 +7,7 @@ const cae = suite("createActiveElement");
 
 cae("returns correct values", () =>
   createRoot(dispose => {
-    const [activeEl, { stop, start }] = createActiveElement();
+    const [activeEl, stop] = createActiveElement();
 
     assert.type(activeEl, "function");
     assert.ok(
@@ -15,7 +15,6 @@ cae("returns correct values", () =>
       "no element should be active"
     );
     assert.type(stop, "function");
-    assert.type(start, "function");
 
     dispose();
   })
@@ -28,12 +27,11 @@ const iea = suite("createIsElementActive");
 iea("returns correct values", () =>
   createRoot(dispose => {
     const el = document.createElement("div");
-    const [isFocused, { stop, start }] = createIsElementActive(el);
+    const [isFocused, stop] = createIsElementActive(el);
 
     assert.type(isFocused, "function");
     assert.is(isFocused(), false);
     assert.type(stop, "function");
-    assert.type(start, "function");
 
     dispose();
   })
@@ -42,12 +40,11 @@ iea("returns correct values", () =>
 iea("target can be an accessor", () =>
   createRoot(dispose => {
     const el = document.createElement("div");
-    const [isFocused, { stop, start }] = createIsElementActive(() => el);
+    const [isFocused, stop] = createIsElementActive(() => el);
 
     assert.type(isFocused, "function");
     assert.is(isFocused(), false);
     assert.type(stop, "function");
-    assert.type(start, "function");
 
     dispose();
   })

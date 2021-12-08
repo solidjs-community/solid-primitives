@@ -62,7 +62,7 @@
     "solid-js": "^1.2.5"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "^1.3.0",
-    "@solid-primitives/utils": "^0.0.250"
+    "@solid-primitives/event-listener": "^1.3.2",
+    "@solid-primitives/utils": "^0.0.255"
   }
 }

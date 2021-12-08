@@ -4,11 +4,22 @@ import {
   isClient,
   Many,
   MaybeAccessor,
-  forEach
+  forEach,
+  Fn
 } from "@solid-primitives/utils";
 import { createSignal } from "solid-js";
 import { Accessor, createEffect, onCleanup } from "solid-js";
-import { EventListenerDirectiveProps, EventMapOf, TargetWithEventMap } from "./types";
+import {
+  ClearListeners,
+  EventListenerDirectiveProps,
+  EventMapOf,
+  TargetWithEventMap
+} from "./types";
+
+export type EventListenerSignalReturns<Event> = [
+  lastEvent: Accessor<Event | undefined>,
+  clear: ClearListeners
+];
 
 /**
  * Creates an event listener, that will be automatically disposed on cleanup.
@@ -18,11 +29,13 @@ import { EventListenerDirectiveProps, EventMapOf, TargetWithEventMap } from "./t
  * @param handler - event handler
  * @param options - addEventListener options
  *
+ * @returns Function clearing all event listeners form targets
+ *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
  * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#createEventListener
  *
  * @example
- * createEventListener(element, 'click', e => { ... }, { passive: true })
+ * const clear = createEventListener(element, 'click', e => { ... }, { passive: true })
  */
 
 // DOM Events
@@ -35,7 +48,7 @@ export function createEventListener<
   eventName: MaybeAccessor<EventName>,
   handler: (event: EventMap[EventName]) => void,
   options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): void;
+): ClearListeners;
 
 // Custom Events
 export function createEventListener<
@@ -46,15 +59,15 @@ export function createEventListener<
   eventName: MaybeAccessor<EventName>,
   handler: (event: EventMap[EventName]) => void,
   options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): void;
+): ClearListeners;
 
 export function createEventListener(
   targets: MaybeAccessor<Many<EventTarget>>,
   eventName: MaybeAccessor<string>,
   handler: (event: Event) => void,
   options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): void {
-  if (!isClient) return;
+): ClearListeners {
+  if (!isClient) return () => {};
   const toCleanup = createCallbackStack();
   createEffect(() => {
     toCleanup.execute();
@@ -67,6 +80,7 @@ export function createEventListener(
     });
   });
   onCleanup(toCleanup.execute);
+  return toCleanup.execute;
 }
 
 /**
@@ -76,11 +90,17 @@ export function createEventListener(
  * @param eventName - name of the handled event
  * @param options - addEventListener options
  *
+ * @returns Signal of last captured event & function clearing all event listeners
+ *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
  * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#createEventSignal
  *
  * @example
  * const lastEvent = createEventSignal(el, 'click', { passive: true })
+ *
+ * createEffect(() => {
+ *    console.log(lastEvent())
+ * })
  */
 
 // DOM Events
@@ -92,7 +112,7 @@ export function createEventSignal<
   target: MaybeAccessor<Many<Target>>,
   eventName: MaybeAccessor<EventName>,
   options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): Accessor<EventMap[EventName] | undefined>;
+): EventListenerSignalReturns<EventMap[EventName]>;
 
 // Custom Events
 export function createEventSignal<
@@ -102,16 +122,16 @@ export function createEventSignal<
   target: MaybeAccessor<Many<EventTarget>>,
   eventName: MaybeAccessor<EventName>,
   options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): Accessor<EventMap[EventName] | undefined>;
+): EventListenerSignalReturns<EventMap[EventName]>;
 
 export function createEventSignal(
   target: MaybeAccessor<Many<EventTarget>>,
   eventName: MaybeAccessor<string>,
   options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): Accessor<Event | undefined> {
+): [Accessor<Event | undefined>, Fn] {
   const [lastEvent, setLastEvent] = createSignal<Event>();
-  createEventListener(target, eventName, setLastEvent, options);
-  return lastEvent;
+  const clear = createEventListener(target, eventName, setLastEvent, options);
+  return [lastEvent, clear];
 }
 
 /**

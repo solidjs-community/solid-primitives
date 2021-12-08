@@ -1,6 +1,6 @@
+import { ClearListeners, createEventListenerMap } from "@solid-primitives/event-listener";
 import { access, Fn, MaybeAccessor, createCallbackStack } from "@solid-primitives/utils";
 import { Accessor, createComputed, createEffect, createSignal, JSX } from "solid-js";
-import { addListener } from "./common";
 
 export type IsElementActiveProps = (isActive: boolean) => void;
 declare module "solid-js" {
@@ -20,10 +20,7 @@ export type E = JSX.Element;
  * @example
  * const [activeEl, { stop, start }] = createActiveElement()
  */
-export function createActiveElement(): [
-  getter: Accessor<null | Element>,
-  actions: { stop: Fn; start: Fn }
-] {
+export function createActiveElement(): [getter: Accessor<null | Element>, clear: ClearListeners] {
   const [active, setActive] = createSignal<Element | null>(null);
   const handleChange = () => setActive(window.document.activeElement);
 
@@ -32,19 +29,12 @@ export function createActiveElement(): [
     toCleanup.execute();
     handleChange();
     toCleanup.push(
-      addListener(window, "blur", handleChange),
-      addListener(window, "focus", handleChange)
+      createEventListenerMap(window, { blur: handleChange, focus: handleChange }, true)
     );
   };
   start();
 
-  return [
-    active,
-    {
-      stop: toCleanup.execute,
-      start
-    }
-  ];
+  return [active, toCleanup.execute];
 }
 
 /**
@@ -56,7 +46,7 @@ export function createActiveElement(): [
  */
 export function createIsElementActive(
   target: MaybeAccessor<Element>
-): [getter: Accessor<boolean>, actions: { stop: Fn; start: Fn }] {
+): [getter: Accessor<boolean>, clear: ClearListeners] {
   const [isActive, setIsActive] = createSignal(false);
   const handleFocus = () => setIsActive(true);
   const handleBlur = () => setIsActive(false);
@@ -67,7 +57,7 @@ export function createIsElementActive(
     const el = access(target);
     if (!el) return setIsActive(false);
     setIsActive(window.document.activeElement === el);
-    toCleanup.push(addListener(el, "blur", handleBlur), addListener(el, "focus", handleFocus));
+    toCleanup.push(createEventListenerMap(el, { blur: handleBlur, focus: handleFocus }, true));
   };
 
   const el = access(target);
@@ -75,7 +65,7 @@ export function createIsElementActive(
 
   createEffect(start);
 
-  return [isActive, { stop: toCleanup.execute, start }];
+  return [isActive, toCleanup.execute];
 }
 
 /**

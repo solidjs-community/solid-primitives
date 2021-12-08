@@ -46,7 +46,7 @@ const List: Component = () => {
   const [items, setItems] = createSignal<HTMLDivElement[]>([]);
 
   // new event listeners are automatically added to the new items
-  const lastEvent = createEventSignal(items, "click");
+  const [lastEvent] = createEventSignal(items, "click");
 
   return (
     <div class="flex flex-col items-center space-y-6">

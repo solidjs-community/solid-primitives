@@ -26,8 +26,11 @@ Listens to the global mouse events, providing a reactive up-to-date position of 
 ### Usage
 
 ```ts
-const [{ x, y, sourceType }, { stop, start }] = createMousePosition({ touch: false });
+const [{ x, y, sourceType }, clear] = createMousePosition({ touch: false });
 // listening to touch events is enabled by default
+
+// to clear all event listeners
+clear();
 ```
 
 ### Types
@@ -39,10 +42,7 @@ function createMousePosition(options: MouseOptions = {}): [
     y: Accessor<number>;
     sourceType: Accessor<MouseSourceType>;
   },
-  actions: {
-    start: Fn;
-    stop: Fn;
-  }
+  clear: ClearListeners
 ];
 interface MouseOptions {
   /**
@@ -135,11 +135,14 @@ An alternative to [`createMouseToElement`](#createMouseToElement), that listens 
 ### Usage
 
 ```ts
-const [{ x, y, sourceType, isInside }, { stop, start }] = createMouseInElement(() => myRef, {
+const [{ x, y, sourceType, isInside }, clear] = createMouseInElement(() => myRef, {
   followTouch: false
 });
 // Same way as createMousePosition:
 // the "touch", and "foullowTouch" settings are enabled by default
+
+// to clear all event listeners
+clear();
 ```
 
 ### Types
@@ -155,10 +158,7 @@ function createMouseInElement(
     sourceType: Accessor<MouseSourceType>;
     isInside: Accessor<boolean>;
   },
-  actions: {
-    stop: Fn;
-    start: Fn;
-  }
+  clear: ClearListeners
 ];
 type MouseSourceType = "mouse" | "touch" | null;
 ```
@@ -170,7 +170,10 @@ Answers the question: _Is the cursor on screen?_
 ### Usage
 
 ```ts
-const [isMouseOnScreen, { start, stop }] = createMouseOnScreen(true);
+const [isMouseOnScreen, clear] = createMouseOnScreen(true);
+
+// to clear all event listeners
+clear();
 ```
 
 ### Types
@@ -178,10 +181,10 @@ const [isMouseOnScreen, { start, stop }] = createMouseOnScreen(true);
 ```ts
 function createMouseOnScreen(
   initialValue?: boolean
-): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
+): [onScreen: Accessor<boolean>, clear: ClearListeners];
 function createMouseOnScreen(
   options?: MouseOnScreenOptions
-): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
+): [onScreen: Accessor<boolean>, clear: ClearListeners];
 
 interface MouseOnScreenOptions {
   /**
