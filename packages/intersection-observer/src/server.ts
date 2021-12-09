@@ -1,24 +1,12 @@
+import { MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor } from "solid-js";
 
 import {
   AddIntersectionObserverEntry,
-  AddViewportObserverEntry,
   CreateViewportObserverReturnValue,
   EntryCallback,
-  MaybeAccessor,
-  RemoveIntersectionObserverEntry,
-  RemoveViewportObserverEntry
+  RemoveIntersectionObserverEntry
 } from "./index";
-
-export {
-  AddIntersectionObserverEntry,
-  AddViewportObserverEntry,
-  CreateViewportObserverReturnValue,
-  EntryCallback,
-  MaybeAccessor,
-  RemoveIntersectionObserverEntry,
-  RemoveViewportObserverEntry
-};
 
 export const createIntersectionObserver = (
   _elements: MaybeAccessor<Element[]>,

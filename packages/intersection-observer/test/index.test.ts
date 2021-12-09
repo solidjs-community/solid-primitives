@@ -2,7 +2,11 @@ import { createRoot, createSignal } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
-import { createIntersectionObserver, createViewportObserver, createVisibilityObserver } from "..";
+import {
+  createIntersectionObserver,
+  createViewportObserver,
+  createVisibilityObserver
+} from "../src";
 
 const intersectionObserverInstances: any[] = [];
 
@@ -571,6 +575,21 @@ cviso("signal changes state when intersection changes", ({ div }) => {
     (instance as IntersectionObserver).__TEST__onChange(false);
 
     assert.is(isVisible(), false, "signal returns incorrect value");
+
+    dispose();
+  });
+});
+
+cviso("once option stops inter-obs after vis change", ({ div }) => {
+  createRoot(dispose => {
+    const [isVisible, { instance, start }] = createVisibilityObserver(div, { once: true });
+    start();
+
+    (instance as IntersectionObserver).__TEST__onChange(true);
+    assert.is(isVisible(), true, "signal returns incorrect value");
+
+    (instance as IntersectionObserver).__TEST__onChange(false);
+    assert.is(isVisible(), true, "signal returns incorrect value");
 
     dispose();
   });

@@ -1,9 +1,6 @@
 import { onMount, onCleanup, createSignal } from "solid-js";
 import type { JSX, Accessor } from "solid-js";
-
-export type MaybeAccessor<T> = T | Accessor<T>;
-const read = <T>(val: MaybeAccessor<T>): T =>
-  typeof val === "function" ? (val as Function)() : val;
+import { access, MaybeAccessor } from "@solid-primitives/utils";
 
 export type AddIntersectionObserverEntry = (el: Element) => void;
 export type RemoveIntersectionObserverEntry = (el: Element) => void;
@@ -74,10 +71,10 @@ export const createIntersectionObserver = (
   }
 ] => {
   const instance = new IntersectionObserver(onChange, options);
-  const add: AddIntersectionObserverEntry = el => instance.observe(read(el));
-  const remove: RemoveIntersectionObserverEntry = el => instance.unobserve(read(el));
-  const start = () => read(elements).forEach(el => add(el));
-  const stop = () => instance.takeRecords().forEach(entry => remove(entry.target));
+  const add: AddIntersectionObserverEntry = el => instance.observe(access(el));
+  const remove: RemoveIntersectionObserverEntry = el => instance.unobserve(access(el));
+  const start = () => access(elements).forEach(el => add(el));
+  const stop = () => instance.disconnect();
   onMount(start);
   onCleanup(stop);
   return [add, { remove, start, stop, instance }];
@@ -123,10 +120,10 @@ export function createViewportObserver(...a: any) {
   let options: IntersectionObserverInit = {};
   if (Array.isArray(a[0]) || typeof a[0] === "function") {
     if (typeof a[1] === "function") {
-      initial = read<Element[]>(a[0]).map(el => [el, a[1]]);
+      initial = access<Element[]>(a[0]).map(el => [el, a[1]]);
       options = a[2];
     } else {
-      initial = read(a[0]);
+      initial = access(a[0]);
       options = a[1];
     }
   } else options = a[0];
@@ -177,8 +174,9 @@ export const createVisibilityObserver = (
 ): [Accessor<boolean>, { start: () => void; stop: () => void; instance: IntersectionObserver }] => {
   const [isVisible, setVisible] = createSignal(options?.initialValue ?? false);
   const [, { start, stop, instance }] = createIntersectionObserver(
-    () => [read(element)],
+    () => [access(element)],
     ([entry]) => {
+      if (!entry) return;
       setVisible(entry.isIntersecting);
       if (options?.once && entry.isIntersecting !== !!options?.initialValue) stop();
     },
