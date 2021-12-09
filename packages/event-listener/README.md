@@ -47,8 +47,13 @@ const [options, setOptions] = createSignal({ passive: true });
 createEventListener(ref, name, e => {}, options);
 
 // you can provide your own event map type as well:
-createEventListener<{ myCustomEvent: Event }>(window, "myCustomEvent", () => console.log("yup!"));
-// just don't use interfaces as EventMaps!
+// fill both type generics for the best type support
+createEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
+  window,
+  "myCustomEvent",
+  () => console.log("yup!")
+);
+// just don't use interfaces as EventMaps! (write them using `type` keyword)
 ```
 
 ### Directive Usage
@@ -158,6 +163,7 @@ createEventListenerMap(
 );
 
 // createEventListenerMap can be used to listen to custom events
+// fill both type generics for the best type support
 createEventListenerMap<
   {
     myEvent: MyEvent;
@@ -223,10 +229,12 @@ const [options, setOptions] = createSignal({ passive: true });
 const [lastEvents] = createEventStore(target, options, "mousemove", "touchmove");
 
 // createEventStore can be used to listen to custom events
+// fill both type generics for the best type support
 const [lastEvents] = createEventStore<
   {
     myEvent: MyEvent;
     custom: Event;
+    unused: Event;
   },
   "myEvent" | "custom"
 >(target, "myEvent", "custom");
@@ -320,6 +328,6 @@ Migrated to new build process.
 1.3.0
 
 **(minor breaking changes to type generics and returned functions)**
-Primitive rewritten to provide better types and more reliable usage. Added a lot more primitives.
+Primitive rewritten to provide better types and more solidlike (reactive) usage. Added a lot more primitives.
 
 </details>
