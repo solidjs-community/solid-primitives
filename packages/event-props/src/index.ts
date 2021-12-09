@@ -31,8 +31,7 @@ export type EventProps<Names extends EventNames> = {
 export const createEventProps = <Names extends EventNames>(
   ...names: Names
 ): [EventStore<Names>, EventProps<Names>] => {
-  type EventStore = Partial<Pick<HTMLElementEventMap, typeof names[number]>>;
-  const store = {};
+  const store: EventStore<Names> = {};
   const eventProps: Record<string, (ev: Event) => void> = {};
   names.forEach((name) => {
     const [accessor, setter] = createSignal<HTMLElementEventMap[typeof name]>();
