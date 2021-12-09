@@ -87,7 +87,7 @@ Released with CJS support.
 
 After a couple rounds, patched CJS support.
 
-1.1.21
+1.2.0
 
 Patched issue with observer only firing once and disconnecting not functional.
 
