@@ -1,4 +1,5 @@
 import type { Accessor } from "solid-js";
+import type { Store } from "solid-js/store";
 
 //
 // GENERAL HELPERS:
@@ -52,6 +53,18 @@ export const objectOmit = <T extends Object, K extends Array<keyof T>>(
   }
   return copy;
 };
+
+export type Destore<T extends Object> = {
+  [K in keyof T]: T[K] extends Function ? T[K] : Accessor<T[K]>;
+};
+export function destore<T extends Object>(store: Store<T>): Destore<T> {
+  const _store = store as Record<string, any>;
+  const result: any = {};
+  Object.keys(_store).forEach(key => {
+    result[key] = typeof _store[key] === "function" ? _store[key].bind(_store) : () => _store[key];
+  });
+  return result;
+}
 
 //
 // SIGNAL BUILDERS:

@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
-    "emitDeclarationOnly": true,
-    "declaration": true,
-    "target": "esnext",
+    "module": "ESNext",
     "newLine": "LF",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,

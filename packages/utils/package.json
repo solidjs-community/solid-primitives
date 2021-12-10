@@ -19,7 +19,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "test": "uvu -r solid-register",
+    "watch-test": "watchlist src test -- npm test"
   },
   "keywords": [
     "utilities",
@@ -28,14 +30,15 @@
     "primitives"
   ],
   "devDependencies": {
-    "jsdom": "^18.1.1",
-    "prettier": "^2.4.1",
+    "jsdom": "^19.0.0",
+    "prettier": "^2.5.1",
     "solid-register": "^0.0.18",
     "tslib": "^2.3.1",
-    "tsup": "^5.10.1",
-    "uvu": "^0.5.2"
+    "tsup": "^5.11.0",
+    "uvu": "^0.5.2",
+    "watchlist": "^0.3.1"
   },
   "peerDependencies": {
-    "solid-js": "^1.2.5"
+    "solid-js": "^1.2.6"
   }
 }
