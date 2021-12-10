@@ -15,7 +15,7 @@
     "list": [
       "createScrollObserver"
     ],
-    "category": "Display & Media"
+    "category": "Inputs"
   },
   "files": [
     "dist"
