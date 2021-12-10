@@ -1,15 +1,12 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
     "module": "ESNext",
-    "newLine": "LF",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "strictNullChecks": true,
+    "esModuleInterop": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-  },
-  "exclude": [
-    "node_modules"
-  ]
+    "types": ["vite/client"]
+  }
 }

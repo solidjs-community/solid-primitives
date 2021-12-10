@@ -38,7 +38,7 @@ Initial release.
 
 Shipped first stable version.
 
-1.1.6
+1.1.7
 
 Published with CJS and SSR support.
 
