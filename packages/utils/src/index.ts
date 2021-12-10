@@ -5,20 +5,58 @@ import type { Store } from "solid-js/store";
 // GENERAL HELPERS:
 //
 
+/**
+ * A function
+ */
 export type Fn<R = void> = () => R;
+/**
+ * Can be single or in an array
+ */
 export type Many<T> = T | T[];
 /**
- * Infers the element type of an array
+ * Infers the type of the array elements
  */
 export type ItemsOf<T> = T extends (infer E)[] ? E : never;
+/**
+ * T or a reactive/non-reactive function returning T
+ */
 export type MaybeAccessor<T> = T | Accessor<T>;
+/**
+ * Accessed value of a MaybeAccessor
+ * @example
+ * MaybeAccessorValue<MaybeAccessor<string>>
+ * // => string
+ * MaybeAccessorValue<MaybeAccessor<() => string>>
+ * // => string | (() => string)
+ * MaybeAccessorValue<MaybeAccessor<string> | Function>
+ * // => string | void
+ */
 export type MaybeAccessorValue<T extends MaybeAccessor<any>> = T extends Fn ? ReturnType<T> : T;
 
 export const isClient = typeof window !== "undefined";
+export const isServer = !isClient;
 
+/**
+ * Accesses the value of a MaybeAccessor
+ * @example
+ * access(x as MaybeAccessor<string>)
+ * // => string
+ * access(x as MaybeAccessor<() => string>)
+ * // => string | (() => string)
+ * access(x as MaybeAccessor<string> | Function)
+ * // => string | void
+ */
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
   typeof v === "function" ? (v as any)() : v;
 
+/**
+ * Accesses the value of a MaybeAccessor, but always returns an array
+ * @example
+ * accessAsArray('abc') // => ['abc']
+ * accessAsArray(() => 'abc') // => ['abc']
+ * accessAsArray([1,2,3]) // => [1,2,3]
+ * accessAsArray(() => [1,2,3]) // => [1,2,3]
+ */
 export const accessAsArray = <T extends MaybeAccessor<any>, V = MaybeAccessorValue<T>>(
   value: T
 ): V extends any[] ? V : V[] => {
@@ -26,6 +64,11 @@ export const accessAsArray = <T extends MaybeAccessor<any>, V = MaybeAccessorVal
   return Array.isArray(_value) ? (_value as any) : [_value];
 };
 
+/**
+ * Run the function if the accessed value is not `undefined` nor `null`
+ * @param value
+ * @param fn
+ */
 export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue<A>>(
   value: A,
   fn: (value: NonNullable<V>) => void
@@ -57,6 +100,21 @@ export const objectOmit = <T extends Object, K extends Array<keyof T>>(
 export type Destore<T extends Object> = {
   [K in keyof T]: T[K] extends Function ? T[K] : Accessor<T[K]>;
 };
+/**
+ * Allows the Solid's store to be destructured
+ *
+ * @param store
+ * @returns Destructible object, with values changed to accessors
+ *
+ * @example
+ * const [state, setState] = createStore({
+ *   count: 0,
+ *   get double() { return this.count * 2 },
+ * })
+ * const { count, double } = destore(state)
+ * // use it like a signal:
+ * count()
+ */
 export function destore<T extends Object>(store: Store<T>): Destore<T> {
   const _store = store as Record<string, any>;
   const result: any = {};
