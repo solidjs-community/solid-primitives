@@ -4,7 +4,7 @@ import "uno.css";
 
 const App: Component = () => {
   return (
-    <div class="p-24 box-border w-full min-h-screen text-white flex justify-center items-center flex-wrap gap-12">
+    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center">
       Apply your primitive test here for testing.
     </div>
   );

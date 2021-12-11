@@ -8,6 +8,14 @@ A sample primitive that is made up for templating with the following options:
 
 `createPrimitiveTemplate` - Provides a getter and setter for the primitive.
 
+## Installation
+
+```bash
+npm install @solid-primitives/template-primitive
+# or
+yarn add @solid-primitives/template-primitive
+```
+
 ## How to use it
 
 ```ts
