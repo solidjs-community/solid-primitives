@@ -1,0 +1,56 @@
+{
+  "name": "@solid-primitives/template-primitive",
+  "version": "0.0.100",
+  "description": "A template primitive example.",
+  "author": "Your Name <you@youremail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/utils#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "template-primitive",
+    "stage": 0,
+    "list": [
+      "createPrimitiveTemplate"
+    ],
+    "category": "Display & Media"
+  },
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "vite serve dev",
+    "build": "tsup",
+    "test": "uvu -r solid-register"
+  },
+  "keywords": [
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "jsdom": "^19.0.0",
+    "prettier": "^2.5.1",
+    "solid-register": "^0.0.18",
+    "tslib": "^2.3.1",
+    "tsup": "^5.11.1",
+    "typescript": "^4.5.3",
+    "unocss": "^0.16.0",
+    "uvu": "^0.5.2",
+    "vite": "2.7.1",
+    "vite-plugin-solid": "2.1.4"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.2.6"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "^0.0.255"
+  }
+}
