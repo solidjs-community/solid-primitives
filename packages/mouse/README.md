@@ -26,6 +26,8 @@ Listens to the global mouse events, providing a reactive up-to-date position of 
 ### Usage
 
 ```ts
+import { createMousePosition } from "@solid-primitives/mouse";
+
 const [{ x, y, sourceType }, clear] = createMousePosition({ touch: false });
 // listening to touch events is enabled by default
 
@@ -75,6 +77,8 @@ Provides an autoupdating position relative to a provided element. It can be used
 ### Usage
 
 ```ts
+import { createMouseToElement } from "@solid-primitives/mouse";
+
 const [{ x, y, top, left, width, height, isInside }, manualUpdate] = createMouseToElement(
   () => myRef
 );
@@ -135,6 +139,8 @@ An alternative to [`createMouseToElement`](#createMouseToElement), that listens 
 ### Usage
 
 ```ts
+import { createMouseInElement } from "@solid-primitives/mouse";
+
 const [{ x, y, sourceType, isInside }, clear] = createMouseInElement(() => myRef, {
   followTouch: false
 });
@@ -170,6 +176,8 @@ Answers the question: _Is the cursor on screen?_
 ### Usage
 
 ```ts
+import { createMouseOnScreen } from "@solid-primitives/mouse";
+
 const [isMouseOnScreen, clear] = createMouseOnScreen(true);
 
 // to clear all event listeners
