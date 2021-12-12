@@ -1,0 +1,55 @@
+{
+  "name": "@solid-primitives/event-props",
+  "version": "0.0.100",
+  "description": "Primitive to manage events in a reactive way.",
+  "author": "Alex Lohr <alex.lohr@logmein.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/event-props",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "event-props",
+    "stage": 1,
+    "list": [
+      "createEventProps"
+    ],
+    "category": "Browser APIs"
+  },
+  "files": [
+    "dist"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist/",
+    "build": "tsup",
+    "typecheck": "tsc --noEmit src/* test/*;",
+    "test": "uvu -r solid-register"
+  },
+  "keywords": [
+    "event",
+    "store",
+    "reactive",
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "jsdom": "^18.1.1",
+    "prettier": "^2.5.0",
+    "solid-register": "^0.1.1",
+    "tslib": "^2.3.1",
+    "tsup": "^5.10.1",
+    "typescript": "^4.5.2",
+    "uvu": "^0.5.2"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.2.5"
+  }
+}
