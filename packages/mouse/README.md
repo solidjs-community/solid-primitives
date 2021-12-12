@@ -220,6 +220,10 @@ https://codesandbox.io/s/solid-primitives-mouse-p10s5?file=/index.tsx
 
 1.0.0
 
-Eelease as a Stage-2 primitive.
+Release as a Stage-2 primitive.
+
+1.0.1
+
+Updated util and event-listener dependencies.
 
 </details>

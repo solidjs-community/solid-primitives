@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/utils",
-  "version": "0.0.255",
+  "version": "0.0.260",
   "description": "A bunch of reactive utility types and functions, for building primitives with Solid.js",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",

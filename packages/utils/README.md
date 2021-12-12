@@ -15,4 +15,8 @@ First commit of the timer primitive.
 
 Republished version with better ESM support and build tooling.
 
+0.0.260
+
+Added comments for util methods.
+
 </details>

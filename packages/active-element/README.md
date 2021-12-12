@@ -98,4 +98,8 @@ https://codesandbox.io/s/solid-primitives-active-element-q4kul?file=/index.tsx
 
 Initial release as a Stage-2 primitive.
 
+1.0.1
+
+Updated event listener and util dependencies.
+
 </details>

@@ -331,4 +331,8 @@ Migrated to new build process.
 **(minor breaking changes to type generics and returned functions)**
 Primitive rewritten to provide better types and more solidlike (reactive) usage. Added a lot more primitives.
 
+1.3.8
+
+Published recent major updates to latest tag.
+
 </details>
