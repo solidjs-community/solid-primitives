@@ -35,7 +35,7 @@ async function updateReadme(log) {
         data.NPM = `[![VERSION](${npmShield}${lernaPackage.name}?style=for-the-badge&label=)](${npmURL}${lernaPackage.name})`;
       }
       // data.Stage = stage ? stage.toString() : "2";
-      data.Stage = `[![STAGE](https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fstage-badges%2Fassets%2Fbadges%2Fstage-${
+      data.Stage = `[![STAGE](https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-${
         stage ? stage.toString() : "2"
       }.json)](https://github.com/davedbase/solid-primitives#contribution-process)`;
       data.Primitives = list.join("<br />");
