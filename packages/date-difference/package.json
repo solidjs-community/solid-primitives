@@ -2,7 +2,7 @@
   "name": "@solid-primitives/date-difference",
   "version": "1.0.2",
   "description": "Reactive primitives that provide autoupdating, relative date features.",
-  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/date-difference",
   "repository": {

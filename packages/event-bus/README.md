@@ -1,8 +1,8 @@
-# @solid-primitives/template-primitive
+# @solid-primitives/event-bus
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/template-primitive?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/template-primitive)
-[![size](https://img.shields.io/npm/v/@solid-primitives/template-primitive?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/template-primitive)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/event-bus?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/event-bus)
+[![size](https://img.shields.io/npm/v/@solid-primitives/event-bus?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/event-bus)
 
 A sample primitive that is made up for templating with the following options:
 
@@ -11,9 +11,9 @@ A sample primitive that is made up for templating with the following options:
 ## Installation
 
 ```bash
-npm install @solid-primitives/template-primitive
+npm install @solid-primitives/event-bus
 # or
-yarn add @solid-primitives/template-primitive
+yarn add @solid-primitives/event-bus
 ```
 
 ## How to use it

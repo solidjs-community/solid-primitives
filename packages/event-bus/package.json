@@ -1,8 +1,8 @@
 {
-  "name": "@solid-primitives/template-primitive",
+  "name": "@solid-primitives/event-bus",
   "version": "0.0.100",
   "description": "A template primitive example.",
-  "author": "Your Name <you@youremail.com>",
+  "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/utils#readme",
   "repository": {
@@ -10,12 +10,13 @@
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
   "primitive": {
-    "name": "template-primitive",
+    "name": "event-bus",
     "stage": 0,
     "list": [
-      "createPrimitiveTemplate"
+      "createEventBus",
+      "createMultiEventBus"
     ],
-    "category": "Display & Media"
+    "category": "Utilities"
   },
   "private": false,
   "sideEffects": false,
@@ -32,6 +33,8 @@
     "test": "uvu -r solid-register"
   },
   "keywords": [
+    "eventbus",
+    "pubsub",
     "solid",
     "primitives"
   ],
@@ -49,8 +52,5 @@
   },
   "peerDependencies": {
     "solid-js": "^1.2.6"
-  },
-  "dependencies": {
-    "@solid-primitives/utils": "^0.0.255"
   }
 }
