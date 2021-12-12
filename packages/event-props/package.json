@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-props",
-  "version": "0.0.100",
+  "version": "0.0.150",
   "description": "Primitive to manage events in a reactive way.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
@@ -11,7 +11,7 @@
   },
   "primitive": {
     "name": "event-props",
-    "stage": 1,
+    "stage": 2,
     "list": [
       "createEventProps"
     ],
@@ -45,7 +45,7 @@
     "prettier": "^2.5.0",
     "solid-register": "^0.1.1",
     "tslib": "^2.3.1",
-    "tsup": "^5.10.1",
+    "tsup": "^5.11.1",
     "typescript": "^4.5.2",
     "uvu": "^0.5.2"
   },

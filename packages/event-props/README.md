@@ -34,7 +34,6 @@ createEffect(() => {
 <div {...eventProps}>Click and drag on me</div>
 ```
 
-
 ## Demo
 
 TODO
@@ -47,5 +46,9 @@ TODO
 0.0.100
 
 First commit.
+
+0.0.150
+
+Published publicly for general use.
 
 </details>
