@@ -12,6 +12,14 @@ A collection of primitives, capturing current mouse cursor position, and helping
 - [`createMouseInElement`](#createMouseInElement) - An alternative to `createMouseToElement`, that listens to mouse (and touch) events only inside the element. Provides information of position and if the element is being hovered.
 - [`createMouseOnScreen`](#createMouseOnScreen) - Answers the question: _Is the cursor on screen?_
 
+## Installation
+
+```bash
+npm install @solid-primitives/mouse
+# or
+yarn add @solid-primitives/mouse
+```
+
 ## `createMousePosition`
 
 Listens to the global mouse events, providing a reactive up-to-date position of the cursor on the page.
@@ -21,8 +29,11 @@ Listens to the global mouse events, providing a reactive up-to-date position of 
 ```ts
 import { createMousePosition } from "@solid-primitives/mouse";
 
-const [{ x, y, sourceType }, { stop, start }] = createMousePosition({ touch: false });
+const [{ x, y, sourceType }, clear] = createMousePosition({ touch: false });
 // listening to touch events is enabled by default
+
+// to clear all event listeners
+clear();
 ```
 
 ### Types
@@ -34,10 +45,7 @@ function createMousePosition(options: MouseOptions = {}): [
     y: Accessor<number>;
     sourceType: Accessor<MouseSourceType>;
   },
-  actions: {
-    start: Fn;
-    stop: Fn;
-  }
+  clear: ClearListeners
 ];
 interface MouseOptions {
   /**
@@ -134,11 +142,14 @@ An alternative to [`createMouseToElement`](#createMouseToElement), that listens 
 ```ts
 import { createMouseInElement } from "@solid-primitives/mouse";
 
-const [{ x, y, sourceType, isInside }, { stop, start }] = createMouseInElement(() => myRef, {
+const [{ x, y, sourceType, isInside }, clear] = createMouseInElement(() => myRef, {
   followTouch: false
 });
 // Same way as createMousePosition:
 // the "touch", and "foullowTouch" settings are enabled by default
+
+// to clear all event listeners
+clear();
 ```
 
 ### Types
@@ -154,10 +165,7 @@ function createMouseInElement(
     sourceType: Accessor<MouseSourceType>;
     isInside: Accessor<boolean>;
   },
-  actions: {
-    stop: Fn;
-    start: Fn;
-  }
+  clear: ClearListeners
 ];
 type MouseSourceType = "mouse" | "touch" | null;
 ```
@@ -171,7 +179,10 @@ Answers the question: _Is the cursor on screen?_
 ```ts
 import { createMouseOnScreen } from "@solid-primitives/mouse";
 
-const [isMouseOnScreen, { start, stop }] = createMouseOnScreen(true);
+const [isMouseOnScreen, clear] = createMouseOnScreen(true);
+
+// to clear all event listeners
+clear();
 ```
 
 ### Types
@@ -179,10 +190,10 @@ const [isMouseOnScreen, { start, stop }] = createMouseOnScreen(true);
 ```ts
 function createMouseOnScreen(
   initialValue?: boolean
-): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
+): [onScreen: Accessor<boolean>, clear: ClearListeners];
 function createMouseOnScreen(
   options?: MouseOnScreenOptions
-): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
+): [onScreen: Accessor<boolean>, clear: ClearListeners];
 
 interface MouseOnScreenOptions {
   /**

@@ -1,4 +1,5 @@
-import { Fn, isClient } from "@solid-primitives/utils";
+import { ClearListeners } from "@solid-primitives/event-listener";
+import { isClient, createCallbackStack } from "@solid-primitives/utils";
 import { Accessor, batch, createSignal } from "solid-js";
 import { Position } from ".";
 import { addListener } from "./common";
@@ -40,10 +41,7 @@ export function createMousePosition(options: MouseOptions = {}): [
     y: Accessor<number>;
     sourceType: Accessor<MouseSourceType>;
   },
-  actions: {
-    start: Fn;
-    stop: Fn;
-  }
+  clear: ClearListeners
 ] {
   const { touch = true, followTouch = true, initialValue = { x: 0, y: 0 } } = options;
 
@@ -66,21 +64,16 @@ export function createMousePosition(options: MouseOptions = {}): [
     });
   };
 
-  let cleanupList: Fn[] = [];
+  const toCleanup = createCallbackStack();
   const start = () => {
-    stop();
-    if (isClient) {
-      cleanupList.push(addListener(window, "mousemove", mouseHandler));
-      cleanupList.push(addListener(window, "dragover", mouseHandler));
-      if (touch) {
-        cleanupList.push(addListener(window, "touchstart", touchHandler));
-        if (followTouch) cleanupList.push(addListener(window, "touchmove", touchHandler));
-      }
+    if (!isClient) return;
+    toCleanup.execute();
+    toCleanup.push(addListener(window, "mousemove", mouseHandler));
+    toCleanup.push(addListener(window, "dragover", mouseHandler));
+    if (touch) {
+      toCleanup.push(addListener(window, "touchstart", touchHandler));
+      if (followTouch) toCleanup.push(addListener(window, "touchmove", touchHandler));
     }
-  };
-  const stop = () => {
-    cleanupList.forEach(fn => fn());
-    cleanupList = [];
   };
   start();
 
@@ -90,9 +83,6 @@ export function createMousePosition(options: MouseOptions = {}): [
       y,
       sourceType
     },
-    {
-      start,
-      stop
-    }
+    toCleanup.execute
   ];
 }

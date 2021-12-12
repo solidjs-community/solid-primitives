@@ -13,6 +13,10 @@ export type Fn<R = void> = () => R;
  * Can be single or in an array
  */
 export type Many<T> = T | T[];
+
+export type Keys<O extends Object> = keyof O;
+export type Values<O extends Object> = O[Keys<O>];
+
 /**
  * Infers the type of the array elements
  */
@@ -77,6 +81,19 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
   if (typeof _value !== "undefined" && _value !== null) fn(_value as NonNullable<V>);
 };
 
+export const forEach = <A extends MaybeAccessor<any>, V = MaybeAccessorValue<A>>(
+  array: A,
+  iterator: (
+    item: V extends any[] ? ItemsOf<V> : V,
+    index: number,
+    array: V extends any[] ? V : V[]
+  ) => void
+): void => accessAsArray(array).forEach(iterator as any);
+
+export const entries = <A extends MaybeAccessor<Object>, V = MaybeAccessorValue<A>>(
+  object: A
+): [string, Values<V>][] => Object.entries(access(object));
+
 export const promiseTimeout = (
   ms: number,
   throwOnTimeout = false,
@@ -123,6 +140,23 @@ export function destore<T extends Object>(store: Store<T>): Destore<T> {
   });
   return result;
 }
+
+export const createCallbackStack = <Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void>(): {
+  push: (...callbacks: Fn[]) => void;
+  execute: (arg0: Arg0, arg1: Arg1, arg2: Arg2, arg3: Arg3) => void;
+  clear: Fn;
+} => {
+  let stack: Array<(arg0: Arg0, arg1: Arg1, arg2: Arg2, arg3: Arg3) => void> = [];
+  const clear: Fn = () => (stack = []);
+  return {
+    push: (...callbacks) => stack.push(...callbacks),
+    execute: (arg0, arg1, arg2, arg3) => {
+      stack.forEach(cb => cb(arg0, arg1, arg2, arg3));
+      clear();
+    },
+    clear
+  };
+};
 
 //
 // SIGNAL BUILDERS:

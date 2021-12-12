@@ -1,4 +1,5 @@
-import { Fn, isClient } from "@solid-primitives/utils";
+import { ClearListeners } from "@solid-primitives/event-listener";
+import { isClient, createCallbackStack } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal } from "solid-js";
 import { addListener } from "./common";
 
@@ -27,13 +28,13 @@ export interface MouseOnScreenOptions {
  */
 export function createMouseOnScreen(
   initialValue?: boolean
-): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
+): [onScreen: Accessor<boolean>, clear: ClearListeners];
 export function createMouseOnScreen(
   options?: MouseOnScreenOptions
-): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
+): [onScreen: Accessor<boolean>, clear: ClearListeners];
 export function createMouseOnScreen(
   a: MouseOnScreenOptions | boolean = {}
-): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }] {
+): [onScreen: Accessor<boolean>, clear: ClearListeners] {
   let touch: boolean;
   let initialValue: boolean;
   if (typeof a === "object") {
@@ -50,31 +51,26 @@ export function createMouseOnScreen(
     touch ? () => mouseOnScreen() || touchOnScreen() : () => mouseOnScreen()
   );
 
-  let cleanupList: Fn[] = [];
+  const toCleanup = createCallbackStack();
   const start = () => {
-    stop();
-    if (isClient) {
-      cleanupList.push(
-        addListener(document, "mouseenter", () => setMouseOnScreen(true)),
-        // mousemove with once is for the situations where the cursor has entered the screen before the listeners could attach
-        addListener(document, "mousemove", () => setMouseOnScreen(true), {
-          passive: true,
-          once: true
-        }),
-        addListener(document, "mouseleave", () => setMouseOnScreen(false))
+    if (!isClient) return;
+    toCleanup.execute();
+    toCleanup.push(
+      addListener(document, "mouseenter", () => setMouseOnScreen(true)),
+      // mousemove with once is for the situations where the cursor has entered the screen before the listeners could attach
+      addListener(document, "mousemove", () => setMouseOnScreen(true), {
+        passive: true,
+        once: true
+      }),
+      addListener(document, "mouseleave", () => setMouseOnScreen(false))
+    );
+    if (touch)
+      toCleanup.push(
+        addListener(window, "touchstart", () => setTouchOnScreen(true)),
+        addListener(window, "touchend", () => setTouchOnScreen(false))
       );
-      if (touch)
-        cleanupList.push(
-          addListener(window, "touchstart", () => setTouchOnScreen(true)),
-          addListener(window, "touchend", () => setTouchOnScreen(false))
-        );
-    }
-  };
-  const stop = () => {
-    cleanupList.forEach(fn => fn());
-    cleanupList = [];
   };
   start();
 
-  return [onScreen, { start, stop }];
+  return [onScreen, toCleanup.execute];
 }
