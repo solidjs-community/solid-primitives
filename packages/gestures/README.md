@@ -1,5 +1,7 @@
 # @solid-primitives/gestures
 
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fstage-badges%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/davedbase/solid-primitives#contribution-process)
+
 Helpful directives to react to user gestures.
 
 `pan` -
