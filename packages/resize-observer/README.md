@@ -21,7 +21,7 @@ yarn add @solid-primitives/resize-observer
 Main resize observer primitive.
 
 ```ts
-const [refCallback] = createResizeObserver(() => console.log("resized"));
+const refCallback = createResizeObserver(() => console.log("resized"));
 ```
 
 ## Changelog
