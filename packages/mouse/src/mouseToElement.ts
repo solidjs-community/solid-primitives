@@ -1,4 +1,4 @@
-import { access, Fn, MaybeAccessor, isClient, objectOmit } from "@solid-primitives/utils";
+import { access, Fn, MaybeAccessor, objectOmit } from "@solid-primitives/utils";
 import { Accessor, batch, createComputed, createMemo, createSignal, onMount } from "solid-js";
 import {
   createMousePosition,
@@ -81,7 +81,7 @@ export function createMouseToElement(
     });
   };
 
-  if (isClient) onMount(() => createComputed(update));
+  access(element) ? createComputed(update) : onMount(() => createComputed(update));
 
   return [
     {

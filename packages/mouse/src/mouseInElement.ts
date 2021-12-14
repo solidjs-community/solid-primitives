@@ -1,5 +1,6 @@
-import { access, Fn, MaybeAccessor, isClient } from "@solid-primitives/utils";
-import { Accessor, createEffect, createSignal, onMount } from "solid-js";
+import { ClearListeners } from "@solid-primitives/event-listener";
+import { access, createCallbackStack, MaybeAccessor } from "@solid-primitives/utils";
+import { Accessor, createComputed, createSignal, onMount } from "solid-js";
 import { MouseOptions, MouseSourceType } from ".";
 import { addListener } from "./common";
 
@@ -25,10 +26,7 @@ export function createMouseInElement(
     sourceType: Accessor<MouseSourceType>;
     isInside: Accessor<boolean>;
   },
-  actions: {
-    stop: Fn;
-    start: Fn;
-  }
+  clear: ClearListeners
 ] {
   const { touch = true, followTouch = true, initialValue = { x: 0, y: 0 } } = options;
   const [x, setX] = createSignal(initialValue.x);
@@ -50,36 +48,28 @@ export function createMouseInElement(
     setSourceType("touch");
   };
 
-  let cleanupList: Fn[] = [];
+  const toCleanup = createCallbackStack();
   const start = (el: HTMLElement = access(element)) => {
-    stop();
-    if (isClient) {
-      cleanupList.push(
-        addListener(el, "mouseover", () => setIsInside(true)),
-        addListener(el, "mouseout", () => setIsInside(false)),
-        addListener(el, "mousemove", e => handleMouseMove(e, el))
+    toCleanup.execute();
+    if (!el) return;
+    toCleanup.push(
+      addListener(el, "mouseover", () => setIsInside(true)),
+      addListener(el, "mouseout", () => setIsInside(false)),
+      addListener(el, "mousemove", e => handleMouseMove(e, el))
+    );
+    if (touch) {
+      toCleanup.push(
+        addListener(el, "touchstart", e => {
+          setIsInside(true);
+          handleTouchMove(e, el);
+        }),
+        addListener(el, "touchend", () => setIsInside(false))
       );
-      if (touch) {
-        cleanupList.push(
-          addListener(el, "touchstart", e => {
-            setIsInside(true);
-            handleTouchMove(e, el);
-          }),
-          addListener(el, "touchend", () => setIsInside(false))
-        );
-        if (followTouch)
-          cleanupList.push(addListener(el, "touchmove", e => handleTouchMove(e, el)));
-      }
+      if (followTouch) toCleanup.push(addListener(el, "touchmove", e => handleTouchMove(e, el)));
     }
   };
-  const stop = () => {
-    cleanupList.forEach(fn => fn());
-    cleanupList = [];
-  };
 
-  const setup = () => createEffect(() => start(access(element)));
-  if (access(element)) setup();
-  else onMount(setup);
+  access(element) ? createComputed(() => start()) : onMount(() => createComputed(() => start()));
 
   return [
     {
@@ -88,6 +78,6 @@ export function createMouseInElement(
       sourceType,
       isInside
     },
-    { stop, start }
+    toCleanup.execute
   ];
 }

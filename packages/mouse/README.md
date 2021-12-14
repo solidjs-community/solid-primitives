@@ -3,6 +3,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/mouse?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/mouse)
 [![size](https://img.shields.io/npm/v/@solid-primitives/mouse?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/mouse)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
 A collection of primitives, capturing current mouse cursor position, and helping to deal with common usecases:
 
@@ -10,6 +11,14 @@ A collection of primitives, capturing current mouse cursor position, and helping
 - [`createMouseToElement`](#createMouseToElement) - Provides an auto-updating position relative to a provided element. It can be used with existing position signals or left to get the current cursor position itself.
 - [`createMouseInElement`](#createMouseInElement) - An alternative to `createMouseToElement`, that listens to mouse (and touch) events only inside the element. Provides information of position and if the element is being hovered.
 - [`createMouseOnScreen`](#createMouseOnScreen) - Answers the question: _Is the cursor on screen?_
+
+## Installation
+
+```bash
+npm install @solid-primitives/mouse
+# or
+yarn add @solid-primitives/mouse
+```
 
 ## `createMousePosition`
 
@@ -20,8 +29,11 @@ Listens to the global mouse events, providing a reactive up-to-date position of 
 ```ts
 import { createMousePosition } from "@solid-primitives/mouse";
 
-const [{ x, y, sourceType }, { stop, start }] = createMousePosition({ touch: false });
+const [{ x, y, sourceType }, clear] = createMousePosition({ touch: false });
 // listening to touch events is enabled by default
+
+// to clear all event listeners
+clear();
 ```
 
 ### Types
@@ -33,10 +45,7 @@ function createMousePosition(options: MouseOptions = {}): [
     y: Accessor<number>;
     sourceType: Accessor<MouseSourceType>;
   },
-  actions: {
-    start: Fn;
-    stop: Fn;
-  }
+  clear: ClearListeners
 ];
 interface MouseOptions {
   /**
@@ -133,11 +142,14 @@ An alternative to [`createMouseToElement`](#createMouseToElement), that listens 
 ```ts
 import { createMouseInElement } from "@solid-primitives/mouse";
 
-const [{ x, y, sourceType, isInside }, { stop, start }] = createMouseInElement(() => myRef, {
+const [{ x, y, sourceType, isInside }, clear] = createMouseInElement(() => myRef, {
   followTouch: false
 });
 // Same way as createMousePosition:
 // the "touch", and "foullowTouch" settings are enabled by default
+
+// to clear all event listeners
+clear();
 ```
 
 ### Types
@@ -153,10 +165,7 @@ function createMouseInElement(
     sourceType: Accessor<MouseSourceType>;
     isInside: Accessor<boolean>;
   },
-  actions: {
-    stop: Fn;
-    start: Fn;
-  }
+  clear: ClearListeners
 ];
 type MouseSourceType = "mouse" | "touch" | null;
 ```
@@ -170,7 +179,10 @@ Answers the question: _Is the cursor on screen?_
 ```ts
 import { createMouseOnScreen } from "@solid-primitives/mouse";
 
-const [isMouseOnScreen, { start, stop }] = createMouseOnScreen(true);
+const [isMouseOnScreen, clear] = createMouseOnScreen(true);
+
+// to clear all event listeners
+clear();
 ```
 
 ### Types
@@ -178,10 +190,10 @@ const [isMouseOnScreen, { start, stop }] = createMouseOnScreen(true);
 ```ts
 function createMouseOnScreen(
   initialValue?: boolean
-): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
+): [onScreen: Accessor<boolean>, clear: ClearListeners];
 function createMouseOnScreen(
   options?: MouseOnScreenOptions
-): [onScreen: Accessor<boolean>, actions: { stop: Fn; start: Fn }];
+): [onScreen: Accessor<boolean>, clear: ClearListeners];
 
 interface MouseOnScreenOptions {
   /**
@@ -208,6 +220,10 @@ https://codesandbox.io/s/solid-primitives-mouse-p10s5?file=/index.tsx
 
 1.0.0
 
-Eelease as a Stage-2 primitive.
+Release as a Stage-2 primitive.
+
+1.0.1
+
+Updated util and event-listener dependencies.
 
 </details>

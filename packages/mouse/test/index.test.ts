@@ -13,7 +13,7 @@ const mp = suite("createMousePosition");
 
 mp("returns correct values", () =>
   createRoot(dispose => {
-    const [{ x, y, sourceType }, { stop, start }] = createMousePosition();
+    const [{ x, y, sourceType }, stop] = createMousePosition();
 
     assert.type(x, "function");
     assert.is(x(), 0);
@@ -23,7 +23,6 @@ mp("returns correct values", () =>
     assert.is(sourceType(), null);
 
     assert.type(stop, "function");
-    assert.type(start, "function");
     dispose();
   })
 );
@@ -72,17 +71,21 @@ mte("returns correct values", () =>
 
 mte("initial values can be changed", () =>
   createRoot(dispose => {
-    const el = document.createElement("div");
-    const [{ x, y, width, height, top, left, isInside }] = createMouseToElement(el, undefined, {
-      initialValue: {
-        x: -1,
-        y: 2,
-        width: 3,
-        height: 4,
-        top: 5,
-        left: 6
+    const [{ x, y, width, height, top, left, isInside }] = createMouseToElement(
+      // passed target must behave like an ref (initially undefined) for initial values to matter
+      () => undefined,
+      undefined,
+      {
+        initialValue: {
+          x: -1,
+          y: 2,
+          width: 3,
+          height: 4,
+          top: 5,
+          left: 6
+        }
       }
-    });
+    );
 
     assert.is(x(), -1);
     assert.is(y(), 2);
@@ -103,7 +106,7 @@ const mie = suite("createMouseInElement");
 mie("returns correct values", () =>
   createRoot(dispose => {
     const el = document.createElement("div");
-    const [{ x, y, isInside }, { stop, start }] = createMouseInElement(el);
+    const [{ x, y, isInside }, stop] = createMouseInElement(el);
 
     assert.type(x, "function");
     assert.is(x(), 0);
@@ -115,7 +118,6 @@ mie("returns correct values", () =>
     assert.is(isInside(), false);
 
     assert.type(stop, "function");
-    assert.type(start, "function");
     dispose();
   })
 );
@@ -143,13 +145,12 @@ const mos = suite("createMouseOnScreen");
 
 mos("returns correct values", () =>
   createRoot(dispose => {
-    const [onScreen, { stop, start }] = createMouseOnScreen();
+    const [onScreen, stop] = createMouseOnScreen();
 
     assert.type(onScreen, "function");
     assert.is(onScreen(), false);
 
     assert.type(stop, "function");
-    assert.type(start, "function");
     dispose();
   })
 );
