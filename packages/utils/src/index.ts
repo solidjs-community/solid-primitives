@@ -103,10 +103,13 @@ export const promiseTimeout = (
     throwOnTimeout ? setTimeout(() => reject(reason), ms) : setTimeout(resolve, ms)
   );
 
-export const objectOmit = <T extends Object, K extends Array<keyof T>>(
-  object: T,
-  ...keys: K
-): Omit<T, ItemsOf<K>> => {
+/**
+ * Create a new subset object without provided keys
+ */
+export const objectOmit = <O extends Object, K extends keyof O>(
+  object: O,
+  ...keys: K[]
+): Omit<O, K> => {
   const copy = Object.assign({}, object);
   for (const key of keys) {
     delete copy[key];
@@ -114,6 +117,21 @@ export const objectOmit = <T extends Object, K extends Array<keyof T>>(
   return copy;
 };
 
+/**
+ * Create a new subset object with provided keys
+ */
+export const objectPick = <O extends Object, K extends keyof O>(
+  object: O,
+  ...keys: K[]
+): Pick<O, K> =>
+  keys.reduce((n, k) => {
+    if (k in object) n[k] = object[k];
+    return n;
+  }, {} as Pick<O, K>);
+
+/**
+ * Destructible store object, with values changed to accessors
+ */
 export type Destore<T extends Object> = {
   [K in keyof T]: T[K] extends Function ? T[K] : Accessor<T[K]>;
 };
