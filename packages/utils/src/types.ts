@@ -1,0 +1,61 @@
+import { Accessor } from "solid-js";
+
+/**
+ * A function
+ */
+export type Fn<R = void> = () => R;
+
+/**
+ * Can be single or in an array
+ */
+export type Many<T> = T | T[];
+
+export type Keys<O extends Object> = keyof O;
+export type Values<O extends Object> = O[Keys<O>];
+
+/**
+ * Infers the type of the array elements
+ */
+export type ItemsOf<T> = T extends (infer E)[] ? E : never;
+
+/**
+ * T or a reactive/non-reactive function returning T
+ */
+export type MaybeAccessor<T> = T | Accessor<T>;
+/**
+ * Accessed value of a MaybeAccessor
+ * @example
+ * MaybeAccessorValue<MaybeAccessor<string>>
+ * // => string
+ * MaybeAccessorValue<MaybeAccessor<() => string>>
+ * // => string | (() => string)
+ * MaybeAccessorValue<MaybeAccessor<string> | Function>
+ * // => string | void
+ */
+export type MaybeAccessorValue<T extends MaybeAccessor<any>> = T extends Fn ? ReturnType<T> : T;
+
+/** Allows to make shallow overwrites to an interface */
+export type Modify<T, R> = Omit<T, keyof R> & R;
+
+/** Allows to make nested overwrites to an interface */
+export type ModifyDeep<A extends AnyObject, B extends DeepPartialAny<A>> = {
+  [K in keyof A]: B[K] extends never
+    ? A[K]
+    : B[K] extends AnyObject
+    ? ModifyDeep<A[K], B[K]>
+    : B[K];
+} & (A extends AnyObject ? Omit<B, keyof A> : A);
+
+/** Makes each property optional and turns each leaf property into any, allowing for type overrides by narrowing any. */
+export type DeepPartialAny<T> = {
+  [P in keyof T]?: T[P] extends AnyObject ? DeepPartialAny<T[P]> : any;
+};
+
+export type AnyObject = Record<string, any>;
+
+/**
+ * Destructible store object, with values changed to accessors
+ */
+export type Destore<T extends Object> = {
+  [K in keyof T]: T[K] extends Function ? T[K] : Accessor<T[K]>;
+};

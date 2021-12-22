@@ -28,6 +28,7 @@
     "dist"
   ],
   "scripts": {
+    "dev": "vite serve dev",
     "start": "vite serve dev",
     "build": "tsup",
     "test": "uvu -r solid-register"
@@ -51,6 +52,7 @@
     "vite-plugin-solid": "2.1.4"
   },
   "peerDependencies": {
-    "solid-js": "^1.2.6"
+    "solid-js": "^1.2.6",
+    "@solid-primitives/utils": "^0.0.260"
   }
 }

@@ -1,76 +1,84 @@
+import { Fn } from "@solid-primitives/utils";
 import { onCleanup } from "solid-js";
 
-export type Fn = () => void;
 export type ClearListeners = Fn;
-export type CookedUnsubscribe = Fn;
+export type Unsubscribe = Fn;
 
-export type Listen<Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void> = (
-  listener: Listener<Arg0, Arg1, Arg2, Arg3>
-) => CookedUnsubscribe;
-export type Listener<Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void> = (
-  arg0: Arg0,
-  arg1: Arg1,
-  arg2: Arg2,
-  arg3: Arg3
+export type MultiArgListen<A0 = void, A1 = void, A2 = void> = (
+  listener: MultiArgListener<A0, A1, A2>
+) => Unsubscribe;
+export type Listen<Payload = void> = (listener: Listener<Payload>) => Unsubscribe;
+
+export type MultiArgListener<A0 = void, A1 = void, A2 = void> = (
+  arg0: A0,
+  arg1: A1,
+  arg2: A2
 ) => void;
-export type Emit<Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void> = Listener<
-  Arg0,
-  Arg1,
-  Arg2,
-  Arg3
->;
-export type Remove<Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void> = (
-  listener: Listener<Arg0, Arg1, Arg2, Arg3>
+export type Listener<Payload = void> = (payload: Payload) => void;
+
+export type MultiArgEmit<A0 = void, A1 = void, A2 = void> = MultiArgListener<A0, A1, A2>;
+export type Emit<Payload = void> = (payload: Payload) => void;
+
+export type Remove<A0 = void, A1 = void, A2 = void> = (
+  listener: MultiArgListener<A0, A1, A2>
 ) => boolean;
 
-export type Has<Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void> = (
-  listener: Listener<Arg0, Arg1, Arg2, Arg3>
-) => boolean;
-
-export type BeforeEmit<Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void> = (
-  pub: Emit<Arg0, Arg1, Arg2, Arg3>,
-  ...payload: [Arg0, Arg1, Arg2, Arg3]
+export type EmitGuard<A0 = void, A1 = void, A2 = void> = (
+  pub: MultiArgEmit<A0, A1, A2>,
+  ...payload: [A0, A1, A2]
 ) => void;
 
-export type BeforeRemove<Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void> = (
+export type RemoveGuard<Listener extends Function> = (
   remove: () => boolean,
-  listener: Listener<Arg0, Arg1, Arg2, Arg3>
+  listener: Listener
 ) => boolean;
 
-export type PubSub<Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void> = {
-  remove: Remove<Arg0, Arg1, Arg2, Arg3>;
-  listen: Listen<Arg0, Arg1, Arg2, Arg3>;
-  emit: Emit<Arg0, Arg1, Arg2, Arg3>;
-  clear: ClearListeners;
-  has: Has<Arg0, Arg1, Arg2, Arg3>;
-};
+export type Pubsub<A0 = void, A1 = void, A2 = void> = [
+  sub: MultiArgListen<A0, A1, A2>,
+  pub: MultiArgEmit<A0, A1, A2>,
+  rest: {
+    remove: Remove<A0, A1, A2>;
+    clear: ClearListeners;
+    has: (listener: MultiArgListener<A0, A1, A2>) => boolean;
+  }
+];
 
-export function createPubSub<Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void>(config?: {
-  beforeEmit?: BeforeEmit<Arg0, Arg1, Arg2, Arg3>;
-  beforeRemove?: BeforeRemove<Arg0, Arg1, Arg2, Arg3>;
-}): PubSub<Arg0, Arg1, Arg2, Arg3> {
-  type _Listener = Listener<Arg0, Arg1, Arg2, Arg3>;
-  type _Emit = Emit<Arg0, Arg1, Arg2, Arg3>;
-  type _Remove = Remove<Arg0, Arg1, Arg2, Arg3>;
+export function createPubsub<A0 = void, A1 = void, A2 = void>(config?: {
+  emitGuard?: EmitGuard<A0, A1, A2>;
+  removeGuard?: RemoveGuard<MultiArgListener<A0, A1, A2>>;
+  beforeEmit?: MultiArgListener<A0, A1, A2>;
+}): Pubsub<A0, A1, A2> {
+  type _Listener = MultiArgListener<A0, A1, A2>;
+  type _Listen = MultiArgListen<A0, A1, A2>;
+  type _Emit = MultiArgEmit<A0, A1, A2>;
+  type _Remove = Remove<A0, A1, A2>;
 
-  const { beforeEmit, beforeRemove } = config ?? {};
+  const { emitGuard, removeGuard, beforeEmit } = config ?? {};
   const set = new Set<_Listener>();
 
+  const forEachListener = (fn: (listener: _Listener) => void) => {
+    for (const cb of set.values()) fn(cb);
+  };
+
   const _remove: _Remove = listener => !!set.delete(listener);
-  const remove: _Remove = beforeRemove
-    ? listener => beforeRemove(() => _remove(listener), listener)
+  const remove: _Remove = removeGuard
+    ? listener => removeGuard(() => _remove(listener), listener)
     : _remove;
 
-  const listen: Listen<Arg0, Arg1, Arg2, Arg3> = listener => {
+  const listen: _Listen = listener => {
     set.add(listener);
-    onCleanup(() => set.delete(listener));
-    return () => remove(listener);
+    const unsub = () => set.delete(listener);
+    onCleanup(unsub);
+    return unsub;
   };
 
-  const _emit: _Emit = (...payload) => {
-    for (const cb of set.values()) cb(...payload);
-  };
-  const emit: _Emit = beforeEmit ? (...payload) => beforeEmit(_emit, ...payload) : _emit;
+  const _emit: _Emit = beforeEmit
+    ? (...p) => {
+        beforeEmit(...p);
+        forEachListener(cb => cb(...p));
+      }
+    : (...p) => forEachListener(cb => cb(...p));
+  const emit: _Emit = emitGuard ? (...payload) => emitGuard(_emit, ...payload) : _emit;
 
   const clear = () => {
     for (const cb of set.values()) remove(cb);
@@ -79,11 +87,13 @@ export function createPubSub<Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void>
 
   onCleanup(() => set.clear());
 
-  return {
-    remove,
+  return [
     listen,
     emit,
-    clear,
-    has
-  };
+    {
+      remove,
+      clear,
+      has
+    }
+  ];
 }

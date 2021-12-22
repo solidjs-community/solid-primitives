@@ -1,32 +1,79 @@
 import {
   createEventBus,
-  EventBusSubscribe,
-  createMultiEventBus,
-  MultiEventBusSubscribe
+  createEventHub,
+  createPubsub,
+  MultiArgEmit,
+  EventBusListen,
+  Listen
+  // EventBusSubscribe,
+  // createMultiEventBus,
+  // MultiEventBusSubscribe
 } from "../src";
 import { Component, createSignal, onMount } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
 
-type AnimEvents = {
-  spin: number;
-  wiggle: void;
-};
-
 const App: Component = () => {
   return (
-    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center bg-gray-800 text-white">
-      <ParentNode />
+    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-12 bg-gray-800 text-white">
+      <PubsubTest />
+      <HubParentNode />
     </div>
   );
 };
 
-const ParentNode: Component = () => {
-  const { listen, emit } = createMultiEventBus<AnimEvents>();
+const PubsubTest: Component = () => {
+  const Switch: Component<{
+    emit: MultiArgEmit<boolean>;
+  }> = props => {
+    const [on, setOn] = createSignal(true);
+    const toggle = () =>
+      setOn(p => {
+        props.emit(!p);
+        return !p;
+      });
+    return (
+      <button class="w-12 h-8 bg-white border-none rounded font-semibold" onclick={toggle}>
+        {on() ? "ON" : "OFF"}
+      </button>
+    );
+  };
+
+  const Light: Component<{
+    subscribe: Listen<boolean>;
+  }> = props => {
+    const [on, setOn] = createSignal(true);
+    props.subscribe(setOn);
+    return (
+      <div
+        class="w-18 h-18 bg-gray-500 rounded-full"
+        classList={{
+          "bg-yellow-200": on()
+        }}
+        style={{
+          "box-shadow": on() ? "0 0 24px rgb(254, 239, 179)" : ""
+        }}
+      ></div>
+    );
+  };
+
+  const [sub, emit] = createPubsub<boolean>();
+  return (
+    <div class="p-8 flex items-center space-x-8 bg-gray-700 rounded-2xl">
+      <Switch emit={emit} />
+      <Light subscribe={sub} />
+    </div>
+  );
+};
+
+const HubParentNode: Component = () => {
+  const { emit, spin, wiggle } = createEventHub(_ => ({
+    spin: _<number>(),
+    wiggle: _<void>()
+  }));
 
   return (
     <div class="p-8 flex flex-col items-center space-y-4 bg-gray-700 rounded-2xl">
-      <h3>Send events from Parent to Children</h3>
       <div class="flex space-x-4">
         <button class="btn" onclick={() => emit("spin", Math.random() * 360 - 180)}>
           SPIN!
@@ -36,19 +83,20 @@ const ParentNode: Component = () => {
         </button>
       </div>
       <div class="flex justify-center flex-wrap gap-8 !mt-12">
-        <ChildNode subscribe={listen} />
-        <ChildNode subscribe={listen} />
-        <ChildNode subscribe={listen} />
+        <HubChildNode listenToSpin={spin.listen} listenToWiggle={wiggle.listen} />
+        <HubChildNode listenToSpin={spin.listen} listenToWiggle={wiggle.listen} />
+        <HubChildNode listenToSpin={spin.listen} listenToWiggle={wiggle.listen} />
       </div>
     </div>
   );
 };
 
-const ChildNode: Component<{
-  subscribe: MultiEventBusSubscribe<AnimEvents>;
+const HubChildNode: Component<{
+  listenToSpin: Listen<number>;
+  listenToWiggle: Listen;
 }> = props => {
   const [angle, setAngle] = createSignal(0);
-  props.subscribe("spin", angle => setAngle(p => p + angle));
+  props.listenToSpin(angle => setAngle(p => p + angle));
 
   let ref!: HTMLDivElement;
   let anim: Animation;
@@ -73,7 +121,7 @@ const ChildNode: Component<{
     anim = new Animation(keyframes);
   });
 
-  props.subscribe("wiggle", () => {
+  props.listenToWiggle(() => {
     anim.currentTime = 0;
     anim.play();
   });

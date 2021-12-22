@@ -1,44 +1,15 @@
-import type { Accessor } from "solid-js";
 import type { Store } from "solid-js/store";
+import { isServer } from "solid-js/web";
+import type { Destore, Fn, ItemsOf, MaybeAccessor, MaybeAccessorValue, Values } from "./types";
+
+export * from "./types";
 
 //
 // GENERAL HELPERS:
 //
 
-/**
- * A function
- */
-export type Fn<R = void> = () => R;
-/**
- * Can be single or in an array
- */
-export type Many<T> = T | T[];
-
-export type Keys<O extends Object> = keyof O;
-export type Values<O extends Object> = O[Keys<O>];
-
-/**
- * Infers the type of the array elements
- */
-export type ItemsOf<T> = T extends (infer E)[] ? E : never;
-/**
- * T or a reactive/non-reactive function returning T
- */
-export type MaybeAccessor<T> = T | Accessor<T>;
-/**
- * Accessed value of a MaybeAccessor
- * @example
- * MaybeAccessorValue<MaybeAccessor<string>>
- * // => string
- * MaybeAccessorValue<MaybeAccessor<() => string>>
- * // => string | (() => string)
- * MaybeAccessorValue<MaybeAccessor<string> | Function>
- * // => string | void
- */
-export type MaybeAccessorValue<T extends MaybeAccessor<any>> = T extends Fn ? ReturnType<T> : T;
-
-export const isClient = typeof window !== "undefined";
-export const isServer = !isClient;
+export const isClient = !isServer;
+export { isServer };
 
 /**
  * Accesses the value of a MaybeAccessor
@@ -130,12 +101,6 @@ export const objectPick = <O extends Object, K extends keyof O>(
   }, {} as Pick<O, K>);
 
 /**
- * Destructible store object, with values changed to accessors
- */
-export type Destore<T extends Object> = {
-  [K in keyof T]: T[K] extends Function ? T[K] : Accessor<T[K]>;
-};
-/**
  * Allows the Solid's store to be destructured
  *
  * @param store
@@ -159,12 +124,12 @@ export function destore<T extends Object>(store: Store<T>): Destore<T> {
   return result;
 }
 
-export const createCallbackStack = <Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void>(): {
+export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {
   push: (...callbacks: Fn[]) => void;
-  execute: (arg0: Arg0, arg1: Arg1, arg2: Arg2, arg3: Arg3) => void;
+  execute: (arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void;
   clear: Fn;
 } => {
-  let stack: Array<(arg0: Arg0, arg1: Arg1, arg2: Arg2, arg3: Arg3) => void> = [];
+  let stack: Array<(arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void> = [];
   const clear: Fn = () => (stack = []);
   return {
     push: (...callbacks) => stack.push(...callbacks),
