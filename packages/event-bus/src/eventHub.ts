@@ -1,12 +1,4 @@
-import {
-  ClearListeners,
-  Unsubscribe,
-  createEventBus,
-  EventBus,
-  MultiArgListener,
-  createPubsub,
-  Listener
-} from ".";
+import { ClearListeners, Unsubscribe, createEventBus, EventBus, createPubsub, Listener } from ".";
 import { Store } from "solid-js/store";
 
 type PayloadMap<ChannelMap extends Record<string, EventBus>> = {

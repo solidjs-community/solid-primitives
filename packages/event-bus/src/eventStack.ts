@@ -1,49 +1,47 @@
-import { Fn, Modify, objectPick } from "@solid-primitives/utils";
+import { Fn } from "@solid-primitives/utils";
 import { Accessor, createSignal, Setter } from "solid-js";
 import {
-  createEventBus,
+  ClearListeners,
   createPubsub,
   Emit,
   EmitGuard,
-  EventBus,
-  EventBusListener,
   Listener,
+  PubsubConfig,
   RemoveGuard,
   Unsubscribe
 } from ".";
 
+export type EventStackListener<E, V = E> = (event: V, stack: V[], removeFromStack: Fn) => void;
+
 export type EventStack<E, V = E> = {
   value: Accessor<V[]>;
+  stack: Accessor<V[]>;
   setStack: Setter<V[]>;
-  listen: (listener: (event: V, stack: V[], removeFromStack: Fn) => void) => Unsubscribe;
-  once: (listener: (event: V, stack: V[], removeFromStack: Fn) => void) => Unsubscribe;
+  listen: (listener: EventStackListener<E, V>) => Unsubscribe;
+  once: (listener: EventStackListener<E, V>) => Unsubscribe;
   emit: Emit<E>;
   removeValue: (value: V) => boolean;
+  clear: ClearListeners;
 };
 
 export function createEventStack<E, V = E>(
-  config: {
+  config: PubsubConfig<E> & {
     toValue?: (event: E) => V;
-    emitGuard?: EmitGuard<E>;
-    removeGuard?: RemoveGuard<Listener<E>>;
-    beforeEmit?: Listener<E>;
   } = {}
 ): EventStack<E, V> {
-  type _Listen = (listener: (event: V, stack: V[], removeFromStack: Fn) => void) => Unsubscribe;
-
   const { toValue = (e: any) => e } = config;
 
   const [stack, setStack] = createSignal<V[]>([]);
   const eventBus = createPubsub<E>(config);
-  const valueBus = createPubsub<V>();
+  const valueBus = createPubsub<V, V[], Fn>();
 
   eventBus.listen(event => {
     const value = toValue(event);
     setStack(p => [...p, value]);
-    valueBus.emit(value);
+    valueBus.emit(value, stack(), () => removeValue(value));
   });
 
-  const removeValue = (value: V): boolean => {
+  const removeValue: EventStack<E, V>["removeValue"] = value => {
     let removed: boolean = false;
     setStack(p =>
       p.filter(item => {
@@ -56,22 +54,20 @@ export function createEventStack<E, V = E>(
     return removed;
   };
 
-  const listen: _Listen = listener =>
-    valueBus.listen(event => listener(event, stack(), () => removeValue(event)));
-
-  const once: _Listen = listener => {
-    const unsub = listen((...args) => {
-      unsub();
-      return listener(...args);
-    });
-    return unsub;
+  return {
+    value: stack,
+    stack,
+    setStack,
+    listen: valueBus.listen,
+    once: valueBus.once,
+    emit: eventBus.emit,
+    removeValue,
+    clear: valueBus.clear
   };
-
-  return { value: stack, setStack, listen, once, emit: eventBus.emit, removeValue };
 }
 
-const x = createEventStack<string>();
+// const x = createEventStack<string>();
 
-x.emit("Hello");
-x.listen((payload, stack, remove) => {});
-x.value();
+// x.emit("Hello");
+// x.listen((payload, stack, remove) => {});
+// x.value();
