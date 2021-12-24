@@ -1,4 +1,4 @@
-import { onCleanup } from "solid-js";
+import { Accessor, Setter, createEffect, on, onCleanup } from "solid-js";
 
 import { cjs, setup, KILL, RPC } from "./utils";
 
@@ -9,15 +9,13 @@ import { cjs, setup, KILL, RPC } from "./utils";
  * @param options Web worker options to control the instance.
  * @returns An array with worker, start and stop methods
  */
-function createWorker(
-  ...args: (Function | object)[]
-): WorkerExports {
+export function createWorker(...args: (Function | object)[]): WorkerExports {
   const exports = new Set<string>();
   let code = "";
   let options = {};
   for (let i in arguments) {
     if (typeof arguments[i] === "object") {
-      options = arguments[i];
+      options = args[i];
       continue;
     }
     const exportObj = `__xpo${Math.random().toString().substring(2)}__`;
@@ -67,10 +65,10 @@ function createWorker(
  * @param options Web worker options to control the instance.
  * @returns An array with worker, start and stop methods
  */
-export function createWorkerPool(
+export const createWorkerPool = (
   concurrency: number = 1,
   ...args: (Function | object)[]
-): WorkerExports {
+): WorkerExports => {
   let current = -1;
   let workers: WorkerExports[] = [];
   const start = () => {
@@ -78,22 +76,57 @@ export function createWorkerPool(
       workers.push(createWorker(...args));
     }
   };
-  const stop = () => workers.forEach((worker) => worker[2]());
+  const stop = () => workers.forEach(worker => worker[2]());
   start();
   return [
     // @ts-ignore
-    new Proxy({}, {
-      get: function(_, method) {
-        current = current + 1 >= workers.length ? 0 : current + 1;
-        return function() {
-          // @ts-ignore
-          return workers[current][0][method].apply(this, arguments);
+    new Proxy(
+      {},
+      {
+        get: function (_, method) {
+          current = current + 1 >= workers.length ? 0 : current + 1;
+          return function () {
+            // @ts-ignore
+            return workers[current][0][method].apply(this, arguments);
+          };
         }
       }
-    }),
+    ),
     start,
     stop
   ];
-}
+};
 
-export default createWorker;
+export type WorkerInstruction = {
+  func: Function;
+  input?: Accessor<any>;
+  output?: Setter<any>;
+  concurrency?: number;
+};
+
+/**
+ * Creates a complex worker that reads inputs and provides outputs.
+ *
+ * @param args An instruction list of controls for the worker.
+ * @returns Basic start and stop functions
+ */
+export const createSignaledWorker = (
+  ...args: WorkerInstruction[]
+): [start: () => void, stop: () => void] => {
+  let fns = [];
+  for (const i in args) {
+    const { input, output, func, concurrency } = args[i];
+    if (input) {
+      createEffect(
+        on(input, async () => {
+          // @ts-ignore
+          const result = await worker[func.name](input());
+          if (output) output(result);
+        })
+      );
+    }
+    fns.push(func);
+  }
+  const [worker, start, stop] = createWorker(...fns);
+  return [start, stop];
+};

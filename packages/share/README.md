@@ -1,22 +1,19 @@
----
-Name: share
-Stage: 2
-Package: "@solid-primitives/share"
-Primitives: createSocialShare
-Category: Utilities
----
-
 # @solid-primitives/share
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/share?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/share)
 [![size](https://img.shields.io/npm/v/@solid-primitives/share?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/share)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
 Primitives for supporting sharing of resources on social media and beyond.
 
-`createSocialShare` - Provides a getter and setter for the primitive.
+## Installation
 
-A portion of this primitive was built off of https://github.com/nicolasbeauvais/vue-social-sharing/blob/master/src/share-network.js.
+```
+npm install @solid-primitives/share
+# or
+yarn add @solid-primitives/share
+```
 
 ## How to use it
 
@@ -45,8 +42,12 @@ You may view a working example here: [ link to Stackblize or CodeSandBox ]
 
 Initial release as a Stage-0 primitive.
 
-0.0.101
+0.0.105
 
-Added CJS support.
+Added CJS and SSR support.
 
 </details>
+
+## Acknowledgements
+
+A portion of this primitive was built from https://github.com/nicolasbeauvais/vue-social-sharing/blob/master/src/share-network.js.

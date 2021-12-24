@@ -1,29 +1,34 @@
 {
   "name": "@solid-primitives/props",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Primitive that provides controllable props signals like knobs/controls",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/props",
-  "private": false,
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "props",
+    "stage": 3,
+    "list": [
+      "createProps"
+    ],
+    "category": "Utilities"
+  },
   "files": [
     "dist"
   ],
-  "exports": {
-    "require": "./dist/cjs/index.cjs",
-    "import": "./dist/index.js",
-    "default": "./dist/index.js"
-  },
-  "sideEffects": "false",
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
-    "test": "jest"
+    "build": "tsup",
+    "test": "uvu -r solid-register"
   },
   "keywords": [
     "props",
@@ -33,25 +38,17 @@
     "primitives"
   ],
   "devDependencies": {
-    "@babel/core": "7.14.8",
-    "@babel/preset-env": "7.14.8",
-    "@babel/preset-typescript": "7.14.5",
-    "@types/jest": "27.0.1",
-    "babel-preset-solid": "1.1.3",
-    "jest": "27.0.1",
+    "esbuild-plugin-solid": "^0.4.1",
+    "jsdom": "^18.1.0",
     "prettier": "^2.0.5",
+    "solid-register": "^0.1.1",
     "solid-testing-library": "^0.2.0",
-    "solid-jest": "0.2.0",
     "tslib": "^2.3.1",
-    "typescript": "^4.4.3"
+    "tsup": "^5.10.1",
+    "typescript": "^4.4.3",
+    "uvu": "^0.5.2"
   },
   "dependencies": {
-    "solid-js": "^1.1.6"
-  },
-  "jest": {
-    "preset": "solid-jest/preset/browser",
-    "setupFiles": [
-      "./test/setup.ts"
-    ]
+    "solid-js": "^1.2.5"
   }
 }

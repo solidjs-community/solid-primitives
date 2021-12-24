@@ -1,16 +1,9 @@
----
-Name: workers
-Stage: 1
-Package: "@solid-primitives/workers"
-Primitives: createWorker, createWorkerPool
-Category: Browser APIs
----
-
 # @solid-primitives/workers
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/workers?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/workers)
 [![size](https://img.shields.io/npm/v/@solid-primitives/workers?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/workers)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
 A set of utility to support using Web Workers and Shared Workers:
 
@@ -18,7 +11,11 @@ A set of utility to support using Web Workers and Shared Workers:
 
 `createWorkerPool` - Creates a pool of workers and round-robins requests between each.
 
+`createSignaledWorker` - Creates a work with that reads and writes to signals.
+
 ## How to use it
+
+### createWorker
 
 Create a basic web worker:
 
@@ -30,6 +27,8 @@ console.log(await worker.add(1, 2));
 // output: 3
 ```
 
+### createWorkerPool
+
 Create a worker pool with a set concurrency:
 
 ```ts
@@ -37,6 +36,25 @@ const [pool, start, stop] = createWorkerPool(4, function add(a, b) {
   return a + b;
 });
 console.log(await pool.add(1, 2));
+// output: 3
+```
+
+### createSignaledWprler
+
+Create a more advanced worker that accepts multiple instructional inputs:
+
+```ts
+const [input, setInput] = createSignal([1, 1]);
+const [output, setOutput] = createSignal([1, 1]);
+createSignaledWorker({
+  input,
+  output: setOutput,
+  func: function add([a, b]) {
+    return a + b;
+  }
+});
+setInput([1, 2]);
+console.log(output());
 // output: 3
 ```
 
@@ -52,6 +70,14 @@ You may view a working example here: [ link to Stackblize or CodeSandBox ]
 0.0.100
 
 Initial release as a Stage-1 primitive.
+
+0.0.150
+
+Added signaled workers.
+
+0.0.160
+
+Add CJS and SSR support as well as better building process.
 
 </details>
 

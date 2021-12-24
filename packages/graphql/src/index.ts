@@ -1,8 +1,5 @@
 import { Accessor, createResource } from "solid-js";
 
-type QueryVariables = { [key: string]: string | number };
-type Headers = { [key: string]: string };
-
 /**
  * Creates a reactive GraphQL query client.
  *
@@ -18,7 +15,7 @@ type Headers = { [key: string]: string };
  */
 const createGraphQLClient = (
   url: string | Accessor<string>,
-  headers: Headers = {},
+  headers: RequestHeaders = {},
   fetcher = fetch
 ) => {
   return (query: string, variables: Accessor<QueryVariables>) => {

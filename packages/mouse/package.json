@@ -1,0 +1,63 @@
+{
+  "name": "@solid-primitives/mouse",
+  "version": "1.0.1",
+  "description": "A collection of Solid Primitives, that capture current mouse cursor position, and help to deal with common related usecases.",
+  "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/mouse#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "mouse",
+    "stage": 2,
+    "list": [
+      "createMousePosition",
+      "createMouseToElement",
+      "createMouseInElement",
+      "createMouseOnScreen"
+    ],
+    "category": "Inputs"
+  },
+  "sideEffects": false,
+  "private": false,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
+    "build": "tsup",
+    "test": "uvu -r solid-register"
+  },
+  "keywords": [
+    "mouse",
+    "touch",
+    "cursor",
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "@solid-primitives/raf": "^1.0.5",
+    "jsdom": "^19.0.0",
+    "prettier": "^2.4.1",
+    "solid-register": "^0.0.18",
+    "tslib": "^2.3.1",
+    "tsup": "^5.10.0",
+    "unocss": "^0.12.4",
+    "uvu": "^0.5.2",
+    "vite": "2.6.14",
+    "vite-plugin-solid": "2.1.2"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.2.5"
+  },
+  "dependencies": {
+    "@solid-primitives/event-listener": "^1.3.8",
+    "@solid-primitives/utils": "0.0.260"
+  }
+}
