@@ -61,13 +61,13 @@ export type EventHub<ChannelMap extends Record<string, EventBus>> = ChannelMap &
 export function createEventHub<ChannelMap extends Record<string, EventBus<any, any>>>(
   createBuses: (bus: typeof createEventBus) => ChannelMap
 ): EventHub<ChannelMap> {
-  const [globalListen, globalEmit, global] = createPubsub<string, any>();
+  const global = createPubsub<string, any>();
   const buses = createBuses(createEventBus);
   const store: Record<string, any> = {};
 
   Object.entries(buses).forEach(([event, bus]) => {
     Object.defineProperty(store, event, { get: bus.value, enumerable: true });
-    bus.listen(payload => globalEmit(event, payload), true);
+    bus.listen(payload => global.emit(event, payload), true);
   });
 
   return {
@@ -78,7 +78,7 @@ export function createEventHub<ChannelMap extends Record<string, EventBus<any, a
     emit: (e, data?: any) => buses[e].emit(data),
     clear: e => buses[e].clear(),
     clearAll: () => Object.values(buses).forEach(bus => bus.clear()),
-    globalListen,
+    globalListen: global.listen,
     globalRemove: global.remove,
     globalClear: global.clear
   };

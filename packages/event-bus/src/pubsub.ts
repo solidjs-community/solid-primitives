@@ -33,15 +33,13 @@ export type RemoveGuard<Listener extends Function> = (
   listener: Listener
 ) => boolean;
 
-export type Pubsub<A0 = void, A1 = void, A2 = void> = [
-  sub: MultiArgListen<A0, A1, A2>,
-  pub: MultiArgEmit<A0, A1, A2>,
-  rest: {
-    remove: Remove<A0, A1, A2>;
-    clear: ClearListeners;
-    has: (listener: MultiArgListener<A0, A1, A2>) => boolean;
-  }
-];
+export type Pubsub<A0 = void, A1 = void, A2 = void> = {
+  listen: MultiArgListen<A0, A1, A2>;
+  emit: MultiArgEmit<A0, A1, A2>;
+  remove: Remove<A0, A1, A2>;
+  clear: ClearListeners;
+  has: (listener: MultiArgListener<A0, A1, A2>) => boolean;
+};
 
 export function createPubsub<A0 = void, A1 = void, A2 = void>(config?: {
   emitGuard?: EmitGuard<A0, A1, A2>;
@@ -87,13 +85,11 @@ export function createPubsub<A0 = void, A1 = void, A2 = void>(config?: {
 
   onCleanup(() => set.clear());
 
-  return [
+  return {
     listen,
     emit,
-    {
-      remove,
-      clear,
-      has
-    }
-  ];
+    remove,
+    clear,
+    has
+  };
 }

@@ -4,12 +4,15 @@ import {
   createPubsub,
   MultiArgEmit,
   EventBusListen,
-  Listen
+  Listen,
+  createSimplePubsub,
+  createEventStack,
+  EventStack
   // EventBusSubscribe,
   // createMultiEventBus,
   // MultiEventBusSubscribe
 } from "../src";
-import { Component, createSignal, onMount } from "solid-js";
+import { Component, createSignal, For, onMount } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
 
@@ -18,6 +21,7 @@ const App: Component = () => {
     <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-12 bg-gray-800 text-white">
       <PubsubTest />
       <HubParentNode />
+      <NotificationsTest />
     </div>
   );
 };
@@ -57,9 +61,9 @@ const PubsubTest: Component = () => {
     );
   };
 
-  const [sub, emit] = createPubsub<boolean>();
+  const [sub, emit] = createSimplePubsub<boolean>();
   return (
-    <div class="p-8 flex items-center space-x-8 bg-gray-700 rounded-2xl">
+    <div class="node-h">
       <Switch emit={emit} />
       <Light subscribe={sub} />
     </div>
@@ -73,7 +77,7 @@ const HubParentNode: Component = () => {
   }));
 
   return (
-    <div class="p-8 flex flex-col items-center space-y-4 bg-gray-700 rounded-2xl">
+    <div class="node-v">
       <div class="flex space-x-4">
         <button class="btn" onclick={() => emit("spin", Math.random() * 360 - 180)}>
           SPIN!
@@ -135,6 +139,86 @@ const HubChildNode: Component<{
       >
         Child
       </div>
+    </div>
+  );
+};
+
+const NotificationsTest: Component = () => {
+  const [inputText, setInputText] = createSignal("my message!");
+
+  let bus!: EventStack<
+    string,
+    {
+      text: string;
+    }
+  >;
+
+  return (
+    <div class="node-h">
+      <form
+        class="flex space-x-2"
+        onsubmit={e => {
+          e.preventDefault();
+          bus.emit(inputText());
+          setInputText("");
+        }}
+      >
+        <input
+          type="text"
+          value={inputText()}
+          oninput={e => setInputText(e.currentTarget.value)}
+        ></input>
+        <button class="btn">SEND</button>
+        <button class="btn" type="button" onclick={() => bus.setStack([])}>
+          CLEAR
+        </button>
+      </form>
+      <Toaster useEventBus={x => (bus = x)} />
+    </div>
+  );
+};
+
+const Toaster: Component<{
+  useEventBus: (
+    bus: EventStack<
+      string,
+      {
+        text: string;
+      }
+    >
+  ) => void;
+}> = props => {
+  const bus = createEventStack<
+    string,
+    {
+      text: string;
+    }
+  >({
+    toValue: e => {
+      const text = e.length > 50 ? e.substring(0, 50) + "..." : e;
+      return { text };
+    },
+    beforeEmit: e => {
+      console.log("bout to be emited:", e);
+    },
+    emitGuard: (emit, event) => {
+      if (event) emit(event);
+      else console.log("Empty messages are not allowed");
+    }
+  });
+
+  props.useEventBus(bus);
+
+  return (
+    <div class="fixed top-4 right-4 flex flex-col items-end space-y-4">
+      <For each={bus.value()}>
+        {item => (
+          <div class="p-2 px-3 bg-gray-600">
+            <span class="mr-2">{item.text}</span>
+            <button onClick={() => bus.removeValue(item)}>X</button>
+          </div>
+        )}
+      </For>
     </div>
   );
 };
