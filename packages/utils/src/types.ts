@@ -53,6 +53,8 @@ export type DeepPartialAny<T> = {
 
 export type AnyObject = Record<string, any>;
 
+export type PrimitiveValue = string | boolean | number | bigint | symbol | null | undefined
+
 /**
  * Destructible store object, with values changed to accessors
  */
