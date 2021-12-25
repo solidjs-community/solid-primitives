@@ -1,45 +1,62 @@
-import { ClearListeners, Unsubscribe, createEventBus, EventBus, createPubsub, Listener } from ".";
-import { Store } from "solid-js/store";
+import {
+  ClearListeners,
+  Unsubscribe,
+  createEventBus,
+  createEmitter,
+  Listener,
+  GenericListenProtect
+} from ".";
+import { Accessor } from "solid-js";
 
-type PayloadMap<ChannelMap extends Record<string, EventBus>> = {
+type EventMap<ChannelMap extends Record<string, EventHubChannel>> = {
   [Event in keyof ChannelMap]: NonNullable<ReturnType<ChannelMap[Event]["value"]>>;
 };
 
-type ValueMap<ChannelMap extends Record<string, EventBus>> = {
+type ValueMap<ChannelMap extends Record<string, EventHubChannel>> = {
   [Event in keyof ChannelMap]: ReturnType<ChannelMap[Event]["value"]>;
 };
 
-export type EventHubListener<ChannelMap extends Record<string, EventBus>> = <
+export type EventHubListener<ChannelMap extends Record<string, EventHubChannel>> = <
   Event extends keyof ChannelMap
 >(
-  event: Event,
-  payload: PayloadMap<ChannelMap>[Event]
+  name: Event,
+  event: EventMap<ChannelMap>[Event]
 ) => void;
 
-export type EventHubListen<ChannelMap extends Record<string, EventBus>> = <
-  Event extends keyof ChannelMap
+export type EventHubListen<ChannelMap extends Record<string, EventHubChannel>> = <
+  Name extends keyof ChannelMap
 >(
-  event: Event,
-  listener: Listener<PayloadMap<ChannelMap>[Event]>,
+  name: Name,
+  listener: Listener<EventMap<ChannelMap>[Name]>,
   protect?: boolean
 ) => Unsubscribe;
 
-export type EventHubRemove<ChannelMap extends Record<string, EventBus>> = <
-  Event extends keyof ChannelMap
+export type EventHubRemove<ChannelMap extends Record<string, EventHubChannel>> = <
+  Name extends keyof ChannelMap
 >(
-  event: Event,
-  listener: Listener<PayloadMap<ChannelMap>[Event]>
+  name: Name,
+  listener: Listener<EventMap<ChannelMap>[Name]>
+) => boolean;
+
+export type EventHubEmit<ChannelMap extends Record<string, EventHubChannel>> = <
+  Name extends keyof ChannelMap,
+  Event extends EventMap<ChannelMap>[Name]
+>(
+  ...a: Event extends void ? [name: Name] : [name: Name, event: Event]
 ) => void;
 
-export type EventHubEmit<ChannelMap extends Record<string, EventBus>> = <
-  Event extends keyof ChannelMap,
-  Payload extends PayloadMap<ChannelMap>[Event]
->(
-  ...a: Payload extends void ? [event: Event] : [event: Event, payload: Payload]
-) => void;
+export interface EventHubChannel<Event = void, V = Event | undefined> {
+  remove: (fn: Listener<Event>) => boolean;
+  listen: GenericListenProtect<Listener<Event>>;
+  once: GenericListenProtect<Listener<Event>>;
+  emit: (event: Event) => void;
+  clear: ClearListeners;
+  value: Accessor<V>;
+}
 
-export type EventHub<ChannelMap extends Record<string, EventBus>> = ChannelMap & {
+export type EventHub<ChannelMap extends Record<string, EventHubChannel>> = ChannelMap & {
   listen: EventHubListen<ChannelMap>;
+  once: EventHubListen<ChannelMap>;
   remove: EventHubRemove<ChannelMap>;
   emit: EventHubEmit<ChannelMap>;
   clear: (event: keyof ChannelMap) => void;
@@ -47,25 +64,26 @@ export type EventHub<ChannelMap extends Record<string, EventBus>> = ChannelMap &
   globalListen: (listener: EventHubListener<ChannelMap>) => Unsubscribe;
   globalRemove: (listener: EventHubListener<ChannelMap>) => void;
   globalClear: ClearListeners;
-  value: Store<ValueMap<ChannelMap>>;
+  value: ValueMap<ChannelMap>;
 };
 
-export function createEventHub<ChannelMap extends Record<string, EventBus<any, any>>>(
+export function createEventHub<ChannelMap extends Record<string, EventHubChannel<any, any>>>(
   createBuses: (bus: typeof createEventBus) => ChannelMap
 ): EventHub<ChannelMap> {
-  const global = createPubsub<string, any>();
+  const global = createEmitter<string, any>();
   const buses = createBuses(createEventBus);
   const store: Record<string, any> = {};
 
-  Object.entries(buses).forEach(([event, bus]) => {
-    Object.defineProperty(store, event, { get: bus.value, enumerable: true });
-    bus.listen(payload => global.emit(event, payload), true);
+  Object.entries(buses).forEach(([name, bus]) => {
+    Object.defineProperty(store, name, { get: bus.value, enumerable: true });
+    bus.listen(event => global.emit(name, event), true);
   });
 
   return {
     ...buses,
-    value: store as Store<ValueMap<ChannelMap>>,
+    value: store as ValueMap<ChannelMap>,
     listen: (e, ...a) => buses[e].listen(...a),
+    once: (e, ...a) => buses[e].once(...a),
     remove: (e, fn) => buses[e].remove(fn),
     emit: (e, data?: any) => buses[e].emit(data),
     clear: e => buses[e].clear(),
@@ -76,13 +94,17 @@ export function createEventHub<ChannelMap extends Record<string, EventBus<any, a
   };
 }
 
+// /* Type Check */
 // const { test, other, bus, news, messages, listen, remove, emit, clear, clearAll, value } =
 //   createEventHub(bus => ({
-//     test: bus<string>({ initialValue: "Initial" }),
+//     test: bus<string>({ value: "Initial" }),
 //     other: bus<void>(),
 //     news: bus<[Date, string]>(),
+//     foo: createEmitter<Date>(),
 //     bus: createEventBus<number>(),
-//     messages: createEventStack<string>()
+//     messages: createEventStack({
+//       toValue: (e: string) => ({ text: e })
+//     })
 //   }));
 
 // listen("news", ([date, message]) => {});

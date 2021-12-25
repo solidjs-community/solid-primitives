@@ -1,5 +1,5 @@
 import { Accessor, createSignal } from "solid-js";
-import { ClearListeners, Unsubscribe, Emit, createPubsub, PubsubConfig } from ".";
+import { ClearListeners, Unsubscribe, Emit, createEmitter, EmitterConfig } from ".";
 
 export type EventBusListener<Payload = void, V = Payload | undefined> = (
   payload: Payload,
@@ -27,50 +27,27 @@ export type EventBus<Payload = void, V = Payload | undefined> = {
 
 // Initial value was NOT provided
 export function createEventBus<Payload = void, V extends Payload | undefined = Payload | undefined>(
-  config?: PubsubConfig<Payload, V> & {
+  config?: EmitterConfig<Payload, V> & {
     value?: undefined;
   }
 ): EventBus<Payload, V>;
 // Initial value was provided
 export function createEventBus<Payload = void, V extends Payload = Payload>(
-  config: PubsubConfig<Payload, V> & {
+  config: EmitterConfig<Payload, V> & {
     value: V;
   }
 ): EventBus<Payload, V>;
 export function createEventBus<Payload, V>(
-  config: PubsubConfig<Payload, V> & {
+  config: EmitterConfig<Payload, V> & {
     value?: V;
   } = {}
 ): EventBus<Payload, V> {
-  type _Listener = EventBusListener<Payload, V>;
-
   const { value: initialValue } = config;
-  const pubsub = createPubsub<Payload, V>(config);
-
-  const protectedSet = new Set<_Listener>();
+  const pubsub = createEmitter<Payload, V>(config);
   const [value, setValue] = createSignal<any>(initialValue);
-
-  const protectedUnsub = (listener: _Listener, unsub: Unsubscribe, protect = false) => {
-    if (protect) {
-      protectedSet.add(listener);
-      return () => {
-        protectedSet.delete(listener);
-        unsub();
-      };
-    }
-    return unsub;
-  };
 
   return {
     ...pubsub,
-    listen: (listener, protect) => {
-      const unsub = pubsub.listen(listener);
-      return protectedUnsub(listener, unsub, protect);
-    },
-    once: (listener, protect) => {
-      const unsub = pubsub.once(listener);
-      return protectedUnsub(listener, unsub, protect);
-    },
     emit: payload => {
       let prev!: V;
       setValue(p => {

@@ -1,11 +1,11 @@
 import {
   createEventBus,
   createEventHub,
-  createPubsub,
+  createEmitter,
   MultiArgEmit,
   EventBusListen,
   Listen,
-  createSimplePubsub,
+  createSimpleEmitter,
   createEventStack,
   EventStack
   // EventBusSubscribe,
@@ -61,7 +61,7 @@ const PubsubTest: Component = () => {
     );
   };
 
-  const [sub, emit] = createSimplePubsub<boolean>();
+  const [sub, emit] = createSimpleEmitter<boolean>();
   return (
     <div class="node-h">
       <Switch emit={emit} />
@@ -213,9 +213,9 @@ const Toaster: Component<{
     <div class="fixed top-4 right-4 flex flex-col items-end space-y-4">
       <For each={bus.value()}>
         {item => (
-          <div class="p-2 px-3 bg-gray-600">
+          <div class="p-2 px-3 bg-gray-600 animate-fade-in-down animate-count-1 animate-duration-150">
             <span class="mr-2">{item.text}</span>
-            <button onClick={() => bus.removeValue(item)}>X</button>
+            <button onClick={() => bus.removeFromStack(item)}>X</button>
           </div>
         )}
       </For>

@@ -1,8 +1,8 @@
 import { onCleanup } from "solid-js";
-import { ClearListeners, MultiArgEmit, MultiArgListen, MultiArgListener } from ".";
+import { ClearListeners, MultiArgEmit, GenericListen, MultiArgListener } from ".";
 
-export function createSimplePubsub<A0 = void, A1 = void, A2 = void>(): [
-  listen: MultiArgListen<A0, A1, A2>,
+export function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(): [
+  listen: GenericListen<MultiArgListener<A0, A1, A2>>,
   emit: MultiArgEmit<A0, A1, A2>,
   clear: ClearListeners
 ] {
