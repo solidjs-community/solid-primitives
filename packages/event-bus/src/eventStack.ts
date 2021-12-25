@@ -1,6 +1,7 @@
 import { Accessor, createSignal, Setter } from "solid-js";
 import { ClearListeners, createEmitter, Emit, EmitterConfig, GenericListenProtect } from ".";
 import { push, drop } from "@solid-primitives/utils/fp";
+import { filterOut } from "@solid-primitives/utils/setter";
 import { Fn } from "@solid-primitives/utils";
 
 export type EventStackListener<E, V = E> = (event: V, stack: V[], removeFromStack: Fn) => void;
@@ -40,34 +41,24 @@ export function createEventStack<E, V>(
   const { toValue = (e: any) => e, length = 0 } = config;
 
   const [stack, setStack] = createSignal<V[]>([]);
-  const eventBus = createEmitter<E>(config);
-  const valueBus = createEmitter<V, V[], Fn>();
+  const eventEmitter = createEmitter<E>(config);
+  const valueEmitter = createEmitter<V, V[], Fn>();
 
-  eventBus.listen(event => {
+  eventEmitter.listen(event => {
     const value = toValue(event);
     setStack(p => {
       const list = push(p, value);
       return length && list.length > length ? drop(list) : list;
     });
-    valueBus.emit(value, stack(), () => removeFromStack(value));
+    valueEmitter.emit(value, stack(), () => removeFromStack(value));
   });
 
-  const removeFromStack: EventStack<E, V>["removeFromStack"] = value => {
-    let removed: boolean = false;
-    setStack(p =>
-      p.filter(item => {
-        if (item !== value) {
-          removed = true;
-          return true;
-        } else return false;
-      })
-    );
-    return removed;
-  };
+  const removeFromStack: EventStack<E, V>["removeFromStack"] = value =>
+    !!setStack(filterOut(value)).removed;
 
   return {
-    ...valueBus,
-    emit: eventBus.emit,
+    ...valueEmitter,
+    emit: eventEmitter.emit,
     value: stack,
     stack,
     setStack,

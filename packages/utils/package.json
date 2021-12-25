@@ -28,12 +28,20 @@
       "types": "./dist/fp.d.ts",
       "require": "./dist/fp.cjs",
       "import": "./dist/fp.js"
+    },
+    "./setter": {
+      "types": "./dist/setter.d.ts",
+      "require": "./dist/setter.cjs",
+      "import": "./dist/setter.js"
     }
   },
   "typesVersions": {
     "*": {
       "fp": [
         "./dist/fp.d.ts"
+      ],
+      "setter": [
+        "./dist/setter.d.ts"
       ]
     }
   },

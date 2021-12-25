@@ -1,3 +1,5 @@
+import { Predicate } from ".";
+
 export const withArrayCopy = <T>(list: readonly T[], fn: (list: T[]) => void): T[] => {
   const copy = list.slice();
   fn(copy);
@@ -8,3 +10,15 @@ export const push = <T>(list: readonly T[], item: T): T[] =>
   withArrayCopy(list, list => list.push(item));
 
 export const drop = <T>(list: readonly T[], n = 1): T[] => list.slice(n);
+
+export function filterOut<T>(list: readonly T[], item: T): T[] & { removed: number } {
+  const newList: T[] & { removed: number } = list.filter(i => i !== item) as any;
+  newList.removed = list.length - newList.length;
+  return newList;
+}
+
+export function filter<T>(list: readonly T[], predicate: Predicate<T>): T[] & { removed: number } {
+  const newList: T[] & { removed: number } = list.filter(predicate) as any;
+  newList.removed = list.length - newList.length;
+  return newList;
+}
