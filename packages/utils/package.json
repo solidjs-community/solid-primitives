@@ -18,6 +18,25 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    },
+    "./fp": {
+      "types": "./dist/fp.d.ts",
+      "require": "./dist/fp.cjs",
+      "import": "./dist/fp.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "fp": [
+        "./dist/fp.d.ts"
+      ]
+    }
+  },
   "scripts": {
     "build": "tsup",
     "test": "uvu -r solid-register",

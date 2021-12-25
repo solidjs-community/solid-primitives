@@ -1,4 +1,5 @@
-export type Fn = () => void;
+import { Fn } from "@solid-primitives/utils";
+
 export type ClearListeners = Fn;
 export type Unsubscribe = Fn;
 

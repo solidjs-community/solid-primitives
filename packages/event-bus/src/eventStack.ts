@@ -1,5 +1,7 @@
 import { Accessor, createSignal, Setter } from "solid-js";
-import { ClearListeners, createEmitter, Emit, EmitterConfig, Fn, GenericListenProtect } from ".";
+import { ClearListeners, createEmitter, Emit, EmitterConfig, GenericListenProtect } from ".";
+import { push, drop } from "@solid-primitives/utils/fp";
+import { Fn } from "@solid-primitives/utils";
 
 export type EventStackListener<E, V = E> = (event: V, stack: V[], removeFromStack: Fn) => void;
 
@@ -16,20 +18,26 @@ export type EventStack<E, V = E> = {
 };
 
 // Overload 0: "toValue" was not passed
-export function createEventStack<E extends object>(config?: EmitterConfig<E>): EventStack<E, E>;
-// Overload 1:
+export function createEventStack<E extends object>(
+  config?: EmitterConfig<E> & {
+    length?: number;
+  }
+): EventStack<E, E>;
+// Overload 1: "toValue" was set
 export function createEventStack<E, V extends object>(
   config: EmitterConfig<E> & {
     toValue: (event: E) => V;
+    length?: number;
   }
 ): EventStack<E, V>;
 
 export function createEventStack<E, V>(
   config: EmitterConfig<E> & {
     toValue?: (event: E) => V;
+    length?: number;
   } = {}
 ): EventStack<E, V> {
-  const { toValue = (e: any) => e } = config;
+  const { toValue = (e: any) => e, length = 0 } = config;
 
   const [stack, setStack] = createSignal<V[]>([]);
   const eventBus = createEmitter<E>(config);
@@ -37,7 +45,10 @@ export function createEventStack<E, V>(
 
   eventBus.listen(event => {
     const value = toValue(event);
-    setStack(p => [...p, value]);
+    setStack(p => {
+      const list = push(p, value);
+      return length && list.length > length ? drop(list) : list;
+    });
     valueBus.emit(value, stack(), () => removeFromStack(value));
   });
 
