@@ -13,8 +13,11 @@
     "name": "event-bus",
     "stage": 0,
     "list": [
+      "createSimpleEmitter",
+      "createEmitter",
       "createEventBus",
-      "createMultiEventBus"
+      "createEventHub",
+      "createEventStack"
     ],
     "category": "Utilities"
   },
@@ -39,20 +42,22 @@
     "solid",
     "primitives"
   ],
+  "dependencies": {
+    "@solid-primitives/utils": "^0.0.261"
+  },
   "devDependencies": {
     "jsdom": "^19.0.0",
     "prettier": "^2.5.1",
     "solid-register": "^0.0.18",
     "tslib": "^2.3.1",
-    "tsup": "^5.11.1",
-    "typescript": "^4.5.3",
-    "unocss": "^0.16.0",
+    "tsup": "^5.11.9",
+    "typescript": "^4.5.4",
+    "unocss": "^0.18.0",
     "uvu": "^0.5.2",
-    "vite": "2.7.1",
+    "vite": "2.7.6",
     "vite-plugin-solid": "2.1.4"
   },
   "peerDependencies": {
-    "solid-js": "^1.2.6",
-    "@solid-primitives/utils": "^0.0.260"
+    "solid-js": "^1.2.6"
   }
 }
