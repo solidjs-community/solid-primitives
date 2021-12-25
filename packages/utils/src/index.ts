@@ -11,6 +11,9 @@ export * from "./types";
 export const isClient = !isServer;
 export { isServer };
 
+export const isDefined = <T>(value: T | undefined | null): value is T =>
+  typeof value !== "undefined" && value !== null;
+
 /**
  * Accesses the value of a MaybeAccessor
  * @example
@@ -49,7 +52,7 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
   fn: (value: NonNullable<V>) => void
 ) => {
   const _value = access(value);
-  if (typeof _value !== "undefined" && _value !== null) fn(_value as NonNullable<V>);
+  isDefined(_value) && fn(_value as NonNullable<V>);
 };
 
 export const forEach = <A extends MaybeAccessor<any>, V = MaybeAccessorValue<A>>(
