@@ -202,7 +202,7 @@ const Toaster: Component<{
       console.log("bout to be emited:", e);
     },
     emitGuard: (emit, event) => {
-      if (event) emit(event);
+      if (event) emit();
       else console.log("Empty messages are not allowed");
     },
     length: 10

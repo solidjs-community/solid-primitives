@@ -12,13 +12,13 @@ export const push = <T>(list: readonly T[], item: T): T[] =>
 export const drop = <T>(list: readonly T[], n = 1): T[] => list.slice(n);
 
 export function filterOut<T>(list: readonly T[], item: T): T[] & { removed: number } {
-  const newList: T[] & { removed: number } = list.filter(i => i !== item) as any;
+  const newList = list.filter(i => i !== item) as T[] & { removed: number };
   newList.removed = list.length - newList.length;
   return newList;
 }
 
 export function filter<T>(list: readonly T[], predicate: Predicate<T>): T[] & { removed: number } {
-  const newList: T[] & { removed: number } = list.filter(predicate) as any;
+  const newList = list.filter(predicate) as T[] & { removed: number };
   newList.removed = list.length - newList.length;
   return newList;
 }

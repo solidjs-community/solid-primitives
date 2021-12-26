@@ -145,8 +145,55 @@ Extends [`createEmitter`](#createEmitter). Provides the emitted events in a list
 
 ### How to use it
 
+#### Creating the event bus
+
 ```ts
 import { createEventStack } from "@solid-primitives/event-bus";
+
+// 1. event type has to be an object
+// be what you emit will be added to the value stack
+const bus = createEventStack<{ message: string }>();
+
+// 2. provide event type, value type, and toValue parsing function
+// value type has to be an object
+const bus = createEventStack<string, { text: string }>({
+  toValue: e => ({ text: e })
+});
+
+// can be destructured:
+const { listen, emit, has, clear, value } = bus;
+```
+
+#### Listening & Emitting
+
+```ts
+const listener: EventStackListener<{ text: string }> = (event, stack, removeValue) => {
+  console.log(event, stack);
+  // you can remove the value from stack
+  removeValue();
+};
+bus.listen(listener);
+
+bus.emit("foo");
+
+bus.remove(listener);
+bus.has(listener); // false
+
+// pass true as a second argument to protect the listener
+bus.listen(listener, true);
+bus.remove(listener);
+bus.has(listener); // true
+```
+
+#### Event Stack
+
+```ts
+// a signal accessor:
+bus.stack() // => { text: string }[]
+
+bus.removeFromStack(value) // pass a reference to the value
+
+bus.setStack(stack => stack.filter(item => {...}))
 ```
 
 ### Types
