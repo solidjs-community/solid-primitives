@@ -1,7 +1,9 @@
 import { createSimpleEmitter } from "../src";
 import { createRoot } from "solid-js";
-import { test } from "uvu";
+import { suite } from "uvu";
 import * as assert from "uvu/assert";
+
+const test = suite("createSimpleEmitter");
 
 test("return values", () =>
   createRoot(dispose => {
