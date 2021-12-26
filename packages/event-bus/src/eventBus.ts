@@ -1,49 +1,44 @@
 import { Accessor, createSignal } from "solid-js";
 import { ClearListeners, Unsubscribe, Emit, createEmitter, EmitterConfig } from ".";
 
-export type EventBusListener<Payload, V = Payload | undefined> = (
-  payload: Payload,
-  prev: V
-) => void;
+export type EventBusListener<Event, V = Event | undefined> = (payload: Event, prev: V) => void;
 
-export type EventBusListen<Payload, V = Payload | undefined> = (
-  listener: EventBusListener<Payload, V>,
+export type EventBusListen<Event, V = Event | undefined> = (
+  listener: EventBusListener<Event, V>,
   protect?: boolean
 ) => Unsubscribe;
 
-export type EventBusRemove<Payload, V = Payload | undefined> = (
-  listener: EventBusListener<Payload, V>
+export type EventBusRemove<Event, V = Event | undefined> = (
+  listener: EventBusListener<Event, V>
 ) => boolean;
 
-export type EventBus<Payload, V = Payload | undefined> = {
-  remove: EventBusRemove<Payload, V>;
-  listen: EventBusListen<Payload, V>;
-  once: EventBusListen<Payload, V>;
-  emit: Emit<Payload>;
+export type EventBus<Event, V = Event | undefined> = {
+  remove: EventBusRemove<Event, V>;
+  listen: EventBusListen<Event, V>;
+  once: EventBusListen<Event, V>;
+  emit: Emit<Event>;
   clear: ClearListeners;
-  has: (listener: EventBusListener<Payload, V>) => boolean;
+  has: (listener: EventBusListener<Event, V>) => boolean;
   value: Accessor<V>;
 };
 
 // Initial value was NOT provided
-export function createEventBus<Payload>(
-  config?: EmitterConfig<Payload, Payload | undefined> & {
-    value?: undefined;
-  }
-): EventBus<Payload, Payload | undefined>;
+export function createEventBus<Event>(
+  config?: EmitterConfig<Event, Event | undefined>
+): EventBus<Event, Event | undefined>;
 // Initial value was provided
-export function createEventBus<Payload>(
-  config: EmitterConfig<Payload, Payload> & {
-    value: Payload;
+export function createEventBus<Event>(
+  config: EmitterConfig<Event, Event> & {
+    value: Event;
   }
-): EventBus<Payload, Payload>;
-export function createEventBus<Payload, V>(
-  config: EmitterConfig<Payload, V> & {
+): EventBus<Event, Event>;
+export function createEventBus<Event, V>(
+  config: EmitterConfig<Event, V> & {
     value?: V;
   } = {}
-): EventBus<Payload, V> {
+): EventBus<Event, V> {
   const { value: initialValue } = config;
-  const pubsub = createEmitter<Payload, V>(config);
+  const pubsub = createEmitter<Event, V>(config);
   const [value, setValue] = createSignal<any>(initialValue);
 
   return {

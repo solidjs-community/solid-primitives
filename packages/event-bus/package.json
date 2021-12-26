@@ -11,7 +11,7 @@
   },
   "primitive": {
     "name": "event-bus",
-    "stage": 0,
+    "stage": 1,
     "list": [
       "createSimpleEmitter",
       "createEmitter",

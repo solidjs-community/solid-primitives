@@ -204,7 +204,8 @@ const Toaster: Component<{
     emitGuard: (emit, event) => {
       if (event) emit(event);
       else console.log("Empty messages are not allowed");
-    }
+    },
+    length: 10
   });
 
   props.useEventBus(bus);
