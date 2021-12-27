@@ -206,10 +206,62 @@ bus.setStack(stack => stack.filter(item => {...}))
 
 Provides functions for using a group of emitters.
 
+Can be used with [`createEmitter`](#createEmitter), [`createEventBus`](#createEventBus), [`createEventStack`](#createEventStack).
+
 ### How to use it
+
+#### Creating EventHub
 
 ```ts
 import { createEventHub } from "@solid-primitives/event-bus";
+
+// by passing an record of Channels
+const hub = createEventHub({
+  busA: createEmitter<void>(),
+  busB: createEventBus<string>(),
+  busC: createEventStack<{ text: string }>()
+});
+
+// by passing a function
+const hub = createEventHub(bus => ({
+  busA: bus<number>(),
+  busB: bus<string>(),
+  busC: createEventStack<{ text: string }>()
+}));
+
+// hub can be destructured
+const { busA, busB, listen, emit, clear, globalListen } = hub;
+```
+
+#### Listening & Emitting
+
+```ts
+// using hub methods:
+hub.listen("busA", e => {});
+hub.listen("busB", e => {});
+
+hub.emit("busA", 0);
+hub.emit("busB", "foo");
+
+// using emitters
+hub.busA.listen(e => {});
+hub.busA.emit(1);
+
+hub.busB.listen(e => {});
+hub.busB.emit("bar");
+
+// global listener - listens to all channels
+hub.globalListen((name, e) => {});
+```
+
+#### Accessing values
+
+If a emitter returns an accessor value, it will be available in a `.store` store.
+
+```ts
+hub.store.myBus;
+// same as
+hub.myBus.value();
 ```
 
 ### Types

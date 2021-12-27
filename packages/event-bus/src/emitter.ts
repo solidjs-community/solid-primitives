@@ -6,8 +6,7 @@ import {
   GenericListenProtect,
   MultiArgListener,
   Remove,
-  RemoveGuard,
-  Unsubscribe
+  RemoveGuard
 } from ".";
 
 export type Emitter<A0 = void, A1 = void, A2 = void> = {
@@ -38,17 +37,17 @@ export function createEmitter<A0 = void, A1 = void, A2 = void>(
   const protectedSet = new WeakSet<_Listener>();
   const listeners = new Set<_Listener>();
 
-  const forEachListener = (fn: (listener: _Listener) => void) => {
-    for (const cb of listeners.values()) fn(cb);
-  };
-
   const _remove: _Remove = listener =>
     protectedSet.has(listener) ? false : !!listeners.delete(listener);
   const remove: _Remove = removeGuard
     ? listener => removeGuard(() => _remove(listener), listener)
     : _remove;
 
-  const protectedUnsub = (listener: _Listener, unsub: Unsubscribe) => {
+  const listen: _Listen = (listener, protect) => {
+    listeners.add(listener);
+    const unsub = () => listeners.delete(listener);
+    onCleanup(unsub);
+    if (!protect) return unsub;
     protectedSet.add(listener);
     return () => {
       protectedSet.delete(listener);
@@ -56,27 +55,20 @@ export function createEmitter<A0 = void, A1 = void, A2 = void>(
     };
   };
 
-  const listen: _Listen = (listener, protect) => {
-    listeners.add(listener);
-    const unsub = () => listeners.delete(listener);
-    onCleanup(unsub);
-    return protect ? protectedUnsub(listener, unsub) : unsub;
-  };
-
   const once: _Listen = (listener, protect) => {
     const unsub = listen((...args) => {
       unsub();
       return listener(...args);
     }, protect);
-    return protect ? protectedUnsub(listener, unsub) : unsub;
+    return unsub;
   };
 
   const _emit: _Emit = beforeEmit
     ? (...payload) => {
         beforeEmit(...payload);
-        forEachListener(cb => cb(...payload));
+        listeners.forEach(cb => cb(...payload));
       }
-    : (...payload) => forEachListener(cb => cb(...payload));
+    : (...payload) => listeners.forEach(cb => cb(...payload));
   const emit: _Emit = emitGuard
     ? (...payload) =>
         emitGuard(
@@ -96,7 +88,7 @@ export function createEmitter<A0 = void, A1 = void, A2 = void>(
     once,
     emit,
     remove,
-    clear: () => forEachListener(cb => remove(cb)),
+    clear: () => listeners.forEach(cb => remove(cb)),
     has: listener => listeners.has(listener),
     value: () => {}
   };

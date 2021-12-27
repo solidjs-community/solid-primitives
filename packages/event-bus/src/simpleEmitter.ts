@@ -15,9 +15,7 @@ export function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(): [
       onCleanup(() => set.delete(listener));
       return () => set.delete(listener);
     },
-    (...payload) => {
-      for (const cb of set.values()) cb(...payload);
-    },
+    (...payload) => set.forEach(cb => cb(...payload)),
     () => set.clear()
   ];
 }
