@@ -30,12 +30,12 @@ syncTest("returned values", () => {
   assert.type(hub.clear, "function");
   assert.type(hub.clearAll, "function");
   assert.type(hub.emit, "function");
-  assert.type(hub.globalClear, "function");
-  assert.type(hub.globalListen, "function");
-  assert.type(hub.globalRemove, "function");
+  assert.type(hub.clearGlobal, "function");
   assert.type(hub.listen, "function");
-  assert.type(hub.once, "function");
   assert.type(hub.remove, "function");
+  assert.type(hub.on, "function");
+  assert.type(hub.once, "function");
+  assert.type(hub.off, "function");
   assert.type(hub.store, "object");
 });
 
@@ -49,9 +49,9 @@ syncTest("listening and emiting", () => {
     busB: createEventBus<string>()
   });
 
-  hub.listen("busA", e => capturedA.push(e));
-  hub.listen("busB", e => capturedB.push(e));
-  hub.globalListen((name, [e]) => capturedAny.push([name, e]));
+  hub.on("busA", e => capturedA.push(e));
+  hub.on("busB", e => capturedB.push(e));
+  hub.listen((name, [e]) => capturedAny.push([name, e]));
 
   hub.emit("busA", 0);
   hub.busA.emit(1);
@@ -78,9 +78,9 @@ syncTest("clearing listeners", () => {
     busB: createEventBus<string>()
   });
 
-  hub.listen("busA", e => capturedA.push(e));
-  hub.listen("busB", e => capturedB.push(e));
-  hub.globalListen((name, [e]) => capturedAny.push([name, e]));
+  hub.on("busA", e => capturedA.push(e));
+  hub.on("busB", e => capturedB.push(e));
+  hub.listen((name, [e]) => capturedAny.push([name, e]));
 
   hub.clear("busA");
 
@@ -108,7 +108,7 @@ syncTest("clearing listeners", () => {
     ["busB", "bar"]
   ]);
 
-  hub.globalClear();
+  hub.clearGlobal();
 
   hub.emit("busA", 2);
   hub.emit("busB", "baz");

@@ -50,15 +50,15 @@ export interface EventHubChannel {
 }
 
 export type EventHub<ChannelMap extends Record<string, EventHubChannel>> = ChannelMap & {
-  listen: EventHubListen<ChannelMap>;
+  on: EventHubListen<ChannelMap>;
   once: EventHubListen<ChannelMap>;
-  remove: EventHubRemove<ChannelMap>;
+  off: EventHubRemove<ChannelMap>;
   emit: EventHubEmit<ChannelMap>;
   clear: (event: keyof ChannelMap) => void;
   clearAll: ClearListeners;
-  globalListen: (listener: EventHubGlobalListener<ChannelMap>, protect?: boolean) => Unsubscribe;
-  globalRemove: (listener: EventHubGlobalListener<ChannelMap>) => void;
-  globalClear: ClearListeners;
+  listen: (listener: EventHubGlobalListener<ChannelMap>, protect?: boolean) => Unsubscribe;
+  remove: (listener: EventHubGlobalListener<ChannelMap>) => void;
+  clearGlobal: ClearListeners;
   store: ValueMap<ChannelMap>;
 };
 
@@ -78,15 +78,15 @@ export function createEventHub<ChannelMap extends Record<string, EventHubChannel
   return {
     ...buses,
     store: store as ValueMap<ChannelMap>,
-    listen: (e, ...a) => buses[e].listen(...(a as [any])),
+    on: (e, ...a) => buses[e].listen(...(a as [any])),
     once: (e, ...a) => buses[e].once(...(a as [any])),
-    remove: (e, ...a) => buses[e].remove(...(a as [any])),
+    off: (e, ...a) => buses[e].remove(...(a as [any])),
     emit: (e, ...a) => buses[e].emit(...a),
     clear: e => buses[e].clear(),
     clearAll: () => Object.values(buses).forEach(bus => bus.clear()),
-    globalListen: global.listen,
-    globalRemove: global.remove,
-    globalClear: global.clear
+    listen: global.listen,
+    remove: global.remove,
+    clearGlobal: global.clear
   };
 }
 
@@ -103,18 +103,18 @@ export function createEventHub<ChannelMap extends Record<string, EventHubChannel
 //   })
 // }));
 
-// hub.listen("news", ([date, message]) => {});
-// hub.listen("foo", (date, message, number) => {});
+// hub.on("news", ([date, message]) => {});
+// hub.on("foo", (date, message, number) => {});
 
-// hub.remove("test", message => {});
-// hub.remove("news", ([date, message]) => {});
+// hub.off("test", message => {});
+// hub.off("news", ([date, message]) => {});
 
 // hub.emit("news", [new Date(), "HELLO"]);
 // hub.emit("test", "HELLO");
 // hub.emit("foo", new Date(), "HELLO", 123);
 // hub.emit("other");
 
-// hub.globalListen((name, payload) => {});
+// hub.listen((name, payload) => {});
 
 // hub.clear("other");
 // hub.clearAll();
@@ -124,9 +124,9 @@ export function createEventHub<ChannelMap extends Record<string, EventHubChannel
 //   a: Emitter<string, string>;
 // }>;
 
-// hub.value.test;
-// hub.value.news;
-// hub.value.bus;
+// hub.store.test;
+// hub.store.news;
+// hub.store.bus;
 
-// hub.value.messages;
+// hub.store.messages;
 // hub.messages.value;

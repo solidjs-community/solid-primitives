@@ -11,7 +11,7 @@ A collection of primitives providing different functionalities of pubsub/event-e
 - [`createEmitter`](#createEmitter) - Provides all the base functions of an event-emitter, plus additional functions for managing listeners, it's behavior could be customized with an config object. Good for advanced usage.
 - [`createEventBus`](#createEventBus) - Extends [`createEmitter`](#createEmitter). Additionally it provides a signal accessor function with last event's value.
 - [`createEventStack`](#createEventStack) - Extends [`createEmitter`](#createEmitter). Provides the emitted events in a list form, with tools to manage it.
-- [`createEventHub`](#createEventHub) - Provides functions for using a group of emitters.
+- [`createEventHub`](#createEventHub) - Provides helpers for using a group of emitters.
 
 ## Installation
 
@@ -204,7 +204,7 @@ bus.setStack(stack => stack.filter(item => {...}))
 
 ## `createEventHub`
 
-Provides functions for using a group of emitters.
+Provides helpers for using a group of emitters.
 
 Can be used with [`createEmitter`](#createEmitter), [`createEventBus`](#createEventBus), [`createEventStack`](#createEventStack).
 
@@ -230,15 +230,15 @@ const hub = createEventHub(bus => ({
 }));
 
 // hub can be destructured
-const { busA, busB, listen, emit, clear, globalListen } = hub;
+const { busA, busB, on, off, listen, emit, clear } = hub;
 ```
 
 #### Listening & Emitting
 
 ```ts
 // using hub methods:
-hub.listen("busA", e => {});
-hub.listen("busB", e => {});
+hub.on("busA", e => {});
+hub.on("busB", e => {});
 
 hub.emit("busA", 0);
 hub.emit("busB", "foo");
@@ -251,7 +251,7 @@ hub.busB.listen(e => {});
 hub.busB.emit("bar");
 
 // global listener - listens to all channels
-hub.globalListen((name, e) => {});
+hub.listen((name, e) => {});
 ```
 
 #### Accessing values
