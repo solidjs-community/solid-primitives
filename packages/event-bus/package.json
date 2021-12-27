@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/event-bus",
   "version": "0.0.100",
-  "description": "A template primitive example.",
+  "description": "A collection of SolidJS primitives providing various features of a pubsub/event-emitter/event-bus.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/utils#readme",
@@ -39,6 +39,8 @@
   "keywords": [
     "eventbus",
     "pubsub",
+    "event",
+    "emitter",
     "solid",
     "primitives"
   ],

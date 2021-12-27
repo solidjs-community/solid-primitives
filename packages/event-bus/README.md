@@ -5,7 +5,7 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/event-bus?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/event-bus)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
-A collection of primitives providing different functionalities of pubsub/event-emitter/event-bus:
+A collection of SolidJS primitives providing various features of a pubsub/event-emitter/event-bus:
 
 - [`createSimpleEmitter`](#createSimpleEmitter) - Very minimal interface for emiting and receiving events. Good for parent-child component communication.
 - [`createEmitter`](#createEmitter) - Provides all the base functions of an event-emitter, plus additional functions for managing listeners, it's behavior could be customized with an config object. Good for advanced usage.
@@ -57,6 +57,8 @@ Provides all the base functions of an event-emitter, plus additional functions f
 
 ### How to use it
 
+#### Creating Emitter
+
 ```ts
 import { createEmitter } from "@solid-primitives/event-bus";
 
@@ -68,7 +70,11 @@ createEmitter();
 
 // emitter can be destructured:
 const { listen, emit, has, clear } = emitter;
+```
 
+#### Emiting & Listening to events
+
+```ts
 const listener = (a, b, c) => console.log(a, b, c);
 emitter.listen(listener);
 
@@ -87,6 +93,16 @@ emitter.clear();
 // listeners will also be cleared onCleanup automatically
 ```
 
+#### Emitter Config
+
+```ts
+const { listen, has, remove, emit } = createEmitter<string>({
+  beforeEmit: event => {...},
+  emitGuard: (emit, payload) => allowedEmit && emit(), // emit('foo') to emit different value
+  removeGuard: (remove, listener) => allowedRemove && remove()
+});
+```
+
 See [the tests](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/test/emitter.test.ts) for better usage reference.
 
 ### Types
@@ -101,15 +117,20 @@ Extends [`createEmitter`](#createEmitter). Additionally it provides a signal acc
 
 ### How to use it
 
+#### Creating EventBus
+
 ```ts
 import { createEventBus } from "@solid-primitives/event-bus";
 
-// accepts up-to-3 genetic payload types
 const bus = createEventBus<string>();
 
 // can be destructured:
 const { listen, emit, has, clear, value } = bus;
+```
 
+#### Emitting & listening to events
+
+```ts
 const listener = (event, previous) => console.log(event, previous);
 bus.listen(listener);
 
@@ -123,12 +144,34 @@ bus.listen(listener, true);
 bus.remove(listener);
 bus.has(listener); // true
 
-// last event is be available as a signal
-bus.value();
-
 // clear all listeners
 bus.clear();
 // listeners will also be cleared onCleanup automatically
+```
+
+#### Last Value signal
+
+```ts
+// last event is be available as a signal
+bus.value(); // => string | undefined
+
+// pass initial value to config to remove "undefined" from the type
+createEventBus({
+  value: "initial"
+});
+
+bus.value(); // => string
+```
+
+#### EventBus Config
+
+```ts
+createEventBus<string>({
+  beforeEmit: event => console.log(event),
+  emitGuard: (emit, event, prev) => allowedEmit && emit(), // emit('foo') to emit different value,
+  removeGuard: (remove, listener) => allowedRemove && remove(),
+  value: "Initial Value"
+});
 ```
 
 See [the tests](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/test/eventBus.test.ts) for better usage reference.
@@ -194,6 +237,17 @@ bus.stack() // => { text: string }[]
 bus.removeFromStack(value) // pass a reference to the value
 
 bus.setStack(stack => stack.filter(item => {...}))
+```
+
+#### createEventStack Config
+
+```ts
+createEventStack<string, { text: string }>({
+  beforeEmit: (value, stack, remove) => console.log(value, stack),
+  emitGuard: (emit, text) => allowEmit && emit(), // emit('foo') to emit different value
+  removeGuard: (remove, listener) => allowRemove && remove(),
+  toValue: e => ({ text: e })
+});
 ```
 
 ### Types
