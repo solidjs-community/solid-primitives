@@ -146,4 +146,3 @@ This package comes with a number of support utilities built with Lerna Scripts.
 - createWorker (in progress)
 - createQueue
 - createEffectWhen
-- createEventBus *(in progress)*

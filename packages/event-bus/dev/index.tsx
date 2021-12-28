@@ -6,20 +6,9 @@ import {
   EventStack,
   Emit
 } from "../src";
-import {
-  Accessor,
-  Component,
-  createEffect,
-  createRoot,
-  createSignal,
-  For,
-  onCleanup,
-  onMount
-} from "solid-js";
+import { Component, createSignal, For, onMount } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
-import { access, Fn, isDefined, MaybeAccessor } from "@solid-primitives/utils";
-import { on } from "solid-js";
 
 const App: Component = () => {
   return (
@@ -183,21 +172,6 @@ const NotificationsTest: Component = () => {
   );
 };
 
-const createTimeout = (fn: Fn, delay: number, paused?: Accessor<boolean>): Fn =>
-  createRoot(() => {
-    const timeout = setTimeout(fn, delay);
-    const clear = () => clearTimeout(timeout);
-
-    if (isDefined(paused)) {
-      createEffect(() => {
-        console.log(paused());
-      });
-    }
-
-    onCleanup(clear);
-    return clear;
-  });
-
 const Toaster: Component<{
   useEventBus: (
     bus: EventStack<
@@ -208,8 +182,6 @@ const Toaster: Component<{
     >
   ) => void;
 }> = props => {
-  const [paused, setPaused] = createSignal(false);
-
   const bus = createEventStack<
     string,
     {
@@ -221,14 +193,7 @@ const Toaster: Component<{
       return { text };
     },
     beforeEmit: e => {
-      // timeoutMap.set();
-      createTimeout(
-        () => {
-          console.log("remove", e);
-        },
-        4000,
-        paused
-      );
+      console.log("bout to be emitted", e);
     },
     emitGuard: (emit, event) => {
       if (event) emit();
@@ -238,17 +203,11 @@ const Toaster: Component<{
   });
   props.useEventBus(bus);
 
-  // const timeoutMap = new Map();
-
   return (
     <div class="fixed top-4 right-4 flex flex-col items-end space-y-4">
       <For each={bus.value()}>
         {item => (
-          <div
-            class="p-2 px-3 bg-gray-600 animate-fade-in-down animate-count-1 animate-duration-150"
-            onmouseenter={() => setPaused(true)}
-            onmouseleave={() => setPaused(false)}
-          >
+          <div class="p-2 px-3 bg-gray-600 animate-fade-in-down animate-count-1 animate-duration-150">
             <span class="mr-2">{item.text}</span>
             <button onClick={() => bus.removeFromStack(item)}>X</button>
           </div>

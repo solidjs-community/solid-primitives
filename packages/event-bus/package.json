@@ -11,7 +11,7 @@
   },
   "primitive": {
     "name": "event-bus",
-    "stage": 1,
+    "stage": 2,
     "list": [
       "createSimpleEmitter",
       "createEmitter",
@@ -45,7 +45,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^0.0.261"
+    "@solid-primitives/utils": "^0.1.0"
   },
   "devDependencies": {
     "jsdom": "^19.0.0",

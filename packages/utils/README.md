@@ -19,4 +19,8 @@ Republished version with better ESM support and build tooling.
 
 Added comments for util methods.
 
+0.1.0
+
+Add `/fp` and `/setter` export entries. Add `objectPick` and `destore` utils.
+
 </details>
