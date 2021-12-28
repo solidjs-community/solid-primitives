@@ -1,5 +1,5 @@
 import { Accessor, createSignal, Setter } from "solid-js";
-import { createEmitter, Emit, Emitter, EmitterConfig } from ".";
+import { createEmitter, Emitter, EmitterConfig, GenericEmit } from ".";
 import { push, drop } from "@solid-primitives/utils/fp";
 import { filterOut } from "@solid-primitives/utils/setter";
 import { Fn, Modify, objectPick } from "@solid-primitives/utils";
@@ -13,7 +13,7 @@ export type EventStack<E, V = E> = Modify<
     stack: Accessor<V[]>;
     setStack: Setter<V[]>;
     removeFromStack: (value: V) => boolean;
-    emit: Emit<E>;
+    emit: GenericEmit<[E]>;
   }
 >;
 
@@ -23,6 +23,38 @@ type Config<E, V> = {
   removeGuard?: EmitterConfig<V, V[], Fn>["removeGuard"];
   beforeEmit?: EmitterConfig<V, V[], Fn>["beforeEmit"];
 };
+
+/**
+ * Provides all the base functions of an event-emitter, functions for managing listeners, it's behavior could be customized with an config object.
+ * Additionally it provides the emitted events in a list/history form, with tools to manage it.
+ * 
+ * @param config Emitter configuration: `emitGuard`, `removeGuard`, `beforeEmit` functions and `toValue` parsing event to a value in stack.
+ * 
+ * @returns event stack: `{listen, once, emit, remove, clear, has, stack, setStack, removeFromStack}`
+ * 
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-bus#createEventStack
+ * 
+ * @example
+const bus = createEventStack<{ message: string }>();
+// can be destructured:
+const { listen, emit, has, clear, stack } = bus;
+
+const listener: EventStackListener<{ text: string }> = (event, stack, removeValue) => {
+  console.log(event, stack);
+  // you can remove the value from stack
+  removeValue();
+};
+bus.listen(listener);
+
+bus.emit({text: "foo"});
+
+// a signal accessor:
+bus.stack() // => { text: string }[]
+
+bus.removeFromStack(value) // pass a reference to the value
+
+bus.setStack(stack => stack.filter(item => {...}))
+ */
 
 // Overload 0: "toValue" was not passed
 export function createEventStack<E extends object>(config?: Config<E, E>): EventStack<E, E>;

@@ -1,12 +1,30 @@
 import { onCleanup } from "solid-js";
-import { ClearListeners, MultiArgEmit, GenericListen, MultiArgListener } from ".";
+import { ClearListeners, GenericListener, MultiArgListen, GenericEmit } from ".";
 
+/**
+ * Very minimal interface for emiting and receiving events. Good for parent-child component communication.
+ * 
+ * @returns `[listen, emit, clear]`
+ * 
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-bus#createSimpleEmitter
+ * 
+ * @example
+// accepts up-to-3 genetic payload types
+const [listen, emit, clear] = createSimpleEmitter<string, number, boolean>();
+
+listen((a, b, c) => console.log(a, b, c));
+
+emit("foo", 123, true);
+
+// clear all listeners
+clear();
+ */
 export function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(): [
-  listen: GenericListen<MultiArgListener<A0, A1, A2>>,
-  emit: MultiArgEmit<A0, A1, A2>,
+  listen: MultiArgListen<A0, A1, A2>,
+  emit: GenericEmit<[A0, A1, A2]>,
   clear: ClearListeners
 ] {
-  const set = new Set<MultiArgListener<A0, A1, A2>>();
+  const set = new Set<GenericListener<[A0, A1, A2]>>();
   onCleanup(() => set.clear());
 
   return [

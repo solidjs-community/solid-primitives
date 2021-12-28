@@ -10,7 +10,7 @@ A collection of SolidJS primitives providing various features of a pubsub/event-
 - [`createSimpleEmitter`](#createSimpleEmitter) - Very minimal interface for emiting and receiving events. Good for parent-child component communication.
 - [`createEmitter`](#createEmitter) - Provides all the base functions of an event-emitter, plus additional functions for managing listeners, it's behavior could be customized with an config object. Good for advanced usage.
 - [`createEventBus`](#createEventBus) - Extends [`createEmitter`](#createEmitter). Additionally it provides a signal accessor function with last event's value.
-- [`createEventStack`](#createEventStack) - Extends [`createEmitter`](#createEmitter). Provides the emitted events in a list form, with tools to manage it.
+- [`createEventStack`](#createEventStack) - Extends [`createEmitter`](#createEmitter). Provides the emitted events in a list/history form, with tools to manage it.
 - [`createEventHub`](#createEventHub) - Provides helpers for using a group of emitters.
 
 ## Installation
@@ -47,8 +47,14 @@ clear();
 
 ### Types
 
-```ts
+Check out [shared types](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/src/types.ts).
 
+```ts
+function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(): [
+  listen: MultiArgListen<A0, A1, A2>,
+  emit: GenericEmit<[A0, A1, A2]>,
+  clear: ClearListeners
+];
 ```
 
 ## `createEmitter`
@@ -107,8 +113,27 @@ See [the tests](https://github.com/davedbase/solid-primitives/blob/main/packages
 
 ### Types
 
-```ts
+Check out [shared types](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/src/types.ts).
 
+```ts
+function createEmitter<A0 = void, A1 = void, A2 = void>(
+  config: EmitterConfig<A0, A1, A2> = {}
+): Emitter<A0, A1, A2>;
+
+type Emitter<A0 = void, A1 = void, A2 = void> = {
+  listen: MultiArgListenProtect<A0, A1, A2>;
+  once: MultiArgListenProtect<A0, A1, A2>;
+  emit: GenericEmit<[A0, A1, A2]>;
+  remove: Remove<A0, A1, A2>;
+  clear: ClearListeners;
+  has: (listener: GenericListener<[A0, A1, A2]>) => boolean;
+};
+
+type EmitterConfig<A0 = void, A1 = void, A2 = void> = {
+  emitGuard?: EmitGuard<A0, A1, A2>;
+  removeGuard?: RemoveGuard<GenericListener<[A0, A1, A2]>>;
+  beforeEmit?: GenericListener<[A0, A1, A2]>;
+};
 ```
 
 ## `createEventBus`
@@ -178,13 +203,41 @@ See [the tests](https://github.com/davedbase/solid-primitives/blob/main/packages
 
 ### Types
 
-```ts
+Check out [shared types](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/src/types.ts).
 
+```ts
+// Initial value was NOT provided
+function createEventBus<Event>(
+  config?: EmitterConfig<Event, Event | undefined>
+): EventBus<Event, Event | undefined>;
+// Initial value was provided
+function createEventBus<Event>(
+  config: EmitterConfig<Event, Event> & {
+    value: Event;
+  }
+): EventBus<Event, Event>;
+
+type EventBusListener<Event, V = Event | undefined> = GenericListener<[Event, V]>;
+type EventBusListen<Event, V = Event | undefined> = ListenProtect<Event, V>;
+
+type EventBusRemove<Event, V = Event | undefined> = (
+  listener: EventBusListener<Event, V>
+) => boolean;
+
+type EventBus<Event, V = Event | undefined> = {
+  remove: EventBusRemove<Event, V>;
+  listen: EventBusListen<Event, V>;
+  once: EventBusListen<Event, V>;
+  emit: GenericEmit<[Event]>;
+  clear: ClearListeners;
+  has: (listener: EventBusListener<Event, V>) => boolean;
+  value: Accessor<V>;
+};
 ```
 
 ## `createEventStack`
 
-Extends [`createEmitter`](#createEmitter). Provides the emitted events in a list form, with tools to manage it.
+Extends [`createEmitter`](#createEmitter). Provides the emitted events in a list/history form, with tools to manage it.
 
 ### How to use it
 
@@ -252,8 +305,36 @@ createEventStack<string, { text: string }>({
 
 ### Types
 
-```ts
+Check out [shared types](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/src/types.ts).
 
+```ts
+// Overload 0: "toValue" was not passed
+function createEventStack<E extends object>(config?: Config<E, E>): EventStack<E, E>;
+// Overload 1: "toValue" was set
+function createEventStack<E, V extends object>(
+  config: Config<E, V> & {
+    toValue: (event: E, stack: V[]) => V;
+  }
+): EventStack<E, V>;
+
+type EventStackListener<V> = (event: V, stack: V[], removeFromStack: Fn) => void;
+
+type EventStack<E, V = E> = Modify<
+  Emitter<V, V[], Fn>,
+  {
+    value: Accessor<V[]>;
+    stack: Accessor<V[]>;
+    setStack: Setter<V[]>;
+    removeFromStack: (value: V) => boolean;
+    emit: GenericEmit<[E]>;
+  }
+>;
+type Config<E, V> = {
+  length?: number;
+  emitGuard?: EmitterConfig<E>["emitGuard"];
+  removeGuard?: EmitterConfig<V, V[], Fn>["removeGuard"];
+  beforeEmit?: EmitterConfig<V, V[], Fn>["beforeEmit"];
+};
 ```
 
 ## `createEventHub`
@@ -320,8 +401,35 @@ hub.myBus.value();
 
 ### Types
 
-```ts
+Check out [shared types](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/src/types.ts) and [createEventHub source](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/src/eventHub.ts).
 
+```ts
+function createEventHub<ChannelMap extends Record<string, EventHubChannel>>(
+  defineChannels: ((bus: typeof createEventBus) => ChannelMap) | ChannelMap
+): EventHub<ChannelMap>;
+/**
+ * Required interface of a Emitter/EventBus, to be able to be used as a channel in the EventHub
+ */
+interface EventHubChannel {
+  remove: (fn: (...payload: any[]) => void) => boolean;
+  listen: (listener: (...payload: any[]) => void, protect?: boolean) => Unsubscribe;
+  once: (listener: (...payload: any[]) => void, protect?: boolean) => Unsubscribe;
+  emit: (...payload: any[]) => void;
+  clear: ClearListeners;
+  value: Accessor<any>;
+}
+type EventHub<ChannelMap extends Record<string, EventHubChannel>> = ChannelMap & {
+  on: EventHubOn<ChannelMap>;
+  once: EventHubOn<ChannelMap>;
+  off: EventHubOff<ChannelMap>;
+  emit: EventHubEmit<ChannelMap>;
+  clear: (event: keyof ChannelMap) => void;
+  clearAll: ClearListeners;
+  listen: (listener: EventHubListener<ChannelMap>, protect?: boolean) => Unsubscribe;
+  remove: (listener: EventHubListener<ChannelMap>) => void;
+  clearGlobal: ClearListeners;
+  store: ValueMap<ChannelMap>;
+};
 ```
 
 ## Demo

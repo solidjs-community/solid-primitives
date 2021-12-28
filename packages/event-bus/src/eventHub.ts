@@ -1,4 +1,4 @@
-import { ClearListeners, Unsubscribe, createEventBus, createEmitter } from ".";
+import { ClearListeners, Unsubscribe, createEventBus, createEmitter, GenericListener } from ".";
 import { Accessor } from "solid-js";
 import { Keys, Values } from "@solid-primitives/utils";
 
@@ -10,24 +10,24 @@ type ValueMap<ChannelMap extends Record<string, EventHubChannel>> = {
   [Name in keyof ChannelMap]: ReturnType<ChannelMap[Name]["value"]>;
 };
 
-export type EventHubGlobalListener<ChannelMap extends Record<string, EventHubChannel>> = (
+export type EventHubListener<ChannelMap extends Record<string, EventHubChannel>> = (
   name: Keys<ChannelMap>,
   payload: Values<PayloadMap<ChannelMap>>
 ) => void;
 
-export type EventHubListen<ChannelMap extends Record<string, EventHubChannel>> = <
+export type EventHubOn<ChannelMap extends Record<string, EventHubChannel>> = <
   Name extends keyof ChannelMap
 >(
   name: Name,
-  listener: (...payload: PayloadMap<ChannelMap>[Name]) => void,
+  listener: GenericListener<PayloadMap<ChannelMap>[Name]>,
   protect?: boolean
 ) => Unsubscribe;
 
-export type EventHubRemove<ChannelMap extends Record<string, EventHubChannel>> = <
+export type EventHubOff<ChannelMap extends Record<string, EventHubChannel>> = <
   Name extends keyof ChannelMap
 >(
   name: Name,
-  listener: (...payload: PayloadMap<ChannelMap>[Name]) => void
+  listener: GenericListener<PayloadMap<ChannelMap>[Name]>
 ) => boolean;
 
 export type EventHubEmit<ChannelMap extends Record<string, EventHubChannel>> = <
@@ -50,17 +50,44 @@ export interface EventHubChannel {
 }
 
 export type EventHub<ChannelMap extends Record<string, EventHubChannel>> = ChannelMap & {
-  on: EventHubListen<ChannelMap>;
-  once: EventHubListen<ChannelMap>;
-  off: EventHubRemove<ChannelMap>;
+  on: EventHubOn<ChannelMap>;
+  once: EventHubOn<ChannelMap>;
+  off: EventHubOff<ChannelMap>;
   emit: EventHubEmit<ChannelMap>;
   clear: (event: keyof ChannelMap) => void;
   clearAll: ClearListeners;
-  listen: (listener: EventHubGlobalListener<ChannelMap>, protect?: boolean) => Unsubscribe;
-  remove: (listener: EventHubGlobalListener<ChannelMap>) => void;
+  listen: (listener: EventHubListener<ChannelMap>, protect?: boolean) => Unsubscribe;
+  remove: (listener: EventHubListener<ChannelMap>) => void;
   clearGlobal: ClearListeners;
   store: ValueMap<ChannelMap>;
 };
+
+/**
+ * Provides helpers for using a group of emitters.
+ *
+ * Can be used with `createEmitter`, `createEventBus`, `createEventStack`.
+ *
+ * @param defineChannels object with defined channels or a defineChannels function returning channels.
+ *
+ * @returns hub functions: `{on, once, off, emit, clear, clearAll, listen, remove, clearGlobal, store}` + channels available by their key
+ *
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-bus#createEventHub
+ *
+ * @example
+ * const hub = createEventHub({
+ *    busA: createEmitter<void>(),
+ *    busB: createEventBus<string>(),
+ *    busC: createEventStack<{ text: string }>()
+ * });
+ * // can be destructured
+ * const { busA, busB, on, off, listen, emit, clear } = hub;
+ *
+ * hub.on("busA", e => {});
+ * hub.on("busB", e => {});
+ *
+ * hub.emit("busA", 0);
+ * hub.emit("busB", "foo");
+ */
 
 export function createEventHub<ChannelMap extends Record<string, EventHubChannel>>(
   defineChannels: ((bus: typeof createEventBus) => ChannelMap) | ChannelMap

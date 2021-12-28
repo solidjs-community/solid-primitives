@@ -2,33 +2,56 @@ import { onCleanup } from "solid-js";
 import {
   ClearListeners,
   EmitGuard,
-  MultiArgEmit,
-  GenericListenProtect,
-  MultiArgListener,
+  GenericEmit,
+  GenericListener,
+  MultiArgListenProtect,
   Remove,
   RemoveGuard
 } from ".";
 
 export type Emitter<A0 = void, A1 = void, A2 = void> = {
-  listen: GenericListenProtect<MultiArgListener<A0, A1, A2>>;
-  once: GenericListenProtect<MultiArgListener<A0, A1, A2>>;
-  emit: MultiArgEmit<A0, A1, A2>;
+  listen: MultiArgListenProtect<A0, A1, A2>;
+  once: MultiArgListenProtect<A0, A1, A2>;
+  emit: GenericEmit<[A0, A1, A2]>;
   remove: Remove<A0, A1, A2>;
   clear: ClearListeners;
-  has: (listener: MultiArgListener<A0, A1, A2>) => boolean;
+  has: (listener: GenericListener<[A0, A1, A2]>) => boolean;
   value: () => void;
 };
 
 export type EmitterConfig<A0 = void, A1 = void, A2 = void> = {
   emitGuard?: EmitGuard<A0, A1, A2>;
-  removeGuard?: RemoveGuard<MultiArgListener<A0, A1, A2>>;
-  beforeEmit?: MultiArgListener<A0, A1, A2>;
+  removeGuard?: RemoveGuard<GenericListener<[A0, A1, A2]>>;
+  beforeEmit?: GenericListener<[A0, A1, A2]>;
 };
 
+/**
+ * Provides all the base functions of an event-emitter, plus additional functions for managing listeners, it's behavior could be customized with an config object.
+ * 
+ * @param config Emitter configuration: `emitGuard`, `removeGuard`, `beforeEmit` functions.
+ * 
+ * @returns the emitter: `{listen, once, emit, remove, clear, has}`
+ * 
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-bus#createEmitter
+ * 
+ * @example
+// accepts up-to-3 genetic payload types
+const emitter = createEmitter<string, number, boolean>();
+// emitter can be destructured:
+const { listen, emit, has, clear } = emitter;
+
+const listener = (a, b, c) => console.log(a, b, c);
+emitter.listen(listener);
+
+emitter.emit("foo", 123, true);
+
+emitter.remove(listener);
+emitter.has(listener); // false
+ */
 export function createEmitter<A0 = void, A1 = void, A2 = void>(
   config: EmitterConfig<A0, A1, A2> = {}
 ): Emitter<A0, A1, A2> {
-  type _Listener = MultiArgListener<A0, A1, A2>;
+  type _Listener = GenericListener<[A0, A1, A2]>;
   type _Listen = Emitter<A0, A1, A2>["listen"];
   type _Emit = Emitter<A0, A1, A2>["emit"];
   type _Remove = Emitter<A0, A1, A2>["remove"];

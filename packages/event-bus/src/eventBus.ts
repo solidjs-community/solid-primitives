@@ -1,12 +1,15 @@
 import { Accessor, createSignal } from "solid-js";
-import { ClearListeners, Unsubscribe, Emit, createEmitter, EmitterConfig } from ".";
+import {
+  ClearListeners,
+  createEmitter,
+  EmitterConfig,
+  GenericEmit,
+  GenericListener,
+  ListenProtect
+} from ".";
 
-export type EventBusListener<Event, V = Event | undefined> = (payload: Event, prev: V) => void;
-
-export type EventBusListen<Event, V = Event | undefined> = (
-  listener: EventBusListener<Event, V>,
-  protect?: boolean
-) => Unsubscribe;
+export type EventBusListener<Event, V = Event | undefined> = GenericListener<[Event, V]>;
+export type EventBusListen<Event, V = Event | undefined> = ListenProtect<Event, V>;
 
 export type EventBusRemove<Event, V = Event | undefined> = (
   listener: EventBusListener<Event, V>
@@ -16,11 +19,38 @@ export type EventBus<Event, V = Event | undefined> = {
   remove: EventBusRemove<Event, V>;
   listen: EventBusListen<Event, V>;
   once: EventBusListen<Event, V>;
-  emit: Emit<Event>;
+  emit: GenericEmit<[Event]>;
   clear: ClearListeners;
   has: (listener: EventBusListener<Event, V>) => boolean;
   value: Accessor<V>;
 };
+
+/**
+ * Provides all the base functions of an event-emitter, functions for managing listeners, it's behavior could be customized with an config object.
+ * Additionally it provides a signal accessor function with last event's value.
+ * 
+ * @param config Emitter configuration: `emitGuard`, `removeGuard`, `beforeEmit` functions and `value` for setting initial value.
+ * 
+ * @returns event bus: `{listen, once, emit, remove, clear, has, value}`
+ * 
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-bus#createEventBus
+ * 
+ * @example
+const bus = createEventBus<string>();
+// can be destructured:
+const { listen, emit, has, clear, value } = bus;
+
+const listener = (event, previous) => console.log(event, previous);
+bus.listen(listener);
+
+bus.emit("foo");
+
+bus.remove(listener);
+bus.has(listener); // false
+
+// clear all listeners
+bus.clear();
+ */
 
 // Initial value was NOT provided
 export function createEventBus<Event>(

@@ -1,4 +1,4 @@
-export * from "./sharedTypes";
+export * from "./types";
 export * from "./simpleEmitter";
 export * from "./emitter";
 export * from "./eventBus";
