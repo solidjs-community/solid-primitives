@@ -26,12 +26,12 @@ export type ListenProtect<A0 = void, A1 = void, A2 = void> = (
   protect?: boolean
 ) => Unsubscribe;
 
-export type MultiArgListen<A0 = void, A1 = void, A2 = void> = (
-  listener: GenericListener<[A0, A1, A2]>
+export type GenericListen<Payload extends any[] = []> = (
+  listener: GenericListener<Payload>
 ) => Unsubscribe;
 
-export type MultiArgListenProtect<A0 = void, A1 = void, A2 = void> = (
-  listener: GenericListener<[A0, A1, A2]>,
+export type GenericListenProtect<Payload extends any[] = []> = (
+  listener: GenericListener<Payload>,
   protect?: boolean
 ) => Unsubscribe;
 

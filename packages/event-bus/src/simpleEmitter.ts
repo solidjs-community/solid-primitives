@@ -1,5 +1,5 @@
 import { onCleanup } from "solid-js";
-import { ClearListeners, GenericListener, MultiArgListen, GenericEmit } from ".";
+import { ClearListeners, GenericListener, GenericEmit, GenericListen } from ".";
 
 /**
  * Very minimal interface for emiting and receiving events. Good for parent-child component communication.
@@ -20,7 +20,7 @@ emit("foo", 123, true);
 clear();
  */
 export function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(): [
-  listen: MultiArgListen<A0, A1, A2>,
+  listen: GenericListen<[A0, A1, A2]>,
   emit: GenericEmit<[A0, A1, A2]>,
   clear: ClearListeners
 ] {

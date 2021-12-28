@@ -1,17 +1,18 @@
+import { noop } from "@solid-primitives/utils";
 import { onCleanup } from "solid-js";
 import {
   ClearListeners,
   EmitGuard,
   GenericEmit,
   GenericListener,
-  MultiArgListenProtect,
+  GenericListenProtect,
   Remove,
   RemoveGuard
 } from ".";
 
 export type Emitter<A0 = void, A1 = void, A2 = void> = {
-  listen: MultiArgListenProtect<A0, A1, A2>;
-  once: MultiArgListenProtect<A0, A1, A2>;
+  listen: GenericListenProtect<[A0, A1, A2]>;
+  once: GenericListenProtect<[A0, A1, A2]>;
   emit: GenericEmit<[A0, A1, A2]>;
   remove: Remove<A0, A1, A2>;
   clear: ClearListeners;
@@ -113,6 +114,6 @@ export function createEmitter<A0 = void, A1 = void, A2 = void>(
     remove,
     clear: () => listeners.forEach(cb => remove(cb)),
     has: listener => listeners.has(listener),
-    value: () => {}
+    value: noop
   };
 }

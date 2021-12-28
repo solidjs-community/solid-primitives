@@ -8,6 +8,8 @@ export * from "./types";
 // GENERAL HELPERS:
 //
 
+/** no operation */
+export const noop = (...a: any[]) => {};
 export const isClient = !isServer;
 export { isServer };
 
@@ -76,6 +78,29 @@ export const promiseTimeout = (
   new Promise((resolve, reject) =>
     throwOnTimeout ? setTimeout(() => reject(reason), ms) : setTimeout(resolve, ms)
   );
+
+export function raceAgainstTime<T>(
+  promises: T,
+  ms: number,
+  throwOnTimeout?: false,
+  reason?: string
+): (T extends any[] ? Promise<Awaited<T[number]>> : Promise<Awaited<T>>) | undefined;
+export function raceAgainstTime<T>(
+  promises: T,
+  ms: number,
+  throwOnTimeout: true,
+  reason?: string
+): T extends any[] ? Promise<Awaited<T[number]>> : Promise<Awaited<T>>;
+export function raceAgainstTime(
+  promises: any,
+  ms: number,
+  throwOnTimeout = false,
+  reason = "Timeout"
+): Promise<any> {
+  const promiseList = Array.isArray(promises) ? promises : [promises];
+  promiseList.push(promiseTimeout(ms, throwOnTimeout, reason));
+  return Promise.race(promiseList);
+}
 
 /**
  * Create a new subset object without provided keys

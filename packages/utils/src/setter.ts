@@ -5,22 +5,22 @@ import * as fp from "./fp";
 
 export const push =
   <T>(item: T) =>
-  (list: readonly T[]): T[] =>
+  (list: T[]): T[] =>
     fp.push(list, item);
 
 export const drop =
   (n = 1) =>
-  <T>(list: readonly T[]): T[] =>
+  <T>(list: T[]): T[] =>
     fp.drop(list, n);
 
 export const filterOut =
   <T>(item: T) =>
-  (list: readonly T[]): T[] & { removed: number } =>
+  (list: T[]): T[] & { removed: number } =>
     fp.filterOut(list, item);
 
 export const filter =
   <T>(predicate: Predicate<T>) =>
-  (list: readonly T[]): T[] & { removed: number } =>
+  (list: T[]): T[] & { removed: number } =>
     fp.filter(list, predicate);
 
 // import { createSignal } from "solid-js";
