@@ -57,6 +57,14 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
   isDefined(_value) && fn(_value as NonNullable<V>);
 };
 
+/**
+ * Quickly iterate over an MaybeAccessor<any>
+ *
+ * @example
+ * const myFunc = (source: MaybeAccessor<string[]>) => {
+ *    forEach(source, item => console.log(item))
+ * }
+ */
 export const forEach = <A extends MaybeAccessor<any>, V = MaybeAccessorValue<A>>(
   array: A,
   iterator: (
@@ -66,10 +74,25 @@ export const forEach = <A extends MaybeAccessor<any>, V = MaybeAccessorValue<A>>
   ) => void
 ): void => accessAsArray(array).forEach(iterator as any);
 
+/**
+ * Get `Object.entries()` of an MaybeAccessor<Object>
+ */
 export const entries = <A extends MaybeAccessor<Object>, V = MaybeAccessorValue<A>>(
   object: A
 ): [string, Values<V>][] => Object.entries(access(object));
 
+/**
+ * Creates a promise that resolves *(or rejects)* after gives time.
+ *
+ * @param ms timeout duration in ms
+ * @param throwOnTimeout promise will be rejected on timeout if set to `true`
+ * @param reason rejection reason
+ * @returns Promise<void>
+ *
+ * @example
+ * await promiseTimeout(1500) // will resolve void after timeout
+ * await promiseTimeout(1500, true, 'rejection reason') // will reject 'rejection reason' after timout
+ */
 export const promiseTimeout = (
   ms: number,
   throwOnTimeout = false,
@@ -79,19 +102,36 @@ export const promiseTimeout = (
     throwOnTimeout ? setTimeout(() => reject(reason), ms) : setTimeout(resolve, ms)
   );
 
-export function raceAgainstTime<T>(
+/**
+ * Combination of `Promise.race()` and `promiseTimeout`.
+ *
+ * @param promises single promise, or array of promises
+ * @param ms timeout duration in ms
+ * @param throwOnTimeout promise will be rejected on timeout if set to `true`
+ * @param reason rejection reason
+ * @returns a promise resulting in value of the first source promises to be resolved
+ *
+ * @example
+ * // single promise
+ * await raceWithTimeout(new Promise(() => {...}), 3000)
+ * // list of promises racing
+ * await raceWithTimeout([new Promise(),new Promise()...], 3000)
+ * // reject on timeout
+ * await raceWithTimeout(new Promise(), 3000, true, 'rejection reason')
+ */
+export function raceWithTimeout<T>(
   promises: T,
   ms: number,
   throwOnTimeout?: false,
   reason?: string
 ): (T extends any[] ? Promise<Awaited<T[number]>> : Promise<Awaited<T>>) | undefined;
-export function raceAgainstTime<T>(
+export function raceWithTimeout<T>(
   promises: T,
   ms: number,
   throwOnTimeout: true,
   reason?: string
 ): T extends any[] ? Promise<Awaited<T[number]>> : Promise<Awaited<T>>;
-export function raceAgainstTime(
+export function raceWithTimeout(
   promises: any,
   ms: number,
   throwOnTimeout = false,
@@ -101,32 +141,6 @@ export function raceAgainstTime(
   promiseList.push(promiseTimeout(ms, throwOnTimeout, reason));
   return Promise.race(promiseList);
 }
-
-/**
- * Create a new subset object without provided keys
- */
-export const objectOmit = <O extends Object, K extends keyof O>(
-  object: O,
-  ...keys: K[]
-): Omit<O, K> => {
-  const copy = Object.assign({}, object);
-  for (const key of keys) {
-    delete copy[key];
-  }
-  return copy;
-};
-
-/**
- * Create a new subset object with provided keys
- */
-export const objectPick = <O extends Object, K extends keyof O>(
-  object: O,
-  ...keys: K[]
-): Pick<O, K> =>
-  keys.reduce((n, k) => {
-    if (k in object) n[k] = object[k];
-    return n;
-  }, {} as Pick<O, K>);
 
 /**
  * Allows the Solid's store to be destructured

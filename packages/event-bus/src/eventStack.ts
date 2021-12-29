@@ -1,8 +1,8 @@
 import { Accessor, createSignal, Setter } from "solid-js";
 import { createEmitter, Emitter, EmitterConfig, GenericEmit } from ".";
-import { push, drop } from "@solid-primitives/utils/fp";
+import { push, drop, pick } from "@solid-primitives/utils/fp";
 import { filterOut } from "@solid-primitives/utils/setter";
-import { Fn, Modify, objectPick } from "@solid-primitives/utils";
+import { Fn, Modify } from "@solid-primitives/utils";
 
 export type EventStackListener<V> = (event: V, stack: V[], removeFromStack: Fn) => void;
 
@@ -73,8 +73,8 @@ export function createEventStack<E, V>(
   const { toValue = (e: any) => e, length = 0 } = config;
 
   const [stack, setStack] = createSignal<V[]>([]);
-  const eventEmitter = createEmitter<E>(objectPick(config, "emitGuard"));
-  const valueEmitter = createEmitter<V, V[], Fn>(objectPick(config, "beforeEmit", "removeGuard"));
+  const eventEmitter = createEmitter<E>(pick(config, "emitGuard"));
+  const valueEmitter = createEmitter<V, V[], Fn>(pick(config, "beforeEmit", "removeGuard"));
 
   eventEmitter.listen(event => {
     const value = toValue(event, stack());

@@ -7,7 +7,7 @@ import {
 import { Component, createSignal, Show } from "solid-js";
 import { render } from "solid-js/web";
 import createRAF from "@solid-primitives/raf";
-import { objectOmit } from "@solid-primitives/utils";
+import { omit } from "@solid-primitives/utils/fp";
 import { lerp } from "./utils";
 import "uno.css";
 import { DisplayRecord } from "./components";
@@ -67,7 +67,7 @@ const App: Component = () => {
         }}
       >
         {() => {
-          const record = objectOmit(relative, "isInside");
+          const record = omit(relative, "isInside");
           return <DisplayRecord record={record} />;
         }}
       </div>
