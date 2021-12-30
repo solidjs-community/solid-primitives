@@ -432,6 +432,28 @@ type EventHub<ChannelMap extends Record<string, EventHubChannel>> = ChannelMap &
 };
 ```
 
+## EventBus Utils
+
+### `toPromise`
+
+Turns a stream-like listen function, into a promise resolving when the first event is captured.
+
+```ts
+const emitter = createEmitter<string>();
+const event = await toPromise(emitter.listen);
+
+// can be used together with raceTimeout from @solid-primitives/utils
+import { raceTimeout } from "@solid-primitives/utils";
+try {
+  const event = await raceTimeout(toPromise(emitter.listen), 2000, true, "event was too slow");
+  // if event is quicker:
+  event; // => string
+} catch (err) {
+  // if timeouts:
+  console.log(err); // => "event was too slow"
+}
+```
+
 ## Demo
 
 You may view a working example here: [ link to Stackblize or CodeSandBox ]
@@ -443,6 +465,6 @@ You may view a working example here: [ link to Stackblize or CodeSandBox ]
 
 0.0.100
 
-Initial release as a Stage-1 primitive.
+Initial release as a Stage-2 primitive.
 
 </details>

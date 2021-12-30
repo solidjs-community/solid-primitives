@@ -1,7 +1,18 @@
+import { getOwner, onCleanup } from "solid-js";
 import { GenericListen, GenericListenProtect } from ".";
+
+export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
 
 type ToPromiseValue<T extends any[]> = void extends T[1] ? T[0] : T;
 
+/**
+ * Turns a stream-like listen function, into a promise resolving when the first event is captured.
+ * @param subscribe listen function from any EventBus/Emitter
+ * @returns a promise resulting in the captured event value
+ * @example
+ * const emitter = createEmitter<string>();
+ * const event = await toPromise(emitter.listen);
+ */
 export function toPromise<T extends any[]>(subscribe: GenericListen<T>): Promise<ToPromiseValue<T>>;
 export function toPromise<T extends any[]>(
   subscribe: GenericListenProtect<T>,

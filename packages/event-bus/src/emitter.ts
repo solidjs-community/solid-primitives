@@ -1,7 +1,7 @@
 import { noop } from "@solid-primitives/utils";
-import { onCleanup } from "solid-js";
 import {
   ClearListeners,
+  onRootCleanup,
   EmitGuard,
   GenericEmit,
   GenericListener,
@@ -70,7 +70,7 @@ export function createEmitter<A0 = void, A1 = void, A2 = void>(
   const listen: _Listen = (listener, protect) => {
     listeners.add(listener);
     const unsub = () => listeners.delete(listener);
-    onCleanup(unsub);
+    onRootCleanup(unsub);
     if (!protect) return unsub;
     protectedSet.add(listener);
     return () => {
@@ -105,7 +105,7 @@ export function createEmitter<A0 = void, A1 = void, A2 = void>(
 
   // cleanup uses set.clear() instead of clear() to always clear all the listeners,
   // ragardles of the conditions in the removeGuard
-  onCleanup(() => listeners.clear());
+  onRootCleanup(() => listeners.clear());
 
   return {
     listen,

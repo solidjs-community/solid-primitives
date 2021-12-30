@@ -1,3 +1,4 @@
+import { getOwner, onCleanup } from "solid-js";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import type { Destore, Fn, ItemsOf, MaybeAccessor, MaybeAccessorValue, Values } from "./types";
@@ -8,11 +9,19 @@ export * from "./types";
 // GENERAL HELPERS:
 //
 
+/**
+ * Solid's `onCleanup` that runs only if there is a root.
+ */
+export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
+
 /** no operation */
 export const noop = (...a: any[]) => {};
 export const isClient = !isServer;
 export { isServer };
 
+/**
+ * `if (typeof value !== "undefined" && value !== null)`
+ */
 export const isDefined = <T>(value: T | undefined | null): value is T =>
   typeof value !== "undefined" && value !== null;
 
@@ -113,25 +122,25 @@ export const promiseTimeout = (
  *
  * @example
  * // single promise
- * await raceWithTimeout(new Promise(() => {...}), 3000)
+ * await raceTimeout(new Promise(() => {...}), 3000)
  * // list of promises racing
- * await raceWithTimeout([new Promise(),new Promise()...], 3000)
+ * await raceTimeout([new Promise(),new Promise()...], 3000)
  * // reject on timeout
- * await raceWithTimeout(new Promise(), 3000, true, 'rejection reason')
+ * await raceTimeout(new Promise(), 3000, true, 'rejection reason')
  */
-export function raceWithTimeout<T>(
+export function raceTimeout<T>(
   promises: T,
   ms: number,
   throwOnTimeout?: false,
   reason?: string
 ): (T extends any[] ? Promise<Awaited<T[number]>> : Promise<Awaited<T>>) | undefined;
-export function raceWithTimeout<T>(
+export function raceTimeout<T>(
   promises: T,
   ms: number,
   throwOnTimeout: true,
   reason?: string
 ): T extends any[] ? Promise<Awaited<T[number]>> : Promise<Awaited<T>>;
-export function raceWithTimeout(
+export function raceTimeout(
   promises: any,
   ms: number,
   throwOnTimeout = false,

@@ -45,6 +45,6 @@ Added comments for util methods.
 
 0.1.0
 
-Add `/fp` and `/setter` export entries. Add `destore` and `raceWithTimeout` util. More jsdoc.
+Add `/fp` and `/setter` export entries. Add `destore` and `raceTimeout` util. More jsdoc.
 
 </details>
