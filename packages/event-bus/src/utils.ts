@@ -67,7 +67,7 @@ export function once<T extends any[] = []>(
 /**
  * Type Check
  */
-// import { createEmitter, createEventBus, createEventStack } from ".";
+// import { createEmitter, createEventBus, createEventStack, createSimpleEmitter } from ".";
 
 // const emitter = createEmitter<string, number, boolean>();
 // const res = await toPromise(emitter.listen);
@@ -90,3 +90,6 @@ export function once<T extends any[] = []>(
 // const stack = createEventStack<{ text: string }>();
 // const res5 = await toPromise(stack.listen);
 // // [{text: string}, {text: string}[], Fn]
+
+// const [listen, emit] = createSimpleEmitter<string>()
+// once(listen, (e) => {});

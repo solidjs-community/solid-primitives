@@ -1,20 +1,43 @@
-import { produce } from "solid-js/store";
 import { Predicate } from ".";
 
 /**
+ * apply mutations to the an array without changing the original
+ * @param array original array
+ * @param mutator function applying mutations to the copy of source
+ * @returns changed array copy
+ */
+export const withArrayCopy = <T extends any[]>(array: T, mutator: (copy: T) => void): T => {
+  const copy = array.slice() as T;
+  mutator(copy);
+  return copy;
+};
+
+/**
  * apply mutations to the an object without changing the original
+ * @param object original object
+ * @param mutator function applying mutations to the copy of source
+ * @returns changed object copy
+ */
+export const withObjectCopy = <T extends object>(object: T, mutator: (copy: T) => void): T => {
+  const copy = Object.assign({}, object);
+  mutator(copy);
+  return copy;
+};
+
+/**
+ * apply mutations to the an object/array without changing the original
  * @param source original object
  * @param mutator function applying mutations to the copy of source
  * @returns changed object copy
  */
 export const withCopy = <T extends object>(source: T, mutator: (copy: T) => void): T =>
-  produce(mutator)(source as any);
+  Array.isArray(source) ? withArrayCopy(source, mutator) : withObjectCopy(source, mutator);
 
 /**
  * non-mutating `Array.push()`
  * @returns changed array copy
  */
-export const push = <T>(list: T[], item: T): T[] => withCopy(list, list => list.push(item));
+export const push = <T>(list: T[], item: T): T[] => withArrayCopy(list, list => list.push(item));
 
 /**
  * non-mutating function that drops n items from the array start.
@@ -57,7 +80,7 @@ export function filter<T>(list: readonly T[], predicate: Predicate<T>): T[] & { 
  * newObject // => { c: "baz" }
  */
 export const omit = <O extends object, K extends keyof O>(object: O, ...keys: K[]): Omit<O, K> =>
-  withCopy(object, object => keys.forEach(key => delete object[key]));
+  withObjectCopy(object, object => keys.forEach(key => delete object[key]));
 
 /**
  * Create a new subset object with only the provided keys
