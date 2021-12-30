@@ -54,6 +54,7 @@ export type DeepPartialAny<T> = {
 };
 
 export type AnyObject = Record<string, any>;
+export type AnyFunction = (...args: any[]) => any;
 
 export type PrimitiveValue = string | boolean | number | bigint | symbol | null | undefined;
 

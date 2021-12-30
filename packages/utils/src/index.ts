@@ -1,7 +1,15 @@
 import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
-import type { Destore, Fn, ItemsOf, MaybeAccessor, MaybeAccessorValue, Values } from "./types";
+import type {
+  AnyFunction,
+  Destore,
+  Fn,
+  ItemsOf,
+  MaybeAccessor,
+  MaybeAccessorValue,
+  Values
+} from "./types";
 
 export * from "./types";
 
@@ -23,12 +31,8 @@ export const isDefined = <T>(value: T | undefined | null): value is T =>
 /**
  * Accesses the value of a MaybeAccessor
  * @example
- * access(x as MaybeAccessor<string>)
- * // => string
- * access(x as MaybeAccessor<() => string>)
- * // => string | (() => string)
- * access(x as MaybeAccessor<string> | Function)
- * // => string | void
+ * access("foo") // => "foo"
+ * access(() => "foo") // => "foo"
  */
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
   typeof v === "function" ? (v as any)() : v;
@@ -183,22 +187,19 @@ export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn)
  * @returns whatever the "fn" returns
  *
  * @example
- * const handleClick = () => createSubRoot(() => {
+ * const owner = getOwner()
+ * const handleClick = () => createSubRoot(owner, () => {
  *    createEffect(() => {})
  * });
  */
-export function createSubRoot<T>(
-  fn: (dispose: Fn) => T,
-  owner: ReturnType<typeof getOwner> = getOwner()
-): T {
-  if (!owner) return fn(noop);
-  const [dispose, returns] = createRoot(dispose => [dispose, fn(dispose)]);
-  runWithOwner(owner, () => onCleanup(dispose));
+export function createSubRoot<T>(owner: ReturnType<typeof getOwner>, fn: (dispose: Fn) => T): T {
+  const [dispose, returns] = createRoot(dispose => [dispose, fn(dispose)], owner ?? undefined);
+  owner && runWithOwner(owner, () => onCleanup(dispose));
   return returns;
 }
 
 /**
- * A wrapper for the `createSubRoot`
+ * A wrapper for creating functions with the `createSubRoot`
  *
  * @param callback
  * @param owner a root that will trigger the cleanup
@@ -209,11 +210,8 @@ export function createSubRoot<T>(
  *    createEffect(() => {})
  * })
  */
-export function createSubRootFunction<T extends (...args: any[]) => any>(
-  callback: T,
-  owner?: ReturnType<typeof getOwner>
-): T {
-  return ((...args) => createSubRoot(() => callback(...args), owner)) as T;
+export function createSubRootFunction<T extends AnyFunction>(callback: T, owner = getOwner()): T {
+  return ((...args) => createSubRoot(owner, () => callback(...args))) as T;
 }
 
 export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {

@@ -1,4 +1,4 @@
-import { noop, createSubRootFunction } from "@solid-primitives/utils";
+import { noop } from "@solid-primitives/utils";
 import {
   ClearListeners,
   onRootCleanup,
@@ -77,11 +77,10 @@ export function createEmitter<A0 = void, A1 = void, A2 = void>(
     };
   };
 
-  // creates synthetic root so that effects could be created inside the event handlers
-  const _emit: _Emit = createSubRootFunction((...payload) => {
+  const _emit: _Emit = (...payload) => {
     beforeEmit?.(...payload);
     listeners.forEach(cb => cb(...payload));
-  });
+  };
   const emit: _Emit = emitGuard
     ? (...payload) =>
         emitGuard(
