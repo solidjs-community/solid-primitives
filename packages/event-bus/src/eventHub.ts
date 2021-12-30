@@ -43,7 +43,6 @@ export type EventHubEmit<ChannelMap extends Record<string, EventHubChannel>> = <
 export interface EventHubChannel {
   remove: (fn: (...payload: any[]) => void) => boolean;
   listen: (listener: (...payload: any[]) => void, protect?: boolean) => Unsubscribe;
-  once: (listener: (...payload: any[]) => void, protect?: boolean) => Unsubscribe;
   emit: (...payload: any[]) => void;
   clear: ClearListeners;
   value: Accessor<any>;
@@ -51,7 +50,6 @@ export interface EventHubChannel {
 
 export type EventHub<ChannelMap extends Record<string, EventHubChannel>> = ChannelMap & {
   on: EventHubOn<ChannelMap>;
-  once: EventHubOn<ChannelMap>;
   off: EventHubOff<ChannelMap>;
   emit: EventHubEmit<ChannelMap>;
   clear: (event: keyof ChannelMap) => void;
@@ -106,7 +104,6 @@ export function createEventHub<ChannelMap extends Record<string, EventHubChannel
     ...buses,
     store: store as ValueMap<ChannelMap>,
     on: (e, ...a) => buses[e].listen(...(a as [any])),
-    once: (e, ...a) => buses[e].once(...(a as [any])),
     off: (e, ...a) => buses[e].remove(...(a as [any])),
     emit: (e, ...a) => buses[e].emit(...a),
     clear: e => buses[e].clear(),

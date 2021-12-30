@@ -122,7 +122,6 @@ function createEmitter<A0 = void, A1 = void, A2 = void>(
 
 type Emitter<A0 = void, A1 = void, A2 = void> = {
   listen: MultiArgListenProtect<A0, A1, A2>;
-  once: MultiArgListenProtect<A0, A1, A2>;
   emit: GenericEmit<[A0, A1, A2]>;
   remove: Remove<A0, A1, A2>;
   clear: ClearListeners;
@@ -227,7 +226,6 @@ type EventBusRemove<Event, V = Event | undefined> = (
 type EventBus<Event, V = Event | undefined> = {
   remove: EventBusRemove<Event, V>;
   listen: EventBusListen<Event, V>;
-  once: EventBusListen<Event, V>;
   emit: GenericEmit<[Event]>;
   clear: ClearListeners;
   has: (listener: EventBusListener<Event, V>) => boolean;
@@ -413,14 +411,12 @@ function createEventHub<ChannelMap extends Record<string, EventHubChannel>>(
 interface EventHubChannel {
   remove: (fn: (...payload: any[]) => void) => boolean;
   listen: (listener: (...payload: any[]) => void, protect?: boolean) => Unsubscribe;
-  once: (listener: (...payload: any[]) => void, protect?: boolean) => Unsubscribe;
   emit: (...payload: any[]) => void;
   clear: ClearListeners;
   value: Accessor<any>;
 }
 type EventHub<ChannelMap extends Record<string, EventHubChannel>> = ChannelMap & {
   on: EventHubOn<ChannelMap>;
-  once: EventHubOn<ChannelMap>;
   off: EventHubOff<ChannelMap>;
   emit: EventHubEmit<ChannelMap>;
   clear: (event: keyof ChannelMap) => void;
@@ -452,6 +448,19 @@ try {
   // if timeouts:
   console.log(err); // => "event was too slow"
 }
+```
+
+### `once`
+
+Listen to any EventBus/Emitter, but the listener will automatically unsubscribe on the first captured event. So the callback will run only **once**.
+
+```ts
+const { listen, emit } = createEmitter<string>();
+const unsub = once(listen, event => console.log(event));
+
+emit("foo"); // will log "foo" and unsub
+
+emit("bar"); // won't log
 ```
 
 ## Demo

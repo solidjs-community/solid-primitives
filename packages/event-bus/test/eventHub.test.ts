@@ -34,7 +34,6 @@ syncTest("returned values", () => {
   assert.type(hub.listen, "function");
   assert.type(hub.remove, "function");
   assert.type(hub.on, "function");
-  assert.type(hub.once, "function");
   assert.type(hub.off, "function");
   assert.type(hub.store, "object");
 });

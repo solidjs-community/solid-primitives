@@ -12,7 +12,6 @@ import {
 
 export type Emitter<A0 = void, A1 = void, A2 = void> = {
   listen: GenericListenProtect<[A0, A1, A2]>;
-  once: GenericListenProtect<[A0, A1, A2]>;
   emit: GenericEmit<[A0, A1, A2]>;
   remove: Remove<A0, A1, A2>;
   clear: ClearListeners;
@@ -78,14 +77,6 @@ export function createEmitter<A0 = void, A1 = void, A2 = void>(
     };
   };
 
-  const once: _Listen = (listener, protect) => {
-    const unsub = listen((...args) => {
-      unsub();
-      return listener(...args);
-    }, protect);
-    return unsub;
-  };
-
   const _emit: _Emit = beforeEmit
     ? (...payload) => {
         beforeEmit(...payload);
@@ -108,7 +99,6 @@ export function createEmitter<A0 = void, A1 = void, A2 = void>(
 
   return {
     listen,
-    once,
     emit,
     remove,
     clear: () => listeners.forEach(cb => remove(cb)),

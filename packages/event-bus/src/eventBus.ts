@@ -18,7 +18,6 @@ export type EventBusRemove<Event, V = Event | undefined> = (
 export type EventBus<Event, V = Event | undefined> = {
   remove: EventBusRemove<Event, V>;
   listen: EventBusListen<Event, V>;
-  once: EventBusListen<Event, V>;
   emit: GenericEmit<[Event]>;
   clear: ClearListeners;
   has: (listener: EventBusListener<Event, V>) => boolean;

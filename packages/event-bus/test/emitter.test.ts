@@ -13,7 +13,6 @@ test("return values", () =>
     assert.type(emitter.emit, "function");
     assert.type(emitter.has, "function");
     assert.type(emitter.listen, "function");
-    assert.type(emitter.once, "function");
     assert.type(emitter.remove, "function");
 
     dispose();
@@ -61,29 +60,6 @@ test("clears on dispose", () =>
 
     emit("foo");
     assert.is(captured.length, 0);
-  }));
-
-test("once()", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const { once, emit } = createEmitter<string>();
-
-    once(a => captured.push(a));
-
-    emit("foo");
-    assert.is(captured.length, 1, "first emit should work");
-
-    emit("bar");
-    assert.is(captured.length, 1, "second emit shouldn't be captured");
-
-    once(a => captured.push(a), true);
-    emit("foo");
-    assert.is(captured.length, 2, "protected: first emit should work");
-
-    emit("bar");
-    assert.is(captured.length, 2, "protected: second emit shouldn't be captured");
-
-    dispose();
   }));
 
 test("remove()", () =>
