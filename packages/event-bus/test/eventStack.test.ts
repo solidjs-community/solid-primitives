@@ -1,5 +1,5 @@
 import { createEventStack } from "../src";
-import { createRoot } from "solid-js";
+import { createComputed, createRoot } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
@@ -163,27 +163,43 @@ test("has()", () =>
     dispose();
   }));
 
-test("stack", () =>
+test("stack", () => {
+  const { emit, stack, removeFromStack, setStack } = createEventStack<[string]>();
+
+  assert.equal(stack(), []);
+
+  emit(["foo"]);
+  assert.equal(stack(), [["foo"]]);
+
+  const x: [string] = ["bar"];
+
+  emit(x);
+  assert.equal(stack(), [["foo"], ["bar"]]);
+
+  assert.is(removeFromStack(x), true);
+  assert.is(removeFromStack(["hello"]), false);
+  assert.is(stack().length, 1);
+
+  const y: [string][] = [["0"], ["1"]];
+  setStack(y);
+  assert.equal(stack(), y);
+});
+
+test("stack is reactive", () =>
   createRoot(dispose => {
-    const { emit, stack, removeFromStack, setStack } = createEventStack<[string]>();
+    const { emit, stack } = createEventStack<{ t: string }>();
+    let captured: any;
+    createComputed(() => {
+      captured = stack();
+    });
 
-    assert.equal(stack(), []);
+    assert.equal(captured, []);
 
-    emit(["foo"]);
-    assert.equal(stack(), [["foo"]]);
+    emit({ t: "foo" });
+    assert.equal(captured, [{ t: "foo" }]);
 
-    const x: [string] = ["bar"];
-
-    emit(x);
-    assert.equal(stack(), [["foo"], ["bar"]]);
-
-    assert.is(removeFromStack(x), true);
-    assert.is(removeFromStack(["hello"]), false);
-    assert.is(stack().length, 1);
-
-    const y: [string][] = [["0"], ["1"]];
-    setStack(y);
-    assert.equal(stack(), y);
+    emit({ t: "bar" });
+    assert.equal(captured, [{ t: "foo" }, { t: "bar" }]);
 
     dispose();
   }));

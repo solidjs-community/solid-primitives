@@ -205,7 +205,7 @@ const Toaster: Component<{
 
   return (
     <div class="fixed top-4 right-4 flex flex-col items-end space-y-4">
-      <For each={bus.value()}>
+      <For each={bus.stack()}>
         {item => (
           <div class="p-2 px-3 bg-gray-600 animate-fade-in-down animate-count-1 animate-duration-150">
             <span class="mr-2">{item.text}</span>

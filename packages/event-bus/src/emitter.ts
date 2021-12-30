@@ -69,8 +69,7 @@ export function createEmitter<A0 = void, A1 = void, A2 = void>(
 
   const listen: _Listen = (listener, protect) => {
     listeners.add(listener);
-    const unsub = () => listeners.delete(listener);
-    onRootCleanup(unsub);
+    const unsub = onRootCleanup(() => listeners.delete(listener));
     if (!protect) return unsub;
     protectedSet.add(listener);
     return () => {
