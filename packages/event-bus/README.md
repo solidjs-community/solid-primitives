@@ -435,6 +435,8 @@ type EventHub<ChannelMap extends Record<string, EventHubChannel>> = ChannelMap &
 Turns a stream-like listen function, into a promise resolving when the first event is captured.
 
 ```ts
+import { toPromise } from "@solid-primitives/event-bus";
+
 const emitter = createEmitter<string>();
 const event = await toPromise(emitter.listen);
 
@@ -455,12 +457,32 @@ try {
 Listen to any EventBus/Emitter, but the listener will automatically unsubscribe on the first captured event. So the callback will run only **once**.
 
 ```ts
+import { once } from "@solid-primitives/event-bus";
+
 const { listen, emit } = createEmitter<string>();
 const unsub = once(listen, event => console.log(event));
 
 emit("foo"); // will log "foo" and unsub
 
 emit("bar"); // won't log
+```
+
+### `toEffect`
+
+Wraps `emit` calls inside a `createEffect`. It causes that listeners execute having an reactive owner available. It allows for usage of effects, memos and other primitives inside listeners, without having to create a synthetic root.
+
+```ts
+import { toEffect } from "@solid-primitives/event-bus";
+
+const { listen, emit } = createEmitter();
+const emitInEffect = toEffect(emit);
+
+// owner is needed for creating computations like createEffect
+listen(() => console.log(getOwner()));
+
+// ...sometime later (after root initiation):
+emit(); // listener will log `null`
+emitInEffect(); // listener will log an owner object
 ```
 
 ## Demo

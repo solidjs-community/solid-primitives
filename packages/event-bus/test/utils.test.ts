@@ -1,6 +1,8 @@
-import { createEmitter, once, toPromise } from "../src";
+import { createEmitter, once, toEffect, toPromise } from "../src";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
+import { createRoot } from "solid-js";
+import { getOwner } from "solid-js";
 
 const tp = suite("toPromise");
 
@@ -44,3 +46,39 @@ testOnce("once()", () => {
 });
 
 testOnce.run();
+
+const testToEffect = suite("toEffect");
+
+testToEffect("toEffect()", () =>
+  createRoot(dispose => {
+    const captured: any[] = [];
+    let capturedOwner: any;
+    const { listen, emit } = createEmitter<string>();
+    const emitInEffect = toEffect(emit);
+    listen(e => {
+      captured.push(e);
+      capturedOwner = getOwner();
+    });
+
+    // owner gets set to null synchronously after root executes
+    setTimeout(() => {
+      emit("foo");
+      assert.is(
+        capturedOwner,
+        null,
+        "owner will should not be available inside listener after using normal emit"
+      );
+
+      emitInEffect("bar");
+      assert.equal(captured, ["foo", "bar"]);
+      assert.is.not(
+        capturedOwner,
+        null,
+        "owner will should be available inside listener after using emitInEffect"
+      );
+      dispose();
+    }, 0);
+  })
+);
+
+testToEffect.run();

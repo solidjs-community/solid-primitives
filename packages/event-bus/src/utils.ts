@@ -1,9 +1,10 @@
-import { getOwner, onCleanup } from "solid-js";
-import { GenericListen, GenericListener, GenericListenProtect, Unsubscribe } from ".";
+import { push } from "@solid-primitives/utils/setter";
+import { createEffect, createSignal, getOwner, on, onCleanup } from "solid-js";
+import { GenericEmit, GenericListen, GenericListener, GenericListenProtect, Unsubscribe } from ".";
 
 export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
 
-type ToPromiseValue<T extends any[]> = void extends T[1] ? T[0] : T;
+type _PromiseValue<T extends any[]> = void extends T[1] ? T[0] : T;
 
 /**
  * Turns a stream-like listen function, into a promise resolving when the first event is captured.
@@ -13,16 +14,16 @@ type ToPromiseValue<T extends any[]> = void extends T[1] ? T[0] : T;
  * const emitter = createEmitter<string>();
  * const event = await toPromise(emitter.listen);
  */
-export function toPromise<T extends any[]>(subscribe: GenericListen<T>): Promise<ToPromiseValue<T>>;
+export function toPromise<T extends any[]>(subscribe: GenericListen<T>): Promise<_PromiseValue<T>>;
 export function toPromise<T extends any[]>(
   subscribe: GenericListenProtect<T>,
   protect?: boolean
-): Promise<ToPromiseValue<T>>;
+): Promise<_PromiseValue<T>>;
 export function toPromise<T extends any[]>(
   subscribe: GenericListenProtect<T>,
   protect?: boolean
-): Promise<ToPromiseValue<T>> {
-  return new Promise<ToPromiseValue<T>>(resolve => {
+): Promise<_PromiseValue<T>> {
+  return new Promise<_PromiseValue<T>>(resolve => {
     once(subscribe, (...data) => resolve(data.length > 1 ? data : data[0]), protect);
   });
 }
@@ -65,31 +66,28 @@ export function once<T extends any[] = []>(
 }
 
 /**
- * Type Check
+ * Wraps `emit` calls inside a `createEffect`. It causes that listeners execute having an reactive owner available. It allows for usage of effects, memos and other primitives inside listeners, without having to create a synthetic root.
+ *
+ * @param emit the emit function of any emitter/event-bus
+ * @returns modified emit function
+ *
+ * @example
+ * const { listen, emit } = createEmitter();
+ * const emitInEffect = toEffect(emit);
+ * listen(() => console.log(getOwner()))
+ *
+ * // ...sometime later (after root initiation):
+ * emit() // listener will log `null`
+ * emitInEffect() // listener will log an owner object
  */
-// import { createEmitter, createEventBus, createEventStack, createSimpleEmitter } from ".";
-
-// const emitter = createEmitter<string, number, boolean>();
-// const res = await toPromise(emitter.listen);
-// // [string, number, boolean]
-
-// once(emitter.listen, (a, b, c) => {});
-
-// const bus = createEventBus<string>();
-// const res2 = await toPromise(bus.listen);
-// // [string, string | undefined]
-
-// const emitter3 = createEmitter<string>();
-// const res3 = await toPromise(emitter3.listen);
-// // string
-
-// const emitterVoid = createEmitter();
-// const res4 = await toPromise(emitterVoid.listen);
-// // void
-
-// const stack = createEventStack<{ text: string }>();
-// const res5 = await toPromise(stack.listen);
-// // [{text: string}, {text: string}[], Fn]
-
-// const [listen, emit] = createSimpleEmitter<string>()
-// once(listen, (e) => {});
+export function toEffect<T extends any[]>(emit: GenericEmit<T>): GenericEmit<T> {
+  const [stack, setStack] = createSignal<T[]>([]);
+  createEffect(
+    on(stack, stack => {
+      if (!stack.length) return;
+      stack.forEach(payload => emit(...payload));
+      setStack([]);
+    })
+  );
+  return (...payload) => setStack(push(payload));
+}
