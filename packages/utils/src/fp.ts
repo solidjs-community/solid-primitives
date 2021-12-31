@@ -1,4 +1,4 @@
-import { Predicate } from ".";
+import { MappingFn, Predicate } from ".";
 
 /**
  * apply mutations to the an array without changing the original
@@ -6,8 +6,8 @@ import { Predicate } from ".";
  * @param mutator function applying mutations to the copy of source
  * @returns changed array copy
  */
-export const withArrayCopy = <T extends any[]>(array: T, mutator: (copy: T) => void): T => {
-  const copy = array.slice() as T;
+export const withArrayCopy = <T>(array: readonly T[], mutator: (copy: T[]) => void): T[] => {
+  const copy = array.slice();
   mutator(copy);
   return copy;
 };
@@ -31,10 +31,12 @@ export const withObjectCopy = <T extends object>(object: T, mutator: (copy: T) =
  * @returns changed object copy
  */
 export const withCopy = <T extends object>(source: T, mutator: (copy: T) => void): T =>
-  Array.isArray(source) ? withArrayCopy(source, mutator) : withObjectCopy(source, mutator);
+  Array.isArray(source)
+    ? (withArrayCopy(source, mutator as any) as any)
+    : withObjectCopy(source, mutator);
 
 /**
- * non-mutating `Array.push()`
+ * non-mutating `Array.prototype.push()`
  * @returns changed array copy
  */
 export const push = <T>(list: T[], item: T): T[] => withArrayCopy(list, list => list.push(item));
@@ -53,17 +55,14 @@ export const push = <T>(list: T[], item: T): T[] => withArrayCopy(list, list => 
 export const drop = <T>(list: T[], n = 1): T[] => list.slice(n);
 
 /**
- * non-mutating `Array.filter()` that filters out passed item
+ * non-mutating `Array.prototype.filter()` that filters out passed item
  * @returns changed array copy
  */
-export function filterOut<T>(list: readonly T[], item: T): T[] & { removed: number } {
-  const newList = list.filter(i => i !== item) as T[] & { removed: number };
-  newList.removed = list.length - newList.length;
-  return newList;
-}
+export const filterOut = <T>(list: readonly T[], item: T): T[] & { removed: number } =>
+  filter(list, i => i !== item);
 
 /**
- * non-mutating `Array.filter()` as a standalone function
+ * non-mutating `Array.prototype.filter()` as a standalone function
  * @returns changed array copy
  */
 export function filter<T>(list: readonly T[], predicate: Predicate<T>): T[] & { removed: number } {
@@ -71,6 +70,24 @@ export function filter<T>(list: readonly T[], predicate: Predicate<T>): T[] & { 
   newList.removed = list.length - newList.length;
   return newList;
 }
+
+/**
+ * standalone `Array.prototype.map()` function
+ */
+export const map = <T, V>(list: readonly T[], mapFn: MappingFn<T, V>): V[] => list.map(mapFn);
+
+/**
+ * standalone `Array.prototype.slice()` function
+ */
+export const slice = <T>(list: readonly T[], start?: number, end?: number): T[] =>
+  list.slice(start, end);
+
+/**
+ * non-mutating `Array.prototype.splice()` as a standalone function
+ * @returns changed array copy
+ */
+export const splice = <T>(list: readonly T[], start: number, deleteCount: number, ...items: T[]) =>
+  withArrayCopy(list, list => list.splice(start, deleteCount, ...items));
 
 /**
  * Create a new subset object without the provided keys
