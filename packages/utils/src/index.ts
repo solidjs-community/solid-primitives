@@ -1,5 +1,5 @@
 import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
-import { Owner } from "solid-js/types/reactive/signal";
+import type { Owner } from "solid-js/types/reactive/signal";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import type {
@@ -48,10 +48,10 @@ export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T
  */
 export const accessAsArray = <T extends MaybeAccessor<any>, V = MaybeAccessorValue<T>>(
   value: T
-): V extends any[] ? V : V[] => {
-  const _value = access(value);
-  return Array.isArray(_value) ? (_value as any) : [_value];
-};
+): V extends any[] ? V : V[] => asArray(access(value)) as any;
+
+export const asArray = <T>(value: T): T extends any[] ? T : T[] =>
+  Array.isArray(value) ? (value as any) : [value];
 
 /**
  * Run the function if the accessed value is not `undefined` nor `null`
@@ -141,14 +141,19 @@ export function raceTimeout<T>(
   reason?: string
 ): T extends any[] ? Promise<Awaited<T[number]> | undefined> : Promise<Awaited<T> | undefined>;
 export function raceTimeout(
-  promises: any,
+  input: any,
   ms: number,
   throwOnTimeout = false,
   reason = "Timeout"
 ): Promise<any> {
-  const promiseList = Array.isArray(promises) ? promises : [promises];
-  promiseList.push(promiseTimeout(ms, throwOnTimeout, reason));
-  return Promise.race(promiseList);
+  const promises = asArray(input);
+  const race = Promise.race([...promises, promiseTimeout(ms, throwOnTimeout, reason)]);
+  race.finally(() => {
+    promises.forEach(
+      (p: any) => p && typeof p === "object" && typeof p.dispose === "function" && p.dispose()
+    );
+  });
+  return race;
 }
 
 /**
@@ -193,7 +198,7 @@ export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn)
  *    createEffect(() => {})
  * });
  */
-export function createSubRoot<T>(owner: Owner | null, fn: (dispose: Fn) => T): T {
+export function createSubRoot<T>(fn: (dispose: Fn) => T, owner = getOwner()): T {
   const [dispose, returns] = createRoot(dispose => [dispose, fn(dispose)], owner ?? undefined);
   owner && runWithOwner(owner, () => onCleanup(dispose));
   return returns;
@@ -211,8 +216,8 @@ export function createSubRoot<T>(owner: Owner | null, fn: (dispose: Fn) => T): T
  *    createEffect(() => {})
  * })
  */
-export function createSubRootFunction<T extends AnyFunction>(callback: T, owner = getOwner()): T {
-  return ((...args) => createSubRoot(owner, () => callback(...args))) as T;
+export function createSubRootFunction<T extends AnyFunction>(callback: T, owner?: Owner | null): T {
+  return ((...args) => createSubRoot(() => callback(...args), owner)) as T;
 }
 
 export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {

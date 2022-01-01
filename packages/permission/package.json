@@ -47,6 +47,6 @@
     "uvu": "^0.5.2"
   },
   "peerDependencies": {
-    "solid-js": "^1.2.5"
+    "solid-js": "^1.3.0-rc.2"
   }
 }
