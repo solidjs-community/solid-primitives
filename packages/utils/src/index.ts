@@ -1,4 +1,5 @@
 import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
+import { Owner } from "solid-js/types/reactive/signal";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import type {
@@ -130,15 +131,15 @@ export const promiseTimeout = (
 export function raceTimeout<T>(
   promises: T,
   ms: number,
-  throwOnTimeout?: false,
-  reason?: string
-): (T extends any[] ? Promise<Awaited<T[number]>> : Promise<Awaited<T>>) | undefined;
-export function raceTimeout<T>(
-  promises: T,
-  ms: number,
   throwOnTimeout: true,
   reason?: string
 ): T extends any[] ? Promise<Awaited<T[number]>> : Promise<Awaited<T>>;
+export function raceTimeout<T>(
+  promises: T,
+  ms: number,
+  throwOnTimeout?: boolean,
+  reason?: string
+): T extends any[] ? Promise<Awaited<T[number]> | undefined> : Promise<Awaited<T> | undefined>;
 export function raceTimeout(
   promises: any,
   ms: number,
@@ -192,7 +193,7 @@ export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn)
  *    createEffect(() => {})
  * });
  */
-export function createSubRoot<T>(owner: ReturnType<typeof getOwner>, fn: (dispose: Fn) => T): T {
+export function createSubRoot<T>(owner: Owner | null, fn: (dispose: Fn) => T): T {
   const [dispose, returns] = createRoot(dispose => [dispose, fn(dispose)], owner ?? undefined);
   owner && runWithOwner(owner, () => onCleanup(dispose));
   return returns;
