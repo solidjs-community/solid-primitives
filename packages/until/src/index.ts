@@ -1,15 +1,15 @@
 import { Truthy, Fn, createSubRoot } from "@solid-primitives/utils";
-import { Accessor, createComputed, onCleanup } from "solid-js";
+import { Accessor, createComputed, createMemo, onCleanup } from "solid-js";
 
 export type Until<T> = Promise<Truthy<T>> & { dispose: Fn };
 
 export const until = <T>(condition: Accessor<T>): Until<T> =>
   createSubRoot(dispose => {
+    const memo = createMemo(condition);
     const promise = new Promise((resolve, reject) => {
       createComputed(() => {
-        const v = condition();
-        if (!v) return;
-        resolve(v as Truthy<T>);
+        if (!memo()) return;
+        resolve(memo() as Truthy<T>);
         dispose();
       });
       onCleanup(reject);

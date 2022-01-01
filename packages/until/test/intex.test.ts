@@ -1,4 +1,5 @@
 import { until } from "../src";
+import { changed, includes } from "../src/resolvers";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createRoot, createSignal } from "solid-js";
@@ -74,3 +75,66 @@ testUntil("computation stops when root disposes", () =>
 // });
 
 testUntil.run();
+
+const testChanged = suite("changed");
+
+testChanged("resolves after changes", () =>
+  createRoot(dispose => {
+    const [count, setCount] = createSignal(0);
+    let captured: any;
+    until(changed(count, 2)).then(v => (captured = v));
+
+    setCount(1);
+    setTimeout(() => {
+      assert.is(captured, undefined);
+
+      setCount(1);
+      setTimeout(() => {
+        assert.is(captured, undefined);
+
+        setCount(2);
+        setTimeout(() => {
+          assert.is(captured, true);
+          dispose();
+        }, 0);
+      }, 0);
+    }, 0);
+  })
+);
+
+testChanged.run();
+
+const testIncludes = suite("includes");
+
+testIncludes("resolves when matches", () =>
+  createRoot(dispose => {
+    const [list, setList] = createSignal([4, 5]);
+    const [count, setCount] = createSignal(0);
+    const res = includes(list, count);
+
+    setCount(1);
+    assert.is(res(), false);
+
+    setList([1]);
+    assert.is(res(), true);
+
+    dispose();
+  })
+);
+
+testIncludes("list of functions", () =>
+  createRoot(dispose => {
+    const fn1 = () => {};
+    const fn2 = () => {};
+    const [list, setList] = createSignal([fn1]);
+    const res = includes(list, () => fn2);
+
+    assert.is(res(), false);
+    setList([fn1, fn2]);
+    assert.is(res(), true);
+
+    dispose();
+  })
+);
+
+testIncludes.run();

@@ -1,5 +1,3 @@
-// "The real signal builders"
-
 import { Predicate, MappingFn } from ".";
 import * as fp from "./fp";
 
