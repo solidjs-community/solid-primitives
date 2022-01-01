@@ -487,7 +487,7 @@ emitInEffect(); // listener will log an owner object
 
 ## Demo
 
-You may view a working example here: [ link to Stackblize or CodeSandBox ]
+https://codesandbox.io/s/solid-primitives-event-bus-6fp4h?file=/index.tsx
 
 ## Changelog
 
