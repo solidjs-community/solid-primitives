@@ -59,6 +59,10 @@ export type AnyFunction = (...args: any[]) => any;
 
 export type PrimitiveValue = string | boolean | number | bigint | symbol | null | undefined;
 
+export type FalsyValue = false | 0 | "" | null | undefined;
+export type Truthy<T> = T extends FalsyValue ? never : T;
+export type Falsy<T> = T extends FalsyValue ? T : never;
+
 /**
  * Destructible store object, with values changed to accessors
  */
