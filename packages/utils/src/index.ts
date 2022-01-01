@@ -1,5 +1,4 @@
 import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
-import { Owner } from "solid-js/types/reactive/signal";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import type {
@@ -180,40 +179,42 @@ export function destore<T extends Object>(store: Store<T>): Destore<T> {
  */
 export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
 
-/**
- * Creates a reactive root, which will be disposed when the passed owner does.
- *
- * @param fn
- * @param owner a root that will trigger the cleanup
- * @returns whatever the "fn" returns
- *
- * @example
- * const owner = getOwner()
- * const handleClick = () => createSubRoot(owner, () => {
- *    createEffect(() => {})
- * });
- */
-export function createSubRoot<T>(owner: Owner | null, fn: (dispose: Fn) => T): T {
-  const [dispose, returns] = createRoot(dispose => [dispose, fn(dispose)], owner ?? undefined);
-  owner && runWithOwner(owner, () => onCleanup(dispose));
-  return returns;
-}
+// createSubRoot requires solid 1.3.0:
 
-/**
- * A wrapper for creating functions with the `createSubRoot`
- *
- * @param callback
- * @param owner a root that will trigger the cleanup
- * @returns the callback function
- *
- * @example
- * const handleClick = createSubRootFunction(() => {
- *    createEffect(() => {})
- * })
- */
-export function createSubRootFunction<T extends AnyFunction>(callback: T, owner = getOwner()): T {
-  return ((...args) => createSubRoot(owner, () => callback(...args))) as T;
-}
+// /**
+//  * Creates a reactive root, which will be disposed when the passed owner does.
+//  *
+//  * @param fn
+//  * @param owner a root that will trigger the cleanup
+//  * @returns whatever the "fn" returns
+//  *
+//  * @example
+//  * const owner = getOwner()
+//  * const handleClick = () => createSubRoot(owner, () => {
+//  *    createEffect(() => {})
+//  * });
+//  */
+// export function createSubRoot<T>(owner: Owner | null, fn: (dispose: Fn) => T): T {
+//   const [dispose, returns] = createRoot(dispose => [dispose, fn(dispose)], owner ?? undefined);
+//   owner && runWithOwner(owner, () => onCleanup(dispose));
+//   return returns;
+// }
+
+// /**
+//  * A wrapper for creating functions with the `createSubRoot`
+//  *
+//  * @param callback
+//  * @param owner a root that will trigger the cleanup
+//  * @returns the callback function
+//  *
+//  * @example
+//  * const handleClick = createSubRootFunction(() => {
+//  *    createEffect(() => {})
+//  * })
+//  */
+// export function createSubRootFunction<T extends AnyFunction>(callback: T, owner = getOwner()): T {
+//   return ((...args) => createSubRoot(owner, () => callback(...args))) as T;
+// }
 
 export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {
   push: (...callbacks: Fn[]) => void;
