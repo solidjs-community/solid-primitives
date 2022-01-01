@@ -1,0 +1,65 @@
+{
+  "name": "@solid-primitives/event-bus",
+  "version": "0.0.100",
+  "description": "A collection of SolidJS primitives providing various features of a pubsub/event-emitter/event-bus.",
+  "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/utils#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "event-bus",
+    "stage": 2,
+    "list": [
+      "createSimpleEmitter",
+      "createEmitter",
+      "createEventBus",
+      "createEventHub",
+      "createEventStack"
+    ],
+    "category": "Utilities"
+  },
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite serve dev",
+    "start": "vite serve dev",
+    "build": "tsup",
+    "test": "uvu -r solid-register"
+  },
+  "keywords": [
+    "eventbus",
+    "pubsub",
+    "event",
+    "emitter",
+    "solid",
+    "primitives"
+  ],
+  "dependencies": {
+    "@solid-primitives/utils": "^0.1.0"
+  },
+  "devDependencies": {
+    "jsdom": "^19.0.0",
+    "prettier": "^2.5.1",
+    "solid-register": "^0.0.18",
+    "tslib": "^2.3.1",
+    "tsup": "^5.11.9",
+    "typescript": "^4.5.4",
+    "unocss": "^0.18.0",
+    "uvu": "^0.5.2",
+    "vite": "2.7.6",
+    "vite-plugin-solid": "2.1.4"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.2.6"
+  }
+}

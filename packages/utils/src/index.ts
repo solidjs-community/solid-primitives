@@ -1,54 +1,38 @@
-import type { Accessor } from "solid-js";
+import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
 import type { Store } from "solid-js/store";
+import { isServer } from "solid-js/web";
+import type {
+  AnyFunction,
+  Destore,
+  Fn,
+  ItemsOf,
+  MaybeAccessor,
+  MaybeAccessorValue,
+  Values
+} from "./types";
+
+export * from "./types";
 
 //
 // GENERAL HELPERS:
 //
 
-/**
- * A function
- */
-export type Fn<R = void> = () => R;
-/**
- * Can be single or in an array
- */
-export type Many<T> = T | T[];
-
-export type Keys<O extends Object> = keyof O;
-export type Values<O extends Object> = O[Keys<O>];
+/** no operation */
+export const noop = (...a: any[]) => {};
+export const isClient = !isServer;
+export { isServer };
 
 /**
- * Infers the type of the array elements
+ * `if (typeof value !== "undefined" && value !== null)`
  */
-export type ItemsOf<T> = T extends (infer E)[] ? E : never;
-/**
- * T or a reactive/non-reactive function returning T
- */
-export type MaybeAccessor<T> = T | Accessor<T>;
-/**
- * Accessed value of a MaybeAccessor
- * @example
- * MaybeAccessorValue<MaybeAccessor<string>>
- * // => string
- * MaybeAccessorValue<MaybeAccessor<() => string>>
- * // => string | (() => string)
- * MaybeAccessorValue<MaybeAccessor<string> | Function>
- * // => string | void
- */
-export type MaybeAccessorValue<T extends MaybeAccessor<any>> = T extends Fn ? ReturnType<T> : T;
-
-export const isClient = typeof window !== "undefined";
-export const isServer = !isClient;
+export const isDefined = <T>(value: T | undefined | null): value is T =>
+  typeof value !== "undefined" && value !== null;
 
 /**
  * Accesses the value of a MaybeAccessor
  * @example
- * access(x as MaybeAccessor<string>)
- * // => string
- * access(x as MaybeAccessor<() => string>)
- * // => string | (() => string)
- * access(x as MaybeAccessor<string> | Function)
- * // => string | void
+ * access("foo") // => "foo"
+ * access(() => "foo") // => "foo"
  */
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
   typeof v === "function" ? (v as any)() : v;
@@ -78,9 +62,17 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
   fn: (value: NonNullable<V>) => void
 ) => {
   const _value = access(value);
-  if (typeof _value !== "undefined" && _value !== null) fn(_value as NonNullable<V>);
+  isDefined(_value) && fn(_value as NonNullable<V>);
 };
 
+/**
+ * Quickly iterate over an MaybeAccessor<any>
+ *
+ * @example
+ * const myFunc = (source: MaybeAccessor<string[]>) => {
+ *    forEach(source, item => console.log(item))
+ * }
+ */
 export const forEach = <A extends MaybeAccessor<any>, V = MaybeAccessorValue<A>>(
   array: A,
   iterator: (
@@ -90,10 +82,25 @@ export const forEach = <A extends MaybeAccessor<any>, V = MaybeAccessorValue<A>>
   ) => void
 ): void => accessAsArray(array).forEach(iterator as any);
 
+/**
+ * Get `Object.entries()` of an MaybeAccessor<Object>
+ */
 export const entries = <A extends MaybeAccessor<Object>, V = MaybeAccessorValue<A>>(
   object: A
 ): [string, Values<V>][] => Object.entries(access(object));
 
+/**
+ * Creates a promise that resolves *(or rejects)* after gives time.
+ *
+ * @param ms timeout duration in ms
+ * @param throwOnTimeout promise will be rejected on timeout if set to `true`
+ * @param reason rejection reason
+ * @returns Promise<void>
+ *
+ * @example
+ * await promiseTimeout(1500) // will resolve void after timeout
+ * await promiseTimeout(1500, true, 'rejection reason') // will reject 'rejection reason' after timout
+ */
 export const promiseTimeout = (
   ms: number,
   throwOnTimeout = false,
@@ -104,37 +111,45 @@ export const promiseTimeout = (
   );
 
 /**
- * Create a new subset object without provided keys
+ * Combination of `Promise.race()` and `promiseTimeout`.
+ *
+ * @param promises single promise, or array of promises
+ * @param ms timeout duration in ms
+ * @param throwOnTimeout promise will be rejected on timeout if set to `true`
+ * @param reason rejection reason
+ * @returns a promise resulting in value of the first source promises to be resolved
+ *
+ * @example
+ * // single promise
+ * await raceTimeout(new Promise(() => {...}), 3000)
+ * // list of promises racing
+ * await raceTimeout([new Promise(),new Promise()...], 3000)
+ * // reject on timeout
+ * await raceTimeout(new Promise(), 3000, true, 'rejection reason')
  */
-export const objectOmit = <O extends Object, K extends keyof O>(
-  object: O,
-  ...keys: K[]
-): Omit<O, K> => {
-  const copy = Object.assign({}, object);
-  for (const key of keys) {
-    delete copy[key];
-  }
-  return copy;
-};
+export function raceTimeout<T>(
+  promises: T,
+  ms: number,
+  throwOnTimeout: true,
+  reason?: string
+): T extends any[] ? Promise<Awaited<T[number]>> : Promise<Awaited<T>>;
+export function raceTimeout<T>(
+  promises: T,
+  ms: number,
+  throwOnTimeout?: boolean,
+  reason?: string
+): T extends any[] ? Promise<Awaited<T[number]> | undefined> : Promise<Awaited<T> | undefined>;
+export function raceTimeout(
+  promises: any,
+  ms: number,
+  throwOnTimeout = false,
+  reason = "Timeout"
+): Promise<any> {
+  const promiseList = Array.isArray(promises) ? promises : [promises];
+  promiseList.push(promiseTimeout(ms, throwOnTimeout, reason));
+  return Promise.race(promiseList);
+}
 
-/**
- * Create a new subset object with provided keys
- */
-export const objectPick = <O extends Object, K extends keyof O>(
-  object: O,
-  ...keys: K[]
-): Pick<O, K> =>
-  keys.reduce((n, k) => {
-    if (k in object) n[k] = object[k];
-    return n;
-  }, {} as Pick<O, K>);
-
-/**
- * Destructible store object, with values changed to accessors
- */
-export type Destore<T extends Object> = {
-  [K in keyof T]: T[K] extends Function ? T[K] : Accessor<T[K]>;
-};
 /**
  * Allows the Solid's store to be destructured
  *
@@ -159,12 +174,54 @@ export function destore<T extends Object>(store: Store<T>): Destore<T> {
   return result;
 }
 
-export const createCallbackStack = <Arg0 = void, Arg1 = void, Arg2 = void, Arg3 = void>(): {
+/**
+ * Solid's `onCleanup` that runs only if there is a root.
+ */
+export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
+
+// createSubRoot requires solid 1.3.0:
+
+// /**
+//  * Creates a reactive root, which will be disposed when the passed owner does.
+//  *
+//  * @param fn
+//  * @param owner a root that will trigger the cleanup
+//  * @returns whatever the "fn" returns
+//  *
+//  * @example
+//  * const owner = getOwner()
+//  * const handleClick = () => createSubRoot(owner, () => {
+//  *    createEffect(() => {})
+//  * });
+//  */
+// export function createSubRoot<T>(owner: Owner | null, fn: (dispose: Fn) => T): T {
+//   const [dispose, returns] = createRoot(dispose => [dispose, fn(dispose)], owner ?? undefined);
+//   owner && runWithOwner(owner, () => onCleanup(dispose));
+//   return returns;
+// }
+
+// /**
+//  * A wrapper for creating functions with the `createSubRoot`
+//  *
+//  * @param callback
+//  * @param owner a root that will trigger the cleanup
+//  * @returns the callback function
+//  *
+//  * @example
+//  * const handleClick = createSubRootFunction(() => {
+//  *    createEffect(() => {})
+//  * })
+//  */
+// export function createSubRootFunction<T extends AnyFunction>(callback: T, owner = getOwner()): T {
+//   return ((...args) => createSubRoot(owner, () => callback(...args))) as T;
+// }
+
+export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {
   push: (...callbacks: Fn[]) => void;
-  execute: (arg0: Arg0, arg1: Arg1, arg2: Arg2, arg3: Arg3) => void;
+  execute: (arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void;
   clear: Fn;
 } => {
-  let stack: Array<(arg0: Arg0, arg1: Arg1, arg2: Arg2, arg3: Arg3) => void> = [];
+  let stack: Array<(arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void> = [];
   const clear: Fn = () => (stack = []);
   return {
     push: (...callbacks) => stack.push(...callbacks),

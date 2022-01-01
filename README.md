@@ -71,13 +71,13 @@ Solid Primitives strives to provide idiomatic Solid principles but also allow ro
 | 3     | Pre-shipping (final effort) |
 | 4     | Accepted/shipped            |
 
-Any primitive Stage 0-1 should be used with caution and with the understanding the the design or implementation may change. Beyond Stage 2 we make an effort to mitigate changes. If a primitive reaches Stage 2 it's likely to remain an official package with additional approvements until fully accepted and shipped.
+Any primitive Stage 0-1 should be used with caution and with the understanding the the design or implementation may change. Beyond Stage 2 we make an effort to mitigate changes. If a primitive reaches Stage 2 it's likely to remain an official package with additional approvement until fully accepted and shipped.
 
 ## Design Maxims
 
 Other frameworks have large and extremely well established ecosystems. Notably React which has a vast array of component and hooks. The amount of choice within the ecosystem is great but often these tools are built as one-offs resulting in often un-tested logic or are designed with narrow needs. Over time the less concise these building blocks are the more they tend to repeat themselves. Our goal with Primitives is to bring the community together to contribute, evolve and utilize a powerful centralize primitive foundation.
 
-All our primitives are meant to be consistent and sustain a level of quality. We guarentee that each is created with the utmost care. Our primitivates are:
+All our primitives are meant to be consistent and sustain a level of quality. We guarantee that each is created with the utmost care. Our primitivates are:
 
 1. Documented and follow a consistent style guide
 2. Be well tested
@@ -146,4 +146,3 @@ This package comes with a number of support utilities built with Lerna Scripts.
 - createWorker (in progress)
 - createQueue
 - createEffectWhen
-- createEventBus

@@ -1,4 +1,5 @@
-import { access, Fn, MaybeAccessor, objectOmit } from "@solid-primitives/utils";
+import { omit } from "@solid-primitives/utils/fp";
+import { access, Fn, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, batch, createComputed, createMemo, createSignal, onMount } from "solid-js";
 import {
   createMousePosition,
@@ -54,7 +55,7 @@ export function createMouseToElement(
     pageX = typeof pos.x === "function" ? pos.x : () => pos.x as number;
     pageY = typeof pos.y === "function" ? pos.y : () => pos.y as number;
   } else {
-    const [mouse] = createMousePosition(objectOmit(options, "initialValue"));
+    const [mouse] = createMousePosition(omit(options, "initialValue"));
     pageX = mouse.x;
     pageY = mouse.y;
   }
