@@ -73,6 +73,38 @@ try {
 }
 ```
 
+#### Manually stopping computation
+
+If you don't want to use `raceTimeout`, there are other ways to stop the reactive computation of `until` if needed.
+
+First, it will stop itself "onCleanup".
+
+```ts
+// the same goes for components as they are roots too
+createRoot(dispose => {
+
+  // disposing root causes the promise to reject,
+  // so you need to catch that outcome to prevent errors
+  until(condition)
+    .then(res => {...})
+    .catch(() => {})
+
+  dispose()
+})
+```
+
+Second, using the `.dispose()` method.
+
+```ts
+// until returns a promise with a dispose method in it
+const promise = until(condition);
+
+// you need to catch the rejection here too
+promise.then().catch();
+
+promise.dispose();
+```
+
 ## Changelog
 
 <details>
