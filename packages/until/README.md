@@ -109,6 +109,8 @@ promise.dispose();
 
 `until` + `createResource` demo: https://codesandbox.io/s/until-resource-demo-sfs7c?file=/src/index.tsx
 
+`until` as `createResource` fetcher: https://codesandbox.io/s/until-as-resource-fetcher-6sl0e?file=/src/index.tsx
+
 ## Changelog
 
 <details>
