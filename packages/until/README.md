@@ -105,6 +105,10 @@ promise.then().catch();
 promise.dispose();
 ```
 
+## Demo
+
+`until` + `createResource` demo: https://codesandbox.io/s/until-resource-demo-sfs7c?file=/src/index.tsx
+
 ## Changelog
 
 <details>
