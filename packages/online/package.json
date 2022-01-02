@@ -1,0 +1,53 @@
+{
+  "name": "@solid-primitives/online",
+  "version": "0.0.100",
+  "description": "A navigator.onLine signal.",
+  "author": "Klemen Slavič <krof.drakula@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/utils#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "online",
+    "stage": 0,
+    "list": [
+      "createOnline"
+    ],
+    "category": "Network"
+  },
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "vite serve dev",
+    "build": "tsup",
+    "test": "uvu -r solid-register"
+  },
+  "keywords": [
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "jsdom": "18.1.1",
+    "prettier": "^2.5.1",
+    "solid-register": "0.1.1",
+    "tslib": "^2.3.1",
+    "typescript": "^4.5.3",
+    "tsup": "^5.11.1",
+    "uvu": "^0.5.2",
+    "unocss": "^0.16.0",
+    "vite": "2.7.1",
+    "vite-plugin-solid": "2.1.4"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.2.6"
+  }
+}
