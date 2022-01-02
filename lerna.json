@@ -2,5 +2,6 @@
   "packages": [
     "packages/*"
   ],
-  "version": "independent"
+  "version": "independent",
+  "lerna-script-tasks": "./tasks.js"
 }
