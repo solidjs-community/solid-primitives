@@ -25,7 +25,7 @@ const [value, setValue] = createPrimitiveTemplate(false);
 
 ## Demo
 
-You may view a working example here: [ link to Stackblize or CodeSandBox ]
+You can use this template for publishing your demo on CodeSandbox: https://codesandbox.io/s/solid-primitives-demo-template-sz95h
 
 ## Changelog
 
