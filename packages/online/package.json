@@ -1,5 +1,5 @@
 {
-  "name": "@solid-primitives/online",
+  "name": "@solid-primitives/connectivity",
   "version": "0.0.100",
   "description": "A navigator.onLine signal.",
   "author": "Klemen Slavič <krof.drakula@gmail.com>",
@@ -10,10 +10,10 @@
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
   "primitive": {
-    "name": "online",
+    "name": "connectivity",
     "stage": 0,
     "list": [
-      "createOnline"
+      "createConnectivity"
     ],
     "category": "Network"
   },
