@@ -13,8 +13,7 @@
     "name": "until",
     "stage": 1,
     "list": [
-      "until",
-      "untilWithTimeout"
+      "until"
     ],
     "category": "Reactivity"
   },
@@ -39,7 +38,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^0.1.0"
+    "@solid-primitives/utils": "^0.1.2"
   },
   "devDependencies": {
     "jsdom": "^19.0.0",

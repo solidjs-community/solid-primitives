@@ -1,8 +1,26 @@
 import { Truthy, Fn, createSubRoot } from "@solid-primitives/utils";
 import { Accessor, createComputed, createMemo, onCleanup } from "solid-js";
 
+// .dispose() method is for disposing of root form outside
+// raceTimeout calls it when the first promise resolves
 export type Until<T> = Promise<Truthy<T>> & { dispose: Fn };
 
+/**
+ * Promised one-time watch for changes. Await a reactive condition.
+ *
+ * @param condition a signal or a reactive condition, which will resolve the promise if truthy
+ * @returns A promise that resolves a truthy value of a condition. Or rejects when it's root get's disposed.
+ *
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/until#readme
+ *
+ * @example
+ * const [count, setCount] = createSignal(0)
+ * await until(() => count() > 5)
+ *
+ * // or with createResource
+ * const [data] = createResource(fetcher)
+ * const result = await until(data)
+ */
 export const until = <T>(condition: Accessor<T>): Until<T> =>
   createSubRoot(dispose => {
     const memo = createMemo(condition);
@@ -14,6 +32,6 @@ export const until = <T>(condition: Accessor<T>): Until<T> =>
       });
       onCleanup(reject);
     }) as Until<T>;
-    Object.assign(promise, { dispose });
+    promise.dispose = dispose;
     return promise;
   });

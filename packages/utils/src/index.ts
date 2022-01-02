@@ -151,6 +151,8 @@ export function raceTimeout(
   const race = Promise.race([...promises, promiseTimeout(ms, throwOnTimeout, reason)]);
   race.finally(() => {
     promises.forEach(
+      // inputted promises can have .dispose() method on them,
+      // it will be called when the first promise resolves, to stop the rest
       (p: any) => p && typeof p === "object" && typeof p.dispose === "function" && p.dispose()
     );
   });
