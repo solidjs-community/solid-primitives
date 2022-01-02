@@ -39,7 +39,7 @@ console.log(await pool.add(1, 2));
 // output: 3
 ```
 
-### createSignaledWprler
+### createSignaledWorker
 
 Create a more advanced worker that accepts multiple instructional inputs:
 

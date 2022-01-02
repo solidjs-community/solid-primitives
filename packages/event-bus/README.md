@@ -51,7 +51,7 @@ Check out [shared types](https://github.com/davedbase/solid-primitives/blob/main
 
 ```ts
 function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(): [
-  listen: MultiArgListen<A0, A1, A2>,
+  listen: GenericListen<[A0, A1, A2]>,
   emit: GenericEmit<[A0, A1, A2]>,
   clear: ClearListeners
 ];
@@ -121,7 +121,7 @@ function createEmitter<A0 = void, A1 = void, A2 = void>(
 ): Emitter<A0, A1, A2>;
 
 type Emitter<A0 = void, A1 = void, A2 = void> = {
-  listen: MultiArgListenProtect<A0, A1, A2>;
+  listen: GenericListenProtect<[A0, A1, A2]>;
   emit: GenericEmit<[A0, A1, A2]>;
   remove: Remove<A0, A1, A2>;
   clear: ClearListeners;
@@ -487,7 +487,7 @@ emitInEffect(); // listener will log an owner object
 
 ## Demo
 
-You may view a working example here: [ link to Stackblize or CodeSandBox ]
+https://codesandbox.io/s/solid-primitives-event-bus-6fp4h?file=/index.tsx
 
 ## Changelog
 

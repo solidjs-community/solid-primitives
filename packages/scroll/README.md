@@ -9,6 +9,14 @@ Helpful primitives to manage browser scrolling.
 
 `createScrollObserver` - Helpful monitor that reports the current position of an element or window.
 
+## Installation
+
+```
+npm install @solid-primitives/scroll
+# or
+yarn add @solid-primitives/scroll
+```
+
 ## How to use it
 
 ```ts
