@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://raw.githubusercontent.com/davedbase/solid-primitives/main/banner.png" alt="Solid Primitives">
+  <img width="100%" src="https://raw.githubusercontent.com/davedbase/solid-primitives/main/assets/banner.png" alt="Solid Primitives">
 </p>
 
 # Solid Primitives
