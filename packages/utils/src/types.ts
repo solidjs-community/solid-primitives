@@ -39,6 +39,18 @@ export type MaybeAccessor<T> = T | Accessor<T>;
  */
 export type MaybeAccessorValue<T extends MaybeAccessor<any>> = T extends Fn ? ReturnType<T> : T;
 
+export type OnAccessEffectFunction<S, Prev, Next extends Prev = Prev> = (
+  input: AccessReturnTypes<S>,
+  prevInput: AccessReturnTypes<S>,
+  v: Prev
+) => Next;
+
+export type AccessReturnTypes<S> = S extends MaybeAccessor<any>[]
+  ? {
+      [I in keyof S]: AccessReturnTypes<S[I]>;
+    }
+  : MaybeAccessorValue<S>;
+
 /** Allows to make shallow overwrites to an interface */
 export type Modify<T, R> = Omit<T, keyof R> & R;
 

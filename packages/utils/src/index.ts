@@ -1,5 +1,12 @@
 import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
-import type { Owner } from "solid-js/types/reactive/signal";
+import {
+  Accessor,
+  EffectFunction,
+  NoInfer,
+  on,
+  OnOptions,
+  Owner
+} from "solid-js/types/reactive/signal";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import type {
@@ -10,6 +17,7 @@ import type {
   MaybeAccessor,
   MaybeAccessorValue,
   Noop,
+  OnAccessEffectFunction,
   Values
 } from "./types";
 
@@ -30,6 +38,8 @@ export { isServer };
 export const isDefined = <T>(value: T | undefined | null): value is T =>
   typeof value !== "undefined" && value !== null;
 
+export const isAccessor = <T>(value: T | Accessor<T>): value is T => typeof value === "function";
+
 /**
  * Accesses the value of a MaybeAccessor
  * @example
@@ -37,7 +47,7 @@ export const isDefined = <T>(value: T | undefined | null): value is T =>
  * access(() => "foo") // => "foo"
  */
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
-  typeof v === "function" ? (v as any)() : v;
+  isAccessor(v) ? (v as any)() : v;
 
 /**
  * Accesses the value of a MaybeAccessor, but always returns an array
@@ -66,6 +76,19 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
   const _value = access(value);
   isDefined(_value) && fn(_value as NonNullable<V>);
 };
+
+export const asAccessor = <A extends MaybeAccessor<unknown>>(
+  v: A
+): Accessor<MaybeAccessorValue<A>> => (isAccessor(v) ? (v as any) : () => v);
+
+export function onAccess<S extends MaybeAccessor<unknown>[] | [], Next, Init = unknown>(
+  deps: S,
+  fn: OnAccessEffectFunction<S, Init | Next, Next>,
+  options?: OnOptions
+): EffectFunction<NoInfer<Init> | NoInfer<Next>, NoInfer<Next>> {
+  const source = deps.map(asAccessor);
+  return (on as any)(source, fn, options);
+}
 
 /**
  * Quickly iterate over an MaybeAccessor<any>
@@ -178,7 +201,7 @@ export function destore<T extends Object>(store: Store<T>): Destore<T> {
   const _store = store as Record<string, any>;
   const result: any = {};
   Object.keys(_store).forEach(key => {
-    result[key] = typeof _store[key] === "function" ? _store[key].bind(_store) : () => _store[key];
+    result[key] = isAccessor(_store[key]) ? _store[key].bind(_store) : () => _store[key];
   });
   return result;
 }
