@@ -1,15 +1,7 @@
-import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
+import { getOwner, onCleanup } from "solid-js";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
-import type {
-  AnyFunction,
-  Destore,
-  Fn,
-  ItemsOf,
-  MaybeAccessor,
-  MaybeAccessorValue,
-  Values
-} from "./types";
+import type { Destore, Fn, ItemsOf, MaybeAccessor, MaybeAccessorValue, Values } from "./types";
 
 export * from "./types";
 
@@ -237,22 +229,22 @@ export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(
 // SIGNAL BUILDERS:
 //
 
-export const stringConcat = (...a: MaybeAccessor<any>[]): string =>
-  a.reduce((t: string, c) => t + access(c), "") as string;
+// export const stringConcat = (...a: MaybeAccessor<any>[]): string =>
+//   a.reduce((t: string, c) => t + access(c), "") as string;
 
-export const concat = <A extends MaybeAccessor<any>[], V = MaybeAccessorValue<ItemsOf<A>>>(
-  ...a: A
-): Array<V extends any[] ? ItemsOf<V> : V> =>
-  a.reduce((t, c) => {
-    const v = access(c);
-    return Array.isArray(v) ? [...t, ...v] : [...t, v];
-  }, []);
+// export const concat = <A extends MaybeAccessor<any>[], V = MaybeAccessorValue<ItemsOf<A>>>(
+//   ...a: A
+// ): Array<V extends any[] ? ItemsOf<V> : V> =>
+//   a.reduce((t, c) => {
+//     const v = access(c);
+//     return Array.isArray(v) ? [...t, ...v] : [...t, v];
+//   }, []);
 
-export const toFloat = (string: MaybeAccessor<string>): number => Number.parseFloat(access(string));
+// export const toFloat = (string: MaybeAccessor<string>): number => Number.parseFloat(access(string));
 
-export const toInt = (string: MaybeAccessor<string>, radix?: number): number =>
-  Number.parseInt(access(string), radix);
+// export const toInt = (string: MaybeAccessor<string>, radix?: number): number =>
+//   Number.parseInt(access(string), radix);
 
-export const toArray = <A extends MaybeAccessor<any>[]>(
-  ...a: A
-): MaybeAccessorValue<ItemsOf<A>>[] => a.map(v => access(v));
+// export const toArray = <A extends MaybeAccessor<any>[]>(
+//   ...a: A
+// ): MaybeAccessorValue<ItemsOf<A>>[] => a.map(v => access(v));

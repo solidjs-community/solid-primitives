@@ -1,0 +1,10 @@
+{
+   "entryPoints": [
+      "./src/index.ts",
+      "./src/fp.ts",
+      "./src/setter.ts"
+   ],
+   "out": "docs",
+   "githubPages": false,
+   "readme": "none"
+}
