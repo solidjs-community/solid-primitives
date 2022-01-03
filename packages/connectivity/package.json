@@ -40,7 +40,7 @@
     "test": "uvu -r solid-register"
   },
   "keywords": [
-    "newtwork",
+    "network",
     "online",
     "solid",
     "primitives"
