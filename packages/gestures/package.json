@@ -19,9 +19,6 @@
     "tslib": "^2.0.1",
     "typescript": "^4.0.2"
   },
-  "dependencies": {
-    "solid-js": "^1.3.0-rc.2"
-  },
   "jest": {
     "setupFiles": [
       "./test/setup.ts"
