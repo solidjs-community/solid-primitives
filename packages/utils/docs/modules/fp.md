@@ -28,11 +28,13 @@
 non-mutating function that drops n items from the array start.
 
 **`example`**
+```ts
 const newList = drop([1,2,3])
 newList // => [2,3]
 
 const newList = drop([1,2,3], 2)
 newList // => [3]
+```
 
 #### Type parameters
 
@@ -55,7 +57,7 @@ changed array copy
 
 #### Defined in
 
-[packages/utils/src/fp.ts:55](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/fp.ts#L55)
+[packages/utils/src/fp.ts:57](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/fp.ts#L57)
 
 ___
 
@@ -86,7 +88,7 @@ changed array copy
 
 #### Defined in
 
-[packages/utils/src/fp.ts:68](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/fp.ts#L68)
+[packages/utils/src/fp.ts:70](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/fp.ts#L70)
 
 ___
 
@@ -117,7 +119,7 @@ changed array copy
 
 #### Defined in
 
-[packages/utils/src/fp.ts:61](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/fp.ts#L61)
+[packages/utils/src/fp.ts:63](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/fp.ts#L63)
 
 ___
 
@@ -147,7 +149,7 @@ standalone `Array.prototype.map()` function
 
 #### Defined in
 
-[packages/utils/src/fp.ts:77](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/fp.ts#L77)
+[packages/utils/src/fp.ts:79](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/fp.ts#L79)
 
 ___
 
@@ -158,8 +160,10 @@ ___
 Create a new subset object without the provided keys
 
 **`example`**
+```ts
 const newObject = omit({ a:"foo", b:"bar", c: "baz" }, 'a', 'b')
 newObject // => { c: "baz" }
+```
 
 #### Type parameters
 
@@ -181,7 +185,7 @@ newObject // => { c: "baz" }
 
 #### Defined in
 
-[packages/utils/src/fp.ts:99](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/fp.ts#L99)
+[packages/utils/src/fp.ts:103](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/fp.ts#L103)
 
 ___
 
@@ -192,8 +196,10 @@ ___
 Create a new subset object with only the provided keys
 
 **`example`**
+```ts
 const newObject = pick({ a:"foo", b:"bar", c: "baz" }, 'a', 'b')
 newObject // => { a:"foo", b:"bar" }
+```
 
 #### Type parameters
 
@@ -215,7 +221,7 @@ newObject // => { a:"foo", b:"bar" }
 
 #### Defined in
 
-[packages/utils/src/fp.ts:109](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/fp.ts#L109)
+[packages/utils/src/fp.ts:115](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/fp.ts#L115)
 
 ___
 
@@ -246,7 +252,7 @@ changed array copy
 
 #### Defined in
 
-[packages/utils/src/fp.ts:42](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/fp.ts#L42)
+[packages/utils/src/fp.ts:42](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/fp.ts#L42)
 
 ___
 
@@ -276,7 +282,7 @@ standalone `Array.prototype.slice()` function
 
 #### Defined in
 
-[packages/utils/src/fp.ts:82](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/fp.ts#L82)
+[packages/utils/src/fp.ts:84](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/fp.ts#L84)
 
 ___
 
@@ -309,7 +315,7 @@ changed array copy
 
 #### Defined in
 
-[packages/utils/src/fp.ts:89](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/fp.ts#L89)
+[packages/utils/src/fp.ts:91](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/fp.ts#L91)
 
 ___
 
@@ -340,7 +346,7 @@ changed array copy
 
 #### Defined in
 
-[packages/utils/src/fp.ts:9](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/fp.ts#L9)
+[packages/utils/src/fp.ts:9](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/fp.ts#L9)
 
 ___
 
@@ -371,7 +377,7 @@ changed object copy
 
 #### Defined in
 
-[packages/utils/src/fp.ts:33](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/fp.ts#L33)
+[packages/utils/src/fp.ts:33](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/fp.ts#L33)
 
 ___
 
@@ -402,4 +408,4 @@ changed object copy
 
 #### Defined in
 
-[packages/utils/src/fp.ts:21](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/fp.ts#L21)
+[packages/utils/src/fp.ts:21](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/fp.ts#L21)

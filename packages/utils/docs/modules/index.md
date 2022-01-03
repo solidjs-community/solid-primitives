@@ -65,7 +65,7 @@
 
 #### Defined in
 
-[packages/utils/src/types.ts:58](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L58)
+[packages/utils/src/types.ts:60](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L60)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/types.ts:57](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L57)
+[packages/utils/src/types.ts:59](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L59)
 
 ___
 
@@ -93,7 +93,7 @@ Makes each property optional and turns each leaf property into any, allowing for
 
 #### Defined in
 
-[packages/utils/src/types.ts:53](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L53)
+[packages/utils/src/types.ts:55](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L55)
 
 ___
 
@@ -111,7 +111,7 @@ Destructible store object, with values changed to accessors
 
 #### Defined in
 
-[packages/utils/src/types.ts:65](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L65)
+[packages/utils/src/types.ts:67](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L67)
 
 ___
 
@@ -137,7 +137,7 @@ A function
 
 #### Defined in
 
-[packages/utils/src/types.ts:6](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L6)
+[packages/utils/src/types.ts:6](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L6)
 
 ___
 
@@ -155,7 +155,7 @@ Infers the type of the array elements
 
 #### Defined in
 
-[packages/utils/src/types.ts:19](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L19)
+[packages/utils/src/types.ts:19](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L19)
 
 ___
 
@@ -171,7 +171,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/types.ts:13](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L13)
+[packages/utils/src/types.ts:13](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L13)
 
 ___
 
@@ -189,7 +189,7 @@ Can be single or in an array
 
 #### Defined in
 
-[packages/utils/src/types.ts:11](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L11)
+[packages/utils/src/types.ts:11](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L11)
 
 ___
 
@@ -222,7 +222,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/types.ts:22](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L22)
+[packages/utils/src/types.ts:22](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L22)
 
 ___
 
@@ -240,7 +240,7 @@ T or a reactive/non-reactive function returning T
 
 #### Defined in
 
-[packages/utils/src/types.ts:27](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L27)
+[packages/utils/src/types.ts:27](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L27)
 
 ___
 
@@ -251,12 +251,14 @@ ___
 Accessed value of a MaybeAccessor
 
 **`example`**
+```ts
 MaybeAccessorValue<MaybeAccessor<string>>
 // => string
 MaybeAccessorValue<MaybeAccessor<() => string>>
 // => string | (() => string)
 MaybeAccessorValue<MaybeAccessor<string> | Function>
 // => string | void
+```
 
 #### Type parameters
 
@@ -266,7 +268,7 @@ MaybeAccessorValue<MaybeAccessor<string> | Function>
 
 #### Defined in
 
-[packages/utils/src/types.ts:38](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L38)
+[packages/utils/src/types.ts:40](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L40)
 
 ___
 
@@ -285,7 +287,7 @@ Allows to make shallow overwrites to an interface
 
 #### Defined in
 
-[packages/utils/src/types.ts:41](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L41)
+[packages/utils/src/types.ts:43](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L43)
 
 ___
 
@@ -304,7 +306,7 @@ Allows to make nested overwrites to an interface
 
 #### Defined in
 
-[packages/utils/src/types.ts:44](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L44)
+[packages/utils/src/types.ts:46](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L46)
 
 ___
 
@@ -336,7 +338,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/types.ts:21](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L21)
+[packages/utils/src/types.ts:21](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L21)
 
 ___
 
@@ -346,7 +348,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/types.ts:60](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L60)
+[packages/utils/src/types.ts:62](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L62)
 
 ___
 
@@ -362,7 +364,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/types.ts:14](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/types.ts#L14)
+[packages/utils/src/types.ts:14](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/types.ts#L14)
 
 ## Variables
 
@@ -372,7 +374,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/index.ts:14](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L14)
+[packages/utils/src/index.ts:14](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L14)
 
 ___
 
@@ -393,8 +395,10 @@ node_modules/solid-js/web/types/index.d.ts:5
 Accesses the value of a MaybeAccessor
 
 **`example`**
+```ts
 access("foo") // => "foo"
 access(() => "foo") // => "foo"
+```
 
 #### Type parameters
 
@@ -414,7 +418,7 @@ access(() => "foo") // => "foo"
 
 #### Defined in
 
-[packages/utils/src/index.ts:29](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L29)
+[packages/utils/src/index.ts:31](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L31)
 
 ___
 
@@ -425,10 +429,12 @@ ___
 Accesses the value of a MaybeAccessor, but always returns an array
 
 **`example`**
+```ts
 accessAsArray('abc') // => ['abc']
 accessAsArray(() => 'abc') // => ['abc']
 accessAsArray([1,2,3]) // => [1,2,3]
 accessAsArray(() => [1,2,3]) // => [1,2,3]
+```
 
 #### Type parameters
 
@@ -449,7 +455,7 @@ accessAsArray(() => [1,2,3]) // => [1,2,3]
 
 #### Defined in
 
-[packages/utils/src/index.ts:40](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L40)
+[packages/utils/src/index.ts:44](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L44)
 
 ___
 
@@ -478,7 +484,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/index.ts:211](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L211)
+[packages/utils/src/index.ts:223](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L223)
 
 ___
 
@@ -489,6 +495,7 @@ ___
 Allows the Solid's store to be destructured
 
 **`example`**
+```ts
 const [state, setState] = createStore({
   count: 0,
   get double() { return this.count * 2 },
@@ -496,6 +503,7 @@ const [state, setState] = createStore({
 const { count, double } = destore(state)
 // use it like a signal:
 count()
+```
 
 #### Type parameters
 
@@ -517,7 +525,7 @@ Destructible object, with values changed to accessors
 
 #### Defined in
 
-[packages/utils/src/index.ts:160](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L160)
+[packages/utils/src/index.ts:172](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L172)
 
 ___
 
@@ -546,7 +554,7 @@ Get `Object.entries()` of an MaybeAccessor<Object>
 
 #### Defined in
 
-[packages/utils/src/index.ts:80](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L80)
+[packages/utils/src/index.ts:86](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L86)
 
 ___
 
@@ -557,9 +565,11 @@ ___
 Quickly iterate over an MaybeAccessor<any>
 
 **`example`**
+```ts
 const myFunc = (source: MaybeAccessor<string[]>) => {
    forEach(source, item => console.log(item))
 }
+```
 
 #### Type parameters
 
@@ -581,7 +591,7 @@ const myFunc = (source: MaybeAccessor<string[]>) => {
 
 #### Defined in
 
-[packages/utils/src/index.ts:68](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L68)
+[packages/utils/src/index.ts:74](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L74)
 
 ___
 
@@ -609,7 +619,7 @@ value is T
 
 #### Defined in
 
-[packages/utils/src/index.ts:20](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L20)
+[packages/utils/src/index.ts:20](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L20)
 
 ___
 
@@ -631,7 +641,7 @@ no operation
 
 #### Defined in
 
-[packages/utils/src/index.ts:13](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L13)
+[packages/utils/src/index.ts:13](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L13)
 
 ___
 
@@ -663,7 +673,7 @@ onCleanup - run an effect once before the reactive scope is disposed
 
 #### Defined in
 
-[packages/utils/src/index.ts:172](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L172)
+[packages/utils/src/index.ts:184](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L184)
 
 ___
 
@@ -674,8 +684,10 @@ ___
 Creates a promise that resolves *(or rejects)* after gives time.
 
 **`example`**
+```ts
 await promiseTimeout(1500) // will resolve void after timeout
 await promiseTimeout(1500, true, 'rejection reason') // will reject 'rejection reason' after timout
+```
 
 #### Parameters
 
@@ -693,7 +705,7 @@ Promise<void>
 
 #### Defined in
 
-[packages/utils/src/index.ts:96](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L96)
+[packages/utils/src/index.ts:104](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L104)
 
 ___
 
@@ -704,12 +716,14 @@ ___
 Combination of `Promise.race()` and `promiseTimeout`.
 
 **`example`**
+```ts
 // single promise
 await raceTimeout(new Promise(() => {...}), 3000)
 // list of promises racing
 await raceTimeout([new Promise(),new Promise()...], 3000)
 // reject on timeout
 await raceTimeout(new Promise(), 3000, true, 'rejection reason')
+```
 
 #### Type parameters
 
@@ -734,7 +748,7 @@ a promise resulting in value of the first source promises to be resolved
 
 #### Defined in
 
-[packages/utils/src/index.ts:122](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L122)
+[packages/utils/src/index.ts:132](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L132)
 
 ▸ **raceTimeout**<`T`\>(`promises`, `ms`, `throwOnTimeout?`, `reason?`): `T` extends `any`[] ? `Promise`<`Awaited`<`T`[`number`]\> \| `undefined`\> : `Promise`<`Awaited`<`T`\> \| `undefined`\>
 
@@ -759,7 +773,7 @@ a promise resulting in value of the first source promises to be resolved
 
 #### Defined in
 
-[packages/utils/src/index.ts:128](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L128)
+[packages/utils/src/index.ts:138](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L138)
 
 ___
 
@@ -790,4 +804,4 @@ Run the function if the accessed value is not `undefined` nor `null`
 
 #### Defined in
 
-[packages/utils/src/index.ts:52](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/index.ts#L52)
+[packages/utils/src/index.ts:56](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/index.ts#L56)

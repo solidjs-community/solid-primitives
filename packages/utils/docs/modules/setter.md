@@ -50,7 +50,7 @@
 
 #### Defined in
 
-[packages/utils/src/setter.ts:11](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/setter.ts#L11)
+[packages/utils/src/setter.ts:11](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/setter.ts#L11)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/setter.ts:21](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/setter.ts#L21)
+[packages/utils/src/setter.ts:21](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/setter.ts#L21)
 
 ___
 
@@ -126,7 +126,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/setter.ts:16](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/setter.ts#L16)
+[packages/utils/src/setter.ts:16](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/setter.ts#L16)
 
 ___
 
@@ -164,7 +164,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/setter.ts:26](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/setter.ts#L26)
+[packages/utils/src/setter.ts:26](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/setter.ts#L26)
 
 ___
 
@@ -202,7 +202,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/setter.ts:6](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/setter.ts#L6)
+[packages/utils/src/setter.ts:6](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/setter.ts#L6)
 
 ___
 
@@ -241,7 +241,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/setter.ts:31](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/setter.ts#L31)
+[packages/utils/src/setter.ts:31](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/setter.ts#L31)
 
 ___
 
@@ -280,7 +280,7 @@ ___
 
 #### Defined in
 
-[packages/utils/src/setter.ts:36](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/setter.ts#L36)
+[packages/utils/src/setter.ts:36](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/setter.ts#L36)
 
 ▸ **splice**<`T`\>(`start`, `deleteCount`, ...`items`): (`list`: `T`[]) => `T`[]
 
@@ -316,4 +316,4 @@ ___
 
 #### Defined in
 
-[packages/utils/src/setter.ts:37](https://github.com/davedbase/solid-primitives/blob/ad37021/packages/utils/src/setter.ts#L37)
+[packages/utils/src/setter.ts:37](https://github.com/davedbase/solid-primitives/blob/db2edff/packages/utils/src/setter.ts#L37)
