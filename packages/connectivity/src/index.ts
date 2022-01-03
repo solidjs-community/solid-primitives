@@ -1,4 +1,5 @@
-import { Accessor, createSignal, onCleanup } from "solid-js";
+import { createEventListenerMap } from "@solid-primitives/event-listener";
+import { Accessor, createSignal } from "solid-js";
 
 /**
  * A signal representing the browser's interpretation of whether it is on- or offline.
@@ -7,13 +8,9 @@ import { Accessor, createSignal, onCleanup } from "solid-js";
  */
 export const createConnectivity = (): Accessor<boolean> => {
   const [onLine, setOnLine] = createSignal<boolean>(navigator.onLine);
-  const online = () => setOnLine(true);
-  const offline = () => setOnLine(false);
-  window.addEventListener("online", online);
-  window.addEventListener("offline", offline);
-  onCleanup(() => {
-    window.removeEventListener("online", online);
-    window.removeEventListener("offline", offline);
+  createEventListenerMap(window, {
+    online: () => setOnLine(true),
+    offline: () => setOnLine(false)
   });
   return onLine;
 };
