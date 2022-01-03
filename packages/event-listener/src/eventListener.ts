@@ -1,11 +1,14 @@
 import {
-  access,
   createCallbackStack,
-  isClient,
   Many,
   MaybeAccessor,
   forEach,
-  Fn
+  Fn,
+  isAccessor,
+  onAccess,
+  noop,
+  access,
+  isServer
 } from "@solid-primitives/utils";
 import { createSignal } from "solid-js";
 import { Accessor, createEffect, onCleanup } from "solid-js";
@@ -13,7 +16,8 @@ import {
   ClearListeners,
   EventListenerDirectiveProps,
   EventMapOf,
-  TargetWithEventMap
+  TargetWithEventMap,
+  EventListenerOptions
 } from "./types";
 
 export type EventListenerSignalReturns<Event> = [
@@ -47,7 +51,7 @@ export function createEventListener<
   target: MaybeAccessor<Many<Target>>,
   eventName: MaybeAccessor<EventName>,
   handler: (event: EventMap[EventName]) => void,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
+  options?: MaybeAccessor<EventListenerOptions>
 ): ClearListeners;
 
 // Custom Events
@@ -58,30 +62,52 @@ export function createEventListener<
   target: MaybeAccessor<Many<EventTarget>>,
   eventName: MaybeAccessor<EventName>,
   handler: (event: EventMap[EventName]) => void,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
+  options?: MaybeAccessor<EventListenerOptions>
 ): ClearListeners;
 
 export function createEventListener(
   targets: MaybeAccessor<Many<EventTarget>>,
   eventName: MaybeAccessor<string>,
   handler: (event: Event) => void,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
+  options?: MaybeAccessor<EventListenerOptions>
 ): ClearListeners {
-  if (!isClient) return () => {};
-  const toCleanup = createCallbackStack();
-  createEffect(() => {
-    toCleanup.execute();
-    const _eventName = access(eventName);
-    const _options = access(options);
+  if (isServer) return noop;
+  const cleanup = createCallbackStack();
+
+  const attachListeners = (
+    targets: Many<EventTarget>,
+    eventName: string,
+    options?: EventListenerOptions
+  ) => {
+    cleanup.execute();
     forEach(targets, el => {
       if (!el) return;
-      el.addEventListener(_eventName, handler, _options);
-      toCleanup.push(() => el.removeEventListener(_eventName, handler, _options));
+      el.addEventListener(eventName, handler, options);
+      cleanup.push(() => el.removeEventListener(eventName, handler, options));
     });
-  });
-  onCleanup(toCleanup.execute);
-  return toCleanup.execute;
+  };
+
+  if (isAccessor(targets)) {
+    // if the target is an accessor the listeners will be added on the first effect (onMount)
+    // so that when passed a jsx ref it will be availabe
+    createEffect(onAccess([targets, eventName, options], a => attachListeners(...a)));
+  } else {
+    // if the target prop is NOT an accessor, the event listeners can be added right away
+    attachListeners(targets, access(eventName), access(options));
+    createEffect(
+      onAccess([eventName, options], a => attachListeners(targets, ...a), { defer: true })
+    );
+  }
+
+  onCleanup(cleanup.execute);
+  return cleanup.execute;
 }
+
+// Possible targets prop shapes:
+// el
+// () => el
+// [el, el]
+// () => [el, el]
 
 /**
  * Provides an reactive signal of last captured event.

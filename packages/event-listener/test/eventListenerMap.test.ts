@@ -17,6 +17,25 @@ test("will listen to multiple events", () =>
       map_1: e => (captured1 = e)
     });
 
+    dispatchFakeEvent("map_0", testEvent);
+    dispatchFakeEvent("map_1", testEvent1);
+
+    assert.is(captured, testEvent);
+    assert.is(captured1, testEvent1);
+    dispose();
+  }));
+
+test("target accessor", () =>
+  createRoot(dispose => {
+    const testEvent = new Event("map_0");
+    const testEvent1 = new Event("map_1");
+    let captured: any;
+    let captured1: any;
+    createEventListenerMap(() => window, {
+      map_0: e => (captured = e),
+      map_1: e => (captured1 = e)
+    });
+
     onMount(() => {
       dispatchFakeEvent("map_0", testEvent);
       dispatchFakeEvent("map_1", testEvent1);

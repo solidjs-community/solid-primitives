@@ -1,12 +1,5 @@
-import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
-import {
-  Accessor,
-  EffectFunction,
-  NoInfer,
-  on,
-  OnOptions,
-  Owner
-} from "solid-js/types/reactive/signal";
+import { createRoot, getOwner, onCleanup, runWithOwner, on, Accessor } from "solid-js";
+import type { EffectFunction, NoInfer, OnOptions, Owner } from "solid-js/types/reactive/signal";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import type {
@@ -38,7 +31,8 @@ export { isServer };
 export const isDefined = <T>(value: T | undefined | null): value is T =>
   typeof value !== "undefined" && value !== null;
 
-export const isAccessor = <T>(value: T | Accessor<T>): value is T => typeof value === "function";
+export const isAccessor = <T>(value: T | Function): value is Function =>
+  typeof value === "function";
 
 /**
  * Accesses the value of a MaybeAccessor
