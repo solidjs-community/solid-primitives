@@ -2,7 +2,7 @@ import { createDateDifference, createDateNow, HOUR, MINUTE, SECOND, WEEK, YEAR }
 import { Component, createMemo, createSignal, on } from "solid-js";
 import { render } from "solid-js/web";
 import { clamp, valToP, pToVal } from "./utils";
-import listen from "@solid-primitives/event-listener";
+import { createEventListener } from "@solid-primitives/event-listener";
 import { createEffect } from "solid-js";
 import { format, formatRelative } from "date-fns";
 import { onMount } from "solid-js";
@@ -50,8 +50,8 @@ const Slider: Component<{
   );
   createEffect(() => props.ondrag(Math.round(value())));
 
-  listen(window, "mousemove", (e: MouseEvent) => dragging() && setPageX(e.pageX));
-  listen(window, "mouseup", () => setDragging(false));
+  createEventListener(window, "mousemove", e => dragging() && setPageX(e.pageX));
+  createEventListener(window, "mouseup", () => setDragging(false));
 
   return (
     <div ref={bar} class="w-[80vw] h-6 my-4 relative bg-gray-100 rounded-full">
