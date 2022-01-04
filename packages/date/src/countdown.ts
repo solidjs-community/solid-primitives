@@ -1,6 +1,3 @@
-import { createStore } from "solid-js/store";
-import createTimer, { Schedule } from "@solid-primitives/timer";
-
 interface Countdown {
   days?: number;
   hours?: number;
@@ -28,5 +25,3 @@ const createCountdown = (start: Date, end?: () => Date, interval = 1000): Countd
   createTimer(calculate, interval, Schedule.Interval);
   return data;
 };
-
-export default createCountdown;

@@ -55,5 +55,8 @@
   },
   "peerDependencies": {
     "solid-js": "^1.3.0-rc.2"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "^0.1.2"
   }
 }
