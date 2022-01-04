@@ -1,6 +1,5 @@
 import { createPrimitiveTemplate } from "../src";
-import { createComputed, createEffect, createRoot } from "solid-js";
-import { createStore } from "solid-js/store";
+import { createRoot } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 

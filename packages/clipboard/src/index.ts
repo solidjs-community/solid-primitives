@@ -1,15 +1,17 @@
 import { onCleanup } from "solid-js";
-import { isServer } from "solid-js/web";
 
 export type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
+export type NewClipboardItem = (data: ClipboardItemData, type: string) => ClipboardItem;
+export type CopyToClipboardOptions = {
+  value?: any;
+  setter?: ClipboardSetter;
+  highlight?: boolean;
+};
 
 declare module "solid-js" {
   namespace JSX {
     interface Directives {
-      copyToClipboard: {
-        value?: any;
-        setter: ClipboardSetter;
-      };
+      copyToClipboard: CopyToClipboardOptions | true;
     }
   }
 }
@@ -19,7 +21,7 @@ declare module "solid-js" {
  *
  * @return write - A method to write to the clipboard
  * @return read - Read from the clipboard
- * @return options - IntersectionObserver constructor options:
+ * @return helpers - helper functions:
  * - `newItem` — Returns an item to write to the clipboard.
  *
  * @example
@@ -30,17 +32,15 @@ declare module "solid-js" {
  */
 const createClipboard = (): [
   write: ClipboardSetter,
-  read: () => Promise<ClipboardItems | undefined>,
-  helpers: {
-    newItem: (data: ClipboardItemData, type: string) => ClipboardItem;
-  }
+  read: () => Promise<string>,
+  helpers: { newItem: NewClipboardItem }
 ] => {
-  const read = async () => navigator.clipboard.read();
-  const write = async (data: string | ClipboardItem[]) =>
-    // @ts-ignore
-    await navigator.clipboard[typeof data === "string" ? "writeText" : "write"](data);
-  const newItem = (data: ClipboardItemData, type: string) =>
-    !isServer ? new ClipboardItem({ [type]: data }) : ({} as ClipboardItem);
+  const read = () => navigator.clipboard.readText();
+  const write: ClipboardSetter = data =>
+    typeof data === "string"
+      ? navigator.clipboard.writeText(data)
+      : navigator.clipboard.write(data);
+  const newItem: NewClipboardItem = (data, type) => new ClipboardItem({ [type]: data });
   return [write, read, { newItem }];
 };
 
@@ -59,28 +59,10 @@ const createClipboard = (): [
  * <input type="text" use:copyToClipboard />
  * ```
  */
-export const copyToClipboard = (
-  el: Element,
-  options: () => {
-    value?: any;
-    setter?: ClipboardSetter;
-    highlight: boolean;
-  }
-) => {
+export const copyToClipboard = (el: Element, options: () => CopyToClipboardOptions | true) => {
   function highlightText(node: Element, start: number, end: number) {
     const text = node.childNodes[0];
-    // SSR protected value
-    const range = !isServer
-      ? new Range()
-      : // @ts-ignore
-        ({
-          setStart: () => {
-            /*noop*/
-          },
-          setEnd: () => {
-            /*noop*/
-          }
-        } as Range);
+    const range = new Range();
     const selection = document.getSelection();
     range.setStart(text, start);
     range.setEnd(text, end);
@@ -88,18 +70,19 @@ export const copyToClipboard = (
     selection!.addRange(range);
   }
   const setValue = () => {
-    let data = options().value;
+    const config: CopyToClipboardOptions = typeof options === "object" ? options : {};
+    let data = config.value;
     if (!data) {
       // @ts-ignore
       data = el[["input", "texfield"].includes(el.tagName.toLowerCase()) ? "value" : "innerHTML"];
     }
     let write;
-    if (options().setter) {
-      write = options().setter;
+    if (config.setter) {
+      write = config.setter;
     } else {
       [write] = createClipboard();
     }
-    if (options().highlight !== false) highlightText(el, 0, data.length);
+    if (config.highlight !== false) highlightText(el, 0, data.length);
     write!(data);
   };
   el.addEventListener("click", setValue);

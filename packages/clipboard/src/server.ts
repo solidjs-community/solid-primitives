@@ -1,35 +1,12 @@
-import type { ClipboardSetter } from "./index";
+import * as api from "./index";
 
-export const createClipboard = (): [
-  write: ClipboardSetter,
-  read: () => Promise<ClipboardItems | undefined>,
-  helpers: {
-    newItem: (data: ClipboardItemData, type: string) => ClipboardItem | undefined;
+const createClipboard: typeof api.default = (...a: any[]) => [
+  () => undefined as unknown as Promise<void>,
+  () => undefined as unknown as Promise<undefined>,
+  {
+    newItem: () => ({} as ClipboardItem)
   }
-] => {
-  return [
-    async (_data: string | ClipboardItem[]) => {
-      /*noop*/
-    },
-    async () => {
-      return undefined;
-    },
-    {
-      newItem: (_data: ClipboardItemData, _type: string) => {
-        /*noop*/
-        return undefined;
-      }
-    }
-  ];
-};
+];
+export default createClipboard;
 
-export const copyToClipboard = (
-  _el: Element,
-  _options: () => {
-    value?: any;
-    setter?: ClipboardSetter;
-    highlight: boolean;
-  }
-) => {
-  /*noop*/
-};
+export const copyToClipboard: typeof api.copyToClipboard = () => {};
