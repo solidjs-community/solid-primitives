@@ -37,8 +37,10 @@ export const isAccessor = <T>(value: T | Function): value is Function =>
 /**
  * Accesses the value of a MaybeAccessor
  * @example
+ * ```ts
  * access("foo") // => "foo"
  * access(() => "foo") // => "foo"
+ * ```
  */
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
   isAccessor(v) ? (v as any)() : v;
@@ -46,10 +48,12 @@ export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T
 /**
  * Accesses the value of a MaybeAccessor, but always returns an array
  * @example
+ * ```ts
  * accessAsArray('abc') // => ['abc']
  * accessAsArray(() => 'abc') // => ['abc']
  * accessAsArray([1,2,3]) // => [1,2,3]
  * accessAsArray(() => [1,2,3]) // => [1,2,3]
+ * ```
  */
 export const accessAsArray = <T extends MaybeAccessor<any>, V = MaybeAccessorValue<T>>(
   value: T
@@ -88,9 +92,11 @@ export function onAccess<S extends MaybeAccessor<unknown>[] | [], Next, Init = u
  * Quickly iterate over an MaybeAccessor<any>
  *
  * @example
+ * ```ts
  * const myFunc = (source: MaybeAccessor<string[]>) => {
  *    forEach(source, item => console.log(item))
  * }
+ * ```
  */
 export const forEach = <A extends MaybeAccessor<any>, V = MaybeAccessorValue<A>>(
   array: A,
@@ -117,8 +123,10 @@ export const entries = <A extends MaybeAccessor<Object>, V = MaybeAccessorValue<
  * @returns Promise<void>
  *
  * @example
+ * ```ts
  * await promiseTimeout(1500) // will resolve void after timeout
  * await promiseTimeout(1500, true, 'rejection reason') // will reject 'rejection reason' after timout
+ * ```
  */
 export const promiseTimeout = (
   ms: number,
@@ -139,12 +147,14 @@ export const promiseTimeout = (
  * @returns a promise resulting in value of the first source promises to be resolved
  *
  * @example
+ * ```ts
  * // single promise
  * await raceTimeout(new Promise(() => {...}), 3000)
  * // list of promises racing
  * await raceTimeout([new Promise(),new Promise()...], 3000)
  * // reject on timeout
  * await raceTimeout(new Promise(), 3000, true, 'rejection reason')
+ * ```
  */
 export function raceTimeout<T>(
   promises: T,
@@ -183,6 +193,7 @@ export function raceTimeout(
  * @returns Destructible object, with values changed to accessors
  *
  * @example
+ * ```ts
  * const [state, setState] = createStore({
  *   count: 0,
  *   get double() { return this.count * 2 },
@@ -190,6 +201,7 @@ export function raceTimeout(
  * const { count, double } = destore(state)
  * // use it like a signal:
  * count()
+ * ```
  */
 export function destore<T extends Object>(store: Store<T>): Destore<T> {
   const _store = store as Record<string, any>;

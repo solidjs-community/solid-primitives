@@ -46,11 +46,13 @@ export const push = <T>(list: T[], item: T): T[] => withArrayCopy(list, list => 
  * @returns changed array copy
  *
  * @example
+ * ```ts
  * const newList = drop([1,2,3])
  * newList // => [2,3]
  *
  * const newList = drop([1,2,3], 2)
  * newList // => [3]
+ * ```
  */
 export const drop = <T>(list: T[], n = 1): T[] => list.slice(n);
 
@@ -93,8 +95,10 @@ export const splice = <T>(list: readonly T[], start: number, deleteCount: number
  * Create a new subset object without the provided keys
  *
  * @example
+ * ```ts
  * const newObject = omit({ a:"foo", b:"bar", c: "baz" }, 'a', 'b')
  * newObject // => { c: "baz" }
+ * ```
  */
 export const omit = <O extends object, K extends keyof O>(object: O, ...keys: K[]): Omit<O, K> =>
   withObjectCopy(object, object => keys.forEach(key => delete object[key]));
@@ -103,8 +107,10 @@ export const omit = <O extends object, K extends keyof O>(object: O, ...keys: K[
  * Create a new subset object with only the provided keys
  *
  * @example
+ * ```ts
  * const newObject = pick({ a:"foo", b:"bar", c: "baz" }, 'a', 'b')
  * newObject // => { a:"foo", b:"bar" }
+ * ```
  */
 export const pick = <O extends object, K extends keyof O>(object: O, ...keys: K[]): Pick<O, K> =>
   keys.reduce((n, k) => {
