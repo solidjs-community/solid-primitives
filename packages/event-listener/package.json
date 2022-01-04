@@ -44,7 +44,7 @@
     "primitives"
   ],
   "devDependencies": {
-    "jsdom": "^19.0.0",
+    "jsdom": "^18.1.1",
     "prettier": "^2.5.0",
     "solid-register": "0.0.18",
     "tslib": "^2.3.1",

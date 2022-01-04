@@ -51,7 +51,7 @@
     "node-fetch": "^3.1.0"
   },
   "devDependencies": {
-    "jsdom": "^19.0.0",
+    "jsdom": "^18.1.1",
     "prettier": "^2.0.5",
     "solid-register": "0.1.1",
     "tslib": "^2.3.1",

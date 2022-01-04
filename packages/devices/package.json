@@ -50,7 +50,7 @@
     "primitives"
   ],
   "devDependencies": {
-    "jsdom": "^19.0.0",
+    "jsdom": "^18.1.1",
     "prettier": "^2.4.1",
     "rimraf": "^3.0.2",
     "solid-register": "0.1.1",

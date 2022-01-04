@@ -28,6 +28,7 @@
   ],
   "scripts": {
     "start": "vite serve dev",
+    "dev": "vite serve dev",
     "build": "tsup",
     "test": "uvu -r solid-register"
   },
