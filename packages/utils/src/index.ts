@@ -31,7 +31,7 @@ export { isServer };
 export const isDefined = <T>(value: T | undefined | null): value is T =>
   typeof value !== "undefined" && value !== null;
 
-export const isAccessor = <T>(value: T | Function): value is Function =>
+export const isFunction = <T>(value: T | Function): value is Function =>
   typeof value === "function";
 
 /**
@@ -43,7 +43,7 @@ export const isAccessor = <T>(value: T | Function): value is Function =>
  * ```
  */
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
-  isAccessor(v) ? (v as any)() : v;
+  isFunction(v) ? (v as any)() : v;
 
 /**
  * Accesses the value of a MaybeAccessor, but always returns an array
@@ -77,7 +77,7 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
 
 export const asAccessor = <A extends MaybeAccessor<unknown>>(
   v: A
-): Accessor<MaybeAccessorValue<A>> => (isAccessor(v) ? (v as any) : () => v);
+): Accessor<MaybeAccessorValue<A>> => (isFunction(v) ? (v as any) : () => v);
 
 export function onAccess<S extends MaybeAccessor<unknown>[] | [], Next, Init = unknown>(
   deps: S,
@@ -207,7 +207,7 @@ export function destore<T extends Object>(store: Store<T>): Destore<T> {
   const _store = store as Record<string, any>;
   const result: any = {};
   Object.keys(_store).forEach(key => {
-    result[key] = isAccessor(_store[key]) ? _store[key].bind(_store) : () => _store[key];
+    result[key] = isFunction(_store[key]) ? _store[key].bind(_store) : () => _store[key];
   });
   return result;
 }

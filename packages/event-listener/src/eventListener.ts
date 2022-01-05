@@ -4,7 +4,7 @@ import {
   MaybeAccessor,
   forEach,
   Fn,
-  isAccessor,
+  isFunction,
   onAccess,
   noop,
   access,
@@ -87,7 +87,7 @@ export function createEventListener(
     });
   };
 
-  if (isAccessor(targets)) {
+  if (isFunction(targets)) {
     // if the target is an accessor the listeners will be added on the first effect (onMount)
     // so that when passed a jsx ref it will be availabe
     createEffect(onAccess([targets, eventName, options], a => attachListeners(...a)));

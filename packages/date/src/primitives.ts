@@ -1,4 +1,4 @@
-import { access, Fn, isAccessor, isDefined, MaybeAccessor } from "@solid-primitives/utils";
+import { access, Fn, isFunction, isDefined, MaybeAccessor } from "@solid-primitives/utils";
 import {
   Accessor,
   createComputed,
@@ -7,32 +7,45 @@ import {
   createSignal,
   onCleanup
 } from "solid-js";
-import { createStore } from "solid-js/store";
-import { Store } from "solid-js/store";
-import { Countdown, getCountdown, MINUTE } from ".";
-
-export type DateInit = number | Date | string;
-export type DateSetter = (input: DateInit | ((prev: Date) => DateInit)) => Date;
-export type TimeSetter = (input: DateInit | ((prev: number) => DateInit)) => number;
+import { createStore, Store } from "solid-js/store";
+import {
+  Countdown,
+  DateInit,
+  DateSetter,
+  DEFAULT_MESSAGES,
+  formatDate,
+  formatTimeDifference,
+  TimeAgoOptions,
+  getCountdown,
+  getDate,
+  getDateDifference,
+  getTime,
+  GetUpdateInterval,
+  HOUR,
+  MINUTE,
+  TimeSetter,
+  UpdateInterval
+} from ".";
 
 export const createDate = (init: MaybeAccessor<DateInit>): [Accessor<Date>, DateSetter] => {
-  const [date, setDate] = createSignal(new Date(access(init)));
+  const [date, setDate] = createSignal(getDate(access(init)));
   const setter: DateSetter = input =>
     setDate(prev => {
-      const init = typeof input === "function" ? input(prev) : input;
-      return init instanceof Date ? init : new Date(init);
+      const init = isFunction(input) ? input(prev) : input;
+      return getDate(init);
     });
-  if (isAccessor(init)) createComputed(() => setter(init()));
+  if (isFunction(init)) createComputed(() => setter(init()));
   return [date, setter];
 };
 
-export const createTime = (input: MaybeAccessor<DateInit>): [Accessor<number>, TimeSetter] => {
-  const [date, setDate] = createDate(input);
-  const time = createMemo(() => date().getTime());
-  const setter: TimeSetter = input => {
-    const date = setDate(typeof input === "function" ? input(time()) : input);
-    return date.getTime();
-  };
+export const createTime = (init: MaybeAccessor<DateInit>): [Accessor<number>, TimeSetter] => {
+  const [time, setTime] = createSignal(getTime(access(init)));
+  const setter: TimeSetter = input =>
+    setTime(prev => {
+      const init = isFunction(input) ? input(prev) : input;
+      return getTime(init);
+    });
+  if (isFunction(init)) createComputed(() => setter(init()));
   return [time, setter];
 };
 
@@ -54,7 +67,9 @@ export const createTime = (input: MaybeAccessor<DateInit>): [Accessor<number>, T
  * update()
  * ```
  */
-export function createDateNow(interval: MaybeAccessor<number> = MINUTE / 2): [Accessor<Date>, Fn] {
+export function createDateNow(
+  interval: MaybeAccessor<UpdateInterval> = MINUTE / 2
+): [Accessor<Date>, Fn] {
   const [now, setNow] = createSignal(new Date());
   const update = () => setNow(new Date());
   let timer: number;
@@ -68,13 +83,53 @@ export function createDateNow(interval: MaybeAccessor<number> = MINUTE / 2): [Ac
   return [now, update];
 }
 
-export function createDateDifference(
+export function createTimeDifference(
   from: MaybeAccessor<DateInit>,
   to: MaybeAccessor<DateInit>
-): Accessor<number> {
-  const [fromTime] = createTime(from),
-    [toTime] = createTime(to);
-  return createMemo(() => fromTime() - toTime());
+): [difference: Accessor<number>, extra: { from: Accessor<Date>; to: Accessor<Date> }] {
+  const [fromDate] = createDate(from),
+    [toDate] = createDate(to);
+  const diff = createMemo(() => getDateDifference(fromDate(), toDate()));
+  return [diff, { from: fromDate, to: toDate }];
+}
+
+export function createTimeDifferenceFromNow(
+  to: MaybeAccessor<DateInit>,
+  updateInterval: UpdateInterval | GetUpdateInterval = diff =>
+    Math.abs(diff) <= HOUR ? MINUTE / 2 : HOUR / 2
+): [difference: Accessor<number>, extra: { from: Accessor<Date>; to: Accessor<Date>; update: Fn }] {
+  const [now, update] = createDateNow(
+    isFunction(updateInterval) ? () => updateInterval(diff()) : updateInterval
+  );
+  const [diff, extra] = createTimeDifference(now, to);
+  return [diff, { update, ...extra }];
+}
+
+export function createTimeAgo(
+  to: MaybeAccessor<DateInit>,
+  options: TimeAgoOptions = {}
+): [
+  timeago: Accessor<string>,
+  extra: { from: Accessor<Date>; to: Accessor<Date>; update: Fn; difference: Accessor<number> }
+] {
+  const {
+    min = MINUTE,
+    max = Infinity,
+    dateFormatter = formatDate,
+    messages,
+    differenceFormatter = (a, b, diff) => formatTimeDifference(diff, messages)
+  } = options;
+
+  const [difference, extra] = createTimeDifferenceFromNow(to, options.interval);
+
+  const timeAgo = createMemo(() => {
+    const absDiff = Math.abs(difference());
+    if (absDiff < min) return messages?.justNow ?? DEFAULT_MESSAGES.justNow;
+    if (absDiff > max) return dateFormatter(extra.to());
+    return differenceFormatter(extra.from(), extra.to(), difference());
+  });
+
+  return [timeAgo, { ...extra, difference }];
 }
 
 export function createCountdown(
@@ -87,9 +142,18 @@ export function createCountdown(
   b?: MaybeAccessor<DateInit>
 ): Store<Countdown> {
   let difference: Accessor<number>;
-  if (isDefined(b)) difference = createDateDifference(a, b);
+  if (isDefined(b)) difference = createTimeDifference(a, b)[0];
   else difference = a as Accessor<number>;
   const [countdown, setCountdown] = createStore<Countdown>({});
   createComputed(() => setCountdown(getCountdown(difference())));
   return countdown;
+}
+
+export function createCountdownFromNow(
+  to: MaybeAccessor<DateInit>,
+  updateInterval: UpdateInterval | GetUpdateInterval = 1000
+): [countdown: Store<Countdown>, extra: { from: Accessor<Date>; to: Accessor<Date>; update: Fn }] {
+  const [difference, extra] = createTimeDifferenceFromNow(to, updateInterval);
+  const countdown = createCountdown(difference);
+  return [countdown, extra];
 }
