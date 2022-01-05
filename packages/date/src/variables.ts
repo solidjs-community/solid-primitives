@@ -1,13 +1,21 @@
 import { RelativeFormatMessages, Unit } from ".";
 
+/** one second in ms */
 export const SECOND = 1000,
+  /** one minute in ms */
   MINUTE = 60_000,
+  /** one hour in ms */
   HOUR = 3_600_000,
+  /** one day in ms */
   DAY = 86_400_000,
+  /** one week in ms */
   WEEK = 604_800_000,
+  /** one month in ms */
   MONTH = 2_592_000_000,
+  /** one year in ms */
   YEAR = 31_536_000_000;
 
+/** @internal */
 export const UNITS: Unit[] = [
   { max: 60000, value: SECOND, name: "second" },
   { max: 2760000, value: MINUTE, name: "minute" },
@@ -18,6 +26,7 @@ export const UNITS: Unit[] = [
   { max: Infinity, value: YEAR, name: "year" }
 ];
 
+/** @internal */
 export const DEFAULT_MESSAGES: RelativeFormatMessages = {
   justNow: "just now",
   past: n => (n.match(/\d/) ? `${n} ago` : n),

@@ -66,6 +66,7 @@ export interface TimeAgoOptions {
   relativeFormatter?: RelativeFormatter;
 }
 
+/** timestamp `number` | date `string` | `Date` instance */
 export type DateInit = number | Date | string;
 export type DateSetter = (input: DateInit | ((prev: Date) => DateInit)) => Date;
 export type TimeSetter = (input: DateInit | ((prev: number) => DateInit)) => number;
