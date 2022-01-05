@@ -5,15 +5,15 @@ import { Accessor, createSignal, onCleanup } from "solid-js";
  *
  * @return Returns a signal representing the online status. Read-only.
  */
-export const createConnectivity = (): Accessor<boolean> => {
-  const [onLine, setOnLine] = createSignal<boolean>(navigator.onLine);
-  const online = () => setOnLine(true);
-  const offline = () => setOnLine(false);
+export const createConnectivitySignal = (): Accessor<boolean> => {
+  const [status, setStatus] = createSignal<boolean>(navigator.onLine);
+  const online = () => setStatus(true);
+  const offline = () => setStatus(false);
   window.addEventListener("online", online);
   window.addEventListener("offline", offline);
   onCleanup(() => {
     window.removeEventListener("online", online);
     window.removeEventListener("offline", offline);
   });
-  return onLine;
+  return status;
 };

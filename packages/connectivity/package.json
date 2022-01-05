@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/connectivity",
-  "version": "0.0.100",
+  "version": "0.1.0",
   "description": "A navigator.onLine signal.",
   "author": "Klemen Slavič <krof.drakula@gmail.com>",
   "license": "MIT",
@@ -11,9 +11,9 @@
   },
   "primitive": {
     "name": "connectivity",
-    "stage": 0,
+    "stage": 1,
     "list": [
-      "createConnectivity"
+      "createConnectivitySignal"
     ],
     "category": "Network"
   },

@@ -1,1 +1,1 @@
-export const createConnectivity = () => () => true;
+export const createConnectivitySignal = () => () => true;
