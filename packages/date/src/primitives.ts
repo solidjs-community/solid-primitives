@@ -89,7 +89,7 @@ export function createDateNow(
     clearInterval(timer);
     const ms = access(interval);
     // if interval === 0 | false the date won't update automatically
-    if (ms) timer = setInterval(update, ms);
+    if (ms) timer = setInterval(update, ms) as any;
   });
   onCleanup(() => clearInterval(timer));
   return [now, update];

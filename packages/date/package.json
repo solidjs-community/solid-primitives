@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/date",
-  "version": "1.0.2",
-  "description": "Reactive primitives that provide autoupdating, relative date features.",
+  "version": "1.1.0",
+  "description": "Collection of reactive primitives and utility functions, providing easier ways to deal with dates in SolidJS",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/date",
@@ -13,8 +13,14 @@
     "name": "date",
     "stage": 2,
     "list": [
+      "createDate",
       "createDateNow",
-      "createDateDifference"
+      "createTime",
+      "createTimeDifference",
+      "createTimeDifferenceFromNow",
+      "createTimeAgo",
+      "createCountdown",
+      "createCountdownFromNow"
     ],
     "category": "Utilities"
   },
