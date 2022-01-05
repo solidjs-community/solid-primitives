@@ -1,5 +1,5 @@
 export type MessageFormatter<T = number> = (value: T, isPast: boolean) => string;
-export type RelativeFormatter = (from: Date, to: Date, diff: number) => string;
+export type RelativeFormatter = (now: Date, target: Date, diff: number) => string;
 
 export interface RelativeFormatMessages {
   justNow: string;
