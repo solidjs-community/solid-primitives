@@ -23,15 +23,15 @@ export const getDateDifference = (from: Date, to: Date): number => to.getTime() 
 
 export const getCountdown = (difference: number): Countdown => ({
   days: Math.floor(difference / DAY),
-  hours: Math.floor(difference / HOUR),
-  minutes: Math.floor(difference / MINUTE),
-  seconds: Math.floor(difference / SECOND),
-  milliseconds: difference
+  hours: Math.floor((difference / HOUR) % 24),
+  minutes: Math.floor((difference / MINUTE) % 60),
+  seconds: Math.floor((difference / SECOND) % 60),
+  milliseconds: difference % 100
 });
 
 export const formatDate = (date: Date): string => date.toISOString().slice(0, 10);
 
-export function formatTimeDifference(
+export function formatDateRelative(
   difference: number,
   messages?: Partial<RelativeFormatMessages>
 ): string {

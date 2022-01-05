@@ -14,7 +14,7 @@ import {
   DateSetter,
   DEFAULT_MESSAGES,
   formatDate,
-  formatTimeDifference,
+  formatDateRelative,
   TimeAgoOptions,
   getCountdown,
   getDate,
@@ -97,12 +97,15 @@ export function createTimeDifferenceFromNow(
   to: MaybeAccessor<DateInit>,
   updateInterval: UpdateInterval | GetUpdateInterval = diff =>
     Math.abs(diff) <= HOUR ? MINUTE / 2 : HOUR / 2
-): [difference: Accessor<number>, extra: { from: Accessor<Date>; to: Accessor<Date>; update: Fn }] {
+): [
+  difference: Accessor<number>,
+  extra: { now: Accessor<Date>; target: Accessor<Date>; update: Fn }
+] {
   const [now, update] = createDateNow(
     isFunction(updateInterval) ? () => updateInterval(diff()) : updateInterval
   );
-  const [diff, extra] = createTimeDifference(now, to);
-  return [diff, { update, ...extra }];
+  const [diff, { to: target }] = createTimeDifference(now, to);
+  return [diff, { update, target, now }];
 }
 
 export function createTimeAgo(
@@ -110,14 +113,14 @@ export function createTimeAgo(
   options: TimeAgoOptions = {}
 ): [
   timeago: Accessor<string>,
-  extra: { from: Accessor<Date>; to: Accessor<Date>; update: Fn; difference: Accessor<number> }
+  extra: { now: Accessor<Date>; target: Accessor<Date>; update: Fn; difference: Accessor<number> }
 ] {
   const {
     min = MINUTE,
     max = Infinity,
     dateFormatter = formatDate,
     messages,
-    differenceFormatter = (a, b, diff) => formatTimeDifference(diff, messages)
+    relativeFormatter = (a, b, diff) => formatDateRelative(diff, messages)
   } = options;
 
   const [difference, extra] = createTimeDifferenceFromNow(to, options.interval);
@@ -125,8 +128,8 @@ export function createTimeAgo(
   const timeAgo = createMemo(() => {
     const absDiff = Math.abs(difference());
     if (absDiff < min) return messages?.justNow ?? DEFAULT_MESSAGES.justNow;
-    if (absDiff > max) return dateFormatter(extra.to());
-    return differenceFormatter(extra.from(), extra.to(), difference());
+    if (absDiff > max) return dateFormatter(extra.target());
+    return relativeFormatter(extra.now(), extra.target(), difference());
   });
 
   return [timeAgo, { ...extra, difference }];
@@ -152,7 +155,10 @@ export function createCountdown(
 export function createCountdownFromNow(
   to: MaybeAccessor<DateInit>,
   updateInterval: UpdateInterval | GetUpdateInterval = 1000
-): [countdown: Store<Countdown>, extra: { from: Accessor<Date>; to: Accessor<Date>; update: Fn }] {
+): [
+  countdown: Store<Countdown>,
+  extra: { now: Accessor<Date>; target: Accessor<Date>; update: Fn }
+] {
   const [difference, extra] = createTimeDifferenceFromNow(to, updateInterval);
   const countdown = createCountdown(difference);
   return [countdown, extra];

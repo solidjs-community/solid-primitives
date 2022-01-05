@@ -1,71 +1,18 @@
-import { createDateDifference, createDateNow, HOUR, MINUTE, SECOND, WEEK, YEAR } from "../src";
-import { Component, createMemo, createSignal, on } from "solid-js";
+import {
+  createTimeAgo,
+  createDateNow,
+  HOUR,
+  MINUTE,
+  SECOND,
+  WEEK,
+  YEAR,
+  createCountdown
+} from "../src";
+import { Component, createMemo, createSignal } from "solid-js";
 import { render } from "solid-js/web";
-import { clamp, valToP, pToVal } from "./utils";
-import { createEventListener } from "@solid-primitives/event-listener";
-import { createEffect } from "solid-js";
 import { format, formatRelative } from "date-fns";
-import { onMount } from "solid-js";
-import { createCompositeEffect, createModifier } from "@solid-primitives/composites";
-
+import { Slider } from "./lib";
 import "uno.css";
-
-const withMounted = createModifier<void>((s, cb) => {
-  onMount(() => {
-    // @ts-ignore
-    cb(s(), undefined, undefined);
-  });
-  return [cb, {}];
-});
-
-const Slider: Component<{
-  ondrag: (value: number) => void;
-  value?: number;
-  min: number;
-  max: number;
-}> = props => {
-  const [pageX, setPageX] = createSignal(0);
-  const [dragging, setDragging] = createSignal(false);
-  const [p, setP] = createSignal(clamp(valToP(props.value, props.min, props.max), 0, 1));
-
-  let bar!: HTMLDivElement;
-
-  const [left, setLeft] = createSignal(0);
-  createCompositeEffect(
-    withMounted(p, () => setLeft((p() * 2 - 1) * ((bar.offsetWidth - 12) / 2)))
-  );
-
-  const bezier = t => t * t * t;
-  const value = createMemo(on(p, p => pToVal((bezier(p * 2 - 1) + 1) / 2, props.min, props.max)));
-  createEffect(
-    on(
-      pageX,
-      pageX => {
-        const x = pageX - bar.offsetLeft;
-        const w = bar.offsetWidth;
-        setP(clamp(valToP(x, 0, w), 0, 1));
-      },
-      { defer: true }
-    )
-  );
-  createEffect(() => props.ondrag(Math.round(value())));
-
-  createEventListener(window, "mousemove", e => dragging() && setPageX(e.pageX));
-  createEventListener(window, "mouseup", () => setDragging(false));
-
-  return (
-    <div ref={bar} class="w-[80vw] h-6 my-4 relative bg-gray-100 rounded-full">
-      <div
-        class="w-6 h-6 border-2 border-blue-400 box-content absolute bg-blue-400 rounded-full select-none left-1/2 -top-0.5 -ml-3"
-        style={{ transform: `translateX(${left() ?? 0 - 2}px)` }}
-        onmousedown={e => {
-          setPageX(e.pageX);
-          setDragging(true);
-        }}
-      ></div>
-    </div>
-  );
-};
 
 const App: Component = () => {
   const timeRange = YEAR;
@@ -75,39 +22,62 @@ const App: Component = () => {
   const [inputTimeMs, setInputTimeMs] = createSignal(0);
   const targetTimestamp = createMemo(() => Date.now() + inputTimeMs());
 
-  const [timeago, { target }] = createDateDifference(targetTimestamp);
+  // default timeago format
+  const [timeago, { target }] = createTimeAgo(targetTimestamp);
 
-  const [customTimeago] = createDateDifference(targetTimestamp, {
+  // custom relative firmatter using date-fns
+  const [customTimeago] = createTimeAgo(targetTimestamp, {
     min: SECOND * 10,
-    updateInterval: MINUTE / 2,
-    relativeFormatter: (target, now) => formatRelative(target, now)
+    interval: MINUTE / 2,
+    relativeFormatter: (from, to) => formatRelative(to, from)
   });
 
-  const [customTimeago2] = createDateDifference(targetTimestamp, {
+  // custom absolute formatter using date-fns
+  const [customTimeago2] = createTimeAgo(targetTimestamp, {
     min: 0,
     max: WEEK * 2,
-    updateInterval: diff => (diff <= MINUTE ? SECOND : diff <= HOUR ? MINUTE / 2 : HOUR / 2),
-    absoluteFormatter: date => format(date, "d MMM yyyy — HH:mm")
+    interval: diff => (diff <= MINUTE ? SECOND : diff <= HOUR ? MINUTE / 2 : HOUR / 2),
+    dateFormatter: date => format(date, "d MMM yyyy — HH:mm")
   });
 
+  // autoupdating current date
   const [dateNow] = createDateNow(updateNowInterval);
+
+  // countdown
+  const countdown = createCountdown(dateNow, targetTimestamp);
 
   return (
     <div class="w-screen min-h-screen overflow-hidden flex flex-col justify-center items-center space-y-12 bg-gray-50">
-      <div class="flex flex-col items-center p-8 bg-white rounded-3xl shadow-lg">
+      <div class="card">
         <div>
           NOW: <span>{format(dateNow(), "d MMM yyyy — HH:mm:ss:SSS")}</span>
         </div>
         <p>Update "now" every {updateNowInterval()}ms</p>
         <Slider ondrag={setUpdateNowInterval} min={200} max={10_000} value={updateNowInterval()} />
       </div>
-      <div class="flex flex-col items-center p-8 bg-white rounded-3xl shadow-lg">
+      <div class="card">
         <p>{inputTimeMs()}ms</p>
         <Slider ondrag={setInputTimeMs} value={0} min={-timeRange} max={timeRange} />
         <p>TARGET: {format(target(), "d MMM yyyy — HH:mm")}</p>
         <p>DEFAULT: {timeago()}</p>
         <p>CUSTOM: {customTimeago()}</p>
         <p>CUSTOM2: {customTimeago2()}</p>
+      </div>
+      <div class="card">
+        <div class="flex space-x-2">
+          <div class="countdown-cell">
+            Days: <span class="countdown-cell-number">{countdown.days}</span>
+          </div>
+          <div class="countdown-cell">
+            Hours: <span class="countdown-cell-number">{countdown.hours}</span>
+          </div>
+          <div class="countdown-cell">
+            Minutes: <span class="countdown-cell-number">{countdown.minutes}</span>
+          </div>
+          <div class="countdown-cell">
+            Seconds: <span class="countdown-cell-number">{countdown.seconds}</span>
+          </div>
+        </div>
       </div>
     </div>
   );
