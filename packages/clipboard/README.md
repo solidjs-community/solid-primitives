@@ -52,4 +52,8 @@ Committing first version of primitive.
 
 Added proper SSR support and modified documentation.
 
+1.2.8
+
+Upgraded to Solid 1.3
+
 </details>

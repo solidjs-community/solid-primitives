@@ -35,4 +35,8 @@ Initial release as a Stage-0 primitive.
 
 Change primitive name to createConnectivitySignal. Minor adjustments to internal variable naming. Updated to a Stage 1 primitive.
 
+0.1.1
+
+Upgraded to Solid 1.3
+
 </details>

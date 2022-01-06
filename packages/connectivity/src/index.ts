@@ -6,7 +6,7 @@ import { Accessor, createSignal } from "solid-js";
  *
  * @return Returns a signal representing the online status. Read-only.
  */
-export const createConnectivity = (): Accessor<boolean> => {
+export const createConnectivitySignal = (): Accessor<boolean> => {
   const [status, setStatus] = createSignal<boolean>(navigator.onLine);
   createEventListener(window, "online", () => setStatus(true));
   createEventListener(window, "offline", () => setStatus(false));

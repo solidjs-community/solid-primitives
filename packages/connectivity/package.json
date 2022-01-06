@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/connectivity",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A navigator.onLine signal.",
   "author": "Klemen Slavič <krof.drakula@gmail.com>",
   "license": "MIT",
@@ -46,7 +46,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/event-listener": "^1.4.0"
+    "@solid-primitives/event-listener": "^1.4.1"
   },
   "devDependencies": {
     "jsdom": "18.1.1",
@@ -61,6 +61,6 @@
     "vite-plugin-solid": "2.1.4"
   },
   "peerDependencies": {
-    "solid-js": "^1.2.6"
+    "solid-js": "^1.3.1"
   }
 }
