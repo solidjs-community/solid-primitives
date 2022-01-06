@@ -52,11 +52,11 @@
     "unocss": "^0.12.4",
     "uvu": "^0.5.2",
     "vite": "2.6.14",
-    "vite-plugin-solid": "2.2.0",
+    "vite-plugin-solid": "2.2.1",
     "watchlist": "^0.3.1"
   },
   "peerDependencies": {
-    "solid-js": "1.3.0-rc.4"
+    "solid-js": "1.3.0"
   },
   "dependencies": {
     "@solid-primitives/utils": "^0.1.2"
