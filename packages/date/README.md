@@ -17,6 +17,8 @@ Collection of reactive primitives and utility functions, providing easier ways t
 - [`createCountdownFromNow`](#createCountdownFromNow) - Provides a reactive, autoupdating _(from **now**)_, broken down "time remaining" as a Store.
 - \+ [some non-reactive date-related utility functions](#utility-functions).
 
+Note: This package consolidates date-related primitives formerly contained countdown and date-diff.
+
 ## Installation
 
 ```
