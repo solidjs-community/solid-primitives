@@ -1,16 +1,16 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
 
-type ResizeHandler = (size: { width: number, height: number }, ref: HTMLElement) => void;
+type ResizeHandler = (size: { width: number, height: number }, ref: Element) => void;
 
 /**
  * Create resize observer is a helper primitive for binding resize events.
  *
- * @param opts.refs - Either an `HTMLElement`, an array of `HTMLElement`s, or a signal returning one of these.
+ * @param opts.refs - Either an `Element`, an array of `Element`s, or a signal returning one of these.
  * @param opts.onResize - Function handler to trigger on resize
  * @return A callback that can be used to add refs to observe resizing
  *
  */
-function createResizeObserver<T extends HTMLElement>(opts: {
+function createResizeObserver<T extends Element>(opts: {
   onResize: ResizeHandler;
   refs?: T | T[] | (() => T | T[]);
 }): (arg: T) => void {

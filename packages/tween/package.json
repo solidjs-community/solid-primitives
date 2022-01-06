@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/tween",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Primitive that creates tween functions",
   "author": "Ryan Carniato <ryancarniato@gmail.com>",
   "license": "MIT",
@@ -22,10 +22,17 @@
   ],
   "private": false,
   "sideEffects": false,
-  "type": "module",
-  "main": "./dist/index.cjs",
+  "main": "./dist/server.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "scripts": {
     "build": "tsup"
   },

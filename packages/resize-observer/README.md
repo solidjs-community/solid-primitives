@@ -38,6 +38,10 @@ Initial commit of the resize observer.
 
 Release initial version for CJS and SSR support.
 
+1.0.4
+
+Patched HTMLElement to Element to resolve type error on buildd. Updated to Solid 1.3.
+
 </details>
 
 ## Contributors

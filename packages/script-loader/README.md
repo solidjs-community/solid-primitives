@@ -53,4 +53,8 @@ Initial release.
 
 Release first first with CJS support.
 
+1.0.3
+
+Upgrade to Solid 1.3
+
 </details>

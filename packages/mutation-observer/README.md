@@ -120,4 +120,8 @@ Added support for CJS and cleaned up docs.
 
 Updated utility package dependency.
 
+1.0.4
+
+Updated to Solid 1.3
+
 </details>

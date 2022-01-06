@@ -43,4 +43,8 @@ Shipped first stable version.
 
 Published with CJS and SSR support.
 
+1.1.10
+
+Added server entry and updated to latest Solid.
+
 </details>

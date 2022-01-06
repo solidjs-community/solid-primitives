@@ -44,4 +44,8 @@ Patched an issue with clear on clean-up.
 
 Release official version with CJS support.
 
+1.1.0
+
+Updated to Solid 1.3
+
 </details>
