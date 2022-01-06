@@ -1,4 +1,4 @@
-import { createMemo, createResource, onCleanup } from "solid-js";
+import { createMemo, createResource, onCleanup, ResourceFetcherInfo } from "solid-js";
 import type { Accessor } from "solid-js";
 
 const abortError = "AbortError";
@@ -140,9 +140,9 @@ export function createFetch<T, I>(
     ];
   }
 
-  const fetcher = (
+  const fetcher = <T>(
     [requestInfo, requestInit]: [requestInfo: RequestInfo, requestInit?: RequestInit],
-    getPrev: () => T | I
+    info: ResourceFetcherInfo<T>
   ): Promise<T | I> => {
     if (!abort || (!abort.signal.aborted && resourceReturn?.[0].loading)) {
       abort?.abort();
@@ -170,7 +170,7 @@ export function createFetch<T, I>(
       .catch(err => {
         if (err?.name === abortError) {
           resourceReturn[0].aborted = true;
-          return Promise.resolve(getPrev());
+          return Promise.resolve(info.value);
         }
         throw err;
       });
