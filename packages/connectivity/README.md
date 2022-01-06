@@ -22,6 +22,10 @@ const online = createConnectivitySignal();
 console.log(online());
 ```
 
+## Demo
+
+https://codesandbox.io/s/solid-primitives-connectivity-demo-2m76q?file=/index.tsx
+
 ## Changelog
 
 <details>
