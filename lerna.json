@@ -3,5 +3,6 @@
     "packages/*"
   ],
   "version": "independent",
-  "lerna-script-tasks": "./tasks.js"
+  "lerna-script-tasks": "./tasks.js",
+  "npmClient": "yarn"
 }

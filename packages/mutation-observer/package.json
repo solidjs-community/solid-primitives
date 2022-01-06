@@ -44,9 +44,9 @@
     "solid-register": "0.1.1",
     "tslib": "^2.3.1",
     "tsup": "^5.10.1",
-    "unocss": "^0.12.4",
+    "unocss": "0.21.2",
     "uvu": "^0.5.2",
-    "vite": "2.6.14",
+    "vite": "2.7.10",
     "vite-plugin-solid": "2.2.1"
   },
   "peerDependencies": {
