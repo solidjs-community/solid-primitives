@@ -2,8 +2,8 @@ import { createRoot, createSignal } from "solid-js";
 import { test } from "uvu";
 import * as assert from "uvu/assert";
 import {
-  createDateDifference,
-  DateDifferenceMessages,
+  createTimeAgo,
+  RelativeFormatMessages,
   DAY,
   HOUR,
   MINUTE,
@@ -15,7 +15,7 @@ import {
 test("returns correct values", () => {
   createRoot(dispose => {
     const date = new Date("2020 1 11");
-    const [timeago, { update, target, now }] = createDateDifference(date);
+    const [timeago, { update, target, now }] = createTimeAgo(date);
 
     assert.type(timeago(), "string", "timeago should return a string");
     assert.instance(now(), Date, "now() should return an instance of Date");
@@ -29,8 +29,8 @@ test("returns correct values", () => {
 test("formats timeago correctly", () => {
   createRoot(dispose => {
     const [date, setDate] = createSignal<number>(Date.now());
-    const [timeago] = createDateDifference(date, {
-      updateInterval: 0
+    const [timeago] = createTimeAgo(date, {
+      interval: 0
     });
 
     assert.is(timeago(), "just now");
@@ -64,9 +64,9 @@ test("custom relative formatter", () => {
     let captured_target;
     let captured_now;
     let captured_diff;
-    const [timeago, { target, now }] = createDateDifference(date, {
-      updateInterval: 0,
-      relativeFormatter: (target, now, diff) => {
+    const [timeago, { target, now }] = createTimeAgo(date, {
+      interval: 0,
+      relativeFormatter: (now, target, diff) => {
         captured_target = target;
         captured_now = now;
         captured_diff = diff;
@@ -96,10 +96,10 @@ test("custom absolute formatter", () => {
     const [date, setDate] = createSignal<number>(Date.now());
 
     let capturedDate;
-    const [timeago, { target }] = createDateDifference(date, {
-      updateInterval: 0,
+    const [timeago, { target }] = createTimeAgo(date, {
+      interval: 0,
       max: HOUR,
-      absoluteFormatter: date => {
+      dateFormatter: date => {
         capturedDate = date;
         return "absolute";
       }
@@ -122,15 +122,15 @@ test("custom messages", () => {
   createRoot(dispose => {
     const [date, setDate] = createSignal<number>(Date.now());
 
-    const messages: Partial<DateDifferenceMessages> = {
+    const messages: Partial<RelativeFormatMessages> = {
       justNow: "NOW",
       future: n => `in the next ${n}`,
       day: (n, past) => `${n} DAY${n > 1 ? "S" : ""}`,
       week: (n, past) => (n === 1 ? "week" : `${n} weeks`)
     };
 
-    const [timeago] = createDateDifference(date, {
-      updateInterval: 0,
+    const [timeago] = createTimeAgo(date, {
+      interval: 0,
       messages
     });
 

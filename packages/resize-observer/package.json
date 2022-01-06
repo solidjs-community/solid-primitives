@@ -51,9 +51,6 @@
     "tsup": "^5.10.1",
     "typescript": "^4.0.2"
   },
-  "dependencies": {
-    "solid-js": "^1.2.1"
-  },
   "jest": {
     "setupFiles": [
       "./test/setup.ts"

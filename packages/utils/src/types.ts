@@ -13,6 +13,8 @@ export type Many<T> = T | T[];
 export type Keys<O extends Object> = keyof O;
 export type Values<O extends Object> = O[Keys<O>];
 
+export type Noop = (...a: any[]) => void;
+
 /**
  * Infers the type of the array elements
  */
@@ -39,6 +41,18 @@ export type MaybeAccessor<T> = T | Accessor<T>;
  */
 export type MaybeAccessorValue<T extends MaybeAccessor<any>> = T extends Fn ? ReturnType<T> : T;
 
+export type OnAccessEffectFunction<S, Prev, Next extends Prev = Prev> = (
+  input: AccessReturnTypes<S>,
+  prevInput: AccessReturnTypes<S>,
+  v: Prev
+) => Next;
+
+export type AccessReturnTypes<S> = S extends MaybeAccessor<any>[]
+  ? {
+      [I in keyof S]: AccessReturnTypes<S[I]>;
+    }
+  : MaybeAccessorValue<S>;
+
 /** Allows to make shallow overwrites to an interface */
 export type Modify<T, R> = Omit<T, keyof R> & R;
 
@@ -60,6 +74,10 @@ export type AnyObject = Record<string, any>;
 export type AnyFunction = (...args: any[]) => any;
 
 export type PrimitiveValue = string | boolean | number | bigint | symbol | null | undefined;
+
+export type FalsyValue = false | 0 | "" | null | undefined;
+export type Truthy<T> = T extends FalsyValue ? never : T;
+export type Falsy<T> = T extends FalsyValue ? T : never;
 
 /**
  * Destructible store object, with values changed to accessors

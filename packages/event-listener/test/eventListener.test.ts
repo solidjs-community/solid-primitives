@@ -11,18 +11,51 @@ import {
 
 const test = suite("createEventListener");
 
-test("it will add an event", () => {
+test("single window target", () => {
   createRoot(dispose => {
     const testEvent = new Event("test");
     let capturedEvent: Event;
     createEventListener<{ test: Event }>(window, "test", ev => {
       capturedEvent = ev;
     });
+    dispatchFakeEvent("test", testEvent);
+    assert.is(capturedEvent, testEvent);
+    dispose();
+  });
+});
+
+test("array window target", () => {
+  createRoot(dispose => {
+    const testEvent = new Event("test");
+    let capturedEvent: Event;
+    createEventListener<{ test: Event }>([window, document.createElement("p")], "test", ev => {
+      capturedEvent = ev;
+    });
+    dispatchFakeEvent("test", testEvent);
+    assert.is(capturedEvent, testEvent);
+    dispose();
+  });
+});
+
+test("accessor window target", () => {
+  createRoot(dispose => {
+    const testEvent = new Event("test");
+    let capturedEvent: Event;
+    createEventListener<{ test: Event }>(
+      () => window,
+      "test",
+      ev => {
+        capturedEvent = ev;
+      }
+    );
+    dispatchFakeEvent("test", testEvent);
+    assert.is(capturedEvent, undefined, "event listener won't be added yet");
+
     setTimeout(() => {
       dispatchFakeEvent("test", testEvent);
       assert.is(capturedEvent, testEvent);
       dispose();
-    }, 10);
+    }, 0);
   });
 });
 

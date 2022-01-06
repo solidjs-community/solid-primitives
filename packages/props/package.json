@@ -47,8 +47,5 @@
     "tsup": "^5.10.1",
     "typescript": "^4.4.3",
     "uvu": "^0.5.2"
-  },
-  "dependencies": {
-    "solid-js": "^1.2.5"
   }
 }

@@ -36,7 +36,8 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
+    "start": "vite serve dev",
+    "dev": "vite serve dev",
     "build": "tsup",
     "test": "uvu -r solid-register"
   },
@@ -49,19 +50,18 @@
     "primitives"
   ],
   "devDependencies": {
-    "@types/jest": "^27.0.0",
-    "prettier": "^2.0.5",
-    "solid-testing-library": "^0.2.0",
-    "tsup": "^5.10.0",
-    "tslib": "^2.0.1",
-    "typescript": "^4.0.2"
+    "jsdom": "18.1.1",
+    "prettier": "^2.5.1",
+    "solid-register": "0.1.1",
+    "tslib": "^2.3.1",
+    "tsup": "^5.11.1",
+    "typescript": "^4.5.3",
+    "unocss": "^0.16.0",
+    "uvu": "^0.5.2",
+    "vite": "2.7.1",
+    "vite-plugin-solid": "2.1.4"
   },
   "peerDependencies": {
-    "solid-js": "^1.2.5"
-  },
-  "jest": {
-    "setupFiles": [
-      "./test/setup.ts"
-    ]
+    "solid-js": "1.3.0"
   }
 }

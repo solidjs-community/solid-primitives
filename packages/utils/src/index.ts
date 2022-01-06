@@ -1,7 +1,18 @@
-import { getOwner, onCleanup } from "solid-js";
+import { createRoot, getOwner, onCleanup, runWithOwner, on, Accessor } from "solid-js";
+import type { EffectFunction, NoInfer, OnOptions, Owner } from "solid-js/types/reactive/signal";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
-import type { Destore, Fn, ItemsOf, MaybeAccessor, MaybeAccessorValue, Values } from "./types";
+import type {
+  AnyFunction,
+  Destore,
+  Fn,
+  ItemsOf,
+  MaybeAccessor,
+  MaybeAccessorValue,
+  Noop,
+  OnAccessEffectFunction,
+  Values
+} from "./types";
 
 export * from "./types";
 
@@ -10,7 +21,7 @@ export * from "./types";
 //
 
 /** no operation */
-export const noop = (...a: any[]) => {};
+export const noop = (() => undefined) as Noop;
 export const isClient = !isServer;
 export { isServer };
 
@@ -19,6 +30,9 @@ export { isServer };
  */
 export const isDefined = <T>(value: T | undefined | null): value is T =>
   typeof value !== "undefined" && value !== null;
+
+export const isFunction = <T>(value: T | Function): value is Function =>
+  typeof value === "function";
 
 /**
  * Accesses the value of a MaybeAccessor
@@ -29,7 +43,7 @@ export const isDefined = <T>(value: T | undefined | null): value is T =>
  * ```
  */
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
-  typeof v === "function" ? (v as any)() : v;
+  isFunction(v) ? (v as any)() : v;
 
 /**
  * Accesses the value of a MaybeAccessor, but always returns an array
@@ -43,10 +57,10 @@ export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T
  */
 export const accessAsArray = <T extends MaybeAccessor<any>, V = MaybeAccessorValue<T>>(
   value: T
-): V extends any[] ? V : V[] => {
-  const _value = access(value);
-  return Array.isArray(_value) ? (_value as any) : [_value];
-};
+): V extends any[] ? V : V[] => asArray(access(value)) as any;
+
+export const asArray = <T>(value: T): T extends any[] ? T : T[] =>
+  Array.isArray(value) ? (value as any) : [value];
 
 /**
  * Run the function if the accessed value is not `undefined` nor `null`
@@ -60,6 +74,19 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
   const _value = access(value);
   isDefined(_value) && fn(_value as NonNullable<V>);
 };
+
+export const asAccessor = <A extends MaybeAccessor<unknown>>(
+  v: A
+): Accessor<MaybeAccessorValue<A>> => (isFunction(v) ? (v as any) : () => v);
+
+export function onAccess<S extends MaybeAccessor<unknown>[] | [], Next, Init = unknown>(
+  deps: S,
+  fn: OnAccessEffectFunction<S, Init | Next, Next>,
+  options?: OnOptions
+): EffectFunction<NoInfer<Init> | NoInfer<Next>, NoInfer<Next>> {
+  const source = deps.map(asAccessor);
+  return (on as any)(source, fn, options);
+}
 
 /**
  * Quickly iterate over an MaybeAccessor<any>
@@ -142,14 +169,21 @@ export function raceTimeout<T>(
   reason?: string
 ): T extends any[] ? Promise<Awaited<T[number]> | undefined> : Promise<Awaited<T> | undefined>;
 export function raceTimeout(
-  promises: any,
+  input: any,
   ms: number,
   throwOnTimeout = false,
   reason = "Timeout"
 ): Promise<any> {
-  const promiseList = Array.isArray(promises) ? promises : [promises];
-  promiseList.push(promiseTimeout(ms, throwOnTimeout, reason));
-  return Promise.race(promiseList);
+  const promises = asArray(input);
+  const race = Promise.race([...promises, promiseTimeout(ms, throwOnTimeout, reason)]);
+  race.finally(() => {
+    promises.forEach(
+      // inputted promises can have .dispose() method on them,
+      // it will be called when the first promise resolves, to stop the rest
+      (p: any) => p && typeof p === "object" && typeof p.dispose === "function" && p.dispose()
+    );
+  });
+  return race;
 }
 
 /**
@@ -173,7 +207,7 @@ export function destore<T extends Object>(store: Store<T>): Destore<T> {
   const _store = store as Record<string, any>;
   const result: any = {};
   Object.keys(_store).forEach(key => {
-    result[key] = typeof _store[key] === "function" ? _store[key].bind(_store) : () => _store[key];
+    result[key] = isFunction(_store[key]) ? _store[key].bind(_store) : () => _store[key];
   });
   return result;
 }
@@ -183,42 +217,40 @@ export function destore<T extends Object>(store: Store<T>): Destore<T> {
  */
 export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
 
-// createSubRoot requires solid 1.3.0:
+/**
+ * Creates a reactive root, which will be disposed when the passed owner does.
+ *
+ * @param fn
+ * @param owner a root that will trigger the cleanup
+ * @returns whatever the "fn" returns
+ *
+ * @example
+ * const owner = getOwner()
+ * const handleClick = () => createSubRoot(owner, () => {
+ *    createEffect(() => {})
+ * });
+ */
+export function createSubRoot<T>(fn: (dispose: Fn) => T, owner = getOwner()): T {
+  const [dispose, returns] = createRoot(dispose => [dispose, fn(dispose)], owner ?? undefined);
+  owner && runWithOwner(owner, () => onCleanup(dispose));
+  return returns;
+}
 
-// /**
-//  * Creates a reactive root, which will be disposed when the passed owner does.
-//  *
-//  * @param fn
-//  * @param owner a root that will trigger the cleanup
-//  * @returns whatever the "fn" returns
-//  *
-//  * @example
-//  * const owner = getOwner()
-//  * const handleClick = () => createSubRoot(owner, () => {
-//  *    createEffect(() => {})
-//  * });
-//  */
-// export function createSubRoot<T>(owner: Owner | null, fn: (dispose: Fn) => T): T {
-//   const [dispose, returns] = createRoot(dispose => [dispose, fn(dispose)], owner ?? undefined);
-//   owner && runWithOwner(owner, () => onCleanup(dispose));
-//   return returns;
-// }
-
-// /**
-//  * A wrapper for creating functions with the `createSubRoot`
-//  *
-//  * @param callback
-//  * @param owner a root that will trigger the cleanup
-//  * @returns the callback function
-//  *
-//  * @example
-//  * const handleClick = createSubRootFunction(() => {
-//  *    createEffect(() => {})
-//  * })
-//  */
-// export function createSubRootFunction<T extends AnyFunction>(callback: T, owner = getOwner()): T {
-//   return ((...args) => createSubRoot(owner, () => callback(...args))) as T;
-// }
+/**
+ * A wrapper for creating functions with the `createSubRoot`
+ *
+ * @param callback
+ * @param owner a root that will trigger the cleanup
+ * @returns the callback function
+ *
+ * @example
+ * const handleClick = createSubRootFunction(() => {
+ *    createEffect(() => {})
+ * })
+ */
+export function createSubRootFunction<T extends AnyFunction>(callback: T, owner?: Owner | null): T {
+  return ((...args) => createSubRoot(() => callback(...args), owner)) as T;
+}
 
 export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {
   push: (...callbacks: Fn[]) => void;
@@ -236,27 +268,3 @@ export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(
     clear
   };
 };
-
-//
-// SIGNAL BUILDERS:
-//
-
-// export const stringConcat = (...a: MaybeAccessor<any>[]): string =>
-//   a.reduce((t: string, c) => t + access(c), "") as string;
-
-// export const concat = <A extends MaybeAccessor<any>[], V = MaybeAccessorValue<ItemsOf<A>>>(
-//   ...a: A
-// ): Array<V extends any[] ? ItemsOf<V> : V> =>
-//   a.reduce((t, c) => {
-//     const v = access(c);
-//     return Array.isArray(v) ? [...t, ...v] : [...t, v];
-//   }, []);
-
-// export const toFloat = (string: MaybeAccessor<string>): number => Number.parseFloat(access(string));
-
-// export const toInt = (string: MaybeAccessor<string>, radix?: number): number =>
-//   Number.parseInt(access(string), radix);
-
-// export const toArray = <A extends MaybeAccessor<any>[]>(
-//   ...a: A
-// ): MaybeAccessorValue<ItemsOf<A>>[] => a.map(v => access(v));
