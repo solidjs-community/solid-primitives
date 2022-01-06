@@ -68,4 +68,8 @@ Added testing and support for srcObject.
 
 Added proper SSR and CJS support.
 
+1.1.7
+
+Updated to Solid 1.3.
+
 </details>

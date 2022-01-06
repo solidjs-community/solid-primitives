@@ -51,4 +51,8 @@ Added comments for util methods.
 
 Add `/fp` and `/setter` export entries. Add `destore` and `raceTimeout` util. More jsdoc.
 
+0.1.2
+
+Updated to Solid 1.3
+
 </details>

@@ -335,4 +335,8 @@ Primitive rewritten to provide better types and more solidlike (reactive) usage.
 
 Published recent major updates to latest tag.
 
+1.4.1
+
+Updated to Solid 1.3
+
 </details>

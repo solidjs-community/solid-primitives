@@ -102,4 +102,8 @@ Initial release as a Stage-2 primitive.
 
 Updated event listener and util dependencies.
 
+1.0.2
+
+Updated to Solid 1.3
+
 </details>
