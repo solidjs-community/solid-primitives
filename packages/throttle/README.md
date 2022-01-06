@@ -35,4 +35,8 @@ Cleaned up return types and documentation.
 
 Adding CJS support to package.
 
+1.1.0
+
+Updated to Solid 1.3
+
 </details>

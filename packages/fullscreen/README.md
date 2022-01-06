@@ -70,4 +70,8 @@ Initial release
 
 Published with CJS and SSR protection.
 
+1.0.5
+
+Added missing peerDependencies and updated to latest Solid.
+
 </details>

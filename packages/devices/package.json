@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/devices",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Primitive that enumerates media devices",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",

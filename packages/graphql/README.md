@@ -50,4 +50,8 @@ Initial commit and publish of primitive.
 
 Released with CJS support.
 
+1.0.4
+
+Updated to latest Solid.
+
 </details>

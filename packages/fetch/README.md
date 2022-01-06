@@ -58,4 +58,8 @@ Add tests for error case, remove stray console.warn
 
 Released CJS and SSR support.
 
+1.0.6
+
+Added missing server entry compile in TSUP and updated to Solid.
+
 </details>

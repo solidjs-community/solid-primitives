@@ -46,6 +46,10 @@ Initial release as a Stage-0 primitive.
 
 Added CJS and SSR support.
 
+0.0.150
+
+Updated to Solid 1.3
+
 </details>
 
 ## Acknowledgements

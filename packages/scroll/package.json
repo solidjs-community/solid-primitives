@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/scroll",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Primitive to manage scrolling",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",

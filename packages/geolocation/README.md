@@ -64,4 +64,8 @@ Added testing, improved types, changed name of createGeolocationWatcher to creat
 
 Published with CJS and SSR support.
 
+1.0.7
+
+Changed to peerDependencies and updated to latest Solid
+
 </details>

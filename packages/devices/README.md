@@ -48,4 +48,8 @@ Released official version, CJS and updated to Stage 3
 
 Add proper build process and clean up docs. Added SSR and CJS support.
 
+1.0.4
+
+Updated to latest Solid.
+
 </details>

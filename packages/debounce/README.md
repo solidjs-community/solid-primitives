@@ -51,4 +51,8 @@ Adding CJS support to package.
 
 Cleaned up documentation
 
+1.1.0
+
+Updated to Solid 1.3
+
 </details>

@@ -51,4 +51,8 @@ Initial release.
 
 Released a version with CJS and SSR.
 
+0.1.0
+
+Updated for latest Solid.
+
 </details>

@@ -39,4 +39,8 @@ Initial release ported from https://github.com/microcipcip/vue-use-kit/blob/mast
 
 Released official version with CJS and SSR support.
 
+1.0.7
+
+Updated to Solid 1.3, switched to peerDependencies
+
 </details>
