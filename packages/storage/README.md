@@ -174,4 +174,8 @@ Patch CJS support.
 
 Minor patch fixed missing types.
 
+1.1.0
+
+Updated to Solid 1.3
+
 </details>
