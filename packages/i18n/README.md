@@ -94,4 +94,8 @@ Releasd with CJS support.
 
 Patch CJS support release.
 
+1.0.9
+
+Updated to Solid 1.3
+
 </details>
