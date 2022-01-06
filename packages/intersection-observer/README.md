@@ -92,4 +92,8 @@ After a couple rounds, patched CJS support.
 
 Patched issue with observer only firing once and disconnecting not functional.
 
+1.2.1
+
+Updated to Solid 1.3
+
 </details>
