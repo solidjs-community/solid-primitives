@@ -41,7 +41,7 @@
     "@solid-primitives/composites": "^1.0.5",
     "jsdom": "18.1.1",
     "prettier": "^2.4.1",
-    "solid-register": "0.1.1",
+    "solid-register": "0.1.3",
     "tslib": "^2.3.1",
     "tsup": "^5.10.1",
     "unocss": "0.21.2",

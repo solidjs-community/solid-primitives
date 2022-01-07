@@ -1,6 +1,6 @@
 import { push } from "@solid-primitives/utils/setter";
 import { createEffect, createSignal, getOwner, on, onCleanup } from "solid-js";
-import { GenericEmit, GenericListen, GenericListener, GenericListenProtect, Unsubscribe } from ".";
+import { GenericEmit, GenericListen, GenericListener, GenericListenProtect, Unsubscribe } from "./types";
 
 export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
 

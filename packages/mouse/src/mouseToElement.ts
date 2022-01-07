@@ -7,7 +7,7 @@ import {
   Position,
   posRelativeToElement,
   RelativeToElementValues
-} from ".";
+} from "./mousePosition";
 
 export type InitialValues = Partial<RelativeToElementValues>;
 

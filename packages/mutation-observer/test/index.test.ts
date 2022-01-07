@@ -1,5 +1,5 @@
 import { MutationObserver, instances } from "./setup";
-import { createMutationObserver, mutationObserver } from "..";
+import { createMutationObserver, mutationObserver } from "../src";
 import { createRoot } from "solid-js";
 import { test } from "uvu";
 import * as assert from "uvu/assert";

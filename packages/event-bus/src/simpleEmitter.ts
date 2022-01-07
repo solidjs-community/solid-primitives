@@ -1,4 +1,5 @@
-import { ClearListeners, GenericListener, GenericEmit, GenericListen, onRootCleanup } from ".";
+import { ClearListeners, GenericListener, GenericEmit, GenericListen } from "./types";
+import { onRootCleanup } from './utils';
 
 /**
  * Very minimal interface for emiting and receiving events. Good for parent-child component communication.

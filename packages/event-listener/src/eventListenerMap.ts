@@ -1,14 +1,14 @@
 import { Many, MaybeAccessor, entries, createCallbackStack } from "@solid-primitives/utils";
 import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 import { Store } from "solid-js/store";
+import { createEventListener } from './eventListener'
 import {
   ClearListeners,
-  createEventListener,
   EventListenerMapDirectiveProps,
   EventMapOf,
   TargetWithEventMap,
   EventListenerOptions
-} from ".";
+} from "./types";
 
 export type EventHandlersMap<EventMap> = {
   [EventName in keyof EventMap]: (event: EventMap[EventName]) => void;

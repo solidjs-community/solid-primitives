@@ -1,14 +1,14 @@
 import { noop } from "@solid-primitives/utils";
+import { onRootCleanup } from './utils';
 import {
   ClearListeners,
-  onRootCleanup,
   EmitGuard,
   GenericEmit,
   GenericListener,
   GenericListenProtect,
   Remove,
   RemoveGuard
-} from ".";
+} from "./types";
 
 export type Emitter<A0 = void, A1 = void, A2 = void> = {
   listen: GenericListenProtect<[A0, A1, A2]>;

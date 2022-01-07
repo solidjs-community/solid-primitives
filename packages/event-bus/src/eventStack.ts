@@ -1,5 +1,6 @@
 import { Accessor, createSignal, Setter } from "solid-js";
-import { createEmitter, Emitter, EmitterConfig, GenericEmit } from ".";
+import { createEmitter, Emitter, EmitterConfig } from './emitter';
+import { GenericEmit } from "./types";
 import { push, drop, pick } from "@solid-primitives/utils/fp";
 import { filterOut } from "@solid-primitives/utils/setter";
 import { Fn, Modify } from "@solid-primitives/utils";
