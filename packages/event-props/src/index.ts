@@ -20,7 +20,7 @@ export type EventProps<Names extends EventNames> = {
  * const isMouseDown = createMemo(() => (events.mousedown?.ts ?? 0) > (events.mouseup?.ts ?? 1));
  * 
  * createEffect(() => {
- *   if (isMouseDown) {
+ *   if (isMouseDown()) {
  *     console.log(events.mousemove?.clientX, events.mousemove?.clientY);
  *   }
  * });
