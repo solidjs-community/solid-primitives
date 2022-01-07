@@ -19,7 +19,7 @@ yarn add @solid-primitives/script-loader
 
 ```ts
 const [script: HTMLScriptElement, remove: () => void] = createScriptLoader({
-  url: string | Accessor<string>,
+  src: string | Accessor<string>, // url or js source
   type?: string,
   onload?: () => void,
   onerror?: () => void
@@ -27,12 +27,19 @@ const [script: HTMLScriptElement, remove: () => void] = createScriptLoader({
 
 // For example, to use recaptcha:
 createScriptLoader({
-  url: 'https://www.google.com/recaptcha/enterprise.js?render=my_token'
+  src: 'https://www.google.com/recaptcha/enterprise.js?render=my_token'
   onload: async () => {
     await grecaptcha.enterprise.ready();
     const token = await grecaptcha.enterprise.execute('my_token', {action: 'login'});
     // do your stuff...
   }
+});
+
+// or pinterest embeds:
+const pinterestEmbedScript = '!function(a,b,c){var d,e,f;d="PIN_"+~~((new Date).getTime()/864e5),...';
+createScriptLoader({
+  src: pinterestEmbedScript,
+  onload: () => window?.PinUtils?.build()
 });
 ```
 
@@ -56,5 +63,9 @@ Release first first with CJS support.
 1.0.3
 
 Upgrade to Solid 1.3
+
+1.0.4
+
+Support JS source inclusion.
 
 </details>
