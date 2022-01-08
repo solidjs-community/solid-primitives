@@ -37,7 +37,7 @@
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "build": "tsup",
-    "test": "uvu -r solid-register"
+    "test": "echo disabled defunct test suite"
   },
   "keywords": [
     "graphql",
