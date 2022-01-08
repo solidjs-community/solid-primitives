@@ -5,12 +5,11 @@ import {
   forEach,
   Fn,
   isFunction,
-  onAccess,
   noop,
   access,
   isServer
 } from "@solid-primitives/utils";
-import { createSignal } from "solid-js";
+import { createRenderEffect, createSignal } from "solid-js";
 import { Accessor, createEffect, onCleanup } from "solid-js";
 import {
   ClearListeners,
@@ -74,30 +73,22 @@ export function createEventListener(
   if (isServer) return noop;
   const cleanup = createCallbackStack();
 
-  const attachListeners = (
-    targets: Many<EventTarget>,
-    eventName: string,
-    options?: EventListenerOptions
-  ) => {
+  const attachListeners = () => {
     cleanup.execute();
+    const _eventName = access(eventName);
+    const _options = access(options);
     forEach(targets, el => {
       if (!el) return;
-      el.addEventListener(eventName, handler, options);
-      cleanup.push(() => el.removeEventListener(eventName, handler, options));
+      el.addEventListener(_eventName, handler, _options);
+      cleanup.push(() => el.removeEventListener(_eventName, handler, _options));
     });
   };
 
-  if (isFunction(targets)) {
-    // if the target is an accessor the listeners will be added on the first effect (onMount)
-    // so that when passed a jsx ref it will be availabe
-    createEffect(onAccess([targets, eventName, options], a => attachListeners(...a)));
-  } else {
-    // if the target prop is NOT an accessor, the event listeners can be added right away
-    attachListeners(targets, access(eventName), access(options));
-    createEffect(
-      onAccess([eventName, options], a => attachListeners(targets, ...a), { defer: true })
-    );
-  }
+  // if the target is an accessor the listeners will be added on the first effect (onMount)
+  // so that when passed a jsx ref it will be availabe
+  if (isFunction(targets)) createEffect(attachListeners);
+  // if the target prop is NOT an accessor, the event listeners can be added right away
+  else createRenderEffect(attachListeners);
 
   onCleanup(cleanup.execute);
   return cleanup.execute;
