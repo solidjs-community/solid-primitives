@@ -67,7 +67,7 @@ export function createLazyMemo<T>(
     runWithOwner(owner as Owner, () => createComputed(() => {
       if (listeners > 0) setState((prev: T | undefined) => calc(prev));
       else isActive = false;
-    }));
+    }, undefined, options));
   }
 
   // wrapped signal accessor
