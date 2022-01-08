@@ -32,7 +32,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsup",
-    "test": "uvu -r solid-register"
+    "test-disabled": "uvu -r solid-register"
   },
   "keywords": [
     "watch",
