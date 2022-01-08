@@ -1,8 +1,8 @@
 {
-  "name": "@solid-primitives/template-primitive",
+  "name": "@solid-primitives/lazy-memo",
   "version": "0.0.100",
-  "description": "A template primitive example.",
-  "author": "Your Name <you@youremail.com>",
+  "description": "Lazily evaluated createMemo. Will run the calculation only if is being listened to.",
+  "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/utils#readme",
   "repository": {
@@ -10,12 +10,12 @@
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
   "primitive": {
-    "name": "template-primitive",
-    "stage": 0,
+    "name": "lazy-memo",
+    "stage": 1,
     "list": [
-      "createPrimitiveTemplate"
+      "createLazyMemo"
     ],
-    "category": "Display & Media"
+    "category": "Reactivity"
   },
   "private": false,
   "sideEffects": false,
@@ -34,11 +34,9 @@
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "memo"
   ],
-  "dependencies": {
-    "@solid-primitives/utils": "^0.1.2"
-  },
   "devDependencies": {
     "jsdom": "18.1.1",
     "prettier": "^2.5.1",
