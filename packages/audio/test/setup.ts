@@ -36,8 +36,8 @@ window.Audio = MockAudio;
 
 Object.defineProperty(window, "MediaSource", {
   writable: true,
-  value: jest.fn().mockImplementation(params => ({
+  value: (_params: any) => ({
     // MediaSource implementation goes here
-    addEventListener: jest.fn()
-  }))
+    addEventListener: () => {}
+  })
 });
