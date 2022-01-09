@@ -1,5 +1,5 @@
 import { gql, createGraphQLClient } from "../src";
-import { Component, createSignal, Show, For } from "solid-js";
+import { Component, createSignal, Show, For, ResourceReturn } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
 
@@ -7,7 +7,7 @@ const App: Component = () => {
   const [code, setCode] = createSignal("BR");
 
   const query = createGraphQLClient("https://countries.trevorblades.com/");
-  const [countriesData] = query(
+  const [countriesData] = query<{ countries: { name: string; code: string }[] }>(
     gql`
       query {
         countries {
@@ -17,7 +17,7 @@ const App: Component = () => {
       }
     `
   );
-  const [countryData] = query(
+  const [countryData] = query<{ country: { name: string } }>(
     gql`
       query data($code: ID!) {
         country(code: $code) {
@@ -41,9 +41,9 @@ const App: Component = () => {
       <Show when={countriesData()}>
         <ul>
           <For each={countriesData().countries}>
-            {({ name, code }: any) => (
+            {country => (
               <li>
-                {code} - {name}
+                {country.code} - {country.name}
               </li>
             )}
           </For>

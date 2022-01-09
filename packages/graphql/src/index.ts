@@ -1,4 +1,4 @@
-import { createResource } from "solid-js";
+import { createResource, ResourceReturn } from "solid-js";
 import { access, isFunction, MaybeAccessor } from "@solid-primitives/utils";
 
 /**
@@ -16,7 +16,7 @@ import { access, isFunction, MaybeAccessor } from "@solid-primitives/utils";
  */
 export const createGraphQLClient =
   (url: MaybeAccessor<string>, headers: RequestHeaders = {}, fetchFn = fetch) =>
-  (query: string, variables: MaybeAccessor<QueryVariables> = {}) => {
+  <T>(query: string, variables: MaybeAccessor<QueryVariables> = {}): ResourceReturn<T> => {
     const fetcher = async (variables: QueryVariables) =>
       fetchFn(access(url), {
         method: "POST",
