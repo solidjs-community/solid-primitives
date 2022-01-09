@@ -91,6 +91,11 @@ export const slice = <T>(list: readonly T[], start?: number, end?: number): T[] 
 export const splice = <T>(list: readonly T[], start: number, deleteCount: number, ...items: T[]) =>
   withArrayCopy(list, list => list.splice(start, deleteCount, ...items));
 
+export const remove = <T>(list: readonly T[], item: T): T[] => {
+  const index = list.indexOf(item);
+  return splice(list, 0, index + 1);
+};
+
 /**
  * Create a new subset object without the provided keys
  *
