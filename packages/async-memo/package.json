@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/async-memo",
   "version": "0.0.100",
-  "description": "Lazily evaluated createMemo. Will run the calculation only if is being listened to.",
+  "description": "Solid's `createMemo` that allows for asynchronous calculations.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/utils#readme",

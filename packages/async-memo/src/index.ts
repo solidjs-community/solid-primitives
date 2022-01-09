@@ -4,6 +4,21 @@ import { EffectOptions } from "solid-js/types/reactive/signal";
 export type AsyncMemoOptions<T> = EffectOptions & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
 
+/**
+ * Solid's `createMemo` that allows for asynchronous calculations.
+ *
+ * @param calc reactive calculation returning a promise
+ * @param options specify initial value *(by default it will be undefined)*
+ * @returns signal of values resolved from running calculations
+ *
+ * **calculation will track reactive reads synchronously — untracks after first `await`**
+ *
+ * @example
+ * const memo = createAsyncMemo(async prev => {
+ *    const value = await myAsyncFunc(signal())
+ *    return value.data
+ * }, { value: 'initial value' })
+ */
 export function createAsyncMemo<T>(
   calc: AsyncMemoCalculation<T, T>,
   options: AsyncMemoOptions<T> & { value: T }
