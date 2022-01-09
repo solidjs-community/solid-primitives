@@ -53,6 +53,8 @@ const [data] = createResource(signal, value => {...})
 
 ## Demo
 
+Demo uses fetching because it is the simplest example to make
+
 https://codesandbox.io/s/solid-primitives-async-memo-fetch-demo-htne6?file=/index.tsx
 
 ## Changelog
