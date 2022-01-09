@@ -48,7 +48,8 @@
     "uvu": "^0.5.2",
     "unocss": "0.21.2",
     "vite": "2.7.10",
-    "vite-plugin-solid": "2.2.1"
+    "vite-plugin-solid": "2.2.1",
+    "@solid-primitives/utils": "^0.1.2"
   },
   "peerDependencies": {
     "solid-js": "^1.3.1"

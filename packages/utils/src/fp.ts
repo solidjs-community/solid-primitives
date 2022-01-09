@@ -93,7 +93,7 @@ export const splice = <T>(list: readonly T[], start: number, deleteCount: number
 
 export const remove = <T>(list: readonly T[], item: T): T[] => {
   const index = list.indexOf(item);
-  return splice(list, 0, index + 1);
+  return splice(list, index, 1);
 };
 
 /**
