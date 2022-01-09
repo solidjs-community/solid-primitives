@@ -1,4 +1,5 @@
-import { Accessor, createResource } from "solid-js";
+import { createResource } from "solid-js";
+import { access, isFunction, MaybeAccessor } from "@solid-primitives/utils";
 
 /**
  * Creates a reactive GraphQL query client.
@@ -13,14 +14,11 @@ import { Accessor, createResource } from "solid-js";
  * const newQuery = createGraphQLClient("https://foobar.com/v1/api", { authorization: "Bearer mytoken" });
  * ```
  */
-const createGraphQLClient = (
-  url: string | Accessor<string>,
-  headers: RequestHeaders = {},
-  fetcher = fetch
-) => {
-  return (query: string, variables: Accessor<QueryVariables>) => {
-    return createResource(variables, async variables =>
-      fetcher(typeof url === "function" ? url() : url, {
+export const createGraphQLClient =
+  (url: MaybeAccessor<string>, headers: RequestHeaders = {}, fetchFn = fetch) =>
+  (query: string, variables: MaybeAccessor<QueryVariables> = {}) => {
+    const fetcher = async (variables: QueryVariables) =>
+      fetchFn(access(url), {
         method: "POST",
         body: JSON.stringify({ query, variables }),
         headers: {
@@ -30,20 +28,19 @@ const createGraphQLClient = (
       })
         .then(r => r.json())
         .then(({ data, errors }) => {
-          if (errors) {
-            throw errors;
-          }
+          if (errors) throw errors;
           return data;
-        })
-    );
+        });
+
+    return isFunction(variables)
+      ? createResource(variables, fetcher)
+      : createResource(() => fetcher(variables));
   };
-};
-export const gql = (query: Array<string>) =>
+
+export const gql = (query: TemplateStringsArray) =>
   query
     .join(" ")
     .replace(/#.+\r?\n|\r/g, "")
     .replace(/\r?\n|\r/g, "")
     .replace(/\s{2,}/g, " ")
     .trim();
-
-export default createGraphQLClient;
