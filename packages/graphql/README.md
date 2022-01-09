@@ -18,6 +18,8 @@ yarn add @solid-primitives/graphql
 ## How to use it
 
 ```ts
+import { createGraphQLClient, gql } from "@solid-primitives/graphql";
+
 const newQuery = createGraphQLClient("https://foobar.com/v1/api");
 const [data, { refetch }] = newQuery(
   gql`
@@ -29,9 +31,11 @@ const [data, { refetch }] = newQuery(
       }
     }
   `,
-  () => ({ path: "home" })
+  { path: "home" }
 );
 ```
+
+Remember, just like with [`createResource`](https://www.solidjs.com/docs/latest/api#createresource), you will need an [`<ErrorBoundary>`](https://www.solidjs.com/docs/latest/api#%3Cerrorboundary%3E) to catch the errors, even if they are accessible inside the resource. Otherwise, uncaught errors might disrupt your application.
 
 ## Demo
 
@@ -53,5 +57,9 @@ Released with CJS support.
 1.0.4
 
 Updated to latest Solid.
+
+1.0.5
+
+Function argument improvements, named exports.
 
 </details>

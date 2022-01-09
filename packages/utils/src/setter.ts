@@ -37,6 +37,9 @@ export function splice<T>(start: number, deleteCount: number, ...items: T[]): (l
   return list => fp.splice(list, start, deleteCount, ...items);
 }
 
+// prettier-ignore
+export const remove = <T>(item: T) => (list: T[]): T[] => fp.remove(list, item);
+
 // import { createSignal } from "solid-js";
 
 // const [state, setState] = createSignal([1, 2, 3]);
