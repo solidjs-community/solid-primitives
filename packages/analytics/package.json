@@ -25,7 +25,7 @@
   },
   "scripts": {
     "build": "tsup",
-    "test": "uvu -r ../../../solid-register/dist/"
+    "test": "uvu -r solid-register"
   },
   "keywords": [
     "analytics",
