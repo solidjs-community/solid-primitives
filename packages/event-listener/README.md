@@ -339,4 +339,8 @@ Published recent major updates to latest tag.
 
 Updated to Solid 1.3
 
+1.4.2
+
+Minor improvements.
+
 </details>
