@@ -1,5 +1,5 @@
 import { gql, createGraphQLClient } from "../src";
-import { Component, createSignal, Show, For, ResourceReturn } from "solid-js";
+import { Component, createSignal, Show, For } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
 

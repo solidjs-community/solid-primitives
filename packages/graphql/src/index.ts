@@ -16,7 +16,7 @@ import { access, isFunction, MaybeAccessor } from "@solid-primitives/utils";
  */
 export const createGraphQLClient =
   (url: MaybeAccessor<string>, headers: RequestHeaders = {}, fetchFn = fetch) =>
-  <T>(query: string, variables: MaybeAccessor<QueryVariables> = {}): ResourceReturn<T> => {
+  <T = any>(query: string, variables: MaybeAccessor<QueryVariables> = {}): ResourceReturn<T> => {
     const fetcher = async (variables: QueryVariables) =>
       fetchFn(access(url), {
         method: "POST",

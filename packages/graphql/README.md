@@ -35,11 +35,51 @@ const [data, { refetch }] = newQuery(
 );
 ```
 
+#### Providing Response Type
+
+```ts
+// query function accepts type generic for the response:
+const [countries] = newQuery<{ countries: { name: string }[] }>(
+  gql`
+    query {
+      countries {
+        name
+        code
+      }
+    }
+  `
+);
+countries(); // T: { countries: { name: string }[] }
+```
+
+#### Reactive query variables
+
+Variables passed to the query can be reactive. If they change, the resource will be refetched.
+
+```ts
+const [code, setCode] = createSignal("BR");
+const [data] = query(
+  gql`
+    query data($code: ID!) {
+      country(code: $code) {
+        name
+      }
+    }
+  `,
+  // function returning an object
+  () => ({
+    code: code()
+  })
+);
+```
+
 Remember, just like with [`createResource`](https://www.solidjs.com/docs/latest/api#createresource), you will need an [`<ErrorBoundary>`](https://www.solidjs.com/docs/latest/api#%3Cerrorboundary%3E) to catch the errors, even if they are accessible inside the resource. Otherwise, uncaught errors might disrupt your application.
 
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-primitives-graphql-query-4ljs7?file=/src/createGraphQLClient.ts
+You may view a working example here:
+
+https://codesandbox.io/s/solid-primitives-graphql-demo-g6fv6?file=/index.tsx
 
 ## Changelog
 
