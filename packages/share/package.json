@@ -36,7 +36,7 @@
   },
   "scripts": {
     "build": "tsup",
-    "test": "uvu -r solid-register"
+    "test": "echo disabled defunct test suite"
   },
   "keywords": [
     "template",
@@ -46,7 +46,7 @@
     "jsdom": "18.1.1",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
-    "solid-register": "0.1.1",
+    "solid-register": "0.1.5",
     "tslib": "^2.0.1",
     "tsup": "^5.10.1",
     "typescript": "^4.5.2",

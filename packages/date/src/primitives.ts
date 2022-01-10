@@ -8,24 +8,24 @@ import {
   onCleanup
 } from "solid-js";
 import { createStore, Store } from "solid-js/store";
+import { DEFAULT_MESSAGES, HOUR, MINUTE } from './variables'
 import {
-  Countdown,
-  DateInit,
-  DateSetter,
-  DEFAULT_MESSAGES,
   formatDate,
   formatDateRelative,
-  TimeAgoOptions,
   getCountdown,
   getDate,
   getDateDifference,
-  getTime,
+  getTime
+} from './utils'
+import type {
+  Countdown,
+  DateInit,
+  DateSetter,
+  TimeAgoOptions,
   GetUpdateInterval,
-  HOUR,
-  MINUTE,
   TimeSetter,
   UpdateInterval
-} from ".";
+} from "./types";
 
 /**
  * Creates a reactive `Date` signal.

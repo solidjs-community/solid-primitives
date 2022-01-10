@@ -1,12 +1,11 @@
 import { Accessor, createSignal } from "solid-js";
+import { createEmitter, EmitterConfig } from './emitter'
 import {
   ClearListeners,
-  createEmitter,
-  EmitterConfig,
   GenericEmit,
   GenericListener,
   ListenProtect
-} from ".";
+} from "./types";
 
 export type EventBusListener<Event, V = Event | undefined> = GenericListener<[Event, V]>;
 export type EventBusListen<Event, V = Event | undefined> = ListenProtect<Event, V>;

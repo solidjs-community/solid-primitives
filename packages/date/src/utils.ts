@@ -1,15 +1,17 @@
 import {
   Countdown,
   DateInit,
+  RelativeFormatMessages,
+  Unit
+} from "./types";
+import {
   DAY,
   DEFAULT_MESSAGES,
   HOUR,
   MINUTE,
-  RelativeFormatMessages,
   SECOND,
-  Unit,
   UNITS
-} from ".";
+} from './variables'
 
 /**
  * @param init timestamp `number` | date `string` | `Date` instance

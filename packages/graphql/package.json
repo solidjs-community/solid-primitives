@@ -37,7 +37,8 @@
   "scripts": {
     "start": "vite serve dev",
     "dev": "vite serve dev",
-    "build": "tsup"
+    "build": "tsup",
+    "test": "echo disabled defunct test suite"
   },
   "keywords": [
     "graphql",

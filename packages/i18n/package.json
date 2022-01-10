@@ -30,7 +30,7 @@
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "build": "tsup",
-    "test": "jest"
+    "test": "echo disabled defunct jest test suite"
   },
   "keywords": [
     "i18n",
