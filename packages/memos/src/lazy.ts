@@ -21,6 +21,11 @@ export type LazyMemoOptions<T> = EffectOptions & {
  * - `value` - initial value of the signal
  * - `init` - if **true**, will run the calculation initially, to get the initial value
  * @returns signal of a value that was returned by the calculation
+ *
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memos#createLazyMemo
+ *
+ * @example
+ * const double = createLazyMemo(() => count() * 2)
  */
 
 // both init run was enabled and initial value provided

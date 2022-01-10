@@ -1,7 +1,5 @@
 import { createLazyMemo } from "../src";
 import { Component, createRoot, createSignal, Show, createEffect } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
 
 const [count, setCount] = createSignal(0);
 const [runs, setRuns] = createSignal(0);
@@ -24,12 +22,12 @@ const TestEffect: Component = () => {
   return <></>;
 };
 
-const App: Component = () => {
+const Lazy: Component = () => {
   const [showComp, setShowComp] = createSignal(false);
   const [showEffect, setShowEffect] = createSignal(false);
 
   return (
-    <div class="p-24 box-border w-full min-h-screen space-y-4 bg-gray-800 text-white">
+    <>
       <button class="btn" onclick={() => setShowComp(p => !p)}>
         component: {showComp() ? "ON" : "OFF"}
       </button>
@@ -50,8 +48,8 @@ const App: Component = () => {
       <Show when={showEffect()}>
         <TestEffect />
       </Show>
-    </div>
+    </>
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+export default Lazy;

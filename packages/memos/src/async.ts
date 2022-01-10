@@ -13,6 +13,8 @@ export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Prom
  *
  * **calculation will track reactive reads synchronously — untracks after first `await`**
  *
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memos#createAsyncMemo
+ *
  * @example
  * const memo = createAsyncMemo(async prev => {
  *    const value = await myAsyncFunc(signal())
