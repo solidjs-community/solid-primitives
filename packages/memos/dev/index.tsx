@@ -5,6 +5,7 @@ import "uno.css";
 
 const Lazy = lazy(() => import("./lazy"));
 const Async = lazy(() => import("./async"));
+const Grouped = lazy(() => import("./grouped"));
 
 const App: Component = () => {
   return (
@@ -16,11 +17,15 @@ const App: Component = () => {
         <Link class="text-yellow-400" href="/async">
           /async
         </Link>
+        <Link class="text-yellow-400" href="/grouped">
+          /grouped
+        </Link>
       </nav>
       <div class="p-24 box-border w-full min-h-screen space-y-4 bg-gray-800 text-white">
         <Routes>
           <Route path="/lazy" element={<Lazy />} />
           <Route path="/async" element={<Async />} />
+          <Route path="/grouped" element={<Grouped />} />
         </Routes>
       </div>
     </Router>

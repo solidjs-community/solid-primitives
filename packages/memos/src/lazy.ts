@@ -7,11 +7,7 @@ import {
   runWithOwner
 } from "solid-js";
 import { EffectOptions, Owner } from "solid-js/types/reactive/signal";
-
-export type LazyMemoOptions<T> = EffectOptions & {
-  value?: T;
-  init?: boolean;
-};
+import { MemoOptionsWithValueInit } from ".";
 
 /**
  * Lazily evaluated `createMemo`. Will run the calculation only if is being listened to.
@@ -36,21 +32,21 @@ export function createLazyMemo<T>(
 // initial value was provided
 export function createLazyMemo<T>(
   calc: (prev: T) => T,
-  options: LazyMemoOptions<T> & { value: T }
+  options: MemoOptionsWithValueInit<T> & { value: T }
 ): Accessor<T>;
 // calculation will run initially
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
-  options: LazyMemoOptions<T> & { init: true }
+  options: MemoOptionsWithValueInit<T> & { init: true }
 ): Accessor<T>;
 // no initial value was provided
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
-  options?: LazyMemoOptions<T>
+  options?: MemoOptionsWithValueInit<T>
 ): Accessor<T | undefined>;
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
-  options?: LazyMemoOptions<T>
+  options?: MemoOptionsWithValueInit<T>
 ): Accessor<T | undefined> {
   const initValue: T | undefined = options?.value ?? undefined;
   const [state, setState] = createSignal(options?.init ? calc(initValue) : initValue);

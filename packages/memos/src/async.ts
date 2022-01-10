@@ -1,7 +1,6 @@
 import { Accessor, createComputed, createSignal, untrack } from "solid-js";
-import { EffectOptions } from "solid-js/types/reactive/signal";
+import { MemoOptionsWithValue } from ".";
 
-export type AsyncMemoOptions<T> = EffectOptions & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
 
 /**
@@ -23,15 +22,15 @@ export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Prom
  */
 export function createAsyncMemo<T>(
   calc: AsyncMemoCalculation<T, T>,
-  options: AsyncMemoOptions<T> & { value: T }
+  options: MemoOptionsWithValue<T> & { value: T }
 ): Accessor<T>;
 export function createAsyncMemo<T>(
   calc: AsyncMemoCalculation<T>,
-  options?: AsyncMemoOptions<T>
+  options?: MemoOptionsWithValue<T>
 ): Accessor<T | undefined>;
 export function createAsyncMemo<T>(
   calc: AsyncMemoCalculation<T>,
-  options?: AsyncMemoOptions<T>
+  options?: MemoOptionsWithValue<T>
 ): Accessor<T | undefined> {
   const [state, setState] = createSignal<T | undefined>(options?.value);
   /** pending promises from oldest to newest */
