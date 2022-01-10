@@ -58,7 +58,7 @@ Released with CJS support.
 
 Updated to latest Solid.
 
-1.0.5
+1.0.6
 
 Function argument improvements, named exports.
 
