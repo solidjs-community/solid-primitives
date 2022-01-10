@@ -30,9 +30,9 @@ export function createAsyncMemo<T>(
 ): Accessor<T | undefined>;
 export function createAsyncMemo<T>(
   calc: AsyncMemoCalculation<T>,
-  options?: MemoOptionsWithValue<T>
+  options: MemoOptionsWithValue<T | undefined> = {}
 ): Accessor<T | undefined> {
-  const [state, setState] = createSignal<T | undefined>(options?.value);
+  const [state, setState] = createSignal(options.value, options);
   /** pending promises from oldest to newest */
   const order: Promise<T>[] = [];
 

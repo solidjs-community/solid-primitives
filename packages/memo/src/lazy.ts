@@ -27,7 +27,7 @@ import { MemoOptionsWithValueInit } from ".";
 // both init run was enabled and initial value provided
 export function createLazyMemo<T>(
   calc: (prev: T) => T,
-  options: EffectOptions & { value: T; init: true }
+  options: MemoOptionsWithValueInit<T> & { value: T; init: true }
 ): Accessor<T>;
 // initial value was provided
 export function createLazyMemo<T>(
@@ -46,10 +46,10 @@ export function createLazyMemo<T>(
 ): Accessor<T | undefined>;
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
-  options?: MemoOptionsWithValueInit<T>
+  options: MemoOptionsWithValueInit<T | undefined> = {}
 ): Accessor<T | undefined> {
-  const initValue: T | undefined = options?.value ?? undefined;
-  const [state, setState] = createSignal(options?.init ? calc(initValue) : initValue);
+  const initValue: T | undefined = options.value ?? undefined;
+  const [state, setState] = createSignal(options.init ? calc(initValue) : initValue, options);
 
   /** number of places where the state is being actively observed */
   let listeners = 0;

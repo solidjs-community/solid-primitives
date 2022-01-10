@@ -28,9 +28,9 @@ export function createDebouncedMemo<T>(
 export function createDebouncedMemo<T>(
   calc: (prev: T | undefined) => T,
   timeoutMs: number,
-  options?: MemoOptionsWithValue<T>
+  options: MemoOptionsWithValue<T | undefined> = {}
 ): Accessor<T> {
-  const [state, setState] = createSignal<T | undefined>(options?.value);
+  const [state, setState] = createSignal(options.value, options);
   const [fn] = debounce(() => track(() => setState(calc)), timeoutMs);
   const track = createReaction(() => {
     fn();
@@ -65,9 +65,9 @@ export function createThrottledMemo<T>(
 export function createThrottledMemo<T>(
   calc: (prev: T | undefined) => T,
   timeoutMs: number,
-  options?: MemoOptionsWithValue<T>
+  options: MemoOptionsWithValue<T | undefined> = {}
 ): Accessor<T> {
-  const [state, setState] = createSignal<T | undefined>(options?.value);
+  const [state, setState] = createSignal(options.value, options);
   const [fn] = throttle(() => track(() => setState(calc)), timeoutMs);
   const track = createReaction(fn, options);
   track(() => setState(calc));
