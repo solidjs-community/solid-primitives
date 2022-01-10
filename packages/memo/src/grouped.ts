@@ -10,7 +10,7 @@ import { MemoOptionsWithValue } from ".";
  * @param timeoutMs The duration to debounce in ms
  * @param options specify initial value *(by default it will be undefined)*
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memos#createDebouncedMemo
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createDebouncedMemo
  *
  * @example
  * const double = createDebouncedMemo(() => count() * 2, 200)
@@ -47,7 +47,7 @@ export function createDebouncedMemo<T>(
  * @param timeoutMs The duration to throttle in ms
  * @param options specify initial value *(by default it will be undefined)*
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memos#createThrottledMemo
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createThrottledMemo
  *
  * @example
  * const double = createThrottledMemo(() => count() * 2, 200)

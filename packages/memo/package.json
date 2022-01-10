@@ -1,16 +1,16 @@
 {
-  "name": "@solid-primitives/memos",
+  "name": "@solid-primitives/memo",
   "version": "0.0.100",
   "description": "Collection of custom memo primitives. They extend Solid's createMemo functionality while keeping the usage similar.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/memos#readme",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/memo#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
   "primitive": {
-    "name": "memos",
+    "name": "memo",
     "stage": 1,
     "list": [
       "createLazyMemo",

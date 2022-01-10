@@ -1,8 +1,8 @@
-# @solid-primitives/memos
+# @solid-primitives/memo
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/memos?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/memos)
-[![version](https://img.shields.io/npm/v/@solid-primitives/memos?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/memos)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/memo?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/memo)
+[![version](https://img.shields.io/npm/v/@solid-primitives/memo?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/memo)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
 Collection of custom `createMemo` primitives. They extend it's functionality while keeping the usage similar.
@@ -15,9 +15,9 @@ Collection of custom `createMemo` primitives. They extend it's functionality whi
 ## Installation
 
 ```bash
-npm install @solid-primitives/memos
+npm install @solid-primitives/memo
 # or
-yarn add @solid-primitives/memos
+yarn add @solid-primitives/memo
 ```
 
 ## `createLazyMemo`
@@ -29,7 +29,7 @@ Lazily evaluated `createMemo`. Will run the calculation only if is being listene
 It's usage is almost the same as Solid's `createMemo`. Similarly it should be placed inside a reactive root — component or createRoot.
 
 ```ts
-import { createLazyMemo } from "@solid-primitives/memos";
+import { createLazyMemo } from "@solid-primitives/memo";
 
 // use like a createMemo
 const double = createLazyMemo(() => count() * 2);
@@ -48,11 +48,11 @@ const double = createLazyMemo(() => count() * 2, { value: 0 });
 double(); // T: number
 ```
 
-###### See [the tests](https://github.com/davedbase/solid-primitives/blob/main/packages/memos/test/lazy.test.ts) for better usage reference.
+###### See [the tests](https://github.com/davedbase/solid-primitives/blob/main/packages/memo/test/lazy.test.ts) for better usage reference.
 
 ### Demo
 
-https://codesandbox.io/s/solid-primitives-memos-demo-3w0oz?file=/index.tsx
+https://codesandbox.io/s/solid-primitives-memo-demo-3w0oz?file=/index.tsx
 
 ## `createAsyncMemo`
 
@@ -65,7 +65,7 @@ It's usage is almost the same as Solid's `createMemo`. Similarly it should be pl
 The function argument can return a promise. Promises will be handled with preserving the order of execution, that means if a promise would take more time to execute it won't overwrite thouse that start after it but finish quicker.
 
 ```ts
-import { createAsyncMemo } from "@solid-primitives/memos";
+import { createAsyncMemo } from "@solid-primitives/memo";
 
 const memo = createAsyncMemo(
   async prev => {
@@ -107,7 +107,7 @@ Solid's `createMemo` which returned signal is debounced.
 ### How to use it
 
 ```ts
-import { createDebouncedMemo } from "@solid-primitives/memos";
+import { createDebouncedMemo } from "@solid-primitives/memo";
 
 // base usage:
 const double = createDebouncedMemo(prev => count() * 2, 200);
@@ -128,7 +128,7 @@ Solid's `createMemo` which returned signal is throttled.
 ### How to use it
 
 ```ts
-import { createThrottledMemo } from "@solid-primitives/memos";
+import { createThrottledMemo } from "@solid-primitives/memo";
 
 // base usage:
 const double = createThrottledMemo(prev => count() * 2, 200);
