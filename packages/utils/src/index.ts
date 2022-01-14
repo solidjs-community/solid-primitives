@@ -115,7 +115,7 @@ export const entries = <A extends MaybeAccessor<Object>, V = MaybeAccessorValue<
 ): [string, Values<V>][] => Object.entries(access(object));
 
 /**
- * Creates a promise that resolves *(or rejects)* after gives time.
+ * Creates a promise that resolves *(or rejects)* after given time.
  *
  * @param ms timeout duration in ms
  * @param throwOnTimeout promise will be rejected on timeout if set to `true`
@@ -187,6 +187,11 @@ export function raceTimeout(
 }
 
 /**
+ * Solid's `onCleanup` that is registered only if there is a root.
+ */
+export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
+
+/**
  * Allows the Solid's store to be destructured
  *
  * @param store
@@ -210,46 +215,6 @@ export function destore<T extends Object>(store: Store<T>): Destore<T> {
     result[key] = isFunction(_store[key]) ? _store[key].bind(_store) : () => _store[key];
   });
   return result;
-}
-
-/**
- * Solid's `onCleanup` that runs only if there is a root.
- */
-export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
-
-/**
- * Creates a reactive root, which will be disposed when the passed owner does.
- *
- * @param fn
- * @param owner a root that will trigger the cleanup
- * @returns whatever the "fn" returns
- *
- * @example
- * const owner = getOwner()
- * const handleClick = () => createSubRoot(owner, () => {
- *    createEffect(() => {})
- * });
- */
-export function createSubRoot<T>(fn: (dispose: Fn) => T, owner = getOwner()): T {
-  const [dispose, returns] = createRoot(dispose => [dispose, fn(dispose)], owner ?? undefined);
-  owner && runWithOwner(owner, () => onCleanup(dispose));
-  return returns;
-}
-
-/**
- * A wrapper for creating functions with the `createSubRoot`
- *
- * @param callback
- * @param owner a root that will trigger the cleanup
- * @returns the callback function
- *
- * @example
- * const handleClick = createSubRootFunction(() => {
- *    createEffect(() => {})
- * })
- */
-export function createSubRootFunction<T extends AnyFunction>(callback: T, owner?: Owner | null): T {
-  return ((...args) => createSubRoot(() => callback(...args), owner)) as T;
 }
 
 export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {
