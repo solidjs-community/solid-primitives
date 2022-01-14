@@ -1,10 +1,6 @@
-import { AnyFunction, Fn, isDefined, onRootCleanup } from "@solid-primitives/utils";
+import { AnyFunction, Fn, isDefined } from "@solid-primitives/utils";
 import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
 import type { Owner } from "solid-js/types/reactive/signal";
-
-// I kept onRootCleanup in the utils, instead of in here,
-// because it's usage is mostly for making primitives
-export { onRootCleanup };
 
 export type Dispose = Fn;
 export type RunInRootReturn<T> = T extends void | undefined | null
@@ -25,9 +21,10 @@ export type RunInRootReturn<T> = T extends void | undefined | null
  * });
  */
 export function createSubRoot<T>(fn: (dispose: Dispose) => T, owner = getOwner()): T {
-  const [dispose, returns] = createRoot(dispose => [dispose, fn(dispose)], owner ?? undefined);
-  owner && runWithOwner(owner, () => onCleanup(dispose));
-  return returns;
+  return createRoot(dispose => {
+    owner && runWithOwner(owner, () => onCleanup(dispose));
+    return fn(dispose);
+  }, owner ?? undefined);
 }
 
 /**

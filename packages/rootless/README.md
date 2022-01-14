@@ -5,7 +5,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/rootless?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/rootless)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
-A collection of helpers that aim to simplify using reactive primitives outside of reactive roots, or asynchronously after the root initialization.
+A collection of helpers that aim to simplify using reactive primitives outside of reactive roots, asynchronously after the root initialization, or just working with roots in general.
 
 - [`createSubRoot`](#createSubRoot) - Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
 - [`createCallbackWithOwner`](#createCallbackWithOwner) - A wrapper for creating callbacks with `runWithOwner`.
@@ -145,6 +145,6 @@ const runInSubRoot = <T>(fn: () => T, detachedOwner?: Owner): RunInRootReturn<T>
 
 0.0.100
 
-Initial release as a Stage-0 primitive.
+Initial release as a Stage-1 primitive.
 
 </details>
