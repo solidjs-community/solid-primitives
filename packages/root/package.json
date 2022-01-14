@@ -1,18 +1,23 @@
 {
-  "name": "@solid-primitives/root",
+  "name": "@solid-primitives/rootless",
   "version": "0.0.100",
   "description": "A template primitive example.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/root#readme",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/rootless#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
   "primitive": {
-    "name": "root",
+    "name": "rootless",
     "stage": 0,
-    "list": [],
+    "list": [
+      "createSubRoot",
+      "createCallbackWithOwner",
+      "runInRoot",
+      "runInSubRoot"
+    ],
     "category": "Reactivity"
   },
   "private": false,
