@@ -12,7 +12,7 @@ export type RunInRootReturn<T> = T extends void | undefined | null
   : [returns: T, dispose: Dispose];
 
 /**
- * Creates a reactive root, which will be disposed when the passed owner does.
+ * Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
  *
  * @param fn
  * @param owner a root that will trigger the cleanup
@@ -31,7 +31,7 @@ export function createSubRoot<T>(fn: (dispose: Dispose) => T, owner = getOwner()
 }
 
 /**
- * A wrapper for creating callbacks with the `runWithOwner`.
+ * A wrapper for creating callbacks with `runWithOwner`.
  * It gives you the option to use reactive primitives after root setup and outside of effects.
  *
  * @param callback
