@@ -1,8 +1,13 @@
+import { ItemsOf } from "@solid-primitives/utils";
+
 export type Predicate<T> = (item: T, index: number, array: readonly T[]) => boolean;
 export type MappingFn<T, V> = (item: T, index: number, array: readonly T[]) => V;
 
+/** make shallow copy of an array */
 export const shallowArrayCopy = <T>(array: readonly T[]): T[] => array.slice();
+/** make shallow copy of an object */
 export const shallowObjectCopy = <T extends object>(object: T): T => Object.assign({}, object);
+/** make shallow copy of an array/object */
 export const shallowCopy = <T extends object>(source: T): T =>
   Array.isArray(source) ? (shallowArrayCopy(source) as T) : shallowObjectCopy(source);
 
@@ -63,6 +68,21 @@ export const push = <T>(list: T[], item: T): T[] => withArrayCopy(list, list => 
 export const drop = <T>(list: T[], n = 1): T[] => list.slice(n);
 
 /**
+ * non-mutating function that drops n items from the array end.
+ * @returns changed array copy
+ *
+ * @example
+ * ```ts
+ * const newList = dropRight([1,2,3])
+ * newList // => [1,2]
+ *
+ * const newList = dropRight([1,2,3], 2)
+ * newList // => [1]
+ * ```
+ */
+export const dropRight = <T>(list: T[], n = 1): T[] => list.slice(0, list.length - n);
+
+/**
  * non-mutating `Array.prototype.filter()` that filters out passed item
  * @returns changed array copy
  */
@@ -104,6 +124,25 @@ export const slice = <T>(list: readonly T[], start?: number, end?: number): T[] 
 export const splice = <T>(list: readonly T[], start: number, deleteCount: number, ...items: T[]) =>
   withArrayCopy(list, list => list.splice(start, deleteCount, ...items));
 
+/**
+ * Creates a new array concatenating array with any additional arrays and/or values.
+ * @param ...a values or arrays
+ * @returns new concatenated array
+ */
+export function concat<A extends any[], V extends ItemsOf<A>>(
+  ...a: A
+): Array<V extends any[] ? ItemsOf<V> : V> {
+  const result: any[] = [];
+  for (let i = 0; i++; i < a.length) {
+    Array.isArray(a[i]) ? result.push(...a[i]) : result.push(a[i]);
+  }
+  return result;
+}
+
+/**
+ * Remove item from array
+ * @returns changed array copy
+ */
 export const remove = <T>(list: readonly T[], item: T): T[] => {
   const index = list.indexOf(item);
   return splice(list, index, 1);
