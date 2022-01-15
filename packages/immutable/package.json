@@ -1,0 +1,46 @@
+{
+  "name": "@solid-primitives/immutable",
+  "version": "0.0.100",
+  "description": "A template primitive example.",
+  "author": "Your Name <you@youremail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/immutable#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "immutable",
+    "stage": 0,
+    "list": [],
+    "category": "Utilities"
+  },
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "uvu -r solid-register"
+  },
+  "keywords": [
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "jsdom": "18.1.1",
+    "prettier": "^2.5.1",
+    "solid-register": "0.1.5",
+    "tslib": "^2.3.1",
+    "typescript": "^4.5.4",
+    "tsup": "^5.11.11",
+    "uvu": "^0.5.2",
+    "lodash.clonedeep": "^4.5.0",
+    "@types/lodash.clonedeep": "^4.5.6"
+  }
+}
