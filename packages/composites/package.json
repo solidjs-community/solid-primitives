@@ -15,9 +15,7 @@
     "list": [
       "createCompositeEffect",
       "createCompositeComputed",
-      "createCompositeMemo",
-      "createCompositeRenderEffect",
-      "createModifier"
+      "createCompositeRenderEffect"
     ],
     "category": "Reactivity"
   },
