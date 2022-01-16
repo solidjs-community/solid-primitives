@@ -63,6 +63,16 @@ export const asArray = <T>(value: T): T extends any[] ? T : T[] =>
   Array.isArray(value) ? (value as any) : [value];
 
 /**
+ * Access an array of MaybeAccessors
+ * @example
+ * const list = [1, 2, () => 3)] // T: MaybeAccessor<number>[]
+ * const newList = accessArray(list) // T: number[]
+ */
+export const accessArray = <A extends MaybeAccessor<any>>(
+  list: readonly A[]
+): MaybeAccessorValue<A>[] => list.map(v => access(v));
+
+/**
  * Run the function if the accessed value is not `undefined` nor `null`
  * @param value
  * @param fn
