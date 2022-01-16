@@ -43,6 +43,7 @@ newObj; // { foo: 123 }
 - **`map`** - standalone `Array.prototype.map()` function
 - **`slice`** - standalone `Array.prototype.slice()` function
 - **`splice`** - non-mutating `Array.prototype.splice()` as a standalone function
+- **`fill`** - non-mutating `Array.prototype.fill()` as a standalone function
 - **`concat`** - Creates a new array concatenating array with any additional arrays and/or values.
 - **`remove`** - Remove item from array
 - **`omit`** - Create a new subset object without the provided keys

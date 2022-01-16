@@ -125,6 +125,13 @@ export const splice = <T>(list: readonly T[], start: number, deleteCount: number
   withArrayCopy(list, list => list.splice(start, deleteCount, ...items));
 
 /**
+ * non-mutating `Array.prototype.fill()` as a standalone function
+ * @returns changed array copy
+ */
+export const fill = <T>(list: readonly T[], value: T, start?: number, end?: number): T[] =>
+  withArrayCopy(list, list => list.fill(value, start, end));
+
+/**
  * Creates a new array concatenating array with any additional arrays and/or values.
  * @param ...a values or arrays
  * @returns new concatenated array
@@ -133,7 +140,7 @@ export function concat<A extends any[], V extends ItemsOf<A>>(
   ...a: A
 ): Array<V extends any[] ? ItemsOf<V> : V> {
   const result: any[] = [];
-  for (let i = 0; i++; i < a.length) {
+  for (const i in a) {
     Array.isArray(a[i]) ? result.push(...a[i]) : result.push(a[i]);
   }
   return result;

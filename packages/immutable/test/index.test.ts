@@ -1,4 +1,4 @@
-import { update } from "../src";
+import { update, concat } from "../src";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { cloneDeep } from "lodash";
@@ -38,3 +38,16 @@ testUpdate("update()", () => {
 });
 
 testUpdate.run();
+
+const testConcat = suite("concat");
+
+testConcat("concat()", () => {
+  const originalArgs = [1, 2, ["a", "b"], "c", [3, [4, 5]]];
+  const copiedArgs = cloneDeep(originalArgs);
+
+  const a = concat(...originalArgs);
+  assert.equal(a, [1, 2, "a", "b", "c", 3, [4, 5]]);
+  assert.equal(originalArgs, copiedArgs);
+});
+
+testConcat.run();
