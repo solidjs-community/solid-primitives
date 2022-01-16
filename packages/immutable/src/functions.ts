@@ -50,7 +50,8 @@ export const withCopy = <T extends object>(source: T, mutator: (copy: T) => void
  * non-mutating `Array.prototype.push()`
  * @returns changed array copy
  */
-export const push = <T>(list: T[], item: T): T[] => withArrayCopy(list, list => list.push(item));
+export const push = <T>(list: T[], ...items: T[]): T[] =>
+  withArrayCopy(list, list => list.push(...items));
 
 /**
  * non-mutating function that drops n items from the array start.
@@ -121,8 +122,12 @@ export const slice = <T>(list: readonly T[], start?: number, end?: number): T[] 
  * non-mutating `Array.prototype.splice()` as a standalone function
  * @returns changed array copy
  */
-export const splice = <T>(list: readonly T[], start: number, deleteCount: number, ...items: T[]) =>
-  withArrayCopy(list, list => list.splice(start, deleteCount, ...items));
+export const splice = <T>(
+  list: readonly T[],
+  start: number,
+  deleteCount: number = 0,
+  ...items: T[]
+): T[] => withArrayCopy(list, list => list.splice(start, deleteCount, ...items));
 
 /**
  * non-mutating `Array.prototype.fill()` as a standalone function
