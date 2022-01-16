@@ -84,14 +84,14 @@ export const drop = <T>(list: T[], n = 1): T[] => list.slice(n);
 export const dropRight = <T>(list: T[], n = 1): T[] => list.slice(0, list.length - n);
 
 /**
- * non-mutating `Array.prototype.filter()` that filters out passed item
+ * standalone `Array.prototype.filter()` that filters out passed item
  * @returns changed array copy
  */
 export const filterOut = <T>(list: readonly T[], item: T): T[] & { removed: number } =>
   filter(list, i => i !== item);
 
 /**
- * non-mutating `Array.prototype.filter()` as a standalone function
+ * standalone `Array.prototype.filter()`
  * @returns changed array copy
  */
 export function filter<T>(list: readonly T[], predicate: Predicate<T>): T[] & { removed: number } {

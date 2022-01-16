@@ -37,8 +37,8 @@ newObj; // { foo: 123 }
 - **`push`** - non-mutating `Array.prototype.push()`
 - **`drop`** - non-mutating function that drops n items from the array start
 - **`dropRight`** - non-mutating function that drops n items from the array end
-- **`filterOut`** - non-mutating `Array.prototype.filter()` that filters out passed item
-- **`filter`** - non-mutating `Array.prototype.filter()` as a standalone function
+- **`filterOut`** - standalone `Array.prototype.filter()` that filters out passed item
+- **`filter`** - standalone `Array.prototype.filter()`
 - **`sort`** - non-mutating `Array.prototype.sort()` as a standalone function
 - **`map`** - standalone `Array.prototype.map()` function
 - **`slice`** - standalone `Array.prototype.slice()` function
