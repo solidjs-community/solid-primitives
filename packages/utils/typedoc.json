@@ -1,8 +1,6 @@
 {
    "entryPoints": [
-      "./src/index.ts",
-      "./src/fp.ts",
-      "./src/setter.ts"
+      "./src/index.ts"
    ],
    "out": "docs",
    "githubPages": false,

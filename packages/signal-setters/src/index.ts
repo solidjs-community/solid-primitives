@@ -1,25 +1,25 @@
-import { Predicate, MappingFn } from ".";
-import * as fp from "./fp";
+import type { Predicate, MappingFn } from "@solid-primitives/immutable";
+import * as _ from "@solid-primitives/immutable";
 
 export const push =
   <T>(item: T) =>
   (list: T[]): T[] =>
-    fp.push(list, item);
+    _.push(list, item);
 
 export const drop =
   (n = 1) =>
   <T>(list: T[]): T[] =>
-    fp.drop(list, n);
+    _.drop(list, n);
 
 export const filterOut =
   <T>(item: T) =>
   (list: T[]): T[] & { removed: number } =>
-    fp.filterOut(list, item);
+    _.filterOut(list, item);
 
 export const filter =
   <T>(predicate: Predicate<T>) =>
   (list: T[]): T[] & { removed: number } =>
-    fp.filter(list, predicate);
+    _.filter(list, predicate);
 
 export const map =
   <T>(mapFn: MappingFn<T, T>) =>
@@ -34,11 +34,11 @@ export const slice =
 export function splice(start: number, deleteCount: number): <T>(list: T[]) => T[];
 export function splice<T>(start: number, deleteCount: number, ...items: T[]): (list: T[]) => T[];
 export function splice<T>(start: number, deleteCount: number, ...items: T[]): (list: T[]) => T[] {
-  return list => fp.splice(list, start, deleteCount, ...items);
+  return list => _.splice(list, start, deleteCount, ...items);
 }
 
 // prettier-ignore
-export const remove = <T>(item: T) => (list: T[]): T[] => fp.remove(list, item);
+export const remove = <T>(item: T) => (list: T[]): T[] => _.remove(list, item);
 
 // import { createSignal } from "solid-js";
 

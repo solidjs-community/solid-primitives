@@ -1,9 +1,8 @@
-import { createRoot, getOwner, onCleanup, runWithOwner, on, Accessor } from "solid-js";
-import type { EffectFunction, NoInfer, OnOptions, Owner } from "solid-js/types/reactive/signal";
+import { getOwner, onCleanup, on, Accessor } from "solid-js";
+import type { EffectFunction, NoInfer, OnOptions } from "solid-js/types/reactive/signal";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import type {
-  AnyFunction,
   Destore,
   Fn,
   ItemsOf,
