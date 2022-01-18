@@ -33,19 +33,15 @@ import { createLazyMemo } from "@solid-primitives/memo";
 
 // use like a createMemo
 const double = createLazyMemo(() => count() * 2);
-double(); // T: number | undefined
+double(); // T: number
 ```
 
-Because it executes lazily, the calculation won't run if nothing is listening to it, that also includes the initial run by default. It causes the signal to might return `undefined` when accessed for the first time.
+Set the initial value, or type of the previous value in calculation function will be `T | undefined`.
 
 ```ts
-// use the options to enable initial run
-const double = createLazyMemo(() => count() * 2, { init: true });
-double(); // T: number
-
-// or set the initial value
-const double = createLazyMemo(() => count() * 2, { value: 0 });
-double(); // T: number
+// set the initial value
+const memo = createLazyMemo(prev => count() + prev, { value: 0 });
+memo(); // T: number
 ```
 
 ###### See [the tests](https://github.com/davedbase/solid-primitives/blob/main/packages/memo/test/lazy.test.ts) for better usage reference.
