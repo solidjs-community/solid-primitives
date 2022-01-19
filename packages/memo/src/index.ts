@@ -16,10 +16,29 @@ import { Fn } from "@solid-primitives/utils";
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
 
+/**
+ * Solid's `createReaction` that is based on pure computation *(runs before render, and is non-batching)*
+ *
+ * @param onInvalidate callback that runs when the tracked sources trigger update
+ * @param options set computation name for debugging pourposes
+ * @returns track() function
+ *
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createPureReaction
+ *
+ * @example
+ * const [count, setCount] = createSignal(0);
+ * const track = createPureReaction(() => {...});
+ * track(count);
+ * setCount(1); // triggers callback
+ *
+ * // sources need to be re-tracked every time
+ * setCount(2); // doesn't trigger callback
+ */
 export function createPureReaction(
   onInvalidate: Fn,
   options?: EffectOptions
 ): (tracking: Fn) => void {
+  // current sources tracked by the user
   const [trackedList, setTrackedList] = createSignal<Fn[]>([]);
   let addedTracked = false;
 
@@ -38,8 +57,9 @@ export function createPureReaction(
       setTrackedList([]);
       untrack(onInvalidate);
     }
-  });
+  }, options);
 
+  // track()
   return tracking => {
     addedTracked = true;
     setTrackedList(p => [...p, tracking]);
