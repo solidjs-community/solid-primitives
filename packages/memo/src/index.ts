@@ -250,3 +250,31 @@ export function createLazyMemo<T>(
     return (memo as Accessor<T>)();
   };
 }
+
+type CacheCalculation<Key, Value, Rest extends any[]> = (key: Key, ...a: Rest) => Value;
+
+export function createCache<Key, Value, Rest extends any[]>(
+  key: Accessor<Key>,
+  calc: CacheCalculation<Key, Value, Rest>
+): (...a: Rest) => Value;
+export function createCache<Key, Value, Rest extends any[]>(
+  calc: CacheCalculation<Key, Value, Rest>
+): CacheCalculation<Key, Value, Rest>;
+export function createCache<Key, Value, Rest extends any[]>(
+  ...args:
+    | [Accessor<Key>, CacheCalculation<Key, Value, Rest>]
+    | [CacheCalculation<Key, Value, Rest>]
+): CacheCalculation<Key, Value, Rest> | ((...a: Rest) => Value) {
+  const cache = new Map<Key, Accessor<Value>>();
+  const owner = getOwner() as Owner;
+  const calc = args.length === 1 ? args[0] : args[1];
+
+  const run: CacheCalculation<Key, Value, Rest> = (key, ...a) => {
+    if (cache.has(key)) return (cache.get(key) as Accessor<Value>)();
+    const memo = runWithOwner(owner, () => createLazyMemo(() => calc(key, ...a)));
+    cache.set(key, memo);
+    return memo();
+  };
+
+  return args.length === 1 ? run : (...a: Rest) => run(args[0](), ...a);
+}
