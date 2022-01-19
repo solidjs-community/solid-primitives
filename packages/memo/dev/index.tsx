@@ -11,6 +11,9 @@ const App: Component = () => {
   return (
     <Router>
       <nav class="fixed top-2 left-2 flex space-x-4">
+        <a class="text-yellow-400" href="/">
+          reload
+        </a>
         <Link class="text-yellow-400" href="/lazy">
           /lazy
         </Link>

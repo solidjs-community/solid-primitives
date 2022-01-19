@@ -6,7 +6,8 @@ import {
   untrack,
   getOwner,
   onCleanup,
-  runWithOwner
+  runWithOwner,
+  createMemo
 } from "solid-js";
 import type { EffectOptions, MemoOptions, Owner } from "solid-js/types/reactive/signal";
 import debounce from "@solid-primitives/debounce";
@@ -195,8 +196,8 @@ export function createAsyncMemo<T>(
  * Lazily evaluated `createMemo`. Will run the calculation only if is being listened to.
  *
  * @param calc pure reactive calculation returning some value
- * @param options for configuring initial state: *(before first read)*
- * - `value` - initial value of the signal
+ * @param value the initial previous value *(in callback)*
+ * @param options set computation name for debugging pourposes
  * @returns signal of a value that was returned by the calculation
  *
  * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createLazyMemo
@@ -208,57 +209,44 @@ export function createAsyncMemo<T>(
 // initial value was provided
 export function createLazyMemo<T>(
   calc: (prev: T) => T,
-  options: MemoOptionsWithValue<T> & { value: T }
+  value: T,
+  options?: MemoOptions<T>
 ): Accessor<T>;
 // no initial value was provided
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
-  options?: MemoOptionsWithValue<T>
+  value?: undefined,
+  options?: MemoOptions<T>
 ): Accessor<T>;
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
-  options: MemoOptionsWithValue<T | undefined> = {}
+  value?: T,
+  options?: MemoOptions<T>
 ): Accessor<T> {
-  let signal: Accessor<T>;
-  let run: () => void;
-
+  let memo: Accessor<T> | undefined;
   /** number of places where the state is being actively observed */
   let listeners = 0;
-  /** is the reaction tracking enabled */
-  let isTracking = false;
   /** original root in which the primitive was initially run */
   const owner = getOwner();
 
+  // prettier-ignore
+  // memo is recreated every time it's being read, and the prevous one is derailed
+  // memo disables itself once computation happend without anyone listening
+  const recreateMemo = () => runWithOwner(owner as Owner, () => {
+    memo = createMemo(prev => {
+      if (listeners) return calc(prev);
+      memo = undefined;
+      return prev as T;
+    }, value, options);
+  });
+
   // wrapped signal accessor
   return () => {
-    // this will run on the first access (only)
-    if (!signal) {
-      // TODO: rewrite lazy memo to use pure computation (createReaction is an effect)
-      const track = runWithOwner(owner as Owner, () => createReaction(() => run()));
-      run = () => {
-        if (listeners) {
-          isTracking = true;
-          track(() => setState((prev: T | undefined) => calc(prev)));
-        } else isTracking = false;
-      };
-      // prettier-ignore
-      // on the initial access, signal's value is calculated only once, here:
-      // (which kicks off tracking)
-      const [state, setState] = createSignal((() => {
-         let v!: T;
-         track(() => (v = calc(options.value ?? undefined)));
-         return v;
-       })(), options);
-      signal = state;
-      isTracking = true;
-    }
-
     if (getOwner()) {
       listeners++;
       onCleanup(() => listeners--);
-      isTracking || run();
     }
-
-    return signal();
+    if (!memo) recreateMemo();
+    return (memo as Accessor<T>)();
   };
 }

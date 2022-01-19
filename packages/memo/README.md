@@ -41,7 +41,7 @@ Set the initial value, or type of the previous value in calculation function wil
 
 ```ts
 // set the initial value
-const memo = createLazyMemo(prev => count() + prev, { value: 0 });
+const memo = createLazyMemo(prev => count() + prev, 123);
 memo(); // T: number
 ```
 
