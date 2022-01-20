@@ -17,6 +17,7 @@ const TestComponent: Component = () => {
 
 const TestEffect: Component = () => {
   createEffect(() => {
+    console.log("in effect", memo());
     setEffectCount(memo());
   });
   return <></>;

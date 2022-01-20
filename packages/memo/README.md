@@ -11,6 +11,8 @@ Collection of custom `createMemo` primitives. They extend it's functionality whi
 - [`createAsyncMemo`](#createAsyncMemo) - Memo that allows for asynchronous calculations.
 - [`createDebouncedMemo`](#createDebouncedMemo) - Memo which returned signal is debounced.
 - [`createThrottledMemo`](#createThrottledMemo) - Memo which returned signal is throttled.
+- [`createPureReaction`](#createPureReaction) - A `createReaction` that runs before render _(non-batching)_.
+- [`createCache`](#createCache) - Custom, lazily-evaluated, memo, with caching based on keys.
 
 ## Installation
 
@@ -33,19 +35,15 @@ import { createLazyMemo } from "@solid-primitives/memo";
 
 // use like a createMemo
 const double = createLazyMemo(() => count() * 2);
-double(); // T: number | undefined
+double(); // T: number
 ```
 
-Because it executes lazily, the calculation won't run if nothing is listening to it, that also includes the initial run by default. It causes the signal to might return `undefined` when accessed for the first time.
+Set the initial value, or type of the previous value in calculation function will be `T | undefined`.
 
 ```ts
-// use the options to enable initial run
-const double = createLazyMemo(() => count() * 2, { init: true });
-double(); // T: number
-
-// or set the initial value
-const double = createLazyMemo(() => count() * 2, { value: 0 });
-double(); // T: number
+// set the initial value
+const memo = createLazyMemo(prev => count() + prev, 123);
+memo(); // T: number
 ```
 
 ###### See [the tests](https://github.com/davedbase/solid-primitives/blob/main/packages/memo/test/lazy.test.ts) for better usage reference.
@@ -138,6 +136,104 @@ const double = createThrottledMemo(prev => count() * 2, 200, { value: 0 });
 ```
 
 Note: the callback is run initially to kickoff tracking and set the signal's value.
+
+## `createPureReaction`
+
+Solid's [`createReaction`](#https://www.solidjs.com/docs/latest/api#createreaction) that is based on pure computation _(runs before render, and is non-batching)_
+
+### How to use it
+
+It's usage exactly matches the original. The only difference is in when the callback is being executed, the normal createReaction runs it after render, similar to how effects work, while the createPureReaction is more like createComputed.
+
+```ts
+import { createPureReaction } from "@solid-primitives/memo"
+
+const [count, setCount] = createSignal(0);
+const track = createPureReaction(() => {...});
+track(count);
+setCount(1); // triggers callback
+
+// sources need to be re-tracked every time
+setCount(2); // doesn't trigger callback
+```
+
+### Definition
+
+```ts
+function createPureReaction(onInvalidate: Fn, options?: EffectOptions): (tracking: Fn) => void;
+```
+
+## `createCache`
+
+Custom, lazily-evaluated, cached memo. The caching is based on a `key`, it has to be declared up-front as a reactive source, or passed to the signal access function.
+
+### how to use it
+
+It takes params:
+
+- `key` a reactive source, that will serve as cache key (later value access for the same key will be taken from cache instead of recalculated)
+- `calc` calculation function returning value to cache. the function is **tracking** - will recalculate when the accessed signals change.
+- `options` set maximum **size** of the cache, or memo options.
+
+Returns a signal access function.
+
+#### Import
+
+```ts
+import { createCache } from "@solid-primitives/memo";
+```
+
+#### Setting the key up-front as a reactive source
+
+```ts
+const [count, setCount] = createSignal(1);
+const double = createCache(count, n => n * 2);
+// access value:
+double();
+```
+
+#### Provide the key by passing it to the access function
+
+let's accessing different keys in different places
+
+```ts
+const [count, setCount] = createSignal(1);
+const double = createCache((n: number) => n * 2);
+// access value with key:
+double(count());
+```
+
+#### Calculation function is reactive
+
+will recalculate when the accessed signals change.
+
+```ts
+// changing number creates new entry in cache
+const [number, setNumber] = createSignal(1);
+// changing divisor will force cache to be recalculated
+const [divisor, setDivisor] = createSignal(1);
+
+// calculation subscribes to divisor signal
+const result = createCache(number, n / divisor());
+```
+
+### Definition
+
+```ts
+function createCache<Key, Value>(
+  key: Accessor<Key>,
+  calc: CacheCalculation<Key, Value>,
+  options?: CacheOptions<Value>
+): Accessor<Value>;
+function createCache<Key, Value>(
+  calc: CacheCalculation<Key, Value>,
+  options?: CacheOptions<Value>
+): CacheKeyAccessor<Key, Value>;
+
+type CacheCalculation<Key, Value> = (key: Key, prev: Value | undefined) => Value;
+type CacheKeyAccessor<Key, Value> = (key: Key) => Value;
+type CacheOptions<Value> = MemoOptions<Value> & { size?: number };
+```
 
 ## Changelog
 
