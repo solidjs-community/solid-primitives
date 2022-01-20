@@ -45,7 +45,8 @@
   "dependencies": {
     "@solid-primitives/utils": "^0.1.4",
     "@solid-primitives/debounce": "^1.1.0",
-    "@solid-primitives/throttle": "^1.1.0"
+    "@solid-primitives/throttle": "^1.1.0",
+    "@solid-primitives/rootless": "^0.0.100"
   },
   "devDependencies": {
     "jsdom": "18.1.1",

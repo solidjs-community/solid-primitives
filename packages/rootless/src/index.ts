@@ -1,11 +1,16 @@
 import { AnyFunction, Fn, isDefined } from "@solid-primitives/utils";
-import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
+import { createRoot, getOwner, onCleanup, runWithOwner as _runWithOwner } from "solid-js";
 import type { Owner } from "solid-js/types/reactive/signal";
 
 export type Dispose = Fn;
 export type RunInRootReturn<T> = T extends void | undefined | null
   ? Dispose
   : [returns: T, dispose: Dispose];
+
+/**
+ * Solid's `runWithOwner` that allows `null` to be passed as an owner.
+ */
+export const runWithOwner = <T>(o: Owner | null, fn: () => T): T => _runWithOwner(o as Owner, fn);
 
 /**
  * Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
