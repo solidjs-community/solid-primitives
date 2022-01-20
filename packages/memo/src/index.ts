@@ -12,7 +12,7 @@ import {
 import type { EffectOptions, MemoOptions, Owner } from "solid-js/types/reactive/signal";
 import debounce from "@solid-primitives/debounce";
 import throttle from "@solid-primitives/throttle";
-import { Fn } from "@solid-primitives/utils";
+import { Fn, isFunction } from "@solid-primitives/utils";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
@@ -251,30 +251,64 @@ export function createLazyMemo<T>(
   };
 }
 
-type CacheCalculation<Key, Value, Rest extends any[]> = (key: Key, ...a: Rest) => Value;
+export type CacheCalculation<Key, Value> = (key: Key, prev: Value | undefined) => Value;
+export type CacheKeyAccessor<Key, Value> = (key: Key) => Value;
+export type CacheOptions<Value> = MemoOptions<Value> & { size?: number };
 
-export function createCache<Key, Value, Rest extends any[]>(
+/**
+ * Custom, lazily-evaluated, cached memo. The caching is based on a `key`, it has to be declared up-front as a reactive source, or passed to the signal access function.
+ *
+ * @param key a reactive source, that will serve as cache key (later value access for the same key will be taken from cache instead of recalculated)
+ * @param calc calculation function returning value to cache. the function is **tracking** - will recalculate when the accessed signals change.
+ * @param options set maximum **size** of the cache, or memo options.
+ * @returns signal access function
+ *
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createCache
+ *
+ * @example
+ * set the reactive key up-front
+ * ```ts
+ * const [count, setCount] = createSignal(1)
+ * const double = createCache(count, n => n * 2)
+ * // access value:
+ * double()
+ * ```
+ * or pass it to the access function (let's accessing different keys in different places)
+ * ```ts
+ * const double = createCache((n: number) => n * 2)
+ * // access with key
+ * double(count())
+ * ```
+ */
+export function createCache<Key, Value>(
   key: Accessor<Key>,
-  calc: CacheCalculation<Key, Value, Rest>
-): (...a: Rest) => Value;
-export function createCache<Key, Value, Rest extends any[]>(
-  calc: CacheCalculation<Key, Value, Rest>
-): CacheCalculation<Key, Value, Rest>;
-export function createCache<Key, Value, Rest extends any[]>(
+  calc: CacheCalculation<Key, Value>,
+  options?: CacheOptions<Value>
+): Accessor<Value>;
+export function createCache<Key, Value>(
+  calc: CacheCalculation<Key, Value>,
+  options?: CacheOptions<Value>
+): CacheKeyAccessor<Key, Value>;
+export function createCache<Key, Value>(
   ...args:
-    | [Accessor<Key>, CacheCalculation<Key, Value, Rest>]
-    | [CacheCalculation<Key, Value, Rest>]
-): CacheCalculation<Key, Value, Rest> | ((...a: Rest) => Value) {
+    | [key: Accessor<Key>, calc: CacheCalculation<Key, Value>, options?: CacheOptions<Value>]
+    | [calc: CacheCalculation<Key, Value>, options?: CacheOptions<Value>]
+): CacheKeyAccessor<Key, Value> | Accessor<Value> {
   const cache = new Map<Key, Accessor<Value>>();
   const owner = getOwner() as Owner;
-  const calc = args.length === 1 ? args[0] : args[1];
 
-  const run: CacheCalculation<Key, Value, Rest> = (key, ...a) => {
+  const key = isFunction(args[1]) ? (args[0] as Accessor<Key>) : undefined,
+    calc = isFunction(args[1]) ? args[1] : (args[0] as CacheCalculation<Key, Value>),
+    options = typeof args[1] === "object" ? args[1] : typeof args[2] === "object" ? args[2] : {};
+
+  const run: CacheKeyAccessor<Key, Value> = key => {
     if (cache.has(key)) return (cache.get(key) as Accessor<Value>)();
-    const memo = runWithOwner(owner, () => createLazyMemo(() => calc(key, ...a)));
-    cache.set(key, memo);
+    const memo = runWithOwner(owner, () =>
+      createLazyMemo<Value>(prev => calc(key, prev), undefined, options)
+    );
+    if (options.size === undefined || cache.size < options.size) cache.set(key, memo);
     return memo();
   };
 
-  return args.length === 1 ? run : (...a: Rest) => run(args[0](), ...a);
+  return key ? () => run(key()) : run;
 }

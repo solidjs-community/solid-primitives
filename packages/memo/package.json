@@ -16,7 +16,9 @@
       "createLazyMemo",
       "createAsyncMemo",
       "createDebouncedMemo",
-      "createThrottledMemo"
+      "createThrottledMemo",
+      "createPureReaction",
+      "createCache"
     ],
     "category": "Reactivity"
   },
