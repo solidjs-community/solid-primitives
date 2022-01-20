@@ -1,6 +1,5 @@
 import {
   Accessor,
-  createReaction,
   createSignal,
   createComputed,
   untrack,
@@ -96,7 +95,7 @@ export function createDebouncedMemo<T>(
 ): Accessor<T> {
   const [state, setState] = createSignal(options.value, options);
   const [fn] = debounce(() => track(() => setState(calc)), timeoutMs);
-  const track = createReaction(() => {
+  const track = createPureReaction(() => {
     fn();
     track(() => calc(state()));
   }, options);
@@ -133,7 +132,7 @@ export function createThrottledMemo<T>(
 ): Accessor<T> {
   const [state, setState] = createSignal(options.value, options);
   const [fn] = throttle(() => track(() => setState(calc)), timeoutMs);
-  const track = createReaction(fn, options);
+  const track = createPureReaction(fn, options);
   track(() => setState(calc));
   return state as Accessor<T>;
 }
@@ -230,7 +229,7 @@ export function createLazyMemo<T>(
   const owner = getOwner();
 
   // prettier-ignore
-  // memo is recreated every time it's being read, and the prevous one is derailed
+  // memo is recreated every time it's being read, and the previous one is derailed
   // memo disables itself once computation happend without anyone listening
   const recreateMemo = () => runWithOwner(owner as Owner, () => {
     memo = createMemo(prev => {

@@ -1,5 +1,5 @@
 import { createDebouncedMemo, createThrottledMemo } from "../src";
-import { Component } from "solid-js";
+import { Component, Show } from "solid-js";
 import { createMousePosition } from "@solid-primitives/mouse";
 
 const Grouped: Component = () => {
@@ -15,18 +15,26 @@ const Grouped: Component = () => {
           transform: `translate(${poz.x()}px, ${poz.y()}px)`
         }}
       ></div>
-      <div
-        class="ball bg-yellow-600"
-        style={{
-          transform: `translate(${debPoz().x}px, ${debPoz().y}px)`
-        }}
-      ></div>
-      <div
-        class="ball bg-cyan-500"
-        style={{
-          transform: `translate(${thrPoz().x}px, ${thrPoz().y}px)`
-        }}
-      ></div>
+      <Show when={debPoz()}>
+        {({ x, y }) => (
+          <div
+            class="ball bg-yellow-600"
+            style={{
+              transform: `translate(${x}px, ${y}px)`
+            }}
+          ></div>
+        )}
+      </Show>
+      <Show when={thrPoz()}>
+        {({ x, y }) => (
+          <div
+            class="ball bg-cyan-500"
+            style={{
+              transform: `translate(${x}px, ${y}px)`
+            }}
+          ></div>
+        )}
+      </Show>
       <p class="font-bold text-green-500 opacity-50">normal</p>
       <p class="font-bold text-yellow-600 opacity-50">debounced</p>
       <p class="font-bold text-cyan-500 opacity-50">throttled</p>
