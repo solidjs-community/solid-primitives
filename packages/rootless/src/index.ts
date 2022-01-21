@@ -10,7 +10,7 @@ export type RunInRootReturn<T> = T extends void | undefined | null
 /**
  * Solid's `runWithOwner` that allows `null` to be passed as an owner.
  */
-export const runWithOwner = <T>(o: Owner | null, fn: () => T): T => _runWithOwner(o as Owner, fn);
+export const runWithOwner = _runWithOwner as <T>(o: Owner | null, fn: () => T) => T;
 
 /**
  * Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
