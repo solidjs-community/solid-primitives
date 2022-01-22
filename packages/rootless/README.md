@@ -8,9 +8,9 @@
 A collection of helpers that aim to simplify using reactive primitives outside of reactive roots, asynchronously after the root initialization, or just working with roots in general.
 
 - [`createSubRoot`](#createSubRoot) - Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
-- [`createCallbackWithOwner`](#createCallbackWithOwner) - A wrapper for creating callbacks with `runWithOwner`.
-- [`runInRoot`](#runInRoot) - Use reactive primitives outside of reactive roots.
-- [`runInSubRoot`](#runInSubRoot) - Like `runInRoot`, but creates a sub root instead.
+- [`createCallback`](#createCallback) - A wrapper for creating callbacks with `runWithOwner`.
+- [`runWithRoot`](#runWithRoot) - Use reactive primitives outside of reactive roots.
+- [`runWithSubRoot`](#runWithSubRoot) - Like `runWithRoot`, but creates a sub root instead.
 
 ## Installation
 
@@ -51,7 +51,7 @@ createRoot(dispose => {
 function createSubRoot<T>(fn: (dispose: () => void) => T, owner?: Owner | null): T;
 ```
 
-## `createCallbackWithOwner`
+## `createCallback`
 
 A wrapper for creating callbacks with `runWithOwner`.
 It gives you the option to use reactive primitives after root setup and outside of effects.
@@ -66,7 +66,7 @@ All of the callback-based (in opposite to effect-based) events is Solid don't ha
 
 ```tsx
 // in component body
-const handleClick = createCallbackWithOwner(() => {
+const handleClick = createCallback(() => {
    // the effect will be created normally, attached to the component's reactive root
    createEffect(() => {...})
 })
@@ -78,13 +78,13 @@ const handleClick = createCallbackWithOwner(() => {
 ### Definition
 
 ```ts
-const createCallbackWithOwner = <T extends AnyFunction>(
+const createCallback = <T extends AnyFunction>(
   callback: T,
   owner?: Owner | null
 ): T
 ```
 
-## `runInRoot`
+## `runWithRoot`
 
 Helper for simplifying usage of Solid's reactive primitives outside of components (reactive roots).
 
@@ -92,26 +92,26 @@ Helper for simplifying usage of Solid's reactive primitives outside of component
 
 ```ts
 // when fn doesn't return anything
-const dispose = runInRoot(() =>
+const dispose = runWithRoot(() =>
   createEffect(() => {
     console.log(count());
   })
 );
 
 // when fn returns something
-const [double, dispose] = runInRoot(() => createMemo(() => count() * 2));
+const [double, dispose] = runWithRoot(() => createMemo(() => count() * 2));
 ```
 
 ### Definition
 
 ```ts
-type RunInRootReturn<T> = T extends void | undefined | null
+type runWithRootReturn<T> = T extends void | undefined | null
   ? Dispose
   : [returns: T, dispose: Dispose];
-const runInRoot = <T>(fn: () => T, detachedOwner?: Owner): RunInRootReturn<T>
+const runWithRoot = <T>(fn: () => T, detachedOwner?: Owner): runWithRootReturn<T>
 ```
 
-## `runInSubRoot`
+## `runWithSubRoot`
 
 Helper for simplifying usage of Solid's reactive primitives outside of components (reactive roots). A **sub root** will be automatically disposed when it's owner does.
 
@@ -119,23 +119,23 @@ Helper for simplifying usage of Solid's reactive primitives outside of component
 
 ```ts
 // when fn doesn't return anything
-const dispose = runInSubRoot(() =>
+const dispose = runWithSubRoot(() =>
   createEffect(() => {
     console.log(count());
   })
 );
 
 // when fn returns something
-const [double, dispose] = runInSubRoot(() => createMemo(() => count() * 2));
+const [double, dispose] = runWithSubRoot(() => createMemo(() => count() * 2));
 ```
 
 ### Definition
 
 ```ts
-type RunInRootReturn<T> = T extends void | undefined | null
+type runWithRootReturn<T> = T extends void | undefined | null
   ? Dispose
   : [returns: T, dispose: Dispose];
-const runInSubRoot = <T>(fn: () => T, detachedOwner?: Owner): RunInRootReturn<T>
+const runWithSubRoot = <T>(fn: () => T, detachedOwner?: Owner): runWithRootReturn<T>
 ```
 
 ## Changelog

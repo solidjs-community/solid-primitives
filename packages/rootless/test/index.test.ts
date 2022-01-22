@@ -1,4 +1,4 @@
-import { createCallbackWithOwner, createSubRoot, runInRoot, runInSubRoot } from "../src";
+import { createCallback, createSubRoot, runWithRoot, runWithSubRoot } from "../src";
 import { createComputed, createMemo, createRoot, createSignal, getOwner } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
@@ -41,7 +41,7 @@ ccwo("owner is available in async trigger", () =>
   createRoot(dispose => {
     let capturedPayload: any;
     let capturedOwner: any;
-    const handler = createCallbackWithOwner(payload => {
+    const handler = createCallback(payload => {
       capturedPayload = payload;
       capturedOwner = getOwner();
     });
@@ -57,12 +57,12 @@ ccwo("owner is available in async trigger", () =>
 
 ccwo.run();
 
-const rir = suite("runInRoot");
+const rir = suite("runWithRoot");
 
 rir("working with createComputed", () => {
   const [count, setCount] = createSignal(0);
   const captured: any[] = [];
-  const dispose = runInRoot(() => createComputed(() => captured.push(count())));
+  const dispose = runWithRoot(() => createComputed(() => captured.push(count())));
   assert.equal(captured, [0]);
   setCount(1);
   assert.equal(captured, [0, 1], "before dispose()");
@@ -72,7 +72,7 @@ rir("working with createComputed", () => {
 
 rir("working with createMemo", () => {
   const [count, setCount] = createSignal(0);
-  const [memo, dispose] = runInRoot(() => createMemo(() => count()));
+  const [memo, dispose] = runWithRoot(() => createMemo(() => count()));
   assert.is(memo(), 0);
   setCount(1);
   assert.is(memo(), 1, "before dispose()");
@@ -82,12 +82,12 @@ rir("working with createMemo", () => {
 
 rir.run();
 
-const risr = suite("runInSubRoot");
+const risr = suite("runWithSubRoot");
 
 risr("working with createComputed", () => {
   const [count, setCount] = createSignal(0);
   const captured: any[] = [];
-  const dispose = runInSubRoot(() => createComputed(() => captured.push(count())));
+  const dispose = runWithSubRoot(() => createComputed(() => captured.push(count())));
   assert.equal(captured, [0]);
   setCount(1);
   assert.equal(captured, [0, 1], "before dispose()");
@@ -97,7 +97,7 @@ risr("working with createComputed", () => {
 
 risr("working with createMemo", () => {
   const [count, setCount] = createSignal(0);
-  const [memo, dispose] = runInSubRoot(() => createMemo(() => count()));
+  const [memo, dispose] = runWithSubRoot(() => createMemo(() => count()));
   assert.is(memo(), 0);
   setCount(1);
   assert.is(memo(), 1, "before dispose()");
@@ -109,7 +109,7 @@ risr("disposes together with owner", () =>
   createRoot(dispose => {
     const [count, setCount] = createSignal(0);
     const captured: any[] = [];
-    runInSubRoot(() => createComputed(() => captured.push(count())));
+    runWithSubRoot(() => createComputed(() => captured.push(count())));
     assert.equal(captured, [0]);
     setCount(1);
     assert.equal(captured, [0, 1], "before dispose()");

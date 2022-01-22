@@ -14,9 +14,9 @@
     "stage": 1,
     "list": [
       "createSubRoot",
-      "createCallbackWithOwner",
-      "runInRoot",
-      "runInSubRoot"
+      "createCallback",
+      "runWithRoot",
+      "runWithSubRoot"
     ],
     "category": "Reactivity"
   },
