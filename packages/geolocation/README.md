@@ -1,26 +1,25 @@
----
-Name: geolocation
-Stage: 3
-Package: "@solid-primitives/geolocation"
-Primitives: createGeolocation, createGeolocationWatcher
-Category: Browser APIs
----
-
 # @solid-primitives/geolocation
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/geolocation?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/geolocation)
 [![size](https://img.shields.io/npm/v/@solid-primitives/geolocation?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/geolocation)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
-Primitives to query and watch geolocation information.
+Primitives to query and watch geolocation information from within the browser.
 
-`createGeolocation` - Used to fetch current geolocation data as a resource.
+## Installation
 
-`createGeolocationWatcher` - Creates a geolocation watcher and updates a signal with the latest coordinates.
+```
+npm install @solid-primitives/geolocation
+# or
+yarn add @solid-primitives/geolocation
+```
 
 ## How to use it
 
-Basic use with refetch:
+### createGeolocation
+
+Used to fetch current geolocation data as a resource.
 
 ```ts
 const [location, refetch] = createGeolocation();
@@ -36,7 +35,9 @@ const [location, refetch] = createGeolocation({
 });
 ```
 
-or to watch geolocation:
+### createGeolocationWatcher
+
+Creates a geolocation watcher and updates a signal with the latest coordinates.
 
 ```ts
 const [location, error] = createGeolocationWatcher(true);
@@ -59,8 +60,12 @@ Pulling an early release of the package together and preparing for 1.0.0 release
 
 Added testing, improved types, changed name of createGeolocationWatcher to createGeolocationMonitor.
 
-1.0.2
+1.0.6
 
-Published with CJS support.
+Published with CJS and SSR support.
+
+1.0.7
+
+Changed to peerDependencies and updated to latest Solid
 
 </details>

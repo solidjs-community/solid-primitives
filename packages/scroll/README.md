@@ -1,25 +1,21 @@
----
-Name: scroll
-Stage: 3
-Package: "@solid-primitives/scroll"
-Primitives: createScrollObserver
-Category: Display & Media
----
-
 # @solid-primitives/scroll
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/scroll?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/scroll)
 [![size](https://img.shields.io/npm/v/@solid-primitives/scroll?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/scroll)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
 Helpful primitives to manage browser scrolling.
 
 `createScrollObserver` - Helpful monitor that reports the current position of an element or window.
 
-## Primitive ideas:
+## Installation
 
-`createScrollTo` - A primitive to support scroll to a target
-`createHashScroll` - A primitive to support scrolling based on a hashtag change
+```
+npm install @solid-primitives/scroll
+# or
+yarn add @solid-primitives/scroll
+```
 
 ## How to use it
 
@@ -38,6 +34,11 @@ const position = createScrollObserver(() => ref);
 
 You may view a working example here: https://codesandbox.io/s/solid-primitives-scroll-csg7f
 
+### Primitive ideas:
+
+`createScrollTo` - A primitive to support scroll to a target
+`createHashScroll` - A primitive to support scrolling based on a hashtag change
+
 ## Changelog
 
 <details>
@@ -47,12 +48,12 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-s
 
 Initial porting of the scroll primitive.
 
-1.0.2
+1.0.4
 
-Released new version with CJS support.
+Released new version with CJS and SSR support.
+
+1.0.5
+
+Updated to Solid 1.3
 
 </details>
-
-## Contributors
-
-Ported from the amazing work by at https://github.com/dance2die/react-use-localstorage.

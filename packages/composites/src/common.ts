@@ -1,11 +1,11 @@
 import { Accessor, on, onCleanup } from "solid-js";
-import { WatchOptions } from ".";
 import type {
   CallbackModifier,
   EffectCallback,
   EffectSource,
   ModifierReturn,
-  StopEffect
+  StopEffect,
+  WatchOptions
 } from "./types";
 
 //

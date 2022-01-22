@@ -1,33 +1,43 @@
 {
   "name": "@solid-primitives/throttle",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Primitive that creates a throttle function",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/audio",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/throttle",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
-  "private": false,
-  "main": "dist/cjs/index.cjs",
-  "type": "module",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "primitive": {
+    "name": "throttle",
+    "stage": 3,
+    "list": [
+      "createThrottle"
+    ],
+    "category": "Utilities"
+  },
   "files": [
     "dist"
   ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "require": "./dist/cjs/index.cjs",
+    "node": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
     "import": "./dist/index.js",
-    "default": "./dist/index.js"
+    "require": "./dist/index.cjs"
   },
-  "sideEffects": "false",
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
-    "test": "jest"
+    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
+    "build": "tsup",
+    "test": "echo disabled defunct jest test suite"
   },
   "keywords": [
     "throttle",
@@ -36,15 +46,16 @@
   ],
   "devDependencies": {
     "@types/jest": "^27.0.2",
-    "prettier": "^2.0.5",
     "jest": "^27.2.5",
-    "ts-jest": "^27.0.5",
+    "prettier": "^2.0.5",
     "solid-testing-library": "^0.2.0",
+    "ts-jest": "^27.0.5",
     "tslib": "^2.0.1",
+    "tsup": "^5.10.0",
     "typescript": "^4.0.2"
   },
   "peerDependencies": {
-    "solid-js": "^1.1.6"
+    "solid-js": "^1.3.1"
   },
   "jest": {
     "preset": "ts-jest",

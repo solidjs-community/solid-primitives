@@ -1,28 +1,44 @@
 {
   "name": "@solid-primitives/graphql",
-  "version": "1.0.2",
+  "version": "1.0.6",
   "description": "Primitive that generates a client and reactive GraphQL queries",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/graphql",
-  "private": false,
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davedbase/solid-primitives/tree/main/packages/graphql"
+  },
+  "primitive": {
+    "name": "graphql",
+    "stage": 3,
+    "list": [
+      "createGraphQLClient"
+    ],
+    "category": "Network"
+  },
   "files": [
     "dist"
   ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "require": "./dist/cjs/index.cjs",
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
     "import": "./dist/index.js",
-    "default": "./dist/index.js"
+    "require": "./dist/index.cjs"
   },
-  "sideEffects": "false",
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs"
+    "start": "vite serve dev",
+    "dev": "vite serve dev",
+    "build": "tsup",
+    "test": "echo disabled defunct test suite"
   },
   "keywords": [
     "graphql",
@@ -31,18 +47,20 @@
     "primitives"
   ],
   "devDependencies": {
-    "@types/jest": "^27.0.0",
-    "prettier": "^2.0.5",
-    "solid-testing-library": "^0.2.0",
+    "prettier": "^2.5.1",
     "tslib": "^2.0.1",
-    "typescript": "^4.0.2"
+    "tsup": "^5.10.0",
+    "typescript": "^4.0.2",
+    "uvu": "^0.5.2",
+    "unocss": "0.21.2",
+    "vite": "2.7.10",
+    "vite-plugin-solid": "2.2.1"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.3.1"
   },
   "dependencies": {
-    "solid-js": "^1.0.8"
-  },
-  "jest": {
-    "setupFiles": [
-      "./test/setup.ts"
-    ]
+    "node-fetch": "^2.6.6",
+    "@solid-primitives/utils": "^0.1.2"
   }
 }

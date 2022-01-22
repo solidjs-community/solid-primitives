@@ -1,4 +1,4 @@
-import { createMemo, createResource, onCleanup } from "solid-js";
+import { createMemo, createResource, onCleanup, ResourceFetcherInfo } from "solid-js";
 import type { Accessor } from "solid-js";
 
 const abortError = "AbortError";
@@ -9,12 +9,14 @@ type FetchOptions<I> = I extends undefined
       name?: string;
       fetch?: typeof fetch;
       responseHandler?: (response: Response) => any;
+      disable?: boolean;
     }
   : {
       initialValue: I;
       name?: string;
       fetch?: typeof fetch;
       responseHandler?: (response: Response) => any;
+      disable?: boolean;
     };
 
 export type FetchReturn<T, I> = [
@@ -54,7 +56,13 @@ const isOptions = <I>(
  * createFetch<T>(
  *  requestInfo: RequestInfo,
  *  requestInit?: RequestInit,
- *  options?: { initialValue?: T, name?: string, fetch?: typeof fetch }
+ *  options?: {
+ *    initialValue?: T,
+ *    name?: string,
+ *    fetch?: typeof fetch,
+ *    // disable fetching, e.g. in SSR situations (use `isServer`)
+ *    disabled?: boolean
+ *  }
  * ): [
  *   Resource<T> & {
  *     aborted: boolean,
@@ -109,9 +117,32 @@ export function createFetch<T, I>(
     requestInit = undefined;
   }
 
-  const fetcher = (
+  if (options?.disable) {
+    let value = options?.initialValue as T | I;
+    let aborted = false;
+    return [
+      Object.assign(() => value, {
+        aborted,
+        error: undefined,
+        loading: false,
+        status: 201,
+        response: null
+      }),
+      {
+        abort: () => {
+          aborted = true;
+        },
+        mutate: (v: T | I) => (value = v),
+        refetch: () => {
+          aborted = false;
+        }
+      }
+    ];
+  }
+
+  const fetcher = <T>(
     [requestInfo, requestInit]: [requestInfo: RequestInfo, requestInit?: RequestInit],
-    getPrev: () => T | I
+    info: ResourceFetcherInfo<T>
   ): Promise<T | I> => {
     if (!abort || (!abort.signal.aborted && resourceReturn?.[0].loading)) {
       abort?.abort();
@@ -139,7 +170,7 @@ export function createFetch<T, I>(
       .catch(err => {
         if (err?.name === abortError) {
           resourceReturn[0].aborted = true;
-          return Promise.resolve(getPrev());
+          return Promise.resolve(info.value);
         }
         throw err;
       });
@@ -159,6 +190,7 @@ export function createFetch<T, I>(
   Object.defineProperty(resourceReturn[1], "abort", {
     get: () => () => {
       resourceReturn[0].aborted = true;
+      resourceReturn[0].error = false;
       abort?.abort();
     }
   });

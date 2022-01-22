@@ -7,6 +7,7 @@ import {
   onCleanup,
   Resource
 } from "solid-js";
+import { ResourceActions, ResourceFetcherInfo } from "solid-js/types/reactive/signal";
 
 const constraintsFromDevice = (
   device: MediaDeviceInfo | MediaStreamConstraints
@@ -20,16 +21,14 @@ const constraintsFromDevice = (
     : device;
 };
 
-const stop = (stream: Accessor<MediaStream | undefined>) =>
-  stream()
+const stop = (stream: MediaStream | undefined) =>
+  stream
     ?.getTracks()
     ?.forEach(track => track.stop());
 
 export type StreamReturn = [
   stream: Resource<MediaStream | undefined>,
-  controls: {
-    mutate: (stream: MediaStream) => void;
-    refetch: () => void;
+  controls: ResourceActions<MediaStream | undefined> & {
     stop: () => void;
   }
 ];
@@ -55,21 +54,21 @@ export const createStream = (
     | MediaStreamConstraints
     | Accessor<MediaDeviceInfo | MediaStreamConstraints>
 ): StreamReturn => {
-  const [stream, { mutate, refetch }] = createResource<MediaStream, MediaStreamConstraints>(
+  const [stream, { mutate, refetch }] = createResource(
     createMemo<MediaStreamConstraints>(() =>
       constraintsFromDevice(typeof constraints === "function" ? constraints() : constraints)
     ),
-    (constraints, prev: Accessor<MediaStream | undefined>): Promise<MediaStream> =>
+    (constraints, info: ResourceFetcherInfo<MediaStream>): Promise<MediaStream> =>
       navigator.mediaDevices.getUserMedia(constraints).then(stream => {
-        if (stream !== prev()) {
-          stop(prev);
+        if (info.value && stream !== info.value) {
+          stop(info.value);
         }
         return stream;
       })
   );
 
-  onCleanup(() => stop(stream));
-  return [stream, { mutate, refetch, stop: () => stop(stream) }];
+  onCleanup(() => stop(stream()));
+  return [stream, { mutate, refetch, stop: () => stop(stream()) }];
 };
 
 /**

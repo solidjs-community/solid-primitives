@@ -1,18 +1,19 @@
----
-Name: stream
-Stage: 3
-Package: "@solid-primitives/stream"
-Primitives: createStream, createAmplitudeStream
-Category: Display & Media
----
-
 # @solid-primitives/stream
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/stream?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/stream)
 [![size](https://img.shields.io/npm/v/@solid-primitives/stream?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/stream)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
 Creates primitives to work with media streams from microphones, cameras or the screen.
+
+## Installation
+
+```
+npm install @solid-primitives/stream
+# or
+yarn add @solid-primitives/stream
+```
 
 ## How to use it
 
@@ -46,8 +47,12 @@ TODO
 
 Initial release.
 
-0.0.160
+0.0.180
 
-Released a version with CJS.
+Released a version with CJS and SSR.
+
+0.1.0
+
+Updated for latest Solid.
 
 </details>

@@ -1,33 +1,44 @@
 {
   "name": "@solid-primitives/intersection-observer",
-  "version": "1.1.4",
+  "version": "1.2.1",
   "description": "Primitives to support using the intersection observer API.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/intersection-observer",
-  "private": false,
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
   "files": [
     "dist"
   ],
-  "exports": {
-    "import": {
-      "node": "./dist/server.js",
-      "default": "./dist/index.js"
-    },
-    "require": {
-      "node":  "./dist/cjs/server.js",
-      "default": "./dist/cjs/index.js"
-    }
+  "primitive": {
+    "name": "intersection-observer",
+    "stage": 3,
+    "list": [
+      "createIntersectionObserver",
+      "createViewportObserver",
+      "createVisibilityObserver"
+    ],
+    "category": "Display & Media"
   },
-  "sideEffects": "false",
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs",
+    "start": "vite serve dev",
+    "build": "tsup",
     "test": "uvu -r solid-register"
   },
   "keywords": [
@@ -37,14 +48,21 @@
     "primitives"
   ],
   "devDependencies": {
+    "jsdom": "^18.1.1",
+    "prettier": "^2.5.1",
+    "solid-register": "0.1.5",
+    "tslib": "^2.3.1",
+    "tsup": "^5.10.3",
+    "typescript": "^4.5.2",
+    "unocss": "0.21.2",
     "uvu": "^0.5.2",
-    "jsdom": "^18.0.1",
-    "solid-register": "^0.0.10",
-    "prettier": "^2.0.5",
-    "tslib": "^2.0.1",
-    "typescript": "^4.4.4"
+    "vite": "2.7.10",
+    "vite-plugin-solid": "2.2.1"
   },
   "peerDependencies": {
-    "solid-js": "^1.2.2"
+    "solid-js": "^1.3.1"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "^0.1.2"
   }
 }

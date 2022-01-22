@@ -1,5 +1,5 @@
 import { Accessor, createMemo, createRoot, onCleanup } from "solid-js";
-import type { StopEffect, WatchOptions, ModifierReturn, EffectCallback } from ".";
+import type { StopEffect, WatchOptions, ModifierReturn, EffectCallback } from "./types";
 import { createComputationWatcher, Fn, parseCompositeArgs } from "./common";
 
 type CustomEquals<T> = false | ((prev: T, next: T) => boolean);

@@ -1,20 +1,23 @@
----
-Name: storage
-Stage: 3
-Package: "@solid-primitives/storage"
-Primitives: createStorage, createCookieStorage, createAsyncStorage, createStorageSignal, createLocalStorage, createSessionStorage
-Category: Browser APIs
----
-
 # @solid-primitives/storage
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/storage?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/storage)
 [![size](https://img.shields.io/npm/v/@solid-primitives/storage?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/storage)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
 Creates a primitive to reactively access both synchronous and asynchronous persistent storage APIs similar to localStorage.
 
+## Installation
+
+```
+npm install @solid-primitives/storage
+# or
+yarn add @solid-primitives/storage
+```
+
 ## How to use it
+
+### Basic Usage
 
 `createStorage` is meant to wrap any localStorage-like API to be as accessible as a [Solid Store](https://www.solidjs.com/docs/latest/api#createstore). The main differences are
 
@@ -163,8 +166,16 @@ Initial release
 
 First proper release of storage engine with CJS support.
 
-1.0.4
+1.0.7
 
 Patch CJS support.
+
+1.0.10
+
+Minor patch fixed missing types.
+
+1.1.0
+
+Updated to Solid 1.3
 
 </details>

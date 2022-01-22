@@ -1,16 +1,9 @@
----
-Name: i18n
-Stage: 3
-Package: "@solid-primitives/i18n"
-Primitives: createI18nContext, useI18n
-Category: Utilities
----
-
 # @solid-primitives/i18n
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/i18n?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/i18n)
 [![size](https://img.shields.io/npm/v/@solid-primitives/i18n?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/i18n)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
 Creates a method for internationalization support. This primitive set is largely inspired by [dlv](https://github.com/developit/dlv/blob/master/index.js) and passes all its tests.
 
@@ -97,8 +90,12 @@ General package clean-up and added testing facility.
 
 Releasd with CJS support.
 
-1.0.6
+1.0.8
 
 Patch CJS support release.
+
+1.0.9
+
+Updated to Solid 1.3
 
 </details>

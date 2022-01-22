@@ -1,20 +1,23 @@
----
-Name: mutation-observer
-Stage: 2
-Package: "@solid-primitives/mutation-observer"
-Primitives: createMutationObserver
-Category: Browser APIs
----
-
 # @solid-primitives/mutation-observer
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/mutation-observer?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/mutation-observer)
 [![size](https://img.shields.io/npm/v/@solid-primitives/mutation-observer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/mutation-observer)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
 Primitive providing the ability to watch for changes made to the DOM tree. A wrapper for Browser's [MutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) API.
 
-## Usage
+## Installation
+
+```
+npm install @solid-primitives/mutation-observer
+# or
+yarn add @solid-primitives/mutation-observer
+```
+
+## How to use it
+
+### createMutationObserver
 
 ```ts
 import { createMutationObserver } from "@solid-primitives/mutation-observer";
@@ -50,7 +53,7 @@ observe(el1, { childList: true })
 stop()
 ```
 
-## Directive Usage
+### Directive Usage
 
 ```tsx
 // You have to name it as "mutationObserver" when using typescript
@@ -59,7 +62,7 @@ const [mutationObserver] = createMutationObserver([], e => {...})
 <div use:mutationObserver={{ childList: true }}>...</div>
 ```
 
-## Standalone Directive Usage
+### Standalone Directive Usage
 
 ```tsx
 import { mutationObserver } from "@solid-primitives/mutation-observer";
@@ -70,7 +73,7 @@ mutationObserver;
 <div use:mutationObserver={[{ childList: true }, e => {...}]}>...</div>
 ```
 
-## Types
+### Types
 
 ```ts
 function createMutationObserver(
@@ -108,5 +111,17 @@ https://codesandbox.io/s/solid-mutation-observer-p59tu?file=/index.tsx
 1.0.0
 
 Initial release as a Stage-2 primitive.
+
+1.0.2
+
+Added support for CJS and cleaned up docs.
+
+1.0.3
+
+Updated utility package dependency.
+
+1.0.4
+
+Updated to Solid 1.3
 
 </details>
