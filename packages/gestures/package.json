@@ -14,8 +14,8 @@
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "yarn start",
-    "build": "tsup",
-    "test": "uvu -r solid-register"
+    "build": "echo noop build",
+    "test": "echo noop test"
   },
   "devDependencies": {
     "jsdom": "18.1.1",
