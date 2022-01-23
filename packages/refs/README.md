@@ -11,6 +11,7 @@ Collection of primitives, components and directives that help managing reference
 - [`Ref`](#Ref) - Get up-to-date reference to a single child element.
 - [`Refs`](#Refs) - Get up-to-date references of the multiple children elements.
 - [`Key`](#Key) - Causes the children to rerender when the `key` changes.
+- [`Remote`](#Remote) - Applies all JSX attributes, special attributes, event listeners and inserts passed children to the target element.
 
 ## Installation
 
@@ -203,6 +204,79 @@ const [count, setCount] = createSignal(0);
 const Key: Component<{
   key: any;
 }>;
+```
+
+## `Remote`
+
+A Remote Element. Applies all JSX attributes, special attributes such as `style`, `classList`, event listeners and inserts passed children to the target `element`.
+
+### Import
+
+```ts
+import { Remote } from "@solid-primitives/refs";
+```
+
+### How to use it
+
+`<Remote>` accepts these properties:
+
+- `element` - target DOM element.
+- `useShadow` - use the shadow dom for children
+- `isSvg` - set to true if the target element is a part of an svg
+- `children` & attributes that should be applied to `target`
+
+```tsx
+const [hovering, setHovering] = createSignal(false);
+
+// you can pass a generic with tag-name of the target element
+<Remote<"div">
+  element={() => document.querySelector("#capture-me")}
+  style={{
+    transform: "translate(24px, 24px)"
+  }}
+  classList={{
+    "bg-orange-700": hovering()
+  }}
+  onmouseenter={e => setHovering(true)}
+  onmouseleave={e => setHovering(false)}
+/>;
+```
+
+#### Passing children
+
+`<Remote>` uses [Solid's `<Portal>`](#https://www.solidjs.com/docs/latest/api#<portal>) to insert children, so it should be used similarly.
+
+```tsx
+const [count, setCount] = createSignal(0);
+
+<Remote<"div">
+  element={() => document.querySelector("#capture-me")}
+  style={{
+    transform: `translate(${count()}px, ${count()}px)`
+  }}
+>
+  {/* All children will be inserted to the target element */}
+  <p>Hi, I'm new here!</p>
+  <button class="btn" onClick={() => setCount(p => ++p)}>
+    {count()}
+  </button>
+  <Show when={count() % 2 === 0}>
+    <p>It's even</p>
+  </Show>
+</Remote>;
+```
+
+### Definition
+
+```ts
+declare const Remote: <T extends keyof JSX.IntrinsicElements>(
+  props: ComponentProps<T> & {
+    element: MaybeAccessor<Element>;
+    useShadow?: boolean;
+    isSvg?: boolean;
+    children?: JSX.Element;
+  }
+) => Text;
 ```
 
 ## Demo

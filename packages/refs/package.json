@@ -13,9 +13,10 @@
     "name": "refs",
     "stage": 0,
     "list": [
-      "Refs",
       "Ref",
+      "Refs",
       "Key",
+      "Remote",
       "unmount"
     ],
     "category": "Utilities"

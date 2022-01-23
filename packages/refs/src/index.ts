@@ -1,14 +1,24 @@
-import { access, asArray, Directive, Get } from "@solid-primitives/utils";
+import {
+  access,
+  asArray,
+  Directive,
+  Get,
+  isFunction,
+  MaybeAccessor
+} from "@solid-primitives/utils";
 import {
   children,
   Component,
+  ComponentProps,
   createComputed,
   createMemo,
   JSX,
   onCleanup,
   onMount,
+  splitProps,
   untrack
 } from "solid-js";
+import { spread, Portal } from "solid-js/web";
 
 declare module "solid-js" {
   namespace JSX {
@@ -127,4 +137,32 @@ export const Key: Component<{ key: any }> = props => {
     key();
     return props.children;
   });
+};
+
+/**
+ * A Remote Element. Applies all JSX attributes, special attributes such as `style`, `classList`, event listeners and inserts passed children to the target `element`.
+ * @param element target DOM element.
+ * @param useShadow use the shadow dom for children
+ * @param isSvg set to true if the target element is a part of an svg
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/refs#Remote
+ */
+export const Remote = <T extends keyof JSX.IntrinsicElements>(
+  props: ComponentProps<T> & {
+    element: MaybeAccessor<Element>;
+    useShadow?: boolean;
+    isSvg?: boolean;
+    children?: JSX.Element;
+  }
+) => {
+  const [p, others] = splitProps(props, ["element", "children", "useShadow", "isSvg"]);
+
+  const run = () => {
+    const el = access(p.element);
+    if (!el) return;
+    spread(el, others, !!p.isSvg);
+    if (p.children) Portal({ ...p, mount: el, children: p.children });
+  };
+  isFunction(p.element) ? onMount(run) : run();
+
+  return document.createTextNode("");
 };

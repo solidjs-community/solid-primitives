@@ -1,5 +1,5 @@
 import { Key } from "../src";
-import { Component, createSignal, For } from "solid-js";
+import { Component, createSignal } from "solid-js";
 import { Transition } from "solid-transition-group";
 
 const App: Component = () => {
