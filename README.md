@@ -81,7 +81,7 @@ Any primitive Stage 0-1 should be used with caution and with the understanding t
 
 Other frameworks have large and extremely well established ecosystems. Notably React which has a vast array of component and hooks. The amount of choice within the ecosystem is great but often these tools are built as one-offs resulting in often un-tested logic or are designed with narrow needs. Over time the less concise these building blocks are the more they tend to repeat themselves. Our goal with Primitives is to bring the community together to contribute, evolve and utilize a powerful centralize primitive foundation.
 
-All our primitives are meant to be consistent and sustain a level of quality. We guarantee that each is created with the utmost care. Our primitivates are:
+All our primitives are meant to be consistent and sustain a level of quality. We guarantee that each is created with the utmost care. Our primitives are:
 
 1. Documented and follow a consistent style guide
 2. Be well tested
