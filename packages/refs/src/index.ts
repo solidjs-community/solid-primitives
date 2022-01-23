@@ -128,15 +128,3 @@ export const Key: Component<{ key: any }> = props => {
     return props.children;
   });
 };
-
-/**
- * Prevents changing children. Provide `key` to force rerender.
- */
-export const Freeze: Component<{ key?: any }> = props => {
-  const resolved = children(() => props.children);
-  const key = createMemo(() => props.key);
-  return createMemo(() => {
-    key();
-    return untrack(resolved);
-  });
-};
