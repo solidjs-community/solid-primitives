@@ -1,8 +1,26 @@
-import { access, asArray, Get } from "@solid-primitives/utils";
+import { access, asArray, Directive, Get } from "@solid-primitives/utils";
 import { children, createComputed, JSX, onCleanup, onMount, untrack } from "solid-js";
 
+declare module "solid-js" {
+  namespace JSX {
+    interface Directives {
+      unmount: UnmountHandler;
+    }
+  }
+}
+export type E = JSX.Element;
+
+export type UnmountHandler<E extends Element = Element> = Get<E>;
+
 /**
- * Get up-to-date references of the children elements.
+ * A directive that calls handler when the element get's unmounted from DOM.
+ */
+export const unmount: Directive<UnmountHandler> = (el, handler): void => {
+  onCleanup(() => handler()(el));
+};
+
+/**
+ * Get up-to-date references of the multiple children elements.
  * @param refs Getter of current array of elements
  * @param added Getter of added elements since the last change
  * @param removed Getter of removed elements since the last change
@@ -48,7 +66,7 @@ export const Refs = <U extends Element>(props: {
 };
 
 /**
- * Get up-to-date reference to a single child element
+ * Get up-to-date reference to a single child element.
  * @param ref Getter of current element *(or `undefined` if not mounted)*
  * @param onMount handle the child element getting mounted to the dom
  * @param onUnmount handle the child element getting unmounted from the dom

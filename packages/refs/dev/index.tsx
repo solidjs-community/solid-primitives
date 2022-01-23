@@ -1,7 +1,8 @@
-import { Ref, Refs } from "../src";
+import { Ref, Refs, unmount } from "../src";
 import { Component, createSignal, For, Show } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
+unmount;
 
 const App: Component = () => {
   const [show, setShow] = createSignal(true);
@@ -50,7 +51,9 @@ const App: Component = () => {
               </Show>
             </Ref>
             <Show when={show2()}>
-              <div class="node">ID 2</div>
+              <div class="node" use:unmount={el => console.log("Unmounted", el)}>
+                ID 2
+              </div>
               <div class="node">ID 3</div>
             </Show>
             <For each={Array.from({ length: count() }, (_, i) => i)}>
