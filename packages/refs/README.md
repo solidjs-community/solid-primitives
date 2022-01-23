@@ -10,6 +10,7 @@ Collection of primitives, components and directives that help managing reference
 - [`unmount`](#unmount) - A directive that calls handler when the element get's unmounted from DOM.
 - [`Ref`](#Ref) - Get up-to-date reference to a single child element.
 - [`Refs`](#Refs) - Get up-to-date references of the multiple children elements.
+- [`Key`](#Key) - Causes the children to rerender when the `key` changes.
 
 ## Installation
 
@@ -159,6 +160,49 @@ const Refs: <U extends Element>(props: {
   }>;
   children: JSX.Element;
 }) => JSX.Element;
+```
+
+## `Key`
+
+Causes the children to rerender when the `key` changes.
+
+### Import
+
+```ts
+import { Key } from "@solid-primitives/refs";
+```
+
+### How to use it
+
+You have to provide a `key` prop. Changing it, will cause the children to rerender.
+
+```tsx
+const [count, setCount] = createSignal(0);
+
+// will rerender whole <button>, instead of just text
+<Key key={count()}>
+  <button onClick={() => setCount(p => ++p)}>{count()}</button>
+</Key>;
+```
+
+#### Using with Transition
+
+`<Key>` can be used together with [`solid-transition-group`](#https://github.com/solidjs/solid-transition-group) to animate single component's transition, on state change.
+
+```tsx
+<Transition name="your-animation" mode="out-in">
+  <Key key={count()}>
+    <button onClick={() => setCount(p => ++p)}>{count()}</button>
+  </Key>
+</Transition>
+```
+
+### Definition
+
+```ts
+const Key: Component<{
+  key: any;
+}>;
 ```
 
 ## Demo

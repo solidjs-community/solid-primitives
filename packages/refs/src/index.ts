@@ -1,5 +1,14 @@
 import { access, asArray, Directive, Get } from "@solid-primitives/utils";
-import { children, createComputed, JSX, onCleanup, onMount, untrack } from "solid-js";
+import {
+  children,
+  Component,
+  createComputed,
+  createMemo,
+  JSX,
+  onCleanup,
+  onMount,
+  untrack
+} from "solid-js";
 
 declare module "solid-js" {
   namespace JSX {
@@ -14,6 +23,7 @@ export type UnmountHandler<E extends Element = Element> = Get<E>;
 
 /**
  * A directive that calls handler when the element get's unmounted from DOM.
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/refs#unmount
  */
 export const unmount: Directive<UnmountHandler> = (el, handler): void => {
   onCleanup(() => handler()(el));
@@ -25,6 +35,7 @@ export const unmount: Directive<UnmountHandler> = (el, handler): void => {
  * @param added Getter of added elements since the last change
  * @param removed Getter of removed elements since the last change
  * @param onChange handle children changes
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/refs#Refs
  */
 export const Refs = <U extends Element>(props: {
   refs?: Get<U[]>;
@@ -70,6 +81,7 @@ export const Refs = <U extends Element>(props: {
  * @param ref Getter of current element *(or `undefined` if not mounted)*
  * @param onMount handle the child element getting mounted to the dom
  * @param onUnmount handle the child element getting unmounted from the dom
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/refs#Ref
  */
 export const Ref = <U extends Element>(props: {
   ref?: Get<U | undefined>;
@@ -87,10 +99,11 @@ export const Ref = <U extends Element>(props: {
       return el;
     })();
 
-    props.ref?.(el);
-    if (el && prev !== el) onMount(() => props.onMount?.(el));
-    if (prev && prev !== el && props.onUnmount) props.onUnmount(prev);
-
+    untrack(() => {
+      props.ref?.(el);
+      if (el && prev !== el) onMount(() => props.onMount?.(el));
+      if (prev && prev !== el && props.onUnmount) props.onUnmount(prev);
+    });
     prev = el;
   });
 
@@ -102,4 +115,28 @@ export const Ref = <U extends Element>(props: {
   });
 
   return resolved;
+};
+
+/**
+ * Causes the children to rerender when the `key` changes.
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/refs#Key
+ */
+export const Key: Component<{ key: any }> = props => {
+  const key = createMemo(() => props.key);
+  return createMemo(() => {
+    key();
+    return props.children;
+  });
+};
+
+/**
+ * Prevents changing children. Provide `key` to force rerender.
+ */
+export const Freeze: Component<{ key?: any }> = props => {
+  const resolved = children(() => props.children);
+  const key = createMemo(() => props.key);
+  return createMemo(() => {
+    key();
+    return untrack(resolved);
+  });
 };
