@@ -4,6 +4,7 @@ import type { Accessor } from "solid-js";
  * A function
  */
 export type Fn<R = void> = () => R;
+export type Get<T> = (v: T) => void;
 
 /**
  * Can be single or in an array
@@ -14,6 +15,8 @@ export type Keys<O extends Object> = keyof O;
 export type Values<O extends Object> = O[Keys<O>];
 
 export type Noop = (...a: any[]) => void;
+
+export type Directive<P = true> = (el: Element, props: Accessor<P>) => void;
 
 /**
  * Infers the type of the array elements
