@@ -1,4 +1,4 @@
-import { update, concat } from "../src";
+import { update, concat, split } from "../src";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { cloneDeep } from "lodash";
@@ -51,3 +51,23 @@ testConcat("concat()", () => {
 });
 
 testConcat.run();
+
+const testSplit = suite("split");
+
+testSplit("split()", () => {
+  const original = { a: 123, b: "foo", c: { inner: 1 }, d: [1, 2, 3] };
+  const originalCopy = cloneDeep(original);
+
+  const [a, b] = split(original, "a", "c");
+  assert.equal(a, { a: 123, c: { inner: 1 } });
+  assert.equal(b, { b: "foo", d: [1, 2, 3] });
+
+  const [c, d, e] = split(original, ["a"], ["c", "b"]);
+  assert.equal(c, { a: 123 });
+  assert.equal(d, { b: "foo", c: { inner: 1 } });
+  assert.equal(e, { d: [1, 2, 3] });
+
+  assert.equal(original, originalCopy);
+});
+
+testSplit.run();
