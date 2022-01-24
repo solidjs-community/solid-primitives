@@ -29,9 +29,12 @@ export { isServer };
  */
 export const isDefined = <T>(value: T | undefined | null): value is T =>
   typeof value !== "undefined" && value !== null;
-
 export const isFunction = <T>(value: T | Function): value is Function =>
   typeof value === "function";
+export const isBoolean = (val: any): val is boolean => typeof val === "boolean";
+export const isNumber = (val: any): val is number => typeof val === "number";
+export const isString = (val: unknown): val is string => typeof val === "string";
+export const isObject = (val: any): val is object => toString.call(val) === "[object Object]";
 
 /**
  * Accesses the value of a MaybeAccessor
