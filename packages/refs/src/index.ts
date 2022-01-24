@@ -153,7 +153,7 @@ export const Remote = <T extends keyof JSX.IntrinsicElements>(
     isSvg?: boolean;
     children?: JSX.Element;
   }
-) => {
+): JSX.Element => {
   const [p, others] = splitProps(props, ["element", "children", "useShadow", "isSvg"]);
 
   const run = () => {
