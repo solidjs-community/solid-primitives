@@ -1,9 +1,8 @@
-import { createRoot, getOwner, onCleanup, runWithOwner, on, Accessor } from "solid-js";
-import type { EffectFunction, NoInfer, OnOptions, Owner } from "solid-js/types/reactive/signal";
+import { getOwner, onCleanup, on, Accessor } from "solid-js";
+import type { EffectFunction, NoInfer, OnOptions } from "solid-js/types/reactive/signal";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import type {
-  AnyFunction,
   Destore,
   Fn,
   ItemsOf,
@@ -30,9 +29,12 @@ export { isServer };
  */
 export const isDefined = <T>(value: T | undefined | null): value is T =>
   typeof value !== "undefined" && value !== null;
-
 export const isFunction = <T>(value: T | Function): value is Function =>
   typeof value === "function";
+export const isBoolean = (val: any): val is boolean => typeof val === "boolean";
+export const isNumber = (val: any): val is number => typeof val === "number";
+export const isString = (val: unknown): val is string => typeof val === "string";
+export const isObject = (val: any): val is object => toString.call(val) === "[object Object]";
 
 /**
  * Accesses the value of a MaybeAccessor
@@ -61,6 +63,16 @@ export const accessAsArray = <T extends MaybeAccessor<any>, V = MaybeAccessorVal
 
 export const asArray = <T>(value: T): T extends any[] ? T : T[] =>
   Array.isArray(value) ? (value as any) : [value];
+
+/**
+ * Access an array of MaybeAccessors
+ * @example
+ * const list = [1, 2, () => 3)] // T: MaybeAccessor<number>[]
+ * const newList = accessArray(list) // T: number[]
+ */
+export const accessArray = <A extends MaybeAccessor<any>>(
+  list: readonly A[]
+): MaybeAccessorValue<A>[] => list.map(v => access(v));
 
 /**
  * Run the function if the accessed value is not `undefined` nor `null`
