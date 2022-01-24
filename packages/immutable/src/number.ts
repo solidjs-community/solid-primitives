@@ -38,3 +38,6 @@ export const power = (a: number, ...b: number[]): number => {
   }
   return a;
 };
+
+/** clamp a number value between two other values */
+export const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));

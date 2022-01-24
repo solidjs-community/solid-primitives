@@ -80,6 +80,7 @@ setUser(p => update(p, "street", "number", 64));
 - **`multiply`** - `a * b * c * ...`
 - **`divide`** - `a / b / c / ...`
 - **`power`** - `a ** b ** c ** ...`
+- **`clamp`** - clamp a number value between two other values
 
 ## Changelog
 

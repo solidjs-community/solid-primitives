@@ -19,3 +19,9 @@ export const power = (a: MaybeAccessor<number>, ...b: MaybeAccessor<number>[]) =
 export const round = (a: MaybeAccessor<number>) => createMemo(() => Math.round(access(a)));
 export const ceil = (a: MaybeAccessor<number>) => createMemo(() => Math.ceil(access(a)));
 export const floor = (a: MaybeAccessor<number>) => createMemo(() => Math.floor(access(a)));
+
+export const clamp = (
+  value: MaybeAccessor<number>,
+  min: MaybeAccessor<number>,
+  max: MaybeAccessor<number>
+) => createMemo(() => _.clamp(access(value), access(min), access(max)));
