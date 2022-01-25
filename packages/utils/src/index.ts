@@ -6,6 +6,7 @@ import type {
   Destore,
   Fn,
   ItemsOf,
+  Keys,
   MaybeAccessor,
   MaybeAccessorValue,
   Noop,
@@ -120,11 +121,30 @@ export const forEach = <A extends MaybeAccessor<any>, V = MaybeAccessorValue<A>>
 ): void => accessAsArray(array).forEach(iterator as any);
 
 /**
- * Get `Object.entries()` of an MaybeAccessor<Object>
+ * Iterate through object entries.
  */
-export const entries = <A extends MaybeAccessor<Object>, V = MaybeAccessorValue<A>>(
+export const forEachEntry = <A extends MaybeAccessor<object>, O = MaybeAccessorValue<A>>(
+  object: A,
+  iterator: (
+    key: keyof O,
+    item: Values<O>,
+    index: number,
+    pairs: [keyof O, Values<O>][],
+    object: O
+  ) => void
+): void => {
+  const obj = access(object);
+  Object.entries(obj).forEach(([key, item], index, pairs) =>
+    iterator(key as keyof O, item, index, pairs as [keyof O, Values<O>][], obj as O)
+  );
+};
+
+/**
+ * Get `Object.entries()` of an MaybeAccessor<object>
+ */
+export const entries = <A extends MaybeAccessor<object>, O = MaybeAccessorValue<A>>(
   object: A
-): [string, Values<V>][] => Object.entries(access(object));
+): [Keys<O>, Values<O>][] => Object.entries(access(object)) as [Keys<O>, Values<O>][];
 
 /**
  * Creates a promise that resolves *(or rejects)* after given time.
