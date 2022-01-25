@@ -7,10 +7,15 @@ const App: Component = () => {
   const increment = () => setCount(count() + 1);
 
   return (
-    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-12 bg-gray-800 text-white">
-      <button class="btn" onClick={increment}>
-        {count()}
-      </button>
+    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
+      <div class="wrapper-v">
+        <h4>Counter component</h4>
+        <p class="caption">it's very important...</p>
+        <button class="btn" onClick={increment}>
+          {count()}
+          <div></div>
+        </button>
+      </div>
     </div>
   );
 };
