@@ -41,11 +41,10 @@ const clear = createEventListener(
 // to clear all of the event listeners
 clear();
 
-// target element, event name and options can be reactive signals
+// target element and event name can be reactive signals
 const [ref, setRef] = createSignal<HTMLElement>();
 const [name, setName] = createSignal("mousemove");
-const [options, setOptions] = createSignal({ passive: true });
-createEventListener(ref, name, e => {}, options);
+createEventListener(ref, name, e => {}, { passive: true });
 ```
 
 #### Custom events
@@ -119,16 +118,15 @@ const clear = createEventListenerMap(element, {
 // to clear all the event listeners
 clear();
 
-// both target and options args can be reactive:
+// both target can be reactive:
 const [target, setTarget] = createSignal(document.getElementById("abc"));
-const [options, setOptions] = createSignal({ passive: true });
 createEventListenerMap(
   target,
   {
     mousemove: e => {},
     touchstart: e => {}
   },
-  options
+  { passive: true }
 );
 
 // createEventListenerMap can be used to listen to custom events
@@ -181,8 +179,7 @@ clear()
 
 // both target and options args can be reactive:
 const [target, setTarget] = createSignal(document.getElementById("abc"));
-const [options, setOptions] = createSignal({ passive: true });
-const [lastEvents] = createEventStore(target, options, "mousemove", "touchmove");
+const [lastEvents] = createEventStore(target, "mousemove", "touchmove");
 
 // createEventStore can be used to listen to custom events
 // fill both type generics for the best type support
@@ -276,6 +273,6 @@ Minor improvements.
 
 1.4.3
 
-Allow listening to multiple event types with a single `createEventListener` | `createEventSignal`
+Allow listening to multiple event types with a single `createEventListener` | `createEventSignal`. Removed option to pass a reactive signal as options.
 
 </details>

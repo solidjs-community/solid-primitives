@@ -50,7 +50,7 @@ export function createEventListener<
   target: MaybeAccessor<Many<Target>>,
   type: MaybeAccessor<Many<EventType>>,
   handler: (event: EventMap[EventType]) => void,
-  options?: MaybeAccessor<EventListenerOptions>
+  options?: EventListenerOptions
 ): ClearListeners;
 
 // Custom Events
@@ -61,26 +61,25 @@ export function createEventListener<
   target: MaybeAccessor<Many<EventTarget>>,
   type: MaybeAccessor<Many<EventType>>,
   handler: (event: EventMap[EventType]) => void,
-  options?: MaybeAccessor<EventListenerOptions>
+  options?: EventListenerOptions
 ): ClearListeners;
 
 export function createEventListener(
   targets: MaybeAccessor<Many<EventTarget>>,
   type: MaybeAccessor<Many<string>>,
   handler: (event: Event) => void,
-  options?: MaybeAccessor<EventListenerOptions>
+  options?: EventListenerOptions
 ): ClearListeners {
   if (isServer) return noop;
   const cleanup = createCallbackStack();
 
   const attachListeners = () => {
     cleanup.execute();
-    const _options = access(options);
     forEach(type, type => {
       forEach(targets, el => {
         if (!el) return;
-        el.addEventListener(type, handler, _options);
-        cleanup.push(() => el.removeEventListener(type, handler, _options));
+        el.addEventListener(type, handler, options);
+        cleanup.push(() => el.removeEventListener(type, handler, options));
       });
     });
   };
@@ -129,7 +128,7 @@ export function createEventSignal<
 >(
   target: MaybeAccessor<Many<Target>>,
   type: MaybeAccessor<Many<EventType>>,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
+  options?: EventListenerOptions
 ): EventListenerSignalReturns<EventMap[EventType]>;
 
 // Custom Events
@@ -139,13 +138,13 @@ export function createEventSignal<
 >(
   target: MaybeAccessor<Many<EventTarget>>,
   type: MaybeAccessor<Many<EventType>>,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
+  options?: EventListenerOptions
 ): EventListenerSignalReturns<EventMap[EventType]>;
 
 export function createEventSignal(
   target: MaybeAccessor<Many<EventTarget>>,
   type: MaybeAccessor<Many<string>>,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
+  options?: EventListenerOptions
 ): [Accessor<Event | undefined>, Fn] {
   const [lastEvent, setLastEvent] = createSignal<Event>();
   const clear = createEventListener(target, type, setLastEvent, options);

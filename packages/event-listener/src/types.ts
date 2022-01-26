@@ -18,11 +18,11 @@ export type EventMapOf<Target> = Target extends Window
 export type EventListenerDirectiveProps = [
   type: string,
   handler: (e: any) => void,
-  options?: AddEventListenerOptions | boolean
+  options?: EventListenerOptions
 ];
 
 export type EventListenerMapDirectiveProps =
-  | [handlerMap: Record<string, (e: any) => void>, options?: AddEventListenerOptions | boolean]
+  | [handlerMap: Record<string, (e: any) => void>, options?: EventListenerOptions]
   | Record<string, (e: any) => void>;
 
 declare module "solid-js" {

@@ -43,7 +43,7 @@ export function createEventListenerMap<
 >(
   target: MaybeAccessor<Many<EventTarget>>,
   handlersMap: Partial<Pick<EventHandlersMap<EventMap>, UsedEvents>>,
-  options?: MaybeAccessor<EventListenerOptions>
+  options?: EventListenerOptions
 ): ClearListeners;
 
 // DOM Events
@@ -54,13 +54,13 @@ export function createEventListenerMap<
 >(
   target: MaybeAccessor<Many<Target>>,
   handlersMap: HandlersMap,
-  options?: MaybeAccessor<EventListenerOptions>
+  options?: EventListenerOptions
 ): ClearListeners;
 
 export function createEventListenerMap(
   targets: MaybeAccessor<Many<EventTarget>>,
   handlersMap: Record<string, any>,
-  options?: MaybeAccessor<EventListenerOptions>
+  options?: EventListenerOptions
 ): ClearListeners {
   const { push, execute } = createCallbackStack();
   entries(handlersMap).forEach(([eventName, handler]) => {
@@ -106,7 +106,7 @@ export function createEventStore<
   UsedEvents extends keyof EventMap
 >(
   target: MaybeAccessor<Many<Target>>,
-  options: MaybeAccessor<EventListenerOptions>,
+  options: EventListenerOptions,
   ...eventNames: UsedEvents[]
 ): EventListenerStoreReturns<Pick<EventMap, UsedEvents>>;
 
@@ -125,7 +125,7 @@ export function createEventStore<
   UsedEvents extends keyof EventMap = keyof EventMap
 >(
   target: MaybeAccessor<Many<EventTarget>>,
-  options: MaybeAccessor<EventListenerOptions>,
+  options: EventListenerOptions,
   ...eventNames: UsedEvents[]
 ): EventListenerStoreReturns<Pick<EventMap, UsedEvents>>;
 
