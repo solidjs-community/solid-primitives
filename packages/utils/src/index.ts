@@ -40,6 +40,14 @@ export const isArray = (val: any): val is any[] => Array.isArray(val);
 
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
 
+/** `Array.prototype.includes()` without so strict types. Also allows for checking for multiple items */
+export const includes = (arr: any[], ...items: any): boolean => {
+  for (const item of arr) {
+    if (items.includes(item)) return true;
+  }
+  return false;
+};
+
 /**
  * Accesses the value of a MaybeAccessor
  * @example
