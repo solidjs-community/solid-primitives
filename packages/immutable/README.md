@@ -66,13 +66,19 @@ setUser(p => update(p, "street", "number", 64));
 - **`fill`** - non-mutating `Array.prototype.fill()` as a standalone function
 - **`concat`** - Creates a new array concatenating array with any additional arrays and/or values.
 - **`remove`** - Remove item from array
+- **`flatten`** - Flattens a nested array into a one-level array
+- **`sortBy`** - Sort an array by object key, or multiple keys
 
 ### Object
 
 - **`omit`** - Create a new subset object without the provided keys
 - **`pick`** - Create a new subset object with only the provided keys
-- **`update`** - Change single value in an object by key.
 - **`split`** - Split object into multiple subset objects.
+
+### Object/Array
+
+- **`get`** - Get a single property value of an object by specifying a path to it.
+- **`update`** - Change single value in an object by key.
 
 ### Number
 
