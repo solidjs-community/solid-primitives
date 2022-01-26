@@ -16,7 +16,7 @@ export type EventMapOf<Target> = Target extends Window
   : never;
 
 export type EventListenerDirectiveProps = [
-  name: string,
+  type: string,
   handler: (e: any) => void,
   options?: AddEventListenerOptions | boolean
 ];

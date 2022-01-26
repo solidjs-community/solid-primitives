@@ -46,7 +46,11 @@ const [ref, setRef] = createSignal<HTMLElement>();
 const [name, setName] = createSignal("mousemove");
 const [options, setOptions] = createSignal({ passive: true });
 createEventListener(ref, name, e => {}, options);
+```
 
+#### Custom events
+
+```ts
 // you can provide your own event map type as well:
 // fill both type generics for the best type support
 createEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
@@ -55,6 +59,14 @@ createEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
   () => console.log("yup!")
 );
 // just don't use interfaces as EventMaps! (write them using `type` keyword)
+```
+
+#### Listening to multiple events
+
+Now _(`@1.4.3`)_ you can listen to multiple events using a single `createEventListener` primitive.
+
+```ts
+createEventListener(el, ["mousemove", "mouseenter", "mouseleave"], e => {});
 ```
 
 ### Directive Usage
@@ -67,32 +79,6 @@ import { eventListener } from "@solid-primitives/event-listener";
 eventListener;
 
 <button use:eventListener={["click", () => console.log("Click")]}>Click!</button>;
-```
-
-### Types
-
-```ts
-function createEventListener<
-  EventMap extends Record<string, Event>,
-  EventName extends keyof EventMap
->(
-  target: MaybeAccessor<Many<EventTarget>>,
-  eventName: MaybeAccessor<EventName>,
-  handler: (event: EventMap[EventName]) => void,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): ClearListeners;
-
-// Directive
-function eventListener(
-  target: Element,
-  props: Accessor<EventListenerDirectiveProps>
-): EventListenerReturn;
-
-type EventListenerDirectiveProps = [
-  name: string,
-  handler: (e: any) => void,
-  options?: AddEventListenerOptions | boolean
-];
 ```
 
 ## `createEventSignal`
@@ -113,24 +99,6 @@ createEffect(() => {
 
 // to clear all the event listeners
 clear();
-```
-
-### Types
-
-```ts
-function createEventSignal<
-  EventMap extends Record<string, Event>,
-  EventName extends keyof EventMap = keyof EventMap
->(
-  target: MaybeAccessor<Many<EventTarget>>,
-  eventName: MaybeAccessor<EventName>,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): EventListenerSignalReturns<EventMap[EventName]>;
-
-type EventListenerSignalReturns<Event> = [
-  lastEvent: Accessor<Event | undefined>,
-  clear: ClearListeners
-];
 ```
 
 ## `createEventListenerMap`
@@ -195,19 +163,6 @@ eventListenerMap;
 ></div>;
 ```
 
-### Types
-
-```ts
-function createEventListenerMap<
-  EventMap extends Record<string, Event>,
-  UsedEvents extends keyof EventMap = keyof EventMap
->(
-  target: MaybeAccessor<Many<EventTarget>>,
-  handlersMap: EventHandlersMap,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): ClearListeners;
-```
-
 ## `createEventStore`
 
 Similar to [`createEventListenerMap`](#createEventListenerMap), but provides a reactive store with the latest captured events.
@@ -243,30 +198,6 @@ const [lastEvents] = createEventStore<
 // DON'T DO THIS:
 const [{ mousemove }] = createEventStore(target, "mousemove", ...);
 // the store cannot be destructured
-```
-
-### types
-
-```ts
-function createEventStore<
-  EventMap extends Record<string, Event>,
-  UsedEvents extends keyof EventMap = keyof EventMap
->(
-  target: MaybeAccessor<Many<EventTarget>>,
-  ...eventNames: UsedEvents[]
-): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
-
-// with options:
-function createEventStore<
-  EventMap extends Record<string, Event>,
-  UsedEvents extends keyof EventMap = keyof EventMap
->(
-  target: MaybeAccessor<Many<EventTarget>>,
-  options: MaybeAccessor<boolean | AddEventListenerOptions>,
-  ...eventNames: UsedEvents[]
-): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
-
-type EventListnenerStoreReturns<E> = [lastEvents: Store<Partial<E>>, clear: ClearListeners];
 ```
 
 ## `WindowEventListener`
@@ -342,5 +273,9 @@ Updated to Solid 1.3
 1.4.2
 
 Minor improvements.
+
+1.4.3
+
+Allow listening to multiple event types with a single `createEventListener` | `createEventSignal`
 
 </details>

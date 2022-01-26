@@ -59,6 +59,22 @@ test("accessor window target", () => {
   });
 });
 
+test("listening multiple events", () => {
+  createRoot(dispose => {
+    const event1 = new Event("test1");
+    const event2 = new Event("test2");
+    let capturedEvent: Event;
+    createEventListener<{ test1: Event; test2: Event }>(window, ["test1", "test2"], ev => {
+      capturedEvent = ev;
+    });
+    dispatchFakeEvent("test1", event1);
+    assert.is(capturedEvent, event1);
+    dispatchFakeEvent("test1", event2);
+    assert.is(capturedEvent, event2);
+    dispose();
+  });
+});
+
 test("it will only add the event once", () => {
   createRoot(dispose => {
     const testEvent = new Event("test2");

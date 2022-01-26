@@ -1,7 +1,7 @@
 import { Many, MaybeAccessor, entries, createCallbackStack } from "@solid-primitives/utils";
 import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 import { Store } from "solid-js/store";
-import { createEventListener } from './eventListener'
+import { createEventListener } from "./eventListener";
 import {
   ClearListeners,
   EventListenerMapDirectiveProps,
@@ -14,7 +14,7 @@ export type EventHandlersMap<EventMap> = {
   [EventName in keyof EventMap]: (event: EventMap[EventName]) => void;
 };
 
-export type EventListnenerStoreReturns<E> = [lastEvents: Store<Partial<E>>, clear: ClearListeners];
+export type EventListenerStoreReturns<E> = [lastEvents: Store<Partial<E>>, clear: ClearListeners];
 
 /**
  * A helpful primitive that listens to a map of events. Handle them by individual callbacks.
@@ -97,7 +97,7 @@ export function createEventStore<
 >(
   target: MaybeAccessor<Many<Target>>,
   ...eventNames: UsedEvents[]
-): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
+): EventListenerStoreReturns<Pick<EventMap, UsedEvents>>;
 
 // DOM Events - with options
 export function createEventStore<
@@ -108,7 +108,7 @@ export function createEventStore<
   target: MaybeAccessor<Many<Target>>,
   options: MaybeAccessor<EventListenerOptions>,
   ...eventNames: UsedEvents[]
-): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
+): EventListenerStoreReturns<Pick<EventMap, UsedEvents>>;
 
 // Custom Events - without options
 export function createEventStore<
@@ -117,7 +117,7 @@ export function createEventStore<
 >(
   target: MaybeAccessor<Many<EventTarget>>,
   ...eventNames: UsedEvents[]
-): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
+): EventListenerStoreReturns<Pick<EventMap, UsedEvents>>;
 
 // Custom Events - with options
 export function createEventStore<
@@ -127,12 +127,12 @@ export function createEventStore<
   target: MaybeAccessor<Many<EventTarget>>,
   options: MaybeAccessor<EventListenerOptions>,
   ...eventNames: UsedEvents[]
-): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
+): EventListenerStoreReturns<Pick<EventMap, UsedEvents>>;
 
 export function createEventStore(
   targets: MaybeAccessor<Many<EventTarget>>,
   ...rest: any[]
-): EventListnenerStoreReturns<Record<string, Event>> {
+): EventListenerStoreReturns<Record<string, Event>> {
   let options: EventListenerOptions | undefined = undefined;
   let names: string[];
   if (typeof rest[0] === "string") names = rest;
@@ -144,10 +144,10 @@ export function createEventStore(
 
   const store = {};
   const { push, execute } = createCallbackStack();
-  names.forEach(eventName => {
+  names.forEach(type => {
     const [accessor, setter] = createSignal<Event>();
-    Object.defineProperty(store, eventName, { get: accessor, set: setter, enumerable: true });
-    push(createEventListener(targets, eventName, setter, options));
+    Object.defineProperty(store, type, { get: accessor, set: setter, enumerable: true });
+    push(createEventListener(targets, type, setter, options));
   });
   return [store, execute];
 }
@@ -180,9 +180,9 @@ export function eventListenerMap(
       handlersMap = props[0];
       options = props[1];
     } else handlersMap = props;
-    entries(handlersMap).forEach(([eventName, handler]) => {
-      target.addEventListener(eventName, handler, options);
-      toCleanup.push(() => target.removeEventListener(eventName, handler, options));
+    entries(handlersMap).forEach(([type, handler]) => {
+      target.addEventListener(type, handler, options);
+      toCleanup.push(() => target.removeEventListener(type, handler, options));
     });
   });
   onCleanup(toCleanup.execute);
@@ -198,7 +198,7 @@ export function eventListenerMap(
 //   mouseenter: e => {},
 //   touchend: touchHandler
 // });
-// const lastEvents = createEventStore(el, "mousemove", "touchend", "click");
+// const [lastEvents] = createEventStore(el, "mousemove", "touchend");
 // lastEvents.touchend; // TouchEvent | undefined
 // lastEvents.mousemove; // MouseEvent | undefined
 // lastEvents.click; // ERROR
@@ -211,7 +211,7 @@ export function eventListenerMap(
 //   test: eventHandler,
 //   custom: e => {}
 // });
-// const lastEvents2 = createEventStore<{
+// const [lastEvents2] = createEventStore<{
 //   test: Event;
 //   custom: MouseEvent;
 //   unused: Event;
@@ -232,7 +232,7 @@ export function eventListenerMap(
 //   custom: e => {},
 //   unused: e => {} // ERROR
 // });
-// const lastEvents3 = createEventStore<
+// const [lastEvents3] = createEventStore<
 //   {
 //     test: Event;
 //     custom: MouseEvent;
