@@ -1,4 +1,4 @@
-import { update, concat, split } from "../src";
+import { update, concat, split, get, sortBy } from "../src";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { cloneDeep } from "lodash";
@@ -71,3 +71,62 @@ testSplit("split()", () => {
 });
 
 testSplit.run();
+
+const testGet = suite("get");
+
+testGet("get()", () => {
+  const original = {
+    a: 123,
+    b: "foo",
+    c: { inner: { x: "baz" } },
+    d: [1, 2, ["bar"]] as [number, number, string[]]
+  };
+  const originalCopy = cloneDeep(original);
+
+  assert.is(get(original, "a"), 123);
+  assert.is(get(original, "c", "inner", "x"), "baz");
+  assert.is(get(original, "d", 2, 0), "bar");
+  assert.equal(original, originalCopy);
+});
+
+testGet.run();
+
+const testSortBy = suite("sortBy");
+
+testSortBy("sortBy()", () => {
+  const source = [
+    { x: "b", y: 4 },
+    { x: "a", y: 2 },
+    { x: "b", y: 3 },
+    { x: "a", y: 1 }
+  ];
+
+  assert.equal(
+    sortBy(source, ({ x }) => x),
+    [
+      { x: "a", y: 2 },
+      { x: "a", y: 1 },
+      { x: "b", y: 4 },
+      { x: "b", y: 3 }
+    ]
+  );
+
+  assert.equal(sortBy(source, ["x", "y"]), [
+    { x: "a", y: 1 },
+    { x: "a", y: 2 },
+    { x: "b", y: 3 },
+    { x: "b", y: 4 }
+  ]);
+
+  assert.equal(
+    sortBy(source, ({ y }) => y / 10),
+    [
+      { x: "a", y: 1 },
+      { x: "a", y: 2 },
+      { x: "b", y: 3 },
+      { x: "b", y: 4 }
+    ]
+  );
+});
+
+testSortBy.run();
