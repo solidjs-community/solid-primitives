@@ -30,6 +30,20 @@ test("emitting and listening", () =>
     dispose();
   }));
 
+test("initial listeners", () =>
+  createRoot(dispose => {
+    const captured: any[] = [];
+    const [, emit] = createSimpleEmitter<string>([a => captured.push(a)]);
+
+    emit("foo");
+    assert.equal(captured, ["foo"]);
+
+    emit("bar");
+    assert.equal(captured, ["foo", "bar"]);
+
+    dispose();
+  }));
+
 test("clear function", () =>
   createRoot(dispose => {
     const captured: any[] = [];

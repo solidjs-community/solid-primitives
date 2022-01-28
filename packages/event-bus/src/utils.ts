@@ -1,6 +1,12 @@
-import { push } from "@solid-primitives/utils/setter";
+import { push } from "@solid-primitives/immutable";
 import { createEffect, createSignal, getOwner, on, onCleanup } from "solid-js";
-import { GenericEmit, GenericListen, GenericListener, GenericListenProtect, Unsubscribe } from "./types";
+import {
+  GenericEmit,
+  GenericListen,
+  GenericListener,
+  GenericListenProtect,
+  Unsubscribe
+} from "./types";
 
 export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
 
@@ -89,5 +95,5 @@ export function toEffect<T extends any[]>(emit: GenericEmit<T>): GenericEmit<T> 
       setStack([]);
     })
   );
-  return (...payload) => setStack(push(payload));
+  return (...payload) => setStack(p => push(p, payload));
 }

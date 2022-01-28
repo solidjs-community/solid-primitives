@@ -1,5 +1,5 @@
 import { ClearListeners, GenericListener, GenericEmit, GenericListen } from "./types";
-import { onRootCleanup } from './utils';
+import { onRootCleanup } from "./utils";
 
 /**
  * Very minimal interface for emiting and receiving events. Good for parent-child component communication.
@@ -19,12 +19,10 @@ emit("foo", 123, true);
 // clear all listeners
 clear();
  */
-export function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(): [
-  listen: GenericListen<[A0, A1, A2]>,
-  emit: GenericEmit<[A0, A1, A2]>,
-  clear: ClearListeners
-] {
-  const set = new Set<GenericListener<[A0, A1, A2]>>();
+export function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(
+  initial?: GenericListener<[A0, A1, A2]>[]
+): [listen: GenericListen<[A0, A1, A2]>, emit: GenericEmit<[A0, A1, A2]>, clear: ClearListeners] {
+  const set = new Set(initial);
   onRootCleanup(() => set.clear());
 
   return [
