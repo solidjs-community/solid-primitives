@@ -20,21 +20,28 @@ testUpdate("update()", () => {
   });
   assert.is(x.a, "69");
   assert.is(captirePrev, 123);
-  assert.equal(original, originalClone, "0. original shouldn't be modified");
+
   const y = update(original, "b", "inner", "69");
   assert.is(y.b.inner, "69");
-  assert.equal(original, originalClone, "1. original shouldn't be modified");
+
   const z = update(original, "b", "inner", "c", { aha: 123 });
   assert.is(z.b.inner.c.aha, 123);
   assert.equal(z.b.inner.d, [0, 1, 2]);
-  assert.equal(original, originalClone, "2. original shouldn't be modified");
+
   const a = update(original, "arr", 0, "yoo");
   assert.equal(a.arr, ["yoo", 2, 3]);
+
   const fn = update(original, "b", "inner", "fn", () => () => 123);
   assert.is(fn.b.inner.fn(), 123);
-  assert.equal(original, originalClone, "3. original shouldn't be modified");
+
   const theSame = update(original, "b", "inner", "c", "yo");
-  assert.equal(theSame, originalClone);
+  assert.equal(theSame, originalClone, "no changes makes no changes");
+
+  const fnUpdate = update(original, "b", "inner", "d", list => [...list, 3]);
+  assert.equal(fnUpdate.b.inner.d, [0, 1, 2, 3], "item was added to the copy");
+  assert.equal(original.b.inner.d, [0, 1, 2], "item should't be added to the original");
+
+  assert.equal(original, originalClone, "original object should stay the same");
 });
 
 testUpdate.run();

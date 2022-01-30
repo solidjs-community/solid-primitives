@@ -7,7 +7,7 @@ import { FlattenArray, MappingFn, Predicate } from "./types";
  * non-mutating `Array.prototype.push()`
  * @returns changed array copy
  */
-export const push = <T>(list: T[], ...items: T[]): T[] =>
+export const push = <T>(list: readonly T[], ...items: T[]): T[] =>
   withArrayCopy(list, list => list.push(...items));
 
 /**
