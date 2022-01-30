@@ -6,11 +6,9 @@ import {
   Fn,
   isFunction,
   noop,
-  access,
   isServer
 } from "@solid-primitives/utils";
-import { createRenderEffect, createSignal } from "solid-js";
-import { Accessor, createEffect, onCleanup } from "solid-js";
+import { Accessor, createEffect, onCleanup, createRenderEffect, createSignal } from "solid-js";
 import {
   ClearListeners,
   EventListenerDirectiveProps,

@@ -68,17 +68,13 @@ test("stops listeneing after disposing of root", () =>
     });
   }));
 
-test("target and options can be signals", () =>
+test("target can be a signal", () =>
   createRoot(dispose => {
     const testEvent = new Event("map_0");
     let captured: any;
-    createEventListenerMap<{ map_0: Event }>(
-      () => window,
-      {
-        map_0: e => (captured = e)
-      },
-      () => ({ passive: true })
-    );
+    createEventListenerMap<{ map_0: Event }>(() => window, {
+      map_0: e => (captured = e)
+    });
 
     onMount(() => {
       dispatchFakeEvent("map_0", testEvent);

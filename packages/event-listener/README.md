@@ -11,6 +11,7 @@ A set of primitives that help with listening to DOM and Custom Events.
 - [`createEventSignal`](#createEventListener) - Like `createEventListener`, but events are handled with the returned signal, instead of with a callback.
 - [`createEventListenerMap`](#createEventListenerMap) - A helpful primitive that listens to a map of events. Handle them by individual callbacks.
 - [`createEventStore`](#createEventStore) - Similar to `createEventListenerMap`, but provides a reactive store with the latest captured events.
+- [`createEventListenerBus`](#createEventListenerBus) - Dynamically add and remove event listeners to an event target by calling appropriate property.
 - [`WindowEventListener`](#WindowEventListener) - Listen to the `window` DOM Events, using a component.
 - [`DocumentEventListener`](#DocumentEventListener) - The same as [`WindowEventListener`](#WindowEventListener), but listens to `document` events.
 
@@ -197,6 +198,60 @@ const [{ mousemove }] = createEventStore(target, "mousemove", ...);
 // the store cannot be destructured
 ```
 
+## `createEventListenerBus`
+
+Dynamically add and remove event listeners to an event target by calling appropriate property. The listeners will be automatically removed on cleanup.
+
+### How to use it
+
+#### Import
+
+```ts
+import { createEventListenerBus } from "@solid-primitives/event-listener";
+```
+
+#### Basic usage
+
+`createEventListenerBus` takes two arguments:
+
+- `target` - the event target, could be a `window`, `document`, `HTMLElement` or `MediaQueryList`. _Defaults to `window`_
+- `options` - event listener options, such as `passive` or `capture`
+
+```ts
+const bus = createEventListenerBus(document.body);
+bus.onpointerenter(e => {...});
+// listeners return a function that removes them
+const clear = bus.onpointermove(e => {...});
+clear();
+```
+
+#### Reactive target
+
+Target argument could be an **array**, and a **reactive signal**.
+
+```ts
+const [target, setTarget] = createSignal([document.body]);
+const bus = createEventListenerBus(target);
+setTarget(p => [...p, window]); // will change the targets of all active listeners.
+```
+
+#### Custom Events
+
+The `createEventListenerBus` can be used to listen to Custom Events.
+
+```ts
+const bus = createEventListenerBus<{
+  foo: SomeEvent;
+  bar: MyEvent;
+}>();
+bus.onfoo(e => {});
+bus.onbar(e => {});
+```
+
+#### Reactive Roots
+
+Calling `bus.on__()` creates a reactive computation, so disposing of a root – in which event listener was created OR in which the primitive was initially used – will remove applying event listeners.
+
 ## `WindowEventListener`
 
 Listen to the `window` DOM Events, using a component.
@@ -274,5 +329,9 @@ Minor improvements.
 1.4.3
 
 Allow listening to multiple event types with a single `createEventListener` | `createEventSignal`. Removed option to pass a reactive signal as options.
+
+1.5.0
+
+Add `createEventListenerBus`.
 
 </details>
