@@ -1,11 +1,18 @@
-import { ClearListeners, createEventListener } from "@solid-primitives/event-listener";
+import {
+  ClearListeners,
+  createEventListener,
+  createEventListenerBus
+} from "@solid-primitives/event-listener";
 import {
   Get,
   MaybeAccessor,
   forEachEntry,
   includes,
   createCallbackStack,
-  Directive
+  Directive,
+  Many,
+  noop,
+  isString
 } from "@solid-primitives/utils";
 import { pick, split } from "@solid-primitives/immutable";
 import { Accessor, createSignal, JSX } from "solid-js";
@@ -31,12 +38,9 @@ type PointerEventNames =
 
 type OnEventName<T extends string> = `on${Lowercase<T>}` | `on${Capitalize<T>}`;
 
-type OnPointerEventNames = OnEventName<PointerEventNames>;
-
-type Handlers = Partial<
-  Record<OnPointerEventNames, Get<PointerEvent>> &
-    Record<OnEventName<"end" | "start">, Get<PointerEvent>>
->;
+type PointerHandlers = Partial<OnEventRecord<PointerEventNames, Handler>>;
+type OnEventRecord<T extends string, V> = Record<OnEventName<T>, V>;
+type Handler = Get<PointerEvent>;
 
 type AnyOnEventName = `on${string}`;
 type ReverseOnEventName<T> = T extends string
@@ -81,7 +85,7 @@ type PointerHoverDirectiveProps =
 
 const parseOnEventName = <T extends string>(name: T) =>
   name.substring(2).toLowerCase() as ReverseOnEventName<T>;
-const parseEventHandlers = <H extends Record<AnyOnEventName, Get<any>>>(
+const parseEventHandlers = <H extends Record<AnyOnEventName, any>>(
   handlers: H
 ): ParsedEventHandlers<H> => {
   const result = {} as any;
@@ -100,7 +104,7 @@ const parseEventHandlers = <H extends Record<AnyOnEventName, Get<any>>>(
  * @returns function stopping currently attached listener
  *
  * @example
- * createPointerListener({
+ * createPointerListeners({
  *    // pass a function if the element has to mount
  *    target: () => el,
  *    pointerTypes: ["touch"],
@@ -110,66 +114,104 @@ const parseEventHandlers = <H extends Record<AnyOnEventName, Get<any>>>(
  *    onLostCapture: e => console.log("lost")
  * });
  */
-export function createPointerListener(
-  config: Handlers & {
+export function createPointerListeners(
+  config: PointerHandlers & {
     target?: MaybeAccessor<Window | Document | HTMLElement>;
     pointerTypes?: PointerType[];
+    passive?: boolean;
   }
 ): ClearListeners {
-  const [{ target = document.body, pointerTypes }, handlers] = split(
+  const [{ target = document.body, pointerTypes, passive = true }, handlers] = split(
     config,
     "target",
-    "pointerTypes"
+    "pointerTypes",
+    "passive"
   );
-  const [
-    { start: onStart, end: onEnd, gotcapture: onGotCapture, lostcapture: onLostCapture },
-    nativeHandlers
-  ] = split(parseEventHandlers(handlers), "start", "end", "gotcapture", "lostcapture");
+  const [{ gotcapture: onGotCapture, lostcapture: onLostCapture }, nativeHandlers] = split(
+    parseEventHandlers(handlers),
+    "gotcapture",
+    "lostcapture"
+  );
 
-  const runHandler = (handler: Get<PointerEvent>) => (event: PointerEvent) =>
+  const guardCB = (handler: Handler) => (event: PointerEvent) =>
     (!pointerTypes || includes(pointerTypes, event.pointerType)) && handler(event);
-
   const cleanup = createCallbackStack();
+  const addEventListener = (type: Many<keyof HTMLElementEventMap>, fn: Handler) =>
+    cleanup.push(createEventListener(target, type, guardCB(fn) as any, { passive }));
 
-  forEachEntry(nativeHandlers, (name, fn) => {
-    if (!fn) return;
-    cleanup.push(createEventListener(target, `pointer${name}`, runHandler(fn), { passive: true }));
-  });
-
-  // prettier-ignore
-  if (onStart) cleanup.push(createEventListener(
-    target,
-    ["pointerenter", "pointerdown"],
-    runHandler(e => {
-      if (e.type === "pointerdown" && e.pointerType === "touch") onStart(e);
-      else if (e.type === "pointerenter" && e.pointerType === "mouse") onStart(e);
-    }),
-    { passive: true }
-  ));
-
-  // prettier-ignore
-  if (onEnd) cleanup.push(createEventListener(
-    target,
-    ["pointerleave", "pointerup"],
-    runHandler(e => {
-      if (e.type === "pointerup" && e.pointerType === "touch") onEnd(e);
-      else if (e.type === "pointerleave" && e.pointerType === "mouse") onEnd(e);
-    }),
-    { passive: true }
-  ));
-
-  if (onGotCapture)
-    cleanup.push(
-      createEventListener(target, "gotpointercapture", runHandler(onGotCapture), { passive: true })
-    );
-  if (onLostCapture)
-    cleanup.push(
-      createEventListener(target, "lostpointercapture", runHandler(onLostCapture), {
-        passive: true
-      })
-    );
+  forEachEntry(nativeHandlers, (name, fn) => fn && addEventListener(`pointer${name}`, fn));
+  if (onGotCapture) addEventListener("gotpointercapture", onGotCapture);
+  if (onLostCapture) addEventListener("lostpointercapture", onLostCapture);
 
   return cleanup.execute;
+}
+
+export function createPerPointerListeners(
+  config: {
+    target?: MaybeAccessor<HTMLElement>;
+    pointerTypes?: PointerType[];
+    passive?: boolean;
+  } & Partial<
+    OnEventRecord<
+      "enter",
+      (
+        event: PointerEvent,
+        handlers: OnEventRecord<"down" | "move" | "up" | "leave" | "cancel", Get<Handler>>
+      ) => void
+    > &
+      OnEventRecord<"down", (event: PointerEvent, onMove: Get<Handler>, onUp: Get<Handler>) => void>
+  >
+) {
+  const [{ target = document.body, pointerTypes, passive = true }, handlers] = split(
+    config,
+    "pointerTypes",
+    "target",
+    "passive"
+  );
+  const { down: onDown, enter: onEnter } = parseEventHandlers(handlers);
+  const guardCB = (handler: Handler, pointerId?: number) => (e: PointerEvent) =>
+    (!pointerTypes || includes(pointerTypes, e.pointerType)) &&
+    (!pointerId || e.pointerId === pointerId) &&
+    handler(e);
+
+  const bus = createEventListenerBus<Record<string, PointerEvent>>(target, { passive });
+
+  if (onEnter) {
+    const handleEnter = (e: PointerEvent) => {
+      const { pointerId } = e;
+      const cleanup = createCallbackStack<PointerEvent>();
+      cleanup.push(bus.onpointerleave(guardCB(cleanup.execute, pointerId)));
+      const proxy = new Proxy(
+        {},
+        {
+          get(_, p): Get<Handler> {
+            if (!isString(p)) return noop;
+            const type = ("onpointer" + p.substring(2).toLowerCase()) as `on${string}`;
+            if (type === "onpointerleave") return fn => cleanup.push(fn);
+            return fn => cleanup.push(bus[type](guardCB(fn, pointerId)));
+          }
+        }
+      );
+      onEnter(e, proxy as any);
+    };
+    createEventListener(target, "pointerenter", guardCB(handleEnter), { passive });
+  }
+  if (onDown) {
+    const handleDown = (e: PointerEvent) => {
+      const { pointerId } = e;
+      const cleanup = createCallbackStack<PointerEvent>();
+      cleanup.push(bus.onpointerup(guardCB(cleanup.execute, pointerId)));
+      cleanup.push(bus.onpointercancel(guardCB(cleanup.execute, pointerId)));
+      onDown(
+        e,
+        // onMove()
+        fn => cleanup.push(bus.onpointermove(guardCB(fn, pointerId))),
+        // onEnd()
+        fn => cleanup.push(fn)
+      );
+    };
+    createEventListener(target, "pointerdown", guardCB(handleDown), { passive });
+  }
 }
 
 const defaultState: PointerState = {
@@ -223,15 +265,19 @@ export function createPointerPosition(
 ): Accessor<PointerState> {
   const [state, setState] = createSignal<any>(config.value ?? defaultState);
   const handler = (e: PointerEvent, active = true) => setState(getPointerState(e, active));
-  createPointerListener({
+  createPointerListeners({
     target: config.target,
     pointerTypes: config.pointerTypes,
-    onstart: handler,
-    onMove: handler,
-    onend: e => handler(e, false)
+    onEnter: e => handler(e),
+    onMove: e => handler(e),
+    onLeave: e => handler(e, false)
   });
   return state;
 }
+
+// TODO: pointer list primitive returning a dynamic array of active touch points
+
+export function createPointerList() {}
 
 /**
  * A non-reactive helper function. It turns a position relative to the screen/window, to be relative to an element.
@@ -263,16 +309,14 @@ export const pointerPosition: Directive<PointerPositionDirectiveProps> = (el, pr
     return typeof v === "function" ? { handler: v, pointerTypes: undefined } : v;
   })();
   const runHandler = (e: PointerEvent, active = true) => handler(getPointerState(e, active), el);
-  createPointerListener({
+  createPointerListeners({
     target: el as HTMLElement,
     pointerTypes: pointerTypes,
-    onstart: runHandler,
+    onEnter: e => runHandler(e),
     onMove: runHandler,
-    onend: e => runHandler(e, false)
+    onLeave: e => runHandler(e, false)
   });
 };
-
-// TODO: track pointer id's of start & end events, to not disable the hovering state when at least one pointer is still hovering
 
 /**
  * A directive for checking if the element is being hovered by a pointer.
@@ -282,10 +326,17 @@ export const pointerHover: Directive<PointerHoverDirectiveProps> = (el, props) =
     const v = props();
     return typeof v === "function" ? { handler: v, pointerTypes: undefined } : v;
   })();
-  createPointerListener({
+  const pointers = new Set<number>();
+  createPointerListeners({
     target: el as HTMLElement,
     pointerTypes: pointerTypes,
-    onstart: () => handler(true, el),
-    onend: () => handler(false, el)
+    onEnter: e => {
+      pointers.add(e.pointerId);
+      handler(true, el);
+    },
+    onLeave: e => {
+      pointers.delete(e.pointerId);
+      if (pointers.size === 0) handler(false, el);
+    }
   });
 };
