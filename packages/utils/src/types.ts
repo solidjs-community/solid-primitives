@@ -5,6 +5,7 @@ import type { Accessor } from "solid-js";
  */
 export type Fn<R = void> = () => R;
 export type Get<T> = (v: T) => void;
+export type Clear = () => void;
 
 /**
  * Can be single or in an array

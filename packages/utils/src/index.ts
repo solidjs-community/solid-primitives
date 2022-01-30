@@ -261,7 +261,7 @@ export function destore<T extends Object>(store: Store<T>): Destore<T> {
 }
 
 export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {
-  push: (...callbacks: Fn[]) => void;
+  push: (...callbacks: ((arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void)[]) => void;
   execute: (arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void;
   clear: Fn;
 } => {
@@ -269,7 +269,7 @@ export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(
   const clear: Fn = () => (stack = []);
   return {
     push: (...callbacks) => stack.push(...callbacks),
-    execute: (arg0, arg1, arg2, arg3) => {
+    execute(arg0, arg1, arg2, arg3) {
       stack.forEach(cb => cb(arg0, arg1, arg2, arg3));
       clear();
     },
