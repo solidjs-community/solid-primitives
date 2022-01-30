@@ -1,9 +1,9 @@
-import { AnyFunction, Fn, isDefined } from "@solid-primitives/utils";
+import { AnyFunction, Fn, forEach, isDefined } from "@solid-primitives/utils";
 import { createRoot, getOwner, onCleanup, runWithOwner as _runWithOwner } from "solid-js";
 import type { Owner } from "solid-js/types/reactive/signal";
 
 export type Dispose = Fn;
-export type runWithRootReturn<T> = T extends void | undefined | null
+export type RunWithRootReturn<T> = T extends void | undefined | null
   ? Dispose
   : [returns: T, dispose: Dispose];
 
@@ -21,15 +21,19 @@ export const runWithOwner = _runWithOwner as <T>(o: Owner | null, fn: () => T) =
  *
  * @example
  * const owner = getOwner()
- * const handleClick = () => createSubRoot(owner, () => {
+ * const handleClick = () => createSubRoot(() => {
  *    createEffect(() => {})
- * });
+ * }, owner);
  */
-export function createSubRoot<T>(fn: (dispose: Dispose) => T, owner = getOwner()): T {
+export function createSubRoot<T>(
+  fn: (dispose: Dispose) => T,
+  ...owners: (Owner | null | undefined)[]
+): T {
+  if (owners.length === 0) owners = [getOwner()];
   return createRoot(dispose => {
-    owner && runWithOwner(owner, () => onCleanup(dispose));
+    forEach(owners, owner => owner && runWithOwner(owner, () => onCleanup(dispose)));
     return fn(dispose);
-  }, owner ?? undefined);
+  }, owners[0] || undefined);
 }
 
 /**
@@ -68,11 +72,11 @@ export const createCallback = <T extends AnyFunction>(
  * );
  * ```
  */
-export const runWithRoot = <T>(fn: () => T, detachedOwner?: Owner): runWithRootReturn<T> =>
+export const runWithRoot = <T>(fn: () => T, detachedOwner?: Owner): RunWithRootReturn<T> =>
   createRoot(dispose => {
     const returns = fn();
     return isDefined(returns) ? [returns, dispose] : dispose;
-  }, detachedOwner) as runWithRootReturn<T>;
+  }, detachedOwner) as RunWithRootReturn<T>;
 
 /**
  * Helper for simplifying usage of Solid's reactive primitives outside of components (reactive roots). A **sub root** will be automatically disposed when it's owner does.
@@ -92,11 +96,14 @@ export const runWithRoot = <T>(fn: () => T, detachedOwner?: Owner): runWithRootR
  * );
  * ```
  */
-export const runWithSubRoot = <T>(fn: () => T, owner?: Owner | null): runWithRootReturn<T> =>
+export const runWithSubRoot = <T>(
+  fn: () => T,
+  ...owners: (Owner | null | undefined)[]
+): RunWithRootReturn<T> =>
   createSubRoot(dispose => {
     const returns = fn();
     return isDefined(returns) ? [returns, dispose] : dispose;
-  }, owner) as runWithRootReturn<T>;
+  }, ...owners) as RunWithRootReturn<T>;
 
 // import { createEffect, createMemo, createResource } from "solid-js";
 // const [memo, del] = runWithRoot(() => createMemo(() => 123));
