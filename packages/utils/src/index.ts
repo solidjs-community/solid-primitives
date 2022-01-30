@@ -276,3 +276,28 @@ export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(
     clear
   };
 };
+
+/** WIP: an easier to setup and type Proxy */
+export function createProxy<T extends Record<string | symbol, any>>(traps: {
+  get: <K extends keyof T>(key: K) => T[K];
+  set: <K extends keyof T>(key: K, value: T[K]) => void;
+}): T;
+export function createProxy<T extends Record<string | symbol, any>>(traps: {
+  get: <K extends keyof T>(key: K) => T[K];
+  set?: undefined;
+}): Readonly<T>;
+export function createProxy(traps: {
+  get: (key: string | symbol) => any;
+  set?: (key: string | symbol, value: any) => void;
+}): any {
+  return new Proxy(
+    {},
+    {
+      get: (_, k) => traps.get(k),
+      set: (_, k, v) => {
+        traps.set?.(k, v);
+        return false;
+      }
+    }
+  );
+}
