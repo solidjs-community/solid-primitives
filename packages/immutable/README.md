@@ -78,7 +78,7 @@ setUser(p => update(p, "street", "number", 64));
 ### Object/Array
 
 - **`get`** - Get a single property value of an object by specifying a path to it.
-- **`update`** - Change single value in an object by key.
+- **`update`** - Change single value in an object by key, or series of recursing keys.
 
 ### Number
 
