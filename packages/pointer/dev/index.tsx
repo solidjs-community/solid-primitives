@@ -35,26 +35,29 @@ const App: Component = () => {
   });
 
   createPerPointerListeners({
-    // onEnter({ x, y, pointerId }, { onMove, onLeave }) {
-    //   console.log("New pointer:", pointerId);
-    //   const [point, setPoint] = createSignal({ x, y });
-    //   setPoints(p => push(p, point));
-    //   onMove(e => setPoint({ x: e.x, y: e.y }));
-    //   onLeave(e => {
-    //     setPoint({ x: e.x, y: e.y });
-    //     setPoints(p => remove(p, point));
-    //   });
-    // },
-    onDown({ x, y, pointerId }, onMove, onUp) {
+    onEnter({ x, y, pointerId }, { onMove, onLeave, onDown }) {
       console.log("New pointer:", pointerId);
+      onDown(e => {
+        onLeave(e => {});
+      });
       const [point, setPoint] = createSignal({ x, y });
       setPoints(p => push(p, point));
       onMove(e => setPoint({ x: e.x, y: e.y }));
-      onUp(e => {
+      onLeave(e => {
         setPoint({ x: e.x, y: e.y });
         setPoints(p => remove(p, point));
       });
     }
+    // onDown({ x, y, pointerId }, onMove, onUp) {
+    //   console.log("New pointer:", pointerId);
+    //   const [point, setPoint] = createSignal({ x, y });
+    //   setPoints(p => push(p, point));
+    //   onMove(e => setPoint({ x: e.x, y: e.y }));
+    //   onUp(e => {
+    //     setPoint({ x: e.x, y: e.y });
+    //     setPoints(p => remove(p, point));
+    //   });
+    // }
   });
 
   // const state = createPointerPosition();

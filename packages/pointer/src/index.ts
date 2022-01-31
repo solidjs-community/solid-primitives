@@ -1,8 +1,4 @@
-import {
-  ClearListeners,
-  createEventListener,
-  createEventListenerBus
-} from "@solid-primitives/event-listener";
+import { ClearListeners, createEventListener } from "@solid-primitives/event-listener";
 import {
   Get,
   MaybeAccessor,
@@ -11,11 +7,13 @@ import {
   createCallbackStack,
   Directive,
   Many,
-  noop,
-  isString
+  Clear,
+  createProxy,
+  warn
 } from "@solid-primitives/utils";
 import { pick, split } from "@solid-primitives/immutable";
-import { Accessor, createSignal, JSX } from "solid-js";
+import { Accessor, createSignal, getOwner, JSX } from "solid-js";
+import { createSubRoot } from "@solid-primitives/rootless";
 
 export type PointerType = "mouse" | "touch" | "pen";
 
@@ -156,7 +154,7 @@ export function createPerPointerListeners(
       "enter",
       (
         event: PointerEvent,
-        handlers: OnEventRecord<"down" | "move" | "up" | "leave" | "cancel", Get<Handler>>
+        handlers: Readonly<OnEventRecord<"down" | "move" | "up" | "leave" | "cancel", Get<Handler>>>
       ) => void
     > &
       OnEventRecord<"down", (event: PointerEvent, onMove: Get<Handler>, onUp: Get<Handler>) => void>
@@ -169,48 +167,87 @@ export function createPerPointerListeners(
     "passive"
   );
   const { down: onDown, enter: onEnter } = parseEventHandlers(handlers);
-  const guardCB = (handler: Handler, pointerId?: number) => (e: PointerEvent) =>
-    (!pointerTypes || includes(pointerTypes, e.pointerType)) &&
-    (!pointerId || e.pointerId === pointerId) &&
-    handler(e);
-
-  const bus = createEventListenerBus<Record<string, PointerEvent>>(target, { passive });
+  const owner = getOwner();
+  const onlyInitMessage = "All listeners need to be added synchronously in the initial event.";
+  const addListener = (type: Many<string>, fn: Handler, pointerId?: number): Clear =>
+    createEventListener(
+      target,
+      type,
+      ((e: PointerEvent) =>
+        (!pointerTypes || includes(pointerTypes, e.pointerType)) &&
+        (!pointerId || e.pointerId === pointerId) &&
+        fn(e)) as any,
+      { passive }
+    );
 
   if (onEnter) {
     const handleEnter = (e: PointerEvent) => {
-      const { pointerId } = e;
-      const cleanup = createCallbackStack<PointerEvent>();
-      cleanup.push(bus.onpointerleave(guardCB(cleanup.execute, pointerId)));
-      const proxy = new Proxy(
-        {},
-        {
-          get(_, p): Get<Handler> {
-            if (!isString(p)) return noop;
-            const type = ("onpointer" + p.substring(2).toLowerCase()) as `on${string}`;
-            if (type === "onpointerleave") return fn => cleanup.push(fn);
-            return fn => cleanup.push(bus[type](guardCB(fn, pointerId)));
-          }
-        }
-      );
-      onEnter(e, proxy as any);
+      createSubRoot(dispose => {
+        const { pointerId } = e;
+        let init = true;
+        let onLeave: Handler | undefined;
+
+        addListener(
+          "pointerleave",
+          e => {
+            onLeave?.(e);
+            dispose();
+          },
+          pointerId
+        );
+
+        onEnter(
+          e,
+          createProxy({
+            get(key) {
+              const type = "pointer" + key.substring(2).toLowerCase();
+              return fn => {
+                if (!init) return warn(onlyInitMessage);
+                if (type === "pointerleave") onLeave = fn;
+                else addListener(type, fn, pointerId);
+              };
+            }
+          })
+        );
+        init = false;
+      }, owner);
     };
-    createEventListener(target, "pointerenter", guardCB(handleEnter), { passive });
+    addListener("pointerenter", handleEnter);
   }
+
   if (onDown) {
     const handleDown = (e: PointerEvent) => {
-      const { pointerId } = e;
-      const cleanup = createCallbackStack<PointerEvent>();
-      cleanup.push(bus.onpointerup(guardCB(cleanup.execute, pointerId)));
-      cleanup.push(bus.onpointercancel(guardCB(cleanup.execute, pointerId)));
-      onDown(
-        e,
-        // onMove()
-        fn => cleanup.push(bus.onpointermove(guardCB(fn, pointerId))),
-        // onEnd()
-        fn => cleanup.push(fn)
-      );
+      createSubRoot(dispose => {
+        const { pointerId } = e;
+        let init = true;
+        let onUp: Handler | undefined;
+
+        addListener(
+          ["pointerup", "pointercancel"],
+          e => {
+            onUp?.(e);
+            dispose();
+          },
+          pointerId
+        );
+
+        onDown(
+          e,
+          // onMove()
+          fn => {
+            if (init) addListener("pointermove", fn, pointerId);
+            else warn(onlyInitMessage);
+          },
+          // onUp()
+          fn => {
+            if (init) onUp = fn;
+            else warn(onlyInitMessage);
+          }
+        );
+        init = false;
+      }, owner);
     };
-    createEventListener(target, "pointerdown", guardCB(handleDown), { passive });
+    addListener("pointerdown", handleDown);
   }
 }
 
