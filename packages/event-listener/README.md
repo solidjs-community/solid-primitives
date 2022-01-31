@@ -63,7 +63,9 @@ createEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
 
 #### Listening to multiple events
 
-Now _(`@1.4.3`)_ you can listen to multiple events using a single `createEventListener` primitive.
+###### Added in `@1.4.3`
+
+You can listen to multiple events with single `createEventListener` primitive.
 
 ```ts
 createEventListener(el, ["mousemove", "mouseenter", "mouseleave"], e => {});
@@ -200,6 +202,8 @@ const [{ mousemove }] = createEventStore(target, "mousemove", ...);
 
 ## `createEventListenerBus`
 
+###### Added in `@1.5.0`
+
 Dynamically add and remove event listeners to an event target by calling appropriate property. The listeners will be automatically removed on cleanup.
 
 ### How to use it
@@ -235,6 +239,17 @@ const bus = createEventListenerBus(target);
 setTarget(p => [...p, window]); // will change the targets of all active listeners.
 ```
 
+#### generic on()
+
+Using `bus.on(type, handler)` gives you more options in passing event type.
+
+```ts
+bus.on("click", e => {});
+bus.on(["mousemove", "mousedown"], e => {});
+const [types, setTypes] = createsignal(["focus", "blur"]);
+bus.on(types, e => {});
+```
+
 #### Custom Events
 
 The `createEventListenerBus` can be used to listen to Custom Events.
@@ -247,10 +262,6 @@ const bus = createEventListenerBus<{
 bus.onfoo(e => {});
 bus.onbar(e => {});
 ```
-
-#### Reactive Roots
-
-Calling `bus.on__()` creates a reactive computation, so disposing of a root – in which event listener was created OR in which the primitive was initially used – will remove applying event listeners.
 
 ## `WindowEventListener`
 

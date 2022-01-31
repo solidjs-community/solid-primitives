@@ -4,11 +4,18 @@ import { runWithSubRoot } from "@solid-primitives/rootless";
 import { EventMapOf, TargetWithEventMap, EventListenerOptions } from "./types";
 import { getOwner } from "solid-js";
 
-export type EventListenerBus<EventMap extends Record<string, any>> = Readonly<{
-  [K in `on${keyof EventMap extends string ? keyof EventMap : never}`]: (
-    handler: Get<EventMap[K extends `on${infer T}` ? T : never]>
-  ) => Clear;
-}>;
+export type EventListenerBus<EventMap extends Record<string, any>> = Readonly<
+  {
+    [K in `on${keyof EventMap extends string ? keyof EventMap : never}`]: (
+      handler: Get<EventMap[K extends `on${infer T}` ? T : never]>
+    ) => Clear;
+  } & {
+    on: <T extends keyof EventMap>(
+      type: MaybeAccessor<Many<T>>,
+      handler: Get<EventMap[T]>
+    ) => Clear;
+  }
+>;
 
 // owner option:
 // use initial = true
@@ -27,6 +34,8 @@ export type EventListenerBus<EventMap extends Record<string, any>> = Readonly<{
  * // listeners return a function that removes them
  * const clear = bus.onpointermove(e => {...});
  * clear();
+ * // or pass event type as an argument
+ * const unsub = bus.on('click', e => {...})
  */
 
 // Target not specified
@@ -49,7 +58,7 @@ export function createEventListenerBus(
   options: EventListenerOptions = {}
 ) {
   const owner = getOwner();
-  const addListener = (type: string, handler: Get<any>) =>
+  const addListener = (type: MaybeAccessor<Many<string>>, handler: Get<any>) =>
     runWithSubRoot(
       () => {
         createEventListener(target, type, handler, options);
@@ -57,8 +66,11 @@ export function createEventListenerBus(
       owner,
       getOwner()
     );
-  return createProxy<Record<string, (fn: Get<any>) => Clear>>({
-    get: key => fn => addListener(key.substring(2), fn)
+  return createProxy<Record<string, (a: any, b: any) => Clear>>({
+    get:
+      key =>
+      (...args) =>
+        args.length === 2 ? addListener(...args) : addListener(key.substring(2), args[0])
   });
 }
 
@@ -66,6 +78,10 @@ export function createEventListenerBus(
 // bus.onpointerenter(e => {});
 // const unsub = bus.onpointermove(e => {});
 // unsub();
+// const clear = bus.on(
+//   () => ["mousemove", "mousedown"],
+//   e => {}
+// );
 
 // type SomeEvent = Event & { _: "" };
 // type MyEvent = Event & { _: "" };
