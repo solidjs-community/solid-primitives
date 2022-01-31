@@ -1,4 +1,4 @@
-import { getOwner, onCleanup, on, Accessor } from "solid-js";
+import { getOwner, onCleanup, on, Accessor, DEV } from "solid-js";
 import type { EffectFunction, NoInfer, OnOptions } from "solid-js/types/reactive/signal";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
@@ -22,8 +22,16 @@ export * from "./types";
 
 /** no operation */
 export const noop = (() => undefined) as Noop;
+
 export const isClient = !isServer;
 export { isServer };
+
+/** development environment */
+export const isDev = DEV && DEV.hasOwnProperty("writeSignal");
+/** production environment */
+export const isProd = !isDev;
+/** `console.warn` only during development */
+export const warn: typeof console.warn = (...a) => isDev && console.warn(...a);
 
 /**
  * `if (typeof value !== "undefined" && value !== null)`
