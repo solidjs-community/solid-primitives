@@ -11,11 +11,12 @@ import {
   createProxy,
   warn
 } from "@solid-primitives/utils";
-import { pick, split } from "@solid-primitives/immutable";
+import { pick, remove, split } from "@solid-primitives/immutable";
 import { Accessor, createSignal, getOwner, JSX } from "solid-js";
 import { createSubRoot } from "@solid-primitives/rootless";
 
 export type PointerType = "mouse" | "touch" | "pen";
+type EventTarget = Window | Document | HTMLElement;
 
 export type Position = {
   x: number;
@@ -49,7 +50,6 @@ type ParsedEventHandlers<H extends Record<AnyOnEventName, Get<any>>> = {
 };
 
 export type PointerState = {
-  active: boolean;
   pressure: number;
   pointerId: number;
   tiltX: number;
@@ -98,6 +98,7 @@ const parseEventHandlers = <H extends Record<AnyOnEventName, any>>(
  * @param config event handlers, target, and chosen pointer types
  * - `target` - specify the target to attach the listeners to. Will default to `document.body`
  * - `pointerTypes` - specify array of pointer types you want to listen to. By default listens to `["mouse", "touch", "pen"]`
+ * - `passive` - Add passive option to event listeners. Defaults to `true`.
  * - your event handlers: e.g. `onstart`, `onend`, `onMove`, ...
  * @returns function stopping currently attached listener
  *
@@ -106,15 +107,15 @@ const parseEventHandlers = <H extends Record<AnyOnEventName, any>>(
  *    // pass a function if the element has to mount
  *    target: () => el,
  *    pointerTypes: ["touch"],
- *    onStart: e => console.log("start", e.x, e.y),
- *    onMove: e => console.log({ x: e.x, y: e.y }),
- *    onend: e => console.log("end", e.x, e.y),
+ *    onEnter: e => console.log("enter", e.x, e.y),
+ *    onmove: e => console.log({ x: e.x, y: e.y }),
+ *    onup: e => console.log("pointer up", e.x, e.y),
  *    onLostCapture: e => console.log("lost")
  * });
  */
 export function createPointerListeners(
   config: PointerHandlers & {
-    target?: MaybeAccessor<Window | Document | HTMLElement>;
+    target?: MaybeAccessor<EventTarget>;
     pointerTypes?: PointerType[];
     passive?: boolean;
   }
@@ -144,9 +145,29 @@ export function createPointerListeners(
   return cleanup.execute;
 }
 
+/**
+ * Setup pointer event listeners, while following the pointers individually, from when they appear, until they're gone.
+ * @param config primitive configuration:
+ * - `target` - specify the target to attach the listeners to. Will default to `document.body`
+ * - `pointerTypes` - specify array of pointer types you want to listen to. By default listens to `["mouse", "touch", "pen"]`
+ * - `passive` - Add passive option to event listeners. Defaults to `true`.
+ * - `onDown` - Start following a pointer from when it's down.
+ * - `onEnter` - Start following a pointer from when it enters the screen.
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/pointer#createPerPointerListeners
+ * @example
+ * createPerPointerListeners({
+ *    target: el,
+ *    pointerTypes: ['touch', 'pen'],
+ *    onDown({ x, y, pointerId }, onMove, onUp) {
+ *        console.log(x, y, pointerId);
+ *        onMove(e => {...});
+ *        onUp(e => {...});
+ *    }
+ * })
+ */
 export function createPerPointerListeners(
   config: {
-    target?: MaybeAccessor<HTMLElement>;
+    target?: MaybeAccessor<EventTarget>;
     pointerTypes?: PointerType[];
     passive?: boolean;
   } & Partial<
@@ -251,20 +272,9 @@ export function createPerPointerListeners(
   }
 }
 
-const defaultState: PointerState = {
-  x: 0,
-  y: 0,
-  pointerId: 0,
-  pressure: 0,
-  tiltX: 0,
-  tiltY: 0,
-  width: 0,
-  height: 0,
-  twist: 0,
-  pointerType: null,
-  active: false
-};
-const pointerStateKeys: Exclude<keyof PointerState, "active">[] = [
+type PointerStateWithActive = PointerState & { isActive: boolean };
+
+const pointerStateKeys: (keyof PointerState)[] = [
   "x",
   "y",
   "pointerId",
@@ -276,8 +286,26 @@ const pointerStateKeys: Exclude<keyof PointerState, "active">[] = [
   "twist",
   "pointerType"
 ];
-const getPointerState = (e: PointerEvent, active: boolean) =>
-  ({ ...pick(e, ...pointerStateKeys), active } as PointerState);
+const getPointerState = (e: PointerEvent): PointerState =>
+  pick(e, ...pointerStateKeys) as PointerState;
+const getPointerStateActive = (e: PointerEvent, isActive: boolean) => ({
+  ...getPointerState(e),
+  isActive
+});
+
+const defaultState: PointerStateWithActive = {
+  x: 0,
+  y: 0,
+  pointerId: 0,
+  pressure: 0,
+  tiltX: 0,
+  tiltY: 0,
+  width: 0,
+  height: 0,
+  twist: 0,
+  pointerType: null,
+  isActive: false
+};
 
 /**
  * Returns a signal with autoupdating Pointer position.
@@ -295,16 +323,15 @@ const getPointerState = (e: PointerEvent, active: boolean) =>
  */
 export function createPointerPosition(
   config: {
-    target?: MaybeAccessor<Window | Document | HTMLElement>;
+    target?: MaybeAccessor<EventTarget>;
     pointerTypes?: PointerType[];
-    value?: PointerState;
+    value?: PointerStateWithActive;
   } = {}
-): Accessor<PointerState> {
-  const [state, setState] = createSignal<any>(config.value ?? defaultState);
-  const handler = (e: PointerEvent, active = true) => setState(getPointerState(e, active));
+): Accessor<PointerStateWithActive> {
+  const [state, setState] = createSignal(config.value ?? defaultState);
+  const handler = (e: PointerEvent, active = true) => setState(getPointerStateActive(e, active));
   createPointerListeners({
-    target: config.target,
-    pointerTypes: config.pointerTypes,
+    ...config,
     onEnter: e => handler(e),
     onMove: e => handler(e),
     onLeave: e => handler(e, false)
@@ -312,9 +339,49 @@ export function createPointerPosition(
   return state;
 }
 
-// TODO: pointer list primitive returning a dynamic array of active touch points
+export type PointerListItem = PointerState & { isDown: boolean };
 
-export function createPointerList() {}
+/**
+ * Provides a signal of current pointers on screen.
+ * @param config primitive config:
+ * - `target` - specify the target to attach the listeners to. Will default to `document.body`
+ * - `pointerTypes` - specify array of pointer types you want to listen to. By default listens to `["mouse", "touch", "pen"]`
+ * @returns list of pointers on the screen
+ * ```
+ * Accessor<Accessor<PointerListItem>[]>
+ * ```
+ * @example
+ * ```tsx
+ * const points = createPointerList();
+ * 
+*  <For each={points()}>
+    {poz => <div>{poz()}</div>}
+  </For>
+  ```
+ */
+export function createPointerList(
+  config: {
+    target?: MaybeAccessor<EventTarget>;
+    pointerTypes?: PointerType[];
+  } = {}
+): Accessor<Accessor<PointerListItem>[]> {
+  const [pointers, setPointers] = createSignal<Accessor<PointerListItem>[]>([]);
+  createPerPointerListeners({
+    ...config,
+    onEnter(e, { onMove, onDown, onUp, onLeave }) {
+      const [pointer, setPointer] = createSignal<PointerListItem>({
+        ...getPointerState(e),
+        isDown: false
+      });
+      setPointers(p => [...p, pointer]);
+      onMove(e => setPointer(p => ({ ...getPointerState(e), isDown: p.isDown })));
+      onDown(e => setPointer({ ...getPointerState(e), isDown: true }));
+      onUp(e => setPointer({ ...getPointerState(e), isDown: false }));
+      onLeave(() => setPointers(p => remove(p, pointer)));
+    }
+  });
+  return pointers;
+}
 
 /**
  * A non-reactive helper function. It turns a position relative to the screen/window, to be relative to an element.
@@ -335,24 +402,6 @@ export const getPositionToElement = <T extends Position>(
     y,
     isInside: x >= 0 && y >= 0 && x <= width && y <= height
   };
-};
-
-/**
- * A directive for getting pointer position.
- */
-export const pointerPosition: Directive<PointerPositionDirectiveProps> = (el, props) => {
-  const { pointerTypes, handler } = (() => {
-    const v = props();
-    return typeof v === "function" ? { handler: v, pointerTypes: undefined } : v;
-  })();
-  const runHandler = (e: PointerEvent, active = true) => handler(getPointerState(e, active), el);
-  createPointerListeners({
-    target: el as HTMLElement,
-    pointerTypes: pointerTypes,
-    onEnter: e => runHandler(e),
-    onMove: runHandler,
-    onLeave: e => runHandler(e, false)
-  });
 };
 
 /**

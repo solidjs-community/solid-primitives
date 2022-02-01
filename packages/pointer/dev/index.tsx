@@ -1,23 +1,13 @@
-import {
-  createPointerListeners,
-  createPointerPosition,
-  getPositionToElement,
-  pointerPosition,
-  pointerHover,
-  Position,
-  createPerPointerListeners
-} from "../src";
-import { Accessor, Component, createEffect, createSignal, For } from "solid-js";
+import { createPointerListeners, pointerHover, createPointerList } from "../src";
+import { Component, createSignal, For } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
-import { push, remove } from "@solid-primitives/immutable";
-pointerPosition;
 pointerHover;
 
 const App: Component = () => {
   const [poz, setPoz] = createSignal({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = createSignal(false);
-  const [points, setPoints] = createSignal<Accessor<Position>[]>([]);
+  // const [points, setPoints] = createSignal<Accessor<Position>[]>([]);
 
   let ref!: HTMLDivElement;
 
@@ -34,31 +24,33 @@ const App: Component = () => {
     onMove: e => setPoz({ x: e.x, y: e.y })
   });
 
-  createPerPointerListeners({
-    onEnter({ x, y, pointerId }, { onMove, onLeave, onDown }) {
-      console.log("New pointer:", pointerId);
-      onDown(e => {
-        onLeave(e => {});
-      });
-      const [point, setPoint] = createSignal({ x, y });
-      setPoints(p => push(p, point));
-      onMove(e => setPoint({ x: e.x, y: e.y }));
-      onLeave(e => {
-        setPoint({ x: e.x, y: e.y });
-        setPoints(p => remove(p, point));
-      });
-    }
-    // onDown({ x, y, pointerId }, onMove, onUp) {
-    //   console.log("New pointer:", pointerId);
-    //   const [point, setPoint] = createSignal({ x, y });
-    //   setPoints(p => push(p, point));
-    //   onMove(e => setPoint({ x: e.x, y: e.y }));
-    //   onUp(e => {
-    //     setPoint({ x: e.x, y: e.y });
-    //     setPoints(p => remove(p, point));
-    //   });
-    // }
-  });
+  const points = createPointerList();
+
+  // createPerPointerListeners({
+  //   onEnter({ x, y, pointerId }, { onMove, onLeave, onDown }) {
+  //     console.log("New pointer:", pointerId);
+  //     onDown(e => {
+  //       onLeave(e => {});
+  //     });
+  //     const [point, setPoint] = createSignal({ x, y });
+  //     setPoints(p => push(p, point));
+  //     onMove(e => setPoint({ x: e.x, y: e.y }));
+  //     onLeave(e => {
+  //       setPoint({ x: e.x, y: e.y });
+  //       setPoints(p => remove(p, point));
+  //     });
+  //   }
+  //   // onDown({ x, y, pointerId }, onMove, onUp) {
+  //   //   console.log("New pointer:", pointerId);
+  //   //   const [point, setPoint] = createSignal({ x, y });
+  //   //   setPoints(p => push(p, point));
+  //   //   onMove(e => setPoint({ x: e.x, y: e.y }));
+  //   //   onUp(e => {
+  //   //     setPoint({ x: e.x, y: e.y });
+  //   //     setPoints(p => remove(p, point));
+  //   //   });
+  //   // }
+  // });
 
   // const state = createPointerPosition();
 
@@ -71,12 +63,7 @@ const App: Component = () => {
         }}
         style={{ "touch-action": "pan-y" }}
       >
-        <div
-          ref={ref}
-          class="wrapper-v"
-          // use:pointerPosition={(poz, el) => console.log(getPositionToElement(poz, el))}
-          use:pointerHover={setIsHovering}
-        >
+        <div ref={ref} class="wrapper-v" use:pointerHover={setIsHovering}>
           <p class="caption">x = {Math.round(poz().x)}</p>
           <p class="caption">y = {Math.round(poz().y)}</p>
           <p class="caption">{isHovering() ? "hovering" : "not hovering"}</p>
