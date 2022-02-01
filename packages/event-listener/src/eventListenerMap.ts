@@ -1,4 +1,4 @@
-import { Many, MaybeAccessor, entries, createCallbackStack } from "@solid-primitives/utils";
+import { Many, MaybeAccessor, createCallbackStack, forEachEntry } from "@solid-primitives/utils";
 import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 import { Store } from "solid-js/store";
 import { createEventListener } from "./eventListener";
@@ -63,7 +63,7 @@ export function createEventListenerMap(
   options?: EventListenerOptions
 ): ClearListeners {
   const { push, execute } = createCallbackStack();
-  entries(handlersMap).forEach(([eventName, handler]) => {
+  forEachEntry(handlersMap, (eventName, handler) => {
     push(createEventListener(targets, eventName, e => handler?.(e), options));
   });
   return execute;
@@ -73,7 +73,7 @@ export function createEventListenerMap(
  * A helpful primitive that listens to target events and provides a reactive store with the latest captured events.
  *
  * @param target accessor or variable of multiple or single event targets
- * @param options e.g. `{ passive: true }` *(can be omited)*
+ * @param options e.g. `{ passive: true }` *(can be omitted)*
  * @param eventNames names of events you want to listen to, e.g. `"mousemove", "touchend", "click"`
  *
  * @returns reactive store with the latest captured events & clear function
@@ -180,7 +180,7 @@ export function eventListenerMap(
       handlersMap = props[0];
       options = props[1];
     } else handlersMap = props;
-    entries(handlersMap).forEach(([type, handler]) => {
+    forEachEntry(handlersMap, (type, handler) => {
       target.addEventListener(type, handler, options);
       toCleanup.push(() => target.removeEventListener(type, handler, options));
     });
