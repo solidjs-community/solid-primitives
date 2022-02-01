@@ -40,30 +40,3 @@ export const withCopy = <T extends object>(source: T, mutator: (copy: T) => void
   Array.isArray(source)
     ? (withArrayCopy(source, mutator as any) as any)
     : withObjectCopy(source, mutator);
-
-/**
- * Create a new subset object without the provided keys
- *
- * @example
- * ```ts
- * const newObject = omit({ a:"foo", b:"bar", c: "baz" }, 'a', 'b')
- * newObject // => { c: "baz" }
- * ```
- */
-export const omit = <O extends object, K extends keyof O>(object: O, ...keys: K[]): Omit<O, K> =>
-  withObjectCopy(object, object => keys.forEach(key => delete object[key]));
-
-/**
- * Create a new subset object with only the provided keys
- *
- * @example
- * ```ts
- * const newObject = pick({ a:"foo", b:"bar", c: "baz" }, 'a', 'b')
- * newObject // => { a:"foo", b:"bar" }
- * ```
- */
-export const pick = <O extends object, K extends keyof O>(object: O, ...keys: K[]): Pick<O, K> =>
-  keys.reduce((n, k) => {
-    if (k in object) n[k] = object[k];
-    return n;
-  }, {} as Pick<O, K>);

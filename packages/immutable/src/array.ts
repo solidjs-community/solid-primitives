@@ -1,6 +1,6 @@
 import { compare, isArray, isFunction, ItemsOf, Many } from "@solid-primitives/utils";
-import { withArrayCopy } from "./functions";
-import { get } from "./get";
+import { withArrayCopy } from "./copy";
+import { get } from "./object";
 import { FlattenArray, MappingFn, Predicate } from "./types";
 
 /**
