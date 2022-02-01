@@ -1,7 +1,7 @@
 import { isFunction } from "@solid-primitives/utils";
-import { withCopy } from "./functions";
+import { withCopy } from "./copy";
+import { ModifyValue } from "./types";
 
-export type ModifyValue<O, K extends keyof O, V> = Omit<O, K> & { [key in K]: V };
 export type UpdateSetter<O, K extends keyof O, V> = V | ((prev: O[K]) => V);
 
 export type Update = {

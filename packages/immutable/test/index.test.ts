@@ -1,4 +1,4 @@
-import { update, concat, split, get, sortBy } from "../src";
+import { update, concat, split, get, sortBy, merge } from "../src";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { cloneDeep } from "lodash";
@@ -137,3 +137,21 @@ testSortBy("sortBy()", () => {
 });
 
 testSortBy.run();
+
+const testMerge = suite("merge");
+
+testMerge("merges", () => {
+  const a = { foo: "bar", arr: [1, 2, 3] };
+  const a_copy = cloneDeep(a);
+  const b = { foo: "baz", arr: [1, 2, 3], inner: { z: 123 } };
+  const b_copy = cloneDeep(b);
+  const c = { arr: [1, 2, 3, 4], inner: { z: 321 } };
+  const c_copy = cloneDeep(c);
+  const x = merge(a, b, c);
+  assert.equal(a_copy, a);
+  assert.equal(b_copy, b);
+  assert.equal(c_copy, c);
+  assert.equal(x, { foo: "baz", arr: [1, 2, 3, 4], inner: { z: 321 } });
+});
+
+testMerge.run();

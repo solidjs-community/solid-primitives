@@ -74,6 +74,7 @@ setUser(p => update(p, "street", "number", 64));
 - **`omit`** - Create a new subset object without the provided keys
 - **`pick`** - Create a new subset object with only the provided keys
 - **`split`** - Split object into multiple subset objects.
+- **`merge`** - Merges multiple objects into a single one.
 
 ### Object/Array
 
