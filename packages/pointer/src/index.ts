@@ -12,7 +12,8 @@ import {
   Many,
   Clear,
   createProxy,
-  warn
+  warn,
+  isFunction
 } from "@solid-primitives/utils";
 import {
   Handler,
@@ -20,6 +21,7 @@ import {
   PointerEventNames,
   PointerHoverDirectiveProps,
   PointerListItem,
+  PointerPositionDirectiveProps,
   PointerStateWithActive,
   PointerType
 } from "./types";
@@ -32,7 +34,9 @@ export {
   PointerStateWithActive,
   PointerListItem,
   PointerHoverDirectiveProps,
-  PointerHoverDirectiveHandler
+  PointerHoverDirectiveHandler,
+  PointerPositionDirectiveHandler,
+  PointerPositionDirectiveProps
 } from "./types";
 
 /**
@@ -301,13 +305,48 @@ export function createPointerList(
   return pointers;
 }
 
+//
+// DIRECTIVES:
+//
+
+/**
+ * A directive that will fire a callback once the pointer position change.
+ */
+export const pointerPosition: Directive<PointerPositionDirectiveProps> = (el, props) => {
+  const { pointerTypes, handler } = (() => {
+    const v = props();
+    return isFunction(v) ? { handler: v, pointerTypes: undefined } : v;
+  })();
+  const runHandler = (e: PointerEvent, active = true) => handler(toStateActive(e, active), el);
+  let pointer: null | number = null;
+  createPointerListeners({
+    target: el,
+    pointerTypes,
+    onEnter: e => {
+      if (pointer === null) {
+        pointer = e.pointerId;
+        runHandler(e);
+      }
+    },
+    onMove: e => {
+      if (e.pointerId === pointer) runHandler(e);
+    },
+    onLeave: e => {
+      if (e.pointerId === pointer) {
+        pointer = null;
+        runHandler(e, false);
+      }
+    }
+  });
+};
+
 /**
  * A directive for checking if the element is being hovered by at least one pointer.
  */
 export const pointerHover: Directive<PointerHoverDirectiveProps> = (el, props) => {
   const { pointerTypes, handler } = (() => {
     const v = props();
-    return typeof v === "function" ? { handler: v, pointerTypes: undefined } : v;
+    return isFunction(v) ? { handler: v, pointerTypes: undefined } : v;
   })();
   const pointers = new Set<number>();
   createPointerListeners({

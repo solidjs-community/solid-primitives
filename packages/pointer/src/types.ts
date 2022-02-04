@@ -55,6 +55,14 @@ declare module "solid-js" {
 }
 export type E = JSX.Element;
 
+export type PointerPositionDirectiveHandler = (state: PointerStateWithActive, el: Element) => void;
+export type PointerPositionDirectiveProps =
+  | PointerPositionDirectiveHandler
+  | {
+      pointerTypes?: PointerType[];
+      handler: PointerPositionDirectiveHandler;
+    };
+
 export type PointerHoverDirectiveHandler = (hovering: boolean, el: Element) => void;
 export type PointerHoverDirectiveProps =
   | PointerHoverDirectiveHandler

@@ -130,6 +130,29 @@ const position = createPointerPosition({
   target: document.querySelector("my-el"),
   pointerTypes: ["touch"]
 });
+
+createEffect(() => {
+  console.log("position", position().x, position().y);
+  console.log("hovering", position().isActive);
+});
+```
+
+### As a directive
+
+```tsx
+import { pointerPosition } from "@solid-primitives/pointer";
+// place this in code to avoid being tree-shaken
+pointerPosition;
+
+const [pos, setPos] = createSignal({ x: 0, y: 0 });
+const [hovering, setHovering] = createSignal(false);
+
+<div
+  use:pointerPosition={e => {
+    setPos({ x: e.x, y: e.y });
+    setHovering(e.isActive);
+  }}
+/>;
 ```
 
 ## `createPointerList`
@@ -162,6 +185,22 @@ const points = createPointerList();
 
 // notice that points is an signal returning an array of signals
 <For each={points()}>{poz => <div>{poz()}</div>}</For>;
+```
+
+## `pointerHover`
+
+A directive for checking if the element is being hovered by at least one pointer.
+
+### How to use it
+
+```ts
+import { pointerHover } from "@solid-primitives/pointer";
+// place this in code to avoid being tree-shaken
+pointerHover;
+
+const [hovering, setHovering] = createSignal(false);
+
+<div use:pointerHover={setHovering} />;
 ```
 
 ## Changelog
