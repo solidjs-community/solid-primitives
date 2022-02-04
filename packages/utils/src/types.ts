@@ -86,3 +86,8 @@ export type Falsy<T> = T extends FalsyValue ? T : never;
 export type Destore<T extends Object> = {
   [K in keyof T]: T[K] extends Function ? T[K] : Accessor<T[K]>;
 };
+
+export type Position = {
+  x: number;
+  y: number;
+};
