@@ -1,4 +1,7 @@
+import { Accessor, createSignal, getOwner } from "solid-js";
 import { ClearListeners, createEventListener } from "@solid-primitives/event-listener";
+import { remove, split } from "@solid-primitives/immutable";
+import { createSubRoot } from "@solid-primitives/rootless";
 import {
   Get,
   MaybeAccessor,
@@ -11,87 +14,26 @@ import {
   createProxy,
   warn
 } from "@solid-primitives/utils";
-import { pick, remove, split } from "@solid-primitives/immutable";
-import { Accessor, createSignal, getOwner, JSX } from "solid-js";
-import { createSubRoot } from "@solid-primitives/rootless";
+import {
+  Handler,
+  OnEventRecord,
+  PointerEventNames,
+  PointerHoverDirectiveProps,
+  PointerListItem,
+  PointerStateWithActive,
+  PointerType
+} from "./types";
+import { DEFAULT_STATE, parseHandlersMap, toState, toStateActive } from "./helpers";
 
-export type PointerType = "mouse" | "touch" | "pen";
-type EventTarget = Window | Document | HTMLElement;
-
-export type Position = {
-  x: number;
-  y: number;
-};
-
-type PointerEventNames =
-  | "over"
-  | "enter"
-  | "down"
-  | "move"
-  | "up"
-  | "cancel"
-  | "out"
-  | "leave"
-  | "gotCapture"
-  | "lostCapture";
-
-type OnEventName<T extends string> = `on${Lowercase<T>}` | `on${Capitalize<T>}`;
-
-type PointerHandlers = Partial<OnEventRecord<PointerEventNames, Handler>>;
-type OnEventRecord<T extends string, V> = Record<OnEventName<T>, V>;
-type Handler = Get<PointerEvent>;
-
-type AnyOnEventName = `on${string}`;
-type ReverseOnEventName<T> = T extends string
-  ? Lowercase<T extends `on${infer K}` ? K : `${T}`>
-  : never;
-type ParsedEventHandlers<H extends Record<AnyOnEventName, Get<any>>> = {
-  [K in ReverseOnEventName<keyof H>]: H[`on${K}`];
-};
-
-export type PointerState = {
-  pressure: number;
-  pointerId: number;
-  tiltX: number;
-  tiltY: number;
-  width: number;
-  height: number;
-  twist: number;
-  pointerType: PointerType | null;
-  x: number;
-  y: number;
-};
-
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      pointerPosition: PointerPositionDirectiveProps;
-      pointerHover: PointerHoverDirectiveProps;
-    }
-  }
-}
-export type E = JSX.Element;
-
-type PointerPositionDirectiveHandler = (poz: PointerState, el: Element) => void;
-type PointerPositionDirectiveProps =
-  | PointerPositionDirectiveHandler
-  | { pointerTypes?: PointerType[]; handler: PointerPositionDirectiveHandler };
-type PointerHoverDirectiveHandler = (hovering: boolean, el: Element) => void;
-type PointerHoverDirectiveProps =
-  | PointerHoverDirectiveHandler
-  | { pointerTypes?: PointerType[]; handler: PointerHoverDirectiveHandler };
-
-const parseOnEventName = <T extends string>(name: T) =>
-  name.substring(2).toLowerCase() as ReverseOnEventName<T>;
-const parseEventHandlers = <H extends Record<AnyOnEventName, any>>(
-  handlers: H
-): ParsedEventHandlers<H> => {
-  const result = {} as any;
-  Object.entries(handlers).forEach(([name, fn]) => (result[parseOnEventName(name)] = fn));
-  return result;
-};
-
-// TODO: possible helpers for managing multiple pointers?
+export { getPositionToElement } from "./helpers";
+export {
+  PointerType,
+  PointerState,
+  PointerStateWithActive,
+  PointerListItem,
+  PointerHoverDirectiveProps,
+  PointerHoverDirectiveHandler
+} from "./types";
 
 /**
  * Setups event listeners for pointer events, that will get automatically removed on cleanup.
@@ -99,12 +41,12 @@ const parseEventHandlers = <H extends Record<AnyOnEventName, any>>(
  * - `target` - specify the target to attach the listeners to. Will default to `document.body`
  * - `pointerTypes` - specify array of pointer types you want to listen to. By default listens to `["mouse", "touch", "pen"]`
  * - `passive` - Add passive option to event listeners. Defaults to `true`.
- * - your event handlers: e.g. `onstart`, `onend`, `onMove`, ...
+ * - your event handlers: e.g. `onenter`, `onLeave`, `onMove`, ...
  * @returns function stopping currently attached listener
  *
  * @example
  * createPointerListeners({
- *    // pass a function if the element has to mount
+ *    // pass a function if the element is yet to mount
  *    target: () => el,
  *    pointerTypes: ["touch"],
  *    onEnter: e => console.log("enter", e.x, e.y),
@@ -114,7 +56,7 @@ const parseEventHandlers = <H extends Record<AnyOnEventName, any>>(
  * });
  */
 export function createPointerListeners(
-  config: PointerHandlers & {
+  config: Partial<OnEventRecord<PointerEventNames, Handler>> & {
     target?: MaybeAccessor<EventTarget>;
     pointerTypes?: PointerType[];
     passive?: boolean;
@@ -127,7 +69,7 @@ export function createPointerListeners(
     "passive"
   );
   const [{ gotcapture: onGotCapture, lostcapture: onLostCapture }, nativeHandlers] = split(
-    parseEventHandlers(handlers),
+    parseHandlersMap(handlers),
     "gotcapture",
     "lostcapture"
   );
@@ -187,7 +129,7 @@ export function createPerPointerListeners(
     "target",
     "passive"
   );
-  const { down: onDown, enter: onEnter } = parseEventHandlers(handlers);
+  const { down: onDown, enter: onEnter } = parseHandlersMap(handlers);
   const owner = getOwner();
   const onlyInitMessage = "All listeners need to be added synchronously in the initial event.";
   const addListener = (type: Many<string>, fn: Handler, pointerId?: number): Clear =>
@@ -222,7 +164,7 @@ export function createPerPointerListeners(
           createProxy({
             get(key) {
               const type = "pointer" + key.substring(2).toLowerCase();
-              return fn => {
+              return (fn: Handler) => {
                 if (!init) return warn(onlyInitMessage);
                 if (type === "pointerleave") onLeave = fn;
                 else addListener(type, fn, pointerId);
@@ -272,41 +214,6 @@ export function createPerPointerListeners(
   }
 }
 
-type PointerStateWithActive = PointerState & { isActive: boolean };
-
-const pointerStateKeys: (keyof PointerState)[] = [
-  "x",
-  "y",
-  "pointerId",
-  "pressure",
-  "tiltX",
-  "tiltY",
-  "width",
-  "height",
-  "twist",
-  "pointerType"
-];
-const getPointerState = (e: PointerEvent): PointerState =>
-  pick(e, ...pointerStateKeys) as PointerState;
-const getPointerStateActive = (e: PointerEvent, isActive: boolean) => ({
-  ...getPointerState(e),
-  isActive
-});
-
-const defaultState: PointerStateWithActive = {
-  x: 0,
-  y: 0,
-  pointerId: 0,
-  pressure: 0,
-  tiltX: 0,
-  tiltY: 0,
-  width: 0,
-  height: 0,
-  twist: 0,
-  pointerType: null,
-  isActive: false
-};
-
 /**
  * Returns a signal with autoupdating Pointer position.
  * @param config primitive config:
@@ -328,18 +235,29 @@ export function createPointerPosition(
     value?: PointerStateWithActive;
   } = {}
 ): Accessor<PointerStateWithActive> {
-  const [state, setState] = createSignal(config.value ?? defaultState);
-  const handler = (e: PointerEvent, active = true) => setState(getPointerStateActive(e, active));
+  const [state, setState] = createSignal(config.value ?? DEFAULT_STATE);
+  let pointer: null | number = null;
+  const handler = (e: PointerEvent, active = true) => setState(toStateActive(e, active));
   createPointerListeners({
     ...config,
-    onEnter: e => handler(e),
-    onMove: e => handler(e),
-    onLeave: e => handler(e, false)
+    onEnter: e => {
+      if (pointer === null) {
+        pointer = e.pointerId;
+        handler(e);
+      }
+    },
+    onMove: e => {
+      if (e.pointerId === pointer) handler(e);
+    },
+    onLeave: e => {
+      if (e.pointerId === pointer) {
+        pointer = null;
+        handler(e, false);
+      }
+    }
   });
   return state;
 }
-
-export type PointerListItem = PointerState & { isDown: boolean };
 
 /**
  * Provides a signal of current pointers on screen.
@@ -370,13 +288,13 @@ export function createPointerList(
     ...config,
     onEnter(e, { onMove, onDown, onUp, onLeave }) {
       const [pointer, setPointer] = createSignal<PointerListItem>({
-        ...getPointerState(e),
+        ...toState(e),
         isDown: false
       });
       setPointers(p => [...p, pointer]);
-      onMove(e => setPointer(p => ({ ...getPointerState(e), isDown: p.isDown })));
-      onDown(e => setPointer({ ...getPointerState(e), isDown: true }));
-      onUp(e => setPointer({ ...getPointerState(e), isDown: false }));
+      onMove(e => setPointer(p => ({ ...toState(e), isDown: p.isDown })));
+      onDown(e => setPointer({ ...toState(e), isDown: true }));
+      onUp(e => setPointer({ ...toState(e), isDown: false }));
       onLeave(() => setPointers(p => remove(p, pointer)));
     }
   });
@@ -384,28 +302,7 @@ export function createPointerList(
 }
 
 /**
- * A non-reactive helper function. It turns a position relative to the screen/window, to be relative to an element.
- * @param poz object containing `x` & `y`
- * @param el element to calculate the position of
- * @returns the `poz` with `x` and `y` changed, and `isInside` added
- */
-export const getPositionToElement = <T extends Position>(
-  poz: T,
-  el: Element
-): T & { isInside: boolean } => {
-  const { top, left, width, height } = el.getBoundingClientRect(),
-    x = poz.x - left,
-    y = poz.y - top;
-  return {
-    ...poz,
-    x,
-    y,
-    isInside: x >= 0 && y >= 0 && x <= width && y <= height
-  };
-};
-
-/**
- * A directive for checking if the element is being hovered by a pointer.
+ * A directive for checking if the element is being hovered by at least one pointer.
  */
 export const pointerHover: Directive<PointerHoverDirectiveProps> = (el, props) => {
   const { pointerTypes, handler } = (() => {

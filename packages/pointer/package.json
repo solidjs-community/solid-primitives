@@ -1,8 +1,8 @@
 {
   "name": "@solid-primitives/pointer",
   "version": "0.0.100",
-  "description": "A template primitive example.",
-  "author": "Your Name <you@youremail.com>",
+  "description": "A collection of primitives, giving you a nicer API to handle pointer events in a reactive context.",
+  "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/pointer#readme",
   "repository": {
@@ -11,18 +11,29 @@
   },
   "primitive": {
     "name": "pointer",
-    "stage": 0,
+    "stage": 2,
     "list": [
-      "createPrimitiveTemplate"
+      "createPointerListeners",
+      "createPerPointerListeners",
+      "createPointerPosition",
+      "createPointerList"
     ],
-    "category": "Display & Media"
+    "category": "Inputs"
   },
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "files": [
     "dist"
   ],
@@ -34,14 +45,18 @@
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "events",
+    "pointer",
+    "mouse",
+    "touch",
+    "pen"
   ],
   "dependencies": {
     "@solid-primitives/event-listener": "^1.5.0",
     "@solid-primitives/utils": "^0.2.0",
     "@solid-primitives/immutable": "^0.0.100",
-    "@solid-primitives/rootless": "^0.0.100",
-    "@solid-primitives/event-bus": "^0.0.150"
+    "@solid-primitives/rootless": "^0.0.100"
   },
   "devDependencies": {
     "jsdom": "18.1.1",
