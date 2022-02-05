@@ -56,7 +56,7 @@ setUser(p => update(p, "street", "number", 64));
 
 - **`push`** - non-mutating `Array.prototype.push()`
 - **`drop`** - non-mutating function that drops n items from the array start
-- **`dropRight`** - non-mutating function that drops n items from the array end
+- **`pop`** - non-mutating function that drops n items from the array end
 - **`filterOut`** - standalone `Array.prototype.filter()` that filters out passed item
 - **`filter`** - standalone `Array.prototype.filter()`
 - **`sort`** - non-mutating `Array.prototype.sort()` as a standalone function
@@ -66,6 +66,7 @@ setUser(p => update(p, "street", "number", 64));
 - **`fill`** - non-mutating `Array.prototype.fill()` as a standalone function
 - **`concat`** - Creates a new array concatenating array with any additional arrays and/or values.
 - **`remove`** - Remove item from array
+- **`removeItems`** - Remove multiple items from an array
 - **`flatten`** - Flattens a nested array into a one-level array
 - **`sortBy`** - Sort an array by object key, or multiple keys
 

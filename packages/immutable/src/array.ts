@@ -31,14 +31,14 @@ export const drop = <T>(list: T[], n = 1): T[] => list.slice(n);
  *
  * @example
  * ```ts
- * const newList = dropRight([1,2,3])
+ * const newList = pop([1,2,3])
  * newList // => [1,2]
  *
- * const newList = dropRight([1,2,3], 2)
+ * const newList = pop([1,2,3], 2)
  * newList // => [1]
  * ```
  */
-export const dropRight = <T>(list: T[], n = 1): T[] => list.slice(0, list.length - n);
+export const pop = <T>(list: T[], n = 1): T[] => list.slice(0, list.length - n);
 
 /**
  * standalone `Array.prototype.filter()` that filters out passed item
@@ -62,7 +62,7 @@ export function filter<T>(list: readonly T[], predicate: Predicate<T>): T[] & { 
  * @returns changed array copy
  */
 export const sort = <T>(list: T[], compareFn?: (a: T, b: T) => number): T[] =>
-  withArrayCopy(list, list => list.sort(compareFn));
+  list.slice().sort(compareFn);
 
 /**
  * standalone `Array.prototype.map()` function
@@ -84,14 +84,14 @@ export const splice = <T>(
   start: number,
   deleteCount: number = 0,
   ...items: T[]
-): T[] => withArrayCopy(list, list => list.splice(start, deleteCount, ...items));
+): T[] => list.slice().splice(start, deleteCount, ...items);
 
 /**
  * non-mutating `Array.prototype.fill()` as a standalone function
  * @returns changed array copy
  */
 export const fill = <T>(list: readonly T[], value: T, start?: number, end?: number): T[] =>
-  withArrayCopy(list, list => list.fill(value, start, end));
+  list.slice().fill(value, start, end);
 
 /**
  * Creates a new array concatenating array with any additional arrays and/or values.
@@ -115,6 +115,21 @@ export function concat<A extends any[], V extends ItemsOf<A>>(
 export const remove = <T>(list: readonly T[], item: T): T[] => {
   const index = list.indexOf(item);
   return splice(list, index, 1);
+};
+
+/**
+ * Remove multiple items from an array
+ * @returns changed array copy
+ */
+export const removeItems = <T>(list: readonly T[], ...items: T[]): T[] => {
+  const res = [];
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i];
+    const ii = items.indexOf(item);
+    if (ii !== -1) items.splice(ii, 1);
+    else res.push(item);
+  }
+  return res;
 };
 
 /**

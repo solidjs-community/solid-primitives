@@ -1,4 +1,4 @@
-import { update, concat, split, get, sortBy, merge } from "../src";
+import { update, concat, split, get, sortBy, merge, removeItems } from "../src";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { cloneDeep } from "lodash";
@@ -155,3 +155,12 @@ testMerge("merges", () => {
 });
 
 testMerge.run();
+
+const testRemoveItems = suite("removeItems");
+
+testRemoveItems("", () => {
+  const res = removeItems([1, 2, 3, 4, 5, 6, 7, 8, 9], 2, 6, 7, 11);
+  assert.equal(res, [1, 3, 4, 5, 8, 9]);
+});
+
+testRemoveItems.run();
