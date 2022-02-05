@@ -39,22 +39,33 @@ test("array window target", () => {
 
 test("accessor window target", () => {
   createRoot(dispose => {
+    const [target, setTarget] = createSignal(window);
     const testEvent = new Event("test");
-    let capturedEvent: Event;
-    createEventListener<{ test: Event }>(
-      () => window,
-      "test",
-      ev => {
-        capturedEvent = ev;
-      }
-    );
+    let captured_times = 0;
+    createEventListener<{ test: Event }>(target, "test", ev => {
+      captured_times++;
+    });
     dispatchFakeEvent("test", testEvent);
-    assert.is(capturedEvent, undefined, "event listener won't be added yet");
+    assert.is(captured_times, 0, "event listener won't be added yet");
 
     setTimeout(() => {
       dispatchFakeEvent("test", testEvent);
-      assert.is(capturedEvent, testEvent);
-      dispose();
+      assert.is(captured_times, 1);
+
+      setTarget(undefined);
+
+      setTimeout(() => {
+        dispatchFakeEvent("test", testEvent);
+        assert.is(captured_times, 1);
+
+        setTarget(window);
+
+        setTimeout(() => {
+          dispatchFakeEvent("test", testEvent);
+          assert.is(captured_times, 2);
+          dispose();
+        }, 0);
+      }, 0);
     }, 0);
   });
 });
