@@ -31,14 +31,14 @@ export const drop = <T>(list: T[], n = 1): T[] => list.slice(n);
  *
  * @example
  * ```ts
- * const newList = pop([1,2,3])
+ * const newList = dropRight([1,2,3])
  * newList // => [1,2]
  *
- * const newList = pop([1,2,3], 2)
+ * const newList = dropRight([1,2,3], 2)
  * newList // => [1]
  * ```
  */
-export const pop = <T>(list: T[], n = 1): T[] => list.slice(0, list.length - n);
+export const dropRight = <T>(list: T[], n = 1): T[] => list.slice(0, list.length - n);
 
 /**
  * standalone `Array.prototype.filter()` that filters out passed item
@@ -136,7 +136,7 @@ export const removeItems = <T>(list: readonly T[], ...items: T[]): T[] => {
  * Flattens a nested array into a one-level array
  * @returns changed array copy
  */
-const flatten = <T extends any[]>(arr: T): FlattenArray<T>[] =>
+export const flatten = <T extends any[]>(arr: T): FlattenArray<T>[] =>
   arr.reduce((flat, next) => flat.concat(isArray(next) ? flatten(next) : next), []);
 
 /**
