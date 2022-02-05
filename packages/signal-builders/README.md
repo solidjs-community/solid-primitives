@@ -1,31 +1,65 @@
-# @solid-primitives/template-primitive
+# @solid-primitives/signal-builders
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/template-primitive?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/template-primitive)
-[![version](https://img.shields.io/npm/v/@solid-primitives/template-primitive?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/template-primitive)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/davedbase/solid-primitives#contribution-process)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/signal-builders?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/signal-builders)
+[![version](https://img.shields.io/npm/v/@solid-primitives/signal-builders?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/signal-builders)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
-A sample primitive that is made up for templating with the following options:
-
-`createPrimitiveTemplate` - Provides a getter and setter for the primitive.
+A collection of chainable and composable reactive signal calculations, _AKA_ **Signal Builders**.
 
 ## Installation
 
 ```bash
-npm install @solid-primitives/template-primitive
+npm install @solid-primitives/signal-builders
 # or
-yarn add @solid-primitives/template-primitive
+yarn add @solid-primitives/signal-builders
 ```
 
 ## How to use it
 
+Signal buildres are creating computations when used, so they need to be used under a reactive root.
+
+### Array
+
 ```ts
-const [value, setValue] = createPrimitiveTemplate(false);
+import { push, flatten, remove } from "@solid-primitives/signal-builders";
+
+const [fruits, setFruits] = createSignal(["apples", "bananas", "oranges", "tomatoes"]);
+const [toRemove, setToRemove] = createSignal("tomatoes");
+
+const list = flatten(remove(push(fruits, ["kiwis", "avocados"]), toRemove));
+
+list(); // ["apples", "bananas", "oranges", "kiwis", "avocados"]
 ```
 
-## Demo
+### Object
 
-You can use this template for publishing your demo on CodeSandbox: https://codesandbox.io/s/solid-primitives-demo-template-sz95h
+```ts
+import { update, merge } from "@solid-primitives/signal-builders";
+
+const [user, setUser] = createSignal({ name: { first: "John", last: "Doe" } });
+const [last, setLast] = createSignal("Solid");
+
+const modifiedUser = merge(update(user, "name", "last", last), { age: 21 });
+
+modifiedUser(); // { name: { first: "John", last: "Solid" }, age: 21 }
+```
+
+### Number
+
+```ts
+import { add, multiply, clamp, int } from "@solid-primitives/signal-builders";
+
+const [input, setInput] = createSignal("123");
+const [ing, setIng] = createSignal(-45);
+const [max, setMax] = createSignal(1000);
+
+const value = clamp(multiply(int(input), add(ing, 54, 9)), 0, max);
+```
+
+## A call for feedback
+
+Signal buildres are still a fresh and experimental idea. Therefore all feedback/ideas/issues are highly welcome! :)
 
 ## Changelog
 
@@ -34,6 +68,6 @@ You can use this template for publishing your demo on CodeSandbox: https://codes
 
 0.0.100
 
-Initial release as a Stage-0 primitive.
+Initial release as a Stage-1 primitive.
 
 </details>

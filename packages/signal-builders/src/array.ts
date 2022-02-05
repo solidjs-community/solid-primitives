@@ -7,7 +7,7 @@ import {
 } from "@solid-primitives/utils";
 import * as _ from "@solid-primitives/immutable";
 import { Accessor, createMemo } from "solid-js";
-import type { MappingFn, Predicate } from "@solid-primitives/immutable";
+import type { MappingFn, Predicate, FlattenArray } from "@solid-primitives/immutable";
 
 export const push = <
   A extends MaybeAccessor<any[]>,
@@ -70,12 +70,15 @@ export const remove = <A extends MaybeAccessor<any[]>, V extends ItemsOf<MaybeAc
   item: MaybeAccessor<V>
 ): Accessor<V[]> => createMemo(() => _.remove(access(list), access(item)));
 
+export const removeItems = <T extends any[]>(
+  list: MaybeAccessor<T>,
+  ...items: MaybeAccessor<ItemsOf<T>>[]
+): Accessor<T> => createMemo(() => _.removeItems(access(list), ...accessArray(items)) as T);
+
 export const concat = <A extends MaybeAccessor<any>[], V extends MaybeAccessorValue<ItemsOf<A>>>(
   ...a: A
 ): Accessor<Array<V extends any[] ? ItemsOf<V> : V>> =>
   createMemo(() => _.concat(...accessArray(a)));
 
-export const join = <T extends any[]>(
-  list: MaybeAccessor<T>,
-  separator?: MaybeAccessor<string>
-): Accessor<string> => createMemo(() => access(list).join(access(separator)));
+export const flatten = <T extends any[]>(list: MaybeAccessor<T>): Accessor<FlattenArray<T>> =>
+  createMemo(() => _.flatten(access(list)) as FlattenArray<T>);

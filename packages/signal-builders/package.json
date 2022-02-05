@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/signal-builders",
   "version": "0.0.100",
-  "description": "A template primitive example.",
+  "description": "A collection of chainable and composable reactive signal calculations, aka Signal Builders.",
   "author": "Your Name <you@youremail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/signal-builders#readme",
@@ -11,7 +11,7 @@
   },
   "primitive": {
     "name": "signal-builders",
-    "stage": 0,
+    "stage": 1,
     "list": [],
     "category": "Reactivity"
   },
