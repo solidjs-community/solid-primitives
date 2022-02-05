@@ -1,4 +1,4 @@
-import { Clear, createProxy, Get, Many, MaybeAccessor } from "@solid-primitives/utils";
+import { Clear, createProxy, Get, isClient, Many, MaybeAccessor } from "@solid-primitives/utils";
 import { createEventListener } from "./eventListener";
 import { runWithSubRoot } from "@solid-primitives/rootless";
 import { EventMapOf, TargetWithEventMap, EventListenerOptions } from "./types";
@@ -54,7 +54,7 @@ export function createEventListenerBus<EventMap extends Record<string, Event>>(
   options?: EventListenerOptions
 ): EventListenerBus<EventMap>;
 export function createEventListenerBus(
-  target: MaybeAccessor<Many<EventTarget>> = window,
+  target: MaybeAccessor<Many<EventTarget>> = isClient ? window : [],
   options: EventListenerOptions = {}
 ) {
   const owner = getOwner();

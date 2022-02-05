@@ -263,6 +263,21 @@ bus.onfoo(e => {});
 bus.onbar(e => {});
 ```
 
+#### Reactive Roots
+
+The EventListenerBus is designed in a way to let you add event listeners outside of reactive roots/ in different root then the one primitive was used in.
+
+```ts
+const bus = createRoot(dispose => {
+  return createEventListenerBus();
+});
+
+// listeners can be added outside of the original root setup function.
+createRoot(dispose => {
+  bus.onclick(e => {});
+});
+```
+
 ## `WindowEventListener`
 
 Listen to the `window` DOM Events, using a component.
