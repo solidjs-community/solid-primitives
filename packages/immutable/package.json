@@ -12,7 +12,9 @@
   "primitive": {
     "name": "immutable",
     "stage": 1,
-    "list": [],
+    "list": [
+      "List of functions"
+    ],
     "category": "Utilities"
   },
   "private": false,

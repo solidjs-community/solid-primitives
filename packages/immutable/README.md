@@ -41,7 +41,7 @@ const [user, setUser] = createSignal({
 setUser(p => update(p, "street", "number", 64));
 ```
 
-## List of available functions:
+## List of functions:
 
 ### Copying
 

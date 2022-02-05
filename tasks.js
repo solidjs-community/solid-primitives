@@ -39,7 +39,9 @@ async function updateReadme(log) {
         data.NPM = `[![VERSION](${npmShield}${lernaPackage.name}?style=for-the-badge&label=)](${npmURL}${lernaPackage.name})`;
       }
       data.Stage = `[![STAGE](${stageShieldBaseURL}${stage ?? "2"}.json)](${stageShieldLink})`;
-      data.Primitives = list.map(prim => `[${prim}](${githubURL}${name}#${prim})`).join("<br />");
+      data.Primitives = list
+        .map(prim => `[${prim}](${githubURL}${name}#${prim.replace(/ /g, "-")})`)
+        .join("<br />");
       // Merge the package into the correct category
       let cat = category || "Misc";
       categories[cat] = Array.isArray(categories[cat]) ? [...categories[cat], data] : [data];
