@@ -12,7 +12,9 @@
   "primitive": {
     "name": "signal-builders",
     "stage": 1,
-    "list": [],
+    "list": [
+      "List of builders"
+    ],
     "category": "Reactivity"
   },
   "private": false,

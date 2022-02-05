@@ -57,6 +57,57 @@ const [max, setMax] = createSignal(1000);
 const value = clamp(multiply(int(input), add(ing, 54, 9)), 0, max);
 ```
 
+## List of builders
+
+### Array
+
+- **`push`** - basically `Array.prototype.push()`
+- **`drop`** - drop n items from the array start
+- **`dropRight`** - drop n items from the end of the array
+- **`filter`** - basically `Array.prototype.filter()`
+- **`filterOut`** - filter out passed item from an array
+- **`remove`** - removes passed item from an array (first one from the start)
+- **`removeItems`** - removes multiple items from an array
+- **`splice`** - signal-builder `Array.prototype.splice()`
+- **`slice`** - signal-builder `Array.prototype.slice()`
+- **`map`** - signal-builder `Array.prototype.map()`
+- **`sort`** - signal-builder `Array.prototype.sort()`
+- **`concat`** - Append multiple arrays together
+
+### Object/Array
+
+- **`get`** - Get a single property value of an object by specifying a path to it.
+- **`update`** - Change single value in an object by key, or series of recursing keys.
+
+### Object
+
+- **`omit`** - get an object copy without the provided keys
+- **`pick`** - get an object copy with only the provided keys
+- **`merge`** - Merges multiple objects into a single one.
+
+### Convert
+
+- **`string`** - turns passed value to a string
+- **`float`** - turns passed string to an float number
+- **`int`** - turns passed string to an intiger
+- **`join`** - join array with a separator to a string
+
+### Number
+
+- **`add`** - `a + b + c + ...`
+- **`substract`** - `a - b - c - ...`
+- **`multiply`** - `a * b * c * ...`
+- **`divide`** - `a / b / c / ...`
+- **`power`** - `a ** b ** c ** ...`
+- **`clamp`** - clamp a number value between two other values
+- **`round`** - `Math.round()`
+- **`ceil`** - `Math.ceil()`
+- **`floor`** - `Math.floor()`
+
+### String
+
+- **`stringConcat`** - combine multiple strings into one
+
 ## A call for feedback
 
 Signal buildres are still a fresh and experimental idea. Therefore all feedback/ideas/issues are highly welcome! :)

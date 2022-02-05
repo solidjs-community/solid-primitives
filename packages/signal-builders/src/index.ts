@@ -6,6 +6,10 @@ import { Accessor, createMemo } from "solid-js";
 export * from "./convert";
 
 // STRING
+
+/**
+ * Signal Builder: combine multiple strings into one
+ */
 export const stringConcat = (...a: MaybeAccessor<any>[]): Accessor<string> =>
   createMemo(() => a.reduce((t: string, c) => t + access(c), "") as string);
 
