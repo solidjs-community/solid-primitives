@@ -106,11 +106,31 @@ const value = clamp(multiply(int(input), add(ing, 54, 9)), 0, max);
 
 ### String
 
-- **`stringConcat`** - combine multiple strings into one
+- **`add`** - `a + b + c + ...`
+- **`lowercase`** - signal builder `String.prototype.toLowerCase()`
+- **`uppercase`** - signal builder `String.prototype.toUpperCase()`
+- **`capitalize`** - capitalize a string input e.g. `"solidJS"` -> `"Solidjs"`
+- **`substring`** - signal builder `String.prototype.substring()`
+
+### Special
+
+- **`spread`** - Turn your signal into a tuple of signals, or map of signals. **(input needs to have static keys)**
+
+```ts
+// spread tuples
+const [first, second, third] = spread(() => [1, 2, 3]);
+first(); // => 1
+second(); // => 2
+third(); // => 3
+// spread objects
+const { name, age } = spread(() => ({ name: "John", age: 36 }));
+name(); // => "John"
+age(); // => 36
+```
 
 ## A call for feedback
 
-Signal buildres are still a fresh and experimental idea. Therefore all feedback/ideas/issues are highly welcome! :)
+`signal-builders` package is now a proof of concept of a fresh and experimental idea. Therefore all feedback/ideas/issues are highly welcome! :)
 
 ## Changelog
 

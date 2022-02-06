@@ -1,5 +1,7 @@
 /** `a + b + c + ...` */
-export const add = (...a: number[]): number => {
+export const add: ((...a: number[]) => number) | ((...a: string[]) => string) = (
+  ...a: number[]
+) => {
   let r = 0;
   for (const n of a) {
     r += n;

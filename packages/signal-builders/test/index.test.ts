@@ -1,8 +1,8 @@
-import { push, sort } from "../src";
+import { push, sort, spread } from "../src";
 import { createRoot, createSignal } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
-import { compare } from "@solid-primitives/utils";
+import { compare, tuple } from "@solid-primitives/utils";
 
 const test = suite("*");
 
@@ -15,6 +15,20 @@ test("", () =>
     setList([1, 2, 3, 5, 4]);
     setItem(1);
     assert.equal(res(), [1, 1, 2, 3, 4, 5]);
+    dispose();
+  }));
+
+test("spread", () =>
+  createRoot(dispose => {
+    const [numbers, setNumbers] = createSignal(tuple([1, 2, 3]));
+    const [first, second, last] = spread(numbers);
+    assert.is(first(), 1);
+    assert.is(second(), 2);
+    assert.is(last(), 3);
+    setNumbers([5, 6, 7]);
+    assert.is(first(), 5);
+    assert.is(second(), 6);
+    assert.is(last(), 7);
     dispose();
   }));
 

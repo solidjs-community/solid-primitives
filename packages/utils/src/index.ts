@@ -40,6 +40,14 @@ export const isArray = (val: any): val is any[] => Array.isArray(val);
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
 
 /**
+ * for creating tuples by inferring type
+ * @example
+ * const users = tuple(["John", "Jeff", "Joe"]);
+ * // users: [string, string, string]
+ */
+export const tuple = <T extends [] | any[]>(input: T): T => input;
+
+/**
  * Accesses the value of a MaybeAccessor
  * @example
  * ```ts
@@ -125,9 +133,15 @@ export const forEach = <A extends MaybeAccessor<any>, V = MaybeAccessorValue<A>>
 /**
  * Get `Object.entries()` of an MaybeAccessor<Object>
  */
-export const entries = <A extends MaybeAccessor<Object>, V = MaybeAccessorValue<A>>(
+export const entries = <A extends MaybeAccessor<object>, V = MaybeAccessorValue<A>>(
   object: A
 ): [string, Values<V>][] => Object.entries(access(object));
+
+/**
+ * Get `Object.keys()` of an MaybeAccessor<Object>
+ */
+export const keys = <A extends MaybeAccessor<object>>(object: A) =>
+  Object.keys(access(object)) as (keyof MaybeAccessorValue<A>)[];
 
 /**
  * Creates a promise that resolves *(or rejects)* after given time.

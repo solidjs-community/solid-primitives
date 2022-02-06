@@ -84,7 +84,7 @@ setUser(p => update(p, "street", "number", 64));
 
 ### Number
 
-- **`add`** - `a + b + c + ...`
+- **`add`** - `a + b + c + ...` _(works for numbers or strings)_
 - **`substract`** - `a - b - c - ...`
 - **`multiply`** - `a * b * c * ...`
 - **`divide`** - `a / b / c / ...`
