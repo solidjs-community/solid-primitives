@@ -1,22 +1,19 @@
 {
-  "name": "@solid-primitives/rootless",
+  "name": "@solid-primitives/signal-builders",
   "version": "0.0.100",
-  "description": "A template primitive example.",
-  "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
+  "description": "A collection of chainable and composable reactive signal calculations, aka Signal Builders.",
+  "author": "Your Name <you@youremail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/rootless#readme",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/signal-builders#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
   "primitive": {
-    "name": "rootless",
+    "name": "signal-builders",
     "stage": 1,
     "list": [
-      "createSubRoot",
-      "createCallback",
-      "runWithRoot",
-      "runWithSubRoot"
+      "List of builders"
     ],
     "category": "Reactivity"
   },
@@ -38,7 +35,8 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^0.2.0"
+    "@solid-primitives/utils": "^0.2.0",
+    "@solid-primitives/immutable": "^0.0.100"
   },
   "devDependencies": {
     "jsdom": "18.1.1",
