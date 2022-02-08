@@ -84,7 +84,7 @@ export const splice = <T>(
   start: number,
   deleteCount: number = 0,
   ...items: T[]
-): T[] => list.slice().splice(start, deleteCount, ...items);
+): T[] => withArrayCopy(list, list => list.splice(start, deleteCount, ...items));
 
 /**
  * non-mutating `Array.prototype.fill()` as a standalone function
@@ -131,6 +131,19 @@ export const removeItems = <T>(list: readonly T[], ...items: T[]): T[] => {
   }
   return res;
 };
+
+/**
+ * Replace item in an array with different one, by reference to it
+ * @param list immutable list
+ * @param oldItem item to remove
+ * @param newItem item to add
+ * @returns changed array copy
+ */
+export const replace = <T>(list: readonly T[], oldItem: T, newItem: T): T[] =>
+  withArrayCopy(list, list => {
+    const index = list.indexOf(oldItem);
+    return list.splice(index, 1, newItem);
+  });
 
 /**
  * Flattens a nested array into a one-level array
