@@ -68,6 +68,7 @@ setUser(p => update(p, "street", "number", 64));
 - **`concat`** - Creates a new array concatenating array with any additional arrays and/or values.
 - **`remove`** - Remove item from array
 - **`removeItems`** - Remove multiple items from an array
+- **`replace`** - Replace item in an array with different one, by reference to it
 - **`flatten`** - Flattens a nested array into a one-level array
 
 ### Object
