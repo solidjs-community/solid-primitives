@@ -1,9 +1,11 @@
 import {
   access,
   accessArray,
+  AnyClass,
   ItemsOf,
   MaybeAccessor,
-  MaybeAccessorValue
+  MaybeAccessorValue,
+  ofClass
 } from "@solid-primitives/utils";
 import * as _ from "@solid-primitives/immutable";
 import { Accessor, createMemo } from "solid-js";
@@ -116,5 +118,31 @@ export const concat = <A extends MaybeAccessor<any>[], V extends MaybeAccessorVa
 ): Accessor<Array<V extends any[] ? ItemsOf<V> : V>> =>
   createMemo(() => _.concat(...accessArray(a)));
 
+/**
+ * Signal builder: Flattens a nested array into a one-level array
+ */
 export const flatten = <T extends any[]>(list: MaybeAccessor<T>): Accessor<FlattenArray<T>> =>
   createMemo(() => _.flatten(access(list)) as FlattenArray<T>);
+
+/**
+ * Signal builder: filter list: only leave items that are instances of specified Classes
+ */
+export const filterInstance = <T, I extends AnyClass[]>(list: MaybeAccessor<T[]>, ...classes: I) =>
+  (classes.length === 1
+    ? createMemo(() => access(list).filter(item => ofClass(item, classes[0])))
+    : createMemo(() =>
+        access(list).filter(item => item && classes.some(c => ofClass(item, c)))
+      )) as Accessor<Extract<T, InstanceType<ItemsOf<I>>>[]>;
+
+/**
+ * Signal builder: filter list: remove items that are instances of specified Classes
+ */
+export const filterOutInstance = <T, I extends AnyClass[]>(
+  list: MaybeAccessor<T[]>,
+  ...classes: I
+) =>
+  (classes.length === 1
+    ? createMemo(() => access(list).filter(item => item && !ofClass(item, classes[0])))
+    : createMemo(() =>
+        access(list).filter(item => item && !classes.some(c => ofClass(item, c)))
+      )) as Accessor<Exclude<T, InstanceType<ItemsOf<I>>>[]>;

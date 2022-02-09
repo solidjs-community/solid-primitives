@@ -1,4 +1,4 @@
-import { push, sort, spread } from "../src";
+import { filterInstance, filterOutInstance, push, sort, spread } from "../src";
 import { createRoot, createSignal } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
@@ -29,6 +29,23 @@ test("spread", () =>
     assert.is(first(), 5);
     assert.is(second(), 6);
     assert.is(last(), 7);
+    dispose();
+  }));
+
+test("filter instances", () =>
+  createRoot(dispose => {
+    const num = 12345;
+    const string = "hello";
+    const el = document.createElement("div");
+    const svg = document.createElement("svg");
+    const list = [num, string, el, svg, string, null, undefined, NaN];
+    const copy = [num, string, el, svg, string, null, undefined, NaN];
+
+    const a = filterInstance(() => list, Element, Number);
+    assert.equal(a(), [num, el, svg]);
+    const b = filterOutInstance(() => list, Element, Number);
+    assert.equal(b(), [string, string]);
+    assert.equal(list, copy, "nonmutable");
     dispose();
   }));
 
