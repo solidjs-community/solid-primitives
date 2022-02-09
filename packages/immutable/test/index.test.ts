@@ -1,4 +1,14 @@
-import { update, concat, split, get, sortBy, merge, removeItems } from "../src";
+import {
+  update,
+  concat,
+  split,
+  get,
+  sortBy,
+  merge,
+  removeItems,
+  filterInstance,
+  filterOutInstance
+} from "../src";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { cloneDeep } from "lodash";
@@ -164,3 +174,22 @@ testRemoveItems("", () => {
 });
 
 testRemoveItems.run();
+
+const testFilterInstance = suite("filterInstance");
+
+testFilterInstance("*", () => {
+  const num = 12345;
+  const string = "hello";
+  const el = document.createElement("div");
+  const svg = document.createElement("svg");
+  const list = [num, string, el, svg, string, null, undefined, NaN];
+  const copy = [num, string, el, svg, string, null, undefined, NaN];
+
+  const a = filterInstance(list, Element, Number);
+  assert.equal(a, [num, el, svg]);
+  const b = filterOutInstance(list, Element, Number);
+  assert.equal(b, [string, string]);
+  assert.equal(list, copy, "nonmutable");
+});
+
+testFilterInstance.run();

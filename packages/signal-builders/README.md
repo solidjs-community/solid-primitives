@@ -73,6 +73,9 @@ const value = clamp(multiply(int(input), add(ing, 54, 9)), 0, max);
 - **`map`** - signal-builder `Array.prototype.map()`
 - **`sort`** - signal-builder `Array.prototype.sort()`
 - **`concat`** - Append multiple arrays together
+- **`flatten`** - Flattens a nested array into a one-level array
+- **`filterInstance`** - filter list: only leave items that are instances of specified Classes
+- **`filterOutInstance`** - filter list: remove items that are instances of specified Classes
 
 ### Object/Array
 

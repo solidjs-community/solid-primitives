@@ -1,9 +1,13 @@
 import { access, accessArray, MaybeAccessor } from "@solid-primitives/utils";
 import * as _ from "@solid-primitives/immutable";
-import { createMemo } from "solid-js";
+import { Accessor, createMemo } from "solid-js";
 
 /** signal-builder `a + b + c + ...` */
-export const add = (...a: MaybeAccessor<number>[]) => createMemo(() => _.add(...accessArray(a)));
+export function add(...a: MaybeAccessor<number>[]): Accessor<number>;
+export function add(...a: MaybeAccessor<string>[]): Accessor<string>;
+export function add(...a: MaybeAccessor<any>[]): Accessor<string | number> {
+  return createMemo(() => _.add(...accessArray(a)));
+}
 
 /** signal-builder `a - b - c - ...` */
 export const substract = (a: MaybeAccessor<number>, ...b: MaybeAccessor<number>[]) =>
