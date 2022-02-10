@@ -70,14 +70,23 @@ export type DeepPartialAny<T> = {
   [P in keyof T]?: T[P] extends AnyObject ? DeepPartialAny<T[P]> : any;
 };
 
+/** `A | B => A & B` */
+export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I
+) => void
+  ? I
+  : never;
+
 export type AnyObject = Record<string, any>;
 export type AnyFunction = (...args: any[]) => any;
+export type AnyClass = abstract new (...args: any) => any;
 
+export type LiteralKey = string | number | symbol;
 export type PrimitiveValue = string | boolean | number | bigint | symbol | null | undefined;
 
 export type FalsyValue = false | 0 | "" | null | undefined;
-export type Truthy<T> = T extends FalsyValue ? never : T;
-export type Falsy<T> = T extends FalsyValue ? T : never;
+export type Truthy<T> = Exclude<T, FalsyValue>;
+export type Falsy<T> = Extract<T, FalsyValue>;
 
 /**
  * Destructible store object, with values changed to accessors
