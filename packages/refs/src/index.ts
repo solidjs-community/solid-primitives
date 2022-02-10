@@ -1,14 +1,6 @@
 import { filterInstance, remove, removeItems } from "@solid-primitives/immutable";
 import { createSubRoot } from "@solid-primitives/rootless";
-import {
-  access,
-  asArray,
-  Directive,
-  Get,
-  ItemsOf,
-  Many,
-  withAccess
-} from "@solid-primitives/utils";
+import { access, asArray, Directive, Get, ItemsOf, Many } from "@solid-primitives/utils";
 import {
   Accessor,
   children as _children,
@@ -21,7 +13,8 @@ import {
   onCleanup,
   onMount,
   untrack,
-  getOwner
+  getOwner,
+  Setter
 } from "solid-js";
 
 declare module "solid-js" {
@@ -142,12 +135,13 @@ export const unmount: Directive<Get<Element>> = (el, handler): void => {
  *    return el; // set the signal to undefined to remove it from array
  * });
  */
-export function mapRemoved<T>(
+export function mapRemoved<T extends object>(
   list: Accessor<readonly T[]>,
-  mapFn: (v: T, index: number) => Accessor<T | undefined> | undefined | void
+  mapFn: (v: T, index: Accessor<number>) => Accessor<T | undefined> | undefined | void
 ): Accessor<T[]> {
   let prevList: T[] = [];
-  const saved: T[] = [];
+  const saved = new WeakSet<T>();
+  const indexes = mapFn.length > 1 ? new WeakMap<T, Setter<number>>() : undefined;
   const owner = getOwner();
   const [items, setItems] = createSignal<T[]>([]);
 
@@ -157,10 +151,10 @@ export function mapRemoved<T>(
 
       // fast path for empty new list
       if (!_list.length) {
-        const list = [];
+        const list: T[] = [];
         for (let i = 0; i < length; i++) {
           const item = prevList[i];
-          if (saved.includes(item)) list.push(item);
+          if (saved.has(item)) list.push(item);
           else mapRemovedElement(list, item, i);
         }
         return setItems((prevList = list));
@@ -176,8 +170,9 @@ export function mapRemoved<T>(
         // item already in both lists
         if (list.includes(item)) continue;
         // item saved from previous changes
-        if (saved.includes(item)) {
+        if (saved.has(item)) {
           while (list[j] && !prevList.includes(list[j]) && ++j) {}
+          indexes?.get(item)?.(j);
           list.splice(j, 0, item);
         }
         // item removed in this change
@@ -195,30 +190,56 @@ export function mapRemoved<T>(
     toRemove = [];
   };
 
-  function mapRemovedElement(list: T[], item: T, index: number) {
+  function mapRemovedElement(list: T[], item: T, i: number) {
     createSubRoot(dispose => {
-      const sig = mapFn(item, index);
-      if (!sig) return dispose();
+      let signal: Accessor<T | undefined>, mapped: T;
+      // create index signal
+      if (indexes) {
+        const [index, setIndex] = createSignal(i);
+        const s = mapFn(item, index);
+        const m = access(s);
+        if (!m) return dispose();
+        indexes.set(m, setIndex);
+        (signal = s as Accessor<T | undefined>), (mapped = m);
+      }
+      // don't create index signal
+      else {
+        const s = (mapFn as any)(item);
+        const m = access(s);
+        if (!m) return dispose();
+        (signal = s), (mapped = m);
+      }
 
-      withAccess(sig, item => {
-        saved.push(item);
-        list.splice(index, 0, item);
-        let prev: T = item;
+      saved.add(mapped);
+      list.splice(i, 0, mapped);
+      let prev: T = mapped;
 
-        onCleanup(() => {
-          toRemove.push(prev);
+      // prettier-ignore
+      createComputed(on(signal, item => {
+        saved.delete(prev)
+        if (indexes) {
+          const set = indexes.get(prev)
+          indexes.delete(prev)
+          if (item) set && indexes.set(item, set)
+          else {
+            const list = items()
+            for (i = list.indexOf(prev); i < list.length; i++) {
+              indexes.get(list[i])?.(p => --p)
+            }
+          }
+        }
+        // remove saved item if changed to undefined
+        if (!item) {
           mutableRemove(prevList, prev);
+          // batch setItems changes
+          toRemove.push(prev);
           queueMicrotask(executeToRemove);
-        });
-        // prettier-ignore
-        createComputed(on(sig, item => {
-          mutableRemove(saved, prev);
-          if (!item) return dispose();
-          saved.push(item);
-          setItems(p => remove(p, prev, item));
-          prev = item;
-        }, { defer: true }));
-      });
+          return dispose();
+        }
+        saved.add(item);
+        setItems(p => remove(p, prev, item));
+        prev = item;
+      }, { defer: true }));
     }, owner);
   }
 

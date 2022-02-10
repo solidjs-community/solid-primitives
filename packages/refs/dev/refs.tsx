@@ -12,11 +12,11 @@ const Keep: Component<{
   props.getClear?.(stack.execute);
   const combined = mapRemoved(refs, (ref, i) => {
     const [el, setEl] = createSignal(ref);
-    console.log("REMOVED", i);
+    console.log("REMOVED", i());
     stack.push(() => setEl(undefined));
     ref.style.filter = "grayscale(100%)";
     ref.style.position = "relative";
-    ref.appendChild((<div class="absolute bg-black">{i}</div>) as Element);
+    ref.appendChild((<div class="absolute bg-black">{i()}</div>) as Element);
 
     ref.addEventListener("click", () => setEl(undefined));
 
