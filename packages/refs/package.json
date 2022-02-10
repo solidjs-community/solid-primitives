@@ -16,7 +16,6 @@
       "Ref",
       "Refs",
       "Key",
-      "Remote",
       "unmount"
     ],
     "category": "Utilities"
@@ -49,7 +48,9 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^0.1.4"
+    "@solid-primitives/utils": "^0.2.0",
+    "@solid-primitives/rootless": "^0.0.100",
+    "@solid-primitives/immutable": "^0.0.100"
   },
   "devDependencies": {
     "jsdom": "18.1.1",
