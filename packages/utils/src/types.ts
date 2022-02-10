@@ -22,6 +22,7 @@ export type Directive<P = true> = (el: Element, props: Accessor<P>) => void;
  * Infers the type of the array elements
  */
 export type ItemsOf<T> = T extends (infer E)[] ? E : never;
+export type ItemsOfMany<T> = T extends any[] ? ItemsOf<T> : T;
 
 /**
  * T or a reactive/non-reactive function returning T
@@ -76,6 +77,8 @@ export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) ex
 ) => void
   ? I
   : never;
+
+export type ExtractIfPossible<T, U> = Extract<T, U> extends never ? U : Extract<T, U>;
 
 export type AnyObject = Record<string, any>;
 export type AnyFunction = (...args: any[]) => any;
