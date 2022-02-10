@@ -1,6 +1,14 @@
 import { filterInstance, remove, removeItems } from "@solid-primitives/immutable";
 import { createSubRoot } from "@solid-primitives/rootless";
-import { access, asArray, Directive, Get, ItemsOf, Many } from "@solid-primitives/utils";
+import {
+  access,
+  asArray,
+  Directive,
+  ExtractIfPossible,
+  Get,
+  ItemsOf,
+  Many
+} from "@solid-primitives/utils";
 import {
   Accessor,
   children as _children,
@@ -34,6 +42,12 @@ const mutableRemove = <T>(list: T[], item: T): void => {
   list.splice(index, 1);
 };
 
+/**
+ * Which elements got added to the array, and which got removed?
+ * @param prevList Array before change
+ * @param list Array after change
+ * @returns `[added items, removed items]`
+ */
 export function getChangedItems<T>(
   prevList: readonly T[],
   list: readonly T[]
@@ -47,8 +61,20 @@ export function getChangedItems<T>(
   }
   return [added, prev];
 }
+/**
+ * Which elements got added to the array?
+ * @param prevList Array before change
+ * @param list Array after change
+ * @returns list of added items
+ */
 export const getAddedItems = <T>(prevList: readonly T[], list: readonly T[]): T[] =>
   list.filter(item => !prevList.includes(item));
+/**
+ * Which elements got removed from the array?
+ * @param prevList Array before change
+ * @param list Array after change
+ * @returns list of removed items
+ */
 export const getRemovedItems = <T>(prevList: readonly T[], list: readonly T[]): T[] =>
   prevList.filter(item => !list.includes(item));
 
@@ -64,15 +90,29 @@ export const getRemovedItems = <T>(prevList: readonly T[], list: readonly T[]): 
 //   return v instanceof Element && (!type || type === v.tagName.toLowerCase());
 // }
 
-export function elements(fn: Accessor<ResolvedJSXElement>): Accessor<Element[]>;
-export function elements<T extends typeof Element[]>(
-  fn: Accessor<ResolvedJSXElement>,
+// cannot be used, because of typescript not unwrapping this type, so it doesn't give proper feedback
+type SignalElementFrom<S, T extends typeof Element[] = [typeof Element]> = Accessor<
+  ExtractIfPossible<S, InstanceType<ItemsOf<T>>>[]
+>;
+
+/**
+ * Filter out non-element items from a signal array.
+ * @param fn Array signal
+ * @returns Array signal
+ * @example
+ * const resolved = children(() => props.children);
+ * const refs = elements(resolved);
+ * refs() // T: Element[]
+ * // or narrow down type of the Element
+ * const refs = elements(resolved, HTMLElement);
+ * refs() // T: HTMLElement[]
+ */
+export function elements<S>(fn: Accessor<Many<S>>): Accessor<ExtractIfPossible<S, Element>[]>;
+export function elements<S, T extends typeof Element[]>(
+  fn: Accessor<Many<S>>,
   ...types: T
-): Accessor<InstanceType<ItemsOf<T>>[]>;
-export function elements(
-  fn: Accessor<ResolvedJSXElement>,
-  ...types: typeof Element[]
-): Accessor<Element[]> {
+): Accessor<ExtractIfPossible<S, InstanceType<ItemsOf<T>>>[]>;
+export function elements(fn: Accessor<any>, ...types: typeof Element[]): Accessor<Element[]> {
   return createMemo(() => filterInstance(asArray(fn()), ...(types.length ? types : [Element])));
 }
 
@@ -87,19 +127,23 @@ export function elements(
  * added() // => [...]
  * removed() // => [...]
  */
-export function refs(
-  fn: Accessor<ResolvedJSXElement>
-): [refs: Accessor<Element[]>, added: Accessor<Element[]>, removed: Accessor<Element[]>];
-export function refs<T extends typeof Element[]>(
-  fn: Accessor<ResolvedJSXElement>,
+export function refs<S>(
+  fn: Accessor<Many<S>>
+): [
+  refs: Accessor<ExtractIfPossible<S, Element>[]>,
+  added: Accessor<ExtractIfPossible<S, Element>[]>,
+  removed: Accessor<ExtractIfPossible<S, Element>[]>
+];
+export function refs<S, T extends typeof Element[]>(
+  fn: Accessor<Many<S>>,
   ...types: T
 ): [
-  refs: Accessor<InstanceType<ItemsOf<T>>[]>,
-  added: Accessor<InstanceType<ItemsOf<T>>[]>,
-  removed: Accessor<InstanceType<ItemsOf<T>>[]>
+  refs: Accessor<ExtractIfPossible<S, InstanceType<ItemsOf<T>>>[]>,
+  added: Accessor<ExtractIfPossible<S, InstanceType<ItemsOf<T>>>[]>,
+  removed: Accessor<ExtractIfPossible<S, InstanceType<ItemsOf<T>>>[]>
 ];
 export function refs(
-  fn: Accessor<ResolvedJSXElement>,
+  fn: Accessor<any>,
   ...types: typeof Element[]
 ): [refs: Accessor<Element[]>, added: Accessor<Element[]>, removed: Accessor<Element[]>] {
   const resolved = elements(fn, ...types);
@@ -165,18 +209,22 @@ export function mapRemoved<T extends object>(
       // fast path for empty prev list
       if (!length) return setItems((prevList = list));
 
-      for (let i = 0, j = 0; i < length; i++, j++) {
-        const item = prevList[i];
+      for (let pi = 0, ni = 0; pi < length; ) {
+        const item = prevList[pi];
         // item already in both lists
-        if (list.includes(item)) continue;
+        if (list.includes(item)) pi++, ni++;
         // item saved from previous changes
-        if (saved.has(item)) {
-          while (list[j] && !prevList.includes(list[j]) && ++j) {}
-          indexes?.get(item)?.(j);
-          list.splice(j, 0, item);
+        else if (saved.has(item)) {
+          const x = prevList.indexOf(list[ni]);
+          if (x !== -1 && x <= pi) ni++;
+          else {
+            list.splice(ni, 0, item);
+            indexes?.get(item)?.(ni);
+            pi++;
+          }
         }
         // item removed in this change
-        else mapRemovedElement(list, item, j);
+        else mapRemovedElement(list, item, pi), pi++;
       }
 
       setItems((prevList = list));

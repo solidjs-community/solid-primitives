@@ -26,7 +26,7 @@ const Keep: Component<{
 };
 
 const App: Component = () => {
-  const [show, setShow] = createSignal(true);
+  const [show, setShow] = createSignal(false);
   const [show1, setShow1] = createSignal(false);
   const [show2, setShow2] = createSignal(true);
   const [showWrapper, setShowWrapper] = createSignal(true);
@@ -66,32 +66,32 @@ const App: Component = () => {
         </button>
       </div>
       <div class="wrapper-h flex-wrap">
-        <Refs onChange={e => console.log(e)} refs={setRefs}>
-          <Keep getClear={fn => (clear = fn)}>
-            <Show when={showWrapper()}>
-              <p>Hello</p>
-              World
-              {show() && <div class="node">ID 0</div>}
-              <Ref<HTMLDivElement>
+        {/* <Refs onChange={e => console.log(e)} refs={setRefs}> */}
+        <Keep getClear={fn => (clear = fn)}>
+          <Show when={showWrapper()}>
+            <p>Hello</p>
+            World
+            {show() && <div class="node">ID 0</div>}
+            {/* <Ref<HTMLDivElement>
                 ref={el => console.log(el)}
                 onMount={el => console.log("Mounted", el)}
-              >
-                <Show when={show1()}>
-                  <div class="node">ID 1</div>
-                </Show>
-              </Ref>
-              <Show when={show2()}>
-                <div class="node" use:unmount={el => console.log("Unmounted", el)}>
-                  ID 2
-                </div>
-                <div class="node">ID 3</div>
-              </Show>
-              <For each={Array.from({ length: count() }, (_, i) => i)}>
-                {i => <div class="node bg-yellow-600">{i + 1}.</div>}
-              </For>
+              > */}
+            <Show when={show1()}>
+              <div class="node">ID 1</div>
             </Show>
-          </Keep>
-        </Refs>
+            {/* </Ref> */}
+            <Show when={show2()}>
+              <div class="node" use:unmount={el => console.log("Unmounted", el)}>
+                ID 2
+              </div>
+              <div class="node">ID 3</div>
+            </Show>
+            <For each={Array.from({ length: count() }, (_, i) => i)}>
+              {i => <div class="node bg-yellow-600">{i + 1}.</div>}
+            </For>
+          </Show>
+        </Keep>
+        {/* </Refs> */}
       </div>
     </>
   );
