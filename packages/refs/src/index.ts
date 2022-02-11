@@ -12,7 +12,6 @@ import {
 import {
   Accessor,
   children as _children,
-  Component,
   createComputed,
   createMemo,
   createSignal,
@@ -385,16 +384,4 @@ export const Ref = <U extends Element>(props: {
   });
 
   return resolved;
-};
-
-/**
- * Causes the children to rerender when the `key` changes.
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/refs#Key
- */
-export const Key: Component<{ key: any }> = props => {
-  const key = createMemo(() => props.key);
-  return createMemo(() => {
-    key();
-    return props.children;
-  });
 };

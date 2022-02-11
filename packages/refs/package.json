@@ -16,9 +16,9 @@
       "elements",
       "refs",
       "mapRemoved",
+      "Children",
       "Refs",
       "Ref",
-      "Key",
       "unmount"
     ],
     "category": "Control Flow"
