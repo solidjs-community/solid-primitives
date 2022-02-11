@@ -1,6 +1,6 @@
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
-import { createRoot, createSignal, mapArray } from "solid-js";
+import { createRoot, createSignal } from "solid-js";
 import {
   elements,
   getAddedItems,
@@ -147,6 +147,66 @@ testMapRemoved("returns combined array", () =>
 
     setSource(() => [el4, el5, el1]);
     assert.equal(res(), [el4, el3, el5, el1]);
+
+    dispose();
+  })
+);
+
+testMapRemoved("removeing saved element", () =>
+  createRoot(dispose => {
+    const _source = [el1, el2, el3, el5];
+    const [source, setSource] = createSignal(_source);
+    const fns = [];
+
+    const res = mapRemoved(source, ref => {
+      const [el, setEl] = createSignal(ref);
+      fns.push(() => setEl(undefined));
+      return el;
+    });
+
+    setSource(p => remove(p, el3));
+    assert.equal(res(), [el1, el2, el3, el5]);
+
+    fns.forEach(fn => fn());
+    assert.equal(res(), [el1, el2, el5]);
+
+    setSource(p => removeItems(p, el2, el1));
+    assert.equal(res(), [el1, el2, el5]);
+
+    fns.forEach(fn => fn());
+    assert.equal(res(), [el5]);
+
+    dispose();
+  })
+);
+
+testMapRemoved("index signal", () =>
+  createRoot(dispose => {
+    const _source = [el1, el2, el3, el5];
+    const [source, setSource] = createSignal(_source);
+    const saved = new Map<Element, () => number>();
+
+    let returns = true;
+    mapRemoved(source, (el, index) => {
+      saved.set(el, index);
+      return returns ? () => el : undefined;
+    });
+
+    setSource(p => remove(p, el3));
+    assert.is(saved.get(el3)(), 2);
+
+    returns = false;
+    setSource(p => remove(p, el2));
+    assert.is(saved.get(el3)(), 1);
+
+    setSource(p => [el4, ...p]);
+    assert.is(saved.get(el3)(), 2);
+
+    setSource([]);
+    assert.is(saved.get(el3)(), 0);
+
+    setSource([el1, el2, el4, el5]);
+    assert.is(saved.get(el3)(), 0);
 
     dispose();
   })

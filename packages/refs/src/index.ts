@@ -96,7 +96,7 @@ type SignalElementFrom<S, T extends typeof Element[] = [typeof Element]> = Acces
 >;
 
 /**
- * Filter out non-element items from a signal array.
+ * Reactive signal that filters out non-element items from a signal array.
  * @param fn Array signal
  * @returns Array signal
  * @example
@@ -179,32 +179,20 @@ export const unmount: Directive<Get<Element>> = (el, handler): void => {
  *    return el; // set the signal to undefined to remove it from array
  * });
  */
-export function mapRemoved<T extends object>(
-  list: Accessor<readonly T[]>,
+export function mapRemoved<T>(
+  list: Accessor<Many<T>>,
   mapFn: (v: T, index: Accessor<number>) => Accessor<T | undefined> | undefined | void
 ): Accessor<T[]> {
   let prevList: T[] = [];
-  const saved = new WeakSet<T>();
-  const indexes = mapFn.length > 1 ? new WeakMap<T, Setter<number>>() : undefined;
+  const saved = new Set<T>();
+  const indexes = mapFn.length > 1 ? new Map<T, Setter<number>>() : undefined;
   const owner = getOwner();
   const [items, setItems] = createSignal<T[]>([]);
 
   createComputed(
     on(list, _list => {
       const { length } = prevList;
-
-      // fast path for empty new list
-      if (!_list.length) {
-        const list: T[] = [];
-        for (let i = 0; i < length; i++) {
-          const item = prevList[i];
-          if (saved.has(item)) list.push(item);
-          else mapRemovedElement(list, item, i);
-        }
-        return setItems((prevList = list));
-      }
-
-      const list = _list.slice();
+      const list = asArray(_list).slice();
 
       // fast path for empty prev list
       if (!length) return setItems((prevList = list));
