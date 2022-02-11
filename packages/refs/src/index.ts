@@ -321,18 +321,27 @@ export const Refs = <E extends Element>(props: {
   children: JSX.Element;
 }): Accessor<ResolvedJSXElement> => {
   const resolved = children(() => props.children);
-  const [elements, added, removed] = refs(resolved);
 
-  const emit = (refs: E[], added: E[], removed: E[]) =>
-    untrack(() => {
-      props.refs?.(refs);
-      props.added?.(added);
-      props.removed?.(removed);
-      props.onChange?.({ refs, added, removed });
-    });
-
-  createComputed(() => emit(elements() as E[], added() as E[], removed() as E[]));
-  onCleanup(() => emit([], [], elements() as E[]));
+  // calculate changed elements only if user listens for it
+  if (props.added || props.removed || props.onChange) {
+    const [elements, added, removed] = refs(resolved);
+    const emit = (refs: E[], added: E[], removed: E[]) =>
+      untrack(() => {
+        props.refs?.(refs);
+        props.added?.(added);
+        props.removed?.(removed);
+        props.onChange?.({ refs, added, removed });
+      });
+    createComputed(() => emit(elements() as E[], added() as E[], removed() as E[]));
+    onCleanup(() => emit([], [], elements() as E[]));
+  }
+  // or emit only the current elements
+  else if (props.refs) {
+    const cb = props.refs;
+    const refs = elements(resolved);
+    createComputed(() => cb(refs() as E[]));
+    onCleanup(() => cb([]));
+  }
 
   return resolved;
 };
