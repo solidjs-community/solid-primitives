@@ -5,7 +5,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/refs?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/refs)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
-Collection of primitives, components and directives that help managing references to JSX elements, keeping track of mounted/unmounted elements.
+Collection of primitives, components and directives that help managing references to JSX elements, keeping track of mounted elements.
 
 ##### Primitives:
 
@@ -22,6 +22,7 @@ Collection of primitives, components and directives that help managing reference
 - [`<Children>`](#<Children>) - Solid's `children` helper in component form. Access it's children elements by `get` property.
 - [`<Refs>`](#<Refs>) - Get up-to-date references of the multiple children elements.
 - [`<Ref>`](#<Ref>) - Get up-to-date reference to a single child element.
+- [`<Key>`](#<Key>) - Causes the children to rerender when the `key` changes.
 
 ##### Vanilla helpers:
 
@@ -152,7 +153,7 @@ const [ref, setRef] = createSignal<Element | undefined>();
 
 ---
 
-### `<Children>`
+### `Children`
 
 Solid's `children` helper in component form. Access it's children elements by `get` property.
 
@@ -170,7 +171,7 @@ const [children, setChildren] = createSignal<ResolvedJSXElement>([])
 </Children>
 ```
 
-### `<Ref>`
+### `Ref`
 
 Get up-to-date reference to a single child element.
 
@@ -214,7 +215,7 @@ const [ref, setRef] = createSignal<Element | undefined>();
 </Ref>
 ```
 
-### `<Refs>`
+### `Refs`
 
 Get up-to-date references of the multiple children elements.
 
@@ -263,6 +264,41 @@ const [refs, setRefs] = createSignal<Element[]>([]);
 </Refs>
 ```
 
+### `Key`
+
+Causes the children to rerender when the `key` changes.
+
+#### Import
+
+```ts
+import { Key } from "@solid-primitives/refs";
+```
+
+#### How to use it
+
+You have to provide a `key` prop. Changing it, will cause the children to rerender.
+
+```tsx
+const [count, setCount] = createSignal(0);
+
+// will rerender whole <button>, instead of just text
+<Key key={count()}>
+  <button onClick={() => setCount(p => ++p)}>{count()}</button>
+</Key>;
+```
+
+##### Using with Transition
+
+`<Key>` can be used together with [`solid-transition-group`](#https://github.com/solidjs/solid-transition-group) to animate single component's transition, on state change.
+
+```tsx
+<Transition name="your-animation" mode="out-in">
+  <Key key={count()}>
+    <button onClick={() => setCount(p => ++p)}>{count()}</button>
+  </Key>
+</Transition>
+```
+
 ## Demo
 
 https://stackblitz.com/edit/solid-vite-unocss-bkbgap?file=index.tsx
@@ -276,6 +312,6 @@ https://stackblitz.com/edit/solid-vite-unocss-bkbgap?file=index.tsx
 
 0.0.100
 
-Initial release as a Stage-1 primitive.
+Initial release as a Stage-0 primitive.
 
 </details>
