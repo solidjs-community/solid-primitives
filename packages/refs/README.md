@@ -19,9 +19,9 @@ Collection of primitives, components and directives that help managing reference
 
 ##### Components:
 
-- [`<Children>`](#<Children>) - Solid's `children` helper in component form. Access it's children elements by `get` property.
-- [`<Refs>`](#<Refs>) - Get up-to-date references of the multiple children elements.
-- [`<Ref>`](#<Ref>) - Get up-to-date reference to a single child element.
+- [`<Children>`](#children) - Solid's `children` helper in component form. Access it's children elements by `get` property.
+- [`<Refs>`](#refs-1) - Get up-to-date references of the multiple children elements.
+- [`<Ref>`](#ref) - Get up-to-date reference to a single child element.
 
 ##### Vanilla helpers:
 
