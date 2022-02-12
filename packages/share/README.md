@@ -31,7 +31,7 @@ share(facebook);
 
 ## Demo
 
-You may view a working example here: [ link to Stackblize or CodeSandBox ]
+You may view a working example here: [ link to Stackblitz or CodeSandBox ]
 
 ## Changelog
 

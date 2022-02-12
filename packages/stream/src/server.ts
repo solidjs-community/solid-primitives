@@ -1,15 +1,17 @@
-import type { Accessor, Resource } from "solid-js";
+import type { Accessor, Resource, Setter } from "solid-js";
 import type { StreamReturn } from "./index";
 
 const noop = {
-  stream: new Proxy({}, {}) as Resource<undefined>,
-  mutate: () => {
+  stream: Object.assign(() => undefined, { loading: true, error: undefined }) as Resource<MediaStream | undefined>,
+  mutate: (() => {
     /*noop*/
-  },
+  }) as Setter<MediaStream | undefined>,
   refetch: () => {
     /*noop*/
   },
-  stop
+  stop: () => {
+    /*noop*/
+  }
 };
 
 export const createStream = (
