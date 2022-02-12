@@ -1,24 +1,21 @@
 {
-  "name": "@solid-primitives/rootless",
+  "name": "@solid-primitives/immutable",
   "version": "0.0.100",
-  "description": "A template primitive example.",
+  "description": "Functional programming helpers for making non-mutating changes to data. Keeping it immutable.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/rootless#readme",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/immutable#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
   "primitive": {
-    "name": "rootless",
+    "name": "immutable",
     "stage": 1,
     "list": [
-      "createSubRoot",
-      "createCallback",
-      "runWithRoot",
-      "runWithSubRoot"
+      "List of functions"
     ],
-    "category": "Reactivity"
+    "category": "Utilities"
   },
   "private": false,
   "sideEffects": false,
@@ -34,6 +31,8 @@
     "test": "uvu -r solid-register"
   },
   "keywords": [
+    "fp",
+    "immutable",
     "solid",
     "primitives"
   ],
@@ -47,9 +46,8 @@
     "tslib": "^2.3.1",
     "typescript": "^4.5.4",
     "tsup": "^5.11.11",
-    "uvu": "^0.5.2"
-  },
-  "peerDependencies": {
-    "solid-js": "^1.3.1"
+    "uvu": "^0.5.2",
+    "lodash.clonedeep": "^4.5.0",
+    "@types/lodash.clonedeep": "^4.5.6"
   }
 }

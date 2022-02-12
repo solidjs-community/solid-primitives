@@ -20,9 +20,6 @@ export type Noop = (...a: any[]) => void;
  */
 export type ItemsOf<T> = T extends (infer E)[] ? E : never;
 
-export type Predicate<T> = (item: T, index: number, array: readonly T[]) => boolean;
-export type MappingFn<T, V> = (item: T, index: number, array: readonly T[]) => V;
-
 /**
  * T or a reactive/non-reactive function returning T
  */

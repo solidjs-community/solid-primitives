@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/utils",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "A bunch of reactive utility types and functions, for building primitives with Solid.js",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -18,33 +18,6 @@
   "files": [
     "dist"
   ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
-    },
-    "./fp": {
-      "types": "./dist/fp.d.ts",
-      "require": "./dist/fp.cjs",
-      "import": "./dist/fp.js"
-    },
-    "./setter": {
-      "types": "./dist/setter.d.ts",
-      "require": "./dist/setter.cjs",
-      "import": "./dist/setter.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "fp": [
-        "./dist/fp.d.ts"
-      ],
-      "setter": [
-        "./dist/setter.d.ts"
-      ]
-    }
-  },
   "scripts": {
     "build": "tsup",
     "test": "uvu -r solid-register",
