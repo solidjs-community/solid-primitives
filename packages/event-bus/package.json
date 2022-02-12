@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-bus",
-  "version": "0.0.110",
+  "version": "0.0.112",
   "description": "A collection of SolidJS primitives providing various features of a pubsub/event-emitter/event-bus.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -54,10 +54,10 @@
     "tslib": "^2.3.1",
     "tsup": "^5.11.9",
     "typescript": "^4.5.4",
-    "unocss": "0.21.2",
+    "unocss": "0.24.3",
     "uvu": "^0.5.2",
-    "vite": "2.7.10",
-    "vite-plugin-solid": "2.2.1"
+    "vite": "2.8.1",
+    "vite-plugin-solid": "2.2.5"
   },
   "peerDependencies": {
     "solid-js": "^1.3.1"

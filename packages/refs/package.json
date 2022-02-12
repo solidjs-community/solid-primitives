@@ -57,9 +57,9 @@
     "typescript": "^4.5.4",
     "tsup": "^5.11.11",
     "uvu": "^0.5.2",
-    "unocss": "0.22.2",
-    "vite": "2.7.12",
-    "vite-plugin-solid": "2.2.2",
+    "unocss": "0.24.3",
+    "vite": "2.8.1",
+    "vite-plugin-solid": "2.2.5",
     "solid-transition-group": "^0.0.8",
     "solid-app-router": "^0.2.1"
   },
