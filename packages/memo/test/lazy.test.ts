@@ -1,5 +1,5 @@
 import { createLazyMemo } from "../src";
-import { createEffect, createRoot, createSignal } from "solid-js";
+import { createComputed, createEffect, createRoot, createSignal } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
@@ -99,6 +99,7 @@ test("will be running even if some of the reading roots are disposed", () =>
     });
 
     setCount(1);
+
     assert.is(runs, 2, "ran twice");
 
     dispose1();
@@ -115,58 +116,43 @@ test("will be running even if some of the reading roots are disposed", () =>
 test("initial value if NOT set in options", () =>
   createRoot(dispose => {
     const [count, setCount] = createSignal(0);
-    let runs = 0;
-    const memo = createLazyMemo(() => {
-      runs++;
+    let capturedPrev: any;
+    const memo = createLazyMemo(prev => {
+      capturedPrev = prev;
       return count();
     });
     const captured: any[] = [];
-    createEffect(() => captured.push(memo()));
 
-    setTimeout(() => {
-      assert.equal(captured, [undefined, 0]);
-      dispose();
-    }, 0);
+    createComputed(() => captured.push(memo()));
+    assert.equal(captured, [0]);
+    assert.equal(capturedPrev, undefined);
+
+    setCount(1);
+    assert.equal(captured, [0, 1]);
+    assert.equal(capturedPrev, 0);
+
+    dispose();
   }));
 
-test("initial value if set in options", () =>
+test("initial value if NOT set in options", () =>
   createRoot(dispose => {
-    const [count] = createSignal(0);
-    let runs = 0;
-    const memo = createLazyMemo(
-      () => {
-        runs++;
-        return count();
-      },
-      { value: 5 }
-    );
+    const [count, setCount] = createSignal(0);
+    let capturedPrev: any;
+    const memo = createLazyMemo(prev => {
+      capturedPrev = prev;
+      return count();
+    }, 123);
     const captured: any[] = [];
-    createEffect(() => captured.push(memo()));
 
-    setTimeout(() => {
-      assert.equal(captured, [5, 0]);
-      dispose();
-    }, 0);
-  }));
+    createComputed(() => captured.push(memo()));
+    assert.equal(captured, [0]);
+    assert.equal(capturedPrev, 123);
 
-test("initial value if enabled initial run", () =>
-  createRoot(dispose => {
-    const [count] = createSignal(0);
-    let runs = 0;
-    const memo = createLazyMemo(
-      () => {
-        runs++;
-        return count();
-      },
-      { init: true }
-    );
-    const captured: any[] = [];
-    createEffect(() => captured.push(memo()));
+    setCount(1);
+    assert.equal(captured, [0, 1]);
+    assert.equal(capturedPrev, 0);
 
-    setTimeout(() => {
-      assert.equal(captured, [0]);
-      dispose();
-    }, 0);
+    dispose();
   }));
 
 test.run();

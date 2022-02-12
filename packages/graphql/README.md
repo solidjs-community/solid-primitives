@@ -17,6 +17,22 @@ yarn add @solid-primitives/graphql
 
 ## How to use it
 
+#### Import
+
+```ts
+import { createGraphQLClient, gql, request } from "@solid-primitives/graphql";
+// gql is a helper for creating GraphQL query strings
+// request is an additional function to perform GraphQL requests imperatively
+```
+
+#### Using the client
+
+`createGraphQLClient` takes 3 arguments:
+
+- `url` - target api endpoint, as string or signal
+- `headers` - _optional_, A list of request headers to supply the client
+- `fetchFn` - _optional_, A fetch function to replace the default one, that is Fetch API on browser and `node-fetch` on server.
+
 ```ts
 import { createGraphQLClient, gql } from "@solid-primitives/graphql";
 
@@ -35,6 +51,18 @@ const [data, { refetch }] = newQuery(
 );
 ```
 
+#### Preventing immediate requests
+
+Query function is based on `createResource`, so it can be deferred in the same way - by passing `false` to the variables.
+
+```ts
+const newQuery = createGraphQLClient("https://foobar.com/v1/api");
+const [data, { refetch }] = newQuery(somequery, false);
+
+// later
+refetch();
+```
+
 #### Providing Response Type
 
 ```ts
@@ -48,6 +76,28 @@ const [countries] = newQuery<{ countries: { name: string }[] }>(
       }
     }
   `
+);
+countries(); // T: { countries: { name: string }[] } | undefined
+```
+
+#### Initial value
+
+By default the returned data type will be `T | undefined`, to make it always `T` you need to provide an initial value.
+
+```ts
+const [countries] = newQuery<{ countries: { name: string }[] }>(
+  gql`
+    query {
+      countries {
+        name
+        code
+      }
+    }
+  `,
+  // no variables
+  undefined,
+  // the initial value
+  { countries: [] }
 );
 countries(); // T: { countries: { name: string }[] }
 ```

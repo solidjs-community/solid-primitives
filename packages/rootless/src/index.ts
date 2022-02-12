@@ -1,11 +1,16 @@
 import { AnyFunction, Fn, isDefined } from "@solid-primitives/utils";
-import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
+import { createRoot, getOwner, onCleanup, runWithOwner as _runWithOwner } from "solid-js";
 import type { Owner } from "solid-js/types/reactive/signal";
 
 export type Dispose = Fn;
-export type RunInRootReturn<T> = T extends void | undefined | null
+export type runWithRootReturn<T> = T extends void | undefined | null
   ? Dispose
   : [returns: T, dispose: Dispose];
+
+/**
+ * Solid's `runWithOwner` that allows `null` to be passed as an owner.
+ */
+export const runWithOwner = _runWithOwner as <T>(o: Owner | null, fn: () => T) => T;
 
 /**
  * Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
@@ -36,11 +41,11 @@ export function createSubRoot<T>(fn: (dispose: Dispose) => T, owner = getOwner()
  * @returns the callback function
  *
  * @example
- * const handleClick = createCallbackWithOwner(() => {
+ * const handleClick = createCallback(() => {
  *    createEffect(() => {})
  * })
  */
-export const createCallbackWithOwner = <T extends AnyFunction>(
+export const createCallback = <T extends AnyFunction>(
   callback: T,
   owner: Owner | null = getOwner()
 ): T => (owner ? (((...args) => runWithOwner(owner, () => callback(...args))) as T) : callback);
@@ -53,21 +58,21 @@ export const createCallbackWithOwner = <T extends AnyFunction>(
  * @example
  * ```ts
  * // when fn doesn't return anything
- * const dispose = runInRoot(() => createEffect(() => {
+ * const dispose = runWithRoot(() => createEffect(() => {
  *    console.log(count())
  * }));
  *
  * // when fn returns something
- * const [double, dispose] = runInRoot(
+ * const [double, dispose] = runWithRoot(
  *    () => createMemo(() => count() * 2)
  * );
  * ```
  */
-export const runInRoot = <T>(fn: () => T, detachedOwner?: Owner): RunInRootReturn<T> =>
+export const runWithRoot = <T>(fn: () => T, detachedOwner?: Owner): runWithRootReturn<T> =>
   createRoot(dispose => {
     const returns = fn();
     return isDefined(returns) ? [returns, dispose] : dispose;
-  }, detachedOwner) as RunInRootReturn<T>;
+  }, detachedOwner) as runWithRootReturn<T>;
 
 /**
  * Helper for simplifying usage of Solid's reactive primitives outside of components (reactive roots). A **sub root** will be automatically disposed when it's owner does.
@@ -77,23 +82,23 @@ export const runInRoot = <T>(fn: () => T, detachedOwner?: Owner): RunInRootRetur
  * @example
  * ```ts
  * // when fn doesn't return anything
- * const dispose = runInSubRoot(() => createEffect(() => {
+ * const dispose = runWithSubRoot(() => createEffect(() => {
  *    console.log(count())
  * }));
  *
  * // when fn returns something
- * const [double, dispose] = runInSubRoot(
+ * const [double, dispose] = runWithSubRoot(
  *    () => createMemo(() => count() * 2)
  * );
  * ```
  */
-export const runInSubRoot = <T>(fn: () => T, owner?: Owner | null): RunInRootReturn<T> =>
+export const runWithSubRoot = <T>(fn: () => T, owner?: Owner | null): runWithRootReturn<T> =>
   createSubRoot(dispose => {
     const returns = fn();
     return isDefined(returns) ? [returns, dispose] : dispose;
-  }, owner) as RunInRootReturn<T>;
+  }, owner) as runWithRootReturn<T>;
 
 // import { createEffect, createMemo, createResource } from "solid-js";
-// const [memo, del] = runInRoot(() => createMemo(() => 123));
-// const dis = runInRoot(() => createEffect(() => 123));
-// const [[data, { refetch }], dispose] = runInRoot(() => createResource(() => 123));
+// const [memo, del] = runWithRoot(() => createMemo(() => 123));
+// const dis = runWithRoot(() => createEffect(() => 123));
+// const [[data, { refetch }], dispose] = runWithRoot(() => createResource(() => 123));

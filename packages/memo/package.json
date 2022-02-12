@@ -16,7 +16,9 @@
       "createLazyMemo",
       "createAsyncMemo",
       "createDebouncedMemo",
-      "createThrottledMemo"
+      "createThrottledMemo",
+      "createPureReaction",
+      "createCache"
     ],
     "category": "Reactivity"
   },
@@ -30,8 +32,8 @@
     "dist"
   ],
   "scripts": {
-    "start": "vite serve dev",
-    "dev": "vite serve dev",
+    "start": "vite serve dev --host",
+    "dev": "yarn start",
     "build": "tsup",
     "test": "uvu -r solid-register"
   },
@@ -41,6 +43,7 @@
     "memo"
   ],
   "dependencies": {
+    "@solid-primitives/utils": "^0.2.0",
     "@solid-primitives/debounce": "^1.1.0",
     "@solid-primitives/throttle": "^1.1.0"
   },
@@ -49,12 +52,12 @@
     "prettier": "^2.5.1",
     "solid-register": "0.1.5",
     "tslib": "^2.3.1",
-    "typescript": "^4.5.3",
+    "typescript": "^4.5.4",
     "tsup": "^5.11.1",
     "uvu": "^0.5.2",
-    "unocss": "0.21.2",
-    "vite": "2.7.10",
-    "vite-plugin-solid": "2.2.1",
+    "unocss": "^0.22.4",
+    "vite": "^2.7.12",
+    "vite-plugin-solid": "^2.2.3",
     "solid-app-router": "^0.2.0",
     "@solid-primitives/mouse": "^1.0.2"
   },

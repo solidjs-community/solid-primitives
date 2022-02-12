@@ -1,4 +1,4 @@
-import { createRoot } from "solid-js";
+import { createEffect, createRoot, Resource } from "solid-js";
 import { createGeolocation, createGeolocationWatcher } from "../src/index";
 import waitForExpect from "wait-for-expect";
 
@@ -19,12 +19,14 @@ describe("createGeolocation", () => {
   test("test basic geolocation error", async () => {
     const geoSpy = jest.spyOn(navigator.geolocation, "getCurrentPosition");
     geoSpy.mockImplementation(
-      jest.fn(
-        (_, error) =>
-          error && error({ code: 1, message: "Geolocation error" } as GeolocationPositionError)
+      jest.fn((_, error) =>
+        error!({ code: 1, message: "GeoLocation error" } as GeolocationPositionError)
       )
     );
     const [location] = createRoot(() => createGeolocation());
+
+    await waitForResourceLoad(location);
+
     // expect(location.loading).toBe(false);
     expect(location.error).toEqual({
       code: 1,
@@ -39,3 +41,16 @@ describe("createGeolocation", () => {
     });
   });
 });
+
+async function waitForResourceLoad(resource: Resource<any>) {
+  await new Promise<void>(resolve => {
+    createRoot(stop => {
+      createEffect(() => {
+        if (!resource.loading) {
+          resolve();
+          stop();
+        }
+      });
+    });
+  });
+}

@@ -27,16 +27,19 @@ const App: Component = () => {
     `,
     () => ({
       code: code()
-    })
+    }),
+    { country: { name: "loading..." } }
   );
 
   return (
     <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
       <h3>Get country by code</h3>
       <input value={code()} oninput={e => setCode(e.currentTarget.value.toUpperCase())}></input>
-      <Show when={countryData()}>
-        {({ country }) => <h4>{country ? country.name : "not found"}</h4>}
-      </Show>
+      <h4>
+        <Show when={countryData()?.country?.name} fallback="not found">
+          {name => name}
+        </Show>
+      </h4>
       <h3>Countries:</h3>
       <Show when={countriesData()}>
         <ul>
