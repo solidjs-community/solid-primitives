@@ -3,6 +3,7 @@ import type { EffectFunction, NoInfer, OnOptions } from "solid-js/types/reactive
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import type {
+  AnyClass,
   Destore,
   Fn,
   ItemsOf,
@@ -37,6 +38,9 @@ export const isString = (val: unknown): val is string => typeof val === "string"
 export const isObject = (val: any): val is object => toString.call(val) === "[object Object]";
 export const isArray = (val: any): val is any[] => Array.isArray(val);
 
+export const ofClass = (v: any, c: AnyClass): boolean =>
+  v instanceof c || (v && v.constructor === c);
+
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
 
 /**
@@ -46,6 +50,14 @@ export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
  * // users: [string, string, string]
  */
 export const tuple = <T extends [] | any[]>(input: T): T => input;
+
+/** `Array.prototype.includes()` without so strict types. Also allows for checking for multiple items */
+export const includes = (arr: any[], ...items: any): boolean => {
+  for (const item of arr) {
+    if (items.includes(item)) return true;
+  }
+  return false;
+};
 
 /**
  * Accesses the value of a MaybeAccessor
