@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/keyed",
   "version": "0.0.100",
-  "description": "",
+  "description": "Control Flow primitives and components that require specifying explicit keys to identify or rerender elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/keyed#readme",
@@ -12,7 +12,11 @@
   "primitive": {
     "name": "keyed",
     "stage": 1,
-    "list": [],
+    "list": [
+      "mapKey",
+      "Key",
+      "Rerun"
+    ],
     "category": "Control Flow"
   },
   "private": false,
@@ -31,8 +35,8 @@
     "test": "uvu -r solid-register"
   },
   "keywords": [
-    "elements",
-    "ref",
+    "key",
+    "control-flow",
     "solid",
     "primitives"
   ],

@@ -1,7 +1,8 @@
 import { Refs } from "@solid-primitives/refs";
-import { splice } from "@solid-primitives/immutable";
+import { splice, update } from "@solid-primitives/immutable";
 import { createSignal } from "solid-js";
 import { Key } from "../src";
+import { TransitionGroup } from "solid-transition-group";
 
 const foods = [
   "oatmeal",
@@ -30,7 +31,8 @@ const foods = [
   "chips",
   "cookie"
 ];
-const getRandomFood = () => foods[Math.floor(Math.random() * foods.length)];
+const randomIndex = (list: readonly any[]): number => Math.floor(Math.random() * list.length);
+const getRandomFood = () => foods[randomIndex(foods)];
 
 export default function App() {
   const [list, setList] = createSignal<{ id: number; value: string }[]>([
@@ -46,47 +48,57 @@ export default function App() {
       const is = list().find(item => i === item.id);
       if (!is) {
         setList(p => splice(p, i, 0, { id: i, value: getRandomFood() }));
+        return;
       }
     }
   };
-
-  const [aliveCheck, setAliveCheck] = createSignal("/");
-  setInterval(() => setAliveCheck(p => (p === "/" ? "\\" : "/")), 500);
+  const removeRandom = () => setList(p => splice(p, randomIndex(p), 1));
+  const shuffle = () => setList(p => p.slice().sort(() => Math.random() - 0.5));
+  const cloneList = () => setList(p => JSON.parse(JSON.stringify(p)));
+  const changeRandomValue = () => setList(p => update(p, randomIndex(p), "value", getRandomFood()));
 
   return (
     <>
       <div class="wrapper-h">
         <button class="btn" onclick={addRandom}>
-          Add random
+          Add
         </button>
-        <button class="btn">Remove random</button>
-        <button class="btn">Shuffle</button>
+        <button class="btn" onclick={removeRandom}>
+          Remove
+        </button>
+        <button class="btn" onclick={changeRandomValue}>
+          Change value
+        </button>
+        <button class="btn" onclick={shuffle}>
+          Shuffle
+        </button>
+        <button class="btn" onclick={cloneList}>
+          Clone list
+        </button>
       </div>
-      <div class="wrapper-h">
-        <Refs
-          onChange={({ added, removed }) =>
-            console.log("Added:", added.length, "| Removed:", removed.length)
-          }
-        >
-          <Key
-            each={list()}
-            by={item => item.id}
-            fallback={
-              <p class="bg-yellow-500">
-                {aliveCheck()} No items in the list. {aliveCheck()}
-              </p>
+      <div class="wrapper-h flex-wrap">
+        <TransitionGroup name="fade">
+          <Refs
+            onChange={({ added, removed }) =>
+              console.log("Added:", added.length, "| Removed:", removed.length)
             }
           >
-            {(item, index) => (
-              <div class="node relative">
-                {index()}. {item().value}
-                <div class="absolute -bottom-2 left-2 px-1 bg-dark-500 text-light-900">
-                  ID: {item().id} {aliveCheck()}
+            <Key
+              each={list()}
+              by="id"
+              fallback={<p class="bg-yellow-500 transition-all p-1">No items in the list.</p>}
+            >
+              {(item, index) => (
+                <div class="node relative transition-all duration-500">
+                  {index()}. {item().value}
+                  <div class="absolute -bottom-2 left-2 px-1 bg-dark-500 text-light-900">
+                    ID: {item().id}
+                  </div>
                 </div>
-              </div>
-            )}
-          </Key>
-        </Refs>
+              )}
+            </Key>
+          </Refs>
+        </TransitionGroup>
       </div>
     </>
   );

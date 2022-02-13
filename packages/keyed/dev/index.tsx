@@ -20,7 +20,7 @@ const App: Component = () => {
           /rerun
         </Link>
       </nav>
-      <div class="p-24 box-border w-full min-h-screen space-y-4 bg-gray-800 text-white">
+      <div class="p-24 box-border w-full min-h-screen space-y-4 bg-gray-800 text-white overflow-hidden">
         <Routes>
           <Route path="/key" element={<Key />} />
           <Route path="/rerun" element={<Rerun />} />
