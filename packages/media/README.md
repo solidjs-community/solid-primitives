@@ -47,4 +47,8 @@ Published with CJS and SSR support.
 
 Added server entry and updated to latest Solid.
 
+1.1.11
+
+Removed onMount and returned the current media query immediately as opposed to onEffect.
+
 </details>
