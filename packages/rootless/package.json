@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/rootless",
-  "version": "0.0.100",
+  "version": "0.0.101",
   "description": "A template primitive example.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -38,7 +38,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^0.2.0"
+    "@solid-primitives/utils": "^0.2.1"
   },
   "devDependencies": {
     "jsdom": "18.1.1",

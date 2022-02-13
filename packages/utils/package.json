@@ -9,6 +9,9 @@
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
+  "bugs": {
+    "url": "https://github.com/davedbase/solid-primitives/issues"
+  },
   "private": false,
   "sideEffects": false,
   "type": "module",
