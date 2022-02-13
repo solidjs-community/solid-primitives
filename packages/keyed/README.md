@@ -3,7 +3,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/keyed?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/keyed)
 [![version](https://img.shields.io/npm/v/@solid-primitives/keyed?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/keyed)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/davedbase/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
 Control Flow primitives and components that require specifying explicit keys to identify or rerender elements.
 
@@ -111,6 +111,10 @@ Second argument of the map function is an index signal.
 </Key>
 ```
 
+### Demo
+
+https://codesandbox.io/s/solid-primitives-keyed-key-demo-gh7gd?file=/index.tsx
+
 ## `<Rerun>`
 
 Causes the children to rerender when the `on` key changes.
@@ -139,12 +143,16 @@ const [count, setCount] = createSignal(0);
 `<Rerun>` can be used together with [`solid-transition-group`](#https://github.com/solidjs/solid-transition-group) to animate single component's transition, on state change.
 
 ```tsx
-<Transition name="your-animation" mode="out-in">
+<Transition name="your-animation" mode="outin">
   <Rerun on={count()}>
     <button onClick={() => setCount(p => ++p)}>{count()}</button>
   </Rerun>
 </Transition>
 ```
+
+### DEMO
+
+https://codesandbox.io/s/solid-primitives-keyed-rerun-demo-14vjr?file=/index.tsx
 
 ## Changelog
 
