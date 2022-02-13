@@ -117,7 +117,7 @@ https://codesandbox.io/s/solid-primitives-keyed-key-demo-gh7gd?file=/index.tsx
 
 ## `<Rerun>`
 
-Causes the children to rerender when the `on` key changes.
+Causes the children to rerender when the `on` key changes. Equivalent of `v-key` in vue, and `{#key}` in svelte.
 
 ### Import
 
