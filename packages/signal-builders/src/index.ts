@@ -1,32 +1,12 @@
-import { access, AnyObject, keys, MaybeAccessor } from "@solid-primitives/utils";
-import { Accessor, createMemo, on } from "solid-js";
+import { AnyObject, keys } from "@solid-primitives/utils";
+import { Accessor } from "solid-js";
 
 // CONVERT
 export * from "./convert";
 
 // STRING
 
-/**
- * Signal builder: `String.prototype.toLowerCase()`
- */
-export const lowercase = (string: Accessor<string>) => createMemo(() => string().toLowerCase());
-/**
- * Signal builder: `String.prototype.toUpperCase()`
- */
-export const uppercase = (string: Accessor<string>) => createMemo(() => string().toUpperCase());
-/**
- * Signal builder: capitalize a string input
- */
-export const capitalize = (string: Accessor<string>) =>
-  createMemo(on(string, s => s[0].toUpperCase() + s.substring(1).toLowerCase()));
-/**
- * Signal builder: `String.prototype.substring()`
- */
-export const substring = (
-  string: MaybeAccessor<string>,
-  start: MaybeAccessor<number>,
-  end?: MaybeAccessor<number>
-) => createMemo(() => access(string).substring(access(start), access(end)));
+export * from "./string";
 
 // NUMBER
 export * from "./number";

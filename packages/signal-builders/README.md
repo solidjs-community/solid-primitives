@@ -3,7 +3,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/signal-builders?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/signal-builders)
 [![version](https://img.shields.io/npm/v/@solid-primitives/signal-builders?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/signal-builders)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/davedbase/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
 A collection of chainable and composable reactive signal calculations, _AKA_ **Signal Builders**.
 
@@ -55,6 +55,21 @@ const [ing, setIng] = createSignal(-45);
 const [max, setMax] = createSignal(1000);
 
 const value = clamp(multiply(int(input), add(ing, 54, 9)), 0, max);
+```
+
+### String
+
+```ts
+import { lowercase, substring, template, add } from "@solid-primitives/signal-builders";
+
+const [greeting, setGreeting] = createSignal("Hello");
+const [target, setTarget] = createSignal("World");
+
+const message = template`${greeting}, ${target}!`;
+message(); // => Hello, World!
+
+const solidMessage = lowercase(add(substring(message, 0, 7), "Solid"));
+solidMessage(); // => hello, solid
 ```
 
 ## List of builders
@@ -114,6 +129,7 @@ const value = clamp(multiply(int(input), add(ing, 54, 9)), 0, max);
 - **`uppercase`** - signal builder `String.prototype.toUpperCase()`
 - **`capitalize`** - capitalize a string input e.g. `"solidJS"` -> `"Solidjs"`
 - **`substring`** - signal builder `String.prototype.substring()`
+- **`template`** - Create reactive string templates
 
 ### Special
 
@@ -143,5 +159,10 @@ age(); // => 36
 0.0.100
 
 Initial release as a Stage-1 primitive.
+
+0.0.150
+
+Add `template` function _(inspired by [@lxsmnsyc's string function in solid-use](#https://github.com/LXSMNSYC/solid-use/tree/main/packages/solid-use#string))_.
+Bump to Stage 2.
 
 </details>

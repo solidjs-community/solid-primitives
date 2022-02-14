@@ -1,4 +1,4 @@
-import { filterInstance, filterOutInstance, push, sort, spread } from "../src";
+import { filterInstance, filterOutInstance, push, sort, spread, template } from "../src";
 import { createRoot, createSignal } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
@@ -46,6 +46,19 @@ test("filter instances", () =>
     const b = filterOutInstance(() => list, Element, Number);
     assert.equal(b(), [string, string]);
     assert.equal(list, copy, "nonmutable");
+    dispose();
+  }));
+
+test("teamplate", () =>
+  createRoot(dispose => {
+    const [a, setA] = createSignal("Hello");
+    const [b, setB] = createSignal("World");
+    const result = template`${a} ${b}!!!`;
+    assert.is(result(), "Hello World!!!");
+
+    setB("Solid");
+    assert.is(result(), "Hello Solid!!!");
+
     dispose();
   }));
 
