@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/utils",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A bunch of reactive utility types and functions, for building primitives with Solid.js",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -8,6 +8,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/davedbase/solid-primitives/issues"
   },
   "private": false,
   "sideEffects": false,

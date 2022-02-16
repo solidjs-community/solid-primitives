@@ -1,11 +1,13 @@
 /** `a + b + c + ...` */
-export const add = (...a: number[]): number => {
+export function add(...a: number[]): number;
+export function add(...a: string[]): string;
+export function add(...a: any[]): string | number {
   let r = 0;
   for (const n of a) {
     r += n;
   }
   return r;
-};
+}
 
 /** `a - b - c - ...` */
 export const substract = (a: number, ...b: number[]): number => {

@@ -1,4 +1,4 @@
-import { createSignal, onMount, onCleanup } from "solid-js";
+import { createSignal, getOwner, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 
 /**
@@ -17,21 +17,22 @@ import { isServer } from "solid-js/web";
  */
 const createMediaQuery = (
   query: string,
-  initialState: boolean = false,
+  fallbackState: boolean = false,
   watchChange: boolean = true
 ): (() => boolean) => {
-  let mql: MediaQueryList;
-  const [state, setState] = createSignal(initialState);
-  const onChange = () => setState(mql.matches);
-  onMount(() => {
-    if (isServer) return false;
-    mql = window.matchMedia(query);
+  let initialState = fallbackState;
+  if (!isServer) {
+    const mql = window.matchMedia(query);
+    initialState = mql.matches;
     if (watchChange) {
+      const onChange = () => setState(mql.matches);
       mql.addEventListener("change", onChange);
+      if (getOwner()) {
+        onCleanup(() => mql.removeEventListener("change", onChange));
+      }
     }
-    setState(mql.matches);
-  });
-  onCleanup(() => watchChange && mql.removeEventListener("change", onChange));
+  }
+  const [state, setState] = createSignal(initialState);
   return state;
 };
 

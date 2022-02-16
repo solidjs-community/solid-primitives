@@ -96,4 +96,8 @@ Patched issue with observer only firing once and disconnecting not functional.
 
 Updated to Solid 1.3
 
+1.2.2
+
+Minor improvements
+
 </details>

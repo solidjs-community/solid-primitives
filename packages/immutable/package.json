@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/immutable",
-  "version": "0.0.100",
+  "version": "0.0.110",
   "description": "Functional programming helpers for making non-mutating changes to data. Keeping it immutable.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -12,7 +12,9 @@
   "primitive": {
     "name": "immutable",
     "stage": 1,
-    "list": [],
+    "list": [
+      "List of functions"
+    ],
     "category": "Utilities"
   },
   "private": false,
@@ -35,7 +37,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^0.2.0"
+    "@solid-primitives/utils": "^0.2.1"
   },
   "devDependencies": {
     "jsdom": "18.1.1",

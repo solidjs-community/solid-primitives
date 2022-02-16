@@ -1,52 +1,43 @@
-import { access, accessArray, MaybeAccessor, MaybeAccessorValue } from "@solid-primitives/utils";
-import * as _ from "@solid-primitives/immutable";
-import { Accessor, createMemo } from "solid-js";
+import { AnyObject, keys } from "@solid-primitives/utils";
+import { Accessor } from "solid-js";
 
-//
+// CONVERT
+export * from "./convert";
+
 // STRING
-//
 
-export const toFloat = (string: MaybeAccessor<string>): Accessor<number> =>
-  createMemo(() => Number.parseFloat(access(string)));
+export * from "./string";
 
-export const toInt = (string: MaybeAccessor<string>, radix?: number): Accessor<number> =>
-  createMemo(() => Number.parseInt(access(string), radix));
-
-export const stringConcat = (...a: MaybeAccessor<any>[]): Accessor<string> =>
-  createMemo(() => a.reduce((t: string, c) => t + access(c), "") as string);
-
-//
 // NUMBER
-//
-
 export * from "./number";
 
-//
 // ARRAY
-//
-
 export * from "./array";
 
-//
 // OBJECT
-//
-
-export const omit = <
-  A extends MaybeAccessor<object>,
-  O extends MaybeAccessorValue<A>,
-  K extends keyof O
->(
-  object: A,
-  ...keys: MaybeAccessor<K>[]
-): Accessor<Omit<O, K>> => createMemo(() => _.omit<any, any>(access(object), ...accessArray(keys)));
-
-export const pick = <
-  A extends MaybeAccessor<object>,
-  O extends MaybeAccessorValue<A>,
-  K extends keyof O
->(
-  object: A,
-  ...keys: MaybeAccessor<K>[]
-): Accessor<Pick<O, K>> => createMemo(() => _.pick<any, any>(access(object), ...accessArray(keys)));
-
+export * from "./object";
 export * from "./update";
+
+// SPECIAL
+export type Spread<T extends [] | any[] | AnyObject> = {
+  [I in keyof T]: Accessor<T[I]>;
+};
+/**
+ * Turn your signal into a tuple of signals, or map of signals. **(input needs to have static keys)**
+ * @example // spread tuples
+ * const [first, second, third] = spread(() => [1,2,3])
+ * first() // => 1
+ * second() // => 2
+ * third() // => 3
+ * @example // spread objects
+ * const { name, age } = spread(() => ({ name: "John", age: 36 }))
+ * name() // => "John"
+ * age() // => 36
+ */
+export function spread<T extends [] | any[] | AnyObject>(obj: Accessor<T>): Spread<T> {
+  const res: Spread<T> = obj().constructor();
+  for (const key of keys(obj)) {
+    res[key] = () => obj()[key];
+  }
+  return res;
+}

@@ -10,9 +10,9 @@ import {
 import { ResourceActions, ResourceFetcherInfo } from "solid-js/types/reactive/signal";
 
 const constraintsFromDevice = (
-  device: MediaDeviceInfo | MediaStreamConstraints
-): MediaStreamConstraints => {
-  return "deviceId" in device
+  device?: MediaDeviceInfo | MediaStreamConstraints
+): MediaStreamConstraints | undefined => {
+  return device && "deviceId" in device
     ? {
         [device.kind === "videoinput" ? "video" : "audio"]: {
           deviceId: { exact: device.deviceId }
@@ -52,10 +52,10 @@ export const createStream = (
   constraints:
     | MediaDeviceInfo
     | MediaStreamConstraints
-    | Accessor<MediaDeviceInfo | MediaStreamConstraints>
+    | Accessor<MediaDeviceInfo | MediaStreamConstraints | undefined>
 ): StreamReturn => {
   const [stream, { mutate, refetch }] = createResource(
-    createMemo<MediaStreamConstraints>(() =>
+    createMemo<MediaStreamConstraints | undefined>(() =>
       constraintsFromDevice(typeof constraints === "function" ? constraints() : constraints)
     ),
     (constraints, info: ResourceFetcherInfo<MediaStream>): Promise<MediaStream> =>

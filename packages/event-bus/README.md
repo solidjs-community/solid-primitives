@@ -498,4 +498,8 @@ https://codesandbox.io/s/solid-primitives-event-bus-6fp4h?file=/index.tsx
 
 Initial release as a Stage-2 primitive.
 
+0.0.112
+
+Minor improvement
+
 </details>

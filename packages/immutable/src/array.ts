@@ -1,4 +1,12 @@
-import { compare, isArray, isFunction, ItemsOf, Many } from "@solid-primitives/utils";
+import {
+  AnyClass,
+  compare,
+  isArray,
+  isFunction,
+  ItemsOf,
+  Many,
+  ofClass
+} from "@solid-primitives/utils";
 import { withArrayCopy } from "./copy";
 import { get } from "./object";
 import { FlattenArray, MappingFn, Predicate } from "./types";
@@ -62,7 +70,7 @@ export function filter<T>(list: readonly T[], predicate: Predicate<T>): T[] & { 
  * @returns changed array copy
  */
 export const sort = <T>(list: T[], compareFn?: (a: T, b: T) => number): T[] =>
-  withArrayCopy(list, list => list.sort(compareFn));
+  list.slice().sort(compareFn);
 
 /**
  * standalone `Array.prototype.map()` function
@@ -91,7 +99,7 @@ export const splice = <T>(
  * @returns changed array copy
  */
 export const fill = <T>(list: readonly T[], value: T, start?: number, end?: number): T[] =>
-  withArrayCopy(list, list => list.fill(value, start, end));
+  list.slice().fill(value, start, end);
 
 /**
  * Creates a new array concatenating array with any additional arrays and/or values.
@@ -112,16 +120,31 @@ export function concat<A extends any[], V extends ItemsOf<A>>(
  * Remove item from array
  * @returns changed array copy
  */
-export const remove = <T>(list: readonly T[], item: T): T[] => {
+export const remove = <T>(list: readonly T[], item: T, ...insertItems: T[]): T[] => {
   const index = list.indexOf(item);
-  return splice(list, index, 1);
+  return splice(list, index, 1, ...insertItems);
+};
+
+/**
+ * Remove multiple items from an array
+ * @returns changed array copy
+ */
+export const removeItems = <T>(list: readonly T[], ...items: T[]): T[] => {
+  const res = [];
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i];
+    const ii = items.indexOf(item);
+    if (ii !== -1) items.splice(ii, 1);
+    else res.push(item);
+  }
+  return res;
 };
 
 /**
  * Flattens a nested array into a one-level array
  * @returns changed array copy
  */
-const flatten = <T extends any[]>(arr: T): FlattenArray<T>[] =>
+export const flatten = <T extends any[]>(arr: T): FlattenArray<T>[] =>
   arr.reduce((flat, next) => flat.concat(isArray(next) ? flatten(next) : next), []);
 
 /**
@@ -141,3 +164,31 @@ export const sortBy = <T>(
       ),
     arr
   );
+
+/**
+ * Returns a subset of items that are instances of provided Classes
+ * @param list list of original items
+ * @param ...classes list or classes
+ * @returns changed array copy
+ */
+export const filterInstance = <T, I extends AnyClass[]>(
+  list: readonly T[],
+  ...classes: I
+): Extract<T, InstanceType<ItemsOf<I>>>[] =>
+  (classes.length === 1
+    ? list.filter(item => ofClass(item, classes[0]))
+    : list.filter(item => item && classes.some(c => ofClass(item, c)))) as any[];
+
+/**
+ * Returns a subset of items that aren't instances of provided Classes
+ * @param list list of original items
+ * @param ...classes list or classes
+ * @returns changed array copy
+ */
+export const filterOutInstance = <T, I extends AnyClass[]>(
+  list: readonly T[],
+  ...classes: I
+): Exclude<T, InstanceType<ItemsOf<I>>>[] =>
+  (classes.length === 1
+    ? list.filter(item => item && !ofClass(item, classes[0]))
+    : list.filter(item => item && !classes.some(c => ofClass(item, c)))) as any[];

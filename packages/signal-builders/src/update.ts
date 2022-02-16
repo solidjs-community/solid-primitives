@@ -90,5 +90,8 @@ export type Update = {
   ): Accessor<ModifyValue<O, K, V>>;
 };
 
+/**
+ * Signal Builder: Change single value in an object by key. Allows accessign nested objects by passing multiple keys.
+ */
 export const update: Update = (...args: any[]) =>
   createMemo(() => _update(...(accessArray(args) as [any, any, any])));

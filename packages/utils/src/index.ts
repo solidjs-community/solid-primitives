@@ -3,6 +3,7 @@ import type { EffectFunction, NoInfer, OnOptions } from "solid-js/types/reactive
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import type {
+  AnyClass,
   Destore,
   Fn,
   ItemsOf,
@@ -46,7 +47,18 @@ export const isString = (val: unknown): val is string => typeof val === "string"
 export const isObject = (val: any): val is object => toString.call(val) === "[object Object]";
 export const isArray = (val: any): val is any[] => Array.isArray(val);
 
+export const ofClass = (v: any, c: AnyClass): boolean =>
+  v instanceof c || (v && v.constructor === c);
+
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
+
+/**
+ * for creating tuples by inferring type
+ * @example
+ * const users = tuple(["John", "Jeff", "Joe"]);
+ * // users: [string, string, string]
+ */
+export const tuple = <T extends [] | any[]>(input: T): T => input;
 
 /** `Array.prototype.includes()` without so strict types. Also allows for checking for multiple items */
 export const includes = (arr: any[], ...items: any): boolean => {
@@ -164,6 +176,12 @@ export const forEachEntry = <A extends MaybeAccessor<object>, O = MaybeAccessorV
 export const entries = <A extends MaybeAccessor<object>, O = MaybeAccessorValue<A>>(
   object: A
 ): [Keys<O>, Values<O>][] => Object.entries(access(object)) as [Keys<O>, Values<O>][];
+
+/**
+ * Get `Object.keys()` of an MaybeAccessor<Object>
+ */
+export const keys = <A extends MaybeAccessor<object>>(object: A) =>
+  Object.keys(access(object)) as (keyof MaybeAccessorValue<A>)[];
 
 /**
  * Creates a promise that resolves *(or rejects)* after given time.

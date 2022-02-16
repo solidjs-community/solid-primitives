@@ -21,7 +21,7 @@
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsc && tsc --target es5 --module commonjs --declaration false --outDir ./dist/cjs"
+    "build": "echo noop build"
   },
   "keywords": [
     "websocket",

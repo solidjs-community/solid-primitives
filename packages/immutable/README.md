@@ -41,7 +41,7 @@ const [user, setUser] = createSignal({
 setUser(p => update(p, "street", "number", 64));
 ```
 
-## List of available functions:
+## List of functions:
 
 ### Copying
 
@@ -60,14 +60,17 @@ setUser(p => update(p, "street", "number", 64));
 - **`filterOut`** - standalone `Array.prototype.filter()` that filters out passed item
 - **`filter`** - standalone `Array.prototype.filter()`
 - **`sort`** - non-mutating `Array.prototype.sort()` as a standalone function
+- **`sortBy`** - Sort an array by object key, or multiple keys
 - **`map`** - standalone `Array.prototype.map()` function
 - **`slice`** - standalone `Array.prototype.slice()` function
 - **`splice`** - non-mutating `Array.prototype.splice()` as a standalone function
 - **`fill`** - non-mutating `Array.prototype.fill()` as a standalone function
 - **`concat`** - Creates a new array concatenating array with any additional arrays and/or values.
 - **`remove`** - Remove item from array
+- **`removeItems`** - Remove multiple items from an array
 - **`flatten`** - Flattens a nested array into a one-level array
-- **`sortBy`** - Sort an array by object key, or multiple keys
+- **`filterInstance`** - Flattens a nested array into a one-level array
+- **`filterOutInstance`** - Flattens a nested array into a one-level array
 
 ### Object
 
@@ -83,7 +86,7 @@ setUser(p => update(p, "street", "number", 64));
 
 ### Number
 
-- **`add`** - `a + b + c + ...`
+- **`add`** - `a + b + c + ...` _(works for numbers or strings)_
 - **`substract`** - `a - b - c - ...`
 - **`multiply`** - `a * b * c * ...`
 - **`divide`** - `a / b / c / ...`
