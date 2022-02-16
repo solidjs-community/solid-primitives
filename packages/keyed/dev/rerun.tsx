@@ -18,10 +18,12 @@ const App: Component = () => {
     <>
       <div class="wrapper-h">
         <Transition onEnter={animateIn} onExit={animateOut} mode="outin">
-          <Rerun on={count()}>
-            <button class="btn" onClick={() => setCount(p => ++p)}>
-              {count()}
-            </button>
+          <Rerun on={count}>
+            {count => (
+              <button class="btn" onClick={() => setCount(p => ++p)}>
+                {count}
+              </button>
+            )}
           </Rerun>
         </Transition>
       </div>

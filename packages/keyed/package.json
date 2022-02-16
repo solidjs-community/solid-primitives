@@ -40,7 +40,6 @@
     "solid",
     "primitives"
   ],
-  "dependencies": {},
   "devDependencies": {
     "jsdom": "18.1.1",
     "prettier": "^2.5.1",

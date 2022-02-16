@@ -7,7 +7,7 @@ import {
   on,
   onCleanup,
   Setter,
-  Component
+  ReturnTypes
 } from "solid-js";
 
 const FALLBACK = Symbol("fallback");
@@ -133,14 +133,25 @@ export function Key<T, U extends JSX.Element>(props: {
   return createMemo(mapped);
 }
 
+export type RerunChildren<T> = ((input: T, prevInput: T | undefined) => JSX.Element) | JSX.Element;
+
 /**
  * Causes the children to rerender when the `on` changes.
  * @see https://github.com/davedbase/solid-primitives/tree/main/packages/refs#Rerun
  */
-export const Rerun: Component<{ on: any }> = props => {
-  const key = createMemo(() => props.on);
-  return createMemo(() => {
-    key();
-    return props.children;
-  });
-};
+export function Rerun<S extends Accessor<unknown> | Accessor<unknown>[] | []>(props: {
+  on: S;
+  children: RerunChildren<ReturnTypes<S>>;
+}): Accessor<JSX.Element>;
+export function Rerun<
+  S extends (object | string | bigint | number | boolean) & { length?: never }
+>(props: { on: S; children: RerunChildren<S> }): Accessor<JSX.Element>;
+export function Rerun(props: { on: any; children: RerunChildren<any> }): Accessor<JSX.Element> {
+  const key = typeof props.on === "function" || Array.isArray(props.on) ? props.on : () => props.on;
+  return createMemo(
+    on(key, (a, b) => {
+      const child = props.children;
+      return typeof child === "function" && child.length > 0 ? (child as any)(a, b) : child;
+    })
+  );
+}

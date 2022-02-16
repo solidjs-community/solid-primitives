@@ -136,6 +136,26 @@ const [count, setCount] = createSignal(0);
 <Rerun on={count()}>
   <button onClick={() => setCount(p => ++p)}>{count()}</button>
 </Rerun>;
+
+// or pass a function
+<Rerun on={() => count()}/>
+
+// or an array of dependencies
+<Rerun on={[count, name, length]}/>
+```
+
+#### Passing a function as children
+
+You can treat `on` prop like sources argument of the Solid's `on` helper, and the children as the second, callback argument.
+
+```tsx
+<Rerun on={[count, className]}>
+  {([count, className]) => (
+    <button class={className} onClick={() => setCount(p => ++p)}>
+      {count}
+    </button>
+  )}
+</Rerun>
 ```
 
 #### Using with Transition
@@ -161,6 +181,6 @@ https://codesandbox.io/s/solid-primitives-keyed-rerun-demo-14vjr?file=/index.tsx
 
 0.0.100
 
-Initial release as a Stage-1 primitive.
+Initial release as a Stage-2 primitive.
 
 </details>
