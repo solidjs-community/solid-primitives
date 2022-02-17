@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/memo",
-  "version": "0.0.100",
+  "version": "0.0.101",
   "description": "Collection of custom memo primitives. They extend Solid's createMemo functionality while keeping the usage similar.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -43,10 +43,9 @@
     "memo"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^0.1.4",
+    "@solid-primitives/utils": "^0.2.0",
     "@solid-primitives/debounce": "^1.1.0",
-    "@solid-primitives/throttle": "^1.1.0",
-    "@solid-primitives/rootless": "^0.0.100"
+    "@solid-primitives/throttle": "^1.1.0"
   },
   "devDependencies": {
     "jsdom": "18.1.1",
@@ -56,9 +55,9 @@
     "typescript": "^4.5.4",
     "tsup": "^5.11.1",
     "uvu": "^0.5.2",
-    "unocss": "^0.22.4",
-    "vite": "^2.7.12",
-    "vite-plugin-solid": "^2.2.3",
+    "unocss": "0.24.3",
+    "vite": "2.8.1",
+    "vite-plugin-solid": "2.2.5",
     "solid-app-router": "^0.2.0",
     "@solid-primitives/mouse": "^1.0.2"
   },

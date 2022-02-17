@@ -12,10 +12,7 @@ import type { EffectOptions, MemoOptions, Owner } from "solid-js/types/reactive/
 import debounce from "@solid-primitives/debounce";
 import throttle from "@solid-primitives/throttle";
 import { Fn, isFunction } from "@solid-primitives/utils";
-
-// uvu crashes on this function when it is's not imported from solid-js
-// may be related to solid-register resolving external dependencies as cjs (which disables the reactivity on server)
-// import { runWithOwner } from "@solid-primitives/rootless";
+import type { Owner } from "solid-js/types/reactive/signal";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
@@ -235,7 +232,7 @@ export function createLazyMemo<T>(
   // prettier-ignore
   // memo is recreated every time it's being read, and the previous one is derailed
   // memo disables itself once computation happend without anyone listening
-  const recreateMemo = () => runWithOwner(owner, () => {
+  const recreateMemo = () => runWithOwner(owner as Owner, () => {
     memo = createMemo(prev => {
       if (listeners) return calc(prev);
       memo = undefined;

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/composites",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Composable reactive helpers built around watching computation changes.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -15,9 +15,7 @@
     "list": [
       "createCompositeEffect",
       "createCompositeComputed",
-      "createCompositeMemo",
-      "createCompositeRenderEffect",
-      "createModifier"
+      "createCompositeRenderEffect"
     ],
     "category": "Reactivity"
   },

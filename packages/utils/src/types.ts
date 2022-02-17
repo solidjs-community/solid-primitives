@@ -4,6 +4,7 @@ import type { Accessor } from "solid-js";
  * A function
  */
 export type Fn<R = void> = () => R;
+export type Get<T> = (v: T) => void;
 
 /**
  * Can be single or in an array
@@ -15,13 +16,13 @@ export type Values<O extends Object> = O[Keys<O>];
 
 export type Noop = (...a: any[]) => void;
 
+export type Directive<P = true> = (el: Element, props: Accessor<P>) => void;
+
 /**
  * Infers the type of the array elements
  */
 export type ItemsOf<T> = T extends (infer E)[] ? E : never;
-
-export type Predicate<T> = (item: T, index: number, array: readonly T[]) => boolean;
-export type MappingFn<T, V> = (item: T, index: number, array: readonly T[]) => V;
+export type ItemsOfMany<T> = T extends any[] ? ItemsOf<T> : T;
 
 /**
  * T or a reactive/non-reactive function returning T
@@ -70,14 +71,25 @@ export type DeepPartialAny<T> = {
   [P in keyof T]?: T[P] extends AnyObject ? DeepPartialAny<T[P]> : any;
 };
 
+/** `A | B => A & B` */
+export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I
+) => void
+  ? I
+  : never;
+
+export type ExtractIfPossible<T, U> = Extract<T, U> extends never ? U : Extract<T, U>;
+
 export type AnyObject = Record<string, any>;
 export type AnyFunction = (...args: any[]) => any;
+export type AnyClass = abstract new (...args: any) => any;
 
+export type LiteralKey = string | number | symbol;
 export type PrimitiveValue = string | boolean | number | bigint | symbol | null | undefined;
 
 export type FalsyValue = false | 0 | "" | null | undefined;
-export type Truthy<T> = T extends FalsyValue ? never : T;
-export type Falsy<T> = T extends FalsyValue ? T : never;
+export type Truthy<T> = Exclude<T, FalsyValue>;
+export type Falsy<T> = Extract<T, FalsyValue>;
 
 /**
  * Destructible store object, with values changed to accessors

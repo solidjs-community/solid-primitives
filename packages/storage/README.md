@@ -178,4 +178,8 @@ Minor patch fixed missing types.
 
 Updated to Solid 1.3
 
+1.1.1
+
+Patched peerDependency issue
+
 </details>

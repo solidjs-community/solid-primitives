@@ -1,9 +1,9 @@
-import { createRoot, getOwner, onCleanup, runWithOwner, on, Accessor } from "solid-js";
-import type { EffectFunction, NoInfer, OnOptions, Owner } from "solid-js/types/reactive/signal";
+import { getOwner, onCleanup, on, Accessor } from "solid-js";
+import type { EffectFunction, NoInfer, OnOptions } from "solid-js/types/reactive/signal";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import type {
-  AnyFunction,
+  AnyClass,
   Destore,
   Fn,
   ItemsOf,
@@ -30,9 +30,34 @@ export { isServer };
  */
 export const isDefined = <T>(value: T | undefined | null): value is T =>
   typeof value !== "undefined" && value !== null;
-
 export const isFunction = <T>(value: T | Function): value is Function =>
   typeof value === "function";
+export const isBoolean = (val: any): val is boolean => typeof val === "boolean";
+export const isNumber = (val: any): val is number => typeof val === "number";
+export const isString = (val: unknown): val is string => typeof val === "string";
+export const isObject = (val: any): val is object => toString.call(val) === "[object Object]";
+export const isArray = (val: any): val is any[] => Array.isArray(val);
+
+export const ofClass = (v: any, c: AnyClass): boolean =>
+  v instanceof c || (v && v.constructor === c);
+
+export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
+
+/**
+ * for creating tuples by inferring type
+ * @example
+ * const users = tuple(["John", "Jeff", "Joe"]);
+ * // users: [string, string, string]
+ */
+export const tuple = <T extends [] | any[]>(input: T): T => input;
+
+/** `Array.prototype.includes()` without so strict types. Also allows for checking for multiple items */
+export const includes = (arr: any[], ...items: any): boolean => {
+  for (const item of arr) {
+    if (items.includes(item)) return true;
+  }
+  return false;
+};
 
 /**
  * Accesses the value of a MaybeAccessor
@@ -61,6 +86,16 @@ export const accessAsArray = <T extends MaybeAccessor<any>, V = MaybeAccessorVal
 
 export const asArray = <T>(value: T): T extends any[] ? T : T[] =>
   Array.isArray(value) ? (value as any) : [value];
+
+/**
+ * Access an array of MaybeAccessors
+ * @example
+ * const list = [1, 2, () => 3)] // T: MaybeAccessor<number>[]
+ * const newList = accessArray(list) // T: number[]
+ */
+export const accessArray = <A extends MaybeAccessor<any>>(
+  list: readonly A[]
+): MaybeAccessorValue<A>[] => list.map(v => access(v));
 
 /**
  * Run the function if the accessed value is not `undefined` nor `null`
@@ -110,9 +145,15 @@ export const forEach = <A extends MaybeAccessor<any>, V = MaybeAccessorValue<A>>
 /**
  * Get `Object.entries()` of an MaybeAccessor<Object>
  */
-export const entries = <A extends MaybeAccessor<Object>, V = MaybeAccessorValue<A>>(
+export const entries = <A extends MaybeAccessor<object>, V = MaybeAccessorValue<A>>(
   object: A
 ): [string, Values<V>][] => Object.entries(access(object));
+
+/**
+ * Get `Object.keys()` of an MaybeAccessor<Object>
+ */
+export const keys = <A extends MaybeAccessor<object>>(object: A) =>
+  Object.keys(access(object)) as (keyof MaybeAccessorValue<A>)[];
 
 /**
  * Creates a promise that resolves *(or rejects)* after given time.

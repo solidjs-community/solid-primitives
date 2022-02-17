@@ -152,4 +152,8 @@ Updated to latest Solid.
 
 Function argument improvements, named exports.
 
+1.0.7
+
+Added export request function to make gql requests more imperative.
+
 </details>
