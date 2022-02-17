@@ -27,8 +27,8 @@ const forEachEventAttr = (
  */
 export const WindowEventListener: Component<EventAttributes<null>> = props => {
   if (isClient)
-    forEachEventAttr(props, (eventName, attr) => {
-      createEventListener(window, eventName, e => (props as any)[attr](e));
+    forEachEventAttr(props, (type, attr) => {
+      createEventListener(window, type, e => (props as any)[attr](e));
     });
   return undefined;
 };

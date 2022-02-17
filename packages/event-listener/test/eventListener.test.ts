@@ -39,23 +39,50 @@ test("array window target", () => {
 
 test("accessor window target", () => {
   createRoot(dispose => {
+    const [target, setTarget] = createSignal(window);
     const testEvent = new Event("test");
-    let capturedEvent: Event;
-    createEventListener<{ test: Event }>(
-      () => window,
-      "test",
-      ev => {
-        capturedEvent = ev;
-      }
-    );
+    let captured_times = 0;
+    createEventListener<{ test: Event }>(target, "test", ev => {
+      captured_times++;
+    });
     dispatchFakeEvent("test", testEvent);
-    assert.is(capturedEvent, undefined, "event listener won't be added yet");
+    assert.is(captured_times, 0, "event listener won't be added yet");
 
     setTimeout(() => {
       dispatchFakeEvent("test", testEvent);
-      assert.is(capturedEvent, testEvent);
-      dispose();
+      assert.is(captured_times, 1);
+
+      setTarget(undefined);
+
+      setTimeout(() => {
+        dispatchFakeEvent("test", testEvent);
+        assert.is(captured_times, 1);
+
+        setTarget(window);
+
+        setTimeout(() => {
+          dispatchFakeEvent("test", testEvent);
+          assert.is(captured_times, 2);
+          dispose();
+        }, 0);
+      }, 0);
     }, 0);
+  });
+});
+
+test("listening multiple events", () => {
+  createRoot(dispose => {
+    const event1 = new Event("test1");
+    const event2 = new Event("test2");
+    let capturedEvent: Event;
+    createEventListener<{ test1: Event; test2: Event }>(window, ["test1", "test2"], ev => {
+      capturedEvent = ev;
+    });
+    dispatchFakeEvent("test1", event1);
+    assert.is(capturedEvent, event1);
+    dispatchFakeEvent("test1", event2);
+    assert.is(capturedEvent, event2);
+    dispose();
   });
 });
 

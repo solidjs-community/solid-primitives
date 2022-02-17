@@ -33,6 +33,32 @@ csr("disposes with owner", () =>
   })
 );
 
+csr("many parent owners", () => {
+  const [o1, o2, dispose1, dispose2] = createRoot(dispose1 => {
+    const o1 = getOwner();
+    const [o2, dispose2] = createRoot(dispose2 => {
+      return [getOwner(), dispose2];
+    });
+    return [o1, o2, dispose1, dispose2];
+  });
+
+  createSubRoot(
+    () => {
+      const captured: any[] = [];
+      const [count, setCount] = createSignal(0);
+      createComputed(() => captured.push(count()));
+      setCount(1);
+      assert.equal(captured, [0, 1], "before dispose()");
+      dispose1();
+      setCount(2);
+      assert.equal(captured, [0, 1], "after dispose()");
+    },
+    o1,
+    o2
+  );
+  dispose2();
+});
+
 csr.run();
 
 const ccwo = suite("createCallbackWithOwner");

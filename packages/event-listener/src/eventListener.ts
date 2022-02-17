@@ -6,11 +6,9 @@ import {
   Fn,
   isFunction,
   noop,
-  access,
   isServer
 } from "@solid-primitives/utils";
-import { createRenderEffect, createSignal } from "solid-js";
-import { Accessor, createEffect, onCleanup } from "solid-js";
+import { Accessor, createEffect, onCleanup, createRenderEffect, createSignal } from "solid-js";
 import {
   ClearListeners,
   EventListenerDirectiveProps,
@@ -28,7 +26,7 @@ export type EventListenerSignalReturns<Event> = [
  * Creates an event listener, that will be automatically disposed on cleanup.
  *
  * @param target - ref to HTMLElement, EventTarget or Array thereof
- * @param eventName - name of the handled event
+ * @param type - name of the handled event
  * @param handler - event handler
  * @param options - addEventListener options
  *
@@ -45,42 +43,42 @@ export type EventListenerSignalReturns<Event> = [
 export function createEventListener<
   Target extends TargetWithEventMap,
   EventMap extends EventMapOf<Target>,
-  EventName extends keyof EventMap
+  EventType extends keyof EventMap
 >(
   target: MaybeAccessor<Many<Target>>,
-  eventName: MaybeAccessor<EventName>,
-  handler: (event: EventMap[EventName]) => void,
-  options?: MaybeAccessor<EventListenerOptions>
+  type: MaybeAccessor<Many<EventType>>,
+  handler: (event: EventMap[EventType]) => void,
+  options?: EventListenerOptions
 ): ClearListeners;
 
 // Custom Events
 export function createEventListener<
   EventMap extends Record<string, Event>,
-  EventName extends keyof EventMap = keyof EventMap
+  EventType extends keyof EventMap = keyof EventMap
 >(
   target: MaybeAccessor<Many<EventTarget>>,
-  eventName: MaybeAccessor<EventName>,
-  handler: (event: EventMap[EventName]) => void,
-  options?: MaybeAccessor<EventListenerOptions>
+  type: MaybeAccessor<Many<EventType>>,
+  handler: (event: EventMap[EventType]) => void,
+  options?: EventListenerOptions
 ): ClearListeners;
 
 export function createEventListener(
   targets: MaybeAccessor<Many<EventTarget>>,
-  eventName: MaybeAccessor<string>,
+  type: MaybeAccessor<Many<string>>,
   handler: (event: Event) => void,
-  options?: MaybeAccessor<EventListenerOptions>
+  options?: EventListenerOptions
 ): ClearListeners {
   if (isServer) return noop;
   const cleanup = createCallbackStack();
 
   const attachListeners = () => {
     cleanup.execute();
-    const _eventName = access(eventName);
-    const _options = access(options);
-    forEach(targets, el => {
-      if (!el) return;
-      el.addEventListener(_eventName, handler, _options);
-      cleanup.push(() => el.removeEventListener(_eventName, handler, _options));
+    forEach(type, type => {
+      forEach(targets, el => {
+        if (!el) return;
+        el.addEventListener(type, handler, options);
+        cleanup.push(() => el.removeEventListener(type, handler, options));
+      });
     });
   };
 
@@ -104,7 +102,7 @@ export function createEventListener(
  * Provides an reactive signal of last captured event.
  *
  * @param target - ref to HTMLElement, EventTarget or Array thereof
- * @param eventName - name of the handled event
+ * @param type - name of the handled event
  * @param options - addEventListener options
  *
  * @returns Signal of last captured event & function clearing all event listeners
@@ -124,37 +122,37 @@ export function createEventListener(
 export function createEventSignal<
   Target extends TargetWithEventMap,
   EventMap extends EventMapOf<Target>,
-  EventName extends keyof EventMap
+  EventType extends keyof EventMap
 >(
   target: MaybeAccessor<Many<Target>>,
-  eventName: MaybeAccessor<EventName>,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): EventListenerSignalReturns<EventMap[EventName]>;
+  type: MaybeAccessor<Many<EventType>>,
+  options?: EventListenerOptions
+): EventListenerSignalReturns<EventMap[EventType]>;
 
 // Custom Events
 export function createEventSignal<
   EventMap extends Record<string, Event>,
-  EventName extends keyof EventMap = keyof EventMap
+  EventType extends keyof EventMap = keyof EventMap
 >(
   target: MaybeAccessor<Many<EventTarget>>,
-  eventName: MaybeAccessor<EventName>,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): EventListenerSignalReturns<EventMap[EventName]>;
+  type: MaybeAccessor<Many<EventType>>,
+  options?: EventListenerOptions
+): EventListenerSignalReturns<EventMap[EventType]>;
 
 export function createEventSignal(
   target: MaybeAccessor<Many<EventTarget>>,
-  eventName: MaybeAccessor<string>,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
+  type: MaybeAccessor<Many<string>>,
+  options?: EventListenerOptions
 ): [Accessor<Event | undefined>, Fn] {
   const [lastEvent, setLastEvent] = createSignal<Event>();
-  const clear = createEventListener(target, eventName, setLastEvent, options);
+  const clear = createEventListener(target, type, setLastEvent, options);
   return [lastEvent, clear];
 }
 
 /**
  * Directive Usage. Creates an event listener, that will be automatically disposed on cleanup.
  *
- * @param props [eventName, eventHandler, options]
+ * @param props [eventType, handler, options]
  *
  * @example
  * <button use:eventListener={["click", () => {...}]}>Click me!</button>
@@ -163,9 +161,9 @@ export function eventListener(target: Element, props: Accessor<EventListenerDire
   const toCleanup = createCallbackStack();
   createEffect(() => {
     toCleanup.execute();
-    const [eventName, handler, options] = props();
-    target.addEventListener(eventName, handler, options);
-    toCleanup.push(() => target.removeEventListener(eventName, handler, options));
+    const [type, handler, options] = props();
+    target.addEventListener(type, handler, options);
+    toCleanup.push(() => target.removeEventListener(type, handler, options));
   });
   onCleanup(toCleanup.execute);
 }

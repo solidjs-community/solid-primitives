@@ -1,4 +1,4 @@
-import { getOwner, onCleanup, on, Accessor } from "solid-js";
+import { getOwner, onCleanup, on, Accessor, DEV } from "solid-js";
 import type { EffectFunction, NoInfer, OnOptions } from "solid-js/types/reactive/signal";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
@@ -7,6 +7,7 @@ import type {
   Destore,
   Fn,
   ItemsOf,
+  Keys,
   MaybeAccessor,
   MaybeAccessorValue,
   Noop,
@@ -22,8 +23,16 @@ export * from "./types";
 
 /** no operation */
 export const noop = (() => undefined) as Noop;
+
 export const isClient = !isServer;
 export { isServer };
+
+/** development environment */
+export const isDev = DEV && DEV.hasOwnProperty("writeSignal");
+/** production environment */
+export const isProd = !isDev;
+/** `console.warn` only during development */
+export const warn: typeof console.warn = (...a) => isDev && console.warn(...a);
 
 /**
  * `if (typeof value !== "undefined" && value !== null)`
@@ -143,11 +152,30 @@ export const forEach = <A extends MaybeAccessor<any>, V = MaybeAccessorValue<A>>
 ): void => accessAsArray(array).forEach(iterator as any);
 
 /**
- * Get `Object.entries()` of an MaybeAccessor<Object>
+ * Iterate through object entries.
  */
-export const entries = <A extends MaybeAccessor<object>, V = MaybeAccessorValue<A>>(
+export const forEachEntry = <A extends MaybeAccessor<object>, O = MaybeAccessorValue<A>>(
+  object: A,
+  iterator: (
+    key: keyof O,
+    item: Values<O>,
+    index: number,
+    pairs: [keyof O, Values<O>][],
+    object: O
+  ) => void
+): void => {
+  const obj = access(object);
+  Object.entries(obj).forEach(([key, item], index, pairs) =>
+    iterator(key as keyof O, item, index, pairs as [keyof O, Values<O>][], obj as O)
+  );
+};
+
+/**
+ * Get `Object.entries()` of an MaybeAccessor<object>
+ */
+export const entries = <A extends MaybeAccessor<object>, O = MaybeAccessorValue<A>>(
   object: A
-): [string, Values<V>][] => Object.entries(access(object));
+): [Keys<O>, Values<O>][] => Object.entries(access(object)) as [Keys<O>, Values<O>][];
 
 /**
  * Get `Object.keys()` of an MaybeAccessor<Object>
@@ -259,7 +287,7 @@ export function destore<T extends Object>(store: Store<T>): Destore<T> {
 }
 
 export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {
-  push: (...callbacks: Fn[]) => void;
+  push: (...callbacks: ((arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void)[]) => void;
   execute: (arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void;
   clear: Fn;
 } => {
@@ -267,10 +295,35 @@ export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(
   const clear: Fn = () => (stack = []);
   return {
     push: (...callbacks) => stack.push(...callbacks),
-    execute: (arg0, arg1, arg2, arg3) => {
+    execute(arg0, arg1, arg2, arg3) {
       stack.forEach(cb => cb(arg0, arg1, arg2, arg3));
       clear();
     },
     clear
   };
 };
+
+/** WIP: an easier to setup and type Proxy */
+export function createProxy<T extends Record<string | symbol, any>>(traps: {
+  get: <K extends keyof T>(key: K) => T[K];
+  set: <K extends keyof T>(key: K, value: T[K]) => void;
+}): T;
+export function createProxy<T extends Record<string | symbol, any>>(traps: {
+  get: <K extends keyof T>(key: K) => T[K];
+  set?: undefined;
+}): Readonly<T>;
+export function createProxy(traps: {
+  get: (key: string | symbol) => any;
+  set?: (key: string | symbol, value: any) => void;
+}): any {
+  return new Proxy(
+    {},
+    {
+      get: (_, k) => traps.get(k),
+      set: (_, k, v) => {
+        traps.set?.(k, v);
+        return false;
+      }
+    }
+  );
+}

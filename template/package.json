@@ -27,8 +27,8 @@
     "dist"
   ],
   "scripts": {
-    "start": "vite serve dev",
-    "dev": "vite serve dev",
+    "start": "vite serve dev --host",
+    "dev": "yarn start",
     "build": "tsup",
     "test": "uvu -r solid-register"
   },

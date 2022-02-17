@@ -5,6 +5,7 @@ import type { Accessor } from "solid-js";
  */
 export type Fn<R = void> = () => R;
 export type Get<T> = (v: T) => void;
+export type Clear = () => void;
 
 /**
  * Can be single or in an array
@@ -96,4 +97,9 @@ export type Falsy<T> = Extract<T, FalsyValue>;
  */
 export type Destore<T extends Object> = {
   [K in keyof T]: T[K] extends Function ? T[K] : Accessor<T[K]>;
+};
+
+export type Position = {
+  x: number;
+  y: number;
 };

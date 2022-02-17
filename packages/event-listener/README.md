@@ -11,6 +11,7 @@ A set of primitives that help with listening to DOM and Custom Events.
 - [`createEventSignal`](#createEventListener) - Like `createEventListener`, but events are handled with the returned signal, instead of with a callback.
 - [`createEventListenerMap`](#createEventListenerMap) - A helpful primitive that listens to a map of events. Handle them by individual callbacks.
 - [`createEventStore`](#createEventStore) - Similar to `createEventListenerMap`, but provides a reactive store with the latest captured events.
+- [`createEventListenerBus`](#createEventListenerBus) - Dynamically add and remove event listeners to an event target by calling appropriate property.
 - [`WindowEventListener`](#WindowEventListener) - Listen to the `window` DOM Events, using a component.
 - [`DocumentEventListener`](#DocumentEventListener) - The same as [`WindowEventListener`](#WindowEventListener), but listens to `document` events.
 
@@ -41,12 +42,15 @@ const clear = createEventListener(
 // to clear all of the event listeners
 clear();
 
-// target element, event name and options can be reactive signals
+// target element and event name can be reactive signals
 const [ref, setRef] = createSignal<HTMLElement>();
 const [name, setName] = createSignal("mousemove");
-const [options, setOptions] = createSignal({ passive: true });
-createEventListener(ref, name, e => {}, options);
+createEventListener(ref, name, e => {}, { passive: true });
+```
 
+#### Custom events
+
+```ts
 // you can provide your own event map type as well:
 // fill both type generics for the best type support
 createEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
@@ -55,6 +59,16 @@ createEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
   () => console.log("yup!")
 );
 // just don't use interfaces as EventMaps! (write them using `type` keyword)
+```
+
+#### Listening to multiple events
+
+###### Added in `@1.4.3`
+
+You can listen to multiple events with single `createEventListener` primitive.
+
+```ts
+createEventListener(el, ["mousemove", "mouseenter", "mouseleave"], e => {});
 ```
 
 ### Directive Usage
@@ -67,32 +81,6 @@ import { eventListener } from "@solid-primitives/event-listener";
 eventListener;
 
 <button use:eventListener={["click", () => console.log("Click")]}>Click!</button>;
-```
-
-### Types
-
-```ts
-function createEventListener<
-  EventMap extends Record<string, Event>,
-  EventName extends keyof EventMap
->(
-  target: MaybeAccessor<Many<EventTarget>>,
-  eventName: MaybeAccessor<EventName>,
-  handler: (event: EventMap[EventName]) => void,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): ClearListeners;
-
-// Directive
-function eventListener(
-  target: Element,
-  props: Accessor<EventListenerDirectiveProps>
-): EventListenerReturn;
-
-type EventListenerDirectiveProps = [
-  name: string,
-  handler: (e: any) => void,
-  options?: AddEventListenerOptions | boolean
-];
 ```
 
 ## `createEventSignal`
@@ -115,24 +103,6 @@ createEffect(() => {
 clear();
 ```
 
-### Types
-
-```ts
-function createEventSignal<
-  EventMap extends Record<string, Event>,
-  EventName extends keyof EventMap = keyof EventMap
->(
-  target: MaybeAccessor<Many<EventTarget>>,
-  eventName: MaybeAccessor<EventName>,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): EventListenerSignalReturns<EventMap[EventName]>;
-
-type EventListenerSignalReturns<Event> = [
-  lastEvent: Accessor<Event | undefined>,
-  clear: ClearListeners
-];
-```
-
 ## `createEventListenerMap`
 
 A helpful primitive that listens to a map of events. Handle them by individual callbacks.
@@ -151,16 +121,15 @@ const clear = createEventListenerMap(element, {
 // to clear all the event listeners
 clear();
 
-// both target and options args can be reactive:
+// both target can be reactive:
 const [target, setTarget] = createSignal(document.getElementById("abc"));
-const [options, setOptions] = createSignal({ passive: true });
 createEventListenerMap(
   target,
   {
     mousemove: e => {},
     touchstart: e => {}
   },
-  options
+  { passive: true }
 );
 
 // createEventListenerMap can be used to listen to custom events
@@ -195,19 +164,6 @@ eventListenerMap;
 ></div>;
 ```
 
-### Types
-
-```ts
-function createEventListenerMap<
-  EventMap extends Record<string, Event>,
-  UsedEvents extends keyof EventMap = keyof EventMap
->(
-  target: MaybeAccessor<Many<EventTarget>>,
-  handlersMap: EventHandlersMap,
-  options?: MaybeAccessor<boolean | AddEventListenerOptions>
-): ClearListeners;
-```
-
 ## `createEventStore`
 
 Similar to [`createEventListenerMap`](#createEventListenerMap), but provides a reactive store with the latest captured events.
@@ -226,8 +182,7 @@ clear()
 
 // both target and options args can be reactive:
 const [target, setTarget] = createSignal(document.getElementById("abc"));
-const [options, setOptions] = createSignal({ passive: true });
-const [lastEvents] = createEventStore(target, options, "mousemove", "touchmove");
+const [lastEvents] = createEventStore(target, "mousemove", "touchmove");
 
 // createEventStore can be used to listen to custom events
 // fill both type generics for the best type support
@@ -245,28 +200,82 @@ const [{ mousemove }] = createEventStore(target, "mousemove", ...);
 // the store cannot be destructured
 ```
 
-### types
+## `createEventListenerBus`
+
+###### Added in `@1.5.0`
+
+Dynamically add and remove event listeners to an event target by calling appropriate property. The listeners will be automatically removed on cleanup.
+
+### How to use it
+
+#### Import
 
 ```ts
-function createEventStore<
-  EventMap extends Record<string, Event>,
-  UsedEvents extends keyof EventMap = keyof EventMap
->(
-  target: MaybeAccessor<Many<EventTarget>>,
-  ...eventNames: UsedEvents[]
-): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
+import { createEventListenerBus } from "@solid-primitives/event-listener";
+```
 
-// with options:
-function createEventStore<
-  EventMap extends Record<string, Event>,
-  UsedEvents extends keyof EventMap = keyof EventMap
->(
-  target: MaybeAccessor<Many<EventTarget>>,
-  options: MaybeAccessor<boolean | AddEventListenerOptions>,
-  ...eventNames: UsedEvents[]
-): EventListnenerStoreReturns<Pick<EventMap, UsedEvents>>;
+#### Basic usage
 
-type EventListnenerStoreReturns<E> = [lastEvents: Store<Partial<E>>, clear: ClearListeners];
+`createEventListenerBus` takes two arguments:
+
+- `target` - the event target, could be a `window`, `document`, `HTMLElement` or `MediaQueryList`. _Defaults to `window`_
+- `options` - event listener options, such as `passive` or `capture`
+
+```ts
+const bus = createEventListenerBus(document.body);
+bus.onpointerenter(e => {...});
+// listeners return a function that removes them
+const clear = bus.onpointermove(e => {...});
+clear();
+```
+
+#### Reactive target
+
+Target argument could be an **array**, and a **reactive signal**.
+
+```ts
+const [target, setTarget] = createSignal([document.body]);
+const bus = createEventListenerBus(target);
+setTarget(p => [...p, window]); // will change the targets of all active listeners.
+```
+
+#### generic on()
+
+Using `bus.on(type, handler)` gives you more options in passing event type.
+
+```ts
+bus.on("click", e => {});
+bus.on(["mousemove", "mousedown"], e => {});
+const [types, setTypes] = createsignal(["focus", "blur"]);
+bus.on(types, e => {});
+```
+
+#### Custom Events
+
+The `createEventListenerBus` can be used to listen to Custom Events.
+
+```ts
+const bus = createEventListenerBus<{
+  foo: SomeEvent;
+  bar: MyEvent;
+}>();
+bus.onfoo(e => {});
+bus.onbar(e => {});
+```
+
+#### Reactive Roots
+
+The EventListenerBus is designed in a way to let you add event listeners outside of reactive roots/ in different root then the one primitive was used in.
+
+```ts
+const bus = createRoot(dispose => {
+  return createEventListenerBus();
+});
+
+// listeners can be added outside of the original root setup function.
+createRoot(dispose => {
+  bus.onclick(e => {});
+});
 ```
 
 ## `WindowEventListener`
@@ -342,5 +351,13 @@ Updated to Solid 1.3
 1.4.2
 
 Minor improvements.
+
+1.4.3
+
+Allow listening to multiple event types with a single `createEventListener` | `createEventSignal`. Removed option to pass a reactive signal as options.
+
+1.5.0
+
+Add `createEventListenerBus`.
 
 </details>
