@@ -38,7 +38,8 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^0.1.2"
+    "@solid-primitives/utils": "^0.1.2",
+    "@solid-primitives/rootless": "^0.0.100"
   },
   "devDependencies": {
     "jsdom": "^18.1.1",

@@ -7,12 +7,11 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "install": "lerna bootstrap --concurrency 4",
+    "install": "lerna bootstrap --concurrency 4 --no-ci",
     "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx}\" \"utils/**/*.{js,ts,json,css,tsx,jsx}\"",
     "ls": "lerna-script",
-    "test": "lerna run test --concurrency 4",
     "build": "lerna run build --concurrency 4",
-    "clean:windows": "lerna clean && del */**/*.lock && del *.lock"
+    "test": "lerna run test --concurrency 4"
   },
   "devDependencies": {
     "lerna": "^4.0.0",

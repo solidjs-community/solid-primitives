@@ -1,4 +1,5 @@
-import { Truthy, Fn, createSubRoot } from "@solid-primitives/utils";
+import { Truthy, Fn } from "@solid-primitives/utils";
+import { createSubRoot } from "@solid-primitives/rootless";
 import { Accessor, createComputed, createMemo, onCleanup } from "solid-js";
 
 // .dispose() method is for disposing of root form outside

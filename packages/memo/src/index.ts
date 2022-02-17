@@ -8,11 +8,10 @@ import {
   createMemo,
   runWithOwner
 } from "solid-js";
-import type { EffectOptions, MemoOptions } from "solid-js/types/reactive/signal";
+import type { EffectOptions, MemoOptions, Owner } from "solid-js/types/reactive/signal";
 import debounce from "@solid-primitives/debounce";
 import throttle from "@solid-primitives/throttle";
 import { Fn, isFunction } from "@solid-primitives/utils";
-import type { Owner } from "solid-js/types/reactive/signal";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
@@ -227,7 +226,7 @@ export function createLazyMemo<T>(
   /** number of places where the state is being actively observed */
   let listeners = 0;
   /** original root in which the primitive was initially run */
-  const owner = getOwner();
+  const owner = getOwner() as Owner;
 
   // prettier-ignore
   // memo is recreated every time it's being read, and the previous one is derailed
