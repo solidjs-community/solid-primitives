@@ -12,7 +12,6 @@ import type { EffectOptions, MemoOptions, Owner } from "solid-js/types/reactive/
 import debounce from "@solid-primitives/debounce";
 import throttle from "@solid-primitives/throttle";
 import { Fn, isFunction } from "@solid-primitives/utils";
-import type { Owner } from "solid-js/types/reactive/signal";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
