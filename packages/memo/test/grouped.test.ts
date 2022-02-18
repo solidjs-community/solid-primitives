@@ -66,7 +66,7 @@ deb("writes to signal are debounced", () =>
           setTimeout(() => {
             assert.is(memo(), 3);
             dispose();
-          }, 100);
+          }, 200);
         }, 10);
       }, 10);
     }, 10);
