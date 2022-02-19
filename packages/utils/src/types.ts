@@ -92,6 +92,8 @@ export type FalsyValue = false | 0 | "" | null | undefined;
 export type Truthy<T> = Exclude<T, FalsyValue>;
 export type Falsy<T> = Extract<T, FalsyValue>;
 
+export type Fallback<T, F = NonNullable<T>> = NonNullable<T> | F;
+
 /**
  * Destructible store object, with values changed to accessors
  */

@@ -12,7 +12,8 @@ import type {
   MaybeAccessorValue,
   Noop,
   OnAccessEffectFunction,
-  Values
+  Values,
+  Fallback
 } from "./types";
 
 export * from "./types";
@@ -47,6 +48,9 @@ export const isString = (val: unknown): val is string => typeof val === "string"
 export const isObject = (val: any): val is object => toString.call(val) === "[object Object]";
 export const isArray = Array.isArray as (val: any) => val is any[];
 
+/**
+ * Check if the value is an instance of ___
+ */
 export const ofClass = (v: any, c: AnyClass): boolean =>
   v instanceof c || (v && v.constructor === c);
 
@@ -56,9 +60,37 @@ export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
  * for creating tuples by inferring type
  * @example
  * const users = tuple(["John", "Jeff", "Joe"]);
- * // users: [string, string, string]
+ * users // T: [string, string, string]
  */
 export const tuple = <T extends [] | any[]>(input: T): T => input;
+
+/**
+ * Removes the `null` and `undefined` from the type.
+ * @warning **Obviously use with caution**
+ */
+export const definite = <T>(v: T) => v as NonNullable<T>;
+
+/**
+ * Get the value if it is defined, or get the fallback otherwise
+ * @param v the value to check
+ * @param fallback the fallback value
+ */
+export function withFallback<T>(v: T, fallback: NonNullable<T>): Fallback<T>;
+export function withFallback<T, F>(v: T, fallback: F): Fallback<T, F>;
+export function withFallback(v: any, fallback: any): any {
+  return isDefined(v) ? v : fallback;
+}
+
+/**
+ * Get the value if it is defined, or get the fallback otherwise
+ * @param v the value to check
+ * @param fallback function returning a fallback value
+ */
+export function withFallbackFn<T>(v: T, fallback: () => NonNullable<T>): Fallback<T>;
+export function withFallbackFn<T, F>(v: T, fallback: () => F): Fallback<T, F>;
+export function withFallbackFn(v: any, fallback: () => any): any {
+  return isDefined(v) ? v : fallback();
+}
 
 /** `Array.prototype.includes()` without so strict types. Also allows for checking for multiple items */
 export const includes = (arr: any[], ...items: any): boolean => {
