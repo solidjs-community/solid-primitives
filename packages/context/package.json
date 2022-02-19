@@ -12,6 +12,14 @@
   "bugs": {
     "url": "https://github.com/davedbase/solid-primitives/issues"
   },
+  "primitive": {
+    "name": "context",
+    "stage": 1,
+    "list": [
+      "createContextProvider"
+    ],
+    "category": "Utilities"
+  },
   "private": false,
   "sideEffects": false,
   "type": "module",
