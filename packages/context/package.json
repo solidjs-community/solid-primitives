@@ -22,9 +22,10 @@
     "dist"
   ],
   "scripts": {
+    "start": "vite serve dev --host",
+    "dev": "yarn start",
     "build": "tsup",
-    "test": "uvu -r solid-register",
-    "watch-test": "watchlist src test -- npm test"
+    "test": "uvu -r solid-register"
   },
   "keywords": [
     "provider",
@@ -39,7 +40,9 @@
     "tslib": "^2.3.1",
     "tsup": "^5.11.0",
     "uvu": "^0.5.2",
-    "watchlist": "^0.3.1"
+    "unocss": "0.24.3",
+    "vite": "2.8.1",
+    "vite-plugin-solid": "2.2.5"
   },
   "peerDependencies": {
     "solid-js": "^1.3.0"
