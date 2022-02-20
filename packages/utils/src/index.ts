@@ -335,6 +335,20 @@ export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(
   };
 };
 
+/**
+ * Group synchronous function calls.
+ * @param fn
+ * @returns `fn`
+ */
+export function createMicrotask<A extends any[] | []>(fn: (...a: A) => void): (...a: A) => void {
+  let calls = 0;
+  let args: A;
+  return (...a: A) => {
+    (args = a), calls++;
+    queueMicrotask(() => --calls === 0 && fn(...args));
+  };
+}
+
 /** WIP: an easier to setup and type Proxy */
 export function createProxy<T extends Record<string | symbol, any>>(traps: {
   get: <K extends keyof T>(key: K) => T[K];
