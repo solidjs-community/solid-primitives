@@ -6,7 +6,7 @@
 
 A project that strives to develop high-quality, community contributed Solid primitives. All utilities are well tested and continuously maintained. Every contribution to the repository is checked for quality and maintained to the highest degree of excellence. The ultimate goal is to extend Solid's primary and secondary primitives with a set of tertiary primitives.
 
-While Solid Primitives is not a SolidJS Core Team maintained project is managed by members of the SolidJS core and ecosystem members. This separation allows the core library to iterate independently while allowing Solid Primitives to remain in-sync with future plans.
+While Solid Primitives is not officially maintained by the SolidJS Core Team, it is managed by members of the SolidJS core and ecosystem teams. This separation allows the core library to iterate independently while allowing Solid Primitives to remain in-sync with future plans.
 
 ## Philosophy
 
