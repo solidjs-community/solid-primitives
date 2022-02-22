@@ -1,4 +1,4 @@
-import { getOwner, onCleanup, on, Accessor, DEV } from "solid-js";
+import { getOwner, onCleanup, on, createSignal, Accessor, DEV } from "solid-js";
 import type { EffectFunction, NoInfer, OnOptions } from "solid-js/types/reactive/signal";
 import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
@@ -13,7 +13,9 @@ import type {
   Noop,
   OnAccessEffectFunction,
   Values,
-  Fallback
+  Fallback,
+  Trigger,
+  TriggerCache
 } from "./types";
 
 export * from "./types";
@@ -372,4 +374,51 @@ export function createProxy(traps: {
       }
     }
   );
+}
+
+/**
+ * Set listeners in reactive computations and then trigger them when you want.
+ * @returns `[track function, dirty function]`
+ * @example
+ * const [track, dirty] = createTrigger()
+ * createEffect(() => {
+ *    track()
+ *    ...
+ * })
+ * // later
+ * dirty()
+ */
+export function createTrigger(): Trigger {
+  return createSignal(undefined, { equals: false });
+}
+
+/**
+ * Set listeners in reactive computations and then trigger them when you want. Cache trackers by a `key`.
+ * @returns `{ track, dirty, dirtyAll }` functions
+ * `track` and `dirty` are called with a `key` so that each tracker will trigger an update only when his individual `key` would get marked as dirty.
+ * @example
+ * const { track, dirty } = createTriggerCache()
+ * createEffect(() => {
+ *    track(1)
+ *    ...
+ * })
+ * // later
+ * dirty(1)
+ * // this won't cause an update:
+ * dirty(2)
+ */
+export function createTriggerCache<T>(): TriggerCache<T> {
+  const cache = new Map<T, Trigger>();
+  return {
+    dirty: key => cache.get(key)?.[1](),
+    dirtyAll: () => cache.forEach(s => s[1]()),
+    track(key) {
+      let trigger = cache.get(key);
+      if (!trigger) {
+        trigger = createTrigger();
+        cache.set(key, trigger);
+      }
+      trigger[0]();
+    }
+  };
 }

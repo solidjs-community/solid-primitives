@@ -101,6 +101,14 @@ export type Destore<T extends Object> = {
   [K in keyof T]: T[K] extends Function ? T[K] : Accessor<T[K]>;
 };
 
+export type TriggerCache<T> = {
+  track: Get<T>;
+  dirty: Get<T>;
+  dirtyAll: Fn;
+};
+
+export type Trigger = [track: Fn, dirty: Fn];
+
 export type Position = {
   x: number;
   y: number;
