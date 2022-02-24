@@ -9,7 +9,7 @@
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
-  "primitives": {
+  "primitive": {
     "name": "audio",
     "stage": 3,
     "list": [
