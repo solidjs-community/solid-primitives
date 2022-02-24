@@ -1,9 +1,9 @@
-import { Accessor, createSignal, Setter } from "solid-js";
-import type { BaseOptions } from "solid-js/types/reactive/signal";
+import { Accessor } from "solid-js";
 import { Get, createTriggerCache } from "@solid-primitives/utils";
-import { untrack } from "solid-js";
 
 export type SignalSet<T> = Accessor<T[]> & ReactiveSet<T>;
+
+const WHOLE = Symbol("watch_whole");
 
 /**
  * A reactive version of a Javascript built-in `Set` class.
@@ -19,15 +19,10 @@ export type SignalSet<T> = Accessor<T[]> & ReactiveSet<T>;
  */
 export class ReactiveSet<T> {
   private s: Set<T>;
-  private signal: Accessor<Set<T>>;
-  private setSignal: Setter<Set<T>>;
-  private cache = createTriggerCache<T>();
+  private cache = createTriggerCache<T | typeof WHOLE>();
 
-  constructor(initial?: T[], options?: BaseOptions) {
+  constructor(initial?: T[]) {
     this.s = new Set(initial);
-    const [get, set] = createSignal(this.s, { equals: false, name: options?.name });
-    this.signal = get;
-    this.setSignal = set;
   }
 
   has(v: T): boolean {
@@ -35,45 +30,37 @@ export class ReactiveSet<T> {
     return this.s.has(v);
   }
   add(v: T): boolean {
-    const set = untrack(this.signal);
-    if (set.has(v)) return false;
-    set.add(v);
-    this.setSignal(set);
+    if (this.s.has(v)) return false;
+    this.s.add(v);
     this.cache.dirty(v);
     return true;
   }
   delete(v: T): boolean {
-    const set = untrack(this.signal);
-    const r = set.delete(v);
-    if (r) {
-      this.setSignal(set);
-      this.cache.dirty(v);
-    }
+    const r = this.s.delete(v);
+    if (r) this.cache.dirty(v);
     return r;
   }
   clear(): void {
-    const set = untrack(this.signal);
-    if (set.size) {
-      set.clear();
-      this.setSignal(set);
+    if (this.s.size) {
+      this.s.clear();
       this.cache.dirtyAll();
     }
   }
   set(list: T[]): void {
-    const set = untrack(this.signal);
-    set.clear();
-    list.forEach(v => set.add(v));
-    this.setSignal(set);
+    this.s.clear();
+    list.forEach(v => this.s.add(v));
     this.cache.dirtyAll();
   }
   forEach(cb: Get<T>) {
-    this.signal().forEach(cb);
+    this.s.forEach(cb);
   }
   values(): IterableIterator<T> {
-    return this.signal().values();
+    this.cache.track(WHOLE);
+    return this.s.values();
   }
   get size(): number {
-    return this.signal().size;
+    this.cache.track(WHOLE);
+    return this.s.size;
   }
 
   [Symbol.iterator](): IterableIterator<T> {
@@ -128,8 +115,8 @@ export class ReactiveWeakSet<T extends object> {
  * set.delete(2)
  * set.clear()
  */
-export function createSet<T>(initial: T[], options?: BaseOptions): SignalSet<T> {
-  const set = new ReactiveSet(initial, options);
+export function createSet<T>(initial: T[]): SignalSet<T> {
+  const set = new ReactiveSet(initial);
   return new Proxy(set, {
     apply: () => [...set]
   }) as SignalSet<T>;
