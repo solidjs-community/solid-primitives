@@ -3,6 +3,7 @@ import { Component, createContext, createComponent, useContext } from "solid-js"
 /**
  * Create the context provider component & useContext function with types inferred from the factory function.
  * @param factoryFn Factory function will run when the provider component in executed. It takes the provider component `props` as it's argument, and what it returns will be available in the contexts for all the underlying components.
+ * @param defaults fallback returned from useContext function if the context wasn't provided
  * @returns tuple of `[provider component, useContext function]`
  * @example
  * ```tsx
@@ -20,11 +21,19 @@ import { Component, createContext, createComponent, useContext } from "solid-js"
  * ctx?.count() // => 1
  * ```
  */
-export const createContextProvider = <T, P extends Record<string, any>>(
+export function createContextProvider<T, P extends Record<string, unknown>>(
+  factoryFn: (props: P) => T,
+  defaults: T
+): [provider: Component<P>, useContext: () => T];
+export function createContextProvider<T, P extends Record<string, unknown>>(
   factoryFn: (props: P) => T
-): [provider: Component<P>, useContext: () => T | undefined] => {
-  const ctx = createContext<any>();
-  const Provider: Component<any> = props => {
+): [provider: Component<P>, useContext: () => T | undefined];
+export function createContextProvider<T, P extends Record<string, unknown>>(
+  factoryFn: (props: P) => T,
+  defaults?: T
+): [provider: Component<P>, useContext: () => T | undefined] {
+  const ctx = createContext(defaults);
+  const Provider: Component<P> = props => {
     return createComponent(ctx.Provider, {
       value: factoryFn(props),
       get children() {
@@ -34,4 +43,4 @@ export const createContextProvider = <T, P extends Record<string, any>>(
   };
   const useProvider = () => useContext(ctx);
   return [Provider, useProvider];
-};
+}

@@ -3,11 +3,9 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/context?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/context)
 [![version](https://img.shields.io/npm/v/@solid-primitives/context?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/context)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/davedbase/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
-Primitives simplifying or extending the SolidJS Context API.
-
-- **[`createContextProvider`](#createContextProvider)** - Create the context provider component & useContext function with types inferred from the factory function.
+Primitives simplifying the creation and use of SolidJS Context Providers.
 
 ## Installation
 
@@ -19,9 +17,19 @@ yarn add @solid-primitives/context
 
 ## `createContextProvider`
 
-Create the context provider component & useContext function with types inferred from the factory function.
+Create the Context Provider component & useContext function with types inferred from the factory function.
 
-### How To use it
+#### Definition
+
+```ts
+function createContextProvider<T, P extends Record<string, unknown>>(
+  factoryFn: (props: P) => T,
+  defaults: T
+): [provider: Component<P>, useContext: () => T];
+function createContextProvider<T, P extends Record<string, unknown>>(
+  factoryFn: (props: P) => T
+): [provider: Component<P>, useContext: () => T | undefined];
+```
 
 #### Import
 
@@ -29,9 +37,9 @@ Create the context provider component & useContext function with types inferred 
 import { createContextProvider } from "@solid-primitives/context";
 ```
 
-#### Creating the context provider and use-primitive
+#### Creating the Context Provider
 
-Types of the context are inferred from it's factory function. Factory function will run when the provider component in executed. It takes the provider component `props` as it's argument, and what it returns will be available in the contexts for all the underlying components.
+Given a factory function, `createContextProvider` creates a SolidJS Context and returns both a Provider component for setting the context, and a useContext helper for getting the context. The factory function gets called when the provider component gets executed; all `props` of the provider component get passed into the factory function, and what it returns will be available in the contexts for all the underlying components. The types of the provider props and context are inferred from the factory function.
 
 ```ts
 const [CounterProvider, useCounter] = createContextProvider((props: { initial: number }) => {
@@ -41,7 +49,7 @@ const [CounterProvider, useCounter] = createContextProvider((props: { initial: n
 });
 ```
 
-#### Place the Provider
+#### Set Context using the Provider
 
 The provider component takes `props` declared as arguments of the factory functions.
 
@@ -62,10 +70,32 @@ const ctx = useCounter();
 ctx?.count(); // => 1
 ```
 
-Or provide an fallback to be able to destructure safely.
+#### Providing context fallback
+
+The `createContextProvider` primitive takes a second, optional argument for providing context defaults for when the context wouldn't be provided higher in the component tree.
+Providing a fallback also removes `undefined` from `T | undefined` return type of the `useContext` function.
 
 ```ts
-const { count } = useCounter() ?? { count: () => 0 };
+const [CounterProvider, useCounter] = createContextProvider(
+  () => {
+    const [count, setCount] = createSignal(0);
+    const increment = () => setCount(count() + 1);
+    return { count, increment };
+  },
+  {
+    count: () => 0,
+    increment: () => {}
+  }
+);
+
+// then when using the context:
+const { count } = useCounter();
+```
+
+Definite context types without defaults:
+
+```ts
+const useDefiniteCounter = () => useCounter()!;
 ```
 
 ## Changelog
@@ -75,6 +105,6 @@ const { count } = useCounter() ?? { count: () => 0 };
 
 0.0.100
 
-Initial realease of the context package.
+Initial release of the context package.
 
 </details>
