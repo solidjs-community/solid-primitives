@@ -3,9 +3,12 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/set?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/set)
 [![version](https://img.shields.io/npm/v/@solid-primitives/set?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/set)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/davedbase/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
-The set data structure as a reactive signal.
+Provides a reactive version of a Javascript built-in `Set` class.
+
+- **[`ReactiveSet`](#ReactiveSet)** - A reactive version of a Javascript built-in `Set` class.
+- **[`createSet`](#createSet)** - Creates an signal instance of a `ReactiveSet`.
 
 ## Installation
 
@@ -15,15 +18,91 @@ npm install @solid-primitives/set
 yarn add @solid-primitives/set
 ```
 
-## How to use it
+## `ReactiveSet`
+
+A reactive version of a Javascript built-in `Set` class.
+
+### How to use it
+
+#### Import
 
 ```ts
-const [value, setValue] = createPrimitiveTemplate(false);
+import { ReactiveSet } from "@solid-primitives/set";
 ```
 
-## Demo
+#### Basic usage
 
-You can use this template for publishing your demo on CodeSandbox: https://codesandbox.io/s/solid-primitives-demo-template-sz95h
+```ts
+const set = new ReactiveSet([1, 1, 2, 3]);
+
+// listen for changes reactively
+createEffect(() => {
+  [...set]; // => [1,2,3] (reactive on any change)
+  set.has(2); // => true (reactive on change to the result)
+});
+
+// apply like with normal Set
+set.add(4);
+set.delete(2);
+set.clear();
+```
+
+#### Differences from `Set`
+
+The interface is mostly the same, but there are some slight changes to the available mathods/returned values.
+
+##### `.add()`
+
+`.add()` method of `Set` returns it's instance, while in `ReactiveSet` a `boolean` is returned to indicate wheather the value was insterted to the set (was new).
+
+```ts
+const set = new ReactiveSet();
+set.add(2); // => true
+set.add(2); // => false
+```
+
+##### `.set()`
+
+`.set()` is a new method added to give an availability to compleately overwrite the currect set with a new array of values.
+
+```ts
+const numbers = new ReactiveSet([1,2,3])
+numbers.set([4,5,6])
+[...numbers] // => [4,5,6]
+```
+
+##### `.values()`, `.entries()`, `.keys()`
+
+In `Set` all the methods `.values()`, `.entries()`, `.keys()` do the same thing, `ReactiveSet` only has `.values()`.
+
+## `createSet`
+
+Creates an signal instance of a [`ReactiveSet`](#reactiveset).
+
+### How to use it
+
+#### Import
+
+```ts
+import { createSet } from "@solid-primitives/set";
+```
+
+#### Basic usage
+
+```ts
+const set = createSet([1, 1, 2, 3]);
+
+// listen for changes reactively
+createEffect(() => {
+  set(); // => [1,2,3] (reactive on any change)
+  set.has(2); // => true (reactive on change to the result)
+});
+
+// apply like with normal Set
+set.add(4);
+set.delete(2);
+set.clear();
+```
 
 ## Changelog
 
@@ -32,6 +111,6 @@ You can use this template for publishing your demo on CodeSandbox: https://codes
 
 0.0.100
 
-Initial release as a Stage-0 primitive.
+Initial release of the package.
 
 </details>

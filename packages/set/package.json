@@ -14,7 +14,7 @@
   },
   "primitive": {
     "name": "set",
-    "stage": 0,
+    "stage": 1,
     "list": [
       "createSet"
     ],
