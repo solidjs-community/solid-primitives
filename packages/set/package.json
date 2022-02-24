@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/set",
   "version": "0.0.100",
-  "description": "The set data structure as a reactive signal.",
+  "description": "The Set & WeakSet data structures as a reactive signals.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/utils#readme",
@@ -16,7 +16,8 @@
     "name": "set",
     "stage": 1,
     "list": [
-      "createSet"
+      "createSet",
+      "createWeakSet"
     ],
     "category": "Reactivity"
   },

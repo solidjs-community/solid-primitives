@@ -5,10 +5,12 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/set?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/set)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
-Provides a reactive version of a Javascript built-in `Set` class.
+The Javascript built-in `Set` & `WeakSet` data structures as a reactive signals.
 
 - **[`ReactiveSet`](#ReactiveSet)** - A reactive version of a Javascript built-in `Set` class.
 - **[`createSet`](#createSet)** - Creates an signal instance of a `ReactiveSet`.
+- **[`ReactiveWeakSet`](#ReactiveWeakSet)** - A reactive version of a Javascript built-in `WeakSet` class.
+- **[`createWeakSet`](#createWeakSet)** - Creates an signal instance of a `ReactiveWeakSet`.
 
 ## Installation
 
@@ -102,6 +104,60 @@ createEffect(() => {
 set.add(4);
 set.delete(2);
 set.clear();
+```
+
+## `ReactiveWeakSet`
+
+A reactive version of a Javascript built-in `WeakSet` class.
+
+### How to use it
+
+#### Import
+
+```ts
+import { ReactiveWeakSet } from "@solid-primitives/set";
+```
+
+#### Basic usage
+
+```ts
+const set = new ReactiveWeakSet([1, 1, 2, 3]);
+
+// listen for changes reactively
+createEffect(() => {
+  set.has(2); // => true (reactive on change to the result)
+});
+
+// apply like with normal Set
+set.add(4); // (.add() returns a boolean of if the item was added to the set)
+set.delete(2);
+```
+
+## `createWeakSet`
+
+Creates an signal instance of a [`ReactiveWeakSet`](#reactiveWeakset).
+
+### How to use it
+
+#### Import
+
+```ts
+import { createWeakSet } from "@solid-primitives/set";
+```
+
+#### Basic usage
+
+```ts
+const set = createWeakSet([1, 1, 2, 3]);
+
+// listen for changes reactively
+createEffect(() => {
+  set.has(2); // => true (reactive on change to the result)
+});
+
+// apply like with normal Set
+set.add(4);
+set.delete(2);
 ```
 
 ## Changelog
