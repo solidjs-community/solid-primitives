@@ -100,7 +100,7 @@ createEffect(() => {
   set.has(2); // => true (reactive on change to the result)
 });
 
-// apply like with normal Set
+// apply changes like with normal Set
 set.add(4);
 set.delete(2);
 set.clear();
@@ -128,7 +128,7 @@ createEffect(() => {
   set.has(2); // => true (reactive on change to the result)
 });
 
-// apply like with normal Set
+// apply changes like with normal Set
 set.add(4); // (.add() returns a boolean of if the item was added to the set)
 set.delete(2);
 ```
