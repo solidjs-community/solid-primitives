@@ -17,19 +17,7 @@ yarn add @solid-primitives/context
 
 ## `createContextProvider`
 
-Create the Context Provider component & useContext function with types inferred from the factory function.
-
-#### Definition
-
-```ts
-function createContextProvider<T, P extends Record<string, unknown>>(
-  factoryFn: (props: P) => T,
-  defaults: T
-): [provider: Component<P>, useContext: () => T];
-function createContextProvider<T, P extends Record<string, unknown>>(
-  factoryFn: (props: P) => T
-): [provider: Component<P>, useContext: () => T | undefined];
-```
+Create the Context Provider component and useContext function with types inferred from the factory function.
 
 #### Import
 
@@ -96,6 +84,25 @@ Definite context types without defaults:
 
 ```ts
 const useDefiniteCounter = () => useCounter()!;
+```
+
+#### Type Definition
+
+```ts
+function createContextProvider<T, P extends ContextProviderProps>(
+  factoryFn: (props: P) => T,
+  defaults: T
+): [provider: ContextProvider<P>, useContext: () => T];
+function createContextProvider<T, P extends ContextProviderProps>(
+  factoryFn: (props: P) => T
+): [provider: ContextProvider<P>, useContext: () => T | undefined];
+
+type ContextProviderProps = {
+  children?: JSX.Element;
+} & Record<string, unknown>;
+type ContextProvider<T extends ContextProviderProps> = (
+  props: { children: JSX.Element } & T
+) => JSX.Element;
 ```
 
 ## Changelog

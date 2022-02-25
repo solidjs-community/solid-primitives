@@ -1,7 +1,14 @@
-import { Component, createContext, createComponent, useContext } from "solid-js";
+import { createContext, createComponent, useContext, JSX } from "solid-js";
+
+export type ContextProviderProps = {
+  children?: JSX.Element;
+} & Record<string, unknown>;
+export type ContextProvider<T extends ContextProviderProps> = (
+  props: { children: JSX.Element } & T
+) => JSX.Element;
 
 /**
- * Create the context provider component & useContext function with types inferred from the factory function.
+ * Create the Context Provider component and useContext function with types inferred from the factory function.
  * @param factoryFn Factory function will run when the provider component in executed. It takes the provider component `props` as it's argument, and what it returns will be available in the contexts for all the underlying components.
  * @param defaults fallback returned from useContext function if the context wasn't provided
  * @returns tuple of `[provider component, useContext function]`
@@ -21,19 +28,19 @@ import { Component, createContext, createComponent, useContext } from "solid-js"
  * ctx?.count() // => 1
  * ```
  */
-export function createContextProvider<T, P extends Record<string, unknown>>(
+export function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T,
   defaults: T
-): [provider: Component<P>, useContext: () => T];
-export function createContextProvider<T, P extends Record<string, unknown>>(
+): [provider: ContextProvider<P>, useContext: () => T];
+export function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T
-): [provider: Component<P>, useContext: () => T | undefined];
-export function createContextProvider<T, P extends Record<string, unknown>>(
+): [provider: ContextProvider<P>, useContext: () => T | undefined];
+export function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T,
   defaults?: T
-): [provider: Component<P>, useContext: () => T | undefined] {
+): [provider: ContextProvider<P>, useContext: () => T | undefined] {
   const ctx = createContext(defaults);
-  const Provider: Component<P> = props => {
+  const Provider: ContextProvider<P> = props => {
     return createComponent(ctx.Provider, {
       value: factoryFn(props),
       get children() {
