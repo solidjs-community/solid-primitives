@@ -19,7 +19,7 @@
       "createSet",
       "createWeakSet"
     ],
-    "category": "Reactivity"
+    "category": "Utilities"
   },
   "private": false,
   "sideEffects": false,
