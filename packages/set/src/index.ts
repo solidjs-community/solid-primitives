@@ -33,11 +33,15 @@ export class ReactiveSet<T> {
     if (this.s.has(v)) return false;
     this.s.add(v);
     this.cache.dirty(v);
+    this.cache.dirty(WHOLE);
     return true;
   }
   delete(v: T): boolean {
     const r = this.s.delete(v);
-    if (r) this.cache.dirty(v);
+    if (r) {
+      this.cache.dirty(v);
+      this.cache.dirty(WHOLE);
+    }
     return r;
   }
   clear(): void {
@@ -115,10 +119,10 @@ export class ReactiveWeakSet<T extends object> {
  * set.delete(2)
  * set.clear()
  */
-export function createSet<T>(initial: T[]): SignalSet<T> {
+export function createSet<T>(initial?: T[]): SignalSet<T> {
   const set = new ReactiveSet(initial);
-  return new Proxy(set, {
-    apply: () => [...set]
+  return new Proxy(() => [...set], {
+    get: (_, b) => set[b as keyof ReactiveSet<T>]
   }) as SignalSet<T>;
 }
 
@@ -132,6 +136,6 @@ export function createSet<T>(initial: T[]): SignalSet<T> {
  * set.add(4)
  * set.delete(2)
  */
-export function createWeakSet<T extends object>(initial: T[]): ReactiveWeakSet<T> {
+export function createWeakSet<T extends object>(initial?: T[]): ReactiveWeakSet<T> {
   return new ReactiveWeakSet(initial);
 }

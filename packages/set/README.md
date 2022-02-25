@@ -79,7 +79,7 @@ In `Set` all the methods `.values()`, `.entries()`, `.keys()` do the same thing,
 
 ## `createSet`
 
-Creates an signal instance of a [`ReactiveSet`](#reactiveset).
+Creates an proxy signal instance of a [`ReactiveSet`](#reactiveset), that can be called to get the values in list form.
 
 ### How to use it
 
