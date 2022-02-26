@@ -1,16 +1,16 @@
-import { createCache } from "../src";
+import { createMemoCache } from "../src";
 import { createRoot, createSignal } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
-const test = suite("createCache");
+const test = suite("createMemoCache");
 
 test("cashes values by key", () =>
   createRoot(dispose => {
     const [count, setCount] = createSignal(0);
 
     let runs = 0;
-    const result = createCache(count, n => {
+    const result = createMemoCache(count, n => {
       runs++;
       return n;
     });
@@ -40,7 +40,7 @@ test("cashes values by key", () =>
 test("passing key to access function", () =>
   createRoot(dispose => {
     let runs = 0;
-    const result = createCache((n: number) => {
+    const result = createMemoCache((n: number) => {
       runs++;
       return n;
     });
@@ -66,7 +66,7 @@ test("reactive signal dependency", () =>
     const [dep, setDep] = createSignal(0);
 
     let runs = 0;
-    const result = createCache((n: number) => {
+    const result = createMemoCache((n: number) => {
       runs++;
       return n + dep();
     });
@@ -96,7 +96,7 @@ test("reactive signal dependency", () =>
 test("limit cache size", () =>
   createRoot(dispose => {
     let runs = 0;
-    const result = createCache(
+    const result = createMemoCache(
       (n: number) => {
         runs++;
         return n;

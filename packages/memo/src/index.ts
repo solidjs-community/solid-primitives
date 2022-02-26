@@ -6,7 +6,9 @@ import {
   getOwner,
   onCleanup,
   createMemo,
-  runWithOwner
+  runWithOwner,
+  Setter,
+  on
 } from "solid-js";
 import type { EffectOptions, MemoOptions, Owner } from "solid-js/types/reactive/signal";
 import debounce from "@solid-primitives/debounce";
@@ -64,6 +66,52 @@ export function createPureReaction(
     addedTracked = true;
     setTrackedList(p => [...p, tracking]);
   };
+}
+
+/**
+ * Solid's `createMemo` which value can be overwritten by a setter. Signal value will be the last one, set by a setter or a memo calculation.
+ * @param calc callback that calculates the value
+ * @param value initial value (for calcultion)
+ * @param options give a name to the reactive computation, or change `equals` method.
+ * @returns signal returning value of the last change.
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createWritableMemo
+ * @example
+ * const [count, setCount] = createSignal(1);
+ * const [result, setResult] = createWritableMemo(() => count() * 2);
+ * setResult(5) // overwrites calculation result
+ */
+export function createWritableMemo<T>(
+  calc: (prev: T) => T,
+  value: T,
+  options?: MemoOptions<T>
+): [signal: Accessor<T>, setter: Setter<T>];
+export function createWritableMemo<T>(
+  calc: (prev: T | undefined) => T,
+  value?: undefined,
+  options?: MemoOptions<T | undefined>
+): [signal: Accessor<T>, setter: Setter<T>];
+export function createWritableMemo<T>(
+  calc: (prev: T | undefined) => T,
+  value?: T,
+  options?: MemoOptions<T | undefined>
+): [signal: Accessor<T>, setter: Setter<T>] {
+  const equalsOptions = { equals: options?.equals };
+  let last = "memo" as "memo" | "setter";
+  const memo = createMemo(calc, value, equalsOptions);
+  createComputed(on(memo, () => (last = "memo")));
+  const [signal, setSignal] = createSignal(memo(), equalsOptions);
+
+  const get = createMemo(
+    on([memo, signal], ([memo, signal]) => (last === "setter" ? signal : memo)),
+    undefined,
+    options
+  );
+  const set: Setter<T> = (a: any) => {
+    last = "setter";
+    const v = isFunction(a) ? (a.length > 0 ? a(untrack(get)) : a()) : a;
+    return setSignal(() => v);
+  };
+  return [get, set];
 }
 
 /**
@@ -262,33 +310,33 @@ export type CacheOptions<Value> = MemoOptions<Value> & { size?: number };
  * @param options set maximum **size** of the cache, or memo options.
  * @returns signal access function
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createCache
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createMemoCache
  *
  * @example
  * set the reactive key up-front
  * ```ts
  * const [count, setCount] = createSignal(1)
- * const double = createCache(count, n => n * 2)
+ * const double = createMemoCache(count, n => n * 2)
  * // access value:
  * double()
  * ```
  * or pass it to the access function (let's accessing different keys in different places)
  * ```ts
- * const double = createCache((n: number) => n * 2)
+ * const double = createMemoCache((n: number) => n * 2)
  * // access with key
  * double(count())
  * ```
  */
-export function createCache<Key, Value>(
+export function createMemoCache<Key, Value>(
   key: Accessor<Key>,
   calc: CacheCalculation<Key, Value>,
   options?: CacheOptions<Value>
 ): Accessor<Value>;
-export function createCache<Key, Value>(
+export function createMemoCache<Key, Value>(
   calc: CacheCalculation<Key, Value>,
   options?: CacheOptions<Value>
 ): CacheKeyAccessor<Key, Value>;
-export function createCache<Key, Value>(
+export function createMemoCache<Key, Value>(
   ...args:
     | [key: Accessor<Key>, calc: CacheCalculation<Key, Value>, options?: CacheOptions<Value>]
     | [calc: CacheCalculation<Key, Value>, options?: CacheOptions<Value>]
