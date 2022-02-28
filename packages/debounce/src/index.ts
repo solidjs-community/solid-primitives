@@ -1,3 +1,5 @@
+import { onCleanup } from "solid-js";
+
 /**
  * Creates a method that is debounced and cancellable.
  *
@@ -17,6 +19,7 @@ const createDebounce = <T extends (...args: unknown[]) => void, A = Parameters<T
 ): [fn: (...args: A extends unknown[] ? A : never) => void, clear: () => void] => {
   let timeoutId: ReturnType<typeof setTimeout>;
   const clear = () => clearTimeout(timeoutId);
+  onCleanup(clear);
   return [
     (...args: A extends unknown[] ? A : never) => {
       if (timeoutId !== undefined) clear();

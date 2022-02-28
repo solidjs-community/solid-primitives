@@ -55,4 +55,8 @@ Cleaned up documentation
 
 Updated to Solid 1.3
 
+1.1.2
+
+Added missing automated clean-up.
+
 </details>
