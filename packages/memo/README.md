@@ -7,12 +7,13 @@
 
 Collection of custom `createMemo` primitives. They extend it's functionality while keeping the usage similar.
 
+- [`createWritableMemo`](#createWritableMemo) - Solid's `createMemo` which value can be overwritten by a setter.
 - [`createLazyMemo`](#createLazyMemo) - Lazily evaluated memo. Will run the calculation only if is being listened to.
 - [`createAsyncMemo`](#createAsyncMemo) - Memo that allows for asynchronous calculations.
 - [`createDebouncedMemo`](#createDebouncedMemo) - Memo which returned signal is debounced.
 - [`createThrottledMemo`](#createThrottledMemo) - Memo which returned signal is throttled.
 - [`createPureReaction`](#createPureReaction) - A `createReaction` that runs before render _(non-batching)_.
-- [`createCache`](#createCache) - Custom, lazily-evaluated, memo, with caching based on keys.
+- [`createMemoCache`](#createMemoCache) - Custom, lazily-evaluated, memo, with caching based on keys.
 
 ## Installation
 
@@ -20,6 +21,26 @@ Collection of custom `createMemo` primitives. They extend it's functionality whi
 npm install @solid-primitives/memo
 # or
 yarn add @solid-primitives/memo
+```
+
+## `createWritableMemo`
+
+Solid's `createMemo` which value can be overwritten by a setter.
+
+### How to use it
+
+`createWritableMemo` takes the same arguments as Solid's `createMemo`:
+
+- `calc` - callback that calculates the value
+- `value` - initial value (for calcultion)
+- `options` - give a name to the reactive computation, or change `equals` method.
+
+And returns a signal with value of the last change, set by a setter or a memo calculation.
+
+```ts
+const [count, setCount] = createSignal(1);
+const [result, setResult] = createWritableMemo(() => count() * 2);
+setResult(5); // overwrites calculation result
 ```
 
 ## `createLazyMemo`
@@ -163,7 +184,7 @@ setCount(2); // doesn't trigger callback
 function createPureReaction(onInvalidate: Fn, options?: EffectOptions): (tracking: Fn) => void;
 ```
 
-## `createCache`
+## `createMemoCache`
 
 Custom, lazily-evaluated, cached memo. The caching is based on a `key`, it has to be declared up-front as a reactive source, or passed to the signal access function.
 
@@ -180,14 +201,14 @@ Returns a signal access function.
 #### Import
 
 ```ts
-import { createCache } from "@solid-primitives/memo";
+import { createMemoCache } from "@solid-primitives/memo";
 ```
 
 #### Setting the key up-front as a reactive source
 
 ```ts
 const [count, setCount] = createSignal(1);
-const double = createCache(count, n => n * 2);
+const double = createMemoCache(count, n => n * 2);
 // access value:
 double();
 ```
@@ -198,7 +219,7 @@ let's accessing different keys in different places
 
 ```ts
 const [count, setCount] = createSignal(1);
-const double = createCache((n: number) => n * 2);
+const double = createMemoCache((n: number) => n * 2);
 // access value with key:
 double(count());
 ```
@@ -214,18 +235,18 @@ const [number, setNumber] = createSignal(1);
 const [divisor, setDivisor] = createSignal(1);
 
 // calculation subscribes to divisor signal
-const result = createCache(number, n / divisor());
+const result = createMemoCache(number, n / divisor());
 ```
 
 ### Definition
 
 ```ts
-function createCache<Key, Value>(
+function createMemoCache<Key, Value>(
   key: Accessor<Key>,
   calc: CacheCalculation<Key, Value>,
   options?: CacheOptions<Value>
 ): Accessor<Value>;
-function createCache<Key, Value>(
+function createMemoCache<Key, Value>(
   calc: CacheCalculation<Key, Value>,
   options?: CacheOptions<Value>
 ): CacheKeyAccessor<Key, Value>;
@@ -243,5 +264,9 @@ type CacheOptions<Value> = MemoOptions<Value> & { size?: number };
 0.0.100
 
 Initial release as a Stage-1 primitive.
+
+0.0.200
+
+Add `createWritableMemo`. rename `createCache` to `createMemoCache`.
 
 </details>

@@ -1,12 +1,12 @@
 import { createSignal } from "solid-js";
-import { createCache } from "../src";
+import { createMemoCache } from "../src";
 
 export default function Cache() {
   const [number, setNumber] = createSignal(1);
   const [divisor, setDivisor] = createSignal(1);
   const [runs, setRuns] = createSignal(0);
 
-  const result = createCache(number, n => {
+  const result = createMemoCache(number, n => {
     setRuns(p => ++p);
     return n / divisor();
   });
