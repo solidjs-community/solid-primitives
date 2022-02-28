@@ -131,22 +131,6 @@ solidMessage(); // => hello, solid
 - **`substring`** - signal builder `String.prototype.substring()`
 - **`template`** - Create reactive string templates
 
-### Special
-
-- **`spread`** - Turn your signal into a tuple of signals, or map of signals. **(input needs to have static keys)**
-
-```ts
-// spread tuples
-const [first, second, third] = spread(() => [1, 2, 3]);
-first(); // => 1
-second(); // => 2
-third(); // => 3
-// spread objects
-const { name, age } = spread(() => ({ name: "John", age: 36 }));
-name(); // => "John"
-age(); // => 36
-```
-
 ## A call for feedback
 
 `signal-builders` package is now a proof of concept of a fresh and experimental idea. Therefore all feedback/ideas/issues are highly welcome! :)

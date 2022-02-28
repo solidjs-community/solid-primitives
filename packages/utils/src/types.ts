@@ -41,7 +41,9 @@ export type MaybeAccessor<T> = T | Accessor<T>;
  * // => string | void
  * ```
  */
-export type MaybeAccessorValue<T extends MaybeAccessor<any>> = T extends Fn ? ReturnType<T> : T;
+export type MaybeAccessorValue<T extends MaybeAccessor<any>> = T extends () => any
+  ? ReturnType<T>
+  : T;
 
 export type OnAccessEffectFunction<S, Prev, Next extends Prev = Prev> = (
   input: AccessReturnTypes<S>,
