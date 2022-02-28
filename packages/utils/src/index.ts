@@ -116,7 +116,7 @@ export const includes = (arr: any[], ...items: any): boolean => {
  * ```
  */
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
-  isFunction(v) ? (v as any)() : v;
+  isFunction(v) && !v.length ? v() : v;
 
 /**
  * Accesses the value of a MaybeAccessor, but always returns an array
@@ -217,10 +217,9 @@ export const entries = <A extends MaybeAccessor<object>, O = MaybeAccessorValue<
 ): [Keys<O>, Values<O>][] => Object.entries(access(object)) as [Keys<O>, Values<O>][];
 
 /**
- * Get `Object.keys()` of an MaybeAccessor<Object>
+ * Get keys of an object
  */
-export const keys = <A extends MaybeAccessor<object>>(object: A) =>
-  Object.keys(access(object)) as (keyof MaybeAccessorValue<A>)[];
+export const keys = Object.keys as <T extends object>(object: T) => (keyof T)[];
 
 /**
  * Creates a promise that resolves *(or rejects)* after given time.
