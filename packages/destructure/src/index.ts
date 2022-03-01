@@ -1,4 +1,4 @@
-import { createMemo, Accessor, getOwner, runWithOwner } from "solid-js";
+import { createMemo, Accessor } from "solid-js";
 import {
   access,
   isFunction,
@@ -7,10 +7,14 @@ import {
   MaybeAccessorValue
 } from "@solid-primitives/utils";
 
-type ReactiveObject = [] | any[] | Record<string | symbol, any>;
+type ReactiveSource = MaybeAccessor<[] | any[] | Record<string | symbol, any>>;
 
-export type Spread<T extends ReactiveObject> = Readonly<{
+export type Spread<T extends ReactiveSource> = Readonly<{
   [Key in keyof T]: Accessor<T[Key]>;
+}>;
+
+export type Destructure<T extends object> = Readonly<{
+  [Key in keyof T]-?: Accessor<T[Key]>;
 }>;
 
 /**
@@ -18,8 +22,8 @@ export type Spread<T extends ReactiveObject> = Readonly<{
  * @description When a key is accessed for the first time, the `get` function is executed, later a cached value is used instead.
  */
 function createProxyCache<T extends object>(get: <K extends keyof T>(key: K) => T[K]): Readonly<T> {
-  return new Proxy({} as Readonly<T>, {
-    get(target, key) {
+  return new Proxy({} as T, {
+    get: (target, key) => {
       const saved = Reflect.get(target, key);
       if (saved) return saved;
       const value = get(key as keyof T);
@@ -29,21 +33,28 @@ function createProxyCache<T extends object>(get: <K extends keyof T>(key: K) => 
   });
 }
 
-export function destructure<
-  A extends MaybeAccessor<ReactiveObject>,
-  T extends MaybeAccessorValue<A>
->(source: A): Spread<T> {
-  // make keys fine-grained for accessors
-  if (!isFunction(source)) return createProxyCache(key => () => Reflect.get(source, key));
+/**
+ * Access properties of an reactive object as if they were signals. For destructuring props, stores, or signals returning reactive objects.
+ * @description result keys are created lazily, so looping over the keys is discouraged.
+ * @param source reactive object or signal returning one
+ * @returns object of the same keys as the source, but with values turned into accessors.
+ * @example // destructure objects
+ * const { name, age } = destructure({ name: "John", age: 36 })
+ * name() // => "John"
+ * age() // => 36
+ */
+export function destructure<A extends Record<string | symbol, any>>(
+  source: A
+): Destructure<MaybeAccessorValue<A>> {
   // reactive objects should be already fine-grained
-  const owner = getOwner()!;
-  return createProxyCache(key =>
-    runWithOwner(owner, () => createMemo(() => Reflect.get(source(), key)))
-  );
+  if (!isFunction(source)) return createProxyCache(key => () => Reflect.get(source, key));
+  // make keys fine-grained for accessors
+  return createProxyCache(key => createMemo(() => Reflect.get(source(), key)));
 }
 
 /**
- * Turn your signal into a tuple of signals, or map of signals. **(input needs to have static keys)**
+ * Spreads an reactive object *(store or props)* or a reactive object signal into a tuple/map of signals for each object key. **(source object needs to have static keys – all the keys are eagerly spread)**
+ * @param source reactive object or signal returning one
  * @example // spread tuples
  * const [first, second, third] = spread(() => [1,2,3])
  * first() // => 1
@@ -54,7 +65,7 @@ export function destructure<
  * name() // => "John"
  * age() // => 36
  */
-export function spread<A extends MaybeAccessor<ReactiveObject>, T extends MaybeAccessorValue<A>>(
+export function spread<A extends ReactiveSource, T extends MaybeAccessorValue<A>>(
   source: A
 ): Spread<T> {
   const obj = access(source);
