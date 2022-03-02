@@ -74,6 +74,16 @@ export type DeepPartialAny<T> = {
   [P in keyof T]?: T[P] extends AnyObject ? DeepPartialAny<T[P]> : any;
 };
 
+/** Removes the `[...list]` functionality */
+export type NonIterable<T> = T & {
+  [Symbol.iterator]: never;
+};
+
+/** An opposite of `Partial`. Makes all the keys required. */
+export type Definite<T> = {
+  [K in keyof T]-?: T[K];
+};
+
 /** `A | B => A & B` */
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
   k: infer I
@@ -83,7 +93,7 @@ export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) ex
 
 export type ExtractIfPossible<T, U> = Extract<T, U> extends never ? U : Extract<T, U>;
 
-export type AnyObject = Record<string, any>;
+export type AnyObject = Record<string | symbol | number, any>;
 export type AnyFunction = (...args: any[]) => any;
 export type AnyClass = abstract new (...args: any) => any;
 
