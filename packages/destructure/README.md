@@ -5,7 +5,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/destructure?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/destructure)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
-Primitives for destructuring a reactive objects _– like props or stores –_ and signals into a tuple/map of separate accessors.
+Primitives for destructuring reactive objects _– like props or stores –_ and signals into a tuple/map of separate accessors.
 
 - **[`spread`](#spread)** - Spread a reactive object source **eagerely**.
 - **[`destructure`](#destructure)** - Destructure a reactive object source **lazily**.
