@@ -105,6 +105,10 @@ type ContextProvider<T extends ContextProviderProps> = (
 ) => JSX.Element;
 ```
 
+## Demo
+
+https://codesandbox.io/s/solid-primitives-context-demo-oqyie2?file=/index.tsx
+
 ## Changelog
 
 <details>

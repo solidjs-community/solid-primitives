@@ -27,7 +27,7 @@ test("autoupdates", () => {
       const time2 = now().getTime();
       assert.ok(time2 > time1, "the newer timestamp should have bigger value");
       dispose();
-    }, 5);
+    }, 20);
   });
 });
 
