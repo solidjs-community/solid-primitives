@@ -4,25 +4,35 @@ import {
   isFunction,
   keys,
   MaybeAccessor,
-  MaybeAccessorValue
+  MaybeAccessorValue,
+  AnyObject,
+  Values,
+  Definite,
+  NonIterable
 } from "@solid-primitives/utils";
+import type { MemoOptions } from "solid-js/types/reactive/signal";
 
-type ReactiveSource = MaybeAccessor<[] | any[] | Record<string | symbol, any>>;
+type ReactiveSource = MaybeAccessor<[] | any[] | AnyObject>;
+type AccessorProps<T> = {
+  [K in keyof T]: Accessor<T[K]>;
+};
 
-export type Spread<T extends ReactiveSource> = Readonly<{
-  [Key in keyof T]: Accessor<T[Key]>;
-}>;
+export type SpreadOptions<T extends ReactiveSource> = MemoOptions<Values<T>> & { cache?: boolean };
 
-export type Destructure<T extends object> = Readonly<{
-  [Key in keyof T]-?: Accessor<T[Key]>;
-}>;
+export type Spread<T extends ReactiveSource> = Readonly<AccessorProps<T>>;
+
+export type Destructure<T extends ReactiveSource> = Readonly<
+  NonIterable<Definite<AccessorProps<T>>>
+>;
 
 /**
  * Cashed object getters.
  * @description When a key is accessed for the first time, the `get` function is executed, later a cached value is used instead.
  */
-function createProxyCache<T extends object>(get: <K extends keyof T>(key: K) => T[K]): Readonly<T> {
-  return new Proxy({} as T, {
+function createProxyCache<T extends AnyObject>(
+  get: <K extends keyof T>(key: K) => T[K]
+): Readonly<NonIterable<T>> {
+  return new Proxy({} as NonIterable<T>, {
     get: (target, key) => {
       const saved = Reflect.get(target, key);
       if (saved) return saved;
@@ -43,13 +53,17 @@ function createProxyCache<T extends object>(get: <K extends keyof T>(key: K) => 
  * name() // => "John"
  * age() // => 36
  */
-export function destructure<A extends Record<string | symbol, any>>(
-  source: A
-): Destructure<MaybeAccessorValue<A>> {
-  // reactive objects should be already fine-grained
-  if (!isFunction(source)) return createProxyCache(key => () => Reflect.get(source, key));
-  // make keys fine-grained for accessors
-  return createProxyCache(key => createMemo(() => Reflect.get(source(), key)));
+export function destructure<A extends ReactiveSource, T extends MaybeAccessorValue<A>>(
+  source: A,
+  options: SpreadOptions<T> = {}
+): Destructure<T> {
+  const cache = options.cache ?? isFunction(source);
+  return createProxyCache(key => {
+    const calc = isFunction(source)
+      ? () => Reflect.get(source(), key)
+      : () => Reflect.get(source, key);
+    return cache ? createMemo(calc, options) : calc;
+  });
 }
 
 /**
@@ -66,14 +80,18 @@ export function destructure<A extends Record<string | symbol, any>>(
  * age() // => 36
  */
 export function spread<A extends ReactiveSource, T extends MaybeAccessorValue<A>>(
-  source: A
+  source: A,
+  options: SpreadOptions<T> = {}
 ): Spread<T> {
+  const cache = options.cache ?? isFunction(source);
+  const getter = isFunction(source)
+    ? (key: any) => () => source()[key]
+    : (key: any) => () => source[key];
   const obj = access(source);
   const result = obj.constructor();
-  // make keys fine-grained for accessors
-  if (isFunction(source))
-    for (const key of keys(obj)) result[key] = createMemo(() => (source() as T)[key]);
-  // reactive objects should be already fine-grained
-  else for (const key of keys(obj)) result[key] = () => obj[key];
+  for (const key of keys(obj)) {
+    const calc = getter(key);
+    result[key] = cache ? createMemo(calc) : calc;
+  }
   return result;
 }

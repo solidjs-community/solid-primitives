@@ -1,13 +1,16 @@
 {
   "name": "@solid-primitives/destructure",
   "version": "0.0.100",
-  "description": "",
+  "description": "Primitives for destructuring a reactive objects – like props or stores – and signals into a tuple/map of separate accessors.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/destructure#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/davedbase/solid-primitives/issues"
   },
   "primitive": {
     "name": "destructure",
@@ -34,13 +37,13 @@
     "test": "uvu -r solid-register"
   },
   "keywords": [
-    "elements",
-    "ref",
+    "props",
+    "store",
     "solid",
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^0.5.2"
+    "@solid-primitives/utils": "^0.5.3"
   },
   "devDependencies": {
     "jsdom": "18.1.1",
