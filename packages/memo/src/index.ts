@@ -10,13 +10,26 @@ import {
   Setter,
   on
 } from "solid-js";
-import type { EffectOptions, MemoOptions, Owner } from "solid-js/types/reactive/signal";
+import type {
+  EffectOptions,
+  MemoOptions,
+  Owner,
+  SignalOptions
+} from "solid-js/types/reactive/signal";
 import debounce from "@solid-primitives/debounce";
 import throttle from "@solid-primitives/throttle";
-import { Fn, isFunction } from "@solid-primitives/utils";
+import { Fn, isFunction, ItemsOf } from "@solid-primitives/utils";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
+
+const set =
+  <T>(setter: Setter<T>) =>
+  (v: T) =>
+    setter(() => v);
+
+const callbackWith = <A, T>(fn: (a: A) => T, v: Accessor<A>): (() => T) =>
+  fn.length > 0 ? () => fn(untrack(v)) : (fn as () => T);
 
 /**
  * Solid's `createReaction` that is based on pure computation *(runs before render, and is non-batching)*
@@ -69,8 +82,42 @@ export function createPureReaction(
 }
 
 /**
+ * A combined memo of multiple sources, last updated source will be the value of the returned signal.
+ * @param sources list of reactive calculations/signals/memos
+ * @param value specify initial value of the returned signal
+ * @param options signal options
+ * @returns signal with value of the last updated source
+ * @example
+ * const [count, setCount] = createSignal(1);
+ * const number = createMemo(() => otherValue() * 2);
+ * const lastUpdated = createCurtain([count, number]);
+ * lastUpdated() // => undefined
+ * setCount(4)
+ * lastUpdated() // => 4
+ */
+export function createCurtain<T extends Accessor<any>[]>(
+  sources: T,
+  value: ReturnType<ItemsOf<T>>,
+  options: SignalOptions<ReturnType<ItemsOf<T>>>
+): Accessor<ReturnType<ItemsOf<T>>>;
+export function createCurtain<T extends Accessor<any>[]>(
+  sources: T,
+  value?: ReturnType<ItemsOf<T>>,
+  options?: SignalOptions<ReturnType<ItemsOf<T>> | undefined>
+): Accessor<ReturnType<ItemsOf<T>> | undefined>;
+export function createCurtain(
+  sources: Accessor<any>[],
+  value: any,
+  options: SignalOptions<any> = {}
+): Accessor<any> {
+  const [last, setLast] = createSignal(value, options);
+  for (const fn of sources) createComputed(on(fn, set(setLast), { defer: true }));
+  return last;
+}
+
+/**
  * Solid's `createMemo` which value can be overwritten by a setter. Signal value will be the last one, set by a setter or a memo calculation.
- * @param calc callback that calculates the value
+ * @param fn callback that calculates the value
  * @param value initial value (for calcultion)
  * @param options give a name to the reactive computation, or change `equals` method.
  * @returns signal returning value of the last change.
@@ -81,37 +128,24 @@ export function createPureReaction(
  * setResult(5) // overwrites calculation result
  */
 export function createWritableMemo<T>(
-  calc: (prev: T) => T,
+  fn: (prev: T) => T,
   value: T,
   options?: MemoOptions<T>
 ): [signal: Accessor<T>, setter: Setter<T>];
 export function createWritableMemo<T>(
-  calc: (prev: T | undefined) => T,
+  fn: (prev: T | undefined) => T,
   value?: undefined,
   options?: MemoOptions<T | undefined>
 ): [signal: Accessor<T>, setter: Setter<T>];
 export function createWritableMemo<T>(
-  calc: (prev: T | undefined) => T,
+  fn: (prev: T | undefined) => T,
   value?: T,
   options?: MemoOptions<T | undefined>
 ): [signal: Accessor<T>, setter: Setter<T>] {
-  const equalsOptions = { equals: options?.equals };
-  let last = "memo" as "memo" | "setter";
-  const memo = createMemo(calc, value, equalsOptions);
-  createComputed(on(memo, () => (last = "memo")));
-  const [signal, setSignal] = createSignal(memo(), equalsOptions);
-
-  const get = createMemo(
-    on([memo, signal], ([memo, signal]) => (last === "setter" ? signal : memo)),
-    undefined,
-    options
-  );
-  const set: Setter<T> = (a: any) => {
-    last = "setter";
-    const v = isFunction(a) ? (a.length > 0 ? a(untrack(get)) : a()) : a;
-    return setSignal(() => v);
-  };
-  return [get, set];
+  const [signal, setSignal] = createSignal(fn(value), options);
+  const calc = callbackWith(fn, signal);
+  createComputed(on(calc, set(setSignal), { defer: true }));
+  return [signal, setSignal];
 }
 
 /**

@@ -7,6 +7,7 @@
 
 Collection of custom `createMemo` primitives. They extend it's functionality while keeping the usage similar.
 
+- [`createCurtain`](#createCurtain) - A combined memo of a list of sources, where last updated will be the value.
 - [`createWritableMemo`](#createWritableMemo) - Solid's `createMemo` which value can be overwritten by a setter.
 - [`createLazyMemo`](#createLazyMemo) - Lazily evaluated memo. Will run the calculation only if is being listened to.
 - [`createAsyncMemo`](#createAsyncMemo) - Memo that allows for asynchronous calculations.
@@ -21,6 +22,34 @@ Collection of custom `createMemo` primitives. They extend it's functionality whi
 npm install @solid-primitives/memo
 # or
 yarn add @solid-primitives/memo
+```
+
+## `createCurtain`
+
+A combined memo of multiple sources, last updated source will be the value of the returned signal.
+
+### How to use it
+
+`createCurtain` takes three arguments:
+
+- `sources` - list of reactive calculations/signals/memos
+- `value` - initial value of returned signal
+- `options` - signal options
+
+And returns a signal with value of the last change
+
+```ts
+import { createCurtain } from "@solid-primitives/memo";
+
+const [count, setCount] = createSignal(1);
+const [x, setX] = createSignal(2);
+const number = createMemo(() => otherValue() * 2);
+const lastUpdated = createCurtain([count, number, () => x() / 3]);
+lastUpdated(); // => undefined
+setCount(4);
+lastUpdated(); // => 4
+setX(9);
+lastUpdated(); // => 3
 ```
 
 ## `createWritableMemo`
@@ -38,9 +67,13 @@ Solid's `createMemo` which value can be overwritten by a setter.
 And returns a signal with value of the last change, set by a setter or a memo calculation.
 
 ```ts
+import { createWritableMemo } from "@solid-primitives/memo";
+
 const [count, setCount] = createSignal(1);
 const [result, setResult] = createWritableMemo(() => count() * 2);
+result(); // => 2
 setResult(5); // overwrites calculation result
+result(); // => 10
 ```
 
 ## `createLazyMemo`
@@ -268,5 +301,9 @@ Initial release as a Stage-1 primitive.
 0.0.200
 
 Add `createWritableMemo`. rename `createCache` to `createMemoCache`.
+
+0.0.300
+
+Add `createCurtain`. refactor `createWritableMemo`.
 
 </details>
