@@ -29,7 +29,7 @@ async function updateReadme(log) {
     const { name, list, category, stage } = package.primitive;
     if (name) {
       let data = {};
-      data.Name = `[${name}](${githubURL}${name})`;
+      data.Name = `[${name}](${githubURL}${name}#readme)`;
       // Detect the stage and build size/version only if needed
       if (data.Stage == "X" || data.Stage == 0) {
         data.Size = "";
