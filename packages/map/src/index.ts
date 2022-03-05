@@ -1,10 +1,35 @@
 import { Accessor } from "solid-js";
-import { createTriggerCache } from "@solid-primitives/utils";
+import { createTriggerCache, isFunction } from "@solid-primitives/utils";
 
 export type SignalMap<K, V> = Accessor<[K, V][]> & ReactiveMap<K, V>;
+export type MapSetter<V> = V extends Function
+  ? (prev: V | undefined) => V
+  : ((prev: V | undefined) => V) | V;
+
+/** If value is a function – call it with a given argument – otherwise get the value as is */
+function accessWith<T extends ((arg: A) => V) | V, A, V>(v: T, arg: A): V {
+  return isFunction(v) ? v(arg) : v;
+}
 
 const WHOLE = Symbol("watch_whole");
 
+/**
+ * A reactive version of `Map` data structure. All the reads (like `get` or `has`) are signals, and all the writes (`delete` or `set`) will cause updates to appropriate signals.
+ * @param initial initial entries of the reactive map
+ * @param equals signal equals function, determining if a change should cause an update
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/map#ReactiveMap
+ * @example
+ * const userPoints = new ReactiveMap<User, number>();
+ * createEffect(() => {
+ *    userPoints.get(user1) // => T: number | undefined (reactive)
+ *    userPoints.has(user1) // => T: boolean (reactive)
+ *    userPoints.size // => T: number (reactive)
+ * });
+ * // apply changes
+ * userPoints.set(user1, 100);
+ * userPoints.delete(user2);
+ * userPoints.set(user1, n => n * 10);
+ */
 export class ReactiveMap<K, V> {
   private map: Map<K, V>;
   private cache = createTriggerCache<K | typeof WHOLE>();
@@ -43,9 +68,17 @@ export class ReactiveMap<K, V> {
   }
 
   // writes
-  set(key: K, value: V): boolean {
-    if (this.map.has(key) && this.equals(this.map.get(key)!, value)) return false;
-    this.map.set(key, value);
+  set(key: K, setter: MapSetter<V>): boolean {
+    let newV: V;
+    if (this.map.has(key)) {
+      const oldV: V = this.map.get(key)!;
+      newV = accessWith(setter, oldV);
+      if (this.equals(oldV, newV)) {
+        this.map.set(key, newV);
+        return false;
+      }
+    } else newV = accessWith(setter, undefined);
+    this.map.set(key, newV);
     this.cache.dirty(key);
     this.cache.dirty(WHOLE);
     return true;
@@ -71,6 +104,22 @@ export class ReactiveMap<K, V> {
   }
 }
 
+/**
+ * A reactive version of `WeakMap` data structure. All the reads (like `get` or `has`) are signals, and all the writes (`delete` or `set`) will cause updates to appropriate signals.
+ * @param initial initial entries of the reactive map
+ * @param equals signal equals function, determining if a change should cause an update
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/map#ReactiveWeakMap
+ * @example
+ * const userPoints = new ReactiveWeakMap<User, number>();
+ * createEffect(() => {
+ *    userPoints.get(user1) // => T: number | undefined (reactive)
+ *    userPoints.has(user1) // => T: boolean (reactive)
+ * });
+ * // apply changes
+ * userPoints.set(user1, 100);
+ * userPoints.delete(user2);
+ * userPoints.set(user1, n => n * 10);
+ */
 export class ReactiveWeakMap<K extends object, V> {
   private map: WeakMap<K, V>;
   private cache = createTriggerCache<K>();
@@ -87,9 +136,17 @@ export class ReactiveWeakMap<K extends object, V> {
     this.cache.track(key);
     return this.map.get(key);
   }
-  set(key: K, value: V): boolean {
-    if (this.map.has(key) && this.equals(this.map.get(key)!, value)) return false;
-    this.map.set(key, value);
+  set(key: K, setter: MapSetter<V>): boolean {
+    let newV: V;
+    if (this.map.has(key)) {
+      const oldV: V = this.map.get(key)!;
+      newV = accessWith(setter, oldV);
+      if (this.equals(oldV, newV)) {
+        this.map.set(key, newV);
+        return false;
+      }
+    } else newV = accessWith(setter, undefined);
+    this.map.set(key, newV);
     this.cache.dirty(key);
     return true;
   }
@@ -100,6 +157,12 @@ export class ReactiveWeakMap<K extends object, V> {
   }
 }
 
+/**
+ * Creates an instance of `ReactiveMap` class.
+ * @param initial initial entries of the reactive map
+ * @param equals signal equals function, determining if a change should cause an update
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/map#createMap
+ */
 export function createMap<K, V>(
   initial?: [K, V][],
   equals?: (a: V, b: V) => boolean
@@ -110,6 +173,12 @@ export function createMap<K, V>(
   }) as SignalMap<K, V>;
 }
 
+/**
+ * Creates an instance of `ReactiveWeakMap` class.
+ * @param initial initial entries of the reactive map
+ * @param equals signal equals function, determining if a change should cause an update
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/map#createWeakMap
+ */
 export function createWeakMap<K extends object, V>(
   initial?: [K, V][],
   equals?: (a: V, b: V) => boolean

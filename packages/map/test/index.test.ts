@@ -38,6 +38,22 @@ testMap("behaves like a Map", () =>
   })
 );
 
+testMap("setter can be a function", () =>
+  createRoot(dispose => {
+    const map = new ReactiveMap<string, number>();
+
+    assert.is(map.set("foo", 0), true);
+    assert.is(map.set("foo", 0), false);
+    assert.is(
+      map.set("foo", p => p! + 1),
+      true
+    );
+    assert.is(map.get("foo"), 1);
+
+    dispose();
+  })
+);
+
 testMap.run();
 
 const testWeakMap = suite("ReactiveWeakMap");
