@@ -135,7 +135,9 @@ This package comes with a number of support utilities built with Lerna Scripts.
 ### Browser
 
 - createURL
+- createPageVisibilityObserver (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
 - createHistory
+- createWebShare (https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share)
 - createLocale
 - createUpload (https://github.com/Marvinified/use-file-upload)
 
