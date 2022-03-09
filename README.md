@@ -124,7 +124,7 @@ This package comes with a number of support utilities built with Lerna Scripts.
 ### Display & Media
 
 - createDragAndDrop
-- createPageVisibilityObserver
+- createPageVisibilityObserver (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
 
 ### Device
 
@@ -135,7 +135,6 @@ This package comes with a number of support utilities built with Lerna Scripts.
 ### Browser
 
 - createURL
-- createPageVisibilityObserver (https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
 - createHistory
 - createWebShare (https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share)
 - createLocale
