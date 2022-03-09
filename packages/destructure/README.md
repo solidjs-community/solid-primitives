@@ -83,13 +83,13 @@ const [store, setStore] = createStore({
   user: {
     name: "Johnny",
     lastName: "Bravo",
-    age: 25
+    age: 19
   }
 });
 
 const {
   user: { name, lastName, age }
-} = destructure(store, { deep: false });
+} = destructure(store, { deep: true });
 
 name(); // => "Johnny"
 ```
