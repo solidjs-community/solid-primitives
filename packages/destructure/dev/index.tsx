@@ -4,7 +4,7 @@ import { render } from "solid-js/web";
 import "uno.css";
 
 const Inner: Component<{ seconds: number; count: number; list: { n?: number }[] }> = props => {
-  const { seconds, count } = destructure(props);
+  const { seconds, count } = destructure(props, { lazy: true });
 
   createEffect(() => console.log("Seconds", seconds()));
   createEffect(() => console.log("Count", count()));
@@ -33,11 +33,11 @@ const App: Component = () => {
   };
   setInterval(shuffle, 2000);
 
-  const [n0, n1, n2] = wrapGetters(list, { deep: true });
+  // const [n0, n1, n2] = wrapGetters(list, { deep: true });
 
-  createEffect(() => console.log("0:", n0.n));
-  createEffect(() => console.log("1:", n1.n));
-  createEffect(() => console.log("2:", n2.n));
+  // createEffect(() => console.log("0:", n0.n));
+  // createEffect(() => console.log("1:", n1.n));
+  // createEffect(() => console.log("2:", n2.n));
 
   setTimeout(() => setList([{ n: 1 }, { n: 2 }, { n: 3 }]), 3000);
   // setTimeout(() => setList([{ n: 1 }, { n: 2 }, { n: 3 }]), 6000);
@@ -49,7 +49,7 @@ const App: Component = () => {
       <div class="wrapper-v" onclick={() => setCount(p => ++p)}>
         <button class="btn">{count()}</button>
       </div>
-      {/* <Inner seconds={seconds()} count={count()} list={list()} /> */}
+      <Inner seconds={seconds()} count={count()} list={list()} />
     </div>
   );
 };

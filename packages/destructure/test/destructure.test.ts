@@ -1,12 +1,12 @@
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { destructure } from "../src";
 import { createComputed, createRoot, createSignal } from "solid-js";
 import { tuple } from "@solid-primitives/utils";
-import { destructure } from "../src";
+import { suite } from "uvu";
+import * as assert from "uvu/assert";
 
-const testSpread = suite("spread");
+const test = suite("destructure");
 
-testSpread("spread array", () =>
+test("spread array", () =>
   createRoot(dispose => {
     const [numbers, setNumbers] = createSignal(tuple([1, 2, 3]));
     const [first, second, last] = destructure(numbers);
@@ -47,10 +47,9 @@ testSpread("spread array", () =>
     assert.is(updates.c, 2);
 
     dispose();
-  })
-);
+  }));
 
-testSpread("spread object", () =>
+test("spread object", () =>
   createRoot(dispose => {
     const [numbers, setNumbers] = createSignal({
       a: 1,
@@ -99,10 +98,9 @@ testSpread("spread object", () =>
     assert.is(updates.c, 2);
 
     dispose();
-  })
-);
+  }));
 
-testSpread("spread is eager", () =>
+test("spread is eager", () =>
   createRoot(dispose => {
     const [numbers, setNumbers] = createSignal<{ a: number; b?: number }>({
       a: 0
@@ -122,14 +120,9 @@ testSpread("spread is eager", () =>
     assert.is(b, undefined);
 
     dispose();
-  })
-);
+  }));
 
-testSpread.run();
-
-const testDest = suite("destructure");
-
-testDest("destructure object", () =>
+test("destructure object", () =>
   createRoot(dispose => {
     const [numbers, setNumbers] = createSignal({
       a: 1,
@@ -178,10 +171,9 @@ testDest("destructure object", () =>
     assert.is(updates.c, 2);
 
     dispose();
-  })
-);
+  }));
 
-testDest("destructure is lazy", () =>
+test("destructure is lazy", () =>
   createRoot(dispose => {
     const [numbers, setNumbers] = createSignal<{ a: number; b?: number }>({
       a: 0
@@ -201,7 +193,63 @@ testDest("destructure is lazy", () =>
     assert.is(b(), 3);
 
     dispose();
-  })
-);
+  }));
 
-testDest.run();
+test("destructure recursively nested objects", () =>
+  createRoot(dispose => {
+    const [numbers, setNumbers] = createSignal({
+      nested: {
+        a: 1,
+        b: 2,
+        c: 3
+      }
+    });
+    const {
+      nested: { a, b, c }
+    } = destructure(numbers, { deep: true });
+
+    const updates = {
+      a: 0,
+      b: 0,
+      c: 0
+    };
+    createComputed(() => {
+      a();
+      updates.a++;
+    });
+    createComputed(() => {
+      b();
+      updates.b++;
+    });
+    createComputed(() => {
+      c();
+      updates.c++;
+    });
+
+    assert.is(a(), 1);
+    assert.is(b(), 2);
+    assert.is(c(), 3);
+
+    assert.is(updates.a, 1);
+    assert.is(updates.b, 1);
+    assert.is(updates.c, 1);
+
+    setNumbers({
+      nested: {
+        a: 1,
+        b: 6,
+        c: 7
+      }
+    });
+    assert.is(a(), 1);
+    assert.is(b(), 6);
+    assert.is(c(), 7);
+
+    assert.is(updates.a, 1);
+    assert.is(updates.b, 2);
+    assert.is(updates.c, 2);
+
+    dispose();
+  }));
+
+test.run();
