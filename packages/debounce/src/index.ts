@@ -13,20 +13,18 @@ import { onCleanup } from "solid-js";
  * fn('my-new-value');
  * ```
  */
-const createDebounce = <T extends (...args: unknown[]) => void, A = Parameters<T>>(
-  func: T,
+export function createDebounce<Args extends any[], F extends (...args: Args) => void>(
+  func: F,
   wait?: number
-): [fn: (...args: A extends unknown[] ? A : never) => void, clear: () => void] => {
+): F & { clear: () => void } {
   let timeoutId: ReturnType<typeof setTimeout>;
   const clear = () => clearTimeout(timeoutId);
   onCleanup(clear);
-  return [
-    (...args: A extends unknown[] ? A : never) => {
-      if (timeoutId !== undefined) clear();
-      timeoutId = setTimeout(() => func(...args), wait);
-    },
-    clear
-  ];
-};
+  const debounced = function (this: ThisParameterType<F>, ...args: Parameters<F>) {
+    if (timeoutId !== undefined) clear();
+    timeoutId = setTimeout(() => func.apply(this, args), wait);
+  };
+  return Object.assign(debounced, { clear }) as F & { clear: () => void };
+}
 
 export default createDebounce;
