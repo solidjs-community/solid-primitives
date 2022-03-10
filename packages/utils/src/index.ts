@@ -1,4 +1,4 @@
-import { getOwner, onCleanup, on, createSignal, Accessor, DEV } from "solid-js";
+import { getOwner, onCleanup, on, createSignal, Accessor, DEV, untrack } from "solid-js";
 import type {
   BaseOptions,
   EffectFunction,
@@ -20,7 +20,8 @@ import type {
   Values,
   Fallback,
   Trigger,
-  TriggerCache
+  TriggerCache,
+  AnyFunction
 } from "./types";
 
 export * from "./types";
@@ -117,6 +118,16 @@ export const includes = (arr: any[], ...items: any): boolean => {
  */
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
   isFunction(v) && !v.length ? v() : v;
+
+/** If value is a function – call it with a given argument – otherwise get the value as is */
+export function accessWith<T>(
+  v: T,
+  args: T extends AnyFunction ? MaybeAccessor<Parameters<T>> : never
+): T extends AnyFunction ? ReturnType<T> : T {
+  if (!isFunction(v)) return v as any;
+  const a = isFunction(args) ? untrack(args) : (args as any);
+  return v(...a);
+}
 
 /**
  * Accesses the value of a MaybeAccessor, but always returns an array
