@@ -152,7 +152,7 @@ function createProxyCacheGet<T extends ReactiveSource>(
 /**
  * Wraps object/array signal with getters for every key, making accessing properties similar to component props/store. Properties are cached with memos on access, so th primitive needs to be used in a reactive context.
  * @param signal signal source of the object to wrap
- * @param options memo options object + `deep` for wrapping nested objects as well (by default source object is wrapped shallowly)
+ * @param options memo options object + `deep` for wrapping nested objects recursively (by default source object is wrapped shallowly)
  * @returns wrapped readonly object with reactive getters
  * @example
  * const [getUser, setUser] = createSignal({
@@ -168,24 +168,24 @@ export function wrapGetters<T extends ReactiveSource, O extends GettersOptions>(
   options?: O
 ): O["deep"] extends true ? Store<T> : Readonly<T> {
   const proxies = new Map<object, { proxy: object; dispose: Fn }>();
-  let trash: Set<object> | undefined;
+  let cleanup: Set<object> | undefined;
   onCleanup(() => proxies.forEach(({ dispose }) => dispose()));
   return wrap(signal(), signal);
 
   function wrap<T extends ReactiveSource>(obj: T, signal: Accessor<T>): T {
-    if (!trash) {
+    if (!cleanup) {
       // dispose and remove saved objects that weren't used from previous iteration
-      trash = new Set(proxies.keys());
+      cleanup = new Set(proxies.keys());
       queueMicrotask(() => {
-        trash?.forEach(obj => {
+        cleanup?.forEach(obj => {
           proxies.get(obj)!.dispose();
           proxies.delete(obj);
         });
-        trash = undefined;
+        cleanup = undefined;
       });
     }
     if (proxies.has(obj)) {
-      trash.delete(obj);
+      cleanup.delete(obj);
       return proxies.get(obj)!.proxy as T;
     }
 

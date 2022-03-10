@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/destructure",
   "version": "0.0.100",
-  "description": "Primitives for destructuring reactive objects – like props or stores – and signals into a tuple/map of separate accessors.",
+  "description": "Primitives for destructuring reactive objects – like props or stores – or signals of them into a separate accessors updated individually.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/destructure#readme",
@@ -14,7 +14,7 @@
   },
   "primitive": {
     "name": "destructure",
-    "stage": 1,
+    "stage": 2,
     "list": [
       "destructure",
       "wrapGetters"
