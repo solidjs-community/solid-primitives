@@ -1,25 +1,16 @@
-import { createEventListener } from "@solid-primitives/event-listener";
 import { Destructure, destructure } from "@solid-primitives/destructure";
-import {
-  createProxy,
-  createTrigger,
-  entries,
-  Fn,
-  forEachEntry,
-  Get,
-  keys,
-  Values,
-  accessWith,
-  createTriggerCache
-} from "@solid-primitives/utils";
+import { createEventListener } from "@solid-primitives/event-listener";
+import { accessWith, createTriggerCache } from "@solid-primitives/utils";
 import {
   Accessor,
+  createComputed,
+  createMemo,
   createSignal,
   getOwner,
+  on,
   runWithOwner,
-  Setter,
   untrack,
-  createComputed
+  batch
 } from "solid-js";
 
 export type LocationState = Readonly<Omit<Location, "toString" | "assign" | "reload" | "replace">>;
@@ -49,12 +40,28 @@ export type URLSetter = (
 ) => URLRecord;
 export type URLSetterRecord = Partial<Omit<URLRecord, "origin">>;
 
+export type ReactiveSearchParamsInit =
+  | string
+  | [string, string][]
+  | Record<string, string>
+  | URLSearchParams
+  | ReactiveSearchParams;
+
+const WHOLE = Symbol("watch_whole");
+
 let globalLocationState: Accessor<LocationState> | undefined;
 let globalHistoryState: Accessor<HistoryState> | undefined;
+let globalReactiveURL: ReactiveURL | undefined;
+let globalReactiveSearchParams: ReactiveSearchParams | undefined;
 
 export function createLocationState(): Accessor<LocationState> {
-  const [state, setState] = createSignal<LocationState>(location);
-  const updateState = () => setState(location);
+  const [state, setState] = createSignal<LocationState>(
+    { ...location },
+    {
+      equals: (a, b) => a.href === b.href
+    }
+  );
+  const updateState = () => setState({ ...location });
   createEventListener(window, ["popstate", "hashchange"], updateState, false);
   return state;
 }
@@ -65,8 +72,8 @@ export function useLocationState(): Accessor<LocationState> {
 }
 
 export function createHistoryState(): Accessor<HistoryState> {
-  const [state, setState] = createSignal<HistoryState>(history);
-  const updateState = () => setState(history);
+  const [state, setState] = createSignal<HistoryState>({ ...history });
+  const updateState = () => setState({ ...history });
   createEventListener(window, "popstate", updateState, false);
   return state;
 }
@@ -76,16 +83,105 @@ export function useHistoryState(): Accessor<HistoryState> {
   return globalHistoryState;
 }
 
-function createURL(url: string, base?: string): [accessor: Accessor<URLRecord>, setter: URLSetter] {
-  const [signal, setSignal] = createSignal(new URL(url, base), { equals: false });
+export function createURLSignal(
+  url: string,
+  base?: string
+): [accessor: Accessor<URLRecord>, setter: URLSetter] {
+  const [signal, setSignal] = createSignal(new URL(url, base), {
+    equals: (a, b) => a.href === b.href
+  });
   const setter: URLSetter = get => {
     const record = accessWith(get, () => [signal()]);
     // @ts-expect-error origin filed is omitted from the types, but could still be passed to the setter
     delete record.origin;
     if (Object.keys(record).length === 0) return untrack(signal);
-    return setSignal(p => Object.assign(p, record));
+    return setSignal(p => ({ ...p, ...record }));
   };
   return [signal, setter];
+}
+
+export function createURL(url: string, base?: string) {
+  return new ReactiveURL(url, base);
+}
+
+export function createLocationURL(): ReactiveURL {
+  const state = useLocationState();
+  const href = createMemo(() => state().href);
+  const url = new ReactiveURL(href());
+  let causedRead = true;
+  let causedWrite = true;
+
+  // update ReactiveURL instance on read
+  createComputed(
+    on(href, href => {
+      console.log("href update", href, causedRead);
+      if (causedRead) return (causedRead = false);
+      (causedWrite = true), (url.href = href);
+    })
+  );
+
+  // update location on write
+  createComputed(
+    on(
+      () => url.href,
+      href => {
+        if (causedWrite) return (causedWrite = false);
+        (causedRead = true), (location.href = href);
+      }
+    )
+  );
+
+  return url;
+}
+
+export function useLocationURL(): ReactiveURL {
+  if (!globalReactiveURL) globalReactiveURL = createLocationURL();
+  return globalReactiveURL;
+}
+
+export function createSearchParams(init: ReactiveSearchParamsInit) {
+  return new ReactiveSearchParams(init);
+}
+
+export function createLocationSearchParams(): ReactiveSearchParams {
+  const state = useLocationState();
+  const search = createMemo(() => state().search);
+  const searchParams = new ReactiveSearchParams(search());
+  let causedChange = true;
+
+  // update ReactiveSearchParams instance on location change
+  createComputed(
+    on(search, search => {
+      if (causedChange) return (causedChange = false);
+      const keys = new Set(searchParams.keys());
+      const newSearchParams = new URLSearchParams(search);
+      batch(() => {
+        newSearchParams.forEach((value, name) => {
+          if (keys.has(name)) {
+            keys.delete(name);
+            searchParams.set(name, value);
+          } else searchParams.append(name, value);
+        });
+        keys.forEach(key => searchParams.delete(key));
+      });
+    })
+  );
+
+  // update location on write
+  createComputed(
+    on(
+      () => searchParams + "",
+      search => ((causedChange = true), (location.search = search)),
+      { defer: true }
+    )
+  );
+
+  return searchParams;
+}
+
+export function useLocationSearchParams(): ReactiveSearchParams {
+  if (!globalReactiveSearchParams) globalReactiveSearchParams = createLocationSearchParams();
+  return globalReactiveSearchParams;
 }
 
 export class ReactiveURL implements URL {
@@ -95,7 +191,7 @@ export class ReactiveURL implements URL {
   private owner = getOwner()!;
 
   constructor(url: string, base?: string) {
-    const [getURL, setURL] = createURL(url, base);
+    const [getURL, setURL] = createURLSignal(url, base);
     this.fields = destructure(getURL, { lazy: true });
     this.set = setURL;
   }
@@ -182,27 +278,25 @@ export class ReactiveURL implements URL {
   }
 
   get searchParams(): ReactiveSearchParams {
-    if (!this.rsp) {
-      this.rsp = new ReactiveSearchParams(this.search);
-      runWithOwner(this.owner, () => createComputed(() => (this.search = this.rsp + "")));
-    }
-    return this.rsp;
+    if (!this.rsp)
+      runWithOwner(this.owner, () => {
+        this.rsp = new ReactiveSearchParams(this.search);
+        createComputed(
+          on(
+            () => this.rsp + "",
+            search => (this.search = search),
+            { defer: true }
+          )
+        );
+      });
+    return this.rsp!;
   }
 }
-
-const WHOLE = Symbol("watch_whole");
 
 export class ReactiveSearchParams extends URLSearchParams {
   private cache = createTriggerCache<string | typeof WHOLE>();
 
-  constructor(
-    init:
-      | string
-      | [string, string][]
-      | Record<string, string>
-      | URLSearchParams
-      | ReactiveSearchParams
-  ) {
+  constructor(init: ReactiveSearchParamsInit) {
     super(init instanceof ReactiveSearchParams ? init.toString() : init);
   }
 
@@ -264,17 +358,3 @@ export class ReactiveSearchParams extends URLSearchParams {
     return this.entries();
   }
 }
-
-/**
- * readonly:
- * - createLocationState
- * - createHistoryState
- * editable:
- * - createLocationSearchParams
- * - createLocationURL
- * independent:
- * - createSearchParams | ReactiveSearchParams class
- * - createURL | ReactiveURL class
- * functions:
- * - updateLocationSearchParams
- */
