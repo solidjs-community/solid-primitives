@@ -106,13 +106,6 @@ export type Falsy<T> = Extract<T, FalsyValue>;
 
 export type Fallback<T, F = NonNullable<T>> = NonNullable<T> | F;
 
-/**
- * Destructible store object, with values changed to accessors
- */
-export type Destore<T extends Object> = {
-  [K in keyof T]: T[K] extends Function ? T[K] : Accessor<T[K]>;
-};
-
 export type TriggerCache<T> = {
   track: Get<T>;
   dirty: Get<T>;
@@ -124,4 +117,11 @@ export type Trigger = [track: Fn, dirty: Fn];
 export type Position = {
   x: number;
   y: number;
+};
+
+export type StaticStoreSetter<T extends [] | any[] | AnyObject> = {
+  (setter: (prev: Readonly<T>) => Partial<Readonly<T>>): Readonly<T>;
+  (state: Partial<Readonly<T>>): Readonly<T>;
+  <K extends keyof T>(key: K, setter: (prev: T[K]) => T[K]): Readonly<T>;
+  <K extends keyof T>(key: K, state: T[K]): Readonly<T>;
 };

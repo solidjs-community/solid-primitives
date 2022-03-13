@@ -1,15 +1,23 @@
-import { getOwner, onCleanup, on, createSignal, Accessor, DEV, untrack } from "solid-js";
+import {
+  getOwner,
+  onCleanup,
+  on,
+  createSignal,
+  Accessor,
+  DEV,
+  untrack,
+  Signal,
+  batch
+} from "solid-js";
 import type {
   BaseOptions,
   EffectFunction,
   NoInfer,
   OnOptions
 } from "solid-js/types/reactive/signal";
-import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import type {
   AnyClass,
-  Destore,
   Fn,
   ItemsOf,
   Keys,
@@ -21,7 +29,9 @@ import type {
   Fallback,
   Trigger,
   TriggerCache,
-  AnyFunction
+  AnyFunction,
+  AnyObject,
+  StaticStoreSetter
 } from "./types";
 
 export * from "./types";
@@ -309,32 +319,6 @@ export function raceTimeout(
  */
 export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
 
-/**
- * Allows the Solid's store to be destructured
- *
- * @param store
- * @returns Destructible object, with values changed to accessors
- *
- * @example
- * ```ts
- * const [state, setState] = createStore({
- *   count: 0,
- *   get double() { return this.count * 2 },
- * })
- * const { count, double } = destore(state)
- * // use it like a signal:
- * count()
- * ```
- */
-export function destore<T extends Object>(store: Store<T>): Destore<T> {
-  const _store = store as Record<string, any>;
-  const result: any = {};
-  Object.keys(_store).forEach(key => {
-    result[key] = isFunction(_store[key]) ? _store[key].bind(_store) : () => _store[key];
-  });
-  return result;
-}
-
 export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {
   push: (...callbacks: ((arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void)[]) => void;
   execute: (arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void;
@@ -436,4 +420,45 @@ export function createTriggerCache<T>(options?: BaseOptions): TriggerCache<T> {
       trigger[0]();
     }
   };
+}
+
+/**
+ * A shallow/flat and static store. It behaves similarly to the creatStore, but with limited features to keep it simple. Designed to be used for reactive objects with static keys, but dynamic values, like reactive Event State, location, etc.
+ * @param init initial value of the store, put every key you want to use here, you won't be able to delete/add keys later.
+ * @returns [reactive-readonly store, store setter]
+ */
+export function createStaticStore<T extends [] | any[] | AnyObject>(
+  init: Readonly<T>
+): [access: Readonly<T>, write: StaticStoreSetter<T>] {
+  const copy = { ...init };
+  const readObj = {} as T;
+  const signalCache = new Map<PropertyKey, any>();
+
+  const signalGetter = <K extends keyof T>(key: K): Signal<T[K]> => {
+    const saved = signalCache.get(key);
+    if (saved) return saved;
+    const signal = createSignal(copy[key], { name: key + "" });
+    signalCache.set(key, signal);
+    delete copy[key];
+    return signal;
+  };
+
+  for (const key of keys(init)) {
+    readObj[key] = void 0 as any;
+    Object.defineProperty(readObj, key, {
+      get: () => signalGetter(key)[0]()
+    });
+  }
+
+  const setter = (a: any, b?: any) => {
+    if (typeof a === "object" || isFunction(a))
+      batch(() => {
+        for (const [key, value] of entries(accessWith(a, () => [{ ...readObj }])))
+          signalGetter(key as keyof T)[1](() => value);
+      });
+    else signalGetter(a)[1](b);
+    return readObj;
+  };
+
+  return [readObj, setter];
 }
