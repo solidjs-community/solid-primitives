@@ -5,10 +5,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/destructure?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/destructure)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
-Primitives for destructuring reactive objects _– like props or stores –_ or signals of them into a separate accessors updated individually.
-
-- **[`destructure`](#destructure)** - Destructure a reactive object into map/tuple of signals.
-- **[`wrapGetters`](#wrapGetters)** - Access properties of an object signal like a store.
+Primitive for destructuring reactive objects _– like props or stores –_ or signals of them into a separate accessors updated individually.
 
 ## Installation
 
@@ -25,14 +22,14 @@ Spreads an reactive object _(store or props)_ or a reactive object signal into a
 #### Import
 
 ```ts
-import { spread } from "@solid-primitives/destructure";
+import { destructure } from "@solid-primitives/destructure";
 ```
 
 #### How to use it
 
 `destructure` is an reactive primitive, hence needs to be used under an reactive root. Pass an reactive object or a signal as it's first argument, and configure it's behavior via options:
 
-- `cache` - wraps accessors in `createMemo`, making each property update independently. _(enabled by default for signal source)_
+- `memo` - wraps accessors in `createMemo`, making each property update independently. _(enabled by default for signal source)_
 - `lazy` - property accessors are created on key read. enable if you want to only a subset of source properties, or use properties initially missing
 - `deep` - destructure nested objects
 
@@ -58,9 +55,9 @@ const ListItem: Component<{ title: string; label: string; highlight: boolean }> 
 };
 ```
 
-#### Caching keys
+#### Caching keys (memo)
 
-By default keys of an accessor source are **cached** and keys of an object source **are not**. _(reactive objet like stores and props should be fine-grained anyway)_ But caching can be controlled by specifying a `cache` property in options.
+By default keys of an accessor source are **cached** and keys of an object source **are not**. _(reactive objet like stores and props should be fine-grained anyway)_ But caching can be controlled by specifying a `memo` property in options.
 
 ```ts
 const [store, setStore] = createStore({
@@ -70,8 +67,8 @@ const [store, setStore] = createStore({
     age: 25
   }
 });
-// disable caching (for accessors is enabled by default)
-const { name, lastName, age } = destructure(() => store.user, { cache: false });
+// disable memo (for accessors is enabled by default)
+const { name, lastName, age } = destructure(() => store.user, { memo: false });
 ```
 
 #### Destructuring nested objects
@@ -157,44 +154,6 @@ const c = list[2];
 a(); // => 1
 b(); // => 2
 b(); // => undefined (no error)
-```
-
-## `wrapGetters`
-
-Wraps object/array signal with getters for every key, making accessing properties similar to component props/store. Properties are cached with memos on access, so th primitive needs to be used in a reactive context.
-
-#### Import
-
-```ts
-import { wrapGetters } from "@solid-primitives/destructure";
-```
-
-#### How to use it
-
-```ts
-const [getPlayer, setPlayer] = createSignal({
-  name: "Raven",
-  points: 350,
-  weaponOfChoice: "Machete"
-});
-const player = wrapGetters(getPlayer);
-player.points; // => 350 (reactive on updates to that property)
-```
-
-#### Wrapping nested objects
-
-The `deep` flag enables wrapping nested objects recursively.
-
-```ts
-const [getPlayer, setPlayer] = createSignal({
-  player: {
-    name: "Raven",
-    points: 350,
-    weaponOfChoice: "Machete"
-  }
-});
-const { player } = wrapGetters(getPlayer, { deep: true });
-player.points; // => 350
 ```
 
 ### Acknowledgements

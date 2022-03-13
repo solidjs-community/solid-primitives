@@ -1,4 +1,4 @@
-import { destructure, wrapGetters } from "../src";
+import { destructure } from "../src";
 import { Component, createEffect, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
@@ -32,12 +32,6 @@ const App: Component = () => {
     setList(p => p.slice().sort(() => Math.random() - 0.5));
   };
   setInterval(shuffle, 2000);
-
-  // const [n0, n1, n2] = wrapGetters(list, { deep: true });
-
-  // createEffect(() => console.log("0:", n0.n));
-  // createEffect(() => console.log("1:", n1.n));
-  // createEffect(() => console.log("2:", n2.n));
 
   setTimeout(() => setList([{ n: 1 }, { n: 2 }, { n: 3 }]), 3000);
   // setTimeout(() => setList([{ n: 1 }, { n: 2 }, { n: 3 }]), 6000);
