@@ -1,4 +1,4 @@
-# solid-primitives/visibility-observer
+# @solid-primitives/visibility-observer
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/visibility-observer?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/visibility-observer)
