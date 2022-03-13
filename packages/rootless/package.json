@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/rootless",
-  "version": "0.0.101",
-  "description": "A template primitive example.",
+  "version": "0.1.0",
+  "description": "A collection of primitives that help dealing with Solid's reactive roots.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/rootless#readme",
@@ -16,7 +16,8 @@
       "createSubRoot",
       "createCallback",
       "runWithRoot",
-      "runWithSubRoot"
+      "runWithSubRoot",
+      "createSharedRoot"
     ],
     "category": "Reactivity"
   },

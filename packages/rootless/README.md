@@ -11,6 +11,7 @@ A collection of helpers that aim to simplify using reactive primitives outside o
 - [`createCallback`](#createCallback) - A wrapper for creating callbacks with `runWithOwner`.
 - [`runWithRoot`](#runWithRoot) - Use reactive primitives outside of reactive roots.
 - [`runWithSubRoot`](#runWithSubRoot) - Like `runWithRoot`, but creates a sub root instead.
+- [`createSharedRoot`](#createSharedRoot) - Share "global primitives" across multiple reactive scopes.
 
 ## Installation
 
@@ -138,6 +139,43 @@ type runWithRootReturn<T> = T extends void | undefined | null
 const runWithSubRoot = <T>(fn: () => T, detachedOwner?: Owner): runWithRootReturn<T>
 ```
 
+## `createSharedRoot`
+
+###### Added in `@0.1.0`
+
+Creates a reactive root that is shared across every instance it was used in. Shared root gets created when the returned function gets first called, and disposed when last reactive context listening to it gets disposed. Only to be recreated again when a new listener appears.
+
+Designed to make "global primitives" shareable, without instanciating them (recreating, state, computations, event listeners, etc.) every time they're used. For example a `createLocationState` primitive would work the same for every instance and provide the same data, so reinitializeing it every time is wastefull.
+
+### How to use it
+
+`createSharedRoot` primitive takes a single argument:
+
+- `factory` - a function where can you initialize some reactive primitives, returned value will be shared across instances.
+
+And returns a function registering reactive owner as one of the listeners, returns the value `factory` function returned.
+
+```ts
+const useState = createSharedScope(() => {
+   return createMemo(() => {...})
+});
+
+// later in a component:
+const state = useState();
+state()
+
+// in another component
+// previously created primitive would get reused
+const state = useState();
+...
+```
+
+### Type Definition
+
+```ts
+function createSharedRoot<T>(factory: (dispose: Fn) => T): () => T;
+```
+
 ## Changelog
 
 <details>
@@ -146,5 +184,9 @@ const runWithSubRoot = <T>(fn: () => T, detachedOwner?: Owner): runWithRootRetur
 0.0.100
 
 Initial release as a Stage-1 primitive.
+
+0.1.0
+
+Add `createSharedRoot` primitive
 
 </details>
