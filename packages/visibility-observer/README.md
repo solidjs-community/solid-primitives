@@ -31,8 +31,8 @@ console.log(visible());
 <details>
 <summary><b>Expand Changelog</b></summary>
 
-0.0.100
+1.0.0
 
-Initial commit of the resize observer.
+Initial commit of the visibility observer.
 
 </details>

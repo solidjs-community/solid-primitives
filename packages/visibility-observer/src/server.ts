@@ -7,7 +7,7 @@ import { Accessor } from "solid-js";
  *
  */
 const createPageVisibilityObserver = (): Accessor<boolean> => {
-  return () => false;
+  return () => true;
 };
 
 export default createPageVisibilityObserver;

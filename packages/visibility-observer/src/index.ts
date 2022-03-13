@@ -6,15 +6,16 @@ import { onMount, createSignal, onCleanup, Accessor } from "solid-js";
  * @return Returns a signel with a boolean value identifying the visibility state.
  *
  */
-function createPageVisibilityObserver(): Accessor<boolean> {
-  const isVisible = () => document.visibilityState === 'visible';
-  const [state, setState] = createSignal(isVisible());
-  const callback = () => setState(isVisible());
+const createPageVisibilityObserver = (): Accessor<boolean> => {
+  const visible = () =>
+    document ? document.visibilityState === "visible" : true;
+  const [state, setState] = createSignal(visible());
+  const cb = () => setState(visible());
   onMount(() => {
-    document.addEventListener('visibilitychange', callback, false);
-    onCleanup(() => document.removeEventListener('visibilitychange', callback, false));
+    document.addEventListener("visibilitychange", cb);
+    onCleanup(() => document.removeEventListener("visibilitychange", cb));
   });
   return state;
-}
+};
 
 export default createPageVisibilityObserver;
