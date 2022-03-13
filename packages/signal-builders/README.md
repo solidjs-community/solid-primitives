@@ -19,6 +19,8 @@ yarn add @solid-primitives/signal-builders
 
 Signal buildres are creating computations when used, so they need to be used under a reactive root.
 
+Note, since all of these functions use `[createMemo](https://www.solidjs.com/docs/latest/api#creatememo)`, if the calculated values don't change, the signal will not re-render. Also the functions should stay 'pure'; don't set outside values inside the Signal Builders.
+
 ### Array
 
 ```ts
