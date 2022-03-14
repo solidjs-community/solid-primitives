@@ -14,7 +14,7 @@
   },
   "primitive": {
     "name": "map",
-    "stage": 1,
+    "stage": 2,
     "list": [
       "createMap",
       "createWeakMap"

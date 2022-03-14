@@ -3,7 +3,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/map?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/map)
 [![version](https://img.shields.io/npm/v/@solid-primitives/map?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/map)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fasmaps%2Fbadges%2Fstage-1.json)](https://github.com/davedbase/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fasmaps%2Fbadges%2Fstage-2.json)](https://github.com/davedbase/solid-primitives#contribution-process)
 
 The reactive versions of `Map` & `WeakMap` built-in data structures.
 
