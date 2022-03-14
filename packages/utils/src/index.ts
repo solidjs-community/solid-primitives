@@ -434,9 +434,9 @@ export function createStaticStore<T extends [] | any[] | AnyObject>(
   const readObj = {} as T;
   const signalCache = new Map<PropertyKey, any>();
 
-  const signalGetter = <K extends keyof T>(key: K): Signal<T[K]> => {
+  const signalGetter = <K extends keyof T>(key: K): Signal<T[K]> | undefined => {
     const saved = signalCache.get(key);
-    if (saved) return saved;
+    if (saved || !copy.hasOwnProperty(key)) return saved;
     const signal = createSignal(copy[key], { name: key + "" });
     signalCache.set(key, signal);
     delete copy[key];
@@ -444,9 +444,9 @@ export function createStaticStore<T extends [] | any[] | AnyObject>(
   };
 
   for (const key of keys(init)) {
-    readObj[key] = void 0 as any;
+    readObj[key] = undefined as any;
     Object.defineProperty(readObj, key, {
-      get: () => signalGetter(key)[0]()
+      get: () => signalGetter(key)![0]()
     });
   }
 
@@ -454,9 +454,9 @@ export function createStaticStore<T extends [] | any[] | AnyObject>(
     if (typeof a === "object" || isFunction(a))
       batch(() => {
         for (const [key, value] of entries(accessWith(a, () => [{ ...readObj }])))
-          signalGetter(key as keyof T)[1](() => value);
+          signalGetter(key as keyof T)?.[1](() => value);
       });
-    else signalGetter(a)[1](b);
+    else signalGetter(a)?.[1](b);
     return readObj;
   };
 
