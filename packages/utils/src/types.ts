@@ -118,10 +118,3 @@ export type Position = {
   x: number;
   y: number;
 };
-
-export type StaticStoreSetter<T extends [] | any[] | AnyObject> = {
-  (setter: (prev: Readonly<T>) => Partial<Readonly<T>>): Readonly<T>;
-  (state: Partial<Readonly<T>>): Readonly<T>;
-  <K extends keyof T>(key: K, setter: (prev: T[K]) => T[K]): Readonly<T>;
-  <K extends keyof T>(key: K, state: T[K]): Readonly<T>;
-};

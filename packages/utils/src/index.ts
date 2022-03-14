@@ -7,7 +7,8 @@ import {
   DEV,
   untrack,
   Signal,
-  batch
+  batch,
+  createComputed
 } from "solid-js";
 import type {
   BaseOptions,
@@ -30,8 +31,7 @@ import type {
   Trigger,
   TriggerCache,
   AnyFunction,
-  AnyObject,
-  StaticStoreSetter
+  AnyObject
 } from "./types";
 
 export * from "./types";
@@ -422,6 +422,13 @@ export function createTriggerCache<T>(options?: BaseOptions): TriggerCache<T> {
   };
 }
 
+export type StaticStoreSetter<T extends [] | any[] | AnyObject> = {
+  (setter: (prev: Readonly<T>) => Partial<Readonly<T>>): Readonly<T>;
+  (state: Partial<Readonly<T>>): Readonly<T>;
+  <K extends keyof T>(key: K, setter: (prev: T[K]) => T[K]): Readonly<T>;
+  <K extends keyof T>(key: K, state: T[K]): Readonly<T>;
+};
+
 /**
  * A shallow/flat and static store. It behaves similarly to the creatStore, but with limited features to keep it simple. Designed to be used for reactive objects with static keys, but dynamic values, like reactive Event State, location, etc.
  * @param init initial value of the store, put every key you want to use here, you won't be able to delete/add keys later.
@@ -461,4 +468,29 @@ export function createStaticStore<T extends [] | any[] | AnyObject>(
   };
 
   return [readObj, setter];
+}
+
+export type SyncSignal<T, U> = {
+  get: () => T;
+  set: (v: U) => void;
+};
+
+/**
+ * For syncing two signal values with eachother.
+ */
+export function biSyncSignals<A, B>(a: SyncSignal<A, B>, b: SyncSignal<B, A>, init = false): void {
+  let causedA = !init;
+  let causedB = !init;
+  createComputed(
+    on(a.get, v => {
+      if (causedA) return (causedA = false);
+      (causedB = true), b.set(v);
+    })
+  );
+  createComputed(
+    on(b.get, v => {
+      if (causedB) return (causedB = false);
+      (causedA = true), a.set(v);
+    })
+  );
 }
