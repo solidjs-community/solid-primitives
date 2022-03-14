@@ -1,4 +1,4 @@
-import { createLocationURL, ReactiveURL, useLocationState, useLocationURL } from "../src";
+import { useLocationURL } from "../src";
 import { Component, createEffect, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
@@ -6,17 +6,22 @@ import "uno.css";
 const App: Component = () => {
   // const loc = useLocationState();
 
+  history.replaceState({}, "", location.protocol + "//" + location.host);
+
   const url = useLocationURL();
 
-  setTimeout(() => (url.hash = "XD"), 1000);
+  setTimeout(() => {
+    // url.hash = "XD";
+    url.search = "foo=bar";
+  }, 1000);
 
-  // setInterval(() => {
-  //   url.hash += "d";
-  // }, 1000);
+  setInterval(() => {
+    url.hash += "d";
+  }, 2000);
 
-  // createEffect(() => {
-  //   console.log(url.href);
-  // });
+  createEffect(() => {
+    console.log(url.href);
+  });
 
   return (
     <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
@@ -28,4 +33,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+render(() => <App />, document.getElementById("root")!);

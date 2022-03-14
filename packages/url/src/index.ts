@@ -1,24 +1,28 @@
-import { Destructure, destructure } from "@solid-primitives/destructure";
+import { createComputed, getOwner, on, runWithOwner, untrack, batch } from "solid-js";
 import { createEventListener } from "@solid-primitives/event-listener";
-import { accessWith, createTriggerCache } from "@solid-primitives/utils";
+import { createSimpleEmitter } from "@solid-primitives/event-bus";
 import {
-  Accessor,
-  createComputed,
-  createMemo,
-  createSignal,
-  getOwner,
-  on,
-  runWithOwner,
-  untrack,
-  batch
-} from "solid-js";
+  accessWith,
+  createTriggerCache,
+  createStaticStore,
+  entries,
+  biSyncSignals
+} from "@solid-primitives/utils";
+import { pick } from "@solid-primitives/immutable";
+import { createSharedRoot } from "@solid-primitives/rootless";
 
-export type LocationState = Readonly<Omit<Location, "toString" | "assign" | "reload" | "replace">>;
-export type HistoryState = Readonly<{
-  length: number;
-  scrollRestoration: ScrollRestoration;
-  state: any;
-}>;
+export type LocationState = {
+  readonly origin: string;
+  readonly hash: string;
+  readonly host: string;
+  readonly hostname: string;
+  readonly href: string;
+  readonly pathname: string;
+  readonly port: string;
+  readonly protocol: string;
+  readonly search: string;
+  readonly ancestorOrigins: DOMStringList;
+};
 
 export type URLFields = {
   hash: string;
@@ -34,11 +38,14 @@ export type URLFields = {
   username: string;
 };
 export type URLRecord = Readonly<URLFields>;
+type WritableURLFields = Exclude<keyof URLFields, "origin">;
 
-export type URLSetter = (
-  record: URLSetterRecord | ((prev: URLRecord) => URLSetterRecord)
-) => URLRecord;
-export type URLSetterRecord = Partial<Omit<URLRecord, "origin">>;
+type SetterValue<Prev, Next = Prev> = Next | ((prev: Prev) => Next);
+export type URLSetter = {
+  (record: SetterValue<URLRecord, URLSetterRecord>): URLRecord;
+  (key: WritableURLFields, value: SetterValue<string>): URLRecord;
+};
+export type URLSetterRecord = Partial<Record<WritableURLFields, string>>;
 
 export type ReactiveSearchParamsInit =
   | string
@@ -49,88 +56,136 @@ export type ReactiveSearchParamsInit =
 
 const WHOLE = Symbol("watch_whole");
 
-let globalLocationState: Accessor<LocationState> | undefined;
-let globalHistoryState: Accessor<HistoryState> | undefined;
+const URL_KEYS = [
+  "hash",
+  "host",
+  "hostname",
+  "href",
+  "origin",
+  "password",
+  "pathname",
+  "port",
+  "protocol",
+  "search",
+  "username"
+] as (keyof URLFields)[];
+
 let globalReactiveURL: ReactiveURL | undefined;
 let globalReactiveSearchParams: ReactiveSearchParams | undefined;
 
-export function createLocationState(): Accessor<LocationState> {
-  const [state, setState] = createSignal<LocationState>(
-    { ...location },
-    {
-      equals: (a, b) => a.href === b.href
-    }
-  );
-  const updateState = () => setState({ ...location });
-  createEventListener(window, ["popstate", "hashchange"], updateState, false);
-  return state;
-}
+let monkeyPatchedStateEvents = false;
+const [listenStateEvents, triggerStateEvents] = createSimpleEmitter();
 
-export function useLocationState(): Accessor<LocationState> {
-  if (!globalLocationState) globalLocationState = createLocationState();
-  return globalLocationState;
-}
-
-export function createHistoryState(): Accessor<HistoryState> {
-  const [state, setState] = createSignal<HistoryState>({ ...history });
-  const updateState = () => setState({ ...history });
-  createEventListener(window, "popstate", updateState, false);
-  return state;
-}
-
-export function useHistoryState(): Accessor<HistoryState> {
-  if (!globalHistoryState) globalHistoryState = createHistoryState();
-  return globalHistoryState;
-}
-
-export function createURLSignal(
-  url: string,
-  base?: string
-): [accessor: Accessor<URLRecord>, setter: URLSetter] {
-  const [signal, setSignal] = createSignal(new URL(url, base), {
-    equals: (a, b) => a.href === b.href
-  });
-  const setter: URLSetter = get => {
-    const record = accessWith(get, () => [signal()]);
-    // @ts-expect-error origin filed is omitted from the types, but could still be passed to the setter
-    delete record.origin;
-    if (Object.keys(record).length === 0) return untrack(signal);
-    return setSignal(p => ({ ...p, ...record }));
+function patchStateEvents() {
+  if (monkeyPatchedStateEvents) return;
+  const replaceState = history.replaceState.bind(history);
+  const pushState = history.pushState.bind(history);
+  history.replaceState = (...args) => {
+    replaceState(...args);
+    triggerStateEvents();
   };
-  return [signal, setter];
+  history.pushState = (...args) => {
+    pushState(...args);
+    triggerStateEvents();
+  };
+  monkeyPatchedStateEvents = true;
 }
 
-export function createURL(url: string, base?: string) {
-  return new ReactiveURL(url, base);
-}
-
-export function createLocationURL(): ReactiveURL {
-  const state = useLocationState();
-  const href = createMemo(() => state().href);
-  const url = new ReactiveURL(href());
-  let causedRead = true;
-  let causedWrite = true;
-
-  // update ReactiveURL instance on read
-  createComputed(
-    on(href, href => {
-      console.log("href update", href, causedRead);
-      if (causedRead) return (causedRead = false);
-      (causedWrite = true), (url.href = href);
-    })
-  );
-
-  // update location on write
-  createComputed(
-    on(
-      () => url.href,
-      href => {
-        if (causedWrite) return (causedWrite = false);
-        (causedRead = true), (location.href = href);
-      }
+export function createLocationState(): LocationState {
+  const [state, setState] = createStaticStore<LocationState>(
+    pick(
+      location,
+      "origin",
+      "hash",
+      "host",
+      "hostname",
+      "href",
+      "pathname",
+      "port",
+      "protocol",
+      "search",
+      "ancestorOrigins"
     )
   );
+  const updateState = () => setState(location);
+  createEventListener(window, ["popstate", "hashchange"], updateState, false);
+  patchStateEvents();
+  listenStateEvents(updateState);
+  return state;
+}
 
+export const useSharedLocationState = createSharedRoot(createLocationState);
+
+export function createURLRecord(
+  url: string,
+  base?: string
+): [accessor: URLRecord, setter: URLSetter] {
+  let instance = new URL(url, base);
+  const [state, setState] = createStaticStore<URLRecord>(
+    (() => {
+      const copy = {} as any;
+      URL_KEYS.forEach(key => (copy[key] = instance[key]));
+      return copy;
+    })()
+  );
+
+  const setter = (
+    a: WritableURLFields | SetterValue<URLRecord, URLSetterRecord>,
+    b?: SetterValue<string>
+  ) => {
+    if (typeof a === "string") instance[a] = accessWith(b, [instance[a]])!;
+    else {
+      let record = accessWith(a, [state]);
+      if (record instanceof URL) instance = new URL(record);
+      else {
+        // @ts-expect-error origin filed is omitted from the types, but could still be passed to the setter
+        delete record.origin;
+        if (Object.keys(record).length === 0) return state;
+        for (const [key, value] of entries(record)) instance[key] = value as string;
+      }
+    }
+    batch(() => URL_KEYS.forEach(key => setState(key, instance[key])));
+    return state;
+  };
+
+  return [state, ((a, b) => untrack(setter.bind(void 0, a, b))) as URLSetter];
+}
+
+export function createLocationURLRecord(options?: {
+  useSharedState: boolean;
+}): [accessor: URLRecord, setter: URLSetter] {
+  const state = options?.useSharedState ? useSharedLocationState() : createLocationState();
+  const [url, setURL] = createURLRecord(state.href);
+  biSyncSignals(
+    {
+      get: () => state.href,
+      set: () => history.replaceState({}, "", url.href)
+    },
+    {
+      get: () => url.href,
+      set: href => setURL("href", href)
+    }
+  );
+  return [url, setURL];
+}
+
+export const useSharedLocationURLRecord = createSharedRoot(
+  createLocationURLRecord.bind(void 0, { useSharedState: true })
+);
+
+export function createLocationURL(): ReactiveURL {
+  const state = createLocationState();
+  const url = new ReactiveURL(state.href);
+  biSyncSignals(
+    {
+      get: () => state.href,
+      set: () => history.replaceState({}, "", url)
+    },
+    {
+      get: () => url.href,
+      set: href => (url.href = href)
+    }
+  );
   return url;
 }
 
@@ -144,27 +199,29 @@ export function createSearchParams(init: ReactiveSearchParamsInit) {
 }
 
 export function createLocationSearchParams(): ReactiveSearchParams {
-  const state = useLocationState();
-  const search = createMemo(() => state().search);
-  const searchParams = new ReactiveSearchParams(search());
+  const state = createLocationState();
+  const searchParams = new ReactiveSearchParams(state.search);
   let causedChange = true;
 
   // update ReactiveSearchParams instance on location change
   createComputed(
-    on(search, search => {
-      if (causedChange) return (causedChange = false);
-      const keys = new Set(searchParams.keys());
-      const newSearchParams = new URLSearchParams(search);
-      batch(() => {
-        newSearchParams.forEach((value, name) => {
-          if (keys.has(name)) {
-            keys.delete(name);
-            searchParams.set(name, value);
-          } else searchParams.append(name, value);
+    on(
+      () => state.search,
+      search => {
+        if (causedChange) return (causedChange = false);
+        const keys = new Set(searchParams.keys());
+        const newSearchParams = new URLSearchParams(search);
+        batch(() => {
+          newSearchParams.forEach((value, name) => {
+            if (keys.has(name)) {
+              keys.delete(name);
+              searchParams.set(name, value);
+            } else searchParams.append(name, value);
+          });
+          keys.forEach(key => searchParams.delete(key));
         });
-        keys.forEach(key => searchParams.delete(key));
-      });
-    })
+      }
+    )
   );
 
   // update location on write
@@ -185,89 +242,91 @@ export function useLocationSearchParams(): ReactiveSearchParams {
 }
 
 export class ReactiveURL implements URL {
-  private fields: Destructure<URLRecord>;
+  private fields: URLRecord;
   private set: URLSetter;
   private rsp?: ReactiveSearchParams;
   private owner = getOwner()!;
 
   constructor(url: string, base?: string) {
-    const [getURL, setURL] = createURLSignal(url, base);
-    this.fields = destructure(getURL, { lazy: true });
+    const [fields, setURL] = createURLRecord(url, base);
+    this.fields = fields;
     this.set = setURL;
   }
 
   get hash() {
-    return this.fields.hash();
+    return this.fields.hash;
   }
   set hash(hash) {
-    this.set({ hash });
+    this.set("hash", hash);
   }
 
   get host() {
-    return this.fields.host();
+    return this.fields.host;
   }
   set host(host) {
-    this.set({ host });
+    this.set("host", host);
   }
 
   get hostname() {
-    return this.fields.hostname();
+    return this.fields.hostname;
   }
   set hostname(hostname) {
-    this.set({ hostname });
+    this.set("hostname", hostname);
   }
 
   get href() {
-    return this.fields.href();
+    return this.fields.href;
   }
   set href(href) {
-    this.set({ href });
+    this.set("href", href);
   }
 
   get origin() {
-    return this.fields.origin();
+    return this.fields.origin;
   }
 
   get password() {
-    return this.fields.password();
+    return this.fields.password;
   }
   set password(password) {
-    this.set({ password });
+    this.set("password", password);
   }
 
   get pathname() {
-    return this.fields.pathname();
+    return this.fields.pathname;
   }
   set pathname(pathname) {
-    this.set({ pathname });
+    this.set("pathname", pathname);
   }
 
   get port() {
-    return this.fields.port();
+    return this.fields.port;
   }
   set port(port) {
-    this.set({ port });
+    this.set("port", port);
   }
 
   get protocol() {
-    return this.fields.protocol();
+    return this.fields.protocol;
   }
   set protocol(protocol) {
-    this.set({ protocol });
+    this.set("protocol", protocol);
   }
 
   get search() {
-    return this.fields.search();
+    return this.fields.search;
   }
   set search(search) {
-    this.set({ search });
+    const new_url = new URL(location.href);
+    new_url.search = search;
+    this.set(new_url);
   }
 
   get username() {
-    return this.fields.username();
+    return this.fields.username;
   }
   set username(username) {
-    this.set({ username });
+    this.set("username", username);
   }
 
   toString(): string {
