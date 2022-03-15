@@ -18,14 +18,10 @@ yarn add @solid-primitives/raf
 ## How to use it
 
 ```ts
-
-// createRAF(callback fn, targetFPS number, runImmediately bool)
-
-const [running, start, stop] = createRAF((timeElapsed) => console.log('hi from RAF, timeElapsed is', timeElapsed)));
+const [running, start, stop] = createRAF(
+  (timeElapsed) => console.log('Time elapsed is', timeElapsed))
+);
 start();
-console.log('is running? ' + running() ? 'YES' : 'NO')
-stop();
-console.log('is running? ' + running() ? 'YES' : 'NO')
 ```
 
 ## Warning
@@ -52,5 +48,9 @@ Released official version with CJS and SSR support.
 1.0.7
 
 Updated to Solid 1.3, switched to peerDependencies
+
+1.0.9
+
+Patched double running and added refresh rate warning (patch by [titoBouzout](https://www.github.com/titoBouzout)).
 
 </details>
