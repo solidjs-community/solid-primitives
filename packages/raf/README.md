@@ -18,9 +18,19 @@ yarn add @solid-primitives/raf
 ## How to use it
 
 ```ts
-const [running, start, stop] = createRAF(() => console.log('hi')));
+
+// createRAF(callback fn, targetFPS number, runImmediately bool)
+
+const [running, start, stop] = createRAF((timeElapsed) => console.log('hi from RAF, timeElapsed is', timeElapsed)));
 start();
+console.log('is running? ' + running() ? 'YES' : 'NO')
+stop();
+console.log('is running? ' + running() ? 'YES' : 'NO')
 ```
+
+## Warning
+
+To respect clients refresh rate, timeElapsed should be used to calculate how much the animation should progress in a frame, otherwise the animation will run faster on high refresh rate screens. As an example: A screen refreshing at 300fps will run the animations 5x faster than a screen with 60fps if you use other forms of time keeping. See https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
 
 ## Demo
 
