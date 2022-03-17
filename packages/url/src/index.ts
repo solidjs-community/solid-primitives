@@ -1,4 +1,5 @@
 import { createComputed, getOwner, on, runWithOwner, untrack, batch } from "solid-js";
+import { createStore, Store, DeepReadonly } from "solid-js/store";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { createSimpleEmitter } from "@solid-primitives/event-bus";
 import {
@@ -6,7 +7,10 @@ import {
   createTriggerCache,
   createStaticStore,
   entries,
-  biSyncSignals
+  biSyncSignals,
+  Get,
+  Fn,
+  AnyObject
 } from "@solid-primitives/utils";
 import { pick } from "@solid-primitives/immutable";
 import { createSharedRoot } from "@solid-primitives/rootless";
@@ -40,12 +44,20 @@ export type URLFields = {
 export type URLRecord = Readonly<URLFields>;
 type WritableURLFields = Exclude<keyof URLFields, "origin">;
 
-type SetterValue<Prev, Next = Prev> = Next | ((prev: Prev) => Next);
+type SetterValue<Prev, Next = Prev> = Next | ((prev: DeepReadonly<Prev>) => Next);
 export type URLSetter = {
   (record: SetterValue<URLRecord, URLSetterRecord>): URLRecord;
   (key: WritableURLFields, value: SetterValue<string>): URLRecord;
 };
 export type URLSetterRecord = Partial<Record<WritableURLFields, string>>;
+
+type SearchParamRecord = Record<string, string | string[]>;
+type SearchParamsSetter = {
+  (record: SetterValue<SearchParamRecord>): Store<SearchParamRecord>;
+  (name: string, value: SetterValue<string | string[]>): Store<SearchParamRecord>;
+};
+
+export type UpdateLocationMethod = "push" | "replace" | "navigate";
 
 export type ReactiveSearchParamsInit =
   | string
@@ -70,9 +82,6 @@ const URL_KEYS = [
   "username"
 ] as (keyof URLFields)[];
 
-let globalReactiveURL: ReactiveURL | undefined;
-let globalReactiveSearchParams: ReactiveSearchParams | undefined;
-
 let monkeyPatchedStateEvents = false;
 const [listenStateEvents, triggerStateEvents] = createSimpleEmitter();
 
@@ -89,6 +98,40 @@ function patchStateEvents() {
     triggerStateEvents();
   };
   monkeyPatchedStateEvents = true;
+}
+
+function getSearchParamRecord(searchParams: URLSearchParams): SearchParamRecord {
+  const obj: SearchParamRecord = {};
+  searchParams.forEach((value, name) => {
+    const p = obj[name];
+    if (!p) obj[name] = value;
+    else if (typeof p === "string") obj[name] = [p, value];
+    else p.push(value);
+  });
+  return obj;
+}
+
+function applySearchParamEntry(
+  searchParams: URLSearchParams,
+  name: string,
+  value?: string | string[]
+): void {
+  if (!value) return;
+  if (Array.isArray(value)) {
+    searchParams.set(name, value[0]);
+    for (let i = 1; i < value.length; i++) searchParams.append(name, value[i]);
+  } else searchParams.set(name, value);
+}
+
+function getSearchParamEntry(searchParams: URLSearchParams, name: string): string | string[] {
+  const value = searchParams.getAll(name);
+  return value.length > 1 ? value : value[0];
+}
+
+function updateLocation(href: string, method: UpdateLocationMethod): void {
+  if (method === "push") return history.pushState({}, "", href);
+  if (method === "replace") return history.replaceState({}, "", href);
+  location.href = href;
 }
 
 export function createLocationState(): LocationState {
@@ -152,34 +195,59 @@ export function createURLRecord(
 }
 
 export function createLocationURLRecord(options?: {
-  useSharedState: boolean;
-}): [accessor: URLRecord, setter: URLSetter] {
+  useSharedState?: boolean;
+}): [accessor: URLRecord, setters: { push: URLSetter; replace: URLSetter; navigate: URLSetter }] {
   const state = options?.useSharedState ? useSharedLocationState() : createLocationState();
   const [url, setURL] = createURLRecord(state.href);
+  let updateMethod: UpdateLocationMethod;
+
   biSyncSignals(
     {
       get: () => state.href,
-      set: () => history.replaceState({}, "", url.href)
+      set: () => updateLocation(url.href, updateMethod)
     },
     {
       get: () => url.href,
       set: href => setURL("href", href)
     }
   );
-  return [url, setURL];
+
+  return [
+    url,
+    {
+      push: (a: any, b?: any) => {
+        updateMethod = "push";
+        return setURL(a[0], a[1]);
+      },
+      replace: (a: any, b?: any) => {
+        updateMethod = "replace";
+        return setURL(a[0], a[1]);
+      },
+      navigate: (a: any, b?: any) => {
+        updateMethod = "navigate";
+        return setURL(a[0], a[1]);
+      }
+    }
+  ];
 }
 
 export const useSharedLocationURLRecord = createSharedRoot(
   createLocationURLRecord.bind(void 0, { useSharedState: true })
 );
 
-export function createLocationURL(): ReactiveURL {
-  const state = createLocationState();
+export function createLocationURL(
+  options: {
+    useSharedState?: boolean;
+    updateMethod?: UpdateLocationMethod;
+  } = {}
+): ReactiveURL {
+  const { useSharedState = false, updateMethod = "replace" } = options;
+  const state = useSharedState ? useSharedLocationState() : createLocationState();
   const url = new ReactiveURL(state.href);
   biSyncSignals(
     {
       get: () => state.href,
-      set: () => history.replaceState({}, "", url)
+      set: () => updateLocation(url.href, updateMethod)
     },
     {
       get: () => url.href,
@@ -189,57 +257,74 @@ export function createLocationURL(): ReactiveURL {
   return url;
 }
 
-export function useLocationURL(): ReactiveURL {
-  if (!globalReactiveURL) globalReactiveURL = createLocationURL();
-  return globalReactiveURL;
-}
+export const useSharedLocationURL = createSharedRoot(
+  createLocationURL.bind(void 0, { useSharedState: true })
+);
 
-export function createSearchParams(init: ReactiveSearchParamsInit) {
-  return new ReactiveSearchParams(init);
-}
+export function createLocationSearchParamRecord(options?: { useSharedState?: boolean }): [
+  access: Store<SearchParamRecord>,
+  write: {
+    push: SearchParamsSetter;
+    replace: SearchParamsSetter;
+    navigate: SearchParamsSetter;
+  }
+] {
+  const state = options?.useSharedState ? useSharedLocationState() : createLocationState();
+  const url = new URL(state.href);
+  const [store, setStore] = createStore(getSearchParamRecord(url.searchParams));
+  let changedLocation = true;
 
-export function createLocationSearchParams(): ReactiveSearchParams {
-  const state = createLocationState();
-  const searchParams = new ReactiveSearchParams(state.search);
-  let causedChange = true;
-
-  // update ReactiveSearchParams instance on location change
   createComputed(
     on(
-      () => state.search,
-      search => {
-        if (causedChange) return (causedChange = false);
-        const keys = new Set(searchParams.keys());
-        const newSearchParams = new URLSearchParams(search);
-        batch(() => {
-          newSearchParams.forEach((value, name) => {
-            if (keys.has(name)) {
-              keys.delete(name);
-              searchParams.set(name, value);
-            } else searchParams.append(name, value);
-          });
-          keys.forEach(key => searchParams.delete(key));
-        });
+      () => state.href,
+      href => {
+        if (changedLocation) return;
+        // update local instance when url changes
+        url.href = href;
+        setStore(getSearchParamRecord(url.searchParams));
       }
     )
   );
 
-  // update location on write
-  createComputed(
-    on(
-      () => searchParams + "",
-      search => ((causedChange = true), (location.search = search)),
-      { defer: true }
-    )
-  );
+  const setter = (updateMethod: UpdateLocationMethod, a: any, b?: any) =>
+    untrack(() => {
+      if (typeof a === "string") {
+        // update only the value of passed param
+        const value = accessWith(b, () => [getSearchParamEntry(url.searchParams, a)]);
+        applySearchParamEntry(url.searchParams, a, value);
+      } else {
+        // clear search params, and apply passed record as new params
+        url.search = "";
+        const record = accessWith(a, [store]);
+        Object.entries(record).forEach(([name, value]) => {
+          applySearchParamEntry(url.searchParams, name, value as string | string[]);
+        });
+      }
+      changedLocation = true;
+      updateLocation(url.href, updateMethod);
+      changedLocation = false;
+      const record: AnyObject = {};
+      Object.keys(store).forEach(key => (record[key] = undefined));
+      setStore({
+        ...record,
+        ...getSearchParamRecord(url.searchParams)
+      });
+      return store;
+    });
 
-  return searchParams;
+  return [
+    store,
+    {
+      push: setter.bind(void 0, "push"),
+      replace: setter.bind(void 0, "replace"),
+      navigate: setter.bind(void 0, "navigate")
+    }
+  ];
 }
 
-export function useLocationSearchParams(): ReactiveSearchParams {
-  if (!globalReactiveSearchParams) globalReactiveSearchParams = createLocationSearchParams();
-  return globalReactiveSearchParams;
-}
+export const useSharedLocationSearchParamRecord = createSharedRoot(
+  createLocationSearchParamRecord.bind(void 0, { useSharedState: true })
+);
 
 export class ReactiveURL implements URL {
   private fields: URLRecord;
