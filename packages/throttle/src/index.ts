@@ -1,4 +1,4 @@
-import { onCleanup } from "solid-js";
+import { getOwner, onCleanup } from "solid-js";
 
 /**
  * Creates a method that is throttled and cancellable.
@@ -31,7 +31,7 @@ const createThrottle = <T extends (...args: any[]) => void, A = Parameters<T>>(
   };
 
   const clear = () => clearTimeout(timerId);
-  onCleanup(clear);
+  if (getOwner()) onCleanup(clear);
 
   return [throttled, clear];
 };
