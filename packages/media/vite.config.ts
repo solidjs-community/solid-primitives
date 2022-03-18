@@ -2,9 +2,18 @@ import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 
 export default defineConfig({
-  plugins: [solidPlugin()],
   test: {
+    clearMocks: true,
     environment: "jsdom",
-    clearMocks: true
+    transformMode: {
+      web: [/\.[jt]sx?$/]
+    },
+    deps: {
+      inline: [/solid-js/]
+    }
+  },
+  plugins: [solidPlugin()],
+  resolve: {
+    conditions: ["development", "browser"]
   }
 });
