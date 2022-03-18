@@ -53,7 +53,7 @@ type Matches = Record<string, Boolean>;
     lg: "1024px",
     xl: "1280px",
   } as const;
- * const { minMatch, matches } = createMatchBreakpoints(breakpoints);
+ * const { minMatch, matches } = createResponsive(breakpoints);
  * console.log(minMatch('lg'), matches());
  * ```
  */
