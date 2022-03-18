@@ -53,11 +53,11 @@ type Matches = Record<string, Boolean>;
     lg: "1024px",
     xl: "1280px",
   } as const;
- * const { minMatch, matches } = createResponsive(breakpoints);
+ * const { minMatch, matches } = createBreakpoints(breakpoints);
  * console.log(minMatch('lg'), matches());
  * ```
  */
-export const createResponsive = (breakpoints: Breakpoints, watchChange: boolean = true) => {
+export const createBreakpoints = (breakpoints: Breakpoints, watchChange: boolean = true) => {
   const mqlInstances = createMemo(() => {
     const mqlInstances: MqlInstances = {};
 

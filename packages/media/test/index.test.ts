@@ -1,11 +1,11 @@
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createRoot } from "solid-js";
-import createMediaQuery, { createResponsive } from "../src/index";
+import createMediaQuery, { createBreakpoints } from "../src/index";
 
 suite("createMediaQuery", (): void => {});
 
-const testResponsive = suite("createResponsive");
+const testResponsive = suite("createBreakpoints");
 
 const breakpoints = {
   sm: "640px",
@@ -34,7 +34,7 @@ testResponsive.after.each(() => {
 
 testResponsive("give the smallest breakpoint by default", () => {
   createRoot(dispose => {
-    const { matches, minMatch } = createResponsive(breakpoints);
+    const { matches, minMatch } = createBreakpoints(breakpoints);
     assert.equal(matches(), {
       sm: false,
       lg: false,
