@@ -1,3 +1,5 @@
+import { onCleanup } from "solid-js";
+
 /**
  * Creates a method that is throttled and cancellable.
  *
@@ -17,18 +19,21 @@ const createThrottle = <T extends (...args: any[]) => void, A = Parameters<T>>(
 ): [fn: (...args: A extends any[] ? A : never) => void, clear: () => void] => {
   let shouldThrottle: boolean = false,
     timerId: ReturnType<typeof setTimeout>;
-  return [
-    (...args: A extends any[] ? A : never) => {
-      // Reject calls during the throttle period
-      if (shouldThrottle) return;
-      shouldThrottle = true;
-      timerId = setTimeout(() => {
-        func(...args);
-        shouldThrottle = false;
-      }, wait);
-    },
-    () => clearTimeout(timerId)
-  ];
+
+  const throttled = (...args: A extends any[] ? A : never) => {
+    // Reject calls during the throttle period
+    if (shouldThrottle) return;
+    shouldThrottle = true;
+    timerId = setTimeout(() => {
+      func(...args);
+      shouldThrottle = false;
+    }, wait);
+  };
+
+  const clear = () => clearTimeout(timerId);
+  onCleanup(clear);
+
+  return [throttled, clear];
 };
 
 export default createThrottle;
