@@ -36,9 +36,9 @@ const createMediaQuery = (
   return state;
 };
 
-type Breakpoints = Record<string, string>;
-type MqlInstances = Record<string, MediaQueryList>;
-type Matches = Record<string, Boolean>;
+export type Breakpoints = Record<string, string>;
+export type Matches = Record<string, Boolean>;
+export type MqlInstances = Record<string, MediaQueryList>;
 
 /**
  * Creates a multi-breakpoint monitor to make responsive components easily.
