@@ -84,6 +84,11 @@ export type Definite<T> = {
   [K in keyof T]-?: T[K];
 };
 
+/** Makes all the properties of an object mutable */
+export type Mutable<T> = {
+  -readonly [K in keyof T]: T[K];
+};
+
 /** `A | B => A & B` */
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
   k: infer I

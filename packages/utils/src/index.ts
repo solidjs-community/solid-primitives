@@ -479,18 +479,30 @@ export type SyncSignal<T, U> = {
  * For syncing two signal values with eachother.
  */
 export function biSyncSignals<A, B>(a: SyncSignal<A, B>, b: SyncSignal<B, A>, init = false): void {
-  let causedA = !init;
-  let causedB = !init;
+  let causedA = false;
+  let causedB = false;
   createComputed(
-    on(a.get, v => {
-      if (causedA) return (causedA = false);
-      (causedB = true), b.set(v);
-    })
+    on(
+      a.get,
+      v => {
+        if (causedA) return;
+        causedB = true;
+        b.set(v);
+        causedB = false;
+      },
+      { defer: !init }
+    )
   );
   createComputed(
-    on(b.get, v => {
-      if (causedB) return (causedB = false);
-      (causedA = true), a.set(v);
-    })
+    on(
+      b.get,
+      v => {
+        if (causedB) return;
+        causedA = true;
+        a.set(v);
+        causedA = false;
+      },
+      { defer: !init }
+    )
   );
 }
