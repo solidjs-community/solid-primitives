@@ -21,11 +21,6 @@ describe("createMediaQuery", () => {
 
   beforeAll(() => {
     originalMatchMedia = window.matchMedia;
-    window.matchMedia = matchMediaMock;
-  });
-
-  beforeEach(() => {
-    matchingBreakpoints = [];
     matchMediaMock.mockImplementation((query: string) => {
       return {
         matches: checkMatch(query),
@@ -36,51 +31,110 @@ describe("createMediaQuery", () => {
     });
   });
 
+  beforeEach(() => {
+    matchingBreakpoints = [];
+    window.matchMedia = matchMediaMock;
+  });
+
   afterAll(() => {
     window.matchMedia = originalMatchMedia;
   });
 
-  test("give the smallest breakpoint by default", () => {
+  test("match no breakpoint by default", () => {
     createRoot(dispose => {
-      const { matches, minMatch } = createBreakpoints(breakpoints);
-      expect(matches()).toEqual({
+      const matches = createBreakpoints(breakpoints);
+      expect(matches).toEqual({
         sm: false,
         lg: false,
         xl: false
       });
-      expect(minMatch("sm")).toEqual(false);
-      expect(minMatch("unknown")).toEqual(false);
       dispose();
     });
   });
 
-  test("give sm breakpoint when min-width: 640px media query matches", () => {
+  test("match sm breakpoint when min-width: 640px media query matches", () => {
     createRoot(dispose => {
       matchingBreakpoints = [breakpoints.sm];
-      const { matches, minMatch } = createBreakpoints(breakpoints);
-      expect(matches()).toEqual({
+      const matches = createBreakpoints(breakpoints);
+      expect(matches).toEqual({
         sm: true,
         lg: false,
         xl: false
       });
-      expect(minMatch("sm")).toEqual(true);
-      expect(minMatch("lg")).toEqual(false);
       dispose();
     });
   });
 
-  test("give lg breakpoint when min-width: 1024px media query matches", () => {
+  test("match sm & lg breakpoint when min-width: 1024px media query matches", () => {
     createRoot(dispose => {
       matchingBreakpoints = [breakpoints.sm, breakpoints.lg];
-      const { matches, minMatch } = createBreakpoints(breakpoints);
-      expect(matches()).toEqual({
+      const matches = createBreakpoints(breakpoints);
+      expect(matches).toEqual({
         sm: true,
         lg: true,
         xl: false
       });
-      expect(minMatch("sm")).toEqual(true);
-      expect(minMatch("lg")).toEqual(true);
-      expect(minMatch("xl")).toEqual(false);
+      dispose();
+    });
+  });
+
+  test("match fallback breakpoint when window.matchMedia is not available", () => {
+    window.matchMedia = undefined;
+    createRoot(dispose => {
+      const matchesWithNoFallback = createBreakpoints(breakpoints);
+      expect(matchesWithNoFallback).toEqual({});
+
+      const matchesWithFallback = createBreakpoints(breakpoints, {
+        fallbackMatch: {
+          sm: true,
+          lg: true,
+          xl: true
+        }
+      });
+      expect(matchesWithFallback).toEqual({
+        sm: true,
+        lg: true,
+        xl: true
+      });
+      dispose();
+    });
+  });
+
+  test("runs correct media query for mobile-first & desktop-first responsive modes", () => {
+    createRoot(dispose => {
+      createBreakpoints(breakpoints);
+      expect(matchMediaMock.mock.calls).toMatchInlineSnapshot(`
+        [
+          [
+            "(min-width: 640px)",
+          ],
+          [
+            "(min-width: 1024px)",
+          ],
+          [
+            "(min-width: 1280px)",
+          ],
+        ]
+      `);
+
+      matchMediaMock.mockClear();
+
+      createBreakpoints(breakpoints, {
+        responsiveMode: "desktop-first"
+      });
+      expect(matchMediaMock.mock.calls).toMatchInlineSnapshot(`
+        [
+          [
+            "(max-width: 640px)",
+          ],
+          [
+            "(max-width: 1024px)",
+          ],
+          [
+            "(max-width: 1280px)",
+          ],
+        ]
+      `);
       dispose();
     });
   });
@@ -88,16 +142,14 @@ describe("createMediaQuery", () => {
   test("update breakpoint when media query change event is triggered", async () => {
     const actualOutput = await new Promise(resolve => {
       createRoot(dispose => {
-        const { matches, minMatch } = createBreakpoints(breakpoints);
+        const matches = createBreakpoints(breakpoints);
         const output = [];
 
         createEffect(() => {
           output.push({
-            matches: matches(),
-            minMatch: {
-              sm: minMatch("sm"),
-              lg: minMatch("lg")
-            }
+            sm: matches.sm,
+            lg: matches.lg,
+            xl: matches.xl
           });
 
           if (output.length >= 2) {
@@ -122,26 +174,14 @@ describe("createMediaQuery", () => {
     expect(actualOutput).toMatchInlineSnapshot(`
       [
         {
-          "matches": {
-            "lg": false,
-            "sm": false,
-            "xl": false,
-          },
-          "minMatch": {
-            "lg": false,
-            "sm": false,
-          },
+          "lg": false,
+          "sm": false,
+          "xl": false,
         },
         {
-          "matches": {
-            "lg": true,
-            "sm": true,
-            "xl": false,
-          },
-          "minMatch": {
-            "lg": true,
-            "sm": true,
-          },
+          "lg": true,
+          "sm": true,
+          "xl": false,
         },
       ]
     `);
@@ -150,13 +190,28 @@ describe("createMediaQuery", () => {
 
   test("do not setup listeners if watchChange is false", () => {
     createRoot(dispose => {
-      createBreakpoints(breakpoints, false);
+      createBreakpoints(breakpoints, {
+        watchChange: false
+      });
 
       onMount(() => {
-        expect(addListenerMock).toBeCalledTimes(0);
+        expect(addListenerMock).not.toBeCalled();
         dispose();
       });
     });
-    expect(removeListenerMock).toBeCalledTimes(0);
+    expect(removeListenerMock).not.toBeCalled();
+  });
+
+  test("do not setup listeners if window.matchMedia is not available", () => {
+    window.matchMedia = undefined;
+    createRoot(dispose => {
+      createBreakpoints(breakpoints);
+
+      onMount(() => {
+        expect(addListenerMock).not.toBeCalled();
+        dispose();
+      });
+    });
+    expect(removeListenerMock).not.toBeCalled();
   });
 });
