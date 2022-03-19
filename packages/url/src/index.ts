@@ -1,5 +1,5 @@
 import { createComputed, getOwner, on, runWithOwner, untrack, batch } from "solid-js";
-import { createStore, Store, DeepReadonly } from "solid-js/store";
+import { createStore, Store, DeepReadonly, DeepMutable } from "solid-js/store";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { createSimpleEmitter } from "@solid-primitives/event-bus";
 import {
@@ -8,12 +8,13 @@ import {
   createStaticStore,
   entries,
   biSyncSignals,
-  Get,
-  Fn,
   AnyObject
 } from "@solid-primitives/utils";
 import { pick } from "@solid-primitives/immutable";
 import { createSharedRoot } from "@solid-primitives/rootless";
+import { isServer } from "solid-js/web";
+
+type SetterValue<Prev, Next = Prev> = Next | ((prev: DeepReadonly<Prev>) => Next);
 
 export type LocationState = {
   readonly origin: string;
@@ -25,46 +26,36 @@ export type LocationState = {
   readonly port: string;
   readonly protocol: string;
   readonly search: string;
-  readonly ancestorOrigins: DOMStringList;
 };
 
-export type URLFields = {
-  hash: string;
-  host: string;
-  hostname: string;
-  href: string;
+export type URLRecord = {
+  readonly hash: string;
+  readonly host: string;
+  readonly hostname: string;
+  readonly href: string;
   readonly origin: string;
-  password: string;
-  pathname: string;
-  port: string;
-  protocol: string;
-  search: string;
-  username: string;
+  readonly password: string;
+  readonly pathname: string;
+  readonly port: string;
+  readonly protocol: string;
+  readonly search: string;
+  readonly username: string;
 };
-export type URLRecord = Readonly<URLFields>;
-type WritableURLFields = Exclude<keyof URLFields, "origin">;
+type WritableURLFields = Exclude<keyof URLRecord, "origin">;
 
-type SetterValue<Prev, Next = Prev> = Next | ((prev: DeepReadonly<Prev>) => Next);
 export type URLSetter = {
   (record: SetterValue<URLRecord, URLSetterRecord>): URLRecord;
   (key: WritableURLFields, value: SetterValue<string>): URLRecord;
 };
 export type URLSetterRecord = Partial<Record<WritableURLFields, string>>;
 
-type SearchParamRecord = Record<string, string | string[]>;
-type SearchParamsSetter = {
-  (record: SetterValue<SearchParamRecord>): Store<SearchParamRecord>;
-  (name: string, value: SetterValue<string | string[]>): Store<SearchParamRecord>;
+export type SearchParamsRecord = Store<Record<string, string | string[]>>;
+export type SearchParamsSetter = {
+  (record: SetterValue<SearchParamsRecord>): SearchParamsRecord;
+  (name: string, value: SetterValue<string | string[]>): SearchParamsRecord;
 };
 
 export type UpdateLocationMethod = "push" | "replace" | "navigate";
-
-export type ReactiveSearchParamsInit =
-  | string
-  | [string, string][]
-  | Record<string, string>
-  | URLSearchParams
-  | ReactiveSearchParams;
 
 const WHOLE = Symbol("watch_whole");
 
@@ -80,10 +71,22 @@ const URL_KEYS = [
   "protocol",
   "search",
   "username"
-] as (keyof URLFields)[];
+] as const;
+
+let FALLBACK_LOCATION: LocationState = {
+  hash: "",
+  host: "example.com",
+  hostname: "example.com",
+  href: "http://example.com/",
+  origin: "http://example.com",
+  pathname: "/",
+  port: "",
+  protocol: "http:",
+  search: ""
+};
 
 let monkeyPatchedStateEvents = false;
-const [listenStateEvents, triggerStateEvents] = createSimpleEmitter();
+const [listenStateEvents, triggerStateEvents] = /*#__PURE__*/ createSimpleEmitter();
 
 function patchStateEvents() {
   if (monkeyPatchedStateEvents) return;
@@ -100,8 +103,8 @@ function patchStateEvents() {
   monkeyPatchedStateEvents = true;
 }
 
-function getSearchParamRecord(searchParams: URLSearchParams): SearchParamRecord {
-  const obj: SearchParamRecord = {};
+export function getSearchParamsRecord(searchParams: URLSearchParams): SearchParamsRecord {
+  const obj: DeepMutable<SearchParamsRecord> = {};
   searchParams.forEach((value, name) => {
     const p = obj[name];
     if (!p) obj[name] = value;
@@ -129,12 +132,18 @@ function getSearchParamEntry(searchParams: URLSearchParams, name: string): strin
 }
 
 function updateLocation(href: string, method: UpdateLocationMethod): void {
+  if (isServer) return;
   if (method === "push") return history.pushState({}, "", href);
   if (method === "replace") return history.replaceState({}, "", href);
   location.href = href;
 }
 
-export function createLocationState(): LocationState {
+export function setLocationFallback(state: LocationState): void {
+  FALLBACK_LOCATION = state;
+}
+
+export function createLocationState(fallback?: LocationState): LocationState {
+  if (isServer) return fallback ?? FALLBACK_LOCATION;
   const [state, setState] = createStaticStore<LocationState>(
     pick(
       location,
@@ -146,8 +155,7 @@ export function createLocationState(): LocationState {
       "pathname",
       "port",
       "protocol",
-      "search",
-      "ancestorOrigins"
+      "search"
     )
   );
   const updateState = () => setState(location);
@@ -157,20 +165,19 @@ export function createLocationState(): LocationState {
   return state;
 }
 
-export const useSharedLocationState = createSharedRoot(createLocationState);
+export const useSharedLocationState = /*#__PURE__*/ createSharedRoot(
+  createLocationState.bind(void 0, undefined)
+);
+
+const _useLocationState = (useShared: boolean) =>
+  useShared ? useSharedLocationState() : createLocationState();
 
 export function createURLRecord(
   url: string,
   base?: string
 ): [accessor: URLRecord, setter: URLSetter] {
   let instance = new URL(url, base);
-  const [state, setState] = createStaticStore<URLRecord>(
-    (() => {
-      const copy = {} as any;
-      URL_KEYS.forEach(key => (copy[key] = instance[key]));
-      return copy;
-    })()
-  );
+  const [state, setState] = createStaticStore<URLRecord>(pick(instance, ...URL_KEYS));
 
   const setter = (
     a: WritableURLFields | SetterValue<URLRecord, URLSetterRecord>,
@@ -194,10 +201,10 @@ export function createURLRecord(
   return [state, ((a, b) => untrack(setter.bind(void 0, a, b))) as URLSetter];
 }
 
-export function createLocationURLRecord(options?: {
+export function createLocationURL(options?: {
   useSharedState?: boolean;
 }): [accessor: URLRecord, setters: { push: URLSetter; replace: URLSetter; navigate: URLSetter }] {
-  const state = options?.useSharedState ? useSharedLocationState() : createLocationState();
+  const state = _useLocationState(!!options?.useSharedState);
   const [url, setURL] = createURLRecord(state.href);
   let updateMethod: UpdateLocationMethod;
 
@@ -217,52 +224,26 @@ export function createLocationURLRecord(options?: {
     {
       push: (a: any, b?: any) => {
         updateMethod = "push";
-        return setURL(a[0], a[1]);
+        return setURL(a, b);
       },
       replace: (a: any, b?: any) => {
         updateMethod = "replace";
-        return setURL(a[0], a[1]);
+        return setURL(a, b);
       },
       navigate: (a: any, b?: any) => {
         updateMethod = "navigate";
-        return setURL(a[0], a[1]);
+        return setURL(a, b);
       }
     }
   ];
 }
 
-export const useSharedLocationURLRecord = createSharedRoot(
-  createLocationURLRecord.bind(void 0, { useSharedState: true })
-);
-
-export function createLocationURL(
-  options: {
-    useSharedState?: boolean;
-    updateMethod?: UpdateLocationMethod;
-  } = {}
-): ReactiveURL {
-  const { useSharedState = false, updateMethod = "replace" } = options;
-  const state = useSharedState ? useSharedLocationState() : createLocationState();
-  const url = new ReactiveURL(state.href);
-  biSyncSignals(
-    {
-      get: () => state.href,
-      set: () => updateLocation(url.href, updateMethod)
-    },
-    {
-      get: () => url.href,
-      set: href => (url.href = href)
-    }
-  );
-  return url;
-}
-
-export const useSharedLocationURL = createSharedRoot(
+export const useSharedLocationURL = /*#__PURE__*/ createSharedRoot(
   createLocationURL.bind(void 0, { useSharedState: true })
 );
 
-export function createLocationSearchParamRecord(options?: { useSharedState?: boolean }): [
-  access: Store<SearchParamRecord>,
+export function createLocationSearchParams(options?: { useSharedState?: boolean }): [
+  access: Store<SearchParamsRecord>,
   write: {
     push: SearchParamsSetter;
     replace: SearchParamsSetter;
@@ -271,7 +252,7 @@ export function createLocationSearchParamRecord(options?: { useSharedState?: boo
 ] {
   const state = options?.useSharedState ? useSharedLocationState() : createLocationState();
   const url = new URL(state.href);
-  const [store, setStore] = createStore(getSearchParamRecord(url.searchParams));
+  const [store, setStore] = createStore(getSearchParamsRecord(url.searchParams));
   let changedLocation = true;
 
   createComputed(
@@ -281,7 +262,7 @@ export function createLocationSearchParamRecord(options?: { useSharedState?: boo
         if (changedLocation) return;
         // update local instance when url changes
         url.href = href;
-        setStore(getSearchParamRecord(url.searchParams));
+        setStore(getSearchParamsRecord(url.searchParams));
       }
     )
   );
@@ -307,7 +288,7 @@ export function createLocationSearchParamRecord(options?: { useSharedState?: boo
       Object.keys(store).forEach(key => (record[key] = undefined));
       setStore({
         ...record,
-        ...getSearchParamRecord(url.searchParams)
+        ...getSearchParamsRecord(url.searchParams)
       });
       return store;
     });
@@ -322,9 +303,17 @@ export function createLocationSearchParamRecord(options?: { useSharedState?: boo
   ];
 }
 
-export const useSharedLocationSearchParamRecord = createSharedRoot(
-  createLocationSearchParamRecord.bind(void 0, { useSharedState: true })
+export const useSharedLocationSearchParams = /*#__PURE__*/ createSharedRoot(
+  createLocationSearchParams.bind(void 0, { useSharedState: true })
 );
+
+export function createURL(url: string, base?: string): ReactiveURL {
+  return new ReactiveURL(url, base);
+}
+
+export function createSearchParams(init: ReactiveSearchParamsInit): ReactiveSearchParams {
+  return new ReactiveSearchParams(init);
+}
 
 export class ReactiveURL implements URL {
   private fields: URLRecord;
@@ -402,9 +391,7 @@ export class ReactiveURL implements URL {
     return this.fields.search;
   }
   set search(search) {
-    const new_url = new URL(location.href);
-    new_url.search = search;
-    this.set(new_url);
+    this.set("search", search);
   }
 
   get username() {
@@ -423,19 +410,44 @@ export class ReactiveURL implements URL {
 
   get searchParams(): ReactiveSearchParams {
     if (!this.rsp)
-      runWithOwner(this.owner, () => {
-        this.rsp = new ReactiveSearchParams(this.search);
-        createComputed(
-          on(
-            () => this.rsp + "",
-            search => (this.search = search),
-            { defer: true }
-          )
-        );
-      });
+      untrack(
+        runWithOwner.bind(void 0, this.owner, () => {
+          const rsp = (this.rsp = new ReactiveSearchParams(this.search));
+          biSyncSignals(
+            {
+              get: () => rsp + "",
+              set: search => {
+                // TODO: figure out a way to update search params granularly (currently causes needless updates)
+                const keys = new Set(rsp.keys());
+                const newSearchParams = new URLSearchParams(search);
+                batch(() => {
+                  newSearchParams.forEach((value, name) => {
+                    if (keys.has(name)) {
+                      keys.delete(name);
+                      rsp.set(name, value);
+                    } else rsp.append(name, value);
+                  });
+                  keys.forEach(key => rsp.delete(key));
+                });
+              }
+            },
+            {
+              get: () => this.search,
+              set: search => (this.search = search)
+            }
+          );
+        })
+      );
     return this.rsp!;
   }
 }
+
+export type ReactiveSearchParamsInit =
+  | string
+  | [string, string][]
+  | Record<string, string>
+  | URLSearchParams
+  | ReactiveSearchParams;
 
 export class ReactiveSearchParams extends URLSearchParams {
   private cache = createTriggerCache<string | typeof WHOLE>();
@@ -500,5 +512,9 @@ export class ReactiveSearchParams extends URLSearchParams {
   }
   [Symbol.iterator](): IterableIterator<[string, string]> {
     return this.entries();
+  }
+  forEach(callbackfn: (value: string, key: string, parent: URLSearchParams) => void): void {
+    this.cache.track(WHOLE);
+    super.forEach(callbackfn);
   }
 }
