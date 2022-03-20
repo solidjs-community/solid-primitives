@@ -1,4 +1,4 @@
-import { Breakpoints, BreakpointOptions } from "./types";
+import { Breakpoints, BreakpointOptions, Matches } from "./types";
 
 /**
  * Creates a very simple and straightforward media query monitor.
@@ -35,13 +35,17 @@ const createMediaQuery = (
     sm: "640px",
     lg: "1024px",
     xl: "1280px",
-  } as const;
+  };
  * const matches = createBreakpoints(breakpoints);
  * console.log(matches.lg);
  * ```
  */
-export const createBreakpoints = (_breakpoints: Breakpoints, options: BreakpointOptions = {}) => {
+
+export function createBreakpoints<T extends Breakpoints>(
+  _breakpoints: T,
+  options: BreakpointOptions<T> = {}
+): Matches<T> {
   return options.fallbackMatch || {};
-};
+}
 
 export default createMediaQuery;

@@ -63,23 +63,26 @@ function checkMqSupported() {
     sm: "640px",
     lg: "1024px",
     xl: "1280px",
-  } as const;
+  };
  * const matches = createBreakpoints(breakpoints);
  * console.log(matches.lg);
  * ```
  */
-export const createBreakpoints = (breakpoints: Breakpoints, options: BreakpointOptions = {}) => {
+export function createBreakpoints<T extends Breakpoints>(
+  breakpoints: T,
+  options: BreakpointOptions<T> = {}
+): Matches<T> {
   const isMqSupported = checkMqSupported();
 
   const mqlInstances = createMemo(() => {
-    const mqlInstances: MqlInstances = {};
+    const mqlInstances: MqlInstances<T> = {};
 
     if (isMqSupported) {
       Object.entries(breakpoints).forEach(([token, width]) => {
         const responsiveProperty = options.responsiveMode === "desktop-first" ? "max" : "min";
         const mediaquery = `(${responsiveProperty}-width: ${width})`;
         const instance = window.matchMedia(mediaquery);
-  
+
         mqlInstances[token] = instance;
       });
     }
@@ -92,7 +95,7 @@ export const createBreakpoints = (breakpoints: Breakpoints, options: BreakpointO
       return options.fallbackMatch || {};
     }
 
-    const matches: Matches = {};
+    const matches: Matches<T> = {};
 
     Object.entries(mqlInstances()).forEach(([token, mql]) => {
       matches[token] = mql.matches;
@@ -122,6 +125,6 @@ export const createBreakpoints = (breakpoints: Breakpoints, options: BreakpointO
   });
 
   return matches;
-};
+}
 
 export default createMediaQuery;

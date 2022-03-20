@@ -7,7 +7,7 @@ describe("createMediaQuery", () => {
     sm: "640px",
     lg: "1024px",
     xl: "1280px"
-  } as const;
+  };
 
   const matchMediaMock = vi.fn();
   const addListenerMock = vi.fn();
