@@ -35,7 +35,7 @@ console.log(isSmall());
 
 ### `createBreakpoints`
 
-Creates a very simple and straightforward media query monitor.
+Creates a multi-breakpoint monitor to make responsive components easily.
 
 ```ts
 import { createBreakpoints } from "@solid-primitives/media";
