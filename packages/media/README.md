@@ -25,7 +25,7 @@ yarn add @solid-primitives/media
 Creates a very simple and straightforward media query monitor.
 
 ```ts
-import createMediaQuery from "@solid-primitives/media";
+import { createMediaQuery } from "@solid-primitives/media";
 
 const isSmall = createMediaQuery("(max-width: 767px)");
 console.log(isSmall());
@@ -63,18 +63,20 @@ const Example: Component = () => {
       'text-huge': matches.xl,  // huge text with flex row layout
     }}>
       <Switch fallback={<div>Smallest</div>}>
-        <Match when={match.xl}>Extra Large</Match>
-        <Match when={match.lg}>Large</Match>
-        <Match when={match.sm}>Small</Match>
+        <Match when={matches.xl}>Extra Large</Match>
+        <Match when={matches.lg}>Large</Match>
+        <Match when={matches.sm}>Small</Match>
         {/* 
-          Instead of fallback, you can also use `!match.sm`
-          <Match when={!match.sm}>Smallest</Match>
+          Instead of fallback, you can also use `!matches.sm`
+          <Match when={!matches.sm}>Smallest</Match>
          */}
       </Switch>
     </div>
   );
 }
 ```
+
+[Working Demo](https://codesandbox.io/s/solid-responsive-breakpoints-h4emy8?file=/src/index.tsx)
 
 ## Changelog
 

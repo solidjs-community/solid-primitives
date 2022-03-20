@@ -1,6 +1,6 @@
 import { describe, test, expect, vi, beforeEach, beforeAll, afterEach, afterAll } from "vitest";
 import { createEffect, createRoot, onMount } from "solid-js";
-import createMediaQuery, { createBreakpoints } from "../src/index";
+import { createMediaQuery, createBreakpoints } from "../src/index";
 
 describe("createMediaQuery", () => {
   const breakpoints = {
