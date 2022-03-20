@@ -37,7 +37,7 @@ console.log(isSmall());
 
 Creates a multi-breakpoint monitor to make responsive components easily.
 
-```ts
+```tsx
 import { createBreakpoints } from "@solid-primitives/media";
 
 const breakpoints = {
@@ -46,11 +46,34 @@ const breakpoints = {
   xl: "1280px",
 };
 
-const matches = createBreakpoints(breakpoints);
+const Example: Component = () => {
+  const matches = createBreakpoints(breakpoints);
 
-console.log(matches.sm); // true when screen width >= 640px
-console.log(matches.lg); // true when screen width >= 1024px
-console.log(matches.xl); // true when screen width >= 1280px
+  createEffect(() => {
+    console.log(matches.sm); // true when screen width >= 640px
+    console.log(matches.lg); // true when screen width >= 1024px
+    console.log(matches.xl); // true when screen width >= 1280px
+  });
+
+  return (
+    <div classList={{
+      'text-tiny flex flex-column': true,  // tiny text with flex column layout
+      'text-small': matches.sm, // small text with flex column layout
+      'text-base flex-row': matches.lg, // base text with flex row layout
+      'text-huge': matches.xl,  // huge text with flex row layout
+    }}>
+      <Switch fallback={<div>Smallest</div>}>
+        <Match when={match.xl}>Extra Large</Match>
+        <Match when={match.lg}>Large</Match>
+        <Match when={match.sm}>Small</Match>
+        {/* 
+          Instead of fallback, you can also use `!match.sm`
+          <Match when={!match.sm}>Smallest</Match>
+         */}
+      </Switch>
+    </div>
+  );
+}
 ```
 
 ## Changelog
