@@ -68,7 +68,7 @@ function checkMqSupported() {
  * console.log(matches.lg);
  * ```
  */
-export function createBreakpoints<T extends Breakpoints>(
+function createBreakpoints<T extends Breakpoints>(
   breakpoints: T,
   options: BreakpointOptions<T> = {}
 ): Matches<T> {
@@ -128,3 +128,5 @@ export function createBreakpoints<T extends Breakpoints>(
 }
 
 export default createMediaQuery;
+export { createBreakpoints };
+export * from './types';
