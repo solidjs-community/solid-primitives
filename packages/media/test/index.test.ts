@@ -2,7 +2,7 @@ import { describe, test, expect, vi, beforeEach, beforeAll, afterEach, afterAll 
 import { createEffect, createRoot, onMount } from "solid-js";
 import { createMediaQuery, createBreakpoints } from "../src/index";
 
-describe("createMediaQuery", () => {
+describe("createBreakpoints", () => {
   const breakpoints = {
     sm: "640px",
     lg: "1024px",
@@ -82,7 +82,11 @@ describe("createMediaQuery", () => {
     window.matchMedia = undefined;
     createRoot(dispose => {
       const matchesWithNoFallback = createBreakpoints(breakpoints);
-      expect(matchesWithNoFallback).toEqual({});
+      expect(matchesWithNoFallback).toEqual({
+        sm: false,
+        lg: false,
+        xl: false,
+      });
 
       const matchesWithFallback = createBreakpoints(breakpoints, {
         fallbackMatch: {

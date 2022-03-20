@@ -1,4 +1,4 @@
-export { createMediaQuery as default } from './createMediaQuery';
-export * from './createMediaQuery';
-export * from './createBreakpoints';
-export * from './types';
+export { createMediaQuery as default } from "./createMediaQuery";
+export * from "./createMediaQuery";
+export * from "./createBreakpoints";
+export * from "./types";

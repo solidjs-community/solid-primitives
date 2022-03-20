@@ -2,7 +2,7 @@ import { Store } from "solid-js/store";
 
 export type Breakpoints = Record<string, string>;
 
-export type Matches<T extends Breakpoints> = Store<Record<keyof T, boolean>>;
+export type Matches<T extends Breakpoints> = Readonly<Record<keyof T, boolean>>;
 
 export interface BreakpointOptions<T extends Breakpoints> {
   /** If true watches changes and reports state reactively */
