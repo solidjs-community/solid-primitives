@@ -43,7 +43,7 @@ import { createBreakpoints } from "@solid-primitives/media";
 const breakpoints = {
   sm: "640px",
   lg: "1024px",
-  xl: "1280px",
+  xl: "1280px"
 };
 
 const Example: Component = () => {
@@ -56,12 +56,14 @@ const Example: Component = () => {
   });
 
   return (
-    <div classList={{
-      'text-tiny flex flex-column': true,  // tiny text with flex column layout
-      'text-small': matches.sm, // small text with flex column layout
-      'text-base flex-row': matches.lg, // base text with flex row layout
-      'text-huge': matches.xl,  // huge text with flex row layout
-    }}>
+    <div
+      classList={{
+        "text-tiny flex flex-column": true, // tiny text with flex column layout
+        "text-small": matches.sm, // small text with flex column layout
+        "text-base flex-row": matches.lg, // base text with flex row layout
+        "text-huge": matches.xl // huge text with flex row layout
+      }}
+    >
       <Switch fallback={<div>Smallest</div>}>
         <Match when={matches.xl}>Extra Large</Match>
         <Match when={matches.lg}>Large</Match>
@@ -73,7 +75,7 @@ const Example: Component = () => {
       </Switch>
     </div>
   );
-}
+};
 ```
 
 [Working Demo](https://codesandbox.io/s/solid-responsive-breakpoints-h4emy8?file=/src/index.tsx)
@@ -103,4 +105,12 @@ Added server entry and updated to latest Solid.
 
 Removed onMount and returned the current media query immediately as opposed to onEffect.
 
+1.2.0
+
+Added createBreakpoints primitive as an alpha release.
+
 </details>
+
+## Contributors
+
+Thanks to Aditya Agarwal for contributing createBreakpoints.
