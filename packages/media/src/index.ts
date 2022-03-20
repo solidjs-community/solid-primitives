@@ -1,7 +1,7 @@
 import { createEffect, createMemo, createSignal, getOwner, onCleanup } from "solid-js";
 import { createStore } from "solid-js/store";
-
 import { isServer } from "solid-js/web";
+import { Breakpoints, BreakpointOptions, MqlInstances, Matches } from "./types";
 
 /**
  * Creates a very simple and straightforward media query monitor.
@@ -37,18 +37,6 @@ const createMediaQuery = (
   const [state, setState] = createSignal(initialState);
   return state;
 };
-
-export type Breakpoints = Record<string, string>;
-export type Matches = Record<string, Boolean>;
-export interface BreakpointOptions {
-  /** If true watches changes and reports state reactively */
-  watchChange?: boolean;
-  /** Default value of `match` when `window.matchMedia` is not available like during SSR & legacy browsers */
-  fallbackMatch?: Matches;
-  /** Use `min-width` media query for mobile first or `max-width` for desktop first  */
-  responsiveMode?: "mobile-first" | "desktop-first";
-}
-export type MqlInstances = Record<string, MediaQueryList>;
 
 function checkMqSupported() {
   if (isServer) {
