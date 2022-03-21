@@ -1,5 +1,3 @@
-import { Store } from "solid-js/store";
-
 export type Breakpoints = Record<string, string>;
 
 export type Matches<T extends Breakpoints> = Readonly<Record<keyof T, boolean>>;

@@ -1,4 +1,4 @@
-import { getOwner, onCleanup, createSignal } from "solid-js";
+import { getOwner, onCleanup, createSignal, Accessor } from "solid-js";
 import { isServer } from "solid-js/web";
 
 /**
@@ -15,11 +15,11 @@ import { isServer } from "solid-js/web";
  * console.log(isSmall());
  * ```
  */
- export const createMediaQuery = (
+export const createMediaQuery = (
   query: string,
-  fallbackState: boolean = false,
-  watchChange: boolean = true
-): (() => boolean) => {
+  fallbackState = false,
+  watchChange = true
+): Accessor<boolean> => {
   let initialState = fallbackState;
   if (!isServer) {
     const mql = window.matchMedia(query);
