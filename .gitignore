@@ -163,4 +163,5 @@ temp/
 
 # ignore lock files, only needed for apps, not libs
 *lock.json
+*lock.yaml
 *.lock

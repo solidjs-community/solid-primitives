@@ -1,8 +1,19 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import solidPlugin from "vite-plugin-solid";
 import Unocss from "unocss/vite";
 
 export default defineConfig({
+  root: "./dev",
+  test: {
+    clearMocks: true,
+    environment: "jsdom",
+    transformMode: {
+      web: [/\.[jt]sx?$/]
+    },
+    deps: {
+      inline: [/solid-js/]
+    }
+  },
   plugins: [
     solidPlugin(),
     Unocss({
@@ -17,9 +28,8 @@ export default defineConfig({
       }
     })
   ],
-  build: {
-    target: "esnext",
-    polyfillDynamicImport: false
+  resolve: {
+    conditions: ["development", "browser"]
   },
   optimizeDeps: {
     exclude: ["@solid-primitives/utils"]

@@ -3,6 +3,7 @@
   "version": "0.0.100",
   "description": "A template primitive example.",
   "author": "Your Name <you@youremail.com>",
+  "contributors": [],
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/template-primitive#readme",
   "repository": {
