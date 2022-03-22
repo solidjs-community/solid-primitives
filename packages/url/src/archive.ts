@@ -1,6 +1,4 @@
 // primitives that was scrapped from released package, left here for safekeeping
-// as I would like to have reactive URL and URLSearchParams classes "connected" with the window location
-// they is no convineint way to decide how you'd like to update the location href (push/replace/navigate)
 
 export function createLocationURL(
   options: {
@@ -70,4 +68,45 @@ export function createLocationSearchParams(
 
 export const useSharedLocationSearchParams = /*#__PURE__*/ createSharedRoot(
   createLocationSearchParams.bind(void 0, { useSharedState: true })
+);
+
+export function createLocationURLRecord(options?: {
+  useSharedState?: boolean;
+}): [accessor: URLRecord, setters: { push: URLSetter; replace: URLSetter; navigate: URLSetter }] {
+  const state = _useLocationState(!!options?.useSharedState);
+  const [url, setURL] = createURLRecord(state.href);
+  let updateMethod: UpdateLocationMethod;
+
+  biSyncSignals(
+    {
+      get: () => state.href,
+      set: () => updateLocation(url.href, updateMethod)
+    },
+    {
+      get: () => url.href,
+      set: href => setURL("href", href)
+    }
+  );
+
+  return [
+    url,
+    {
+      push: (a: any, b?: any) => {
+        updateMethod = "push";
+        return setURL(a, b);
+      },
+      replace: (a: any, b?: any) => {
+        updateMethod = "replace";
+        return setURL(a, b);
+      },
+      navigate: (a: any, b?: any) => {
+        updateMethod = "navigate";
+        return setURL(a, b);
+      }
+    }
+  ];
+}
+
+export const useSharedLocationURLRecord = /*#__PURE__*/ createSharedRoot(
+  createLocationURLRecord.bind(void 0, { useSharedState: true })
 );

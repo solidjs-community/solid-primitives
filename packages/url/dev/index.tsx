@@ -1,9 +1,4 @@
-import {
-  ReactiveURL,
-  useSharedLocationSearchParams,
-  useSharedLocationURL,
-  getSearchParamsRecord
-} from "../src";
+import { ReactiveURL, getSearchParamsRecord } from "../src";
 import { Component, createEffect, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
