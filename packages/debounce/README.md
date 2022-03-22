@@ -18,8 +18,9 @@ yarn add @solid-primitives/debounce
 ## How to use it
 
 ```ts
-const [fn, clear] = createDebounce(() => console.log('hi'), 250));
+const fn = createDebounce(() => console.log('hi'), 250));
 fn('my-new-value');
+fn.clear()
 ```
 
 ## Demo
@@ -58,5 +59,9 @@ Updated to Solid 1.3
 1.1.2
 
 Added missing automated clean-up.
+
+1.2.0
+
+Improved types, changed output format from `[fn, clear]` to `fn & { clear }`
 
 </details>

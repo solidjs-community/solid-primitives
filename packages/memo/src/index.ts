@@ -176,7 +176,7 @@ export function createDebouncedMemo<T>(
   options: MemoOptionsWithValue<T | undefined> = {}
 ): Accessor<T> {
   const [state, setState] = createSignal(options.value, options);
-  const [fn] = debounce(() => track(() => setState(calc)), timeoutMs);
+  const fn = debounce(() => track(() => setState(calc)), timeoutMs);
   const track = createPureReaction(() => {
     fn();
     track(() => calc(state()));
