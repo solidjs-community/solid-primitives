@@ -3,15 +3,19 @@
   "version": "0.0.310",
   "description": "Collection of custom memo primitives. They extend Solid's createMemo functionality while keeping the usage similar.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
+  "contributors": [],
   "license": "MIT",
   "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/memo#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davedbase/solid-primitives.git"
   },
+  "bugs": {
+    "url": "https://github.com/davedbase/solid-primitives/issues"
+  },
   "primitive": {
     "name": "memo",
-    "stage": 1,
+    "stage": 2,
     "list": [
       "createCurtain",
       "createWritableMemo",

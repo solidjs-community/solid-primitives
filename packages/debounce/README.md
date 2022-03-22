@@ -18,9 +18,23 @@ yarn add @solid-primitives/debounce
 ## How to use it
 
 ```ts
-const fn = createDebounce(() => console.log('hi'), 250));
-fn('my-new-value');
-fn.clear()
+const fn = createDebounce((message: string) => console.log(message), 250));
+fn('Hello!');
+fn.clear() // clears a timeout in progress
+```
+
+### Definition
+
+```ts
+function createDebounce<Args extends any[]>(
+  func: (...args: Args) => void,
+  wait?: number
+): DebouncedFunction<Args>;
+
+interface DebouncedFunction<Args extends any[]> {
+  (...args: Args): void;
+  clear: () => void;
+}
 ```
 
 ## Demo

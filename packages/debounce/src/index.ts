@@ -1,8 +1,8 @@
 import { onCleanup } from "solid-js";
 
-export interface DebouncedFunction<Args extends any[], F extends (...args: Args) => any> {
-  (this: ThisParameterType<F>, ...args: Args & Parameters<F>): Promise<ReturnType<F>>;
-  cancel: (reason?: any) => void;
+export interface DebouncedFunction<Args extends any[]> {
+  (...args: Args): void;
+  clear: () => void;
 }
 
 /**
@@ -14,22 +14,23 @@ export interface DebouncedFunction<Args extends any[], F extends (...args: Args)
  *
  * @example
  * ```ts
- * const [fn, clear] = createDebounce(() => console.log('hi'), 250));
- * fn('my-new-value');
+ * const fn = createDebounce((message: string) => console.log(message), 250));
+ * fn('Hello!');
+ * fn.clear() // clears a timeout in progress
  * ```
  */
-export function createDebounce<Args extends any[], F extends (...args: Args) => void>(
-  func: F,
+export function createDebounce<Args extends any[]>(
+  func: (...args: Args) => void,
   wait?: number
-): F & { clear: () => void } {
+): DebouncedFunction<Args> {
   let timeoutId: ReturnType<typeof setTimeout>;
   const clear = () => clearTimeout(timeoutId);
   onCleanup(clear);
-  const debounced = function (this: ThisParameterType<F>, ...args: Parameters<F>) {
+  const debounced = function (...args: Args) {
     if (timeoutId !== undefined) clear();
-    timeoutId = setTimeout(() => func.apply(this, args), wait);
+    timeoutId = setTimeout(() => func(...args), wait);
   };
-  return Object.assign(debounced, { clear }) as F & { clear: () => void };
+  return Object.assign(debounced, { clear }) as DebouncedFunction<Args>;
 }
 
 export default createDebounce;
