@@ -1,4 +1,4 @@
-import { createMemo, Accessor, runWithOwner, getOwner, onCleanup, createRoot } from "solid-js";
+import { createMemo, Accessor, runWithOwner, getOwner } from "solid-js";
 import {
   access,
   isFunction,
@@ -7,20 +7,15 @@ import {
   Values,
   isObject,
   isArray,
-  AnyFunction,
-  Fn
+  AnyFunction
 } from "@solid-primitives/utils";
 import type { MemoOptions } from "solid-js/types/reactive/signal";
-import { Store } from "solid-js/store";
 
 type ReactiveSource = [] | any[] | AnyObject;
 
 export type DestructureOptions<T extends ReactiveSource> = MemoOptions<Values<T>> & {
-  cache?: boolean;
+  memo?: boolean;
   lazy?: boolean;
-  deep?: boolean;
-};
-export type GettersOptions = MemoOptions<any> & {
   deep?: boolean;
 };
 
@@ -72,7 +67,7 @@ function createProxyCache(obj: object, get: (key: any) => any): any {
  * Destructures an reactive object *(e.g. store or component props)* or a signal of one into a tuple/map of signals for each object key.
  * @param source reactive object or signal returning one
  * @param options memo options + primitive configuration:
- * - `cache` - wraps accessors in `createMemo`, making each property update independently. *(enabled by default for signal source)*
+ * - `memo` - wraps accessors in `createMemo`, making each property update independently. *(enabled by default for signal source)*
  * - `lazy` - property accessors are created on key read. enable if you want to only a subset of source properties, or use properties initially missing
  * - `deep` - destructure nested objects
  * @returns object of the same keys as the source, but with values turned into accessors.
@@ -97,7 +92,7 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
   ? DeepSpread<T>
   : Spread<T> {
   const config: DestructureOptions<T> = options ?? {};
-  const cache = config.cache ?? isFunction(source);
+  const memo = config.memo ?? isFunction(source);
   const getter = isFunction(source)
     ? (key: any) => () => source()[key]
     : (key: any) => () => source[key];
@@ -109,8 +104,8 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
     return createProxyCache(obj, key => {
       const calc = getter(key);
       if (config.deep && isReactiveObject(obj[key]))
-        return runWithOwner(owner, () => destructure(calc, { ...config, cache }));
-      return cache ? runWithOwner(owner, () => createMemo(calc, undefined, options)) : calc;
+        return runWithOwner(owner, () => destructure(calc, { ...config, memo }));
+      return memo ? runWithOwner(owner, () => createMemo(calc, undefined, options)) : calc;
     });
   }
 
@@ -119,82 +114,8 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
   for (const [key, value] of Object.entries(obj)) {
     const calc = getter(key);
     if (config.deep && isReactiveObject(value))
-      result[key] = destructure(calc, { ...config, cache });
-    else result[key] = cache ? createMemo(calc, undefined, options) : calc;
+      result[key] = destructure(calc, { ...config, memo });
+    else result[key] = memo ? createMemo(calc, undefined, options) : calc;
   }
   return result;
-}
-
-function createProxyCacheGet<T extends ReactiveSource>(
-  get: (key: keyof T) => Values<T>,
-  options?: MemoOptions<Values<T>>
-): [proxy: Readonly<T>, dispose: Fn] {
-  const [root, dispose] = createRoot(dispose => [getOwner()!, dispose]);
-  const getMemo = (key: keyof T) =>
-    runWithOwner(root, () => createMemo(() => get(key), undefined, options));
-
-  const proxy = new Proxy(
-    {},
-    {
-      get(obj, key) {
-        const saved = Reflect.get(obj, key);
-        if (saved) saved();
-        const memo = getMemo(key as keyof T);
-        Reflect.set(obj, key, memo);
-        return memo();
-      },
-      set: () => false
-    }
-  ) as T;
-  return [proxy, dispose];
-}
-
-/**
- * Wraps object/array signal with getters for every key, making accessing properties similar to component props/store. Properties are cached with memos on access, so th primitive needs to be used in a reactive context.
- * @param signal signal source of the object to wrap
- * @param options memo options object + `deep` for wrapping nested objects recursively (by default source object is wrapped shallowly)
- * @returns wrapped readonly object with reactive getters
- * @example
- * const [getUser, setUser] = createSignal({
- *    name: "John",
- *    age: 35,
- *    weaponOfChoice: "Machete"
- * })
- * const user = wrapGetters(getUser)
- * user.age // => 35 (reactive on updates to that property)
- */
-export function wrapGetters<T extends ReactiveSource, O extends GettersOptions>(
-  signal: Accessor<T>,
-  options?: O
-): O["deep"] extends true ? Store<T> : Readonly<T> {
-  const proxies = new Map<object, { proxy: object; dispose: Fn }>();
-  let cleanup: Set<object> | undefined;
-  onCleanup(() => proxies.forEach(({ dispose }) => dispose()));
-  return wrap(signal(), signal);
-
-  function wrap<T extends ReactiveSource>(obj: T, signal: Accessor<T>): T {
-    if (!cleanup) {
-      // dispose and remove saved objects that weren't used from previous iteration
-      cleanup = new Set(proxies.keys());
-      queueMicrotask(() => {
-        cleanup?.forEach(obj => {
-          proxies.get(obj)!.dispose();
-          proxies.delete(obj);
-        });
-        cleanup = undefined;
-      });
-    }
-    if (proxies.has(obj)) {
-      cleanup.delete(obj);
-      return proxies.get(obj)!.proxy as T;
-    }
-
-    const [proxy, dispose] = createProxyCacheGet<T>(key => {
-      const value = signal()[key];
-      return options?.deep && isReactiveObject(value) ? wrap(value, () => signal()[key]) : value;
-    }, options);
-
-    proxies.set(obj, { proxy, dispose });
-    return proxy;
-  }
 }

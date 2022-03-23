@@ -16,8 +16,7 @@
     "name": "destructure",
     "stage": 2,
     "list": [
-      "destructure",
-      "wrapGetters"
+      "destructure"
     ],
     "category": "Reactivity"
   },

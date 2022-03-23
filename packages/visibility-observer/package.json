@@ -1,0 +1,62 @@
+{
+  "name": "@solid-primitives/visibility-observer",
+  "version": "1.0.0",
+  "description": "Primitive to track page visibility",
+  "author": "David Di Biase",
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/visibility-observer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "visibility-observer",
+    "stage": 3,
+    "list": [
+      "createPageVisibilityObserver"
+    ],
+    "category": "Display & Media"
+  },
+  "files": [
+    "dist"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "build": "tsup"
+  },
+  "keywords": [
+    "page",
+    "visibility",
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "@types/jest": "^27.0.0",
+    "prettier": "^2.0.5",
+    "solid-testing-library": "^0.2.0",
+    "tslib": "^2.0.1",
+    "tsup": "^5.10.1",
+    "typescript": "^4.0.2"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.3.0"
+  },
+  "jest": {
+    "setupFiles": [
+      "./test/setup.ts"
+    ]
+  }
+}

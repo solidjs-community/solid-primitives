@@ -50,6 +50,7 @@ const createRAF = (
     requestAnimationFrame(loop);
   };
   const start = () => {
+    if (running()) return;
     setRunning(true);
     requestAnimationFrame(loop);
   };

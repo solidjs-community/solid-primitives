@@ -29,7 +29,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsup",
+    "build-disabled": "tsup",
     "test-disabled": "uvu -r solid-register"
   },
   "keywords": [

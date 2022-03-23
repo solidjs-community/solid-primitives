@@ -1,5 +1,10 @@
 import { onCleanup } from "solid-js";
 
+export interface DebouncedFunction<Args extends any[]> {
+  (...args: Args): void;
+  clear: () => void;
+}
+
 /**
  * Creates a method that is debounced and cancellable.
  *
@@ -9,24 +14,23 @@ import { onCleanup } from "solid-js";
  *
  * @example
  * ```ts
- * const [fn, clear] = createDebounce(() => console.log('hi'), 250));
- * fn('my-new-value');
+ * const fn = createDebounce((message: string) => console.log(message), 250));
+ * fn('Hello!');
+ * fn.clear() // clears a timeout in progress
  * ```
  */
-const createDebounce = <T extends (...args: unknown[]) => void, A = Parameters<T>>(
-  func: T,
+export function createDebounce<Args extends any[]>(
+  func: (...args: Args) => void,
   wait?: number
-): [fn: (...args: A extends unknown[] ? A : never) => void, clear: () => void] => {
+): DebouncedFunction<Args> {
   let timeoutId: ReturnType<typeof setTimeout>;
   const clear = () => clearTimeout(timeoutId);
   onCleanup(clear);
-  return [
-    (...args: A extends unknown[] ? A : never) => {
-      if (timeoutId !== undefined) clear();
-      timeoutId = setTimeout(() => func(...args), wait);
-    },
-    clear
-  ];
-};
+  const debounced = function (...args: Args) {
+    if (timeoutId !== undefined) clear();
+    timeoutId = setTimeout(() => func(...args), wait);
+  };
+  return Object.assign(debounced, { clear }) as DebouncedFunction<Args>;
+}
 
 export default createDebounce;

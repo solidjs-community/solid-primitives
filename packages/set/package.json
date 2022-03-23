@@ -14,7 +14,7 @@
   },
   "primitive": {
     "name": "set",
-    "stage": 1,
+    "stage": 2,
     "list": [
       "createSet",
       "createWeakSet"

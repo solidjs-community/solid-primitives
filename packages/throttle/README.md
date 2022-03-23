@@ -7,6 +7,8 @@
 
 Creates a throttled function that invokes at most once per specified time.
 
+When used in an reactive context (effect or component), any throttled function pending to execute will be automatically canceled when the context is cleaned up.
+
 ## How to use it
 
 ```ts
@@ -38,5 +40,9 @@ Adding CJS support to package.
 1.1.0
 
 Updated to Solid 1.3
+
+1.1.3
+
+General clean-up and improvements by Joe Pea (trusktr)
 
 </details>

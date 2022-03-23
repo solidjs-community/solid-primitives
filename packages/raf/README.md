@@ -18,9 +18,15 @@ yarn add @solid-primitives/raf
 ## How to use it
 
 ```ts
-const [running, start, stop] = createRAF(() => console.log('hi')));
+const [running, start, stop] = createRAF(
+  (timeElapsed) => console.log('Time elapsed is', timeElapsed))
+);
 start();
 ```
+
+## Warning
+
+To respect clients refresh rate, timeElapsed should be used to calculate how much the animation should progress in a frame, otherwise the animation will run faster on high refresh rate screens. As an example: A screen refreshing at 300fps will run the animations 5x faster than a screen with 60fps if you use other forms of time keeping. See https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
 
 ## Demo
 
@@ -42,5 +48,9 @@ Released official version with CJS and SSR support.
 1.0.7
 
 Updated to Solid 1.3, switched to peerDependencies
+
+1.0.9
+
+Patched double running and added refresh rate warning (patch by [titoBouzout](https://www.github.com/titoBouzout)).
 
 </details>
