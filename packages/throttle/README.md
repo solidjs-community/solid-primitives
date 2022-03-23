@@ -41,4 +41,8 @@ Adding CJS support to package.
 
 Updated to Solid 1.3
 
+1.1.3
+
+General clean-up and improvements by Joe Pea (trusktr)
+
 </details>
