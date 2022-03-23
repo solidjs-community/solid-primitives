@@ -7,6 +7,8 @@
 
 Creates a throttled function that invokes at most once per specified time.
 
+When used in an reactive context (effect or component), any throttled function pending to execute will be automatically canceled when the context is cleaned up.
+
 ## How to use it
 
 ```ts
