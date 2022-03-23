@@ -53,7 +53,7 @@ function applySearchParamEntry(
 }
 
 /**
- * Provides a reactive record of `URLSearchParams` connected to the `window.location`. The record is granular, and updates whenever the search params in the Browser's URL change.
+ * Provides a reactive record of `URLSearchParams` reflecting `window.location.search`. The record is granular, and updates whenever the search params in the Browser's URL change.
  *
  * Additionally provides different setters to update the location's search params.
  * @see https://github.com/davedbase/solid-primitives/tree/main/packages/url#createLocationSearchParams
@@ -151,7 +151,6 @@ export const useSharedLocationSearchParams = /*#__PURE__*/ createSharedRoot(
  *
  * A Reactive version of `URLSearchParmas` class. All the method reads are granular – cause reactive updates only when the value changes.
  *
- * As this is a reactive structure, it should be instanciated under a reactive root.
  * @see https://github.com/davedbase/solid-primitives/tree/main/packages/url#ReactiveSearchParams
  */
 export function createSearchParams(init: ReactiveSearchParamsInit): ReactiveSearchParams {

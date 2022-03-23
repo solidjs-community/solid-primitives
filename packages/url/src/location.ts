@@ -28,17 +28,7 @@ export type LocationSetter = {
 
 export type UpdateLocationMethod = "push" | "replace" | "navigate";
 
-let FALLBACK_LOCATION: LocationState = {
-  hash: "",
-  host: "",
-  hostname: "",
-  href: "",
-  origin: "",
-  pathname: "",
-  port: "",
-  protocol: "",
-  search: ""
-};
+let FALLBACK_LOCATION: LocationState | undefined;
 
 let monkeyPatchedStateEvents = false;
 const [listenStateEvents, triggerStateEvents] = /*#__PURE__*/ createSimpleEmitter();
@@ -79,7 +69,7 @@ export function updateLocation(href: string, method: UpdateLocationMethod): void
  * Needs to be called before other primitives to take effect.
  */
 export function setLocationFallback(state: LocationState): void {
-  FALLBACK_LOCATION = state;
+  if (isServer) FALLBACK_LOCATION = state;
 }
 
 /**
@@ -106,15 +96,21 @@ export function createLocationState(fallback?: LocationState): [
     navigate: LocationSetter;
   }
 ] {
-  if (isServer)
+  if (isServer && typeof location === "undefined") {
+    const state = fallback ?? FALLBACK_LOCATION;
+    if (!state)
+      throw new Error(
+        "createLocationState requires location fallback to be provided for the server execution."
+      );
     return [
-      fallback ?? FALLBACK_LOCATION,
+      state,
       {
         push: noop,
         replace: noop,
         navigate: noop
       }
     ];
+  }
 
   const [state, setState] = createStaticStore<LocationState>(
     pick(

@@ -88,7 +88,7 @@ export function createURLRecord(
 
 /**
  * Creates an instance of the `ReactiveURL` class. The ReactiveURL interface represents an object providing reactive setters and getters used for managing object URLs.
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/url#ReactiveURL
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/url#createURL
  * @param url
  * @param base
  * @returns an instance of the `ReactiveURL` class
