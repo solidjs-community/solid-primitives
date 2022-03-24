@@ -21,7 +21,6 @@ import type {
   AnyClass,
   Fn,
   ItemsOf,
-  Keys,
   MaybeAccessor,
   MaybeAccessorValue,
   Noop,
@@ -31,7 +30,9 @@ import type {
   Trigger,
   TriggerCache,
   AnyFunction,
-  AnyObject
+  AnyObject,
+  AnyStatic,
+  SetterValue
 } from "./types";
 
 export * from "./types";
@@ -58,12 +59,14 @@ export const warn: typeof console.warn = (...a) => isDev && console.warn(...a);
  */
 export const isDefined = <T>(value: T | undefined | null): value is T =>
   typeof value !== "undefined" && value !== null;
-export const isFunction = <T>(value: T | Function): value is Function =>
+export const isFunction = <T>(value: T | AnyFunction): value is AnyFunction =>
   typeof value === "function";
 export const isBoolean = (val: any): val is boolean => typeof val === "boolean";
 export const isNumber = (val: any): val is number => typeof val === "number";
 export const isString = (val: unknown): val is string => typeof val === "string";
-export const isObject = (val: any): val is object => toString.call(val) === "[object Object]";
+export const isObject = (val: any): val is object => typeof val === "object";
+/** Is value a record? Only `{}` matches, all other like `Array`, `null` or class instances won't. */
+export const isRecord = (val: any): val is object => toString.call(val) === "[object Object]";
 export const isArray = Array.isArray as (val: any) => val is any[];
 
 /**
@@ -231,11 +234,9 @@ export const forEachEntry = <A extends MaybeAccessor<object>, O = MaybeAccessorV
 };
 
 /**
- * Get `Object.entries()` of an MaybeAccessor<object>
+ * Get typed `Object.entries()`
  */
-export const entries = <A extends MaybeAccessor<object>, O = MaybeAccessorValue<A>>(
-  object: A
-): [Keys<O>, Values<O>][] => Object.entries(access(object)) as [Keys<O>, Values<O>][];
+export const entries = Object.entries as <T extends AnyObject>(obj: T) => [keyof T, T[keyof T]][];
 
 /**
  * Get keys of an object
@@ -422,11 +423,10 @@ export function createTriggerCache<T>(options?: BaseOptions): TriggerCache<T> {
   };
 }
 
-export type StaticStoreSetter<T extends [] | any[] | AnyObject> = {
-  (setter: (prev: Readonly<T>) => Partial<Readonly<T>>): Readonly<T>;
-  (state: Partial<Readonly<T>>): Readonly<T>;
-  <K extends keyof T>(key: K, setter: (prev: T[K]) => T[K]): Readonly<T>;
-  <K extends keyof T>(key: K, state: T[K]): Readonly<T>;
+export type StaticStoreSetter<T extends Readonly<AnyStatic>> = {
+  (setter: (prev: T) => Partial<T>): T;
+  (state: Partial<T>): T;
+  <K extends keyof T>(key: K, state: SetterValue<T[K]>): T;
 };
 
 /**
@@ -434,40 +434,48 @@ export type StaticStoreSetter<T extends [] | any[] | AnyObject> = {
  * @param init initial value of the store, put every key you want to use here, you won't be able to delete/add keys later.
  * @returns [reactive-readonly store, store setter]
  */
-export function createStaticStore<T extends [] | any[] | AnyObject>(
-  init: Readonly<T>
-): [access: Readonly<T>, write: StaticStoreSetter<T>] {
+export function createStaticStore<T extends Readonly<AnyStatic>>(
+  init: T
+): [access: T, write: StaticStoreSetter<T>] {
   const copy = { ...init };
-  const readObj = {} as T;
-  const signalCache = new Map<PropertyKey, any>();
+  const store = {} as T;
+  const cache = new Map<PropertyKey, Signal<any>>();
 
-  const signalGetter = <K extends keyof T>(key: K): Signal<T[K]> | undefined => {
-    const saved = signalCache.get(key);
-    if (saved || !copy.hasOwnProperty(key)) return saved;
-    const signal = createSignal(copy[key], { name: key + "" });
-    signalCache.set(key, signal);
+  const getValue = <K extends keyof T>(key: K): T[K] => {
+    const saved = cache.get(key);
+    if (saved) return saved[0]();
+    const signal = createSignal<any>(copy[key], {
+      name: typeof key === "string" ? key : undefined
+    });
+    cache.set(key, signal);
     delete copy[key];
-    return signal;
+    return signal[0]();
+  };
+
+  const setValue = <K extends keyof T>(key: K, value: SetterValue<any>): void => {
+    const saved = cache.get(key);
+    if (saved) return saved[1](value);
+    copy[key] = accessWith(value, [copy[key]]);
   };
 
   for (const key of keys(init)) {
-    readObj[key] = undefined as any;
-    Object.defineProperty(readObj, key, {
-      get: () => signalGetter(key)![0]()
+    store[key] = undefined as any;
+    Object.defineProperty(store, key, {
+      get: getValue.bind(void 0, key)
     });
   }
 
-  const setter = (a: any, b?: any) => {
+  const setter = (a: any, b?: SetterValue<any>) => {
     if (typeof a === "object" || isFunction(a))
       batch(() => {
-        for (const [key, value] of entries(accessWith(a, () => [{ ...readObj }])))
-          signalGetter(key as keyof T)?.[1](() => value);
+        for (const [key, value] of entries(accessWith(a, () => [store])))
+          setValue(key as keyof T, () => value);
       });
-    else signalGetter(a)?.[1](b);
-    return readObj;
+    else setValue(a, b);
+    return store;
   };
 
-  return [readObj, setter];
+  return [store, setter];
 }
 
 export type SyncSignal<T, U> = {
