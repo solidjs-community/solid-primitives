@@ -1,53 +1,61 @@
-import { createSignal, onMount, onCleanup, createMemo } from "solid-js";
+import { createSignal, onCleanup, createMemo, createEffect } from "solid-js";
 
 export type FPS = number | Function;
-const getFps = (fps: FPS) => (typeof fps === "function" ? fps() : fps);
-const calcFpsInterval = (fps: number) => 1000 / fps;
+const getFps = (targetFps: FPS) => (typeof targetFps === "function" ? targetFps() : targetFps);
+const calcFpsInterval = (targetFps: number) => 1000 / targetFps;
 
 /**
  * Creates a method to support RAF.
  * Based on useRafFN (https://github.com/microcipcip/vue-use-kit/blob/master/src/functions/useRafFn/useRafFn.ts).
  *
  * @param callback The callback to run on a frame
- * @param fps Target frame rate, defaults to 60
- * @param runImmediately Determines if the function could run immediately
- * @returns Returns a signal if currently running as well as star tand stop methods
+ * @param targetFps Target frame rate, defaults to Infinity
+ * @returns Returns a signal if currently running as well as start and stop methods
  *
  * @example
  */
 const createRAF = (
-  callback: (timeElapse: number) => void,
-  fps: FPS = 60,
-  runImmediately = true
+  callback: (timeStamp: number) => void,
+  targetFps: FPS = Infinity
 ): [running: () => boolean, start: () => void, stop: () => void] => {
+
   const [running, setRunning] = createSignal(false);
-  const fpsInterval = createMemo(() => calcFpsInterval(getFps(fps)));
-  let wasIdle = false;
-  let startTime = 0;
-  let timeElapsed = 0;
-  let timePaused = 0;
-  let timeDelta = 0;
+  const fpsInterval = createMemo(() => calcFpsInterval(getFps(targetFps)));
+
+  let elapsed = 0;
+  let lastRun = 0;
+  let missedBy = 0;
+
+  let interval = fpsInterval();
+  let fps = getFps(targetFps)
+  createEffect(() => {
+    interval = fpsInterval();
+    fps = getFps(targetFps)
+  });
+
+  let isRunning = running();
+  createEffect(() => {
+    isRunning = running();
+    lastRun = 0;
+    missedBy = 0;
+  });
+
   const loop = (timeStamp: number) => {
-    if (!startTime) startTime = timeStamp;
-    if (!running()) return;
-    if (wasIdle) {
-      timePaused = timeStamp - startTime - timeElapsed;
-      wasIdle = false;
-    }
-    timeElapsed = timeStamp - startTime - timePaused;
-    const shouldRun = getFps(fps) >= 60;
-    if (shouldRun) {
-      timeDelta = timeElapsed;
-      callback(timeElapsed);
-    }
-    if (!shouldRun) {
-      const elapsedTimeFromPrevLoop = Math.ceil(timeElapsed - timeDelta);
-      if (elapsedTimeFromPrevLoop > fpsInterval()) {
-        timeDelta = timeElapsed;
-        callback(timeElapsed);
-      }
-    }
+    if (!isRunning) return
+
     requestAnimationFrame(loop);
+
+    if(fps === Infinity) {
+      callback(timeStamp);
+      return
+    }
+
+    elapsed = timeStamp - lastRun;
+    if (elapsed + missedBy >= interval) {
+      lastRun = timeStamp;
+      missedBy = Math.max(elapsed - interval, 0)
+      callback(timeStamp);
+    }
   };
   const start = () => {
     if (running()) return;
@@ -56,9 +64,8 @@ const createRAF = (
   };
   const stop = () => {
     setRunning(false);
-    wasIdle = true;
   };
-  onMount(() => runImmediately && start());
+
   onCleanup(stop);
   return [running, start, stop];
 };

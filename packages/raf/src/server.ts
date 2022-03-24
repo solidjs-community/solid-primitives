@@ -1,9 +1,8 @@
 export type FPS = number | Function;
 
 const createRAF = (
-  _callback: (timeElapse: number) => void,
-  _fps: FPS = 60,
-  _runImmediately = true
+  _callback: (timeStamp: number) => void,
+  _targetFps: FPS = Infinity
 ): [running: () => boolean, start: () => void, stop: () => void] => {
   return [
     () => false,
