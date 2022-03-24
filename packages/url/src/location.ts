@@ -27,12 +27,26 @@ export type LocationSetter = {
 };
 
 export type UpdateLocationMethod = "push" | "replace" | "navigate";
+export type LocationFallbackInit = LocationState | string | URL | ReactiveURL;
 
-let FALLBACK_LOCATION: LocationState | undefined;
+let LOCATION_FALLBACK: LocationState | undefined;
+
+const LOCATION_FIELDS = [
+  "origin",
+  "hash",
+  "host",
+  "hostname",
+  "href",
+  "pathname",
+  "port",
+  "protocol",
+  "search"
+] as const;
 
 let monkeyPatchedStateEvents = false;
 const [listenStateEvents, triggerStateEvents] = /*#__PURE__*/ createSimpleEmitter();
 
+/** @internal */
 function patchStateEvents() {
   if (monkeyPatchedStateEvents) return;
   const replaceState = history.replaceState.bind(history);
@@ -46,6 +60,14 @@ function patchStateEvents() {
     triggerStateEvents();
   };
   monkeyPatchedStateEvents = true;
+}
+
+/** @internal */
+function getLocationStateFromFallback(fallback: LocationFallbackInit): LocationState {
+  if (typeof fallback === "string" || fallback instanceof URL || fallback instanceof ReactiveURL) {
+    const instance = typeof fallback === "string" ? new URL(fallback) : fallback;
+    return pick(instance, ...LOCATION_FIELDS);
+  } else return fallback;
 }
 
 /**
@@ -68,8 +90,8 @@ export function updateLocation(href: string, method: UpdateLocationMethod): void
  *
  * Needs to be called before other primitives to take effect.
  */
-export function setLocationFallback(state: LocationState): void {
-  if (isServer) FALLBACK_LOCATION = state;
+export function setLocationFallback(fallback: LocationFallbackInit): void {
+  if (isServer) LOCATION_FALLBACK = getLocationStateFromFallback(fallback);
 }
 
 /**
@@ -88,7 +110,7 @@ export function setLocationFallback(state: LocationState): void {
  *    hash: "heading1"
  * }))
  */
-export function createLocationState(fallback?: LocationState): [
+export function createLocationState(fallback?: LocationFallbackInit): [
   state: LocationState,
   setters: {
     push: LocationSetter;
@@ -97,7 +119,7 @@ export function createLocationState(fallback?: LocationState): [
   }
 ] {
   if (isServer && typeof location === "undefined") {
-    const state = fallback ?? FALLBACK_LOCATION;
+    const state = fallback ? getLocationStateFromFallback(fallback) : LOCATION_FALLBACK;
     if (!state)
       throw new Error(
         "createLocationState requires location fallback to be provided for the server execution."
@@ -112,20 +134,7 @@ export function createLocationState(fallback?: LocationState): [
     ];
   }
 
-  const [state, setState] = createStaticStore<LocationState>(
-    pick(
-      location,
-      "origin",
-      "hash",
-      "host",
-      "hostname",
-      "href",
-      "pathname",
-      "port",
-      "protocol",
-      "search"
-    )
-  );
+  const [state, setState] = createStaticStore<LocationState>(pick(location, ...LOCATION_FIELDS));
   const updateState = () => setState.bind(location);
   createEventListener(window, ["popstate", "hashchange"], updateState, false);
   patchStateEvents();

@@ -55,17 +55,8 @@ push(p => ({
 As `location` won't probably be available when executing on the server, a fallback location state has to be provided. It could be done with the `fallback` argument, or by using `setLocationFallback` to set a global fallback.
 
 ```ts
-const fallback = {
-  hash: "",
-  host: "example.com",
-  hostname: "example.com",
-  href: "http://example.com/",
-  origin: "http://example.com",
-  pathname: "/",
-  port: "",
-  protocol: "http:",
-  search: ""
-};
+// fallback can ba a href string / URL / LocationState
+const fallback = "http://example.com";
 
 // with fallback argument:
 const [state] = createLocationState(fallback);
