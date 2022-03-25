@@ -2,7 +2,7 @@ import { createSignal, onCleanup, createMemo, createEffect } from "solid-js";
 
 export type FPS = number | Function;
 const getFps = (targetFps: FPS) => (typeof targetFps === "function" ? targetFps() : targetFps);
-const calcFpsInterval = (targetFps: number) => 1000 / targetFps;
+const calcFpsInterval = (targetFps: number) => Math.floor(1000 / targetFps);
 
 /**
  * Creates a method to support RAF.
@@ -51,7 +51,7 @@ const createRAF = (
     }
 
     elapsed = timeStamp - lastRun;
-    if (elapsed + missedBy >= interval) {
+    if (Math.ceil(elapsed + missedBy) >= interval) {
       lastRun = timeStamp;
       missedBy = Math.max(elapsed - interval, 0)
       callback(timeStamp);
