@@ -137,7 +137,6 @@ This package comes with a number of support utilities built with Lerna Scripts.
 
 ### Browser
 
-- createURL
 - createHistory
 - createWebShare (https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share)
 - createLocale
@@ -156,7 +155,6 @@ This package comes with a number of support utilities built with Lerna Scripts.
 - createKeyboard
 - createForm
 - createInput
-- createInputMask
 - createTouch
 
 ### Utilities
