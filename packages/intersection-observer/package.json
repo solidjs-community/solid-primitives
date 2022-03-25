@@ -37,7 +37,8 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "start": "vite serve dev",
+    "start": "vite serve dev --host",
+    "dev": "yarn start",
     "build": "tsup",
     "test": "uvu -r solid-register"
   },
@@ -54,10 +55,10 @@
     "tslib": "^2.3.1",
     "tsup": "^5.10.3",
     "typescript": "^4.5.2",
-    "unocss": "0.24.3",
+    "unocss": "0.30.3",
     "uvu": "^0.5.2",
     "vite": "2.8.1",
-    "vite-plugin-solid": "2.2.5"
+    "vite-plugin-solid": "^2.2.5"
   },
   "peerDependencies": {
     "solid-js": "^1.3.1"

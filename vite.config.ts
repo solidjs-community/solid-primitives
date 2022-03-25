@@ -2,18 +2,7 @@ import { defineConfig } from "vitest/config";
 import solidPlugin from "vite-plugin-solid";
 import Unocss from "unocss/vite";
 
-export default defineConfig({
-  root: "./dev",
-  test: {
-    clearMocks: true,
-    environment: "jsdom",
-    transformMode: {
-      web: [/\.[jt]sx?$/]
-    },
-    deps: {
-      inline: [/solid-js/]
-    }
-  },
+export const viteConfig = defineConfig({
   plugins: [
     solidPlugin(),
     Unocss({
@@ -28,6 +17,22 @@ export default defineConfig({
       }
     })
   ],
+  optimizeDeps: {
+    exclude: ["@solid-primitives/utils"]
+  }
+});
+
+export const vitestConfig = defineConfig({
+  test: {
+    clearMocks: true,
+    environment: "jsdom",
+    transformMode: {
+      web: [/\.[jt]sx?$/]
+    },
+    deps: {
+      inline: [/solid-js/]
+    }
+  },
   resolve: {
     conditions: ["development", "browser"]
   },

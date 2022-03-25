@@ -1,8 +1,5 @@
-import { createSignal, onMount, onCleanup, createMemo } from "solid-js";
-
-export type FPS = number | Function;
-const getFps = (fps: FPS) => (typeof fps === "function" ? fps() : fps);
-const calcFpsInterval = (fps: number) => 1000 / fps;
+import { access, Fn, Get, MaybeAccessor } from "@solid-primitives/utils";
+import { createSignal, onMount, onCleanup, createMemo, Accessor } from "solid-js";
 
 /**
  * Creates a method to support RAF.
@@ -16,12 +13,12 @@ const calcFpsInterval = (fps: number) => 1000 / fps;
  * @example
  */
 const createRAF = (
-  callback: (timeElapse: number) => void,
-  fps: FPS = 60,
+  callback: Get<number>,
+  fps: MaybeAccessor<number> = 60,
   runImmediately = true
-): [running: () => boolean, start: () => void, stop: () => void] => {
+): [running: Accessor<boolean>, start: Fn, stop: Fn] => {
   const [running, setRunning] = createSignal(false);
-  const fpsInterval = createMemo(() => calcFpsInterval(getFps(fps)));
+  const fpsInterval = createMemo(() => 1000 / access(fps));
   let wasIdle = false;
   let startTime = 0;
   let timeElapsed = 0;
@@ -35,7 +32,7 @@ const createRAF = (
       wasIdle = false;
     }
     timeElapsed = timeStamp - startTime - timePaused;
-    const shouldRun = getFps(fps) >= 60;
+    const shouldRun = access(fps) >= 60;
     if (shouldRun) {
       timeDelta = timeElapsed;
       callback(timeElapsed);

@@ -1,19 +1,8 @@
-export type FPS = number | Function;
+import { noop } from "@solid-primitives/utils";
+import * as API from ".";
 
-const createRAF = (
-  _callback: (timeElapse: number) => void,
-  _fps: FPS = 60,
-  _runImmediately = true
-): [running: () => boolean, start: () => void, stop: () => void] => {
-  return [
-    () => false,
-    () => {
-      /*noop*/
-    },
-    () => {
-      /*noop*/
-    }
-  ];
+const createRAF: typeof API.default = () => {
+  return [() => false, noop, noop];
 };
 
 export default createRAF;
