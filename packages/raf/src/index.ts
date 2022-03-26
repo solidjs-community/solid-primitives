@@ -6,7 +6,7 @@ import { createSignal, createEffect, createMemo, Accessor, onCleanup } from "sol
  * Based on useRafFN (https://github.com/microcipcip/vue-use-kit/blob/master/src/functions/useRafFn/useRafFn.ts).
  *
  * @param callback The callback to run on a frame
- * @param targetFps Target frame rate, defaults to Infinity
+ * @param options {targetFPS: Target frame rate, defaults to Infinity}
  * @returns Returns a signal if currently running as well as start and stop methods
  *
  * @example
