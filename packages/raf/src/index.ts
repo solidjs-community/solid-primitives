@@ -13,17 +13,21 @@ import { createSignal, createEffect, createMemo, Accessor, onCleanup } from "sol
  */
 const createRAF = (
   callback: Get<number>,
-  targetFPS: MaybeAccessor<number> = Infinity
+  options: {
+    targetFPS: MaybeAccessor<number>
+  }
 ): [running: Accessor<boolean>, start: Fn, stop: Fn] => {
 
   const [running, setRunning] = createSignal(false);
-  const fpsInterval = createMemo(() => Math.floor(1000 / access(targetFPS)));
+
+  const getFPS = () => access(options?.targetFPS || Infinity)
+  const fpsInterval = createMemo(() => Math.floor(1000 / getFPS()));
 
   let interval = fpsInterval();
-  let fps = access(targetFPS)
+  let fps = getFPS()
   createEffect(() => {
     interval = fpsInterval();
-    fps = access(targetFPS)
+    fps = getFPS()
   });
 
   let elapsed = 0;

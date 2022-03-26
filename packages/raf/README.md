@@ -18,11 +18,14 @@ yarn add @solid-primitives/raf
 ## How to use it
 
 ```ts
-const [running, start, stop] = createRAF(
-  (timeStamp) => console.log('Time stamp is', timeStamp))
-);
+const [running, start, stop] = createRAF(timeStamp => console.log("Time stamp is", timeStamp));
+
 start();
 ```
+
+## `options` object argument
+
+- `targetFPS` to target a FPS
 
 ## Warning
 
@@ -60,6 +63,8 @@ Patched double running and added refresh rate warning (patch by [titoBouzout](ht
 - remove `runImmediately` as trying to change the default of this value will require you to provide a `targetFps` which may not be clear that should be `Infinity` in case you want to respect clients fps. Screens above 60fps are becoming increasing popular.
 - respect `requestAnimationFrame` signature and give `timeStamp` back to the callback instead of a `deltaTime` (deltaTime could be added back on a future version)
 - improve dev tests
+- user cancelAnimationFrame instead of !isRunning
+- change second argument to be an options object
 
 (patch by [titoBouzout](https://www.github.com/titoBouzout)).
 

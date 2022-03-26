@@ -9,15 +9,18 @@ export default props => {
   let runs = -1;
   let last = 0;
 
-  const [running, start, stop] = createRAF(() => {
-    runs++;
-    if (runs) {
-      const ms = performance.now() - last;
-      setSum(p => p + ms);
-    }
-    last = performance.now();
-    if (runs === targetRuns) handleStop();
-  }, props.targetFPS);
+  const [running, start, stop] = createRAF(
+    () => {
+      runs++;
+      if (runs) {
+        const ms = performance.now() - last;
+        setSum(p => p + ms);
+      }
+      last = performance.now();
+      if (runs === targetRuns) handleStop();
+    },
+    { targetFPS: props.targetFPS }
+  );
 
   const [avgMs, setAvgMs] = createSignal(0);
   const [avgFps, setAvgFps] = createSignal(0);
