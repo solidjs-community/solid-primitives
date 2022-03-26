@@ -63,7 +63,7 @@ Patched double running and added refresh rate warning (patch by [titoBouzout](ht
 - remove `runImmediately` as trying to change the default of this value will require you to provide a `targetFps` which may not be clear that should be `Infinity` in case you want to respect clients fps. Screens above 60fps are becoming increasing popular.
 - respect `requestAnimationFrame` signature and give `timeStamp` back to the callback instead of a `deltaTime` (deltaTime could be added back on a future version)
 - improve dev tests
-- user cancelAnimationFrame instead of !isRunning
+- use cancelAnimationFrame instead of !isRunning
 - change second argument to be an options object
 
 (patch by [titoBouzout](https://www.github.com/titoBouzout)).
