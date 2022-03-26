@@ -30,17 +30,15 @@ const createRAF = (
   let lastRun = 0;
   let missedBy = 0;
 
-  let isRunning = running();
   createEffect(() => {
-    isRunning = running();
     lastRun = 0;
     missedBy = 0;
   });
 
-  const loop = (timeStamp: number) => {
-    if (!isRunning) return
+  let requestID = 0
 
-    requestAnimationFrame(loop);
+  const loop = (timeStamp: number) => {
+    requestID = requestAnimationFrame(loop);
 
     if(fps === Infinity) {
       callback(timeStamp);
@@ -58,10 +56,11 @@ const createRAF = (
   const start = () => {
     if (running()) return;
     setRunning(true);
-    requestAnimationFrame(loop);
+    requestID = requestAnimationFrame(loop);
   };
   const stop = () => {
     setRunning(false);
+    cancelAnimationFrame(requestID)
   };
 
   onCleanup(stop);
