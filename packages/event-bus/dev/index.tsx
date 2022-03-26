@@ -57,7 +57,7 @@ const PubsubTest: Component = () => {
 
   const [sub, emit] = createSimpleEmitter<boolean>();
   return (
-    <div class="node-h">
+    <div class="wrapper-h">
       <Switch emit={emit} />
       <Light subscribe={sub} />
     </div>
@@ -71,7 +71,7 @@ const HubParentNode: Component = () => {
   }));
 
   return (
-    <div class="node-v">
+    <div class="wrapper-v">
       <div class="flex space-x-4">
         <button class="btn" onclick={() => emit("spin", Math.random() * 360 - 180)}>
           SPIN!
@@ -148,7 +148,7 @@ const NotificationsTest: Component = () => {
   >;
 
   return (
-    <div class="node-h">
+    <div class="wrapper-h">
       <form
         class="flex space-x-2"
         onsubmit={e => {
@@ -217,4 +217,4 @@ const Toaster: Component<{
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+render(() => <App />, document.getElementById("root")!);

@@ -1,0 +1,58 @@
+{
+  "name": "@solid-primitives/input-mask",
+  "version": "0.0.100",
+  "description": "input masking event primitive.",
+  "author": "Alex Lohr <alex.lohr@logmein.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/input-mask#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/davedbase/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "input-mask",
+    "stage": 0,
+    "list": [
+      "createInputMask"
+    ],
+    "category": "Inputs"
+  },
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "vite serve dev --host",
+    "dev": "yarn start",
+    "build": "tsup",
+    "test": "uvu -r solid-register"
+  },
+  "keywords": [
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "jsdom": "19.0.0",
+    "prettier": "^2.6.0",
+    "solid-register": "0.1.5",
+    "tslib": "^2.3.1",
+    "typescript": "^4.6.2",
+    "tsup": "^5.12.1",
+    "uvu": "^0.5.3",
+    "unocss": "0.28.1",
+    "vite": "2.8.6",
+    "vite-plugin-solid": "2.2.6"
+  },
+  "peerDependencies": {
+    "solid-js": ">=1.0.0"
+  }
+}

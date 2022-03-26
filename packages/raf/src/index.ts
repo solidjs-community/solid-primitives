@@ -1,8 +1,5 @@
-import { createSignal, onCleanup, createMemo, createEffect } from "solid-js";
-
-export type FPS = number | Function;
-const getFps = (targetFps: FPS) => (typeof targetFps === "function" ? targetFps() : targetFps);
-const calcFpsInterval = (targetFps: number) => Math.floor(1000 / targetFps);
+import { access, Fn, Get, MaybeAccessor } from "@solid-primitives/utils";
+import { createSignal, createEffect, createMemo, Accessor, onCleanup } from "solid-js";
 
 /**
  * Creates a method to support RAF.
@@ -15,23 +12,23 @@ const calcFpsInterval = (targetFps: number) => Math.floor(1000 / targetFps);
  * @example
  */
 const createRAF = (
-  callback: (timeStamp: number) => void,
-  targetFps: FPS = Infinity
-): [running: () => boolean, start: () => void, stop: () => void] => {
+  callback: Get<number>,
+  targetFPS: MaybeAccessor<number> = Infinity
+): [running: Accessor<boolean>, start: Fn, stop: Fn] => {
 
   const [running, setRunning] = createSignal(false);
-  const fpsInterval = createMemo(() => calcFpsInterval(getFps(targetFps)));
+  const fpsInterval = createMemo(() => Math.floor(1000 / access(targetFPS)));
+
+  let interval = fpsInterval();
+  let fps = access(targetFPS)
+  createEffect(() => {
+    interval = fpsInterval();
+    fps = access(targetFPS)
+  });
 
   let elapsed = 0;
   let lastRun = 0;
   let missedBy = 0;
-
-  let interval = fpsInterval();
-  let fps = getFps(targetFps)
-  createEffect(() => {
-    interval = fpsInterval();
-    fps = getFps(targetFps)
-  });
 
   let isRunning = running();
   createEffect(() => {
@@ -57,6 +54,7 @@ const createRAF = (
       callback(timeStamp);
     }
   };
+
   const start = () => {
     if (running()) return;
     setRunning(true);

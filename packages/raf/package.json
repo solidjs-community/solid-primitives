@@ -12,32 +12,54 @@
   "primitive": {
     "name": "raf",
     "stage": 3,
-    "list": ["createRAF"],
+    "list": [
+      "createRAF"
+    ],
     "category": "Display & Media"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.cjs",
+  "main": "./dist/server.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "scripts": {
+    "start": "vite serve dev --host",
+    "dev": "yarn start",
     "build": "tsup"
   },
-  "keywords": ["raf", "animation", "requestAnimationFrame", "solid", "primitives"],
+  "keywords": [
+    "raf",
+    "animation",
+    "requestAnimationFrame",
+    "solid",
+    "primitives"
+  ],
   "devDependencies": {
-    "@types/jest": "^27.0.0",
-    "prettier": "^2.0.5",
-    "solid-testing-library": "^0.2.0",
-    "tslib": "^2.0.1",
-    "tsup": "^5.10.1",
-    "typescript": "^4.0.2"
+    "prettier": "^2.6.1",
+    "tslib": "^2.3.1",
+    "tsup": "^5.12.1",
+    "typescript": "^4.6.3",
+    "unocss": "0.28.1",
+    "vite": "2.8.6",
+    "vite-plugin-solid": "2.2.6",
+    "vitest": "^0.7.11"
   },
   "peerDependencies": {
-    "solid-js": "^1.3.1"
+    "solid-js": "^1.3.0"
   },
-  "jest": {
-    "setupFiles": ["./test/setup.ts"]
+  "dependencies": {
+    "@solid-primitives/utils": "^0.5.3"
   }
 }
