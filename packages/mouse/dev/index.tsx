@@ -24,7 +24,7 @@ const App: Component = () => {
   });
 
   const [pos, setPos] = createSignal({ x: 0, y: 0, elX: 0, elY: 0 });
-  createRAF(() => {
+  const [running, start, stop] = createRAF(() => {
     setPos(p => ({
       x: lerp(p.x, mouse.x(), 0.1),
       y: lerp(p.y, mouse.y(), 0.1),
@@ -32,6 +32,7 @@ const App: Component = () => {
       elY: lerp(p.elY, relative.y(), 0.2)
     }));
   });
+  start();
 
   return (
     <div class="box-border w-full h-screen overflow-hidden bg-indigo-800 text-white">
