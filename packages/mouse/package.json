@@ -4,10 +4,10 @@
   "description": "A collection of Solid Primitives, that capture current mouse cursor position, and help to deal with common related usecases.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/mouse#readme",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/mouse#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davedbase/solid-primitives.git"
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
   "primitive": {
     "name": "mouse",

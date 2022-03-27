@@ -38,7 +38,7 @@ const callbackWith = <A, T>(fn: (a: A) => T, v: Accessor<A>): (() => T) =>
  * @param options set computation name for debugging pourposes
  * @returns track() function
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createPureReaction
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createPureReaction
  *
  * @example
  * const [count, setCount] = createSignal(0);
@@ -121,7 +121,7 @@ export function createCurtain(
  * @param value initial value (for calcultion)
  * @param options give a name to the reactive computation, or change `equals` method.
  * @returns signal returning value of the last change.
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createWritableMemo
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createWritableMemo
  * @example
  * const [count, setCount] = createSignal(1);
  * const [result, setResult] = createWritableMemo(() => count() * 2);
@@ -155,7 +155,7 @@ export function createWritableMemo<T>(
  * @param timeoutMs The duration to debounce in ms
  * @param options specify initial value *(by default it will be undefined)*
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createDebouncedMemo
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createDebouncedMemo
  *
  * @example
  * const double = createDebouncedMemo(() => count() * 2, 200)
@@ -192,7 +192,7 @@ export function createDebouncedMemo<T>(
  * @param timeoutMs The duration to throttle in ms
  * @param options specify initial value *(by default it will be undefined)*
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createThrottledMemo
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createThrottledMemo
  *
  * @example
  * const double = createThrottledMemo(() => count() * 2, 200)
@@ -228,7 +228,7 @@ export function createThrottledMemo<T>(
  *
  * **calculation will track reactive reads synchronously — untracks after first `await`**
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createAsyncMemo
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createAsyncMemo
  *
  * @example
  * const memo = createAsyncMemo(async prev => {
@@ -281,7 +281,7 @@ export function createAsyncMemo<T>(
  * @param options set computation name for debugging pourposes
  * @returns signal of a value that was returned by the calculation
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createLazyMemo
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createLazyMemo
  *
  * @example
  * const double = createLazyMemo(() => count() * 2)
@@ -344,7 +344,7 @@ export type CacheOptions<Value> = MemoOptions<Value> & { size?: number };
  * @param options set maximum **size** of the cache, or memo options.
  * @returns signal access function
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/memo#createMemoCache
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createMemoCache
  *
  * @example
  * set the reactive key up-front

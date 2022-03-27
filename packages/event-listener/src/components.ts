@@ -20,7 +20,7 @@ const forEachEventAttr = (
 /**
  * Listen to the `window` DOM Events, using a component.
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#WindowEventListener
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener#WindowEventListener
  *
  * @example
  * <WindowEventListener onMouseMove={e => console.log(e.x, e.y)} />
@@ -36,7 +36,7 @@ export const WindowEventListener: Component<EventAttributes<null>> = props => {
 /**
  * Listen to the `document` DOM Events, using a component.
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#DocumentEventListener
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener#DocumentEventListener
  *
  * @example
  * <DocumentEventListener onMouseMove={e => console.log(e.x, e.y)} />

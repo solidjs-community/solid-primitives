@@ -4,10 +4,10 @@
   "description": "Composable reactive helpers built around watching computation changes.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/composites",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/composites",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davedbase/solid-primitives.git"
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
   "primitive": {
     "name": "composites",

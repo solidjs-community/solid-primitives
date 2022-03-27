@@ -1,5 +1,5 @@
 import { noop } from "@solid-primitives/utils";
-import { onRootCleanup } from './utils';
+import { onRootCleanup } from "./utils";
 import {
   ClearListeners,
   EmitGuard,
@@ -32,7 +32,7 @@ export type EmitterConfig<A0 = void, A1 = void, A2 = void> = {
  * 
  * @returns the emitter: `{listen, once, emit, remove, clear, has}`
  * 
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-bus#createEmitter
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEmitter
  * 
  * @example
 // accepts up-to-3 genetic payload types

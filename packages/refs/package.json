@@ -4,10 +4,10 @@
   "description": "Library of primitives, components and directives for SolidJS that help managing references to JSX elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/refs#readme",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davedbase/solid-primitives.git"
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
   "primitive": {
     "name": "refs",

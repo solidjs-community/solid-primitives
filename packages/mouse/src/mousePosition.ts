@@ -29,7 +29,7 @@ export type MouseSourceType = "mouse" | "touch" | null;
  * @param options
  * @returns Accessors for current x & y position, and source of the last cursor movement
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/mouse#createmouseposition
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/mouse#createmouseposition
  *
  * @example
  * const [{ x, y, sourceType }, { stop, start }] = createMousePosition({ touch: false })

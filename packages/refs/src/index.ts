@@ -119,7 +119,7 @@ export function elements(fn: Accessor<any>, ...types: typeof Element[]): Accesso
  * Get signal references to DOM Elements of the reactive input. Which Elements were added, which were removed.
  * @param fn JSX.Element signal
  * @returns `[current elements, added, removed]`
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/refs#refs
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#refs
  * @example
  * const [elements, added, removed] = refs(children(() => props.children));
  * elements() // => [<button>, <div>, ...]
@@ -160,7 +160,7 @@ export function refs(
 
 /**
  * A directive that calls handler when the element get's unmounted from DOM.
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/refs#unmount
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#unmount
  */
 export const unmount: Directive<Get<Element>> = (el, handler): void => {
   onCleanup(() => handler()(el));
@@ -310,7 +310,7 @@ export const Children = (props: {
  * @param added Getter of added elements since the last change
  * @param removed Getter of removed elements since the last change
  * @param onChange handle children changes
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/refs#Refs
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Refs
  */
 export const Refs = <E extends Element>(props: {
   refs?: Get<E[]>;
@@ -350,7 +350,7 @@ export const Refs = <E extends Element>(props: {
  * @param ref Getter of current element *(or `undefined` if not mounted)*
  * @param onMount handle the child element getting mounted to the dom
  * @param onUnmount handle the child element getting unmounted from the dom
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/refs#Ref
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Ref
  */
 export const Ref = <U extends Element>(props: {
   ref?: Get<U | undefined>;

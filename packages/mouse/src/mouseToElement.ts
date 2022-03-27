@@ -23,7 +23,7 @@ export interface PositionToElementOptions extends Omit<MouseOptions, "initialVal
  * @param options
  * @returns Autoupdating position relative to top-left of the target + current bounds of the element.
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/mouse#createmousetoelement
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/mouse#createmousetoelement
  *
  * @example
  * const [{ x, y, top, left, width, height, isInside }, manualUpdate] = createMouseToElement(() => myRef)
