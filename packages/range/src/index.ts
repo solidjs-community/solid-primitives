@@ -1,5 +1,22 @@
 import { Accessor, createMemo, createRoot, onCleanup, untrack } from "solid-js";
 
+/**
+ * Reactively maps a number range of specified length with a callback function - underlying helper for the `<Range>` control flow.
+ * @param length number of the elements to map
+ * @param mapFn reactive function used to create mapped output item array
+ * @param options a fallback for when the input list is empty or missing
+ * @returns mapped input array signal
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#mapRange
+ * @example
+ * ```tsx
+ * const [length, setLength] = createSignal(10)
+ * const mapped = mapRange(length, index => {
+ *    const [value, setValue] = createSignal(index);
+ *    createEffect(() => {...})
+ *    return value
+ * })
+ * ```
+ */
 export function mapRange<T>(
   length: Accessor<number>,
   mapFn: (i: number) => T,
@@ -55,6 +72,29 @@ export function mapRange<T>(
     return mapFn(index);
   };
 
-  const memoLen = createMemo(length);
+  const memoLen = createMemo(() => Math.floor(Math.max(length(), 0)));
   return () => untrack(mapNewRange.bind(void 0, memoLen()));
+}
+
+/**
+ * Creates a range of elements `of` specified size.
+ * @param of number of elements
+ * @param fallback element returned when `of` equals 0
+ * @param children render function
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#Range
+ * @example
+ * ```tsx
+ * <Range of={10}>
+ *    {n => <div>{n}</div>}
+ * </Range>
+ * ```
+ */
+export function Range<T>(props: {
+  of: number;
+  fallback?: T;
+  children: (index: number) => T;
+}): Accessor<T[]> {
+  const fallback = props.fallback ? () => props.fallback as T : undefined;
+  const length = () => props.of;
+  return mapRange(length, props.children, { fallback });
 }
