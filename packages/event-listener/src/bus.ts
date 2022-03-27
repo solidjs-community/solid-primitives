@@ -27,7 +27,7 @@ export type EventListenerBus<EventMap extends Record<string, any>> = Readonly<
  * @param target the event target, could be a `window`, `document`, `HTMLElement` or `MediaQueryList`. *Defaults to `window`*
  * @param options event listener options, such as `passive` or `capture`
  * @returns a Proxy object, which lets you create event listeners by calling appropriate property
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#createEventListenerBus
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener#createEventListenerBus
  * @example
  * const bus = createEventListenerBus(document.body);
  * bus.onpointerenter(e => {...});

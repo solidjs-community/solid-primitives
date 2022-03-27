@@ -4,7 +4,7 @@
   "description": "Primitive to create a worker helper",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/websocket",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/websocket",
   "private": false,
   "main": "dist/cjs/index.cjs",
   "module": "dist/index.js",

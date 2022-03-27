@@ -4,10 +4,10 @@
   "description": "Primitive that provides controllable props signals like knobs/controls",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/props",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/props",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davedbase/solid-primitives.git"
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
   "primitive": {
     "name": "props",

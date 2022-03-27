@@ -32,7 +32,7 @@ type Config<E, V> = {
  * 
  * @returns event stack: `{listen, once, emit, remove, clear, has, stack, setStack, removeFromStack}`
  * 
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-bus#createEventStack
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventStack
  * 
  * @example
 const bus = createEventStack<{ message: string }>();

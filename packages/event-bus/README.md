@@ -3,7 +3,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/event-bus?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/event-bus)
 [![size](https://img.shields.io/npm/v/@solid-primitives/event-bus?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/event-bus)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/davedbase/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A collection of SolidJS primitives providing various features of a pubsub/event-emitter/event-bus:
 
@@ -47,7 +47,7 @@ clear();
 
 ### Types
 
-Check out [shared types](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/src/types.ts).
+Check out [shared types](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/src/types.ts).
 
 ```ts
 function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(): [
@@ -109,11 +109,11 @@ const { listen, has, remove, emit } = createEmitter<string>({
 });
 ```
 
-See [the tests](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/test/emitter.test.ts) for better usage reference.
+See [the tests](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/test/emitter.test.ts) for better usage reference.
 
 ### Types
 
-Check out [shared types](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/src/types.ts).
+Check out [shared types](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/src/types.ts).
 
 ```ts
 function createEmitter<A0 = void, A1 = void, A2 = void>(
@@ -198,11 +198,11 @@ createEventBus<string>({
 });
 ```
 
-See [the tests](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/test/eventBus.test.ts) for better usage reference.
+See [the tests](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/test/eventBus.test.ts) for better usage reference.
 
 ### Types
 
-Check out [shared types](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/src/types.ts).
+Check out [shared types](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/src/types.ts).
 
 ```ts
 // Initial value was NOT provided
@@ -303,7 +303,7 @@ createEventStack<string, { text: string }>({
 
 ### Types
 
-Check out [shared types](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/src/types.ts).
+Check out [shared types](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/src/types.ts).
 
 ```ts
 // Overload 0: "toValue" was not passed
@@ -399,7 +399,7 @@ hub.myBus.value();
 
 ### Types
 
-Check out [shared types](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/src/types.ts) and [createEventHub source](https://github.com/davedbase/solid-primitives/blob/main/packages/event-bus/src/eventHub.ts).
+Check out [shared types](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/src/types.ts) and [createEventHub source](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/src/eventHub.ts).
 
 ```ts
 function createEventHub<ChannelMap extends Record<string, EventHubChannel>>(

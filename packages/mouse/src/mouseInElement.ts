@@ -11,7 +11,7 @@ import { addListener } from "./common";
  * @param options
  * @returns Autoupdating position of cursor inside the element; source of the last cursor movement
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/mouse#createmouseinelement
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/mouse#createmouseinelement
  *
  * @example
  * const [{ x, y, sourceType, isInside }, { stop, start }] = createMouseInElement(() => myRef, { followTouch: false })

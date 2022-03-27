@@ -31,7 +31,7 @@ export type GraphQLClientQuery = {
  * @param fetchFn Fetch library to use for the request
  * @returns Returns a query generator the produces Solid resources for queries
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/graphql#how-to-use-it
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/graphql#how-to-use-it
  *
  * @example
  * ```ts

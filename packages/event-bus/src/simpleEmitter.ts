@@ -6,7 +6,7 @@ import { onRootCleanup } from "./utils";
  * 
  * @returns `[listen, emit, clear]`
  * 
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-bus#createSimpleEmitter
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createSimpleEmitter
  * 
  * @example
 // accepts up-to-3 genetic payload types

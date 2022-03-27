@@ -4,10 +4,10 @@
   "description": "Primitive that generates a client and reactive GraphQL queries",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/graphql",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/graphql",
   "repository": {
     "type": "git",
-    "url": "https://github.com/davedbase/solid-primitives/tree/main/packages/graphql"
+    "url": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/graphql"
   },
   "primitive": {
     "name": "graphql",

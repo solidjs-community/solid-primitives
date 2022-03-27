@@ -1,5 +1,5 @@
-import { createEventBus } from './eventBus';
-import { createEmitter } from './emitter';
+import { createEventBus } from "./eventBus";
+import { createEmitter } from "./emitter";
 import { ClearListeners, Unsubscribe, GenericListener } from "./types";
 import { Accessor } from "solid-js";
 import { Keys, Values } from "@solid-primitives/utils";
@@ -71,7 +71,7 @@ export type EventHub<ChannelMap extends Record<string, EventHubChannel>> = Chann
  *
  * @returns hub functions: `{on, once, off, emit, clear, clearAll, listen, remove, clearGlobal, store}` + channels available by their key
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-bus#createEventHub
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventHub
  *
  * @example
  * const hub = createEventHub({
