@@ -17,7 +17,7 @@ const WHOLE = Symbol("watch_whole");
  * A reactive version of `Map` data structure. All the reads (like `get` or `has`) are signals, and all the writes (`delete` or `set`) will cause updates to appropriate signals.
  * @param initial initial entries of the reactive map
  * @param equals signal equals function, determining if a change should cause an update
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/map#ReactiveMap
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/map#ReactiveMap
  * @example
  * const userPoints = new ReactiveMap<User, number>();
  * createEffect(() => {
@@ -108,7 +108,7 @@ export class ReactiveMap<K, V> {
  * A reactive version of `WeakMap` data structure. All the reads (like `get` or `has`) are signals, and all the writes (`delete` or `set`) will cause updates to appropriate signals.
  * @param initial initial entries of the reactive map
  * @param equals signal equals function, determining if a change should cause an update
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/map#ReactiveWeakMap
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/map#ReactiveWeakMap
  * @example
  * const userPoints = new ReactiveWeakMap<User, number>();
  * createEffect(() => {
@@ -161,7 +161,7 @@ export class ReactiveWeakMap<K extends object, V> {
  * Creates an instance of `ReactiveMap` class.
  * @param initial initial entries of the reactive map
  * @param equals signal equals function, determining if a change should cause an update
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/map#createMap
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/map#createMap
  */
 export function createMap<K, V>(
   initial?: [K, V][],
@@ -177,7 +177,7 @@ export function createMap<K, V>(
  * Creates an instance of `ReactiveWeakMap` class.
  * @param initial initial entries of the reactive map
  * @param equals signal equals function, determining if a change should cause an update
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/map#createWeakMap
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/map#createWeakMap
  */
 export function createWeakMap<K extends object, V>(
   initial?: [K, V][],

@@ -99,7 +99,7 @@ export function createPointerListeners(
  * - `passive` - Add passive option to event listeners. Defaults to `true`.
  * - `onDown` - Start following a pointer from when it's down.
  * - `onEnter` - Start following a pointer from when it enters the screen.
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/pointer#createPerPointerListeners
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/pointer#createPerPointerListeners
  * @example
  * createPerPointerListeners({
  *    target: el,

@@ -16,7 +16,7 @@ export type E = JSX.Element;
 /**
  * A reactive `document.activeElement`. Check which element is currently focused.
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/active-element#createActiveElement
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#createActiveElement
  * @example
  * const [activeEl, { stop, start }] = createActiveElement()
  */
@@ -40,7 +40,7 @@ export function createActiveElement(): [getter: Accessor<null | Element>, clear:
 /**
  * Pass in an element, and see if it's focused.
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/active-element#createIsElementActive
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#createIsElementActive
  * @example
  * const [isFocused, { stop, start }] = createIsElementActive(() => el)
  */
@@ -71,7 +71,7 @@ export function createIsElementActive(
 /**
  * Use as a directive. Notifies you when the element becomes active or inactive.
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/active-element#createIsElementActive
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#createIsElementActive
  *
  * @example
  * const [active, setActive] = createSignal(false)

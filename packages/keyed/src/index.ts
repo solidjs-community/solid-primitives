@@ -19,7 +19,7 @@ const FALLBACK = Symbol("fallback");
  * @param mapFn reactive function used to create mapped output item. Similar to `Array.prototype.map` but both item and index are signals, that could change over time.
  * @param options a fallback for when the input list is empty or missing
  * @returns mapped input array signal
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/keyed#mapKey
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#mapKey
  */
 export function mapKey<T, U, K>(
   list: Accessor<readonly T[] | undefined | null | false>,
@@ -118,7 +118,7 @@ export function mapKey<T, U, K>(
  * <Key each={items()} by="id">
  * ```
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/keyed#Key
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#Key
  */
 export function Key<T, U extends JSX.Element>(props: {
   each?: readonly T[] | null | false;
@@ -137,7 +137,7 @@ export type RerunChildren<T> = ((input: T, prevInput: T | undefined) => JSX.Elem
 
 /**
  * Causes the children to rerender when the `on` changes.
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/refs#Rerun
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Rerun
  */
 export function Rerun<S extends Accessor<unknown> | Accessor<unknown>[] | []>(props: {
   on: S;

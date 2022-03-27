@@ -4,10 +4,10 @@
   "description": "Primitives to help with sharing content on social media and beyond.",
   "author": "David Di Biase <dave.dibiase@gmail.com",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/share",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/share",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davedbase/solid-primitives.git"
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
   "primitive": {
     "name": "share",

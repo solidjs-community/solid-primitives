@@ -39,7 +39,7 @@ export type E = JSX.Element;
  * @param options MutationObserver options
  * @param callback function called by MutationObserver when DOM tree mutation is triggered
  * 
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/mutation-observer
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/mutation-observer
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
  * 
  * @example
@@ -110,7 +110,7 @@ export function createMutationObserver(
  *
  * @param props [MutationObserver options, callback]
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/mutation-observer
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/mutation-observer
  * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
  *
  * @example

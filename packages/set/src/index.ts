@@ -7,7 +7,7 @@ const WHOLE = Symbol("watch_whole");
 
 /**
  * A reactive version of a Javascript built-in `Set` class.
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/set#ReactiveSet
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/set#ReactiveSet
  * @example
  * const set = new ReactiveSet([1,2,3]);
  * [...set] // reactive on any change
@@ -74,7 +74,7 @@ export class ReactiveSet<T> {
 
 /**
  * A reactive version of a Javascript built-in `WeakSet` class.
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/set#ReactiveWeakSet
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/set#ReactiveWeakSet
  * @example
  * const set = new ReactiveWeakSet([1,2,3]);
  * set.has(2) // reactive on change to the result
@@ -109,7 +109,7 @@ export class ReactiveWeakSet<T extends object> {
 
 /**
  * creates an instance of a `ReactiveSet` class.
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/set#createSet
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/set#createSet
  * @example
  * const set = createSet([1,1,2,3]);
  * set() // => [1,2,3] (reactive on any change)
@@ -128,7 +128,7 @@ export function createSet<T>(initial?: T[]): SignalSet<T> {
 
 /**
  * creates an instance of a `ReactiveWeakSet` class.
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/set#createWeakSet
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/set#createWeakSet
  * @example
  * const set = createWeakSet([1,1,2,3]);
  * set.has(2) // => true (reactive on change to the result)

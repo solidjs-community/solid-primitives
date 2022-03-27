@@ -5,13 +5,13 @@
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/memo#readme",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davedbase/solid-primitives.git"
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
   "bugs": {
-    "url": "https://github.com/davedbase/solid-primitives/issues"
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
     "name": "memo",

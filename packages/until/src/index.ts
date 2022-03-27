@@ -12,7 +12,7 @@ export type Until<T> = Promise<Truthy<T>> & { dispose: Fn };
  * @param condition a signal or a reactive condition, which will resolve the promise if truthy
  * @returns A promise that resolves a truthy value of a condition. Or rejects when it's root get's disposed.
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/until#readme
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/until#readme
  *
  * @example
  * const [count, setCount] = createSignal(0)

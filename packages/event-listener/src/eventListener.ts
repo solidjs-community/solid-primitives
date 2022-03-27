@@ -33,7 +33,7 @@ export type EventListenerSignalReturns<Event> = [
  * @returns Function clearing all event listeners form targets
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#createEventListener
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener#createEventListener
  *
  * @example
  * const clear = createEventListener(element, 'click', e => { ... }, { passive: true })
@@ -108,7 +108,7 @@ export function createEventListener(
  * @returns Signal of last captured event & function clearing all event listeners
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#createEventSignal
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener#createEventSignal
  *
  * @example
  * const lastEvent = createEventSignal(el, 'click', { passive: true })

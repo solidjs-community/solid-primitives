@@ -1,11 +1,6 @@
 import { Accessor, createSignal } from "solid-js";
-import { createEmitter, EmitterConfig } from './emitter'
-import {
-  ClearListeners,
-  GenericEmit,
-  GenericListener,
-  ListenProtect
-} from "./types";
+import { createEmitter, EmitterConfig } from "./emitter";
+import { ClearListeners, GenericEmit, GenericListener, ListenProtect } from "./types";
 
 export type EventBusListener<Event, V = Event | undefined> = GenericListener<[Event, V]>;
 export type EventBusListen<Event, V = Event | undefined> = ListenProtect<Event, V>;
@@ -31,7 +26,7 @@ export type EventBus<Event, V = Event | undefined> = {
  * 
  * @returns event bus: `{listen, once, emit, remove, clear, has, value}`
  * 
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-bus#createEventBus
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventBus
  * 
  * @example
 const bus = createEventBus<string>();

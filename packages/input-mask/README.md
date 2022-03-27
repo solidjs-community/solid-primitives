@@ -3,7 +3,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/input-mask?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/input-mask)
 [![version](https://img.shields.io/npm/v/@solid-primitives/input-mask?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/input-mask)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/davedbase/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Primitive that returns an event handler to mask the inputs of an text input element (`<input>`, `<textarea>`) when applied in `oninput` or `onchange`.
 
@@ -14,6 +14,7 @@ npm install @solid-primitives/input-mask
 # or
 yarn add @solid-primitives/input-mask
 ```
+
 ## Usage
 
 For convenience reasons, the handler returns the current value, which allows you to use it to fill a signal or assign a let variable. The masks come in 3 different formats: function, array and string. There are tools to convert string masks to array masks and array masks to function masks.
@@ -30,13 +31,15 @@ import {
 // a = any letter,
 // * = any alphanumeric character
 // any other letter becomes a fixed placeholder
-const isodate = '9999-99-99';
+const isodate = "9999-99-99";
 // array mask: RegExp to match variable parts, strings for fixed placeholders
-const meetingId = [/\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/];
+const meetingId = [/\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/];
 // function mask: (value, [start, end]) => [value, [start, end]]
-const meetingIdOrName = (value, selection) => (/^\D/.test(value)
-  ? arrayMaskToFn([/\w+/, /\S*/])
-  : anyMaskToFn('999-999-999'))(value, selection);
+const meetingIdOrName = (value, selection) =>
+  (/^\D/.test(value) ? arrayMaskToFn([/\w+/, /\S*/]) : anyMaskToFn("999-999-999"))(
+    value,
+    selection
+  );
 
 // converting string mask to array:
 const maskArrayFromString = stringMaskToArray(maskString);
@@ -49,30 +52,27 @@ let changeMaskValue = "";
 let inputMaskRef;
 const inputMask = {
   ref,
-  get value() { return inputMask.ref?.value; }
+  get value() {
+    return inputMask.ref?.value;
+  }
 };
 
-const dateMask = createInputMask("99/99/9999")
+const dateMask = createInputMask("99/99/9999");
 
-return <>
-  <label for="changeMask">
-    The mask will only be applied after you leave the field
-  </label>
-  <input
-    type="text"
-    id="changeMask"
-    onchange={(e) => { changeMaskValue = dateMask(e); }}
-  />
-  <label for="inputMask">
-    The mask will be applied on every single input
-  </label>
-  <input
-    type="text"
-    id="inputMask"
-    ref={inputMask.ref}
-    oninput={dateMask}
-  />
-</>
+return (
+  <>
+    <label for="changeMask">The mask will only be applied after you leave the field</label>
+    <input
+      type="text"
+      id="changeMask"
+      onchange={e => {
+        changeMaskValue = dateMask(e);
+      }}
+    />
+    <label for="inputMask">The mask will be applied on every single input</label>
+    <input type="text" id="inputMask" ref={inputMask.ref} oninput={dateMask} />
+  </>
+);
 ```
 
 In most cases you'll want to use `oninput`.
@@ -85,13 +85,14 @@ In most cases you'll want to use `oninput`.
 - **Is there a server version?**<br> No, since it only creates an event handler that will solely run on the client; it makes no sense to create a server version.
 - **Does this provide any error handling?**<br> There is no error handling, but it should work well together with any form handling library.
 - **Can I turn this off and on again?**<br> You can still wrap the output handler in your own handler to turn it off and on again:
+
 ```jsx
 import { createInputMask } from "@solid-primitives/input-mask";
 
 let ref;
 let useMask = false;
 const mask = createInputMask("9999-99-99");
-return <input ref={ref} oninput={(e) => useMask && mask(e)} />;
+return <input ref={ref} oninput={e => useMask && mask(e)} />;
 ```
 
 ### DEMO

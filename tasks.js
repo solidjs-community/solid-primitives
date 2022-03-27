@@ -9,14 +9,15 @@ async function updateReadme(log) {
   log.info("updateReadme", "Updating README documentation");
   const markdownMagic = require("markdown-magic");
   const tablemark = require("json-to-markdown-table");
-  const githubURL = "https://github.com/davedbase/solid-primitives/tree/main/packages/";
+  const githubURL = "https://github.com/solidjs-community/solid-primitives/tree/main/packages/";
   const sizeShield = "https://img.shields.io/bundlephobia/minzip/";
   const bundlephobiaURL = "https://bundlephobia.com/package/";
   const npmShield = "https://img.shields.io/npm/v/";
   const npmURL = "https://www.npmjs.com/package/";
   const stageShieldBaseURL =
-    "https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fdavedbase%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-"; // add "<stage>.json" after
-  const stageShieldLink = "https://github.com/davedbase/solid-primitives#contribution-process";
+    "https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-"; // add "<stage>.json" after
+  const stageShieldLink =
+    "https://github.com/solidjs-community/solid-primitives#contribution-process";
 
   let categories = {};
   // Retrieve packages managed by Lerna

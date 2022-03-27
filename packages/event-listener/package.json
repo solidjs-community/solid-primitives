@@ -4,10 +4,10 @@
   "description": "Primitive to manage creating event listeners.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davedbase/solid-primitives.git"
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
   "primitive": {
     "name": "event-listener",

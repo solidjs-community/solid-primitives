@@ -26,7 +26,7 @@ export type EventListenerStoreReturns<E> = [lastEvents: Store<Partial<E>>, clear
  * @returns Function clearing all event listeners form targets
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#createEventListenerMap
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener#createEventListenerMap
  *
  * @example
  * const clear = createEventListenerMap(element, {
@@ -79,7 +79,7 @@ export function createEventListenerMap(
  * @returns reactive store with the latest captured events & clear function
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/event-listener#createEventStore
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener#createEventStore
  *
  * @example
  * const [lastEvents, clear] = createEventStore(el, "mousemove", "touchend", "click");
