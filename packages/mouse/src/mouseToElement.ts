@@ -1,4 +1,4 @@
-import { omit } from "@solid-primitives/utils/fp";
+import { omit } from "@solid-primitives/immutable";
 import { access, Fn, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, batch, createComputed, createMemo, createSignal, onMount } from "solid-js";
 import {
