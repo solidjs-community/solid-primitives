@@ -1,4 +1,4 @@
-import { Range } from "../src";
+import { Repeat } from "../src";
 import { Component, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
@@ -28,13 +28,13 @@ const App: Component = () => {
           </button>
         </div>
         <div class="flex space-x-2">
-          <Range of={count()}>
+          <Repeat times={count()} fallback="yoooo">
             {n => (
               <div class="w-3 h-3 rounded-full bg-pink-700 animate-zoom-in animate-count-1">
                 {n}
               </div>
             )}
-          </Range>
+          </Repeat>
         </div>
       </div>
     </div>
