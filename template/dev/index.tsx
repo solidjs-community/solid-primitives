@@ -13,11 +13,10 @@ const App: Component = () => {
         <p class="caption">it's very important...</p>
         <button class="btn" onClick={increment}>
           {count()}
-          <div></div>
         </button>
       </div>
     </div>
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+render(() => <App />, document.getElementById("root")!);
