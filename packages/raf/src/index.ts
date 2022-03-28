@@ -1,63 +1,82 @@
-import { access, Fn, Get, MaybeAccessor } from "@solid-primitives/utils";
-import { createSignal, onMount, onCleanup, createMemo, Accessor } from "solid-js";
+import { Fn, isFunction, MaybeAccessor } from "@solid-primitives/utils";
+import { createSignal, createMemo, Accessor, onCleanup } from "solid-js";
 
 /**
- * Creates a method to support RAF.
- * Based on useRafFN (https://github.com/microcipcip/vue-use-kit/blob/master/src/functions/useRafFn/useRafFn.ts).
- *
- * @param callback The callback to run on a frame
- * @param fps Target frame rate, defaults to 60
- * @param runImmediately Determines if the function could run immediately
- * @returns Returns a signal if currently running as well as star tand stop methods
+ * A primitive creating reactive `window.requestAnimationFrame`, that is automatically disposed onCleanup.
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#createRAF
+ * @param callback The callback to run each frame
+ * @returns Returns a signal if currently running as well as start and stop methods
+ * ```ts
+ * [running: Accessor<boolean>, start: Fn, stop: Fn]
+ * ```
  *
  * @example
+ * const [running, start, stop] = createRAF((timestamp) => {
+ *    el.style.transform = "translateX(...)"
+ * });
  */
-const createRAF = (
-  callback: Get<number>,
-  fps: MaybeAccessor<number> = 60,
-  runImmediately = true
-): [running: Accessor<boolean>, start: Fn, stop: Fn] => {
+function createRAF(
+  callback: FrameRequestCallback
+): [running: Accessor<boolean>, start: Fn, stop: Fn] {
   const [running, setRunning] = createSignal(false);
-  const fpsInterval = createMemo(() => 1000 / access(fps));
-  let wasIdle = false;
-  let startTime = 0;
-  let timeElapsed = 0;
-  let timePaused = 0;
-  let timeDelta = 0;
-  const loop = (timeStamp: number) => {
-    if (!startTime) startTime = timeStamp;
-    if (!running()) return;
-    if (wasIdle) {
-      timePaused = timeStamp - startTime - timeElapsed;
-      wasIdle = false;
-    }
-    timeElapsed = timeStamp - startTime - timePaused;
-    const shouldRun = access(fps) >= 60;
-    if (shouldRun) {
-      timeDelta = timeElapsed;
-      callback(timeElapsed);
-    }
-    if (!shouldRun) {
-      const elapsedTimeFromPrevLoop = Math.ceil(timeElapsed - timeDelta);
-      if (elapsedTimeFromPrevLoop > fpsInterval()) {
-        timeDelta = timeElapsed;
-        callback(timeElapsed);
-      }
-    }
-    requestAnimationFrame(loop);
+  let requestID = 0;
+
+  const loop: FrameRequestCallback = timeStamp => {
+    requestID = requestAnimationFrame(loop);
+    callback(timeStamp);
   };
   const start = () => {
     if (running()) return;
     setRunning(true);
-    requestAnimationFrame(loop);
+    requestID = requestAnimationFrame(loop);
   };
   const stop = () => {
     setRunning(false);
-    wasIdle = true;
+    cancelAnimationFrame(requestID);
   };
-  onMount(() => runImmediately && start());
+
   onCleanup(stop);
   return [running, start, stop];
-};
+}
 
-export default createRAF;
+/**
+ * A primitive for wrapping `window.requestAnimationFrame` callback function to limit the execution of the callback to specified number of FPS.
+ *
+ * Keep in mind that limiting FPS is achieved by not executing a callback if the frames are above defined limit. This can lead to not consistant frame duration.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#targetFPS
+ * @param callback The callback to run each *allowed* frame
+ * @param fps The target FPS limit
+ * @returns Wrapped RAF callback
+ *
+ * @example
+ * const [running, start, stop] = createRAF(
+ *   targetFPS(() => {...}, 60)
+ * );
+ */
+function targetFPS(
+  callback: FrameRequestCallback,
+  fps: MaybeAccessor<number>
+): FrameRequestCallback {
+  const interval = isFunction(fps)
+    ? createMemo(() => Math.floor(1000 / (fps as Accessor<number>)()))
+    : (() => {
+        const interval = Math.floor(1000 / fps);
+        return () => interval;
+      })();
+
+  let elapsed = 0;
+  let lastRun = 0;
+  let missedBy = 0;
+
+  return timeStamp => {
+    elapsed = timeStamp - lastRun;
+    if (Math.ceil(elapsed + missedBy) >= interval()) {
+      lastRun = timeStamp;
+      missedBy = Math.max(elapsed - interval(), 0);
+      callback(timeStamp);
+    }
+  };
+}
+
+export { createRAF, createRAF as default, targetFPS };

@@ -14,8 +14,8 @@ export const stringMaskToArray = (mask: string) =>
     c =>
       ({
         9: /\d/,
-        a: /\w/,
-        "*": /[\d\w]/
+        a: /[a-z]/i,
+        "*": /\w/
       }[c] || c)
   );
 
