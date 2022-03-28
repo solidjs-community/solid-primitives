@@ -42,10 +42,10 @@
     "primitives"
   ],
   "devDependencies": {
-    "jsdom": "^18.1.1",
+    "jsdom": "^19.0.0",
     "@solid-primitives/raf": "^1.0.5",
     "prettier": "^2.4.1",
-    "solid-register": "0.1.5",
+    "solid-register": "^0.1.5",
     "tslib": "^2.3.1",
     "tsup": "^5.10.0",
     "unocss": "0.24.3",
@@ -58,6 +58,6 @@
   },
   "dependencies": {
     "@solid-primitives/event-listener": "^1.4.1",
-    "@solid-primitives/utils": "0.1.2"
+    "@solid-primitives/utils": "0.5.3"
   }
 }
