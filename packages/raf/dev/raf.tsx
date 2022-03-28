@@ -1,25 +1,26 @@
 import { createSignal, Show } from "solid-js";
 
-import createRAF from "../src";
+import createRAF, { targetFPS } from "../src";
 
 const targetRuns = 500;
 
-export default props => {
+export default (props: { targetFPS?: number }) => {
   const [sum, setSum] = createSignal(0);
   let runs = -1;
   let last = 0;
 
+  const eachFrame = () => {
+    runs++;
+    if (runs) {
+      const ms = performance.now() - last;
+      setSum(p => p + ms);
+    }
+    last = performance.now();
+    if (runs === targetRuns) handleStop();
+  };
+
   const [running, start, stop] = createRAF(
-    () => {
-      runs++;
-      if (runs) {
-        const ms = performance.now() - last;
-        setSum(p => p + ms);
-      }
-      last = performance.now();
-      if (runs === targetRuns) handleStop();
-    },
-    { targetFPS: props.targetFPS }
+    props.targetFPS ? targetFPS(eachFrame, props.targetFPS) : eachFrame
   );
 
   const [avgMs, setAvgMs] = createSignal(0);
@@ -46,8 +47,8 @@ export default props => {
           | Running{" "}
         </Show>
         <span>
-          | Target FPS: {props.targetFPS}| Runs: {numRuns()}| AVG Ms: {avgMs()}| AVG FPS {avgFps()}|
-          Current FPS: {1000 / (sum() / runs)}
+          | Target FPS: {props.targetFPS || "UNCAPPED"}| Runs: {numRuns()}| AVG Ms: {avgMs()}| AVG
+          FPS {avgFps()}| Current FPS: {1000 / (sum() / runs)}
         </span>
       </span>
     </div>

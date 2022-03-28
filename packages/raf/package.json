@@ -1,8 +1,12 @@
 {
   "name": "@solid-primitives/raf",
-  "version": "2.0.9",
+  "version": "2.0.0",
   "description": "Primitive that facilitates RAF functionality",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "contributors": [
+    "Tito <tito.bouzout@gmail.com>",
+    "Damian Tarnawski <gthetarnav@gmail.com>"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf",
   "repository": {
@@ -13,7 +17,8 @@
     "name": "raf",
     "stage": 3,
     "list": [
-      "createRAF"
+      "createRAF",
+      "targetFPS"
     ],
     "category": "Display & Media"
   },
