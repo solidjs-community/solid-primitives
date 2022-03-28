@@ -4,5 +4,5 @@
   ],
   "version": "independent",
   "lerna-script-tasks": "./tasks.js",
-  "npmClient": "yarn"
+  "npmClient": "pnpm"
 }

@@ -82,7 +82,7 @@ function targetFPS(
 
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-create-raf-czd1e?file=/src/index.tsx
+You may view a working example here: https://codesandbox.io/s/solid-primitives-raf-demo-4xvmjd?file=/src/index.tsx
 
 ## Changelog
 
