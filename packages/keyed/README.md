@@ -122,7 +122,7 @@ Causes the children to rerender when the `on` key changes. Equivalent of `v-key`
 ### Import
 
 ```ts
-import { Rerun } from "@solid-primitives/refs";
+import { Rerun } from "@solid-primitives/keyed";
 ```
 
 ### How to use it
