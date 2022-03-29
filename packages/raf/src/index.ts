@@ -1,5 +1,5 @@
-import { Fn, isFunction, MaybeAccessor } from "@solid-primitives/utils";
-import { createSignal, createMemo, Accessor, onCleanup } from "solid-js";
+import { Fn } from "@solid-primitives/utils";
+import { createSignal, Accessor, onCleanup } from "solid-js";
 
 /**
  * A primitive creating reactive `window.requestAnimationFrame`, that is automatically disposed onCleanup.
@@ -39,44 +39,4 @@ function createRAF(
   return [running, start, stop];
 }
 
-/**
- * A primitive for wrapping `window.requestAnimationFrame` callback function to limit the execution of the callback to specified number of FPS.
- *
- * Keep in mind that limiting FPS is achieved by not executing a callback if the frames are above defined limit. This can lead to not consistant frame duration.
- *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#targetFPS
- * @param callback The callback to run each *allowed* frame
- * @param fps The target FPS limit
- * @returns Wrapped RAF callback
- *
- * @example
- * const [running, start, stop] = createRAF(
- *   targetFPS(() => {...}, 60)
- * );
- */
-function targetFPS(
-  callback: FrameRequestCallback,
-  fps: MaybeAccessor<number>
-): FrameRequestCallback {
-  const interval = isFunction(fps)
-    ? createMemo(() => Math.floor(1000 / (fps as Accessor<number>)()))
-    : (() => {
-        const interval = Math.floor(1000 / fps);
-        return () => interval;
-      })();
-
-  let elapsed = 0;
-  let lastRun = 0;
-  let missedBy = 0;
-
-  return timeStamp => {
-    elapsed = timeStamp - lastRun;
-    if (Math.ceil(elapsed + missedBy) >= interval()) {
-      lastRun = timeStamp;
-      missedBy = Math.max(elapsed - interval(), 0);
-      callback(timeStamp);
-    }
-  };
-}
-
-export { createRAF, createRAF as default, targetFPS };
+export { createRAF, createRAF as default };
