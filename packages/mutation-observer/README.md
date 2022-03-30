@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Mutation%20Observer" alt="Solid Primitives">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Mutation%20Observer" alt="Solid Primitives Mutation Observer">
 </p>
 
 # @solid-primitives/mutation-observer

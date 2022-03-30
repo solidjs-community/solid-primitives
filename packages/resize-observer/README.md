@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Resize%20Observer" alt="Solid Primitives">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Resize%20Observer" alt="Solid Primitives Resize Observer">
 </p>
 
 # @solid-primitives/resize-observer

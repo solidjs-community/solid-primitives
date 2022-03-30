@@ -6,7 +6,7 @@ Primitives: createAnalytics
 Category: Utilities
 ---
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Analytics" alt="Solid Primitives">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Analytics" alt="Solid Primitives Analytics">
 </p>
 
 # @solid-primitives/analytics
