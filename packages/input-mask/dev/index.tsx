@@ -1,6 +1,7 @@
 import { Component } from "solid-js";
 import { render } from "solid-js/web";
 import { anyMaskToFn, createInputMask, Selection } from '../src';
+import 'uno.css';
 
 const App: Component = () => {
   const isoDateHandler = createInputMask('9999-99-99');
@@ -27,7 +28,7 @@ const App: Component = () => {
 
   return (
     <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
-      <div class="wrapper-v">
+      <div class="wrapper-v items-start">
         <h4>Input Mask</h4>
         <label for="isodate">ISO Date:</label>
         <input type="text" id="isodate" placeholder="YYYY-MM-DD" onInput={isoDateHandler} onPaste={isoDateHandler} /><br />
