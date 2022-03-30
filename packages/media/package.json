@@ -64,5 +64,8 @@
 			"email": "adityaa803@gmail.com",
 			"url": "https://devadi.netlify.app"
 		}
-	]
+	],
+  "engines": {
+    "node": ">=14.19.1"
+  }
 }

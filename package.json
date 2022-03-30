@@ -29,5 +29,8 @@
     "vite": "2.8.6",
     "vite-plugin-solid": "2.2.6",
     "vitest": "^0.7.7"
+  },
+  "engines": {
+    "node": ">=14.19.1"
   }
 }
