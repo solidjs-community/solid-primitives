@@ -1,5 +1,5 @@
-import { assert, expect, describe, it } from "vitest";
-import { createRoot, createSignal, onCleanup } from "solid-js";
+import { expect, describe, it } from "vitest";
+import { createComputed, createRoot, createSignal, onCleanup } from "solid-js";
 import { repeat } from "../src";
 
 describe("repeat", () => {
@@ -70,6 +70,8 @@ describe("repeat", () => {
           }
         }
       );
+      // cleanups happen on access
+      createComputed(mapped);
       expect(cleanups, "initial cleanups").toEqual([]);
       setLength(1);
       expect(cleanups, "1 cleanups").toEqual([1]);

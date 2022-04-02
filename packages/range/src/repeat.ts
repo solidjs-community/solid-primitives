@@ -1,12 +1,12 @@
 import { Accessor, createMemo, createRoot, onCleanup, untrack } from "solid-js";
 
 /**
- * Reactively maps a number range of specified length with a callback function - underlying helper for the `<Range>` control flow.
+ * Reactively maps a number range of specified length with a callback function - underlying helper for the `<Repeat>` control flow.
  * @param times number of the elements to map
  * @param mapFn reactive function used to create mapped output item array
  * @param options a fallback for when the input list is empty or missing
  * @returns mapped input array signal
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#mapRange
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#repeat
  * @example
  * ```tsx
  * const [length, setLength] = createSignal(10)
@@ -69,14 +69,14 @@ export function repeat<T>(
   };
 
   const memoLen = createMemo(() => Math.floor(Math.max(times(), 0)));
-  return createMemo(() => {
+  return () => {
     const len = memoLen();
     return untrack(() => {
       const items = mapLength(len);
       prevLen = len;
       return items;
     });
-  });
+  };
 }
 
 /**
@@ -84,7 +84,7 @@ export function repeat<T>(
  * @param times number of elements
  * @param fallback element returned when `of` equals 0
  * @param children render function
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#Range
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#Repeat-1
  * @example
  * ```tsx
  * <Repeat times={10}>
