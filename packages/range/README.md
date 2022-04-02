@@ -123,19 +123,19 @@ All `stop`, `to` and `step` props are reactive, and changing them will cause the
 - `step` will become negative _(the range will be descending)_ if `to` is smaller than `start`.
 
 ```tsx
-<Repeat start={2} to={14} step={0.5}>
+<Range start={2} to={14} step={0.5}>
    <div></div>
-</Repeat>
+</Range>
 
 // with a render prop:
-<Repeat start={2} to={14} step={0.5}>
+<Range start={2} to={14} step={0.5}>
    {n => <div>{n}</div>}
-</Repeat>
+</Range>
 
 // with fallback:
-<Repeat to={0}  fallback={<p>no items...</p>}>
+<Range to={0}  fallback={<p>no items...</p>}>
    <div></div>
-</Repeat>
+</Range>
 ```
 
 Array spread shortcut:
