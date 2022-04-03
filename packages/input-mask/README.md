@@ -1,3 +1,7 @@
+<p>
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Input%20Mask" alt="Solid Primitives Input Mask">
+</p>
+
 # @solid-primitives/input-mask
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -70,12 +74,12 @@ return (
       }}
     />
     <label for="inputMask">The mask will be applied on every single input</label>
-    <input type="text" id="inputMask" ref={inputMask.ref} oninput={dateMask} />
+    <input type="text" id="inputMask" ref={inputMask.ref} oninput={dateMask} onPaste={dateMask} />
   </>
 );
 ```
 
-In most cases you'll want to use `oninput`.
+In most cases you'll want to use `onInput` and `onPaste`.
 
 ## FAQ
 
@@ -92,7 +96,7 @@ import { createInputMask } from "@solid-primitives/input-mask";
 let ref;
 let useMask = false;
 const mask = createInputMask("9999-99-99");
-return <input ref={ref} oninput={e => useMask && mask(e)} />;
+return <input ref={ref} onInput={e => useMask && mask(e)} onPaste={e => useMask && mask(e)} />;
 ```
 
 ### DEMO
@@ -107,5 +111,9 @@ TODO
 0.0.100
 
 Initial release as a Stage-0 primitive.
+
+0.0.101
+
+Document onPaste event.
 
 </details>

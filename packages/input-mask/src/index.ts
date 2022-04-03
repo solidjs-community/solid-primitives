@@ -59,7 +59,7 @@ export const anyMaskToFn = (mask: InputMask) =>
 
 export const createInputMask = (mask: InputMask) => {
   const maskFn = anyMaskToFn(mask);
-  const handler = (ev: KeyboardEvent | InputEvent) => {
+  const handler = (ev: KeyboardEvent | InputEvent | ClipboardEvent) => {
     const ref = (ev.currentTarget || ev.target) as HTMLInputElement | HTMLTextAreaElement;
     const [value, selection] = maskFn(ref.value, [
       ref.selectionStart || ref.value.length,

@@ -11,6 +11,16 @@ const animateIn = (el: Element, done: Fn) => {
 const animateOut = (el: Element, done: Fn) =>
   el.animate([base, { opacity: 0, transform: "translate(-12px)" }], options).finished.then(done);
 
+const Button: Component<{ onClick: Fn }> = props => {
+  console.log("new button");
+
+  return (
+    <button class="btn" onClick={props.onClick}>
+      {props.children}
+    </button>
+  );
+};
+
 const App: Component = () => {
   const [count, setCount] = createSignal(0);
 
@@ -18,12 +28,12 @@ const App: Component = () => {
     <>
       <div class="wrapper-h">
         <Transition onEnter={animateIn} onExit={animateOut} mode="outin">
-          <Rerun on={count}>
-            {count => (
-              <button class="btn" onClick={() => setCount(p => ++p)}>
-                {count}
-              </button>
-            )}
+          <Rerun on={count()}>
+            <Button onClick={() => setCount(p => ++p)}>{count()}</Button>
+            {/* <button class="btn" onClick={() => setCount(p => ++p)}>
+            </button> */}
+            {/* {count => (
+            )} */}
           </Rerun>
         </Transition>
       </div>

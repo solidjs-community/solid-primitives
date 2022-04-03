@@ -1,3 +1,7 @@
+<p>
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Keyed" alt="Solid Primitives Keyed">
+</p>
+
 # @solid-primitives/keyed
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
@@ -122,7 +126,7 @@ Causes the children to rerender when the `on` key changes. Equivalent of `v-key`
 ### Import
 
 ```ts
-import { Rerun } from "@solid-primitives/refs";
+import { Rerun } from "@solid-primitives/keyed";
 ```
 
 ### How to use it
