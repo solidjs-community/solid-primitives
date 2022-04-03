@@ -1,4 +1,4 @@
-import { Repeat, Range } from "../src";
+import { Repeat, Range, IndexRange } from "../src";
 import { Component, createSignal, onCleanup } from "solid-js";
 import { render } from "solid-js/web";
 import { TransitionGroup } from "solid-transition-group";
@@ -14,20 +14,24 @@ const Fallback = () => <div class="p-2 bg-gray-600 transition-all duration-500">
 
 const App: Component = () => {
   const [state, setState] = createStore({
-    start: 0,
-    to: 0,
-    step: 0.5
+    start: 5,
+    to: -5,
+    step: 2
+
+    // start: 1,
+    // to: 2,
+    // step: 4
   });
 
-  const shuffle = () => {
-    // const start = 0;
-    // const to = 3
-    // const step = 0.5;
-    const start = Math.round(Math.random() * 8 - 4);
-    const to = Math.round(Math.random() * 8 + 12);
-    const step = Math.round(Math.random() * 4);
-    setState({ start, to, step });
-  };
+  // const shuffle = () => {
+  //   // const start = 1;
+  //   // const to = 2;
+  //   // const step = 1.5;
+  //   const start = Math.round(Math.random() * 10 - 6);
+  //   const to = Math.round(Math.random() * 10 - 4);
+  //   const step = Math.round(Math.random() * 4);
+  //   setState({ start, to, step });
+  // };
 
   // const [state, setState] = createStore({
   //   start: 0,
@@ -35,15 +39,15 @@ const App: Component = () => {
   //   step: -0.5
   // });
 
-  // const shuffle = () => {
-  //   // const start = -2
-  //   // const to = 3
-  //   const step = -0.5;
-  //   const start = Math.round(Math.random() * 5 + 5);
-  //   const to = Math.round(Math.random() * 5 - 5);
-  //   // const step = +(Math.random() * 2).toFixed(1)
-  //   setState({ start, to, step });
-  // };
+  const shuffle = () => {
+    // const start = -2
+    // const to = 3
+    // const step = -0.5;
+    const start = Math.round(Math.random() * 5 + 5);
+    const to = Math.round(Math.random() * 5 - 5);
+    const step = +(Math.random() * 2).toFixed(1);
+    setState({ start, to, step });
+  };
 
   // const i = setInterval(shuffle, 6000);
   // onCleanup(() => clearInterval(i));
@@ -68,11 +72,19 @@ const App: Component = () => {
           </TransitionGroup>
         </div>
         <h4>Range component</h4>
-        <div class="flex space-x-2">
+        <div class="flex flex-col space-y-2">
           <TransitionGroup name="fade">
             <Range start={state.start} to={state.to} step={state.step} fallback={<Fallback />}>
               {n => <Ball n={n} />}
             </Range>
+          </TransitionGroup>
+        </div>
+        <h4>IndexRange component</h4>
+        <div class="flex flex-col space-y-2">
+          <TransitionGroup name="fade">
+            <IndexRange start={state.start} to={state.to} step={state.step} fallback={<Fallback />}>
+              {n => <Ball n={n()} />}
+            </IndexRange>
           </TransitionGroup>
         </div>
       </div>

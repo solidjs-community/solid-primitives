@@ -52,17 +52,17 @@ Creates a range of elements `of` specified size.
 The `of` argument is reactive, and changing it will only create new elements for the added numbers.
 
 ```tsx
-<Repeat of={10}>
+<Repeat times={10}>
    <div></div>
 </Repeat>
 
 // with a render prop:
-<Repeat of={10}>
+<Repeat times={10}>
    {n => <div>{n}</div>}
 </Repeat>
 
 // with fallback:
-<Repeat of={0} fallback={<p>no items...</p>}>
+<Repeat times={0} fallback={<p>no items...</p>}>
    <div></div>
 </Repeat>
 ```
@@ -162,6 +162,13 @@ function Range<T>(
   }
 ): Accessor<T[]>;
 ```
+
+## Possible improvements
+
+###### (PRs Welcome)
+
+- [ ] Currently the `mapRange` is handling decremanting ranges by swapping `start` and `to` with each other, and then cloning and reversing the mapped array. Doing this during the range mapping could possibly be more performant.
+- [ ] For Ranges, because of how numbers are calculated, fractions might sometimes loose precision. E.g. a range from `1.64` to `2` by `0.2` step would generate numbers: `[1.64, 1.8399999999999999]` instead of `[1.64, 1.84]`.
 
 ## Changelog
 

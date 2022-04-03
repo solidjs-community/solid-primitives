@@ -1,53 +1,53 @@
 import { expect, describe, it } from "vitest";
 import { createRoot, createSignal, onCleanup } from "solid-js";
-import { mapRange } from "../src";
+import { indexRange } from "../src";
 
-describe("mapRange", () => {
+describe("indexRange", () => {
   it("returns a correct array", () =>
     createRoot(dispose => {
       expect(
-        mapRange(
+        indexRange(
           () => -3.5,
           () => 0.2,
           () => 1.5,
-          n => n
+          n => n()
         )()
       ).toEqual([-3.5, -2, -0.5]);
 
-      const a = mapRange(
+      const a = indexRange(
         () => 0,
         () => 2,
         () => 0.2,
-        n => n
+        n => n()
       )();
       for (let n = 0, i = 0; i < 10; n += 0.2, i++) {
         expect(a[i]).toBe(n);
       }
 
       expect(
-        mapRange(
+        indexRange(
           () => 5,
           () => -5,
           () => 2,
-          n => n
+          n => n()
         )()
       ).toEqual([5, 3, 1, -1, -3]);
 
       expect(
-        mapRange(
+        indexRange(
           () => 0,
           () => 0.5,
           () => 1,
-          n => n
+          n => n()
         )()
       ).toEqual([0]);
 
       expect(
-        mapRange(
+        indexRange(
           () => 0.5,
           () => 0,
           () => 1,
-          n => n
+          n => n()
         )()
       ).toEqual([0.5]);
 
@@ -60,35 +60,45 @@ describe("mapRange", () => {
       const [to, setTo] = createSignal(0.2);
       const [step, setStep] = createSignal(1.5);
 
-      const mapped = mapRange(start, to, step, n => n);
+      const mapped = indexRange(start, to, step, n => n);
 
-      expect(mapped()).toEqual([-3.5, -2, -0.5]);
+      const a = mapped();
+      expect(a.length).toBe(3);
+      expect(a[0]()).toBe(-3.5);
+      expect(a[1]()).toBe(-2);
+      expect(a[2]()).toBe(-0.5);
 
       setStart(0);
       setTo(2);
       setStep(0.2);
-      const a = mapped();
+      const b = mapped();
       for (let n = 0, i = 0; i < 10; n += 0.2, i++) {
-        expect(a[i]).toBe(n);
+        expect(b[i]()).toBe(n);
       }
 
       setStart(5);
       setTo(-5);
       setStep(2);
-      expect(mapped()).toEqual([5, 3, 1, -1, -3]);
+      const c = mapped();
+      expect(c.length).toBe(5);
+      expect(c[0]()).toBe(5);
+      expect(c[1]()).toBe(3);
+      expect(c[2]()).toBe(1);
+      expect(c[3]()).toBe(-1);
+      expect(c[4]()).toBe(-3);
 
       dispose();
     }));
 
-  it("maps only added numbers", () =>
+  it("maps only added indexes", () =>
     createRoot(dispose => {
       const [start, setStart] = createSignal(4);
       const [to, setTo] = createSignal(8);
       const [step, setStep] = createSignal(1);
 
       let captured: (string | number)[] = [];
-      const mapped = mapRange(start, to, step, n => {
-        captured.push(n);
+      const mapped = indexRange(start, to, step, n => {
+        captured.push(n());
       });
 
       mapped();
@@ -97,17 +107,12 @@ describe("mapRange", () => {
       setStart(6);
       setTo(9);
       mapped();
-      expect(captured).toEqual([4, 5, 6, 7, 8]);
+      expect(captured).toEqual([4, 5, 6, 7]);
 
       setStart(4);
-      setTo(7);
+      setTo(10);
       mapped();
-      expect(captured).toEqual([4, 5, 6, 7, 8, 4, 5]);
-
-      setStart(3);
-      setStep(1.5);
-      mapped();
-      expect(captured).toEqual([4, 5, 6, 7, 8, 4, 5, 3, 4.5]);
+      expect(captured).toEqual([4, 5, 6, 7, 7, 8, 9]);
 
       dispose();
     }));
@@ -119,8 +124,8 @@ describe("mapRange", () => {
       const [step, setStep] = createSignal(1);
 
       let captured: (string | number)[] = [];
-      const mapped = mapRange(start, to, step, n => {
-        onCleanup(() => captured.push(n));
+      const mapped = indexRange(start, to, step, n => {
+        onCleanup(() => captured.push(n()));
       });
 
       mapped();
@@ -129,17 +134,16 @@ describe("mapRange", () => {
       setStart(6);
       setTo(9);
       mapped();
-      expect(captured).toEqual([4, 5]);
+      expect(captured).toEqual([7]);
 
-      setStart(4);
-      setTo(7);
+      setStart(6);
+      setTo(9);
       mapped();
-      expect(captured).toEqual([4, 5, 7, 8]);
+      expect(captured).toEqual([7]);
 
-      setStart(3);
       setStep(1.5);
       mapped();
-      expect(captured).toEqual([4, 5, 7, 8, 4, 5]);
+      expect(captured).toEqual([7, 8]);
 
       dispose();
     }));
@@ -150,7 +154,9 @@ describe("mapRange", () => {
       const [to, setTo] = createSignal(8);
       const [step, setStep] = createSignal(1);
 
-      const mapped = mapRange<string | number>(start, to, step, n => n, { fallback: () => "fb" });
+      const mapped = indexRange<string | number>(start, to, step, n => n(), {
+        fallback: () => "fb"
+      });
 
       setStart(0);
       setTo(0);

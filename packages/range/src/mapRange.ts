@@ -1,18 +1,6 @@
-import { Fn, isFunction, MaybeAccessor, MaybeAccessorValue, warn } from "@solid-primitives/utils";
+import { Fn, warn } from "@solid-primitives/utils";
 import { Accessor, createRoot, onCleanup, untrack } from "solid-js";
-import { RangeProps } from "./common";
-
-const { abs, sign, min, ceil } = Math;
-
-const accessor = <T extends MaybeAccessor<unknown>>(a: Accessor<T>) =>
-  (typeof a() === "function" ? a() : a.bind(void 0)) as Accessor<MaybeAccessorValue<T>>;
-
-const toFunction =
-  <T, A extends [] | any[]>(a: Accessor<T | ((...args: A) => T)>) =>
-  (...args: A) => {
-    const v = a();
-    return isFunction(v) ? v(...args) : v;
-  };
+import { abs, accessor, ceil, floor, min, RangeProps, toFunction } from "./common";
 
 /**
  * Reactively maps a number range of specified `stop`, `to` and `step`, with a callback function - underlying helper for the `<Range>` control flow.
@@ -59,7 +47,7 @@ export function mapRange<T>(
 
   const mapNewRange = (start: number, to: number, step: number): T[] => {
     // new range is empty
-    if (start === to || start + step >= to) {
+    if (start === to) {
       disposers.forEach(f => f());
 
       if (options.fallback) {
@@ -97,7 +85,7 @@ export function mapRange<T>(
 
     // front - add
     if (start < prevStart) {
-      end = ceil((prevStart - start) / step);
+      end = min(ceil((prevStart - start) / step), newLength);
       for (n = start; i < end; i++, n += step) mapper(i, n, newItems, newDisposers);
     }
 
@@ -133,13 +121,14 @@ export function mapRange<T>(
     }
     let _start = start();
     let _to = to();
+    _step = abs(_step);
     const positive = _start <= _to;
     if (!positive) {
       let temp = _start;
-      _start = _to + _step;
+      const x = (_start - _to) / _step;
+      _start = _start - (Number.isInteger(x) ? x - 1 : floor(x)) * _step;
       _to = temp + _step;
     }
-    _step = abs(_step) * sign(_to - _start || 1);
     const list = untrack(mapNewRange.bind(void 0, _start, _to, _step));
     prevStart = _start;
     prevTo = _to;
