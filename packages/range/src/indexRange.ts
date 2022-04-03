@@ -120,7 +120,7 @@ export function indexRange<T>(
  * @param step difference between two points in the range *(negative step value depends on the `to` being greater/smaller then `start`, not this argument)* *(defaults to 1)*
  * @param fallback element returned when the range size is 0
  * @param children render function, recives number value as a signal
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#Range
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#IndexRange
  * @example
  * ```tsx
  * <IndexRange start={2} to={14} step={0.5}>
