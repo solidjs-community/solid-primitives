@@ -169,7 +169,7 @@ function Range<T>(
 
 Primitive for mapping a number range of specified `stop`, `to` and `step`, while keeping previous elements of the same index. Underlying helper for the [`<IndexRange>`](#indexrange-1) control flow.
 
-All `stop`, `to` and `step` arguments are accessors, and changing them will cause the mapped array to be recalculated, mapping new items for numbers added to the range.
+All `stop`, `to` and `step` arguments are accessors, and changing them will cause the mapped array to be recalculated, mapping new items appended at the end of the range.
 
 `step` will become negative _(the range will be descending)_ if `to` is smaller than `start`. Range stops at `to`, it is not included in the range.
 
