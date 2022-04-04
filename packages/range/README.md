@@ -203,7 +203,7 @@ function indexRange<T>(
 ): Accessor<T[]>;
 ```
 
-## `IndexRange`
+## `<IndexRange>`
 
 Control Flow Component for displaying a number range of elements, where elements receive a number value as signal, by mapping a number range of specified `start`, `to`, and `step`.
 
