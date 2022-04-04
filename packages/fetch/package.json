@@ -21,7 +21,7 @@
     "dist"
   ],
   "private": false,
-  "sideEffects": false,
+  "sideEffects": true,
   "type": "module",
   "main": "./dist/server.cjs",
   "module": "./dist/index.js",
