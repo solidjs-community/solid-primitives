@@ -58,7 +58,7 @@ async function updateReadme(log) {
             return Object.entries(categories).reduce((md, [category, items]) => {
               // Some MD jousting to get the table to render nicely
               // with consistent columns
-              md += `|<br />*${category}*<br /><br />|\n`;
+              md += `|<h4>*${category}*</h4>|\n`;
               md += tablemark(items, ["Name", "Stage", "Primitives", "Size", "NPM"])
                 .replace("|Name|Stage|Primitives|Size|NPM|\n", "")
                 .replace("|----|----|----|----|----|\n", "");
