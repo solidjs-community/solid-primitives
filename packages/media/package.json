@@ -3,6 +3,13 @@
 	"version": "1.2.0",
 	"description": "Primitives for media query and device features",
 	"author": "David Di Biase <dave.dibiase@gmail.com>",
+	"contributors": [
+		{
+			"name": "Aditya Agarwal",
+			"email": "adityaa803@gmail.com",
+			"url": "https://devadi.netlify.app"
+		}
+	],
 	"license": "MIT",
 	"homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/media",
 	"repository": {
@@ -35,6 +42,13 @@
 		"import": "./dist/index.js",
 		"require": "./dist/index.cjs"
 	},
+	"scripts": {
+		"start": "vite serve dev --host",
+		"dev": "yarn start",
+		"build": "tsup",
+		"test": "vitest run test",
+		"test:watch": "vitest watch test"
+	},
 	"keywords": [
 		"media",
 		"mediaquery",
@@ -57,12 +71,5 @@
 	},
 	"peerDependencies": {
 		"solid-js": "^1.3.1"
-	},
-	"contributors": [
-		{
-			"name": "Aditya Agarwal",
-			"email": "adityaa803@gmail.com",
-			"url": "https://devadi.netlify.app"
-		}
-	]
+	}
 }
