@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/range",
-  "version": "0.0.100",
+  "version": "0.0.101",
   "description": "Control Flow Primitives for displaying given number or a number range of elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "contributors": [],
@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "range",
-    "stage": 0,
+    "stage": 1,
     "list": [
       "repeat",
       "mapRange",
