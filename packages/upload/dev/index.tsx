@@ -1,6 +1,6 @@
-import { Component, For } from "solid-js";
+import { Component, createEffect, For } from "solid-js";
 import { render } from "solid-js/web";
-import createFileUploader from "../src";
+import { createFileUploader } from "../src";
 import "uno.css";
 
 const wait = (s: number): Promise<void> => {
@@ -14,6 +14,8 @@ const App: Component = () => {
     multiple: true,
     accept: "image/*"
   });
+  const [fileInput, _, handleFileInput] = createFileUploader();
+  const [filesInput, __, handleFilesInput] = createFileUploader({ multiple: true });
 
   return (
     <div>
@@ -50,14 +52,24 @@ const App: Component = () => {
         <h5>Upload multiple files</h5>
         <button
           onClick={() => {
-            selectFiles(files => {
-              console.log(files);
-            });
+            selectFiles(files => files.forEach(file => console.log(file)));
           }}
         >
           Select file
         </button>
         <For each={files()}>{item => <p>{item.name}</p>}</For>
+      </div>
+
+      <div>
+        <h5>Upload single file with input handler</h5>
+        <input type="file" onChange={handleFileInput} />
+        <p>{fileInput()?.name}</p>
+      </div>
+
+      <div>
+        <h5>Upload multiple files with input handler</h5>
+        <input type="file" multiple onChange={handleFilesInput} />
+        <For each={filesInput()}>{item => <p>{item.name}</p>}</For>
       </div>
     </div>
   );

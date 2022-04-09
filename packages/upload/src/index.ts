@@ -45,16 +45,26 @@ export type FileSelectCallback = {
  */
 function createFileUploader(): [
   files: Accessor<UploadFile>,
-  uploadFiles: (callback: (file: UploadFile) => void | Promise<void>) => void
+  uploadFiles: (callback: (file: UploadFile) => void | Promise<void>) => void,
+  handleFileInput: (
+    event: Event & {
+      currentTarget: HTMLInputElement;
+      target: Element;
+    }
+  ) => void | Promise<void>
 ];
-function createFileUploader(
-  options?: FileUploaderOptions
-): [
+function createFileUploader(options?: FileUploaderOptions): [
   files: Accessor<UploadFile[]>,
-  uploadFiles: (callback: (files: UploadFile[]) => void | Promise<void>) => void
+  uploadFiles: (callback: (files: UploadFile[]) => void | Promise<void>) => void,
+  handleFileInput: (
+    event: Event & {
+      currentTarget: HTMLInputElement;
+      target: Element;
+    }
+  ) => void | Promise<void>
 ];
 function createFileUploader(options?: FileUploaderOptions): any {
-  const [files, setFiles] = createSignal<UploadFile | UploadFile[] | null>(null);
+  const [files, setFiles] = createSignal<UploadFile | UploadFile[]>([]);
 
   let userCallback: FileSelectCallback;
 
@@ -69,13 +79,7 @@ function createFileUploader(options?: FileUploaderOptions): any {
       }
 
       const file = target.files[fileIndex];
-
-      const parsedFile: UploadFile = {
-        source: URL.createObjectURL(file),
-        name: file.name,
-        size: file.size,
-        file
-      };
+      const parsedFile = transformFile(file);
 
       parsedFiles.push(parsedFile);
     }
@@ -106,10 +110,34 @@ function createFileUploader(options?: FileUploaderOptions): any {
     inputEL.click();
   };
 
-  return [files, uploadFiles];
+  const handleFileInput = async (
+    event: Event & {
+      currentTarget: HTMLInputElement;
+      target: Element;
+    }
+    // mode: "append" | "write"
+  ) => {
+    let filesArr: File[] = [];
+    const target = event.currentTarget;
+
+    filesArr = Array.from(target.files || []);
+    if (target.multiple && options?.multiple) {
+      setFiles(filesArr.map(transformFile));
+    } else {
+      setFiles(filesArr.map(transformFile)[0]);
+    }
+  };
+
+  return [files, uploadFiles, handleFileInput];
 }
 
-export default createFileUploader;
+function createDropzone() {
+  // TODO: handleFileInput
+  // * } else if (target.dataTransfer.files) {
+  // * filesArr = Array.from(target.dataTransfer.files);
+}
+
+export { createFileUploader, createDropzone };
 
 function createInputComponent({ multiple = false, accept = "" }: FileUploaderOptions) {
   const element = document.createElement("input");
@@ -118,4 +146,14 @@ function createInputComponent({ multiple = false, accept = "" }: FileUploaderOpt
   element.multiple = multiple;
 
   return element;
+}
+
+function transformFile(file: File): UploadFile {
+  const parsedFile: UploadFile = {
+    source: URL.createObjectURL(file),
+    name: file.name,
+    size: file.size,
+    file
+  };
+  return parsedFile;
 }
