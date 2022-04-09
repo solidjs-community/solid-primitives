@@ -17,18 +17,9 @@ export type FileUploaderOptions = {
   accept?: string;
   multiple?: boolean;
 };
-export type FileUploader = [
-  files: FileUploaderAccessor,
-  selectFile: (callback: FileSelectCallback) => void
-];
-export type FileUploaderAccessor = {
-  (): UploadFile;
-  (): UploadFile[];
-  (): null;
-};
 export type FileSelectCallback = {
-  (file: UploadFile): void;
-  (files: UploadFile[]): void;
+  (file: UploadFile): void | Promise<void>;
+  (files: UploadFile[]): void | Promise<void>;
 };
 
 /**
@@ -54,11 +45,14 @@ export type FileSelectCallback = {
  */
 function createFileUploader(): [
   files: Accessor<UploadFile>,
-  uploadFiles: (callback: (file: UploadFile) => void) => void
+  uploadFiles: (callback: (file: UploadFile) => void | Promise<void>) => void
 ];
 function createFileUploader(
   options?: FileUploaderOptions
-): [files: Accessor<UploadFile[]>, uploadFiles: (callback: (files: UploadFile[]) => void) => void];
+): [
+  files: Accessor<UploadFile[]>,
+  uploadFiles: (callback: (files: UploadFile[]) => void | Promise<void>) => void
+];
 function createFileUploader(options?: FileUploaderOptions): any {
   const [files, setFiles] = createSignal<UploadFile | UploadFile[] | null>(null);
 
@@ -99,8 +93,12 @@ function createFileUploader(options?: FileUploaderOptions): any {
     return userCallback(parsedFiles[0]);
   }
 
-  const uploadFiles = (callback: FileSelectCallback = () => {}) => {
+  const uploadFiles = (callback: FileSelectCallback) => {
     userCallback = callback;
+
+    if (callback instanceof Promise) {
+      callback.then().catch(e => console.error(e));
+    }
 
     const inputEL = createInputComponent(options || {});
 
