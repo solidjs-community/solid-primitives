@@ -8,14 +8,17 @@ const wait = (s: number): Promise<void> => {
 };
 
 const App: Component = () => {
-  const [file, selectFile] = createFileUploader();
-  const [fileAsync, selectFileAsync] = createFileUploader();
-  const [files, selectFiles] = createFileUploader({
+  const { file, selectFile } = createFileUploader();
+  const { file: fileAsync, selectFile: selectFileAsync } = createFileUploader();
+  const { files, selectFiles } = createFileUploader({
     multiple: true,
     accept: "image/*"
   });
-  const [fileInput, _, handleFileInput] = createFileUploader();
-  const [filesInput, __, handleFilesInput] = createFileUploader({ multiple: true });
+  const { file: fileInput, handleFileInput } = createFileUploader();
+  const { files: filesInput, handleFilesInput } = createFileUploader({ multiple: true });
+
+  createEffect(() => console.log(file()));
+  createEffect(() => console.log(files()));
 
   return (
     <div>

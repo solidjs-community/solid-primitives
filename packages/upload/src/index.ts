@@ -26,45 +26,49 @@ export type FileSelectCallback = {
  * Primitive to make uploading files easier.
  *
  * @return files - Uploaded file or files
- * @return uploadFiles - Setter function
+ * @return selectFiles - Setter function
  *
  * @example
  * ```ts
  * // multiple files
- * const [files, selectFiles] = createFileUploader({ multiple: true, accept: "image/*" });
+ * const {files, selectFiles} = createFileUploader({ multiple: true, accept: "image/*" });
  * selectFiles(files => {
  *   console.log(files);
  * });
  *
  * // single file
- * const [file, selectFile] = createFileUploader();
+ * const {file, selectFile} = createFileUploader();
  * selectFile(({ source, name, size, file }) => {
  *   console.log({ source, name, size, file });
  * });
  * ```
  */
-function createFileUploader(): [
-  files: Accessor<UploadFile>,
-  uploadFiles: (callback: (file: UploadFile) => void | Promise<void>) => void,
+function createFileUploader(): {
+  file: Accessor<UploadFile>;
+  selectFile: (callback: (file: UploadFile) => void | Promise<void>) => void;
   handleFileInput: (
     event: Event & {
       currentTarget: HTMLInputElement;
       target: Element;
     }
-  ) => void | Promise<void>
-];
-function createFileUploader(options?: FileUploaderOptions): [
-  files: Accessor<UploadFile[]>,
-  uploadFiles: (callback: (files: UploadFile[]) => void | Promise<void>) => void,
-  handleFileInput: (
+  ) => void | Promise<void>;
+  removeFile: (fileName: string) => void;
+  clearFiles: () => void;
+};
+function createFileUploader(options?: FileUploaderOptions): {
+  files: Accessor<UploadFile[]>;
+  selectFiles: (callback: (files: UploadFile[]) => void | Promise<void>) => void;
+  handleFilesInput: (
     event: Event & {
       currentTarget: HTMLInputElement;
       target: Element;
     }
-  ) => void | Promise<void>
-];
+  ) => void | Promise<void>;
+  removeFile: (fileName: string) => void;
+  clearFiles: () => void;
+};
 function createFileUploader(options?: FileUploaderOptions): any {
-  const [files, setFiles] = createSignal<UploadFile | UploadFile[]>([]);
+  const [files, setFiles] = createSignal<UploadFile | UploadFile[]>();
 
   let userCallback: FileSelectCallback;
 
@@ -97,7 +101,7 @@ function createFileUploader(options?: FileUploaderOptions): any {
     return userCallback(parsedFiles[0]);
   }
 
-  const uploadFiles = (callback: FileSelectCallback) => {
+  const selectFiles = (callback: FileSelectCallback) => {
     userCallback = callback;
 
     if (callback instanceof Promise) {
@@ -115,20 +119,42 @@ function createFileUploader(options?: FileUploaderOptions): any {
       currentTarget: HTMLInputElement;
       target: Element;
     }
-    // mode: "append" | "write"
+    // TODO: mode: "append" | "write"
   ) => {
     let filesArr: File[] = [];
     const target = event.currentTarget;
 
     filesArr = Array.from(target.files || []);
-    if (target.multiple && options?.multiple) {
+    if (options?.multiple) {
       setFiles(filesArr.map(transformFile));
     } else {
       setFiles(filesArr.map(transformFile)[0]);
     }
   };
 
-  return [files, uploadFiles, handleFileInput];
+  const removeFile = (fileName: string) => {
+    if (options?.multiple) {
+      setFiles(prev => (prev as UploadFile[]).filter(f => f.name !== fileName));
+    } else {
+      setFiles(undefined);
+    }
+  };
+
+  const clearFiles = () => {
+    if (options?.multiple) {
+      setFiles([]);
+    } else {
+      setFiles(undefined);
+    }
+  };
+
+  return {
+    files,
+    selectFiles,
+    handleFileInput,
+    removeFile,
+    clearFiles
+  };
 }
 
 function createDropzone() {

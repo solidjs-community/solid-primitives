@@ -7,7 +7,7 @@ const test = suite("createFileUploader");
 
 test("file upload", () => {
   createRoot(dispose => {
-    const [files, selectFiles] = createFileUploader();
+    const { files, selectFiles } = createFileUploader();
 
     assert.is(files(), null);
     dispose();

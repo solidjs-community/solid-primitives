@@ -27,13 +27,13 @@ Upload exports getter and setter. Depending on setter's settings, getter will re
 
 ```ts
 // multiple files
-const [files, selectFiles] = createFileUploader({ multiple: true, accept: "image/*" });
+const { files, selectFiles } = createFileUploader({ multiple: true, accept: "image/*" });
 selectFiles(files => {
   console.log(files);
 });
 
 // single file
-const [file, selectFile] = createFileUploader();
+const { file, selectFile } = createFileUploader();
 selectFile(({ source, name, size, file }) => {
   console.log({ source, name, size, file });
 });
