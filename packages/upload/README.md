@@ -21,18 +21,20 @@ yarn add @solid-primitives/upload
 
 ## How to use it
 
-### createUpload
+### createFileUploader
 
 Upload exports getter and setter. Depending on setter's settings, getter will return single file object or array of it.
 
 ```ts
-const [files, selectFiles] = createUpload();
-// single file
-selectFiles({ multiple: true }, (files: CustomFile[]) => {
+// multiple files
+const [files, selectFiles] = createFileUploader({ multiple: true, accept: "image/*" });
+selectFiles(files => {
   console.log(files);
 });
-// multiple files
-selectFile({}, ({ source, name, size, file }: CustomFile) => {
+
+// single file
+const [file, selectFile] = createFileUploader();
+selectFile(({ source, name, size, file }) => {
   console.log({ source, name, size, file });
 });
 ```

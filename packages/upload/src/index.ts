@@ -13,31 +13,23 @@ export type UploadFile = {
  * @property `accept` - Comma-separated list of one or more file types, or unique file type specifiers
  * @link `accept` - https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept
  */
-export type UploadSetter = (
-  {
-    accept,
-    multiple
-  }: {
-    accept?: string | undefined;
-    multiple?: boolean | undefined;
-  },
-  cb: (files: UploadFile | UploadFile[]) => void
-) => void;
-
-function createInputComponent({
-  multiple = false,
-  accept = ""
-}: {
-  multiple: boolean;
-  accept: string;
-}) {
-  const element = document.createElement("input");
-  element.type = "file";
-  element.accept = accept;
-  element.multiple = multiple;
-
-  return element;
-}
+export type FileUploaderOptions = {
+  accept?: string;
+  multiple?: boolean;
+};
+export type FileUploader = [
+  files: FileUploaderAccessor,
+  selectFile: (callback: FileSelectCallback) => void
+];
+export type FileUploaderAccessor = {
+  (): UploadFile;
+  (): UploadFile[];
+  (): null;
+};
+export type FileSelectCallback = {
+  (file: UploadFile): void;
+  (files: UploadFile[]): void;
+};
 
 /**
  * Primitive to make uploading files easier.
@@ -47,21 +39,30 @@ function createInputComponent({
  *
  * @example
  * ```ts
- * const [files, selectFiles] = createUpload();
- * // single file
- * selectFiles({ multiple: true, accept: "image/*" }, (files: CustomFile[]) => {
+ * // multiple files
+ * const [files, selectFiles] = createFileUploader({ multiple: true, accept: "image/*" });
+ * selectFiles(files => {
  *   console.log(files);
  * });
- * // multiple files
- * selectFile({}, ({ source, name, size, file }: CustomFile) => {
+ *
+ * // single file
+ * const [file, selectFile] = createFileUploader();
+ * selectFile(({ source, name, size, file }) => {
  *   console.log({ source, name, size, file });
  * });
  * ```
  */
-const createUpload = (): [Accessor<UploadFile | UploadFile[] | null>, UploadSetter] => {
+function createFileUploader(): [
+  files: Accessor<UploadFile>,
+  uploadFiles: (callback: (file: UploadFile) => void) => void
+];
+function createFileUploader(
+  options?: FileUploaderOptions
+): [files: Accessor<UploadFile[]>, uploadFiles: (callback: (files: UploadFile[]) => void) => void];
+function createFileUploader(options?: FileUploaderOptions): any {
   const [files, setFiles] = createSignal<UploadFile | UploadFile[] | null>(null);
 
-  let userCallback: any = () => {};
+  let userCallback: FileSelectCallback;
 
   async function onChange(this: HTMLInputElement, ev: Event) {
     const parsedFiles = [];
@@ -98,21 +99,25 @@ const createUpload = (): [Accessor<UploadFile | UploadFile[] | null>, UploadSett
     return userCallback(parsedFiles[0]);
   }
 
-  const uploadFile = (
-    { accept = "", multiple = false }: { accept?: string; multiple?: boolean },
-    cb: any
-  ) => {
-    if (typeof cb === "function") {
-      userCallback = cb;
-    }
+  const uploadFiles = (callback: FileSelectCallback = () => {}) => {
+    userCallback = callback;
 
-    const inputEL = createInputComponent({ multiple, accept });
+    const inputEL = createInputComponent(options || {});
 
     inputEL.addEventListener("change", onChange);
     inputEL.click();
   };
 
-  return [files, uploadFile];
-};
+  return [files, uploadFiles];
+}
 
-export default createUpload;
+export default createFileUploader;
+
+function createInputComponent({ multiple = false, accept = "" }: FileUploaderOptions) {
+  const element = document.createElement("input");
+  element.type = "file";
+  element.accept = accept;
+  element.multiple = multiple;
+
+  return element;
+}
