@@ -53,9 +53,9 @@ function repeat<T>(
 
 ## `<Repeat>`
 
-Creates a range of elements `of` specified size.
+Control Flow component for displaying a specified number of elements.
 
-The `of` argument is reactive, and changing it will only create new elements for the added numbers.
+The `times` prop is reactive – changing it will only create new elements for added numbers.
 
 ```tsx
 <Repeat times={10}>
