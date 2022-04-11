@@ -9,7 +9,7 @@ export interface DebouncedFunction<Args extends any[]> {
  * Creates a method that is debounced and cancellable.
  *
  * @param callback The callback to debounce
- * @param wait The duration to debounce
+ * @param wait The duration to debounce in milliseconds
  * @returns The debounced function
  *
  * @example
