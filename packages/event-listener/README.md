@@ -46,6 +46,12 @@ const clear = createEventListener(
 // to clear all of the event listeners
 clear();
 
+// when element is not wrapped in an accessor,
+// runs in createEffect so refs are already bound:
+let ref;
+createEventListener(ref, "mousemove", e => {});
+return <div ref={ref}/>;
+
 // target element and event name can be reactive signals
 const [ref, setRef] = createSignal<HTMLElement>();
 const [name, setName] = createSignal("mousemove");
