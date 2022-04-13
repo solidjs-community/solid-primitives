@@ -130,7 +130,7 @@ export function createStorage<O, T>(
     });
     return result;
   };
-  onMount(() => {
+  props?.sync !== false && onMount(() => {
     const listener = (ev: StorageEvent) => {
       let changed = false;
       apis.forEach(api => {
@@ -293,7 +293,7 @@ export function createAsyncStorage<O, T>(
     );
     return result;
   };
-  onMount(() => {
+  props?.sync !== false && onMount(() => {
     const listener = (ev: StorageEvent) => {
       let changed = false;
       apis.forEach(async api => {
@@ -364,7 +364,7 @@ export function createStorageSignal<T extends any, O extends any>(
       }
       return value;
     }, null);
-  const [accessor, setter] = createSignal<T | null>(read() ?? (initialValue as T));
+  const [accessor, setter] = createSignal<T | null>(read() ?? (initialValue as T), props as any);
   createEffect(() => {
     const value = accessor();
     const filteredValue = props?.serializer
@@ -380,7 +380,7 @@ export function createStorageSignal<T extends any, O extends any>(
     const value = read();
     setter(value as any);
   };
-  onMount(() => {
+  props?.sync !== false && onMount(() => {
     const listener = (ev: StorageEvent) => {
       let changed = false;
       apis.forEach(api => {

@@ -14,19 +14,33 @@ export type StorageDeserializer<T, O> = (value: string, key: string, options?: O
 export type StorageSerializer<T, O> = (value: T, key: string, options?: O) => string;
 
 export type StringStorageProps<A, O, T = string> = {
+  /** a Storage-like API, e.g. localStorage */
   api?: A | A[];
+  /** a function that parses the stored data after retrieval */
   deserializer?: StorageDeserializer<T, O>;
+  /** a function that serializes the data before storing */
   serializer?: StorageSerializer<T, O>;
+  /** options for the Storage-like API, if supported */
   options?: O;
+  /** a prefix for the keys */
   prefix?: string;
+  /** should the storage be synchronized via Storage events, default is `true`? */
+  sync?: boolean;
 };
 
 export type AnyStorageProps<A, O, T> = {
+  /** a Storage-like API, e.g. localStorage */
   api?: A | A[];
-  deserializer: StorageDeserializer<T, O>;
-  serializer: StorageSerializer<T, O>;
+  /** a function that parses the stored data after retrieval */
+  deserializer?: StorageDeserializer<T, O>;
+  /** a function that serializes the data before storing */
+  serializer?: StorageSerializer<T, O>;
+  /** options for the Storage-like API, if supported */
   options?: O;
+  /** a prefix for the keys */
   prefix?: string;
+  /** should the storage be synchronized via Storage events, default is `true`? */
+  sync?: boolean;
 };
 
 export type StorageProps<T, A, O> = T extends string
@@ -75,7 +89,12 @@ export type AsyncStorageActions<T> = {
 };
 
 export type StorageSignalProps<T, A, O> = StorageProps<T, A, O> & {
+  /** signal equality checker */
   equals?: false | ((prev: T, next: T) => boolean) | undefined;
+  /** signal name used in dev mode */
   name?: string | undefined;
+  
   internal?: boolean | undefined;
+  /** should the storage be synchronized via Storage events, default is `true`? */
+  sync?: boolean;
 };
