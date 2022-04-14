@@ -19,6 +19,18 @@ npm install @solid-primitives/fetch
 yarn add @solid-primitives/fetch
 ```
 
+### Additional requirements
+
+Since nodejs 17.5.0, the fetch API is available in node via the `--experimental-fetch` command line option. From version 18.0.0 upwards, it is supposed to become available out of the box. If you want to use `createFetch` on your server, but your nodejs version does not support the fetch API, you need to install node-fetch alongside this primitive:
+
+```bash
+npm install node-fetch
+# or
+yarn add node-fetch
+```
+
+If you fail to install it, but still run it on the server, you should see a nice error message that asks you to install it in the logs and your requests are all rejected.
+
 ## How to use it
 
 ```ts
@@ -65,5 +77,9 @@ Released CJS and SSR support.
 1.0.6
 
 Added missing server entry compile in TSUP and updated to Solid.
+
+1.0.7
+
+Improve server entry to make node-fetch optional in cases it is not needed.
 
 </details>
