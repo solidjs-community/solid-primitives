@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-listener",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Primitive to manage creating event listeners.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -61,6 +61,6 @@
   },
   "dependencies": {
     "@solid-primitives/utils": "^0.2.1",
-    "@solid-primitives/rootless": "^0.0.101"
+    "@solid-primitives/rootless": "^0.1.0"
   }
 }

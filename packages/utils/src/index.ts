@@ -1,18 +1,26 @@
-import { getOwner, onCleanup, on, createSignal, Accessor, DEV } from "solid-js";
+import {
+  getOwner,
+  onCleanup,
+  on,
+  createSignal,
+  Accessor,
+  DEV,
+  untrack,
+  Signal,
+  batch,
+  createComputed
+} from "solid-js";
 import type {
   BaseOptions,
   EffectFunction,
   NoInfer,
   OnOptions
 } from "solid-js/types/reactive/signal";
-import type { Store } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import type {
   AnyClass,
-  Destore,
   Fn,
   ItemsOf,
-  Keys,
   MaybeAccessor,
   MaybeAccessorValue,
   Noop,
@@ -20,7 +28,11 @@ import type {
   Values,
   Fallback,
   Trigger,
-  TriggerCache
+  TriggerCache,
+  AnyFunction,
+  AnyObject,
+  AnyStatic,
+  SetterValue
 } from "./types";
 
 export * from "./types";
@@ -47,12 +59,14 @@ export const warn: typeof console.warn = (...a) => isDev && console.warn(...a);
  */
 export const isDefined = <T>(value: T | undefined | null): value is T =>
   typeof value !== "undefined" && value !== null;
-export const isFunction = <T>(value: T | Function): value is Function =>
+export const isFunction = <T>(value: T | AnyFunction): value is AnyFunction =>
   typeof value === "function";
 export const isBoolean = (val: any): val is boolean => typeof val === "boolean";
 export const isNumber = (val: any): val is number => typeof val === "number";
 export const isString = (val: unknown): val is string => typeof val === "string";
-export const isObject = (val: any): val is object => toString.call(val) === "[object Object]";
+export const isObject = (val: any): val is object => typeof val === "object";
+/** Is value a record? Only `{}` matches, all other like `Array`, `null` or class instances won't. */
+export const isRecord = (val: any): val is object => toString.call(val) === "[object Object]";
 export const isArray = Array.isArray as (val: any) => val is any[];
 
 /**
@@ -117,6 +131,16 @@ export const includes = (arr: any[], ...items: any): boolean => {
  */
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
   isFunction(v) && !v.length ? v() : v;
+
+/** If value is a function – call it with a given argument – otherwise get the value as is */
+export function accessWith<T>(
+  v: T,
+  args: T extends AnyFunction ? MaybeAccessor<Parameters<T>> : never
+): T extends AnyFunction ? ReturnType<T> : T {
+  if (!isFunction(v)) return v as any;
+  const a = isFunction(args) ? untrack(args) : (args as any);
+  return v(...a);
+}
 
 /**
  * Accesses the value of a MaybeAccessor, but always returns an array
@@ -210,11 +234,9 @@ export const forEachEntry = <A extends MaybeAccessor<object>, O = MaybeAccessorV
 };
 
 /**
- * Get `Object.entries()` of an MaybeAccessor<object>
+ * Get typed `Object.entries()`
  */
-export const entries = <A extends MaybeAccessor<object>, O = MaybeAccessorValue<A>>(
-  object: A
-): [Keys<O>, Values<O>][] => Object.entries(access(object)) as [Keys<O>, Values<O>][];
+export const entries = Object.entries as <T extends AnyObject>(obj: T) => [keyof T, T[keyof T]][];
 
 /**
  * Get keys of an object
@@ -297,32 +319,6 @@ export function raceTimeout(
  * Solid's `onCleanup` that is registered only if there is a root.
  */
 export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
-
-/**
- * Allows the Solid's store to be destructured
- *
- * @param store
- * @returns Destructible object, with values changed to accessors
- *
- * @example
- * ```ts
- * const [state, setState] = createStore({
- *   count: 0,
- *   get double() { return this.count * 2 },
- * })
- * const { count, double } = destore(state)
- * // use it like a signal:
- * count()
- * ```
- */
-export function destore<T extends Object>(store: Store<T>): Destore<T> {
-  const _store = store as Record<string, any>;
-  const result: any = {};
-  Object.keys(_store).forEach(key => {
-    result[key] = isFunction(_store[key]) ? _store[key].bind(_store) : () => _store[key];
-  });
-  return result;
-}
 
 export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {
   push: (...callbacks: ((arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void)[]) => void;
@@ -425,4 +421,96 @@ export function createTriggerCache<T>(options?: BaseOptions): TriggerCache<T> {
       trigger[0]();
     }
   };
+}
+
+export type StaticStoreSetter<T extends Readonly<AnyStatic>> = {
+  (setter: (prev: T) => Partial<T>): T;
+  (state: Partial<T>): T;
+  <K extends keyof T>(key: K, state: SetterValue<T[K]>): T;
+};
+
+/**
+ * A shallow/flat and static store. It behaves similarly to the creatStore, but with limited features to keep it simple. Designed to be used for reactive objects with static keys, but dynamic values, like reactive Event State, location, etc.
+ * @param init initial value of the store, put every key you want to use here, you won't be able to delete/add keys later.
+ * @returns [reactive-readonly store, store setter]
+ */
+export function createStaticStore<T extends Readonly<AnyStatic>>(
+  init: T
+): [access: T, write: StaticStoreSetter<T>] {
+  const copy = { ...init };
+  const store = {} as T;
+  const cache = new Map<PropertyKey, Signal<any>>();
+
+  const getValue = <K extends keyof T>(key: K): T[K] => {
+    const saved = cache.get(key);
+    if (saved) return saved[0]();
+    const signal = createSignal<any>(copy[key], {
+      name: typeof key === "string" ? key : undefined
+    });
+    cache.set(key, signal);
+    delete copy[key];
+    return signal[0]();
+  };
+
+  const setValue = <K extends keyof T>(key: K, value: SetterValue<any>): void => {
+    const saved = cache.get(key);
+    if (saved) return saved[1](value);
+    copy[key] = accessWith(value, [copy[key]]);
+  };
+
+  for (const key of keys(init)) {
+    store[key] = undefined as any;
+    Object.defineProperty(store, key, {
+      get: getValue.bind(void 0, key)
+    });
+  }
+
+  const setter = (a: any, b?: SetterValue<any>) => {
+    if (typeof a === "object" || isFunction(a))
+      batch(() => {
+        for (const [key, value] of entries(accessWith(a, () => [store])))
+          setValue(key as keyof T, () => value);
+      });
+    else setValue(a, b);
+    return store;
+  };
+
+  return [store, setter];
+}
+
+export type SyncSignal<T, U> = {
+  get: () => T;
+  set: (v: U) => void;
+};
+
+/**
+ * For syncing two signal values with eachother.
+ */
+export function biSyncSignals<A, B>(a: SyncSignal<A, B>, b: SyncSignal<B, A>, init = false): void {
+  let causedA = false;
+  let causedB = false;
+  createComputed(
+    on(
+      a.get,
+      v => {
+        if (causedA) return;
+        causedB = true;
+        b.set(v);
+        causedB = false;
+      },
+      { defer: !init }
+    )
+  );
+  createComputed(
+    on(
+      b.get,
+      v => {
+        if (causedB) return;
+        causedA = true;
+        a.set(v);
+        causedA = false;
+      },
+      { defer: !init }
+    )
+  );
 }

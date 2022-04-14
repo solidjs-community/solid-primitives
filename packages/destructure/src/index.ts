@@ -40,7 +40,7 @@ export type DeepDestructure<T extends ReactiveSource> = {
     : Accessor<T[K]>;
 };
 
-const isReactiveObject = (value: any): boolean => isObject(value) || isArray(value);
+const isReactiveObject = (value: any): boolean => value !== null && isObject(value);
 
 /**
  * Cashed object getters.

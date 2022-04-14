@@ -1,0 +1,72 @@
+{
+  "name": "@solid-primitives/url",
+  "version": "0.0.100",
+  "description": "Reactive primitives covering Browser's location, URL and URLSearchParams interfaces.",
+  "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/davedbase/solid-primitives/tree/main/packages/url#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davedbase/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/davedbase/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "url",
+    "stage": 2,
+    "list": [
+      "createLocationState",
+      "createLocationSearchParams",
+      "createSearchParams",
+      "createURL",
+      "createURLRecord"
+    ],
+    "category": "Browser APIs"
+  },
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "vite serve --host",
+    "dev": "yarn start",
+    "build": "tsup",
+    "test": "vitest run test",
+    "test:watch": "vitest watch test"
+  },
+  "keywords": [
+    "URL",
+    "location",
+    "URLSearchParams",
+    "solid",
+    "primitives"
+  ],
+  "dependencies": {
+    "@solid-primitives/utils": "^0.6.0",
+    "@solid-primitives/event-listener": "^1.5.0",
+    "@solid-primitives/event-bus": "^0.0.112",
+    "@solid-primitives/immutable": "^0.0.110",
+    "@solid-primitives/rootless": "^0.1.0"
+  },
+  "devDependencies": {
+    "jsdom": "18.1.1",
+    "prettier": "^2.5.1",
+    "tslib": "^2.3.1",
+    "typescript": "^4.6.2",
+    "tsup": "^5.12.1",
+    "unocss": "0.29.5",
+    "vite": "2.8.6",
+    "vite-plugin-solid": "2.2.6",
+    "vitest": "^0.7.7"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.3.0"
+  }
+}

@@ -43,7 +43,7 @@ const App: Component = () => {
       <div class="wrapper-v" onclick={() => setCount(p => ++p)}>
         <button class="btn">{count()}</button>
       </div>
-      <Inner seconds={seconds()} count={count()} list={list()} />
+      {/* <Inner seconds={seconds()} count={count()} list={list()} /> */}
     </div>
   );
 };
