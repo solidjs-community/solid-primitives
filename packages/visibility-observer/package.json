@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/visibility-observer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Primitive to track page visibility",
   "author": "David Di Biase",
   "license": "MIT",

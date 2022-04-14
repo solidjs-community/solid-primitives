@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/destructure",
-  "version": "0.0.100",
+  "version": "0.1.0",
   "description": "Primitives for destructuring reactive objects – like props or stores – or signals of them into a separate accessors updated individually.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -49,10 +49,10 @@
     "prettier": "^2.5.1",
     "solid-register": "^0.1.5",
     "tslib": "^2.3.1",
-    "typescript": "^4.5.5",
     "tsup": "^5.11.13",
-    "uvu": "^0.5.3",
+    "typescript": "^4.5.5",
     "unocss": "^0.27.0",
+    "uvu": "^0.5.3",
     "vite": "2.8.5",
     "vite-plugin-solid": "2.2.5"
   },

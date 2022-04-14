@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/workers",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Primitives that support creating Web Workers.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",

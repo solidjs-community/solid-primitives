@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/input-mask",
-  "version": "0.0.101",
+  "version": "0.1.0",
   "description": "input masking event primitive.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [],
@@ -44,10 +44,10 @@
     "prettier": "^2.6.0",
     "solid-register": "^0.1.5",
     "tslib": "^2.3.1",
-    "typescript": "^4.6.2",
     "tsup": "^5.12.1",
-    "uvu": "^0.5.3",
+    "typescript": "^4.6.2",
     "unocss": "0.28.1",
+    "uvu": "^0.5.3",
     "vite": "2.8.6",
     "vite-plugin-solid": "2.2.6"
   },

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/signal-builders",
-  "version": "0.0.160",
+  "version": "0.1.0",
   "description": "A collection of chainable and composable reactive signal calculations, aka Signal Builders.",
   "author": "Your Name <you@youremail.com>",
   "license": "MIT",
@@ -35,16 +35,16 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^1.0.0",
-    "@solid-primitives/immutable": "^0.0.110"
+    "@solid-primitives/immutable": "^0.1.0",
+    "@solid-primitives/utils": "^1.0.0"
   },
   "devDependencies": {
     "jsdom": "^19.0.0",
     "prettier": "^2.5.1",
     "solid-register": "^0.1.5",
     "tslib": "^2.3.1",
-    "typescript": "^4.5.4",
     "tsup": "^5.11.11",
+    "typescript": "^4.5.4",
     "uvu": "^0.5.2"
   },
   "peerDependencies": {
