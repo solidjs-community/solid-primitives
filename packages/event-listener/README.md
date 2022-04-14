@@ -50,6 +50,13 @@ clear();
 const [ref, setRef] = createSignal<HTMLElement>();
 const [name, setName] = createSignal("mousemove");
 createEventListener(ref, name, e => {}, { passive: true });
+
+// also runs in createEffect so refs are already bound
+// (but variable refs need to be wrapped in functions)
+let ref;
+createEventListener(() => ref, "mousemove", e => {});
+return <div ref={ref}/>;
+
 ```
 
 #### Custom events
