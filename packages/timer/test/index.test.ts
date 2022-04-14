@@ -1,78 +1,62 @@
-import { render } from "solid-testing-library";
-import createInterval from "../src/index";
+import { createTimer, createPolled } from "../src/index";
+import { suite } from "uvu";
+import * as assert from "uvu/assert";
+import { createRoot } from "solid-js";
 
-describe("createInterval", (): void => {
-  test("is passed a `handler` and a `delay`", () => {
-    const handler = jest.fn();
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms + 5));
+}
 
-    createInterval(handler, 1000);
+const test = suite("timer");
 
-    expect(handler).toHaveBeenCalledTimes(0);
-    jest.advanceTimersByTime(5000);
-    expect(handler).toHaveBeenCalledTimes(5);
-  });
-
-  test('if you pass a `delay` of `null`, the timer is "paused"', () => {
-    const handler = jest.fn();
-
-    createInterval(handler, null);
-
-    jest.advanceTimersByTime(5000);
-    expect(handler).toHaveBeenCalledTimes(0);
-  });
-
-  test("if you pass a new `handler`, the timer will not restart ", () => {
-    const handler1 = jest.fn();
-    const handler2 = jest.fn();
-    let handler = handler1;
-
-    createInterval(handler, 1000);
-
-    jest.advanceTimersByTime(500);
-
-    handler = handler2;
-
-    jest.advanceTimersByTime(500);
-    expect(handler1).toHaveBeenCalledTimes(0);
-    expect(handler2).toHaveBeenCalledTimes(1);
-  });
-
-  test("if you pass a new `delay`, it will cancel the current timer and start a new one", () => {
-    const handler = jest.fn();
-    let delay = 500;
-
-    createInterval(handler, delay);
-
-    jest.advanceTimersByTime(1000);
-    expect(handler).toHaveBeenCalledTimes(2);
-
-    delay = 1000;
-    jest.advanceTimersByTime(5000);
-    expect(handler).toHaveBeenCalledTimes(7);
-  });
-
-  test('if you pass a new `delay` of `null`, it will cancel the current timer and "pause"', () => {
-    const handler = jest.fn();
-    let delay: number | null = 500;
-
-    createInterval(handler, delay);
-
-    jest.advanceTimersByTime(1000);
-    expect(handler).toHaveBeenCalledTimes(2);
-
-    delay = null;
-    jest.advanceTimersByTime(5000);
-    expect(handler).toHaveBeenCalledTimes(2);
-  });
-
-  test("passing the same parameters causes no change in the timer", () => {
-    const handler = jest.fn();
-
-    createInterval(handler, 1000);
-
-    jest.advanceTimersByTime(500);
-
-    jest.advanceTimersByTime(500);
-    expect(handler).toHaveBeenCalledTimes(1);
+test("createTimer with setTimeout calls callback as expected with number delay", async () => {
+  await createRoot(async dispose => {
+    let count = 0;
+    createTimer(() => count++, 100);
+    assert.equal(count, 0);
+    for (let i = 1; i < 5; i++) {
+      await sleep(100);
+      assert.equal(count, 1);
+    }
+    dispose();
   });
 });
+
+test("createTimer with setInterval calls callback as expected with number delay", async () => {
+  await createRoot(async dispose => {
+    let count = 0;
+    createTimer(() => count++, 100, setInterval);
+    assert.equal(count, 0);
+    for (let i = 1; i < 5; i++) {
+      await sleep(100);
+      assert.equal(count, i);
+    }
+    dispose();
+  });
+});
+
+test("createPolled with setTimeout calls callback as expected with number delay", async () => {
+  await createRoot(async dispose => {
+    const count = createPolled(prev => prev + 1, 100, 0, setTimeout);
+    assert.equal(count(), 0);
+    for (let i = 1; i < 5; i++) {
+      await sleep(100);
+      assert.equal(count(), 1);
+    }
+    dispose();
+  });
+});
+
+test("createPolled with setInterval calls callback as expected with number delay", async () => {
+  await createRoot(async dispose => {
+    const count = createPolled(prev => prev + 1, 100, 0);
+    assert.equal(count(), 0);
+    for (let i = 1; i < 5; i++) {
+      await sleep(100);
+      assert.equal(count(), i);
+    }
+    dispose();
+  });
+});
+
+test.run();
