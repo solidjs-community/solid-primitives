@@ -1,4 +1,4 @@
-import { Fn, warn } from "@solid-primitives/utils";
+import { warn } from "@solid-primitives/utils";
 import { Accessor, createRoot, onCleanup, untrack } from "solid-js";
 import { abs, accessor, ceil, floor, min, RangeProps, toFunction } from "./common";
 
@@ -30,7 +30,7 @@ export function mapRange<T>(
   mapFn: (n: number) => T,
   options: { fallback?: Accessor<T> } = {}
 ): Accessor<T[]> {
-  let disposers: Fn[] = [],
+  let disposers: VoidFunction[] = [],
     items: T[] = [],
     prevStart = 0,
     prevTo = 0,
@@ -39,7 +39,7 @@ export function mapRange<T>(
 
   onCleanup(() => disposers.forEach(f => f()));
 
-  const mapper = (i: number, n: number, items: T[], disposers: Fn[]): void =>
+  const mapper = (i: number, n: number, items: T[], disposers: VoidFunction[]): void =>
     createRoot(dispose => {
       disposers[i] = dispose;
       items[i] = mapFn(n);
@@ -79,8 +79,8 @@ export function mapRange<T>(
 
     const newLength = ceil((to - start) / step);
     const newItems = new Array(newLength) as T[];
-    const newDisposers = new Array(newLength) as Fn[];
-    const oldDisposers: (Fn | undefined)[] = disposers;
+    const newDisposers = new Array(newLength) as VoidFunction[];
+    const oldDisposers: (VoidFunction | undefined)[] = disposers;
     let end: number;
 
     // front - add

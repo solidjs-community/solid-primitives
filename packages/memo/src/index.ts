@@ -18,7 +18,7 @@ import type {
 } from "solid-js/types/reactive/signal";
 import debounce from "@solid-primitives/debounce";
 import throttle from "@solid-primitives/throttle";
-import { Fn, isFunction, ItemsOf } from "@solid-primitives/utils";
+import { ItemsOf } from "@solid-primitives/utils";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
@@ -50,11 +50,11 @@ const callbackWith = <A, T>(fn: (a: A) => T, v: Accessor<A>): (() => T) =>
  * setCount(2); // doesn't trigger callback
  */
 export function createPureReaction(
-  onInvalidate: Fn,
+  onInvalidate: VoidFunction,
   options?: EffectOptions
-): (tracking: Fn) => void {
+): (tracking: VoidFunction) => void {
   // current sources tracked by the user
-  const [trackedList, setTrackedList] = createSignal<Fn[]>([]);
+  const [trackedList, setTrackedList] = createSignal<VoidFunction[]>([]);
   let addedTracked = false;
 
   createComputed(() => {
@@ -378,8 +378,8 @@ export function createMemoCache<Key, Value>(
   const cache = new Map<Key, Accessor<Value>>();
   const owner = getOwner() as Owner;
 
-  const key = isFunction(args[1]) ? (args[0] as Accessor<Key>) : undefined,
-    calc = isFunction(args[1]) ? args[1] : (args[0] as CacheCalculation<Key, Value>),
+  const key = typeof args[1] === "function" ? (args[0] as Accessor<Key>) : undefined,
+    calc = typeof args[1] === "function" ? args[1] : (args[0] as CacheCalculation<Key, Value>),
     options = typeof args[1] === "object" ? args[1] : typeof args[2] === "object" ? args[2] : {};
 
   const run: CacheKeyAccessor<Key, Value> = key => {

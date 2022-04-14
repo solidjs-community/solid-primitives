@@ -58,7 +58,7 @@
   },
   "dependencies": {
     "@solid-primitives/event-listener": "^1.4.1",
-    "@solid-primitives/utils": "0.5.3",
+    "@solid-primitives/utils": "^1.0.0",
     "@solid-primitives/immutable": "^0.0.110"
   }
 }

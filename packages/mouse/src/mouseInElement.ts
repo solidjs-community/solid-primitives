@@ -1,4 +1,3 @@
-import { ClearListeners } from "@solid-primitives/event-listener";
 import { access, createCallbackStack, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createComputed, createSignal, onMount } from "solid-js";
 import { MouseOptions, MouseSourceType } from ".";
@@ -26,7 +25,7 @@ export function createMouseInElement(
     sourceType: Accessor<MouseSourceType>;
     isInside: Accessor<boolean>;
   },
-  clear: ClearListeners
+  clear: VoidFunction
 ] {
   const { touch = true, followTouch = true, initialValue = { x: 0, y: 0 } } = options;
   const [x, setX] = createSignal(initialValue.x);

@@ -1,4 +1,3 @@
-import { ClearListeners } from "@solid-primitives/event-listener";
 import { isClient, createCallbackStack } from "@solid-primitives/utils";
 import { Accessor, batch, createSignal } from "solid-js";
 import { addListener } from "./common";
@@ -40,7 +39,7 @@ export function createMousePosition(options: MouseOptions = {}): [
     y: Accessor<number>;
     sourceType: Accessor<MouseSourceType>;
   },
-  clear: ClearListeners
+  clear: VoidFunction
 ] {
   const { touch = true, followTouch = true, initialValue = { x: 0, y: 0 } } = options;
 

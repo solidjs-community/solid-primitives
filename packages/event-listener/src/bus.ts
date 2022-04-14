@@ -1,4 +1,4 @@
-import { Clear, createProxy, Get, isClient, Many, MaybeAccessor } from "@solid-primitives/utils";
+import { createProxy, isClient, Many, MaybeAccessor } from "@solid-primitives/utils";
 import { createEventListener } from "./eventListener";
 import { runWithSubRoot } from "@solid-primitives/rootless";
 import { EventMapOf, TargetWithEventMap, EventListenerOptions } from "./types";
@@ -7,13 +7,13 @@ import { getOwner } from "solid-js";
 export type EventListenerBus<EventMap extends Record<string, any>> = Readonly<
   {
     [K in `on${keyof EventMap extends string ? keyof EventMap : never}`]: (
-      handler: Get<EventMap[K extends `on${infer T}` ? T : never]>
-    ) => Clear;
+      handler: (event: EventMap[K extends `on${infer T}` ? T : never]) => void
+    ) => VoidFunction;
   } & {
     on: <T extends keyof EventMap>(
       type: MaybeAccessor<Many<T>>,
-      handler: Get<EventMap[T]>
-    ) => Clear;
+      handler: (event: EventMap[T]) => void
+    ) => VoidFunction;
   }
 >;
 
@@ -58,7 +58,7 @@ export function createEventListenerBus(
   options: EventListenerOptions = {}
 ) {
   const owner = getOwner();
-  const addListener = (type: MaybeAccessor<Many<string>>, handler: Get<any>) =>
+  const addListener = (type: MaybeAccessor<Many<string>>, handler: (v: any) => void) =>
     runWithSubRoot(
       () => {
         createEventListener(target, type, handler, options);
@@ -66,7 +66,7 @@ export function createEventListenerBus(
       owner,
       getOwner()
     );
-  return createProxy<Record<string, (a: any, b: any) => Clear>>({
+  return createProxy<Record<string, (a: any, b: any) => VoidFunction>>({
     get:
       key =>
       (...args) =>

@@ -1,4 +1,3 @@
-import { ClearListeners } from "@solid-primitives/event-listener";
 import { isClient, createCallbackStack } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal } from "solid-js";
 import { addListener } from "./common";
@@ -28,13 +27,13 @@ export interface MouseOnScreenOptions {
  */
 export function createMouseOnScreen(
   initialValue?: boolean
-): [onScreen: Accessor<boolean>, clear: ClearListeners];
+): [onScreen: Accessor<boolean>, clear: VoidFunction];
 export function createMouseOnScreen(
   options?: MouseOnScreenOptions
-): [onScreen: Accessor<boolean>, clear: ClearListeners];
+): [onScreen: Accessor<boolean>, clear: VoidFunction];
 export function createMouseOnScreen(
   a: MouseOnScreenOptions | boolean = {}
-): [onScreen: Accessor<boolean>, clear: ClearListeners] {
+): [onScreen: Accessor<boolean>, clear: VoidFunction] {
   let touch: boolean;
   let initialValue: boolean;
   if (typeof a === "object") {

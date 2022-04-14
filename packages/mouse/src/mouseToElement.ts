@@ -1,5 +1,5 @@
 import { omit } from "@solid-primitives/immutable";
-import { access, Fn, MaybeAccessor } from "@solid-primitives/utils";
+import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, batch, createComputed, createMemo, createSignal, onMount } from "solid-js";
 import {
   createMousePosition,
@@ -42,7 +42,7 @@ export function createMouseToElement(
     height: Accessor<number>;
     isInside: Accessor<boolean>;
   },
-  update: Fn
+  update: VoidFunction
 ] {
   const { initialValue = {} } = options;
 

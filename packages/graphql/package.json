@@ -61,6 +61,6 @@
   },
   "dependencies": {
     "node-fetch": "^2.6.6",
-    "@solid-primitives/utils": "^0.1.2"
+    "@solid-primitives/utils": "^1.0.0"
   }
 }

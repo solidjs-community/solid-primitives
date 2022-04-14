@@ -49,7 +49,7 @@
     "memo"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^0.2.1",
+    "@solid-primitives/utils": "^1.0.0",
     "@solid-primitives/debounce": "^1.2.0",
     "@solid-primitives/throttle": "^1.1.1"
   },

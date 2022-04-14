@@ -3,7 +3,6 @@ import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 import { Store } from "solid-js/store";
 import { createEventListener } from "./eventListener";
 import {
-  ClearListeners,
   EventListenerMapDirectiveProps,
   EventMapOf,
   TargetWithEventMap,
@@ -14,7 +13,7 @@ export type EventHandlersMap<EventMap> = {
   [EventName in keyof EventMap]: (event: EventMap[EventName]) => void;
 };
 
-export type EventListenerStoreReturns<E> = [lastEvents: Store<Partial<E>>, clear: ClearListeners];
+export type EventListenerStoreReturns<E> = [lastEvents: Store<Partial<E>>, clear: VoidFunction];
 
 /**
  * A helpful primitive that listens to a map of events. Handle them by individual callbacks.
@@ -44,7 +43,7 @@ export function createEventListenerMap<
   target: MaybeAccessor<Many<EventTarget>>,
   handlersMap: Partial<Pick<EventHandlersMap<EventMap>, UsedEvents>>,
   options?: EventListenerOptions
-): ClearListeners;
+): VoidFunction;
 
 // DOM Events
 export function createEventListenerMap<
@@ -55,13 +54,13 @@ export function createEventListenerMap<
   target: MaybeAccessor<Many<Target>>,
   handlersMap: HandlersMap,
   options?: EventListenerOptions
-): ClearListeners;
+): VoidFunction;
 
 export function createEventListenerMap(
   targets: MaybeAccessor<Many<EventTarget>>,
   handlersMap: Record<string, any>,
   options?: EventListenerOptions
-): ClearListeners {
+): VoidFunction {
   const { push, execute } = createCallbackStack();
   forEachEntry(handlersMap, (eventName, handler) => {
     push(createEventListener(targets, eventName, e => handler?.(e), options));

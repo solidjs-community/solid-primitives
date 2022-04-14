@@ -57,7 +57,7 @@ Check out [shared types](https://github.com/solidjs-community/solid-primitives/b
 function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(): [
   listen: GenericListen<[A0, A1, A2]>,
   emit: GenericEmit<[A0, A1, A2]>,
-  clear: ClearListeners
+  clear: VoidFunction
 ];
 ```
 
@@ -128,7 +128,7 @@ type Emitter<A0 = void, A1 = void, A2 = void> = {
   listen: GenericListenProtect<[A0, A1, A2]>;
   emit: GenericEmit<[A0, A1, A2]>;
   remove: Remove<A0, A1, A2>;
-  clear: ClearListeners;
+  clear: VoidFunction;
   has: (listener: GenericListener<[A0, A1, A2]>) => boolean;
 };
 
@@ -231,7 +231,7 @@ type EventBus<Event, V = Event | undefined> = {
   remove: EventBusRemove<Event, V>;
   listen: EventBusListen<Event, V>;
   emit: GenericEmit<[Event]>;
-  clear: ClearListeners;
+  clear: VoidFunction;
   has: (listener: EventBusListener<Event, V>) => boolean;
   value: Accessor<V>;
 };
@@ -414,9 +414,9 @@ function createEventHub<ChannelMap extends Record<string, EventHubChannel>>(
  */
 interface EventHubChannel {
   remove: (fn: (...payload: any[]) => void) => boolean;
-  listen: (listener: (...payload: any[]) => void, protect?: boolean) => Unsubscribe;
+  listen: (listener: (...payload: any[]) => void, protect?: boolean) => VoidFunction;
   emit: (...payload: any[]) => void;
-  clear: ClearListeners;
+  clear: VoidFunction;
   value: Accessor<any>;
 }
 type EventHub<ChannelMap extends Record<string, EventHubChannel>> = ChannelMap & {
@@ -424,10 +424,10 @@ type EventHub<ChannelMap extends Record<string, EventHubChannel>> = ChannelMap &
   off: EventHubOff<ChannelMap>;
   emit: EventHubEmit<ChannelMap>;
   clear: (event: keyof ChannelMap) => void;
-  clearAll: ClearListeners;
-  listen: (listener: EventHubListener<ChannelMap>, protect?: boolean) => Unsubscribe;
+  clearAll: VoidFunction;
+  listen: (listener: EventHubListener<ChannelMap>, protect?: boolean) => VoidFunction;
   remove: (listener: EventHubListener<ChannelMap>) => void;
-  clearGlobal: ClearListeners;
+  clearGlobal: VoidFunction;
   store: ValueMap<ChannelMap>;
 };
 ```

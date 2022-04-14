@@ -2,15 +2,13 @@ import {
   createCallbackStack,
   Many,
   MaybeAccessor,
-  forEach,
-  Fn,
-  isFunction,
   noop,
-  isServer
+  isServer,
+  access,
+  asArray
 } from "@solid-primitives/utils";
 import { Accessor, createEffect, onCleanup, createRenderEffect, createSignal } from "solid-js";
 import {
-  ClearListeners,
   EventListenerDirectiveProps,
   EventMapOf,
   TargetWithEventMap,
@@ -19,7 +17,7 @@ import {
 
 export type EventListenerSignalReturns<Event> = [
   lastEvent: Accessor<Event | undefined>,
-  clear: ClearListeners
+  clear: VoidFunction
 ];
 
 /**
@@ -49,7 +47,7 @@ export function createEventListener<
   type: MaybeAccessor<Many<EventType>>,
   handler: (event: EventMap[EventType]) => void,
   options?: EventListenerOptions
-): ClearListeners;
+): VoidFunction;
 
 // Custom Events
 export function createEventListener<
@@ -60,21 +58,21 @@ export function createEventListener<
   type: MaybeAccessor<Many<EventType>>,
   handler: (event: EventMap[EventType]) => void,
   options?: EventListenerOptions
-): ClearListeners;
+): VoidFunction;
 
 export function createEventListener(
   targets: MaybeAccessor<Many<EventTarget>>,
   type: MaybeAccessor<Many<string>>,
   handler: (event: Event) => void,
   options?: EventListenerOptions
-): ClearListeners {
+): VoidFunction {
   if (isServer) return noop;
   const cleanup = createCallbackStack();
 
   const attachListeners = () => {
     cleanup.execute();
-    forEach(type, type => {
-      forEach(targets, el => {
+    asArray(access(type)).forEach(type => {
+      asArray(access(targets)).forEach(el => {
         if (!el) return;
         el.addEventListener(type, handler, options);
         cleanup.push(() => el.removeEventListener(type, handler, options));
@@ -84,7 +82,7 @@ export function createEventListener(
 
   // if the target is an accessor the listeners will be added on the first effect (onMount)
   // so that when passed a jsx ref it will be availabe
-  if (isFunction(targets)) createEffect(attachListeners);
+  if (typeof targets === "function") createEffect(attachListeners);
   // if the target prop is NOT an accessor, the event listeners can be added right away
   else createRenderEffect(attachListeners);
 
@@ -143,7 +141,7 @@ export function createEventSignal(
   target: MaybeAccessor<Many<EventTarget>>,
   type: MaybeAccessor<Many<string>>,
   options?: EventListenerOptions
-): [Accessor<Event | undefined>, Fn] {
+): [Accessor<Event | undefined>, VoidFunction] {
   const [lastEvent, setLastEvent] = createSignal<Event>();
   const clear = createEventListener(target, type, setLastEvent, options);
   return [lastEvent, clear];

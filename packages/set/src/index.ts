@@ -1,5 +1,5 @@
 import { Accessor } from "solid-js";
-import { Get, createTriggerCache } from "@solid-primitives/utils";
+import { createTriggerCache } from "@solid-primitives/utils";
 
 export type SignalSet<T> = Accessor<T[]> & ReactiveSet<T>;
 
@@ -55,7 +55,7 @@ export class ReactiveSet<T> {
     list.forEach(v => this.s.add(v));
     this.cache.dirtyAll();
   }
-  forEach(cb: Get<T>) {
+  forEach(cb: (v: T) => void) {
     this.s.forEach(cb);
   }
   values(): IterableIterator<T> {

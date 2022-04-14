@@ -45,7 +45,7 @@ running(); // => true
 ```ts
 function createRAF(
   callback: FrameRequestCallback
-): [running: Accessor<boolean>, start: Fn, stop: Fn];
+): [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction];
 ```
 
 #### Warning

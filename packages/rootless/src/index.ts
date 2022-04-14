@@ -1,11 +1,10 @@
-import { AnyFunction, Fn, forEach, isDefined } from "@solid-primitives/utils";
+import { AnyFunction, asArray, access } from "@solid-primitives/utils";
 import { createRoot, getOwner, onCleanup, runWithOwner as _runWithOwner } from "solid-js";
 import type { Owner } from "solid-js/types/reactive/signal";
 
-export type Dispose = Fn;
 export type RunWithRootReturn<T> = T extends void | undefined | null
-  ? Dispose
-  : [returns: T, dispose: Dispose];
+  ? VoidFunction
+  : [returns: T, dispose: VoidFunction];
 
 /**
  * Solid's `runWithOwner` that allows `null` to be passed as an owner.
@@ -26,12 +25,14 @@ export const runWithOwner = _runWithOwner as <T>(o: Owner | null, fn: () => T) =
  * }, owner);
  */
 export function createSubRoot<T>(
-  fn: (dispose: Dispose) => T,
+  fn: (dispose: VoidFunction) => T,
   ...owners: (Owner | null | undefined)[]
 ): T {
   if (owners.length === 0) owners = [getOwner()];
   return createRoot(dispose => {
-    forEach(owners, owner => owner && runWithOwner(owner, () => onCleanup(dispose)));
+    asArray(access(owners)).forEach(
+      owner => owner && runWithOwner(owner, () => onCleanup(dispose))
+    );
     return fn(dispose);
   }, owners[0] || undefined);
 }
@@ -75,7 +76,7 @@ export const createCallback = <T extends AnyFunction>(
 export const runWithRoot = <T>(fn: () => T, detachedOwner?: Owner): RunWithRootReturn<T> =>
   createRoot(dispose => {
     const returns = fn();
-    return isDefined(returns) ? [returns, dispose] : dispose;
+    return returns !== undefined && returns !== null ? [returns, dispose] : dispose;
   }, detachedOwner) as RunWithRootReturn<T>;
 
 /**
@@ -102,7 +103,7 @@ export const runWithSubRoot = <T>(
 ): RunWithRootReturn<T> =>
   createSubRoot(dispose => {
     const returns = fn();
-    return isDefined(returns) ? [returns, dispose] : dispose;
+    return returns !== undefined && returns !== null ? [returns, dispose] : dispose;
   }, ...owners) as RunWithRootReturn<T>;
 
 // import { createEffect, createMemo, createResource } from "solid-js";

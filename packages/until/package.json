@@ -38,7 +38,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^0.1.2",
+    "@solid-primitives/utils": "^1.0.0",
     "@solid-primitives/rootless": "^0.0.100"
   },
   "devDependencies": {

@@ -1,19 +1,10 @@
 import type { Accessor } from "solid-js";
 
 /**
- * A function
- */
-export type Fn<R = void> = () => R;
-export type Get<T> = (v: T) => void;
-export type Clear = () => void;
-
-/**
  * Can be single or in an array
  */
 export type Many<T> = T | T[];
-
-export type Keys<O extends Object> = keyof O;
-export type Values<O extends Object> = O[Keys<O>];
+export type Values<O extends Object> = O[keyof O];
 
 export type Noop = (...a: any[]) => void;
 
@@ -114,12 +105,12 @@ export type Destore<T extends Object> = {
 };
 
 export type TriggerCache<T> = {
-  track: Get<T>;
-  dirty: Get<T>;
-  dirtyAll: Fn;
+  track: (v: T) => void;
+  dirty: (v: T) => void;
+  dirtyAll: VoidFunction;
 };
 
-export type Trigger = [track: Fn, dirty: Fn];
+export type Trigger = [track: VoidFunction, dirty: VoidFunction];
 
 export type Position = {
   x: number;

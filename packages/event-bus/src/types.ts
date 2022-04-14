@@ -1,8 +1,3 @@
-import { Fn } from "@solid-primitives/utils";
-
-export type ClearListeners = Fn;
-export type Unsubscribe = Fn;
-
 //
 // Listener Types
 //
@@ -19,21 +14,21 @@ export type Listen<A0 = void, A1 = void, A2 = void> = (
     : void extends A2
     ? GenericListener<[A0, A1]>
     : GenericListener<[A0, A1, A2]>
-) => Unsubscribe;
+) => VoidFunction;
 
 export type ListenProtect<A0 = void, A1 = void, A2 = void> = (
   listener: Parameters<Listen<A0, A1, A2>>[0],
   protect?: boolean
-) => Unsubscribe;
+) => VoidFunction;
 
 export type GenericListen<Payload extends any[] = []> = (
   listener: GenericListener<Payload>
-) => Unsubscribe;
+) => VoidFunction;
 
 export type GenericListenProtect<Payload extends any[] = []> = (
   listener: GenericListener<Payload>,
   protect?: boolean
-) => Unsubscribe;
+) => VoidFunction;
 
 //
 // Emit Types

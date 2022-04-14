@@ -1,6 +1,5 @@
 import { destructure } from "../src";
 import { createComputed, createRoot, createSignal } from "solid-js";
-import { tuple } from "@solid-primitives/utils";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
@@ -8,7 +7,7 @@ const test = suite("destructure");
 
 test("spread array", () =>
   createRoot(dispose => {
-    const [numbers, setNumbers] = createSignal(tuple([1, 2, 3]));
+    const [numbers, setNumbers] = createSignal([1, 2, 3] as [number, number, number]);
     const [first, second, last] = destructure(numbers);
 
     const updates = {

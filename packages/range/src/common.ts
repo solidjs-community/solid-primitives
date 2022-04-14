@@ -1,4 +1,4 @@
-import { isFunction, MaybeAccessor, MaybeAccessorValue } from "@solid-primitives/utils";
+import { MaybeAccessor, MaybeAccessorValue } from "@solid-primitives/utils";
 import { Accessor } from "solid-js";
 
 export type RangeProps =
@@ -14,5 +14,5 @@ export const toFunction =
   <T, A extends [] | any[]>(a: Accessor<T | ((...args: A) => T)>) =>
   (...args: A) => {
     const v = a();
-    return isFunction(v) ? v(...args) : v;
+    return typeof v === "function" ? (v as any)(...args) : v;
   };

@@ -1,6 +1,6 @@
-import { Fn, warn } from "@solid-primitives/utils";
+import { warn } from "@solid-primitives/utils";
 import { Accessor, createRoot, createSignal, onCleanup, Setter, untrack } from "solid-js";
-import { abs, accessor, ceil, min, RangeProps, sign, toFunction } from "./common";
+import { abs, ceil, min, RangeProps, sign, toFunction, accessor } from "./common";
 
 /**
  * Reactively maps a number range of specified `stop`, `to` and `step`, with a callback function - underlying helper for the `<IndexRange>` control flow.
@@ -30,7 +30,7 @@ export function indexRange<T>(
   mapFn: (n: Accessor<number>) => T,
   options: { fallback?: Accessor<T> } = {}
 ): Accessor<T[]> {
-  let disposers: Fn[] = [],
+  let disposers: VoidFunction[] = [],
     items: T[] = [],
     setters: Setter<number>[] = [],
     fallback = false;

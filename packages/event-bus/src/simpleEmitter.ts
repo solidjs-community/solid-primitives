@@ -1,4 +1,4 @@
-import { ClearListeners, GenericListener, GenericEmit, GenericListen } from "./types";
+import { GenericListener, GenericEmit, GenericListen } from "./types";
 import { onRootCleanup } from "./utils";
 
 /**
@@ -21,7 +21,7 @@ clear();
  */
 export function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(
   initial?: GenericListener<[A0, A1, A2]>[]
-): [listen: GenericListen<[A0, A1, A2]>, emit: GenericEmit<[A0, A1, A2]>, clear: ClearListeners] {
+): [listen: GenericListen<[A0, A1, A2]>, emit: GenericEmit<[A0, A1, A2]>, clear: VoidFunction] {
   const set = new Set(initial);
   onRootCleanup(() => set.clear());
 

@@ -1,4 +1,3 @@
-import { Get } from "@solid-primitives/utils";
 import { JSX } from "solid-js";
 
 export type PointerType = "mouse" | "touch" | "pen";
@@ -19,13 +18,13 @@ export type PointerEventNames =
 export type OnEventName<T extends string> = `on${Lowercase<T>}` | `on${Capitalize<T>}`;
 
 export type OnEventRecord<T extends string, V> = Record<OnEventName<T>, V>;
-export type Handler = Get<PointerEvent>;
+export type Handler = (e: PointerEvent) => void;
 
 export type AnyOnEventName = `on${string}`;
 export type ReverseOnEventName<T> = T extends string
   ? Lowercase<T extends `on${infer K}` ? K : `${T}`>
   : never;
-export type ParsedEventHandlers<H extends Record<AnyOnEventName, Get<any>>> = {
+export type ParsedEventHandlers<H extends Record<AnyOnEventName, (v: any) => void>> = {
   [K in ReverseOnEventName<keyof H>]: H[`on${K}`];
 };
 

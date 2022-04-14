@@ -1,5 +1,5 @@
-import { ClearListeners, createEventListenerMap } from "@solid-primitives/event-listener";
-import { access, Fn, MaybeAccessor, createCallbackStack } from "@solid-primitives/utils";
+import { createEventListenerMap } from "@solid-primitives/event-listener";
+import { access, MaybeAccessor, createCallbackStack } from "@solid-primitives/utils";
 import { Accessor, createComputed, createEffect, createSignal, JSX } from "solid-js";
 
 export type IsElementActiveProps = (isActive: boolean) => void;
@@ -20,7 +20,7 @@ export type E = JSX.Element;
  * @example
  * const [activeEl, { stop, start }] = createActiveElement()
  */
-export function createActiveElement(): [getter: Accessor<null | Element>, clear: ClearListeners] {
+export function createActiveElement(): [getter: Accessor<null | Element>, clear: VoidFunction] {
   const [active, setActive] = createSignal<Element | null>(null);
   const handleChange = () => setActive(window.document.activeElement);
 
@@ -46,7 +46,7 @@ export function createActiveElement(): [getter: Accessor<null | Element>, clear:
  */
 export function createIsElementActive(
   target: MaybeAccessor<Element>
-): [getter: Accessor<boolean>, clear: ClearListeners] {
+): [getter: Accessor<boolean>, clear: VoidFunction] {
   const [isActive, setIsActive] = createSignal(false);
   const handleFocus = () => setIsActive(true);
   const handleBlur = () => setIsActive(false);

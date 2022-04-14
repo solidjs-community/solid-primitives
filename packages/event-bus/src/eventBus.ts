@@ -1,6 +1,6 @@
 import { Accessor, createSignal } from "solid-js";
 import { createEmitter, EmitterConfig } from "./emitter";
-import { ClearListeners, GenericEmit, GenericListener, ListenProtect } from "./types";
+import { GenericEmit, GenericListener, ListenProtect } from "./types";
 
 export type EventBusListener<Event, V = Event | undefined> = GenericListener<[Event, V]>;
 export type EventBusListen<Event, V = Event | undefined> = ListenProtect<Event, V>;
@@ -13,7 +13,7 @@ export type EventBus<Event, V = Event | undefined> = {
   remove: EventBusRemove<Event, V>;
   listen: EventBusListen<Event, V>;
   emit: GenericEmit<[Event]>;
-  clear: ClearListeners;
+  clear: VoidFunction;
   has: (listener: EventBusListener<Event, V>) => boolean;
   value: Accessor<V>;
 };

@@ -49,7 +49,7 @@ function createMousePosition(options: MouseOptions = {}): [
     y: Accessor<number>;
     sourceType: Accessor<MouseSourceType>;
   },
-  clear: ClearListeners
+  clear: VoidFunction
 ];
 interface MouseOptions {
   /**
@@ -119,7 +119,7 @@ function createMouseToElement(
     height: Accessor<number>;
     isInside: Accessor<boolean>;
   },
-  update: Fn
+  update: VoidFunction
 ];
 interface Position {
   x: number;
@@ -169,7 +169,7 @@ function createMouseInElement(
     sourceType: Accessor<MouseSourceType>;
     isInside: Accessor<boolean>;
   },
-  clear: ClearListeners
+  clear: VoidFunction
 ];
 type MouseSourceType = "mouse" | "touch" | null;
 ```
@@ -194,10 +194,10 @@ clear();
 ```ts
 function createMouseOnScreen(
   initialValue?: boolean
-): [onScreen: Accessor<boolean>, clear: ClearListeners];
+): [onScreen: Accessor<boolean>, clear: VoidFunction];
 function createMouseOnScreen(
   options?: MouseOnScreenOptions
-): [onScreen: Accessor<boolean>, clear: ClearListeners];
+): [onScreen: Accessor<boolean>, clear: VoidFunction];
 
 interface MouseOnScreenOptions {
   /**

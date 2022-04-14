@@ -1,12 +1,6 @@
 import { push } from "@solid-primitives/immutable";
 import { createEffect, createSignal, getOwner, on, onCleanup } from "solid-js";
-import {
-  GenericEmit,
-  GenericListen,
-  GenericListener,
-  GenericListenProtect,
-  Unsubscribe
-} from "./types";
+import { GenericEmit, GenericListen, GenericListener, GenericListenProtect } from "./types";
 
 export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
 
@@ -53,17 +47,17 @@ export function toPromise<T extends any[]>(
 export function once<T extends any[] = []>(
   subscribe: GenericListen<T>,
   listener: GenericListener<T>
-): Unsubscribe;
+): VoidFunction;
 export function once<T extends any[] = []>(
   subscribe: GenericListenProtect<T>,
   listener: GenericListener<T>,
   protect?: boolean
-): Unsubscribe;
+): VoidFunction;
 export function once<T extends any[] = []>(
   subscribe: GenericListenProtect<T>,
   listener: GenericListener<T>,
   protect?: boolean
-): Unsubscribe {
+): VoidFunction {
   const unsub = subscribe((...payload) => {
     unsub();
     listener(...payload);

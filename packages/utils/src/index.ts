@@ -1,24 +1,12 @@
-import { getOwner, onCleanup, on, createSignal, Accessor, DEV } from "solid-js";
-import type {
-  BaseOptions,
-  EffectFunction,
-  NoInfer,
-  OnOptions
-} from "solid-js/types/reactive/signal";
-import type { Store } from "solid-js/store";
+import { getOwner, onCleanup, createSignal, Accessor, DEV } from "solid-js";
+import type { BaseOptions } from "solid-js/types/reactive/signal";
 import { isServer } from "solid-js/web";
 import type {
   AnyClass,
-  Destore,
-  Fn,
-  ItemsOf,
-  Keys,
   MaybeAccessor,
   MaybeAccessorValue,
   Noop,
-  OnAccessEffectFunction,
   Values,
-  Fallback,
   Trigger,
   TriggerCache
 } from "./types";
@@ -36,24 +24,11 @@ export const isClient = !isServer;
 export { isServer };
 
 /** development environment */
-export const isDev = DEV && DEV.hasOwnProperty("writeSignal");
+export const isDev = DEV && isClient;
 /** production environment */
 export const isProd = !isDev;
 /** `console.warn` only during development */
 export const warn: typeof console.warn = (...a) => isDev && console.warn(...a);
-
-/**
- * `if (typeof value !== "undefined" && value !== null)`
- */
-export const isDefined = <T>(value: T | undefined | null): value is T =>
-  typeof value !== "undefined" && value !== null;
-export const isFunction = <T>(value: T | Function): value is Function =>
-  typeof value === "function";
-export const isBoolean = (val: any): val is boolean => typeof val === "boolean";
-export const isNumber = (val: any): val is number => typeof val === "number";
-export const isString = (val: unknown): val is string => typeof val === "string";
-export const isObject = (val: any): val is object => toString.call(val) === "[object Object]";
-export const isArray = Array.isArray as (val: any) => val is any[];
 
 /**
  * Check if the value is an instance of ___
@@ -64,50 +39,6 @@ export const ofClass = (v: any, c: AnyClass): boolean =>
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
 
 /**
- * for creating tuples by inferring type
- * @example
- * const users = tuple(["John", "Jeff", "Joe"]);
- * users // T: [string, string, string]
- */
-export const tuple = <T extends [] | any[]>(input: T): T => input;
-
-/**
- * Removes the `null` and `undefined` from the type.
- * @warning **Obviously use with caution**
- */
-export const definite = <T>(v: T) => v as NonNullable<T>;
-
-/**
- * Get the value if it is defined, or get the fallback otherwise
- * @param v the value to check
- * @param fallback the fallback value
- */
-export function withFallback<T>(v: T, fallback: NonNullable<T>): Fallback<T>;
-export function withFallback<T, F>(v: T, fallback: F): Fallback<T, F>;
-export function withFallback(v: any, fallback: any): any {
-  return isDefined(v) ? v : fallback;
-}
-
-/**
- * Get the value if it is defined, or get the fallback otherwise
- * @param v the value to check
- * @param fallback function returning a fallback value
- */
-export function withFallbackFn<T>(v: T, fallback: () => NonNullable<T>): Fallback<T>;
-export function withFallbackFn<T, F>(v: T, fallback: () => F): Fallback<T, F>;
-export function withFallbackFn(v: any, fallback: () => any): any {
-  return isDefined(v) ? v : fallback();
-}
-
-/** `Array.prototype.includes()` without so strict types. Also allows for checking for multiple items */
-export const includes = (arr: any[], ...items: any): boolean => {
-  for (const item of arr) {
-    if (items.includes(item)) return true;
-  }
-  return false;
-};
-
-/**
  * Accesses the value of a MaybeAccessor
  * @example
  * ```ts
@@ -116,21 +47,7 @@ export const includes = (arr: any[], ...items: any): boolean => {
  * ```
  */
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
-  isFunction(v) && !v.length ? v() : v;
-
-/**
- * Accesses the value of a MaybeAccessor, but always returns an array
- * @example
- * ```ts
- * accessAsArray('abc') // => ['abc']
- * accessAsArray(() => 'abc') // => ['abc']
- * accessAsArray([1,2,3]) // => [1,2,3]
- * accessAsArray(() => [1,2,3]) // => [1,2,3]
- * ```
- */
-export const accessAsArray = <T extends MaybeAccessor<any>, V = MaybeAccessorValue<T>>(
-  value: T
-): V extends any[] ? V : V[] => asArray(access(value)) as any;
+  typeof v === "function" && !v.length ? v() : v;
 
 export const asArray = <T>(value: T): T extends any[] ? T : T[] =>
   Array.isArray(value) ? (value as any) : [value];
@@ -155,40 +72,12 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
   fn: (value: NonNullable<V>) => void
 ) => {
   const _value = access(value);
-  isDefined(_value) && fn(_value as NonNullable<V>);
+  typeof _value !== "undefined" && _value !== null && fn(_value as NonNullable<V>);
 };
 
 export const asAccessor = <A extends MaybeAccessor<unknown>>(
   v: A
-): Accessor<MaybeAccessorValue<A>> => (isFunction(v) ? (v as any) : () => v);
-
-export function onAccess<S extends MaybeAccessor<unknown>[] | [], Next, Init = unknown>(
-  deps: S,
-  fn: OnAccessEffectFunction<S, Init | Next, Next>,
-  options?: OnOptions
-): EffectFunction<NoInfer<Init> | NoInfer<Next>, NoInfer<Next>> {
-  const source = deps.map(asAccessor);
-  return (on as any)(source, fn, options);
-}
-
-/**
- * Quickly iterate over an MaybeAccessor<any>
- *
- * @example
- * ```ts
- * const myFunc = (source: MaybeAccessor<string[]>) => {
- *    forEach(source, item => console.log(item))
- * }
- * ```
- */
-export const forEach = <A extends MaybeAccessor<any>, V = MaybeAccessorValue<A>>(
-  array: A,
-  iterator: (
-    item: V extends any[] ? ItemsOf<V> : V,
-    index: number,
-    array: V extends any[] ? V : V[]
-  ) => void
-): void => accessAsArray(array).forEach(iterator as any);
+): Accessor<MaybeAccessorValue<A>> => (typeof v === "function" ? (v as any) : () => v);
 
 /**
  * Iterate through object entries.
@@ -214,7 +103,7 @@ export const forEachEntry = <A extends MaybeAccessor<object>, O = MaybeAccessorV
  */
 export const entries = <A extends MaybeAccessor<object>, O = MaybeAccessorValue<A>>(
   object: A
-): [Keys<O>, Values<O>][] => Object.entries(access(object)) as [Keys<O>, Values<O>][];
+): [keyof O, Values<O>][] => Object.entries(access(object)) as [keyof O, Values<O>][];
 
 /**
  * Get keys of an object
@@ -298,39 +187,13 @@ export function raceTimeout(
  */
 export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
 
-/**
- * Allows the Solid's store to be destructured
- *
- * @param store
- * @returns Destructible object, with values changed to accessors
- *
- * @example
- * ```ts
- * const [state, setState] = createStore({
- *   count: 0,
- *   get double() { return this.count * 2 },
- * })
- * const { count, double } = destore(state)
- * // use it like a signal:
- * count()
- * ```
- */
-export function destore<T extends Object>(store: Store<T>): Destore<T> {
-  const _store = store as Record<string, any>;
-  const result: any = {};
-  Object.keys(_store).forEach(key => {
-    result[key] = isFunction(_store[key]) ? _store[key].bind(_store) : () => _store[key];
-  });
-  return result;
-}
-
 export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {
   push: (...callbacks: ((arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void)[]) => void;
   execute: (arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void;
-  clear: Fn;
+  clear: VoidFunction;
 } => {
   let stack: Array<(arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void> = [];
-  const clear: Fn = () => (stack = []);
+  const clear: VoidFunction = () => (stack = []);
   return {
     push: (...callbacks) => stack.push(...callbacks),
     execute(arg0, arg1, arg2, arg3) {

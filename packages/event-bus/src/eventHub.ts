@@ -1,8 +1,8 @@
 import { createEventBus } from "./eventBus";
 import { createEmitter } from "./emitter";
-import { ClearListeners, Unsubscribe, GenericListener } from "./types";
+import { GenericListener } from "./types";
 import { Accessor } from "solid-js";
-import { Keys, Values } from "@solid-primitives/utils";
+import { Values } from "@solid-primitives/utils";
 
 type PayloadMap<ChannelMap extends Record<string, EventHubChannel>> = {
   [Name in keyof ChannelMap]: Parameters<ChannelMap[Name]["emit"]>;
@@ -13,7 +13,7 @@ type ValueMap<ChannelMap extends Record<string, EventHubChannel>> = {
 };
 
 export type EventHubListener<ChannelMap extends Record<string, EventHubChannel>> = (
-  name: Keys<ChannelMap>,
+  name: keyof ChannelMap,
   payload: Values<PayloadMap<ChannelMap>>
 ) => void;
 
@@ -23,7 +23,7 @@ export type EventHubOn<ChannelMap extends Record<string, EventHubChannel>> = <
   name: Name,
   listener: GenericListener<PayloadMap<ChannelMap>[Name]>,
   protect?: boolean
-) => Unsubscribe;
+) => VoidFunction;
 
 export type EventHubOff<ChannelMap extends Record<string, EventHubChannel>> = <
   Name extends keyof ChannelMap
@@ -44,9 +44,9 @@ export type EventHubEmit<ChannelMap extends Record<string, EventHubChannel>> = <
  */
 export interface EventHubChannel {
   remove: (fn: (...payload: any[]) => void) => boolean;
-  listen: (listener: (...payload: any[]) => void, protect?: boolean) => Unsubscribe;
+  listen: (listener: (...payload: any[]) => void, protect?: boolean) => VoidFunction;
   emit: (...payload: any[]) => void;
-  clear: ClearListeners;
+  clear: VoidFunction;
   value: Accessor<any>;
 }
 
@@ -55,10 +55,10 @@ export type EventHub<ChannelMap extends Record<string, EventHubChannel>> = Chann
   off: EventHubOff<ChannelMap>;
   emit: EventHubEmit<ChannelMap>;
   clear: (event: keyof ChannelMap) => void;
-  clearAll: ClearListeners;
-  listen: (listener: EventHubListener<ChannelMap>, protect?: boolean) => Unsubscribe;
+  clearAll: VoidFunction;
+  listen: (listener: EventHubListener<ChannelMap>, protect?: boolean) => VoidFunction;
   remove: (listener: EventHubListener<ChannelMap>) => void;
-  clearGlobal: ClearListeners;
+  clearGlobal: VoidFunction;
   store: ValueMap<ChannelMap>;
 };
 

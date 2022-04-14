@@ -35,7 +35,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^0.5.2",
+    "@solid-primitives/utils": "^1.0.0",
     "@solid-primitives/immutable": "^0.0.110"
   },
   "devDependencies": {
