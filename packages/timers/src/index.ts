@@ -6,9 +6,11 @@ import { createSignal, onCleanup, createEffect, untrack, Accessor } from "solid-
  * @param fn Function to be called every {@link delay}.
  * @param delay Number representing the time between executions of {@link fn} in ms.
  */
-export const createBasicInterval = (fn: () => void, delay: number) => {
+export const createBasicInterval = (fn: () => void, delay: number): (() => void) => {
   const intervalId = setInterval(fn, delay);
-  onCleanup(() => clearInterval(intervalId));
+  const clear = () => clearInterval(intervalId);
+  onCleanup(clear);
+  return clear;
 };
 
 /**
@@ -17,9 +19,11 @@ export const createBasicInterval = (fn: () => void, delay: number) => {
  * @param fn Function to be called after {@link delay}.
  * @param delay Number representing the time before calling {@link fn} in ms.
  */
-export const createBasicTimeout = (fn: () => void, delay: number) => {
+export const createBasicTimeout = (fn: () => void, delay: number): (() => void) => {
   const timeoutId = setTimeout(fn, delay);
-  onCleanup(() => clearTimeout(timeoutId));
+  const clear = () => clearTimeout(timeoutId);
+  onCleanup(clear);
+  return clear;
 };
 
 /**
