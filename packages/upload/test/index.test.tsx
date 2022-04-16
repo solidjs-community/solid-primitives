@@ -1,27 +1,19 @@
 import { createRoot } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
-import createFileUploader from "../src";
+import { createFileUploader } from "../src";
 
 const test = suite("createFileUploader");
 
 test("file upload", () => {
   createRoot(dispose => {
-    const { files, selectFiles } = createFileUploader();
+    const { files: file, selectFiles: selectFile } = createFileUploader();
+    const { files, selectFiles } = createFileUploader({ multiple: true });
 
-    assert.is(files(), null);
+    assert.is(file(), undefined);
+    assert.is(files(), undefined);
     dispose();
   });
 });
 
 test.run();
-
-/**
- * - selectFiles is called
- * - input element is created with type of 'file'
- * - 'change' event listener is attached
- * - 'change' event listener is called
- * - event.files is parsed
- * - files updated to array or object
- * - user provided callback is called
- */

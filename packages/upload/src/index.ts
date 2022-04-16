@@ -9,24 +9,50 @@ export type UploadFile = {
   size: number;
   file: File;
 };
+
 /**
  * @property `accept` - Comma-separated list of one or more file types, or unique file type specifiers
  * @link `accept` - https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept
  */
-export type FileUploaderOptions = {
+export type CreateFileUploaderOptions = {
   accept?: string;
   multiple?: boolean;
 };
+
 export type FileSelectCallback = {
   (file: UploadFile): void | Promise<void>;
   (files: UploadFile[]): void | Promise<void>;
 };
 
+export interface FilesUploader {
+  files: Accessor<UploadFile[]>;
+  selectFiles: (callback: (file: UploadFile[]) => void | Promise<void>) => void;
+  /**
+   * `change` event handler for input element. Handles `drop` event as well
+   */
+  handleFilesInput: (
+    event: (Event | DragEvent) & {
+      currentTarget: HTMLInputElement;
+      target: Element;
+    }
+  ) => void | Promise<void>;
+  removeFile: (fileName: string) => void;
+  clearFiles: () => void;
+}
+
+export interface FileUploader extends Omit<FilesUploader, "files" | "selectFiles"> {
+  files: Accessor<UploadFile>;
+  selectFiles: (callback: (file: UploadFile) => void | Promise<void>) => void;
+}
+
 /**
  * Primitive to make uploading files easier.
  *
- * @return files - Uploaded file or files
- * @return selectFiles - Setter function
+ * @returns `file (files)`
+ * @returns `selectFile (selectFiles)` - Open file picker and set files
+ * @returns `handleFileInput (handleFilesInput)` - Event handler for `<input type="file" />`
+ * @returns `removeFile`
+ * @returns `clearFiles`
  *
  * @example
  * ```ts
@@ -43,31 +69,10 @@ export type FileSelectCallback = {
  * });
  * ```
  */
-function createFileUploader(): {
-  file: Accessor<UploadFile>;
-  selectFile: (callback: (file: UploadFile) => void | Promise<void>) => void;
-  handleFileInput: (
-    event: Event & {
-      currentTarget: HTMLInputElement;
-      target: Element;
-    }
-  ) => void | Promise<void>;
-  removeFile: (fileName: string) => void;
-  clearFiles: () => void;
-};
-function createFileUploader(options?: FileUploaderOptions): {
-  files: Accessor<UploadFile[]>;
-  selectFiles: (callback: (files: UploadFile[]) => void | Promise<void>) => void;
-  handleFilesInput: (
-    event: Event & {
-      currentTarget: HTMLInputElement;
-      target: Element;
-    }
-  ) => void | Promise<void>;
-  removeFile: (fileName: string) => void;
-  clearFiles: () => void;
-};
-function createFileUploader(options?: FileUploaderOptions): any {
+
+function createFileUploader(): FileUploader;
+function createFileUploader(options?: CreateFileUploaderOptions): FilesUploader;
+function createFileUploader(options?: CreateFileUploaderOptions): any {
   const [files, setFiles] = createSignal<UploadFile | UploadFile[]>();
 
   let userCallback: FileSelectCallback;
@@ -114,17 +119,15 @@ function createFileUploader(options?: FileUploaderOptions): any {
     inputEL.click();
   };
 
-  const handleFileInput = async (
-    event: Event & {
+  const handleFilesInput = async (
+    event: (Event | DragEvent) & {
       currentTarget: HTMLInputElement;
       target: Element;
     }
-    // TODO: mode: "append" | "write"
   ) => {
-    let filesArr: File[] = [];
-    const target = event.currentTarget;
-
-    filesArr = Array.from(target.files || []);
+    const filesArr: File[] = Array.from(
+      event?.currentTarget?.files || (event as DragEvent)?.dataTransfer?.files || []
+    );
     if (options?.multiple) {
       setFiles(filesArr.map(transformFile));
     } else {
@@ -151,21 +154,15 @@ function createFileUploader(options?: FileUploaderOptions): any {
   return {
     files,
     selectFiles,
-    handleFileInput,
+    handleFilesInput,
     removeFile,
     clearFiles
   };
 }
 
-function createDropzone() {
-  // TODO: handleFileInput
-  // * } else if (target.dataTransfer.files) {
-  // * filesArr = Array.from(target.dataTransfer.files);
-}
+export { createFileUploader };
 
-export { createFileUploader, createDropzone };
-
-function createInputComponent({ multiple = false, accept = "" }: FileUploaderOptions) {
+function createInputComponent({ multiple = false, accept = "" }: CreateFileUploaderOptions) {
   const element = document.createElement("input");
   element.type = "file";
   element.accept = accept;
