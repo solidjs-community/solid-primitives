@@ -5,6 +5,7 @@ import { createSignal, onCleanup, createEffect, untrack, Accessor } from "solid-
  *
  * @param fn Function to be called every {@link delay}.
  * @param delay Number representing the time between executions of {@link fn} in ms.
+ * @returns Function to manually clear the interval
  */
 export const createBasicInterval = (fn: () => void, delay: number): (() => void) => {
   const intervalId = setInterval(fn, delay);
@@ -17,7 +18,8 @@ export const createBasicInterval = (fn: () => void, delay: number): (() => void)
  * {@link setTimeout} which automatically clears when the reactive scope is disposed.
  *
  * @param fn Function to be called after {@link delay}.
- * @param delay Number representing the time before calling {@link fn} in ms.
+ * @param delay Number representing the time before executing {@link fn} in ms.
+ * @returns Function to manually clear the timeout
  */
 export const createBasicTimeout = (fn: () => void, delay: number): (() => void) => {
   const timeoutId = setTimeout(fn, delay);
@@ -27,14 +29,48 @@ export const createBasicTimeout = (fn: () => void, delay: number): (() => void) 
 };
 
 /**
- * {@link setInterval} with an optionally reactive interval. If it changes, the time
- * since the previous execution will be counted towards the new interval as well.
+ * {@link setTimeout} with an optionally reactive delay. If it changes, the elapsed fraction
+ * of the previous delay will be counted as elapsed for the new delay as well.
+ *
+ * @param fn Function to be called after {@link delay}.
+ * @param delay Number representing the time before executing {@link fn} in ms.
+ */
+export const createTimeout = (fn: () => void, delay: number | Accessor<number>) => {
+  if (typeof delay === "number") {
+    createBasicTimeout(fn, delay);
+    return;
+  }
+
+  let done = false;
+  let fractionDone = 0;
+  let prev = performance.now();
+  const callHandlerAndSetDone = () => {
+    fn();
+    done = true;
+  };
+
+  createEffect((prevTimeout?: number) => {
+    if (done) return;
+    const currTimeout = delay();
+    if (prevTimeout) {
+      const curr = performance.now();
+      fractionDone += (curr - prev) / prevTimeout;
+      prev = curr;
+    }
+    createBasicTimeout(callHandlerAndSetDone, (1 - fractionDone) * currTimeout);
+    return currTimeout;
+  });
+};
+
+/**
+ * {@link setInterval} with an optionally reactive delay. If it changes, the elapsed fraction
+ * of the previous delay will be counted as elapsed for the first new delay as well.
  *
  * @param fn Function to be called every {@link delay}.
  * @param delay Number or {@link Accessor} containing a number representing
  * the time between executions of {@link fn} in ms.
  */
-export const createInterval = (fn: () => void, delay: Accessor<number> | number): void => {
+export const createInterval = (fn: () => void, delay: number | Accessor<number>): void => {
   if (typeof delay === "number") {
     createBasicInterval(fn, delay);
     return;
@@ -78,45 +114,11 @@ export const createInterval = (fn: () => void, delay: Accessor<number> | number)
 };
 
 /**
- * {@link setTimeout} with an optionally reactive timeout. If it changes, the time
- * since the previous execution will be counted towards the new interval as well.
- *
- * @param fn Function to be called after {@link delay}.
- * @param delay Number representing the time before calling {@link fn} in ms.
- */
-export const createTimeout = (fn: () => void, delay: number | Accessor<number>) => {
-  if (typeof delay === "number") {
-    createBasicTimeout(fn, delay);
-    return;
-  }
-
-  let done = false;
-  let fractionDone = 0;
-  let prev = performance.now();
-  const callHandlerAndSetDone = () => {
-    fn();
-    done = true;
-  };
-
-  createEffect((prevTimeout?: number) => {
-    if (done) return;
-    const currTimeout = delay();
-    if (prevTimeout) {
-      const curr = performance.now();
-      fractionDone += (curr - prev) / prevTimeout;
-      prev = curr;
-    }
-    createBasicTimeout(callHandlerAndSetDone, (1 - fractionDone) * currTimeout);
-    return currTimeout;
-  });
-};
-
-/**
  * Like {@link createInterval}, except the timeout only updates between executions.
  *
  * @param handler Function to be called every {@link timeout}
  * @param timeout Number or Function returning a number representing
- * the interval in ms between executions of {@link handler}.
+ * the time between executions of {@link handler} in ms.
  */
 export const createTimeoutLoop = (handler: () => void, timeout: number | (() => number)): void => {
   if (typeof timeout === "number") {
@@ -133,7 +135,7 @@ export const createTimeoutLoop = (handler: () => void, timeout: number | (() => 
 };
 
 /**
- * Polls a function periodically. Returns an {@link Accessor} to the latest polled value.
+ * Polls a function periodically. Returns an {@link Accessor} containing the latest polled value.
  *
  * @param timeout Number or {@link Accessor} containing a number representing
  * the time between executions of {@link fn} in ms.
@@ -155,6 +157,6 @@ export const createPolled = <T>(
  * the time between increments in ms.
  * @returns An {@link Accessor} containing the current count.
  */
-export const createIntervalCounter = (timeout: Accessor<number> | number): Accessor<number> => {
+export const createIntervalCounter = (timeout: number | Accessor<number>): Accessor<number> => {
   return createPolled(prev => (prev === undefined ? 0 : prev + 1), timeout);
 };
