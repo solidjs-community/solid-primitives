@@ -6,6 +6,7 @@ import { createSignal, onCleanup, createEffect, untrack, Accessor } from "solid-
  *
  * @param fn Function to be called every {@link delay}.
  * @param delay Number representing the time between executions of {@link fn} in ms.
+ * @param timer The timer to create: {@link setTimeout} or {@link setInterval}.
  * @returns Function to manually clear the interval
  */
 export const makeTimer = (
@@ -28,6 +29,7 @@ export const makeTimer = (
  * @param fn Function to be called every {@link delay}.
  * @param delay Number or {@link Accessor} containing a number
  * representing the time between executions of {@link fn} in ms.
+ * @param timer The timer to create: {@link setTimeout} or {@link setInterval}.
  */
 export const createTimer = (
   fn: () => void,
