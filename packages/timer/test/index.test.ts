@@ -1,78 +1,96 @@
-import { render } from "solid-testing-library";
-import createInterval from "../src/index";
+import { createRoot, createSignal } from "solid-js";
+import { suite } from "uvu";
+import * as assert from "uvu/assert";
+import { createTimer } from "../src";
 
-describe("createInterval", (): void => {
-  test("is passed a `handler` and a `delay`", () => {
-    const handler = jest.fn();
+const test = suite("timers");
 
-    createInterval(handler, 1000);
+const sleep = (delay: number) => new Promise<void>(resolve => setTimeout(resolve, delay));
 
-    expect(handler).toHaveBeenCalledTimes(0);
-    jest.advanceTimersByTime(5000);
-    expect(handler).toHaveBeenCalledTimes(5);
+test("createTimer calls and disposes when expected with number", async () => {
+  let timeoutCount = 0;
+  let intervalCount = 0;
+
+  await createRoot(async dispose => {
+    createTimer(() => timeoutCount++, 100, setTimeout);
+    createTimer(() => intervalCount++, 100, setInterval);
+    await sleep(50);
+    dispose();
   });
+  await sleep(100);
+  assert.is(timeoutCount, 0);
+  assert.is(intervalCount, 0);
 
-  test('if you pass a `delay` of `null`, the timer is "paused"', () => {
-    const handler = jest.fn();
-
-    createInterval(handler, null);
-
-    jest.advanceTimersByTime(5000);
-    expect(handler).toHaveBeenCalledTimes(0);
+  await createRoot(async dispose => {
+    createTimer(() => timeoutCount++, 100, setTimeout);
+    createTimer(() => intervalCount++, 100, setInterval);
+    await sleep(50); // 0.5, account for drift
+    assert.is(timeoutCount, 0);
+    assert.is(intervalCount, 0);
+    await sleep(100); // 1.5
+    assert.is(timeoutCount, 1);
+    assert.is(intervalCount, 1);
+    await sleep(100); // 2.5
+    assert.is(timeoutCount, 1);
+    assert.is(intervalCount, 2);
+    dispose();
   });
-
-  test("if you pass a new `handler`, the timer will not restart ", () => {
-    const handler1 = jest.fn();
-    const handler2 = jest.fn();
-    let handler = handler1;
-
-    createInterval(handler, 1000);
-
-    jest.advanceTimersByTime(500);
-
-    handler = handler2;
-
-    jest.advanceTimersByTime(500);
-    expect(handler1).toHaveBeenCalledTimes(0);
-    expect(handler2).toHaveBeenCalledTimes(1);
-  });
-
-  test("if you pass a new `delay`, it will cancel the current timer and start a new one", () => {
-    const handler = jest.fn();
-    let delay = 500;
-
-    createInterval(handler, delay);
-
-    jest.advanceTimersByTime(1000);
-    expect(handler).toHaveBeenCalledTimes(2);
-
-    delay = 1000;
-    jest.advanceTimersByTime(5000);
-    expect(handler).toHaveBeenCalledTimes(7);
-  });
-
-  test('if you pass a new `delay` of `null`, it will cancel the current timer and "pause"', () => {
-    const handler = jest.fn();
-    let delay: number | null = 500;
-
-    createInterval(handler, delay);
-
-    jest.advanceTimersByTime(1000);
-    expect(handler).toHaveBeenCalledTimes(2);
-
-    delay = null;
-    jest.advanceTimersByTime(5000);
-    expect(handler).toHaveBeenCalledTimes(2);
-  });
-
-  test("passing the same parameters causes no change in the timer", () => {
-    const handler = jest.fn();
-
-    createInterval(handler, 1000);
-
-    jest.advanceTimersByTime(500);
-
-    jest.advanceTimersByTime(500);
-    expect(handler).toHaveBeenCalledTimes(1);
-  });
+  await sleep(100); // 3.5
+  assert.is(timeoutCount, 1);
+  assert.is(intervalCount, 2);
 });
+
+test("createInterval calls when expected with accessor", async () => {
+  let timeoutCount = 0;
+  let intervalCount = 0;
+
+  await createRoot(async dispose => {
+    const [delay, setDelay] = createSignal(100);
+    createTimer(() => timeoutCount++, delay, setTimeout);
+    createTimer(() => intervalCount++, delay, setInterval);
+    await sleep(50);
+    setDelay(200);
+    await sleep(60);
+    assert.is(timeoutCount, 0);
+    assert.is(intervalCount, 0);
+    await sleep(80);
+    assert.is(timeoutCount, 1);
+    assert.is(intervalCount, 1);
+    dispose();
+  });
+
+  timeoutCount = 0;
+  intervalCount = 0;
+
+  await createRoot(async dispose => {
+    const [delay, setDelay] = createSignal(100);
+    createTimer(() => timeoutCount++, delay, setTimeout);
+    createTimer(() => intervalCount++, delay, setInterval);
+    await sleep(50); // 0.5, account for drift
+    assert.is(timeoutCount, 0);
+    assert.is(intervalCount, 0);
+    await sleep(100); // 1.5
+    assert.is(timeoutCount, 1);
+    assert.is(intervalCount, 1);
+    await sleep(100); // 2.5
+    assert.is(timeoutCount, 1);
+    assert.is(intervalCount, 2);
+    setDelay(200);
+    await sleep(60); // 2.8
+    assert.is(timeoutCount, 1);
+    assert.is(intervalCount, 2);
+    await sleep(80); // 3.2
+    assert.is(timeoutCount, 1);
+    assert.is(intervalCount, 3);
+    await sleep(200); // 4.2
+    assert.is(timeoutCount, 1);
+    assert.is(intervalCount, 4);
+    dispose();
+  });
+
+  await sleep(200); // 5.2
+  assert.is(timeoutCount, 1);
+  assert.is(intervalCount, 4);
+});
+
+test.run();
