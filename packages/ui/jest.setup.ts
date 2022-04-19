@@ -2,4 +2,4 @@
 // allows you to do things like:
 // expect(element).toHaveTextContent(/solidjs/i)
 // learn more: https://github.com/testing-library/jest-dom
-require("@testing-library/jest-dom");
+import "@testing-library/jest-dom";

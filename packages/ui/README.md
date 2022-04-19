@@ -21,6 +21,10 @@ yarn add @solid-primitives/ui
 pnpm add @solid-primitives/ui
 ```
 
+## Primitives
+
+- [visually-hidden](./src/visually-hidden/) - hides its children visually, while keeping content visible to screen readers.
+
 ## Changelog
 
 <details>
@@ -31,3 +35,7 @@ pnpm add @solid-primitives/ui
 Initial release as a Stage-0 primitive.
 
 </details>
+
+## Acknowledgment
+
+This project is inspired by Adobe's [React Spectrum Libraries](https://github.com/adobe/react-spectrum).

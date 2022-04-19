@@ -12,7 +12,7 @@ interface CreateVisuallyHiddenProps {
   isFocusable?: MaybeAccessor<boolean | undefined>;
 
   /**
-   * The style prop of the element.
+   * Additional style to be passed to the element.
    */
   style?: MaybeAccessor<JSX.HTMLAttributes<HTMLElement>["style"] | undefined>;
 }
@@ -51,7 +51,7 @@ const visuallyHiddenStyles: JSX.CSSProperties = {
   padding: 0,
   position: "absolute",
   width: 1,
-  "white-space": "nowrap",
+  "white-space": "nowrap"
 };
 
 /**
@@ -63,7 +63,7 @@ export function createVisuallyHidden(props: CreateVisuallyHiddenProps = {}): Vis
 
   const { focusProps } = createFocus({
     isDisabled: () => !access(props.isFocusable),
-    onFocusChange: setFocused,
+    onFocusChange: setFocused
   });
 
   // If focused, don't hide the element.
@@ -83,7 +83,7 @@ export function createVisuallyHidden(props: CreateVisuallyHiddenProps = {}): Vis
 
   const visuallyHiddenProps: Accessor<VisuallyHiddenProps> = createMemo(() => ({
     ...focusProps(),
-    style: combinedStyles(),
+    style: combinedStyles()
   }));
 
   return { visuallyHiddenProps };
