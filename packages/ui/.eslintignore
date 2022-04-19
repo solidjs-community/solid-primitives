@@ -6,6 +6,5 @@ dist/
 public/
 __mocks__/
 
-jest.config.js
-jest.setup.js
+jest.config.cjs
 *.d.ts

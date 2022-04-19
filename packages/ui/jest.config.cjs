@@ -1,12 +1,12 @@
-const repoRootPath = `<rootDir>`;
-const solidjsPath = `${repoRootPath}/../../node_modules/solid-js`;
+const pkgRootPath = `<rootDir>`;
+const solidjsPath = `${pkgRootPath}/../../node_modules/solid-js`;
 
 module.exports = {
   preset: "ts-jest",
 
   globals: {
     "ts-jest": {
-      tsconfig: `${repoRootPath}/tsconfig.json`,
+      tsconfig: `${pkgRootPath}/tsconfig.json`,
       babelConfig: {
         presets: ["babel-preset-solid", "@babel/preset-env"]
       }
@@ -15,7 +15,7 @@ module.exports = {
 
   testEnvironment: "jsdom",
 
-  setupFilesAfterEnv: [`${repoRootPath}/jest.setup.js`, "regenerator-runtime"],
+  setupFilesAfterEnv: [`${pkgRootPath}/jest.setup.ts`, "regenerator-runtime"],
 
   moduleNameMapper: {
     "solid-js/web": `${solidjsPath}/web/dist/web.cjs`,

@@ -1,12 +1,8 @@
 {
   "extends": "../../tsconfig.json",
-  "include": [
-    "./src",
-    "./test",
-    "./dev"
-  ],
-  "exclude": [
-    "node_modules",
-    "./dist"
-  ]
+  "compilerOptions": {
+    "types": ["vite/client", "node", "jest", "@testing-library/jest-dom"]
+  },
+  "include": ["./src", "./test", "./dev", "jest.config.ts"],
+  "exclude": ["node_modules", "./dist"]
 }

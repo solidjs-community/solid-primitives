@@ -17,6 +17,8 @@ A collection of state and behavior primitives, for building accessible user inte
 npm install @solid-primitives/ui
 # or
 yarn add @solid-primitives/ui
+# or
+pnpm add @solid-primitives/ui
 ```
 
 ## Changelog
