@@ -1,0 +1,56 @@
+{
+  "name": "@solid-primitives/template-primitive",
+  "version": "0.0.100",
+  "description": "Primitives that support building user interfaces.",
+  "author": "Fabien Marie-Lousie",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/template-primitive#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "ui",
+    "stage": 0,
+    "list": [],
+    "category": "Display & Media"
+  },
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "vite serve dev --host",
+    "dev": "yarn start",
+    "build": "tsup",
+    "test": "uvu -r solid-register"
+  },
+  "keywords": [
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "jsdom": "^19.0.0",
+    "prettier": "^2.5.1",
+    "solid-register": "^0.1.5",
+    "tslib": "^2.3.1",
+    "typescript": "^4.6.2",
+    "tsup": "^5.12.1",
+    "uvu": "^0.5.3",
+    "unocss": "0.28.1",
+    "vite": "2.8.6",
+    "vite-plugin-solid": "2.2.6"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.3.15"
+  }
+}
