@@ -141,7 +141,7 @@ export function createPolled<T extends P, P = T>(
   fn: (prev: P | Exclude<undefined, P>) => T,
   timeout: number | Accessor<number | false>
 ): Accessor<T>;
-export function createPolled<T extends P, I, P = T>(
+export function createPolled<T extends P, I = T, P = T>(
   fn: (prev: P | I) => T,
   timeout: number | Accessor<number | false>,
   value: I,
