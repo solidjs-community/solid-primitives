@@ -1,4 +1,5 @@
 import { createSignal, onCleanup, createEffect, untrack, Accessor } from "solid-js";
+import { SignalOptions } from "solid-js/types/reactive/signal";
 
 /**
  * Create a timer ({@link setTimeout} or {@link setInterval})
@@ -113,15 +114,18 @@ export const createTimeoutLoop = (handler: () => void, timeout: number | (() => 
 /**
  * Polls a function periodically. Returns an {@link Accessor} containing the latest polled value.
  *
+ * @param fn Function to be called every {@link timeout}.
  * @param timeout Number or {@link Accessor} containing a number representing
  * the time between executions of {@link fn} in ms.
+ * @param options Signal options for createSignal.
  * @returns An {@link Accessor} containing the latest polled value.
  */
 export const createPolled = <T>(
   fn: (prev?: T) => T,
-  timeout: Accessor<number> | number
+  timeout: Accessor<number> | number,
+  options?: SignalOptions<T>
 ): Accessor<T> => {
-  const [polled, setPolled] = createSignal(untrack(() => fn()));
+  const [polled, setPolled] = createSignal(untrack(fn), options);
   createTimer(() => setPolled(fn), timeout, setInterval);
   return polled;
 };
