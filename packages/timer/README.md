@@ -7,15 +7,15 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/timer?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/timer)
 [![version](https://img.shields.io/npm/v/@solid-primitives/timer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/timer)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Timer primitives related to `setInterval` and `setTimeout`:
+Timer primitives related to [`setInterval`](https://developer.mozilla.org/en-US/docs/Web/API/setInterval) and [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/setTimeout):
 
-- `createTimeout` - setTimeout with an optionally reactive delay.
-- `createInterval` - setInterval with an optionally reactive delay.
-- `createTimeoutLoop` - Like createInterval, except the delay only updates between executions.
-- `createPolled` - Polls a function periodically. Returns an to the latest polled value.
-- `createIntervalCounter` - Creates a counter which increments periodically.
+- [`makeTimer`](#makeTimer) - Makes an automatically cleaned up timer.
+- [`createTimer`](#createTimer) - [makeTimer](#maketimer), but with a fully reactive delay
+- [`createTimeoutLoop`](#createTimeoutLoop) - Like createInterval, except the delay only updates between executions.
+- [`createPolled`](#createPolled) - Polls a function periodically. Returns an to the latest polled value.
+- [`createIntervalCounter`](#createIntervalCounter) - Creates a counter which increments periodically.
 
 ## Installation
 
@@ -131,5 +131,9 @@ Release official version with CJS support.
 1.1.0
 
 Updated to Solid 1.3
+
+1.3.0
+
+Added [`makeTimer`](#maketimer), [`createTimeoutLoop`](#createtimeoutloop), [`createPolled`](#createpolled), [`createIntervalCounter`](#createintervalcounter), and made the timeout of [`createTimer`](#createtimer) optionally reactive.
 
 </details>
