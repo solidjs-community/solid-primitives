@@ -8,7 +8,7 @@ import { SignalOptions } from "solid-js/types/reactive/signal";
  * @param fn Function to be called every {@link delay}.
  * @param delay Number representing the time between executions of {@link fn} in ms.
  * @param timer The timer to create: {@link setTimeout} or {@link setInterval}.
- * @returns Function to manually clear the interval
+ * @returns Function to manually clear the interval.
  */
 export const makeTimer = (
   fn: () => void,
@@ -28,13 +28,13 @@ export const makeTimer = (
  * will be counted as elapsed for the first new delay as well.
  *
  * @param fn Function to be called every {@link delay}.
- * @param delay Number or {@link Accessor} containing a number
- * representing the time between executions of {@link fn} in ms.
+ * @param delay Number or {@link Accessor} containing a number representing
+ * the time between executions of {@link fn} in ms, or false to disable the timer.
  * @param timer The timer to create: {@link setTimeout} or {@link setInterval}.
  */
 export const createTimer = (
   fn: () => void,
-  delay: number | Accessor<number>,
+  delay: number | Accessor<number | false>,
   timer: typeof setTimeout | typeof setInterval
 ): void => {
   if (typeof delay === "number") {
@@ -55,6 +55,7 @@ export const createTimer = (
   createEffect((prevDelay?: number) => {
     if (done) return;
     const currDelay = delay();
+    if (currDelay === false) return;
 
     // check prevDelay to make sure it isn't 0 or undefined to avoid Infinity and NaN
     if (shouldHandleFraction && prevDelay) {
@@ -90,25 +91,30 @@ export const createTimer = (
  * except the timeout only updates between executions.
  *
  * @param handler Function to be called every {@link timeout}
- * @param timeout Number or Function returning a number representing
- * the time between executions of {@link handler} in ms.
+ * @param timeout Number or Function returning a number representing the time
+ * between executions of {@link handler} in ms, or false to disable looping.
  */
-export const createTimeoutLoop = (handler: () => void, timeout: number | (() => number)): void => {
+export const createTimeoutLoop = (
+  handler: () => void,
+  timeout: number | (() => number | false)
+): void => {
   if (typeof timeout === "number") {
     makeTimer(handler, timeout, setInterval);
     return;
   }
   const [currentTimeout, setCurrentTimeout] = createSignal(untrack(timeout));
-  createEffect(() =>
+  createEffect(() => {
+    const currTimeout = currentTimeout();
+    if (currTimeout === false) return;
     makeTimer(
       () => {
         handler();
         setCurrentTimeout(timeout);
       },
-      currentTimeout(),
+      currTimeout,
       setInterval
-    )
-  );
+    );
+  });
 };
 
 /**
@@ -116,13 +122,13 @@ export const createTimeoutLoop = (handler: () => void, timeout: number | (() => 
  *
  * @param fn Function to be called every {@link timeout}.
  * @param timeout Number or {@link Accessor} containing a number representing
- * the time between executions of {@link fn} in ms.
+ * the time between executions of {@link fn} in ms, or false to disable polling.
  * @param options Signal options for createSignal.
  * @returns An {@link Accessor} containing the latest polled value.
  */
 export const createPolled = <T>(
   fn: (prev?: T) => T,
-  timeout: Accessor<number> | number,
+  timeout: number | Accessor<number | false>,
   options?: SignalOptions<T>
 ): Accessor<T> => {
   const [polled, setPolled] = createSignal(untrack(fn), options);
@@ -134,9 +140,11 @@ export const createPolled = <T>(
  * Creates a counter which increments periodically.
  *
  * @param timeout Number or {@link Accessor} containing a number representing
- * the time between increments in ms.
+ * the time between increments in ms, or false to disable the counter.
  * @returns An {@link Accessor} containing the current count.
  */
-export const createIntervalCounter = (timeout: number | Accessor<number>): Accessor<number> => {
+export const createIntervalCounter = (
+  timeout: number | Accessor<number | false>
+): Accessor<number> => {
   return createPolled(prev => (prev === undefined ? 0 : prev + 1), timeout);
 };

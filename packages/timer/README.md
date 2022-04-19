@@ -43,7 +43,7 @@ dispose(); // clean up manually if needed
 
 #### createTimer
 
-[makeTimer](#maketimer), but with a fully reactive delay. Does not return a dispose function.
+[makeTimer](#maketimer), but with a fully reactive delay. The delay can also be `false`, in which case the timer is disabled. Does not return a dispose function.
 
 ```ts
 const callback = () => {};
