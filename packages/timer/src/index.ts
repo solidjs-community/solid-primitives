@@ -129,21 +129,37 @@ export const createTimeoutLoop = (
 /**
  * Polls a function periodically. Returns an {@link Accessor} containing the latest polled value.
  *
- * @param fn Function to be called every {@link timeout}.
+ * @param fn Function to be executed immediately, then every {@link timeout}.
  * @param timeout Number or {@link Accessor} containing a number representing
  * the time between executions of {@link fn} in ms, or false to disable polling.
+ * @param value Initial value passed to {@link fn}. Defaults to undefined.
  * @param options Signal options for createSignal.
  * @returns An {@link Accessor} containing the latest polled value.
  */
-export const createPolled = <T>(
-  fn: (prev?: T) => T,
+
+export function createPolled<T extends P, P = T>(
+  fn: (prev: P | Exclude<undefined, P>) => T,
+  timeout: number | Accessor<number | false>
+): Accessor<T>;
+export function createPolled<T extends P, I, P = T>(
+  fn: (prev: P | I) => T,
   timeout: number | Accessor<number | false>,
+  value: I,
   options?: SignalOptions<T>
-): Accessor<T> => {
-  const [polled, setPolled] = createSignal(untrack(fn), options);
+): Accessor<T>;
+export function createPolled<T extends P, I, P>(
+  fn: (prev: P | I) => T,
+  timeout: number | Accessor<number | false>,
+  value?: I,
+  options?: SignalOptions<T>
+): Accessor<T> {
+  const [polled, setPolled] = createSignal(
+    untrack(() => fn(value!)),
+    options
+  );
   createTimer(() => setPolled(fn), timeout, setInterval);
   return polled;
-};
+}
 
 /**
  * Creates a counter which increments periodically.
@@ -153,7 +169,8 @@ export const createPolled = <T>(
  * @returns An {@link Accessor} containing the current count.
  */
 export const createIntervalCounter = (
-  timeout: number | Accessor<number | false>
+  timeout: number | Accessor<number | false>,
+  options?: SignalOptions<number>
 ): Accessor<number> => {
-  return createPolled(prev => (prev === undefined ? 0 : prev + 1), timeout);
+  return createPolled(prev => prev + 1, timeout, -1, options);
 };
