@@ -63,6 +63,9 @@ test("createInterval calls when expected with accessor", async () => {
     assert.is(timeoutCount, 0);
     assert.is(intervalCount, 0);
     await sleep(50);
+    setPaused(true);
+    await sleep(300);
+    setPaused(false);
     setDelay(200);
     await sleep(60);
     assert.is(timeoutCount, 0);

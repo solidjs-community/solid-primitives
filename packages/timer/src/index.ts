@@ -55,14 +55,24 @@ export const createTimer = (
   createEffect((prevDelay?: number | false) => {
     if (done) return;
     const currDelay = delay();
-    if (currDelay === false) return currDelay;
+    if (currDelay === false) {
+      // if false, update fractionDone and pause
+      if (prevDelay) fractionDone += (performance.now() - prevTime) / prevDelay;
+      return currDelay;
+    }
+
+    // if resuming from pause, set prevTime to now
     if (prevDelay === false) prevTime = performance.now();
 
-    // check prevDelay to make sure it isn't 0 or undefined or false
-    if (shouldHandleFraction && prevDelay) {
-      fractionDone += (performance.now() - prevTime) / prevDelay;
-      if (fractionDone < 1) {
-        prevTime = performance.now();
+    if (shouldHandleFraction) {
+      if (prevDelay) fractionDone += (performance.now() - prevTime) / prevDelay;
+      prevTime = performance.now();
+      if (fractionDone >= 1) {
+        fractionDone = 0;
+        callHandler();
+      } else if (fractionDone > 0) {
+        // 0 < fractionDone < 1, need to reconcile the delay
+        // signal to rerun this effect when we're done reconciling the delay
         const [listen, rerunEffect] = createSignal(undefined, { equals: false });
         listen();
         makeTimer(
@@ -76,8 +86,6 @@ export const createTimer = (
           setTimeout
         );
         return currDelay;
-      } else {
-        callHandler();
       }
     }
 
