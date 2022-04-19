@@ -1,0 +1,11 @@
+node_modules/
+
+# Ignore artifacts:
+coverage/
+dist/
+public/
+__mocks__/
+
+jest.config.js
+jest.setup.js
+*.d.ts
