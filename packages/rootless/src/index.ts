@@ -69,3 +69,51 @@ export function createDisposable(
     return dispose;
   }, ...owners);
 }
+
+/**
+ * Creates a reactive root that is shared across every instance it was used in. Shared root gets created when the returned function gets first called, and disposed when last reactive context listening to it gets disposed. Only to be recreated again when a new listener appears.
+ * @param factory function where you initialize your reactive primitives
+ * @returns function, registering reactive owner as one of the listeners, returns the value {@link factory} returned.
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/rootless#createSharedRoot
+ * @example
+ * const useState = createSharedScope(() => {
+ *    return createMemo(() => {...})
+ * });
+ *
+ * // later in a component:
+ * const state = useState();
+ * state()
+ *
+ * // in another component
+ * // previously created primitive would get reused
+ * const state = useState();
+ * ...
+ */
+export function createSharedRoot<T>(factory: (dispose: VoidFunction) => T): () => T {
+  let listeners = 0;
+  let value: T | undefined;
+  let dispose: VoidFunction | undefined;
+
+  return () => {
+    if (!dispose) {
+      createRoot(_dispose => {
+        value = factory(_dispose);
+        dispose = _dispose;
+      });
+    }
+
+    listeners++;
+    getOwner() &&
+      onCleanup(() => {
+        listeners--;
+        queueMicrotask(() => {
+          if (listeners) return;
+          dispose!();
+          dispose = undefined;
+          value = undefined;
+        });
+      });
+
+    return value!;
+  };
+}

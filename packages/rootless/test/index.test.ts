@@ -1,5 +1,13 @@
-import { createCallback, createBranch, createDisposable } from "../src";
-import { createComputed, createRoot, createSignal, getOwner } from "solid-js";
+import { createCallback, createBranch, createDisposable, createSharedRoot } from "../src";
+import {
+  createComputed,
+  createEffect,
+  createMemo,
+  createRoot,
+  createSignal,
+  getOwner,
+  onCleanup
+} from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
@@ -110,3 +118,84 @@ risr("disposes together with owner", () =>
 );
 
 risr.run();
+
+const testSR = suite("createSharedRoot");
+
+testSR("single root", () => {
+  const [count, setCount] = createSignal(0);
+
+  let runs = 0;
+  let disposes = 0;
+  const useMemo = createSharedRoot(() => {
+    onCleanup(() => disposes++);
+    return createMemo(() => {
+      runs++;
+      return count();
+    });
+  });
+
+  createRoot(dispose => {
+    assert.is(useMemo()(), 0);
+    assert.is(disposes, 0);
+    assert.is(runs, 1);
+    setCount(1);
+    assert.is(runs, 2);
+    dispose();
+    queueMicrotask(() => {
+      assert.is(disposes, 1);
+      assert.is(runs, 2);
+      setCount(2);
+      assert.is(runs, 2);
+    });
+  });
+});
+
+testSR("multiple roots", () => {
+  const [count, setCount] = createSignal(0);
+
+  let runs = 0;
+  let disposes = 0;
+  const useMemo = createSharedRoot(() => {
+    onCleanup(() => disposes++);
+    return createMemo(() => {
+      runs++;
+      return count();
+    });
+  });
+
+  const d1 = createRoot(dispose => {
+    assert.is(useMemo()(), 0);
+    return dispose;
+  });
+
+  const d2 = createRoot(dispose => {
+    createEffect(() => useMemo()());
+    return dispose;
+  });
+
+  assert.is(runs, 1);
+  setCount(1);
+  assert.is(runs, 2);
+
+  d1();
+
+  queueMicrotask(() => {
+    assert.is(runs, 2);
+    assert.is(disposes, 0);
+    setCount(2);
+    assert.is(runs, 3);
+
+    setTimeout(() => {
+      d2();
+
+      setTimeout(() => {
+        assert.is(runs, 3);
+        assert.is(disposes, 1);
+        setCount(3);
+        assert.is(runs, 3);
+      });
+    });
+  });
+});
+
+testSR.run();
