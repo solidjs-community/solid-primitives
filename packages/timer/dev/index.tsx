@@ -7,8 +7,11 @@ const Counter: Component<{ timer: typeof setTimeout | typeof setInterval }> = pr
   const [key, reset] = createSignal(undefined, { equals: false });
   const [delay, setDelay] = createSignal(1000);
   const [count, setCount] = createSignal(0);
+  const [paused, setPaused] = createSignal(false);
   const increment = () => setCount(count() + 1);
-  createEffect(() => (key(), (setCount(0), createTimer(increment, delay, props.timer))));
+  createEffect(
+    () => (key(), (setCount(0), createTimer(increment, () => !paused() && delay(), props.timer)))
+  );
   return (
     <div class="wrapper-v">
       <h4>{props.timer.name}</h4>
@@ -20,6 +23,9 @@ const Counter: Component<{ timer: typeof setTimeout | typeof setInterval }> = pr
         </button>
         <button class="btn" onClick={reset}>
           Reset
+        </button>
+        <button class="btn" onClick={[setPaused, (p: boolean) => !p]}>
+          Pause/Unpause
         </button>
         <button class="btn" onClick={() => setDelay(delay => delay / 10)}>
           ÷10

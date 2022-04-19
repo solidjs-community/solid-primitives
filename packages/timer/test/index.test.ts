@@ -45,9 +45,23 @@ test("createInterval calls when expected with accessor", async () => {
   let intervalCount = 0;
 
   await createRoot(async dispose => {
+    const [paused, setPaused] = createSignal(false);
     const [delay, setDelay] = createSignal(100);
-    createTimer(() => timeoutCount++, delay, setTimeout);
-    createTimer(() => intervalCount++, delay, setInterval);
+    createTimer(
+      () => timeoutCount++,
+      () => !paused() && delay(),
+      setTimeout
+    );
+    createTimer(
+      () => intervalCount++,
+      () => !paused() && delay(),
+      setInterval
+    );
+    setPaused(true);
+    await sleep(300);
+    setPaused(false);
+    assert.is(timeoutCount, 0);
+    assert.is(intervalCount, 0);
     await sleep(50);
     setDelay(200);
     await sleep(60);

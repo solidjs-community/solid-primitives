@@ -52,12 +52,13 @@ export const createTimer = (
     done = timer === setTimeout;
   };
 
-  createEffect((prevDelay?: number) => {
+  createEffect((prevDelay?: number | false) => {
     if (done) return;
     const currDelay = delay();
-    if (currDelay === false) return;
+    if (currDelay === false) return currDelay;
+    if (prevDelay === false) prevTime = performance.now();
 
-    // check prevDelay to make sure it isn't 0 or undefined to avoid Infinity and NaN
+    // check prevDelay to make sure it isn't 0 or undefined or false
     if (shouldHandleFraction && prevDelay) {
       fractionDone += (performance.now() - prevTime) / prevDelay;
       if (fractionDone < 1) {
