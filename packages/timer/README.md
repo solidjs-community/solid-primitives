@@ -51,11 +51,16 @@ createTimer(callback, 1000, setTimeout);
 createTimer(callback, 1000, setInterval);
 // with reactive delay
 const callback = () => {};
+const [paused, setPaused] = createSignal(false);
 const [delay, setDelay] = createSignal(1000);
-createTimer(callback, delay, setTimeout);
-createTimer(callback, delay, setInterval);
+createTimer(callback, () => !paused() && delay(), setTimeout);
+createTimer(callback, () => !paused() && delay(), setInterval);
 // ...
 setDelay(500);
+// pause
+setPaused(true);
+// unpause
+setPaused(false);
 ```
 
 #### createTimeoutLoop
