@@ -13,21 +13,6 @@ export type StorageDeserializer<T, O> = (value: string, key: string, options?: O
 
 export type StorageSerializer<T, O> = (value: T, key: string, options?: O) => string;
 
-export type StringStorageProps<A, O, T = string> = {
-  /** a Storage-like API, e.g. localStorage */
-  api?: A | A[];
-  /** a function that parses the stored data after retrieval */
-  deserializer?: StorageDeserializer<T, O>;
-  /** a function that serializes the data before storing */
-  serializer?: StorageSerializer<T, O>;
-  /** options for the Storage-like API, if supported */
-  options?: O;
-  /** a prefix for the keys */
-  prefix?: string;
-  /** should the storage be synchronized via Storage events, default is `true`? */
-  sync?: boolean;
-};
-
 export type AnyStorageProps<A, O, T> = {
   /** a Storage-like API, e.g. localStorage */
   api?: A | A[];
@@ -41,7 +26,11 @@ export type AnyStorageProps<A, O, T> = {
   prefix?: string;
   /** should the storage be synchronized via Storage events, default is `true`? */
   sync?: boolean;
+  /** errors will be thrown and need to be caught in an ErrorBoundary, default is `false` */
+  throw?: boolean;
 };
+
+export type StringStorageProps<A, O, T = string> = AnyStorageProps<A, O, T>;
 
 export type StorageProps<T, A, O> = T extends string
   ? StringStorageProps<A, O>
@@ -54,6 +43,7 @@ export type StorageSetter<T, O> = (key: string, value: T, options?: O) => void;
 export type StorageActions<T> = {
   remove: (key: string) => void;
   clear: () => void;
+  error: () => Error | undefined;
   toJSON: () => { [key: string]: T };
 };
 
@@ -85,16 +75,18 @@ export type AsyncStorageSetter<T, O> = (key: string, value: T, options?: O) => P
 export type AsyncStorageActions<T> = {
   remove: (key: string) => Promise<void> | void;
   clear: () => Promise<void> | void;
+  error: () => Error | undefined;
   toJSON: () => Promise<{ [key: string]: T }>;
 };
 
 export type StorageSignalProps<T, A, O> = StorageProps<T, A, O> & {
   /** signal equality checker */
-  equals?: false | ((prev: T, next: T) => boolean) | undefined;
+  equals?: false | ((prev: T, next: T) => boolean);
   /** signal name used in dev mode */
-  name?: string | undefined;
-  
-  internal?: boolean | undefined;
+  name?: string;
+  internal?: boolean;
   /** should the storage be synchronized via Storage events, default is `true`? */
   sync?: boolean;
+  /** errors will be thrown and need to be caught in an ErrorBoundary, default is `false` */
+  throw?: boolean;
 };
