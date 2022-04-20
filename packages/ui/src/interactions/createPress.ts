@@ -67,7 +67,7 @@ export function createPress(props: CreatePressProps): PressResult {
   const pressProps: Accessor<PressElementProps> = createMemo(() => ({
     onClick,
     onMouseDown,
-    onMouseUp,
+    onMouseUp
   }));
 
   return { pressProps };

@@ -1,5 +1,6 @@
 import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor } from "solid-js";
+
 import { createControllableArraySignal } from "../utils";
 
 export interface CreateCheckboxGroupStateProps {

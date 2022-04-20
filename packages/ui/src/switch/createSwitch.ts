@@ -20,7 +20,7 @@ export interface SwitchAria {
 export function createSwitch(
   props: AriaSwitchProps,
   state: ToggleState,
-  inputRef?: HTMLInputElement
+  inputRef: Accessor<HTMLInputElement | undefined>
 ): SwitchAria {
   const { inputProps: toggleInputProps } = createToggle(props, state, inputRef);
   const { isSelected } = state;

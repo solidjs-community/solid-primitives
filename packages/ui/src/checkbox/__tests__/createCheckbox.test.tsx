@@ -8,7 +8,7 @@ function Checkbox(props: AriaCheckboxProps) {
   let ref: HTMLInputElement | undefined;
 
   const state = createToggleState(props);
-  const { inputProps } = createCheckbox(props, state, ref);
+  const { inputProps } = createCheckbox(props, state, () => ref);
 
   return (
     <label data-testid="label">
@@ -28,8 +28,6 @@ describe("createCheckbox", () => {
   });
 
   it("should update checked and aria-checked state on label click", async () => {
-    const state = createToggleState();
-
     render(() => <Checkbox>Test</Checkbox>);
 
     const label = screen.getByTestId("label");
@@ -46,8 +44,6 @@ describe("createCheckbox", () => {
   });
 
   it("should not update checked state for disabled checkbox", async () => {
-    const state = createToggleState();
-
     render(() => <Checkbox isDisabled>Test</Checkbox>);
 
     const label = screen.getByTestId("label");
@@ -64,8 +60,6 @@ describe("createCheckbox", () => {
   });
 
   it("should not update checked state for readonly checkbox", async () => {
-    const state = createToggleState();
-
     render(() => <Checkbox isReadOnly>Test</Checkbox>);
 
     const label = screen.getByTestId("label");
@@ -82,8 +76,6 @@ describe("createCheckbox", () => {
   });
 
   it("should makes swicth disabled when isDisabled is true", async () => {
-    const state = createToggleState();
-
     render(() => <Checkbox isDisabled>Test</Checkbox>);
 
     const input = screen.getByTestId("input") as HTMLInputElement;
@@ -92,8 +84,6 @@ describe("createCheckbox", () => {
   });
 
   it("should sets aria-readonly='true' when isReadOnly is true", async () => {
-    const state = createToggleState();
-
     render(() => <Checkbox isReadOnly>Test</Checkbox>);
 
     const input = screen.getByTestId("input") as HTMLInputElement;
@@ -102,8 +92,6 @@ describe("createCheckbox", () => {
   });
 
   it("should sets aria-checked='mixed' when isIndeterminate is true", async () => {
-    const state = createToggleState();
-
     render(() => <Checkbox isIndeterminate>Test</Checkbox>);
 
     const input = screen.getByTestId("input") as HTMLInputElement;

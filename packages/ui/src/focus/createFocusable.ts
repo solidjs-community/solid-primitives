@@ -7,7 +7,7 @@ import {
   createKeyboard,
   CreateKeyboardProps,
   FocusElementProps,
-  keyboardElementProps,
+  keyboardElementProps
 } from "../interactions";
 import { combineProps } from "../utils";
 
@@ -48,7 +48,7 @@ export interface FocusableResult {
  */
 export function createFocusable(
   props: CreateFocusableProps,
-  ref?: MaybeAccessor<HTMLElement>
+  ref?: Accessor<HTMLElement | undefined>
 ): FocusableResult {
   const [autoFocus, setAutoFocus] = createSignal(!!access(props.autoFocus));
 
@@ -64,7 +64,7 @@ export function createFocusable(
       focusProps(),
       keyboardProps(),
       {
-        tabIndex: access(props.excludeFromTabOrder) && !access(props.isDisabled) ? -1 : undefined,
+        tabIndex: access(props.excludeFromTabOrder) && !access(props.isDisabled) ? -1 : undefined
       }
       // interactionProps()
     );

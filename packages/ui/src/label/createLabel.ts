@@ -1,7 +1,7 @@
 import { MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo, JSX, mergeProps, splitProps } from "solid-js";
 
-import { AriaLabelingProps, DOMProps, LabelableProps, ElementType } from "../types";
+import { AriaLabelingProps, DOMProps, ElementType, LabelableProps } from "../types";
 import { createId, mergeAriaLabels } from "../utils";
 
 export interface LabelAriaProps extends LabelableProps, DOMProps, AriaLabelingProps {

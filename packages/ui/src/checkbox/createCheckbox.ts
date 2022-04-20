@@ -1,7 +1,8 @@
-import { Accessor, createEffect, createMemo, JSX, on } from "solid-js";
+import { access } from "@solid-primitives/utils";
+import { Accessor, createEffect, createMemo, JSX } from "solid-js";
 
-import { AriaCheckboxProps } from "../types";
 import { createToggle, ToggleState } from "../toggle";
+import { AriaCheckboxProps } from "../types";
 
 export interface CheckboxAria {
   /**
@@ -21,23 +22,20 @@ export interface CheckboxAria {
 export function createCheckbox(
   props: AriaCheckboxProps,
   state: ToggleState,
-  inputRef?: HTMLInputElement
+  inputRef: Accessor<HTMLInputElement | undefined>
 ): CheckboxAria {
   const { inputProps: toggleInputProps } = createToggle(props, state, inputRef);
   const { isSelected } = state;
 
   // indeterminate is a property, but it can only be set via javascript
   // https://css-tricks.com/indeterminate-checkboxes/
-  createEffect(
-    on(
-      () => props.isIndeterminate,
-      () => {
-        if (inputRef) {
-          inputRef.indeterminate = props.isIndeterminate || false;
-        }
-      }
-    )
-  );
+  createEffect(() => {
+    const input = access(inputRef);
+
+    if (input) {
+      input.indeterminate = props.isIndeterminate || false;
+    }
+  });
 
   const inputProps: Accessor<JSX.InputHTMLAttributes<HTMLInputElement>> = createMemo(() => ({
     ...toggleInputProps(),

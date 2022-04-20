@@ -22,7 +22,7 @@ export interface ToggleAria {
 export function createToggle(
   props: AriaToggleProps,
   state: ToggleState,
-  inputRef?: HTMLInputElement
+  inputRef: Accessor<HTMLInputElement | undefined>
 ): ToggleAria {
   const defaultProps: AriaToggleProps = {
     isDisabled: false,
@@ -62,11 +62,11 @@ export function createToggle(
   const { pressProps } = createPress(props);
 
   const { focusableProps } = createFocusable(props, inputRef);
-  const domProps = filterDOMProps(props, { labelable: true });
+  const domProps = createMemo(() => filterDOMProps(props, { labelable: true }));
 
   const inputProps = createMemo(() => {
     return combineProps(
-      domProps,
+      domProps(),
       {
         "aria-invalid": local.validationState === "invalid" || undefined,
         "aria-errormessage": local["aria-errormessage"],

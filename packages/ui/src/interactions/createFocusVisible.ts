@@ -38,7 +38,7 @@ let hasBlurredWindowRecently = false;
 // Only Tab or Esc keys will make focus visible on text input elements
 const FOCUS_VISIBLE_INPUT_KEYS = {
   Tab: true,
-  Escape: true,
+  Escape: true
 };
 
 function triggerChangeHandlers(modality: Modality, e?: HandlerEvent) {
@@ -255,7 +255,7 @@ export function createFocusVisible(props: CreateFocusVisibleProps = {}): FocusVi
   );
 
   createFocusVisibleListener(setFocusVisible, () => access(props.isTextInput), {
-    isTextInput: access(props.isTextInput),
+    isTextInput: access(props.isTextInput)
   });
 
   return { isFocusVisible };

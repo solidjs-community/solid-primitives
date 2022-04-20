@@ -8,7 +8,7 @@ function Switch(props: AriaSwitchProps) {
   let ref: HTMLInputElement | undefined;
 
   const state = createToggleState(props);
-  const { inputProps } = createSwitch(props, state, ref);
+  const { inputProps } = createSwitch(props, state, () => ref);
 
   return (
     <label data-testid="label">
@@ -36,8 +36,6 @@ describe("createSwitch", () => {
   });
 
   it("should update checked and aria-checked states on label click", async () => {
-    const state = createToggleState();
-
     render(() => <Switch>Test</Switch>);
 
     const label = screen.getByTestId("label");
@@ -54,8 +52,6 @@ describe("createSwitch", () => {
   });
 
   it("should not update checked state for disabled switch", async () => {
-    const state = createToggleState();
-
     render(() => <Switch isDisabled>Test</Switch>);
 
     const label = screen.getByTestId("label");
@@ -72,8 +68,6 @@ describe("createSwitch", () => {
   });
 
   it("should not update checked state for readonly switch", async () => {
-    const state = createToggleState();
-
     render(() => <Switch isReadOnly>Test</Switch>);
 
     const label = screen.getByTestId("label");
@@ -90,8 +84,6 @@ describe("createSwitch", () => {
   });
 
   it("should makes swicth disabled when isDisabled is true", async () => {
-    const state = createToggleState();
-
     render(() => <Switch isDisabled>Test</Switch>);
 
     const input = screen.getByTestId("input") as HTMLInputElement;
@@ -100,8 +92,6 @@ describe("createSwitch", () => {
   });
 
   it("should sets aria-readonly='true' when isReadOnly is true", async () => {
-    const state = createToggleState();
-
     render(() => <Switch isReadOnly>Test</Switch>);
 
     const input = screen.getByTestId("input") as HTMLInputElement;

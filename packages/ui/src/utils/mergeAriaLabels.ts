@@ -51,7 +51,7 @@ export function mergeAriaLabels(
     // combine them by pointing to the element itself.
     // ex: `<input id="foo" aria-label="Email" aria-labelledby="foo" />`
     if (labelledBy && label) {
-      let ids = new Set([...labelledBy.trim().split(/\s+/), id()]);
+      const ids = new Set([...labelledBy.trim().split(/\s+/), id()]);
       labelledBy = [...ids].join(" ");
     } else if (labelledBy) {
       labelledBy = labelledBy.trim().split(/\s+/).join(" ");

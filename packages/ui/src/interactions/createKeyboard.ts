@@ -51,7 +51,7 @@ export function createKeyboard(props: CreateKeyboardProps): KeyboardResult {
 
   const keyboardProps: Accessor<keyboardElementProps> = createMemo(() => ({
     onKeyDown,
-    onKeyUp,
+    onKeyUp
   }));
 
   return { keyboardProps };

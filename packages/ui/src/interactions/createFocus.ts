@@ -57,7 +57,7 @@ export function createFocus(props: CreateFocusProps): FocusResult {
 
   const focusProps: Accessor<FocusElementProps> = createMemo(() => ({
     onFocus,
-    onBlur,
+    onBlur
   }));
 
   return { focusProps };

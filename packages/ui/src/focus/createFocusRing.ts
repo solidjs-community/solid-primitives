@@ -8,7 +8,7 @@ import {
   createFocusWithin,
   FocusElementProps,
   FocusWithinElementProps,
-  isKeyboardFocusVisible,
+  isKeyboardFocusVisible
 } from "../interactions";
 
 export interface CreateFocusRingProps {
@@ -58,7 +58,7 @@ export interface FocusRingResult {
 export function createFocusRing(props: CreateFocusRingProps = {}): FocusRingResult {
   const [state, setState] = createStore({
     isFocused: false,
-    isFocusVisible: access(props.autoFocus) || isKeyboardFocusVisible(),
+    isFocusVisible: access(props.autoFocus) || isKeyboardFocusVisible()
   });
 
   const [isFocused, setFocused] = createSignal(false);
@@ -85,12 +85,12 @@ export function createFocusRing(props: CreateFocusRingProps = {}): FocusRingResu
 
   const { focusProps } = createFocus({
     isDisabled: () => access(props.within),
-    onFocusChange,
+    onFocusChange
   });
 
   const { focusWithinProps } = createFocusWithin({
     isDisabled: () => !access(props.within),
-    onFocusWithinChange: onFocusChange,
+    onFocusWithinChange: onFocusChange
   });
 
   const focusRingProps: Accessor<FocusRingElementProps> = () => {
@@ -100,6 +100,6 @@ export function createFocusRing(props: CreateFocusRingProps = {}): FocusRingResu
   return {
     isFocused,
     isFocusVisible,
-    focusRingProps,
+    focusRingProps
   };
 }

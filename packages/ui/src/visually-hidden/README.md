@@ -16,7 +16,7 @@ Provides props for an element that hides its children visually, but keeps conten
 import { createVisuallyHidden } from "@solid-primitives/ui";
 
 function Example() {
-  const { visuallyHiddenProps } = createVisuallyHidden();
+  const { visuallyHiddenProps } = createVisuallyHidden<HTMLDivElement>();
 
   return <div {...visuallyHiddenProps()}>I am hidden</div>;
 }

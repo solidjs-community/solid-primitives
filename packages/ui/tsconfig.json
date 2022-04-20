@@ -11,6 +11,6 @@
     "sourceMap": true,
     "types": ["vite/client", "node", "jest", "@testing-library/jest-dom"]
   },
-  "include": ["./src", "./test", "./dev", "jest.config.ts"],
+  "include": ["src/**/*", "test/**/*", "dev/**/*", "jest.setup.ts"],
   "exclude": ["node_modules", "./dist"]
 }

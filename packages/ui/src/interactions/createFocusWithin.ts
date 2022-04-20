@@ -61,7 +61,7 @@ export function createFocusWithin(props: CreateFocusWithinProps): FocusWithinRes
 
   const focusWithinProps: Accessor<FocusWithinElementProps> = createMemo(() => ({
     onFocusIn,
-    onFocusOut,
+    onFocusOut
   }));
 
   return { focusWithinProps };

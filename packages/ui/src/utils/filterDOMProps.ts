@@ -16,7 +16,7 @@ const labelablePropNames = new Set([
   "aria-label",
   "aria-labelledby",
   "aria-describedby",
-  "aria-details",
+  "aria-details"
 ]);
 
 interface Options {
