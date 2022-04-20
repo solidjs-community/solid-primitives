@@ -1,8 +1,15 @@
+import { JSX } from "solid-js";
+
 import { AriaLabelingProps, AriaValidationProps } from "./aria";
 import { FocusableDOMProps, FocusableProps } from "./focusable";
 import { InputBase, Validation } from "./inputs";
 
 export interface ToggleProps extends InputBase, Validation, FocusableProps {
+  /**
+   * The label for the element.
+   */
+  children?: JSX.Element;
+
   /**
    * Whether the element should be selected (uncontrolled).
    */

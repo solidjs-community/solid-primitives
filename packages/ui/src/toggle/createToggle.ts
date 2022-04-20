@@ -6,7 +6,7 @@ import { AriaToggleProps } from "../types";
 import { combineProps, filterDOMProps } from "../utils";
 import { ToggleState } from "./createToggleState";
 
-export interface ToggleResult {
+export interface ToggleAria {
   /**
    * Props to be spread on the input element.
    */
@@ -15,12 +15,15 @@ export interface ToggleResult {
 
 /**
  * Handles interactions for toggle elements, e.g. Checkboxes and Switches.
+ * @param props - Props for the toggle element.
+ * @param state - State for the toggle element, as returned by `createToggleState`.
+ * @param inputRef - Ref to the HTML input element.
  */
 export function createToggle(
   props: AriaToggleProps,
   state: ToggleState,
-  ref?: HTMLElement
-): ToggleResult {
+  inputRef?: HTMLInputElement
+): ToggleAria {
   const defaultProps: AriaToggleProps = {
     isDisabled: false,
     validationState: "valid"
@@ -58,7 +61,7 @@ export function createToggle(
 
   const { pressProps } = createPress(props);
 
-  const { focusableProps } = createFocusable(props, ref);
+  const { focusableProps } = createFocusable(props, inputRef);
   const domProps = filterDOMProps(props, { labelable: true });
 
   const inputProps = createMemo(() => {

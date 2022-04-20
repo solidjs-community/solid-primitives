@@ -2,9 +2,8 @@ import { access, MaybeAccessor, isObject } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal, JSX } from "solid-js";
 
 import { createFocus } from "../interactions";
-import { FocusEvents } from "../types";
 
-interface CreateVisuallyHiddenProps {
+interface AriaVisuallyHiddenProps {
   /**
    * Whether the element should become visible on focus, for example skip links.
    */
@@ -16,28 +15,11 @@ interface CreateVisuallyHiddenProps {
   style?: MaybeAccessor<JSX.CSSProperties | string | undefined>;
 }
 
-interface VisuallyHiddenProps {
-  /**
-   * Handler that is called when the element receives focus.
-   */
-  onFocus: FocusEvents["onFocus"];
-
-  /**
-   * Handler that is called when the element loses focus.
-   */
-  onBlur: FocusEvents["onBlur"];
-
-  /**
-   * The style prop of the element, which may contains the visually hidden styles.
-   */
-  style?: JSX.CSSProperties | string;
-}
-
-interface VisuallyHiddenResult {
+interface VisuallyHiddenAria {
   /**
    * Props to spread onto the target element.
    */
-  visuallyHiddenProps: Accessor<VisuallyHiddenProps>;
+  visuallyHiddenProps: Accessor<JSX.HTMLAttributes<HTMLElement>>;
 }
 
 const visuallyHiddenStyles: JSX.CSSProperties = {
@@ -57,7 +39,7 @@ const visuallyHiddenStyles: JSX.CSSProperties = {
  * Provides props for an element that hides its children visually
  * but keeps content visible to assistive technology.
  */
-export function createVisuallyHidden(props: CreateVisuallyHiddenProps = {}): VisuallyHiddenResult {
+export function createVisuallyHidden(props: AriaVisuallyHiddenProps = {}): VisuallyHiddenAria {
   const [isFocused, setFocused] = createSignal(false);
 
   const { focusProps } = createFocus({
@@ -80,7 +62,7 @@ export function createVisuallyHidden(props: CreateVisuallyHiddenProps = {}): Vis
     return visuallyHiddenStyles;
   });
 
-  const visuallyHiddenProps: Accessor<VisuallyHiddenProps> = createMemo(() => ({
+  const visuallyHiddenProps: Accessor<JSX.HTMLAttributes<HTMLElement>> = createMemo(() => ({
     ...focusProps(),
     style: combinedStyles()
   }));

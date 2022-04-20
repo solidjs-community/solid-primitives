@@ -1,14 +1,14 @@
 import { fireEvent, render, screen } from "solid-testing-library";
 
 import { createToggleState } from "../../toggle";
-import { AriaSwitchProps } from "../../types";
-import { createSwitch } from "..";
+import { AriaCheckboxProps } from "../../types";
+import { createCheckbox } from "..";
 
-function Switch(props: AriaSwitchProps) {
+function Checkbox(props: AriaCheckboxProps) {
   let ref: HTMLInputElement | undefined;
 
   const state = createToggleState(props);
-  const { inputProps } = createSwitch(props, state, ref);
+  const { inputProps } = createCheckbox(props, state, ref);
 
   return (
     <label data-testid="label">
@@ -18,27 +18,19 @@ function Switch(props: AriaSwitchProps) {
   );
 }
 
-describe("createSwitch", () => {
+describe("createCheckbox", () => {
   it("should set input type to checkbox", async () => {
-    render(() => <Switch>Test</Switch>);
+    render(() => <Checkbox>Test</Checkbox>);
 
     const input = screen.getByTestId("input") as HTMLInputElement;
 
     expect(input).toHaveAttribute("type", "checkbox");
   });
 
-  it("should set input role to switch", async () => {
-    render(() => <Switch>Test</Switch>);
-
-    const input = screen.getByTestId("input") as HTMLInputElement;
-
-    expect(input).toHaveAttribute("role", "switch");
-  });
-
-  it("should update checked and aria-checked states on label click", async () => {
+  it("should update checked and aria-checked state on label click", async () => {
     const state = createToggleState();
 
-    render(() => <Switch>Test</Switch>);
+    render(() => <Checkbox>Test</Checkbox>);
 
     const label = screen.getByTestId("label");
     const input = screen.getByTestId("input") as HTMLInputElement;
@@ -53,10 +45,10 @@ describe("createSwitch", () => {
     expect(input).toHaveAttribute("aria-checked", "true");
   });
 
-  it("should not update checked state for disabled switch", async () => {
+  it("should not update checked state for disabled checkbox", async () => {
     const state = createToggleState();
 
-    render(() => <Switch isDisabled>Test</Switch>);
+    render(() => <Checkbox isDisabled>Test</Checkbox>);
 
     const label = screen.getByTestId("label");
     const input = screen.getByTestId("input") as HTMLInputElement;
@@ -71,10 +63,10 @@ describe("createSwitch", () => {
     expect(input).toHaveAttribute("aria-checked", "false");
   });
 
-  it("should not update checked state for readonly switch", async () => {
+  it("should not update checked state for readonly checkbox", async () => {
     const state = createToggleState();
 
-    render(() => <Switch isReadOnly>Test</Switch>);
+    render(() => <Checkbox isReadOnly>Test</Checkbox>);
 
     const label = screen.getByTestId("label");
     const input = screen.getByTestId("input") as HTMLInputElement;
@@ -92,7 +84,7 @@ describe("createSwitch", () => {
   it("should makes swicth disabled when isDisabled is true", async () => {
     const state = createToggleState();
 
-    render(() => <Switch isDisabled>Test</Switch>);
+    render(() => <Checkbox isDisabled>Test</Checkbox>);
 
     const input = screen.getByTestId("input") as HTMLInputElement;
 
@@ -102,10 +94,20 @@ describe("createSwitch", () => {
   it("should sets aria-readonly='true' when isReadOnly is true", async () => {
     const state = createToggleState();
 
-    render(() => <Switch isReadOnly>Test</Switch>);
+    render(() => <Checkbox isReadOnly>Test</Checkbox>);
 
     const input = screen.getByTestId("input") as HTMLInputElement;
 
     expect(input).toHaveAttribute("aria-readonly", "true");
+  });
+
+  it("should sets aria-checked='mixed' when isIndeterminate is true", async () => {
+    const state = createToggleState();
+
+    render(() => <Checkbox isIndeterminate>Test</Checkbox>);
+
+    const input = screen.getByTestId("input") as HTMLInputElement;
+
+    expect(input).toHaveAttribute("aria-checked", "mixed");
   });
 });

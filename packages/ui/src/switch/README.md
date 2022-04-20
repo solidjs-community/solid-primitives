@@ -21,7 +21,11 @@ import {
   createVisuallyHidden
 } from "@solid-primitives/ui";
 
-function Switch(props: AriaSwitchProps) {
+interface SwitchProps extends AriaSwitchProps {
+  // your component specific props
+}
+
+function Switch(props: SwitchProps) {
   let ref: HTMLInputElement | undefined;
 
   const state = createToggleState(props);
@@ -30,18 +34,18 @@ function Switch(props: AriaSwitchProps) {
   const { visuallyHiddenProps } = createVisuallyHidden();
 
   return (
-    <label class="switch__wrapper">
+    <label class="my-switch__wrapper">
       <div {...visuallyHiddenProps()}>
-        <input {...inputProps()} {...focusRingProps()} ref={ref} class="switch__input" />
+        <input {...inputProps()} {...focusRingProps()} ref={ref} class="my-switch__input" />
       </div>
       <span
         classList={{
-          switch: true,
-          "is--selected": state.isSelected(),
-          "is--focused": isFocusVisible()
+          "my-switch": true,
+          "my-switch--selected": state.isSelected(),
+          "my-switch--focused": isFocusVisible()
         }}
       />
-      <span class="switch__label">{props.children}</span>
+      <span class="my-switch__label">{props.children}</span>
     </label>
   );
 }

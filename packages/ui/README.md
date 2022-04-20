@@ -26,6 +26,7 @@ pnpm add @solid-primitives/ui
 ### Forms
 
 - [checkbox](./src/checkbox/) - Provides the behavior and accessibility implementation for a checkbox and checkbox group components.
+- [label](./src/label) - Provides the accessibility implementation for labels and their associated elements.
 - [switch](./src/switch/) - Provides the behavior and accessibility implementation for a switch component.
 - [toggle](./src/toggle/) - Handles interactions for toggle elements, e.g. Checkboxes and Switches..
 

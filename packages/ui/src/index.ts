@@ -1,6 +1,7 @@
 export * from "./checkbox";
 export * from "./focus";
 export * from "./interactions";
+export * from "./label";
 export * from "./switch";
 export * from "./toggle";
 export * from "./types";
