@@ -58,7 +58,7 @@ export function createToggleState(props: CreateToggleStateProps = {}): ToggleSta
     }
   };
 
-  const toggleState = () => {
+  const toggleSelected = () => {
     if (!access(props.isReadOnly)) {
       setSelected(!isSelected());
     }
@@ -67,6 +67,6 @@ export function createToggleState(props: CreateToggleStateProps = {}): ToggleSta
   return {
     isSelected,
     setSelected: updateSelected,
-    toggle: toggleState
+    toggle: toggleSelected
   };
 }

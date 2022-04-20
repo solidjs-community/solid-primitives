@@ -90,9 +90,57 @@ describe("combineProps", () => {
         { class: className3 }
       );
 
+      const expectedCombinedClasses = clsx(className1, className2, className3);
+
+      expect(combinedProps.class).toBe(expectedCombinedClasses);
+
+      dispose();
+    });
+  });
+
+  it("combines css classNames", async () => {
+    createRoot(async dispose => {
+      const className1 = "primary";
+      const className2 = "hover";
+      const className3 = "focus";
+
+      const combinedProps = combineProps(
+        { className: className1 },
+        { className: className2 },
+        { className: className3 }
+      );
+
       const expectedCombinedClassNames = clsx(className1, className2, className3);
 
-      expect(combinedProps.class).toBe(expectedCombinedClassNames);
+      expect(combinedProps.className).toBe(expectedCombinedClassNames);
+
+      dispose();
+    });
+  });
+
+  it("combines css classList", async () => {
+    createRoot(async dispose => {
+      const classList1 = {
+        primary: true,
+        outline: true,
+        compact: true
+      };
+
+      const classList2 = {
+        large: true,
+        compact: false
+      };
+
+      const combinedProps = combineProps({ classList: classList1 }, { classList: classList2 });
+
+      const expectedCombinedClassList = {
+        primary: true,
+        outline: true,
+        large: true,
+        compact: false
+      };
+
+      expect(combinedProps.classList).toMatchObject(expectedCombinedClassList);
 
       dispose();
     });

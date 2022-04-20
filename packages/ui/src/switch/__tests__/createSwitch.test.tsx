@@ -80,4 +80,24 @@ describe("createSwitch", () => {
     expect(input.checked).toBeFalsy();
     expect(input).toHaveAttribute("aria-checked", "false");
   });
+
+  it("should makes swicth disabled when isDisabled is true", async () => {
+    const state = createToggleState();
+
+    render(() => <Switch isDisabled>Test</Switch>);
+
+    const input = screen.getByTestId("input") as HTMLInputElement;
+
+    expect(input.disabled).toBeTruthy();
+  });
+
+  it("should sets aria-readonly when isReadOnly is true", async () => {
+    const state = createToggleState();
+
+    render(() => <Switch isReadOnly>Test</Switch>);
+
+    const input = screen.getByTestId("input") as HTMLInputElement;
+
+    expect(input).toHaveAttribute("aria-readonly", "true");
+  });
 });

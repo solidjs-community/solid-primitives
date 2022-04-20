@@ -50,13 +50,25 @@ export function createControllableSignal<T>(props: CreateControllableSignalProps
 }
 
 /**
- * Creates a simple reactive boolean state with a getter and setter,
+ * Creates a simple reactive boolean state with a getter, setter and a fallback value of `false`,
  * that can be controlled with `value` and `onChange` props.
  */
 export function createControllableBooleanSignal(props: CreateControllableSignalProps<boolean>) {
   const [_value, setValue] = createControllableSignal(props);
 
   const value: Accessor<boolean> = () => _value() ?? false;
+
+  return [value, setValue] as const;
+}
+
+/**
+ * Creates a simple reactive array state with a getter, setter and a fallback value of `[]`,
+ * that can be controlled with `value` and `onChange` props.
+ */
+export function createControllableArraySignal<T>(props: CreateControllableSignalProps<Array<T>>) {
+  const [_value, setValue] = createControllableSignal(props);
+
+  const value: Accessor<Array<T>> = () => _value() ?? [];
 
   return [value, setValue] as const;
 }
