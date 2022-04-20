@@ -8,7 +8,8 @@ import type {
   Noop,
   Values,
   Trigger,
-  TriggerCache
+  TriggerCache,
+  AnyObject
 } from "./types";
 
 export * from "./types";
@@ -82,8 +83,8 @@ export const asAccessor = <A extends MaybeAccessor<unknown>>(
 /**
  * Iterate through object entries.
  */
-export const forEachEntry = <A extends MaybeAccessor<object>, O = MaybeAccessorValue<A>>(
-  object: A,
+export function forEachEntry<O extends AnyObject>(
+  object: O,
   iterator: (
     key: keyof O,
     item: Values<O>,
@@ -91,12 +92,11 @@ export const forEachEntry = <A extends MaybeAccessor<object>, O = MaybeAccessorV
     pairs: [keyof O, Values<O>][],
     object: O
   ) => void
-): void => {
-  const obj = access(object);
-  Object.entries(obj).forEach(([key, item], index, pairs) =>
-    iterator(key as keyof O, item, index, pairs as [keyof O, Values<O>][], obj as O)
+): void {
+  Object.entries(object).forEach(([key, item], index, pairs) =>
+    iterator(key as keyof O, item, index, pairs as [keyof O, Values<O>][], object)
   );
-};
+}
 
 /**
  * Get `Object.entries()` of an MaybeAccessor<object>

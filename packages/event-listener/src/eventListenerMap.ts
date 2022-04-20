@@ -1,4 +1,10 @@
-import { Many, MaybeAccessor, createCallbackStack, forEachEntry } from "@solid-primitives/utils";
+import {
+  Many,
+  MaybeAccessor,
+  createCallbackStack,
+  forEachEntry,
+  access
+} from "@solid-primitives/utils";
 import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 import { Store } from "solid-js/store";
 import { createEventListener } from "./eventListener";
@@ -62,7 +68,7 @@ export function createEventListenerMap(
   options?: EventListenerOptions
 ): VoidFunction {
   const { push, execute } = createCallbackStack();
-  forEachEntry(handlersMap, (eventName, handler) => {
+  forEachEntry(access(handlersMap), (eventName, handler) => {
     push(createEventListener(targets, eventName, e => handler?.(e), options));
   });
   return execute;
