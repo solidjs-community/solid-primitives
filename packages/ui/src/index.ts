@@ -1,3 +1,4 @@
+export * from "./checkbox";
 export * from "./focus";
 export * from "./interactions";
 export * from "./switch";

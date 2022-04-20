@@ -42,7 +42,18 @@ export function createToggle(
     // since we spread props on label, onChange will end up there as well as in here.
     // so we have to stop propagation at the lowest level that we care about
     event.stopPropagation();
-    state.setSelected((event.target as HTMLInputElement).checked);
+
+    const target = event.target as HTMLInputElement;
+
+    state.setSelected(target.checked);
+
+    // unlike in React, inputs `checked` state can be out of sync with our toggle state.
+    // for example a readonly `<input type="checkbox">` is always "checkable".
+    // clicking on the input will change its `checked` state.
+    // so we need to force the input `checked` state to be in sync with the toggle state in that case.
+    if (state.isSelected() !== target.checked) {
+      target.checked = state.isSelected();
+    }
   };
 
   const { pressProps } = createPress(props);

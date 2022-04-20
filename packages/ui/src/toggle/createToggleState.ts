@@ -49,7 +49,7 @@ export function createToggleState(props: CreateToggleStateProps = {}): ToggleSta
   const [isSelected, setSelected] = createControllableBooleanSignal({
     value: () => access(props.isSelected),
     defaultValue: () => !!access(props.defaultSelected),
-    onChange: props.onChange,
+    onChange: props.onChange
   });
 
   const updateSelected = (value: boolean) => {
@@ -67,6 +67,6 @@ export function createToggleState(props: CreateToggleStateProps = {}): ToggleSta
   return {
     isSelected,
     setSelected: updateSelected,
-    toggle: toggleState,
+    toggle: toggleState
   };
 }
