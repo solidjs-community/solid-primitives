@@ -45,7 +45,7 @@
     "components"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^1.1.0",
+    "@solid-primitives/utils": "^1.2.0",
     "clsx": "^1.1.1"
   },
   "devDependencies": {

@@ -1,7 +1,5 @@
 import { JSX } from "solid-js";
 
-import { isFunction } from "./assertion";
-
 /**
  * Call the handler with the event.
  * Simpler way to call a JSX.EventHandlerUnion programmatically.
@@ -14,7 +12,7 @@ export function callHandler<T, E extends Event>(
   }
 ) {
   if (handler) {
-    if (isFunction(handler)) {
+    if (typeof handler === "function") {
       handler(event);
     } else {
       handler[0](handler[1], event);

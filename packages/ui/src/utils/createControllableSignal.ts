@@ -1,8 +1,5 @@
-import { access, MaybeAccessor } from "@solid-primitives/utils";
-import { Accessor, createMemo, createSignal } from "solid-js";
-
-import { isUndefined } from "./assertion";
-import { runIfFn } from "./function";
+import { access, accessWith, MaybeAccessor } from "@solid-primitives/utils";
+import { Accessor, createMemo, createSignal, untrack } from "solid-js";
 
 export interface CreateControllableSignalProps<T> {
   /**
@@ -30,23 +27,24 @@ export function createControllableSignal<T>(props: CreateControllableSignalProps
   // eslint-disable-next-line solid/reactivity
   const [_value, _setValue] = createSignal(access(props.defaultValue));
 
-  const isControlled = createMemo(() => !isUndefined(access(props.value)));
+  const isControlled = createMemo(() => access(props.value) !== undefined);
 
   const value = createMemo(() => (isControlled() ? access(props.value) : _value()));
 
-  const setValue = (next: Exclude<T, Function> | ((prev: T) => T)) => {
-    const nextValue = runIfFn(next, value() as T);
+  const setValue = (next: Exclude<T, Function> | ((prev: T) => T)) =>
+    untrack(() => {
+      const nextValue = accessWith(next, [value() as T]);
 
-    if (!Object.is(nextValue, value())) {
-      if (!isControlled()) {
-        _setValue(nextValue as Exclude<T, Function>);
+      if (!Object.is(nextValue, value())) {
+        if (!isControlled()) {
+          _setValue(nextValue as Exclude<T, Function>);
+        }
+
+        props.onChange?.(nextValue);
       }
 
-      props.onChange?.(nextValue);
-    }
-
-    return nextValue;
-  };
+      return nextValue;
+    });
 
   return [value, setValue] as const;
 }

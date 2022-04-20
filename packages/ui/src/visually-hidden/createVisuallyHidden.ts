@@ -1,9 +1,8 @@
-import { access, MaybeAccessor } from "@solid-primitives/utils";
+import { access, MaybeAccessor, isObject } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal, JSX } from "solid-js";
 
 import { createFocus } from "../interactions";
 import { FocusEvents } from "../types";
-import { isObject } from "../utils";
 
 interface CreateVisuallyHiddenProps {
   /**
@@ -14,7 +13,7 @@ interface CreateVisuallyHiddenProps {
   /**
    * Additional style to be passed to the element.
    */
-  style?: MaybeAccessor<JSX.HTMLAttributes<HTMLElement>["style"] | undefined>;
+  style?: MaybeAccessor<JSX.CSSProperties | string | undefined>;
 }
 
 interface VisuallyHiddenProps {
@@ -31,7 +30,7 @@ interface VisuallyHiddenProps {
   /**
    * The style prop of the element, which may contains the visually hidden styles.
    */
-  style?: JSX.HTMLAttributes<HTMLElement>["style"];
+  style?: JSX.CSSProperties | string;
 }
 
 interface VisuallyHiddenResult {
