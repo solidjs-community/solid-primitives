@@ -9,15 +9,13 @@ export type InputMaskArray = (string | RegExp)[];
 
 export type InputMask = InputMaskFn | InputMaskArray | string;
 
-export const stringMaskToArray = (mask: string) =>
-  [...mask].map(
-    c =>
-      ({
-        9: /\d/,
-        a: /[a-z]/i,
-        "*": /\w/
-      }[c] || c)
-  );
+export const stringMaskRegExp: Record<string, RegExp> = {
+  9: /\d/,
+  a: /[a-z]/i,
+  "*": /\w/
+};
+
+export const stringMaskToArray = (mask: string) => [...mask].map(c => stringMaskRegExp[c] || c);
 
 export const maskArrayToFn =
   (maskArray: InputMaskArray): InputMaskFn =>
@@ -57,9 +55,18 @@ export const anyMaskToFn = (mask: InputMask) =>
     ? mask
     : maskArrayToFn(Array.isArray(mask) ? mask : stringMaskToArray(mask));
 
-export const createInputMask = (mask: InputMask) => {
+export interface EventLike {
+  target: EventTarget | null;
+  currentTarget: EventTarget | null;
+}
+
+export const createInputMask = <
+  MaskEvent extends EventLike = KeyboardEvent | InputEvent | ClipboardEvent
+>(
+  mask: InputMask
+): ((ev: MaskEvent) => string) => {
   const maskFn = anyMaskToFn(mask);
-  const handler = (ev: KeyboardEvent | InputEvent | ClipboardEvent) => {
+  const handler = (ev: MaskEvent) => {
     const ref = (ev.currentTarget || ev.target) as HTMLInputElement | HTMLTextAreaElement;
     const [value, selection] = maskFn(ref.value, [
       ref.selectionStart || ref.value.length,
