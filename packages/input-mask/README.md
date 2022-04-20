@@ -89,7 +89,7 @@ In most cases you'll want to use `onInput` and `onPaste`.
 - **Is there a server version?**<br> No, since it only creates an event handler that will solely run on the client; it makes no sense to create a server version.
 - **Does this provide any error handling?**<br> There is no error handling, but it should work well together with any form handling library.
 - **Can I limit the events this uses?**<br> If you want to limit the events this uses e.g. as part of a library or to use this with another framework's events while you port your app to solid, we got you covered, you can just call `createInputMask<EventTypeUnion>(mask)` in order to do exactly that.
-- **Can I change the string mask handling?**<br> As a matter of fact, you can! Just `import { stringMaskRegExp } from "@solid-primitives/input-mask"` and change it to your liking.
+- **Can I change the string mask handling?**<br> As a matter of fact, you can! Either use the second optional parameter of `stringMaskToArray(mask[, regexps])` or `anyMaskToFn(mask[, regexps])` or `import { stringMaskRegExp } from "@solid-primitives/input-mask"` and change it to your liking.
 - **Can I turn this off and on again?**<br> You can still wrap the output handler in your own handler to turn it off and on again:
 
 ```jsx

@@ -15,8 +15,10 @@ export const stringMaskRegExp: Record<string, RegExp> = {
   "*": /\w/
 };
 
-export const stringMaskToArray = (mask: string) => [...mask].map(c => stringMaskRegExp[c] || c);
+/** Convert a string mask to an array mask */
+export const stringMaskToArray = (mask: string, regexps = stringMaskRegExp) => [...mask].map(c => regexps[c] || c);
 
+/** Convert an array mask to a mask function */
 export const maskArrayToFn =
   (maskArray: InputMaskArray): InputMaskFn =>
   (value: string, selection: Selection) => {
@@ -50,22 +52,30 @@ export const maskArrayToFn =
     return [value.slice(0, pos), selection];
   };
 
-export const anyMaskToFn = (mask: InputMask) =>
+/** Convert an array or string mask to a mask function */
+export const anyMaskToFn = (mask: InputMask, regexps?: Record<string, RegExp>) =>
   typeof mask === "function"
     ? mask
-    : maskArrayToFn(Array.isArray(mask) ? mask : stringMaskToArray(mask));
+    : maskArrayToFn(Array.isArray(mask) ? mask : stringMaskToArray(mask, regexps));
 
 export interface EventLike {
   target: EventTarget | null;
   currentTarget: EventTarget | null;
 }
 
+/**
+ * Create input mask handler
+ * @param mask string or array or function mask
+ * @param regexps optional object with regexps for string replacements used for string masks
+ * @returns event handler to effectuate the input mask
+ */
 export const createInputMask = <
   MaskEvent extends EventLike = KeyboardEvent | InputEvent | ClipboardEvent
 >(
-  mask: InputMask
+  mask: InputMask,
+  regexps?: Record<string, RegExp>
 ): ((ev: MaskEvent) => string) => {
-  const maskFn = anyMaskToFn(mask);
+  const maskFn = anyMaskToFn(mask, regexps);
   const handler = (ev: MaskEvent) => {
     const ref = (ev.currentTarget || ev.target) as HTMLInputElement | HTMLTextAreaElement;
     const [value, selection] = maskFn(ref.value, [
