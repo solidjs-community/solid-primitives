@@ -1,9 +1,8 @@
-import { Component } from "solid-js";
 import { render } from "solid-js/web";
-import "uno.css";
+import "./index.css";
 
-const App: Component = () => {
-  return <div>Hello @solid-primitives/ui</div>;
-};
+function App() {
+  return <div></div>;
+}
 
 render(() => <App />, document.getElementById("root")!);

@@ -23,7 +23,14 @@ pnpm add @solid-primitives/ui
 
 ## Primitives
 
-- [visually-hidden](./src/visually-hidden/) - hides its children visually, while keeping content visible to screen readers.
+### Forms
+
+- [switch](./src/switch/) - Provides the behavior and accessibility implementation for a switch component.
+- [toggle](./src/toggle/) - Handles interactions for toggle elements, e.g. Checkboxes and Switches..
+
+### Utilities
+
+- [visually-hidden](./src/visually-hidden/) - Hides its children visually, while keeping content visible to screen readers.
 
 ## Changelog
 
