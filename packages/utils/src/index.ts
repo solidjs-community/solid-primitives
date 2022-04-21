@@ -1,4 +1,4 @@
-import { getOwner, onCleanup, createSignal, Accessor, DEV } from "solid-js";
+import { getOwner, onCleanup, createSignal, Accessor, DEV, untrack } from "solid-js";
 import type { BaseOptions } from "solid-js/types/reactive/signal";
 import { isServer } from "solid-js/web";
 import type {
@@ -9,7 +9,8 @@ import type {
   Values,
   Trigger,
   TriggerCache,
-  AnyObject
+  AnyObject,
+  AnyFunction
 } from "./types";
 
 export * from "./types";
@@ -36,6 +37,11 @@ export const warn: typeof console.warn = (...a) => isDev && console.warn(...a);
  */
 export const ofClass = (v: any, c: AnyClass): boolean =>
   v instanceof c || (v && v.constructor === c);
+
+/** Check if value is typeof "object" or "function" */
+export function isObject(value: any): value is AnyObject {
+  return value !== null && (typeof value === "object" || typeof value === "function");
+}
 
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
 
@@ -79,6 +85,14 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
 export const asAccessor = <A extends MaybeAccessor<unknown>>(
   v: A
 ): Accessor<MaybeAccessorValue<A>> => (typeof v === "function" ? (v as any) : () => v);
+
+/** If value is a function – call it with a given arguments – otherwise get the value as is */
+export function accessWith<T>(
+  valueOrFn: T,
+  ...args: T extends AnyFunction ? Parameters<T> : never
+): T extends AnyFunction ? ReturnType<T> : T {
+  return typeof valueOrFn === "function" ? valueOrFn(...args) : valueOrFn;
+}
 
 /**
  * Iterate through object entries.
