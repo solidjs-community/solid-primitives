@@ -7,9 +7,12 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/connectivity?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/template-primitive)
 [![version](https://img.shields.io/npm/v/@solid-primitives/connectivity?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/template-primitive)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A [`navigator.onLine`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/Online_and_offline_events) signal that tells you when the browser _thinks_ you're online. Connectivity is determined by your browser, which is a best-effort process.
+
+- [`newConnectivityListener`](#newConnectivityListener) - Attaches event listeners and fires callback whenever `window.onLine` changes.
+- [`createConnectivitySignal`](#createConnectivitySignal) - A signal representing the browser's interpretation of whether it is on- or offline.
 
 ## Installation
 
@@ -19,11 +22,41 @@ npm install @solid-primitives/connectivity
 yarn add @solid-primitives/connectivity
 ```
 
-## How to use it
+## `newConnectivityListener`
+
+Attaches event listeners and fires callback whenever `window.onLine` changes.
 
 ```ts
-const online = createConnectivitySignal();
-console.log(online());
+import { newConnectivityListener } from "@solid-primitives/connectivity";
+
+const clear = newConnectivityListener(isOnline => {
+  console.log(isOnline); // T: booelan
+});
+// remove event listeners (happens also on cleanup)
+clear();
+```
+
+#### Definition
+
+```ts
+function newConnectivityListener(callback: (isOnline: boolean) => void): VoidFunction;
+```
+
+## `createConnectivitySignal`
+
+A signal representing the browser's interpretation of whether it is on- or offline.
+
+```ts
+import { createConnectivitySignal } from "@solid-primitives/connectivity";
+
+const isOnline = createConnectivitySignal();
+isOnline(); // T: boolean
+```
+
+#### Definition
+
+```ts
+function createConnectivitySignal(): Accessor<boolean>;
 ```
 
 ## Demo
@@ -46,5 +79,9 @@ Change primitive name to createConnectivitySignal. Minor adjustments to internal
 0.1.1
 
 Upgraded to Solid 1.3
+
+0.2.0 - **stage-2**
+
+Add `newConnectivityListener`
 
 </details>
