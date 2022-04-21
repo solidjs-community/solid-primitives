@@ -2,6 +2,7 @@ import { access, isObject, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal, JSX } from "solid-js";
 
 import { createFocus } from "../interactions";
+import { DOMElements } from "../types";
 
 interface AriaVisuallyHiddenProps {
   /**
@@ -15,11 +16,11 @@ interface AriaVisuallyHiddenProps {
   style?: MaybeAccessor<JSX.CSSProperties | string | undefined>;
 }
 
-interface VisuallyHiddenAria<T extends HTMLElement> {
+interface VisuallyHiddenAria<T extends DOMElements> {
   /**
    * Props to spread onto the target element.
    */
-  visuallyHiddenProps: Accessor<JSX.HTMLAttributes<T>>;
+  visuallyHiddenProps: Accessor<JSX.IntrinsicElements[T]>;
 }
 
 const visuallyHiddenStyles: JSX.CSSProperties = {
@@ -39,7 +40,7 @@ const visuallyHiddenStyles: JSX.CSSProperties = {
  * Provides props for an element that hides its children visually
  * but keeps content visible to assistive technology.
  */
-export function createVisuallyHidden<T extends HTMLElement>(
+export function createVisuallyHidden<T extends DOMElements = "div">(
   props: AriaVisuallyHiddenProps = {}
 ): VisuallyHiddenAria<T> {
   const [isFocused, setFocused] = createSignal(false);
@@ -64,10 +65,12 @@ export function createVisuallyHidden<T extends HTMLElement>(
     return visuallyHiddenStyles;
   });
 
-  const visuallyHiddenProps: Accessor<JSX.HTMLAttributes<T>> = createMemo(() => ({
-    ...focusProps(),
-    style: combinedStyles()
-  }));
+  const visuallyHiddenProps = createMemo(() => {
+    return {
+      ...focusProps(),
+      style: combinedStyles()
+    } as JSX.IntrinsicElements[T];
+  });
 
   return { visuallyHiddenProps };
 }

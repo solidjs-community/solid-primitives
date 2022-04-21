@@ -208,4 +208,22 @@ describe("createSwitch", () => {
     expect(input).toHaveAttribute("aria-checked", "true");
     expect(onChangeSpy).not.toHaveBeenCalled();
   });
+
+  it("supports uncontrolled readOnly", async () => {
+    render(() => (
+      <Switch onChange={onChangeSpy} isReadOnly>
+        Click Me
+      </Switch>
+    ));
+
+    const input = screen.getByTestId("input") as HTMLInputElement;
+
+    expect(input.checked).toBeFalsy();
+
+    fireEvent.click(input);
+    await Promise.resolve();
+
+    expect(input.checked).toBeFalsy();
+    expect(onChangeSpy).not.toHaveBeenCalled();
+  });
 });

@@ -12,9 +12,9 @@ Provides the behavior and accessibility implementation for a checkbox component.
 
 ### Features
 
-Checkboxes can be built with the `<input />` HTML element, but this can be difficult to style. `createCheckbox` helps achieve accessible checkboxes that can be styled as needed.
+Checkboxes can be built with the `<input>` HTML element, but this can be difficult to style. `createCheckbox` helps achieve accessible checkboxes that can be styled as needed.
 
-- Built with a native HTML `<input />` element, which can be optionally visually hidden to allow custom styling
+- Built with a native HTML `<input>` element, which can be optionally visually hidden to allow custom styling
 - Full support for browser features like form autofill
 - Keyboard focus management and cross browser normalization
 - Labeling support for assistive technology
@@ -25,11 +25,7 @@ Checkboxes can be built with the `<input />` HTML element, but this can be diffi
 ```tsx
 import { AriaCheckboxProps, createCheckbox, createToggleState } from "@solid-primitives/ui";
 
-interface CheckboxProps extends AriaCheckboxProps {
-  // your component specific props
-}
-
-function Checkbox(props: CheckboxProps) {
+function Checkbox(props: AriaCheckboxProps) {
   let ref: HTMLInputElement | undefined;
 
   const state = createToggleState(props);
@@ -70,11 +66,7 @@ import {
 
 import { Show } from "solid-js/web";
 
-interface CheckboxProps extends AriaCheckboxProps {
-  // your component specific props
-}
-
-function Checkbox(props: CheckboxProps) {
+function Checkbox(props: AriaCheckboxProps) {
   let ref: HTMLInputElement | undefined;
 
   const state = createToggleState(props);
@@ -123,8 +115,87 @@ function App() {
 
 #### RTL
 
-In right-to-left languages, the checkbox should be mirrored. The checkbox should be placed on the right side of the label. Ensure that your CSS accounts for this.
+In right-to-left languages, the checkbox should be mirrored. Ensure that your CSS accounts for this.
 
-## `createCheckboxGroup`
+# Checkbox Group
 
-TODO
+Checkbox groups allow users to select multiple items from a list of options.
+
+## `createCheckboxGroup` and `createCheckboxGroupItem`
+
+Provides the behavior and accessibility implementation for a checkbox group component.
+
+### Features
+
+Checkbox groups can be built in HTML with the `<fieldset>` and `<input>` elements, however these can be difficult to style. `createCheckboxGroup` and `createCheckboxGroupItem` help achieve accessible checkbox groups that can be styled as needed.
+
+- Checkbox groups are exposed to assistive technology via ARIA
+- Each checkbox is built with a native HTML `<input>` element, which can be optionally visually hidden to allow custom styling
+- Full support for browser features like form autofill
+- Keyboard focus management and cross browser normalization
+- Group and checkbox labeling support for assistive technology
+
+### How to use it
+
+This example uses native input elements for the checkboxes, and SolidJS context to share state from the group to each checkbox. An HTML `<label>` element wraps the native input and the text to provide an implicit label for the checkbox.
+
+```tsx
+import {
+  AriaCheckboxGroupItemProps,
+  AriaCheckboxGroupProps,
+  CheckboxGroupState,
+  createCheckboxGroup,
+  createCheckboxGroupItem,
+  createCheckboxGroupState
+} from "@solid-primitives/ui";
+
+import { createContext, useContext } from "solid-js";
+
+const CheckboxGroupContext = createContext<CheckboxGroupState>();
+
+function CheckboxGroup(props: AriaCheckboxGroupProps) {
+  const state = createCheckboxGroupState(props);
+  const { groupProps, labelProps } = createCheckboxGroup(props, state);
+
+  return (
+    <div {...groupProps()}>
+      <span {...labelProps()}>{props.label}</span>
+      <CheckboxGroupContext.Provider value={state}>{props.children}</CheckboxGroupContext.Provider>
+    </div>
+  );
+}
+
+function Checkbox(props: AriaCheckboxGroupItemProps) {
+  let ref: HTMLInputElement | undefined;
+
+  const state = useContext(CheckboxGroupContext)!;
+  const { inputProps } = createCheckboxGroupItem(props, state, () => ref);
+
+  const isDisabled = () => state.isDisabled() || props.isDisabled;
+  const isSelected = () => state.isSelected(props.value);
+
+  return (
+    <label
+      style={{
+        display: "block",
+        color: (isDisabled() && "gray") || (isSelected() && "dodgerblue")
+      }}
+    >
+      <input {...inputProps()} ref={ref} />
+      {props.children}
+    </label>
+  );
+}
+
+function App() {
+  return (
+    <CheckboxGroup label="Favorite sports">
+      <Checkbox value="soccer" isDisabled>
+        Soccer
+      </Checkbox>
+      <Checkbox value="baseball">Baseball</Checkbox>
+      <Checkbox value="basketball">Basketball</Checkbox>
+    </CheckboxGroup>
+  );
+}
+```

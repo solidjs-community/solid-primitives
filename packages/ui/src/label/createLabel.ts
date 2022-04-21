@@ -1,7 +1,7 @@
 import { MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo, JSX, mergeProps, splitProps } from "solid-js";
 
-import { AriaLabelingProps, DOMProps, ElementType, LabelableProps } from "../types";
+import { AriaLabelingProps, DOMElements, DOMProps, ElementType, LabelableProps } from "../types";
 import { createId, mergeAriaLabels } from "../utils";
 
 export interface LabelAriaProps extends LabelableProps, DOMProps, AriaLabelingProps {
@@ -12,11 +12,11 @@ export interface LabelAriaProps extends LabelableProps, DOMProps, AriaLabelingPr
   labelElementType?: MaybeAccessor<ElementType | undefined>;
 }
 
-export interface LabelAria {
+export interface LabelAria<T extends DOMElements> {
   /**
    * Props to apply to the label container element.
    */
-  labelProps: Accessor<JSX.LabelHTMLAttributes<HTMLLabelElement>>;
+  labelProps: Accessor<JSX.IntrinsicElements[T]>;
 
   /**
    * Props to apply to the field container element being labeled.
@@ -29,7 +29,7 @@ export interface LabelAria {
  * Labels provide context for user inputs.
  * @param props - The props for labels and fields.
  */
-export function createLabel(props: LabelAriaProps): LabelAria {
+export function createLabel<T extends DOMElements = "label">(props: LabelAriaProps): LabelAria<T> {
   const defaultFieldId = createId();
   const labelId = createId();
 
@@ -47,7 +47,7 @@ export function createLabel(props: LabelAriaProps): LabelAria {
     "labelElementType"
   ]);
 
-  const labelProps: Accessor<JSX.LabelHTMLAttributes<HTMLLabelElement>> = createMemo(() => {
+  const labelProps: Accessor<JSX.IntrinsicElements[T]> = createMemo(() => {
     if (!local.label) {
       return {};
     }
@@ -72,8 +72,5 @@ export function createLabel(props: LabelAriaProps): LabelAria {
     "aria-labelledby": ariaLabelledby
   });
 
-  return {
-    labelProps,
-    fieldProps
-  };
+  return { labelProps, fieldProps };
 }

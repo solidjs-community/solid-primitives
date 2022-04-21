@@ -38,3 +38,5 @@ function App() {
   return <ColorField label="Favorite color" />;
 }
 ```
+
+By default, `createLabel` assumes that the label is a native HTML label element. However, if you are labeling a non-native form element, be sure to use an element other than a `<label>` and set the `labelElementType` prop appropriately.

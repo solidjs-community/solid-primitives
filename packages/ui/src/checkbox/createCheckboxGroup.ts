@@ -1,21 +1,21 @@
 import { Accessor, createEffect, createMemo, JSX, mergeProps } from "solid-js";
 
 import { createLabel, LabelAriaProps } from "../label";
-import { AriaCheckboxGroupProps } from "../types";
+import { AriaCheckboxGroupProps, DOMElements } from "../types";
 import { combineProps, filterDOMProps } from "../utils";
 import { CheckboxGroupState } from "./createCheckboxGroupState";
 import { checkboxGroupNames } from "./utils";
 
-interface CheckboxGroupAria {
+interface CheckboxGroupAria<T extends DOMElements, U extends DOMElements> {
   /**
    * Props for the checkbox group wrapper element.
    */
-  groupProps: Accessor<JSX.HTMLAttributes<HTMLElement>>;
+  groupProps: Accessor<JSX.IntrinsicElements[T]>;
 
   /**
    * Props for the checkbox group's visible label (if any).
    *  */
-  labelProps: Accessor<JSX.HTMLAttributes<HTMLElement>>;
+  labelProps: Accessor<JSX.IntrinsicElements[U]>;
 }
 
 /**
@@ -24,10 +24,10 @@ interface CheckboxGroupAria {
  * @param props - Props for the checkbox group.
  * @param state - State for the checkbox group, as returned by `useCheckboxGroupState`.
  */
-export function createCheckboxGroup(
+export function createCheckboxGroup<T extends DOMElements = "div", U extends DOMElements = "span">(
   props: AriaCheckboxGroupProps,
   state: CheckboxGroupState
-): CheckboxGroupAria {
+): CheckboxGroupAria<T, U> {
   const defaultCreateLabelProps: LabelAriaProps = {
     // Checkbox group is not an HTML input element so it
     // shouldn't be labeled by a <label> element.
@@ -36,16 +36,16 @@ export function createCheckboxGroup(
 
   const createLabelProps = mergeProps(defaultCreateLabelProps, props);
 
-  const { labelProps, fieldProps } = createLabel(createLabelProps);
+  const { labelProps, fieldProps } = createLabel<U>(createLabelProps);
 
   const domProps = createMemo(() => filterDOMProps(props, { labelable: true }));
 
-  const groupProps: Accessor<JSX.HTMLAttributes<HTMLElement>> = createMemo(() => {
+  const groupProps = createMemo(() => {
     return combineProps(domProps(), {
       role: "group",
       "aria-disabled": props.isDisabled || undefined,
       ...fieldProps()
-    } as JSX.HTMLAttributes<HTMLElement>);
+    });
   });
 
   // Pass name prop from group to all items by attaching to the state.
@@ -57,7 +57,7 @@ export function createCheckboxGroup(
   });
 
   return {
-    groupProps,
-    labelProps: labelProps as Accessor<JSX.HTMLAttributes<HTMLElement>>
+    groupProps: groupProps as Accessor<unknown> as Accessor<JSX.IntrinsicElements[T]>,
+    labelProps
   };
 }

@@ -1,3 +1,5 @@
+import { JSX } from "solid-js";
+
 import { AriaLabelingProps, AriaValidationProps } from "./aria";
 import { DOMProps } from "./dom";
 import { InputBase, ValueBase } from "./inputs";
@@ -21,6 +23,11 @@ export interface AriaCheckboxGroupProps
     DOMProps,
     AriaLabelingProps,
     AriaValidationProps {
+  /**
+   * The Checkboxes contained within the CheckboxGroup.
+   */
+  children?: JSX.Element;
+
   /**
    * The name of the CheckboxGroup, used when submitting an HTML form.
    */

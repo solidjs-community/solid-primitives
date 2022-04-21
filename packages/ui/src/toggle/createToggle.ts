@@ -57,9 +57,7 @@ export function createToggle(
     // clicking on the input will change its internal `checked` state.
     //
     // To prevent this, we need to force the input `checked` state to be in sync with the toggle state.
-    if (state.isSelected() !== target.checked) {
-      target.checked = state.isSelected();
-    }
+    target.checked = state.isSelected();
   };
 
   const { pressProps } = createPress(props);
