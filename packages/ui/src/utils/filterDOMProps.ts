@@ -33,7 +33,7 @@ interface Options {
 
 const dataAttrsRegex = /^(data-.*)$/;
 
-// Note: "valid DOM props" refers to the `DOMPropNames` Set above.
+// Note: "valid DOM props" refers to the `DOMPropNames` Set above, not "any valid DOM props".
 /**
  * Filters out all props that aren't valid DOM props or defined via override prop obj.
  * @param props - The component props to be filtered.

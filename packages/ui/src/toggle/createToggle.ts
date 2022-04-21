@@ -50,10 +50,13 @@ export function createToggle(
 
     state.setSelected(target.checked);
 
-    // unlike in React, inputs `checked` state can be out of sync with our toggle state.
-    // for example a readonly `<input type="checkbox">` is always "checkable".
-    // clicking on the input will change its `checked` state.
-    // so we need to force the input `checked` state to be in sync with the toggle state in that case.
+    // Unlike in React, inputs `checked` state can be out of sync with our toggle state.
+    // for example a readonly `<input type="checkbox" />` is always "checkable".
+    //
+    // Also even if an input is controlled (ex: `<input type="checkbox" checked={isChecked} />`,
+    // clicking on the input will change its internal `checked` state.
+    //
+    // To prevent this, we need to force the input `checked` state to be in sync with the toggle state.
     if (state.isSelected() !== target.checked) {
       target.checked = state.isSelected();
     }
@@ -65,6 +68,8 @@ export function createToggle(
   const domProps = createMemo(() => filterDOMProps(props, { labelable: true }));
 
   const inputProps = createMemo(() => {
+    console.log(domProps());
+
     return combineProps(
       domProps(),
       {

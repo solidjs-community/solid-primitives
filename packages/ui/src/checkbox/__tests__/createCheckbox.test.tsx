@@ -91,11 +91,12 @@ describe("createCheckbox", () => {
     expect(input).toHaveAttribute("aria-readonly", "true");
   });
 
-  it("should sets aria-checked='mixed' when isIndeterminate is true", async () => {
+  it("should sets indeterminate and aria-checked='mixed' when isIndeterminate is true", async () => {
     render(() => <Checkbox isIndeterminate>Test</Checkbox>);
 
     const input = screen.getByTestId("input") as HTMLInputElement;
 
+    expect(input.indeterminate).toBeTruthy();
     expect(input).toHaveAttribute("aria-checked", "mixed");
   });
 });
