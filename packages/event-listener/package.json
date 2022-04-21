@@ -38,7 +38,7 @@
     "dev": "yarn start",
     "build": "tsup",
     "test": "uvu -r solid-register",
-    "watch-test": "watchlist src test -- npm test"
+    "test:watch": "watchlist src test -- npm test"
   },
   "keywords": [
     "event",
