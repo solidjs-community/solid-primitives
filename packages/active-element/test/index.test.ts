@@ -1,53 +1,92 @@
+import { fireEvent, createEvent } from "solid-testing-library";
 import { createRoot } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
-import { createActiveElement, createIsElementActive } from "../src";
+import {
+  newActiveElementListener,
+  createActiveElement,
+  newFocusListener,
+  createFocusSignal
+} from "../src";
 
-const cae = suite("createActiveElement");
+const testNAEL = suite("newActiveElementListener");
 
-cae("returns correct values", () =>
+const dispatchFocusEvent = (target: Element | Window = window, event: "focus" | "blur" = "focus") =>
+  fireEvent(target, createEvent(event, window));
+
+testNAEL("works properly", () =>
   createRoot(dispose => {
-    const [activeEl, stop] = createActiveElement();
-
-    assert.type(activeEl, "function");
-    assert.ok(
-      () => activeEl() === null || activeEl() === document.body,
-      "no element should be active"
-    );
-    assert.type(stop, "function");
+    let events = 0;
+    let captured;
+    newActiveElementListener(e => ((captured = e), events++));
+    assert.is(captured, undefined);
+    dispatchFocusEvent();
+    assert.is(captured, null);
+    assert.is(events, 1);
 
     dispose();
+    dispatchFocusEvent();
+    assert.is(events, 1);
+
+    const clear = newActiveElementListener(e => events++);
+    dispatchFocusEvent();
+    assert.is(events, 2);
+
+    clear();
+    dispatchFocusEvent();
+    assert.is(events, 2);
   })
 );
 
-cae.run();
+testNAEL.run();
 
-const iea = suite("createIsElementActive");
+const testNFL = suite("newFocusListener");
 
-iea("returns correct values", () =>
+testNFL("works properly", () =>
   createRoot(dispose => {
     const el = document.createElement("div");
-    const [isFocused, stop] = createIsElementActive(el);
+    const captured: any[] = [];
+    const clear = newFocusListener(el, e => captured.push(e));
+    assert.equal(captured, []);
+    dispatchFocusEvent(el, "focus");
+    assert.equal(captured, [true]);
+    dispatchFocusEvent(el, "blur");
+    assert.equal(captured, [true, false]);
+    clear();
+    dispatchFocusEvent(el, "focus");
+    assert.equal(captured, [true, false]);
+    newFocusListener(el, e => captured.push(e));
+    dispatchFocusEvent(el, "blur");
+    assert.equal(captured, [true, false, false]);
+    dispose();
+    dispatchFocusEvent(el, "focus");
+    assert.equal(captured, [true, false, false]);
+  })
+);
 
-    assert.type(isFocused, "function");
-    assert.is(isFocused(), false);
-    assert.type(stop, "function");
+testNFL.run();
 
+const testCAE = suite("createActiveElement");
+
+testCAE("works properly", () =>
+  createRoot(dispose => {
+    const activeEl = createActiveElement();
+    assert.is(activeEl(), null);
     dispose();
   })
 );
 
-iea("target can be an accessor", () =>
+testCAE.run();
+
+const testCFS = suite("createFocusSignal");
+
+testCFS("works properly", () =>
   createRoot(dispose => {
     const el = document.createElement("div");
-    const [isFocused, stop] = createIsElementActive(() => el);
-
-    assert.type(isFocused, "function");
-    assert.is(isFocused(), false);
-    assert.type(stop, "function");
-
+    const activeEl = createFocusSignal(el);
+    assert.is(activeEl(), false);
     dispose();
   })
 );
 
-iea.run();
+testCFS.run();
