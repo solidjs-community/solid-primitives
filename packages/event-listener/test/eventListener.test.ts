@@ -6,15 +6,58 @@ import {
   createEventListener,
   createEventSignal,
   eventListener,
-  EventListenerDirectiveProps
+  EventListenerDirectiveProps,
+  newEventListener
 } from "../src";
+
+const testNewListener = suite("newEventListener");
+
+testNewListener("listens to events", () =>
+  createRoot(dispose => {
+    const testEvent = new Event("test");
+    let capturedEvent!: Event;
+    newEventListener<{ test: Event }>(window, "test", ev => {
+      capturedEvent = ev;
+    });
+    dispatchFakeEvent("test", testEvent);
+    assert.is(capturedEvent, testEvent);
+    dispose();
+  })
+);
+
+testNewListener("returns clear() function", () =>
+  createRoot(dispose => {
+    const testEvent = new Event("test");
+    let capturedEvent!: Event;
+    const clear = newEventListener<{ test: Event }>(window, "test", ev => {
+      capturedEvent = ev;
+    });
+    clear();
+    dispatchFakeEvent("test", testEvent);
+    assert.is(capturedEvent, undefined);
+    dispose();
+  })
+);
+
+testNewListener("clears on cleanup", () =>
+  createRoot(dispose => {
+    const testEvent = new Event("test");
+    let capturedEvent!: Event;
+    newEventListener<{ test: Event }>(window, "test", ev => {
+      capturedEvent = ev;
+    });
+    dispose();
+    dispatchFakeEvent("test", testEvent);
+    assert.is(capturedEvent, undefined);
+  })
+);
 
 const test = suite("createEventListener");
 
 test("single window target", () => {
   createRoot(dispose => {
     const testEvent = new Event("test");
-    let capturedEvent: Event;
+    let capturedEvent!: Event;
     createEventListener<{ test: Event }>(window, "test", ev => {
       capturedEvent = ev;
     });
@@ -27,7 +70,7 @@ test("single window target", () => {
 test("array window target", () => {
   createRoot(dispose => {
     const testEvent = new Event("test");
-    let capturedEvent: Event;
+    let capturedEvent!: Event;
     createEventListener<{ test: Event }>([window, document.createElement("p")], "test", ev => {
       capturedEvent = ev;
     });
@@ -39,7 +82,7 @@ test("array window target", () => {
 
 test("accessor window target", () => {
   createRoot(dispose => {
-    const [target, setTarget] = createSignal(window);
+    const [target, setTarget] = createSignal<Window | []>(window);
     const testEvent = new Event("test");
     let captured_times = 0;
     createEventListener<{ test: Event }>(target, "test", ev => {
@@ -52,7 +95,7 @@ test("accessor window target", () => {
       dispatchFakeEvent("test", testEvent);
       assert.is(captured_times, 1);
 
-      setTarget(undefined);
+      setTarget([]);
 
       setTimeout(() => {
         dispatchFakeEvent("test", testEvent);
@@ -74,7 +117,7 @@ test("listening multiple events", () => {
   createRoot(dispose => {
     const event1 = new Event("test1");
     const event2 = new Event("test2");
-    let capturedEvent: Event;
+    let capturedEvent!: Event;
     createEventListener<{ test1: Event; test2: Event }>(window, ["test1", "test2"], ev => {
       capturedEvent = ev;
     });
@@ -120,12 +163,14 @@ test("disposing on cleanup", () =>
     });
   }));
 
+test.run();
+
 const signalTest = suite("createEventSignal");
 
 signalTest("return autoupdating signal", () =>
   createRoot(dispose => {
     const testEvent = new Event("sig_test");
-    const [lastEvent] = createEventSignal<{ sig_test: Event }>(window, "sig_test");
+    const lastEvent = createEventSignal<{ sig_test: Event }>(window, "sig_test");
     assert.type(lastEvent, "function", "returned value is an accessor");
     assert.type(lastEvent(), "undefined", "returned value is undefined");
 
@@ -184,6 +229,5 @@ directiveTest("will work as directive and update the event", () =>
   })
 );
 
-test.run();
 signalTest.run();
 directiveTest.run();

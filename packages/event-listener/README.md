@@ -11,13 +11,12 @@
 
 A set of primitives that help with listening to DOM and Custom Events.
 
-- [`createEventListener`](#createEventListener) - Very basic and straightforward primitive that handles multiple elements according to a single event binding.
-- [`createEventSignal`](#createEventListener) - Like `createEventListener`, but events are handled with the returned signal, instead of with a callback.
+- [`newEventListener`](#newEventListener) - Non-reactive primitive for adding event listeners that get's removed onCleanup.
+- [`createEventListener`](#createEventListener) - Reactive version of [`newEventListener`](#newEventListener), that takes signal arguments to apply new listeners once changed.
+- [`createEventSignal`](#createEventListener) - Like [`createEventListener`](#createEventListener), but captured events are stored in a returned signal.
 - [`createEventListenerMap`](#createEventListenerMap) - A helpful primitive that listens to a map of events. Handle them by individual callbacks.
-- [`createEventStore`](#createEventStore) - Similar to `createEventListenerMap`, but provides a reactive store with the latest captured events.
-- [`createEventListenerBus`](#createEventListenerBus) - Dynamically add and remove event listeners to an event target by calling appropriate property.
 - [`WindowEventListener`](#WindowEventListener) - Listen to the `window` DOM Events, using a component.
-- [`DocumentEventListener`](#DocumentEventListener) - The same as [`WindowEventListener`](#WindowEventListener), but listens to `document` events.
+- [`DocumentEventListener`](#DocumentEventListener) - Listen to the `document` DOM Events, using a component.
 
 ## Installation
 
@@ -27,16 +26,18 @@ npm install @solid-primitives/event-listener
 yarn add @solid-primitives/event-listener
 ```
 
-## `createEventListener`
+## `newEventListener`
 
-Can be used to listen to DOM or Custom Events on window, document, list of HTML elements or any EventTarget. The target prop can be reactive.
+Can be used to listen to DOM or Custom Events on window, document, or any EventTarget.
+
+Event listener is automatically removed on root cleanup. The clear() function is also returned for calling it early.
 
 ### How to use it
 
-```ts
-import { createEventListener } from "@solid-primitives/event-listener";
+```tsx
+import { newEventListener } from "@solid-primitives/event-listener";
 
-const clear = createEventListener(
+const clear = newEventListener(
   document.getElementById("myButton"),
   "mousemove",
   e => console.log("x:", e.pageX, "y:", e.pageY),
@@ -46,17 +47,55 @@ const clear = createEventListener(
 // to clear all of the event listeners
 clear();
 
+// when listening to element refs, call it inside onMount
+let ref!: HTMLDivElement
+onMount(() => {
+  newEventListener(ref, "click", e => {...}, { passive: true });
+});
+
+<div ref={ref} />;
+```
+
+#### Custom events
+
+```ts
+// you can provide your own event map type as well:
+// fill both type generics for the best type support
+newEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
+  window,
+  "myCustomEvent",
+  () => console.log("yup!")
+);
+// just don't use interfaces as EventMaps! (write them using `type` keyword)
+```
+
+## `createEventListener`
+
+Reactive version of [`newEventListener`](#newEventListener), that can take signal `target` and `type` arguments to apply new listeners once changed.
+
+### How to use it
+
+```tsx
+import { createEventListener } from "@solid-primitives/event-listener";
+
+createEventListener(
+  document.getElementById("myButton"),
+  "mousemove",
+  e => console.log("x:", e.pageX, "y:", e.pageY),
+  { passive: true }
+);
+
+
 // target element and event name can be reactive signals
 const [ref, setRef] = createSignal<HTMLElement>();
-const [name, setName] = createSignal("mousemove");
-createEventListener(ref, name, e => {}, { passive: true });
+const [type, setType] = createSignal("mousemove");
+createEventListener(ref, type, e => {...});
 
-// also runs in createEffect so refs are already bound
-// (but variable refs need to be wrapped in functions)
+// when using ref as a target, pass it in a function – function will be executed after mount
+// or wrap the whole primitive in onMount
 let ref;
 createEventListener(() => ref, "mousemove", e => {});
-return <div ref={ref}/>;
-
+<div ref={ref} />;
 ```
 
 #### Custom events
@@ -70,6 +109,31 @@ createEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
   () => console.log("yup!")
 );
 // just don't use interfaces as EventMaps! (write them using `type` keyword)
+```
+
+#### Removing event listeners manually
+
+Since version `@2.0.0` `createEventListener` and other reactive primitives aren't returning a `clear()` function, because of it's flawed behavior [described in this issue](https://github.com/solidjs-community/solid-primitives/issues/103).
+
+Although there are still ways to remove attached event listeners:
+
+1. Changing reactive `target` or `type` arguments to an empty array.
+
+```ts
+const [type, setType] = createSignal<"click" | []>("click");
+createEventListener(window, type, e => {...});
+// remove listener:
+setType([]);
+```
+
+2. Wrapping usage of `createEventListener` primitive in Solid's `createRoot` or `createBranch` | `createDisposable` from ["@solid-primitives/rootless"](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createDisposable).
+
+```ts
+import { createDisposable } from "@solid-primitives/rootless";
+
+const clear = createDisposable(() => createEventListener(element, "click", e => {...}));
+// remove listener:
+clear();
 ```
 
 #### Listening to multiple events
@@ -104,14 +168,11 @@ Like [`createEventListener`](#createEventListener), but events are handled with 
 import { createEventSignal } from "@solid-primitives/event-listener";
 
 // all arguments can be reactive signals
-const [lastEvent, clear] = createEventSignal(el, "mousemove", { passive: true });
+const lastEvent = createEventSignal(el, "mousemove", { passive: true });
 
 createEffect(() => {
   console.log(lastEvent()?.x, lastEvent()?.y);
 });
-
-// to clear all the event listeners
-clear();
 ```
 
 ## `createEventListenerMap`
@@ -123,14 +184,11 @@ A helpful primitive that listens to a map of events. Handle them by individual c
 ```ts
 import { createEventListenerMap } from "@solid-primitives/event-listener";
 
-const clear = createEventListenerMap(element, {
+createEventListenerMap(element, {
   mousemove: mouseHandler,
   mouseenter: e => {},
   touchend: touchHandler
 });
-
-// to clear all the event listeners
-clear();
 
 // both target can be reactive:
 const [target, setTarget] = createSignal(document.getElementById("abc"));
@@ -155,137 +213,6 @@ createEventListenerMap<
 >(target, {
   myEvent: e => {},
   custom: e => {}
-});
-```
-
-### Directive usage
-
-```tsx
-import { eventListenerMap } from "@solid-primitives/event-listener";
-// prevent tree-shaking:
-eventListenerMap;
-
-<div
-  use:eventListenerMap={{
-    mousemove: e => {},
-    click: clickHandler,
-    touchstart: () => {},
-    myCustomEvent: e => {}
-  }}
-></div>;
-```
-
-## `createEventStore`
-
-Similar to [`createEventListenerMap`](#createEventListenerMap), but provides a reactive store with the latest captured events.
-
-### How to use it
-
-```ts
-const [lastEvents, clear] = createEventStore(el, "mousemove", "touchend", "click");
-
-createEffect(() => {
-  console.log(lastEvents?.mousemove.x);
-});
-
-// to clear all the event listeners
-clear()
-
-// both target and options args can be reactive:
-const [target, setTarget] = createSignal(document.getElementById("abc"));
-const [lastEvents] = createEventStore(target, "mousemove", "touchmove");
-
-// createEventStore can be used to listen to custom events
-// fill both type generics for the best type support
-const [lastEvents] = createEventStore<
-  {
-    myEvent: MyEvent;
-    custom: Event;
-    unused: Event;
-  },
-  "myEvent" | "custom"
->(target, "myEvent", "custom");
-
-// DON'T DO THIS:
-const [{ mousemove }] = createEventStore(target, "mousemove", ...);
-// the store cannot be destructured
-```
-
-## `createEventListenerBus`
-
-###### Added in `@1.5.0`
-
-Dynamically add and remove event listeners to an event target by calling appropriate property. The listeners will be automatically removed on cleanup.
-
-### How to use it
-
-#### Import
-
-```ts
-import { createEventListenerBus } from "@solid-primitives/event-listener";
-```
-
-#### Basic usage
-
-`createEventListenerBus` takes two arguments:
-
-- `target` - the event target, could be a `window`, `document`, `HTMLElement` or `MediaQueryList`. _Defaults to `window`_
-- `options` - event listener options, such as `passive` or `capture`
-
-```ts
-const bus = createEventListenerBus(document.body);
-bus.onpointerenter(e => {...});
-// listeners return a function that removes them
-const clear = bus.onpointermove(e => {...});
-clear();
-```
-
-#### Reactive target
-
-Target argument could be an **array**, and a **reactive signal**.
-
-```ts
-const [target, setTarget] = createSignal([document.body]);
-const bus = createEventListenerBus(target);
-setTarget(p => [...p, window]); // will change the targets of all active listeners.
-```
-
-#### generic on()
-
-Using `bus.on(type, handler)` gives you more options in passing event type.
-
-```ts
-bus.on("click", e => {});
-bus.on(["mousemove", "mousedown"], e => {});
-const [types, setTypes] = createsignal(["focus", "blur"]);
-bus.on(types, e => {});
-```
-
-#### Custom Events
-
-The `createEventListenerBus` can be used to listen to Custom Events.
-
-```ts
-const bus = createEventListenerBus<{
-  foo: SomeEvent;
-  bar: MyEvent;
-}>();
-bus.onfoo(e => {});
-bus.onbar(e => {});
-```
-
-#### Reactive Roots
-
-The EventListenerBus is designed in a way to let you add event listeners outside of reactive roots/ in different root then the one primitive was used in.
-
-```ts
-const bus = createRoot(dispose => {
-  return createEventListenerBus();
-});
-
-// listeners can be added outside of the original root setup function.
-createRoot(dispose => {
-  bus.onclick(e => {});
 });
 ```
 
@@ -370,5 +297,13 @@ Allow listening to multiple event types with a single `createEventListener` | `c
 1.5.0
 
 Add `createEventListenerBus`.
+
+2.0.0
+
+Remove `createEventListenerBus`, `createEventListenerStore` & `eventListenerMap`
+
+Add `newEventListener`
+
+Remove clear() functions from reactive primitives.
 
 </details>
