@@ -155,7 +155,7 @@ Updated to Solid 1.3
 
 2.0.0 - **stage-3**
 
-Renamed `createIsElementActive` to `createFocusSignal` nad `isElementActive` directive to `focus`.
+Renamed `createIsElementActive` to `createFocusSignal` and `isElementActive` directive to `focus`.
 
 Add `newActiveElementListener` & `newFocusListener` non-reactive primitives.
 
