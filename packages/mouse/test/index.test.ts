@@ -1,39 +1,30 @@
+import { createStaticStore } from "@solid-primitives/utils";
 import { createRoot } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
-import {
-  createMouseInElement,
-  createMouseOnScreen,
-  createMousePosition,
-  createMouseToElement
-} from "../src";
+import { createMousePosition, createPositionToElement } from "../src";
 
 const mp = suite("createMousePosition");
 
-mp("returns correct values", () =>
+mp("returns fallback", () =>
   createRoot(dispose => {
-    const [{ x, y, sourceType }, stop] = createMousePosition();
-
-    assert.type(x, "function");
-    assert.is(x(), 0);
-    assert.type(y, "function");
-    assert.is(y(), 0);
-    assert.type(sourceType, "function");
-    assert.is(sourceType(), null);
-
-    assert.type(stop, "function");
+    const pos = createMousePosition();
+    assert.is(pos.x, 0);
+    assert.is(pos.y, 0);
+    assert.is(pos.sourceType, null);
+    assert.is(pos.isInside, false);
     dispose();
   })
 );
 
 mp("initial values can be changed", () =>
   createRoot(dispose => {
-    const [{ x, y }] = createMousePosition({
+    const pos = createMousePosition(undefined, {
       initialValue: { x: 69, y: 420 }
     });
-    assert.is(x(), 69);
-    assert.is(y(), 420);
+    assert.is(pos.x, 69);
+    assert.is(pos.y, 420);
     dispose();
   })
 );
@@ -45,36 +36,46 @@ const mte = suite("createMouseToElement");
 mte("returns correct values", () =>
   createRoot(dispose => {
     const el = document.createElement("div");
-    const [{ x, y, width, height, top, left, isInside }, update] = createMouseToElement(el);
+    const [pos, setPos] = createStaticStore({ x: 0, y: 0 });
+    const relative = createPositionToElement(el, () => pos);
 
-    assert.type(x, "function");
-    assert.is(x(), 0);
-    assert.type(y, "function");
-    assert.is(y(), 0);
-    assert.type(width, "function");
-    assert.is(width(), 0);
-    assert.type(height, "function");
-    assert.is(height(), 0);
-    assert.type(top, "function");
-    assert.is(top(), 0);
-    assert.type(left, "function");
-    assert.is(left(), 0);
-    assert.type(isInside, "function");
-    // isInside is calculated with position and element bounds,
-    // so x is greater or equal to 0
-    assert.is(isInside(), true);
+    assert.is(relative.x, 0);
+    assert.is(relative.y, 0);
+    assert.is(relative.width, 0);
+    assert.is(relative.height, 0);
+    assert.is(relative.top, 0);
+    assert.is(relative.left, 0);
+    assert.is(relative.isInside, true);
 
-    assert.type(update, "function");
+    setPos({ x: -20, y: 30 });
+
+    assert.is(relative.x, -20);
+    assert.is(relative.y, 30);
+    assert.is(relative.width, 0);
+    assert.is(relative.height, 0);
+    assert.is(relative.top, 0);
+    assert.is(relative.left, 0);
+    assert.is(relative.isInside, false);
+
+    setPos({ x: 15 });
+
+    assert.is(relative.x, 15);
+    assert.is(relative.y, 30);
+    assert.is(relative.width, 0);
+    assert.is(relative.height, 0);
+    assert.is(relative.top, 0);
+    assert.is(relative.left, 0);
+    assert.is(relative.isInside, false);
+
     dispose();
   })
 );
 
 mte("initial values can be changed", () =>
   createRoot(dispose => {
-    const [{ x, y, width, height, top, left, isInside }] = createMouseToElement(
-      // passed target must behave like an ref (initially undefined) for initial values to matter
+    const pos = createPositionToElement(
       () => undefined,
-      undefined,
+      () => ({ x: 69, y: 420 }),
       {
         initialValue: {
           x: -1,
@@ -87,80 +88,16 @@ mte("initial values can be changed", () =>
       }
     );
 
-    assert.is(x(), -1);
-    assert.is(y(), 2);
-    assert.is(width(), 3);
-    assert.is(height(), 4);
-    assert.is(top(), 5);
-    assert.is(left(), 6);
-    assert.is(isInside(), false, "x is smaller than 0");
+    assert.is(pos.x, -1);
+    assert.is(pos.y, 2);
+    assert.is(pos.width, 3);
+    assert.is(pos.height, 4);
+    assert.is(pos.top, 5);
+    assert.is(pos.left, 6);
+    assert.is(pos.isInside, false);
 
     dispose();
   })
 );
 
 mte.run();
-
-const mie = suite("createMouseInElement");
-
-mie("returns correct values", () =>
-  createRoot(dispose => {
-    const el = document.createElement("div");
-    const [{ x, y, isInside }, stop] = createMouseInElement(el);
-
-    assert.type(x, "function");
-    assert.is(x(), 0);
-    assert.type(y, "function");
-    assert.is(y(), 0);
-    assert.type(isInside, "function");
-    // isInside is captured by mouseenter and mouseleave events
-    // none of these happened yet, so it defaults to false
-    assert.is(isInside(), false);
-
-    assert.type(stop, "function");
-    dispose();
-  })
-);
-
-mie("initial values can be changed", () =>
-  createRoot(dispose => {
-    const el = document.createElement("div");
-    const [{ x, y }] = createMouseInElement(el, {
-      initialValue: {
-        x: 69,
-        y: 420
-      }
-    });
-
-    assert.is(x(), 69);
-    assert.is(y(), 420);
-
-    dispose();
-  })
-);
-
-mie.run();
-
-const mos = suite("createMouseOnScreen");
-
-mos("returns correct values", () =>
-  createRoot(dispose => {
-    const [onScreen, stop] = createMouseOnScreen();
-
-    assert.type(onScreen, "function");
-    assert.is(onScreen(), false);
-
-    assert.type(stop, "function");
-    dispose();
-  })
-);
-
-mos("initial value can be changed", () =>
-  createRoot(dispose => {
-    const [onScreen] = createMouseOnScreen(true);
-    assert.is(onScreen(), true);
-    dispose();
-  })
-);
-
-mos.run();
