@@ -11,11 +11,19 @@
 
 A set of primitives that help with listening to DOM and Custom Events.
 
+##### Non-reactive primitives:
+
 - [`newEventListener`](#newEventListener) - Non-reactive primitive for adding event listeners that get's removed onCleanup.
 - [`newEventListenerStack`](#newEventListenerStack) - Creates a stack of event listeners, that will be automatically disposed on cleanup.
+
+##### Reactive primitives:
+
 - [`createEventListener`](#createEventListener) - Reactive version of [`newEventListener`](#newEventListener), that takes signal arguments to apply new listeners once changed.
 - [`createEventSignal`](#createEventListener) - Like [`createEventListener`](#createEventListener), but captured events are stored in a returned signal.
 - [`createEventListenerMap`](#createEventListenerMap) - A helpful primitive that listens to a map of events. Handle them by individual callbacks.
+
+##### Component global listeners:
+
 - [`WindowEventListener`](#WindowEventListener) - Listen to the `window` DOM Events, using a component.
 - [`DocumentEventListener`](#DocumentEventListener) - Listen to the `document` DOM Events, using a component.
 
