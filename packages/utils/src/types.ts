@@ -1,4 +1,4 @@
-import type { Accessor } from "solid-js";
+import type { Accessor, Setter } from "solid-js";
 
 /**
  * Can be single or in an array
@@ -15,6 +15,8 @@ export type Directive<P = true> = (el: Element, props: Accessor<P>) => void;
  */
 export type ItemsOf<T> = T extends (infer E)[] ? E : never;
 export type ItemsOfMany<T> = T extends any[] ? ItemsOf<T> : T;
+
+export type SetterValue<T> = Parameters<Setter<T>>[0];
 
 /**
  * T or a reactive/non-reactive function returning T
@@ -84,25 +86,16 @@ export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) ex
 
 export type ExtractIfPossible<T, U> = Extract<T, U> extends never ? U : Extract<T, U>;
 
-export type AnyObject = Record<string | symbol | number, any>;
+export type AnyObject = Record<PropertyKey, any>;
+export type AnyStatic = [] | any[] | AnyObject;
 export type AnyFunction = (...args: any[]) => any;
 export type AnyClass = abstract new (...args: any) => any;
 
-export type LiteralKey = string | number | symbol;
-export type PrimitiveValue = string | boolean | number | bigint | symbol | null | undefined;
+export type PrimitiveValue = PropertyKey | boolean | bigint | null | undefined;
 
 export type FalsyValue = false | 0 | "" | null | undefined;
 export type Truthy<T> = Exclude<T, FalsyValue>;
 export type Falsy<T> = Extract<T, FalsyValue>;
-
-export type Fallback<T, F = NonNullable<T>> = NonNullable<T> | F;
-
-/**
- * Destructible store object, with values changed to accessors
- */
-export type Destore<T extends Object> = {
-  [K in keyof T]: T[K] extends Function ? T[K] : Accessor<T[K]>;
-};
 
 export type TriggerCache<T> = {
   track: (v: T) => void;
