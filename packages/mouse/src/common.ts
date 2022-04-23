@@ -1,4 +1,4 @@
-import { newEventListenerStack } from "@solid-primitives/event-listener";
+import { makeEventListenerStack } from "@solid-primitives/event-listener";
 import { Position, clamp } from "@solid-primitives/utils";
 import {
   FollowTouchOptions,
@@ -39,13 +39,13 @@ export const DEFAULT_RELATIVE_ELEMENT_POSITION: PositionRelativeToElement = {
  * @param options {@link UseTouchOptions} & {@link FollowTouchOptions}
  * @returns function removing all event listeners
  */
-export function newMousePositionListener(
+export function makeMousePositionListener(
   target: HTMLElement | Window | Document = window,
   callback: (position: MousePosition) => void,
   options: UseTouchOptions & FollowTouchOptions = {}
 ): VoidFunction {
   const { touch = true, followTouch = true } = options;
-  const [listen, clear] = newEventListenerStack(target, PASSIVE);
+  const [listen, clear] = makeEventListenerStack(target, PASSIVE);
 
   const handleMouse = (e: MouseEvent) => callback({ x: e.pageX, y: e.pageY, sourceType: "mouse" });
   listen("mousemove", handleMouse);
@@ -73,13 +73,13 @@ export function newMousePositionListener(
  * @param options {@link UseTouchOptions}
  * @returns function removing all event listeners
  */
-export function newMouseInsideListener(
+export function makeMouseInsideListener(
   target: HTMLElement | Window | Document = window,
   callback: (isInside: boolean) => void,
   options: UseTouchOptions = {}
 ): VoidFunction {
   const { touch = true } = options;
-  const [listen, clear] = newEventListenerStack(target, PASSIVE);
+  const [listen, clear] = makeEventListenerStack(target, PASSIVE);
 
   let mouseIn = false;
   let touchIn = !touch;

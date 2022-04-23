@@ -1,15 +1,15 @@
 import { setOnline } from "./setup";
-import { newConnectivityListener, createConnectivitySignal } from "../src";
+import { makeConnectivityListener, createConnectivitySignal } from "../src";
 import { createRoot } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
-const testNCL = suite("newConnectivityListener");
+const testNCL = suite("makeConnectivityListener");
 
-testNCL("newConnectivityListener", () =>
+testNCL("makeConnectivityListener", () =>
   createRoot(dispose => {
     let captured!: boolean;
-    newConnectivityListener(e => (captured = e));
+    makeConnectivityListener(e => (captured = e));
     assert.is(captured, undefined, "0");
     setOnline(false);
     assert.is(captured, false, "1");

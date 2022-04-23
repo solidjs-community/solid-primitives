@@ -7,17 +7,17 @@ import {
   createEventSignal,
   eventListener,
   EventListenerDirectiveProps,
-  newEventListener,
-  newEventListenerStack
+  makeEventListener,
+  makeEventListenerStack
 } from "../src";
 
-const testNewListener = suite("newEventListener");
+const testNewListener = suite("makeEventListener");
 
 testNewListener("listens to events", () =>
   createRoot(dispose => {
     const testEvent = new Event("test");
     let capturedEvent!: Event;
-    newEventListener<{ test: Event }>(window, "test", ev => {
+    makeEventListener<{ test: Event }>(window, "test", ev => {
       capturedEvent = ev;
     });
     dispatchFakeEvent("test", testEvent);
@@ -30,7 +30,7 @@ testNewListener("returns clear() function", () =>
   createRoot(dispose => {
     const testEvent = new Event("test");
     let capturedEvent!: Event;
-    const clear = newEventListener<{ test: Event }>(window, "test", ev => {
+    const clear = makeEventListener<{ test: Event }>(window, "test", ev => {
       capturedEvent = ev;
     });
     clear();
@@ -44,7 +44,7 @@ testNewListener("clears on cleanup", () =>
   createRoot(dispose => {
     const testEvent = new Event("test");
     let capturedEvent!: Event;
-    newEventListener<{ test: Event }>(window, "test", ev => {
+    makeEventListener<{ test: Event }>(window, "test", ev => {
       capturedEvent = ev;
     });
     dispose();
@@ -53,13 +53,13 @@ testNewListener("clears on cleanup", () =>
   })
 );
 
-const testNewStack = suite("newEventListenerStack");
+const testNewStack = suite("makeEventListenerStack");
 
 testNewStack("listens to events, and disposes on cleanup", () =>
   createRoot(dispose => {
     const testEvent = new Event("test");
     let capturedEvent: any;
-    const [listen] = newEventListenerStack<{ test: Event }>(window);
+    const [listen] = makeEventListenerStack<{ test: Event }>(window);
     listen("test", ev => (capturedEvent = ev));
     dispatchFakeEvent("test", testEvent);
     assert.is(capturedEvent, testEvent);
@@ -74,7 +74,7 @@ testNewStack("listens to events, and disposes on cleanup", () =>
   createRoot(dispose => {
     const testEvent = new Event("test");
     let capturedEvent: any;
-    const [listen, clear] = newEventListenerStack<{ test: Event }>(window);
+    const [listen, clear] = makeEventListenerStack<{ test: Event }>(window);
     listen("test", ev => (capturedEvent = ev));
     clear();
     dispatchFakeEvent("test", testEvent);

@@ -1,4 +1,4 @@
-import { newEventListener, createEventListener } from "@solid-primitives/event-listener";
+import { makeEventListener, createEventListener } from "@solid-primitives/event-listener";
 import { MaybeAccessor, Directive } from "@solid-primitives/utils";
 import { Accessor, createSignal, JSX } from "solid-js";
 declare module "solid-js" {
@@ -16,21 +16,21 @@ const getActiveElement = () =>
 
 /**
  * Attaches event listeners to window, listening for the changes of the `document.activeElement`.
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#newActiveElementListener
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#makeActiveElementListener
  * @param callback handle active element change
  * @returns function to clear event listeners
  * @example
  * const [activeElement, setActiveElement] = createSignal(null);
- * const clear = newActiveElementListener(el => setActiveElement(el));
+ * const clear = makeActiveElementListener(el => setActiveElement(el));
  * // remove listeners (happens also on cleanup)
  * clear();
  */
-export function newActiveElementListener(
+export function makeActiveElementListener(
   callback: (element: Element | null) => void
 ): VoidFunction {
   const handleChange = () => callback(getActiveElement());
-  const clear1 = newEventListener(window, "blur", handleChange, true);
-  const clear2 = newEventListener(window, "focus", handleChange, true);
+  const clear1 = makeEventListener(window, "blur", handleChange, true);
+  const clear2 = makeEventListener(window, "focus", handleChange, true);
   return () => (clear1(), clear2());
 }
 
@@ -44,28 +44,28 @@ export function newActiveElementListener(
  */
 export function createActiveElement(): Accessor<Element | null> {
   const [active, setActive] = createSignal<Element | null>(getActiveElement());
-  newActiveElementListener(setActive);
+  makeActiveElementListener(setActive);
   return active;
 }
 
 /**
  * Attaches "blur" and "focus" event listeners to the element.
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#newFocusListener
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#makeFocusListener
  * @param target element
  * @param callback handle focus change
  * @returns function for clearing event listeners
  * @example
  * const [isFocused, setIsFocused] = createSignal(false)
- * const clear = newFocusListener(focused => setIsFocused(focused));
+ * const clear = makeFocusListener(focused => setIsFocused(focused));
  * // remove listeners (happens also on cleanup)
  * clear();
  */
-export function newFocusListener(
+export function makeFocusListener(
   target: Element,
   callback: (isActive: boolean) => void
 ): VoidFunction {
-  const clear1 = newEventListener(target, "blur", () => callback(false), true);
-  const clear2 = newEventListener(target, "focus", () => callback(true), true);
+  const clear1 = makeEventListener(target, "blur", () => callback(false), true);
+  const clear2 = makeEventListener(target, "focus", () => callback(true), true);
   return () => (clear1(), clear2());
 }
 
@@ -97,5 +97,5 @@ export function createFocusSignal(target: MaybeAccessor<Element>): Accessor<bool
 export const focus: Directive<(isActive: boolean) => void> = (target, props) => {
   const callback = props();
   callback(document.activeElement === target);
-  newFocusListener(target, callback);
+  makeFocusListener(target, callback);
 };

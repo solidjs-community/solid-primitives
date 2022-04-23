@@ -1,7 +1,7 @@
 export * from "./types";
 export {
-  newMousePositionListener,
-  newMouseInsideListener,
+  makeMousePositionListener,
+  makeMouseInsideListener,
   getPositionToElement,
   getPositionToScreen,
   getPositionInElement

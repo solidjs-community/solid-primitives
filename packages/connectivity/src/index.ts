@@ -1,4 +1,4 @@
-import { newEventListener } from "@solid-primitives/event-listener";
+import { makeEventListener } from "@solid-primitives/event-listener";
 import { Accessor, createSignal } from "solid-js";
 
 /**
@@ -6,15 +6,15 @@ import { Accessor, createSignal } from "solid-js";
  * @param callback fired whenever `window.onLine` changes
  * @returns function clearing event listeners
  * @example
- * const clear = newConnectivityListener(isOnline => {
+ * const clear = makeConnectivityListener(isOnline => {
  *    console.log(isOnline) // T: booelan
  * });
  * // remove event listeners (happens also on cleanup)
  * clear()
  */
-export function newConnectivityListener(callback: (isOnline: boolean) => void): VoidFunction {
-  const clear1 = newEventListener(window, "online", callback.bind(void 0, true));
-  const clear2 = newEventListener(window, "offline", callback.bind(void 0, false));
+export function makeConnectivityListener(callback: (isOnline: boolean) => void): VoidFunction {
+  const clear1 = makeEventListener(window, "online", callback.bind(void 0, true));
+  const clear2 = makeEventListener(window, "offline", callback.bind(void 0, false));
   return () => (clear1(), clear2());
 }
 
@@ -28,6 +28,6 @@ export function newConnectivityListener(callback: (isOnline: boolean) => void): 
  */
 export function createConnectivitySignal(): Accessor<boolean> {
   const [status, setStatus] = createSignal<boolean>(navigator.onLine);
-  newConnectivityListener(setStatus);
+  makeConnectivityListener(setStatus);
   return status;
 }

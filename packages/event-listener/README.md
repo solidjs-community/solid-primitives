@@ -13,12 +13,12 @@ A set of primitives that help with listening to DOM and Custom Events.
 
 ##### Non-reactive primitives:
 
-- [`newEventListener`](#newEventListener) - Non-reactive primitive for adding event listeners that get's removed onCleanup.
-- [`newEventListenerStack`](#newEventListenerStack) - Creates a stack of event listeners, that will be automatically disposed on cleanup.
+- [`makeEventListener`](#makeEventListener) - Non-reactive primitive for adding event listeners that get's removed onCleanup.
+- [`makeEventListenerStack`](#makeEventListenerStack) - Creates a stack of event listeners, that will be automatically disposed on cleanup.
 
 ##### Reactive primitives:
 
-- [`createEventListener`](#createEventListener) - Reactive version of [`newEventListener`](#newEventListener), that takes signal arguments to apply new listeners once changed.
+- [`createEventListener`](#createEventListener) - Reactive version of [`makeEventListener`](#makeEventListener), that takes signal arguments to apply new listeners once changed.
 - [`createEventSignal`](#createEventListener) - Like [`createEventListener`](#createEventListener), but captured events are stored in a returned signal.
 - [`createEventListenerMap`](#createEventListenerMap) - A helpful primitive that listens to a map of events. Handle them by individual callbacks.
 
@@ -35,7 +35,7 @@ npm install @solid-primitives/event-listener
 yarn add @solid-primitives/event-listener
 ```
 
-## `newEventListener`
+## `makeEventListener`
 
 Can be used to listen to DOM or Custom Events on window, document, or any EventTarget.
 
@@ -44,9 +44,9 @@ Event listener is automatically removed on root cleanup. The clear() function is
 ### How to use it
 
 ```tsx
-import { newEventListener } from "@solid-primitives/event-listener";
+import { makeEventListener } from "@solid-primitives/event-listener";
 
-const clear = newEventListener(
+const clear = makeEventListener(
   document.getElementById("myButton"),
   "mousemove",
   e => console.log("x:", e.pageX, "y:", e.pageY),
@@ -59,7 +59,7 @@ clear();
 // when listening to element refs, call it inside onMount
 let ref!: HTMLDivElement
 onMount(() => {
-  newEventListener(ref, "click", e => {...}, { passive: true });
+  makeEventListener(ref, "click", e => {...}, { passive: true });
 });
 
 <div ref={ref} />;
@@ -70,7 +70,7 @@ onMount(() => {
 ```ts
 // you can provide your own event map type as well:
 // fill both type generics for the best type support
-newEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
+makeEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
   window,
   "myCustomEvent",
   () => console.log("yup!")
@@ -78,16 +78,16 @@ newEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
 // just don't use interfaces as EventMaps! (write them using `type` keyword)
 ```
 
-## `newEventListenerStack`
+## `makeEventListenerStack`
 
 Creates a stack of event listeners, that will be automatically disposed on cleanup.
 
 ### How to use it
 
 ```ts
-import { newEventListenerStack } from "@solid-primitives/event-listener";
+import { makeEventListenerStack } from "@solid-primitives/event-listener";
 
-const [listen, clear] = newEventListenerStack(target, { passive: true });
+const [listen, clear] = makeEventListenerStack(target, { passive: true });
 
 listen("mousemove", handleMouse);
 listen("dragover", handleMouse);
@@ -98,7 +98,7 @@ clear();
 
 ## `createEventListener`
 
-Reactive version of [`newEventListener`](#newEventListener), that can take signal `target` and `type` arguments to apply new listeners once changed.
+Reactive version of [`makeEventListener`](#makeEventListener), that can take signal `target` and `type` arguments to apply new listeners once changed.
 
 ### How to use it
 
@@ -331,7 +331,7 @@ Add `createEventListenerBus`.
 
 Remove `createEventListenerBus`, `createEventListenerStore` & `eventListenerMap`
 
-Add `newEventListener` and `newEventListenerStack`
+Add `makeEventListener` and `makeEventListenerStack`
 
 Remove clear() functions from reactive primitives.
 

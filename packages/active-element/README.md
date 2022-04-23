@@ -11,8 +11,8 @@
 
 ##### Non-reactive primitives:
 
-- [`newActiveElementListener`](#newActiveElementListener) - Listen for changes to the `document.activeElement`.
-- [`newFocusListener`](#newFocusListener) - Attaches "blur" and "focus" event listeners to the element.
+- [`makeActiveElementListener`](#makeActiveElementListener) - Listen for changes to the `document.activeElement`.
+- [`makeFocusListener`](#makeFocusListener) - Attaches "blur" and "focus" event listeners to the element.
 
 ##### Reactive primitives:
 
@@ -31,15 +31,15 @@ npm install @solid-primitives/active-element
 yarn add @solid-primitives/active-element
 ```
 
-## `newActiveElementListener`
+## `makeActiveElementListener`
 
 Attaches event listeners to window, listening for the changes of the `document.activeElement`.
 
 ```ts
-import { newActiveElementListener } from "@solid-primitives/active-element";
+import { makeActiveElementListener } from "@solid-primitives/active-element";
 
 const [activeElement, setActiveElement] = createSignal(null);
-const clear = newActiveElementListener(el => setActiveElement(el));
+const clear = makeActiveElementListener(el => setActiveElement(el));
 
 // remove listeners (happens also on cleanup)
 clear();
@@ -48,18 +48,18 @@ clear();
 #### Definition
 
 ```ts
-function newActiveElementListener(callback: (element: Element | null) => void): VoidFunction;
+function makeActiveElementListener(callback: (element: Element | null) => void): VoidFunction;
 ```
 
-## `newFocusListener`
+## `makeFocusListener`
 
 Attaches "blur" and "focus" event listeners to the element.
 
 ```ts
-import { newFocusListener } from "@solid-primitives/active-element";
+import { makeFocusListener } from "@solid-primitives/active-element";
 
 const [isFocused, setIsFocused] = createSignal(false);
-const clear = newFocusListener(focused => setIsFocused(focused));
+const clear = makeFocusListener(focused => setIsFocused(focused));
 
 // remove listeners (happens also on cleanup)
 clear();
@@ -68,7 +68,7 @@ clear();
 #### Definition
 
 ```ts
-function newFocusListener(target: Element, callback: (isActive: boolean) => void): VoidFunction;
+function makeFocusListener(target: Element, callback: (isActive: boolean) => void): VoidFunction;
 ```
 
 ## `createActiveElement`
@@ -166,7 +166,7 @@ Updated to Solid 1.3
 
 Renamed `createIsElementActive` to `createFocusSignal` and `isElementActive` directive to `focus`.
 
-Add `newActiveElementListener` & `newFocusListener` non-reactive primitives.
+Add `makeActiveElementListener` & `makeFocusListener` non-reactive primitives.
 
 Removed clear() functions from reactive primitives.
 

@@ -11,7 +11,7 @@
 
 A [`navigator.onLine`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/Online_and_offline_events) signal that tells you when the browser _thinks_ you're online. Connectivity is determined by your browser, which is a best-effort process.
 
-- [`newConnectivityListener`](#newConnectivityListener) - Attaches event listeners and fires callback whenever `window.onLine` changes.
+- [`makeConnectivityListener`](#makeConnectivityListener) - Attaches event listeners and fires callback whenever `window.onLine` changes.
 - [`createConnectivitySignal`](#createConnectivitySignal) - A signal representing the browser's interpretation of whether it is on- or offline.
 
 ## Installation
@@ -22,14 +22,14 @@ npm install @solid-primitives/connectivity
 yarn add @solid-primitives/connectivity
 ```
 
-## `newConnectivityListener`
+## `makeConnectivityListener`
 
 Attaches event listeners and fires callback whenever `window.onLine` changes.
 
 ```ts
-import { newConnectivityListener } from "@solid-primitives/connectivity";
+import { makeConnectivityListener } from "@solid-primitives/connectivity";
 
-const clear = newConnectivityListener(isOnline => {
+const clear = makeConnectivityListener(isOnline => {
   console.log(isOnline); // T: booelan
 });
 // remove event listeners (happens also on cleanup)
@@ -39,7 +39,7 @@ clear();
 #### Definition
 
 ```ts
-function newConnectivityListener(callback: (isOnline: boolean) => void): VoidFunction;
+function makeConnectivityListener(callback: (isOnline: boolean) => void): VoidFunction;
 ```
 
 ## `createConnectivitySignal`
@@ -82,6 +82,6 @@ Upgraded to Solid 1.3
 
 0.2.0 - **stage-2**
 
-Add `newConnectivityListener`
+Add `makeConnectivityListener`
 
 </details>

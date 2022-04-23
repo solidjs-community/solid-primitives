@@ -3,8 +3,8 @@ import { createSharedRoot } from "@solid-primitives/rootless";
 import {
   DEFAULT_MOUSE_POSITION,
   DEFAULT_RELATIVE_ELEMENT_POSITION,
-  newMouseInsideListener,
-  newMousePositionListener,
+  makeMouseInsideListener,
+  makeMousePositionListener,
   getPositionToElement
 } from "./common";
 import {
@@ -57,8 +57,8 @@ export function createMousePosition(
   });
 
   const attachListeners = (el: Window | Document | HTMLElement | undefined) => {
-    newMousePositionListener(el, setState, options);
-    newMouseInsideListener(el, setState.bind(void 0, "isInside"), options);
+    makeMousePositionListener(el, setState, options);
+    makeMouseInsideListener(el, setState.bind(void 0, "isInside"), options);
   };
 
   if (typeof target !== "function") attachListeners(target);

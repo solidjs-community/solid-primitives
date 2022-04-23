@@ -1,5 +1,5 @@
 import { isClient, keys } from "@solid-primitives/utils";
-import { newEventListener } from "./eventListener";
+import { makeEventListener } from "./eventListener";
 
 export type WindowEventProps = {
   [K in keyof WindowEventMap as `on${Capitalize<K>}` | `on${K}`]?: (
@@ -18,7 +18,7 @@ const attachPropListeners = (
 ) => {
   keys(props).forEach(attr => {
     if (attr.startsWith("on") && typeof props[attr] === "function")
-      newEventListener(target, attr.substring(2).toLowerCase(), props[attr] as any);
+      makeEventListener(target, attr.substring(2).toLowerCase(), props[attr] as any);
   });
 };
 

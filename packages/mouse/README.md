@@ -18,8 +18,8 @@ A collection of primitives, capturing current mouse cursor position, and helping
 
 ##### Non-reactive primitives:
 
-- [`newMousePositionListener`](#newMousePositionListener) - Attaches event listeners to provided targat, listeneing for changes to the mouse/touch position.
-- [`newMouseInsideListener`](#newMouseInsideListener) - Attaches event listeners to provided targat, listening for mouse/touch entering/leaving the element.
+- [`makeMousePositionListener`](#makeMousePositionListener) - Attaches event listeners to provided targat, listeneing for changes to the mouse/touch position.
+- [`makeMouseInsideListener`](#makeMouseInsideListener) - Attaches event listeners to provided targat, listening for mouse/touch entering/leaving the element.
 
 ##### Calculations:
 
@@ -127,22 +127,22 @@ function createPositionToElement(
 
 ## Non-reactive primitives:
 
-### `newMousePositionListener`
+### `makeMousePositionListener`
 
 Attaches event listeners to provided targat, listeneing for changes to the mouse/touch position.
 
 ```ts
-const clear = newMousePositionListener(el, pos => console.log(pos), { touch: false });
+const clear = makeMousePositionListener(el, pos => console.log(pos), { touch: false });
 // remove listeners manually (will happen on cleanup)
 clear();
 ```
 
-### `newMouseInsideListener`
+### `makeMouseInsideListener`
 
 Attaches event listeners to provided targat, listening for mouse/touch entering/leaving the element.
 
 ```ts
-const clear = newMouseInsideListener(el, inside => console.log(inside), { touch: false });
+const clear = makeMouseInsideListener(el, inside => console.log(inside), { touch: false });
 // remove listeners manually (will happen on cleanup)
 clear();
 ```
@@ -206,7 +206,7 @@ Renamed:
 - `posRelativeToScreen` -> `getPositionToScreen`
 - `createMouseToElement` -> `createPositionToElement`
 
-Added `newMousePositionListener`, `newMouseInsideListener` and `getPositionInElement`
+Added `makeMousePositionListener`, `makeMouseInsideListener` and `getPositionInElement`
 
 Removed clear() and update() functions from reactive primitives. `createPositionToElement` now only takes accessor position.
 

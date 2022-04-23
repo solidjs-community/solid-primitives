@@ -3,13 +3,13 @@ import { createRoot } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import {
-  newActiveElementListener,
+  makeActiveElementListener,
   createActiveElement,
-  newFocusListener,
+  makeFocusListener,
   createFocusSignal
 } from "../src";
 
-const testNAEL = suite("newActiveElementListener");
+const testNAEL = suite("makeActiveElementListener");
 
 const dispatchFocusEvent = (target: Element | Window = window, event: "focus" | "blur" = "focus") =>
   fireEvent(target, createEvent(event, window));
@@ -18,7 +18,7 @@ testNAEL("works properly", () =>
   createRoot(dispose => {
     let events = 0;
     let captured;
-    newActiveElementListener(e => ((captured = e), events++));
+    makeActiveElementListener(e => ((captured = e), events++));
     assert.is(captured, undefined);
     dispatchFocusEvent();
     assert.is(captured, null);
@@ -28,7 +28,7 @@ testNAEL("works properly", () =>
     dispatchFocusEvent();
     assert.is(events, 1);
 
-    const clear = newActiveElementListener(e => events++);
+    const clear = makeActiveElementListener(e => events++);
     dispatchFocusEvent();
     assert.is(events, 2);
 
@@ -40,13 +40,13 @@ testNAEL("works properly", () =>
 
 testNAEL.run();
 
-const testNFL = suite("newFocusListener");
+const testNFL = suite("makeFocusListener");
 
 testNFL("works properly", () =>
   createRoot(dispose => {
     const el = document.createElement("div");
     const captured: any[] = [];
-    const clear = newFocusListener(el, e => captured.push(e));
+    const clear = makeFocusListener(el, e => captured.push(e));
     assert.equal(captured, []);
     dispatchFocusEvent(el, "focus");
     assert.equal(captured, [true]);
@@ -55,7 +55,7 @@ testNFL("works properly", () =>
     clear();
     dispatchFocusEvent(el, "focus");
     assert.equal(captured, [true, false]);
-    newFocusListener(el, e => captured.push(e));
+    makeFocusListener(el, e => captured.push(e));
     dispatchFocusEvent(el, "blur");
     assert.equal(captured, [true, false, false]);
     dispose();

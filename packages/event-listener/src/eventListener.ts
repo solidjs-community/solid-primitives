@@ -15,15 +15,15 @@ import {
  * @param options - addEventListener options
  * @returns Function clearing all event listeners form targets
  * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener#newEventListener
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener#makeEventListener
  * @example
- * const clear = newEventListener(element, 'click', e => { ... }, { passive: true })
+ * const clear = makeEventListener(element, 'click', e => { ... }, { passive: true })
  * // remove listener (will also happen on cleanup)
  * clear()
  */
 
 // DOM Events
-export function newEventListener<
+export function makeEventListener<
   Target extends TargetWithEventMap,
   EventMap extends EventMapOf<Target>,
   EventType extends keyof EventMap
@@ -35,7 +35,7 @@ export function newEventListener<
 ): VoidFunction;
 
 // Custom Events
-export function newEventListener<
+export function makeEventListener<
   EventMap extends Record<string, Event>,
   EventType extends keyof EventMap = keyof EventMap
 >(
@@ -45,7 +45,7 @@ export function newEventListener<
   options?: EventListenerOptions
 ): VoidFunction;
 
-export function newEventListener(
+export function makeEventListener(
   target: EventTarget,
   type: string,
   handler: (event: Event) => void,
@@ -104,7 +104,7 @@ export function createEventListener(
 
   const attachListeners = () => {
     asArray(access(targets)).forEach(el => {
-      if (el) asArray(access(type)).forEach(type => newEventListener(el, type, handler, options));
+      if (el) asArray(access(type)).forEach(type => makeEventListener(el, type, handler, options));
     });
   };
 
@@ -183,7 +183,7 @@ export function createEventSignal(
 export const eventListener: Directive<EventListenerDirectiveProps> = (target, props) => {
   createEffect(() => {
     const [type, handler, options] = props();
-    newEventListener(target, type, handler, options);
+    makeEventListener(target, type, handler, options);
   });
 };
 
