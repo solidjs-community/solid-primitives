@@ -132,7 +132,9 @@ Designed to make "global primitives" shareable, without instanciating them (recr
 And returns a function registering reactive owner as one of the listeners, returns the value `factory` function returned.
 
 ```ts
-const useState = createSharedScope(() => {
+import { createSharedRoot } from "@solid-primitives/rootless";
+
+const useState = createSharedRoot(() => {
    return createMemo(() => {...})
 });
 
