@@ -7,7 +7,8 @@ import {
   createEventSignal,
   eventListener,
   EventListenerDirectiveProps,
-  newEventListener
+  newEventListener,
+  newEventListenerStack
 } from "../src";
 
 const testNewListener = suite("newEventListener");
@@ -51,6 +52,38 @@ testNewListener("clears on cleanup", () =>
     assert.is(capturedEvent, undefined);
   })
 );
+
+const testNewStack = suite("newEventListenerStack");
+
+testNewStack("listens to events, and disposes on cleanup", () =>
+  createRoot(dispose => {
+    const testEvent = new Event("test");
+    let capturedEvent: any;
+    const [listen] = newEventListenerStack<{ test: Event }>(window);
+    listen("test", ev => (capturedEvent = ev));
+    dispatchFakeEvent("test", testEvent);
+    assert.is(capturedEvent, testEvent);
+    capturedEvent = undefined;
+    dispose();
+    dispatchFakeEvent("test", testEvent);
+    assert.is(capturedEvent, undefined);
+  })
+);
+
+testNewStack("listens to events, and disposes on cleanup", () =>
+  createRoot(dispose => {
+    const testEvent = new Event("test");
+    let capturedEvent: any;
+    const [listen, clear] = newEventListenerStack<{ test: Event }>(window);
+    listen("test", ev => (capturedEvent = ev));
+    clear();
+    dispatchFakeEvent("test", testEvent);
+    assert.is(capturedEvent, undefined);
+    dispose();
+  })
+);
+
+testNewStack.run();
 
 const test = suite("createEventListener");
 

@@ -12,6 +12,7 @@
 A set of primitives that help with listening to DOM and Custom Events.
 
 - [`newEventListener`](#newEventListener) - Non-reactive primitive for adding event listeners that get's removed onCleanup.
+- [`newEventListenerStack`](#newEventListenerStack) - Creates a stack of event listeners, that will be automatically disposed on cleanup.
 - [`createEventListener`](#createEventListener) - Reactive version of [`newEventListener`](#newEventListener), that takes signal arguments to apply new listeners once changed.
 - [`createEventSignal`](#createEventListener) - Like [`createEventListener`](#createEventListener), but captured events are stored in a returned signal.
 - [`createEventListenerMap`](#createEventListenerMap) - A helpful primitive that listens to a map of events. Handle them by individual callbacks.
@@ -67,6 +68,24 @@ newEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
   () => console.log("yup!")
 );
 // just don't use interfaces as EventMaps! (write them using `type` keyword)
+```
+
+## `newEventListenerStack`
+
+Creates a stack of event listeners, that will be automatically disposed on cleanup.
+
+### How to use it
+
+```ts
+import { newEventListenerStack } from "@solid-primitives/event-listener";
+
+const [listen, clear] = newEventListenerStack(target, { passive: true });
+
+listen("mousemove", handleMouse);
+listen("dragover", handleMouse);
+
+// remove listener (will also happen on cleanup)
+clear();
 ```
 
 ## `createEventListener`
@@ -300,9 +319,11 @@ Add `createEventListenerBus`.
 
 2.0.0
 
+[PR#113](https://github.com/solidjs-community/solid-primitives/pull/113)
+
 Remove `createEventListenerBus`, `createEventListenerStore` & `eventListenerMap`
 
-Add `newEventListener`
+Add `newEventListener` and `newEventListenerStack`
 
 Remove clear() functions from reactive primitives.
 
