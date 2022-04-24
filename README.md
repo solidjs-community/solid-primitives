@@ -113,9 +113,7 @@ All our primitives are meant to be consistent and sustain a level of quality. We
 
 ## Basic and Compound Primitives
 
-Each primitive is designed with composition in mind. To align with the goal of being small and concise a major rule to designing our primitives is deciding if the interface for primitives should be: composable or segmented. For this reason every API is intricately studied and considered to be composed (stacked with features) or composed into smaller units.
-
-Designing our primitives in this manner allows for better tree shaking and very layering complexity as needed. Only ship what you have to by picking from existing primitives as your foundational building blocks.
+Each primitive is designed with composition in mind. A major rule in designing our primitives is deciding that the interface of primitives should be composable or segmented. For this reason every API is intricately studied and considered to be composed (stacked with features) or decomposed into smaller units. Designing our primitives in this manner allows for better tree-shaking and extendable complexity only as needed. You should only ship what you have to by picking from existing primitives as your foundational building blocks.
 
 ### `make` (non-reactive) vs `create` (reactive)
 
