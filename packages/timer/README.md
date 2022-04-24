@@ -139,6 +139,14 @@ Updated to Solid 1.3
 
 1.3.0
 
+[PR#106](https://github.com/solidjs-community/solid-primitives/pull/106)
+
 Added [`makeTimer`](#maketimer), [`createTimeoutLoop`](#createtimeoutloop), [`createPolled`](#createpolled), [`createIntervalCounter`](#createintervalcounter), and made the timeout of [`createTimer`](#createtimer) optionally reactive.
+
+1.3.1
+
+[PR#113](https://github.com/solidjs-community/solid-primitives/pull/113)
+
+Make the calc function of `createPolled` reactive
 
 </details>
