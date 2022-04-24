@@ -101,7 +101,7 @@ All our primitives are meant to be consistent and sustain a level of quality. We
 2. Be well tested
 3. Small, concise and practical as possible
 4. A single primitive for a single purpose
-5. As few, if none, dependencies as possible
+5. No dependencies or as few as possible
 6. SSR safe entries (or short-circuits where needed) provided
 7. Wrap base level Browser APIs
 8. Should be progressively improved for future features
@@ -111,11 +111,19 @@ All our primitives are meant to be consistent and sustain a level of quality. We
 12. Support for both CJS and ESM
 13. Solid performance!
 
-## Compound vs. Isolated Primitives
+## Basic and Compound Primitives
 
 Each primitive is designed with composition in mind. To align with the goal of being small and concise a major rule to designing our primitives is deciding if the interface for primitives should be: composable or segmented. For this reason every API is intricately studied and considered to be composed (stacked with features) or composed into smaller units.
 
 Designing our primitives in this manner allows for better tree shaking and very layering complexity as needed. Only ship what you have to by picking from existing primitives as your foundational building blocks.
+
+### `make` (non-reactive) vs `create` (reactive)
+
+Solid uses the `create` prefix to define a primitive that provides reactive utility. Solid Primitives reinforces this pattern but in an effort to enhance composability we have also introduced the `make` prefix for identify non-reactive basic primities. Having a non-reactive alternative means that the primitive does the bare essentials such as cleaning up events or interupting a process. ie. `makeTimer` will create and clean-up the scheduler, providing only a clear method. createTimer provides a properly reactive primitive that composes it.
+
+### Managing Primitve Complexity
+
+Solid Primitives is mostly about supplying 80-90% of the common-use cases for the end-user. We prefer to be less prescriptive than other hook libraries such as VueUse and supply granular solutions as opposed to monolithic primitives. The remaining 10-20% of complex use cases are likely not to be covered with this library. This is on purpose to limit the potential of bloat and extended complexity. This project strives to provide foundations and not cumulative solutions. We expect the broader ecosystem will fill the remaining need as further composition to this projects effort. This allows for just the right amount of prescription and opinion.
 
 ## Lerna CLI Helpers
 
