@@ -115,6 +115,8 @@ All our primitives are meant to be consistent and sustain a level of quality. We
 
 Each primitive is designed with composition in mind. A major rule in designing our primitives is deciding that the interface of primitives should be composable or segmented. For this reason every API is intricately studied and considered to be composed (stacked with features) or decomposed into smaller units. Designing our primitives in this manner allows for better tree-shaking and extendable complexity only as needed. You should only ship what you have to by picking from existing primitives as your foundational building blocks.
 
+Much of the design decisions in naming are best described in the [7 Lessons to Outlive React](https://www.youtube.com/watch?v=yLgq-Foc1EE&t=502s) talk by [swyx](https://www.swyx.io). We strive to follow a similar design pattern promoted by the React core team.
+
 ### `make` (non-reactive) vs `create` (reactive)
 
 Solid uses the `create` prefix to define a primitive that provides reactive utility. Solid Primitives reinforces this pattern but in an effort to enhance composability we have also introduced the `make` prefix for identify non-reactive basic primities. Having a non-reactive alternative means that the primitive does the bare essentials such as cleaning up events or interupting a process. ie. `makeTimer` will create and clean-up the scheduler, providing only a clear method. createTimer provides a properly reactive primitive that composes it.
