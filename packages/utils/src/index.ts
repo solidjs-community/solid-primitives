@@ -47,7 +47,7 @@ export function isObject(value: any): value is AnyObject {
 
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
 
-export const clamp = (n:number, min: number, max: number) => Math.min(Math.max(n, min), max)
+export const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
 
 /**
  * Accesses the value of a MaybeAccessor
@@ -117,11 +117,9 @@ export function forEachEntry<O extends AnyObject>(
 }
 
 /**
- * Get `Object.entries()` of an MaybeAccessor<object>
+ * Get entries of an object
  */
-export const entries = <A extends MaybeAccessor<object>, O = MaybeAccessorValue<A>>(
-  object: A
-): [keyof O, Values<O>][] => Object.entries(access(object)) as [keyof O, Values<O>][];
+export const entries = Object.entries as <T extends object>(obj: T) => [keyof T, T[keyof T]][];
 
 /**
  * Get keys of an object

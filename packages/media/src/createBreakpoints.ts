@@ -1,7 +1,7 @@
-import { createEffect, createMemo, onCleanup } from "solid-js";
-import { createStore } from "solid-js/store";
-import { entries, getEmptyMatchesFromBreakpoints, checkMqSupported } from "./common";
-import { Breakpoints, BreakpointOptions, MqlInstances, Matches } from "./types";
+import { makeEventListener } from "@solid-primitives/event-listener";
+import { createStaticStore, forEachEntry } from "@solid-primitives/utils";
+import { getEmptyMatchesFromBreakpoints } from "./common";
+import { Breakpoints, BreakpointOptions, Matches } from "./types";
 
 /**
  * Creates a multi-breakpoint monitor to make responsive components easily.
@@ -25,60 +25,25 @@ export function createBreakpoints<T extends Breakpoints>(
   breakpoints: T,
   options: BreakpointOptions<T> = {}
 ): Matches<T> {
-  const isMqSupported = checkMqSupported();
+  if (!window.matchMedia)
+    return options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints);
 
-  const mqlInstances = createMemo(() => {
-    const mqlInstances = {} as MqlInstances<T>;
+  const { mediaFeature = "min-width", watchChange = true } = options;
 
-    if (isMqSupported) {
-      entries(breakpoints).forEach(([token, width]) => {
-        const responsiveProperty = options.responsiveMode === "desktop-first" ? "max" : "min";
-        const mediaquery = `(${responsiveProperty}-width: ${width})`;
-        const instance = window.matchMedia(mediaquery);
+  const [matches, setMatches] = createStaticStore<Matches<T>>(
+    (() => {
+      const matches = {} as Record<keyof T, boolean>;
 
-        mqlInstances[token] = instance;
+      forEachEntry(breakpoints, (token, width) => {
+        const mql = window.matchMedia(`(${mediaFeature}: ${width})`);
+        matches[token] = mql.matches;
+
+        if (watchChange) makeEventListener(mql, "change", e => setMatches(token, e.matches as any));
       });
-    }
 
-    return mqlInstances;
-  });
-
-  function getInitialMatches(): Matches<T> {
-    if (!isMqSupported) {
-      return options.fallbackMatch || getEmptyMatchesFromBreakpoints(breakpoints);
-    }
-
-    const matches = {} as Record<keyof T, boolean>;
-
-    entries(mqlInstances()).forEach(([token, mql]) => {
-      matches[token] = mql.matches;
-    });
-
-    return matches;
-  }
-
-  // TODO: switch to createStaticStore once available to clear types
-  const [matches, setMatches] = createStore<Record<keyof T, boolean>>(
-    getInitialMatches()
-  ) as unknown as [Matches<T>, (token: keyof T, match: boolean) => void];
-
-  createEffect(() => {
-    const shouldWatch = options.watchChange ?? true;
-    if (!shouldWatch || !isMqSupported) {
-      return;
-    }
-
-    entries(mqlInstances()).forEach(([token, mql]) => {
-      const listener = (event: MediaQueryListEvent) => {
-        setMatches(token, event.matches);
-      };
-      mql.addEventListener("change", listener);
-
-      onCleanup(() => {
-        mql.removeEventListener("change", listener);
-      });
-    });
-  });
+      return matches;
+    })()
+  );
 
   return matches;
 }
