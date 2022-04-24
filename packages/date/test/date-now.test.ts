@@ -33,7 +33,7 @@ test("autoupdates", () => {
 
 test("manual updating", () => {
   createRoot(dispose => {
-    const [now, update] = createDateNow(0);
+    const [now, update] = createDateNow(() => false);
     const time1 = now().getTime();
 
     setTimeout(() => {
