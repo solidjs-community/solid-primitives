@@ -53,6 +53,7 @@ export function createActiveElement(): Accessor<Element | null> {
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#makeFocusListener
  * @param target element
  * @param callback handle focus change
+ * @param useCapture activates capturing, which allows to listen on events at the root that don't support bubbling.
  * @returns function for clearing event listeners
  * @example
  * const [isFocused, setIsFocused] = createSignal(false)
@@ -62,10 +63,11 @@ export function createActiveElement(): Accessor<Element | null> {
  */
 export function makeFocusListener(
   target: Element,
-  callback: (isActive: boolean) => void
+  callback: (isActive: boolean) => void,
+  useCapture = true
 ): VoidFunction {
-  const clear1 = makeEventListener(target, "blur", () => callback(false), true);
-  const clear2 = makeEventListener(target, "focus", () => callback(true), true);
+  const clear1 = makeEventListener(target, "blur", callback.bind(void 0, false), useCapture);
+  const clear2 = makeEventListener(target, "focus", callback.bind(void 0, true), useCapture);
   return () => (clear1(), clear2());
 }
 

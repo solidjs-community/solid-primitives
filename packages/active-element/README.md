@@ -68,7 +68,11 @@ clear();
 #### Definition
 
 ```ts
-function makeFocusListener(target: Element, callback: (isActive: boolean) => void): VoidFunction;
+function makeFocusListener(
+  target: Element,
+  callback: (isActive: boolean) => void,
+  useCapture?: boolean
+): VoidFunction;
 ```
 
 ## `createActiveElement`

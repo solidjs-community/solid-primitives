@@ -6,15 +6,16 @@ import {
   makeActiveElementListener,
   createActiveElement,
   makeFocusListener,
-  createFocusSignal
+  createFocusSignal,
+  focus
 } from "../src";
 
-const testNAEL = suite("makeActiveElementListener");
+const testMAEL = suite("makeActiveElementListener");
 
 const dispatchFocusEvent = (target: Element | Window = window, event: "focus" | "blur" = "focus") =>
   fireEvent(target, createEvent(event, window));
 
-testNAEL("works properly", () =>
+testMAEL("works properly", () =>
   createRoot(dispose => {
     let events = 0;
     let captured;
@@ -38,11 +39,11 @@ testNAEL("works properly", () =>
   })
 );
 
-testNAEL.run();
+testMAEL.run();
 
-const testNFL = suite("makeFocusListener");
+const testMFL = suite("makeFocusListener");
 
-testNFL("works properly", () =>
+testMFL("works properly", () =>
   createRoot(dispose => {
     const el = document.createElement("div");
     const captured: any[] = [];
@@ -64,7 +65,7 @@ testNFL("works properly", () =>
   })
 );
 
-testNFL.run();
+testMFL.run();
 
 const testCAE = suite("createActiveElement");
 
@@ -85,8 +86,34 @@ testCFS("works properly", () =>
     const el = document.createElement("div");
     const activeEl = createFocusSignal(el);
     assert.is(activeEl(), false);
+    dispatchFocusEvent(el, "focus");
+    assert.is(activeEl(), true);
+    dispatchFocusEvent(el, "blur");
+    assert.is(activeEl(), false);
     dispose();
+    dispatchFocusEvent(el, "focus");
+    assert.is(activeEl(), false);
   })
 );
 
 testCFS.run();
+
+const testFocus = suite("use:focus");
+
+testFocus("works properly", () =>
+  createRoot(dispose => {
+    const el = document.createElement("div");
+    let captured!: boolean;
+    focus(el, () => e => (captured = e));
+    assert.is(captured, false);
+    dispatchFocusEvent(el, "focus");
+    assert.is(captured, true);
+    dispatchFocusEvent(el, "blur");
+    assert.is(captured, false);
+    dispose();
+    dispatchFocusEvent(el, "focus");
+    assert.is(captured, false);
+  })
+);
+
+testFocus.run();

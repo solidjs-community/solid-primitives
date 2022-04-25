@@ -113,15 +113,16 @@ export const getPositionToElement = (
     top = bounds.top + window.scrollY,
     left = bounds.left + window.scrollX,
     x = pageX - left,
-    y = pageY - top;
+    y = pageY - top,
+    { width, height } = bounds;
   return {
     x,
     y,
     top,
     left,
-    width: bounds.width,
-    height: bounds.height,
-    isInside: x >= 0 && y >= 0 && x <= bounds.width && y <= bounds.height
+    width,
+    height,
+    isInside: x >= 0 && y >= 0 && x <= width && y <= height
   };
 };
 

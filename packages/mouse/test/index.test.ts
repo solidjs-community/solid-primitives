@@ -10,10 +10,12 @@ const mp = suite("createMousePosition");
 mp("returns fallback", () =>
   createRoot(dispose => {
     const pos = createMousePosition();
-    assert.is(pos.x, 0);
-    assert.is(pos.y, 0);
-    assert.is(pos.sourceType, null);
-    assert.is(pos.isInside, false);
+    assert.equal(pos, {
+      x: 0,
+      y: 0,
+      sourceType: null,
+      isInside: false
+    });
     dispose();
   })
 );
@@ -23,8 +25,12 @@ mp("initial values can be changed", () =>
     const pos = createMousePosition(undefined, {
       initialValue: { x: 69, y: 420 }
     });
-    assert.is(pos.x, 69);
-    assert.is(pos.y, 420);
+    assert.equal(pos, {
+      x: 69,
+      y: 420,
+      sourceType: null,
+      isInside: false
+    });
     dispose();
   })
 );
@@ -39,33 +45,39 @@ mte("returns correct values", () =>
     const [pos, setPos] = createStaticStore({ x: 0, y: 0 });
     const relative = createPositionToElement(el, () => pos);
 
-    assert.is(relative.x, 0);
-    assert.is(relative.y, 0);
-    assert.is(relative.width, 0);
-    assert.is(relative.height, 0);
-    assert.is(relative.top, 0);
-    assert.is(relative.left, 0);
-    assert.is(relative.isInside, true);
+    assert.equal(relative, {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      top: 0,
+      left: 0,
+      isInside: true
+    });
 
     setPos({ x: -20, y: 30 });
 
-    assert.is(relative.x, -20);
-    assert.is(relative.y, 30);
-    assert.is(relative.width, 0);
-    assert.is(relative.height, 0);
-    assert.is(relative.top, 0);
-    assert.is(relative.left, 0);
-    assert.is(relative.isInside, false);
+    assert.equal(relative, {
+      x: -20,
+      y: 30,
+      width: 0,
+      height: 0,
+      top: 0,
+      left: 0,
+      isInside: false
+    });
 
     setPos({ x: 15 });
 
-    assert.is(relative.x, 15);
-    assert.is(relative.y, 30);
-    assert.is(relative.width, 0);
-    assert.is(relative.height, 0);
-    assert.is(relative.top, 0);
-    assert.is(relative.left, 0);
-    assert.is(relative.isInside, false);
+    assert.equal(relative, {
+      x: 15,
+      y: 30,
+      width: 0,
+      height: 0,
+      top: 0,
+      left: 0,
+      isInside: false
+    });
 
     dispose();
   })
@@ -88,13 +100,15 @@ mte("initial values can be changed", () =>
       }
     );
 
-    assert.is(pos.x, -1);
-    assert.is(pos.y, 2);
-    assert.is(pos.width, 3);
-    assert.is(pos.height, 4);
-    assert.is(pos.top, 5);
-    assert.is(pos.left, 6);
-    assert.is(pos.isInside, false);
+    assert.equal(pos, {
+      x: -1,
+      y: 2,
+      width: 3,
+      height: 4,
+      top: 5,
+      left: 6,
+      isInside: false
+    });
 
     dispose();
   })

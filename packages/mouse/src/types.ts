@@ -15,14 +15,14 @@ export interface PositionRelativeToElement extends Position {
 
 export interface UseTouchOptions {
   /**
-   * Listen to `touchmove` events
+   * Listen to touch events. If enabled, position will be updated on `touchstart` event.
    * @default true
    */
   touch?: boolean;
 }
 export interface FollowTouchOptions {
   /**
-   * If enabled, position will be updated on touchmove event.
+   * If enabled, position will be updated on `touchmove` event.
    * @default true
    */
   followTouch?: boolean;
