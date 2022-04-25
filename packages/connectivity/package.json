@@ -51,7 +51,8 @@
   ],
   "dependencies": {
     "@solid-primitives/utils": "1.2.0",
-    "@solid-primitives/event-listener": "^2.0.0"
+    "@solid-primitives/event-listener": "^2.0.0",
+    "@solid-primitives/rootless": "^1.1.0"
   },
   "devDependencies": {
     "jsdom": "^19.0.0",

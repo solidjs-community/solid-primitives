@@ -1,5 +1,5 @@
 import { setOnline } from "./setup";
-import { makeConnectivityListener, createConnectivitySignal } from "../src";
+import { makeConnectivityListener, createConnectivitySignal, useConnectivitySignal } from "../src";
 import { createRoot } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
@@ -29,8 +29,26 @@ testCCS("createConnectivitySignal", () =>
     assert.equal(onLine(), true);
     setOnline(false);
     assert.equal(onLine(), false);
+    setOnline(true);
+    assert.equal(onLine(), true);
     dispose();
   })
 );
 
 testCCS.run();
+
+const testUCS = suite("useConnectivitySignal");
+
+testUCS("useConnectivitySignal", () =>
+  createRoot(dispose => {
+    const onLine = useConnectivitySignal();
+    assert.equal(onLine(), true);
+    setOnline(false);
+    assert.equal(onLine(), false);
+    setOnline(true);
+    assert.equal(onLine(), true);
+    dispose();
+  })
+);
+
+testUCS.run();

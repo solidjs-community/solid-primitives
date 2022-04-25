@@ -36,7 +36,7 @@ const clear = makeConnectivityListener(isOnline => {
 clear();
 ```
 
-#### Definition
+### Definition
 
 ```ts
 function makeConnectivityListener(callback: (isOnline: boolean) => void): VoidFunction;
@@ -53,7 +53,20 @@ const isOnline = createConnectivitySignal();
 isOnline(); // T: boolean
 ```
 
-#### Definition
+### `useConnectivitySignal`
+
+This primitive providea a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) variant that will reuse event listeners and signals across dependents.
+
+It's behavior is the same as [`createConnectivitySignal`](#createConnectivitySignal).
+
+```ts
+import { useConnectivitySignal } from "@solid-primitives/connectivity";
+
+const isOnline = useConnectivitySignal();
+isOnline(); // T: boolean
+```
+
+### Definition
 
 ```ts
 function createConnectivitySignal(): Accessor<boolean>;
@@ -82,6 +95,6 @@ Upgraded to Solid 1.3
 
 0.2.0 - **stage-2**
 
-Add `makeConnectivityListener`
+Add `makeConnectivityListener` and `useConnectivitySignal`
 
 </details>

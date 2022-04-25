@@ -1,4 +1,5 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
+import { createSharedRoot } from "@solid-primitives/rootless";
 import { Accessor, createSignal } from "solid-js";
 
 /**
@@ -31,3 +32,15 @@ export function createConnectivitySignal(): Accessor<boolean> {
   makeConnectivityListener(setStatus);
   return status;
 }
+
+/**
+ * A signal representing the browser's interpretation of whether it is on- or offline.
+ *
+ * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot).
+ *
+ * @return Returns a signal representing the online status. Read-only.
+ * @example
+ * const isOnline = useConnectivitySignal()
+ * isOnline() // T: boolean
+ */
+export const useConnectivitySignal = /*#__PURE__*/ createSharedRoot(createConnectivitySignal);
