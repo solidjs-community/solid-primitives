@@ -154,6 +154,10 @@ const state = useState();
 function createSharedRoot<T>(factory: (dispose: Fn) => T): () => T;
 ```
 
+### Demo
+
+Usage of combining `createSharedRoot` with `createMousePosition`: https://codesandbox.io/s/shared-root-demo-fjl1l9?file=/index.tsx
+
 ## Changelog
 
 <details>
