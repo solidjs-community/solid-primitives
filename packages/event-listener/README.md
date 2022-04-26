@@ -13,7 +13,7 @@ A set of primitives that help with listening to DOM and Custom Events.
 
 ##### Non-reactive primitives:
 
-- [`makeEventListener`](#makeEventListener) - Non-reactive primitive for adding event listeners that get's removed onCleanup.
+- [`makeEventListener`](#makeEventListener) - Non-reactive primitive for adding event listeners that gets removed onCleanup.
 - [`makeEventListenerStack`](#makeEventListenerStack) - Creates a stack of event listeners, that will be automatically disposed on cleanup.
 
 ##### Reactive primitives:
