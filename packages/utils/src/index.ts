@@ -1,5 +1,5 @@
-import { getOwner, onCleanup, createSignal, Accessor, DEV, untrack } from "solid-js";
-import type { BaseOptions } from "solid-js/types/reactive/signal";
+import { getOwner, onCleanup, createSignal, Accessor, DEV, untrack, batch } from "solid-js";
+import type { BaseOptions, Signal } from "solid-js/types/reactive/signal";
 import { isServer } from "solid-js/web";
 import type {
   AnyClass,
@@ -10,7 +10,9 @@ import type {
   Trigger,
   TriggerCache,
   AnyObject,
-  AnyFunction
+  AnyFunction,
+  SetterValue,
+  AnyStatic
 } from "./types";
 
 export * from "./types";
@@ -44,6 +46,8 @@ export function isObject(value: any): value is AnyObject {
 }
 
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
+
+export const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
 
 /**
  * Accesses the value of a MaybeAccessor
@@ -113,11 +117,9 @@ export function forEachEntry<O extends AnyObject>(
 }
 
 /**
- * Get `Object.entries()` of an MaybeAccessor<object>
+ * Get entries of an object
  */
-export const entries = <A extends MaybeAccessor<object>, O = MaybeAccessorValue<A>>(
-  object: A
-): [keyof O, Values<O>][] => Object.entries(access(object)) as [keyof O, Values<O>][];
+export const entries = Object.entries as <T extends object>(obj: T) => [keyof T, T[keyof T]][];
 
 /**
  * Get keys of an object
@@ -302,4 +304,64 @@ export function createTriggerCache<T>(options?: BaseOptions): TriggerCache<T> {
       trigger[0]();
     }
   };
+}
+
+export type StaticStoreSetter<T extends Readonly<AnyStatic>> = {
+  (setter: (prev: T) => Partial<T>): T;
+  (state: Partial<T>): T;
+  <K extends keyof T>(key: K, state: SetterValue<T[K]>): T;
+};
+
+/**
+ * A shallowly wrapped reactive store object. It behaves similarly to the creatStore, but with limited features to keep it simple. Designed to be used for reactive objects with static keys, but dynamic values, like reactive Event State, location, etc.
+ * @param init initial value of the store
+ * @returns
+ * ```ts
+ * [access: Readonly<T>, write: StaticStoreSetter<T>]
+ * ```
+ */
+export function createStaticStore<T extends Readonly<AnyStatic>>(
+  init: T
+): [access: T, write: StaticStoreSetter<T>] {
+  const copy = { ...init };
+  const store = {} as T;
+  const cache = new Map<PropertyKey, Signal<any>>();
+
+  const getValue = <K extends keyof T>(key: K): T[K] => {
+    const saved = cache.get(key);
+    if (saved) return saved[0]();
+    const signal = createSignal<any>(copy[key], {
+      name: typeof key === "string" ? key : undefined
+    });
+    cache.set(key, signal);
+    delete copy[key];
+    return signal[0]();
+  };
+
+  const setValue = <K extends keyof T>(key: K, value: SetterValue<any>): void => {
+    const saved = cache.get(key);
+    if (saved) return saved[1](value);
+    if (key in copy) copy[key] = accessWith(value, [copy[key]]);
+  };
+
+  for (const key of keys(init)) {
+    store[key] = undefined as any;
+    Object.defineProperty(store, key, {
+      get: getValue.bind(void 0, key)
+    });
+  }
+
+  const setter = (a: ((prev: T) => Partial<T>) | Partial<T> | keyof T, b?: SetterValue<any>) => {
+    if (isObject(a))
+      untrack(() => {
+        batch(() => {
+          for (const [key, value] of entries(accessWith(a, store) as Partial<T>))
+            setValue(key as keyof T, () => value);
+        });
+      });
+    else setValue(a, b);
+    return store;
+  };
+
+  return [store, setter];
 }

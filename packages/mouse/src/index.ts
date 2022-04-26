@@ -1,4 +1,9 @@
-export * from "./mousePosition";
-export * from "./mouseOnScreen";
-export * from "./mouseInElement";
-export * from "./mouseToElement";
+export * from "./types";
+export {
+  makeMousePositionListener,
+  makeMouseInsideListener,
+  getPositionToElement,
+  getPositionToScreen,
+  getPositionInElement
+} from "./common";
+export * from "./primitives";

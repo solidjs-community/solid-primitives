@@ -1,9 +1,4 @@
-import {
-  createEventListenerMap,
-  WindowEventListener,
-  eventListener,
-  createEventSignal
-} from "../src";
+import { WindowEventListener, eventListener, createEventListener, createEventSignal } from "../src";
 import { Component, createSignal, For, Show } from "solid-js";
 import { render } from "solid-js/web";
 import { DisplayRecord } from "./components";
@@ -41,11 +36,12 @@ const WindowMousemove: Component = () => {
 };
 
 const List: Component = () => {
+  const [lastEvent, setLastEvent] = createSignal<Event>();
   const [n, setN] = createSignal(5);
   const [items, setItems] = createSignal<HTMLDivElement[]>([]);
 
   // new event listeners are automatically added to the new items
-  const [lastEvent] = createEventSignal(items, "click");
+  createEventListener(items, "click", setLastEvent);
 
   return (
     <div class="flex flex-col items-center space-y-6">
@@ -77,12 +73,7 @@ type MyCustomEvents = {
 
 const CustomEvents: Component = () => {
   let ref!: HTMLDivElement;
-  const [lastEvent, setLastEvent] = createSignal<Event>();
-  createEventListenerMap(() => ref, {
-    A: setLastEvent,
-    B: setLastEvent,
-    C: setLastEvent
-  });
+  const lastEvent = createEventSignal<MyCustomEvents>(() => ref, ["a", "b", "c"]);
 
   return (
     <div class="flex flex-col items-center space-y-4">
@@ -92,9 +83,9 @@ const CustomEvents: Component = () => {
         TARGET
       </div>
       <div class="flex space-x-2">
-        <button onclick={() => ref.dispatchEvent(new Event("A"))}>Emit A</button>
-        <button onclick={() => ref.dispatchEvent(new Event("B"))}>Emit B</button>
-        <button onclick={() => ref.dispatchEvent(new Event("C"))}>Emit C</button>
+        <button onclick={() => ref.dispatchEvent(new Event("a"))}>Emit A</button>
+        <button onclick={() => ref.dispatchEvent(new Event("b"))}>Emit B</button>
+        <button onclick={() => ref.dispatchEvent(new Event("c"))}>Emit C</button>
       </div>
     </div>
   );
@@ -113,19 +104,10 @@ const DirectiveUsage: Component = () => {
 };
 
 const EventMap: Component = () => {
-  const [lastEvent, setLastEvent] = createSignal<Event>();
-
   let ref!: HTMLDivElement;
-  createEventListenerMap(
-    () => ref,
-    {
-      mouseenter: setLastEvent,
-      mouseleave: setLastEvent,
-      click: setLastEvent,
-      wheel: setLastEvent
-    },
-    { passive: true }
-  );
+  const lastEvent = createEventSignal(() => ref, ["mouseenter", "mouseleave", "click", "wheel"], {
+    passive: true
+  });
 
   return (
     <div class="flex flex-col items-center space-y-2">
@@ -141,4 +123,4 @@ const EventMap: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+render(() => <App />, document.getElementById("root")!);

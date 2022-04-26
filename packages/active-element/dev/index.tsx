@@ -1,17 +1,17 @@
-import { createActiveElement, isElementActive } from "../src";
+import { createActiveElement, focus } from "../src";
 import { Component, createSignal, Index } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
 import { genNodeList } from "./utils";
 // prevent tree-shaking
-isElementActive;
+focus;
 
 const Node: Component<{ x: number; y: number; size: number }> = props => {
   const [isFocused, setIsFocused] = createSignal(false);
 
   return (
     <button
-      use:isElementActive={setIsFocused}
+      use:focus={setIsFocused}
       class="fixed top-0 left-0 w-48 h-48 rounded-full bg-orange-700 border-none cursor-pointer hover:bg-orange-600 text-4xl font-extrabold text-gray-900"
       classList={{
         "!bg-indigo-700 !hover:bg-indigo-600": isFocused()
@@ -29,7 +29,7 @@ const Node: Component<{ x: number; y: number; size: number }> = props => {
 const App: Component = () => {
   const [list, setList] = createSignal(genNodeList());
   const shuffle = () => setList(genNodeList());
-  const [activeEl] = createActiveElement();
+  const activeEl = createActiveElement();
 
   return (
     <div class="box-border w-full h-screen overflow-hidden bg-gray-900 text-white">

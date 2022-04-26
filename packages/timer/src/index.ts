@@ -1,5 +1,7 @@
-import { createSignal, onCleanup, createEffect, untrack, Accessor } from "solid-js";
+import { createSignal, onCleanup, createEffect, untrack, Accessor, createComputed } from "solid-js";
 import { SignalOptions } from "solid-js/types/reactive/signal";
+
+export type TimeoutSource = number | Accessor<number | false>;
 
 /**
  * Create a timer ({@link setTimeout} or {@link setInterval})
@@ -11,14 +13,13 @@ import { SignalOptions } from "solid-js/types/reactive/signal";
  * @returns Function to manually clear the interval.
  */
 export const makeTimer = (
-  fn: () => void,
+  fn: VoidFunction,
   delay: number,
   timer: typeof setTimeout | typeof setInterval
-): (() => void) => {
+): VoidFunction => {
   const intervalId = timer(fn, delay);
-  const clear = () => clearInterval(intervalId);
-  onCleanup(clear);
-  return clear;
+  const clear = () => clearInterval(intervalId as number);
+  return onCleanup(clear);
 };
 
 /**
@@ -33,8 +34,8 @@ export const makeTimer = (
  * @param timer The timer to create: {@link setTimeout} or {@link setInterval}.
  */
 export const createTimer = (
-  fn: () => void,
-  delay: number | Accessor<number | false>,
+  fn: VoidFunction,
+  delay: TimeoutSource,
   timer: typeof setTimeout | typeof setInterval
 ): void => {
   if (typeof delay === "number") {
@@ -103,10 +104,7 @@ export const createTimer = (
  * @param timeout Number or Function returning a number representing the time
  * between executions of {@link handler} in ms, or false to disable looping.
  */
-export const createTimeoutLoop = (
-  handler: () => void,
-  timeout: number | (() => number | false)
-): void => {
+export const createTimeoutLoop = (handler: VoidFunction, timeout: TimeoutSource): void => {
   if (typeof timeout === "number") {
     makeTimer(handler, timeout, setInterval);
     return;
@@ -135,29 +133,35 @@ export const createTimeoutLoop = (
  * @param value Initial value passed to {@link fn}. Defaults to undefined.
  * @param options Signal options for createSignal.
  * @returns An {@link Accessor} containing the latest polled value.
+ * @example
+ * const date = createPolled(() => new Date(), 1000);
+ * date() // T: Date
+ * // with reactive delay
+ * const [delay, setDelay] = createSignal(1000);
+ * createPolled(() => new Date(), delay);
  */
-
 export function createPolled<T extends P, P = T>(
   fn: (prev: P | Exclude<undefined, P>) => T,
-  timeout: number | Accessor<number | false>
+  timeout: TimeoutSource,
+  value?: undefined,
+  options?: SignalOptions<T>
 ): Accessor<T>;
 export function createPolled<T extends P, I = T, P = T>(
   fn: (prev: P | I) => T,
-  timeout: number | Accessor<number | false>,
+  timeout: TimeoutSource,
   value: I,
   options?: SignalOptions<T>
 ): Accessor<T>;
-export function createPolled<T extends P, I, P>(
-  fn: (prev: P | I) => T,
-  timeout: number | Accessor<number | false>,
-  value?: I,
+export function createPolled<T>(
+  fn: (prev: T | undefined) => T,
+  timeout: TimeoutSource,
+  value?: T,
   options?: SignalOptions<T>
 ): Accessor<T> {
-  const [polled, setPolled] = createSignal(
-    untrack(() => fn(value!)),
-    options
-  );
-  createTimer(() => setPolled(fn), timeout, setInterval);
+  const [polled, setPolled] = createSignal(untrack(fn.bind(void 0, value)), options);
+  const update = () => setPolled(fn);
+  createTimer(update, timeout, setInterval);
+  createComputed(update);
   return polled;
 }
 
@@ -169,7 +173,7 @@ export function createPolled<T extends P, I, P>(
  * @returns An {@link Accessor} containing the current count.
  */
 export const createIntervalCounter = (
-  timeout: number | Accessor<number | false>,
+  timeout: TimeoutSource,
   options?: SignalOptions<number>
 ): Accessor<number> => {
   return createPolled(prev => prev + 1, timeout, -1, options);

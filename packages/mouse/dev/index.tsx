@@ -1,35 +1,29 @@
-import {
-  createMousePosition,
-  createMouseOnScreen,
-  createMouseToElement,
-  createMouseInElement
-} from "../src";
-import { Component, createSignal, Show } from "solid-js";
+import { useMousePosition, createPositionToElement } from "../src";
+import { Component, createMemo, createSignal, Show } from "solid-js";
 import { render } from "solid-js/web";
 import createRAF from "@solid-primitives/raf";
-import { omit } from "@solid-primitives/utils/fp";
 import { lerp } from "./utils";
 import "uno.css";
 import { DisplayRecord } from "./components";
+import { clamp } from "@solid-primitives/utils";
 
 const App: Component = () => {
   const [showContainer, setShowContainer] = createSignal(true);
-
-  const [mouse] = createMousePosition();
-  const [onScreen] = createMouseOnScreen(false);
   const [ref, setRef] = createSignal<HTMLDivElement>();
-  const [relative] = createMouseToElement(ref, mouse);
-  const [{ x: hoverX, y: hoverY, isInside: isHovering }] = createMouseInElement(ref, {
-    followTouch: false
-  });
+
+  const mouse = useMousePosition();
+  const relative = createPositionToElement(ref, () => mouse);
+
+  const inElementX = createMemo(() => clamp(relative.x, 0, relative.width));
+  const inElementY = createMemo(() => clamp(relative.y, 0, relative.height));
 
   const [pos, setPos] = createSignal({ x: 0, y: 0, elX: 0, elY: 0 });
-  const [running, start, stop] = createRAF(() => {
+  const [, start] = createRAF(() => {
     setPos(p => ({
-      x: lerp(p.x, mouse.x(), 0.1),
-      y: lerp(p.y, mouse.y(), 0.1),
-      elX: lerp(p.elX, relative.x(), 0.2),
-      elY: lerp(p.elY, relative.y(), 0.2)
+      x: lerp(p.x, mouse.x, 0.1),
+      y: lerp(p.y, mouse.y, 0.1),
+      elX: lerp(p.elX, relative.x, 0.2),
+      elY: lerp(p.elY, relative.y, 0.2)
     }));
   });
   start();
@@ -39,8 +33,8 @@ const App: Component = () => {
       <div
         class="w-36 h-36 bg-violet-700 rounded-full filter pointer-events-none"
         classList={{
-          "opacity-0": !onScreen(),
-          "blur-xl": !onScreen()
+          "opacity-0": !mouse.isInside,
+          "blur-xl": !mouse.isInside
         }}
         style={{
           transition: "opacity 500ms, filter 300ms",
@@ -63,14 +57,11 @@ const App: Component = () => {
       <div
         class="fixed z-20 top-25vh left-25vw p-6 py-4 rounded-2xl rounded-lt bg-white bg-opacity-10 border-1 border-white border-opacity-20 pointer-events-none text-opacity-50 text-white transition-opacity"
         style={{
-          transform: `translate(${hoverX()}px, ${hoverY()}px)`,
-          opacity: isHovering() ? 1 : 0
+          transform: `translate(${inElementX()}px, ${inElementY()}px)`,
+          opacity: relative.isInside ? 1 : 0
         }}
       >
-        {() => {
-          const record = omit(relative, "isInside");
-          return <DisplayRecord record={record} />;
-        }}
+        <DisplayRecord record={{ x: inElementX(), y: inElementY() }} />
       </div>
       <div class="fixed top-6 left-6 caption text-opacity-60 select-none text-white">
         <DisplayRecord record={mouse} />
@@ -85,4 +76,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+render(() => <App />, document.getElementById("root")!);
