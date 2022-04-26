@@ -37,6 +37,8 @@ yarn add @solid-primitives/event-listener
 
 ## `makeEventListener`
 
+###### Added id `@2.0.0`
+
 Can be used to listen to DOM or Custom Events on window, document, or any EventTarget.
 
 Event listener is automatically removed on root cleanup. The clear() function is also returned for calling it early.
@@ -79,6 +81,8 @@ makeEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
 ```
 
 ## `makeEventListenerStack`
+
+###### Added id `@2.0.0`
 
 Creates a stack of event listeners, that will be automatically disposed on cleanup.
 

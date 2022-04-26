@@ -129,6 +129,8 @@ function createPositionToElement(
 
 ### `makeMousePositionListener`
 
+###### Added id `@2.0.0`
+
 Attaches event listeners to provided targat, listeneing for changes to the mouse/touch position.
 
 ```ts
@@ -138,6 +140,8 @@ clear();
 ```
 
 ### `makeMouseInsideListener`
+
+###### Added id `@2.0.0`
 
 Attaches event listeners to provided targat, listening for mouse/touch entering/leaving the element.
 

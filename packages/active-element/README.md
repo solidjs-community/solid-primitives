@@ -33,6 +33,8 @@ yarn add @solid-primitives/active-element
 
 ## `makeActiveElementListener`
 
+###### Added id `@2.0.0`
+
 Attaches event listeners to window, listening for the changes of the `document.activeElement`.
 
 ```ts
@@ -52,6 +54,8 @@ function makeActiveElementListener(callback: (element: Element | null) => void):
 ```
 
 ## `makeFocusListener`
+
+###### Added id `@2.0.0`
 
 Attaches "blur" and "focus" event listeners to the element.
 
