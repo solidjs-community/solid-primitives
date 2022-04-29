@@ -5,25 +5,18 @@ import 'uno.css';
 
 const App: Component = () => {
   const isoDateHandler = createInputMask('9999-99-99');
-  const cardExpiryHandler = createInputMask('99/9999');
+  const cardExpiryHandler = createInputMask([/\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]);
   const ibanMask = anyMaskToFn('aa99999999999999999999');
   const ibanHandler = createInputMask((value, selection) => {
     const maskOutput = ibanMask(value, selection)
     maskOutput[0] = maskOutput[0].toUpperCase();
     return maskOutput;
   })
+  const potentialNumericId = /^\d{1,3}$|^\d{2,4}-?\d{0,3}$|^\d{2,4}-?\d{2,4}-?\d{0,3}$/;
   const meetingIdMask = anyMaskToFn('999-999-999');
-  const gotoURLs = /^(https?:\/\/|)(meet\.goto\.com|gotomeet\.me|)\/?/;
-  const removeGotoURLMask = (value: string, selection: Selection): [string, Selection] => {
-    const cleanedValue = value.replace(gotoURLs, '');
-    const removed = value.length - cleanedValue.length;    
-    return cleanedValue === value
-      ? [value, selection]
-      : [cleanedValue, [Math.max(selection[0] - removed, 0), Math.max(selection[1] - removed, 0)]]
-  }
-  const meetingMask = (value: string, selection: Selection): [string, Selection] => /^\D/.test(value)
-    ? removeGotoURLMask(value, selection)
-    : meetingIdMask(value, selection)
+  const meetingNameMask = anyMaskToFn([/[^0-9a-zäöüß\-_/]|^(https?:\/\/|)(meet\.goto\.com|gotomeet\.me|)\/?/gi, () => '']);
+  const meetingMask = (value: string, selection: Selection): [string, Selection] => 
+    potentialNumericId.test(value) ? meetingIdMask(value, selection) : meetingNameMask(value, selection)
   const meetingInputHandler = createInputMask(meetingMask)
 
   return (
