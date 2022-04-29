@@ -65,4 +65,3 @@ test("works with regex mask", async ({ container }) => {
   assert.is(input.value, "test");
   unmount();
 });
-'re
