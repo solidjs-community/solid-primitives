@@ -42,7 +42,7 @@ test("adds placeholder (e.g. to an iso date)", async ({ container }) => {
   unmount();
 });
 
-test('removes wrongful input (e.g. from iso-date)', async ({ container }) => {
+test("removes wrongful input (e.g. from iso-date)", async ({ container }) => {
   const unmount = render(() => <input onInput={createInputMask("9999-99-99")} />, container);
   const input = container.querySelector("input") as HTMLInputElement;
   input.value = "a";
@@ -54,4 +54,15 @@ test('removes wrongful input (e.g. from iso-date)', async ({ container }) => {
   unmount();
 });
 
-test.run();
+test("works with regex mask", async ({ container }) => {
+  const unmount = render(() => <input onInput={createInputMask([
+    /[^0-9a-zäöüß\-_/]|^(https?:\/\/|)(meet\.goto\.com|gotomeet\.me|)\/?/gi,
+    () => ''
+  ])} />, container);
+  const input = container.querySelector("input") as HTMLInputElement;
+  input.value = "https://meet.goto.com/test";
+  await dispatchInputEvent(input);
+  assert.is(input.value, "test");
+  unmount();
+});
+'re

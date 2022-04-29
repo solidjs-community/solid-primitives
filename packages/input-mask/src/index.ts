@@ -7,7 +7,11 @@ export type InputMaskFn = (
 
 export type InputMaskArray = (string | RegExp)[];
 
-export type InputMask = InputMaskFn | InputMaskArray | string;
+export type ReplaceArgs = [substring: string, ...args: any[]];
+
+export type InputMaskRegex = [regex: RegExp, replacer: (...args: ReplaceArgs) => string];
+
+export type InputMask = InputMaskFn | InputMaskArray | InputMaskRegex | string;
 
 export const stringMaskRegExp: Record<string, RegExp> = {
   9: /\d/,
@@ -16,7 +20,31 @@ export const stringMaskRegExp: Record<string, RegExp> = {
 };
 
 /** Convert a string mask to an array mask */
-export const stringMaskToArray = (mask: string, regexps = stringMaskRegExp) => [...mask].map(c => regexps[c] || c);
+export const stringMaskToArray = (mask: string, regexps = stringMaskRegExp) =>
+  [...mask].map(c => regexps[c] || c);
+
+/** Convert a regex mask to a mask function */
+export const regexMaskToFn =
+  (regex: RegExp, replacer: (...args: ReplaceArgs) => string): InputMaskFn =>
+  (value: string, selection: Selection) =>
+    [
+      value.replace(regex, (...args) => {
+        const replacement = replacer(...args);
+        const index = args[args.length - 2];
+        selection[0] +=
+          index < selection[0]
+            ? 0
+            : ((replacement.length - args[0].length) / args[0].length) *
+              Math.max(selection[0] - index, args[0].length);
+        selection[1] +=
+          index < selection[1]
+            ? 0
+            : ((replacement.length - args[0].length) / args[0].length) *
+              Math.max(selection[1] - index, args[0].length);
+        return replacement;
+      }),
+      selection
+    ];
 
 /** Convert an array mask to a mask function */
 export const maskArrayToFn =
@@ -24,18 +52,17 @@ export const maskArrayToFn =
   (value: string, selection: Selection) => {
     let pos = 0;
     maskArray.forEach(maskItem => {
-      if (value.length < pos + 1) {
-        return;
-      }
-      if (typeof maskItem === "string") {
-        const index = value.slice(pos).indexOf(maskItem);
-        if (index !== 0) {
-          value = value.slice(0, pos) + maskItem + value.slice(pos);
-          selection[0] > pos && (selection[0] += maskItem.length);
-          selection[1] > pos && (selection[1] += maskItem.length);
+      if (value.length >= pos + 1) {
+        if (typeof maskItem === "string") {
+          const index = value.slice(pos).indexOf(maskItem);
+          if (index !== 0) {
+            value = value.slice(0, pos) + maskItem + value.slice(pos);
+            selection[0] += ((selection[0] > pos) as unknown as number) * maskItem.length;
+            selection[1] += ((selection[1] > pos) as unknown as number) * maskItem.length;
+          }
+          pos += maskItem.length;
+          return;
         }
-        pos += maskItem.length;
-      } else if (maskItem instanceof RegExp) {
         const match = value.slice(pos).match(maskItem);
         if (!match || match.index === undefined) {
           value = value.slice(0, pos);
@@ -43,8 +70,8 @@ export const maskArrayToFn =
         } else if (match.index > 0) {
           value = value.slice(0, pos) + value.slice(pos + match.index);
           pos -= match.index - 1;
-          selection[0] > pos && (selection[0] -= match.index);
-          selection[1] > pos && (selection[1] -= match.index);
+          selection[0] -= ((selection[0] > pos) as unknown as number) * match.index;
+          selection[1] -= ((selection[1] > pos) as unknown as number) * match.index;
         }
         pos += match[0].length;
       }
@@ -56,7 +83,11 @@ export const maskArrayToFn =
 export const anyMaskToFn = (mask: InputMask, regexps?: Record<string, RegExp>) =>
   typeof mask === "function"
     ? mask
-    : maskArrayToFn(Array.isArray(mask) ? mask : stringMaskToArray(mask, regexps));
+    : typeof mask[1] === "function" && mask[0] instanceof RegExp
+    ? regexMaskToFn(mask[0], mask[1])
+    : maskArrayToFn(
+        Array.isArray(mask) ? (mask as InputMaskArray) : stringMaskToArray(mask, regexps)
+      );
 
 export interface EventLike {
   target: EventTarget | null;
