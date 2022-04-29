@@ -120,18 +120,18 @@ Much of the design decisions in naming are best described in the [7 Lessons to O
 
 ### `make` (non-reactive) vs `create` (reactive)
 
-Solid uses the `create` prefix to define a primitive that provides reactive utility. Solid Primitives reinforces this pattern but in an effort to enhance composability we have also introduced the `make` prefix for identify non-reactive basic primities. Having a non-reactive alternative means that the primitive does the bare essentials such as cleaning up events or interupting a process. ie. `makeTimer` will create and clean-up the scheduler, providing only a clear method. createTimer provides a properly reactive primitive that composes it.
+Solid uses the `create` prefix to define a primitive that provides reactive utility. Solid Primitives reinforces this pattern but in an effort to enhance composability we have also introduced the `make` prefix for identify non-reactive basic primitives. Having a non-reactive alternative means that the primitive does the bare essentials such as cleaning up events or interupting a process. ie. `makeTimer` will create and clean-up the scheduler, providing only a clear method. createTimer provides a properly reactive primitive that composes it.
 
-### Managing Primitve Complexity
+### Managing Primitive Complexity
 
 Solid Primitives is mostly about supplying 80-90% of the common-use cases for the end-user. We prefer to be less prescriptive than other hook libraries such as VueUse and supply granular solutions as opposed to monolithic primitives. The remaining 10-20% of complex use cases are likely not to be covered with this library. This is on purpose to limit the potential of bloat and extended complexity. This project strives to provide foundations and not cumulative solutions. We expect the broader ecosystem will fill the remaining need as further composition to this projects effort. This allows for just the right amount of prescription and opinion.
 
-## Lerna CLI Helpers
+## CLI Helpers
 
-This package comes with a number of support utilities built with Lerna Scripts.
+Available node scripts for managing packages and creating new ones:
 
-- `yarn ls updateReadme` - This will update the list of primitives by inspecting individual packages.
-- `yarn ls createPrimitive name` - A helper to setup a primitive template package.
+- `yarn update-readme` - This will update the list of primitives by inspecting individual packages.
+- `yarn new-package name-of-your-package` - A helper to setup a primitive template package.
 
 ## Planned Primitives
 

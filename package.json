@@ -14,11 +14,12 @@
     "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx}\" \"utils/**/*.{js,ts,json,css,tsx,jsx}\"",
     "ls": "lerna-script",
     "build": "lerna run build --concurrency 4",
-    "test": "lerna run test --concurrency 4"
+    "test": "lerna run test --concurrency 4",
+    "new-package": "node ./scripts/new-package",
+    "update-readme": "node ./scripts/update-readme"
   },
   "devDependencies": {
     "lerna": "^4.0.0",
-    "lerna-script": "^1.4.0",
     "markdown-magic": "^2.6.0",
     "prettier": "^2.5.1",
     "solid-js": "^1.3.12",
