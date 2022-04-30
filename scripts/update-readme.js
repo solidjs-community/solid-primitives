@@ -3,7 +3,7 @@ const { join } = require("path");
 const markdownMagic = require("markdown-magic");
 const tablemark = require("json-to-markdown-table");
 
-const getPathTo = path => join(__dirname, path);
+const pathTo = (...path) => join(__dirname, ...path);
 
 console.log("updateReadme", "Updating README documentation");
 
@@ -19,8 +19,8 @@ const stageShieldLink =
 
 const categories = {};
 
-readdirSync(getPathTo(`../packages/`)).forEach(name => {
-  const dir = getPathTo(`../packages/${name}/package.json`);
+readdirSync(pathTo(`../packages/`)).forEach(name => {
+  const dir = pathTo(`../packages/${name}/package.json`);
   if (!existsSync(dir)) return;
   const pkg = JSON.parse(readFileSync(dir, "utf8"));
 
@@ -51,7 +51,7 @@ readdirSync(getPathTo(`../packages/`)).forEach(name => {
   categories[cat] = Array.isArray(categories[cat]) ? [...categories[cat], data] : [data];
 });
 
-markdownMagic(getPathTo("../README.md"), {
+markdownMagic(pathTo("../README.md"), {
   transforms: {
     GENERATE_PRIMITIVES_TABLE: () => {
       return Object.entries(categories).reduce((md, [category, items]) => {
