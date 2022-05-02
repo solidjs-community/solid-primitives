@@ -1,182 +1,51 @@
-import { Accessor, createSignal } from "solid-js";
+import { onCleanup, onMount } from "solid-js";
+import { transformFile } from "./helpers";
+import { FileUploaderDirective } from "./types";
 
-/**
- * @property `source` - DOMString containing a URL representing the object given in the parameter
- */
-export type UploadFile = {
-  source: string;
-  name: string;
-  size: number;
-  file: File;
-};
-
-/**
- * @property `accept` - Comma-separated list of one or more file types, or unique file type specifiers
- * @link `accept` - https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept
- */
-export type CreateFileUploaderOptions = {
-  accept?: string;
-  multiple?: boolean;
-};
-
-export type FileSelectCallback = {
-  (file: UploadFile): void | Promise<void>;
-  (files: UploadFile[]): void | Promise<void>;
-};
-
-export interface FilesUploader {
-  files: Accessor<UploadFile[]>;
-  selectFiles: (callback: (file: UploadFile[]) => void | Promise<void>) => void;
-  /**
-   * `change` event handler for input element. Handles `drop` event as well
-   */
-  handleFilesInput: (
-    event: (Event | DragEvent) & {
-      currentTarget: HTMLInputElement;
-      target: Element;
+declare module "solid-js" {
+  namespace JSX {
+    interface Directives {
+      fileUploader: FileUploaderDirective;
     }
-  ) => void | Promise<void>;
-  removeFile: (fileName: string) => void;
-  clearFiles: () => void;
+  }
 }
 
-export interface FileUploader extends Omit<FilesUploader, "files" | "selectFiles"> {
-  files: Accessor<UploadFile>;
-  selectFiles: (callback: (file: UploadFile) => void | Promise<void>) => void;
-}
+export const fileUploader = (element: HTMLInputElement, options: () => FileUploaderDirective) => {
+  const { userCallback, setFiles } = options();
 
-/**
- * Primitive to make uploading files easier.
- *
- * @returns `file (files)`
- * @returns `selectFile (selectFiles)` - Open file picker and set files
- * @returns `handleFileInput (handleFilesInput)` - Event handler for `<input type="file" />`
- * @returns `removeFile`
- * @returns `clearFiles`
- *
- * @example
- * ```ts
- * // multiple files
- * const {files, selectFiles} = createFileUploader({ multiple: true, accept: "image/*" });
- * selectFiles(files => {
- *   console.log(files);
- * });
- *
- * // single file
- * const {file, selectFile} = createFileUploader();
- * selectFile(({ source, name, size, file }) => {
- *   console.log({ source, name, size, file });
- * });
- * ```
- */
 
-function createFileUploader(): FileUploader;
-function createFileUploader(options?: CreateFileUploaderOptions): FilesUploader;
-function createFileUploader(options?: CreateFileUploaderOptions): any {
-  const [files, setFiles] = createSignal<UploadFile | UploadFile[]>();
+  onMount(() => {
+    async function onChange(this: HTMLInputElement, event: Event) {
+      const parsedFiles = [];
+      const target = this;
 
-  let userCallback: FileSelectCallback;
+      for (const index in target.files) {
+        const fileIndex = +index;
+        if (isNaN(+fileIndex)) {
+          continue;
+        }
 
-  async function onChange(this: HTMLInputElement, ev: Event) {
-    const parsedFiles = [];
-    const target = this;
+        const file = target.files[fileIndex];
+        const parsedFile = transformFile(file);
 
-    for (const index in target.files) {
-      const fileIndex = +index;
-      if (isNaN(+fileIndex)) {
-        continue;
+        parsedFiles.push(parsedFile);
       }
 
-      const file = target.files[fileIndex];
-      const parsedFile = transformFile(file);
-
-      parsedFiles.push(parsedFile);
-    }
-
-    target.removeEventListener("change", onChange);
-
-    target.remove();
-
-    if (target.multiple) {
       setFiles(parsedFiles);
-      return userCallback(parsedFiles);
+
+      try {
+        await userCallback(parsedFiles);
+      } catch (error) {
+        console.error(error);
+      }
+      return;
     }
 
-    setFiles(parsedFiles[0]);
-    return userCallback(parsedFiles[0]);
-  }
+    onCleanup(() => element.removeEventListener('change', onChange))
 
-  const selectFiles = (callback: FileSelectCallback) => {
-    userCallback = callback;
+    element.addEventListener("change", onChange);
+  })
+};
 
-    if (callback instanceof Promise) {
-      callback.then().catch(e => console.error(e));
-    }
-
-    const inputEL = createInputComponent(options || {});
-
-    inputEL.addEventListener("change", onChange);
-    inputEL.click();
-  };
-
-  const handleFilesInput = async (
-    event: (Event | DragEvent) & {
-      currentTarget: HTMLInputElement;
-      target: Element;
-    }
-  ) => {
-    const filesArr: File[] = Array.from(
-      event?.currentTarget?.files || (event as DragEvent)?.dataTransfer?.files || []
-    );
-    if (options?.multiple) {
-      setFiles(filesArr.map(transformFile));
-    } else {
-      setFiles(filesArr.map(transformFile)[0]);
-    }
-  };
-
-  const removeFile = (fileName: string) => {
-    if (options?.multiple) {
-      setFiles(prev => (prev as UploadFile[]).filter(f => f.name !== fileName));
-    } else {
-      setFiles(undefined);
-    }
-  };
-
-  const clearFiles = () => {
-    if (options?.multiple) {
-      setFiles([]);
-    } else {
-      setFiles(undefined);
-    }
-  };
-
-  return {
-    files,
-    selectFiles,
-    handleFilesInput,
-    removeFile,
-    clearFiles
-  };
-}
-
-export { createFileUploader };
-
-function createInputComponent({ multiple = false, accept = "" }: CreateFileUploaderOptions) {
-  const element = document.createElement("input");
-  element.type = "file";
-  element.accept = accept;
-  element.multiple = multiple;
-
-  return element;
-}
-
-function transformFile(file: File): UploadFile {
-  const parsedFile: UploadFile = {
-    source: URL.createObjectURL(file),
-    name: file.name,
-    size: file.size,
-    file
-  };
-  return parsedFile;
-}
+export { createFileUploader } from "./createFileUploader";
+export { createDropzone } from "./createDropzone";

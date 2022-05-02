@@ -1,27 +1,18 @@
-import { Component, createEffect, For } from "solid-js";
+import { Component, createEffect, createSignal, For } from "solid-js";
 import { render } from "solid-js/web";
-import { createFileUploader } from "../src";
+import { createFileUploader, fileUploader } from "../src";
+import { doStuff } from "../src/helpers";
 import "uno.css";
+import { UploadFile } from "../src/types";
 
-const wait = (s: number): Promise<void> => {
-  return new Promise((res, rej) => setTimeout(res, s * 1000));
-};
+fileUploader;
 
-const App: Component = () => {
-  const { files: file, selectFiles: selectFile } = createFileUploader();
-  const { files: fileAsync, selectFiles: selectFileAsync } = createFileUploader();
-  const { files, selectFiles } = createFileUploader({
-    multiple: true,
-    accept: "image/*"
-  });
-  const { files: fileInput, handleFilesInput: handleFileInput } = createFileUploader();
-  const { files: filesInput, handleFilesInput } = createFileUploader({ multiple: true });
+const SingleFileUpload: Component = () => {
+  const { files, selectFiles } = createFileUploader();
+  const { files: filesAsync, selectFiles: selectFilesAsync } = createFileUploader();
 
-  createEffect(() => console.log("file", file && file()));
-  createEffect(() => console.log("files", files && files()));
-  createEffect(() => console.log("fileAsync", fileAsync && fileAsync()));
-  createEffect(() => console.log("fileInput", fileInput && fileInput()));
-  createEffect(() => console.log("filesInput", filesInput && filesInput()));
+  createEffect(() => console.log("files", files()));
+  createEffect(() => console.log("filesAsync", filesAsync()));
 
   return (
     <div>
@@ -29,14 +20,14 @@ const App: Component = () => {
         <h5>Select a single file</h5>
         <button
           onClick={() => {
-            selectFile(({ source, name, size, file }) => {
+            selectFiles(([{ source, name, size, file }]) => {
               console.log({ source, name, size, file });
             });
           }}
         >
           Select
         </button>
-        <p>{file()?.name}</p>
+        <For each={files()}>{file => <p>{file.name}</p>}</For>
       </div>
 
       <hr />
@@ -45,19 +36,30 @@ const App: Component = () => {
         <h5>Select a single file with async callback</h5>
         <button
           onClick={() => {
-            selectFileAsync(async ({ source, name, size, file }) => {
-              await wait(2);
+            selectFilesAsync(async ([{ source, name, size, file }]) => {
+              await doStuff(2);
               console.log("AWAIT", { source, name, size, file });
             });
           }}
         >
           Select
         </button>
-        <p>{fileAsync()?.name}</p>
+        <For each={filesAsync()}>{file => <p>{file.name}</p>}</For>
       </div>
+    </div>
+  );
+};
 
-      <hr />
+const MultipleFileUpload: Component = () => {
+  const { files, selectFiles } = createFileUploader({
+    multiple: true,
+    accept: "image/*"
+  });
 
+  createEffect(() => console.log("files", files()));
+
+  return (
+    <div>
       <div>
         <h5>Select multiple files</h5>
         <button
@@ -72,19 +74,45 @@ const App: Component = () => {
 
       <hr />
 
-      <div>
-        <h5>Select or drag'n'drop a single file with input handler</h5>
-        <input type="file" onChange={handleFileInput} />
-        <p>{fileInput()?.name}</p>
-      </div>
+      {/* <div>
+        <h5>Select multiple files with event handler</h5>
+        <input type="file" multiple onChange={onChange} />
+      </div> */}
+    </div>
+  );
+};
 
-      <hr />
+const App: Component = () => {
+  const [files, setFiles] = createSignal<UploadFile[]>([])
 
-      <div>
-        <h5>Select or drag'n'drop multiple files with input handler</h5>
-        <input type="file" multiple onChange={handleFilesInput} />
-        <For each={filesInput()}>{item => <p>{item.name}</p>}</For>
-      </div>
+  createEffect(() => console.log('directive files', files()))
+
+  return (
+    <div>
+      <h5>Upload files using <strong>directive</strong></h5>
+      <input
+        type="file"
+        multiple
+        use:fileUploader={{
+          userCallback: fs => fs.forEach(f => console.log(f)),
+          setFiles
+        }}
+      />
+      <For each={files()}>
+        {file => <p>{file.name}</p>}
+      </For>
+
+      <br />
+      <br />
+      <br />
+
+      <SingleFileUpload />
+
+      <br />
+      <br />
+      <br />
+
+      <MultipleFileUpload />
     </div>
   );
 };
