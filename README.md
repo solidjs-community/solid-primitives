@@ -126,6 +126,12 @@ Solid uses the `create` prefix to define a primitive that provides reactive util
 
 Solid Primitives is mostly about supplying 80-90% of the common-use cases for the end-user. We prefer to be less prescriptive than other hook libraries such as VueUse and supply granular solutions as opposed to monolithic primitives. The remaining 10-20% of complex use cases are likely not to be covered with this library. This is on purpose to limit the potential of bloat and extended complexity. This project strives to provide foundations and not cumulative solutions. We expect the broader ecosystem will fill the remaining need as further composition to this projects effort. This allows for just the right amount of prescription and opinion.
 
+## NPM Release and Repository Structure
+
+Solid Primitives is a large and growing project and the way we manage and release updates has been setup to suit the projects scope. The approach we've taken with organizing our packages and npm releases is more granular than other projects such as VueUse which ship all updates in a single release.
+
+There are a number of benefits to this including small download sizes, reducing bloat and not shipping experimental/unnecessary primitives that users don't need or want locally. Thie does mean a bit more effort to install precisely what you need. As a team we've decided that this tradeoff is beneficial and valuable. 
+
 ## CLI Helpers
 
 Available node scripts for managing packages and creating new ones:
