@@ -37,8 +37,8 @@ export type FetchReturn<T, I> = [
 
 const isOptions = <I>(
   prop:
-    | Accessor<RequestInfo>
-    | Accessor<RequestInit>
+    | Accessor<RequestInfo | undefined>
+    | Accessor<RequestInit | undefined>
     | RequestInfo
     | RequestInit
     | FetchOptions<I>
@@ -85,28 +85,28 @@ const isOptions = <I>(
  * ```
  */
 export function createFetch<T, I = undefined>(
-  requestInfo: Accessor<RequestInfo> | RequestInfo
+  requestInfo: Accessor<RequestInfo | undefined> | RequestInfo
 ): FetchReturn<T, I>;
 export function createFetch<T, I = undefined>(
-  requestInfo: Accessor<RequestInfo> | RequestInfo,
-  requestInit: Accessor<RequestInit> | RequestInit
+  requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
+  requestInit: Accessor<RequestInit | undefined> | RequestInit
 ): FetchReturn<T, I>;
 export function createFetch<T, I = undefined>(
-  requestInfo: Accessor<RequestInfo> | RequestInfo,
+  requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
   options: FetchOptions<I>
 ): FetchReturn<T, I>;
 export function createFetch<T, I>(
-  requestInfo: Accessor<RequestInfo> | RequestInfo,
+  requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
   options: FetchOptions<I>
 ): FetchReturn<T, I>;
 export function createFetch<T, I>(
-  requestInfo: Accessor<RequestInfo> | RequestInfo,
-  requestInit: Accessor<RequestInit> | RequestInit,
+  requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
+  requestInit: Accessor<RequestInit | undefined> | RequestInit,
   options: FetchOptions<I>
 ): FetchReturn<T, I>;
 export function createFetch<T, I>(
-  requestInfo: Accessor<RequestInfo> | RequestInfo,
-  requestInit?: Accessor<RequestInit> | RequestInit | FetchOptions<I>,
+  requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
+  requestInit?: Accessor<RequestInit | undefined> | RequestInit | FetchOptions<I>,
   options?: FetchOptions<I>
 ): FetchReturn<T, I> {
   let abort: AbortController;
@@ -176,10 +176,11 @@ export function createFetch<T, I>(
       });
   };
   resourceReturn = createResource<T | I, [RequestInfo, RequestInit | undefined]>(
-    createMemo<[RequestInfo, RequestInit | undefined]>(() => [
-      typeof requestInfo === "function" ? requestInfo() : requestInfo,
-      typeof requestInit === "function" ? requestInit() : (requestInit as RequestInit | undefined)
-    ]),
+    createMemo<[RequestInfo, RequestInit | undefined] | undefined>(() => {
+      const info = typeof requestInfo === 'function' ? requestInfo() : requestInfo;
+      const init = typeof requestInit === "function" ? requestInit() : requestInit;
+      return info ? [info, init] as [RequestInfo, RequestInit | undefined] : undefined
+    }),
     fetcher,
     options as any
   ) as unknown as FetchReturn<T, I>;

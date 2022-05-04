@@ -1,6 +1,6 @@
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
-import { createRoot, createEffect } from "solid-js";
+import { createRoot, createEffect, createSignal } from "solid-js";
 import { createFetch } from "../src";
 
 const test = suite("createFetch");
@@ -107,5 +107,25 @@ test("will make a request error accessible otherwise", () =>
       });
     })
   ));
+
+test("will not start a request with a requestinfo accessor returning undefined", () => 
+  new Promise<void>((resolve, reject) => {    
+    createRoot(dispose => {
+      const [url, setUrl] = createSignal<string>()
+      const fetch = () => url() === undefined
+        ? Promise.reject(reject(new Error('called even though the url was undefined')))
+        : Promise.resolve(mockResponse);
+      const [ready] = createFetch(url(), { fetch });
+      createEffect(() => {
+        ready();
+        if (url() === undefined) {
+          setUrl(mockUrl);
+        } else {
+          dispose();
+          resolve();
+        }
+      })
+    })
+  }));
 
 test.run();
