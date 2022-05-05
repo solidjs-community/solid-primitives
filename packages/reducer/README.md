@@ -5,7 +5,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/reducer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/reducer)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-SolidJS equavalent of React [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer).
+SolidJS equavalent of React's [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer).
 
 ## Installation
 
@@ -15,11 +15,27 @@ npm install @solid-primitives/reducer
 yarn add @solid-primitives/reducer
 ```
 
+## When use it
+
+`createReducer` is useful for:
+1. DRY the code of the `set`s of a signal
+2. Ensure the signal always is in a valid state
+3. Make it easier to understand for what a signal is used
+
 ## How to use it
 
 ```ts
-const [acessor, dispatch] = createReducer(reducer, initialValue);
+const [accessor, dispatch] = createReducer<State>(
+  dispatcher: (state: State, ...args) => State,
+  initialState: State
+);
 ```
+
+`dispatcher` is the reducer, its 1st parameter always is the current state of the reducer and it returns the new state of the reducer.
+
+`accessor` can be used as you use a normal signal: `accessor()`. It contains the state of the reducer.
+
+`dispatch` is the action of the reducer, it is a sort of `setSignal` that does NOT receive the new state, but instructions to create it from the current state.
 
 For example:
 ```tsx

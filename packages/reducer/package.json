@@ -17,9 +17,9 @@
     "name": "reducer",
     "stage": 0,
     "list": [
-      "createPrimitiveTemplate"
+      "createReducer"
     ],
-    "category": "Display & Media"
+    "category": "Reactivity"
   },
   "private": false,
   "sideEffects": false,
