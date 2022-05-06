@@ -12,15 +12,22 @@ jobs:
         operating-system: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+
+      - uses: pnpm/action-setup@v2.1.0
+        with:
+          version: 6.0.2
+
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: npm install, build, and test
+          cache: pnpm
+
+      - name: pnpm install, build, and test
         run: |
-          npm install
-          npm run build
-          npm test
+          pnpm install
+          pnpm run build
+          pnpm run test
         env:
           CI: true
