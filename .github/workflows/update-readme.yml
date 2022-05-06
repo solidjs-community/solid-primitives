@@ -15,8 +15,7 @@ jobs:
           node-version: 16
       - run: npm install
       - run: npm run update-readme
-      - uses: EndBug/add-and-commit@v9
+      - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          add: "README.md"
-          message: "Update Readme"
-          default_author: github_actions
+          commit_message: "Update Readme"
+          file_pattern: README.md
