@@ -10,7 +10,6 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "install": "lerna bootstrap --concurrency 4 --no-ci",
     "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx}\" \"utils/**/*.{js,ts,json,css,tsx,jsx}\"",
     "ls": "lerna-script",
     "build": "lerna run build --concurrency 4",
@@ -32,5 +31,6 @@
     "vite": "2.8.6",
     "vite-plugin-solid": "2.2.6",
     "vitest": "^0.7.7"
-  }
+  },
+  "packageManager": "pnpm@6.32.11"
 }

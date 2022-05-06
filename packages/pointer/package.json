@@ -39,7 +39,7 @@
   ],
   "scripts": {
     "start": "vite serve dev --host",
-    "dev": "yarn start",
+    "dev": "npm run start",
     "build": "tsup",
     "test": "uvu -r solid-register"
   },

@@ -137,8 +137,8 @@ There are a number of benefits to this including small download sizes, reducing 
 
 Available node scripts for managing packages and creating new ones:
 
-- `yarn update-readme` - This will update the list of primitives by inspecting individual packages.
-- `yarn new-package name-of-your-package` - A helper to setup a primitive template package.
+- `pnpm run update-readme` - This will update the list of primitives by inspecting individual packages.
+- `pnpm run new-package name-of-your-package` - A helper to setup a primitive template package.
 
 ## Planned Primitives
 
