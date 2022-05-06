@@ -10,7 +10,6 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "install": "lerna bootstrap --concurrency 4 --no-ci",
     "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx}\" \"utils/**/*.{js,ts,json,css,tsx,jsx}\"",
     "ls": "lerna-script",
     "build": "lerna run build --concurrency 4",
