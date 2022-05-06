@@ -1,8 +1,8 @@
 {
   "name": "@solid-primitives/reducer",
   "version": "0.0.100",
-  "description": "A template primitive example.",
-  "author": "Your Name <you@youremail.com>",
+  "description": "Provides a createReducer primitive for updating state in a predictable way.",
+  "author": "Tiago Cavalcante <tiagotrindade111@gmail.com>",
   "contributors": [],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/reducer#readme",
