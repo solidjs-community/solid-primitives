@@ -9,7 +9,7 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/upload?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/upload)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Primitive to make uploading files easy.
+Primitive to make uploading files and making dropzones easier.
 
 ## Installation
 
@@ -21,21 +21,52 @@ yarn add @solid-primitives/upload
 
 ## How to use it
 
-### createFileUploader
-
-Upload exports getter and setter. Depending on setter's settings, getter will return single file object or array of it.
+### [createFileUploader](#createfileuploader)
 
 ```ts
+// single files
+const { files, selectFiles } = createFileUploader();
+selectFiles([file] => console.log(file));
+
 // multiple files
 const { files, selectFiles } = createFileUploader({ multiple: true, accept: "image/*" });
-selectFiles(files => {
-  console.log(files);
-});
+selectFiles(files => files.forEach(file => console.log(file)));
+```
 
-// single file
-const { file, selectFile } = createFileUploader();
-selectFile(({ source, name, size, file }) => {
-  console.log({ source, name, size, file });
+### use:fileUploader directive
+
+```ts
+const [files, setFiles] = createSignal<UploadFile[]>([]);
+
+<input
+  type="file"
+  multiple
+  use:fileUploader={{
+    userCallback: fs => fs.forEach(f => console.log(f)),
+    setFiles
+  }}
+/>;
+```
+
+### [createDropzone](#createdropzone)
+
+```html
+<div
+  ref={dropzoneRef}
+  style={{ width: "100px", height: "100px", background: "red" }}>
+  Dropzone
+</div>
+```
+
+```ts
+const { setRef: dropzoneRef, files: droppedFiles } = createDropzone({
+  onDrop: async files => {
+    await doStuff(2);
+    files.forEach(f => console.log(f));
+  },
+  onDragStart: files => console.log("drag start")
+  onDragStart: files => files.forEach(f => console.log(f)),
+  onDragOver: files => console.log("drag over")
 });
 ```
 

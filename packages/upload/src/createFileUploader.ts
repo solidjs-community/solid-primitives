@@ -1,5 +1,5 @@
-import { createSignal } from "solid-js";
-import { transformFile, createInputComponent } from "./helpers";
+import { createSignal, JSX } from "solid-js";
+import { transformFiles, createInputComponent } from "./helpers";
 import { FileUploader, FileUploaderOptions, UploadFile, UserCallback } from "./types";
 
 /**
@@ -24,28 +24,23 @@ import { FileUploader, FileUploaderOptions, UploadFile, UserCallback } from "./t
 function createFileUploader(options?: FileUploaderOptions): FileUploader {
   const [files, setFiles] = createSignal<UploadFile[]>([]);
 
-  let userCallback: UserCallback;
+  let userCallback: UserCallback = () => {};
 
-  async function onChange(this: HTMLInputElement, event: Event) {
-    const parsedFiles = [];
-    const target = this;
+  const onChange: JSX.EventHandler<HTMLInputElement, Event> = async event => {
+    event.preventDefault();
+    event.stopPropagation();
 
-    for (const index in target.files) {
-      const fileIndex = +index;
-      if (isNaN(+fileIndex)) {
-        continue;
-      }
+    const target = event.currentTarget;
 
-      const file = target.files[fileIndex];
-      const parsedFile = transformFile(file);
-
-      parsedFiles.push(parsedFile);
+    let parsedFiles: UploadFile[] = [];
+    if (target.files) {
+      parsedFiles = transformFiles(target.files);
     }
 
-    target.removeEventListener("change", onChange);
+    target.removeEventListener("change", onChange as any);
     target.remove();
 
-    setFiles(parsedFiles);
+    setFiles(parsedFiles || []);
 
     try {
       await userCallback(parsedFiles);
@@ -53,14 +48,16 @@ function createFileUploader(options?: FileUploaderOptions): FileUploader {
       console.error(error);
     }
     return;
-  }
+  };
 
-  const selectFiles = (callback: UserCallback) => {
-    userCallback = callback;
+  const selectFiles = (callback?: UserCallback) => {
+    if (callback) {
+      userCallback = callback;
+    }
 
     const inputElement = createInputComponent(options || {});
 
-    inputElement.addEventListener("change", onChange);
+    inputElement.addEventListener("change", onChange as any);
     inputElement.click();
   };
 
