@@ -1,82 +1,82 @@
 {
-	"name": "@solid-primitives/media",
-	"version": "1.3.0",
-	"description": "Primitives for media query and device features",
-	"author": "David Di Biase <dave.dibiase@gmail.com>",
-	"contributors": [
-		{
-			"name": "Aditya Agarwal",
-			"email": "adityaa803@gmail.com",
-			"url": "https://devadi.netlify.app"
-		},
-		"Damian Tarnawski <gthetarnav@gmail.com>"
-	],
-	"license": "MIT",
-	"homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/media",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/solidjs-community/solid-primitives.git"
-	},
-	"primitive": {
-		"name": "media",
-		"stage": 3,
-		"list": [
-			"createMediaQuery",
-			"createBreakpoints"
-		],
-		"category": "Display & Media"
-	},
-	"files": [
-		"dist"
-	],
-	"private": false,
-	"sideEffects": false,
-	"type": "module",
-	"main": "./dist/server.cjs",
-	"module": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"exports": {
-		"node": {
-			"import": "./dist/server.js",
-			"require": "./dist/server.cjs"
-		},
-		"import": "./dist/index.js",
-		"require": "./dist/index.cjs"
-	},
-	"scripts": {
-		"start": "vite serve dev --host",
-		"dev": "npm run start",
-		"build": "tsup",
-		"test": "vitest run test",
-		"test:watch": "vitest watch test"
-	},
-	"keywords": [
-		"media",
-		"mediaquery",
-		"query",
-		"breakpoints",
-		"responsive",
-		"solid",
-		"primitives"
-	],
-	"dependencies": {
-		"@solid-primitives/utils": "^1.3.0",
-		"@solid-primitives/event-listener": "^2.0.0"
-	},
-	"devDependencies": {
-		"c8": "^7.11.0",
-		"jsdom": "^19.0.0",
-		"prettier": "^2.0.5",
-		"solid-testing-library": "^0.2.0",
-		"tslib": "^2.0.1",
-		"tsup": "^5.10.3",
-		"typescript": "^4.0.2",
-		"vitest": "^0.7.4",
-		"unocss": "0.31.13",
-		"vite": "2.9.5",
-		"vite-plugin-solid": "2.2.6"
-	},
-	"peerDependencies": {
-		"solid-js": "^1.3.1"
-	}
+  "name": "@solid-primitives/media",
+  "version": "1.3.0",
+  "description": "Primitives for media query and device features",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "contributors": [
+    {
+      "name": "Aditya Agarwal",
+      "email": "adityaa803@gmail.com",
+      "url": "https://devadi.netlify.app"
+    },
+    "Damian Tarnawski <gthetarnav@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/media",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "media",
+    "stage": 3,
+    "list": [
+      "createMediaQuery",
+      "createBreakpoints"
+    ],
+    "category": "Display & Media"
+  },
+  "files": [
+    "dist"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "start": "vite serve dev --host",
+    "dev": "npm run start",
+    "build": "tsup",
+    "test": "vitest run test",
+    "test:watch": "vitest watch test"
+  },
+  "keywords": [
+    "media",
+    "mediaquery",
+    "query",
+    "breakpoints",
+    "responsive",
+    "solid",
+    "primitives"
+  ],
+  "dependencies": {
+    "@solid-primitives/utils": "^1.3.0",
+    "@solid-primitives/event-listener": "^2.0.0"
+  },
+  "devDependencies": {
+    "c8": "^7.11.0",
+    "jsdom": "^19.0.0",
+    "prettier": "^2.0.5",
+    "solid-testing-library": "^0.2.0",
+    "tslib": "^2.0.1",
+    "tsup": "^5.10.3",
+    "typescript": "^4.0.2",
+    "vitest": "^0.7.4",
+    "unocss": "0.31.13",
+    "vite": "2.9.5",
+    "vite-plugin-solid": "2.2.6"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.3.1"
+  }
 }

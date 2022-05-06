@@ -10,10 +10,7 @@ test("reducer works", () =>
     const initialValue = 1;
     const numberOfDoubles = 3;
 
-    const [counter, doubleCounter] = createReducer(
-      (counter) => counter * 2,
-      initialValue
-    );
+    const [counter, doubleCounter] = createReducer(counter => counter * 2, initialValue);
 
     let expectedCounter = initialValue;
 

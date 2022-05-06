@@ -13,24 +13,24 @@ const dispatchAndWait = (script: HTMLScriptElement, name: "load" | "error") =>
     script.dispatchEvent(new Event(name));
   });
 
-test("will create a script tag with src", () => createRoot(dispose => {
-  const [_, remove] = createRoot(() =>
-    createScriptLoader({ src: "https://localhost:3000/script.js" })
-  );
-  const script = document.querySelector('script[src="https://localhost:3000/script.js"]');
-  assert.instance(script, window.HTMLScriptElement);
-  remove();
-}));
+test("will create a script tag with src", () =>
+  createRoot(dispose => {
+    const [_, remove] = createRoot(() =>
+      createScriptLoader({ src: "https://localhost:3000/script.js" })
+    );
+    const script = document.querySelector('script[src="https://localhost:3000/script.js"]');
+    assert.instance(script, window.HTMLScriptElement);
+    remove();
+  }));
 
-test("will create a script tag with textContent", () => createRoot(dispose => {
-  const src = "!(function(){ window.test = true; })();";
-  const [script, remove] = createRoot(() =>
-    createScriptLoader({ src })
-  );
-  assert.instance(script, window.HTMLScriptElement);
-  assert.is(script.textContent, src);
-  remove();
-}));
+test("will create a script tag with textContent", () =>
+  createRoot(dispose => {
+    const src = "!(function(){ window.test = true; })();";
+    const [script, remove] = createRoot(() => createScriptLoader({ src }));
+    assert.instance(script, window.HTMLScriptElement);
+    assert.is(script.textContent, src);
+    remove();
+  }));
 
 test("will call the onload handler", async () => {
   let loadCalled = false;
@@ -64,20 +64,22 @@ test("will call the onerror handler", async () => {
 
 test("will update the url from an accessor", async () => {
   const actualSrcUrls = [];
-  await new Promise<void>(resolve => createRoot(async (dispose) => {
-    const [src, setSrc] = createSignal("https://localhost:3000/script.js");
-    const [script] = createScriptLoader({
-      src: src,
-      onload: () => setSrc("https://localhost:3000/script2.js")
-    });
-    actualSrcUrls.push(script.src);
-    await dispatchAndWait(script, 'load');
-    createEffect(() => {
+  await new Promise<void>(resolve =>
+    createRoot(async dispose => {
+      const [src, setSrc] = createSignal("https://localhost:3000/script.js");
+      const [script] = createScriptLoader({
+        src: src,
+        onload: () => setSrc("https://localhost:3000/script2.js")
+      });
       actualSrcUrls.push(script.src);
-      dispose();
-      resolve();
-    });
-  }));
+      await dispatchAndWait(script, "load");
+      createEffect(() => {
+        actualSrcUrls.push(script.src);
+        dispose();
+        resolve();
+      });
+    })
+  );
   assert.equal(actualSrcUrls, [
     "https://localhost:3000/script.js",
     "https://localhost:3000/script2.js"

@@ -194,18 +194,17 @@ export type CreateProps = <
         ? boolean
         : Props[name]
     >;
-  } &
-    {
-      [name in keyof Props as `set${Capitalize<name & string>}`]: Setter<
-        Props[name] extends object
-          ? Props[name]["options"] extends object
-            ? Props[name]["options"][keyof Props[name]["options"]]
-            : Props[name]["initialValue"]
-          : Props[name] extends boolean
-          ? boolean
-          : Props[name]
-      >;
-    },
+  } & {
+    [name in keyof Props as `set${Capitalize<name & string>}`]: Setter<
+      Props[name] extends object
+        ? Props[name]["options"] extends object
+          ? Props[name]["options"][keyof Props[name]["options"]]
+          : Props[name]["initialValue"]
+        : Props[name] extends boolean
+        ? boolean
+        : Props[name]
+    >;
+  },
   fields: JSX.Element[]
 ];
 

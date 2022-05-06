@@ -177,9 +177,9 @@ export function createFetch<T, I>(
   };
   resourceReturn = createResource<T | I, [RequestInfo, RequestInit | undefined]>(
     createMemo<[RequestInfo, RequestInit | undefined] | undefined>(() => {
-      const info = typeof requestInfo === 'function' ? requestInfo() : requestInfo;
+      const info = typeof requestInfo === "function" ? requestInfo() : requestInfo;
       const init = typeof requestInit === "function" ? requestInit() : requestInit;
-      return info ? [info, init] as [RequestInfo, RequestInit | undefined] : undefined
+      return info ? ([info, init] as [RequestInfo, RequestInit | undefined]) : undefined;
     }),
     fetcher,
     options as any

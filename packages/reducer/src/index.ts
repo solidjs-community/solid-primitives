@@ -1,5 +1,5 @@
-import { createSignal } from 'solid-js';
-import type { Accessor } from 'solid-js';
+import { createSignal } from "solid-js";
+import type { Accessor } from "solid-js";
 
 export function createReducer<State, ActionData extends Array<any>>(
   dispatcher: (state: State, ...args: ActionData) => State,
@@ -7,8 +7,5 @@ export function createReducer<State, ActionData extends Array<any>>(
 ): [Accessor<State>, (...args: ActionData) => void] {
   const [state, setState] = createSignal(initialState);
 
-  return [
-    state,
-    (...args: ActionData) => void (setState((state) => dispatcher(state, ...args)))
-  ];
+  return [state, (...args: ActionData) => void setState(state => dispatcher(state, ...args))];
 }

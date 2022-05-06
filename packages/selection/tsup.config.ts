@@ -1,2 +1,2 @@
-import defaultConfig from '../../tsup.config';
+import defaultConfig from "../../tsup.config";
 export default defaultConfig;

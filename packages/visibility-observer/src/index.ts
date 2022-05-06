@@ -7,8 +7,7 @@ import { onMount, createSignal, onCleanup, Accessor } from "solid-js";
  *
  */
 const createPageVisibilityObserver = (): Accessor<boolean> => {
-  const visible = () =>
-    document ? document.visibilityState === "visible" : true;
+  const visible = () => (document ? document.visibilityState === "visible" : true);
   const [state, setState] = createSignal(visible());
   const cb = () => setState(visible());
   onMount(() => {
