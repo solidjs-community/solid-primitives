@@ -16,7 +16,7 @@ npm install @solid-primitives/reducer
 yarn add @solid-primitives/reducer
 ```
 
-## When use it
+## When to use it
 
 `createReducer` is useful for:
 
