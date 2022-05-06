@@ -91,7 +91,7 @@ const [fibonacci, nextFibonacci] = createReducer(nextFib, fib(1));
 
 ## Demo
 
-You can use this template for publishing your demo on CodeSandbox: https://codesandbox.io/s/solid-primitives-demo-template-sz95h
+https://codesandbox.io/s/solid-primitives-reducer-demo-7nrfs2?file=/index.tsx
 
 ## Changelog
 
