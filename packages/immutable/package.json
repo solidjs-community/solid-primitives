@@ -40,9 +40,7 @@
     "@solid-primitives/utils": "^1.0.0"
   },
   "devDependencies": {
-    "@types/lodash.clonedeep": "^4.5.6",
     "jsdom": "^19.0.0",
-    "lodash.clonedeep": "^4.5.0",
     "prettier": "^2.5.1",
     "solid-register": "^0.1.5",
     "tslib": "^2.3.1",
