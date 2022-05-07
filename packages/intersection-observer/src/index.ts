@@ -98,7 +98,7 @@ export const makeIntersectionObserver = (
  * ```
  */
 export const createIntersectionObserver = (
-  elements: MaybeAccessor<Element[]>,
+  elements: Accessor<Element[]>,
   onChange: IntersectionObserverCallback,
   options?: IntersectionObserverInit
 ) => {
