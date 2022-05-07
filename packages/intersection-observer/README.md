@@ -11,7 +11,8 @@
 
 A range of IntersectionObserver API utilities great for different types of usecases:
 
-- `createIntersectionObserver` - Creates a basic intersection observer exposing methods to manage the observable.
+- `makeIntersectionObserver` - Creates a basic Intersection Observer exposing methods to manage the observable.
+- `createIntersectionObserver` - A reactive observer primitive.
 - `createViewportObserver` - More advanced tracker that creates a store of element signals.
 - `createVisibilityObserver` - Basic visibility observer using a signal.
 
@@ -35,8 +36,8 @@ const [add, { remove, start, stop, instance }] = createIntersectionObserver(els,
 add(el)
 
 // Directive usage:
-const [observer] = createIntersectionObserver()
-<div use:observer></div>
+const [intersectionObserver] = createIntersectionObserver()
+<div use:intersectionObserver></div>
 ```
 
 ### createViewportObserver
@@ -103,5 +104,9 @@ Updated to Solid 1.3
 1.2.2
 
 Minor improvements
+
+1.3.0
+
+Migrated to new `make` pattern and improved primitive structures.
 
 </details>
