@@ -70,6 +70,10 @@ Published with CJS and SSR support.
 
 1.0.7
 
-Changed to peerDependencies and updated to latest Solid
+Changed to peerDependencies and updated to latest Solid.
+
+1.1.1
+
+Improved tests and type dependencies.
 
 </details>

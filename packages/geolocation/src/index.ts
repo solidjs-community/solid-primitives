@@ -1,4 +1,5 @@
 import type { Accessor, Resource } from "solid-js";
+import { MaybeAccessor } from "@solid-primitives/utils";
 import { createComputed, batch, createSignal, onCleanup, createResource } from "solid-js";
 
 const geolocationDefaults: PositionOptions = {
@@ -8,7 +9,7 @@ const geolocationDefaults: PositionOptions = {
 };
 
 /**
- * Creates a primitive to perform unary geolocation querying and updating.
+ * Generates a basic primitive to perform unary geolocation querying and updating.
  *
  * @param options - @type PositionOptions
  * @param options.enableHighAccuracy - Enable if the locator should be very accurate
@@ -52,7 +53,7 @@ export const createGeolocation = (
  * ```
  */
 export const createGeolocationWatcher = (
-  enabled: boolean | (() => boolean) = true,
+  enabled: MaybeAccessor<boolean>,
   options: PositionOptions = {}
 ): [
   location: Accessor<GeolocationCoordinates | null>,
