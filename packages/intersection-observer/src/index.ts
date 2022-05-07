@@ -32,6 +32,7 @@ declare module "solid-js" {
     }
   }
 }
+
 // This ensures the `JSX` import won't fall victim to tree shaking before
 // TypesScript can use it
 export type E = JSX.Element;
@@ -48,13 +49,9 @@ export type E = JSX.Element;
  *
  * @example
  * ```tsx
- * const [add, { remove, start, stop, instance }] = createIntersectionObserver(els, entries =>
+ * const { add, remove, start, stop, instance } = makeIntersectionObserver(els, entries =>
  *   console.log(entries)
  * );
- *
- * // directive usage:
- * const [observer] = createIntersectionObserver(els, () => {...})
- * <div use:observer></div>
  * ```
  */
 export const makeIntersectionObserver = (
@@ -134,7 +131,7 @@ export const createVisibilityObserver = (
   }
 ): [Accessor<boolean>, { start: () => void; stop: () => void; instance: IntersectionObserver }] => {
   const [isVisible, setVisible] = createSignal(options?.initialValue ?? false);
-  const { start, stop, instance } = makeIntersectionObserver(
+  const { start, add, stop, reset, instance } = makeIntersectionObserver(
     [access(element)],
     ([entry]) => {
       if (!entry) return;
@@ -143,6 +140,12 @@ export const createVisibilityObserver = (
     },
     options
   );
+  if (typeof element === 'function') {
+    createEffect(() => {
+      reset();
+      add(access(element));
+    });
+  }
   return [isVisible, { start, stop, instance }];
 };
 
