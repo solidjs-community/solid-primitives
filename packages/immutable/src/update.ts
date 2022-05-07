@@ -1,4 +1,3 @@
-import { isFunction } from "@solid-primitives/utils";
 import { withCopy } from "./copy";
 import { ModifyValue } from "./types";
 
@@ -96,6 +95,6 @@ export type Update = {
 export const update: Update = (...args: any[]) =>
   withCopy(args[0], obj => {
     if (args.length > 3) obj[args[1]] = update(obj[args[1]], ...(args.slice(2) as [any, any]));
-    else if (isFunction(args[2])) obj[args[1]] = args[2](obj[args[1]]);
+    else if (typeof args[2] === "function") obj[args[1]] = args[2](obj[args[1]]);
     else obj[args[1]] = args[2];
   });

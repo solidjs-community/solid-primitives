@@ -5,7 +5,6 @@ import {
   asArray,
   Directive,
   ExtractIfPossible,
-  Get,
   ItemsOf,
   Many
 } from "@solid-primitives/utils";
@@ -27,7 +26,7 @@ import {
 declare module "solid-js" {
   namespace JSX {
     interface Directives {
-      unmount: Get<Element>;
+      unmount: (el: Element) => void;
     }
   }
 }
@@ -162,7 +161,7 @@ export function refs(
  * A directive that calls handler when the element get's unmounted from DOM.
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#unmount
  */
-export const unmount: Directive<Get<Element>> = (el, handler): void => {
+export const unmount: Directive<(el: Element) => void> = (el, handler): void => {
   onCleanup(() => handler()(el));
 };
 
@@ -295,7 +294,7 @@ export function mapRemoved<T>(
  * ```
  */
 export const Children = (props: {
-  get: Get<ResolvedJSXElement>;
+  get: (resolved: ResolvedJSXElement) => void;
   children: JSX.Element;
 }): Accessor<ResolvedJSXElement> => {
   const resolved = children(() => props.children);
@@ -313,10 +312,10 @@ export const Children = (props: {
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Refs
  */
 export const Refs = <E extends Element>(props: {
-  refs?: Get<E[]>;
-  added?: Get<E[]>;
-  removed?: Get<E[]>;
-  onChange?: Get<{ refs: E[]; added: E[]; removed: E[] }>;
+  refs?: (els: E[]) => void;
+  added?: (els: E[]) => void;
+  removed?: (els: E[]) => void;
+  onChange?: (changed: { refs: E[]; added: E[]; removed: E[] }) => void;
   children: JSX.Element;
 }): Accessor<ResolvedJSXElement> => {
   const resolved = children(() => props.children);
@@ -353,9 +352,9 @@ export const Refs = <E extends Element>(props: {
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Ref
  */
 export const Ref = <U extends Element>(props: {
-  ref?: Get<U | undefined>;
-  onMount?: Get<U>;
-  onUnmount?: Get<U>;
+  ref?: (el: U | undefined) => void;
+  onMount?: (el: U) => void;
+  onUnmount?: (el: U) => void;
   children: JSX.Element;
 }): Accessor<ResolvedJSXElement> => {
   const resolved = children(() => props.children);

@@ -1,19 +1,24 @@
-import { isClient } from "@solid-primitives/utils";
-import { Component, JSX } from "solid-js";
-import { createEventListener } from ".";
+import { isClient, keys } from "@solid-primitives/utils";
+import { makeEventListener } from "./eventListener";
 
-type EventAttributes<T> = {
-  [K in keyof JSX.DOMAttributes<T>]: `${K}` extends `on${string}` ? JSX.DOMAttributes<T>[K] : never;
+export type WindowEventProps = {
+  [K in keyof WindowEventMap as `on${Capitalize<K>}` | `on${K}`]?: (
+    event: WindowEventMap[K]
+  ) => void;
+};
+export type DocumentEventProps = {
+  [K in keyof DocumentEventMap as `on${Capitalize<K>}` | `on${K}`]?: (
+    event: DocumentEventMap[K]
+  ) => void;
 };
 
-const forEachEventAttr = (
-  props: EventAttributes<null>,
-  fn: (eventName: string, attr: string) => void
+const attachPropListeners = (
+  target: typeof window | typeof document,
+  props: WindowEventProps | DocumentEventProps
 ) => {
-  Object.keys(props).forEach(attr => {
-    if (!attr.startsWith("on")) return;
-    const eventName = attr.substring(2).toLowerCase();
-    fn(eventName, attr);
+  keys(props).forEach(attr => {
+    if (attr.startsWith("on") && typeof props[attr] === "function")
+      makeEventListener(target, attr.substring(2).toLowerCase(), props[attr] as any);
   });
 };
 
@@ -25,13 +30,10 @@ const forEachEventAttr = (
  * @example
  * <WindowEventListener onMouseMove={e => console.log(e.x, e.y)} />
  */
-export const WindowEventListener: Component<EventAttributes<null>> = props => {
-  if (isClient)
-    forEachEventAttr(props, (type, attr) => {
-      createEventListener(window, type, e => (props as any)[attr](e));
-    });
+export function WindowEventListener(props: WindowEventProps) {
+  if (isClient) attachPropListeners(window, props);
   return undefined;
-};
+}
 
 /**
  * Listen to the `document` DOM Events, using a component.
@@ -41,10 +43,7 @@ export const WindowEventListener: Component<EventAttributes<null>> = props => {
  * @example
  * <DocumentEventListener onMouseMove={e => console.log(e.x, e.y)} />
  */
-export const DocumentEventListener: Component<EventAttributes<null>> = props => {
-  if (isClient)
-    forEachEventAttr(props, (eventName, attr) => {
-      createEventListener(document, eventName, e => (props as any)[attr](e));
-    });
+export function DocumentEventListener(props: DocumentEventProps) {
+  if (isClient) attachPropListeners(document, props);
   return undefined;
-};
+}

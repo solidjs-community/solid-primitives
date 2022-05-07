@@ -1,4 +1,4 @@
-import { Fn, isFunction, MaybeAccessor } from "@solid-primitives/utils";
+import { MaybeAccessor } from "@solid-primitives/utils";
 import { createSignal, createMemo, Accessor, onCleanup } from "solid-js";
 
 /**
@@ -7,7 +7,7 @@ import { createSignal, createMemo, Accessor, onCleanup } from "solid-js";
  * @param callback The callback to run each frame
  * @returns Returns a signal if currently running as well as start and stop methods
  * ```ts
- * [running: Accessor<boolean>, start: Fn, stop: Fn]
+ * [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction]
  * ```
  *
  * @example
@@ -17,7 +17,7 @@ import { createSignal, createMemo, Accessor, onCleanup } from "solid-js";
  */
 function createRAF(
   callback: FrameRequestCallback
-): [running: Accessor<boolean>, start: Fn, stop: Fn] {
+): [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction] {
   const [running, setRunning] = createSignal(false);
   let requestID = 0;
 
@@ -58,12 +58,13 @@ function targetFPS(
   callback: FrameRequestCallback,
   fps: MaybeAccessor<number>
 ): FrameRequestCallback {
-  const interval = isFunction(fps)
-    ? createMemo(() => Math.floor(1000 / (fps as Accessor<number>)()))
-    : (() => {
-        const interval = Math.floor(1000 / fps);
-        return () => interval;
-      })();
+  const interval =
+    typeof fps === "function"
+      ? createMemo(() => Math.floor(1000 / (fps as Accessor<number>)()))
+      : (() => {
+          const interval = Math.floor(1000 / fps);
+          return () => interval;
+        })();
 
   let elapsed = 0;
   let lastRun = 0;

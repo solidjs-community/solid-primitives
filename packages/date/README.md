@@ -7,21 +7,18 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/date?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/date)
 [![size](https://img.shields.io/npm/v/@solid-primitives/date?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/date)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Collection of reactive primitives and utility functions, providing easier ways to deal with dates in SolidJS.
 
 - [`createDate`](#createDate) - Creates a reactive `Date` signal.
 - [`createDateNow`](#createDateNow) - Creates an autoupdating and reactive `new Date()`.
-- [`createTime`](#createTime) - Creates a reactive timestamp `number` signal.
 - [`createTimeDifference`](#createTimeDifference) - Provides a reactive time difference _(in ms)_ signal.
 - [`createTimeDifferenceFromNow`](#createTimeDifferenceFromNow) - Provides a autoupdating, reactive time difference _(in ms)_ from **now** as a signal.
 - [`createTimeAgo`](#createTimeAgo) - Provides a reactive, formatted, autoupdating date difference in relation to **now**.
 - [`createCountdown`](#createCountdown) - Provides a reactive broken down time remaining Store.
 - [`createCountdownFromNow`](#createCountdownFromNow) - Provides a reactive, autoupdating _(from **now**)_, broken down "time remaining" as a Store.
 - \+ [some non-reactive date-related utility functions](#utility-functions).
-
-Note: This package consolidates date-related primitives formerly contained countdown and date-diff.
 
 ## Installation
 
@@ -61,29 +58,15 @@ import { createDateNow } from "@solid-primitives/date";
 // updates every second:
 const [now] = createDateNow(1000);
 
+// reactive timeout value
+const [timeout, setTimeout] = createSignal(500);
+const [now] = createDateNow(timeout);
+
 // won't autoupdate:
-const [now, update] = createDateNow(false);
+const [now, update] = createDateNow(() => false);
 
 // update manually:
 update();
-```
-
-### `createTime`
-
-Creates a reactive timestamp `number` signal.
-
-```ts
-const [time, setTime] = createTime("2020 1 11");
-
-time(); // T: number
-
-setDate(1641408329089);
-
-// passed initial value can be reactive
-const [date, setDate] = createSignal("2020 1 11");
-const [time, setTime] = createTime(date);
-
-setTimestamp("2021 5 23"); // will update the time
 ```
 
 ### `createTimeDifference`
@@ -270,6 +253,12 @@ Updated build process and documentation.
 1.1.0
 
 Rename to `date`, merge with `countdown`, refactor primitives to split them into smaller functions.
+
+2.0.0 - **stage-3**
+
+[PR#113](https://github.com/solidjs-community/solid-primitives/pull/113)
+
+Remove `createTime`, use memo, and timer packages to reuse primitives
 
 </details>
 

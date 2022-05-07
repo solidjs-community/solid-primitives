@@ -7,14 +7,14 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/rootless?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/rootless)
 [![version](https://img.shields.io/npm/v/@solid-primitives/rootless?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/rootless)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A collection of helpers that aim to simplify using reactive primitives outside of reactive roots, asynchronously after the root initialization, or just working with roots in general.
+A collection of helpers that aim to simplify using reactive primitives outside of reactive roots, and managing disposal of reactive roots.
 
-- [`createSubRoot`](#createSubRoot) - Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
+- [`createBranch`](#createBranch) - Creates a reactive **root branch**, that will be automatically disposed when it's owner does.
 - [`createCallback`](#createCallback) - A wrapper for creating callbacks with `runWithOwner`.
-- [`runWithRoot`](#runWithRoot) - Use reactive primitives outside of reactive roots.
-- [`runWithSubRoot`](#runWithSubRoot) - Like `runWithRoot`, but creates a sub root instead.
+- [`createDisposable`](#createDisposable) - For disposing computations early – before the root cleanup.
+- [`createSharedRoot`](#createSharedRoot) - Share "global primitives" across multiple reactive scopes.
 
 ## Installation
 
@@ -24,35 +24,37 @@ npm install @solid-primitives/rootless
 yarn add @solid-primitives/rootless
 ```
 
-## `createSubRoot`
+## `createBranch`
 
-Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
+###### Previously `createSubRoot`
+
+Creates a reactive **root branch**, that will be automatically disposed when it's owner does.
 
 ### How to use it
 
-Use it for creating roots nested in other roots.
+Use it for nested roots _(literally nested, or provided manually to dependency array)_ that should be disposed before or with their owner.
 
 ```ts
-import { createSubRoot } from "@solid-primitives/rootless";
+import { createBranch } from "@solid-primitives/rootless";
 
 createRoot(dispose => {
+  createBranch(disposeBranch => {
+    // computations will be disposed with branch
+    createEffect(() => {...});
 
-   createSubRoot(disposeSubRoot => {
-      createEffect(...)
+    // disposes only the branch
+    disposeBranch();
+  });
 
-      // disposes only the sub root
-      disposeSubRoot()
-   })
-
-   // disposes the outer root, AND all the nested sub roots
-   dispose()
-})
+  // disposes the outer root, AND all the nested branches
+  dispose();
+});
 ```
 
 ### Definition
 
 ```ts
-function createSubRoot<T>(fn: (dispose: () => void) => T, owner?: Owner | null): T;
+function createBranch<T>(fn: (dispose: VoidFunction) => T, ...owners: (Owner | null)[]): T;
 ```
 
 ## `createCallback`
@@ -82,28 +84,26 @@ const handleClick = createCallback(() => {
 ### Definition
 
 ```ts
-const createCallback = <T extends AnyFunction>(
-  callback: T,
-  owner?: Owner | null
-): T
+function createCallback<T extends AnyFunction>(callback: T, owner?: Owner | null): T;
 ```
 
-## `runWithRoot`
+## `createDisposable`
 
-Helper for simplifying usage of Solid's reactive primitives outside of components (reactive roots).
+###### Previously `runWithSubRoot`
+
+For disposing computations early – before the root cleanup.
 
 ### How to use it
 
-```ts
-// when fn doesn't return anything
-const dispose = runWithRoot(() =>
-  createEffect(() => {
-    console.log(count());
-  })
-);
+Executes provided function in a [`createBranch`](#createBranch) _(auto-disposing root)_, and returns a dispose function, to dispose computations used inside before automatic cleanup.
 
-// when fn returns something
-const [double, dispose] = runWithRoot(() => createMemo(() => count() * 2));
+```ts
+const dispose = createDisposable(dispose => {
+   createEffect(() => {...})
+});
+
+// dispose later (if not, will dispose automatically)
+dispose()
 ```
 
 ### Definition
@@ -112,35 +112,51 @@ const [double, dispose] = runWithRoot(() => createMemo(() => count() * 2));
 type runWithRootReturn<T> = T extends void | undefined | null
   ? Dispose
   : [returns: T, dispose: Dispose];
-const runWithRoot = <T>(fn: () => T, detachedOwner?: Owner): runWithRootReturn<T>
+const createDisposable = <T>(fn: () => T, detachedOwner?: Owner): runWithRootReturn<T>
 ```
 
-## `runWithSubRoot`
+## `createSharedRoot`
 
-Helper for simplifying usage of Solid's reactive primitives outside of components (reactive roots). A **sub root** will be automatically disposed when it's owner does.
+###### Added in `@1.1.0`
+
+Creates a reactive root that is shared across every instance it was used in. Shared root gets created when the returned function gets first called, and disposed when last reactive context listening to it gets disposed. Only to be recreated again when a new listener appears.
+
+Designed to make "global primitives" shareable, without instanciating them (recreating, state, computations, event listeners, etc.) every time they're used. For example a `createLocationState` primitive would work the same for every instance and provide the same data, so reinitializeing it every time is wastefull.
 
 ### How to use it
 
-```ts
-// when fn doesn't return anything
-const dispose = runWithSubRoot(() =>
-  createEffect(() => {
-    console.log(count());
-  })
-);
+`createSharedRoot` primitive takes a single argument:
 
-// when fn returns something
-const [double, dispose] = runWithSubRoot(() => createMemo(() => count() * 2));
-```
+- `factory` - a function where can you initialize some reactive primitives, returned value will be shared across instances.
 
-### Definition
+And returns a function registering reactive owner as one of the listeners, returns the value `factory` function returned.
 
 ```ts
-type runWithRootReturn<T> = T extends void | undefined | null
-  ? Dispose
-  : [returns: T, dispose: Dispose];
-const runWithSubRoot = <T>(fn: () => T, detachedOwner?: Owner): runWithRootReturn<T>
+import { createSharedRoot } from "@solid-primitives/rootless";
+
+const useState = createSharedRoot(() => {
+   return createMemo(() => {...})
+});
+
+// later in a component:
+const state = useState();
+state()
+
+// in another component
+// previously created primitive would get reused
+const state = useState();
+...
 ```
+
+### Type Definition
+
+```ts
+function createSharedRoot<T>(factory: (dispose: Fn) => T): () => T;
+```
+
+### Demo
+
+Usage of combining `createSharedRoot` with `createMousePosition`: https://codesandbox.io/s/shared-root-demo-fjl1l9?file=/index.tsx
 
 ## Changelog
 
@@ -150,5 +166,14 @@ const runWithSubRoot = <T>(fn: () => T, detachedOwner?: Owner): runWithRootRetur
 0.0.100
 
 Initial release as a Stage-1 primitive.
+
+1.0.0 - **Stage-2**
+
+- Remove `runWithRoot`
+- Rename `createSubRoot` to `createBranch` and `runWithSubRoot` to `createDisposable` (also unify returns to only dispose fn)
+
+  1.1.0
+
+Add `createSharedRoot` primitive
 
 </details>

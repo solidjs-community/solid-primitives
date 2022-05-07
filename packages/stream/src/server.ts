@@ -2,7 +2,9 @@ import type { Accessor, Resource, Setter } from "solid-js";
 import type { StreamReturn } from "./index";
 
 const noop = {
-  stream: Object.assign(() => undefined, { loading: true, error: undefined }) as Resource<MediaStream | undefined>,
+  stream: Object.assign(() => undefined, { loading: true, error: undefined }) as Resource<
+    MediaStream | undefined
+  >,
   mutate: (() => {
     /*noop*/
   }) as Setter<MediaStream | undefined>,

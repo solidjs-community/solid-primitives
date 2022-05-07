@@ -1,10 +1,10 @@
-import { Truthy, Fn } from "@solid-primitives/utils";
+import { Truthy } from "@solid-primitives/utils";
 import { createSubRoot } from "@solid-primitives/rootless";
 import { Accessor, createComputed, createMemo, onCleanup } from "solid-js";
 
 // .dispose() method is for disposing of root form outside
 // raceTimeout calls it when the first promise resolves
-export type Until<T> = Promise<Truthy<T>> & { dispose: Fn };
+export type Until<T> = Promise<Truthy<T>> & { dispose: VoidFunction };
 
 /**
  * Promised one-time watch for changes. Await a reactive condition.

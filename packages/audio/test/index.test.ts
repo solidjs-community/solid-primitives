@@ -23,6 +23,10 @@ describe("createBasicAudio", () => {
     const { player } = createAudioPlayer(() => new MediaSource(), []);
     expect(player.srcObject).toBeInstanceOf(Object);
   });
+  test("test player with no handlers", async () => {
+    const { player } = createAudioPlayer(() => new MediaSource());
+    expect(player.srcObject).toBeInstanceOf(Object);
+  });
 });
 
 describe("createAudio", () => {

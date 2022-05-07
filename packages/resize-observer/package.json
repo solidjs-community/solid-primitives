@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/resize-observer",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Primitive to observer browser resizes",
   "author": "Moshe Udimar",
   "license": "MIT",

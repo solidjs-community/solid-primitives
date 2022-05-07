@@ -18,21 +18,22 @@ export const TestingNode: Component<{ output?: JSX.Element; heading?: string }> 
   );
 };
 
-export const ToggleBtn: Component<{ state: boolean } & JSX.HTMLAttributes<HTMLButtonElement>> =
-  props => {
-    const [, attrs] = splitProps(props, ["children", "state"]);
-    return (
-      <button
-        class="bg-gray-700 text-gray-100 w-6 h-6 center-child select-none cursor-pointer rounded border-1 border-gray-600 hover:bg-gray-600"
-        classList={{
-          "!bg-green-700 border-green-600 !hover:bg-green-600": props.state
-        }}
-        {...attrs}
-      >
-        {props.children}
-      </button>
-    );
-  };
+export const ToggleBtn: Component<
+  { state: boolean } & JSX.HTMLAttributes<HTMLButtonElement>
+> = props => {
+  const [, attrs] = splitProps(props, ["children", "state"]);
+  return (
+    <button
+      class="bg-gray-700 text-gray-100 w-6 h-6 center-child select-none cursor-pointer rounded border-1 border-gray-600 hover:bg-gray-600"
+      classList={{
+        "!bg-green-700 border-green-600 !hover:bg-green-600": props.state
+      }}
+      {...attrs}
+    >
+      {props.children}
+    </button>
+  );
+};
 
 export const DisplayRecord: Component<{ record: Record<string, any> }> = props => (
   <div>

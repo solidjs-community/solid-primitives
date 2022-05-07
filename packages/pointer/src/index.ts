@@ -1,19 +1,15 @@
 import { Accessor, createSignal, getOwner } from "solid-js";
-import { ClearListeners, createEventListener } from "@solid-primitives/event-listener";
+import { createEventListener } from "@solid-primitives/event-listener";
 import { remove, split } from "@solid-primitives/immutable";
 import { createSubRoot } from "@solid-primitives/rootless";
 import {
-  Get,
   MaybeAccessor,
   forEachEntry,
-  includes,
   createCallbackStack,
   Directive,
   Many,
-  Clear,
   createProxy,
-  warn,
-  isFunction
+  warn
 } from "@solid-primitives/utils";
 import {
   Handler,
@@ -65,7 +61,7 @@ export function createPointerListeners(
     pointerTypes?: PointerType[];
     passive?: boolean;
   }
-): ClearListeners {
+): VoidFunction {
   const [{ target = document.body, pointerTypes, passive = true }, handlers] = split(
     config,
     "target",
@@ -79,7 +75,7 @@ export function createPointerListeners(
   );
 
   const guardCB = (handler: Handler) => (event: PointerEvent) =>
-    (!pointerTypes || includes(pointerTypes, event.pointerType)) && handler(event);
+    (!pointerTypes || pointerTypes.includes(event.pointerType as PointerType)) && handler(event);
   const cleanup = createCallbackStack();
   const addEventListener = (type: Many<keyof HTMLElementEventMap>, fn: Handler) =>
     cleanup.push(createEventListener(target, type, guardCB(fn) as any, { passive }));
@@ -121,10 +117,19 @@ export function createPerPointerListeners(
       "enter",
       (
         event: PointerEvent,
-        handlers: Readonly<OnEventRecord<"down" | "move" | "up" | "leave" | "cancel", Get<Handler>>>
+        handlers: Readonly<
+          OnEventRecord<"down" | "move" | "up" | "leave" | "cancel", (handler: Handler) => void>
+        >
       ) => void
     > &
-      OnEventRecord<"down", (event: PointerEvent, onMove: Get<Handler>, onUp: Get<Handler>) => void>
+      OnEventRecord<
+        "down",
+        (
+          event: PointerEvent,
+          onMove: (handler: Handler) => void,
+          onUp: (handler: Handler) => void
+        ) => void
+      >
   >
 ) {
   const [{ target = document.body, pointerTypes, passive = true }, handlers] = split(
@@ -136,12 +141,12 @@ export function createPerPointerListeners(
   const { down: onDown, enter: onEnter } = parseHandlersMap(handlers);
   const owner = getOwner();
   const onlyInitMessage = "All listeners need to be added synchronously in the initial event.";
-  const addListener = (type: Many<string>, fn: Handler, pointerId?: number): Clear =>
+  const addListener = (type: Many<string>, fn: Handler, pointerId?: number): VoidFunction =>
     createEventListener(
       target,
       type,
       ((e: PointerEvent) =>
-        (!pointerTypes || includes(pointerTypes, e.pointerType)) &&
+        (!pointerTypes || pointerTypes.includes(e.pointerType as PointerType)) &&
         (!pointerId || e.pointerId === pointerId) &&
         fn(e)) as any,
       { passive }
@@ -315,7 +320,7 @@ export function createPointerList(
 export const pointerPosition: Directive<PointerPositionDirectiveProps> = (el, props) => {
   const { pointerTypes, handler } = (() => {
     const v = props();
-    return isFunction(v) ? { handler: v, pointerTypes: undefined } : v;
+    return typeof v === "function" ? { handler: v, pointerTypes: undefined } : v;
   })();
   const runHandler = (e: PointerEvent, active = true) => handler(toStateActive(e, active), el);
   let pointer: null | number = null;
@@ -346,7 +351,7 @@ export const pointerPosition: Directive<PointerPositionDirectiveProps> = (el, pr
 export const pointerHover: Directive<PointerHoverDirectiveProps> = (el, props) => {
   const { pointerTypes, handler } = (() => {
     const v = props();
-    return isFunction(v) ? { handler: v, pointerTypes: undefined } : v;
+    return typeof v === "function" ? { handler: v, pointerTypes: undefined } : v;
   })();
   const pointers = new Set<number>();
   createPointerListeners({

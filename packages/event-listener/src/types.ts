@@ -1,7 +1,5 @@
-import { Fn } from "@solid-primitives/utils";
 import { JSX } from "solid-js";
 
-export type ClearListeners = Fn;
 export type EventListenerOptions = boolean | AddEventListenerOptions;
 export type TargetWithEventMap = Window | Document | HTMLElement | MediaQueryList;
 
@@ -21,16 +19,11 @@ export type EventListenerDirectiveProps = [
   options?: EventListenerOptions
 ];
 
-export type EventListenerMapDirectiveProps =
-  | [handlerMap: Record<string, (e: any) => void>, options?: EventListenerOptions]
-  | Record<string, (e: any) => void>;
-
 declare module "solid-js" {
   namespace JSX {
     interface Directives {
       // directive types are very premissive to prevent type errors from incompatible types, since props cannot be generic
       eventListener: EventListenerDirectiveProps;
-      eventListenerMap: EventListenerMapDirectiveProps;
     }
   }
 }

@@ -1,6 +1,6 @@
 import { onCleanup, onMount } from "solid-js";
 import type { JSX } from "solid-js";
-import { access, accessAsArray, Fn, MaybeAccessor } from "@solid-primitives/utils";
+import { access, asArray, MaybeAccessor } from "@solid-primitives/utils";
 
 export type MutationObserverAdd = (
   target: Node,
@@ -10,8 +10,8 @@ export type MutationObserverAdd = (
 export type MutationObserverReturn = [
   add: MutationObserverAdd,
   rest: {
-    start: Fn;
-    stop: Fn;
+    start: VoidFunction;
+    stop: VoidFunction;
     instance: MutationObserver;
     isSupported: boolean;
   }
@@ -86,7 +86,7 @@ export function createMutationObserver(
   const add: MutationObserverAdd = (el, options) =>
     instance?.observe(el, access(options) ?? defaultOptions);
   const start = () => {
-    accessAsArray(initial).forEach(item => {
+    asArray(access(initial)).forEach(item => {
       item instanceof Node ? add(item, defaultOptions) : add(item[0], item[1]);
     });
   };

@@ -13,6 +13,7 @@ Collection of reactive primitives to deal with media queries.
 
 - [`createMediaQuery`](#createMediaQuery) - Creates a very simple and straightforward media query monitor.
 - [`createBreakpoints`](#createBreakpoints) - Creates a multi-breakpoint monitor to make responsive components easily.
+- [`makeMediaQueryListener`](#makeMediaQueryListener) - Listen for changes to provided Media Query.
 
 ## Installation
 
@@ -22,9 +23,7 @@ npm install @solid-primitives/media
 yarn add @solid-primitives/media
 ```
 
-## Reactive Primitives:
-
-### `createMediaQuery`
+## `createMediaQuery`
 
 Creates a very simple and straightforward media query monitor.
 
@@ -37,7 +36,7 @@ console.log(isSmall());
 
 [Working Demo](https://codesandbox.io/s/solid-media-query-5bf16?file=/src/index.tsx)
 
-### `createBreakpoints`
+## `createBreakpoints`
 
 Creates a multi-breakpoint monitor to make responsive components easily.
 
@@ -82,6 +81,20 @@ const Example: Component = () => {
 };
 ```
 
+## `makeMediaQueryListener`
+
+Attaches a MediaQuery listener to window, listeneing to changes to provided query
+
+```ts
+import { makeMediaQueryListener } from "@solid-primitives/media";
+
+const clear = makeMediaQueryListener("(max-width: 767px)", e => {
+  console.log(e.matches);
+});
+// remove listeners (will happen also on cleanup)
+clear();
+```
+
 [Working Demo](https://codesandbox.io/s/solid-responsive-breakpoints-h4emy8?file=/src/index.tsx)
 
 ## Changelog
@@ -112,6 +125,10 @@ Removed onMount and returned the current media query immediately as opposed to o
 1.2.0
 
 Added createBreakpoints primitive as an alpha release.
+
+1.3.0
+
+Added `makeMediaQueryListener`, implementation improvements
 
 </details>
 

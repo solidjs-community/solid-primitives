@@ -1,12 +1,4 @@
-import {
-  AnyClass,
-  compare,
-  isArray,
-  isFunction,
-  ItemsOf,
-  Many,
-  ofClass
-} from "@solid-primitives/utils";
+import { AnyClass, compare, ItemsOf, Many, ofClass } from "@solid-primitives/utils";
 import { withArrayCopy } from "./copy";
 import { get } from "./object";
 import { FlattenArray, MappingFn, Predicate } from "./types";
@@ -111,7 +103,7 @@ export function concat<A extends any[], V extends ItemsOf<A>>(
 ): Array<V extends any[] ? ItemsOf<V> : V> {
   const result: any[] = [];
   for (const i in a) {
-    isArray(a[i]) ? result.push(...a[i]) : result.push(a[i]);
+    Array.isArray(a[i]) ? result.push(...a[i]) : result.push(a[i]);
   }
   return result;
 }
@@ -145,7 +137,7 @@ export const removeItems = <T>(list: readonly T[], ...items: T[]): T[] => {
  * @returns changed array copy
  */
 export const flatten = <T extends any[]>(arr: T): FlattenArray<T>[] =>
-  arr.reduce((flat, next) => flat.concat(isArray(next) ? flatten(next) : next), []);
+  arr.reduce((flat, next) => flat.concat(Array.isArray(next) ? flatten(next) : next), []);
 
 /**
  * Sort an array by object key, or multiple keys
@@ -158,7 +150,7 @@ export const sortBy = <T>(
   flatten(paths).reduce(
     (source, path) =>
       sort(source, (a, b) =>
-        isFunction(path)
+        typeof path === "function"
           ? compare(path(a), path(b))
           : compare(get(a as any, path), get(b as any, path))
       ),

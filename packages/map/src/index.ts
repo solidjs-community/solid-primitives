@@ -1,5 +1,5 @@
 import { Accessor } from "solid-js";
-import { createTriggerCache, isFunction } from "@solid-primitives/utils";
+import { createTriggerCache } from "@solid-primitives/utils";
 
 export type SignalMap<K, V> = Accessor<[K, V][]> & ReactiveMap<K, V>;
 export type MapSetter<V> = V extends Function
@@ -8,7 +8,7 @@ export type MapSetter<V> = V extends Function
 
 /** If value is a function – call it with a given argument – otherwise get the value as is */
 function accessWith<T extends ((arg: A) => V) | V, A, V>(v: T, arg: A): V {
-  return isFunction(v) ? v(arg) : v;
+  return typeof v === "function" ? v(arg) : v;
 }
 
 const WHOLE = Symbol("watch_whole");

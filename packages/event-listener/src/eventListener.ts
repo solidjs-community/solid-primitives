@@ -1,42 +1,74 @@
-import {
-  createCallbackStack,
-  Many,
-  MaybeAccessor,
-  forEach,
-  Fn,
-  isFunction,
-  noop,
-  isServer
-} from "@solid-primitives/utils";
+import { Many, MaybeAccessor, isServer, access, asArray, Directive } from "@solid-primitives/utils";
 import { Accessor, createEffect, onCleanup, createRenderEffect, createSignal } from "solid-js";
 import {
-  ClearListeners,
   EventListenerDirectiveProps,
   EventMapOf,
   TargetWithEventMap,
   EventListenerOptions
 } from "./types";
 
-export type EventListenerSignalReturns<Event> = [
-  lastEvent: Accessor<Event | undefined>,
-  clear: ClearListeners
-];
-
 /**
  * Creates an event listener, that will be automatically disposed on cleanup.
- *
+ * @param target - ref to HTMLElement, EventTarget
+ * @param type - name of the handled event
+ * @param handler - event handler
+ * @param options - addEventListener options
+ * @returns Function clearing all event listeners form targets
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener#makeEventListener
+ * @example
+ * const clear = makeEventListener(element, 'click', e => { ... }, { passive: true })
+ * // remove listener (will also happen on cleanup)
+ * clear()
+ */
+
+// DOM Events
+export function makeEventListener<
+  Target extends TargetWithEventMap,
+  EventMap extends EventMapOf<Target>,
+  EventType extends keyof EventMap
+>(
+  target: Target,
+  type: EventType,
+  handler: (event: EventMap[EventType]) => void,
+  options?: EventListenerOptions
+): VoidFunction;
+
+// Custom Events
+export function makeEventListener<
+  EventMap extends Record<string, Event>,
+  EventType extends keyof EventMap = keyof EventMap
+>(
+  target: EventTarget,
+  type: EventType,
+  handler: (event: EventMap[EventType]) => void,
+  options?: EventListenerOptions
+): VoidFunction;
+
+export function makeEventListener(
+  target: EventTarget,
+  type: string,
+  handler: (event: Event) => void,
+  options?: EventListenerOptions
+): VoidFunction {
+  target.addEventListener(type, handler, options);
+  return onCleanup(target.removeEventListener.bind(target, type, handler, options));
+}
+
+/**
+ * Creates a reactive event listener, that will be automatically disposed on cleanup,
+ * and can take reactive arguments to attach listeners to new targets once changed.
  * @param target - ref to HTMLElement, EventTarget or Array thereof
  * @param type - name of the handled event
  * @param handler - event handler
  * @param options - addEventListener options
- *
- * @returns Function clearing all event listeners form targets
- *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener#createEventListener
- *
  * @example
- * const clear = createEventListener(element, 'click', e => { ... }, { passive: true })
+ * const [targets, setTargets] = createSignal([element])
+ * createEventListener(targets, 'click', e => { ... }, { passive: true })
+ * setTargets([]) // <- removes listeners from previous target
+ * setTargets([element, button]) // <- adds listeners to new targets
  */
 
 // DOM Events
@@ -49,7 +81,7 @@ export function createEventListener<
   type: MaybeAccessor<Many<EventType>>,
   handler: (event: EventMap[EventType]) => void,
   options?: EventListenerOptions
-): ClearListeners;
+): void;
 
 // Custom Events
 export function createEventListener<
@@ -60,36 +92,27 @@ export function createEventListener<
   type: MaybeAccessor<Many<EventType>>,
   handler: (event: EventMap[EventType]) => void,
   options?: EventListenerOptions
-): ClearListeners;
+): void;
 
 export function createEventListener(
   targets: MaybeAccessor<Many<EventTarget>>,
   type: MaybeAccessor<Many<string>>,
   handler: (event: Event) => void,
   options?: EventListenerOptions
-): ClearListeners {
-  if (isServer) return noop;
-  const cleanup = createCallbackStack();
+): void {
+  if (isServer) return;
 
   const attachListeners = () => {
-    cleanup.execute();
-    forEach(type, type => {
-      forEach(targets, el => {
-        if (!el) return;
-        el.addEventListener(type, handler, options);
-        cleanup.push(() => el.removeEventListener(type, handler, options));
-      });
+    asArray(access(targets)).forEach(el => {
+      if (el) asArray(access(type)).forEach(type => makeEventListener(el, type, handler, options));
     });
   };
 
   // if the target is an accessor the listeners will be added on the first effect (onMount)
   // so that when passed a jsx ref it will be availabe
-  if (isFunction(targets)) createEffect(attachListeners);
+  if (typeof targets === "function") createEffect(attachListeners);
   // if the target prop is NOT an accessor, the event listeners can be added right away
   else createRenderEffect(attachListeners);
-
-  onCleanup(cleanup.execute);
-  return cleanup.execute;
 }
 
 // Possible targets prop shapes:
@@ -127,7 +150,7 @@ export function createEventSignal<
   target: MaybeAccessor<Many<Target>>,
   type: MaybeAccessor<Many<EventType>>,
   options?: EventListenerOptions
-): EventListenerSignalReturns<EventMap[EventType]>;
+): Accessor<EventMap[EventType]>;
 
 // Custom Events
 export function createEventSignal<
@@ -137,16 +160,16 @@ export function createEventSignal<
   target: MaybeAccessor<Many<EventTarget>>,
   type: MaybeAccessor<Many<EventType>>,
   options?: EventListenerOptions
-): EventListenerSignalReturns<EventMap[EventType]>;
+): Accessor<EventMap[EventType]>;
 
 export function createEventSignal(
   target: MaybeAccessor<Many<EventTarget>>,
   type: MaybeAccessor<Many<string>>,
   options?: EventListenerOptions
-): [Accessor<Event | undefined>, Fn] {
+): Accessor<Event | undefined> {
   const [lastEvent, setLastEvent] = createSignal<Event>();
-  const clear = createEventListener(target, type, setLastEvent, options);
-  return [lastEvent, clear];
+  createEventListener(target, type, setLastEvent, options);
+  return lastEvent;
 }
 
 /**
@@ -157,16 +180,12 @@ export function createEventSignal(
  * @example
  * <button use:eventListener={["click", () => {...}]}>Click me!</button>
  */
-export function eventListener(target: Element, props: Accessor<EventListenerDirectiveProps>): void {
-  const toCleanup = createCallbackStack();
+export const eventListener: Directive<EventListenerDirectiveProps> = (target, props) => {
   createEffect(() => {
-    toCleanup.execute();
     const [type, handler, options] = props();
-    target.addEventListener(type, handler, options);
-    toCleanup.push(() => target.removeEventListener(type, handler, options));
+    makeEventListener(target, type, handler, options);
   });
-  onCleanup(toCleanup.execute);
-}
+};
 
 // // /* TypeCheck */
 // const mouseHandler = (e: MouseEvent) => {};

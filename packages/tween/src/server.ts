@@ -1,4 +1,3 @@
-
 /**
  * Creates a simple tween method.
  *
@@ -11,10 +10,7 @@
  * const tweenedValue = createTween(myNumber, { duration: 500 });
  * ```
  */
-export default function createTween<T extends number>(
-  _target: () => T,
-  {}
-) {
+export default function createTween<T extends number>(_target: () => T, {}) {
   return () => {
     /*noop*/
   };

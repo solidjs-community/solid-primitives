@@ -1,12 +1,20 @@
-import { createCallback, createSubRoot, runWithRoot, runWithSubRoot } from "../src";
-import { createComputed, createMemo, createRoot, createSignal, getOwner } from "solid-js";
+import { createCallback, createBranch, createDisposable, createSharedRoot } from "../src";
+import {
+  createComputed,
+  createEffect,
+  createMemo,
+  createRoot,
+  createSignal,
+  getOwner,
+  onCleanup
+} from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
-const csr = suite("createSubRoot");
+const csr = suite("createBranch");
 
 csr("behaves like a root", () =>
-  createSubRoot(dispose => {
+  createBranch(dispose => {
     const captured: any[] = [];
     const [count, setCount] = createSignal(0);
     createComputed(() => captured.push(count()));
@@ -20,7 +28,7 @@ csr("behaves like a root", () =>
 
 csr("disposes with owner", () =>
   createRoot(dispose => {
-    createSubRoot(() => {
+    createBranch(() => {
       const captured: any[] = [];
       const [count, setCount] = createSignal(0);
       createComputed(() => captured.push(count()));
@@ -42,7 +50,7 @@ csr("many parent owners", () => {
     return [o1, o2, dispose1, dispose2];
   });
 
-  createSubRoot(
+  createBranch(
     () => {
       const captured: any[] = [];
       const [count, setCount] = createSignal(0);
@@ -61,7 +69,7 @@ csr("many parent owners", () => {
 
 csr.run();
 
-const ccwo = suite("createCallbackWithOwner");
+const ccwo = suite("createCallback");
 
 ccwo("owner is available in async trigger", () =>
   createRoot(dispose => {
@@ -83,59 +91,24 @@ ccwo("owner is available in async trigger", () =>
 
 ccwo.run();
 
-const rir = suite("runWithRoot");
-
-rir("working with createComputed", () => {
-  const [count, setCount] = createSignal(0);
-  const captured: any[] = [];
-  const dispose = runWithRoot(() => createComputed(() => captured.push(count())));
-  assert.equal(captured, [0]);
-  setCount(1);
-  assert.equal(captured, [0, 1], "before dispose()");
-  dispose();
-  assert.equal(captured, [0, 1], "after disposing");
-});
-
-rir("working with createMemo", () => {
-  const [count, setCount] = createSignal(0);
-  const [memo, dispose] = runWithRoot(() => createMemo(() => count()));
-  assert.is(memo(), 0);
-  setCount(1);
-  assert.is(memo(), 1, "before dispose()");
-  dispose();
-  assert.is(memo(), 1, "after disposing");
-});
-
-rir.run();
-
-const risr = suite("runWithSubRoot");
+const risr = suite("createDisposable");
 
 risr("working with createComputed", () => {
   const [count, setCount] = createSignal(0);
   const captured: any[] = [];
-  const dispose = runWithSubRoot(() => createComputed(() => captured.push(count())));
+  const dispose = createDisposable(() => createComputed(() => captured.push(count())));
   assert.equal(captured, [0]);
   setCount(1);
   assert.equal(captured, [0, 1], "before dispose()");
   dispose();
   assert.equal(captured, [0, 1], "after disposing");
-});
-
-risr("working with createMemo", () => {
-  const [count, setCount] = createSignal(0);
-  const [memo, dispose] = runWithSubRoot(() => createMemo(() => count()));
-  assert.is(memo(), 0);
-  setCount(1);
-  assert.is(memo(), 1, "before dispose()");
-  dispose();
-  assert.is(memo(), 1, "after disposing");
 });
 
 risr("disposes together with owner", () =>
   createRoot(dispose => {
     const [count, setCount] = createSignal(0);
     const captured: any[] = [];
-    runWithSubRoot(() => createComputed(() => captured.push(count())));
+    createDisposable(() => createComputed(() => captured.push(count())));
     assert.equal(captured, [0]);
     setCount(1);
     assert.equal(captured, [0, 1], "before dispose()");
@@ -145,3 +118,84 @@ risr("disposes together with owner", () =>
 );
 
 risr.run();
+
+const testSR = suite("createSharedRoot");
+
+testSR("single root", () => {
+  const [count, setCount] = createSignal(0);
+
+  let runs = 0;
+  let disposes = 0;
+  const useMemo = createSharedRoot(() => {
+    onCleanup(() => disposes++);
+    return createMemo(() => {
+      runs++;
+      return count();
+    });
+  });
+
+  createRoot(dispose => {
+    assert.is(useMemo()(), 0);
+    assert.is(disposes, 0);
+    assert.is(runs, 1);
+    setCount(1);
+    assert.is(runs, 2);
+    dispose();
+    queueMicrotask(() => {
+      assert.is(disposes, 1);
+      assert.is(runs, 2);
+      setCount(2);
+      assert.is(runs, 2);
+    });
+  });
+});
+
+testSR("multiple roots", () => {
+  const [count, setCount] = createSignal(0);
+
+  let runs = 0;
+  let disposes = 0;
+  const useMemo = createSharedRoot(() => {
+    onCleanup(() => disposes++);
+    return createMemo(() => {
+      runs++;
+      return count();
+    });
+  });
+
+  const d1 = createRoot(dispose => {
+    assert.is(useMemo()(), 0);
+    return dispose;
+  });
+
+  const d2 = createRoot(dispose => {
+    createEffect(() => useMemo()());
+    return dispose;
+  });
+
+  assert.is(runs, 1);
+  setCount(1);
+  assert.is(runs, 2);
+
+  d1();
+
+  queueMicrotask(() => {
+    assert.is(runs, 2);
+    assert.is(disposes, 0);
+    setCount(2);
+    assert.is(runs, 3);
+
+    setTimeout(() => {
+      d2();
+
+      setTimeout(() => {
+        assert.is(runs, 3);
+        assert.is(disposes, 1);
+        setCount(3);
+        assert.is(runs, 3);
+      });
+    });
+  });
+});
+
+testSR.run();

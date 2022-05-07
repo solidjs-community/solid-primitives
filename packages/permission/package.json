@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/permission",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Primitive that wraps permission queries",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",

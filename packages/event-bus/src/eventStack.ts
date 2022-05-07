@@ -2,12 +2,12 @@ import { Accessor, createSignal, Setter } from "solid-js";
 import { createEmitter, Emitter, EmitterConfig } from "./emitter";
 import { GenericEmit } from "./types";
 import { push, drop, pick, filterOut } from "@solid-primitives/immutable";
-import { Fn, Modify } from "@solid-primitives/utils";
+import { Modify } from "@solid-primitives/utils";
 
-export type EventStackListener<V> = (event: V, stack: V[], removeFromStack: Fn) => void;
+export type EventStackListener<V> = (event: V, stack: V[], removeFromStack: VoidFunction) => void;
 
 export type EventStack<E, V = E> = Modify<
-  Emitter<V, V[], Fn>,
+  Emitter<V, V[], VoidFunction>,
   {
     value: Accessor<V[]>;
     stack: Accessor<V[]>;
@@ -20,8 +20,8 @@ export type EventStack<E, V = E> = Modify<
 type Config<E, V> = {
   length?: number;
   emitGuard?: EmitterConfig<E>["emitGuard"];
-  removeGuard?: EmitterConfig<V, V[], Fn>["removeGuard"];
-  beforeEmit?: EmitterConfig<V, V[], Fn>["beforeEmit"];
+  removeGuard?: EmitterConfig<V, V[], VoidFunction>["removeGuard"];
+  beforeEmit?: EmitterConfig<V, V[], VoidFunction>["beforeEmit"];
 };
 
 /**
@@ -74,7 +74,9 @@ export function createEventStack<E, V>(
 
   const [stack, setStack] = createSignal<V[]>([]);
   const eventEmitter = createEmitter<E>(pick(config, "emitGuard"));
-  const valueEmitter = createEmitter<V, V[], Fn>(pick(config, "beforeEmit", "removeGuard"));
+  const valueEmitter = createEmitter<V, V[], VoidFunction>(
+    pick(config, "beforeEmit", "removeGuard")
+  );
 
   eventEmitter.listen(event => {
     const value = toValue(event, stack());

@@ -21,13 +21,13 @@ export const createScriptLoader = (opts: {
   opts.onerror && script.addEventListener("error", opts.onerror);
   const remove = () => document.head.contains(script) && document.head.removeChild(script);
   const load = () => {
-    const src = typeof opts.src === "string" ? opts.src : opts.src()
-    const prop = /^(https?:|\w[\.\w-_%]+|)\//.test(src) ? 'src' : 'textContent';
+    const src = typeof opts.src === "string" ? opts.src : opts.src();
+    const prop = /^(https?:|\w[\.\w-_%]+|)\//.test(src) ? "src" : "textContent";
     if (script[prop] !== src) {
       script[prop] = src;
       document.head.appendChild(script);
     }
-  }
+  };
   load();
   createEffect(load, false);
   onCleanup(remove);

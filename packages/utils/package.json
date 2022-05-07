@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/utils",
-  "version": "0.5.3",
+  "version": "1.4.0",
   "description": "A bunch of reactive utility types and functions, for building primitives with Solid.js",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -24,7 +24,7 @@
   "scripts": {
     "build": "tsup",
     "test": "uvu -r solid-register",
-    "watch-test": "watchlist src test -- npm test"
+    "test:watch": "watchlist src test -- npm test"
   },
   "keywords": [
     "utilities",

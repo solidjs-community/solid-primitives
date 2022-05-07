@@ -1,14 +1,5 @@
 import { createMemo, Accessor, runWithOwner, getOwner } from "solid-js";
-import {
-  access,
-  isFunction,
-  MaybeAccessor,
-  AnyObject,
-  Values,
-  isObject,
-  isArray,
-  AnyFunction
-} from "@solid-primitives/utils";
+import { access, MaybeAccessor, AnyObject, Values, AnyFunction } from "@solid-primitives/utils";
 import type { MemoOptions } from "solid-js/types/reactive/signal";
 
 type ReactiveSource = [] | any[] | AnyObject;
@@ -40,7 +31,7 @@ export type DeepDestructure<T extends ReactiveSource> = {
     : Accessor<T[K]>;
 };
 
-const isReactiveObject = (value: any): boolean => isObject(value) || isArray(value);
+const isReactiveObject = (value: any): boolean => typeof value === "object" && value !== null;
 
 /**
  * Cashed object getters.
@@ -92,10 +83,11 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
   ? DeepSpread<T>
   : Spread<T> {
   const config: DestructureOptions<T> = options ?? {};
-  const memo = config.memo ?? isFunction(source);
-  const getter = isFunction(source)
-    ? (key: any) => () => source()[key]
-    : (key: any) => () => source[key];
+  const memo = config.memo ?? typeof source === "function";
+  const getter =
+    typeof source === "function"
+      ? (key: any) => () => source()[key]
+      : (key: any) => () => source[key];
   const obj = access(source);
 
   // lazy (use proxy)

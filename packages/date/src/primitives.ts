@@ -1,31 +1,11 @@
-import { access, Fn, isFunction, isDefined, MaybeAccessor } from "@solid-primitives/utils";
-import {
-  Accessor,
-  createComputed,
-  createEffect,
-  createMemo,
-  createSignal,
-  onCleanup
-} from "solid-js";
+import { access, MaybeAccessor, accessWith, createTrigger } from "@solid-primitives/utils";
+import { createWritableMemo } from "@solid-primitives/memo";
+import { createPolled, TimeoutSource } from "@solid-primitives/timer";
+import { Accessor, createComputed, createMemo } from "solid-js";
 import { createStore, Store } from "solid-js/store";
 import { DEFAULT_MESSAGES, HOUR, MINUTE } from "./variables";
-import {
-  formatDate,
-  formatDateRelative,
-  getCountdown,
-  getDate,
-  getDateDifference,
-  getTime
-} from "./utils";
-import type {
-  Countdown,
-  DateInit,
-  DateSetter,
-  TimeAgoOptions,
-  GetUpdateInterval,
-  TimeSetter,
-  UpdateInterval
-} from "./types";
+import { formatDate, formatDateRelative, getCountdown, getDate, getDateDifference } from "./utils";
+import type { Countdown, DateInit, DateSetter, TimeAgoOptions, GetUpdateInterval } from "./types";
 
 /**
  * Creates a reactive `Date` signal.
@@ -34,31 +14,9 @@ import type {
  * @returns [`Date` signal, setter function]
  */
 export const createDate = (init: MaybeAccessor<DateInit>): [Accessor<Date>, DateSetter] => {
-  const [date, setDate] = createSignal(getDate(access(init)));
-  const setter: DateSetter = input =>
-    setDate(prev => {
-      const init = isFunction(input) ? input(prev) : input;
-      return getDate(init);
-    });
-  if (isFunction(init)) createComputed(() => setter(init()));
+  const [date, setDate] = createWritableMemo(() => getDate(access(init)));
+  const setter: DateSetter = input => setDate(prev => getDate(accessWith(input, prev)));
   return [date, setter];
-};
-
-/**
- * Creates a reactive timestamp `number` signal.
- *
- * @param init timestamp `number` | date `string` | `Date` instance; *May be a reactive signal*
- * @returns [timestamp signal, setter function]
- */
-export const createTime = (init: MaybeAccessor<DateInit>): [Accessor<number>, TimeSetter] => {
-  const [time, setTime] = createSignal(getTime(access(init)));
-  const setter: TimeSetter = input =>
-    setTime(prev => {
-      const init = isFunction(input) ? input(prev) : input;
-      return getTime(init);
-    });
-  if (isFunction(init)) createComputed(() => setter(init()));
-  return [time, setter];
 };
 
 /**
@@ -72,27 +30,33 @@ export const createTime = (init: MaybeAccessor<DateInit>): [Accessor<number>, Ti
  * // updates every second:
  * const [now] = createDateNow(1000);
  *
+ * // reactive timeout value
+ * const [timeout, setTimeout] = createSignal(500);
+ * const [now] = createDateNow(timeout);
+ *
  * // won't autoupdate:
- * const [now, update] = createDateNow(false);
+ * const [now, update] = createDateNow(() => false);
  *
  * // update manually:
  * update()
  * ```
  */
 export function createDateNow(
-  interval: MaybeAccessor<UpdateInterval> = MINUTE / 2
-): [Accessor<Date>, Fn] {
-  const [now, setNow] = createSignal(new Date());
-  const update = () => setNow(new Date());
-  let timer: number;
-  createEffect(() => {
-    clearInterval(timer);
-    const ms = access(interval);
-    // if interval === 0 | false the date won't update automatically
-    if (ms) timer = setInterval(update, ms) as any;
-  });
-  onCleanup(() => clearInterval(timer));
-  return [now, update];
+  interval: TimeoutSource = MINUTE / 2
+): [Accessor<Date>, VoidFunction] {
+  const [track, trigger] = createTrigger();
+  const memo = createPolled(
+    () => {
+      track();
+      return new Date();
+    },
+    interval,
+    undefined,
+    {
+      equals: (a, b) => a.getTime() === b.getTime()
+    }
+  );
+  return [memo, trigger];
 }
 
 /**
@@ -140,15 +104,15 @@ export function createTimeDifference(
  */
 export function createTimeDifferenceFromNow(
   to: MaybeAccessor<DateInit>,
-  updateInterval: UpdateInterval | GetUpdateInterval = diff =>
+  updateInterval: number | GetUpdateInterval = diff =>
     Math.abs(diff) <= HOUR ? MINUTE / 2 : HOUR / 2
 ): [
   difference: Accessor<number>,
-  extra: { now: Accessor<Date>; target: Accessor<Date>; update: Fn }
+  extra: { now: Accessor<Date>; target: Accessor<Date>; update: VoidFunction }
 ] {
-  const [now, update] = createDateNow(
-    isFunction(updateInterval) ? () => updateInterval(diff()) : updateInterval
-  );
+  const interval =
+    typeof updateInterval === "function" ? () => updateInterval(diff()) : updateInterval;
+  const [now, update] = createDateNow(interval);
   const [diff, { to: target }] = createTimeDifference(now, to);
   return [diff, { update, target, now }];
 }
@@ -179,7 +143,12 @@ export function createTimeAgo(
   options: TimeAgoOptions = {}
 ): [
   timeago: Accessor<string>,
-  extra: { now: Accessor<Date>; target: Accessor<Date>; update: Fn; difference: Accessor<number> }
+  extra: {
+    now: Accessor<Date>;
+    target: Accessor<Date>;
+    update: VoidFunction;
+    difference: Accessor<number>;
+  }
 ] {
   const {
     min = MINUTE,
@@ -231,7 +200,7 @@ export function createCountdown(
   b?: MaybeAccessor<DateInit>
 ): Store<Countdown> {
   let difference: Accessor<number>;
-  if (isDefined(b)) difference = createTimeDifference(a, b)[0];
+  if (b !== undefined) difference = createTimeDifference(a, b)[0];
   else difference = a as Accessor<number>;
   const [countdown, setCountdown] = createStore<Countdown>(getCountdown(difference()));
   createComputed(() => setCountdown(getCountdown(difference())));
@@ -261,10 +230,10 @@ export function createCountdown(
  */
 export function createCountdownFromNow(
   to: MaybeAccessor<DateInit>,
-  updateInterval: UpdateInterval | GetUpdateInterval = 1000
+  updateInterval: TimeoutSource | GetUpdateInterval = 1000
 ): [
   countdown: Store<Countdown>,
-  extra: { now: Accessor<Date>; target: Accessor<Date>; update: Fn }
+  extra: { now: Accessor<Date>; target: Accessor<Date>; update: VoidFunction }
 ] {
   const [difference, extra] = createTimeDifferenceFromNow(to, updateInterval);
   const countdown = createCountdown(difference);

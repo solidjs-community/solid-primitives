@@ -9,5 +9,5 @@ import { Accessor } from "solid-js";
 export const createPermission = (
   _name: PermissionDescriptor | PermissionName
 ): Accessor<PermissionState | "unknown"> => {
-  return () => 'unknown';
+  return () => "unknown";
 };

@@ -149,7 +149,7 @@ Only initially available indexes can be accessed while using this syntax: `[a, b
 const [a, b, c] = destructure([1, 2], { lazy: true });
 a(); // => 1
 b(); // => 2
-b(); // error (c will be undefined)
+c(); // error (c will be undefined)
 
 // Do this instead:
 const list = destructure([1, 2], { lazy: true });
@@ -157,7 +157,7 @@ const [a, b] = list;
 const c = list[2];
 a(); // => 1
 b(); // => 2
-b(); // => undefined (no error)
+c(); // => undefined (no error)
 ```
 
 ### Acknowledgements

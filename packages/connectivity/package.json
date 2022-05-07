@@ -1,8 +1,11 @@
 {
   "name": "@solid-primitives/connectivity",
-  "version": "0.1.1",
+  "version": "0.3.0",
   "description": "A navigator.onLine signal.",
   "author": "Klemen Slavič <krof.drakula@gmail.com>",
+  "contributors": [
+    "Damian Tarnawski <gthetarnav@gmail.com>"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/utils#readme",
   "repository": {
@@ -11,7 +14,7 @@
   },
   "primitive": {
     "name": "connectivity",
-    "stage": 1,
+    "stage": 2,
     "list": [
       "createConnectivitySignal"
     ],
@@ -35,7 +38,8 @@
     "dist"
   ],
   "scripts": {
-    "start": "vite serve dev",
+    "start": "vite serve dev --host",
+    "dev": "npm run start",
     "build": "tsup",
     "test": "uvu -r solid-register"
   },
@@ -46,17 +50,19 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/event-listener": "^1.4.1"
+    "@solid-primitives/utils": "1.2.0",
+    "@solid-primitives/event-listener": "^2.0.0",
+    "@solid-primitives/rootless": "^1.1.0"
   },
   "devDependencies": {
     "jsdom": "^19.0.0",
     "prettier": "^2.5.1",
     "solid-register": "^0.1.5",
     "tslib": "^2.3.1",
-    "typescript": "^4.5.3",
     "tsup": "^5.11.1",
-    "uvu": "^0.5.2",
+    "typescript": "^4.5.3",
     "unocss": "0.24.3",
+    "uvu": "^0.5.2",
     "vite": "2.8.1",
     "vite-plugin-solid": "2.2.5"
   },

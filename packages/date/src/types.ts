@@ -1,3 +1,5 @@
+import { TimeoutSource } from "@solid-primitives/timer";
+
 export type MessageFormatter<T = number> = (value: T, isPast: boolean) => string;
 export type RelativeFormatter = (now: Date, target: Date, diff: number) => string;
 
@@ -34,7 +36,7 @@ export interface TimeAgoOptions {
    *
    * @default (diff) => diff <= 3600_000 ? 30_000 : 1800_000
    */
-  interval?: UpdateInterval | GetUpdateInterval;
+  interval?: TimeoutSource | GetUpdateInterval;
 
   /**
    * Minimum diff in milliseconds to display "just now" instead of relative time
@@ -70,5 +72,4 @@ export interface TimeAgoOptions {
 export type DateInit = number | Date | string;
 export type DateSetter = (input: DateInit | ((prev: Date) => DateInit)) => Date;
 export type TimeSetter = (input: DateInit | ((prev: number) => DateInit)) => number;
-export type UpdateInterval = number | false;
-export type GetUpdateInterval = (difference: number) => UpdateInterval;
+export type GetUpdateInterval = (difference: number) => number | false;

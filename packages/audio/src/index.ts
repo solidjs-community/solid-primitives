@@ -25,7 +25,7 @@ type AudioSource =
  */
 export const createAudioPlayer = (
   src: AudioSource,
-  handlers: Array<[string, EventListener]>
+  handlers: Array<[string, EventListener]> = []
 ): {
   player: HTMLAudioElement;
   state: () => AudioState;

@@ -7,14 +7,25 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/mouse?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/mouse)
 [![size](https://img.shields.io/npm/v/@solid-primitives/mouse?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/mouse)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A collection of primitives, capturing current mouse cursor position, and helping to deal with common usecases:
 
-- [`createMousePosition`](#createMousePosition) - Listens to the global mouse events, providing a reactive up-to-date position of the cursor on the page.
-- [`createMouseToElement`](#createMouseToElement) - Provides an auto-updating position relative to a provided element. It can be used with existing position signals or left to get the current cursor position itself.
-- [`createMouseInElement`](#createMouseInElement) - An alternative to `createMouseToElement`, that listens to mouse (and touch) events only inside the element. Provides information of position and if the element is being hovered.
-- [`createMouseOnScreen`](#createMouseOnScreen) - Answers the question: _Is the cursor on screen?_
+##### Reactive primitives:
+
+- [`createMousePosition`](#createMousePosition) - Listens to the mouse events, providing a reactive up-to-date position of the cursor on the page.
+- [`createPositionToElement`](#createPositionToElement) - Provides an auto-updating position relative to a provided element.
+
+##### Non-reactive primitives:
+
+- [`makeMousePositionListener`](#makeMousePositionListener) - Attaches event listeners to provided targat, listeneing for changes to the mouse/touch position.
+- [`makeMouseInsideListener`](#makeMouseInsideListener) - Attaches event listeners to provided targat, listening for mouse/touch entering/leaving the element.
+
+##### Calculations:
+
+- [`getPositionToElement`](#getPositionToElement) - Turn position relative to the page, into position relative to an element.
+- [`getPositionInElement`](#getPositionInElement) - Turn position relative to the page, into position relative to an element. Clamped to the element bounds.
+- [`getPositionToScreen`](#getPositionToScreen) - Turn position relative to the page, into position relative to the screen.
 
 ## Installation
 
@@ -26,191 +37,144 @@ yarn add @solid-primitives/mouse
 
 ## `createMousePosition`
 
-Listens to the global mouse events, providing a reactive up-to-date position of the cursor on the page.
+Attaches event listeners to provided targat, providing a reactive up-to-date position of the cursor on the page.
 
-### Usage
+#### Usage
 
-```ts
+```tsx
 import { createMousePosition } from "@solid-primitives/mouse";
 
-const [{ x, y, sourceType }, clear] = createMousePosition({ touch: false });
-// listening to touch events is enabled by default
-
-// to clear all event listeners
-clear();
-```
-
-### Types
-
-```ts
-function createMousePosition(options: MouseOptions = {}): [
-  getters: {
-    x: Accessor<number>;
-    y: Accessor<number>;
-    sourceType: Accessor<MouseSourceType>;
-  },
-  clear: ClearListeners
-];
-interface MouseOptions {
-  /**
-   * Listen to `touchmove` events
-   * @default true
-   */
-  touch?: boolean;
-  /**
-   * Initial values
-   * @default { x:0, y:0 }
-   */
-  initialValue?: Position;
-  /**
-   * If enabled, position will be updated on touchmove event.
-   * @default true
-   */
-  followTouch?: boolean;
-}
-interface Position {
-  x: number;
-  y: number;
-}
-type MouseSourceType = "mouse" | "touch" | null;
-```
-
-## `createMouseToElement`
-
-Provides an autoupdating position relative to a provided element. It can be used with existing position signals, or left to get the current cursor position itself.
-
-### Usage
-
-```ts
-import { createMouseToElement } from "@solid-primitives/mouse";
-
-const [{ x, y, top, left, width, height, isInside }, manualUpdate] = createMouseToElement(
-  () => myRef
-);
-// If position argument is left undefined, it will use
-// createMousePosition internally to track the cursor position.
-
-// But if you are already tracking the mouse position yourself, or with createMousePosition.
-// You can pass it to createMouseToElement to avoid additional performance payload.
-const [mouse] = createMousePosition();
-const [{ x, y, isInside }] = createMouseToElement(el, mouse);
-
-// This also works when you are applying some transformations to the position, or debouncing it.
-const myPos = createMemo(() => {
-  /* do sth with the mouse position */
+const pos = createMousePosition(window);
+createEffect(() => {
+  console.log(pos.x, pos.y);
 });
-const [{ x, y, isInside }] = createMouseToElement(el, myPos);
+
+// target can be a reactive signal
+const [el, setEl] = createSignal(ref);
+const pos = createMousePosition(el);
+
+// if using a jsx ref, pass it as a function, or wrap primitive inside onMount
+let ref;
+const pos = createMousePosition(() => ref);
+<div ref={ref}></div>;
 ```
 
-### Types
+By default `createMousePosition` is listening to `touch` events as well. You can disable that behavior with `touch` and `followTouch` options.
 
 ```ts
-function createMouseToElement(
-  element: MaybeAccessor<Element>,
-  pos?: Accessor<Position> | { x: MaybeAccessor<number>; y: MaybeAccessor<number> },
-  options: PositionToElementOptions = {}
-): [
-  getters: {
-    x: Accessor<number>;
-    y: Accessor<number>;
-    top: Accessor<number>;
-    left: Accessor<number>;
-    width: Accessor<number>;
-    height: Accessor<number>;
-    isInside: Accessor<boolean>;
-  },
-  update: Fn
-];
-interface Position {
-  x: number;
-  y: number;
-}
-interface PositionToElementOptions extends MouseOptions {
-  initialValue?: {
-    top?: number;
-    left?: number;
-    width?: number;
-    height?: number;
-    x?: number;
-    y?: number;
-  };
-}
+// disables following touch position – only registers touch start
+const pos = createMousePosition(window, { followTouch: false });
+
+// disables listeneing to any touch events
+const pos = createMousePosition(window, { touch: false });
 ```
 
-## `createMouseInElement`
+#### `useMousePosition`
 
-An alternative to [`createMouseToElement`](#createMouseToElement), that listens to mouse _(and touch)_ events only inside the element. Provides information of position and if is the element being currently hovered.
-
-### Usage
+This primitive providea a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) variant that will listen to window mouse position, and reuse event listeners and signals across dependents.
 
 ```ts
-import { createMouseInElement } from "@solid-primitives/mouse";
-
-const [{ x, y, sourceType, isInside }, clear] = createMouseInElement(() => myRef, {
-  followTouch: false
+const pos = useMousePosition();
+createEffect(() => {
+  console.log(pos.x, pos.y);
 });
-// Same way as createMousePosition:
-// the "touch", and "foullowTouch" settings are enabled by default
+```
 
-// to clear all event listeners
+#### Definition
+
+```ts
+function createMousePosition(
+  target?: MaybeAccessor<Window | Document | HTMLElement>,
+  options?: MousePositionOptions
+): MousePositionInside;
+```
+
+## `createPositionToElement`
+
+Provides an autoupdating position relative to an element based on provided page position.
+
+#### Usage
+
+```ts
+import { createPositionToElement, useMousePosition } from "@solid-primitives/mouse";
+
+const pos = useMousePosition();
+const relative = createPositionToElement(ref, () => pos);
+
+createEffect(() => {
+  console.log(relative.x, relative.y);
+});
+
+// target can be a reactive signal
+const [el, setEl] = createSignal(ref);
+const relative = createPositionToElement(el, () => pos);
+
+// if using a jsx ref, pass it as a function, or wrap primitive inside onMount
+let ref;
+const relative = createPositionToElement(() => ref);
+<div ref={ref}></div>;
+```
+
+#### Definition
+
+```ts
+function createPositionToElement(
+  element: Element | Accessor<Element | undefined>,
+  pos: Accessor<Position>,
+  options?: PositionToElementOptions
+): PositionRelativeToElement;
+```
+
+## Non-reactive primitives:
+
+### `makeMousePositionListener`
+
+###### Added id `@2.0.0`
+
+Attaches event listeners to provided targat, listeneing for changes to the mouse/touch position.
+
+```ts
+const clear = makeMousePositionListener(el, pos => console.log(pos), { touch: false });
+// remove listeners manually (will happen on cleanup)
 clear();
 ```
 
-### Types
+### `makeMouseInsideListener`
+
+###### Added id `@2.0.0`
+
+Attaches event listeners to provided targat, listening for mouse/touch entering/leaving the element.
 
 ```ts
-function createMouseInElement(
-  element: MaybeAccessor<HTMLElement>,
-  options: MouseOptions = {}
-): [
-  getters: {
-    x: Accessor<number>;
-    y: Accessor<number>;
-    sourceType: Accessor<MouseSourceType>;
-    isInside: Accessor<boolean>;
-  },
-  clear: ClearListeners
-];
-type MouseSourceType = "mouse" | "touch" | null;
-```
-
-## `createMouseOnScreen`
-
-Answers the question: _Is the cursor on screen?_
-
-### Usage
-
-```ts
-import { createMouseOnScreen } from "@solid-primitives/mouse";
-
-const [isMouseOnScreen, clear] = createMouseOnScreen(true);
-
-// to clear all event listeners
+const clear = makeMouseInsideListener(el, inside => console.log(inside), { touch: false });
+// remove listeners manually (will happen on cleanup)
 clear();
 ```
 
-### Types
+## Calculations
+
+### `getPositionToElement`
+
+Turn position relative to the page, into position relative to an element.
 
 ```ts
-function createMouseOnScreen(
-  initialValue?: boolean
-): [onScreen: Accessor<boolean>, clear: ClearListeners];
-function createMouseOnScreen(
-  options?: MouseOnScreenOptions
-): [onScreen: Accessor<boolean>, clear: ClearListeners];
+const pos = getPositionToElement(pageX, pageY, element);
+```
 
-interface MouseOnScreenOptions {
-  /**
-   * Listen to touch events
-   * @default true
-   */
-  touch?: boolean;
-  /**
-   * Initial value
-   * @default false
-   */
-  initialValue?: boolean;
-}
+### `getPositionInElement`
+
+Turn position relative to the page, into position relative to an element. Clamped to the element bounds.
+
+```ts
+const pos = getPositionInElement(pageX, pageY, element);
+```
+
+### `getPositionToScreen`
+
+Turn position relative to the page, into position relative to the screen.
+
+```ts
+const pos = getPositionToScreen(pageX, pageY);
 ```
 
 ## Demo
@@ -233,5 +197,21 @@ Updated util and event-listener dependencies.
 1.0.2
 
 Upgraded to Solid 1.3
+
+2.0.0 - **stage-3**
+
+[PR#113](https://github.com/solidjs-community/solid-primitives/pull/113)
+
+Removed `createMouseInElement`, `createMouseOnScreen`
+
+Renamed:
+
+- `posRelativeToElement` -> `getPositionToElement`
+- `posRelativeToScreen` -> `getPositionToScreen`
+- `createMouseToElement` -> `createPositionToElement`
+
+Added `makeMousePositionListener`, `makeMouseInsideListener` and `getPositionInElement`
+
+Removed clear() and update() functions from reactive primitives. `createPositionToElement` now only takes accessor position.
 
 </details>

@@ -11,14 +11,15 @@ import {
 } from "../src";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
-import { cloneDeep } from "lodash";
+
+const cloneDeep = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
 
 const testUpdate = suite("update");
 
 testUpdate("update()", () => {
   const original = {
     a: 123,
-    b: { inner: { c: "yo", d: [0, 1, 2], fn: () => {} } },
+    b: { inner: { c: "yo", d: [0, 1, 2], test: "test" } },
     arr: [1, 2, 3]
   };
   const originalClone = cloneDeep(original);
@@ -40,9 +41,6 @@ testUpdate("update()", () => {
 
   const a = update(original, "arr", 0, "yoo");
   assert.equal(a.arr, ["yoo", 2, 3]);
-
-  const fn = update(original, "b", "inner", "fn", () => () => 123);
-  assert.is(fn.b.inner.fn(), 123);
 
   const theSame = update(original, "b", "inner", "c", "yo");
   assert.equal(theSame, originalClone, "no changes makes no changes");
