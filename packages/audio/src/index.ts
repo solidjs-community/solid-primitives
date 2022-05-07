@@ -1,4 +1,4 @@
-import { createSignal, batch, onMount, onCleanup, createEffect } from "solid-js";
+import { createSignal, Accessor, batch, onMount, onCleanup, createEffect } from "solid-js";
 
 // Set of control enums
 export enum AudioState {
@@ -17,37 +17,33 @@ type AudioSource =
   | (() => string | MediaSource | (string & MediaSource));
 
 /**
- * Creates an extremely basic audio generator method.
+ * Generates a basic audio instance with no to minimal functionality.
  *
  * @param src Audio file path or MediaSource to be played
  * @param handlers An array of handlers to bind against the player
  * @return
  */
-export const createAudioPlayer = (
-  src: AudioSource,
-  handlers: Array<[string, EventListener]> = []
-): {
-  player: HTMLAudioElement;
-  state: () => AudioState;
-  setState: (state: AudioState) => void;
-} => {
-  const [state, setState] = createSignal<AudioState>(AudioState.STOPPED);
-  const player: HTMLAudioElement = new Audio();
-  if (src instanceof Function) {
-    const srcKey = typeof src() === "string" ? "src" : "srcObject";
-    player[srcKey] = src() as string & MediaSource;
-    createEffect(() => (player[srcKey] = src() as string & MediaSource));
-  } else {
-    player[typeof src === "string" ? "src" : "srcObject"] = src as string & MediaSource;
-  }
+export const makeAudio = (
+  src: string | undefined,
+  handlers: { [key: string]: EventListener } = {}
+): HTMLAudioElement => {
+  const player: HTMLAudioElement = new Audio(src);
+  const listeners = (enabled: boolean) => {
+    Object.entries(handlers).forEach(([evt, handler]) =>
+      player[enabled ? "addEventListener" : "removeEventListener"](evt, handler)
+    );
+  };
   // Handle management on create and clean-up
-  onMount(() => handlers.forEach(([evt, handler]) => player.addEventListener(evt, handler)));
-  onCleanup(() => handlers.forEach(([evt, handler]) => player.removeEventListener(evt, handler)));
-  return { player, state, setState };
+  onMount(() => listeners(true));
+  onCleanup(() => {
+    player.pause();
+    listeners(false)
+  });
+  return player;
 };
 
 /**
- * Creates a simple audio manager with basic pause and play.
+ * Generates a basic audio player with simple control mechanisms.
  *
  * @param src Audio file path or MediaSource to be played
  * @return options - @type Object
@@ -58,27 +54,27 @@ export const createAudioPlayer = (
  *
  * @example
  * ```ts
- * const [start, pause] = createAudio('./example1.mp3);
+ * const [start, pause] = makeAudio('./example1.mp3);
  * ```
  */
-export const createAudio = (
-  src: AudioSource
+export const makeAudioPlayer = (
+  src: AudioSource,
+  handlers: { [key: string]: EventListener } = {}
 ): {
   play: () => void;
   pause: () => void;
-  state: () => AudioState;
+  seek: (time: number) => void;
+  setVolume: (volume: number) => void;
   player: HTMLAudioElement;
 } => {
-  const { player, state, setState } = createAudioPlayer(src, [
-    ["loadeddata", () => setState(AudioState.READY)],
-    ["loadstart", () => setState(AudioState.LOADING)],
-    ["playing", () => setState(AudioState.PLAYING)],
-    ["pause", () => setState(AudioState.PAUSED)]
-  ]);
+  const player = makeAudio(undefined, handlers);
+  player[typeof src === "string" ? "src" : "srcObject"] = src as string & MediaSource;
   // Audio controls
   const play = () => player.play();
   const pause = () => player.pause();
-  return { play, pause, state, player };
+  const seek = (time: number) => player.fastSeek(time);
+  const setVolume = (volume: number) => (player.volume = volume);
+  return { play, pause, seek, setVolume, player };
 };
 
 /**
@@ -98,49 +94,40 @@ export const createAudio = (
  *
  * @example
  * ```ts
- * const [start, pause, seek, currentTime, duration] = createAudioManager('./example1.mp3);
+ * const [start, pause, seek, currentTime, duration] = createAudio('./example1.mp3, playing);
  * ```
  */
-export const createAudioManager = (
+export const createAudio = (
   src: AudioSource,
-  volume: number = 1
+  playing: Accessor<boolean>,
+  volume?: Accessor<number>
 ): {
-  play: () => void;
-  pause: () => void;
   state: () => AudioState;
   currentTime: () => number;
   duration: () => number;
-  setVolume: (volume: number) => void;
-  seek: (position: number) => void;
-  player: HTMLAudioElement;
 } => {
+  const [state, setState] = createSignal<AudioState>(AudioState.STOPPED);
   const [currentTime, setCurrentTime] = createSignal<number>(0);
   const [duration, setDuration] = createSignal<number>(0);
-  // Bind recording events to the player
-  const { player, state, setState } = createAudioPlayer(src, [
-    [
-      "loadeddata",
-      () =>
-        batch(() => {
-          setState(AudioState.READY);
-          setDuration(player.duration);
-        })
-    ],
-    ["loadstart", () => setState(AudioState.LOADING)],
-    ["playing", () => setState(AudioState.PLAYING)],
-    ["pause", () => setState(AudioState.PAUSED)],
-    ["loadstart", () => setState(AudioState.LOADING)],
-    ["playing", () => setState(AudioState.PLAYING)],
-    ["pause", () => setState(AudioState.PAUSED)],
-    ["timeupdate", () => setCurrentTime(player.currentTime)]
-  ]);
-  // Audio controls
-  const play = () => player.play();
-  const pause = () => player.pause();
-  const seek = (time: number) => player.fastSeek(time);
-  const setVolume = (volume: number) => (player.volume = volume);
-
-  createEffect(() => (player.volume = volume));
-
-  return { play, pause, currentTime, state, duration, seek, setVolume, player };
+  const { play, pause, setVolume, player } = makeAudioPlayer(src, {
+    loadeddata: () =>
+      batch(() => {
+        setState(AudioState.READY);
+        setDuration(player.duration);
+      }),
+    timeupdate: () => setCurrentTime(player.currentTime),
+    loadstart: () => setState(AudioState.LOADING),
+    playing: () => setState(AudioState.PLAYING),
+    pause: () => setState(AudioState.PAUSED)
+  });
+  if (src instanceof Function) {
+    const srcKey = typeof src() === "string" ? "src" : "srcObject";
+    player[srcKey] = src() as string & MediaSource;
+    createEffect(() => (player[srcKey] = src() as string & MediaSource));
+  }
+  createEffect(() => (playing() === true ? play() : pause()));
+  if (typeof volume !== "undefined") {
+    createEffect(() => setVolume(volume()));
+  }
+  return { currentTime, state, duration };
 };
