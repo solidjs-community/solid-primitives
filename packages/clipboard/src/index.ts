@@ -1,4 +1,4 @@
-import { onCleanup } from "solid-js";
+import { Accessor, onCleanup, createSignal, onMount, onCleanup, createEffect } from "solid-js";
 
 export type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
 export type NewClipboardItem = (data: ClipboardItemData, type: string) => ClipboardItem;
@@ -17,7 +17,35 @@ declare module "solid-js" {
 }
 
 /**
- * Primitives to that make reading and writing to clipboard easy.
+ * Generates a simple clipbaord for reading and writing.
+ *
+ * @return write - A method to write to the clipboard
+ * @return read - Read from the clipboard
+ * @return helpers - helper functions:
+ * - `newItem` — Returns an item to write to the clipboard.
+ *
+ * @example
+ * ```ts
+ * const [ write, read ] = makeClipboard();
+ * console.log(await read());
+ * ```
+ */
+export const makeClipboard = (): [
+  write: ClipboardSetter,
+  read: () => Promise<string>,
+  helpers: { newItem: NewClipboardItem }
+] => {
+  const read = () => navigator.clipboard.readText();
+  const write: ClipboardSetter = data =>
+    typeof data === "string"
+      ? navigator.clipboard.writeText(data)
+      : navigator.clipboard.write(data);
+  const newItem: NewClipboardItem = (data, type) => new ClipboardItem({ [type]: data });
+  return [write, read, { newItem }];
+};
+
+/**
+ * Creates a new reactive primitive for managing the clipboard.
  *
  * @return write - A method to write to the clipboard
  * @return read - Read from the clipboard
@@ -30,18 +58,15 @@ declare module "solid-js" {
  * console.log(await read());
  * ```
  */
-const createClipboard = (): [
-  write: ClipboardSetter,
-  read: () => Promise<string>,
-  helpers: { newItem: NewClipboardItem }
-] => {
-  const read = () => navigator.clipboard.readText();
-  const write: ClipboardSetter = data =>
-    typeof data === "string"
-      ? navigator.clipboard.writeText(data)
-      : navigator.clipboard.write(data);
-  const newItem: NewClipboardItem = (data, type) => new ClipboardItem({ [type]: data });
-  return [write, read, { newItem }];
+export const createClipboard = (data: Accessor<string | ClipboardItem[]>): Accessor<string> => {
+  const [write, read] = makeClipboard();
+  const [clipboard, setClipboard] = createSignal("");
+  const listener = async () => setClipboard(await read());
+  onMount(() => window.addEventListener("clipboardchange", listener));
+  onCleanup(() => window.removeEventListener("clipboardchange", listener));
+  createEffect(() => write(data()));
+  listener();
+  return clipboard;
 };
 
 /**
@@ -80,7 +105,7 @@ export const copyToClipboard = (el: Element, options: () => CopyToClipboardOptio
     if (config.setter) {
       write = config.setter;
     } else {
-      [write] = createClipboard();
+      [write] = makeClipboard();
     }
     if (config.highlight !== false) highlightText(el, 0, data.length);
     write!(data);
@@ -88,5 +113,3 @@ export const copyToClipboard = (el: Element, options: () => CopyToClipboardOptio
   el.addEventListener("click", setValue);
   onCleanup(() => el.removeEventListener("click", setValue));
 };
-
-export default createClipboard;
