@@ -307,9 +307,6 @@ https://stackblitz.com/edit/solid-vite-unocss-bkbgap?file=index.tsx
 
 ## Types
 
-- [`RefProps`](#RefProps) - Component properties with types for `ref`
-- [`ResolvedChildren`](#ResolvedChildren) - Type of resolved JSX elements provided by Solid's `children` helper.
-
 ### `RefProps`
 
 Component properties with types for `ref`
