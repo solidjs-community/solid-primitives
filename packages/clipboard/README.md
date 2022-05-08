@@ -21,6 +21,14 @@ yarn add @solid-primitives/clipboard
 
 ## How to use it
 
+### makeClipboard
+
+A basic non-reactive primitive that makes accessing the clipboard easy. Note that write supports both string and ClipboardItems object structure.
+
+```ts
+const [write, read, newItem] = makeClipboard();
+```
+
 ### createClipboard
 
 Clipboard exports a read and write function. Note the write function is exported first for convenience as the most common use case for this primitive.
@@ -59,5 +67,9 @@ Added proper SSR support and modified documentation.
 1.2.9
 
 Upgraded to Solid 1.3
+
+1.3.0
+
+Update clipboard to the new Primitives project structure.
 
 </details>

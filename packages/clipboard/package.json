@@ -13,6 +13,7 @@
     "name": "clipboard",
     "stage": 3,
     "list": [
+      "makeClipboard",
       "createClipboard",
       "copyToClipboard"
     ],

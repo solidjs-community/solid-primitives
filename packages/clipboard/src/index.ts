@@ -1,4 +1,4 @@
-import { Accessor, onCleanup, createSignal, onMount, onCleanup, createEffect } from "solid-js";
+import { Accessor, createSignal, onMount, onCleanup, createEffect } from "solid-js";
 
 export type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
 export type NewClipboardItem = (data: ClipboardItemData, type: string) => ClipboardItem;
@@ -17,12 +17,11 @@ declare module "solid-js" {
 }
 
 /**
- * Generates a simple clipbaord for reading and writing.
+ * Generates a simple non-reactive clipbaord primitive for reading and writing.
  *
- * @return write - A method to write to the clipboard
- * @return read - Read from the clipboard
- * @return helpers - helper functions:
- * - `newItem` — Returns an item to write to the clipboard.
+ * @return write - Async write to the clipboard
+ * @return read - Async read from the clipboard
+ * @return newItem - Helper function to wrap ClipboardItem creation.
  *
  * @example
  * ```ts
@@ -33,7 +32,7 @@ declare module "solid-js" {
 export const makeClipboard = (): [
   write: ClipboardSetter,
   read: () => Promise<string>,
-  helpers: { newItem: NewClipboardItem }
+  newItem: NewClipboardItem
 ] => {
   const read = () => navigator.clipboard.readText();
   const write: ClipboardSetter = data =>
@@ -41,16 +40,14 @@ export const makeClipboard = (): [
       ? navigator.clipboard.writeText(data)
       : navigator.clipboard.write(data);
   const newItem: NewClipboardItem = (data, type) => new ClipboardItem({ [type]: data });
-  return [write, read, { newItem }];
+  return [write, read, newItem];
 };
 
 /**
  * Creates a new reactive primitive for managing the clipboard.
  *
- * @return write - A method to write to the clipboard
- * @return read - Read from the clipboard
- * @return helpers - helper functions:
- * - `newItem` — Returns an item to write to the clipboard.
+ * @param data - Data signal to write to the clipboard.
+ * @return Returns a signal representing the body of the clipboard value.
  *
  * @example
  * ```ts
