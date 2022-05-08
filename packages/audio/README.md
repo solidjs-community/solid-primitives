@@ -9,7 +9,7 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/audio?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/audio)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Primitive to manage audio playback in the browser. The primitives are easily composable and extended. To create your own audio element, consider using createAudioPlayer which allows you to supply a player instance that matches the built-in standard Audio API.
+Primitive to manage audio playback in the browser. The primitives are easily composable and extended. To create your own audio element, consider using makeAudioPlayer which allows you to supply a player instance that matches the built-in standard Audio API.
 
 Each primitive also exposes the audio instance for further custom extensions. Within an SSR context this audio primitive performs noops but never interrupts the process. Time values and durations are zero'd and in LOADING state.
 
@@ -23,20 +23,20 @@ yarn add @solid-primitives/audio
 
 ## How to use it
 
-### createAudioPlayer
+### makeAudio
 
 A foundational primitive with no player controls but exposes the raw player object.
 
 ```ts
-const { player } = createAudioPlayer("example.wav");
+const player = makeAudio("example.wav");
 ```
 
-### createAudio
+### makeAudioPlayer
 
 Provides a very basic interface for wrapping listeners to a supplied or default audio player.
 
 ```ts
-const { play, pause } = createAudio("example.wav");
+const { play, pause } = makeAudioPlayer("example.wav");
 ```
 
 ### createAudioManager
@@ -44,7 +44,9 @@ const { play, pause } = createAudio("example.wav");
 Creates a very basic audio/sound player.
 
 ```ts
-const { play, pause, duration, currentTime, seek, setVolume } = createAudioManager("example.wav");
+const [playing setPlaying] = createSignal(false);
+const { state, currentTime, duration } = createAudio('example.wav', playing);
+setPlaying(true);
 ```
 
 ## Demo
@@ -75,5 +77,9 @@ Added proper SSR and CJS support.
 1.1.8
 
 Updated to Solid 1.3.
+
+1.2.0
+
+Major improvements to bring package in line with project standards.
 
 </details>
