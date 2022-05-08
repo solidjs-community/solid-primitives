@@ -1,6 +1,6 @@
 import type { Accessor, Resource } from "solid-js";
-import { MaybeAccessor } from "@solid-primitives/utils";
 import { createComputed, batch, createSignal, onCleanup, createResource } from "solid-js";
+import { MaybeAccessor } from "@solid-primitives/utils";
 
 const geolocationDefaults: PositionOptions = {
   enableHighAccuracy: false,
@@ -68,8 +68,8 @@ export const createGeolocationWatcher = (
   // Implement as an effect to allow switching locator on/off
   createComputed(() => {
     if (
-      (typeof enabled === "function" && enabled()) ||
-      (typeof enabled !== "function" && enabled)
+      (enabled instanceof Function && enabled()) ||
+      (enabled instanceof Function && enabled)
     ) {
       return (registeredHandlerID = navigator.geolocation.watchPosition(
         res => batch(() => [setLocation(res.coords), error() && setError(null)]),

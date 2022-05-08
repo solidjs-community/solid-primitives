@@ -76,4 +76,8 @@ Changed to peerDependencies and updated to latest Solid.
 
 Improved tests and type dependencies.
 
+1.2.0
+
+Additional clean-up and tests improvements.
+
 </details>
