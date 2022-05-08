@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/refs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Library of primitives, components and directives for SolidJS that help managing references to JSX elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -13,6 +13,7 @@
     "name": "refs",
     "stage": 1,
     "list": [
+      "mergeRefs",
       "elements",
       "refs",
       "mapRemoved",
@@ -56,6 +57,7 @@
     "solid-register": "^0.2.5",
     "esbuild-plugin-solid": "^0.4.2",
     "solid-transition-group": "^0.0.8",
+    "@solid-primitives/keyed": "^0.1.0",
     "tslib": "^2.3.1",
     "tsup": "^5.11.11",
     "typescript": "^4.5.4",

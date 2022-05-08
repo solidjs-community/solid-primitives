@@ -7,7 +7,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/refs?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/refs)
 [![version](https://img.shields.io/npm/v/@solid-primitives/refs?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/refs)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Collection of primitives, components and directives that help managing references to JSX elements, keeping track of mounted/unmounted elements.
 
@@ -299,11 +299,34 @@ const [refs, setRefs] = createSignal<Element[]>([]);
 </Refs>
 ```
 
-## Demo
+#### Demo
 
 https://stackblitz.com/edit/solid-vite-unocss-bkbgap?file=index.tsx
 
 (run `npm start` in the terminal)
+
+## Types
+
+- [`RefProps`](#RefProps) - Component properties with types for `ref`
+- [`ResolvedChildren`](#ResolvedChildren) - Type of resolved JSX elements provided by Solid's `children` helper.
+
+### `RefProps`
+
+Component properties with types for `ref`
+
+```ts
+interface RefProps<T extends Element> {
+  ref?: T | ((el: T) => void);
+}
+```
+
+### `ResolvedChildren`
+
+Type of resolved JSX elements provided by Solid's `children` helper.
+
+```ts
+type ResolvedChildren = ResolvedJSXElement | ResolvedJSXElement[];
+```
 
 ## Changelog
 
@@ -313,5 +336,9 @@ https://stackblitz.com/edit/solid-vite-unocss-bkbgap?file=index.tsx
 0.0.100
 
 Initial release as a Stage-1 primitive.
+
+0.2.0
+
+Add `mergeRefs`
 
 </details>
