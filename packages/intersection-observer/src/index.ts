@@ -140,7 +140,7 @@ export const createVisibilityObserver = (
     },
     options
   );
-  if (typeof element === 'function') {
+  if (element instanceof Function) {
     createEffect(() => {
       reset();
       add(access(element));
@@ -187,8 +187,8 @@ export function createViewportObserver(
 export function createViewportObserver(...a: any) {
   let initial: [Element, EntryCallback][] = [];
   let options: IntersectionObserverInit = {};
-  if (Array.isArray(a[0]) || typeof a[0] === "function") {
-    if (typeof a[1] === "function") {
+  if (Array.isArray(a[0]) || a[0] instanceof Function) {
+    if (a[1] instanceof Function) {
       initial = access<Element[]>(a[0]).map(el => [el, a[1]]);
       options = a[2];
     } else {
@@ -202,7 +202,7 @@ export function createViewportObserver(...a: any) {
       const cb = callbacks.get(entry.target)?.(entry, instance);
       // Additional check to prevent errors when the user
       // use "observe" directive without providing a callback
-      typeof cb === "function" && cb(entry, instance);
+      cb instanceof Function && cb(entry, instance);
     });
   const{ add, remove, stop, instance } = makeIntersectionObserver([], onChange, options);
   const addEntry: AddViewportObserverEntry = (el, callback) => {
