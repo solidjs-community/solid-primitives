@@ -1,5 +1,5 @@
-import { createSignal, Accessor, batch, onMount, onCleanup, createEffect } from "solid-js";
-import { createStore, Store } from "solid-js/store";
+import { Accessor, batch, onMount, onCleanup, createEffect } from "solid-js";
+import { createStaticStore } from "@solid-primitives/utils";
 
 // Set of control enums
 export enum AudioState {
@@ -109,12 +109,12 @@ export const createAudio = (
   src: AudioSource,
   playing: Accessor<boolean>,
   volume?: Accessor<number>
-): Store<{
+): {
   state: AudioState,
   currentTime: number,
   duration: number
-}> => {
-  const [store, setStore] = createStore({
+} => {
+  const [store, setStore] = createStaticStore({
     currentTime: 0,
     duration: 0,
     state: AudioState.STOPPED,
