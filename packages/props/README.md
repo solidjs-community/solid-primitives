@@ -25,9 +25,9 @@ You can either create a single prop:
 
 ```ts
 // Second argument can be initialValue for boolean, number, string:
-const [string, setString, stringField] = createProp("stringValue", "test");
+const [string, setString, stringField] = createTestProp("stringValue", "test");
 // Arrays or enums can be provided in an options object:
-const [language, setLanguage, languageField] = createProp(
+const [language, setLanguage, languageField] = createTestProp(
   "language",
   { initialValue: "en", options: ["de", "en", "fr", "it"] as const }
   // If you want your array to be able to influence the setter/getter types, use `as const`.
@@ -41,7 +41,7 @@ enum Currency {
   JPY,
   CNY
 }
-const [currency, setCurrency, currencyField] = createProp("currency", {
+const [currency, setCurrency, currencyField] = createTestProp("currency", {
   initialValue: Currency.USD,
   options: Currency
 });
@@ -54,7 +54,7 @@ or multiple props in one call:
 ```ts
 enum Test { One, Two, Three };
 const languages = ['de', 'en', 'fr', 'it'] as const;
-const [props, fields] = createProps({
+const [props, fields] = createTestProps({
   boolean: true,
   number: 42,
   string: 'text',

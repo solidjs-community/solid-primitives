@@ -1,13 +1,13 @@
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createRoot } from "solid-js";
-import { createProp, createProps } from "../src";
+import { createTestProp, createTestProps } from "../src";
 
-const test = suite("createProp(s)");
+const test = suite("createTestProp(s)");
 
 test("will output a boolean prop signal and a field", () =>
   createRoot(dispose => {
-    const [value, setValue, field] = createProp("value", true);
+    const [value, setValue, field] = createTestProp("value", true);
     assert.is(value(), true);
     setValue(false);
     assert.is(value(), false);
@@ -24,7 +24,7 @@ test("will output a boolean prop signal and a field", () =>
 
 test("will output a number prop signal and a field", () =>
   createRoot(dispose => {
-    const [value, setValue, field] = createProp("value", 1);
+    const [value, setValue, field] = createTestProp("value", 1);
     assert.is(value(), 1);
     setValue(7);
     assert.is(value(), 7);
@@ -41,7 +41,7 @@ test("will output a number prop signal and a field", () =>
 
 test("will output a string prop signal and a field", () =>
   createRoot(dispose => {
-    const [value, setValue, field] = createProp("value", "prop");
+    const [value, setValue, field] = createTestProp("value", "prop");
     assert.is(value(), "prop");
     setValue("primitive");
     assert.is(value(), "primitive");
@@ -59,7 +59,7 @@ test("will output a string prop signal and a field", () =>
 test("will output a select prop signal and a field from array", () =>
   createRoot(dispose => {
     const languages = ["de", "en", "it", "pl"];
-    const [value, setValue, field] = createProp("value", {
+    const [value, setValue, field] = createTestProp("value", {
       initialValue: "en",
       options: languages
     });
@@ -85,7 +85,7 @@ test("will output a select prop signal and a field from enum", () =>
       Two,
       Three
     }
-    const [value, setValue, field] = createProp("enum", {
+    const [value, setValue, field] = createTestProp("enum", {
       initialValue: Test.Two,
       options: Test
     });
@@ -103,7 +103,7 @@ test("will output a select prop signal and a field from enum", () =>
     dispose();
   }));
 
-test("will create multiple props with createProps", () =>
+test("will create multiple props with createTestProps", () =>
   createRoot(dispose => {
     const languages = ["de", "en", "it", "pl"] as const;
     enum Test {
@@ -112,7 +112,7 @@ test("will create multiple props with createProps", () =>
       Two,
       Three
     }
-    const [props, fields] = createProps({
+    const [props, fields] = createTestProps({
       boolean: true,
       number: 42,
       string: "text",
