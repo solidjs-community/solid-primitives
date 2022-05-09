@@ -9,7 +9,10 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/props?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/props)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Creates a primitive to provide props signals for simple component testing
+Library of primitives focused around component props.
+
+- [`combineProps`](#combineProps) - Reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
+- [`createProps`](#createProps) - Provides controllable props signals like knobs/controls for simple component testing.
 
 ## Installation
 
@@ -19,7 +22,61 @@ npm install @solid-primitives/props
 yarn add @solid-primitives/props
 ```
 
-## How to use it
+## `combineProps`
+
+A helper that reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
+
+Event handlers _(onClick, onMouseMove)_, custom events _(onTodoComplete)_, and refs _(props.ref)_ are chained.
+
+`class`, `className`, `classList` and `style` are combined.
+
+For all other props, the last prop object overrides all previous ones. Similarly to Solid's [mergeProps](https://www.solidjs.com/docs/latest/api#mergeprops).
+
+### How to use it
+
+```tsx
+import { combineProps } from "@solid-primitives/props";
+
+const MyButton: Component<ButtonProps> = props => {
+  // primitives of a lot of headless ui libraries will provide props to spread
+  const { buttonProps } = createButton();
+  // they can be combined with user's props easily
+  const combined = combineProps(props, buttonProps);
+
+  return <button {...combined} />;
+};
+
+// component consumer can provide button props
+// they will be combined with those provided by createButton() primitive
+<MyButton style={{ margin: "24px" }} />;
+```
+
+### Additional helpers
+
+A couple of lower-lever helpers that power `combineProps`:
+
+#### `stringStyleToObject`
+
+```ts
+const styles = stringStyleToObject("margin: 24px; border: 1px solid #121212");
+styles; // { margin: "24px", border: "1px solid #121212" }
+```
+
+#### `combineStyle`
+
+```ts
+const styles = combineStyle("margin: 24px; border: 1px solid #121212", {
+  margin: "2rem",
+  padding: "16px"
+});
+styles; // { margin: "2rem", border: "1px solid #121212", padding: "16px" }
+```
+
+## `createProps`
+
+Primitive that provides controllable props signals like knobs/controls for simple component testing
+
+### How to use it
 
 You can either create a single prop:
 
@@ -78,7 +135,7 @@ props == {
 fields == JSX.Element[];
 ```
 
-## Demo
+### Demo
 
 TODO
 
@@ -94,5 +151,11 @@ Initial release
 1.0.2
 
 Release initial version with CJS support.
+
+2.0.0
+
+Renamed `createProps` to `createTestProps`, `createProp` to `createTestProp` etc. (for all of the primitives focused on testing)
+
+Added `combineProps`
 
 </details>
