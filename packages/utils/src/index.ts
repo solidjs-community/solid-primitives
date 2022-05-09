@@ -47,6 +47,17 @@ export function isObject(value: any): value is AnyObject {
 
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
 
+/**
+ * Returns a function that will call all functions in the order they were chained with the same arguments.
+ */
+export function chain<Args extends [] | any[]>(
+  ...callbacks: ((...args: Args) => any)[]
+): (...args: Args) => void {
+  return (...args: Args) => {
+    for (const callback of callbacks) callback(...args);
+  };
+}
+
 export const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
 
 /**
