@@ -13,7 +13,7 @@ test("will output a boolean prop signal and a field", () =>
     assert.is(value(), false);
     const label = field({}) as HTMLLabelElement;
     assert.instance(label, HTMLLabelElement);
-    const input = label.querySelector("input");
+    const input = label.querySelector("input")!;
     assert.instance(input, HTMLInputElement);
     assert.is(input.checked, false);
     input.checked = true;
@@ -30,7 +30,7 @@ test("will output a number prop signal and a field", () =>
     assert.is(value(), 7);
     const label = field({}) as HTMLLabelElement;
     assert.instance(label, HTMLLabelElement);
-    const input = label.querySelector("input");
+    const input = label.querySelector("input")!;
     assert.instance(input, HTMLInputElement);
     assert.is(input.valueAsNumber, 7);
     input.valueAsNumber = 42;
@@ -47,7 +47,7 @@ test("will output a string prop signal and a field", () =>
     assert.is(value(), "primitive");
     const label = field({}) as HTMLLabelElement;
     assert.instance(label, HTMLLabelElement);
-    const input = label.querySelector("input");
+    const input = label.querySelector("input")!;
     assert.instance(input, HTMLInputElement);
     assert.is(input.value, "primitive");
     input.value = "works";
@@ -68,7 +68,7 @@ test("will output a select prop signal and a field from array", () =>
     assert.is(value(), "pl");
     const label = field({}) as HTMLLabelElement;
     assert.instance(label, HTMLLabelElement);
-    const select = label.querySelector("select");
+    const select = label.querySelector("select")!;
     assert.instance(select, HTMLSelectElement);
     assert.is(select.selectedOptions[0].innerHTML, "pl");
     select.selectedIndex = 0;
@@ -94,7 +94,7 @@ test("will output a select prop signal and a field from enum", () =>
     assert.is(value(), Test.One);
     const label = field({}) as HTMLLabelElement;
     assert.instance(label, HTMLLabelElement);
-    const select = label.querySelector("select");
+    const select = label.querySelector("select")!;
     assert.instance(select, HTMLSelectElement);
     assert.is(select.selectedOptions[0].innerHTML, "One");
     select.selectedIndex = 0;
@@ -136,11 +136,11 @@ test("will create multiple props with createTestProps", () =>
     assert.is(props.enum(), Test.Zero);
     const div = document.createElement("div");
     fields.forEach(field => div.appendChild(field as HTMLLabelElement));
-    const booleanInput: HTMLInputElement = div.querySelector('input[type="checkbox"]');
-    const numberInput: HTMLInputElement = div.querySelector('input[type="number"]');
-    const stringInput: HTMLInputElement = div.querySelector('input[type="text"]');
-    const arraySelect: HTMLSelectElement = div.querySelector("select");
-    const enumSelect: HTMLSelectElement = div.querySelector("label:last-child select");
+    const booleanInput: HTMLInputElement = div.querySelector('input[type="checkbox"]')!;
+    const numberInput: HTMLInputElement = div.querySelector('input[type="number"]')!;
+    const stringInput: HTMLInputElement = div.querySelector('input[type="text"]')!;
+    const arraySelect: HTMLSelectElement = div.querySelector("select")!;
+    const enumSelect: HTMLSelectElement = div.querySelector("label:last-child select")!;
     assert.instance(booleanInput, HTMLInputElement);
     assert.instance(numberInput, HTMLInputElement);
     assert.instance(stringInput, HTMLInputElement);

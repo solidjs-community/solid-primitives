@@ -1,8 +1,8 @@
-import { AnyObject, chain } from "@solid-primitives/utils";
+import { AnyFunction, AnyObject, chain } from "@solid-primitives/utils";
 import { JSX, mergeProps } from "solid-js";
 import { MergeProps } from "./utils";
 
-const extractCSSregex = /([^:; ]*):\s*([^;]*)/g;
+const extractCSSregex = /([^:; ]*):\s*([^;\n]*)/g;
 
 export function stringStyleToObject(style: string): JSX.CSSProperties {
   const object: Record<string, string> = {};
@@ -34,25 +34,26 @@ export function combineStyle(
 
 type EventPropKeys<T extends string> = T extends `on${string}` ? T : never;
 
-type CombinePropsInputOf<El extends Element> = {
+type CombinePropsInput = {
   class?: string;
   className?: string;
   classList?: Record<string, boolean | undefined>;
   style?: JSX.CSSProperties | string;
-  ref?: El | ((el: El) => void);
+  ref?: Element | ((el: any) => void);
 } & {
-  [K in EventPropKeys<keyof JSX.DOMAttributes<El>>]?: JSX.DOMAttributes<El>[K];
-};
+  [K in EventPropKeys<keyof JSX.DOMAttributes<Element>>]?: JSX.DOMAttributes<Element>[K];
+} & Record<PropertyKey, any>;
 
-export type CombinePropsInput = CombinePropsInputOf<Element>;
-
-export type CombineProps<T extends AnyObject> = {
+type CombineProps<T extends AnyObject> = {
   [K in keyof T]: K extends "style" ? JSX.CSSProperties | string : T[K];
 };
 
 export function combineProps<T extends CombinePropsInput[]>(
   ...sources: T
 ): CombineProps<MergeProps<T>> {
+  if (sources.length === 0) return {} as CombineProps<MergeProps<T>>;
+  if (sources.length === 1) return sources[0] as CombineProps<MergeProps<T>>;
+
   const merge = mergeProps(...sources) as CombineProps<MergeProps<T>>;
 
   const reduce = <K extends keyof CombinePropsInput>(
@@ -61,12 +62,15 @@ export function combineProps<T extends CombinePropsInput[]>(
       a: NonNullable<CombinePropsInput[K]>,
       b: NonNullable<CombinePropsInput[K]>
     ) => CombinePropsInput[K]
-  ): CombinePropsInput[K] =>
-    sources.reduce((a, props) => {
-      if (!a) return props[key];
-      if (!props[key]) return a;
-      return calc(a!, props[key]!);
-    }, sources[0]?.[key]);
+  ) => {
+    let v: CombinePropsInput[K] = undefined;
+    for (const props of sources) {
+      const propV = props[key];
+      if (!v) v = propV;
+      else if (propV) v = calc(v, propV);
+    }
+    return v;
+  };
 
   return new Proxy(merge, {
     get(target, key) {
@@ -82,14 +86,20 @@ export function combineProps<T extends CombinePropsInput[]>(
           key[1] === "n" &&
           key.charCodeAt(2) >= /* 'A' */ 65 &&
           key.charCodeAt(2) <= /* 'Z' */ 90)
-      )
-        return reduce(key as any, chain);
+      ) {
+        const callbacks: AnyFunction[] = [];
+        for (const props of sources) {
+          const cb = props[key as "onClick"];
+          if (cb) callbacks.push(cb as AnyFunction);
+        }
+        return chain(...callbacks);
+      }
 
       // Merge classes or classNames
-      if (key === "class" || key === "className") reduce(key, (a, b) => `${a} ${b}`);
+      if (key === "class" || key === "className") return reduce(key, (a, b) => `${a} ${b}`);
 
       // Merge classList objects, keys in the last object overrides all previous ones.
-      if (key === "classList") reduce(key, (a, b) => ({ ...a, ...b }));
+      if (key === "classList") return reduce(key, (a, b) => ({ ...a, ...b }));
 
       return Reflect.get(target, key);
     }
