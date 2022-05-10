@@ -1,2 +1,2 @@
-export * from "./testProps";
+export * from "./controlledProps";
 export * from "./combineProps";

@@ -1,13 +1,13 @@
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createRoot } from "solid-js";
-import { createTestProp, createTestProps } from "../src";
+import { createControlledProp, createControlledProps } from "../src";
 
 const test = suite("createTestProp(s)");
 
 test("will output a boolean prop signal and a field", () =>
   createRoot(dispose => {
-    const [value, setValue, field] = createTestProp("value", true);
+    const [value, setValue, field] = createControlledProp("value", true);
     assert.is(value(), true);
     setValue(false);
     assert.is(value(), false);
@@ -24,7 +24,7 @@ test("will output a boolean prop signal and a field", () =>
 
 test("will output a number prop signal and a field", () =>
   createRoot(dispose => {
-    const [value, setValue, field] = createTestProp("value", 1);
+    const [value, setValue, field] = createControlledProp("value", 1);
     assert.is(value(), 1);
     setValue(7);
     assert.is(value(), 7);
@@ -41,7 +41,7 @@ test("will output a number prop signal and a field", () =>
 
 test("will output a string prop signal and a field", () =>
   createRoot(dispose => {
-    const [value, setValue, field] = createTestProp("value", "prop");
+    const [value, setValue, field] = createControlledProp("value", "prop");
     assert.is(value(), "prop");
     setValue("primitive");
     assert.is(value(), "primitive");
@@ -59,7 +59,7 @@ test("will output a string prop signal and a field", () =>
 test("will output a select prop signal and a field from array", () =>
   createRoot(dispose => {
     const languages = ["de", "en", "it", "pl"];
-    const [value, setValue, field] = createTestProp("value", {
+    const [value, setValue, field] = createControlledProp("value", {
       initialValue: "en",
       options: languages
     });
@@ -85,7 +85,7 @@ test("will output a select prop signal and a field from enum", () =>
       Two,
       Three
     }
-    const [value, setValue, field] = createTestProp("enum", {
+    const [value, setValue, field] = createControlledProp("enum", {
       initialValue: Test.Two,
       options: Test
     });
@@ -112,7 +112,7 @@ test("will create multiple props with createTestProps", () =>
       Two,
       Three
     }
-    const [props, fields] = createTestProps({
+    const [props, fields] = createControlledProps({
       boolean: true,
       number: 42,
       string: "text",

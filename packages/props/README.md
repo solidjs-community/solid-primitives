@@ -82,9 +82,9 @@ You can either create a single prop:
 
 ```ts
 // Second argument can be initialValue for boolean, number, string:
-const [string, setString, stringField] = createTestProp("stringValue", "test");
+const [string, setString, stringField] = createControlledProp("stringValue", "test");
 // Arrays or enums can be provided in an options object:
-const [language, setLanguage, languageField] = createTestProp(
+const [language, setLanguage, languageField] = createControlledProp(
   "language",
   { initialValue: "en", options: ["de", "en", "fr", "it"] as const }
   // If you want your array to be able to influence the setter/getter types, use `as const`.
@@ -98,7 +98,7 @@ enum Currency {
   JPY,
   CNY
 }
-const [currency, setCurrency, currencyField] = createTestProp("currency", {
+const [currency, setCurrency, currencyField] = createControlledProp("currency", {
   initialValue: Currency.USD,
   options: Currency
 });
@@ -111,7 +111,7 @@ or multiple props in one call:
 ```ts
 enum Test { One, Two, Three };
 const languages = ['de', 'en', 'fr', 'it'] as const;
-const [props, fields] = createTestProps({
+const [props, fields] = createControlledProps({
   boolean: true,
   number: 42,
   string: 'text',
@@ -152,10 +152,10 @@ Initial release
 
 Release initial version with CJS support.
 
-2.0.0
+2.0.0 - [PR#127](https://github.com/solidjs-community/solid-primitives/pull/127)
 
-Renamed `createProps` to `createTestProps`, `createProp` to `createTestProp` etc. (for all of the primitives focused on testing)
+Renamed `createProps` to `createControlledProps`, `createProp` to `createControlledProp` etc. (for all of the primitives focused on testing)
 
-Added `combineProps`
+Added `combineProps` primitive
 
 </details>

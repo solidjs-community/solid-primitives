@@ -17,7 +17,7 @@
     "stage": 3,
     "list": [
       "combineProps",
-      "createProps"
+      "createControlledProps"
     ],
     "category": "Utilities"
   },
