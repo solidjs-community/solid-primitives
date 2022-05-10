@@ -77,6 +77,15 @@ export type Definite<T> = {
   [K in keyof T]-?: T[K];
 };
 
+/** Unwraps the type definition of an object, making it more readable */
+export type Simplify<T> = T extends object ? { [K in keyof T]: T[K] } : T;
+/** Unboxes type definition, making it more readable */
+export type UnboxLazy<T> = T extends () => infer U ? U : T;
+/** Get the required keys of an object */
+export type RequiredKeys<T> = keyof {
+  [K in keyof T as T extends { [_ in K]: unknown } ? K : never]: 0;
+};
+
 /** `A | B => A & B` */
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
   k: infer I

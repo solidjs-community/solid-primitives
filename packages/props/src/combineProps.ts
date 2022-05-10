@@ -1,6 +1,12 @@
-import { AnyFunction, AnyObject, chain } from "@solid-primitives/utils";
+import {
+  AnyFunction,
+  AnyObject,
+  chain,
+  RequiredKeys,
+  Simplify,
+  UnboxLazy
+} from "@solid-primitives/utils";
 import { JSX, mergeProps } from "solid-js";
-import { MergeProps } from "./utils";
 
 const extractCSSregex = /([^:; ]*):\s*([^;\n]*)/g;
 
@@ -20,7 +26,13 @@ export function stringStyleToObject(style: string): JSX.CSSProperties {
 }
 
 /**
- * Combines two set of styles together. Accepts both string and object styles.
+ * Combines two set of styles together. Accepts both string and object styles.\
+ * @example
+ * const styles = combineStyle("margin: 24px; border: 1px solid #121212", {
+ *   margin: "2rem",
+ *   padding: "16px"
+ * });
+ * styles; // { margin: "2rem", border: "1px solid #121212", padding: "16px" }
  */
 export function combineStyle(a: string, b: string): string;
 export function combineStyle(a: JSX.CSSProperties, b: JSX.CSSProperties): JSX.CSSProperties;
@@ -41,21 +53,48 @@ export function combineStyle(
   return { ...objA, ...objB };
 }
 
-type EventPropKeys<T extends string> = T extends `on${string}` ? T : never;
-
-type CombinePropsInput = {
+type PropsInput = {
   class?: string;
   className?: string;
   classList?: Record<string, boolean | undefined>;
   style?: JSX.CSSProperties | string;
   ref?: Element | ((el: any) => void);
-} & {
-  [K in EventPropKeys<keyof JSX.DOMAttributes<Element>>]?: JSX.DOMAttributes<Element>[K];
-} & Record<PropertyKey, any>;
+} & AnyObject;
 
-type CombineProps<T extends AnyObject> = {
-  [K in keyof T]: K extends "style" ? JSX.CSSProperties | string : T[K];
+type OverrideProp<T, U, K extends keyof U> =
+  | Exclude<U[K], undefined>
+  | (undefined extends U[K] ? (K extends keyof T ? T[K] : undefined) : never);
+
+type Override<T, U> = {
+  // all keys in T which are not overridden by U
+  [K in keyof Omit<T, RequiredKeys<U>>]: T[K] | Exclude<U[K & keyof U], undefined>;
+} & {
+  // all keys in U except those which are merged into T
+  [K in keyof Omit<U, Exclude<keyof T, RequiredKeys<U>>>]: K extends `on${infer R}`
+    ? R extends Capitalize<R>
+      ? K extends keyof T
+        ? T[K] extends AnyFunction
+          ? (
+              ...args: U[K] extends AnyFunction
+                ? Parameters<T[K]> & Parameters<U[K]>
+                : Parameters<T[K]>
+            ) => void
+          : OverrideProp<T, U, K>
+        : OverrideProp<T, U, K>
+      : UnboxLazy<OverrideProp<T, U, K>>
+    : UnboxLazy<OverrideProp<T, U, K>>;
 };
+
+type MergeProps<T extends unknown[], Curr = {}> = T extends [infer Next, ...infer Rest]
+  ? MergeProps<
+      Rest,
+      Next extends object ? (Next extends Function ? Curr : Override<Curr, UnboxLazy<Next>>) : Curr
+    >
+  : Simplify<Curr>;
+
+export type CombineProps<T extends PropsInput[]> = Simplify<{
+  [K in keyof MergeProps<T>]: K extends "style" ? JSX.CSSProperties | string : MergeProps<T>[K];
+}>;
 
 /**
  * A helper that reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
@@ -75,22 +114,17 @@ type CombineProps<T extends AnyObject> = {
  * <MyButton style={{ margin: "24px" }} />
  * ```
  */
-export function combineProps<T extends CombinePropsInput[]>(
-  ...sources: T
-): CombineProps<MergeProps<T>> {
-  if (sources.length === 0) return {} as CombineProps<MergeProps<T>>;
-  if (sources.length === 1) return sources[0] as CombineProps<MergeProps<T>>;
+export function combineProps<T extends PropsInput[]>(...sources: T): CombineProps<T> {
+  if (sources.length === 0) return {} as CombineProps<T>;
+  if (sources.length === 1) return sources[0] as CombineProps<T>;
 
-  const merge = mergeProps(...sources) as CombineProps<MergeProps<T>>;
+  const merge = mergeProps(...sources) as CombineProps<T>;
 
-  const reduce = <K extends keyof CombinePropsInput>(
+  const reduce = <K extends keyof PropsInput>(
     key: K,
-    calc: (
-      a: NonNullable<CombinePropsInput[K]>,
-      b: NonNullable<CombinePropsInput[K]>
-    ) => CombinePropsInput[K]
+    calc: (a: NonNullable<PropsInput[K]>, b: NonNullable<PropsInput[K]>) => PropsInput[K]
   ) => {
-    let v: CombinePropsInput[K] = undefined;
+    let v: PropsInput[K] = undefined;
     for (const props of sources) {
       const propV = props[key];
       if (!v) v = propV;
@@ -117,7 +151,7 @@ export function combineProps<T extends CombinePropsInput[]>(
         const callbacks: AnyFunction[] = [];
         for (const props of sources) {
           const cb = props[key as "onClick"];
-          if (cb) callbacks.push(cb as AnyFunction);
+          if (typeof cb === "function") callbacks.push(cb as AnyFunction);
         }
         return chain(...callbacks);
       }
@@ -132,3 +166,51 @@ export function combineProps<T extends CombinePropsInput[]>(
     }
   });
 }
+
+// const com = combineProps(
+//   {
+//     onclick: 123,
+//     onClick: 123,
+//     onHover: (n: string) => 213,
+//     something: "foo",
+//     style: { margin: "24px" },
+//     once: true
+//   },
+//   {
+//     onClick: () => "fo",
+//     onHover: 123,
+//     onclick: "ovv"
+//   },
+//   {
+//     onClick: "noo",
+//     onHover: (n: number) => "foo",
+//     onMount: (fn: VoidFunction) => undefined
+//   }
+// );
+// com.onclick;
+// com.once;
+// com.onClick;
+// com.onHover;
+// com.onMount;
+// com.something;
+// com.style;
+
+// const cm1 = combineProps({} as JSX.IntrinsicElements['div'], {
+//   onclick: 123,
+//   onClick: 123,
+//   onHover: (n: string) => 213,
+//   something: "foo",
+//   style: { margin: "24px" },
+//   once: true
+// },
+// {
+//   onClick: () => "fo",
+//   onHover: 123,
+//   onclick: "ovv"
+// },
+// {
+//   onClick: "noo",
+//   onHover: (n: number) => "foo",
+//   onMount: (fn: VoidFunction) => undefined
+// })
+// cm1.onClick

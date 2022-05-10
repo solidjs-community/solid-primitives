@@ -26,7 +26,7 @@ yarn add @solid-primitives/props
 
 A helper that reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
 
-Event handlers _(onClick, onMouseMove)_, custom events _(onTodoComplete)_, and refs _(props.ref)_ are chained.
+Event handlers _(onClick, onMouseMove)_, **(every function property with name mathing `on[A-Z].\*` get's chained – lowercase like "onclick" will NOT)** and refs _(props.ref)_ are chained.
 
 `class`, `className`, `classList` and `style` are combined.
 
