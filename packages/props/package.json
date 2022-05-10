@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/props",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Library of primitives focused around component props.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
@@ -44,7 +44,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^1.5.0"
+    "@solid-primitives/utils": "^1.5.1"
   },
   "devDependencies": {
     "esbuild-plugin-solid": "^0.4.2",
