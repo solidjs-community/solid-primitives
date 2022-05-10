@@ -1,19 +1,19 @@
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createRoot } from "solid-js";
-import { createProp, createProps } from "../src";
+import { createControlledProp, createControlledProps } from "../src";
 
-const test = suite("createProp(s)");
+const test = suite("createTestProp(s)");
 
 test("will output a boolean prop signal and a field", () =>
   createRoot(dispose => {
-    const [value, setValue, field] = createProp("value", true);
+    const [value, setValue, field] = createControlledProp("value", true);
     assert.is(value(), true);
     setValue(false);
     assert.is(value(), false);
     const label = field({}) as HTMLLabelElement;
     assert.instance(label, HTMLLabelElement);
-    const input = label.querySelector("input");
+    const input = label.querySelector("input")!;
     assert.instance(input, HTMLInputElement);
     assert.is(input.checked, false);
     input.checked = true;
@@ -24,13 +24,13 @@ test("will output a boolean prop signal and a field", () =>
 
 test("will output a number prop signal and a field", () =>
   createRoot(dispose => {
-    const [value, setValue, field] = createProp("value", 1);
+    const [value, setValue, field] = createControlledProp("value", 1);
     assert.is(value(), 1);
     setValue(7);
     assert.is(value(), 7);
     const label = field({}) as HTMLLabelElement;
     assert.instance(label, HTMLLabelElement);
-    const input = label.querySelector("input");
+    const input = label.querySelector("input")!;
     assert.instance(input, HTMLInputElement);
     assert.is(input.valueAsNumber, 7);
     input.valueAsNumber = 42;
@@ -41,13 +41,13 @@ test("will output a number prop signal and a field", () =>
 
 test("will output a string prop signal and a field", () =>
   createRoot(dispose => {
-    const [value, setValue, field] = createProp("value", "prop");
+    const [value, setValue, field] = createControlledProp("value", "prop");
     assert.is(value(), "prop");
     setValue("primitive");
     assert.is(value(), "primitive");
     const label = field({}) as HTMLLabelElement;
     assert.instance(label, HTMLLabelElement);
-    const input = label.querySelector("input");
+    const input = label.querySelector("input")!;
     assert.instance(input, HTMLInputElement);
     assert.is(input.value, "primitive");
     input.value = "works";
@@ -59,7 +59,7 @@ test("will output a string prop signal and a field", () =>
 test("will output a select prop signal and a field from array", () =>
   createRoot(dispose => {
     const languages = ["de", "en", "it", "pl"];
-    const [value, setValue, field] = createProp("value", {
+    const [value, setValue, field] = createControlledProp("value", {
       initialValue: "en",
       options: languages
     });
@@ -68,7 +68,7 @@ test("will output a select prop signal and a field from array", () =>
     assert.is(value(), "pl");
     const label = field({}) as HTMLLabelElement;
     assert.instance(label, HTMLLabelElement);
-    const select = label.querySelector("select");
+    const select = label.querySelector("select")!;
     assert.instance(select, HTMLSelectElement);
     assert.is(select.selectedOptions[0].innerHTML, "pl");
     select.selectedIndex = 0;
@@ -85,7 +85,7 @@ test("will output a select prop signal and a field from enum", () =>
       Two,
       Three
     }
-    const [value, setValue, field] = createProp("enum", {
+    const [value, setValue, field] = createControlledProp("enum", {
       initialValue: Test.Two,
       options: Test
     });
@@ -94,7 +94,7 @@ test("will output a select prop signal and a field from enum", () =>
     assert.is(value(), Test.One);
     const label = field({}) as HTMLLabelElement;
     assert.instance(label, HTMLLabelElement);
-    const select = label.querySelector("select");
+    const select = label.querySelector("select")!;
     assert.instance(select, HTMLSelectElement);
     assert.is(select.selectedOptions[0].innerHTML, "One");
     select.selectedIndex = 0;
@@ -103,7 +103,7 @@ test("will output a select prop signal and a field from enum", () =>
     dispose();
   }));
 
-test("will create multiple props with createProps", () =>
+test("will create multiple props with createTestProps", () =>
   createRoot(dispose => {
     const languages = ["de", "en", "it", "pl"] as const;
     enum Test {
@@ -112,7 +112,7 @@ test("will create multiple props with createProps", () =>
       Two,
       Three
     }
-    const [props, fields] = createProps({
+    const [props, fields] = createControlledProps({
       boolean: true,
       number: 42,
       string: "text",
@@ -136,11 +136,11 @@ test("will create multiple props with createProps", () =>
     assert.is(props.enum(), Test.Zero);
     const div = document.createElement("div");
     fields.forEach(field => div.appendChild(field as HTMLLabelElement));
-    const booleanInput: HTMLInputElement = div.querySelector('input[type="checkbox"]');
-    const numberInput: HTMLInputElement = div.querySelector('input[type="number"]');
-    const stringInput: HTMLInputElement = div.querySelector('input[type="text"]');
-    const arraySelect: HTMLSelectElement = div.querySelector("select");
-    const enumSelect: HTMLSelectElement = div.querySelector("label:last-child select");
+    const booleanInput: HTMLInputElement = div.querySelector('input[type="checkbox"]')!;
+    const numberInput: HTMLInputElement = div.querySelector('input[type="number"]')!;
+    const stringInput: HTMLInputElement = div.querySelector('input[type="text"]')!;
+    const arraySelect: HTMLSelectElement = div.querySelector("select")!;
+    const enumSelect: HTMLSelectElement = div.querySelector("label:last-child select")!;
     assert.instance(booleanInput, HTMLInputElement);
     assert.instance(numberInput, HTMLInputElement);
     assert.instance(stringInput, HTMLInputElement);

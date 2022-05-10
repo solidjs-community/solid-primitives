@@ -1,20 +1,22 @@
 import { createMemo, createSignal, For } from "solid-js";
 import type { Accessor, Component, JSX, Setter } from "solid-js";
 
-export type PropType = "boolean" | "number" | "string" | "object";
+export type TestPropType = "boolean" | "number" | "string" | "object";
 
-export type PropObjectOptions<T> = T[] | Record<string, T> | any;
+export type TestPropObjectOptions<T> = T[] | Record<string, T> | any;
 
-export type PropOptions<T> = (T extends undefined ? { initialValue?: T } : { initialValue: T }) & {
+export type TestPropOptions<T> = (T extends undefined
+  ? { initialValue?: T }
+  : { initialValue: T }) & {
   min?: T extends number ? number : undefined;
   max?: T extends number ? number : undefined;
-  options?: PropObjectOptions<T>;
-  type?: PropType;
+  options?: TestPropObjectOptions<T>;
+  type?: TestPropType;
 };
 
-export type PropReturn<T> = [value: Accessor<T>, setValue: Setter<T>, field: Component];
+export type TestPropReturn<T> = [value: Accessor<T>, setValue: Setter<T>, field: Component];
 
-export type PropProps<T> = {
+export type TestPropProps<T> = {
   name: string;
   value: Accessor<T>;
   setValue: Setter<T>;
@@ -22,7 +24,7 @@ export type PropProps<T> = {
   max?: T extends number ? number : undefined;
 };
 
-export const BoolProp: Component<PropProps<boolean>> = props => (
+export const BoolProp: Component<TestPropProps<boolean>> = props => (
   <label>
     <input
       type="checkbox"
@@ -34,7 +36,7 @@ export const BoolProp: Component<PropProps<boolean>> = props => (
   </label>
 );
 
-export const NumberProp: Component<PropProps<number>> = props => (
+export const NumberProp: Component<TestPropProps<number>> = props => (
   <label>
     <span>{props.name}</span>{" "}
     <input
@@ -48,7 +50,7 @@ export const NumberProp: Component<PropProps<number>> = props => (
   </label>
 );
 
-export const StringProp: Component<PropProps<string>> = props => (
+export const StringProp: Component<TestPropProps<string>> = props => (
   <label>
     <span>{props.name}</span>{" "}
     <input
@@ -79,7 +81,7 @@ const filterEnum = <O extends Record<string, any>>(
 };
 
 export const SelectProp = <T extends any>(
-  props: PropProps<T> & { options: PropObjectOptions<T> }
+  props: TestPropProps<T> & { options: TestPropObjectOptions<T> }
 ): JSX.Element => {
   const options = createMemo<[boolean | number | string, T][]>(() =>
     Array.isArray(props.options)
@@ -103,7 +105,7 @@ export const SelectProp = <T extends any>(
   );
 };
 
-const defaultInitialValues: Record<PropType & string, boolean | number | string | undefined> = {
+const defaultInitialValues: Record<TestPropType & string, boolean | number | string | undefined> = {
   boolean: false,
   number: 0,
   string: "",
@@ -117,45 +119,64 @@ const defaultInitialValues: Record<PropType & string, boolean | number | string 
  * @param options initialValue or Options object
  *
  * @example ```ts
- * createProp('value', 'test');
- * createProp('page', { initialValue: 7, min: 1, max: 99 });
- * createProp('language', {
+ * createControlledProp('value', 'test');
+ * createControlledProp('page', { initialValue: 7, min: 1, max: 99 });
+ * createControlledProp('language', {
  *   initialValue: 'en',
  *   options: ['en', 'de', 'it', 'jp', 'cn', 'xy']
  * });
  * // => { value: Accessor<string>, setValue: Setter<string>, field: Component }
  * ```
  */
-export function createProp<T extends undefined>(
+export function createControlledProp<T extends undefined>(
   name: string,
-  options?: PropOptions<T>
-): PropReturn<T>;
-export function createProp<T = boolean>(name: string, options: PropOptions<T> | T): PropReturn<T>;
-export function createProp<T = number>(name: string, options: PropOptions<T> | T): PropReturn<T>;
-export function createProp<T = string>(name: string, options: PropOptions<T> | T): PropReturn<T>;
-export function createProp<T = any>(name: string, options: PropOptions<T>): PropReturn<T>;
-export function createProp<T>(
+  options?: TestPropOptions<T>
+): TestPropReturn<T>;
+export function createControlledProp<T = boolean>(
   name: string,
-  options: T extends undefined ? never : T extends object ? PropOptions<T> : PropOptions<T> | T
-): PropReturn<T>;
-export function createProp<T>(name: string, options?: PropOptions<T> | T): PropReturn<T> {
+  options: TestPropOptions<T> | T
+): TestPropReturn<T>;
+export function createControlledProp<T = number>(
+  name: string,
+  options: TestPropOptions<T> | T
+): TestPropReturn<T>;
+export function createControlledProp<T = string>(
+  name: string,
+  options: TestPropOptions<T> | T
+): TestPropReturn<T>;
+export function createControlledProp<T = any>(
+  name: string,
+  options: TestPropOptions<T>
+): TestPropReturn<T>;
+export function createControlledProp<T>(
+  name: string,
+  options: T extends undefined
+    ? never
+    : T extends object
+    ? TestPropOptions<T>
+    : TestPropOptions<T> | T
+): TestPropReturn<T>;
+export function createControlledProp<T>(
+  name: string,
+  options?: TestPropOptions<T> | T
+): TestPropReturn<T> {
   const initialValue: T | undefined =
     options == null
       ? undefined
       : typeof options !== "object"
       ? (options as T)
-      : ((options as PropOptions<T>).initialValue as T | undefined) ??
+      : ((options as TestPropOptions<T>).initialValue as T | undefined) ??
         (defaultInitialValues[
-          ((options as PropOptions<T>).type as keyof typeof defaultInitialValues | undefined) ??
+          ((options as TestPropOptions<T>).type as keyof typeof defaultInitialValues | undefined) ??
             "object"
         ] as T | undefined);
 
   if (initialValue == null) {
     throw new Error(`cannot get type for Prop ${name}`);
   }
-  const propType = (options as PropOptions<T>)?.options
+  const propType = (options as TestPropOptions<T>)?.options
     ? "object"
-    : (options as PropOptions<T>)?.type ?? (typeof initialValue as PropType);
+    : (options as TestPropOptions<T>)?.type ?? (typeof initialValue as TestPropType);
 
   const [value, setValue] = createSignal<T>(initialValue, { name });
   return [
@@ -172,14 +193,16 @@ export function createProp<T>(name: string, options?: PropOptions<T> | T): PropR
             name,
             value: value as Accessor<T>,
             setValue: setValue as Setter<T>,
-            options: (options as PropOptions<T>).options ?? ([initialValue] as PropObjectOptions<T>)
+            options:
+              (options as TestPropOptions<T>).options ??
+              ([initialValue] as TestPropObjectOptions<T>)
           })
   ];
 }
 
-export type CreateProps = <
+export type CreateTestProps = <
   Props extends {
-    [name: string]: boolean | number | string | PropOptions<boolean | number | string | object>;
+    [name: string]: boolean | number | string | TestPropOptions<boolean | number | string | object>;
   }
 >(
   props: Props
@@ -211,7 +234,7 @@ export type CreateProps = <
 /**
  * creates reactive props for testing a component
  *
- * @param props {Record<string, PropOptions>}
+ * @param props {Record<string, TestPropOptions>}
  * @returns ```ts
  * [
  *   props: { [name: string]: Accessor<T>, [setName: string]: Setter<T> }
@@ -223,7 +246,7 @@ export type CreateProps = <
  * { count: Accessor<T>, getCount: Setter<T> }
  * ```
  * @example ```ts
- * const [props, fields] = createProps({
+ * const [props, fields] = createControlledProps({
  *   value: { initialValue: '' },
  *   disabled: { initialValue: false },
  *   invalid: { initialValue: false },
@@ -235,10 +258,10 @@ export type CreateProps = <
  * </>
  * ```
  */
-export const createProps: CreateProps = props =>
+export const createControlledProps: CreateTestProps = props =>
   Object.entries(props).reduce(
     (result, [name, options]) => {
-      const [value, setValue, field] = createProp(name, options as any);
+      const [value, setValue, field] = createControlledProp(name, options as any);
       result[0][name] = value;
       result[0][`set${name.slice(0, 1).toUpperCase()}${name.slice(1)}`] = setValue;
       result[1].push(field({}));
