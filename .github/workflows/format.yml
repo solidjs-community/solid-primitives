@@ -1,4 +1,4 @@
-name: Format
+name: Format and Update Readme
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  format:
+  format-and-update:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,3 +30,12 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "Format"
+
+      - name: Update Readme
+        run: pnpm run update-readme
+
+      - name: Add, Commit and Push
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Update Readme"
+          file_pattern: README.md
