@@ -24,9 +24,9 @@ yarn add @solid-primitives/props
 
 ## `combineProps`
 
-A helper that reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
+A helper that reactively merges multiple props objects together while smartly combining some of Solid's JSX/HTML attributes.
 
-Event handlers _(onClick, onMouseMove)_, **(every function property with name mathing `on[A-Z].\*` get's chained – lowercase like "onclick" will NOT)** and refs _(props.ref)_ are chained.
+Event handlers _(onClick, onclick, onMouseMove, onSomething)_, and refs _(props.ref)_ are chained.
 
 `class`, `className`, `classList` and `style` are combined.
 
@@ -49,6 +49,25 @@ const MyButton: Component<ButtonProps> = props => {
 // component consumer can provide button props
 // they will be combined with those provided by createButton() primitive
 <MyButton style={{ margin: "24px" }} />;
+```
+
+#### Chaining of event listeners
+
+Every [function/tuple](https://www.solidjs.com/docs/latest/api#on___) property with name mathing pattern `on.+` get's chained.
+
+**Warning:** The types may not always correctly represent the event handlers.
+
+```ts
+const combined = combineProps(
+  {
+    onClick: e => {},
+    onclick: e => {}
+  },
+  {
+    onClick: [(n, e) => {}, 123]
+  }
+);
+// combined.onClick() will call all 3 of the functions above
 ```
 
 ### Additional helpers
@@ -157,5 +176,9 @@ Release initial version with CJS support.
 Renamed `createProps` to `createControlledProps`, `createProp` to `createControlledProp` etc. (for all of the primitives focused on testing)
 
 Added `combineProps` primitive
+
+2.1.0
+
+Add support for tuple event handlers and de-dupeing to `combineProps`.
 
 </details>

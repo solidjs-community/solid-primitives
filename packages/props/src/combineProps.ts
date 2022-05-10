@@ -8,7 +8,14 @@ import {
 } from "@solid-primitives/utils";
 import { JSX, mergeProps } from "solid-js";
 
-const extractCSSregex = /([^:; ]*):\s*([^;\n]*)/g;
+const extractCSSregex = /([^:; ]*):\s*([^;]*)/g;
+
+const isEventListenerKey = (key: string): boolean =>
+  key[0] === "o" &&
+  key[1] === "n" &&
+  key.length > 2 &&
+  key[2] !== ":" &&
+  !key.startsWith("oncapture:");
 
 /**
  * converts inline string styles to object form
@@ -70,17 +77,11 @@ type Override<T, U> = {
   [K in keyof Omit<T, RequiredKeys<U>>]: T[K] | Exclude<U[K & keyof U], undefined>;
 } & {
   // all keys in U except those which are merged into T
-  [K in keyof Omit<U, Exclude<keyof T, RequiredKeys<U>>>]: K extends `on${infer R}`
-    ? R extends Capitalize<R>
-      ? K extends keyof T
-        ? T[K] extends AnyFunction
-          ? (
-              ...args: U[K] extends AnyFunction
-                ? Parameters<T[K]> & Parameters<U[K]>
-                : Parameters<T[K]>
-            ) => void
-          : OverrideProp<T, U, K>
-        : OverrideProp<T, U, K>
+  [K in keyof Omit<U, Exclude<keyof T, RequiredKeys<U>>>]: K extends `on${string}`
+    ? K extends keyof T
+      ? undefined extends U[K]
+        ? undefined
+        : Extract<Exclude<T[K], undefined> | U[K], AnyFunction | any[]>
       : UnboxLazy<OverrideProp<T, U, K>>
     : UnboxLazy<OverrideProp<T, U, K>>;
 };
@@ -133,27 +134,52 @@ export function combineProps<T extends PropsInput[]>(...sources: T): CombineProp
     return v;
   };
 
+  // create a map of event listeners to be chained
+  const listeners: Record<string, ((...args: any[]) => void)[]> = {};
+
+  for (const props of sources) {
+    for (const key in props) {
+      if (!isEventListenerKey(key)) continue;
+
+      const v = props[key];
+      const name = key.toLowerCase();
+
+      let callback: (...args: any[]) => void;
+      if (typeof v === "function") callback = v;
+      // jsx event listeners also accept a tuple [handler, arg]
+      else if (Array.isArray(v) && v.length === 2) callback = v[0].bind(void 0, v[1]);
+      else {
+        delete listeners[name];
+        continue;
+      }
+
+      const callbacks = listeners[name];
+      if (!callbacks) listeners[name] = [callback];
+      else callbacks.push(callback);
+    }
+  }
+
   return new Proxy(merge, {
     get(target, key) {
       if (typeof key !== "string") return Reflect.get(target, key);
 
+      // Combine style prop
       if (key === "style") return reduce("style", combineStyle);
 
-      // Chain events/ref assignments
-      if (
-        key === "ref" ||
-        // This is a lot faster than a regex.
-        (key[0] === "o" &&
-          key[1] === "n" &&
-          key.charCodeAt(2) >= /* 'A' */ 65 &&
-          key.charCodeAt(2) <= /* 'Z' */ 90)
-      ) {
-        const callbacks: AnyFunction[] = [];
+      // chain props.ref assignments
+      if (key === "ref") {
+        const callbacks: ((el: any) => void)[] = [];
         for (const props of sources) {
-          const cb = props[key as "onClick"];
-          if (typeof cb === "function") callbacks.push(cb as AnyFunction);
+          const cb = props[key] as ((el: any) => void) | undefined;
+          if (typeof cb === "function") callbacks.push(cb);
         }
         return chain(...callbacks);
+      }
+
+      // Chain event listeners
+      if (isEventListenerKey(key)) {
+        const callbacks = listeners[key.toLowerCase()];
+        return Array.isArray(callbacks) ? chain(...callbacks) : Reflect.get(target, key);
       }
 
       // Merge classes or classNames
@@ -169,48 +195,25 @@ export function combineProps<T extends PropsInput[]>(...sources: T): CombineProp
 
 // const com = combineProps(
 //   {
-//     onclick: 123,
-//     onClick: 123,
-//     onHover: (n: string) => 213,
+//     onSomething: 123,
+//     onWheel: (e: WheelEvent) => 213,
 //     something: "foo",
 //     style: { margin: "24px" },
-//     once: true
-//   },
-//   {
-//     onClick: () => "fo",
-//     onHover: 123,
-//     onclick: "ovv"
-//   },
-//   {
-//     onClick: "noo",
-//     onHover: (n: number) => "foo",
+//     once: true,
 //     onMount: (fn: VoidFunction) => undefined
+//   },
+//   {
+//     onSomething: [(n: number, s: string) => "fo", 123],
+//     once: "ovv"
+//   },
+//   {
+//     onWheel: (e: WheelEvent) => "foo",
+//     onMount: false
 //   }
 // );
-// com.onclick;
-// com.once;
-// com.onClick;
-// com.onHover;
-// com.onMount;
-// com.something;
-// com.style;
-
-// const cm1 = combineProps({} as JSX.IntrinsicElements['div'], {
-//   onclick: 123,
-//   onClick: 123,
-//   onHover: (n: string) => 213,
-//   something: "foo",
-//   style: { margin: "24px" },
-//   once: true
-// },
-// {
-//   onClick: () => "fo",
-//   onHover: 123,
-//   onclick: "ovv"
-// },
-// {
-//   onClick: "noo",
-//   onHover: (n: number) => "foo",
-//   onMount: (fn: VoidFunction) => undefined
-// })
-// cm1.onClick
+// com.onSomething; // (s: string) => void;
+// com.once; // string;
+// com.onWheel; // (n: WheelEvent) => void;
+// com.onMount; // false;
+// com.something; // string;
+// com.style; // string | JSX.CSSProperties;

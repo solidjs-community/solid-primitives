@@ -81,10 +81,16 @@ export type Definite<T> = {
 export type Simplify<T> = T extends object ? { [K in keyof T]: T[K] } : T;
 /** Unboxes type definition, making it more readable */
 export type UnboxLazy<T> = T extends () => infer U ? U : T;
+
 /** Get the required keys of an object */
 export type RequiredKeys<T> = keyof {
   [K in keyof T as T extends { [_ in K]: unknown } ? K : never]: 0;
 };
+
+/** Remove the first item of a tuple [1, 2, 3, 4] => [2, 3, 4] */
+export type Tail<T extends any[]> = ((...t: T) => void) extends (x: any, ...u: infer U) => void
+  ? U
+  : never;
 
 /** `A | B => A & B` */
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
