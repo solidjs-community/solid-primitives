@@ -122,7 +122,7 @@ Much of the design decisions in naming are best described in the [7 Lessons to O
 
 ### `make` (non-reactive) vs `create` (reactive)
 
-Solid uses the `create` prefix to define a primitive that provides reactive utility. Solid Primitives reinforces this pattern but in an effort to enhance composability we have also introduced the `make` prefix for identify non-reactive basic primitives. Having a non-reactive alternative means that the primitive does the bare essentials such as cleaning up events or interupting a process. ie. `makeTimer` will create and clean-up the scheduler, providing only a clear method. createTimer provides a properly reactive primitive that composes it.
+Solid uses the `create` prefix to define a primitive that provides reactive utility. Solid Primitives reinforces this pattern but in an effort to enhance composability we have also introduced the `make` prefix for identifying non-reactive foundation primitives. Having a non-reactive alternative means that the primitive does the bare essentials such as cleaning up events or interupting a process. ie. `makeTimer` will create and clean-up the scheduler, providing only a clear method. createTimer provides a properly reactive primitive that composes it.
 
 ### Managing Primitive Complexity
 
