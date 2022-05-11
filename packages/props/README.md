@@ -53,9 +53,11 @@ const MyButton: Component<ButtonProps> = props => {
 
 #### Chaining of event listeners
 
-Every [function/tuple](https://www.solidjs.com/docs/latest/api#on___) property with name mathing pattern `on.+` get's chained.
+Every [function/tuple](https://www.solidjs.com/docs/latest/api#on___) property with `on___` name get's chained. That could potentially include properties that are not actually event-listeners – such as `only` or `once`. Hence you should remove them from the props (with [splitProps](https://www.solidjs.com/docs/latest/api#splitprops)).
 
-**Warning:** The types may not always correctly represent the event handlers.
+Chained functions will always return `void`. If you want to get the returned value from a callback, you have to split those props and handle them yourself.
+
+**Warning:** The types for event-listeners often won't correctly represent the values. Chaining is meant only for DOM Events spreading to an element.
 
 ```ts
 const combined = combineProps(
@@ -69,6 +71,8 @@ const combined = combineProps(
 );
 // combined.onClick() will call all 3 of the functions above
 ```
+
+##### For better reference of how exactly `combineProps` works, see the [TESTS](https://github.com/solidjs-community/solid-primitives/blob/main/packages/props/test/combineProps.test.ts)
 
 ### Additional helpers
 

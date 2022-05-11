@@ -147,8 +147,10 @@ export function combineProps<T extends PropsInput[]>(...sources: T): CombineProp
       let callback: (...args: any[]) => void;
       if (typeof v === "function") callback = v;
       // jsx event listeners also accept a tuple [handler, arg]
-      else if (Array.isArray(v) && v.length === 2) callback = v[0].bind(void 0, v[1]);
-      else {
+      else if (Array.isArray(v)) {
+        if (v.length === 1) callback = v[0];
+        else callback = v[0].bind(void 0, v[1]);
+      } else {
         delete listeners[name];
         continue;
       }
