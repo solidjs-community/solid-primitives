@@ -29,9 +29,73 @@ test("combines handlers", async () => {
     const message3 = "click3";
 
     const combinedProps = combineProps(
+      { onEvent: () => mockFn(message1) },
+      { onEvent: () => mockFn(message2) },
+      { onEvent: () => mockFn(message3) }
+    );
+
+    combinedProps.onEvent();
+
+    assert.is(mockFn.callCount, 3);
+    assert.equal(mockFn.calls, [[message1], [message2], [message3]]);
+
+    dispose();
+  });
+});
+
+test("event handlers can be overwritten", async () => {
+  createRoot(async dispose => {
+    const mockFn = spy();
+    const message1 = "click1";
+    const message2 = "click2";
+    const message3 = "click3";
+
+    const combinedProps = combineProps(
+      { onEvent: () => mockFn(message1) },
+      { onEvent: () => mockFn(message2) },
+      { onEvent: "should ignore this" },
+      { onEvent: () => mockFn(message3) }
+    );
+
+    combinedProps.onEvent();
+
+    assert.is(mockFn.callCount, 1);
+    assert.equal(mockFn.calls, [[message3]]);
+
+    dispose();
+  });
+});
+
+test("last value overwrites the event-listeners", async () => {
+  createRoot(async dispose => {
+    const mockFn = spy();
+    const message1 = "click1";
+    const message2 = "click2";
+
+    const combinedProps = combineProps(
+      { onEvent: () => mockFn(message1) },
+      { onEvent: () => mockFn(message2) },
+      { onEvent: "overwrites" },
+      {}
+    );
+
+    assert.is(combinedProps.onEvent, "overwrites");
+
+    dispose();
+  });
+});
+
+test("handles tuples as event handlers", () =>
+  createRoot(dispose => {
+    const mockFn = spy();
+    const message1 = "click1";
+    const message2 = "click2";
+    const message3 = "click3";
+
+    const combinedProps = combineProps(
       { onClick: () => mockFn(message1) },
-      { onClick: () => mockFn(message2) },
-      { onClick: () => mockFn(message3) }
+      { onClick: [mockFn, message2] },
+      { onClick: [mockFn, message3] }
     );
 
     combinedProps.onClick();
@@ -40,8 +104,7 @@ test("combines handlers", async () => {
     assert.equal(mockFn.calls, [[message1], [message2], [message3]]);
 
     dispose();
-  });
-});
+  }));
 
 test("merges props with different keys", async () => {
   createRoot(async dispose => {
@@ -149,7 +212,7 @@ test("combines styles", () =>
       padding: "2",
       "background-color": "red",
       border: "1px solid #123456 ",
-      "--x": "123",
+      "--x": "123\n      ",
       "font-size": "2rem"
     });
 

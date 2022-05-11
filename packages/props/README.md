@@ -24,9 +24,9 @@ yarn add @solid-primitives/props
 
 ## `combineProps`
 
-A helper that reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
+A helper that reactively merges multiple props objects together while smartly combining some of Solid's JSX/HTML attributes.
 
-Event handlers _(onClick, onMouseMove)_, **(every function property with name mathing `on[A-Z].\*` get's chained – lowercase like "onclick" will NOT)** and refs _(props.ref)_ are chained.
+Event handlers _(onClick, onclick, onMouseMove, onSomething)_, and refs _(props.ref)_ are chained.
 
 `class`, `className`, `classList` and `style` are combined.
 
@@ -50,6 +50,29 @@ const MyButton: Component<ButtonProps> = props => {
 // they will be combined with those provided by createButton() primitive
 <MyButton style={{ margin: "24px" }} />;
 ```
+
+#### Chaining of event listeners
+
+Every [function/tuple](https://www.solidjs.com/docs/latest/api#on___) property with `on___` name get's chained. That could potentially include properties that are not actually event-listeners – such as `only` or `once`. Hence you should remove them from the props (with [splitProps](https://www.solidjs.com/docs/latest/api#splitprops)).
+
+Chained functions will always return `void`. If you want to get the returned value from a callback, you have to split those props and handle them yourself.
+
+**Warning:** The types for event-listeners often won't correctly represent the values. Chaining is meant only for DOM Events spreading to an element.
+
+```ts
+const combined = combineProps(
+  {
+    onClick: e => {},
+    onclick: e => {}
+  },
+  {
+    onClick: [(n, e) => {}, 123]
+  }
+);
+// combined.onClick() will call all 3 of the functions above
+```
+
+##### For better reference of how exactly `combineProps` works, see the [TESTS](https://github.com/solidjs-community/solid-primitives/blob/main/packages/props/test/combineProps.test.ts)
 
 ### Additional helpers
 
@@ -157,5 +180,9 @@ Release initial version with CJS support.
 Renamed `createProps` to `createControlledProps`, `createProp` to `createControlledProp` etc. (for all of the primitives focused on testing)
 
 Added `combineProps` primitive
+
+2.1.0
+
+Add support for tuple event handlers and de-dupeing to `combineProps`.
 
 </details>
