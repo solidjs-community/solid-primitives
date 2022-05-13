@@ -79,9 +79,9 @@ type Override<T, U> = {
   // all keys in U except those which are merged into T
   [K in keyof Omit<U, Exclude<keyof T, RequiredKeys<U>>>]: K extends `on${string}`
     ? K extends keyof T
-      ? undefined extends U[K]
-        ? undefined
-        : Extract<Exclude<T[K], undefined> | U[K], AnyFunction | any[]>
+      ? U[K] extends AnyFunction | any[]
+        ? T[K] & U[K]
+        : UnboxLazy<OverrideProp<T, U, K>>
       : UnboxLazy<OverrideProp<T, U, K>>
     : UnboxLazy<OverrideProp<T, U, K>>;
 };
@@ -115,11 +115,12 @@ export type CombineProps<T extends PropsInput[]> = Simplify<{
  * <MyButton style={{ margin: "24px" }} />
  * ```
  */
-export function combineProps<T extends PropsInput[]>(...sources: T): CombineProps<T> {
-  if (sources.length === 0) return {} as CombineProps<T>;
+export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
+  ...sources: T
+): CombineProps<T> {
   if (sources.length === 1) return sources[0] as CombineProps<T>;
 
-  const merge = mergeProps(...sources) as CombineProps<T>;
+  const merge = mergeProps(...sources) as unknown as CombineProps<T>;
 
   const reduce = <K extends keyof PropsInput>(
     key: K,
@@ -195,27 +196,27 @@ export function combineProps<T extends PropsInput[]>(...sources: T): CombineProp
   });
 }
 
-// const com = combineProps(
-//   {
-//     onSomething: 123,
-//     onWheel: (e: WheelEvent) => 213,
-//     something: "foo",
-//     style: { margin: "24px" },
-//     once: true,
-//     onMount: (fn: VoidFunction) => undefined
-//   },
-//   {
-//     onSomething: [(n: number, s: string) => "fo", 123],
-//     once: "ovv"
-//   },
-//   {
-//     onWheel: (e: WheelEvent) => "foo",
-//     onMount: false
-//   }
-// );
-// com.onSomething; // (s: string) => void;
-// com.once; // string;
-// com.onWheel; // (n: WheelEvent) => void;
-// com.onMount; // false;
-// com.something; // string;
-// com.style; // string | JSX.CSSProperties;
+const com = combineProps(
+  {
+    onSomething: 123,
+    onWheel: (e: WheelEvent) => 213,
+    something: "foo",
+    style: { margin: "24px" },
+    once: true,
+    onMount: (fn: VoidFunction) => undefined
+  },
+  {
+    onSomething: [(n: number, s: string) => "fo", 123],
+    once: "ovv"
+  },
+  {
+    onWheel: false,
+    onMount: (n: number) => void 0
+  }
+);
+com.onSomething; // (s: string) => void;
+com.once; // string;
+com.onWheel; // false;
+com.onMount; // ((fn: VoidFunction) => undefined) & ((n: number) => undefined);
+com.something; // string;
+com.style; // string | JSX.CSSProperties;

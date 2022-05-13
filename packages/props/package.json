@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/props",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Library of primitives focused around component props.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [

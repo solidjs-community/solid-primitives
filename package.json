@@ -24,7 +24,7 @@
     "lerna": "^4.0.0",
     "markdown-magic": "^2.6.0",
     "prettier": "^2.5.1",
-    "solid-js": "^1.3.12",
+    "solid-js": "^1.4.0",
     "tsup": "^5.12.1",
     "typescript": "^4.6.2",
     "unocss": "0.29.5",

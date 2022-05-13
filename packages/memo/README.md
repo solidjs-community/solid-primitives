@@ -310,4 +310,8 @@ Add `createWritableMemo`. rename `createCache` to `createMemoCache`.
 
 Add `createCurtain`. refactor `createWritableMemo`.
 
+0.1.1
+
+Support for Solid 1.4
+
 </details>

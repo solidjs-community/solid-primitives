@@ -189,4 +189,8 @@ Added `combineProps` primitive
 
 Add support for tuple event handlers and de-dupeing to `combineProps`.
 
+2.1.1
+
+Support for Solid 1.4
+
 </details>

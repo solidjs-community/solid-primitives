@@ -25,8 +25,9 @@ export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Prom
 
 const set =
   <T>(setter: Setter<T>) =>
-  (v: T) =>
+  (v: T): void => {
     setter(() => v);
+  };
 
 const callbackWith = <A, T>(fn: (a: A) => T, v: Accessor<A>): (() => T) =>
   fn.length > 0 ? () => fn(untrack(v)) : (fn as () => T);
