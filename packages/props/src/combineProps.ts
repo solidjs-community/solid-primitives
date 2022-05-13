@@ -196,27 +196,27 @@ export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
   });
 }
 
-const com = combineProps(
-  {
-    onSomething: 123,
-    onWheel: (e: WheelEvent) => 213,
-    something: "foo",
-    style: { margin: "24px" },
-    once: true,
-    onMount: (fn: VoidFunction) => undefined
-  },
-  {
-    onSomething: [(n: number, s: string) => "fo", 123],
-    once: "ovv"
-  },
-  {
-    onWheel: false,
-    onMount: (n: number) => void 0
-  }
-);
-com.onSomething; // (s: string) => void;
-com.once; // string;
-com.onWheel; // false;
-com.onMount; // ((fn: VoidFunction) => undefined) & ((n: number) => undefined);
-com.something; // string;
-com.style; // string | JSX.CSSProperties;
+// const com = combineProps(
+//   {
+//     onSomething: 123,
+//     onWheel: (e: WheelEvent) => 213,
+//     something: "foo",
+//     style: { margin: "24px" },
+//     once: true,
+//     onMount: (fn: VoidFunction) => undefined
+//   },
+//   {
+//     onSomething: [(n: number, s: string) => "fo", 123],
+//     once: "ovv"
+//   },
+//   {
+//     onWheel: false,
+//     onMount: (n: number) => void 0
+//   }
+// );
+// com.onSomething; // (s: string) => void;
+// com.once; // string;
+// com.onWheel; // false;
+// com.onMount; // ((fn: VoidFunction) => undefined) & ((n: number) => undefined);
+// com.something; // string;
+// com.style; // string | JSX.CSSProperties;
