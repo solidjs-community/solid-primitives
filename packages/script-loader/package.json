@@ -49,7 +49,7 @@
   "devDependencies": {
     "jsdom": "^19.0.0",
     "prettier": "^2.0.5",
-    "solid-register": "^0.1.5",
+    "solid-register": "^0.2.5",
     "solid-testing-library": "^0.2.0",
     "tslib": "^2.3.1",
     "tsup": "^5.10.1",
