@@ -51,10 +51,12 @@ export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
  * Returns a function that will call all functions in the order they were chained with the same arguments.
  */
 export function chain<Args extends [] | any[]>(callbacks: {
-  [Symbol.iterator](): IterableIterator<(...args: Args) => any>;
+  [Symbol.iterator](): IterableIterator<((...args: Args) => any) | undefined>;
 }): (...args: Args) => void {
   return (...args: Args) => {
-    for (const callback of callbacks) callback(...args);
+    for (const callback of callbacks) {
+      if (typeof callback === "function") callback(...args);
+    }
   };
 }
 
