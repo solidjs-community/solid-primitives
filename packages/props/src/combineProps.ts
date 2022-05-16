@@ -176,13 +176,13 @@ export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
           const cb = props[key] as ((el: any) => void) | undefined;
           if (typeof cb === "function") callbacks.push(cb);
         }
-        return chain(...callbacks);
+        return chain(callbacks);
       }
 
       // Chain event listeners
       if (isEventListenerKey(key)) {
         const callbacks = listeners[key.toLowerCase()];
-        return Array.isArray(callbacks) ? chain(...callbacks) : Reflect.get(target, key);
+        return Array.isArray(callbacks) ? chain(callbacks) : Reflect.get(target, key);
       }
 
       // Merge classes or classNames
