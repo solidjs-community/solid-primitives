@@ -2,7 +2,7 @@ import "./setup";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createRoot, createEffect, createSignal } from "solid-js";
-import { createFetch } from "../src";
+import { createFetch, withAbort } from "../src";
 
 const test = suite("createFetch");
 
@@ -76,7 +76,7 @@ test("will abort a request without an error", () =>
   createRoot(dispose => {
     const [ready, { abort }] = createFetch<typeof mockResponseBody, undefined>(mockUrl, {
       fetch: fetchMock
-    });
+    }, [withAbort()]);
     abort();
     assert.is(ready.aborted, true);
     createEffect(() => {
