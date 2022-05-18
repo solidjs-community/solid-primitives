@@ -5,13 +5,29 @@ import {
   ResourceFetcherInfo,
   ResourceReturn
 } from "solid-js";
-import { withRequest, RequestModifier } from "./modifiers";
+import { RequestModifier } from "./modifiers";
+import { fetchRequest } from "./request";
+
+export type RequestContext<T> = {
+  urlAccessor: Accessor<[info: RequestInfo, init?: RequestInit] | undefined>;
+  wrapResource: () => ResourceReturn<T>;
+  fetcher?: <T>(
+    requestData: [info: RequestInfo, init?: RequestInit],
+    info: ResourceFetcherInfo<T>
+  ) => Promise<T>;
+  response?: Response;
+  resource?: ResourceReturn<T>;
+  abortController?: AbortController;
+  responseHandler?: (response: Response) => T;
+  [key: string]: any;
+};
 
 export type FetchOptions<I> = I extends undefined
   ? {
       initialValue?: I;
       name?: string;
       fetch?: typeof fetch;
+      request: <T>(requestContext: RequestContext<T>) => void;
       responseHandler?: (response: Response) => any;
       disable?: boolean;
     }
@@ -19,6 +35,7 @@ export type FetchOptions<I> = I extends undefined
       initialValue: I;
       name?: string;
       fetch?: typeof fetch;
+      request: <T>(requestContext: RequestContext<T>) => void;
       responseHandler?: (response: Response) => any;
       disable?: boolean;
     };
@@ -42,22 +59,8 @@ export type FetchReturn<T, I> = [
   }
 ];
 
-export type RequestContext<T> = {
-  urlAccessor: Accessor<[info: RequestInfo, init?: RequestInit] | undefined>;
-  wrapResource: () => ResourceReturn<T>;
-  fetcher?: <T>(
-    requestData: [info: RequestInfo, init?: RequestInit],
-    info: ResourceFetcherInfo<T>
-  ) => Promise<T>;
-  response?: Response;
-  resource?: ResourceReturn<T>;
-  abortController?: AbortController;
-  responseHandler?: (response: Response) => T;
-  [key: string]: any;
-};
-
 const isOptions = <I>(prop: any): prop is FetchOptions<I> =>
-  typeof prop === "object" && ("name" in prop || "initialValue" in prop || "fetch" in prop);
+  typeof prop === "object" && ["name", "initialValue", "fetch", "request"].some((key) => key in prop);
 
 /* we want to be able to overload our functions */
 /* eslint no-redeclare:off */
@@ -158,7 +161,7 @@ export function createFetch<T, I>(
       if (options.disable) {
         return undefined;
       }
-      const info = typeof args[0] === "function" ? args[0]() : args[0];
+      const info: RequestInfo | undefined = typeof args[0] === "function" ? args[0]() : args[0];
       if (!info) {
         return undefined;
       }
@@ -168,11 +171,11 @@ export function createFetch<T, I>(
           : isOptions(args[1])
           ? undefined
           : (args[1] as RequestInit);
-      return [info, init];
+      return [info, init] as [info: RequestInfo, init?: RequestInit];
     }
   );
   const modifiers = args.slice(1).find(Array.isArray) || [];
-  modifiers.unshift(withRequest());
+  modifiers.unshift(options.request || fetchRequest(options.fetch));
   let index = 0;
   const fetchContext: RequestContext<T> = {
     urlAccessor,
