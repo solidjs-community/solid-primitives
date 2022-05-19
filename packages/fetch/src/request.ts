@@ -23,24 +23,18 @@ export const fetchRequest: RequestModifier =
     requestContext.wrapResource();
   };
 
-export const axiosRequest: RequestModifier = <T>(axios: AxiosStatic) =>
+export const axiosRequest: RequestModifier = (axios: AxiosStatic) =>
   requestContext => {
-    requestContext.fetcher = (requestData: [info: RequestInfo, init?: RequestInit]) => {
-      // TODO: replace with actual axios
-      return fetch?.(...requestData).then((response: Response) => {
-        requestContext.response = response;
-        if (requestContext.responseHandler) {
-          return requestContext.responseHandler(response) as unknown as T;
-        }
-        const contentType = response.headers.get("content-type") ?? "";
-        if (contentType.includes("application/json")) {
-          return response.json();
-        } else if (contentType.includes("text/")) {
-          return response.text();
-        } else {
-          return response.blob();
-        }
-      });
+    requestContext.fetcher = (requestData: [info: RequestInfo, init?: RequestInit]) => {      
+      return axios.request({
+        ...(typeof requestData[0] === 'string'
+          ? { url: requestData[0], method: 'get' }
+          : requestData[0]),
+        ...requestData[1],
+        ...(requestContext.abortController
+          ? { signal: requestContext.abortController.signal }
+          : {})
+      } as any)
     }
     requestContext.wrapResource();
   };
