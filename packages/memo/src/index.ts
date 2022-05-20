@@ -328,19 +328,23 @@ export function createLazyMemo<T>(
     }
 
     listeners++;
-    onCleanup(() => {
-      listeners--;
-      queueMicrotask(() => {
-        if (listeners) return;
-        dispose?.();
-        dispose = memo = undefined;
-      });
-    });
+    onCleanup(() => listeners--);
 
     if (!memo) {
       createRoot(_dispose => {
         dispose = _dispose;
-        memo = createMemo(prev => (lastest = calc(prev)), lastest, options);
+        memo = createMemo(
+          () => {
+            if (!listeners) {
+              dispose!();
+              dispose = memo = undefined;
+              return lastest!;
+            }
+            return (lastest = calc(lastest));
+          },
+          lastest,
+          options
+        );
       }, owner ?? undefined);
     }
 

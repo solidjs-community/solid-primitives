@@ -238,4 +238,34 @@ test("works in an effect", () =>
     });
   }));
 
+test("computation will last until the source changes", () =>
+  createRoot(dispose => {
+    const [count, setCount] = createSignal(0);
+    let runs = 0;
+    const memo = createLazyMemo(() => {
+      runs++;
+      return count();
+    });
+
+    createRoot(dispose => {
+      createComputed(memo);
+      dispose();
+    });
+
+    assert.is(runs, 1);
+
+    createRoot(dispose => {
+      createComputed(memo);
+      dispose();
+    });
+
+    assert.is(runs, 1);
+
+    setCount(1);
+
+    assert.is(runs, 1);
+
+    dispose();
+  }));
+
 test.run();
