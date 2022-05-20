@@ -308,22 +308,26 @@ export function createLazyMemo<T>(
   options?: MemoOptions<T>
 ): Accessor<T> {
   /** original root in which the primitive was initially run */
-  const owner = getOwner();
+  const owner = getOwner() ?? undefined;
   /** number of places where the state is being tracked */
   let listeners = 0;
+  /** lastly calculated value */
   let lastest: T | undefined = value;
-  let stale = true;
+  /** does the value need to be recalculated? — for reading outside of tracking scopes */
+  let dirty = true;
   let memo: Accessor<T> | undefined;
   let dispose: VoidFunction | undefined;
   onCleanup(() => dispose?.());
 
-  const track = createPureReaction(() => (stale = !memo));
+  // marks the lastest value as dirty if the sources updated
+  const track = createPureReaction(() => (dirty = !memo));
 
   return () => {
+    // path for access outside of tracking scopes
     if (!getListener()) {
       if (memo) return memo();
-      if (stale) track(() => (lastest = calc(lastest)));
-      stale = false;
+      if (dirty) track(() => (lastest = calc(lastest)));
+      dirty = false;
       return lastest!;
     }
 
@@ -335,17 +339,15 @@ export function createLazyMemo<T>(
         dispose = _dispose;
         memo = createMemo(
           () => {
-            if (!listeners) {
-              dispose!();
-              dispose = memo = undefined;
-              return lastest!;
-            }
-            return (lastest = calc(lastest));
+            if (listeners) return (lastest = calc(lastest));
+            dispose!();
+            dispose = memo = undefined;
+            return lastest!;
           },
           lastest,
           options
         );
-      }, owner ?? undefined);
+      }, owner);
     }
 
     return memo!();
