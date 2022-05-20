@@ -58,24 +58,55 @@ test("runs only once, even if accessed multiple times", () =>
     dispose();
   }));
 
-test("won't run if the root of where it was accessed is gone", () =>
+test("runs once until invalidated", () =>
   createRoot(dispose => {
     const [count, setCount] = createSignal(0);
     let runs = 0;
+
     const memo = createLazyMemo(() => {
       runs++;
       return count();
     });
-    createRoot(dispose1 => {
-      assert.is(memo(), 0, "memo matches the signal");
-      assert.is(runs, 1, "ran once");
-      dispose1();
-    });
+
+    createComputed(memo);
+    assert.is(runs, 1, "1-1.");
+    createComputed(memo);
+    assert.is(runs, 1, "1-2.");
+    memo();
+    assert.is(runs, 1, "1-3.");
 
     setCount(1);
-    assert.is(runs, 1, "ran only once. after dispose");
+    assert.is(runs, 2, "2-1.");
+
+    createComputed(memo);
+    assert.is(runs, 2, "2-2.");
 
     dispose();
+  }));
+
+test("won't run if the root of where it was accessed is gone", () =>
+  createRoot(dispose => {
+    const [count, setCount] = createSignal(0);
+    let runs = 0;
+
+    const memo = createLazyMemo(() => {
+      runs++;
+      return count();
+    });
+
+    createRoot(dispose => {
+      createComputed(memo);
+      dispose();
+    });
+
+    assert.is(runs, 1, "1");
+
+    // lazy memo is disposed in the next microtask
+    queueMicrotask(() => {
+      setCount(1);
+      assert.is(runs, 1, "2");
+      dispose();
+    });
   }));
 
 test("will be running even if some of the reading roots are disposed", () =>
@@ -88,15 +119,15 @@ test("will be running even if some of the reading roots are disposed", () =>
     });
 
     const dispose1 = createRoot(dispose => {
-      assert.is(memo(), 0, "memo matches the signal");
-      assert.is(runs, 1, "ran once");
+      createComputed(memo);
       return dispose;
     });
     const dispose2 = createRoot(dispose => {
-      assert.is(memo(), 0, "memo matches the signal; 2. root");
-      assert.is(runs, 1, "ran once; 2. root");
+      createComputed(memo);
       return dispose;
     });
+
+    assert.is(runs, 1, "ran once");
 
     setCount(1);
 
@@ -107,10 +138,13 @@ test("will be running even if some of the reading roots are disposed", () =>
     assert.is(runs, 3, "ran 3 times");
 
     dispose2();
-    setCount(3);
-    assert.is(runs, 3, "ran 3 times; (not changed)");
 
-    dispose();
+    // lazy memo is disposed in the next microtask
+    queueMicrotask(() => {
+      setCount(3);
+      assert.is(runs, 3, "ran 3 times; (not changed)");
+      dispose();
+    });
   }));
 
 test("initial value if NOT set in options", () =>
@@ -134,7 +168,7 @@ test("initial value if NOT set in options", () =>
     dispose();
   }));
 
-test("initial value if NOT set in options", () =>
+test("initial value if set", () =>
   createRoot(dispose => {
     const [count, setCount] = createSignal(0);
     let capturedPrev: any;
@@ -153,6 +187,55 @@ test("initial value if NOT set in options", () =>
     assert.equal(capturedPrev, 0);
 
     dispose();
+  }));
+
+test("handles prev value properly", () =>
+  createRoot(dispose => {
+    const [count, setCount] = createSignal(0);
+
+    let capturedPrev: any;
+    const memo = createLazyMemo(prev => {
+      capturedPrev = prev;
+      return count();
+    });
+
+    const dis1 = createRoot(dis => {
+      createComputed(memo);
+      return dis;
+    });
+    assert.is(capturedPrev, undefined);
+
+    setCount(1);
+    assert.is(capturedPrev, 0);
+
+    dis1();
+
+    // lazy memo is disposed in the next microtask
+    queueMicrotask(() => {
+      setCount(2);
+      assert.is(capturedPrev, 0);
+      assert.is(memo(), 2);
+      assert.is(capturedPrev, 1);
+      dispose();
+    });
+  }));
+
+test("works in an effect", () =>
+  createRoot(dispose => {
+    const [count, setCount] = createSignal(0);
+    const memo = createLazyMemo(count);
+    const captured: number[] = [];
+    createEffect(() => captured.push(memo()));
+
+    queueMicrotask(() => {
+      assert.equal(captured, [0]);
+
+      setCount(1);
+      queueMicrotask(() => {
+        assert.equal(captured, [0, 1]);
+        dispose();
+      });
+    });
   }));
 
 test.run();

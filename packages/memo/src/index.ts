@@ -8,7 +8,9 @@ import {
   createMemo,
   runWithOwner,
   Setter,
-  on
+  on,
+  getListener,
+  createRoot
 } from "solid-js";
 import type {
   EffectOptions,
@@ -305,31 +307,44 @@ export function createLazyMemo<T>(
   value?: T,
   options?: MemoOptions<T>
 ): Accessor<T> {
-  let memo: Accessor<T> | undefined;
-  /** number of places where the state is being actively observed */
-  let listeners = 0;
   /** original root in which the primitive was initially run */
-  const owner = getOwner() as Owner;
+  const owner = getOwner();
+  /** number of places where the state is being tracked */
+  let listeners = 0;
+  let lastest: T | undefined = value;
+  let stale = true;
+  let memo: Accessor<T> | undefined;
+  let dispose: VoidFunction | undefined;
+  onCleanup(() => dispose?.());
 
-  // prettier-ignore
-  // memo is recreated every time it's being read, and the previous one is derailed
-  // memo disables itself once computation happend without anyone listening
-  const recreateMemo = () => runWithOwner(owner as Owner, () => {
-    memo = createMemo(prev => {
-      if (listeners) return calc(prev);
-      memo = undefined;
-      return prev as T;
-    }, value, options);
-  });
+  const track = createPureReaction(() => (stale = !memo));
 
-  // wrapped signal accessor
   return () => {
-    if (getOwner()) {
-      listeners++;
-      onCleanup(() => listeners--);
+    if (!getListener()) {
+      if (memo) return memo();
+      if (stale) track(() => (lastest = calc(lastest)));
+      stale = false;
+      return lastest!;
     }
-    if (!memo) recreateMemo();
-    return (memo as Accessor<T>)();
+
+    listeners++;
+    onCleanup(() => {
+      listeners--;
+      queueMicrotask(() => {
+        if (listeners) return;
+        dispose?.();
+        dispose = memo = undefined;
+      });
+    });
+
+    if (!memo) {
+      createRoot(_dispose => {
+        dispose = _dispose;
+        memo = createMemo(prev => (lastest = calc(prev)), lastest, options);
+      }, owner ?? undefined);
+    }
+
+    return memo!();
   };
 }
 
