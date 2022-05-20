@@ -85,6 +85,7 @@
     }
   },
   "dependencies": {
-    "@solid-primitives/utils": "^1.4.0"
+    "@solid-primitives/utils": "^1.4.0",
+    "uvu": "^0.5.3"
   }
 }
