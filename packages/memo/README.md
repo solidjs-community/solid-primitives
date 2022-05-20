@@ -106,6 +106,23 @@ memo(); // T: number
 
 ###### See [the tests](https://github.com/solidjs-community/solid-primitives/blob/main/packages/memo/test/lazy.test.ts) for better usage reference.
 
+### Usage caveats
+
+###### Aka "Why you may not want to use a lazy memo"
+
+There are vary few actual good applications of a lazy memo. And most of them could be done with other means, or just by changing the data architecture. For example, you can always only create memos in places that you intend to use it in, instead of declaring it prematurely.
+
+```ts
+// instead of memo, distribute only a calculation function
+const getDouble = (n: number) => n * 2;
+// and only declare memo where you want to use it
+const double = createMemo(() => getDouble(count()));
+```
+
+A lazy memo won't work reliably with [Suspense](https://www.solidjs.com/docs/latest/api#<suspense>).
+
+There is a performance cost involved with using it — it is basically createMemo wrapped with more logic. And when you'd usually use a lazy mamo for performance optimizations — it may actually be more costly.
+
 ### Demo
 
 https://codesandbox.io/s/solid-primitives-memo-demo-3w0oz?file=/index.tsx
@@ -313,5 +330,9 @@ Add `createCurtain`. refactor `createWritableMemo`.
 0.1.1
 
 Support for Solid 1.4
+
+0.2.1
+
+`createLazyMemo` improvements
 
 </details>
