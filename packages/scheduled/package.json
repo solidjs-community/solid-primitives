@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/scheduled",
   "version": "1.0.0",
-  "description": "Primitives for creating throttled or debounced callbacks.",
+  "description": "Primitives for creating scheduled — throttled or debounced — callbacks.",
   "contributors": [
     "David Di Biase <dave.dibiase@gmail.com>",
     "Damian Tarnawski <gthetarnav@gmail.com>"
@@ -20,7 +20,8 @@
     "stage": 2,
     "list": [
       "debounce",
-      "throttle"
+      "throttle",
+      "leading"
     ],
     "category": "Utilities"
   },
