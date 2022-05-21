@@ -101,12 +101,9 @@ test("won't run if the root of where it was accessed is gone", () =>
 
     assert.is(runs, 1, "1");
 
-    // lazy memo is disposed in the next microtask
-    queueMicrotask(() => {
-      setCount(1);
-      assert.is(runs, 1, "2");
-      dispose();
-    });
+    setCount(1);
+    assert.is(runs, 1, "2");
+    dispose();
   }));
 
 test("will be running even if some of the reading roots are disposed", () =>
@@ -139,12 +136,9 @@ test("will be running even if some of the reading roots are disposed", () =>
 
     dispose2();
 
-    // lazy memo is disposed in the next microtask
-    queueMicrotask(() => {
-      setCount(3);
-      assert.is(runs, 3, "ran 3 times; (not changed)");
-      dispose();
-    });
+    setCount(3);
+    assert.is(runs, 3, "ran 3 times; (not changed)");
+    dispose();
   }));
 
 test("initial value if NOT set in options", () =>
@@ -210,14 +204,11 @@ test("handles prev value properly", () =>
 
     dis1();
 
-    // lazy memo is disposed in the next microtask
-    queueMicrotask(() => {
-      setCount(2);
-      assert.is(capturedPrev, 0);
-      assert.is(memo(), 2);
-      assert.is(capturedPrev, 1);
-      dispose();
-    });
+    setCount(2);
+    assert.is(capturedPrev, 0);
+    assert.is(memo(), 2);
+    assert.is(capturedPrev, 1);
+    dispose();
   }));
 
 test("works in an effect", () =>
