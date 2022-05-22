@@ -8,7 +8,9 @@ import {
   createMemo,
   runWithOwner,
   Setter,
-  on
+  on,
+  getListener,
+  createRoot
 } from "solid-js";
 import type {
   EffectOptions,
@@ -305,31 +307,50 @@ export function createLazyMemo<T>(
   value?: T,
   options?: MemoOptions<T>
 ): Accessor<T> {
-  let memo: Accessor<T> | undefined;
-  /** number of places where the state is being actively observed */
-  let listeners = 0;
   /** original root in which the primitive was initially run */
-  const owner = getOwner() as Owner;
+  const owner = getOwner() ?? undefined;
+  /** number of places where the state is being tracked */
+  let listeners = 0;
+  /** lastly calculated value */
+  let lastest: T | undefined = value;
+  /** does the value need to be recalculated? — for reading outside of tracking scopes */
+  let dirty = true;
+  let memo: Accessor<T> | undefined;
+  let dispose: VoidFunction | undefined;
+  onCleanup(() => dispose?.());
 
-  // prettier-ignore
-  // memo is recreated every time it's being read, and the previous one is derailed
-  // memo disables itself once computation happend without anyone listening
-  const recreateMemo = () => runWithOwner(owner as Owner, () => {
-    memo = createMemo(prev => {
-      if (listeners) return calc(prev);
-      memo = undefined;
-      return prev as T;
-    }, value, options);
-  });
+  // marks the lastest value as dirty if the sources updated
+  const track = createPureReaction(() => (dirty = !memo));
 
-  // wrapped signal accessor
   return () => {
-    if (getOwner()) {
-      listeners++;
-      onCleanup(() => listeners--);
+    // path for access outside of tracking scopes
+    if (!getListener()) {
+      if (memo) return memo();
+      if (dirty) track(() => (lastest = calc(lastest)));
+      dirty = false;
+      return lastest!;
     }
-    if (!memo) recreateMemo();
-    return (memo as Accessor<T>)();
+
+    listeners++;
+    onCleanup(() => listeners--);
+
+    if (!memo) {
+      createRoot(_dispose => {
+        dispose = _dispose;
+        memo = createMemo(
+          () => {
+            if (listeners) return (lastest = calc(lastest));
+            dispose!();
+            dispose = memo = undefined;
+            return lastest!;
+          },
+          lastest,
+          options
+        );
+      }, owner);
+    }
+
+    return memo!();
   };
 }
 

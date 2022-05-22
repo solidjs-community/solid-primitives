@@ -84,6 +84,8 @@ result(); // => 10
 
 Lazily evaluated `createMemo`. Will run the calculation only if is being listened to.
 
+It may be useful for memos that aren't being listened to all the time, to reduce performance cost of wastefull computations.
+
 ### How to use it
 
 It's usage is almost the same as Solid's `createMemo`. Similarly it should be placed inside a reactive root — component or createRoot.
@@ -105,6 +107,21 @@ memo(); // T: number
 ```
 
 ###### See [the tests](https://github.com/solidjs-community/solid-primitives/blob/main/packages/memo/test/lazy.test.ts) for better usage reference.
+
+### Usage caveats
+
+There are vary few actual good applications of a lazy memo, that couldn't be solved with other means — like improving the data architecture. For example, you can always only create memos in places that you intend to use it in, instead of declaring it prematurely.
+
+```ts
+// instead of memo, distribute only a calculation function
+const getDouble = (n: number) => n * 2;
+// and only declare memo where you want to use it
+const double = createMemo(() => getDouble(count()));
+```
+
+A lazy memo won't work reliably with [Suspense](https://www.solidjs.com/docs/latest/api#<suspense>).
+
+There is a performance cost, from recreating and disposing computations, involved with using it over normal memo.
 
 ### Demo
 
@@ -313,5 +330,9 @@ Add `createCurtain`. refactor `createWritableMemo`.
 0.1.1
 
 Support for Solid 1.4
+
+0.2.1
+
+`createLazyMemo` improvements
 
 </details>

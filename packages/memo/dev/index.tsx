@@ -1,3 +1,4 @@
+/* @refresh reload */
 import { Component, lazy } from "solid-js";
 import { render } from "solid-js/web";
 import { Router, Routes, Route, Link } from "solid-app-router";
@@ -44,4 +45,4 @@ const App: Component = () => {
     </Router>
   );
 };
-render(() => <App />, document.getElementById("root"));
+render(() => <App />, document.getElementById("root")!);
