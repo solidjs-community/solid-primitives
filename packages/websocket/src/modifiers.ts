@@ -1,17 +1,24 @@
-import { RequestContext } from "./socket";
+import { SocketContext } from "./socket";
 
-export type RequestModifier = <T>(...args: any[]) => (requestContext: RequestContext<T>) => any;
+export type SocketModifier = (...args: any[]) => (requestContext: SocketContext) => any;
 
-export const withReconnect = <T>(
-  requestContext: RequestContext<T>,
-  retryLimit: number = Infinity,
-  retryInterval: number = 500
+export const withReconnect = (
+  socketContext: SocketContext,
+  reconnectLimit: number = Number.POSITIVE_INFINITY,
+  reconnectInterval: number = 500
 ) => {
+  let { socket, connect, disconnecting } = socketContext;
   let reconnections = 0;
   let reconnectId: number;
-  const cancelReconnect = () => {
+  disconnecting = () => {
     if (reconnectId) {
       clearTimeout(reconnectId);
+    }
+  };
+  socket.onclose = () => {
+    if (reconnectLimit && reconnectLimit > reconnections) {
+      reconnections += 1;
+      reconnectId = setTimeout(connect!, reconnectInterval);
     }
   };
 };

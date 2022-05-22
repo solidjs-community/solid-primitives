@@ -1,20 +1,20 @@
 import { Accessor, createSignal, onCleanup } from "solid-js";
-import { RequestModifier } from "./modifiers";
+import { SocketModifier } from "./modifiers";
 
-export type RequestContext<T> = {
-  urlAccessor: Accessor<[info: RequestInfo, init?: RequestInit] | undefined>;
-  response?: Response;
-  abortController?: AbortController;
-  responseHandler?: (response: Response) => T;
-  [key: string]: any;
+export type SocketContext = {
+  url: string;
+  socket: WebSocket;
+  connect?: VoidFunction;
+  disconnect?: VoidFunction;
+  disconnecting?: Function;
 };
 
 type SocketReturn = [
-  connect: () => void,
-  disconnect: () => void,
+  connect: VoidFunction,
+  disconnect: VoidFunction,
   send: (message: string) => void,
   state: Accessor<number>,
-  socket: () => WebSocket
+  socket: Accessor<WebSocket>
 ];
 
 /**
@@ -33,45 +33,46 @@ type SocketReturn = [
  * const [ connect, disconnect ] = makeWebsocket('http://localhost', '', 3, 5000);
  * ```
  */
- export function makeWebsocket<T, I = undefined>(
-  url: string,
-  onData: (message: MessageEvent) => void,
-  onError: (message: Event) => void,
-  protocols?: string | Array<string> | undefined,
-): SocketReturn;
 export function makeWebsocket(
   url: string,
   onData: (message: MessageEvent) => void,
   onError: (message: Event) => void,
   protocols?: string | Array<string> | undefined,
+  ...modifiers: SocketModifier[]
 ): SocketReturn {
   let socket: WebSocket;
+  let disconnecting: Function;
   const [state, setState] = createSignal(WebSocket.CLOSED);
   const send = (data: string | ArrayBuffer) => socket.send(data);
   const disconnect = () => {
-    // cancelReconnect();
-    // reconnectLimit = Number.POSITIVE_INFINITY;
+    if (disconnecting) disconnecting();
     if (socket) {
       socket.close();
     }
   };
   // Connect the socket to the server
   const connect = () => {
-    // cancelReconnect();
+    if (disconnecting) disconnecting();
     setState(WebSocket.CONNECTING);
     socket = new WebSocket(url, protocols);
     socket.onopen = () => setState(WebSocket.OPEN);
-    socket.onclose = () => {
-      setState(WebSocket.CLOSED);
-    //   if (reconnectLimit && reconnectLimit > reconnections) {
-    //     reconnections += 1;
-    //     reconnectId = setTimeout(connect, reconnectInterval);
-    //   }
-    };
+    socket.onclose = () => setState(WebSocket.CLOSED);
     socket.onerror = onError;
     socket.onmessage = onData;
   };
-  const modifiers = args.slice(1).find(Array.isArray) || [];
+  const ctx = {
+    url,
+    disconnect,
+    get socket() {
+      return socket;
+    },
+    get disconnecting() {
+      if (disconnecting) disconnecting;
+      return () => {};
+    },
+    connect
+  } as SocketContext;
+  (modifiers || []).map((modifier) => modifier(ctx));
   onCleanup(() => disconnect);
   return [connect, disconnect, send, state, () => socket];
 };
