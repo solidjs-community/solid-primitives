@@ -1,0 +1,116 @@
+# @solid-primitives/scheduled
+
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/scheduled?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/scheduled)
+[![version](https://img.shields.io/npm/v/@solid-primitives/scheduled?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/scheduled)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+
+Primitives for creating scheduled — throttled or debounced — callbacks.
+
+- [`debounce`](#debounce) - Creates a callback that is **debounced** and cancellable.
+- [`throttle`](#throttle) - Creates a callback that is **throttled** and cancellable.
+- [`leading`](#leading) - Creates a scheduled and cancellable callback that will be called on **leading** edge.
+
+## Installation
+
+```bash
+npm install @solid-primitives/scheduled
+# or
+yarn add @solid-primitives/scheduled
+```
+
+## `debounce`
+
+Creates a callback that is debounced and cancellable. The debounced callback is called on **trailing** edge.
+
+The timeout will be automatically cleared on root dispose.
+
+### How to use it
+
+```ts
+import { debounce } from "@solid-primitives/scheduled";
+
+const trigger = debounce((message: string) => console.log(message), 250);
+trigger("Hello!");
+trigger.clear(); // clears a timeout in progress
+```
+
+### Demo
+
+https://codesandbox.io/s/solid-primitives-debounce-ng9bs?file=/src/index.tsx
+
+## `throttle`
+
+Creates a callback that is throttled and cancellable. The throttled callback is called on **trailing** edge.
+
+The timeout will be automatically cleared on root dispose.
+
+### How to use it
+
+```ts
+import { throttle } from "@solid-primitives/scheduled";
+
+const trigger = throttle((message: string) => console.log(message), 250);
+trigger("Hello!");
+trigger.clear(); // clears a timeout in progress
+```
+
+### Demo
+
+https://codesandbox.io/s/solid-primitives-throttle-h2wni?file=/src/index.tsx
+
+## `leading`
+
+Creates a scheduled and cancellable callback that will be called on **leading** edge.
+
+The timeout will be automatically cleared on root dispose.
+
+### How to use it
+
+```ts
+// with debounce
+import { leading, debounce } from "@solid-primitives/scheduled";
+
+const trigger = leading(debounce, (message: string) => console.log(message), 250);
+trigger("Hello!");
+trigger.clear(); // clears a timeout in progress
+
+// with throttle
+import { leading, throttle } from "@solid-primitives/scheduled";
+
+const trigger = leading(throttle, (message: string) => console.log(message), 250);
+trigger("Hello!");
+trigger.clear(); // clears a timeout in progress
+```
+
+## Scheduling explanation
+
+This package provides 4 different methods for scheduling a callback. Pick one that suits your application.
+
+```
+TOP: scheduled function triggered
+BOTTOM: called user callback
+
+1. debounce
+2. throttle
+3. leading debounce
+4. leading throttle
+
+   █   █     █
+------------------------>
+1.                  █
+2.        █         █
+3. █
+4. █         █
+```
+
+## Changelog
+
+<details>
+<summary><b>Expand Changelog</b></summary>
+
+1.0.0
+
+Initial release as a Stage-2 primitive.
+
+</details>

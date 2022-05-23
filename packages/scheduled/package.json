@@ -1,11 +1,13 @@
 {
-  "name": "@solid-primitives/template-primitive",
-  "version": "0.0.100",
-  "description": "A template primitive example.",
-  "author": "Your Name <you@youremail.com>",
-  "contributors": [],
+  "name": "@solid-primitives/scheduled",
+  "version": "1.0.0",
+  "description": "Primitives for creating scheduled — throttled or debounced — callbacks.",
+  "contributors": [
+    "David Di Biase <dave.dibiase@gmail.com>",
+    "Damian Tarnawski <gthetarnav@gmail.com>"
+  ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/template-primitive#readme",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -14,12 +16,14 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "template-primitive",
-    "stage": 0,
+    "name": "scheduled",
+    "stage": 2,
     "list": [
-      "createPrimitiveTemplate"
+      "debounce",
+      "throttle",
+      "leading"
     ],
-    "category": "Display & Media"
+    "category": "Utilities"
   },
   "private": false,
   "sideEffects": false,
@@ -39,7 +43,10 @@
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "scheduled",
+    "debounce",
+    "throttle"
   ],
   "devDependencies": {
     "jsdom": "^19.0.0",

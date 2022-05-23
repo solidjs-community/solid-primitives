@@ -18,8 +18,7 @@ import type {
   Owner,
   SignalOptions
 } from "solid-js/types/reactive/signal";
-import debounce from "@solid-primitives/debounce";
-import throttle from "@solid-primitives/throttle";
+import { debounce, throttle } from "@solid-primitives/scheduled";
 import { ItemsOf } from "@solid-primitives/utils";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
@@ -216,7 +215,7 @@ export function createThrottledMemo<T>(
   options: MemoOptionsWithValue<T | undefined> = {}
 ): Accessor<T> {
   const [state, setState] = createSignal(options.value, options);
-  const [fn] = throttle(() => track(() => setState(calc)), timeoutMs);
+  const fn = throttle(() => track(() => setState(calc)), timeoutMs);
   const track = createPureReaction(fn, options);
   track(() => setState(calc));
   return state as Accessor<T>;
