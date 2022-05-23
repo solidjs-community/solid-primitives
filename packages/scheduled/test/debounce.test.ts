@@ -15,10 +15,10 @@ deb("setup and trigger debounce", () =>
     const fn = (current: number) => {
       val = current;
     };
-    const trigger = debounce(fn, 150);
+    const trigger = debounce(fn, 20);
     assert.is(val, 0);
     trigger(5);
-    await sleep(300);
+    await sleep(50);
     assert.is(val, 5);
     dispose();
   })
@@ -27,11 +27,11 @@ deb("setup and trigger debounce", () =>
 deb("trigger multiple debounce", () =>
   createRoot(async dispose => {
     let val = 0;
-    const trigger = debounce((current: number) => (val = current), 150);
+    const trigger = debounce((current: number) => (val = current), 20);
     assert.is(val, 0);
     trigger(5);
     trigger(1);
-    await sleep(300);
+    await sleep(50);
     assert.is(val, 1);
     dispose();
   })
@@ -40,11 +40,11 @@ deb("trigger multiple debounce", () =>
 deb("test clearing debounce", () =>
   createRoot(async dispose => {
     let val = 0;
-    const trigger = debounce((current: number) => (val = current), 500);
+    const trigger = debounce((current: number) => (val = current), 50);
     assert.is(val, 0);
     trigger(5);
     trigger.clear();
-    await sleep(300);
+    await sleep(20);
     assert.is(val, 0);
     dispose();
   })
@@ -76,13 +76,13 @@ const ldeb = suite("leading debounce");
 ldeb("setup and trigger debounce", () =>
   createRoot(async dispose => {
     let val = 0;
-    const trigger = leading(debounce, (current: number) => (val = current), 150);
+    const trigger = leading(debounce, (current: number) => (val = current), 20);
     assert.is(val, 0);
     trigger(5);
     assert.is(val, 5);
     trigger(10);
     assert.is(val, 5);
-    await sleep(300);
+    await sleep(50);
     trigger(15);
     assert.is(val, 15);
     dispose();
@@ -92,7 +92,7 @@ ldeb("setup and trigger debounce", () =>
 ldeb("test clearing debounce", () =>
   createRoot(async dispose => {
     let val = 0;
-    const trigger = leading(debounce, (current: number) => (val = current), 500);
+    const trigger = leading(debounce, (current: number) => (val = current), 20);
     trigger(5);
     trigger.clear();
     trigger(10);

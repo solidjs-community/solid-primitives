@@ -97,7 +97,8 @@ export function leading<Args extends unknown[]>(
   wait?: number
 ): Scheduled<Args> {
   let isScheduled = false;
-  const scheduled = schedule(() => (isScheduled = false), wait);
+  const onTrail = () => (isScheduled = false);
+  const scheduled = schedule(onTrail, wait);
   const func: typeof callback = (...args) => {
     if (!isScheduled) callback(...args);
     isScheduled = true;
@@ -107,6 +108,6 @@ export function leading<Args extends unknown[]>(
     isScheduled = false;
     scheduled.clear();
   };
-  if (getOwner()) onCleanup(() => (isScheduled = false));
+  if (getOwner()) onCleanup(clear);
   return Object.assign(func, { clear });
 }
