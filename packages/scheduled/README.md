@@ -35,10 +35,6 @@ trigger("Hello!");
 trigger.clear(); // clears a timeout in progress
 ```
 
-### Demo
-
-https://codesandbox.io/s/solid-primitives-debounce-ng9bs?file=/src/index.tsx
-
 ## `throttle`
 
 Creates a callback that is throttled and cancellable. The throttled callback is called on **trailing** edge.
@@ -54,10 +50,6 @@ const trigger = throttle((message: string) => console.log(message), 250);
 trigger("Hello!");
 trigger.clear(); // clears a timeout in progress
 ```
-
-### Demo
-
-https://codesandbox.io/s/solid-primitives-throttle-h2wni?file=/src/index.tsx
 
 ## `leading`
 
@@ -103,6 +95,8 @@ BOTTOM: called user callback
 3. █
 4. █         █
 ```
+
+[**Interactive DEMO of the schematic above**](https://codesandbox.io/s/solid-primitives-scheduled-demo-0uk8xc?file=/index.tsx)
 
 ## Changelog
 
