@@ -1,6 +1,6 @@
 import { getOwner, onCleanup, createSignal, Accessor, DEV, untrack, batch } from "solid-js";
 import type { BaseOptions, Signal } from "solid-js/types/reactive/signal";
-import { isServer } from "solid-js/web";
+import { isServer as _isServer } from "solid-js/web";
 import type {
   AnyClass,
   MaybeAccessor,
@@ -24,8 +24,8 @@ export * from "./types";
 /** no operation */
 export const noop = (() => undefined) as Noop;
 
+export const isServer: boolean = _isServer;
 export const isClient = !isServer;
-export { isServer };
 
 /** development environment */
 export const isDev = DEV && isClient;
