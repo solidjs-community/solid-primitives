@@ -5,6 +5,7 @@ import { Router, Routes, Route, Link } from "solid-app-router";
 import "uno.css";
 
 const Lazy = lazy(() => import("./lazy"));
+const LazySuspense = lazy(() => import("./lazy-suspense"));
 const Async = lazy(() => import("./async"));
 const Grouped = lazy(() => import("./grouped"));
 const Cache = lazy(() => import("./cache"));
@@ -19,6 +20,9 @@ const App: Component = () => {
         </a>
         <Link class="text-yellow-400" href="/lazy">
           /lazy
+        </Link>
+        <Link class="text-yellow-400" href="/lazy-suspense">
+          /lazy-suspense
         </Link>
         <Link class="text-yellow-400" href="/async">
           /async
@@ -36,6 +40,7 @@ const App: Component = () => {
       <div class="p-24 box-border w-full min-h-screen space-y-4 bg-gray-800 text-white">
         <Routes>
           <Route path="/lazy" element={<Lazy />} />
+          <Route path="/lazy-suspense" element={<LazySuspense />} />
           <Route path="/async" element={<Async />} />
           <Route path="/grouped" element={<Grouped />} />
           <Route path="/cache" element={<Cache />} />
