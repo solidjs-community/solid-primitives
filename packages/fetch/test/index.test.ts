@@ -31,8 +31,10 @@ const fetchMock: typeof fetch = (input: RequestInfo, init?: RequestInit): Promis
       resolve(mockResponse);
     }
   });
+
 test("will fetch json data", () =>
   new Promise<void>(resolve => {
+    throw new Error("test");
     createRoot(dispose => {
       const [ready] = createFetch<typeof mockResponseBody, undefined>(mockUrl, {
         fetch: fetchMock
@@ -74,9 +76,13 @@ test("will fetch text data", () =>
 
 test("will abort a request without an error", () =>
   createRoot(dispose => {
-    const [ready, { abort }] = createFetch<typeof mockResponseBody, undefined>(mockUrl, {
-      fetch: fetchMock
-    }, [withAbort()]);
+    const [ready, { abort }] = createFetch<typeof mockResponseBody, undefined>(
+      mockUrl,
+      {
+        fetch: fetchMock
+      },
+      [withAbort()]
+    );
     abort();
     assert.is(ready.aborted, true);
     createEffect(() => {

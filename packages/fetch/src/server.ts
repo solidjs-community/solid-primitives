@@ -6,12 +6,14 @@ if (!globalThis.fetch) {
         Object.assign(globalThis, { fetch });
         return fetch(...args);
       } catch (e) {
-        Object.assign(globalThis, { fetch: () => {
-          console.warn(
-            '"\x1b[33m⚠️ package missing to run createFetch on the server.\n Please run:\x1b[0m\n\nnpm i node-fetch\n"'
-          );
-          Promise.reject() 
-        } });
+        Object.assign(globalThis, {
+          fetch: () => {
+            console.warn(
+              '"\x1b[33m⚠️ package missing to run createFetch on the server.\n Please run:\x1b[0m\n\nnpm i node-fetch\n"'
+            );
+            Promise.reject();
+          }
+        });
         return Promise.reject();
       }
     }
