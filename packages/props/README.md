@@ -12,6 +12,8 @@
 Library of primitives focused around component props.
 
 - [`combineProps`](#combineProps) - Reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
+- [`omitProps`](#omitProps) - Create a new subset props object by omitting unwanted keys.
+- [`pickProps`](#pickProps) - Create a new subset props object by picking only specified keys.
 - [`createProps`](#createProps) - Provides controllable props signals like knobs/controls for simple component testing.
 
 ## Installation
@@ -99,6 +101,66 @@ styles; // { margin: "2rem", border: "1px solid #121212", padding: "16px" }
 
 https://codesandbox.io/s/combineprops-demo-ytw247?file=/index.tsx
 
+## `omitProps`
+
+Create a new subset props object by **omitting unwanted keys** from the source props.
+
+A lighter alternative to Solid's [splitProps](https://www.solidjs.com/docs/latest/api#splitprops) for creating only a single new props object.
+
+### How to use it
+
+```tsx
+import { omitProps } from "@solid-primitives/props";
+
+const MyButton: ParentComponent<
+  JSX.HTMLAttributes<HTMLButtonElement> & {
+    size: "small" | "medium" | "large";
+    primary: boolean;
+    animate: boolean;
+  }
+> = props => {
+  const attrs = omitProps(props, "size", "primary", "animate", "children");
+
+  createEffect(() => {
+    // access the rest of the props from the "props" object
+    props.animate;
+    props.size;
+  });
+
+  return <button {...attrs}>{props.children}</button>;
+};
+```
+
+## `pickProps`
+
+Create a new subset props object by **selecting only specified keys** from the source props.
+
+A lighter alternative to Solid's [splitProps](https://www.solidjs.com/docs/latest/api#splitprops) for creating only a single new props object.
+
+### How to use it
+
+```tsx
+import { pickProps } from "@solid-primitives/props";
+
+const MyButton: ParentComponent<{
+  class?: string;
+  style?: JSX.CSSProperties | string;
+  size: "small" | "medium" | "large";
+  primary: boolean;
+  animate: boolean;
+}> = props => {
+  const attrs = pickProps(props, "class", "style", "children");
+
+  createEffect(() => {
+    // access the rest of the props from the "props" object
+    props.animate;
+    props.size;
+  });
+
+  return <button {...attrs} />;
+};
+```
+
 ## `createProps`
 
 Primitive that provides controllable props signals like knobs/controls for simple component testing
@@ -185,12 +247,16 @@ Renamed `createProps` to `createControlledProps`, `createProp` to `createControl
 
 Added `combineProps` primitive
 
-2.1.0
+2.1.0 - [PR#128](https://github.com/solidjs-community/solid-primitives/pull/128)
 
 Add support for tuple event handlers and de-dupeing to `combineProps`.
 
 2.1.1
 
 Support for Solid 1.4
+
+2.2.0
+
+Add `pickProps` and `omitProps` primitives
 
 </details>

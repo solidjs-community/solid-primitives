@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/props",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "Library of primitives focused around component props.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
@@ -17,6 +17,8 @@
     "stage": 3,
     "list": [
       "combineProps",
+      "omitProps",
+      "pickProps",
       "createControlledProps"
     ],
     "category": "Utilities"
