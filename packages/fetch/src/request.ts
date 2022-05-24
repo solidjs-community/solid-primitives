@@ -1,6 +1,6 @@
 import { RequestModifier } from "./modifiers";
 
-import { AxiosStatic } from 'axios';
+import { AxiosStatic } from "axios";
 
 export const fetchRequest: RequestModifier =
   <T>(fetch = globalThis.fetch) =>
@@ -23,18 +23,15 @@ export const fetchRequest: RequestModifier =
     requestContext.wrapResource();
   };
 
-export const axiosRequest: RequestModifier = (axios: AxiosStatic) =>
-  requestContext => {
-    requestContext.fetcher = (requestData: [info: RequestInfo, init?: RequestInit]) => {      
-      return axios.request({
-        ...(typeof requestData[0] === 'string'
-          ? { url: requestData[0], method: 'get' }
-          : requestData[0]),
-        ...requestData[1],
-        ...(requestContext.abortController
-          ? { signal: requestContext.abortController.signal }
-          : {})
-      } as any)
-    }
-    requestContext.wrapResource();
+export const axiosRequest: RequestModifier = (axios: AxiosStatic) => requestContext => {
+  requestContext.fetcher = (requestData: [info: RequestInfo, init?: RequestInit]) => {
+    return axios.request({
+      ...(typeof requestData[0] === "string"
+        ? { url: requestData[0], method: "get" }
+        : requestData[0]),
+      ...requestData[1],
+      ...(requestContext.abortController ? { signal: requestContext.abortController.signal } : {})
+    } as any);
   };
+  requestContext.wrapResource();
+};

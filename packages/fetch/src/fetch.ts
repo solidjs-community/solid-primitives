@@ -27,7 +27,7 @@ export type FetchOptions<I> = I extends undefined
       initialValue?: I;
       name?: string;
       fetch?: typeof fetch;
-      request: <T>(requestContext: RequestContext<T>) => void;
+      request?: <T>(requestContext: RequestContext<T>) => void;
       responseHandler?: (response: Response) => any;
       disable?: boolean;
     }
@@ -35,7 +35,7 @@ export type FetchOptions<I> = I extends undefined
       initialValue: I;
       name?: string;
       fetch?: typeof fetch;
-      request: <T>(requestContext: RequestContext<T>) => void;
+      request?: <T>(requestContext: RequestContext<T>) => void;
       responseHandler?: (response: Response) => any;
       disable?: boolean;
     };
@@ -60,7 +60,7 @@ export type FetchReturn<T, I> = [
 ];
 
 const isOptions = <I>(prop: any): prop is FetchOptions<I> =>
-  typeof prop === "object" && ["name", "initialValue", "fetch", "request"].some((key) => key in prop);
+  typeof prop === "object" && ["name", "initialValue", "fetch", "request"].some(key => key in prop);
 
 /* we want to be able to overload our functions */
 /* eslint no-redeclare:off */
