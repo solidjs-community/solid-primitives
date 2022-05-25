@@ -16,8 +16,8 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
-    "test": "uvu -r solid-register",
-    "test:watch": "watchlist src test -- npm test"
+    "test": "echo disabled defunct test suite",
+    "test:watch": "echo disabled defunct test suite"
   },
   "keywords": [
     "websocket",
