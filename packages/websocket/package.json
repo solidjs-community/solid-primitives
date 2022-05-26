@@ -1,27 +1,23 @@
 {
   "name": "@solid-primitives/websocket",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Primitive to create a worker helper",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/websocket",
   "private": false,
-  "main": "dist/cjs/index.cjs",
+  "type": "module",
+  "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "exports": {
-    "require": "./dist/cjs/index.cjs",
-    "import": "./dist/index.js",
-    "default": "./dist/index.js"
-  },
-  "sideEffects": "false",
+  "sideEffects": false,
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "echo noop build"
+    "build": "tsup",
+    "test": "echo disabled defunct test suite",
+    "test:watch": "echo disabled defunct test suite"
   },
   "keywords": [
     "websocket",
@@ -37,11 +33,9 @@
     "typescript": "^4.0.2"
   },
   "peerDependencies": {
-    "solid-js": "^1.3.1"
+    "solid-js": "^1.4.2"
   },
-  "jest": {
-    "setupFiles": [
-      "./test/setup.ts"
-    ]
+  "dependencies": {
+    "tsup": "^5.12.8"
   }
 }
