@@ -1,47 +1,12 @@
-import { asArray, Many, MaybeAccessor } from "@solid-primitives/utils";
-import { createEffect, onCleanup, on } from "solid-js";
+import { asArray, Many, MaybeAccessor, handleDiffArray } from "@solid-primitives/utils";
+import { makeEventListener } from "@solid-primitives/event-listener";
+import { createEffect, onCleanup, on, $PROXY, $TRACK, Accessor, createMemo } from "solid-js";
 
 export type ResizeHandler = (
   rect: DOMRectReadOnly,
   element: Element,
   entry: ResizeObserverEntry
 ) => void;
-
-function handleDiffArray<T>(
-  current: T[],
-  prev: T[],
-  handleRemoved: (item: T) => void,
-  handleAdded: (item: T) => void
-): void {
-  const currLength = current.length;
-  const prevLength = prev.length;
-  let i = 0;
-
-  if (!prevLength) {
-    for (; i < currLength; i++) handleAdded(current[i]);
-    return;
-  }
-
-  if (!currLength) {
-    for (; i < prevLength; i++) handleRemoved(prev[i]);
-    return;
-  }
-
-  let prevEl: T;
-  let currEl: T;
-
-  for (; i < prevLength; i++) {
-    if (prev[i] !== current[i]) break;
-  }
-  for (let j = i; j < prevLength; j++) {
-    prevEl = prev[i];
-    if (!current.includes(prevEl)) handleRemoved(prevEl);
-  }
-  for (; i < currLength; i++) {
-    currEl = current[i];
-    if (!prev.includes(currEl)) handleAdded(currEl);
-  }
-}
 
 export function makeResizeObserver<T extends Element>(
   callback: ResizeObserverCallback,
@@ -87,14 +52,23 @@ export function createResizeObserver<T extends Element>(
     }
   }
 
-  if (typeof targets === "function") {
-    createEffect(
-      on(
-        () => asArray(targets()),
-        (current, prev = []) => handleDiffArray(current, prev, unobserve, observe)
-      )
-    );
-  } else {
+  let refs: Accessor<T[]> | undefined;
+  // is an signal
+  if (typeof targets === "function") refs = () => asArray(targets()).slice() as T[];
+  // is a store array
+  else if (Array.isArray(targets) && $PROXY in targets)
+    refs = () => {
+      // track top-level store array
+      (targets as any)[$TRACK];
+      return targets.slice();
+    };
+  // is not reactive
+  else {
     asArray(targets).forEach(observe);
+    return;
   }
+
+  createEffect(
+    on(refs, (current, prev = []) => handleDiffArray(current, prev, observe, unobserve))
+  );
 }
