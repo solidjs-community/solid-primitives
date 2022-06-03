@@ -1,6 +1,62 @@
-import { createEffect, createSignal, onCleanup } from "solid-js";
+import { asArray, Many, MaybeAccessor } from "@solid-primitives/utils";
+import { createEffect, onCleanup, on } from "solid-js";
 
-type ResizeHandler = (size: { width: number; height: number }, ref: Element) => void;
+export type ResizeHandler = (
+  rect: DOMRectReadOnly,
+  element: Element,
+  entry: ResizeObserverEntry
+) => void;
+
+function handleDiffArray<T>(
+  current: T[],
+  prev: T[],
+  handleRemoved: (item: T) => void,
+  handleAdded: (item: T) => void
+): void {
+  const currLength = current.length;
+  const prevLength = prev.length;
+  let i = 0;
+
+  if (!prevLength) {
+    for (; i < currLength; i++) handleAdded(current[i]);
+    return;
+  }
+
+  if (!currLength) {
+    for (; i < prevLength; i++) handleRemoved(prev[i]);
+    return;
+  }
+
+  let prevEl: T;
+  let currEl: T;
+
+  for (; i < prevLength; i++) {
+    if (prev[i] !== current[i]) break;
+  }
+  for (let j = i; j < prevLength; j++) {
+    prevEl = prev[i];
+    if (!current.includes(prevEl)) handleRemoved(prevEl);
+  }
+  for (; i < currLength; i++) {
+    currEl = current[i];
+    if (!prev.includes(currEl)) handleAdded(currEl);
+  }
+}
+
+export function makeResizeObserver<T extends Element>(
+  callback: ResizeObserverCallback,
+  options?: ResizeObserverOptions
+): {
+  observe: (ref: T) => void;
+  unobserve: (ref: T) => void;
+} {
+  const resizeObserver = new ResizeObserver(callback);
+  onCleanup(resizeObserver.disconnect.bind(resizeObserver));
+  return {
+    observe: ref => resizeObserver.observe(ref, options),
+    unobserve: resizeObserver.unobserve.bind(resizeObserver)
+  };
+}
 
 /**
  * Create resize observer is a helper primitive for binding resize events.
@@ -10,53 +66,35 @@ type ResizeHandler = (size: { width: number; height: number }, ref: Element) => 
  * @return A callback that can be used to add refs to observe resizing
  *
  */
-function createResizeObserver<T extends Element>(opts: {
-  onResize: ResizeHandler;
-  refs?: T | T[] | (() => T | T[]);
-}): (arg: T) => void {
-  const [otherRefs, setOtherRefs] = createSignal<T[]>([]);
-  // @ts-ignore
-  const refCallback = (e: T) => setOtherRefs((l: T[]) => l.concat(e));
-  const previousMap = new Map<Element, ObservedSize>();
-  const resizeObserver = new ResizeObserver(entries => {
-    if (!Array.isArray(entries)) {
-      return;
-    }
-    for (const entry of entries) {
-      const newWidth = Math.round(entry.contentRect.width);
-      const newHeight = Math.round(entry.contentRect.height);
-      const previous = previousMap.get(entry.target);
-      if (!previous || previous.width !== newWidth || previous.height !== newHeight) {
-        const newSize = { width: newWidth, height: newHeight };
-        opts.onResize(newSize, entry.target);
-        previousMap.set(entry.target, { width: newWidth, height: newHeight });
-      }
-    }
-  });
-  createEffect((oldRefs?: T[]) => {
-    let refs: T[] = [];
-    if (opts.refs) {
-      const optsRefs = typeof opts.refs === "function" ? opts.refs() : opts.refs;
-      if (Array.isArray(optsRefs)) refs = refs.concat(optsRefs);
-      else refs.push(optsRefs);
-    }
-    refs = refs.concat(otherRefs());
-    oldRefs = oldRefs || [];
-    oldRefs.forEach(oldRef => {
-      if (!(oldRef in refs)) {
-        resizeObserver.unobserve(oldRef);
-        previousMap.delete(oldRef);
-      }
-    });
-    refs.forEach(ref => {
-      if (!(ref in oldRefs!)) {
-        resizeObserver.observe(ref);
-      }
-    });
-    return refs;
-  });
-  onCleanup(() => resizeObserver.disconnect());
-  return refCallback;
-}
+export function createResizeObserver<T extends Element>(
+  targets: MaybeAccessor<Many<T>>,
+  onResize: ResizeHandler,
+  options?: ResizeObserverOptions
+): void {
+  const previousMap = new WeakMap<Element, { width: number; height: number }>();
+  const { observe, unobserve } = makeResizeObserver(handleObserverCallback, options);
 
-export default createResizeObserver;
+  function handleObserverCallback(entries: ResizeObserverEntry[]) {
+    for (const entry of entries) {
+      const { contentRect, target } = entry;
+      const width = Math.round(contentRect.width);
+      const height = Math.round(contentRect.height);
+      const previous = previousMap.get(target);
+      if (!previous || previous.width !== width || previous.height !== height) {
+        onResize(contentRect, entry.target, entry);
+        previousMap.set(target, { width, height });
+      }
+    }
+  }
+
+  if (typeof targets === "function") {
+    createEffect(
+      on(
+        () => asArray(targets()),
+        (current, prev = []) => handleDiffArray(current, prev, unobserve, observe)
+      )
+    );
+  } else {
+    asArray(targets).forEach(observe);
+  }
+}
