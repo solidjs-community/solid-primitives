@@ -91,7 +91,7 @@ Solid Primitives strives to provide idiomatic Solid principles but also allow ro
 | 3     | Pre-shipping (final effort) |
 | 4     | Accepted/shipped            |
 
-Any primitive Stage 0-1 should be used with caution and with the understanding the the design or implementation may change. Beyond Stage 2 we make an effort to mitigate changes. If a primitive reaches Stage 2 it's likely to remain an official package with additional approvement until fully accepted and shipped.
+Any primitive Stage 0-1 should be used with caution and with the understanding that the design or implementation may change. Beyond Stage 2 we make an effort to mitigate changes. If a primitive reaches Stage 2 it's likely to remain an official package with additional approvement until fully accepted and shipped.
 
 ## Design Maxims
 
@@ -131,7 +131,7 @@ Solid Primitives is mostly about supplying 80-90% of the common-use cases for th
 
 Solid Primitives is a large and growing project and the way we manage and release updates has been setup to suit the projects scope. The approach we've taken with organizing our packages and npm releases is more granular than other projects such as VueUse which ship all updates in a single release.
 
-There are a number of benefits to this including small download sizes, reducing bloat and not shipping experimental/unnecessary primitives that users don't need or want locally. Thie does mean a bit more effort to install precisely what you need. As a team we've decided that this tradeoff is beneficial and valuable. 
+There are a number of benefits to this including small download sizes, reducing bloat and not shipping experimental/unnecessary primitives that users don't need or want locally. This does mean a bit more effort to install precisely what you need. As a team we've decided that this tradeoff is beneficial and valuable. 
 
 ## CLI Helpers
 
