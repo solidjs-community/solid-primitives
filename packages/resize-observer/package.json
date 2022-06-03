@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/resize-observer",
   "version": "2.0.0",
-  "description": "Reactive primitives for observing resizing of browser window or HTML elements.",
+  "description": "Reactive primitives for observing resizing of HTML elements.",
   "author": "Moshe Udimar",
   "contributors": [
     "Damian Tarnawski <gthetarnav@gmail.com>"
@@ -46,9 +46,7 @@
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "npm run start",
-    "build": "tsup",
-    "test": "uvu -r solid-register",
-    "test:watch": "watchlist src test -- npm test"
+    "build": "tsup"
   },
   "devDependencies": {
     "jsdom": "^19.0.0",
@@ -64,7 +62,6 @@
     "watchlist": "^0.3.1"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "^2.0.0",
     "@solid-primitives/utils": "^2.1.0"
   },
   "peerDependencies": {

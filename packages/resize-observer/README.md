@@ -9,7 +9,10 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/resize-observer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/resize-observer)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Provides a reactive resize observer wrapper.
+Reactive primitives for observing resizing of HTML elements.
+
+- [`makeResizeObserver`](#makeResizeObserver) — Instantiate a new ResizeObserver that automatically get's disposed on cleanup.
+- [`createResizeObserver`](#createResizeObserver) — Create resize observer instance, listening for changes to size of reactive element targets array.
 
 ## Installation
 
@@ -19,14 +22,80 @@ npm install @solid-primitives/resize-observer
 yarn add @solid-primitives/resize-observer
 ```
 
-## How to use it
+## `makeResizeObserver`
 
-### createResizeObserver
+Instantiate a new ResizeObserver that automatically get's disposed on cleanup.
 
-Main resize observer primitive.
+### How to use it
+
+`makeResizeObserver` returns `observe` and `unobserve` functions for managing targets.
 
 ```ts
-const refCallback = createResizeObserver(() => console.log("resized"));
+import { makeResizeObserver } from "@solid-primitives/resize-observer";
+
+const { observe, unobserve } = makeResizeObserver(handleObserverCallback, { box: "content-box" });
+observe(document.body);
+observe(ref);
+
+function handleObserverCallback(entries: ResizeObserverEntry[]) {
+  for (const entry of entries) {
+    console.log(entry.contentRect.width);
+  }
+}
+```
+
+#### Disposing
+
+`makeResizeObserver` will dispose itself with it's parent reactive owner.
+
+To dispose early, wrap the primitive with a [`createRoot`](https://www.solidjs.com/docs/latest/api#createroot).
+
+```ts
+const { dispose } = createRoot(dispose => {
+  const { observe, unobserve } = makeResizeObserver(handleObserverCallback);
+  return { dispose, observe, unobserve };
+});
+// dispose early
+dispose();
+```
+
+## `createResizeObserver`
+
+Create resize observer instance, listening for changes to size of reactive element targets array.
+
+Disposes automatically itself with it's parent reactive owner.
+
+### How to use it
+
+```tsx
+import { createResizeObserver } from "@solid-primitives/resize-observer";
+
+let ref!: HTMLDivElement;
+
+// can in onMount if the target variable in not yet populated
+onMount(() => {
+  createResizeObserver(ref, ({ width, height }, el) => {
+    if (el === ref) console.log(width, height);
+  });
+});
+
+<div ref={ref} />;
+```
+
+#### Reactive targets
+
+The `targets` argument can be a reactive signal or top-level store array.
+
+```ts
+const [targets, setTargets] = createSignal([document.body]);
+createResizeObserver(targets, ({ width, height }, el) => {});
+// updating the signal will unobserve removed elements and observe added ones
+setTargets(p => [...p, element]);
+
+// createResizeObserver supports top-lever store arrays too
+const [targets, setTargets] = createStore([document.body]);
+createResizeObserver(targets, ({ width, height }, el) => {});
+setTargets(targets.length, element);
 ```
 
 ## Changelog
@@ -44,7 +113,11 @@ Release initial version for CJS and SSR support.
 
 1.0.4
 
-Patched HTMLElement to Element to resolve type error on buildd. Updated to Solid 1.3.
+Patched HTMLElement to Element to resolve type error on build. Updated to Solid 1.3.
+
+2.0.0
+
+Added `makeResizeObserver` and refactored `createResizeObserver` API.
 
 </details>
 

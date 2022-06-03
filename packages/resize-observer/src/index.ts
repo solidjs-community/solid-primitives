@@ -1,6 +1,5 @@
 import { asArray, Many, MaybeAccessor, handleDiffArray } from "@solid-primitives/utils";
-import { makeEventListener } from "@solid-primitives/event-listener";
-import { createEffect, onCleanup, on, $PROXY, $TRACK, Accessor, createMemo } from "solid-js";
+import { createEffect, onCleanup, on, $PROXY, $TRACK, Accessor } from "solid-js";
 
 export type ResizeHandler = (
   rect: DOMRectReadOnly,
@@ -8,6 +7,13 @@ export type ResizeHandler = (
   entry: ResizeObserverEntry
 ) => void;
 
+/**
+ * Instantiate a new ResizeObserver that automatically get's disposed on cleanup.
+ *
+ * @param callback handler called once element size changes
+ * @param options ResizeObserver options
+ * @returns `observe` and `unobserve` functions
+ */
 export function makeResizeObserver<T extends Element>(
   callback: ResizeObserverCallback,
   options?: ResizeObserverOptions
@@ -24,12 +30,19 @@ export function makeResizeObserver<T extends Element>(
 }
 
 /**
- * Create resize observer is a helper primitive for binding resize events.
+ * Create resize observer instance, listening for changes to size of the reactive {@link targets} array.
  *
- * @param opts.refs - Either an `Element`, an array of `Element`s, or a signal returning one of these.
- * @param opts.onResize - Function handler to trigger on resize
- * @return A callback that can be used to add refs to observe resizing
+ * @param targets Elements to be observed. Can be a reactive signal or store top-level array.
+ * @param onResize - Function handler to trigger on element resize
  *
+ * @example
+ * ```tsx
+ * let ref
+ * createResizeObserver(() => ref, ({ width, height }, el) => {
+ *   if (el === ref) console.log(width, height)
+ * });
+ * <div ref={ref}/>
+ * ```
  */
 export function createResizeObserver<T extends Element>(
   targets: MaybeAccessor<Many<T>>,
