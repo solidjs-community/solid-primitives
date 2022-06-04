@@ -53,8 +53,8 @@ export function makeResizeObserver<T extends Element>(
  * <div ref={ref}/>
  * ```
  */
-export function createResizeObserver<T extends Element>(
-  targets: MaybeAccessor<Many<T>>,
+export function createResizeObserver(
+  targets: MaybeAccessor<Many<Element>>,
   onResize: ResizeHandler,
   options?: ResizeObserverOptions
 ): void {
@@ -74,9 +74,9 @@ export function createResizeObserver<T extends Element>(
     }
   }
 
-  let refs: Accessor<T[]> | undefined;
+  let refs: Accessor<Element[]> | undefined;
   // is an signal
-  if (typeof targets === "function") refs = () => asArray(targets()).slice() as T[];
+  if (typeof targets === "function") refs = () => asArray(targets()).slice();
   // is a store array
   else if (Array.isArray(targets) && $PROXY in targets)
     refs = () => {
