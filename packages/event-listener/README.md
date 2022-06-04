@@ -339,4 +339,8 @@ Add `makeEventListener` and `makeEventListenerStack`
 
 Remove clear() functions from reactive primitives.
 
+2.1.0
+
+Allow for `undefined` targets in `createEventListener`
+
 </details>
