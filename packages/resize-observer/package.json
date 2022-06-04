@@ -16,7 +16,9 @@
     "name": "resize-observer",
     "stage": 3,
     "list": [
-      "createResizeObserver"
+      "createResizeObserver",
+      "createWindowSize",
+      "createElementSize"
     ],
     "category": "Display & Media"
   },
@@ -62,7 +64,9 @@
     "watchlist": "^0.3.1"
   },
   "dependencies": {
-    "@solid-primitives/utils": "^2.1.0"
+    "@solid-primitives/event-listener": "^2.1.0",
+    "@solid-primitives/utils": "^2.1.0",
+    "@solid-primitives/rootless": "^1.1.0"
   },
   "peerDependencies": {
     "solid-js": "^1.4.0"

@@ -1,5 +1,14 @@
-import { asArray, Many, MaybeAccessor, handleDiffArray } from "@solid-primitives/utils";
-import { createEffect, onCleanup, on, $PROXY, $TRACK, Accessor } from "solid-js";
+import { createEffect, onCleanup, on, $PROXY, $TRACK, Accessor, onMount } from "solid-js";
+import {
+  asArray,
+  Many,
+  MaybeAccessor,
+  handleDiffArray,
+  createStaticStore,
+  access
+} from "@solid-primitives/utils";
+import { createSharedRoot } from "@solid-primitives/rootless";
+import { makeEventListener } from "@solid-primitives/event-listener";
 
 export type ResizeHandler = (
   rect: DOMRectReadOnly,
@@ -84,4 +93,80 @@ export function createResizeObserver<T extends Element>(
   createEffect(
     on(refs, (current, prev = []) => handleDiffArray(current, prev, observe, unobserve))
   );
+}
+
+export function getWindowSize(): {
+  width: number;
+  height: number;
+  scrollWidth: number;
+  scrollHeight: number;
+  screenWidth: number;
+  screenHeight: number;
+} {
+  return {
+    width: window.innerWidth,
+    height: window.innerHeight,
+    scrollWidth: document.body.scrollWidth,
+    scrollHeight: document.body.scrollHeight,
+    screenWidth: window.screen.height,
+    screenHeight: window.screen.height
+  };
+}
+
+export function createWindowSize(): {
+  readonly width: number;
+  readonly height: number;
+  readonly scrollWidth: number;
+  readonly scrollHeight: number;
+  readonly screenWidth: number;
+  readonly screenHeight: number;
+} {
+  const [size, setSize] = createStaticStore(getWindowSize());
+  const updateSize = () => setSize(getWindowSize());
+  makeEventListener(window, "resize", updateSize);
+  return size;
+}
+
+export const useWindowSize: typeof createWindowSize = createSharedRoot(createWindowSize);
+
+export function getElementSize(target: Element | false | undefined | null):
+  | {
+      width: number;
+      height: number;
+    }
+  | {
+      width: null;
+      height: null;
+    } {
+  if (!target)
+    return {
+      width: null,
+      height: null
+    };
+  const { width, height } = target.getBoundingClientRect();
+  return { width, height };
+}
+
+export function createElementSize(target: MaybeAccessor<Element>): {
+  readonly width: number;
+  readonly height: number;
+};
+export function createElementSize(target: Accessor<Element | false | undefined | null>):
+  | {
+      readonly width: number;
+      readonly height: number;
+    }
+  | {
+      readonly width: null;
+      readonly height: null;
+    };
+export function createElementSize(target: Accessor<Element | false | undefined | null> | Element): {
+  readonly width: number | null;
+  readonly height: number | null;
+} {
+  const [size, setSize] = createStaticStore(getElementSize(access(target)));
+  if (typeof target === "function") onMount(() => setSize(getElementSize(target())));
+  const updateSize = (e: DOMRectReadOnly) => setSize({ width: e.width, height: e.height });
+  createResizeObserver(typeof target === "function" ? () => target() || [] : target, updateSize);
+  return size;
 }
