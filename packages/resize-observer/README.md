@@ -72,7 +72,7 @@ import { createResizeObserver } from "@solid-primitives/resize-observer";
 
 let ref!: HTMLDivElement;
 
-// can in onMount if the target variable in not yet populated
+// can in onMount if the target variable isn't yet populated
 onMount(() => {
   createResizeObserver(ref, ({ width, height }, el) => {
     if (el === ref) console.log(width, height);
