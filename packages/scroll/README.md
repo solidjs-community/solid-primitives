@@ -12,6 +12,7 @@
 Reactive primitives to react to element/window scrolling.
 
 - [`createScrollPosition`](#createScrollPosition) - Reactive primitive providing a store-like object with current scroll position of specified target.
+- [`useWindowScrollPosition`](#useWindowScrollPosition) - Returns a reactive object with current window scroll position.
 
 ## Installation
 
@@ -95,6 +96,23 @@ y(); // => number
 ### Demo
 
 You may view a working example here: https://codesandbox.io/s/solid-primitives-scroll-csg7f
+
+## `useWindowScrollPosition`
+
+Returns a reactive object with current window scroll position.
+
+`useWindowScrollPosition` is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive, hence the object instance, signals and event-listeners are shared between dependents, making it more optimized to use in multiple places at once.
+
+```ts
+const scroll = useWindowScrollPosition();
+
+createEffect(() => {
+  console.log(
+    scroll.x, // => number
+    scroll.y //  => number
+  );
+});
+```
 
 ## Additional helpers
 

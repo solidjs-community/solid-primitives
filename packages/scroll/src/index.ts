@@ -1,6 +1,7 @@
+import { createComputed, on, onMount } from "solid-js";
 import { access, createStaticStore, MaybeAccessor } from "@solid-primitives/utils";
 import { createEventListener } from "@solid-primitives/event-listener";
-import { createComputed, on, onMount } from "solid-js";
+import { createSharedRoot } from "@solid-primitives/rootless";
 
 /**
  * Get an `{ x: number, y: number }` object of element/window scroll position.
@@ -70,3 +71,16 @@ export function createScrollPosition(
   createEventListener(target, "scroll", updatePos);
   return pos;
 }
+
+/**
+ * Returns a reactive object with current window scroll position.
+ *
+ * This is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive.
+ *
+ * @example
+ * const scroll = useWindowScrollPosition();
+ * createEffect(() => {
+ *   console.log(scroll.x, scroll.y)
+ * })
+ */
+export const useWindowScrollPosition = createSharedRoot(() => createScrollPosition(window));
