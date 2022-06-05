@@ -13,6 +13,8 @@ Reactive primitives for observing resizing of HTML elements.
 
 - [`makeResizeObserver`](#makeResizeObserver) — Instantiate a new ResizeObserver that automatically get's disposed on cleanup.
 - [`createResizeObserver`](#createResizeObserver) — Create resize observer instance, listening for changes to size of reactive element targets array.
+- [`createWindowSize`](#createWindowSize) — Creates a reactive store-like object of current width and height dimensions of window, page and screen.
+- [`createElementSize`](#createElementSize) — Creates a reactive store-like object of current width and height dimensions of html element.
 
 ## Installation
 
@@ -98,6 +100,74 @@ createResizeObserver(targets, ({ width, height }, el) => {});
 setTargets(targets.length, element);
 ```
 
+## `createWindowSize`
+
+Creates a reactive store-like object of current width and height dimensions of window, page and screen.
+
+### How to use it
+
+```ts
+import { createWindowSize } from "@solid-primitives/resize-observer";
+
+const size = createWindowSize();
+
+createEffect(() => {
+  size.width; // => number
+  size.height; // => number
+});
+```
+
+### `useWindowSize`
+
+`useWindowSize` is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive. It is providing the same reactive object as `createWindowSize`, but the object instance, signals and event-listeners are shared between dependents, making it more optimized to use in multiple places at once.
+
+```ts
+import { useWindowSize } from "@solid-primitives/resize-observer";
+
+const size = useWindowSize();
+
+createEffect(() => {
+  size.width; // => number
+  size.height; // => number
+});
+```
+
+### Media Queries
+
+**The `createWindowSize` isn't meant to be used for creating media queries.**
+
+If you want a reactive interface for media-queries, please checkout [the media package](https://github.com/solidjs-community/solid-primitives/tree/main/packages/media#readme).
+
+## `createElementSize`
+
+Creates a reactive store-like object of current width and height dimensions of html element.
+
+### How to use it
+
+`createElementSize` needs to be provided a target. It can be an HTML element, or a reactive signal returning one. Target also takes falsy values to disable tracking.
+
+```tsx
+import { createElementSize } from "@solid-primitives/resize-observer";
+
+const size = createElementSize(document.body);
+createEffect(() => {
+  size.width; // => number
+  size.height; // => number
+});
+
+// reactive target
+
+const [target, setTarget] = createSignal<HTMLElement>();
+
+const size = createElementSize(target);
+createEffect(() => {
+  size.width; // => number | null
+  size.height; // => number | null
+});
+
+<div ref={setTarget} />;
+```
+
 ## Changelog
 
 <details>
@@ -117,7 +187,9 @@ Patched HTMLElement to Element to resolve type error on build. Updated to Solid 
 
 2.0.0
 
-Added `makeResizeObserver` and refactored `createResizeObserver` API.
+Refactored `createResizeObserver` API.
+
+Added `makeResizeObserver`, `createWindowSize`, `useWindowSize` and `createElementSize`
 
 </details>
 

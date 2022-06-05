@@ -95,31 +95,30 @@ export function createResizeObserver(
   );
 }
 
+/**
+ * @returns object with width and height dimensions of window, page and screen.
+ */
 export function getWindowSize(): {
   width: number;
   height: number;
-  scrollWidth: number;
-  scrollHeight: number;
-  screenWidth: number;
-  screenHeight: number;
 } {
   return {
     width: window.innerWidth,
-    height: window.innerHeight,
-    scrollWidth: document.body.scrollWidth,
-    scrollHeight: document.body.scrollHeight,
-    screenWidth: window.screen.height,
-    screenHeight: window.screen.height
+    height: window.innerHeight
   };
 }
 
+/**
+ * Creates a reactive store-like object of current width and height dimensions of window, page and screen.
+ * @example
+ * const size = createWindowSize();
+ * createEffect(() => {
+ *   console.log(size.width, size.height)
+ * })
+ */
 export function createWindowSize(): {
   readonly width: number;
   readonly height: number;
-  readonly scrollWidth: number;
-  readonly scrollHeight: number;
-  readonly screenWidth: number;
-  readonly screenHeight: number;
 } {
   const [size, setSize] = createStaticStore(getWindowSize());
   const updateSize = () => setSize(getWindowSize());
@@ -127,8 +126,23 @@ export function createWindowSize(): {
   return size;
 }
 
+/**
+ * Returns a reactive store-like object of current width and height dimensions of window, page and screen.
+ *
+ * This is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive.
+ *
+ * @example
+ * const size = useWindowSize();
+ * createEffect(() => {
+ *   console.log(size.width, size.height)
+ * })
+ */
 export const useWindowSize: typeof createWindowSize = createSharedRoot(createWindowSize);
 
+/**
+ * @param target html element
+ * @returns object with width and height dimensions of provided {@link target} element.
+ */
 export function getElementSize(target: Element | false | undefined | null):
   | {
       width: number;
@@ -147,6 +161,16 @@ export function getElementSize(target: Element | false | undefined | null):
   return { width, height };
 }
 
+/**
+ * Creates a reactive store-like object of current width and height dimensions of {@link target} element.
+ * @param target html element to track the size of. Can be a reactive signal.
+ * @returns `{ width: number, height: number }`
+ * @example
+ * const size = createElementSize(document.body);
+ * createEffect(() => {
+ *   console.log(size.width, size.height)
+ * })
+ */
 export function createElementSize(target: MaybeAccessor<Element>): {
   readonly width: number;
   readonly height: number;
