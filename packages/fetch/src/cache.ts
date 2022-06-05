@@ -2,21 +2,23 @@ import { DEV } from "solid-js";
 import { RequestContext } from "./fetch";
 import { RequestModifier, wrapFetcher } from "./modifiers";
 
-export type CacheEntry = {
+export type CacheEntry<T = any> = {
   ts: number;
   requestData: [info: RequestInfo, init?: RequestInit];
-  data: any;
+  data: T;
 };
 
-export type CacheOptions = {
-  expires: number | ((entry: CacheEntry) => boolean);
+export type RequestCache<T = any> = Record<string, CacheEntry<T>>;
+
+export type CacheOptions<T = any> = {
+  expires: number | ((entry: CacheEntry<T>) => boolean);
+  cache?: RequestCache<T>;
 };
 
-export const defaultCacheOptions = {
-  expires: 5000
+export const defaultCacheOptions: CacheOptions = {
+  expires: 5000,
+  cache: {}
 };
-
-export type RequestCache = Record<string, Response>;
 
 export const serializeRequest = (requestData: [info: RequestInfo, init?: RequestInit]): string =>
   JSON.stringify({
@@ -25,13 +27,13 @@ export const serializeRequest = (requestData: [info: RequestInfo, init?: Request
   });
 
 export const withCache: RequestModifier =
-  <T>(options = defaultCacheOptions) =>
+  <T>(options: CacheOptions = defaultCacheOptions) =>
   (requestContext: RequestContext<T>) => {
-    requestContext.cache = {} as RequestCache;
-    const isExpired =
+    requestContext.cache = requestContext.cache || options.cache;
+    const isExpired = (entry: CacheEntry) =>
       typeof options.expires === "number"
-        ? (entry: CacheEntry) => entry.ts + options.expires > new Date().getTime()
-        : options.expires;
+        ? entry.ts + options.expires > new Date().getTime()
+        : options.expires(entry);
     wrapFetcher<T>(requestContext, <T>(originalFetcher: any) => (requestData, info) => {
       const serializedRequest = serializeRequest(requestData);
       const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
@@ -52,10 +54,20 @@ export const withCache: RequestModifier =
       });
     });
     requestContext.wrapResource();
+    Object.assign(requestContext.resource![1], {
+      invalidate: (requestData: [info: RequestInfo, init?: RequestInit]) => {
+        try {
+          delete requestContext.cache[serializeRequest(requestData)];
+        } catch (e) {
+          DEV &&
+            console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
+        }
+      }
+    });
   };
 
 export const withCacheStorage: RequestModifier =
-  (storage: Storage = localStorage, key = "cache") =>
+  (storage: Storage = localStorage, key = "fetch-cache") =>
   requestContext => {
     try {
       const loadedCache = JSON.parse(storage.getItem(key) || "{}");
@@ -67,7 +79,7 @@ export const withCacheStorage: RequestModifier =
     requestContext.writeCache = (...args: any[]) => {
       originalWriteCache?.(...args);
       try {
-        localStorage.setItem(key, JSON.stringify(requestContext.cache));
+        storage.setItem(key, JSON.stringify(requestContext.cache));
       } catch (e) {
         DEV && console.warn("attempt to store request cache failed with error", e);
       }
