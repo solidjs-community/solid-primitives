@@ -48,7 +48,9 @@
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "npm run start",
-    "build": "tsup"
+    "build": "tsup",
+    "test": "uvu -r solid-register",
+    "test:watch": "watchlist src test -- npm test"
   },
   "devDependencies": {
     "jsdom": "^19.0.0",
