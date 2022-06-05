@@ -1,4 +1,4 @@
-import { createSignal, ResourceFetcherInfo } from "solid-js";
+import { createSignal, getOwner, onCleanup, ResourceFetcherInfo } from "solid-js";
 import { RequestContext } from "./fetch";
 
 export type RequestModifier = <T>(...args: any[]) => (requestContext: RequestContext<T>) => any;
@@ -144,6 +144,42 @@ export const withRetry: RequestModifier =
               );
           return wrappedFetcher(0);
         }
+    );
+    requestContext.wrapResource();
+  };
+
+export type RefetchEventOptions<T> = {
+  on?: (keyof WindowEventMap)[];
+  filter?: (requestData: [info: RequestInfo, init?: RequestInit], data: T, ev: Event) => boolean;
+};
+
+export const withRefetchEvent: RequestModifier =
+  <T>(options: RefetchEventOptions<T> = {}) =>
+  (requestContext: RequestContext<T>) => {
+    requestContext.wrapResource();
+    let lastRequest: [requestData: [info: RequestInfo, init?: RequestInit], data: T] | undefined;
+    const events = options.on || ["visibilitychange"];
+    const filter = options.filter || (() => true);
+    const handler = (ev: Event) => {
+      if (
+        !lastRequest ||
+        (ev.type === "visibilitychange" && document.visibilityState !== "visible") ||
+        !filter(...lastRequest, ev)
+      ) {
+        return;
+      }
+      requestContext.resource?.[1].refetch();
+    };
+    events.forEach(name => window.addEventListener(name, handler));
+    getOwner() &&
+      onCleanup(() => events.forEach(name => window.removeEventListener(name, handler)));
+    wrapFetcher<T>(
+      requestContext,
+      originalFetcher => (requestData, info) =>
+        originalFetcher(requestData, info).then(data => {
+          lastRequest = [requestData, data as any];
+          return data;
+        })
     );
     requestContext.wrapResource();
   };
