@@ -3,27 +3,17 @@ import { access, createStaticStore } from "@solid-primitives/utils";
 import { createResizeObserver } from "@solid-primitives/resize-observer";
 import { makeEventListener } from "@solid-primitives/event-listener";
 
-export interface Bounds {
+export type Bounds = {
   top: number;
   left: number;
   bottom: number;
   right: number;
   width: number;
   height: number;
-}
+};
 
-/**
- * @returns object of element's boundingClientRect with enumerable properties
- */
-export function getElementBounds(element: Element | undefined | null | false):
-  | {
-      top: number;
-      left: number;
-      bottom: number;
-      right: number;
-      width: number;
-      height: number;
-    }
+export type NullableBounds =
+  | Bounds
   | {
       top: null;
       left: null;
@@ -31,7 +21,14 @@ export function getElementBounds(element: Element | undefined | null | false):
       right: null;
       width: null;
       height: null;
-    } {
+    };
+
+/**
+ * @returns object of element's boundingClientRect with enumerable properties
+ */
+export function getElementBounds(element: Element): Bounds;
+export function getElementBounds(element: Element | undefined | null | false): NullableBounds;
+export function getElementBounds(element: Element | undefined | null | false): NullableBounds {
   if (!element)
     return {
       top: null,
@@ -51,14 +48,7 @@ function clientRectToBounds(rect: {
   right: number;
   width: number;
   height: number;
-}): {
-  top: number;
-  left: number;
-  bottom: number;
-  right: number;
-  width: number;
-  height: number;
-} {
+}): Bounds {
   return {
     top: rect.top,
     left: rect.left,
@@ -69,32 +59,59 @@ function clientRectToBounds(rect: {
   };
 }
 
+/**
+ * Creates a reactive store-like object of current element bounds — position on the screen, and size dimensions. Bounds will be automatically updated on scroll, resize events and updates to the dom.
+ *
+ * @param target Element for calculating bounds. Can be a reactive signal. Set to falsy value to disable tracking.
+ * @param options Choose which events should be tracked *(All are enabled by default)*
+ * - `options.trackScroll` — listen to window scroll events
+ * - `options.trackMutation` — listen to changes to the dom structure/styles
+ * - `options.trackResize` — listen to element's resize events
+ * @returns reactive object of {@link target} bounds
+ * @example
+ * ```ts
+ * const bounds = createElementBounds(document.querySelector("#my_elem")!);
+ *
+ * createEffect(() => {
+ *    console.log(
+ *      bounds.width, // => number
+ *      bounds.height, // => number
+ *      bounds.top, // => number
+ *      bounds.left, // => number
+ *      bounds.right, // => number
+ *      bounds.bottom, // => number
+ *    );
+ * });
+ * ```
+ */
+export function createElementBounds(
+  target: Accessor<Element> | Element,
+  options?: {
+    trackScroll?: boolean;
+    trackMutation?: boolean;
+    trackResize?: boolean;
+  }
+): Readonly<Bounds>;
 export function createElementBounds(
   target: Accessor<Element | undefined | null | false> | Element,
-  options: {
+  options?: {
+    trackScroll?: boolean;
+    trackMutation?: boolean;
+    trackResize?: boolean;
+  }
+): Readonly<NullableBounds>;
+export function createElementBounds(
+  target: Accessor<Element | undefined | null | false> | Element,
+  {
+    trackMutation = true,
+    trackResize = true,
+    trackScroll = true
+  }: {
     trackScroll?: boolean;
     trackMutation?: boolean;
     trackResize?: boolean;
   } = {}
-):
-  | {
-      readonly top: number;
-      readonly left: number;
-      readonly bottom: number;
-      readonly right: number;
-      readonly width: number;
-      readonly height: number;
-    }
-  | {
-      readonly top: null;
-      readonly left: null;
-      readonly bottom: null;
-      readonly right: null;
-      readonly width: null;
-      readonly height: null;
-    } {
-  const { trackMutation = true, trackResize = true, trackScroll = true } = options;
-
+): Readonly<NullableBounds> {
   const [bounds, setBounds] = createStaticStore(getElementBounds(access(target)));
   const updateBounds = () => setBounds(getElementBounds(access(target)));
   const updateBoundsOf = (el: Element | undefined | null | false) =>

@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/bounds",
   "version": "0.0.100",
-  "description": "A template primitive example.",
+  "description": "Primitives for tracking HTML element size and position on screen as it changes.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
@@ -17,7 +17,7 @@
     "name": "bounds",
     "stage": 0,
     "list": [
-      "createPrimitiveTemplate"
+      "createElementBounds"
     ],
     "category": "Display & Media"
   },
@@ -39,7 +39,10 @@
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "size",
+    "position",
+    "bounds"
   ],
   "devDependencies": {
     "jsdom": "^19.0.0",
