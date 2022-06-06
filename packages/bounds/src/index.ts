@@ -1,6 +1,6 @@
 import { Accessor, createComputed, on, onCleanup, onMount } from "solid-js";
 import { access, createStaticStore } from "@solid-primitives/utils";
-import { createResizeObserver } from "@solid-primitives/resize-observer";
+import { createResizeObserver, ResizeHandler } from "@solid-primitives/resize-observer";
 import { makeEventListener } from "@solid-primitives/event-listener";
 
 export type Bounds = {
@@ -12,16 +12,26 @@ export type Bounds = {
   height: number;
 };
 
-export type NullableBounds =
-  | Bounds
-  | {
-      top: null;
-      left: null;
-      bottom: null;
-      right: null;
-      width: null;
-      height: null;
-    };
+export type NullableBounds = Bounds | typeof NULLED_BOUNDS;
+
+export type UpdateGuard = <Args extends unknown[]>(
+  update: (...args: Args) => void
+) => (...args: Args) => void;
+
+export type Options = {
+  trackScroll?: boolean | UpdateGuard;
+  trackMutation?: boolean | UpdateGuard;
+  trackResize?: boolean | UpdateGuard;
+};
+
+const NULLED_BOUNDS = {
+  top: null,
+  left: null,
+  bottom: null,
+  right: null,
+  width: null,
+  height: null
+} as const;
 
 /**
  * @returns object of element's boundingClientRect with enumerable properties
@@ -29,26 +39,8 @@ export type NullableBounds =
 export function getElementBounds(element: Element): Bounds;
 export function getElementBounds(element: Element | undefined | null | false): NullableBounds;
 export function getElementBounds(element: Element | undefined | null | false): NullableBounds {
-  if (!element)
-    return {
-      top: null,
-      left: null,
-      bottom: null,
-      right: null,
-      width: null,
-      height: null
-    };
-  return clientRectToBounds(element.getBoundingClientRect());
-}
-
-function clientRectToBounds(rect: {
-  top: number;
-  left: number;
-  bottom: number;
-  right: number;
-  width: number;
-  height: number;
-}): Bounds {
+  if (!element) return Object.assign({}, NULLED_BOUNDS);
+  const rect = element.getBoundingClientRect();
   return {
     top: rect.top,
     left: rect.left,
@@ -70,7 +62,8 @@ function clientRectToBounds(rect: {
  * @returns reactive object of {@link target} bounds
  * @example
  * ```ts
- * const bounds = createElementBounds(document.querySelector("#my_elem")!);
+ * const target = document.querySelector("#my_elem")!;
+ * const bounds = createElementBounds(target);
  *
  * createEffect(() => {
  *    console.log(
@@ -86,31 +79,15 @@ function clientRectToBounds(rect: {
  */
 export function createElementBounds(
   target: Accessor<Element> | Element,
-  options?: {
-    trackScroll?: boolean;
-    trackMutation?: boolean;
-    trackResize?: boolean;
-  }
+  options?: Options
 ): Readonly<Bounds>;
 export function createElementBounds(
   target: Accessor<Element | undefined | null | false> | Element,
-  options?: {
-    trackScroll?: boolean;
-    trackMutation?: boolean;
-    trackResize?: boolean;
-  }
+  options?: Options
 ): Readonly<NullableBounds>;
 export function createElementBounds(
   target: Accessor<Element | undefined | null | false> | Element,
-  {
-    trackMutation = true,
-    trackResize = true,
-    trackScroll = true
-  }: {
-    trackScroll?: boolean;
-    trackMutation?: boolean;
-    trackResize?: boolean;
-  } = {}
+  { trackMutation = true, trackResize = true, trackScroll = true }: Options = {}
 ): Readonly<NullableBounds> {
   const [bounds, setBounds] = createStaticStore(getElementBounds(access(target)));
   const updateBounds = () => setBounds(getElementBounds(access(target)));
@@ -122,10 +99,13 @@ export function createElementBounds(
     createComputed(on(target, updateBoundsOf, { defer: true }));
   }
 
-  if (trackResize)
-    createResizeObserver(typeof target === "function" ? () => target() || [] : target, (_, el) =>
-      updateBoundsOf(el)
+  if (trackResize) {
+    const resizeHandler: ResizeHandler = (_, el) => updateBoundsOf(el);
+    createResizeObserver(
+      typeof target === "function" ? () => target() || [] : target,
+      typeof trackResize === "function" ? trackResize(resizeHandler) : resizeHandler
     );
+  }
 
   if (trackScroll) {
     const scrollHandler =
@@ -137,11 +117,18 @@ export function createElementBounds(
         : (e: Event) => {
             if (e.target instanceof Node && e.target.contains(target)) updateBoundsOf(target);
           };
-    makeEventListener(window, "scroll", scrollHandler, { capture: true });
+    makeEventListener(
+      window,
+      "scroll",
+      typeof trackScroll === "function" ? trackScroll(scrollHandler) : scrollHandler,
+      { capture: true }
+    );
   }
 
   if (trackMutation) {
-    const mo = new MutationObserver(updateBounds);
+    const mo = new MutationObserver(
+      typeof trackMutation === "function" ? trackMutation(updateBounds) : updateBounds
+    );
     mo.observe(document.body, {
       attributeFilter: ["style", "class"],
       subtree: true,

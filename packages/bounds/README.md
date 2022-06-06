@@ -19,12 +19,13 @@ yarn add @solid-primitives/bounds
 
 ## `createElementBounds`
 
-Creates a reactive store-like object of current element bounds — position on the screen, and size dimensions. Bounds will be automatically updated on scroll, resize events and updates to the dom.
+Creates a reactive store-like object of current element bounds — position on the screen, and size dimensions. Bounds will be automatically updated on scroll, resize events and updates to the DOM.
 
 ```ts
 import { createElementBounds } from "@solid-primitives/bounds";
 
-const bounds = createElementBounds(document.querySelector("#my_elem")!);
+const target = document.querySelector("#my_elem")!;
+const bounds = createElementBounds(target);
 
 createEffect(() => {
   console.log(
@@ -53,6 +54,7 @@ createEffect(() => {
   bounds.height; // => number | null
 });
 
+// bounds object will always be in sync with current target
 <div ref={setTarget} />;
 ```
 
@@ -69,6 +71,24 @@ These types of tracking are available: _(all are enabled by default)_
 const bounds = createElementBounds(target, {
   trackScroll: false,
   trackMutation: false
+});
+```
+
+### Throttling updates
+
+Options [above](#disabling-types-of-tracking) allow passing a guarding function for controlling frequency of updates.
+
+The scroll event/mutations/resizing can be triggered dozens of times per second, causing calculating bounds and updating the store every time. Hence it is a good idea to [throttle/debounce](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) updates.
+
+```ts
+import { UpdateGuard, createElementBounds } from "@solid-primitives/bounds";
+import { throttle } from "@solid-primitives/scheduled";
+
+const throttleUpdate: UpdateGuard = fn => throttle(fn, 500);
+
+const bounds = createElementBounds(target, {
+  trackMutation: throttleUpdate,
+  trackScroll: throttleUpdate
 });
 ```
 

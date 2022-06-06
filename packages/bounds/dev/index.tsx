@@ -1,7 +1,8 @@
 import { Component, createSignal, Setter } from "solid-js";
 import { render } from "solid-js/web";
+import { throttle } from "@solid-primitives/scheduled";
 import "uno.css";
-import { createElementBounds } from "../src";
+import { createElementBounds, UpdateGuard } from "../src";
 
 const NumberInput: Component<{ value: number; setValue: Setter<number>; name: string }> = props => {
   return (
@@ -27,7 +28,11 @@ const App: Component = () => {
   const [height, setHeight] = createSignal(200);
 
   let ref: HTMLDivElement | undefined;
-  const es = createElementBounds(() => ref);
+  const throttleUpdate: UpdateGuard = fn => throttle(fn, 500);
+  const es = createElementBounds(() => ref, {
+    trackMutation: throttleUpdate,
+    trackScroll: throttleUpdate
+  });
 
   return (
     <div class="p-24 box-border w-full h-150vh flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">

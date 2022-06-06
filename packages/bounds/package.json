@@ -63,7 +63,8 @@
     "uvu": "^0.5.3",
     "vite": "2.9.9",
     "vite-plugin-solid": "2.2.6",
-    "watchlist": "^0.3.1"
+    "watchlist": "^0.3.1",
+    "@solid-primitives/scheduled": "^1.0.0"
   },
   "dependencies": {
     "@solid-primitives/utils": "^2.1.0",
