@@ -13,7 +13,7 @@ Reactive primitives for observing resizing of HTML elements.
 
 - [`makeResizeObserver`](#makeResizeObserver) — Instantiate a new ResizeObserver that automatically get's disposed on cleanup.
 - [`createResizeObserver`](#createResizeObserver) — Create resize observer instance, listening for changes to size of reactive element targets array.
-- [`createWindowSize`](#createWindowSize) — Creates a reactive store-like object of current width and height dimensions of window, page and screen.
+- [`createWindowSize`](#createWindowSize) — Creates a reactive store-like object of current width and height dimensions of the browser window.
 - [`createElementSize`](#createElementSize) — Creates a reactive store-like object of current width and height dimensions of html element.
 
 ## Installation
@@ -102,7 +102,7 @@ setTargets(targets.length, element);
 
 ## `createWindowSize`
 
-Creates a reactive store-like object of current width and height dimensions of window, page and screen.
+Creates a reactive store-like object of current width and height dimensions of the browser window.
 
 ### How to use it
 
