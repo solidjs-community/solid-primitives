@@ -16,7 +16,8 @@
     "name": "scroll",
     "stage": 2,
     "list": [
-      "createScrollPosition"
+      "createScrollPosition",
+      "useWindowScrollPosition"
     ],
     "category": "Inputs"
   },
