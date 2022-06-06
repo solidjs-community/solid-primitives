@@ -95,7 +95,7 @@ y(); // => number
 
 ### Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-primitives-scroll-csg7f
+https://codesandbox.io/s/solid-primitives-scroll-xy19c8?file=/index.tsx
 
 ## `useWindowScrollPosition`
 
