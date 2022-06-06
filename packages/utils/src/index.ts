@@ -378,3 +378,48 @@ export function createStaticStore<T extends Readonly<AnyStatic>>(
 
   return [store, setter];
 }
+
+/**
+ * Handle items removed and added to the array by diffing it by refference.
+ *
+ * @param current new array instance
+ * @param prev previous array copy
+ * @param handleAdded called once for every added item to array
+ * @param handleRemoved called once for every removed from array
+ */
+export function handleDiffArray<T>(
+  current: T[],
+  prev: T[],
+  handleAdded: (item: T) => void,
+  handleRemoved: (item: T) => void
+): void {
+  const currLength = current.length;
+  const prevLength = prev.length;
+  let i = 0;
+
+  if (!prevLength) {
+    for (; i < currLength; i++) handleAdded(current[i]);
+    return;
+  }
+
+  if (!currLength) {
+    for (; i < prevLength; i++) handleRemoved(prev[i]);
+    return;
+  }
+
+  for (; i < prevLength; i++) {
+    if (prev[i] !== current[i]) break;
+  }
+
+  let prevEl: T;
+  let currEl: T;
+  prev = prev.slice(i);
+  current = current.slice(i);
+
+  for (prevEl of prev) {
+    if (!current.includes(prevEl)) handleRemoved(prevEl);
+  }
+  for (currEl of current) {
+    if (!prev.includes(currEl)) handleAdded(currEl);
+  }
+}

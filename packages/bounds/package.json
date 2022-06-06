@@ -1,28 +1,26 @@
 {
-  "name": "@solid-primitives/scroll",
-  "version": "2.0.0",
-  "description": "Reactive primitives to react to element/window scrolling.",
-  "author": "David Di Biase <dave.dibiase@gmail.com>",
-  "contributors": [
-    "Damian Tarnawski <gthetarnav@gmail.com>"
-  ],
+  "name": "@solid-primitives/bounds",
+  "version": "0.0.100",
+  "description": "Primitives for tracking HTML element size and position on screen as it changes.",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
+  "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/scroll",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/bounds#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
-  "primitive": {
-    "name": "scroll",
-    "stage": 2,
-    "list": [
-      "createScrollPosition"
-    ],
-    "category": "Inputs"
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
-  "files": [
-    "dist"
-  ],
+  "primitive": {
+    "name": "bounds",
+    "stage": 0,
+    "list": [
+      "createElementBounds"
+    ],
+    "category": "Display & Media"
+  },
   "private": false,
   "sideEffects": false,
   "type": "module",
@@ -37,6 +35,9 @@
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "npm run start",
@@ -45,11 +46,11 @@
     "test:watch": "watchlist src test -- npm test"
   },
   "keywords": [
-    "monitor",
-    "scrollTo",
-    "scroll",
     "solid",
-    "primitives"
+    "primitives",
+    "size",
+    "position",
+    "bounds"
   ],
   "devDependencies": {
     "jsdom": "^19.0.0",
@@ -62,12 +63,13 @@
     "uvu": "^0.5.3",
     "vite": "2.9.9",
     "vite-plugin-solid": "2.2.6",
-    "watchlist": "^0.3.1"
+    "watchlist": "^0.3.1",
+    "@solid-primitives/scheduled": "^1.0.0"
   },
   "dependencies": {
     "@solid-primitives/utils": "^2.1.0",
-    "@solid-primitives/event-listener": "^2.1.0",
-    "@solid-primitives/rootless": "^1.1.0"
+    "@solid-primitives/resize-observer": "^2.0.0",
+    "@solid-primitives/event-listener": "^2.1.0"
   },
   "peerDependencies": {
     "solid-js": "^1.4.0"

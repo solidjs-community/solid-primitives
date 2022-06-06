@@ -77,7 +77,7 @@ export function createEventListener<
   EventMap extends EventMapOf<Target>,
   EventType extends keyof EventMap
 >(
-  target: MaybeAccessor<Many<Target>>,
+  target: MaybeAccessor<Many<Target | undefined>>,
   type: MaybeAccessor<Many<EventType>>,
   handler: (event: EventMap[EventType]) => void,
   options?: EventListenerOptions
@@ -88,14 +88,14 @@ export function createEventListener<
   EventMap extends Record<string, Event>,
   EventType extends keyof EventMap = keyof EventMap
 >(
-  target: MaybeAccessor<Many<EventTarget>>,
+  target: MaybeAccessor<Many<EventTarget | undefined>>,
   type: MaybeAccessor<Many<EventType>>,
   handler: (event: EventMap[EventType]) => void,
   options?: EventListenerOptions
 ): void;
 
 export function createEventListener(
-  targets: MaybeAccessor<Many<EventTarget>>,
+  targets: MaybeAccessor<Many<EventTarget | undefined>>,
   type: MaybeAccessor<Many<string>>,
   handler: (event: Event) => void,
   options?: EventListenerOptions
@@ -192,7 +192,7 @@ export const eventListener: Directive<EventListenerDirectiveProps> = (target, pr
 // const touchHandler = (e: TouchEvent) => {};
 // const el = document.createElement("div");
 // // dom events
-// createEventListener(window, "mousemove", mouseHandler);
+// createEventListener(window as Window | undefined, "mousemove", mouseHandler);
 // createEventListener(document, "touchstart", touchHandler);
 // createEventListener(el, "mousemove", mouseHandler);
 // createEventListener(() => el, "touchstart", touchHandler);
