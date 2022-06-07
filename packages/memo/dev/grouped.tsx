@@ -3,19 +3,19 @@ import { Component, Show } from "solid-js";
 import { createMousePosition } from "@solid-primitives/mouse";
 
 const Grouped: Component = () => {
-  const poz = createMousePosition();
-  const debPoz = createDebouncedMemo(() => ({ x: poz.x, y: poz.y }), 200);
-  const thrPoz = createThrottledMemo(() => ({ x: poz.x, y: poz.y }), 200);
+  const pos = createMousePosition();
+  const debPos = createDebouncedMemo(() => ({ x: pos.x, y: pos.y }), 200);
+  const thrPos = createThrottledMemo(() => ({ x: pos.x, y: pos.y }), 200);
 
   return (
     <div>
       <div
         class="ball bg-green-500"
         style={{
-          transform: `translate(${poz.x}px, ${poz.y}px)`
+          transform: `translate(${pos.x}px, ${pos.y}px)`
         }}
       ></div>
-      <Show when={debPoz()}>
+      <Show when={debPos()}>
         {({ x, y }) => (
           <div
             class="ball bg-yellow-600"
@@ -25,7 +25,7 @@ const Grouped: Component = () => {
           ></div>
         )}
       </Show>
-      <Show when={thrPoz()}>
+      <Show when={thrPos()}>
         {({ x, y }) => (
           <div
             class="ball bg-cyan-500"

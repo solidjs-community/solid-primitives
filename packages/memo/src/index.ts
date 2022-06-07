@@ -19,7 +19,7 @@ import type {
   SignalOptions
 } from "solid-js/types/reactive/signal";
 import { debounce, throttle } from "@solid-primitives/scheduled";
-import { ItemsOf } from "@solid-primitives/utils";
+import { ItemsOf, noop } from "@solid-primitives/utils";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
@@ -38,6 +38,7 @@ const callbackWith = <A, T>(fn: (a: A) => T, v: Accessor<A>): (() => T) =>
  *
  * @param onInvalidate callback that runs when the tracked sources trigger update
  * @param options set computation name for debugging pourposes
+ * - `options.initial` — an array of functions to be run initially and tracked. *(useful for runing code before other pure computations)*
  * @returns track() function
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createPureReaction
@@ -55,31 +56,29 @@ export function createPureReaction(
   onInvalidate: VoidFunction,
   options?: EffectOptions
 ): (tracking: VoidFunction) => void {
-  // current sources tracked by the user
-  const [trackedList, setTrackedList] = createSignal<VoidFunction[]>([]);
-  let addedTracked = false;
-
-  createComputed(() => {
-    // subs to trackedList signal
-    if (!trackedList().length) return;
-
-    // computation triggered by calling track()
-    if (addedTracked) {
-      addedTracked = false;
-      // subs to trackedList's items
-      trackedList().forEach(tracking => tracking());
-    }
-    // computation triggered by tracked sources
-    else {
-      setTrackedList([]);
-      untrack(onInvalidate);
-    }
-  }, options);
+  const owner = getOwner()!;
+  const disposers: VoidFunction[] = [];
+  onCleanup(() => {
+    for (const fn of disposers) fn();
+    disposers.length = 0;
+  });
+  let trackers = 0;
 
   // track()
   return tracking => {
-    addedTracked = true;
-    setTrackedList(p => [...p, tracking]);
+    trackers++;
+    createRoot(dispose => {
+      disposers.push(dispose);
+      let init = true;
+      createComputed(() => {
+        if (init) {
+          init = false;
+          return tracking();
+        }
+        if (--trackers === 0) untrack(onInvalidate);
+        dispose();
+      }, options);
+    }, owner);
   };
 }
 
@@ -177,14 +176,22 @@ export function createDebouncedMemo<T>(
   timeoutMs: number,
   options: MemoOptionsWithValue<T | undefined> = {}
 ): Accessor<T> {
-  const [state, setState] = createSignal(options.value, options);
+  let onInvalidate: VoidFunction = noop;
+  const track = createPureReaction(() => onInvalidate());
+  const [state, setState] = createSignal(
+    (() => {
+      let v!: T;
+      track(() => (v = calc(options.value)));
+      return v;
+    })(),
+    options
+  );
   const fn = debounce(() => track(() => setState(calc)), timeoutMs);
-  const track = createPureReaction(() => {
+  onInvalidate = () => {
     fn();
     track(() => calc(state()));
-  }, options);
-  track(() => setState(calc));
-  return state as Accessor<T>;
+  };
+  return state;
 }
 
 /**
@@ -214,11 +221,18 @@ export function createThrottledMemo<T>(
   timeoutMs: number,
   options: MemoOptionsWithValue<T | undefined> = {}
 ): Accessor<T> {
-  const [state, setState] = createSignal(options.value, options);
-  const fn = throttle(() => track(() => setState(calc)), timeoutMs);
-  const track = createPureReaction(fn, options);
-  track(() => setState(calc));
-  return state as Accessor<T>;
+  let onInvalidate: VoidFunction = noop;
+  const track = createPureReaction(() => onInvalidate());
+  const [state, setState] = createSignal(
+    (() => {
+      let v!: T;
+      track(() => (v = calc(options.value)));
+      return v;
+    })(),
+    options
+  );
+  onInvalidate = throttle(() => track(() => setState(calc)), timeoutMs);
+  return state;
 }
 
 /**

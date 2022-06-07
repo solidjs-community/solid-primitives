@@ -37,7 +37,7 @@ const App: Component = () => {
           /writable
         </Link>
       </nav>
-      <div class="p-24 box-border w-full min-h-screen space-y-4 bg-gray-800 text-white">
+      <div class="p-24 box-border w-full min-h-screen space-y-4 bg-gray-800 text-white overflow-hidden">
         <Routes>
           <Route path="/lazy" element={<Lazy />} />
           <Route path="/lazy-suspense" element={<LazySuspense />} />
@@ -45,6 +45,7 @@ const App: Component = () => {
           <Route path="/grouped" element={<Grouped />} />
           <Route path="/cache" element={<Cache />} />
           <Route path="/writable" element={<Writable />} />
+          <Route path="/" element={<p>Welcome</p>} />
         </Routes>
       </div>
     </Router>

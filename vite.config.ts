@@ -14,7 +14,8 @@ export const viteConfig = defineConfig({
           "p-6 flex justify-center items-center space-x-4 space-y-0 bg-gray-700 rounded-2xl",
         "wrapper-v": "wrapper-h flex-col space-x-0 space-y-4",
         node: "p-4 bg-orange-600 rounded m-2",
-        input: "bg-gray-800 rounded border border-gray-600 px-3 py-2 text-white"
+        input: "bg-gray-800 rounded border border-gray-600 px-3 py-2 text-white",
+        ball: "w-8 h-8 fixed -top-4 -left-4 opacity-50 rounded-full pointer-events-none"
       }
     })
   ],

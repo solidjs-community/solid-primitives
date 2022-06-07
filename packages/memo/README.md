@@ -335,4 +335,10 @@ Support for Solid 1.4
 
 `createLazyMemo` improvements
 
+0.3.0
+
+Improve how `createPureReaction`, `createThrottledMemo` and `createDebouncedMemo` work when created during batched effect.
+
+Provida a separate tuntime for server.
+
 </details>
