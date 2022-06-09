@@ -35,3 +35,4 @@ export const fileUploader = (element: HTMLInputElement, options: () => FileUploa
 
 export { createFileUploader } from "./createFileUploader";
 export { createDropzone } from "./createDropzone";
+export * from "./types";
