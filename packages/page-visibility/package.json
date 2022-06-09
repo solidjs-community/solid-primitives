@@ -1,19 +1,19 @@
 {
-  "name": "@solid-primitives/visibility-observer",
-  "version": "2.0.1",
+  "name": "@solid-primitives/page-visibility",
+  "version": "2.0.0",
   "description": "Primitive to track page visibility",
   "author": "David Di Biase",
   "contributors": [
     "Damian Tarnawski <gthetarnav@gmail.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/visibility-observer",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/page-visibility",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
   "primitive": {
-    "name": "visibility-observer",
+    "name": "page-visibility",
     "stage": 3,
     "list": [
       "createPageVisibility"

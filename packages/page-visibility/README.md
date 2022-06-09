@@ -1,12 +1,12 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Visibility%20Observer" alt="Solid Primitives Visibility Observer">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Page%20Visibility" alt="Solid Primitives Page Visibility">
 </p>
 
-# @solid-primitives/visibility-observer
+# @solid-primitives/page-visibility
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/visibility-observer?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/visibility-observer)
-[![size](https://img.shields.io/npm/v/@solid-primitives/visibility-observer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/visibility-observer)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/page-visibility?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/page-visibility)
+[![size](https://img.shields.io/npm/v/@solid-primitives/page-visibility?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/page-visibility)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 - [`createPageVisibility`](#createPageVisibility) - Creates a signal with a boolean value identifying the page visibility state
@@ -15,9 +15,9 @@
 ## Installation
 
 ```
-npm install @solid-primitives/visibility-observer
+npm install @solid-primitives/page-visibility
 # or
-yarn add @solid-primitives/visibility-observer
+yarn add @solid-primitives/page-visibility
 ```
 
 ## `createPageVisibility`
@@ -27,7 +27,7 @@ Creates a signal with a boolean value identifying the page visibility state.
 ### How to use it
 
 ```ts
-import { createPageVisibility } from "@solid-primitives/visibility-observer";
+import { createPageVisibility } from "@solid-primitives/page-visibility";
 
 const visible = createPageVisibility();
 
@@ -43,7 +43,7 @@ createEffect(() => {
 ### How to use it
 
 ```ts
-import { usePageVisibility } from "@solid-primitives/visibility-observer";
+import { usePageVisibility } from "@solid-primitives/page-visibility";
 
 const visible = usePageVisibility();
 
