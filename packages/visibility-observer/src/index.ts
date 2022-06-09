@@ -35,4 +35,4 @@ export const createPageVisibility = (): Accessor<boolean> => {
  * })
  * ```
  */
-export const usePageVisibility = createSharedRoot(createPageVisibility);
+export const usePageVisibility = /*#__PURE__*/ createSharedRoot(createPageVisibility);

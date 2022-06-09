@@ -83,4 +83,6 @@ export function createScrollPosition(
  *   console.log(scroll.x, scroll.y)
  * })
  */
-export const useWindowScrollPosition = createSharedRoot(() => createScrollPosition(window));
+export const useWindowScrollPosition = /*#__PURE__*/ createSharedRoot(() =>
+  createScrollPosition(window)
+);

@@ -137,7 +137,8 @@ export function createWindowSize(): {
  *   console.log(size.width, size.height)
  * })
  */
-export const useWindowSize: typeof createWindowSize = createSharedRoot(createWindowSize);
+export const useWindowSize: typeof createWindowSize =
+  /*#__PURE__*/ createSharedRoot(createWindowSize);
 
 /**
  * @param target html element
