@@ -1,5 +1,4 @@
-import { createSignal, Accessor } from "solid-js";
-import { makeEventListener } from "@solid-primitives/event-listener";
+import { createSignal, Accessor, onCleanup } from "solid-js";
 import { createSharedRoot } from "@solid-primitives/rootless";
 
 /**
@@ -17,7 +16,8 @@ import { createSharedRoot } from "@solid-primitives/rootless";
 export const createPageVisibility = (): Accessor<boolean> => {
   const [state, setState] = createSignal(document.visibilityState === "visible");
   const cb = () => setState(document.visibilityState === "visible");
-  makeEventListener(document, "visibilitychange", cb);
+  document.addEventListener("visibilitychange", cb);
+  onCleanup(() => document.removeEventListener("visibilitychange", cb));
   return state;
 };
 
