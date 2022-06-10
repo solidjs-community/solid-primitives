@@ -160,7 +160,7 @@ testCreateStorageSignal.before(context => {
 });
 
 testCreateStorageSignal("creates a signal", ({ mockStorage }) => {
-  const [storageItem, setStorageItem] = createStorageSignal<string | null, undefined>(
+  const [storageItem, setStorageItem] = createStorageSignal<string | null>(
     "test",
     null,
     { api: mockStorage }

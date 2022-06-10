@@ -446,7 +446,7 @@ export function createAsyncStorage<O, T>(
  * ]
  * ```
  */
-export function createStorageSignal<T extends any, O extends any>(
+export function createStorageSignal<T, O = {}>(
   key: string,
   initialValue?: T,
   props?: StorageSignalProps<T, Storage | StorageWithOptions<O>, O>
@@ -543,5 +543,5 @@ export function createStorageSignal<T extends any, O extends any>(
 
 export const createLocalStorage = createStorage;
 
-export const createSessionStorage = <T, O>(props: StorageProps<T, Storage, O>) =>
+export const createSessionStorage = <T, O = {}>(props: StorageProps<T, Storage, O>) =>
   createStorage({ ...props, api: globalThis.sessionStorage } as any);
