@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/props",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Library of primitives focused around component props.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
@@ -26,7 +26,6 @@
   ],
   "private": false,
   "sideEffects": false,
-  "type": "module",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",

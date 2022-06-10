@@ -98,7 +98,7 @@ test("handles tuples as event handlers", () =>
       { onClick: [mockFn, message3] }
     );
 
-    combinedProps.onClick();
+    (combinedProps as any).onClick();
 
     assert.is(mockFn.callCount, 3);
     assert.equal(mockFn.calls, [[message1], [message2], [message3]]);

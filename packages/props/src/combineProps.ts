@@ -1,12 +1,5 @@
-import {
-  AnyFunction,
-  AnyObject,
-  chain,
-  RequiredKeys,
-  Simplify,
-  UnboxLazy
-} from "@solid-primitives/utils";
-import { JSX, mergeProps } from "solid-js";
+import { AnyObject, chain } from "@solid-primitives/utils";
+import { JSX, mergeProps, MergeProps } from "solid-js";
 
 const extractCSSregex = /([^:; ]*):\s*([^;]*)/g;
 
@@ -68,35 +61,6 @@ type PropsInput = {
   ref?: Element | ((el: any) => void);
 } & AnyObject;
 
-type OverrideProp<T, U, K extends keyof U> =
-  | Exclude<U[K], undefined>
-  | (undefined extends U[K] ? (K extends keyof T ? T[K] : undefined) : never);
-
-type Override<T, U> = {
-  // all keys in T which are not overridden by U
-  [K in keyof Omit<T, RequiredKeys<U>>]: T[K] | Exclude<U[K & keyof U], undefined>;
-} & {
-  // all keys in U except those which are merged into T
-  [K in keyof Omit<U, Exclude<keyof T, RequiredKeys<U>>>]: K extends `on${string}`
-    ? K extends keyof T
-      ? U[K] extends AnyFunction | any[]
-        ? T[K] & U[K]
-        : UnboxLazy<OverrideProp<T, U, K>>
-      : UnboxLazy<OverrideProp<T, U, K>>
-    : UnboxLazy<OverrideProp<T, U, K>>;
-};
-
-type MergeProps<T extends unknown[], Curr = {}> = T extends [infer Next, ...infer Rest]
-  ? MergeProps<
-      Rest,
-      Next extends object ? (Next extends Function ? Curr : Override<Curr, UnboxLazy<Next>>) : Curr
-    >
-  : Simplify<Curr>;
-
-export type CombineProps<T extends PropsInput[]> = Simplify<{
-  [K in keyof MergeProps<T>]: K extends "style" ? JSX.CSSProperties | string : MergeProps<T>[K];
-}>;
-
 /**
  * A helper that reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
  *
@@ -117,10 +81,10 @@ export type CombineProps<T extends PropsInput[]> = Simplify<{
  */
 export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
   ...sources: T
-): CombineProps<T> {
-  if (sources.length === 1) return sources[0] as CombineProps<T>;
+): MergeProps<T> {
+  if (sources.length === 1) return sources[0] as MergeProps<T>;
 
-  const merge = mergeProps(...sources) as unknown as CombineProps<T>;
+  const merge = mergeProps(...sources) as unknown as MergeProps<T>;
 
   const reduce = <K extends keyof PropsInput>(
     key: K,
