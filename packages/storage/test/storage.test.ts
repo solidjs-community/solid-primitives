@@ -160,11 +160,9 @@ testCreateStorageSignal.before(context => {
 });
 
 testCreateStorageSignal("creates a signal", ({ mockStorage }) => {
-  const [storageItem, setStorageItem] = createStorageSignal<string | null>(
-    "test",
-    null,
-    { api: mockStorage }
-  );
+  const [storageItem, setStorageItem] = createStorageSignal<string | null>("test", null, {
+    api: mockStorage
+  });
   assert.is(storageItem(), null);
   setStorageItem("1");
   assert.is(storageItem(), "1");
