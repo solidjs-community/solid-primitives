@@ -22,6 +22,27 @@ npm install @solid-primitives/props
 yarn add @solid-primitives/props
 ```
 
+## SSR Support
+
+If you are using [solid-start](https://github.com/solidjs/solid-start) with SSR, you may see this error comming form the `@solid-primitives/props` package.
+
+```
+TypeError: web.template is not a function
+```
+
+To prevent this, add `"@solid-primitives/props"` entry to `noExternal` field in your vite config, like so:
+
+```tsx
+export default defineConfig({
+  plugins: [solid()],
+  ssr: {
+    // It allows Vite to preprocess the package 
+    noExternal: ["@solid-primitives/props"],
+  },
+})
+```
+
+
 ## `combineProps`
 
 A helper that reactively merges multiple props objects together while smartly combining some of Solid's JSX/HTML attributes.
