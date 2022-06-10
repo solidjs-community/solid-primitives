@@ -475,7 +475,7 @@ export function createStorageSignal<T, O = {}>(
         }
       }
       if (value !== null && props?.deserializer) {
-        return props.deserializer(value + '', key, props?.options as O) as T;
+        return props.deserializer(value + "", key, props?.options as O) as T;
       }
       return value;
     }, null);
@@ -484,7 +484,7 @@ export function createStorageSignal<T, O = {}>(
     const value = accessor();
     const filteredValue = props?.serializer
       ? props.serializer(value as string & T, key, props?.options)
-      : (value + '');
+      : value + "";
     const apiKey = `${prefix}${key}`;
     try {
       if (value === null) {
