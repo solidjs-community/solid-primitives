@@ -1,4 +1,5 @@
 const ua = navigator.userAgent;
+const w = window as any;
 
 /** Is running on browser */
 export const isBrowser: boolean = true;
@@ -42,13 +43,22 @@ export const isMobile: boolean = /*#__PURE__*/ /Mobi/.test(ua);
 export const isFirefox: boolean = /*#__PURE__*/ /^(?!.*Seamonkey)(?=.*Firefox).*/i.test(ua);
 
 /** Browser is Opera */
-export const isOpera: boolean = /*#__PURE__*/ !!(window as any).opr;
+export const isOpera: boolean =
+  (!!w.opr && !!w.opr.addons) || !!w.opera || /*#__PURE__*/ / OPR\//.test(ua);
+
+/** Browser is Safari */
+export const isSafari: boolean =
+  /*#__PURE__*/ /constructor/i.test(window.HTMLElement as any) ||
+  w.safari?.pushNotification + "" === "[object SafariRemoteNotification]";
+
+/** Browser is Internet Explorer 6-11 */
+export const isIE = /*@cc_on!@*/ false || !!(document as any).documentMode;
 
 /** is Chromium-based browser */
-export const isChromium: boolean = /*#__PURE__*/ !!(window as any).chrome;
+export const isChromium: boolean = !!w.chrome;
 
 /** Browser is Edge */
-export const isEdge: boolean = /*#__PURE__*/ /Edg/.test(ua);
+export const isEdge: boolean = /*#__PURE__*/ /Edg/.test(ua) && isChromium;
 
 /** Browser is Chrome */
 export const isChrome: boolean =

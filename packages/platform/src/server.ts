@@ -16,6 +16,8 @@ export const isMobile: boolean = false;
 
 export const isFirefox: boolean = false;
 export const isOpera: boolean = false;
+export const isSafari: boolean = false;
+export const isIE: boolean = false;
 export const isChromium: boolean = false;
 export const isEdge: boolean = false;
 export const isChrome: boolean = false;

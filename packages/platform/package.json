@@ -1,8 +1,8 @@
 {
   "name": "@solid-primitives/platform",
   "version": "0.0.100",
-  "description": "A template primitive example.",
-  "author": "Your Name <you@youremail.com>",
+  "description": "A set of const boolean variables identifying device and browser type.",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/platform#readme",
@@ -17,9 +17,9 @@
     "name": "platform",
     "stage": 0,
     "list": [
-      "createPrimitiveTemplate"
+      "List of variables"
     ],
-    "category": "Display & Media"
+    "category": "Utilities"
   },
   "private": false,
   "sideEffects": false,
@@ -33,9 +33,7 @@
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "npm run start",
-    "build": "tsup",
-    "test": "uvu -r solid-register",
-    "test:watch": "watchlist src test -- npm test"
+    "build": "tsup"
   },
   "keywords": [
     "solid",
@@ -44,12 +42,10 @@
   "devDependencies": {
     "jsdom": "^19.0.0",
     "prettier": "^2.6.2",
-    "solid-register": "^0.2.5",
     "tslib": "^2.4.0",
     "tsup": "^5.12.8",
     "typescript": "^4.6.4",
     "unocss": "0.34.0",
-    "uvu": "^0.5.3",
     "vite": "2.9.9",
     "vite-plugin-solid": "2.2.6",
     "watchlist": "^0.3.1"
