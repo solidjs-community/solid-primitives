@@ -27,7 +27,7 @@ export const isIPad: boolean = /*#__PURE__*/ /ipad/i.test(ua) && navigator.maxTo
 export const isIPod: boolean = /*#__PURE__*/ /ipod/i.test(ua);
 
 /** Is IOS Device */
-export const isIOS: boolean = /*#__PURE__*/ /(iphone|ipad|ipod)/i.test(ua);
+export const isIOS: boolean = isIPhone || isIPad || isIPod;
 
 /** Is Apple Device */
 export const isAppleDevice: boolean = isIOS || isMac;
