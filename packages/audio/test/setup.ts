@@ -5,39 +5,28 @@ export class MockAudio extends Audio {
   src: string;
   state: AudioState;
   duration: number;
+  currentTime: number;
   playing: boolean;
-  constructor() {
+  constructor(src) {
     super();
     this.playing = false;
-    this.duration = NaN;
     this.state = AudioState.STOPPED;
-    this.src = "";
+    this.src = src;
   }
   fastSeek = (time: number): Promise<void> => {
     this.currentTime = time;
     return Promise.resolve();
   };
-  play = (): Promise<void> => {
+  play = async (): Promise<void> => {
     this.playing = true;
     this.state = AudioState.PLAYING;
-    return super.play();
+    return;
   };
   pause = (): void => {
     this.playing = false;
     this.state = AudioState.PAUSED;
-    return super.pause();
+    return;
   };
 }
 
-HTMLMediaElement.prototype.pause = () => Promise.resolve();
-HTMLMediaElement.prototype.play = () => Promise.resolve();
-
-window.Audio = MockAudio;
-
-Object.defineProperty(window, "MediaSource", {
-  writable: true,
-  value: (_params: any) => ({
-    // MediaSource implementation goes here
-    addEventListener: () => {}
-  })
-});
+global.Audio = MockAudio;

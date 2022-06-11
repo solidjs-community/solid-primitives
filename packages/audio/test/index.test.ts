@@ -1,83 +1,94 @@
-import { createRoot } from "solid-js";
-import { createAudioPlayer, createAudio, createAudioManager, AudioState } from "../src/index";
+import { createRoot, createSignal } from "solid-js";
+import { suite } from "uvu";
 import { MockAudio } from "./setup";
+import * as assert from "uvu/assert";
+import { makeAudio, makeAudioPlayer, createAudio, AudioState } from "../src/index";
+import { isObject } from "@solid-primitives/utils";
 
-describe("createBasicAudio", () => {
-  test("test static string path", async () => {
-    const { player } = createAudioPlayer("test.mp3", []);
+const testMA = suite("makeAudio");
+
+testMA("test static string path", () =>
+  createRoot(dispose => {
+    const player = makeAudio("test.mp3") as MockAudio;
+    assert.is(player.playing, false);
+    assert.is(player.state, AudioState.STOPPED);
+    assert.is(player.src, "https://localhost:3000/test.mp3");
+    dispose();
+  })
+);
+
+testMA.run();
+
+const testMAP = suite("makeAudioPlayer");
+
+testMAP("test play pause", () =>
+  createRoot(async dispose => {
+    const { player, play, pause } = makeAudioPlayer("test.mp3");
     const mocked = player as MockAudio;
-
-    expect(mocked.playing).toBe(false);
-    expect(mocked.state).toBe(AudioState.STOPPED);
-    expect(mocked.src).toBe("test.mp3");
-  });
-  test("test reactive value path", async () => {
-    const { player } = createAudioPlayer(() => "test.mp3", []);
-    expect(player.src).toBe("test.mp3");
-  });
-  test("test srcObject value path", async () => {
-    const { player } = createAudioPlayer(new MediaSource(), []);
-    expect(player.srcObject).toBeInstanceOf(Object);
-  });
-  test("test srcObject reactive value path", async () => {
-    const { player } = createAudioPlayer(() => new MediaSource(), []);
-    expect(player.srcObject).toBeInstanceOf(Object);
-  });
-  test("test player with no handlers", async () => {
-    const { player } = createAudioPlayer(() => new MediaSource());
-    expect(player.srcObject).toBeInstanceOf(Object);
-  });
-});
-
-describe("createAudio", () => {
-  test("test basic play and pause", async () => {
-    const { play, pause, player } = createAudio("test.mp3");
-    const mocked = player as MockAudio;
-
-    expect(mocked.playing).toBe(false);
-    expect(mocked.state).toBe(AudioState.STOPPED);
-
+    assert.is(mocked.src, "https://localhost:3000/test.mp3");
+    assert.is(mocked.playing, false);
+    assert.is(mocked.state, AudioState.STOPPED);
     await play();
-    expect(mocked.playing).toBe(true);
-    expect(mocked.state).toBe(AudioState.PLAYING);
-
+    assert.is(mocked.playing, true);
+    assert.is(mocked.state, AudioState.PLAYING);
     await pause();
-    expect(mocked.playing).toBe(false);
-    expect(mocked.state).toBe(AudioState.PAUSED);
-  });
-});
+    assert.is(mocked.playing, false);
+    assert.is(mocked.state, AudioState.PAUSED);
+    dispose();
+  })
+);
 
-describe("createAudioManager", () => {
-  test("test audio manager load, play, pause and seek", async () => {
-    const { play, pause, currentTime, duration, seek, setVolume, player } = createRoot(() => {
-      return createAudioManager("test.mp3");
-    });
+testMAP("test seek and volume", () =>
+  createRoot(async dispose => {
+    const { player, seek, setVolume } = makeAudioPlayer("test.mp3");
     const mocked = player as MockAudio;
-    expect(currentTime()).toBe(0);
-    expect(mocked.playing).toBe(false);
-    expect(mocked.volume).toBe(1);
-    expect(mocked.state).toBe(AudioState.STOPPED);
-    expect(mocked.currentTime).toBe(0);
-    expect(mocked.playing).toBe(false);
-    expect(mocked.state).toBe(AudioState.STOPPED);
+    seek(500);
+    assert.is(mocked.currentTime, 500);
+    setVolume(0.75);
+    assert.is(mocked.volume, 0.75);
+    dispose();
+  })
+);
 
-    mocked.duration = 50000;
-    mocked.dispatchEvent(new Event("loadeddata"));
+testMAP("test srcObject value path", () =>
+  createRoot(dispose => {
+    const { player } = makeAudioPlayer({} as MediaSource);
+    assert.is(typeof player.srcObject, 'object');
+    dispose();
+  })
+);
 
-    expect(duration()).toBe(50000);
+testMAP.run();
 
-    await play();
-    expect(mocked.playing).toBe(true);
-    expect(mocked.state).toBe(AudioState.PLAYING);
+const testCA = suite("createAudioPlayer");
 
-    await pause();
-    expect(mocked.playing).toBe(false);
-    expect(mocked.state).toBe(AudioState.PAUSED);
+testCA("test srcObject value path", () =>
+  createRoot(dispose => {
+    const media = {} as MediaSource;
+    let audio = createAudio(media);
+    let mocked = audio.player as MockAudio;
+    assert.is(typeof mocked.srcObject, 'object');
+    audio = createAudio(() => media);
+    mocked = audio.player as MockAudio;
+    assert.is(typeof mocked.srcObject, 'object');
+    dispose();
+  })
+);
 
-    seek(25000);
-    expect(mocked.currentTime).toBe(25000);
+testCA("test basic reactive controls", () =>
+  createRoot(async dispose => {
+    const [playing, setPlaying] = createSignal(false);
+    const [playhead, setPlayhead] = createSignal(0);
+    const [volume, setVolume] = createSignal(0.25);
+    const { duration, state, currentTime, player } = createAudio("test.mp3", playing, playhead, volume);
+    const mocked = player as MockAudio;
+    assert.is(mocked.playing, false);
+    setPlaying(true);
+    // assert.is(mocked.playing, true);
+    // assert.is(mocked.duration, 5000);
+    assert.is(mocked.volume, 0.25);
+    dispose();
+  })
+);
 
-    setVolume(0.25);
-    expect(mocked.volume).toBe(0.25);
-  });
-});
+testCA.run();
