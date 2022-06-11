@@ -1,5 +1,5 @@
 import { Accessor, batch, onMount, onCleanup, createEffect } from "solid-js";
-import { createStaticStore } from "@solid-primitives/utils";
+import { createStaticStore, access } from "@solid-primitives/utils";
 
 // Set of control enums
 export enum AudioState {
@@ -39,12 +39,12 @@ const unwrapSource = (src: AudioSource) => {
  */
 export const makeAudio = (
   src: AudioSource,
-  handlers: { [key: string]: EventListener } = {},
+  handlers: { [K in keyof HTMLMediaElementEventMap]?: (event: HTMLMediaElementEventMap[K]) => void; } = {},
 ): HTMLAudioElement => {
   const player = unwrapSource(src);
   const listeners = (enabled: boolean) => {
     Object.entries(handlers).forEach(([evt, handler]) =>
-      player[enabled ? "addEventListener" : "removeEventListener"](evt, handler)
+      player[enabled ? "addEventListener" : "removeEventListener"](evt, handler as EventListenerOrEventListenerObject)
     );
   };
   onMount(() => listeners(true));
@@ -124,14 +124,13 @@ export const createAudio = (
     currentTime: 0,
     duration: 0,
     state: AudioState.STOPPED,
-    player: unwrapSource(src instanceof Function ? src() : src)
+    player: unwrapSource(access(src))
   });
   const { play, pause, setVolume, seek, player } = makeAudioPlayer(
     store.player,
     {
       loadeddata: () =>
         batch(() => {
-          console.log('DONE');
           setStore('state', AudioState.READY);
           setStore('duration', player.duration);
         }),
@@ -144,12 +143,13 @@ export const createAudio = (
   // Bind reactive properties as needed
   if (src instanceof Function) {
     createEffect(src, () => {
-      const newSrc = src instanceof Function ? src() : src;
+      const newSrc = access(src);
       if (newSrc instanceof HTMLAudioElement) {
         setStore('player', newSrc);
       } else {
         store.player[typeof src === "string" ? "src" : "srcObject"] = newSrc as string & MediaSource;
       }
+      seek(0);
     });
   }
   if (playhead) {
@@ -158,9 +158,7 @@ export const createAudio = (
   if (playing) {
     createEffect(() => (playing() === true ? play() : pause()));
   }
-    console.log('yes1');
   if (volume) {
-    console.log('yes2', volume());
     createEffect(() => setVolume(volume()));
   }
   return store;

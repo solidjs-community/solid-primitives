@@ -28,7 +28,7 @@ yarn add @solid-primitives/audio
 A foundational primitive with no player controls but exposes the raw player object.
 
 ```ts
-const player = makeAudio("example.wav");
+const player = makeAudio("example.mp3");
 ```
 
 ### makeAudioPlayer
@@ -36,18 +36,44 @@ const player = makeAudio("example.wav");
 Provides a very basic interface for wrapping listeners to a supplied or default audio player.
 
 ```ts
-const { play, pause } = makeAudioPlayer("example.wav");
+const { play, pause } = makeAudioPlayer("example.mp3");
 ```
 
 ### createAudioManager
 
-Creates a very basic audio/sound player.
+Creates a very basic audio/sound player with reactive properties to control the audio.
 
 ```ts
-const [playing setPlaying] = createSignal(false);
-const { state, currentTime, duration } = createAudio('example.wav', playing);
+const [playing, setPlaying] = createSignal(false);
+const [volume, setVolume] = createSignal(false);
+const [playhead, setPlayhead] = createSignal(0);
+const audio = createAudio("sample.mp3", playing, playhead, volume);
 setPlaying(true);
+setPlayhead(100);
 ```
+
+The audio primitive exports an reactive properties that provides you access to state, duration and playhead location.
+
+#### Dynamic audio changes
+
+The source property can be a signal as well as a media source. Upon switching the source via a signal it will continue playing from the head.
+
+```ts
+const [src, setSrc] = createSignal("sample.mp3");
+const audio = createAudio(src);
+setSrc("sample2.mp3");
+```
+
+### Audio Source
+
+`createAudio` as well as `makeAudio` and `makeAudioPlayer` all accept MediaSource as a property.
+
+```ts
+const media = new MediaSource();
+const audio = createAudio(URL.createObjectURL(media));
+```
+
+This allows you to managed streamed or Blob supplied media. In essence the primitives in this package are very flexible and allow direct access to the base browser API.
 
 ## Demo
 
@@ -81,5 +107,9 @@ Updated to Solid 1.3.
 1.2.0
 
 Major improvements to bring package in line with project standards.
+
+1.3.0
+
+A major refactor of the `audio` package that includes new basic and reactive primitives.
 
 </details>
