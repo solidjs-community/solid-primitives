@@ -39,9 +39,9 @@ Provides a very basic interface for wrapping listeners to a supplied or default 
 const { play, pause } = makeAudioPlayer("example.mp3");
 ```
 
-### createAudioManager
+### createAudio
 
-Creates a very basic audio/sound player with reactive properties to control the audio.
+Creates a very basic audio/sound player with reactive properties to control the audio. Be careful not to destructure the properties provided by the primitive as it will likely break reactivity.
 
 ```ts
 const [playing, setPlaying] = createSignal(false);
@@ -49,10 +49,12 @@ const [volume, setVolume] = createSignal(false);
 const [playhead, setPlayhead] = createSignal(0);
 const audio = createAudio("sample.mp3", playing, playhead, volume);
 setPlaying(true);
-setPlayhead(100);
+audio.seek(4000);
 ```
 
 The audio primitive exports an reactive properties that provides you access to state, duration and playhead location.
+
+_Note:_ Initializing the primitive with `playing` as true works, however note that the user has to interact with the page first (on a fresh page load).
 
 #### Dynamic audio changes
 

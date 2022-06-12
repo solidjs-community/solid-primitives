@@ -98,9 +98,10 @@ export const makeAudioPlayer = (
  *
  * @example
  * ```ts
- * const [playing setPlaying] = createSignal(false);
- * const { state, currentTime, duration } = createAudio('./example1.mp3, playing);
- * setPlaying(true);
+ * const [playing, setPlaying] = createSignal(false);
+ * const [volume, setVolume] = createSignal(1);
+ * const audio = createAudio('./example1.mp3', playing, volume);
+ * console.log(audio.duration);
  * ```
  */
 export const createAudio = (
