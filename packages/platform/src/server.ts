@@ -1,4 +1,6 @@
-export const isBrowser: boolean = false;
+//
+// Devices
+//
 
 export const isAndroid: boolean = false;
 export const isWindows: boolean = false;

@@ -1,9 +1,6 @@
 const ua = navigator.userAgent;
 const w = window as any;
 
-/** Is running on browser */
-export const isBrowser: boolean = true;
-
 //
 // Devices
 //

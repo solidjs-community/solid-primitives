@@ -22,10 +22,10 @@ yarn add @solid-primitives/platform
 ## How to use it
 
 ```ts
-import { isWebKit, isBrowser } from "@solid-primitives/platform";
+import { isWebKit, isFirefox } from "@solid-primitives/platform";
 
-if (isBrowser) {
-  // won't run on the server
+if (!isFirefox) {
+  // won't run on the Mozilla Firefox Browser
 }
 
 if (isWebKit) {
@@ -36,8 +36,6 @@ if (isWebKit) {
 ## List of variables
 
 ### Device
-
-- `isBrowser` — Is running on browser
 
 - `isAndroid` — Is Android Device
 
