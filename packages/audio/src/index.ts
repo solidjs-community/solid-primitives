@@ -1,4 +1,4 @@
-import { Accessor, batch, onMount, onCleanup, createEffect } from "solid-js";
+import { Accessor, onMount, onCleanup, createEffect } from "solid-js";
 import { createStaticStore, access } from "@solid-primitives/utils";
 
 // Set of control enums
@@ -11,12 +11,6 @@ export enum AudioState {
   READY = "ready",
   ERROR = "error"
 }
-
-type AudioSource = string
-  | undefined
-  | HTMLAudioElement
-  | MediaSource
-  | (string & MediaSource);
 
 // Helper for producing the audio source
 const unwrapSource = (src: AudioSource) => {
@@ -39,7 +33,7 @@ const unwrapSource = (src: AudioSource) => {
  */
 export const makeAudio = (
   src: AudioSource,
-  handlers: { [K in keyof HTMLMediaElementEventMap]?: (event: HTMLMediaElementEventMap[K]) => void; } = {},
+  handlers: AudioEventHandlers = {},
 ): HTMLAudioElement => {
   const player = unwrapSource(src);
   const listeners = (enabled: boolean) => {
@@ -74,7 +68,7 @@ export const makeAudio = (
  */
 export const makeAudioPlayer = (
   src: AudioSource,
-  handlers: { [key: string]: EventListener } = {}
+  handlers: AudioEventHandlers = {}
 ): {
   play: () => void;
   pause: () => void;
@@ -112,9 +106,9 @@ export const makeAudioPlayer = (
 export const createAudio = (
   src: AudioSource | Accessor<AudioSource>,
   playing?: Accessor<boolean>,
-  playhead?: Accessor<number>,
   volume?: Accessor<number>,
 ): {
+  seek: (time: number) => void,
   state: AudioState,
   currentTime: number,
   duration: number,
@@ -123,23 +117,28 @@ export const createAudio = (
   const [store, setStore] = createStaticStore({
     currentTime: 0,
     duration: 0,
+    seek: (_time: number) => {},
     state: AudioState.LOADING,
     player: unwrapSource(access(src))
   });
   const { play, pause, setVolume, seek, player } = makeAudioPlayer(
     store.player,
     {
-      loadeddata: () =>
-        batch(() => {
-          setStore('state', AudioState.READY);
-          setStore('duration', player.duration);
-        }),
+      loadeddata: () => {
+        setStore({
+          'state': AudioState.READY,
+          'duration': player.duration
+        });
+        if (playing && playing() == true) play();
+      },
       timeupdate: () => setStore('currentTime', player.currentTime),
       loadstart: () => setStore('state', AudioState.LOADING),
       playing: () => setStore('state', AudioState.PLAYING),
-      pause: () => setStore('state', AudioState.PAUSED)
+      pause: () => setStore('state', AudioState.PAUSED),
+      error: () => setStore('state', AudioState.ERROR),
     }
   );
+  setStore('seek', () => seek);
   // Bind reactive properties as needed
   if (src instanceof Function) {
     createEffect(() => {
@@ -151,9 +150,6 @@ export const createAudio = (
       }
       seek(0);
     });
-  }
-  if (playhead) {
-    createEffect(() => seek(playhead()));
   }
   if (playing) {
     createEffect(() => (playing() === true ? play() : pause()));

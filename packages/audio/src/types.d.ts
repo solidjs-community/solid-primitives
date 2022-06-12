@@ -1,15 +1,8 @@
-// Set of control enums
-declare enum AudioState {
-  LOADING = "loading",
-  PLAYING = "playing",
-  PAUSED = "paused",
-  COMPLETE = "complete",
-  STOPPED = "stopped",
-  READY = "ready"
-}
 
-declare type AudioSource =
-  | string
+type AudioSource = string
+  | undefined
+  | HTMLAudioElement
   | MediaSource
-  | (string & MediaSource)
-  | (() => string | MediaSource | (string & MediaSource));
+  | (string & MediaSource);
+
+declare type AudioEventHandlers = { [K in keyof HTMLMediaElementEventMap]?: (event: HTMLMediaElementEventMap[K]) => void; }; 

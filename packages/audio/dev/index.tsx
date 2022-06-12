@@ -1,4 +1,4 @@
-import { Component, For, createSignal } from "solid-js";
+import { Component, For, Show, createSignal } from "solid-js";
 import { createAudio, AudioState } from "../src";
 import { render } from "solid-js/web";
 import { Icon } from "solid-heroicons";
@@ -19,9 +19,8 @@ const iconMap = {
 const App: Component = () => {
   const [source, setSource] = createSignal("sample1.mp3");
   const [playing, setPlaying] = createSignal(false);
-  const [playhead, setPlayhead] = createSignal(0);
   const [volume, setVolume] = createSignal(1);
-  const audio = createAudio(source, playing, playhead, volume);
+  const audio = createAudio(source, playing, volume);
   return (
     <div class="flex justify-center items-center box-border w-full h-screen overflow-hidden bg-gray-900">
       <div class="flex flex-col items-center">
@@ -33,14 +32,16 @@ const App: Component = () => {
           >
             <Icon
               class="w-12 text-blue-600 hover:text-blue-700 transition"
-              path={iconMap[audio.state]}
+              path={audio.state === AudioState.PLAYING ? pause : play}
             />
           </button>
-          <div>
-            {formatTime(audio.currentTime)} / {formatTime(audio.duration)}
+          <div class="text-center min-w-32">
+            <Show fallback="Loading..." when={audio.state !== AudioState.LOADING}>
+              {formatTime(audio.currentTime)} / {formatTime(audio.duration)}
+            </Show>
           </div>
           <input
-            onInput={evt => setPlayhead(evt.currentTarget.value)}
+            onInput={evt => audio.seek(evt.currentTarget.value)}
             type="range"
             min="0"
             step="0.1"
@@ -73,7 +74,6 @@ const App: Component = () => {
               <button
                 onClick={() => {
                   setSource(url);
-                  setPlaying(false);
                 }}
                 class="transition cursor-pointer bg-transparent px-4 py-3 border-none"
                 classList={{

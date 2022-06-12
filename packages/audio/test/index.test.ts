@@ -3,7 +3,6 @@ import { suite } from "uvu";
 import { MockAudio } from "./setup";
 import * as assert from "uvu/assert";
 import { makeAudio, makeAudioPlayer, createAudio, AudioState } from "../src/index";
-import { isObject } from "@solid-primitives/utils";
 
 const testMA = suite("makeAudio");
 
