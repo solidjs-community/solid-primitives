@@ -77,15 +77,16 @@ testCA("test srcObject value path", () =>
 testCA("test basic reactive controls", () =>
   createRoot(async dispose => {
     const [playing, setPlaying] = createSignal(false);
-    const [playhead, setPlayhead] = createSignal(0);
     const [volume, setVolume] = createSignal(0.25);
-    const audio = createAudio("test.mp3", playing, playhead, volume);
+    const audio = createAudio("test.mp3", playing, volume);
     const mocked = audio.player as MockAudio;
+    assert.is(mocked.duration, 5000);
     assert.is(mocked.playing, false);
     setPlaying(true);
     assert.is(mocked.playing, true);
-    assert.is(mocked.duration, 5000);
     assert.is(mocked.volume, 0.25);
+    setVolume(0.5);
+    assert.is(mocked.volume, 0.5);
     dispose();
   })
 );
