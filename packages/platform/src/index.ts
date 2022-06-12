@@ -45,7 +45,7 @@ export const isOpera: boolean =
 
 /** Browser is Safari */
 export const isSafari: boolean =
-  /*#__PURE__*/ /constructor/i.test(window.HTMLElement as any) ||
+  /*#__PURE__*/ /constructor/i.test(w.HTMLElement) ||
   w.safari?.pushNotification + "" === "[object SafariRemoteNotification]";
 
 /** Browser is Internet Explorer 6-11 */
