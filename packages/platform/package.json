@@ -24,9 +24,17 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "files": [
     "dist"
   ],
@@ -37,7 +45,10 @@
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "platform",
+    "device",
+    "browser"
   ],
   "devDependencies": {
     "jsdom": "^19.0.0",
