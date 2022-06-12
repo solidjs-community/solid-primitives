@@ -123,7 +123,7 @@ export const createAudio = (
   const [store, setStore] = createStaticStore({
     currentTime: 0,
     duration: 0,
-    state: AudioState.STOPPED,
+    state: AudioState.LOADING,
     player: unwrapSource(access(src))
   });
   const { play, pause, setVolume, seek, player } = makeAudioPlayer(
@@ -142,12 +142,12 @@ export const createAudio = (
   );
   // Bind reactive properties as needed
   if (src instanceof Function) {
-    createEffect(src, () => {
+    createEffect(() => {
       const newSrc = access(src);
       if (newSrc instanceof HTMLAudioElement) {
         setStore('player', newSrc);
       } else {
-        store.player[typeof src === "string" ? "src" : "srcObject"] = newSrc as string & MediaSource;
+        store.player[typeof newSrc === "string" ? "src" : "srcObject"] = newSrc as string & MediaSource;
       }
       seek(0);
     });
