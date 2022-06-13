@@ -31,5 +31,3 @@ export class MockAudio extends Audio {
     return;
   };
 }
-
-global.Audio = MockAudio;

@@ -31,13 +31,36 @@ A foundational primitive with no player controls but exposes the raw player obje
 const player = makeAudio("example.mp3");
 ```
 
+#### Definition
+
+```ts
+function makeAudio(src: AudioSource, handlers: AudioEventHandlers = {}): HTMLAudioElement;
+```
+
 ### makeAudioPlayer
 
 Provides a very basic interface for wrapping listeners to a supplied or default audio player.
 
 ```ts
-const { play, pause } = makeAudioPlayer("example.mp3");
+const { play, pause, seek } = makeAudioPlayer("example.mp3");
 ```
+
+#### Definition
+
+```ts
+function makeAudioPlayer(
+  src: AudioSource,
+  handlers: AudioEventHandlers = {}
+): {
+  play: VoidFunction;
+  pause: VoidFunction;
+  seek: (time: number) => void;
+  setVolume: (volume: number) => void;
+  player: HTMLAudioElement;
+};
+```
+
+The seek function falls back to fastSeek when on [supporting browsers](https://caniuse.com/?search=fastseek).
 
 ### createAudio
 
@@ -55,6 +78,20 @@ audio.seek(4000);
 The audio primitive exports an reactive properties that provides you access to state, duration and playhead location.
 
 _Note:_ Initializing the primitive with `playing` as true works, however note that the user has to interact with the page first (on a fresh page load).
+
+```ts
+function makeAudioPlayer(
+  src: AudioSource | Accessor<AudioSource>,
+  playing?: Accessor<boolean>,
+  volume?: Accessor<number>
+): {
+  seek: (time: number) => void;
+  state: AudioState;
+  currentTime: number;
+  duration: number;
+  player: HTMLAudioElement;
+};
+```
 
 #### Dynamic audio changes
 

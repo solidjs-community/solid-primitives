@@ -70,8 +70,8 @@ export const makeAudioPlayer = (
   src: AudioSource,
   handlers: AudioEventHandlers = {}
 ): {
-  play: () => void;
-  pause: () => void;
+  play: VoidFunction;
+  pause: VoidFunction;
   seek: (time: number) => void;
   setVolume: (volume: number) => void;
   player: HTMLAudioElement;
@@ -79,7 +79,7 @@ export const makeAudioPlayer = (
   const player = makeAudio(src, handlers);
   const play = () => player.play();
   const pause = () => player.pause();
-  const seek = (time: number) => player.currentTime = time;
+  const seek = (time: number) => player.fastSeek ? player.fastSeek(time) : player.currentTime = time;
   const setVolume = (volume: number) => (player.volume = volume);
   return { play, pause, seek, setVolume, player };
 };

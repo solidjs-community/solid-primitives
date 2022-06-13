@@ -79,6 +79,7 @@ testCA("test basic reactive controls", () =>
     const [playing, setPlaying] = createSignal(false);
     const [volume, setVolume] = createSignal(0.25);
     const audio = createAudio("test.mp3", playing, volume);
+    // console.log(audio.duration);
     const mocked = audio.player as MockAudio;
     assert.is(mocked.duration, 5000);
     assert.is(mocked.playing, false);
