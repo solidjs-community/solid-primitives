@@ -88,9 +88,9 @@ const pathToREADME = pathTo("../README.md");
   const start = exec.index + exec[1].length;
   const end = exec.index + exec[0].length - exec[2].length;
 
-  const combinedDownloadsBadge = `![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://runkit.io/thetarnav/combined-weekly-npm-downloads/1.0.3/${rootDependencies.join(
+  const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://runkit.io/thetarnav/combined-weekly-npm-downloads/1.0.3/${rootDependencies.join(
     ","
-  )})`;
+  )})](https://runkit.com/thetarnav/combined-weekly-npm-downloads)`;
 
   const newReadme =
     readme.slice(0, start) + "\r\n" + combinedDownloadsBadge + "\r\n" + readme.slice(end);
