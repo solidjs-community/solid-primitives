@@ -25,6 +25,12 @@ readdirSync(pathTo(`../packages/`)).forEach(name => {
   if (!existsSync(dir)) return;
   const pkg = JSON.parse(readFileSync(dir, "utf8"));
 
+  const { dependencies } = pkg;
+
+  if (!dependencies || Object.keys(dependencies).every(d => !d.includes("@solid-primitives/"))) {
+    rootDependencies.push(`@solid-primitives/${name}`);
+  }
+
   if (!pkg.primitive)
     return console.warn(`package ${name} doesn't have primitive field in package.json`);
   if (pkg.primitive.name !== name)
@@ -33,11 +39,6 @@ readdirSync(pathTo(`../packages/`)).forEach(name => {
     );
 
   const { list, category, stage } = pkg.primitive;
-  const { dependencies } = pkg;
-
-  if (!dependencies || Object.keys(dependencies).every(d => !d.includes("@solid-primitives/"))) {
-    rootDependencies.push(`@solid-primitives/${name}`);
-  }
 
   const data = {};
   data.Name = `[${name}](${githubURL}${name}#readme)`;
