@@ -1,4 +1,4 @@
-const { readdirSync, existsSync, readFileSync } = require("fs");
+const { readdirSync, existsSync, readFileSync, writeFileSync } = require("fs");
 const { join } = require("path");
 const markdownMagic = require("markdown-magic");
 const tablemark = require("json-to-markdown-table");
@@ -58,24 +58,42 @@ readdirSync(pathTo(`../packages/`)).forEach(name => {
   categories[cat] = Array.isArray(categories[cat]) ? [...categories[cat], data] : [data];
 });
 
-markdownMagic(pathTo("../README.md"), {
-  transforms: {
-    GENERATE_PRIMITIVES_TABLE: () => {
-      return Object.entries(categories).reduce((md, [category, items]) => {
-        // Some MD jousting to get the table to render nicely
-        // with consistent columns
-        md += `|<h4>*${category}*</h4>|\n`;
-        md += tablemark(items, ["Name", "Stage", "Primitives", "Size", "NPM"])
-          .replace("|Name|Stage|Primitives|Size|NPM|\n", "")
-          .replace("|----|----|----|----|----|\n", "");
-        return md;
-      }, "|Name|Stage|Primitives|Size|NPM|\n|----|----|----|----|----|\n");
+const pathToREADME = pathTo("../README.md");
+
+(async () => {
+  await markdownMagic(pathToREADME, {
+    transforms: {
+      GENERATE_PRIMITIVES_TABLE: () => {
+        return Object.entries(categories).reduce((md, [category, items]) => {
+          // Some MD jousting to get the table to render nicely
+          // with consistent columns
+          md += `|<h4>*${category}*</h4>|\n`;
+          md += tablemark(items, ["Name", "Stage", "Primitives", "Size", "NPM"])
+            .replace("|Name|Stage|Primitives|Size|NPM|\n", "")
+            .replace("|----|----|----|----|----|\n", "");
+          return md;
+        }, "|Name|Stage|Primitives|Size|NPM|\n|----|----|----|----|----|\n");
+      }
     }
-  }
-});
+  });
 
-const combinedDownloadsBadge = `![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://runkit.io/fezvrasta/combined-npm-downloads/1.0.0?packages=${rootDependencies.join(
-  ","
-)})`;
+  const readme = readFileSync(pathToREADME).toString();
 
-console.log(combinedDownloadsBadge);
+  const exec =
+    /(<!-- INSERT-NPM-DOWNLOADS-BADGE:START -->)[.\n\r\S]*(<!-- INSERT-NPM-DOWNLOADS-BADGE:END -->)/g.exec(
+      readme
+    );
+  if (!exec) return console.log("Couldn't find INSERT-NPM-DOWNLOADS-BADGE tag in README.md");
+
+  const start = exec.index + exec[1].length;
+  const end = exec.index + exec[0].length - exec[2].length;
+
+  const combinedDownloadsBadge = `![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://runkit.io/thetarnav/combined-weekly-npm-downloads/1.0.3/${rootDependencies.join(
+    ","
+  )})`;
+
+  const newReadme =
+    readme.slice(0, start) + "\r\n" + combinedDownloadsBadge + "\r\n" + readme.slice(end);
+
+  writeFileSync(pathToREADME, newReadme);
+})();

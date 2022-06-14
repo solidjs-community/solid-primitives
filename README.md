@@ -4,6 +4,11 @@
 
 # Solid Primitives
 
+[![pnpm](https://img.shields.io/badge/maintained%20with-pnpm-cc00ff.svg?style=for-the-badge&logo=pnpm)](https://pnpm.io/)
+[![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)<!-- INSERT-NPM-DOWNLOADS-BADGE:START -->
+![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://runkit.io/thetarnav/combined-weekly-npm-downloads/1.0.2/@solid-primitives/audio,@solid-primitives/clipboard,@solid-primitives/context,@solid-primitives/devices,@solid-primitives/event-props,@solid-primitives/fetch,@solid-primitives/fullscreen,@solid-primitives/geolocation,@solid-primitives/i18n,@solid-primitives/input-mask,@solid-primitives/keyed,@solid-primitives/permission,@solid-primitives/platform,@solid-primitives/reducer,@solid-primitives/scheduled,@solid-primitives/script-loader,@solid-primitives/selection,@solid-primitives/share,@solid-primitives/storage,@solid-primitives/stream,@solid-primitives/timer,@solid-primitives/tween,@solid-primitives/workers)
+<!-- INSERT-NPM-DOWNLOADS-BADGE:END -->
+
 A project that strives to develop high-quality, community contributed Solid primitives. All utilities are well tested and continuously maintained. Every contribution to the repository is checked for quality and maintained to the highest degree of excellence. The ultimate goal is to extend Solid's primary and secondary primitives with a set of tertiary primitives.
 
 While Solid Primitives is not officially maintained by the SolidJS Core Team, it is managed by members of the SolidJS core and ecosystem teams. This separation allows the core library to iterate independently while allowing Solid Primitives to remain in-sync with future plans.
