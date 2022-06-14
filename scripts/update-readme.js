@@ -1,4 +1,4 @@
-const { readdirSync, existsSync, readFileSync } = require("fs");
+const { readdirSync, existsSync, readFileSync, writeFileSync } = require("fs");
 const { join } = require("path");
 const markdownMagic = require("markdown-magic");
 const tablemark = require("json-to-markdown-table");
@@ -18,11 +18,18 @@ const stageShieldLink =
   "https://github.com/solidjs-community/solid-primitives#contribution-process";
 
 const categories = {};
+const rootDependencies = [];
 
 readdirSync(pathTo(`../packages/`)).forEach(name => {
   const dir = pathTo(`../packages/${name}/package.json`);
   if (!existsSync(dir)) return;
   const pkg = JSON.parse(readFileSync(dir, "utf8"));
+
+  const { dependencies } = pkg;
+
+  if (!dependencies || Object.keys(dependencies).every(d => !d.includes("@solid-primitives/"))) {
+    rootDependencies.push(`@solid-primitives/${name}`);
+  }
 
   if (!pkg.primitive)
     return console.warn(`package ${name} doesn't have primitive field in package.json`);
@@ -32,6 +39,7 @@ readdirSync(pathTo(`../packages/`)).forEach(name => {
     );
 
   const { list, category, stage } = pkg.primitive;
+
   const data = {};
   data.Name = `[${name}](${githubURL}${name}#readme)`;
   // Detect the stage and build size/version only if needed
@@ -51,18 +59,42 @@ readdirSync(pathTo(`../packages/`)).forEach(name => {
   categories[cat] = Array.isArray(categories[cat]) ? [...categories[cat], data] : [data];
 });
 
-markdownMagic(pathTo("../README.md"), {
-  transforms: {
-    GENERATE_PRIMITIVES_TABLE: () => {
-      return Object.entries(categories).reduce((md, [category, items]) => {
-        // Some MD jousting to get the table to render nicely
-        // with consistent columns
-        md += `|<h4>*${category}*</h4>|\n`;
-        md += tablemark(items, ["Name", "Stage", "Primitives", "Size", "NPM"])
-          .replace("|Name|Stage|Primitives|Size|NPM|\n", "")
-          .replace("|----|----|----|----|----|\n", "");
-        return md;
-      }, "|Name|Stage|Primitives|Size|NPM|\n|----|----|----|----|----|\n");
+const pathToREADME = pathTo("../README.md");
+
+(async () => {
+  await markdownMagic(pathToREADME, {
+    transforms: {
+      GENERATE_PRIMITIVES_TABLE: () => {
+        return Object.entries(categories).reduce((md, [category, items]) => {
+          // Some MD jousting to get the table to render nicely
+          // with consistent columns
+          md += `|<h4>*${category}*</h4>|\n`;
+          md += tablemark(items, ["Name", "Stage", "Primitives", "Size", "NPM"])
+            .replace("|Name|Stage|Primitives|Size|NPM|\n", "")
+            .replace("|----|----|----|----|----|\n", "");
+          return md;
+        }, "|Name|Stage|Primitives|Size|NPM|\n|----|----|----|----|----|\n");
+      }
     }
-  }
-});
+  });
+
+  const readme = readFileSync(pathToREADME).toString();
+
+  const exec =
+    /(<!-- INSERT-NPM-DOWNLOADS-BADGE:START -->)[.\n\r\S]*(<!-- INSERT-NPM-DOWNLOADS-BADGE:END -->)/g.exec(
+      readme
+    );
+  if (!exec) return console.log("Couldn't find INSERT-NPM-DOWNLOADS-BADGE tag in README.md");
+
+  const start = exec.index + exec[1].length;
+  const end = exec.index + exec[0].length - exec[2].length;
+
+  const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://runkit.io/thetarnav/combined-weekly-npm-downloads/1.0.3/${rootDependencies.join(
+    ","
+  )})](https://runkit.com/thetarnav/combined-weekly-npm-downloads)`;
+
+  const newReadme =
+    readme.slice(0, start) + "\r\n" + combinedDownloadsBadge + "\r\n" + readme.slice(end);
+
+  writeFileSync(pathToREADME, newReadme);
+})();
