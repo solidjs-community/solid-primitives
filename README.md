@@ -5,7 +5,7 @@
 # Solid Primitives
 
 [![pnpm](https://img.shields.io/badge/maintained%20with-pnpm-cc00ff.svg?style=for-the-badge&logo=pnpm)](https://pnpm.io/)
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)<!-- INSERT-NPM-DOWNLOADS-BADGE:START -->
+[![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)<!-- INSERT-NPM-DOWNLOADS-BADGE:START -->
 [![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://runkit.io/thetarnav/combined-weekly-npm-downloads/1.0.3/@solid-primitives/analytics,@solid-primitives/audio,@solid-primitives/clipboard,@solid-primitives/context,@solid-primitives/devices,@solid-primitives/event-props,@solid-primitives/fetch,@solid-primitives/fullscreen,@solid-primitives/geolocation,@solid-primitives/gestures,@solid-primitives/i18n,@solid-primitives/input-mask,@solid-primitives/keyed,@solid-primitives/permission,@solid-primitives/platform,@solid-primitives/reducer,@solid-primitives/scheduled,@solid-primitives/script-loader,@solid-primitives/selection,@solid-primitives/share,@solid-primitives/storage,@solid-primitives/stream,@solid-primitives/timer,@solid-primitives/tween,@solid-primitives/utils,@solid-primitives/websocket,@solid-primitives/workers)](https://runkit.com/thetarnav/combined-weekly-npm-downloads)
 <!-- INSERT-NPM-DOWNLOADS-BADGE:END -->
 

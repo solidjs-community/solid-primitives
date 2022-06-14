@@ -167,3 +167,6 @@ temp/
 *.lock
 
 tsup.config.bundled*.mjs
+
+# turbo
+.turbo

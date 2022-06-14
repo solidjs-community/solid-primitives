@@ -4,7 +4,7 @@
 
 # @solid-primitives/storage
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
+[![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/storage?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/storage)
 [![size](https://img.shields.io/npm/v/@solid-primitives/storage?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/storage)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
@@ -149,12 +149,12 @@ As a convenient additional method, you can also use `createCookieStorageSignal(k
 
 The properties of your `createStorage`/`createAsyncStorage`/`createStorageSignal` props are:
 
-* `api`: the (sync or async) [Storage-like API](https://developer.mozilla.org/de/docs/Web/API/Web_Storage_API), default is localStorage
-* `deserializer` (optional): a deserializer or parser for the stored data
-* `serializer` (optional): a serializer or string converter for the stored data
-* `options` (optional): default options for the set-call of Storage-like API, if supported
-* `prefix` (optional): a prefix for the Storage keys
-* `sync` (optional): if set to false, [event synchronization](https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent) is disabled
+- `api`: the (sync or async) [Storage-like API](https://developer.mozilla.org/de/docs/Web/API/Web_Storage_API), default is localStorage
+- `deserializer` (optional): a deserializer or parser for the stored data
+- `serializer` (optional): a serializer or string converter for the stored data
+- `options` (optional): default options for the set-call of Storage-like API, if supported
+- `prefix` (optional): a prefix for the Storage keys
+- `sync` (optional): if set to false, [event synchronization](https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent) is disabled
 
 ### Tools
 
@@ -200,4 +200,5 @@ Patched peerDependency issue
 1.1.2
 
 Added sync option to disable event synching
+
 </details>
