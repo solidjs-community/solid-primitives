@@ -18,6 +18,7 @@ const stageShieldLink =
   "https://github.com/solidjs-community/solid-primitives#contribution-process";
 
 const categories = {};
+const rootDependencies = [];
 
 readdirSync(pathTo(`../packages/`)).forEach(name => {
   const dir = pathTo(`../packages/${name}/package.json`);
@@ -32,6 +33,12 @@ readdirSync(pathTo(`../packages/`)).forEach(name => {
     );
 
   const { list, category, stage } = pkg.primitive;
+  const { dependencies } = pkg;
+
+  if (!dependencies || Object.keys(dependencies).every(d => !d.includes("@solid-primitives/"))) {
+    rootDependencies.push(`@solid-primitives/${name}`);
+  }
+
   const data = {};
   data.Name = `[${name}](${githubURL}${name}#readme)`;
   // Detect the stage and build size/version only if needed
@@ -66,3 +73,9 @@ markdownMagic(pathTo("../README.md"), {
     }
   }
 });
+
+const combinedDownloadsBadge = `![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://runkit.io/fezvrasta/combined-npm-downloads/1.0.0?packages=${rootDependencies.join(
+  ","
+)})`;
+
+console.log(combinedDownloadsBadge);
