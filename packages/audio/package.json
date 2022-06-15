@@ -49,9 +49,10 @@
   ],
   "testEnvironment": "jsdom",
   "devDependencies": {
-    "@babel/preset-env": "^7.15.8",
-    "babel-preset-solid": "^1.1.5",
+    "@babel/preset-env": "^7.18.2",
+    "babel-preset-solid": "^1.4.4",
     "jsdom": "^19.0.0",
+    "mock-audio-element-adv": "^0.1.2",
     "prettier": "^2.0.5",
     "solid-heroicons": "^2.0.3",
     "solid-register": "^0.2.5",
@@ -69,6 +70,6 @@
     "solid-js": "^1.4.4"
   },
   "dependencies": {
-    "@solid-primitives/utils": "^1.4.0"
+    "@solid-primitives/utils": "^2.1.0"
   }
 }

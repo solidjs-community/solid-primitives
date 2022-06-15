@@ -20,7 +20,7 @@ const App: Component = () => {
   const [source, setSource] = createSignal("sample1.mp3");
   const [playing, setPlaying] = createSignal(false);
   const [volume, setVolume] = createSignal(1);
-  const audio = createAudio(source, playing, volume);
+  const [audio, { seek }] = createAudio(source, playing, volume);
   return (
     <div class="flex justify-center items-center box-border w-full h-screen overflow-hidden bg-gray-900">
       <div class="flex flex-col items-center">
@@ -41,7 +41,7 @@ const App: Component = () => {
             </Show>
           </div>
           <input
-            onInput={evt => audio.seek(evt.currentTarget.value)}
+            onInput={evt => seek(evt.currentTarget.value)}
             type="range"
             min="0"
             step="0.1"

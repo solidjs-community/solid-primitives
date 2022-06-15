@@ -1,4 +1,4 @@
-import { Accessor, onMount, onCleanup, createEffect } from "solid-js";
+import { Accessor, Setter, onMount, onCleanup, createEffect } from "solid-js";
 import { createStaticStore, access } from "@solid-primitives/utils";
 
 // Set of control enums
@@ -108,27 +108,40 @@ export const createAudio = (
   src: AudioSource | Accessor<AudioSource>,
   playing?: Accessor<boolean>,
   volume?: Accessor<number>,
-): {
-  seek: (time: number) => void,
-  state: AudioState,
-  currentTime: number,
-  duration: number,
-  player: HTMLAudioElement
-} => {
+): [
+  {
+    state: AudioState,
+    currentTime: number,
+    duration: number,
+    volume: number,
+    player: HTMLAudioElement
+  },
+  {
+    seek: (time: number) => void,
+    setVolume: (volume: number) => void,
+    play: VoidFunction,
+    pause: VoidFunction,
+  }
+] => {
+  const player = unwrapSource(access(src));
   const [store, setStore] = createStaticStore({
-    currentTime: 0,
-    duration: 0,
-    seek: (_time: number) => {},
     state: AudioState.LOADING,
-    player: unwrapSource(access(src))
+    player,
+    currentTime: 0,
+    get duration() {
+      return this.player.duration;
+    },
+    get volume() {
+      return this.player.volume;
+    },
   });
-  const { play, pause, setVolume, seek, player } = makeAudioPlayer(
+  const { play, pause, setVolume, seek } = makeAudioPlayer(
     store.player,
     {
       loadeddata: () => {
         setStore({
           'state': AudioState.READY,
-          'duration': player.duration
+          'duration': player.duration,
         });
         if (playing && playing() == true) play();
       },
@@ -139,7 +152,6 @@ export const createAudio = (
       error: () => setStore('state', AudioState.ERROR),
     }
   );
-  setStore('seek', () => seek);
   // Bind reactive properties as needed
   if (src instanceof Function) {
     createEffect(() => {
@@ -157,6 +169,7 @@ export const createAudio = (
   }
   if (volume) {
     createEffect(() => setVolume(volume()));
+    setVolume(volume());
   }
-  return store;
+  return [store, {seek, play, pause, setVolume}];
 };
