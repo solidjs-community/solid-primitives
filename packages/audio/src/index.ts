@@ -1,4 +1,4 @@
-import { Accessor, Setter, onMount, onCleanup, createEffect } from "solid-js";
+import { Accessor, onMount, onCleanup, createEffect } from "solid-js";
 import { createStaticStore, access } from "@solid-primitives/utils";
 
 // Set of control enums
@@ -77,7 +77,7 @@ export const makeAudioPlayer = (
   player: HTMLAudioElement;
 } => {
   const player = makeAudio(src, handlers);
-  const play = () => player.play();
+  const play = () => player.play();;
   const pause = () => player.pause();
   const seek = (time: number) => player.fastSeek ? player.fastSeek(time) : player.currentTime = time;
   const setVolume = (volume: number) => (player.volume = volume);
