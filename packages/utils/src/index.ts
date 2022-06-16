@@ -48,6 +48,12 @@ export function isObject(value: any): value is AnyObject {
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
 
 /**
+ * Check shallow array equality
+ */
+export const arrayEquals = (a: readonly unknown[], b: readonly unknown[]): boolean =>
+  a === b || (a.length === b.length && a.every((e, i) => e === b[i]));
+
+/**
  * Returns a function that will call all functions in the order they were chained with the same arguments.
  */
 export function chain<Args extends [] | any[]>(callbacks: {

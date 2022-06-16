@@ -1,5 +1,5 @@
 import { createComputed, createRoot } from "solid-js";
-import { createStaticStore, handleDiffArray } from "../src";
+import { createStaticStore, handleDiffArray, arrayEquals } from "../src";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
@@ -145,3 +145,19 @@ da("calls callbacks for added and removed items", () => {
 });
 
 da.run();
+
+const ae = suite("arrayEquals");
+
+ae("arrayEquals", () => {
+  const _1: any[] = [];
+  assert.ok(arrayEquals(_1, _1));
+  assert.ok(arrayEquals(_1, []));
+  assert.ok(arrayEquals([1, 2, 3], [1, 2, 3]));
+  assert.ok(arrayEquals([1, 2, _1], [1, 2, _1]));
+
+  assert.not.ok(arrayEquals([1, 2, 3], [1, 2, 3, 4]));
+  assert.not.ok(arrayEquals([1, 2, 3], [1, 0, 3]));
+  assert.not.ok(arrayEquals([1, 2, _1], [1, 2, []]));
+});
+
+ae.run();
