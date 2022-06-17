@@ -1,4 +1,5 @@
-import { createSignal, batch, onMount, onCleanup, createEffect } from "solid-js";
+import { Accessor, onMount, onCleanup, createEffect } from "solid-js";
+import { createStaticStore, access } from "@solid-primitives/utils";
 
 // Set of control enums
 export enum AudioState {
@@ -7,140 +8,168 @@ export enum AudioState {
   PAUSED = "paused",
   COMPLETE = "complete",
   STOPPED = "stopped",
-  READY = "ready"
+  READY = "ready",
+  ERROR = "error"
 }
 
-type AudioSource =
-  | string
-  | MediaSource
-  | (string & MediaSource)
-  | (() => string | MediaSource | (string & MediaSource));
+// Helper for producing the audio source
+const unwrapSource = (src: AudioSource) => {
+  let player: HTMLAudioElement;
+  if (src instanceof HTMLAudioElement) {
+    player = src;
+  } else {
+    player = new Audio();
+    player[typeof src === "string" ? "src" : "srcObject"] = src as string & MediaSource;
+  }
+  return player;
+};
 
 /**
- * Creates an extremely basic audio generator method.
+ * Generates a basic audio instance with limited functionality.
  *
  * @param src Audio file path or MediaSource to be played
  * @param handlers An array of handlers to bind against the player
- * @return
+ * @return A basic audio player instance
  */
-export const createAudioPlayer = (
+export const makeAudio = (
   src: AudioSource,
-  handlers: Array<[string, EventListener]> = []
-): {
-  player: HTMLAudioElement;
-  state: () => AudioState;
-  setState: (state: AudioState) => void;
-} => {
-  const [state, setState] = createSignal<AudioState>(AudioState.STOPPED);
-  const player: HTMLAudioElement = new Audio();
-  if (src instanceof Function) {
-    const srcKey = typeof src() === "string" ? "src" : "srcObject";
-    player[srcKey] = src() as string & MediaSource;
-    createEffect(() => (player[srcKey] = src() as string & MediaSource));
-  } else {
-    player[typeof src === "string" ? "src" : "srcObject"] = src as string & MediaSource;
-  }
-  // Handle management on create and clean-up
-  onMount(() => handlers.forEach(([evt, handler]) => player.addEventListener(evt, handler)));
-  onCleanup(() => handlers.forEach(([evt, handler]) => player.removeEventListener(evt, handler)));
-  return { player, state, setState };
+  handlers: AudioEventHandlers = {},
+): HTMLAudioElement => {
+  const player = unwrapSource(src);
+  const listeners = (enabled: boolean) => {
+    Object.entries(handlers).forEach(([evt, handler]) =>
+      player[enabled ? "addEventListener" : "removeEventListener"](evt, handler as EventListenerOrEventListenerObject)
+    );
+  };
+  onMount(() => listeners(true));
+  onCleanup(() => {
+    player.pause();
+    listeners(false)
+  });
+  return player;
 };
 
 /**
- * Creates a simple audio manager with basic pause and play.
+ * Generates a basic audio player with simple control mechanisms.
  *
  * @param src Audio file path or MediaSource to be played
  * @return options - @type Object
  * @return options.start - Start playing
- * @return options.stop - Stop playing
- * @return options.state - Current state of the player as a Symbol
+ * @return options.pause - Pause playing
+ * @return options.seek - Seeks to a location in the playhead
+ * @return options.setVolume - Sets the volume of the player
+ * @return options.player - Raw player instance
  * @return Returns a location signal and one-off async query callback
  *
  * @example
  * ```ts
- * const [start, pause] = createAudio('./example1.mp3);
+ * const { start, seek } = makeAudioPlayer('./example1.mp3);
+ * ```
+ */
+export const makeAudioPlayer = (
+  src: AudioSource,
+  handlers: AudioEventHandlers = {}
+): {
+  play: VoidFunction;
+  pause: VoidFunction;
+  seek: (time: number) => void;
+  setVolume: (volume: number) => void;
+  player: HTMLAudioElement;
+} => {
+  const player = makeAudio(src, handlers);
+  const play = () => player.play();;
+  const pause = () => player.pause();
+  const seek = (time: number) => player.fastSeek ? player.fastSeek(time) : player.currentTime = time;
+  const setVolume = (volume: number) => (player.volume = volume);
+  return { play, pause, seek, setVolume, player };
+};
+
+/**
+ * A reactive audio primitive with basic control actions.
+ *
+ * @param src Audio source path or MediaSource to be played or an accessor
+ * @param playing A signal for controlling the player
+ * @param playerhead A signal for controlling the playhead location
+ * @param volume A signal for controlling the volume
+ * @return store - @type Store
+ * @return store.state - Current state of the player
+ * @return store.currentTime - Current time of the playhead
+ * @return store.duration - Duratio of the audio player
+ *
+ * @example
+ * ```ts
+ * const [playing, setPlaying] = createSignal(false);
+ * const [volume, setVolume] = createSignal(1);
+ * const audio = createAudio('./example1.mp3', playing, volume);
+ * console.log(audio.duration);
  * ```
  */
 export const createAudio = (
-  src: AudioSource
-): {
-  play: () => void;
-  pause: () => void;
-  state: () => AudioState;
-  player: HTMLAudioElement;
-} => {
-  const { player, state, setState } = createAudioPlayer(src, [
-    ["loadeddata", () => setState(AudioState.READY)],
-    ["loadstart", () => setState(AudioState.LOADING)],
-    ["playing", () => setState(AudioState.PLAYING)],
-    ["pause", () => setState(AudioState.PAUSED)]
-  ]);
-  // Audio controls
-  const play = () => player.play();
-  const pause = () => player.pause();
-  return { play, pause, state, player };
-};
-
-/**
- * Creates a simple audio manager with most control actions.
- *
- * @param src Audio file path or MediaSource to be played
- * @param volume Volume setting for the audio file
- * @return options - @type Object
- * @return options.start - Start playing
- * @return options.stop - Stop playing
- * @return options.currentTime - Current time that the player is at
- * @return options.state - Current state of the player as a Symbol
- * @return options.duration - Duration of the audio clip
- * @return options.seek - A function to support seeking
- * @return options.setVolume - A function to change the volume setting
- * @return Returns a location signal and one-off async query callback
- *
- * @example
- * ```ts
- * const [start, pause, seek, currentTime, duration] = createAudioManager('./example1.mp3);
- * ```
- */
-export const createAudioManager = (
-  src: AudioSource,
-  volume: number = 1
-): {
-  play: () => void;
-  pause: () => void;
-  state: () => AudioState;
-  currentTime: () => number;
-  duration: () => number;
-  setVolume: (volume: number) => void;
-  seek: (position: number) => void;
-  player: HTMLAudioElement;
-} => {
-  const [currentTime, setCurrentTime] = createSignal<number>(0);
-  const [duration, setDuration] = createSignal<number>(0);
-  // Bind recording events to the player
-  const { player, state, setState } = createAudioPlayer(src, [
-    [
-      "loadeddata",
-      () =>
-        batch(() => {
-          setState(AudioState.READY);
-          setDuration(player.duration);
-        })
-    ],
-    ["loadstart", () => setState(AudioState.LOADING)],
-    ["playing", () => setState(AudioState.PLAYING)],
-    ["pause", () => setState(AudioState.PAUSED)],
-    ["loadstart", () => setState(AudioState.LOADING)],
-    ["playing", () => setState(AudioState.PLAYING)],
-    ["pause", () => setState(AudioState.PAUSED)],
-    ["timeupdate", () => setCurrentTime(player.currentTime)]
-  ]);
-  // Audio controls
-  const play = () => player.play();
-  const pause = () => player.pause();
-  const seek = (time: number) => player.fastSeek(time);
-  const setVolume = (volume: number) => (player.volume = volume);
-
-  createEffect(() => (player.volume = volume));
-
-  return { play, pause, currentTime, state, duration, seek, setVolume, player };
+  src: AudioSource | Accessor<AudioSource>,
+  playing?: Accessor<boolean>,
+  volume?: Accessor<number>,
+): [
+  {
+    state: AudioState,
+    currentTime: number,
+    duration: number,
+    volume: number,
+    player: HTMLAudioElement
+  },
+  {
+    seek: (time: number) => void,
+    setVolume: (volume: number) => void,
+    play: VoidFunction,
+    pause: VoidFunction,
+  }
+] => {
+  const player = unwrapSource(access(src));
+  const [store, setStore] = createStaticStore({
+    state: AudioState.LOADING,
+    player,
+    currentTime: 0,
+    get duration() {
+      return this.player.duration;
+    },
+    get volume() {
+      return this.player.volume;
+    },
+  });
+  const { play, pause, setVolume, seek } = makeAudioPlayer(
+    store.player,
+    {
+      loadeddata: () => {
+        setStore({
+          'state': AudioState.READY,
+          'duration': player.duration,
+        });
+        if (playing && playing() == true) play();
+      },
+      timeupdate: () => setStore('currentTime', player.currentTime),
+      loadstart: () => setStore('state', AudioState.LOADING),
+      playing: () => setStore('state', AudioState.PLAYING),
+      pause: () => setStore('state', AudioState.PAUSED),
+      error: () => setStore('state', AudioState.ERROR),
+    }
+  );
+  // Bind reactive properties as needed
+  if (src instanceof Function) {
+    createEffect(() => {
+      const newSrc = access(src);
+      if (newSrc instanceof HTMLAudioElement) {
+        setStore('player', newSrc);
+      } else {
+        store.player[typeof newSrc === "string" ? "src" : "srcObject"] = newSrc as string & MediaSource;
+      }
+      seek(0);
+    });
+  }
+  if (playing) {
+    createEffect(() => (playing() === true ? play() : pause()));
+  }
+  if (volume) {
+    createEffect(() => setVolume(volume()));
+    setVolume(volume());
+  }
+  return [store, {seek, play, pause, setVolume}];
 };
