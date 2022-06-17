@@ -1,6 +1,8 @@
 import { noop } from "@solid-primitives/utils";
 import * as API from "./index";
 
+export const AudioState = API.AudioState;
+
 export const makeAudio: typeof API.makeAudio = () => ({} as HTMLAudioElement);
 
 export const makeAudioPlayer: typeof API.makeAudioPlayer = () => ({
@@ -13,7 +15,7 @@ export const makeAudioPlayer: typeof API.makeAudioPlayer = () => ({
 
 export const createAudio: typeof API.createAudio = () => [
   {
-    state: API.AudioState.LOADING,
+    state: AudioState.LOADING,
     currentTime: 0,
     duration: 0,
     volume: 0,
