@@ -6,7 +6,8 @@ import { makeAudio, makeAudioPlayer, createAudio } from "../src/index";
 
 const testMA = suite("makeAudio");
 
-const testPath = 'https://github.com/solidjs-community/solid-primitives/blob/audio/packages/audio/dev/sample1.mp3?raw=true';
+const testPath =
+  "https://github.com/solidjs-community/solid-primitives/blob/audio/packages/audio/dev/sample1.mp3?raw=true";
 
 testMA("test static string path", () =>
   createRoot(dispose => {
@@ -48,7 +49,7 @@ testMAP("test seek and volume", () =>
 testMAP("test srcObject value path", () =>
   createRoot(dispose => {
     const { player } = makeAudioPlayer({} as MediaSource);
-    assert.is(typeof player.srcObject, 'object');
+    assert.is(typeof player.srcObject, "object");
     dispose();
   })
 );
@@ -61,9 +62,9 @@ testCA("test srcObject value path", () =>
   createRoot(dispose => {
     const media = {} as MediaSource;
     let [audio] = createAudio(media);
-    assert.is(typeof audio.player.srcObject, 'object');
+    assert.is(typeof audio.player.srcObject, "object");
     [audio] = createAudio(() => media);
-    assert.is(typeof audio.player.srcObject, 'object');
+    assert.is(typeof audio.player.srcObject, "object");
     dispose();
   })
 );
@@ -72,7 +73,7 @@ testCA("test basic reactive controls", () =>
   createRoot(async dispose => {
     const [playing, setPlaying] = createSignal(false);
     const [volume, setVolume] = createSignal(0.25);
-    const [audio, {play}] = createAudio("test.mp3", playing, volume);
+    const [audio, { play }] = createAudio("test.mp3", playing, volume);
     audio.player._mock._load(audio.player);
     assert.is(audio.player._mock.paused, true);
     await setPlaying(true);

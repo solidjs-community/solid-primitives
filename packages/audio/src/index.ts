@@ -33,18 +33,21 @@ const unwrapSource = (src: AudioSource) => {
  */
 export const makeAudio = (
   src: AudioSource,
-  handlers: AudioEventHandlers = {},
+  handlers: AudioEventHandlers = {}
 ): HTMLAudioElement => {
   const player = unwrapSource(src);
   const listeners = (enabled: boolean) => {
     Object.entries(handlers).forEach(([evt, handler]) =>
-      player[enabled ? "addEventListener" : "removeEventListener"](evt, handler as EventListenerOrEventListenerObject)
+      player[enabled ? "addEventListener" : "removeEventListener"](
+        evt,
+        handler as EventListenerOrEventListenerObject
+      )
     );
   };
   onMount(() => listeners(true));
   onCleanup(() => {
     player.pause();
-    listeners(false)
+    listeners(false);
   });
   return player;
 };
@@ -77,9 +80,10 @@ export const makeAudioPlayer = (
   player: HTMLAudioElement;
 } => {
   const player = makeAudio(src, handlers);
-  const play = () => player.play();;
+  const play = () => player.play();
   const pause = () => player.pause();
-  const seek = (time: number) => player.fastSeek ? player.fastSeek(time) : player.currentTime = time;
+  const seek = (time: number) =>
+    player.fastSeek ? player.fastSeek(time) : (player.currentTime = time);
   const setVolume = (volume: number) => (player.volume = volume);
   return { play, pause, seek, setVolume, player };
 };
@@ -107,20 +111,20 @@ export const makeAudioPlayer = (
 export const createAudio = (
   src: AudioSource | Accessor<AudioSource>,
   playing?: Accessor<boolean>,
-  volume?: Accessor<number>,
+  volume?: Accessor<number>
 ): [
   {
-    state: AudioState,
-    currentTime: number,
-    duration: number,
-    volume: number,
-    player: HTMLAudioElement
+    state: AudioState;
+    currentTime: number;
+    duration: number;
+    volume: number;
+    player: HTMLAudioElement;
   },
   {
-    seek: (time: number) => void,
-    setVolume: (volume: number) => void,
-    play: VoidFunction,
-    pause: VoidFunction,
+    seek: (time: number) => void;
+    setVolume: (volume: number) => void;
+    play: VoidFunction;
+    pause: VoidFunction;
   }
 ] => {
   const player = unwrapSource(access(src));
@@ -133,33 +137,31 @@ export const createAudio = (
     },
     get volume() {
       return this.player.volume;
-    },
-  });
-  const { play, pause, setVolume, seek } = makeAudioPlayer(
-    store.player,
-    {
-      loadeddata: () => {
-        setStore({
-          'state': AudioState.READY,
-          'duration': player.duration,
-        });
-        if (playing && playing() == true) play();
-      },
-      timeupdate: () => setStore('currentTime', player.currentTime),
-      loadstart: () => setStore('state', AudioState.LOADING),
-      playing: () => setStore('state', AudioState.PLAYING),
-      pause: () => setStore('state', AudioState.PAUSED),
-      error: () => setStore('state', AudioState.ERROR),
     }
-  );
+  });
+  const { play, pause, setVolume, seek } = makeAudioPlayer(store.player, {
+    loadeddata: () => {
+      setStore({
+        state: AudioState.READY,
+        duration: player.duration
+      });
+      if (playing && playing() == true) play();
+    },
+    timeupdate: () => setStore("currentTime", player.currentTime),
+    loadstart: () => setStore("state", AudioState.LOADING),
+    playing: () => setStore("state", AudioState.PLAYING),
+    pause: () => setStore("state", AudioState.PAUSED),
+    error: () => setStore("state", AudioState.ERROR)
+  });
   // Bind reactive properties as needed
   if (src instanceof Function) {
     createEffect(() => {
       const newSrc = access(src);
       if (newSrc instanceof HTMLAudioElement) {
-        setStore('player', newSrc);
+        setStore("player", newSrc);
       } else {
-        store.player[typeof newSrc === "string" ? "src" : "srcObject"] = newSrc as string & MediaSource;
+        store.player[typeof newSrc === "string" ? "src" : "srcObject"] = newSrc as string &
+          MediaSource;
       }
       seek(0);
     });
@@ -171,5 +173,5 @@ export const createAudio = (
     createEffect(() => setVolume(volume()));
     setVolume(volume());
   }
-  return [store, {seek, play, pause, setVolume}];
+  return [store, { seek, play, pause, setVolume }];
 };

@@ -8,10 +8,8 @@ declare enum AudioState {
   ERROR = "error"
 }
 
-type AudioSource = string
-  | undefined
-  | HTMLAudioElement
-  | MediaSource
-  | (string & MediaSource);
+type AudioSource = string | undefined | HTMLAudioElement | MediaSource | (string & MediaSource);
 
-declare type AudioEventHandlers = { [K in keyof HTMLMediaElementEventMap]?: (event: HTMLMediaElementEventMap[K]) => void; }; 
+declare type AudioEventHandlers = {
+  [K in keyof HTMLMediaElementEventMap]?: (event: HTMLMediaElementEventMap[K]) => void;
+};
