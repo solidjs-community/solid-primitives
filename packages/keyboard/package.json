@@ -1,0 +1,75 @@
+{
+  "name": "@solid-primitives/keyboard",
+  "version": "0.0.100",
+  "description": "A library of reactive promitives helping handling user's keyboard input.",
+  "author": "Damian Tarnwski <gthetarnav@gmail.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "keyboard",
+    "stage": 0,
+    "list": [
+      "makeHoldKeyListener"
+    ],
+    "category": "Inputs"
+  },
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "vite serve dev --host",
+    "dev": "npm run start",
+    "build": "tsup",
+    "test": "uvu -r solid-register",
+    "test:watch": "watchlist src test -- npm test"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "keyboard",
+    "keystroke",
+    "hotkey"
+  ],
+  "devDependencies": {
+    "jsdom": "^19.0.0",
+    "prettier": "^2.7.1",
+    "solid-register": "^0.2.5",
+    "tslib": "^2.4.0",
+    "tsup": "^6.1.2",
+    "typescript": "^4.7.3",
+    "unocss": "0.39.0",
+    "uvu": "^0.5.3",
+    "vite": "2.9.12",
+    "vite-plugin-solid": "2.2.6",
+    "watchlist": "^0.3.1",
+    "solid-js": "^1.4.4"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.4.0"
+  },
+  "dependencies": {
+    "@solid-primitives/event-listener": "^2.2.0"
+  }
+}
