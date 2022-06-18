@@ -31,5 +31,5 @@
     "vite-plugin-solid": "2.2.6",
     "vitest": "^0.7.7"
   },
-  "packageManager": "pnpm@6.32.11"
+  "packageManager": "pnpm@7.2.1"
 }
