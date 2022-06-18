@@ -3,6 +3,19 @@ import { access, createStaticStore, MaybeAccessor } from "@solid-primitives/util
 import { createEventListener } from "@solid-primitives/event-listener";
 import { createSharedRoot } from "@solid-primitives/rootless";
 
+export function getScrollParent(node: Element | null): Element {
+  while (node && !isScrollable(node)) {
+    node = node.parentElement;
+  }
+
+  return node || document.scrollingElement || document.documentElement;
+}
+
+export function isScrollable(node: Element): boolean {
+  const style = window.getComputedStyle(node);
+  return /(auto|scroll)/.test(style.overflow + style.overflowX + style.overflowY);
+}
+
 /**
  * Get an `{ x: number, y: number }` object of element/window scroll position.
  */
