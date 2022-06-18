@@ -27,15 +27,15 @@
   ],
   "devDependencies": {
     "@types/jest": "^27.0.0",
-    "prettier": "^2.0.5",
+    "prettier": "^2.7.1",
     "solid-testing-library": "^0.2.0",
     "tslib": "^2.0.1",
-    "typescript": "^4.0.2"
+    "typescript": "^4.7.4"
   },
   "peerDependencies": {
     "solid-js": "^1.4.2"
   },
   "dependencies": {
-    "tsup": "^5.12.8"
+    "tsup": "^6.1.2"
   }
 }

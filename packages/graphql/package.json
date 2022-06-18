@@ -50,13 +50,13 @@
     "primitives"
   ],
   "devDependencies": {
-    "prettier": "^2.5.1",
+    "prettier": "^2.7.1",
     "tslib": "^2.0.1",
-    "tsup": "^5.10.0",
-    "typescript": "^4.0.2",
-    "unocss": "0.24.3",
-    "uvu": "^0.5.2",
-    "vite": "2.8.1",
+    "tsup": "^6.1.2",
+    "typescript": "^4.7.4",
+    "unocss": "^0.39.1",
+    "uvu": "^0.5.3",
+    "vite": "^2.9.12",
     "vite-plugin-solid": "2.2.5"
   },
   "peerDependencies": {

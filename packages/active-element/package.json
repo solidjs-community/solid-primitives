@@ -50,13 +50,13 @@
   ],
   "devDependencies": {
     "jsdom": "^19.0.0",
-    "prettier": "^2.6.2",
+    "prettier": "^2.7.1",
     "solid-register": "^0.2.5",
     "tslib": "^2.3.1",
-    "tsup": "^5.12.6",
-    "unocss": "0.31.12",
+    "tsup": "^6.1.2",
+    "unocss": "^0.39.1",
     "uvu": "^0.5.3",
-    "vite": "2.9.5",
+    "vite": "^2.9.12",
     "vite-plugin-solid": "2.2.6",
     "solid-testing-library": "^0.3.0",
     "watchlist": "^0.3.1"
