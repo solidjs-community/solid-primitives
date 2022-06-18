@@ -1,15 +1,15 @@
-import { makeHoldKeyListener } from "../src";
+import { makeKeyHoldListener } from "../src";
 import { createRoot } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
-const testMHKL = suite("makeHoldKeyListener");
+const testMHKL = suite("makeKeyHoldListener");
 
 testMHKL("calls callback in a simple key scenario", () =>
   createRoot(dispose => {
     const captured: boolean[] = [];
 
-    makeHoldKeyListener("a", e => captured.push(e));
+    makeKeyHoldListener("a", e => captured.push(e));
     assert.equal(captured, []);
 
     let ev = new Event("keydown") as any;
@@ -32,7 +32,7 @@ testMHKL("calls callback in a simple modifier scenario", () =>
   createRoot(dispose => {
     const captured: boolean[] = [];
 
-    makeHoldKeyListener("altKey", e => captured.push(e));
+    makeKeyHoldListener("altKey", e => captured.push(e));
     assert.equal(captured, []);
 
     let ev = new Event("keydown") as any;
@@ -55,7 +55,7 @@ testMHKL("don't allowOtherKeys — key", () =>
   createRoot(dispose => {
     const captured: boolean[] = [];
 
-    makeHoldKeyListener("a", e => captured.push(e));
+    makeKeyHoldListener("a", e => captured.push(e));
     assert.equal(captured, []);
 
     let ev = new Event("keydown") as any;
@@ -78,7 +78,7 @@ testMHKL("don't allowOtherKeys — modifier", () =>
   createRoot(dispose => {
     const captured: boolean[] = [];
 
-    makeHoldKeyListener("altKey", e => captured.push(e));
+    makeKeyHoldListener("altKey", e => captured.push(e));
     assert.equal(captured, []);
 
     let ev = new Event("keydown") as any;
@@ -102,7 +102,7 @@ testMHKL("allowOtherKeys — key", () =>
   createRoot(dispose => {
     const captured: boolean[] = [];
 
-    makeHoldKeyListener("a", e => captured.push(e), {
+    makeKeyHoldListener("a", e => captured.push(e), {
       allowOtherKeys: true
     });
     assert.equal(captured, []);
@@ -127,7 +127,7 @@ testMHKL("allowOtherKeys — modifier", () =>
   createRoot(dispose => {
     const captured: boolean[] = [];
 
-    makeHoldKeyListener("altKey", e => captured.push(e), {
+    makeKeyHoldListener("altKey", e => captured.push(e), {
       allowOtherKeys: true
     });
     assert.equal(captured, []);

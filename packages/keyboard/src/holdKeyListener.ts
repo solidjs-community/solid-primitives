@@ -1,8 +1,10 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 
-export type HoldKeySetting = "altKey" | "ctrlKey" | "metaKey" | "shiftKey" | (string & {});
+export type KeyModifier = "altKey" | "ctrlKey" | "metaKey" | "shiftKey";
 
-const keyModifierProperties = ["altKey", "ctrlKey", "metaKey", "shiftKey"] as const;
+export type KeyToHold = KeyModifier | (string & {});
+
+const keyModifiers: readonly KeyModifier[] = ["altKey", "ctrlKey", "metaKey", "shiftKey"];
 
 /**
  * Attaches keyboard event-listeners to `window`, and calls {@link onHoldChange} callback whenever user holds or stops holding specified {@link key}.
@@ -15,8 +17,8 @@ const keyModifierProperties = ["altKey", "ctrlKey", "metaKey", "shiftKey"] as co
  * - `options.preventDefault` — call `e.preventDefault()` on the keyboard event, when the specified {@link key} is pressed. *(Defaults to `false`)*
  * - `options.allowOtherKeys` — Should the user be allowed to press other keys while holding the specified one *(Defaults to `false`)*
  */
-export function makeHoldKeyListener(
-  key: HoldKeySetting,
+export function makeKeyHoldListener(
+  key: KeyToHold,
   onHoldChange: (isHolding: boolean) => void,
   options: {
     preventDefault?: boolean;
@@ -25,9 +27,7 @@ export function makeHoldKeyListener(
 ): void {
   const { preventDefault, allowOtherKeys } = options;
 
-  const modifier = keyModifierProperties.includes(key)
-    ? (key as "altKey" | "ctrlKey" | "metaKey" | "shiftKey")
-    : undefined;
+  const modifier = keyModifiers.includes(key) ? (key as KeyModifier) : undefined;
 
   let state = false;
   let actualPressed = false;

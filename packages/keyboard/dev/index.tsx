@@ -2,12 +2,12 @@
 import { Component, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
-import { makeHoldKeyListener } from "../src";
+import { makeKeyHoldListener } from "../src";
 
 const App: Component = () => {
   const [pressing, setPressing] = createSignal(false);
 
-  makeHoldKeyListener("altKey", setPressing, {
+  makeKeyHoldListener("altKey", setPressing, {
     preventDefault: true
   });
 

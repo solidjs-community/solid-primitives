@@ -11,7 +11,7 @@
 
 A library of reactive promitives helping handling user's keyboard input.
 
-- [`makeHoldKeyListener`](#makeHoldKeyListener) - Attaches keyboard event-listeners, and triggers callback whenever user holds or stops holding specified key.
+- [`makeKeyHoldListener`](#makeKeyHoldListener) - Attaches keyboard event-listeners, and triggers callback whenever user holds or stops holding specified key.
 
 ## Installation
 
@@ -21,7 +21,7 @@ npm install @solid-primitives/keyboard
 yarn add @solid-primitives/keyboard
 ```
 
-## `makeHoldKeyListener`
+## `makeKeyHoldListener`
 
 Attaches keyboard event-listeners to `window`, and calls provided callback whenever user holds or stops holding specified key.
 
@@ -29,7 +29,7 @@ Event listeners are automatically cleaned on root dispose.
 
 ### How to use it
 
-`makeHoldKeyListener` takes three arguments:
+`makeKeyHoldListener` takes three arguments:
 
 - `key` keyboard key or modifier to listen for
 - `onHoldChange` callback fired when the hold state changes
@@ -38,11 +38,11 @@ Event listeners are automatically cleaned on root dispose.
   - `allowOtherKeys` — Should the user be allowed to press other keys while holding the specified one _(Defaults to `false`)_
 
 ```tsx
-import { makeHoldKeyListener } from "@solid-primitives/keyboard";
+import { makeKeyHoldListener } from "@solid-primitives/keyboard";
 
 const [pressing, setPressing] = createSignal(false);
 
-makeHoldKeyListener("altKey", setPressing, {
+makeKeyHoldListener("altKey", setPressing, {
   preventDefault: true
 });
 

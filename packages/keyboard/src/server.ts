@@ -1,3 +1,3 @@
 import type * as API from "./index";
 
-export const makeHoldKeyListener: typeof API.makeHoldKeyListener = () => {};
+export const makeKeyHoldListener: typeof API.makeKeyHoldListener = () => {};
