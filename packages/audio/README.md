@@ -116,7 +116,7 @@ This allows you to managed streamed or Blob supplied media. In essence the primi
 
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-primitives-audio-5c9f3
+You may view a working example here: https://stackblitz.com/edit/vitejs-vite-zwfs6h?file=src%2Fmain.tsx
 
 ## Changelog
 
