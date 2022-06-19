@@ -13,8 +13,8 @@ export const createGeolocation = (
 };
 
 export const createGeolocationWatcher = (
-  _enabled: boolean | (() => boolean) = true,
-  _options: PositionOptions = {}
+  _enabled: MaybeAccessor<boolean>,
+  _options: MaybeAccessor<PositionOptions>
 ): {
   location: GeolocationCoordinates | null,
   error: GeolocationPositionError | null

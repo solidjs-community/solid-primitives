@@ -23,7 +23,7 @@ const geolocationDefaults: PositionOptions = {
  * ```
  */
 export const createGeolocation = (
-  options?: MaybeAccessor<PositionOptions> | undefined
+  options?: MaybeAccessor<PositionOptions>
 ): [location: Resource<GeolocationCoordinates | undefined>, refetch: VoidFunction] => {
   const [location, {refetch}] = createResource(
     () => Object.assign(geolocationDefaults, access(options)),
@@ -56,7 +56,7 @@ export const createGeolocation = (
  */
 export const createGeolocationWatcher = (
   enabled: MaybeAccessor<boolean>,
-  options: PositionOptions = {}
+  options?: MaybeAccessor<PositionOptions>
 ): {
   location: GeolocationCoordinates | null,
   error: GeolocationPositionError | null
@@ -68,7 +68,6 @@ export const createGeolocationWatcher = (
     location: null,
     error: null
   });
-  options = Object.assign(geolocationDefaults, options);
   let registeredHandlerID: number | null;
   const clearGeolocator = () =>
     registeredHandlerID && navigator.geolocation.clearWatch(registeredHandlerID);
@@ -78,7 +77,7 @@ export const createGeolocationWatcher = (
       return (registeredHandlerID = navigator.geolocation.watchPosition(
         res => setStore({ location: res.coords, error: null }),
         error => setStore({ location: null, error }),
-        options
+        Object.assign(geolocationDefaults, access(options))
       ));
     }
     clearGeolocator();

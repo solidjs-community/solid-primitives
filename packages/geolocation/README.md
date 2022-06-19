@@ -7,7 +7,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/geolocation?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/geolocation)
 [![size](https://img.shields.io/npm/v/@solid-primitives/geolocation?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/geolocation)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Primitives to query and watch geolocation information from within the browser.
 
@@ -43,27 +43,11 @@ const [location, refetch] = createGeolocation({
 
 ```ts
 createGeolocation(
-  options: PositionOptions // asserts general defaults
+  options: MaybeAccessor<PositionOptions> // these override basic defaults (see Types section)
 ): [
   location: Resource<GeolocationCoordinates | undefined>,
   refetch: Accessor<void>
 ]
-```
-
-#### Types
-
-The response types of the primitive are based on standard browser API types.
-
-```ts
-interface GeolocationCoordinates {
-  readonly accuracy: number;
-  readonly altitude: number | null;
-  readonly altitudeAccuracy: number | null;
-  readonly heading: number | null;
-  readonly latitude: number;
-  readonly longitude: number;
-  readonly speed: number | null;
-}
 ```
 
 ### createGeolocationWatcher
@@ -81,16 +65,49 @@ console.log(watcher.error);
 ```ts
 createGeolocationWatcher(
   enabled: MaybeAccessor<boolean>,
-  options: PositionOptions = {}
+  options: MaybeAccessor<PositionOptions>
 ): {
   location: GeolocationCoordinates | null,
   error: GeolocationPositionError | null
 }
 ```
 
+#### Types
+
+The values returned in the location property are as follows:
+
+```ts
+interface GeolocationCoordinates {
+  readonly accuracy: number;
+  readonly altitude: number | null;
+  readonly altitudeAccuracy: number | null;
+  readonly heading: number | null;
+  readonly latitude: number;
+  readonly longitude: number;
+  readonly speed: number | null;
+}
+```
+
+The options property defaults to the following value unless overwritten:
+
+```ts
+const geolocationDefaults: PositionOptions = {
+  enableHighAccuracy: false,
+  maximumAge: 0,
+  timeout: Number.POSITIVE_INFINITY
+};
+```
+
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-primitives-geolocation-fhzu4?file=/src/index.tsx
+You may view a working example here: https://stackblitz.com/edit/vitejs-vite-dvk4m4
+
+## Primitive Ideas
+
+We're always looking to enhance our primitives. Some ideas:
+
+- `createDistance` (supply a lat/lng and reactively calculate the difference in km/m)
+- `createWithinRadius` (a signal for tracking if a user is within a radius boundary)
 
 ## Changelog
 
