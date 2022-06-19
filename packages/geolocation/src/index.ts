@@ -1,6 +1,6 @@
-import type { Accessor, Resource } from "solid-js";
-import { createComputed, batch, createSignal, onCleanup, createResource } from "solid-js";
-import { MaybeAccessor } from "@solid-primitives/utils";
+import type { Resource } from "solid-js";
+import { createComputed, onCleanup, createResource } from "solid-js";
+import { access, MaybeAccessor, createStaticStore } from "@solid-primitives/utils";
 
 const geolocationDefaults: PositionOptions = {
   enableHighAccuracy: false,
@@ -15,7 +15,7 @@ const geolocationDefaults: PositionOptions = {
  * @param options.enableHighAccuracy - Enable if the locator should be very accurate
  * @param options.maximumAge - Maximum cached position age
  * @param options.timeout - Amount of time before the error callback is envoked, if 0 then never
- * @return Returns arrays containing a `Resource` resolving to the location coordinates, refetch function and loading value.
+ * @return Returns a `Resource` and refetch option resolving the location coordinates, refetch function and loading value.
  *
  * @example
  * ```ts
@@ -23,19 +23,21 @@ const geolocationDefaults: PositionOptions = {
  * ```
  */
 export const createGeolocation = (
-  options: PositionOptions = {}
-): [location: Resource<GeolocationCoordinates | undefined>, refetch: Accessor<void>] => {
-  options = Object.assign(geolocationDefaults, options);
-  const [location, { refetch }] = createResource(() => {
-    return new Promise<GeolocationCoordinates>((resolve, reject) => {
-      if (!("geolocation" in navigator)) {
-        return reject({ code: null, message: "Geolocation is not defined." });
+  options?: MaybeAccessor<PositionOptions> | undefined
+): [location: Resource<GeolocationCoordinates | undefined>, refetch: VoidFunction] => {
+  const [location, {refetch}] = createResource(
+    () => Object.assign(geolocationDefaults, access(options)),
+    (options) => new Promise<GeolocationCoordinates>(
+      (resolve, reject) => {
+        if (!("geolocation" in navigator)) {
+          return reject({ code: null, message: "Geolocation is not defined." });
+        }
+        navigator.geolocation.getCurrentPosition(res => resolve(res.coords), reject, options);
       }
-      navigator.geolocation.getCurrentPosition(res => resolve(res.coords), reject, options);
-    });
-  });
+    )
+  );
   return [location, refetch];
-};
+}
 
 /**
  * Creates a primitive that allows for real-time geolocation watching.
@@ -55,30 +57,32 @@ export const createGeolocation = (
 export const createGeolocationWatcher = (
   enabled: MaybeAccessor<boolean>,
   options: PositionOptions = {}
-): [
-  location: Accessor<GeolocationCoordinates | null>,
-  error: Accessor<GeolocationPositionError | null>
-] => {
+): {
+  location: GeolocationCoordinates | null,
+  error: GeolocationPositionError | null
+} => {
+  const [store, setStore] = createStaticStore<{
+    location: null | GeolocationCoordinates,
+    error: null | GeolocationPositionError
+  }>({
+    location: null,
+    error: null
+  });
   options = Object.assign(geolocationDefaults, options);
-  const [location, setLocation] = createSignal<GeolocationCoordinates | null>(null);
-  const [error, setError] = createSignal<GeolocationPositionError | null>(null);
   let registeredHandlerID: number | null;
   const clearGeolocator = () =>
     registeredHandlerID && navigator.geolocation.clearWatch(registeredHandlerID);
   // Implement as an effect to allow switching locator on/off
   createComputed(() => {
-    if (
-      (enabled instanceof Function && enabled()) ||
-      (enabled instanceof Function && enabled)
-    ) {
+    if (access(enabled)) {
       return (registeredHandlerID = navigator.geolocation.watchPosition(
-        res => batch(() => [setLocation(res.coords), error() && setError(null)]),
-        error => batch(() => [setLocation(null), setError(error)]),
+        res => setStore({ location: res.coords, error: null }),
+        error => setStore({ location: null, error }),
         options
       ));
     }
     clearGeolocator();
   });
   onCleanup(clearGeolocator);
-  return [location, error];
+  return store;
 };

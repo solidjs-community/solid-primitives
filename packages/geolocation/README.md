@@ -23,7 +23,7 @@ yarn add @solid-primitives/geolocation
 
 ### createGeolocation
 
-Used to fetch current geolocation data as a resource.
+Used to fetch current geolocation data as a resource. This primitive uses `createResource` to return a location, so `loading`, `error`
 
 ```ts
 const [location, refetch] = createGeolocation();
@@ -39,12 +39,53 @@ const [location, refetch] = createGeolocation({
 });
 ```
 
-### createGeolocationWatcher
-
-Creates a geolocation watcher and updates a signal with the latest coordinates.
+#### Definition
 
 ```ts
-const [location, error] = createGeolocationWatcher(true);
+createGeolocation(
+  options: PositionOptions // asserts general defaults
+): [
+  location: Resource<GeolocationCoordinates | undefined>,
+  refetch: Accessor<void>
+]
+```
+
+#### Types
+
+The response types of the primitive are based on standard browser API types.
+
+```ts
+interface GeolocationCoordinates {
+  readonly accuracy: number;
+  readonly altitude: number | null;
+  readonly altitudeAccuracy: number | null;
+  readonly heading: number | null;
+  readonly latitude: number;
+  readonly longitude: number;
+  readonly speed: number | null;
+}
+```
+
+### createGeolocationWatcher
+
+Creates a geolocation watcher and updates a signal with the latest coordinates. This primitive returns two reactive getters: `location` and `error`.
+
+```ts
+const watcher = createGeolocationWatcher(true);
+console.log(watcher.location);
+console.log(watcher.error);
+```
+
+#### Definition
+
+```ts
+createGeolocationWatcher(
+  enabled: MaybeAccessor<boolean>,
+  options: PositionOptions = {}
+): {
+  location: GeolocationCoordinates | null,
+  error: GeolocationPositionError | null
+}
 ```
 
 ## Demo
@@ -79,5 +120,9 @@ Improved tests and type dependencies.
 1.2.0
 
 Additional clean-up and tests improvements.
+
+1.3.0
+
+Upgraded to latest version of Solid and our Primitives standards.
 
 </details>
