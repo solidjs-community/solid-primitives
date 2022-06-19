@@ -1,5 +1,5 @@
 import { createPureReaction } from "../src";
-import { createRoot, createSignal } from "solid-js";
+import { createEffect, createMemo, createRoot, createSignal } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
@@ -110,6 +110,22 @@ test("dispose stops tracking", () =>
     track(count);
     setCount(2);
     assert.is(runCount, 0, "2. no tracking after disposal");
+  }));
+
+test("executes tracked functions synchronously even in batched effects", () =>
+  createRoot(dispose => {
+    createEffect(() => {
+      const order: number[] = [];
+
+      const track = createPureReaction(() => {});
+      order.push(1);
+      track(() => order.push(2));
+      order.push(3);
+      createMemo(() => order.push(4));
+
+      assert.equal(order, [1, 2, 3, 4]);
+      dispose();
+    });
   }));
 
 test.run();

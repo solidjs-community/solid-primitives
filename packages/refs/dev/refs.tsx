@@ -1,24 +1,25 @@
-import { children, elements, mapRemoved, Ref, Refs, unmount } from "../src";
+import { children } from "solid-js";
+import { elements, mapRemoved, unmount } from "../src";
 import { Component, createSignal, For, Show } from "solid-js";
-import { createCallbackStack, Fn, Get } from "@solid-primitives/utils";
+import { createCallbackStack } from "@solid-primitives/utils";
 unmount;
 
 const Keep: Component<{
-  getClear?: Get<Fn>;
+  getClear?: (fn: VoidFunction) => void;
 }> = props => {
   const resolved = children(() => props.children);
   const refs = elements(resolved, HTMLElement);
   const stack = createCallbackStack();
   props.getClear?.(stack.execute);
-  const combined = mapRemoved(refs, (ref, i) => {
-    const [el, setEl] = createSignal(ref);
+  const combined = mapRemoved<HTMLElement | undefined>(refs, (ref, i) => {
+    const [el, setEl] = createSignal<HTMLElement | undefined>(ref);
     console.log("REMOVED", i());
     stack.push(() => setEl(undefined));
-    ref.style.filter = "grayscale(100%)";
-    ref.style.position = "relative";
-    ref.appendChild((<div class="absolute bg-black">{i()}</div>) as Element);
+    ref!.style.filter = "grayscale(100%)";
+    ref!.style.position = "relative";
+    ref!.appendChild((<div class="absolute bg-black">{i()}</div>) as Element);
 
-    ref.addEventListener("click", () => setEl(undefined));
+    ref!.addEventListener("click", () => setEl(undefined));
 
     return el;
   });
@@ -37,7 +38,7 @@ const App: Component = () => {
   const [dummy, setDummy] = createSignal(0);
   setInterval(() => setDummy(p => ++p), 1000);
 
-  let clear!: Fn;
+  let clear!: VoidFunction;
 
   return (
     <>

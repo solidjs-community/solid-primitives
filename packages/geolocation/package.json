@@ -51,6 +51,8 @@
   "devDependencies": {
     "@babel/preset-env": "^7.18.2",
     "@types/jest": "^27.4.0",
+    "@babel/preset-env": "^7.18.2",
+    "@types/jest": "^27.4.0",
     "@types/leaflet": "^1.7.11",
     "babel-preset-solid": "^1.4.4",
     "jsdom": "^19.0.0",

@@ -1,6 +1,6 @@
 import { getOwner, onCleanup, createSignal, Accessor, DEV, untrack, batch } from "solid-js";
 import type { BaseOptions, Signal } from "solid-js/types/reactive/signal";
-import { isServer } from "solid-js/web";
+import { isServer as _isServer } from "solid-js/web";
 import type {
   AnyClass,
   MaybeAccessor,
@@ -24,8 +24,8 @@ export * from "./types";
 /** no operation */
 export const noop = (() => undefined) as Noop;
 
+export const isServer: boolean = _isServer;
 export const isClient = !isServer;
-export { isServer };
 
 /** development environment */
 export const isDev = DEV && isClient;
@@ -46,6 +46,25 @@ export function isObject(value: any): value is AnyObject {
 }
 
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
+
+/**
+ * Check shallow array equality
+ */
+export const arrayEquals = (a: readonly unknown[], b: readonly unknown[]): boolean =>
+  a === b || (a.length === b.length && a.every((e, i) => e === b[i]));
+
+/**
+ * Returns a function that will call all functions in the order they were chained with the same arguments.
+ */
+export function chain<Args extends [] | any[]>(callbacks: {
+  [Symbol.iterator](): IterableIterator<((...args: Args) => any) | undefined>;
+}): (...args: Args) => void {
+  return (...args: Args) => {
+    for (const callback of callbacks) {
+      if (typeof callback === "function") callback(...args);
+    }
+  };
+}
 
 export const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
 
@@ -364,4 +383,49 @@ export function createStaticStore<T extends Readonly<AnyStatic>>(
   };
 
   return [store, setter];
+}
+
+/**
+ * Handle items removed and added to the array by diffing it by refference.
+ *
+ * @param current new array instance
+ * @param prev previous array copy
+ * @param handleAdded called once for every added item to array
+ * @param handleRemoved called once for every removed from array
+ */
+export function handleDiffArray<T>(
+  current: T[],
+  prev: T[],
+  handleAdded: (item: T) => void,
+  handleRemoved: (item: T) => void
+): void {
+  const currLength = current.length;
+  const prevLength = prev.length;
+  let i = 0;
+
+  if (!prevLength) {
+    for (; i < currLength; i++) handleAdded(current[i]);
+    return;
+  }
+
+  if (!currLength) {
+    for (; i < prevLength; i++) handleRemoved(prev[i]);
+    return;
+  }
+
+  for (; i < prevLength; i++) {
+    if (prev[i] !== current[i]) break;
+  }
+
+  let prevEl: T;
+  let currEl: T;
+  prev = prev.slice(i);
+  current = current.slice(i);
+
+  for (prevEl of prev) {
+    if (!current.includes(prevEl)) handleRemoved(prevEl);
+  }
+  for (currEl of current) {
+    if (!prev.includes(currEl)) handleAdded(currEl);
+  }
 }

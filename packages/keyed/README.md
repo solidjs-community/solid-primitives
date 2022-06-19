@@ -7,11 +7,11 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/keyed?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/keyed)
 [![version](https://img.shields.io/npm/v/@solid-primitives/keyed?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/keyed)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Control Flow primitives and components that require specifying explicit keys to identify or rerender elements.
 
-- [`mapKey`](#mapKey) - Reactively maps an array by specified key with a callback function - underlying helper for the `<Key>` control flow.
+- [`keyArray`](#keyArray) - Reactively maps an array by specified key with a callback function - underlying helper for the `<Key>` control flow.
 - [`Key`](#Key) - Creates a list of elements by mapping items by provided key.
 - [`Rerun`](#Rerun) - Causes the children to rerender when the `on` changes.
 
@@ -23,7 +23,7 @@ npm install @solid-primitives/keyed
 yarn add @solid-primitives/keyed
 ```
 
-## `mapKey`
+## `keyArray`
 
 Reactively maps an array by specified key with a callback function - underlying helper for the [`<Key>`](#Key) control flow.
 
@@ -32,12 +32,12 @@ Reactively maps an array by specified key with a callback function - underlying 
 #### Import
 
 ```ts
-import { mapKey } from "@solid-primitives/keyed";
+import { keyArray } from "@solid-primitives/keyed";
 ```
 
 #### Basic usage
 
-The `mapKey` primitive takes 4 arguments:
+The `keyArray` primitive takes 4 arguments:
 
 - `list` - input list of values to map
 - `keyFn` - key getter, items will be identified by it's value. changing the value is changing the item.
@@ -45,7 +45,7 @@ The `mapKey` primitive takes 4 arguments:
 - `options` - a fallback for when the input list is empty or missing _(Optional)_
 
 ```ts
-const mapped = mapArray(source, (model, index) => {
+const mapped = keyArray(source, (model, index) => {
   const [name, setName] = createSignal(model().name);
   const [description, setDescription] = createSignal(model().description);
 
@@ -71,7 +71,7 @@ const mapped = mapArray(source, (model, index) => {
 });
 ```
 
-Notice that both the value and index arguments are singlas. Items are identified only by keys, it means that the items could be copied, replaced, changed, but as long as the key is the same, `mapKey` will treat it as the same item.
+Notice that both the value and index arguments are singlas. Items are identified only by keys, it means that the items could be copied, replaced, changed, but as long as the key is the same, `keyArray` will treat it as the same item.
 
 ## `<Key>`
 
@@ -186,5 +186,11 @@ https://codesandbox.io/s/solid-primitives-keyed-rerun-demo-14vjr?file=/index.tsx
 0.0.100
 
 Initial release as a Stage-2 primitive.
+
+1.0.0 - **stage-3**
+
+Support for Solid 1.4 Store Top Level Arrays
+
+Renamed `mapKey` -> `keyArray`
 
 </details>

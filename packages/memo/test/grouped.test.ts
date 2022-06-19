@@ -1,5 +1,5 @@
 import { createDebouncedMemo, createThrottledMemo } from "../src";
-import { createRoot, createSignal } from "solid-js";
+import { createEffect, createMemo, createRoot, createSignal } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
@@ -45,6 +45,25 @@ thr("changing initial value", () =>
   })
 );
 
+thr("execution order is the same even when batched", () => {
+  createRoot(dispose => {
+    const order: number[] = [];
+    createThrottledMemo(() => order.push(1), 0);
+    createMemo(() => order.push(2));
+    assert.equal(order, [1, 2]);
+    dispose();
+  });
+  createRoot(dispose => {
+    createEffect(() => {
+      const order: number[] = [];
+      createThrottledMemo(() => order.push(1), 0);
+      createMemo(() => order.push(2));
+      assert.equal(order, [1, 2]);
+      dispose();
+    });
+  });
+});
+
 thr.run();
 
 const deb = suite("createDebouncedMemo");
@@ -72,5 +91,24 @@ deb("writes to signal are debounced", () =>
     }, 10);
   })
 );
+
+deb("execution order is the same even when batched", () => {
+  createRoot(dispose => {
+    const order: number[] = [];
+    createDebouncedMemo(() => order.push(1), 0);
+    createMemo(() => order.push(2));
+    assert.equal(order, [1, 2]);
+    dispose();
+  });
+  createRoot(dispose => {
+    createEffect(() => {
+      const order: number[] = [];
+      createDebouncedMemo(() => order.push(1), 0);
+      createMemo(() => order.push(2));
+      assert.equal(order, [1, 2]);
+      dispose();
+    });
+  });
+});
 
 deb.run();

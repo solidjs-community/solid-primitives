@@ -446,7 +446,7 @@ export function createAsyncStorage<O, T>(
  * ]
  * ```
  */
-export function createStorageSignal<T extends any, O extends any>(
+export function createStorageSignal<T, O = {}>(
   key: string,
   initialValue?: T,
   props?: StorageSignalProps<T, Storage | StorageWithOptions<O>, O>
@@ -475,7 +475,7 @@ export function createStorageSignal<T extends any, O extends any>(
         }
       }
       if (value !== null && props?.deserializer) {
-        return props.deserializer(value as string, key, props?.options as O) as T;
+        return props.deserializer(value + "", key, props?.options as O) as T;
       }
       return value;
     }, null);
@@ -484,7 +484,7 @@ export function createStorageSignal<T extends any, O extends any>(
     const value = accessor();
     const filteredValue = props?.serializer
       ? props.serializer(value as string & T, key, props?.options)
-      : (value as string);
+      : value + "";
     const apiKey = `${prefix}${key}`;
     try {
       if (value === null) {
@@ -543,5 +543,5 @@ export function createStorageSignal<T extends any, O extends any>(
 
 export const createLocalStorage = createStorage;
 
-export const createSessionStorage = <T, O>(props: StorageProps<T, Storage, O>) =>
+export const createSessionStorage = <T, O = {}>(props: StorageProps<T, Storage, O>) =>
   createStorage({ ...props, api: globalThis.sessionStorage } as any);

@@ -1,14 +1,8 @@
----
-Name: websocket
-Stage: 0
-Package: "@solid-primitives/websocket"
-Primitives: createWebsocket
-Category: Network
----
-
 <p>
   <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Websocket" alt="Solid Primitives Websocket">
 </p>
+
+## Warning: This package is under active development and will change.
 
 # @solid-primitives/websocket
 
@@ -37,5 +31,9 @@ You may find a semi-functional example here: https://codesandbox.io/s/solid-webs
 0.0.100
 
 Initial version. Proposed and waiting for feedback.
+
+0.3.0
+
+Fixed package exports.
 
 </details>

@@ -1,43 +1,70 @@
 import "regenerator-runtime/runtime";
-import { AudioState } from "../src";
 
-export class MockAudio extends Audio {
-  src: string;
-  state: AudioState;
-  duration: number;
-  playing: boolean;
-  constructor() {
-    super();
-    this.playing = false;
-    this.duration = NaN;
-    this.state = AudioState.STOPPED;
-    this.src = "";
+declare global {
+  interface HTMLMediaElement {
+    _mock: any;
   }
-  fastSeek = (time: number): Promise<void> => {
-    this.currentTime = time;
-    return Promise.resolve();
-  };
-  play = (): Promise<void> => {
-    this.playing = true;
-    this.state = AudioState.PLAYING;
-    return super.play();
-  };
-  pause = (): void => {
-    this.playing = false;
-    this.state = AudioState.PAUSED;
-    return super.pause();
-  };
 }
 
-HTMLMediaElement.prototype.pause = () => Promise.resolve();
-HTMLMediaElement.prototype.play = () => Promise.resolve();
+// Mock data and helper methods
+global.HTMLMediaElement.prototype._mock = {
+  paused: true,
+  duration: NaN,
+  _loaded: false,
+  // Emulates the audio file loading
+  _load: function audioInit(audio: HTMLAudioElement) {
+    audio.dispatchEvent(new Event("loadeddata"));
+    audio.dispatchEvent(new Event("loadedmetadata"));
+    audio.dispatchEvent(new Event("canplaythrough"));
+    this.duration = 5000;
+    this._loaded = true;
+  },
+  // Reset audio object mock data to the initial state
+  _resetMock: function resetMock(audio: HTMLAudioElement) {
+    audio._mock = Object.assign({}, global.HTMLMediaElement.prototype._mock);
+  }
+};
 
-window.Audio = MockAudio;
-
-Object.defineProperty(window, "MediaSource", {
-  writable: true,
-  value: (_params: any) => ({
-    // MediaSource implementation goes here
-    addEventListener: () => {}
-  })
+// Get "paused" value, it is automatically set to true / false when we play / pause the audio.
+Object.defineProperty(global.HTMLMediaElement.prototype, "paused", {
+  get() {
+    return this._mock.paused;
+  }
 });
+
+// Get and set audio duration
+Object.defineProperty(global.HTMLMediaElement.prototype, "duration", {
+  get() {
+    return this._mock.duration;
+  },
+  set(value) {
+    // Reset the mock state to initial (paused) when we set the duration.
+    this._mock._resetMock(this);
+    this._mock.duration = value;
+  }
+});
+
+// Get and set audio volume
+Object.defineProperty(global.HTMLMediaElement.prototype, "volume", {
+  get() {
+    return this._mock.volume;
+  },
+  set(value) {
+    this._mock.volume = value;
+  }
+});
+
+// Start the playback.
+global.HTMLMediaElement.prototype.play = async function playMock() {
+  if (!this._mock._loaded) {
+    this._mock._load(this);
+  }
+  this.dispatchEvent(new Event("play"));
+  this._mock.paused = false;
+};
+
+// Pause the playback
+global.HTMLMediaElement.prototype.pause = function pauseMock() {
+  this.dispatchEvent(new Event("pause"));
+  this._mock.paused = true;
+};
