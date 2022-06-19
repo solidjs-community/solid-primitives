@@ -20,7 +20,7 @@
     "@types/fs-extra": "^9.0.13",
     "fs-extra": "^10.1.0",
     "json-to-markdown-table": "^1.0.0",
-    "lerna": "^4.0.0",
+    "lerna": "^5.1.4",
     "markdown-magic": "^2.6.0",
     "prettier": "^2.7.1",
     "solid-js": "^1.4.3",
