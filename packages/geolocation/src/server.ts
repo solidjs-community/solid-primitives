@@ -1,4 +1,4 @@
-import type { Accessor, Resource } from "solid-js";
+import type { Resource } from "solid-js";
 import { MaybeAccessor } from "@solid-primitives/utils";
 
 export const createGeolocation = (
