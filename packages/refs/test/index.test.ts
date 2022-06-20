@@ -108,7 +108,7 @@ testMapRemoved("mapFn get's called on each item remove", () =>
     const _source = [el2, el1, el2, el3, el4];
     const [source, setSource] = createSignal(_source);
 
-    const captured_els = [];
+    const captured_els: Element[] = [];
     mapRemoved(source, el => {
       captured_els.push(el);
     });
@@ -156,10 +156,10 @@ testMapRemoved("removeing saved element", () =>
   createRoot(dispose => {
     const _source = [el1, el2, el3, el5];
     const [source, setSource] = createSignal(_source);
-    const fns = [];
+    const fns: VoidFunction[] = [];
 
-    const res = mapRemoved(source, ref => {
-      const [el, setEl] = createSignal(ref);
+    const res = mapRemoved<Element | undefined>(source, ref => {
+      const [el, setEl] = createSignal<Element | undefined>(ref);
       fns.push(() => setEl(undefined));
       return el;
     });
@@ -193,20 +193,20 @@ testMapRemoved("index signal", () =>
     });
 
     setSource(p => remove(p, el3));
-    assert.is(saved.get(el3)(), 2);
+    assert.is(saved.get(el3)!(), 2);
 
     returns = false;
     setSource(p => remove(p, el2));
-    assert.is(saved.get(el3)(), 1);
+    assert.is(saved.get(el3)!(), 1);
 
     setSource(p => [el4, ...p]);
-    assert.is(saved.get(el3)(), 2);
+    assert.is(saved.get(el3)!(), 2);
 
     setSource([]);
-    assert.is(saved.get(el3)(), 0);
+    assert.is(saved.get(el3)!(), 0);
 
     setSource([el1, el2, el4, el5]);
-    assert.is(saved.get(el3)(), 0);
+    assert.is(saved.get(el3)!(), 0);
 
     dispose();
   })

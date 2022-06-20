@@ -9,18 +9,22 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x, 17.x]
-        operating-system: [windows-latest, ubuntu-latest, macos-latest]
+        operating-system: [ubuntu-latest]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v2.2.2
+
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: npm install, build, and test
+
+      - name: pnpm install, build, and test
         run: |
-          npm install
-          npm run build
-          npm test
+          pnpm install
+          pnpm run build
+          pnpm run test
         env:
           CI: true

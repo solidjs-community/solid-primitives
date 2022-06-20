@@ -7,8 +7,10 @@ import {
   on,
   onCleanup,
   Setter,
-  ReturnTypes
+  untrack,
+  $TRACK
 } from "solid-js";
+import type { AccessorArray } from "solid-js/types/reactive/signal";
 
 const FALLBACK = Symbol("fallback");
 
@@ -19,10 +21,10 @@ const FALLBACK = Symbol("fallback");
  * @param mapFn reactive function used to create mapped output item. Similar to `Array.prototype.map` but both item and index are signals, that could change over time.
  * @param options a fallback for when the input list is empty or missing
  * @returns mapped input array signal
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#mapKey
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#keyArray
  */
-export function mapKey<T, U, K>(
-  list: Accessor<readonly T[] | undefined | null | false>,
+export function keyArray<T, U, K>(
+  items: Accessor<readonly T[] | undefined | null | false>,
   keyFn: (v: T) => K,
   mapFn: (v: Accessor<T>, i: Accessor<number>) => U,
   options: { fallback?: Accessor<U> } = {}
@@ -32,11 +34,11 @@ export function mapKey<T, U, K>(
   const prev = new Map<K | typeof FALLBACK, Save>();
   onCleanup(() => prev.forEach(v => v.dispose()));
 
-  const empty: readonly T[] = [];
-  const items = createMemo(on(list, list => (list && list.length ? list : empty)));
+  return () => {
+    let list = items() || [];
+    (list as any)[$TRACK]; // top level store tracking
 
-  return createMemo<U[]>(
-    on(items, list => {
+    return untrack(() => {
       // fast path for empty arrays
       if (!list.length) {
         prev.forEach(v => v.dispose());
@@ -85,8 +87,8 @@ export function mapKey<T, U, K>(
       });
 
       return result;
-    })
-  );
+    });
+  };
 
   function addNewItem(list: U[], item: T, i: number, key: K): void {
     createRoot(dispose => {
@@ -129,7 +131,7 @@ export function Key<T, U extends JSX.Element>(props: {
   const fallback = props.fallback ? () => props.fallback as U : undefined;
   const { by } = props;
   const key = typeof by === "function" ? by : (v: T) => v[by];
-  const mapped = mapKey<T, U, any>(() => props.each, key, props.children, { fallback });
+  const mapped = keyArray<T, U, any>(() => props.each, key, props.children, { fallback });
   return createMemo(mapped);
 }
 
@@ -139,9 +141,9 @@ export type RerunChildren<T> = ((input: T, prevInput: T | undefined) => JSX.Elem
  * Causes the children to rerender when the `on` changes.
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Rerun
  */
-export function Rerun<S extends Accessor<unknown> | Accessor<unknown>[] | []>(props: {
-  on: S;
-  children: RerunChildren<ReturnTypes<S>>;
+export function Rerun<S>(props: {
+  on: AccessorArray<S> | Accessor<S>;
+  children: RerunChildren<S>;
 }): Accessor<JSX.Element>;
 export function Rerun<
   S extends (object | string | bigint | number | boolean) & { length?: never }

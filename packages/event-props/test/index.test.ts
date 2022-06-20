@@ -11,27 +11,24 @@ const test = suite("createEventProps");
 createEventProps();
 //- will only accept HTMLElementEvent names
 //@ts-expect-error
-createEventProps('foobar');
+createEventProps("foobar");
 //- will only contain given names in props and store
-const [store, props] = createEventProps('focus', 'blur');
+const [store, props] = createEventProps("focus", "blur");
 //@ts-expect-error
-store.click
+store.click;
 //@ts-expect-error
-props.onclick?.(new MouseEvent('click'))
+props.onclick?.(new MouseEvent("click"));
 
 test("it will support multiple events", () =>
   new Promise<void>(resolve =>
     createRoot(dispose => {
-      const [store, props] = createEventProps('keydown', 'keyup');
-      props.onkeydown(new KeyboardEvent('keydown', { key: 'A' }));
-      props.onkeyup(new KeyboardEvent('keyup', { key: 'A' }));
-      const expected = [
-        undefined,
-        'A',
-      ]
+      const [store, props] = createEventProps("keydown", "keyup");
+      props.onkeydown(new KeyboardEvent("keydown", { key: "A" }));
+      props.onkeyup(new KeyboardEvent("keyup", { key: "A" }));
+      const expected = [undefined, "A"];
       createEffect(() => {
-        assert.is(store.keydown.key, 'A');
-        assert.is(store.keyup.key, 'A');
+        assert.is(store.keydown.key, "A");
+        assert.is(store.keyup.key, "A");
         dispose();
         resolve();
       });

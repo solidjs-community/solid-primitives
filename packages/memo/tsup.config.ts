@@ -1,2 +1,2 @@
-import defaultConfig from '../../tsup.config';
-export default defaultConfig;
+import { doubleEntryConfig } from "../../tsup.config";
+export default doubleEntryConfig;

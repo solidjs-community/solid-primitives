@@ -1,0 +1,77 @@
+{
+  "name": "@solid-primitives/bounds",
+  "version": "0.0.100",
+  "description": "Primitives for tracking HTML element size and position on screen as it changes.",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/bounds#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "bounds",
+    "stage": 1,
+    "list": [
+      "createElementBounds"
+    ],
+    "category": "Display & Media"
+  },
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "vite serve dev --host",
+    "dev": "npm run start",
+    "build": "tsup",
+    "test": "uvu -r solid-register",
+    "test:watch": "watchlist src test -- npm test"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "size",
+    "position",
+    "bounds"
+  ],
+  "devDependencies": {
+    "jsdom": "^19.0.0",
+    "prettier": "^2.7.1",
+    "solid-register": "^0.2.5",
+    "tslib": "^2.4.0",
+    "tsup": "^6.1.2",
+    "typescript": "^4.7.4",
+    "unocss": "^0.39.1",
+    "uvu": "^0.5.3",
+    "vite": "^2.9.12",
+    "vite-plugin-solid": "2.2.6",
+    "watchlist": "^0.3.1",
+    "@solid-primitives/scheduled": "^1.0.0"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "^2.1.0",
+    "@solid-primitives/resize-observer": "^2.0.0",
+    "@solid-primitives/event-listener": "^2.1.0"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.4.0"
+  }
+}

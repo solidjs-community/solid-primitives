@@ -36,33 +36,49 @@ testCreateStorage.before(context => {
   };
 });
 
-testCreateStorage("creates a storage", ({ mockStorage }) => createRoot((dispose) => {
-  const [storage, setStorage, { remove, clear }] = createStorage({ api: mockStorage });
-  setStorage("test", "1");
-  mockStorage.setItem("test2", "2");
-  assert.is(storage.test, mockStorage.getItem("test"));
-  assert.is(storage.test, "1");
-  assert.is(storage.test2, "2");
-  remove("test2");
-  assert.is(storage.test2, null);
-  clear();
-  assert.is(mockStorage.length, 0);
-  dispose();
-}));
+testCreateStorage("creates a storage", ({ mockStorage }) =>
+  createRoot(dispose => {
+    const [storage, setStorage, { remove, clear }] = createStorage({ api: mockStorage });
+    setStorage("test", "1");
+    mockStorage.setItem("test2", "2");
+    assert.is(storage.test, mockStorage.getItem("test"));
+    assert.is(storage.test, "1");
+    assert.is(storage.test2, "2");
+    remove("test2");
+    assert.is(storage.test2, null);
+    clear();
+    assert.is(mockStorage.length, 0);
+    dispose();
+  })
+);
 
-testCreateStorage("does not throw if not configured to", ({ mockStorage }) => createRoot((dispose) => {
-  const mockErrorStorage = {...mockStorage, setItem: () => { throw new Error('Throws'); } };
-  const [_storage, setStorage, { error }] = createStorage({ api: mockErrorStorage });
-  assert.not.throws(() => setStorage('test3', "1"), 'Throws', 'error thrown unexpectedly');
-  assert.instance(error(), Error);
-}));
+testCreateStorage("does not throw if not configured to", ({ mockStorage }) =>
+  createRoot(dispose => {
+    const mockErrorStorage = {
+      ...mockStorage,
+      setItem: () => {
+        throw new Error("Throws");
+      }
+    };
+    const [_storage, setStorage, { error }] = createStorage({ api: mockErrorStorage });
+    assert.not.throws(() => setStorage("test3", "1"), "Throws", "error thrown unexpectedly");
+    assert.instance(error(), Error);
+  })
+);
 
-testCreateStorage("does throw if configured to", ({ mockStorage }) => createRoot((dispose) => {
-  const mockErrorStorage = {...mockStorage, setItem: () => { throw new Error('Throws'); } };
-  const [_storage, setStorage, { error }] = createStorage({ api: mockErrorStorage, throw: true });
-  assert.throws(() => setStorage('test3', "1"), 'Throws', 'error thrown unexpectedly');
-  assert.instance(error(), Error);
-}));
+testCreateStorage("does throw if configured to", ({ mockStorage }) =>
+  createRoot(dispose => {
+    const mockErrorStorage = {
+      ...mockStorage,
+      setItem: () => {
+        throw new Error("Throws");
+      }
+    };
+    const [_storage, setStorage, { error }] = createStorage({ api: mockErrorStorage, throw: true });
+    assert.throws(() => setStorage("test3", "1"), "Throws", "error thrown unexpectedly");
+    assert.instance(error(), Error);
+  })
+);
 
 testCreateStorage.run();
 
@@ -103,19 +119,21 @@ testCreateAsyncStorage.before(context => {
   };
 });
 
-testCreateAsyncStorage("creates an async storage", ({ mockAsyncStorage }) => createRoot(async (dispose) => {
-  const [storage, setStorage, { remove, clear }] = createAsyncStorage({ api: mockAsyncStorage });
-  await setStorage("test", "1");
-  await mockAsyncStorage.setItem("test2", "2");
-  assert.is(await storage.test, await mockAsyncStorage.getItem("test"));
-  assert.is(await storage.test, "1");
-  assert.is(await storage.test2, "2");
-  await remove("test2");
-  assert.is(await storage.test2, null);
-  await clear();
-  assert.is(mockAsyncStorage.length, 0);
-  dispose();
-}));
+testCreateAsyncStorage("creates an async storage", ({ mockAsyncStorage }) =>
+  createRoot(async dispose => {
+    const [storage, setStorage, { remove, clear }] = createAsyncStorage({ api: mockAsyncStorage });
+    await setStorage("test", "1");
+    await mockAsyncStorage.setItem("test2", "2");
+    assert.is(await storage.test, await mockAsyncStorage.getItem("test"));
+    assert.is(await storage.test, "1");
+    assert.is(await storage.test2, "2");
+    await remove("test2");
+    assert.is(await storage.test2, null);
+    await clear();
+    assert.is(mockAsyncStorage.length, 0);
+    dispose();
+  })
+);
 
 testCreateAsyncStorage.run();
 
@@ -142,11 +160,9 @@ testCreateStorageSignal.before(context => {
 });
 
 testCreateStorageSignal("creates a signal", ({ mockStorage }) => {
-  const [storageItem, setStorageItem] = createStorageSignal<string | null, undefined>(
-    "test",
-    null,
-    { api: mockStorage }
-  );
+  const [storageItem, setStorageItem] = createStorageSignal<string | null>("test", null, {
+    api: mockStorage
+  });
   assert.is(storageItem(), null);
   setStorageItem("1");
   assert.is(storageItem(), "1");

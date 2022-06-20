@@ -11,16 +11,16 @@ export type RequestOptions = Modify<
 >;
 
 export type GraphQLClientQuery = {
-  <T = any>(
-    query: string,
-    variables?: MaybeAccessor<QueryVariables | boolean>,
-    initialValue?: undefined
-  ): ResourceReturn<T | undefined>;
-  <T = any>(
+  <T = unknown>(
     query: string,
     variables: MaybeAccessor<QueryVariables | boolean> | undefined,
     initialValue: T
-  ): ResourceReturn<T>;
+  ): ResourceReturn<T, { initialValue: T }>;
+  <T = unknown>(
+    query: string,
+    variables?: MaybeAccessor<QueryVariables | boolean>,
+    initialValue?: undefined
+  ): ResourceReturn<T, undefined>;
 };
 
 /**

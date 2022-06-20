@@ -165,3 +165,5 @@ temp/
 *lock.json
 *lock.yaml
 *.lock
+
+tsup.config.bundled*.mjs

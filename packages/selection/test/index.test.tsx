@@ -35,7 +35,7 @@ test("reads selection from input", ({ container }) =>
     await createEffect(async () => {
       await dispatchKeyupEvent(input);
       assert.equal(selection(), [input, 1, 3]);
-      unmount();      
+      unmount();
       dispose();
     });
   }));
@@ -51,7 +51,7 @@ test("writes selection to an input", ({ container }) =>
       await dispatchKeyupEvent(input);
       assert.is(input.selectionStart, 2);
       assert.is(input.selectionEnd, 5);
-      unmount();      
+      unmount();
       dispose();
     });
   }));
@@ -69,7 +69,7 @@ test("reads selection from textarea", ({ container }) =>
     await createEffect(async () => {
       await dispatchKeyupEvent(textarea);
       assert.equal(selection(), [textarea, 2, 5]);
-      unmount();      
+      unmount();
       dispose();
     });
   }));
@@ -85,7 +85,7 @@ test("writes selection to a textarea", ({ container }) =>
       await dispatchKeyupEvent(textarea);
       assert.is(textarea.selectionStart, 2);
       assert.is(textarea.selectionEnd, 5);
-      unmount();      
+      unmount();
       dispose();
     });
   }));
@@ -98,13 +98,13 @@ test("reads selection from contentEditable div", ({ container }) =>
     const div = container.querySelector("div") as HTMLDivElement;
     assert.instance(div, HTMLDivElement);
     div.focus();
-    window.getSelection()?.addRange(
-      ((range) => (
-        range.setStart(div.firstChild!, 0),
-        range.setEnd(div.firstChild!, 6),
-        range
-      ))(document.createRange())
-    );
+    window
+      .getSelection()
+      ?.addRange(
+        (range => (range.setStart(div.firstChild!, 0), range.setEnd(div.firstChild!, 6), range))(
+          document.createRange()
+        )
+      );
     // only wrapped in createEffect, we will subscribe to changes
     await createEffect(async () => {
       await dispatchKeyupEvent(div);
@@ -132,7 +132,7 @@ test("writes selection to a contentEditable div", ({ container }) =>
         assert.is(range?.startContainer, div);
         assert.is(range?.startOffset, 2);
         assert.is(range?.endOffset, 5);
-        unmount();      
+        unmount();
         dispose();
       }
     });

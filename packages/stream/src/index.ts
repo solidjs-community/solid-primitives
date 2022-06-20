@@ -22,9 +22,7 @@ const constraintsFromDevice = (
 };
 
 const stop = (stream: MediaStream | undefined) =>
-  stream
-    ?.getTracks()
-    ?.forEach(track => track.stop());
+  stream?.getTracks()?.forEach(track => track.stop());
 
 export type StreamReturn = [
   stream: Resource<MediaStream | undefined>,

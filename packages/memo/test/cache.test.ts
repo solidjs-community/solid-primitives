@@ -85,7 +85,7 @@ test("reactive signal dependency", () =>
     assert.is(runs, 2);
 
     setDep(1);
-    assert.is(runs, 4);
+    assert.is(runs, 2);
     assert.is(result(0), 1);
     assert.is(result(1), 2);
     assert.is(runs, 4);

@@ -111,6 +111,10 @@ createPerPointerListeners({
 });
 ```
 
+### DEMO
+
+https://codesandbox.io/s/solid-primitives-pointer-demo-zryr5h?file=/app.tsx
+
 ## `createPointerPosition`
 
 Returns a signal with autoupdating Pointer position.
