@@ -14,7 +14,8 @@
     "build": "lerna run build --concurrency 4",
     "test": "lerna run test --concurrency 4",
     "new-package": "jiti ./scripts/new-package.ts",
-    "update-readme": "jiti ./scripts/update-readme.ts"
+    "update-readme": "jiti ./scripts/update-readme.ts",
+    "update-all": "node ./scripts/update-all"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
