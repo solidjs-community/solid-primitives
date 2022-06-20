@@ -131,8 +131,9 @@ export const createVisibilityObserver = (
   }
 ): [Accessor<boolean>, { start: VoidFunction; stop: VoidFunction; instance: IntersectionObserver }] => {
   const [isVisible, setVisible] = createSignal(options?.initialValue ?? false);
+  const el = access(element);
   const { start, add, stop, reset, instance } = makeIntersectionObserver(
-    [access(element)],
+    el ? [el] : [],
     ([entry]) => {
       if (!entry) return;
       setVisible(entry.isIntersecting);
