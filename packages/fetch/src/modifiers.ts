@@ -1,13 +1,18 @@
 import { createSignal, getOwner, onCleanup, ResourceFetcherInfo } from "solid-js";
 import { RequestContext } from "./fetch";
 
-export type RequestModifier = <T>(...args: any[]) => (requestContext: RequestContext<T>) => any;
+export type RequestModifier = <Result extends unknown, FetcherArgs extends any[]>(
+  ...args: any[]
+) => (requestContext: RequestContext<Result, FetcherArgs>) => void;
 
-export type Fetcher<T> = Exclude<RequestContext<T>["fetcher"], undefined>;
+export type Fetcher<Result, FetcherArgs> = Exclude<
+  RequestContext<Result, FetcherArgs>["fetcher"],
+  undefined
+>;
 
-export const wrapFetcher = <T>(
-  requestContext: RequestContext<T>,
-  wrapper: (originalFetcher: Fetcher<T>) => Fetcher<T>
+export const wrapFetcher = <Result extends unknown, FetcherArgs extends any[]>(
+  requestContext: RequestContext<Result, FetcherArgs>,
+  wrapper: (originalFetcher: Fetcher<Result, FetcherArgs>) => Fetcher<Result, FetcherArgs>
 ) => {
   const originalFetcher = requestContext.fetcher;
   if (!originalFetcher) {
@@ -16,10 +21,10 @@ export const wrapFetcher = <T>(
   requestContext.fetcher = wrapper(originalFetcher) || originalFetcher;
 };
 
-export const wrapResource = <T>(
-  requestContext: RequestContext<T>,
+export const wrapResource = <Result, FetcherArgs>(
+  requestContext: RequestContext<Result, FetcherArgs>,
   wrapper: (
-    requestContext: RequestContext<T>
+    requestContext: RequestContext<Result, FetcherArgs>
   ) => [props?: { [key: string]: any }, actions?: { [key: string]: any }]
 ) => {
   if (!requestContext.resource) {
@@ -31,26 +36,36 @@ export const wrapResource = <T>(
 };
 
 export const withAbort: RequestModifier =
-  <T>() =>
-  requestContext => {
+  <Result extends unknown, FetcherArgs extends any[]>() =>
+  (requestContext: RequestContext<Result, FetcherArgs>) => {
     wrapFetcher(
       requestContext,
-      originalFetcher =>
-        <T>(requestData: [info: RequestInfo, init?: RequestInit], info: ResourceFetcherInfo<T>) => {
-          if (requestContext.abortController) {
-            requestContext.abortController.abort();
-          }
-          requestContext.abortController = new AbortController();
-          return originalFetcher(
-            [requestData[0], { ...requestData[1], signal: requestContext.abortController.signal }],
-            info
-          ).catch(err => {
-            if (info.value && err.name === "AbortError") {
-              return Promise.resolve(info.value);
-            }
-            throw err;
-          });
+      originalFetcher => (requestData: FetcherArgs, info: ResourceFetcherInfo<Result>) => {
+        if (requestContext.abortController) {
+          requestContext.abortController.abort();
         }
+        requestContext.abortController = new AbortController();
+        const lastRequestDataObj = (() => {
+          for (let l = requestData.length - 1; l >= 0; l--) {
+            if (typeof requestData[l] === "object") {
+              return requestData[l];
+            }
+          }
+          const obj = {};
+          requestData.push(obj);
+          return obj;
+        })();
+        lastRequestDataObj.signal = requestContext.abortController.signal;
+        return originalFetcher(
+          requestData as FetcherArgs,
+          info as ResourceFetcherInfo<Result>
+        ).catch(err => {
+          if (info.value && err.name === "AbortError") {
+            return Promise.resolve(info.value);
+          }
+          throw err;
+        });
+      }
     );
     requestContext.wrapResource();
     wrapResource(requestContext, requestContext => [
@@ -65,24 +80,23 @@ export const withAbort: RequestModifier =
     ]);
   };
 
-export const withTimeout: RequestModifier =
-  <T>(timeout: number) =>
-  requestContext => {
-    wrapFetcher(
-      requestContext,
-      originalFetcher => (requestData, info) =>
-        new Promise((resolve, reject) => {
-          window.setTimeout(() => {
-            requestContext.abortController?.abort("timeout");
-            reject(new Error("timeout"));
-          }, timeout);
-          originalFetcher(requestData, info)
-            .then(resolve as any)
-            .catch(reject);
-        })
-    );
-    requestContext.wrapResource();
-  };
+export const withTimeout: RequestModifier = (timeout: number) => requestContext => {
+  wrapFetcher(
+    requestContext,
+    originalFetcher => (requestData, info) =>
+      new Promise((resolve, reject) => {
+        window.setTimeout(() => {
+          // @ts-ignore
+          requestContext.abortController?.abort("timeout");
+          reject(new Error("timeout"));
+        }, timeout);
+        originalFetcher(requestData, info)
+          .then(resolve as any)
+          .catch(reject);
+      })
+  );
+  requestContext.wrapResource();
+};
 
 export const withCatchAll: RequestModifier =
   <T>() =>
@@ -91,7 +105,7 @@ export const withCatchAll: RequestModifier =
     wrapFetcher(
       requestContext,
       originalFetcher => (requestData, info) =>
-        originalFetcher(requestData, info).catch(err => {
+        originalFetcher(requestData, info).catch((err: Error) => {
           setError(err);
           return Promise.resolve(info.value!);
         })
@@ -113,7 +127,7 @@ const defaultWait = (attempt: number) => Math.max(1000 << attempt, 30000);
  * default checks if response.ok is true.
  */
 export const withRetry: RequestModifier =
-  <T>(
+  <Result extends unknown, FetcherArgs extends any[]>(
     retries: number,
     wait: number | ((attempt: number) => number) = defaultWait,
     verify = (response?: Response) => response?.ok
@@ -123,42 +137,40 @@ export const withRetry: RequestModifier =
       new Promise<void>(resolve =>
         setTimeout(resolve, typeof wait === "number" ? wait : wait(attempt))
       );
-    wrapFetcher(
-      requestContext,
-      originalFetcher =>
-        <T>(
-          requestData: [info: RequestInfo, init?: RequestInit | undefined],
-          info: ResourceFetcherInfo<T>
-        ) => {
-          const wrappedFetcher = (attempt: number): Promise<T> =>
-            originalFetcher<T>(requestData, info)
-              .then((data: T) =>
-                !verify(requestContext.response) && attempt <= retries
-                  ? waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1))
-                  : data
-              )
-              .catch(err =>
-                attempt > retries
-                  ? Promise.reject(err)
-                  : waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1))
-              );
-          return wrappedFetcher(0);
-        }
+    wrapFetcher<Result, FetcherArgs>(
+      requestContext as unknown as RequestContext<Result, FetcherArgs>,
+      originalFetcher => (requestData: FetcherArgs, info: ResourceFetcherInfo<Result>) => {
+        const wrappedFetcher = (attempt: number): Promise<Result> =>
+          originalFetcher(requestData, info)
+            .then(data =>
+              !verify(requestContext.response) && attempt <= retries
+                ? waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1))
+                : data
+            )
+            .catch(err =>
+              attempt > retries
+                ? Promise.reject(err)
+                : waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1))
+            );
+        return wrappedFetcher(0);
+      }
     );
     requestContext.wrapResource();
   };
 
-export type RefetchEventOptions<T> = {
+export type RefetchEventOptions<Result extends unknown, FetcherArgs extends any[]> = {
   on?: (keyof WindowEventMap)[];
-  filter?: (requestData: [info: RequestInfo, init?: RequestInit], data: T, ev: Event) => boolean;
+  filter?: (requestData: FetcherArgs, data: Result, ev: Event) => boolean;
 };
 
 export const withRefetchEvent: RequestModifier =
-  <T>(options: RefetchEventOptions<T> = {}) =>
-  (requestContext: RequestContext<T>) => {
+  <Result extends unknown, FetcherArgs extends any[]>(
+    options: RefetchEventOptions<Result, FetcherArgs> = {}
+  ) =>
+  (requestContext: RequestContext<Result, FetcherArgs>) => {
     requestContext.wrapResource();
-    let lastRequest: [requestData: [info: RequestInfo, init?: RequestInit], data: T] | undefined;
-    const events = options.on || ["visibilitychange"];
+    let lastRequest: [requestData: FetcherArgs, data: Result] | undefined;
+    const events: string[] = options.on || ["visibilitychange"];
     const filter = options.filter || (() => true);
     const handler = (ev: Event) => {
       if (
@@ -173,7 +185,7 @@ export const withRefetchEvent: RequestModifier =
     events.forEach(name => window.addEventListener(name, handler));
     getOwner() &&
       onCleanup(() => events.forEach(name => window.removeEventListener(name, handler)));
-    wrapFetcher<T>(
+    wrapFetcher<Result, FetcherArgs>(
       requestContext,
       originalFetcher => (requestData, info) =>
         originalFetcher(requestData, info).then(data => {

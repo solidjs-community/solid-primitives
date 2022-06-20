@@ -3,6 +3,7 @@ import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createRoot, createEffect, createSignal } from "solid-js";
 import { createFetch, withAbort } from "../src";
+import { DistributeFetcherArgs, FetchArgs, FetchOptions } from "../src/fetch";
 
 const test = suite("createFetch");
 
@@ -34,13 +35,12 @@ const fetchMock: typeof fetch = (input: RequestInfo, init?: RequestInit): Promis
 
 test("will fetch json data", () =>
   new Promise<void>(resolve => {
-    throw new Error("test");
     createRoot(dispose => {
-      const [ready] = createFetch<typeof mockResponseBody, undefined>(mockUrl, {
+      const [ready] = createFetch(mockUrl, {
         fetch: fetchMock
       });
       createEffect(() => {
-        const isReady = ready()?.ready;
+        const isReady = (ready() as any)?.ready;
         if (ready.error) {
           throw ready.error;
         }
@@ -76,7 +76,7 @@ test("will fetch text data", () =>
 
 test("will abort a request without an error", () =>
   createRoot(dispose => {
-    const [ready, { abort }] = createFetch<typeof mockResponseBody, undefined>(
+    const [ready, { abort }] = createFetch<typeof mockResponseBody, undefined, Parameters<typeof fetchMock>>(
       mockUrl,
       {
         fetch: fetchMock
@@ -102,7 +102,7 @@ test("will make a request error accessible otherwise", () =>
   new Promise<void>(resolve =>
     createRoot(dispose => {
       const fetchError = new Error("TypeError: failed to fetch");
-      const [ready] = createFetch<typeof mockResponseBody, undefined>(mockUrl, {
+      const [ready] = createFetch(() => mockUrl, {
         fetch: () => Promise.reject(fetchError)
       });
       createEffect(() => {
@@ -123,7 +123,7 @@ test("will not start a request with a requestinfo accessor returning undefined",
         url() === undefined
           ? Promise.reject(reject(new Error("called even though the url was undefined")))
           : Promise.resolve(mockResponse);
-      const [ready] = createFetch(url(), { fetch });
+      const [ready] = createFetch(url, { fetch });
       createEffect(() => {
         ready();
         if (url() === undefined) {

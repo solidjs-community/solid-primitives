@@ -20,42 +20,48 @@ export const defaultCacheOptions: CacheOptions = {
   cache: {}
 };
 
-export const serializeRequest = (requestData: [info: RequestInfo, init?: RequestInit]): string =>
+export const serializeRequest = <FetcherArgs extends any[]>(requestData: FetcherArgs): string =>
   JSON.stringify({
     ...(typeof requestData[0] === "string" ? { url: requestData[0] } : requestData[0]),
     ...requestData[1]
   });
 
 export const withCache: RequestModifier =
-  <T>(options: CacheOptions = defaultCacheOptions) =>
-  (requestContext: RequestContext<T>) => {
+  <Result extends unknown, FetcherArgs extends any[]>(
+    options: CacheOptions = defaultCacheOptions
+  ) =>
+  (requestContext: RequestContext<Result, FetcherArgs>) => {
     requestContext.cache = requestContext.cache || options.cache;
     const isExpired = (entry: CacheEntry) =>
       typeof options.expires === "number"
         ? entry.ts + options.expires > new Date().getTime()
         : options.expires(entry);
-    wrapFetcher<T>(requestContext, <T>(originalFetcher: any) => (requestData, info) => {
-      const serializedRequest = serializeRequest(requestData);
-      const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
-      const shouldRead = requestContext.readCache?.(cached) !== false;
-      if (cached && !isExpired(cached) && shouldRead) {
-        return Promise.resolve<T>(cached.data);
-      }
-      return originalFetcher(requestData, info).then((data: T) => {
-        requestContext.writeCache?.(
-          serializedRequest,
-          (requestContext.cache[serializedRequest] = {
-            ts: new Date().getTime(),
-            requestData: requestData,
-            data
-          })
-        );
-        return data;
-      });
-    });
+    wrapFetcher<Result, FetcherArgs>(
+      requestContext,
+      <T>(originalFetcher: any) =>
+        (requestData, info) => {
+          const serializedRequest = serializeRequest(requestData);
+          const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
+          const shouldRead = requestContext.readCache?.(cached) !== false;
+          if (cached && !isExpired(cached) && shouldRead) {
+            return Promise.resolve<T>(cached.data);
+          }
+          return originalFetcher(requestData, info).then((data: T) => {
+            requestContext.writeCache?.(
+              serializedRequest,
+              (requestContext.cache[serializedRequest] = {
+                ts: new Date().getTime(),
+                requestData: requestData,
+                data
+              })
+            );
+            return data;
+          });
+        }
+    );
     requestContext.wrapResource();
     Object.assign(requestContext.resource![1], {
-      invalidate: (requestData: [info: RequestInfo, init?: RequestInit]) => {
+      invalidate: (requestData: FetcherArgs) => {
         try {
           delete requestContext.cache[serializeRequest(requestData)];
         } catch (e) {
