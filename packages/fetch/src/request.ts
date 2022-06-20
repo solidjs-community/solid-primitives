@@ -1,37 +1,41 @@
-import { RequestModifier } from "./modifiers";
+import { RequestContext } from "./fetch";
+import { ResourceFetcherInfo } from "solid-js";
+import { AxiosStatic, AxiosRequestConfig } from "axios";
 
-import { AxiosStatic } from "axios";
+export type Request<FetcherArgs extends any[]> = <Result>(
+  ...args: any[]
+) => (requestContext: RequestContext<Result, FetcherArgs>) => void;
 
-export const fetchRequest: RequestModifier =
-  <T>(fetch = globalThis.fetch) =>
+export const fetchRequest: Request<[info: RequestInfo, init?: RequestInit]> =
+  (fetch = globalThis.fetch) =>
   requestContext => {
-    requestContext.fetcher = (requestData: [info: RequestInfo, init?: RequestInit]) =>
+    requestContext.fetcher = <Result extends unknown>(
+      requestData: [info: RequestInfo, init?: RequestInit],
+      info: ResourceFetcherInfo<Result>
+    ) =>
       fetch?.(...requestData).then((response: Response) => {
         requestContext.response = response;
         if (requestContext.responseHandler) {
-          return requestContext.responseHandler(response) as unknown as T;
+          return requestContext.responseHandler(response) as any;
         }
         const contentType = response.headers.get("content-type") ?? "";
         if (contentType.includes("application/json")) {
-          return response.json();
+          return response.json() as Result;
         } else if (contentType.includes("text/")) {
-          return response.text();
+          return response.text() as Result;
         } else {
-          return response.blob();
+          return response.blob() as Result;
         }
       });
     requestContext.wrapResource();
   };
 
-export const axiosRequest: RequestModifier = (axios: AxiosStatic) => requestContext => {
-  requestContext.fetcher = (requestData: [info: RequestInfo, init?: RequestInit]) => {
-    return axios.request({
-      ...(typeof requestData[0] === "string"
-        ? { url: requestData[0], method: "get" }
-        : requestData[0]),
-      ...requestData[1],
-      ...(requestContext.abortController ? { signal: requestContext.abortController.signal } : {})
-    } as any);
+export const axiosRequest: Request<[config: AxiosRequestConfig]> =
+  (axios: AxiosStatic) => requestContext => {
+    requestContext.fetcher = <Result extends unknown>(
+      requestData: [config: AxiosRequestConfig]
+    ) => {
+      return axios(...requestData) as Promise<Result>;
+    };
+    requestContext.wrapResource();
   };
-  requestContext.wrapResource();
-};

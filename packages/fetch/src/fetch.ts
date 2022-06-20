@@ -6,36 +6,35 @@ import {
   ResourceReturn
 } from "solid-js";
 import { RequestModifier } from "./modifiers";
-import { fetchRequest } from "./request";
+import { fetchRequest, Request } from "./request";
 
-export type RequestContext<T> = {
-  urlAccessor: Accessor<[info: RequestInfo, init?: RequestInit] | undefined>;
-  wrapResource: () => ResourceReturn<T>;
-  fetcher?: <T>(
-    requestData: [info: RequestInfo, init?: RequestInit],
-    info: ResourceFetcherInfo<T>
-  ) => Promise<T>;
-  response?: Response;
-  resource?: ResourceReturn<T>;
-  abortController?: AbortController;
-  responseHandler?: (response: Response) => T;
-  [key: string]: any;
-};
+export type FetchArgs = [info: RequestInfo] | [info: RequestInfo, init?: RequestInit];
 
-export type FetchOptions<I> = I extends undefined
+export type DistributeFetcherArgs<
+  FetcherArgs extends any[],
+  ExtraArgs extends any[]
+> = FetcherArgs extends any
+  ? ExtraArgs extends any
+    ? | [...FetcherArgs, ...ExtraArgs]
+      | [Accessor<FetcherArgs | undefined>, ...ExtraArgs]
+      | [...{ [n in keyof FetcherArgs]: Accessor<FetcherArgs[n] | undefined> }, ...ExtraArgs]
+    : never
+  : never;
+  
+export type FetchOptions<Result, InitialValue, FetcherArgs> = InitialValue extends undefined
   ? {
-      initialValue?: I;
+      initialValue?: InitialValue;
       name?: string;
       fetch?: typeof fetch;
-      request?: <T>(requestContext: RequestContext<T>) => void;
+      request?: (requestContext: RequestContext<Result, FetcherArgs>) => void;
       responseHandler?: (response: Response) => any;
       disable?: boolean;
     }
   : {
-      initialValue: I;
+      initialValue: InitialValue;
       name?: string;
       fetch?: typeof fetch;
-      request?: <T>(requestContext: RequestContext<T>) => void;
+      request?: (requestContext: RequestContext<Result, FetcherArgs>) => void;
       responseHandler?: (response: Response) => any;
       disable?: boolean;
     };
@@ -59,16 +58,27 @@ export type FetchReturn<T, I> = [
   }
 ];
 
-const isOptions = <I>(prop: any): prop is FetchOptions<I> =>
+export type RequestContext<Result, FetcherArgs> = {
+  urlAccessor: Accessor<FetcherArgs | undefined>;
+  wrapResource: () => ResourceReturn<Result>;
+  fetcher?: (requestData: FetcherArgs, info: ResourceFetcherInfo<Result>) => Promise<Result>;
+  response?: Response;
+  resource?: ResourceReturn<Result>;
+  abortController?: AbortController;
+  responseHandler?: (response: Response) => Result;
+  [key: string]: any;
+};
+
+const isOptions = <Result, InitialValue, FetcherArgs>(
+  prop: any
+): prop is FetchOptions<Result, InitialValue, FetcherArgs> =>
   typeof prop === "object" && ["name", "initialValue", "fetch", "request"].some(key => key in prop);
 
-/* we want to be able to overload our functions */
-/* eslint no-redeclare:off */
 /**
  * Creates a fetch resource with lightweight modifications
  *
  * ```typescript
- * createFetch<T>(
+ * createFetch<Result, InitialValue, FetcherArgs>(
  *  requestInfo: RequestInfo,
  *  requestInit?: RequestInit,
  *  options?: {
@@ -78,7 +88,7 @@ const isOptions = <I>(prop: any): prop is FetchOptions<I> =>
  *    // disable fetching, e.g. in SSR situations (use `isServer`)
  *    disabled?: boolean
  *  },
- *  modifiers: (withAbort() | withCache() | ...)[]
+ *  modifiers?: (withAbort() | withCache() | ...)[]
  * ): [
  *   Resource<T> & {
  *     status: number | null,
@@ -102,7 +112,6 @@ const isOptions = <I>(prop: any): prop is FetchOptions<I> =>
  * ## Available Modifiers:
  * * withAbort() - makes request abortable
  * * withTimeout(ms) - adds a request timeout (works with abort)
- * // TODO:
  * * withRetry(num) - retries request *num* times
  * * withCache(options) - caches requests
  * * withCatchAll() - catches all errors so you don't need a boundary
@@ -110,89 +119,94 @@ const isOptions = <I>(prop: any): prop is FetchOptions<I> =>
  * You can even add your own modifiers.
  * ```
  */
-export function createFetch<T, I = undefined>(
-  requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
-  modifiers?: RequestModifier[]
-): FetchReturn<T, I>;
-export function createFetch<T, I = undefined>(
-  requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
-  requestInit: Accessor<RequestInit | undefined> | RequestInit,
-  modifiers?: RequestModifier[]
-): FetchReturn<T, I>;
-export function createFetch<T, I = undefined>(
-  requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
-  options: FetchOptions<I>,
-  modifiers?: RequestModifier[]
-): FetchReturn<T, I>;
-export function createFetch<T, I>(
-  requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
-  options: FetchOptions<I>,
-  modifiers?: RequestModifier[]
-): FetchReturn<T, I>;
-export function createFetch<T, I>(
-  requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
-  requestInit: Accessor<RequestInit | undefined> | RequestInit,
-  options: FetchOptions<I>,
-  modifiers?: RequestModifier[]
-): FetchReturn<T, I>;
-export function createFetch<T, I>(
-  ...args:
-    | [
-        requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
-        requestInit?: Accessor<RequestInit | undefined> | RequestInit | FetchOptions<I>,
-        options?: FetchOptions<I>,
-        modifiers?: RequestModifier[]
-      ]
-    | [
-        requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
-        requestInit?: Accessor<RequestInit | undefined> | RequestInit | FetchOptions<I>,
-        modifiers?: RequestModifier[]
-      ]
-    | [
-        requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
-        options?: FetchOptions<I>,
-        modifiers?: RequestModifier[]
-      ]
-    | [requestInfo: Accessor<RequestInfo | undefined> | RequestInfo, modifiers?: RequestModifier[]]
-): FetchReturn<T, I> {
-  const options: FetchOptions<T> = ([args[2], args[1]].find(isOptions) || {}) as FetchOptions<T>;
-  const urlAccessor: Accessor<[info: RequestInfo, init?: RequestInit] | undefined> = createMemo(
-    () => {
-      if (options.disable) {
-        return undefined;
-      }
-      const info: RequestInfo | undefined = typeof args[0] === "function" ? args[0]() : args[0];
-      if (!info) {
-        return undefined;
-      }
-      const init =
-        typeof args[1] === "function"
-          ? args[1]()
-          : isOptions(args[1])
-          ? undefined
-          : (args[1] as RequestInit);
-      return [info, init] as [info: RequestInfo, init?: RequestInit];
+export function createFetch<
+  Result,
+  InitialValue = undefined,
+  FetcherArgs extends any[] = FetchArgs
+>(...fetcherArgs: FetcherArgs): FetchReturn<Result, InitialValue>;
+export function createFetch<
+  Result,
+  InitialValue = undefined,
+  FetcherArgs extends any[] = FetchArgs
+>(
+  ...args: DistributeFetcherArgs<FetcherArgs, [modifiers: RequestModifier[] | [options: FetchOptions<Result, InitialValue, FetcherArgs> & { request: never, initialValue: never }, modifiers?: RequestModifier[]]]>
+): FetchReturn<Result, InitialValue>;
+export function createFetch<
+  Result,
+  InitialValue,
+  FetcherArgs extends any[] = FetchArgs
+>(
+  ...args: DistributeFetcherArgs<FetcherArgs, [options: FetchOptions<Result, InitialValue, FetcherArgs> & { request: never, initialValue: InitialValue }, modifiers?: RequestModifier[]]>
+): FetchReturn<Result, InitialValue>;
+export function createFetch<
+  Result,
+  InitialValue,
+  FetcherArgs extends any[], 
+>(
+  ...args: DistributeFetcherArgs<FetcherArgs, [modifiers: RequestModifier[] | [options: FetchOptions<Result, InitialValue, FetcherArgs> & { initialValue?: undefined }, modifiers?: RequestModifier[]]]>
+): FetcherArgs extends FetchArgs ? never : FetchReturn<Result, InitialValue>;
+export function createFetch<
+  Result,
+  InitialValue,
+  FetcherArgs extends any[]
+>(
+  ...args: DistributeFetcherArgs<FetcherArgs, [options: FetchOptions<Result, InitialValue, FetcherArgs>] | [options: FetchOptions<Result, InitialValue, FetcherArgs>, modifiers?: RequestModifier[]]>
+): FetchReturn<Result, InitialValue>;
+export function createFetch<
+  Result,
+  InitialValue extends Result,
+  FetcherArgs extends any[] = [info: RequestInfo, init?: RequestInit]
+>(...args: any[]): FetchReturn<Result, InitialValue> {
+  const options = ([args[2], args[1]].find(isOptions) || {}) as FetchOptions<
+    Result,
+    InitialValue,
+    FetcherArgs
+  >;
+  const urlAccessor: Accessor<FetcherArgs | undefined> = createMemo(() => {
+    if (options.disable) {
+      return undefined;
     }
-  );
-  const modifiers = args.slice(1).find(Array.isArray) || [];
-  modifiers.unshift(options.request || fetchRequest(options.fetch));
+    const info: RequestInfo | undefined =
+      typeof args[0] === "function"
+        ? (args[0] as Accessor<FetcherArgs | FetcherArgs[0]>)()
+        : args[0];
+    if (!info) {
+      return undefined;
+    }
+    const init =
+      typeof args[1] === "function"
+        ? (args[1] as Accessor<FetcherArgs[1]>)()
+        : isOptions(args[1])
+        ? undefined
+        : (args[1] as RequestInit);
+    return [info, init] as FetcherArgs;
+  });
+  const modifiers: (Request<FetcherArgs> | RequestModifier)[] = ((): RequestModifier[] => {
+    for (let l = args.length - 1; l >= 1; l--) {
+      if (Array.isArray(args[l])) {
+        return args[l];
+      }
+    }
+    return [];
+  })();
+  modifiers.unshift((options.request || fetchRequest(options.fetch)) as Request<FetcherArgs>);
   let index = 0;
-  const fetchContext: RequestContext<T> = {
+  const fetchContext: RequestContext<Result, FetcherArgs> = {
     urlAccessor,
     responseHandler: options.responseHandler,
     wrapResource: () => {
       const modifier = modifiers[index++];
-      typeof modifier === "function" && modifier(fetchContext);
+      typeof modifier === "function" && (modifier as RequestModifier)(fetchContext);
       if (!fetchContext.resource) {
         fetchContext.resource = createResource(
           fetchContext.urlAccessor,
           fetchContext.fetcher!,
           options as any
-        ) as ResourceReturn<T>;
+        ) as ResourceReturn<Result>;
       }
       return fetchContext.resource!;
     }
   };
   fetchContext.wrapResource();
-  return fetchContext.resource as unknown as FetchReturn<T, I>;
-}
+  return fetchContext.resource as unknown as FetchReturn<Result, InitialValue>;
+};
