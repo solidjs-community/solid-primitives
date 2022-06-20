@@ -71,6 +71,6 @@
     "solid-js": "^1.4.4"
   },
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^2.1.1"
+    "@solid-primitives/utils": "^2.1.1"
   }
 }
