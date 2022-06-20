@@ -61,9 +61,9 @@ export const makeIntersectionObserver = (
 ): {
   add: AddIntersectionObserverEntry,
   remove: RemoveIntersectionObserverEntry;
-  start: () => void;
-  reset: () => void;
-  stop: () => void;
+  start: VoidFunction;
+  reset: VoidFunction;
+  stop: VoidFunction;
   instance: IntersectionObserver;
 } => {
   const instance = new IntersectionObserver(onChange, options);
@@ -129,7 +129,7 @@ export const createVisibilityObserver = (
     initialValue?: boolean;
     once?: boolean;
   }
-): [Accessor<boolean>, { start: () => void; stop: () => void; instance: IntersectionObserver }] => {
+): [Accessor<boolean>, { start: VoidFunction; stop: VoidFunction; instance: IntersectionObserver }] => {
   const [isVisible, setVisible] = createSignal(options?.initialValue ?? false);
   const { start, add, stop, reset, instance } = makeIntersectionObserver(
     [access(element)],

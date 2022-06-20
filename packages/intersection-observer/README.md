@@ -42,6 +42,23 @@ const { add: intersectionObserver } = makeIntersectionObserver([], entries => {
 <div use:intersectionObserver></div>
 ```
 
+#### Definition
+
+```ts
+function makeIntersectionObserver = (
+  elements: Element[],
+  onChange: IntersectionObserverCallback,
+  options?: IntersectionObserverInit
+): {
+  add:  AddIntersectionObserverEntry,
+  remove:  RemoveIntersectionObserverEntry;
+  start: () =>  void;
+  reset: () =>  void;
+  stop: () =>  void;
+  instance: IntersectionObserver;
+}
+```
+
 ### createIntersectionObserver
 
 ```tsx
@@ -54,6 +71,16 @@ add(el)
 // Directive usage:
 const [intersectionObserver] = createIntersectionObserver()
 <div use:intersectionObserver></div>
+```
+
+#### Definition
+
+```ts
+function createIntersectionObserver = (
+  elements: Accessor<Element[]>,
+  onChange: IntersectionObserverCallback,
+  options?: IntersectionObserverInit
+)
 ```
 
 ### createViewportObserver
@@ -70,15 +97,44 @@ const [observer] = createIntersectionObserver()
 <div use:observer={(e) => console.log(e.isIntersecting)}></div>
 ```
 
+#### Definition
+
+```ts
+function createVisibilityObserver = (
+  element: MaybeAccessor<Element>,
+  options?: IntersectionObserverInit & {
+    initialValue?: boolean;
+    once?: boolean;
+  }
+): [
+  Accessor<boolean>,
+  {
+    start: () =>  void;
+    stop: () =>  void;
+    instance: IntersectionObserver
+  }
+]
+```
+
 ### createVisibilityObserver
 
 ```ts
 const [isVisible, { start, stop, instance }] = createVisibilityObserver(() => el, { once: true });
 ```
 
+#### Definition
+
+```ts
+function createViewportObserver(
+  elements: MaybeAccessor<Element[]>,
+  callback: EntryCallback,
+  options?: IntersectionObserverInit
+): CreateViewportObserverReturnValue;
+```
+
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-primitives-intersection-observer-h22it?file=/src/index.tsx
+You may view a working example here: https://stackblitz.com/edit/vitejs-vite-n2lwpq
 
 ## Changelog
 
@@ -122,6 +178,10 @@ Updated to Solid 1.3
 Minor improvements
 
 1.3.0
+
+General improvements to bring up to latest standards.
+
+1.4.0
 
 Migrated to new `make` pattern and improved primitive structures.
 
