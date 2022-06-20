@@ -9,6 +9,6 @@ Object.defineProperty(global.navigator, "geolocation", {
   value: {
     clearWatch: () => {},
     getCurrentPosition: success => success({ coords: mockCoordinates }),
-    watchPosition: callback => callback({ coords: mockCoordinates }),
+    watchPosition: callback => callback({ coords: mockCoordinates })
   }
 });

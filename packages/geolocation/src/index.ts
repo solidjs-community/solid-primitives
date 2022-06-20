@@ -25,19 +25,18 @@ const geolocationDefaults: PositionOptions = {
 export const createGeolocation = (
   options?: MaybeAccessor<PositionOptions>
 ): [location: Resource<GeolocationCoordinates | undefined>, refetch: VoidFunction] => {
-  const [location, {refetch}] = createResource(
+  const [location, { refetch }] = createResource(
     () => Object.assign(geolocationDefaults, access(options)),
-    (options) => new Promise<GeolocationCoordinates>(
-      (resolve, reject) => {
+    options =>
+      new Promise<GeolocationCoordinates>((resolve, reject) => {
         if (!("geolocation" in navigator)) {
           return reject({ code: null, message: "Geolocation is not defined." });
         }
         navigator.geolocation.getCurrentPosition(res => resolve(res.coords), reject, options);
-      }
-    )
+      })
   );
   return [location, refetch];
-}
+};
 
 /**
  * Creates a primitive that allows for real-time geolocation watching.
@@ -58,12 +57,12 @@ export const createGeolocationWatcher = (
   enabled: MaybeAccessor<boolean>,
   options?: MaybeAccessor<PositionOptions>
 ): {
-  location: GeolocationCoordinates | null,
-  error: GeolocationPositionError | null
+  location: GeolocationCoordinates | null;
+  error: GeolocationPositionError | null;
 } => {
   const [store, setStore] = createStaticStore<{
-    location: null | GeolocationCoordinates,
-    error: null | GeolocationPositionError
+    location: null | GeolocationCoordinates;
+    error: null | GeolocationPositionError;
   }>({
     location: null,
     error: null

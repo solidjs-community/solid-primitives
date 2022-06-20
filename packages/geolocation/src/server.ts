@@ -16,8 +16,8 @@ export const createGeolocationWatcher = (
   _enabled: MaybeAccessor<boolean>,
   _options: MaybeAccessor<PositionOptions>
 ): {
-  location: GeolocationCoordinates | null,
-  error: GeolocationPositionError | null
+  location: GeolocationCoordinates | null;
+  error: GeolocationPositionError | null;
 } => {
-  return {location: null, error: null};
+  return { location: null, error: null };
 };

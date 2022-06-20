@@ -16,19 +16,21 @@ testCG("test basic geolocation", () =>
     assert.is(location.loading, false);
     assert.is(location(), mockCoordinates);
     dispose();
-  }));
+  })
+);
 
 testCG("test basic geolocation error", () =>
   createRoot(async dispose => {
     global.navigator.geolocation.getCurrentPosition = (_, reject: any) => {
       return reject({ code: 1, message: "GeoLocation error" } as GeolocationPositionError);
-    }
+    };
     const [location] = createRoot(() => createGeolocation());
     await location();
     assert.is(location.loading, false);
     assert.equal(location.error, { code: 1, message: "GeoLocation error" });
     dispose();
-  }));
+  })
+);
 
 testCG.run();
 
@@ -43,6 +45,7 @@ testCGW("test basic geolocation", () =>
     await setEnabled(true);
     assert.is(watcher.location, mockCoordinates);
     dispose();
-  }));
+  })
+);
 
 testCGW.run();
