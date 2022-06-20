@@ -17,6 +17,9 @@ Library of reactive primitives.
 
 Please refer to the main [README](../../README.md) for a list of primitives.
 
+> **Info**
+> The `signal-builder` primitives are exported as `sb.*` in order to avoid conflicts with the `immutable` primitives.
+
 ## Changelog
 
 <details>

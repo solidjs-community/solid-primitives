@@ -2,7 +2,6 @@ export * from "@solid-primitives/active-element";
 export * from "@solid-primitives/audio";
 export * from "@solid-primitives/bounds";
 export * from "@solid-primitives/clipboard";
-export * from "@solid-primitives/composites";
 export * from "@solid-primitives/connectivity";
 export * from "@solid-primitives/context";
 export * from "@solid-primitives/date";
