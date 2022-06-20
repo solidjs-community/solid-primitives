@@ -86,7 +86,6 @@
     "@solid-primitives/tween": "^1.2.0",
     "@solid-primitives/until": "^0.1.0",
     "@solid-primitives/upload": "^0.0.101",
-    "@solid-primitives/utils": "^2.1.1",
     "@solid-primitives/websocket": "^0.3.0",
     "@solid-primitives/workers": "^0.2.0"
   },

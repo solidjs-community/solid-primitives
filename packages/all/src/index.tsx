@@ -50,6 +50,5 @@ export * from "@solid-primitives/timer";
 export * from "@solid-primitives/tween";
 export * from "@solid-primitives/until";
 export * from "@solid-primitives/upload";
-export * from "@solid-primitives/utils";
 export * from "@solid-primitives/websocket";
 export * from "@solid-primitives/workers";

@@ -2,10 +2,16 @@ const { readdir, readFile, writeFile } = require('fs/promises');
 const { join } = require('path');
 const pathTo = (...path) => join(__dirname, ...path);
 
+const excluded = [
+  'all', 'analytics', 'debounce',
+  'gestures', 'lazy-memo', 'throttle',
+  'utils', 'visibility-observer'
+];
+
 (async () => {
   const packages = (await readdir(pathTo('../packages')).catch(() => {
     throw new Error('could not read packages');
-  }))?.filter(pkg => !['all', 'analytics', 'debounce', 'gestures', 'lazy-memo', 'throttle', 'visibility-observer'].includes(pkg));
+  }))?.filter(pkg => !excluded.includes(pkg));
 
   const allPackageJson = JSON.parse(await readFile(pathTo('../packages/all/package.json')));  
   // overwrite dependencies
