@@ -21,6 +21,7 @@
     "name": "media",
     "stage": 3,
     "list": [
+      "makeMediaQueryListener",
       "createMediaQuery",
       "createBreakpoints",
       "usePrefersDark"
