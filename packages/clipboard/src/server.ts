@@ -1,12 +1,9 @@
-import * as api from "./index";
+import * as API from "./index";
 
-const createClipboard: typeof api.default = (...a: any[]) => [
-  () => undefined as unknown as Promise<void>,
-  () => undefined as unknown as Promise<undefined>,
-  {
-    newItem: () => ({} as ClipboardItem)
-  }
+export const makeClipboard: typeof API.makeClipboard = () => [
+  async (_data: string | ClipboardItem[]) => { /*noop*/ },
+  async () => '',
+  (_data, _type) => ({} as ClipboardItem)
 ];
-export default createClipboard;
-
-export const copyToClipboard: typeof api.copyToClipboard = () => {};
+export const createClipboard: typeof API.createClipboard = (..._a: any[]) => () => '';
+export const copyToClipboard: typeof API.copyToClipboard = () => {};

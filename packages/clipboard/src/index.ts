@@ -1,4 +1,4 @@
-import { Accessor, createSignal, onMount, onCleanup, createEffect } from "solid-js";
+import { Accessor, createSignal, on, onMount, onCleanup, createEffect } from "solid-js";
 
 export type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
 export type NewClipboardItem = (data: ClipboardItemData, type: string) => ClipboardItem;
@@ -31,10 +31,10 @@ declare module "solid-js" {
  */
 export const makeClipboard = (): [
   write: ClipboardSetter,
-  read: () => Promise<string>,
+  read: () => Promise<ClipboardItems>,
   newItem: NewClipboardItem
 ] => {
-  const read = () => navigator.clipboard.readText();
+  const read = async () => await navigator.clipboard.read();
   const write: ClipboardSetter = data =>
     typeof data === "string"
       ? navigator.clipboard.writeText(data)
@@ -55,15 +55,21 @@ export const makeClipboard = (): [
  * console.log(await read());
  * ```
  */
-export const createClipboard = (data: Accessor<string | ClipboardItem[]>): Accessor<string> => {
+export const createClipboard = (data: Accessor<string | ClipboardItem[]>): [
+  clipboard: Accessor<ClipboardItems>,
+  read: () => Promise<ClipboardItem[]>
+ ] => {
   const [write, read] = makeClipboard();
-  const [clipboard, setClipboard] = createSignal("");
+  const [clipboard, setClipboard] = createSignal<ClipboardItems>([]);
   const listener = async () => setClipboard(await read());
-  onMount(() => window.addEventListener("clipboardchange", listener));
-  onCleanup(() => window.removeEventListener("clipboardchange", listener));
-  createEffect(() => write(data()));
+  onMount(() => navigator.clipboard.addEventListener("clipboardchange", listener));
+  onCleanup(() => navigator.clipboard.removeEventListener("clipboardchange", listener));
+  createEffect(on(data, () => {
+    console.log('yes', data());
+    write(data());
+  }), { defer: true });
   listener();
-  return clipboard;
+  return [clipboard,read];
 };
 
 /**
