@@ -2,11 +2,7 @@ import { createRoot, createSignal } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
-import {
-  makeIntersectionObserver,
-  createViewportObserver,
-  createVisibilityObserver
-} from "../src";
+import { makeIntersectionObserver, createViewportObserver, createVisibilityObserver } from "../src";
 
 const intersectionObserverInstances: any[] = [];
 
@@ -112,7 +108,7 @@ mio("options are passed to IntersectionObserver", ({ div }) => {
 
 mio("add function observes an element", ({ div }) => {
   createRoot(dispose => {
-    const {add, instance } = makeIntersectionObserver([], () => {});
+    const { add, instance } = makeIntersectionObserver([], () => {});
     add(div);
 
     assert.is(
@@ -127,7 +123,7 @@ mio("add function observes an element", ({ div }) => {
 
 mio("remove function removes observed element", ({ div }) => {
   createRoot(dispose => {
-    const {add, instance, remove } = makeIntersectionObserver([], () => {});
+    const { add, instance, remove } = makeIntersectionObserver([], () => {});
     add(div);
     remove(div);
 
@@ -161,10 +157,7 @@ mio("start function observes initial elements", ({ div, img }) => {
       "elements were not added to the IntersectionObserver on restart"
     );
 
-    const { start: start2, instance: instance2 } = makeIntersectionObserver(
-      [div, img],
-      () => {}
-    );
+    const { start: start2, instance: instance2 } = makeIntersectionObserver([div, img], () => {});
     start2();
 
     assert.is(

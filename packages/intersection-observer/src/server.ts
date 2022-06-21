@@ -22,8 +22,8 @@ export const makeIntersectionObserver: typeof API.makeIntersectionObserver = (
       /* void */
     },
     instance: {} as unknown as IntersectionObserver
-  }
-}
+  };
+};
 
 export const createIntersectionObserver: typeof API.createIntersectionObserver = (
   _elements,
@@ -49,7 +49,7 @@ export const createViewportObserver: typeof API.createViewportObserver = (...a: 
       instance: {} as unknown as IntersectionObserver
     }
   ];
-}
+};
 
 export const createVisibilityObserver: typeof API.createVisibilityObserver = (
   _element,

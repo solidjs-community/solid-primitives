@@ -59,7 +59,7 @@ export const makeIntersectionObserver = (
   onChange: IntersectionObserverCallback,
   options?: IntersectionObserverInit
 ): {
-  add: AddIntersectionObserverEntry,
+  add: AddIntersectionObserverEntry;
   remove: RemoveIntersectionObserverEntry;
   start: VoidFunction;
   reset: VoidFunction;
@@ -71,7 +71,7 @@ export const makeIntersectionObserver = (
   const remove: RemoveIntersectionObserverEntry = el => instance.unobserve(access(el));
   const start = () => elements.forEach(el => add(el));
   const stop = () => instance.disconnect();
-  const reset = () => instance.takeRecords().forEach((el) => remove(el.target));
+  const reset = () => instance.takeRecords().forEach(el => remove(el.target));
   onMount(start);
   onCleanup(stop);
   return { add, remove, start, stop, reset, instance };
@@ -129,7 +129,10 @@ export const createVisibilityObserver = (
     initialValue?: boolean;
     once?: boolean;
   }
-): [Accessor<boolean>, { start: VoidFunction; stop: VoidFunction; instance: IntersectionObserver }] => {
+): [
+  Accessor<boolean>,
+  { start: VoidFunction; stop: VoidFunction; instance: IntersectionObserver }
+] => {
   const [isVisible, setVisible] = createSignal(options?.initialValue ?? false);
   const el = access(element);
   const { start, add, stop, reset, instance } = makeIntersectionObserver(
@@ -205,7 +208,7 @@ export function createViewportObserver(...a: any) {
       // use "observe" directive without providing a callback
       cb instanceof Function && cb(entry, instance);
     });
-  const{ add, remove, stop, instance } = makeIntersectionObserver([], onChange, options);
+  const { add, remove, stop, instance } = makeIntersectionObserver([], onChange, options);
   const addEntry: AddViewportObserverEntry = (el, callback) => {
     add(el);
     callbacks.set(el, callback);
