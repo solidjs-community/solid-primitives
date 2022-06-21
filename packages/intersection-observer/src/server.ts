@@ -1,61 +1,39 @@
-import { MaybeAccessor } from "@solid-primitives/utils";
-import { Accessor } from "solid-js";
+import * as API from "./index";
 
-import {
-  AddIntersectionObserverEntry,
-  CreateViewportObserverReturnValue,
-  EntryCallback,
-  RemoveIntersectionObserverEntry
-} from "./index";
-
-export const createIntersectionObserver = (
-  _elements: MaybeAccessor<Element[]>,
-  _onChange: IntersectionObserverCallback,
-  _options?: IntersectionObserverInit
-): [
-  AddIntersectionObserverEntry,
-  {
-    remove: RemoveIntersectionObserverEntry;
-    start: () => void;
-    stop: () => void;
-    instance: IntersectionObserver;
-  }
-] => [
-  _el => {
-    /* noop */
-  },
-  {
-    remove: _el => {
-      /* noop */
+export const makeIntersectionObserver: typeof API.makeIntersectionObserver = (
+  _elements,
+  _onChange,
+  _options
+) => {
+  return {
+    add: (_el: Element) => {
+      /* void */
+    },
+    remove: (_el: Element) => {
+      /* void */
     },
     start: () => {
-      /* noop */
+      /* void */
     },
     stop: () => {
-      /* noop */
+      /* void */
+    },
+    reset: () => {
+      /* void */
     },
     instance: {} as unknown as IntersectionObserver
   }
-];
+}
 
-export function createViewportObserver(
-  elements: MaybeAccessor<Element[]>,
-  callback: EntryCallback,
-  options?: IntersectionObserverInit
-): CreateViewportObserverReturnValue;
+export const createIntersectionObserver: typeof API.createIntersectionObserver = (
+  _elements,
+  _onChange,
+  _options?
+) => {};
 
-export function createViewportObserver(
-  initial: MaybeAccessor<[Element, EntryCallback][]>,
-  options?: IntersectionObserverInit
-): CreateViewportObserverReturnValue;
-
-export function createViewportObserver(
-  options?: IntersectionObserverInit
-): CreateViewportObserverReturnValue;
-
-export function createViewportObserver(...a: any): CreateViewportObserverReturnValue {
+export const createViewportObserver: typeof API.createViewportObserver = (...a: any) => {
   return [
-    (_el: Element) => {
+    (_: Element) => {
       /* void */
     },
     {
@@ -73,13 +51,10 @@ export function createViewportObserver(...a: any): CreateViewportObserverReturnV
   ];
 }
 
-export const createVisibilityObserver = (
-  _element: MaybeAccessor<Element>,
-  _options?: IntersectionObserverInit & {
-    initialValue?: boolean;
-    once?: boolean;
-  }
-): [Accessor<boolean>, { start: () => void; stop: () => void; instance: IntersectionObserver }] => {
+export const createVisibilityObserver: typeof API.createVisibilityObserver = (
+  _element,
+  _options
+) => {
   return [
     () => false,
     {

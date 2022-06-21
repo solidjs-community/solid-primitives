@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/intersection-observer",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Primitives to support using the intersection observer API.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -16,6 +16,7 @@
     "name": "intersection-observer",
     "stage": 3,
     "list": [
+      "makeIntersectionObserver",
       "createIntersectionObserver",
       "createViewportObserver",
       "createVisibilityObserver"
@@ -40,7 +41,7 @@
     "start": "vite serve dev --host",
     "dev": "npm run start",
     "build": "tsup",
-    "test": "uvu -r solid-register"
+    "test": "uvu -b -r solid-register"
   },
   "keywords": [
     "intersection",
@@ -61,9 +62,9 @@
     "vite-plugin-solid": "^2.2.5"
   },
   "peerDependencies": {
-    "solid-js": "^1.3.1"
+    "solid-js": "^1.4.4"
   },
   "dependencies": {
-    "@solid-primitives/utils": "^1.0.0"
+    "@solid-primitives/utils": "^2.1.1"
   }
 }
