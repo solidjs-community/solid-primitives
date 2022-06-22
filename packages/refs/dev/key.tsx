@@ -1,4 +1,4 @@
-import { Key } from "../src";
+import { Rerun } from "@solid-primitives/keyed";
 import { Component, createSignal } from "solid-js";
 import { Transition } from "solid-transition-group";
 
@@ -21,11 +21,11 @@ const App: Component = () => {
           }}
           mode="outin"
         >
-          <Key key={count()}>
+          <Rerun on={count}>
             <button class="btn" onClick={() => setCount(p => ++p)}>
               {count()}
             </button>
-          </Key>
+          </Rerun>
         </Transition>
       </div>
     </>

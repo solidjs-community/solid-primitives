@@ -44,13 +44,13 @@
   "devDependencies": {
     "esbuild-plugin-solid": "^0.4.2",
     "jsdom": "^19.0.0",
-    "prettier": "^2.5.1",
-    "solid-register": "^0.1.5",
+    "prettier": "^2.7.1",
+    "solid-register": "^0.2.5",
     "tslib": "^2.3.1",
-    "tsup": "^5.11.0",
-    "unocss": "0.24.3",
-    "uvu": "^0.5.2",
-    "vite": "2.8.1",
+    "tsup": "^6.1.2",
+    "unocss": "^0.39.1",
+    "uvu": "^0.5.3",
+    "vite": "^2.9.12",
     "vite-plugin-solid": "2.2.5"
   },
   "peerDependencies": {

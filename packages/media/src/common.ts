@@ -1,5 +1,4 @@
 import { entries } from "@solid-primitives/utils";
-import { isServer } from "solid-js/web";
 import { Breakpoints, Matches } from "./types";
 
 export const getEmptyMatchesFromBreakpoints = <T extends Breakpoints>(

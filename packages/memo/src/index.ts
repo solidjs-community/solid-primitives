@@ -8,7 +8,9 @@ import {
   createMemo,
   runWithOwner,
   Setter,
-  on
+  on,
+  getListener,
+  createRoot
 } from "solid-js";
 import type {
   EffectOptions,
@@ -16,17 +18,17 @@ import type {
   Owner,
   SignalOptions
 } from "solid-js/types/reactive/signal";
-import debounce from "@solid-primitives/debounce";
-import throttle from "@solid-primitives/throttle";
-import { ItemsOf } from "@solid-primitives/utils";
+import { debounce, throttle } from "@solid-primitives/scheduled";
+import { ItemsOf, noop } from "@solid-primitives/utils";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
 
 const set =
   <T>(setter: Setter<T>) =>
-  (v: T) =>
+  (v: T): void => {
     setter(() => v);
+  };
 
 const callbackWith = <A, T>(fn: (a: A) => T, v: Accessor<A>): (() => T) =>
   fn.length > 0 ? () => fn(untrack(v)) : (fn as () => T);
@@ -36,6 +38,7 @@ const callbackWith = <A, T>(fn: (a: A) => T, v: Accessor<A>): (() => T) =>
  *
  * @param onInvalidate callback that runs when the tracked sources trigger update
  * @param options set computation name for debugging pourposes
+ * - `options.initial` — an array of functions to be run initially and tracked. *(useful for runing code before other pure computations)*
  * @returns track() function
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createPureReaction
@@ -53,31 +56,29 @@ export function createPureReaction(
   onInvalidate: VoidFunction,
   options?: EffectOptions
 ): (tracking: VoidFunction) => void {
-  // current sources tracked by the user
-  const [trackedList, setTrackedList] = createSignal<VoidFunction[]>([]);
-  let addedTracked = false;
-
-  createComputed(() => {
-    // subs to trackedList signal
-    if (!trackedList().length) return;
-
-    // computation triggered by calling track()
-    if (addedTracked) {
-      addedTracked = false;
-      // subs to trackedList's items
-      trackedList().forEach(tracking => tracking());
-    }
-    // computation triggered by tracked sources
-    else {
-      setTrackedList([]);
-      untrack(onInvalidate);
-    }
-  }, options);
+  const owner = getOwner()!;
+  const disposers: VoidFunction[] = [];
+  onCleanup(() => {
+    for (const fn of disposers) fn();
+    disposers.length = 0;
+  });
+  let trackers = 0;
 
   // track()
   return tracking => {
-    addedTracked = true;
-    setTrackedList(p => [...p, tracking]);
+    trackers++;
+    createRoot(dispose => {
+      disposers.push(dispose);
+      let init = true;
+      createComputed(() => {
+        if (init) {
+          init = false;
+          return tracking();
+        }
+        if (--trackers === 0) untrack(onInvalidate);
+        dispose();
+      }, options);
+    }, owner);
   };
 }
 
@@ -175,14 +176,22 @@ export function createDebouncedMemo<T>(
   timeoutMs: number,
   options: MemoOptionsWithValue<T | undefined> = {}
 ): Accessor<T> {
-  const [state, setState] = createSignal(options.value, options);
+  let onInvalidate: VoidFunction = noop;
+  const track = createPureReaction(() => onInvalidate());
+  const [state, setState] = createSignal(
+    (() => {
+      let v!: T;
+      track(() => (v = calc(options.value)));
+      return v;
+    })(),
+    options
+  );
   const fn = debounce(() => track(() => setState(calc)), timeoutMs);
-  const track = createPureReaction(() => {
+  onInvalidate = () => {
     fn();
     track(() => calc(state()));
-  }, options);
-  track(() => setState(calc));
-  return state as Accessor<T>;
+  };
+  return state;
 }
 
 /**
@@ -212,11 +221,18 @@ export function createThrottledMemo<T>(
   timeoutMs: number,
   options: MemoOptionsWithValue<T | undefined> = {}
 ): Accessor<T> {
-  const [state, setState] = createSignal(options.value, options);
-  const [fn] = throttle(() => track(() => setState(calc)), timeoutMs);
-  const track = createPureReaction(fn, options);
-  track(() => setState(calc));
-  return state as Accessor<T>;
+  let onInvalidate: VoidFunction = noop;
+  const track = createPureReaction(() => onInvalidate());
+  const [state, setState] = createSignal(
+    (() => {
+      let v!: T;
+      track(() => (v = calc(options.value)));
+      return v;
+    })(),
+    options
+  );
+  onInvalidate = throttle(() => track(() => setState(calc)), timeoutMs);
+  return state;
 }
 
 /**
@@ -304,31 +320,50 @@ export function createLazyMemo<T>(
   value?: T,
   options?: MemoOptions<T>
 ): Accessor<T> {
-  let memo: Accessor<T> | undefined;
-  /** number of places where the state is being actively observed */
-  let listeners = 0;
   /** original root in which the primitive was initially run */
-  const owner = getOwner() as Owner;
+  const owner = getOwner() ?? undefined;
+  /** number of places where the state is being tracked */
+  let listeners = 0;
+  /** lastly calculated value */
+  let lastest: T | undefined = value;
+  /** does the value need to be recalculated? — for reading outside of tracking scopes */
+  let dirty = true;
+  let memo: Accessor<T> | undefined;
+  let dispose: VoidFunction | undefined;
+  onCleanup(() => dispose?.());
 
-  // prettier-ignore
-  // memo is recreated every time it's being read, and the previous one is derailed
-  // memo disables itself once computation happend without anyone listening
-  const recreateMemo = () => runWithOwner(owner as Owner, () => {
-    memo = createMemo(prev => {
-      if (listeners) return calc(prev);
-      memo = undefined;
-      return prev as T;
-    }, value, options);
-  });
+  // marks the lastest value as dirty if the sources updated
+  const track = createPureReaction(() => (dirty = !memo));
 
-  // wrapped signal accessor
   return () => {
-    if (getOwner()) {
-      listeners++;
-      onCleanup(() => listeners--);
+    // path for access outside of tracking scopes
+    if (!getListener()) {
+      if (memo) return memo();
+      if (dirty) track(() => (lastest = calc(lastest)));
+      dirty = false;
+      return lastest!;
     }
-    if (!memo) recreateMemo();
-    return (memo as Accessor<T>)();
+
+    listeners++;
+    onCleanup(() => listeners--);
+
+    if (!memo) {
+      createRoot(_dispose => {
+        dispose = _dispose;
+        memo = createMemo(
+          () => {
+            if (listeners) return (lastest = calc(lastest));
+            dispose!();
+            dispose = memo = undefined;
+            return lastest!;
+          },
+          lastest,
+          options
+        );
+      }, owner);
+    }
+
+    return memo!();
   };
 }
 

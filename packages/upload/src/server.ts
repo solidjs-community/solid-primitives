@@ -1,15 +1,20 @@
-import { noop, asAccessor } from "@solid-primitives/utils";
-import { CreateFileUploaderOptions } from ".";
+import { noop } from "@solid-primitives/utils";
 import * as api from "./index";
 
-const createFileUploader: typeof api.createFileUploader = (options?: CreateFileUploaderOptions) => {
-  return {
-    files: noop,
-    selectFiles: noop,
-    handleFilesInput: noop,
-    removeFile: noop,
-    clearFiles: noop
-  };
-};
+export const createFileUploader: typeof api.createFileUploader = () => ({
+  files: () => [],
+  selectFiles: noop,
+  handleFilesInput: noop,
+  removeFile: noop,
+  clearFiles: noop
+});
 
-export { createFileUploader };
+export const createDropzone: typeof api.createDropzone = () => ({
+  files: () => [],
+  isDragging: () => false,
+  setRef: noop,
+  clearFiles: noop,
+  removeFile: noop
+});
+
+export const fileUploader: typeof api.fileUploader = noop;

@@ -1,17 +1,16 @@
 import { Rerun } from "../src";
-import { Component, createSignal } from "solid-js";
+import { ParentComponent, VoidComponent, createSignal } from "solid-js";
 import { Transition } from "solid-transition-group";
-import { Fn } from "@solid-primitives/utils";
 
 const base = { opacity: 1, transform: "translate(0)" };
 const options = { duration: 300 };
-const animateIn = (el: Element, done: Fn) => {
+const animateIn = (el: Element, done: VoidFunction) => {
   el.animate([{ opacity: 0, transform: "translate(12px)" }, base], options).finished.then(done);
 };
-const animateOut = (el: Element, done: Fn) =>
+const animateOut = (el: Element, done: VoidFunction) =>
   el.animate([base, { opacity: 0, transform: "translate(-12px)" }], options).finished.then(done);
 
-const Button: Component<{ onClick: Fn }> = props => {
+const Button: ParentComponent<{ onClick: VoidFunction }> = props => {
   console.log("new button");
 
   return (
@@ -21,7 +20,7 @@ const Button: Component<{ onClick: Fn }> = props => {
   );
 };
 
-const App: Component = () => {
+const App: VoidComponent = () => {
   const [count, setCount] = createSignal(0);
 
   return (

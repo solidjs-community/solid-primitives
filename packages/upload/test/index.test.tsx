@@ -10,8 +10,8 @@ test("file upload", () => {
     const { files: file, selectFiles: selectFile } = createFileUploader();
     const { files, selectFiles } = createFileUploader({ multiple: true });
 
-    assert.is(file(), undefined);
-    assert.is(files(), undefined);
+    assert.equal(file(), []);
+    assert.equal(files(), []);
     dispose();
   });
 });
