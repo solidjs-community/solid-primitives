@@ -1,36 +1,32 @@
 import { createVisibilityObserver } from "../src";
-import { Component, createEffect, createSignal, For, onMount, Show } from "solid-js";
+import { Component, For } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
 
 const App: Component = () => {
-  let ref!: HTMLDivElement;
-
-  // const [visible, setVisible] = createSignal(false);
-
-  // const io = new IntersectionObserver(([entry]) => {
-  //   setVisible(entry.isIntersecting);
-  // });
-  // onMount(() => {
-  //   io.observe(ref);
-  // });
-
-  const [visible] = createVisibilityObserver(() => ref, { once: true });
-
-  createEffect(() => {
-    console.log(visible());
-  });
-
+  const list = [...new Array(25)];
   return (
-    <div class="box-border p-24 w-full min-h-screen overflow-hidden bg-indigo-800 text-white">
-      <div class="w-full h-300vh">
-        {/* <button onclick={() => io.disconnect()}>disconnect</button>
-        <button onclick={() => io.observe(ref)}>observe</button> */}
-        <div ref={ref} class="bg-orange-700 w-32 h-24"></div>
+    <div class="flex justify-center items-center box-border w-full h-screen overflow-hidden bg-gray-900">
+      <div class="flex flex-col items-center">
+        <div class="h-100 w-100 rounded-lg shadow-lg overflow-scroll bg-white">
+          <For each={list}>
+            {() => {
+              let ref: HTMLDivElement;
+              const [isVisible] = createVisibilityObserver(() => ref || undefined);
+              return (
+                <div
+                  ref={el => (ref = el)}
+                  class="h-20 flex justify-center transition duration-1500 rounded-lg m-5 text-white items-center"
+                  classList={{
+                    "bg-slate-500 scale-x-75": !isVisible(),
+                    "bg-blue-900": isVisible()
+                  }}
+                />
+              );
+            }}
+          </For>
+        </div>
       </div>
-      {/* <For each={Array.from({length: 20})}>
-        
-      </For> */}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { filterInstance, remove, removeItems } from "@solid-primitives/immutable";
-import { createSubRoot } from "@solid-primitives/rootless";
+import { createBranch } from "@solid-primitives/rootless";
 import {
   access,
   asArray,
@@ -10,7 +10,7 @@ import {
 } from "@solid-primitives/utils";
 import {
   Accessor,
-  children as _children,
+  children,
   createComputed,
   createMemo,
   createSignal,
@@ -32,8 +32,54 @@ declare module "solid-js" {
 }
 export type E = JSX.Element;
 
-export type ResolvedJSXElement = Many<Exclude<JSX.Element, JSX.ArrayElement | JSX.FunctionElement>>;
-export const children = _children as (fn: Accessor<JSX.Element>) => Accessor<ResolvedJSXElement>;
+/**
+ * Component properties with types for `ref`
+ * ```ts
+ * {
+ *    ref?: Element | ((el: Element) => void);
+ * }
+ * ```
+ */
+export interface RefProps<T extends Element> {
+  ref?: T | ((el: T) => void);
+}
+
+/**
+ * Type of resolved JSX elements provided by Solid's `children` helper.
+ */
+export type ResolvedChildren = ReturnType<ReturnType<typeof children>>;
+
+/**
+ * Utility for using jsx refs both for local variables and providing it to the `props.ref` for component consumers.
+ * @param setRef use this to set local variables
+ * @param propsRef for forwarding the ref to `props.ref`
+ * @example
+ * ```tsx
+ * interface ButtonProps {
+ *    ref?: HTMLButtonElement | ((el: HTMLButtonElement) => void);
+ * }
+ * const Button = (props: ButtonProps) => {
+ *    let ref!: HTMLButtonElement
+ *    onMount(() => {
+ *        // use the local ref
+ *    })
+ *    return <button ref={mergeRefs(el => (ref = el), props.ref)} />
+ * }
+ *
+ * // in consumer's component:
+ * let ref!: HTMLButtonElement
+ * <Button ref={ref} />
+ * ```
+ */
+export function mergeRefs<T extends Element>(
+  setRef: (el: T) => void,
+  propsRef: T | ((el: T) => void) | undefined
+): (el: T) => void {
+  return el => {
+    setRef(el);
+    (propsRef as ((el: T) => void) | undefined)?.(el);
+  };
+}
 
 const mutableRemove = <T>(list: T[], item: T): void => {
   const index = list.indexOf(item);
@@ -75,23 +121,6 @@ export const getAddedItems = <T>(prevList: readonly T[], list: readonly T[]): T[
  */
 export const getRemovedItems = <T>(prevList: readonly T[], list: readonly T[]): T[] =>
   prevList.filter(item => !list.includes(item));
-
-// export type ElementTagName = keyof JSX.IntrinsicElements;
-// export type ElementOfTagName<
-//   T extends ElementTagName,
-//   Ref = JSX.IntrinsicElements[T]["ref"]
-// > = Exclude<Ref extends (el: any) => void ? Parameters<Ref>[0] : Ref, undefined>;
-
-// export function isElement(v: any): v is Element;
-// export function isElement<T extends ElementTagName>(v: any, type: T): v is ElementOfTagName<T>;
-// export function isElement(v: any, type?: string): boolean {
-//   return v instanceof Element && (!type || type === v.tagName.toLowerCase());
-// }
-
-// cannot be used, because of typescript not unwrapping this type, so it doesn't give proper feedback
-type SignalElementFrom<S, T extends typeof Element[] = [typeof Element]> = Accessor<
-  ExtractIfPossible<S, InstanceType<ItemsOf<T>>>[]
->;
 
 /**
  * Reactive signal that filters out non-element items from a signal array.
@@ -225,7 +254,7 @@ export function mapRemoved<T>(
   };
 
   function mapRemovedElement(list: T[], item: T, i: number) {
-    createSubRoot(dispose => {
+    createBranch(dispose => {
       let signal: Accessor<T | undefined>, mapped: T;
       // create index signal
       if (indexes) {
@@ -294,9 +323,9 @@ export function mapRemoved<T>(
  * ```
  */
 export const Children = (props: {
-  get: (resolved: ResolvedJSXElement) => void;
+  get: (resolved: ResolvedChildren) => void;
   children: JSX.Element;
-}): Accessor<ResolvedJSXElement> => {
+}): Accessor<ResolvedChildren> => {
   const resolved = children(() => props.children);
   createComputed(on(resolved, props.get));
   onCleanup(() => props.get(undefined));
@@ -317,7 +346,7 @@ export const Refs = <E extends Element>(props: {
   removed?: (els: E[]) => void;
   onChange?: (changed: { refs: E[]; added: E[]; removed: E[] }) => void;
   children: JSX.Element;
-}): Accessor<ResolvedJSXElement> => {
+}): Accessor<ResolvedChildren> => {
   const resolved = children(() => props.children);
 
   // calculate changed elements only if user listens for it
@@ -356,7 +385,7 @@ export const Ref = <U extends Element>(props: {
   onMount?: (el: U) => void;
   onUnmount?: (el: U) => void;
   children: JSX.Element;
-}): Accessor<ResolvedJSXElement> => {
+}): Accessor<ResolvedChildren> => {
   const resolved = children(() => props.children);
   let prev: U | undefined;
 

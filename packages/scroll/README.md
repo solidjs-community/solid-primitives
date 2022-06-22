@@ -7,11 +7,12 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/scroll?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/scroll)
 [![size](https://img.shields.io/npm/v/@solid-primitives/scroll?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/scroll)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Helpful primitives to manage browser scrolling.
+Reactive primitives to react to element/window scrolling.
 
-`createScrollObserver` - Helpful monitor that reports the current position of an element or window.
+- [`createScrollPosition`](#createScrollPosition) - Reactive primitive providing a store-like object with current scroll position of specified target.
+- [`useWindowScrollPosition`](#useWindowScrollPosition) - Returns a reactive object with current window scroll position.
 
 ## Installation
 
@@ -21,27 +22,110 @@ npm install @solid-primitives/scroll
 yarn add @solid-primitives/scroll
 ```
 
-## How to use it
+## `createScrollPosition`
+
+Reactive primitive providing a store-like object with current scroll position of specified target.
+
+### How to use it
 
 ```ts
-const position = createScrollObserver();
+import { createScrollPosition } from "@solid-primitives/scroll";
+
+// target will be window by default
+const windowScroll = createScrollPosition();
+
+createEffect(() => {
+  // returned object is a reactive store-like structure
+  windowScroll.x; // => number
+  windowScroll.y; // => number
+});
 ```
 
-or
+#### With element refs
+
+```tsx
+let ref: HTMLDivElement | undefined;
+
+// pass as function
+const scroll = createScrollPosition(() => ref);
+// or wrap with onMount
+onMount(() => {
+  const scroll = createScrollPosition(ref!);
+});
+
+<div ref={e => (ref = e)} />;
+```
+
+#### Reactive Target
+
+The element target can be a reactive signal.
+
+```tsx
+const [target, setTarget] = createSignal<Element | undefined>(element);
+
+const scroll = createScrollPosition(target);
+
+// if target is undefined, scroll values will be null
+scroll.x; // => number | null
+scroll.y; // => number | null
+
+// update the tracking element
+setTarget(ref);
+
+// disable tracking
+setTarget(undefined);
+```
+
+#### Destructuring
+
+If you are interested in listening to only single axis, you'd still have to access `scroll.y` as a property. To use it as a separate signal, you can wrap it with a function, or use [`destructure`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/destructure#destructure) helper.
 
 ```ts
-let ref;
-const position = createScrollObserver(() => ref);
+const scroll = createScrollPosition();
+const x = () => scroll.x;
+x(); // => number
+
+// or destructure
+
+import { destructure } from "@solid-primitives/destructure";
+const { x, y } = destructure(createScrollPosition());
+x(); // => number
+y(); // => number
 ```
 
-## Demo
+### Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-primitives-scroll-csg7f
+https://codesandbox.io/s/solid-primitives-scroll-xy19c8?file=/index.tsx
 
-### Primitive ideas:
+## `useWindowScrollPosition`
 
-`createScrollTo` - A primitive to support scroll to a target
-`createHashScroll` - A primitive to support scrolling based on a hashtag change
+Returns a reactive object with current window scroll position.
+
+`useWindowScrollPosition` is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive, hence the object instance, signals and event-listeners are shared between dependents, making it more optimized to use in multiple places at once.
+
+```ts
+const scroll = useWindowScrollPosition();
+
+createEffect(() => {
+  console.log(
+    scroll.x, // => number
+    scroll.y //  => number
+  );
+});
+```
+
+## Additional helpers
+
+### `getScrollPosition`
+
+Get an `{ x: number, y: number }` object of element/window scroll position.
+
+## Primitive ideas:
+
+_PRs Welcome :)_
+
+- `createScrollTo` - A primitive to support scroll to a target
+- `createHashScroll` - A primitive to support scrolling based on a hashtag change
 
 ## Changelog
 
@@ -59,5 +143,11 @@ Released new version with CJS and SSR support.
 1.0.5
 
 Updated to Solid 1.3
+
+2.0.0 - **stage-2**
+
+Rename `createScrollObserver` to `createScrollPosition` and add y scroll axis to the returned value, making it a store-like object.
+
+Add `getScrollPosition` as a separately exported helper.
 
 </details>

@@ -43,7 +43,7 @@ const App: Component = () => {
       <h3>Countries:</h3>
       <Show when={countriesData()}>
         <ul>
-          <For each={countriesData().countries}>
+          <For each={countriesData()!.countries}>
             {country => (
               <li>
                 {country.code} - {country.name}
@@ -56,4 +56,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+render(() => <App />, document.getElementById("root")!);

@@ -1,56 +1,51 @@
-import { createEffect, createRoot, Resource } from "solid-js";
+import "./setup";
+import { mockCoordinates } from "./setup";
+import { createRoot, createSignal } from "solid-js";
+import { suite } from "uvu";
+import * as assert from "uvu/assert";
+
 import { createGeolocation, createGeolocationWatcher } from "../src/index";
-import waitForExpect from "wait-for-expect";
 
-export const mockCoordinates = {
-  latitude: 43.65107,
-  longitude: -79.347015
-};
+const testCG = suite("createGeolocation");
 
-describe("createGeolocation", () => {
-  test("test basic geolocation", async () => {
+testCG("test basic geolocation", () =>
+  createRoot(async dispose => {
+    const [location] = createGeolocation();
+    assert.is(location.loading, true);
+    await location.loading;
+    assert.is(location.loading, false);
+    assert.is(location(), mockCoordinates);
+    dispose();
+  })
+);
+
+testCG("test basic geolocation error", () =>
+  createRoot(async dispose => {
+    global.navigator.geolocation.getCurrentPosition = (_, reject: any) => {
+      return reject({ code: 1, message: "GeoLocation error" } as GeolocationPositionError);
+    };
     const [location] = createRoot(() => createGeolocation());
-    expect(location.loading).toBe(true);
-    await waitForExpect(() => {
-      expect(location.loading).toBe(false);
-    });
-    expect(location()).toEqual(mockCoordinates);
-  });
-  test("test basic geolocation error", async () => {
-    const geoSpy = jest.spyOn(navigator.geolocation, "getCurrentPosition");
-    geoSpy.mockImplementation(
-      jest.fn((_, error) =>
-        error!({ code: 1, message: "GeoLocation error" } as GeolocationPositionError)
-      )
-    );
-    const [location] = createRoot(() => createGeolocation());
+    await location();
+    assert.is(location.loading, false);
+    assert.equal(location.error, { code: 1, message: "GeoLocation error" });
+    dispose();
+  })
+);
 
-    await waitForResourceLoad(location);
+testCG.run();
 
-    // expect(location.loading).toBe(false);
-    expect(location.error).toEqual({
-      code: 1,
-      message: "GeoLocation error"
-    });
-    geoSpy.mockRestore();
-  });
-  test("test geolocation watcher value", async () => {
-    const [location] = createRoot(() => createGeolocationWatcher());
-    await waitForExpect(() => {
-      expect(location()).toEqual(mockCoordinates);
-    });
-  });
-});
+const testCGW = suite("createGeolocation");
 
-async function waitForResourceLoad(resource: Resource<any>) {
-  await new Promise<void>(resolve => {
-    createRoot(stop => {
-      createEffect(() => {
-        if (!resource.loading) {
-          resolve();
-          stop();
-        }
-      });
-    });
-  });
-}
+testCGW("test basic geolocation", () =>
+  createRoot(async dispose => {
+    const [enabled, setEnabled] = createSignal(false);
+    const watcher = createGeolocationWatcher(enabled);
+    assert.is(watcher.location, null);
+    assert.is(watcher.error, null);
+    await setEnabled(true);
+    assert.is(watcher.location, mockCoordinates);
+    dispose();
+  })
+);
+
+testCGW.run();
