@@ -77,7 +77,7 @@ function copyToClipboard(el: Element, options: () => CopyToClipboardOptions | tr
 
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-primitives-clipboard-g14dh?file=/src/clipboard.ts
+You may view a working example here: https://stackblitz.com/edit/vitejs-vite-okxns7
 
 ## Changelog
 
