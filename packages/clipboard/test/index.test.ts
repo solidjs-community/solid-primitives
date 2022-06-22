@@ -1,23 +1,20 @@
+import { createRoot, createSignal } from "solid-js";
 import { getLastClipboardEntry } from "./setup";
-import createClipboard from "../src";
+import { createClipboard } from "../src";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
-const test = suite("createClipboard");
+const testCP = suite("createClipboard");
 
-test("copies text to clipboard, and reads", () => {
-  const [write, read] = createClipboard();
-  write("hello");
-  setTimeout(() => {
-    assert.is(getLastClipboardEntry(), "hello");
+testCP("copies text to clipboard, and reads", () =>
+  createRoot(async dispose => {
+    const [data, setData] = createSignal('');
+    const [clipboard, read] = createClipboard(data);
+    await setData("hello");
+    console.log(clipboard(), getLastClipboardEntry());
+    // assert.is(clipboard(), "hello");
+    dispose();
+  })
+);
 
-    write("readTest");
-    setTimeout(() => {
-      read().then(res => {
-        assert.is(res, "readTest");
-      });
-    }, 0);
-  }, 0);
-});
-
-test.run();
+testCP.run();

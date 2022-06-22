@@ -29,13 +29,35 @@ A basic non-reactive primitive that makes accessing the clipboard easy. Note tha
 const [write, read, newItem] = makeClipboard();
 ```
 
+#### Definition
+
+```ts
+function makeClipboard(): [
+  write: ClipboardSetter,
+  read: () => Promise<ClipboardItems | undefined>,
+  newItem: NewClipboardItem
+];
+```
+
 ### createClipboard
 
 Clipboard exports a read and write function. Note the write function is exported first for convenience as the most common use case for this primitive.
 
 ```ts
-const [setClipboard, clipboard] = createClipboard();
-setClipboard("foobar");
+const [data, setData] = createSignal('Hello);
+const [clipboard, refresh] = createClipboard(data);
+setData("foobar");
+console.log(clipboard);
+```
+
+Note: The primitive binds and listens for `clipboardchange` meaning that clipboard changes should automatically propagate. The implementation however is buggy on certain browsers.
+
+#### Definition
+
+```ts
+function createClipboard(
+  data: Accessor<string | ClipboardItem[]>
+): [clipboard: Resource<ClipboardItems | undefined>, read: VoidFunction];
 ```
 
 ### copyToClipboard
@@ -45,6 +67,12 @@ You can also use clipboard as a convenient directive for setting the clipboard v
 ```ts
 import { copyToClipboard } from "@solid-primitives/clipboard";
 <input type="text" use:copyToClipboard={{ highlight: true }} />;
+```
+
+#### Definition
+
+```ts
+function copyToClipboard(el: Element, options: () => CopyToClipboardOptions | true);
 ```
 
 ## Demo
@@ -71,5 +99,9 @@ Upgraded to Solid 1.3
 1.3.0
 
 Update clipboard to the new Primitives project structure.
+
+1.4.0
+
+Add `make` and separate `create` primitives to follow new library standards.
 
 </details>

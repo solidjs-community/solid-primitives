@@ -1,4 +1,4 @@
-import { Accessor, createSignal, on, onMount, onCleanup, createEffect } from "solid-js";
+import { Accessor, createResource, Resource, on, onMount, onCleanup, createEffect } from "solid-js";
 
 export type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
 export type NewClipboardItem = (data: ClipboardItemData, type: string) => ClipboardItem;
@@ -31,14 +31,14 @@ declare module "solid-js" {
  */
 export const makeClipboard = (): [
   write: ClipboardSetter,
-  read: () => Promise<ClipboardItems>,
+  read: () => Promise<ClipboardItems | undefined>,
   newItem: NewClipboardItem
 ] => {
   const read = async () => await navigator.clipboard.read();
-  const write: ClipboardSetter = data =>
+  const write: ClipboardSetter = async data =>
     typeof data === "string"
-      ? navigator.clipboard.writeText(data)
-      : navigator.clipboard.write(data);
+      ? await navigator.clipboard.writeText(data)
+      : await navigator.clipboard.write(data);
   const newItem: NewClipboardItem = (data, type) => new ClipboardItem({ [type]: data });
   return [write, read, newItem];
 };
@@ -56,20 +56,15 @@ export const makeClipboard = (): [
  * ```
  */
 export const createClipboard = (data: Accessor<string | ClipboardItem[]>): [
-  clipboard: Accessor<ClipboardItems>,
-  read: () => Promise<ClipboardItem[]>
+  clipboard: Resource<ClipboardItems | undefined>,
+  read: VoidFunction
  ] => {
-  const [write, read] = makeClipboard();
-  const [clipboard, setClipboard] = createSignal<ClipboardItems>([]);
-  const listener = async () => setClipboard(await read());
-  onMount(() => navigator.clipboard.addEventListener("clipboardchange", listener));
-  onCleanup(() => navigator.clipboard.removeEventListener("clipboardchange", listener));
-  createEffect(on(data, () => {
-    console.log('yes', data());
-    write(data());
-  }), { defer: true });
-  listener();
-  return [clipboard,read];
+  const [write, readClipboard] = makeClipboard();
+  const [clipboard, { refetch }] = createResource<ClipboardItems | undefined>(readClipboard);
+  onMount(() => navigator.clipboard.addEventListener("clipboardchange", refetch));
+  onCleanup(() => navigator.clipboard.removeEventListener("clipboardchange", refetch));
+  createEffect(on(data, () => write(data()), { defer: true }));
+  return [clipboard, refetch];
 };
 
 /**
