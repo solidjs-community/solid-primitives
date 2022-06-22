@@ -1,14 +1,16 @@
-import { Component, createSignal, Suspense, For, createEffect } from "solid-js";
-import { createClipboard, copyToClipboard } from "../src";
+import { Component, createSignal, Suspense, For, Switch, Match } from "solid-js";
+import { createClipboard, copyToClipboard, newItem } from "../src";
 import { render } from "solid-js/web";
+import img from "./img.png";
 import "uno.css";
 
 copyToClipboard;
 
 const App: Component = () => {
   let ref: HTMLInputElement;
-  const [data, setClipboard] = createSignal("");
+  const [data, setClipboard] = createSignal<string | ClipboardItem[]>("");
   const [clipboard, read] = createClipboard(data);
+
   return (
     <div class="flex justify-center items-center box-border w-full h-screen overflow-hidden bg-gray-900">
       <div class="flex flex-col items-center">
@@ -29,20 +31,28 @@ const App: Component = () => {
               class="mt-2 font-semibold p-3 text-white bg-blue-700 hover:bg-blue-600 transition cursor-pointer border-none rounded-md"
               use:copyToClipboard
             >
-              Click me!
+              Copy text
             </button>
+            <button
+              class="mt-2 font-semibold p-3 text-white bg-blue-700 hover:bg-blue-600 transition cursor-pointer border-none rounded-t-md"
+              onClick={() => setClipboard(newItem(img, "img/png"))}
+            >
+              Copy image
+            </button>
+            <img class="border-4 rounded-b overflow-hidden border-blue-700" src={img} />
           </div>
           <div class="flex rounded-lg overflow-hidden text-center bg-white">
             <div class="w-full p-5">
               <Suspense fallback={"Loading..."}>
                 <For each={clipboard()}>
-                  {item => {
-                    const [result, setResult] = createSignal<string>("");
-                    createEffect(async () =>
-                      setResult(await (await item.getType("text/plain")).text())
-                    );
-                    return <div>{result()}</div>;
-                  }}
+                  {item => (
+                    <Switch>
+                      <Match when={item.type == "text/plain"}>{item.text()}</Match>
+                      <Match when={item.blob() && item.type == "image/png"}>
+                        <img src={URL.createObjectURL(item.blob())} />
+                      </Match>
+                    </Switch>
+                  )}
                 </For>
               </Suspense>
             </div>

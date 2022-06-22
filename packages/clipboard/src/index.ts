@@ -1,4 +1,4 @@
-import { Accessor, createResource, Resource, on, onMount, onCleanup, createEffect } from "solid-js";
+import { Accessor, createResource, Resource, on, onMount, onCleanup, createEffect, createSignal } from "solid-js";
 
 export type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
 export type NewClipboardItem = (data: ClipboardItemData, type: string) => ClipboardItem;
@@ -15,6 +15,9 @@ declare module "solid-js" {
     }
   }
 }
+
+
+export const newItem: NewClipboardItem = (data, type) => new ClipboardItem({ [type]: data });
 
 /**
  * Generates a simple non-reactive clipbaord primitive for reading and writing.
@@ -39,7 +42,6 @@ export const makeClipboard = (): [
     typeof data === "string"
       ? await navigator.clipboard.writeText(data)
       : await navigator.clipboard.write(data);
-  const newItem: NewClipboardItem = (data, type) => new ClipboardItem({ [type]: data });
   return [write, read, newItem];
 };
 
@@ -56,11 +58,40 @@ export const makeClipboard = (): [
  * ```
  */
 export const createClipboard = (data: Accessor<string | ClipboardItem[]>): [
-  clipboard: Resource<ClipboardItems | undefined>,
-  read: VoidFunction
+  clipboardItems: Resource<{
+    type: string;
+    text: () => string;
+    blob: () => Blob;
+  }[]>,
+  refetch: VoidFunction
  ] => {
   const [write, readClipboard] = makeClipboard();
-  const [clipboard, { refetch }] = createResource<ClipboardItems | undefined>(readClipboard);
+  const [clipboard, { refetch }] = createResource<any>(
+    async () => {
+      const items = await (readClipboard()) || [];
+      return items.map((item) => {
+        const [data, setData] = createSignal<string | Blob | undefined>(undefined);
+        const getType = () => item.types[item.types.length - 1];
+        return {
+          async load(mime: string) {
+            const value = await item.getType(mime);
+            setData(value.type == 'text/plain' ? await value.text() : value);
+          },
+          get type(): string {
+            return getType();
+          },
+          get text(): Accessor<string | Blob | undefined> {
+            this.load('text/plain');
+            return data;
+          },
+          get blob(): Accessor<string | Blob | undefined> {
+            this.load(getType());
+            return data;
+          }
+        }
+      });
+    }
+  );
   onMount(() => navigator.clipboard.addEventListener("clipboardchange", refetch));
   onCleanup(() => navigator.clipboard.removeEventListener("clipboardchange", refetch));
   createEffect(on(data, () => write(data()), { defer: true }));
