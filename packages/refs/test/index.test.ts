@@ -7,7 +7,8 @@ import {
   getChangedItems,
   getRemovedItems,
   mapRemoved,
-  refs
+  refs,
+  resolveElements
 } from "../src";
 import { push, remove, removeItems } from "@solid-primitives/immutable";
 
@@ -213,3 +214,34 @@ testMapRemoved("index signal", () =>
 );
 
 testMapRemoved.run();
+
+const testResolve = suite("resolveElements");
+
+testResolve("resolves elements", () => {
+  const el1 = document.createElement("div");
+  const el2 = document.createElement("div");
+  const el3 = document.createElement("div");
+  const el4 = document.createElement("div");
+  const el5 = document.createElement("div");
+  const el6 = document.createElement("div");
+
+  assert.equal(resolveElements(el1), el1);
+  assert.equal(resolveElements("hello"), null);
+  assert.equal(
+    resolveElements(() => el1),
+    el1
+  );
+  assert.equal(resolveElements([el1, () => undefined]), [el1]);
+  assert.equal(
+    resolveElements([
+      el1,
+      () => undefined,
+      () => () => el2,
+      [el3, () => el4, () => 123, (a: number) => el5],
+      el6
+    ]),
+    [el1, el2, el3, el4, el6]
+  );
+});
+
+testResolve.run();

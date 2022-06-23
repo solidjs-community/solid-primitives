@@ -123,6 +123,32 @@ export const getRemovedItems = <T>(prevList: readonly T[], list: readonly T[]): 
   prevList.filter(item => !list.includes(item));
 
 /**
+ * Similarly to `children()` helper from `solid-js` will resolve provided {@link value} to a flat list of HTML elements or a single element or `null`. But doesn't create a computation.
+ * @param value value to be resolved
+ * @returns ```ts
+ * HTMLElement | HTMLElement[] | null
+ * ```
+ */
+export function resolveElements(value: unknown): HTMLElement | HTMLElement[] | null {
+  let resolved = getResolvedElements(value);
+  if (Array.isArray(resolved) && !resolved.length) resolved = null;
+  return resolved;
+}
+function getResolvedElements(value: unknown): HTMLElement | HTMLElement[] | null {
+  if (typeof value === "function" && !value.length) return getResolvedElements(value());
+  if (Array.isArray(value)) {
+    const results: HTMLElement[] = [];
+    for (const item of value) {
+      const result = getResolvedElements(item);
+      if (result)
+        Array.isArray(result) ? results.push.apply(results, result) : results.push(result);
+    }
+    return results;
+  }
+  return value instanceof HTMLElement ? value : null;
+}
+
+/**
  * Reactive signal that filters out non-element items from a signal array.
  * @param fn Array signal
  * @returns Array signal
