@@ -9,7 +9,7 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/clipboard?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/clipboard)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Primitive to that make reading and writing to single or multiple values to clipboard easy. It also comes with a convenient directive to write to clipboard.
+This primitive is designed to that make reading and writing to [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API) easy. It also comes with a convenient directive to write to clipboard.
 
 ## Installation
 
@@ -41,13 +41,26 @@ function makeClipboard(): [
 
 ### createClipboard
 
-Clipboard exports a read and write function. Note the write function is exported first for convenience as the most common use case for this primitive.
+This primitive provides full facilities for reading and writing to the clipboard. It allows for writing to clipboard via exported function or input signal. It wraps the Clipboard Async API with a resource and supplies reactive helpers to make pulling from the clipboard easy.
 
 ```ts
 const [data, setData] = createSignal('Hello);
 const [clipboard, refresh] = createClipboard(data);
 setData("foobar");
-console.log(clipboard);
+return (
+  <Suspense fallback={"Loading..."}>
+    <For each={clipboard()}>
+      {item => (
+        <Switch>
+          <Match when={item.type == "text/plain"}>{item.text()}</Match>
+          <Match when={item.blob() && item.type == "image/png"}>
+            <img class="w-full" src={URL.createObjectURL(item.blob())} />
+          </Match>
+        </Switch>
+      )}
+    </For>
+  </Suspense>
+)
 ```
 
 Note: The primitive binds and listens for `clipboardchange` meaning that clipboard changes should automatically propagate. The implementation however is buggy on certain browsers.
@@ -56,23 +69,66 @@ Note: The primitive binds and listens for `clipboardchange` meaning that clipboa
 
 ```ts
 function createClipboard(
-  data: Accessor<string | ClipboardItem[]>
-): [clipboard: Resource<ClipboardItems | undefined>, read: VoidFunction];
+  data?: Accessor<string | ClipboardItem[]>,
+  setInitial?: boolean
+): [
+  clipboardItems: Resource<
+    {
+      type: string;
+      text: Accessor<string>;
+      blob: Accessor<Blob>;
+    }[]
+  >,
+  refetch: VoidFunction,
+  write: ClipboardSetter
+];
 ```
 
 ### copyToClipboard
 
-You can also use clipboard as a convenient directive for setting the clipboard value.
+You can also use clipboard as a convenient directive for setting the clipboard value. You can override the default value and the setter with the options parameter.
 
 ```ts
 import { copyToClipboard } from "@solid-primitives/clipboard";
-<input type="text" use:copyToClipboard={{ highlight: true }} />;
+<input type="text" use:copyToClipboard />;
 ```
 
 #### Definition
 
 ```ts
-function copyToClipboard(el: Element, options: () => CopyToClipboardOptions | true);
+function copyToClipboard(
+  el: Element,
+  options: MaybeAccessor<{
+    value?: any;
+    setter?: ClipboardSetter;
+    highlight?: HighlightModifier;
+  }>
+);
+```
+
+#### Highlighters/Range Selection
+
+In some scenarios you'll want to highlight or select a range of text. copyToClipboard has an option to specify the type of highlighting you'd like. Use either `input` or `element` based on the type you're making selectable.
+
+```ts
+import { copyToClipboard, input, element } from "@solid-primitives/clipboard";
+<input type="text" use:copyToClipboard={{ highlight: input() }} />;
+<div use:copyToClipboard={{ highlight: element(5, 10) }} />;
+```
+
+### newItem
+
+This package ships with newItem which is a helper method for creating new ClipboardItem types.
+
+```ts
+import { newItem } from "@solid-primitives/clipboard";
+write([newItem("image/png", await image.blob())]);
+```
+
+#### Definition
+
+```ts
+function newItem(type: string, data: ClipboardItemData): ClipboardItem;
 ```
 
 ## Demo
@@ -102,6 +158,6 @@ Update clipboard to the new Primitives project structure.
 
 1.4.0
 
-Add `make` and separate `create` primitives to follow new library standards.
+Add `make` and separate `create` primitives to follow new library standards. Improved createClipboard with better reactive pattern.
 
 </details>

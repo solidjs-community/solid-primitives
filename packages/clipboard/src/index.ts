@@ -1,12 +1,5 @@
 import { Accessor, createResource, Resource, on, onMount, onCleanup, createEffect, createSignal } from "solid-js";
-
-export type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
-export type NewClipboardItem = (data: ClipboardItemData, type: string) => ClipboardItem;
-export type CopyToClipboardOptions = {
-  value?: any;
-  setter?: ClipboardSetter;
-  highlight?: boolean;
-};
+import { MaybeAccessor, access } from "@solid-primitives/utils";
 
 declare module "solid-js" {
   namespace JSX {
@@ -15,9 +8,6 @@ declare module "solid-js" {
     }
   }
 }
-
-
-export const newItem: NewClipboardItem = (data, type) => new ClipboardItem({ [type]: data });
 
 /**
  * Generates a simple non-reactive clipbaord primitive for reading and writing.
@@ -38,10 +28,11 @@ export const makeClipboard = (): [
   newItem: NewClipboardItem
 ] => {
   const read = async () => await navigator.clipboard.read();
-  const write: ClipboardSetter = async data =>
+  const write: ClipboardSetter = async data => {
     typeof data === "string"
       ? await navigator.clipboard.writeText(data)
       : await navigator.clipboard.write(data);
+  }
   return [write, read, newItem];
 };
 
@@ -49,21 +40,22 @@ export const makeClipboard = (): [
  * Creates a new reactive primitive for managing the clipboard.
  *
  * @param data - Data signal to write to the clipboard.
- * @return Returns a signal representing the body of the clipboard value.
+ * @param deferInitial - Sets the value of the clipboard from the signal. defaulse to false.
+ * @return Returns a resource representing the clipboard elements and children.
  *
- * @example
- * ```ts
- * const [ write, read ] = createClipboard();
- * console.log(await read());
+ * @examplefindmy
+ * const [data, setData] = createSignal('Foo bar');
+ * const [ clipboard, read ] = createClipboard(data);
  * ```
  */
-export const createClipboard = (data: Accessor<string | ClipboardItem[]>): [
+export const createClipboard = (data?: Accessor<string | ClipboardItem[]>, deferInitial?: boolean): [
   clipboardItems: Resource<{
     type: string;
-    text: () => string;
-    blob: () => Blob;
+    text: Accessor<string>;
+    blob: Accessor<Blob>;
   }[]>,
-  refetch: VoidFunction
+  refetch: VoidFunction,
+  write: ClipboardSetter,
  ] => {
   const [write, readClipboard] = makeClipboard();
   const [clipboard, { refetch }] = createResource<any>(
@@ -74,17 +66,17 @@ export const createClipboard = (data: Accessor<string | ClipboardItem[]>): [
         const getType = () => item.types[item.types.length - 1];
         return {
           async load(mime: string) {
-            const value = await item.getType(mime);
-            setData(value.type == 'text/plain' ? await value.text() : value);
+            const blob = await item.getType(mime);
+            setData(blob.type == 'text/plain' ? await blob.text() : blob);
           },
           get type(): string {
             return getType();
           },
-          get text(): Accessor<string | Blob | undefined> {
+          get text() {
             this.load('text/plain');
             return data;
           },
-          get blob(): Accessor<string | Blob | undefined> {
+          get blob() {
             this.load(getType());
             return data;
           }
@@ -94,8 +86,10 @@ export const createClipboard = (data: Accessor<string | ClipboardItem[]>): [
   );
   onMount(() => navigator.clipboard.addEventListener("clipboardchange", refetch));
   onCleanup(() => navigator.clipboard.removeEventListener("clipboardchange", refetch));
-  createEffect(on(data, () => write(data()), { defer: true }));
-  return [clipboard, refetch];
+  if (data) {
+    createEffect(on(data, () => write(data()), { defer: (deferInitial || true) }));
+  }
+  return [clipboard, refetch, write];
 };
 
 /**
@@ -106,39 +100,72 @@ export const createClipboard = (data: Accessor<string | ClipboardItem[]>): [
  * @param options - Options to supply the directive with:
  * - `value` — Value to override the clipboard with.
  * - `write` — Optional write method to use for the clipboard action.
- * - `highlight` — On copy should the text be highlighted, defaults to true.
+ * - `highlight` — The higlight modifier to use for the current element.
  *
  * @example
  * ```ts
  * <input type="text" use:copyToClipboard />
  * ```
  */
-export const copyToClipboard = (el: Element, options: () => CopyToClipboardOptions | true) => {
-  function highlightText(node: Element, start: number, end: number) {
-    const text = node.childNodes[0];
-    const range = new Range();
-    const selection = document.getSelection();
-    range.setStart(text, start);
-    range.setEnd(text, end);
-    selection!.removeAllRanges();
-    selection!.addRange(range);
-  }
+export const copyToClipboard = (el: HTMLElement | HTMLInputElement, options: MaybeAccessor<CopyToClipboardOptions>) => {
   const setValue = () => {
-    const config: CopyToClipboardOptions = typeof options === "object" ? options : {};
-    let data = config.value;
+    const opts: CopyToClipboardOptions = access(options);
+    let data = opts.value;
     if (!data) {
       // @ts-ignore
       data = el[["input", "texfield"].includes(el.tagName.toLowerCase()) ? "value" : "innerHTML"];
     }
     let write;
-    if (config.setter) {
-      write = config.setter;
+    if (opts.setter) {
+      write = opts.setter;
     } else {
-      [write] = makeClipboard();
+      write = async (data: any) => await navigator.clipboard.writeText(data);
     }
-    if (config.highlight !== false) highlightText(el, 0, data.length);
+    if (opts.highlight) opts.highlight(el);
     write!(data);
   };
   el.addEventListener("click", setValue);
   onCleanup(() => el.removeEventListener("click", setValue));
 };
+
+/**
+ * newItem is a wrapper method around creating new ClipboardItems. 
+ *
+ * @param type - The MIME type of the item to create
+ * @param data - Data to populate the item with
+ * @returns Provides a ClipboardItem object
+ */
+export const newItem: NewClipboardItem = (type, data) => new ClipboardItem({ [type]: data });
+
+/**
+ * A modifier that highlights/selects a range on an HTML element.
+ *
+ * @param start - Starting point to highlight
+ * @param end - Ening point to highlight
+ * @returns Returns a modifier function.
+ */
+export const element: Highlighter = (start: number = 0, end: number = 0) => {
+  return (node: HTMLElement) => {
+    const text = node.childNodes[0];
+    const range = new Range();
+    range.setStart(text, start);
+    range.setEnd(text, end);
+    const selection = document.getSelection();
+    selection!.removeAllRanges();
+    selection!.addRange(range);
+  }
+}
+
+/**
+ * A modifier that highlights/selects a range on an HTML input element.
+ *
+ * @param start - Starting point to highlight
+ * @param end - Ening point to highlight
+ * @returns Returns a modifier function.
+ */
+export const input: Highlighter = (start?: number, end?: number) => {
+  return (node: HTMLInputElement) => {
+    node.setSelectionRange(start || 0, end || node.value.length);
+  }
+}
+
