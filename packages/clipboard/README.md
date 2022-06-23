@@ -43,7 +43,7 @@ function makeClipboard(): [
 
 This primitive provides full facilities for reading and writing to the clipboard. It allows for writing to clipboard via exported function or input signal. It wraps the Clipboard Async API with a resource and supplies reactive helpers to make pulling from the clipboard easy.
 
-```ts
+```tsx
 const [data, setData] = createSignal('Hello);
 const [clipboard, refresh] = createClipboard(data);
 setData("foobar");
@@ -110,7 +110,7 @@ function copyToClipboard(
 
 In some scenarios you'll want to highlight or select a range of text. copyToClipboard has an option to specify the type of highlighting you'd like. Use either `input` or `element` based on the type you're making selectable.
 
-```ts
+```tsx
 import { copyToClipboard, input, element } from "@solid-primitives/clipboard";
 <input type="text" use:copyToClipboard={{ highlight: input() }} />;
 <div use:copyToClipboard={{ highlight: element(5, 10) }} />;

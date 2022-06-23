@@ -1,4 +1,13 @@
-import { Accessor, createResource, Resource, on, onMount, onCleanup, createEffect, createSignal } from "solid-js";
+import {
+  Accessor,
+  createResource,
+  Resource,
+  on,
+  onMount,
+  onCleanup,
+  createEffect,
+  createSignal
+} from "solid-js";
 import { MaybeAccessor, access } from "@solid-primitives/utils";
 
 declare module "solid-js" {
@@ -32,7 +41,7 @@ export const makeClipboard = (): [
     typeof data === "string"
       ? await navigator.clipboard.writeText(data)
       : await navigator.clipboard.write(data);
-  }
+  };
   return [write, read, newItem];
 };
 
@@ -48,46 +57,49 @@ export const makeClipboard = (): [
  * const [ clipboard, read ] = createClipboard(data);
  * ```
  */
-export const createClipboard = (data?: Accessor<string | ClipboardItem[]>, deferInitial?: boolean): [
-  clipboardItems: Resource<{
-    type: string;
-    text: Accessor<string>;
-    blob: Accessor<Blob>;
-  }[]>,
+export const createClipboard = (
+  data?: Accessor<string | ClipboardItem[]>,
+  deferInitial?: boolean
+): [
+  clipboardItems: Resource<
+    {
+      type: string;
+      text: Accessor<string>;
+      blob: Accessor<Blob>;
+    }[]
+  >,
   refetch: VoidFunction,
-  write: ClipboardSetter,
- ] => {
+  write: ClipboardSetter
+] => {
   const [write, readClipboard] = makeClipboard();
-  const [clipboard, { refetch }] = createResource<any>(
-    async () => {
-      const items = await (readClipboard()) || [];
-      return items.map((item) => {
-        const [data, setData] = createSignal<string | Blob | undefined>(undefined);
-        const getType = () => item.types[item.types.length - 1];
-        return {
-          async load(mime: string) {
-            const blob = await item.getType(mime);
-            setData(blob.type == 'text/plain' ? await blob.text() : blob);
-          },
-          get type(): string {
-            return getType();
-          },
-          get text() {
-            this.load('text/plain');
-            return data;
-          },
-          get blob() {
-            this.load(getType());
-            return data;
-          }
+  const [clipboard, { refetch }] = createResource<any>(async () => {
+    const items = (await readClipboard()) || [];
+    return items.map(item => {
+      const [data, setData] = createSignal<string | Blob | undefined>(undefined);
+      const getType = () => item.types[item.types.length - 1];
+      return {
+        async load(mime: string) {
+          const blob = await item.getType(mime);
+          setData(blob.type == "text/plain" ? await blob.text() : blob);
+        },
+        get type(): string {
+          return getType();
+        },
+        get text() {
+          this.load("text/plain");
+          return data;
+        },
+        get blob() {
+          this.load(getType());
+          return data;
         }
-      });
-    }
-  );
+      };
+    });
+  });
   onMount(() => navigator.clipboard.addEventListener("clipboardchange", refetch));
   onCleanup(() => navigator.clipboard.removeEventListener("clipboardchange", refetch));
   if (data) {
-    createEffect(on(data, () => write(data()), { defer: (deferInitial || true) }));
+    createEffect(on(data, () => write(data()), { defer: deferInitial || true }));
   }
   return [clipboard, refetch, write];
 };
@@ -107,7 +119,10 @@ export const createClipboard = (data?: Accessor<string | ClipboardItem[]>, defer
  * <input type="text" use:copyToClipboard />
  * ```
  */
-export const copyToClipboard = (el: HTMLElement | HTMLInputElement, options: MaybeAccessor<CopyToClipboardOptions>) => {
+export const copyToClipboard = (
+  el: HTMLElement | HTMLInputElement,
+  options: MaybeAccessor<CopyToClipboardOptions>
+) => {
   const setValue = () => {
     const opts: CopyToClipboardOptions = access(options);
     let data = opts.value;
@@ -129,7 +144,7 @@ export const copyToClipboard = (el: HTMLElement | HTMLInputElement, options: May
 };
 
 /**
- * newItem is a wrapper method around creating new ClipboardItems. 
+ * newItem is a wrapper method around creating new ClipboardItems.
  *
  * @param type - The MIME type of the item to create
  * @param data - Data to populate the item with
@@ -153,8 +168,8 @@ export const element: Highlighter = (start: number = 0, end: number = 0) => {
     const selection = document.getSelection();
     selection!.removeAllRanges();
     selection!.addRange(range);
-  }
-}
+  };
+};
 
 /**
  * A modifier that highlights/selects a range on an HTML input element.
@@ -166,6 +181,5 @@ export const element: Highlighter = (start: number = 0, end: number = 0) => {
 export const input: Highlighter = (start?: number, end?: number) => {
   return (node: HTMLInputElement) => {
     node.setSelectionRange(start || 0, end || node.value.length);
-  }
-}
-
+  };
+};
