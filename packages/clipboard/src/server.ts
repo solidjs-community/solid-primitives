@@ -1,12 +1,17 @@
-import * as api from "./index";
+import { Resource } from "solid-js";
+import * as API from "./index";
 
-const createClipboard: typeof api.default = (...a: any[]) => [
-  () => undefined as unknown as Promise<void>,
-  () => undefined as unknown as Promise<undefined>,
-  {
-    newItem: () => ({} as ClipboardItem)
+export const makeClipboard: typeof API.makeClipboard = () => [
+  async (_data: string | ClipboardItem[]) => {
+    /*noop*/
+  },
+  async () => Promise.resolve(undefined),
+  (_data, _type) => ({} as ClipboardItem)
+];
+export const createClipboard: typeof API.createClipboard = (..._a: any[]) => [
+  {} as Resource<ClipboardItems | undefined>,
+  () => {
+    /** noop */
   }
 ];
-export default createClipboard;
-
-export const copyToClipboard: typeof api.copyToClipboard = () => {};
+export const copyToClipboard: typeof API.copyToClipboard = () => {};

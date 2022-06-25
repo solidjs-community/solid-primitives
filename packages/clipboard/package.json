@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/clipboard",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Primitives for reading and writing to clipboard.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -13,6 +13,7 @@
     "name": "clipboard",
     "stage": 3,
     "list": [
+      "makeClipboard",
       "createClipboard",
       "copyToClipboard"
     ],
@@ -49,19 +50,23 @@
     "solid",
     "primitives"
   ],
+  "testEnvironment": "jsdom",
   "devDependencies": {
-    "jsdom": "^19.0.0",
+    "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-register": "^0.2.5",
-    "tslib": "^2.3.1",
+    "tslib": "^2.4.0",
     "tsup": "^6.1.2",
     "typescript": "^4.7.4",
-    "unocss": "^0.39.1",
-    "uvu": "^0.5.3",
+    "unocss": "^0.39.3",
+    "uvu": "^0.5.4",
     "vite": "^2.9.12",
-    "vite-plugin-solid": "2.2.5"
+    "vite-plugin-solid": "^2.2.6"
   },
   "peerDependencies": {
-    "solid-js": "^1.3.3"
+    "solid-js": "^1.4.4"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "^2.1.1"
   }
 }
