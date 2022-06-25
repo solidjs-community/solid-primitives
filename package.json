@@ -20,16 +20,16 @@
     "@types/fs-extra": "^9.0.13",
     "fs-extra": "^10.1.0",
     "json-to-markdown-table": "^1.0.0",
-    "lerna": "^5.1.4",
+    "lerna": "^5.1.6",
     "markdown-magic": "^2.6.0",
     "prettier": "^2.7.1",
-    "solid-js": "^1.4.3",
+    "solid-js": "^1.4.4",
     "tsup": "^6.1.2",
     "typescript": "^4.7.4",
-    "unocss": "^0.39.1",
+    "unocss": "^0.39.3",
     "vite": "^2.9.12",
     "vite-plugin-solid": "2.2.6",
-    "vitest": "^0.7.7"
+    "vitest": "^0.7.13"
   },
   "packageManager": "pnpm@7.2.1"
 }
