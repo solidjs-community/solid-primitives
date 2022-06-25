@@ -156,7 +156,7 @@ Upgraded to Solid 1.3
 
 Update clipboard to the new Primitives project structure.
 
-1.4.0
+1.4.1
 
 Add `make` and separate `create` primitives to follow new library standards. Improved createClipboard with better reactive pattern.
 
