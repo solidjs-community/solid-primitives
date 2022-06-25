@@ -32,11 +32,11 @@ const [selection, setSelection] = createSelection();
 selection(); // [null, NaN, NaN]
 
 // select the second to fourth letter inside a contentEditable div:
-setSelection([document.querySelector('div[contenteditable]'), 1, 3]);
+setSelection([document.querySelector("div[contenteditable]"), 1, 3]);
 selection(); // [HTMLDivElement, 1, 3]
 
 // change the selection to a cursor behind the fourth letter inside the first input:
-setSelection([document.querySelector('input'), 3, 3]);
+setSelection([document.querySelector("input"), 3, 3]);
 selection(); // [HTMLInputElement, 3, 3]
 
 // remove the selection again:
@@ -51,9 +51,9 @@ import { anyMaskToFn } from "@solid-primitives/input-mask";
 
 const [selection, setSelection] = createSelection();
 
-const ibanMask = anyMaskToFn('aa99999999999999999999');
+const ibanMask = anyMaskToFn("aa99999999999999999999");
 
-const inputMaskHandler = (ev) => {
+const inputMaskHandler = ev => {
   const [node, start, end] = selection();
   if (ev.currentTarget === node) {
     const [value, selection] = ibanMask(node.innerHTML, [start, end]);
@@ -62,7 +62,7 @@ const inputMaskHandler = (ev) => {
   }
 };
 
-return <div contenteditable onInput={inputMaskHandler}></div>
+return <div contenteditable onInput={inputMaskHandler}></div>;
 ```
 
 For more information about input-mask, see its [README.md](../input-mask/README.md).
@@ -72,7 +72,7 @@ For more information about input-mask, see its [README.md](../input-mask/README.
 Since we need it for the selection inside contentEditable elements, there is a function called `getTextNodes` that will return all text nodes inside the given DOM node in their actual order, even if encapsulated by other elements:
 
 ```ts
-import { getTextNodes } from '@solid-primitives/select';
+import { getTextNodes } from "@solid-primitives/select";
 
 getTextNodes(div); // [Text, Text, Text]
 ```

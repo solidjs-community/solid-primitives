@@ -149,12 +149,12 @@ As a convenient additional method, you can also use `createCookieStorageSignal(k
 
 The properties of your `createStorage`/`createAsyncStorage`/`createStorageSignal` props are:
 
-* `api`: the (sync or async) [Storage-like API](https://developer.mozilla.org/de/docs/Web/API/Web_Storage_API), default is localStorage
-* `deserializer` (optional): a deserializer or parser for the stored data
-* `serializer` (optional): a serializer or string converter for the stored data
-* `options` (optional): default options for the set-call of Storage-like API, if supported
-* `prefix` (optional): a prefix for the Storage keys
-* `sync` (optional): if set to false, [event synchronization](https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent) is disabled
+- `api`: the (sync or async) [Storage-like API](https://developer.mozilla.org/de/docs/Web/API/Web_Storage_API), default is localStorage
+- `deserializer` (optional): a deserializer or parser for the stored data
+- `serializer` (optional): a serializer or string converter for the stored data
+- `options` (optional): default options for the set-call of Storage-like API, if supported
+- `prefix` (optional): a prefix for the Storage keys
+- `sync` (optional): if set to false, [event synchronization](https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent) is disabled
 
 ### Tools
 
@@ -200,4 +200,5 @@ Patched peerDependency issue
 1.1.2
 
 Added sync option to disable event synching
+
 </details>

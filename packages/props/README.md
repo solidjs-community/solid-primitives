@@ -36,12 +36,11 @@ To prevent this, add `"@solid-primitives/props"` entry to `noExternal` field in 
 export default defineConfig({
   plugins: [solid()],
   ssr: {
-    // It allows Vite to preprocess the package 
-    noExternal: ["@solid-primitives/props"],
-  },
-})
+    // It allows Vite to preprocess the package
+    noExternal: ["@solid-primitives/props"]
+  }
+});
 ```
-
 
 ## `combineProps`
 
