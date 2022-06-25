@@ -5,15 +5,21 @@ import { createClipboard, copyToClipboard } from "../src";
 import * as assert from "uvu/assert";
 import { suite } from "uvu";
 
-const until = (value): Promise<void> => 
-  new Promise((resolve) => {
+const until = (value): Promise<void> =>
+  new Promise(resolve => {
     const timeout = setTimeout(resolve, 2500);
     createRoot(dispose => {
-      createEffect(on(value, () => {
-        resolve();
-        clearTimeout(timeout);
-        dispose();
-      }, { defer: true }));
+      createEffect(
+        on(
+          value,
+          () => {
+            resolve();
+            clearTimeout(timeout);
+            dispose();
+          },
+          { defer: true }
+        )
+      );
     });
   });
 
@@ -27,7 +33,7 @@ testCP("test initial read values", () =>
     assert.equal(items.length, 1);
     const txt = items[0].text;
     await until(txt);
-    assert.is(txt(), 'InitialValue')
+    assert.is(txt(), "InitialValue");
     dispose();
   })
 );
