@@ -1,9 +1,15 @@
-const { readdirSync, existsSync, readFileSync, writeFileSync } = require("fs");
-const { join } = require("path");
-const markdownMagic = require("markdown-magic");
-const tablemark = require("json-to-markdown-table");
+import { readdirSync, existsSync, readFileSync, writeFileSync } from "fs";
+// @ts-expect-error ts-missing-module
+import tablemark from "json-to-markdown-table";
+import { insertTextBetweenComments, pathTo } from "./utils";
 
-const pathTo = (...path) => join(__dirname, ...path);
+type PackageData = {
+  Name: string;
+  Stage: string | number;
+  Size: string;
+  NPM: string;
+  Primitives: string;
+};
 
 console.log("updateReadme", "Updating README documentation");
 
@@ -17,8 +23,8 @@ const stageShieldBaseURL =
 const stageShieldLink =
   "https://github.com/solidjs-community/solid-primitives#contribution-process";
 
-const categories = {};
-const rootDependencies = [];
+const categories: Record<string, PackageData[]> = {};
+const rootDependencies: string[] = [];
 
 readdirSync(pathTo(`../packages/`)).forEach(name => {
   const dir = pathTo(`../packages/${name}/package.json`);
@@ -38,9 +44,14 @@ readdirSync(pathTo(`../packages/`)).forEach(name => {
       `directory name (${name}) and name in package info ${pkg.primitive.name} do not match`
     );
 
-  const { list, category, stage } = pkg.primitive;
+  const { list, category, stage } = pkg.primitive as {
+    list: string[];
+    category: string;
+    stage: number;
+  };
 
-  const data = {};
+  const data = {} as PackageData;
+
   data.Name = `[${name}](${githubURL}${name}#readme)`;
   // Detect the stage and build size/version only if needed
   if (data.Stage == "X" || data.Stage == 0) {
@@ -60,41 +71,28 @@ readdirSync(pathTo(`../packages/`)).forEach(name => {
 });
 
 const pathToREADME = pathTo("../README.md");
+let readme = readFileSync(pathToREADME).toString();
 
-(async () => {
-  await markdownMagic(pathToREADME, {
-    transforms: {
-      GENERATE_PRIMITIVES_TABLE: () => {
-        return Object.entries(categories).reduce((md, [category, items]) => {
-          // Some MD jousting to get the table to render nicely
-          // with consistent columns
-          md += `|<h4>*${category}*</h4>|\n`;
-          md += tablemark(items, ["Name", "Stage", "Primitives", "Size", "NPM"])
-            .replace("|Name|Stage|Primitives|Size|NPM|\n", "")
-            .replace("|----|----|----|----|----|\n", "");
-          return md;
-        }, "|Name|Stage|Primitives|Size|NPM|\n|----|----|----|----|----|\n");
-      }
-    }
-  });
+// Update Primitives Table
 
-  const readme = readFileSync(pathToREADME).toString();
+const table = Object.entries(categories).reduce((md, [category, items]) => {
+  // Some MD jousting to get the table to render nicely
+  // with consistent columns
+  md += `|<h4>*${category}*</h4>|\n`;
+  md += tablemark(items, ["Name", "Stage", "Primitives", "Size", "NPM"])
+    .replace("|Name|Stage|Primitives|Size|NPM|\n", "")
+    .replace("|----|----|----|----|----|\n", "");
+  return md;
+}, "|Name|Stage|Primitives|Size|NPM|\n|----|----|----|----|----|\n");
 
-  const exec =
-    /(<!-- INSERT-NPM-DOWNLOADS-BADGE:START -->)[.\n\r\S]*(<!-- INSERT-NPM-DOWNLOADS-BADGE:END -->)/g.exec(
-      readme
-    );
-  if (!exec) return console.log("Couldn't find INSERT-NPM-DOWNLOADS-BADGE tag in README.md");
+readme = insertTextBetweenComments(readme, table, "INSERT-PRIMITIVES-TABLE");
 
-  const start = exec.index + exec[1].length;
-  const end = exec.index + exec[0].length - exec[2].length;
+// Update Combined Downloads Badge
 
-  const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://runkit.io/thetarnav/combined-weekly-npm-downloads/1.0.3/${rootDependencies.join(
-    ","
-  )})](https://runkit.com/thetarnav/combined-weekly-npm-downloads)`;
+const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://runkit.io/thetarnav/combined-weekly-npm-downloads/1.0.3/${rootDependencies.join(
+  ","
+)})](https://runkit.com/thetarnav/combined-weekly-npm-downloads)`;
 
-  const newReadme =
-    readme.slice(0, start) + "\r\n" + combinedDownloadsBadge + "\r\n" + readme.slice(end);
+readme = insertTextBetweenComments(readme, combinedDownloadsBadge, "INSERT-NPM-DOWNLOADS-BADGE");
 
-  writeFileSync(pathToREADME, newReadme);
-})();
+writeFileSync(pathToREADME, readme);

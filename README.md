@@ -19,8 +19,7 @@ The goal of Solid Primitives is to wrap client and server side functionality to 
 
 ## Primitives
 
-<!-- ⛔️ AUTO-GENERATED-CONTENT:START (GENERATE_PRIMITIVES_TABLE)
-- Do not remove or modify this section. -->
+<!-- INSERT-PRIMITIVES-TABLE:START -->
 |Name|Stage|Primitives|Size|NPM|
 |----|----|----|----|----|
 |<h4>*Inputs*</h4>|
@@ -84,7 +83,7 @@ The goal of Solid Primitives is to wrap client and server side functionality to 
 |[range](https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#readme)|[![STAGE](https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)|[repeat](https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#repeat)<br />[mapRange](https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#mapRange)<br />[indexRange](https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#indexRange)<br />[Repeat](https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#Repeat)<br />[Range](https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#Range)<br />[IndexRange](https://github.com/solidjs-community/solid-primitives/tree/main/packages/range#IndexRange)|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/range?style=for-the-badge&label=)](https://bundlephobia.com/package/@solid-primitives/range)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/range?style=for-the-badge&label=)](https://www.npmjs.com/package/@solid-primitives/range)|
 |[refs](https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#readme)|[![STAGE](https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)|[mergeRefs](https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#mergeRefs)<br />[elements](https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#elements)<br />[refs](https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#refs)<br />[mapRemoved](https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#mapRemoved)<br />[Children](https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Children)<br />[Refs](https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Refs)<br />[Ref](https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Ref)<br />[unmount](https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#unmount)|[![SIZE](https://img.shields.io/bundlephobia/minzip/@solid-primitives/refs?style=for-the-badge&label=)](https://bundlephobia.com/package/@solid-primitives/refs)|[![VERSION](https://img.shields.io/npm/v/@solid-primitives/refs?style=for-the-badge&label=)](https://www.npmjs.com/package/@solid-primitives/refs)|
 
-<!-- ⛔️ AUTO-GENERATED-CONTENT:END - Do not remove or modify this section. -->
+<!-- INSERT-PRIMITIVES-TABLE:END -->
 
 ## Contribution Process
 
