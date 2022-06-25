@@ -10,7 +10,7 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx}\"",
+    "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx,md}\"",
     "build": "lerna run build --concurrency 4",
     "test": "lerna run test --concurrency 4",
     "new-package": "node ./scripts/new-package",
