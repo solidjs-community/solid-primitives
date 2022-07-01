@@ -4,14 +4,21 @@ import { anyMaskToFn, createInputMask, maskArrayToFn, Selection } from "../src";
 import "uno.css";
 
 const App: Component = () => {
+  // ISO Date
   const isoDateHandler = createInputMask("9999-99-99");
+
+  // Card Expiry Date
   const cardExpiryHandler = createInputMask([/\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/]);
+
+  // IBAN
   const ibanMask = anyMaskToFn("aa99999999999999999999");
   const ibanHandler = createInputMask((value, selection) => {
     const maskOutput = ibanMask(value, selection);
     maskOutput[0] = maskOutput[0].toUpperCase();
     return maskOutput;
   });
+
+  // GoToMeeting
   const potentialNumericId = /^\d{1,3}$|^\d{2,4}-?\d{0,3}$|^\d{2,4}-?\d{2,4}-?\d{0,3}$/;
   const meetingIdMask = anyMaskToFn("999-999-999");
   const meetingNameMask = anyMaskToFn([
@@ -24,6 +31,7 @@ const App: Component = () => {
       : meetingNameMask(value, selection);
   const meetingInputHandler = createInputMask(meetingMask);
 
+  // Hex Color
   const hexMask = maskArrayToFn([/#?/, /[\da-fA-F]{1,6}/]);
   const hexHandler = createInputMask(hexMask);
 

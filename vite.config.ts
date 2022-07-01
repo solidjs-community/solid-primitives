@@ -21,6 +21,10 @@ export const viteConfig = defineConfig({
   ],
   optimizeDeps: {
     exclude: ["@solid-primitives/utils"]
+  },
+  build: {
+    target: "esnext",
+    polyfillDynamicImport: false
   }
 });
 
