@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import { render } from "solid-js/web";
-import { anyMaskToFn, createInputMask, Selection } from "../src";
+import { anyMaskToFn, createInputMask, maskArrayToFn, Selection } from "../src";
 import "uno.css";
 
 const App: Component = () => {
@@ -24,6 +24,9 @@ const App: Component = () => {
       : meetingNameMask(value, selection);
   const meetingInputHandler = createInputMask(meetingMask);
 
+  const hexMask = maskArrayToFn([/#?/, /[\da-fA-F]{1,6}/]);
+  const hexHandler = createInputMask(hexMask);
+
   return (
     <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
       <div class="wrapper-v items-start">
@@ -46,7 +49,7 @@ const App: Component = () => {
           onPaste={isoDateHandler}
         />
         <br />
-        <label for="iban" title="International Banking Accound Number">
+        <label for="iban" title="International Banking Account Number">
           IBAN:
         </label>
         <input
@@ -64,6 +67,15 @@ const App: Component = () => {
           placeholder="000-000-000 or meeting name"
           onInput={meetingInputHandler}
           onPaste={meetingInputHandler}
+        />
+        <br />
+        <label for="hex">Hex:</label>
+        <input
+          type="text"
+          id="hex"
+          placeholder="#000000"
+          onInput={hexHandler}
+          onPaste={hexHandler}
         />
         <br />
       </div>
