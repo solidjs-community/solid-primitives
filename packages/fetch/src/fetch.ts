@@ -10,17 +10,16 @@ import { fetchRequest, Request } from "./request";
 
 export type FetchArgs = [info: RequestInfo] | [info: RequestInfo, init?: RequestInit];
 
-export type DistributeFetcherArgs<
-  FetcherArgs extends any[],
-  ExtraArgs extends any[]
-> = FetcherArgs extends any
-  ? ExtraArgs extends any
-    ? | [...FetcherArgs, ...ExtraArgs]
+export type DistributeFetcherArgs<FetcherArgs extends any[], ExtraArgs extends any[]> = [
+  FetcherArgs,
+  ExtraArgs
+] extends [any, any]
+  ?
+      | [...FetcherArgs, ...ExtraArgs]
       | [Accessor<FetcherArgs | undefined>, ...ExtraArgs]
       | [...{ [n in keyof FetcherArgs]: Accessor<FetcherArgs[n] | undefined> }, ...ExtraArgs]
-    : never
   : never;
-  
+
 export type FetchOptions<Result, InitialValue, FetcherArgs> = InitialValue extends undefined
   ? {
       initialValue?: InitialValue;
@@ -108,55 +107,95 @@ const isOptions = <Result, InitialValue, FetcherArgs>(
  * ```typescript
  * const [value] = createFetch('https://my-url/');
  * const [json, { abort }] = createFetch({ url: 'https://my-url/', method: 'POST', body }, [withAbort()]);
- *
+ * ```
  * ## Available Modifiers:
  * * withAbort() - makes request abortable
  * * withTimeout(ms) - adds a request timeout (works with abort)
  * * withRetry(num) - retries request *num* times
  * * withCache(options) - caches requests
- * * withCatchAll() - catches all errors so you don't need a boundary
+ * * withCatchAll() - catches all errors so you do not need a boundary
  *
  * You can even add your own modifiers.
- * ```
  */
-export function createFetch<
-  Result,
-  InitialValue = undefined,
-  FetcherArgs extends any[] = FetchArgs
->(...fetcherArgs: FetcherArgs): FetchReturn<Result, InitialValue>;
-export function createFetch<
-  Result,
-  InitialValue = undefined,
-  FetcherArgs extends any[] = FetchArgs
->(
-  ...args: DistributeFetcherArgs<FetcherArgs, [modifiers: RequestModifier[] | [options: FetchOptions<Result, InitialValue, FetcherArgs> & { request: never, initialValue: never }, modifiers?: RequestModifier[]]]>
+export function createFetch<Result>(
+  ...fetcherArgs: DistributeFetcherArgs<FetchArgs, []>
+): FetchReturn<Result, undefined>;
+export function createFetch<Result>(
+  ...args: DistributeFetcherArgs<FetchArgs, [modifiers: ReturnType<RequestModifier>[]]>
+): FetchReturn<Result, undefined>;
+export function createFetch<Result>(
+  ...args: DistributeFetcherArgs<FetchArgs, [options: FetchOptions<Result, undefined, FetchArgs>]>
+): FetchReturn<Result, undefined>;
+export function createFetch<Result>(
+  ...args: DistributeFetcherArgs<
+    FetchArgs,
+    [options: FetchOptions<Result, undefined, FetchArgs>, modifiers: ReturnType<RequestModifier>[]]
+  >
+): FetchReturn<Result, undefined>;
+export function createFetch<Result, InitialValue extends Result | undefined = undefined>(
+  ...args: DistributeFetcherArgs<
+    FetchArgs,
+    [options: FetchOptions<Result, InitialValue, FetchArgs>]
+  >
+): FetchReturn<Result, InitialValue>;
+export function createFetch<Result, InitialValue extends Result | undefined = undefined>(
+  ...args: DistributeFetcherArgs<
+    FetchArgs,
+    [
+      options: FetchOptions<Result, InitialValue, FetchArgs>,
+      modifiers: ReturnType<RequestModifier>[]
+    ]
+  >
 ): FetchReturn<Result, InitialValue>;
 export function createFetch<
   Result,
-  InitialValue,
+  InitialValue extends Result | undefined = undefined,
   FetcherArgs extends any[] = FetchArgs
 >(
-  ...args: DistributeFetcherArgs<FetcherArgs, [options: FetchOptions<Result, InitialValue, FetcherArgs> & { request: never, initialValue: InitialValue }, modifiers?: RequestModifier[]]>
+  ...args: DistributeFetcherArgs<
+    FetcherArgs,
+    [options: FetchOptions<Result, InitialValue, FetcherArgs>]
+  >
 ): FetchReturn<Result, InitialValue>;
 export function createFetch<
   Result,
-  InitialValue,
-  FetcherArgs extends any[], 
+  InitialValue extends Result | undefined = undefined,
+  FetcherArgs extends any[] = FetchArgs
 >(
-  ...args: DistributeFetcherArgs<FetcherArgs, [modifiers: RequestModifier[] | [options: FetchOptions<Result, InitialValue, FetcherArgs> & { initialValue?: undefined }, modifiers?: RequestModifier[]]]>
-): FetcherArgs extends FetchArgs ? never : FetchReturn<Result, InitialValue>;
+  ...args: DistributeFetcherArgs<
+    FetcherArgs,
+    [
+      options: FetchOptions<Result, InitialValue, FetcherArgs>,
+      modifiers: ReturnType<RequestModifier>[]
+    ]
+  >
+): FetchReturn<Result, InitialValue>;
 export function createFetch<
   Result,
-  InitialValue,
+  InitialValue extends Result | undefined,
   FetcherArgs extends any[]
 >(
-  ...args: DistributeFetcherArgs<FetcherArgs, [options: FetchOptions<Result, InitialValue, FetcherArgs>] | [options: FetchOptions<Result, InitialValue, FetcherArgs>, modifiers?: RequestModifier[]]>
-): FetchReturn<Result, InitialValue>;
-export function createFetch<
-  Result,
-  InitialValue extends Result,
-  FetcherArgs extends any[] = [info: RequestInfo, init?: RequestInit]
->(...args: any[]): FetchReturn<Result, InitialValue> {
+  ...args:
+    | DistributeFetcherArgs<FetchArgs, []>
+    | DistributeFetcherArgs<FetchArgs, [options: FetchOptions<Result, InitialValue, FetchArgs>]>
+    | DistributeFetcherArgs<FetchArgs, [modifiers: ReturnType<RequestModifier>[]]>
+    | DistributeFetcherArgs<
+        FetchArgs,
+        [
+          options: FetchOptions<Result, InitialValue, FetchArgs>,
+          modifiers: ReturnType<RequestModifier>[]
+        ]
+      >
+    | DistributeFetcherArgs<FetcherArgs, [options: FetchOptions<Result, InitialValue, FetcherArgs>]>
+    | DistributeFetcherArgs<FetcherArgs, [modifiers: ReturnType<RequestModifier>[]]>
+    | DistributeFetcherArgs<
+        FetcherArgs,
+        [
+          options: FetchOptions<Result, InitialValue, FetcherArgs>,
+          modifiers: ReturnType<RequestModifier>[]
+        ]
+      >
+): FetchReturn<Result, InitialValue> {
   const options = ([args[2], args[1]].find(isOptions) || {}) as FetchOptions<
     Result,
     InitialValue,
@@ -209,4 +248,4 @@ export function createFetch<
   };
   fetchContext.wrapResource();
   return fetchContext.resource as unknown as FetchReturn<Result, InitialValue>;
-};
+}
