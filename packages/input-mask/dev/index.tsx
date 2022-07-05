@@ -32,7 +32,7 @@ const App: Component = () => {
   const meetingInputHandler = createInputMask(meetingMask);
 
   // Hex Color
-  const hexMask = maskArrayToFn([/#?/, /[\da-fA-F]{1,6}/]);
+  const hexMask = maskArrayToFn(["#", /[0-9a-f]{0,6}/i]);
   const hexHandler = createInputMask(hexMask);
 
   return (
