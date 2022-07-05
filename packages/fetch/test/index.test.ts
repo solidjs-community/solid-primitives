@@ -3,7 +3,6 @@ import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createRoot, createEffect, createSignal } from "solid-js";
 import { createFetch, withAbort } from "../src";
-import { DistributeFetcherArgs, FetchArgs, FetchOptions } from "../src/fetch";
 
 const test = suite("createFetch");
 
@@ -56,7 +55,7 @@ test("will fetch json data", () =>
 test("will fetch text data", () =>
   new Promise<void>(resolve => {
     createRoot(dispose => {
-      const [ready] = createFetch<typeof mockResponseBody, undefined>(mockUrl, {
+      const [ready] = createFetch<typeof mockResponseBody>(mockUrl, {
         fetch: fetchMock,
         responseHandler: res => res.text()
       });
@@ -76,13 +75,9 @@ test("will fetch text data", () =>
 
 test("will abort a request without an error", () =>
   createRoot(dispose => {
-    const [ready, { abort }] = createFetch<typeof mockResponseBody, undefined, Parameters<typeof fetchMock>>(
-      mockUrl,
-      {
-        fetch: fetchMock
-      },
-      [withAbort()]
-    );
+    const [ready, { abort }] = createFetch<typeof mockResponseBody>(mockUrl, { fetch: fetchMock }, [
+      withAbort()
+    ]);
     abort();
     assert.is(ready.aborted, true);
     createEffect(() => {
