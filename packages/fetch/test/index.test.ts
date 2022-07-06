@@ -2,7 +2,7 @@ import "./setup";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createRoot, createEffect, createSignal } from "solid-js";
-import { createFetch, withAbort } from "../src";
+import { createFetch, withAbort, withCatchAll, withTimeout } from "../src";
 
 const test = suite("createFetch");
 
@@ -130,5 +130,22 @@ test("will not start a request with a requestinfo accessor returning undefined",
       });
     });
   }));
+
+  test('will abort the request on timeout', () => new Promise<void>((resolve) => createRoot((dispose) => {
+    const fetch = () => new Promise<typeof mockResponse>((r) => setTimeout(() => r(mockResponse), 1000));
+    const [ready] = createFetch(mockUrl, { fetch }, [withAbort(), withTimeout(100), withCatchAll()])
+    createEffect((iteration: number = 0) => {
+      ready();
+      if (iteration === 1) {
+        assert.is(ready(), undefined);
+        assert.is(ready.aborted, true);
+      }
+      if (iteration === 2) {
+        dispose();
+        resolve();
+      }
+      return iteration + 1
+    });
+  })));
 
 test.run();
