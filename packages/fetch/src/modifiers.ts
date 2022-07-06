@@ -111,7 +111,7 @@ export const withCatchAll: RequestModifier =
         })
     );
     requestContext.wrapResource();
-    wrapResource(requestContext, () => [{ error: { get: () => error() } }, undefined]);
+    wrapResource(requestContext, () => [{ caught: { get: () => error() } }, undefined]);
   };
 
 const defaultWait = (attempt: number) => Math.max(1000 << attempt, 30000);
