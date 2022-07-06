@@ -1,10 +1,10 @@
-import { createDebouncedMemo, createThrottledMemo } from "../src";
+import { createDebouncedMemo, createDebouncedMemoOn, createThrottledMemo } from "../src";
 import { Component, Show } from "solid-js";
 import { createMousePosition } from "@solid-primitives/mouse";
 
 const Grouped: Component = () => {
   const pos = createMousePosition();
-  const debPos = createDebouncedMemo(() => ({ x: pos.x, y: pos.y }), 200);
+  const debPos = createDebouncedMemoOn([() => pos.x, () => pos.y], ([x, y]) => ({ x, y }), 200);
   const thrPos = createThrottledMemo(() => ({ x: pos.x, y: pos.y }), 200);
 
   return (
