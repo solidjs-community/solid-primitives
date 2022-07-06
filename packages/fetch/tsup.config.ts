@@ -1,9 +1,3 @@
-import defaultConfig from "../../tsup.config";
-import { defineConfig } from "tsup";
+import {doubleEntryConfig} from "../../tsup.config";
 
-export default {
-  ...defaultConfig,
-  ...defineConfig({
-    entryPoints: ["src/index.ts", "src/server.ts"]
-  })
-};
+export default doubleEntryConfig
