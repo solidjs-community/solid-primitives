@@ -2,7 +2,7 @@ import "./setup";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createRoot, createEffect, createSignal } from "solid-js";
-import { createFetch, withAbort, withCatchAll, withTimeout } from "../src";
+import { createFetch, withAbort, withCache, withCatchAll, withTimeout } from "../src";
 
 const test = suite("createFetch");
 
@@ -131,9 +131,13 @@ test("will not start a request with a requestinfo accessor returning undefined",
     });
   }));
 
-  test('will abort the request on timeout', () => new Promise<void>((resolve) => createRoot((dispose) => {
+  test('will abort the request on timeout and catchAll the error', () => new Promise<void>((resolve) => createRoot((dispose) => {
     const fetch = () => new Promise<typeof mockResponse>((r) => setTimeout(() => r(mockResponse), 1000));
-    const [ready] = createFetch(mockUrl, { fetch }, [withAbort(), withTimeout(100), withCatchAll()])
+    const [ready] = createFetch(mockUrl, { fetch }, [withTimeout(50), withAbort(), withCatchAll()])
+    createEffect((iteration: number = 0) => {
+      assert.equal(ready.error, [undefined, new Error('timeout')][iteration])
+      return iteration + 1;
+    });
     createEffect((iteration: number = 0) => {
       ready();
       if (iteration === 1) {
@@ -144,8 +148,34 @@ test("will not start a request with a requestinfo accessor returning undefined",
         dispose();
         resolve();
       }
-      return iteration + 1
+      return iteration + 1;
     });
   })));
+
+test('caches request instead of making them twice', () => new Promise<void>((resolve) => createRoot((dispose) => {
+  let calls = 0;
+  const [url, setUrl] = createSignal(undefined, { equals: false });
+  const cache = {}
+  const fetch = () => { calls++; return Promise.resolve(mockResponse); };
+  const [ready] = createFetch(url, { fetch }, [withCache({ cache })]);
+  createEffect((iteration: number = 0) => {
+    ready();
+    if (iteration === 0) {
+      setUrl(mockUrl);
+    }
+    if (iteration === 1) {
+      setUrl(mockUrl)
+    }
+    if (iteration === 2) {
+      setUrl(mockUrl)
+    }
+    if (iteration === 3) {
+      assert.is(calls, 1);
+      dispose();
+      resolve();
+    }
+    return iteration + 1;
+  });
+})));
 
 test.run();
