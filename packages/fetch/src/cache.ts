@@ -26,6 +26,24 @@ export const serializeRequest = <FetcherArgs extends any[]>(requestData: Fetcher
     ...requestData[1]
   });
 
+/**
+ * Modifies createFetch request to support caching
+ * ```ts
+ * withCache({
+ *   expires: number | ((entry: CacheEntry<T>) => boolean);
+ *   cache?: RequestCache<T>; // global cache by default
+ * })
+ * ```
+ * `CacheEntry` is structured as follows:
+ * ```ts
+ * type CacheEntry<T = any> = {
+ *   ts: number;
+ *   requestData: [info: RequestInfo, init?: RequestInit];
+ *   data: T;
+ * };
+ * ```
+ * The RequestCache is a simple object.
+ */
 export const withCache: RequestModifier =
   <Result extends unknown, FetcherArgs extends any[]>(
     options: CacheOptions = defaultCacheOptions

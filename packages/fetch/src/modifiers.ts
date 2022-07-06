@@ -111,7 +111,17 @@ export const withCatchAll: RequestModifier =
         })
     );
     requestContext.wrapResource();
-    wrapResource(requestContext, () => [{ caught: { get: () => error() } }, undefined]);
+    const originalResource = requestContext.resource
+    requestContext.resource = [
+      Object.defineProperties(
+        () => originalResource?.[0](),
+        {
+          ...Object.getOwnPropertyDescriptors(originalResource?.[0]),
+          error: { get: () => error() }
+        }
+      ),
+      originalResource?.[1]
+    ] as typeof originalResource
   };
 
 const defaultWait = (attempt: number) => Math.max(1000 << attempt, 30000);
