@@ -353,6 +353,8 @@ Provida a separate tuntime for server.
 
 1.0.0 - **stage-3**
 
+[PR#158](https://github.com/solidjs-community/solid-primitives/pull/158)
+
 Add `createDebouncedMemoOn` primitive.
 
 Move the initial value argument from options to a separate argument in `createDebouncedMemo` and `createThrottledMemo` primitives.
