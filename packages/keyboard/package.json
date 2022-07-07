@@ -70,6 +70,8 @@
     "solid-js": "^1.4.0"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "^2.2.0"
+    "@solid-primitives/event-listener": "^2.2.0",
+    "@solid-primitives/rootless": "workspace:^1.1.0",
+    "@solid-primitives/utils": "workspace:^2.1.1"
   }
 }
