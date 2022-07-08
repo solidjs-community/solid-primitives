@@ -1,85 +1,66 @@
 import { ReactiveMap, ReactiveWeakMap } from "../src";
-import { createRoot } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
 const testMap = suite("ReactiveMap");
 
-testMap("behaves like a Map", () =>
-  createRoot(dispose => {
-    const obj1 = {};
-    const obj2 = {};
+testMap("behaves like a Map", () => {
+  const obj1 = {};
+  const obj2 = {};
 
-    const map = new ReactiveMap<any, any>([
-      [obj1, 123],
-      [1, "foo"]
-    ]);
+  const map = new ReactiveMap<any, any>([
+    [obj1, 123],
+    [1, "foo"]
+  ]);
 
-    assert.is(map.has(obj1), true);
-    assert.is(map.has(1), true);
-    assert.is(map.has(2), false);
+  assert.is(map.has(obj1), true);
+  assert.is(map.has(1), true);
+  assert.is(map.has(2), false);
 
-    assert.is(map.get(obj1), 123);
-    assert.is(map.get(1), "foo");
+  assert.is(map.get(obj1), 123);
+  assert.is(map.get(1), "foo");
 
-    map.set(obj2, "bar");
-    assert.is(map.get(obj2), "bar");
-    assert.is(map.set(obj1, "change"), true);
-    assert.is(map.get(obj1), "change");
+  map.set(obj2, "bar");
+  assert.is(map.get(obj2), "bar");
+  map.set(obj1, "change");
+  assert.is(map.get(obj1), "change");
 
-    assert.is(map.delete(obj2), true);
-    assert.is(map.has(obj2), false);
+  assert.is(map.delete(obj2), true);
+  assert.is(map.has(obj2), false);
 
-    assert.is(map.size, 2);
-    map.clear();
-    assert.is(map.size, 0);
+  assert.is(map.size, 2);
+  map.clear();
+  assert.is(map.size, 0);
 
-    dispose();
-  })
-);
-
-testMap("setter can be a function", () =>
-  createRoot(dispose => {
-    const map = new ReactiveMap<string, number>();
-
-    assert.is(map.set("foo", 0), true);
-    assert.is(map.set("foo", 0), false);
-    assert.is(
-      map.set("foo", p => p! + 1),
-      true
-    );
-    assert.is(map.get("foo"), 1);
-
-    dispose();
-  })
-);
+  assert.instance(map, Map);
+  assert.instance(map, ReactiveMap);
+});
 
 testMap.run();
 
 const testWeakMap = suite("ReactiveWeakMap");
 
-testWeakMap("behaves like a Map", () =>
-  createRoot(dispose => {
-    const obj1 = {};
-    const obj2 = {};
+testWeakMap("behaves like a Map", () => {
+  const obj1 = {};
+  const obj2 = {};
 
-    const map = new ReactiveWeakMap<object, any>([[obj1, 123]]);
+  const map = new ReactiveWeakMap<object, any>([[obj1, 123]]);
 
-    assert.is(map.has(obj1), true);
-    assert.is(map.has(obj2), false);
+  assert.is(map.has(obj1), true);
+  assert.is(map.has(obj2), false);
 
-    assert.is(map.get(obj1), 123);
+  assert.is(map.get(obj1), 123);
 
-    map.set(obj2, "bar");
-    assert.is(map.get(obj2), "bar");
-    assert.is(map.set(obj1, "change"), true);
-    assert.is(map.get(obj1), "change");
+  map.set(obj2, "bar");
+  assert.is(map.get(obj2), "bar");
+  map.set(obj1, "change");
+  assert.is(map.get(obj1), "change");
 
-    assert.is(map.delete(obj2), true);
-    assert.is(map.has(obj2), false);
+  assert.is(map.delete(obj2), true);
+  assert.is(map.has(obj2), false);
 
-    dispose();
-  })
-);
+  assert.instance(map, WeakMap);
+  assert.instance(map, ReactiveWeakMap);
+});
 
 testWeakMap.run();

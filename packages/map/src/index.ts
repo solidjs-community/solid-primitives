@@ -1,17 +1,7 @@
 import { Accessor } from "solid-js";
 import { createTriggerCache } from "@solid-primitives/utils";
 
-export type SignalMap<K, V> = Accessor<[K, V][]> & ReactiveMap<K, V>;
-export type MapSetter<V> = V extends Function
-  ? (prev: V | undefined) => V
-  : ((prev: V | undefined) => V) | V;
-
-/** If value is a function – call it with a given argument – otherwise get the value as is */
-function accessWith<T extends ((arg: A) => V) | V, A, V>(v: T, arg: A): V {
-  return typeof v === "function" ? v(arg) : v;
-}
-
-const WHOLE = Symbol("watch_whole");
+const KEYS = Symbol("track-keys");
 
 /**
  * A reactive version of `Map` data structure. All the reads (like `get` or `has`) are signals, and all the writes (`delete` or `set`) will cause updates to appropriate signals.
@@ -28,11 +18,11 @@ const WHOLE = Symbol("watch_whole");
  * // apply changes
  * userPoints.set(user1, 100);
  * userPoints.delete(user2);
- * userPoints.set(user1, n => n * 10);
+ * userPoints.set(user1, { foo: "bar" });
  */
-export class ReactiveMap<K, V> {
+export class ReactiveMap<K, V> implements Map<K, V> {
   private map: Map<K, V>;
-  private cache = createTriggerCache<K | typeof WHOLE>();
+  private cache = createTriggerCache<K | typeof KEYS>();
 
   constructor(initial?: [K, V][], private equals = (a: V, b: V) => a === b) {
     this.map = new Map(initial);
@@ -48,46 +38,41 @@ export class ReactiveMap<K, V> {
     return this.map.get(key);
   }
   get size(): number {
-    this.cache.track(WHOLE);
+    this.cache.track(KEYS);
     return this.map.size;
   }
   keys(): IterableIterator<K> {
-    this.cache.track(WHOLE);
+    this.cache.track(KEYS);
     return this.map.keys();
   }
   values(): IterableIterator<V> {
-    this.cache.track(WHOLE);
+    this.cache.track(KEYS);
     return this.map.values();
   }
   entries(): IterableIterator<[K, V]> {
-    this.cache.track(WHOLE);
+    this.cache.track(KEYS);
     return this.map.entries();
-  }
-  [Symbol.iterator](): IterableIterator<[K, V]> {
-    return this.entries();
   }
 
   // writes
-  set(key: K, setter: MapSetter<V>): boolean {
-    let newV: V;
+  set(key: K, value: V): this {
     if (this.map.has(key)) {
       const oldV: V = this.map.get(key)!;
-      newV = accessWith(setter, oldV);
-      if (this.equals(oldV, newV)) {
-        this.map.set(key, newV);
-        return false;
+      if (this.equals(oldV, value)) {
+        this.map.set(key, value);
+        return this;
       }
-    } else newV = accessWith(setter, undefined);
-    this.map.set(key, newV);
+    }
+    this.map.set(key, value);
     this.cache.dirty(key);
-    this.cache.dirty(WHOLE);
-    return true;
+    this.cache.dirty(KEYS);
+    return this;
   }
   delete(key: K): boolean {
     const r = this.map.delete(key);
     if (r) {
       this.cache.dirty(key);
-      this.cache.dirty(WHOLE);
+      this.cache.dirty(KEYS);
     }
     return r;
   }
@@ -99,10 +84,20 @@ export class ReactiveMap<K, V> {
   }
 
   // callback
-  forEach(cb: (value: V, key: K) => void) {
-    this.map.forEach(cb);
+  forEach(callbackfn: (value: V, key: K, map: this) => void) {
+    this.cache.track(KEYS);
+    this.map.forEach((value, key) => callbackfn(value, key, this));
+  }
+
+  [Symbol.iterator](): IterableIterator<[K, V]> {
+    return this.entries();
+  }
+  get [Symbol.toStringTag](): string {
+    return this.map[Symbol.toStringTag];
   }
 }
+
+Object.setPrototypeOf(ReactiveMap.prototype, Map.prototype);
 
 /**
  * A reactive version of `WeakMap` data structure. All the reads (like `get` or `has`) are signals, and all the writes (`delete` or `set`) will cause updates to appropriate signals.
@@ -118,9 +113,9 @@ export class ReactiveMap<K, V> {
  * // apply changes
  * userPoints.set(user1, 100);
  * userPoints.delete(user2);
- * userPoints.set(user1, n => n * 10);
+ * userPoints.set(user1, { foo: "bar" });
  */
-export class ReactiveWeakMap<K extends object, V> {
+export class ReactiveWeakMap<K extends object, V> implements WeakMap<K, V> {
   private map: WeakMap<K, V>;
   private cache = createTriggerCache<K>();
 
@@ -136,33 +131,35 @@ export class ReactiveWeakMap<K extends object, V> {
     this.cache.track(key);
     return this.map.get(key);
   }
-  set(key: K, setter: MapSetter<V>): boolean {
-    let newV: V;
+  set(key: K, value: V): this {
     if (this.map.has(key)) {
       const oldV: V = this.map.get(key)!;
-      newV = accessWith(setter, oldV);
-      if (this.equals(oldV, newV)) {
-        this.map.set(key, newV);
-        return false;
+      if (this.equals(oldV, value)) {
+        this.map.set(key, value);
+        return this;
       }
-    } else newV = accessWith(setter, undefined);
-    this.map.set(key, newV);
+    }
+    this.map.set(key, value);
     this.cache.dirty(key);
-    return true;
+    return this;
   }
   delete(key: K): boolean {
     const r = this.map.delete(key);
     if (r) this.cache.dirty(key);
     return r;
   }
+
+  get [Symbol.toStringTag](): string {
+    return this.map[Symbol.toStringTag];
+  }
 }
 
-/**
- * Creates an instance of `ReactiveMap` class.
- * @param initial initial entries of the reactive map
- * @param equals signal equals function, determining if a change should cause an update
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/map#createMap
- */
+Object.setPrototypeOf(ReactiveWeakMap.prototype, WeakMap.prototype);
+
+/** @deprecated */
+export type SignalMap<K, V> = Accessor<[K, V][]> & ReactiveMap<K, V>;
+
+/** @deprecated */
 export function createMap<K, V>(
   initial?: [K, V][],
   equals?: (a: V, b: V) => boolean
@@ -173,12 +170,7 @@ export function createMap<K, V>(
   }) as SignalMap<K, V>;
 }
 
-/**
- * Creates an instance of `ReactiveWeakMap` class.
- * @param initial initial entries of the reactive map
- * @param equals signal equals function, determining if a change should cause an update
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/map#createWeakMap
- */
+/** @deprecated */
 export function createWeakMap<K extends object, V>(
   initial?: [K, V][],
   equals?: (a: V, b: V) => boolean
