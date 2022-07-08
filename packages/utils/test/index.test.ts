@@ -1,5 +1,11 @@
 import { createComputed, createRoot } from "solid-js";
-import { createStaticStore, handleDiffArray, arrayEquals } from "../src";
+import {
+  createStaticStore,
+  handleDiffArray,
+  arrayEquals,
+  createWeakTriggerCache,
+  createTriggerCache
+} from "../src";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
@@ -161,3 +167,58 @@ ae("arrayEquals", () => {
 });
 
 ae.run();
+
+const testTriggerCache = suite("createTriggerCache");
+
+testTriggerCache("weak trigger cache", () =>
+  createRoot(dispose => {
+    const { dirty, track } = createWeakTriggerCache();
+    let runs = -1;
+    const key1 = {};
+    const key2 = {};
+    createComputed(() => {
+      track(key1);
+      runs++;
+    });
+    assert.is(runs, 0);
+    dirty(key2);
+    assert.is(runs, 0);
+    dirty(key1);
+    assert.is(runs, 1);
+
+    dispose();
+  })
+);
+
+testTriggerCache("weak trigger cache", () =>
+  createRoot(dispose => {
+    const { dirty, track, dirtyAll } = createTriggerCache();
+    let runs1 = -1;
+    let runs2 = -1;
+    const key1 = "key1";
+    const key2 = "key2";
+    createComputed(() => {
+      track(key1);
+      runs1++;
+    });
+    createComputed(() => {
+      track(key2);
+      runs2++;
+    });
+    assert.is(runs1, 0);
+    assert.is(runs2, 0);
+    dirty(key2);
+    assert.is(runs1, 0);
+    assert.is(runs2, 1);
+    dirty(key1);
+    assert.is(runs1, 1);
+    assert.is(runs2, 1);
+    dirtyAll();
+    assert.is(runs1, 2);
+    assert.is(runs2, 2);
+
+    dispose();
+  })
+);
+
+testTriggerCache.run();
