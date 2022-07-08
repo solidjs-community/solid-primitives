@@ -16,8 +16,8 @@
     "name": "set",
     "stage": 2,
     "list": [
-      "createSet",
-      "createWeakSet"
+      "ReactiveSet",
+      "ReactiveWeakSet"
     ],
     "category": "Utilities"
   },
