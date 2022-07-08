@@ -17,7 +17,11 @@
     "name": "keyboard",
     "stage": 0,
     "list": [
-      "makeKeyHoldListener"
+      "useKeyDownList",
+      "useCurrentlyHeldKey",
+      "useKeyDownSequence",
+      "createKeyHold",
+      "createShortcut"
     ],
     "category": "Inputs"
   },

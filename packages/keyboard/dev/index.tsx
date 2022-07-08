@@ -2,7 +2,7 @@
 import { Component } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
-import { makeKeyHoldListener, useKeyDownList, createKeyHold, createShortcut } from "../src";
+import { useKeyDownList, createKeyHold, createShortcut } from "../src";
 
 const App: Component = () => {
   const [pressedKeys] = useKeyDownList();
