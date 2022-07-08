@@ -12,9 +12,7 @@
 The Javascript built-in `Set` & `WeakSet` data structures as a reactive signals.
 
 - **[`ReactiveSet`](#ReactiveSet)** - A reactive version of a Javascript built-in `Set` class.
-- **[`createSet`](#createSet)** - Creates an signal instance of a `ReactiveSet`.
 - **[`ReactiveWeakSet`](#ReactiveWeakSet)** - A reactive version of a Javascript built-in `WeakSet` class.
-- **[`createWeakSet`](#createWeakSet)** - Creates an signal instance of a `ReactiveWeakSet`.
 
 ## Installation
 
@@ -53,63 +51,6 @@ set.delete(2);
 set.clear();
 ```
 
-#### Differences from `Set`
-
-The interface is mostly the same, but there are some slight changes to the available mathods/returned values.
-
-##### `.add()`
-
-`.add()` method of `Set` returns it's instance, while in `ReactiveSet` a `boolean` is returned to indicate wheather the value was insterted to the set (was new).
-
-```ts
-const set = new ReactiveSet();
-set.add(2); // => true
-set.add(2); // => false
-```
-
-##### `.set()`
-
-`.set()` is a new method added to give an availability to compleately overwrite the currect set with a new array of values.
-
-```ts
-const numbers = new ReactiveSet([1,2,3])
-numbers.set([4,5,6])
-[...numbers] // => [4,5,6]
-```
-
-##### `.values()`, `.entries()`, `.keys()`
-
-In `Set` all the methods `.values()`, `.entries()`, `.keys()` do the same thing, `ReactiveSet` only has `.values()`.
-
-## `createSet`
-
-Creates an proxy signal instance of a [`ReactiveSet`](#reactiveset), that can be called to get the values in list form.
-
-### How to use it
-
-#### Import
-
-```ts
-import { createSet } from "@solid-primitives/set";
-```
-
-#### Basic usage
-
-```ts
-const set = createSet([1, 1, 2, 3]);
-
-// listen for changes reactively
-createEffect(() => {
-  set(); // => [1,2,3] (reactive on any change)
-  set.has(2); // => true (reactive on change to the result)
-});
-
-// apply changes like with normal Set
-set.add(4);
-set.delete(2);
-set.clear();
-```
-
 ## `ReactiveWeakSet`
 
 A reactive version of a Javascript built-in `WeakSet` class.
@@ -133,33 +74,6 @@ createEffect(() => {
 });
 
 // apply changes like with normal Set
-set.add(4); // (.add() returns a boolean of if the item was added to the set)
-set.delete(2);
-```
-
-## `createWeakSet`
-
-Creates an signal instance of a [`ReactiveWeakSet`](#reactiveWeakset).
-
-### How to use it
-
-#### Import
-
-```ts
-import { createWeakSet } from "@solid-primitives/set";
-```
-
-#### Basic usage
-
-```ts
-const set = createWeakSet([1, 1, 2, 3]);
-
-// listen for changes reactively
-createEffect(() => {
-  set.has(2); // => true (reactive on change to the result)
-});
-
-// apply like with normal Set
 set.add(4);
 set.delete(2);
 ```
@@ -172,5 +86,13 @@ set.delete(2);
 0.0.100
 
 Initial release of the package.
+
+0.2.0
+
+Deprecated `createSet` and `createWeakSet` functions, as they weren't providing any benefit over instanciating with the `new` keyword.
+
+`ReactiveSet` and `ReactiveWeakSet` now will respect `instanceof Set/WeakSet` checks.
+
+Internal signals will be created only if read in a tracking scope.
 
 </details>

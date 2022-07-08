@@ -1,10 +1,10 @@
 import { Component, createEffect, For } from "solid-js";
 import { render } from "solid-js/web";
-import { createSet } from "../src";
+import { ReactiveSet } from "../src";
 import "uno.css";
 
 const App: Component = () => {
-  const set = createSet([1, 2, 3]);
+  const set = new ReactiveSet([1, 2, 3]);
 
   setInterval(() => {
     const n = Math.round(Math.random() * 10);
@@ -18,11 +18,11 @@ const App: Component = () => {
   return (
     <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
       <div class="wrapper-h">
-        <For each={set()}>{n => <div class="node">{n}</div>}</For>
+        <For each={[...set]}>{n => <div class="node">{n}</div>}</For>
       </div>
       <p>size: {set.size}</p>
     </div>
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+render(() => <App />, document.getElementById("root")!);
