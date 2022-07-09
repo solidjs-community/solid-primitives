@@ -30,19 +30,17 @@ export const viteConfig = defineConfig({
 
 export const vitestConfig = defineConfig({
   test: {
+    globals: true,
     clearMocks: true,
     environment: "jsdom",
     transformMode: {
       web: [/\.[jt]sx?$/]
     },
     deps: {
-      inline: [/solid-js/]
+      inline: [/solid-js/, /solid-testing-library/, /@solid-primitives\/.*/]
     }
   },
   resolve: {
     conditions: ["development", "browser"]
-  },
-  optimizeDeps: {
-    exclude: ["@solid-primitives/utils"]
   }
 });
