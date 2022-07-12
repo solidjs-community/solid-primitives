@@ -1,5 +1,5 @@
 import { createComputed, createRoot } from "solid-js";
-import { describe, test, expect, vi, beforeEach, beforeAll, afterAll } from "vitest";
+import { describe, test, expect } from "vitest";
 import { createKeyHold, useKeyDownList, useCurrentlyHeldKey, useKeyDownSequence } from "../src";
 
 const dispatchKeyEvent = (key: string, type: "keydown" | "keyup") => {
@@ -7,12 +7,6 @@ const dispatchKeyEvent = (key: string, type: "keydown" | "keyup") => {
   ev.key = key;
   window.dispatchEvent(ev);
 };
-
-import { isServer } from "@solid-primitives/utils";
-
-test(":(", () => {
-  expect(isServer).toBe(false);
-});
 
 describe("useKeyDownList", () => {
   test("returns a list of currently held keys", () =>
@@ -116,37 +110,37 @@ describe("useKeyDownSequence", () => {
     }));
 });
 
-describe("createKeyHold", () => {
-  test("returns a boolean of is the wanted key pressed", () =>
-    createRoot(dispose => {
-      let captured: any;
-      const key = useCurrentlyHeldKey();
-      const isHeld = createKeyHold("ALT");
-      createComputed(() => (captured = isHeld()));
-      expect(captured).toBe(false);
+// describe("createKeyHold", () => {
+//   test("returns a boolean of is the wanted key pressed", () =>
+//     createRoot(dispose => {
+//       let captured: any;
+//       const key = useCurrentlyHeldKey();
+//       const isHeld = createKeyHold("ALT");
+//       createComputed(() => (captured = isHeld()));
+//       expect(captured).toBe(false);
 
-      dispatchKeyEvent("ALT", "keydown");
+//       dispatchKeyEvent("ALT", "keydown");
 
-      console.log(key());
+//       console.log(key());
 
-      // expect(captured).toBe(true);
+//       // expect(captured).toBe(true);
 
-      dispatchKeyEvent("a", "keyup");
-      // assert.equal(captured, false);
+//       dispatchKeyEvent("a", "keyup");
+//       // assert.equal(captured, false);
 
-      // dispatchKeyEvent("Alt", "keydown");
-      // assert.equal(captured, [["ALT"]]);
-      // dispatchKeyEvent("q", "keydown");
-      // assert.equal(captured, [["ALT"], ["ALT", "Q"]]);
+//       // dispatchKeyEvent("Alt", "keydown");
+//       // assert.equal(captured, [["ALT"]]);
+//       // dispatchKeyEvent("q", "keydown");
+//       // assert.equal(captured, [["ALT"], ["ALT", "Q"]]);
 
-      // dispatchKeyEvent("Alt", "keyup");
-      // assert.equal(captured, [["ALT"], ["ALT", "Q"], ["Q"]]);
-      // dispatchKeyEvent("q", "keyup");
-      // assert.equal(captured, []);
+//       // dispatchKeyEvent("Alt", "keyup");
+//       // assert.equal(captured, [["ALT"], ["ALT", "Q"], ["Q"]]);
+//       // dispatchKeyEvent("q", "keyup");
+//       // assert.equal(captured, []);
 
-      dispose();
-    }));
-});
+//       dispose();
+//     }));
+// });
 
 // const testCKH = suite("createKeyHold");
 

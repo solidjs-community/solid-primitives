@@ -8,9 +8,9 @@ const App: Component = () => {
   const [pressedKeys] = useKeyDownList();
   const pressing = createKeyHold("Alt");
 
-  // createShortcut(["q", "w", "e"], () => {
-  //   console.log("Shortcut pressed");
-  // });
+  createShortcut(["Q"], () => {
+    console.log("Q Pressed");
+  });
 
   createShortcut(
     ["Control", "E", "r"],
@@ -20,7 +20,6 @@ const App: Component = () => {
     {
       preventDefault: true
       // requireReset: true
-      // modifier: ["Control"]
     }
   );
 
