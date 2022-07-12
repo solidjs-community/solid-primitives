@@ -3,17 +3,14 @@
     "module": "ESNext",
     "target": "ESNext",
     "newLine": "LF",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "strictNullChecks": true,
+    "esModuleInterop": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": [
-      "solid-js"
-    ]
+    "types": ["solid-js"]
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
