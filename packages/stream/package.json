@@ -37,7 +37,7 @@
   },
   "scripts": {
     "build": "tsup",
-    "test": "uvu -r solid-register -r test/setup.ts -i test/setup.ts"
+    "test": "uvu -r solid-register"
   },
   "keywords": [
     "media",

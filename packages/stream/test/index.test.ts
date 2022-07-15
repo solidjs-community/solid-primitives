@@ -1,3 +1,4 @@
+import "./setup";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 import { createEffect, createRoot } from "solid-js";

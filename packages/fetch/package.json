@@ -38,7 +38,7 @@
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
     "build": "tsup",
-    "test": "uvu -r solid-register -r ./test/setup.ts -i ./test/setup.ts"
+    "test": "uvu -r solid-register"
   },
   "keywords": [
     "fetch",
