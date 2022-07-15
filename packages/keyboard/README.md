@@ -7,7 +7,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg?style=for-the-badge)](https://lerna.js.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/keyboard?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/keyboard)
 [![version](https://img.shields.io/npm/v/@solid-primitives/keyboard?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/keyboard)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A library of reactive promitives helping handling user's keyboard input.
 
@@ -146,6 +146,12 @@ createShortcut(
 When `preventDefault` is `true`, `e.preventDefault()` will be called not only on the keydown event that have triggered the callback, but it will **optimistically** also prevend the default behavior of every previous keydown that will have the possibility to lead to the shotcut being pressed.
 
 E.g. when listening for `Control + Shift + A`, all three keydown events will be prevented.
+
+## DEMO
+
+Working demo of some of the primitives in keyboard package:
+
+https://codesandbox.io/s/solid-primitives-keyboard-demo-s2l84k?file=/index.tsx
 
 ## Changelog
 

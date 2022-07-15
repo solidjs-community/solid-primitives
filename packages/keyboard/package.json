@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "keyboard",
-    "stage": 0,
+    "stage": 1,
     "list": [
       "useKeyDownList",
       "useCurrentlyHeldKey",
