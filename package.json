@@ -11,8 +11,8 @@
   "license": "MIT",
   "scripts": {
     "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx,md}\"",
-    "build": "lerna run build --concurrency 4",
-    "test": "lerna run test --concurrency 4",
+    "build": "turbo run build",
+    "test": "turbo run test",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts"
   },
@@ -21,7 +21,7 @@
     "fs-extra": "^10.1.0",
     "jiti": "^1.14.0",
     "json-to-markdown-table": "^1.0.0",
-    "lerna": "^5.1.6",
+    "turbo": "^1.2.16",
     "prettier": "^2.7.1",
     "solid-js": "^1.4.4",
     "tsup": "^6.1.2",
@@ -33,3 +33,4 @@
   },
   "packageManager": "pnpm@7.2.1"
 }
+
