@@ -95,7 +95,7 @@ createEffect(() => {
 
 ## `createKeyHold`
 
-Provides a `boolean` signal indicating if provided {@link key} is currently being held down.
+Provides a `boolean` signal indicating if provided key is currently being held down.
 
 Holding multiple keys at the same time will return `false` — holding only the specified one will return `true`.
 
