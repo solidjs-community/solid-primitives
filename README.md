@@ -175,7 +175,6 @@ Available node scripts for managing packages and creating new ones:
 
 - createGesture (in progress)
 - createCompositionObserver (CompositionEvent observer)
-- createKeyboard
 - createForm
 - createInput
 - createTouch

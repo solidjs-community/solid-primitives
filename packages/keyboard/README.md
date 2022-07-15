@@ -11,7 +11,11 @@
 
 A library of reactive promitives helping handling user's keyboard input.
 
-- [`makeKeyHoldListener`](#makeKeyHoldListener) - Attaches keyboard event-listeners, and triggers callback whenever user holds or stops holding specified key.
+- [`useKeyDownList`](#useKeyDownList) — Provides a signal with the list of currently held keys
+- [`useCurrentlyHeldKey`](#useCurrentlyHeldKey) — Provides a signal with the currently held single key.
+- [`useKeyDownSequence`](#useKeyDownSequence) — Provides a signal with a sequence of currently held keys, as they were pressed down and up.
+- [`createKeyHold`](#createKeyHold) — Provides a signal indicating if provided key is currently being held down.
+- [`createShortcut`](#createShortcut) — Creates a keyboard shotcut observer.
 
 ## Installation
 
@@ -21,33 +25,127 @@ npm install @solid-primitives/keyboard
 yarn add @solid-primitives/keyboard
 ```
 
-## `makeKeyHoldListener`
+## `useKeyDownList`
 
-Attaches keyboard event-listeners to `window`, and calls provided callback whenever user holds or stops holding specified key.
+Provides a signal with the list of currently held keys, ordered from least recent to most recent.
 
-Event listeners are automatically cleaned on root dispose.
+This is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive that will reuse event listeners and signals across dependents.
 
 ### How to use it
 
-`makeKeyHoldListener` takes three arguments:
-
-- `key` keyboard key or modifier to listen for
-- `onHoldChange` callback fired when the hold state changes
-- `options` additional configuration:
-  - `preventDefault` — call `e.preventDefault()` on the keyboard event, when the specified key is pressed. _(Defaults to `false`)_
-  - `allowOtherKeys` — Should the user be allowed to press other keys while holding the specified one _(Defaults to `false`)_
+`useKeyDownList` takes no arguments, and returns a signal with the list of currently held keys, and last keydown event.
 
 ```tsx
-import { makeKeyHoldListener } from "@solid-primitives/keyboard";
+import { useKeyDownList } from "@solid-primitives/keyboard";
 
-const [pressing, setPressing] = createSignal(false);
+const [keys, { event }] = useKeyDownList();
 
-makeKeyHoldListener("altKey", setPressing, {
-  preventDefault: true
+createEffect(() => {
+  console.log(keys()); // => string[] — list of currently held keys
+  console.log(event()); // => KeyboardEvent | null — last keydown event
 });
+
+<For each={keys()}>
+  {key => <kbd>{key}</kdb>}
+</For>
+```
+
+## `useCurrentlyHeldKey`
+
+Provides a signal with the currently held single key. Pressing any other key at the same time will reset the signal to `null`.
+
+This is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive that will reuse event listeners and signals across dependents.
+
+### How to use it
+
+`useCurrentlyHeldKey` takes no arguments, and returns a signal with the currently held single key.
+
+```tsx
+import { useCurrentlyHeldKey } from "@solid-primitives/keyboard";
+
+const key = useCurrentlyHeldKey();
+
+createEffect(() => {
+  console.log(key()); // => string | null — currently held key
+});
+```
+
+## `useKeyDownSequence`
+
+Provides a signal with a sequence of currently held keys, as they were pressed down and up.
+
+This is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive that will reuse event listeners and signals across dependents.
+
+### How to use it
+
+`useKeyDownSequence` takes no arguments, and returns a single signal.
+
+```tsx
+import { useKeyDownSequence } from "@solid-primitives/keyboard";
+
+const sequence = useKeyDownSequence();
+
+createEffect(() => {
+  console.log(sequence()); // => string[][] — sequence of currently held keys
+});
+
+// example sequence of pressing Ctrl + Shift + A
+// [["Control"], ["Control", "Shift"], ["Control", "Shift", "A"]]
+```
+
+## `createKeyHold`
+
+Provides a `boolean` signal indicating if provided {@link key} is currently being held down.
+
+Holding multiple keys at the same time will return `false` — holding only the specified one will return `true`.
+
+### How to use it
+
+`createKeyHold` takes two arguments:
+
+- `key` keyboard key to listen for
+- `options` additional configuration:
+  - `preventDefault` — call `e.preventDefault()` on the keyboard event, when the specified key is pressed. _(Defaults to `true`)_
+
+```tsx
+import { createKeyHold } from "@solid-primitives/keyboard";
+
+const pressing = createKeyHold("Alt", { preventDefault: false });
 
 <p>Is pressing Alt? {pressing() ? "YES" : "NO"}</p>;
 ```
+
+## `createShortcut`
+
+Creates a keyboard shotcut observer. The provided callback will be called when the specified keys are pressed.
+
+### How to use it
+
+`createShortcut` takes three arguments:
+
+- `keys` — list of keys to listen for
+- `callback` — callback to call when the specified keys are pressed
+- `options` — additional configuration:
+  - `preventDefault` — call `e.preventDefault()` on the keyboard event, when the specified key is pressed. _(Defaults to `true`)_
+  - `requireReset` — If `true`, the shortcut will only be triggered once until all of the keys stop being pressed. Disabled by default.
+
+```tsx
+import { createShortcut } from "@solid-primitives/keyboard";
+
+createShortcut(
+  ["Control", "Shift", "A"],
+  () => {
+    console.log("Shortcut triggered");
+  },
+  { preventDefault: false, requireReset: true }
+);
+```
+
+### Preventing default
+
+When `preventDefault` is `true`, `e.preventDefault()` will be called not only on the keydown event that have triggered the callback, but it will **optimistically** also prevend the default behavior of every previous keydown that will have the possibility to lead to the shotcut being pressed.
+
+E.g. when listening for `Control + Shift + A`, all three keydown events will be prevented.
 
 ## Changelog
 
@@ -57,5 +155,17 @@ makeKeyHoldListener("altKey", setPressing, {
 0.0.100
 
 Initial release as a Stage-0 primitive.
+
+1.0.0
+
+[PR#159](https://github.com/solidjs-community/solid-primitives/pull/159)
+
+General package refactor. The single initial `makeKeyHoldListener` primitive has been replaced by:
+
+- `useKeyDownList`,
+- `useCurrentlyHeldKey`,
+- `useKeyDownSequence`,
+- `createKeyHold`,
+- `createShortcut`
 
 </details>
