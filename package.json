@@ -14,23 +14,24 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "new-package": "jiti ./scripts/new-package.ts",
-    "update-readme": "jiti ./scripts/update-readme.ts"
+    "update-readme": "jiti ./scripts/update-readme.ts",
+    "update-deps": "taze -w -r && pnpm i"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
     "fs-extra": "^10.1.0",
     "jiti": "^1.14.0",
     "json-to-markdown-table": "^1.0.0",
-    "turbo": "^1.2.16",
     "prettier": "^2.7.1",
-    "solid-js": "^1.4.4",
-    "tsup": "^6.1.2",
+    "solid-js": "^1.4.7",
+    "taze": "^0.7.6",
+    "tsup": "^6.1.3",
+    "turbo": "^1.3.1",
     "typescript": "^4.7.4",
     "unocss": "^0.39.3",
     "vite": "^2.9.14",
     "vite-plugin-solid": "2.2.6",
     "vitest": "^0.18.0"
   },
-  "packageManager": "pnpm@7.2.1"
+  "packageManager": "pnpm@7.5.0"
 }
-

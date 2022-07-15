@@ -36,6 +36,6 @@
     "solid-js": "^1.4.2"
   },
   "dependencies": {
-    "tsup": "^6.1.2"
+    "tsup": "^6.1.3"
   }
 }
