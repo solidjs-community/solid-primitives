@@ -1,5 +1,14 @@
-import { getOwner, onCleanup, createSignal, Accessor, DEV, untrack, batch } from "solid-js";
-import type { BaseOptions, Signal } from "solid-js/types/reactive/signal";
+import {
+  getOwner,
+  onCleanup,
+  createSignal,
+  Accessor,
+  DEV,
+  untrack,
+  batch,
+  getListener
+} from "solid-js";
+import type { Signal } from "solid-js/types/reactive/signal";
 import { isServer as _isServer } from "solid-js/web";
 import type {
   AnyClass,
@@ -7,8 +16,6 @@ import type {
   MaybeAccessorValue,
   Noop,
   Values,
-  Trigger,
-  TriggerCache,
   AnyObject,
   AnyFunction,
   SetterValue,
@@ -46,6 +53,12 @@ export function isObject(value: any): value is AnyObject {
 }
 
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
+
+/**
+ * Check shallow array equality
+ */
+export const arrayEquals = (a: readonly unknown[], b: readonly unknown[]): boolean =>
+  a === b || (a.length === b.length && a.every((e, i) => e === b[i]));
 
 /**
  * Returns a function that will call all functions in the order they were chained with the same arguments.
@@ -272,6 +285,8 @@ export function createProxy(traps: {
   );
 }
 
+export type Trigger = [track: VoidFunction, dirty: VoidFunction];
+
 /**
  * Set listeners in reactive computations and then trigger them when you want.
  * @returns `[track function, dirty function]`
@@ -284,9 +299,40 @@ export function createProxy(traps: {
  * // later
  * dirty()
  */
-export function createTrigger(options?: BaseOptions): Trigger {
-  return createSignal(undefined, { equals: false, name: options?.name });
+export const createTrigger: () => Trigger = isDev
+  ? () => createSignal(undefined, { equals: false, name: "trigger" })
+  : () => createSignal(undefined, { equals: false });
+
+function dirtyTriggerCache<T>(
+  this: T extends object ? WeakMap<T, Trigger> | Map<T, Trigger> : Map<T, Trigger>,
+  key: T
+): void {
+  const trigger = this.get(key);
+  if (trigger) trigger[1]();
 }
+
+function dirtyAllTriggerCache(this: Map<any, Trigger>): void {
+  this.forEach(s => s[1]());
+}
+
+function trackTriggerCache<T>(
+  this: T extends object ? WeakMap<T, Trigger> | Map<T, Trigger> : Map<T, Trigger>,
+  key: T
+): void {
+  if (!getListener()) return;
+  let trigger = this.get(key);
+  if (!trigger) {
+    trigger = createTrigger();
+    this.set(key, trigger);
+  }
+  trigger[0]();
+}
+
+export type TriggerCache<T> = {
+  track: (v: T) => void;
+  dirty: (v: T) => void;
+  dirtyAll: VoidFunction;
+};
 
 /**
  * Set listeners in reactive computations and then trigger them when you want. Cache trackers by a `key`.
@@ -303,19 +349,40 @@ export function createTrigger(options?: BaseOptions): Trigger {
  * // this won't cause an update:
  * dirty(2)
  */
-export function createTriggerCache<T>(options?: BaseOptions): TriggerCache<T> {
+export function createTriggerCache<T>(): TriggerCache<T> {
   const cache = new Map<T, Trigger>();
   return {
-    dirty: key => cache.get(key)?.[1](),
-    dirtyAll: () => cache.forEach(s => s[1]()),
-    track(key) {
-      let trigger = cache.get(key);
-      if (!trigger) {
-        trigger = createTrigger(options);
-        cache.set(key, trigger);
-      }
-      trigger[0]();
-    }
+    dirty: dirtyTriggerCache.bind(cache),
+    dirtyAll: dirtyAllTriggerCache.bind(cache),
+    track: trackTriggerCache.bind(cache)
+  };
+}
+
+export type WeakTriggerCache<T extends object> = {
+  track: (v: T) => void;
+  dirty: (v: T) => void;
+};
+
+/**
+ * Set listeners in reactive computations and then trigger them when you want. Cache trackers by a `key`.
+ * @returns `{ track, dirty }` functions
+ * `track` and `dirty` are called with a `key` so that each tracker will trigger an update only when his individual `key` would get marked as dirty.
+ * @example
+ * const { track, dirty } = createWeakTriggerCache()
+ * createEffect(() => {
+ *    track(1)
+ *    ...
+ * })
+ * // later
+ * dirty(1)
+ * // this won't cause an update:
+ * dirty(2)
+ */
+export function createWeakTriggerCache<T extends object>(): WeakTriggerCache<T> {
+  const cache = new WeakMap<T, Trigger>();
+  return {
+    dirty: dirtyTriggerCache.bind(cache as any),
+    track: trackTriggerCache.bind(cache as any)
   };
 }
 
@@ -326,7 +393,7 @@ export type StaticStoreSetter<T extends Readonly<AnyStatic>> = {
 };
 
 /**
- * A shallowly wrapped reactive store object. It behaves similarly to the creatStore, but with limited features to keep it simple. Designed to be used for reactive objects with static keys, but dynamic values, like reactive Event State, location, etc.
+ * A shallowly wrapped reactive store object. It behaves similarly to the createStore, but with limited features to keep it simple. Designed to be used for reactive objects with static keys, but dynamic values, like reactive Event State, location, etc.
  * @param init initial value of the store
  * @returns
  * ```ts

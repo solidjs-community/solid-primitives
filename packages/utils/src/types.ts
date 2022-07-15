@@ -117,14 +117,6 @@ export type FalsyValue = false | 0 | "" | null | undefined;
 export type Truthy<T> = Exclude<T, FalsyValue>;
 export type Falsy<T> = Extract<T, FalsyValue>;
 
-export type TriggerCache<T> = {
-  track: (v: T) => void;
-  dirty: (v: T) => void;
-  dirtyAll: VoidFunction;
-};
-
-export type Trigger = [track: VoidFunction, dirty: VoidFunction];
-
 export type Position = {
   x: number;
   y: number;

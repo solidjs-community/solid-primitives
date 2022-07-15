@@ -1,5 +1,5 @@
 import { noop } from "@solid-primitives/utils";
-import { Accessor } from "solid-js";
+import { Accessor, createMemo, on } from "solid-js";
 import * as API from "./index";
 
 export const createPureReaction: typeof API.createPureReaction = () => noop;
@@ -8,15 +8,28 @@ export const createCurtain = API.createCurtain;
 
 export const createWritableMemo = API.createWritableMemo;
 
-export const createDebouncedMemo: typeof API.createDebouncedMemo = (calc, timeoutMs, options) => {
-  const value = calc(options?.value as any);
+export const createDebouncedMemo: typeof API.createDebouncedMemo = ((calc, timeoutMs, init) => {
+  const value = calc(init as any);
   return () => value;
-};
+}) as typeof API.createDebouncedMemo;
 
-export const createThrottledMemo: typeof API.createThrottledMemo = (calc, timeoutMs, options) => {
-  const value = calc(options?.value as any);
+export const createDebouncedMemoOn: typeof API.createDebouncedMemoOn = ((
+  deps,
+  calc,
+  timeoutMs,
+  init,
+  options
+) =>
+  createMemo(
+    on(deps, calc as any) as () => any,
+    init,
+    options
+  )) as typeof API.createDebouncedMemoOn;
+
+export const createThrottledMemo: typeof API.createThrottledMemo = ((calc, timeoutMs, init) => {
+  const value = calc(init as any);
   return () => value;
-};
+}) as typeof API.createThrottledMemo;
 
 export const createAsyncMemo: typeof API.createAsyncMemo = (calc, options) => options?.value;
 

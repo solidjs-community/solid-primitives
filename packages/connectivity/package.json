@@ -50,20 +50,20 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "1.2.0",
-    "@solid-primitives/event-listener": "^2.0.0",
-    "@solid-primitives/rootless": "^1.1.0"
+    "@solid-primitives/event-listener": "^2.2.0",
+    "@solid-primitives/rootless": "^1.1.0",
+    "@solid-primitives/utils": "1.2.0"
   },
   "devDependencies": {
     "jsdom": "^19.0.0",
-    "prettier": "^2.5.1",
+    "prettier": "^2.7.1",
     "solid-register": "^0.2.5",
-    "tslib": "^2.3.1",
-    "tsup": "^5.11.1",
-    "typescript": "^4.5.3",
-    "unocss": "0.24.3",
-    "uvu": "^0.5.2",
-    "vite": "2.8.1",
+    "tslib": "^2.4.0",
+    "tsup": "^6.1.2",
+    "typescript": "^4.7.4",
+    "unocss": "^0.39.3",
+    "uvu": "^0.5.4",
+    "vite": "^2.9.12",
     "vite-plugin-solid": "2.2.5"
   },
   "peerDependencies": {

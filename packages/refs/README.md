@@ -17,6 +17,7 @@ Collection of primitives, components and directives that help managing reference
 - [`elements`](#elements) - Reactive signal that filters out non-element items from a signal array. _(Can be used with `children` primitive)_
 - [`refs`](#refs) - Get signal references to Elements of the reactive input. Which were added, which were removed. _(Can be used with `children` primitive)_
 - [`mapRemoved`](#mapRemoved) - Similar to Solid's `mapArray`, but you map the elements that were removed from source array. Leting you keep them for longer.
+- [`resolveElements`](#resolveElements) — Will resolve value to a flat list of HTML elements or a single element or `null`.
 
 ##### Directive:
 
@@ -155,6 +156,22 @@ const MyComp = props => {
   });
 
   return combined;
+};
+```
+
+### `resolveElements`
+
+Similarly to `children()` helper from `solid-js` will resolve provided value to a flat list of HTML elements or a single element or `null`. But doesn't create a computation.
+
+```ts
+import { resolveElements } from "@solid-primitives/refs";
+
+const MyComponent: ParentComponent = props => {
+  createEffect(() => {
+    const resolved = resolveElements(props.children);
+    resolved; // T: HTMLElement | HTMLElement[] | null
+  });
+  return "Don't access props.children here again — it'll create new dom nodes";
 };
 ```
 

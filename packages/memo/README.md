@@ -7,7 +7,7 @@
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/memo?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/memo)
 [![version](https://img.shields.io/npm/v/@solid-primitives/memo?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/memo)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Collection of custom `createMemo` primitives. They extend it's functionality while keeping the usage similar.
 
@@ -16,7 +16,8 @@ Collection of custom `createMemo` primitives. They extend it's functionality whi
 - [`createLazyMemo`](#createLazyMemo) - Lazily evaluated memo. Will run the calculation only if is being listened to.
 - [`createAsyncMemo`](#createAsyncMemo) - Memo that allows for asynchronous calculations.
 - [`createDebouncedMemo`](#createDebouncedMemo) - Memo which returned signal is debounced.
-- [`createThrottledMemo`](#createThrottledMemo) - Memo which returned signal is throttled.
+- [`createDebouncedMemoOn`](#createDebouncedMemoOn) - Memo which callback is debounced.
+- [`createThrottledMemo`](#createThrottledMemo) - Memo which callback is throttled.
 - [`createPureReaction`](#createPureReaction) - A `createReaction` that runs before render _(non-batching)_.
 - [`createMemoCache`](#createMemoCache) - Custom, lazily-evaluated, memo, with caching based on keys.
 
@@ -175,7 +176,7 @@ const [data] = createResource(signal, value => {...})
 
 ## `createDebouncedMemo`
 
-Solid's `createMemo` which returned signal is debounced.
+Solid's `createMemo` which returned signal is debounced. _(The callback is not debounced!)_
 
 ### How to use it
 
@@ -186,17 +187,28 @@ import { createDebouncedMemo } from "@solid-primitives/memo";
 const double = createDebouncedMemo(prev => count() * 2, 200);
 
 // with initial value:
-const double = createDebouncedMemo(prev => count() * 2, 200, { value: 0 });
+const double = createDebouncedMemo(prev => count() * 2, 200, 0);
 ```
 
-Notes:
+> **Note** The callback is not perfectly debounced, it will be fired every time the source changes. It's the updates of the returned signal that are debounced. If you want to debounce the callback, use [`createDebouncedMemoOn`](#createDebouncedMemoOn) instead.
 
-1. the callback is not perfectly debounced, it will be fired twice for each debounce duration, instead of once. _(this shouldn't really matter, because only a pure calculation should be passed as callback)_
-2. the callback is run initially to kickoff tracking and set the signal's value.
+## `createDebouncedMemoOn`
+
+Solid's `createMemo` with explicit sources, and debounced callback execution.
+
+The `deps` and `fn` arguments are the same as in Solid's `on` halper.
+
+### How to use it
+
+```ts
+import { createDebouncedMemoOn } from "@solid-primitives/memo";
+
+const double = createDebouncedMemoOn(count, v => v * 2, 200);
+```
 
 ## `createThrottledMemo`
 
-Solid's `createMemo` which returned signal is throttled.
+Solid's `createMemo` which callback execution is throttled.
 
 ### How to use it
 
@@ -207,10 +219,8 @@ import { createThrottledMemo } from "@solid-primitives/memo";
 const double = createThrottledMemo(prev => count() * 2, 200);
 
 // with initial value:
-const double = createThrottledMemo(prev => count() * 2, 200, { value: 0 });
+const double = createThrottledMemo(prev => count() * 2, 200, 0);
 ```
-
-Note: the callback is run initially to kickoff tracking and set the signal's value.
 
 ## `createPureReaction`
 
@@ -340,5 +350,13 @@ Support for Solid 1.4
 Improve how `createPureReaction`, `createThrottledMemo` and `createDebouncedMemo` work when created during batched effect.
 
 Provida a separate tuntime for server.
+
+1.0.0 - **stage-3**
+
+[PR#158](https://github.com/solidjs-community/solid-primitives/pull/158)
+
+Add `createDebouncedMemoOn` primitive.
+
+Move the initial value argument from options to a separate argument in `createDebouncedMemo` and `createThrottledMemo` primitives.
 
 </details>

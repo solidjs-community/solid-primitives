@@ -1,7 +1,11 @@
-const { join } = require("path");
-const { copy, readFile, writeFile, pathExists } = require("fs-extra");
-const pathTo = (...path) => join(__dirname, ...path);
+import { join } from "path";
+import { copy, readFile, writeFile, pathExists } from "fs-extra";
+import { pathTo } from "./utils";
+
 const name = process.argv.pop();
+
+if (!name || !/[a-z0-9\-]+/.test(name) || name.match(/[a-z0-9\-]+/)![0].length !== name.length)
+  throw `Incorrect package name argument: ${name}`;
 
 const templateSrc = pathTo("../template");
 const destSrc = pathTo("../packages", name);
@@ -9,11 +13,8 @@ const pkgPath = join(destSrc, "package.json");
 const readmePath = join(destSrc, "README.md");
 
 (async () => {
-  if (!/[a-z0-9\-]+/.test(name) || name.match(/[a-z0-9\-]+/)[0].length !== name.length)
-    return console.error(`Incorrect package name argument: ${name}`);
-
   const alreadyExists = await pathExists(destSrc);
-  if (alreadyExists) return console.error(`Package ${name} already exists.`);
+  if (alreadyExists) throw `Package ${name} already exists.`;
 
   try {
     // copy /template -> /packages/{name}

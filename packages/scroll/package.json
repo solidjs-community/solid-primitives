@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/scroll",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Reactive primitives to react to element/window scrolling.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -54,21 +54,21 @@
   ],
   "devDependencies": {
     "jsdom": "^19.0.0",
-    "prettier": "^2.6.2",
+    "prettier": "^2.7.1",
     "solid-register": "^0.2.5",
     "tslib": "^2.4.0",
-    "tsup": "^5.12.8",
-    "typescript": "^4.7.3",
-    "unocss": "0.34.0",
-    "uvu": "^0.5.3",
-    "vite": "2.9.9",
+    "tsup": "^6.1.2",
+    "typescript": "^4.7.4",
+    "unocss": "^0.39.3",
+    "uvu": "^0.5.4",
+    "vite": "^2.9.12",
     "vite-plugin-solid": "2.2.6",
     "watchlist": "^0.3.1"
   },
   "dependencies": {
-    "@solid-primitives/utils": "^2.1.0",
-    "@solid-primitives/event-listener": "^2.1.0",
-    "@solid-primitives/rootless": "^1.1.0"
+    "@solid-primitives/event-listener": "^2.2.0",
+    "@solid-primitives/rootless": "^1.1.0",
+    "@solid-primitives/utils": "^2.1.1"
   },
   "peerDependencies": {
     "solid-js": "^1.4.0"

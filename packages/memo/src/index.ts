@@ -13,8 +13,13 @@ import {
   createRoot
 } from "solid-js";
 import type {
+  AccessorArray,
+  EffectFunction,
   EffectOptions,
   MemoOptions,
+  NoInfer,
+  OnEffectFunction,
+  OnOptions,
   Owner,
   SignalOptions
 } from "solid-js/types/reactive/signal";
@@ -150,54 +155,102 @@ export function createWritableMemo<T>(
 }
 
 /**
- * Solid's `createMemo` which returned signal is debounced.
+ * Solid's `createMemo` which returned signal is debounced. *(The {@link fn} callback is not debounced!)*
  *
- * @param calc reactive calculation returning signals value
+ * @param fn reactive calculation returning signals value
  * @param timeoutMs The duration to debounce in ms
- * @param options specify initial value *(by default it will be undefined)*
+ * @param value specify initial value *(by default it will be undefined)*
+ * @param options
+ * @returns signal with debounced value
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createDebouncedMemo
  *
  * @example
  * const double = createDebouncedMemo(() => count() * 2, 200)
  */
-export function createDebouncedMemo<T>(
-  calc: (prev: T) => T,
+export function createDebouncedMemo<Next extends Prev, Prev = Next>(
+  fn: EffectFunction<undefined | NoInfer<Prev>, Next>,
+  timeoutMs: number
+): Accessor<Next>;
+export function createDebouncedMemo<Next extends Prev, Init = Next, Prev = Next>(
+  fn: EffectFunction<Init | Prev, Next>,
   timeoutMs: number,
-  options: MemoOptionsWithValue<T> & { value: T }
-): Accessor<T>;
+  value: Init,
+  options?: MemoOptions<Next>
+): Accessor<Next>;
 export function createDebouncedMemo<T>(
-  calc: (prev: T | undefined) => T,
+  fn: (prev: T | undefined) => T,
   timeoutMs: number,
-  options?: MemoOptionsWithValue<T>
-): Accessor<T>;
-export function createDebouncedMemo<T>(
-  calc: (prev: T | undefined) => T,
-  timeoutMs: number,
-  options: MemoOptionsWithValue<T | undefined> = {}
+  value?: T,
+  options?: MemoOptions<T | undefined>
 ): Accessor<T> {
-  let onInvalidate: VoidFunction = noop;
-  const track = createPureReaction(() => onInvalidate());
-  const [state, setState] = createSignal(
+  const memo = createMemo(() => fn(value), undefined, options);
+  const [signal, setSignal] = createSignal(untrack(memo));
+  const updateSignal = debounce(() => (value = setSignal(memo)), timeoutMs);
+  createComputed(on(memo, updateSignal, { defer: true }));
+  return signal;
+}
+
+/**
+ * Solid's `createMemo` with explicit sources, and debounced callback.
+ *
+ * @param sources signal or a list of reactive signals *(Similar to `on` helper)*
+ * @param calc reactive calculation returning signals value
+ * @param timeoutMs The duration to debounce in ms
+ * @param value specify initial value *(by default it will be undefined)*
+ * @param options
+ * @returns signal with debounced value
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createDebouncedMemoOn
+ *
+ * @example
+ * const double = createDebouncedMemoOn(count, v => v * 2, 200)
+ */
+export function createDebouncedMemoOn<S, Next extends Prev, Prev = Next>(
+  deps: AccessorArray<S> | Accessor<S>,
+  fn: (input: S, prevInput: S | undefined, prev: undefined | NoInfer<Prev>) => Next,
+  timeoutMs: number
+): Accessor<Next>;
+export function createDebouncedMemoOn<S, Next extends Prev, Init = Next, Prev = Next>(
+  deps: AccessorArray<S> | Accessor<S>,
+  fn: (input: S, prevInput: S | undefined, prev: Prev | Init) => Next,
+  timeoutMs: number,
+  value: Init,
+  options?: MemoOptions<Next>
+): Accessor<Next>;
+export function createDebouncedMemoOn<S, Next extends Prev, Prev = Next>(
+  deps: AccessorArray<S> | Accessor<S>,
+  fn: (input: S, prevInput: S | undefined, prev: Prev | undefined) => Next,
+  timeoutMs: number,
+  value?: Prev,
+  options?: MemoOptions<Next | undefined>
+): Accessor<Next> {
+  let init = true;
+  const [signal, setSignal] = createSignal(
     (() => {
-      let v!: T;
-      track(() => (v = calc(options.value)));
+      let v!: Next;
+      createComputed(
+        on(deps, (input, prevInput) => {
+          if (init) {
+            v = fn(input, prevInput, value);
+            init = false;
+          } else updateSignal(input, prevInput);
+        })
+      );
       return v;
     })(),
     options
   );
-  const fn = debounce(() => track(() => setState(calc)), timeoutMs);
-  onInvalidate = () => {
-    fn();
-    track(() => calc(state()));
-  };
-  return state;
+  const updateSignal = debounce((input: S, prevInput: S | undefined) => {
+    setSignal(() => fn(input, prevInput, signal()));
+  }, timeoutMs);
+  return signal;
 }
 
 /**
- * Solid's `createMemo` which returned signal is throttled.
+ * Solid's `createMemo` which callback execution is throttled.
  *
- * @param calc reactive calculation returning signals value
+ * @param fn reactive calculation returning signals value
  * @param timeoutMs The duration to throttle in ms
  * @param options specify initial value *(by default it will be undefined)*
  *
@@ -206,32 +259,33 @@ export function createDebouncedMemo<T>(
  * @example
  * const double = createThrottledMemo(() => count() * 2, 200)
  */
-export function createThrottledMemo<T>(
-  calc: (prev: T) => T,
+export function createThrottledMemo<Next extends Prev, Prev = Next>(
+  fn: EffectFunction<undefined | NoInfer<Prev>, Next>,
+  timeoutMs: number
+): Accessor<Next>;
+export function createThrottledMemo<Next extends Prev, Init = Next, Prev = Next>(
+  fn: EffectFunction<Init | Prev, Next>,
   timeoutMs: number,
-  options: MemoOptionsWithValue<T> & { value: T }
-): Accessor<T>;
+  value: Init,
+  options?: MemoOptions<Next>
+): Accessor<Next>;
 export function createThrottledMemo<T>(
-  calc: (prev: T | undefined) => T,
+  fn: (prev: T | undefined) => T,
   timeoutMs: number,
-  options?: MemoOptionsWithValue<T>
-): Accessor<T>;
-export function createThrottledMemo<T>(
-  calc: (prev: T | undefined) => T,
-  timeoutMs: number,
-  options: MemoOptionsWithValue<T | undefined> = {}
+  value?: T,
+  options?: MemoOptions<T | undefined>
 ): Accessor<T> {
   let onInvalidate: VoidFunction = noop;
   const track = createPureReaction(() => onInvalidate());
   const [state, setState] = createSignal(
     (() => {
       let v!: T;
-      track(() => (v = calc(options.value)));
+      track(() => (v = fn(value)));
       return v;
     })(),
     options
   );
-  onInvalidate = throttle(() => track(() => setState(calc)), timeoutMs);
+  onInvalidate = throttle(() => track(() => setState(fn)), timeoutMs);
   return state;
 }
 

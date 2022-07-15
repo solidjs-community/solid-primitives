@@ -12,9 +12,7 @@
 The reactive versions of `Map` & `WeakMap` built-in data structures.
 
 - **[`ReactiveMap`](#reactivemap-and-reactiveweakmap)** - A reactive `Map`.
-- **[`createMap`](#createMap)** - Function returning an instance of `ReactiveMap`.
 - **[`ReactiveWeakMap`](#reactivemap-and-reactiveweakmap)** - A reactive `WeakMap`.
-- **[`createWeakMap`](#createWeakMap)** - Function returning an instance of `ReactiveWeakMap`.
 
 ## Installation
 
@@ -54,7 +52,7 @@ createEffect(() => {
 // apply changes
 userPoints.set(user1, 100);
 userPoints.delete(user2);
-userPoints.set(user1, n => n * 10);
+userPoints.set(user1, { foo: "bar" });
 ```
 
 #### Constructor arguments
@@ -89,22 +87,6 @@ map.get("John").age = 35;
 map.set("John", { age: 35 });
 ```
 
-### `createMap` and `createWeakMap`
-
-These functions are returning instances of `ReactiveMap`/`ReactiveWeakMap`.
-
-```ts
-import { createMap } from "@solid-primitives/map";
-// or
-import { createWeakMap } from "@solid-primitives/map";
-
-const userPoints = createMap<User, number>();
-userPoints.get(user1);
-userPoints.set(user1, 100);
-userPoints.set(user1, n => n * 10);
-userPoints.delete(user1);
-```
-
 ## Changelog
 
 <details>
@@ -113,5 +95,15 @@ userPoints.delete(user1);
 0.0.100
 
 Initial release of the package.
+
+0.2.0
+
+Deprecated `createMap` and `createWeakMap` functions, as they weren't providing any benefit over instanciating with the `new` keyword.
+
+`ReactiveMap` and `ReactiveWeakMap` now will respect `instanceof Map/WeakMap` checks.
+
+Internal signals will be created only if read in a tracking scope.
+
+Remove setter function api from `.set()` method.
 
 </details>

@@ -9,9 +9,10 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/intersection-observer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/intersection-observer)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A range of IntersectionObserver API utilities great for different types of usecases:
+A range of IntersectionObserver API utilities great for different types of use cases:
 
-- `createIntersectionObserver` - Creates a basic intersection observer exposing methods to manage the observable.
+- `makeIntersectionObserver` - Creates a basic non-reactive Intersection Observer exposing methods to manage the observable.
+- `createIntersectionObserver` - A reactive observer primitive.
 - `createViewportObserver` - More advanced tracker that creates a store of element signals.
 - `createVisibilityObserver` - Basic visibility observer using a signal.
 
@@ -25,6 +26,39 @@ yarn add @solid-primitives/intersection-observer
 
 ## How to use them
 
+### makeIntersectionObserver
+
+```tsx
+// Basic usage:
+const { add, remove, start, stop, instance }] = makeIntersectionObserver(els, entries => {
+  entries.forEach(e => console.log(e.isIntersecting));
+});
+add(el)
+
+// Directive usage:
+const { add: intersectionObserver } = makeIntersectionObserver([], entries => {
+  entries.forEach(e => console.log(e.isIntersecting));
+});
+<div use:intersectionObserver></div>
+```
+
+#### Definition
+
+```ts
+function makeIntersectionObserver = (
+  elements: Element[],
+  onChange: IntersectionObserverCallback,
+  options?: IntersectionObserverInit
+): {
+  add:  AddIntersectionObserverEntry,
+  remove:  RemoveIntersectionObserverEntry;
+  start: () =>  void;
+  reset: () =>  void;
+  stop: () =>  void;
+  instance: IntersectionObserver;
+}
+```
+
 ### createIntersectionObserver
 
 ```tsx
@@ -35,8 +69,18 @@ const [add, { remove, start, stop, instance }] = createIntersectionObserver(els,
 add(el)
 
 // Directive usage:
-const [observer] = createIntersectionObserver()
-<div use:observer></div>
+const [intersectionObserver] = createIntersectionObserver()
+<div use:intersectionObserver></div>
+```
+
+#### Definition
+
+```ts
+function createIntersectionObserver = (
+  elements: Accessor<Element[]>,
+  onChange: IntersectionObserverCallback,
+  options?: IntersectionObserverInit
+)
 ```
 
 ### createViewportObserver
@@ -53,15 +97,44 @@ const [observer] = createIntersectionObserver()
 <div use:observer={(e) => console.log(e.isIntersecting)}></div>
 ```
 
+#### Definition
+
+```ts
+function createVisibilityObserver = (
+  element: MaybeAccessor<Element>,
+  options?: IntersectionObserverInit & {
+    initialValue?: boolean;
+    once?: boolean;
+  }
+): [
+  Accessor<boolean>,
+  {
+    start: () =>  void;
+    stop: () =>  void;
+    instance: IntersectionObserver
+  }
+]
+```
+
 ### createVisibilityObserver
 
 ```ts
 const [isVisible, { start, stop, instance }] = createVisibilityObserver(() => el, { once: true });
 ```
 
+#### Definition
+
+```ts
+function createViewportObserver(
+  elements: MaybeAccessor<Element[]>,
+  callback: EntryCallback,
+  options?: IntersectionObserverInit
+): CreateViewportObserverReturnValue;
+```
+
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/solid-primitives-intersection-observer-h22it?file=/src/index.tsx
+You may view a working example here: https://stackblitz.com/edit/vitejs-vite-n2lwpq
 
 ## Changelog
 
@@ -103,5 +176,13 @@ Updated to Solid 1.3
 1.2.2
 
 Minor improvements
+
+1.3.0
+
+General improvements to bring up to latest standards.
+
+1.4.0
+
+Migrated to new `make` pattern and improved primitive structures.
 
 </details>

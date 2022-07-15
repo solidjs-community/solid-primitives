@@ -11,9 +11,10 @@
 
 Collection of reactive primitives to deal with media queries.
 
+- [`makeMediaQueryListener`](#makeMediaQueryListener) - Listen for changes to provided Media Query.
 - [`createMediaQuery`](#createMediaQuery) - Creates a very simple and straightforward media query monitor.
 - [`createBreakpoints`](#createBreakpoints) - Creates a multi-breakpoint monitor to make responsive components easily.
-- [`makeMediaQueryListener`](#makeMediaQueryListener) - Listen for changes to provided Media Query.
+- [`usePrefersDark`](#usePrefersDark) - Provides a signal indicating if the user has requested dark color theme.
 
 ## Installation
 
@@ -21,6 +22,20 @@ Collection of reactive primitives to deal with media queries.
 npm install @solid-primitives/media
 # or
 yarn add @solid-primitives/media
+```
+
+## `makeMediaQueryListener`
+
+Attaches a MediaQuery listener to window, listeneing to changes to provided query
+
+```ts
+import { makeMediaQueryListener } from "@solid-primitives/media";
+
+const clear = makeMediaQueryListener("(max-width: 767px)", e => {
+  console.log(e.matches);
+});
+// remove listeners (will happen also on cleanup)
+clear();
 ```
 
 ## `createMediaQuery`
@@ -81,21 +96,32 @@ const Example: Component = () => {
 };
 ```
 
-## `makeMediaQueryListener`
+[Working Demo](https://codesandbox.io/s/solid-responsive-breakpoints-h4emy8?file=/src/index.tsx)
 
-Attaches a MediaQuery listener to window, listeneing to changes to provided query
+## `usePrefersDark`
+
+Provides a signal indicating if the user has requested dark color theme. The setting is being watched with a [Media Query](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme).
+
+### How to use it
 
 ```ts
-import { makeMediaQueryListener } from "@solid-primitives/media";
+import { usePrefersDark } from "@solid-primitives/media";
 
-const clear = makeMediaQueryListener("(max-width: 767px)", e => {
-  console.log(e.matches);
+const prefersDark = usePrefersDark();
+createEffect(() => {
+  prefersDark(); // => boolean
 });
-// remove listeners (will happen also on cleanup)
-clear();
 ```
 
-[Working Demo](https://codesandbox.io/s/solid-responsive-breakpoints-h4emy8?file=/src/index.tsx)
+### Server fallback
+
+`usePrefersDark` accepts a `serverFallback` argument — value that should be returned on the server — defaults to `false`.
+
+```ts
+const prefersDark = usePrefersDark(true);
+// will return true on the server
+prefersDark();
+```
 
 ## Changelog
 
@@ -129,6 +155,12 @@ Added createBreakpoints primitive as an alpha release.
 1.3.0
 
 Added `makeMediaQueryListener`, implementation improvements
+
+2.0.0
+
+Add `usePrefersDark`.
+
+Remove the default export. (`createMediaQuery` will only be available as named export)
 
 </details>
 

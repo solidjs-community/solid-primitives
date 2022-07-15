@@ -2,11 +2,7 @@ import { createRoot, createSignal } from "solid-js";
 import { suite } from "uvu";
 import * as assert from "uvu/assert";
 
-import {
-  createIntersectionObserver,
-  createViewportObserver,
-  createVisibilityObserver
-} from "../src";
+import { makeIntersectionObserver, createViewportObserver, createVisibilityObserver } from "../src";
 
 const intersectionObserverInstances: any[] = [];
 
@@ -61,27 +57,26 @@ global.IntersectionObserver = IntersectionObserver;
 const runOnChangeOnLastObserver = (payload: any) =>
   intersectionObserverInstances[intersectionObserverInstances.length - 1].onChange(payload);
 
-const cio = suite("createIntersectionObserver");
+const mio = suite("makeIntersectionObserver");
 
-cio.before(context => {
+mio.before(context => {
   context.div = document.createElement("div");
   context.img = document.createElement("img");
 });
 
-cio("creates a new IntersectionObserver instance", ({ div }) => {
+mio("creates a new IntersectionObserver instance", ({ div }) => {
   const previousInstanceCount = intersectionObserverInstances.length;
   createRoot(dispose => {
-    createIntersectionObserver(div, console.log);
+    makeIntersectionObserver(div, console.log);
     dispose();
   });
   const newInstanceCount = intersectionObserverInstances.length;
   assert.is(previousInstanceCount + 1, newInstanceCount, "new instance was not created");
 });
 
-cio("returns the created IntersectionObserver instance", () => {
+mio("returns the created IntersectionObserver instance", () => {
   createRoot(dispose => {
-    const [, { instance }] = createIntersectionObserver([], () => {});
-
+    const { instance } = makeIntersectionObserver([], () => {});
     assert.is(
       intersectionObserverInstances[intersectionObserverInstances.length - 1],
       instance,
@@ -92,14 +87,14 @@ cio("returns the created IntersectionObserver instance", () => {
   });
 });
 
-cio("options are passed to IntersectionObserver", ({ div }) => {
+mio("options are passed to IntersectionObserver", ({ div }) => {
   createRoot(dispose => {
     const options: IntersectionObserverInit = {
       threshold: 0.6,
       root: div,
       rootMargin: "10px 10px 10px 10px"
     };
-    const [, { instance }] = createIntersectionObserver([], () => {}, options);
+    const { instance } = makeIntersectionObserver([], () => {}, options);
 
     assert.is(
       (instance as IntersectionObserver).options,
@@ -111,9 +106,9 @@ cio("options are passed to IntersectionObserver", ({ div }) => {
   });
 });
 
-cio("add function observes an element", ({ div }) => {
+mio("add function observes an element", ({ div }) => {
   createRoot(dispose => {
-    const [add, { instance }] = createIntersectionObserver([], () => {});
+    const { add, instance } = makeIntersectionObserver([], () => {});
     add(div);
 
     assert.is(
@@ -126,9 +121,9 @@ cio("add function observes an element", ({ div }) => {
   });
 });
 
-cio("remove function removes observed element", ({ div }) => {
+mio("remove function removes observed element", ({ div }) => {
   createRoot(dispose => {
-    const [add, { instance, remove }] = createIntersectionObserver([], () => {});
+    const { add, instance, remove } = makeIntersectionObserver([], () => {});
     add(div);
     remove(div);
 
@@ -142,9 +137,9 @@ cio("remove function removes observed element", ({ div }) => {
   });
 });
 
-cio("start function observes initial elements", ({ div, img }) => {
+mio("start function observes initial elements", ({ div, img }) => {
   createRoot(dispose => {
-    const [, { start, instance, stop }] = createIntersectionObserver([div, img], () => {});
+    const { start, instance, stop } = makeIntersectionObserver([div, img], () => {});
     start();
 
     assert.is(
@@ -162,10 +157,7 @@ cio("start function observes initial elements", ({ div, img }) => {
       "elements were not added to the IntersectionObserver on restart"
     );
 
-    const [, { start: start2, instance: instance2 }] = createIntersectionObserver(
-      () => [div, img],
-      () => {}
-    );
+    const { start: start2, instance: instance2 } = makeIntersectionObserver([div, img], () => {});
     start2();
 
     assert.is(
@@ -178,9 +170,9 @@ cio("start function observes initial elements", ({ div, img }) => {
   });
 });
 
-cio("stop function unobserves all elements", ({ div, img }) => {
+mio("stop function unobserves all elements", ({ div, img }) => {
   createRoot(dispose => {
-    const [, { instance, start, stop }] = createIntersectionObserver([div, img], () => {});
+    const { instance, start, stop } = makeIntersectionObserver([div, img], () => {});
     start();
     stop();
 
@@ -194,39 +186,33 @@ cio("stop function unobserves all elements", ({ div, img }) => {
   });
 });
 
-cio("onChange callback", ({ div, img }) => {
+mio("onChange callback", ({ div, img }) => {
   createRoot(dispose => {
     let cbEntries!: IntersectionObserverEntry[];
     let cbInstance!: IntersectionObserver;
-    const [, { instance, start }] = createIntersectionObserver([div, img], (entries, observer) => {
+    const { instance, start } = makeIntersectionObserver([div, img], (entries, observer) => {
       cbEntries = entries;
       cbInstance = observer as IntersectionObserver;
     });
     start();
-
     (instance as IntersectionObserver).__TEST__onChange();
-
     assert.is(cbInstance, instance, "IntersectionObserver instance is not passed to the callback");
-
     assert.is(cbEntries.length, 2, "IntersectionObserver Entries are not passed to the callback");
-
     assert.type(cbEntries[0].isIntersecting, "boolean", "Entry is missing isIntersecting property");
-
     assert.is(cbEntries[0].target, div, "Entry target doesn't match the correct element");
-
     dispose();
   });
 });
 
-cio("add function works as a directive", () => {
+mio("add function works as a directive", () => {
   createRoot(dispose => {
     const el = document.createElement("div");
-    const [observe, { instance }] = createIntersectionObserver([], e => {
+    const { add, instance } = makeIntersectionObserver([], e => {
       assert.is(e[0].target, el);
     });
     const [props] = createSignal(true);
     // @ts-ignore
-    observe(el, props);
+    add(el, props);
 
     (instance as IntersectionObserver).__TEST__onChange();
 
@@ -234,7 +220,7 @@ cio("add function works as a directive", () => {
   });
 });
 
-cio.run();
+mio.run();
 
 const cvo = suite("createViewportObserver");
 
@@ -337,43 +323,36 @@ cvo("start function observes initial elements", ({ div, img }) => {
       2,
       "elements were not added to the IntersectionObserver on restart"
     );
-
     const [, { start: start2, instance: instance2 }] = createViewportObserver([
       [div, () => {}],
       [img, () => {}]
     ]);
     start2();
-
     assert.is(
       (instance2 as IntersectionObserver).elements.length,
       2,
       "elements in array of tuples were not added to the IntersectionObserver"
     );
-
     const [, { start: start3, instance: instance3 }] = createViewportObserver(
       () => [div, img],
       () => {}
     );
     start3();
-
     assert.is(
       (instance3 as IntersectionObserver).elements.length,
       2,
       "elements in array accessor were not added to the IntersectionObserver"
     );
-
     const [, { start: start4, instance: instance4 }] = createViewportObserver(() => [
       [div, () => {}],
       [img, () => {}]
     ]);
     start4();
-
     assert.is(
       (instance4 as IntersectionObserver).elements.length,
       2,
       "elements in an accessor od array of tuples were not added to the IntersectionObserver"
     );
-
     dispose();
   });
 });
@@ -383,13 +362,11 @@ cvo("stop function unobserves all elements", ({ div, img }) => {
     const [, { instance, start, stop }] = createViewportObserver([div, img], () => {});
     start();
     stop();
-
     assert.is(
       (instance as IntersectionObserver).elements.length,
       0,
       "elements weren't removed from the IntersectionObserver"
     );
-
     dispose();
   });
 });
@@ -403,17 +380,11 @@ cvo("calls onChange callback for initial elements with common callback", ({ div,
       cbInstance = observer as IntersectionObserver;
     });
     start();
-
     (instance as IntersectionObserver).__TEST__onChange();
-
     assert.is(cbInstance, instance, "IntersectionObserver instance is not passed to the callback");
-
     assert.is(cbEntries.length, 2, "IntersectionObserver Entries are not passed to the callback");
-
     assert.type(cbEntries[0].isIntersecting, "boolean", "Entry is missing isIntersecting property");
-
     assert.is(cbEntries[0].target, div, "Entry target doesn't match the correct element");
-
     dispose();
   });
 });

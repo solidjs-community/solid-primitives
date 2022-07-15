@@ -10,26 +10,27 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx}\"",
+    "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx,md}\"",
     "build": "turbo run build",
     "test": "turbo run test",
-    "new-package": "node ./scripts/new-package",
-    "update-readme": "node ./scripts/update-readme"
+    "new-package": "jiti ./scripts/new-package.ts",
+    "update-readme": "jiti ./scripts/update-readme.ts"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
     "fs-extra": "^10.1.0",
+    "jiti": "^1.14.0",
     "json-to-markdown-table": "^1.0.0",
     "turbo": "^1.2.16",
-    "markdown-magic": "^2.6.0",
-    "prettier": "^2.5.1",
-    "solid-js": "^1.4.3",
-    "tsup": "^5.12.1",
-    "typescript": "^4.6.2",
-    "unocss": "0.29.5",
-    "vite": "2.8.6",
+    "prettier": "^2.7.1",
+    "solid-js": "^1.4.4",
+    "tsup": "^6.1.2",
+    "typescript": "^4.7.4",
+    "unocss": "^0.39.3",
+    "vite": "^2.9.14",
     "vite-plugin-solid": "2.2.6",
-    "vitest": "^0.7.7"
+    "vitest": "^0.18.0"
   },
-  "packageManager": "pnpm@6.32.11"
+  "packageManager": "pnpm@7.2.1"
 }
+

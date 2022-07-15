@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/memo",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Collection of custom memo primitives. They extend Solid's createMemo functionality while keeping the usage similar.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "contributors": [],
@@ -15,13 +15,14 @@
   },
   "primitive": {
     "name": "memo",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "createCurtain",
       "createWritableMemo",
       "createLazyMemo",
       "createAsyncMemo",
       "createDebouncedMemo",
+      "createDebouncedMemoOn",
       "createThrottledMemo",
       "createPureReaction",
       "createMemoCache"
@@ -58,20 +59,20 @@
   ],
   "dependencies": {
     "@solid-primitives/scheduled": "1.0.0",
-    "@solid-primitives/utils": "^2.0.1"
+    "@solid-primitives/utils": "^2.1.1"
   },
   "devDependencies": {
     "@solid-primitives/mouse": "^2.0.0",
     "jsdom": "^19.0.0",
-    "prettier": "^2.6.2",
+    "prettier": "^2.7.1",
     "solid-app-router": "^0.3.3",
     "solid-register": "^0.2.5",
     "tslib": "^2.4.0",
-    "tsup": "^5.12.8",
-    "typescript": "^4.6.4",
-    "unocss": "0.34.0",
-    "uvu": "^0.5.3",
-    "vite": "2.9.9",
+    "tsup": "^6.1.2",
+    "typescript": "^4.7.4",
+    "unocss": "^0.39.3",
+    "uvu": "^0.5.4",
+    "vite": "^2.9.12",
     "vite-plugin-solid": "2.2.6"
   },
   "peerDependencies": {

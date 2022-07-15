@@ -144,7 +144,7 @@ const [active, setActive] = createSignal(false)
 #### Definition
 
 ```ts
-Directive<(isActive: boolean) => void>
+Directive<(isActive: boolean) => void>;
 ```
 
 ## Demo

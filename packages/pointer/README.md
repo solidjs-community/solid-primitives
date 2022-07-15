@@ -183,7 +183,7 @@ Primitive takes one `config` argument, of options:
 Returns a list of pointers on the screen:
 
 ```ts
-Accessor<Accessor<PointerListItem>[]>
+Accessor<Accessor<PointerListItem>[]>;
 ```
 
 Basic example:

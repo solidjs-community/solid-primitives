@@ -71,7 +71,7 @@ const pos = createMousePosition(window, { touch: false });
 
 #### `useMousePosition`
 
-This primitive providea a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) variant that will listen to window mouse position, and reuse event listeners and signals across dependents.
+This primitive provides a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) variant that will listen to window mouse position, and reuse event listeners and signals across dependents.
 
 ```ts
 const pos = useMousePosition();
