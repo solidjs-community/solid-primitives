@@ -8,9 +8,11 @@ export type {
   StorageObject,
   StorageSetter,
   AsyncStorage,
+  StorageActions,
   AsyncStorageWithOptions,
   AsyncStorageObject,
   AsyncStorageSetter,
+  AsyncStorageActions,
   StorageSignalProps
 } from "./types";
 
