@@ -1,10 +1,6 @@
-import "./setup";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { test, expect } from 'vitest';
 import { createRoot, createEffect, createSignal } from "solid-js";
 import { createFetch, withAbort, withCache, withCatchAll, withTimeout } from "../src";
-
-const test = suite("createFetch");
 
 const mockResponseBody = { ready: true };
 const mockResponse = new Response(JSON.stringify(mockResponseBody), {
@@ -12,6 +8,7 @@ const mockResponse = new Response(JSON.stringify(mockResponseBody), {
   status: 200
 });
 const mockUrl = "https://test.url/ready.json";
+const mockUrl2 = "https://test.url/notready.json";
 let mockError: Error | undefined = undefined;
 let expected: { input: RequestInfo; init?: RequestInit } = {
   input: mockUrl,
@@ -20,10 +17,10 @@ let expected: { input: RequestInfo; init?: RequestInit } = {
 const fetchMock: typeof fetch = (input: RequestInfo, init?: RequestInit): Promise<Response> =>
   new Promise((resolve, reject) => {
     if (expected.input) {
-      assert.equal(input, expected.input);
+      expect(input).toEqual(expected.input);
     }
     if (expected.init) {
-      assert.equal(init, expected.init);
+      expect(init).toEqual(expected.init);
     }
     if (mockError) {
       reject(mockError);
@@ -44,7 +41,7 @@ test("will fetch json data", () =>
           throw ready.error;
         }
         if (typeof isReady !== "undefined") {
-          assert.is(isReady, true);
+          expect(isReady).toBe(true);
           dispose();
           resolve();
         }
@@ -65,7 +62,7 @@ test("will fetch text data", () =>
           throw ready.error;
         }
         if (typeof answer !== "undefined") {
-          assert.is(answer, JSON.stringify(mockResponseBody));
+          expect(answer).toBe(JSON.stringify(mockResponseBody));
           dispose();
           resolve();
         }
@@ -78,8 +75,8 @@ test("will abort a request without an error", () =>
     const [ready, { abort }] = createFetch<typeof mockResponseBody>(mockUrl, { fetch: fetchMock }, [
       withAbort()
     ]);
-    abort();
-    assert.is(ready.aborted, true);
+    abort!();
+    expect(ready.aborted).toBe(true);
     createEffect(() => {
       if (ready.error) {
         throw ready.error;
@@ -102,7 +99,7 @@ test("will make a request error accessible otherwise", () =>
       });
       createEffect(() => {
         if (ready.error) {
-          assert.is(ready.error, fetchError);
+          expect(ready.error).toBe(fetchError);
           dispose();
           resolve();
         }
@@ -135,16 +132,8 @@ test("will not start a request with a requestinfo accessor returning undefined",
     const fetch = () => new Promise<typeof mockResponse>((r) => setTimeout(() => r(mockResponse), 1000));
     const [ready] = createFetch(mockUrl, { fetch }, [withTimeout(50), withAbort(), withCatchAll()])
     createEffect((iteration: number = 0) => {
-      assert.equal(ready.error, [undefined, new Error('timeout')][iteration])
-      return iteration + 1;
-    });
-    createEffect((iteration: number = 0) => {
-      ready();
+      expect(ready.error).toEqual([undefined, new Error('timeout')][iteration])
       if (iteration === 1) {
-        assert.is(ready(), undefined);
-        assert.is(ready.aborted, true);
-      }
-      if (iteration === 2) {
         dispose();
         resolve();
       }
@@ -154,28 +143,26 @@ test("will not start a request with a requestinfo accessor returning undefined",
 
 test('caches request instead of making them twice', () => new Promise<void>((resolve) => createRoot((dispose) => {
   let calls = 0;
-  const [url, setUrl] = createSignal(undefined, { equals: false });
-  const cache = {}
+  const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
+  const cache = {};
   const fetch = () => { calls++; return Promise.resolve(mockResponse); };
-  const [ready] = createFetch(url, { fetch }, [withCache({ cache })]);
+  const [ready] = createFetch(url, { fetch }, [withCache({ cache, expires: 100000 })]);
   createEffect((iteration: number = 0) => {
     ready();
     if (iteration === 0) {
       setUrl(mockUrl);
-    }
+    }    
     if (iteration === 1) {
-      setUrl(mockUrl)
+      setUrl(mockUrl2)
     }
     if (iteration === 2) {
       setUrl(mockUrl)
     }
     if (iteration === 3) {
-      assert.is(calls, 1);
+      expect(calls).toBe(2);
       dispose();
       resolve();
     }
     return iteration + 1;
   });
 })));
-
-test.run();
