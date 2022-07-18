@@ -49,15 +49,15 @@ export const withCache: RequestModifier =
     options: CacheOptions = defaultCacheOptions
   ) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
-    requestContext.cache = requestContext.cache || options.cache;
+    requestContext.cache = options.cache || requestContext.cache;
     const isExpired = (entry: CacheEntry) =>
       typeof options.expires === "number"
-        ? entry.ts + options.expires > new Date().getTime()
+        ? entry.ts + options.expires < new Date().getTime()
         : options.expires(entry);
     wrapFetcher<Result, FetcherArgs>(
       requestContext,
       <T>(originalFetcher: any) =>
-        (requestData, info) => {
+        (requestData, info) => {          
           const serializedRequest = serializeRequest(requestData);
           const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
           const shouldRead = requestContext.readCache?.(cached) !== false;
@@ -65,14 +65,13 @@ export const withCache: RequestModifier =
             return Promise.resolve<T>(cached.data);
           }
           return originalFetcher(requestData, info).then((data: T) => {
-            requestContext.writeCache?.(
-              serializedRequest,
-              (requestContext.cache[serializedRequest] = {
-                ts: new Date().getTime(),
-                requestData: requestData,
-                data
-              })
-            );
+            const cacheEntry = {
+              ts: new Date().getTime(),
+              requestData: requestData,
+              data
+            };
+            requestContext.cache[serializedRequest] = cacheEntry;
+            requestContext.writeCache?.(serializedRequest, cacheEntry);
             return data;
           });
         }

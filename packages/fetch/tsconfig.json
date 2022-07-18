@@ -5,5 +5,5 @@
     "emitDeclarationOnly": false,
     "types": ["node"]
   },
-  "include": ["./src"]
+  "include": ["./src", "vitest/client"]
 }
