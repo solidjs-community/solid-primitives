@@ -1,5 +1,8 @@
 import { vitestConfig } from "../../vite.config";
 
-vitestConfig.test!.setupFiles = ['./test/setup.ts'];
+if (!vitestConfig.test) {
+  vitestConfig.test = {};
+}
+vitestConfig.test.setupFiles = ['./test/setup.ts'];
 
 export default vitestConfig;
