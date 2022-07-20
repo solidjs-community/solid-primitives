@@ -9,7 +9,7 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/fetch?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/fetch)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Creates a primitive to support abortable HTTP requests. If any reactive request options changes, the request is aborted automatically.
+Creates a primitive to support a composable HTTP requests.
 
 ## Installation
 
@@ -34,20 +34,21 @@ If you fail to install it, but still run it on the server, you should see a nice
 ## How to use it
 
 ```ts
-const [resource, { mutate, refetch, abort }] = createFetch<T>(
+const [resource, { mutate, refetch }] = createFetch<T>(
   requestInfo: Accessor<RequestInfo | undefined> | RequestInfo,
   requestInit?: Accessor<RequestInit | undefined> | RequestInit | undefined,
-  options?: { initialValue: T, name?: string }
+  options?: { initialValue: T, name?: string },
+  modifiers?: RequestModifier[]
 );
 
 resource(): T
-resource.aborted: boolean
 resource.error: Error | any | undefined
 resource.loading: boolean
 resource.status: number | null
+resource.response: Response
 ```
 
-Remember, just like with [`createResource`](https://www.solidjs.com/docs/latest/api#createresource), you will need an [`<ErrorBoundary>`](https://www.solidjs.com/docs/latest/api#%3Cerrorboundary%3E) to catch the errors, even if they are accessible inside the resource. Otherwise, uncaught errors might disrupt your application.
+Remember, just like with [`createResource`](https://www.solidjs.com/docs/latest/api#createresource), you will need an [`<ErrorBoundary>`](https://www.solidjs.com/docs/latest/api#%3Cerrorboundary%3E) to catch the errors, even if they are accessible inside the resource. Otherwise, uncaught errors might disrupt your application - except if you use the `withCatchAll()` modifier.
 
 If you want to initialize a fetch request without directly starting it, you can use an Accessor that returns undefined before being set to the actual request info or url. Even if you add a RequestInit, the request will not be started without a defined RequestInfo.
 
