@@ -31,7 +31,7 @@
     "unocss": "^0.39.3",
     "vite": "^2.9.14",
     "vite-plugin-solid": "2.2.6",
-    "vitest": "^0.18.0"
+    "vitest": "^0.18.1"
   },
   "packageManager": "pnpm@7.5.0"
 }

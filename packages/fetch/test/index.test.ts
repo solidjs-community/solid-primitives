@@ -1,6 +1,8 @@
 import { test, expect } from 'vitest';
 import { createRoot, createEffect, createSignal } from "solid-js";
-import { createFetch, withAbort, withCache, withCatchAll, withTimeout } from "../src";
+import { createFetch } from "../src/fetch";
+import { withAbort, withCatchAll, withTimeout } from "../src/modifiers";
+import { withCache, withCacheStorage } from "../src/cache";
 
 const mockResponseBody = { ready: true };
 const mockResponse = new Response(JSON.stringify(mockResponseBody), {
@@ -14,7 +16,7 @@ let expected: { input: RequestInfo; init?: RequestInit } = {
   input: mockUrl,
   init: undefined
 };
-const fetchMock: typeof fetch = (input: RequestInfo, init?: RequestInit): Promise<Response> =>
+const fetchMock: typeof fetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> =>
   new Promise((resolve, reject) => {
     if (expected.input) {
       expect(input).toEqual(expected.input);
@@ -162,6 +164,72 @@ test('caches request instead of making them twice', () => new Promise<void>((res
       expect(calls).toBe(2);
       dispose();
       resolve();
+    }
+    return iteration + 1;
+  });
+})));
+
+test('invalidates cached request', () => new Promise<void>((resolve) => createRoot((dispose) => {
+  let calls = 0;
+  const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
+  const cache = {};
+  const fetch = () => { calls++; return Promise.resolve(mockResponse); };
+  const [ready] = createFetch(url, { fetch }, [withCache({ cache, expires: -1 })]);
+  createEffect((iteration: number = 0) => {
+    ready();
+    if (iteration === 0) {
+      setUrl(mockUrl);
+    }    
+    if (iteration === 1) {
+      setUrl(mockUrl2);
+    }
+    if (iteration === 2) {
+      setUrl(mockUrl);
+    }
+    if (iteration === 3) {
+      expect(calls).toBe(3);
+      dispose();
+      resolve();
+    }
+    return iteration + 1;
+  });
+})));
+
+test('loads and saves cache to localStorage', () => new Promise<void>((resolve) => createRoot((dispose) => {
+  let calls = 0;
+  const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
+  const cache = {};
+  const fetch = () => { calls++; return Promise.resolve(mockResponse); };
+  localStorage.setItem(
+    'fetch-cache',
+    JSON.stringify({
+      [JSON.stringify({ url: mockUrl })]: {
+        ts: (new Date()).getTime(),
+        requestData: [mockUrl],
+        data: mockResponseBody
+      }
+    })
+  );
+  const [ready] = createFetch(url, { fetch }, [withCache({ cache, expires: 10000 }), withCacheStorage()]);
+  createEffect((iteration: number = 0) => {
+    ready();
+    if (iteration === 0) {
+      setUrl(mockUrl);
+    }    
+    if (iteration === 1) {
+      expect(calls).toBe(0);
+      setUrl(mockUrl2);
+    }
+    if (iteration === 2) {
+      expect(calls).toBe(1);
+      setUrl(mockUrl);
+    }
+    if (iteration === 3) {
+      const savedCache = localStorage.getItem('fetch-cache');
+      expect(savedCache).toEqual(JSON.stringify(cache));
+      expect(Object.keys(cache)).toHaveLength(2);
+      dispose();
+      resolve();      
     }
     return iteration + 1;
   });

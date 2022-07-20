@@ -94,7 +94,7 @@ export const withCacheStorage: RequestModifier =
   requestContext => {
     try {
       const loadedCache = JSON.parse(storage.getItem(key) || "{}");
-      requestContext.cache = loadedCache;
+      Object.assign(requestContext.cache, loadedCache);
     } catch (e) {
       DEV && console.warn("attempt to parse stored request cache failed with error", e);
     }
