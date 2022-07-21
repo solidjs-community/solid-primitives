@@ -12,6 +12,7 @@
 Library of primitives focused around component props.
 
 - [`combineProps`](#combineProps) - Reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
+- [`filterProps`](#filterProps) - Create a new props object with only the property names that match the predicate.
 - [`createProps`](#createProps) - Provides controllable props signals like knobs/controls for simple component testing.
 
 ## Installation
@@ -119,6 +120,52 @@ styles; // { margin: "2rem", border: "1px solid #121212", padding: "16px" }
 
 https://codesandbox.io/s/combineprops-demo-ytw247?file=/index.tsx
 
+## `filterProps`
+
+A helper that creates a new props object with only the property names that match the predicate.
+
+An alternative primitive to Solid's [splitProps](https://www.solidjs.com/docs/latest/api#splitprops) that will split the props eagerly, without letting you change the omitter keys afterwards.
+
+The `predicate` is run for every property read lazily — any signal accessed within the `predicate` will be tracked, and `predicate` re-executed if changed.
+
+### How to use it
+
+Params:
+
+- `props` — The props object to filter.
+- `predicate` — A function that returns `true` if the property should be included in the filtered object.
+
+Returns A new props object with only the properties that match the predicate.
+
+```tsx
+import { filterProps } from "@solid-primitives/props";
+
+const MyComponent = props => {
+  const dataProps = filterProps(props, key => key.startsWith("data-"));
+
+  return <div {...dataProps} />;
+};
+```
+
+### `createPropsPredicate`
+
+Creates a predicate function that can be used to filter props by the prop name dynamically.
+
+The provided `predicate` function get's wrapped with a cache layer to prevent unnecessary re-evaluation. If one property is requested multiple times, the `predicate` will only be evaluated once.
+
+The cache is only cleared when the keys of the props object change. _(when spreading props from a singal)_ This also means that any signal accessed within the `predicate` won't be tracked.
+
+```tsx
+import { filterProps, createPropsPredicate } from "@solid-primitives/props";
+
+const MyComponent = props => {
+  const predicate = createPropsPredicate(props, key => key.startsWith("data-"));
+  const dataProps = filterProps(props, predicate);
+
+  return <div {...dataProps} />;
+};
+```
+
 ## `createProps`
 
 Primitive that provides controllable props signals like knobs/controls for simple component testing
@@ -212,5 +259,9 @@ Add support for tuple event handlers and de-dupeing to `combineProps`.
 2.1.1
 
 Support for Solid 1.4
+
+2.2.0
+
+Add `filterProps` and `createPropsPredicate` primitives.
 
 </details>
