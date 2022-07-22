@@ -40,6 +40,10 @@ test("predicate runs for every read", () => {
   assert.equal(checked, ["a"]);
   checked.length = 0;
 
+  filtered["not-existing"];
+  assert.is(checked.length, 0, "predicate is not run for non-existing keys");
+  checked.length = 0;
+
   filtered.b;
   filtered.a;
   filtered.a;
