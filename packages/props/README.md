@@ -124,7 +124,7 @@ https://codesandbox.io/s/combineprops-demo-ytw247?file=/index.tsx
 
 A helper that creates a new props object with only the property names that match the predicate.
 
-An alternative primitive to Solid's [splitProps](https://www.solidjs.com/docs/latest/api#splitprops) that will split the props eagerly, without letting you change the omitter keys afterwards.
+An alternative primitive to Solid's [splitProps](https://www.solidjs.com/docs/latest/api#splitprops) that will split the props eagerly, without letting you change the omitted keys afterwards.
 
 The `predicate` is run for every property read lazily — any signal accessed within the `predicate` will be tracked, and `predicate` re-executed if changed.
 
