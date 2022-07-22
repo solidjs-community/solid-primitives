@@ -107,8 +107,8 @@ export function createSharedRoot<T>(factory: (dispose: VoidFunction) => T): () =
       onCleanup(() => {
         listeners--;
         queueMicrotask(() => {
-          if (listeners) return;
-          dispose!();
+          if (listeners || !dispose) return;
+          dispose();
           dispose = undefined;
           value = undefined;
         });

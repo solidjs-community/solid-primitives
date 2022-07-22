@@ -198,4 +198,33 @@ testSR("multiple roots", () => {
   });
 });
 
+testSR("multiple dependents disposing in one tick", () =>
+  createRoot(dispose => {
+    let alive = false;
+    const track = createSharedRoot(() => {
+      alive = true;
+      onCleanup(() => (alive = false));
+    });
+
+    const d1 = createRoot(d1 => {
+      track();
+      return d1;
+    });
+
+    const d2 = createRoot(d2 => {
+      track();
+      return d2;
+    });
+
+    assert.is(alive, true);
+    d1();
+    d2();
+
+    queueMicrotask(() => {
+      assert.is(alive, false);
+      dispose();
+    });
+  })
+);
+
 testSR.run();
