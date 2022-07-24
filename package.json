@@ -15,7 +15,11 @@
     "test": "turbo run test",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts",
-    "update-deps": "taze -w -r && pnpm i"
+    "update-deps": "taze -w -r && pnpm i",
+    "changeset": "changeset",
+    "release": "pnpm run build-test && changeset publish",
+    "version-packages": "changeset version && pnpm i",
+    "ci:version": "changeset version && pnpm i --no-frozen-lockfile && git add ."
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
