@@ -1,5 +1,5 @@
 import { Truthy } from "@solid-primitives/utils";
-import { createSubRoot } from "@solid-primitives/rootless";
+import { createBranch } from "@solid-primitives/rootless";
 import { Accessor, createComputed, createMemo, onCleanup } from "solid-js";
 
 // .dispose() method is for disposing of root form outside
@@ -23,7 +23,7 @@ export type Until<T> = Promise<Truthy<T>> & { dispose: VoidFunction };
  * const result = await until(data)
  */
 export const until = <T>(condition: Accessor<T>): Until<T> =>
-  createSubRoot(dispose => {
+  createBranch(dispose => {
     const memo = createMemo(condition);
     const promise = new Promise((resolve, reject) => {
       createComputed(() => {
