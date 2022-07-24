@@ -52,15 +52,15 @@
     "jsdom": "^19.0.0",
     "prettier": "^2.7.1",
     "solid-heroicons": "^2.0.3",
-    "solid-js": "^1.4.7",
+    "solid-js": "^1.4.8",
     "solid-register": "^0.2.5",
     "solid-testing-library": "^0.2.1",
     "tslib": "^2.4.0",
     "tsup": "^6.1.3",
     "typescript": "^4.7.4",
-    "unocss": "^0.39.3",
+    "unocss": "^0.44.7",
     "uvu": "^0.5.6",
-    "vite": "^2.9.14",
+    "vite": "^3.0.2",
     "vite-plugin-solid": "^2.3.0"
   },
   "peerDependencies": {
