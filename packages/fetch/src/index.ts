@@ -10,6 +10,7 @@ type FetchOptions<I> = I extends undefined
       fetch?: typeof fetch;
       responseHandler?: (response: Response) => any;
       disable?: boolean;
+      deferStream?: boolean;
     }
   : {
       initialValue: I;
@@ -17,6 +18,7 @@ type FetchOptions<I> = I extends undefined
       fetch?: typeof fetch;
       responseHandler?: (response: Response) => any;
       disable?: boolean;
+      deferStream?: boolean;
     };
 
 export type FetchReturn<T, I> = [
