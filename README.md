@@ -146,6 +146,7 @@ Available node scripts for managing packages and creating new ones:
 
 - `pnpm run update-readme` - This will update the list of primitives by inspecting individual packages.
 - `pnpm run new-package name-of-your-package` - A helper to setup a primitive template package.
+- `pnpm run changeset` - This will create a changeset file for updated packages.
 
 ## Planned Primitives
 
