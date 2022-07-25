@@ -63,19 +63,5 @@ TODO
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
+See [CHANGELOG.md](.\CHANGELOG.md)
 
-0.0.100
-
-Initial release
-
-1.0.4
-
-Published with CJS and SSR protection.
-
-1.0.5
-
-Added missing peerDependencies and updated to latest Solid.
-
-</details>

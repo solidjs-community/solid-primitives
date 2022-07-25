@@ -344,15 +344,5 @@ type ResolvedChildren = ResolvedJSXElement | ResolvedJSXElement[];
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
+See [CHANGELOG.md](.\CHANGELOG.md)
 
-0.0.100
-
-Initial release as a Stage-1 primitive.
-
-0.2.0
-
-Add `mergeRefs`
-
-</details>

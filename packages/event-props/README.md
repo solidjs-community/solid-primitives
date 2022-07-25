@@ -44,19 +44,5 @@ TODO
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
+See [CHANGELOG.md](.\CHANGELOG.md)
 
-0.0.100
-
-First commit.
-
-0.0.150
-
-Published publicly for general use.
-
-0.1.0
-
-Updated to latest Solid
-
-</details>

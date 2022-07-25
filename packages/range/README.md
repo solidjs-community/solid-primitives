@@ -274,11 +274,5 @@ Codesandbox: https://codesandbox.io/s/solid-primitives-range-demo-y3sc5c?file=/i
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
+See [CHANGELOG.md](.\CHANGELOG.md)
 
-0.0.100
-
-Initial release as a Stage-0 primitive.
-
-</details>

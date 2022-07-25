@@ -39,22 +39,7 @@ You may view a working example here: [ link to Stackblitz or CodeSandBox ]
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-0.0.100
-
-Initial release as a Stage-0 primitive.
-
-0.0.105
-
-Added CJS and SSR support.
-
-0.0.150
-
-Updated to Solid 1.3
-
-</details>
+See [CHANGELOG.md](.\CHANGELOG.md)
 
 ## Acknowledgements
 

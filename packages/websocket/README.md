@@ -25,15 +25,5 @@ You may find a semi-functional example here: https://codesandbox.io/s/solid-webs
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
+See [CHANGELOG.md](.\CHANGELOG.md)
 
-0.0.100
-
-Initial version. Proposed and waiting for feedback.
-
-0.3.0
-
-Fixed package exports.
-
-</details>

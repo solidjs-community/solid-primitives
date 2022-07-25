@@ -30,9 +30,5 @@ You may view a working example here: https://codesandbox.io/s/solid-create-analy
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
+See [CHANGELOG.md](.\CHANGELOG.md)
 
-0.0.100
-
-</details>
