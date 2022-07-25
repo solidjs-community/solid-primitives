@@ -78,5 +78,5 @@ https://codesandbox.io/s/solid-primitives-connectivity-demo-2m76q?file=/index.ts
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
+See [CHANGELOG.md](./CHANGELOG.md)
 

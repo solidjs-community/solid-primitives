@@ -1,6 +1,6 @@
 # @solid-primitives/active-element
 
-## Changelog up to 2.0.0
+## Changelog up to version 2.0.0
 
 1.0.0
 

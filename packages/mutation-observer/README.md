@@ -109,5 +109,4 @@ https://codesandbox.io/s/solid-mutation-observer-p59tu?file=/index.tsx
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

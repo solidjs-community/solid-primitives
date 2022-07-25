@@ -111,5 +111,4 @@ We're always looking to enhance our primitives. Some ideas:
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

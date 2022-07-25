@@ -104,5 +104,4 @@ BOTTOM: called user callback
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

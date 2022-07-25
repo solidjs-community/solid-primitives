@@ -129,5 +129,4 @@ _PRs Welcome :)_
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

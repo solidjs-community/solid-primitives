@@ -39,7 +39,7 @@ You may view a working example here: [ link to Stackblitz or CodeSandBox ]
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
+See [CHANGELOG.md](./CHANGELOG.md)
 
 ## Acknowledgements
 

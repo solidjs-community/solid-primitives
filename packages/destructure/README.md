@@ -166,5 +166,4 @@ c(); // => undefined (no error)
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

@@ -266,7 +266,7 @@ See the [implementations of official modifiers](https://github.com/solidjs-commu
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
+See [CHANGELOG.md](./CHANGELOG.md)
 
 ## Acknowledgements
 

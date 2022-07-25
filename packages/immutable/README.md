@@ -99,5 +99,4 @@ setUser(p => update(p, "street", "number", 64));
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

@@ -89,5 +89,4 @@ map.set("John", { age: 35 });
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

@@ -160,5 +160,4 @@ Usage of combining `createSharedRoot` with `createMousePosition`: https://codesa
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

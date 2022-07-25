@@ -25,5 +25,4 @@ You may find a semi-functional example here: https://codesandbox.io/s/solid-webs
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

@@ -344,5 +344,4 @@ type ResolvedChildren = ResolvedJSXElement | ResolvedJSXElement[];
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

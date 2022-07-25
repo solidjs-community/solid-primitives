@@ -495,5 +495,4 @@ https://codesandbox.io/s/solid-primitives-event-bus-6fp4h?file=/index.tsx
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

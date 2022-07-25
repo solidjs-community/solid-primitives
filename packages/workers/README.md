@@ -68,7 +68,7 @@ You may view a working example here: [ link to Stackblize or CodeSandBox ]
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
+See [CHANGELOG.md](./CHANGELOG.md)
 
 ## Inspiration
 

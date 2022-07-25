@@ -27,5 +27,4 @@ const tweenedValue = createTween(myNumber, { duration: 500 });
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

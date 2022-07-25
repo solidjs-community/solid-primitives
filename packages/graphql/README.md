@@ -137,5 +137,4 @@ https://codesandbox.io/s/solid-primitives-graphql-demo-g6fv6?file=/index.tsx
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

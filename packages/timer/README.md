@@ -118,5 +118,4 @@ You may view a working example here: https://codesandbox.io/s/solid-primitives-t
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

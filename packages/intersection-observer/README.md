@@ -138,5 +138,4 @@ You may view a working example here: https://stackblitz.com/edit/vitejs-vite-n2l
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

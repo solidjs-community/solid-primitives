@@ -79,5 +79,4 @@ You may view a working example here: https://codesandbox.io/s/use-i18n-rd7jq?fil
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

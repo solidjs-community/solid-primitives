@@ -76,5 +76,4 @@ Working example: https://codesandbox.io/s/solid-primitives-upload-ry042x?file=/s
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

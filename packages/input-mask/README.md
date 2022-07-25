@@ -117,5 +117,4 @@ https://codesandbox.io/s/solid-primitives-input-mask-demo-fnvg76?file=/index.tsx
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

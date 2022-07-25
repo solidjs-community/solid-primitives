@@ -274,5 +274,4 @@ Codesandbox: https://codesandbox.io/s/solid-primitives-range-demo-y3sc5c?file=/i
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

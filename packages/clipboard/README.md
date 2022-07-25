@@ -137,5 +137,4 @@ You may view a working example here: https://stackblitz.com/edit/vitejs-vite-okx
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)

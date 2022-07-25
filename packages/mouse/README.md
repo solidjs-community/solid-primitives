@@ -183,5 +183,4 @@ https://codesandbox.io/s/solid-primitives-mouse-p10s5?file=/index.tsx
 
 ## Changelog
 
-See [CHANGELOG.md](.\CHANGELOG.md)
-
+See [CHANGELOG.md](./CHANGELOG.md)
