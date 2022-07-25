@@ -63,7 +63,7 @@ readdirSync(pathTo(`../packages/`)).forEach(name => {
   }
   data.Stage = `[![STAGE](${stageShieldBaseURL}${stage ?? "2"}.json)](${stageShieldLink})`;
   data.Primitives = list
-    .map(prim => `[${prim}](${githubURL}${name}#${prim.replace(/ /g, "-")})`)
+    .map(prim => `[${prim}](${githubURL}${name}#${prim.replace(/ /g, "-").toLowerCase()})`)
     .join("<br />");
   // Merge the package into the correct category
   let cat = category || "Misc";
