@@ -107,53 +107,6 @@ export const createIntersectionObserver = (
 };
 
 /**
- * Creates reactive signal that changes when a single element's visibility changes.
- *
- * @param element - An element to watch
- * @param options - A Primitive and IntersectionObserver constructor options:
- * - `root` — The Element or Document whose bounds are used as the bounding box when testing for intersection.
- * - `rootMargin` — A string which specifies a set of offsets to add to the root's bounding_box when calculating intersections, effectively shrinking or growing the root for calculation purposes.
- * - `threshold` — Either a single number or an array of numbers between 0.0 and 1.0, specifying a ratio of intersection area to total bounding box area for the observed target.
- * - `initialValue` — Initial value of the signal *(default: false)*
- * - `once` — If true: the stop function will be called automatically after visibility changes *(default: false)*
- *
- * @example
- * ```ts
- * let el!: HTMLElement
- * const [isVisible, { start, stop, instance }] = createVisibilityObserver(() => el, { once: true })
- * ```
- */
-export const createVisibilityObserver = (
-  element: MaybeAccessor<Element>,
-  options?: IntersectionObserverInit & {
-    initialValue?: boolean;
-    once?: boolean;
-  }
-): [
-  Accessor<boolean>,
-  { start: VoidFunction; stop: VoidFunction; instance: IntersectionObserver }
-] => {
-  const [isVisible, setVisible] = createSignal(options?.initialValue ?? false);
-  const el = access(element);
-  const { start, add, stop, reset, instance } = makeIntersectionObserver(
-    el ? [el] : [],
-    ([entry]) => {
-      if (!entry) return;
-      setVisible(entry.isIntersecting);
-      if (options?.once && entry.isIntersecting !== !!options?.initialValue) stop();
-    },
-    options
-  );
-  if (element instanceof Function) {
-    createEffect(() => {
-      reset();
-      add(access(element));
-    });
-  }
-  return [isVisible, { start, stop, instance }];
-};
-
-/**
  * Creates a more advanced viewport observer for complex tracking with multiple objects in a single IntersectionObserver instance.
  *
  * @param elements - A list of elements to watch
@@ -221,3 +174,71 @@ export function createViewportObserver(...a: any) {
   onMount(start);
   return [addEntry, { remove: removeEntry, start, stop, instance }];
 }
+
+/**
+ * Creates reactive signal that changes when a single element's visibility changes.
+ *
+ * @param element - An element to watch
+ * @param options - A Primitive and IntersectionObserver constructor options:
+ * - `root` — The Element or Document whose bounds are used as the bounding box when testing for intersection.
+ * - `rootMargin` — A string which specifies a set of offsets to add to the root's bounding_box when calculating intersections, effectively shrinking or growing the root for calculation purposes.
+ * - `threshold` — Either a single number or an array of numbers between 0.0 and 1.0, specifying a ratio of intersection area to total bounding box area for the observed target.
+ * - `initialValue` — Initial value of the signal *(default: false)*
+ * - `once` — If true: the stop function will be called automatically after visibility changes *(default: false)*
+ *
+ * @example
+ * ```ts
+ * let el!: HTMLElement
+ * const [isVisible, { start, stop, instance }] = createVisibilityObserver(() => el, { once: true })
+ * ```
+ */
+export const createVisibilityObserver = (
+  options?: IntersectionObserverInit & {
+    initialValue?: boolean;
+    once?: boolean;
+  }
+): ((element: MaybeAccessor<Element | undefined | false | null>) => Accessor<boolean>) => {
+  const callbacks = new WeakMap<Element, EntryCallback>();
+
+  const { add, remove } = makeIntersectionObserver(
+    [],
+    (entries, instance) => {
+      entries.forEach(entry => callbacks.get(entry.target)?.(entry, instance));
+    },
+    options
+  );
+
+  function removeEntry(el: Element) {
+    remove(el);
+    callbacks.delete(el);
+  }
+
+  function addEntry(el: Element, callback: EntryCallback) {
+    add(el);
+    callbacks.set(el, callback);
+  }
+
+  function setterCallback(this: (v: boolean) => void, entry: IntersectionObserverEntry) {
+    this(entry.isIntersecting);
+  }
+
+  return element => {
+    const [isVisible, setVisible] = createSignal(options?.initialValue ?? false);
+    const callback = setterCallback.bind(setVisible);
+    let prevEl: Element | undefined | false | null;
+
+    if (typeof element === "function") {
+      createEffect(() => {
+        const el = element();
+        if (el === prevEl) return;
+        if (prevEl) removeEntry(prevEl);
+        if (el) addEntry(el, callback);
+        prevEl = el;
+      });
+    } else if (element) addEntry(element, callback);
+
+    onCleanup(() => prevEl && removeEntry(prevEl));
+
+    return isVisible;
+  };
+};
