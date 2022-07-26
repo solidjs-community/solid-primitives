@@ -3,6 +3,7 @@ import {
   createMemo,
   createResource,
   ResourceFetcherInfo,
+  ResourceOptions,
   ResourceReturn
 } from "solid-js";
 import { RequestModifier } from "./modifiers";
@@ -20,23 +21,14 @@ export type DistributeFetcherArgs<FetcherArgs extends any[], ExtraArgs extends a
       | [...{ [n in keyof FetcherArgs]: Accessor<FetcherArgs[n] | undefined> }, ...ExtraArgs]
   : never;
 
-export type FetchOptions<Result, InitialValue, FetcherArgs> = InitialValue extends undefined
-  ? {
-      initialValue?: InitialValue;
-      name?: string;
-      fetch?: typeof fetch;
-      request?: (requestContext: RequestContext<Result, FetcherArgs>) => void;
-      responseHandler?: (response: Response) => any;
-      disable?: boolean;
-    }
-  : {
-      initialValue: InitialValue;
-      name?: string;
-      fetch?: typeof fetch;
-      request?: (requestContext: RequestContext<Result, FetcherArgs>) => void;
-      responseHandler?: (response: Response) => any;
-      disable?: boolean;
-    };
+export type FetchOptions<Result, InitialValue, FetcherArgs> = ResourceOptions<
+  Result | InitialValue
+> & {
+  fetch?: typeof fetch;
+  request?: (requestContext: RequestContext<Result, FetcherArgs>) => void;
+  responseHandler?: (response: Response) => any;
+  disable?: boolean;
+};
 
 export type FetchReturn<T, I> = [
   {
@@ -59,10 +51,10 @@ export type FetchReturn<T, I> = [
 
 export type RequestContext<Result, FetcherArgs> = {
   urlAccessor: Accessor<FetcherArgs | undefined>;
-  wrapResource: () => ResourceReturn<Result>;
+  wrapResource: () => ResourceReturn<Result, ResourceOptions<Result>>;
   fetcher?: (requestData: FetcherArgs, info: ResourceFetcherInfo<Result>) => Promise<Result>;
   response?: Response;
-  resource?: ResourceReturn<Result>;
+  resource?: ResourceReturn<Result, ResourceOptions<Result>>;
   abortController?: AbortController;
   responseHandler?: (response: Response) => Result;
   [key: string]: any;
@@ -205,7 +197,7 @@ export function createFetch<
     if (options.disable) {
       return undefined;
     }
-    const info: RequestInfo | undefined =
+    const info: FetcherArgs[0] | undefined =
       typeof args[0] === "function"
         ? (args[0] as Accessor<FetcherArgs | FetcherArgs[0]>)()
         : args[0];
@@ -223,7 +215,7 @@ export function createFetch<
   const modifiers: (Request<FetcherArgs> | RequestModifier)[] = ((): RequestModifier[] => {
     for (let l = args.length - 1; l >= 1; l--) {
       if (Array.isArray(args[l])) {
-        return args[l];
+        return args[l] as RequestModifier[];
       }
     }
     return [];
@@ -240,8 +232,8 @@ export function createFetch<
         fetchContext.resource = createResource(
           fetchContext.urlAccessor,
           fetchContext.fetcher!,
-          options as any
-        ) as ResourceReturn<Result>;
+          options as ResourceOptions<Result>
+        ) as ResourceReturn<Result, ResourceOptions<Result>>;
       }
       return fetchContext.resource!;
     }

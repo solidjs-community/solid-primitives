@@ -11,7 +11,7 @@ export const fetchRequest: Request<[info: RequestInfo, init?: RequestInit]> =
   requestContext => {
     requestContext.fetcher = <Result extends unknown>(
       requestData: [info: RequestInfo, init?: RequestInit],
-      info: ResourceFetcherInfo<Result>
+      _info: ResourceFetcherInfo<Result>
     ) =>
       fetch?.(...requestData).then((response: Response) => {
         requestContext.response = response;

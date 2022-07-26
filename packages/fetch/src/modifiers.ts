@@ -1,4 +1,5 @@
 import { createSignal, getOwner, onCleanup, ResourceFetcherInfo } from "solid-js";
+import { callbackify } from "util";
 import { RequestContext } from "./fetch";
 
 export type RequestModifier = <Result extends unknown, FetcherArgs extends any[]>(
@@ -111,17 +112,14 @@ export const withCatchAll: RequestModifier =
         })
     );
     requestContext.wrapResource();
-    const originalResource = requestContext.resource
+    const originalResource = requestContext.resource;
     requestContext.resource = [
-      Object.defineProperties(
-        () => originalResource?.[0](),
-        {
-          ...Object.getOwnPropertyDescriptors(originalResource?.[0]),
-          error: { get: () => error() }
-        }
-      ),
+      Object.defineProperties(() => originalResource?.[0](), {
+        ...Object.getOwnPropertyDescriptors(originalResource?.[0]),
+        error: { get: () => error() }
+      }),
       originalResource?.[1]
-    ] as typeof originalResource
+    ] as typeof originalResource;
   };
 
 const defaultWait = (attempt: number) => Math.max(1000 << attempt, 30000);
@@ -170,7 +168,7 @@ export const withRetry: RequestModifier =
 
 export type RefetchEventOptions<Result extends unknown, FetcherArgs extends any[]> = {
   on?: (keyof WindowEventMap)[];
-  filter?: (requestData: FetcherArgs, data: Result, ev: Event) => boolean;
+  filter?: (requestData: FetcherArgs, data: Result | undefined, ev: Event) => boolean;
 };
 
 export const withRefetchEvent: RequestModifier =
@@ -179,29 +177,30 @@ export const withRefetchEvent: RequestModifier =
   ) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
     requestContext.wrapResource();
-    let lastRequest: [requestData: FetcherArgs, data: Result] | undefined;
+    const lastRequestRef: { current: [requestData: FetcherArgs, data?: Result] | undefined } = {
+      current: undefined
+    };
+    console.log("wrapping fetcher");
+    wrapFetcher<Result, FetcherArgs>(requestContext, originalFetcher => (...args) => {
+      lastRequestRef.current = [args as any, undefined];
+      return originalFetcher(...args).then(data => {
+        lastRequestRef.current = [args as any, data as Result];
+        return data;
+      });
+    });
     const events: string[] = options.on || ["visibilitychange"];
     const filter = options.filter || (() => true);
     const handler = (ev: Event) => {
       if (
-        !lastRequest ||
-        (ev.type === "visibilitychange" && document.visibilityState !== "visible") ||
-        !filter(...lastRequest, ev)
+        lastRequestRef.current &&
+        !(ev.type === "visibilitychange" && document.visibilityState !== "visible") &&
+        filter(...lastRequestRef.current, ev)
       ) {
-        return;
+        requestContext.resource?.[1].refetch();
       }
-      requestContext.resource?.[1].refetch();
     };
     events.forEach(name => window.addEventListener(name, handler));
     getOwner() &&
       onCleanup(() => events.forEach(name => window.removeEventListener(name, handler)));
-    wrapFetcher<Result, FetcherArgs>(
-      requestContext,
-      originalFetcher => (requestData, info) =>
-        originalFetcher(requestData, info).then(data => {
-          lastRequest = [requestData, data as any];
-          return data;
-        })
-    );
     requestContext.wrapResource();
   };

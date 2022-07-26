@@ -57,7 +57,7 @@ export const withCache: RequestModifier =
     wrapFetcher<Result, FetcherArgs>(
       requestContext,
       <T>(originalFetcher: any) =>
-        (requestData, info) => {          
+        (requestData, info) => {
           const serializedRequest = serializeRequest(requestData);
           const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
           const shouldRead = requestContext.readCache?.(cached) !== false;
