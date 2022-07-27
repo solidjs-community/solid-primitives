@@ -54,7 +54,7 @@ export type E = JSX.Element;
  * );
  * ```
  */
-export const makeIntersectionObserver = (
+export function makeIntersectionObserver(
   elements: Element[],
   onChange: IntersectionObserverCallback,
   options?: IntersectionObserverInit
@@ -65,7 +65,7 @@ export const makeIntersectionObserver = (
   reset: VoidFunction;
   stop: VoidFunction;
   instance: IntersectionObserver;
-} => {
+} {
   const instance = new IntersectionObserver(onChange, options);
   const add: AddIntersectionObserverEntry = el => instance.observe(el);
   const remove: RemoveIntersectionObserverEntry = el => instance.unobserve(el);
@@ -75,7 +75,7 @@ export const makeIntersectionObserver = (
   start();
   onCleanup(stop);
   return { add, remove, start, stop, reset, instance };
-};
+}
 
 /**
  * Creates a reactive Intersection Observer primitive.
@@ -94,17 +94,17 @@ export const makeIntersectionObserver = (
  * );
  * ```
  */
-export const createIntersectionObserver = (
+export function createIntersectionObserver(
   elements: Accessor<Element[]>,
   onChange: IntersectionObserverCallback,
   options?: IntersectionObserverInit
-) => {
+) {
   const { add, reset } = makeIntersectionObserver([], onChange, options);
   createEffect(() => {
     reset();
     access(elements).forEach(el => add(el));
   });
-};
+}
 
 /**
  * Creates a more advanced viewport observer for complex tracking with multiple objects in a single IntersectionObserver instance.
