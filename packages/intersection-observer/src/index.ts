@@ -1,4 +1,4 @@
-import { onMount, onCleanup, createSignal, createEffect } from "solid-js";
+import { onMount, onCleanup, createSignal, createEffect, untrack } from "solid-js";
 import type { JSX, Accessor } from "solid-js";
 import { access, MaybeAccessor } from "@solid-primitives/utils";
 
@@ -175,6 +175,14 @@ export function createViewportObserver(...a: any) {
   return [addEntry, { remove: removeEntry, start, stop, instance }];
 }
 
+export type VisibilityCallback<Ctx extends {} = {}> = (
+  entry: IntersectionObserverEntry,
+  context: Ctx & { visible: boolean }
+) => boolean;
+
+const trueFn = () => true;
+const falseFn = () => false;
+
 /**
  * Creates reactive signal that changes when a single element's visibility changes.
  *
@@ -195,8 +203,8 @@ export function createViewportObserver(...a: any) {
 export const createVisibilityObserver = (
   options?: IntersectionObserverInit & {
     initialValue?: boolean;
-    once?: boolean;
-  }
+  },
+  guard?: () => VisibilityCallback
 ): ((element: MaybeAccessor<Element | undefined | false | null>) => Accessor<boolean>) => {
   const callbacks = new WeakMap<Element, EntryCallback>();
 
@@ -212,19 +220,24 @@ export const createVisibilityObserver = (
     remove(el);
     callbacks.delete(el);
   }
-
   function addEntry(el: Element, callback: EntryCallback) {
     add(el);
     callbacks.set(el, callback);
   }
 
-  function setterCallback(this: (v: boolean) => void, entry: IntersectionObserverEntry) {
-    this(entry.isIntersecting);
-  }
+  const getCallback: (
+    getter: Accessor<boolean>,
+    setter: (state: boolean) => void
+  ) => EntryCallback = guard
+    ? (getter, setter) => {
+        const cbGuard = guard();
+        return entry => setter(cbGuard(entry, { visible: untrack(getter) }));
+      }
+    : (_, setter) => entry => setter(entry.isIntersecting);
 
   return element => {
     const [isVisible, setVisible] = createSignal(options?.initialValue ?? false);
-    const callback = setterCallback.bind(setVisible);
+    const callback = getCallback(isVisible, setVisible);
     let prevEl: Element | undefined | false | null;
 
     if (typeof element === "function") {
@@ -242,3 +255,85 @@ export const createVisibilityObserver = (
     return isVisible;
   };
 };
+
+export enum Occurrence {
+  Entering = "Entering",
+  Leaving = "Leaving",
+  Inside = "Inside",
+  Outside = "Outside"
+}
+
+export function getOccurrence(
+  isIntersecting: boolean,
+  prevIsIntersecting: boolean | undefined
+): Occurrence {
+  return isIntersecting
+    ? prevIsIntersecting
+      ? Occurrence.Inside
+      : Occurrence.Entering
+    : prevIsIntersecting === undefined || prevIsIntersecting === true
+    ? Occurrence.Leaving
+    : Occurrence.Outside;
+}
+
+export function withOccurrence<Ctx extends {}>(
+  callback: MaybeAccessor<VisibilityCallback<Ctx & { occurrence: Occurrence }>>
+): () => VisibilityCallback<Ctx> {
+  return () => {
+    let prevIntersecting: boolean | undefined;
+    const cb = access(callback);
+
+    return (entry, ctx) => {
+      const { isIntersecting } = entry;
+      const occurrence = getOccurrence(isIntersecting, prevIntersecting);
+      prevIntersecting = isIntersecting;
+      return cb(entry, { ...ctx, occurrence });
+    };
+  };
+}
+
+export enum DirectionX {
+  Left = "Left",
+  Right = "Right",
+  None = "None"
+}
+
+export enum DirectionY {
+  Top = "Top",
+  Bottom = "Bottom",
+  None = "None"
+}
+
+export function getDirection(
+  rect: DOMRectReadOnly,
+  prevRect: DOMRectReadOnly | undefined,
+  intersecting: boolean
+): { directionX: DirectionX; directionY: DirectionY } {
+  let directionX = DirectionX.None;
+  let directionY = DirectionY.None;
+  if (!prevRect) return { directionX, directionY };
+  if (rect.top < prevRect.top) directionY = intersecting ? DirectionY.Bottom : DirectionY.Top;
+  else if (rect.top > prevRect.top) directionY = intersecting ? DirectionY.Top : DirectionY.Bottom;
+  if (rect.left > prevRect.left) directionX = intersecting ? DirectionX.Left : DirectionX.Right;
+  else if (rect.left < prevRect.left)
+    directionX = intersecting ? DirectionX.Right : DirectionX.Left;
+  return { directionX, directionY };
+}
+
+export function withDirection<Ctx extends {}>(
+  callback: MaybeAccessor<
+    VisibilityCallback<Ctx & { directionX: DirectionX; directionY: DirectionY }>
+  >
+): () => VisibilityCallback<Ctx> {
+  return () => {
+    let prevBounds: DOMRectReadOnly | undefined;
+    const cb = access(callback);
+
+    return (entry, ctx) => {
+      const { boundingClientRect } = entry;
+      const direction = getDirection(boundingClientRect, prevBounds, entry.isIntersecting);
+      prevBounds = boundingClientRect;
+      return cb(entry, { ...ctx, ...direction });
+    };
+  };
+}

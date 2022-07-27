@@ -1,16 +1,27 @@
-import { createVisibilityObserver } from "../src";
 import { Component, createSignal } from "solid-js";
-import { Repeat } from "@solid-primitives/range";
 import { render } from "solid-js/web";
+import { Repeat } from "@solid-primitives/range";
+import { createVisibilityObserver, withDirection, withOccurrence, DirectionY } from "../src";
 import "uno.css";
 
 const App: Component = () => {
-  const useVisibilityObserver = createVisibilityObserver({ threshold: 0.6 });
+  const useVisibilityObserver = createVisibilityObserver(
+    {},
+    withOccurrence(
+      withDirection((entry, { occurrence, directionY, directionX, visible }) => {
+        if (!entry.isIntersecting && directionY === DirectionY.Top && visible) {
+          return true;
+        }
+        return entry.isIntersecting;
+      })
+    )
+  );
+
   const [enabled, setEnabled] = createSignal(true);
   const [length, setLength] = createSignal(20);
 
   return (
-    <div class="flex justify-center items-center box-border w-full h-screen overflow-hidden bg-gray-900">
+    <div class="center-child box-border w-full h-screen overflow-hidden bg-gray-900">
       <div class="flex flex-col items-center">
         <div class="flex">
           <button class="btn" onClick={() => setEnabled(p => !p)}>
@@ -25,20 +36,28 @@ const App: Component = () => {
         </div>
         <div class="h-100 w-100 rounded-lg shadow-lg overflow-y-scroll bg-white">
           <Repeat times={length()}>
-            {() => {
-              let ref: HTMLDivElement | undefined;
-              const isVisible = useVisibilityObserver(() => enabled() && ref);
-              return (
-                <div
-                  ref={el => (ref = el)}
-                  class="h-20 flex justify-center transition duration-1500 rounded-lg m-5 text-white items-center"
-                  classList={{
-                    "bg-slate-500 scale-x-75": !isVisible(),
-                    "bg-blue-900": isVisible()
+            {x => (
+              <div class="flex">
+                <Repeat times={length()}>
+                  {y => {
+                    let ref: HTMLDivElement | undefined;
+                    const isVisible = useVisibilityObserver(() => enabled() && ref);
+                    return (
+                      <div
+                        ref={el => (ref = el)}
+                        class="h-20 w-90 flex-shrink-0 center-child transition duration-1500 rounded-lg m-5 text-white"
+                        classList={{
+                          "bg-slate-500 scale-x-75": !isVisible(),
+                          "bg-blue-900": isVisible()
+                        }}
+                      >
+                        Item_{x}_{y}
+                      </div>
+                    );
                   }}
-                />
-              );
-            }}
+                </Repeat>
+              </div>
+            )}
           </Repeat>
         </div>
       </div>
