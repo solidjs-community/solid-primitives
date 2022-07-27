@@ -1,6 +1,6 @@
-import { onMount, onCleanup, createSignal, createEffect, untrack } from "solid-js";
+import { onMount, onCleanup, createSignal, createEffect, untrack, Setter } from "solid-js";
 import type { JSX, Accessor } from "solid-js";
-import { access, MaybeAccessor } from "@solid-primitives/utils";
+import { access, FalsyValue, MaybeAccessor } from "@solid-primitives/utils";
 
 export type AddIntersectionObserverEntry = (el: Element) => void;
 export type RemoveIntersectionObserverEntry = (el: Element) => void;
@@ -67,12 +67,12 @@ export const makeIntersectionObserver = (
   instance: IntersectionObserver;
 } => {
   const instance = new IntersectionObserver(onChange, options);
-  const add: AddIntersectionObserverEntry = el => instance.observe(access(el));
-  const remove: RemoveIntersectionObserverEntry = el => instance.unobserve(access(el));
+  const add: AddIntersectionObserverEntry = el => instance.observe(el);
+  const remove: RemoveIntersectionObserverEntry = el => instance.unobserve(el);
   const start = () => elements.forEach(el => add(el));
   const stop = () => instance.disconnect();
   const reset = () => instance.takeRecords().forEach(el => remove(el.target));
-  onMount(start);
+  start();
   onCleanup(stop);
   return { add, remove, start, stop, reset, instance };
 };
@@ -175,37 +175,39 @@ export function createViewportObserver(...a: any) {
   return [addEntry, { remove: removeEntry, start, stop, instance }];
 }
 
-export type VisibilityCallback<Ctx extends {} = {}> = (
+export type VisibilitySetter<Ctx extends {} = {}> = (
   entry: IntersectionObserverEntry,
   context: Ctx & { visible: boolean }
 ) => boolean;
 
-const trueFn = () => true;
-const falseFn = () => false;
-
 /**
  * Creates reactive signal that changes when a single element's visibility changes.
  *
- * @param element - An element to watch
  * @param options - A Primitive and IntersectionObserver constructor options:
  * - `root` — The Element or Document whose bounds are used as the bounding box when testing for intersection.
  * - `rootMargin` — A string which specifies a set of offsets to add to the root's bounding_box when calculating intersections, effectively shrinking or growing the root for calculation purposes.
  * - `threshold` — Either a single number or an array of numbers between 0.0 and 1.0, specifying a ratio of intersection area to total bounding box area for the observed target.
  * - `initialValue` — Initial value of the signal *(default: false)*
- * - `once` — If true: the stop function will be called automatically after visibility changes *(default: false)*
+ *
+ * @returns A configured *"use"* function for creating a visibility signal for a single element. The passed element can be a **reactive signal** or a DOM element. Returning a falsy value will remove the element from the observer.
+ * ```ts
+ * (element: MaybeAccessor<Element | FalsyValue>) => Accessor<boolean>
+ * ```
  *
  * @example
- * ```ts
- * let el!: HTMLElement
- * const [isVisible, { start, stop, instance }] = createVisibilityObserver(() => el, { once: true })
+ * ```tsx
+ * let el: HTMLDivElement | undefined
+ * const useVisibilityObserver = createVisibilityObserver({ threshold: 0.8 })
+ * const visible = useVisibilityObserver(() => el)
+ * <div ref={el}>{ visible() ? "Visible" : "Hidden" }</div>
  * ```
  */
-export const createVisibilityObserver = (
+export function createVisibilityObserver(
   options?: IntersectionObserverInit & {
     initialValue?: boolean;
   },
-  guard?: () => VisibilityCallback
-): ((element: MaybeAccessor<Element | undefined | false | null>) => Accessor<boolean>) => {
+  setter?: MaybeAccessor<VisibilitySetter>
+): (element: MaybeAccessor<Element | FalsyValue>) => Accessor<boolean> {
   const callbacks = new WeakMap<Element, EntryCallback>();
 
   const { add, remove } = makeIntersectionObserver(
@@ -225,20 +227,17 @@ export const createVisibilityObserver = (
     callbacks.set(el, callback);
   }
 
-  const getCallback: (
-    getter: Accessor<boolean>,
-    setter: (state: boolean) => void
-  ) => EntryCallback = guard
-    ? (getter, setter) => {
-        const cbGuard = guard();
-        return entry => setter(cbGuard(entry, { visible: untrack(getter) }));
+  const getCallback: (get: Accessor<boolean>, set: Setter<boolean>) => EntryCallback = setter
+    ? (get, set) => {
+        const setterRef = access(setter);
+        return entry => set(setterRef(entry, { visible: untrack(get) }));
       }
-    : (_, setter) => entry => setter(entry.isIntersecting);
+    : (_, set) => entry => set(entry.isIntersecting);
 
   return element => {
     const [isVisible, setVisible] = createSignal(options?.initialValue ?? false);
     const callback = getCallback(isVisible, setVisible);
-    let prevEl: Element | undefined | false | null;
+    let prevEl: Element | FalsyValue;
 
     if (typeof element === "function") {
       createEffect(() => {
@@ -254,7 +253,7 @@ export const createVisibilityObserver = (
 
     return isVisible;
   };
-};
+}
 
 export enum Occurrence {
   Entering = "Entering",
@@ -263,6 +262,9 @@ export enum Occurrence {
   Outside = "Outside"
 }
 
+/**
+ * Calculates the occurrence of an element in the viewport.
+ */
 export function getOccurrence(
   isIntersecting: boolean,
   prevIsIntersecting: boolean | undefined
@@ -276,12 +278,27 @@ export function getOccurrence(
     : Occurrence.Outside;
 }
 
+/**
+ * A visibility setter factory function. It provides information about element occurrence in the viewport — `"Entering"`, `"Leaving"`, `"Inside"` or `"Outside"`.
+ * @param setter - A function that sets the occurrence of an element in the viewport.
+ * @returns A visibility setter function.
+ * @example
+ * ```ts
+ * const useVisibilityObserver = createVisibilityObserver(
+ *  { threshold: 0.8 },
+ *  withOccurrence((entry, { occurrence }) => {
+ *    console.log(occurrence);
+ *    return entry.isIntersecting;
+ *  })
+ * );
+ * ```
+ */
 export function withOccurrence<Ctx extends {}>(
-  callback: MaybeAccessor<VisibilityCallback<Ctx & { occurrence: Occurrence }>>
-): () => VisibilityCallback<Ctx> {
+  setter: MaybeAccessor<VisibilitySetter<Ctx & { occurrence: Occurrence }>>
+): () => VisibilitySetter<Ctx> {
   return () => {
     let prevIntersecting: boolean | undefined;
-    const cb = access(callback);
+    const cb = access(setter);
 
     return (entry, ctx) => {
       const { isIntersecting } = entry;
@@ -304,6 +321,10 @@ export enum DirectionY {
   None = "None"
 }
 
+/**
+ * Calculates the direction of an element in the viewport. The direction is calculated based on the element's rect, it's previous rect and the `isIntersecting` flag.
+ * @returns A direction string: `"Left"`, `"Right"`, `"Top"`, `"Bottom"` or `"None"`.
+ */
 export function getDirection(
   rect: DOMRectReadOnly,
   prevRect: DOMRectReadOnly | undefined,
@@ -320,11 +341,28 @@ export function getDirection(
   return { directionX, directionY };
 }
 
+/**
+ * A visibility setter factory function. It provides information about element direction on the screen — `"Left"`, `"Right"`, `"Top"`, `"Bottom"` or `"None"`.
+ * @param setter - A function that sets the occurrence of an element in the viewport.
+ * @returns A visibility setter function.
+ * @example
+ * ```ts
+ * const useVisibilityObserver = createVisibilityObserver(
+ *  { threshold: 0.8 },
+ *  withDirection((entry, { directionY, directionX, visible }) => {
+ *    if (!entry.isIntersecting && directionY === "Top" && visible) {
+ *      return true;
+ *    }
+ *    return entry.isIntersecting;
+ *  })
+ * );
+ * ```
+ */
 export function withDirection<Ctx extends {}>(
   callback: MaybeAccessor<
-    VisibilityCallback<Ctx & { directionX: DirectionX; directionY: DirectionY }>
+    VisibilitySetter<Ctx & { directionX: DirectionX; directionY: DirectionY }>
   >
-): () => VisibilityCallback<Ctx> {
+): () => VisibilitySetter<Ctx> {
   return () => {
     let prevBounds: DOMRectReadOnly | undefined;
     const cb = access(callback);
