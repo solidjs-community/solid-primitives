@@ -1,6 +1,8 @@
 import * as API from "./index";
 import { noop } from "@solid-primitives/utils";
 
+export { Occurrence, DirectionX, DirectionY } from ".";
+
 export const makeIntersectionObserver: typeof API.makeIntersectionObserver = () => ({
   add: noop,
   remove: noop,

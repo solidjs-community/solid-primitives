@@ -69,7 +69,7 @@ export const makeIntersectionObserver = (
   const instance = new IntersectionObserver(onChange, options);
   const add: AddIntersectionObserverEntry = el => instance.observe(el);
   const remove: RemoveIntersectionObserverEntry = el => instance.unobserve(el);
-  const start = () => elements.forEach(el => add(el));
+  const start = () => elements.forEach(add);
   const stop = () => instance.disconnect();
   const reset = () => instance.takeRecords().forEach(el => remove(el.target));
   start();
@@ -273,7 +273,7 @@ export function getOccurrence(
     ? prevIsIntersecting
       ? Occurrence.Inside
       : Occurrence.Entering
-    : prevIsIntersecting === undefined || prevIsIntersecting === true
+    : prevIsIntersecting === true
     ? Occurrence.Leaving
     : Occurrence.Outside;
 }
