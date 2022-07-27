@@ -176,11 +176,9 @@ export const withRefetchEvent: RequestModifier =
     options: RefetchEventOptions<Result, FetcherArgs> = {}
   ) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
-    requestContext.wrapResource();
     const lastRequestRef: { current: [requestData: FetcherArgs, data?: Result] | undefined } = {
       current: undefined
     };
-    console.log("wrapping fetcher");
     wrapFetcher<Result, FetcherArgs>(requestContext, originalFetcher => (...args) => {
       lastRequestRef.current = [args as any, undefined];
       return originalFetcher(...args).then(data => {
@@ -188,6 +186,7 @@ export const withRefetchEvent: RequestModifier =
         return data;
       });
     });
+    requestContext.wrapResource();
     const events: string[] = options.on || ["visibilitychange"];
     const filter = options.filter || (() => true);
     const handler = (ev: Event) => {
@@ -202,5 +201,4 @@ export const withRefetchEvent: RequestModifier =
     events.forEach(name => window.addEventListener(name, handler));
     getOwner() &&
       onCleanup(() => events.forEach(name => window.removeEventListener(name, handler)));
-    requestContext.wrapResource();
   };

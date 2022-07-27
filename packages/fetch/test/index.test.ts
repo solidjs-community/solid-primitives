@@ -183,20 +183,20 @@ test("retries request if fails on first try", () =>
     })
   ));
 
-test.skip("refetches request after visibility changes to visible", () =>
-  new Promise<void>(resolve =>
+test("refetches request after visibility changes to visible", () =>
+  new Promise<void>((resolve, reject) =>
     createRoot(dispose => {
       let calls = 0;
       const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
       const fetch = () => {
-        if (++calls === 2) {
-          dispose();
-          resolve();
-        }
+        calls++;
         return Promise.resolve(mockResponse);
-      };
+      }
       const [ready] = createFetch<typeof mockResponseBody>(url, { fetch }, [withRefetchEvent()]);
       createEffect(() => {
+        if (ready.error) {
+          reject(ready.error);
+        }
         const data = ready();
         if (!data) {
           setUrl(mockUrl);
@@ -204,6 +204,10 @@ test.skip("refetches request after visibility changes to visible", () =>
         if (data?.ready) {
           Object.defineProperty(document, "visibilityState", { get: () => "visible" });
           window.dispatchEvent(new Event("visibilitychange"));
+        }
+        if (calls === 2) {
+          dispose();
+          resolve();
         }
       });
     })

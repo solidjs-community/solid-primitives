@@ -104,6 +104,7 @@ const isOptions = <Result, InitialValue, FetcherArgs>(
  * * withAbort() - makes request abortable
  * * withTimeout(ms) - adds a request timeout (works with abort)
  * * withRetry(num) - retries request *num* times
+ * * withRefetchEvent(events, filter) - automatically fetches again after certain event(s)
  * * withCache(options) - caches requests
  * * withCatchAll() - catches all errors so you do not need a boundary
  *
