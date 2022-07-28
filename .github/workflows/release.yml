@@ -19,7 +19,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 17.x
-          cache: pnpm
 
       - name: Install Dependencies
         run: pnpm install
