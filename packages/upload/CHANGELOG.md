@@ -5,4 +5,3 @@
 1.0.0
 
 Committed first version of primitive.
-

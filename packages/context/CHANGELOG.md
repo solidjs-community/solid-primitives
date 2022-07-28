@@ -5,4 +5,3 @@
 0.0.100
 
 Initial release of the context package.
-

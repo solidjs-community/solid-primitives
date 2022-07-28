@@ -23,4 +23,3 @@ Rename to `date`, merge with `countdown`, refactor primitives to split them into
 [PR#113](https://github.com/solidjs-community/solid-primitives/pull/113)
 
 Remove `createTime`, use memo, and timer packages to reuse primitives
-

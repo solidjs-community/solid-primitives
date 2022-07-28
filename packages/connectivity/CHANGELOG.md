@@ -17,4 +17,3 @@ Upgraded to Solid 1.3
 0.2.0 - **stage-2**
 
 Add `makeConnectivityListener` and `useConnectivitySignal`
-

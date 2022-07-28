@@ -13,4 +13,3 @@ Minor clean-up and added CJS support.
 1.0.3
 
 Added server entry and updated to latest Solid.
-

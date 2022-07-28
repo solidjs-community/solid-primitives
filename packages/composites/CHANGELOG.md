@@ -17,4 +17,3 @@ Updated to Solid 1.3
 1.0.6
 
 Minor improvements
-

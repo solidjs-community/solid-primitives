@@ -17,4 +17,3 @@ General package refactor. The single initial `makeKeyHoldListener` primitive has
 - `useKeyDownSequence`,
 - `createKeyHold`,
 - `createShortcut`
-

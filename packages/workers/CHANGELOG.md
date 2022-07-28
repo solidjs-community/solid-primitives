@@ -17,4 +17,3 @@ Add CJS and SSR support as well as better building process.
 0.1.1
 
 Updated to Solid 1.3
-

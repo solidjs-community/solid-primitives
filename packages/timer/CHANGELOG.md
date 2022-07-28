@@ -29,4 +29,3 @@ Added [`makeTimer`](#maketimer), [`createTimeoutLoop`](#createtimeoutloop), [`cr
 [PR#113](https://github.com/solidjs-community/solid-primitives/pull/113)
 
 Make the calc function of `createPolled` reactive
-

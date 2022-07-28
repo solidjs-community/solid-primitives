@@ -17,4 +17,3 @@ Shipping a tighter and better CJS supported version.
 1.1.0
 
 Added server entry and updated to Solid 1.3.
-

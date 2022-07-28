@@ -10,4 +10,3 @@ Initial release as a Stage-1 primitive.
 
 Add `template` function _(inspired by [@lxsmnsyc's string function in solid-use](#https://github.com/LXSMNSYC/solid-use/tree/main/packages/solid-use#string))_.
 Bump to Stage 2.
-

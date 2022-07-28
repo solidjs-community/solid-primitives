@@ -29,4 +29,3 @@ Major improvements to bring package in line with project standards.
 1.3.0
 
 A major refactor of the `audio` package that includes new basic and reactive primitives.
-

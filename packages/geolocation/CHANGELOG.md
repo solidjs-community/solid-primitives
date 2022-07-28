@@ -29,4 +29,3 @@ Additional clean-up and tests improvements.
 1.3.0
 
 Upgraded to latest version of Solid and our Primitives standards.
-

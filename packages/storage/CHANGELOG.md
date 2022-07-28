@@ -29,4 +29,3 @@ Patched peerDependency issue
 1.1.2
 
 Added sync option to disable event synching
-

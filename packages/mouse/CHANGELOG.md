@@ -29,4 +29,3 @@ Renamed:
 Added `makeMousePositionListener`, `makeMouseInsideListener` and `getPositionInElement`
 
 Removed clear() and update() functions from reactive primitives. `createPositionToElement` now only takes accessor position.
-

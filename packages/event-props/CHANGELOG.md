@@ -13,4 +13,3 @@ Published publicly for general use.
 0.1.0
 
 Updated to latest Solid
-

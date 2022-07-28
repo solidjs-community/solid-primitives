@@ -25,4 +25,3 @@ Added export request function to make gql requests more imperative.
 1.1.1
 
 Correct types for solid-js@1.4.3
-

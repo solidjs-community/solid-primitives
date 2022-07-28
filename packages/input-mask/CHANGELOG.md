@@ -19,4 +19,3 @@ Optional generic to type events.
 0.1.2
 
 New regexMaskToFn helper.
-

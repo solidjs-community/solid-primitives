@@ -17,4 +17,3 @@ Add proper build process and clean up docs. Added SSR and CJS support.
 1.0.4
 
 Updated to latest Solid.
-

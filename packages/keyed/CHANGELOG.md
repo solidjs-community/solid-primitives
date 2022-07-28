@@ -11,4 +11,3 @@ Initial release as a Stage-2 primitive.
 Support for Solid 1.4 Store Top Level Arrays
 
 Renamed `mapKey` -> `keyArray`
-

@@ -25,4 +25,3 @@ Updated to Solid 1.3
 0.1.3
 
 Minor upgrades.
-

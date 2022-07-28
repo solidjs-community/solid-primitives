@@ -5,4 +5,3 @@
 1.0.0
 
 First ported commit from svelte-gestures.
-

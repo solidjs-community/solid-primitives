@@ -64,4 +64,3 @@ Allow for `undefined` targets in `createEventListener`
 2.2.0
 
 Add `preventDefault`, `stopPropagation` and `stopImmediatePropagation` callback wrappers.
-

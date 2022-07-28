@@ -33,4 +33,3 @@ Update solid.
 1.2.0
 
 Allow a RequestInfo Accessor to return undefined in order to not yet make a request.
-

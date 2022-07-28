@@ -9,4 +9,3 @@ Initial release as a Stage-1 primitive.
 0.2.0
 
 Add `mergeRefs`
-

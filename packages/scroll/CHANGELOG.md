@@ -19,4 +19,3 @@ Updated to Solid 1.3
 Rename `createScrollObserver` to `createScrollPosition` and add y scroll axis to the returned value, making it a store-like object.
 
 Add `getScrollPosition` as a separately exported helper.
-

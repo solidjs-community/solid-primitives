@@ -17,4 +17,3 @@ Upgrade to Solid 1.3
 1.0.4
 
 Support JS source inclusion.
-

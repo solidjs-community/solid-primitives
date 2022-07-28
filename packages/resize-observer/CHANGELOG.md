@@ -19,4 +19,3 @@ Patched HTMLElement to Element to resolve type error on build. Updated to Solid 
 Refactored `createResizeObserver` API.
 
 Added `makeResizeObserver`, `createWindowSize`, `useWindowSize` and `createElementSize`
-

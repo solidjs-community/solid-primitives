@@ -45,4 +45,3 @@ General improvements to bring up to latest standards.
 1.4.0
 
 Migrated to new `make` pattern and improved primitive structures.
-

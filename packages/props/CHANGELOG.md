@@ -27,4 +27,3 @@ Support for Solid 1.4
 2.2.0
 
 Add `filterProps` and `createPropsPredicate` primitives.
-

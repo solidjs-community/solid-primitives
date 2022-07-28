@@ -13,4 +13,3 @@ Deprecated `createSet` and `createWeakSet` functions, as they weren't providing 
 `ReactiveSet` and `ReactiveWeakSet` now will respect `instanceof Set/WeakSet` checks.
 
 Internal signals will be created only if read in a tracking scope.
-

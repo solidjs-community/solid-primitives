@@ -11,4 +11,3 @@ Initial commit of the visibility observer.
 Rename `createPageVisibilityObserver` to `createPageVisibility` _(no longer exported as default)_
 
 Add `usePageVisibility`
-

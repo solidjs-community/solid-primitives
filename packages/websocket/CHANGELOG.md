@@ -9,4 +9,3 @@ Initial version. Proposed and waiting for feedback.
 0.3.0
 
 Fixed package exports.
-

@@ -35,4 +35,3 @@ Added `makeMediaQueryListener`, implementation improvements
 Add `usePrefersDark`.
 
 Remove the default export. (`createMediaQuery` will only be available as named export)
-
