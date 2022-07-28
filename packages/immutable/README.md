@@ -99,11 +99,4 @@ setUser(p => update(p, "street", "number", 64));
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-0.0.100
-
-Initial release as a Stage-1 primitive.
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)

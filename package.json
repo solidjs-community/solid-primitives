@@ -15,7 +15,11 @@
     "test": "turbo run test",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts",
-    "update-deps": "taze -w -r && pnpm i"
+    "update-deps": "taze -w -r && pnpm i",
+    "changeset": "changeset",
+    "release": "pnpm run build-test && changeset publish",
+    "version-packages": "changeset version && pnpm i",
+    "ci:version": "changeset version && pnpm i --no-frozen-lockfile && git add ."
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
@@ -31,7 +35,8 @@
     "unocss": "^0.44.7",
     "vite": "^3.0.2",
     "vite-plugin-solid": "^2.3.0",
-    "vitest": "^0.18.1"
+    "vitest": "^0.18.1",
+    "@changesets/cli": "^2.24.0"
   },
   "packageManager": "pnpm@7.5.0"
 }

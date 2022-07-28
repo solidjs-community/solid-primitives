@@ -160,20 +160,4 @@ Usage of combining `createSharedRoot` with `createMousePosition`: https://codesa
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-0.0.100
-
-Initial release as a Stage-1 primitive.
-
-1.0.0 - **Stage-2**
-
-- Remove `runWithRoot`
-- Rename `createSubRoot` to `createBranch` and `runWithSubRoot` to `createDisposable` (also unify returns to only dispose fn)
-
-  1.1.0
-
-Add `createSharedRoot` primitive
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)

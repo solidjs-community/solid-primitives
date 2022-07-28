@@ -54,17 +54,4 @@ createEffect(() => {
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-1.0.0
-
-Initial commit of the visibility observer.
-
-2.0.0
-
-Rename `createPageVisibilityObserver` to `createPageVisibility` _(no longer exported as default)_
-
-Add `usePageVisibility`
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)
