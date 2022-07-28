@@ -213,11 +213,4 @@ const [hovering, setHovering] = createSignal(false);
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-0.0.100
-
-Initial release as a Stage-2 primitive.
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)

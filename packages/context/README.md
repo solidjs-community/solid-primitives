@@ -115,11 +115,4 @@ https://codesandbox.io/s/solid-primitives-context-demo-oqyie2?file=/index.tsx
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-0.0.100
-
-Initial release of the context package.
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)

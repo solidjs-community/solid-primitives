@@ -102,11 +102,4 @@ https://codesandbox.io/s/solid-primitives-bounds-64rls0?file=/index.tsx
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-0.0.100
-
-Initial release as a Stage-0 primitive.
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)

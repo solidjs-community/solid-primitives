@@ -80,19 +80,4 @@ set.delete(2);
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-0.0.100
-
-Initial release of the package.
-
-0.2.0
-
-Deprecated `createSet` and `createWeakSet` functions, as they weren't providing any benefit over instanciating with the `new` keyword.
-
-`ReactiveSet` and `ReactiveWeakSet` now will respect `instanceof Set/WeakSet` checks.
-
-Internal signals will be created only if read in a tracking scope.
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)

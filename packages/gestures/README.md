@@ -16,14 +16,7 @@ Helpful directives to react to user gestures.
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-1.0.0
-
-First ported commit from svelte-gestures.
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)
 
 ## Contributors
 

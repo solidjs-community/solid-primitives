@@ -180,17 +180,4 @@ https://codesandbox.io/s/solid-primitives-keyed-rerun-demo-14vjr?file=/index.tsx
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-0.0.100
-
-Initial release as a Stage-2 primitive.
-
-1.0.0 - **stage-3**
-
-Support for Solid 1.4 Store Top Level Arrays
-
-Renamed `mapKey` -> `keyArray`
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)

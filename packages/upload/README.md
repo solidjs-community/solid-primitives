@@ -76,11 +76,4 @@ Working example: https://codesandbox.io/s/solid-primitives-upload-ry042x?file=/s
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-1.0.0
-
-Committed first version of primitive.
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)

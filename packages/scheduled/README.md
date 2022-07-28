@@ -104,11 +104,4 @@ BOTTOM: called user callback
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-1.0.0
-
-Initial release as a Stage-2 primitive.
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)

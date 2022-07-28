@@ -166,11 +166,4 @@ c(); // => undefined (no error)
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-0.0.100
-
-Initial release of the destructure package.
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)

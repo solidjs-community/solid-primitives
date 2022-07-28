@@ -53,23 +53,4 @@ TODO
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-0.0.100
-
-Initial release.
-
-1.0.2
-
-Release first first with CJS support.
-
-1.0.3
-
-Upgrade to Solid 1.3
-
-1.0.4
-
-Support JS source inclusion.
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)
