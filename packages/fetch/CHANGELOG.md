@@ -33,3 +33,7 @@ Update solid.
 1.2.0
 
 Allow a RequestInfo Accessor to return undefined in order to not yet make a request.
+
+2.0.0
+
+Rewrite to allow for an extendible primitive; the previously supported AbortControllers are now handled by the withAbort modifier. Additional modifiers mostly close the feature gap between @solid-primitives/fetch and react-query.
