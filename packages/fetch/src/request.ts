@@ -1,6 +1,5 @@
 import { RequestContext } from "./fetch";
 import { ResourceFetcherInfo } from "solid-js";
-import { AxiosStatic, AxiosRequestConfig } from "axios";
 
 export type Request<FetcherArgs extends any[]> = <Result>(
   ...args: any[]
@@ -27,15 +26,5 @@ export const fetchRequest: Request<[info: RequestInfo, init?: RequestInit]> =
           return response.blob() as Result;
         }
       });
-    requestContext.wrapResource();
-  };
-
-export const axiosRequest: Request<[config: AxiosRequestConfig]> =
-  (axios: AxiosStatic) => requestContext => {
-    requestContext.fetcher = <Result extends unknown>(
-      requestData: [config: AxiosRequestConfig]
-    ) => {
-      return axios(...requestData) as Promise<Result>;
-    };
     requestContext.wrapResource();
   };

@@ -9,4 +9,4 @@ export {
   wrapResource
 } from "./modifiers";
 export { withCache, withCacheStorage } from "./cache";
-export { fetchRequest, axiosRequest } from "./request";
+export { fetchRequest } from "./request";
