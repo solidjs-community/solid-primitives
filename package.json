@@ -19,7 +19,7 @@
     "changeset": "changeset",
     "release": "pnpm run build-test && changeset publish",
     "version-packages": "changeset version && pnpm i",
-    "ci:version": "changeset version && pnpm i --no-frozen-lockfile && git add ."
+    "ci:version": "changeset version && pnpm i && git add ."
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
