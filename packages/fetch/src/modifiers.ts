@@ -1,5 +1,5 @@
 import { createSignal, getOwner, onCleanup, ResourceFetcherInfo } from "solid-js";
-import { callbackify } from "util";
+import { isServer } from "solid-js/web";
 import { RequestContext } from "./fetch";
 
 export type RequestModifier = <Result extends unknown, FetcherArgs extends any[]>(
@@ -86,8 +86,7 @@ export const withTimeout: RequestModifier = (timeout: number) => requestContext 
     requestContext,
     originalFetcher => (requestData, info) =>
       new Promise((resolve, reject) => {
-        window.setTimeout(() => {
-          // @ts-ignore
+        setTimeout(() => {
           requestContext.abortController?.abort("timeout");
           reject(new Error("timeout"));
         }, timeout);
@@ -171,8 +170,9 @@ export type RefetchEventOptions<Result extends unknown, FetcherArgs extends any[
   filter?: (requestData: FetcherArgs, data: Result | undefined, ev: Event) => boolean;
 };
 
-export const withRefetchEvent: RequestModifier =
-  <Result extends unknown, FetcherArgs extends any[]>(
+export const withRefetchEvent: RequestModifier = isServer
+  ? () => (requestContext) => { requestContext.wrapResource(); }
+  : <Result extends unknown, FetcherArgs extends any[]>(
     options: RefetchEventOptions<Result, FetcherArgs> = {}
   ) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
