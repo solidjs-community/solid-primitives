@@ -1,5 +1,14 @@
 # @solid-primitives/keyboard
 
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [73b6a34]
+  - @solid-primitives/utils@3.0.0
+  - @solid-primitives/event-listener@2.2.1
+  - @solid-primitives/rootless@1.1.2
+
 ## Changelog up to version 1.0.0
 
 0.0.100

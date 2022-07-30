@@ -1,5 +1,19 @@
 # @solid-primitives/intersection-observer
 
+## 2.0.0
+
+### Major Changes
+
+- 140d862: - Reworks `createVisibilityObserver` to be able to use it with multiple elements — for reusing the IO instance.
+  - Extends it's functionality with a setter callback argument — a way to custom calculate the visibility.
+  - Removes the `once` option — imperative `clear` functions and such options don't fit the model of declaring computations. If computation has to be stopped, one needs to wrap it with `createRoot`.
+  - Adds `withOccurrence` and `withDirection` setter modifiers.
+
+### Patch Changes
+
+- Updated dependencies [73b6a34]
+  - @solid-primitives/utils@3.0.0
+
 ## Changelog up to version 1.4.0
 
 0.0.108
