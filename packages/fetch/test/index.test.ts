@@ -191,7 +191,7 @@ test("refetches request after visibility changes to visible", () =>
       const fetch = () => {
         calls++;
         return Promise.resolve(mockResponse);
-      }
+      };
       const [ready] = createFetch<typeof mockResponseBody>(url, { fetch }, [withRefetchEvent()]);
       createEffect(() => {
         if (ready.error) {

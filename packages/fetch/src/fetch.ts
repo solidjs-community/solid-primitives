@@ -69,21 +69,19 @@ const fetcherArgsFromArgs = <FetcherArgs extends any[]>(
   args: [...fetcherArgs: FetcherArgs | [], ...rest: any[]]
 ): FetcherArgs | undefined => {
   const info: FetcherArgs[0] | undefined =
-  typeof args[0] === "function"
-    ? (args[0] as Accessor<FetcherArgs | FetcherArgs[0]>)()
-    : args[0];
-if (!info) {
-  return undefined;
-}
+    typeof args[0] === "function" ? (args[0] as Accessor<FetcherArgs | FetcherArgs[0]>)() : args[0];
+  if (!info) {
+    return undefined;
+  }
 
-const init =
-  typeof args[1] === "function"
-    ? (args[1] as Accessor<FetcherArgs[1]>)()
-    : isOptions(args[1]) || Array.isArray(args[1])
-    ? undefined
-    : (args[1] as RequestInit);
-return [info, init] as FetcherArgs;
-}
+  const init =
+    typeof args[1] === "function"
+      ? (args[1] as Accessor<FetcherArgs[1]>)()
+      : isOptions(args[1]) || Array.isArray(args[1])
+      ? undefined
+      : (args[1] as RequestInit);
+  return [info, init] as FetcherArgs;
+};
 
 /**
  * Creates a fetch resource with lightweight modifications
@@ -218,7 +216,10 @@ export function createFetch<
     ? () => undefined
     : typeof args[0] === "function" || typeof args[1] === "function"
     ? createMemo(() => fetcherArgsFromArgs(args))
-    : ((fetcherArgs) => () => fetcherArgs)(fetcherArgsFromArgs(args));
+    : (
+        fetcherArgs => () =>
+          fetcherArgs
+      )(fetcherArgsFromArgs(args));
   const modifiers: (Request<FetcherArgs> | RequestModifier)[] = ((): RequestModifier[] => {
     for (let l = args.length - 1; l >= 1; l--) {
       if (Array.isArray(args[l])) {

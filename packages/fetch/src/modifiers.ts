@@ -171,34 +171,36 @@ export type RefetchEventOptions<Result extends unknown, FetcherArgs extends any[
 };
 
 export const withRefetchEvent: RequestModifier = isServer
-  ? () => (requestContext) => { requestContext.wrapResource(); }
+  ? () => requestContext => {
+      requestContext.wrapResource();
+    }
   : <Result extends unknown, FetcherArgs extends any[]>(
-    options: RefetchEventOptions<Result, FetcherArgs> = {}
-  ) =>
-  (requestContext: RequestContext<Result, FetcherArgs>) => {
-    const lastRequestRef: { current: [requestData: FetcherArgs, data?: Result] | undefined } = {
-      current: undefined
-    };
-    wrapFetcher<Result, FetcherArgs>(requestContext, originalFetcher => (...args) => {
-      lastRequestRef.current = [args as any, undefined];
-      return originalFetcher(...args).then(data => {
-        lastRequestRef.current = [args as any, data as Result];
-        return data;
-      });
-    });
-    requestContext.wrapResource();
-    const events: string[] = options.on || ["visibilitychange"];
-    const filter = options.filter || (() => true);
-    const handler = (ev: Event) => {
-      if (
-        lastRequestRef.current &&
-        !(ev.type === "visibilitychange" && document.visibilityState !== "visible") &&
-        filter(...lastRequestRef.current, ev)
-      ) {
-        requestContext.resource?.[1].refetch();
-      }
-    };
-    events.forEach(name => window.addEventListener(name, handler));
-    getOwner() &&
-      onCleanup(() => events.forEach(name => window.removeEventListener(name, handler)));
-  };
+        options: RefetchEventOptions<Result, FetcherArgs> = {}
+      ) =>
+      (requestContext: RequestContext<Result, FetcherArgs>) => {
+        const lastRequestRef: { current: [requestData: FetcherArgs, data?: Result] | undefined } = {
+          current: undefined
+        };
+        wrapFetcher<Result, FetcherArgs>(requestContext, originalFetcher => (...args) => {
+          lastRequestRef.current = [args as any, undefined];
+          return originalFetcher(...args).then(data => {
+            lastRequestRef.current = [args as any, data as Result];
+            return data;
+          });
+        });
+        requestContext.wrapResource();
+        const events: string[] = options.on || ["visibilitychange"];
+        const filter = options.filter || (() => true);
+        const handler = (ev: Event) => {
+          if (
+            lastRequestRef.current &&
+            !(ev.type === "visibilitychange" && document.visibilityState !== "visible") &&
+            filter(...lastRequestRef.current, ev)
+          ) {
+            requestContext.resource?.[1].refetch();
+          }
+        };
+        events.forEach(name => window.addEventListener(name, handler));
+        getOwner() &&
+          onCleanup(() => events.forEach(name => window.removeEventListener(name, handler)));
+      };
