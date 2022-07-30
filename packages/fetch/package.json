@@ -36,7 +36,7 @@
   },
   "scripts": {
     "start": "vite serve dev --host",
-    "dev": "yarn start",
+    "dev": "pnpm run start",
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
     "build": "tsup",
