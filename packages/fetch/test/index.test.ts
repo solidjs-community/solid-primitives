@@ -1,10 +1,14 @@
-import "./setup";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { test, expect } from "vitest";
 import { createRoot, createEffect, createSignal } from "solid-js";
-import { createFetch } from "../src";
-
-const test = suite("createFetch");
+import { createFetch } from "../src/fetch";
+import {
+  withAbort,
+  withCatchAll,
+  withRefetchEvent,
+  withRetry,
+  withTimeout
+} from "../src/modifiers";
+import { withCache, withCacheStorage } from "../src/cache";
 
 const mockResponseBody = { ready: true };
 const mockResponse = new Response(JSON.stringify(mockResponseBody), {
@@ -12,18 +16,19 @@ const mockResponse = new Response(JSON.stringify(mockResponseBody), {
   status: 200
 });
 const mockUrl = "https://test.url/ready.json";
+const mockUrl2 = "https://test.url/notready.json";
 let mockError: Error | undefined = undefined;
 let expected: { input: RequestInfo; init?: RequestInit } = {
   input: mockUrl,
   init: undefined
 };
-const fetchMock: typeof fetch = (input: RequestInfo, init?: RequestInit): Promise<Response> =>
+const fetchMock: typeof fetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> =>
   new Promise((resolve, reject) => {
     if (expected.input) {
-      assert.equal(input, expected.input);
+      expect(input).toEqual(expected.input);
     }
     if (expected.init) {
-      assert.equal(init, expected.init);
+      expect(init).toEqual(expected.init);
     }
     if (mockError) {
       reject(mockError);
@@ -31,19 +36,20 @@ const fetchMock: typeof fetch = (input: RequestInfo, init?: RequestInit): Promis
       resolve(mockResponse);
     }
   });
+
 test("will fetch json data", () =>
   new Promise<void>(resolve => {
     createRoot(dispose => {
-      const [ready] = createFetch<typeof mockResponseBody, undefined>(mockUrl, {
+      const [ready] = createFetch(mockUrl, {
         fetch: fetchMock
       });
       createEffect(() => {
-        const isReady = ready()?.ready;
+        const isReady = (ready() as any)?.ready;
         if (ready.error) {
           throw ready.error;
         }
         if (typeof isReady !== "undefined") {
-          assert.is(isReady, true);
+          expect(isReady).toBe(true);
           dispose();
           resolve();
         }
@@ -54,7 +60,7 @@ test("will fetch json data", () =>
 test("will fetch text data", () =>
   new Promise<void>(resolve => {
     createRoot(dispose => {
-      const [ready] = createFetch<typeof mockResponseBody, undefined>(mockUrl, {
+      const [ready] = createFetch<typeof mockResponseBody>(mockUrl, {
         fetch: fetchMock,
         responseHandler: res => res.text()
       });
@@ -64,7 +70,7 @@ test("will fetch text data", () =>
           throw ready.error;
         }
         if (typeof answer !== "undefined") {
-          assert.is(answer, JSON.stringify(mockResponseBody));
+          expect(answer).toBe(JSON.stringify(mockResponseBody));
           dispose();
           resolve();
         }
@@ -74,11 +80,11 @@ test("will fetch text data", () =>
 
 test("will abort a request without an error", () =>
   createRoot(dispose => {
-    const [ready, { abort }] = createFetch<typeof mockResponseBody, undefined>(mockUrl, {
-      fetch: fetchMock
-    });
-    abort();
-    assert.is(ready.aborted, true);
+    const [ready, { abort }] = createFetch<typeof mockResponseBody>(mockUrl, { fetch: fetchMock }, [
+      withAbort()
+    ]);
+    abort!();
+    expect(ready.aborted).toBe(true);
     createEffect(() => {
       if (ready.error) {
         throw ready.error;
@@ -96,12 +102,12 @@ test("will make a request error accessible otherwise", () =>
   new Promise<void>(resolve =>
     createRoot(dispose => {
       const fetchError = new Error("TypeError: failed to fetch");
-      const [ready] = createFetch<typeof mockResponseBody, undefined>(mockUrl, {
+      const [ready] = createFetch(() => mockUrl, {
         fetch: () => Promise.reject(fetchError)
       });
       createEffect(() => {
         if (ready.error) {
-          assert.is(ready.error, fetchError);
+          expect(ready.error).toBe(fetchError);
           dispose();
           resolve();
         }
@@ -117,7 +123,7 @@ test("will not start a request with a requestinfo accessor returning undefined",
         url() === undefined
           ? Promise.reject(reject(new Error("called even though the url was undefined")))
           : Promise.resolve(mockResponse);
-      const [ready] = createFetch(url(), { fetch });
+      const [ready] = createFetch(url, { fetch });
       createEffect(() => {
         ready();
         if (url() === undefined) {
@@ -130,4 +136,192 @@ test("will not start a request with a requestinfo accessor returning undefined",
     });
   }));
 
-test.run();
+test("will abort the request on timeout and catchAll the error", () =>
+  new Promise<void>(resolve =>
+    createRoot(dispose => {
+      const fetch = () =>
+        new Promise<typeof mockResponse>(r => setTimeout(() => r(mockResponse), 1000));
+      const [ready] = createFetch(mockUrl, { fetch }, [
+        withTimeout(50),
+        withAbort(),
+        withCatchAll()
+      ]);
+      createEffect((iteration: number = 0) => {
+        expect(ready.error).toEqual([undefined, new Error("timeout")][iteration]);
+        if (iteration === 1) {
+          dispose();
+          resolve();
+        }
+        return iteration + 1;
+      });
+    })
+  ));
+
+test("retries request if fails on first try", () =>
+  new Promise<void>(resolve =>
+    createRoot(dispose => {
+      let calls = 0;
+      const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
+      const fetch = () => {
+        return calls++
+          ? Promise.resolve(mockResponse)
+          : Promise.reject(new Error("TypeError: Failed to fetch"));
+      };
+      const [ready] = createFetch<typeof mockResponseBody>(url, { fetch }, [withRetry(1, 0)]);
+      createEffect((iteration: number = 0) => {
+        const data = ready();
+        if (iteration === 0) {
+          setUrl(mockUrl);
+        }
+        if (iteration === 1 && data?.ready) {
+          expect(calls).toBe(2);
+          dispose();
+          resolve();
+        }
+        return iteration + 1;
+      });
+    })
+  ));
+
+test("refetches request after visibility changes to visible", () =>
+  new Promise<void>((resolve, reject) =>
+    createRoot(dispose => {
+      let calls = 0;
+      const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
+      const fetch = () => {
+        calls++;
+        return Promise.resolve(mockResponse);
+      }
+      const [ready] = createFetch<typeof mockResponseBody>(url, { fetch }, [withRefetchEvent()]);
+      createEffect(() => {
+        if (ready.error) {
+          reject(ready.error);
+        }
+        const data = ready();
+        if (!data) {
+          setUrl(mockUrl);
+        }
+        if (data?.ready) {
+          Object.defineProperty(document, "visibilityState", { get: () => "visible" });
+          window.dispatchEvent(new Event("visibilitychange"));
+        }
+        if (calls === 2) {
+          dispose();
+          resolve();
+        }
+      });
+    })
+  ));
+
+test("caches request instead of making them twice", () =>
+  new Promise<void>(resolve =>
+    createRoot(dispose => {
+      let calls = 0;
+      const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
+      const cache = {};
+      const fetch = () => {
+        calls++;
+        return Promise.resolve(mockResponse);
+      };
+      const [ready] = createFetch(url, { fetch }, [withCache({ cache, expires: 100000 })]);
+      createEffect((iteration: number = 0) => {
+        ready();
+        if (iteration === 0) {
+          setUrl(mockUrl);
+        }
+        if (iteration === 1) {
+          setUrl(mockUrl2);
+        }
+        if (iteration === 2) {
+          setUrl(mockUrl);
+        }
+        if (iteration === 3) {
+          expect(calls).toBe(2);
+          dispose();
+          resolve();
+        }
+        return iteration + 1;
+      });
+    })
+  ));
+
+test("invalidates cached request", () =>
+  new Promise<void>(resolve =>
+    createRoot(dispose => {
+      let calls = 0;
+      const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
+      const cache = {};
+      const fetch = () => {
+        calls++;
+        return Promise.resolve(mockResponse);
+      };
+      const [ready] = createFetch(url, { fetch }, [withCache({ cache, expires: -1 })]);
+      createEffect((iteration: number = 0) => {
+        ready();
+        if (iteration === 0) {
+          setUrl(mockUrl);
+        }
+        if (iteration === 1) {
+          setUrl(mockUrl2);
+        }
+        if (iteration === 2) {
+          setUrl(mockUrl);
+        }
+        if (iteration === 3) {
+          expect(calls).toBe(3);
+          dispose();
+          resolve();
+        }
+        return iteration + 1;
+      });
+    })
+  ));
+
+test("loads and saves cache to localStorage", () =>
+  new Promise<void>(resolve =>
+    createRoot(dispose => {
+      let calls = 0;
+      const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
+      const cache = {};
+      const fetch = () => {
+        calls++;
+        return Promise.resolve(mockResponse);
+      };
+      localStorage.setItem(
+        "fetch-cache",
+        JSON.stringify({
+          [JSON.stringify({ url: mockUrl })]: {
+            ts: new Date().getTime(),
+            requestData: [mockUrl],
+            data: mockResponseBody
+          }
+        })
+      );
+      const [ready] = createFetch(url, { fetch }, [
+        withCache({ cache, expires: 10000 }),
+        withCacheStorage()
+      ]);
+      createEffect((iteration: number = 0) => {
+        ready();
+        if (iteration === 0) {
+          setUrl(mockUrl);
+        }
+        if (iteration === 1) {
+          expect(calls).toBe(0);
+          setUrl(mockUrl2);
+        }
+        if (iteration === 2) {
+          expect(calls).toBe(1);
+          setUrl(mockUrl);
+        }
+        if (iteration === 3) {
+          const savedCache = localStorage.getItem("fetch-cache");
+          expect(savedCache).toEqual(JSON.stringify(cache));
+          expect(Object.keys(cache)).toHaveLength(2);
+          dispose();
+          resolve();
+        }
+        return iteration + 1;
+      });
+    })
+  ));
