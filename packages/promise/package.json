@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/promise",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Promised one-time watch for changes. Await a reactive condition.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -41,7 +41,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^2.2.1"
+    "@solid-primitives/utils": "^3.0.0"
   },
   "devDependencies": {
     "jsdom": "^19.0.0",

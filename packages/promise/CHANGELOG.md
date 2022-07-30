@@ -1,5 +1,16 @@
 # @solid-primitives/until
 
+## 1.0.0
+
+### Major Changes
+
+- 73b6a34: rename `until` -> `promise` package & move `raceTimeout` and `promiseTimeout` to `promise` package
+
+### Patch Changes
+
+- Updated dependencies [73b6a34]
+  - @solid-primitives/utils@3.0.0
+
 ## Changelog up to version 0.1.0
 
 0.0.100

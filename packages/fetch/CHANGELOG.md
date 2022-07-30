@@ -1,5 +1,11 @@
 # @solid-primitives/fetch
 
+## 2.0.0
+
+### Major Changes
+
+- 0fda65c: Rewrite to allow for an extendible primitive; the previously supported AbortControllers are now handled by the withAbort modifier. Additional modifiers mostly close the feature gap between @solid-primitives/fetch and react-query.
+
 ## Changelog up to version 1.2.0
 
 0.0.100

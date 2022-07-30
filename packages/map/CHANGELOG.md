@@ -1,5 +1,12 @@
 # @solid-primitives/map
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [73b6a34]
+  - @solid-primitives/utils@3.0.0
+
 ## Changelog up to version 0.2.0
 
 0.0.100
