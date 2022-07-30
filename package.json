@@ -13,11 +13,12 @@
     "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx,md}\"",
     "build": "turbo run build",
     "test": "turbo run test",
+    "build-test": "turbo run build test",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts",
     "update-deps": "taze -w -r && pnpm i",
     "changeset": "changeset",
-    "release": "pnpm run build-test && changeset publish",
+    "release": "pnpm build-test && changeset publish",
     "version-packages": "changeset version && pnpm i",
     "ci:version": "changeset version && git add ."
   },
