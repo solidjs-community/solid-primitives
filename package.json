@@ -23,6 +23,7 @@
     "ci:version": "changeset version && git add ."
   },
   "devDependencies": {
+    "@changesets/cli": "^2.24.1",
     "@types/fs-extra": "^9.0.13",
     "fs-extra": "^10.1.0",
     "jiti": "^1.14.0",
@@ -30,14 +31,13 @@
     "prettier": "^2.7.1",
     "solid-js": "^1.4.8",
     "taze": "^0.7.6",
-    "tsup": "^6.1.3",
-    "turbo": "^1.3.4",
+    "tsup": "^6.2.1",
+    "turbo": "^1.4.0",
     "typescript": "^4.7.4",
     "unocss": "^0.44.7",
-    "vite": "^3.0.2",
+    "vite": "^3.0.4",
     "vite-plugin-solid": "^2.3.0",
-    "vitest": "^0.18.1",
-    "@changesets/cli": "^2.24.0"
+    "vitest": "^0.20.1"
   },
   "packageManager": "pnpm@7.5.0"
 }
