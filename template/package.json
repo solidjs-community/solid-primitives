@@ -24,18 +24,25 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "main": "./dist/server.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "npm run start",
     "build": "tsup",
-    "test": "uvu -r solid-register",
-    "test:watch": "watchlist src test -- npm test"
+    "test": "vitest"
   },
   "keywords": [
     "solid",
@@ -45,15 +52,13 @@
     "jsdom": "^19.0.0",
     "prettier": "^2.7.1",
     "solid-js": "^1.4.8",
-    "solid-register": "^0.2.5",
     "tslib": "^2.4.0",
     "tsup": "^6.2.1",
     "typescript": "^4.7.4",
     "unocss": "^0.44.7",
-    "uvu": "^0.5.6",
     "vite": "^3.0.4",
     "vite-plugin-solid": "^2.3.0",
-    "watchlist": "^0.3.1"
+    "vitest": "^0.20.1"
   },
   "peerDependencies": {
     "solid-js": "^1.4.0"

@@ -1,17 +1,14 @@
 import { createPrimitiveTemplate } from "../src";
 import { createRoot } from "solid-js";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { describe, test, expect } from "vitest";
 
-const test = suite("createPrimitiveTemplate");
-
-test("createPrimitiveTemplate return values", () =>
-  createRoot(dispose => {
-    const [value, setValue] = createPrimitiveTemplate(true);
-    assert.is(value(), true, "initial value should be true");
-    setValue(false);
-    assert.is(value(), false, "value after change should be false");
-    dispose();
-  }));
-
-test.run();
+describe("createPrimitiveTemplate", () => {
+  test("createPrimitiveTemplate return values", () =>
+    createRoot(dispose => {
+      const [value, setValue] = createPrimitiveTemplate(true);
+      expect(value(), "initial value should be true")(true);
+      setValue(false);
+      expect(value(), "value after change should be false")(false);
+      dispose();
+    }));
+});
