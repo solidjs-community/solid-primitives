@@ -46,8 +46,7 @@
     "start": "vite serve dev --host",
     "dev": "npm run start",
     "build": "tsup",
-    "test": "vitest run test",
-    "test:watch": "vitest watch test"
+    "test": "vitest"
   },
   "keywords": [
     "solid",

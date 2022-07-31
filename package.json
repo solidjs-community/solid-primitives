@@ -12,7 +12,7 @@
   "scripts": {
     "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx,md}\"",
     "build": "turbo run build",
-    "test": "turbo run test",
+    "test": "turbo run test -- --run",
     "build-test": "turbo run build test",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts",

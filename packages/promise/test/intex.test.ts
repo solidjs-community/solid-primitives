@@ -23,7 +23,7 @@ describe("promiseTimeout", () => {
 describe("raceTimeout", () => {
   test("resolves after timeout", async () => {
     let time = Date.now();
-    await raceTimeout([new Promise(() => {}), promiseTimeout(200)], 100);
+    await raceTimeout([promiseTimeout(200)], 100);
     expect(Date.now() - time).toBeGreaterThan(50);
     expect(Date.now() - time).toBeLessThan(150);
   }, 100);
@@ -49,7 +49,7 @@ describe("raceTimeout", () => {
     let time = Date.now();
     try {
       await raceTimeout(
-        [new Promise(() => {}), promiseTimeout(200)],
+        [promiseTimeout(200)],
         100,
         true,
         new Error("raceTimeout rejection reason")

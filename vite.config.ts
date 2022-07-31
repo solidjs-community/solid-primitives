@@ -23,8 +23,7 @@ export const viteConfig = defineConfig({
     exclude: ["@solid-primitives/utils"]
   },
   build: {
-    target: "esnext",
-    polyfillDynamicImport: false
+    target: "esnext"
   }
 });
 
@@ -35,9 +34,6 @@ export const vitestConfig = defineConfig({
     environment: "jsdom",
     transformMode: {
       web: [/\.[jt]sx?$/]
-    },
-    deps: {
-      inline: [/solid-js/, /solid-testing-library/, /@solid-primitives\/.*/]
     }
   },
   resolve: {
