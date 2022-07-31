@@ -1,5 +1,4 @@
-import { createSignal, getListener } from "solid-js";
-import { isDev } from "@solid-primitives/utils";
+import { createSignal, getListener, DEV } from "solid-js";
 
 class _Object<T extends {}> {
   obj: Partial<T> = {};
@@ -36,7 +35,7 @@ export type WeakTriggerCache<T extends object> = {
  * // later
  * dirty()
  */
-export const createTrigger: () => Trigger = isDev
+export const createTrigger: () => Trigger = DEV
   ? () => createSignal(undefined, { equals: false, name: "trigger" })
   : () => createSignal(undefined, { equals: false });
 
@@ -99,14 +98,15 @@ export function createTriggerCache<T>(): TriggerCache<T> {
  * `track` and `dirty` are called with a `key` so that each tracker will trigger an update only when his individual `key` would get marked as dirty.
  * @example
  * const { track, dirty } = createWeakTriggerCache()
+ * const key = {};
  * createEffect(() => {
- *    track(1)
+ *    track(key)
  *    ...
  * })
  * // later
- * dirty(1)
+ * dirty(key)
  * // this won't cause an update:
- * dirty(2)
+ * dirty({})
  */
 export function createWeakTriggerCache<T extends object>(): WeakTriggerCache<T> {
   const cache = new WeakMap<T, Trigger>();
