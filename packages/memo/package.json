@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "@solid-primitives/mouse": "^2.0.0",
-    "jsdom": "^19.0.0",
+    "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-app-router": "^0.3.3",
     "solid-register": "^0.2.5",

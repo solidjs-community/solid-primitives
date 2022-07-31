@@ -49,7 +49,7 @@
   ],
   "testEnvironment": "jsdom",
   "devDependencies": {
-    "jsdom": "^19.0.0",
+    "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-heroicons": "^2.0.3",
     "solid-js": "^1.4.8",

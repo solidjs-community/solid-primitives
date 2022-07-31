@@ -44,7 +44,7 @@
     "@solid-primitives/utils": "^3.0.0"
   },
   "devDependencies": {
-    "jsdom": "^19.0.0",
+    "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-js": "^1.4.8",
     "solid-register": "^0.2.5",

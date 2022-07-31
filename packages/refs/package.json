@@ -53,7 +53,7 @@
   "devDependencies": {
     "@solid-primitives/keyed": "^0.1.0",
     "esbuild-plugin-solid": "^0.4.2",
-    "jsdom": "^19.0.0",
+    "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-app-router": "^0.2.1",
     "solid-register": "^0.2.5",

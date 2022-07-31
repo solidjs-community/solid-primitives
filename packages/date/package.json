@@ -49,7 +49,7 @@
     "@solid-primitives/composites": "^1.1.0",
     "@solid-primitives/event-listener": "^1.6.1",
     "date-fns": "^2.29.1",
-    "jsdom": "^19.0.0",
+    "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-register": "^0.2.5",
     "tslib": "^2.4.0",

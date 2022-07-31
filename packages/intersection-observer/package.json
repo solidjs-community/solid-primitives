@@ -54,7 +54,7 @@
   ],
   "devDependencies": {
     "@solid-primitives/range": "workspace:^0.1.0",
-    "jsdom": "^19.0.0",
+    "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-js": "^1.4.8",
     "tslib": "^2.4.0",
