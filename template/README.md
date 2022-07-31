@@ -33,11 +33,4 @@ You can use this template for publishing your demo on CodeSandbox: https://codes
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-0.0.100
-
-Initial release as a Stage-0 primitive.
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)
