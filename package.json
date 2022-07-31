@@ -14,7 +14,7 @@
     "build": "turbo run build",
     "test": "turbo run test -- --run",
     "build-test": "turbo run build test",
-    "new-package": "jiti ./scripts/new-package.ts",
+    "new-package": "jiti ./scripts/new-package.ts && pnpm i",
     "update-readme": "jiti ./scripts/update-readme.ts",
     "update-deps": "taze -w -r && pnpm i",
     "changeset": "changeset",
