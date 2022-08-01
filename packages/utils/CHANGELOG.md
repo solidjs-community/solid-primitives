@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 3.0.1
+
+### Patch Changes
+
+- 555e973: add "readonly" to handleDiffArray array arguments
+
 ## 3.0.0
 
 ### Major Changes
