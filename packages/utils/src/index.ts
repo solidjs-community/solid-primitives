@@ -383,8 +383,8 @@ export function createStaticStore<T extends Readonly<AnyStatic>>(
  * @param handleRemoved called once for every removed from array
  */
 export function handleDiffArray<T>(
-  current: T[],
-  prev: T[],
+  current: readonly T[],
+  prev: readonly T[],
   handleAdded: (item: T) => void,
   handleRemoved: (item: T) => void
 ): void {
