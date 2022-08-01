@@ -20,7 +20,7 @@
       "createRAF",
       "targetFPS"
     ],
-    "category": "Display & Media"
+    "category": "Animation"
   },
   "files": [
     "dist"

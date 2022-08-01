@@ -15,7 +15,7 @@
     "list": [
       "createTween"
     ],
-    "category": "Display & Media"
+    "category": "Animation"
   },
   "files": [
     "dist"
