@@ -86,7 +86,10 @@ export const createStream = (
  * The stream will be stopped on cleanup automatically.
  */
 export const createAmplitudeStream = (
-  device: MediaDeviceInfo | Accessor<MediaDeviceInfo>
+  device?: 
+    | MediaDeviceInfo
+    | MediaStreamConstraints
+    | Accessor<MediaDeviceInfo | MediaStreamConstraints | undefined>
 ): [
   Resource<number>,
   {
@@ -111,6 +114,7 @@ export const createAmplitudeStream = (
   createEffect(() => {
     const currentStream = stream();
     if (currentStream !== undefined) {
+      ctx.resume();
       source?.disconnect();
       source = ctx.createMediaStreamSource(currentStream);
       source.connect(analyser);
@@ -120,7 +124,7 @@ export const createAmplitudeStream = (
   const buffer = new Uint8Array(analyser.frequencyBinCount);
   const read = () => {
     analyser.getByteFrequencyData(buffer);
-    const rootMeanSquare = Math.sqrt(buffer.reduce((sum, v) => sum + v * v, 0) / buffer.length) | 0;
+    const rootMeanSquare = Math.sqrt(buffer.reduce((sum, v) => sum + v * v, 0) / buffer.length) << 2;
     setAmplitude(rootMeanSquare > 100 ? 100 : rootMeanSquare);
   };
   let id: number;
