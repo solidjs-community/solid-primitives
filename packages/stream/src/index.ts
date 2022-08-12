@@ -5,9 +5,10 @@ import {
   createResource,
   createSignal,
   onCleanup,
-  Resource
+  Resource,
 } from "solid-js";
 import { ResourceActions, ResourceFetcherInfo } from "solid-js/types/reactive/signal";
+import { FalsyValue } from "@solid-primitives/utils";
 
 const constraintsFromDevice = (
   device?: MediaDeviceInfo | MediaStreamConstraints
@@ -24,6 +25,13 @@ const constraintsFromDevice = (
 const stop = (stream: MediaStream | undefined) =>
   stream?.getTracks()?.forEach(track => track.stop());
 
+
+export type StreamSourceDescription = 
+  | MediaDeviceInfo
+  | MediaStreamConstraints
+  | Accessor<MediaDeviceInfo | MediaStreamConstraints | FalsyValue>
+  | FalsyValue
+
 export type StreamReturn = [
   stream: Resource<MediaStream | undefined>,
   controls: ResourceActions<MediaStream | undefined> & {
@@ -36,7 +44,7 @@ export type StreamReturn = [
  * ```typescript
  * [stream, { mutate, refetch, stop } = createStream(constraints);
  * ```
- * @param constraints MediaDeviceInfo | MediaStreamConstraints | Accessor<MediaDeviceInfo | MediaStreamConstraints>
+ * @param streamSource MediaDeviceInfo | MediaStreamConstraints | Accessor<MediaDeviceInfo | MediaStreamConstraints>
  * @property `stream()` allows access to the media stream (or undefined if none is present)
  * @property `stream.loading` is a boolean indicator for the loading state
  * @property `stream.error` contains any error getting the stream encountered
@@ -47,14 +55,11 @@ export type StreamReturn = [
  * The stream will be stopped on cleanup automatically.
  */
 export const createStream = (
-  constraints:
-    | MediaDeviceInfo
-    | MediaStreamConstraints
-    | Accessor<MediaDeviceInfo | MediaStreamConstraints | undefined>
+  streamSource: StreamSourceDescription
 ): StreamReturn => {
   const [stream, { mutate, refetch }] = createResource(
     createMemo<MediaStreamConstraints | undefined>(() =>
-      constraintsFromDevice(typeof constraints === "function" ? constraints() : constraints)
+      constraintsFromDevice((typeof streamSource === "function" ? streamSource() : streamSource) || undefined)
     ),
     (constraints, info: ResourceFetcherInfo<MediaStream>): Promise<MediaStream> =>
       navigator.mediaDevices.getUserMedia(constraints).then(stream => {
@@ -74,7 +79,7 @@ export const createStream = (
  * ```typescript
  * [amplitude, { stream, mutate, refetch, stop }] = createAmplitudeStream(device);
  * ```
- * @param device MediaDeviceInfo | Accessor<MediaDeviceInfo>
+ * @param source MediaDeviceInfo | Accessor<MediaDeviceInfo>
  * @param constraints MediaDeviceInfo | MediaStreamConstraints | Accessor<MediaDeviceInfo | MediaStreamConstraints>
  * @property `amplitude()` allows access the amplitude as a number between 0 and 100
  * @property `amplitude.loading` is a boolean indicator for the loading state of the underlying stream
@@ -86,7 +91,7 @@ export const createStream = (
  * The stream will be stopped on cleanup automatically.
  */
 export const createAmplitudeStream = (
-  device: MediaDeviceInfo | Accessor<MediaDeviceInfo>
+  streamSource?: StreamSourceDescription
 ): [
   Resource<number>,
   {
@@ -97,7 +102,7 @@ export const createAmplitudeStream = (
   }
 ] => {
   const [amplitude, setAmplitude] = createSignal(0);
-  const [stream, { mutate, refetch, stop }] = createStream(device);
+  const [stream, { mutate, refetch, stop }] = createStream(streamSource);
   const ctx = new AudioContext({ sampleRate: 8000 });
   const analyser = ctx.createAnalyser();
   Object.assign(analyser, {
@@ -111,6 +116,7 @@ export const createAmplitudeStream = (
   createEffect(() => {
     const currentStream = stream();
     if (currentStream !== undefined) {
+      ctx.resume();
       source?.disconnect();
       source = ctx.createMediaStreamSource(currentStream);
       source.connect(analyser);
@@ -120,7 +126,7 @@ export const createAmplitudeStream = (
   const buffer = new Uint8Array(analyser.frequencyBinCount);
   const read = () => {
     analyser.getByteFrequencyData(buffer);
-    const rootMeanSquare = Math.sqrt(buffer.reduce((sum, v) => sum + v * v, 0) / buffer.length) | 0;
+    const rootMeanSquare = Math.sqrt(buffer.reduce((sum, v) => sum + v * v, 0) / buffer.length) << 2;
     setAmplitude(rootMeanSquare > 100 ? 100 : rootMeanSquare);
   };
   let id: number;
