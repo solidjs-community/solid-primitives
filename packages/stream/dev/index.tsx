@@ -7,7 +7,7 @@ import "uno.css";
 declare module "solid-js" {
   namespace JSX {
     interface ExplicitProperties {
-      srcObject?: MediaStream
+      srcObject?: MediaStream;
     }
   }
 }
@@ -25,14 +25,19 @@ const App: Component = () => {
         <h2>TestVideo</h2>
         <video prop:srcObject={video()} autoplay />
         <h2>Amplitude test</h2>
-        <Show when={audioConstraints()} fallback={
-          <button
-            onClick={() => setAudioConstraints({ audio: true })}
-            title="We need user interaction to run an audio context"
-          >Click to start amplitude level</button>
-        }>
+        <Show
+          when={audioConstraints()}
+          fallback={
+            <button
+              onClick={() => setAudioConstraints({ audio: true })}
+              title="We need user interaction to run an audio context"
+            >
+              Click to start amplitude level
+            </button>
+          }
+        >
           <meter min="0" max="100" value={level()} />
-        </Show>      
+        </Show>
       </div>
     </div>
   );

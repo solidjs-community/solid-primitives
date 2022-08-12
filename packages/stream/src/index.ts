@@ -5,7 +5,7 @@ import {
   createResource,
   createSignal,
   onCleanup,
-  Resource,
+  Resource
 } from "solid-js";
 import { ResourceActions, ResourceFetcherInfo } from "solid-js/types/reactive/signal";
 import { FalsyValue } from "@solid-primitives/utils";
@@ -25,12 +25,11 @@ const constraintsFromDevice = (
 const stop = (stream: MediaStream | undefined) =>
   stream?.getTracks()?.forEach(track => track.stop());
 
-
-export type StreamSourceDescription = 
+export type StreamSourceDescription =
   | MediaDeviceInfo
   | MediaStreamConstraints
   | Accessor<MediaDeviceInfo | MediaStreamConstraints | FalsyValue>
-  | FalsyValue
+  | FalsyValue;
 
 export type StreamReturn = [
   stream: Resource<MediaStream | undefined>,
@@ -54,12 +53,12 @@ export type StreamReturn = [
  *
  * The stream will be stopped on cleanup automatically.
  */
-export const createStream = (
-  streamSource: StreamSourceDescription
-): StreamReturn => {
+export const createStream = (streamSource: StreamSourceDescription): StreamReturn => {
   const [stream, { mutate, refetch }] = createResource(
     createMemo<MediaStreamConstraints | undefined>(() =>
-      constraintsFromDevice((typeof streamSource === "function" ? streamSource() : streamSource) || undefined)
+      constraintsFromDevice(
+        (typeof streamSource === "function" ? streamSource() : streamSource) || undefined
+      )
     ),
     (constraints, info: ResourceFetcherInfo<MediaStream>): Promise<MediaStream> =>
       navigator.mediaDevices.getUserMedia(constraints).then(stream => {
@@ -126,7 +125,8 @@ export const createAmplitudeStream = (
   const buffer = new Uint8Array(analyser.frequencyBinCount);
   const read = () => {
     analyser.getByteFrequencyData(buffer);
-    const rootMeanSquare = Math.sqrt(buffer.reduce((sum, v) => sum + v * v, 0) / buffer.length) << 2;
+    const rootMeanSquare =
+      Math.sqrt(buffer.reduce((sum, v) => sum + v * v, 0) / buffer.length) << 2;
     setAmplitude(rootMeanSquare > 100 ? 100 : rootMeanSquare);
   };
   let id: number;
