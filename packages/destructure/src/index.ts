@@ -102,7 +102,7 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
   }
 
   // eager (loop keys)
-  const result = obj.constructor();
+  const result: any = Array.isArray(obj) ? [] : {};
   for (const [key, value] of Object.entries(obj)) {
     const calc = getter(key);
     if (config.deep && isReactiveObject(value))
