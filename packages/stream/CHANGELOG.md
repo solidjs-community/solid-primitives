@@ -1,5 +1,11 @@
 # @solid-primitives/stream
 
+## 0.3.0
+
+### Minor Changes
+
+- 52d3110: Fix for audio context requiring user interaction.
+
 ## Changelog up to version 0.2.0
 
 0.0.100
