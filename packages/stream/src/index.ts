@@ -25,6 +25,11 @@ const constraintsFromDevice = (
 const stop = (stream: MediaStream | undefined) =>
   stream?.getTracks()?.forEach(track => track.stop());
 
+const mute = (stream: MediaStream | undefined, muted?: boolean) =>
+  stream?.getTracks()?.forEach(track => {
+    track.enabled = muted === false;
+  });
+
 export type StreamSourceDescription =
   | MediaDeviceInfo
   | MediaStreamConstraints
@@ -34,14 +39,17 @@ export type StreamSourceDescription =
 export type StreamReturn = [
   stream: Resource<MediaStream | undefined>,
   controls: ResourceActions<MediaStream | undefined> & {
+    /** stop the stream */
     stop: () => void;
+    /** if called with false, unmute, otherwise mute the stream */
+    mute: (muted?: boolean) => void;
   }
 ];
 
 /**
  * Creates a reactive wrapper to get media streams from devices or screen
  * ```typescript
- * [stream, { mutate, refetch, stop } = createStream(constraints);
+ * [stream, { mutate, refetch, mute, stop } = createStream(constraints);
  * ```
  * @param streamSource MediaDeviceInfo | MediaStreamConstraints | Accessor<MediaDeviceInfo | MediaStreamConstraints>
  * @property `stream()` allows access to the media stream (or undefined if none is present)
@@ -49,6 +57,7 @@ export type StreamReturn = [
  * @property `stream.error` contains any error getting the stream encountered
  * @method `mutate` allows to manually overwrite the stream
  * @method `refetch` allows to restart the request without changing the constraints
+ * @method `mute` will mute the stream or unmute if called with `false`
  * @method `stop` allows stopping the media stream
  *
  * The stream will be stopped on cleanup automatically.
@@ -70,7 +79,15 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
   );
 
   onCleanup(() => stop(stream()));
-  return [stream, { mutate, refetch, stop: () => stop(stream()) }];
+  return [
+    stream,
+    {
+      mutate,
+      refetch,
+      mute: (muted?: boolean) => mute(stream(), muted),
+      stop: () => stop(stream())
+    }
+  ];
 };
 
 /**
