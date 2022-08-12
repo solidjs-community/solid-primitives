@@ -39,7 +39,7 @@
     "build": "tsup",
     "test": "uvu -r solid-register",
     "start": "vite serve dev --host",
-    "dev": "yarn start"
+    "dev": "npm run start"
   },
   "keywords": [
     "media",
@@ -47,6 +47,9 @@
     "solid",
     "primitives"
   ],
+  "dependencies": {
+    "@solid-primitives/utils": "^3.0.0"
+  },
   "devDependencies": {
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",

@@ -13,7 +13,3 @@ Released a version with CJS and SSR.
 0.1.0
 
 Updated for latest Solid.
-
-0.1.1
-
-Fix for audio context requiring user interaction.
