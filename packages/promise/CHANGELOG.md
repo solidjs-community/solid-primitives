@@ -1,5 +1,11 @@
 # @solid-primitives/until
 
+## 1.0.1
+
+### Patch Changes
+
+- change createEffect to createComputed to work under Suspense
+
 ## 1.0.0
 
 ### Major Changes
