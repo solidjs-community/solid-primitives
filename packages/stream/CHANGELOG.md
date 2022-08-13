@@ -1,5 +1,11 @@
 # @solid-primitives/stream
 
+## 0.4.0
+
+### Minor Changes
+
+- 730cfcf: add mute method to stream controls
+
 ## 0.3.0
 
 ### Minor Changes
