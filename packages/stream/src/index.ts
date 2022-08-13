@@ -5,10 +5,14 @@ import {
   createResource,
   createSignal,
   onCleanup,
-  Resource
+  Resource,
+  ResourceReturn,
+  ResourceFetcherInfo,
+  untrack
 } from "solid-js";
-import { ResourceActions, ResourceFetcherInfo } from "solid-js/types/reactive/signal";
 import { FalsyValue } from "@solid-primitives/utils";
+
+export type ResourceActions<T, O = {}> = ResourceReturn<T, O>[1]
 
 const constraintsFromDevice = (
   device?: MediaDeviceInfo | MediaStreamConstraints
@@ -25,6 +29,11 @@ const constraintsFromDevice = (
 const stop = (stream: MediaStream | undefined) =>
   stream?.getTracks()?.forEach(track => track.stop());
 
+const mute = (stream: MediaStream | undefined, muted?: boolean) =>
+  stream?.getTracks()?.forEach(track => {
+    track.enabled = muted === false;
+  });
+
 export type StreamSourceDescription =
   | MediaDeviceInfo
   | MediaStreamConstraints
@@ -34,21 +43,25 @@ export type StreamSourceDescription =
 export type StreamReturn = [
   stream: Resource<MediaStream | undefined>,
   controls: ResourceActions<MediaStream | undefined> & {
+    /** stop the stream */
     stop: () => void;
+    /** if called with false, unmute, otherwise mute the stream */
+    mute: (muted?: boolean) => void;
   }
 ];
 
 /**
  * Creates a reactive wrapper to get media streams from devices or screen
  * ```typescript
- * [stream, { mutate, refetch, stop } = createStream(constraints);
+ * [stream, { mutate, refetch, mute, stop } = createStream(streamSource);
  * ```
- * @param streamSource MediaDeviceInfo | MediaStreamConstraints | Accessor<MediaDeviceInfo | MediaStreamConstraints>
- * @property `stream()` allows access to the media stream (or undefined if none is present)
+ * @param streamSource MediaDeviceInfo | MediaStreamConstraints | FalsyValue | Accessor<MediaDeviceInfo | MediaStreamConstraints | FalsyValue>
+ * @returnValue `stream()` is an accessor to the media stream (or undefined if not yet loaded)
  * @property `stream.loading` is a boolean indicator for the loading state
  * @property `stream.error` contains any error getting the stream encountered
  * @method `mutate` allows to manually overwrite the stream
  * @method `refetch` allows to restart the request without changing the constraints
+ * @method `mute` will mute the stream or unmute if called with `false`
  * @method `stop` allows stopping the media stream
  *
  * The stream will be stopped on cleanup automatically.
@@ -70,19 +83,27 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
   );
 
   onCleanup(() => stop(stream()));
-  return [stream, { mutate, refetch, stop: () => stop(stream()) }];
+  return [
+    stream,
+    {
+      mutate,
+      refetch,
+      mute: (muted?: boolean) => mute(untrack(stream), muted),
+      stop: () => stop(untrack(stream))
+    }
+  ];
 };
 
 /**
  * Creates a reactive signal containing the amplitude of a microphone
  * ```typescript
- * [amplitude, { stream, mutate, refetch, stop }] = createAmplitudeStream(device);
+ * [amplitude, { stream, mutate, refetch, stop }] = createAmplitudeStream(streamSource);
  * ```
- * @param source MediaDeviceInfo | Accessor<MediaDeviceInfo>
- * @param constraints MediaDeviceInfo | MediaStreamConstraints | Accessor<MediaDeviceInfo | MediaStreamConstraints>
+ * @param streamSource MediaDeviceInfo | MediaStreamConstraints | FalsyValue | Accessor<MediaDeviceInfo | MediaStreamConstraints | FalsyValue>
  * @property `amplitude()` allows access the amplitude as a number between 0 and 100
  * @property `amplitude.loading` is a boolean indicator for the loading state of the underlying stream
  * @property `amplitude.error` contains any error getting the stream encountered
+ * @property `amplitude.stream()` is an accessor to allow access to the stream
  * @method `mutate` allows to manually overwrite the microphone stream
  * @method `refetch` allows to restart the request without changing the device
  * @method `stop` allows stopping the media stream
@@ -163,7 +184,7 @@ export const createAmplitudeStream = (
  * ```
  * @param source MediaStreamConstraints | 'audio' | 'video' | undefined
  *
- * If no source is given, both microphone and camera permissions will be requested. You can read the permissions with the `createPermission` primitive.
+ * If no source is given, both microphone and camera permissions will be requested. You can read the permissions with the `createPermission` primitive from the `@solid-primitives/permission` package.
  */
 export const createMediaPermissionRequest = (source?: MediaStreamConstraints | "audio" | "video") =>
   navigator.mediaDevices
@@ -174,4 +195,4 @@ export const createMediaPermissionRequest = (source?: MediaStreamConstraints | "
           : source
         : { audio: true, video: true }
     )
-    .then(stream => stream?.getTracks()?.forEach(track => track.stop()));
+    .then(stop);
