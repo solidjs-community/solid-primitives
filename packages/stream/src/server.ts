@@ -19,9 +19,7 @@ const noop = {
   }
 };
 
-export const createStream = (
-  _sourceDescription: StreamSourceDescription
-): StreamReturn => {
+export const createStream = (_sourceDescription: StreamSourceDescription): StreamReturn => {
   return [new Proxy({}, {}) as Resource<undefined>, noop as any];
 };
 

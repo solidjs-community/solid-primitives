@@ -12,7 +12,7 @@ import {
 } from "solid-js";
 import { FalsyValue } from "@solid-primitives/utils";
 
-export type ResourceActions<T, O = {}> = ResourceReturn<T, O>[1]
+export type ResourceActions<T, O = {}> = ResourceReturn<T, O>[1];
 
 const constraintsFromDevice = (
   device?: MediaDeviceInfo | MediaStreamConstraints
