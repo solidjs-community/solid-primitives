@@ -46,8 +46,8 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/immutable": "^0.1.0",
-    "@solid-primitives/rootless": "^1.1.2",
+    "@solid-primitives/immutable": "workspace:^0.1.0",
+    "@solid-primitives/rootless": "workspace:^1.1.2",
     "@solid-primitives/utils": "^1.5.2"
   },
   "devDependencies": {

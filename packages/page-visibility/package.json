@@ -68,6 +68,6 @@
     "solid-js": "^1.4.3"
   },
   "dependencies": {
-    "@solid-primitives/rootless": "^1.1.2"
+    "@solid-primitives/rootless": "workspace:^1.1.2"
   }
 }

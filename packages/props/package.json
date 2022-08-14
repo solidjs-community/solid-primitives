@@ -56,7 +56,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^3.0.1"
+    "@solid-primitives/utils": "workspace:^3.0.1"
   },
   "devDependencies": {
     "babel-preset-solid": "^1.4.8",

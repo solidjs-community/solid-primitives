@@ -41,7 +41,7 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solid-primitives/immutable": "^0.1.0",
+    "@solid-primitives/immutable": "workspace:^0.1.0",
     "@solid-primitives/refs": "^0.2.0",
     "@solid-primitives/utils": "^1.5.2",
     "jsdom": "^20.0.0",

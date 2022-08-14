@@ -50,8 +50,8 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/event-listener": "^2.2.1",
-    "@solid-primitives/rootless": "^1.1.2",
+    "@solid-primitives/event-listener": "workspace:^2.2.1",
+    "@solid-primitives/rootless": "workspace:^1.1.2",
     "@solid-primitives/utils": "1.2.0"
   },
   "devDependencies": {
