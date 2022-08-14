@@ -1,5 +1,9 @@
 # @solid-primitives/graphql
 
+## 1.2.0
+
+- Add support for `DocumentNode` and `TypedDocumentNode` types.
+
 ## 1.1.2
 
 ### Patch Changes
