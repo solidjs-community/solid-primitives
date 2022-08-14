@@ -23,7 +23,7 @@ const App: Component = () => {
   // We can query using a string.
   const [countriesData] = query<{ countries: { name: string; code: string }[] }>(
     gql`
-      query {
+      query CountriesQuery {
         countries {
           name
           code

@@ -1,9 +1,9 @@
 import { createResource, ResourceReturn } from "solid-js";
-import { access, MaybeAccessor, Modify } from "@solid-primitives/utils";
+import { access, FalsyValue, MaybeAccessor, Modify } from "@solid-primitives/utils";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode, print } from "graphql";
 
-export type RequestOptions<V = unknown> = Modify<
+export type RequestOptions<V extends object = {}> = Modify<
   Omit<RequestInit, "body">,
   {
     headers?: RequestHeaders;
@@ -13,14 +13,14 @@ export type RequestOptions<V = unknown> = Modify<
 >;
 
 export type GraphQLClientQuery = {
-  <T = unknown, V = unknown>(
+  <T = unknown, V extends object = {}>(
     query: string | DocumentNode | TypedDocumentNode<T, V>,
-    variables: MaybeAccessor<V | boolean> | undefined,
+    variables: MaybeAccessor<V | FalsyValue> | undefined,
     initialValue: T
   ): ResourceReturn<T, { initialValue: T }>;
-  <T = unknown, V = unknown>(
+  <T = unknown, V extends object = {}>(
     query: string,
-    variables?: MaybeAccessor<V | boolean>,
+    variables?: MaybeAccessor<V | FalsyValue>,
     initialValue?: undefined
   ): ResourceReturn<T, undefined>;
 };
@@ -64,7 +64,7 @@ export const createGraphQLClient =
  * @param options config object where you can specify query variables, request headers, method, etc.
  * @returns a Promise resolving in JSON value if the request was successful
  */
-export async function request<T = any, V = any>(
+export async function request<T = any, V extends object = {}>(
   url: string,
   query: string | DocumentNode | TypedDocumentNode<T, V>,
   options: RequestOptions<V> = {}
