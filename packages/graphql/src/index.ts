@@ -46,9 +46,9 @@ export const createGraphQLClient =
     headers?: RequestHeaders,
     fetchFn?: typeof fetch
   ): GraphQLClientQuery =>
-  (query, variables, initialValue) =>
+  (query, variables: any = {}, initialValue) =>
     createResource(
-      () => access(variables == undefined ? {} : variables),
+      () => access(variables),
       (vars: any) => {
         const variables = typeof vars === "boolean" ? {} : vars;
         return request(access(url), query, { headers, variables, fetcher: fetchFn });
