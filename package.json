@@ -23,7 +23,7 @@
     "ci:version": "changeset version && git add ."
   },
   "devDependencies": {
-    "@changesets/cli": "^2.24.2",
+    "@changesets/cli": "^2.24.3",
     "@types/fs-extra": "^9.0.13",
     "fs-extra": "^10.1.0",
     "jiti": "^1.14.0",
