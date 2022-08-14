@@ -1,24 +1,26 @@
 import { createResource, ResourceReturn } from "solid-js";
 import { access, MaybeAccessor, Modify } from "@solid-primitives/utils";
+import { TypedDocumentNode } from "@graphql-typed-document-node/core";
+import { DocumentNode, print } from "graphql";
 
-export type RequestOptions = Modify<
+export type RequestOptions<V = unknown> = Modify<
   Omit<RequestInit, "body">,
   {
     headers?: RequestHeaders;
-    variables?: QueryVariables;
+    variables?: V;
     fetcher?: typeof fetch;
   }
 >;
 
 export type GraphQLClientQuery = {
-  <T = unknown>(
-    query: string,
-    variables: MaybeAccessor<QueryVariables | boolean> | undefined,
+  <T = unknown, V = unknown>(
+    query: string | DocumentNode | TypedDocumentNode<T, V>,
+    variables: MaybeAccessor<V | boolean> | undefined,
     initialValue: T
   ): ResourceReturn<T, { initialValue: T }>;
-  <T = unknown>(
+  <T = unknown, V = unknown>(
     query: string,
-    variables?: MaybeAccessor<QueryVariables | boolean>,
+    variables?: MaybeAccessor<V | boolean>,
     initialValue?: undefined
   ): ResourceReturn<T, undefined>;
 };
@@ -44,10 +46,10 @@ export const createGraphQLClient =
     headers?: RequestHeaders,
     fetchFn?: typeof fetch
   ): GraphQLClientQuery =>
-  (query, variables = {}, initialValue) =>
+  (query, variables, initialValue) =>
     createResource(
-      () => access(variables),
-      vars => {
+      () => access(variables == undefined ? {} : variables),
+      (vars: any) => {
         const variables = typeof vars === "boolean" ? {} : vars;
         return request(access(url), query, { headers, variables, fetcher: fetchFn });
       },
@@ -58,35 +60,36 @@ export const createGraphQLClient =
  * Performs a GraphQL fetch to provided endpoint.
  *
  * @param url target api endpoint
- * @param query GraphQL query string *(use `gql` function)*
+ * @param query GraphQL query string *(use `gql` function or `DocumentNode`/`TypedDocumentNode` type)*
  * @param options config object where you can specify query variables, request headers, method, etc.
  * @returns a Promise resolving in JSON value if the request was successful
  */
-export function request<T = any>(
+export async function request<T = any, V = any>(
   url: string,
-  query: string,
-  options: RequestOptions = {}
+  query: string | DocumentNode | TypedDocumentNode<T, V>,
+  options: RequestOptions<V> = {}
 ): Promise<T> {
   const { fetcher = fetch, variables = {}, headers = {}, method = "POST" } = options;
+  const query_ = typeof query == "string" ? query : print(query);
 
   return fetcher(url, {
     ...options,
     method,
-    body: JSON.stringify({ query, variables }),
+    body: JSON.stringify({ query: query_, variables }),
     headers: {
       "content-type": "application/json",
       ...headers
     }
   })
-    .then(r => r.json())
-    .then(({ data, errors }) => {
+    .then((r: any) => r.json())
+    .then(({ data, errors }: any) => {
       if (errors) throw errors;
       return data;
     });
 }
 
 /**
- * Creates GraphQL query string
+ * Creates a GraphQL query string.
  */
 export const gql = (query: TemplateStringsArray) =>
   query
