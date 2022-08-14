@@ -61,10 +61,11 @@ Query function is based on `createResource`, so it can be deferred in the same w
 
 ```ts
 const newQuery = createGraphQLClient("https://foobar.com/v1/api");
-const [data, { refetch }] = newQuery(somequery, false);
+const [queryVars, setQueryVars] = createSignal<boolean | object>(false);
+const [data, { refetch }] = newQuery(gql`...`, queryVars);
 
-// later
-refetch();
+setQueryVars({ foo: bar }); // will fetch for the first time
+refetch(); // will refetch the second time
 ```
 
 #### Providing Response Type
