@@ -60,18 +60,15 @@
     "typescript": "^4.7.4",
     "vite": "^2.9.15",
     "vite-plugin-solid": "2.2.6",
-    "vitest": "^0.20.3"
+    "vitest": "^0.22.0"
   },
   "peerDependencies": {
-    "node-fetch": ">=2.0.0",
+    "node-fetch": ">=3.2.10",
     "solid-js": ">=1.3.0"
   },
   "peerDependenciesMeta": {
     "node-fetch": {
       "optional": true
     }
-  },
-  "dependencies": {
-    "node-fetch": "^3.2.10"
   }
 }

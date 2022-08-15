@@ -1,25 +1,3 @@
-if (!globalThis.fetch) {
-  Object.assign(globalThis, {
-    fetch: (...args: any[]) => {
-      try {
-        const fetch = require("node-fetch");
-        Object.assign(globalThis, { fetch });
-        return fetch(...args);
-      } catch (e) {
-        Object.assign(globalThis, {
-          fetch: () => {
-            console.warn(
-              '"\x1b[33m⚠️ package missing to run createFetch on the server.\n Please run:\x1b[0m\n\nnpm i node-fetch\n"'
-            );
-            Promise.reject();
-          }
-        });
-        return Promise.reject();
-      }
-    }
-  });
-}
-
 export { createFetch, FetchReturn, FetchOptions, RequestContext } from "./fetch";
 export {
   withAbort,
@@ -31,4 +9,28 @@ export {
   wrapResource
 } from "./modifiers";
 export { withCache, withCacheStorage } from "./cache";
-export { fetchRequest } from "./request";
+
+import { fetchRequest as originalFetchRequest } from "./request";
+
+let fetchFallback: typeof fetch;
+try {
+  const nodeFetch = require('node-fetch');
+  fetchFallback = nodeFetch;
+} catch(_e) {
+  fetchFallback = () => {
+    console.warn(
+      '"\x1b[33m⚠️ package missing to run createFetch on the server.\n Please run:\x1b[0m\n\nnpm i node-fetch\n"'
+    );
+    return Promise.reject(new Error('fetch not available'));
+  }
+}
+
+const fetchRequest = !globalThis.fetch
+  ? (fetch: any) => {
+    const originalRequest = originalFetchRequest(fetch ?? fetchFallback);
+    console.warn(originalRequest instanceof Promise)
+    return originalRequest;
+  }
+  : originalFetchRequest;
+
+export { fetchRequest }
