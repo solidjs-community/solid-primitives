@@ -1,5 +1,11 @@
 # @solid-primitives/fetch
 
+## 2.1.0
+
+### Minor Changes
+
+- cf1326b: remove side effects
+
 ## 2.0.0
 
 ### Major Changes
