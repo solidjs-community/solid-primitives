@@ -1,5 +1,11 @@
 # @solid-primitives/graphql
 
+## 1.2.1
+
+### Patch Changes
+
+- c576d1c: Fix query input type
+
 ## 1.2.0
 
 ### Minor Changes
