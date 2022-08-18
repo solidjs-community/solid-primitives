@@ -1,5 +1,11 @@
 # @solid-primitives/connectivity
 
+## 0.3.1
+
+### Patch Changes
+
+- e7870cb: Update deps.
+
 ## Changelog up to version 0.3.0
 
 0.0.100
