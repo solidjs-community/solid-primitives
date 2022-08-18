@@ -4,7 +4,8 @@
   "description": "Primitive that generates a client and reactive GraphQL queries",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
-    "Damian Tarnawski <gthetarnav@gmail.com>"
+    "Damian Tarnawski <gthetarnav@gmail.com>",
+    "Alex Ryapolov"
   ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/graphql",
@@ -68,7 +69,7 @@
     "solid-js": "^1.4.3"
   },
   "dependencies": {
-    "@graphql-typed-document-node/core": "^3.1.1",
+    "@graphql-typed-document-node/core": "^3.0.0",
     "@solid-primitives/utils": "^3.0.1",
     "graphql": "^16.5.0",
     "node-fetch": "^2.6.7"
