@@ -45,7 +45,7 @@ Primitive takes one `config` argument, of options:
 - your event handlers: e.g. `onenter`, `onLeave`, `onMove`, ...
 
 ```ts
-const clear = createPointerListeners({
+createPointerListeners({
   // pass a function if the element is yet to mount
   target: () => el,
   pointerTypes: ["touch"],
@@ -55,9 +55,6 @@ const clear = createPointerListeners({
   onup: e => console.log("pointer up", e.x, e.y),
   onLostCapture: e => console.log("lost")
 });
-
-// remove all listeners if needed
-clear();
 ```
 
 ## `createPerPointerListeners`

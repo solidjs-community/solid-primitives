@@ -42,8 +42,8 @@
   ],
   "devDependencies": {
     "@solid-primitives/immutable": "^0.1.0",
-    "@solid-primitives/refs": "^0.2.0",
-    "@solid-primitives/utils": "^1.5.2",
+    "@solid-primitives/refs": "^0.3.0",
+    "@solid-primitives/utils": "^3.0.1",
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-app-router": "^0.2.1",

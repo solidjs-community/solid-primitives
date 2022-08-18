@@ -47,7 +47,7 @@
   ],
   "devDependencies": {
     "@solid-primitives/composites": "^1.1.0",
-    "@solid-primitives/event-listener": "^1.6.1",
+    "@solid-primitives/event-listener": "^2.2.1",
     "date-fns": "^2.29.1",
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
@@ -65,8 +65,8 @@
     "solid-js": "^1.3.1"
   },
   "dependencies": {
-    "@solid-primitives/memo": "^0.1.1",
+    "@solid-primitives/memo": "^1.0.1",
     "@solid-primitives/timer": "^1.3.1",
-    "@solid-primitives/utils": "^1.5.2"
+    "@solid-primitives/utils": "^3.0.1"
   }
 }

@@ -65,7 +65,7 @@ describe("createTimes", () => {
       await sleep(300);
       setPaused(false);
       setDelay(200);
-      await sleep(60);
+      await sleep(30);
       expect(timeoutCount).toBe(0);
       expect(intervalCount).toBe(0);
       await sleep(80);

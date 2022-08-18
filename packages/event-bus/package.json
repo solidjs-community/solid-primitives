@@ -46,7 +46,7 @@
   ],
   "dependencies": {
     "@solid-primitives/immutable": "^0.1.0",
-    "@solid-primitives/utils": "^1.5.2"
+    "@solid-primitives/utils": "^3.0.1"
   },
   "devDependencies": {
     "jsdom": "^20.0.0",

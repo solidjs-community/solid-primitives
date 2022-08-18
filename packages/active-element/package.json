@@ -66,6 +66,6 @@
   },
   "dependencies": {
     "@solid-primitives/event-listener": "^2.2.1",
-    "@solid-primitives/utils": "^1.5.2"
+    "@solid-primitives/utils": "^3.0.1"
   }
 }

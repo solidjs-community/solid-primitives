@@ -52,7 +52,7 @@
   "dependencies": {
     "@solid-primitives/event-listener": "^2.2.1",
     "@solid-primitives/rootless": "^1.1.2",
-    "@solid-primitives/utils": "1.2.0"
+    "@solid-primitives/utils": "^3.0.1"
   },
   "devDependencies": {
     "jsdom": "^20.0.0",

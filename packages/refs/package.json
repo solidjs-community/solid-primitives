@@ -48,10 +48,9 @@
   "dependencies": {
     "@solid-primitives/immutable": "^0.1.0",
     "@solid-primitives/rootless": "^1.1.2",
-    "@solid-primitives/utils": "^1.5.2"
+    "@solid-primitives/utils": "^3.0.1"
   },
   "devDependencies": {
-    "@solid-primitives/keyed": "^0.1.0",
     "esbuild-plugin-solid": "^0.4.2",
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",

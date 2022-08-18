@@ -1,11 +1,10 @@
 import { Accessor, createSignal, getOwner } from "solid-js";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { remove, split } from "@solid-primitives/immutable";
-import { createSubRoot } from "@solid-primitives/rootless";
+import { createBranch } from "@solid-primitives/rootless";
 import {
   MaybeAccessor,
   forEachEntry,
-  createCallbackStack,
   Directive,
   Many,
   createProxy,
@@ -42,7 +41,7 @@ export {
  * - `pointerTypes` - specify array of pointer types you want to listen to. By default listens to `["mouse", "touch", "pen"]`
  * - `passive` - Add passive option to event listeners. Defaults to `true`.
  * - your event handlers: e.g. `onenter`, `onLeave`, `onMove`, ...
- * @returns function stopping currently attached listener
+ * @returns function stopping currently attached listener **!deprecated!**
  *
  * @example
  * createPointerListeners({
@@ -61,7 +60,7 @@ export function createPointerListeners(
     pointerTypes?: PointerType[];
     passive?: boolean;
   }
-): VoidFunction {
+): void {
   const [{ target = document.body, pointerTypes, passive = true }, handlers] = split(
     config,
     "target",
@@ -76,15 +75,12 @@ export function createPointerListeners(
 
   const guardCB = (handler: Handler) => (event: PointerEvent) =>
     (!pointerTypes || pointerTypes.includes(event.pointerType as PointerType)) && handler(event);
-  const cleanup = createCallbackStack();
   const addEventListener = (type: Many<keyof HTMLElementEventMap>, fn: Handler) =>
-    cleanup.push(createEventListener(target, type, guardCB(fn) as any, { passive }));
+    createEventListener(target, type, guardCB(fn) as any, { passive });
 
   forEachEntry(nativeHandlers, (name, fn) => fn && addEventListener(`pointer${name}`, fn));
   if (onGotCapture) addEventListener("gotpointercapture", onGotCapture);
   if (onLostCapture) addEventListener("lostpointercapture", onLostCapture);
-
-  return cleanup.execute;
 }
 
 /**
@@ -141,7 +137,7 @@ export function createPerPointerListeners(
   const { down: onDown, enter: onEnter } = parseHandlersMap(handlers);
   const owner = getOwner();
   const onlyInitMessage = "All listeners need to be added synchronously in the initial event.";
-  const addListener = (type: Many<string>, fn: Handler, pointerId?: number): VoidFunction =>
+  const addListener = (type: Many<string>, fn: Handler, pointerId?: number): void =>
     createEventListener(
       target,
       type,
@@ -154,7 +150,7 @@ export function createPerPointerListeners(
 
   if (onEnter) {
     const handleEnter = (e: PointerEvent) => {
-      createSubRoot(dispose => {
+      createBranch(dispose => {
         const { pointerId } = e;
         let init = true;
         let onLeave: Handler | undefined;
@@ -189,7 +185,7 @@ export function createPerPointerListeners(
 
   if (onDown) {
     const handleDown = (e: PointerEvent) => {
-      createSubRoot(dispose => {
+      createBranch(dispose => {
         const { pointerId } = e;
         let init = true;
         let onUp: Handler | undefined;
