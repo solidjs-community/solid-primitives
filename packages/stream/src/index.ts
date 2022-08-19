@@ -121,8 +121,31 @@ export const createAmplitudeStream = (
     stop: () => void;
   }
 ] => {
-  const [amplitude, setAmplitude] = createSignal(0);
   const [stream, { mutate, refetch, stop }] = createStream(streamSource);
+  const [amplitude, amplitudeStop] = createAmplitudeFromStream(stream)
+
+  const teardown = () => {
+    amplitudeStop()
+    stop()
+  };
+  onCleanup(teardown);
+
+  return [
+    Object.defineProperties(amplitude, {
+      error: { get: () => stream.error },
+      loading: { get: () => stream.loading }
+    }) as Resource<number>,
+    { stream, mutate, refetch, stop: teardown }
+  ];
+};
+
+export const createAmplitudeFromStream = (
+  stream : Accessor<MediaStream | undefined> 
+  ): [
+    Accessor<number>,
+    () => void
+  ] => {
+  const [amplitude, setAmplitude] = createSignal(0);
   const ctx = new AudioContext({ sampleRate: 8000 });
   const analyser = ctx.createAnalyser();
   Object.assign(analyser, {
@@ -164,16 +187,12 @@ export const createAmplitudeStream = (
     if (ctx.state !== "closed") {
       ctx.close();
     }
-    stop();
   };
   onCleanup(teardown);
 
   return [
-    Object.defineProperties(amplitude, {
-      error: { get: () => stream.error },
-      loading: { get: () => stream.loading }
-    }) as Resource<number>,
-    { stream, mutate, refetch, stop: teardown }
+    amplitude,
+    teardown
   ];
 };
 
