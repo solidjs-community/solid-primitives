@@ -34,12 +34,12 @@ export function createEventDispatcher<Props>(props: Props) {
   ): boolean {
     const [eventName, payload, dispatcherOptions] = args
     const propName = get_event_listener_name(eventName) as string & keyof Props
-    const cb = props[propName]
+    const handler = props[propName]
 
-    if (typeof cb !== 'function') return true
+    if (typeof handler !== 'function') return true
 
     const customEvt = create_custom_evt(eventName, payload, dispatcherOptions?.cancelable ?? false)
-    cb(customEvt)
+    handler(customEvt)
 
     return !customEvt.defaultPrevented
   }
