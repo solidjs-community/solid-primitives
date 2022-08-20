@@ -1,1 +1,1 @@
-export * from './createEventDispatcher'
+export * from './eventDispatcher'
