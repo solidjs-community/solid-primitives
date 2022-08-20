@@ -122,11 +122,11 @@ export const createAmplitudeStream = (
   }
 ] => {
   const [stream, { mutate, refetch, stop }] = createStream(streamSource);
-  const [amplitude, amplitudeStop] = createAmplitudeFromStream(stream)
+  const [amplitude, amplitudeStop] = createAmplitudeFromStream(stream);
 
   const teardown = () => {
-    amplitudeStop()
-    stop()
+    amplitudeStop();
+    stop();
   };
   onCleanup(teardown);
 
@@ -142,7 +142,7 @@ export const createAmplitudeStream = (
 /**
  * Creates a reactive signal containing the amplitude of a microphone
  * ```typescript
- * [amplitude, stop] = createAmplitudeStream(stream);
+ * [amplitude, stop] = createAmplitudeFromStream(stream);
  * ```
  * @param stream MaybeAccessor<MediaStream | undefined>
  * @return `amplitude()` allows access the amplitude as a number between 0 and 100
@@ -168,7 +168,7 @@ export const createAmplitudeFromStream = (
 
   let source: MediaStreamAudioSourceNode;
   createEffect(() => {
-    const currentStream = typeof stream  === "function" ? stream() : stream
+    const currentStream = typeof stream === "function" ? stream() : stream;
     if (currentStream !== undefined) {
       ctx.resume();
       source?.disconnect();
