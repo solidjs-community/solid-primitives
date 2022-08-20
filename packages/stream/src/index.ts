@@ -168,7 +168,7 @@ export const createAmplitudeFromStream = (
 
   let source: MediaStreamAudioSourceNode;
   createEffect(() => {
-    const currentStream = stream instanceof MediaStream ? stream : stream ? stream() : undefined;
+    const currentStream = typeof stream  === "function" ? stream() : stream
     if (currentStream !== undefined) {
       ctx.resume();
       source?.disconnect();
