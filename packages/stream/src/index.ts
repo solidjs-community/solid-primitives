@@ -10,7 +10,7 @@ import {
   ResourceFetcherInfo,
   untrack
 } from "solid-js";
-import { FalsyValue } from "@solid-primitives/utils";
+import { FalsyValue, MaybeAccessor } from "@solid-primitives/utils";
 
 export type ResourceActions<T, O = {}> = ResourceReturn<T, O>[1];
 
@@ -139,14 +139,25 @@ export const createAmplitudeStream = (
   ];
 };
 
+/**
+ * Creates a reactive signal containing the amplitude of a microphone
+ * ```typescript
+ * [amplitude, stop] = createAmplitudeStream(stream);
+ * ```
+ * @param stream MaybeAccessor<MediaStream | undefined>
+ * @return `amplitude()` allows access the amplitude as a number between 0 and 100
+ * @return `stop()` allows stopping the amplitude
+ *
+ * The amplitude will be stopped on cleanup automatically.
+ */
 export const createAmplitudeFromStream = (
-  stream : Accessor<MediaStream | undefined> 
+  stream : MaybeAccessor<MediaStream | undefined> 
   ): [
-    Accessor<number>,
-    () => void
+    amplitude: Accessor<number>,
+    stop: () => void
   ] => {
   const [amplitude, setAmplitude] = createSignal(0);
-  const ctx = new AudioContext({ sampleRate: 8000 });
+  const ctx = new AudioContext();
   const analyser = ctx.createAnalyser();
   Object.assign(analyser, {
     fftSize: 128,
@@ -157,7 +168,7 @@ export const createAmplitudeFromStream = (
 
   let source: MediaStreamAudioSourceNode;
   createEffect(() => {
-    const currentStream = stream();
+    const currentStream = stream instanceof MediaStream ? stream : stream ? stream() : undefined;
     if (currentStream !== undefined) {
       ctx.resume();
       source?.disconnect();
