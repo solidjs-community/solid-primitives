@@ -151,11 +151,8 @@ export const createAmplitudeStream = (
  * The amplitude will be stopped on cleanup automatically.
  */
 export const createAmplitudeFromStream = (
-  stream : MaybeAccessor<MediaStream | undefined> 
-  ): [
-    amplitude: Accessor<number>,
-    stop: () => void
-  ] => {
+  stream: MaybeAccessor<MediaStream | undefined>
+): [amplitude: Accessor<number>, stop: () => void] => {
   const [amplitude, setAmplitude] = createSignal(0);
   const ctx = new AudioContext();
   const analyser = ctx.createAnalyser();
@@ -201,10 +198,7 @@ export const createAmplitudeFromStream = (
   };
   onCleanup(teardown);
 
-  return [
-    amplitude,
-    teardown
-  ];
+  return [amplitude, teardown];
 };
 
 /**
