@@ -17,7 +17,7 @@
     "name": "event-dispatcher",
     "stage": 0,
     "list": [
-      "createPrimitiveTemplate"
+      "createEventDispatcher"
     ],
     "category": "Utilities"
   },
