@@ -24,7 +24,7 @@ yarn add @solid-primitives/event-dispatcher
 
 ### Exemple: create and dispatch the event
 ```tsx
-import { createEventDispatcher } from 'solid-create-event-dispatcher'
+import { createEventDispatcher } from "@solid-primitives/event-dispatcher";
 
 interface Props {
   onCustomMessage: (evt: CustomEvent<string>) => void,
