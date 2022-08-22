@@ -9,7 +9,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/event-dispatcher?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/event-dispatcher)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-`createEventoDispatcher` creates a custom-event dispatcher for emitting component events.
+`createEventDispatcher` creates a custom-event dispatcher for emitting component events.
 SolidJS equivalent of Svelte's [homonymous function](svelte.dev/docs#run-time-svelte-createeventdispatcher).
 
 ## Installation
@@ -24,7 +24,7 @@ yarn add @solid-primitives/event-dispatcher
 
 ### Exemple: create and dispatch the event
 ```tsx
-import { createEventDispatcher } from 'solid-create-event-dispatcher'
+import { createEventDispatcher } from "@solid-primitives/event-dispatcher";
 
 interface Props {
   onCustomMessage: (evt: CustomEvent<string>) => void,

@@ -17,9 +17,9 @@
     "name": "event-dispatcher",
     "stage": 0,
     "list": [
-      "createPrimitiveTemplate"
+      "createEventDispatcher"
     ],
-    "category": "Display & Media"
+    "category": "Utilities"
   },
   "private": false,
   "sideEffects": false,
