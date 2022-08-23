@@ -1,4 +1,4 @@
-import { createRoot, createSignal } from "solid-js";
+import { batch, createRoot, createSignal } from "solid-js";
 import { describe, test, expect } from "vitest";
 import { createTimer } from "../src";
 
@@ -44,7 +44,7 @@ describe("createTimes", () => {
 
     await createRoot(async dispose => {
       const [paused, setPaused] = createSignal(false);
-      const [delay, setDelay] = createSignal(100);
+      const [delay, setDelay] = createSignal(50);
       createTimer(
         () => timeoutCount++,
         () => !paused() && delay(),
@@ -60,15 +60,16 @@ describe("createTimes", () => {
       setPaused(false);
       expect(timeoutCount).toBe(0);
       expect(intervalCount).toBe(0);
-      await sleep(50);
       setPaused(true);
-      await sleep(300);
-      setPaused(false);
-      setDelay(200);
-      await sleep(30);
+      await sleep(100);
+      batch(() => {
+        setPaused(false);
+        setDelay(100);
+      });
+      await sleep(10);
       expect(timeoutCount).toBe(0);
       expect(intervalCount).toBe(0);
-      await sleep(80);
+      await sleep(140);
       expect(timeoutCount).toBe(1);
       expect(intervalCount).toBe(1);
       dispose();
