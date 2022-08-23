@@ -1,4 +1,3 @@
-export type Handles = {}
-export type DispatcherOptions = {}
+import * as API from "."
 
-export const createEventDispatcher  = () => () => {}
+export const createEventDispatcher:typeof API.createEventDispatcher  = () => () => false

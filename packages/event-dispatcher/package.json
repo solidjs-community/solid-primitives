@@ -46,7 +46,10 @@
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "event",
+    "component",
+    "custom-event"
   ],
   "devDependencies": {
     "jsdom": "^20.0.0",
