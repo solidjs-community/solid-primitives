@@ -1,3 +1,3 @@
-import * as API from "."
+import * as API from ".";
 
-export const createEventDispatcher:typeof API.createEventDispatcher  = () => () => false
+export const createEventDispatcher: typeof API.createEventDispatcher = () => () => false;
