@@ -1,5 +1,11 @@
 # @solid-primitives/stream
 
+## 0.5.0
+
+### Minor Changes
+
+- 1d83f92: added createAmplitudeFromStream
+
 ## 0.4.0
 
 ### Minor Changes
