@@ -50,8 +50,6 @@ export type CursorProperty =
  *
  * @example
  * ```ts
- * import { createElementCursor } from "@solid-primitives/cursor";
- *
  * const target = document.querySelector("#element");
  * const [cursor, setCursor] = createSignal("pointer");
  * const [enabled, setEnabled] = createSignal(true);
@@ -82,8 +80,6 @@ export function createElementCursor(
  *
  * @example
  * ```ts
- * import { createBodyCursor } from "@solid-primitives/cursor";
- *
  * const [cursor, setCursor] = createSignal("pointer");
  * const [enabled, setEnabled] = createSignal(true);
  *

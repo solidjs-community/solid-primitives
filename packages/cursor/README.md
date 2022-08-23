@@ -9,9 +9,10 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/cursor?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/cursor)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A sample primitive that is made up for templating with the following options:
+Two simple primitives for setting cursor css property reactively.
 
-`createPrimitiveTemplate` - Provides a getter and setter for the primitive.
+- [`createElementCursor`](#createElementCursor) - Set provided cursor to given HTML Element styles reactively.
+- [`createBodyCursor`](#createBodyCursor) - Set selected cursor to body element styles reactively.
 
 ## Installation
 
@@ -23,15 +24,45 @@ yarn add @solid-primitives/cursor
 pnpm add @solid-primitives/cursor
 ```
 
-## How to use it
+## `createElementCursor`
+
+Set provided cursor to given HTML Element styles reactively.
+
+It takes two arguments:
+
+- `element` - HTMLElement or a reactive signal returning one. Returning falsy value will unset the cursor.
+- `cursor` - Cursor css property. E.g. "pointer", "grab", "zoom-in", "wait", etc.
 
 ```ts
-const [value, setValue] = createPrimitiveTemplate(false);
+import { createElementCursor } from "@solid-primitives/cursor";
+
+const target = document.querySelector("#element");
+const [cursor, setCursor] = createSignal("pointer");
+const [enabled, setEnabled] = createSignal(true);
+
+createElementCursor(() => enabled() && target, cursor);
+
+setCursor("help");
 ```
 
-## Demo
+## `createBodyCursor`
 
-You can use this template for publishing your demo on CodeSandbox: https://codesandbox.io/s/solid-primitives-demo-template-sz95h
+Set selected cursor to body element styles reactively.
+
+It takes only one argument:
+
+- `cursor` - Signal returing a cursor css property. E.g. "pointer", "grab", "zoom-in", "wait", etc. Returning falsy value will unset the cursor.
+
+```ts
+import { createBodyCursor } from "@solid-primitives/cursor";
+
+const [cursor, setCursor] = createSignal("pointer");
+const [enabled, setEnabled] = createSignal(true);
+
+createBodyCursor(() => enabled() && cursor());
+
+setCursor("help");
+```
 
 ## Changelog
 

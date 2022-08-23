@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/cursor",
   "version": "0.0.100",
-  "description": "A template primitive example.",
+  "description": "Two simple primitives for setting cursor css property reactively.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
@@ -47,7 +47,9 @@
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "style",
+    "cursor"
   ],
   "devDependencies": {
     "jsdom": "^20.0.0",
