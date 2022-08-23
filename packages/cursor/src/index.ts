@@ -1,4 +1,4 @@
-import { Accessor, createEffect } from "solid-js";
+import { Accessor, createEffect, onCleanup } from "solid-js";
 import { access, FalsyValue, MaybeAccessor } from "@solid-primitives/utils";
 
 export type CursorProperty =
@@ -43,43 +43,61 @@ export type CursorProperty =
   | (string & {});
 
 /**
- * Set selected {@link cursor} to {@link target} styles.
+ * Set selected {@link cursor} to {@link target} styles reactively.
  *
- * @param target
- * @param cursor
+ * @param target HTMLElement or a reactive signal returning one. Returning falsy value will unset the cursor.
+ * @param cursor Cursor css property. E.g. "pointer", "grab", "zoom-in", "wait", etc.
+ *
+ * @example
+ * ```ts
+ * import { createElementCursor } from "@solid-primitives/cursor";
+ *
+ * const target = document.querySelector("#element");
+ * const [cursor, setCursor] = createSignal("pointer");
+ * const [enabled, setEnabled] = createSignal(true);
+ *
+ * createElementCursor(() => enabled() && target, cursor);
+ *
+ * setCursor("help");
+ * ```
  */
 export function createElementCursor(
   target: Accessor<HTMLElement | FalsyValue> | HTMLElement,
   cursor: MaybeAccessor<CursorProperty>
 ): void {
-  createEffect<{ el: HTMLElement | FalsyValue; cursor: CursorProperty }>(
-    prev => {
-      const el = access(target);
-      const cursorValue = access(cursor);
-      if (prev.el === el && prev.cursor === cursorValue) return prev;
-      if (prev.el) prev.el.style.cursor = prev.cursor;
-      if (el) {
-        const newPrevCursor = el.style.cursor;
-        el.style.cursor = cursorValue;
-        return { el, cursor: newPrevCursor };
-      }
-      return { el, cursor: "" };
-    },
-    { el: undefined, cursor: "" }
-  );
+  createEffect(() => {
+    const el = access(target);
+    const cursorValue = access(cursor);
+    if (!el) return;
+    const overwritten = el.style.cursor;
+    el.style.cursor = cursorValue;
+    onCleanup(() => (el.style.cursor = overwritten));
+  });
 }
 
+/**
+ * Set selected {@link cursor} to body element styles reactively.
+ *
+ * @param cursor Signal returing a cursor css property. E.g. "pointer", "grab", "zoom-in", "wait", etc. Returning falsy value will unset the cursor.
+ *
+ * @example
+ * ```ts
+ * import { createBodyCursor } from "@solid-primitives/cursor";
+ *
+ * const [cursor, setCursor] = createSignal("pointer");
+ * const [enabled, setEnabled] = createSignal(true);
+ *
+ * createBodyCursor(() => enabled() && cursor());
+ *
+ * setCursor("help");
+ * ```
+ */
 export function createBodyCursor(cursor: Accessor<CursorProperty | FalsyValue>): void {
-  let overwritten: string;
-  createEffect((prev: CursorProperty | FalsyValue) => {
+  createEffect(() => {
     const cursorValue = cursor();
-    if (prev === cursorValue) return prev;
-    if (cursorValue) {
-      overwritten = document.body.style.cursor;
-      document.body.style.cursor = cursorValue;
-    } else {
-      document.body.style.cursor = overwritten;
-    }
-    return cursorValue;
+    if (!cursorValue) return;
+    const overwritten = document.body.style.cursor;
+    document.body.style.cursor = cursorValue;
+    onCleanup(() => (document.body.style.cursor = overwritten));
   });
 }
