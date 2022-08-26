@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/reducer",
-  "version": "0.0.100",
+  "version": "0.0.101",
   "description": "Provides a createReducer primitive for updating state in a predictable way.",
   "author": "Tiago Cavalcante <tiagotrindade111@gmail.com>",
   "contributors": [],

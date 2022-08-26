@@ -1,5 +1,11 @@
 # @solid-primitives/fullscreen
 
+## 1.1.1
+
+### Patch Changes
+
+- 7ac41ed: Update to solid-js version 1.5
+
 ## Changelog up to version 1.1.0
 
 0.0.100

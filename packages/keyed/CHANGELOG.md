@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.0.2
+
+### Patch Changes
+
+- 7ac41ed: Update to solid-js version 1.5
+
 ## 1.0.1
 
 ### Patch Changes

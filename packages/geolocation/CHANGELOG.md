@@ -1,5 +1,17 @@
 # @solid-primitives/geolocation
 
+## 1.4.0
+
+### Minor Changes
+
+- 6fcf348: Adjustments to support Solid 1.5
+
+### Patch Changes
+
+- 7ac41ed: Update to solid-js version 1.5
+- Updated dependencies [7ac41ed]
+  - @solid-primitives/utils@3.0.2
+
 ## 1.3.1
 
 ### Patch Changes
