@@ -14,7 +14,7 @@ const geolocationDefaults: PositionOptions = {
  * @param options - @type PositionOptions
  * @param options.enableHighAccuracy - Enable if the locator should be very accurate
  * @param options.maximumAge - Maximum cached position age
- * @param options.timeout - Amount of time before the error callback is envoked, if 0 then never
+ * @param options.timeout - Amount of time before the error callback is evoked, if 0 then never
  * @return Returns a `Resource` and refetch option resolving the location coordinates, refetch function and loading value.
  *
  * @example
@@ -41,11 +41,11 @@ export const createGeolocation = (
 /**
  * Creates a primitive that allows for real-time geolocation watching.
  *
- * @param enabled - Specify if the location should be updated periodically (used to temporarialy disable location watching)
+ * @param enabled - Specify if the location should be updated periodically (used to temporarily disable location watching)
  * @param options - @type PositionOptions
  * @param options.enableHighAccuracy - Enable if the locator should be very accurate
  * @param options.maximumAge - Maximum cached position age
- * @param options.timeout - Amount of time before the error callback is envoked, if 0 then never
+ * @param options.timeout - Amount of time before the error callback is evoked, if 0 then never
  * @return Returns a location signal
  *
  * @example

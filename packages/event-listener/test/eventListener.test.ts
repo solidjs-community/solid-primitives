@@ -209,16 +209,8 @@ signalTest("return autoupdating signal", () =>
 
     onMount(() => {
       dispatchFakeEvent("sig_test", testEvent);
-      assert.type(
-        lastEvent(),
-        "undefined",
-        "lastEvent will shouldn't be available in the same effect"
-      );
-
-      setTimeout(() => {
-        assert.is(lastEvent(), testEvent);
-        dispose();
-      }, 0);
+      assert.is(lastEvent(), testEvent);
+      dispose();
     });
   })
 );
