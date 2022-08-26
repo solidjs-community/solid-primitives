@@ -52,7 +52,7 @@
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-heroicons": "^2.0.3",
-    "solid-js": "^1.4.8",
+    "solid-js": "^1.5.1",
     "solid-register": "^0.2.5",
     "solid-testing-library": "^0.2.1",
     "tslib": "^2.4.0",
@@ -67,6 +67,6 @@
     "solid-js": "^1.4.4"
   },
   "dependencies": {
-    "@solid-primitives/utils": "^3.0.1"
+    "@solid-primitives/utils": "workspace:^3.0.1"
   }
 }

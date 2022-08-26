@@ -14,7 +14,7 @@ const geolocationDefaults: PositionOptions = {
  * @param options - @type PositionOptions
  * @param options.enableHighAccuracy - Enable if the locator should be very accurate
  * @param options.maximumAge - Maximum cached position age
- * @param options.timeout - Amount of time before the error callback is envoked, if 0 then never
+ * @param options.timeout - Amount of time before the error callback is evoked, if 0 then never
  * @return Returns a `Resource` and refetch option resolving the location coordinates, refetch function and loading value.
  *
  * @example
@@ -30,9 +30,13 @@ export const createGeolocation = (
     options =>
       new Promise<GeolocationCoordinates>((resolve, reject) => {
         if (!("geolocation" in navigator)) {
-          return reject({ code: null, message: "Geolocation is not defined." });
+          return reject("Geolocation is not supported.");
         }
-        navigator.geolocation.getCurrentPosition(res => resolve(res.coords), reject, options);
+        navigator.geolocation.getCurrentPosition(
+          res => resolve(res.coords),
+          error => reject(Object.assign(new Error(error.message), error)),
+          options
+        );
       })
   );
   return [location, refetch];
@@ -41,11 +45,11 @@ export const createGeolocation = (
 /**
  * Creates a primitive that allows for real-time geolocation watching.
  *
- * @param enabled - Specify if the location should be updated periodically (used to temporarialy disable location watching)
+ * @param enabled - Specify if the location should be updated periodically (used to temporarily disable location watching)
  * @param options - @type PositionOptions
  * @param options.enableHighAccuracy - Enable if the locator should be very accurate
  * @param options.maximumAge - Maximum cached position age
- * @param options.timeout - Amount of time before the error callback is envoked, if 0 then never
+ * @param options.timeout - Amount of time before the error callback is evoked, if 0 then never
  * @return Returns a location signal
  *
  * @example

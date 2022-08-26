@@ -1,5 +1,3 @@
-import { fetchRequest as originalFetchRequest } from "./request";
-
 export { createFetch, FetchReturn, FetchOptions, RequestContext } from "./fetch";
 export {
   withAbort,
@@ -12,6 +10,8 @@ export {
 } from "./modifiers";
 export { withCache, withCacheStorage } from "./cache";
 
+import { fetchRequest as originalFetchRequest } from "./request";
+
 let fetchFallback: typeof fetch;
 try {
   const nodeFetch = require("node-fetch");
@@ -21,12 +21,16 @@ try {
     console.warn(
       '"\x1b[33m⚠️ package missing to run createFetch on the server.\n Please run:\x1b[0m\n\nnpm i node-fetch\n"'
     );
-    return Promise.reject();
+    return Promise.reject(new Error("fetch not available"));
   };
 }
 
 const fetchRequest = !globalThis.fetch
-  ? (fetch = fetchFallback) => originalFetchRequest(fetch)
+  ? (fetch: any) => {
+      const originalRequest = originalFetchRequest(fetch ?? fetchFallback);
+      console.warn(originalRequest instanceof Promise);
+      return originalRequest;
+    }
   : originalFetchRequest;
 
 export { fetchRequest };

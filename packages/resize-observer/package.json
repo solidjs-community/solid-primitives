@@ -55,6 +55,7 @@
   "devDependencies": {
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
+    "solid-js": "^1.5.1",
     "solid-register": "^0.2.5",
     "tslib": "^2.4.0",
     "tsup": "^6.2.2",
@@ -66,9 +67,9 @@
     "watchlist": "^0.3.1"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "^2.2.1",
-    "@solid-primitives/rootless": "^1.1.2",
-    "@solid-primitives/utils": "^3.0.1"
+    "@solid-primitives/event-listener": "workspace:^2.2.1",
+    "@solid-primitives/rootless": "workspace:^1.1.2",
+    "@solid-primitives/utils": "workspace:^3.0.1"
   },
   "peerDependencies": {
     "solid-js": "^1.4.0"

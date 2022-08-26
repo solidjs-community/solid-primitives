@@ -47,6 +47,7 @@
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-app-router": "^0.2.1",
+    "solid-js": "^1.5.1",
     "solid-register": "^0.2.5",
     "solid-transition-group": "^0.0.8",
     "tslib": "^2.4.0",

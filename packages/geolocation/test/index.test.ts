@@ -21,13 +21,15 @@ testCG("test basic geolocation", () =>
 
 testCG("test basic geolocation error", () =>
   createRoot(async dispose => {
-    global.navigator.geolocation.getCurrentPosition = (_, reject: any) => {
-      return reject({ code: 1, message: "GeoLocation error" } as GeolocationPositionError);
+    navigator.geolocation.getCurrentPosition = (_, reject: (error: any) => void) => {
+      reject({ code: 1, message: "GeoLocation error" });
     };
-    const [location] = createRoot(() => createGeolocation());
+    const [location] = createGeolocation();
     await location();
     assert.is(location.loading, false);
-    assert.equal(location.error, { code: 1, message: "GeoLocation error" });
+    assert.instance(location.error, Error);
+    assert.is(location.error.code, 1);
+    assert.is(location.error.message, "GeoLocation error");
     dispose();
   })
 );
