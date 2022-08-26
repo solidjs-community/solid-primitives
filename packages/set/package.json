@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/set",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "The Set & WeakSet data structures as a reactive signals.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -41,7 +41,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^3.0.1"
+    "@solid-primitives/utils": "workspace:^3.0.2"
   },
   "devDependencies": {
     "jsdom": "^20.0.0",

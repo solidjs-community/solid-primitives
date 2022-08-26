@@ -1,5 +1,11 @@
 # @solid-primitives/timer
 
+## 1.3.2
+
+### Patch Changes
+
+- 7ac41ed: Update to solid-js version 1.5
+
 ## Changelog up to version 1.3.1
 
 0.0.100
