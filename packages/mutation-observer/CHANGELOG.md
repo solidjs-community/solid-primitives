@@ -1,5 +1,11 @@
 # @solid-primitives/mutation-observer
 
+## 1.1.1
+
+### Patch Changes
+
+- e7870cb: Update deps.
+
 ## Changelog up to version 1.1.0
 
 1.0.0

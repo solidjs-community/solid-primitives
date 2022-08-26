@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/refs",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Library of primitives, components and directives for SolidJS that help managing references to JSX elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -46,12 +46,11 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/immutable": "workspace:^0.1.0",
-    "@solid-primitives/rootless": "workspace:^1.1.2",
-    "@solid-primitives/utils": "^1.5.2"
+    "@solid-primitives/immutable": "^0.1.1",
+    "@solid-primitives/rootless": "^1.1.2",
+    "@solid-primitives/utils": "^3.0.1"
   },
   "devDependencies": {
-    "@solid-primitives/keyed": "^0.1.0",
     "esbuild-plugin-solid": "^0.4.2",
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",

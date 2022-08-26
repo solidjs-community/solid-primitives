@@ -19,7 +19,7 @@ export type GraphQLClientQuery = {
     initialValue: T
   ): ResourceReturn<T>;
   <T = unknown, V extends object = {}>(
-    query: string,
+    query: string | DocumentNode | TypedDocumentNode<T, V>,
     variables?: MaybeAccessor<V | FalsyValue>,
     initialValue?: undefined
   ): ResourceReturn<T | undefined>;

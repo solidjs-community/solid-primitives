@@ -8,9 +8,9 @@ const testCPL = suite("createPointerListeners");
 testCPL("listens to pointer events", () =>
   createRoot(dispose => {
     let captured_events = {
-      move: undefined,
-      enter: undefined,
-      up: undefined
+      move: undefined as undefined | PointerEvent,
+      enter: undefined as undefined | PointerEvent,
+      up: undefined as undefined | PointerEvent
     };
     const move_event = new Event("pointermove");
     const enter_event = new Event("pointerenter");
@@ -33,29 +33,6 @@ testCPL("listens to pointer events", () =>
 
     window.dispatchEvent(up_event);
     assert.is(captured_events.up, up_event);
-
-    dispose();
-  })
-);
-
-testCPL("clear function", () =>
-  createRoot(dispose => {
-    let captured_event;
-    const move_event1 = new Event("pointermove");
-    const move_event2 = new Event("pointermove");
-
-    const clear = createPointerListeners({
-      target: window,
-      onMove: e => (captured_event = e)
-    });
-
-    window.dispatchEvent(move_event1);
-    assert.is(captured_event, move_event1);
-
-    clear();
-
-    window.dispatchEvent(move_event2);
-    assert.is(captured_event, move_event1);
 
     dispose();
   })

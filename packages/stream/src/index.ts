@@ -10,7 +10,7 @@ import {
   ResourceFetcherInfo,
   untrack
 } from "solid-js";
-import { FalsyValue } from "@solid-primitives/utils";
+import { FalsyValue, MaybeAccessor } from "@solid-primitives/utils";
 
 export type ResourceActions<T, O = {}> = ResourceReturn<T, O>[1];
 
@@ -121,9 +121,40 @@ export const createAmplitudeStream = (
     stop: () => void;
   }
 ] => {
-  const [amplitude, setAmplitude] = createSignal(0);
   const [stream, { mutate, refetch, stop }] = createStream(streamSource);
-  const ctx = new AudioContext({ sampleRate: 8000 });
+  const [amplitude, amplitudeStop] = createAmplitudeFromStream(stream);
+
+  const teardown = () => {
+    amplitudeStop();
+    stop();
+  };
+  onCleanup(teardown);
+
+  return [
+    Object.defineProperties(amplitude, {
+      error: { get: () => stream.error },
+      loading: { get: () => stream.loading }
+    }) as Resource<number>,
+    { stream, mutate, refetch, stop: teardown }
+  ];
+};
+
+/**
+ * Creates a reactive signal containing the amplitude of a microphone
+ * ```typescript
+ * [amplitude, stop] = createAmplitudeFromStream(stream);
+ * ```
+ * @param stream MaybeAccessor<MediaStream | undefined>
+ * @return `amplitude()` allows access the amplitude as a number between 0 and 100
+ * @return `stop()` allows stopping the amplitude
+ *
+ * The amplitude will be stopped on cleanup automatically.
+ */
+export const createAmplitudeFromStream = (
+  stream: MaybeAccessor<MediaStream | undefined>
+): [amplitude: Accessor<number>, stop: () => void] => {
+  const [amplitude, setAmplitude] = createSignal(0);
+  const ctx = new AudioContext();
   const analyser = ctx.createAnalyser();
   Object.assign(analyser, {
     fftSize: 128,
@@ -134,7 +165,7 @@ export const createAmplitudeStream = (
 
   let source: MediaStreamAudioSourceNode;
   createEffect(() => {
-    const currentStream = stream();
+    const currentStream = typeof stream === "function" ? stream() : stream;
     if (currentStream !== undefined) {
       ctx.resume();
       source?.disconnect();
@@ -164,17 +195,10 @@ export const createAmplitudeStream = (
     if (ctx.state !== "closed") {
       ctx.close();
     }
-    stop();
   };
   onCleanup(teardown);
 
-  return [
-    Object.defineProperties(amplitude, {
-      error: { get: () => stream.error },
-      loading: { get: () => stream.loading }
-    }) as Resource<number>,
-    { stream, mutate, refetch, stop: teardown }
-  ];
+  return [amplitude, teardown];
 };
 
 /**

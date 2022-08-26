@@ -1,5 +1,11 @@
 # @solid-primitives/raf
 
+## 2.1.1
+
+### Patch Changes
+
+- e7870cb: Update deps.
+
 ## Changelog up to version 2.1.0
 
 0.0.100

@@ -19,6 +19,8 @@ A sample primitive that is made up for templating with the following options:
 npm install @solid-primitives/template-primitive
 # or
 yarn add @solid-primitives/template-primitive
+# or
+pnpm add @solid-primitives/template-primitive
 ```
 
 ## How to use it
