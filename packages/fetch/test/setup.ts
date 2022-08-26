@@ -60,7 +60,7 @@ if (!globalThis.Response) {
       return () => Promise.resolve(JSON.parse((this.body ?? "").toString()));
     }
   }
-  (globalThis.window as any || {}).Response = ResponseMock;
+  ((globalThis.window as any) || {}).Response = ResponseMock;
   (globalThis as any).Response = ResponseMock;
 }
 
@@ -68,8 +68,8 @@ if (!globalThis.Headers) {
   class HeadersMock {
     private headers: Record<string, string> = {};
     append(key: string, value: string) {
-      this.headers[key] = `${this.headers[key]}${this.headers.key ? ' ' : ''}${value}`;
-      return this.headers[key]
+      this.headers[key] = `${this.headers[key]}${this.headers.key ? " " : ""}${value}`;
+      return this.headers[key];
     }
     delete(key: string) {
       delete this.headers[key];
@@ -98,9 +98,13 @@ if (!globalThis.Headers) {
       return Object.values(this.headers);
     }
   }
-  (globalThis.window as any || {}).Headers = HeadersMock;
+  ((globalThis.window as any) || {}).Headers = HeadersMock;
   (globalThis as any).Headers = HeadersMock;
 }
 
 // we need to remove this in order to test the server mock
-Object.defineProperty(globalThis, 'fetch', { configurable: true, enumerable: true, value: undefined });
+Object.defineProperty(globalThis, "fetch", {
+  configurable: true,
+  enumerable: true,
+  value: undefined
+});
