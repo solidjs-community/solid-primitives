@@ -30,9 +30,13 @@ export const createGeolocation = (
     options =>
       new Promise<GeolocationCoordinates>((resolve, reject) => {
         if (!("geolocation" in navigator)) {
-          return reject({ code: null, message: "Geolocation is not defined." });
+          return reject("Geolocation is not supported.");
         }
-        navigator.geolocation.getCurrentPosition(res => resolve(res.coords), reject, options);
+        navigator.geolocation.getCurrentPosition(
+          res => resolve(res.coords),
+          error => reject(Object.assign(new Error(error.message), error)),
+          options
+        );
       })
   );
   return [location, refetch];

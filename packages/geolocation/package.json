@@ -69,7 +69,7 @@
     "vitest": "^0.20.3"
   },
   "peerDependencies": {
-    "solid-js": "^1.4.4"
+    "solid-js": "^1.5.0"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^3.0.1"
