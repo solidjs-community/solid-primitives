@@ -206,6 +206,10 @@ import { createDebouncedMemoOn } from "@solid-primitives/memo";
 const double = createDebouncedMemoOn(count, v => v * 2, 200);
 ```
 
+### Demo
+
+A stackblitz demo of the primitive: https://stackblitz.com/edit/solid-vite-unocss-xmnubd?file=index.tsx
+
 ## `createThrottledMemo`
 
 Solid's `createMemo` which callback execution is throttled.
@@ -221,6 +225,10 @@ const double = createThrottledMemo(prev => count() * 2, 200);
 // with initial value:
 const double = createThrottledMemo(prev => count() * 2, 200, 0);
 ```
+
+### Demo
+
+A stackblitz demo of the primitive: https://stackblitz.com/edit/solid-vite-unocss-xmnubd?file=index.tsx
 
 ## `createPureReaction`
 
