@@ -82,7 +82,7 @@ export const createCameras = () => {
  * @returnValue Acceleration: Accessor<DeviceMotionEventAcceleration | undefined>
  */
 export const createAccelerometer = (includeGravity: boolean = false, interval: number = 100) => {
-  const [Acceleration, setAcceleration] = createSignal<DeviceMotionEventAcceleration>();
+  const [acceleration, setAcceleration] = createSignal<DeviceMotionEventAcceleration>();
   let throttled = false;
 
   const accelerationEvent = (e: DeviceMotionEvent) => {
@@ -96,7 +96,7 @@ export const createAccelerometer = (includeGravity: boolean = false, interval: n
 
   window.addEventListener("devicemotion", accelerationEvent);
   getOwner() && onCleanup(() => { window.removeEventListener("devicemotion", accelerationEvent) });
-  return Acceleration;
+  return acceleration;
 };
 
 /**
@@ -105,7 +105,7 @@ export const createAccelerometer = (includeGravity: boolean = false, interval: n
  * @returnValue { alpha: 0, beta: 0, gamma: 0 }
  */
 export const createGyroscope = (interval: number = 100) => {
-  const [Orientation, setOrientation] = createStore({ alpha: 0, beta: 0, gamma: 0 });
+  const [orientation, setOrientation] = createStore({ alpha: 0, beta: 0, gamma: 0 });
   let throttled = false;
 
   const orientationEvent = (e: DeviceOrientationEvent) => {
@@ -122,5 +122,5 @@ export const createGyroscope = (interval: number = 100) => {
 
   window.addEventListener("deviceorientation", orientationEvent);
   getOwner() && onCleanup(() => { window.removeEventListener("deviceorientation", orientationEvent) });
-  return Orientation;
+  return orientation;
 };
