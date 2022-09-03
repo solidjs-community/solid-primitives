@@ -1,4 +1,4 @@
-import { createMemo, createSignal, onCleanup } from "solid-js";
+import { createMemo, createSignal, getOwner, onCleanup } from "solid-js";
 import { createStore } from "solid-js/store";
 
 /**
@@ -95,7 +95,7 @@ export const createAccelerometer = (includeGravity: boolean = false, interval: n
   }
 
   window.addEventListener("devicemotion", accelerationEvent);
-  onCleanup(() => { window.removeEventListener("devicemotion", accelerationEvent) });
+  getOwner() && onCleanup(() => { window.removeEventListener("devicemotion", accelerationEvent) });
   return Acceleration;
 };
 
@@ -121,6 +121,6 @@ export const createGyroscope = (interval: number = 100) => {
   }
 
   window.addEventListener("deviceorientation", orientationEvent);
-  onCleanup(() => { window.removeEventListener("deviceorientation", orientationEvent) });
+  getOwner() && onCleanup(() => { window.removeEventListener("deviceorientation", orientationEvent) });
   return Orientation;
 };
