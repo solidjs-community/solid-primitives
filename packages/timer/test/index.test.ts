@@ -69,7 +69,7 @@ describe("createTimes", () => {
       await sleep(10);
       expect(timeoutCount).toBe(0);
       expect(intervalCount).toBe(0);
-      await sleep(140);
+      await sleep(160);
       expect(timeoutCount).toBe(1);
       expect(intervalCount).toBe(1);
       dispose();
@@ -88,11 +88,11 @@ describe("createTimes", () => {
       await sleep(100); // 1.5
       expect(timeoutCount).toBe(1);
       expect(intervalCount).toBe(1);
-      await sleep(100); // 2.5
+      await sleep(70); // 2.2
       expect(timeoutCount).toBe(1);
       expect(intervalCount).toBe(2);
       setDelay(200);
-      await sleep(60); // 2.8
+      await sleep(90); // 3
       expect(timeoutCount).toBe(1);
       expect(intervalCount).toBe(2);
       await sleep(80); // 3.2
