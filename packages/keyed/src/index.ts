@@ -138,8 +138,7 @@ export function Key<T, U extends JSX.Element>(props: {
 export type RerunChildren<T> = ((input: T, prevInput: T | undefined) => JSX.Element) | JSX.Element;
 
 /**
- * Causes the children to rerender when the `on` changes.
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Rerun
+ * @deprecated use `<Show keyed>` instead
  */
 export function Rerun<S>(props: {
   on: AccessorArray<S> | Accessor<S>;
@@ -149,6 +148,7 @@ export function Rerun<
   S extends (object | string | bigint | number | boolean) & { length?: never }
 >(props: { on: S; children: RerunChildren<S> }): Accessor<JSX.Element>;
 export function Rerun(props: { on: any; children: RerunChildren<any> }): Accessor<JSX.Element> {
+  console.warn("<Rerun> is deprecated, please use <Show keyed> instead");
   const key = typeof props.on === "function" || Array.isArray(props.on) ? props.on : () => props.on;
   return createMemo(
     on(key, (a, b) => {
