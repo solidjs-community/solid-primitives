@@ -1,5 +1,12 @@
 # @solid-primitives/keyed
 
+## 1.1.0
+
+### Minor Changes
+
+- 2a042aa: Add `Entries` control flow component.
+- c4db05a: Deprecate `<Rerun>` (use `<Show keyed>` instead)
+
 ## 1.0.2
 
 ### Patch Changes
