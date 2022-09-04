@@ -14,7 +14,8 @@
     "stage": 3,
     "list": [
       "keyArray",
-      "Key"
+      "Key",
+      "Entries"
     ],
     "category": "Control Flow"
   },
