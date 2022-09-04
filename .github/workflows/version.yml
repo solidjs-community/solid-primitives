@@ -2,8 +2,7 @@ name: Version
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 

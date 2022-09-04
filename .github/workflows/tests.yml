@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 17.x]
+        node-version: [16.x, 18.x]
         operating-system: [ubuntu-latest]
 
     steps:
@@ -28,6 +28,4 @@ jobs:
       - name: pnpm install, build, and test
         run: |
           pnpm install
-          pnpm ci:build-test
-        env:
-          CI: true
+          pnpm build-test

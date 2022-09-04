@@ -35,10 +35,10 @@
   "devDependencies": {
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
-    "solid-js": "^1.5.1",
+    "solid-js": "^1.5.4",
     "solid-register": "^0.2.5",
     "tslib": "^2.4.0",
-    "tsup": "^6.2.2",
+    "tsup": "^6.2.3",
     "uvu": "^0.5.6",
     "watchlist": "^0.3.1"
   },

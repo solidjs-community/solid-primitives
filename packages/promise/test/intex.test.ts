@@ -42,7 +42,7 @@ describe("raceTimeout", () => {
     );
     expect(res).toBe("result");
     expect(Date.now() - time).toBeGreaterThan(50);
-    expect(Date.now() - time).toBeLessThan(150);
+    expect(Date.now() - time).toBeLessThan(170);
   }, 100);
 
   test("rejects after timeout", async () => {

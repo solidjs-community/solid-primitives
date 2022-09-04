@@ -50,17 +50,17 @@
     "primitives"
   ],
   "devDependencies": {
-    "@types/node": "^18.7.3",
+    "@types/node": "^18.7.14",
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
-    "solid-js": "^1.5.1",
+    "solid-js": "^1.5.4",
     "tslib": "^2.4.0",
-    "tsup": "^6.2.2",
-    "typescript": "^4.7.4",
+    "tsup": "^6.2.3",
+    "typescript": "^4.8.2",
     "vite": "^2.9.15",
     "vite-plugin-solid": "2.2.6",
-    "vitest": "^0.22.0"
+    "vitest": "^0.22.1"
   },
   "peerDependencies": {
     "node-fetch": ">=3.2.10",
