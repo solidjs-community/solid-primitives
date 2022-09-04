@@ -13,6 +13,7 @@ Control Flow primitives and components that require specifying explicit keys to 
 
 - [`keyArray`](#keyArray) - Reactively maps an array by specified key with a callback function - underlying helper for the `<Key>` control flow.
 - [`Key`](#Key) - Creates a list of elements by mapping items by provided key.
+- [`Entries`](#Entries) - Creates a list of elements by mapping object entries.
 
 ## Installation
 
@@ -117,6 +118,38 @@ Second argument of the map function is an index signal.
 ### Demo
 
 https://codesandbox.io/s/solid-primitives-keyed-key-demo-gh7gd?file=/index.tsx
+
+## `<Entries>`
+
+Creates a list of elements by mapping object entries. Similar to Solid's `<For>` and `<Index>`, but here, render function takes three arguments, and both value and index arguments are signals.
+
+### How to use it
+
+```tsx
+import { Entries } from "@solid-primitives/keyed";
+
+<Entries of={object()} fallback={<div>No items</div>}>
+  {(key, value) => (
+    <div>
+      {key}: {value()}
+    </div>
+  )}
+</Entries>;
+```
+
+### Index argument
+
+Third argument of the map function is an index signal.
+
+```tsx
+<Entries of={object()} fallback={<div>No items</div>}>
+  {(key, value, index) => (
+    <div data-index={index()}>
+      {key}: {value()}
+    </div>
+  )}
+</Entries>
+```
 
 ## Changelog
 
