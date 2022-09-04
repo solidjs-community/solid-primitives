@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.1.1
+
+### Patch Changes
+
+- Correct `<Entries>` types
+
 ## 1.1.0
 
 ### Minor Changes

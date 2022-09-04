@@ -153,18 +153,18 @@ export function Key<T>(props: {
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#Entries
  */
-export function Entries<T extends object>(props: {
-  of: T | undefined | null | false;
+export function Entries<V>(props: {
+  of: Record<string, V> | ArrayLike<V> | undefined | null | false;
   fallback?: JSX.Element;
-  children: <K extends keyof T>(key: K, v: Accessor<T[K]>, i: Accessor<number>) => JSX.Element;
+  children: (key: string, v: Accessor<V>, i: Accessor<number>) => JSX.Element;
 }): Accessor<JSX.Element[]> {
   const mapFn = props.children;
   const mapped = keyArray(
-    () => props.of && (Object.entries(props.of) as [keyof T, T[keyof T]][]),
+    () => props.of && Object.entries(props.of),
     () => 0,
     mapFn.length < 3
       ? keyvalue =>
-          (mapFn as (key: keyof T, v: Accessor<T[keyof T]>) => JSX.Element)(
+          (mapFn as (key: string, v: Accessor<V>) => JSX.Element)(
             keyvalue()[0],
             () => keyvalue()[1]
           )
