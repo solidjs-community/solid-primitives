@@ -96,11 +96,8 @@ export const createAccelerometer = (includeGravity: boolean = false, interval: n
     setAcceleration(acceleration ? acceleration : undefined);
   };
 
-  window.addEventListener("devicemotion", accelerationEvent);
-  getOwner() &&
-    onCleanup(() => {
-      window.removeEventListener("devicemotion", accelerationEvent);
-    });
+  addEventListener("devicemotion", accelerationEvent);
+  getOwner() && onCleanup(() => removeEventListener("devicemotion", accelerationEvent));
   return acceleration;
 };
 
@@ -127,10 +124,7 @@ export const createGyroscope = (interval: number = 100) => {
     });
   };
 
-  window.addEventListener("deviceorientation", orientationEvent);
-  getOwner() &&
-    onCleanup(() => {
-      window.removeEventListener("deviceorientation", orientationEvent);
-    });
+  addEventListener("deviceorientation", orientationEvent);
+  getOwner() && onCleanup(() => removeEventListener("deviceorientation", orientationEvent));
   return orientation;
 };
