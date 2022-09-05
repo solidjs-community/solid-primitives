@@ -160,8 +160,6 @@ Available node scripts for managing packages and creating new ones:
 ### Device
 
 - createBattery
-- createAccelerometer
-- createGyroscope
 
 ### Browser
 
