@@ -87,15 +87,20 @@ export const createAccelerometer = (includeGravity: boolean = false, interval: n
 
   const accelerationEvent = (e: DeviceMotionEvent) => {
     if (throttled) return;
-    throttled = true
-    setTimeout(() => { throttled = false }, interval)
+    throttled = true;
+    setTimeout(() => {
+      throttled = false;
+    }, interval);
 
     const acceleration = includeGravity ? e.accelerationIncludingGravity : e.acceleration;
     setAcceleration(acceleration ? acceleration : undefined);
-  }
+  };
 
   window.addEventListener("devicemotion", accelerationEvent);
-  getOwner() && onCleanup(() => { window.removeEventListener("devicemotion", accelerationEvent) });
+  getOwner() &&
+    onCleanup(() => {
+      window.removeEventListener("devicemotion", accelerationEvent);
+    });
   return acceleration;
 };
 
@@ -110,17 +115,22 @@ export const createGyroscope = (interval: number = 100) => {
 
   const orientationEvent = (e: DeviceOrientationEvent) => {
     if (throttled) return;
-    throttled = true
-    setTimeout(() => { throttled = false }, interval)
+    throttled = true;
+    setTimeout(() => {
+      throttled = false;
+    }, interval);
 
     setOrientation({
       alpha: e.alpha ? e.alpha : 0,
       beta: e.beta ? e.beta : 0,
-      gamma: e.gamma ? e.gamma : 0,
+      gamma: e.gamma ? e.gamma : 0
     });
-  }
+  };
 
   window.addEventListener("deviceorientation", orientationEvent);
-  getOwner() && onCleanup(() => { window.removeEventListener("deviceorientation", orientationEvent) });
+  getOwner() &&
+    onCleanup(() => {
+      window.removeEventListener("deviceorientation", orientationEvent);
+    });
   return orientation;
 };

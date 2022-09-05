@@ -48,6 +48,7 @@ TODO
 
 `createAccelerometer` : [devicemotion event](https://developer.mozilla.org/en-US/docs/Web/API/Window/devicemotion_event)
 `createGyroscope` : [deviceorientation event](https://developer.mozilla.org/en-US/docs/Web/API/Window/deviceorientation_event)
+
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
