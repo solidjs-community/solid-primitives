@@ -1,5 +1,11 @@
 # @solid-primitives/devices
 
+## 1.2.0
+
+### Minor Changes
+
+- fe034aaa: Implemented createAccelerometer and createGyroscope
+
 ## 1.1.1
 
 ### Patch Changes
