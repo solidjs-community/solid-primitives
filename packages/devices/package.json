@@ -16,7 +16,9 @@
       "createDevices",
       "createMicrophones",
       "createSpeakers",
-      "createCameras"
+      "createCameras",
+      "createAccelerometer",
+      "createGyroscope"
     ],
     "category": "Display & Media"
   },

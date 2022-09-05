@@ -1,4 +1,5 @@
-import { createMemo, createSignal, onCleanup } from "solid-js";
+import { createMemo, createSignal, getOwner, onCleanup } from "solid-js";
+import { createStore } from "solid-js/store";
 
 /**
  * Creates a list of all media devices
@@ -72,4 +73,54 @@ export const createCameras = () => {
     name: "cameras",
     equals: equalDeviceLists
   });
+};
+
+/**
+ * Creates a reactive wrapper to get device acceleration
+ * @param includeGravity boolean. default value false
+ * @param interval number as ms. default value 100
+ * @returnValue Acceleration: Accessor<DeviceMotionEventAcceleration | undefined>
+ */
+export const createAccelerometer = (includeGravity: boolean = false, interval: number = 100) => {
+  const [acceleration, setAcceleration] = createSignal<DeviceMotionEventAcceleration>();
+  let throttled = false;
+
+  const accelerationEvent = (e: DeviceMotionEvent) => {
+    if (throttled) return;
+    throttled = true
+    setTimeout(() => { throttled = false }, interval)
+
+    const acceleration = includeGravity ? e.accelerationIncludingGravity : e.acceleration;
+    setAcceleration(acceleration ? acceleration : undefined);
+  }
+
+  window.addEventListener("devicemotion", accelerationEvent);
+  getOwner() && onCleanup(() => { window.removeEventListener("devicemotion", accelerationEvent) });
+  return acceleration;
+};
+
+/**
+ * Creates a reactive wrapper to get device orientation
+ * @param interval number as ms. default value 100
+ * @returnValue { alpha: 0, beta: 0, gamma: 0 }
+ */
+export const createGyroscope = (interval: number = 100) => {
+  const [orientation, setOrientation] = createStore({ alpha: 0, beta: 0, gamma: 0 });
+  let throttled = false;
+
+  const orientationEvent = (e: DeviceOrientationEvent) => {
+    if (throttled) return;
+    throttled = true
+    setTimeout(() => { throttled = false }, interval)
+
+    setOrientation({
+      alpha: e.alpha ? e.alpha : 0,
+      beta: e.beta ? e.beta : 0,
+      gamma: e.gamma ? e.gamma : 0,
+    });
+  }
+
+  window.addEventListener("deviceorientation", orientationEvent);
+  getOwner() && onCleanup(() => { window.removeEventListener("deviceorientation", orientationEvent) });
+  return orientation;
 };
