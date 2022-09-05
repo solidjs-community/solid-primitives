@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/keyed",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Control Flow primitives and components that require specifying explicit keys to identify or rerender elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -32,7 +32,7 @@
     "start": "vite serve dev",
     "dev": "vite serve dev",
     "build": "tsup",
-    "test": "uvu -r solid-register"
+    "test": "vitest"
   },
   "keywords": [
     "key",
@@ -47,15 +47,14 @@
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-js": "^1.5.4",
-    "solid-register": "^0.2.5",
     "solid-transition-group": "^0.0.8",
     "tslib": "^2.4.0",
     "tsup": "^6.2.3",
     "typescript": "^4.8.2",
     "unocss": "^0.45.15",
-    "uvu": "^0.5.6",
     "vite": "^3.0.9",
-    "vite-plugin-solid": "^2.3.0"
+    "vite-plugin-solid": "^2.3.0",
+    "vitest": "^0.23.0"
   },
   "peerDependencies": {
     "solid-js": "^1.4.0"

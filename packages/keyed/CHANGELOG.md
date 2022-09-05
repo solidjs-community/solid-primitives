@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.1.2
+
+### Patch Changes
+
+- fix key function of Entries component.
+
 ## 1.1.1
 
 ### Patch Changes

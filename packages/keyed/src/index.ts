@@ -161,7 +161,7 @@ export function Entries<V>(props: {
   const mapFn = props.children;
   const mapped = keyArray(
     () => props.of && Object.entries(props.of),
-    () => 0,
+    v => v[0],
     mapFn.length < 3
       ? keyvalue =>
           (mapFn as (key: string, v: Accessor<V>) => JSX.Element)(
