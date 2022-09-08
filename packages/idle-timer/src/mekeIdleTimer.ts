@@ -70,7 +70,7 @@ export const makeUserIdleTimer = ({
   function handleEvent(evt: Event) {
     if (shouldPreventRunning()) return;
     if (isIdle()) onActive?.(evt);
-    timerReset(evt);
+    if (!isPrompted()) timerReset(evt);
   }
 
   function addListeners() {
