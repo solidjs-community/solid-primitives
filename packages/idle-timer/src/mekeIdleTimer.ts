@@ -2,11 +2,12 @@ import { EventTypeName, IdleTimerOptions, IdleTimerReturn } from './types';
 import { createSignal, onMount, onCleanup } from 'solid-js';
 
 const THROTTLE_DELAY: number = 250;
-const TEN_MINUTES: number = 600_000; // 10 minutes
+const FIFTEEN_MINUTES: number = 900_000; // 10 minutes
 const EVENTS: EventTypeName[] = [
   'mousemove',
   'keydown',
   'wheel',
+  'resize',
   'mousewheel',
   'mousedown',
   'pointerdown',
@@ -25,7 +26,7 @@ const EVENTS: EventTypeName[] = [
  *    @param params.onIdle: Function, callback fired when the user entetrs the idle phase. Takes the last activity event as argument.
  *    @param params.onPrompt: Function, callback fired when the idle timer expires. Takes the last activity event as argument.
  *    @param params.element: HTMLElement, DOM element to which the event listeners will be attached; it defaults to document.
- *    @param params.startsManually: boolean, reaquires the events listeners to be attached omanually, by calling the start method (see @returns); defaults to false.
+ *    @param params.startsManually: boolean, requires the event-listeners to be attached manually, by calling the start method (see @returns); defaults to false.
  * }
  * @returns - returns an object with several methods and accessors
  * {
@@ -39,7 +40,7 @@ const EVENTS: EventTypeName[] = [
 export const makeIdleTimer = ({
   element,
   events = EVENTS,
-  idleTimeout = TEN_MINUTES,
+  idleTimeout = FIFTEEN_MINUTES,
   promptTimeout = 0,
   onActive,
   onIdle,
