@@ -76,6 +76,10 @@ withRefetchEvent({ on: keyof HTMLWindowEventMap[], filter: (...args, data, event
 // caches requests
 withCache({ cache?: Record<string, CacheEntry>, expires?: number | ((entry: CacheEntry) => boolean); })
 
+// refetch on cache expiry
+// (expiry control function requires polling; you can set the delay; 0 = raf; default is 100ms)
+withRefetchOnExpiry(pollDelayMs: number)
+
 // makes cache persistent in storage, defaults = [localStorage, 'fetch-cache']
 withCacheStorage(storage?: Storage, key?: string)
 ```
