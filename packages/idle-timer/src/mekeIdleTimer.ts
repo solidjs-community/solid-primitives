@@ -25,7 +25,7 @@ const EVENTS: EventTypeName[] = [
  *    @param params.onIdle: Function, callback fired when the user entetrs the idle phase. Takes the last activity event as argument.
  *    @param params.onPrompt: Function, callback fired when the idle timer expires. Takes the last activity event as argument.
  *    @param params.element: HTMLElement, DOM element to which the event listeners will be attached; it defaults to document.
- *    @param params.startsOnMount: boolean, reaquires the events listeners to be attached onMount (as opposed to manually, with the start method, see @returns); defaults to true.
+ *    @param params.startsManually: boolean, reaquires the events listeners to be attached omanually, by calling the start method (see @returns); defaults to false.
  * }
  * @returns - returns an object with several methods and accessors
  * {
@@ -44,20 +44,15 @@ export const makeIdleTimer = ({
   onActive,
   onIdle,
   onPrompt,
-  startOnMount = true,
+  startManually = false,
 }: IdleTimerOptions): IdleTimerReturn => {
   const [listenersAreOn, setListenersAreOn] = createSignal(false);
   const [isPrompted, setIsPrompted] = createSignal(false);
   const [isIdle, setIsIdle] = createSignal(false);
 
-  let sessionTimestamp = new Date().getTime()
   let idle: ReturnType<typeof setTimeout>;
   let prompt: ReturnType<typeof setTimeout>;
   let lastThrottle: number = 0;
-
-  function getSessionTime() {
-    return new Date().getTime() - sessionTimestamp
-  }
 
   function shouldPreventRunning() {
     const now = new Date().getTime();
@@ -144,7 +139,8 @@ export const makeIdleTimer = ({
   }
 
   onMount(() => {
-    if (startOnMount) startListening(new CustomEvent('mount'))
+    if (startManually) return
+    startListening(new CustomEvent('mount'))
   });
 
   onCleanup(stopListening);
@@ -152,7 +148,6 @@ export const makeIdleTimer = ({
   return {
     isIdle,
     isPrompted,
-    getSessionTime,
     start: () => startListening(),
     reset: () => timerReset(new CustomEvent('manualreset')),
     stop: stopListening,

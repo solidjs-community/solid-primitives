@@ -106,7 +106,7 @@ export interface IdleTimerOptions {
   element?: HTMLElement,
   idleTimeout?: number,
   promptTimeout?: number,
-  startOnMount?: boolean,
+  startManually?: boolean,
   onIdle?: (lastEvt: Event) => void,
   onActive?: (activyEvt: Event) => void,
   onPrompt?: (promptEvt: Event) => void,
@@ -115,7 +115,6 @@ export interface IdleTimerOptions {
 export interface IdleTimerReturn {
   isIdle: Accessor<boolean>,
   isPrompted: Accessor<boolean>,
-  getSessionTime: () => number,
   reset: () => void,
   start: () => void,
   stop: () => void,
