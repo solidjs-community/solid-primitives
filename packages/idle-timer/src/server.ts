@@ -1,6 +1,6 @@
 import * as API from ".";
 
-export const makeUserIdleTimer: typeof API.makeUserIdleTimer = v => ({
+export const makeIdleTimer: typeof API.makeIdleTimer = v => ({
     isIdle: () => false,
     isPrompted: () => false,
     getSessionTime: () => 0,
