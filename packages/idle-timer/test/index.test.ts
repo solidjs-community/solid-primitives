@@ -14,16 +14,16 @@ describe('makeIdleTimer', () => {
             })
 
             await sleep(2)
-            expect(isPrompted()).toBe(false)
-            expect(isIdle()).toBe(false)
+            expect(isPrompted(), 'user is not prompted yet').toBe(false)
+            expect(isIdle(), 'user is not idle yet').toBe(false)
 
             await sleep(5)
-            expect(isPrompted()).toBe(true)
-            expect(isIdle()).toBe(false)
+            expect(isPrompted(), 'user has been prompted').toBe(true)
+            expect(isIdle(), 'user is not idle yet').toBe(false)
 
             await sleep(5)
-            expect(isPrompted()).toBe(false)
-            expect(isIdle()).toBe(true)
+            expect(isPrompted(), 'user is not in the prompted phase anymore').toBe(false)
+            expect(isIdle(), 'user is idle').toBe(true)
 
             stop()
             dispose()
