@@ -1,5 +1,5 @@
 import { makeIdleTimer } from "../src";
-import { createRoot } from "solid-js";
+import { createRoot, onMount } from "solid-js";
 import { describe, test, expect } from "vitest";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -27,6 +27,42 @@ describe('makeIdleTimer', () => {
 
             stop()
             dispose()
+        })
+    )
+
+    test(
+        'start and stop should successfully bind, unbind the event listeners, reset should clean and restart the timers',
+        async () => await createRoot(async dispose => {
+            const { isIdle, reset,start, stop } = makeIdleTimer({
+                idleTimeout: 5,
+                startManually: true,
+            })
+
+            await sleep(0)
+            expect(isIdle(), 'user is not idle yet, events are not bound yet').toBe(false)
+
+            start()
+
+            await sleep(10)
+            expect(isIdle(), 'user is idle').toBe(true)
+
+            reset()
+
+            await sleep(4)
+            expect(isIdle(), 'user is not idle yet, timers have restarted').toBe(false)
+            await sleep(10)
+            expect(isIdle(), 'user is idle').toBe(true)
+
+
+            stop()
+            await sleep(1)
+            expect(isIdle(), 'user is not idle anymore, timers have been cleaned up').toBe(false)
+            await sleep(10)
+            expect(isIdle(), 'user is idle, event listeners are unbound, timers have not restarted').toBe(false)
+
+            dispose()
+
+
         })
     )
 })
