@@ -1,5 +1,11 @@
 # @solid-primitives/fetch
 
+## 2.3.0
+
+### Minor Changes
+
+- 66d5eb39: refetch on expiry modifier added
+
 ## 2.2.0
 
 ### Minor Changes
