@@ -6,7 +6,7 @@ import {
   ResourceOptions,
   ResourceReturn
 } from "solid-js";
-import { Fetcher, RequestModifier } from "./modifiers";
+import { RequestModifier } from "./modifiers";
 import { fetchRequest, Request } from "./request";
 
 export type FetchArgs = [info: RequestInfo] | [info: RequestInfo, init?: RequestInit];
