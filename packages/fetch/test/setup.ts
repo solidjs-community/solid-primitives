@@ -10,7 +10,9 @@ class ResponseMock {
     return this.init.statusText || "";
   }
   get headers() {
-    return this.init.headers instanceof Headers ? this.init.headers : new Headers(this.init.headers) || new Headers();
+    return this.init.headers instanceof Headers
+      ? this.init.headers
+      : new Headers(this.init.headers) || new Headers();
   }
   get ok() {
     return this.status >= 200 && this.status < 300;
@@ -67,10 +69,12 @@ class HeadersMock {
   constructor(headers: Record<string, string>) {
     Object.entries(headers || {}).forEach(([key, value]) => {
       this.headers[key.toLowerCase()] = value;
-    })
-  };
+    });
+  }
   append(key: string, value: string) {
-    this.headers[key.toLowerCase()] = `${this.headers[key.toLowerCase()]}${this.headers.key.toLowerCase() ? " " : ""}${value}`;
+    this.headers[key.toLowerCase()] = `${this.headers[key.toLowerCase()]}${
+      this.headers.key.toLowerCase() ? " " : ""
+    }${value}`;
     return this.headers[key.toLowerCase()];
   }
   delete(key: string) {

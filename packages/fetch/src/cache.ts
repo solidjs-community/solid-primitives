@@ -90,7 +90,7 @@ export const withCache: RequestModifier =
     });
   };
 
-export const withRefetchOnExpiry: RequestModifier = 
+export const withRefetchOnExpiry: RequestModifier =
   <Result extends unknown, FetcherArgs extends any[]>(pollDelayMs = 100) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
     wrapFetcher<Result, FetcherArgs>(
@@ -100,19 +100,20 @@ export const withRefetchOnExpiry: RequestModifier =
           const serializedRequest = serializeRequest(requestData);
           const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
           if (!cached) {
-            if (typeof requestContext.expires === 'number') {
+            if (typeof requestContext.expires === "number") {
               setTimeout(() => requestContext.resource?.[1].refetch(), requestContext.expires + 10);
-            } else if (typeof requestContext.expires === 'function') {
-              const delay = pollDelayMs === 0
-                ? (fn: FrameRequestCallback, _ms: number) => requestAnimationFrame(fn)
-                : setTimeout;
+            } else if (typeof requestContext.expires === "function") {
+              const delay =
+                pollDelayMs === 0
+                  ? (fn: FrameRequestCallback, _ms: number) => requestAnimationFrame(fn)
+                  : setTimeout;
               const poll = () => {
                 if (requestContext.expires(cached)) {
                   requestContext.resource?.[1].refetch();
                 } else {
                   delay(poll, pollDelayMs);
                 }
-              }
+              };
               poll();
             }
           }
@@ -120,7 +121,7 @@ export const withRefetchOnExpiry: RequestModifier =
         }
     );
     requestContext.wrapResource();
-  }
+  };
 
 export const withCacheStorage: RequestModifier =
   (storage: Storage = localStorage, key = "fetch-cache") =>

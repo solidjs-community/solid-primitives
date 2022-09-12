@@ -22,7 +22,7 @@ describe("fetch primitive", () => {
   test("will fetch json data", () =>
     new Promise<void>(resolve => {
       createRoot(dispose => {
-        const fetchMock = () => Promise.resolve(mockResponse)
+        const fetchMock = () => Promise.resolve(mockResponse);
         const [ready] = createFetch(mockUrl, { fetch: fetchMock });
         createEffect(() => {
           const isReady = (ready() as any)?.ready;
@@ -41,9 +41,10 @@ describe("fetch primitive", () => {
   test("will fetch text data", () =>
     new Promise<void>(resolve => {
       createRoot(dispose => {
-        const fetchMock = () => Promise.resolve(
-          new Response('it works', { headers: new Headers({ 'Content-Type': 'text/plain' }) })
-        );
+        const fetchMock = () =>
+          Promise.resolve(
+            new Response("it works", { headers: new Headers({ "Content-Type": "text/plain" }) })
+          );
         const [ready] = createFetch<string>(mockUrl, { fetch: fetchMock });
         createEffect(() => {
           const answer = ready();
@@ -51,7 +52,7 @@ describe("fetch primitive", () => {
             throw ready.error;
           }
           if (typeof answer !== "undefined") {
-            expect(answer).toBe('it works');
+            expect(answer).toBe("it works");
             dispose();
             resolve();
           }
@@ -65,11 +66,11 @@ describe("fetch primitive", () => {
         new Promise<typeof mockResponse>((resolve, reject) => {
           const signal: AbortSignal | undefined = (info as any).signal;
           const timer = setTimeout(() => resolve(mockResponse), 100);
-          signal?.addEventListener('aborted', () => {
+          signal?.addEventListener("aborted", () => {
             clearTimeout(timer);
-            reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+            reject(Object.assign(new Error("aborted"), { name: "AbortError" }));
           });
-        })
+        });
       const [ready, { abort }] = createFetch(mockUrl, { fetch: fetchMock }, [withAbort()]);
       abort!();
       expect(ready.aborted).toBe(true);
@@ -156,7 +157,9 @@ describe("fetch primitive", () => {
             ? Promise.resolve(mockResponse)
             : Promise.reject(new Error("TypeError: Failed to fetch"));
         };
-        const [ready] = createFetch<typeof mockResponseBody>(url, { fetch: fetchMock }, [withRetry(1, 0)]);
+        const [ready] = createFetch<typeof mockResponseBody>(url, { fetch: fetchMock }, [
+          withRetry(1, 0)
+        ]);
         createEffect((iteration: number = 0) => {
           const data = ready();
           if (iteration === 0) {
@@ -210,7 +213,9 @@ describe("fetch primitive", () => {
           calls++;
           return Promise.resolve(mockResponse);
         };
-        const [ready] = createFetch(url, { fetch: fetchMock }, [withCache({ cache, expires: 100000 })]);
+        const [ready] = createFetch(url, { fetch: fetchMock }, [
+          withCache({ cache, expires: 100000 })
+        ]);
         createEffect((iteration: number = 0) => {
           ready();
           if (iteration === 0) {
@@ -267,7 +272,7 @@ describe("fetch primitive", () => {
   test("re-fetches after expiry", () =>
     new Promise<void>(resolve =>
       createRoot(dispose => {
-        vitest.useFakeTimers()
+        vitest.useFakeTimers();
         let calls = 0;
         const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
         const cache = {};
@@ -294,7 +299,8 @@ describe("fetch primitive", () => {
           }
           return iteration + 1;
         });
-      })));
+      })
+    ));
 
   test("loads and saves cache to localStorage", () =>
     new Promise<void>(resolve =>

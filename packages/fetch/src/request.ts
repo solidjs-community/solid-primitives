@@ -6,8 +6,7 @@ export type Request<FetcherArgs extends any[]> = <Result>(
 ) => (requestContext: RequestContext<Result, FetcherArgs>) => void;
 
 export const fetchRequest: Request<[info: RequestInfo, init?: RequestInit]> =
-  (fetchFn) =>
-  requestContext => {
+  fetchFn => requestContext => {
     requestContext.fetcher = <Result extends unknown>(
       requestData: [info: RequestInfo, init?: RequestInit],
       _info: ResourceFetcherInfo<Result>
