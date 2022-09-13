@@ -1,22 +1,51 @@
-import { Component, createSignal } from "solid-js";
+import { Component, Switch, Match } from "solid-js";
 import { render } from "solid-js/web";
-import "uno.css";
+
+import { makeIdleTimer } from '../src';
+
+const divStyle = {
+  background: 'black',
+  color: 'white',
+  display: 'grid',
+  'place-content': 'center',
+  height: '100vh',
+  width: '100vw',
+  'max-height': '100%',
+  'max-width': '100%',
+};
 
 const App: Component = () => {
-  const [count, setCount] = createSignal(0);
-  const increment = () => setCount(count() + 1);
-
+  const { isIdle, isPrompted, start, stop, reset } = makeIdleTimer({
+    onActive: (evt) =>
+      console.log('this event re-activated me ⚡ => ', evt),
+    onIdle: (evt) =>
+      console.log('last event before I went to sleep 😴 => ', evt),
+    idleTimeout: 3_000,
+    promptTimeout: 2_000,
+  });
   return (
-    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
-      <div class="wrapper-v">
-        <h4>Counter component</h4>
-        <p class="caption">it's very important...</p>
-        <button class="btn" onClick={increment}>
-          {count()}
-        </button>
-      </div>
-    </div>
+    <Switch
+      fallback={
+        <>
+          <h1>Super sensitive data: ******</h1>
+          <button onClick={stop}>stop</button>
+          <button onClick={start}>start</button>
+          <button onClick={reset}>reset</button>
+        </>
+      }
+    >
+      <Match when={isIdle()}>
+        <div style={divStyle}>Hiding the data...</div>
+      </Match>
+      <Match when={isPrompted()}>
+        <div style={divStyle}>
+          <p>Are you still there?</p>
+          <button onClick={reset}>yup</button>
+        </div>
+      </Match>
+    </Switch>
   );
 };
+
 
 render(() => <App />, document.getElementById("root")!);
