@@ -73,6 +73,11 @@ withRetry(retries: number, wait: number | (retry: number) => number)
 // refetches the request after certain events
 withRefetchEvent({ on: keyof HTMLWindowEventMap[], filter: (...args, data, event) => boolean })
 
+// aggregates response data; depending on existing data, it will handle the response
+// you can either use initial data or an optional dataFilter to trigger certain handling
+// strings and arrays will be joined, objects merged shallowly, everything else will be put into an array
+withAggregation(dataFilter?: (responseData: Result) => Result)
+
 // caches requests
 withCache({ cache?: Record<string, CacheEntry>, expires?: number | ((entry: CacheEntry) => boolean); })
 
@@ -83,6 +88,8 @@ withRefetchOnExpiry(pollDelayMs: number)
 // makes cache persistent in storage, defaults = [localStorage, 'fetch-cache']
 withCacheStorage(storage?: Storage, key?: string)
 ```
+
+The main advantage of using modifiers like this is that you only import what you need and the rest will be eliminated in tree shaking.
 
 ## Demo
 

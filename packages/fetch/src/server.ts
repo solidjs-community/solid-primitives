@@ -5,6 +5,7 @@ export {
   withTimeout,
   withRetry,
   withRefetchEvent,
+  withAggregation,
   wrapFetcher,
   wrapResource
 } from "./modifiers";

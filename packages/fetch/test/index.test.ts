@@ -1,8 +1,9 @@
 import { test, expect, describe, vitest } from "vitest";
 import { createRoot, createEffect, createSignal } from "solid-js";
-import { createFetch, FetchArgs } from "../src/fetch";
+import { createFetch } from "../src/fetch";
 import {
   withAbort,
+  withAggregation,
   withCatchAll,
   withRefetchEvent,
   withRetry,
@@ -202,6 +203,112 @@ describe("fetch primitive", () => {
         });
       })
     ));
+
+  test('aggregates numbers', () => new Promise<void>((resolve, reject) => createRoot(dispose => {
+    let calls = 0;
+    const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
+    const fetchMock = () => Promise.resolve(new Response(
+      '' + calls++,
+      { headers: new Headers({ 'Content-type': 'application/json' }) }
+    ));
+    const [numbers] = createFetch<number | number[]>(url, { fetch: fetchMock }, [
+      withAggregation()
+    ]);
+    createEffect(() => {
+      const data = numbers.error ? undefined : numbers();
+      if (!data || typeof data === 'number') {
+        setUrl(mockUrl);
+      } else {
+        try {
+          expect(data).toEqual([0, 1]);
+        } catch(e) {
+          reject(e);
+        }
+        dispose();
+        resolve();
+      }
+    });
+  })));
+
+  test('aggregates strings', () => new Promise<void>((resolve, reject) => createRoot(dispose => {
+    let calls = 0;
+    const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
+    const fetchMock = () => Promise.resolve(new Response(
+      '"' + calls++ + '"',
+      { headers: new Headers({ 'Content-type': 'application/json' }) }
+    ));
+    const [strings] = createFetch<string>(url, { fetch: fetchMock }, [
+      withAggregation()
+    ]);
+    createEffect(() => {
+      const data = strings.error ? undefined : strings();
+      if (!data || data === '0') {
+        setUrl(mockUrl);
+      } else {
+        try {
+          expect(data).toBe("01");
+        } catch(e) {
+          reject(e);
+        }
+        dispose();
+        resolve();
+      }
+    });
+  })));
+
+  test('aggregates arrays', () => new Promise<void>((resolve, reject) => createRoot(dispose => {
+    let calls = 0;
+    const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
+    const fetchMock = () => Promise.resolve(new Response(
+      '[' + calls++ + ']',
+      { headers: new Headers({ 'Content-type': 'application/json' }) }
+    ));
+    const [array] = createFetch<number[]>(url, { fetch: fetchMock }, [
+      withAggregation()
+    ]);
+    createEffect(() => {
+      const data = array.error ? undefined : array();
+      console.log({ data })
+      if (!data || data.length === 1) {
+        setUrl(mockUrl);
+      } else {
+        try {
+          expect(data).toEqual([0, 1]);
+        } catch(e) {
+          reject(e);
+        }
+        dispose();
+        resolve();
+      }
+    });
+  })));
+
+  test('aggregates objects', () => new Promise<void>((resolve, reject) => createRoot(dispose => {
+    let calls = 0;
+    const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });
+    const fetchMock = () => Promise.resolve(new Response(
+      '{ "' + calls++ + '": true }',
+      { headers: new Headers({ 'Content-type': 'application/json' }) }
+    ));
+    const [array] = createFetch<Record<string, boolean>>(url, { fetch: fetchMock }, [
+      withAggregation()
+    ]);
+    createEffect(() => {
+      const data = array.error ? undefined : array();
+      console.log({ data })
+      if (!data || !data['1']) {
+        setUrl(mockUrl);
+      } else {
+        try {
+          expect(data).toEqual({ "0": true , "1": true });
+        } catch(e) {
+          reject(e);
+        }
+        dispose();
+        resolve();
+      }
+    });
+  })));
 
   test("caches request instead of making them twice", () =>
     new Promise<void>(resolve =>
