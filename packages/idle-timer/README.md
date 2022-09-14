@@ -66,6 +66,8 @@ The options are:
 ## Demo
 
 Here is a working example: https://stackblitz.com/edit/vitejs-vite-dwxlhp?file=src/App.tsx
+## Acknowledgments
+This primitive is inspired by [react-idle-timer](https://idletimer.dev/)
 
 ## Changelog
 
