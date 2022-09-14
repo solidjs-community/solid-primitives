@@ -50,6 +50,7 @@ export const withCache: RequestModifier =
   ) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
     requestContext.cache = options.cache || requestContext.cache;
+    requestContext.expires = options.expires;
     const isExpired = (entry: CacheEntry) =>
       typeof options.expires === "number"
         ? entry.ts + options.expires < new Date().getTime()
@@ -58,7 +59,7 @@ export const withCache: RequestModifier =
       requestContext,
       <T>(originalFetcher: any) =>
         (requestData, info) => {
-          const serializedRequest = serializeRequest(requestData);
+          const serializedRequest: string = serializeRequest(requestData);
           const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
           const shouldRead = requestContext.readCache?.(cached) !== false;
           if (cached && !isExpired(cached) && shouldRead) {
@@ -87,6 +88,39 @@ export const withCache: RequestModifier =
         }
       }
     });
+  };
+
+export const withRefetchOnExpiry: RequestModifier =
+  <Result extends unknown, FetcherArgs extends any[]>(pollDelayMs = 100) =>
+  (requestContext: RequestContext<Result, FetcherArgs>) => {
+    wrapFetcher<Result, FetcherArgs>(
+      requestContext,
+      <T>(originalFetcher: any) =>
+        (requestData, info) => {
+          const serializedRequest = serializeRequest(requestData);
+          const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
+          if (!cached) {
+            if (typeof requestContext.expires === "number") {
+              setTimeout(() => requestContext.resource?.[1].refetch(), requestContext.expires + 10);
+            } else if (typeof requestContext.expires === "function") {
+              const delay =
+                pollDelayMs === 0
+                  ? (fn: FrameRequestCallback, _ms: number) => requestAnimationFrame(fn)
+                  : setTimeout;
+              const poll = () => {
+                if (requestContext.expires(cached)) {
+                  requestContext.resource?.[1].refetch();
+                } else {
+                  delay(poll, pollDelayMs);
+                }
+              };
+              poll();
+            }
+          }
+          return originalFetcher(requestData, info);
+        }
+    );
+    requestContext.wrapResource();
   };
 
 export const withCacheStorage: RequestModifier =

@@ -6,13 +6,12 @@ export type Request<FetcherArgs extends any[]> = <Result>(
 ) => (requestContext: RequestContext<Result, FetcherArgs>) => void;
 
 export const fetchRequest: Request<[info: RequestInfo, init?: RequestInit]> =
-  (fetch = globalThis.fetch) =>
-  requestContext => {
+  fetchFn => requestContext => {
     requestContext.fetcher = <Result extends unknown>(
       requestData: [info: RequestInfo, init?: RequestInit],
       _info: ResourceFetcherInfo<Result>
     ) =>
-      fetch?.(...requestData).then((response: Response) => {
+      (fetchFn || globalThis.fetch)?.(...requestData).then((response: Response) => {
         requestContext.response = response;
         if (requestContext.responseHandler) {
           return requestContext.responseHandler(response) as any;

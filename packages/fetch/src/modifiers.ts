@@ -148,17 +148,15 @@ export const withRetry: RequestModifier =
       requestContext as unknown as RequestContext<Result, FetcherArgs>,
       originalFetcher => (requestData: FetcherArgs, info: ResourceFetcherInfo<Result>) => {
         const wrappedFetcher = (attempt: number): Promise<Result> =>
-          originalFetcher(requestData, info)
-            .then(data =>
-              !verify(requestContext.response) && attempt <= retries
-                ? waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1))
-                : data
-            )
-            .catch(err =>
-              attempt > retries
-                ? Promise.reject(err)
-                : waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1))
-            );
+          attempt <= retries
+            ? originalFetcher(requestData, info)
+                .then(data =>
+                  !verify(requestContext.response)
+                    ? waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1))
+                    : data
+                )
+                .catch(_err => waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1)))
+            : originalFetcher(requestData, info);
         return wrappedFetcher(0);
       }
     );

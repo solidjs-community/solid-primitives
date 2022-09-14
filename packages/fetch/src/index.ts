@@ -8,5 +8,5 @@ export {
   wrapFetcher,
   wrapResource
 } from "./modifiers";
-export { withCache, withCacheStorage } from "./cache";
+export { withCache, withRefetchOnExpiry, withCacheStorage } from "./cache";
 export { fetchRequest } from "./request";
