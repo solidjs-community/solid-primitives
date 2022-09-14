@@ -30,9 +30,9 @@ export type FetchOptions<Result, InitialValue, FetcherArgs> = ResourceOptions<
   disable?: boolean;
 };
 
-export type FetchReturn<T, I> = [
+export type FetchReturn<Result, Initial, FetcherArgs extends any[]> = [
   {
-    (): T | I;
+    (): Result | Initial;
     /** if you are using withAbort(), this will contain a boolean to check if the request was aborted */
     aborted?: boolean;
     error: any;
@@ -44,7 +44,8 @@ export type FetchReturn<T, I> = [
   {
     /** if you are using withAbort(), this callback will allow you to abort the request */
     abort?: () => void;
-    mutate: (v: T | I) => T | I;
+    invalidate?: (requestData?: FetcherArgs) => void
+    mutate: (v: Result | Initial) => Result | Initial;
     refetch: () => void;
   }
 ];
@@ -54,7 +55,7 @@ export type RequestContext<Result, FetcherArgs> = {
   wrapResource: () => ResourceReturn<Result, ResourceOptions<Result>>;
   fetcher?: (requestData: FetcherArgs, info: ResourceFetcherInfo<Result>) => Promise<Result>;
   response?: Response;
-  resource?: ResourceReturn<Result, ResourceOptions<Result>>;
+  resource?: ResourceReturn<Result, ResourceOptions<Result>> & FetchReturn<Result, Result, any[] & FetcherArgs>;
   abortController?: AbortController;
   responseHandler?: (response: Response) => Result;
   [key: string]: any;
@@ -130,25 +131,25 @@ const fetcherArgsFromArgs = <FetcherArgs extends any[]>(
  */
 export function createFetch<Result>(
   ...fetcherArgs: DistributeFetcherArgs<FetchArgs, []>
-): FetchReturn<Result, undefined>;
+): FetchReturn<Result, undefined, FetchArgs>;
 export function createFetch<Result>(
   ...args: DistributeFetcherArgs<FetchArgs, [modifiers: ReturnType<RequestModifier>[]]>
-): FetchReturn<Result, undefined>;
+): FetchReturn<Result, undefined, FetchArgs>;
 export function createFetch<Result>(
   ...args: DistributeFetcherArgs<FetchArgs, [options: FetchOptions<Result, undefined, FetchArgs>]>
-): FetchReturn<Result, undefined>;
+): FetchReturn<Result, undefined, FetchArgs>;
 export function createFetch<Result>(
   ...args: DistributeFetcherArgs<
     FetchArgs,
     [options: FetchOptions<Result, undefined, FetchArgs>, modifiers: ReturnType<RequestModifier>[]]
   >
-): FetchReturn<Result, undefined>;
+): FetchReturn<Result, undefined, FetchArgs>;
 export function createFetch<Result, InitialValue extends Result | undefined = undefined>(
   ...args: DistributeFetcherArgs<
     FetchArgs,
     [options: FetchOptions<Result, InitialValue, FetchArgs>]
   >
-): FetchReturn<Result, InitialValue>;
+): FetchReturn<Result, InitialValue, FetchArgs>;
 export function createFetch<Result, InitialValue extends Result | undefined = undefined>(
   ...args: DistributeFetcherArgs<
     FetchArgs,
@@ -157,7 +158,7 @@ export function createFetch<Result, InitialValue extends Result | undefined = un
       modifiers: ReturnType<RequestModifier>[]
     ]
   >
-): FetchReturn<Result, InitialValue>;
+): FetchReturn<Result, InitialValue, FetchArgs>;
 export function createFetch<
   Result,
   InitialValue extends Result | undefined = undefined,
@@ -167,7 +168,7 @@ export function createFetch<
     FetcherArgs,
     [options: FetchOptions<Result, InitialValue, FetcherArgs>]
   >
-): FetchReturn<Result, InitialValue>;
+): FetchReturn<Result, InitialValue, FetchArgs>;
 export function createFetch<
   Result,
   InitialValue extends Result | undefined = undefined,
@@ -180,7 +181,7 @@ export function createFetch<
       modifiers: ReturnType<RequestModifier>[]
     ]
   >
-): FetchReturn<Result, InitialValue>;
+): FetchReturn<Result, InitialValue, FetcherArgs>;
 export function createFetch<
   Result,
   InitialValue extends Result | undefined,
@@ -206,7 +207,7 @@ export function createFetch<
           modifiers: ReturnType<RequestModifier>[]
         ]
       >
-): FetchReturn<Result, InitialValue> {
+): FetchReturn<Result, InitialValue, FetcherArgs> {
   const options = ([args[2], args[1]].find(isOptions) || {}) as FetchOptions<
     Result,
     InitialValue,
@@ -247,5 +248,5 @@ export function createFetch<
     }
   };
   fetchContext.wrapResource();
-  return fetchContext.resource as unknown as FetchReturn<Result, InitialValue>;
+  return fetchContext.resource as unknown as FetchReturn<Result, InitialValue, FetcherArgs>;
 }

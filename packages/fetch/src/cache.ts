@@ -59,6 +59,7 @@ export const withCache: RequestModifier =
       requestContext,
       <T>(originalFetcher: any) =>
         (requestData, info) => {
+          requestContext.lastRequestData = requestData;
           const serializedRequest: string = serializeRequest(requestData);
           const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
           const shouldRead = requestContext.readCache?.(cached) !== false;
@@ -79,12 +80,12 @@ export const withCache: RequestModifier =
     );
     requestContext.wrapResource();
     Object.assign(requestContext.resource![1], {
-      invalidate: (requestData: FetcherArgs) => {
+      invalidate: (requestData?: FetcherArgs) => {
         try {
-          delete requestContext.cache[serializeRequest(requestData)];
+          delete requestContext.cache[serializeRequest(requestData || requestContext.lastRequestData)];
         } catch (e) {
           DEV &&
-            console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
+            console.warn("attempt to invalidate cache for", requestData || requestContext.lastRequestData, "failed with error", e);
         }
       }
     });
@@ -121,6 +122,11 @@ export const withRefetchOnExpiry: RequestModifier =
         }
     );
     requestContext.wrapResource();
+    const originalInvalidate = requestContext.resource![1].invalidate;
+    requestContext.resource![1].invalidate = (requestData?: FetcherArgs) => {
+      originalInvalidate?.(requestData);
+      requestContext.resource?.[1].refetch();
+    }
   };
 
 export const withCacheStorage: RequestModifier =
