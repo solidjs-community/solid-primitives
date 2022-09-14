@@ -1,7 +1,7 @@
 import { makeIdleTimer } from "../src";
-import { createRoot, createSignal, ErrorBoundary, onMount } from "solid-js";
+import { createRoot, createSignal, onMount } from "solid-js";
 import { render } from "solid-js/web";
-import { describe, test, expect, JSDOMOptions } from "vitest";
+import { describe, test, expect, beforeEach } from "vitest";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -77,6 +77,7 @@ describe('makeIdleTimer', () => {
     'configuration options shall work',
     async () => await createRoot(async dispose => {
       let currStatus =  'initial'
+      const div = document.createElement('div')
 
       const { start, stop } = makeIdleTimer({
         promptTimeout: 15,
@@ -85,6 +86,8 @@ describe('makeIdleTimer', () => {
         onActive: () => currStatus = 'active',
         onIdle: () => currStatus = 'idle',
         onPrompt: () => currStatus = 'prompted',
+        element: div,
+        events: ['click']
       })
 
       await new Promise(resolve => onMount(() => {
@@ -98,9 +101,11 @@ describe('makeIdleTimer', () => {
 
       await sleep(20)
       expect(currStatus, 'timers started, user should be in the prompt phase, onPrompt should have been called by now').toBe('prompted')
-
       await sleep(20)
       expect(currStatus, 'prompt timer has expired, onIdle should have been called by now').toBe('idle')
+
+      div.click()
+      expect(currStatus, 'prompt timer has expired, onIdle should have been called by now').toBe('active')
 
       stop()
 
