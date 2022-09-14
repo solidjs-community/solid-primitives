@@ -22,7 +22,7 @@ pnpm add @solid-primitives/idle-timer
 ```
 
 ## How to use it
-`makeIdleTimer` provides different accessors and methods to observe the user's idle status and react to its changing, allowing a high degree of personalization of the configuration.
+`makeIdleTimer` provides different accessors and methods to observe the user's idle status and react to its changing.
 
 ### Basic example
 

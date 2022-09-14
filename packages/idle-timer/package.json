@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/idle-timer",
   "version": "0.0.100",
-  "description": "A primitive to observe the user's idle state and react to its changes.",
+  "description": "A primitive to observe the user's idle status and react to its changes.",
   "author": "Aylo Srd <aylo.srd@gmail.com>",
   "contributors": [],
   "license": "MIT",
