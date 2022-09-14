@@ -61,7 +61,7 @@ The options are:
 - **onActive**: `(evt: Event) => void`; callback called when the user resumes activity after having been idle (resuming from prompt phase doesn't trigger `onActive`). The event that triggered the return to activity is passed as a parameter. It defaults to an empty function.
 - **startManually**: `boolean`; requires the event-listeners to be bound manually by using the `start` method, instead of on mount. It defaults to false.
 - **events**: `EventTypeName[]`; a list of the DOM events that will be listened to in order to monitor the user's activity. The events must be of `EventTypeName` type (it can be imported). The list defaults to `['mousemove', 'keydown', 'wheel', 'resize', 'mousewheel', 'mousedown', 'pointerdown', 'touchstart', 'touchmove', 'visibilitychange']`
-- **element**: `HTMLElement` DOM element to which the event listeners will be attached. It defaults to `document`.
+- **element**: `HTMLElement`; DOM element to which the event listeners will be attached. It defaults to `document`.
 
 ## Demo
 
