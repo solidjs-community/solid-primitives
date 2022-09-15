@@ -84,6 +84,14 @@ withRefetchOnExpiry(pollDelayMs: number)
 withCacheStorage(storage?: Storage, key?: string)
 ```
 
+There's also a helper for the cache to serialize the cache key from the request
+
+```ts
+serializeRequest([info: RequestInfo, init?: RequestInit]): string
+```
+
+in case you want to debug or manipulate the cache.
+
 ## Demo
 
 TODO
