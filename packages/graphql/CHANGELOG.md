@@ -1,5 +1,11 @@
 # @solid-primitives/graphql
 
+## 1.4.0
+
+### Minor Changes
+
+- e706297: Allow passing options to `createGraphQLClient`
+
 ## 1.3.0
 
 ### Minor Changes
