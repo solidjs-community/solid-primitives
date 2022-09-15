@@ -29,8 +29,7 @@ export type GraphQLClientQuery = {
  * Creates a reactive GraphQL query client.
  *
  * @param url URL as string or accessor
- * @param headers A list of headers to supply the client
- * @param fetchFn Fetch library to use for the request
+ * @param options Options that will be applied to all the subsequent requests
  * @returns Returns a query generator the produces Solid resources for queries
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/graphql#how-to-use-it
@@ -41,17 +40,13 @@ export type GraphQLClientQuery = {
  * ```
  */
 export const createGraphQLClient =
-  (
-    url: MaybeAccessor<string>,
-    headers?: RequestHeaders,
-    fetchFn?: typeof fetch
-  ): GraphQLClientQuery =>
+  (url: MaybeAccessor<string>, options?: Omit<RequestOptions, "variables">): GraphQLClientQuery =>
   (query, variables: any = {}, initialValue) =>
     createResource(
       () => access(variables),
       (vars: any) => {
         const variables = typeof vars === "boolean" ? {} : vars;
-        return request(access(url), query, { headers, variables, fetcher: fetchFn });
+        return request(access(url), query, { ...options, variables });
       },
       { initialValue }
     );
