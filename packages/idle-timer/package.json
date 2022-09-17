@@ -17,7 +17,7 @@
     "name": "idle-timer",
     "stage": 0,
     "list": [
-      "makeIdleTimer"
+      "createIdleTimer"
     ],
     "category": "Display & Media"
   },
@@ -46,7 +46,10 @@
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "idle",
+    "inactivity",
+    "activity"
   ],
   "devDependencies": {
     "jsdom": "^20.0.0",
