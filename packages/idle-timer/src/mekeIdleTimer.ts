@@ -8,7 +8,7 @@ const EVENTS: EventTypeName[] = [
   'keydown',
   'wheel',
   'resize',
-  'mousewheel',
+  'wheel',
   'mousedown',
   'pointerdown',
   'touchstart',
