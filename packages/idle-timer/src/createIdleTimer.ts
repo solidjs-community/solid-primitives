@@ -1,5 +1,5 @@
 import { EventTypeName, IdleTimerOptions, IdleTimerReturn } from './types';
-import { createSignal, onMount, onCleanup } from 'solid-js';
+import { batch, createSignal, onMount, onCleanup } from 'solid-js';
 
 const THROTTLE_DELAY: number = 250;
 const FIFTEEN_MINUTES: number = 900_000; // 15 minutes
@@ -103,15 +103,19 @@ export const createIdleTimer = ({
 
   function setPromptTimer(evt: Event) {
     prompt = setTimeout(() => {
-      setIsIdle(true);
-      setIsPrompted(false)
+      batch(() => {
+        setIsIdle(true);
+        setIsPrompted(false);
+      });
       onIdle?.(evt);
     }, promptTimeout)
   }
 
   function cleanState() {
-    if (isIdle()) setIsIdle(false);
-    if (isPrompted()) setIsPrompted(false);
+    batch(() => {
+      setIsIdle(false);
+      setIsPrompted(false);
+    });
   }
 
   function startListening(evt: Event = new CustomEvent('manualstart')) {
