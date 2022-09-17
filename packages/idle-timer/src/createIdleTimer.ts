@@ -47,7 +47,7 @@ export const createIdleTimer = ({
   onPrompt,
   startManually = false,
 }: IdleTimerOptions): IdleTimerReturn => {
-  const [listenersAreOn, setListenersAreOn] = createSignal(false);
+  let listenersAreOn = false;
   const [isPrompted, setIsPrompted] = createSignal(false);
   const [isIdle, setIsIdle] = createSignal(false);
 
@@ -70,18 +70,18 @@ export const createIdleTimer = ({
   }
 
   function addListeners() {
-    if (listenersAreOn()) return;
+    if (listenersAreOn) return;
     const target = element ?? document;
 
     for (const evt of events) {
       target.addEventListener(evt, handleEvent);
     }
 
-    setListenersAreOn(true);
+    listenersAreOn = true;
   }
 
   function timerReset(evt: Event) {
-    if (!listenersAreOn()) return;
+    if (!listenersAreOn) return;
 
     timerCleanup();
     cleanState();
@@ -128,7 +128,7 @@ export const createIdleTimer = ({
   }
 
   function removeListeners() {
-    if (!listenersAreOn()) return;
+    if (!listenersAreOn) return;
 
     const target = element ?? document;
 
@@ -136,7 +136,7 @@ export const createIdleTimer = ({
       target.removeEventListener(evt, handleEvent);
     }
 
-    setListenersAreOn(false);
+    listenersAreOn = false;
   }
 
   onMount(() => {
