@@ -1,15 +1,15 @@
-import { makeIdleTimer } from "../src";
+import { createIdleTimer } from "../src";
 import { createRoot, onMount } from "solid-js";
 import { render } from "solid-js/web";
 import { describe, test, expect } from "vitest";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-describe('makeIdleTimer', () => {
+describe('createIdleTimer', () => {
   test(
     'signals when the user is prompted and idle according to the configuration timeouts',
     async () => await createRoot(async dispose => {
-      const { isIdle, isPrompted, stop } = makeIdleTimer({
+      const { isIdle, isPrompted, stop } = createIdleTimer({
         idleTimeout: 5,
         promptTimeout: 5,
       })
@@ -38,7 +38,7 @@ describe('makeIdleTimer', () => {
   test(
     'start and stop should successfully bind, unbind the event listeners, reset should clean and restart the timers',
     async () => await createRoot(async dispose => {
-      const { isIdle, reset,start, stop } = makeIdleTimer({
+      const { isIdle, reset,start, stop } = createIdleTimer({
         idleTimeout: 5,
         startManually: true,
       })
@@ -79,7 +79,7 @@ describe('makeIdleTimer', () => {
       let currStatus: 'initial' | 'idle' | 'active' | 'prompted' =  'initial'
       const div = document.createElement('div')
 
-      const { start, stop } = makeIdleTimer({
+      const { start, stop } = createIdleTimer({
         promptTimeout: 15,
         idleTimeout: 15,
         startManually: true,

@@ -37,7 +37,7 @@ const EVENTS: EventTypeName[] = [
  *    @returns.stop: () => void; removes listeners and cleans up the timers, doesn't trigger onActive.
  * }
  */
-export const makeIdleTimer = ({
+export const createIdleTimer = ({
   element,
   events = EVENTS,
   idleTimeout = FIFTEEN_MINUTES,

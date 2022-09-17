@@ -1,7 +1,7 @@
 import { Component, Switch, Match } from "solid-js";
 import { render } from "solid-js/web";
 
-import { makeIdleTimer } from '../src';
+import { createIdleTimer } from '../src';
 
 const divStyle = {
   background: 'black',
@@ -15,7 +15,7 @@ const divStyle = {
 };
 
 const App: Component = () => {
-  const { isIdle, isPrompted, start, stop, reset } = makeIdleTimer({
+  const { isIdle, isPrompted, start, stop, reset } = createIdleTimer({
     onActive: (evt) =>
       console.log('this event re-activated me ⚡ => ', evt),
     onIdle: (evt) =>

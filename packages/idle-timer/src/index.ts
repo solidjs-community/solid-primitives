@@ -1,2 +1,2 @@
-export * from './mekeIdleTimer'
+export * from './createIdleTimer'
 export * from './types'
