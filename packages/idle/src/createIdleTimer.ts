@@ -1,19 +1,19 @@
-import { EventTypeName, IdleTimerOptions, IdleTimerReturn } from './types';
-import { batch, createSignal, onMount, onCleanup } from 'solid-js';
+import { EventTypeName, IdleTimerOptions, IdleTimerReturn } from "./types";
+import { batch, createSignal, onMount, onCleanup } from "solid-js";
 
 const THROTTLE_DELAY: number = 250;
 const FIFTEEN_MINUTES: number = 900_000; // 15 minutes
 const EVENTS: EventTypeName[] = [
-  'mousemove',
-  'keydown',
-  'wheel',
-  'resize',
-  'wheel',
-  'mousedown',
-  'pointerdown',
-  'touchstart',
-  'touchmove',
-  'visibilitychange',
+  "mousemove",
+  "keydown",
+  "wheel",
+  "resize",
+  "wheel",
+  "mousedown",
+  "pointerdown",
+  "touchstart",
+  "touchmove",
+  "visibilitychange"
 ];
 /**
  * A primiive to observe the user's idle state and react to its changes.
@@ -45,7 +45,7 @@ export const createIdleTimer = ({
   onActive,
   onIdle,
   onPrompt,
-  startManually = false,
+  startManually = false
 }: IdleTimerOptions): IdleTimerReturn => {
   let listenersAreOn = false;
   const [isPrompted, setIsPrompted] = createSignal(false);
@@ -89,15 +89,15 @@ export const createIdleTimer = ({
   }
 
   function timerCleanup() {
-    if (typeof idle === 'number') clearTimeout(idle);
-    if (typeof prompt === 'number') clearTimeout(prompt);
+    if (typeof idle === "number") clearTimeout(idle);
+    if (typeof prompt === "number") clearTimeout(prompt);
   }
 
   function setIdleTimer(evt: Event) {
     idle = setTimeout(() => {
-      setIsPrompted(true)
-      onPrompt?.(evt)
-      setPromptTimer(evt)
+      setIsPrompted(true);
+      onPrompt?.(evt);
+      setPromptTimer(evt);
     }, idleTimeout);
   }
 
@@ -108,7 +108,7 @@ export const createIdleTimer = ({
         setIsPrompted(false);
       });
       onIdle?.(evt);
-    }, promptTimeout)
+    }, promptTimeout);
   }
 
   function cleanState() {
@@ -118,11 +118,11 @@ export const createIdleTimer = ({
     });
   }
 
-  function startListening(evt: Event = new CustomEvent('manualstart')) {
+  function startListening(evt: Event = new CustomEvent("manualstart")) {
     timerCleanup();
     cleanState();
     addListeners();
-    timerReset(evt)
+    timerReset(evt);
   }
 
   function stopListening() {
@@ -144,8 +144,8 @@ export const createIdleTimer = ({
   }
 
   onMount(() => {
-    if (startManually) return
-    startListening(new CustomEvent('mount'))
+    if (startManually) return;
+    startListening(new CustomEvent("mount"));
   });
 
   onCleanup(stopListening);
@@ -154,7 +154,7 @@ export const createIdleTimer = ({
     isIdle,
     isPrompted,
     start: () => startListening(),
-    reset: () => timerReset(new CustomEvent('manualreset')),
-    stop: stopListening,
+    reset: () => timerReset(new CustomEvent("manualreset")),
+    stop: stopListening
   };
 };

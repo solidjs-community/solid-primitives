@@ -1,27 +1,25 @@
 import { Component, Switch, Match } from "solid-js";
 import { render } from "solid-js/web";
 
-import { createIdleTimer } from '../src';
+import { createIdleTimer } from "../src";
 
 const divStyle = {
-  background: 'black',
-  color: 'white',
-  display: 'grid',
-  'place-content': 'center',
-  height: '100vh',
-  width: '100vw',
-  'max-height': '100%',
-  'max-width': '100%',
+  background: "black",
+  color: "white",
+  display: "grid",
+  "place-content": "center",
+  height: "100vh",
+  width: "100vw",
+  "max-height": "100%",
+  "max-width": "100%"
 };
 
 const App: Component = () => {
   const { isIdle, isPrompted, start, stop, reset } = createIdleTimer({
-    onActive: (evt) =>
-      console.log('this event re-activated me ⚡ => ', evt),
-    onIdle: (evt) =>
-      console.log('last event before I went to sleep 😴 => ', evt),
+    onActive: evt => console.log("this event re-activated me ⚡ => ", evt),
+    onIdle: evt => console.log("last event before I went to sleep 😴 => ", evt),
     idleTimeout: 3_000,
-    promptTimeout: 2_000,
+    promptTimeout: 2_000
   });
   return (
     <Switch
@@ -46,6 +44,5 @@ const App: Component = () => {
     </Switch>
   );
 };
-
 
 render(() => <App />, document.getElementById("root")!);

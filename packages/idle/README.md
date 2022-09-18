@@ -22,6 +22,7 @@ pnpm add @solid-primitives/idle
 ```
 
 ## How to use it
+
 `createIdleTimer` provides different accessors and methods to observe the user's idle status and react to its changing.
 
 ### Basic example
@@ -45,10 +46,14 @@ const App: Component = () => {
   );
 };
 ```
+
 ### Accessors and methods
+
 To interact with the timers, `createIdleTimer` provides:
+
 - **isIdle** and **isPrompted**: `Accessor<boolean>`; these two accessors report the user status. They do not concur.
 - **start**, **stop** and **reset**: `() => void`; allow rispectively to start and stop the timers, and to reset them. `start` and `reset`, create a custom `manualstart` and `manualreset` event, that will be passed to the `onIdle` and `onPrompt` callbacks if no oher activity occurs (there's another custom event, `mount`, created when timers start automatically). Finally `stop` and `reset` don't trigger `onActive`.
+
 ### Configuration options
 
 `createIdleTimer` takes as an optional argument an object with the timer's configuration options. Each key has a default value.
@@ -66,7 +71,9 @@ The options are:
 ## Demo
 
 Here is a working example: https://stackblitz.com/edit/vitejs-vite-dwxlhp?file=src/App.tsx
+
 ## Acknowledgments
+
 This primitive is inspired by [react-idle-timer](https://idletimer.dev/)
 
 ## Changelog
