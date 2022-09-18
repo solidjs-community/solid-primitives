@@ -88,11 +88,11 @@ describe("createTimes", () => {
       await sleep(100); // 1.5
       expect(timeoutCount).toBe(1);
       expect(intervalCount).toBe(1);
-      await sleep(70); // 2.2
+      await sleep(60); // 2.1
       expect(timeoutCount).toBe(1);
       expect(intervalCount).toBe(2);
       setDelay(200);
-      await sleep(90); // 3
+      await sleep(100); // 3
       expect(timeoutCount).toBe(1);
       expect(intervalCount).toBe(2);
       await sleep(80); // 3.2
