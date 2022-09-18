@@ -1,6 +1,5 @@
 import { createIdleTimer } from "../src";
 import { createRoot, onMount } from "solid-js";
-import { render } from "solid-js/web";
 import { describe, test, expect } from "vitest";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -53,20 +52,20 @@ describe("createIdleTimer", () => {
 
       start();
 
-      await sleep(10);
+      await sleep(20);
       expect(isIdle(), "user is idle, timer should have expired by now").toBe(true);
 
       reset();
 
       await sleep(4);
       expect(isIdle(), "user is not idle yet, timers have restarted").toBe(false);
-      await sleep(10);
+      await sleep(20);
       expect(isIdle(), "user is idle again").toBe(true);
 
       stop();
       await sleep(1);
       expect(isIdle(), "user is not idle anymore, timers have been cleaned up").toBe(false);
-      await sleep(10);
+      await sleep(20);
       expect(
         isIdle(),
         "user is still not idle, event listeners are unbound, timers have not restarted"
@@ -98,7 +97,7 @@ describe("createIdleTimer", () => {
       );
 
       await sleep(10);
-      expect(currStatus, "events are not bound yet, the status has not cahnged").toBe("initial");
+      expect(currStatus, "events are not bound yet, the status has not changed").toBe("initial");
 
       start();
 
