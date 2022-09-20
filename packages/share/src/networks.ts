@@ -43,4 +43,5 @@ export const weibo: Network = "http://service.weibo.com/share/share.php?url=@u&t
 export const whatsapp: Network = "https://api.whatsapp.com/send?text=@t%0D%0A@u%0D%0A@d";
 export const wordpress: Network = "https://wordpress.com/press-this.php?u=@u&t=@t&s=@d&i=@m";
 export const xing: Network = "https://www.xing.com/social/share/spi?op=share&url=@u&title=@t";
-export const yammer: Network = "https://www.yammer.com/messages/new?login=true&status=@t%0D%0A@u%0D%0A@d";
+export const yammer: Network =
+  "https://www.yammer.com/messages/new?login=true&status=@t%0D%0A@u%0D%0A@d";
