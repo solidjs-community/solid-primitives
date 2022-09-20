@@ -1,5 +1,11 @@
 # @solid-primitives/share
 
+## 2.0.0
+
+### Major Changes
+
+- 32792b71: Updated to Solid 1.5.4, corrected/simplified exports and types. Updated README with docs and definition.
+
 ## 0.1.1
 
 ### Patch Changes
