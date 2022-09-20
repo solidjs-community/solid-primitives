@@ -3,6 +3,7 @@ import { Accessor, createSignal } from "solid-js";
 /**
  * A primitive for sharing on social media and beyond.
  *
+ * @param options A list of options to configure your sharing functionality.
  * @param {network} Network Network that the share should occur on
  * @param {url} string The URL to be shared
  * @param {title} string Title of the content that is being shared

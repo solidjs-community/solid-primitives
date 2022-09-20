@@ -20,6 +20,6 @@ Added CJS and SSR support.
 
 Updated to Solid 1.3
 
-1.0.0
+1.0.1
 
 Updated to Solid 1.5.5, corrected/simplified exports and types. Updated README with docs and definition.
