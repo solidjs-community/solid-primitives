@@ -21,7 +21,7 @@ export const flipboard: Network =
 export const hackernews: Network = "https://news.ycombinator.com/submitlink?u=@u&t=@t";
 export const instapaper: Network = "http://www.instapaper.com/edit?url=@u&title=@t&description=@d";
 export const line: Network = "http://line.me/R/msg/text/?@t%0D%0A@u%0D%0A@d";
-export const linkedin: Network = "https://www.linkedin.com/shareArticle?url=@u";
+export const linkedin: Network = "https://www.linkedin.com/sharing/share-offsite/?url=@u";
 export const messenger: Network = "fb-messenger://share/?link=@u";
 export const odnoklassniki: Network =
   "https://connect.ok.ru/dk?st.cmd=WidgetSharePreview&st.shareUrl=@u&st.comments=@t";
@@ -43,5 +43,4 @@ export const weibo: Network = "http://service.weibo.com/share/share.php?url=@u&t
 export const whatsapp: Network = "https://api.whatsapp.com/send?text=@t%0D%0A@u%0D%0A@d";
 export const wordpress: Network = "https://wordpress.com/press-this.php?u=@u&t=@t&s=@d&i=@m";
 export const xing: Network = "https://www.xing.com/social/share/spi?op=share&url=@u&title=@t";
-export const yammer: Network =
-  "https://www.yammer.com/messages/new?login=true&status=@t%0D%0A@u%0D%0A@d";
+export const yammer: Network = "https://www.yammer.com/messages/new?login=true&status=@t%0D%0A@u%0D%0A@d";

@@ -21,7 +21,7 @@ const createSocialShare = (
 ): [
   share: (network: Network | undefined) => void,
   close: () => void,
-  sharing: Accessor<boolean>
+  isSharing: Accessor<boolean>
 ] => {
   return [
     () => {
