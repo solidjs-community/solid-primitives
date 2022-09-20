@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/share",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Primitives to help with sharing content on social media and beyond.",
   "author": "David Di Biase <dave.dibiase@gmail.com",
   "license": "MIT",

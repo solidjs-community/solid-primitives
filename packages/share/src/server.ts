@@ -17,7 +17,7 @@ const createSocialShare = (
     title: "",
     description: ""
   }),
-  _controller: Window = window
+  _controller: Window
 ): [
   share: (network: Network | undefined) => void,
   close: () => void,
