@@ -1,6 +1,8 @@
 import { render } from "solid-js/web";
-import { Component, createEffect, createSignal } from 'solid-js';
+import { Component, type JSX, createEffect, createSignal } from 'solid-js';
 import { createStream } from "../src";
+
+import "uno.css";
 
 declare module "solid-js" {
   namespace JSX {
@@ -19,68 +21,74 @@ const iceservers = {
   iceCandidatePoolSize: 10,
 }
 
-const App: Component = () => {
+const App: Component = (): JSX.Element => {
   const [localStream, { mutate, stop }] = createStream({ video: true, audio: true })
   const [remoteStream, setRemoteStream] = createSignal<MediaStream>()
 
   const [ICE, setICE] = createSignal("")
   const [input, setInput] = createSignal("")
   
-  let PeerConnection = new RTCPeerConnection(iceservers)
+  let connection = new RTCPeerConnection(iceservers)
   
-  PeerConnection.ontrack = (event) => {
+  connection.ontrack = (event) => {
     setRemoteStream(event.streams[0])
   }
 
-  PeerConnection.onicecandidate = () => {
-    setICE(JSON.stringify(PeerConnection.localDescription))
+  connection.onicecandidate = () => {
+    setICE(JSON.stringify(connection.localDescription))
   }
   
   createEffect(() => {
-    const RawStream = localStream()
-    if (RawStream === undefined) return
-    RawStream.getTracks().forEach(track => PeerConnection.addTrack(track, RawStream))
+    const stream = localStream()
+    if (stream === undefined) {
+      return
+    }
+    stream.getTracks().forEach(track => connection.addTrack(track, stream))
   })
   
-  async function StartCall() {
-    if(PeerConnection.localDescription !== null) return
-    const offer = await PeerConnection.createOffer()
-    await PeerConnection.setLocalDescription(offer)
+  async function startCall() {
+    if (!localStream() || connection.localDescription !== null) {
+      return
+    }
+    const offer = await connection.createOffer()
+    await connection.setLocalDescription(offer)
   }
 
-  async function AnswerCall() {
-    if(PeerConnection.localDescription !== null) return
+  async function answerCall() {
+    if (!localStream() || connection.localDescription !== null) {
+      return
+    }
     let remoteOffer = JSON.parse(input())
-    PeerConnection.setRemoteDescription(remoteOffer)
-    const answer = await PeerConnection.createAnswer()
-    await PeerConnection.setLocalDescription(answer)
+    connection.setRemoteDescription(remoteOffer)
+    const answer = await connection.createAnswer()
+    await connection.setLocalDescription(answer)
   }
 
-  async function AddRemote() {
+  async function addRemote() {
     let remoteAnswer = JSON.parse(input())
-    if (PeerConnection.remoteDescription === null) {
-      await PeerConnection.setRemoteDescription(remoteAnswer)
+    if (connection.remoteDescription === null) {
+      await connection.setRemoteDescription(remoteAnswer)
     } else {
-      await PeerConnection.addIceCandidate(remoteAnswer)
+      await connection.addIceCandidate(remoteAnswer)
     }
   }
   
-  async function Mute() {
+  async function toggleAudio() {
     mutate(s => {
       s?.getAudioTracks().forEach(track => track.enabled = !track.enabled)
       return s
     })
   }
 
-  async function Video() {
+  async function toggleVideo() {
     mutate(s => {
       s?.getVideoTracks().forEach(track => track.enabled = !track.enabled)
       return s
     })
   }
   
-  async function EndCall() {
-    PeerConnection.close()
+  async function endCall() {
+    connection.close()
     stop()
     setICE("")
     setInput("")
@@ -94,12 +102,12 @@ const App: Component = () => {
     </div>
     <input type='text' class='SDP-Input' value={input()} onChange={e => setInput(e.currentTarget.value)}  />
     <div class='action-buttons'>
-      <button disabled={localStream() === undefined} onClick={StartCall}>Start Call</button>
-      <button disabled={localStream() === undefined} onClick={AnswerCall}>Answer Call</button>
-      <button onClick={AddRemote}>Add Remote</button>
-      <button onClick={Mute}>Mute</button>
-      <button onClick={Video}>Video</button> 
-      <button onClick={EndCall}>End Call</button> 
+      <button disabled={localStream() === undefined} onClick={startCall}>Start Call</button>
+      <button disabled={localStream() === undefined} onClick={answerCall}>Answer Call</button>
+      <button onClick={addRemote}>Add Remote</button>
+      <button onClick={toggleAudio}>Toggle Audio</button>
+      <button onClick={toggleVideo}>Toggle Video</button> 
+      <button onClick={endCall}>End Call</button> 
     </div>
     <h3>ICE :</h3>
     <p class='sdp-text'>{ICE()}</p>
@@ -107,4 +115,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+render(() => <App />, document.getElementById("root")!);
