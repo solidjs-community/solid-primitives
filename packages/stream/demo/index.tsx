@@ -20,7 +20,7 @@ const iceservers = {
 }
 
 const App: Component = () => {
-  const [stream, { mutate, stop }] = createStream({ video: true, audio: true })
+  const [localStream, { mutate, stop }] = createStream({ video: true, audio: true })
   const [remoteStream, setRemoteStream] = createSignal<MediaStream>()
 
   const [ICE, setICE] = createSignal("")
@@ -37,22 +37,18 @@ const App: Component = () => {
   }
   
   createEffect(() => {
-    const RawStream = stream()
+    const RawStream = localStream()
     if (RawStream === undefined) return
     RawStream.getTracks().forEach(track => PeerConnection.addTrack(track, RawStream))
   })
   
   async function StartCall() {
-    if (stream() === undefined) return alert("local Stream not ready yet")
-
     if(PeerConnection.localDescription !== null) return
     const offer = await PeerConnection.createOffer()
     await PeerConnection.setLocalDescription(offer)
   }
 
   async function AnswerCall() {
-    if (stream() === undefined) return alert("local stream not ready yet")
-
     if(PeerConnection.localDescription !== null) return
     let remoteOffer = JSON.parse(input())
     PeerConnection.setRemoteDescription(remoteOffer)
@@ -93,13 +89,13 @@ const App: Component = () => {
   return (
     <div class="App">
     <div class="video-container">
-      <video class="video" prop:srcObject={stream()} autoplay playsinline muted={true} />
+      <video class="video" prop:srcObject={localStream()} autoplay playsinline muted={true} />
       <video class="video" prop:srcObject={remoteStream()} playsinline autoplay />
     </div>
     <input type='text' class='SDP-Input' value={input()} onChange={e => setInput(e.currentTarget.value)}  />
     <div class='action-buttons'>
-      <button onClick={StartCall}>Start Call</button>
-      <button onClick={AnswerCall}>Answer Call</button>
+      <button disabled={localStream() === undefined} onClick={StartCall}>Start Call</button>
+      <button disabled={localStream() === undefined} onClick={AnswerCall}>Answer Call</button>
       <button onClick={AddRemote}>Add Remote</button>
       <button onClick={Mute}>Mute</button>
       <button onClick={Video}>Video</button> 
