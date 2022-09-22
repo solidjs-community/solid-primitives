@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/timer",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Primitives to manage timeout and interval",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
