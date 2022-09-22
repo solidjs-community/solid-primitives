@@ -18,7 +18,7 @@ export const makeTimer = (
   timer: typeof setTimeout | typeof setInterval
 ): VoidFunction => {
   const intervalId = timer(fn, delay);
-  const clear = () => clearInterval(intervalId as number);
+  const clear = () => clearInterval(intervalId);
   return onCleanup(clear);
 };
 
