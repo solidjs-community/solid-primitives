@@ -1,5 +1,11 @@
 # @solid-primitives/timer
 
+## 1.3.3
+
+### Patch Changes
+
+- 91060c3d: Adds a separate (NOOP) runtime for the server. — Fixes #214
+
 ## 1.3.2
 
 ### Patch Changes
