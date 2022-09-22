@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "@solid-primitives/memo": "^1.0.2",
-    "@solid-primitives/timer": "^1.3.2",
+    "@solid-primitives/timer": "^1.3.3",
     "@solid-primitives/utils": "^3.0.2"
   }
 }
