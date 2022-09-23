@@ -25,7 +25,7 @@ describe("raceTimeout", () => {
     let time = performance.now();
     await raceTimeout([promiseTimeout(200)], 100);
     expect(performance.now() - time).toBeGreaterThan(50);
-    expect(performance.now() - time).toBeLessThan(150);
+    expect(performance.now() - time).toBeLessThan(170);
   }, 100);
 
   test("resolves before timeout", async () => {
@@ -58,7 +58,7 @@ describe("raceTimeout", () => {
       expect((e as Error).message).toBe("raceTimeout rejection reason");
     }
     expect(performance.now() - time).toBeGreaterThan(50);
-    expect(performance.now() - time).toBeLessThan(150);
+    expect(performance.now() - time).toBeLessThan(170);
   }, 100);
 });
 

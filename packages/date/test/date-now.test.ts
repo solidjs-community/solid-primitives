@@ -47,7 +47,7 @@ describe("createDateNow", () => {
             time2
           );
           dispose();
-        }, 2);
+        }, 30);
       }, 2);
     });
   });
