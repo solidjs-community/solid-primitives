@@ -58,11 +58,11 @@
     "memo"
   ],
   "dependencies": {
-    "@solid-primitives/scheduled": "workspace:1.0.1",
-    "@solid-primitives/utils": "workspace:^3.0.2"
+    "@solid-primitives/scheduled": "^1.0.2",
+    "@solid-primitives/utils": "^3.0.2"
   },
   "devDependencies": {
-    "@solid-primitives/mouse": "workspace:^2.0.2",
+    "@solid-primitives/mouse": "^2.0.2",
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-app-router": "^0.3.3",

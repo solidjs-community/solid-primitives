@@ -80,8 +80,8 @@ describe("createIdleTimer", () => {
       const div = document.createElement("div");
 
       const { start, stop } = createIdleTimer({
-        promptTimeout: 15,
-        idleTimeout: 15,
+        promptTimeout: 30,
+        idleTimeout: 30,
         startManually: true,
         onActive: () => (currStatus = "active"),
         onIdle: () => (currStatus = "idle"),
@@ -106,7 +106,7 @@ describe("createIdleTimer", () => {
         currStatus,
         "timers have started, user should be in the prompt phase, onPrompt should have been called by now"
       ).toBe("prompted");
-      await sleep(50);
+      await sleep(60);
       expect(currStatus, "prompt timer has expired, onIdle should have been called by now").toBe(
         "idle"
       );
