@@ -12,9 +12,8 @@
   "scripts": {
     "format": "prettier -w \"packages/**/*.{js,ts,json,css,tsx,jsx,md,html}\"",
     "build": "turbo run build",
-    "test": "turbo run test -- --run",
-    "build-test": "CI=true turbo run build test",
-    "build-test:win": "cmd /C \"set CI=true && turbo run build test\"",
+    "test": "turbo run test",
+    "build-test": "turbo run build test",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts",
     "update-deps": "taze -w -r && pnpm i",

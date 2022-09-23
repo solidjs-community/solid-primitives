@@ -32,6 +32,7 @@ export const viteConfig = defineConfig({
 
 export const vitestConfig = defineConfig({
   test: {
+    watch: false,
     globals: true,
     clearMocks: true,
     environment: "jsdom",

@@ -52,20 +52,20 @@ describe("createIdleTimer", () => {
 
       start();
 
-      await sleep(20);
+      await sleep(50);
       expect(isIdle(), "user is idle, timer should have expired by now").toBe(true);
 
       reset();
 
       await sleep(4);
       expect(isIdle(), "user is not idle yet, timers have restarted").toBe(false);
-      await sleep(20);
+      await sleep(50);
       expect(isIdle(), "user is idle again").toBe(true);
 
       stop();
       await sleep(1);
       expect(isIdle(), "user is not idle anymore, timers have been cleaned up").toBe(false);
-      await sleep(20);
+      await sleep(50);
       expect(
         isIdle(),
         "user is still not idle, event listeners are unbound, timers have not restarted"
@@ -101,12 +101,12 @@ describe("createIdleTimer", () => {
 
       start();
 
-      await sleep(20);
+      await sleep(50);
       expect(
         currStatus,
         "timers have started, user should be in the prompt phase, onPrompt should have been called by now"
       ).toBe("prompted");
-      await sleep(20);
+      await sleep(50);
       expect(currStatus, "prompt timer has expired, onIdle should have been called by now").toBe(
         "idle"
       );
