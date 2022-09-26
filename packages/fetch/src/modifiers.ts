@@ -203,23 +203,28 @@ export const withRefetchEvent: RequestModifier = isServer
           onCleanup(() => events.forEach(name => window.removeEventListener(name, handler)));
       };
 
-export const withAggregation: RequestModifier = <Result extends unknown, FetcherArgs extends any[]>(dataFilter?: (result: Result) => Result) => 
+export const withAggregation: RequestModifier =
+  <Result extends unknown, FetcherArgs extends any[]>(dataFilter?: (result: Result) => Result) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
-    wrapFetcher<Result, FetcherArgs>(requestContext, originalFetcher => 
-      (...args) => originalFetcher(...args).then((data) => {
-        const next = dataFilter ? dataFilter(data) : data;
-        const current = requestContext.resource?.[0]();
-        return Array.isArray(current)
-          ? Array.isArray(next)
-            ? [...current, ...next] as Result
-            : [...current, next] as Result
-          : typeof current === 'object' && typeof next === 'object'
-          ? { ...current, ...next } as Result
-          : typeof current === 'string' && typeof next === 'string'
-          ? current + next as Result
-          : current != null
-          ? [current, next] as Result
-          : next;
-      }));
+    wrapFetcher<Result, FetcherArgs>(
+      requestContext,
+      originalFetcher =>
+        (...args) =>
+          originalFetcher(...args).then(data => {
+            const next = dataFilter ? dataFilter(data) : data;
+            const current = requestContext.resource?.[0]();
+            return Array.isArray(current)
+              ? Array.isArray(next)
+                ? ([...current, ...next] as Result)
+                : ([...current, next] as Result)
+              : typeof current === "object" && typeof next === "object"
+              ? ({ ...current, ...next } as Result)
+              : typeof current === "string" && typeof next === "string"
+              ? ((current + next) as Result)
+              : current != null
+              ? ([current, next] as Result)
+              : next;
+          })
+    );
     requestContext.wrapResource();
-  }
+  };
