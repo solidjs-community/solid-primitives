@@ -21,7 +21,7 @@ export const flipboard: Network =
 export const hackernews: Network = "https://news.ycombinator.com/submitlink?u=@u&t=@t";
 export const instapaper: Network = "http://www.instapaper.com/edit?url=@u&title=@t&description=@d";
 export const line: Network = "http://line.me/R/msg/text/?@t%0D%0A@u%0D%0A@d";
-export const linkedin: Network = "https://www.linkedin.com/shareArticle?url=@u";
+export const linkedin: Network = "https://www.linkedin.com/sharing/share-offsite/?url=@u";
 export const messenger: Network = "fb-messenger://share/?link=@u";
 export const odnoklassniki: Network =
   "https://connect.ok.ru/dk?st.cmd=WidgetSharePreview&st.shareUrl=@u&st.comments=@t";

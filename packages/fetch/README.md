@@ -91,6 +91,14 @@ withCacheStorage(storage?: Storage, key?: string)
 
 The main advantage of using modifiers like this is that you only import what you need and the rest will be eliminated in tree shaking.
 
+There's also a helper for the cache to serialize the cache key from the request.
+
+```ts
+serializeRequest([info: RequestInfo, init?: RequestInit]): string
+```
+
+in case you want to debug or manipulate the cache.
+
 ## Demo
 
 TODO

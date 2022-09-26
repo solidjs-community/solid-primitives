@@ -7,7 +7,7 @@ import "uno.css";
 // This query will be used by `graphql-code-generator` to generate `CountryQueryDocument`.
 // Normally it would be defined inside it's own file, but this is just
 // a demonstration.
-const _CountryQuery = gql`
+gql`
   query CountryQuery($code: ID!) {
     country(code: $code) {
       name
@@ -18,7 +18,9 @@ const _CountryQuery = gql`
 const App: Component = () => {
   const [code, setCode] = createSignal("BR");
 
-  const query = createGraphQLClient("https://countries.trevorblades.com/");
+  const query = createGraphQLClient("https://countries.trevorblades.com/", {
+    credentials: "same-origin"
+  });
 
   // We can query using a string.
   const [countriesData] = query<{ countries: { name: string; code: string }[] }>(
@@ -48,7 +50,7 @@ const App: Component = () => {
       <input value={code()} oninput={e => setCode(e.currentTarget.value.toUpperCase())}></input>
       <h4>
         <Show when={countryData()?.country?.name} fallback="not found">
-          {name => name}
+          <p>{countryData()!.country!.name}</p>
         </Show>
       </h4>
       <h3>Countries:</h3>

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/scheduled",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Primitives for creating scheduled — throttled or debounced — callbacks.",
   "contributors": [
     "David Di Biase <dave.dibiase@gmail.com>",
@@ -49,7 +49,7 @@
     "throttle"
   ],
   "devDependencies": {
-    "@solid-primitives/timer": "workspace:^1.3.2",
+    "@solid-primitives/timer": "workspace:^1.3.3",
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-js": "^1.5.4",

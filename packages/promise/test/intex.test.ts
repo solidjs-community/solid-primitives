@@ -4,32 +4,32 @@ import { until, changed, promiseTimeout, raceTimeout } from "../src";
 
 describe("promiseTimeout", () => {
   test("resolves after timeout", async () => {
-    let time = Date.now();
+    let time = performance.now();
     await promiseTimeout(100);
-    expect(Date.now() - time).toBeGreaterThan(50);
+    expect(performance.now() - time).toBeGreaterThan(50);
   });
 
   test("rejects after timeout", async () => {
-    let time = Date.now();
+    let time = performance.now();
     try {
       await promiseTimeout(100, true, "rejection reason");
     } catch (e) {
       expect(e).toBe("rejection reason");
     }
-    expect(Date.now() - time).toBeGreaterThan(50);
+    expect(performance.now() - time).toBeGreaterThan(50);
   });
 });
 
 describe("raceTimeout", () => {
   test("resolves after timeout", async () => {
-    let time = Date.now();
+    let time = performance.now();
     await raceTimeout([promiseTimeout(200)], 100);
-    expect(Date.now() - time).toBeGreaterThan(50);
-    expect(Date.now() - time).toBeLessThan(150);
+    expect(performance.now() - time).toBeGreaterThan(50);
+    expect(performance.now() - time).toBeLessThan(170);
   }, 100);
 
   test("resolves before timeout", async () => {
-    let time = Date.now();
+    let time = performance.now();
     const res = await raceTimeout(
       [
         new Promise(() => {}),
@@ -41,12 +41,12 @@ describe("raceTimeout", () => {
       200
     );
     expect(res).toBe("result");
-    expect(Date.now() - time).toBeGreaterThan(50);
-    expect(Date.now() - time).toBeLessThan(170);
+    expect(performance.now() - time).toBeGreaterThan(50);
+    expect(performance.now() - time).toBeLessThan(170);
   }, 100);
 
   test("rejects after timeout", async () => {
-    let time = Date.now();
+    let time = performance.now();
     try {
       await raceTimeout(
         [promiseTimeout(200)],
@@ -57,8 +57,8 @@ describe("raceTimeout", () => {
     } catch (e) {
       expect((e as Error).message).toBe("raceTimeout rejection reason");
     }
-    expect(Date.now() - time).toBeGreaterThan(50);
-    expect(Date.now() - time).toBeLessThan(150);
+    expect(performance.now() - time).toBeGreaterThan(50);
+    expect(performance.now() - time).toBeLessThan(170);
   }, 100);
 });
 

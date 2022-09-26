@@ -1,11 +1,11 @@
 {
-  "name": "@solid-primitives/bounds",
-  "version": "0.0.103",
-  "description": "Primitives for tracking HTML element size and position on screen as it changes.",
-  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
+  "name": "@solid-primitives/idle",
+  "version": "0.0.100",
+  "description": "A primitive to observe the user's idle status and react to its changes.",
+  "author": "Aylo Srd <aylo.srd@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/bounds#readme",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/idle#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -14,16 +14,19 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "bounds",
-    "stage": 1,
+    "name": "idle",
+    "stage": 0,
     "list": [
-      "createElementBounds"
+      "createIdleTimer"
     ],
     "category": "Display & Media"
   },
   "private": false,
   "sideEffects": false,
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "main": "./dist/server.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -35,42 +38,30 @@
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "npm run start",
     "build": "tsup",
-    "test": "uvu -r solid-register",
-    "test:watch": "watchlist src test -- npm test"
+    "test": "vitest"
   },
   "keywords": [
     "solid",
     "primitives",
-    "size",
-    "position",
-    "bounds"
+    "idle",
+    "inactivity",
+    "activity"
   ],
   "devDependencies": {
-    "@solid-primitives/scheduled": "workspace:^1.0.2",
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
     "solid-js": "^1.5.4",
-    "solid-register": "^0.2.5",
     "tslib": "^2.4.0",
     "tsup": "^6.2.3",
     "typescript": "^4.8.2",
     "unocss": "^0.45.15",
-    "uvu": "^0.5.6",
     "vite": "^3.0.9",
     "vite-plugin-solid": "^2.3.0",
-    "watchlist": "^0.3.1"
-  },
-  "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.2",
-    "@solid-primitives/resize-observer": "workspace:^2.0.4",
-    "@solid-primitives/utils": "workspace:^3.0.2"
+    "vitest": "^0.23.0"
   },
   "peerDependencies": {
     "solid-js": "^1.4.0"
