@@ -1,5 +1,12 @@
 # @solid-primitives/fetch
 
+## 2.4.0
+
+### Minor Changes
+
+- 6d39bcc7: new aggregation modifier
+- 38578006: expose cache key serializer
+
 ## 2.3.0
 
 ### Minor Changes
