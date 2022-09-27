@@ -10,7 +10,7 @@ export const createPermission = (
   name: PermissionDescriptor | PermissionName | "microphone" | "camera"
 ): Accessor<PermissionState | "unknown"> => {
   const [permission, setPermission] = createSignal<PermissionState | "unknown">("unknown");
-  if (navigator) {
+  if (typeof navigator !== "undefined") {
     navigator.permissions
       .query(typeof name === "string" ? { name: name as PermissionName } : name)
       .then(status => {
