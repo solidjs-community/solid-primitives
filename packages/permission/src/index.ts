@@ -1,4 +1,4 @@
-import { Accessor, createSignal, onCleanup } from "solid-js";
+import { Accessor, createEffect, createSignal, on, onCleanup } from "solid-js";
 
 /**
  * Querying the permission API
@@ -10,15 +10,11 @@ export const createPermission = (
   name: PermissionDescriptor | PermissionName | "microphone" | "camera"
 ): Accessor<PermissionState | "unknown"> => {
   const [permission, setPermission] = createSignal<PermissionState | "unknown">("unknown");
-  if (typeof navigator !== "undefined") {
+  const [status, setStatus] = createSignal<PermissionStatus>();
+  if (navigator) {
     navigator.permissions
       .query(typeof name === "string" ? { name: name as PermissionName } : name)
-      .then(status => {
-        setPermission(status.state);
-        const listener = () => setPermission(status.state);
-        status.addEventListener("change", listener);
-        onCleanup(() => status.removeEventListener("change", listener));
-      })
+      .then(setStatus)
       .catch(error => {
         if (error.name !== "TypeError" || (name !== "microphone" && name !== "camera")) {
           return;
@@ -41,6 +37,14 @@ export const createPermission = (
                 })
             : getUserMedia(constraints);
       });
+    createEffect(on(status, (status) => {
+      if (status) {
+        setPermission(status.state);
+        const listener = () => setPermission(status.state);
+        status.addEventListener("change", listener);
+        onCleanup(() => status.removeEventListener("change", listener));
+      }
+    }))
   }
   return permission;
 };
