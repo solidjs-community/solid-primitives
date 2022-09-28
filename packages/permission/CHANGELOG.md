@@ -1,5 +1,11 @@
 # @solid-primitives/permission
 
+## 1.2.0
+
+### Minor Changes
+
+- a9adb30f: fix in firefox
+
 ## 1.1.1
 
 ### Patch Changes
