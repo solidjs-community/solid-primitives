@@ -8,7 +8,8 @@ const App: Component = () => {
   const camPermission = createPermission("camera");
 
   const requestPermission = (constraints: MediaStreamConstraints) =>
-    navigator.mediaDevices.getUserMedia(constraints)
+    navigator.mediaDevices
+      .getUserMedia(constraints)
       .then(stream => stream.getTracks().forEach(track => track.stop()))
       .catch(console.warn);
 

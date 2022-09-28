@@ -37,14 +37,16 @@ export const createPermission = (
                 })
             : getUserMedia(constraints);
       });
-    createEffect(on(status, (status) => {
-      if (status) {
-        setPermission(status.state);
-        const listener = () => setPermission(status.state);
-        status.addEventListener("change", listener);
-        onCleanup(() => status.removeEventListener("change", listener));
-      }
-    }))
+    createEffect(
+      on(status, status => {
+        if (status) {
+          setPermission(status.state);
+          const listener = () => setPermission(status.state);
+          status.addEventListener("change", listener);
+          onCleanup(() => status.removeEventListener("change", listener));
+        }
+      })
+    );
   }
   return permission;
 };
