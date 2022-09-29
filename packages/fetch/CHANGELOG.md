@@ -1,5 +1,11 @@
 # @solid-primitives/fetch
 
+## 2.4.1
+
+### Patch Changes
+
+- d1622e79: fix to cache invalidation function types and cause a re-fetch on invalidation.
+
 ## 2.4.0
 
 ### Minor Changes
