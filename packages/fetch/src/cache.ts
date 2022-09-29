@@ -85,15 +85,14 @@ export const withCache: RequestModifier =
       try {
         delete requestContext.cache[serializeRequest(requestData || currentRequest)];
       } catch (e) {
-        DEV &&
-          console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
+        DEV && console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
       }
-    }
+    };
     Object.assign(requestContext.resource![1], {
       invalidate,
       refetch: (info?: ResourceOptions<Result, unknown>) => {
-        invalidate()
-        return originalRefetch(info)
+        invalidate();
+        return originalRefetch(info);
       }
     });
   };
