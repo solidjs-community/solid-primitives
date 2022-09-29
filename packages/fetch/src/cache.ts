@@ -1,4 +1,4 @@
-import { DEV } from "solid-js";
+import { DEV, ResourceOptions } from "solid-js";
 import { RequestContext } from "./fetch";
 import { RequestModifier, wrapFetcher } from "./modifiers";
 
@@ -49,6 +49,7 @@ export const withCache: RequestModifier =
     options: CacheOptions = defaultCacheOptions
   ) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
+    let currentRequest: FetcherArgs;
     requestContext.cache = options.cache || requestContext.cache;
     requestContext.expires = options.expires;
     const isExpired = (entry: CacheEntry) =>
@@ -59,6 +60,7 @@ export const withCache: RequestModifier =
       requestContext,
       <T>(originalFetcher: any) =>
         (requestData, info) => {
+          currentRequest = requestData;
           const serializedRequest: string = serializeRequest(requestData);
           const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
           const shouldRead = requestContext.readCache?.(cached) !== false;
@@ -78,14 +80,20 @@ export const withCache: RequestModifier =
         }
     );
     requestContext.wrapResource();
+    const originalRefetch = requestContext.resource![1].refetch;
+    const invalidate = (...requestData: FetcherArgs | []) => {
+      try {
+        delete requestContext.cache[serializeRequest(requestData || currentRequest)];
+      } catch (e) {
+        DEV &&
+          console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
+      }
+    }
     Object.assign(requestContext.resource![1], {
-      invalidate: (requestData: FetcherArgs) => {
-        try {
-          delete requestContext.cache[serializeRequest(requestData)];
-        } catch (e) {
-          DEV &&
-            console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
-        }
+      invalidate,
+      refetch: (info?: ResourceOptions<Result, unknown>) => {
+        invalidate()
+        return originalRefetch(info)
       }
     });
   };
