@@ -1,26 +1,35 @@
 import { createSharedRoot } from "@solid-primitives/rootless";
 import { Accessor, createSignal, onCleanup } from "solid-js";
 
-const visuallyHiddenStyles: Partial<CSSStyleDeclaration> = {
+const totallyHiddenStyles: Partial<CSSStyleDeclaration> = {
   border: "0",
   padding: "0",
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
+  visibility: "hidden",
   position: "absolute",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  visibility: "hidden"
+  top: "-9999px",
+  left: "-9999px"
 };
 
+/**
+ * Reads the current rem size from the document root.
+ */
 export const getRemSize = (): number =>
   parseFloat(getComputedStyle(document.documentElement).fontSize);
 
+/**
+ * Creates a reactive signal with value of the current rem size, and tracks it's changes.
+ * @returns A signal with the current rem size in pixels.
+ * @see [Primitive documentation](https://github.com/solidjs-community/solid-primitives/tree/main/packages/styles#createRemSize).
+ * @example
+ * const remSize = createRemSize();
+ * console.log(remSize()); // 16
+ */
 export function createRemSize(): Accessor<number> {
   const [remSize, setRemSize] = createSignal(getRemSize());
   const el = document.createElement("div");
   el.style.width = "1rem";
   // visually hide the element
-  Object.assign(el.style, visuallyHiddenStyles);
+  Object.assign(el.style, totallyHiddenStyles);
   document.body.appendChild(el);
   let init = true;
   const ro = new ResizeObserver(() => {
@@ -32,8 +41,21 @@ export function createRemSize(): Accessor<number> {
   return remSize;
 }
 
+/**
+ * Returns a reactive signal with value of the current rem size, and tracks it's changes.
+ *
+ * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot).
+ * @returns A signal with the current rem size in pixels.
+ * @see [Primitive documentation](https://github.com/solidjs-community/solid-primitives/tree/main/packages/styles#useRemSize).
+ * @example
+ * const remSize = useRemSize();
+ * console.log(remSize()); // 16
+ */
 export const useRemSize: () => Accessor<number> = /*#__PURE__*/ createSharedRoot(createRemSize);
 
+/**
+ * Set the server fallback value for the rem size. {@link getRemSize}, {@link createRemSize} and {@link useRemSize} will return this value on the server.
+ */
 export const setServerRemSize = (size: number): void => {
   // logic is in the server.ts file
 };
