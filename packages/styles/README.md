@@ -9,9 +9,9 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/styles?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/styles)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A sample primitive that is made up for templating with the following options:
+Collection of reactive primitives focused on styles.
 
-`createPrimitiveTemplate` - Provides a getter and setter for the primitive.
+- [`createRemSize`](#createRemSize) - Create a reactive signal of css `rem` size in pixels.
 
 ## Installation
 
@@ -23,15 +23,54 @@ yarn add @solid-primitives/styles
 pnpm add @solid-primitives/styles
 ```
 
-## How to use it
+## `createRemSize`
+
+Creates a reactive signal with value of the current rem size in pixels, and tracks it's changes.
+
+### How to use it
+
+It takes no arguments and returns a number signal.
 
 ```ts
-const [value, setValue] = createPrimitiveTemplate(false);
+import { createRemSize } from "@solid-primitives/styles";
+
+const remSize = createRemSize();
+console.log(remSize()); // 16
+
+createEffect(() => {
+  console.log(remSize()); // remSize value will be logged on every change to the root font size
+});
+```
+
+### `useRemSize`
+
+This primitive provides a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) variant that will reuse signals, HTML elements and the ResizeObserver instance across all dependents that use it.
+
+It's behavior is the same as [`createRemSize`](#createRemSize).
+
+```ts
+import { useRemSize } from "@solid-primitives/styles";
+
+const remSize = useRemSize();
+console.log(remSize()); // 16
+```
+
+### Server fallback
+
+When using this primitive on the server, it will return a signal with a value of `16` by default. You can override this value by calling the `setServerRemSize` helper with a new value, before calling `createRemSize` or `useRemSize`.
+
+```ts
+import { setServerRemSize, createRemSize } from "@solid-primitives/styles";
+
+setServerRemSize(10);
+
+const remSize = createRemSize();
+console.log(remSize()); // 10 instead of 16 (only on the server!)
 ```
 
 ## Demo
 
-You can use this template for publishing your demo on CodeSandbox: https://codesandbox.io/s/solid-primitives-demo-template-sz95h
+TODO
 
 ## Changelog
 

@@ -27,9 +27,7 @@ export const getRemSize = (): number =>
 export function createRemSize(): Accessor<number> {
   const [remSize, setRemSize] = createSignal(getRemSize());
   const el = document.createElement("div");
-  el.style.width = "1rem";
-  // visually hide the element
-  Object.assign(el.style, totallyHiddenStyles);
+  Object.assign(el.style, totallyHiddenStyles, { width: "1rem" });
   document.body.appendChild(el);
   let init = true;
   const ro = new ResizeObserver(() => {
@@ -37,7 +35,10 @@ export function createRemSize(): Accessor<number> {
     setRemSize(getRemSize());
   });
   ro.observe(el);
-  onCleanup(() => ro.disconnect());
+  onCleanup(() => {
+    document.body.removeChild(el);
+    ro.disconnect();
+  });
   return remSize;
 }
 
