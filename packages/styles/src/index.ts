@@ -36,7 +36,7 @@ export function createRemSize(): Accessor<number> {
   });
   ro.observe(el);
   onCleanup(() => {
-    document.body.removeChild(el);
+    el.remove();
     ro.disconnect();
   });
   return remSize;
