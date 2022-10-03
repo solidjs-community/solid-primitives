@@ -1,5 +1,6 @@
 import { render } from "solid-js/web";
-import { Component, type JSX, createEffect, createSignal } from 'solid-js';
+import { type Component, type JSX, createEffect, createSignal } from 'solid-js';
+import { createStore } from "solid-js/store";
 import { createStream } from "../src";
 import { createPermission } from '../../permission/src'
 import { createCameras, createMicrophones } from "../../devices/src";
@@ -27,17 +28,19 @@ const App: Component = (): JSX.Element => {
   const microphones = createMicrophones();
   const cameras = createCameras();
 
-  const microphone = createPermission("microphone")
-  const camera = createPermission("camera")
+  const microphonePermission = createPermission("microphone")
+  const cameraPermission = createPermission("camera")
 
-  const constraints: MediaStreamConstraints = {}
-  if (microphones().length > 0) {
-    constraints.audio = { deviceId: microphones()[0].deviceId }
-  }
-
-  if (cameras().length > 0) {
-    constraints.video = { deviceId: cameras()[0].deviceId }
-  }
+  const [constraints, setContraints] = createStore<MediaStreamConstraints>({})
+  createEffect(() => {
+    if (microphones().length > 0) {
+      setContraints("audio", { deviceId: microphones()[0].deviceId })
+    }
+    
+    if (cameras().length > 0) {
+      setContraints("video", { deviceId: cameras()[0].deviceId })
+    }
+  })
   
   const [localStream, { mutate, stop }] = createStream(constraints)
   const [remoteStream, setRemoteStream] = createSignal<MediaStream>()
@@ -122,8 +125,8 @@ const App: Component = (): JSX.Element => {
       <button disabled={localStream() === undefined} onClick={startCall}>Start Call</button>
       <button disabled={localStream() === undefined} onClick={answerCall}>Answer Call</button>
       <button onClick={addRemote}>Add Remote</button>
-      <button onClick={toggleAudio} disabled={microphone() != "granted"}>Toggle Audio</button>
-      <button onClick={toggleVideo} disabled={camera() != "granted"}>Toggle Video</button> 
+      <button onClick={toggleAudio} disabled={microphonePermission() != "granted"}>Toggle Audio</button>
+      <button onClick={toggleVideo} disabled={cameraPermission() != "granted"}>Toggle Video</button> 
       <button onClick={endCall}>End Call</button> 
     </div>
     <h3>ICE :</h3>
