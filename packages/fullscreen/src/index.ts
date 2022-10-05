@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup, JSX } from "solid-js";
+import { createEffect, createSignal, onCleanup, JSX, getOwner } from "solid-js";
 import { isServer } from "solid-js/web";
 import type { Accessor } from "solid-js";
 
@@ -39,7 +39,7 @@ export const createFullscreen = (
   });
   const listener = () => setActive(document.fullscreenElement === ref);
   document.addEventListener("fullscreenchange", listener);
-  onCleanup(() => {
+  getOwner() && onCleanup(() => {
     document.removeEventListener("fullscreenchange", listener);
     if (isActive()) {
       document.exitFullscreen();
