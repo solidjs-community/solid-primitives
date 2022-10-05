@@ -1,5 +1,11 @@
 # @solid-primitives/fullscreen
 
+## 1.2.0
+
+### Minor Changes
+
+- 48051f0b: fix oncleanup message
+
 ## 1.1.1
 
 ### Patch Changes
