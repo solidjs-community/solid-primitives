@@ -24,6 +24,12 @@ const iceservers = {
   iceCandidatePoolSize: 10,
 }
 
+enum CALL_STATE {
+  IDLE,
+  INITIATED,
+  ACTIVE
+}
+
 const App: Component = (): JSX.Element => {
   const microphones = createMicrophones();
   const cameras = createCameras();
@@ -48,7 +54,7 @@ const App: Component = (): JSX.Element => {
   const [localStream, { mutate, stop }] = createStream(() => foundDevice() ? constraints : undefined)
   const [remoteStream, setRemoteStream] = createSignal<MediaStream>()
 
-  const [CallState, setCallState] = createSignal(0)
+  const [CallState, setCallState] = createSignal<CALL_STATE>(CALL_STATE.IDLE)
   const [ICE, setICE] = createSignal("")
   const [input, setInput] = createSignal("")
   
@@ -74,7 +80,7 @@ const App: Component = (): JSX.Element => {
     if (!localStream() || connection.localDescription !== null) {
       return
     }
-    setCallState(1)
+    setCallState(CALL_STATE.INITIATED)
     const offer = await connection.createOffer()
     await connection.setLocalDescription(offer)
   }
@@ -83,7 +89,7 @@ const App: Component = (): JSX.Element => {
     if (!localStream() || connection.localDescription !== null) {
       return
     }
-    setCallState(2)
+    setCallState(CALL_STATE.ACTIVE)
     let remoteOffer = JSON.parse(input())
     connection.setRemoteDescription(remoteOffer)
     const answer = await connection.createAnswer()
@@ -116,7 +122,7 @@ const App: Component = (): JSX.Element => {
   async function endCall() {
     connection.close()
     stop()
-    setCallState(0)
+    setCallState(CALL_STATE.IDLE)
     setICE("")
     setInput("")
   }
@@ -129,12 +135,12 @@ const App: Component = (): JSX.Element => {
     </div>
     <input type='text' class='SDP-Input' value={input()} onChange={e => setInput(e.currentTarget.value)}  />
     <div class='action-buttons'>
-      <button disabled={localStream() === undefined || CallState() > 0} onClick={startCall}>Start Call</button>
-      <button disabled={localStream() === undefined || CallState() > 0} onClick={answerCall}>Answer Call</button>
-      <button onClick={addRemote} disabled={CallState() != 1}>Add Remote</button>
+      <button disabled={localStream() === undefined || CallState() > CALL_STATE.IDLE} onClick={startCall}>Start Call</button>
+      <button disabled={localStream() === undefined || CallState() > CALL_STATE.IDLE} onClick={answerCall}>Answer Call</button>
+      <button onClick={addRemote} disabled={CallState() != CALL_STATE.INITIATED}>Add Remote</button>
       <button onClick={toggleAudio} disabled={microphonePermission() != "granted"}>Toggle Audio</button>
       <button onClick={toggleVideo} disabled={cameraPermission() != "granted"}>Toggle Video</button> 
-      <button onClick={endCall} disabled={CallState() == 0}>End Call</button> 
+      <button onClick={endCall} disabled={CallState() == CALL_STATE.IDLE}>End Call</button> 
     </div>
     <h3>ICE :</h3>
     <p class='sdp-text'>{ICE()}</p>
