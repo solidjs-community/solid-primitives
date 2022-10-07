@@ -217,10 +217,10 @@ export const createAmplitudeFromStream = (
  *
  * The stream will be stopped on cleanup automatically.
  */
- export const createScreen = (screenSource: MaybeAccessor<DisplayMediaStreamConstraints | undefined>): StreamReturn => {
+export const createScreen = (screenSource: MaybeAccessor<DisplayMediaStreamConstraints | undefined>): StreamReturn => {
   const [stream, { mutate, refetch }] = createResource(
     createMemo<DisplayMediaStreamConstraints | undefined>(() =>
-      typeof screenSource === "function" ? screenSource() : screenSource || undefined
+      typeof screenSource === "function" ? screenSource() : screenSource
     ),
     (constraints, info: ResourceFetcherInfo<MediaStream>): Promise<MediaStream> =>
       navigator.mediaDevices.getDisplayMedia(constraints).then(stream => {
