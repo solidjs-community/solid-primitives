@@ -202,6 +202,48 @@ export const createAmplitudeFromStream = (
 };
 
 /**
+ * Creates a reactive wrapper to get display media streams from screen
+ * ```typescript
+ * [stream, { mutate, refetch, mute, stop } = createScreen(screenSource);
+ * ```
+ * @param screenSource DisplayMediaStreamConstraints | undefined | Accessor<DisplayMediaStreamConstraints | undefined>
+ * @returnValue `stream()` is an accessor to the display media stream (or undefined if not yet loaded)
+ * @property `stream.loading` is a boolean indicator for the loading state
+ * @property `stream.error` contains any error getting the stream encountered
+ * @method `mutate` allows to manually overwrite the stream
+ * @method `refetch` allows to restart the request without changing the constraints
+ * @method `mute` will mute the stream or unmute if called with `false`
+ * @method `stop` allows stopping the display media stream
+ *
+ * The stream will be stopped on cleanup automatically.
+ */
+ export const createScreen = (screenSource: MaybeAccessor<DisplayMediaStreamConstraints | undefined>): StreamReturn => {
+  const [stream, { mutate, refetch }] = createResource(
+    createMemo<DisplayMediaStreamConstraints | undefined>(() =>
+      typeof screenSource === "function" ? screenSource() : screenSource || undefined
+    ),
+    (constraints, info: ResourceFetcherInfo<MediaStream>): Promise<MediaStream> =>
+      navigator.mediaDevices.getDisplayMedia(constraints).then(stream => {
+        if (info.value && stream !== info.value) {
+          stop(info.value);
+        }
+        return stream;
+      })
+  );
+
+  onCleanup(() => stop(stream()));
+  return [
+    stream,
+    {
+      mutate,
+      refetch,
+      mute: (muted?: boolean) => mute(untrack(stream), muted),
+      stop: () => stop(untrack(stream))
+    }
+  ];
+};
+
+/**
  * Creates an initial user media request that will be stopped immediately in order to request permissions from the user
  * ```typescript
  * createMediaPermissionRequest('audio');
