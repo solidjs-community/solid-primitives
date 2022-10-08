@@ -46,7 +46,7 @@ export const createIdleTimer = ({
   onIdle,
   onPrompt,
   startManually = false
-}: IdleTimerOptions): IdleTimerReturn => {
+}: IdleTimerOptions = {}): IdleTimerReturn => {
   let listenersAreOn = false;
   const [isPrompted, setIsPrompted] = createSignal(false);
   const [isIdle, setIsIdle] = createSignal(false);
