@@ -18,8 +18,6 @@ import type {
   EffectOptions,
   MemoOptions,
   NoInfer,
-  OnEffectFunction,
-  OnOptions,
   Owner,
   SignalOptions
 } from "solid-js/types/reactive/signal";

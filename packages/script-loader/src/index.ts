@@ -1,4 +1,4 @@
-import { Accessor, createEffect, on, onCleanup } from "solid-js";
+import { Accessor, createEffect, onCleanup } from "solid-js";
 
 /**
  * Creates a convenient script loader utility

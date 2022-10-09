@@ -115,7 +115,7 @@ export const createSignaledWorker = (
 ): [start: () => void, stop: () => void] => {
   let fns = [];
   for (const i in args) {
-    const { input, output, func, concurrency } = args[i];
+    const { input, output, func } = args[i];
     if (input) {
       createEffect(
         on(input, async () => {
