@@ -1,5 +1,6 @@
 import type { Accessor, Resource, Setter } from "solid-js";
 import type { StreamReturn, StreamSourceDescription } from "./index";
+import { MaybeAccessor } from "@solid-primitives/utils";
 
 const noop = {
   stream: Object.assign(() => undefined, { loading: true, error: undefined }) as Resource<
@@ -36,6 +37,21 @@ export const createAmplitudeStream = (
   }
 ] => {
   return [new Proxy({}, {}) as Resource<number>, noop];
+};
+
+export const createAmplitudeFromStream = (
+  _stream: MaybeAccessor<MediaStream | undefined>
+): [
+  amplitude: Accessor<number>,
+  stop: () => void
+] => {
+  return [new Proxy({}, {}) as Accessor<number>, () => {}];
+};
+
+export const createScreen = (
+  _screenSource: MaybeAccessor<DisplayMediaStreamConstraints | undefined>
+): StreamReturn => {
+  return [new Proxy({}, {}) as Resource<undefined>, noop as any];
 };
 
 export const createMediaPermissionRequest = (
