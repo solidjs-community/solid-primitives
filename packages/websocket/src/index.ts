@@ -42,7 +42,7 @@ const createWebsocket = (
   };
   const disconnect = () => {
     cancelReconnect();
-    reconnectLimit = Number.POSITIVE_INFINITY;
+    reconnectLimit = Number.NEGATIVE_INFINITY;
     if (socket) {
       socket.close();
     }
