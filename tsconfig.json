@@ -8,6 +8,8 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "esModuleInterop": true,
+    "noUnusedLocals": true,
+    "forceConsistentCasingInFileNames": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "types": ["solid-js"]
