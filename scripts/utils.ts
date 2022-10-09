@@ -1,6 +1,6 @@
 import path from "path";
 
-export const r = (...pathSegments: string[]) => path.resolve(process.cwd(), ...pathSegments);
+export const r = (...pathSegments: string[]) => path.resolve(__dirname, ...pathSegments);
 
 const getCommentText = (text: string, marker: "START" | "END") => `<!-- ${text}:${marker} -->`;
 
