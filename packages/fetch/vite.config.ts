@@ -1,4 +1,4 @@
-import { vitestConfig } from "../../vite.config";
+import { vitestConfig } from "../../configs/vite.config";
 
 if (!vitestConfig.test) {
   vitestConfig.test = {};

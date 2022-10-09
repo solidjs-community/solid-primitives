@@ -1,3 +1,3 @@
-import { vitestConfig } from "../../vite.config";
+import { vitestConfig } from "../../configs/vite.config";
 
 export default vitestConfig;

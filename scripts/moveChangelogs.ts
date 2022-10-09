@@ -1,3 +1,11 @@
+/*
+
+This script was used to move changelogs from being inlined in the packages README.md files to being separated CHANGELOG.md files.
+
+Left for reference and future use.
+
+*/
+
 import { readdirSync, readFileSync, writeFileSync } from "fs";
 import { pathTo } from "./utils";
 

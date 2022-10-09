@@ -1,4 +1,4 @@
-import { viteConfig } from "../../../vite.config";
+import { viteConfig } from "../../../configs/vite.config";
 import mkcert from "vite-plugin-mkcert";
 
 viteConfig.server = { httos: true };
