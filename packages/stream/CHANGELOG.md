@@ -1,5 +1,11 @@
 # @solid-primitives/stream
 
+## 0.6.0
+
+### Minor Changes
+
+- 64569c17: Add `createScreen` primitive
+
 ## 0.5.1
 
 ### Patch Changes
