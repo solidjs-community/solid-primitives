@@ -221,9 +221,7 @@ export const createScreen = (
   screenSource: MaybeAccessor<DisplayMediaStreamConstraints | undefined>
 ): StreamReturn => {
   const [stream, { mutate, refetch }] = createResource(
-    createMemo<DisplayMediaStreamConstraints | undefined>(() =>
-      typeof screenSource === "function" ? screenSource() : screenSource
-    ),
+    typeof screenSource === "function" ? createMemo(screenSource) : () => screenSource,
     (constraints, info: ResourceFetcherInfo<MediaStream>): Promise<MediaStream> =>
       navigator.mediaDevices.getDisplayMedia(constraints).then(stream => {
         if (info.value && stream !== info.value) {
