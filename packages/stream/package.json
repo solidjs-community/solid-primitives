@@ -14,7 +14,10 @@
     "stage": 3,
     "list": [
       "createStream",
-      "createAmplitudeStream"
+      "createAmplitudeStream",
+      "createMediaPermissionRequest",
+      "createAmplitudeFromStream",
+      "createScreen"
     ],
     "category": "Network"
   },
