@@ -41,10 +41,7 @@ export const createAmplitudeStream = (
 
 export const createAmplitudeFromStream = (
   _stream: MaybeAccessor<MediaStream | undefined>
-): [
-  amplitude: Accessor<number>,
-  stop: () => void
-] => {
+): [amplitude: Accessor<number>, stop: () => void] => {
   return [new Proxy({}, {}) as Accessor<number>, () => {}];
 };
 

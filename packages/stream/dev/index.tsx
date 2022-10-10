@@ -1,7 +1,12 @@
 import type { Component, JSX } from "solid-js";
 import { createSignal, Show } from "solid-js";
 import { render } from "solid-js/web";
-import { createStream, createAmplitudeStream, createMediaPermissionRequest, createScreen } from "../src";
+import {
+  createStream,
+  createAmplitudeStream,
+  createMediaPermissionRequest,
+  createScreen
+} from "../src";
 import "uno.css";
 
 declare module "solid-js" {
@@ -20,7 +25,7 @@ const App: Component = () => {
   const [audioConstraints, setAudioConstraints] = createSignal<MediaStreamConstraints>();
   const [level] = createAmplitudeStream(audioConstraints);
   const [screenConstraints, setScreenConstraints] = createSignal<MediaStreamConstraints>();
-  const [screen] = createScreen(screenConstraints)
+  const [screen] = createScreen(screenConstraints);
   return (
     <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
       <div class="wrapper-v">
@@ -42,11 +47,11 @@ const App: Component = () => {
         </Show>
         <h2>Screen Capture Test</h2>
         <video prop:srcObject={screen()} autoplay />
-        <button 
+        <button
           onclick={() => setScreenConstraints({ video: true })}
           title="We need user interaction to capture screen"
         >
-          {!screenConstraints() ? "Capture Screen" : "Change Window" }
+          {!screenConstraints() ? "Capture Screen" : "Change Window"}
         </button>
       </div>
     </div>
