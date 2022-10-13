@@ -20,14 +20,18 @@
   },
   "private": false,
   "sideEffects": false,
-  "type": "module",
   "files": [
     "dist"
   ],
+  "type": "module",
   "main": "./dist/server.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
     "node": {
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
