@@ -1,2 +1,3 @@
-import { doubleEntryConfig } from "../../configs/tsup.config";
-export default doubleEntryConfig;
+import { createConfig } from "../../configs/tsup.config";
+
+export default createConfig({ devEntry: true, ssrEntry: true });
