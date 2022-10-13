@@ -23,17 +23,17 @@
   },
   "private": false,
   "sideEffects": false,
-  "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/server.cjs",
+  "type": "module",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    "node": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"

@@ -9,6 +9,11 @@ import { Accessor, Setter, createSignal, JSX } from "solid-js";
 export const createPrimitiveTemplate = (
   param: boolean
 ): [get: Accessor<boolean>, set: Setter<boolean>] => {
+  // `process.env.SSR` will be replaced at build time and tree-shaken
+  if (process.env.SSR) {
+    return [() => param, () => undefined];
+  }
+
   const [value, setValue] = createSignal(param);
   return [value, setValue];
 };
