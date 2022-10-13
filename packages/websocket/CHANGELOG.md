@@ -1,5 +1,11 @@
 # @solid-primitives/websocket
 
+## 0.3.2
+
+### Patch Changes
+
+- 1f266d23: Updated the reconnectLimit to avoid reconnection on calling disconnect function
+
 ## 0.3.1
 
 ### Patch Changes
