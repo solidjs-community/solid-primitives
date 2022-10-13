@@ -15,7 +15,6 @@ import type {
   MaybeAccessor,
   MaybeAccessorValue,
   Noop,
-  Values,
   AnyObject,
   AnyFunction,
   SetterValue,
@@ -122,24 +121,6 @@ export function accessWith<T>(
   ...args: T extends AnyFunction ? Parameters<T> : never
 ): T extends AnyFunction ? ReturnType<T> : T {
   return typeof valueOrFn === "function" ? valueOrFn(...args) : valueOrFn;
-}
-
-/**
- * Iterate through object entries.
- */
-export function forEachEntry<O extends AnyObject>(
-  object: O,
-  iterator: (
-    key: keyof O,
-    item: Values<O>,
-    index: number,
-    pairs: [keyof O, Values<O>][],
-    object: O
-  ) => void
-): void {
-  Object.entries(object).forEach(([key, item], index, pairs) =>
-    iterator(key as keyof O, item, index, pairs as [keyof O, Values<O>][], object)
-  );
 }
 
 /**
