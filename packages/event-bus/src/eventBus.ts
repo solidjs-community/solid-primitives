@@ -47,7 +47,9 @@ bus.clear();
 
 // Initial value was NOT provided
 export function createEventBus<Event>(
-  config?: EmitterConfig<Event, Event | undefined>
+  config?: EmitterConfig<Event, Event | undefined> & {
+    value?: undefined;
+  }
 ): EventBus<Event, Event | undefined>;
 // Initial value was provided
 export function createEventBus<Event>(

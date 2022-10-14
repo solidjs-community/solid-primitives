@@ -1,75 +1,63 @@
-import { createSimpleEmitter } from "../src";
+import { describe, test, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { createSimpleEmitter } from "../src";
 
-const test = suite("createSimpleEmitter");
+describe("createSimpleEmitter", () => {
+  test("emitting and listening", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const [listen, emit] = createSimpleEmitter<string, number, boolean>();
 
-test("return values", () =>
-  createRoot(dispose => {
-    const [listen, emit, clear] = createSimpleEmitter();
-    assert.type(listen, "function", "listen should be a function");
-    assert.type(emit, "function", "emit should be a function");
-    assert.type(clear, "function", "clear should be a function");
-    dispose();
-  }));
+      listen((...args) => captured.push(args));
 
-test("emitting and listening", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const [listen, emit] = createSimpleEmitter<string, number, boolean>();
+      emit("foo", 1, true);
+      expect(captured[0]).toEqual(["foo", 1, true]);
 
-    listen((...args) => captured.push(args));
+      emit("bar", 2, false);
+      expect(captured[1]).toEqual(["bar", 2, false]);
 
-    emit("foo", 1, true);
-    assert.equal(captured[0], ["foo", 1, true]);
+      dispose();
+    }));
 
-    emit("bar", 2, false);
-    assert.equal(captured[1], ["bar", 2, false]);
+  test("initial listeners", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const [, emit] = createSimpleEmitter<string>([a => captured.push(a)]);
 
-    dispose();
-  }));
+      emit("foo");
+      expect(captured).toEqual(["foo"]);
 
-test("initial listeners", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const [, emit] = createSimpleEmitter<string>([a => captured.push(a)]);
+      emit("bar");
+      expect(captured).toEqual(["foo", "bar"]);
 
-    emit("foo");
-    assert.equal(captured, ["foo"]);
+      dispose();
+    }));
 
-    emit("bar");
-    assert.equal(captured, ["foo", "bar"]);
+  test("clear function", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const [listen, emit, clear] = createSimpleEmitter<string>();
 
-    dispose();
-  }));
+      listen(a => captured.push(a));
 
-test("clear function", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const [listen, emit, clear] = createSimpleEmitter<string>();
+      clear();
 
-    listen(a => captured.push(a));
+      emit("foo");
+      expect(captured.length).toBe(0);
 
-    clear();
+      dispose();
+    }));
 
-    emit("foo");
-    assert.is(captured.length, 0);
+  test("clears on dispose", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const [listen, emit] = createSimpleEmitter<string>();
 
-    dispose();
-  }));
+      listen(a => captured.push(a));
 
-test("clears on dispose", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const [listen, emit] = createSimpleEmitter<string>();
+      dispose();
 
-    listen(a => captured.push(a));
-
-    dispose();
-
-    emit("foo");
-    assert.is(captured.length, 0);
-  }));
-
-test.run();
+      emit("foo");
+      expect(captured.length).toBe(0);
+    }));
+});
