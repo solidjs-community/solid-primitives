@@ -43,7 +43,8 @@
     "dev": "vite serve dev",
     "start": "vite serve dev",
     "build": "jiti ../../scripts/build.ts",
-    "test": "vitest"
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "eventbus",

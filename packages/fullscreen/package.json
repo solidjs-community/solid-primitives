@@ -37,8 +37,9 @@
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsup",
-    "test": "echo disabled defunct jest test suite"
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "fullscreen",

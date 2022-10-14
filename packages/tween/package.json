@@ -34,7 +34,7 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "tsup"
+    "build": "jiti ../../scripts/build.ts --ssr --dev"
   },
   "keywords": [
     "animate",

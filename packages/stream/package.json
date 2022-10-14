@@ -39,8 +39,9 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "tsup",
-    "test": "uvu -r solid-register",
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr",
     "start": "vite serve dev --host",
     "dev": "npm run start",
     "demo": "vite serve demo --host"

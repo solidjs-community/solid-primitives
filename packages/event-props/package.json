@@ -29,9 +29,10 @@
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsup",
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
     "typecheck": "tsc --noEmit src/* test/*;",
-    "test": "uvu -r solid-register"
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "event",

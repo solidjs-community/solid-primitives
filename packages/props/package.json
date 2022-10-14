@@ -46,7 +46,8 @@
     "start": "vite serve dev --host",
     "dev": "npm run start",
     "build": "rollup -c",
-    "test": "uvu -r solid-register"
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "props",

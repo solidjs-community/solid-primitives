@@ -32,8 +32,9 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsup",
-    "test": "uvu -r solid-register"
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "localStorage",

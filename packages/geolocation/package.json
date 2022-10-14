@@ -38,8 +38,9 @@
   "scripts": {
     "start": "vite serve dev",
     "dev": "vite serve dev",
-    "build": "tsup",
-    "test": "uvu -b -r solid-register"
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "geolocation",

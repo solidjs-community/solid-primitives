@@ -15,7 +15,8 @@
     "start": "vite serve dev --host",
     "dev": "npm run start",
     "build": "echo noop build",
-    "test": "echo noop test"
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "devDependencies": {
     "jsdom": "^20.0.0",

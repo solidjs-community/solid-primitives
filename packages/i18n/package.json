@@ -29,8 +29,9 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
-    "build": "tsup",
-    "test": "echo disabled defunct jest test suite"
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "i18n",

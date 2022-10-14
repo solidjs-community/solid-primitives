@@ -30,8 +30,9 @@
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "yarn start",
-    "build": "tsup",
-    "test": "uvu -r solid-register"
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "file",

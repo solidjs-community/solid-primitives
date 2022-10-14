@@ -41,7 +41,7 @@
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "npm run start",
-    "build": "tsup"
+    "build": "jiti ../../scripts/build.ts --ssr --dev"
   },
   "keywords": [
     "solid",

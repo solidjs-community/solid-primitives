@@ -35,8 +35,7 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "tsup",
-    "test": "echo disabled defunct test suite"
+    "build": "jiti ../../scripts/build.ts --ssr --dev"
   },
   "keywords": [
     "template",
