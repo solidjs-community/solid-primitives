@@ -30,7 +30,7 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "jiti ../../scripts/build.ts",
     "test": "vitest"
   },
   "keywords": [

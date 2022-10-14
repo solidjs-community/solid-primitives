@@ -25,12 +25,24 @@
   ],
   "type": "module",
   "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/server.js",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
   "types": "./dist/index.d.ts",
   "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
     "browser": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
     },
     "node": {
       "import": "./dist/server.js",
@@ -42,7 +54,7 @@
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "npm run start",
-    "build": "tsup",
+    "build": "jiti ../../scripts/build.ts --ssr",
     "test": "vitest"
   },
   "keywords": [
@@ -57,7 +69,6 @@
     "solid-js": "^1.5.4",
     "solid-testing-library": "^0.3.0",
     "tslib": "^2.4.0",
-    "tsup": "^6.2.3",
     "unocss": "^0.45.15",
     "vite": "^3.0.9",
     "vite-plugin-solid": "^2.3.0",
