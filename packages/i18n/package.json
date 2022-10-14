@@ -45,7 +45,7 @@
     "babel-preset-solid": "^1.5.4",
     "jest": "^27.5.1",
     "prettier": "^2.7.1",
-    "solid-js": "^1.5.4",
+    "solid-js": "^1.5.7",
     "solid-testing-library": "^0.2.1",
     "ts-jest": "^27.1.5",
     "tslib": "^2.4.0",

@@ -31,7 +31,7 @@
     "jiti": "^1.14.0",
     "json-to-markdown-table": "^1.0.0",
     "prettier": "^2.7.1",
-    "solid-js": "^1.5.4",
+    "solid-js": "^1.5.7",
     "taze": "^0.8.0",
     "tsup": "^6.2.3",
     "turbo": "^1.4.5",

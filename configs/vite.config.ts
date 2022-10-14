@@ -42,12 +42,13 @@ export const vitestConfig = defineConfig({
     setupFiles: [path.resolve(__dirname, "ssr.setup.ts")],
     globals: true,
     clearMocks: true,
+    passWithNoTests: true,
     environment: "jsdom",
     transformMode: {
       web: [/\.[jt]sx?$/]
     }
   },
   resolve: {
-    conditions: ["development", "browser"]
+    conditions: ["browser", "development"]
   }
 });
