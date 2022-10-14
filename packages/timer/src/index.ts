@@ -17,6 +17,9 @@ export const makeTimer = (
   delay: number,
   timer: typeof setTimeout | typeof setInterval
 ): VoidFunction => {
+  if (process.env.SSR) {
+    return () => void 0;
+  }
   const intervalId = timer(fn, delay);
   const clear = () => clearInterval(intervalId);
   return onCleanup(clear);
@@ -38,6 +41,9 @@ export const createTimer = (
   delay: TimeoutSource,
   timer: typeof setTimeout | typeof setInterval
 ): void => {
+  if (process.env.SSR) {
+    return void 0;
+  }
   if (typeof delay === "number") {
     makeTimer(fn, delay, timer);
     return;
@@ -109,6 +115,9 @@ export const createTimeoutLoop = (handler: VoidFunction, timeout: TimeoutSource)
     makeTimer(handler, timeout, setInterval);
     return;
   }
+  if (process.env.SSR) {
+    return void 0;
+  }
   const [currentTimeout, setCurrentTimeout] = createSignal(untrack(timeout));
   createEffect(() => {
     const currTimeout = currentTimeout();
@@ -176,5 +185,8 @@ export const createIntervalCounter = (
   timeout: TimeoutSource,
   options?: SignalOptions<number>
 ): Accessor<number> => {
+  if (process.env.SSR) {
+    return () => 0;
+  }
   return createPolled(prev => prev + 1, timeout, -1, options);
 };
