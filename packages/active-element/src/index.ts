@@ -1,6 +1,10 @@
+console.log("0");
 import { makeEventListener, createEventListener } from "@solid-primitives/event-listener";
+console.log("1");
 import { MaybeAccessor, Directive } from "@solid-primitives/utils";
+console.log("2");
 import { Accessor, createSignal, JSX } from "solid-js";
+console.log("3");
 
 declare module "solid-js" {
   namespace JSX {

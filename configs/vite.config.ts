@@ -1,7 +1,6 @@
 import { defineConfig } from "vitest/config";
 import solidPlugin from "vite-plugin-solid";
 import Unocss from "unocss/vite";
-import path from "path";
 
 export const viteConfig = defineConfig({
   server: {
@@ -28,27 +27,5 @@ export const viteConfig = defineConfig({
   },
   build: {
     target: "esnext"
-  }
-});
-
-export const vitestConfig = defineConfig({
-  test: {
-    watch: false,
-    env: {
-      DEV: "1",
-      SSR: "",
-      PROD: ""
-    },
-    setupFiles: [path.resolve(__dirname, "ssr.setup.ts")],
-    globals: true,
-    clearMocks: true,
-    passWithNoTests: true,
-    environment: "jsdom",
-    transformMode: {
-      web: [/\.[jt]sx?$/]
-    }
-  },
-  resolve: {
-    conditions: ["browser", "development"]
   }
 });

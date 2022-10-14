@@ -30,6 +30,7 @@ const getEnvVars = (mode: "dev" | "prod" | "ssr"): Options => ({
   esbuildOptions(options) {
     options.define = {
       ...options.define,
+      "process.env.NODE_ENV": mode === "dev" ? `"development"` : `"production"`,
       "process.env.PROD": mode === "dev" ? '""' : '"1"',
       "process.env.DEV": mode === "dev" ? '"1"' : '""',
       "process.env.SSR": mode === "ssr" ? '"1"' : '""'

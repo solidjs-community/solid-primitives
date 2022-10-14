@@ -31,8 +31,8 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
   "exports": {
     "worker": {
@@ -55,10 +55,9 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
     "build": "jiti ../../scripts/build.ts --ssr",
-    "test": "vitest"
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "media",
@@ -66,17 +65,11 @@
     "solid",
     "primitives"
   ],
-  "devDependencies": {
-    "jiti": "^1.16.0",
-    "jsdom": "^20.0.1",
-    "prettier": "^2.7.1",
-    "rimraf": "^3.0.2",
-    "solid-js": "^1.5.7",
-    "tslib": "2.4.0",
-    "typescript": "^4.8.4",
-    "vitest": "^0.24.3"
-  },
   "peerDependencies": {
     "solid-js": ">= 1.0.0"
+  },
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
   }
 }

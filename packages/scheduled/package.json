@@ -62,7 +62,7 @@
     "start": "vite serve dev --host",
     "dev": "npm run start",
     "build": "jiti ../../scripts/build.ts --ssr",
-    "test": "vitest"
+    "test": "vitest -c ../../configs/vitest.config.ts"
   },
   "keywords": [
     "solid",

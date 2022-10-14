@@ -1,7 +1,3 @@
-/**
- * @vitest-environment node
- */
-
 import { describe, test, expect, vi } from "vitest";
 import { makeActiveElementListener, createActiveElement, createFocusSignal } from "../src";
 
