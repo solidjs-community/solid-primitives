@@ -28,13 +28,13 @@
   "devDependencies": {
     "@types/jest": "^27.5.2",
     "prettier": "^2.7.1",
-    "solid-js": "^1.5.7",
+    "solid-js": "^1.5.0",
     "solid-testing-library": "^0.2.1",
     "tslib": "^2.4.0",
     "typescript": "^4.8.2"
   },
   "peerDependencies": {
-    "solid-js": "^1.4.2"
+    "solid-js": "^1.5.0"
   },
   "dependencies": {
     "tsup": "^6.2.3"

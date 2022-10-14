@@ -46,7 +46,7 @@
     "@solid-primitives/utils": "^3.0.2",
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
-    "solid-js": "^1.5.7",
+    "solid-js": "^1.5.0",
     "solid-transition-group": "^0.0.8",
     "tslib": "^2.4.0",
     "tsup": "^6.2.3",
@@ -57,6 +57,6 @@
     "vitest": "^0.23.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.4.0"
+    "solid-js": "^1.5.0"
   }
 }

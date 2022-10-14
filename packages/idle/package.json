@@ -54,7 +54,7 @@
   "devDependencies": {
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
-    "solid-js": "^1.5.7",
+    "solid-js": "^1.5.0",
     "tslib": "^2.4.0",
     "tsup": "^6.2.3",
     "typescript": "^4.8.2",
@@ -64,6 +64,6 @@
     "vitest": "^0.23.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.4.0"
+    "solid-js": "^1.5.0"
   }
 }

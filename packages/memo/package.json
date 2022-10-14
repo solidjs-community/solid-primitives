@@ -82,6 +82,6 @@
     "solid-app-router": "^0.3.3"
   },
   "peerDependencies": {
-    "solid-js": "^1.4.2"
+    "solid-js": "^1.5.0"
   }
 }
