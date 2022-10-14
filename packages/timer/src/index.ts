@@ -111,12 +111,12 @@ export const createTimer = (
  * between executions of {@link handler} in ms, or false to disable looping.
  */
 export const createTimeoutLoop = (handler: VoidFunction, timeout: TimeoutSource): void => {
+  if (process.env.SSR) {
+    return void 0;
+  }
   if (typeof timeout === "number") {
     makeTimer(handler, timeout, setInterval);
     return;
-  }
-  if (process.env.SSR) {
-    return void 0;
   }
   const [currentTimeout, setCurrentTimeout] = createSignal(untrack(timeout));
   createEffect(() => {
@@ -167,6 +167,9 @@ export function createPolled<T>(
   value?: T,
   options?: SignalOptions<T>
 ): Accessor<T> {
+  if (process.env.SSR) {
+    return fn as Accessor<T>;
+  }
   const [polled, setPolled] = createSignal(untrack(fn.bind(void 0, value)), options);
   const update = () => setPolled(fn);
   createTimer(update, timeout, setInterval);
