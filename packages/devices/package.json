@@ -35,6 +35,18 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
     "node": {
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
@@ -45,8 +57,8 @@
   "scripts": {
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsup",
-    "test": "uvu -r solid-register"
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "test": "vitest"
   },
   "keywords": [
     "media",
@@ -55,15 +67,14 @@
     "primitives"
   ],
   "devDependencies": {
-    "jsdom": "^20.0.0",
+    "jiti": "^1.16.0",
+    "jsdom": "^20.0.1",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
     "solid-js": "^1.5.7",
-    "solid-register": "^0.2.5",
-    "tslib": "2.3.1",
-    "tsup": "^6.2.3",
-    "typescript": "^4.8.2",
-    "uvu": "^0.5.6"
+    "tslib": "2.4.0",
+    "typescript": "^4.8.4",
+    "vitest": "^0.24.3"
   },
   "peerDependencies": {
     "solid-js": ">= 1.0.0"

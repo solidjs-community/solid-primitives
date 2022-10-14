@@ -11,6 +11,9 @@ import { createStore } from "solid-js/store";
  * If the array does not contain a device of a certain kind, you cannot get permissions, as requesting permissions requires requesting a stream on any device of the kind.
  */
 export const createDevices = () => {
+  if (process.env.SSR) {
+    return () => [];
+  }
   const [devices, setDevices] = createSignal<MediaDeviceInfo[]>([]);
   const enumerate = () => {
     navigator.mediaDevices.enumerateDevices().then(setDevices);
@@ -34,6 +37,9 @@ const equalDeviceLists = (prev: MediaDeviceInfo[], next: MediaDeviceInfo[]) =>
  * Without a device, you cannot get permissions, as requesting permissions requires requesting a stream on any device of the kind.
  */
 export const createMicrophones = () => {
+  if (process.env.SSR) {
+    return () => [];
+  }
   const devices = createDevices();
   return createMemo(() => devices().filter(device => device.kind === "audioinput"), [], {
     name: "microphones",
@@ -51,6 +57,9 @@ export const createMicrophones = () => {
  * Microphone permissions automatically include speaker permissions. You can use the device id of the speaker to use the setSinkId-API of any audio tag.
  */
 export const createSpeakers = () => {
+  if (process.env.SSR) {
+    return () => [];
+  }
   const devices = createDevices();
   return createMemo(() => devices().filter(device => device.kind === "audiooutput"), [], {
     name: "speakers",
@@ -68,6 +77,9 @@ export const createSpeakers = () => {
  * Without a device, you cannot get permissions, as requesting permissions requires requesting a stream on any device of the kind.
  */
 export const createCameras = () => {
+  if (process.env.SSR) {
+    return () => [];
+  }
   const devices = createDevices();
   return createMemo(() => devices().filter(device => device.kind === "videoinput"), [], {
     name: "cameras",
@@ -82,6 +94,13 @@ export const createCameras = () => {
  * @returnValue Acceleration: Accessor<DeviceMotionEventAcceleration | undefined>
  */
 export const createAccelerometer = (includeGravity: boolean = false, interval: number = 100) => {
+  if (process.env.SSR) {
+    return () => ({
+      x: 0,
+      y: 0,
+      z: 0
+    });
+  }
   const [acceleration, setAcceleration] = createSignal<DeviceMotionEventAcceleration>();
   let throttled = false;
 
@@ -107,6 +126,9 @@ export const createAccelerometer = (includeGravity: boolean = false, interval: n
  * @returnValue { alpha: 0, beta: 0, gamma: 0 }
  */
 export const createGyroscope = (interval: number = 100) => {
+  if (process.env.SSR) {
+    return { alpha: 0, beta: 0, gamma: 0 };
+  }
   const [orientation, setOrientation] = createStore({ alpha: 0, beta: 0, gamma: 0 });
   let throttled = false;
 
@@ -116,7 +138,6 @@ export const createGyroscope = (interval: number = 100) => {
     setTimeout(() => {
       throttled = false;
     }, interval);
-
     setOrientation({
       alpha: e.alpha ? e.alpha : 0,
       beta: e.beta ? e.beta : 0,
