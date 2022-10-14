@@ -59,6 +59,9 @@ export function createPureReaction(
   onInvalidate: VoidFunction,
   options?: EffectOptions
 ): (tracking: VoidFunction) => void {
+  if (process.env.SSR) {
+    return () => void 0;
+  }
   const owner = getOwner()!;
   const disposers: VoidFunction[] = [];
   onCleanup(() => {
@@ -94,22 +97,22 @@ export function createPureReaction(
  * @example
  * const [count, setCount] = createSignal(1);
  * const number = createMemo(() => otherValue() * 2);
- * const lastUpdated = createCurtain([count, number]);
+ * const lastUpdated = createLatest([count, number]);
  * lastUpdated() // => undefined
  * setCount(4)
  * lastUpdated() // => 4
  */
-export function createCurtain<T extends Accessor<any>[]>(
+export function createLatest<T extends Accessor<any>[]>(
   sources: T,
   value: ReturnType<ItemsOf<T>>,
   options: SignalOptions<ReturnType<ItemsOf<T>>>
 ): Accessor<ReturnType<ItemsOf<T>>>;
-export function createCurtain<T extends Accessor<any>[]>(
+export function createLatest<T extends Accessor<any>[]>(
   sources: T,
   value?: ReturnType<ItemsOf<T>>,
   options?: SignalOptions<ReturnType<ItemsOf<T>> | undefined>
 ): Accessor<ReturnType<ItemsOf<T>> | undefined>;
-export function createCurtain(
+export function createLatest(
   sources: Accessor<any>[],
   value: any,
   options: SignalOptions<any> = {}
@@ -118,6 +121,9 @@ export function createCurtain(
   for (const fn of sources) createComputed(on(fn, set(setLast), { defer: true }));
   return last;
 }
+
+/** @deprecated use `createLatest` instead */
+export const createCurtain = createLatest;
 
 /**
  * Solid's `createMemo` which value can be overwritten by a setter. Signal value will be the last one, set by a setter or a memo calculation.
@@ -183,6 +189,9 @@ export function createDebouncedMemo<T>(
   options?: MemoOptions<T | undefined>
 ): Accessor<T> {
   const memo = createMemo(() => fn(value), undefined, options);
+  if (process.env.SSR) {
+    return memo;
+  }
   const [signal, setSignal] = createSignal(untrack(memo));
   const updateSignal = debounce(() => (value = setSignal(memo)), timeoutMs);
   createComputed(on(memo, updateSignal, { defer: true }));
@@ -223,6 +232,9 @@ export function createDebouncedMemoOn<S, Next extends Prev, Prev = Next>(
   value?: Prev,
   options?: MemoOptions<Next | undefined>
 ): Accessor<Next> {
+  if (process.env.SSR) {
+    return createMemo(on(deps, fn as any) as () => any, value);
+  }
   let init = true;
   const [signal, setSignal] = createSignal(
     (() => {
@@ -273,6 +285,9 @@ export function createThrottledMemo<T>(
   value?: T,
   options?: MemoOptions<T | undefined>
 ): Accessor<T> {
+  if (process.env.SSR) {
+    return createMemo(fn);
+  }
   let onInvalidate: VoidFunction = noop;
   const track = createPureReaction(() => onInvalidate());
   const [state, setState] = createSignal(
@@ -316,6 +331,9 @@ export function createAsyncMemo<T>(
   calc: AsyncMemoCalculation<T>,
   options: MemoOptionsWithValue<T | undefined> = {}
 ): Accessor<T | undefined> {
+  if (process.env.SSR) {
+    return () => options?.value;
+  }
   const [state, setState] = createSignal(options.value, options);
   /** pending promises from oldest to newest */
   const order: Promise<T>[] = [];
@@ -372,6 +390,17 @@ export function createLazyMemo<T>(
   value?: T,
   options?: MemoOptions<T>
 ): Accessor<T> {
+  if (process.env.SSR) {
+    let calculated = false;
+    return () => {
+      if (!calculated) {
+        calculated = true;
+        value = calc(value);
+      }
+      return value as T;
+    };
+  }
+
   /** original root in which the primitive was initially run */
   const owner = getOwner() ?? undefined;
   /** number of places where the state is being tracked */

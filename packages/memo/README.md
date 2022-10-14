@@ -11,7 +11,7 @@
 
 Collection of custom `createMemo` primitives. They extend it's functionality while keeping the usage similar.
 
-- [`createCurtain`](#createCurtain) - A combined memo of a list of sources, where last updated will be the value.
+- [`createLatest`](#createLatest) - A combined memo of a list of sources, where last updated will be the value.
 - [`createWritableMemo`](#createWritableMemo) - Solid's `createMemo` which value can be overwritten by a setter.
 - [`createLazyMemo`](#createLazyMemo) - Lazily evaluated memo. Will run the calculation only if is being listened to.
 - [`createAsyncMemo`](#createAsyncMemo) - Memo that allows for asynchronous calculations.
@@ -29,13 +29,13 @@ npm install @solid-primitives/memo
 yarn add @solid-primitives/memo
 ```
 
-## `createCurtain`
+## `createLatest`
 
 A combined memo of multiple sources, last updated source will be the value of the returned signal.
 
 ### How to use it
 
-`createCurtain` takes three arguments:
+`createLatest` takes three arguments:
 
 - `sources` - list of reactive calculations/signals/memos
 - `value` - initial value of returned signal
@@ -44,12 +44,12 @@ A combined memo of multiple sources, last updated source will be the value of th
 And returns a signal with value of the last change
 
 ```ts
-import { createCurtain } from "@solid-primitives/memo";
+import { createLatest } from "@solid-primitives/memo";
 
 const [count, setCount] = createSignal(1);
 const [x, setX] = createSignal(2);
 const number = createMemo(() => otherValue() * 2);
-const lastUpdated = createCurtain([count, number, () => x() / 3]);
+const lastUpdated = createLatest([count, number, () => x() / 3]);
 lastUpdated(); // => undefined
 setCount(4);
 lastUpdated(); // => 4

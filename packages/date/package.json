@@ -31,11 +31,20 @@
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
+  "browser": {},
   "types": "./dist/index.d.ts",
+  "exports": {
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "scripts": {
     "start": "vite serve dev",
     "dev": "vite serve dev",
-    "build": "tsup",
+    "build": "jiti ../../scripts/build.ts",
     "test": "vitest"
   },
   "keywords": [
@@ -45,19 +54,8 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solid-primitives/composites": "^1.1.1",
     "@solid-primitives/event-listener": "^2.2.2",
-    "date-fns": "^2.29.2",
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "solid-js": "^1.5.7",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.3",
-    "typescript": "^4.8.2",
-    "unocss": "^0.45.15",
-    "vite": "^3.0.9",
-    "vite-plugin-solid": "^2.3.0",
-    "vitest": "^0.23.4"
+    "date-fns": "^2.29.2"
   },
   "peerDependencies": {
     "solid-js": "^1.3.1"
