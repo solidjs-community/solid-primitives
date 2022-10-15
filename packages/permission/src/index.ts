@@ -9,6 +9,9 @@ import { Accessor, createEffect, createSignal, on, onCleanup } from "solid-js";
 export const createPermission = (
   name: PermissionDescriptor | PermissionName | "microphone" | "camera"
 ): Accessor<PermissionState | "unknown"> => {
+  if (process.env.SSR) {
+    return () => "unknown";
+  }
   const [permission, setPermission] = createSignal<PermissionState | "unknown">("unknown");
   const [status, setStatus] = createSignal<PermissionStatus>();
   if (navigator) {

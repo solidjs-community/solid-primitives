@@ -1,3 +1,4 @@
+import "./setup";
 import { test, expect, describe, vitest } from "vitest";
 import { createRoot, createEffect, createSignal } from "solid-js";
 import { createFetch } from "../src/fetch";

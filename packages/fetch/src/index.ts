@@ -1,4 +1,4 @@
-export { createFetch, FetchReturn, FetchOptions, RequestContext } from "./fetch";
+export { createFetch, type FetchReturn, type FetchOptions, type RequestContext } from "./fetch";
 export {
   withAbort,
   withCatchAll,
