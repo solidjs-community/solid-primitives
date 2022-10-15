@@ -1,5 +1,6 @@
 import path from "path";
 import { defineConfig } from "vitest/config";
+import solidPlugin from "vite-plugin-solid";
 
 const cwd = process.cwd();
 
@@ -9,6 +10,7 @@ export default defineConfig(({ mode }) => {
   const testSSR = mode === "test:ssr" || mode === "ssr";
 
   return {
+    plugins: [solidPlugin()],
     test: {
       watch: false,
       env: {
