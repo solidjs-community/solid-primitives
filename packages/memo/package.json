@@ -25,7 +25,8 @@
       "createDebouncedMemoOn",
       "createThrottledMemo",
       "createPureReaction",
-      "createMemoCache"
+      "createMemoCache",
+      "createReducer"
     ],
     "category": "Reactivity"
   },

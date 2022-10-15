@@ -509,3 +509,25 @@ export function createMemoCache<Key, Value>(
 
   return key ? () => run(key()) : run;
 }
+
+/**
+ * Primitive for updating signal in a predictable way. SolidJS equivalent of React's [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer).
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createReducer
+ * @param dispatcher is the reducer, it's 1st parameter always is the current state of the reducer and it returns the new state of the reducer.
+ * @param initialValue initial value of the signal
+ * @returns
+ * ```ts
+ * [accessor: Accessor<State>, dispatch: (...args: ActionData) => void]
+ * ```
+ * - `accessor` can be used as you use a normal signal: `accessor()`. It contains the state of the reducer.
+ * - `dispatch` is the action of the reducer, it is a sort of `setSignal` that does NOT receive the new state, but instructions to create it from the current state.
+ */
+export function createReducer<T, ActionData extends Array<any>>(
+  dispatcher: (state: T, ...args: ActionData) => T,
+  initialValue: T,
+  options?: SignalOptions<T>
+): [accessor: Accessor<T>, dispatch: (...args: ActionData) => void] {
+  const [state, setState] = createSignal(initialValue, options);
+
+  return [state, (...args: ActionData) => void setState(state => dispatcher(state, ...args))];
+}
