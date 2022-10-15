@@ -1,8 +1,7 @@
-import * as assert from "uvu/assert";
-import { suite } from "uvu";
-import { createResizeObserver, getElementSize, getWindowSize } from "../src";
+import { describe, test, expect } from "vitest";
 import { createRoot, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
+import { createResizeObserver, getElementSize, getWindowSize } from "../src";
 
 const div1 = document.createElement("div");
 const div2 = document.createElement("div");
@@ -27,99 +26,88 @@ class TestResizeObserver {
 }
 global.ResizeObserver = TestResizeObserver;
 
-const cro = suite("createResizeObserver");
+describe("createResizeObserver", () => {
+  test("disposes on cleanup", () =>
+    createRoot(dispose => {
+      _targets = new Set<Element>();
+      createResizeObserver(div1, () => {});
+      expect(disconnect_count).toBe(0);
+      dispose();
+      expect(disconnect_count).toBe(1);
+    }));
 
-cro("disposes on cleanup", () =>
-  createRoot(dispose => {
-    _targets = new Set<Element>();
-    createResizeObserver(div1, () => {});
-    assert.is(disconnect_count, 0);
-    dispose();
-    assert.is(disconnect_count, 1);
-  })
-);
+  test("adds initial target", () =>
+    createRoot(dispose => {
+      const targets = (_targets = new Set<Element>());
+      createResizeObserver(div1, () => {});
+      expect(targets.size).toBe(1);
+      expect(targets.has(div1)).toBeTruthy();
+      dispose();
+    }));
 
-cro("adds initial target", () =>
-  createRoot(dispose => {
-    const targets = (_targets = new Set<Element>());
-    createResizeObserver(div1, () => {});
-    assert.is(targets.size, 1);
-    assert.ok(targets.has(div1));
-    dispose();
-  })
-);
+  test("adds initial targets", () =>
+    createRoot(dispose => {
+      const targets = (_targets = new Set<Element>());
+      createResizeObserver([div1, div2], () => {});
+      expect(targets.size).toBe(2);
+      expect(targets.has(div1)).toBeTruthy();
+      expect(targets.has(div2)).toBeTruthy();
+      dispose();
+    }));
 
-cro("adds initial targets", () =>
-  createRoot(dispose => {
-    const targets = (_targets = new Set<Element>());
-    createResizeObserver([div1, div2], () => {});
-    assert.is(targets.size, 2);
-    assert.ok(targets.has(div1));
-    assert.ok(targets.has(div2));
-    dispose();
-  })
-);
-
-cro("observes signal targets", () =>
-  createRoot(dispose => {
-    const targets = (_targets = new Set<Element>());
-    const [refs, setRefs] = createSignal([div1]);
-    createResizeObserver(refs, () => {});
-    assert.is(targets.size, 0, "targets shouldn't be connected synchronously");
-    queueMicrotask(() => {
-      assert.is(targets.size, 1);
-      assert.ok(targets.has(div1));
-
-      setRefs([div2, div3]);
+  test("observes signal targets", () =>
+    createRoot(dispose => {
+      const targets = (_targets = new Set<Element>());
+      const [refs, setRefs] = createSignal([div1]);
+      createResizeObserver(refs, () => {});
+      expect(targets.size, "targets shouldn't be connected synchronously").toBe(0);
       queueMicrotask(() => {
-        assert.is(targets.size, 2);
-        assert.ok(targets.has(div2));
-        assert.ok(targets.has(div3));
+        expect(targets.size).toBe(1);
+        expect(targets.has(div1)).toBeTruthy();
 
-        dispose();
+        setRefs([div2, div3]);
+        queueMicrotask(() => {
+          expect(targets.size).toBe(2);
+          expect(targets.has(div2)).toBeTruthy();
+          expect(targets.has(div3)).toBeTruthy();
+
+          dispose();
+        });
       });
-    });
-  })
-);
+    }));
 
-cro("observes store top-level targets", () =>
-  createRoot(dispose => {
-    const targets = (_targets = new Set<Element>());
-    const [refs, setRefs] = createStore([div1]);
-    createResizeObserver(refs, () => {});
-    assert.is(targets.size, 0, "targets shouldn't be connected synchronously");
-    queueMicrotask(() => {
-      assert.is(targets.size, 1);
-      assert.ok(targets.has(div1));
-
-      setRefs([div2, div3]);
+  test("observes store top-level targets", () =>
+    createRoot(dispose => {
+      const targets = (_targets = new Set<Element>());
+      const [refs, setRefs] = createStore([div1]);
+      createResizeObserver(refs, () => {});
+      expect(targets.size, "targets shouldn't be connected synchronously").toBe(0);
       queueMicrotask(() => {
-        assert.is(targets.size, 2);
-        assert.ok(targets.has(div2));
-        assert.ok(targets.has(div3));
+        expect(targets.size).toBe(1);
+        expect(targets.has(div1)).toBeTruthy();
 
-        dispose();
+        setRefs([div2, div3]);
+        queueMicrotask(() => {
+          expect(targets.size).toBe(2);
+          expect(targets.has(div2)).toBeTruthy();
+          expect(targets.has(div3)).toBeTruthy();
+
+          dispose();
+        });
       });
-    });
-  })
-);
-
-cro.run();
-
-const gws = suite("getWindowSize");
-
-gws("returns window size", () => {
-  // values predefined by jsdom
-  assert.equal(getWindowSize(), { width: 1024, height: 768 });
+    }));
 });
 
-gws.run();
-
-const ges = suite("getElementSize");
-
-ges("returns window size", () => {
-  assert.equal(getElementSize(div1), { width: 0, height: 0 });
-  assert.equal(getElementSize(undefined), { width: null, height: null });
+describe("getWindowSize", () => {
+  test("returns window size", () => {
+    // values predefined by jsdom
+    expect(getWindowSize()).toEqual({ width: 1024, height: 768 });
+  });
 });
 
-ges.run();
+describe("getElementSize", () => {
+  test("returns window size", () => {
+    expect(getElementSize(div1)).toEqual({ width: 0, height: 0 });
+    expect(getElementSize(undefined)).toEqual({ width: null, height: null });
+  });
+});
