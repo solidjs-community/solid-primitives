@@ -11,7 +11,7 @@
 
 A collection of helpers that aim to simplify using reactive primitives outside of reactive roots, and managing disposal of reactive roots.
 
-- [`createBranch`](#createBranch) - Creates a reactive **root branch**, that will be automatically disposed when it's owner does.
+- [`createSubRoot`](#createSubRoot) - Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
 - [`createCallback`](#createCallback) - A wrapper for creating callbacks with `runWithOwner`.
 - [`createDisposable`](#createDisposable) - For disposing computations early – before the root cleanup.
 - [`createSharedRoot`](#createSharedRoot) - Share "global primitives" across multiple reactive scopes.
@@ -24,7 +24,7 @@ npm install @solid-primitives/rootless
 yarn add @solid-primitives/rootless
 ```
 
-## `createBranch`
+## `createSubRoot`
 
 ###### Previously `createSubRoot`
 
@@ -35,10 +35,10 @@ Creates a reactive **root branch**, that will be automatically disposed when it'
 Use it for nested roots _(literally nested, or provided manually to dependency array)_ that should be disposed before or with their owner.
 
 ```ts
-import { createBranch } from "@solid-primitives/rootless";
+import { createSubRoot } from "@solid-primitives/rootless";
 
 createRoot(dispose => {
-  createBranch(disposeBranch => {
+  createSubRoot(disposeBranch => {
     // computations will be disposed with branch
     createEffect(() => {...});
 
@@ -54,7 +54,7 @@ createRoot(dispose => {
 ### Definition
 
 ```ts
-function createBranch<T>(fn: (dispose: VoidFunction) => T, ...owners: (Owner | null)[]): T;
+function createSubRoot<T>(fn: (dispose: VoidFunction) => T, ...owners: (Owner | null)[]): T;
 ```
 
 ## `createCallback`
@@ -95,7 +95,7 @@ For disposing computations early – before the root cleanup.
 
 ### How to use it
 
-Executes provided function in a [`createBranch`](#createBranch) _(auto-disposing root)_, and returns a dispose function, to dispose computations used inside before automatic cleanup.
+Executes provided function in a [`createSubRoot`](#createSubRoot) _(auto-disposing root)_, and returns a dispose function, to dispose computations used inside before automatic cleanup.
 
 ```ts
 const dispose = createDisposable(dispose => {
