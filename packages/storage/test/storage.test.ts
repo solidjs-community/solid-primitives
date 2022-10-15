@@ -1,14 +1,11 @@
 import { createRoot } from "solid-js";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { describe, expect, it } from "vitest";
+
 import { createAsyncStorage, createStorage, createStorageSignal } from "../src/storage";
-import { AsyncStorage } from "../src/types";
 
-const testCreateStorage = suite("createStorage");
-
-testCreateStorage.before(context => {
+describe("createStorage", () => {
   let data: Record<string, string> = {};
-  context.mockStorage = {
+  const mockStorage = {
     getItem: (key: string): string | null => data[key] ?? null,
     setItem: (key: string, value: string): void => {
       const oldValue = data[key];
@@ -18,7 +15,7 @@ testCreateStorage.before(context => {
           key,
           newValue: value,
           oldValue,
-          storageArea: context.mockStorage,
+          storageArea: mockStorage,
           url: window.document.URL
         })
       );
@@ -34,61 +31,55 @@ testCreateStorage.before(context => {
       return Object.keys(data).length;
     }
   };
+
+  it("creates a storage", () =>
+    createRoot(dispose => {
+      const [storage, setStorage, { remove, clear }] = createStorage({ api: mockStorage });
+      setStorage("test", "1");
+      mockStorage.setItem("test2", "2");
+      expect(storage.test).toBe(mockStorage.getItem("test"));
+      expect(storage.test).toBe("1");
+      expect(storage.test2).toBe("2");
+      remove("test2");
+      expect(storage.test2).toBe(null);
+      clear();
+      expect(mockStorage.length).toBe(0);
+      dispose();
+    }));
+
+  it("does not throw if not configured to", () =>
+    createRoot(dispose => {
+      const mockErrorStorage = {
+        ...mockStorage,
+        setItem: () => {
+          throw new Error("Throws");
+        }
+      };
+      const [_storage, setStorage, { error }] = createStorage({ api: mockErrorStorage });
+      expect(() => setStorage("test3", "1")).not.toThrow();
+      expect(error()).toBeInstanceOf(Error);
+    }));
+
+  it("does throw if configured to", () =>
+    createRoot(dispose => {
+      const mockErrorStorage = {
+        ...mockStorage,
+        setItem: () => {
+          throw new Error("Throws");
+        }
+      };
+      const [_storage, setStorage, { error }] = createStorage({
+        api: mockErrorStorage,
+        throw: true
+      });
+      expect(() => setStorage("test3", "1")).toThrow();
+      expect(error()).toBeInstanceOf(Error);
+    }));
 });
 
-testCreateStorage("creates a storage", ({ mockStorage }) =>
-  createRoot(dispose => {
-    const [storage, setStorage, { remove, clear }] = createStorage({ api: mockStorage });
-    setStorage("test", "1");
-    mockStorage.setItem("test2", "2");
-    assert.is(storage.test, mockStorage.getItem("test"));
-    assert.is(storage.test, "1");
-    assert.is(storage.test2, "2");
-    remove("test2");
-    assert.is(storage.test2, null);
-    clear();
-    assert.is(mockStorage.length, 0);
-    dispose();
-  })
-);
-
-testCreateStorage("does not throw if not configured to", ({ mockStorage }) =>
-  createRoot(dispose => {
-    const mockErrorStorage = {
-      ...mockStorage,
-      setItem: () => {
-        throw new Error("Throws");
-      }
-    };
-    const [_storage, setStorage, { error }] = createStorage({ api: mockErrorStorage });
-    assert.not.throws(() => setStorage("test3", "1"), "Throws", "error thrown unexpectedly");
-    assert.instance(error(), Error);
-  })
-);
-
-testCreateStorage("does throw if configured to", ({ mockStorage }) =>
-  createRoot(dispose => {
-    const mockErrorStorage = {
-      ...mockStorage,
-      setItem: () => {
-        throw new Error("Throws");
-      }
-    };
-    const [_storage, setStorage, { error }] = createStorage({ api: mockErrorStorage, throw: true });
-    assert.throws(() => setStorage("test3", "1"), "Throws", "error thrown unexpectedly");
-    assert.instance(error(), Error);
-  })
-);
-
-testCreateStorage.run();
-
-const testCreateAsyncStorage = suite<{
-  mockAsyncStorage: AsyncStorage;
-}>("createAsyncStorage");
-
-testCreateAsyncStorage.before(context => {
+describe("createAsyncStorage", () => {
   let data: Record<string, string> = {};
-  context.mockAsyncStorage = {
+  const mockAsyncStorage = {
     getItem: (key: string) => Promise.resolve(data[key] ?? null),
     setItem: (key: string, value: string): Promise<void> => {
       const oldValue = data[key];
@@ -98,7 +89,7 @@ testCreateAsyncStorage.before(context => {
           key,
           newValue: value,
           oldValue,
-          storageArea: context.mockAsyncStorage,
+          storageArea: mockAsyncStorage,
           url: window.document.URL
         })
       );
@@ -117,31 +108,28 @@ testCreateAsyncStorage.before(context => {
       return Object.keys(data).length;
     }
   };
+
+  it("creates an async storage", () =>
+    createRoot(async dispose => {
+      const [storage, setStorage, { remove, clear }] = createAsyncStorage({
+        api: mockAsyncStorage
+      });
+      await setStorage("test", "1" as any);
+      await mockAsyncStorage.setItem("test2", "2");
+      expect(await storage.test).toBe(await mockAsyncStorage.getItem("test"));
+      expect(await storage.test).toBe("1");
+      expect(await storage.test2).toBe("2");
+      await remove("test2");
+      expect(await storage.test2).toBe(null);
+      await clear();
+      expect(mockAsyncStorage.length).toBe(0);
+      dispose();
+    }));
 });
 
-testCreateAsyncStorage("creates an async storage", ({ mockAsyncStorage }) =>
-  createRoot(async dispose => {
-    const [storage, setStorage, { remove, clear }] = createAsyncStorage({ api: mockAsyncStorage });
-    await setStorage("test", "1");
-    await mockAsyncStorage.setItem("test2", "2");
-    assert.is(await storage.test, await mockAsyncStorage.getItem("test"));
-    assert.is(await storage.test, "1");
-    assert.is(await storage.test2, "2");
-    await remove("test2");
-    assert.is(await storage.test2, null);
-    await clear();
-    assert.is(mockAsyncStorage.length, 0);
-    dispose();
-  })
-);
-
-testCreateAsyncStorage.run();
-
-const testCreateStorageSignal = suite("createStorageSignal");
-
-testCreateStorageSignal.before(context => {
+describe("createStorageSignal", () => {
   let data: Record<string, string> = {};
-  context.mockStorage = {
+  const mockStorage = {
     getItem: (key: string): string | null => data[key] ?? null,
     setItem: (key: string, value: string): void => {
       data[key] = value;
@@ -157,13 +145,13 @@ testCreateStorageSignal.before(context => {
       return Object.keys(data).length;
     }
   };
-});
 
-testCreateStorageSignal("creates a signal", ({ mockStorage }) => {
-  const [storageItem, setStorageItem] = createStorageSignal<string | null>("test", null, {
-    api: mockStorage
+  it("creates a signal", () => {
+    const [storageItem, setStorageItem] = createStorageSignal<string | null>("test", null, {
+      api: mockStorage
+    });
+    expect(storageItem()).toBe(null);
+    setStorageItem("1");
+    expect(storageItem()).toBe("1");
   });
-  assert.is(storageItem(), null);
-  setStorageItem("1");
-  assert.is(storageItem(), "1");
 });

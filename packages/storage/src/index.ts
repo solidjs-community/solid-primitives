@@ -30,7 +30,7 @@ export {
   createLocalStorage,
   createCookieStorage,
   createSessionStorage,
-  CookieOptions,
+  type CookieOptions,
   cookieStorage,
   addClearMethod
 };
