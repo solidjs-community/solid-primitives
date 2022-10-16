@@ -8,8 +8,6 @@ interface Props {
   nonEvent: string;
 }
 
-const step = { at: "first" };
-
 describe("createEventDispatcher primitive test", () => {
   test("createEventDispatcher return values and callback execution", () =>
     createRoot(dispose => {

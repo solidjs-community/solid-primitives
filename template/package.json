@@ -21,6 +21,10 @@
     ],
     "category": "Display & Media"
   },
+  "keywords": [
+    "solid",
+    "primitives"
+  ],
   "private": false,
   "sideEffects": false,
   "files": [
@@ -60,10 +64,6 @@
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
-  "keywords": [
-    "solid",
-    "primitives"
-  ],
   "peerDependencies": {
     "solid-js": "^1.5.0"
   }
