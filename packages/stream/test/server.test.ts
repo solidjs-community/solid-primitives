@@ -3,7 +3,7 @@ import { createStream, createAmplitudeStream, createMediaPermissionRequest, crea
 
 describe("API doesn't break in SSR", () => {
   // check if the API doesn't throw when calling it in SSR
-  test("createFullScreen() - SSR", () => {
+  test("createStream() - SSR", () => {
     expect(createStream({ audio: true })[0]()).toBe(undefined);
   });
 
