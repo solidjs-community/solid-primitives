@@ -34,12 +34,23 @@ const createSocialShare = (
     title: "",
     description: ""
   }),
-  controller: Window = window
+  controller: Window = process.env.SSR ? globalThis as any : window
 ): [
   share: (network: Network | undefined) => void,
   close: () => void,
   isSharing: Accessor<boolean>
 ] => {
+  if (process.env.SSR) {
+    return [
+      () => {
+        /*noop*/
+      },
+      () => {
+        /*noop*/
+      },
+      () => false
+    ];
+  }
   const [isSharing, setIsSharing] = createSignal(false);
   let popupInterval: null | ReturnType<typeof setTimeout> = null;
   let popupWindow: null | Window;

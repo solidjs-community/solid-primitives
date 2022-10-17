@@ -1,4 +1,4 @@
-import { MaybeAccessor } from "@solid-primitives/utils";
+import { MaybeAccessor, noop } from "@solid-primitives/utils";
 import { createSignal, createMemo, Accessor, onCleanup } from "solid-js";
 
 /**
@@ -18,6 +18,9 @@ import { createSignal, createMemo, Accessor, onCleanup } from "solid-js";
 function createRAF(
   callback: FrameRequestCallback
 ): [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction] {
+  if (process.env.SSR) {
+    return [() => false, noop, noop];
+  }
   const [running, setRunning] = createSignal(false);
   let requestID = 0;
 
@@ -58,6 +61,9 @@ function targetFPS(
   callback: FrameRequestCallback,
   fps: MaybeAccessor<number>
 ): FrameRequestCallback {
+  if (process.env.SSR) {
+    return callback;
+  }
   const interval =
     typeof fps === "function"
       ? createMemo(() => Math.floor(1000 / (fps as Accessor<number>)()))
