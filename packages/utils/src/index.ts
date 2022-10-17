@@ -28,7 +28,7 @@ export * from "./types";
 //
 
 /** no operation */
-export const noop = (() => undefined) as Noop;
+export const noop = (() => void 0) as Noop;
 
 export const isServer: boolean = _isServer;
 export const isClient = !isServer;

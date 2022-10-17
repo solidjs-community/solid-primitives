@@ -72,14 +72,14 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
     return [
       Object.assign(() => undefined, { loading: true, error: undefined }) as Resource<
         MediaStream | undefined
-      >, 
+      >,
       {
         mutate: noop as Setter<MediaStream | undefined>,
-        refetch: (_info) => void 0,
+        refetch: _info => void 0,
         mute: noop,
-        stop: noop,
+        stop: noop
       }
-    ]
+    ];
   }
   const [stream, { mutate, refetch }] = createResource(
     createMemo<MediaStreamConstraints | undefined>(() =>
@@ -134,7 +134,7 @@ export const createAmplitudeStream = (
     stream: Resource<MediaStream | undefined>;
     stop: () => void;
   }
-] => {  
+] => {
   const [stream, { mutate, refetch, stop }] = createStream(streamSource);
   const [amplitude, amplitudeStop] = createAmplitudeFromStream(stream);
 
@@ -241,14 +241,14 @@ export const createScreen = (
     return [
       Object.assign(() => undefined, { loading: true, error: undefined }) as Resource<
         MediaStream | undefined
-      >, 
+      >,
       {
         mutate: noop as Setter<MediaStream | undefined>,
-        refetch: (_info) => void 0,
+        refetch: _info => void 0,
         mute: noop,
-        stop: noop,
+        stop: noop
       }
-    ]
+    ];
   }
   const [stream, { mutate, refetch }] = createResource(
     typeof screenSource === "function" ? createMemo(screenSource) : () => screenSource,
@@ -282,18 +282,19 @@ export const createScreen = (
  *
  * If no source is given, both microphone and camera permissions will be requested. You can read the permissions with the `createPermission` primitive from the `@solid-primitives/permission` package.
  */
-export const createMediaPermissionRequest = (source?: MediaStreamConstraints | "audio" | "video") => {
+export const createMediaPermissionRequest = (
+  source?: MediaStreamConstraints | "audio" | "video"
+) => {
   if (process.env.SSR) {
     return Promise.resolve();
   }
   return navigator.mediaDevices
     .getUserMedia(
       source
-      ? typeof source === "string"
-      ? { [source]: true }
-      : source
-      : { audio: true, video: true }
-      )
-      .then(stop);
-}
-    
+        ? typeof source === "string"
+          ? { [source]: true }
+          : source
+        : { audio: true, video: true }
+    )
+    .then(stop);
+};

@@ -1,4 +1,3 @@
-import { warn } from "@solid-primitives/utils";
 import { Accessor, createRoot, onCleanup, untrack } from "solid-js";
 import { abs, accessor, ceil, floor, min, RangeProps, toFunction } from "./common";
 
@@ -116,7 +115,7 @@ export function mapRange<T>(
   return () => {
     let _step = step();
     if (_step === 0) {
-      warn("Range cannot have a step of 0");
+      if (process.env.DEV) console.warn("Range cannot have a step of 0");
       return items;
     }
     let _start = start();

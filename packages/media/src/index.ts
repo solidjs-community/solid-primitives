@@ -23,6 +23,9 @@ export function makeMediaQueryListener(
   query: string | MediaQueryList,
   callback: (e: MediaQueryListEvent) => void
 ): VoidFunction {
+  if (process.env.SSR) {
+    return () => {};
+  }
   const mql = typeof query === "string" ? window.matchMedia(query) : query;
   return makeEventListener(mql, "change", callback);
 }
@@ -43,9 +46,12 @@ export function makeMediaQueryListener(
  */
 export const createMediaQuery = (
   query: string,
-  fallbackState?: boolean,
+  fallbackState: boolean = false,
   watchChange = true
 ): Accessor<boolean> => {
+  if (process.env.SSR) {
+    return () => fallbackState;
+  }
   const mql = window.matchMedia(query);
   if (!watchChange) return () => mql.matches;
   const [state, setState] = createSignal(mql.matches);
@@ -75,7 +81,7 @@ export function createBreakpoints<T extends Breakpoints>(
   breakpoints: T,
   options: BreakpointOptions<T> = {}
 ): Matches<T> {
-  if (!window.matchMedia)
+  if (process.env.SSR || !window.matchMedia)
     return options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints);
 
   const { mediaFeature = "min-width", watchChange = true } = options;
