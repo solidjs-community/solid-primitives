@@ -36,6 +36,15 @@ export const makeClipboard = (): [
   read: () => Promise<ClipboardItems | undefined>,
   newItem: NewClipboardItem
 ] => {
+  if (process.env.SSR) {
+    return [
+      async (_data: string | ClipboardItem[]) => {
+        /*noop*/
+      },
+      async () => Promise.resolve(undefined),
+      (_data, _type) => ({} as ClipboardItem)
+    ];
+  }
   const read = async () => await navigator.clipboard.read();
   const write: ClipboardSetter = async data => {
     typeof data === "string"
@@ -71,6 +80,15 @@ export const createClipboard = (
   refetch: VoidFunction,
   write: ClipboardSetter
 ] => {
+  if (process.env.SSR) {
+    return [
+      Object.assign(() => [], { loading: false, error: undefined }) as any,
+      () => {
+        /** noop */
+      },
+      (_value) => Promise.resolve()
+    ];
+  }
   const [write, readClipboard] = makeClipboard();
   const [clipboard, { refetch }] = createResource<any>(async () => {
     const items = (await readClipboard()) || [];
@@ -123,6 +141,9 @@ export const copyToClipboard = (
   el: HTMLElement | HTMLInputElement,
   options: MaybeAccessor<CopyToClipboardOptions>
 ) => {
+  if (process.env.SSR) {
+    return undefined;
+  }
   const setValue = () => {
     const opts: CopyToClipboardOptions = access(options);
     let data = opts.value;
