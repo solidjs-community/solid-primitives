@@ -4,6 +4,9 @@ import { createEventListener } from "@solid-primitives/event-listener";
 import { createSharedRoot } from "@solid-primitives/rootless";
 
 export function getScrollParent(node: Element | null): Element {
+  if (process.env.SSR) {
+    return ({} as Element);
+  }
   while (node && !isScrollable(node)) {
     node = node.parentElement;
   }
@@ -12,6 +15,9 @@ export function getScrollParent(node: Element | null): Element {
 }
 
 export function isScrollable(node: Element): boolean {
+  if (process.env.SSR) {
+    return false;
+  }
   const style = window.getComputedStyle(node);
   return /(auto|scroll)/.test(style.overflow + style.overflowX + style.overflowY);
 }
@@ -31,6 +37,9 @@ export function getScrollPosition(target: Element | Window | undefined): {
   x: number | null;
   y: number | null;
 } {
+  if (process.env.SSR) {
+    return { x: 0, y: 0 };
+  }
   if (!target) return { x: null, y: null };
   if (target instanceof Window)
     return {
@@ -75,6 +84,9 @@ export function createScrollPosition(
   readonly x: number | null;
   readonly y: number | null;
 } {
+  if (process.env.SSR) {
+    return { x: 0, y: 0 };
+  }
   const [pos, setPos] = createStaticStore(getScrollPosition(access(target)));
   const updatePos = () => setPos(getScrollPosition(access(target)));
   if (typeof target === "function") {

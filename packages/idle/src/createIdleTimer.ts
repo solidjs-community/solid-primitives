@@ -47,6 +47,15 @@ export const createIdleTimer = ({
   onPrompt,
   startManually = false
 }: IdleTimerOptions = {}): IdleTimerReturn => {
+  if (process.env.SSR) {
+    return {
+      isIdle: () => false,
+      isPrompted: () => false,
+      reset: () => {},
+      start: () => {},
+      stop: () => {}
+    };
+  }
   let listenersAreOn = false;
   const [isPrompted, setIsPrompted] = createSignal(false);
   const [isIdle, setIsIdle] = createSignal(false);

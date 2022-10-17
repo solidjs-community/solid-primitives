@@ -1,6 +1,6 @@
 import { createSignal, Accessor } from "solid-js";
 import { makeEventListener } from "@solid-primitives/event-listener";
-import { createStaticStore, forEachEntry } from "@solid-primitives/utils";
+import { createStaticStore, forEachEntry, noop } from "@solid-primitives/utils";
 import { getEmptyMatchesFromBreakpoints } from "./common";
 import { Breakpoints, BreakpointOptions, Matches } from "./types";
 import { createSharedRoot } from "@solid-primitives/rootless";
@@ -24,7 +24,7 @@ export function makeMediaQueryListener(
   callback: (e: MediaQueryListEvent) => void
 ): VoidFunction {
   if (process.env.SSR) {
-    return () => {};
+    return noop;
   }
   const mql = typeof query === "string" ? window.matchMedia(query) : query;
   return makeEventListener(mql, "change", callback);
@@ -117,7 +117,10 @@ export function createBreakpoints<T extends Breakpoints>(
  *    prefersDark() // => boolean
  * });
  */
-export const usePrefersDark: (serverFallback?: boolean) => Accessor<boolean> =
-  /*#__PURE__*/ createSharedRoot(
-    createMediaQuery.bind(null, "(prefers-color-scheme: dark)", false, true)
-  );
+export const usePrefersDark: (serverFallback?: boolean) => Accessor<boolean> = process.env.SSR
+  ? (fallback = false) =>
+      () =>
+        fallback
+  : /*#__PURE__*/ createSharedRoot(
+      createMediaQuery.bind(null, "(prefers-color-scheme: dark)", false, true)
+    );
