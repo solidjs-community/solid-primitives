@@ -399,3 +399,6 @@ export function handleDiffArray<T>(
     if (!prev.includes(currEl)) handleAdded(currEl);
   }
 }
+
+export const forEachEntry = <T>(obj: Record<string, T>, fn: (key: string, value: T) => void): void =>
+  Object.entries(obj).forEach(([key, value])=> fn(key, value));

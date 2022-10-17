@@ -23,7 +23,7 @@ import {
 import { DEFAULT_STATE, parseHandlersMap, toState, toStateActive } from "./helpers";
 
 export { getPositionToElement } from "./helpers";
-export {
+export type {
   PointerType,
   PointerState,
   PointerStateWithActive,
@@ -78,7 +78,10 @@ export function createPointerListeners(
   const addEventListener = (type: Many<keyof HTMLElementEventMap>, fn: Handler) =>
     createEventListener(target, type, guardCB(fn) as any, { passive });
 
-  forEachEntry(nativeHandlers, (name, fn) => fn && addEventListener(`pointer${name}`, fn));
+  forEachEntry(
+    nativeHandlers,
+    (name, fn) => fn && addEventListener(`pointer${name}` as keyof HTMLElementEventMap, fn)
+  );
   if (onGotCapture) addEventListener("gotpointercapture", onGotCapture);
   if (onLostCapture) addEventListener("lostpointercapture", onLostCapture);
 }

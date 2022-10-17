@@ -86,7 +86,7 @@ export function createBreakpoints<T extends Breakpoints>(
 
       forEachEntry(breakpoints, (token, width) => {
         const mql = window.matchMedia(`(${mediaFeature}: ${width})`);
-        matches[token] = mql.matches;
+        matches[token as keyof T] = mql.matches;
 
         if (watchChange) makeEventListener(mql, "change", e => setMatches(token, e.matches as any));
       });
