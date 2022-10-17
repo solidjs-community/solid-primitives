@@ -37,8 +37,6 @@ export const isClient = !isServer;
 export const isDev = DEV && isClient;
 /** production environment */
 export const isProd = !isDev;
-/** `console.warn` only during development */
-export const warn: typeof console.warn = (...a) => isDev && console.warn(...a);
 
 /**
  * Check if the value is an instance of ___
@@ -400,5 +398,7 @@ export function handleDiffArray<T>(
   }
 }
 
-export const forEachEntry = <T>(obj: Record<string, T>, fn: (key: string, value: T) => void): void =>
-  Object.entries(obj).forEach(([key, value])=> fn(key, value));
+export const forEachEntry = <T>(
+  obj: Record<string, T>,
+  fn: (key: string, value: T) => void
+): void => Object.entries(obj).forEach(([key, value]) => fn(key, value));
