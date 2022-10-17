@@ -1,53 +1,48 @@
 import "./setup";
 import { mockCoordinates } from "./setup";
 import { createRoot, createSignal } from "solid-js";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { describe, expect, it } from "vitest";
 
 import { createGeolocation, createGeolocationWatcher } from "../src/index";
 
-const testCG = suite("createGeolocation");
+describe("createGeolocation", () => {
+  it("test basic geolocation", () =>
+    createRoot(async dispose => {
+      const [location] = createGeolocation();
+      expect(location.loading).toBe(true);
+      await location.loading;
+      expect(location.loading).toBe(false);
+      expect(location()).toBe(mockCoordinates);
+      dispose();
+    })
+  );
 
-testCG("test basic geolocation", () =>
-  createRoot(async dispose => {
-    const [location] = createGeolocation();
-    assert.is(location.loading, true);
-    await location.loading;
-    assert.is(location.loading, false);
-    assert.is(location(), mockCoordinates);
-    dispose();
-  })
-);
+  it("test basic geolocation error", () =>
+    createRoot(async dispose => {
+      navigator.geolocation.getCurrentPosition = (_, reject: (error: any) => void) => {
+        reject({ code: 1, message: "GeoLocation error" });
+      };
+      const [location] = createGeolocation();
+      await location();
+      expect(location.loading).toBe(false);
+      expect(location.error).toBeInstanceOf(Error);
+      expect(location.error.code).toBe(1);
+      expect(location.error.message).toBe("GeoLocation error");
+      dispose();
+    })
+  );
+});
 
-testCG("test basic geolocation error", () =>
-  createRoot(async dispose => {
-    navigator.geolocation.getCurrentPosition = (_, reject: (error: any) => void) => {
-      reject({ code: 1, message: "GeoLocation error" });
-    };
-    const [location] = createGeolocation();
-    await location();
-    assert.is(location.loading, false);
-    assert.instance(location.error, Error);
-    assert.is(location.error.code, 1);
-    assert.is(location.error.message, "GeoLocation error");
-    dispose();
-  })
-);
-
-testCG.run();
-
-const testCGW = suite("createGeolocation");
-
-testCGW("test basic geolocation", () =>
-  createRoot(async dispose => {
-    const [enabled, setEnabled] = createSignal(false);
-    const watcher = createGeolocationWatcher(enabled);
-    assert.is(watcher.location, null);
-    assert.is(watcher.error, null);
-    await setEnabled(true);
-    assert.is(watcher.location, mockCoordinates);
-    dispose();
-  })
-);
-
-testCGW.run();
+describe("createGeolocation", () => {
+  it("test basic geolocation", () =>
+    createRoot(async dispose => {
+      const [enabled, setEnabled] = createSignal(false);
+      const watcher = createGeolocationWatcher(enabled);
+      expect(watcher.location).toBe(null);
+      expect(watcher.error).toBe(null);
+      await setEnabled(true);
+      expect(watcher.location).toBe(mockCoordinates);
+      dispose();
+    })
+  );
+});
