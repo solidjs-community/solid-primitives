@@ -65,6 +65,7 @@
     "solid-js": "^1.5.0"
   },
   "devDependencies": {
+    "solid-js": "^1.5.0",
     "typescript": "^4.8.2"
   }
 }
