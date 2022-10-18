@@ -198,7 +198,7 @@ export const createAudio = (
     createEffect(() => {
       const newSrc = access(src);
       if (newSrc instanceof HTMLAudioElement) {
-        setStore("player", newSrc);
+        setStore("player", () => newSrc);
       } else {
         store.player[typeof newSrc === "string" ? "src" : "srcObject"] = newSrc as string &
           MediaSource;
