@@ -11,7 +11,7 @@ import {
   untrack,
   Setter
 } from "solid-js";
-import { noop, type FalsyValue, type MaybeAccessor } from "@solid-primitives/utils";
+import { access, noop, type FalsyValue, type MaybeAccessor } from "@solid-primitives/utils";
 
 export type ResourceActions<T, O = {}> = ResourceReturn<T, O>[1];
 
@@ -83,9 +83,7 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
   }
   const [stream, { mutate, refetch }] = createResource(
     createMemo<MediaStreamConstraints | undefined>(() =>
-      constraintsFromDevice(
-        (typeof streamSource === "function" ? streamSource() : streamSource) || undefined
-      )
+      constraintsFromDevice(access(streamSource) || undefined)
     ),
     (constraints, info: ResourceFetcherInfo<MediaStream>): Promise<MediaStream> =>
       navigator.mediaDevices.getUserMedia(constraints).then(stream => {
@@ -182,7 +180,7 @@ export const createAmplitudeFromStream = (
 
   let source: MediaStreamAudioSourceNode;
   createEffect(() => {
-    const currentStream = typeof stream === "function" ? stream() : stream;
+    const currentStream = access(stream);
     if (currentStream !== undefined) {
       ctx.resume();
       source?.disconnect();
