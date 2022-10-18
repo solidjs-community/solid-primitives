@@ -1,3 +1,4 @@
+import { noop } from "@solid-primitives/utils";
 import { createSignal, JSX } from "solid-js";
 import { transformFiles, createInputComponent } from "./helpers";
 import { FileUploader, FileUploaderOptions, UploadFile, UserCallback } from "./types";
@@ -22,6 +23,14 @@ import { FileUploader, FileUploaderOptions, UploadFile, UserCallback } from "./t
  * ```
  */
 function createFileUploader(options?: FileUploaderOptions): FileUploader {
+  if (process.env.SSR) {
+    return {
+      files: () => [],
+      selectFiles: noop,
+      removeFile: noop,
+      clearFiles: noop
+    };
+  }
   const [files, setFiles] = createSignal<UploadFile[]>([]);
 
   let userCallback: UserCallback = () => {};

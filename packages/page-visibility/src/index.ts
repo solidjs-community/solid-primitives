@@ -14,6 +14,9 @@ import { createSharedRoot } from "@solid-primitives/rootless";
  * ```
  */
 export const createPageVisibility = (): Accessor<boolean> => {
+  if (process.env.SSR) {
+    return () => true;
+  }
   const [state, setState] = createSignal(document.visibilityState === "visible");
   const cb = () => setState(document.visibilityState === "visible");
   document.addEventListener("visibilitychange", cb);
@@ -35,4 +38,6 @@ export const createPageVisibility = (): Accessor<boolean> => {
  * })
  * ```
  */
-export const usePageVisibility = /*#__PURE__*/ createSharedRoot(createPageVisibility);
+export const usePageVisibility = process.env.SSR
+  ? /*#__PURE__*/ () => () => true
+  : /*#__PURE__*/ createSharedRoot(createPageVisibility);

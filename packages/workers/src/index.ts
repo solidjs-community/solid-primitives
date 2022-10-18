@@ -10,6 +10,14 @@ import { cjs, setup, KILL, RPC } from "./utils";
  * @returns An array with worker, start and stop methods
  */
 export function createWorker(...args: (Function | object)[]): WorkerExports {
+  if (process.env.SSR) {
+    return [
+      new EventTarget() as unknown as Worker,
+      () => {},
+      () => {},
+      new Set()
+    ]
+  }
   const exports = new Set<string>();
   let code = "";
   let options = {};
@@ -69,6 +77,13 @@ export const createWorkerPool = (
   concurrency: number = 1,
   ...args: (Function | object)[]
 ): WorkerExports => {
+  if (process.env.SSR) {
+    return [
+      new EventTarget() as unknown as Worker,
+      () => {},
+      () => {}
+    ]
+  }
   let current = -1;
   let workers: WorkerExports[] = [];
   const start = () => {
@@ -113,6 +128,16 @@ export type WorkerInstruction = {
 export const createSignaledWorker = (
   ...args: WorkerInstruction[]
 ): [start: () => void, stop: () => void] => {
+  if (process.env.SSR) {
+    return [
+      () => {
+        /*noop*/
+      },
+      () => {
+        /*noop*/
+      }
+    ];
+  }
   let fns = [];
   for (const i in args) {
     const { input, output, func } = args[i];

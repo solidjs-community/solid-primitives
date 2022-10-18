@@ -1,5 +1,6 @@
-const ua = navigator.userAgent;
-const w = window as any;
+const w = process.env.SSR ? { document: {}, navigator: { userAgent: '' } } : window as any;
+const n = w.navigator
+const ua = process.env.SSR ? '' : n.userAgent;
 
 //
 // Devices
@@ -18,7 +19,7 @@ export const isMac: boolean = /*#__PURE__*/ /(macintosh|macintel|macppc|mac68k|m
 export const isIPhone: boolean = /*#__PURE__*/ /iphone/i.test(ua);
 
 /** Is IPad Device */
-export const isIPad: boolean = /*#__PURE__*/ /ipad/i.test(ua) && navigator.maxTouchPoints > 1;
+export const isIPad: boolean = /*#__PURE__*/ /ipad/i.test(ua) && n.maxTouchPoints > 1;
 
 /** Is IPod Device */
 export const isIPod: boolean = /*#__PURE__*/ /ipod/i.test(ua);
@@ -49,7 +50,7 @@ export const isSafari: boolean =
   w.safari?.pushNotification + "" === "[object SafariRemoteNotification]";
 
 /** Browser is Internet Explorer 6-11 */
-export const isIE = /*@cc_on!@*/ false || !!(document as any).documentMode;
+export const isIE = /*@cc_on!@*/ false || !!(w.document as any).documentMode;
 
 /** is Chromium-based browser */
 export const isChromium: boolean = !!w.chrome;
@@ -59,7 +60,7 @@ export const isEdge: boolean = /*#__PURE__*/ /Edg/.test(ua) && isChromium;
 
 /** Browser is Chrome */
 export const isChrome: boolean =
-  isChromium && navigator.vendor === "Google Inc." && !isOpera && !isEdge;
+  isChromium && n.vendor === "Google Inc." && !isOpera && !isEdge;
 
 //
 // Rendering Engines

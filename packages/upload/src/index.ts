@@ -11,6 +11,9 @@ declare module "solid-js" {
 }
 
 export const fileUploader = (element: HTMLInputElement, options: () => FileUploaderDirective) => {
+  if (process.env.SSR) {
+    return;
+  }
   const { userCallback, setFiles } = options();
 
   onMount(() => {
