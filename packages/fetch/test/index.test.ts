@@ -279,7 +279,6 @@ describe("fetch primitive", () => {
         const [array] = createFetch<number[]>(url, { fetch: fetchMock }, [withAggregation()]);
         createEffect(() => {
           const data = array.error ? undefined : array();
-          console.log({ data });
           if (!data || data.length === 1) {
             setUrl(mockUrl);
           } else {
@@ -311,7 +310,6 @@ describe("fetch primitive", () => {
         ]);
         createEffect(() => {
           const data = array.error ? undefined : array();
-          console.log({ data });
           if (!data || !data["1"]) {
             setUrl(mockUrl);
           } else {
