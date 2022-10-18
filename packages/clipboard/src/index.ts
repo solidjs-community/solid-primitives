@@ -97,7 +97,8 @@ export const createClipboard = (
       return {
         async load(mime: string) {
           const blob = await item.getType(mime);
-          setData(blob.type == "text/plain" ? await blob.text() : blob);
+          const nextData = blob.type === "text/plain" ? await blob.text() : blob;
+          setData(() => nextData);
         },
         get type(): string {
           return getType();
