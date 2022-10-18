@@ -39,7 +39,8 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solid-primitives/composites": "workspace:^1.1.1"
+    "@solid-primitives/composites": "workspace:^1.1.1",
+    "typescript": "^4.8.2"
   },
   "peerDependencies": {
     "solid-js": "^1.5.0"

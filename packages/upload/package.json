@@ -69,5 +69,8 @@
   },
   "dependencies": {
     "@solid-primitives/utils": "^3.0.2"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.2"
   }
 }

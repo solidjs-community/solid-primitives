@@ -75,5 +75,8 @@
   ],
   "peerDependencies": {
     "solid-js": "^1.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.2"
   }
 }

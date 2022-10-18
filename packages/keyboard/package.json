@@ -78,5 +78,8 @@
     "@solid-primitives/event-listener": "workspace:^2.2.2",
     "@solid-primitives/rootless": "workspace:^1.1.3",
     "@solid-primitives/utils": "workspace:^3.0.2"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.2"
   }
 }

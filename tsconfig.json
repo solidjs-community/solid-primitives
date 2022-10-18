@@ -11,10 +11,17 @@
     "noUnusedLocals": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "types": ["node"]
   },
   "exclude": ["node_modules", "./packages/*/dist"],
-  "include": ["./packages/*/src", "./packages/*/test", "./packages/*/dev", "./env.d.ts"]
+  "include": [
+    "./packages/*/src",
+    "./packages/*/test",
+    "./packages/*/dev",
+    "./scripts",
+    "./env.d.ts"
+  ]
 }

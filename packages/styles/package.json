@@ -80,5 +80,8 @@
   "browser": {
     "./dist/server.cjs": "./dist/index.cjs",
     "./dist/server.js": "./dist/index.js"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.2"
   }
 }

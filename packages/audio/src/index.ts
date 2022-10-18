@@ -12,6 +12,17 @@ export enum AudioState {
   ERROR = "error"
 }
 
+export type AudioSource =
+  | string
+  | undefined
+  | HTMLAudioElement
+  | MediaSource
+  | (string & MediaSource);
+
+export type AudioEventHandlers = {
+  [K in keyof HTMLMediaElementEventMap]?: (event: HTMLMediaElementEventMap[K]) => void;
+};
+
 // Helper for producing the audio source
 const unwrapSource = (src: AudioSource) => {
   let player: HTMLAudioElement;

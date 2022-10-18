@@ -62,5 +62,8 @@
   "dependencies": {
     "@solid-primitives/debounce": "^1.3.0",
     "@solid-primitives/throttle": "^1.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.2"
   }
 }

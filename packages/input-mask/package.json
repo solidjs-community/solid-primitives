@@ -79,5 +79,8 @@
     "solid-js": {
       "optional": true
     }
+  },
+  "devDependencies": {
+    "typescript": "^4.8.2"
   }
 }
