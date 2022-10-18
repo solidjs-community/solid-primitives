@@ -51,10 +51,6 @@
       "require": "./dist/server.cjs"
     },
     "browser": {
-      "development": {
-        "import": "./dist/dev.js",
-        "require": "./dist/dev.cjs"
-      },
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
@@ -65,10 +61,6 @@
     "node": {
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
-    },
-    "development": {
-      "import": "./dist/dev.js",
-      "require": "./dist/dev.cjs"
     },
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"

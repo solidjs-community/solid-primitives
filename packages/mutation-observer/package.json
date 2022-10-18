@@ -23,8 +23,8 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
@@ -46,5 +46,37 @@
   },
   "dependencies": {
     "@solid-primitives/utils": "^3.0.2"
+  },
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
+  "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "development": {
+        "import": "./dist/dev.js",
+        "require": "./dist/dev.cjs"
+      },
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "development": {
+      "import": "./dist/dev.js",
+      "require": "./dist/dev.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
   }
 }

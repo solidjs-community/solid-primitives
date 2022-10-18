@@ -24,7 +24,7 @@
   "sideEffects": false,
   "type": "module",
   "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
   "exports": {
     "worker": {
@@ -32,6 +32,10 @@
       "require": "./dist/server.cjs"
     },
     "browser": {
+      "development": {
+        "import": "./dist/dev.js",
+        "require": "./dist/dev.cjs"
+      },
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
@@ -42,6 +46,10 @@
     "node": {
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
+    },
+    "development": {
+      "import": "./dist/dev.js",
+      "require": "./dist/dev.cjs"
     },
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
@@ -60,5 +68,9 @@
   ],
   "peerDependencies": {
     "solid-js": "^1.5.0"
+  },
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
   }
 }

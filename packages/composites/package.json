@@ -9,17 +9,7 @@
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
-  "primitive": {
-    "name": "composites",
-    "stage": 0,
-    "list": [
-      "createCompositeEffect",
-      "createCompositeComputed",
-      "createCompositeRenderEffect"
-    ],
-    "category": "Reactivity"
-  },
-  "private": false,
+  "private": true,
   "sideEffects": false,
   "files": [
     "dist"
@@ -53,9 +43,9 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "jiti ../../scripts/build.ts --ssr",
-    "test": "vitest -c ../../configs/vitest.config.ts",
-    "test:ssr": "pnpm run test --mode ssr"
+    "build": "echo \"NOOP build - composites package is deprecated\"",
+    "test": "echo \"NOOP test - composites package is deprecated\"",
+    "test:ssr": "echo \"NOOP test:ssr - composites package is deprecated\""
   },
   "keywords": [
     "watch",

@@ -10,7 +10,9 @@
     "solid",
     "primitives"
   ],
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "main": "./dist/server.cjs",
   "module": "./dist/server.js",
