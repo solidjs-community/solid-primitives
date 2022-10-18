@@ -1,11 +1,9 @@
-import "regenerator-runtime/runtime";
-
 // Implement mock ClipboardItem
 class ClipboardItem {
   value: any;
   type: string = "text/plain";
-  types: string[];
-  constructor(value) {
+  types: string[] = [];
+  constructor(value: any) {
     return (this.value = value);
   }
   text() {
@@ -21,8 +19,8 @@ class ClipboardItem {
 class Blob {
   value: any;
   type: string;
-  size: number;
-  constructor(value, { type }: { type: string }) {
+  size: number = 0;
+  constructor(value: any, { type }: { type: string }) {
     this.value = value[0];
     this.type = type;
   }
@@ -40,7 +38,9 @@ class Blob {
   }
 }
 
-let clipboardEntries: ClipboardItems = [new ClipboardItem("InitialValue")];
+let clipboardEntries: ClipboardItems = [
+  new ClipboardItem("InitialValue")
+] as unknown as ClipboardItems;
 export const getLastClipboardEntry = () => clipboardEntries[clipboardEntries.length - 1];
 
 const clipboard: typeof navigator.clipboard = {
@@ -52,7 +52,7 @@ const clipboard: typeof navigator.clipboard = {
   readText: async () => new Promise(res => res("Hello")),
   writeText: value =>
     new Promise(res => {
-      clipboardEntries = [new ClipboardItem(value)];
+      clipboardEntries = [new ClipboardItem(value)] as unknown as ClipboardItems;
       res();
     }),
   write: value =>

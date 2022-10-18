@@ -16,7 +16,7 @@ const EVENTS: EventTypeName[] = [
   "visibilitychange"
 ];
 /**
- * A primiive to observe the user's idle state and react to its changes.
+ * A primitive to observe the user's idle state and react to its changes.
  * @param - an objects that takes several variables and callbacks, all of them optionals
  * {
  *    @param params.events: EventTypeName[]`; a list of the DOM events that will be listened to in order to monitor the user's activity. The events must be of `ventTypeName type (that can be imported). It defaults to the events in the EVENTS constant.

@@ -1,10 +1,9 @@
 import "./setup";
-import { createEffect, createRoot, createSignal, on } from "solid-js";
-import { getLastClipboardEntry } from "./setup";
-import { createClipboard, copyToClipboard } from "../src";
-import { describe, expect, it } from 'vitest';
+import { createEffect, createRoot, on } from "solid-js";
+import { createClipboard } from "../src";
+import { describe, expect, it } from "vitest";
 
-const until = (value): Promise<void> =>
+const until = (value: any): Promise<void> =>
   new Promise(resolve => {
     const timeout = setTimeout(resolve, 2500);
     createRoot(dispose => {
@@ -33,6 +32,5 @@ describe("createClipboard", () => {
       await until(txt);
       expect(txt()).toBe("InitialValue");
       dispose();
-    })
-  );
+    }));
 });
