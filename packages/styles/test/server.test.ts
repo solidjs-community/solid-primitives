@@ -1,5 +1,5 @@
 import { describe, it } from "vitest"
 
-describe("createSocialShare", () => {
+describe("styles", () => {
   it.todo("write tests");
 });

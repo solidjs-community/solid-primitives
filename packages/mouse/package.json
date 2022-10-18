@@ -51,18 +51,7 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solid-primitives/raf": "workspace:^2.1.2",
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "solid-js": "^1.5.0",
-    "solid-register": "^0.2.5",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.3",
-    "unocss": "^0.45.15",
-    "uvu": "^0.5.6",
-    "vite": "^3.0.9",
-    "vite-plugin-solid": "^2.3.0",
-    "watchlist": "^0.3.1"
+    "@solid-primitives/raf": "workspace:^2.1.2"    
   },
   "peerDependencies": {
     "solid-js": "^1.5.0"

@@ -28,8 +28,8 @@
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "browser": {},
+  "types": "./dist/index.d.ts",
   "exports": {
     "browser": {
       "import": "./dist/index.js",

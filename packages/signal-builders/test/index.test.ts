@@ -1,10 +1,10 @@
-import { describe, test, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import { filterInstance, filterOutInstance, push, sort, template } from "../src";
 import { createRoot, createSignal } from "solid-js";
 import { compare } from "@solid-primitives/utils";
 
-describe("all primitives", () => {
-  test("composition", () =>
+describe("signal builders", () => {
+  it("push + sort", () =>
     createRoot(dispose => {
       const [list, setList] = createSignal([4, 3, 2, 1]);
       const [item, setItem] = createSignal(0);
@@ -16,7 +16,7 @@ describe("all primitives", () => {
       dispose();
     }));
 
-  test("filter instances", () =>
+  it("filter instances", () =>
     createRoot(dispose => {
       const num = 12345;
       const string = "hello";
@@ -29,19 +29,19 @@ describe("all primitives", () => {
       expect(a()).toEqual([num, el, svg]);
       const b = filterOutInstance(() => list, Element, Number);
       expect(b()).toEqual([string, string]);
-      expect(list, "nonmutable").toEqual(copy);
+      expect(list).toEqual(copy, "nonmutable");
       dispose();
     }));
 
-  test("teamplate", () =>
+  it("template", () =>
     createRoot(dispose => {
-      const [a] = createSignal("Hello");
+      const [a, setA] = createSignal("Hello");
       const [b, setB] = createSignal("World");
       const result = template`${a} ${b}!!!`;
-      expect(result()).toEqual("Hello World!!!");
+      expect(result()).toBe("Hello World!!!");
 
       setB("Solid");
-      expect(result()).toEqual("Hello Solid!!!");
+      expect(result()).toBe("Hello Solid!!!");
 
       dispose();
     }));

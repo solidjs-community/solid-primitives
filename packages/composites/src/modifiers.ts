@@ -51,7 +51,7 @@ export const atMost = createModifier<
   true
 >((s, callback, config, stop) => {
   const [count, setCount] = createSignal(0);
-  const _fn: EffectCallback<any, any> = (a, b, c) => {
+  const _fn: EffectCallback<any, any> = (a: any, b: any, c: any) => {
     setCount(p => p + 1);
     count() + 1 >= access(config.limit) && stop();
     return callback(a, b, c);
@@ -68,8 +68,8 @@ export const atMost = createModifier<
  * ```
  */
 export const debounce = createModifier<number>((s, fn, wait) => {
-  const [_fn, clear] = _debounce(fn, wait);
-  onCleanup(clear);
+  const _fn = _debounce(fn, wait);
+  onCleanup(_fn.clear);
   return [_fn, {}];
 });
 
@@ -158,7 +158,7 @@ export const ignorable = createModifier<
 >((s, fn) => {
   const [ignoringNext, setIgnoringNext] = createSignal(0);
   let ignoring = false;
-  const _fn: EffectCallback<any, any> = (a, b, c) => {
+  const _fn: EffectCallback<any, any> = (a: any, b: any, c: any) => {
     if (ignoring) return c;
     if (ignoringNext() > 0) {
       setIgnoringNext(p => p - 1);

@@ -1,5 +1,5 @@
 import { describe, it } from "vitest"
 
-describe("websocket", () => {
+describe("tween", () => {
   it.todo("needs to be tested");
 });
