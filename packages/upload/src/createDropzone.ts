@@ -4,7 +4,7 @@ import { transformFiles } from "./helpers";
 import { UploadFile, Dropzone, DropzoneOptions } from "./types";
 
 /**
- * Primitive to make working with dropzones easiere.
+ * Primitive to make working with dropzones easier.
  *
  * @returns `setRef`
  * @returns `files`
@@ -36,7 +36,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
       isDragging: () => false,
       removeFile: noop,
       clearFiles: noop
-    }
+    };
   }
   const [files, setFiles] = createSignal<UploadFile[]>([]);
   const [isDragging, setIsDragging] = createSignal(false);

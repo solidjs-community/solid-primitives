@@ -1,19 +1,16 @@
+import { describe, test, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
 import { createFileUploader } from "../src";
 
-const test = suite("createFileUploader");
+describe("createFileUploader", () => {
+  test("file upload", () => {
+    createRoot(dispose => {
+      const { files: file } = createFileUploader();
+      const { files } = createFileUploader({ multiple: true });
 
-test("file upload", () => {
-  createRoot(dispose => {
-    const { files: file, selectFiles: selectFile } = createFileUploader();
-    const { files, selectFiles } = createFileUploader({ multiple: true });
-
-    assert.equal(file(), []);
-    assert.equal(files(), []);
-    dispose();
+      expect(file()).toEqual([]);
+      expect(files()).toEqual([]);
+      dispose();
+    });
   });
 });
-
-test.run();

@@ -38,3 +38,6 @@ export default function createTween<T extends number>(
   );
   return current;
 }
+
+// TODO: in a major release, remove the default export
+export { createTween };

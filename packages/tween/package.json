@@ -17,15 +17,38 @@
     ],
     "category": "Animation"
   },
+  "keywords": [
+    "animate",
+    "tween",
+    "solid",
+    "primitives"
+  ],
   "files": [
     "dist"
   ],
+  "type": "module",
   "private": false,
   "sideEffects": false,
   "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
   "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
     "node": {
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
@@ -34,22 +57,9 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "jiti ../../scripts/build.ts --ssr --dev"
-  },
-  "keywords": [
-    "animate",
-    "tween",
-    "solid",
-    "primitives"
-  ],
-  "devDependencies": {
-    "@types/jest": "^27.5.2",
-    "prettier": "^2.7.1",
-    "solid-js": "^1.5.0",
-    "solid-testing-library": "^0.2.1",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.3",
-    "typescript": "^4.8.2"
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "peerDependencies": {
     "solid-js": "^1.5.0"
