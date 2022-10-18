@@ -19,7 +19,7 @@ declare module "solid-js" {
 }
 
 /**
- * Generates a simple non-reactive clipbaord primitive for reading and writing.
+ * Generates a simple non-reactive clipboard primitive for reading and writing.
  *
  * @return write - Async write to the clipboard
  * @return read - Async read from the clipboard
@@ -58,13 +58,12 @@ export const makeClipboard = (): [
  * Creates a new reactive primitive for managing the clipboard.
  *
  * @param data - Data signal to write to the clipboard.
- * @param deferInitial - Sets the value of the clipboard from the signal. defaulse to false.
+ * @param deferInitial - Sets the value of the clipboard from the signal. defaults to false.
  * @return Returns a resource representing the clipboard elements and children.
  *
- * @examplefindmy
+ * @example
  * const [data, setData] = createSignal('Foo bar');
  * const [ clipboard, read ] = createClipboard(data);
- * ```
  */
 export const createClipboard = (
   data?: Accessor<string | ClipboardItem[]>,
@@ -86,7 +85,7 @@ export const createClipboard = (
       () => {
         /** noop */
       },
-      (_value) => Promise.resolve()
+      _value => Promise.resolve()
     ];
   }
   const [write, readClipboard] = makeClipboard();
@@ -130,7 +129,7 @@ export const createClipboard = (
  * @param options - Options to supply the directive with:
  * - `value` — Value to override the clipboard with.
  * - `write` — Optional write method to use for the clipboard action.
- * - `highlight` — The higlight modifier to use for the current element.
+ * - `highlight` — The highlight modifier to use for the current element.
  *
  * @example
  * ```ts
@@ -177,7 +176,7 @@ export const newItem: NewClipboardItem = (type, data) => new ClipboardItem({ [ty
  * A modifier that highlights/selects a range on an HTML element.
  *
  * @param start - Starting point to highlight
- * @param end - Ening point to highlight
+ * @param end - Ending point to highlight
  * @returns Returns a modifier function.
  */
 export const element: Highlighter = (start: number = 0, end: number = 0) => {
@@ -196,7 +195,7 @@ export const element: Highlighter = (start: number = 0, end: number = 0) => {
  * A modifier that highlights/selects a range on an HTML input element.
  *
  * @param start - Starting point to highlight
- * @param end - Ening point to highlight
+ * @param end - Ending point to highlight
  * @returns Returns a modifier function.
  */
 export const input: Highlighter = (start?: number, end?: number) => {
