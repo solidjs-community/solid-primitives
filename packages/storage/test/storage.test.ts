@@ -74,6 +74,7 @@ describe("createStorage", () => {
       });
       expect(() => setStorage("test3", "1")).toThrow();
       expect(error()).toBeInstanceOf(Error);
+      dispose();
     }));
 });
 
@@ -134,11 +135,11 @@ describe("createStorageSignal", () => {
     setItem: (key: string, value: string): void => {
       data[key] = value;
     },
-    clear: () => {
-      data = {};
-    },
     removeItem: (key: string): void => {
       delete data[key];
+    },
+    clear: () => {
+      data = {};
     },
     key: (index: number): string => Object.keys(data)[index],
     get length(): number {
@@ -146,12 +147,13 @@ describe("createStorageSignal", () => {
     }
   };
 
-  it("creates a signal", () => {
+  it("creates a signal", () => createRoot(dispose => {
     const [storageItem, setStorageItem] = createStorageSignal<string | null>("test", null, {
       api: mockStorage
     });
     expect(storageItem()).toBe(null);
     setStorageItem("1");
     expect(storageItem()).toBe("1");
-  });
+    dispose()
+  }));
 });
