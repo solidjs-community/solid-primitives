@@ -15,33 +15,11 @@
   },
   "primitive": {
     "name": "platform",
-    "stage": 0,
+    "stage": 1,
     "list": [
       "List of variables"
     ],
     "category": "Utilities"
-  },
-  "private": false,
-  "sideEffects": false,
-  "type": "module",
-  "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    "node": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
-    },
-    "import": "./dist/index.js",
-    "require": "./dist/index.cjs"
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "start": "vite serve dev --host",
-    "dev": "npm run start",
-    "build": "jiti ../../scripts/build.ts --ssr --dev"
   },
   "keywords": [
     "solid",
@@ -50,17 +28,44 @@
     "device",
     "browser"
   ],
-  "devDependencies": {
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "solid-js": "^1.5.0",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.3",
-    "typescript": "^4.8.2",
-    "unocss": "^0.45.15",
-    "vite": "^3.0.9",
-    "vite-plugin-solid": "^2.3.0",
-    "watchlist": "^0.3.1"
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
+  "types": "./dist/index.d.ts",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
+  "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "dev": "npm run start",
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "peerDependencies": {
     "solid-js": "^1.5.0"
