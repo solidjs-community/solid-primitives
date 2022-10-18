@@ -106,27 +106,20 @@ describe("createEventListener", () => {
 
   test("accessor window target", () => {
     createRoot(dispose => {
-      const [target, setTarget] = createSignal<Window | []>(window);
+      const [target, setTarget] = createSignal<Window | []>(window, { name: "target" });
       const testEvent = new Event("test");
       let captured_times = 0;
-      createEventListener<{ test: Event }>(target, "test", ev => {
-        captured_times++;
-      });
+      createEventListener<{ test: Event }>(target, "test", ev => captured_times++);
       dispatchFakeEvent("test", testEvent);
       expect(captured_times, "event listener won't be added yet").toBe(0);
-
       setTimeout(() => {
         dispatchFakeEvent("test", testEvent);
         expect(captured_times).toBe(1);
-
         setTarget([]);
-
         setTimeout(() => {
           dispatchFakeEvent("test", testEvent);
           expect(captured_times).toBe(1);
-
           setTarget(window);
-
           setTimeout(() => {
             dispatchFakeEvent("test", testEvent);
             expect(captured_times).toBe(2);

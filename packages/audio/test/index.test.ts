@@ -13,8 +13,7 @@ describe("makeAudio", () => {
       expect(player._mock.paused).toBe(true);
       expect(player.src).toBe(testPath);
       dispose();
-    })
-  );
+    }));
 });
 
 describe("makeAudioPlayer", () => {
@@ -28,8 +27,7 @@ describe("makeAudioPlayer", () => {
       await pause();
       expect(player.paused).toBe(true);
       dispose();
-    })
-  );
+    }));
 
   it("test seek and volume", () =>
     createRoot(async dispose => {
@@ -39,17 +37,14 @@ describe("makeAudioPlayer", () => {
       setVolume(0.75);
       expect(player.volume).toBe(0.75);
       dispose();
-    })
-  );
+    }));
 
   it("test srcObject value path", () =>
     createRoot(dispose => {
       const { player } = makeAudioPlayer({} as MediaSource);
       expect(typeof player.srcObject).toBe("object");
       dispose();
-    })
-  );
-
+    }));
 });
 
 describe("createAudioPlayer", () => {
@@ -61,14 +56,13 @@ describe("createAudioPlayer", () => {
       [audio] = createAudio(() => media);
       expect(typeof audio.player.srcObject).toBe("object");
       dispose();
-    })
-  );
+    }));
 
   it("test basic reactive controls", () =>
     createRoot(async dispose => {
       const [playing, setPlaying] = createSignal(false);
       const [volume, setVolume] = createSignal(0.25);
-      const [audio, { play }] = createAudio("test.mp3", playing, volume);
+      const [audio] = createAudio("test.mp3", playing, volume);
       audio.player._mock._load(audio.player);
       expect(audio.player._mock.paused).toBe(true);
       await setPlaying(true);
@@ -77,6 +71,5 @@ describe("createAudioPlayer", () => {
       await setVolume(0.5);
       expect(audio.player.volume).toBe(0.5);
       dispose();
-    })
-  );
+    }));
 });

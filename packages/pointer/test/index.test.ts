@@ -1,8 +1,8 @@
 import { describe, it, test, expect } from "vitest";
-import { createRoot } from "solid-js";
+import { createRoot, createSignal } from "solid-js";
 import { createPointerListeners } from "../src";
 
-// const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 describe("createPointerListeners", () => {
   it("listens to pointer events", () =>
@@ -58,39 +58,39 @@ describe("createPointerListeners", () => {
 
   // there is something wrong with this test for some reason
 
-  // test("reactive target", async () =>
-  //   createRoot(async dispose => {
-  //     let captured_events = 0;
-  //     const move_event = new Event("pointermove");
-  //     const [target, setTarget] = createSignal<Window | undefined>(window);
+  test("reactive target", async () =>
+    createRoot(async dispose => {
+      let captured_events = 0;
+      const move_event = new Event("pointermove");
+      const [target, setTarget] = createSignal<Window | undefined>(window, { name: "target" });
 
-  //     createPointerListeners({
-  //       target,
-  //       onMove: e => captured_events++
-  //     });
+      createPointerListeners({
+        target,
+        onMove: e => captured_events++
+      });
 
-  //     window.dispatchEvent(move_event);
-  //     expect(captured_events, "listener will be added onMount").toBe(0);
+      window.dispatchEvent(move_event);
+      expect(captured_events, "listener will be added onMount").toBe(0);
 
-  //     await sleep(0);
+      await sleep(0);
 
-  //     window.dispatchEvent(move_event);
-  //     expect(captured_events).toBe(1);
+      window.dispatchEvent(move_event);
+      expect(captured_events).toBe(1);
 
-  //     setTarget();
+      setTarget();
 
-  //     await sleep(0);
+      await sleep(0);
 
-  //     window.dispatchEvent(move_event);
-  //     expect(captured_events).toBe(1);
+      window.dispatchEvent(move_event);
+      expect(captured_events).toBe(1);
 
-  //     setTarget(window);
+      setTarget(window);
 
-  //     await sleep(0);
+      await sleep(0);
 
-  //     window.dispatchEvent(move_event);
-  //     expect(captured_events).toBe(2);
+      window.dispatchEvent(move_event);
+      expect(captured_events).toBe(2);
 
-  //     dispose();
-  //   }));
+      dispose();
+    }));
 });
