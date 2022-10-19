@@ -268,7 +268,7 @@ export function createVisibilityObserver(
     const callback = getCallback(isVisible, setVisible);
     let prevEl: Element | FalsyValue;
 
-    if (typeof element === "function") {
+    if (element && !(element instanceof Element)) {
       createEffect(() => {
         const el = element();
         if (el === prevEl) return;
