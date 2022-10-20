@@ -1,5 +1,18 @@
 # @solid-primitives/bounds
 
+## 0.0.104
+
+### Patch Changes
+
+- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+- Updated dependencies [a372d0e7]
+- Updated dependencies [b662fe9f]
+- Updated dependencies [abb8063c]
+- Updated dependencies [abb8063c]
+  - @solid-primitives/utils@3.1.0
+  - @solid-primitives/event-listener@2.2.3
+  - @solid-primitives/resize-observer@2.0.5
+
 ## 0.0.102
 
 ### Patch Changes

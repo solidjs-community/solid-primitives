@@ -1,5 +1,16 @@
 # @solid-primitives/utils
 
+## 3.1.0
+
+### Minor Changes
+
+- a372d0e7: Remove `warn` and `noop` functions.
+
+### Patch Changes
+
+- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+- abb8063c: Remove `forEachEntry` utility
+
 ## 3.0.2
 
 ### Patch Changes

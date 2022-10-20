@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/i18n",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Primitive to create and use i18n primitives.",
   "author": "Alexandre Mouton-Brady <amoutonbrady@gmail.com>",
   "license": "MIT",

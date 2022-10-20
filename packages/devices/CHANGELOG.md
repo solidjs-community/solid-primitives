@@ -1,5 +1,11 @@
 # @solid-primitives/devices
 
+## 1.2.1
+
+### Patch Changes
+
+- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+
 ## 1.2.0
 
 ### Minor Changes
