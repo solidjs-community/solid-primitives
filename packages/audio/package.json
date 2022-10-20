@@ -66,13 +66,13 @@
   ],
   "devDependencies": {
     "solid-heroicons": "^2.0.3",
-    "solid-js": "^1.5.0",
+    "solid-js": "^1.6.0",
     "solid-testing-library": "^0.2.1"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^3.1.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.5.0"
+    "solid-js": "^1.6.0"
   }
 }

@@ -72,9 +72,9 @@
     "primitives"
   ],
   "devDependencies": {
-    "solid-js": "^1.5.0"
+    "solid-js": "^1.6.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.5.0"
+    "solid-js": "^1.6.0"
   }
 }

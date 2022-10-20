@@ -66,13 +66,13 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "devDependencies": {
-    "solid-js": "^1.5.0",
+    "solid-js": "^1.6.0",
     "solid-transition-group": "^0.0.8"
   },
   "dependencies": {
     "@solid-primitives/utils": "^3.1.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.5.0"
+    "solid-js": "^1.6.0"
   }
 }
