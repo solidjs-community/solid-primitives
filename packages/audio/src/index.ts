@@ -121,7 +121,7 @@ export const makeAudioPlayer = (
  * @return store - @type Store
  * @return store.state - Current state of the player
  * @return store.currentTime - Current time of the playhead
- * @return store.duration - Duratio of the audio player
+ * @return store.duration - Duration of the audio player
  *
  * @example
  * ```ts

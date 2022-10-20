@@ -57,15 +57,14 @@
     "@graphql-codegen/typed-document-node": "^2.3.3",
     "@graphql-codegen/typescript": "^2.7.3",
     "@graphql-codegen/typescript-operations": "^2.5.3",
-    "solid-js": "^1.5.0",
-    "typescript": "^4.8.2"
-  },
-  "peerDependencies": {
     "solid-js": "^1.5.0"
   },
   "dependencies": {
     "@graphql-typed-document-node/core": "^3.1.1",
     "@solid-primitives/utils": "^3.0.2",
     "graphql": "^16.6.0"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.5.0"
   }
 }

@@ -161,11 +161,6 @@ temp/
 # End of https://www.toptal.com/developers/gitignore/api/macos,node
 .vscode/settings.json
 
-# ignore lock files, only needed for apps, not libs
-*lock.json
-*lock.yaml
-*.lock
-
 tsup.config.bundled*.mjs
 
 # turbo

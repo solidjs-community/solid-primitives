@@ -51,11 +51,10 @@
   "dependencies": {
     "@solid-primitives/utils": "workspace:^3.0.2"
   },
-  "peerDependencies": {
+  "devDependencies": {
     "solid-js": "^1.5.0"
   },
-  "devDependencies": {
-    "solid-js": "^1.5.0",
-    "typescript": "^4.8.2"
+  "peerDependencies": {
+    "solid-js": "^1.5.0"
   }
 }
