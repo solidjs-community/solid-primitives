@@ -1,5 +1,19 @@
 # @solid-primitives/resize-observer
 
+## 2.0.5
+
+### Patch Changes
+
+- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+- Updated dependencies [e36ed229]
+- Updated dependencies [a372d0e7]
+- Updated dependencies [b662fe9f]
+- Updated dependencies [abb8063c]
+- Updated dependencies [abb8063c]
+  - @solid-primitives/rootless@1.2.0
+  - @solid-primitives/utils@3.1.0
+  - @solid-primitives/event-listener@2.2.3
+
 ## 2.0.4
 
 ### Patch Changes

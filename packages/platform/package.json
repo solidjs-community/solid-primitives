@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/platform",
-  "version": "0.0.101",
+  "version": "0.0.102",
   "description": "A set of const boolean variables identifying device and browser type.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],

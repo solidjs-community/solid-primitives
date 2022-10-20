@@ -1,5 +1,16 @@
 # @solid-primitives/event-listener
 
+## 2.2.3
+
+### Patch Changes
+
+- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+- abb8063c: Prevent `makeEventListener` from displaying a warning if used outside of a reactive root
+- Updated dependencies [a372d0e7]
+- Updated dependencies [b662fe9f]
+- Updated dependencies [abb8063c]
+  - @solid-primitives/utils@3.1.0
+
 ## 2.2.2
 
 ### Patch Changes

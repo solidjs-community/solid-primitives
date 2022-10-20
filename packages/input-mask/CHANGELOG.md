@@ -1,5 +1,11 @@
 # @solid-primitives/input-mask
 
+## 0.1.4
+
+### Patch Changes
+
+- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+
 ## 0.1.3
 
 ### Patch Changes

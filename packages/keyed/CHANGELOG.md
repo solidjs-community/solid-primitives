@@ -1,5 +1,12 @@
 # @solid-primitives/keyed
 
+## 1.1.3
+
+### Patch Changes
+
+- e85269d6: Remove deprication warning from the `<Rerun>` component
+- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+
 ## 1.1.2
 
 ### Patch Changes

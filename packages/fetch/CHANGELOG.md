@@ -1,5 +1,11 @@
 # @solid-primitives/fetch
 
+## 2.4.2
+
+### Patch Changes
+
+- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+
 ## 2.4.1
 
 ### Patch Changes

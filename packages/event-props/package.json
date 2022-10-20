@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-props",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Primitive to manage events in a reactive way.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
