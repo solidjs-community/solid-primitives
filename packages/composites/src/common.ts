@@ -92,6 +92,6 @@ export const createComputationWatcher = <O extends Object>(
     Object.assign(returns, _returns);
     return _fn;
   }, initialCallback);
-  const _fn: EffectCallback<any, any> = (a, b, c) => (!disposed ? fn(a, b, c) : c);
-  return [returns, computation(on(source, _fn, options), options.value, options)];
+  const _fn: EffectCallback<any, any> = (a: any, b: any, c: any) => (!disposed ? fn(a, b, c) : c);
+  return [returns, computation(on(source, _fn, options as any), options.value, options)];
 };

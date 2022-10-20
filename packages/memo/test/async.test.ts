@@ -1,60 +1,57 @@
-import { createAsyncMemo } from "../src";
+import { describe, test, expect } from "vitest";
 import { createRoot, createSignal } from "solid-js";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { createAsyncMemo } from "../src";
 
-const test = suite("createAsyncMemo");
-
-test("resolves synchronous functions", () =>
-  createRoot(dispose => {
-    const [count, setCount] = createSignal(0);
-    const memo = createAsyncMemo(count);
-    assert.is(count(), memo());
-    setCount(1);
-    assert.is(count(), memo());
-    dispose();
-  }));
-
-test("resolves asynchronous functions", () =>
-  createRoot(dispose => {
-    const [count, setCount] = createSignal(0);
-    const memo = createAsyncMemo(
-      () =>
-        new Promise(res => {
-          const n = count();
-          setTimeout(() => res(n), 0);
-        })
-    );
-    assert.is(memo(), undefined);
-    setCount(1);
-    assert.is(memo(), undefined);
-    setTimeout(() => {
-      assert.is(count(), memo());
+describe("createAsyncMemo", () => {
+  test("resolves synchronous functions", () =>
+    createRoot(dispose => {
+      const [count, setCount] = createSignal(0);
+      const memo = createAsyncMemo(count);
+      expect(count()).toBe(memo());
+      setCount(1);
+      expect(count()).toBe(memo());
       dispose();
-    }, 0);
-  }));
+    }));
 
-test("preserves order of execution", () =>
-  createRoot(dispose => {
-    const [count, setCount] = createSignal(0);
-    let first = true;
-    const memo = createAsyncMemo(
-      () =>
-        new Promise(res => {
-          const n = count();
-          if (first) {
-            first = false;
-            setTimeout(() => res(n), 100);
-          } else {
+  test("resolves asynchronous functions", () =>
+    createRoot(dispose => {
+      const [count, setCount] = createSignal(0);
+      const memo = createAsyncMemo(
+        () =>
+          new Promise(res => {
+            const n = count();
             setTimeout(() => res(n), 0);
-          }
-        })
-    );
-    setCount(1);
-    setTimeout(() => {
-      assert.is(memo(), 1);
-      dispose();
-    }, 100);
-  }));
+          })
+      );
+      expect(memo()).toBe(undefined);
+      setCount(1);
+      expect(memo()).toBe(undefined);
+      setTimeout(() => {
+        expect(count()).toBe(memo());
+        dispose();
+      }, 0);
+    }));
 
-test.run();
+  test("preserves order of execution", () =>
+    createRoot(dispose => {
+      const [count, setCount] = createSignal(0);
+      let first = true;
+      const memo = createAsyncMemo(
+        () =>
+          new Promise(res => {
+            const n = count();
+            if (first) {
+              first = false;
+              setTimeout(() => res(n), 100);
+            } else {
+              setTimeout(() => res(n), 0);
+            }
+          })
+      );
+      setCount(1);
+      setTimeout(() => {
+        expect(memo()).toBe(1);
+        dispose();
+      }, 100);
+    }));
+});

@@ -1,123 +1,120 @@
-import { createMemoCache } from "../src";
+import { describe, test, expect } from "vitest";
 import { createRoot, createSignal } from "solid-js";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { createMemoCache } from "../src";
 
-const test = suite("createMemoCache");
+describe("createMemoCache", () => {
+  test("cashes values by key", () =>
+    createRoot(dispose => {
+      const [count, setCount] = createSignal(0);
 
-test("cashes values by key", () =>
-  createRoot(dispose => {
-    const [count, setCount] = createSignal(0);
-
-    let runs = 0;
-    const result = createMemoCache(count, n => {
-      runs++;
-      return n;
-    });
-
-    assert.is(runs, 0);
-    assert.is(result(), 0);
-    assert.is(runs, 1);
-
-    setCount(1);
-    assert.is(runs, 1);
-    assert.is(result(), 1);
-    assert.is(runs, 2);
-
-    setCount(0);
-    assert.is(runs, 2);
-    assert.is(result(), 0);
-    assert.is(runs, 2);
-
-    setCount(1);
-    assert.is(runs, 2);
-    assert.is(result(), 1);
-    assert.is(runs, 2);
-
-    dispose();
-  }));
-
-test("passing key to access function", () =>
-  createRoot(dispose => {
-    let runs = 0;
-    const result = createMemoCache((n: number) => {
-      runs++;
-      return n;
-    });
-
-    assert.is(runs, 0);
-    assert.is(result(0), 0);
-    assert.is(runs, 1);
-
-    assert.is(result(1), 1);
-    assert.is(runs, 2);
-
-    assert.is(result(0), 0);
-    assert.is(runs, 2);
-
-    assert.is(result(1), 1);
-    assert.is(runs, 2);
-
-    dispose();
-  }));
-
-test("reactive signal dependency", () =>
-  createRoot(dispose => {
-    const [dep, setDep] = createSignal(0);
-
-    let runs = 0;
-    const result = createMemoCache((n: number) => {
-      runs++;
-      return n + dep();
-    });
-
-    assert.is(runs, 0);
-    assert.is(result(0), 0);
-    assert.is(runs, 1);
-
-    assert.is(result(1), 1);
-    assert.is(runs, 2);
-
-    assert.is(result(0), 0);
-    assert.is(runs, 2);
-
-    assert.is(result(1), 1);
-    assert.is(runs, 2);
-
-    setDep(1);
-    assert.is(runs, 2);
-    assert.is(result(0), 1);
-    assert.is(result(1), 2);
-    assert.is(runs, 4);
-
-    dispose();
-  }));
-
-test("limit cache size", () =>
-  createRoot(dispose => {
-    let runs = 0;
-    const result = createMemoCache(
-      (n: number) => {
+      let runs = 0;
+      const result = createMemoCache(count, n => {
         runs++;
         return n;
-      },
-      { size: 1 }
-    );
+      });
 
-    assert.is(runs, 0);
-    assert.is(result(0), 0);
-    assert.is(runs, 1);
+      expect(runs).toBe(0);
+      expect(result()).toBe(0);
+      expect(runs).toBe(1);
 
-    assert.is(result(1), 1);
-    assert.is(runs, 2);
+      setCount(1);
+      expect(runs).toBe(1);
+      expect(result()).toBe(1);
+      expect(runs).toBe(2);
 
-    assert.is(result(0), 0);
-    assert.is(runs, 2);
+      setCount(0);
+      expect(runs).toBe(2);
+      expect(result()).toBe(0);
+      expect(runs).toBe(2);
 
-    assert.is(result(1), 1);
-    assert.is(runs, 3);
+      setCount(1);
+      expect(runs).toBe(2);
+      expect(result()).toBe(1);
+      expect(runs).toBe(2);
 
-    dispose();
-  }));
+      dispose();
+    }));
 
-test.run();
+  test("passing key to access function", () =>
+    createRoot(dispose => {
+      let runs = 0;
+      const result = createMemoCache((n: number) => {
+        runs++;
+        return n;
+      });
+
+      expect(runs).toBe(0);
+      expect(result(0)).toBe(0);
+      expect(runs).toBe(1);
+
+      expect(result(1)).toBe(1);
+      expect(runs).toBe(2);
+
+      expect(result(0)).toBe(0);
+      expect(runs).toBe(2);
+
+      expect(result(1)).toBe(1);
+      expect(runs).toBe(2);
+
+      dispose();
+    }));
+
+  test("reactive signal dependency", () =>
+    createRoot(dispose => {
+      const [dep, setDep] = createSignal(0);
+
+      let runs = 0;
+      const result = createMemoCache((n: number) => {
+        runs++;
+        return n + dep();
+      });
+
+      expect(runs).toBe(0);
+      expect(result(0)).toBe(0);
+      expect(runs).toBe(1);
+
+      expect(result(1)).toBe(1);
+      expect(runs).toBe(2);
+
+      expect(result(0)).toBe(0);
+      expect(runs).toBe(2);
+
+      expect(result(1)).toBe(1);
+      expect(runs).toBe(2);
+
+      setDep(1);
+      expect(runs).toBe(2);
+      expect(result(0)).toBe(1);
+      expect(result(1)).toBe(2);
+      expect(runs).toBe(4);
+
+      dispose();
+    }));
+
+  test("limit cache size", () =>
+    createRoot(dispose => {
+      let runs = 0;
+      const result = createMemoCache(
+        (n: number) => {
+          runs++;
+          return n;
+        },
+        { size: 1 }
+      );
+
+      expect(runs).toBe(0);
+      expect(result(0)).toBe(0);
+      expect(runs).toBe(1);
+
+      expect(result(1)).toBe(1);
+      expect(runs).toBe(2);
+
+      expect(result(0)).toBe(0);
+      expect(runs).toBe(2);
+
+      expect(result(1)).toBe(1);
+      expect(runs).toBe(3);
+
+      dispose();
+    }));
+});

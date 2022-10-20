@@ -1,5 +1,5 @@
 import { makeEventListenerStack } from "@solid-primitives/event-listener";
-import { Position, clamp } from "@solid-primitives/utils";
+import { Position, clamp, noop } from "@solid-primitives/utils";
 import {
   FollowTouchOptions,
   MousePosition,
@@ -44,6 +44,9 @@ export function makeMousePositionListener(
   callback: (position: MousePosition) => void,
   options: UseTouchOptions & FollowTouchOptions = {}
 ): VoidFunction {
+  if (process.env.SSR) {
+    return noop;
+  }
   const { touch = true, followTouch = true } = options;
   const [listen, clear] = makeEventListenerStack(target, PASSIVE);
 
@@ -78,6 +81,9 @@ export function makeMouseInsideListener(
   callback: (isInside: boolean) => void,
   options: UseTouchOptions = {}
 ): VoidFunction {
+  if (process.env.SSR) {
+    return noop;
+  }
   const { touch = true } = options;
   const [listen, clear] = makeEventListenerStack(target, PASSIVE);
 
@@ -109,6 +115,9 @@ export const getPositionToElement = (
   pageY: number,
   el: Element
 ): PositionRelativeToElement => {
+  if (process.env.SSR) {
+    return DEFAULT_RELATIVE_ELEMENT_POSITION;
+  }
   const bounds = el.getBoundingClientRect(),
     top = bounds.top + window.scrollY,
     left = bounds.left + window.scrollX,
@@ -134,6 +143,9 @@ export const getPositionInElement = (
   pageY: number,
   el: Element
 ): PositionRelativeToElement => {
+  if (process.env.SSR) {
+    return DEFAULT_RELATIVE_ELEMENT_POSITION;
+  }
   const relative = getPositionToElement(pageX, pageY, el);
   return {
     ...relative,
@@ -145,7 +157,9 @@ export const getPositionInElement = (
 /**
  * Turn position relative to the page, into position relative to the screen.
  */
-export const getPositionToScreen = (pageX: number, pageY: number): Position => ({
-  x: pageX - window.scrollX,
-  y: pageY - window.screenY
-});
+export const getPositionToScreen = process.env.SSR
+  ? (_pageX: number, _pageY: number): Position => DEFAULT_MOUSE_POSITION
+  : (pageX: number, pageY: number): Position => ({
+    x: pageX - window.scrollX,
+    y: pageY - window.screenY
+  });

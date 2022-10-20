@@ -1,220 +1,201 @@
-import { createEventStack } from "../src";
+import { describe, test, expect } from "vitest";
 import { createComputed, createRoot } from "solid-js";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { createEventStack } from "../src";
 
-const test = suite("createEventStack");
+describe("createEventStack", () => {
+  test("emitting and listening", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      let capturedStack: any[] = [];
+      let allowRemove = false;
 
-test("return values", () =>
-  createRoot(dispose => {
-    const emitter = createEventStack();
+      const { listen, emit, stack } = createEventStack<[string]>();
 
-    assert.type(emitter.clear, "function");
-    assert.type(emitter.emit, "function");
-    assert.type(emitter.has, "function");
-    assert.type(emitter.listen, "function");
-    assert.type(emitter.remove, "function");
-    assert.type(emitter.stack, "function");
-    assert.type(emitter.setStack, "function");
-    assert.type(emitter.removeFromStack, "function");
+      listen((e, stack, remove) => {
+        captured.push(e[0]);
+        capturedStack = stack;
+        if (allowRemove) remove();
+      });
 
-    dispose();
-  }));
+      emit(["foo"]);
+      expect(captured[0]).toBe("foo");
+      expect(capturedStack.length).toBe(1);
+      expect(stack().length).toBe(1);
 
-test("emitting and listening", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    let capturedStack: any[] = [];
-    let allowRemove = false;
+      emit(["bar"]);
+      expect(captured[1]).toBe("bar");
+      expect(capturedStack.length).toBe(2);
+      expect(stack().length).toBe(2);
 
-    const { listen, emit, stack } = createEventStack<[string]>();
+      allowRemove = true;
+      emit(["baz"]);
+      expect(captured[2]).toBe("baz");
+      expect(capturedStack.length).toBe(3);
+      expect(stack().length).toBe(2);
 
-    listen((e, stack, remove) => {
-      captured.push(e[0]);
-      capturedStack = stack;
-      if (allowRemove) remove();
-    });
+      dispose();
+    }));
+
+  test("clear function", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const { listen, emit, clear } = createEventStack<{ text: string }>();
+
+      listen(a => captured.push(a));
+
+      clear();
+
+      emit({ text: "foo" });
+      expect(captured.length).toBe(0);
+
+      dispose();
+    }));
+
+  test("clears on dispose", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const { listen, emit } = createEventStack<{ text: string }>();
+
+      listen(a => captured.push(a));
+
+      dispose();
+
+      emit({ text: "foo" });
+      expect(captured.length).toBe(0);
+    }));
+
+  test("remove()", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const { listen, emit, remove } = createEventStack<[string]>();
+
+      const listener = (a: [string]) => captured.push(a[0]);
+      listen(listener);
+
+      remove(listener);
+
+      emit(["foo"]);
+      expect(captured.length).toBe(0);
+
+      const unsub = listen(listener);
+      unsub();
+
+      emit(["bar"]);
+      expect(captured.length).toBe(0);
+
+      dispose();
+    }));
+
+  test("remove protected", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const { listen, emit, remove } = createEventStack<[string]>();
+
+      const listener = (a: [string]) => captured.push(a[0]);
+      const unsub = listen(listener, true);
+
+      remove(listener);
+
+      emit(["foo"]);
+      expect(captured, "normal remove() shouldn't remove a protected listener").toEqual(["foo"]);
+
+      unsub();
+
+      emit(["bar"]);
+      expect(captured, "returned unsub func should remove a protected listener").toEqual(["foo"]);
+
+      dispose();
+    }));
+
+  test("has()", () =>
+    createRoot(dispose => {
+      const { listen, has } = createEventStack<[string]>();
+
+      const listener = () => {};
+      expect(has(listener)).toBe(false);
+      const unsub = listen(listener);
+      expect(has(listener)).toBe(true);
+      unsub();
+      expect(has(listener)).toBe(false);
+
+      dispose();
+    }));
+
+  test("stack", () => {
+    const { emit, stack, removeFromStack, setStack } = createEventStack<[string]>();
+
+    expect(stack()).toEqual([]);
 
     emit(["foo"]);
-    assert.is(captured[0], "foo");
-    assert.is(capturedStack.length, 1);
-    assert.is(stack().length, 1);
+    expect(stack()).toEqual([["foo"]]);
 
-    emit(["bar"]);
-    assert.is(captured[1], "bar");
-    assert.is(capturedStack.length, 2);
-    assert.is(stack().length, 2);
+    const x: [string] = ["bar"];
 
-    allowRemove = true;
-    emit(["baz"]);
-    assert.is(captured[2], "baz");
-    assert.is(capturedStack.length, 3);
-    assert.is(stack().length, 2);
+    emit(x);
+    expect(stack()).toEqual([["foo"], ["bar"]]);
 
-    dispose();
-  }));
+    expect(removeFromStack(x)).toBe(true);
+    expect(removeFromStack(["hello"])).toBe(false);
+    expect(stack().length).toBe(1);
 
-test("clear function", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const { listen, emit, clear } = createEventStack<{ text: string }>();
+    const y: [string][] = [["0"], ["1"]];
+    setStack(y);
+    expect(stack()).toEqual(y);
+  });
 
-    listen(a => captured.push(a));
+  test("stack is reactive", () =>
+    createRoot(dispose => {
+      const { emit, stack } = createEventStack<{ t: string }>();
+      let captured: any;
+      createComputed(() => {
+        captured = stack();
+      });
 
-    clear();
+      expect(captured).toEqual([]);
 
-    emit({ text: "foo" });
-    assert.is(captured.length, 0);
+      emit({ t: "foo" });
+      expect(captured).toEqual([{ t: "foo" }]);
 
-    dispose();
-  }));
+      emit({ t: "bar" });
+      expect(captured).toEqual([{ t: "foo" }, { t: "bar" }]);
 
-test("clears on dispose", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const { listen, emit } = createEventStack<{ text: string }>();
+      dispose();
+    }));
 
-    listen(a => captured.push(a));
+  test("config options", () =>
+    createRoot(dispose => {
+      let allowEmit = true;
+      let allowRemove = false;
 
-    dispose();
+      const capturedBeforeEmit: { text: string }[] = [];
 
-    emit({ text: "foo" });
-    assert.is(captured.length, 0);
-  }));
+      const { listen, has, remove, emit, stack } = createEventStack<string, { text: string }>({
+        beforeEmit: a => capturedBeforeEmit.push(a),
+        emitGuard: (emit, ...payload) => allowEmit && emit(...payload),
+        removeGuard: remove => allowRemove && remove(),
+        toValue: e => ({ text: e })
+      });
+      const listener = () => {};
 
-test("remove()", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const { listen, emit, remove } = createEventStack<[string]>();
+      let unsub = listen(listener);
+      remove(listener);
+      expect(has(listener), "removing should fail").toBe(true);
+      unsub();
+      expect(has(listener)).toBe(false);
 
-    const listener = (a: [string]) => captured.push(a[0]);
-    listen(listener);
+      listen(listener);
+      allowRemove = true;
+      remove(listener);
+      expect(has(listener)).toBe(false);
 
-    remove(listener);
+      emit("foo");
+      expect(capturedBeforeEmit).toEqual([{ text: "foo" }]);
+      allowEmit = false;
+      emit("bar");
+      expect(capturedBeforeEmit).toEqual([{ text: "foo" }]);
 
-    emit(["foo"]);
-    assert.is(captured.length, 0);
+      expect(stack()).toEqual([{ text: "foo" }]);
 
-    const unsub = listen(listener);
-    unsub();
-
-    emit(["bar"]);
-    assert.is(captured.length, 0);
-
-    dispose();
-  }));
-
-test("remove protected", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const { listen, emit, remove } = createEventStack<[string]>();
-
-    const listener = (a: [string]) => captured.push(a[0]);
-    const unsub = listen(listener, true);
-
-    remove(listener);
-
-    emit(["foo"]);
-    assert.equal(captured, ["foo"], "normal remove() shouldn't remove a protected listener");
-
-    unsub();
-
-    emit(["bar"]);
-    assert.equal(captured, ["foo"], "returned unsub func should remove a protected listener");
-
-    dispose();
-  }));
-
-test("has()", () =>
-  createRoot(dispose => {
-    const { listen, has } = createEventStack<[string]>();
-
-    const listener = () => {};
-    assert.is(has(listener), false);
-    const unsub = listen(listener);
-    assert.is(has(listener), true);
-    unsub();
-    assert.is(has(listener), false);
-
-    dispose();
-  }));
-
-test("stack", () => {
-  const { emit, stack, removeFromStack, setStack } = createEventStack<[string]>();
-
-  assert.equal(stack(), []);
-
-  emit(["foo"]);
-  assert.equal(stack(), [["foo"]]);
-
-  const x: [string] = ["bar"];
-
-  emit(x);
-  assert.equal(stack(), [["foo"], ["bar"]]);
-
-  assert.is(removeFromStack(x), true);
-  assert.is(removeFromStack(["hello"]), false);
-  assert.is(stack().length, 1);
-
-  const y: [string][] = [["0"], ["1"]];
-  setStack(y);
-  assert.equal(stack(), y);
+      dispose();
+    }));
 });
-
-test("stack is reactive", () =>
-  createRoot(dispose => {
-    const { emit, stack } = createEventStack<{ t: string }>();
-    let captured: any;
-    createComputed(() => {
-      captured = stack();
-    });
-
-    assert.equal(captured, []);
-
-    emit({ t: "foo" });
-    assert.equal(captured, [{ t: "foo" }]);
-
-    emit({ t: "bar" });
-    assert.equal(captured, [{ t: "foo" }, { t: "bar" }]);
-
-    dispose();
-  }));
-
-test("config options", () =>
-  createRoot(dispose => {
-    let allowEmit = true;
-    let allowRemove = false;
-
-    const capturedBeforeEmit: { text: string }[] = [];
-
-    const { listen, has, remove, emit, stack } = createEventStack<string, { text: string }>({
-      beforeEmit: a => capturedBeforeEmit.push(a),
-      emitGuard: (emit, ...payload) => allowEmit && emit(...payload),
-      removeGuard: remove => allowRemove && remove(),
-      toValue: e => ({ text: e })
-    });
-    const listener = () => {};
-
-    let unsub = listen(listener);
-    remove(listener);
-    assert.is(has(listener), true, "removing should fail");
-    unsub();
-    assert.is(has(listener), false);
-
-    listen(listener);
-    allowRemove = true;
-    remove(listener);
-    assert.is(has(listener), false);
-
-    emit("foo");
-    assert.equal(capturedBeforeEmit, [{ text: "foo" }]);
-    allowEmit = false;
-    emit("bar");
-    assert.equal(capturedBeforeEmit, [{ text: "foo" }]);
-
-    assert.equal(stack(), [{ text: "foo" }]);
-
-    dispose();
-  }));
-
-test.run();

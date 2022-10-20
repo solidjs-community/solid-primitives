@@ -8,9 +8,10 @@ import {
   Resource,
   ResourceReturn,
   ResourceFetcherInfo,
-  untrack
+  untrack,
+  Setter
 } from "solid-js";
-import { FalsyValue, MaybeAccessor } from "@solid-primitives/utils";
+import { access, noop, type FalsyValue, type MaybeAccessor } from "@solid-primitives/utils";
 
 export type ResourceActions<T, O = {}> = ResourceReturn<T, O>[1];
 
@@ -67,11 +68,22 @@ export type StreamReturn = [
  * The stream will be stopped on cleanup automatically.
  */
 export const createStream = (streamSource: StreamSourceDescription): StreamReturn => {
+  if (process.env.SSR) {
+    return [
+      Object.assign(() => undefined, { loading: true, error: undefined }) as Resource<
+        MediaStream | undefined
+      >,
+      {
+        mutate: noop as Setter<MediaStream | undefined>,
+        refetch: _info => void 0,
+        mute: noop,
+        stop: noop
+      }
+    ];
+  }
   const [stream, { mutate, refetch }] = createResource(
     createMemo<MediaStreamConstraints | undefined>(() =>
-      constraintsFromDevice(
-        (typeof streamSource === "function" ? streamSource() : streamSource) || undefined
-      )
+      constraintsFromDevice(access(streamSource) || undefined)
     ),
     (constraints, info: ResourceFetcherInfo<MediaStream>): Promise<MediaStream> =>
       navigator.mediaDevices.getUserMedia(constraints).then(stream => {
@@ -153,6 +165,9 @@ export const createAmplitudeStream = (
 export const createAmplitudeFromStream = (
   stream: MaybeAccessor<MediaStream | undefined>
 ): [amplitude: Accessor<number>, stop: () => void] => {
+  if (process.env.SSR) {
+    return [() => 0, noop];
+  }
   const [amplitude, setAmplitude] = createSignal(0);
   const ctx = new AudioContext();
   const analyser = ctx.createAnalyser();
@@ -165,7 +180,7 @@ export const createAmplitudeFromStream = (
 
   let source: MediaStreamAudioSourceNode;
   createEffect(() => {
-    const currentStream = typeof stream === "function" ? stream() : stream;
+    const currentStream = access(stream);
     if (currentStream !== undefined) {
       ctx.resume();
       source?.disconnect();
@@ -220,6 +235,19 @@ export const createAmplitudeFromStream = (
 export const createScreen = (
   screenSource: MaybeAccessor<DisplayMediaStreamConstraints | undefined>
 ): StreamReturn => {
+  if (process.env.SSR) {
+    return [
+      Object.assign(() => undefined, { loading: true, error: undefined }) as Resource<
+        MediaStream | undefined
+      >,
+      {
+        mutate: noop as Setter<MediaStream | undefined>,
+        refetch: _info => void 0,
+        mute: noop,
+        stop: noop
+      }
+    ];
+  }
   const [stream, { mutate, refetch }] = createResource(
     typeof screenSource === "function" ? createMemo(screenSource) : () => screenSource,
     (constraints, info: ResourceFetcherInfo<MediaStream>): Promise<MediaStream> =>
@@ -252,8 +280,13 @@ export const createScreen = (
  *
  * If no source is given, both microphone and camera permissions will be requested. You can read the permissions with the `createPermission` primitive from the `@solid-primitives/permission` package.
  */
-export const createMediaPermissionRequest = (source?: MediaStreamConstraints | "audio" | "video") =>
-  navigator.mediaDevices
+export const createMediaPermissionRequest = (
+  source?: MediaStreamConstraints | "audio" | "video"
+) => {
+  if (process.env.SSR) {
+    return Promise.resolve();
+  }
+  return navigator.mediaDevices
     .getUserMedia(
       source
         ? typeof source === "string"
@@ -262,3 +295,4 @@ export const createMediaPermissionRequest = (source?: MediaStreamConstraints | "
         : { audio: true, video: true }
     )
     .then(stop);
+};

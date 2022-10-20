@@ -14,6 +14,9 @@ import { Accessor, createSignal } from "solid-js";
  * clear()
  */
 export function makeConnectivityListener(callback: (isOnline: boolean) => void): VoidFunction {
+  if (process.env.SSR) {
+    return () => {};
+  }
   const clear1 = makeEventListener(window, "online", callback.bind(void 0, true));
   const clear2 = makeEventListener(window, "offline", callback.bind(void 0, false));
   return () => (clear1(), clear2());
@@ -28,6 +31,9 @@ export function makeConnectivityListener(callback: (isOnline: boolean) => void):
  * isOnline() // T: boolean
  */
 export function createConnectivitySignal(): Accessor<boolean> {
+  if (process.env.SSR) {
+    return () => true;
+  }
   const [status, setStatus] = createSignal<boolean>(navigator.onLine);
   makeConnectivityListener(setStatus);
   return status;

@@ -1,5 +1,5 @@
 import { Accessor, onMount, onCleanup, createEffect } from "solid-js";
-import { createStaticStore, access } from "@solid-primitives/utils";
+import { createStaticStore, access, noop } from "@solid-primitives/utils";
 
 // Set of control enums
 export enum AudioState {
@@ -11,6 +11,17 @@ export enum AudioState {
   READY = "ready",
   ERROR = "error"
 }
+
+export type AudioSource =
+  | string
+  | undefined
+  | HTMLAudioElement
+  | MediaSource
+  | (string & MediaSource);
+
+export type AudioEventHandlers = {
+  [K in keyof HTMLMediaElementEventMap]?: (event: HTMLMediaElementEventMap[K]) => void;
+};
 
 // Helper for producing the audio source
 const unwrapSource = (src: AudioSource) => {
@@ -35,6 +46,9 @@ export const makeAudio = (
   src: AudioSource,
   handlers: AudioEventHandlers = {}
 ): HTMLAudioElement => {
+  if (process.env.SSR) {
+    return {} as HTMLAudioElement;
+  }
   const player = unwrapSource(src);
   const listeners = (enabled: boolean) => {
     Object.entries(handlers).forEach(([evt, handler]) =>
@@ -79,6 +93,15 @@ export const makeAudioPlayer = (
   setVolume: (volume: number) => void;
   player: HTMLAudioElement;
 } => {
+  if (process.env.SSR) {
+    return {
+      pause: noop,
+      play: noop,
+      player: {} as HTMLAudioElement,
+      seek: noop,
+      setVolume: noop
+    };
+  }
   const player = makeAudio(src, handlers);
   const play = () => player.play();
   const pause = () => player.pause();
@@ -98,7 +121,7 @@ export const makeAudioPlayer = (
  * @return store - @type Store
  * @return store.state - Current state of the player
  * @return store.currentTime - Current time of the playhead
- * @return store.duration - Duratio of the audio player
+ * @return store.duration - Duration of the audio player
  *
  * @example
  * ```ts
@@ -127,6 +150,23 @@ export const createAudio = (
     pause: VoidFunction;
   }
 ] => {
+  if (process.env.SSR) {
+    return [
+      {
+        state: AudioState.LOADING,
+        currentTime: 0,
+        duration: 0,
+        volume: 0,
+        player: {} as HTMLAudioElement
+      },
+      {
+        seek: noop,
+        setVolume: noop,
+        play: noop,
+        pause: noop
+      }
+    ];
+  }
   const player = unwrapSource(access(src));
   const [store, setStore] = createStaticStore({
     state: AudioState.LOADING,
@@ -158,7 +198,7 @@ export const createAudio = (
     createEffect(() => {
       const newSrc = access(src);
       if (newSrc instanceof HTMLAudioElement) {
-        setStore("player", newSrc);
+        setStore("player", () => newSrc);
       } else {
         store.player[typeof newSrc === "string" ? "src" : "srcObject"] = newSrc as string &
           MediaSource;

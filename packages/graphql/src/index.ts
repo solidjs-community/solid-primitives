@@ -1,7 +1,9 @@
 import { createResource, ResourceReturn } from "solid-js";
-import { access, FalsyValue, MaybeAccessor, Modify } from "@solid-primitives/utils";
-import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { DocumentNode, print } from "graphql";
+import { TypedDocumentNode } from "@graphql-typed-document-node/core";
+import { access, FalsyValue, MaybeAccessor, Modify } from "@solid-primitives/utils";
+
+export type RequestHeaders = { [key: string]: string };
 
 export type RequestOptions<V extends object = {}> = Modify<
   Omit<RequestInit, "body">,

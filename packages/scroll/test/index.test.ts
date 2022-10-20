@@ -1,81 +1,79 @@
 import { createComputed, createRoot, createSignal } from "solid-js";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { describe, expect, it } from "vitest";
 
 import { createScrollPosition, getScrollPosition } from "../src/index";
 
-const gsp = suite("getScrollPosition");
+describe("getScrollPosition", () => {
 
-gsp("no target returns null", () => {
-  assert.equal(getScrollPosition(undefined), { x: null, y: null });
-});
+  it("no target returns null", () => {
+    expect(getScrollPosition(undefined)).toEqual({ x: null, y: null });
+  });
 
-gsp("get's scroll of window", () => {
-  const target = window;
-  Object.assign(target, { scrollY: 123, scrollX: 222 });
-  assert.equal(getScrollPosition(target), { x: 222, y: 123 });
-});
+  it.skip("get's scroll of window", () => {
+    const target = window;
+    Object.assign(target, { scrollY: 123, scrollX: 222 });
+    expect(getScrollPosition(target)).toEqual({ x: 222, y: 123 });
+  });
 
-gsp("get's scroll of html Element", () => {
-  const target = document.createElement("div");
-  Object.assign(target, { scrollTop: 123, scrollLeft: 222 });
-  assert.equal(getScrollPosition(target), { x: 222, y: 123 });
-});
-
-gsp.run();
-
-const csp = suite("createScrollPosition");
-
-csp("will observe scroll events", () =>
-  createRoot(dispose => {
-    const expectedX = [0, 100, 42];
-    const actualX: number[] = [];
-    const expectedY = [0, 34, 11];
-    const actualY: number[] = [];
-
+  it("get's scroll of html Element", () => {
     const target = document.createElement("div");
+    document.body.appendChild(target);
+    Object.assign(target, { scrollTop: 123, scrollLeft: 222 });
+    expect(getScrollPosition(target)).toEqual({ x: 222, y: 123 });
+    document.body.removeChild(target);
+  });
+});
 
-    const scroll = createScrollPosition(target);
+describe("createScrollPosition", () => {
+  it("will observe scroll events", () =>
+    createRoot(dispose => {
+      const expectedX = [0, 100, 42];
+      const actualX: number[] = [];
+      const expectedY = [0, 34, 11];
+      const actualY: number[] = [];
 
-    createComputed(() => {
-      actualX.push(scroll.x);
-      actualY.push(scroll.y);
-    });
+      const target = document.createElement("div");
 
-    Object.assign(target, { scrollTop: 34, scrollLeft: 100 });
-    target.dispatchEvent(new Event("scroll"));
+      const scroll = createScrollPosition(target);
 
-    Object.assign(target, { scrollTop: 11, scrollLeft: 42 });
-    target.dispatchEvent(new Event("scroll"));
+      createComputed(() => {
+        actualX.push(scroll.x);
+        actualY.push(scroll.y);
+      });
 
-    assert.equal(actualX, expectedX);
-    assert.equal(actualY, expectedY);
+      Object.assign(target, { scrollTop: 34, scrollLeft: 100 });
+      target.dispatchEvent(new Event("scroll"));
 
-    dispose();
-  })
-);
+      Object.assign(target, { scrollTop: 11, scrollLeft: 42 });
+      target.dispatchEvent(new Event("scroll"));
 
-csp("target is reactive", () =>
-  createRoot(dispose => {
-    const div1 = document.createElement("div");
-    Object.assign(div1, { scrollTop: 34, scrollLeft: 100 });
+      expect(actualX).toEqual(expectedX);
+      expect(actualY).toEqual(expectedY);
 
-    const div2 = document.createElement("div");
-    Object.assign(div2, { scrollTop: 11, scrollLeft: 42 });
+      dispose();
+    })
+  );
 
-    const [target, setTarget] = createSignal<Element | undefined>(div1);
+  it("target is reactive", () =>
+    createRoot(dispose => {
+      const div1 = document.createElement("div");
+      Object.assign(div1, { scrollTop: 34, scrollLeft: 100 });
 
-    const scroll = createScrollPosition(target);
-    assert.equal(scroll, { x: 100, y: 34 });
+      const div2 = document.createElement("div");
+      Object.assign(div2, { scrollTop: 11, scrollLeft: 42 });
 
-    setTarget(div2);
-    assert.equal(scroll, { x: 42, y: 11 });
+      const [target, setTarget] = createSignal<Element | undefined>(div1);
 
-    setTarget();
-    assert.equal(scroll, { x: null, y: null });
+      const scroll = createScrollPosition(target);
+      expect(scroll).toEqual({ x: 100, y: 34 });
 
-    dispose();
-  })
-);
+      setTarget(div2);
+      expect(scroll).toEqual({ x: 42, y: 11 });
 
-csp.run();
+      setTarget();
+      expect(scroll).toEqual({ x: null, y: null });
+
+      dispose();
+    })
+  );
+});

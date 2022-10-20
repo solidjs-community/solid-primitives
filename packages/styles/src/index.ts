@@ -1,6 +1,8 @@
 import { createSharedRoot } from "@solid-primitives/rootless";
 import { Accessor, createSignal, onCleanup } from "solid-js";
 
+let serverRemSize = 16;
+
 const totallyHiddenStyles: Partial<CSSStyleDeclaration> = {
   border: "0",
   padding: "0",
@@ -13,8 +15,9 @@ const totallyHiddenStyles: Partial<CSSStyleDeclaration> = {
 /**
  * Reads the current rem size from the document root.
  */
-export const getRemSize = (): number =>
-  parseFloat(getComputedStyle(document.documentElement).fontSize);
+export const getRemSize = (): number => process.env.SSR
+  ? serverRemSize
+  : parseFloat(getComputedStyle(document.documentElement).fontSize);
 
 /**
  * Creates a reactive signal with value of the current rem size, and tracks it's changes.
@@ -25,6 +28,9 @@ export const getRemSize = (): number =>
  * console.log(remSize()); // 16
  */
 export function createRemSize(): Accessor<number> {
+  if (process.env.SSR) {
+    return () => serverRemSize;
+  }
   const [remSize, setRemSize] = createSignal(getRemSize());
   const el = document.createElement("div");
   Object.assign(el.style, totallyHiddenStyles, { width: "1rem" });
@@ -52,11 +58,17 @@ export function createRemSize(): Accessor<number> {
  * const remSize = useRemSize();
  * console.log(remSize()); // 16
  */
-export const useRemSize: () => Accessor<number> = /*#__PURE__*/ createSharedRoot(createRemSize);
+export const useRemSize: () => Accessor<number> = process.env.SSR
+  ? /*#__PURE__*/ () => () => serverRemSize
+  : /*#__PURE__*/ createSharedRoot(createRemSize);
 
 /**
  * Set the server fallback value for the rem size. {@link getRemSize}, {@link createRemSize} and {@link useRemSize} will return this value on the server.
  */
-export const setServerRemSize = (size: number): void => {
-  // logic is in the server.ts file
-};
+export const setServerRemSize = process.env.SSR
+  ? (size: number) => {
+    serverRemSize = size;
+  }
+  : (size: number): void => {
+    // needs not to work in the client
+  };

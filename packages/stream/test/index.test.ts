@@ -1,35 +1,31 @@
 import "./setup";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { afterAll, describe, expect, it } from "vitest";
 import { createEffect, createRoot } from "solid-js";
 import { createStream, createAmplitudeStream, createMediaPermissionRequest } from "../src";
 
-const testCreateStream = suite("createStream");
-
-testCreateStream("gets a stream", () =>
-  createRoot(
-    dispose =>
+describe("createStream", () => {
+  it("gets a stream", () =>
+    createRoot(
+      dispose =>
       new Promise<void>(resolve => {
         const [stream] = createStream({ video: true });
         const expectations = [undefined, (window as any).__mockstream__];
         createEffect(() => {
-          assert.is(stream(), expectations.shift());
+          expect(stream()).toBe(expectations.shift());
           if (!expectations.length) {
             dispose();
             resolve();
           }
         });
       })
-  )
-);
+    )
+  );
+});
 
-testCreateStream.run();
-
-const testCreateAmplitudeStream = suite("createAmplitudeStream");
-
-testCreateAmplitudeStream("gets an amplitude", () =>
-  createRoot(
-    dispose =>
+describe("createAmplitudeStream", () => {
+  it("gets an amplitude", () =>
+    createRoot(
+      dispose =>
       new Promise<void>(resolve => {
         const mockDevice: MediaDeviceInfo = {
           deviceId: "mock-device-id",
@@ -42,35 +38,29 @@ testCreateAmplitudeStream("gets an amplitude", () =>
         };
         const [amplitude] = createAmplitudeStream(mockDevice);
         createEffect(() => {
-          if (amplitude() > 0) {
+          if ((amplitude() || 0) > 0) {
             dispose();
             resolve();
           }
         });
       })
-  )
-);
+    )
+  );
+});
 
-testCreateAmplitudeStream.run();
-
-const testCreateMediaPermissionRequest = suite("createMediaPermissionRequest");
-
-testCreateMediaPermissionRequest.before(context => {
-  context.constraints = [];
-  context.originalGetUserMedia = navigator.mediaDevices.getUserMedia;
+describe("createMediaPermissionRequest", () => {
+  const allConstraints: (MediaStreamConstraints | undefined)[] = [];
+  const originalGetUserMedia = navigator.mediaDevices.getUserMedia;
   navigator.mediaDevices.getUserMedia = constraints => {
-    context.constraints.push(constraints);
-    return context.originalGetUserMedia(constraints);
+    allConstraints.push(constraints);
+    return originalGetUserMedia(constraints);
   };
+  afterAll(() => {
+    navigator.mediaDevices.getUserMedia = originalGetUserMedia;
+  });
+  it("requests a media stream", context => {
+    createMediaPermissionRequest();
+    console.log(allConstraints);
+    expect(allConstraints.at(-1)).toEqual({ audio: true, video: true });
+  });
 });
-
-testCreateMediaPermissionRequest.after(context => {
-  navigator.mediaDevices.getUserMedia = context.originalGetUserMedia;
-});
-
-testCreateMediaPermissionRequest("requests a media stream", context => {
-  createMediaPermissionRequest();
-  assert.equal(context.constraints, [{ audio: true, video: true }]);
-});
-
-testCreateMediaPermissionRequest.run();

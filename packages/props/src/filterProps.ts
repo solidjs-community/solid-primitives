@@ -16,7 +16,7 @@ import { propTraps } from "./propTraps";
  * <div {...dataProps} />
  * ```
  */
-export function filterProps<T>(props: T, predicate: (key: keyof T) => boolean): T {
+export function filterProps<T extends object>(props: T, predicate: (key: keyof T) => boolean): T {
   return new Proxy(
     {
       get(property: string | number | symbol) {
@@ -53,7 +53,7 @@ export function filterProps<T>(props: T, predicate: (key: keyof T) => boolean): 
  * <div {...dataProps} />
  * ```
  */
-export function createPropsPredicate<T>(
+export function createPropsPredicate<T extends object>(
   props: T,
   predicate: (key: keyof T) => boolean
 ): (key: keyof T) => boolean {

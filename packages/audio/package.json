@@ -26,9 +26,25 @@
   "sideEffects": false,
   "type": "module",
   "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/server.js",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
   "types": "./dist/index.d.ts",
   "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
     "node": {
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
@@ -39,34 +55,24 @@
   "scripts": {
     "start": "vite serve dev",
     "dev": "vite serve dev",
-    "build": "tsup",
-    "test": "uvu -b -r solid-register"
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "audio",
     "solid",
     "primitives"
   ],
-  "testEnvironment": "jsdom",
   "devDependencies": {
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
     "solid-heroicons": "^2.0.3",
-    "solid-js": "^1.5.4",
-    "solid-register": "^0.2.5",
-    "solid-testing-library": "^0.2.1",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.3",
-    "typescript": "^4.8.2",
-    "unocss": "^0.45.15",
-    "uvu": "^0.5.6",
-    "vite": "^3.0.9",
-    "vite-plugin-solid": "^2.3.0"
-  },
-  "peerDependencies": {
-    "solid-js": "^1.4.4"
+    "solid-js": "^1.5.0",
+    "solid-testing-library": "^0.2.1"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^3.0.2"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.5.0"
   }
 }

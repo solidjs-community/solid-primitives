@@ -110,187 +110,21 @@ describe("useKeyDownSequence", () => {
     }));
 });
 
-// describe("createKeyHold", () => {
-//   test("returns a boolean of is the wanted key pressed", () =>
-//     createRoot(dispose => {
-//       let captured: any;
-//       const key = useCurrentlyHeldKey();
-//       const isHeld = createKeyHold("ALT");
-//       createComputed(() => (captured = isHeld()));
-//       expect(captured).toBe(false);
+describe("createKeyHold", () => {
+  test("returns a boolean of is the wanted key pressed", () =>
+    createRoot(dispose => {
+      let captured: any;
+      const isHeld = createKeyHold("ALT");
+      createComputed(() => (captured = isHeld()));
+      expect(captured).toBe(false);
 
-//       dispatchKeyEvent("ALT", "keydown");
+      dispatchKeyEvent("ALT", "keydown");
 
-//       console.log(key());
+      expect(captured).toBe(true);
 
-//       // expect(captured).toBe(true);
+      dispatchKeyEvent("a", "keyup");
+      expect(captured).toEqual(false);
 
-//       dispatchKeyEvent("a", "keyup");
-//       // assert.equal(captured, false);
-
-//       // dispatchKeyEvent("Alt", "keydown");
-//       // assert.equal(captured, [["ALT"]]);
-//       // dispatchKeyEvent("q", "keydown");
-//       // assert.equal(captured, [["ALT"], ["ALT", "Q"]]);
-
-//       // dispatchKeyEvent("Alt", "keyup");
-//       // assert.equal(captured, [["ALT"], ["ALT", "Q"], ["Q"]]);
-//       // dispatchKeyEvent("q", "keyup");
-//       // assert.equal(captured, []);
-
-//       dispose();
-//     }));
-// });
-
-// const testCKH = suite("createKeyHold");
-
-// testCKH.run();
-
-/*
-testMHKL("calls callback in a simple key scenario", () =>
-  createRoot(dispose => {
-    const captured: boolean[] = [];
-
-    makeKeyHoldListener("a", e => captured.push(e));
-    assert.equal(captured, []);
-
-    let ev = new Event("keydown") as any;
-    ev.key = "a";
-    window.dispatchEvent(ev);
-
-    assert.equal(captured, [true]);
-
-    ev = new Event("keyup") as any;
-    ev.key = "a";
-    window.dispatchEvent(ev);
-
-    assert.equal(captured, [true, false]);
-
-    dispose();
-  })
-);
-
-testMHKL("calls callback in a simple modifier scenario", () =>
-  createRoot(dispose => {
-    const captured: boolean[] = [];
-
-    makeKeyHoldListener("altKey", e => captured.push(e));
-    assert.equal(captured, []);
-
-    let ev = new Event("keydown") as any;
-    ev.altKey = true;
-    window.dispatchEvent(ev);
-
-    assert.equal(captured, [true]);
-
-    ev = new Event("keyup") as any;
-    ev.altKey = false;
-    window.dispatchEvent(ev);
-
-    assert.equal(captured, [true, false]);
-
-    dispose();
-  })
-);
-
-testMHKL("don't allowOtherKeys — key", () =>
-  createRoot(dispose => {
-    const captured: boolean[] = [];
-
-    makeKeyHoldListener("a", e => captured.push(e));
-    assert.equal(captured, []);
-
-    let ev = new Event("keydown") as any;
-    ev.key = "a";
-    window.dispatchEvent(ev);
-
-    assert.equal(captured, [true]);
-
-    ev = new Event("keydown") as any;
-    ev.key = "b";
-    window.dispatchEvent(ev);
-
-    assert.equal(captured, [true, false]);
-
-    dispose();
-  })
-);
-
-testMHKL("don't allowOtherKeys — modifier", () =>
-  createRoot(dispose => {
-    const captured: boolean[] = [];
-
-    makeKeyHoldListener("altKey", e => captured.push(e));
-    assert.equal(captured, []);
-
-    let ev = new Event("keydown") as any;
-    ev.altKey = true;
-    window.dispatchEvent(ev);
-
-    assert.equal(captured, [true]);
-
-    ev = new Event("keydown") as any;
-    ev.altKey = true;
-    ev.key = "b";
-    window.dispatchEvent(ev);
-
-    assert.equal(captured, [true, false]);
-
-    dispose();
-  })
-);
-
-testMHKL("allowOtherKeys — key", () =>
-  createRoot(dispose => {
-    const captured: boolean[] = [];
-
-    makeKeyHoldListener("a", e => captured.push(e), {
-      allowOtherKeys: true
-    });
-    assert.equal(captured, []);
-
-    let ev = new Event("keydown") as any;
-    ev.key = "a";
-    window.dispatchEvent(ev);
-
-    assert.equal(captured, [true]);
-
-    ev = new Event("keydown") as any;
-    ev.key = "b";
-    window.dispatchEvent(ev);
-
-    assert.equal(captured, [true]);
-
-    dispose();
-  })
-);
-
-testMHKL("allowOtherKeys — modifier", () =>
-  createRoot(dispose => {
-    const captured: boolean[] = [];
-
-    makeKeyHoldListener("altKey", e => captured.push(e), {
-      allowOtherKeys: true
-    });
-    assert.equal(captured, []);
-
-    let ev = new Event("keydown") as any;
-    ev.altKey = true;
-    window.dispatchEvent(ev);
-
-    assert.equal(captured, [true]);
-
-    ev = new Event("keydown") as any;
-    ev.altKey = true;
-    ev.key = "b";
-    window.dispatchEvent(ev);
-
-    assert.equal(captured, [true]);
-
-    dispose();
-  })
-);
-
-testMHKL.run();
-
-*/
+      dispose();
+    }));
+});

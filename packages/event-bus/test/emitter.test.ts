@@ -1,156 +1,140 @@
 import { createEmitter } from "../src";
 import { createRoot } from "solid-js";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { describe, test, expect } from "vitest";
 
-const test = suite("createEmitter");
+describe("createEmitter", () => {
+  test("emitting and listening", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const { listen, emit } = createEmitter<string, number, boolean>();
 
-test("return values", () =>
-  createRoot(dispose => {
-    const emitter = createEmitter();
+      listen((...args) => captured.push(args));
 
-    assert.type(emitter.clear, "function");
-    assert.type(emitter.emit, "function");
-    assert.type(emitter.has, "function");
-    assert.type(emitter.listen, "function");
-    assert.type(emitter.remove, "function");
+      emit("foo", 1, true);
+      expect(captured[0]).toEqual(["foo", 1, true]);
 
-    dispose();
-  }));
+      emit("bar", 2, false);
+      expect(captured[1]).toEqual(["bar", 2, false]);
 
-test("emitting and listening", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const { listen, emit } = createEmitter<string, number, boolean>();
+      dispose();
+    }));
 
-    listen((...args) => captured.push(args));
+  test("clear function", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const { listen, emit, clear } = createEmitter<string>();
 
-    emit("foo", 1, true);
-    assert.equal(captured[0], ["foo", 1, true]);
+      listen(a => captured.push(a));
 
-    emit("bar", 2, false);
-    assert.equal(captured[1], ["bar", 2, false]);
+      clear();
 
-    dispose();
-  }));
+      emit("foo");
+      expect(captured.length).toBe(0);
 
-test("clear function", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const { listen, emit, clear } = createEmitter<string>();
+      dispose();
+    }));
 
-    listen(a => captured.push(a));
+  test("clears on dispose", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const { listen, emit } = createEmitter<string>();
 
-    clear();
+      listen(a => captured.push(a));
 
-    emit("foo");
-    assert.is(captured.length, 0);
+      dispose();
 
-    dispose();
-  }));
+      emit("foo");
+      expect(captured.length).toBe(0);
+    }));
 
-test("clears on dispose", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const { listen, emit } = createEmitter<string>();
+  test("remove()", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const { listen, emit, remove } = createEmitter<string>();
 
-    listen(a => captured.push(a));
+      const listener = (a: string) => captured.push(a);
+      listen(listener);
 
-    dispose();
+      remove(listener);
 
-    emit("foo");
-    assert.is(captured.length, 0);
-  }));
+      emit("foo");
+      expect(captured).toEqual([]);
 
-test("remove()", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const { listen, emit, remove } = createEmitter<string>();
+      const unsub = listen(listener);
+      unsub();
 
-    const listener = (a: string) => captured.push(a);
-    listen(listener);
+      emit("bar");
+      expect(captured).toEqual([]);
 
-    remove(listener);
+      dispose();
+    }));
 
-    emit("foo");
-    assert.equal(captured, []);
+  test("remove protected", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const { listen, emit, remove } = createEmitter<string>();
 
-    const unsub = listen(listener);
-    unsub();
+      const listener = (a: string) => captured.push(a);
+      const unsub = listen(listener, true);
 
-    emit("bar");
-    assert.equal(captured, []);
+      remove(listener);
 
-    dispose();
-  }));
+      emit("foo");
+      expect(captured, "normal remove() shouldn't remove a protected listener").toEqual(["foo"]);
 
-test("remove protected", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    const { listen, emit, remove } = createEmitter<string>();
+      unsub();
 
-    const listener = (a: string) => captured.push(a);
-    const unsub = listen(listener, true);
+      emit("bar");
+      expect(captured, "returned unsub func should remove a protected listener").toEqual(["foo"]);
 
-    remove(listener);
+      dispose();
+    }));
 
-    emit("foo");
-    assert.equal(captured, ["foo"], "normal remove() shouldn't remove a protected listener");
+  test("has()", () =>
+    createRoot(dispose => {
+      const { listen, has } = createEmitter<string>();
 
-    unsub();
+      const listener = () => {};
+      expect(has(listener)).toBe(false);
+      const unsub = listen(listener);
+      expect(has(listener)).toBe(true);
+      unsub();
+      expect(has(listener)).toBe(false);
 
-    emit("bar");
-    assert.equal(captured, ["foo"], "returned unsub func should remove a protected listener");
+      dispose();
+    }));
 
-    dispose();
-  }));
+  test("config options", () =>
+    createRoot(dispose => {
+      let allowEmit = true;
+      let allowRemove = false;
 
-test("has()", () =>
-  createRoot(dispose => {
-    const { listen, has } = createEmitter<string>();
+      const capturedBeforeEmit: any[] = [];
 
-    const listener = () => {};
-    assert.is(has(listener), false);
-    const unsub = listen(listener);
-    assert.is(has(listener), true);
-    unsub();
-    assert.is(has(listener), false);
+      const { listen, has, remove, emit } = createEmitter<string>({
+        beforeEmit: a => capturedBeforeEmit.push(a),
+        emitGuard: (emit, payload) => allowEmit && emit(payload),
+        removeGuard: remove => allowRemove && remove()
+      });
+      const listener = () => {};
 
-    dispose();
-  }));
+      let unsub = listen(listener);
+      remove(listener);
+      expect(has(listener)).toBe(true);
+      unsub();
+      expect(has(listener)).toBe(false);
 
-test("config options", () =>
-  createRoot(dispose => {
-    let allowEmit = true;
-    let allowRemove = false;
+      listen(listener);
+      allowRemove = true;
+      remove(listener);
+      expect(has(listener)).toBe(false);
 
-    const capturedBeforeEmit: any[] = [];
+      emit("foo");
+      expect(capturedBeforeEmit).toEqual(["foo"]);
+      allowEmit = false;
+      emit("bar");
+      expect(capturedBeforeEmit).toEqual(["foo"]);
 
-    const { listen, has, remove, emit } = createEmitter<string>({
-      beforeEmit: a => capturedBeforeEmit.push(a),
-      emitGuard: (emit, payload) => allowEmit && emit(payload),
-      removeGuard: remove => allowRemove && remove()
-    });
-    const listener = () => {};
-
-    let unsub = listen(listener);
-    remove(listener);
-    assert.is(has(listener), true);
-    unsub();
-    assert.is(has(listener), false);
-
-    listen(listener);
-    allowRemove = true;
-    remove(listener);
-    assert.is(has(listener), false);
-
-    emit("foo");
-    assert.equal(capturedBeforeEmit, ["foo"]);
-    allowEmit = false;
-    emit("bar");
-    assert.equal(capturedBeforeEmit, ["foo"]);
-
-    dispose();
-  }));
-
-test.run();
+      dispose();
+    }));
+});

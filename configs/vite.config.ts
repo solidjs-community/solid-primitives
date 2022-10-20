@@ -29,18 +29,3 @@ export const viteConfig = defineConfig({
     target: "esnext"
   }
 });
-
-export const vitestConfig = defineConfig({
-  test: {
-    watch: false,
-    globals: true,
-    clearMocks: true,
-    environment: "jsdom",
-    transformMode: {
-      web: [/\.[jt]sx?$/]
-    }
-  },
-  resolve: {
-    conditions: ["development", "browser"]
-  }
-});

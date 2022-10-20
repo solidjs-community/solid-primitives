@@ -1,5 +1,3 @@
-import "regenerator-runtime/runtime";
-
 export const mockCoordinates = {
   latitude: 43.65107,
   longitude: -79.347015
@@ -8,7 +6,19 @@ export const mockCoordinates = {
 Object.defineProperty(global.navigator, "geolocation", {
   value: {
     clearWatch: () => {},
-    getCurrentPosition: success => success({ coords: mockCoordinates }),
-    watchPosition: callback => callback({ coords: mockCoordinates })
+    getCurrentPosition(
+      successCallback: PositionCallback,
+      errorCallback?: PositionErrorCallback | null,
+      options?: PositionOptions
+    ) {
+      successCallback({ coords: mockCoordinates } as GeolocationPosition);
+    },
+    watchPosition(
+      successCallback: PositionCallback,
+      errorCallback?: PositionErrorCallback | null,
+      options?: PositionOptions
+    ) {
+      successCallback({ coords: mockCoordinates } as GeolocationPosition);
+    }
   }
 });

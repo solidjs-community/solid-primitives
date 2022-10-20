@@ -1,4 +1,5 @@
-import { isClient, keys } from "@solid-primitives/utils";
+import { keys } from "@solid-primitives/utils";
+import { Component } from "solid-js";
 import { makeEventListener } from "./eventListener";
 
 export type WindowEventProps = {
@@ -30,10 +31,10 @@ const attachPropListeners = (
  * @example
  * <WindowEventListener onMouseMove={e => console.log(e.x, e.y)} />
  */
-export function WindowEventListener(props: WindowEventProps) {
-  if (isClient) attachPropListeners(window, props);
-  return undefined;
-}
+export const WindowEventListener: Component<WindowEventProps> = props => {
+  if (process.env.SSR) return null;
+  attachPropListeners(window, props);
+};
 
 /**
  * Listen to the `document` DOM Events, using a component.
@@ -43,7 +44,7 @@ export function WindowEventListener(props: WindowEventProps) {
  * @example
  * <DocumentEventListener onMouseMove={e => console.log(e.x, e.y)} />
  */
-export function DocumentEventListener(props: DocumentEventProps) {
-  if (isClient) attachPropListeners(document, props);
-  return undefined;
-}
+export const DocumentEventListener: Component<DocumentEventProps> = props => {
+  if (process.env.SSR) return null;
+  attachPropListeners(document, props);
+};

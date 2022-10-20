@@ -24,12 +24,36 @@
   "sideEffects": false,
   "type": "module",
   "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/server.js",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
   "types": "./dist/index.d.ts",
   "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "development": {
+        "import": "./dist/dev.js",
+        "require": "./dist/dev.cjs"
+      },
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
     "node": {
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
+    },
+    "development": {
+      "import": "./dist/dev.js",
+      "require": "./dist/dev.cjs"
     },
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
@@ -39,8 +63,9 @@
     "dev": "pnpm run start",
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsup",
-    "test": "vitest"
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "fetch",
@@ -51,16 +76,7 @@
   ],
   "devDependencies": {
     "@types/node": "^18.7.16",
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "rimraf": "^3.0.2",
-    "solid-js": "^1.5.4",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.3",
-    "typescript": "^4.8.2",
-    "vite": "^3.0.1",
-    "vite-plugin-solid": "2.3.0",
-    "vitest": "^0.23.1"
+    "solid-js": "^1.5.0"
   },
   "peerDependencies": {
     "node-fetch": ">=3.2.10",

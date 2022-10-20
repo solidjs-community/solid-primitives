@@ -72,16 +72,6 @@ export type NonIterable<T> = T & {
   [Symbol.iterator]: never;
 };
 
-/** An opposite of `Partial`. Makes all the keys required. */
-export type Definite<T> = {
-  [K in keyof T]-?: T[K];
-};
-
-/** An opposite of `Readonly`. Makes all the params mutable. */
-export type Mutable<T> = {
-  -readonly [K in keyof T]: T[K];
-};
-
 /** Unwraps the type definition of an object, making it more readable */
 export type Simplify<T> = T extends object ? { [K in keyof T]: T[K] } : T;
 /** Unboxes type definition, making it more readable */

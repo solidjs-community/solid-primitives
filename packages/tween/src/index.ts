@@ -16,6 +16,11 @@ export default function createTween<T extends number>(
   target: () => T,
   { ease = (t: T) => t, duration = 100 }
 ) {
+  if (process.env.SSR) {
+    return () => {
+      /*noop*/
+    };
+  }
   const [start, setStart] = createSignal(document.timeline.currentTime);
   const [current, setCurrent] = createSignal<T>(target());
   createEffect(on(target, () => setStart(document.timeline.currentTime), { defer: true }));
@@ -33,3 +38,6 @@ export default function createTween<T extends number>(
   );
   return current;
 }
+
+// TODO: in a major release, remove the default export
+export { createTween };

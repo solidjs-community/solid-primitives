@@ -1,66 +1,61 @@
+import { expect, describe, it } from "vitest";
 import { ReactiveMap, ReactiveWeakMap } from "../src";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
 
-const testMap = suite("ReactiveMap");
+describe("ReactiveMap", () => {
+  it("behaves like a Map", () => {
+    const obj1 = {};
+    const obj2 = {};
 
-testMap("behaves like a Map", () => {
-  const obj1 = {};
-  const obj2 = {};
+    const map = new ReactiveMap<any, any>([
+      [obj1, 123],
+      [1, "foo"]
+    ]);
 
-  const map = new ReactiveMap<any, any>([
-    [obj1, 123],
-    [1, "foo"]
-  ]);
+    expect(map.has(obj1)).toBe(true);
+    expect(map.has(1)).toBe(true);
+    expect(map.has(2)).toBe(false);
 
-  assert.is(map.has(obj1), true);
-  assert.is(map.has(1), true);
-  assert.is(map.has(2), false);
+    expect(map.get(obj1)).toBe(123);
+    expect(map.get(1)).toBe("foo");
 
-  assert.is(map.get(obj1), 123);
-  assert.is(map.get(1), "foo");
+    map.set(obj2, "bar");
+    expect(map.get(obj2)).toBe("bar");
+    map.set(obj1, "change");
+    expect(map.get(obj1)).toBe("change");
 
-  map.set(obj2, "bar");
-  assert.is(map.get(obj2), "bar");
-  map.set(obj1, "change");
-  assert.is(map.get(obj1), "change");
+    expect(map.delete(obj2)).toBe(true);
+    expect(map.has(obj2)).toBe(false);
 
-  assert.is(map.delete(obj2), true);
-  assert.is(map.has(obj2), false);
+    expect(map.size).toBe(2);
+    map.clear();
+    expect(map.size).toBe(0);
 
-  assert.is(map.size, 2);
-  map.clear();
-  assert.is(map.size, 0);
-
-  assert.instance(map, Map);
-  assert.instance(map, ReactiveMap);
+    expect(map).instanceOf(Map);
+    expect(map).instanceOf(ReactiveMap);
+  });
 });
 
-testMap.run();
+describe("ReactiveWeakMap", () => {
+  it("behaves like a Map", () => {
+    const obj1 = {};
+    const obj2 = {};
 
-const testWeakMap = suite("ReactiveWeakMap");
+    const map = new ReactiveWeakMap<object, any>([[obj1, 123]]);
 
-testWeakMap("behaves like a Map", () => {
-  const obj1 = {};
-  const obj2 = {};
+    expect(map.has(obj1)).toBe(true);
+    expect(map.has(obj2)).toBe(false);
 
-  const map = new ReactiveWeakMap<object, any>([[obj1, 123]]);
+    expect(map.get(obj1)).toBe(123);
 
-  assert.is(map.has(obj1), true);
-  assert.is(map.has(obj2), false);
+    map.set(obj2, "bar");
+    expect(map.get(obj2)).toBe("bar");
+    map.set(obj1, "change");
+    expect(map.get(obj1)).toBe("change");
 
-  assert.is(map.get(obj1), 123);
+    expect(map.delete(obj2)).toBe(true);
+    expect(map.has(obj2)).toBe(false);
 
-  map.set(obj2, "bar");
-  assert.is(map.get(obj2), "bar");
-  map.set(obj1, "change");
-  assert.is(map.get(obj1), "change");
-
-  assert.is(map.delete(obj2), true);
-  assert.is(map.has(obj2), false);
-
-  assert.instance(map, WeakMap);
-  assert.instance(map, ReactiveWeakMap);
+    expect(map).instanceOf(WeakMap);
+    expect(map).instanceOf(ReactiveWeakMap);
+  });
 });
-
-testWeakMap.run();

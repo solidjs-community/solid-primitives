@@ -1,6 +1,6 @@
-import { createBodyCursor, createElementCursor, CursorProperty } from "../src";
-import { createRoot, createSignal } from "solid-js";
 import { describe, test, expect } from "vitest";
+import { createRoot, createSignal } from "solid-js";
+import { createBodyCursor, createElementCursor, CursorProperty } from "../src";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 

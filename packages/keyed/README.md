@@ -14,6 +14,7 @@ Control Flow primitives and components that require specifying explicit keys to 
 - [`keyArray`](#keyArray) - Reactively maps an array by specified key with a callback function - underlying helper for the `<Key>` control flow.
 - [`Key`](#Key) - Creates a list of elements by mapping items by provided key.
 - [`Entries`](#Entries) - Creates a list of elements by mapping object entries.
+- [`Rerun`](#Rerun) - Causes the children to rerender when the `on` changes.
 
 ## Installation
 
@@ -150,6 +151,67 @@ Third argument of the map function is an index signal.
   )}
 </Entries>
 ```
+
+## `<Rerun>`
+
+Causes the children to rerender when the `on` key changes. Equivalent of `v-key` in vue, and `{#key}` in svelte.
+
+> **Note:** Since Solid 1.5.0 the `<Show>` component has a `keyed` prop that works very similarly to `<Rerun>`.
+
+### Import
+
+```ts
+import { Rerun } from "@solid-primitives/keyed";
+```
+
+### How to use it
+
+You have to provide a `on` prop. Changing it, will cause the children to rerender.
+
+```tsx
+const [count, setCount] = createSignal(0);
+
+// will rerender whole <button>, instead of just text
+<Rerun on={count()}>
+  <button onClick={() => setCount(p => ++p)}>{count()}</button>
+</Rerun>;
+
+// or pass a function
+<Rerun on={() => count()}/>
+
+// or an array of dependencies
+<Rerun on={[count, name, length]}/>
+```
+
+#### Passing a function as children
+
+You can treat `on` prop like sources argument of the Solid's `on` helper, and the children as the second, callback argument.
+
+```tsx
+<Rerun on={[count, className]}>
+  {([count, className]) => (
+    <button class={className} onClick={() => setCount(p => ++p)}>
+      {count}
+    </button>
+  )}
+</Rerun>
+```
+
+#### Using with Transition
+
+`<Rerun>` can be used together with [`solid-transition-group`](#https://github.com/solidjs/solid-transition-group) to animate single component's transition, on state change.
+
+```tsx
+<Transition name="your-animation" mode="outin">
+  <Rerun on={count()}>
+    <button onClick={() => setCount(p => ++p)}>{count()}</button>
+  </Rerun>
+</Transition>
+```
+
+### DEMO
+
+https://codesandbox.io/s/solid-primitives-keyed-rerun-demo-14vjr?file=/index.tsx
 
 ## Changelog
 

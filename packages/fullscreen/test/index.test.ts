@@ -1,10 +1,12 @@
 import { createRoot, createEffect, createSignal } from "solid-js";
 import { createFullscreen } from "../src";
+import { describe, it, expect} from "vitest";
+import "./setup.ts";
 
 describe("createFullscreen", () => {
   const ref = document.createElement("div");
 
-  test("will call the fullscreen method", () =>
+  it("will call the fullscreen method", () =>
     new Promise<void>(resolve => {
       createRoot(dispose => {
         const active = createFullscreen(ref);
@@ -19,7 +21,7 @@ describe("createFullscreen", () => {
       });
     }));
 
-  test("will exit fullscreen on reactive change", () =>
+  it("will exit fullscreen on reactive change", () =>
     new Promise<void>(resolve => {
       createRoot(dispose => {
         const [fs, setFs] = createSignal(true);
@@ -37,7 +39,7 @@ describe("createFullscreen", () => {
       });
     }));
 
-  test("will open fullscreen with options", () =>
+  it("will open fullscreen with options", () =>
     new Promise<void>(resolve => {
       createRoot(dispose => {
         const options: FullscreenOptions = { navigationUI: "hide" };

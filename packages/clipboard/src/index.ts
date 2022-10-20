@@ -19,7 +19,7 @@ declare module "solid-js" {
 }
 
 /**
- * Generates a simple non-reactive clipbaord primitive for reading and writing.
+ * Generates a simple non-reactive clipboard primitive for reading and writing.
  *
  * @return write - Async write to the clipboard
  * @return read - Async read from the clipboard
@@ -36,6 +36,15 @@ export const makeClipboard = (): [
   read: () => Promise<ClipboardItems | undefined>,
   newItem: NewClipboardItem
 ] => {
+  if (process.env.SSR) {
+    return [
+      async (_data: string | ClipboardItem[]) => {
+        /*noop*/
+      },
+      async () => Promise.resolve(undefined),
+      (_data, _type) => ({} as ClipboardItem)
+    ];
+  }
   const read = async () => await navigator.clipboard.read();
   const write: ClipboardSetter = async data => {
     typeof data === "string"
@@ -49,13 +58,12 @@ export const makeClipboard = (): [
  * Creates a new reactive primitive for managing the clipboard.
  *
  * @param data - Data signal to write to the clipboard.
- * @param deferInitial - Sets the value of the clipboard from the signal. defaulse to false.
+ * @param deferInitial - Sets the value of the clipboard from the signal. defaults to false.
  * @return Returns a resource representing the clipboard elements and children.
  *
- * @examplefindmy
+ * @example
  * const [data, setData] = createSignal('Foo bar');
  * const [ clipboard, read ] = createClipboard(data);
- * ```
  */
 export const createClipboard = (
   data?: Accessor<string | ClipboardItem[]>,
@@ -71,6 +79,15 @@ export const createClipboard = (
   refetch: VoidFunction,
   write: ClipboardSetter
 ] => {
+  if (process.env.SSR) {
+    return [
+      Object.assign(() => [], { loading: false, error: undefined }) as any,
+      () => {
+        /** noop */
+      },
+      _value => Promise.resolve()
+    ];
+  }
   const [write, readClipboard] = makeClipboard();
   const [clipboard, { refetch }] = createResource<any>(async () => {
     const items = (await readClipboard()) || [];
@@ -80,7 +97,8 @@ export const createClipboard = (
       return {
         async load(mime: string) {
           const blob = await item.getType(mime);
-          setData(blob.type == "text/plain" ? await blob.text() : blob);
+          const nextData = blob.type === "text/plain" ? await blob.text() : blob;
+          setData(() => nextData);
         },
         get type(): string {
           return getType();
@@ -112,7 +130,7 @@ export const createClipboard = (
  * @param options - Options to supply the directive with:
  * - `value` — Value to override the clipboard with.
  * - `write` — Optional write method to use for the clipboard action.
- * - `highlight` — The higlight modifier to use for the current element.
+ * - `highlight` — The highlight modifier to use for the current element.
  *
  * @example
  * ```ts
@@ -123,6 +141,9 @@ export const copyToClipboard = (
   el: HTMLElement | HTMLInputElement,
   options: MaybeAccessor<CopyToClipboardOptions>
 ) => {
+  if (process.env.SSR) {
+    return undefined;
+  }
   const setValue = () => {
     const opts: CopyToClipboardOptions = access(options);
     let data = opts.value;
@@ -156,7 +177,7 @@ export const newItem: NewClipboardItem = (type, data) => new ClipboardItem({ [ty
  * A modifier that highlights/selects a range on an HTML element.
  *
  * @param start - Starting point to highlight
- * @param end - Ening point to highlight
+ * @param end - Ending point to highlight
  * @returns Returns a modifier function.
  */
 export const element: Highlighter = (start: number = 0, end: number = 0) => {
@@ -175,7 +196,7 @@ export const element: Highlighter = (start: number = 0, end: number = 0) => {
  * A modifier that highlights/selects a range on an HTML input element.
  *
  * @param start - Starting point to highlight
- * @param end - Ening point to highlight
+ * @param end - Ending point to highlight
  * @returns Returns a modifier function.
  */
 export const input: Highlighter = (start?: number, end?: number) => {

@@ -1,6 +1,11 @@
+console.log("0");
 import { makeEventListener, createEventListener } from "@solid-primitives/event-listener";
+console.log("1");
 import { MaybeAccessor, Directive } from "@solid-primitives/utils";
+console.log("2");
 import { Accessor, createSignal, JSX } from "solid-js";
+console.log("3");
+
 declare module "solid-js" {
   namespace JSX {
     interface Directives {
@@ -28,6 +33,9 @@ const getActiveElement = () =>
 export function makeActiveElementListener(
   callback: (element: Element | null) => void
 ): VoidFunction {
+  if (process.env.SSR) {
+    return () => void 0;
+  }
   const handleChange = () => callback(getActiveElement());
   const clear1 = makeEventListener(window, "blur", handleChange, true);
   const clear2 = makeEventListener(window, "focus", handleChange, true);
@@ -43,6 +51,9 @@ export function makeActiveElementListener(
  * activeEl() // T: Element | null
  */
 export function createActiveElement(): Accessor<Element | null> {
+  if (process.env.SSR) {
+    return () => null;
+  }
   const [active, setActive] = createSignal<Element | null>(getActiveElement());
   makeActiveElementListener(setActive);
   return active;
@@ -66,6 +77,9 @@ export function makeFocusListener(
   callback: (isActive: boolean) => void,
   useCapture = true
 ): VoidFunction {
+  if (process.env.SSR) {
+    return () => void 0;
+  }
   const clear1 = makeEventListener(target, "blur", callback.bind(void 0, false), useCapture);
   const clear2 = makeEventListener(target, "focus", callback.bind(void 0, true), useCapture);
   return () => (clear1(), clear2());
@@ -81,6 +95,9 @@ export function makeFocusListener(
  * isFocused() // T: boolean
  */
 export function createFocusSignal(target: MaybeAccessor<Element>): Accessor<boolean> {
+  if (process.env.SSR) {
+    return () => false;
+  }
   const [isActive, setIsActive] = createSignal(document.activeElement === target);
   createEventListener(target, "blur", () => setIsActive(false), true);
   createEventListener(target, "focus", () => setIsActive(true), true);
@@ -97,6 +114,9 @@ export function createFocusSignal(target: MaybeAccessor<Element>): Accessor<bool
  * <input use:focus={setActive} />
  */
 export const focus: Directive<(isActive: boolean) => void> = (target, props) => {
+  if (process.env.SSR) {
+    return;
+  }
   const callback = props();
   callback(document.activeElement === target);
   makeFocusListener(target, callback);

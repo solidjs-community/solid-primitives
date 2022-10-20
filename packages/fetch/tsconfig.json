@@ -1,9 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./dist",
-    "emitDeclarationOnly": false,
-    "types": ["node", "vitest/globals"]
-  },
-  "include": ["./src", "vitest/client"]
+  "include": ["./src", "./test", "./dev", "./demo"],
+  "exclude": ["node_modules", "./dist"]
 }

@@ -1,86 +1,81 @@
+import { describe, test, it, expect } from "vitest";
 import { ReactiveSet, ReactiveWeakSet } from "../src";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { createComputed, createRoot } from "solid-js";
 
-const testSet = suite("ReactiveSet");
+describe("ReactiveSet", () => {
+  it("behaves like Set", () => {
+    const set = new ReactiveSet([1, 1, 2, 3]);
+    expect([...set]).toEqual([1, 2, 3]);
 
-testSet("behaves like Set", () => {
-  const set = new ReactiveSet([1, 1, 2, 3]);
-  assert.equal([...set], [1, 2, 3]);
+    set.add(4);
+    expect([...set]).toEqual([1, 2, 3, 4]);
 
-  set.add(4);
-  assert.equal([...set], [1, 2, 3, 4]);
+    set.add(4);
+    expect([...set]).toEqual([1, 2, 3, 4]);
 
-  set.add(4);
-  assert.equal([...set], [1, 2, 3, 4]);
+    expect(set.has(2)).toBeTruthy();
+    expect(set.delete(2)).toBeTruthy();
+    expect(set.has(2)).toBeFalsy();
 
-  assert.ok(set.has(2) === true);
-  assert.ok(set.delete(2) === true);
-  assert.ok(set.has(2) === false);
+    set.clear();
+    expect(set.size).toBe(0);
 
-  set.clear();
-  assert.ok(set.size === 0);
+    expect(set).instanceOf(Set);
+    expect(set).instanceOf(ReactiveSet);
+  });
 
-  assert.instance(set, Set);
-  assert.instance(set, ReactiveSet);
+  test("has() is reactive", () =>
+    createRoot(dispose => {
+      const set = new ReactiveSet([1, 1, 2, 3]);
+
+      let captured: any[] = [];
+      createComputed(() => {
+        captured.push(set.has(2));
+      });
+      expect(captured, "1").toEqual([true]);
+
+      set.add(4);
+      expect(captured, "2").toEqual([true]);
+
+      set.delete(4);
+      expect(captured, "3").toEqual([true]);
+
+      set.delete(2);
+      expect(captured, "4").toEqual([true, false]);
+
+      set.add(2);
+      expect(captured, "5").toEqual([true, false, true]);
+
+      set.clear();
+      expect(captured, "6").toEqual([true, false, true, false]);
+
+      dispose();
+    }));
 });
 
-// testSet("has() is reactive", () =>
-//   createRoot(dispose => {
-//     const set = new ReactiveSet([1, 1, 2, 3]);
+describe("ReactiveWeakSet", () => {
+  test("behaves like a WeakSet", () => {
+    const a = {};
+    const b = {};
+    const c = {};
+    const d = {};
+    const e = {};
 
-//     let captured = [];
-//     createComputed(() => {
-//       captured.push(set.has(2));
-//     });
-//     assert.equal(captured, [true], "1");
+    const set = new ReactiveWeakSet([a, a, b, c, d]);
+    expect(set.has(a)).toBeTruthy();
+    expect(set.has(b)).toBeTruthy();
+    expect(set.has(c)).toBeTruthy();
+    expect(set.has(d)).toBeTruthy();
+    expect(set.has(e)).toBeFalsy();
 
-//     set.add(4);
-//     assert.equal(captured, [true], "2");
+    set.add(e);
+    expect(set.has(e)).toBeTruthy();
+    set.add(e);
 
-//     set.delete(4);
-//     assert.equal(captured, [true], "3");
+    expect(set.delete(a)).toBeTruthy();
+    expect(set.has(a)).toBeFalsy();
 
-//     set.delete(2);
-//     assert.equal(captured, [true, false], "4");
-
-//     set.add(2);
-//     assert.equal(captured, [true, false, true], "5");
-
-//     set.clear();
-//     assert.equal(captured, [true, false, true, false], "6");
-
-//     dispose();
-//   })
-// );
-
-testSet.run();
-
-const testWeakSet = suite("ReactiveWeakSet");
-
-testWeakSet("behaves like a WeakSet", () => {
-  const a = {};
-  const b = {};
-  const c = {};
-  const d = {};
-  const e = {};
-
-  const set = new ReactiveWeakSet([a, a, b, c, d]);
-  assert.ok(set.has(a));
-  assert.ok(set.has(b));
-  assert.ok(set.has(c));
-  assert.ok(set.has(d));
-  assert.not.ok(set.has(e));
-
-  set.add(e);
-  assert.ok(set.has(e));
-  set.add(e);
-
-  assert.ok(set.delete(a));
-  assert.not.ok(set.has(a));
-
-  assert.instance(set, WeakSet);
-  assert.instance(set, ReactiveWeakSet);
+    expect(set).instanceOf(WeakSet);
+    expect(set).instanceOf(ReactiveWeakSet);
+  });
 });
-
-testWeakSet.run();

@@ -43,6 +43,9 @@ export function makeEventListenerStack(
   target: EventTarget,
   options?: EventListenerOptions
 ): [listen: EventListenerStackOn<Record<string, Event>>, clear: VoidFunction] {
+  if (process.env.SSR) {
+    return [() => () => void 0, () => void 0];
+  }
   const { push, execute } = createCallbackStack();
   return [
     (type, handler, overwriteOptions) => {

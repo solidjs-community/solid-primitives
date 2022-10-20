@@ -25,6 +25,14 @@ const geolocationDefaults: PositionOptions = {
 export const createGeolocation = (
   options?: MaybeAccessor<PositionOptions>
 ): [location: Resource<GeolocationCoordinates | undefined>, refetch: VoidFunction] => {
+  if (process.env.SSR) {
+    return [
+      Object.assign(() => {}, { error: undefined, loading: true }) as Resource<undefined>,
+      () => {
+        /* noop */
+      }
+    ];
+  }
   const [location, { refetch }] = createResource(
     () => Object.assign(geolocationDefaults, access(options)),
     options =>
@@ -64,6 +72,9 @@ export const createGeolocationWatcher = (
   location: GeolocationCoordinates | null;
   error: GeolocationPositionError | null;
 } => {
+  if (process.env.SSR) {
+    return { location: null, error: null };
+  }
   const [store, setStore] = createStaticStore<{
     location: null | GeolocationCoordinates;
     error: null | GeolocationPositionError;
