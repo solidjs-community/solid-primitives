@@ -147,13 +147,14 @@ describe("createStorageSignal", () => {
     }
   };
 
-  it("creates a signal", () => createRoot(dispose => {
-    const [storageItem, setStorageItem] = createStorageSignal<string | null>("test", null, {
-      api: mockStorage
-    });
-    expect(storageItem()).toBe(null);
-    setStorageItem("1");
-    expect(storageItem()).toBe("1");
-    dispose()
-  }));
+  it("creates a signal", () =>
+    createRoot(dispose => {
+      const [storageItem, setStorageItem] = createStorageSignal<string | null>("test", null, {
+        api: mockStorage
+      });
+      expect(storageItem()).toBe(null);
+      setStorageItem("1");
+      expect(storageItem()).toBe("1");
+      dispose();
+    }));
 });

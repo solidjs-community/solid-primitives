@@ -15,9 +15,8 @@ const totallyHiddenStyles: Partial<CSSStyleDeclaration> = {
 /**
  * Reads the current rem size from the document root.
  */
-export const getRemSize = (): number => process.env.SSR
-  ? serverRemSize
-  : parseFloat(getComputedStyle(document.documentElement).fontSize);
+export const getRemSize = (): number =>
+  process.env.SSR ? serverRemSize : parseFloat(getComputedStyle(document.documentElement).fontSize);
 
 /**
  * Creates a reactive signal with value of the current rem size, and tracks it's changes.
@@ -67,8 +66,8 @@ export const useRemSize: () => Accessor<number> = process.env.SSR
  */
 export const setServerRemSize = process.env.SSR
   ? (size: number) => {
-    serverRemSize = size;
-  }
+      serverRemSize = size;
+    }
   : (size: number): void => {
-    // needs not to work in the client
-  };
+      // needs not to work in the client
+    };

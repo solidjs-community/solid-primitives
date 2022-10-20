@@ -14,8 +14,7 @@ describe("createGeolocation", () => {
       expect(location.loading).toBe(false);
       expect(location()).toBe(mockCoordinates);
       dispose();
-    })
-  );
+    }));
 
   it("test basic geolocation error", () =>
     createRoot(async dispose => {
@@ -29,8 +28,7 @@ describe("createGeolocation", () => {
       expect(location.error.code).toBe(1);
       expect(location.error.message).toBe("GeoLocation error");
       dispose();
-    })
-  );
+    }));
 });
 
 describe("createGeolocation", () => {
@@ -43,6 +41,5 @@ describe("createGeolocation", () => {
       await setEnabled(true);
       expect(watcher.location).toBe(mockCoordinates);
       dispose();
-    })
-  );
+    }));
 });

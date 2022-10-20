@@ -10,14 +10,14 @@ describe("createSelection", () => {
     const container = document.createElement("div");
     document.body.appendChild(container);
     const unmount = render(component, container);
-    return { 
-      container, 
+    return {
+      container,
       unmount: () => {
         unmount();
         document.body.removeChild(container);
       }
     };
-  }
+  };
 
   const dispatchKeyupEvent = (node: HTMLElement | Document) =>
     new Promise<void>(resolve => {

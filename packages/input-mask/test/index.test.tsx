@@ -10,10 +10,13 @@ describe("createInputMask", () => {
     const container = document.createElement("div");
     document.body.appendChild(container);
     const unmount = render(testCase, container);
-    return { container, unmount: () => {
-      unmount();
-      document.body.removeChild(container);
-    } };
+    return {
+      container,
+      unmount: () => {
+        unmount();
+        document.body.removeChild(container);
+      }
+    };
   };
 
   const dispatchInputEvent = (node: HTMLElement) =>
@@ -23,7 +26,9 @@ describe("createInputMask", () => {
     });
 
   it("adds placeholder (e.g. to an iso date)", async () => {
-    const { container, unmount } = renderTest(() => <input onInput={createInputMask("9999-99-99")} />);
+    const { container, unmount } = renderTest(() => (
+      <input onInput={createInputMask("9999-99-99")} />
+    ));
     const input = container.querySelector("input") as HTMLInputElement;
     input.value = "11111";
     await dispatchInputEvent(input);
@@ -44,7 +49,9 @@ describe("createInputMask", () => {
   });
 
   it("removes wrongful input (e.g. from iso-date)", async () => {
-    const { container, unmount } = renderTest(() => <input onInput={createInputMask("9999-99-99")} />);
+    const { container, unmount } = renderTest(() => (
+      <input onInput={createInputMask("9999-99-99")} />
+    ));
     const input = container.querySelector("input") as HTMLInputElement;
     input.value = "a";
     await dispatchInputEvent(input);
@@ -56,16 +63,14 @@ describe("createInputMask", () => {
   });
 
   it("works with regex mask", async () => {
-    const { container, unmount } = renderTest(
-      () => (
-        <input
-          onInput={createInputMask([
-            /[^0-9a-zäöüß\-_/]|^(https?:\/\/|)(meet\.goto\.com|gotomeet\.me|)\/?/gi,
-            () => ""
-          ])}
-        />
-      )
-    );
+    const { container, unmount } = renderTest(() => (
+      <input
+        onInput={createInputMask([
+          /[^0-9a-zäöüß\-_/]|^(https?:\/\/|)(meet\.goto\.com|gotomeet\.me|)\/?/gi,
+          () => ""
+        ])}
+      />
+    ));
     const input = container.querySelector("input") as HTMLInputElement;
     input.value = "https://meet.goto.com/test";
     await dispatchInputEvent(input);

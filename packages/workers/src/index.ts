@@ -11,12 +11,7 @@ import { cjs, setup, KILL, RPC } from "./utils";
  */
 export function createWorker(...args: (Function | object)[]): WorkerExports {
   if (process.env.SSR) {
-    return [
-      new EventTarget() as unknown as Worker,
-      () => {},
-      () => {},
-      new Set()
-    ]
+    return [new EventTarget() as unknown as Worker, () => {}, () => {}, new Set()];
   }
   const exports = new Set<string>();
   let code = "";
@@ -78,11 +73,7 @@ export const createWorkerPool = (
   ...args: (Function | object)[]
 ): WorkerExports => {
   if (process.env.SSR) {
-    return [
-      new EventTarget() as unknown as Worker,
-      () => {},
-      () => {}
-    ]
+    return [new EventTarget() as unknown as Worker, () => {}, () => {}];
   }
   let current = -1;
   let workers: WorkerExports[] = [];

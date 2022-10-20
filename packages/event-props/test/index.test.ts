@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createEffect, createRoot } from "solid-js";
 import { createEventProps } from "../src/index";
 
-describe('event-props', () => {
+describe("event-props", () => {
   //# test type errors - run `yarn typecheck to find them`
   //- will expect at least 1 argument
   //@ts-expect-error

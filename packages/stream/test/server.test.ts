@@ -1,5 +1,10 @@
 import { describe, test, expect } from "vitest";
-import { createStream, createAmplitudeStream, createMediaPermissionRequest, createScreen } from "../src";
+import {
+  createStream,
+  createAmplitudeStream,
+  createMediaPermissionRequest,
+  createScreen
+} from "../src";
 
 describe("API doesn't break in SSR", () => {
   // check if the API doesn't throw when calling it in SSR

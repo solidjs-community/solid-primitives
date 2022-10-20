@@ -12,7 +12,7 @@ const dispatchAndWait = (script?: HTMLScriptElement, name: "load" | "error" = "l
     script?.dispatchEvent(new Event(name));
   });
 
-describe('createScriptLoader', () => {
+describe("createScriptLoader", () => {
   it("will create a script tag with src", () =>
     createRoot(dispose => {
       const [_, remove] = createRoot(() =>

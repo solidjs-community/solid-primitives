@@ -1,6 +1,6 @@
-const w = process.env.SSR ? { document: {}, navigator: { userAgent: '' } } : window as any;
-const n = w.navigator
-const ua = process.env.SSR ? '' : n.userAgent;
+const w = process.env.SSR ? { document: {}, navigator: { userAgent: "" } } : (window as any);
+const n = w.navigator;
+const ua = process.env.SSR ? "" : n.userAgent;
 
 //
 // Devices
@@ -59,8 +59,7 @@ export const isChromium: boolean = !!w.chrome;
 export const isEdge: boolean = /*#__PURE__*/ /Edg/.test(ua) && isChromium;
 
 /** Browser is Chrome */
-export const isChrome: boolean =
-  isChromium && n.vendor === "Google Inc." && !isOpera && !isEdge;
+export const isChrome: boolean = isChromium && n.vendor === "Google Inc." && !isOpera && !isEdge;
 
 //
 // Rendering Engines

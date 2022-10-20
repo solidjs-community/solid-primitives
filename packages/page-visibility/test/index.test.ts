@@ -3,7 +3,6 @@ import { createRoot } from "solid-js";
 import { createPageVisibility } from "../src";
 
 describe("createPageVisibility", () => {
-
   it("observes visibilitychange events", () =>
     createRoot(dispose => {
       let doc_visibility = "prerender";

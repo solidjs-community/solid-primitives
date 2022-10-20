@@ -1,4 +1,4 @@
-import { describe, it } from "vitest"
+import { describe, it } from "vitest";
 
 describe("createSocialShare", () => {
   it.todo("write tests");

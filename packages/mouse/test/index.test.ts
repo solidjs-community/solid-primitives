@@ -15,8 +15,7 @@ describe("createMousePosition", () => {
         isInside: false
       });
       dispose();
-    })
-  );
+    }));
 
   it("initial values can be changed", () =>
     createRoot(dispose => {
@@ -30,8 +29,7 @@ describe("createMousePosition", () => {
         isInside: false
       });
       dispose();
-    })
-  );
+    }));
 });
 
 describe("createMouseToElement", () => {
@@ -76,8 +74,7 @@ describe("createMouseToElement", () => {
       });
 
       dispose();
-    })
-  );
+    }));
 
   it("initial values can be changed", () =>
     createRoot(dispose => {
@@ -107,6 +104,5 @@ describe("createMouseToElement", () => {
       });
 
       dispose();
-    })
-  );
+    }));
 });

@@ -1,7 +1,14 @@
 import "./setup";
 import { describe, it, expect } from "vitest";
 import { createEffect, createRoot } from "solid-js";
-import { createDevices, createMicrophones, createSpeakers, createCameras, createAccelerometer, createGyroscope } from "../src";
+import {
+  createDevices,
+  createMicrophones,
+  createSpeakers,
+  createCameras,
+  createAccelerometer,
+  createGyroscope
+} from "../src";
 
 let fakeDeviceCount = 0;
 const fakeDeviceInfo = (overrides: Partial<MediaDeviceInfo> = {}): MediaDeviceInfo => ({
@@ -18,7 +25,7 @@ const setDevices = (devices: MediaDeviceInfo[]) => {
   (window as any).__devices__ = devices;
 };
 
-describe('devices', () => {
+describe("devices", () => {
   it("initially reads all devices", () =>
     createRoot(
       dispose =>
@@ -134,51 +141,58 @@ describe('devices', () => {
         })
     ));
 
-  it('reads the accelerometer', () => {
-    const moveDevice = (acceleration?: { x: number, y: number, z: number }) =>
-      dispatchEvent(new Event('deviceMotion', { acceleration } as any));
-    createRoot(dispose => new Promise<void>(resolve => {
-      const acceleration = createAccelerometer(false, 0);      
-      const expectedAcceleration = [
-        undefined,
-        { x: 0, y: 0, z: 0 },
-        { x: 1, y: 0, z: 0 },
-        { x: 0, y: 1, z: 0 },
-        { x: 0, y: 0, z: 1 },
-      ];
-      moveDevice(expectedAcceleration[1]);
-      createEffect(() => {
-        expect(acceleration()).toEqual(expectedAcceleration.shift());
-        if (expectedAcceleration.length === 0) {
-          dispose();
-          resolve();
-        } else {
-          moveDevice(expectedAcceleration[0]);
-        }
-      });
-    }));
+  it("reads the accelerometer", () => {
+    const moveDevice = (acceleration?: { x: number; y: number; z: number }) =>
+      dispatchEvent(new Event("deviceMotion", { acceleration } as any));
+    createRoot(
+      dispose =>
+        new Promise<void>(resolve => {
+          const acceleration = createAccelerometer(false, 0);
+          const expectedAcceleration = [
+            undefined,
+            { x: 0, y: 0, z: 0 },
+            { x: 1, y: 0, z: 0 },
+            { x: 0, y: 1, z: 0 },
+            { x: 0, y: 0, z: 1 }
+          ];
+          moveDevice(expectedAcceleration[1]);
+          createEffect(() => {
+            expect(acceleration()).toEqual(expectedAcceleration.shift());
+            if (expectedAcceleration.length === 0) {
+              dispose();
+              resolve();
+            } else {
+              moveDevice(expectedAcceleration[0]);
+            }
+          });
+        })
+    );
   });
 
-  it('reads the gyroscope', () => createRoot(dispose => new Promise<void>(resolve => {
-    const turnDevice = (orientation?: { alpha: number, beta: number, gamma: number }) =>
-      dispatchEvent(Object.assign(new Event("deviceorientation", {}), orientation as any));
-    const orientation = createGyroscope(0);
-    const expectedOrientations = [
-      { alpha: 0, beta: 0, gamma: 0 },
-      { alpha: 1, beta: 0, gamma: 1 },
-    ];
-    createEffect(() => {
-      expect({
-        alpha: orientation.alpha,
-        beta: orientation.beta,
-        gamma: orientation.gamma
-      }).toEqual(expectedOrientations.shift());
-      if (expectedOrientations.length === 0) {
-        dispose();
-        resolve();
-      } else {
-        turnDevice(expectedOrientations[0]);
-      }
-    });
-  })));
+  it("reads the gyroscope", () =>
+    createRoot(
+      dispose =>
+        new Promise<void>(resolve => {
+          const turnDevice = (orientation?: { alpha: number; beta: number; gamma: number }) =>
+            dispatchEvent(Object.assign(new Event("deviceorientation", {}), orientation as any));
+          const orientation = createGyroscope(0);
+          const expectedOrientations = [
+            { alpha: 0, beta: 0, gamma: 0 },
+            { alpha: 1, beta: 0, gamma: 1 }
+          ];
+          createEffect(() => {
+            expect({
+              alpha: orientation.alpha,
+              beta: orientation.beta,
+              gamma: orientation.gamma
+            }).toEqual(expectedOrientations.shift());
+            if (expectedOrientations.length === 0) {
+              dispose();
+              resolve();
+            } else {
+              turnDevice(expectedOrientations[0]);
+            }
+          });
+        })
+    ));
 });

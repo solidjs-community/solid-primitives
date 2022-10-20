@@ -40,7 +40,7 @@ export const createSelection = (): [Accessor<HTMLSelection>, Setter<HTMLSelectio
   if (process.env.SSR) {
     return [
       () => [null, NaN, NaN],
-      (sel) => typeof sel === 'function' ? sel([null, NaN, NaN]) : sel
+      sel => (typeof sel === "function" ? sel([null, NaN, NaN]) : sel)
     ];
   }
   const [selection, setSelection] = createSignal<HTMLSelection>([null, NaN, NaN]);

@@ -34,7 +34,7 @@ const createSocialShare = (
     title: "",
     description: ""
   }),
-  controller: Window = process.env.SSR ? globalThis as any : window
+  controller: Window = process.env.SSR ? (globalThis as any) : window
 ): [
   share: (network: Network | undefined) => void,
   close: () => void,

@@ -5,7 +5,7 @@ import { createSharedRoot } from "@solid-primitives/rootless";
 
 export function getScrollParent(node: Element | null): Element {
   if (process.env.SSR) {
-    return ({} as Element);
+    return {} as Element;
   }
   while (node && !isScrollable(node)) {
     node = node.parentElement;

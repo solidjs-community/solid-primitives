@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 import { createScrollPosition, getScrollPosition } from "../src/index";
 
 describe("getScrollPosition", () => {
-
   it("no target returns null", () => {
     expect(getScrollPosition(undefined)).toEqual({ x: null, y: null });
   });
@@ -51,8 +50,7 @@ describe("createScrollPosition", () => {
       expect(actualY).toEqual(expectedY);
 
       dispose();
-    })
-  );
+    }));
 
   it("target is reactive", () =>
     createRoot(dispose => {
@@ -74,6 +72,5 @@ describe("createScrollPosition", () => {
       expect(scroll).toEqual({ x: null, y: null });
 
       dispose();
-    })
-  );
+    }));
 });
