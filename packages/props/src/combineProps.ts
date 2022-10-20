@@ -1,7 +1,11 @@
-import { AnyObject, chain } from "@solid-primitives/utils";
-import { JSX, mergeProps, MergeProps } from "solid-js";
+import { $PROXY, mergeProps, untrack } from "solid-js";
+import type { JSX, MergeProps } from "solid-js";
+import { type AnyObject, chain } from "@solid-primitives/utils";
 
 const extractCSSregex = /([^:; ]*):\s*([^;]*)/g;
+
+const accessDescriptor = <T>(descriptor: TypedPropertyDescriptor<T>): T | undefined =>
+  descriptor.get ? descriptor.get() : descriptor.value;
 
 const isEventListenerKey = (key: string): boolean =>
   key[0] === "o" &&
@@ -82,81 +86,175 @@ type PropsInput = {
 export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
   ...sources: T
 ): MergeProps<T> {
-  if (sources.length === 1) return sources[0] as MergeProps<T>;
-
-  const merge = mergeProps(...sources) as unknown as MergeProps<T>;
-
-  const reduce = <K extends keyof PropsInput>(
-    key: K,
-    calc: (a: NonNullable<PropsInput[K]>, b: NonNullable<PropsInput[K]>) => PropsInput[K]
-  ) => {
-    let v: PropsInput[K] = undefined;
-    for (const props of sources) {
-      const propV = props[key];
-      if (!v) v = propV;
-      else if (propV) v = calc(v, propV);
-    }
-    return v;
-  };
-
-  // create a map of event listeners to be chained
-  const listeners: Record<string, ((...args: any[]) => void)[]> = {};
-
-  for (const props of sources) {
-    for (const key in props) {
-      if (!isEventListenerKey(key)) continue;
-
-      const v = props[key];
-      const name = key.toLowerCase();
-
-      let callback: (...args: any[]) => void;
-      if (typeof v === "function") callback = v;
-      // jsx event listeners also accept a tuple [handler, arg]
-      else if (Array.isArray(v)) {
-        if (v.length === 1) callback = v[0];
-        else callback = v[0].bind(void 0, v[1]);
-      } else {
-        delete listeners[name];
-        continue;
-      }
-
-      const callbacks = listeners[name];
-      if (!callbacks) listeners[name] = [callback];
-      else callbacks.push(callback);
-    }
+  if (sources.length === 1) {
+    return sources[0] as MergeProps<T>;
   }
 
-  return new Proxy(merge, {
-    get(target, key) {
-      if (typeof key !== "string") return Reflect.get(target, key);
+  return untrack(() => {
+    // check if the sources are dynamic (are proxies)
+    if (!process.env.SSR && sources.some(s => $PROXY in s)) {
+      // create a map of event listeners to be chained
+      const listeners: Record<string, ((...args: any[]) => void)[]> = {};
 
-      // Combine style prop
-      if (key === "style") return reduce("style", combineStyle);
+      for (const props of sources) {
+        for (const key in props) {
+          if (!isEventListenerKey(key)) continue;
 
-      // chain props.ref assignments
-      if (key === "ref") {
-        const callbacks: ((el: any) => void)[] = [];
-        for (const props of sources) {
-          const cb = props[key] as ((el: any) => void) | undefined;
-          if (typeof cb === "function") callbacks.push(cb);
+          const v = props[key];
+          const name = key.toLowerCase();
+
+          let callback: (...args: any[]) => void;
+          if (typeof v === "function") callback = v;
+          // jsx event listeners also accept a tuple [handler, arg]
+          else if (Array.isArray(v)) {
+            if (v.length === 1) callback = v[0];
+            else callback = v[0].bind(void 0, v[1]);
+          } else {
+            delete listeners[name];
+            continue;
+          }
+
+          const callbacks = listeners[name];
+          if (!callbacks) listeners[name] = [callback];
+          else callbacks.push(callback);
         }
-        return chain(callbacks);
       }
 
-      // Chain event listeners
-      if (isEventListenerKey(key)) {
-        const callbacks = listeners[key.toLowerCase()];
-        return Array.isArray(callbacks) ? chain(callbacks) : Reflect.get(target, key);
-      }
+      const reduce = <K extends keyof PropsInput>(
+        key: K,
+        calc: (a: NonNullable<PropsInput[K]>, b: NonNullable<PropsInput[K]>) => PropsInput[K]
+      ) => {
+        let v: PropsInput[K] = undefined;
+        for (const props of sources) {
+          const propV = props[key];
+          if (!v) v = propV;
+          else if (propV) v = calc(v, propV);
+        }
+        return v;
+      };
 
-      // Merge classes or classNames
-      if (key === "class" || key === "className") return reduce(key, (a, b) => `${a} ${b}`);
+      return new Proxy(mergeProps(...sources) as unknown as MergeProps<T>, {
+        get(target, key) {
+          if (typeof key !== "string") return Reflect.get(target, key);
 
-      // Merge classList objects, keys in the last object overrides all previous ones.
-      if (key === "classList") return reduce(key, (a, b) => ({ ...a, ...b }));
+          // Combine style prop
+          if (key === "style") return reduce("style", combineStyle);
 
-      return Reflect.get(target, key);
+          // chain props.ref assignments
+          if (key === "ref") {
+            const callbacks: ((el: any) => void)[] = [];
+            for (const props of sources) {
+              const cb = props[key] as ((el: any) => void) | undefined;
+              if (typeof cb === "function") callbacks.push(cb);
+            }
+            return chain(callbacks);
+          }
+
+          // Chain event listeners
+          if (isEventListenerKey(key)) {
+            const callbacks = listeners[key.toLowerCase()];
+            return Array.isArray(callbacks) ? chain(callbacks) : Reflect.get(target, key);
+          }
+
+          // Merge classes or classNames
+          if (key === "class" || key === "className") return reduce(key, (a, b) => `${a} ${b}`);
+
+          // Merge classList objects, keys in the last object overrides all previous ones.
+          if (key === "classList") return reduce(key, (a, b) => ({ ...a, ...b }));
+
+          return Reflect.get(target, key);
+        }
+      });
     }
+
+    type SourcePropList = TypedPropertyDescriptor<any>[];
+
+    const result = {} as any;
+    const styleList: SourcePropList = [];
+    const refList: SourcePropList = [];
+    const classNameList: SourcePropList = [];
+    const classListList: SourcePropList = [];
+    // const eventListeners: {
+    //   [key: string]: PropsInput[];
+    // } = {};
+
+    // for (const s of sources) {
+    //   for (const key in s) {
+    //     if (key === "style") styleList.push([s, key]);
+    //     else if (key === "ref") refList.push([s, key]);
+    //     else if (key === "class" || key === "className") classNameList.push([s, key]);
+    //     else if (key === "calssList") classListList.push([s, key]);
+    //     else if (isEventListenerKey(key)) {
+    //       const list = eventListeners[key];
+    //       if (Array.isArray(list)) list.push(s);
+    //       else eventListeners[key] = [s];
+    //     }
+    //   }
+    // }
+
+    // create a map of event listeners to be chained
+    const listeners: Record<string, ((...args: any[]) => void)[]> = {};
+
+    const reduce = <T>(
+      list: TypedPropertyDescriptor<T>[],
+      calc: (a: NonNullable<T>, b: NonNullable<T>) => T
+    ): T | undefined => {
+      let a: T | undefined = undefined;
+      for (const desc of list) {
+        const b = accessDescriptor(desc);
+        if (!a) a = b;
+        else if (b) a = calc(a, b);
+      }
+      return a;
+    };
+
+    for (const s of sources) {
+      for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(s))) {
+        if (key === "style") styleList.push(descriptor);
+        else if (key === "ref") refList.push(descriptor);
+        else if (key === "class" || key === "className") classNameList.push(descriptor);
+        else if (key === "calssList") classListList.push(descriptor);
+        else if (isEventListenerKey(key)) {
+          const v = accessDescriptor(descriptor);
+          const name = key.toLowerCase();
+
+          let callback: (...args: any[]) => void;
+          if (typeof v === "function") callback = v;
+          // jsx event listeners also accept a tuple [handler, arg]
+          else if (Array.isArray(v)) {
+            if (v.length === 1) callback = v[0];
+            else callback = v[0].bind(void 0, v[1]);
+          } else {
+            delete listeners[name];
+            continue;
+          }
+
+          const callbacks = listeners[name];
+          if (!callbacks) listeners[name] = [callback];
+          else callbacks.push(callback);
+        } else {
+          Object.defineProperty(result, key, descriptor);
+        }
+      }
+    }
+
+    if (styleList.length) {
+      Object.defineProperty(result, "style", {
+        get() {
+          return reduce(styleList, combineStyle);
+        }
+      });
+    }
+
+    if (refList.length) {
+      Object.defineProperty(result, "ref", {
+        get() {
+          return reduce(styleList, combineStyle);
+        }
+      });
+    }
+
+    return result;
   });
 }
 
