@@ -449,7 +449,7 @@ describe("fetch primitive", () => {
           withCacheStorage()
         ]);
         createEffect((iteration: number = 0) => {
-          const data = ready();
+          ready();
           if (iteration === 0) {
             setUrl(mockUrl);
           }

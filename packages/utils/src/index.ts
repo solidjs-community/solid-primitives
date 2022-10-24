@@ -1,13 +1,4 @@
-import {
-  getOwner,
-  onCleanup,
-  createSignal,
-  Accessor,
-  DEV,
-  untrack,
-  batch,
-  getListener
-} from "solid-js";
+import { getOwner, onCleanup, createSignal, Accessor, DEV, untrack, batch } from "solid-js";
 import type { Signal } from "solid-js/types/reactive/signal";
 import { isServer as _isServer } from "solid-js/web";
 import type {
