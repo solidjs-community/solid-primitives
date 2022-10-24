@@ -1,4 +1,4 @@
-import { Many, MaybeAccessor, forEachEntry } from "@solid-primitives/utils";
+import { entries, Many, MaybeAccessor } from "@solid-primitives/utils";
 import { createEventListener } from "./eventListener";
 import { EventMapOf, TargetWithEventMap, EventListenerOptions } from "./types";
 
@@ -50,9 +50,12 @@ export function createEventListenerMap(
   handlersMap: Record<string, any>,
   options?: EventListenerOptions
 ): void {
-  forEachEntry(handlersMap, (eventName, handler) => {
+  if (process.env.SSR) {
+    return;
+  }
+  for (const [eventName, handler] of entries(handlersMap)) {
     if (handler) createEventListener(targets, eventName, handler, options);
-  });
+  }
 }
 
 // /* Type Check */

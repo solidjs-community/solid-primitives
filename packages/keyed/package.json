@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/keyed",
-  "version": "1.0.0",
+  "version": "1.1.3",
   "description": "Control Flow primitives and components that require specifying explicit keys to identify or rerender elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -15,24 +15,9 @@
     "list": [
       "keyArray",
       "Key",
-      "Rerun"
+      "Entries"
     ],
     "category": "Control Flow"
-  },
-  "private": false,
-  "sideEffects": false,
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "start": "vite serve dev",
-    "dev": "vite serve dev",
-    "build": "tsup",
-    "test": "uvu -r solid-register"
   },
   "keywords": [
     "key",
@@ -40,24 +25,53 @@
     "solid",
     "primitives"
   ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
+  "types": "./dist/index.d.ts",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
+  "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "dev": "vite serve dev",
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
   "devDependencies": {
-    "@solid-primitives/immutable": "^0.1.0",
-    "@solid-primitives/refs": "^0.2.0",
-    "@solid-primitives/utils": "^1.5.2",
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "solid-app-router": "^0.2.1",
-    "solid-register": "^0.2.5",
-    "solid-transition-group": "^0.0.8",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.1",
-    "typescript": "^4.7.4",
-    "unocss": "^0.44.7",
-    "uvu": "^0.5.6",
-    "vite": "^3.0.4",
-    "vite-plugin-solid": "^2.3.0"
+    "@solid-primitives/immutable": "^0.1.3",
+    "@solid-primitives/refs": "^0.3.3",
+    "@solid-primitives/utils": "^3.1.0",
+    "solid-js": "^1.6.0",
+    "solid-transition-group": "^0.0.8"
   },
   "peerDependencies": {
-    "solid-js": "^1.4.0"
+    "solid-js": "^1.6.0"
   }
 }

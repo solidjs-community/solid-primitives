@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/share",
-  "version": "0.1.0",
+  "version": "1.0.3",
   "description": "Primitives to help with sharing content on social media and beyond.",
   "author": "David Di Biase <dave.dibiase@gmail.com",
   "license": "MIT",
@@ -11,7 +11,7 @@
   },
   "primitive": {
     "name": "share",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "createSocialShare"
     ],
@@ -24,35 +24,52 @@
   "sideEffects": false,
   "type": "module",
   "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/server.js",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
   "types": "./dist/index.d.ts",
   "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "development": {
+        "import": "./dist/dev.js",
+        "require": "./dist/dev.cjs"
+      },
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
     "node": {
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
+    },
+    "development": {
+      "import": "./dist/dev.js",
+      "require": "./dist/dev.cjs"
     },
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "tsup",
-    "test": "echo disabled defunct test suite"
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "test": "vitest -c ../../configs/vitest.config.ts"
   },
   "keywords": [
     "template",
     "primitives"
   ],
   "devDependencies": {
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "rimraf": "^3.0.2",
-    "solid-register": "^0.2.5",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.1",
-    "typescript": "^4.7.4",
-    "uvu": "^0.5.6"
+    "solid-js": "^1.6.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.3.1"
+    "solid-js": "^1.6.0"
   }
 }

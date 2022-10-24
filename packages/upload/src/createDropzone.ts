@@ -1,9 +1,10 @@
+import { noop } from "@solid-primitives/utils";
 import { createSignal, JSX, onCleanup, onMount } from "solid-js";
 import { transformFiles } from "./helpers";
 import { UploadFile, Dropzone, DropzoneOptions } from "./types";
 
 /**
- * Primitive to make working with dropzones easiere.
+ * Primitive to make working with dropzones easier.
  *
  * @returns `setRef`
  * @returns `files`
@@ -28,6 +29,15 @@ import { UploadFile, Dropzone, DropzoneOptions } from "./types";
 function createDropzone<T extends HTMLElement = HTMLElement>(
   options?: DropzoneOptions
 ): Dropzone<T> {
+  if (process.env.SSR) {
+    return {
+      setRef: noop,
+      files: () => [],
+      isDragging: () => false,
+      removeFile: noop,
+      clearFiles: noop
+    };
+  }
   const [files, setFiles] = createSignal<UploadFile[]>([]);
   const [isDragging, setIsDragging] = createSignal(false);
 

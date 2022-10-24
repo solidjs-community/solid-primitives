@@ -148,17 +148,15 @@ export const withRetry: RequestModifier =
       requestContext as unknown as RequestContext<Result, FetcherArgs>,
       originalFetcher => (requestData: FetcherArgs, info: ResourceFetcherInfo<Result>) => {
         const wrappedFetcher = (attempt: number): Promise<Result> =>
-          originalFetcher(requestData, info)
-            .then(data =>
-              !verify(requestContext.response) && attempt <= retries
-                ? waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1))
-                : data
-            )
-            .catch(err =>
-              attempt > retries
-                ? Promise.reject(err)
-                : waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1))
-            );
+          attempt <= retries
+            ? originalFetcher(requestData, info)
+                .then(data =>
+                  !verify(requestContext.response)
+                    ? waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1))
+                    : data
+                )
+                .catch(_err => waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1)))
+            : originalFetcher(requestData, info);
         return wrappedFetcher(0);
       }
     );
@@ -204,3 +202,29 @@ export const withRefetchEvent: RequestModifier = isServer
         getOwner() &&
           onCleanup(() => events.forEach(name => window.removeEventListener(name, handler)));
       };
+
+export const withAggregation: RequestModifier =
+  <Result extends unknown, FetcherArgs extends any[]>(dataFilter?: (result: Result) => Result) =>
+  (requestContext: RequestContext<Result, FetcherArgs>) => {
+    wrapFetcher<Result, FetcherArgs>(
+      requestContext,
+      originalFetcher =>
+        (...args) =>
+          originalFetcher(...args).then(data => {
+            const next = dataFilter ? dataFilter(data) : data;
+            const current = requestContext.resource?.[0]();
+            return Array.isArray(current)
+              ? Array.isArray(next)
+                ? ([...current, ...next] as Result)
+                : ([...current, next] as Result)
+              : typeof current === "object" && typeof next === "object"
+              ? ({ ...current, ...next } as Result)
+              : typeof current === "string" && typeof next === "string"
+              ? ((current + next) as Result)
+              : current != null
+              ? ([current, next] as Result)
+              : next;
+          })
+    );
+    requestContext.wrapResource();
+  };

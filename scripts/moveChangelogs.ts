@@ -1,9 +1,17 @@
-import { readdirSync, readFileSync, writeFileSync } from "fs";
-import { pathTo } from "./utils";
+/*
 
-readdirSync(pathTo(`../packages/`)).forEach(name => {
-  const readme = readFileSync(pathTo(`../packages/${name}/README.md`), "utf8");
-  const { version } = JSON.parse(readFileSync(pathTo(`../packages/${name}/package.json`), "utf8"));
+This script was used to move changelogs from being inlined in the packages README.md files to being separated CHANGELOG.md files.
+
+Left for reference and future use.
+
+*/
+
+import { readdirSync, readFileSync, writeFileSync } from "fs";
+import { r } from "./utils";
+
+readdirSync(r(`../packages/`)).forEach(name => {
+  const readme = readFileSync(r(`../packages/${name}/README.md`), "utf8");
+  const { version } = JSON.parse(readFileSync(r(`../packages/${name}/package.json`), "utf8"));
 
   // console.log(readme);
 
@@ -26,12 +34,12 @@ readdirSync(pathTo(`../packages/`)).forEach(name => {
   }
   const changelog = changelogMatch[1];
 
-  const changelogFile = readFileSync(pathTo(`../packages/${name}/CHANGELOG.md`), "utf8");
+  const changelogFile = readFileSync(r(`../packages/${name}/CHANGELOG.md`), "utf8");
   const heading = changelogFile.split("\r\n")[0];
   const newChangelogFile = `${heading}\r\n\r\n## Changelog up to version ${version}${changelog}`;
 
-  writeFileSync(pathTo(`../packages/${name}/CHANGELOG.md`), newChangelogFile);
+  writeFileSync(r(`../packages/${name}/CHANGELOG.md`), newChangelogFile);
 
   const newReadme = `${before}## Changelog\n\nSee [CHANGELOG.md](.\\CHANGELOG.md)\n\n${after}`;
-  writeFileSync(pathTo(`../packages/${name}/README.md`), newReadme);
+  writeFileSync(r(`../packages/${name}/README.md`), newReadme);
 });

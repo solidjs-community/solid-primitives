@@ -2,15 +2,7 @@ import { Accessor, createSignal, getOwner } from "solid-js";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { remove, split } from "@solid-primitives/immutable";
 import { createSubRoot } from "@solid-primitives/rootless";
-import {
-  MaybeAccessor,
-  forEachEntry,
-  createCallbackStack,
-  Directive,
-  Many,
-  createProxy,
-  warn
-} from "@solid-primitives/utils";
+import { MaybeAccessor, Directive, Many, createProxy, entries } from "@solid-primitives/utils";
 import {
   Handler,
   OnEventRecord,
@@ -24,7 +16,7 @@ import {
 import { DEFAULT_STATE, parseHandlersMap, toState, toStateActive } from "./helpers";
 
 export { getPositionToElement } from "./helpers";
-export {
+export type {
   PointerType,
   PointerState,
   PointerStateWithActive,
@@ -42,7 +34,7 @@ export {
  * - `pointerTypes` - specify array of pointer types you want to listen to. By default listens to `["mouse", "touch", "pen"]`
  * - `passive` - Add passive option to event listeners. Defaults to `true`.
  * - your event handlers: e.g. `onenter`, `onLeave`, `onMove`, ...
- * @returns function stopping currently attached listener
+ * @returns function stopping currently attached listener **!deprecated!**
  *
  * @example
  * createPointerListeners({
@@ -57,11 +49,15 @@ export {
  */
 export function createPointerListeners(
   config: Partial<OnEventRecord<PointerEventNames, Handler>> & {
-    target?: MaybeAccessor<EventTarget>;
+    target?: MaybeAccessor<EventTarget | undefined>;
     pointerTypes?: PointerType[];
     passive?: boolean;
   }
-): VoidFunction {
+): void {
+  if (process.env.SSR) {
+    return;
+  }
+
   const [{ target = document.body, pointerTypes, passive = true }, handlers] = split(
     config,
     "target",
@@ -76,15 +72,14 @@ export function createPointerListeners(
 
   const guardCB = (handler: Handler) => (event: PointerEvent) =>
     (!pointerTypes || pointerTypes.includes(event.pointerType as PointerType)) && handler(event);
-  const cleanup = createCallbackStack();
   const addEventListener = (type: Many<keyof HTMLElementEventMap>, fn: Handler) =>
-    cleanup.push(createEventListener(target, type, guardCB(fn) as any, { passive }));
+    createEventListener(target, type, guardCB(fn) as any, { passive });
 
-  forEachEntry(nativeHandlers, (name, fn) => fn && addEventListener(`pointer${name}`, fn));
+  entries(nativeHandlers).forEach(
+    ([name, fn]) => fn && addEventListener(`pointer${name}` as keyof HTMLElementEventMap, fn)
+  );
   if (onGotCapture) addEventListener("gotpointercapture", onGotCapture);
   if (onLostCapture) addEventListener("lostpointercapture", onLostCapture);
-
-  return cleanup.execute;
 }
 
 /**
@@ -132,6 +127,10 @@ export function createPerPointerListeners(
       >
   >
 ) {
+  if (process.env.SSR) {
+    return;
+  }
+
   const [{ target = document.body, pointerTypes, passive = true }, handlers] = split(
     config,
     "pointerTypes",
@@ -141,7 +140,7 @@ export function createPerPointerListeners(
   const { down: onDown, enter: onEnter } = parseHandlersMap(handlers);
   const owner = getOwner();
   const onlyInitMessage = "All listeners need to be added synchronously in the initial event.";
-  const addListener = (type: Many<string>, fn: Handler, pointerId?: number): VoidFunction =>
+  const addListener = (type: Many<string>, fn: Handler, pointerId?: number): void =>
     createEventListener(
       target,
       type,
@@ -174,7 +173,10 @@ export function createPerPointerListeners(
             get(key) {
               const type = "pointer" + key.substring(2).toLowerCase();
               return (fn: Handler) => {
-                if (!init) return warn(onlyInitMessage);
+                if (!init) {
+                  if (process.env.DEV) console.warn(onlyInitMessage);
+                  return;
+                }
                 if (type === "pointerleave") onLeave = fn;
                 else addListener(type, fn, pointerId);
               };
@@ -208,12 +210,16 @@ export function createPerPointerListeners(
           // onMove()
           fn => {
             if (init) addListener("pointermove", fn, pointerId);
-            else warn(onlyInitMessage);
+            else if (process.env.DEV) {
+              console.warn(onlyInitMessage);
+            }
           },
           // onUp()
           fn => {
             if (init) onUp = fn;
-            else warn(onlyInitMessage);
+            else if (process.env.DEV) {
+              console.warn(onlyInitMessage);
+            }
           }
         );
         init = false;
@@ -244,6 +250,10 @@ export function createPointerPosition(
     value?: PointerStateWithActive;
   } = {}
 ): Accessor<PointerStateWithActive> {
+  if (process.env.SSR) {
+    return () => DEFAULT_STATE;
+  }
+
   const [state, setState] = createSignal(config.value ?? DEFAULT_STATE);
   let pointer: null | number = null;
   const handler = (e: PointerEvent, active = true) => setState(toStateActive(e, active));
@@ -292,6 +302,10 @@ export function createPointerList(
     pointerTypes?: PointerType[];
   } = {}
 ): Accessor<Accessor<PointerListItem>[]> {
+  if (process.env.SSR) {
+    return () => [];
+  }
+
   const [pointers, setPointers] = createSignal<Accessor<PointerListItem>[]>([]);
   createPerPointerListeners({
     ...config,

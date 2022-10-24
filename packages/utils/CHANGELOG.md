@@ -1,5 +1,28 @@
 # @solid-primitives/utils
 
+## 3.1.0
+
+### Minor Changes
+
+- a372d0e7: Remove `warn` and `noop` functions.
+
+### Patch Changes
+
+- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+- abb8063c: Remove `forEachEntry` utility
+
+## 3.0.2
+
+### Patch Changes
+
+- 7ac41ed: Update to solid-js version 1.5
+
+## 3.0.1
+
+### Patch Changes
+
+- 555e973: add "readonly" to handleDiffArray array arguments
+
 ## 3.0.0
 
 ### Major Changes

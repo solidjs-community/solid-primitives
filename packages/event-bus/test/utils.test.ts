@@ -1,84 +1,73 @@
+import { describe, test, expect } from "vitest";
+import { createRoot, getOwner } from "solid-js";
 import { createEmitter, once, toEffect, toPromise } from "../src";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
-import { createRoot } from "solid-js";
-import { getOwner } from "solid-js";
 
-const tp = suite("toPromise");
+describe("toPromise", () => {
+  test("toPromise turns subscription into a promise", async () => {
+    const emitter = createEmitter<string>();
+    const promise = toPromise(emitter.listen);
 
-tp("toPromise turns subscription into a promise", async () => {
-  const emitter = createEmitter<string>();
-  const promise = toPromise(emitter.listen);
+    expect(promise).instanceOf(Promise);
 
-  assert.instance(promise, Promise);
-
-  promise.then(event => {
-    assert.is(event, "foo");
-  });
-
-  setTimeout(() => {
-    emitter.emit("foo");
-  }, 0);
-});
-
-tp.run();
-
-const testOnce = suite("once");
-
-testOnce("once()", () => {
-  const captured: any[] = [];
-  const { listen, emit } = createEmitter<string>();
-
-  once(listen, a => captured.push(a));
-
-  emit("foo");
-  assert.is(captured.length, 1, "first emit should work");
-
-  emit("bar");
-  assert.is(captured.length, 1, "second emit shouldn't be captured");
-
-  once(listen, a => captured.push(a), true);
-  emit("foo");
-  assert.is(captured.length, 2, "protected: first emit should work");
-
-  emit("bar");
-  assert.is(captured.length, 2, "protected: second emit shouldn't be captured");
-});
-
-testOnce.run();
-
-const testToEffect = suite("toEffect");
-
-testToEffect("toEffect()", () =>
-  createRoot(dispose => {
-    const captured: any[] = [];
-    let capturedOwner: any;
-    const { listen, emit } = createEmitter<string>();
-    const emitInEffect = toEffect(emit);
-    listen(e => {
-      captured.push(e);
-      capturedOwner = getOwner();
+    promise.then(event => {
+      expect(event).toBe("foo");
     });
 
-    // owner gets set to null synchronously after root executes
     setTimeout(() => {
-      emit("foo");
-      assert.is(
-        capturedOwner,
-        null,
-        "owner will should not be available inside listener after using normal emit"
-      );
-
-      emitInEffect("bar");
-      assert.equal(captured, ["foo", "bar"]);
-      assert.is.not(
-        capturedOwner,
-        null,
-        "owner will should be available inside listener after using emitInEffect"
-      );
-      dispose();
+      emitter.emit("foo");
     }, 0);
-  })
-);
+  });
+});
 
-testToEffect.run();
+describe("once", () => {
+  test("once()", () => {
+    const captured: any[] = [];
+    const { listen, emit } = createEmitter<string>();
+
+    once(listen, a => captured.push(a));
+
+    emit("foo");
+    expect(captured.length, "first emit should work").toBe(1);
+
+    emit("bar");
+    expect(captured.length, "second emit shouldn't be captured").toBe(1);
+
+    once(listen, a => captured.push(a), true);
+    emit("foo");
+    expect(captured.length, "protected: first emit should work").toBe(2);
+
+    emit("bar");
+    expect(captured.length, "protected: second emit shouldn't be captured").toBe(2);
+  });
+});
+
+describe("toEffect", () => {
+  test("toEffect()", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      let capturedOwner: any;
+      const { listen, emit } = createEmitter<string>();
+      const emitInEffect = toEffect(emit);
+      listen(e => {
+        captured.push(e);
+        capturedOwner = getOwner();
+      });
+
+      // owner gets set to null synchronously after root executes
+      setTimeout(() => {
+        emit("foo");
+        expect(
+          capturedOwner,
+          "owner will should not be available inside listener after using normal emit"
+        ).toBe(null);
+
+        emitInEffect("bar");
+        expect(captured).toEqual(["foo", "bar"]);
+        expect(
+          capturedOwner,
+          "owner will should be available inside listener after using emitInEffect"
+        ).not.toBe(null);
+        dispose();
+      }, 0);
+    }));
+});

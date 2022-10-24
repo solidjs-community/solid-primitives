@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/permission",
-  "version": "1.1.0",
+  "version": "1.2.1",
   "description": "Primitive that wraps permission queries",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
@@ -24,19 +24,48 @@
   "sideEffects": false,
   "type": "module",
   "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
   "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "development": {
+        "import": "./dist/dev.js",
+        "require": "./dist/dev.cjs"
+      },
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
     "node": {
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
+    },
+    "development": {
+      "import": "./dist/dev.js",
+      "require": "./dist/dev.cjs"
     },
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "tsup",
-    "test": "uvu -r solid-register"
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "dev": "vite serve dev --host",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.0"
   },
   "keywords": [
     "permission",
@@ -45,16 +74,6 @@
     "primitives"
   ],
   "devDependencies": {
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "rimraf": "^3.0.2",
-    "solid-register": "^0.2.5",
-    "tslib": "2.3.1",
-    "tsup": "^6.2.1",
-    "typescript": "^4.7.4",
-    "uvu": "^0.5.6"
-  },
-  "peerDependencies": {
-    "solid-js": ">= 1.0.0"
+    "solid-js": "^1.6.0"
   }
 }

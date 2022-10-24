@@ -66,8 +66,28 @@ export function makeIntersectionObserver(
   stop: VoidFunction;
   instance: IntersectionObserver;
 } {
+  if (process.env.SSR)
+    return {
+      add: () => void 0,
+      remove: () => void 0,
+      start: () => void 0,
+      reset: () => void 0,
+      stop: () => void 0,
+      instance: {} as unknown as IntersectionObserver
+    };
+
   const instance = new IntersectionObserver(onChange, options);
-  const add: AddIntersectionObserverEntry = el => instance.observe(el);
+  const add: AddIntersectionObserverEntry = el => {
+    // Elements with 'display: "contents"' don't work with IO, even if they are visible by users (https://github.com/solidjs-community/solid-primitives/issues/116)
+    if (process.env.DEV && el instanceof HTMLElement && el.style.display === "contents") {
+      console.warn(
+        `[@solid-primitives/intersection-observer/makeIntersectionObserver] IntersectionObserver is not able to observe elements with 'display: "contents"' style:`,
+        el
+      );
+      return;
+    }
+    instance.observe(el);
+  };
   const remove: RemoveIntersectionObserverEntry = el => instance.unobserve(el);
   const start = () => elements.forEach(add);
   const stop = () => instance.disconnect();
@@ -98,7 +118,8 @@ export function createIntersectionObserver(
   elements: Accessor<Element[]>,
   onChange: IntersectionObserverCallback,
   options?: IntersectionObserverInit
-) {
+): void {
+  if (process.env.SSR) return;
   const { add, reset } = makeIntersectionObserver([], onChange, options);
   createEffect(() => {
     reset();
@@ -142,6 +163,10 @@ export function createViewportObserver(
 ): CreateViewportObserverReturnValue;
 
 export function createViewportObserver(...a: any) {
+  if (process.env.SSR) {
+    return [() => void 0, { start: () => void 0, stop: () => void 0 }];
+  }
+
   let initial: [Element, EntryCallback][] = [];
   let options: IntersectionObserverInit = {};
   if (Array.isArray(a[0]) || a[0] instanceof Function) {
@@ -208,6 +233,10 @@ export function createVisibilityObserver(
   },
   setter?: MaybeAccessor<VisibilitySetter>
 ): (element: MaybeAccessor<Element | FalsyValue>) => Accessor<boolean> {
+  if (process.env.SSR) {
+    return () => () => false;
+  }
+
   const callbacks = new WeakMap<Element, EntryCallback>();
 
   const { add, remove } = makeIntersectionObserver(
@@ -239,7 +268,7 @@ export function createVisibilityObserver(
     const callback = getCallback(isVisible, setVisible);
     let prevEl: Element | FalsyValue;
 
-    if (typeof element === "function") {
+    if (element && !(element instanceof Element)) {
       createEffect(() => {
         const el = element();
         if (el === prevEl) return;
@@ -269,6 +298,9 @@ export function getOccurrence(
   isIntersecting: boolean,
   prevIsIntersecting: boolean | undefined
 ): Occurrence {
+  if (process.env.SSR) {
+    return Occurrence.Outside;
+  }
   return isIntersecting
     ? prevIsIntersecting
       ? Occurrence.Inside
@@ -296,6 +328,9 @@ export function getOccurrence(
 export function withOccurrence<Ctx extends {}>(
   setter: MaybeAccessor<VisibilitySetter<Ctx & { occurrence: Occurrence }>>
 ): () => VisibilitySetter<Ctx> {
+  if (process.env.SSR) {
+    return () => () => false;
+  }
   return () => {
     let prevIntersecting: boolean | undefined;
     const cb = access(setter);
@@ -330,6 +365,12 @@ export function getDirection(
   prevRect: DOMRectReadOnly | undefined,
   intersecting: boolean
 ): { directionX: DirectionX; directionY: DirectionY } {
+  if (process.env.SSR) {
+    return {
+      directionX: DirectionX.None,
+      directionY: DirectionY.None
+    };
+  }
   let directionX = DirectionX.None;
   let directionY = DirectionY.None;
   if (!prevRect) return { directionX, directionY };
@@ -363,6 +404,9 @@ export function withDirection<Ctx extends {}>(
     VisibilitySetter<Ctx & { directionX: DirectionX; directionY: DirectionY }>
   >
 ): () => VisibilitySetter<Ctx> {
+  if (process.env.SSR) {
+    return () => () => false;
+  }
   return () => {
     let prevBounds: DOMRectReadOnly | undefined;
     const cb = access(callback);

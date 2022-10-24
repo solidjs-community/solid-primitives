@@ -1,11 +1,9 @@
 import "./setup";
-import { createEffect, createRoot, createSignal, on } from "solid-js";
-import { getLastClipboardEntry } from "./setup";
-import { createClipboard, copyToClipboard } from "../src";
-import * as assert from "uvu/assert";
-import { suite } from "uvu";
+import { createEffect, createRoot, on } from "solid-js";
+import { createClipboard } from "../src";
+import { describe, expect, it } from "vitest";
 
-const until = (value): Promise<void> =>
+const until = (value: any): Promise<void> =>
   new Promise(resolve => {
     const timeout = setTimeout(resolve, 2500);
     createRoot(dispose => {
@@ -23,19 +21,16 @@ const until = (value): Promise<void> =>
     });
   });
 
-const testCP = suite("createClipboard");
-
-testCP("test initial read values", () =>
-  createRoot(async dispose => {
-    const [clipboard] = createClipboard();
-    await until(clipboard);
-    const items = clipboard();
-    assert.equal(items.length, 1);
-    const txt = items[0].text;
-    await until(txt);
-    assert.is(txt(), "InitialValue");
-    dispose();
-  })
-);
-
-testCP.run();
+describe("createClipboard", () => {
+  it("test initial read values", () =>
+    createRoot(async dispose => {
+      const [clipboard] = createClipboard();
+      await until(clipboard);
+      const items = clipboard();
+      expect(items).toHaveLength(1);
+      const txt = items![0].text;
+      await until(txt);
+      expect(txt()).toBe("InitialValue");
+      dispose();
+    }));
+});

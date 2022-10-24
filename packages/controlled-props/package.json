@@ -1,0 +1,67 @@
+{
+  "name": "@solid-primitives/controlled-props",
+  "version": "0.0.2",
+  "description": "The primitives in this package allow you to create controlls for component props.",
+  "author": "Alex Lohr <alex.lohr@logmein.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/controlled-props",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "controlled props",
+    "stage": 3,
+    "list": [
+      "createControlledProp"
+    ],
+    "category": "Utilities"
+  },
+  "files": [
+    "dist"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "solid": "./dist/source/index.jsx",
+      "import": "./dist/esm/index.js",
+      "browser": {
+        "import": "./dist/esm/index.js",
+        "require": "./dist/cjs/index.js"
+      },
+      "require": "./dist/cjs/index.js",
+      "node": "./dist/cjs/index.js"
+    }
+  },
+  "scripts": {
+    "start": "vite serve dev --host",
+    "dev": "npm run start",
+    "build": "rollup -c",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
+  "keywords": [
+    "controlled props",
+    "knobs",
+    "controls",
+    "solid",
+    "primitives"
+  ],
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^3.1.0"
+  },
+  "devDependencies": {
+    "babel-preset-solid": "^1.5.4",
+    "rollup": "^2.79.0",
+    "rollup-preset-solid": "^1.4.0",
+    "solid-js": "^1.6.0"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.0"
+  }
+}

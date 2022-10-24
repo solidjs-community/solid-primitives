@@ -1,6 +1,6 @@
-import { join } from "path";
+import path from "path";
 
-export const pathTo = (...path: string[]) => join(__dirname, ...path);
+export const r = (...pathSegments: string[]) => path.resolve(__dirname, ...pathSegments);
 
 const getCommentText = (text: string, marker: "START" | "END") => `<!-- ${text}:${marker} -->`;
 

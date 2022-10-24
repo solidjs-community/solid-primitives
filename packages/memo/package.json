@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/memo",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Collection of custom memo primitives. They extend Solid's createMemo functionality while keeping the usage similar.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "contributors": [],
@@ -17,7 +17,7 @@
     "name": "memo",
     "stage": 3,
     "list": [
-      "createCurtain",
+      "createLatest",
       "createWritableMemo",
       "createLazyMemo",
       "createAsyncMemo",
@@ -25,17 +25,37 @@
       "createDebouncedMemoOn",
       "createThrottledMemo",
       "createPureReaction",
-      "createMemoCache"
+      "createMemoCache",
+      "createReducer"
     ],
     "category": "Reactivity"
   },
   "private": false,
   "sideEffects": false,
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/server.js",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
   "types": "./dist/index.d.ts",
   "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
     "node": {
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
@@ -43,14 +63,12 @@
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "npm run start",
-    "build": "tsup",
-    "test": "uvu -r solid-register"
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "solid",
@@ -58,24 +76,15 @@
     "memo"
   ],
   "dependencies": {
-    "@solid-primitives/scheduled": "1.0.0",
-    "@solid-primitives/utils": "^3.0.0"
+    "@solid-primitives/scheduled": "^1.1.0",
+    "@solid-primitives/utils": "^3.1.0"
   },
   "devDependencies": {
-    "@solid-primitives/mouse": "^2.0.0",
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
+    "@solid-primitives/mouse": "^2.0.3",
     "solid-app-router": "^0.3.3",
-    "solid-register": "^0.2.5",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.1",
-    "typescript": "^4.7.4",
-    "unocss": "^0.44.7",
-    "uvu": "^0.5.6",
-    "vite": "^3.0.4",
-    "vite-plugin-solid": "^2.3.0"
+    "solid-js": "^1.6.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.4.2"
+    "solid-js": "^1.6.0"
   }
 }

@@ -1,5 +1,31 @@
 # @solid-primitives/memo
 
+## 1.1.0
+
+### Minor Changes
+
+- 71a1414d: Add `createReducer` (moved from `@solid-primitives/reducer` package)
+- 8ddc147a: Rename `createCurtain` to `createLatest`. (deprecate `createCurtain`)
+
+### Patch Changes
+
+- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+- Updated dependencies [a372d0e7]
+- Updated dependencies [b662fe9f]
+- Updated dependencies [abb8063c]
+- Updated dependencies [8ddc147a]
+  - @solid-primitives/utils@3.1.0
+  - @solid-primitives/scheduled@1.1.0
+
+## 1.0.2
+
+### Patch Changes
+
+- 7ac41ed: Update to solid-js version 1.5
+- Updated dependencies [7ac41ed]
+  - @solid-primitives/scheduled@1.0.1
+  - @solid-primitives/utils@3.0.2
+
 ## 1.0.1
 
 ### Patch Changes

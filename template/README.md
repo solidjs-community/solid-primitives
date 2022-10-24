@@ -19,6 +19,8 @@ A sample primitive that is made up for templating with the following options:
 npm install @solid-primitives/template-primitive
 # or
 yarn add @solid-primitives/template-primitive
+# or
+pnpm add @solid-primitives/template-primitive
 ```
 
 ## How to use it
@@ -33,11 +35,4 @@ You can use this template for publishing your demo on CodeSandbox: https://codes
 
 ## Changelog
 
-<details>
-<summary><b>Expand Changelog</b></summary>
-
-0.0.100
-
-Initial release as a Stage-0 primitive.
-
-</details>
+See [CHANGELOG.md](./CHANGELOG.md)

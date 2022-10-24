@@ -1,5 +1,17 @@
 # @solid-primitives/input-mask
 
+## 0.1.4
+
+### Patch Changes
+
+- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+
+## 0.1.3
+
+### Patch Changes
+
+- 7ac41ed: Update to solid-js version 1.5
+
 ## Changelog up to version 0.1.2
 
 0.0.100

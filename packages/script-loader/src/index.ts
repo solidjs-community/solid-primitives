@@ -1,4 +1,4 @@
-import { Accessor, createEffect, on, onCleanup } from "solid-js";
+import { Accessor, createEffect, onCleanup } from "solid-js";
 
 /**
  * Creates a convenient script loader utility
@@ -15,6 +15,14 @@ export const createScriptLoader = (opts: {
   onload?: () => void;
   onerror?: () => void;
 }): [script: HTMLScriptElement | undefined, remove: () => void] => {
+  if (process.env.SSR) {
+    return [
+      undefined,
+      () => {
+        /*noop*/
+      }
+    ];
+  }
   const script = document.createElement("script");
   opts.type && (script.type = opts.type);
   opts.onload && script.addEventListener("load", opts.onload);

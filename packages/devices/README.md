@@ -21,6 +21,8 @@ yarn add @solid-primitives/devices
 
 ## How to use it
 
+### Media Devices
+
 ```ts
 const devices = createDevices();
 
@@ -31,9 +33,21 @@ const cameras = createCameras();
 
 The filtered primitives are build so that they only triggered if the devices of their own kind changed.
 
+### Device Motion
+
+```ts
+const accelerometer = createAccelerometer();
+const gyroscope = createGyroscope();
+```
+
 ## Demo
 
 TODO
+
+## Reference
+
+`createAccelerometer` : [devicemotion event](https://developer.mozilla.org/en-US/docs/Web/API/Window/devicemotion_event)
+`createGyroscope` : [deviceorientation event](https://developer.mozilla.org/en-US/docs/Web/API/Window/deviceorientation_event)
 
 ## Changelog
 

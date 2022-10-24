@@ -1,0 +1,8 @@
+schema: https://countries.trevorblades.com/
+documents: "./dev/**/*.{ts,tsx,graphql}"
+generates:
+  ./dev/gqlgen.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typed-document-node

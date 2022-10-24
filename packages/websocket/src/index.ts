@@ -32,7 +32,7 @@ const createWebsocket = (
 ] => {
   let socket: WebSocket;
   let reconnections = 0;
-  let reconnectId: number;
+  let reconnectId: ReturnType<typeof setTimeout>;
   const [state, setState] = createSignal(WebSocket.CLOSED);
   const send = (data: string | ArrayBuffer) => socket.send(data);
   const cancelReconnect = () => {
@@ -42,7 +42,7 @@ const createWebsocket = (
   };
   const disconnect = () => {
     cancelReconnect();
-    reconnectLimit = Number.POSITIVE_INFINITY;
+    reconnectLimit = Number.NEGATIVE_INFINITY;
     if (socket) {
       socket.close();
     }

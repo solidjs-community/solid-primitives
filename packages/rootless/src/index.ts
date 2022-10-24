@@ -1,23 +1,23 @@
-import { AnyFunction, asArray, access } from "@solid-primitives/utils";
 import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
 import type { Owner } from "solid-js/types/reactive/signal";
+import { AnyFunction, asArray, access } from "@solid-primitives/utils";
 
 /**
- * Creates a reactive **root branch**, that will be automatically disposed when it's owner does.
+ * Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
  *
  * @param fn a function in which the reactive state is scoped
- * @param owners reactive root dependency list – cleanup of any of them will trigger branch disposal. (Defaults to `getOwner()`)
+ * @param owners reactive root dependency list – cleanup of any of them will trigger sub-root disposal. (Defaults to `getOwner()`)
  * @returns return values of {@link fn}
  *
  * @example
  * const owner = getOwner()
- * const [dispose, memo] = createBranch(dispose => {
+ * const [dispose, memo] = createSubRoot(dispose => {
  *    const memo = createMemo(() => {...})
  *    onCleanup(() => {...}) // <- will cleanup when branch/owner disposes
  *    return [dispose, memo]
  * }, owner, owner2);
  */
-export function createBranch<T>(fn: (dispose: VoidFunction) => T, ...owners: (Owner | null)[]): T {
+export function createSubRoot<T>(fn: (dispose: VoidFunction) => T, ...owners: (Owner | null)[]): T {
   if (owners.length === 0) owners = [getOwner()];
   return createRoot(dispose => {
     asArray(access(owners)).forEach(
@@ -26,6 +26,9 @@ export function createBranch<T>(fn: (dispose: VoidFunction) => T, ...owners: (Ow
     return fn(dispose);
   }, owners[0] || undefined);
 }
+
+/** @deprecated Renamed to `createSubRoot` */
+export const createBranch = createSubRoot;
 
 /**
  * A wrapper for creating callbacks with `runWithOwner`.
@@ -46,7 +49,7 @@ export const createCallback = <T extends AnyFunction>(
 ): T => (owner ? (((...args) => runWithOwner(owner, () => callback(...args))) as T) : callback);
 
 /**
- * Executes {@link fn} in a {@link createBranch} *(auto-disposing root)*, and returns a dispose function, to dispose computations used inside before automatic cleanup.
+ * Executes {@link fn} in a {@link createSubRoot} *(auto-disposing root)*, and returns a dispose function, to dispose computations used inside before automatic cleanup.
  *
  * @param fn a function in which the reactive state is scoped
  * @returns root dispose function
@@ -64,7 +67,7 @@ export function createDisposable(
   fn: (dispose: VoidFunction) => void,
   ...owners: (Owner | null)[]
 ): VoidFunction {
-  return createBranch(dispose => {
+  return createSubRoot(dispose => {
     fn(dispose);
     return dispose;
   }, ...owners);

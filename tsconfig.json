@@ -8,9 +8,20 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "esModuleInterop": true,
+    "noUnusedLocals": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["solid-js"]
+    "types": ["node"]
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "./packages/*/dist"],
+  "include": [
+    "./packages/*/src",
+    "./packages/*/test",
+    "./packages/*/dev",
+    "./scripts",
+    "./env.d.ts"
+  ]
 }

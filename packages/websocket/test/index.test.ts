@@ -1,4 +1,5 @@
-import { render } from "solid-testing-library";
-import createWorker from "../src/index";
+import { describe, it } from "vitest";
 
-describe("createWorker", (): void => {});
+describe("websocket", () => {
+  it.todo("needs to be tested");
+});

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-listener",
-  "version": "2.2.1",
+  "version": "2.2.3",
   "description": "SolidJS Primitives to manage creating event listeners.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -26,19 +26,43 @@
   },
   "private": false,
   "sideEffects": false,
-  "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "npm run start",
-    "build": "tsup",
-    "test": "uvu -r solid-register",
-    "test:watch": "watchlist src test -- npm test"
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "event",
@@ -46,22 +70,13 @@
     "solid",
     "primitives"
   ],
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^3.1.0"
+  },
   "devDependencies": {
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "solid-register": "^0.2.5",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.1",
-    "unocss": "^0.44.7",
-    "uvu": "^0.5.6",
-    "vite": "^3.0.4",
-    "vite-plugin-solid": "^2.3.0",
-    "watchlist": "^0.3.1"
+    "solid-js": "^1.6.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.3.1"
-  },
-  "dependencies": {
-    "@solid-primitives/utils": "^3.0.0"
+    "solid-js": "^1.6.0"
   }
 }

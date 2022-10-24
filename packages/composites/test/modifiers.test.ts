@@ -1,6 +1,5 @@
 import { createRoot, createSignal, createMemo } from "solid-js";
-import { test } from "uvu";
-import * as assert from "uvu/assert";
+import { describe, expect, it } from "vitest";
 
 import { createCompositeEffect } from "../src/createCompositeEffect";
 import {
@@ -14,233 +13,229 @@ import {
   whenever
 } from "../src/modifiers";
 
-test("stoppable", () => {
-  createRoot(dispose => {
-    const [counter, setCounter] = createSignal(0);
+describe("modifiers", () => {
+  it("stoppable", () => {
+    createRoot(dispose => {
+      const [counter, setCounter] = createSignal(0);
 
-    const captured: number[] = [];
+      const captured: number[] = [];
 
-    const { stop } = createCompositeEffect(stoppable(counter, x => captured.push(x)));
+      const { stop } = createCompositeEffect(stoppable(counter, x => captured.push(x)));
 
-    setTimeout(() => {
-      setCounter(1);
-      assert.is(captured[1], 1, "change before stop");
-      stop();
-      setCounter(2);
-      assert.is(captured[2], undefined, "change after stop");
-      dispose();
-    }, 0);
-  });
-});
-
-test("once", () => {
-  createRoot(dispose => {
-    const [counter, setCounter] = createSignal(0);
-
-    const captured: number[] = [];
-
-    createCompositeEffect(
-      once(counter, x => captured.push(x)),
-      { defer: true }
-    );
-
-    setTimeout(() => {
-      setCounter(1);
-      assert.is(captured[0], 1, "first change should be captured");
-      setCounter(2);
-      assert.is(captured[1], undefined, "next change shouldn't be captured");
-      dispose();
-    }, 0);
-  });
-});
-
-test("atMost", () => {
-  createRoot(dispose => {
-    const [counter, setCounter] = createSignal(0);
-
-    const captured: number[] = [];
-
-    const { count } = createCompositeEffect(atMost(counter, x => captured.push(x), { limit: 2 }));
-    assert.is(count(), 0, "initial count should be 0");
-
-    setTimeout(() => {
-      assert.is(count(), 1, "count after initial effect should be 1");
-      assert.equal(captured, [0], "initial state should be captured");
-      setCounter(1);
-      assert.is(count(), 2, "count after first change should be 2");
-      assert.equal(captured, [0, 1], "first change should be captured");
-      setCounter(2);
-      assert.is(count(), 2, "count next change should still be 2");
-      assert.equal(captured, [0, 1], "next change shouldn't be captured");
-      dispose();
-    }, 0);
-  });
-});
-
-test("debounce", () => {
-  createRoot(dispose => {
-    const [counter, setCounter] = createSignal(0);
-
-    const captured: number[] = [];
-
-    createCompositeEffect(debounce(counter, x => captured.push(x), 10));
-
-    setTimeout(() => {
-      assert.equal(captured, [], "initial state should not be captured immediately");
-      setCounter(1);
-      assert.equal(captured, [], "first change should not be captured immediately");
-    }, 0);
-
-    setTimeout(() => {
-      assert.equal(captured, [1], "after delay, only the last change should be captured");
-      setCounter(7);
-      setCounter(9);
       setTimeout(() => {
-        assert.equal(captured, [1, 9], "after delay, only the next last change should be captured");
+        setCounter(1);
+        expect(captured[1]).toBe(Function);
+        stop();
+        setCounter(2);
+        expect(captured[2]).toBe(Function);
         dispose();
-      }, 15);
-    }, 15);
+      }, 0);
+    });
   });
-});
 
-test("throttle", () => {
-  createRoot(dispose => {
-    const [counter, setCounter] = createSignal(0);
+  it("once", () => {
+    createRoot(dispose => {
+      const [counter, setCounter] = createSignal(0);
 
-    const captured: number[] = [];
+      const captured: number[] = [];
 
-    createCompositeEffect(throttle(counter, x => captured.push(x), 10));
+      createCompositeEffect(
+        once(counter, x => captured.push(x)),
+        { defer: true }
+      );
 
-    setTimeout(() => {
-      assert.equal(captured, [], "initial state should not be captured immediately");
-      setCounter(1);
-      assert.equal(captured, [], "first change should not be captured immediately");
-    }, 0);
-
-    setTimeout(() => {
-      assert.equal(captured, [0], "after delay, only the initial state should be captured");
-      setCounter(7);
-      setCounter(9);
       setTimeout(() => {
-        assert.equal(
-          captured,
-          [0, 7],
-          "after delay, only the next first change should be captured"
-        );
+        setCounter(1);
+        expect(captured[0]).toBe(Function);
+        setCounter(2);
+        expect(captured[1]).toBe(Function);
         dispose();
+      }, 0);
+    });
+  });
+
+  it("atMost", () => {
+    createRoot(dispose => {
+      const [counter, setCounter] = createSignal(0);
+
+      const captured: number[] = [];
+
+      const { count } = createCompositeEffect(atMost(counter, x => captured.push(x), { limit: 2 }));
+      expect(count()).toBe(Function);
+
+      setTimeout(() => {
+        expect(count()).toBe(Function);
+        expect(captured).toEqual(Function);
+        setCounter(1);
+        expect(count()).toBe(Function);
+        expect(captured).toEqual(Function);
+        setCounter(2);
+        expect(count()).toBe(Function);
+        expect(captured).toEqual(Function);
+        dispose();
+      }, 0);
+    });
+  });
+
+  it("debounce", () => {
+    createRoot(dispose => {
+      const [counter, setCounter] = createSignal(0);
+
+      const captured: number[] = [];
+
+      createCompositeEffect(debounce(counter, x => captured.push(x), 10));
+
+      setTimeout(() => {
+        expect(captured).toEqual(Function);
+        setCounter(1);
+        expect(captured).toEqual(Function);
+      }, 0);
+
+      setTimeout(() => {
+        expect(captured).toEqual(Function);
+        setCounter(7);
+        setCounter(9);
+        setTimeout(() => {
+          expect(captured).toEqual(Function);
+          dispose();
+        }, 15);
       }, 15);
-    }, 15);
+    });
   });
-});
 
-test("whenever", () => {
-  createRoot(dispose => {
-    const [counter, setCounter] = createSignal(0);
+  it("throttle", () => {
+    createRoot(dispose => {
+      const [counter, setCounter] = createSignal(0);
 
-    const captured1: number[] = [];
-    const captured2: number[] = [];
+      const captured: number[] = [];
 
-    createCompositeEffect(
-      whenever(
-        () => counter() % 2 === 0,
-        () => captured1.push(counter())
-      )
-    );
+      createCompositeEffect(throttle(counter, x => captured.push(x), 10));
 
-    createCompositeEffect(
-      whenever(
-        createMemo(() => counter() >= 3),
-        () => captured2.push(counter())
-      )
-    );
+      setTimeout(() => {
+        expect(captured).toEqual(Function);
+        setCounter(1);
+        expect(captured).toEqual(Function);
+      }, 0);
 
-    setTimeout(() => {
-      assert.equal(captured1, [0], "initial state should be captured for 1");
-      assert.equal(captured2, [], "initial state should not be captured for 2");
-      setCounter(1);
-      assert.equal(captured1, [0], "first change should not be captured for 1");
-      assert.equal(captured2, [], "first change should not be captured for 2");
-      setCounter(2);
-      assert.equal(captured1, [0, 2], "2 should be added for 1");
-      assert.equal(captured2, [], "2 should not be added for 2");
-      setCounter(3);
-      assert.equal(captured1, [0, 2], "3 should not be added for 1");
-      assert.equal(captured2, [3], "3 should be added for 2");
-      setCounter(4);
-      assert.equal(captured1, [0, 2, 4], "4 should be added for 1");
-      assert.equal(captured2, [3], "4 should not be added for 2");
-    }, 0);
+      setTimeout(() => {
+        expect(captured).toEqual(Function);
+        setCounter(7);
+        setCounter(9);
+        setTimeout(() => {
+          expect(captured).toEqual(Function);
+          dispose();
+        }, 15);
+      }, 15);
+    });
   });
-});
 
-test("pausable", () => {
-  createRoot(dispose => {
-    const [counter, setCounter] = createSignal(0);
+  it("whenever", () => {
+    createRoot(dispose => {
+      const [counter, setCounter] = createSignal(0);
 
-    const captured: number[] = [];
+      const captured1: number[] = [];
+      const captured2: number[] = [];
 
-    const { pause, resume, toggle } = createCompositeEffect(
-      pausable(counter, () => captured.push(counter()), { active: false })
-    );
+      createCompositeEffect(
+        whenever(
+          () => counter() % 2 === 0,
+          () => captured1.push(counter())
+        )
+      );
 
-    setTimeout(() => {
-      assert.equal(captured, [], "initial state should not be captured");
-      setCounter(1);
-      assert.equal(captured, [], "first change should not be captured");
-      resume();
-      setCounter(2);
-      assert.equal(captured, [2], "after resume() change should be captured");
-      pause();
-      setCounter(3);
-      assert.equal(captured, [2], "after pause() change should not be captured");
-      toggle();
-      setCounter(4);
-      assert.equal(captured, [2, 4], "after toggle() change should be captured");
-      toggle(true);
-      setCounter(5);
-      assert.equal(captured, [2, 4, 5], "after toggle(true) change should be captured");
-      toggle(false);
-      setCounter(6);
-      assert.equal(captured, [2, 4, 5], "after toggle(false) change should not be captured");
-      dispose();
-    }, 0);
+      createCompositeEffect(
+        whenever(
+          createMemo(() => counter() >= 3),
+          () => captured2.push(counter())
+        )
+      );
+
+      setTimeout(() => {
+        expect(captured1).toEqual(Function);
+        expect(captured2).toEqual(Function);
+        setCounter(1);
+        expect(captured1).toEqual(Function);
+        expect(captured2).toEqual(Function);
+        setCounter(2);
+        expect(captured1).toEqual(Function);
+        expect(captured2).toEqual(Function);
+        setCounter(3);
+        expect(captured1).toEqual(Function);
+        expect(captured2).toEqual(Function);
+        setCounter(4);
+        expect(captured1).toEqual(Function);
+        expect(captured2).toEqual(Function);
+      }, 0);
+    });
   });
-});
 
-test("ignorable", () => {
-  createRoot(dispose => {
-    const [counter, setCounter] = createSignal(0);
+  it("pausable", () => {
+    createRoot(dispose => {
+      const [counter, setCounter] = createSignal(0);
 
-    const captured: number[] = [];
+      const captured: number[] = [];
 
-    const { ignoreNext, ignore } = createCompositeEffect(
-      ignorable(counter, x => {
-        captured.push(x);
-        // next effect will be ignored:
-        ignoreNext();
-        setCounter(p => p + 1);
+      const { pause, resume, toggle } = createCompositeEffect(
+        pausable(counter, () => captured.push(counter()), { active: false })
+      );
 
-        // this change happens in the same effect, so it will also be ignored
+      setTimeout(() => {
+        expect(captured).toEqual(Function);
+        setCounter(1);
+        expect(captured).toEqual(Function);
+        resume();
+        setCounter(2);
+        expect(captured).toEqual(Function);
+        pause();
+        setCounter(3);
+        expect(captured).toEqual(Function);
+        toggle();
+        setCounter(4);
+        expect(captured).toEqual(Function);
+        toggle(true);
         setCounter(5);
-      })
-    );
+        expect(captured).toEqual(Function);
+        toggle(false);
+        setCounter(6);
+        expect(captured).toEqual(Function);
+        dispose();
+      }, 0);
+    });
+  });
 
-    setTimeout(() => {
-      assert.equal(captured, [0], "initial state should be captured");
-      assert.is(counter(), 5, "although it wasn't captured, the counter should be 5");
-      ignore(() => {
-        // both changes will be ignored:
-        setCounter(420);
-        setCounter(69);
-      });
-      assert.equal(captured, [0], "changes in ignore() should not be captured");
-      assert.equal(counter(), 69, "changes in ignore() were executed applied");
-      // but not this one:
-      setCounter(p => 111);
-      assert.equal(captured, [0, 111], "changes after ignore() should be captured");
-      dispose();
-    }, 0);
+  it("ignorable", () => {
+    createRoot(dispose => {
+      const [counter, setCounter] = createSignal(0);
+
+      const captured: number[] = [];
+
+      const { ignoreNext, ignore } = createCompositeEffect(
+        ignorable(counter, x => {
+          captured.push(x);
+          // next effect will be ignored:
+          ignoreNext();
+          setCounter(p => p + 1);
+
+          // this change happens in the same effect, so it will also be ignored
+          setCounter(5);
+        })
+      );
+
+      setTimeout(() => {
+        expect(captured).toEqual(Function);
+        expect(counter()).toBe(Function);
+        ignore(() => {
+          // both changes will be ignored:
+          setCounter(420);
+          setCounter(69);
+        });
+        expect(captured).toEqual(Function);
+        expect(counter()).toEqual(Function);
+        // but not this one:
+        setCounter(p => 111);
+        expect(captured).toEqual(Function);
+        dispose();
+      }, 0);
+    });
   });
 });
-
-test.run();

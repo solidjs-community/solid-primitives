@@ -13,34 +13,15 @@ Library of primitives focused around component props.
 
 - [`combineProps`](#combineProps) - Reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
 - [`filterProps`](#filterProps) - Create a new props object with only the property names that match the predicate.
-- [`createProps`](#createProps) - Provides controllable props signals like knobs/controls for simple component testing.
 
 ## Installation
 
-```
+```bash
 npm install @solid-primitives/props
 # or
 yarn add @solid-primitives/props
-```
-
-## SSR Support
-
-If you are using [solid-start](https://github.com/solidjs/solid-start) with SSR, you may see this error comming form the `@solid-primitives/props` package.
-
-```
-TypeError: web.template is not a function
-```
-
-To prevent this, add `"@solid-primitives/props"` entry to `noExternal` field in your vite config, like so:
-
-```tsx
-export default defineConfig({
-  plugins: [solid()],
-  ssr: {
-    // It allows Vite to preprocess the package
-    noExternal: ["@solid-primitives/props"]
-  }
-});
+# or
+pnpm add @solid-primitives/props
 ```
 
 ## `combineProps`
@@ -165,73 +146,6 @@ const MyComponent = props => {
   return <div {...dataProps} />;
 };
 ```
-
-## `createProps`
-
-Primitive that provides controllable props signals like knobs/controls for simple component testing
-
-### How to use it
-
-You can either create a single prop:
-
-```ts
-// Second argument can be initialValue for boolean, number, string:
-const [string, setString, stringField] = createControlledProp("stringValue", "test");
-// Arrays or enums can be provided in an options object:
-const [language, setLanguage, languageField] = createControlledProp(
-  "language",
-  { initialValue: "en", options: ["de", "en", "fr", "it"] as const }
-  // If you want your array to be able to influence the setter/getter types, use `as const`.
-);
-enum Currency {
-  AUD,
-  GBP,
-  EUR,
-  USD,
-  CHF,
-  JPY,
-  CNY
-}
-const [currency, setCurrency, currencyField] = createControlledProp("currency", {
-  initialValue: Currency.USD,
-  options: Currency
-});
-
-return { languageField(); };
-```
-
-or multiple props in one call:
-
-```ts
-enum Test { One, Two, Three };
-const languages = ['de', 'en', 'fr', 'it'] as const;
-const [props, fields] = createControlledProps({
-  boolean: true,
-  number: 42,
-  string: 'text',
-  array: { initialValue: 'en', options: languages },
-  enum: { initialValue: Test.Three, options: Test }
-});
-
-props == {
-  boolean: Accessor<boolean>,
-  setBoolean: Setter<boolean>,
-  number: Accessor<number>,
-  setNumber: Setter<number>,
-  string: Accessor<string>,
-  setString: Setter<string>,
-  array: Accessor<string>,
-  setArray: Setter<string>,
-  enum: Accessor<Test>,
-  setEnum: Setter<Test>
-};
-
-fields == JSX.Element[];
-```
-
-### Demo
-
-TODO
 
 ## Changelog
 

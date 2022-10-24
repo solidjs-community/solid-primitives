@@ -74,7 +74,7 @@ const map = new ReactiveMap(
 
 #### Values are shallowly wrapped
 
-Treat the values of `ReactiveMap` and `ReactiveMap` as individual signals, to cause updates, they have to be set though the `.set()` method, no mutations.
+Treat the values of `ReactiveMap` and `ReactiveMap` as individual signals, to cause updates, they have to be set through the `.set()` method, no mutations.
 
 ```ts
 const map = new ReactiveMap<string, { age: number }>();

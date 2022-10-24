@@ -15,7 +15,6 @@ import type {
   MaybeAccessor,
   MaybeAccessorValue,
   Noop,
-  Values,
   AnyObject,
   AnyFunction,
   SetterValue,
@@ -29,7 +28,7 @@ export * from "./types";
 //
 
 /** no operation */
-export const noop = (() => undefined) as Noop;
+export const noop = (() => void 0) as Noop;
 
 export const isServer: boolean = _isServer;
 export const isClient = !isServer;
@@ -38,8 +37,6 @@ export const isClient = !isServer;
 export const isDev = DEV && isClient;
 /** production environment */
 export const isProd = !isDev;
-/** `console.warn` only during development */
-export const warn: typeof console.warn = (...a) => isDev && console.warn(...a);
 
 /**
  * Check if the value is an instance of ___
@@ -122,24 +119,6 @@ export function accessWith<T>(
   ...args: T extends AnyFunction ? Parameters<T> : never
 ): T extends AnyFunction ? ReturnType<T> : T {
   return typeof valueOrFn === "function" ? valueOrFn(...args) : valueOrFn;
-}
-
-/**
- * Iterate through object entries.
- */
-export function forEachEntry<O extends AnyObject>(
-  object: O,
-  iterator: (
-    key: keyof O,
-    item: Values<O>,
-    index: number,
-    pairs: [keyof O, Values<O>][],
-    object: O
-  ) => void
-): void {
-  Object.entries(object).forEach(([key, item], index, pairs) =>
-    iterator(key as keyof O, item, index, pairs as [keyof O, Values<O>][], object)
-  );
 }
 
 /**
@@ -282,8 +261,8 @@ export function createStaticStore<T extends Readonly<AnyStatic>>(
  * @param handleRemoved called once for every removed from array
  */
 export function handleDiffArray<T>(
-  current: T[],
-  prev: T[],
+  current: readonly T[],
+  prev: readonly T[],
   handleAdded: (item: T) => void,
   handleRemoved: (item: T) => void
 ): void {
@@ -317,3 +296,8 @@ export function handleDiffArray<T>(
     if (!prev.includes(currEl)) handleAdded(currEl);
   }
 }
+
+export const forEachEntry = <T>(
+  obj: Record<string, T>,
+  fn: (key: string, value: T) => void
+): void => Object.entries(obj).forEach(([key, value]) => fn(key, value));

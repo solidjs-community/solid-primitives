@@ -17,8 +17,11 @@ export const makeTimer = (
   delay: number,
   timer: typeof setTimeout | typeof setInterval
 ): VoidFunction => {
+  if (process.env.SSR) {
+    return () => void 0;
+  }
   const intervalId = timer(fn, delay);
-  const clear = () => clearInterval(intervalId as number);
+  const clear = () => clearInterval(intervalId);
   return onCleanup(clear);
 };
 
@@ -38,6 +41,9 @@ export const createTimer = (
   delay: TimeoutSource,
   timer: typeof setTimeout | typeof setInterval
 ): void => {
+  if (process.env.SSR) {
+    return void 0;
+  }
   if (typeof delay === "number") {
     makeTimer(fn, delay, timer);
     return;
@@ -105,6 +111,9 @@ export const createTimer = (
  * between executions of {@link handler} in ms, or false to disable looping.
  */
 export const createTimeoutLoop = (handler: VoidFunction, timeout: TimeoutSource): void => {
+  if (process.env.SSR) {
+    return void 0;
+  }
   if (typeof timeout === "number") {
     makeTimer(handler, timeout, setInterval);
     return;
@@ -158,6 +167,9 @@ export function createPolled<T>(
   value?: T,
   options?: SignalOptions<T>
 ): Accessor<T> {
+  if (process.env.SSR) {
+    return fn as Accessor<T>;
+  }
   const [polled, setPolled] = createSignal(untrack(fn.bind(void 0, value)), options);
   const update = () => setPolled(fn);
   createTimer(update, timeout, setInterval);
@@ -176,5 +188,8 @@ export const createIntervalCounter = (
   timeout: TimeoutSource,
   options?: SignalOptions<number>
 ): Accessor<number> => {
+  if (process.env.SSR) {
+    return () => 0;
+  }
   return createPolled(prev => prev + 1, timeout, -1, options);
 };

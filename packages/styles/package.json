@@ -1,0 +1,87 @@
+{
+  "name": "@solid-primitives/styles",
+  "version": "0.0.101",
+  "description": "Collection of reactive primitives focused on styles.",
+  "author": "Damian Tarnawski <gthetaranv@gmail.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/styles#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "styles",
+    "stage": 0,
+    "list": [
+      "createRemSize"
+    ],
+    "category": "Display & Media"
+  },
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "development": {
+        "import": "./dist/dev.js",
+        "require": "./dist/dev.cjs"
+      },
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "development": {
+      "import": "./dist/dev.js",
+      "require": "./dist/dev.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "start": "vite serve dev --host",
+    "dev": "npm run start",
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "styles",
+    "css"
+  ],
+  "dependencies": {
+    "@solid-primitives/rootless": "workspace:^1.2.0"
+  },
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
+  "devDependencies": {
+    "solid-js": "^1.6.0"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.0"
+  }
+}

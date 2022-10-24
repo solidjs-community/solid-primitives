@@ -1,15 +1,14 @@
-import { createCompositeEffect, createModifier } from "@solid-primitives/composites";
 import { createEventListener } from "@solid-primitives/event-listener";
-import { Component, createEffect, createMemo, createSignal, on, onMount } from "solid-js";
+import {
+  Component,
+  createComputed,
+  createEffect,
+  createMemo,
+  createSignal,
+  on,
+  onMount
+} from "solid-js";
 import { clamp, pToVal, valToP } from "./utils";
-
-const withMounted = createModifier<void>((s, cb) => {
-  onMount(() => {
-    // @ts-ignore
-    cb(s(), undefined, undefined);
-  });
-  return [cb, {}];
-});
 
 export const Slider: Component<{
   ondrag: (value: number) => void;
@@ -19,16 +18,18 @@ export const Slider: Component<{
 }> = props => {
   const [pageX, setPageX] = createSignal(0);
   const [dragging, setDragging] = createSignal(false);
-  const [p, setP] = createSignal(clamp(valToP(props.value, props.min, props.max), 0, 1));
+  const [p, setP] = createSignal(clamp(valToP(props.value ?? 0, props.min, props.max), 0, 1));
 
   let bar!: HTMLDivElement;
 
   const [left, setLeft] = createSignal(0);
-  createCompositeEffect(
-    withMounted(p, () => setLeft((p() * 2 - 1) * ((bar.offsetWidth - 12) / 2)))
-  );
+  onMount(() => {
+    createComputed(() => {
+      setLeft((p() * 2 - 1) * ((bar.offsetWidth - 12) / 2));
+    });
+  });
 
-  const bezier = t => t * t * t;
+  const bezier = (t: number) => t * t * t;
   const value = createMemo(on(p, p => pToVal((bezier(p * 2 - 1) + 1) / 2, props.min, props.max)));
   createEffect(
     on(

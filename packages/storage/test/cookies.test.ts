@@ -1,52 +1,44 @@
 import { createRoot } from "solid-js";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { describe, expect, it } from "vitest";
+
 import { cookieStorage } from "../src";
 import { createCookieStorage, createCookieStorageSignal } from "../src/cookies";
 
-const testCookieStorage = suite("cookieStorage");
-
-testCookieStorage("adds/gets/removes an item", () => {
-  assert.is(cookieStorage.getItem("test"), null);
-  cookieStorage.setItem("test", "1");
-  assert.is(cookieStorage.getItem("test"), "1");
-  cookieStorage.removeItem("test");
-  assert.is(cookieStorage.getItem("test"), null);
+describe("cookieStorage", () => {
+  it("adds/gets/removes an item", () => {
+    expect(cookieStorage.getItem("test")).toBe(null);
+    cookieStorage.setItem("test", "1");
+    expect(cookieStorage.getItem("test")).toBe("1");
+    cookieStorage.removeItem("test");
+    expect(cookieStorage.getItem("test")).toBe(null);
+  });
 });
 
-testCookieStorage.run();
+describe("createCookieStorage", () => {
+  it("creates a storage", () =>
+    createRoot(dispose => {
+      cookieStorage.clear();
+      const [storage, setStorage, { remove, clear }] = createCookieStorage();
+      setStorage("test", "1");
+      cookieStorage.setItem("test2", "2");
+      expect(storage.test).toBe(cookieStorage.getItem("test"));
+      expect(storage.test).toBe("1");
+      expect(storage.test2).toBe("2");
+      remove("test2");
+      expect(storage.test2).toBe(null);
+      clear();
+      expect(cookieStorage.length).toBe(0);
+      dispose();
+    }));
+});
 
-const testCreateCookieStorage = suite("createCookieStorage");
-
-testCreateCookieStorage("creates a storage", () =>
-  createRoot(dispose => {
-    cookieStorage.clear();
-    const [storage, setStorage, { remove, clear }] = createCookieStorage();
-    setStorage("test", "1");
-    cookieStorage.setItem("test2", "2");
-    assert.is(storage.test, cookieStorage.getItem("test"));
-    assert.is(storage.test, "1");
-    assert.is(storage.test2, "2");
-    remove("test2");
-    assert.is(storage.test2, null);
-    clear();
-    assert.is(cookieStorage.length, 0);
-    dispose();
-  })
-);
-
-testCreateCookieStorage.run();
-
-const testCreateCookieSignal = suite("createCookieSignal");
-
-testCreateCookieSignal("creates a signal", () =>
-  createRoot(dispose => {
-    const [getter, setter] = createCookieStorageSignal("test3");
-    assert.is(getter(), undefined);
-    setter("3");
-    assert.is(getter(), "3");
-    dispose();
-  })
-);
-
-testCreateCookieSignal.run();
+describe("createCookieSignal", () => {
+  it("creates a signal", () =>
+    createRoot(dispose => {
+      const [getter, setter] = createCookieStorageSignal("test3");
+      expect(getter()).toBe(undefined);
+      setter("3");
+      expect(getter()).toBe("3");
+      dispose();
+    }));
+});

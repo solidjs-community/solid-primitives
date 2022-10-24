@@ -1,23 +1,53 @@
 {
   "name": "@solid-primitives/websocket",
-  "version": "0.3.0",
+  "version": "0.3.3",
   "description": "Primitive to create a worker helper",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/websocket",
   "private": false,
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "development": {
+        "import": "./dist/dev.js",
+        "require": "./dist/dev.cjs"
+      },
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "development": {
+      "import": "./dist/dev.js",
+      "require": "./dist/dev.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "files": [
     "dist"
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsup",
-    "test": "echo disabled defunct test suite",
-    "test:watch": "echo disabled defunct test suite"
+    "build": "jiti ../../scripts/build.ts --ssr --dev"
   },
   "keywords": [
     "websocket",
@@ -26,16 +56,9 @@
     "primitives"
   ],
   "devDependencies": {
-    "@types/jest": "^27.5.2",
-    "prettier": "^2.7.1",
-    "solid-testing-library": "^0.2.1",
-    "tslib": "^2.4.0",
-    "typescript": "^4.7.4"
+    "solid-js": "^1.6.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.4.2"
-  },
-  "dependencies": {
-    "tsup": "^6.2.1"
+    "solid-js": "^1.6.0"
   }
 }

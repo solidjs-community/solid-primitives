@@ -51,6 +51,9 @@ export function createMousePosition(
   target?: MaybeAccessor<Window | Document | HTMLElement>,
   options: MousePositionOptions = {}
 ): MousePositionInside {
+  if (process.env.SSR) {
+    return DEFAULT_MOUSE_POSITION;
+  }
   const [state, setState] = createStaticStore<MousePositionInside>({
     ...DEFAULT_MOUSE_POSITION,
     ...options.initialValue
@@ -113,7 +116,9 @@ export function createPositionToElement(
     ...DEFAULT_RELATIVE_ELEMENT_POSITION,
     ...options.initialValue
   };
-
+  if (process.env.SSR) {
+    return fallback;
+  }
   const calcState = (el: Element) => {
     const { x, y } = pos();
     return getPositionToElement(x, y, el);

@@ -1,4 +1,3 @@
-import { warn } from "@solid-primitives/utils";
 import { Accessor, createRoot, createSignal, onCleanup, Setter, untrack } from "solid-js";
 import { abs, ceil, min, RangeProps, sign, toFunction, accessor } from "./common";
 
@@ -103,7 +102,7 @@ export function indexRange<T>(
   return () => {
     let _step = step();
     if (_step === 0) {
-      warn("Range cannot have a step of 0");
+      if (process.env.DEV) console.warn("Range cannot have a step of 0");
       return items;
     }
     let _start = start();

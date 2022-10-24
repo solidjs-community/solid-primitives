@@ -29,6 +29,22 @@ export function keyArray<T, U, K>(
   mapFn: (v: Accessor<T>, i: Accessor<number>) => U,
   options: { fallback?: Accessor<U> } = {}
 ): Accessor<U[]> {
+  // SERVER NOOP
+  if (process.env.SSR) {
+    const itemsRef = items();
+    let s: U[] = [];
+    if (itemsRef && itemsRef.length) {
+      for (let i = 0, len = itemsRef.length; i < len; i++)
+        s.push(
+          mapFn(
+            () => itemsRef[i],
+            () => i
+          )
+        );
+    } else if (options.fallback) s = [options.fallback()];
+    return () => s;
+  }
+
   type Save = { setItem: Setter<T>; setIndex?: Setter<number>; mapped: U; dispose: () => void };
 
   const prev = new Map<K | typeof FALLBACK, Save>();
@@ -122,16 +138,55 @@ export function keyArray<T, U, K>(
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#Key
  */
-export function Key<T, U extends JSX.Element>(props: {
+export function Key<T>(props: {
   each?: readonly T[] | null | false;
   by: ((v: T) => any) | keyof T;
-  fallback?: U;
-  children: (v: Accessor<T>, i: Accessor<number>) => U;
-}): Accessor<U[]> {
-  const fallback = props.fallback ? () => props.fallback as U : undefined;
+  fallback?: JSX.Element;
+  children: (v: Accessor<T>, i: Accessor<number>) => JSX.Element;
+}): Accessor<JSX.Element[]> {
   const { by } = props;
-  const key = typeof by === "function" ? by : (v: T) => v[by];
-  const mapped = keyArray<T, U, any>(() => props.each, key, props.children, { fallback });
+  const mapped = keyArray<T, JSX.Element, any>(
+    () => props.each,
+    typeof by === "function" ? by : (v: T) => v[by],
+    props.children,
+    "fallback" in props ? { fallback: () => props.fallback } : undefined
+  );
+  return createMemo(mapped);
+}
+
+/**
+ * creates a list of elements from the entries of provided object
+ *
+ * @param props
+ * @param props.of object to iterate entries of (`Object.entries(object)`)
+ * @param props.children
+ * a map render function that receives an object key, **value signal** and **index signal** and returns a JSX-Element; if the list is empty, an optional fallback is returned:
+ * ```tsx
+ * <Entries of={object()} fallback={<div>No items</div>}>
+ *   {(key, value, index) => <div data-index={index()}>{key}: {value()}</div>}
+ * </Entries>
+ * ```
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#Entries
+ */
+export function Entries<V>(props: {
+  of: Record<string, V> | ArrayLike<V> | undefined | null | false;
+  fallback?: JSX.Element;
+  children: (key: string, v: Accessor<V>, i: Accessor<number>) => JSX.Element;
+}): Accessor<JSX.Element[]> {
+  const mapFn = props.children;
+  const mapped = keyArray(
+    () => props.of && Object.entries(props.of),
+    v => v[0],
+    mapFn.length < 3
+      ? keyvalue =>
+          (mapFn as (key: string, v: Accessor<V>) => JSX.Element)(
+            keyvalue()[0],
+            () => keyvalue()[1]
+          )
+      : (keyvalue, i) => mapFn(keyvalue()[0], () => keyvalue()[1], i),
+    "fallback" in props ? { fallback: () => props.fallback } : undefined
+  );
   return createMemo(mapped);
 }
 

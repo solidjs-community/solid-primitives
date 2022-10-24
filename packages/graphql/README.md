@@ -13,10 +13,12 @@ Creates a reactive GraphQL query client.
 
 ## Installation
 
-```
+```bash
 npm install @solid-primitives/graphql
 # or
 yarn add @solid-primitives/graphql
+# or
+pnpm add @solid-primitives/graphql
 ```
 
 ## How to use it
@@ -61,10 +63,11 @@ Query function is based on `createResource`, so it can be deferred in the same w
 
 ```ts
 const newQuery = createGraphQLClient("https://foobar.com/v1/api");
-const [data, { refetch }] = newQuery(somequery, false);
+const [queryVars, setQueryVars] = createSignal<boolean | object>(false);
+const [data, { refetch }] = newQuery(gql`...`, queryVars);
 
-// later
-refetch();
+setQueryVars({ foo: bar }); // will fetch for the first time
+refetch(); // will refetch the second time
 ```
 
 #### Providing Response Type
@@ -125,6 +128,17 @@ const [data] = query(
     code: code()
   })
 );
+```
+
+#### fetch on the server
+
+When running on environments without Browser `fetch`, you should provide a `fetcher` to the options object, or add it to the global `window` object.
+
+```ts
+import nodeFetch from "node-fetch";
+import { createGraphQLClient, gql } from "@solid-primitives/graphql";
+
+const newQuery = createGraphQLClient("https://foobar.com/v1/api", { fetcher: nodeFetch });
 ```
 
 Remember, just like with [`createResource`](https://www.solidjs.com/docs/latest/api#createresource), you will need an [`<ErrorBoundary>`](https://www.solidjs.com/docs/latest/api#%3Cerrorboundary%3E) to catch the errors, even if they are accessible inside the resource. Otherwise, uncaught errors might disrupt your application.

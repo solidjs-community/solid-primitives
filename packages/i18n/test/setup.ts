@@ -1,5 +1,3 @@
-import "regenerator-runtime/runtime";
-
 export const dict = {
   fr: {
     hello: "bonjour {{ name }}, comment vas-tu ?"

@@ -1,6 +1,6 @@
 import { createSignal, Accessor } from "solid-js";
 import { makeEventListener } from "@solid-primitives/event-listener";
-import { createStaticStore, forEachEntry } from "@solid-primitives/utils";
+import { createStaticStore, forEachEntry, noop } from "@solid-primitives/utils";
 import { getEmptyMatchesFromBreakpoints } from "./common";
 import { Breakpoints, BreakpointOptions, Matches } from "./types";
 import { createSharedRoot } from "@solid-primitives/rootless";
@@ -23,6 +23,9 @@ export function makeMediaQueryListener(
   query: string | MediaQueryList,
   callback: (e: MediaQueryListEvent) => void
 ): VoidFunction {
+  if (process.env.SSR) {
+    return noop;
+  }
   const mql = typeof query === "string" ? window.matchMedia(query) : query;
   return makeEventListener(mql, "change", callback);
 }
@@ -43,9 +46,12 @@ export function makeMediaQueryListener(
  */
 export const createMediaQuery = (
   query: string,
-  fallbackState?: boolean,
+  fallbackState: boolean = false,
   watchChange = true
 ): Accessor<boolean> => {
+  if (process.env.SSR) {
+    return () => fallbackState;
+  }
   const mql = window.matchMedia(query);
   if (!watchChange) return () => mql.matches;
   const [state, setState] = createSignal(mql.matches);
@@ -75,7 +81,7 @@ export function createBreakpoints<T extends Breakpoints>(
   breakpoints: T,
   options: BreakpointOptions<T> = {}
 ): Matches<T> {
-  if (!window.matchMedia)
+  if (process.env.SSR || !window.matchMedia)
     return options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints);
 
   const { mediaFeature = "min-width", watchChange = true } = options;
@@ -86,7 +92,7 @@ export function createBreakpoints<T extends Breakpoints>(
 
       forEachEntry(breakpoints, (token, width) => {
         const mql = window.matchMedia(`(${mediaFeature}: ${width})`);
-        matches[token] = mql.matches;
+        matches[token as keyof T] = mql.matches;
 
         if (watchChange) makeEventListener(mql, "change", e => setMatches(token, e.matches as any));
       });
@@ -111,7 +117,10 @@ export function createBreakpoints<T extends Breakpoints>(
  *    prefersDark() // => boolean
  * });
  */
-export const usePrefersDark: (serverFallback?: boolean) => Accessor<boolean> =
-  /*#__PURE__*/ createSharedRoot(
-    createMediaQuery.bind(null, "(prefers-color-scheme: dark)", false, true)
-  );
+export const usePrefersDark: (serverFallback?: boolean) => Accessor<boolean> = process.env.SSR
+  ? (fallback = false) =>
+      () =>
+        fallback
+  : /*#__PURE__*/ createSharedRoot(
+      createMediaQuery.bind(null, "(prefers-color-scheme: dark)", false, true)
+    );

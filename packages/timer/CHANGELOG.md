@@ -1,5 +1,23 @@
 # @solid-primitives/timer
 
+## 1.3.4
+
+### Patch Changes
+
+- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+
+## 1.3.3
+
+### Patch Changes
+
+- 91060c3d: Adds a separate (NOOP) runtime for the server. — Fixes #214
+
+## 1.3.2
+
+### Patch Changes
+
+- 7ac41ed: Update to solid-js version 1.5
+
 ## Changelog up to version 1.3.1
 
 0.0.100

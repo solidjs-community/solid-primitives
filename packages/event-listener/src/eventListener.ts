@@ -1,5 +1,12 @@
-import { Many, MaybeAccessor, isServer, access, asArray, Directive } from "@solid-primitives/utils";
-import { Accessor, createEffect, onCleanup, createRenderEffect, createSignal } from "solid-js";
+import {
+  Many,
+  MaybeAccessor,
+  access,
+  asArray,
+  Directive,
+  onRootCleanup
+} from "@solid-primitives/utils";
+import { Accessor, createEffect, createRenderEffect, createSignal } from "solid-js";
 import {
   EventListenerDirectiveProps,
   EventMapOf,
@@ -52,7 +59,7 @@ export function makeEventListener(
   options?: EventListenerOptions
 ): VoidFunction {
   target.addEventListener(type, handler, options);
-  return onCleanup(target.removeEventListener.bind(target, type, handler, options));
+  return onRootCleanup(target.removeEventListener.bind(target, type, handler, options));
 }
 
 /**
@@ -100,7 +107,7 @@ export function createEventListener(
   handler: (event: Event) => void,
   options?: EventListenerOptions
 ): void {
-  if (isServer) return;
+  if (process.env.SSR) return;
 
   const attachListeners = () => {
     asArray(access(targets)).forEach(el => {
@@ -167,6 +174,9 @@ export function createEventSignal(
   type: MaybeAccessor<Many<string>>,
   options?: EventListenerOptions
 ): Accessor<Event | undefined> {
+  if (process.env.SSR) {
+    return () => undefined;
+  }
   const [lastEvent, setLastEvent] = createSignal<Event>();
   createEventListener(target, type, setLastEvent, options);
   return lastEvent;

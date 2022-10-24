@@ -1,4 +1,4 @@
-import { Accessor, createEffect, createMemo, createRoot, getOwner, onCleanup } from "solid-js";
+import { Accessor, createComputed, createMemo, createRoot, getOwner, onCleanup } from "solid-js";
 import { asArray, Truthy } from "@solid-primitives/utils";
 
 /**
@@ -108,7 +108,7 @@ export const until = <T>(condition: Accessor<T>): Until<T> => {
   const promise = createRoot(dispose => {
     const memo = createMemo(condition);
     const promise = new Promise((resolve, reject) => {
-      createEffect(() => {
+      createComputed(() => {
         if (!memo()) return;
         resolve(memo() as Truthy<T>);
         dispose();

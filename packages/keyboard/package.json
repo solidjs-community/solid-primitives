@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/keyboard",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "A library of reactive promitives helping handling user's keyboard input.",
   "author": "Damian Tarnwski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -25,29 +25,6 @@
     ],
     "category": "Inputs"
   },
-  "private": false,
-  "sideEffects": false,
-  "type": "module",
-  "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    "node": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
-    },
-    "import": "./dist/index.js",
-    "require": "./dist/index.cjs"
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "start": "vite serve dev --host",
-    "dev": "npm run start",
-    "build": "tsup",
-    "test": "vitest"
-  },
   "keywords": [
     "solid",
     "primitives",
@@ -55,24 +32,54 @@
     "keystroke",
     "hotkey"
   ],
-  "devDependencies": {
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "solid-js": "^1.4.8",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.1",
-    "typescript": "^4.7.4",
-    "unocss": "^0.44.7",
-    "vite": "^3.0.4",
-    "vite-plugin-solid": "^2.3.0",
-    "vitest": "^0.20.1"
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
+  "types": "./dist/index.d.ts",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
   },
-  "peerDependencies": {
-    "solid-js": "^1.4.0"
+  "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "dev": "npm run start",
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "^2.2.1",
-    "@solid-primitives/rootless": "^1.1.2",
-    "@solid-primitives/utils": "^3.0.0"
+    "@solid-primitives/event-listener": "workspace:^2.2.3",
+    "@solid-primitives/rootless": "workspace:^1.2.0",
+    "@solid-primitives/utils": "workspace:^3.1.0"
+  },
+  "devDependencies": {
+    "solid-js": "^1.6.0"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.0"
   }
 }

@@ -1,4 +1,4 @@
-export { createFetch, FetchReturn, FetchOptions, RequestContext } from "./fetch";
+export { createFetch, type FetchReturn, type FetchOptions, type RequestContext } from "./fetch";
 export {
   withAbort,
   withCatchAll,
@@ -8,5 +8,5 @@ export {
   wrapFetcher,
   wrapResource
 } from "./modifiers";
-export { withCache, withCacheStorage } from "./cache";
+export { withCache, withRefetchOnExpiry, withCacheStorage, serializeRequest } from "./cache";
 export { fetchRequest } from "./request";

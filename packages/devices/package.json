@@ -1,10 +1,13 @@
 {
   "name": "@solid-primitives/devices",
-  "version": "1.1.0",
+  "version": "1.2.1",
   "description": "Primitive that enumerates media devices",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
+  "contributors": [
+    "Mohan <mohanavel15@protonmail.com>"
+  ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/devices",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/devices#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -16,7 +19,9 @@
       "createDevices",
       "createMicrophones",
       "createSpeakers",
-      "createCameras"
+      "createCameras",
+      "createAccelerometer",
+      "createGyroscope"
     ],
     "category": "Display & Media"
   },
@@ -26,10 +31,22 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
     "node": {
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
@@ -38,10 +55,9 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
-    "build": "tsup",
-    "test": "uvu -r solid-register"
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "media",
@@ -49,17 +65,14 @@
     "solid",
     "primitives"
   ],
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
   "devDependencies": {
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "rimraf": "^3.0.2",
-    "solid-register": "^0.2.5",
-    "tslib": "2.3.1",
-    "tsup": "^6.2.1",
-    "typescript": "^4.7.4",
-    "uvu": "^0.5.6"
+    "solid-js": "^1.6.0"
   },
   "peerDependencies": {
-    "solid-js": ">= 1.0.0"
+    "solid-js": "^1.6.0"
   }
 }

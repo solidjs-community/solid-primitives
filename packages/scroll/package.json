@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/scroll",
-  "version": "2.0.3",
+  "version": "2.0.5",
   "description": "Reactive primitives to react to element/window scrolling.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -28,12 +28,32 @@
   "sideEffects": false,
   "type": "module",
   "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "development": {
+        "import": "./dist/dev.js",
+        "require": "./dist/dev.cjs"
+      },
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
     "node": {
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
+    },
+    "development": {
+      "import": "./dist/dev.js",
+      "require": "./dist/dev.cjs"
     },
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
@@ -41,8 +61,9 @@
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "npm run start",
-    "build": "tsup",
-    "test": "uvu -r solid-register",
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr",
     "test:watch": "watchlist src test -- npm test"
   },
   "keywords": [
@@ -52,25 +73,19 @@
     "solid",
     "primitives"
   ],
-  "devDependencies": {
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "solid-register": "^0.2.5",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.1",
-    "typescript": "^4.7.4",
-    "unocss": "^0.44.7",
-    "uvu": "^0.5.6",
-    "vite": "^3.0.4",
-    "vite-plugin-solid": "^2.3.0",
-    "watchlist": "^0.3.1"
-  },
   "dependencies": {
-    "@solid-primitives/event-listener": "^2.2.1",
-    "@solid-primitives/rootless": "^1.1.2",
-    "@solid-primitives/utils": "^3.0.0"
+    "@solid-primitives/event-listener": "workspace:^2.2.3",
+    "@solid-primitives/rootless": "workspace:^1.2.0",
+    "@solid-primitives/utils": "workspace:^3.1.0"
+  },
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
+  "devDependencies": {
+    "solid-js": "^1.6.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.4.0"
+    "solid-js": "^1.6.0"
   }
 }

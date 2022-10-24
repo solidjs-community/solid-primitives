@@ -1,54 +1,31 @@
 import { setOnline } from "./setup";
-import { makeConnectivityListener, createConnectivitySignal, useConnectivitySignal } from "../src";
+import { describe, expect, it } from "vitest";
 import { createRoot } from "solid-js";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
+import { makeConnectivityListener, createConnectivitySignal } from "../src";
 
-const testNCL = suite("makeConnectivityListener");
+describe("makeConnectivityListener", () => {
+  it("works", () =>
+    createRoot(dispose => {
+      let captured!: boolean;
+      makeConnectivityListener(e => (captured = e));
+      expect(captured, "0").toBe(undefined);
+      setOnline(false);
+      expect(captured, "1").toBe(false);
+      setOnline(true);
+      expect(captured, "2").toBe(true);
+      dispose();
+    }));
+});
 
-testNCL("makeConnectivityListener", () =>
-  createRoot(dispose => {
-    let captured!: boolean;
-    makeConnectivityListener(e => (captured = e));
-    assert.is(captured, undefined, "0");
-    setOnline(false);
-    assert.is(captured, false, "1");
-    setOnline(true);
-    assert.is(captured, true, "2");
-    dispose();
-  })
-);
-
-testNCL.run();
-
-const testCCS = suite("createConnectivitySignal");
-
-testCCS("createConnectivitySignal", () =>
-  createRoot(dispose => {
-    const onLine = createConnectivitySignal();
-    assert.equal(onLine(), true);
-    setOnline(false);
-    assert.equal(onLine(), false);
-    setOnline(true);
-    assert.equal(onLine(), true);
-    dispose();
-  })
-);
-
-testCCS.run();
-
-const testUCS = suite("useConnectivitySignal");
-
-testUCS("useConnectivitySignal", () =>
-  createRoot(dispose => {
-    const onLine = useConnectivitySignal();
-    assert.equal(onLine(), true);
-    setOnline(false);
-    assert.equal(onLine(), false);
-    setOnline(true);
-    assert.equal(onLine(), true);
-    dispose();
-  })
-);
-
-testUCS.run();
+describe("createConnectivitySignal", () => {
+  it("works", () =>
+    createRoot(dispose => {
+      const onLine = createConnectivitySignal();
+      expect(onLine()).toBe(true);
+      setOnline(false);
+      expect(onLine()).toBe(false);
+      setOnline(true);
+      expect(onLine()).toBe(true);
+      dispose();
+    }));
+});

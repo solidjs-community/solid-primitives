@@ -38,6 +38,10 @@ function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
 export const useKeyDownList = /*#__PURE__*/ createSharedRoot<
   [keys: Accessor<string[]>, other: { event: Accessor<KeyboardEvent | null> }]
 >(() => {
+  if (process.env.SSR) {
+    return [() => [], { event: () => null }];
+  }
+
   const [pressedKeys, setPressedKeys] = createSignal<string[]>([]);
   const [event, setEvent] = createSignal<KeyboardEvent | null>(null);
 
@@ -87,6 +91,10 @@ export const useKeyDownList = /*#__PURE__*/ createSharedRoot<
  * ```
  */
 export const useCurrentlyHeldKey = /*#__PURE__*/ createSharedRoot<Accessor<string | null>>(() => {
+  if (process.env.SSR) {
+    return () => null;
+  }
+
   const [keys] = useKeyDownList();
   let prevKeys = untrack(keys);
 
@@ -121,6 +129,9 @@ export const useCurrentlyHeldKey = /*#__PURE__*/ createSharedRoot<Accessor<strin
  * ```
  */
 export const useKeyDownSequence = /*#__PURE__*/ createSharedRoot<Accessor<string[][]>>(() => {
+  if (process.env.SSR) {
+    return () => [];
+  }
   const [keys] = useKeyDownList();
   return createMemo(prev => {
     if (keys().length === 0) return [];
@@ -154,6 +165,10 @@ export function createKeyHold(
   key: KbdKey,
   options: { preventDefault?: boolean } = {}
 ): Accessor<boolean> {
+  if (process.env.SSR) {
+    return () => false;
+  }
+
   key = key.toUpperCase();
   const { preventDefault = true } = options;
 
@@ -195,7 +210,10 @@ export function createShortcut(
     requireReset?: boolean;
   } = {}
 ): void {
-  if (!keys.length) return;
+  if (process.env.SSR || !keys.length) {
+    return;
+  }
+
   keys = keys.map(key => key.toUpperCase());
   const { preventDefault = true, requireReset = false } = options;
 

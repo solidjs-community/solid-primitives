@@ -1,34 +1,37 @@
 import { createResource, ResourceReturn } from "solid-js";
-import { access, MaybeAccessor, Modify } from "@solid-primitives/utils";
+import { DocumentNode, print } from "graphql";
+import { TypedDocumentNode } from "@graphql-typed-document-node/core";
+import { access, FalsyValue, MaybeAccessor, Modify } from "@solid-primitives/utils";
 
-export type RequestOptions = Modify<
+export type RequestHeaders = { [key: string]: string };
+
+export type RequestOptions<V extends object = {}> = Modify<
   Omit<RequestInit, "body">,
   {
     headers?: RequestHeaders;
-    variables?: QueryVariables;
+    variables?: V;
     fetcher?: typeof fetch;
   }
 >;
 
 export type GraphQLClientQuery = {
-  <T = unknown>(
-    query: string,
-    variables: MaybeAccessor<QueryVariables | boolean> | undefined,
+  <T = unknown, V extends object = {}>(
+    query: string | DocumentNode | TypedDocumentNode<T, V>,
+    variables: MaybeAccessor<V | FalsyValue> | undefined,
     initialValue: T
-  ): ResourceReturn<T, { initialValue: T }>;
-  <T = unknown>(
-    query: string,
-    variables?: MaybeAccessor<QueryVariables | boolean>,
+  ): ResourceReturn<T>;
+  <T = unknown, V extends object = {}>(
+    query: string | DocumentNode | TypedDocumentNode<T, V>,
+    variables?: MaybeAccessor<V | FalsyValue>,
     initialValue?: undefined
-  ): ResourceReturn<T, undefined>;
+  ): ResourceReturn<T | undefined>;
 };
 
 /**
  * Creates a reactive GraphQL query client.
  *
  * @param url URL as string or accessor
- * @param headers A list of headers to supply the client
- * @param fetchFn Fetch library to use for the request
+ * @param options Options that will be applied to all the subsequent requests
  * @returns Returns a query generator the produces Solid resources for queries
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/graphql#how-to-use-it
@@ -39,17 +42,13 @@ export type GraphQLClientQuery = {
  * ```
  */
 export const createGraphQLClient =
-  (
-    url: MaybeAccessor<string>,
-    headers?: RequestHeaders,
-    fetchFn?: typeof fetch
-  ): GraphQLClientQuery =>
-  (query, variables = {}, initialValue) =>
+  (url: MaybeAccessor<string>, options?: Omit<RequestOptions, "variables">): GraphQLClientQuery =>
+  (query, variables: any = {}, initialValue) =>
     createResource(
       () => access(variables),
-      vars => {
+      (vars: any) => {
         const variables = typeof vars === "boolean" ? {} : vars;
-        return request(access(url), query, { headers, variables, fetcher: fetchFn });
+        return request(access(url), query, { ...options, variables });
       },
       { initialValue }
     );
@@ -58,35 +57,36 @@ export const createGraphQLClient =
  * Performs a GraphQL fetch to provided endpoint.
  *
  * @param url target api endpoint
- * @param query GraphQL query string *(use `gql` function)*
+ * @param query GraphQL query string *(use `gql` function or `DocumentNode`/`TypedDocumentNode` type)*
  * @param options config object where you can specify query variables, request headers, method, etc.
  * @returns a Promise resolving in JSON value if the request was successful
  */
-export function request<T = any>(
+export async function request<T = any, V extends object = {}>(
   url: string,
-  query: string,
-  options: RequestOptions = {}
+  query: string | DocumentNode | TypedDocumentNode<T, V>,
+  options: RequestOptions<V> = {}
 ): Promise<T> {
   const { fetcher = fetch, variables = {}, headers = {}, method = "POST" } = options;
+  const query_ = typeof query == "string" ? query : print(query);
 
   return fetcher(url, {
     ...options,
     method,
-    body: JSON.stringify({ query, variables }),
+    body: JSON.stringify({ query: query_, variables }),
     headers: {
       "content-type": "application/json",
       ...headers
     }
   })
-    .then(r => r.json())
-    .then(({ data, errors }) => {
+    .then((r: any) => r.json())
+    .then(({ data, errors }: any) => {
       if (errors) throw errors;
       return data;
     });
 }
 
 /**
- * Creates GraphQL query string
+ * Creates a GraphQL query string.
  */
 export const gql = (query: TemplateStringsArray) =>
   query

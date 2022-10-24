@@ -1,5 +1,3 @@
-import "regenerator-runtime/runtime";
-
 declare global {
   interface HTMLMediaElement {
     _mock: any;
@@ -68,3 +66,5 @@ global.HTMLMediaElement.prototype.pause = function pauseMock() {
   this.dispatchEvent(new Event("pause"));
   this._mock.paused = true;
 };
+
+export {};

@@ -27,6 +27,9 @@ export interface Scheduled<Args extends unknown[]> {
  * ```
  */
 export const debounce: ScheduleCallback = (callback, wait) => {
+  if (process.env.SSR) {
+    return Object.assign(() => void 0, { clear: () => void 0 });
+  }
   let timeoutId: ReturnType<typeof setTimeout>;
   const clear = () => clearTimeout(timeoutId);
   if (getOwner()) onCleanup(clear);
@@ -54,6 +57,10 @@ export const debounce: ScheduleCallback = (callback, wait) => {
  * ```
  */
 export const throttle: ScheduleCallback = (callback, wait) => {
+  if (process.env.SSR) {
+    return Object.assign(() => void 0, { clear: () => void 0 });
+  }
+
   let isThrottled: boolean = false,
     timeoutId: ReturnType<typeof setTimeout>,
     lastArgs: Parameters<typeof callback>;
@@ -96,6 +103,16 @@ export function leading<Args extends unknown[]>(
   callback: (...args: Args) => void,
   wait?: number
 ): Scheduled<Args> {
+  if (process.env.SSR) {
+    let called = false;
+    const scheduled = (...args: Args) => {
+      if (called) return;
+      called = true;
+      callback(...args);
+    };
+    return Object.assign(scheduled, { clear: () => void 0 });
+  }
+
   let isScheduled = false;
   const onTrail = () => (isScheduled = false);
   const scheduled = schedule(onTrail, wait);

@@ -39,7 +39,9 @@ const NULLED_BOUNDS = {
 export function getElementBounds(element: Element): Bounds;
 export function getElementBounds(element: Element | undefined | null | false): NullableBounds;
 export function getElementBounds(element: Element | undefined | null | false): NullableBounds {
-  if (!element) return Object.assign({}, NULLED_BOUNDS);
+  if (process.env.SSR || !element) {
+    return Object.assign({}, NULLED_BOUNDS);
+  }
   const rect = element.getBoundingClientRect();
   return {
     top: rect.top,
@@ -89,6 +91,10 @@ export function createElementBounds(
   target: Accessor<Element | undefined | null | false> | Element,
   { trackMutation = true, trackResize = true, trackScroll = true }: Options = {}
 ): Readonly<NullableBounds> {
+  if (process.env.SSR) {
+    return Object.assign({}, NULLED_BOUNDS);
+  }
+
   const [bounds, setBounds] = createStaticStore(getElementBounds(access(target)));
   const updateBounds = () => setBounds(getElementBounds(access(target)));
   const updateBoundsOf = (el: Element | undefined | null | false) =>

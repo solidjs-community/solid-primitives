@@ -30,6 +30,12 @@ export function makeResizeObserver<T extends Element>(
   observe: (ref: T) => void;
   unobserve: (ref: T) => void;
 } {
+  if (process.env.SSR) {
+    return {
+      observe: () => {},
+      unobserve: () => {}
+    };
+  }
   const resizeObserver = new ResizeObserver(callback);
   onCleanup(resizeObserver.disconnect.bind(resizeObserver));
   return {
@@ -58,6 +64,8 @@ export function createResizeObserver(
   onResize: ResizeHandler,
   options?: ResizeObserverOptions
 ): void {
+  if (process.env.SSR) return;
+
   const previousMap = new WeakMap<Element, { width: number; height: number }>();
   const { observe, unobserve } = makeResizeObserver(handleObserverCallback, options);
 
@@ -102,6 +110,7 @@ export function getWindowSize(): {
   width: number;
   height: number;
 } {
+  if (process.env.SSR) return { width: 0, height: 0 };
   return {
     width: window.innerWidth,
     height: window.innerHeight
@@ -120,6 +129,9 @@ export function createWindowSize(): {
   readonly width: number;
   readonly height: number;
 } {
+  if (process.env.SSR) {
+    return getWindowSize();
+  }
   const [size, setSize] = createStaticStore(getWindowSize());
   const updateSize = () => setSize(getWindowSize());
   makeEventListener(window, "resize", updateSize);
@@ -144,16 +156,10 @@ export const useWindowSize: typeof createWindowSize =
  * @param target html element
  * @returns object with width and height dimensions of provided {@link target} element.
  */
-export function getElementSize(target: Element | false | undefined | null):
-  | {
-      width: number;
-      height: number;
-    }
-  | {
-      width: null;
-      height: null;
-    } {
-  if (!target)
+export function getElementSize(
+  target: Element | false | undefined | null
+): { width: number; height: number } | { width: null; height: null } {
+  if (process.env.SSR || !target)
     return {
       width: null,
       height: null
@@ -189,6 +195,9 @@ export function createElementSize(target: Accessor<Element | false | undefined |
   readonly width: number | null;
   readonly height: number | null;
 } {
+  if (process.env.SSR) {
+    return { width: null, height: null };
+  }
   const [size, setSize] = createStaticStore(getElementSize(access(target)));
   if (typeof target === "function") onMount(() => setSize(getElementSize(target())));
   const updateSize = (e: DOMRectReadOnly) => setSize({ width: e.width, height: e.height });

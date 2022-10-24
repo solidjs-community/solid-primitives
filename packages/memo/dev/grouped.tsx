@@ -1,4 +1,4 @@
-import { createDebouncedMemo, createDebouncedMemoOn, createThrottledMemo } from "../src";
+import { createDebouncedMemoOn, createThrottledMemo } from "../src";
 import { Component, Show } from "solid-js";
 import { createMousePosition } from "@solid-primitives/mouse";
 
@@ -15,7 +15,7 @@ const Grouped: Component = () => {
           transform: `translate(${pos.x}px, ${pos.y}px)`
         }}
       ></div>
-      <Show when={debPos()}>
+      <Show when={debPos()} keyed>
         {({ x, y }) => (
           <div
             class="ball bg-yellow-600"
@@ -25,7 +25,7 @@ const Grouped: Component = () => {
           ></div>
         )}
       </Show>
-      <Show when={thrPos()}>
+      <Show when={thrPos()} keyed>
         {({ x, y }) => (
           <div
             class="ball bg-cyan-500"

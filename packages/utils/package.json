@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/utils",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "A bunch of reactive utility types and functions, for building primitives with Solid.js",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -14,17 +14,25 @@
   },
   "private": false,
   "sideEffects": false,
-  "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "scripts": {
-    "build": "tsup",
-    "test": "uvu -r solid-register",
-    "test:watch": "watchlist src test -- npm test"
+    "build": "jiti ../../scripts/build.ts",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "utilities",
@@ -35,13 +43,13 @@
   "devDependencies": {
     "jsdom": "^20.0.0",
     "prettier": "^2.7.1",
-    "solid-register": "^0.2.5",
+    "solid-js": "^1.6.0",
     "tslib": "^2.4.0",
-    "tsup": "^6.2.1",
-    "uvu": "^0.5.6",
-    "watchlist": "^0.3.1"
+    "tsup": "^6.2.3",
+    "vitest": "^0.24.1"
   },
+  "browser": {},
   "peerDependencies": {
-    "solid-js": "^1.4.1"
+    "solid-js": "^1.6.0"
   }
 }

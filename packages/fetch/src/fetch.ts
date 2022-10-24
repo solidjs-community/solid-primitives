@@ -2,11 +2,13 @@ import {
   Accessor,
   createMemo,
   createResource,
+  Resource,
+  ResourceActions,
   ResourceFetcherInfo,
   ResourceOptions,
   ResourceReturn
 } from "solid-js";
-import { Fetcher, RequestModifier } from "./modifiers";
+import { RequestModifier } from "./modifiers";
 import { fetchRequest, Request } from "./request";
 
 export type FetchArgs = [info: RequestInfo] | [info: RequestInfo, init?: RequestInit];
@@ -30,22 +32,19 @@ export type FetchOptions<Result, InitialValue, FetcherArgs> = ResourceOptions<
   disable?: boolean;
 };
 
-export type FetchReturn<T, I> = [
-  {
-    (): T | I;
+export type FetchReturn<Result, InitialValue> = [
+  Resource<Result> & {
     /** if you are using withAbort(), this will contain a boolean to check if the request was aborted */
     aborted?: boolean;
-    error: any;
-    loading: boolean;
     status: number | null;
     response: Response | null;
     [key: string]: any;
   },
-  {
+  ResourceActions<Result, ResourceOptions<Result | InitialValue>> & {
     /** if you are using withAbort(), this callback will allow you to abort the request */
     abort?: () => void;
-    mutate: (v: T | I) => T | I;
-    refetch: () => void;
+    /** if you are using withCache(), this callback will invalidate the current resource or the one specified by the fetcher args */
+    invalidate?: (...fetchargs: any[]) => void;
   }
 ];
 
@@ -120,10 +119,13 @@ const fetcherArgsFromArgs = <FetcherArgs extends any[]>(
  * ```
  * ## Available Modifiers:
  * * withAbort() - makes request abortable
+ * * withAggregation(dataFilter) - automatically aggregates the response data
  * * withTimeout(ms) - adds a request timeout (works with abort)
  * * withRetry(num) - retries request *num* times
  * * withRefetchEvent(events, filter) - automatically fetches again after certain event(s)
  * * withCache(options) - caches requests
+ * * withCacheStorage(storage) - saves cache e.g. to localStorage (which is the default if no option is given)
+ * * withRefetchOnExpiry(pollDelayMs) - refetches automatically on expiry; if expiry is handled by a function, it needs to be polled.
  * * withCatchAll() - catches all errors so you do not need a boundary
  *
  * You can even add your own modifiers.

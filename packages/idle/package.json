@@ -1,0 +1,93 @@
+{
+  "name": "@solid-primitives/idle",
+  "version": "0.0.102",
+  "description": "A primitive to observe the user's idle status and react to its changes.",
+  "author": "Aylo Srd <aylo.srd@gmail.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/idle#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "idle",
+    "stage": 0,
+    "list": [
+      "createIdleTimer"
+    ],
+    "category": "Display & Media"
+  },
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "development": {
+        "import": "./dist/dev.js",
+        "require": "./dist/dev.cjs"
+      },
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "development": {
+      "import": "./dist/dev.js",
+      "require": "./dist/dev.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "start": "vite serve dev --host",
+    "dev": "npm run start",
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "idle",
+    "inactivity",
+    "activity"
+  ],
+  "devDependencies": {
+    "jsdom": "^20.0.0",
+    "prettier": "^2.7.1",
+    "solid-js": "^1.6.0",
+    "tslib": "^2.4.0",
+    "tsup": "^6.2.3",
+    "unocss": "^0.45.15",
+    "vite": "^3.0.9",
+    "vite-plugin-solid": "^2.3.0",
+    "vitest": "^0.23.0"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.0"
+  }
+}

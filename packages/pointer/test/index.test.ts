@@ -1,121 +1,96 @@
+import { describe, it, test, expect } from "vitest";
+import { createRoot, createSignal } from "solid-js";
 import { createPointerListeners } from "../src";
-import { createRoot } from "solid-js";
-import { suite } from "uvu";
-import * as assert from "uvu/assert";
 
-const testCPL = suite("createPointerListeners");
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-testCPL("listens to pointer events", () =>
-  createRoot(dispose => {
-    let captured_events = {
-      move: undefined,
-      enter: undefined,
-      up: undefined
-    };
-    const move_event = new Event("pointermove");
-    const enter_event = new Event("pointerenter");
-    const up_event = new Event("pointerup");
+describe("createPointerListeners", () => {
+  it("listens to pointer events", () =>
+    createRoot(dispose => {
+      let captured_events = {
+        move: undefined as undefined | PointerEvent,
+        enter: undefined as undefined | PointerEvent,
+        up: undefined as undefined | PointerEvent
+      };
+      const move_event = new Event("pointermove");
+      const enter_event = new Event("pointerenter");
+      const up_event = new Event("pointerup");
 
-    createPointerListeners({
-      target: window,
-      onMove: e => (captured_events.move = e),
-      onEnter: e => (captured_events.enter = e),
-      onUp: e => (captured_events.up = e)
-    });
+      createPointerListeners({
+        target: window,
+        onMove: e => (captured_events.move = e),
+        onEnter: e => (captured_events.enter = e),
+        onUp: e => (captured_events.up = e)
+      });
 
-    window.dispatchEvent(move_event);
-    assert.is(captured_events.move, move_event);
-    assert.is(captured_events.enter, undefined);
-    assert.is(captured_events.up, undefined);
+      window.dispatchEvent(move_event);
+      expect(captured_events.move).toBe(move_event);
+      expect(captured_events.enter).toBe(undefined);
+      expect(captured_events.up).toBe(undefined);
 
-    window.dispatchEvent(enter_event);
-    assert.is(captured_events.enter, enter_event);
+      window.dispatchEvent(enter_event);
+      expect(captured_events.enter).toBe(enter_event);
 
-    window.dispatchEvent(up_event);
-    assert.is(captured_events.up, up_event);
+      window.dispatchEvent(up_event);
+      expect(captured_events.up).toBe(up_event);
 
-    dispose();
-  })
-);
+      dispose();
+    }));
 
-testCPL("clear function", () =>
-  createRoot(dispose => {
-    let captured_event;
-    const move_event1 = new Event("pointermove");
-    const move_event2 = new Event("pointermove");
+  test("listeners are removed on dispose", () =>
+    createRoot(dispose => {
+      let captured_events = 0;
+      const move_event = new Event("pointermove");
 
-    const clear = createPointerListeners({
-      target: window,
-      onMove: e => (captured_event = e)
-    });
+      createPointerListeners({
+        target: window,
+        onMove: e => captured_events++
+      });
 
-    window.dispatchEvent(move_event1);
-    assert.is(captured_event, move_event1);
+      window.dispatchEvent(move_event);
+      expect(captured_events).toBe(1);
 
-    clear();
+      dispose();
 
-    window.dispatchEvent(move_event2);
-    assert.is(captured_event, move_event1);
+      window.dispatchEvent(move_event);
+      expect(captured_events).toBe(1);
+    }));
 
-    dispose();
-  })
-);
+  // there is something wrong with this test for some reason
 
-// cannot test this because of solid-register's cjs conversion (disables reactivity in solid in dependencies)
+  test("reactive target", async () =>
+    createRoot(async dispose => {
+      let captured_events = 0;
+      const move_event = new Event("pointermove");
+      const [target, setTarget] = createSignal<Window | undefined>(window, { name: "target" });
 
-// testCPL("listeners are removed on dispose", () =>
-//   createRoot(dispose => {
-//     let captured_events = 0;
-//     const move_event = new Event("pointermove");
+      createPointerListeners({
+        target,
+        onMove: e => captured_events++
+      });
 
-//     createPointerListeners({
-//       target: window,
-//       onMove: e => captured_events++
-//     });
+      window.dispatchEvent(move_event);
+      expect(captured_events, "listener will be added onMount").toBe(0);
 
-//     window.dispatchEvent(move_event);
-//     assert.is(captured_events, 1);
+      await sleep(0);
 
-//     dispose();
+      window.dispatchEvent(move_event);
+      expect(captured_events).toBe(1);
 
-//     window.dispatchEvent(move_event);
-//     assert.is(captured_events, 1);
-//   }));
+      setTarget();
 
-// testCPL("reactive target", () =>
-//   createRoot(dispose => {
-//     let captured_events = 0;
-//     const move_event = new Event("pointermove");
-//     const [target, setTarget] = createSignal(window);
+      await sleep(0);
 
-//     createPointerListeners({
-//       target,
-//       onMove: e => captured_events++
-//     });
+      window.dispatchEvent(move_event);
+      expect(captured_events).toBe(1);
 
-//     window.dispatchEvent(move_event);
-//     assert.is(captured_events, 0, "listener will be added onMount");
+      setTarget(window);
 
-//     setTimeout(() => {
-//       window.dispatchEvent(move_event);
-//       assert.is(captured_events, 1);
+      await sleep(0);
 
-//       setTarget(undefined);
+      window.dispatchEvent(move_event);
+      expect(captured_events).toBe(2);
 
-//       setTimeout(() => {
-//         window.dispatchEvent(move_event);
-//         assert.is(captured_events, 1);
-
-//         setTarget(window);
-
-//         setTimeout(() => {
-//           window.dispatchEvent(move_event);
-//           assert.is(captured_events, 2);
-
-//           dispose();
-//         }, 1);
-//       }, 1);
-//     }, 0);
-//   }));
-
-testCPL.run();
+      dispose();
+    }));
+});

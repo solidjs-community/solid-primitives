@@ -1,5 +1,5 @@
 import { filterInstance, remove, removeItems } from "@solid-primitives/immutable";
-import { createBranch } from "@solid-primitives/rootless";
+import { createSubRoot } from "@solid-primitives/rootless";
 import {
   access,
   asArray,
@@ -280,7 +280,7 @@ export function mapRemoved<T>(
   };
 
   function mapRemovedElement(list: T[], item: T, i: number) {
-    createBranch(dispose => {
+    createSubRoot(dispose => {
       let signal: Accessor<T | undefined>, mapped: T;
       // create index signal
       if (indexes) {

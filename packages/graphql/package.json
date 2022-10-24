@@ -1,10 +1,11 @@
 {
   "name": "@solid-primitives/graphql",
-  "version": "1.1.2",
+  "version": "1.4.1",
   "description": "Primitive that generates a client and reactive GraphQL queries",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
-    "Damian Tarnawski <gthetarnav@gmail.com>"
+    "Damian Tarnawski <gthetarnav@gmail.com>",
+    "Alex Ryapolov"
   ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/graphql",
@@ -26,22 +27,24 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/server.cjs",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "browser": {},
   "exports": {
-    "node": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "start": "vite serve dev",
     "dev": "vite serve dev",
-    "build": "tsup",
-    "test": "echo disabled defunct test suite"
+    "gqlgen": "graphql-codegen --config dev/codegen.yml",
+    "build": "jiti ../../scripts/build.ts",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "graphql",
@@ -50,20 +53,18 @@
     "primitives"
   ],
   "devDependencies": {
-    "prettier": "^2.7.1",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.1",
-    "typescript": "^4.7.4",
-    "unocss": "^0.44.7",
-    "uvu": "^0.5.6",
-    "vite": "^3.0.4",
-    "vite-plugin-solid": "^2.3.0"
-  },
-  "peerDependencies": {
-    "solid-js": "^1.4.3"
+    "@graphql-codegen/cli": "^2.12.0",
+    "@graphql-codegen/typed-document-node": "^2.3.3",
+    "@graphql-codegen/typescript": "^2.7.3",
+    "@graphql-codegen/typescript-operations": "^2.5.3",
+    "solid-js": "^1.6.0"
   },
   "dependencies": {
-    "@solid-primitives/utils": "^3.0.0",
-    "node-fetch": "^2.6.7"
+    "@graphql-typed-document-node/core": "^3.1.1",
+    "@solid-primitives/utils": "^3.1.0",
+    "graphql": "^16.6.0"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.0"
   }
 }

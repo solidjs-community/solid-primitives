@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/fetch",
-  "version": "2.0.0",
+  "version": "2.4.2",
   "description": "Primitive that wraps fetch requests",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
@@ -21,15 +21,39 @@
     "dist"
   ],
   "private": false,
-  "sideEffects": true,
+  "sideEffects": false,
   "type": "module",
   "main": "./dist/server.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/server.js",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
   "types": "./dist/index.d.ts",
   "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "development": {
+        "import": "./dist/dev.js",
+        "require": "./dist/dev.cjs"
+      },
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
     "node": {
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
+    },
+    "development": {
+      "import": "./dist/dev.js",
+      "require": "./dist/dev.cjs"
     },
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
@@ -39,8 +63,9 @@
     "dev": "pnpm run start",
     "prebuild": "npm run clean",
     "clean": "rimraf dist/",
-    "build": "tsup",
-    "test": "vitest"
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "fetch",
@@ -50,20 +75,12 @@
     "primitives"
   ],
   "devDependencies": {
-    "@types/node": "^18.6.3",
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "rimraf": "^3.0.2",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.1",
-    "typescript": "^4.7.4",
-    "vite": "^2.9.14",
-    "vite-plugin-solid": "2.2.6",
-    "vitest": "^0.20.1"
+    "@types/node": "^18.7.16",
+    "solid-js": "^1.6.0"
   },
   "peerDependencies": {
-    "node-fetch": ">=2.0.0",
-    "solid-js": ">=1.3.0"
+    "node-fetch": ">=3.2.10",
+    "solid-js": "^1.6.0"
   },
   "peerDependenciesMeta": {
     "node-fetch": {

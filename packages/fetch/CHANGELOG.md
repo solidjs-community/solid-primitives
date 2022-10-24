@@ -1,5 +1,46 @@
 # @solid-primitives/fetch
 
+## 2.4.2
+
+### Patch Changes
+
+- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+
+## 2.4.1
+
+### Patch Changes
+
+- d1622e79: fix to cache invalidation function types and cause a re-fetch on invalidation.
+
+## 2.4.0
+
+### Minor Changes
+
+- 6d39bcc7: new aggregation modifier
+- 38578006: expose cache key serializer
+
+## 2.3.0
+
+### Minor Changes
+
+- 66d5eb39: refetch on expiry modifier added
+
+## 2.2.0
+
+### Minor Changes
+
+- 6fcf348: Adjustments to support Solid 1.5
+
+### Patch Changes
+
+- 7ac41ed: Update to solid-js version 1.5
+
+## 2.1.0
+
+### Minor Changes
+
+- cf1326b: remove side effects
+
 ## 2.0.0
 
 ### Major Changes

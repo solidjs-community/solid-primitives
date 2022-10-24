@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/date",
-  "version": "2.0.0",
+  "version": "2.0.4",
   "description": "Collection of reactive primitives and utility functions, providing easier ways to deal with dates in SolidJS",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -31,13 +31,22 @@
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
+  "browser": {},
   "types": "./dist/index.d.ts",
+  "exports": {
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "scripts": {
     "start": "vite serve dev",
     "dev": "vite serve dev",
-    "build": "tsup",
-    "test": "uvu -r solid-register",
-    "test:watch": "watchlist src test -- npm test"
+    "build": "jiti ../../scripts/build.ts",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "date",
@@ -46,27 +55,16 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solid-primitives/composites": "^1.1.0",
-    "@solid-primitives/event-listener": "^1.6.1",
-    "date-fns": "^2.29.1",
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "solid-register": "^0.2.5",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.1",
-    "typescript": "^4.7.4",
-    "unocss": "^0.44.7",
-    "uvu": "^0.5.6",
-    "vite": "^3.0.4",
-    "vite-plugin-solid": "^2.3.0",
-    "watchlist": "^0.3.1"
-  },
-  "peerDependencies": {
-    "solid-js": "^1.3.1"
+    "@solid-primitives/event-listener": "^2.2.3",
+    "date-fns": "^2.29.2",
+    "solid-js": "^1.6.0"
   },
   "dependencies": {
-    "@solid-primitives/memo": "^0.1.1",
-    "@solid-primitives/timer": "^1.3.1",
-    "@solid-primitives/utils": "^1.5.2"
+    "@solid-primitives/memo": "^1.1.0",
+    "@solid-primitives/timer": "^1.3.4",
+    "@solid-primitives/utils": "^3.1.0"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.0"
   }
 }

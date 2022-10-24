@@ -37,6 +37,12 @@ const getRangeArgs = (offset: number, texts: Node[]): [node: Node | null, offset
   );
 
 export const createSelection = (): [Accessor<HTMLSelection>, Setter<HTMLSelection>] => {
+  if (process.env.SSR) {
+    return [
+      () => [null, NaN, NaN],
+      sel => (typeof sel === "function" ? sel([null, NaN, NaN]) : sel)
+    ];
+  }
   const [selection, setSelection] = createSignal<HTMLSelection>([null, NaN, NaN]);
   const [selected, setSelected] = createSignal<HTMLSelection>([null, NaN, NaN]);
   const selectionHandler = () => {

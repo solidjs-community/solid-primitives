@@ -1,7 +1,7 @@
 import { readdirSync, existsSync, readFileSync, writeFileSync } from "fs";
 // @ts-expect-error ts-missing-module
 import tablemark from "json-to-markdown-table";
-import { insertTextBetweenComments, pathTo } from "./utils";
+import { insertTextBetweenComments, r } from "./utils";
 
 type PackageData = {
   Name: string;
@@ -26,8 +26,8 @@ const stageShieldLink =
 const categories: Record<string, PackageData[]> = {};
 const rootDependencies: string[] = [];
 
-readdirSync(pathTo(`../packages/`)).forEach(name => {
-  const dir = pathTo(`../packages/${name}/package.json`);
+readdirSync(r(`../packages/`)).forEach(name => {
+  const dir = r(`../packages/${name}/package.json`);
   if (!existsSync(dir)) return;
   const pkg = JSON.parse(readFileSync(dir, "utf8"));
 
@@ -70,7 +70,7 @@ readdirSync(pathTo(`../packages/`)).forEach(name => {
   categories[cat] = Array.isArray(categories[cat]) ? [...categories[cat], data] : [data];
 });
 
-const pathToREADME = pathTo("../README.md");
+const pathToREADME = r("../README.md");
 let readme = readFileSync(pathToREADME).toString();
 
 // Update Primitives Table
