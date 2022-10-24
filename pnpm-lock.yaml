@@ -646,7 +646,7 @@ importers:
   packages/trigger:
     specifiers:
       '@solid-primitives/utils': workspace:^3.1.0
-      solid-js: ^1.4.8
+      solid-js: ^1.4.0
     dependencies:
       '@solid-primitives/utils': link:../utils
       solid-js: 1.6.0
