@@ -1,5 +1,11 @@
 # @solid-primitives/active-element
 
+## 2.0.4
+
+### Patch Changes
+
+- fccd18e2: Remove console.log-s
+
 ## 2.0.3
 
 ### Patch Changes
