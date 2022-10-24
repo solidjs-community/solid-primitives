@@ -1,5 +1,5 @@
 import { Accessor } from "solid-js";
-import { createTriggerCache, createWeakTriggerCache } from "@solid-primitives/utils";
+import { createTriggerCache, createWeakTriggerCache } from "@solid-primitives/trigger";
 
 const KEYS = Symbol("track-keys");
 

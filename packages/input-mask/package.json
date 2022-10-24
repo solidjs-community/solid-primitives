@@ -62,8 +62,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "vite serve dev --host",
-    "dev": "npm run start",
+    "dev": "vite serve dev",
     "build": "jiti ../../scripts/build.ts --ssr --dev",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"

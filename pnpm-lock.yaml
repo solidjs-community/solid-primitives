@@ -364,10 +364,10 @@ importers:
 
   packages/map:
     specifiers:
-      '@solid-primitives/utils': workspace:^3.1.0
+      '@solid-primitives/trigger': workspace:^0.0.1
       solid-js: ^1.6.0
     dependencies:
-      '@solid-primitives/utils': link:../utils
+      '@solid-primitives/trigger': link:../trigger
     devDependencies:
       solid-js: 1.6.0
 
@@ -589,10 +589,10 @@ importers:
 
   packages/set:
     specifiers:
-      '@solid-primitives/utils': workspace:^3.1.0
+      '@solid-primitives/trigger': workspace:^0.0.1
       solid-js: ^1.6.0
     dependencies:
-      '@solid-primitives/utils': link:../utils
+      '@solid-primitives/trigger': link:../trigger
     devDependencies:
       solid-js: 1.6.0
 
