@@ -15,27 +15,27 @@ const KEYS = Symbol("track-keys");
  * set.delete(2)
  * set.clear()
  */
-export class ReactiveSet<T> implements Set<T> {
-  private s: Set<T>;
+export class ReactiveSet<T> extends Set<T> {
   private cache = createTriggerCache<T | typeof KEYS>();
 
   constructor(values?: readonly T[] | null) {
-    this.s = new Set(values);
+    super();
+    if (values) for (const v of values) super.add(v);
   }
 
   has(v: T): boolean {
     this.cache.track(v);
-    return this.s.has(v);
+    return super.has(v);
   }
   add(v: T): this {
-    if (this.s.has(v)) return this;
-    this.s.add(v);
+    if (super.has(v)) return this;
+    super.add(v);
     this.cache.dirty(v);
     this.cache.dirty(KEYS);
     return this;
   }
   delete(v: T): boolean {
-    const r = this.s.delete(v);
+    const r = super.delete(v);
     if (r) {
       this.cache.dirty(v);
       this.cache.dirty(KEYS);
@@ -43,45 +43,43 @@ export class ReactiveSet<T> implements Set<T> {
     return r;
   }
   clear(): void {
-    if (this.s.size) {
-      this.s.clear();
+    if (super.size) {
+      super.clear();
       this.cache.dirtyAll();
     }
   }
   set(list: T[]): void {
-    this.s.clear();
-    list.forEach(v => this.s.add(v));
+    super.clear();
+    list.forEach(v => super.add(v));
     this.cache.dirtyAll();
   }
   forEach(callbackfn: (value: T, value2: T, set: this) => void) {
     this.cache.track(KEYS);
-    this.s.forEach((value, value2) => callbackfn(value, value2, this));
+    super.forEach((value, value2) => callbackfn(value, value2, this));
   }
   values(): IterableIterator<T> {
     this.cache.track(KEYS);
-    return this.s.values();
+    return super.values();
   }
   keys(): IterableIterator<T> {
     return this.values();
   }
   entries(): IterableIterator<[T, T]> {
     this.cache.track(KEYS);
-    return this.s.entries();
+    return super.entries();
   }
   get size(): number {
     this.cache.track(KEYS);
-    return this.s.size;
+    return super.size;
   }
 
   [Symbol.iterator](): IterableIterator<T> {
     return this.values();
   }
   get [Symbol.toStringTag](): string {
-    return this.s[Symbol.toStringTag];
+    return super[Symbol.toStringTag];
   }
 }
-
-Object.setPrototypeOf(ReactiveSet.prototype, Set.prototype);
 
 /**
  * A reactive version of a Javascript built-in `WeakSet` class.
@@ -93,36 +91,34 @@ Object.setPrototypeOf(ReactiveSet.prototype, Set.prototype);
  * set.add(4)
  * set.delete(2)
  */
-export class ReactiveWeakSet<T extends object> implements WeakSet<T> {
-  s: WeakSet<T>;
+export class ReactiveWeakSet<T extends object> extends WeakSet<T> {
   private cache = createWeakTriggerCache<T>();
 
   constructor(values?: readonly T[] | null) {
-    this.s = new WeakSet(values);
+    super();
+    if (values) for (const v of values) super.add(v);
   }
 
   has(v: T): boolean {
     this.cache.track(v);
-    return this.s.has(v);
+    return super.has(v);
   }
   add(v: T): this {
-    if (this.s.has(v)) return this;
-    this.s.add(v);
+    if (super.has(v)) return this;
+    super.add(v);
     this.cache.dirty(v);
     return this;
   }
   delete(v: T): boolean {
-    const r = this.s.delete(v);
+    const r = super.delete(v);
     if (r) this.cache.dirty(v);
     return r;
   }
 
   get [Symbol.toStringTag](): string {
-    return this.s[Symbol.toStringTag];
+    return super[Symbol.toStringTag];
   }
 }
-
-Object.setPrototypeOf(ReactiveWeakSet.prototype, WeakSet.prototype);
 
 /** @deprecated */
 export type SignalSet<T> = Accessor<T[]> & ReactiveSet<T>;

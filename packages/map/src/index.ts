@@ -20,56 +20,56 @@ const KEYS = Symbol("track-keys");
  * userPoints.delete(user2);
  * userPoints.set(user1, { foo: "bar" });
  */
-export class ReactiveMap<K, V> implements Map<K, V> {
-  private map: Map<K, V>;
+export class ReactiveMap<K, V> extends Map<K, V> {
   private cache = createTriggerCache<K | typeof KEYS>();
 
   constructor(initial?: [K, V][], private equals = (a: V, b: V) => a === b) {
-    this.map = new Map(initial);
+    super();
+    if (initial) for (const v of initial) super.set(v[0], v[1]);
   }
 
   // reads
   has(key: K): boolean {
     this.cache.track(key);
-    return this.map.has(key);
+    return super.has(key);
   }
   get(key: K): V | undefined {
     this.cache.track(key);
-    return this.map.get(key);
+    return super.get(key);
   }
   get size(): number {
     this.cache.track(KEYS);
-    return this.map.size;
+    return super.size;
   }
   keys(): IterableIterator<K> {
     this.cache.track(KEYS);
-    return this.map.keys();
+    return super.keys();
   }
   values(): IterableIterator<V> {
     this.cache.track(KEYS);
-    return this.map.values();
+    return super.values();
   }
   entries(): IterableIterator<[K, V]> {
     this.cache.track(KEYS);
-    return this.map.entries();
+    return super.entries();
   }
 
   // writes
   set(key: K, value: V): this {
-    if (this.map.has(key)) {
-      const oldV: V = this.map.get(key)!;
+    if (super.has(key)) {
+      const oldV: V = super.get(key)!;
       if (this.equals(oldV, value)) {
-        this.map.set(key, value);
+        super.set(key, value);
         return this;
       }
     }
-    this.map.set(key, value);
+    super.set(key, value);
     this.cache.dirty(key);
     this.cache.dirty(KEYS);
     return this;
   }
   delete(key: K): boolean {
-    const r = this.map.delete(key);
+    const r = super.delete(key);
     if (r) {
       this.cache.dirty(key);
       this.cache.dirty(KEYS);
@@ -77,8 +77,8 @@ export class ReactiveMap<K, V> implements Map<K, V> {
     return r;
   }
   clear(): void {
-    if (this.map.size) {
-      this.map.clear();
+    if (super.size) {
+      super.clear();
       this.cache.dirtyAll();
     }
   }
@@ -86,18 +86,16 @@ export class ReactiveMap<K, V> implements Map<K, V> {
   // callback
   forEach(callbackfn: (value: V, key: K, map: this) => void) {
     this.cache.track(KEYS);
-    this.map.forEach((value, key) => callbackfn(value, key, this));
+    super.forEach((value, key) => callbackfn(value, key, this));
   }
 
   [Symbol.iterator](): IterableIterator<[K, V]> {
     return this.entries();
   }
   get [Symbol.toStringTag](): string {
-    return this.map[Symbol.toStringTag];
+    return super[Symbol.toStringTag];
   }
 }
-
-Object.setPrototypeOf(ReactiveMap.prototype, Map.prototype);
 
 /**
  * A reactive version of `WeakMap` data structure. All the reads (like `get` or `has`) are signals, and all the writes (`delete` or `set`) will cause updates to appropriate signals.
@@ -115,46 +113,44 @@ Object.setPrototypeOf(ReactiveMap.prototype, Map.prototype);
  * userPoints.delete(user2);
  * userPoints.set(user1, { foo: "bar" });
  */
-export class ReactiveWeakMap<K extends object, V> implements WeakMap<K, V> {
-  private map: WeakMap<K, V>;
+export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
   private cache = createWeakTriggerCache<K>();
 
   constructor(initial?: [K, V][], private equals = (a: V, b: V) => a === b) {
-    this.map = new WeakMap(initial);
+    super();
+    if (initial) for (const v of initial) super.set(v[0], v[1]);
   }
 
   has(key: K): boolean {
     this.cache.track(key);
-    return this.map.has(key);
+    return super.has(key);
   }
   get(key: K): V | undefined {
     this.cache.track(key);
-    return this.map.get(key);
+    return super.get(key);
   }
   set(key: K, value: V): this {
-    if (this.map.has(key)) {
-      const oldV: V = this.map.get(key)!;
+    if (super.has(key)) {
+      const oldV: V = super.get(key)!;
       if (this.equals(oldV, value)) {
-        this.map.set(key, value);
+        super.set(key, value);
         return this;
       }
     }
-    this.map.set(key, value);
+    super.set(key, value);
     this.cache.dirty(key);
     return this;
   }
   delete(key: K): boolean {
-    const r = this.map.delete(key);
+    const r = super.delete(key);
     if (r) this.cache.dirty(key);
     return r;
   }
 
   get [Symbol.toStringTag](): string {
-    return this.map[Symbol.toStringTag];
+    return super[Symbol.toStringTag];
   }
 }
-
-Object.setPrototypeOf(ReactiveWeakMap.prototype, WeakMap.prototype);
 
 /** @deprecated */
 export type SignalMap<K, V> = Accessor<[K, V][]> & ReactiveMap<K, V>;
