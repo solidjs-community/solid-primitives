@@ -1,7 +1,7 @@
-import { access, MaybeAccessor, accessWith, createTrigger } from "@solid-primitives/utils";
+import { access, MaybeAccessor, accessWith } from "@solid-primitives/utils";
 import { createWritableMemo } from "@solid-primitives/memo";
 import { createPolled, TimeoutSource } from "@solid-primitives/timer";
-import { Accessor, createComputed, createMemo } from "solid-js";
+import { Accessor, createComputed, createMemo, createSignal } from "solid-js";
 import { createStore, Store } from "solid-js/store";
 import { DEFAULT_MESSAGES, HOUR, MINUTE } from "./variables";
 import { formatDate, formatDateRelative, getCountdown, getDate, getDateDifference } from "./utils";
@@ -44,7 +44,7 @@ export const createDate = (init: MaybeAccessor<DateInit>): [Accessor<Date>, Date
 export function createDateNow(
   interval: TimeoutSource = MINUTE / 2
 ): [Accessor<Date>, VoidFunction] {
-  const [track, trigger] = createTrigger();
+  const [track, trigger] = createSignal(undefined, { equals: false });
   const memo = createPolled(
     () => {
       track();
@@ -52,9 +52,7 @@ export function createDateNow(
     },
     interval,
     undefined,
-    {
-      equals: (a, b) => a.getTime() === b.getTime()
-    }
+    { equals: (a, b) => a.getTime() === b.getTime() }
   );
   return [memo, trigger];
 }
