@@ -1,5 +1,5 @@
 import { Accessor } from "solid-js";
-import { createTriggerCache } from "@solid-primitives/utils";
+import { createTriggerCache, createWeakTriggerCache } from "@solid-primitives/trigger";
 
 const KEYS = Symbol("track-keys");
 
@@ -117,7 +117,7 @@ Object.setPrototypeOf(ReactiveMap.prototype, Map.prototype);
  */
 export class ReactiveWeakMap<K extends object, V> implements WeakMap<K, V> {
   private map: WeakMap<K, V>;
-  private cache = createTriggerCache<K>();
+  private cache = createWeakTriggerCache<K>();
 
   constructor(initial?: [K, V][], private equals = (a: V, b: V) => a === b) {
     this.map = new WeakMap(initial);
