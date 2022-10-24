@@ -1,4 +1,5 @@
-import { createSignal, getListener, DEV } from "solid-js";
+import { createSignal, getListener } from "solid-js";
+import { noop } from "@solid-primitives/utils";
 
 class _Object<T extends {}> {
   obj: Partial<T> = {};
@@ -35,9 +36,15 @@ export type WeakTriggerCache<T extends object> = {
  * // later
  * dirty()
  */
-export const createTrigger: () => Trigger = DEV
-  ? () => createSignal(undefined, { equals: false, name: "trigger" })
-  : () => createSignal(undefined, { equals: false });
+export function createTrigger(): Trigger {
+  if (process.env.SSR) {
+    return [noop, noop];
+  }
+  return createSignal(
+    undefined,
+    process.env.DEV ? { equals: false, name: "trigger" } : { equals: false }
+  );
+}
 
 function dirtyTriggerCache<T>(
   this: WeakMap<any, Trigger> | _Object<Record<any, Trigger>>,
@@ -76,6 +83,10 @@ function trackTriggerCache<T>(
  * dirty(2)
  */
 export function createTriggerCache<T>(): TriggerCache<T> {
+  if (process.env.SSR) {
+    return { track: noop, dirty: noop, dirtyAll: noop };
+  }
+
   const mapCache = new _Object<Record<T extends PropertyKey ? T : never, Trigger>>();
   const cache = new WeakMap<T extends object ? T : never, Trigger>();
   const triggers = new Set<VoidFunction>();
@@ -109,6 +120,10 @@ export function createTriggerCache<T>(): TriggerCache<T> {
  * dirty({})
  */
 export function createWeakTriggerCache<T extends object>(): WeakTriggerCache<T> {
+  if (process.env.SSR) {
+    return { track: noop, dirty: noop };
+  }
+
   const cache = new WeakMap<T, Trigger>();
   return {
     dirty: dirtyTriggerCache.bind(cache),
