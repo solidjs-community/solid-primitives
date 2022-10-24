@@ -175,7 +175,7 @@ Available node scripts for managing packages and creating new ones:
 
 ### Inputs
 
-- createGesture (in progress)
+- createGesture ([in progress](https://github.com/solidjs-community/solid-primitives/tree/main/packages/gestures))
 - createCompositionObserver (CompositionEvent observer)
 - createForm
 - createInput
@@ -183,6 +183,6 @@ Available node scripts for managing packages and creating new ones:
 
 ### Utilities
 
-- createWorker (in progress)
+- createWorker ([in progress](https://github.com/solidjs-community/solid-primitives/tree/main/packages/workers))
 - createQueue
 - createEffectWhen
