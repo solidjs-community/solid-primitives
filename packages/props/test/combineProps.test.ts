@@ -1,10 +1,10 @@
-import { describe, test, expect } from "vitest";
-import { createRoot } from "solid-js";
+import { describe, it, expect, vi } from "vitest";
+import { createRoot, mergeProps } from "solid-js";
 import { spy } from "nanospy";
 import { combineProps } from "../src";
 
 describe("combineProps", () => {
-  test("handles one argument", () =>
+  it("handles one argument", () =>
     createRoot(dispose => {
       const onClick = () => {};
       const className = "primary";
@@ -19,7 +19,7 @@ describe("combineProps", () => {
       dispose();
     }));
 
-  test("combines handlers", async () => {
+  it("combines handlers", async () => {
     createRoot(async dispose => {
       const mockFn = spy();
       const message1 = "click1";
@@ -41,7 +41,7 @@ describe("combineProps", () => {
     });
   });
 
-  test("event handlers can be overwritten", async () => {
+  it("event handlers can be overwritten", async () => {
     createRoot(async dispose => {
       const mockFn = spy();
       const message1 = "click1";
@@ -64,7 +64,7 @@ describe("combineProps", () => {
     });
   });
 
-  test("last value overwrites the event-listeners", async () => {
+  it("last value overwrites the event-listeners", async () => {
     createRoot(async dispose => {
       const mockFn = spy();
       const message1 = "click1";
@@ -83,7 +83,7 @@ describe("combineProps", () => {
     });
   });
 
-  test("handles tuples as event handlers", () =>
+  it("handles tuples as event handlers", () =>
     createRoot(dispose => {
       const mockFn = spy();
       const message1 = "click1";
@@ -104,7 +104,7 @@ describe("combineProps", () => {
       dispose();
     }));
 
-  test("merges props with different keys", async () => {
+  it("merges props with different keys", async () => {
     createRoot(async dispose => {
       const mockFn = spy();
       const click1 = "click1";
@@ -137,7 +137,7 @@ describe("combineProps", () => {
     });
   });
 
-  test("combines css classes", async () => {
+  it("combines css classes", async () => {
     createRoot(async dispose => {
       const className1 = "primary";
       const className2 = "hover";
@@ -163,7 +163,7 @@ describe("combineProps", () => {
     });
   });
 
-  test("combines css classList", async () => {
+  it("combines css classList", async () => {
     createRoot(async dispose => {
       const classList1 = {
         primary: true,
@@ -189,7 +189,7 @@ describe("combineProps", () => {
     });
   });
 
-  test("combines styles", () =>
+  it("combines styles", () =>
     createRoot(dispose => {
       const stringStyles = `
       margin: 24px;;;
@@ -217,7 +217,7 @@ describe("combineProps", () => {
       dispose();
     }));
 
-  test("combines refs", () =>
+  it("combines refs", () =>
     createRoot(dispose => {
       let ref1!: HTMLButtonElement;
       let ref2!: HTMLButtonElement;
@@ -240,4 +240,18 @@ describe("combineProps", () => {
 
       dispose();
     }));
+
+  it("works with mergeProps", () => {
+    const cb1 = vi.fn();
+    const cb2 = vi.fn();
+    const combined = combineProps({ onClick: cb1 }, { onClick: cb2 });
+    const merged = mergeProps(combined);
+
+    merged.onClick("foo");
+
+    expect(cb1).toHaveBeenCalledTimes(1);
+    expect(cb1).toBeCalledWith("foo");
+    expect(cb2).toHaveBeenCalledTimes(1);
+    expect(cb2).toBeCalledWith("foo");
+  });
 });

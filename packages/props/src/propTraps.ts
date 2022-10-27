@@ -1,3 +1,8 @@
+/*
+The propTraps object coles from solid-js repository:
+https://github.com/solidjs/solid/blob/main/packages/solid/src/render/component.ts
+*/
+
 import { $PROXY } from "solid-js";
 
 function trueFn() {

@@ -1,5 +1,6 @@
-import { AnyObject, chain } from "@solid-primitives/utils";
 import { JSX, mergeProps, MergeProps } from "solid-js";
+import { AnyObject, chain } from "@solid-primitives/utils";
+import { propTraps } from "./propTraps";
 
 const extractCSSregex = /([^:; ]*):\s*([^;]*)/g;
 
@@ -126,38 +127,47 @@ export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
     }
   }
 
-  return new Proxy(merge, {
-    get(target, key) {
-      if (typeof key !== "string") return Reflect.get(target, key);
+  return new Proxy(
+    {
+      get(key) {
+        if (typeof key !== "string") return Reflect.get(merge, key);
 
-      // Combine style prop
-      if (key === "style") return reduce("style", combineStyle);
+        // Combine style prop
+        if (key === "style") return reduce("style", combineStyle);
 
-      // chain props.ref assignments
-      if (key === "ref") {
-        const callbacks: ((el: any) => void)[] = [];
-        for (const props of sources) {
-          const cb = props[key] as ((el: any) => void) | undefined;
-          if (typeof cb === "function") callbacks.push(cb);
+        // chain props.ref assignments
+        if (key === "ref") {
+          const callbacks: ((el: any) => void)[] = [];
+          for (const props of sources) {
+            const cb = props[key] as ((el: any) => void) | undefined;
+            if (typeof cb === "function") callbacks.push(cb);
+          }
+          return chain(callbacks);
         }
-        return chain(callbacks);
+
+        // Chain event listeners
+        if (isEventListenerKey(key)) {
+          const callbacks = listeners[key.toLowerCase()];
+          return Array.isArray(callbacks) ? chain(callbacks) : Reflect.get(merge, key);
+        }
+
+        // Merge classes or classNames
+        if (key === "class" || key === "className") return reduce(key, (a, b) => `${a} ${b}`);
+
+        // Merge classList objects, keys in the last object overrides all previous ones.
+        if (key === "classList") return reduce(key, (a, b) => ({ ...a, ...b }));
+
+        return Reflect.get(merge, key);
+      },
+      has(key) {
+        return Reflect.has(merge, key);
+      },
+      keys() {
+        return Object.keys(merge);
       }
-
-      // Chain event listeners
-      if (isEventListenerKey(key)) {
-        const callbacks = listeners[key.toLowerCase()];
-        return Array.isArray(callbacks) ? chain(callbacks) : Reflect.get(target, key);
-      }
-
-      // Merge classes or classNames
-      if (key === "class" || key === "className") return reduce(key, (a, b) => `${a} ${b}`);
-
-      // Merge classList objects, keys in the last object overrides all previous ones.
-      if (key === "classList") return reduce(key, (a, b) => ({ ...a, ...b }));
-
-      return Reflect.get(target, key);
-    }
-  });
+    },
+    propTraps
+  ) as any;
 }
 
 // const com = combineProps(
