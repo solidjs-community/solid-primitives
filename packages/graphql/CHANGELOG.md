@@ -1,5 +1,12 @@
 # @solid-primitives/graphql
 
+## 1.4.2
+
+### Patch Changes
+
+- Updated dependencies [9ed32b38]
+  - @solid-primitives/utils@4.0.0
+
 ## 1.4.1
 
 ### Patch Changes

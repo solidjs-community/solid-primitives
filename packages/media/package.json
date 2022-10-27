@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/media",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Primitives for media query and device features",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -77,9 +77,9 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.3",
-    "@solid-primitives/rootless": "workspace:^1.2.0",
-    "@solid-primitives/utils": "workspace:^3.1.0"
+    "@solid-primitives/event-listener": "workspace:^2.2.4",
+    "@solid-primitives/rootless": "workspace:^1.2.1",
+    "@solid-primitives/utils": "workspace:^4.0.0"
   },
   "devDependencies": {
     "solid-js": "^1.6.0"

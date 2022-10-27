@@ -1,5 +1,16 @@
 # @solid-primitives/set
 
+## 0.3.0
+
+### Minor Changes
+
+- 9ed32b38: Moves trigger primitives from utils to @solid-primitives/trigger package. Better utilize WeakMaps for caching triggers.
+
+### Patch Changes
+
+- Updated dependencies [9ed32b38]
+  - @solid-primitives/trigger@0.0.2
+
 ## 0.2.3
 
 ### Patch Changes

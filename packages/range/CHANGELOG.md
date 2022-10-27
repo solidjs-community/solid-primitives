@@ -1,5 +1,12 @@
 # @solid-primitives/range
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [9ed32b38]
+  - @solid-primitives/utils@4.0.0
+
 ## 0.1.3
 
 ### Patch Changes

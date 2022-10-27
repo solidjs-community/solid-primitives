@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/controlled-props",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "The primitives in this package allow you to create controlls for component props.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [],
@@ -53,7 +53,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^3.1.0"
+    "@solid-primitives/utils": "workspace:^4.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.19.6",
