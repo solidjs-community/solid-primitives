@@ -1,5 +1,13 @@
 # @solid-primitives/signal-builders
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [9ed32b38]
+  - @solid-primitives/utils@4.0.0
+  - @solid-primitives/immutable@0.1.4
+
 ## 0.1.3
 
 ### Patch Changes

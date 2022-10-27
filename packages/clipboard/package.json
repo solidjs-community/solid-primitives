@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/clipboard",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Primitives for reading and writing to clipboard.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -77,7 +77,7 @@
   ],
   "testEnvironment": "jsdom",
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^3.1.0"
+    "@solid-primitives/utils": "workspace:^4.0.0"
   },
   "devDependencies": {
     "solid-js": "^1.6.0"

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/geolocation",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Primitives to query geolocation and observe changes.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -81,7 +81,7 @@
     "vite-plugin-mkcert": "^1.9.0"
   },
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^3.1.0"
+    "@solid-primitives/utils": "workspace:^4.0.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

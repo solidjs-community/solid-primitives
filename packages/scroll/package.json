@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/scroll",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "Reactive primitives to react to element/window scrolling.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -74,9 +74,9 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.3",
-    "@solid-primitives/rootless": "workspace:^1.2.0",
-    "@solid-primitives/utils": "workspace:^3.1.0"
+    "@solid-primitives/event-listener": "workspace:^2.2.4",
+    "@solid-primitives/rootless": "workspace:^1.2.1",
+    "@solid-primitives/utils": "workspace:^4.0.0"
   },
   "browser": {
     "./dist/server.cjs": "./dist/index.cjs",

@@ -1,5 +1,13 @@
 # @solid-primitives/props
 
+## 3.0.1
+
+### Patch Changes
+
+- 27b80ea8: Align the behavior with solid 1.6 mergeProps logic - fixes #235 (combineProps wasn't respecting the check if source is a proxi in mergeProps)
+- Updated dependencies [9ed32b38]
+  - @solid-primitives/utils@4.0.0
+
 ## 3.0.0
 
 ### Major Changes
