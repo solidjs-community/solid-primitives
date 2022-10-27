@@ -130,6 +130,7 @@ importers:
 
   packages/controlled-props:
     specifiers:
+      '@babel/core': ^7.19.6
       '@solid-primitives/utils': workspace:^3.1.0
       babel-preset-solid: ^1.5.4
       rollup: ^2.79.0
@@ -138,6 +139,7 @@ importers:
     dependencies:
       '@solid-primitives/utils': link:../utils
     devDependencies:
+      '@babel/core': 7.19.6
       babel-preset-solid: 1.6.0_@babel+core@7.19.6
       rollup: 2.79.1
       rollup-preset-solid: 1.4.0
@@ -219,10 +221,7 @@ importers:
   packages/fetch:
     specifiers:
       '@types/node': ^18.7.16
-      node-fetch: '>=3.2.10'
       solid-js: ^1.6.0
-    dependencies:
-      node-fetch: 3.2.10
     devDependencies:
       '@types/node': 18.11.7
       solid-js: 1.6.0
@@ -241,6 +240,7 @@ importers:
       mapbox-gl: ^2.10.0
       solid-js: ^1.6.0
       solid-map-gl: ^1.3.9
+      vite: ^3.2.0
       vite-plugin-mkcert: ^1.9.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -250,6 +250,7 @@ importers:
       mapbox-gl: 2.10.0
       solid-js: 1.6.0
       solid-map-gl: 1.5.1_mapbox-gl@2.10.0
+      vite: 3.2.0
       vite-plugin-mkcert: 1.10.1_vite@3.2.0
 
   packages/gestures:
@@ -266,8 +267,11 @@ importers:
       '@graphql-codegen/typescript-operations': ^2.5.3
       '@graphql-typed-document-node/core': ^3.1.1
       '@solid-primitives/utils': ^3.1.0
+      '@types/node': ^18.11.7
       graphql: ^16.6.0
       solid-js: ^1.6.0
+      ts-node: ^10.9.1
+      typescript: ^4.8.4
     dependencies:
       '@graphql-typed-document-node/core': 3.1.1_graphql@16.6.0
       '@solid-primitives/utils': link:../utils
@@ -277,7 +281,10 @@ importers:
       '@graphql-codegen/typed-document-node': 2.3.5_graphql@16.6.0
       '@graphql-codegen/typescript': 2.8.0_graphql@16.6.0
       '@graphql-codegen/typescript-operations': 2.5.5_graphql@16.6.0
+      '@types/node': 18.11.7
       solid-js: 1.6.0
+      ts-node: 10.9.1_evej5wzm4hojmu6uzxwpspdmsu
+      typescript: 4.8.4
 
   packages/i18n:
     specifiers:
@@ -646,10 +653,8 @@ importers:
   packages/trigger:
     specifiers:
       '@solid-primitives/utils': workspace:^3.1.0
-      solid-js: ^1.4.0
     dependencies:
       '@solid-primitives/utils': link:../utils
-      solid-js: 1.6.0
 
   packages/tween:
     specifiers:
@@ -4358,11 +4363,6 @@ packages:
       stream-transform: 2.1.3
     dev: true
 
-  /data-uri-to-buffer/4.0.0:
-    resolution: {integrity: sha512-Vr3mLBA8qWmcuschSLAOogKgQ/Jwxulv3RNE4FXnYWRGujzrRWQI4m12fQqRkwX06C0KanhLr4hK+GydchZsaA==}
-    engines: {node: '>= 12'}
-    dev: false
-
   /data-urls/3.0.2:
     resolution: {integrity: sha512-Jy/tj3ldjZJo63sVAvg6LHt2mHvl4V6AgRAmNDtLdm7faqtsx+aJG42rsyCo9JCoRVKwPFzKlIPx3DIibwSIaQ==}
     engines: {node: '>=12'}
@@ -5185,14 +5185,6 @@ packages:
       - encoding
     dev: true
 
-  /fetch-blob/3.2.0:
-    resolution: {integrity: sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==}
-    engines: {node: ^12.20 || >= 14.13}
-    dependencies:
-      node-domexception: 1.0.0
-      web-streams-polyfill: 3.2.1
-    dev: false
-
   /figgy-pudding/3.5.2:
     resolution: {integrity: sha512-0btnI/H8f2pavGMN8w40mlSKOfTK2SVJmBfBeVIj3kNw0swwgzyRq0d5TJVOwodFmtvpPeWPN/MCcfuWF0Ezbw==}
     dev: true
@@ -5282,13 +5274,6 @@ packages:
       node-domexception: 1.0.0
       web-streams-polyfill: 4.0.0-beta.3
     dev: true
-
-  /formdata-polyfill/4.0.10:
-    resolution: {integrity: sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==}
-    engines: {node: '>=12.20.0'}
-    dependencies:
-      fetch-blob: 3.2.0
-    dev: false
 
   /fs-extra/10.1.0:
     resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
@@ -6739,6 +6724,7 @@ packages:
   /node-domexception/1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
+    dev: true
 
   /node-fetch-native/0.1.8:
     resolution: {integrity: sha512-ZNaury9r0NxaT2oL65GvdGDy+5PlSaHTovT6JV5tOW07k1TQmgC0olZETa4C9KZg0+6zBr99ctTYa3Utqj9P/Q==}
@@ -6755,15 +6741,6 @@ packages:
     dependencies:
       whatwg-url: 5.0.0
     dev: true
-
-  /node-fetch/3.2.10:
-    resolution: {integrity: sha512-MhuzNwdURnZ1Cp4XTazr69K0BTizsBroX7Zx3UgDSVcZYKF/6p0CBe4EUb/hLqmzVhl0UpYfgRljQ4yxE+iCxA==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-    dependencies:
-      data-uri-to-buffer: 4.0.0
-      fetch-blob: 3.2.0
-      formdata-polyfill: 4.0.10
-    dev: false
 
   /node-gyp/9.3.0:
     resolution: {integrity: sha512-A6rJWfXFz7TQNjpldJ915WFb1LnhO4lIve3ANPbWreuEoLoKlFT3sxIepPBkLhM27crW8YmN+pjlgbasH6cH/Q==}
@@ -8964,6 +8941,7 @@ packages:
   /web-streams-polyfill/3.2.1:
     resolution: {integrity: sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==}
     engines: {node: '>= 8'}
+    dev: true
 
   /web-streams-polyfill/4.0.0-beta.3:
     resolution: {integrity: sha512-QW95TCTaHmsYfHDybGMwO5IJIM93I/6vTRk+daHTWFPhwh+C8Cg7j7XyKrwrj8Ib6vYXe0ocYNrmzY4xAAN6ug==}

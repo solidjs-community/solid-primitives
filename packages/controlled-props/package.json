@@ -56,6 +56,7 @@
     "@solid-primitives/utils": "workspace:^3.1.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.19.6",
     "babel-preset-solid": "^1.5.4",
     "rollup": "^2.79.0",
     "rollup-preset-solid": "^1.4.0",
