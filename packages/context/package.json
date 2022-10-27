@@ -39,7 +39,7 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "dev": "npm run start",
+    "dev": "vite serve dev",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"

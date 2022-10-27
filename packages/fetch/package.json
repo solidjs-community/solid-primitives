@@ -59,10 +59,7 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "start": "vite serve dev --host",
     "dev": "pnpm run start",
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
     "build": "jiti ../../scripts/build.ts --ssr --dev",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"

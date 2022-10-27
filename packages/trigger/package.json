@@ -1,13 +1,11 @@
 {
-  "name": "@solid-primitives/scheduled",
-  "version": "1.1.0",
-  "description": "Primitives for creating scheduled — throttled or debounced — callbacks.",
-  "contributors": [
-    "David Di Biase <dave.dibiase@gmail.com>",
-    "Damian Tarnawski <gthetarnav@gmail.com>"
-  ],
+  "name": "@solid-primitives/trigger",
+  "version": "0.0.1",
+  "description": "A set of primitives based on Solid signals, used to trigger computations.",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
+  "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/trigger#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -16,21 +14,21 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "scheduled",
-    "stage": 2,
+    "name": "trigger",
+    "stage": 0,
     "list": [
-      "debounce",
-      "throttle",
-      "leading"
+      "createTrigger",
+      "createTriggerCache",
+      "createWeakTriggerCache"
     ],
-    "category": "Utilities"
+    "category": "Reactivity"
   },
   "private": false,
   "sideEffects": false,
+  "type": "module",
   "files": [
     "dist"
   ],
-  "type": "module",
   "main": "./dist/server.cjs",
   "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
@@ -44,6 +42,10 @@
       "require": "./dist/server.cjs"
     },
     "browser": {
+      "development": {
+        "import": "./dist/dev.js",
+        "require": "./dist/dev.cjs"
+      },
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
@@ -55,28 +57,29 @@
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
     },
+    "development": {
+      "import": "./dist/dev.js",
+      "require": "./dist/dev.cjs"
+    },
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "start": "vite serve dev --host",
     "dev": "vite serve dev",
-    "build": "jiti ../../scripts/build.ts --ssr",
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
     "solid",
     "primitives",
-    "scheduled",
-    "debounce",
-    "throttle"
+    "signal",
+    "trigger"
   ],
-  "devDependencies": {
-    "@solid-primitives/timer": "workspace:^1.3.4",
-    "solid-js": "^1.6.0"
-  },
   "peerDependencies": {
-    "solid-js": "^1.6.0"
+    "solid-js": "^1.4.0"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^3.1.0"
   }
 }
