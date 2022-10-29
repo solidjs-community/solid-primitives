@@ -1,11 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { createRoot, createSignal } from "solid-js";
+import { createEffect, createRoot, createSignal } from "solid-js";
 import { createCachedDerivation } from "../src";
-
-// TODO
-// - [ ] Test disposing (should stop updating)
-// - [ ] timing - if both the derivation and some other computation are observing the same source, the derivation should be updated first
-// - [ ] calculation gets executed where it has been read (computations gets created where they are read)
 
 describe("createCachedDerivation", () => {
   it("caches the result", () => {
@@ -56,5 +51,48 @@ describe("createCachedDerivation", () => {
 
       dispose();
     });
+  });
+
+  it("calculation stops when disposed", () => {
+    createRoot(dispose => {
+      const [source, setSource] = createSignal("0");
+      const cb = vi.fn();
+      cb.mockReturnValue(1);
+      const res = createCachedDerivation(source, cb);
+
+      dispose();
+
+      expect(res()).toBe(1);
+      expect(cb).toBeCalledTimes(1);
+
+      cb.mockReturnValue(5);
+      setSource("1");
+      expect(res(), "shouldn't reevaluate after dispose").toBe(1);
+      expect(cb).toBeCalledTimes(1);
+    });
+  });
+
+  it("runs on invalidation before effects", () => {
+    const [source, setSource] = createSignal("0");
+    const cb = vi.fn();
+    cb.mockReturnValue(1);
+
+    const dispose = createRoot(dispose => {
+      const res = createCachedDerivation(source, cb);
+
+      let i = 0;
+      const expected = [1, 2];
+      createEffect(() => {
+        source();
+        expect(res()).toBe(expected[i++]);
+      });
+
+      return dispose;
+    });
+
+    cb.mockReturnValue(2);
+    setSource("1");
+
+    dispose();
   });
 });

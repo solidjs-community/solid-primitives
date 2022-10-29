@@ -18,7 +18,6 @@ import type {
   EffectOptions,
   MemoOptions,
   NoInfer,
-  OnEffectFunction,
   Owner,
   SignalOptions
 } from "solid-js/types/reactive/signal";
@@ -63,19 +62,26 @@ export function createPureReaction(
   if (process.env.SSR) {
     return () => void 0;
   }
+
   const owner = getOwner()!;
-  const disposers: VoidFunction[] = [];
+  const disposers = new Set<VoidFunction>();
+  let trackers = 0;
+  let disposed = false;
   onCleanup(() => {
     for (const fn of disposers) fn();
-    disposers.length = 0;
+    disposers.clear();
+    disposed = true;
   });
-  let trackers = 0;
 
   // track()
   return tracking => {
+    if (disposed) {
+      untrack(tracking);
+      return;
+    }
     trackers++;
     createRoot(dispose => {
-      disposers.push(dispose);
+      disposers.add(dispose);
       let init = true;
       createComputed(() => {
         if (init) {
@@ -84,6 +90,7 @@ export function createPureReaction(
         }
         if (--trackers === 0) untrack(onInvalidate);
         dispose();
+        disposers.delete(dispose);
       }, options);
     }, owner);
   };
@@ -412,17 +419,23 @@ export function createLazyMemo<T>(
   let dirty = true;
   let memo: Accessor<T> | undefined;
   let dispose: VoidFunction | undefined;
-  onCleanup(() => dispose?.());
+  let disposed = false;
+  onCleanup(() => {
+    dispose && dispose();
+    disposed = true;
+  });
 
   // marks the lastest value as dirty if the sources updated
   const track = createPureReaction(() => (dirty = !memo));
 
   return () => {
     // path for access outside of tracking scopes
-    if (!getListener()) {
+    if (disposed || !getListener()) {
       if (memo) return memo();
-      if (dirty) track(() => (lastest = calc(lastest)));
-      dirty = false;
+      if (dirty) {
+        track(() => (lastest = calc(lastest)));
+        dirty = false;
+      }
       return lastest!;
     }
 
@@ -449,43 +462,57 @@ export function createLazyMemo<T>(
   };
 }
 
-export function createCachedDerivation<S, Next extends Prev, Prev = Next>(
-  deps: AccessorArray<S> | Accessor<S>,
-  fn: OnEffectFunction<S, undefined | NoInfer<Prev>, Next>,
-  options?: EffectOptions
-): Accessor<Next> {
-  let prevInput: S | undefined;
-  let prev: undefined | NoInfer<Prev>;
-  let stale = true;
+/*
 
-  const track = createPureReaction(() => (stale = true), options);
+createCachedDerivation is a cool idea, but it has a n edgecase where it the value may get out of sync if read in a pure computation after it's sources.
+And probably more then that, considering that the calculation is executed where read.
 
-  const trackDeps = Array.isArray(deps)
-    ? () => {
-        for (const fn of deps) fn();
-      }
-    : deps;
+*/
 
-  const getInput = Array.isArray(deps)
-    ? () => {
-        const res = Array(deps.length);
-        for (let i = 0; i < deps.length; i++) res[i] = deps[i]();
-        return res as S;
-      }
-    : deps;
+// /**
+//  * **! The value may get out of sync if read in a pure computation after it's sources !**
+//  * @param deps
+//  * @param fn
+//  * @param options
+//  * @returns
+//  */
+// export function createCachedDerivation<S, Next extends Prev, Prev = Next>(
+//   deps: AccessorArray<S> | Accessor<S>,
+//   fn: OnEffectFunction<S, undefined | NoInfer<Prev>, Next>,
+//   options?: EffectOptions
+// ): Accessor<Next> {
+//   let prevInput: S | undefined;
+//   let prev: undefined | NoInfer<Prev>;
+//   let stale = true;
 
-  return () => {
-    if (stale) {
-      let input!: S;
-      track(() => (input = getInput()));
-      prev = untrack(() => fn(input, prevInput, prev));
-      prevInput = input;
-      stale = false;
-    }
-    trackDeps();
-    return prev as Next;
-  };
-}
+//   const track = createPureReaction(() => (stale = true), options);
+
+//   const trackDeps = Array.isArray(deps)
+//     ? () => {
+//         for (const fn of deps) fn();
+//       }
+//     : deps;
+
+//   const getInput = Array.isArray(deps)
+//     ? () => {
+//         const res = Array(deps.length);
+//         for (let i = 0; i < deps.length; i++) res[i] = deps[i]();
+//         return res as S;
+//       }
+//     : deps;
+
+//   return () => {
+//     if (stale) {
+//       let input!: S;
+//       track(() => (input = getInput()));
+//       prev = untrack(() => fn(input, prevInput, prev));
+//       prevInput = input;
+//       stale = false;
+//     }
+//     trackDeps();
+//     return prev as Next;
+//   };
+// }
 
 export type CacheCalculation<Key, Value> = (key: Key, prev: Value | undefined) => Value;
 export type CacheKeyAccessor<Key, Value> = (key: Key) => Value;

@@ -1,9 +1,9 @@
-import { describe, test, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import { createLazyMemo } from "../src";
 import { createComputed, createEffect, createRoot, createSignal } from "solid-js";
 
 describe("createLazyMemo", () => {
-  test("won't run if not accessed", () =>
+  it("won't run if not accessed", () =>
     createRoot(dispose => {
       const [count, setCount] = createSignal(0);
       let runs = 0;
@@ -22,7 +22,7 @@ describe("createLazyMemo", () => {
       }, 0);
     }));
 
-  test("runs after being accessed", () =>
+  it("runs after being accessed", () =>
     createRoot(dispose => {
       const [count, setCount] = createSignal(0);
       let runs = 0;
@@ -38,7 +38,7 @@ describe("createLazyMemo", () => {
       dispose();
     }));
 
-  test("runs only once, even if accessed multiple times", () =>
+  it("runs only once, even if accessed multiple times", () =>
     createRoot(dispose => {
       const [count, setCount] = createSignal(0);
       let runs = 0;
@@ -56,7 +56,7 @@ describe("createLazyMemo", () => {
       dispose();
     }));
 
-  test("runs once until invalidated", () =>
+  it("runs once until invalidated", () =>
     createRoot(dispose => {
       const [count, setCount] = createSignal(0);
       let runs = 0;
@@ -82,7 +82,7 @@ describe("createLazyMemo", () => {
       dispose();
     }));
 
-  test("won't run if the root of where it was accessed is gone", () =>
+  it("won't run if the root of where it was accessed is gone", () =>
     createRoot(dispose => {
       const [count, setCount] = createSignal(0);
       let runs = 0;
@@ -104,7 +104,7 @@ describe("createLazyMemo", () => {
       dispose();
     }));
 
-  test("will be running even if some of the reading roots are disposed", () =>
+  it("will be running even if some of the reading roots are disposed", () =>
     createRoot(dispose => {
       const [count, setCount] = createSignal(0);
       let runs = 0;
@@ -139,7 +139,7 @@ describe("createLazyMemo", () => {
       dispose();
     }));
 
-  test("initial value if NOT set in options", () =>
+  it("initial value if NOT set in options", () =>
     createRoot(dispose => {
       const [count, setCount] = createSignal(0);
       let capturedPrev: any;
@@ -160,7 +160,7 @@ describe("createLazyMemo", () => {
       dispose();
     }));
 
-  test("initial value if set", () =>
+  it("initial value if set", () =>
     createRoot(dispose => {
       const [count, setCount] = createSignal(0);
       let capturedPrev: any;
@@ -181,7 +181,7 @@ describe("createLazyMemo", () => {
       dispose();
     }));
 
-  test("handles prev value properly", () =>
+  it("handles prev value properly", () =>
     createRoot(dispose => {
       const [count, setCount] = createSignal(0);
 
@@ -209,7 +209,7 @@ describe("createLazyMemo", () => {
       dispose();
     }));
 
-  test("works in an effect", () =>
+  it("works in an effect", () =>
     createRoot(dispose => {
       const [count, setCount] = createSignal(0);
       const memo = createLazyMemo(count);
@@ -227,7 +227,7 @@ describe("createLazyMemo", () => {
       });
     }));
 
-  test("computation will last until the source changes", () =>
+  it("computation will last until the source changes", () =>
     createRoot(dispose => {
       const [count, setCount] = createSignal(0);
       let runs = 0;
@@ -255,5 +255,25 @@ describe("createLazyMemo", () => {
       expect(runs).toBe(1);
 
       dispose();
+    }));
+
+  it("won't run after disposeing", () =>
+    createRoot(dispose => {
+      const [count, setCount] = createSignal(0);
+      let runs = 0;
+      const memo = createLazyMemo(() => {
+        runs++;
+        return count();
+      });
+
+      dispose();
+
+      // has to run at least once
+      expect(memo(), "result before dispose").toBe(0);
+      expect(runs, "runs before dispose").toBe(1);
+
+      setCount(5);
+      expect(memo(), "result after dispose").toBe(0);
+      expect(runs, "runs after dispose").toBe(1);
     }));
 });
