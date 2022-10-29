@@ -1,5 +1,11 @@
 # @solid-primitives/memo
 
+## 1.1.2
+
+### Patch Changes
+
+- 63497285: Correct the cleanup behavior of createLazyMemo and createPureComputation.
+
 ## 1.1.1
 
 ### Patch Changes
