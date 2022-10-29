@@ -18,6 +18,7 @@ import type {
   EffectOptions,
   MemoOptions,
   NoInfer,
+  OnEffectFunction,
   Owner,
   SignalOptions
 } from "solid-js/types/reactive/signal";
@@ -445,6 +446,44 @@ export function createLazyMemo<T>(
     }
 
     return memo!();
+  };
+}
+
+export function createCachedDerivation<S, Next extends Prev, Prev = Next>(
+  deps: AccessorArray<S> | Accessor<S>,
+  fn: OnEffectFunction<S, undefined | NoInfer<Prev>, Next>,
+  options?: EffectOptions
+): Accessor<Next> {
+  let prevInput: S | undefined;
+  let prev: undefined | NoInfer<Prev>;
+  let stale = true;
+
+  const track = createPureReaction(() => (stale = true), options);
+
+  const trackDeps = Array.isArray(deps)
+    ? () => {
+        for (const fn of deps) fn();
+      }
+    : deps;
+
+  const getInput = Array.isArray(deps)
+    ? () => {
+        const res = Array(deps.length);
+        for (let i = 0; i < deps.length; i++) res[i] = deps[i]();
+        return res as S;
+      }
+    : deps;
+
+  return () => {
+    if (stale) {
+      let input!: S;
+      track(() => (input = getInput()));
+      prev = untrack(() => fn(input, prevInput, prev));
+      prevInput = input;
+      stale = false;
+    }
+    trackDeps();
+    return prev as Next;
   };
 }
 
