@@ -75,7 +75,10 @@ export const throttle: ScheduleCallback = (callback, wait) => {
     }, wait);
   };
 
-  const clear = () => clearTimeout(timeoutId);
+  const clear = () => {
+    clearTimeout(timeoutId);
+    isThrottled = false;
+  };
   if (getOwner()) onCleanup(clear);
 
   return Object.assign(throttled, { clear });
@@ -108,7 +111,7 @@ export const scheduleIdle: ScheduleCallback = process.env.SSR
         id: ReturnType<typeof requestIdleCallback>,
         lastArgs: Parameters<typeof callback>;
 
-      const throttled: typeof callback = (...args) => {
+      const deferred: typeof callback = (...args) => {
         lastArgs = args;
         if (isDeferred) return;
         isDeferred = true;
@@ -121,10 +124,13 @@ export const scheduleIdle: ScheduleCallback = process.env.SSR
         );
       };
 
-      const clear = () => cancelIdleCallback(id);
+      const clear = () => {
+        cancelIdleCallback(id);
+        isDeferred = false;
+      };
       if (getOwner()) onCleanup(clear);
 
-      return Object.assign(throttled, { clear });
+      return Object.assign(deferred, { clear });
     }
   : // fallback to setTimeout (throttle)
     callback => throttle(callback);
