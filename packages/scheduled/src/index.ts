@@ -101,12 +101,9 @@ export const throttle: ScheduleCallback = (callback, wait) => {
  */
 export const scheduleIdle: ScheduleCallback = process.env.SSR
   ? () => Object.assign(() => void 0, { clear: () => void 0 })
-  : (window.requestIdleCallback as typeof window.requestIdleCallback | undefined)
+  : // requestIdleCallback is not supported in Safari
+  (window.requestIdleCallback as typeof window.requestIdleCallback | undefined)
   ? (callback, maxWait) => {
-      if (process.env.SSR) {
-        return Object.assign(() => void 0, { clear: () => void 0 });
-      }
-
       let isDeferred: boolean = false,
         id: ReturnType<typeof requestIdleCallback>,
         lastArgs: Parameters<typeof callback>;
@@ -129,7 +126,8 @@ export const scheduleIdle: ScheduleCallback = process.env.SSR
 
       return Object.assign(throttled, { clear });
     }
-  : callback => throttle(callback);
+  : // fallback to setTimeout (throttle)
+    callback => throttle(callback);
 
 /**
  * Creates a scheduled and cancellable callback that will be called on **leading** edge.
