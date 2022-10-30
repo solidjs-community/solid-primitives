@@ -221,7 +221,7 @@ export const createAmplitudeFromStream = (
  * ```typescript
  * [stream, { mutate, refetch, mute, stop } = createScreen(screenSource);
  * ```
- * @param screenSource DisplayMediaStreamOptions | undefined | Accessor<DisplayMediaStreamOptions | undefined>
+ * @param screenSource DisplayMediaStreamConstraints | undefined | Accessor<DisplayMediaStreamConstraints | undefined>
  * @returnValue `stream()` is an accessor to the display media stream (or undefined if not yet loaded)
  * @property `stream.loading` is a boolean indicator for the loading state
  * @property `stream.error` contains any error getting the stream encountered
@@ -233,7 +233,7 @@ export const createAmplitudeFromStream = (
  * The stream will be stopped on cleanup automatically.
  */
 export const createScreen = (
-  screenSource: MaybeAccessor<DisplayMediaStreamOptions | undefined>
+  screenSource: MaybeAccessor<DisplayMediaStreamConstraints | undefined>
 ): StreamReturn => {
   if (process.env.SSR) {
     return [
