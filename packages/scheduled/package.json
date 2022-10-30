@@ -21,6 +21,7 @@
     "list": [
       "debounce",
       "throttle",
+      "scheduleIdle",
       "leading"
     ],
     "category": "Utilities"

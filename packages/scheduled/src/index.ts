@@ -82,6 +82,56 @@ export const throttle: ScheduleCallback = (callback, wait) => {
 };
 
 /**
+ * Creates a callback throttled using `window.requestIdleCallback()`. ([MDN reference](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback))
+ *
+ * The throttled callback is called on **trailing** edge.
+ *
+ * The timeout will be automatically cleared on root dispose.
+ *
+ * @param callback The callback to throttle
+ * @param maxWait maximum wait time in milliseconds until the callback is called
+ * @returns The throttled callback trigger
+ *
+ * @example
+ * ```ts
+ * const trigger = scheduleIdle((val: string) => console.log(val), 250);
+ * trigger('my-new-value');
+ * trigger.clear() // clears a timeout in progress
+ * ```
+ */
+export const scheduleIdle: ScheduleCallback = process.env.SSR
+  ? () => Object.assign(() => void 0, { clear: () => void 0 })
+  : (window.requestIdleCallback as typeof window.requestIdleCallback | undefined)
+  ? (callback, maxWait) => {
+      if (process.env.SSR) {
+        return Object.assign(() => void 0, { clear: () => void 0 });
+      }
+
+      let isDeferred: boolean = false,
+        id: ReturnType<typeof requestIdleCallback>,
+        lastArgs: Parameters<typeof callback>;
+
+      const throttled: typeof callback = (...args) => {
+        lastArgs = args;
+        if (isDeferred) return;
+        isDeferred = true;
+        id = requestIdleCallback(
+          () => {
+            callback(...lastArgs);
+            isDeferred = false;
+          },
+          { timeout: maxWait }
+        );
+      };
+
+      const clear = () => cancelIdleCallback(id);
+      if (getOwner()) onCleanup(clear);
+
+      return Object.assign(throttled, { clear });
+    }
+  : callback => throttle(callback);
+
+/**
  * Creates a scheduled and cancellable callback that will be called on **leading** edge.
  *
  * The timeout will be automatically cleared on root dispose.
