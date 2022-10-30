@@ -8,7 +8,6 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "esModuleInterop": true,
-    "noUnusedLocals": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
