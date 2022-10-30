@@ -27,7 +27,7 @@ export type EffectCallback<Source extends Fn<any> | Fn<any>[], U> = Source exten
   ? EffectSignalCallback<Source, U>
   : never;
 
-export type EffectSource<Source extends Fn<any> | Fn<any>[], U> = Source extends Fn<any>[]
+export type EffectSource<Source extends Fn<any> | Fn<any>[]> = Source extends Fn<any>[]
   ? [...Source]
   : Source extends Fn<any>
   ? Source
@@ -57,7 +57,7 @@ export type CallbackModifier<Source extends Fn<any>[] | Fn<any>, U, Returns exte
 
 export type ModifierReturn<Source extends Fn<any>[] | Fn<any>, U, Returns extends {}> = {
   stopRequired: boolean;
-  initialSource: EffectSource<Source, U>;
+  initialSource: EffectSource<Source>;
   initialCallback: EffectCallback<Source, U>;
   modifyers: CallbackModifier<Source, U, Returns>[];
 };

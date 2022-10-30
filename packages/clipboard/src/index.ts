@@ -37,13 +37,7 @@ export const makeClipboard = (): [
   newItem: NewClipboardItem
 ] => {
   if (process.env.SSR) {
-    return [
-      async (_data: string | ClipboardItem[]) => {
-        /*noop*/
-      },
-      async () => Promise.resolve(undefined),
-      (_data, _type) => ({} as ClipboardItem)
-    ];
+    return [async () => void 0, async () => void 0, () => ({} as ClipboardItem)];
   }
   const read = async () => await navigator.clipboard.read();
   const write: ClipboardSetter = async data => {
@@ -82,10 +76,8 @@ export const createClipboard = (
   if (process.env.SSR) {
     return [
       Object.assign(() => [], { loading: false, error: undefined }) as any,
-      () => {
-        /** noop */
-      },
-      _value => Promise.resolve()
+      () => void 0,
+      async () => void 0
     ];
   }
   const [write, readClipboard] = makeClipboard();

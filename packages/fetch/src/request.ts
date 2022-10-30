@@ -1,5 +1,4 @@
 import { RequestContext } from "./fetch";
-import { ResourceFetcherInfo } from "solid-js";
 
 export type Request<FetcherArgs extends any[]> = <Result>(
   ...args: any[]
@@ -12,6 +11,7 @@ if (process.env.SSR && !fetchFallback) {
     fetchFallback = nodeFetch;
   } catch (_e) {
     fetchFallback = () => {
+      // eslint-disable-next-line no-console
       console.warn(
         '"\x1b[33m⚠️ package missing to run createFetch on the server.\n Please run:\x1b[0m\n\nnpm i node-fetch\n"'
       );
@@ -23,8 +23,7 @@ if (process.env.SSR && !fetchFallback) {
 export const fetchRequest: Request<[info: RequestInfo, init?: RequestInit]> =
   fetchFn => requestContext => {
     requestContext.fetcher = <Result extends unknown>(
-      requestData: [info: RequestInfo, init?: RequestInit],
-      _info: ResourceFetcherInfo<Result>
+      requestData: [info: RequestInfo, init?: RequestInit]
     ) =>
       (fetchFn || fetchFallback)?.(...requestData).then((response: Response) => {
         requestContext.response = response;

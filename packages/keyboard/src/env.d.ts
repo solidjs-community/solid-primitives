@@ -1,10 +1,10 @@
 export {};
 
 declare global {
-  interface Array<T> {
+  interface Array {
     includes(searchElement: unknown, fromIndex?: number): boolean;
   }
-  interface ReadonlyArray<T> {
+  interface ReadonlyArray {
     includes(searchElement: unknown, fromIndex?: number): boolean;
   }
 }
