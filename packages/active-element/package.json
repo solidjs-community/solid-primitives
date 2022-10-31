@@ -64,10 +64,6 @@
     "solid",
     "primitives"
   ],
-  "devDependencies": {
-    "solid-js": "^1.6.0",
-    "solid-testing-library": "^0.3.0"
-  },
   "dependencies": {
     "@solid-primitives/event-listener": "^2.2.4",
     "@solid-primitives/utils": "^4.0.0"

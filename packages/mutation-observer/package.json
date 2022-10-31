@@ -48,8 +48,7 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "devDependencies": {
-    "@solid-primitives/composites": "workspace:^1.1.2",
-    "solid-js": "^1.6.0"
+    "@solid-primitives/composites": "workspace:^1.1.2"
   },
   "dependencies": {
     "@solid-primitives/utils": "^4.0.0"

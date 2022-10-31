@@ -28,5 +28,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build and test
-        run: pnpm build-test
+      - name: Build all packages
+        run: pnpm build
+
+      - name: Test all packages
+        run: pnpm test
+
+      - name: Test all packages in server env
+        run: pnpm test:ssr

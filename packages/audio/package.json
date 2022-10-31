@@ -65,9 +65,7 @@
     "primitives"
   ],
   "devDependencies": {
-    "solid-heroicons": "^2.0.3",
-    "solid-js": "^1.6.0",
-    "solid-testing-library": "^0.2.1"
+    "solid-heroicons": "^2.0.3"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^4.0.0"

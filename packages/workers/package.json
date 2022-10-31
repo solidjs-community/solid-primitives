@@ -70,9 +70,6 @@
     "shared worker",
     "primitives"
   ],
-  "devDependencies": {
-    "solid-js": "^1.6.0"
-  },
   "peerDependencies": {
     "solid-js": "^1.6.0"
   }

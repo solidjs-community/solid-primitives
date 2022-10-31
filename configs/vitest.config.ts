@@ -3,6 +3,7 @@ import { defineConfig } from "vitest/config";
 import solidPlugin from "vite-plugin-solid";
 
 const cwd = process.cwd();
+const fromRoot = process.env.CI === "true";
 
 export default defineConfig(({ mode }) => {
   // test in server environment
@@ -26,9 +27,20 @@ export default defineConfig(({ mode }) => {
       transformMode: {
         web: [/\.[jt]sx?$/]
       },
-      ...(testSSR && { include: ["server.test.{ts,tsx}"] }),
-      ...(!testSSR && { exclude: ["server.test.{ts,tsx}"] }),
-      dir: path.resolve(cwd, "test")
+      ...(fromRoot
+        ? // Testing all packages from root
+          {
+            ...(testSSR && { include: ["packages/*/test/server.test.{ts,tsx}"] }),
+            ...(!testSSR && {
+              include: ["packages/*/test/*.test.{ts,tsx}"],
+              exclude: ["packages/*/test/server.test.{ts,tsx}"]
+            })
+          }
+        : // Testing a single package
+          {
+            ...(testSSR && { include: ["server.test.{ts,tsx}"] }),
+            ...(!testSSR && { exclude: ["server.test.{ts,tsx}"] })
+          })
     },
     resolve: {
       ...(testSSR
@@ -40,7 +52,12 @@ export default defineConfig(({ mode }) => {
             }
           }
         : {
-            conditions: ["browser", "development"]
+            conditions: ["browser", "development"],
+            alias: {
+              "solid-js/web": path.resolve(cwd, "node_modules/solid-js/web/dist/dev.js"),
+              "solid-js/store": path.resolve(cwd, "node_modules/solid-js/store/dist/dev.js"),
+              "solid-js": path.resolve(cwd, "node_modules/solid-js/dist/dev.js")
+            }
           })
     }
   };

@@ -1,6 +1,6 @@
-import { createIdleTimer } from "../src";
-import { createRoot, onMount } from "solid-js";
 import { describe, test, expect } from "vitest";
+import { createRoot, onMount } from "solid-js";
+import { createIdleTimer } from "../src";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 

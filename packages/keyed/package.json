@@ -68,7 +68,6 @@
     "@solid-primitives/immutable": "^0.1.4",
     "@solid-primitives/refs": "^0.3.4",
     "@solid-primitives/utils": "^4.0.0",
-    "solid-js": "^1.6.0",
     "solid-transition-group": "^0.0.8"
   },
   "peerDependencies": {
