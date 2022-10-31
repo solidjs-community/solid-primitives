@@ -75,11 +75,65 @@ export const throttle: ScheduleCallback = (callback, wait) => {
     }, wait);
   };
 
-  const clear = () => clearTimeout(timeoutId);
+  const clear = () => {
+    clearTimeout(timeoutId);
+    isThrottled = false;
+  };
   if (getOwner()) onCleanup(clear);
 
   return Object.assign(throttled, { clear });
 };
+
+/**
+ * Creates a callback throttled using `window.requestIdleCallback()`. ([MDN reference](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback))
+ *
+ * The throttled callback is called on **trailing** edge.
+ *
+ * The timeout will be automatically cleared on root dispose.
+ *
+ * @param callback The callback to throttle
+ * @param maxWait maximum wait time in milliseconds until the callback is called
+ * @returns The throttled callback trigger
+ *
+ * @example
+ * ```ts
+ * const trigger = scheduleIdle((val: string) => console.log(val), 250);
+ * trigger('my-new-value');
+ * trigger.clear() // clears a timeout in progress
+ * ```
+ */
+export const scheduleIdle: ScheduleCallback = process.env.SSR
+  ? () => Object.assign(() => void 0, { clear: () => void 0 })
+  : // requestIdleCallback is not supported in Safari
+  (window.requestIdleCallback as typeof window.requestIdleCallback | undefined)
+  ? (callback, maxWait) => {
+      let isDeferred: boolean = false,
+        id: ReturnType<typeof requestIdleCallback>,
+        lastArgs: Parameters<typeof callback>;
+
+      const deferred: typeof callback = (...args) => {
+        lastArgs = args;
+        if (isDeferred) return;
+        isDeferred = true;
+        id = requestIdleCallback(
+          () => {
+            callback(...lastArgs);
+            isDeferred = false;
+          },
+          { timeout: maxWait }
+        );
+      };
+
+      const clear = () => {
+        cancelIdleCallback(id);
+        isDeferred = false;
+      };
+      if (getOwner()) onCleanup(clear);
+
+      return Object.assign(deferred, { clear });
+    }
+  : // fallback to setTimeout (throttle)
+    callback => throttle(callback);
 
 /**
  * Creates a scheduled and cancellable callback that will be called on **leading** edge.

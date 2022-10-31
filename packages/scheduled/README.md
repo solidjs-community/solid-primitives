@@ -13,6 +13,7 @@ Primitives for creating scheduled — throttled or debounced — callbacks.
 
 - [`debounce`](#debounce) - Creates a callback that is **debounced** and cancellable.
 - [`throttle`](#throttle) - Creates a callback that is **throttled** and cancellable.
+- [`scheduleIdle`](#scheduleIdle) - Creates a callback throttled using `window.requestIdleCallback()`.
 - [`leading`](#leading) - Creates a scheduled and cancellable callback that will be called on **leading** edge.
 
 ## Installation
@@ -51,6 +52,30 @@ The timeout will be automatically cleared on root dispose.
 import { throttle } from "@solid-primitives/scheduled";
 
 const trigger = throttle((message: string) => console.log(message), 250);
+trigger("Hello!");
+trigger.clear(); // clears a timeout in progress
+```
+
+## `scheduleIdle`
+
+Creates a callback throttled using `window.requestIdleCallback()`. ([MDN reference](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback))
+
+The throttled callback is called on **trailing** edge.
+
+The timeout will be automatically cleared on root dispose.
+
+> **Note:** `requestIdleCallback` is not available in Safari. If it's not available, `scheduleIdle` will fallback to `throttle` with default timeout. (callbacks will be batched using setTimeout instead)
+
+### How to use it
+
+```ts
+import { scheduleIdle } from "@solid-primitives/scheduled";
+
+const trigger = scheduleIdle(
+  (message: string) => console.log(message),
+  // timeout passed to requestIdleCallback is a maximum timeout before the callback is called
+  250
+);
 trigger("Hello!");
 trigger.clear(); // clears a timeout in progress
 ```
