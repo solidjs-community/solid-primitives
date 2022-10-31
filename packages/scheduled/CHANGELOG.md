@@ -1,5 +1,15 @@
 # @solid-primitives/scheduled
 
+## 1.2.0
+
+### Minor Changes
+
+- 7a668126: Adds `scheduleIdle` scheduler based on `window.requestIdleCallback()`.
+
+### Patch Changes
+
+- 5b803dcd: Fix throttle blocking itself on clear, if the callback was not called.
+
 ## 1.1.0
 
 ### Minor Changes
