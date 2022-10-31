@@ -64,7 +64,7 @@ The throttled callback is called on **trailing** edge.
 
 The timeout will be automatically cleared on root dispose.
 
-> **Note:** `requestIdleCallback` is not available in all browsers. If it's not available, `scheduleIdle` will fallback to `throttle` with default timeout.
+> **Note:** `requestIdleCallback` is not available in Safari. If it's not available, `scheduleIdle` will fallback to `throttle` with default timeout. (callbacks will be batched using setTimeout instead)
 
 ### How to use it
 
