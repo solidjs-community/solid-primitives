@@ -89,9 +89,9 @@ readme = insertTextBetweenComments(readme, table, "INSERT-PRIMITIVES-TABLE");
 
 // Update Combined Downloads Badge
 
-const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://runkit.io/thetarnav/combined-weekly-npm-downloads/1.0.3/${rootDependencies.join(
+const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://combined-npm-downloads.deno.dev/${rootDependencies.join(
   ","
-)})](https://runkit.com/thetarnav/combined-weekly-npm-downloads)`;
+)})](https://dash.deno.com/playground/combined-npm-downloads)`;
 
 readme = insertTextBetweenComments(readme, combinedDownloadsBadge, "INSERT-NPM-DOWNLOADS-BADGE");
 
