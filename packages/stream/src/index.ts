@@ -75,7 +75,7 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
       >,
       {
         mutate: noop as Setter<MediaStream | undefined>,
-        refetch: _info => void 0,
+        refetch: () => void 0,
         mute: noop,
         stop: noop
       }
@@ -242,7 +242,7 @@ export const createScreen = (
       >,
       {
         mutate: noop as Setter<MediaStream | undefined>,
-        refetch: _info => void 0,
+        refetch: () => void 0,
         mute: noop,
         stop: noop
       }

@@ -68,6 +68,4 @@ export const setServerRemSize = process.env.SSR
   ? (size: number) => {
       serverRemSize = size;
     }
-  : (size: number): void => {
-      // needs not to work in the client
-    };
+  : () => {};

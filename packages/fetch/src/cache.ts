@@ -85,6 +85,7 @@ export const withCache: RequestModifier =
       try {
         delete requestContext.cache[serializeRequest(requestData || currentRequest)];
       } catch (e) {
+        // eslint-disable-next-line no-console
         DEV && console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
       }
     };
@@ -102,30 +103,27 @@ export const withRefetchOnExpiry: RequestModifier =
   (requestContext: RequestContext<Result, FetcherArgs>) => {
     wrapFetcher<Result, FetcherArgs>(
       requestContext,
-      <T>(originalFetcher: any) =>
-        (requestData, info) => {
-          const serializedRequest = serializeRequest(requestData);
-          const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
-          if (!cached) {
-            if (typeof requestContext.expires === "number") {
-              setTimeout(() => requestContext.resource?.[1].refetch(), requestContext.expires + 10);
-            } else if (typeof requestContext.expires === "function") {
-              const delay =
-                pollDelayMs === 0
-                  ? (fn: FrameRequestCallback, _ms: number) => requestAnimationFrame(fn)
-                  : setTimeout;
-              const poll = () => {
-                if (requestContext.expires(cached)) {
-                  requestContext.resource?.[1].refetch();
-                } else {
-                  delay(poll, pollDelayMs);
-                }
-              };
-              poll();
-            }
+      (originalFetcher: any) => (requestData, info) => {
+        const serializedRequest = serializeRequest(requestData);
+        const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
+        if (!cached) {
+          if (typeof requestContext.expires === "number") {
+            setTimeout(() => requestContext.resource?.[1].refetch(), requestContext.expires + 10);
+          } else if (typeof requestContext.expires === "function") {
+            const delay: typeof setTimeout | ((fn: FrameRequestCallback, _ms: number) => number) =
+              pollDelayMs === 0 ? fn => requestAnimationFrame(fn) : setTimeout;
+            const poll = () => {
+              if (requestContext.expires(cached)) {
+                requestContext.resource?.[1].refetch();
+              } else {
+                delay(poll, pollDelayMs);
+              }
+            };
+            poll();
           }
-          return originalFetcher(requestData, info);
         }
+        return originalFetcher(requestData, info);
+      }
     );
     requestContext.wrapResource();
   };
@@ -137,6 +135,7 @@ export const withCacheStorage: RequestModifier =
       const loadedCache = JSON.parse(storage.getItem(key) || "{}");
       Object.assign(requestContext.cache, loadedCache);
     } catch (e) {
+      // eslint-disable-next-line no-console
       DEV && console.warn("attempt to parse stored request cache failed with error", e);
     }
     const originalWriteCache = requestContext.writeCache;
@@ -145,6 +144,7 @@ export const withCacheStorage: RequestModifier =
       try {
         storage.setItem(key, JSON.stringify(requestContext.cache));
       } catch (e) {
+        // eslint-disable-next-line no-console
         DEV && console.warn("attempt to store request cache failed with error", e);
       }
     };

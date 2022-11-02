@@ -25,6 +25,7 @@ export const fileUploader = (element: HTMLInputElement, options: () => FileUploa
       try {
         await userCallback(parsedFiles);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(error);
       }
       return;

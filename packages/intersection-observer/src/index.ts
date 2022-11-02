@@ -80,6 +80,7 @@ export function makeIntersectionObserver(
   const add: AddIntersectionObserverEntry = el => {
     // Elements with 'display: "contents"' don't work with IO, even if they are visible by users (https://github.com/solidjs-community/solid-primitives/issues/116)
     if (process.env.DEV && el instanceof HTMLElement && el.style.display === "contents") {
+      // eslint-disable-next-line no-console
       console.warn(
         `[@solid-primitives/intersection-observer/makeIntersectionObserver] IntersectionObserver is not able to observe elements with 'display: "contents"' style:`,
         el

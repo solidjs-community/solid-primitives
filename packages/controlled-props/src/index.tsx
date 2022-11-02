@@ -76,7 +76,6 @@ const filterEnum = <O extends Record<string, any>>(
       }, [] as string[])
       .map(item => [item, options[item]]);
   }
-  console.log(":(");
   return entries;
 };
 
@@ -88,7 +87,7 @@ export const SelectProp = <T extends any>(
       ? props.options.map((option: any) => [option, option])
       : filterEnum(props.options)
   );
-  const initialValue = options().findIndex(([_, value]) => value === props.value());
+  const initialValue = options().findIndex(([, value]) => value === props.value());
   return (
     <label>
       <span>{props.name}</span>{" "}
