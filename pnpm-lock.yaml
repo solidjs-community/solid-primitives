@@ -11,6 +11,7 @@ importers:
       '@typescript-eslint/parser': ^5.41.0
       cross-env: ^7.0.3
       eslint: ^8.26.0
+      eslint-plugin-no-only-tests: ^3.1.0
       fs-extra: ^10.1.0
       jiti: ^1.16.0
       json-to-markdown-table: ^1.0.0
@@ -33,6 +34,7 @@ importers:
       '@typescript-eslint/parser': 5.41.0_wyqvi574yv7oiwfeinomdzmc3m
       cross-env: 7.0.3
       eslint: 8.26.0
+      eslint-plugin-no-only-tests: 3.1.0
       fs-extra: 10.1.0
       jiti: 1.16.0
       json-to-markdown-table: 1.0.0
@@ -5275,6 +5277,11 @@ packages:
       optionator: 0.8.3
     optionalDependencies:
       source-map: 0.6.1
+    dev: true
+
+  /eslint-plugin-no-only-tests/3.1.0:
+    resolution: {integrity: sha512-Lf4YW/bL6Un1R6A76pRZyE1dl1vr31G/ev8UzIc/geCgFWyrKil8hVjYqWVKGB/UIGmb6Slzs9T0wNezdSVegw==}
+    engines: {node: '>=5.0.0'}
     dev: true
 
   /eslint-scope/5.1.1:

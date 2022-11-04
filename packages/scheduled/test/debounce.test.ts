@@ -47,14 +47,14 @@ describe("debounce", () => {
 });
 
 function typeChecks() {
-  const tc1 = debounce((n: number) => console.log(n), 10000);
+  const tc1 = debounce((n: number) => {}, 10000);
   // @ts-expect-error
   tc1();
   tc1(1);
   // @ts-expect-error
   tc1("string");
   tc1.clear();
-  const tc2 = debounce((n: number | string, u: string) => console.log(n, u), 10000);
+  const tc2 = debounce((n: number | string, u: string) => {}, 10000);
   // @ts-expect-error
   tc2();
   // @ts-expect-error

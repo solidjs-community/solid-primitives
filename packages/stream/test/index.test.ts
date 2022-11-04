@@ -58,7 +58,6 @@ describe("createMediaPermissionRequest", () => {
   });
   it("requests a media stream", context => {
     createMediaPermissionRequest();
-    console.log(allConstraints);
     expect(allConstraints.at(-1)).toEqual({ audio: true, video: true });
   });
 });

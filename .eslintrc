@@ -1,10 +1,12 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "no-only-tests"],
+  "ignorePatterns": ["scripts/**", "**/node_modules/**", "packages/*/dist/**", "packages/*/dev/**"],
   "rules": {
     "no-console": "warn",
     "no-debugger": "warn",
-    "@typescript-eslint/no-unused-vars": "warn"
+    "@typescript-eslint/no-unused-vars": "warn",
+    "no-only-tests/no-only-tests": "warn"
   }
 }
