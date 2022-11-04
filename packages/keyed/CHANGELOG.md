@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.1.4
+
+### Patch Changes
+
+- 9ebe4502: Update `<Entries>` to use mapArray, instead of keyArray
+
 ## 1.1.3
 
 ### Patch Changes
