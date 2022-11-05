@@ -82,9 +82,6 @@
     "@solid-primitives/rootless": "^1.2.1",
     "@solid-primitives/utils": "^4.0.0"
   },
-  "devDependencies": {
-    "solid-js": "^1.6.0"
-  },
   "peerDependencies": {
     "solid-js": "^1.6.0"
   }

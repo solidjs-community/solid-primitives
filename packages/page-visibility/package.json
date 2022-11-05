@@ -78,9 +78,6 @@
   "dependencies": {
     "@solid-primitives/rootless": "workspace:^1.2.0"
   },
-  "devDependencies": {
-    "solid-js": "^1.6.0"
-  },
   "peerDependencies": {
     "solid-js": "^1.6.0"
   }

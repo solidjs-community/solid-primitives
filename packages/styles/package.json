@@ -30,6 +30,10 @@
   "main": "./dist/server.cjs",
   "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
   "exports": {
     "worker": {
       "import": "./dist/server.js",
@@ -73,13 +77,6 @@
   ],
   "dependencies": {
     "@solid-primitives/rootless": "workspace:^1.2.0"
-  },
-  "browser": {
-    "./dist/server.cjs": "./dist/index.cjs",
-    "./dist/server.js": "./dist/index.js"
-  },
-  "devDependencies": {
-    "solid-js": "^1.6.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

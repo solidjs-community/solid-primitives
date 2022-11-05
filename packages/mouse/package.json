@@ -24,6 +24,10 @@
   "main": "./dist/server.cjs",
   "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
   "exports": {
     "worker": {
       "import": "./dist/server.js",
@@ -71,17 +75,12 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solid-primitives/raf": "workspace:^2.1.4",
-    "solid-js": "^1.6.0"
+    "@solid-primitives/raf": "workspace:^2.1.4"
   },
   "dependencies": {
     "@solid-primitives/event-listener": "^2.2.4",
     "@solid-primitives/rootless": "^1.2.1",
     "@solid-primitives/utils": "^4.0.0"
-  },
-  "browser": {
-    "./dist/server.cjs": "./dist/index.cjs",
-    "./dist/server.js": "./dist/index.js"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

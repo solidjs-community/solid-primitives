@@ -77,7 +77,7 @@
     "trigger"
   ],
   "peerDependencies": {
-    "solid-js": "^1.4.0"
+    "solid-js": "^1.6.0"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^4.0.0"

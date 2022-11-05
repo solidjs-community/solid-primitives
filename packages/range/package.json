@@ -66,7 +66,6 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "devDependencies": {
-    "solid-js": "^1.6.0",
     "solid-transition-group": "^0.0.8"
   },
   "dependencies": {

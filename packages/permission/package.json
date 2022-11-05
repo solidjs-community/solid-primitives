@@ -72,8 +72,5 @@
     "query",
     "solid",
     "primitives"
-  ],
-  "devDependencies": {
-    "solid-js": "^1.6.0"
-  }
+  ]
 }

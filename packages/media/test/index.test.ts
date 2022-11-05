@@ -34,6 +34,9 @@ describe("createBreakpoints", () => {
   beforeEach(() => {
     matchingBreakpoints = [];
     window.matchMedia = matchMediaMock;
+    matchMediaMock.mockClear();
+    addListenerMock.mockClear();
+    removeListenerMock.mockClear();
   });
 
   afterAll(() => {

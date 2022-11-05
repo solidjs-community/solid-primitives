@@ -76,17 +76,6 @@
     "inactivity",
     "activity"
   ],
-  "devDependencies": {
-    "jsdom": "^20.0.0",
-    "prettier": "^2.7.1",
-    "solid-js": "^1.6.0",
-    "tslib": "^2.4.0",
-    "tsup": "^6.2.3",
-    "unocss": "^0.45.15",
-    "vite": "^3.0.9",
-    "vite-plugin-solid": "^2.3.0",
-    "vitest": "^0.23.0"
-  },
   "peerDependencies": {
     "solid-js": "^1.6.0"
   }

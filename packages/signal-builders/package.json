@@ -49,9 +49,6 @@
     "@solid-primitives/immutable": "^0.1.4",
     "@solid-primitives/utils": "^4.0.0"
   },
-  "devDependencies": {
-    "solid-js": "^1.6.0"
-  },
   "peerDependencies": {
     "solid-js": "^1.6.0"
   }

@@ -1,16 +1,11 @@
+import { describe, test, expect, assert } from "vitest";
 import { createComputed, createRoot } from "solid-js";
 import { createStaticStore, handleDiffArray, arrayEquals } from "../src";
-import { describe, test, expect, assert } from "vitest";
 
 describe("createStaticStore", () => {
-  test("individual keys only update when changed", () =>
+  test("individual keys only update when changed", () => {
     createRoot(dispose => {
-      const _shape = {
-        a: 1,
-        b: 2,
-        c: 3,
-        d: [0, 1, 2]
-      };
+      const _shape = { a: 1, b: 2, c: 3, d: [0, 1, 2] };
       const [state, setState] = createStaticStore(_shape);
 
       expect(state).toEqual(_shape);
@@ -21,10 +16,7 @@ describe("createStaticStore", () => {
         d: [0, 1, 2]
       });
 
-      setState({
-        a: 9,
-        d: [3, 2, 1]
-      });
+      setState({ a: 9, d: [3, 2, 1] });
 
       expect(state).toEqual({ a: 9, b: 2, c: 3, d: [3, 2, 1] });
       expect(_shape, "original input shouldn't be mutated").toEqual({
@@ -49,7 +41,8 @@ describe("createStaticStore", () => {
       expect(aUpdates).toBe(1);
 
       dispose();
-    }));
+    });
+  });
 
   // tss("able to listen to key, not yet added", () =>
   //   createRoot(dispose => {

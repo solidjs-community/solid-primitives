@@ -67,8 +67,7 @@
     "@solid-primitives/utils": "workspace:^4.0.0"
   },
   "devDependencies": {
-    "nanospy": "^0.5.0",
-    "solid-js": "^1.6.0"
+    "nanospy": "^0.5.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

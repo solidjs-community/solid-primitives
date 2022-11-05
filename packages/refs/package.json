@@ -61,7 +61,6 @@
   },
   "devDependencies": {
     "solid-app-router": "^0.2.1",
-    "solid-js": "^1.6.0",
     "solid-transition-group": "^0.0.8"
   },
   "peerDependencies": {

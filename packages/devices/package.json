@@ -69,9 +69,6 @@
     "./dist/server.cjs": "./dist/index.cjs",
     "./dist/server.js": "./dist/index.js"
   },
-  "devDependencies": {
-    "solid-js": "^1.6.0"
-  },
   "peerDependencies": {
     "solid-js": "^1.6.0"
   }
