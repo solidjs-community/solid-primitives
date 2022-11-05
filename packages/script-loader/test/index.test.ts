@@ -21,6 +21,7 @@ describe("createScriptLoader", () => {
       const script = document.querySelector('script[src="https://localhost:3000/script.js"]');
       expect(script).toBeInstanceOf(window.HTMLScriptElement);
       remove();
+      dispose();
     }));
 
   it("will create a script tag with textContent", () =>
@@ -30,6 +31,7 @@ describe("createScriptLoader", () => {
       expect(script).toBeInstanceOf(window.HTMLScriptElement);
       expect(script?.textContent).toBe(src);
       remove();
+      dispose();
     }));
 
   it("will call the onload handler", async () => {

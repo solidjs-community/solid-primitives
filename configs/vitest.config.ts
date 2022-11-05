@@ -14,18 +14,17 @@ export default defineConfig(({ mode }) => {
     plugins: [solidPlugin()],
     test: {
       watch: false,
+      isolate: !testSSR,
       env: {
         NODE_ENV: testSSR ? "production" : "development",
         DEV: testSSR ? "" : "1",
         SSR: testSSR ? "1" : "",
         PROD: testSSR ? "1" : ""
       },
-      globals: true,
-      clearMocks: true,
       passWithNoTests: true,
       environment: testSSR ? "node" : "jsdom",
       transformMode: {
-        web: [/\.[jt]sx?$/]
+        web: [/\.[jt]sx$/]
       },
       ...(fromRoot
         ? // Testing all packages from root
@@ -38,8 +37,11 @@ export default defineConfig(({ mode }) => {
           }
         : // Testing a single package
           {
-            ...(testSSR && { include: ["server.test.{ts,tsx}"] }),
-            ...(!testSSR && { exclude: ["server.test.{ts,tsx}"] })
+            ...(testSSR && { include: ["test/server.test.{ts,tsx}"] }),
+            ...(!testSSR && {
+              include: ["test/*.test.{ts,tsx}"],
+              exclude: ["test/server.test.{ts,tsx}"]
+            })
           })
     },
     resolve: {
