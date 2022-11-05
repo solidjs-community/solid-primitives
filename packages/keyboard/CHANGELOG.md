@@ -1,5 +1,11 @@
 # @solid-primitives/keyboard
 
+## 1.0.5
+
+### Patch Changes
+
+- 85edc294: Check if the key in keydown and keyup events is a stirng. (fixes #246)
+
 ## 1.0.4
 
 ### Patch Changes
