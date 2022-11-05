@@ -158,7 +158,7 @@ export const getPositionInElement = (
  * Turn position relative to the page, into position relative to the screen.
  */
 export const getPositionToScreen = process.env.SSR
-  ? (_pageX: number, _pageY: number): Position => DEFAULT_MOUSE_POSITION
+  ? (): Position => DEFAULT_MOUSE_POSITION
   : (pageX: number, pageY: number): Position => ({
       x: pageX - window.scrollX,
       y: pageY - window.screenY

@@ -115,6 +115,7 @@ export function mapRange<T>(
   return () => {
     let _step = step();
     if (_step === 0) {
+      // eslint-disable-next-line no-console
       if (process.env.DEV) console.warn("Range cannot have a step of 0");
       return items;
     }

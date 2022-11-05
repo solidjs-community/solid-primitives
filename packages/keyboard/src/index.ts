@@ -48,7 +48,9 @@ export const useKeyDownList = /*#__PURE__*/ createSharedRoot<
   const reset = () => setPressedKeys([]);
 
   makeEventListener(window, "keydown", e => {
-    if (e.repeat) return;
+    // e.key may be undefined when used with <datalist> el
+    // gh issue: https://github.com/solidjs-community/solid-primitives/issues/246
+    if (e.repeat || typeof e.key !== "string") return;
     const key = e.key.toUpperCase();
     if (pressedKeys().includes(key)) return;
     batch(() => {
@@ -58,6 +60,7 @@ export const useKeyDownList = /*#__PURE__*/ createSharedRoot<
   });
 
   makeEventListener(window, "keyup", e => {
+    if (typeof e.key !== "string") return;
     const key = e.key.toUpperCase();
     setPressedKeys(prev => prev.filter(_key => _key !== key));
   });

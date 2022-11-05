@@ -98,28 +98,26 @@ export const withTimeout: RequestModifier = (timeout: number) => requestContext 
   requestContext.wrapResource();
 };
 
-export const withCatchAll: RequestModifier =
-  <T>() =>
-  requestContext => {
-    const [error, setError] = createSignal<Error | undefined>();
-    wrapFetcher(
-      requestContext,
-      originalFetcher => (requestData, info) =>
-        originalFetcher(requestData, info).catch((err: Error) => {
-          setError(err);
-          return Promise.resolve(info.value!);
-        })
-    );
-    requestContext.wrapResource();
-    const originalResource = requestContext.resource;
-    requestContext.resource = [
-      Object.defineProperties(() => originalResource?.[0](), {
-        ...Object.getOwnPropertyDescriptors(originalResource?.[0]),
-        error: { get: () => error() }
-      }),
-      originalResource?.[1]
-    ] as typeof originalResource;
-  };
+export const withCatchAll: RequestModifier = () => requestContext => {
+  const [error, setError] = createSignal<Error | undefined>();
+  wrapFetcher(
+    requestContext,
+    originalFetcher => (requestData, info) =>
+      originalFetcher(requestData, info).catch((err: Error) => {
+        setError(err);
+        return Promise.resolve(info.value!);
+      })
+  );
+  requestContext.wrapResource();
+  const originalResource = requestContext.resource;
+  requestContext.resource = [
+    Object.defineProperties(() => originalResource?.[0](), {
+      ...Object.getOwnPropertyDescriptors(originalResource?.[0]),
+      error: { get: () => error() }
+    }),
+    originalResource?.[1]
+  ] as typeof originalResource;
+};
 
 const defaultWait = (attempt: number) => Math.max(1000 << attempt, 30000);
 
@@ -155,7 +153,7 @@ export const withRetry: RequestModifier =
                     ? waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1))
                     : data
                 )
-                .catch(_err => waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1)))
+                .catch(() => waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1)))
             : originalFetcher(requestData, info);
         return wrappedFetcher(0);
       }

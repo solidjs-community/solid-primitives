@@ -174,6 +174,7 @@ export function createPerPointerListeners(
               const type = "pointer" + key.substring(2).toLowerCase();
               return (fn: Handler) => {
                 if (!init) {
+                  // eslint-disable-next-line no-console
                   if (process.env.DEV) console.warn(onlyInitMessage);
                   return;
                 }
@@ -211,6 +212,7 @@ export function createPerPointerListeners(
           fn => {
             if (init) addListener("pointermove", fn, pointerId);
             else if (process.env.DEV) {
+              // eslint-disable-next-line no-console
               console.warn(onlyInitMessage);
             }
           },
@@ -218,6 +220,7 @@ export function createPerPointerListeners(
           fn => {
             if (init) onUp = fn;
             else if (process.env.DEV) {
+              // eslint-disable-next-line no-console
               console.warn(onlyInitMessage);
             }
           }

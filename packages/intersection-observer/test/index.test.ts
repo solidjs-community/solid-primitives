@@ -67,9 +67,6 @@ class IntersectionObserver {
 // @ts-ignore
 global.IntersectionObserver = IntersectionObserver;
 
-const runOnChangeOnLastObserver = (payload: any) =>
-  intersectionObserverInstances[intersectionObserverInstances.length - 1].onChange(payload);
-
 describe("makeIntersectionObserver", () => {
   let div!: HTMLDivElement;
   let img!: HTMLImageElement;
@@ -82,7 +79,7 @@ describe("makeIntersectionObserver", () => {
   test("creates a new IntersectionObserver instance", () => {
     const previousInstanceCount = intersectionObserverInstances.length;
     createRoot(dispose => {
-      makeIntersectionObserver([div], console.log);
+      makeIntersectionObserver([div], () => {});
       dispose();
     });
     const newInstanceCount = intersectionObserverInstances.length;
@@ -195,7 +192,7 @@ describe("makeIntersectionObserver", () => {
     createRoot(dispose => {
       let cbEntries!: IntersectionObserverEntry[];
       let cbInstance!: IntersectionObserver;
-      const { instance, start } = makeIntersectionObserver([div, img], (entries, observer) => {
+      const { instance } = makeIntersectionObserver([div, img], (entries, observer) => {
         cbEntries = entries;
         cbInstance = observer as IntersectionObserver;
       });

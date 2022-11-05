@@ -8,7 +8,8 @@ import {
   onCleanup,
   Setter,
   untrack,
-  $TRACK
+  $TRACK,
+  mapArray
 } from "solid-js";
 import type { AccessorArray } from "solid-js/types/reactive/signal";
 
@@ -175,19 +176,19 @@ export function Entries<V>(props: {
   children: (key: string, v: Accessor<V>, i: Accessor<number>) => JSX.Element;
 }): Accessor<JSX.Element[]> {
   const mapFn = props.children;
-  const mapped = keyArray(
-    () => props.of && Object.entries(props.of),
-    v => v[0],
-    mapFn.length < 3
-      ? keyvalue =>
-          (mapFn as (key: string, v: Accessor<V>) => JSX.Element)(
-            keyvalue()[0],
-            () => keyvalue()[1]
-          )
-      : (keyvalue, i) => mapFn(keyvalue()[0], () => keyvalue()[1], i),
-    "fallback" in props ? { fallback: () => props.fallback } : undefined
+  return createMemo(
+    mapArray(
+      () => props.of && Object.keys(props.of),
+      mapFn.length < 3
+        ? key =>
+            (mapFn as (key: string, v: Accessor<V>) => JSX.Element)(
+              key,
+              () => props.of![key as never]
+            )
+        : (key, i) => mapFn(key, () => props.of![key as never], i),
+      "fallback" in props ? { fallback: () => props.fallback } : undefined
+    )
   );
-  return createMemo(mapped);
 }
 
 export type RerunChildren<T> = ((input: T, prevInput: T | undefined) => JSX.Element) | JSX.Element;
