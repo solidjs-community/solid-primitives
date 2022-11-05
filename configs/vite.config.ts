@@ -27,5 +27,13 @@ export const viteConfig = defineConfig({
   },
   build: {
     target: "esnext"
+  },
+  define: {
+    "process.env": {
+      NODE_ENV: "development",
+      DEV: "1",
+      SSR: "",
+      PROD: ""
+    }
   }
 });
