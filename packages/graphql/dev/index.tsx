@@ -1,6 +1,6 @@
 import { Component, createSignal, Show, For } from "solid-js";
 import { render } from "solid-js/web";
-import { gql, createGraphQLClient } from "../src";
+import { gql, createGraphQLClient, request } from "../src";
 import { CountryQueryDocument } from "./gqlgen";
 import "uno.css";
 
@@ -43,6 +43,27 @@ const App: Component = () => {
     }),
     { country: { name: "loading..." } }
   );
+
+  // Send a simple mutation with the multipart option. This will never work with the
+  // countries.trevorblades.com backend, but it is not a problem, we don't expect it
+  // to mutate anything.
+  //
+  // request(
+  //   "https://countries.trevorblades.com/",
+  //   gql`
+  //     mutation CountryFlag($code: String!, $image: Upload!) {
+  //       flag (code: $code, image: $image)
+  //         code
+  //         name
+  //       }
+  //     }
+  //   `,
+  //   {
+  //     credentials: "same-origin",
+  //     multipart: true,
+  //     variables: { code: "BR", image: new Blob(["THIS IS WHERE THE IMAGE DATA SHOULD BE."], { type: 'image/jpg' })}
+  //   }
+  // );
 
   return (
     <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">

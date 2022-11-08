@@ -11,6 +11,7 @@ export type RequestOptions<V extends object = {}> = Modify<
     headers?: RequestHeaders;
     variables?: V;
     fetcher?: typeof fetch;
+    multipart?: boolean;
   }
 >;
 
@@ -43,15 +44,15 @@ export type GraphQLClientQuery = {
  */
 export const createGraphQLClient =
   (url: MaybeAccessor<string>, options?: Omit<RequestOptions, "variables">): GraphQLClientQuery =>
-  (query, variables: any = {}, initialValue) =>
-    createResource(
-      () => access(variables),
-      (vars: any) => {
-        const variables = typeof vars === "boolean" ? {} : vars;
-        return request(access(url), query, { ...options, variables });
-      },
-      { initialValue }
-    );
+    (query, variables: any = {}, initialValue) =>
+      createResource(
+        () => access(variables),
+        (vars: any) => {
+          const variables = typeof vars === "boolean" ? {} : vars;
+          return request(access(url), query, { ...options, variables });
+        },
+        { initialValue }
+      );
 
 /**
  * Performs a GraphQL fetch to provided endpoint.
@@ -69,20 +70,86 @@ export async function request<T = any, V extends object = {}>(
   const { fetcher = fetch, variables = {}, headers = {}, method = "POST" } = options;
   const query_ = typeof query == "string" ? query : print(query);
 
-  return fetcher(url, {
-    ...options,
-    method,
-    body: JSON.stringify({ query: query_, variables }),
-    headers: {
-      "content-type": "application/json",
-      ...headers
-    }
-  })
+  const fetched = options.multipart ?
+    fetcher(url, {
+      ...options,
+      method: 'POST',
+      body: makeMultipartBody(query_, variables),
+      headers: {
+        "content-type": "multipart/form-data",
+        ...headers
+      }
+    }) :
+    fetcher(url, {
+      ...options,
+      method,
+      body: JSON.stringify({ query: query_, variables }),
+      headers: {
+        "content-type": "application/json",
+        ...headers
+      }
+    });
+
+  return fetched
     .then((r: any) => r.json())
     .then(({ data, errors }: any) => {
       if (errors) throw errors;
       return data;
     });
+}
+
+export function makeMultipartBody(query: string, variables: any) {
+  const parts: { blob: Blob, path: string }[] = [];
+
+  // We don't want to modify the variables passed in as arguments
+  // so we do a deep copy and we replace instances of Blobs with
+  // a null and generate the correct object-path as we go.
+
+  function copyValue(r: any, k: string | number, v: any, path: (string | number)[]) {
+    if (v instanceof Blob) {
+      parts.push({
+        blob: v,
+        path: path.join(".") + "." + k
+      });
+      r[k] = null;
+    }
+    else {
+      if (typeof v === 'object') {
+        path.push(k);
+        r[k] = Array.isArray(v) ? copyArray(v, path) : copyObject(v, path);
+        path.pop();
+      }
+      else {
+        r[k] = v;
+      }
+    }
+  }
+
+  function copyObject(obj: any, path: (string | number)[]) {
+    const r: any = {};
+    for (const k of Object.getOwnPropertyNames(obj)) {
+      copyValue(r, k, obj[k], path);
+    }
+    return r;
+  }
+
+  function copyArray(arr: any, path: (string | number)[]) {
+    const r: any[] = [];
+    for (let i = 0; i < arr.length; i++) {
+      copyValue(r, i, arr[i], path);
+    }
+    return r;
+  }
+
+  variables = copyObject(variables, ['variables']);
+
+  const formData = new FormData();
+  formData.append("operations", JSON.stringify({ query, variables }));
+  formData.append("map", JSON.stringify(Object.fromEntries(parts.map((x, i) => [`${i}`, x.path]))));
+  for (let i = 0; i < parts.length; i++) {
+    formData.append(`${i}`, parts[i].blob);
+  }
+  return formData;
 }
 
 /**
