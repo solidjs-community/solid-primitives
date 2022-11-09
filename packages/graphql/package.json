@@ -56,8 +56,7 @@
     "@graphql-codegen/cli": "^2.12.0",
     "@graphql-codegen/typed-document-node": "^2.3.3",
     "@graphql-codegen/typescript": "^2.7.3",
-    "@graphql-codegen/typescript-operations": "^2.5.3",
-    "vitest": "^0.24.5"
+    "@graphql-codegen/typescript-operations": "^2.5.3"
   },
   "dependencies": {
     "@graphql-typed-document-node/core": "^3.1.1",
