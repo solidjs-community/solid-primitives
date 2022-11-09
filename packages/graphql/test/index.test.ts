@@ -18,7 +18,7 @@ describe("makeMultipartBody", () => {
         // We cannot extract the Blob/File objects from the FormData instance
         // but we can check they were added.
         expect([...form.keys()]).toEqual(["operations", "map", "0", "1"]);
-    })
+    });
     test("blobs arrays are correctly replaced", () => {
         const form = makeMultipartBody(
             '',
@@ -32,6 +32,6 @@ describe("makeMultipartBody", () => {
         // We cannot extract the Blob/File objects from the FormData instance
         // but we can check they were added.
         expect([...form.keys()]).toEqual(["operations", "map", "0", "1"]);
-    })
+    });
 
 });
