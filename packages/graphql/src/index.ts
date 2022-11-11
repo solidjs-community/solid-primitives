@@ -11,7 +11,6 @@ export type RequestOptions<V extends object = {}> = Modify<
     headers?: RequestHeaders;
     variables?: V;
     fetcher?: typeof fetch;
-    multipart?: boolean;
   }
 >;
 
@@ -63,24 +62,14 @@ export const createGraphQLClient =
  * @returns a Promise resolving in JSON value if the request was successful
  */
 export async function request<T = any, V extends object = {}>(
-  url: string,
-  query: string | DocumentNode | TypedDocumentNode<T, V>,
-  options: RequestOptions<V> = {}
-): Promise<T> {
-  const { fetcher = fetch, variables = {}, headers = {}, method = "POST" } = options;
-  const query_ = typeof query == "string" ? query : print(query);
+    url: string,
+    query: string | DocumentNode | TypedDocumentNode<T, V>,
+    options: RequestOptions<V> = {}
+  ): Promise<T> {
+    const { fetcher = fetch, variables = {}, headers = {}, method = "POST" } = options;
+    const query_ = typeof query == "string" ? query : print(query);
 
-  const fetched = options.multipart ?
-    fetcher(url, {
-      ...options,
-      method: 'POST',
-      body: makeMultipartBody(query_, variables),
-      headers: {
-        "content-type": "multipart/form-data",
-        ...headers
-      }
-    }) :
-    fetcher(url, {
+    return fetcher(url, {
       ...options,
       method,
       body: JSON.stringify({ query: query_, variables }),
@@ -88,9 +77,41 @@ export async function request<T = any, V extends object = {}>(
         "content-type": "application/json",
         ...headers
       }
-    });
+    })
+      .then((r: any) => r.json())
+      .then(({ data, errors }: any) => {
+        if (errors) throw errors;
+        return data;
+      });
+}
 
-  return fetched
+/**
+ * Performs a multi-part GraphQL fetch to provided endpoint.
+ *
+ * @param url target api endpoint
+ * @param query GraphQL query string *(use `gql` function or `DocumentNode`/`TypedDocumentNode` type)*
+ * @param options config object where you can specify query variables, request headers, method, etc.
+ * @returns a Promise resolving in JSON value if the request was successful
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/graphql#file-upload-support
+ */
+export async function multipartRequest<T = any, V extends object = {}>(
+  url: string,
+  query: string | DocumentNode | TypedDocumentNode<T, V>,
+  options: RequestOptions<V> = {}
+): Promise<T> {
+  const { fetcher = fetch, variables = {}, headers = {} } = options;
+  const query_ = typeof query == "string" ? query : print(query);
+
+  return fetcher(url, {
+    ...options,
+    method: "POST",
+    body: makeMultipartBody(query_, variables),
+    headers: {
+      "content-type": "multipart/form-data",
+      ...headers
+    }
+  })
     .then((r: any) => r.json())
     .then(({ data, errors }: any) => {
       if (errors) throw errors;
@@ -98,7 +119,14 @@ export async function request<T = any, V extends object = {}>(
     });
 }
 
-export function makeMultipartBody(query: string, variables: any) {
+/**
+ * Converts GraphQL query and variables into a multipart/form-data compatible format.
+ *
+ * @param query GraphQL query string
+ * @param variables variables used in the mutation (File and Blob instances can be used as values).
+ * @returns a FormData object, ready to be POSTed
+ */
+export function makeMultipartBody(query: string, variables: object) {
   const parts: { blob: Blob, path: string }[] = [];
 
   // We don't want to modify the variables passed in as arguments
@@ -114,9 +142,9 @@ export function makeMultipartBody(query: string, variables: any) {
       r[k] = null;
     }
     else {
-      if (typeof v === 'object') {
+      if (typeof v === 'object' && v != null) {
         path.push(k);
-        r[k] = Array.isArray(v) ? copyArray(v, path) : copyObject(v, path);
+        r[k] = copyObject(v, path);
         path.pop();
       }
       else {
@@ -125,18 +153,10 @@ export function makeMultipartBody(query: string, variables: any) {
     }
   }
 
-  function copyObject(obj: any, path: (string | number)[]) {
-    const r: any = {};
-    for (const k of Object.getOwnPropertyNames(obj)) {
-      copyValue(r, k, obj[k], path);
-    }
-    return r;
-  }
-
-  function copyArray(arr: any, path: (string | number)[]) {
-    const r: any[] = [];
-    for (let i = 0; i < arr.length; i++) {
-      copyValue(r, i, arr[i], path);
+  function copyObject(obj: object, path: readonly (string | number)[]) {
+    const r: any = obj.constructor()
+    for (const [k, v] of Object.entries(obj)) {
+      copyValue(r, k, v, path);
     }
     return r;
   }

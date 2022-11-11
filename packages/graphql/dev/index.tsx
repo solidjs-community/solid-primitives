@@ -1,6 +1,6 @@
 import { Component, createSignal, Show, For } from "solid-js";
 import { render } from "solid-js/web";
-import { gql, createGraphQLClient, request } from "../src";
+import { gql, createGraphQLClient, request, multipartRequest } from "../src";
 import { CountryQueryDocument } from "./gqlgen";
 import "uno.css";
 
@@ -48,7 +48,7 @@ const App: Component = () => {
   // countries.trevorblades.com backend, but it is not a problem, we don't expect it
   // to mutate anything.
   //
-  // request(
+  // multipartRequest(
   //   "https://countries.trevorblades.com/",
   //   gql`
   //     mutation CountryFlag($code: String!, $image: Upload!) {
@@ -60,7 +60,6 @@ const App: Component = () => {
   //   `,
   //   {
   //     credentials: "same-origin",
-  //     multipart: true,
   //     variables: { code: "BR", image: new Blob(["THIS IS WHERE THE IMAGE DATA SHOULD BE."], { type: 'image/jpg' })}
   //   }
   // );
