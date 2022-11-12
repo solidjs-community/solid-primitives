@@ -1,5 +1,11 @@
 # @solid-primitives/graphql
 
+## 1.5.0
+
+### Minor Changes
+
+- 2b25bd5b: Added support for multipart uploads
+
 ## 1.4.2
 
 ### Patch Changes
