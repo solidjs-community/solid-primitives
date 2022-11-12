@@ -43,15 +43,15 @@ export type GraphQLClientQuery = {
  */
 export const createGraphQLClient =
   (url: MaybeAccessor<string>, options?: Omit<RequestOptions, "variables">): GraphQLClientQuery =>
-    (query, variables: any = {}, initialValue) =>
-      createResource(
-        () => access(variables),
-        (vars: any) => {
-          const variables = typeof vars === "boolean" ? {} : vars;
-          return request(access(url), query, { ...options, variables });
-        },
-        { initialValue }
-      );
+  (query, variables: any = {}, initialValue) =>
+    createResource(
+      () => access(variables),
+      (vars: any) => {
+        const variables = typeof vars === "boolean" ? {} : vars;
+        return request(access(url), query, { ...options, variables });
+      },
+      { initialValue }
+    );
 
 /**
  * Performs a GraphQL fetch to provided endpoint.
@@ -62,27 +62,27 @@ export const createGraphQLClient =
  * @returns a Promise resolving in JSON value if the request was successful
  */
 export async function request<T = any, V extends object = {}>(
-    url: string,
-    query: string | DocumentNode | TypedDocumentNode<T, V>,
-    options: RequestOptions<V> = {}
-  ): Promise<T> {
-    const { fetcher = fetch, variables = {}, headers = {}, method = "POST" } = options;
-    const query_ = typeof query == "string" ? query : print(query);
+  url: string,
+  query: string | DocumentNode | TypedDocumentNode<T, V>,
+  options: RequestOptions<V> = {}
+): Promise<T> {
+  const { fetcher = fetch, variables = {}, headers = {}, method = "POST" } = options;
+  const query_ = typeof query == "string" ? query : print(query);
 
-    return fetcher(url, {
-      ...options,
-      method,
-      body: JSON.stringify({ query: query_, variables }),
-      headers: {
-        "content-type": "application/json",
-        ...headers
-      }
-    })
-      .then((r: any) => r.json())
-      .then(({ data, errors }: any) => {
-        if (errors) throw errors;
-        return data;
-      });
+  return fetcher(url, {
+    ...options,
+    method,
+    body: JSON.stringify({ query: query_, variables }),
+    headers: {
+      "content-type": "application/json",
+      ...headers
+    }
+  })
+    .then((r: any) => r.json())
+    .then(({ data, errors }: any) => {
+      if (errors) throw errors;
+      return data;
+    });
 }
 
 /**
@@ -127,7 +127,7 @@ export async function multipartRequest<T = any, V extends object = {}>(
  * @returns a FormData object, ready to be POSTed
  */
 export function makeMultipartBody(query: string, variables: object) {
-  const parts: { blob: Blob, path: string }[] = [];
+  const parts: { blob: Blob; path: string }[] = [];
 
   // We don't want to modify the variables passed in as arguments
   // so we do a deep copy and we replace instances of Blobs with
@@ -140,28 +140,26 @@ export function makeMultipartBody(query: string, variables: object) {
         path: path.join(".") + "." + k
       });
       r[k] = null;
-    }
-    else {
-      if (typeof v === 'object' && v != null) {
+    } else {
+      if (typeof v === "object" && v != null) {
         path.push(k);
         r[k] = copyObject(v, path);
         path.pop();
-      }
-      else {
+      } else {
         r[k] = v;
       }
     }
   }
 
-  function copyObject(obj: object, path: readonly (string | number)[]) {
-    const r: any = obj.constructor()
+  function copyObject(obj: object, path: (string | number)[]) {
+    const r: any = obj.constructor();
     for (const [k, v] of Object.entries(obj)) {
       copyValue(r, k, v, path);
     }
     return r;
   }
 
-  variables = copyObject(variables, ['variables']);
+  variables = copyObject(variables, ["variables"]);
 
   const formData = new FormData();
   formData.append("operations", JSON.stringify({ query, variables }));
