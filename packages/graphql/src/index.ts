@@ -98,7 +98,7 @@ export async function request<T = any, V extends object = {}>(
 export async function multipartRequest<T = any, V extends object = {}>(
   url: string,
   query: string | DocumentNode | TypedDocumentNode<T, V>,
-  options: RequestOptions<V> = {}
+  options: Omit<RequestOptions<V>, "method"> = {}
 ): Promise<T> {
   const { fetcher = fetch, variables = {}, headers = {} } = options;
   const query_ = typeof query == "string" ? query : print(query);
