@@ -130,6 +130,29 @@ const [data] = query(
 );
 ```
 
+#### File upload support
+
+If the server supports the [GraphQL multipart request specification](https://github.com/jaydenseric/graphql-multipart-request-spec) it is possible to upload a `File` or a binary `Blob` of data by calling the `multipartRequest` function with the `File`/`Blob` instances in the variables variables.
+This is especially useful for GraphQL mutations, because allows for binary uploads without the necessity to first encode the data to some text-based format like base64.
+
+```ts
+import { request, gql } from "@solid-primitives/graphql";
+
+const result = multipartRequest(
+  "https://foobar.com/v1/api",
+  gql`
+    mutation UploadImage($file: Upload!, $caption: String!) {
+      uploadImage(file: $file, caption: $caption) {
+        id
+      }
+    }
+  `,
+  {
+    variables: { caption: "A nice image", file: inputElement.files[0] }
+  }
+);
+```
+
 #### fetch on the server
 
 When running on environments without Browser `fetch`, you should provide a `fetcher` to the options object, or add it to the global `window` object.
