@@ -129,7 +129,7 @@ export const makeAudioPlayer = (
  * @return [controls.pause] - Pause playing
  * @return [controls.setVolume] - Sets the volume of the player, from 0 to 1
  *
- *  
+ *
  * @example
  * ```ts
  * const [playing, setPlaying] = createSignal(false);

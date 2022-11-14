@@ -83,18 +83,21 @@ function makeAudioPlayer(
   src: AudioSource | Accessor<AudioSource>,
   playing?: Accessor<boolean>,
   volume?: Accessor<number>
-): [{
-  state: AudioState;
-  currentTime: number;
-  duration: number;
-  volume: number;
-  player: HTMLAudioElement;
-},{
-  seek: (time: number) => void;
-  setVolume: (volume: number) => void;
-  play: VoidFunction;
-  pause: VoidFunction;
-}];
+): [
+  {
+    state: AudioState;
+    currentTime: number;
+    duration: number;
+    volume: number;
+    player: HTMLAudioElement;
+  },
+  {
+    seek: (time: number) => void;
+    setVolume: (volume: number) => void;
+    play: VoidFunction;
+    pause: VoidFunction;
+  }
+];
 ```
 
 #### Dynamic audio changes
