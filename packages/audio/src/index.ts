@@ -116,18 +116,25 @@ export const makeAudioPlayer = (
  *
  * @param src Audio source path or MediaSource to be played or an accessor
  * @param playing A signal for controlling the player
- * @param playerhead A signal for controlling the playhead location
  * @param volume A signal for controlling the volume
- * @return store - @type Store
- * @return store.state - Current state of the player
- * @return store.currentTime - Current time of the playhead
- * @return store.duration - Duration of the audio player
+ * @return [store] - @type Store
+ * @return [store.state] - Current state of the player
+ * @return [store.currentTime] - Current time of the playhead
+ * @return [store.duration] - Duration of the loaded file
+ * @return [store.volume] - Current volume of the audio player
+ * @return [store.player] - Raw player instance
+ * @return [controls] - Controls for the audio player @type Object
+ * @return [controls.seek] - Seeks to a specified location
+ * @return [controls.play] - Start playing
+ * @return [controls.pause] - Pause playing
+ * @return [controls.setVolume] - Sets the volume of the player, from 0 to 1
  *
+ *  
  * @example
  * ```ts
  * const [playing, setPlaying] = createSignal(false);
  * const [volume, setVolume] = createSignal(1);
- * const audio = createAudio('./example1.mp3', playing, volume);
+ * const [audio, controls] = createAudio('./example1.mp3', playing, volume);
  * console.log(audio.duration);
  * ```
  */

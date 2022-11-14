@@ -64,18 +64,17 @@ The seek function falls back to fastSeek when on [supporting browsers](https://c
 
 ### createAudio
 
-Creates a very basic audio/sound player with reactive properties to control the audio. Be careful not to destructure the properties provided by the primitive as it will likely break reactivity.
+Creates a very basic audio/sound player with reactive properties to control the audio. Be careful not to destructure the value properties provided by the primitive as it will likely break reactivity.
 
 ```ts
 const [playing, setPlaying] = createSignal(false);
 const [volume, setVolume] = createSignal(false);
-const [playhead, setPlayhead] = createSignal(0);
-const audio = createAudio("sample.mp3", playing, playhead, volume);
-setPlaying(true);
-audio.seek(4000);
+const [audio, controls] = createAudio("sample.mp3", playing, volume);
+setPlaying(true); // or controls.play()
+controls.seek(4000);
 ```
 
-The audio primitive exports an reactive properties that provides you access to state, duration and playhead location.
+The audio primitive exports an reactive properties that provides you access to state, duration and current time.
 
 _Note:_ Initializing the primitive with `playing` as true works, however note that the user has to interact with the page first (on a fresh page load).
 
@@ -84,13 +83,18 @@ function makeAudioPlayer(
   src: AudioSource | Accessor<AudioSource>,
   playing?: Accessor<boolean>,
   volume?: Accessor<number>
-): {
-  seek: (time: number) => void;
+): [{
   state: AudioState;
   currentTime: number;
   duration: number;
+  volume: number;
   player: HTMLAudioElement;
-};
+},{
+  seek: (time: number) => void;
+  setVolume: (volume: number) => void;
+  play: VoidFunction;
+  pause: VoidFunction;
+}];
 ```
 
 #### Dynamic audio changes
