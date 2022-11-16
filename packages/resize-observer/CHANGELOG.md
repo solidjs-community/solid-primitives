@@ -1,5 +1,11 @@
 # @solid-primitives/resize-observer
 
+## 2.0.7
+
+### Patch Changes
+
+- 608a7a7e: Don't access createElementSize's target argument immediately is it's a function.
+
 ## 2.0.6
 
 ### Patch Changes
