@@ -4,8 +4,7 @@ import {
   Many,
   MaybeAccessor,
   handleDiffArray,
-  createStaticStore,
-  access
+  createStaticStore
 } from "@solid-primitives/utils";
 import { createSharedRoot } from "@solid-primitives/rootless";
 import { makeEventListener } from "@solid-primitives/event-listener";
@@ -159,11 +158,8 @@ export const useWindowSize: typeof createWindowSize =
 export function getElementSize(
   target: Element | false | undefined | null
 ): { width: number; height: number } | { width: null; height: null } {
-  if (process.env.SSR || !target)
-    return {
-      width: null,
-      height: null
-    };
+  if (process.env.SSR || !target) return { width: null, height: null };
+
   const { width, height } = target.getBoundingClientRect();
   return { width, height };
 }
@@ -178,19 +174,15 @@ export function getElementSize(
  *   console.log(size.width, size.height)
  * })
  */
-export function createElementSize(target: MaybeAccessor<Element>): {
+export function createElementSize(target: Element): {
   readonly width: number;
   readonly height: number;
 };
-export function createElementSize(target: Accessor<Element | false | undefined | null>):
-  | {
-      readonly width: number;
-      readonly height: number;
-    }
-  | {
-      readonly width: null;
-      readonly height: null;
-    };
+export function createElementSize(
+  target: Accessor<Element | false | undefined | null>
+):
+  | { readonly width: number; readonly height: number }
+  | { readonly width: null; readonly height: null };
 export function createElementSize(target: Accessor<Element | false | undefined | null> | Element): {
   readonly width: number | null;
   readonly height: number | null;
@@ -198,8 +190,15 @@ export function createElementSize(target: Accessor<Element | false | undefined |
   if (process.env.SSR) {
     return { width: null, height: null };
   }
-  const [size, setSize] = createStaticStore(getElementSize(access(target)));
-  if (typeof target === "function") onMount(() => setSize(getElementSize(target())));
+
+  const [size, setSize] = createStaticStore(
+    typeof target !== "function"
+      ? getElementSize(target)
+      : (() => {
+          onMount(() => setSize(getElementSize(target())));
+          return { width: null, height: null };
+        })()
+  );
   const updateSize = (e: DOMRectReadOnly) => setSize({ width: e.width, height: e.height });
   createResizeObserver(typeof target === "function" ? () => target() || [] : target, updateSize);
   return size;
