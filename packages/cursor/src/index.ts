@@ -63,12 +63,14 @@ export function createElementCursor(
   target: Accessor<HTMLElement | FalsyValue> | HTMLElement,
   cursor: MaybeAccessor<CursorProperty>
 ): void {
+  if (process.env.SSR) return;
+
   createEffect(() => {
     const el = access(target);
     const cursorValue = access(cursor);
     if (!el) return;
     const overwritten = el.style.cursor;
-    el.style.cursor = cursorValue;
+    el.style.setProperty("cursor", cursorValue, "important");
     onCleanup(() => (el.style.cursor = overwritten));
   });
 }
@@ -89,11 +91,13 @@ export function createElementCursor(
  * ```
  */
 export function createBodyCursor(cursor: Accessor<CursorProperty | FalsyValue>): void {
+  if (process.env.SSR) return;
+
   createEffect(() => {
     const cursorValue = cursor();
     if (!cursorValue) return;
     const overwritten = document.body.style.cursor;
-    document.body.style.cursor = cursorValue;
+    document.body.style.setProperty("cursor", cursorValue, "important");
     onCleanup(() => (document.body.style.cursor = overwritten));
   });
 }
