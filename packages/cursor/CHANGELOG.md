@@ -1,5 +1,11 @@
 # @solid-primitives/cursor
 
+## 0.0.103
+
+### Patch Changes
+
+- 187d78d8: Apply cursor style with !important flag.
+
 ## 0.0.102
 
 ### Patch Changes
