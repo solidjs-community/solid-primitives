@@ -41,7 +41,7 @@ const isodate = "9999-99-99";
 const meetingId = [/\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/]);
 // regex replacer mask: a RegExp to match parts and a function to replace them
 // with the output of a function:
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_function_as_a_parameter
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_function_as_the_replacement
 const meetingName = [
   /[^0-9a-zäöüß\-_/]|^(https?:\/\/|)(www\.|)(meet\.goto\.com|gotomeet\.me|)\/?/gi,
   () => ""
