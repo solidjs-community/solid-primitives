@@ -78,6 +78,29 @@ const App = () => {
 };
 ```
 
+### createBroadcastChannel
+
+Access the reactive `message` signal that updates when postMessage is fired from other contexts
+
+```ts
+const { postMessage } = createBroadcastChannel("test_channel");
+
+postMessage({ id: 2, message: "hi" });
+
+// Another browsing context
+const { message } = createBroadcastChannel("test_channel");
+
+createEffect(
+  on(
+    message,
+    data => {
+      console.log(data); // { id: 2, message: "hi" }
+    },
+    { defer: true }
+  )
+);
+```
+
 ## Demo
 
 Here's a working example here: https://stackblitz.com/edit/vitejs-vite-5xren3?file=src%2Fmain.tsx

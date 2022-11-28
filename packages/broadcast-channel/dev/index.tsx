@@ -1,8 +1,8 @@
-import { Component, createSignal, For, Show } from "solid-js";
+import { Component, createEffect, createSignal, For, on, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { render } from "solid-js/web";
 import "uno.css";
-import { makeBroadcastChannel } from "../src";
+import { createBroadcastChannel, makeBroadcastChannel } from "../src";
 import { TPage, useTrackPages } from "./hooks/useTrackPages";
 
 const Content = (props: { page: TPage; channelName: string }) => {
@@ -11,15 +11,31 @@ const Content = (props: { page: TPage; channelName: string }) => {
   const increment = () => setCount(count() + 1);
   const [list, setList] = createStore<{ id: string; count: number }[]>([]);
 
-  const { postMessage, onMessage } = makeBroadcastChannel(props.channelName);
+  const { message, postMessage } = createBroadcastChannel(props.channelName);
 
-  onMessage(({ data }) => {
-    setList(
-      produce(prev => {
-        prev.push(data);
-      })
-    );
-  });
+  //   const { onMessage } = makeBroadcastChannel(props.channelName);
+  //
+  //   onMessage(({ data }) => {
+  //     setList(
+  //       produce(prev => {
+  //         prev.push(data);
+  //       })
+  //     );
+  //   });
+
+  createEffect(
+    on(
+      message,
+      data => {
+        setList(
+          produce(prev => {
+            prev.push(data);
+          })
+        );
+      },
+      { defer: true }
+    )
+  );
 
   const onBtnClick = () => {
     increment();

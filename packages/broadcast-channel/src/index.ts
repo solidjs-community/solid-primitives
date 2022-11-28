@@ -1,4 +1,4 @@
-import { JSX, onCleanup } from "solid-js";
+import { createSignal, JSX, onCleanup } from "solid-js";
 
 type OnMessageCB = (e: MessageEvent<any>) => void;
 
@@ -115,6 +115,17 @@ export function makeBroadcastChannel(name: string) {
   map[name] = newInstance;
 
   return result;
+}
+
+export function createBroadcastChannel(name: string) {
+  const [message, setMessage] = createSignal<any>(null);
+  const { channelName, close, instance, onMessage, postMessage } = makeBroadcastChannel(name);
+
+  onMessage(({ data }) => {
+    setMessage(data);
+  });
+
+  return { message, postMessage: postMessage.bind(instance), channelName, instance, close };
 }
 
 // This ensures the `JSX` import won't fall victim to tree shaking before

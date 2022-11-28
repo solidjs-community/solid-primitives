@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
-import { createRoot } from "solid-js";
-import { makeBroadcastChannel } from "../src";
+import { createEffect, createRoot, on } from "solid-js";
+import { createBroadcastChannel, makeBroadcastChannel } from "../src";
 
 const buildMockBroadcastChannel = (channelName: string) => {
   // Don't know how to open pages/tabs in order to test
@@ -25,8 +25,8 @@ describe("makeBroadcastChannel", () => {
       expect(postMessage).toBeInstanceOf(Function);
       expect(close).toBeInstanceOf(Function);
       expect(instance).toBeInstanceOf(BroadcastChannel);
-      const value = 1;
-      expect(value).toBe(1);
+
+      // expect(5).toBe(10 || 5)
       dispose();
     }));
 });
@@ -327,6 +327,119 @@ describe("makeBroadcastChannel", () => {
       const postedMessage = await getPostMessage();
 
       expect(postedMessage).toBe("");
+
+      dispose();
+    }));
+});
+
+describe("createBroadcastChannel", () => {
+  test("createBroadcastChannel() return values", () =>
+    createRoot(dispose => {
+      const _channelName = "channel-1";
+      const { postMessage, channelName, close, instance } = createBroadcastChannel(_channelName);
+
+      expect(channelName).toBe(_channelName);
+      expect(postMessage).toBeInstanceOf(Function);
+      expect(close).toBeInstanceOf(Function);
+      expect(instance).toBeInstanceOf(BroadcastChannel);
+
+      dispose();
+    }));
+});
+
+describe("createBroadcastChannel", () => {
+  test("createBroadcastChannel() checking instances from BroadcastChannel constructor", () =>
+    createRoot(dispose => {
+      const channelName = "channel-1";
+      const { instance: instance1 } = createBroadcastChannel(channelName);
+      const { instance: instance2 } = createBroadcastChannel(channelName);
+      const { instance: instance3 } = createBroadcastChannel("channel-5");
+
+      expect(instance1).toBeInstanceOf(BroadcastChannel);
+      expect(instance2).toBeInstanceOf(BroadcastChannel);
+      expect(instance3).toBeInstanceOf(BroadcastChannel);
+
+      expect(instance1).toBe(instance2);
+      expect(instance1).not.toBe(instance3);
+
+      dispose();
+    }));
+});
+
+describe("createBroadcastChannel", () => {
+  test("createBroadcastChannel() posting messages between pages", () =>
+    createRoot(async dispose => {
+      const channelName = "channel-1";
+      const mockedBCInstance = buildMockBroadcastChannel(channelName);
+
+      const { message } = createBroadcastChannel(channelName);
+
+      const getPostMessage = () =>
+        new Promise<string>(resolve => {
+          createEffect(
+            on(
+              message,
+              message => {
+                resolve(message);
+              },
+              { defer: true }
+            )
+          );
+
+          mockedBCInstance.postMessage("hi");
+        });
+
+      const postedMessage = await getPostMessage();
+
+      expect(postedMessage).toBe("hi");
+
+      dispose();
+    }));
+});
+
+describe("createBroadcastChannel", () => {
+  test("createBroadcastChannel() posting messages with single instance channel name but called makeBroadcastChannel multiple times", () =>
+    createRoot(async dispose => {
+      const channelName = "channel-1";
+      const mockedBCInstance = buildMockBroadcastChannel(channelName);
+
+      const { message: message1 } = createBroadcastChannel(channelName);
+      const { message: message2 } = createBroadcastChannel(channelName);
+
+      const getPostMessage = () =>
+        new Promise<string>(resolve => {
+          let postedMessage = "";
+
+          createEffect(
+            on(
+              message1,
+              message => {
+                postedMessage += `${message}1`;
+              },
+              { defer: true }
+            )
+          );
+
+          createEffect(
+            on(
+              message2,
+              message => {
+                postedMessage += `${message}2`;
+              },
+              { defer: true }
+            )
+          );
+
+          mockedBCInstance.postMessage("hi");
+
+          setTimeout(() => {
+            resolve(postedMessage);
+          }, 200);
+        });
+
+      const postedMessage = await getPostMessage();
+
+      expect(postedMessage).toMatch(/^(hi1hi2)|(hi2hi1)$/);
 
       dispose();
     }));
