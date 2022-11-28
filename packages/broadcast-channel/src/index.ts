@@ -118,7 +118,7 @@ export function makeBroadcastChannel(name: string) {
 }
 
 export function createBroadcastChannel(name: string) {
-  const [message, setMessage] = createSignal<any>(null);
+  const [message, setMessage] = createSignal<unknown>(null);
   const { channelName, close, instance, onMessage, postMessage } = makeBroadcastChannel(name);
 
   onMessage(({ data }) => {
