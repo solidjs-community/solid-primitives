@@ -68,8 +68,5 @@
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
-  },
-  "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.4"
   }
 }
