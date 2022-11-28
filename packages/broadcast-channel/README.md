@@ -80,7 +80,7 @@ const App = () => {
 
 ### createBroadcastChannel
 
-Access the reactive `message` signal that updates when postMessage is fired from other contexts
+Access the reactive `message()` signal that updates when postMessage is fired from other contexts
 
 ```ts
 const { postMessage } = createBroadcastChannel("test_channel");
