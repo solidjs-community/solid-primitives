@@ -3,7 +3,7 @@ import { createSignal, JSX, onCleanup } from "solid-js";
 type OnMessageCB = (e: MessageEvent<any>) => void;
 
 type TBroadcastChannelInstance = {
-  onMessageCBList: { id: number; cb: OnMessageCB }[];
+  onMessageCBList: { id: Symbol; cb: OnMessageCB }[];
   instanceCount: number;
   instance: {
     onMessage: (cb: OnMessageCB, options?: boolean | AddEventListenerOptions) => void;
@@ -17,11 +17,6 @@ const map: {
   [key: string]: TBroadcastChannelInstance;
 } = {};
 
-let id = 0;
-const createId = () => {
-  return id++;
-};
-
 export function makeBroadcastChannel(name: string) {
   if (process.env.SSR)
     return {
@@ -32,7 +27,7 @@ export function makeBroadcastChannel(name: string) {
       instance: {} as unknown as BroadcastChannel
     };
 
-  const id = createId();
+  const id = Symbol();
   const foundInstance = map[name];
   let cbRef: any;
 
