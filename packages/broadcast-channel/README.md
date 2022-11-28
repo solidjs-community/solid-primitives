@@ -59,7 +59,7 @@ const Component_2 = () => {
     setMessage(data);
   });
 
-  return <div>{message}</div>;
+  return <div>{message()}</div>;
 };
 
 const App = () => {
