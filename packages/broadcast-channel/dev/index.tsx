@@ -51,7 +51,7 @@ const Content = (props: { page: TPage; channelName: string }) => {
                 <li class="flex gap-2">
                   <span class="font-mono">{item.count}</span>
                   <span>-</span>
-                  <span class="opacity-50">{item.id}</span>
+                  <span class="font-mono opacity-50">{item.id}</span>
                 </li>
               );
             }}
