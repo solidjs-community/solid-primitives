@@ -17,11 +17,11 @@ const map: {
   [key: string]: TBroadcastChannelInstance;
 } = {};
 
-export function makeBroadcastChannel(name: string) {
+export function makeBroadcastChannel<T>(name: string) {
   if (process.env.SSR)
     return {
       onMessage: () => void 0,
-      postMessage: () => void 0,
+      postMessage: () => void 0 as unknown as (props: T) => void,
       close: () => void 0,
       channelName: name,
       instance: {} as unknown as BroadcastChannel
@@ -32,7 +32,7 @@ export function makeBroadcastChannel(name: string) {
   let cbRef: any;
 
   const onMessage = (
-    cb: (e: MessageEvent<any>) => void,
+    cb: (e: MessageEvent<T>) => void,
     options?: boolean | AddEventListenerOptions
   ) => {
     const { onMessageCBList, instance } = map[name]!;
@@ -43,7 +43,7 @@ export function makeBroadcastChannel(name: string) {
       return;
     }
 
-    cbRef = (e: MessageEvent<any>) => {
+    cbRef = (e: MessageEvent<T>) => {
       const { onMessageCBList } = map[name]!;
       onMessageCBList.forEach(item => {
         item.cb(e);
@@ -81,7 +81,9 @@ export function makeBroadcastChannel(name: string) {
     // return foundInstance.instance;
     return {
       onMessage,
-      postMessage: foundInstance.instance.postMessage.bind(foundInstance.instance.instance),
+      postMessage: foundInstance.instance.postMessage.bind(foundInstance.instance.instance) as (
+        props: T
+      ) => void,
       close,
       channelName: foundInstance.instance.channelName,
       instance: foundInstance.instance.instance
@@ -99,22 +101,25 @@ export function makeBroadcastChannel(name: string) {
 
   const result = {
     onMessage,
-    postMessage: postMessage.bind(instance),
+    postMessage: postMessage.bind(instance) as (props: T) => void,
     close,
     channelName,
     instance
-  } as TBroadcastChannelInstance["instance"];
+  };
+  // as TBroadcastChannelInstance["instance"]
+
   newInstance.instance = result;
   map[name] = newInstance;
 
   return result;
 }
 
-export function createBroadcastChannel(name: string) {
-  const [message, setMessage] = createSignal<unknown>(null);
-  const { channelName, close, instance, onMessage, postMessage } = makeBroadcastChannel(name);
+export function createBroadcastChannel<T>(name: string) {
+  const [message, setMessage] = createSignal<T | null>(null);
+  const { channelName, close, instance, onMessage, postMessage } = makeBroadcastChannel<T>(name);
 
   onMessage(({ data }) => {
+    // @ts-ignore
     setMessage(data);
   });
 

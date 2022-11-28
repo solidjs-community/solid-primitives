@@ -101,6 +101,44 @@ createEffect(
 );
 ```
 
+## Type Safety
+
+```ts
+type TData = { id: number; message: string };
+
+const { message, postMessage } = createBroadcastChannel<TData>("test_channel");
+
+postMessage({ id: "wrong type", message: "hi" }); // ❌
+//            ^^^
+// (property) id: number
+// Type 'string' is not assignable to type 'number'.
+
+postMessage({ id: 5, message: "hi" }); // ✅
+
+createEffect(
+  on(
+    message,
+    data => {
+      consumeDataIncorrect(data!); // ❌
+      //                    ^^^
+      // Argument of type 'TData' is not assignable to parameter of type '{ id: string; message: string; }'.
+      // Types of property 'id' are incompatible.
+      // Type 'number' is not assignable to type 'string'.
+
+      consumeDataCorrect(data!); // ✅
+    },
+    { defer: true }
+  )
+);
+
+const consumeDataIncorrect = (data: { id: string; message: string }) => {
+  console.log(data);
+};
+const consumeDataCorrect = (data: { id: number; message: string }) => {
+  console.log(data);
+};
+```
+
 ## Demo
 
 Here's a working example here: https://stackblitz.com/edit/vitejs-vite-5xren3?file=src%2Fmain.tsx

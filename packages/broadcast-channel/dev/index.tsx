@@ -11,7 +11,9 @@ const Content = (props: { page: TPage; channelName: string }) => {
   const increment = () => setCount(count() + 1);
   const [list, setList] = createStore<{ id: string; count: number }[]>([]);
 
-  const { message, postMessage } = createBroadcastChannel(props.channelName);
+  const { message, postMessage } = createBroadcastChannel<{ id: string; count: number }>(
+    props.channelName
+  );
 
   //   const { onMessage } = makeBroadcastChannel(props.channelName);
   //
@@ -29,7 +31,7 @@ const Content = (props: { page: TPage; channelName: string }) => {
       data => {
         setList(
           produce(prev => {
-            prev.push(data);
+            prev.push(data!);
           })
         );
       },

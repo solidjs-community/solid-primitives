@@ -2,6 +2,8 @@ import { describe, test, expect } from "vitest";
 import { createEffect, createRoot, on } from "solid-js";
 import { createBroadcastChannel, makeBroadcastChannel } from "../src";
 
+type MsgType = string;
+
 const buildMockBroadcastChannel = (channelName: string) => {
   // Don't know how to open pages/tabs in order to test
   // BroadcastChannel sending messages across different pages.
@@ -56,7 +58,7 @@ describe("makeBroadcastChannel", () => {
       const channelName = "channel-1";
       const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-      const { onMessage } = makeBroadcastChannel(channelName);
+      const { onMessage } = makeBroadcastChannel<MsgType>(channelName);
 
       const getPostMessage = () =>
         new Promise<string>(resolve => {
@@ -81,8 +83,8 @@ describe("makeBroadcastChannel", () => {
       const channelName = "channel-1";
       const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-      const { onMessage: onMessage1 } = makeBroadcastChannel(channelName);
-      const { onMessage: onMessage2 } = makeBroadcastChannel(channelName);
+      const { onMessage: onMessage1 } = makeBroadcastChannel<MsgType>(channelName);
+      const { onMessage: onMessage2 } = makeBroadcastChannel<MsgType>(channelName);
 
       const getPostMessage = () =>
         new Promise<string>(resolve => {
@@ -116,8 +118,8 @@ describe("makeBroadcastChannel", () => {
       const channelName = "channel-1";
       const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-      const { onMessage: onMessage1 } = makeBroadcastChannel(channelName);
-      const { onMessage: onMessage2 } = makeBroadcastChannel("channel-2");
+      const { onMessage: onMessage1 } = makeBroadcastChannel<MsgType>(channelName);
+      const { onMessage: onMessage2 } = makeBroadcastChannel<MsgType>("channel-2");
 
       const getPostMessage = () =>
         new Promise<string>(resolve => {
@@ -151,9 +153,9 @@ describe("makeBroadcastChannel", () => {
       const channelName = "channel-1";
 
       const { onMessage: onMessage1, postMessage: postedMessage1 } =
-        makeBroadcastChannel(channelName);
+        makeBroadcastChannel<MsgType>(channelName);
       const { onMessage: onMessage2, postMessage: postedMessage2 } =
-        makeBroadcastChannel(channelName);
+        makeBroadcastChannel<MsgType>(channelName);
 
       const getPostMessage = () =>
         new Promise<string>(resolve => {
@@ -188,7 +190,7 @@ describe("makeBroadcastChannel", () => {
       const channelName = "channel-1";
       const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-      const { onMessage } = makeBroadcastChannel(channelName);
+      const { onMessage } = makeBroadcastChannel<MsgType>(channelName);
 
       const getPostMessage = () =>
         new Promise<string>(resolve => {
@@ -225,7 +227,7 @@ describe("makeBroadcastChannel", () => {
       const channelName = "channel-1";
       const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-      const { onMessage, close } = makeBroadcastChannel(channelName);
+      const { onMessage, close } = makeBroadcastChannel<MsgType>(channelName);
 
       const getPostMessage = () =>
         new Promise<string>(resolve => {
@@ -264,8 +266,8 @@ describe("makeBroadcastChannel", () => {
       const channelName = "channel-1";
       const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-      const { onMessage: onMessage1 } = makeBroadcastChannel(channelName);
-      const { onMessage: onMessage2, close: close2 } = makeBroadcastChannel(channelName);
+      const { onMessage: onMessage1 } = makeBroadcastChannel<MsgType>(channelName);
+      const { onMessage: onMessage2, close: close2 } = makeBroadcastChannel<MsgType>(channelName);
 
       const getPostMessage = () =>
         new Promise<string>(resolve => {
@@ -301,8 +303,9 @@ describe("makeBroadcastChannel", () => {
       const channelName = "channel-1";
       const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-      const { onMessage: onMessage1 } = makeBroadcastChannel(channelName);
-      const { onMessage: onMessage2, instance: instance2 } = makeBroadcastChannel(channelName);
+      const { onMessage: onMessage1 } = makeBroadcastChannel<MsgType>(channelName);
+      const { onMessage: onMessage2, instance: instance2 } =
+        makeBroadcastChannel<MsgType>(channelName);
 
       const getPostMessage = () =>
         new Promise<string>(resolve => {
@@ -351,9 +354,9 @@ describe("createBroadcastChannel", () => {
   test("createBroadcastChannel() checking instances from BroadcastChannel constructor", () =>
     createRoot(dispose => {
       const channelName = "channel-1";
-      const { instance: instance1 } = createBroadcastChannel(channelName);
-      const { instance: instance2 } = createBroadcastChannel(channelName);
-      const { instance: instance3 } = createBroadcastChannel("channel-5");
+      const { instance: instance1 } = createBroadcastChannel<MsgType>(channelName);
+      const { instance: instance2 } = createBroadcastChannel<MsgType>(channelName);
+      const { instance: instance3 } = createBroadcastChannel<MsgType>("channel-5");
 
       expect(instance1).toBeInstanceOf(BroadcastChannel);
       expect(instance2).toBeInstanceOf(BroadcastChannel);
@@ -372,7 +375,7 @@ describe("createBroadcastChannel", () => {
       const channelName = "channel-1";
       const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-      const { message } = createBroadcastChannel(channelName);
+      const { message } = createBroadcastChannel<MsgType>(channelName);
 
       const getPostMessage = () =>
         new Promise<string>(resolve => {
@@ -380,7 +383,7 @@ describe("createBroadcastChannel", () => {
             on(
               message,
               message => {
-                resolve(message);
+                resolve(message!);
               },
               { defer: true }
             )
@@ -403,8 +406,8 @@ describe("createBroadcastChannel", () => {
       const channelName = "channel-1";
       const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-      const { message: message1 } = createBroadcastChannel(channelName);
-      const { message: message2 } = createBroadcastChannel(channelName);
+      const { message: message1 } = createBroadcastChannel<MsgType>(channelName);
+      const { message: message2 } = createBroadcastChannel<MsgType>(channelName);
 
       const getPostMessage = () =>
         new Promise<string>(resolve => {

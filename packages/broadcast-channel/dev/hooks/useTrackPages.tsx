@@ -1,5 +1,6 @@
+import { createEffect, on } from "solid-js";
 import { createStore, produce } from "solid-js/store";
-import { makeBroadcastChannel } from "../../src";
+import { createBroadcastChannel, makeBroadcastChannel } from "../../src";
 
 const getSmallId = () => {
   const date = new Date();
@@ -16,7 +17,11 @@ export type TPage = {
 export function useTrackPages(id?: string) {
   const name = id || "track-pages-same-origin";
   const pageId = getSmallId();
-  const { onMessage, postMessage } = makeBroadcastChannel(name);
+  const { onMessage, postMessage } = makeBroadcastChannel<{
+    id: string;
+    ids?: typeof tabsMap;
+    state: "close" | "open" | "open::success";
+  }>(name);
   const [store, setStore] = createStore<TPage>({
     id: pageId,
     count: 1,
