@@ -78,9 +78,7 @@ export function makeBroadcastChannel(name: string) {
     map[name] = null as unknown as any;
   };
 
-  onCleanup(() => {
-    close();
-  });
+  onCleanup(close);
 
   if (foundInstance) {
     foundInstance.instanceCount += 1;
