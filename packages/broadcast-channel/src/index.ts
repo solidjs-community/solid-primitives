@@ -1,4 +1,4 @@
-import { createSignal, JSX, onCleanup } from "solid-js";
+import { createSignal, onCleanup } from "solid-js";
 
 type OnMessageCB = (e: MessageEvent<any>) => void;
 
@@ -78,7 +78,6 @@ export function makeBroadcastChannel<T>(name: string) {
   if (foundInstance) {
     foundInstance.instanceCount += 1;
 
-    // return foundInstance.instance;
     return {
       onMessage,
       postMessage: foundInstance.instance.postMessage.bind(foundInstance.instance.instance) as (
@@ -106,7 +105,6 @@ export function makeBroadcastChannel<T>(name: string) {
     channelName,
     instance
   };
-  // as TBroadcastChannelInstance["instance"]
 
   newInstance.instance = result;
   map[name] = newInstance;
@@ -119,13 +117,8 @@ export function createBroadcastChannel<T>(name: string) {
   const { channelName, close, instance, onMessage, postMessage } = makeBroadcastChannel<T>(name);
 
   onMessage(({ data }) => {
-    // @ts-ignore
-    setMessage(data);
+    setMessage(() => data);
   });
 
   return { message, postMessage: postMessage.bind(instance), channelName, instance, close };
 }
-
-// This ensures the `JSX` import won't fall victim to tree shaking before
-// TypesScript can use it
-export type E = JSX.Element;
