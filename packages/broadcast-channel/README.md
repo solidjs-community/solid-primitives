@@ -21,9 +21,26 @@ yarn add @solid-primitives/broadcast-channel
 pnpm add @solid-primitives/broadcast-channel
 ```
 
-## How to use it
+## Available primitives
 
-### makeBroadcastChannel
+- [`makeBroadcastChannel`](#makeBroadcastChannel)
+- [`createBroadcastChannel`](#createBroadcastChannel)
+
+### `makeBroadcastChannel`
+
+Creates a new [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) instance for cross-tab communication.
+
+The channel name is used to identify the channel. If a channel with the same name already exists, it will be returned instead of creating a new one.
+
+Channel attempt closing the channel when the on owner cleanup. If there are multiple connected instances, the channel will not be closed until the last owner is removed.
+
+Returns an object with the following properties:
+
+- `onMessage` - a function to subscribe to messages from other tabs
+- `postMessage` - a function to send messages to other tabs
+- `close` - a function to close the channel
+- `channelName` - the name of the channel
+- `instance` - the underlying [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) instance
 
 ```ts
 const { postMessage } = makeBroadcastChannel("test_channel");
@@ -78,9 +95,9 @@ const App = () => {
 };
 ```
 
-### createBroadcastChannel
+### `createBroadcastChannel`
 
-Access the reactive `message()` signal that updates when postMessage is fired from other contexts
+Provedes the same functionality as [`makeBroadcastChannel`](#makeBroadcastChannel) but instead of returning `onMessage` function, it returns a `message` signal accessor that updates when postMessage is fired from other contexts.
 
 ```ts
 const { postMessage } = createBroadcastChannel("test_channel");

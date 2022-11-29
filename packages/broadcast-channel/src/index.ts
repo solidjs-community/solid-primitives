@@ -17,6 +17,21 @@ const map: {
   [key: string]: TBroadcastChannelInstance;
 } = {};
 
+/**
+ * Creates a new [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) instance for cross-tab communication.
+ *
+ * The channel name is used to identify the channel. If a channel with the same name already exists, it will be returned instead of creating a new one.
+ *
+ * Channel attempt closing the channel when the on owner cleanup. If there are multiple connected instances, the channel will not be closed until the last owner is removed.
+ *
+ * @param name channel name
+ * @returns an object
+ * - `onMessage` - a function to subscribe to messages from other tabs
+ * - `postMessage` - a function to send messages to other tabs
+ * - `close` - a function to close the channel
+ * - `channelName` - the name of the channel
+ * - `instance` - the underlying [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) instance
+ */
 export function makeBroadcastChannel<T>(name: string) {
   if (process.env.SSR)
     return {
@@ -100,7 +115,7 @@ export function makeBroadcastChannel<T>(name: string) {
 
   const result = {
     onMessage,
-    postMessage: postMessage.bind(instance) as (props: T) => void,
+    postMessage: postMessage.bind(instance),
     close,
     channelName,
     instance
@@ -112,6 +127,21 @@ export function makeBroadcastChannel<T>(name: string) {
   return result;
 }
 
+/**
+ * Creates a new [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) instance for cross-tab communication.
+ *
+ * The channel name is used to identify the channel. If a channel with the same name already exists, it will be returned instead of creating a new one.
+ *
+ * Channel attempt closing the channel when the on owner cleanup. If there are multiple connected instances, the channel will not be closed until the last owner is removed.
+ *
+ * @param name channel name
+ * @returns an object
+ * - `message` - a singal accessor with last saved message
+ * - `postMessage` - a function to send messages to other tabs
+ * - `close` - a function to close the channel
+ * - `channelName` - the name of the channel
+ * - `instance` - the underlying [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) instance
+ */
 export function createBroadcastChannel<T>(name: string) {
   const [message, setMessage] = createSignal<T | null>(null);
   const { channelName, close, instance, onMessage, postMessage } = makeBroadcastChannel<T>(name);
