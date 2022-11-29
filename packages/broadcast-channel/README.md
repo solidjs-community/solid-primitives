@@ -103,6 +103,17 @@ createEffect(
 
 ## Type Safety
 
+`makeBroadcastChannel` and `createBroadcastChannel` allows you to pass type which determines what should be passed to `postMessage` and what values `message()` or data from `onMessage` callback are.
+
+```ts
+const { onMessage, postMessage } = makeBroadcastChannel<string>();
+
+onMessage(({ data }) => {
+  data; // Type 'string'
+});
+postMessage("hi");
+```
+
 ```ts
 type TData = { id: number; message: string };
 
