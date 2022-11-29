@@ -96,6 +96,12 @@ importers:
     devDependencies:
       '@solid-primitives/scheduled': link:../scheduled
 
+  packages/broadcast-channel:
+    specifiers:
+      solid-js: ^1.6.0
+    dependencies:
+      solid-js: 1.6.1
+
   packages/clipboard:
     specifiers:
       '@solid-primitives/utils': workspace:^4.0.0
