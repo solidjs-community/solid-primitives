@@ -9,8 +9,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/browser?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/template-primitive)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fbrowser%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-- `createWebShare` - that can create a web share and returns a signal track the status. You can use this to share `title`, `text` or `url`.
-- `createNaughtyWebShare` - that can share `files` and uses `navigator.canShare` which is not fully supported because security to make sure the files could be shared.
+- `createWebShare` - that can create a web share and returns a signal track the status. You can use this to share `title`, `text`, `url` or `files`.
 
 ## Installation
 
@@ -24,27 +23,11 @@ pnpm add @solid-primitives/browser
 
 ## Web Share
 
-### Normal Share
-
-If you want to share `text`, `title` or `url`, you can use `createWebShare`.
+If you want to share `text`, `title`, `url` or `files`, you can use `createWebShare`.
 
 ```ts
 const shareStatus = createWebShare({ url: "https://www.solidjs.com/", title: "title", text: "text" });
 createEffect(() => {
-  if (shareStatus() === "fulfilled") {
-    console.log("successful sharing.");
-  }
-});
-```
-
-### Share Files
-
-If you want share `files`, you can use `createNaughtyWebShare`. The reason why it is `Naughty` is that sharing files is not safe enough and not fully support even if `Web Share` is implemented on some browser such as chrome on windows.
-
-```ts
-const file = new File([new Blob(["text"])], "file.txt");
-const shareStatus = createNaughtyWebShare({files: Object.freeze([file])});
-createEffect(() =>
   if (shareStatus() === "fulfilled") {
     console.log("successful sharing.");
   }

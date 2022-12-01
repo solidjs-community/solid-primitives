@@ -2,7 +2,7 @@ import { Component, createSignal, createEffect } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
 
-import { createWebShare, createNaughtyWebShare } from "../src/index";
+import { createWebShare } from "../src/index";
 
 const App: Component = () => {
   const [shareInfo, setShareInfo] = createSignal<string>("");
@@ -23,7 +23,7 @@ const App: Component = () => {
 
   const onFilesSharing = () => {
     const files = [new File([new Blob(["text"])], "file.txt")];
-    const shareStatus = createNaughtyWebShare({ files });
+    const shareStatus = createWebShare({ files });
     createEffect(() => {
       if (shareStatus() === "pending") {
         setFilesShareInfo("sharing...");
