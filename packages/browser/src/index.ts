@@ -35,7 +35,7 @@ export const createWebShare = (data: ShareDataWithFiles = {}): Accessor<Status> 
 
   // Some browsers do not support `files` and `navigator.canShare`, so sharing failed.
   if (data.files && (!navigator.canShare || !navigator.canShare(data))) {
-    console.log("your browser does not support share files.");
+    console.error("your browser does not support share files.");
     setStatus("rejected");
     return status;
   }
@@ -48,7 +48,7 @@ export const createWebShare = (data: ShareDataWithFiles = {}): Accessor<Status> 
       })
       .catch(err => {
         setStatus("rejected");
-        console.log(err);
+        console.error(err);
       });
   } catch (e) {
     setStatus("rejected");
