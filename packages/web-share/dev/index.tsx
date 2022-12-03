@@ -6,12 +6,7 @@ import { createWebShare } from "../src/index";
 
 const App: Component = () => {
   const [data, setData] = createSignal<ShareData>({});
-
   const shareStatus = createWebShare(data);
-
-  createEffect(() => {
-    console.log(shareStatus.status);
-  })
 
   return (
     <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">

@@ -1,4 +1,4 @@
-import { Accessor, createSignal, createEffect, on } from "solid-js";
+import { Accessor, createEffect, on } from "solid-js";
 import { createStore } from "solid-js/store";
 
 /**
@@ -42,7 +42,7 @@ interface shareStatus {
   /** The status of sharing success, failed or pending. */
   status?: boolean;
 
-  /** The massage of why sharing failed. */
+  /** The reason why sharing failed. */
   message?: string;
 }
 
