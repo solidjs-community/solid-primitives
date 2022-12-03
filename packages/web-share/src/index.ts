@@ -50,7 +50,7 @@ interface shareStatus {
  * Creates a reactive status about web share.
  *
  * @param data Data signal to share on web.
- * @param deferInitial - Sets the value of the clipboard from the signal. defaults to false.
+ * @param deferInitial - Sets the value of the web share data from the signal. defaults to false.
  * @return A store shows sharing status and failing message.
  *
  * @example
@@ -59,7 +59,10 @@ interface shareStatus {
  * const shareStatus = createWebShare(data);
  * ```
  */
-export const createWebShare = (data?: Accessor<ShareData>, deferInitial?: boolean): shareStatus => {
+export const createWebShare = (
+  data?: Accessor<ShareData>,
+  deferInitial: boolean = false
+): shareStatus => {
   const [status, setStatus] = createStore<shareStatus>({});
 
   if (process.env.SSR) {
@@ -79,7 +82,7 @@ export const createWebShare = (data?: Accessor<ShareData>, deferInitial?: boolea
               setStatus({ status: false, message: e.toString() });
             });
         },
-        { defer: deferInitial || true }
+        { defer: !deferInitial }
       )
     );
 
