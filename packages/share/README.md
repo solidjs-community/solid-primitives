@@ -22,12 +22,12 @@ yarn add @solid-primitives/share
 ## How to use it
 
 ```ts
-import createSocialShare, { twitter } from "@solid-promitives/share";
+import createSocialShare, { twitter } from "@solid-primitives/share";
 
 const [share, close] = createSocialShare(() => ({
   title: "SolidJS.com",
   url: "https://www.solidjs.com",
-  description: "Simple and performant reactivity!"
+  description: "Simple and well-behaved reactivity!"
 }));
 share(twitter);
 ```

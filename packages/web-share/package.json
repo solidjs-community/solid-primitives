@@ -1,11 +1,11 @@
 {
-  "name": "@solid-primitives/browser",
+  "name": "@solid-primitives/web-share",
   "version": "0.0.100",
-  "description": "A primitive about browser.",
+  "description": "A primitive about Web Share.",
   "author": "Your Name <you@youremail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/browser#readme",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/web-share#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -14,7 +14,7 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "browser",
+    "name": "web-share",
     "stage": 0,
     "list": [
       "createWebShare"
@@ -24,7 +24,6 @@
   "keywords": [
     "solid",
     "primitives",
-    "browser",
     "web share"
   ],
   "private": false,
