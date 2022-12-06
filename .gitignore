@@ -169,3 +169,6 @@ tsup.config.bundled*.mjs
 # vite
 vite.config.ts.js
 configs/vitest.config.ts.timestamp-*.mjs
+
+# demo pages
+pages

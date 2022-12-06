@@ -41,6 +41,7 @@
   },
   "scripts": {
     "dev": "vite serve dev",
+    "page": "vite build dev",
     "start": "vite serve dev",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",

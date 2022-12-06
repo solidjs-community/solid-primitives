@@ -68,6 +68,7 @@
     "test:ssr": "pnpm run test --mode ssr",
     "start": "vite serve dev --host",
     "dev": "vite serve dev",
+    "page": "vite build dev",
     "demo": "vite serve demo --host"
   },
   "keywords": [

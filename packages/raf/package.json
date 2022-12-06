@@ -66,6 +66,7 @@
   "scripts": {
     "start": "vite serve dev --host",
     "dev": "vite serve dev",
+    "page": "vite build dev",
     "build": "jiti ../../scripts/build.ts --ssr --dev"
   },
   "keywords": [

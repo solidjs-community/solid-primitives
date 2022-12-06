@@ -1,7 +1,7 @@
 import { Component } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
-import { createRemSize } from "../src";
+import { createRemSize } from "../";
 
 const App: Component = () => {
   const remSize = createRemSize();

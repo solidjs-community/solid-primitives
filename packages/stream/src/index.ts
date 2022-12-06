@@ -216,6 +216,13 @@ export const createAmplitudeFromStream = (
   return [amplitude, teardown];
 };
 
+declare global {
+  interface DisplayMediaStreamConstraints {
+    audio?: boolean | MediaTrackConstraints;
+    video?: boolean | MediaTrackConstraints;
+  }
+}
+
 /**
  * Creates a reactive wrapper to get display media streams from screen
  * ```typescript

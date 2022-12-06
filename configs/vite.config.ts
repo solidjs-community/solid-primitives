@@ -28,6 +28,8 @@ export const viteConfig = defineConfig({
   build: {
     target: "esnext"
   },
+  // required to serve from a sub-path (github pages):
+  base: "./",
   define: {
     "process.env": {
       NODE_ENV: "development",
