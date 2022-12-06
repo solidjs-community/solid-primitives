@@ -23,6 +23,8 @@ export type PaginationProps = {
   onClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
   onKeyUp?: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent>;
   children: JSX.Element;
+  /** page number this refers to, not enumerable, allows to use props.page to get the page number */
+  readonly page?: number
 }[];
 
 export const paginationDefaults = {
@@ -75,50 +77,31 @@ export const createPagination = (
               get: () => (page() === pageNo ? "true" : undefined),
               set: noop,
               enumerable: true
-            }
-          }
+            },
+            "page": { value: pageNo, enumerable: false }
+          },
         ))(i + 1)
     );
-    const first = {
-      get disabled() {
-        return page() <= 1;
-      },
-      set disabled(_) {},
-      get children() {
-        return opts().firstContent;
-      },
-      set children(_) {}
-    };
-    const back = {
-      get disabled() {
-        return page() <= 1;
-      },
-      set disabled(_) {},
-      get children() {
-        return opts().prevContent;
-      },
-      set children(_) {}
-    };
-    const next = {
-      get disabled() {
-        return page() >= opts().pages;
-      },
-      set disabled(_) {},
-      get children() {
-        return opts().nextContent;
-      },
-      set children(_) {}
-    };
-    const last = {
-      get disabled() {
-        return page() >= opts().pages;
-      },
-      set disabled(_) {},
-      get children() {
-        return opts().lastContent;
-      },
-      set children(_) {}
-    };
+    const first = Object.defineProperties({} as PaginationProps[number], {
+      disabled: { get: () => page() <= 1, set: noop, enumerable: true },
+      children: { get: () => opts().firstContent, set: noop, enumerable: true },
+      page: { value: 1, enumerable: false },
+    });
+    const back = Object.defineProperties({} as PaginationProps[number], {
+      disabled: { get: () => page() <= 1, set: noop, enumerable: true },
+      children: { get: () => opts().prevContent, set: noop, enumerable: true },
+      page: { get: () => Math.min(1, page() - 1), enumerable: false },
+    });
+    const next = Object.defineProperties({} as PaginationProps[number], {
+      disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
+      children: { get: () => opts().nextContent, set: noop, enumerable: true },
+      page: { get: () => Math.max(opts().pages, page() + 1), enumerable: false },
+    });
+    const last = Object.defineProperties({} as PaginationProps[number], {
+      disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
+      children: { get: () => opts().lastContent, set: noop, enumerable: true },
+      page: { get: () => opts().pages, enumerable: false },
+    });
     const paginationProps = createMemo<PaginationProps>(() => {
       const props = [];
       if (normalizeOption("showFirst", opts().showFirst, page(), opts().pages)) {
@@ -167,58 +150,46 @@ export const createPagination = (
               get: () => (page() === pageNo ? "true" : undefined),
               set: noop,
               enumerable: true
-            }
+            },
+            "page": {
+              value: pageNo,
+              enumerable: false,
+            },
           }
         ))(i + 1)
     );
-    const first = {
-      get disabled() {
-        return page() <= 1;
-      },
-      set disabled(_) {},
-      get children() {
-        return opts().firstContent;
-      },
-      set children(_) {},
+    const first = Object.defineProperties({
       onClick: [setPage, 1] as const,
-      onKeyUp: [onKeyUp, 1] as const
-    };
-    const back = {
-      get disabled() {
-        return page() <= 1;
-      },
-      set disabled(_) {},
-      get children() {
-        return opts().prevContent;
-      },
-      set children(_) {},
+      onKeyUp: [onKeyUp, 1] as const,
+    } as unknown as PaginationProps[number], {
+      disabled: { get: () => page() <= 1, set: noop, enumerable: true },
+      children: { get: () => opts().firstContent, set: noop, enumerable: true },
+      page: { value: 1, enumerable: false },
+    });
+    const back = Object.defineProperties({
       onClick: () => setPage(p => (p > 1 ? p - 1 : p)),
       onKeyUp: (ev: KeyboardEvent) => onKeyUp(page() - 1, ev)
-    };
-    const next = {
-      get disabled() {
-        return page() >= opts().pages;
-      },
-      set disabled(_) {},
-      get children() {
-        return opts().nextContent;
-      },
-      set children(_) {},
+    } as unknown as PaginationProps[number], {
+      disabled: { get: () => page() <= 1, set: noop, enumerable: true },
+      children: { get: () => opts().prevContent, set: noop, enumerable: true },
+      page: { get: () => Math.min(1, page() - 1), enumerable: false },
+    });
+    const next = Object.defineProperties({
       onClick: () => setPage(p => (p < opts().pages ? p + 1 : p)),
       onKeyUp: (ev: KeyboardEvent) => onKeyUp(page() - 1, ev)
-    };
-    const last = {
-      get disabled() {
-        return page() >= opts().pages;
-      },
-      set disabled(_) {},
-      get children() {
-        return opts().lastContent;
-      },
-      set children(_) {},
+    } as unknown as PaginationProps[number], {
+      disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
+      children: { get: () => opts().nextContent, set: noop, enumerable: true },
+      page: { get: () => Math.max(opts().pages, page() + 1), enumerable: false },
+    });
+    const last = Object.defineProperties({
       onClick: () => setPage(opts().pages),
       onKeyUp: (ev: KeyboardEvent) => onKeyUp(opts().pages, ev)
-    };
+    } as unknown as PaginationProps[number], {
+      disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
+      children: { get: () => opts().lastContent, set: noop, enumerable: true },
+      page: { get: () => opts().pages, enumerable: false },
+    });
     const paginationProps = createMemo<PaginationProps>(() => {
       const props = [];
       if (normalizeOption("showFirst", opts().showFirst, page(), opts().pages)) {

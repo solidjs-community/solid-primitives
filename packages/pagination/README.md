@@ -54,7 +54,7 @@ type PaginationOptions = {
 const [props, page, setPage] = createPagination({ pages: 3 });
 ```
 
-While the preferred structure is buttons inside a nav element, you can use arbitrary components, e.g. using your favorite UI component library (as long as it supports the same handlers and properties as DOM nodes, which it probably should). The props objects for each page will be reused in order to grant maximum performance using the `<For>` flow component to iterate over the props:
+While the preferred structure is links or buttons (if only client-side) inside a nav element, you can use arbitrary components, e.g. using your favorite UI component library (as long as it supports the same handlers and properties as DOM nodes, which it probably should). The props objects for each page will be reused in order to grant maximum performance using the `<For>` flow component to iterate over the props:
 
 ```tsx
 const [paginationProps, page, setPage] = createPagination({ pages: 100 });
@@ -62,10 +62,28 @@ const [paginationProps, page, setPage] = createPagination({ pages: 100 });
 createEffect(() => { /* do something with */ page() })
 
 return (
-  <nav>
+  <nav class="pagination">
     <For each={paginationProps()}>
       {(props) => <button {...props} />}
     </For>
+  </nav>
+);
+```
+
+In order to allow linking the pages manually, there is a non-enumerable page property in the props object:
+
+```tsx
+const [paginationProps, page, setPage] = createPagination({ pages: 100 });
+
+createEffect(() => { /* do something with */ page() })
+
+return (
+  <nav class="pagination">
+    <ul>
+      <For each={paginationProps()}>
+        {(props) => <li><A href={`?page=${props.page}`} {...props} /></li>}
+      </For>
+    </ul>
   </nav>
 );
 ```
