@@ -6,7 +6,7 @@
       "outputs": ["dist/**"]
     },
     "page": {
-      "dependsOn": ["^page"],
+      "dependsOn": ["^build"],
       "outputs": ["dev/dist/**"]
     }
   }

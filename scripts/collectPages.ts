@@ -1,37 +1,47 @@
-import { cp, mkdir, readdir, stat, writeFile } from "fs/promises"
-import { r } from "./utils";
+import { cp, mkdir, readdir, stat, writeFile } from "fs/promises";
+import path from "path";
+
+const cwd = process.cwd();
+const pagesPath = path.resolve(cwd, "pages");
+const packagesPath = path.resolve(cwd, "packages");
 
 const isDir = async (dir: string) => {
   try {
-    return (await stat(r(dir))).isDirectory();
+    return (await stat(path.resolve(dir))).isDirectory();
   } catch (e) {
     return false;
   }
 };
 
 const initDir = async () => {
-  if (!(await isDir('../pages'))) {
-    await mkdir("../pages")
+  if (!(await isDir(pagesPath))) {
+    await mkdir(pagesPath);
   }
-}
+};
 
 const copyPage = async () => {
   const pages: string[] = [];
-  await Promise.all((await readdir(r("../packages"))).map(async (pkg) => {
-    if (await isDir(r(`../packages/${pkg}/dev/dist`))) {
-      await cp(
-        r(`../packages/${pkg}/dev/dist`),
-        r(`../pages/${pkg}`),
-        { recursive: true, force: true }
-      );
-      pages.push(pkg);
-    }
-  }));
+  await Promise.all(
+    (
+      await readdir(packagesPath)
+    ).map(async pkg => {
+      const pkgPath = path.resolve(packagesPath, pkg, `dev/dist`);
+      if (await isDir(pkgPath)) {
+        await cp(pkgPath, path.resolve(pagesPath, pkg), {
+          recursive: true,
+          force: true
+        });
+        pages.push(pkg);
+      }
+    })
+  );
   return pages;
-}
+};
 
 const writeIndex = async (pages: string[]) => {
-  await writeFile(r('../pages/index.html'), `<!DOCTYPE html>
+  await writeFile(
+    path.resolve(pagesPath, "index.html"),
+    `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -44,11 +54,16 @@ const writeIndex = async (pages: string[]) => {
   <body>
     <h1>Available demos</h1>
     <ul>
-      ${pages.sort().map(page => `<li><a href="${page}">${page}</a></li>`).join('\n      ')}
+      ${pages
+        .sort()
+        .map(page => `<li><a href="${page}">${page}</a></li>`)
+        .join("\n      ")}
     </ul>
   </body>
 </html>
-`, 'utf-8');
-}
+`,
+    "utf-8"
+  );
+};
 
 initDir().then(copyPage).then(writeIndex).catch(console.error);

@@ -16,7 +16,7 @@
     "build": "cross-env CI=true turbo run build",
     "test": "cross-env CI=true vitest -c ./configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr",
-    "pages": "cross-env CI=true turbo run page; jiti ./scripts/collectPages.ts",
+    "pages": "turbo run page && jiti ./scripts/collectPages.ts",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts",
     "update-deps": "taze -w -r && pnpm i",
@@ -51,5 +51,5 @@
     "vite-plugin-solid": "^2.3.10",
     "vitest": "^0.24.4"
   },
-  "packageManager": "pnpm@7.13.0"
+  "packageManager": "pnpm@7.18.0"
 }
