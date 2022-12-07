@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/pagination": major
+"@solid-primitives/pagination": patch
 ---
 
-new package: pagination
+initial release: pagination
