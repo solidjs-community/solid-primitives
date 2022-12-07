@@ -12,11 +12,11 @@ const App: Component = () => {
         <h4>Pagination component</h4>
         <p>Current page: {page()} / 100</p>
         <nav class="flex flex-row">
-          <For each={paginationProps()}>
-            {(props) => <button {...props} />}
-          </For>
+          <For each={paginationProps()}>{props => <button {...props} />}</For>
         </nav>
-        <button onClick={() => setPage(Math.round(Math.random() * 100 + 1))}>jump to random page</button>
+        <button onClick={() => setPage(Math.round(Math.random() * 100 + 1))}>
+          jump to random page
+        </button>
       </div>
     </div>
   );
