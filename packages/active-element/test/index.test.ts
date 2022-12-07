@@ -1,4 +1,4 @@
-import { fireEvent, createEvent } from "solid-testing-library";
+import { fireEvent, createEvent } from "@solidjs/testing-library";
 import { createRoot } from "solid-js";
 import { describe, test, expect } from "vitest";
 import {
