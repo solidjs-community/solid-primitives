@@ -24,7 +24,7 @@ export type PaginationProps = {
   onKeyUp?: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent>;
   children: JSX.Element;
   /** page number this refers to, not enumerable, allows to use props.page to get the page number */
-  readonly page?: number
+  readonly page?: number;
 }[];
 
 export const paginationDefaults = {
@@ -67,150 +67,120 @@ export const createPagination = (
     }
     return p >= 1 && p <= opts().pages ? _setPage(p) : page();
   };
-  if (process.env.SSR) {
-    const pages: PaginationProps = [...Array(opts().pages)].map((_, i) =>
-      ((pageNo: number) =>
-        Object.defineProperties(
-          { children: pageNo.toString() },
-          {
-            "aria-current": {
-              get: () => (page() === pageNo ? "true" : undefined),
-              set: noop,
-              enumerable: true
+  const onKeyUp = (pageNo: number, ev: KeyboardEvent) =>
+    ((
+      {
+        ArrowLeft: () => setPage(p => p - 1),
+        ArrowRight: () => setPage(p => p + 1),
+        Home: () => setPage(1),
+        End: () => setPage(opts().pages),
+        Space: () => setPage(pageNo),
+        Return: () => setPage(pageNo)
+      }[ev.key] || noop
+    )());
+  const pages: PaginationProps = [...Array(opts().pages)].map((_, i) =>
+    ((pageNo: number) =>
+      Object.defineProperties(
+        process.env.SSR
+          ? { children: pageNo.toString() }
+          : {
+              children: pageNo.toString(),
+              onClick: [setPage, pageNo] as const,
+              onKeyUp: [onKeyUp, pageNo] as const
             },
-            "page": { value: pageNo, enumerable: false }
-          },
-        ))(i + 1)
-    );
-    const first = Object.defineProperties({} as PaginationProps[number], {
-      disabled: { get: () => page() <= 1, set: noop, enumerable: true },
-      children: { get: () => opts().firstContent, set: noop, enumerable: true },
-      page: { value: 1, enumerable: false },
-    });
-    const back = Object.defineProperties({} as PaginationProps[number], {
-      disabled: { get: () => page() <= 1, set: noop, enumerable: true },
-      children: { get: () => opts().prevContent, set: noop, enumerable: true },
-      page: { get: () => Math.min(1, page() - 1), enumerable: false },
-    });
-    const next = Object.defineProperties({} as PaginationProps[number], {
-      disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
-      children: { get: () => opts().nextContent, set: noop, enumerable: true },
-      page: { get: () => Math.max(opts().pages, page() + 1), enumerable: false },
-    });
-    const last = Object.defineProperties({} as PaginationProps[number], {
-      disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
-      children: { get: () => opts().lastContent, set: noop, enumerable: true },
-      page: { get: () => opts().pages, enumerable: false },
-    });
-    const paginationProps = createMemo<PaginationProps>(() => {
-      const props = [];
-      if (normalizeOption("showFirst", opts().showFirst, page(), opts().pages)) {
-        props.push(first);
-      }
-      if (normalizeOption("showPrev", opts().showPrev, page(), opts().pages)) {
-        props.push(back);
-      }
-      const start = Math.min(
-        opts().pages - opts().maxPages,
-        Math.max(1, page() - (opts().maxPages >> 1)) - 1
-      );
-      props.push(...pages.slice(start, start + opts().maxPages));
-      if (normalizeOption("showNext", opts().showNext, page(), opts().pages)) {
-        props.push(next);
-      }
-      if (normalizeOption("showLast", opts().showLast, page(), opts().pages)) {
-        props.push(last);
-      }
-      return props;
-    });
-    return [paginationProps, page, setPage as Setter<number>];
-  } else {
-    const onKeyUp = (pageNo: number, ev: KeyboardEvent) =>
-      ((
         {
-          ArrowLeft: () => setPage(p => p - 1),
-          ArrowRight: () => setPage(p => p + 1),
-          Home: () => setPage(1),
-          End: () => setPage(opts().pages),
-          Space: () => setPage(pageNo),
-          Return: () => setPage(pageNo)
-        }[ev.key] || noop
-      )());
-    // create all pages so we can reuse the objects
-    const pages: PaginationProps = [...Array(opts().pages)].map((_, i) =>
-      ((pageNo: number) =>
-        Object.defineProperties(
-          {
-            children: pageNo.toString(),
-            onClick: [setPage, pageNo] as const,
-            onKeyUp: [onKeyUp, pageNo] as const
+          "aria-current": {
+            get: () => (page() === pageNo ? "true" : undefined),
+            set: noop,
+            enumerable: true
           },
-          {
-            "aria-current": {
-              get: () => (page() === pageNo ? "true" : undefined),
-              set: noop,
-              enumerable: true
-            },
-            "page": {
-              value: pageNo,
-              enumerable: false,
-            },
-          }
-        ))(i + 1)
-    );
-    const first = Object.defineProperties({
-      onClick: [setPage, 1] as const,
-      onKeyUp: [onKeyUp, 1] as const,
-    } as unknown as PaginationProps[number], {
+          page: { value: pageNo, enumerable: false }
+        }
+      ))(i + 1)
+  );
+  const first = Object.defineProperties(
+    process.env.SSR
+      ? ({} as PaginationProps[number])
+      : ({
+          onClick: [setPage, 1] as const,
+          onKeyUp: [onKeyUp, 1] as const
+        } as unknown as PaginationProps[number]),
+    {
       disabled: { get: () => page() <= 1, set: noop, enumerable: true },
       children: { get: () => opts().firstContent, set: noop, enumerable: true },
-      page: { value: 1, enumerable: false },
-    });
-    const back = Object.defineProperties({
-      onClick: () => setPage(p => (p > 1 ? p - 1 : p)),
-      onKeyUp: (ev: KeyboardEvent) => onKeyUp(page() - 1, ev)
-    } as unknown as PaginationProps[number], {
+      page: { value: 1, enumerable: false }
+    }
+  );
+  const back = Object.defineProperties(
+    process.env.SSR
+      ? ({} as PaginationProps[number])
+      : ({
+          onClick: () => setPage(p => (p > 1 ? p - 1 : p)),
+          onKeyUp: (ev: KeyboardEvent) => onKeyUp(page() - 1, ev)
+        } as unknown as PaginationProps[number]),
+    {
       disabled: { get: () => page() <= 1, set: noop, enumerable: true },
       children: { get: () => opts().prevContent, set: noop, enumerable: true },
-      page: { get: () => Math.min(1, page() - 1), enumerable: false },
-    });
-    const next = Object.defineProperties({
-      onClick: () => setPage(p => (p < opts().pages ? p + 1 : p)),
-      onKeyUp: (ev: KeyboardEvent) => onKeyUp(page() - 1, ev)
-    } as unknown as PaginationProps[number], {
+      page: { get: () => Math.min(1, page() - 1), enumerable: false }
+    }
+  );
+  const next = Object.defineProperties(
+    process.env.SSR
+      ? ({} as PaginationProps[number])
+      : ({
+          onClick: () => setPage(p => (p < opts().pages ? p + 1 : p)),
+          onKeyUp: (ev: KeyboardEvent) => onKeyUp(page() - 1, ev)
+        } as unknown as PaginationProps[number]),
+    {
       disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
       children: { get: () => opts().nextContent, set: noop, enumerable: true },
-      page: { get: () => Math.max(opts().pages, page() + 1), enumerable: false },
-    });
-    const last = Object.defineProperties({
-      onClick: () => setPage(opts().pages),
-      onKeyUp: (ev: KeyboardEvent) => onKeyUp(opts().pages, ev)
-    } as unknown as PaginationProps[number], {
+      page: { get: () => Math.max(opts().pages, page() + 1), enumerable: false }
+    }
+  );
+  const last = Object.defineProperties(
+    process.env.SSR
+      ? ({} as PaginationProps[number])
+      : ({
+          onClick: () => setPage(opts().pages),
+          onKeyUp: (ev: KeyboardEvent) => onKeyUp(opts().pages, ev)
+        } as unknown as PaginationProps[number]),
+    {
       disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
       children: { get: () => opts().lastContent, set: noop, enumerable: true },
-      page: { get: () => opts().pages, enumerable: false },
-    });
-    const paginationProps = createMemo<PaginationProps>(() => {
-      const props = [];
-      if (normalizeOption("showFirst", opts().showFirst, page(), opts().pages)) {
-        props.push(first);
-      }
-      if (normalizeOption("showPrev", opts().showPrev, page(), opts().pages)) {
-        props.push(back);
-      }
-      const start = Math.min(
-        opts().pages - opts().maxPages,
-        Math.max(1, page() - (opts().maxPages >> 1)) - 1
-      );
-      props.push(...pages.slice(start, start + opts().maxPages));
-      if (normalizeOption("showNext", opts().showNext, page(), opts().pages)) {
-        props.push(next);
-      }
-      if (normalizeOption("showLast", opts().showLast, page(), opts().pages)) {
-        props.push(last);
-      }
-      return props;
-    });
-    return [paginationProps, page, setPage as Setter<number>];
-  }
+      page: { get: () => opts().pages, enumerable: false }
+    }
+  );
+  const start = createMemo(() =>
+    Math.min(opts().pages - opts().maxPages, Math.max(1, page() - (opts().maxPages >> 1)) - 1)
+  );
+  const showFirst = createMemo(() =>
+    normalizeOption("showFirst", opts().showFirst, page(), opts().pages)
+  );
+  const showPrev = createMemo(() =>
+    normalizeOption("showPrev", opts().showPrev, page(), opts().pages)
+  );
+  const showNext = createMemo(() =>
+    normalizeOption("showNext", opts().showNext, page(), opts().pages)
+  );
+  const showLast = createMemo(() =>
+    normalizeOption("showLast", opts().showLast, page(), opts().pages)
+  );
+  const paginationProps = createMemo<PaginationProps>(() => {
+    const props = [];
+    if (showFirst()) {
+      props.push(first);
+    }
+    if (showPrev()) {
+      props.push(back);
+    }
+    props.push(...pages.slice(start(), start() + opts().maxPages));
+    if (showNext()) {
+      props.push(next);
+    }
+    if (showLast()) {
+      props.push(last);
+    }
+    return props;
+  });
+  return [paginationProps, page, setPage as Setter<number>];
 };
