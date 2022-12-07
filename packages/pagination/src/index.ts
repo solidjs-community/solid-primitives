@@ -2,19 +2,28 @@ import { type Accessor, type Setter, createSignal, type JSX, createMemo } from "
 import { access, type MaybeAccessor, noop } from "@solid-primitives/utils";
 
 export type PaginationOptions = {
+  /** the overall number of pages */
   pages: number;
+  /** the highest number of pages to show at the same time */
   maxPages?: number;
+  /** start with another page than `1` */
   initialPage?: number;
-  showDisabled?: boolean;
+  /** show an element for the first page */
   showFirst?: boolean | ((page: number, pages: number) => boolean);
-  firstContent?: JSX.Element;
+  /** show an element for the previous page */
   showPrev?: boolean | ((page: number, pages: number) => boolean);
-  prevContent?: JSX.Element;
+  /** show an element for the next page */
   showNext?: boolean | ((page: number, pages: number) => boolean);
-  nextContent?: JSX.Element;
+  /** show an element for the last page */
   showLast?: boolean | ((page: number, pages: number) => boolean);
+  /** content for the first page element, e.g. an SVG icon, default is "|<" */
+  firstContent?: JSX.Element;
+  /** content for the previous page element, e.g. an SVG icon, default is "<" */
+  prevContent?: JSX.Element;
+  /** content for the next page element, e.g. an SVG icon, default is ">" */
+  nextContent?: JSX.Element;
+  /** content for the last page element, e.g. an SVG icon, default is ">|" */
   lastContent?: JSX.Element;
-  multiJump?: number | number[];
 };
 
 export type PaginationProps = {
@@ -27,7 +36,7 @@ export type PaginationProps = {
   readonly page?: number;
 }[];
 
-export const paginationDefaults = {
+export const PAGINATION_DEFAULTS = {
   pages: 1,
   maxPages: 10,
   showDisabled: true,
@@ -51,15 +60,32 @@ const normalizeOption = (
     ? value
     : typeof value === "function"
     ? value(page, pages)
-    : paginationDefaults[key];
+    : PAGINATION_DEFAULTS[key];
 
 /**
- * Creates a reactive pagination to fill your layout with
+ * Creates a reactive pagination to fill your layout with.
+ * @param options Options to configure the pagination. Can be a reactive signal. See {@link PaginationOptions}
+ * @returns A tuple of props, page and setPage. Props is an array of props to spread on each button. (See {@link PaginationProps}) Page is the current page number. setPage is a function to set the page number.
+ * ```ts
+ * [props: Accessor<PaginationProps>, page: Accessor<number>, setPage: Setter<number>]
+ * ```
+ * @example
+ * ```tsx
+ * const [paginationProps, page, setPage] = createPagination({ pages: 100 });
+ *
+ * createEffect(() => {
+ *   console.log(page());
+ * })
+ *
+ * <nav class="pagination">
+ *   <For each={paginationProps()}>{props => <button {...props} />}</For>
+ * </nav>
+ * ```
  */
 export const createPagination = (
   options?: MaybeAccessor<PaginationOptions>
 ): [props: Accessor<PaginationProps>, page: Accessor<number>, setPage: Setter<number>] => {
-  const opts = createMemo(() => Object.assign({}, paginationDefaults, access(options)));
+  const opts = createMemo(() => Object.assign({}, PAGINATION_DEFAULTS, access(options)));
   const [page, _setPage] = createSignal(opts().initialPage || 1);
   const setPage = (p: number | ((_p: number) => number)) => {
     if (typeof p === "function") {
@@ -67,6 +93,7 @@ export const createPagination = (
     }
     return p >= 1 && p <= opts().pages ? _setPage(p) : page();
   };
+
   const onKeyUp = (pageNo: number, ev: KeyboardEvent) =>
     ((
       {
@@ -78,6 +105,7 @@ export const createPagination = (
         Return: () => setPage(pageNo)
       }[ev.key] || noop
     )());
+
   const pages: PaginationProps = [...Array(opts().pages)].map((_, i) =>
     ((pageNo: number) =>
       Object.defineProperties(
@@ -150,6 +178,7 @@ export const createPagination = (
       page: { get: () => opts().pages, enumerable: false }
     }
   );
+
   const start = createMemo(() =>
     Math.min(opts().pages - opts().maxPages, Math.max(1, page() - (opts().maxPages >> 1)) - 1)
   );
@@ -165,6 +194,7 @@ export const createPagination = (
   const showLast = createMemo(() =>
     normalizeOption("showLast", opts().showLast, page(), opts().pages)
   );
+
   const paginationProps = createMemo<PaginationProps>(() => {
     const props = [];
     if (showFirst()) {
@@ -182,5 +212,6 @@ export const createPagination = (
     }
     return props;
   });
+
   return [paginationProps, page, setPage as Setter<number>];
 };
