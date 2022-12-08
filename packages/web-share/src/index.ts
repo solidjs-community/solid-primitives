@@ -1,5 +1,4 @@
-import { Accessor, createEffect, on } from "solid-js";
-import { createStore } from "solid-js/store";
+import { Accessor, createEffect, createSignal, on } from "solid-js";
 
 /**
  * Generates a simple non-reactive WebShare primitive for sharing.
@@ -38,13 +37,13 @@ export const makeWebShare = () => {
   return share;
 };
 
-interface shareStatus {
+export type ShareStatus = {
   /** The status of sharing success, failed or pending. */
   status?: boolean;
 
   /** The reason why sharing failed. */
   message?: string;
-}
+};
 
 /**
  * Creates a reactive status about web share.
@@ -60,31 +59,31 @@ interface shareStatus {
  * ```
  */
 export const createWebShare = (
-  data?: Accessor<ShareData>,
+  data: Accessor<ShareData>,
   deferInitial: boolean = false
-): shareStatus => {
-  const [status, setStatus] = createStore<shareStatus>({});
+): Accessor<ShareStatus> => {
+  const [status, setStatus] = createSignal<ShareStatus>({});
 
   if (process.env.SSR) {
     return status;
   }
 
   const share = makeWebShare();
-  if (data)
-    createEffect(
-      on(
-        data,
-        () => {
-          share(data())
-            .then(() => setStatus("status", true))
-            .catch(e => {
-              console.error(e);
-              setStatus({ status: false, message: e.toString() });
-            });
-        },
-        { defer: !deferInitial }
-      )
-    );
+  createEffect(
+    on(
+      data,
+      () => {
+        setStatus({});
+        share(data())
+          .then(() => setStatus({ status: true }))
+          .catch(e => {
+            console.error(e);
+            setStatus({ status: false, message: e.toString() });
+          });
+      },
+      { defer: !deferInitial }
+    )
+  );
 
   return status;
 };

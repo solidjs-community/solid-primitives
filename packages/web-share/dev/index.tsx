@@ -14,11 +14,11 @@ const App: Component = () => {
         <h4>Web Share component</h4>
         <p>share data: [ url: "https://solidjs.com" ]</p>
         <p class="caption">
-          {shareStatus.status === undefined
+          {shareStatus().status === undefined
             ? "Haven't started sharing yet."
-            : shareStatus.status
+            : shareStatus().status
             ? "Sharing success"
-            : `Sharing failed, ${shareStatus.message}`}
+            : `Sharing failed, ${shareStatus().message}`}
         </p>
         <button class="btn" onClick={() => setData({ url: "https://solidjs.com" })}>
           Share
