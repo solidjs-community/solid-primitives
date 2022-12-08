@@ -16,6 +16,7 @@
     "build": "cross-env CI=true turbo run build",
     "test": "cross-env CI=true vitest -c ./configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr",
+    "pages": "turbo run page && jiti ./scripts/collectPages.ts",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts",
     "update-deps": "taze -w -r && pnpm i",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.25.2",
+    "@solidjs/testing-library": "^0.5.1",
     "@types/fs-extra": "^9.0.13",
     "@types/node": "^18.11.10",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
@@ -40,7 +42,6 @@
     "json-to-markdown-table": "^1.0.0",
     "prettier": "^2.8.0",
     "solid-js": "^1.6.0",
-    "@solidjs/testing-library": "^0.5.1",
     "taze": "^0.8.4",
     "tsup": "^6.5.0",
     "turbo": "^1.6.3",
@@ -51,5 +52,5 @@
     "vite-plugin-solid": "^2.4.0",
     "vitest": "^0.25.3"
   },
-  "packageManager": "pnpm@7.13.0"
+  "packageManager": "pnpm@7.18.0"
 }

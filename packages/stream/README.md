@@ -40,7 +40,7 @@ createMediaPermissionRequest(target?: 'audio' | 'video' | MediaStreamConstraints
 
 ## Demo
 
-TODO
+https://solidjs-community.github.io/solid-primitives/stream
 
 ## Changelog
 

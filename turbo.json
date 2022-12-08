@@ -4,6 +4,10 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
+    },
+    "page": {
+      "dependsOn": ["^build"],
+      "outputs": ["dev/dist/**"]
     }
   }
 }

@@ -57,6 +57,7 @@ export const StringProp: Component<TestPropProps<string>> = props => (
       type="text"
       name={props.name}
       value={props.value()}
+      onInput={ev => props.setValue(ev.currentTarget.value)}
       onChange={ev => props.setValue(ev.currentTarget.value)}
     />{" "}
   </label>
