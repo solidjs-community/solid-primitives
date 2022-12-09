@@ -87,7 +87,7 @@ export const makeAudioPlayer = (
   src: AudioSource,
   handlers: AudioEventHandlers = {}
 ): {
-  play: VoidFunction;
+  play: () => Promise<void>;
   pause: VoidFunction;
   seek: (time: number) => void;
   setVolume: (volume: number) => void;
@@ -96,7 +96,7 @@ export const makeAudioPlayer = (
   if (process.env.SSR) {
     return {
       pause: noop,
-      play: noop,
+      play: async () => noop(),
       player: {} as HTMLAudioElement,
       seek: noop,
       setVolume: noop
@@ -143,20 +143,20 @@ export const createAudio = (
   playing?: Accessor<boolean>,
   volume?: Accessor<number>
 ): [
-  {
-    state: AudioState;
-    currentTime: number;
-    duration: number;
-    volume: number;
-    player: HTMLAudioElement;
-  },
-  {
-    seek: (time: number) => void;
-    setVolume: (volume: number) => void;
-    play: VoidFunction;
-    pause: VoidFunction;
-  }
-] => {
+    {
+      state: AudioState;
+      currentTime: number;
+      duration: number;
+      volume: number;
+      player: HTMLAudioElement;
+    },
+    {
+      seek: (time: number) => void;
+      setVolume: (volume: number) => void;
+      play: () => Promise<void>;
+      pause: VoidFunction;
+    }
+  ] => {
   if (process.env.SSR) {
     return [
       {
@@ -169,7 +169,7 @@ export const createAudio = (
       {
         seek: noop,
         setVolume: noop,
-        play: noop,
+        play: async () => noop(),
         pause: noop
       }
     ];
@@ -192,7 +192,13 @@ export const createAudio = (
         state: AudioState.READY,
         duration: player.duration
       });
-      if (playing && playing() == true) play();
+      if (playing && playing() == true) {
+        play().catch((e: DOMException) => {
+          if (e.name === "NotAllowedError") {
+            setStore("state", AudioState.ERROR)
+          }
+        });
+      }
     },
     timeupdate: () => setStore("currentTime", player.currentTime),
     loadstart: () => setStore("state", AudioState.LOADING),
