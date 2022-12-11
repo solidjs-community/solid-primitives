@@ -143,20 +143,20 @@ export const createAudio = (
   playing?: Accessor<boolean>,
   volume?: Accessor<number>
 ): [
-    {
-      state: AudioState;
-      currentTime: number;
-      duration: number;
-      volume: number;
-      player: HTMLAudioElement;
-    },
-    {
-      seek: (time: number) => void;
-      setVolume: (volume: number) => void;
-      play: () => Promise<void>;
-      pause: VoidFunction;
-    }
-  ] => {
+  {
+    state: AudioState;
+    currentTime: number;
+    duration: number;
+    volume: number;
+    player: HTMLAudioElement;
+  },
+  {
+    seek: (time: number) => void;
+    setVolume: (volume: number) => void;
+    play: () => Promise<void>;
+    pause: VoidFunction;
+  }
+] => {
   if (process.env.SSR) {
     return [
       {
@@ -195,7 +195,7 @@ export const createAudio = (
       if (playing && playing() == true) {
         play().catch((e: DOMException) => {
           if (e.name === "NotAllowedError") {
-            setStore("state", AudioState.ERROR)
+            setStore("state", AudioState.ERROR);
           }
         });
       }
