@@ -1,5 +1,11 @@
 # @solid-primitives/audio
 
+## 1.3.5
+
+### Patch Changes
+
+- 76ea4cef: Handle exceptions thrown during audio playback.
+
 ## 1.3.4
 
 ### Patch Changes
