@@ -7,9 +7,13 @@
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/share?style=for-the-badge)](https://bundlephobia.com/package/@solid-primitives/share)
 [![size](https://img.shields.io/npm/v/@solid-primitives/share?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/share)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Primitives for supporting sharing of resources on social media and beyond.
+
+- [`createSocialShare`](#createSocialShare) - A primitive for sharing on social media and beyond.
+- [`makeWebShare`](#makeWebShare) - Generates a simple non-reactive WebShare primitive for sharing.
+- [`createWebShare`](#createWebShare) - Creates a reactive status about web share.
 
 ## Installation
 
@@ -17,22 +21,26 @@ Primitives for supporting sharing of resources on social media and beyond.
 npm install @solid-primitives/share
 # or
 yarn add @solid-primitives/share
+# or
+pnpm add @solid-primitives/share
 ```
 
-## How to use it
+## `createSocialShare`
+
+### How to use it
 
 ```ts
-import createSocialShare, { twitter } from "@solid-promitives/share";
+import { createSocialShare, TWITTER } from "@solid-primitives/share";
 
 const [share, close] = createSocialShare(() => ({
   title: "SolidJS.com",
   url: "https://www.solidjs.com",
-  description: "Simple and performant reactivity!"
+  description: "Simple and well-behaved reactivity!"
 }));
-share(twitter);
+share(TWITTER);
 ```
 
-## Definition
+### Definition
 
 ```ts
 function createSocialShare(
@@ -52,7 +60,7 @@ function createSocialShare(
 ): [share: (network: Network | undefined) => void, close: () => void, isSharing: Accessor<boolean>];
 ```
 
-## Network List
+### Network List
 
 The following are a list of supported networks that may be imported from the share package.
 
@@ -105,14 +113,49 @@ The following is an example of Twitter's share string:
 const twitter: Network = "https://twitter.com/intent/tweet?text=@t&url=@u&hashtags=@h@tu";
 ```
 
-## Demo
+### Demo
 
 You may view a working example [here on Stackblitz](https://stackblitz.com/edit/vitejs-vite-vz1yr8?file=src/App.tsx).
+
+### Acknowledgements
+
+A portion of this primitive was built from https://github.com/nicolasbeauvais/vue-social-sharing/blob/master/src/share-network.js.
+
+## `makeWebShare`
+
+Generates a simple non-reactive WebShare primitive for sharing. Uses the [WebShare API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API).
+
+### How to use it
+
+```ts
+import { makeWebShare } from "@solid-primitives/share";
+
+const share = makeWebShare();
+
+try {
+  await share({ url: "https://solidjs.com" });
+} catch (e) {
+  console.log(e);
+}
+```
+
+## `createWebShare`
+
+Creates a reactive status about web share. Uses the [WebShare API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API).
+
+### How to use it
+
+```ts
+import { createWebShare } from "@solid-primitives/share";
+
+const [data, setData] = createSignal<ShareData>({});
+const shareStatus = createWebShare(data);
+
+createEffect(() => {
+  console.log(shareStatus.status, shareStatus.message);
+});
+```
 
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
-
-## Acknowledgements
-
-A portion of this primitive was built from https://github.com/nicolasbeauvais/vue-social-sharing/blob/master/src/share-network.js.

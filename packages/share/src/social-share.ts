@@ -1,4 +1,12 @@
 import { Accessor, createSignal } from "solid-js";
+import { Network } from "./networks";
+
+export type SharePopupOptions = {
+  height?: number;
+  width?: number;
+  popupLeft?: number;
+  popupTop?: number;
+};
 
 /**
  * A primitive for sharing on social media and beyond.
@@ -17,7 +25,7 @@ import { Accessor, createSignal } from "solid-js";
  * @param {controller} Window Controller to bind the share to
  * @return Returns a share, close and is sharing signal.
  */
-const createSocialShare = (
+export const createSocialShare = (
   options: Accessor<{
     network?: Network;
     url: string;
@@ -155,5 +163,3 @@ const createSocialShare = (
   };
   return [share, close, isSharing];
 };
-
-export default createSocialShare;

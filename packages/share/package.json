@@ -3,6 +3,9 @@
   "version": "1.0.3",
   "description": "Primitives to help with sharing content on social media and beyond.",
   "author": "David Di Biase <dave.dibiase@gmail.com",
+  "contributors": [
+    "Omer Ma<mapinxue@qq.com>"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/share",
   "repository": {
@@ -13,10 +16,17 @@
     "name": "share",
     "stage": 3,
     "list": [
-      "createSocialShare"
+      "createSocialShare",
+      "createWebShare"
     ],
     "category": "Utilities"
   },
+  "keywords": [
+    "template",
+    "primitives",
+    "web share",
+    "social share"
+  ],
   "files": [
     "dist"
   ],
@@ -36,10 +46,6 @@
       "require": "./dist/server.cjs"
     },
     "browser": {
-      "development": {
-        "import": "./dist/dev.js",
-        "require": "./dist/dev.cjs"
-      },
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
@@ -51,21 +57,16 @@
       "import": "./dist/server.js",
       "require": "./dist/server.cjs"
     },
-    "development": {
-      "import": "./dist/dev.js",
-      "require": "./dist/dev.cjs"
-    },
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "jiti ../../scripts/build.ts --ssr --dev",
-    "test": "vitest -c ../../configs/vitest.config.ts"
+    "dev": "vite serve dev",
+    "page": "vite build dev",
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
   },
-  "keywords": [
-    "template",
-    "primitives"
-  ],
   "peerDependencies": {
     "solid-js": "^1.6.0"
   }
