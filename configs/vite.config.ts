@@ -1,5 +1,5 @@
 import { defineConfig } from "vitest/config";
-import solidPlugin from "vite-plugin-solid";
+import solid from "vite-plugin-solid";
 import Unocss from "unocss/vite";
 
 export const viteConfig = defineConfig({
@@ -7,7 +7,7 @@ export const viteConfig = defineConfig({
     port: 3000
   },
   plugins: [
-    solidPlugin(),
+    solid(),
     Unocss({
       shortcuts: {
         "center-child": "flex justify-center items-center",
@@ -20,7 +20,20 @@ export const viteConfig = defineConfig({
         input: "bg-gray-800 rounded border border-gray-600 px-3 py-2 text-white",
         ball: "w-8 h-8 fixed -top-4 -left-4 opacity-50 rounded-full pointer-events-none"
       }
-    })
+    }),
+    {
+      name: "process.env variables",
+      transform(code, id) {
+        if (id.includes("node_modules")) {
+          return code;
+        }
+        return code
+          .replace(/process\.env\.SSR/g, '""')
+          .replace(/process\.env\.DEV/g, '"1"')
+          .replace(/process\.env\.PROD/g, '""')
+          .replace(/process\.env\.NODE_ENV/g, '"development"');
+      }
+    }
   ],
   optimizeDeps: {
     exclude: ["@solid-primitives/utils"]
@@ -28,6 +41,8 @@ export const viteConfig = defineConfig({
   build: {
     target: "esnext"
   },
+  // required to serve from a sub-path (github pages):
+  base: "./",
   define: {
     "process.env": {
       NODE_ENV: "development",
