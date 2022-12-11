@@ -30,14 +30,14 @@ pnpm add @solid-primitives/share
 ### How to use it
 
 ```ts
-import createSocialShare, { twitter } from "@solid-primitives/share";
+import { createSocialShare, TWITTER } from "@solid-primitives/share";
 
 const [share, close] = createSocialShare(() => ({
   title: "SolidJS.com",
   url: "https://www.solidjs.com",
   description: "Simple and well-behaved reactivity!"
 }));
-share(twitter);
+share(TWITTER);
 ```
 
 ### Definition
@@ -128,6 +128,8 @@ Generates a simple non-reactive WebShare primitive for sharing. Uses the [WebSha
 ### How to use it
 
 ```ts
+import { makeWebShare } from "@solid-primitives/share";
+
 const share = makeWebShare();
 
 try {
@@ -137,13 +139,15 @@ try {
 }
 ```
 
-## `createSocialShare`
+## `createWebShare`
 
 Creates a reactive status about web share. Uses the [WebShare API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API).
 
 ### How to use it
 
 ```ts
+import { createWebShare } from "@solid-primitives/share";
+
 const [data, setData] = createSignal<ShareData>({});
 const shareStatus = createWebShare(data);
 
