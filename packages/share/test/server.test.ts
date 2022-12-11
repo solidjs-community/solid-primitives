@@ -10,7 +10,7 @@ describe("createWebShare", () => {
 
       expect(status.status, "Server test starting status should be undefined.").toBe(undefined);
       expect(status.message, "Server test starting message should be undefined.").toBe(undefined);
-  
+
       dispose();
     });
   });
