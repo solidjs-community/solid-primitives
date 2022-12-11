@@ -1,4 +1,3 @@
-import createSocialShare from "./primitive";
-
 export * from "./networks";
-export default createSocialShare;
+export * from "./social-share";
+export * from "./web-share";
