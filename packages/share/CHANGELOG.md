@@ -1,5 +1,11 @@
 # @solid-primitives/share
 
+## 2.0.0
+
+### Major Changes
+
+- aa2fcb52: Add `makeWebShare` and `createWebShare` primitives. Rename network variables to UPPERCASE. Make `createSocialShare` a named export, instead of default.
+
 ## 1.0.3
 
 ### Patch Changes
