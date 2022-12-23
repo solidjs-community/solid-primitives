@@ -1,0 +1,39 @@
+{
+  "name": "site",
+  "scripts": {
+    "dev": "solid-start dev",
+    "build": "solid-start build",
+    "start": "solid-start start"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.8",
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.19",
+    "solid-start-node": "^0.2.0",
+    "tailwindcss": "^3.2.4",
+    "tailwindcss-dir": "^4.0.0",
+    "typescript": "^4.8.4",
+    "vite": "^3.1.8"
+  },
+  "dependencies": {
+    "@solid-primitives/intersection-observer": "^2.0.3",
+    "@solid-primitives/media": "^2.0.4",
+    "@solid-primitives/platform": "^0.0.102",
+    "@solidjs/meta": "^0.28.0",
+    "@solidjs/router": "^0.5.0",
+    "@tailwindcss/container-queries": "^0.1.0",
+    "fuse.js": "^6.6.2",
+    "solid-dismiss": "^1.4.1",
+    "solid-icons": "^1.0.4",
+    "solid-js": "^1.6.2",
+    "solid-jsx": "^0.9.1",
+    "solid-mdx": "^0.0.6",
+    "solid-start": "^0.2.0",
+    "solid-start-static": "^0.2.7",
+    "undici": "^5.11.0"
+  },
+  "engines": {
+    "node": ">=16.8"
+  }
+}

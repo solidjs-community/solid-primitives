@@ -1,0 +1,184 @@
+@import url("./hljs.css");
+
+@font-face {
+  font-family: "Gordita";
+  src: url("/fonts/Gordita/Gordita-Regular.eot?#iefix") format("embedded-opentype"),
+    url("/fonts/Gordita/Gordita-Regular.woff") format("woff"),
+    url("/fonts/Gordita/Gordita-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-display: fallback;
+}
+@font-face {
+  font-family: "Gordita";
+  src: url("/fonts/Gordita/Gordita-Thin.eot?#iefix") format("embedded-opentype"),
+    url("/fonts/Gordita/Gordita-Thin.woff") format("woff"),
+    url("/fonts/Gordita/Gordita-Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: fallback;
+}
+@font-face {
+  font-family: "Gordita";
+  src: url("/fonts/Gordita/Gordita-Medium.eot?#iefix") format("embedded-opentype"),
+    url("/fonts/Gordita/Gordita-Medium.woff") format("woff"),
+    url("/fonts/Gordita/Gordita-Medium.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: fallback;
+}
+@font-face {
+  font-family: "Gordita";
+  src: url("/fonts/Gordita/Gordita-Bold.eot?#iefix") format("embedded-opentype"),
+    url("/fonts/Gordita/Gordita-Bold.woff") format("woff"),
+    url("/fonts/Gordita/Gordita-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: fallback;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.anchor-tag {
+  color: #777777;
+  background-image: linear-gradient(#e7e7e7, #e7e7e7);
+  background-repeat: no-repeat;
+  background-size: 100% 2px;
+  background-position: 0 1.1em;
+  padding-bottom: 0.4em;
+  transition: background-size 300ms;
+}
+
+.anchor-tag:hover {
+  color: #2c4f7c;
+  background-image: linear-gradient(#2c4f7c, #2c4f7c);
+  background-size: 100% 4px;
+}
+
+html {
+  @apply font-display;
+}
+
+html body {
+  padding: 0;
+  margin: 0;
+}
+
+/* Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+h1,
+h2,
+h3 {
+  scroll-margin-top: 80px;
+}
+.defer {
+  content-visibility: auto;
+}
+.header-anchor {
+  margin-right: 0.25em;
+}
+pre {
+  min-width: 100%;
+  background: transparent;
+}
+.prose {
+  max-width: 68ch;
+}
+.prose pre {
+  font-size: inherit;
+  border: 1px solid #ddd;
+  border-radius: 7.5px;
+}
+.dark .prose pre {
+  border-color: #5d5d5d;
+}
+.prose h2 code {
+  color: #777 !important;
+}
+.dark .prose h2 code {
+  color: #aaa !important;
+}
+.prose blockquote {
+  @apply mx-0;
+}
+
+.prose a:not(.header-anchor) {
+  color: #777777;
+  background-image: linear-gradient(#e7e7e7, #e7e7e7);
+  background-repeat: no-repeat;
+  background-size: 100% 2px;
+  background-position: 0 1.1em;
+  padding-bottom: 0.4em;
+  transition: background-size 300ms;
+}
+.dark .prose a:not(.header-anchor) {
+  color: #ccc;
+  background-image: linear-gradient(#666, #666);
+}
+.dark .prose a:not(.header-anchor):hover {
+  color: #ddd;
+  background-image: linear-gradient(#888, #888);
+}
+
+.prose a:not(.header-anchor):hover {
+  color: #2c4f7c;
+  background-image: linear-gradient(#2c4f7c, #2c4f7c);
+  background-size: 100% 4px;
+}
+
+/* TODO: Recreate this class in TW classes */
+.feature-block {
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.35);
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-color: rgb(252, 253, 255);
+  border-radius: 3px;
+}
+.dark .feature-block {
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.35);
+  background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0) 20%);
+  background-color: rgb(54, 55, 56);
+  border-radius: 3px;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+/* .container-s {
+  container-type: inline-size;
+  container-name: foo-bar;
+}
+
+.graphic {
+  display: none;
+}
+
+@container foo-bar (min-width: 300px) {
+  .graphic {
+    display: block;
+  }
+} */
+
+/* :root {
+  --haha: #ff0000;
+}
+
+html.dark {
+  --haha: blue;
+} */
+
+html.dark body {
+  color: #000;
+}
