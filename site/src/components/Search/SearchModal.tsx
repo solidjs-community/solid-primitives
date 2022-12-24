@@ -1,5 +1,6 @@
 import Dismiss from "solid-dismiss";
-import { Accessor, Component, ParentComponent } from "solid-js";
+import { Accessor, Component, createEffect, on, ParentComponent } from "solid-js";
+import { useLocation } from "solid-start";
 import Search from "./Search";
 
 const SearchModal: Component<{
@@ -7,6 +8,19 @@ const SearchModal: Component<{
   open: Accessor<boolean>;
   setOpen: (value: boolean) => void;
 }> = ({ menuButton, open, setOpen }) => {
+  const location = useLocation();
+
+  createEffect(
+    on(
+      () => location.pathname,
+      (currentPathname, prevPathname) => {
+        if (prevPathname === currentPathname) return;
+        setOpen(false);
+      },
+      { defer: true }
+    )
+  );
+
   return (
     <Dismiss
       menuButton={menuButton}

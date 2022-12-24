@@ -1,3 +1,4 @@
+import { A, useLocation } from "@solidjs/router";
 import Fuse from "fuse.js";
 import { FiSearch } from "solid-icons/fi";
 import { createEffect, createSignal, For, on, Show } from "solid-js";
@@ -86,6 +87,7 @@ const Search = () => {
       { defer: true }
     )
   );
+
   return (
     <div class="p-2 flex justify-center items-center w-screen">
       <div class="p-2 w-full rounded-lg bg-white">
@@ -115,7 +117,7 @@ const Search = () => {
               return (
                 <li class="py-2">
                   <h4 class="font-semibold text-[#49494B]">
-                    <a href="#">{name}</a>
+                    <A href={`/${name}`}>{name}</A>
                   </h4>
                   <p class="text-[14px] my-[6px]">{description}</p>
                   <ul class="flex gap-2 flex-wrap">
@@ -123,12 +125,12 @@ const Search = () => {
                       {item => {
                         return (
                           <li class="">
-                            <a
-                              href="#"
+                            <A
+                              href={`/${name}#${item.toLocaleLowerCase()}`}
                               class="text-[14px] sm:text-base text-[#063983] hover:text-black font-semibold pt-1 px-2 pb-0 bg-[#d0e4ff87] rounded-md inline-block transition-colors"
                             >
                               {item}
-                            </a>
+                            </A>
                           </li>
                         );
                       }}

@@ -1,0 +1,10 @@
+[
+  {
+    "name": "media",
+    "tags": ["dark mode", "light mode", "dark theme", "light theme"]
+  },
+  {
+    "name": "platform",
+    "tags": ["useragent", "detect useragent", "sniff useragent"]
+  }
+]

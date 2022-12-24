@@ -17,9 +17,11 @@
     "vite": "^3.1.8"
   },
   "dependencies": {
+    "@solid-primitives/clipboard": "^1.4.5",
     "@solid-primitives/intersection-observer": "^2.0.3",
     "@solid-primitives/media": "^2.0.4",
     "@solid-primitives/platform": "^0.0.102",
+    "@solid-primitives/scheduled": "^1.2.0",
     "@solidjs/meta": "^0.28.0",
     "@solidjs/router": "^0.5.0",
     "@tailwindcss/container-queries": "^0.1.0",

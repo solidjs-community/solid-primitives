@@ -3,7 +3,8 @@ import { onMount, ParentComponent } from "solid-js";
 import { Title } from "solid-start";
 import Heading from "./Heading";
 import InfoBar from "./InfoBar";
-import "../../primitives-page-main.css";
+// import "../../primitives-page-main.css";
+import ON_CLIENT_DEV_MODE from "~/hooks/ON_CLIENT_DEV_MODE";
 
 const githubRepo = "https://github.com/solidjs-community/solid-primitives";
 
@@ -13,6 +14,12 @@ const PrimitivePageMain: ParentComponent<{
   stage: number;
 }> = props => {
   const githubRepoPrimitve = `${githubRepo}/tree/main/packages/${props.name}`;
+
+  // until issue is resolved https://github.com/solidjs/solid-start/issues/579
+  ON_CLIENT_DEV_MODE(() => {
+    document.documentElement.style.background = "#f2f8fa";
+    document.documentElement.style.backgroundImage = "linear-gradient(94deg, #f2f8fa, #f1f3fa)";
+  });
 
   return (
     <>

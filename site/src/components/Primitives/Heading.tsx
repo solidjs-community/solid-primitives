@@ -6,7 +6,6 @@ import solidBlocksHeading0Img from "~/assets/img/solid-blocks-heading-0.svg";
 import solidBlocksHeading1Img from "~/assets/img/solid-blocks-heading-1.svg";
 import solidBlocksHeading2Img from "~/assets/img/solid-blocks-heading-2.svg";
 import { ParentComponent } from "solid-js";
-import SolidBlocksHeaderClusterDefs from "../Icons/SolidBlocksHeaderClusterDefs";
 
 const Heading: ParentComponent = props => {
   return (
@@ -32,7 +31,6 @@ const Heading: ParentComponent = props => {
         {/* <img class="absolute top-[-144px] left-[-335px] z-1" src={solidBlocksHeading0Img} alt="" />
       <img class="absolute top-[-144px] left-[-335px] z-1" src={solidBlocksHeading1Img} alt="" />
       <img class="absolute top-[-144px] left-[-335px] z-1" src={solidBlocksHeading2Img} alt="" /> */}
-        <SolidBlocksHeaderClusterDefs />
         <svg
           class="absolute top-0 left-0"
           viewBox="0 0 88.975 79.46"

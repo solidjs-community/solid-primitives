@@ -1,15 +1,20 @@
-import { Component, Match, Switch } from "solid-js";
+import { Component, createSignal, Match, Switch } from "solid-js";
 import NpmLogo from "../Icons/NpmLogo";
 import NpmMonochrome from "../Icons/NpmMonochrome";
 import PnpmLogo from "../Icons/PnpmLogo";
 import PnpmMonochrome from "../Icons/PnpmMonochrome";
 import YarnLogo from "../Icons/YarnLogo";
 import YarnMonochrome from "../Icons/YarnMonochrome";
+import { makeClipboard } from "@solid-primitives/clipboard";
+import { debounce } from "@solid-primitives/scheduled";
 
 const CopyPackage: Component<{ type: "npm" | "yarn" | "pnpm"; packageName: string }> = ({
   type,
   packageName
 }) => {
+  const [write] = makeClipboard();
+  const [hasCopied, setHasCopied] = createSignal(false);
+
   const getAriaLabel = (managerName: string) => {
     return `Copy ${managerName} install script to clipboard`;
   };
@@ -35,13 +40,30 @@ const CopyPackage: Component<{ type: "npm" | "yarn" | "pnpm"; packageName: strin
     }
   };
 
+  const setHasCopiedDebounced = debounce(() => setHasCopied(false), 1500);
+
+  const copyToClipboard = async () => {
+    try {
+      await write(packageManagers[type].text);
+      setHasCopied(true);
+      setHasCopiedDebounced();
+    } catch (err) {}
+  };
+
+  const onCopyClick = () => {
+    copyToClipboard();
+  };
+
   return (
     <div class="relative flex items-center h-[40px] my-4">
       <button
         class="h-full group flex gap-2 items-center border border-[#99999a] rounded-l-lg font-semibold px-2 pl-3 text-[#555] hover:border-[#0030b1] transition-colors"
         aria-label={packageManagers[type].ariaLabel}
+        onClick={onCopyClick}
       >
-        <div class="group-hover:text-black transition-colors">Copy</div>
+        <div class="group-hover:text-black transition-colors">
+          {hasCopied() ? "Copied!" : "Copy"}
+        </div>
         <div class="relative h-full py-2">
           <div class="flex justify-center items-center h-full w-[40px] relative delay-[0] transition-opacity group-hover:opacity-0 group-hover:delay-100">
             {packageManagers[type].monochromeLogo()}

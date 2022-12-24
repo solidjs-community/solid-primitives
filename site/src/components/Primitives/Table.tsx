@@ -39,13 +39,14 @@ const Table: ParentComponent = props => {
   const rootMarginTop = tableHeaderHeight + pageHeaderHeight;
 
   const showActiveHeader = () => {
-    tableHeader.style.position = "fixed";
-    tableHeader.style.top = "54px";
-    tableHeader.style.left = "4px";
-    // 0px 16px 14px -10px #24405966
+    if (!state.tableSameWidthAsParent) {
+      tableHeader.style.position = "fixed";
+      tableHeader.style.top = "54px";
+      tableHeader.style.left = "4px";
+      tableHeader.style.transform = "translateY(4px)";
+    }
     tableHeader.style.boxShadow = "0px 16px 14px -10px #24405966";
     tableHeader.style.transition = "box-shadow 200ms";
-    tableHeader.style.transform = "translateY(4px)";
     pageHeader.style.borderBottom = "2px solid transparent";
     pageHeader.style.borderImage = "linear-gradient(to right,#E4F6F9,#D8DFF5) 1";
     // tableHeaderShadowEl.style.opacity = "1";
@@ -57,12 +58,15 @@ const Table: ParentComponent = props => {
     setHeaderActive(true);
   };
   const hideActiveHeader = () => {
-    const { scrollLeft } = tableContainerParent;
-    tableHeader.style.position = "absolute";
-    tableHeader.style.top = "0px";
-    tableHeader.style.left = "0px";
+    if (!state.tableSameWidthAsParent) {
+      const { scrollLeft } = tableContainerParent;
+
+      tableHeader.style.position = "absolute";
+      tableHeader.style.top = "0px";
+      tableHeader.style.left = "0px";
+      tableHeader.style.transform = `translate(${scrollLeft}px, 4px)`;
+    }
     tableHeader.style.boxShadow = "0px 16px 14px -10px #24405900";
-    tableHeader.style.transform = `translate(${scrollLeft}px, 4px)`;
     pageHeader.style.borderBottom = "";
     pageHeader.style.borderImage = "";
     // tableHeaderShadowEl.style.opacity = "0";
@@ -143,8 +147,13 @@ const Table: ParentComponent = props => {
     { rootMargin: `-${rootMarginTop}px 0px 0px 0px` }
   );
 
-  const tableSameWidthAsParent = () => {
-    return tableEl.clientWidth <= tableContainerParent.clientWidth;
+  const state = {
+    tableSameWidthAsParent: false
+  };
+  const checkTableSameWidthAsParent = () => {
+    const result = tableEl.clientWidth <= tableContainerParent.clientWidth;
+    state.tableSameWidthAsParent = result;
+    return result;
   };
 
   const setTableSizeSameAsParent = () => {
@@ -187,11 +196,10 @@ const Table: ParentComponent = props => {
   };
 
   onMount(() => {
+    // if (tableSameWidthAsParent()) return;
     tableContainerParent.addEventListener("scroll", onParentScrollX);
-    if (!tableSameWidthAsParent()) {
-      // setTimeout(() => {
+    if (!checkTableSameWidthAsParent()) {
       setTableSizeSameAsParent();
-      // }, 50);
     }
 
     const resizeObserver = new ResizeObserver(entries => {
@@ -199,7 +207,7 @@ const Table: ParentComponent = props => {
         if (entry.target === tableContainerParent) {
           // remove min-width values on tableBodyFirstRowCells
         }
-        if (!tableSameWidthAsParent()) {
+        if (!checkTableSameWidthAsParent()) {
           setTableSizeSameAsParent();
           // renderSmallerTable
         }

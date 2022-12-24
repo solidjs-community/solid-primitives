@@ -1,14 +1,14 @@
 import solidPrimitivesLogo from "~/assets/img/solid-primitives-logo.svg";
 import solidPrimitivesStackedLogo from "~/assets/img/solid-primitives-stacked-logo.svg";
-import HalfSun from "../Icons/HalfSun";
 import { FiMenu, FiSearch } from "solid-icons/fi";
 import { createSignal } from "solid-js";
 import SearchModal from "../Search/SearchModal";
-import { A } from "@solidjs/router";
+import ThemeBtn from "./ThemeBtn";
 
 const Header = () => {
-  let menuButton!: HTMLButtonElement;
   const [open, setOpen] = createSignal(false);
+  let menuButton!: HTMLButtonElement;
+
   return (
     <header
       class="fixed top-0 left-0 right-0 h-[60px] backdrop-blur-md bg-white/50 z-10"
@@ -36,12 +36,7 @@ const Header = () => {
               </button>
             </li>
             <li>
-              <button class="w-[45px] h-[45px] flex justify-center items-center text-[#306FC4] bg-[#F8F8FC] hover:text-[#063983] hover:bg-[#d0e4ff87] rounded-full transition-colors">
-                {/* <FiGithub size={20} /> */}
-                {/* <FaBrandsGithub /> */}
-                {/* < */}
-                <HalfSun />
-              </button>
+              <ThemeBtn />
             </li>
             <li>
               <button class="w-[45px] h-[45px] flex justify-center items-center text-[#306FC4] hover:text-[#063983] mr-[-10px]">

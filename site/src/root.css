@@ -182,3 +182,7 @@ html.dark {
 html.dark body {
   color: #000;
 }
+
+html {
+  background: #fff;
+}

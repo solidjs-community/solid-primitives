@@ -14,10 +14,11 @@ import {
 } from "solid-start";
 import Header from "./components/Header/Header";
 import "./root.css";
+import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderClusterDefs";
 
 export default function Root() {
   return (
-    <Html lang="en">
+    <Html lang="en" data-html>
       <Head>
         <Title>Solid Primitives</Title>
         <Meta charset="utf-8" />
@@ -36,6 +37,7 @@ export default function Root() {
         <Suspense>
           <ErrorBoundary>
             <Header />
+            <SolidBlocksHeaderClusterDefs />
             <Routes>
               <FileRoutes />
             </Routes>
