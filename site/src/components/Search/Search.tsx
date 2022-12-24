@@ -89,7 +89,7 @@ const Search = () => {
   );
 
   return (
-    <div class="p-2 flex justify-center items-center w-screen">
+    <div class="p-2 flex justify-center items-center w-screen max-w-[800px]">
       <div class="p-2 w-full rounded-lg bg-white">
         <div
           class="flex w-full w-max-[350px] font-sans px-2 py-2 items-center bg-white border-[#d0e4ff87] border-2 rounded-md text-[#306FC4] hover:text-[#063983] focus-within:text-[#063983] focus-within:outline-dashed"

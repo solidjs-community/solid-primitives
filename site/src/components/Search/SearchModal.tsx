@@ -1,5 +1,6 @@
+import { createShortcut } from "@solid-primitives/keyboard";
 import Dismiss from "solid-dismiss";
-import { Accessor, Component, createEffect, on, ParentComponent } from "solid-js";
+import { Accessor, Component, createEffect, on } from "solid-js";
 import { useLocation } from "solid-start";
 import Search from "./Search";
 
@@ -9,6 +10,16 @@ const SearchModal: Component<{
   setOpen: (value: boolean) => void;
 }> = ({ menuButton, open, setOpen }) => {
   const location = useLocation();
+
+  // TODO: ONLY WORKS ONCE?? (sometimes it works again)
+  // but is same code as https://github.com/solidjs-community/solid-primitives/blob/main/packages/keyboard/dev/index.tsx#L37 and that works
+  // seems like interacting with tabbable items silences the event or something
+  createShortcut(["Meta", "K"], () => {
+    setOpen(true);
+  });
+  createShortcut(["Control", "K"], () => {
+    setOpen(true);
+  });
 
   createEffect(
     on(

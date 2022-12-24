@@ -65,7 +65,7 @@ const Heading: ParentComponent = props => {
           xml:space="preserve"
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xmlns="http://www.w3.org/2000/svg"
-          style="z-index: 18; left: -239px; width: 247px; top: -120px; pointer-events: none;"
+          style="z-index: 5; left: -239px; width: 247px; top: -120px; pointer-events: none;"
         >
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-30 -26)" />
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-45 -17)" />

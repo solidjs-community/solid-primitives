@@ -1,18 +1,54 @@
 import solidPrimitivesLogo from "~/assets/img/solid-primitives-logo.svg";
 import solidPrimitivesStackedLogo from "~/assets/img/solid-primitives-stacked-logo.svg";
 import { FiMenu, FiSearch } from "solid-icons/fi";
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import SearchModal from "../Search/SearchModal";
 import ThemeBtn from "./ThemeBtn";
+import SearchBtn from "../Search/SearchBtn";
 
 const Header = () => {
   const [open, setOpen] = createSignal(false);
   let menuButton!: HTMLButtonElement;
+  let headerEl!: HTMLDivElement;
+
+  const showActiveHeader = () => {
+    headerEl.classList.add("bg-white/50");
+    headerEl.classList.remove("bg-white/0");
+    headerEl.classList.add("backdrop-blur-md");
+    headerEl.classList.remove("backdrop-blur-none");
+  };
+
+  const hideActiveHeader = () => {
+    headerEl.classList.remove("bg-white/50");
+    headerEl.classList.add("bg-white/0");
+    headerEl.classList.remove("backdrop-blur-md");
+    headerEl.classList.add("backdrop-blur-none");
+  };
+
+  onMount(() => {
+    if (window.scrollY > 30) {
+      showActiveHeader();
+    } else {
+      hideActiveHeader();
+    }
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (window.scrollY > 30) {
+          showActiveHeader();
+        } else {
+          hideActiveHeader();
+        }
+      },
+      { passive: true }
+    );
+  });
 
   return (
     <header
-      class="fixed top-0 left-0 right-0 h-[60px] backdrop-blur-md bg-white/50 z-10"
-      style="z-index: 10"
+      class="fixed top-0 left-0 right-0 h-[60px] bg-white/0 z-10 transition-[background-color,backdrop-filter]"
+      ref={headerEl}
     >
       <div class="max-w-[900px] mx-auto w-full h-full flex px-4 sm:px-8 items-center justify-between">
         {/* <A href="/"> */}
@@ -24,16 +60,7 @@ const Header = () => {
         <nav>
           <ul class="flex items-center gap-3">
             <li>
-              <button
-                class="flex sm:w-[250px] lg:w-[350px] font-sans px-2 py-2 items-center bg-white border-[#d0e4ff87] border-2 rounded-md text-[#306FC4] hover:text-[#063983] hover:bg-[#d0e4ff87]"
-                ref={menuButton}
-              >
-                <div class="mr-2">
-                  <FiSearch />
-                </div>
-                <div class="hidden sm:block">Quick Search ...</div>
-                <div class="ml-auto">⌘K</div>
-              </button>
+              <SearchBtn ref={menuButton} />
             </li>
             <li>
               <ThemeBtn />

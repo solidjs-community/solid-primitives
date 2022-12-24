@@ -28,11 +28,87 @@ export default function Home() {
               <div>consistent and managed testing + maintenance</div>
             </li>
           </ul>
-          <img
+          <svg
+            class="absolute top-[20%] -left-4 -right-4 -z-1 opacity-60 pointer-events-none mask-image-[linear-gradient(to_bottom,transparent,#000_20%)]"
+            viewBox="0 0 188.975 179.46"
+            // @ts-ignore
+            xml:space="preserve"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g style="transform: scale(1.26) translate(-27px, 12px); transform-origin: center;">
+              <use
+                // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(75 -27)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(115 -2)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(64 19)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(113 12)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(98 19)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(16 -21)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(1 3)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(17 12)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(62 -18)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(49 -7.5)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(34 1)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(78 -8)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(64 1)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(49 9.5)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(93.3 0.5)"
+              />
+              <use // @ts-ignore
+                xlink:href="#solid-blocks-header-cluster-e"
+                transform="translate(79 9.5)"
+              />
+            </g>
+          </svg>
+          {/* <img
             class="absolute top-[20%] left-0 right-0 bottom-0 -z-1 opacity-70 object-cover"
             src={solidSquaresImg}
             alt=""
-          />
+          /> */}
         </div>
       </div>
       <PrimitivesTable />
