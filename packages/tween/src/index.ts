@@ -15,7 +15,7 @@ import { createSignal, createEffect, onCleanup, on } from "solid-js";
 export default function createTween<T extends number>(
   target: () => T,
   { ease = (t: T) => t, duration = 100 }
-) {
+): (() => T) | (() => void) {
   if (process.env.SSR) {
     return () => {
       /*noop*/
