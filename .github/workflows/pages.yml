@@ -27,7 +27,7 @@ jobs:
         run: pnpm run pages
 
       - name: deploy pages
-        uses: JamesIves/github-pages-deploy-action@4.4.1
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: pages # The folder the action should deploy.
