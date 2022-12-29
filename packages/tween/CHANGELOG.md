@@ -1,5 +1,11 @@
 # @solid-primitives/tween
 
+## 1.2.3
+
+### Patch Changes
+
+- 45c29876: fix: specify createTween return type
+
 ## 1.2.2
 
 ### Patch Changes
