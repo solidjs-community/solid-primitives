@@ -53,9 +53,7 @@ const VersionBadge: ParentComponent<{ value: string; href: string }> = ({ value,
 
   return (
     <a
-      class={
-        "h-[28px] min-w-[90px] uppercase flex justify-center items-center font-sans rounded-md border-[#cae0ff] bg-[#cae0ff40] border-2 "
-      }
+      class="h-[28px] min-w-[90px] uppercase flex justify-center items-center font-sans rounded-md border-[#cae0ff] bg-[#cae0ff40] border-2 dark:bg-[#6eaaff14] dark:border-[#5577a7]"
       href={href}
       target="_blank"
     >
@@ -76,7 +74,7 @@ export const VersionBadgePill: ParentComponent<{ value: string; href: string }> 
       href={href}
       target="_blank"
     >
-      <div class="flex items-center rounded-l-lg h-[38px] border-[#cae0ff] px-4 border-[3px] bg-[#cae0ff40] dark:border-[#405b6e] dark:bg-[#284051]">
+      <div class="flex items-center rounded-l-lg h-[38px] border-[#cae0ff] px-4 border-[3px] bg-[#cae0ff40] dark:border-[#405b6e] dark:bg-[#2a4355]">
         NPM
       </div>
       <div class="h-full flex justify-center items-center min-w-[90px] rounded-r-lg border-l-0 border-transparent border-[3px] font-semibold background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#cae0ff,#c0c8ff)_border-box] dark:background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#405b6e,#46659a)_border-box]">

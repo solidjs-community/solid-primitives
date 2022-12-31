@@ -32,6 +32,11 @@ const SearchModal: Component<{
     )
   );
 
+  let timeout: number | null = null;
+  const onFocusOut = () => {
+    setOpen(false);
+  };
+
   return (
     <Dismiss
       menuButton={menuButton}
@@ -52,7 +57,15 @@ const SearchModal: Component<{
           role="dialog"
           aria-modal="true"
           tabindex="-1"
-          // ref={modalEl}
+          // this is a bug, I need to fix dismiss
+          // main page header has higher zindex than overlay element and when clicking on it, it doesn't close modal
+          // here's workaround
+          onFocusOut={() => {
+            timeout = window.setTimeout(onFocusOut);
+          }}
+          onFocusIn={() => {
+            window.clearTimeout(timeout!);
+          }}
         >
           <Search />
         </div>

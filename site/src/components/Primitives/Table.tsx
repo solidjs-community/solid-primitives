@@ -232,17 +232,16 @@ const Table: ParentComponent = props => {
   return (
     <div class="max-w-[900px] mx-auto isolate">
       <div class="w-full relative">
-        <div class="absolute top-0 left-0 w-full h-full border-[#E4F6F9] border-[7px] rounded-[30px] pointer-events-none z-10 dark:border-[#456884]" />
+        <div class="absolute top-0 left-0 w-full h-full border-[#E4F6F9] border-[7px] rounded-[30px] pointer-events-none z-10 dark:border-[#2b455a]" />
         <div
-          class="absolute top-0 left-0 w-full h-full border-[#D8DFF5] border-[7px] rounded-[30px] pointer-events-none z-10 dark:border-[#3a5d89]"
+          class="absolute top-0 left-0 w-full h-full border-[#D8DFF5] border-[7px] rounded-[30px] pointer-events-none z-10 dark:border-[#2c4668]"
           style="-webkit-mask-image: linear-gradient(to right, transparent 0px, rgb(0, 0, 0)); mask-image: linear-gradient(to right, transparent 0px, rgb(0, 0, 0))"
         />
         <div
           id="table-horizontal-scroll-shadow"
-          class="absolute top-[7px] bottom-0 left-[120.8px] w-[15px] z-10 opacity-0 transition-opacity"
-          style="background-image: linear-gradient(to right, #24405966, #24405900)"
+          class="absolute top-[7px] bottom-0 left-[120.8px] w-[15px] z-10 opacity-0 transition-opacity bg-[linear-gradient(to_right,#24405966,#24405900)] dark:bg-[linear-gradient(to_right,#05121dbf,#05121d00)]"
         />
-        <div class="w-full rounded-[30px] overflow-x-clip p-1 pt-[2px] bg-[linear-gradient(45deg,#D8DFF5,#E4F6F9)] dark:bg-[linear-gradient(45deg,#3a5d89,#456884)]">
+        <div class="w-full rounded-[30px] overflow-x-clip p-1 pt-[2px] bg-[linear-gradient(45deg,#D8DFF5,#E4F6F9)] dark:bg-[linear-gradient(45deg,#2c4668,#2b455a)]">
           <table
             class="w-full relative mt-[-2px] overflow-clip"
             style="border-collapse: separate; border-spacing: 2px 2px;"

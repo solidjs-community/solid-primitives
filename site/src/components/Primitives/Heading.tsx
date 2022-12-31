@@ -2,7 +2,7 @@ import { ParentComponent } from "solid-js";
 
 const Heading: ParentComponent = props => {
   return (
-    <div class="text-2xl sm:text-4xl font-bold capitalize">
+    <div class="text-3xl sm:text-4xl font-bold capitalize">
       <div class="@container/heading relative container-s mb-[-60px]">
         <div class="invisible">{props.children}</div>
         <svg
@@ -16,6 +16,20 @@ const Heading: ParentComponent = props => {
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-30 -26)" />
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-45 -17)" />
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-16 -16.5)" />
+        </svg>
+        <svg
+          class="absolute sm:hidden"
+          viewBox="0 0 88.975 79.46"
+          xml:space="preserve"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://www.w3.org/2000/svg"
+          style="z-index: 1; right: -157px; width: 247px; pointer-events: none; bottom: -92px;"
+        >
+          <use
+            opacity="0.8"
+            xlink:href="#solid-blocks-header-cluster-e"
+            transform="translate(-16 -16.5)"
+          />
         </svg>
       </div>
       <div class="relative">
@@ -46,6 +60,31 @@ const Heading: ParentComponent = props => {
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(13 -13.3)" />
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-1.5 -4.3)" />
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-16.2 4.7)" />
+        </svg>
+        <svg
+          class="absolute top-0 left-0"
+          viewBox="0 0 88.975 79.46"
+          xml:space="preserve"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://www.w3.org/2000/svg"
+          style="z-index: 0; left: -97px; width: 247px; top: -65px; pointer-events: none;"
+        >
+          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-1.5 -4.3)" />
+          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-16.2 4.7)" />
+        </svg>
+        <svg
+          class="absolute top-0 left-0"
+          viewBox="0 0 88.975 79.46"
+          xml:space="preserve"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://www.w3.org/2000/svg"
+          style="z-index: 0; left: -174px; width: 247px; top: -88px; pointer-events: none;"
+        >
+          <use
+            opacity="0.6"
+            xlink:href="#solid-blocks-header-cluster-e"
+            transform="translate(13 -13.3)"
+          />
         </svg>
         <svg
           class="absolute top-0 left-0"
@@ -127,8 +166,8 @@ const Heading: ParentComponent = props => {
           </g>
         </svg>
         <div class="absolute top-[10px] left-[8px] right-[8px]">
-          <div class="relative top-[3px] w-full h-[43.63px] bg-[linear-gradient(to_right,#f5f7ff,#f5f7ff)] dark:bg-[linear-gradient(to_right,#41586a,#41586b)]" />
-          <div class="w-full h-[11px] bg-[linear-gradient(to_right,#dbe0f2,#d7ddf2)] dark:bg-[linear-gradient(to_right,#364d5e,#364e5f)] box-shadow-[0px_6px_17px_0px_#c4d3f4] dark:box-shadow-[0px_6px_17px_0px_#394d61]" />
+          <div class="relative top-[3px] w-full h-[43.63px] bg-[linear-gradient(to_right,#f5f7ff,#f5f7ff)] dark:bg-[linear-gradient(to_right,#2a3d4b,#2b3c4b)]" />
+          <div class="w-full h-[11px] bg-[linear-gradient(to_right,#dbe0f2,#d7ddf2)] dark:bg-[linear-gradient(to_right,#263544,#263442)] box-shadow-[0px_6px_17px_0px_#c4d3f4] dark:box-shadow-[0px_6px_17px_0px_#202d3b]" />
         </div>
         <h1 class="absolute bottom-[-40px] left-0 z-1">{props.children}</h1>
         <div class="relative z-1">

@@ -12,7 +12,9 @@ module.exports = {
       screens: {
         "pointer-fine": {
           raw: "(pointer: fine)"
-        }
+        },
+        xxs: { raw: "(min-width: 400px)" },
+        xs: { raw: "(min-width: 520px)" }
       },
       colors: {
         "page-main-bg": "var(--page-main-bg)"

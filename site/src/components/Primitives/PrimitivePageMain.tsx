@@ -41,22 +41,37 @@ const PrimitivePageMain: ParentComponent<{
     <>
       <Title>{props.name}</Title>
       <div class="absolute top-0 left-0 right-0 h-[95vh] bg-[linear-gradient(to_bottom,#fff_400px,transparent)] dark:bg-[linear-gradient(to_bottom,#293843_400px,transparent)] -z-1" />
-      <main class="pt-[100px] mb-6 max-w-[900px] mx-auto">
+      <main class="pt-[100px] mb-6 max-w-[900px] mx-auto overflow-x-hidden md:overflow-visible">
         <div class="p-3 sm:p-8 rounded-3xl bg-page-main-bg">
-          <div class="flex justify-between gap-[100px] items-center text-[#232324] dark:text-white mb-[90px]">
+          <div class="flex justify-between gap-[30px] sm:gap-[100px] items-center text-[#232324] dark:text-white mb-[90px]">
             {/* <Heading>
               Has This Type Pattern Tried To Sneak In Some Generic Or Parameterized Type Pattern
               Matching Stuff Anywhere Visitor .java
             </Heading> */}
 
             <Heading>{props.name.replace("-", " ")}</Heading>
-            <div>
+            <div class="relative top-[6px]">
+              <svg
+                class="absolute sm:hidden"
+                viewBox="0 0 88.975 79.46"
+                xml:space="preserve"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns="http://www.w3.org/2000/svg"
+                style="top: 13px; left: -30px; width: 247px; pointer-events: none;"
+              >
+                <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-44 -38)" />
+                <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-44 -38)" />
+                <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-29 -29)" />
+              </svg>
               <a
-                class="inline-block scale-90 sm:scale-100"
+                class="relative inline-block scale-90 sm:scale-100 hover:opacity-70 transition-opacity"
                 href={githubRepoPrimitve}
                 target="_blank"
               >
                 <FaBrandsGithub size={28} />
+                <div class="sm:hidden absolute top-[32px] left-0 -scale-y-100 mask-image-[linear-gradient(to_bottom,transparent_12px,#000)] opacity-20 blur-[2px]">
+                  <FaBrandsGithub size={28} />
+                </div>
               </a>
             </div>
           </div>

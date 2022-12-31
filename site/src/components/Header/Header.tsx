@@ -1,6 +1,7 @@
 import solidPrimitivesLogo from "~/assets/img/solid-primitives-logo.svg";
 import solidPrimitivesDarkLogo from "~/assets/img/solid-primitives-dark-logo.svg";
 import solidPrimitivesStackedLogo from "~/assets/img/solid-primitives-stacked-logo.svg";
+import solidPrimitivesStackedDarkLogo from "~/assets/img/solid-primitives-stacked-dark-logo.svg";
 import { FiMenu, FiSearch } from "solid-icons/fi";
 import { createSignal, onMount } from "solid-js";
 import SearchModal from "../Search/SearchModal";
@@ -51,7 +52,7 @@ const Header = () => {
       class="fixed top-0 left-0 right-0 h-[60px] bg-white/0 dark:bg-[#293843]/0 z-10 transition-[background-color,backdrop-filter]"
       ref={headerEl}
     >
-      <div class="max-w-[900px] mx-auto w-full h-full flex px-4 sm:px-8 items-center justify-between">
+      <div class="max-w-[900px] mx-auto w-full h-full flex px-4 sm:px-8 items-center justify-between gap-2">
         {/* <A href="/"> */}
         <a href="/">
           <img
@@ -64,7 +65,16 @@ const Header = () => {
             src={solidPrimitivesDarkLogo}
             alt=""
           />
-          <img class="sm:hidden h-[28px] sm:h-[40px]" src={solidPrimitivesStackedLogo} alt="" />
+          <img
+            class="dark:hidden sm:hidden h-[28px] sm:h-[40px]"
+            src={solidPrimitivesStackedLogo}
+            alt=""
+          />
+          <img
+            class="hidden dark:block sm:!hidden h-[28px] sm:h-[40px]"
+            src={solidPrimitivesStackedDarkLogo}
+            alt=""
+          />
         </a>
         {/* </A> */}
         <nav>

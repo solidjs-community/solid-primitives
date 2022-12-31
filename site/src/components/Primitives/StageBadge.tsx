@@ -97,7 +97,7 @@ export const StageBadgePill: ParentComponent<{ value: number | string }> = ({ va
   return (
     <>
       <button class="flex font-sans hover:contrast-[1.2] transition-filter" ref={menuButton}>
-        <div class="flex items-center rounded-l-lg h-[38px] border-[#cae0ff] px-4 border-[3px] bg-[#cae0ff40] dark:border-[#405b6e] dark:bg-[#284051]">
+        <div class="flex items-center rounded-l-lg h-[38px] border-[#cae0ff] px-4 border-[3px] bg-[#cae0ff40] dark:border-[#405b6e] dark:bg-[#2a4355]">
           Stage
         </div>
         <div
