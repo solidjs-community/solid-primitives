@@ -19,7 +19,7 @@ const THead: ParentComponent = props => {
       </tr>
       <tr
         id="header-real-tr"
-        class="[&>th:first-child]:sticky [&>th:first-child]:left-[2px] [&>th:first-child]:rounded-tl-[26px] [&>th:last-child]:rounded-tr-[26px] text-[#49494B]"
+        class="[&>th:first-child]:sticky [&>th:first-child]:left-[2px] [&>th:first-child]:rounded-tl-[26px] [&>th:last-child]:rounded-tr-[26px] text-[#49494B] dark:text-[#dee2e5]"
       >
         {props.children}
       </tr>

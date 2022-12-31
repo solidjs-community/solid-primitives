@@ -14,18 +14,13 @@ module.exports = {
           raw: "(pointer: fine)"
         }
       },
+      colors: {
+        "page-main-bg": "var(--page-main-bg)"
+      },
       boxShadow: {
-        "solid-4x_4y_0s": "4px 4px 0px 0px rgb(0, 0, 0)",
-        "solid-0x_0y_4s": "0px 0px 0px 4px rgb(0, 0, 0)",
-        "0x_7y_18b": "0px 7px 18px 0px rgb(0, 0, 0)",
-        "0x_0y_4b_#999ba88c": "0px 3px 4px rgba(153, 155, 168, 0.55)",
-        "0x_4y_4b_#0000000d": "0px 4px 4px rgba(0, 0, 0, 0.05)",
         ring: "0px 0px 4px 4px rgb(0, 0, 0)",
         "ring-white": "0px 0px 0px 2.7px #fff",
         "ring-black": "0px 0px 0px 2.7px #000"
-      },
-      dropShadow: {
-        "lg-dark": "0 5px 6px rgb(0 0 0 / 0.4)"
       },
       fontFamily: {
         display: ["Gordita", ...defaultTheme.fontFamily.sans],
@@ -187,6 +182,16 @@ module.exports = {
         }
       }
     ),
+    plugin(function ({ matchUtilities, theme }) {
+      matchUtilities(
+        {
+          background: value => ({
+            background: value
+          })
+        },
+        { values: theme("background") }
+      );
+    }),
     plugin(function ({ addVariant, e, postcss }) {
       addVariant("has-backdrop-filter", ({ container, separator }) => {
         const isRule = postcss.atRule({

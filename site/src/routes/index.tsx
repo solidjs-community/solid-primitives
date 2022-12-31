@@ -14,17 +14,17 @@ export default function Home() {
         <div class="relative mt-4 mb-10 text-[14px] sm:text-base md:text-lg">
           <ul class="flex gap-4">
             <li>
-              <div class="text-[#30889c] font-semibold">Small</div>
+              <div class="text-[#30889c] dark:text-[#44bfdb] font-semibold">Small</div>
               <div>
                 aggregate <span class="whitespace-nowrap">tree-shaking</span> benefits
               </div>
             </li>
             <li>
-              <div class="text-[#3769a5] font-semibold">Isomorphic</div>
+              <div class="text-[#3769a5] dark:text-[#5aa5ff] font-semibold">Isomorphic</div>
               <div>client and server side functionality</div>
             </li>
             <li>
-              <div class="text-[#3c5098] font-semibold">Stable</div>
+              <div class="text-[#3c5098] dark:text-[#6586ff] font-semibold">Stable</div>
               <div>consistent and managed testing + maintenance</div>
             </li>
           </ul>

@@ -57,11 +57,11 @@ const CopyPackage: Component<{ type: "npm" | "yarn" | "pnpm"; packageName: strin
   return (
     <div class="relative flex items-center h-[40px] my-4">
       <button
-        class="h-full group flex gap-2 items-center border border-[#99999a] rounded-l-lg font-semibold px-2 pl-3 text-[#555] hover:border-[#0030b1] transition-colors"
+        class="h-full group flex gap-2 items-center border border-[#99999a] rounded-l-lg font-semibold px-2 pl-3 text-[#555] dark:text-[#ccc] hover:border-[#0030b1] dark:hover:border-[#b1bfe4] transition-colors"
         aria-label={packageManagers[type].ariaLabel}
         onClick={onCopyClick}
       >
-        <div class="group-hover:text-black transition-colors">
+        <div class="group-hover:text-black dark:group-hover:text-white transition-colors">
           {hasCopied() ? "Copied!" : "Copy"}
         </div>
         <div class="relative h-full py-2">
@@ -73,7 +73,7 @@ const CopyPackage: Component<{ type: "npm" | "yarn" | "pnpm"; packageName: strin
           </div>
         </div>
 
-        <div class="absolute top-0 left-0 bottom-0 right-0 rounded-lg pointer-events-none border border-transparent group-hover:border-[#0030b1] group-hover:box-shadow-[0_5px_0_0_#c5d4e4] transition-[border-color_box-shadow]" />
+        <div class="absolute top-0 left-0 bottom-0 right-0 rounded-lg pointer-events-none border border-transparent group-hover:border-[#0030b1] dark:group-hover:border-[#b1bfe4] group-hover:box-shadow-[0_5px_0_0_#c5d4e4] dark:group-hover:box-shadow-[0_5px_0_0_#3f5d73] transition-[border-color_box-shadow]" />
       </button>
       <div class="flex-grow h-full border border-[#99999a] border-l-0 rounded-r-lg flex items-center px-2 pr-3 text-[13px] xs:text-sm sm:text-base whitespace-nowrap overflow-auto">
         {packageManagers[type].text}

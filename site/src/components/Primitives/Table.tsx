@@ -45,10 +45,10 @@ const Table: ParentComponent = props => {
       tableHeader.style.left = "4px";
       tableHeader.style.transform = "translateY(4px)";
     }
-    tableHeader.style.boxShadow = "0px 16px 14px -10px #24405966";
+    tableHeader.style.boxShadow = "var(--table-header-box-shadow)";
     tableHeader.style.transition = "box-shadow 200ms";
     pageHeader.style.borderBottom = "2px solid transparent";
-    pageHeader.style.borderImage = "linear-gradient(to right,#E4F6F9,#D8DFF5) 1";
+    pageHeader.style.borderImage = "var(--header-border-bottom)";
     // tableHeaderShadowEl.style.opacity = "1";
     tableHeaderFirstLastSiblings.forEach(item => {
       item.style.borderRadius = "0";
@@ -66,7 +66,7 @@ const Table: ParentComponent = props => {
       tableHeader.style.left = "0px";
       tableHeader.style.transform = `translate(${scrollLeft}px, 4px)`;
     }
-    tableHeader.style.boxShadow = "0px 16px 14px -10px #24405900";
+    tableHeader.style.boxShadow = "var(--table-header-box-shadow-hide)";
     pageHeader.style.borderBottom = "";
     pageHeader.style.borderImage = "";
     // tableHeaderShadowEl.style.opacity = "0";
@@ -232,9 +232,9 @@ const Table: ParentComponent = props => {
   return (
     <div class="max-w-[900px] mx-auto isolate">
       <div class="w-full relative">
-        <div class="absolute top-0 left-0 w-full h-full border-[#E4F6F9] border-[7px] rounded-[30px] pointer-events-none z-10" />
+        <div class="absolute top-0 left-0 w-full h-full border-[#E4F6F9] border-[7px] rounded-[30px] pointer-events-none z-10 dark:border-[#456884]" />
         <div
-          class="absolute top-0 left-0 w-full h-full border-[#D8DFF5] border-[7px] rounded-[30px] pointer-events-none z-10"
+          class="absolute top-0 left-0 w-full h-full border-[#D8DFF5] border-[7px] rounded-[30px] pointer-events-none z-10 dark:border-[#3a5d89]"
           style="-webkit-mask-image: linear-gradient(to right, transparent 0px, rgb(0, 0, 0)); mask-image: linear-gradient(to right, transparent 0px, rgb(0, 0, 0))"
         />
         <div
@@ -242,10 +242,7 @@ const Table: ParentComponent = props => {
           class="absolute top-[7px] bottom-0 left-[120.8px] w-[15px] z-10 opacity-0 transition-opacity"
           style="background-image: linear-gradient(to right, #24405966, #24405900)"
         />
-        <div
-          class="w-full rounded-[30px] overflow-x-clip p-1 pt-[2px]"
-          style="background: linear-gradient(45deg,#D8DFF5, #E4F6F9)"
-        >
+        <div class="w-full rounded-[30px] overflow-x-clip p-1 pt-[2px] bg-[linear-gradient(45deg,#D8DFF5,#E4F6F9)] dark:bg-[linear-gradient(45deg,#3a5d89,#456884)]">
           <table
             class="w-full relative mt-[-2px] overflow-clip"
             style="border-collapse: separate; border-spacing: 2px 2px;"

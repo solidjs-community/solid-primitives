@@ -33,7 +33,7 @@ export default function Root() {
         `}
         ></script>
       </Head>
-      <Body>
+      <Body class="dark:text-[#F1F0F2]">
         <Suspense>
           <ErrorBoundary>
             <Header />

@@ -9,21 +9,28 @@ const SolidBlocksHeaderClusterDefs = () => {
     >
       <defs>
         <linearGradient id="solid-blocks-header-cluster-a">
-          <stop offset="0" stop-color="#dbeffb" />
-          {/* <stop offset="0" stop-color="var(--haha)" /> */}
-          <stop offset="1" stop-color="#becbef" />
+          <stop offset="0" stop-color="var(--solid-blocks-header-cluster__shadow-left)" />
+          <stop offset="1" stop-color="var(--solid-blocks-header-cluster__shadow-right)" />
         </linearGradient>
         <linearGradient id="solid-blocks-header-cluster-c">
-          <stop offset="0" stop-color="#edeff7" />
-          <stop offset="1" stop-color="#c8d0eb" />
+          <stop offset="0" stop-color="var(--solid-blocks-header-cluster__block-body-left)" />
+          <stop offset="1" stop-color="var(--solid-blocks-header-cluster__block-body-right)" />
         </linearGradient>
         <linearGradient id="solid-blocks-header-cluster-b">
-          <stop offset="0" stop-color="#dbeffb" stop-opacity=".736" />
-          <stop offset="1" stop-color="#becbef" stop-opacity=".725" />
+          <stop
+            offset="0"
+            stop-color="var(--solid-blocks-header-cluster__small-shadow-left)"
+            stop-opacity=".736"
+          />
+          <stop
+            offset="1"
+            stop-color="var(--solid-blocks-header-cluster__small-shadow-right)"
+            stop-opacity=".725"
+          />
         </linearGradient>
         <linearGradient id="solid-blocks-header-cluster-d">
-          <stop offset="0" stop-color="#fbfcff" />
-          <stop offset="1" stop-color="#eef2fd" />
+          <stop offset="0" stop-color="var(--solid-blocks-header-cluster__block-top-left)" />
+          <stop offset="1" stop-color="var(--solid-blocks-header-cluster__block-top-right)" />
         </linearGradient>
         <linearGradient
           // @ts-ignore

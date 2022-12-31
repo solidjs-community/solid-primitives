@@ -1,19 +1,10 @@
-import solidBlocksHeadingLeftBlockImg from "~/assets/img/solid-blocks-heading-left-block.svg";
-import solidBlocksHeadingRightBlockImg from "~/assets/img/solid-blocks-heading-right-block.svg";
-// import solidBlocksHeadingMidBlockImg from "~/assets/img/solid-blocks-heading-mid-block.svg";
-// import solidBlocksHeadingMidBlockShadowImg from "~/assets/img/solid-blocks-heading-mid-block-shadow.svg";
-import solidBlocksHeading0Img from "~/assets/img/solid-blocks-heading-0.svg";
-import solidBlocksHeading1Img from "~/assets/img/solid-blocks-heading-1.svg";
-import solidBlocksHeading2Img from "~/assets/img/solid-blocks-heading-2.svg";
 import { ParentComponent } from "solid-js";
 
 const Heading: ParentComponent = props => {
   return (
     <div class="text-2xl sm:text-4xl font-bold capitalize">
       <div class="@container/heading relative container-s mb-[-60px]">
-        {/* {props.children} */}
         <div class="invisible">{props.children}</div>
-
         <svg
           class="absolute hidden @[290px]/heading:block"
           viewBox="0 0 88.975 79.46"
@@ -28,9 +19,6 @@ const Heading: ParentComponent = props => {
         </svg>
       </div>
       <div class="relative">
-        {/* <img class="absolute top-[-144px] left-[-335px] z-1" src={solidBlocksHeading0Img} alt="" />
-      <img class="absolute top-[-144px] left-[-335px] z-1" src={solidBlocksHeading1Img} alt="" />
-      <img class="absolute top-[-144px] left-[-335px] z-1" src={solidBlocksHeading2Img} alt="" /> */}
         <svg
           class="absolute top-0 left-0"
           viewBox="0 0 88.975 79.46"
@@ -71,40 +59,89 @@ const Heading: ParentComponent = props => {
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-45 -17)" />
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-16 -16.5)" />
         </svg>
-        <img
-          class="absolute top-[10px] left-[-37.5px] h-[80px] z-1"
-          src={solidBlocksHeadingLeftBlockImg}
-          alt=""
-        />
-        <img
-          class="absolute top-[10px] right-[-40.5px] h-[80px] object-cover object-right"
-          src={solidBlocksHeadingRightBlockImg}
-          alt=""
-        />
+        <svg
+          class="absolute"
+          viewBox="0 0 88.975 79.46"
+          xml:space="preserve"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://www.w3.org/2000/svg"
+          style="z-index: 0; right: -40.5px; width: 247px; top: 0px; pointer-events: none;"
+        >
+          <g transform="translate(11.5 -32.1)">
+            <path
+              d="m902.479-260.051-11.198 6.465a1.09 1.09 0 0 0 0 1.888l11.198 6.464a3.27 3.27 0 0 0 3.27 0l11.197-6.464a1.09 1.09 0 0 0 0-1.888l-11.197-6.465a3.27 3.27 0 0 0-3.27 0z"
+              transform="translate(-753.562 279.827) scale(.89973)"
+              opacity=".352"
+              fill="url(#solid-blocks-header-cluster-f)"
+              filter="url(#solid-blocks-header-cluster-g)"
+            />
+            <path
+              d="M918.917-274.533a3.27 3.27 0 0 0-1.635.438l-7.578 4.376h-4.165v3.033h.007a1.09 1.09 0 0 0 .538.944l11.198 6.465a3.27 3.27 0 0 0 3.27 0l11.197-6.465a1.09 1.09 0 0 0 .541-1.006h.002v-2.971h-4.162l-7.578-4.376a3.27 3.27 0 0 0-1.635-.438z"
+              fill="url(#solid-blocks-header-cluster-j)"
+              transform="translate(-859.018 314.327)"
+            />
+            <path
+              d="m917.282-277.066-11.198 6.465a1.09 1.09 0 0 0 0 1.888l11.198 6.464a3.27 3.27 0 0 0 3.27 0l11.197-6.464a1.09 1.09 0 0 0 0-1.888l-11.197-6.465a3.27 3.27 0 0 0-3.27 0z"
+              fill="url(#solid-blocks-header-cluster-k)"
+              transform="translate(-859.018 314.327)"
+            />
+          </g>
+        </svg>
+        <svg
+          class="absolute"
+          viewBox="0 0 16.57 79.46"
+          xml:space="preserve"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://www.w3.org/2000/svg"
+          style="z-index: 1; left: -37.5px; width: 46px; top: 0px; pointer-events: none;"
+        >
+          <g transform="translate(-43.3 -32.2)">
+            <path
+              d="M918.917-274.533a3.27 3.27 0 0 0-1.635.438l-7.578 4.376h-4.165v3.033h.007a1.09 1.09 0 0 0 .538.944l11.198 6.465a3.27 3.27 0 0 0 3.27 0l11.197-6.465a1.09 1.09 0 0 0 .541-1.006h.002v-2.971h-4.162l-7.578-4.376a3.27 3.27 0 0 0-1.635-.438z"
+              fill="url(#solid-blocks-header-cluster-j)"
+              transform="translate(-859.018 314.327)"
+            />
+            <path
+              d="m917.282-277.066-11.198 6.465a1.09 1.09 0 0 0 0 1.888l11.198 6.464a3.27 3.27 0 0 0 3.27 0l11.197-6.464a1.09 1.09 0 0 0 0-1.888l-11.197-6.465a3.27 3.27 0 0 0-3.27 0z"
+              fill="url(#solid-blocks-header-cluster-k)"
+              transform="translate(-859.018 314.327)"
+            />
+          </g>
+        </svg>
+        <svg
+          class="absolute"
+          viewBox="0 0 88.975 79.46"
+          xml:space="preserve"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://www.w3.org/2000/svg"
+          style="z-index: 0; left: -37.5px; width: 247px; top: 0px; pointer-events: none;"
+        >
+          <g transform="translate(-43.3 -32.2)">
+            <path
+              d="m902.479-260.051-11.198 6.465a1.09 1.09 0 0 0 0 1.888l11.198 6.464a3.27 3.27 0 0 0 3.27 0l11.197-6.464a1.09 1.09 0 0 0 0-1.888l-11.197-6.465a3.27 3.27 0 0 0-3.27 0z"
+              transform="translate(-753.562 279.827) scale(.89973)"
+              opacity=".352"
+              fill="url(#solid-blocks-header-cluster-f)"
+              filter="url(#solid-blocks-header-cluster-g)"
+            />
+          </g>
+        </svg>
         <div class="absolute top-[10px] left-[8px] right-[8px]">
-          <div class="w-full h-[46.577px] bg-[#f4f7fe]" />
-          <div class="w-full h-[8.799px] bg-[#d4d9ee] box-shadow-[0px_6px_17px_0px_#ced8f2]" />
+          <div class="relative top-[3px] w-full h-[43.63px] bg-[linear-gradient(to_right,#f5f7ff,#f5f7ff)] dark:bg-[linear-gradient(to_right,#41586a,#41586b)]" />
+          <div class="w-full h-[11px] bg-[linear-gradient(to_right,#dbe0f2,#d7ddf2)] dark:bg-[linear-gradient(to_right,#364d5e,#364e5f)] box-shadow-[0px_6px_17px_0px_#c4d3f4] dark:box-shadow-[0px_6px_17px_0px_#394d61]" />
         </div>
         <h1 class="absolute bottom-[-40px] left-0 z-1">{props.children}</h1>
-        {/* <div class="invisible h-0 p-0 m-0">{props.children}</div> */}
         <div class="relative z-1">
           <div class="invisible h-0 p-0 m-0">{props.children}</div>
           <div
-            class="absolute top-[24px] left-0 pointer-events-none text-[#4b6a87ff] -scale-y-100 blur-[2px] mask-image-[linear-gradient(to_bottom,transparent,#000)] opacity-40 z-1"
+            class="absolute top-[24px] left-0 pointer-events-none text-[#4b6a87] dark:text-[#8a9fb5] -scale-y-100 blur-[2px] mask-image-[linear-gradient(to_bottom,transparent,#000)] opacity-40 z-1"
             aria-hidden="true"
             style="-webkit-mask-size: 100% 28px; -webkit-mask-repeat: no-repeat; -webkit-mask-position: bottom; mask-size: 100% 28px; mask-repeat: no-repeat; mask-position: bottom;"
           >
             {props.children}
           </div>
         </div>
-        {/* <div
-        class="absolute bottom-[-50px] left-0 pointer-events-none text-[#4b6a87ff] -scale-y-100 blur-[2px] mask-image-[linear-gradient(to_bottom,transparent_25%,#000)] opacity-40 z-1"
-        aria-hidden="true"
-      >
-        {props.children}
-      </div> */}
       </div>
-      {/* <div class="invisible mb-[-60px]">{props.children}</div> */}
       <div class="invisible mb-[-40px] max-h-[80px]">{props.children}</div>
     </div>
   );
