@@ -56,6 +56,16 @@
   background-size: 100% 4px;
 }
 
+.dark .anchor-tag {
+  color: #ccc;
+  background-image: linear-gradient(#666, #666);
+}
+
+.dark .anchor-tag:hover {
+  color: #ddd;
+  background-image: linear-gradient(#888, #888);
+}
+
 html {
   @apply font-display;
 }
@@ -159,21 +169,6 @@ pre {
   color-scheme: dark;
 }
 
-/* .container-s {
-  container-type: inline-size;
-  container-name: foo-bar;
-}
-
-.graphic {
-  display: none;
-}
-
-@container foo-bar (min-width: 300px) {
-  .graphic {
-    display: block;
-  }
-} */
-
 :root {
   --solid-blocks-header-cluster__shadow-left: #dbeffb;
   --solid-blocks-header-cluster__shadow-right: #becbef;
@@ -184,6 +179,7 @@ pre {
   --solid-blocks-header-cluster__block-top-left: #fbfcff;
   --solid-blocks-header-cluster__block-top-right: #eef2fd;
   --page-main-bg: #fff;
+  --header-box-shadow: 0px 26px 14px -18px #24405966;
   --table-header-box-shadow: 0px 16px 14px -10px #24405966;
   --table-header-box-shadow-hide: 0px 16px 14px -10px #24405900;
   --header-border-bottom: linear-gradient(to right, #e4f6f9, #d8dff5) 1;
@@ -211,6 +207,7 @@ html.dark {
   --solid-blocks-header-cluster__small-shadow-left: #255d81bc;
   --solid-blocks-header-cluster__small-shadow-right: #324167b9; */
   --page-main-bg: #293843;
+  --header-box-shadow: 0px 26px 14px -18px #05121dbf;
   --table-header-box-shadow: 0px 16px 14px -10px #05121dbf;
   --table-header-box-shadow-hide: 0px 16px 14px -10px #05121d00;
   --header-border-bottom: linear-gradient(to right, #2b455a, #2c4668) 1;

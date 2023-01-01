@@ -50,7 +50,7 @@ const PrimitivePageMain: ParentComponent<{
             </Heading> */}
 
             <Heading>{props.name.replace("-", " ")}</Heading>
-            <div class="relative top-[6px]">
+            <div class="relative">
               <svg
                 class="absolute sm:hidden"
                 viewBox="0 0 88.975 79.46"

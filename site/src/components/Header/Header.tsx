@@ -7,41 +7,35 @@ import { createSignal, onMount } from "solid-js";
 import SearchModal from "../Search/SearchModal";
 import ThemeBtn from "./ThemeBtn";
 import SearchBtn from "../Search/SearchBtn";
+import { useLocation } from "solid-start";
 
 const Header = () => {
   const [open, setOpen] = createSignal(false);
+  const [showOpaqueBg, setShowOpaqueBg] = createSignal(false);
+  const [showShadow, setShowShadow] = createSignal(false);
+  const location = useLocation();
   let menuButton!: HTMLButtonElement;
-  let headerEl!: HTMLDivElement;
 
-  const showActiveHeader = () => {
-    headerEl.classList.add("bg-white/50", "dark:bg-[#293843]/50");
-    headerEl.classList.remove("bg-white/0", "dark:bg-[#293843]/0");
-    headerEl.classList.add("backdrop-blur-md");
-    headerEl.classList.remove("backdrop-blur-none");
-  };
+  const checkScroll = () => {
+    const showOpaqueBg = window.scrollY > 30;
+    const showShadow = window.scrollY > 150;
 
-  const hideActiveHeader = () => {
-    headerEl.classList.remove("bg-white/50", "dark:bg-[#293843]/50");
-    headerEl.classList.add("bg-white/0", "dark:bg-[#293843]/0");
-    headerEl.classList.remove("backdrop-blur-md");
-    headerEl.classList.add("backdrop-blur-none");
+    setShowOpaqueBg(showOpaqueBg);
+
+    if (location.pathname === "/") {
+      setShowShadow(false);
+      return;
+    }
+    setShowShadow(showShadow);
   };
 
   onMount(() => {
-    if (window.scrollY > 30) {
-      showActiveHeader();
-    } else {
-      hideActiveHeader();
-    }
+    checkScroll();
 
     window.addEventListener(
       "scroll",
       () => {
-        if (window.scrollY > 30) {
-          showActiveHeader();
-        } else {
-          hideActiveHeader();
-        }
+        checkScroll();
       },
       { passive: true }
     );
@@ -49,10 +43,17 @@ const Header = () => {
 
   return (
     <header
-      class="fixed top-0 left-0 right-0 h-[60px] bg-white/0 dark:bg-[#293843]/0 z-10 transition-[background-color,backdrop-filter]"
-      ref={headerEl}
+      class="fixed top-0 left-0 right-0 h-[60px] z-10 transition-[background-color,backdrop-filter]"
+      classList={{
+        "backdrop-blur-md bg-white/50 dark:bg-[#293843]/50": showOpaqueBg(),
+        "backdrop-blur-none bg-white/0 dark:bg-[#293843]/0": !showOpaqueBg()
+      }}
     >
-      <div class="max-w-[900px] mx-auto w-full h-full flex px-4 sm:px-8 items-center justify-between gap-2">
+      <div class="relative max-w-[900px] mx-auto w-full h-full flex px-4 sm:px-8 items-center justify-between gap-2">
+        <div
+          class="absolute top-0 left-0 bottom-0 right-0 box-shadow-[var(--header-box-shadow)] -z-1 transition-opacity"
+          classList={{ "opacity-0": !showShadow(), "opacity-100": showShadow() }}
+        />
         {/* <A href="/"> */}
         <a href="/">
           <img

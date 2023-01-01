@@ -44,7 +44,7 @@ const SearchModal: Component<{
       open={open}
       setOpen={setOpen}
       overlayElement={{
-        class: "bg-[#102a62b8] backdrop-blur-md !top-[60px]"
+        class: "bg-[#102a62b8] dark:bg-[#001627bd] backdrop-blur-md !top-[60px]"
       }}
       focusElementOnOpen="firstChild"
     >
@@ -61,6 +61,7 @@ const SearchModal: Component<{
           // main page header has higher zindex than overlay element and when clicking on it, it doesn't close modal
           // here's workaround
           onFocusOut={() => {
+            window.clearTimeout(timeout!);
             timeout = window.setTimeout(onFocusOut);
           }}
           onFocusIn={() => {

@@ -52,10 +52,11 @@ const styleStageColor = (level: string | number) => {
   }
 };
 
-const StageBadge: ParentComponent<{ type?: "button" | "static"; value: number | string }> = ({
-  type = "button",
-  value: level
-}) => {
+const StageBadge: ParentComponent<{
+  type?: "button" | "static";
+  value: number | string;
+  size?: "small";
+}> = ({ type = "button", value: level, size }) => {
   const [open, setOpen] = createSignal(false);
   let menuButton!: HTMLButtonElement;
   if (type === "static") {
@@ -63,10 +64,11 @@ const StageBadge: ParentComponent<{ type?: "button" | "static"; value: number | 
       <div class="flex justify-center">
         <div
           data-stage
-          class={
-            "flex justify-center items-center font-sans w-[25px] sm:w-[32.25px] h-[28px] rounded-md " +
-            classStageColor(level)
-          }
+          class={"flex justify-center items-center font-sans  rounded-md " + classStageColor(level)}
+          classList={{
+            "w-[25px] sm:w-[32.25px] h-[28px]": !size,
+            "w-[24px] h-[26px]": size === "small"
+          }}
         >
           <span>{level}</span>
         </div>

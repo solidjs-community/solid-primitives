@@ -1,6 +1,6 @@
 import { A, useLocation } from "@solidjs/router";
 import Fuse from "fuse.js";
-import { FiSearch } from "solid-icons/fi";
+import { FiSearch, FiX } from "solid-icons/fi";
 import { createEffect, createSignal, For, on, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 // @ts-ignore
@@ -90,26 +90,37 @@ const Search = () => {
 
   return (
     <div class="p-2 flex justify-center items-center w-screen max-w-[800px]">
-      <div class="p-2 w-full rounded-lg bg-white">
-        <div
-          class="flex w-full w-max-[350px] font-sans px-2 py-2 items-center bg-white border-[#d0e4ff87] border-2 rounded-md text-[#306FC4] hover:text-[#063983] focus-within:text-[#063983] focus-within:outline-dashed"
-          tabindex="-1"
-          onFocus={() => {
-            input.focus();
-          }}
-        >
-          <div class="mr-2">
-            <FiSearch />
+      <div class="p-2 w-full rounded-lg bg-page-main-bg">
+        <div class="flex gap-2">
+          <div
+            class="flex flex-grow w-max-[350px] font-sans px-2 py-2 items-center bg-white dark:bg-page-main-bg border-[#d0e4ff87] border-2 rounded-md text-[#306FC4] hover:text-[#063983] focus-within:text-[#063983] focus-within:outline-dashed cursor-text dark:text-[#c2d5ee] dark:hover:text-white"
+            tabindex="-1"
+            onFocus={() => {
+              input.focus();
+            }}
+          >
+            <div class="mr-2">
+              <FiSearch />
+            </div>
+            <input
+              class="outline-0 dark:bg-page-main-bg"
+              placeholder="Quick Search ..."
+              value={search()}
+              type="text"
+              onInput={e => onInput(e.currentTarget.value)}
+              ref={input}
+            />
           </div>
-          <input
-            class="outline-0"
-            placeholder="Quick Search ..."
-            value={search()}
-            type="text"
-            onInput={e => onInput(e.currentTarget.value)}
-            ref={input}
-          />
+          <button
+            class="w-[45px] h-[45px] rounded-lg text-[#306FC4] flex justify-center items-center dark:text-[#c2d5ee] dark:hover:text-white"
+            onClick={() => {
+              // setOpen(false);
+            }}
+          >
+            <FiX size={25} />
+          </button>
         </div>
+
         <hr class="bg-slate-300 my-4" classList={{ hidden: !searchResult.length }} />
         <ul class="overflow-y-auto max-h-[60vh]">
           <For each={searchResult}>
