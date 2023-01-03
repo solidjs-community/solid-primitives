@@ -1,6 +1,7 @@
 import { Title } from "solid-start";
 import PrimitivesTable from "~/components/Primitives/PrimitivesTable";
 import solidSquaresImg from "~/assets/img/solid-squares.webp";
+import DesignMaxims from "~/DesignMaxims";
 
 export default function Home() {
   return (
@@ -112,6 +113,7 @@ export default function Home() {
         </div>
       </div>
       <PrimitivesTable />
+      <div class="max-w-[864px] mx-auto leading-7 mt-[125px]">{/* <DesignMaxims /> */}</div>
     </main>
   );
 }

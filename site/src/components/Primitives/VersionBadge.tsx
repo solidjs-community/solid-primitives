@@ -53,7 +53,7 @@ const VersionBadge: ParentComponent<{ value: string; href: string }> = ({ value,
 
   return (
     <a
-      class="h-[28px] min-w-[90px] uppercase flex justify-center items-center font-sans rounded-md border-[#cae0ff] bg-[#cae0ff40] border-2 dark:bg-[#6eaaff14] dark:border-[#5577a7]"
+      class="h-[28px] min-w-[90px] uppercase flex justify-center items-center font-sans rounded-md border-[#cae0ff] bg-[#cae0ff40] border-2 hover:border-[#80a7de] hover:bg-[#cae0ff66] transition-colors dark:bg-[#6eaaff14] dark:border-[#5577a7] dark:hover:border-[#8ba8d3] dark:hover:bg-[#6eaaff33]"
       href={href}
       target="_blank"
     >

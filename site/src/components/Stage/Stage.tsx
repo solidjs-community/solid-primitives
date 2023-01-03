@@ -51,7 +51,7 @@ const Stage = () => {
       <h3 class="font-semibold text-lg pb-1 border-b border-slate-300 dark:border-slate-600">
         Contribution Procress
       </h3>
-      <div class="overflow-auto max-h-[60vh]">
+      <div class="overflow-auto max-h-[68vh]">
         <div class="max-w-[420px] rounded-xl overflow-clip relative bg-[#e5ecf3] dark:bg-[#2b455a]">
           <div class="absolute top-0 left-0 right-0 bottom-0 border-[#e5ecf3] border-2 rounded-xl pointer-events-none dark:border-[#2b455a]"></div>
           <table class="w-full my-4" style="border-collapse: separate; border-spacing: 2px 2px;">

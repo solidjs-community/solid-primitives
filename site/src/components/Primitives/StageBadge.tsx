@@ -67,7 +67,7 @@ const StageBadge: ParentComponent<{
           class={"flex justify-center items-center font-sans  rounded-md " + classStageColor(level)}
           classList={{
             "w-[25px] sm:w-[32.25px] h-[28px]": !size,
-            "w-[24px] h-[26px]": size === "small"
+            "w-[22px] h-[24px]": size === "small"
           }}
         >
           <span>{level}</span>
@@ -80,7 +80,7 @@ const StageBadge: ParentComponent<{
       <button
         data-stage
         class={
-          "flex justify-center items-center font-sans w-[25px] sm:w-[32.25px] h-[28px] rounded-md " +
+          "flex justify-center items-center font-sans w-[25px] sm:w-[32.25px] h-[28px] border-[rgba(0,0,0,0.15)] border-2 hover:border-black/40 hover:brightness-110 rounded-md dark:border-black/20 dark:hover:border-black/60 transition-[border-color,filter] " +
           classStageColor(level)
         }
         ref={menuButton}
