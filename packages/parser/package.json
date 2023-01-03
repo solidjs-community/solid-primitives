@@ -18,8 +18,7 @@
     "stage": 0,
     "list": [
       "Token",
-      "tokenize",
-      "childrenTokens"
+      "createParser"
     ],
     "category": "Utilities"
   },
