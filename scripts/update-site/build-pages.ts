@@ -35,7 +35,7 @@ export const buildPage = async ({ pkg, name }: { pkg: PackageJSONData; name: str
       return _;
     })
     // replace Demo links with Live Site, Codesandbox/Stackblitz, Dev Source Code
-    .replace(/(##\s+demo\n)((.|\n)+)(?=(##))/i, (_, p1, p2) => {
+    .replace(/(?<!#)(##\s+demo\n)((.|\n)+?)(?=(\n##\s))/i, (_, p1, p2) => {
       if (p2) {
         p2 = p2.replace(/https?:\/\/[^\s]+/, (match: string) => {
           const url = new URL(match);

@@ -1,7 +1,6 @@
 import { readdirSync, existsSync, readFileSync, writeFileSync } from "fs";
-// @ts-expect-error ts-missing-module
-import tablemark from "json-to-markdown-table";
 import { r } from "../utils";
+import { buildAndWriteHomeSections } from "./build-html-home-sections";
 import { buildCategory, writeHTMLTableFile } from "./build-html-table";
 import { buildJSONCategory, writeJSONFile } from "./build-json-category";
 import { buildPage, writePages } from "./build-pages";
@@ -56,3 +55,4 @@ const run = async () => {
 };
 
 run();
+buildAndWriteHomeSections();
