@@ -61,7 +61,7 @@
   },
   "scripts": {
     "dev": "vite serve dev",
-    "build": "jiti ../../scripts/build.ts --ssr",
+    "build": "jiti ../../scripts/build.ts --ssr --dev",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
