@@ -1,6 +1,6 @@
 import { JSXElement, createMemo } from "solid-js";
 
-export function createParser(id: string = "solid-parser") {
+export function createJSXParser(id: string = "solid-parser") {
   const $TOKEN = Symbol(id);
 
   function tokenize<

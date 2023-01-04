@@ -1,9 +1,9 @@
 import { Component, createMemo, For, JSXElement } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
-import { createParser } from "../src";
+import { createJSXParser } from "../src";
 
-const { tokenize, childrenTokens } = createParser("calculator");
+const { tokenize, childrenTokens } = createJSXParser("calculator");
 
 type Meta = { callback: (props: Props) => JSXElement };
 type Props = {
