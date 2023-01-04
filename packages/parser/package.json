@@ -17,7 +17,6 @@
     "name": "parser",
     "stage": 0,
     "list": [
-      "Token",
       "createParser"
     ],
     "category": "Utilities"

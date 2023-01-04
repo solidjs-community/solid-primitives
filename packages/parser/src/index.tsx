@@ -4,10 +4,9 @@ export function createParser(id?: string) {
   const $TOKEN = Symbol(id || "solid-parser");
 
   function tokenize<
-    TToken extends Meta & {
-      props: unknown;
-    }
-  >(meta: Omit<TToken, "props">): (props: TToken["props"]) => JSXElement {
+    TProps extends { [key: string]: any },
+    TToken extends { [key: string]: any } & { id: string }
+  >(tokenProperties: (props: TProps) => TToken): (props: TToken["props"]) => JSXElement {
     return (props: any) => {
       return Object.assign(
         () => {
@@ -16,8 +15,7 @@ export function createParser(id?: string) {
         },
         {
           [$TOKEN]: true,
-          ...meta,
-          props
+          ...tokenProperties(props)
         }
       );
     };
@@ -36,8 +34,3 @@ export function createParser(id?: string) {
 
   return { tokenize, childrenTokens, $TOKEN };
 }
-type Meta = { [key: string]: any; id: string };
-
-export type Token<TProps, TMeta extends Meta> = TMeta & {
-  props: TProps;
-};

@@ -1,7 +1,7 @@
 import { Component, createMemo, For, JSXElement } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
-import { Token, createParser } from "../src";
+import { createParser } from "../src";
 
 const { tokenize, childrenTokens } = createParser("calculator");
 
@@ -44,26 +44,35 @@ const Calculator = (props: {
 type MetaValue = {
   id: "Value";
 } & Meta;
-type TokenValue = Token<Props, MetaValue>;
+type TokenValue = MetaValue & { props: Props };
 
-const Value = tokenize<TokenValue>({ id: "Value", callback: props => <>{props.value}</> });
+const Value = tokenize<Props, TokenValue>(props => ({
+  props,
+  id: "Value",
+  callback: props => <>{props.value}</>
+}));
 
 type MetaAdd = {
   id: "Add";
 } & Meta;
-type TokenAdd = Token<Props, MetaAdd>;
+type TokenAdd = MetaAdd & { props: Props };
 
-const Add = tokenize<TokenAdd>({ id: "Add", callback: (props: Props) => <> + {props.value}</> });
+const Add = tokenize<Props, TokenAdd>(props => ({
+  props,
+  id: "Add",
+  callback: (props: Props) => <> + {props.value}</>
+}));
 
 type MetaSubtract = {
   id: "Subtract";
 } & Meta;
-type TokenSubtract = Token<Props, MetaSubtract>;
+type TokenSubtract = MetaSubtract & { props: Props };
 
-const Subtract = tokenize<TokenSubtract>({
+const Subtract = tokenize<Props, TokenSubtract>(props => ({
+  props,
   id: "Subtract",
   callback: (props: Props) => <> - {props.value}</>
-});
+}));
 
 const App: Component = () => {
   return (
