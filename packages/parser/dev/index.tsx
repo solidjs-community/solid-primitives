@@ -21,7 +21,7 @@ const Calculator = (props: {
   const calculation = () => {
     let result = 0;
     tokens().forEach(token => {
-      console.log("token is ", token);
+      console.info("token is ", token);
       if (token.id === "Value") {
         result = token.props.value;
       } else if (token.id === "Add") {
@@ -29,7 +29,7 @@ const Calculator = (props: {
       } else if (token.id === "Subtract") {
         result -= token.props.value;
       }
-      console.log("result is", result);
+      console.info("result is", result);
     });
     return result;
   };
@@ -46,11 +46,14 @@ type MetaValue = {
 } & Meta;
 type TokenValue = MetaValue & { props: Props };
 
-const Value = tokenize<Props, TokenValue>(props => ({
-  props,
-  id: "Value",
-  callback: props => <>{props.value}</>
-}));
+const Value = tokenize<Props, TokenValue>(
+  props => ({
+    props,
+    id: "Value",
+    callback: props => <>{props.value}</>
+  }),
+  props => <>value outside of a calculator: {props.value}</>
+);
 
 type MetaAdd = {
   id: "Add";
@@ -76,11 +79,14 @@ const Subtract = tokenize<Props, TokenSubtract>(props => ({
 
 const App: Component = () => {
   return (
-    <Calculator>
-      <Value value={1} />
-      <Add value={4} />
-      <Subtract value={2} />
-    </Calculator>
+    <>
+      <Value value={2} />
+      <Calculator>
+        <Value value={1} />
+        <Add value={4} />
+        <Subtract value={2} />
+      </Calculator>
+    </>
   );
 };
 

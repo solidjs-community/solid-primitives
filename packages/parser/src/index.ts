@@ -1,18 +1,24 @@
 import { JSXElement, createMemo } from "solid-js";
 
-export function createParser(id?: string) {
-  const $TOKEN = Symbol(id || "solid-parser");
+export function createParser(id: string = "solid-parser") {
+  const $TOKEN = Symbol(id);
 
   function tokenize<
     TProps extends { [key: string]: any },
     TToken extends { [key: string]: any } & { id: string }
-  >(tokenProperties: (props: TProps) => TToken): (props: TToken["props"]) => JSXElement {
-    return (props: any) => {
+  >(
+    tokenProperties: (props: TProps) => TToken,
+    component?: (props: TProps) => JSXElement
+  ): (props: TToken["props"]) => JSXElement {
+    return (props: TProps) => {
       return Object.assign(
-        () => {
-          console.info("tokens can only be rendered inside a Parser");
-          return <></>;
-        },
+        component
+          ? () => component(props)
+          : () => {
+              process.env.DEV &&
+                console.info(`tokens can only be rendered inside a Parser with id '${id}'`);
+              return "";
+            },
         {
           [$TOKEN]: true,
           ...tokenProperties(props)
