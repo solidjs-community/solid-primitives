@@ -30,10 +30,7 @@ export function createJSXParser(id: string = "solid-parser") {
   function childrenTokens<T>(children: () => JSXElement | JSXElement[] | T | T[]) {
     return createMemo(() =>
       children
-        ? ([] as any[])
-            .concat(children())
-            .filter(child => child && $TOKEN in child)
-            .map((a: T) => a as T)
+        ? (([] as any[]).concat(children()).filter(child => child && $TOKEN in child) as T[])
         : []
     );
   }
