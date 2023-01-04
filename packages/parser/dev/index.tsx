@@ -3,7 +3,7 @@ import { render } from "solid-js/web";
 import "uno.css";
 import { createJSXParser } from "../src";
 
-const { tokenize, childrenTokens } = createJSXParser("calculator");
+const { createToken, childrenTokens } = createJSXParser("calculator");
 
 type Meta = { callback: (props: Props) => JSXElement };
 type Props = {
@@ -46,7 +46,7 @@ type MetaValue = {
 } & Meta;
 type TokenValue = MetaValue & { props: Props };
 
-const Value = tokenize<Props, TokenValue>(
+const Value = createToken<Props, TokenValue>(
   props => ({
     props,
     id: "Value",
@@ -60,7 +60,7 @@ type MetaAdd = {
 } & Meta;
 type TokenAdd = MetaAdd & { props: Props };
 
-const Add = tokenize<Props, TokenAdd>(props => ({
+const Add = createToken<Props, TokenAdd>(props => ({
   props,
   id: "Add",
   callback: (props: Props) => <> + {props.value}</>
@@ -71,7 +71,7 @@ type MetaSubtract = {
 } & Meta;
 type TokenSubtract = MetaSubtract & { props: Props };
 
-const Subtract = tokenize<Props, TokenSubtract>(props => ({
+const Subtract = createToken<Props, TokenSubtract>(props => ({
   props,
   id: "Subtract",
   callback: (props: Props) => <> - {props.value}</>

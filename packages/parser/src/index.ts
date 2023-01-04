@@ -3,7 +3,7 @@ import { JSXElement, createMemo } from "solid-js";
 export function createJSXParser(id: string = "solid-parser") {
   const $TOKEN = Symbol(id);
 
-  function tokenize<
+  function createToken<
     TProps extends { [key: string]: any },
     TToken extends { [key: string]: any } & { id: string }
   >(
@@ -38,5 +38,5 @@ export function createJSXParser(id: string = "solid-parser") {
     );
   }
 
-  return { tokenize, childrenTokens, $TOKEN };
+  return { createToken, childrenTokens, $TOKEN };
 }
