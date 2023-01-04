@@ -3,8 +3,6 @@ import { render } from "solid-js/web";
 import "uno.css";
 import { createJSXParser } from "../src";
 
-const { createToken, childrenTokens } = createJSXParser("calculator");
-
 type Meta = { callback: (props: Props) => JSXElement };
 type Props = {
   value: number;
@@ -13,9 +11,9 @@ type Props = {
 
 type CustomToken = TokenValue | TokenAdd | TokenSubtract;
 
-const Calculator = (props: {
-  children: JSXElement | JSXElement[] | CustomToken | CustomToken[];
-}) => {
+const { createToken, childrenTokens } = createJSXParser<CustomToken>("calculator");
+
+const Calculator = (props: { children: JSXElement | JSXElement[] }) => {
   const tokens = childrenTokens(() => props.children);
 
   const calculation = () => {
@@ -46,8 +44,8 @@ type MetaValue = {
 } & Meta;
 type TokenValue = MetaValue & { props: Props };
 
-const Value = createToken<Props, TokenValue>(
-  props => ({
+const Value = createToken(
+  (props: Props) => ({
     props,
     id: "Value",
     callback: props => <>{props.value}</>

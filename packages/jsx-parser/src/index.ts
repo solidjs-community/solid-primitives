@@ -1,15 +1,12 @@
 import { JSXElement, createMemo } from "solid-js";
 
-export function createJSXParser(id: string = "solid-parser") {
+export function createJSXParser<TTokens = {}>(id: string = "solid-parser") {
   const $TOKEN = Symbol(id);
 
-  function createToken<
-    TProps extends { [key: string]: any },
-    TToken extends { [key: string]: any } & { id: string }
-  >(
+  function createToken<TProps extends { [key: string]: any }, TToken extends TTokens>(
     tokenProperties: (props: TProps) => TToken,
     component?: (props: TProps) => JSXElement
-  ): (props: TToken["props"]) => JSXElement {
+  ): (props: TProps) => JSXElement {
     return (props: TProps) => {
       return Object.assign(
         component
@@ -27,10 +24,10 @@ export function createJSXParser(id: string = "solid-parser") {
     };
   }
 
-  function childrenTokens<T>(children: () => JSXElement | JSXElement[] | T | T[]) {
+  function childrenTokens(children: () => JSXElement | JSXElement[]): () => TTokens[] {
     return createMemo(() =>
       children
-        ? (([] as any[]).concat(children()).filter(child => child && $TOKEN in child) as T[])
+        ? (([] as any[]).concat(children()).filter(child => child && $TOKEN in child) as TTokens[])
         : []
     );
   }
