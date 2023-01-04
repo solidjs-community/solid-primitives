@@ -24,9 +24,20 @@ export function createJSXParser<TTokens = {}>(id: string = "solid-parser") {
     };
   }
 
-  function childrenTokens(children: () => JSXElement | JSXElement[]): Accessor<TTokens[]> {
+  function childrenTokens(fn: Accessor<JSXElement | JSXElement[]>): Accessor<TTokens[]> {
+    const children = createMemo(fn);
+    const resolveChild = (child: any) => {
+      while (true) {
+        if (typeof child !== "function") return child;
+        if ($TOKEN in child) return child;
+        child = child();
+      }
+    };
     return createMemo(() =>
-      children ? ([] as any[]).concat(children()).filter(child => child && $TOKEN in child) : []
+      ([] as any[])
+        .concat(children())
+        .map(resolveChild)
+        .filter(child => child && $TOKEN in child)
     );
   }
 
