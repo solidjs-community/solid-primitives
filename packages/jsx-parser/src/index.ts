@@ -26,8 +26,9 @@ export function createJSXParser<TTokens = {}>(id: string = "solid-parser") {
 
   function childrenTokens(fn: Accessor<JSXElement | JSXElement[]>): Accessor<TTokens[]> {
     const children = createMemo(fn);
-    const resolveChild = (child: any) => {
+    const resolveChild = (child: any): any => {
       while (true) {
+        if (Array.isArray(child)) return child.map(resolveChild).flat();
         if (typeof child !== "function") return child;
         if ($TOKEN in child) return child;
         child = child();
@@ -37,6 +38,7 @@ export function createJSXParser<TTokens = {}>(id: string = "solid-parser") {
       ([] as any[])
         .concat(children())
         .map(resolveChild)
+        .flat()
         .filter(child => child && $TOKEN in child)
     );
   }
