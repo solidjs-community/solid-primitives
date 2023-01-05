@@ -1,13 +1,12 @@
 import { Title } from "solid-start";
 import PrimitivesTable from "~/components/Primitives/PrimitivesTable";
-import solidSquaresImg from "~/assets/img/solid-squares.webp";
-import DesignMaxims from "~/DesignMaxims";
+import HomeSections from "~/components/Home/HomeSections";
 
 export default function Home() {
   return (
     <main class="py-[60px]">
       <Title>Solid Primitives</Title>
-      <div class="p-4 sm:pt-[5vh] md:pt-[10vh] leading-7 max-w-[720px] mx-auto min-h-[50vh]">
+      <div class="p-4 sm:pt-[5vh] md:pt-[10vh] leading-7 max-w-[720px] mx-auto min-h-[35vh] sm:min-h-[50vh] overflow-clip">
         <p class="py-3 sm:text-lg md:text-2xl">
           A project that strives to develop high-quality, community contributed Solid primitives.
           {/* All utilities are well tested and continuously maintained. */}
@@ -30,7 +29,7 @@ export default function Home() {
             </li>
           </ul>
           <svg
-            class="absolute top-[20%] -left-4 -right-4 -z-1 opacity-60 pointer-events-none mask-image-[linear-gradient(to_bottom,transparent,#000_20%)]"
+            class="absolute top-[20%] -left-6 -right-8 sm:-left-4 sm:-right-4 -z-1 opacity-60 pointer-events-none mask-image-[linear-gradient(to_bottom,transparent,#000_30%)] sm:mask-image-[linear-gradient(to_bottom,transparent,#000_20%)]"
             viewBox="0 0 188.975 179.46"
             // @ts-ignore
             xml:space="preserve"
@@ -113,7 +112,9 @@ export default function Home() {
         </div>
       </div>
       <PrimitivesTable />
-      <div class="max-w-[864px] mx-auto leading-7 mt-[125px]">{/* <DesignMaxims /> */}</div>
+      <div class="max-w-[864px] mx-auto leading-7 mt-[125px] p-4">
+        <HomeSections />
+      </div>
     </main>
   );
 }

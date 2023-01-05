@@ -49,8 +49,9 @@ const Header = () => {
         "backdrop-blur-none bg-white/0 dark:bg-[#293843]/0": !showOpaqueBg()
       }}
     >
-      <div class="relative max-w-[900px] mx-auto w-full h-full flex px-4 sm:px-8 items-center justify-between gap-2">
+      <div class="relative max-w-[900px] mx-auto w-full h-full flex px-4 sm:px-8 items-center justify-between gap-2 border-b-2 border-transparent">
         <div
+          data-header-shadow
           class="absolute top-0 left-0 bottom-0 right-0 box-shadow-[var(--header-box-shadow)] -z-1 transition-opacity"
           classList={{ "opacity-0": !showShadow(), "opacity-100": showShadow() }}
         />

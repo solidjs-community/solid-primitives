@@ -2,11 +2,14 @@ import { createIntersectionObserver, withDirection } from "@solid-primitives/int
 import { createMediaQuery } from "@solid-primitives/media";
 import { isIOS, isSafari } from "@solid-primitives/platform";
 import { createSignal, onMount, ParentComponent } from "solid-js";
+import reflow from "~/utils/reflow";
 import StageModal from "../Stage/StageModal";
 
 const Table: ParentComponent = props => {
-  const [targets, setTargets] = createSignal<Element[]>([]);
+  const [tableRowTargets, setTableRowTargets] = createSignal<Element[]>([]);
+  const [tableTarget, setTableTarget] = createSignal<Element[]>([]);
   const [headerActive, setHeaderActive] = createSignal(false);
+  const [headers, setHeaders] = createSignal<{ name: string; active: boolean }[]>([]);
   // const isSmall = createMediaQuery("(max-width: 767px)");
   let tableContainerParent!: HTMLElement;
   let tableEl!: HTMLTableElement;
@@ -18,9 +21,10 @@ const Table: ParentComponent = props => {
   let tableHeaderFirstLastSiblings: HTMLTableCellElement[] = [];
   let tableHeaderRealTR!: HTMLElement;
   let tableBody!: HTMLElement;
-  let tableHorizontalScrollShadow!: HTMLElement;
+  let tableVerticalScrollShadow!: HTMLDivElement;
   let pageHeader: HTMLElement;
-  let fakeTableRow = (
+  let pageHeaderShadow: HTMLElement;
+  const fakeTableRow = (
     <>
       <tr aria-hidden="true" style="visibility: hidden;">
         <td aria-hidden="true" style="visibility: hidden;"></td>
@@ -31,15 +35,20 @@ const Table: ParentComponent = props => {
       </tr>
     </>
   ) as HTMLElement[];
-  const [headers, setHeaders] = createSignal<{ name: string; active: boolean }[]>([]);
+  let tableSameWidthAsParent = false;
+  let addedFakeTableRow = false;
   let prevY = 0;
+  let prevTableWidth = 0;
+  let prevTableContainerParentWidth = 0;
+  let observeTableElInit = true;
+  let setTableSizeSameAsParentInit = true;
 
   const pageHeaderHeight = 60;
   const tableHeaderHeight = 80;
   const rootMarginTop = tableHeaderHeight + pageHeaderHeight;
 
   const showActiveHeader = () => {
-    if (!state.tableSameWidthAsParent) {
+    if (!tableSameWidthAsParent) {
       tableHeader.style.position = "fixed";
       tableHeader.style.top = "54px";
       tableHeader.style.left = "4px";
@@ -58,7 +67,7 @@ const Table: ParentComponent = props => {
     setHeaderActive(true);
   };
   const hideActiveHeader = () => {
-    if (!state.tableSameWidthAsParent) {
+    if (!tableSameWidthAsParent) {
       const { scrollLeft } = tableContainerParent;
 
       tableHeader.style.position = "absolute";
@@ -92,9 +101,9 @@ const Table: ParentComponent = props => {
     const { scrollLeft } = target;
 
     if (scrollLeft > 0) {
-      tableHorizontalScrollShadow.style.opacity = "1";
+      tableVerticalScrollShadow.style.opacity = "1";
     } else {
-      tableHorizontalScrollShadow.style.opacity = "0";
+      tableVerticalScrollShadow.style.opacity = "0";
     }
 
     tableHeader.scrollLeft = scrollLeft;
@@ -103,8 +112,200 @@ const Table: ParentComponent = props => {
     }
   };
 
+  const checkTableSameWidthAsParent = () => {
+    const tableWidth = tableEl.clientWidth;
+    const result = tableWidth <= tableContainerParent.clientWidth;
+    tableSameWidthAsParent = result;
+    prevTableWidth = tableWidth;
+    return result;
+  };
+
+  const resetSizes = () => {
+    // const tableContainerParentWidth = tableContainerParent.getBoundingClientRect().width;
+    // const tableWidth = tableEl.getBoundingClientRect().width;
+    // const tableHeaderHeight = tableHeader.getBoundingClientRect().height;
+    // const tableHeadersBCRs = tableHeaders.map(item => item.getBoundingClientRect());
+    tableHeaders.forEach((item, idx) => {
+      item.style.maxWidth = "";
+      item.style.width = "";
+      item.style.height = "";
+    });
+    tableFirstTableRowCells.forEach((item, idx) => {
+      item.style.minWidth = "";
+    });
+
+    tableHeader.style.position = "";
+    tableHeader.style.top = "";
+    tableHeader.style.left = "";
+    tableHeader.style.height = "";
+    tableHeader.style.width = "";
+    tableHeader.style.overflow = "";
+    tableHeader.style.transform = "";
+    tableHeader.style.background = "";
+    tableHeaderRealTR.style.position = "";
+    tableHeaderRealTR.style.top = "";
+    tableHeaderRealTR.style.left = "";
+    tableHeaderRealTR.style.width = "";
+    tableContainerParent.style.overflow = "";
+
+    if (addedFakeTableRow) {
+      const tableChildren = tableBody.children;
+      const fakeRow = tableChildren[0];
+      const hiddenRow = tableChildren[1];
+      fakeRow.remove();
+      hiddenRow.remove();
+
+      addedFakeTableRow = false;
+    }
+
+    reflow();
+  };
+
+  const setTableSizeSameAsParent = () => {
+    if (!setTableSizeSameAsParentInit) {
+      tableHeader.style.position = "sticky";
+      tableHeaderRealTR.style.position = "static";
+      tableHeaderRealTR.style.width = "";
+      tableHeaders.forEach(item => {
+        item.style.maxWidth = "";
+        item.style.width = "";
+        item.style.height = "";
+      });
+      tableFirstTableRowCells.forEach(item => {
+        item.style.minWidth = "";
+      });
+
+      setTableSizeSameAsParentInit = false;
+
+      reflow();
+    }
+
+    const tableContainerParentWidth = tableContainerParent.getBoundingClientRect().width;
+    const tableWidth = tableEl.getBoundingClientRect().width;
+    const tableHeaderHeight = tableHeader.getBoundingClientRect().height;
+    const tableHeadersBCRs = tableHeaders.map(item => item.getBoundingClientRect());
+
+    tableHeaders.forEach((item, idx) => {
+      if (idx === 0) {
+        item.style.maxWidth = `${tableHeadersBCRs[idx].width!}px`;
+      }
+      item.style.width = `${tableHeadersBCRs[idx].width!}px`;
+      item.style.height = `${tableHeaderHeight}px`;
+    });
+    tableFirstTableRowCells.forEach((item, idx) => {
+      item.style.minWidth = `${tableHeadersBCRs[idx].width!}px`;
+    });
+    tableVerticalScrollShadow.style.left = `${tableHeadersBCRs[0].right}px`;
+    tableHeader.style.position = "absolute";
+    tableHeader.style.top = "0px";
+    tableHeader.style.left = "0px";
+    tableHeader.style.width = `${tableContainerParentWidth}px`;
+    tableHeader.style.height = `${tableHeaderHeight}px`;
+    tableHeader.style.background = "none";
+    tableHeader.style.transform = "translateY(4px)";
+    tableHeader.classList.add("no-scrollbar");
+    tableHeader.style.overflowX = "scroll";
+    tableHeader.style.overflowY = "hidden";
+    tableHeader.style.boxShadow = "0px 16px 14px -10px #24405900";
+    tableHeaderRealTR.style.position = "absolute";
+    tableHeaderRealTR.style.top = "0px";
+    tableHeaderRealTR.style.left = "0px";
+    tableHeaderRealTR.style.width = `${tableWidth + 8}px`;
+    fakeTableRow[0].style.height = `${tableHeaderHeight}px`;
+    tableContainerParent.style.overflow = "auto hidden";
+    if (!addedFakeTableRow) {
+      tableBody.insertAdjacentElement("afterbegin", fakeTableRow[1]);
+      tableBody.insertAdjacentElement("afterbegin", fakeTableRow[0]);
+      addedFakeTableRow = true;
+    }
+
+    if (headerActive()) {
+      showActiveHeader();
+    } else {
+      hideActiveHeader();
+    }
+  };
+
+  onMount(() => {
+    tableContainerParent.addEventListener("scroll", onParentScrollX);
+
+    const resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        const targetWidth = entry.contentBoxSize
+          ? entry.contentBoxSize[0]
+            ? entry.contentBoxSize[0].inlineSize
+            : // @ts-ignore
+              (entry.contentBoxSize.inlineSize as number)
+          : entry.contentRect.width;
+
+        if (entry.target === tableContainerParent) {
+          if (prevTableContainerParentWidth === targetWidth) {
+            prevTableContainerParentWidth = targetWidth;
+            return;
+          }
+          prevTableContainerParentWidth = targetWidth;
+        }
+
+        if (entry.target === tableEl) {
+          if (prevTableWidth === targetWidth) {
+            prevTableWidth = targetWidth;
+            return;
+          }
+          prevTableWidth = targetWidth;
+
+          if (observeTableElInit) {
+            observeTableElInit = false;
+            return;
+          }
+        }
+
+        if (!checkTableSameWidthAsParent()) {
+          console.log("resize table!!!");
+          setTableSizeSameAsParent();
+        } else {
+          resetSizes();
+        }
+      }
+    });
+
+    const h4Els = tableEl.querySelectorAll("h4");
+    // setHeaders([...h4Els].map(item => ({ name: item.textContent!, active: false })));
+
+    setTableRowTargets(() => [...h4Els]);
+    setTableTarget(() => [tableEl]);
+    resizeObserver.observe(tableContainerParent);
+    resizeObserver.observe(tableEl);
+  });
+
   createIntersectionObserver(
-    targets,
+    tableTarget,
+    entries => {
+      entries.forEach(entry => {
+        const { isIntersecting, boundingClientRect } = entry;
+        const top = boundingClientRect.top - rootMarginTop;
+        const bottom = boundingClientRect.bottom - rootMarginTop;
+        // if (boundingClientRect.top < 0 && boundingClientRect.bottom >= 0) {
+        if (top < 0 && bottom >= 0) {
+          console.log("show");
+          pageHeaderShadow.style.opacity = "0";
+          showActiveHeader();
+          return;
+        }
+        if (isIntersecting) return;
+        // if (boundingClientRect.bottom > 0) return;
+        if (bottom > 0) return;
+        if (tableSameWidthAsParent) return;
+
+        pageHeaderShadow.style.opacity = "1";
+        hideActiveHeader();
+      });
+    },
+
+    { rootMargin: `-${rootMarginTop}px 0px -${rootMarginTop}px 0px` }
+  );
+
+  createIntersectionObserver(
+    tableRowTargets,
     entries => {
       entries.forEach(entry => {
         const { target, rootBounds, isIntersecting, boundingClientRect } = entry;
@@ -126,7 +327,7 @@ const Table: ParentComponent = props => {
         if (isIntersecting && prevY > window.scrollY) {
           prevY = window.scrollY;
           console.log("get TOP!!!!", target);
-          const els = targets();
+          const els = tableRowTargets();
           const prevEl = els[els.indexOf(target) - 1];
           // tableHeaderShadowEl.style.opacity = "1";
           showActiveHeader();
@@ -147,88 +348,6 @@ const Table: ParentComponent = props => {
     { rootMargin: `-${rootMarginTop}px 0px 0px 0px` }
   );
 
-  const state = {
-    tableSameWidthAsParent: false
-  };
-  const checkTableSameWidthAsParent = () => {
-    const result = tableEl.clientWidth <= tableContainerParent.clientWidth;
-    state.tableSameWidthAsParent = result;
-    return result;
-  };
-
-  const setTableSizeSameAsParent = () => {
-    // set tableHeaderCells on fixed width based on bcr
-    // set tableBodyFirstRowCells on min-width based tabledHeaderCells bcr
-
-    const tableContainerParentWidth = tableContainerParent.getBoundingClientRect().width;
-    const tableWidth = tableEl.getBoundingClientRect().width;
-    const tableHeaderHeight = tableHeader.getBoundingClientRect().height;
-    const tableHeadersBCRs = tableHeaders.map(item => item.getBoundingClientRect());
-    tableHeaders.forEach((item, idx) => {
-      item.style.width = `${tableHeadersBCRs[idx].width!}px`;
-      item.style.height = `${tableHeaderHeight}px`;
-    });
-    tableFirstTableRowCells.forEach((item, idx) => {
-      item.style.minWidth = `${tableHeadersBCRs[idx].width!}px`;
-    });
-    tableHeader.style.position = "absolute";
-    tableHeader.style.top = "0px";
-    tableHeader.style.left = "0px";
-    tableHeader.style.width = `${tableContainerParentWidth}px`;
-    tableHeader.style.height = `${tableHeaderHeight}px`;
-    tableHeader.style.background = "none";
-    tableHeader.style.transform = "translateY(4px)";
-    tableHeader.classList.add("no-scrollbar");
-    tableHeader.style.overflowX = "scroll";
-    tableHeader.style.overflowY = "hidden";
-    tableHeader.style.boxShadow = "0px 16px 14px -10px #24405900";
-    tableHeaderRealTR.style.position = "absolute";
-    tableHeaderRealTR.style.top = "0px";
-    tableHeaderRealTR.style.left = "0px";
-    tableHeaderRealTR.style.width = `${tableWidth + 8}px`;
-    fakeTableRow[0].style.height = `${tableHeaderHeight}px`;
-    tableContainerParent.style.overflow = "auto hidden";
-    tableBody.insertAdjacentElement("afterbegin", fakeTableRow[1]);
-    tableBody.insertAdjacentElement("afterbegin", fakeTableRow[0]);
-
-    // tableHeader.style
-    // tableHeader.style.position = 'fixed'
-  };
-
-  onMount(() => {
-    // if (tableSameWidthAsParent()) return;
-    tableContainerParent.addEventListener("scroll", onParentScrollX);
-    if (!checkTableSameWidthAsParent()) {
-      setTableSizeSameAsParent();
-    }
-
-    const resizeObserver = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        if (entry.target === tableContainerParent) {
-          // remove min-width values on tableBodyFirstRowCells
-        }
-        if (!checkTableSameWidthAsParent()) {
-          setTableSizeSameAsParent();
-          // renderSmallerTable
-        }
-        //         if (entry.contentBoxSize) {
-        //           // Firefox implements `contentBoxSize` as a single content rect, rather than an array
-        //           const contentBoxSize = Array.isArray(entry.contentBoxSize) ? entry.contentBoxSize[0] : entry.contentBoxSize;
-        //
-        //         } else {
-        //
-        //         }
-      }
-    });
-
-    // resizeObserver.observe(tableEl);
-
-    const h4Els = tableEl.querySelectorAll("h4");
-    // setHeaders([...h4Els].map(item => ({ name: item.textContent!, active: false })));
-
-    setTargets(() => [...h4Els]);
-  });
-
   return (
     <div class="max-w-[900px] mx-auto isolate">
       <div class="w-full relative">
@@ -238,8 +357,8 @@ const Table: ParentComponent = props => {
           style="-webkit-mask-image: linear-gradient(to right, transparent 0px, rgb(0, 0, 0)); mask-image: linear-gradient(to right, transparent 0px, rgb(0, 0, 0))"
         />
         <div
-          id="table-horizontal-scroll-shadow"
           class="absolute top-[7px] bottom-0 left-[120.8px] w-[15px] z-10 opacity-0 transition-opacity bg-[linear-gradient(to_right,#24405966,#24405900)] dark:bg-[linear-gradient(to_right,#05121dbf,#05121d00)]"
+          ref={tableVerticalScrollShadow}
         />
         <div class="w-full rounded-[30px] overflow-x-clip p-1 pt-[2px] bg-[linear-gradient(45deg,#D8DFF5,#E4F6F9)] dark:bg-[linear-gradient(45deg,#2c4668,#2b455a)]">
           <table
@@ -259,10 +378,8 @@ const Table: ParentComponent = props => {
               ];
               tableHeaderShadowEl = tableHeader.querySelector("#header-shadow")!;
               tableHeaderRealTR = tableHeader.querySelector("#header-real-tr")!;
-              tableHorizontalScrollShadow = document.getElementById(
-                "table-horizontal-scroll-shadow"
-              )!;
               pageHeader = document.querySelector("header div")!;
+              pageHeaderShadow = pageHeader.querySelector("[data-header-shadow]")!;
             }}
           >
             {props.children}

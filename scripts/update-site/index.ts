@@ -25,34 +25,34 @@ export type PackageJSONData = {
 
 console.log("updateSite", "Updating site");
 
-const packageFiles = readdirSync(r(`../packages/`));
-const run = async () => {
-  for (const name of packageFiles) {
-    const dir = r(`../packages/${name}/package.json`);
-    if (!existsSync(dir)) return;
-    const pkg = JSON.parse(readFileSync(dir, "utf8")) as PackageJSONData;
-
-    if (!pkg.primitive) {
-      console.warn(`package ${name} doesn't have primitive field in package.json`);
-      continue;
-    }
-
-    if (pkg.primitive.name !== name) {
-      console.warn(
-        `directory name (${name}) and name in package info ${pkg.primitive.name} do not match`
-      );
-      continue;
-    }
-
-    buildCategory({ name, pkg });
-    buildJSONCategory({ name, pkg });
-    await buildPage({ name, pkg });
-  }
-
-  writeJSONFile();
-  writeHTMLTableFile();
-  writePages();
-};
-
-run();
+// const packageFiles = readdirSync(r(`../packages/`));
+// const run = async () => {
+//   for (const name of packageFiles) {
+//     const dir = r(`../packages/${name}/package.json`);
+//     if (!existsSync(dir)) return;
+//     const pkg = JSON.parse(readFileSync(dir, "utf8")) as PackageJSONData;
+//
+//     if (!pkg.primitive) {
+//       console.warn(`package ${name} doesn't have primitive field in package.json`);
+//       continue;
+//     }
+//
+//     if (pkg.primitive.name !== name) {
+//       console.warn(
+//         `directory name (${name}) and name in package info ${pkg.primitive.name} do not match`
+//       );
+//       continue;
+//     }
+//
+//     buildCategory({ name, pkg });
+//     buildJSONCategory({ name, pkg });
+//     await buildPage({ name, pkg });
+//   }
+//
+//   writeJSONFile();
+//   writeHTMLTableFile();
+//   writePages();
+// };
+//
+// run();
 buildAndWriteHomeSections();

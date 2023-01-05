@@ -4,7 +4,9 @@ const Heading: ParentComponent = props => {
   return (
     <div class="text-3xl sm:text-4xl font-bold capitalize">
       <div class="@container/heading relative container-s mb-[-60px]">
-        <div class="invisible">{props.children}</div>
+        <div aria-hidden="true" style="visibility: hidden;">
+          {props.children}
+        </div>
         <svg
           class="absolute hidden @[290px]/heading:block"
           viewBox="0 0 88.975 79.46"
@@ -61,8 +63,8 @@ const Heading: ParentComponent = props => {
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-1.5 -4.3)" />
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-16.2 4.7)" />
         </svg>
-        <svg
-          class="absolute top-0 left-0"
+        {/* <svg
+          class="absolute top-0 left-0 opacity-80"
           viewBox="0 0 88.975 79.46"
           xml:space="preserve"
           xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -71,7 +73,7 @@ const Heading: ParentComponent = props => {
         >
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-1.5 -4.3)" />
           <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-16.2 4.7)" />
-        </svg>
+        </svg> */}
         <svg
           class="absolute top-0 left-0"
           viewBox="0 0 88.975 79.46"
@@ -171,7 +173,9 @@ const Heading: ParentComponent = props => {
         </div>
         <h1 class="absolute bottom-[-40px] left-0 z-1">{props.children}</h1>
         <div class="relative z-1">
-          <div class="invisible h-0 p-0 m-0">{props.children}</div>
+          <div aria-hidden="true" class="h-0 p-0 m-0" style="visibility: hidden;">
+            {props.children}
+          </div>
           <div
             class="absolute top-[24px] left-0 pointer-events-none text-[#4b6a87] dark:text-[#8a9fb5] -scale-y-100 blur-[2px] mask-image-[linear-gradient(to_bottom,transparent,#000)] opacity-40 z-1"
             aria-hidden="true"
@@ -181,7 +185,9 @@ const Heading: ParentComponent = props => {
           </div>
         </div>
       </div>
-      <div class="invisible mb-[-40px] max-h-[80px]">{props.children}</div>
+      <div aria-hidden="true" class="mb-[-40px] max-h-[80px]" style="visibility: hidden;">
+        {props.children}
+      </div>
     </div>
   );
 };

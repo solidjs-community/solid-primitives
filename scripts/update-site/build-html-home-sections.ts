@@ -19,6 +19,8 @@ export const buildAndWriteHomeSections = async () => {
 
   const dir = r(`../README.md`);
   const rootReadme = readFileSync(dir, "utf-8");
+  const fileName = "HomeSections";
+  const filePath = r(`../site/src/components/Home/${fileName}.tsx`);
   const heading2List = [
     "Philosophy",
     // "Contribution Process",
@@ -26,8 +28,6 @@ export const buildAndWriteHomeSections = async () => {
     "Basic and Compound Primitives",
     "Managing Primitive Complexity"
   ];
-  const fileName = "HomeSections";
-  const filePath = `../site/src/components/Home/${fileName}.tsx`;
   let sections = "";
 
   heading2List.forEach(heading => {
@@ -63,17 +63,20 @@ export const buildAndWriteHomeSections = async () => {
     ]
     // outputFormat: "function-body"
   });
-  const outputString = output.toString();
+  let outputString = output.toString();
+  outputString = outputString.replace("export default MDXContent;", "");
 
   const result = `
 // Do not modify
-// Generated from "./scripts/update-site/build-pages"
+// Generated from "./scripts/update-site/build-html-home-sections"
 
 ${outputString}
 
 export default function ${fileName} () {
   return (
-    <MDXContent/>
+    <div class="prose">
+      <MDXContent/>
+    </div>
   )
 }
 `;
