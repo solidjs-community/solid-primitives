@@ -5,11 +5,11 @@ export function createJSXParser<TTokens extends {}>(id: string = "solid-parser")
   const tokenCache = new WeakMap();
 
   function createToken<TProps extends { [key: string]: any }, TToken extends TTokens>(
-    tokenProperties: (props: TProps) => TToken,
+    tokenCallback: (props: TProps) => TToken,
     component?: (props: TProps) => JSXElement
   ): (props: TProps) => JSXElement {
     return (props: TProps) => {
-      if (tokenCache.has(tokenProperties)) return tokenCache.get(tokenProperties);
+      if (tokenCache.has(tokenCallback)) return tokenCache.get(tokenCallback);
       const token = Object.assign(
         component
           ? () => component(props)
@@ -20,10 +20,10 @@ export function createJSXParser<TTokens extends {}>(id: string = "solid-parser")
             },
         {
           [$TOKEN]: true,
-          ...tokenProperties(props)
+          ...tokenCallback(props)
         }
       );
-      tokenCache.set(tokenProperties, token);
+      tokenCache.set(tokenCallback, token);
       return token;
     };
   }
