@@ -2,14 +2,12 @@ import { Accessor, createMemo, JSXElement } from "solid-js";
 
 export function createJSXParser<TTokens extends {}>(id: string = "solid-parser") {
   const $TOKEN = Symbol(id);
-  const tokenCache = new WeakMap();
 
   function createToken<TProps extends { [key: string]: any }, TToken extends TTokens>(
     tokenCallback: (props: TProps) => TToken,
     component?: (props: TProps) => JSXElement
   ): (props: TProps) => JSXElement {
     return (props: TProps) => {
-      if (tokenCache.has(tokenCallback)) return tokenCache.get(tokenCallback);
       const token = Object.assign(
         component
           ? () => component(props)
@@ -23,7 +21,6 @@ export function createJSXParser<TTokens extends {}>(id: string = "solid-parser")
           ...tokenCallback(props)
         }
       );
-      tokenCache.set(tokenCallback, token);
       return token;
     };
   }
