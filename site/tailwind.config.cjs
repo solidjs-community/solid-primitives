@@ -16,6 +16,9 @@ module.exports = {
         xxs: { raw: "(min-width: 400px)" },
         xs: { raw: "(min-width: 520px)" }
       },
+      transitionDuration: {
+        250: "250ms"
+      },
       colors: {
         "page-main-bg": "var(--page-main-bg)"
       },

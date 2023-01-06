@@ -3,27 +3,24 @@ import { createMediaQuery } from "@solid-primitives/media";
 import { isIOS, isSafari } from "@solid-primitives/platform";
 import { createSignal, onMount, ParentComponent } from "solid-js";
 import reflow from "~/utils/reflow";
+import { setHeaderState } from "../Header/Header";
 import StageModal from "../Stage/StageModal";
 
 const Table: ParentComponent = props => {
   const [tableRowTargets, setTableRowTargets] = createSignal<Element[]>([]);
   const [tableTarget, setTableTarget] = createSignal<Element[]>([]);
   const [headerActive, setHeaderActive] = createSignal(false);
-  const [headers, setHeaders] = createSignal<{ name: string; active: boolean }[]>([]);
   // const isSmall = createMediaQuery("(max-width: 767px)");
   let tableContainerParent!: HTMLElement;
   let tableEl!: HTMLTableElement;
   let tableHeaderName!: HTMLElement;
   let tableHeader!: HTMLElement;
-  let tableHeaderShadowEl!: HTMLElement;
   let tableHeaders: HTMLTableCellElement[] = [];
   let tableFirstTableRowCells: HTMLTableCellElement[] = [];
   let tableHeaderFirstLastSiblings: HTMLTableCellElement[] = [];
   let tableHeaderRealTR!: HTMLElement;
   let tableBody!: HTMLElement;
   let tableVerticalScrollShadow!: HTMLDivElement;
-  let pageHeader: HTMLElement;
-  let pageHeaderShadow: HTMLElement;
   const fakeTableRow = (
     <>
       <tr aria-hidden="true" style="visibility: hidden;">
@@ -56,9 +53,7 @@ const Table: ParentComponent = props => {
     }
     tableHeader.style.boxShadow = "var(--table-header-box-shadow)";
     tableHeader.style.transition = "box-shadow 200ms";
-    pageHeader.style.borderBottom = "2px solid transparent";
-    pageHeader.style.borderImage = "var(--header-border-bottom)";
-    // tableHeaderShadowEl.style.opacity = "1";
+    setHeaderState("showGradientBorder", true);
     tableHeaderFirstLastSiblings.forEach(item => {
       item.style.borderRadius = "0";
       item.style.transition = "border-radius 200ms";
@@ -66,6 +61,7 @@ const Table: ParentComponent = props => {
 
     setHeaderActive(true);
   };
+
   const hideActiveHeader = () => {
     if (!tableSameWidthAsParent) {
       const { scrollLeft } = tableContainerParent;
@@ -76,9 +72,7 @@ const Table: ParentComponent = props => {
       tableHeader.style.transform = `translate(${scrollLeft}px, 4px)`;
     }
     tableHeader.style.boxShadow = "var(--table-header-box-shadow-hide)";
-    pageHeader.style.borderBottom = "";
-    pageHeader.style.borderImage = "";
-    // tableHeaderShadowEl.style.opacity = "0";
+    setHeaderState("showGradientBorder", false);
     tableHeaderFirstLastSiblings.forEach(item => {
       item.style.borderRadius = "";
     });
@@ -286,8 +280,7 @@ const Table: ParentComponent = props => {
         const bottom = boundingClientRect.bottom - rootMarginTop;
         // if (boundingClientRect.top < 0 && boundingClientRect.bottom >= 0) {
         if (top < 0 && bottom >= 0) {
-          console.log("show");
-          pageHeaderShadow.style.opacity = "0";
+          setHeaderState("showShadow", false);
           showActiveHeader();
           return;
         }
@@ -296,7 +289,7 @@ const Table: ParentComponent = props => {
         if (bottom > 0) return;
         if (tableSameWidthAsParent) return;
 
-        pageHeaderShadow.style.opacity = "1";
+        setHeaderState("showShadow", true);
         hideActiveHeader();
       });
     },
@@ -313,13 +306,10 @@ const Table: ParentComponent = props => {
           prevY = window.scrollY;
           return;
         }
-        // if (isIntersecting) return;
 
         if (boundingClientRect.top <= rootBounds?.top! && !isIntersecting) {
           prevY = window.scrollY;
-          // console.log(target, boundingClientRect, rootBounds);
           tableHeaderName.textContent = target.textContent;
-          // tableHeaderShadowEl.style.opacity = "1";
           showActiveHeader();
 
           return;
@@ -329,20 +319,16 @@ const Table: ParentComponent = props => {
           console.log("get TOP!!!!", target);
           const els = tableRowTargets();
           const prevEl = els[els.indexOf(target) - 1];
-          // tableHeaderShadowEl.style.opacity = "1";
           showActiveHeader();
 
           if (prevEl) {
             tableHeaderName.textContent = prevEl.textContent;
           } else {
             tableHeaderName.textContent = "Name";
-            // tableHeaderShadowEl.style.opacity = "0";
             hideActiveHeader();
           }
           return;
         }
-
-        // console.log(target, !isIntersecting);
       });
     },
     { rootMargin: `-${rootMarginTop}px 0px 0px 0px` }
@@ -376,10 +362,7 @@ const Table: ParentComponent = props => {
                 tableHeaders[0],
                 tableHeaders[tableHeaders.length - 1]
               ];
-              tableHeaderShadowEl = tableHeader.querySelector("#header-shadow")!;
               tableHeaderRealTR = tableHeader.querySelector("#header-real-tr")!;
-              pageHeader = document.querySelector("header div")!;
-              pageHeaderShadow = pageHeader.querySelector("[data-header-shadow]")!;
             }}
           >
             {props.children}

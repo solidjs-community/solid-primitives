@@ -192,9 +192,10 @@ pre {
   --solid-blocks-header-cluster__block-top-right: #eef2fd;
   --page-main-bg: #fff;
   --header-box-shadow: 0px 26px 14px -18px #24405966;
+  --header-big-box-shadow: 0px 16px 28px 0px #24405966;
   --table-header-box-shadow: 0px 16px 14px -10px #24405966;
   --table-header-box-shadow-hide: 0px 16px 14px -10px #24405900;
-  --header-border-bottom: linear-gradient(to right, #e4f6f9, #d8dff5) 1;
+  --header-border-bottom: linear-gradient(to right, #e4f6f9, #d8dff5);
 }
 
 html.dark {
@@ -220,9 +221,10 @@ html.dark {
   --solid-blocks-header-cluster__small-shadow-right: #324167b9; */
   --page-main-bg: #293843;
   --header-box-shadow: 0px 26px 14px -18px #05121dbf;
+  --header-big-box-shadow: 0px 16px 28px 0px #05121dbf;
   --table-header-box-shadow: 0px 16px 14px -10px #05121dbf;
   --table-header-box-shadow-hide: 0px 16px 14px -10px #05121d00;
-  --header-border-bottom: linear-gradient(to right, #2b455a, #2c4668) 1;
+  --header-border-bottom: linear-gradient(to right, #2b455a, #2c4668);
 }
 
 html.dark .prose {
