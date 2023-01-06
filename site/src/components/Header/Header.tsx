@@ -126,7 +126,7 @@ const Header = () => {
       <div class="relative h-full">
         <div class="max-w-[900px] mx-auto w-full h-full flex px-4 sm:px-8 items-center justify-between gap-2">
           <div
-            class="absolute top-0 left-0 bottom-0 right-0 box-shadow-[var(--header-box-shadow)] -z-1 transition-opacity duration-250"
+            class="absolute top-0 left-0 bottom-0 right-0 max-w-[900px] mx-auto box-shadow-[var(--header-box-shadow)] -z-1 transition-opacity duration-250"
             classList={{
               "opacity-100": headerState.showShadow || openNavMenu(),
               "opacity-0": !headerState.showShadow
@@ -197,14 +197,14 @@ const Header = () => {
         ref={headerOpaqueBg}
       />
       <div
-        class="background-[var(--header-border-bottom)] h-[2px] transition-opacity duration-250"
+        class="max-w-[900px] mx-auto background-[var(--header-border-bottom)] h-[2px] transition-opacity duration-250"
         classList={{
           "opacity-100": headerState.showGradientBorder,
           "opacity-0": !headerState.showGradientBorder
         }}
         ref={headerBottomGradientBorder}
       />
-      <div class="relative top-[-2px] overflow-clip">
+      <div class="relative max-w-[900px] mx-auto top-[-2px] overflow-clip">
         <Dismiss
           menuButton={menuButtonNavMenu}
           open={openNavMenu}

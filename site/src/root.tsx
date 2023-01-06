@@ -15,6 +15,7 @@ import {
 import Header from "./components/Header/Header";
 import "./root.css";
 import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderClusterDefs";
+import Footer from "./components/Footer/Footer";
 
 export default function Root() {
   return (
@@ -41,6 +42,7 @@ export default function Root() {
             <Routes>
               <FileRoutes />
             </Routes>
+            <Footer />
           </ErrorBoundary>
         </Suspense>
         <Scripts />

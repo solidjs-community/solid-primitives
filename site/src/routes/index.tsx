@@ -4,7 +4,7 @@ import HomeSections from "~/components/Home/HomeSections";
 
 export default function Home() {
   return (
-    <main class="py-[60px]">
+    <main class="pt-[60px]">
       <Title>Solid Primitives</Title>
       <div class="p-4 sm:pt-[5vh] md:pt-[10vh] leading-7 max-w-[720px] mx-auto min-h-[35vh] sm:min-h-[50vh] overflow-clip">
         <p class="py-3 sm:text-lg md:text-2xl">
