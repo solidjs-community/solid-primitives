@@ -1,13 +1,14 @@
-import { JSXElement, createMemo, Accessor } from "solid-js";
+import { Accessor, createMemo, getOwner, JSXElement, Owner } from "solid-js";
 
-export function createJSXParser<TTokens = {}>(id: string = "solid-parser") {
+export function createJSXParser<TTokens extends {}>(id: string = "solid-parser") {
   const $TOKEN = Symbol(id);
 
   function createToken<TProps extends { [key: string]: any }, TToken extends TTokens>(
-    tokenProperties: (props: TProps) => TToken,
+    tokenProperties: (props: TProps, owner: Owner | null) => TToken,
     component?: (props: TProps) => JSXElement
   ): (props: TProps) => JSXElement {
     return (props: TProps) => {
+      const owner = getOwner();
       return Object.assign(
         component
           ? () => component(props)
@@ -18,13 +19,13 @@ export function createJSXParser<TTokens = {}>(id: string = "solid-parser") {
             },
         {
           [$TOKEN]: true,
-          ...tokenProperties(props)
+          ...tokenProperties(props, owner)
         }
       );
     };
   }
 
-  function childrenTokens(fn: Accessor<JSXElement | JSXElement[]>): Accessor<TTokens[]> {
+  function childrenTokens(fn: Accessor<JSXElement>): Accessor<TTokens[]> {
     const children = createMemo(fn);
     const resolveChild = (child: any): any => {
       while (true) {
