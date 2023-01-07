@@ -44,5 +44,9 @@ export function createJSXParser<TTokens extends {}>(id: string = "solid-parser")
     );
   }
 
-  return { createToken, childrenTokens, $TOKEN };
+  function isToken(value: any) {
+    return typeof value === "function" && $TOKEN in value && (value as TTokens);
+  }
+
+  return { createToken, childrenTokens, isToken, $TOKEN };
 }
