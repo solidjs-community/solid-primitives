@@ -278,7 +278,7 @@ const Table: ParentComponent = props => {
         const { isIntersecting, boundingClientRect } = entry;
         const top = boundingClientRect.top - rootMarginTop;
         const bottom = boundingClientRect.bottom - rootMarginTop;
-        // if (boundingClientRect.top < 0 && boundingClientRect.bottom >= 0) {
+
         if (top < 0 && bottom >= 0) {
           setHeaderState("showShadow", false);
           showActiveHeader();
@@ -287,7 +287,7 @@ const Table: ParentComponent = props => {
         if (isIntersecting) return;
         // if (boundingClientRect.bottom > 0) return;
         if (bottom > 0) return;
-        if (tableSameWidthAsParent) return;
+        // if (tableSameWidthAsParent) return;
 
         setHeaderState("showShadow", true);
         hideActiveHeader();

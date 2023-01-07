@@ -81,26 +81,12 @@ const Header = () => {
     on(
       openNavMenu,
       openNavMenu => {
-        //     const coords = {y: 0}
-        // const tween = new TWEEN.Tween(coords) // Create a new tween that modifies 'coords'.
-        // 	.to({y: 200}, 1000) // Move to (300, 200) in 1 second.
-        // 	.easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
-        // 	.onUpdate(() => {
-        // 	})
-        // 	.start() // Start the tween immediately.
         if (openNavMenu) {
           navMenuHeight = navMenu.clientHeight;
 
           headerOpaqueBg.style.height = `${navMenuHeight + headerHeight}px`;
           headerOpaqueBg.style.transform = `translateY(${-navMenuHeight}px)`;
           setFrom(navMenuHeight);
-          // requestAnimationFrame(() => {
-          //   requestAnimationFrame(() => {
-          //     headerBottomGradientBorder.style.transform = `translateY(${navMenuHeight}px)`;
-          //     headerShadow.style.transform = `translateY(${navMenuHeight}px)`;
-          //     headerOpaqueBg.style.transform = "translateY(0px)";
-          //   });
-          // });
           return;
         }
         const showOpaqueBg = window.scrollY > 30;
@@ -187,7 +173,7 @@ const Header = () => {
         <SearchModal menuButton={menuButtonSearch} open={openSearch} setOpen={setOpenSearch} />
       </div>
       <div
-        class="absolute h-full top-0 left-0 right-0 transition-[background-color,backdrop-filter] -z-1"
+        class="absolute h-full top-0 left-0 right-0 translate-y-[calc(-100%+60px)] transition-[background-color,backdrop-filter] -z-1"
         classList={{
           "backdrop-blur-md bg-white/50 dark:bg-[#293843]/70":
             headerState.showOpaqueBg || openNavMenu(),
