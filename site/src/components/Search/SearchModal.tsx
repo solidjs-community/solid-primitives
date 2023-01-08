@@ -1,7 +1,8 @@
-import { createShortcut } from "@solid-primitives/keyboard";
+// import { createShortcut } from "@solid-primitives/keyboard";
 import Dismiss from "solid-dismiss";
 import { Accessor, Component, createEffect, on } from "solid-js";
 import { useLocation } from "solid-start";
+import { createShortcut } from "~/hooks/createShortcut";
 import Search from "./Search";
 
 const SearchModal: Component<{
