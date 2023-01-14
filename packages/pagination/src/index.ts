@@ -1,5 +1,8 @@
-import { type Accessor, type Setter, createSignal, type JSX, createMemo } from "solid-js";
+import { createSignal, createMemo, createEffect, createResource } from "solid-js";
+import type { Accessor, Setter, JSX } from "solid-js";
 import { access, type MaybeAccessor, noop } from "@solid-primitives/utils";
+
+import { createVisibilityObserver } from "@solid-primitives/intersection-observer";
 
 export type PaginationOptions = {
   /** the overall number of pages */
@@ -214,4 +217,57 @@ export const createPagination = (
   });
 
   return [paginationProps, page, setPage as Setter<number>];
+};
+
+declare module "solid-js" {
+  namespace JSX {
+    interface Directives {
+      loaderDirective: boolean
+    }
+  }
+}
+
+export type _E = JSX.Element;
+
+export function createInfiniteScroll<T>(
+  fetcher: (page: number) => Promise<T[]>,
+): [
+    pages: Accessor<T[]>,
+    loaderDirective: Setter<Element | undefined>,
+    options: {
+      page: Accessor<number>,
+      setPage: Setter<number>,
+      setPages: Setter<T[]>
+      end: Accessor<boolean>,
+      setEnd: Setter<boolean>,
+    }
+  ] {
+  const [loader, setLoader] = createSignal<HTMLElement>();
+  const [pages, setPages] = createSignal<T[]>([]);
+  const [page, setPage] = createSignal(0);
+  const [end, setEnd] = createSignal(false);
+
+  const visible = createVisibilityObserver()(loader);
+  const [contents] = createResource(page, fetcher);
+
+  createEffect(() => {
+    if (visible() && !end() && !contents.loading) {
+      setPage(p => p + 1);
+    }
+  })
+
+  createEffect(() => {
+    const content = contents();
+    if (!content) return;
+    if (content.length === 0) setEnd(true);
+    setPages(p => [...p, ...content!]);
+  })
+
+  return [pages, setLoader, { 
+    page: page, 
+    setPage: setPage, 
+    setPages: setPages, 
+    end: end,
+    setEnd: setEnd,
+  }];
 };
