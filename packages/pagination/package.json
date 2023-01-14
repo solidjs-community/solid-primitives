@@ -17,7 +17,8 @@
     "name": "pagination",
     "stage": 0,
     "list": [
-      "createPagination"
+      "createPagination",
+      "createInfiniteScroll"
     ],
     "category": "Utilities"
   },
@@ -66,6 +67,7 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
+    "@solid-primitives/intersection-observer": "workspace:^2.0.3",
     "@solid-primitives/utils": "^4.0.0"
   },
   "peerDependencies": {
