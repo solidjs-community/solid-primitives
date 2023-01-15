@@ -161,11 +161,11 @@ function getResolvedElements(value: unknown): HTMLElement | HTMLElement[] | null
  * refs() // T: HTMLElement[]
  */
 export function elements<S>(fn: Accessor<Many<S>>): Accessor<ExtractIfPossible<S, Element>[]>;
-export function elements<S, T extends typeof Element[]>(
+export function elements<S, T extends (typeof Element)[]>(
   fn: Accessor<Many<S>>,
   ...types: T
 ): Accessor<ExtractIfPossible<S, InstanceType<ItemsOf<T>>>[]>;
-export function elements(fn: Accessor<any>, ...types: typeof Element[]): Accessor<Element[]> {
+export function elements(fn: Accessor<any>, ...types: (typeof Element)[]): Accessor<Element[]> {
   return createMemo(() => filterInstance(asArray(fn()), ...(types.length ? types : [Element])));
 }
 
@@ -187,7 +187,7 @@ export function refs<S>(
   added: Accessor<ExtractIfPossible<S, Element>[]>,
   removed: Accessor<ExtractIfPossible<S, Element>[]>
 ];
-export function refs<S, T extends typeof Element[]>(
+export function refs<S, T extends (typeof Element)[]>(
   fn: Accessor<Many<S>>,
   ...types: T
 ): [
@@ -197,7 +197,7 @@ export function refs<S, T extends typeof Element[]>(
 ];
 export function refs(
   fn: Accessor<any>,
-  ...types: typeof Element[]
+  ...types: (typeof Element)[]
 ): [refs: Accessor<Element[]>, added: Accessor<Element[]>, removed: Accessor<Element[]>] {
   const resolved = elements(fn, ...types);
   let prev: readonly Element[] = [];
