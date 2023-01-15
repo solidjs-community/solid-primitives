@@ -18,7 +18,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --ignore-scripts
 
       - name: Format
         run: pnpm run format
