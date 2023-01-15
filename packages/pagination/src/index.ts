@@ -239,11 +239,11 @@ type loaderDirective = (ref: Element) => void
  * @return `pages()` is an accessor contains array of contents 
  * @property `pages.loading` is a boolean indicator for the loading state
  * @property `pages.error` contains any error encountered
- * @return `asLoader` is an directive used to set loader
+ * @return `asLoader` is a directive used to set loader
  * @method `page` is an accessor that contains page number
  * @method `setPage` allows to manually change the page number
- * @method `setPages` allows to manually change the contents of page
- * @method `end` is a boolean indicator for end of page
+ * @method `setPages` allows to manually change the contents of the page
+ * @method `end` is a boolean indicator for end of the page
  * @method `setEnd` allows to manually change the end
  */
 export function createInfiniteScroll<T>(
