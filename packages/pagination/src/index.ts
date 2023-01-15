@@ -180,7 +180,10 @@ export const createPagination = (
   );
 
   const start = createMemo(() =>
-    Math.min(opts().pages - opts().maxPages, Math.max(1, page() - (opts().maxPages >> 1)) - 1)
+    Math.max(
+      0,
+      Math.min(opts().pages - opts().maxPages, Math.max(1, page() - (opts().maxPages >> 1)) - 1)
+    )
   );
   const showFirst = createMemo(() =>
     normalizeOption("showFirst", opts().showFirst, page(), opts().pages)

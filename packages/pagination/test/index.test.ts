@@ -36,4 +36,15 @@ describe("createPagination", () => {
       expect(paginationProps().findIndex(({ ["aria-current"]: current }) => current)).toBe(3);
       dispose();
     }));
+
+  test("createPagination clamps start", () =>
+    createRoot(dispose => {
+      const [paginationProps, _page, _setPage] = createPagination({
+        pages: 10,
+        maxPages: 13
+      });
+      const extraProps = 4;
+      expect(paginationProps().length, "pages").toBe(10 + extraProps);
+      dispose();
+    }));
 });
