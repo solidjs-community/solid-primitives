@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createRoot } from "solid-js";
+import { createRoot, createSignal } from "solid-js";
 import { createPagination } from "../src";
 
 describe("createPagination", () => {
@@ -34,6 +34,17 @@ describe("createPagination", () => {
       expect(paginationProps().findIndex(({ ["aria-current"]: current }) => current)).toBe(2);
       setPage(page() + 1);
       expect(paginationProps().findIndex(({ ["aria-current"]: current }) => current)).toBe(3);
+      dispose();
+    }));
+
+  test("createPagination reacts to options update", () =>
+    createRoot(dispose => {
+      const [options, setOptions] = createSignal({ pages: 10, maxPages: 20 });
+      const [paginationProps, _page, _setPage] = createPagination(options);
+      const extraProps = 4;
+      expect(paginationProps().length, "initial pages").toBe(10 + extraProps);
+      setOptions({ pages: 5, maxPages: 10 });
+      expect(paginationProps().length, "pages after change").toBe(5 + extraProps);
       dispose();
     }));
 });
