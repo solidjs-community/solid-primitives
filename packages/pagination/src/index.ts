@@ -229,27 +229,28 @@ declare module "solid-js" {
 
 export type _E = JSX.Element;
 
+type loaderDirective = (ref: Element) => void
+
 /**
  * ```typescript
- * const [pages, loaderDirective, { page, setPage, setPages, end, setEnd }] = createInfiniteScroll(fetcher);
+ * const [pages, asLoader, { page, setPage, setPages, end, setEnd }] = createInfiniteScroll(fetcher);
  * ```
  * @param fetcher (page: number) => Promise<T[]>
  * @return `pages()` is an accessor contains array of contents 
  * @property `pages.loading` is a boolean indicator for the loading state
  * @property `pages.error` contains any error encountered
- * @return `loaderDirective` is an directive used to set loader
+ * @return `asLoader` is an directive used to set loader
  * @method `page` is an accessor that contains page number
  * @method `setPage` allows to manually change the page number
  * @method `setPages` allows to manually change the contents of page
  * @method `end` is a boolean indicator for end of page
  * @method `setEnd` allows to manually change the end
- *
  */
 export function createInfiniteScroll<T>(
   fetcher: (page: number) => Promise<T[]>,
 ): [
     pages: Accessor<T[]>,
-    loaderDirective: Setter<Element | undefined>,
+    asLoader: loaderDirective,
     options: {
       page: Accessor<number>,
       setPage: Setter<number>,

@@ -103,13 +103,15 @@ return (
 ```tsx
 export default function App() {
   // fetcher: (page: number) => Promise<T[]>
-  const [pages, loaderDirective] = createInfiniteScroll(fetcher);
+  const [pages, asLoader, { end }] = createInfiniteScroll(fetcher);
   return (
     <div>
       <For each={pages()}>
         {item => <h4>{item}</h4>}
       </For>
-      <h1 use:loaderDirective>Loading...</h1>
+      <Show when={!end()}>
+        <h1 use:asLoader>Loading...</h1>
+      </Show>
     </div>
   );
 };
