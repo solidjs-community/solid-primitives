@@ -16,6 +16,7 @@ export type Directive<P = true> = (el: Element, props: Accessor<P>) => void;
 export type ItemsOf<T> = T extends (infer E)[] ? E : never;
 export type ItemsOfMany<T> = T extends any[] ? ItemsOf<T> : T;
 
+// TODO rename to `SetterParam`
 export type SetterValue<T> = Parameters<Setter<T>>[0];
 
 /**

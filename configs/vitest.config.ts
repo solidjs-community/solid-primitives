@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
   const testSSR = mode === "test:ssr" || mode === "ssr";
 
   return {
-    plugins: [solidPlugin()],
+    plugins: [solidPlugin({ hot: false })],
     test: {
       watch: false,
       isolate: !testSSR,
