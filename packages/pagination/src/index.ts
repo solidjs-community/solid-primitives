@@ -106,6 +106,8 @@ export const createPagination = (
       }[ev.key] || noop
     )());
 
+  const maxPages = createMemo(() => Math.min(opts().maxPages, opts().pages));
+
   const pages: PaginationProps = [...Array(opts().pages)].map((_, i) =>
     ((pageNo: number) =>
       Object.defineProperties(
@@ -180,10 +182,7 @@ export const createPagination = (
   );
 
   const start = createMemo(() =>
-    Math.max(
-      0,
-      Math.min(opts().pages - opts().maxPages, Math.max(1, page() - (opts().maxPages >> 1)) - 1)
-    )
+    Math.min(opts().pages - maxPages(), Math.max(1, page() - (maxPages() >> 1)) - 1)
   );
   const showFirst = createMemo(() =>
     normalizeOption("showFirst", opts().showFirst, page(), opts().pages)
@@ -206,7 +205,7 @@ export const createPagination = (
     if (showPrev()) {
       props.push(back);
     }
-    props.push(...pages.slice(start(), start() + opts().maxPages));
+    props.push(...pages.slice(start(), start() + maxPages()));
     if (showNext()) {
       props.push(next);
     }
