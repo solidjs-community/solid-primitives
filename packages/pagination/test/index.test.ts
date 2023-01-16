@@ -39,12 +39,34 @@ describe("createPagination", () => {
 
   test("createPagination reacts to options update", () =>
     createRoot(dispose => {
-      const [options, setOptions] = createSignal({ pages: 10, maxPages: 20 });
+      const commonOptions = {
+        showFirst: false,
+        showPrev: false,
+        showNext: false,
+        showLast: false
+      };
+      const [options, setOptions] = createSignal({ ...commonOptions, pages: 10, maxPages: 20 });
       const [paginationProps, _page, _setPage] = createPagination(options);
-      const extraProps = 4;
-      expect(paginationProps().length, "initial pages").toBe(10 + extraProps);
-      setOptions({ pages: 5, maxPages: 10 });
-      expect(paginationProps().length, "pages after change").toBe(5 + extraProps);
+      expect(paginationProps().length, "initial pages").toBe(10);
+      setOptions({ ...commonOptions, pages: 5, maxPages: 10 });
+      expect(paginationProps().length, "pages after change").toBe(5);
+      dispose();
+    }));
+
+  test("createPagination pages reused", () =>
+    createRoot(dispose => {
+      const commonOptions = {
+        showFirst: false,
+        showPrev: false,
+        showNext: false,
+        showLast: false
+      };
+      const [options, setOptions] = createSignal({ ...commonOptions, pages: 3 });
+      const [paginationProps, _page, _setPage] = createPagination(options);
+      const initialPages = paginationProps();
+      setOptions({ ...commonOptions, pages: 2 });
+      const updatedPages = paginationProps();
+      expect(updatedPages.every((page, index) => Object.is(page, initialPages[index]))).toBe(true);
       dispose();
     }));
 });

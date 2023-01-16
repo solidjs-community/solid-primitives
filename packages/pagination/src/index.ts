@@ -106,27 +106,31 @@ export const createPagination = (
       }[ev.key] || noop
     )());
 
-  const pages = createMemo(() =>
-    [...Array(opts().pages)].map((_, i) =>
-      ((pageNo: number) =>
-        Object.defineProperties(
-          process.env.SSR
-            ? { children: pageNo.toString() }
-            : {
-                children: pageNo.toString(),
-                onClick: [setPage, pageNo] as const,
-                onKeyUp: [onKeyUp, pageNo] as const
-              },
-          {
-            "aria-current": {
-              get: () => (page() === pageNo ? "true" : undefined),
-              set: noop,
-              enumerable: true
-            },
-            page: { value: pageNo, enumerable: false }
-          }
-        ))(i + 1)
-    )
+  const pages = createMemo<PaginationProps[]>(
+    previous =>
+      [...Array(opts().pages)].map(
+        (_, i) =>
+          (previous && previous[i]) ??
+          ((pageNo: number) =>
+            Object.defineProperties(
+              process.env.SSR
+                ? { children: pageNo.toString() }
+                : {
+                    children: pageNo.toString(),
+                    onClick: [setPage, pageNo] as const,
+                    onKeyUp: [onKeyUp, pageNo] as const
+                  },
+              {
+                "aria-current": {
+                  get: () => (page() === pageNo ? "true" : undefined),
+                  set: noop,
+                  enumerable: true
+                },
+                page: { value: pageNo, enumerable: false }
+              }
+            ))(i + 1)
+      ),
+    []
   );
 
   const first = Object.defineProperties(
