@@ -2,4 +2,4 @@
 "@solid-primitives/pagination": patch
 ---
 
-Prevent wrong pages slice by clamping start to 0.
+Prevent wrong pages slice by internally clamping maxPages to total page count.
