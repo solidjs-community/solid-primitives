@@ -34,7 +34,8 @@ const printExports = !writeExports;
     {
       cjs: true,
       writePackageJson: writeExports,
-      printInstructions: printExports
+      printInstructions: printExports,
+      dropConsole: true
     }
   );
 
