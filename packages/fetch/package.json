@@ -26,36 +26,57 @@
   "main": "./dist/server.cjs",
   "module": "./dist/server.js",
   "browser": {
-    "./dist/server.cjs": "./dist/index.cjs",
-    "./dist/server.js": "./dist/index.js"
+    "./dist/server.js": "./dist/index.js",
+    "./dist/server.cjs": "./dist/index.cjs"
   },
   "types": "./dist/index.d.ts",
   "exports": {
     "worker": {
-      "import": "./dist/server.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": "./dist/server.cjs"
+    },
+    "deno": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
       "require": "./dist/server.cjs"
     },
     "browser": {
       "development": {
-        "import": "./dist/dev.js",
+        "import": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/dev.js"
+        },
         "require": "./dist/dev.cjs"
       },
-      "import": "./dist/index.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
       "require": "./dist/index.cjs"
     },
-    "deno": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
-    },
-    "node": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
-    },
     "development": {
-      "import": "./dist/dev.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/dev.js"
+      },
       "require": "./dist/dev.cjs"
     },
-    "import": "./dist/index.js",
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "require": "./dist/index.cjs"
   },
   "scripts": {
@@ -79,5 +100,6 @@
     "node-fetch": {
       "optional": true
     }
-  }
+  },
+  "typesVersions": {}
 }

@@ -39,10 +39,16 @@
   "browser": {},
   "exports": {
     "browser": {
-      "import": "./dist/index.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
       "require": "./dist/index.cjs"
     },
-    "import": "./dist/index.js",
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "require": "./dist/index.cjs"
   },
   "scripts": {
@@ -57,5 +63,6 @@
   },
   "dependencies": {
     "@solid-primitives/trigger": "workspace:^0.0.2"
-  }
+  },
+  "typesVersions": {}
 }
