@@ -1,5 +1,15 @@
 # @solid-primitives/refs
 
+## 0.3.5
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+- Updated dependencies [dd2d7d1c]
+  - @solid-primitives/immutable@0.1.5
+  - @solid-primitives/rootless@1.2.2
+  - @solid-primitives/utils@4.0.1
+
 ## 0.3.4
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 4.0.1
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+
 ## 4.0.0
 
 ### Major Changes

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/analytics",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Primitive that makes managing analytics a lot easier.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
