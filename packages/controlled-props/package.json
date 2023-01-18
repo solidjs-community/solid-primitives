@@ -30,14 +30,6 @@
   "browser": {},
   "typesVersions": {},
   "exports": {
-    "browser": {
-      "solid": "./dist/index.jsx",
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "require": "./dist/index.cjs"
-    },
     "solid": "./dist/index.jsx",
     "import": {
       "types": "./dist/index.d.ts",

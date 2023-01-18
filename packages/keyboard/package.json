@@ -53,6 +53,13 @@
       },
       "require": "./dist/server.cjs"
     },
+    "browser": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": "./dist/index.cjs"
+    },
     "deno": {
       "import": {
         "types": "./dist/index.d.ts",
@@ -66,13 +73,6 @@
         "default": "./dist/server.js"
       },
       "require": "./dist/server.cjs"
-    },
-    "browser": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "require": "./dist/index.cjs"
     },
     "import": {
       "types": "./dist/index.d.ts",

@@ -36,20 +36,6 @@
       },
       "require": "./dist/server.cjs"
     },
-    "deno": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/server.js"
-      },
-      "require": "./dist/server.cjs"
-    },
-    "node": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/server.js"
-      },
-      "require": "./dist/server.cjs"
-    },
     "browser": {
       "development": {
         "import": {
@@ -63,6 +49,20 @@
         "default": "./dist/index.js"
       },
       "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": "./dist/server.cjs"
     },
     "development": {
       "import": {
