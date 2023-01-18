@@ -1,5 +1,15 @@
 # @solid-primitives/resize-observer
 
+## 2.0.8
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+- Updated dependencies [dd2d7d1c]
+  - @solid-primitives/event-listener@2.2.5
+  - @solid-primitives/rootless@1.2.2
+  - @solid-primitives/utils@4.0.1
+
 ## 2.0.7
 
 ### Patch Changes

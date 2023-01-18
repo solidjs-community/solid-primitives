@@ -1,5 +1,13 @@
 # @solid-primitives/graphql
 
+## 1.5.1
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+- Updated dependencies [dd2d7d1c]
+  - @solid-primitives/utils@4.0.1
+
 ## 1.5.0
 
 ### Minor Changes

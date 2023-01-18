@@ -1,5 +1,11 @@
 # @solid-primitives/share
 
+## 2.0.1
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+
 ## 2.0.0
 
 ### Major Changes
