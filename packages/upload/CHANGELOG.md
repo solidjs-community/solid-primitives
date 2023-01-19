@@ -1,5 +1,13 @@
 # @solid-primitives/upload
 
+## 0.0.106
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+- Updated dependencies [dd2d7d1c]
+  - @solid-primitives/utils@4.0.1
+
 ## 0.0.105
 
 ### Patch Changes

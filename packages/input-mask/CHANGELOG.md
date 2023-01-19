@@ -1,5 +1,11 @@
 # @solid-primitives/input-mask
 
+## 0.1.5
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+
 ## 0.1.4
 
 ### Patch Changes

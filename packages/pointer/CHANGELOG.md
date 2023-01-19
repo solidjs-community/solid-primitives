@@ -1,5 +1,16 @@
 # @solid-primitives/pointer
 
+## 0.2.4
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+- Updated dependencies [dd2d7d1c]
+  - @solid-primitives/event-listener@2.2.5
+  - @solid-primitives/immutable@0.1.5
+  - @solid-primitives/rootless@1.2.2
+  - @solid-primitives/utils@4.0.1
+
 ## 0.2.3
 
 ### Patch Changes

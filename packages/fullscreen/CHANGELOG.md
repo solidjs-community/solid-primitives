@@ -1,5 +1,11 @@
 # @solid-primitives/fullscreen
 
+## 1.2.2
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+
 ## 1.2.1
 
 ### Patch Changes

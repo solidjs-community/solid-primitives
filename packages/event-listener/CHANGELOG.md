@@ -1,5 +1,13 @@
 # @solid-primitives/event-listener
 
+## 2.2.5
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+- Updated dependencies [dd2d7d1c]
+  - @solid-primitives/utils@4.0.1
+
 ## 2.2.4
 
 ### Patch Changes

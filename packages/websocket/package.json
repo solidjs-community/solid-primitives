@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/websocket",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Primitive to create a worker helper",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",

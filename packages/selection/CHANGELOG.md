@@ -1,5 +1,11 @@
 # @solid-primitives/selection
 
+## 0.0.4
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+
 ## 0.0.3
 
 ### Patch Changes
