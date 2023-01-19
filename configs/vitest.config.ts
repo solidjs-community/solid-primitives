@@ -1,8 +1,6 @@
-import path from "path";
 import { defineConfig } from "vitest/config";
 import solidPlugin from "vite-plugin-solid";
 
-const cwd = process.cwd();
 const fromRoot = process.env.CI === "true";
 
 export default defineConfig(({ mode }) => {
@@ -11,7 +9,14 @@ export default defineConfig(({ mode }) => {
   const testSSR = mode === "test:ssr" || mode === "ssr";
 
   return {
-    plugins: [solidPlugin({ hot: false })],
+    plugins: [
+      solidPlugin({
+        // https://github.com/solidjs/solid-refresh/issues/29
+        hot: false,
+        // For testing SSR we need to do a SSR JSX transform
+        solid: { generate: testSSR ? "ssr" : "dom" }
+      })
+    ],
     test: {
       watch: false,
       isolate: !testSSR,
@@ -45,22 +50,7 @@ export default defineConfig(({ mode }) => {
           })
     },
     resolve: {
-      ...(testSSR
-        ? {
-            alias: {
-              "solid-js/web": path.resolve(cwd, "node_modules/solid-js/web/dist/server.js"),
-              "solid-js/store": path.resolve(cwd, "node_modules/solid-js/store/dist/server.js"),
-              "solid-js": path.resolve(cwd, "node_modules/solid-js/dist/server.js")
-            }
-          }
-        : {
-            conditions: ["browser", "development"],
-            alias: {
-              "solid-js/web": path.resolve(cwd, "node_modules/solid-js/web/dist/dev.js"),
-              "solid-js/store": path.resolve(cwd, "node_modules/solid-js/store/dist/dev.js"),
-              "solid-js": path.resolve(cwd, "node_modules/solid-js/dist/dev.js")
-            }
-          })
+      conditions: testSSR ? ["node"] : ["browser", "development"]
     }
   };
 });
