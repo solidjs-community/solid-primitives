@@ -18,7 +18,7 @@ A collection of primitives, capturing current mouse cursor position, and helping
 
 ##### Non-reactive primitives:
 
-- [`makeMousePositionListener`](#makeMousePositionListener) - Attaches event listeners to provided target, listeneing for changes to the mouse/touch position.
+- [`makeMousePositionListener`](#makeMousePositionListener) - Attaches event listeners to provided target, listening for changes to the mouse/touch position.
 - [`makeMouseInsideListener`](#makeMouseInsideListener) - Attaches event listeners to provided target, listening for mouse/touch entering/leaving the element.
 
 ##### Calculations:
@@ -65,7 +65,7 @@ By default `createMousePosition` is listening to `touch` events as well. You can
 // disables following touch position – only registers touch start
 const pos = createMousePosition(window, { followTouch: false });
 
-// disables listeneing to any touch events
+// disables listening to any touch events
 const pos = createMousePosition(window, { touch: false });
 ```
 
@@ -131,7 +131,7 @@ function createPositionToElement(
 
 ###### Added id `@2.0.0`
 
-Attaches event listeners to provided target, listeneing for changes to the mouse/touch position.
+Attaches event listeners to provided target, listening for changes to the mouse/touch position.
 
 ```ts
 const clear = makeMousePositionListener(el, pos => console.log(pos), { touch: false });
