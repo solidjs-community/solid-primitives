@@ -33,11 +33,17 @@ pnpm add @solid-primitives/option
 
 ```tsx
 const [user, setUser] = createStore({
-  role: Some(1),
-  submissionValue: None()
+  submissionValue: None<string>()
 });
-
-return <div>{user.role.unwrap() || "Role is null"}</div>;
+return (
+  <>
+    <p>Wrote: {user.submissionValue.unwrap_or("Didnt write yet.")}</p>
+    <input
+      type="text"
+      onInput={e => setUser("submissionValue", makeOption((e.target as any).value || null))}
+    />
+  </>
+);
 ```
 
 # usage with createOption
