@@ -15,6 +15,7 @@ A collection of helpers that aim to simplify using reactive primitives outside o
 - [`createCallback`](#createCallback) - A wrapper for creating callbacks with `runWithOwner`.
 - [`createDisposable`](#createDisposable) - For disposing computations early – before the root cleanup.
 - [`createSharedRoot`](#createSharedRoot) - Share "global primitives" across multiple reactive scopes.
+- [`onDispose`](#onDispose) - Run an effect when the reactive owner gets disposed.
 
 ## Installation
 
@@ -157,6 +158,42 @@ function createSharedRoot<T>(factory: (dispose: Fn) => T): () => T;
 ### Demo
 
 Usage of combining `createSharedRoot` with `createMousePosition`: https://codesandbox.io/s/shared-root-demo-fjl1l9?file=/index.tsx
+
+## `onDispose`
+
+Run an effect when the reactive owner gets disposed.
+
+Same api as [onCleanup](https://www.solidjs.com/docs/latest/api#oncleanup), but if called inside a computation,
+the `fn` callback won't be called each time the computtion is re-evaluated,
+but only when the computation is fully disposed.
+
+### How to use it
+
+`onDispose` takes only one parameter - `fn` an effect that should run only once on cleanup - which also will be returned from it.
+
+```ts
+import { onDispose } from "@solid-primitives/rootless";
+
+createRoot(dispose => {
+  const [count, setCount] = createSignal(0);
+
+  createEffect(() => {
+    count();
+
+    onCleanup(() => {
+      console.log("cleanup");
+    });
+
+    onDispose(() => {
+      console.log("disposed");
+    });
+  });
+
+  setCount(1); // cleanup
+
+  dispose(); // cleanup + dispose (twice)
+});
+```
 
 ## Changelog
 

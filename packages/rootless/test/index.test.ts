@@ -1,4 +1,4 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 import {
   createComputed,
   createEffect,
@@ -8,7 +8,13 @@ import {
   getOwner,
   onCleanup
 } from "solid-js";
-import { createCallback, createSubRoot, createDisposable, createSharedRoot } from "../src";
+import {
+  createCallback,
+  createSubRoot,
+  createDisposable,
+  createSharedRoot,
+  onDispose
+} from "../src";
 
 describe("createSubRoot", () => {
   test("behaves like a root", () =>
@@ -212,5 +218,48 @@ describe("createSharedRoot", () => {
         expect(alive).toBe(false);
         dispose();
       });
+    }));
+});
+
+describe("onDispose", () => {
+  test("callback is called on dispose not cleanup", () =>
+    createRoot(dispose => {
+      const [count, setCount] = createSignal(0);
+      const cb = vi.fn();
+      createComputed(() => {
+        count();
+        onDispose(cb);
+      });
+      setCount(1);
+      expect(cb).not.toHaveBeenCalled();
+      dispose();
+      expect(cb).toHaveBeenCalledTimes(2);
+    }));
+
+  test("for roots callback get's called on cleanup", () =>
+    createRoot(dispose => {
+      const cb = vi.fn();
+      onDispose(cb);
+      expect(cb).not.toHaveBeenCalled();
+      dispose();
+      expect(cb).toHaveBeenCalledTimes(1);
+    }));
+
+  test("onDispose is called before parent's cleanups", () =>
+    createRoot(dispose => {
+      let calledFirst: "cleanup" | "dispose" | undefined;
+      onCleanup(() => {
+        expect(calledFirst).toBe("dispose");
+        if (!calledFirst) calledFirst = "cleanup";
+      });
+      createComputed(() => {
+        onDispose(() => {
+          expect(calledFirst).toBeUndefined();
+          if (!calledFirst) calledFirst = "dispose";
+        });
+      });
+      expect(calledFirst).toBeUndefined();
+      dispose();
+      expect(calledFirst).toBe("dispose");
     }));
 });

@@ -16,7 +16,8 @@
       "createSubRoot",
       "createCallback",
       "createDisposable",
-      "createSharedRoot"
+      "createSharedRoot",
+      "onDispose"
     ],
     "category": "Reactivity"
   },
@@ -31,6 +32,13 @@
   "types": "./dist/index.d.ts",
   "browser": {},
   "exports": {
+    "development": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/dev.js"
+      },
+      "require": "./dist/dev.cjs"
+    },
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
@@ -38,7 +46,7 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "jiti ../../scripts/build.ts",
+    "build": "jiti ../../scripts/build.ts --dev",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },

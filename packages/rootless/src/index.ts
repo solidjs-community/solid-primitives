@@ -1,5 +1,4 @@
-import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
-import type { Owner } from "solid-js/types/reactive/signal";
+import { createRoot, getOwner, onCleanup, runWithOwner, Owner } from "solid-js";
 import { AnyFunction, asArray, access } from "@solid-primitives/utils";
 
 /**
@@ -119,4 +118,30 @@ export function createSharedRoot<T>(factory: (dispose: VoidFunction) => T): () =
 
     return value!;
   };
+}
+
+/**
+ * Run an effect when the reactive owner gets disposed.
+ *
+ * Same api as {@link onCleanup}, but if called inside a computation,
+ * the {@link fn} callback won't be called each time the computtion is re-evaluated,
+ * but only when the computation is fully disposed.
+ * @param fn an effect that should run only once on cleanup
+ *
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/rootless#onDispose
+ */
+export function onDispose<T extends () => any>(fn: T): T {
+  const owner = getOwner();
+  if (!owner)
+    // eslint-disable-next-line no-console
+    process.env.DEV && console.warn("Cleanups created outside a reactive owner will never run.");
+  // owner is a root - cleanup means dispose
+  else if (!("fn" in owner)) onCleanup(fn);
+  // for computations cleanup needs to be added to the owner.owner (parent)
+  else if (owner.owner) {
+    if (!owner.owner.cleanups) owner.owner.cleanups = [fn];
+    // unshift to make sure it runs before parent cleanups (like onCleanup)
+    else owner.owner.cleanups.unshift(fn);
+  }
+  return fn;
 }
