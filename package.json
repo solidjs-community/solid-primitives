@@ -1,6 +1,6 @@
 {
   "name": "solid-primitives",
-  "private": false,
+  "private": true,
   "description": "A collection of high-quality, community contributed building blocks.",
   "main": "index.ts",
   "repository": {
