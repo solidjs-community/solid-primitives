@@ -3,7 +3,6 @@ import { render } from "solid-js/web";
 import "uno.css";
 import { createJSXParser } from "../src";
 
-type Meta = { callback: (props: Props) => JSXElement };
 type Props = {
   value: number;
   children?: JSXElement | JSXElement[];
@@ -34,57 +33,66 @@ const Calculator = (props: { children: JSXElement | JSXElement[] }) => {
 
   return (
     <div>
-      <For each={tokens()}>{token => token.callback(token.props)}</For> = {calculation()}
+      {props.children} = {calculation()}
     </div>
   );
 };
 
-type MetaValue = {
+type TokenValue = {
   id: "Value";
-} & Meta;
-type TokenValue = MetaValue & { props: Props };
+  props: Props;
+};
 
 const Value = createToken(
   (props: Props) => ({
     props,
-    id: "Value",
-    callback: props => <>{props.value}</>
+    id: "Value"
   }),
-  props => <>value outside of a calculator: {props.value}</>
+  props => <>{props.value}</>
 );
 
-type MetaAdd = {
+type TokenAdd = {
   id: "Add";
-} & Meta;
-type TokenAdd = MetaAdd & { props: Props };
+  props: Props;
+};
 
-const Add = createToken<Props, TokenAdd>(props => ({
-  props,
-  id: "Add",
-  callback: (props: Props) => <> + {props.value}</>
-}));
+const Add = createToken<Props, TokenAdd>(
+  props => ({
+    props,
+    id: "Add"
+  }),
+  props => <> + {props.value}</>
+);
 
-type MetaSubtract = {
+type TokenSubtract = {
   id: "Subtract";
-} & Meta;
-type TokenSubtract = MetaSubtract & { props: Props };
+  props: Props;
+};
 
-const Subtract = createToken<Props, TokenSubtract>(props => ({
-  props,
-  id: "Subtract",
-  callback: (props: Props) => <> - {props.value}</>
-}));
+const Subtract = createToken<Props, TokenSubtract>(
+  props => ({
+    props,
+    id: "Subtract"
+  }),
+  props => <> - {props.value}</>
+);
 
 const App: Component = () => {
   return (
-    <>
-      <Value value={2} />
+    <div
+      style={{
+        display: "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        height: "100vh"
+      }}
+    >
       <Calculator>
         <Value value={1} />
         <Add value={4} />
         <Subtract value={2} />
       </Calculator>
-    </>
+    </div>
   );
 };
 
