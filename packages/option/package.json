@@ -1,0 +1,74 @@
+{
+  "name": "@solid-primitives/option",
+  "version": "0.0.100",
+  "description": "A primitive representing an Optional value, similar to Rust's Option.",
+  "author": "Eudrino <eudrinoga@gmail.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/option#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "option",
+    "stage": 0,
+    "list": [
+      "makeOption",
+      "createOption",
+      "Some",
+      "None"
+    ],
+    "category": "Utilities"
+  },
+  "keywords": [
+    "solid",
+    "primitives"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "dev": "vite serve dev",
+    "page": "vite build dev",
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.0"
+  }
+}
