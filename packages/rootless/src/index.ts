@@ -1,4 +1,4 @@
-import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
+import { createEffect, createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
 import type { Owner } from "solid-js/types/reactive/signal";
 import { AnyFunction, asArray, access } from "@solid-primitives/utils";
 
@@ -119,4 +119,28 @@ export function createSharedRoot<T>(factory: (dispose: VoidFunction) => T): () =
 
     return value!;
   };
+}
+
+/**
+ * Creates an effect that will not create a root/owner itself, but instead runs with the root/owner it is encompassed by.
+ * @param callback function similar to `createEffect`'s callback-function.
+ * @returns void.
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/rootless#createRootlessEffect
+ * @example
+ * createRoot(() => {
+ *  const owner = getOwner();
+ *  createRootlesEffect(() => {
+ *    const effectOwner = getOwner();
+ *    effectOwner === owner // true
+ *  })
+ *  createEffect(() => {
+ *    const effectOwner = getOwner();
+ *    effectOwner === owner // false
+ *  })
+ * })
+ */
+
+export function createRootlessEffect(callback: (prev: unknown) => void) {
+  const owner = getOwner();
+  createEffect(prev => (owner ? runWithOwner(owner, () => callback(prev)) : callback(prev)));
 }

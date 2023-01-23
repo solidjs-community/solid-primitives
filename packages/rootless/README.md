@@ -15,6 +15,7 @@ A collection of helpers that aim to simplify using reactive primitives outside o
 - [`createCallback`](#createCallback) - A wrapper for creating callbacks with `runWithOwner`.
 - [`createDisposable`](#createDisposable) - For disposing computations early – before the root cleanup.
 - [`createSharedRoot`](#createSharedRoot) - Share "global primitives" across multiple reactive scopes.
+- [`createRootlessEffect`](#createSharedRoot) - An effect that does not create an owner/root itself but instead runs with the encompassing owner.
 
 ## Installation
 
@@ -152,6 +153,30 @@ const state = useState();
 
 ```ts
 function createSharedRoot<T>(factory: (dispose: Fn) => T): () => T;
+```
+
+## `createRootlessEffect`
+
+An effect that does not create an owner itself, but instead runs with the encompassing owner.
+
+**Why?**
+
+Solid's `createEffect` creates a new root/owner everytime the effect is run. If you have, for example, a component that is instantiated inside an effect, this component would be disposed everytime the effect is run again. If you want this component to follow instead the lifecycle of the owner encompassing the effect, `createRootlessEffect` can be of your service.
+
+### How to use it
+
+The usage of `createRootlessEffect` is identical to `createEffect`.
+
+```ts
+const owner = getOwner();
+createRootlesEffect(() => {
+  const effectOwner = getOwner();
+  effectOwner === owner; // true
+});
+createEffect(() => {
+  const effectOwner = getOwner();
+  effectOwner === owner; // false
+});
 ```
 
 ### Demo

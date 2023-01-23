@@ -8,7 +8,13 @@ import {
   getOwner,
   onCleanup
 } from "solid-js";
-import { createCallback, createSubRoot, createDisposable, createSharedRoot } from "../src";
+import {
+  createCallback,
+  createSubRoot,
+  createDisposable,
+  createSharedRoot,
+  createRootlessEffect
+} from "../src";
 
 describe("createSubRoot", () => {
   test("behaves like a root", () =>
@@ -184,6 +190,59 @@ describe("createSharedRoot", () => {
         });
       });
     });
+  });
+
+  test("multiple dependents disposing in one tick", () =>
+    createRoot(dispose => {
+      let alive = false;
+      const track = createSharedRoot(() => {
+        alive = true;
+        onCleanup(() => (alive = false));
+      });
+
+      const d1 = createRoot(d1 => {
+        track();
+        return d1;
+      });
+
+      const d2 = createRoot(d2 => {
+        track();
+        return d2;
+      });
+
+      expect(alive).toBe(true);
+      d1();
+      d2();
+
+      queueMicrotask(() => {
+        expect(alive).toBe(false);
+        dispose();
+      });
+    }));
+});
+
+describe("createRootlessEffect", () => {
+  test("rootless effecrt", () => {
+    const [count, setCount] = createSignal(0);
+
+    let disposes = 0;
+    let runs = 0;
+    const dispose = createRoot(dispose => {
+      createRootlessEffect(() => {
+        runs++;
+        onCleanup(() => disposes++);
+      });
+      return dispose;
+    });
+
+    expect(disposes).toBe(0);
+    expect(runs).toBe(1);
+    setCount(1);
+    expect(disposes).toBe(0);
+    expect(runs).toBe(1);
+    dispose();
+    expect(disposes).toBe(1);
+    expect(runs).toBe(1);
   });
 
   test("multiple dependents disposing in one tick", () =>
