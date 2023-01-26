@@ -8,9 +8,10 @@ type Props = {
   children?: JSX.Element | JSX.Element[];
 };
 
-type CustomToken = TokenValue | TokenAdd | TokenSubtract;
-
-const { createToken, childrenTokens } = createJSXParser<CustomToken>({ name: "calculator" });
+const { createToken, childrenTokens } = createJSXParser<{
+  id: "Value" | "Add" | "Subtract";
+  props: Props;
+}>({ name: "calculator" });
 
 const Calculator: ParentComponent = props => {
   const tokens = childrenTokens(() => props.children);
@@ -38,11 +39,6 @@ const Calculator: ParentComponent = props => {
   );
 };
 
-type TokenValue = {
-  id: "Value";
-  props: Props;
-};
-
 const Value = createToken(
   (props: Props) => ({
     props,
@@ -51,26 +47,16 @@ const Value = createToken(
   props => <>{props.value}</>
 );
 
-type TokenAdd = {
-  id: "Add";
-  props: Props;
-};
-
-const Add = createToken<Props, TokenAdd>(
-  props => ({
+const Add = createToken(
+  (props: Props) => ({
     props,
     id: "Add"
   }),
   props => <> + {props.value}</>
 );
 
-type TokenSubtract = {
-  id: "Subtract";
-  props: Props;
-};
-
-const Subtract = createToken<Props, TokenSubtract>(
-  props => ({
+const Subtract = createToken(
+  (props: Props) => ({
     props,
     id: "Subtract"
   }),
