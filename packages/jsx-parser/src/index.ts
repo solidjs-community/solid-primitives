@@ -14,8 +14,9 @@ function resolveChildren(children: unknown, symbol: symbol): unknown {
   return children;
 }
 
-export function createJSXParser<Tokens extends {}>(id = "solid-parser") {
-  const $TOKEN = Symbol(id);
+export function createJSXParser<Tokens extends {}>(options?: { name: string }) {
+  const name = options?.name || process.env.DEV ? "jsx-parser" : "";
+  const id = Symbol(name);
 
   function createToken<Props extends { [key: string]: any }, Token extends Tokens>(
     tokenCallback: (props: Props) => Token,
@@ -28,11 +29,11 @@ export function createJSXParser<Tokens extends {}>(id = "solid-parser") {
           : () => {
               process.env.DEV &&
                 // eslint-disable-next-line no-console
-                console.warn(`tokens can only be rendered inside a Parser with id '${id}'`);
+                console.warn(`tokens can only be rendered inside a Parser with id '${name}'`);
               return "";
             },
         {
-          [$TOKEN]: true,
+          [id]: true,
           ...tokenCallback(props)
         }
       );
@@ -41,14 +42,14 @@ export function createJSXParser<Tokens extends {}>(id = "solid-parser") {
   function childrenTokens(fn: Accessor<JSX.Element>): Accessor<Tokens[]> {
     const children = createMemo(fn);
     return createMemo(() => {
-      const resolvedChildren = resolveChildren(children(), $TOKEN);
+      const resolvedChildren = resolveChildren(children(), id);
       return Array.isArray(resolvedChildren) ? resolvedChildren : [resolvedChildren];
     });
   }
 
   function isToken(value: unknown | Tokens): value is Tokens {
-    return typeof value === "function" && !value.length && $TOKEN in value;
+    return typeof value === "function" && !value.length && id in value;
   }
 
-  return { createToken, childrenTokens, isToken, $TOKEN };
+  return { createToken, childrenTokens, isToken, id };
 }

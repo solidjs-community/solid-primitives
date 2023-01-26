@@ -10,7 +10,7 @@ type Props = {
 
 type CustomToken = TokenValue | TokenAdd | TokenSubtract;
 
-const { createToken, childrenTokens } = createJSXParser<CustomToken>("calculator");
+const { createToken, childrenTokens } = createJSXParser<CustomToken>({ name: "calculator" });
 
 const Calculator: ParentComponent = props => {
   const tokens = childrenTokens(() => props.children);
