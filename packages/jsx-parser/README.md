@@ -1,25 +1,25 @@
 <p>
-  <img width="100%" src="" alt="Solid Primitives parser">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=JSX%20Parser" alt="Solid Primitives JSX Parser">
 </p>
 
 # @solid-primitives/parser
 
 A primitive to extend the types of values JSX can return. These JSX-elements are named `tokens`.
 
-- [`createJSXParser`](#createJSXParser) — Provides the tools to create and identify `tokens`: `createToken`, `childrenTokens`, `isToken` and `$TOKEN`.
+- [`createJSXParser`](#createJSXParser) — Provides the tools to create and identify `tokens`: `createToken`, `childrenTokens`, `isToken` and `id`.
 - [`createToken`](#createToken) — Instantiates a `token` associated with the corresponding jsx-parser.
 - [`childrenTokens`](#childrenTokens) — A function similar to Solid's `children()`, but that will only return valid `tokens` created by the corresponding jsx-parser's `createToken`
 - [`isToken`](#isToken) — A function to validate if an element is a `token` created by the corresponding jsx-parser's `createToken`
-- [`$TOKEN`](#$TOKEN) — The symbol unique to the corresponding jsx-parser
+- [`id`](#id) — The symbol unique to the corresponding jsx-parser
 
 ## Installation
 
 ```bash
 npm install @solid-primitives/jsx-parser
 # or
-yarn add @solid-primitives/parser
+yarn add @solid-primitives/jsx-parser
 # or
-pnpm add @solid-primitives/parser
+pnpm add @solid-primitives/jsx-parser
 ```
 
 ## `createJSXParser`
@@ -28,7 +28,7 @@ Provides the tools to create and identify `tokens`.
 
 ### How to use it
 
-`createJSXParser` takes an optional id as argument, and returns the following functions `createToken`, `childrenTokens`, `isToken` and the symbol associated with the jsx-parser `$TOKEN`.
+`createJSXParser` takes an optional id as argument, and returns the following functions `createToken`, `childrenTokens`, `isToken` and the symbol associated with the jsx-parser `id`.
 
 It also takes as a generic the union of accepted token-types.
 
@@ -37,7 +37,7 @@ import { createJSXParser } from "@solid-primitives/jsx-parser";
 
 type UnionOfAcceptedTokens = Token1 | Token2 | ...
 
-const {createToken, childrenTokens, isToken, $TOKEN} = createJSXParser<UnionOfAcceptedTokens>('parser-example');
+const {createToken, childrenTokens, isToken, id} = createJSXParser<UnionOfAcceptedTokens>('parser-example');
 ```
 
 ## `createToken`
@@ -98,7 +98,7 @@ const tokens = childrenTokens(() => props.children);
 
 ## `isToken`
 
-A function to validate if a value is a token created by the corresponding jsx-parser, by checking if the value contains the `$TOKEN`-symbol.
+A function to validate if a value is a token created by the corresponding jsx-parser, by checking if the value contains the `id`-symbol.
 
 ### How to use it
 
@@ -111,17 +111,17 @@ if (!token) return;
 token; // token is typed as UnionOfAcceptedTokens
 ```
 
-## `$TOKEN`
+## `id`
 
 The symbol which is attached to all tokens of the corresponding jsx-parser. This is internally used in `childrenTokens` and `isToken` to validate if a value is a token.
 
 ### How to use it
 
-`$TOKEN` can be used for validation.
+`id` can be used for validation.
 
 ```tsx
 const value = props.children[0];
-if (!($TOKEN in value)) return;
+if (!(id in value)) return;
 const token = value as UnionOfAcceptedTokens;
 ```
 

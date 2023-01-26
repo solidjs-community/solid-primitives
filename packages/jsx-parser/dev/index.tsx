@@ -33,7 +33,7 @@ const Calculator: ParentComponent = props => {
 
   return (
     <div>
-      {props.children} = {calculation()}
+      {tokens()} = {calculation()}
     </div>
   );
 };
@@ -88,6 +88,7 @@ const App: Component = () => {
       }}
     >
       <Calculator>
+        <h1>This is a calculator</h1>
         <Value value={1} />
         <Add value={4} />
         <Subtract value={2} />

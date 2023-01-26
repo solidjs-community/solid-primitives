@@ -1,19 +1,39 @@
 import { Accessor, createMemo, JSX, untrack } from "solid-js";
 
-function resolveChildren(children: unknown, symbol: symbol): unknown {
-  if (typeof children === "function" && !children.length)
-    return symbol in children ? children : resolveChildren(children(), symbol);
-  if (Array.isArray(children)) {
-    const results: unknown[] = [];
-    for (let i = 0; i < children.length; i++) {
-      const result = resolveChildren(children[i], symbol);
-      Array.isArray(result) ? results.push.apply(results, result) : results.push(result);
-    }
-    return results;
+function resolveChildren(resolved: unknown[], children: unknown, symbol: symbol): void {
+  if (typeof children === "function" && !children.length) {
+    if (symbol in children) resolved.push(children);
+    else resolveChildren(resolved, children(), symbol);
   }
-  return children;
+  if (Array.isArray(children))
+    for (let i = 0; i < children.length; i++) resolveChildren(resolved, children[i], symbol);
 }
 
+export type TokenComponent<T extends {}> = (() => JSX.Element) & T;
+
+/**
+ * Provides the tools to create tokenized components, parse and identify tokens in JSX Elements.
+ *
+ * @param options - Additional options for the parser
+ * @param options.name - The name of the parser, used for debugging
+ * @returns functions `createToken`, `childrenTokens`, `isToken` and the symbol associated with the jsx-parser `id`.
+ * @example
+ * ```tsx
+ * const { createToken, childrenTokens } = createJSXParser();
+ *
+ * const MyToken = createToken(props => ({ type: "my-token", props }));
+ *
+ * const MyComponent = (props) => {
+ *  const tokens = childrenTokens(() => props.children);
+ *  return <ul>{tokens().map(token => <li>token.type</li>)}</ul>;
+ * }
+ *
+ * <MyComponent>
+ *   <MyToken/>
+ *   <MyToken/>
+ * </MyComponent>
+ * ```
+ */
 export function createJSXParser<Tokens extends {}>(options?: { name: string }) {
   const name = options?.name || process.env.DEV ? "jsx-parser" : "";
   const id = Symbol(name);
@@ -39,15 +59,16 @@ export function createJSXParser<Tokens extends {}>(options?: { name: string }) {
       );
   }
 
-  function childrenTokens(fn: Accessor<JSX.Element>): Accessor<Tokens[]> {
+  function childrenTokens(fn: Accessor<JSX.Element>) {
     const children = createMemo(fn);
     return createMemo(() => {
-      const resolvedChildren = resolveChildren(children(), id);
-      return Array.isArray(resolvedChildren) ? resolvedChildren : [resolvedChildren];
+      const tokens: TokenComponent<Tokens>[] = [];
+      resolveChildren(tokens, children(), id);
+      return tokens;
     });
   }
 
-  function isToken(value: unknown | Tokens): value is Tokens {
+  function isToken(value: unknown | TokenComponent<Tokens>): value is TokenComponent<Tokens> {
     return typeof value === "function" && !value.length && id in value;
   }
 
