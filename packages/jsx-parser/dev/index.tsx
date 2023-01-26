@@ -1,18 +1,18 @@
-import { Component, createMemo, For, JSXElement } from "solid-js";
+import { Component, JSX, ParentComponent } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
 import { createJSXParser } from "../src";
 
 type Props = {
   value: number;
-  children?: JSXElement | JSXElement[];
+  children?: JSX.Element | JSX.Element[];
 };
 
 type CustomToken = TokenValue | TokenAdd | TokenSubtract;
 
 const { createToken, childrenTokens } = createJSXParser<CustomToken>("calculator");
 
-const Calculator = (props: { children: JSXElement | JSXElement[] }) => {
+const Calculator: ParentComponent = props => {
   const tokens = childrenTokens(() => props.children);
 
   const calculation = () => {

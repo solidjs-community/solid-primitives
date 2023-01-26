@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/jsx-parser",
-  "version": "0.0.101",
+  "version": "0.0.1",
   "description": "A primitive to tokenize your solid-components to enable custom parsing.",
   "author": "Vincent Van Dijck <vandijckv@gmail.com>",
   "contributors": [],
@@ -32,36 +32,28 @@
     "dist"
   ],
   "type": "module",
-  "main": "./dist/server.cjs",
-  "module": "./dist/server.js",
-  "browser": {
-    "./dist/server.cjs": "./dist/index.cjs",
-    "./dist/server.js": "./dist/index.js"
-  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "browser": {},
   "exports": {
-    "worker": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
+    "development": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/dev.js"
+      },
+      "require": "./dist/dev.cjs"
     },
-    "browser": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
-    "deno": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
-    },
-    "node": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
-    },
-    "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
+  "typesVersions": {},
   "scripts": {
     "dev": "vite serve dev",
-    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "build": "jiti ../../scripts/build.ts --dev",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
