@@ -1,5 +1,11 @@
 # @solid-primitives/analytics
 
+## 0.1.3
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+
 ## 0.1.2
 
 ### Patch Changes

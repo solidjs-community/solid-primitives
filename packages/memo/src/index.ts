@@ -568,7 +568,7 @@ export function createMemoCache<Key, Value>(
     if (cache.has(key)) return (cache.get(key) as Accessor<Value>)();
     const memo = runWithOwner(owner, () =>
       createLazyMemo<Value>(prev => calc(key, prev), undefined, options)
-    );
+    )!;
     if (options.size === undefined || cache.size < options.size) cache.set(key, memo);
     return memo();
   };

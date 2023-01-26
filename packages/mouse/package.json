@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mouse",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "A collection of Solid Primitives, that capture current mouse cursor position, and help to deal with common related usecases.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -25,35 +25,56 @@
   "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
   "browser": {
-    "./dist/server.cjs": "./dist/index.cjs",
-    "./dist/server.js": "./dist/index.js"
+    "./dist/server.js": "./dist/index.js",
+    "./dist/server.cjs": "./dist/index.cjs"
   },
   "exports": {
     "worker": {
-      "import": "./dist/server.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
       "require": "./dist/server.cjs"
     },
     "browser": {
       "development": {
-        "import": "./dist/dev.js",
+        "import": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/dev.js"
+        },
         "require": "./dist/dev.cjs"
       },
-      "import": "./dist/index.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
       "require": "./dist/index.cjs"
     },
     "deno": {
-      "import": "./dist/server.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
       "require": "./dist/server.cjs"
     },
     "node": {
-      "import": "./dist/server.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
       "require": "./dist/server.cjs"
     },
     "development": {
-      "import": "./dist/dev.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/dev.js"
+      },
       "require": "./dist/dev.cjs"
     },
-    "import": "./dist/index.js",
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "require": "./dist/index.cjs"
   },
   "files": [
@@ -76,14 +97,15 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solid-primitives/raf": "workspace:^2.1.4"
+    "@solid-primitives/raf": "workspace:^2.1.5"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "^2.2.4",
-    "@solid-primitives/rootless": "^1.2.1",
-    "@solid-primitives/utils": "^4.0.0"
+    "@solid-primitives/event-listener": "^2.2.5",
+    "@solid-primitives/rootless": "^1.2.2",
+    "@solid-primitives/utils": "^4.0.1"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
-  }
+  },
+  "typesVersions": {}
 }

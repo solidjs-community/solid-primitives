@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/utils",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "A bunch of reactive utility types and functions, for building primitives with Solid.js",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -23,11 +23,10 @@
   "types": "./dist/index.d.ts",
   "browser": {},
   "exports": {
-    "browser": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
-    "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
   "scripts": {
@@ -43,5 +42,6 @@
   ],
   "peerDependencies": {
     "solid-js": "^1.6.0"
-  }
+  },
+  "typesVersions": {}
 }

@@ -1,5 +1,15 @@
 # @solid-primitives/bounds
 
+## 0.0.106
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+- Updated dependencies [dd2d7d1c]
+  - @solid-primitives/resize-observer@2.0.8
+  - @solid-primitives/event-listener@2.2.5
+  - @solid-primitives/utils@4.0.1
+
 ## 0.0.105
 
 ### Patch Changes

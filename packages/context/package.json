@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/context",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Primitives simplifying or extending the SolidJS Context API",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -31,11 +31,10 @@
   "browser": {},
   "types": "./dist/index.d.ts",
   "exports": {
-    "browser": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
-    "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
   "scripts": {
@@ -53,5 +52,6 @@
   ],
   "peerDependencies": {
     "solid-js": "^1.6.0"
-  }
+  },
+  "typesVersions": {}
 }

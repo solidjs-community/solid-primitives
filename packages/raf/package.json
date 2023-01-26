@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/raf",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Primitive that facilitates RAF functionality",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -31,36 +31,57 @@
   "main": "./dist/server.cjs",
   "module": "./dist/server.js",
   "browser": {
-    "./dist/server.cjs": "./dist/index.cjs",
-    "./dist/server.js": "./dist/index.js"
+    "./dist/server.js": "./dist/index.js",
+    "./dist/server.cjs": "./dist/index.cjs"
   },
   "types": "./dist/index.d.ts",
   "exports": {
     "worker": {
-      "import": "./dist/server.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
       "require": "./dist/server.cjs"
     },
     "browser": {
       "development": {
-        "import": "./dist/dev.js",
+        "import": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/dev.js"
+        },
         "require": "./dist/dev.cjs"
       },
-      "import": "./dist/index.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
       "require": "./dist/index.cjs"
     },
     "deno": {
-      "import": "./dist/server.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
       "require": "./dist/server.cjs"
     },
     "node": {
-      "import": "./dist/server.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
       "require": "./dist/server.cjs"
     },
     "development": {
-      "import": "./dist/dev.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/dev.js"
+      },
       "require": "./dist/dev.cjs"
     },
-    "import": "./dist/index.js",
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "require": "./dist/index.cjs"
   },
   "scripts": {
@@ -77,9 +98,10 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^4.0.0"
+    "@solid-primitives/utils": "^4.0.1"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
-  }
+  },
+  "typesVersions": {}
 }

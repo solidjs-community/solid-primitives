@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/trigger",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A set of primitives based on Solid signals, used to trigger computations.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -33,35 +33,56 @@
   "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
   "browser": {
-    "./dist/server.cjs": "./dist/index.cjs",
-    "./dist/server.js": "./dist/index.js"
+    "./dist/server.js": "./dist/index.js",
+    "./dist/server.cjs": "./dist/index.cjs"
   },
   "exports": {
     "worker": {
-      "import": "./dist/server.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
       "require": "./dist/server.cjs"
     },
     "browser": {
       "development": {
-        "import": "./dist/dev.js",
+        "import": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/dev.js"
+        },
         "require": "./dist/dev.cjs"
       },
-      "import": "./dist/index.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
       "require": "./dist/index.cjs"
     },
     "deno": {
-      "import": "./dist/server.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
       "require": "./dist/server.cjs"
     },
     "node": {
-      "import": "./dist/server.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
       "require": "./dist/server.cjs"
     },
     "development": {
-      "import": "./dist/dev.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/dev.js"
+      },
       "require": "./dist/dev.cjs"
     },
-    "import": "./dist/index.js",
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "require": "./dist/index.cjs"
   },
   "scripts": {
@@ -81,6 +102,7 @@
     "solid-js": "^1.6.0"
   },
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^4.0.0"
-  }
+    "@solid-primitives/utils": "workspace:^4.0.1"
+  },
+  "typesVersions": {}
 }

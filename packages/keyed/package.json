@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/keyed",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Control Flow primitives and components that require specifying explicit keys to identify or rerender elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -35,27 +35,42 @@
   "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
   "browser": {
-    "./dist/server.cjs": "./dist/index.cjs",
-    "./dist/server.js": "./dist/index.js"
+    "./dist/server.js": "./dist/index.js",
+    "./dist/server.cjs": "./dist/index.cjs"
   },
   "exports": {
     "worker": {
-      "import": "./dist/server.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
       "require": "./dist/server.cjs"
     },
     "browser": {
-      "import": "./dist/index.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
       "require": "./dist/index.cjs"
     },
     "deno": {
-      "import": "./dist/server.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
       "require": "./dist/server.cjs"
     },
     "node": {
-      "import": "./dist/server.js",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
       "require": "./dist/server.cjs"
     },
-    "import": "./dist/index.js",
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "require": "./dist/index.cjs"
   },
   "scripts": {
@@ -66,12 +81,13 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "devDependencies": {
-    "@solid-primitives/immutable": "^0.1.4",
-    "@solid-primitives/refs": "^0.3.4",
-    "@solid-primitives/utils": "^4.0.0",
+    "@solid-primitives/immutable": "^0.1.5",
+    "@solid-primitives/refs": "^0.3.5",
+    "@solid-primitives/utils": "^4.0.1",
     "solid-transition-group": "^0.0.8"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
-  }
+  },
+  "typesVersions": {}
 }

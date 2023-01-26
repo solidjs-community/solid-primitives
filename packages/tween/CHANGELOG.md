@@ -1,5 +1,11 @@
 # @solid-primitives/tween
 
+## 1.2.4
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+
 ## 1.2.3
 
 ### Patch Changes

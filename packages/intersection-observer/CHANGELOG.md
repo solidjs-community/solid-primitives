@@ -1,5 +1,13 @@
 # @solid-primitives/intersection-observer
 
+## 2.0.4
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+- Updated dependencies [dd2d7d1c]
+  - @solid-primitives/utils@4.0.1
+
 ## 2.0.3
 
 ### Patch Changes

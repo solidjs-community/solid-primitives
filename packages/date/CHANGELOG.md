@@ -1,5 +1,15 @@
 # @solid-primitives/date
 
+## 2.0.6
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+- Updated dependencies [dd2d7d1c]
+  - @solid-primitives/timer@1.3.5
+  - @solid-primitives/utils@4.0.1
+  - @solid-primitives/memo@1.1.3
+
 ## 2.0.5
 
 ### Patch Changes
