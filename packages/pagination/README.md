@@ -11,7 +11,8 @@
 
 A primitive that creates all the reactive data to manage your pagination:
 
-`createPagination` - Provides an array with the properties to fill your pagination with and a page setter/getter.
+- [`createPagination`](#createPagination) - Provides an array with the properties to fill your pagination with and a page setter/getter.
+- [`createInfiniteScroll`](#createInfiniteScroll) - Provides an easy way to implement infinite scrolling.
 
 ## Installation
 
