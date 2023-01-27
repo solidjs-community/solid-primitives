@@ -1,8 +1,7 @@
-import { createSignal, createMemo, createResource, createComputed } from "solid-js";
-import type { Accessor, Setter, JSX } from "solid-js";
-import { access, type MaybeAccessor, noop } from "@solid-primitives/utils";
-
 import { createVisibilityObserver } from "@solid-primitives/intersection-observer";
+import { access, type Directive, noop, type MaybeAccessor } from "@solid-primitives/utils";
+import type { Accessor, JSX, Setter } from "solid-js";
+import { createComputed, createMemo, createResource, createSignal } from "solid-js";
 
 export type PaginationOptions = {
   /** the overall number of pages */
@@ -222,43 +221,41 @@ export const createPagination = (
 declare module "solid-js" {
   namespace JSX {
     interface Directives {
-      asLoader: boolean
+      infiniteScrollLoader: boolean;
     }
   }
 }
 
 export type _E = JSX.Element;
 
-type directive = (ref: Element) => void
-
 /**
- * ```typescript
- * const [pages, asLoader, { page, setPage, setPages, end, setEnd }] = createInfiniteScroll(fetcher);
+ * Provides an easy way to implement infinite scrolling.
+ *
+ * ```ts
+ * const [pages, loader, { page, setPage, setPages, end, setEnd }] = createInfiniteScroll(fetcher);
  * ```
- * @param fetcher (page: number) => Promise<T[]>
- * @return `pages()` is an accessor contains array of contents 
+ * @param fetcher `(page: number) => Promise<T[]>`
+ * @return `pages()` is an accessor contains array of contents
  * @property `pages.loading` is a boolean indicator for the loading state
  * @property `pages.error` contains any error encountered
- * @return `asLoader` is a directive used to set loader
+ * @return `infiniteScrollLoader` is a directive used to set the loader element
  * @method `page` is an accessor that contains page number
  * @method `setPage` allows to manually change the page number
  * @method `setPages` allows to manually change the contents of the page
  * @method `end` is a boolean indicator for end of the page
  * @method `setEnd` allows to manually change the end
  */
-export function createInfiniteScroll<T>(
-  fetcher: (page: number) => Promise<T[]>,
-): [
-    pages: Accessor<T[]>,
-    asLoader: directive,
-    options: {
-      page: Accessor<number>,
-      setPage: Setter<number>,
-      setPages: Setter<T[]>
-      end: Accessor<boolean>,
-      setEnd: Setter<boolean>,
-    }
-  ] {
+export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
+  pages: Accessor<T[]>,
+  loader: Directive,
+  options: {
+    page: Accessor<number>;
+    setPage: Setter<number>;
+    setPages: Setter<T[]>;
+    end: Accessor<boolean>;
+    setEnd: Setter<boolean>;
+  }
+] {
   const [loader, setLoader] = createSignal<HTMLElement>();
   const [pages, setPages] = createSignal<T[]>([]);
   const [page, setPage] = createSignal(0);
@@ -271,20 +268,24 @@ export function createInfiniteScroll<T>(
     if (visible() && !end() && !contents.loading) {
       setPage(p => p + 1);
     }
-  })
+  });
 
   createComputed(() => {
     const content = contents();
     if (!content) return;
     if (content.length === 0) setEnd(true);
     setPages(p => [...p, ...content!]);
-  })
+  });
 
-  return [pages, setLoader, { 
-    page: page, 
-    setPage: setPage, 
-    setPages: setPages, 
-    end: end,
-    setEnd: setEnd,
-  }];
-};
+  return [
+    pages,
+    setLoader,
+    {
+      page: page,
+      setPage: setPage,
+      setPages: setPages,
+      end: end,
+      setEnd: setEnd
+    }
+  ];
+}

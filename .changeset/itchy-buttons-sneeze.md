@@ -2,4 +2,4 @@
 "@solid-primitives/pagination": minor
 ---
 
-added createInfiniteScroll
+added new `createInfiniteScroll` primitive

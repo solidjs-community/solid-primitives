@@ -23,7 +23,11 @@ yarn add @solid-primitives/pagination
 pnpm add @solid-primitives/pagination
 ```
 
-## How to use it
+## `createPagination`
+
+Provides an array with the properties to fill your pagination with and a page setter/getter.
+
+### How to use it
 
 ```ts
 type PaginationOptions = {
@@ -99,32 +103,66 @@ return (
 );
 ```
 
-## createInfiniteScroll
-```tsx
-export default function App() {
-  // fetcher: (page: number) => Promise<T[]>
-  const [pages, asLoader, { end }] = createInfiniteScroll(fetcher);
-  return (
-    <div>
-      <For each={pages()}>
-        {item => <h4>{item}</h4>}
-      </For>
-      <Show when={!end()}>
-        <h1 use:asLoader>Loading...</h1>
-      </Show>
-    </div>
-  );
-};
-```
-## TODO
+### TODO
 
 - Jump over multiple pages (e.g. +10/-10)
 - options for aria-labels
 - optional: touch controls
 
-## Demo
+### Demo
 
 TODO
+
+## `createInfiniteScroll`
+
+Combines [`createResource`](https://www.solidjs.com/docs/latest/api#createresource) with [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) to provide an easy way to implement infinite scrolling.
+
+### How to use it
+
+```tsx
+// fetcher: (page: number) => Promise<T[]>
+const [pages, setEl, { end }] = createInfiniteScroll(fetcher);
+
+return (
+  <div>
+    <For each={pages()}>{item => <h4>{item}</h4>}</For>
+    <Show when={!end()}>
+      <h1 ref={setEl}>Loading...</h1>
+    </Show>
+  </div>
+);
+```
+
+Or as a directive:
+
+```tsx
+const [pages, infiniteScrollLoader, { end }] = createInfiniteScroll(fetcher);
+
+return (
+  <div>
+    <For each={pages()}>{item => <h4>{item}</h4>}</For>
+    <Show when={!end()}>
+      <h1 use:infiniteScrollLoader>Loading...</h1>
+    </Show>
+  </div>
+);
+```
+
+### Definition
+
+```ts
+function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
+  pages: Accessor<T[]>,
+  loader: Directive<true>,
+  options: {
+    page: Accessor<number>;
+    setPage: Setter<number>;
+    setPages: Setter<T[]>;
+    end: Accessor<boolean>;
+    setEnd: Setter<boolean>;
+  }
+];
+```
 
 ## Changelog
 
