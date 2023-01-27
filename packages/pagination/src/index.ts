@@ -222,14 +222,14 @@ export const createPagination = (
 declare module "solid-js" {
   namespace JSX {
     interface Directives {
-      loaderDirective: boolean
+      asLoader: boolean
     }
   }
 }
 
 export type _E = JSX.Element;
 
-type loaderDirective = (ref: Element) => void
+type directive = (ref: Element) => void
 
 /**
  * ```typescript
@@ -250,7 +250,7 @@ export function createInfiniteScroll<T>(
   fetcher: (page: number) => Promise<T[]>,
 ): [
     pages: Accessor<T[]>,
-    asLoader: loaderDirective,
+    asLoader: directive,
     options: {
       page: Accessor<number>,
       setPage: Setter<number>,
