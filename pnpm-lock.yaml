@@ -314,6 +314,12 @@ importers:
     devDependencies:
       '@solid-primitives/range': link:../range
 
+  packages/jsx-parser:
+    specifiers:
+      solid-js: ^1.6.0
+    dependencies:
+      solid-js: 1.6.9
+
   packages/keyboard:
     specifiers:
       '@solid-primitives/event-listener': workspace:^2.2.5
