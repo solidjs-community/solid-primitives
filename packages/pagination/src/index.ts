@@ -1,4 +1,4 @@
-import { createSignal, createMemo, createEffect, createResource } from "solid-js";
+import { createSignal, createMemo, createResource, createComputed } from "solid-js";
 import type { Accessor, Setter, JSX } from "solid-js";
 import { access, type MaybeAccessor, noop } from "@solid-primitives/utils";
 
@@ -267,13 +267,13 @@ export function createInfiniteScroll<T>(
   const visible = createVisibilityObserver()(loader);
   const [contents] = createResource(page, fetcher);
 
-  createEffect(() => {
+  createComputed(() => {
     if (visible() && !end() && !contents.loading) {
       setPage(p => p + 1);
     }
   })
 
-  createEffect(() => {
+  createComputed(() => {
     const content = contents();
     if (!content) return;
     if (content.length === 0) setEnd(true);
