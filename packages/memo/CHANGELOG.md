@@ -1,5 +1,14 @@
 # @solid-primitives/memo
 
+## 1.1.3
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+- Updated dependencies [dd2d7d1c]
+  - @solid-primitives/scheduled@1.2.1
+  - @solid-primitives/utils@4.0.1
+
 ## 1.1.2
 
 ### Patch Changes

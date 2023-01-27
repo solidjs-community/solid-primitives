@@ -1,5 +1,15 @@
 # @solid-primitives/keyboard
 
+## 1.0.6
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+- Updated dependencies [dd2d7d1c]
+  - @solid-primitives/event-listener@2.2.5
+  - @solid-primitives/rootless@1.2.2
+  - @solid-primitives/utils@4.0.1
+
 ## 1.0.5
 
 ### Patch Changes

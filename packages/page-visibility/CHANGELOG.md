@@ -1,5 +1,13 @@
 # @solid-primitives/page-visibility
 
+## 2.0.3
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+- Updated dependencies [dd2d7d1c]
+  - @solid-primitives/rootless@1.2.2
+
 ## 2.0.2
 
 ### Patch Changes

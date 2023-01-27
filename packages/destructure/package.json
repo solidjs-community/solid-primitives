@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/destructure",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Primitives for destructuring reactive objects – like props or stores – or signals of them into a separate accessors updated individually.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -31,11 +31,10 @@
   "types": "./dist/index.d.ts",
   "browser": {},
   "exports": {
-    "browser": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
-    "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
   "scripts": {
@@ -52,9 +51,10 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^4.0.0"
+    "@solid-primitives/utils": "workspace:^4.0.1"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
-  }
+  },
+  "typesVersions": {}
 }

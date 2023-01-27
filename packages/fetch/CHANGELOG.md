@@ -1,5 +1,11 @@
 # @solid-primitives/fetch
 
+## 2.4.3
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+
 ## 2.4.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.1.5
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+
 ## 1.1.4
 
 ### Patch Changes

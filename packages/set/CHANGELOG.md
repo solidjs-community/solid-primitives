@@ -1,5 +1,13 @@
 # @solid-primitives/set
 
+## 0.3.1
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+- Updated dependencies [dd2d7d1c]
+  - @solid-primitives/trigger@0.0.3
+
 ## 0.3.0
 
 ### Minor Changes

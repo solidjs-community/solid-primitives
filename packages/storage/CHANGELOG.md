@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 1.3.4
+
+### Patch Changes
+
+- dd2d7d1c: Improve export conditions.
+
 ## 1.3.3
 
 ### Patch Changes

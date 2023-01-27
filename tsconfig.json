@@ -21,6 +21,7 @@
     "./packages/*/test",
     "./packages/*/dev",
     "./scripts",
+    "./configs",
     "./env.d.ts"
   ]
 }
