@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 5.0.0
+
+### Major Changes
+
+- c2866ea6: Add `defer`, remove `createProxy` and `forEachEntry`, rename `onRootCleanup` to `tryOnCleanup` and `SetterValue` to `SetterParam`.
+
 ## 4.0.1
 
 ### Patch Changes

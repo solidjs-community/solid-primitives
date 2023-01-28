@@ -1,5 +1,12 @@
 # @solid-primitives/until
 
+## 1.0.6
+
+### Patch Changes
+
+- Updated dependencies [c2866ea6]
+  - @solid-primitives/utils@5.0.0
+
 ## 1.0.5
 
 ### Patch Changes

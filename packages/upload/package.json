@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/upload",
-  "version": "0.0.106",
+  "version": "0.0.107",
   "description": "Primitives for uploading files.",
   "author": "Rustam Ashurmatov <rr.ashurmatov.21@gmail.com>",
   "license": "MIT",
@@ -80,7 +80,7 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/utils": "^4.0.1"
+    "@solid-primitives/utils": "^5.0.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
