@@ -22,6 +22,10 @@ yarn add @solid-primitives/script-loader
 ## How to use it
 
 ```ts
+import { createScriptLoader } from "@solid-primitives/script-loader";
+
+// ...
+
 const [script: HTMLScriptElement, remove: () => void] = createScriptLoader({
   src: string | Accessor<string>, // url or js source
   type?: string,
@@ -31,7 +35,7 @@ const [script: HTMLScriptElement, remove: () => void] = createScriptLoader({
 
 // For example, to use recaptcha:
 createScriptLoader({
-  src: 'https://www.google.com/recaptcha/enterprise.js?render=my_token'
+  src: 'https://www.google.com/recaptcha/enterprise.js?render=my_token',
   onload: async () => {
     await grecaptcha.enterprise.ready();
     const token = await grecaptcha.enterprise.execute('my_token', {action: 'login'});
