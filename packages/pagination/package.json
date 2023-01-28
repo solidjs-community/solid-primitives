@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/pagination",
-  "version": "0.0.102",
+  "version": "0.0.103",
   "description": "A primitive that creates all the reactive data to manage your pagination.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [],
@@ -81,7 +81,7 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/utils": "^4.0.1"
+    "@solid-primitives/utils": "^5.0.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

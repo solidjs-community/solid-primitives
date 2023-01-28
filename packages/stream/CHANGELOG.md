@@ -1,5 +1,12 @@
 # @solid-primitives/stream
 
+## 0.6.4
+
+### Patch Changes
+
+- Updated dependencies [c2866ea6]
+  - @solid-primitives/utils@5.0.0
+
 ## 0.6.3
 
 ### Patch Changes

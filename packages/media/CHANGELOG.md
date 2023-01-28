@@ -1,5 +1,16 @@
 # @solid-primitives/media
 
+## 2.0.6
+
+### Patch Changes
+
+- c2866ea6: Update utils package
+- Updated dependencies [c2866ea6]
+- Updated dependencies [c2866ea6]
+  - @solid-primitives/event-listener@2.2.6
+  - @solid-primitives/rootless@1.2.3
+  - @solid-primitives/utils@5.0.0
+
 ## 2.0.5
 
 ### Patch Changes
