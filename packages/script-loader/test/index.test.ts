@@ -1,7 +1,5 @@
+import { createRoot, createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
-
-import { createEffect, createRoot, createSignal } from "solid-js";
-
 import { createScriptLoader } from "../src";
 
 const dispatchAndWait = (script?: HTMLScriptElement, name: "load" | "error" = "load") =>
@@ -15,53 +13,49 @@ const dispatchAndWait = (script?: HTMLScriptElement, name: "load" | "error" = "l
 describe("createScriptLoader", () => {
   it("will create a script tag with src", () =>
     createRoot(dispose => {
-      const [_, remove] = createRoot(() =>
-        createScriptLoader({ src: "https://localhost:3000/script.js" })
-      );
+      createScriptLoader({ src: "https://localhost:3000/script.js" });
       const script = document.querySelector('script[src="https://localhost:3000/script.js"]');
       expect(script).toBeInstanceOf(window.HTMLScriptElement);
-      remove();
       dispose();
     }));
 
   it("will create a script tag with textContent", () =>
     createRoot(dispose => {
       const src = "!(function(){ window.test = true; })();";
-      const [script, remove] = createRoot(() => createScriptLoader({ src }));
+      const script = createRoot(() => createScriptLoader({ src }));
       expect(script).toBeInstanceOf(window.HTMLScriptElement);
       expect(script?.textContent).toBe(src);
-      remove();
       dispose();
     }));
 
   it("will call the onload handler", async () => {
-    let loadCalled = false;
-    const [script, remove] = createRoot(() =>
-      createScriptLoader({
+    createRoot(dispose => {
+      let loadCalled = false;
+      const script = createScriptLoader({
         src: "https://localhost:3000/script.js",
-        onload: () => {
+        onLoad: () => {
           loadCalled = true;
         }
-      })
-    );
-    dispatchAndWait(script, "load");
-    expect(loadCalled).toBe(true);
-    remove();
+      });
+      dispatchAndWait(script, "load");
+      expect(loadCalled).toBe(true);
+      dispose();
+    });
   });
 
   it("will call the onerror handler", async () => {
-    let errorCalled = false;
-    const [script, remove] = createRoot(() =>
-      createScriptLoader({
+    createRoot(dispose => {
+      let errorCalled = false;
+      const script = createScriptLoader({
         src: "https://localhost:3000/script.js",
-        onerror: () => {
+        onError: () => {
           errorCalled = true;
         }
-      })
-    );
-    dispatchAndWait(script, "error");
-    expect(errorCalled).toBe(true);
-    remove();
+      });
+      dispatchAndWait(script, "error");
+      expect(errorCalled).toBe(true);
+      dispose();
+    });
   });
 
   it("will update the url from an accessor", async () => {
@@ -69,13 +63,13 @@ describe("createScriptLoader", () => {
     await new Promise<void>(resolve =>
       createRoot(async dispose => {
         const [src, setSrc] = createSignal("https://localhost:3000/script.js");
-        const [script] = createScriptLoader({
+        const script = createScriptLoader({
           src: src,
-          onload: () => setSrc("https://localhost:3000/script2.js")
+          onLoad: () => setSrc("https://localhost:3000/script2.js")
         });
         actualSrcUrls.push(script?.src);
         await dispatchAndWait(script, "load");
-        createEffect(() => {
+        queueMicrotask(() => {
           actualSrcUrls.push(script?.src);
           dispose();
           resolve();
@@ -90,7 +84,7 @@ describe("createScriptLoader", () => {
 
   it("will automatically remove the script tag on disposal", async () => {
     const script = createRoot(dispose => {
-      const [script] = createScriptLoader({ src: "https://localhost:3000/script.js" });
+      const script = createScriptLoader({ src: "https://localhost:3000/script.js" });
       dispose();
       return script;
     });

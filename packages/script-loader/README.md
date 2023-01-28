@@ -17,6 +17,8 @@ Creates a primitive to load scripts dynamically, either for external services or
 npm install @solid-primitives/script-loader
 # or
 yarn add @solid-primitives/script-loader
+# or
+pnpm add @solid-primitives/script-loader
 ```
 
 ## How to use it
@@ -24,31 +26,35 @@ yarn add @solid-primitives/script-loader
 ```ts
 import { createScriptLoader } from "@solid-primitives/script-loader";
 
-// ...
-
-const [script: HTMLScriptElement, remove: () => void] = createScriptLoader({
-  src: string | Accessor<string>, // url or js source
-  type?: string,
-  onload?: () => void,
-  onerror?: () => void
-});
-
 // For example, to use recaptcha:
 createScriptLoader({
-  src: 'https://www.google.com/recaptcha/enterprise.js?render=my_token',
-  onload: async () => {
+  src: "https://www.google.com/recaptcha/enterprise.js?render=my_token",
+  async onLoad() {
     await grecaptcha.enterprise.ready();
-    const token = await grecaptcha.enterprise.execute('my_token', {action: 'login'});
+    const token = await grecaptcha.enterprise.execute("my_token", { action: "login" });
     // do your stuff...
   }
 });
 
 // or pinterest embeds:
-const pinterestEmbedScript = '!function(a,b,c){var d,e,f;d="PIN_"+~~((new Date).getTime()/864e5),...';
 createScriptLoader({
-  src: pinterestEmbedScript,
-  onload: () => window?.PinUtils?.build()
+  src: '!function(a,b,c){var d,e,f;d="PIN_"+~~((new Date).getTime()/864e5),...',
+  onLoad() {
+    window?.PinUtils?.build();
+  }
 });
+```
+
+## Definition
+
+```ts
+function createScriptLoader(options: {
+  readonly src: string | Accessor<string>; // url or js source
+  readonly type?: string | undefined;
+  readonly onLoad?: (() => void) | undefined;
+  readonly onError?: (() => void) | undefined;
+  readonly onBeforeAppend?: ((script: HTMLScriptElement) => void) | undefined;
+}): HTMLScriptElement | undefined; // script element with be undefined only on the server
 ```
 
 ## Demo

@@ -1,43 +1,39 @@
-import { Accessor, createEffect, onCleanup } from "solid-js";
+import { Accessor, createRenderEffect, onCleanup } from "solid-js";
 
 /**
  * Creates a convenient script loader utility
  *
- * @param string URL or source of the script to load.
+ * @param src URL or source of the script to load.
  * @param type Type value to put in the script attribute.
- * @param function Callback to trigger onLoad.
- * @param function callback on error.
- * @returns
+ * @param onLoad Callback to trigger onLoad.
+ * @param onError callback on error.
+ * @param onBeforeAppend callback before appending the script to the document.
+ * @returns The script element that was created. (will be undefined in SSR)
  */
-export const createScriptLoader = (opts: {
-  src: string | Accessor<string>;
-  type?: string;
-  onload?: () => void;
-  onerror?: () => void;
-}): [script: HTMLScriptElement | undefined, remove: () => void] => {
+export function createScriptLoader(options: {
+  readonly src: string | Accessor<string>;
+  readonly type?: string;
+  readonly onLoad?: () => void;
+  readonly onError?: () => void;
+  readonly onBeforeAppend?: (script: HTMLScriptElement) => void;
+}): HTMLScriptElement | undefined {
   if (process.env.SSR) {
-    return [
-      undefined,
-      () => {
-        /*noop*/
-      }
-    ];
+    return undefined;
   }
+
   const script = document.createElement("script");
-  opts.type && (script.type = opts.type);
-  opts.onload && script.addEventListener("load", opts.onload);
-  opts.onerror && script.addEventListener("error", opts.onerror);
-  const remove = () => document.head.contains(script) && document.head.removeChild(script);
-  const load = () => {
-    const src = typeof opts.src === "string" ? opts.src : opts.src();
+  options.type && (script.type = options.type);
+  options.onLoad && script.addEventListener("load", options.onLoad);
+  options.onError && script.addEventListener("error", options.onError);
+  createRenderEffect(() => {
+    const src = typeof options.src === "string" ? options.src : options.src();
     const prop = /^(https?:|\w[\.\w-_%]+|)\//.test(src) ? "src" : "textContent";
     if (script[prop] !== src) {
       script[prop] = src;
+      options.onBeforeAppend && options.onBeforeAppend(script);
       document.head.appendChild(script);
     }
-  };
-  load();
-  createEffect(load, false);
-  onCleanup(remove);
-  return [script, remove];
-};
+  });
+  onCleanup(() => document.head.contains(script) && document.head.removeChild(script));
+  return script;
+}
