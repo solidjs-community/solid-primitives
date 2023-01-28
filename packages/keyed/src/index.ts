@@ -9,9 +9,9 @@ import {
   Setter,
   untrack,
   $TRACK,
-  mapArray
+  mapArray,
+  AccessorArray
 } from "solid-js";
-import type { AccessorArray } from "solid-js/types/reactive/signal";
 
 const FALLBACK = Symbol("fallback");
 

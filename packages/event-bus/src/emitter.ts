@@ -1,5 +1,4 @@
-import { noop } from "@solid-primitives/utils";
-import { onRootCleanup } from "./utils";
+import { noop, tryOnCleanup } from "@solid-primitives/utils";
 import {
   EmitGuard,
   GenericEmit,
@@ -67,7 +66,7 @@ export function createEmitter<A0 = void, A1 = void, A2 = void>(
 
   const listen: _Listen = (listener, protect) => {
     listeners.add(listener);
-    const unsub = onRootCleanup(() => listeners.delete(listener));
+    const unsub = tryOnCleanup(() => listeners.delete(listener));
     if (!protect) return unsub;
     protectedSet.add(listener);
     return () => {
@@ -92,7 +91,7 @@ export function createEmitter<A0 = void, A1 = void, A2 = void>(
 
   // cleanup uses set.clear() instead of clear() to always clear all the listeners,
   // ragardles of the conditions in the removeGuard
-  onRootCleanup(() => listeners.clear());
+  tryOnCleanup(() => listeners.clear());
 
   return {
     listen,

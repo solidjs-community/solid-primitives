@@ -1,6 +1,12 @@
 import { createMemo, Accessor, runWithOwner, getOwner } from "solid-js";
-import { access, MaybeAccessor, AnyObject, Values, AnyFunction } from "@solid-primitives/utils";
-import type { MemoOptions } from "solid-js/types/reactive/signal";
+import {
+  access,
+  MaybeAccessor,
+  AnyObject,
+  Values,
+  AnyFunction,
+  MemoOptions
+} from "@solid-primitives/utils";
 
 type ReactiveSource = [] | any[] | AnyObject;
 

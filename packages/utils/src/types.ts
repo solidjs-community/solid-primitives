@@ -1,5 +1,13 @@
 import type { Accessor, Setter } from "solid-js";
 
+// export types that aren't exported by solid-js main module
+export type {
+  MemoOptions,
+  EffectOptions,
+  SignalOptions,
+  OnOptions
+} from "solid-js/types/reactive/signal";
+
 /**
  * Can be single or in an array
  */
@@ -16,8 +24,7 @@ export type Directive<P = true> = (el: Element, props: Accessor<P>) => void;
 export type ItemsOf<T> = T extends (infer E)[] ? E : never;
 export type ItemsOfMany<T> = T extends any[] ? ItemsOf<T> : T;
 
-// TODO rename to `SetterParam`
-export type SetterValue<T> = Parameters<Setter<T>>[0];
+export type SetterParam<T> = Parameters<Setter<T>>[0];
 
 /**
  * T or a reactive/non-reactive function returning T

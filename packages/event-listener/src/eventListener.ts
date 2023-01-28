@@ -4,7 +4,7 @@ import {
   access,
   asArray,
   Directive,
-  onRootCleanup
+  tryOnCleanup
 } from "@solid-primitives/utils";
 import { Accessor, createEffect, createRenderEffect, createSignal } from "solid-js";
 import {
@@ -59,7 +59,7 @@ export function makeEventListener(
   options?: EventListenerOptions
 ): VoidFunction {
   target.addEventListener(type, handler, options);
-  return onRootCleanup(target.removeEventListener.bind(target, type, handler, options));
+  return tryOnCleanup(target.removeEventListener.bind(target, type, handler, options));
 }
 
 /**

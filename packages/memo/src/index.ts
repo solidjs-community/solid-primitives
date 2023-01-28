@@ -10,19 +10,16 @@ import {
   Setter,
   on,
   getListener,
-  createRoot
-} from "solid-js";
-import type {
+  createRoot,
   AccessorArray,
   EffectFunction,
-  EffectOptions,
   MemoOptions,
   NoInfer,
   Owner,
   SignalOptions
-} from "solid-js/types/reactive/signal";
+} from "solid-js";
 import { debounce, throttle } from "@solid-primitives/scheduled";
-import { ItemsOf, noop } from "@solid-primitives/utils";
+import { ItemsOf, noop, EffectOptions } from "@solid-primitives/utils";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;

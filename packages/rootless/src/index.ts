@@ -1,5 +1,4 @@
-import { createRoot, getOwner, onCleanup, runWithOwner } from "solid-js";
-import type { Owner } from "solid-js/types/reactive/signal";
+import { createRoot, getOwner, onCleanup, runWithOwner, Owner } from "solid-js";
 import { AnyFunction, asArray, access } from "@solid-primitives/utils";
 
 /**
