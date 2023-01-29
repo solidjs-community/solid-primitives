@@ -1,57 +1,9 @@
-//
-// Listener Types
-//
-export type GenericListener<Payload extends any[] = []> = (...payload: Payload) => void;
+export type Listener<T = void> = (payload: T) => void;
 
-//
-// Listen Types
-//
-export type Listen<A0 = void, A1 = void, A2 = void> = (
-  listener: void extends A0
-    ? GenericListener
-    : void extends A1
-    ? GenericListener<[A0]>
-    : void extends A2
-    ? GenericListener<[A0, A1]>
-    : GenericListener<[A0, A1, A2]>
-) => VoidFunction;
+export type Listen<T = void> = (listener: Listener<T>) => VoidFunction;
 
-export type ListenProtect<A0 = void, A1 = void, A2 = void> = (
-  listener: Parameters<Listen<A0, A1, A2>>[0],
-  protect?: boolean
-) => VoidFunction;
+export type Emit<T = void> = (..._: void extends T ? [payload?: T] : [payload: T]) => void;
 
-export type GenericListen<Payload extends any[] = []> = (
-  listener: GenericListener<Payload>
-) => VoidFunction;
+export type Remove<T> = (listener: Listener<T>) => boolean;
 
-export type GenericListenProtect<Payload extends any[] = []> = (
-  listener: GenericListener<Payload>,
-  protect?: boolean
-) => VoidFunction;
-
-//
-// Emit Types
-//
-export type Emit<A0 = void, A1 = void, A2 = void> = void extends A0
-  ? () => void
-  : void extends A1
-  ? (payload: A0) => void
-  : void extends A2
-  ? GenericEmit<[A0, A1]>
-  : GenericEmit<[A0, A1, A2]>;
-
-export type GenericEmit<Payload extends any[] = []> = (...payload: Payload) => void;
-
-export type Remove<A0 = void, A1 = void, A2 = void> = (
-  listener: GenericListener<[A0, A1, A2]>
-) => boolean;
-
-export type EmitGuard<A0 = void, A1 = void, A2 = void> = {
-  (emit: { (arg0: A0, arg1: A1, arg2: A2): void; (): void }, ...payload: [A0, A1, A2]): void;
-};
-
-export type RemoveGuard<Listener extends Function> = (
-  remove: () => boolean,
-  listener: Listener
-) => boolean;
+export type EmitGuard<T = void> = (emit: Emit<T>, payload: T) => void;

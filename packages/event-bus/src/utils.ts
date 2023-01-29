@@ -1,8 +1,6 @@
 import { push } from "@solid-primitives/immutable";
-import { createEffect, createSignal, on } from "solid-js";
-import { GenericEmit, GenericListen, GenericListener, GenericListenProtect } from "./types";
-
-type _PromiseValue<T extends any[]> = void extends T[1] ? T[0] : T;
+import { batch, createEffect, createSignal, on } from "solid-js";
+import { Emit, Listen, Listener } from "./types";
 
 /**
  * Turns a stream-like listen function, into a promise resolving when the first event is captured.
@@ -12,18 +10,8 @@ type _PromiseValue<T extends any[]> = void extends T[1] ? T[0] : T;
  * const emitter = createEmitter<string>();
  * const event = await toPromise(emitter.listen);
  */
-export function toPromise<T extends any[]>(subscribe: GenericListen<T>): Promise<_PromiseValue<T>>;
-export function toPromise<T extends any[]>(
-  subscribe: GenericListenProtect<T>,
-  protect?: boolean
-): Promise<_PromiseValue<T>>;
-export function toPromise<T extends any[]>(
-  subscribe: GenericListenProtect<T>,
-  protect?: boolean
-): Promise<_PromiseValue<T>> {
-  return new Promise<_PromiseValue<T>>(resolve => {
-    once(subscribe, (...data) => resolve(data.length > 1 ? data : data[0]), protect);
-  });
+export function toPromise<T>(subscribe: Listen<T>): Promise<T> {
+  return new Promise<T>(resolve => once(subscribe, resolve));
 }
 
 /**
@@ -42,24 +30,11 @@ export function toPromise<T extends any[]>(
  *
  * emit("bar") // won't log
  */
-export function once<T extends any[] = []>(
-  subscribe: GenericListen<T>,
-  listener: GenericListener<T>
-): VoidFunction;
-export function once<T extends any[] = []>(
-  subscribe: GenericListenProtect<T>,
-  listener: GenericListener<T>,
-  protect?: boolean
-): VoidFunction;
-export function once<T extends any[] = []>(
-  subscribe: GenericListenProtect<T>,
-  listener: GenericListener<T>,
-  protect?: boolean
-): VoidFunction {
-  const unsub = subscribe((...payload) => {
+export function once<T>(subscribe: Listen<T>, listener: Listener<T>): VoidFunction {
+  const unsub = subscribe(payload => {
     unsub();
-    listener(...payload);
-  }, protect);
+    listener(payload);
+  });
   return unsub;
 }
 
@@ -78,14 +53,20 @@ export function once<T extends any[] = []>(
  * emit() // listener will log `null`
  * emitInEffect() // listener will log an owner object
  */
-export function toEffect<T extends any[]>(emit: GenericEmit<T>): GenericEmit<T> {
+export function toEffect<T>(emit: Emit<T>): Emit<T> {
   const [stack, setStack] = createSignal<T[]>([]);
   createEffect(
     on(stack, stack => {
       if (!stack.length) return;
-      stack.forEach(payload => emit(...payload));
       setStack([]);
+      stack.forEach(emit as Emit<any>);
     })
   );
-  return (...payload) => setStack(p => push(p, payload));
+  return (payload?: any) => void setStack(p => push(p, payload));
+}
+
+// TODO jsdoc
+
+export function batchGuard<T = void>(emit: Emit<T>, payload: T): void {
+  batch(() => emit(payload));
 }

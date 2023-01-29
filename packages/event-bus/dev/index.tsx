@@ -140,12 +140,7 @@ const HubChildNode: Component<{
 const NotificationsTest: Component = () => {
   const [inputText, setInputText] = createSignal("my message!");
 
-  let bus!: EventStack<
-    string,
-    {
-      text: string;
-    }
-  >;
+  let bus!: EventStack<string, { text: string }>;
 
   return (
     <div class="wrapper-h">
@@ -173,31 +168,12 @@ const NotificationsTest: Component = () => {
 };
 
 const Toaster: Component<{
-  useEventBus: (
-    bus: EventStack<
-      string,
-      {
-        text: string;
-      }
-    >
-  ) => void;
+  useEventBus: (bus: EventStack<string, { text: string }>) => void;
 }> = props => {
-  const bus = createEventStack<
-    string,
-    {
-      text: string;
-    }
-  >({
-    toValue: e => {
+  const bus = createEventStack({
+    toValue(e: string) {
       const text = e.length > 50 ? e.substring(0, 50) + "..." : e;
       return { text };
-    },
-    beforeEmit: e => {
-      console.log("bout to be emitted", e);
-    },
-    emitGuard: (emit, event) => {
-      if (event) emit();
-      else console.log("Empty messages are not allowed");
     },
     length: 10
   });

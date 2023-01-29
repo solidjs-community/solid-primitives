@@ -1,5 +1,6 @@
-import { GenericListener, GenericEmit, GenericListen } from "./types";
 import { tryOnCleanup } from "@solid-primitives/utils";
+import { onCleanup } from "solid-js";
+import { Emit, Listen, Listener } from "./types";
 
 /**
  * Very minimal interface for emiting and receiving events. Good for parent-child component communication.
@@ -19,19 +20,17 @@ emit("foo", 123, true);
 // clear all listeners
 clear();
  */
-export function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(
-  initial?: GenericListener<[A0, A1, A2]>[]
-): [listen: GenericListen<[A0, A1, A2]>, emit: GenericEmit<[A0, A1, A2]>, clear: VoidFunction] {
+export function createSimpleEmitter<T>(
+  initial?: Listener<T>[]
+): [listen: Listen<T>, emit: Emit<T>, clear: VoidFunction] {
   const set = new Set(initial);
-  tryOnCleanup(() => set.clear());
 
   return [
     listener => {
       set.add(listener);
-      tryOnCleanup(() => set.delete(listener));
-      return () => set.delete(listener);
+      return tryOnCleanup(() => set.delete(listener));
     },
-    (...payload) => set.forEach(cb => cb(...payload)),
-    () => set.clear()
+    (payload?: any) => set.forEach(cb => cb(payload)),
+    onCleanup(() => set.clear())
   ];
 }
