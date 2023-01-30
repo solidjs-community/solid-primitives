@@ -48,13 +48,12 @@ createScriptLoader({
 ## Definition
 
 ```ts
-function createScriptLoader(options: {
-  readonly src: string | Accessor<string>; // url or js source
-  readonly type?: string | undefined;
-  readonly onLoad?: (() => void) | undefined;
-  readonly onError?: (() => void) | undefined;
-  readonly onBeforeAppend?: ((script: HTMLScriptElement) => void) | undefined;
-}): HTMLScriptElement | undefined; // script element with be undefined only on the server
+function createScriptLoader(props: ScriptProps): HTMLScriptElement | undefined; // script element with be undefined only on the server
+
+type ScriptProps = Omit<ComponentProps<"script">, "src" | "textContent"> & {
+  /** URL or source of the script to load. */
+  src: string | Accessor<string>;
+};
 ```
 
 ## Demo

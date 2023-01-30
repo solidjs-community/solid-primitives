@@ -1,44 +1,44 @@
 import { Accessor, createRenderEffect, onCleanup, splitProps, type ComponentProps } from "solid-js";
-import { spread, template } from "solid-js/web";
+import { spread } from "solid-js/web";
 
-export type ScriptProps = Omit<ComponentProps<"script">, 'src'> & {
+export type ScriptProps = Omit<ComponentProps<"script">, "src" | "textContent"> & {
+  /** URL or source of the script to load. */
   src: string | Accessor<string>;
 };
 
-const scriptTag = template('<script></script>', 1);
+const OMITTED_PROPS = ["src"] as const;
 
 /**
  * Creates a convenient script loader utility
  *
- * @param src URL or source of the script to load.
- * @param type Type value to put in the script attribute.
- * @param onLoad Callback to trigger onLoad.
- * @param onError callback on error.
- * @param onBeforeAppend callback before appending the script to the document.
+ * @param props The props to spread to the script element.
+ * The `src` prop is required and will be used to set the `src` or `textContent` attribute.
  * @returns The script element that was created. (will be undefined in SSR)
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/script-loader#createScriptLoader
+ *
+ * @example
+ * createScriptLoader({
+ *  src: "https://example.com/script.js",
+ *  async onLoad() {
+ *    // do your stuff...
+ *  }
+ * })
  */
 export function createScriptLoader(props: ScriptProps): HTMLScriptElement | undefined {
   if (process.env.SSR) {
     return undefined;
   }
-  const script = scriptTag.cloneNode(false) as HTMLScriptElement;
-  const [local, scriptProps] = splitProps(props, ['src']);
+  const script = document.createElement("script");
+  const [local, scriptProps] = splitProps(props, OMITTED_PROPS);
   spread(script, scriptProps, false, true);
-  const remove = () => document.head.contains(script) && document.head.removeChild(script);
-  const load = () => {
+  createRenderEffect(() => {
     const src = typeof local.src === "string" ? local.src : local.src();
     const prop = /^(https?:|\w[\.\w-_%]+|)\//.test(src) ? "src" : "textContent";
     if (script[prop] !== src) {
       script[prop] = src;
-      options.onBeforeAppend && options.onBeforeAppend(script);
       document.head.appendChild(script);
     }
-  };
-  load();
-  createEffect(load);
-  onCleanup(remove);
-  return [script, remove];
-};
   });
   onCleanup(() => document.head.contains(script) && document.head.removeChild(script));
   return script;
