@@ -47,54 +47,14 @@ describe("createEventBus", () => {
       expect(captured.length).toBe(0);
     }));
 
-  test("remove()", () =>
-    createRoot(dispose => {
-      const captured: any[] = [];
-      const { listen, emit, remove } = createEventBus<string>();
-
-      const listener = (a: string) => captured.push(a);
-      listen(listener);
-
-      remove(listener);
-
-      emit("foo");
-      expect(captured).toEqual([]);
-
-      const unsub = listen(listener);
-      unsub();
-
-      emit("bar");
-      expect(captured).toEqual([]);
-
-      dispose();
-    }));
-
-  test("has()", () =>
-    createRoot(dispose => {
-      const { listen, has } = createEventBus<string>();
-
-      const listener = () => {};
-      expect(has(listener)).toBe(false);
-      const unsub = listen(listener);
-      expect(has(listener)).toBe(true);
-      unsub();
-      expect(has(listener)).toBe(false);
-
-      dispose();
-    }));
-
   test("config options", () =>
     createRoot(dispose => {
       let allowEmit = true;
 
-      const { listen, has, remove, emit } = createEventBus<string>({
+      const { listen, emit } = createEventBus<string>({
         emitGuard: (emit, payload) => allowEmit && emit(payload)
       });
       const listener = vi.fn();
-
-      listen(listener);
-      remove(listener);
-      expect(has(listener)).toBe(false);
 
       listen(listener);
 

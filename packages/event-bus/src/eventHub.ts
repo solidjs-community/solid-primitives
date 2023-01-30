@@ -1,6 +1,5 @@
 import { Accessor } from "solid-js";
-import { createEventBus } from "./eventBus";
-import { Emit, Listen, Listener } from "./types";
+import { createEventBus, Emit, Listen, Listener } from "./eventBus";
 
 export type EventHubPayloadMap<M> = {
   [K in keyof M]: M[K] extends { emit: Emit<infer T> } ? T : never;
@@ -11,7 +10,7 @@ export type EventHubValue<M> = {
 };
 
 export type EventHubPayload<M extends Record<string, EventHubChannel<any>>> = {
-  [K in keyof M]: { name: K; details: EventHubPayloadMap<M>[K] };
+  [K in keyof M]: { readonly name: K; readonly details: EventHubPayloadMap<M>[K] };
 }[keyof M];
 
 export type EventHubListener<M extends Record<string, EventHubChannel<any>>> = (
@@ -34,16 +33,16 @@ export type EventHubEmit<M extends Record<string, EventHubChannel<any>>> = <K ex
  * Required interface of a EventBus, to be able to be used as a channel in the EventHub
  */
 export interface EventHubChannel<T, V = T> {
-  listen: Listen<T>;
-  emit: Emit<T>;
-  value?: Accessor<V>;
+  readonly listen: Listen<T>;
+  readonly emit: Emit<T>;
+  readonly value?: Accessor<V>;
 }
 
 export type EventHub<M extends Record<string, EventHubChannel<any>>> = M & {
-  on: EventHubOn<M>;
-  emit: EventHubEmit<M>;
-  listen: (listener: EventHubListener<M>) => VoidFunction;
-  store: EventHubValue<M>;
+  readonly on: EventHubOn<M>;
+  readonly emit: EventHubEmit<M>;
+  readonly listen: (listener: EventHubListener<M>) => VoidFunction;
+  readonly store: EventHubValue<M>;
 };
 
 /**
@@ -93,6 +92,6 @@ export function createEventHub<M extends Record<string, EventHubChannel<any>>>(
     store,
     on: (e, a) => buses[e].listen(a),
     emit: (e, a?: any) => buses[e].emit(a),
-    listen: /*#__PURE__*/ global.listen.bind(global)
+    listen: /*#__PURE__*/ global.listen
   };
 }

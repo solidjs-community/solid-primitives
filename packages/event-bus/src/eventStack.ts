@@ -1,28 +1,26 @@
-import { drop, filterOut, pick, push } from "@solid-primitives/immutable";
-import { Modify } from "@solid-primitives/utils";
+import { drop, filterOut, push } from "@solid-primitives/immutable";
 import { Accessor, createSignal, Setter } from "solid-js";
-import { createEventBus, EventBus, EventBusConfig } from "./eventBus";
-import { Emit } from "./types";
+import { createEventBus, Emit, EmitGuard, Listen } from "./eventBus";
 
 export type EventStackPayload<E, V = E> = {
-  event: V;
-  stack: V[];
-  removeFromStack: VoidFunction;
+  readonly event: V;
+  readonly stack: V[];
+  readonly remove: VoidFunction;
 };
 
-export type EventStack<E, V = E> = Modify<
-  EventBus<EventStackPayload<V>>,
-  {
-    value: Accessor<V[]>;
-    setValue: Setter<V[]>;
-    removeFromStack: (value: V) => boolean;
-    emit: Emit<E>;
-  }
->;
+export type EventStack<E, V = E> = {
+  readonly listen: Listen<EventStackPayload<V>>;
+  readonly clear: VoidFunction;
+  readonly value: Accessor<V[]>;
+  readonly setValue: Setter<V[]>;
+  readonly remove: (value: V) => boolean;
+  readonly emit: Emit<E>;
+};
 
-export type EventStackConfig<E> = {
-  length?: number;
-  emitGuard?: EventBusConfig<E>["emitGuard"];
+export type EventStackConfig<E, V = E> = {
+  readonly length?: number;
+  readonly emitGuard?: EmitGuard<E>;
+  readonly toValue?: (event: E, stack: V[]) => V;
 };
 
 /**
@@ -31,7 +29,7 @@ export type EventStackConfig<E> = {
  * 
  * @param config EventBus configuration: `emitGuard`, `removeGuard`, `beforeEmit` functions and `toValue` parsing event to a value in stack.
  * 
- * @returns event stack: `{listen, once, emit, remove, clear, has, stack, setStack, removeFromStack}`
+ * @returns event stack: `{listen, once, emit, remove, clear, has, stack, setStack, remove}`
  * 
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventStack
  * 
@@ -52,29 +50,24 @@ bus.emit({text: "foo"});
 // a signal accessor:
 bus.stack() // => { text: string }[]
 
-bus.removeFromStack(value) // pass a reference to the value
+bus.remove(value) // pass a reference to the value
 
 bus.setStack(stack => stack.filter(item => {...}))
  */
 
-// Overload 0: "toValue" was not passed
 export function createEventStack<E extends object>(config?: EventStackConfig<E>): EventStack<E, E>;
-// Overload 1: "toValue" was set
 export function createEventStack<E, V extends object>(
-  config: EventStackConfig<E> & {
-    toValue: (event: E, stack: V[]) => V;
-  }
+  config: EventStackConfig<E, V> & { toValue: (event: E, stack: V[]) => V }
 ): EventStack<E, V>;
-
 export function createEventStack<E, V>(
   config: EventStackConfig<E> & {
     toValue?: (event: E, stack: V[]) => V;
   } = {}
 ): EventStack<E, V> {
-  const { toValue = (e: any) => e, length = 0 } = config;
+  const { toValue = (e: any) => e as V, length = 0 } = config;
 
   const [stack, setValue] = /*#__PURE__*/ createSignal<V[]>([]);
-  const eventEventBus = createEventBus<E>(pick(config, "emitGuard"));
+  const eventEventBus = createEventBus<E>(config);
   const valueEventBus = createEventBus<EventStackPayload<V>>();
 
   eventEventBus.listen(event => {
@@ -86,37 +79,18 @@ export function createEventStack<E, V>(
     valueEventBus.emit({
       event: value,
       stack: stack(),
-      removeFromStack: () => removeFromStack(value)
+      remove: () => remove(value)
     });
   });
 
-  const removeFromStack: EventStack<E, V>["removeFromStack"] = value =>
-    !!setValue(p => filterOut(p, value)).removed;
+  const remove: EventStack<E, V>["remove"] = value => !!setValue(p => filterOut(p, value)).removed;
 
   return {
-    ...valueEventBus,
+    clear: valueEventBus.clear,
+    listen: valueEventBus.listen,
     emit: eventEventBus.emit,
     value: stack,
     setValue,
-    removeFromStack
+    remove
   };
 }
-
-// /* Type Check */
-// createEventStack<string>(); //Error
-// createEventStack<string, { text: string }>(); //Error
-// createEventStack<string, { text: string }>({
-//   toValue: e => e //Error
-// });
-
-// const x = createEventStack<string[]>();
-// x.emit(["Hello", "World"]);
-// x.listen((payload, stack, remove) => {});
-// x.value();
-
-// const y = createEventStack({
-//   toValue: (e: string) => ({ text: e })
-// });
-// y.emit("Hello");
-// y.listen((payload, stack, remove) => {});
-// y.value();

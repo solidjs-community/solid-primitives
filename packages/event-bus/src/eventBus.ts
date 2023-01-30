@@ -1,17 +1,29 @@
 import { tryOnCleanup } from "@solid-primitives/utils";
 import { onCleanup } from "solid-js";
-import { Emit, EmitGuard, Listen, Listener, Remove } from "./types";
 
-export type EventBus<T> = {
-  listen: Listen<T>;
-  emit: Emit<T>;
-  remove: Remove<T>;
-  clear: VoidFunction;
-  has: (listener: Listener<T>) => boolean;
-};
+export type Listener<T = void> = (payload: T) => void;
+
+export type Listen<T = void> = (listener: Listener<T>) => VoidFunction;
+
+export type Emit<T = void> = (..._: void extends T ? [payload?: T] : [payload: T]) => void;
+
+export type EmitGuard<T = void> = (emit: Emit<T>, payload: T) => void;
+
+export class EventBusCore<T> extends Set<Listener<T>> {
+  emit(..._: void extends T ? [payload?: T] : [payload: T]): void;
+  emit(payload?: any) {
+    for (const cb of this) cb(payload);
+  }
+}
+
+export interface EventBus<T> {
+  readonly listen: Listen<T>;
+  readonly emit: Emit<T>;
+  readonly clear: VoidFunction;
+}
 
 export type EventBusConfig<T> = {
-  emitGuard?: EmitGuard<T>;
+  readonly emitGuard?: EmitGuard<T>;
 };
 
 /**
@@ -39,18 +51,16 @@ emitter.has(listener); // false
  */
 export function createEventBus<T>(config: EventBusConfig<T> = {}): EventBus<T> {
   const { emitGuard } = config;
-  const listeners = new Set<Listener<T>>();
-
-  const _emit: Emit<T> = (payload?: any) => listeners.forEach(cb => cb(payload));
+  const bus = new EventBusCore<T>();
 
   return {
     listen(listener) {
-      listeners.add(listener);
-      return tryOnCleanup(() => listeners.delete(listener));
+      bus.add(listener);
+      return tryOnCleanup(bus.delete.bind(bus, listener));
     },
-    emit: emitGuard ? (payload?: any) => emitGuard(_emit, payload) : _emit,
-    remove: listener => !!listeners.delete(listener),
-    clear: onCleanup(listeners.clear.bind(listeners)),
-    has: listeners.has.bind(listeners)
+    emit: emitGuard
+      ? (payload?: any) => emitGuard(bus.emit.bind(bus), payload)
+      : bus.emit.bind(bus),
+    clear: onCleanup(bus.clear.bind(bus))
   };
 }
