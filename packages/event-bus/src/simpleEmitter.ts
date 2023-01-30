@@ -1,5 +1,5 @@
 import { GenericListener, GenericEmit, GenericListen } from "./types";
-import { onRootCleanup } from "./utils";
+import { tryOnCleanup } from "@solid-primitives/utils";
 
 /**
  * Very minimal interface for emiting and receiving events. Good for parent-child component communication.
@@ -23,12 +23,12 @@ export function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(
   initial?: GenericListener<[A0, A1, A2]>[]
 ): [listen: GenericListen<[A0, A1, A2]>, emit: GenericEmit<[A0, A1, A2]>, clear: VoidFunction] {
   const set = new Set(initial);
-  onRootCleanup(() => set.clear());
+  tryOnCleanup(() => set.clear());
 
   return [
     listener => {
       set.add(listener);
-      onRootCleanup(() => set.delete(listener));
+      tryOnCleanup(() => set.delete(listener));
       return () => set.delete(listener);
     },
     (...payload) => set.forEach(cb => cb(...payload)),

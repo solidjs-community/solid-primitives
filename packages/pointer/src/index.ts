@@ -1,8 +1,9 @@
-import { Accessor, createSignal, getOwner } from "solid-js";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { remove, split } from "@solid-primitives/immutable";
 import { createSubRoot } from "@solid-primitives/rootless";
-import { MaybeAccessor, Directive, Many, createProxy, entries } from "@solid-primitives/utils";
+import { Directive, entries, Many, MaybeAccessor } from "@solid-primitives/utils";
+import { Accessor, createSignal, getOwner } from "solid-js";
+import { DEFAULT_STATE, parseHandlersMap, toState, toStateActive } from "./helpers";
 import {
   Handler,
   OnEventRecord,
@@ -13,18 +14,17 @@ import {
   PointerStateWithActive,
   PointerType
 } from "./types";
-import { DEFAULT_STATE, parseHandlersMap, toState, toStateActive } from "./helpers";
 
 export { getPositionToElement } from "./helpers";
 export type {
-  PointerType,
+  PointerHoverDirectiveHandler,
+  PointerHoverDirectiveProps,
+  PointerListItem,
+  PointerPositionDirectiveHandler,
+  PointerPositionDirectiveProps,
   PointerState,
   PointerStateWithActive,
-  PointerListItem,
-  PointerHoverDirectiveProps,
-  PointerHoverDirectiveHandler,
-  PointerPositionDirectiveHandler,
-  PointerPositionDirectiveProps
+  PointerType
 } from "./types";
 
 /**
@@ -169,20 +169,23 @@ export function createPerPointerListeners(
 
         onEnter(
           e,
-          createProxy({
-            get(key) {
-              const type = "pointer" + key.substring(2).toLowerCase();
-              return (fn: Handler) => {
-                if (!init) {
-                  // eslint-disable-next-line no-console
-                  if (process.env.DEV) console.warn(onlyInitMessage);
-                  return;
-                }
-                if (type === "pointerleave") onLeave = fn;
-                else addListener(type, fn, pointerId);
-              };
+          new Proxy(
+            {},
+            {
+              get: (_, key: string) => {
+                const type = "pointer" + key.substring(2).toLowerCase();
+                return (fn: Handler) => {
+                  if (!init) {
+                    // eslint-disable-next-line no-console
+                    if (process.env.DEV) console.warn(onlyInitMessage);
+                    return;
+                  }
+                  if (type === "pointerleave") onLeave = fn;
+                  else addListener(type, fn, pointerId);
+                };
+              }
             }
-          })
+          ) as any
         );
         init = false;
       }, owner);

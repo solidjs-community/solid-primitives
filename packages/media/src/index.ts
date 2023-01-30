@@ -1,6 +1,6 @@
 import { createSignal, Accessor } from "solid-js";
 import { makeEventListener } from "@solid-primitives/event-listener";
-import { createStaticStore, forEachEntry, noop } from "@solid-primitives/utils";
+import { createStaticStore, entries, noop } from "@solid-primitives/utils";
 import { getEmptyMatchesFromBreakpoints } from "./common";
 import { Breakpoints, BreakpointOptions, Matches } from "./types";
 import { createSharedRoot } from "@solid-primitives/rootless";
@@ -90,7 +90,7 @@ export function createBreakpoints<T extends Breakpoints>(
     (() => {
       const matches = {} as Record<keyof T, boolean>;
 
-      forEachEntry(breakpoints, (token, width) => {
+      entries(breakpoints).forEach(([token, width]) => {
         const mql = window.matchMedia(`(${mediaFeature}: ${width})`);
         matches[token as keyof T] = mql.matches;
 

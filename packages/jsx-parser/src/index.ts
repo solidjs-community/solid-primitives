@@ -41,7 +41,7 @@ export function createJSXParser<Tokens extends {}>(options?: { name: string }) {
   function createToken<Props extends { [key: string]: any }, Token extends Tokens>(
     tokenCallback: (props: Props) => Token,
     component?: (props: Props) => JSX.Element
-  ): (props: Props) => JSX.Element {
+  ): (props: Props) => TokenComponent<Token> {
     return (props: Props) =>
       Object.assign(
         component

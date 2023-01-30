@@ -1,5 +1,17 @@
 # @solid-primitives/pointer
 
+## 0.2.5
+
+### Patch Changes
+
+- c2866ea6: Update utils package
+- Updated dependencies [c2866ea6]
+- Updated dependencies [c2866ea6]
+  - @solid-primitives/event-listener@2.2.6
+  - @solid-primitives/rootless@1.2.3
+  - @solid-primitives/utils@5.0.0
+  - @solid-primitives/immutable@0.1.6
+
 ## 0.2.4
 
 ### Patch Changes

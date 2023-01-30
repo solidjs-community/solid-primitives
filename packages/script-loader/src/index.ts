@@ -1,4 +1,11 @@
-import { Accessor, createRenderEffect, onCleanup } from "solid-js";
+import { Accessor, createRenderEffect, onCleanup, splitProps, type ComponentProps } from "solid-js";
+import { spread, template } from "solid-js/web";
+
+export type ScriptProps = Omit<ComponentProps<"script">, 'src'> & {
+  src: string | Accessor<string>;
+};
+
+const scriptTag = template('<script></script>', 1);
 
 /**
  * Creates a convenient script loader utility
@@ -10,29 +17,28 @@ import { Accessor, createRenderEffect, onCleanup } from "solid-js";
  * @param onBeforeAppend callback before appending the script to the document.
  * @returns The script element that was created. (will be undefined in SSR)
  */
-export function createScriptLoader(options: {
-  readonly src: string | Accessor<string>;
-  readonly type?: string;
-  readonly onLoad?: () => void;
-  readonly onError?: () => void;
-  readonly onBeforeAppend?: (script: HTMLScriptElement) => void;
-}): HTMLScriptElement | undefined {
+export function createScriptLoader(props: ScriptProps): HTMLScriptElement | undefined {
   if (process.env.SSR) {
     return undefined;
   }
-
-  const script = document.createElement("script");
-  options.type && (script.type = options.type);
-  options.onLoad && script.addEventListener("load", options.onLoad);
-  options.onError && script.addEventListener("error", options.onError);
-  createRenderEffect(() => {
-    const src = typeof options.src === "string" ? options.src : options.src();
+  const script = scriptTag.cloneNode(false) as HTMLScriptElement;
+  const [local, scriptProps] = splitProps(props, ['src']);
+  spread(script, scriptProps, false, true);
+  const remove = () => document.head.contains(script) && document.head.removeChild(script);
+  const load = () => {
+    const src = typeof local.src === "string" ? local.src : local.src();
     const prop = /^(https?:|\w[\.\w-_%]+|)\//.test(src) ? "src" : "textContent";
     if (script[prop] !== src) {
       script[prop] = src;
       options.onBeforeAppend && options.onBeforeAppend(script);
       document.head.appendChild(script);
     }
+  };
+  load();
+  createEffect(load);
+  onCleanup(remove);
+  return [script, remove];
+};
   });
   onCleanup(() => document.head.contains(script) && document.head.removeChild(script));
   return script;
