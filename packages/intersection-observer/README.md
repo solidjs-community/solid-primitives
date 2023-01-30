@@ -211,7 +211,7 @@ function createViewportObserver(
 
 ## Demo
 
-You may view a working example here: https://stackblitz.com/edit/vitejs-vite-n2lwpq
+You may view a working example in the [/dev](https://github.com/solidjs-community/solid-primitives/tree/main/packages/intersection-observer/dev) directory.
 
 ## Changelog
 
