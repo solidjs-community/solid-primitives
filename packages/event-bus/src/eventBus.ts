@@ -42,14 +42,13 @@ export function createEventBus<T>(config: EventBusConfig<T> = {}): EventBus<T> {
   const listeners = new Set<Listener<T>>();
 
   const _emit: Emit<T> = (payload?: any) => listeners.forEach(cb => cb(payload));
-  const emit: Emit<T> = emitGuard ? (payload?: any) => emitGuard(_emit, payload) : _emit;
 
   return {
     listen(listener) {
       listeners.add(listener);
       return tryOnCleanup(() => listeners.delete(listener));
     },
-    emit,
+    emit: emitGuard ? (payload?: any) => emitGuard(_emit, payload) : _emit,
     remove: listener => !!listeners.delete(listener),
     clear: onCleanup(listeners.clear.bind(listeners)),
     has: listeners.has.bind(listeners)

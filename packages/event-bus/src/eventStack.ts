@@ -14,8 +14,7 @@ export type EventStack<E, V = E> = Modify<
   EventBus<EventStackPayload<V>>,
   {
     value: Accessor<V[]>;
-    stack: Accessor<V[]>;
-    setStack: Setter<V[]>;
+    setValue: Setter<V[]>;
     removeFromStack: (value: V) => boolean;
     emit: Emit<E>;
   }
@@ -74,13 +73,13 @@ export function createEventStack<E, V>(
 ): EventStack<E, V> {
   const { toValue = (e: any) => e, length = 0 } = config;
 
-  const [stack, setStack] = createSignal<V[]>([]);
+  const [stack, setValue] = /*#__PURE__*/ createSignal<V[]>([]);
   const eventEventBus = createEventBus<E>(pick(config, "emitGuard"));
   const valueEventBus = createEventBus<EventStackPayload<V>>();
 
   eventEventBus.listen(event => {
     const value = toValue(event, stack());
-    setStack(prev => {
+    setValue(prev => {
       let list = push(prev, value);
       return length && list.length > length ? drop(list) : list;
     });
@@ -92,14 +91,13 @@ export function createEventStack<E, V>(
   });
 
   const removeFromStack: EventStack<E, V>["removeFromStack"] = value =>
-    !!setStack(p => filterOut(p, value)).removed;
+    !!setValue(p => filterOut(p, value)).removed;
 
   return {
     ...valueEventBus,
     emit: eventEventBus.emit,
     value: stack,
-    stack,
-    setStack,
+    setValue,
     removeFromStack
   };
 }

@@ -31,6 +31,6 @@ export function createSimpleEmitter<T>(
       return tryOnCleanup(() => set.delete(listener));
     },
     (payload?: any) => set.forEach(cb => cb(payload)),
-    onCleanup(() => set.clear())
+    onCleanup(set.clear.bind(set))
   ];
 }
