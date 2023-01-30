@@ -137,6 +137,9 @@ import { createVisibilityObserver } from "@solid-primitives/intersection-observe
 let el: HTMLDivElement | undefined;
 
 const useVisibilityObserver = createVisibilityObserver({ threshold: 0.8 });
+
+// ! extremely important to use an accessor for the element to not lose reactivity
+// ! typescript will give you a warning if you don't use an accessor
 const visible = useVisibilityObserver(() => el);
 
 <div ref={el}>{visible() ? "Visible" : "Hidden"}</div>;
