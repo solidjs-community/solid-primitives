@@ -1,32 +1,38 @@
-import { describe, test, expect } from "vitest";
-import { createRoot, createComputed } from "solid-js";
 import { createEventBus } from "../src";
+import { createRoot } from "solid-js";
+import { describe, test, expect, vi } from "vitest";
 
 describe("createEventBus", () => {
-  test("emitting and listening", () => {
-    const captured: any[] = [];
-    const { listen, emit } = createEventBus<string>();
+  test("emitting and listening", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const { listen, emit } = createEventBus<string>();
 
-    listen((e, prev) => captured.push([e, prev]));
+      listen((...args) => captured.push(args));
 
-    emit("foo");
-    expect(captured[0]).toEqual(["foo", undefined]);
+      emit("foo");
+      expect(captured[0]).toEqual(["foo"]);
 
-    emit("bar");
-    expect(captured[1]).toEqual(["bar", "foo"]);
-  });
+      emit("bar");
+      expect(captured[1]).toEqual(["bar"]);
 
-  test("clear function", () => {
-    const captured: any[] = [];
-    const { listen, emit, clear } = createEventBus<string>();
+      dispose();
+    }));
 
-    listen(a => captured.push(a));
+  test("clear function", () =>
+    createRoot(dispose => {
+      const captured: any[] = [];
+      const { listen, emit, clear } = createEventBus<string>();
 
-    clear();
+      listen(a => captured.push(a));
 
-    emit("foo");
-    expect(captured.length).toBe(0);
-  });
+      clear();
+
+      emit("foo");
+      expect(captured.length).toBe(0);
+
+      dispose();
+    }));
 
   test("clears on dispose", () =>
     createRoot(dispose => {
@@ -41,81 +47,38 @@ describe("createEventBus", () => {
       expect(captured.length).toBe(0);
     }));
 
-  test("remove()", () => {
-    const captured: any[] = [];
-    const { listen, emit, remove } = createEventBus<string>();
-
-    const listener = (a: string) => captured.push(a);
-    listen(listener);
-
-    remove(listener);
-
-    emit("foo");
-    expect(captured).toEqual([]);
-
-    const unsub = listen(listener);
-    unsub();
-
-    emit("bar");
-    expect(captured).toEqual([]);
-  });
-
-  test("remove protected", () => {
-    const captured: any[] = [];
-    const { listen, emit, remove } = createEventBus<string>();
-
-    const listener = (a: string) => captured.push(a);
-    const unsub = listen(listener, true);
-
-    remove(listener);
-
-    emit("foo");
-    expect(captured, "normal remove() shouldn't remove a protected listener").toEqual(["foo"]);
-
-    unsub();
-
-    emit("bar");
-    expect(captured, "returned unsub func should remove a protected listener").toEqual(["foo"]);
-  });
-
-  test("has()", () => {
-    const { listen, has } = createEventBus<string>();
-
-    const listener = () => {};
-    expect(has(listener)).toBe(false);
-    const unsub = listen(listener);
-    expect(has(listener)).toBe(true);
-    unsub();
-    expect(has(listener)).toBe(false);
-  });
-
-  test("last value", () => {
-    const { emit, value } = createEventBus<string>();
-
-    expect(value()).toBe(undefined);
-
-    emit("foo");
-    expect(value()).toBe("foo");
-
-    emit("bar");
-    expect(value()).toBe("bar");
-  });
-
-  test("value is reactive", () =>
+  test("remove()", () =>
     createRoot(dispose => {
-      const { emit, value } = createEventBus<string>();
       const captured: any[] = [];
-      createComputed(() => {
-        captured.push(value());
-      });
+      const { listen, emit, remove } = createEventBus<string>();
 
-      expect(captured).toEqual([undefined]);
+      const listener = (a: string) => captured.push(a);
+      listen(listener);
+
+      remove(listener);
 
       emit("foo");
-      expect(captured).toEqual([undefined, "foo"]);
+      expect(captured).toEqual([]);
+
+      const unsub = listen(listener);
+      unsub();
 
       emit("bar");
-      expect(captured).toEqual([undefined, "foo", "bar"]);
+      expect(captured).toEqual([]);
+
+      dispose();
+    }));
+
+  test("has()", () =>
+    createRoot(dispose => {
+      const { listen, has } = createEventBus<string>();
+
+      const listener = () => {};
+      expect(has(listener)).toBe(false);
+      const unsub = listen(listener);
+      expect(has(listener)).toBe(true);
+      unsub();
+      expect(has(listener)).toBe(false);
 
       dispose();
     }));
@@ -123,38 +86,24 @@ describe("createEventBus", () => {
   test("config options", () =>
     createRoot(dispose => {
       let allowEmit = true;
-      let allowRemove = false;
 
-      const capturedBeforeEmit: any[] = [];
-
-      const { listen, has, remove, emit, value } = createEventBus<string>({
-        beforeEmit: a => capturedBeforeEmit.push(a),
-        emitGuard: (emit, ...payload) => {
-          allowEmit && emit(...payload);
-        },
-        removeGuard: remove => allowRemove && remove(),
-        value: "initial"
+      const { listen, has, remove, emit } = createEventBus<string>({
+        emitGuard: (emit, payload) => allowEmit && emit(payload)
       });
-      const listener = () => {};
+      const listener = vi.fn();
 
-      expect(value()).toBe("initial");
-
-      let unsub = listen(listener);
+      listen(listener);
       remove(listener);
-      expect(has(listener)).toBe(true);
-      unsub();
       expect(has(listener)).toBe(false);
 
       listen(listener);
-      allowRemove = true;
-      remove(listener);
-      expect(has(listener)).toBe(false);
 
       emit("foo");
-      expect(capturedBeforeEmit).toEqual(["foo"]);
       allowEmit = false;
       emit("bar");
-      expect(capturedBeforeEmit).toEqual(["foo"]);
+
+      expect(listener).toHaveBeenCalledTimes(1);
+      expect(listener).toHaveBeenCalledWith("foo");
 
       dispose();
     }));

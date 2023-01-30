@@ -6,15 +6,15 @@ describe("createSimpleEmitter", () => {
   test("emitting and listening", () =>
     createRoot(dispose => {
       const captured: any[] = [];
-      const [listen, emit] = createSimpleEmitter<string, number, boolean>();
+      const [listen, emit] = createSimpleEmitter<string>();
 
       listen((...args) => captured.push(args));
 
-      emit("foo", 1, true);
-      expect(captured[0]).toEqual(["foo", 1, true]);
+      emit("foo");
+      expect(captured[0]).toEqual(["foo"]);
 
-      emit("bar", 2, false);
-      expect(captured[1]).toEqual(["bar", 2, false]);
+      emit("bar");
+      expect(captured[1]).toEqual(["bar"]);
 
       dispose();
     }));

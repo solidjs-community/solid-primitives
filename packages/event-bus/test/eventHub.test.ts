@@ -1,6 +1,6 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 import { createRoot } from "solid-js";
-import { createEmitter, createEventBus, createEventHub, createEventStack } from "../src";
+import { createEventBus, createEventHub, createEventStack } from "../src";
 
 const syncTest = (name: string, fn: (dispose: () => void) => void) =>
   test(name, () =>
@@ -12,102 +12,53 @@ const syncTest = (name: string, fn: (dispose: () => void) => void) =>
 
 describe("createEventHub", () => {
   syncTest("listening and emiting", () => {
-    const capturedA: number[] = [];
-    const capturedB: string[] = [];
-    const capturedAny: [string, number | string][] = [];
+    const hub = createEventHub($ => ({
+      busA: $<number>(),
+      busB: $<string>()
+    }));
 
-    const hub = createEventHub({
-      busA: createEmitter<number>(),
-      busB: createEventBus<string>()
-    });
+    const cbA = vi.fn();
+    const cbB = vi.fn();
+    const cbAny = vi.fn();
 
-    hub.on("busA", e => capturedA.push(e));
-    hub.on("busB", e => capturedB.push(e));
-    hub.listen((name, [e]) => capturedAny.push([name, e]));
+    hub.on("busA", cbA);
+    hub.on("busB", cbB);
+    hub.listen(cbAny);
 
     hub.emit("busA", 0);
     hub.busA.emit(1);
     hub.emit("busB", "foo");
     hub.busB.emit("bar");
 
-    expect(capturedA).toEqual([0, 1]);
-    expect(capturedB).toEqual(["foo", "bar"]);
-    expect(capturedAny).toEqual([
-      ["busA", 0],
-      ["busA", 1],
-      ["busB", "foo"],
-      ["busB", "bar"]
-    ]);
-  });
+    expect(cbA).toBeCalledTimes(2);
+    expect(cbA).nthCalledWith(1, 0);
+    expect(cbA).nthCalledWith(2, 1);
 
-  syncTest("clearing listeners", () => {
-    const capturedA: number[] = [];
-    const capturedB: string[] = [];
-    const capturedAny: [string, number | string][] = [];
+    expect(cbB).toBeCalledTimes(2);
+    expect(cbB).nthCalledWith(1, "foo");
+    expect(cbB).nthCalledWith(2, "bar");
 
-    const hub = createEventHub({
-      busA: createEmitter<number>(),
-      busB: createEventBus<string>()
-    });
-
-    hub.on("busA", e => capturedA.push(e));
-    hub.on("busB", e => capturedB.push(e));
-    hub.listen((name, [e]) => capturedAny.push([name, e]));
-
-    hub.clear("busA");
-
-    hub.emit("busA", 0);
-    hub.emit("busB", "foo");
-
-    expect(capturedA.length).toBe(0);
-    expect(capturedB).toEqual(["foo"]);
-    expect(capturedAny).toEqual([
-      ["busA", 0],
-      ["busB", "foo"]
-    ]);
-
-    hub.clearAll();
-
-    hub.emit("busA", 1);
-    hub.emit("busB", "bar");
-
-    expect(capturedA.length).toBe(0);
-    expect(capturedB.length).toBe(1);
-    expect(capturedAny).toEqual([
-      ["busA", 0],
-      ["busB", "foo"],
-      ["busA", 1],
-      ["busB", "bar"]
-    ]);
-
-    hub.clearGlobal();
-
-    hub.emit("busA", 2);
-    hub.emit("busB", "baz");
-
-    expect(capturedA.length).toBe(0);
-    expect(capturedB.length).toBe(1);
-    expect(capturedAny.length).toBe(4);
+    expect(cbAny).toBeCalledTimes(4);
+    expect(cbAny).nthCalledWith(1, { name: "busA", details: 0 });
+    expect(cbAny).nthCalledWith(2, { name: "busA", details: 1 });
+    expect(cbAny).nthCalledWith(3, { name: "busB", details: "foo" });
+    expect(cbAny).nthCalledWith(4, { name: "busB", details: "bar" });
   });
 
   syncTest("accessing values", () => {
     const hub = createEventHub({
-      busA: createEmitter<void>(),
-      busB: createEventBus<string>(),
-      busC: createEventStack<{ text: string }>()
+      busA: createEventBus<void>(),
+      busB: createEventStack<{ text: string }>()
     });
 
     expect(hub.store.busA).toBe(undefined);
-    expect(hub.store.busB).toBe(undefined);
-    expect(hub.store.busC).instanceOf(Array);
-    expect(hub.store.busC.length).toBe(0);
+    expect(hub.store.busB).instanceOf(Array);
+    expect(hub.store.busB.length).toBe(0);
 
     hub.emit("busA");
-    hub.emit("busB", "foo");
-    hub.emit("busC", { text: "bar" });
+    hub.emit("busB", { text: "bar" });
 
     expect(hub.store.busA).toBe(undefined);
-    expect(hub.store.busB).toBe("foo");
-    expect(hub.store.busC).toEqual([{ text: "bar" }]);
+    expect(hub.store.busB).toEqual([{ text: "bar" }]);
   });
 });

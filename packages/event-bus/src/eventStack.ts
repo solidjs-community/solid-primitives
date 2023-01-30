@@ -4,7 +4,7 @@ import { Accessor, createSignal, Setter } from "solid-js";
 import { createEventBus, EventBus, EventBusConfig } from "./eventBus";
 import { Emit } from "./types";
 
-export type EventStackPayload<V> = {
+export type EventStackPayload<E, V = E> = {
   event: V;
   stack: V[];
   removeFromStack: VoidFunction;

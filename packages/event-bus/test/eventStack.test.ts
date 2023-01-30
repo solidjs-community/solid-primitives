@@ -1,4 +1,4 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 import { createComputed, createRoot } from "solid-js";
 import { createEventStack } from "../src";
 
@@ -11,10 +11,10 @@ describe("createEventStack", () => {
 
       const { listen, emit, stack } = createEventStack<[string]>();
 
-      listen((e, stack, remove) => {
-        captured.push(e[0]);
+      listen(({ event, stack, removeFromStack }) => {
+        captured.push(event[0]);
         capturedStack = stack;
-        if (allowRemove) remove();
+        if (allowRemove) removeFromStack();
       });
 
       emit(["foo"]);
@@ -69,7 +69,7 @@ describe("createEventStack", () => {
       const captured: any[] = [];
       const { listen, emit, remove } = createEventStack<[string]>();
 
-      const listener = (a: [string]) => captured.push(a[0]);
+      const listener = vi.fn();
       listen(listener);
 
       remove(listener);
@@ -82,27 +82,6 @@ describe("createEventStack", () => {
 
       emit(["bar"]);
       expect(captured.length).toBe(0);
-
-      dispose();
-    }));
-
-  test("remove protected", () =>
-    createRoot(dispose => {
-      const captured: any[] = [];
-      const { listen, emit, remove } = createEventStack<[string]>();
-
-      const listener = (a: [string]) => captured.push(a[0]);
-      const unsub = listen(listener, true);
-
-      remove(listener);
-
-      emit(["foo"]);
-      expect(captured, "normal remove() shouldn't remove a protected listener").toEqual(["foo"]);
-
-      unsub();
-
-      emit(["bar"]);
-      expect(captured, "returned unsub func should remove a protected listener").toEqual(["foo"]);
 
       dispose();
     }));
@@ -165,34 +144,20 @@ describe("createEventStack", () => {
   test("config options", () =>
     createRoot(dispose => {
       let allowEmit = true;
-      let allowRemove = false;
-
-      const capturedBeforeEmit: { text: string }[] = [];
 
       const { listen, has, remove, emit, stack } = createEventStack<string, { text: string }>({
-        beforeEmit: a => capturedBeforeEmit.push(a),
         emitGuard: (emit, ...payload) => allowEmit && emit(...payload),
-        removeGuard: remove => allowRemove && remove(),
         toValue: e => ({ text: e })
       });
       const listener = () => {};
 
-      let unsub = listen(listener);
-      remove(listener);
-      expect(has(listener), "removing should fail").toBe(true);
-      unsub();
-      expect(has(listener)).toBe(false);
-
       listen(listener);
-      allowRemove = true;
       remove(listener);
       expect(has(listener)).toBe(false);
 
       emit("foo");
-      expect(capturedBeforeEmit).toEqual([{ text: "foo" }]);
       allowEmit = false;
       emit("bar");
-      expect(capturedBeforeEmit).toEqual([{ text: "foo" }]);
 
       expect(stack()).toEqual([{ text: "foo" }]);
 
