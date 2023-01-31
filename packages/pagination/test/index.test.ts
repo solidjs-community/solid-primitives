@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { createPagination } from "../src";
+import { createInfiniteScroll, createPagination } from "../src";
 
 describe("createPagination", () => {
   test("createPagination returns page getter and setter", () =>
@@ -36,4 +36,28 @@ describe("createPagination", () => {
       expect(paginationProps().findIndex(({ ["aria-current"]: current }) => current)).toBe(3);
       dispose();
     }));
+});
+
+//@ts-ignore
+global.IntersectionObserver = class { disconnect() {} };
+
+describe("createInfiniteScroll", () => {
+  const fetcher = async (page: number) => {
+    let items = [];
+    for (let i = 0; i < page+1; i++) {
+      items.push(i);
+    }
+    return items;
+  }
+
+  test("createInfiniteScroll", () =>
+    createRoot(dispose => {
+      const [pages, _, { page, setPage }] = createInfiniteScroll(fetcher);
+      expect(pages(), "initial value should be []").toStrictEqual([]);
+
+      setPage(1);
+      expect(page(), "value should be 1").toStrictEqual(1);
+
+      dispose();
+  }));
 });
