@@ -2,19 +2,19 @@ import { tryOnCleanup } from "@solid-primitives/utils";
 import { onCleanup } from "solid-js";
 import { createEventBus, EventBusCore, Listener } from "./eventBus";
 
-export class EmitterCore<M extends Record<PropertyKey, any>> {
-  #buses: Record<PropertyKey, EventBusCore<any>> = {};
-
+export class EmitterCore<M extends Record<PropertyKey, any>> extends Map<
+  keyof M,
+  EventBusCore<M[any]>
+> {
   on<K extends keyof M>(event: K, listener: Listener<M[K]>): void {
-    (this.#buses[event] || (this.#buses[event] = new EventBusCore())).add(listener);
+    let bus = this.get(event);
+    bus || this.set(event, (bus = new EventBusCore<M[K]>()));
+    bus.add(listener);
   }
 
   off<K extends keyof M>(event: K, listener: Listener<M[K]>): void {
-    const bus = this.#buses[event];
-    if (bus) {
-      bus.delete(listener);
-      if (!bus.size) delete this.#buses[event];
-    }
+    const bus = this.get(event);
+    bus?.delete(listener) && !bus.size && this.delete(event);
   }
 
   emit<K extends keyof M>(
@@ -22,11 +22,7 @@ export class EmitterCore<M extends Record<PropertyKey, any>> {
     ..._: void extends M[K] ? [payload?: M[K]] : [payload: M[K]]
   ): void;
   emit<K extends keyof M>(event: K, value: M[K]): void {
-    this.#buses[event]?.emit(value);
-  }
-
-  clear(): void {
-    this.#buses = {};
+    this.get(event)?.emit(value);
   }
 }
 
@@ -36,14 +32,6 @@ export type EmitterOn<M extends Record<PropertyKey, any>> = <K extends keyof M>(
 ) => VoidFunction;
 
 export type EmitterEmit<M extends Record<PropertyKey, any>> = EmitterCore<M>["emit"];
-
-export type EmitterPayload<M extends Record<PropertyKey, any>> = {
-  [K in keyof M]: { readonly name: K; readonly details: M[K] };
-}[keyof M];
-
-export type EmitterListener<M extends Record<PropertyKey, any>> = (
-  payload: EmitterPayload<M>
-) => void;
 
 export type Emitter<M extends Record<PropertyKey, any>> = {
   readonly on: EmitterOn<M>;
@@ -63,6 +51,14 @@ export function createEmitter<M extends Record<PropertyKey, any>>(): Emitter<M> 
     clear: onCleanup(emitter.clear.bind(emitter))
   };
 }
+
+export type EmitterPayload<M extends Record<PropertyKey, any>> = {
+  [K in keyof M]: { readonly name: K; readonly details: M[K] };
+}[keyof M];
+
+export type EmitterListener<M extends Record<PropertyKey, any>> = (
+  payload: EmitterPayload<M>
+) => void;
 
 export type EmitterListen<M extends Record<PropertyKey, any>> = (
   listener: EmitterListener<M>

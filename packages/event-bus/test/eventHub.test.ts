@@ -51,14 +51,14 @@ describe("createEventHub", () => {
       busB: createEventStack<{ text: string }>()
     });
 
-    expect(hub.store.busA).toBe(undefined);
-    expect(hub.store.busB).instanceOf(Array);
-    expect(hub.store.busB.length).toBe(0);
+    expect(hub.value.busA).toBe(undefined);
+    expect(hub.value.busB).instanceOf(Array);
+    expect(hub.value.busB.length).toBe(0);
 
     hub.emit("busA");
     hub.emit("busB", { text: "bar" });
 
-    expect(hub.store.busA).toBe(undefined);
-    expect(hub.store.busB).toEqual([{ text: "bar" }]);
+    expect(hub.value.busA).toBe(undefined);
+    expect(hub.value.busB).toEqual([{ text: "bar" }]);
   });
 });

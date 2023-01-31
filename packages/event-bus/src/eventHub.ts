@@ -19,12 +19,13 @@ export interface EventHubChannel<T, V = T> {
   readonly value?: Accessor<V>;
 }
 
-export type EventHub<M extends Record<string, EventHubChannel<any>>> = M & {
-  readonly on: EmitterOn<EventHubPayloadMap<M>>;
-  readonly emit: EmitterEmit<EventHubPayloadMap<M>>;
-  readonly listen: EmitterListen<EventHubPayloadMap<M>>;
-  readonly value: EventHubValue<M>;
-};
+export type EventHub<M extends { readonly [key: string | number]: EventHubChannel<any> }> =
+  Readonly<M> & {
+    readonly on: EmitterOn<EventHubPayloadMap<M>>;
+    readonly emit: EmitterEmit<EventHubPayloadMap<M>>;
+    readonly listen: EmitterListen<EventHubPayloadMap<M>>;
+    readonly value: EventHubValue<M>;
+  };
 
 /**
  * Provides helpers for using a group of emitters.
@@ -53,7 +54,7 @@ export type EventHub<M extends Record<string, EventHubChannel<any>>> = M & {
  * hub.emit("busB", "foo");
  */
 
-export function createEventHub<M extends Record<string, EventHubChannel<any>>>(
+export function createEventHub<M extends { readonly [key: string | number]: EventHubChannel<any> }>(
   defineChannels: ((bus: typeof createEventBus) => M) | M
 ): EventHub<M> {
   const global = /*#__PURE__*/ createEventBus<{ name: string; details: any }>();
