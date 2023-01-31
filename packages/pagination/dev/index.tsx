@@ -31,11 +31,16 @@ const App: Component = () => {
           </button>
         </div>
       </div>
-      <div class="bg-gray-800 w-1/2 text-white max-h-screen overflow-scroll">
+      <div class="bg-gray-800 w-1/2 text-white max-h-screen flex flex-col">
+      <div class="h-[10%] overflow-scroll flex items-center justify-center">
+        <h1>Infinite Scrolling:</h1>
+      </div>
+        <div class="h-[90%] overflow-scroll">
           <For each={pages()}>{item => <p>{item}</p>}</For>
           <Show when={!end()}>
             <h1 use:infiniteScrollLoader>Loading...</h1>
           </Show>
+        </div>
       </div>
     </div>
   );
