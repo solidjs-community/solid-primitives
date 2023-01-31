@@ -11,339 +11,126 @@
 
 A collection of SolidJS primitives providing various features of a pubsub/event-emitter/event-bus:
 
-- [`createSimpleEmitter`](#createSimpleEmitter) - Very minimal interface for emiting and receiving events. Good for parent-child component communication.
-- [`createEmitter`](#createEmitter) - Provides all the base functions of an event-emitter, plus additional functions for managing listeners, it's behavior could be customized with an config object. Good for advanced usage.
-- [`createEventBus`](#createEventBus) - Extends [`createEmitter`](#createEmitter). Additionally it provides a signal accessor function with last event's value.
-- [`createEventStack`](#createEventStack) - Extends [`createEmitter`](#createEmitter). Provides the emitted events in a list/history form, with tools to manage it.
-- [`createEventHub`](#createEventHub) - Provides helpers for using a group of emitters.
+- [`createEventBus`](#createEventBus) - Provides a simple way to listen to and emit events.
+- [`createEmitter`](#createEmitter) - Creates an emitter with which you can listen to and emit various events.
+- [`createEventHub`](#createEventHub) - Provides helpers for using a group of buses.
+- [`createEventStack`](#createEventStack) - Provides the emitted events as list/history, with tools to manage it.
 
 ## Installation
 
 ```bash
 npm install @solid-primitives/event-bus
 # or
+pnpm add @solid-primitives/event-bus
+# or
 yarn add @solid-primitives/event-bus
-```
-
-## `createSimpleEmitter`
-
-Very minimal interface for emiting and receiving events. Good for parent-child component communication.
-
-### How to use it
-
-```ts
-import { createSimpleEmitter } from "@solid-primitives/event-bus";
-
-// accepts up-to-3 genetic payload types
-const [listen, emit, clear] = createSimpleEmitter<string, number, boolean>();
-
-// can be used without payload type, if you don't want to send any
-createSimpleEmitter();
-
-listen((a, b, c) => console.log(a, b, c));
-
-emit("foo", 123, true);
-
-// clear all listeners
-clear();
-// listeners will also be cleared onCleanup automatically
-```
-
-### Types
-
-Check out [shared types](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/src/types.ts).
-
-```ts
-function createSimpleEmitter<A0 = void, A1 = void, A2 = void>(): [
-  listen: GenericListen<[A0, A1, A2]>,
-  emit: GenericEmit<[A0, A1, A2]>,
-  clear: VoidFunction
-];
-```
-
-## `createEmitter`
-
-Provides all the base functions of an event-emitter, plus additional functions for managing listeners, it's behavior could be customized with an config object. Good for advanced usage.
-
-### How to use it
-
-#### Creating Emitter
-
-```ts
-import { createEmitter } from "@solid-primitives/event-bus";
-
-// accepts up-to-3 genetic payload types
-const emitter = createEmitter<string, number, boolean>();
-
-// can be used without payload type, if you don't want to send any
-createEmitter();
-
-// emitter can be destructured:
-const { listen, emit, has, clear } = emitter;
-```
-
-#### Emiting & Listening to events
-
-```ts
-const listener = (a, b, c) => console.log(a, b, c);
-emitter.listen(listener);
-
-emitter.emit("foo", 123, true);
-
-emitter.remove(listener);
-emitter.has(listener); // false
-
-// pass true as a second argument to protect the listener
-emitter.listen(listener, true);
-emitter.remove(listener);
-emitter.has(listener); // true
-
-// clear all listeners
-emitter.clear();
-// listeners will also be cleared onCleanup automatically
-```
-
-#### Emitter Config
-
-```ts
-const { listen, has, remove, emit } = createEmitter<string>({
-  beforeEmit: event => {...},
-  emitGuard: (emit, payload) => allowedEmit && emit(), // emit('foo') to emit different value
-  removeGuard: (remove, listener) => allowedRemove && remove()
-});
-```
-
-See [the tests](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/test/emitter.test.ts) for better usage reference.
-
-### Types
-
-Check out [shared types](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/src/types.ts).
-
-```ts
-function createEmitter<A0 = void, A1 = void, A2 = void>(
-  config: EmitterConfig<A0, A1, A2> = {}
-): Emitter<A0, A1, A2>;
-
-type Emitter<A0 = void, A1 = void, A2 = void> = {
-  listen: GenericListenProtect<[A0, A1, A2]>;
-  emit: GenericEmit<[A0, A1, A2]>;
-  remove: Remove<A0, A1, A2>;
-  clear: VoidFunction;
-  has: (listener: GenericListener<[A0, A1, A2]>) => boolean;
-};
-
-type EmitterConfig<A0 = void, A1 = void, A2 = void> = {
-  emitGuard?: EmitGuard<A0, A1, A2>;
-  removeGuard?: RemoveGuard<GenericListener<[A0, A1, A2]>>;
-  beforeEmit?: GenericListener<[A0, A1, A2]>;
-};
 ```
 
 ## `createEventBus`
 
-Extends [`createEmitter`](#createEmitter). Additionally it provides a signal accessor function with last event's value.
+Provides all the base functions of an event-emitter, plus additional functions for managing listeners, it's behavior could be customized with an config object. Good for advanced usage.
 
 ### How to use it
-
-#### Creating EventBus
 
 ```ts
 import { createEventBus } from "@solid-primitives/event-bus";
 
 const bus = createEventBus<string>();
 
-// can be destructured:
-const { listen, emit, has, clear, value } = bus;
-```
+// can be used without payload type, if you don't want to send any
+createEventBus();
 
-#### Emitting & listening to events
+// bus can be destructured:
+const { listen, emit, clear } = bus;
 
-```ts
-const listener = (event, previous) => console.log(event, previous);
-bus.listen(listener);
+const unsub = bus.listen(a => console.log(a));
 
 bus.emit("foo");
 
-bus.remove(listener);
-bus.has(listener); // false
-
-// pass true as a second argument to protect the listener
-bus.listen(listener, true);
-bus.remove(listener);
-bus.has(listener); // true
-
-// clear all listeners
-bus.clear();
-// listeners will also be cleared onCleanup automatically
+// unsub gets called automatically on cleanup
+unsub();
 ```
 
-#### Last Value signal
+### Emit guard
+
+Event bus can be configured to prevent emitting events, by passing a `emitGuard` function to the config object.
+
+A function that wraps the `emit` function, it's useful for adding custom behavior to the `emit` function, like batching, or debouncing.
 
 ```ts
-// last event is be available as a signal
-bus.value(); // => string | undefined
-
-// pass initial value to config to remove "undefined" from the type
-createEventBus({
-  value: "initial"
-});
-
-bus.value(); // => string
-```
-
-#### EventBus Config
-
-```ts
-createEventBus<string>({
-  beforeEmit: event => console.log(event),
-  emitGuard: (emit, event, prev) => allowedEmit && emit(), // emit('foo') to emit different value,
-  removeGuard: (remove, listener) => allowedRemove && remove(),
-  value: "Initial Value"
+const bus = createEventBus<string>({
+  emitGuard: (emit, payload) => allowedEmit && emit(payload)
 });
 ```
 
-See [the tests](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/test/eventBus.test.ts) for better usage reference.
+## `createEmitter`
 
-### Types
-
-Check out [shared types](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/src/types.ts).
-
-```ts
-// Initial value was NOT provided
-function createEventBus<Event>(
-  config?: EmitterConfig<Event, Event | undefined>
-): EventBus<Event, Event | undefined>;
-// Initial value was provided
-function createEventBus<Event>(
-  config: EmitterConfig<Event, Event> & {
-    value: Event;
-  }
-): EventBus<Event, Event>;
-
-type EventBusListener<Event, V = Event | undefined> = GenericListener<[Event, V]>;
-type EventBusListen<Event, V = Event | undefined> = ListenProtect<Event, V>;
-
-type EventBusRemove<Event, V = Event | undefined> = (
-  listener: EventBusListener<Event, V>
-) => boolean;
-
-type EventBus<Event, V = Event | undefined> = {
-  remove: EventBusRemove<Event, V>;
-  listen: EventBusListen<Event, V>;
-  emit: GenericEmit<[Event]>;
-  clear: VoidFunction;
-  has: (listener: EventBusListener<Event, V>) => boolean;
-  value: Accessor<V>;
-};
-```
-
-## `createEventStack`
-
-Extends [`createEmitter`](#createEmitter). Provides the emitted events in a list/history form, with tools to manage it.
+Creates an emitter with which you can listen to and emit various events.
 
 ### How to use it
 
-#### Creating the event bus
-
 ```ts
-import { createEventStack } from "@solid-primitives/event-bus";
+import { createEmitter } from "@solid-primitives/event-bus";
 
-// 1. event type has to be an object
-// be what you emit will be added to the value stack
-const bus = createEventStack<{ message: string }>();
+const emitter = createEmitter<{
+  foo: number;
+  bar: string;
+}>();
+// can be destructured
+const { on, emit, clear } = emitter;
 
-// 2. provide event type, value type, and toValue parsing function
-// value type has to be an object
-const bus = createEventStack<string, { text: string }>({
-  toValue: e => ({ text: e })
-});
+emitter.on("foo", e => {});
+emitter.on("bar", e => {});
 
-// can be destructured:
-const { listen, emit, has, clear, value } = bus;
+emitter.emit("foo", 0);
+emitter.emit("bar", "hello");
+
+// unsub gets called automatically on cleanup
+unsub();
 ```
 
-#### Listening & Emitting
+### `createGlobalEmitter`
+
+Wrapper around `createEmitter`.
+
+Creates an emitter with which you can listen to and emit various events. With this emitter you can also listen to all events.
 
 ```ts
-const listener: EventStackListener<{ text: string }> = (event, stack, removeValue) => {
-  console.log(event, stack);
-  // you can remove the value from stack
-  removeValue();
-};
-bus.listen(listener);
+import { createGlobalEmitter } from "@solid-primitives/event-bus";
 
-bus.emit("foo");
+const emitter = createGlobalEmitter<{
+  foo: number;
+  bar: string;
+}>();
+// can be destructured
+const { on, emit, clear, listen } = emitter;
 
-bus.remove(listener);
-bus.has(listener); // false
+emitter.on("foo", e => {});
+emitter.on("bar", e => {});
 
-// pass true as a second argument to protect the listener
-bus.listen(listener, true);
-bus.remove(listener);
-bus.has(listener); // true
-```
+emitter.emit("foo", 0);
+emitter.emit("bar", "hello");
 
-#### Event Stack
-
-```ts
-// a signal accessor:
-bus.stack() // => { text: string }[]
-
-bus.removeFromStack(value) // pass a reference to the value
-
-bus.setStack(stack => stack.filter(item => {...}))
-```
-
-#### createEventStack Config
-
-```ts
-createEventStack<string, { text: string }>({
-  beforeEmit: (value, stack, remove) => console.log(value, stack),
-  emitGuard: (emit, text) => allowEmit && emit(), // emit('foo') to emit different value
-  removeGuard: (remove, listener) => allowRemove && remove(),
-  toValue: e => ({ text: e })
-});
-```
-
-### Types
-
-Check out [shared types](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/src/types.ts).
-
-```ts
-// Overload 0: "toValue" was not passed
-function createEventStack<E extends object>(config?: Config<E, E>): EventStack<E, E>;
-// Overload 1: "toValue" was set
-function createEventStack<E, V extends object>(
-  config: Config<E, V> & {
-    toValue: (event: E, stack: V[]) => V;
+// global listener - listens to all channels
+emitter.listen(e => {
+  switch (e.name) {
+    case "foo": {
+      e.details;
+      break;
+    }
+    case "bar": {
+      e.details;
+      break;
+    }
   }
-): EventStack<E, V>;
-
-type EventStackListener<V> = (event: V, stack: V[], removeFromStack: Fn) => void;
-
-type EventStack<E, V = E> = Modify<
-  Emitter<V, V[], Fn>,
-  {
-    value: Accessor<V[]>;
-    stack: Accessor<V[]>;
-    setStack: Setter<V[]>;
-    removeFromStack: (value: V) => boolean;
-    emit: GenericEmit<[E]>;
-  }
->;
-type Config<E, V> = {
-  length?: number;
-  emitGuard?: EmitterConfig<E>["emitGuard"];
-  removeGuard?: EmitterConfig<V, V[], Fn>["removeGuard"];
-  beforeEmit?: EmitterConfig<V, V[], Fn>["beforeEmit"];
-};
+});
 ```
 
 ## `createEventHub`
 
-Provides helpers for using a group of emitters.
+Provides helpers for using a group of event buses.
 
-Can be used with [`createEmitter`](#createEmitter), [`createEventBus`](#createEventBus), [`createEventStack`](#createEventStack).
+Can be used with `createEventBus`, `createEventStack` or any emitter that has the same api.
 
 ### How to use it
 
@@ -354,7 +141,7 @@ import { createEventHub } from "@solid-primitives/event-bus";
 
 // by passing an record of Channels
 const hub = createEventHub({
-  busA: createEmitter<void>(),
+  busA: createEventBus(),
   busB: createEventBus<string>(),
   busC: createEventStack<{ text: string }>()
 });
@@ -367,69 +154,80 @@ const hub = createEventHub(bus => ({
 }));
 
 // hub can be destructured
-const { busA, busB, on, off, listen, emit, clear } = hub;
+const { busA, busB, on, emit, listen, value } = hub;
 ```
 
 #### Listening & Emitting
 
 ```ts
-// using hub methods:
+const hub = createEventHub({
+  busA: createEventBus<void>(),
+  busB: createEventBus<string>(),
+  busC: createEventStack<{ text: string }>()
+});
+// can be destructured
+const { busA, busB, on, listen, emit } = hub;
+
 hub.on("busA", e => {});
 hub.on("busB", e => {});
 
 hub.emit("busA", 0);
 hub.emit("busB", "foo");
 
-// using emitters
-hub.busA.listen(e => {});
-hub.busA.emit(1);
-
-hub.busB.listen(e => {});
-hub.busB.emit("bar");
-
 // global listener - listens to all channels
-hub.listen((name, e) => {});
+hub.listen(e => {
+  switch (e.name) {
+    case "busA": {
+      e.details;
+      break;
+    }
+    case "busB": {
+      e.details;
+      break;
+    }
+  }
+});
 ```
 
 #### Accessing values
 
-If a emitter returns an accessor value, it will be available in a `.store` store.
+If a emitter returns an accessor value, it will be available in a `.value` store.
 
 ```ts
-hub.store.myBus;
+hub.value.myBus;
 // same as
 hub.myBus.value();
 ```
 
-### Types
+## `createEventStack`
 
-Check out [shared types](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/src/types.ts) and [createEventHub source](https://github.com/solidjs-community/solid-primitives/blob/main/packages/event-bus/src/eventHub.ts).
+Extends [`createEmitter`](#createEmitter). Provides the emitted events in a list/history form, with tools to manage it.
+
+### How to use it
 
 ```ts
-function createEventHub<ChannelMap extends Record<string, EventHubChannel>>(
-  defineChannels: ((bus: typeof createEventBus) => ChannelMap) | ChannelMap
-): EventHub<ChannelMap>;
-/**
- * Required interface of a Emitter/EventBus, to be able to be used as a channel in the EventHub
- */
-interface EventHubChannel {
-  remove: (fn: (...payload: any[]) => void) => boolean;
-  listen: (listener: (...payload: any[]) => void, protect?: boolean) => VoidFunction;
-  emit: (...payload: any[]) => void;
-  clear: VoidFunction;
-  value: Accessor<any>;
-}
-type EventHub<ChannelMap extends Record<string, EventHubChannel>> = ChannelMap & {
-  on: EventHubOn<ChannelMap>;
-  off: EventHubOff<ChannelMap>;
-  emit: EventHubEmit<ChannelMap>;
-  clear: (event: keyof ChannelMap) => void;
-  clearAll: VoidFunction;
-  listen: (listener: EventHubListener<ChannelMap>, protect?: boolean) => VoidFunction;
-  remove: (listener: EventHubListener<ChannelMap>) => void;
-  clearGlobal: VoidFunction;
-  store: ValueMap<ChannelMap>;
+import { createEventStack } from "@solid-primitives/event-bus";
+
+const bus = createEventStack<string, { message: string }>({
+  // toValue parsing function is optional
+  toValue: e => ({ message: e })
+});
+// can be destructured:
+const { listen, emit, clear, value } = bus;
+
+const listener: EventStackListener<{ text: string }> = ({ event, stack, remove }) => {
+  console.log(event, stack);
+  // you can remove the value from stack
+  remove();
 };
+bus.listen(listener);
+
+bus.emit({ text: "foo" });
+
+// a signal accessor:
+bus.value() // => { text: string }[]
+
+bus.setValue(stack => stack.filter(item => {...}))
 ```
 
 ## EventBus Utils
@@ -487,6 +285,26 @@ listen(() => console.log(getOwner()));
 // ...sometime later (after root initiation):
 emit(); // listener will log `null`
 emitInEffect(); // listener will log an owner object
+```
+
+### `batchGuard`
+
+An emitGuard that batches executes all listeners in a single `batch` call.
+
+```ts
+import { createEventBus, batchGuard } from "@solid-primitives/event-bus";
+
+const bus = createEventBus({
+  emitGuard: batchGuard
+});
+
+const [a, setA] = createSignal(0);
+const [b, setB] = createSignal(0);
+
+bus.listen(setA);
+bus.listen(setB);
+
+bus.emit(1); // will set both a and b to 1 in a single batch
 ```
 
 ## Demo

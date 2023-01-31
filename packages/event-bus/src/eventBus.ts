@@ -27,27 +27,26 @@ export type EventBusConfig<T> = {
 };
 
 /**
- * Provides all the base functions of an event-emitter, plus additional functions for managing listeners, it's behavior could be customized with an config object.
+ * Provides a simple way to listen to and emit events. All listeners are automatically unsubscribed on cleanup.
  * 
- * @param config EventBus configuration: `emitGuard`, `removeGuard`, `beforeEmit` functions.
+ * @param config Options for the event-bus.
+ * @param config.emitGuard A function that wraps the `emit` function, it's useful for adding custom behavior to the `emit` function, like batching, or debouncing.
  * 
- * @returns the emitter: `{listen, once, emit, remove, clear, has}`
+ * @returns the emitter: `{listen, emit, clear}`
  * 
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventBus
  * 
  * @example
-// accepts up-to-3 genetic payload types
-const emitter = createEventBus<string, number, boolean>();
-// emitter can be destructured:
-const { listen, emit, has, clear } = emitter;
+const bus = createEventBus<string>();
+// bus can be destructured:
+const { listen, emit, clear } = bus;
 
-const listener = (a, b, c) => console.log(a, b, c);
-emitter.listen(listener);
+const unsub = bus.listen((a) => console.log(a));
 
-emitter.emit("foo", 123, true);
+bus.emit("foo");
 
-emitter.remove(listener);
-emitter.has(listener); // false
+// unsub gets called automatically on cleanup
+unsub();
  */
 export function createEventBus<T>(config: EventBusConfig<T> = {}): EventBus<T> {
   const { emitGuard } = config;

@@ -28,13 +28,13 @@ export type EventHub<M extends { readonly [key: string | number]: EventHubChanne
   };
 
 /**
- * Provides helpers for using a group of emitters.
+ * Provides helpers for using a group of event buses.
  *
- * Can be used with `createEventBus`, `createEventBus`, `createEventStack`.
+ * Can be used with `createEventBus`, `createEventStack` or any emitter that has the same api.
  *
  * @param defineChannels object with defined channels or a defineChannels function returning channels.
  *
- * @returns hub functions: `{on, once, off, emit, clear, clearAll, listen, remove, clearGlobal, value}` + channels available by their key
+ * @returns hub functions: `{on, emit, listen, value}` + channels available by their key
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventHub
  *
@@ -45,7 +45,7 @@ export type EventHub<M extends { readonly [key: string | number]: EventHubChanne
  *    busC: createEventStack<{ text: string }>()
  * });
  * // can be destructured
- * const { busA, busB, on, off, listen, emit, clear } = hub;
+ * const { busA, busB, on, listen, emit } = hub;
  *
  * hub.on("busA", e => {});
  * hub.on("busB", e => {});

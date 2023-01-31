@@ -39,6 +39,27 @@ export type Emitter<M extends Record<PropertyKey, any>> = {
   readonly clear: VoidFunction;
 };
 
+/**
+ * Creates an emitter with which you can listen to and emit various events.
+ *
+ * @returns emitter mathods: `{on, emit, clear}`
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEmitter
+ *
+ * @example
+ * const emitter = createEmitter<{
+ *   foo: number;
+ *   bar: string;
+ * }>();
+ * // can be destructured
+ * const { on, emit, clear } = emitter;
+ *
+ * emitter.on("foo", e => {});
+ * emitter.on("bar", e => {});
+ *
+ * emitter.emit("foo", 0);
+ * emitter.emit("bar", "hello");
+ */
 export function createEmitter<M extends Record<PropertyKey, any>>(): Emitter<M> {
   const emitter = new EmitterCore<M>();
 
@@ -71,6 +92,40 @@ export type GlobalEmitter<M extends Record<PropertyKey, any>> = {
   readonly clear: VoidFunction;
 };
 
+/**
+ * Creates an emitter with which you can listen to and emit various events. With this emitter you can also listen to all events.
+ *
+ * @returns emitter mathods: `{on, listen, emit, clear}`
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createGlobalEmitter
+ *
+ * @example
+ * const emitter = createGlobalEmitter<{
+ *   foo: number;
+ *   bar: string;
+ * }>();
+ * // can be destructured
+ * const { on, emit, clear, listen } = emitter;
+ *
+ * emitter.on("foo", e => {});
+ * emitter.on("bar", e => {});
+ *
+ * emitter.emit("foo", 0);
+ * emitter.emit("bar", "hello");
+ *
+ * emitter.listen(e => {
+ *   switch (e.name) {
+ *     case "foo": {
+ *       e.details;
+ *       break;
+ *     }
+ *     case "bar": {
+ *       e.details;
+ *       break;
+ *     }
+ *   }
+ * })
+ */
 export function createGlobalEmitter<M extends Record<PropertyKey, any>>(): GlobalEmitter<M> {
   const emitter = createEmitter<M>();
   const global = createEventBus<{ name: PropertyKey; details: any }>();

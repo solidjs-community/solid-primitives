@@ -7,7 +7,7 @@ import { Listen, Listener, Emit } from "./eventBus";
  * @param subscribe listen function from any EventBus/Emitter
  * @returns a promise resulting in the captured event value
  * @example
- * const emitter = createEmitter<string>();
+ * const emitter = createEventBus<string>();
  * const event = await toPromise(emitter.listen);
  */
 export function toPromise<T>(subscribe: Listen<T>): Promise<T> {
@@ -23,7 +23,7 @@ export function toPromise<T>(subscribe: Listen<T>): Promise<T> {
  * @returns unsubscribe function
  *
  * @example
- * const { listen, emit } = createEmitter<string>();
+ * const { listen, emit } = createEventBus<string>();
  * const unsub = once(listen, event => console.log(event));
  *
  * emit("foo") // will log "foo" and unsub
@@ -45,7 +45,7 @@ export function once<T>(subscribe: Listen<T>, listener: Listener<T>): VoidFuncti
  * @returns modified emit function
  *
  * @example
- * const { listen, emit } = createEmitter();
+ * const { listen, emit } = createEventBus();
  * const emitInEffect = toEffect(emit);
  * listen(() => console.log(getOwner()))
  *
@@ -65,8 +65,9 @@ export function toEffect<T>(emit: Emit<T>): Emit<T> {
   return (payload?: any) => void setStack(p => push(p, payload));
 }
 
-// TODO jsdoc
-
+/**
+ * An emitGuard that batches executes all listeners in a single `batch` call.
+ */
 export function batchGuard<T = void>(emit: Emit<T>, payload: T): void {
   batch(() => emit(payload));
 }

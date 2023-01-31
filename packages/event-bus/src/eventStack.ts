@@ -27,32 +27,31 @@ export type EventStackConfig<E, V = E> = {
  * Provides all the base functions of an event-emitter, functions for managing listeners, it's behavior could be customized with an config object.
  * Additionally it provides the emitted events in a list/history form, with tools to manage it.
  * 
- * @param config EventBus configuration: `emitGuard`, `removeGuard`, `beforeEmit` functions and `toValue` parsing event to a value in stack.
+ * @param config Options for the event-bus.
+ * @param config.emitGuard A function that wraps the `emit` function, it's useful for adding custom behavior to the `emit` function, like batching, or debouncing.
  * 
- * @returns event stack: `{listen, once, emit, remove, clear, has, stack, setStack, remove}`
+ * @returns event stack: `{listen, emit, remove, clear, value, setValue}`
  * 
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventStack
  * 
  * @example
 const bus = createEventStack<{ message: string }>();
 // can be destructured:
-const { listen, emit, has, clear, stack } = bus;
+const { listen, emit, clear, value } = bus;
 
-const listener: EventStackListener<{ text: string }> = (event, stack, removeValue) => {
+const listener: EventStackListener<{ text: string }> = ({ event, stack, remove }) => {
   console.log(event, stack);
   // you can remove the value from stack
-  removeValue();
+  remove();
 };
 bus.listen(listener);
 
-bus.emit({text: "foo"});
+bus.emit({ text: "foo" });
 
 // a signal accessor:
-bus.stack() // => { text: string }[]
+bus.value() // => { text: string }[]
 
-bus.remove(value) // pass a reference to the value
-
-bus.setStack(stack => stack.filter(item => {...}))
+bus.setValue(stack => stack.filter(item => {...}))
  */
 
 export function createEventStack<E extends object>(config?: EventStackConfig<E>): EventStack<E, E>;
