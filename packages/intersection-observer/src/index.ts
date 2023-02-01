@@ -217,7 +217,7 @@ export type VisibilitySetter<Ctx extends {} = {}> = (
  *
  * @returns A configured *"use"* function for creating a visibility signal for a single element. The passed element can be a **reactive signal** or a DOM element. Returning a falsy value will remove the element from the observer.
  * ```ts
- * (element: MaybeAccessor<Element | FalsyValue>) => Accessor<boolean>
+ * (element: Accessor<Element | FalsyValue> | Element) => Accessor<boolean>
  * ```
  *
  * @example
@@ -233,7 +233,7 @@ export function createVisibilityObserver(
     initialValue?: boolean;
   },
   setter?: MaybeAccessor<VisibilitySetter>
-): (element: MaybeAccessor<Element | FalsyValue>) => Accessor<boolean> {
+): (element: Accessor<Element | FalsyValue> | Element) => Accessor<boolean> {
   if (process.env.SSR) {
     return () => () => false;
   }
