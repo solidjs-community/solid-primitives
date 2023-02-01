@@ -137,6 +137,9 @@ import { createVisibilityObserver } from "@solid-primitives/intersection-observe
 let el: HTMLDivElement | undefined;
 
 const useVisibilityObserver = createVisibilityObserver({ threshold: 0.8 });
+
+// ! extremely important to use an accessor for the element to not lose reactivity
+// ! typescript will give you a warning if you don't use an accessor
 const visible = useVisibilityObserver(() => el);
 
 <div ref={el}>{visible() ? "Visible" : "Hidden"}</div>;
@@ -211,7 +214,7 @@ function createViewportObserver(
 
 ## Demo
 
-You may view a working example here: https://stackblitz.com/edit/vitejs-vite-n2lwpq
+You may view a working example in the [/dev](https://github.com/solidjs-community/solid-primitives/tree/main/packages/intersection-observer/dev) directory.
 
 ## Changelog
 
