@@ -1,5 +1,11 @@
 # @solid-primitives/intersection-observer
 
+## 2.0.6
+
+### Patch Changes
+
+- e6e555b5: Improve types for createVisibilityObserver
+
 ## 2.0.5
 
 ### Patch Changes

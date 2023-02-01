@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.1.7
+
+### Patch Changes
+
+- 651af5ce: Cleanup
+
 ## 1.1.6
 
 ### Patch Changes
