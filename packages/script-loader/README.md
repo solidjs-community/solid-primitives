@@ -23,6 +23,10 @@ pnpm add @solid-primitives/script-loader
 
 ## How to use it
 
+createScriptLoader expects a props object with a `src` property. All the other props will be spread to the script element.
+
+The `src` prop is required and will be used to set the `src` or `textContent` attribute. It can be a string or an accessor.
+
 ```ts
 import { createScriptLoader } from "@solid-primitives/script-loader";
 
