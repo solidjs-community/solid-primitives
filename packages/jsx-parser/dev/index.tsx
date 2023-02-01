@@ -18,14 +18,14 @@ const Calculator: ParentComponent = props => {
 
   const calculation = () => {
     let result = 0;
-    tokens().forEach(token => {
-      console.info("token is ", token);
-      if (token.id === "Value") {
-        result = token.props.value;
-      } else if (token.id === "Add") {
-        result += token.props.value;
-      } else if (token.id === "Subtract") {
-        result -= token.props.value;
+    tokens().forEach(({ data }) => {
+      console.info("token is ", data);
+      if (data.id === "Value") {
+        result = data.props.value;
+      } else if (data.id === "Add") {
+        result += data.props.value;
+      } else if (data.id === "Subtract") {
+        result -= data.props.value;
       }
       console.info("result is", result);
     });

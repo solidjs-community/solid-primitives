@@ -22,9 +22,9 @@ describe("jsx-parser", () => {
     ));
 
     expect(tokens()).toHaveLength(2);
-    tokens().forEach(token => expect(token.type).toBe("my-token"));
-    expect(tokens()[0].props.text).toBe("foo");
-    expect(tokens()[1].props.text).toBe("bar");
+    tokens().forEach(token => expect(token.data.type).toBe("my-token"));
+    expect(tokens()[0].data.props.text).toBe("foo");
+    expect(tokens()[1].data.props.text).toBe("bar");
 
     // shouldn't throw
     <>{tokens()}</>;

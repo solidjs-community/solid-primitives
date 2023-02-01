@@ -94,6 +94,12 @@ A function similar to Solid's [`children()`](https://www.solidjs.com/docs/latest
 
 ```tsx
 const tokens = childrenTokens(() => props.children);
+
+createEffect(() => {
+  tokens().forEach(token => {
+    console.log(token.data);
+  });
+});
 ```
 
 ## `isToken`

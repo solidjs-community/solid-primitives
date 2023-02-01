@@ -9,7 +9,7 @@ function resolveChildren(resolved: unknown[], children: unknown, symbol: symbol)
     for (let i = 0; i < children.length; i++) resolveChildren(resolved, children[i], symbol);
 }
 
-export type TokenComponent<T extends {}> = (() => JSX.Element) & T;
+export type TokenElement<T> = (() => JSX.Element) & { data: T };
 
 /**
  * Provides the tools to create tokenized components, parse and identify tokens in JSX Elements.
@@ -25,7 +25,7 @@ export type TokenComponent<T extends {}> = (() => JSX.Element) & T;
  *
  * const MyComponent = (props) => {
  *  const tokens = childrenTokens(() => props.children);
- *  return <ul>{tokens().map(token => <li>token.type</li>)}</ul>;
+ *  return <ul>{tokens().map(token => <li>{token.data.type}</li>)}</ul>;
  * }
  *
  * <MyComponent>
@@ -34,41 +34,49 @@ export type TokenComponent<T extends {}> = (() => JSX.Element) & T;
  * </MyComponent>
  * ```
  */
-export function createJSXParser<Tokens extends {}>(options?: { name: string }) {
+export function createJSXParser<Tokens>(options?: { name: string }) {
   const name = options?.name || process.env.DEV ? "jsx-parser" : "";
   const id = Symbol(name);
 
-  function createToken<Props extends { [key: string]: any }, Token extends Tokens>(
-    tokenCallback: (props: Props) => Token,
-    component?: (props: Props) => JSX.Element
-  ): (props: Props) => TokenComponent<Token> {
-    return (props: Props) =>
-      Object.assign(
-        component
-          ? () => untrack(() => component(props))
+  function createToken<P extends { [key: string]: any }, T extends Tokens>(
+    tokenData: (props: P) => T,
+    render?: (props: P) => JSX.Element
+  ): (props: P) => TokenElement<T>;
+  function createToken<P extends Tokens>(
+    tokenData?: undefined,
+    render?: (props: P) => JSX.Element
+  ): (props: P) => TokenElement<P>;
+  function createToken<P extends { [key: string]: any }, T extends Tokens>(
+    tokenData?: (props: P) => T,
+    render?: (props: P) => JSX.Element
+  ): (props: P) => TokenElement<T> {
+    return (props: P) => {
+      const token = (
+        render
+          ? () => untrack(() => render(props))
           : () => {
               process.env.DEV &&
                 // eslint-disable-next-line no-console
                 console.warn(`tokens can only be rendered inside a Parser with id '${name}'`);
               return "";
-            },
-        {
-          [id]: true,
-          ...tokenCallback(props)
-        }
-      );
+            }
+      ) as TokenElement<T>;
+      (token as any)[id] = true;
+      token.data = tokenData ? tokenData(props) : (props as any);
+      return token;
+    };
   }
 
-  function childrenTokens(fn: Accessor<JSX.Element>) {
+  function childrenTokens(fn: Accessor<JSX.Element>): Accessor<TokenElement<Tokens>[]> {
     const children = createMemo(fn);
     return createMemo(() => {
-      const tokens: TokenComponent<Tokens>[] = [];
+      const tokens: TokenElement<Tokens>[] = [];
       resolveChildren(tokens, children(), id);
       return tokens;
     });
   }
 
-  function isToken(value: unknown | TokenComponent<Tokens>): value is TokenComponent<Tokens> {
+  function isToken(value: unknown | TokenElement<Tokens>): value is TokenElement<Tokens> {
     return typeof value === "function" && !value.length && id in value;
   }
 
