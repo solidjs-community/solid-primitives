@@ -59,7 +59,9 @@
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^5.0.0"
+  },
   "peerDependencies": {
     "solid-js": "^1.6.0"
   }

@@ -6,29 +6,28 @@
 
 A primitive to extend the types of values JSX can return. These JSX-elements are named `tokens`.
 
-- [`createJSXParser`](#createJSXParser) — Provides the tools to create and identify `tokens`: `createToken`, `childrenTokens`, `isToken` and `id`.
-- [`createToken`](#createToken) — Instantiates a `token` associated with the corresponding jsx-parser.
-- [`childrenTokens`](#childrenTokens) — A function similar to Solid's `children()`, but that will only return valid `tokens` created by the corresponding jsx-parser's `createToken`
-- [`isToken`](#isToken) — A function to validate if an element is a `token` created by the corresponding jsx-parser's `createToken`
-- [`id`](#id) — The symbol unique to the corresponding jsx-parser
+- [`createJSXParser`](#createJSXParser) — Creates a JSX Parser that can be used to create tokenized components and parse JSX Elements for tokens.
+- [`createToken`](#createToken) — Creates a token component associated with the corresponding jsx-parser.
+- [`resolveTokens`](#resolveTokens) — A function similar to Solid's `children()`, but that will only return valid token elements created by the corresponding parser's `createToken`
+- [`isToken`](#isToken) — A function to validate if an element is a `token` created by the corresponding parser's `createToken`
 
 ## Installation
 
 ```bash
 npm install @solid-primitives/jsx-parser
 # or
-yarn add @solid-primitives/jsx-parser
-# or
 pnpm add @solid-primitives/jsx-parser
+# or
+yarn add @solid-primitives/jsx-parser
 ```
 
 ## `createJSXParser`
 
-Provides the tools to create and identify `tokens`.
+Creates a JSX Parser that can be used to create tokenized components and parse JSX Elements for tokens.
 
 ### How to use it
 
-`createJSXParser` takes an optional id as argument, and returns the following functions `createToken`, `childrenTokens`, `isToken` and the symbol associated with the jsx-parser `id`.
+`createJSXParser` takes an optional options param with `name` property to identify the parser during development.
 
 It also takes as a generic the union of accepted token-types.
 
@@ -37,44 +36,38 @@ import { createJSXParser } from "@solid-primitives/jsx-parser";
 
 type UnionOfAcceptedTokens = Token1 | Token2 | ...
 
-const {createToken, childrenTokens, isToken, id} = createJSXParser<UnionOfAcceptedTokens>('parser-example');
+const parser = createJSXParser<UnionOfAcceptedTokens>('parser-example');
 ```
 
 ## `createToken`
 
-A function to create a `token` associated with the corresponding jsx-parser.
+Creates a token component associated with the corresponding jsx-parser.
 
 ### How to use it
 
-`createToken` takes two callback-arguments: the first callback returns the token, an optional second callback returns a JSXElement. This second callback is used when the token is being rendered by Solid. If the second callback is not present, the following error will be shown instead: `tokens can only be rendered inside a Parser with id ...`
+`createToken` takes three parameters:
 
-It takes as generic two types: the props of the associated JSX-element and the return-value of the token.
+- `parser` object returned by `createJSXParser`
+- `tokenData` function that returns the data of the token _(if one isn't passed, props will be used as data)_
+- `render` function that returns the fallback JSX Element to render _(if one isn't passed, nothing will get rendred)_
 
 ```tsx
-type Props = {
-  id: string;
-};
-
-type Token = {
-  props: Props;
-  value: number;
-};
-
-const TokenExample = createToken<Props, Token>(
-  props => {
+const TokenExample = createToken(
+  parser,
+  // function that returns the data of the token - called when the token is resolved by `resolveTokens`
+  (props: { id: string }) => {
     const value = Math.random();
     return {
       props,
       value
     };
   },
-  props => {
-    return <span>{props.id}</span>;
-  }
+  // function that returns the fallback JSX Element to render - called when the token rendered by Solid
+  props => <span>{props.id}</span>
 );
 ```
 
-This token can then be used as a JSX-element inside your solid-code:
+This token can then be used inside JSX as a component:
 
 ```tsx
 const App = () => {
@@ -84,27 +77,56 @@ const App = () => {
 
 TokenExample is typed as a JSXElement, this is so TokenExample can be used in JSX without causing type-errors.
 
-## `childrenTokens`
+## `resolveTokens`
 
-A function similar to Solid's [`children()`](https://www.solidjs.com/docs/latest#children), but that will only return valid `tokens` created by the corresponding jsx-parser's `createToken`
+A function similar to Solid's [`children()`](https://www.solidjs.com/docs/latest#children), but that will only return valid token elements created by the corresponding parser's `createToken`
 
 ### How to use it
 
-`childrenTokens` takes a callback returning `props.children`, and will return all tokens associated with the corresponding jsx-parser. Just like Solid's `children`, `childrenTokens` will resolve the tokens: multiple `childrenTokens` of the same `props.children` will execute the token-callback multiple times!
+`createToken` takes three parameters:
+
+- `parser` object returned by `createJSXParser`
+- `fn` accessor that returns a JSX Element
+- `render` function that returns the fallback JSX Element to render
+
+`resolveTokens` will return accessor of tokens associated with the corresponding jsx-parser
+
+Token data is available on the `data` property of the token.
 
 ```tsx
-const tokens = childrenTokens(() => props.children);
+import { resolveTokens } from "@solid-primitives/jsx-parser";
+
+const tokens = resolveTokens(parser, () => props.children);
 
 createEffect(() => {
   tokens().forEach(token => {
+    // token is a function that returns the JSX Element fallback
+    // token.data is the data returned by the tokenData function
     console.log(token.data);
+  });
+});
+```
+
+### `resolveData`
+
+If you never intend to render the tokens, you can use `resolveData` instead of `resolveTokens`. This will return the data of the tokens instead of the JSX Element fallback.
+
+```tsx
+import { resolveData } from "@solid-primitives/jsx-parser";
+
+const tokens = resolveData(parser, () => props.children);
+
+createEffect(() => {
+  tokens().forEach(token => {
+    // token is the data returned by the tokenData function
+    console.log(token);
   });
 });
 ```
 
 ## `isToken`
 
-A function to validate if a value is a token created by the corresponding jsx-parser, by checking if the value contains the `id`-symbol.
+A function to validate if a value is a token created by the corresponding jsx-parser.
 
 ### How to use it
 
@@ -117,23 +139,9 @@ if (!token) return;
 token; // token is typed as UnionOfAcceptedTokens
 ```
 
-## `id`
-
-The symbol which is attached to all tokens of the corresponding jsx-parser. This is internally used in `childrenTokens` and `isToken` to validate if a value is a token.
-
-### How to use it
-
-`id` can be used for validation.
-
-```tsx
-const value = props.children[0];
-if (!(id in value)) return;
-const token = value as UnionOfAcceptedTokens;
-```
-
 ## Demo
 
-TODO
+A working example can be found in the [dev folder](./dev/index.tsx).
 
 ## Changelog
 

@@ -1,20 +1,20 @@
 import { Component, JSX, ParentComponent } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
-import { createJSXParser } from "../src";
+import { createJSXParser, createToken, resolveTokens } from "../src";
 
 type Props = {
   value: number;
   children?: JSX.Element | JSX.Element[];
 };
 
-const { createToken, childrenTokens } = createJSXParser<{
+const parser = createJSXParser<{
   id: "Value" | "Add" | "Subtract";
   props: Props;
 }>({ name: "calculator" });
 
 const Calculator: ParentComponent = props => {
-  const tokens = childrenTokens(() => props.children);
+  const tokens = resolveTokens(parser, () => props.children);
 
   const calculation = () => {
     let result = 0;
@@ -40,6 +40,7 @@ const Calculator: ParentComponent = props => {
 };
 
 const Value = createToken(
+  parser,
   (props: Props) => ({
     props,
     id: "Value"
@@ -48,6 +49,7 @@ const Value = createToken(
 );
 
 const Add = createToken(
+  parser,
   (props: Props) => ({
     props,
     id: "Add"
@@ -56,6 +58,7 @@ const Add = createToken(
 );
 
 const Subtract = createToken(
+  parser,
   (props: Props) => ({
     props,
     id: "Subtract"

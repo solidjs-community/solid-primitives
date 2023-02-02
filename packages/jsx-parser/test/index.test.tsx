@@ -1,6 +1,6 @@
 import { children, createRoot, createSignal, Show } from "solid-js";
 import { describe, expect, it } from "vitest";
-import { createJSXParser } from "../src";
+import { createJSXParser, createToken, resolveTokens } from "../src";
 
 describe("jsx-parser", () => {
   const parser1 = createJSXParser<{
@@ -8,14 +8,14 @@ describe("jsx-parser", () => {
     props: { text: string };
   }>();
 
-  const MyToken1 = parser1.createToken((props: { text: string }) => ({
+  const MyToken1 = createToken(parser1, (props: { text: string }) => ({
     type: "my-token",
     props
   }));
 
   it("should work", () => {
     createRoot(() => {
-      const tokens = parser1.childrenTokens(() => (
+      const tokens = resolveTokens(parser1, () => (
         <>
           <MyToken1 text="foo" />
           <MyToken1 text="bar" />
@@ -36,7 +36,7 @@ describe("jsx-parser", () => {
     createRoot(() => {
       const [show, setShow] = createSignal(true);
 
-      const tokens = parser1.childrenTokens(() => (
+      const tokens = resolveTokens(parser1, () => (
         <>
           <Show when={show()}>
             <MyToken1 text="foo" />
@@ -57,7 +57,8 @@ describe("jsx-parser", () => {
     createRoot(() => {
       const parser = createJSXParser();
 
-      const MyToken = parser.createToken(
+      const MyToken = createToken(
+        parser,
         () => ({}),
         (props: { text: string }) => <div>{props.text}</div>
       );
@@ -73,9 +74,9 @@ describe("jsx-parser", () => {
   it("uses props as data if no data function is provided", () => {
     createRoot(() => {
       const parser = createJSXParser<{ text: string }>();
-      const MyToken = parser.createToken();
+      const MyToken = createToken(parser);
 
-      const tokens = parser.childrenTokens(() => (
+      const tokens = resolveTokens(parser, () => (
         <>
           <MyToken text="foo" />
           <MyToken text="bar" />
@@ -92,13 +93,13 @@ describe("jsx-parser", () => {
     createRoot(() => {
       let count = 0;
       const parser = createJSXParser<{ n: number }>();
-      const MyToken = parser.createToken(() => ({
+      const MyToken = createToken(parser, () => ({
         get n() {
           return count++;
         }
       }));
 
-      const tokens = parser.childrenTokens(() => <MyToken text="foo" />);
+      const tokens = resolveTokens(parser, () => <MyToken text="foo" />);
 
       expect(tokens()[0].data.n).toBe(0);
       expect(tokens()[0].data.n).toBe(1);
