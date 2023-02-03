@@ -86,7 +86,7 @@ function resolveChildren(resolved: unknown[], children: unknown, symbol: symbol)
     else resolveChildren(resolved, children(), symbol);
   } else if (Array.isArray(children))
     for (let i = 0; i < children.length; i++) resolveChildren(resolved, children[i], symbol);
-  else if (process.env.DEV)
+  else if (process.env.DEV && children)
     // eslint-disable-next-line no-console
     console.warn(`Invalid JSX Element passed to Parser "${symbol.description}":`, children);
   return resolved;
