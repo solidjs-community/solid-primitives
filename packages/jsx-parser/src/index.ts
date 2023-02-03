@@ -3,7 +3,7 @@ import { type Narrow } from "@solid-primitives/utils";
 
 export type TokenElement<T> = (() => JSX.Element) & { data: T };
 
-// this is only for type checking
+// this is only for type inference
 declare const TYPE: unique symbol;
 
 export type JSXParser<T> = { readonly id: symbol } & { [k in typeof TYPE]: T };
@@ -68,7 +68,9 @@ export function createToken<T>(
         : () => {
             process.env.DEV &&
               // eslint-disable-next-line no-console
-              console.warn(`tokens can only be rendered inside a Parser with id '${name}'`);
+              console.warn(
+                `Tokens can only be rendered inside a Parser "${parser.id.description}"`
+              );
             return "";
           }
     ) as TokenElement<T>;
@@ -82,9 +84,11 @@ function resolveChildren(resolved: unknown[], children: unknown, symbol: symbol)
   if (typeof children === "function" && !children.length) {
     if (symbol in children) resolved.push(children);
     else resolveChildren(resolved, children(), symbol);
-  }
-  if (Array.isArray(children))
+  } else if (Array.isArray(children))
     for (let i = 0; i < children.length; i++) resolveChildren(resolved, children[i], symbol);
+  else if (process.env.DEV)
+    // eslint-disable-next-line no-console
+    console.warn(`Invalid JSX Element passed to Parser "${symbol.description}":`, children);
   return resolved;
 }
 

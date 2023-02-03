@@ -52,6 +52,8 @@ Creates a token component associated with the corresponding jsx-parser.
 - `render` function that returns the fallback JSX Element to render _(if one isn't passed, nothing will get rendred)_
 
 ```tsx
+import { createToken } from "@solid-primitives/jsx-parser";
+
 const TokenExample = createToken(
   parser,
   // function that returns the data of the token - called when the token is resolved by `resolveTokens`

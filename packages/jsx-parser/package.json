@@ -19,7 +19,10 @@
     "name": "jsx-parser",
     "stage": 0,
     "list": [
-      "createJSXParser"
+      "createJSXParser",
+      "createToken",
+      "resolveTokens",
+      "isToken"
     ],
     "category": "Utilities"
   },

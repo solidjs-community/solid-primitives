@@ -68,20 +68,18 @@ const Subtract = createToken(
 
 const App: Component = () => {
   return (
-    <div
-      style={{
-        display: "flex",
-        "align-items": "center",
-        "justify-content": "center",
-        height: "100vh"
-      }}
-    >
-      <Calculator>
-        <h1>This is a calculator</h1>
-        <Value value={1} />
-        <Add value={4} />
-        <Subtract value={2} />
-      </Calculator>
+    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
+      <div class="wrapper-v">
+        <h4>This is a calculator</h4>
+        <div class="flex">
+          <Calculator>
+            <div>Invalid element (not token)</div>
+            <Value value={1} />
+            <Add value={4} />
+            <Subtract value={2} />
+          </Calculator>
+        </div>
+      </div>
     </div>
   );
 };
