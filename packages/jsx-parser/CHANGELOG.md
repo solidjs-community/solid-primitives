@@ -1,5 +1,11 @@
 # @solid-primitives/jsx-parser
 
+## 0.1.1
+
+### Patch Changes
+
+- 3f2cc1fb: Warn about invalid elements only if thy are truthy
+
 ## 0.1.0
 
 ### Minor Changes
