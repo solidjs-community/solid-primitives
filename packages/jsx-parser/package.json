@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/jsx-parser",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A primitive to tokenize your solid-components to enable custom parsing.",
   "author": "Vincent Van Dijck <vandijckv@gmail.com>",
   "contributors": [
