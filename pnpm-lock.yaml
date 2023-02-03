@@ -316,7 +316,7 @@ importers:
 
   packages/jsx-parser:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.1.0
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
