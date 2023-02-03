@@ -6,7 +6,7 @@ export type TokenElement<T> = (() => JSX.Element) & { data: T };
 // this is only for type inference
 declare const TYPE: unique symbol;
 
-export type JSXParser<T> = { readonly id: symbol } & { [k in typeof TYPE]: T };
+export type JSXParser<T> = { readonly id: symbol; [TYPE]: T };
 
 export type JSXParserData<T extends JSXParser<any>> = T[typeof TYPE];
 
