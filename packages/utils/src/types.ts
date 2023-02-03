@@ -119,3 +119,8 @@ export type Position = {
   x: number;
   y: number;
 };
+
+export type Narrow<T> =
+  | (T extends [] ? [] : never)
+  | (T extends string | number | bigint | boolean ? T : never)
+  | { [K in keyof T]: T[K] extends Function ? T[K] : Narrow<T[K]> };
