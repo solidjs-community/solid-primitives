@@ -137,6 +137,8 @@ import { createVisibilityObserver } from "@solid-primitives/intersection-observe
 let el: HTMLDivElement | undefined;
 
 const useVisibilityObserver = createVisibilityObserver({ threshold: 0.8 });
+
+// make sure that you pass the element reference in a thunk if it is undefined initially
 const visible = useVisibilityObserver(() => el);
 
 <div ref={el}>{visible() ? "Visible" : "Hidden"}</div>;
@@ -211,7 +213,7 @@ function createViewportObserver(
 
 ## Demo
 
-You may view a working example here: https://stackblitz.com/edit/vitejs-vite-n2lwpq
+[a working example](https://solidjs-community.github.io/solid-primitives/intersection-observer/) ([source](https://github.com/solidjs-community/solid-primitives/tree/main/packages/intersection-observer/dev))
 
 ## Changelog
 

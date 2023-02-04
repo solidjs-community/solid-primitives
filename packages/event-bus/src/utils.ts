@@ -1,8 +1,6 @@
 import { push } from "@solid-primitives/immutable";
-import { createEffect, createSignal, getOwner, on, onCleanup } from "solid-js";
+import { createEffect, createSignal, on } from "solid-js";
 import { GenericEmit, GenericListen, GenericListener, GenericListenProtect } from "./types";
-
-export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
 
 type _PromiseValue<T extends any[]> = void extends T[1] ? T[0] : T;
 

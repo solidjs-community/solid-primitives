@@ -1,5 +1,16 @@
-import { getOwner, onCleanup, createSignal, Accessor, DEV, untrack, batch } from "solid-js";
-import type { Signal } from "solid-js/types/reactive/signal";
+import {
+  getOwner,
+  onCleanup,
+  createSignal,
+  Accessor,
+  DEV,
+  untrack,
+  batch,
+  AccessorArray,
+  EffectFunction,
+  NoInfer,
+  Signal
+} from "solid-js";
 import { isServer as _isServer } from "solid-js/web";
 import type {
   AnyClass,
@@ -8,7 +19,7 @@ import type {
   Noop,
   AnyObject,
   AnyFunction,
-  SetterValue,
+  SetterParam,
   AnyStatic
 } from "./types";
 
@@ -74,7 +85,7 @@ export const clamp = (n: number, min: number, max: number) => Math.min(Math.max(
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
   typeof v === "function" && !v.length ? v() : v;
 
-export const asArray = <T>(value: T): T extends any[] ? T : T[] =>
+export const asArray = <T>(value: T): (T extends any[] ? T[number] : T)[] =>
   Array.isArray(value) ? (value as any) : [value];
 
 /**
@@ -113,6 +124,48 @@ export function accessWith<T>(
 }
 
 /**
+ * Solid's `on` helper, but always defers and returns a provided initial value when if does instead of `undefined`.
+ *
+ * @param deps
+ * @param fn
+ * @param initialValue
+ */
+export function defer<S, Next extends Prev, Prev = Next>(
+  deps: AccessorArray<S> | Accessor<S>,
+  fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
+  initialValue: Next
+): EffectFunction<undefined | NoInfer<Next>, NoInfer<Next>>;
+export function defer<S, Next extends Prev, Prev = Next>(
+  deps: AccessorArray<S> | Accessor<S>,
+  fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
+  initialValue?: undefined
+): EffectFunction<undefined | NoInfer<Next>>;
+export function defer<S, Next extends Prev, Prev = Next>(
+  deps: AccessorArray<S> | Accessor<S>,
+  fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
+  initialValue?: Next
+): EffectFunction<undefined | NoInfer<Next>> {
+  const isArray = Array.isArray(deps);
+  let prevInput: S;
+  let shouldDefer = true;
+  return prevValue => {
+    let input: S;
+    if (isArray) {
+      input = Array(deps.length) as S;
+      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]();
+    } else input = deps();
+    if (shouldDefer) {
+      shouldDefer = false;
+      prevInput = input;
+      return initialValue;
+    }
+    const result = untrack(() => fn(input, prevInput, prevValue));
+    prevInput = input;
+    return result;
+  };
+}
+
+/**
  * Get entries of an object
  */
 export const entries = Object.entries as <T extends object>(obj: T) => [keyof T, T[keyof T]][];
@@ -125,7 +178,7 @@ export const keys = Object.keys as <T extends object>(object: T) => (keyof T)[];
 /**
  * Solid's `onCleanup` that is registered only if there is a root.
  */
-export const onRootCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
+export const tryOnCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
 
 export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {
   push: (...callbacks: ((arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void)[]) => void;
@@ -158,35 +211,10 @@ export function createMicrotask<A extends any[] | []>(fn: (...a: A) => void): (.
   };
 }
 
-/** WIP: an easier to setup and type Proxy */
-export function createProxy<T extends Record<string | symbol, any>>(traps: {
-  get: <K extends keyof T>(key: K) => T[K];
-  set: <K extends keyof T>(key: K, value: T[K]) => void;
-}): T;
-export function createProxy<T extends Record<string | symbol, any>>(traps: {
-  get: <K extends keyof T>(key: K) => T[K];
-  set?: undefined;
-}): Readonly<T>;
-export function createProxy(traps: {
-  get: (key: string | symbol) => any;
-  set?: (key: string | symbol, value: any) => void;
-}): any {
-  return new Proxy(
-    {},
-    {
-      get: (_, k) => traps.get(k),
-      set: (_, k, v) => {
-        traps.set?.(k, v);
-        return false;
-      }
-    }
-  );
-}
-
 export type StaticStoreSetter<T extends Readonly<AnyStatic>> = {
   (setter: (prev: T) => Partial<T>): T;
   (state: Partial<T>): T;
-  <K extends keyof T>(key: K, state: SetterValue<T[K]>): T;
+  <K extends keyof T>(key: K, state: SetterParam<T[K]>): T;
 };
 
 /**
@@ -215,7 +243,7 @@ export function createStaticStore<T extends Readonly<AnyStatic>>(
     return signal[0]();
   };
 
-  const setValue = <K extends keyof T>(key: K, value: SetterValue<any>): void => {
+  const setValue = <K extends keyof T>(key: K, value: SetterParam<any>): void => {
     const saved = cache.get(key);
     if (saved) return saved[1](value);
     if (key in copy) copy[key] = accessWith(value, [copy[key]]);
@@ -228,7 +256,7 @@ export function createStaticStore<T extends Readonly<AnyStatic>>(
     });
   }
 
-  const setter = (a: ((prev: T) => Partial<T>) | Partial<T> | keyof T, b?: SetterValue<any>) => {
+  const setter = (a: ((prev: T) => Partial<T>) | Partial<T> | keyof T, b?: SetterParam<any>) => {
     if (isObject(a))
       untrack(() => {
         batch(() => {
@@ -287,8 +315,3 @@ export function handleDiffArray<T>(
     if (!prev.includes(currEl)) handleAdded(currEl);
   }
 }
-
-export const forEachEntry = <T>(
-  obj: Record<string, T>,
-  fn: (key: string, value: T) => void
-): void => Object.entries(obj).forEach(([key, value]) => fn(key, value));

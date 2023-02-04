@@ -1,5 +1,12 @@
 # @solid-primitives/trigger
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [c2866ea6]
+  - @solid-primitives/utils@5.0.0
+
 ## 0.0.3
 
 ### Patch Changes

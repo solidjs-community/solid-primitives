@@ -1,5 +1,17 @@
 # @solid-primitives/keyed
 
+## 1.1.7
+
+### Patch Changes
+
+- 651af5ce: Cleanup
+
+## 1.1.6
+
+### Patch Changes
+
+- c2866ea6: Update utils package
+
 ## 1.1.5
 
 ### Patch Changes

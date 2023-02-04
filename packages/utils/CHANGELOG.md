@@ -1,5 +1,17 @@
 # @solid-primitives/utils
 
+## 5.1.0
+
+### Minor Changes
+
+- c1538561: Add Narrow type utility.
+
+## 5.0.0
+
+### Major Changes
+
+- c2866ea6: Add `defer`, remove `createProxy` and `forEachEntry`, rename `onRootCleanup` to `tryOnCleanup` and `SetterValue` to `SetterParam`.
+
 ## 4.0.1
 
 ### Patch Changes

@@ -21,7 +21,7 @@ const npmURL = "https://www.npmjs.com/package/";
 const stageShieldBaseURL =
   "https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-"; // add "<stage>.json" after
 const stageShieldLink =
-  "https://github.com/solidjs-community/solid-primitives#contribution-process";
+  "https://github.com/solidjs-community/solid-primitives/blob/main/CONTRIBUTING.md#contribution-process";
 
 const categories: Record<string, PackageData[]> = {};
 const rootDependencies: string[] = [];

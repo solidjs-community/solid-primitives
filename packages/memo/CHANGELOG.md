@@ -1,5 +1,13 @@
 # @solid-primitives/memo
 
+## 1.1.4
+
+### Patch Changes
+
+- c2866ea6: Update utils package
+- Updated dependencies [c2866ea6]
+  - @solid-primitives/utils@5.0.0
+
 ## 1.1.3
 
 ### Patch Changes

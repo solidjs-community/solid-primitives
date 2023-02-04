@@ -1,5 +1,13 @@
 # @solid-primitives/destructure
 
+## 0.1.6
+
+### Patch Changes
+
+- c2866ea6: Update utils package
+- Updated dependencies [c2866ea6]
+  - @solid-primitives/utils@5.0.0
+
 ## 0.1.5
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @solid-primitives/refs
 
+## 0.3.6
+
+### Patch Changes
+
+- Updated dependencies [c2866ea6]
+- Updated dependencies [c2866ea6]
+  - @solid-primitives/rootless@1.2.3
+  - @solid-primitives/utils@5.0.0
+  - @solid-primitives/immutable@0.1.6
+
 ## 0.3.5
 
 ### Patch Changes

@@ -9,11 +9,15 @@ import {
   Setter,
   untrack,
   $TRACK,
-  mapArray
+  mapArray,
+  AccessorArray
 } from "solid-js";
-import type { AccessorArray } from "solid-js/types/reactive/signal";
 
 const FALLBACK = Symbol("fallback");
+
+function dispose(list: Iterable<{ dispose: VoidFunction }>) {
+  for (const o of list) o.dispose();
+}
 
 /**
  * Reactively maps an array by specified key with a callback function - underlying helper for the `<Key>` control flow.
@@ -49,16 +53,16 @@ export function keyArray<T, U, K>(
   type Save = { setItem: Setter<T>; setIndex?: Setter<number>; mapped: U; dispose: () => void };
 
   const prev = new Map<K | typeof FALLBACK, Save>();
-  onCleanup(() => prev.forEach(v => v.dispose()));
+  onCleanup(() => dispose(prev.values()));
 
   return () => {
-    let list = items() || [];
+    const list = items() || [];
     (list as any)[$TRACK]; // top level store tracking
 
     return untrack(() => {
       // fast path for empty arrays
       if (!list.length) {
-        prev.forEach(v => v.dispose());
+        dispose(prev.values());
         prev.clear();
         if (!options.fallback) return [];
         const fb = createRoot(dispose => {
@@ -98,10 +102,10 @@ export function keyArray<T, U, K>(
         } else addNewItem(result, item, i, key);
       }
 
-      prevKeys.forEach(key => {
+      for (const key of prevKeys) {
         prev.get(key)?.dispose();
         prev.delete(key);
-      });
+      }
 
       return result;
     });
@@ -146,13 +150,14 @@ export function Key<T>(props: {
   children: (v: Accessor<T>, i: Accessor<number>) => JSX.Element;
 }): Accessor<JSX.Element[]> {
   const { by } = props;
-  const mapped = keyArray<T, JSX.Element, any>(
-    () => props.each,
-    typeof by === "function" ? by : (v: T) => v[by],
-    props.children,
-    "fallback" in props ? { fallback: () => props.fallback } : undefined
+  return createMemo(
+    keyArray<T, JSX.Element, any>(
+      () => props.each,
+      typeof by === "function" ? by : (v: T) => v[by],
+      props.children,
+      "fallback" in props ? { fallback: () => props.fallback } : undefined
+    )
   );
-  return createMemo(mapped);
 }
 
 /**
