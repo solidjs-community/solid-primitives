@@ -1,5 +1,5 @@
 import { JSX, mergeProps, MergeProps } from "solid-js";
-import { AnyObject, chain } from "@solid-primitives/utils";
+import { access, AnyObject, chain, MaybeAccessor } from "@solid-primitives/utils";
 import { propTraps } from "./propTraps";
 
 const extractCSSregex = /([^:; ]*):\s*([^;]*)/g;
@@ -80,9 +80,7 @@ type PropsInput = {
  * <MyButton style={{ margin: "24px" }} />
  * ```
  */
-export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
-  ...sources: T
-): MergeProps<T> {
+export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: T): MergeProps<T> {
   if (sources.length === 1) return sources[0] as MergeProps<T>;
 
   const merge = mergeProps(...sources) as unknown as MergeProps<T>;
@@ -93,7 +91,7 @@ export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
   ) => {
     let v: PropsInput[K] = undefined;
     for (const props of sources) {
-      const propV = props[key];
+      const propV = access(props)[key];
       if (!v) v = propV;
       else if (propV) v = calc(v, propV);
     }
@@ -107,7 +105,7 @@ export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
     for (const key in props) {
       if (!isEventListenerKey(key)) continue;
 
-      const v = props[key];
+      const v = access(props)[key];
       const name = key.toLowerCase();
 
       let callback: (...args: any[]) => void;
@@ -139,7 +137,7 @@ export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
         if (key === "ref") {
           const callbacks: ((el: any) => void)[] = [];
           for (const props of sources) {
-            const cb = props[key] as ((el: any) => void) | undefined;
+            const cb = access(props)[key] as ((el: any) => void) | undefined;
             if (typeof cb === "function") callbacks.push(cb);
           }
           return chain(callbacks);
@@ -169,6 +167,8 @@ export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
     propTraps
   ) as any;
 }
+
+// type check
 
 // const com = combineProps(
 //   {
