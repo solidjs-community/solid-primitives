@@ -1,6 +1,6 @@
 import { createEventBus } from "../src";
 import { createRoot } from "solid-js";
-import { describe, test, expect, vi } from "vitest";
+import { describe, test, expect } from "vitest";
 
 describe("createEventBus", () => {
   test("emitting and listening", () =>
@@ -45,26 +45,5 @@ describe("createEventBus", () => {
 
       emit("foo");
       expect(captured.length).toBe(0);
-    }));
-
-  test("config options", () =>
-    createRoot(dispose => {
-      let allowEmit = true;
-
-      const { listen, emit } = createEventBus<string>({
-        emitGuard: (emit, payload) => allowEmit && emit(payload)
-      });
-      const listener = vi.fn();
-
-      listen(listener);
-
-      emit("foo");
-      allowEmit = false;
-      emit("bar");
-
-      expect(listener).toHaveBeenCalledTimes(1);
-      expect(listener).toHaveBeenCalledWith("foo");
-
-      dispose();
     }));
 });

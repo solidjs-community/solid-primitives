@@ -104,22 +104,4 @@ describe("createEventStack", () => {
 
       dispose();
     }));
-
-  test("config options", () =>
-    createRoot(dispose => {
-      let allowEmit = true;
-
-      const { emit, value } = createEventStack<string, { text: string }>({
-        emitGuard: (emit, ...payload) => allowEmit && emit(...payload),
-        toValue: e => ({ text: e })
-      });
-
-      emit("foo");
-      allowEmit = false;
-      emit("bar");
-
-      expect(value()).toEqual([{ text: "foo" }]);
-
-      dispose();
-    }));
 });
