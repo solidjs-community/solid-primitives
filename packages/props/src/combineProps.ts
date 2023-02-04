@@ -62,6 +62,20 @@ type PropsInput = {
   ref?: Element | ((el: any) => void);
 } & AnyObject;
 
+const reduce = <K extends keyof PropsInput>(
+  sources: MaybeAccessor<PropsInput>[],
+  key: K,
+  calc: (a: NonNullable<PropsInput[K]>, b: NonNullable<PropsInput[K]>) => PropsInput[K]
+) => {
+  let v: PropsInput[K] = undefined;
+  for (const props of sources) {
+    const propV = access(props)[key];
+    if (!v) v = propV;
+    else if (propV) v = calc(v, propV);
+  }
+  return v;
+};
+
 /**
  * A helper that reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
  *
@@ -83,29 +97,15 @@ type PropsInput = {
 export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: T): MergeProps<T> {
   if (sources.length === 1) return sources[0] as MergeProps<T>;
 
-  const merge = mergeProps(...sources) as unknown as MergeProps<T>;
-
-  const reduce = <K extends keyof PropsInput>(
-    key: K,
-    calc: (a: NonNullable<PropsInput[K]>, b: NonNullable<PropsInput[K]>) => PropsInput[K]
-  ) => {
-    let v: PropsInput[K] = undefined;
-    for (const props of sources) {
-      const propV = access(props)[key];
-      if (!v) v = propV;
-      else if (propV) v = calc(v, propV);
-    }
-    return v;
-  };
-
   // create a map of event listeners to be chained
   const listeners: Record<string, ((...args: any[]) => void)[]> = {};
 
   for (const props of sources) {
-    for (const key in props) {
+    const propsObj = access(props);
+    for (const key in propsObj) {
       if (!isEventListenerKey(key)) continue;
 
-      const v = access(props)[key];
+      const v = propsObj[key];
       const name = key.toLowerCase();
 
       let callback: (...args: any[]) => void;
@@ -125,13 +125,15 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: 
     }
   }
 
+  const merge = mergeProps(...sources) as unknown as MergeProps<T>;
+
   return new Proxy(
     {
       get(key) {
         if (typeof key !== "string") return Reflect.get(merge, key);
 
         // Combine style prop
-        if (key === "style") return reduce("style", combineStyle);
+        if (key === "style") return reduce(sources, "style", combineStyle);
 
         // chain props.ref assignments
         if (key === "ref") {
@@ -150,10 +152,11 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: 
         }
 
         // Merge classes or classNames
-        if (key === "class" || key === "className") return reduce(key, (a, b) => `${a} ${b}`);
+        if (key === "class" || key === "className")
+          return reduce(sources, key, (a, b) => `${a} ${b}`);
 
         // Merge classList objects, keys in the last object overrides all previous ones.
-        if (key === "classList") return reduce(key, (a, b) => ({ ...a, ...b }));
+        if (key === "classList") return reduce(sources, key, (a, b) => ({ ...a, ...b }));
 
         return Reflect.get(merge, key);
       },
