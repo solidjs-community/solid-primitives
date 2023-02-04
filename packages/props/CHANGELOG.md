@@ -1,5 +1,11 @@
 # @solid-primitives/props
 
+## 3.0.5
+
+### Patch Changes
+
+- 9e444e21: Fix bug with checking for event-listenets on function sources
+
 ## 3.0.4
 
 ### Patch Changes
