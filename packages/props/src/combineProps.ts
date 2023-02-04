@@ -108,20 +108,16 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: 
       const v = propsObj[key];
       const name = key.toLowerCase();
 
-      let callback: (...args: any[]) => void;
-      if (typeof v === "function") callback = v;
-      // jsx event listeners also accept a tuple [handler, arg]
-      else if (Array.isArray(v)) {
-        if (v.length === 1) callback = v[0];
-        else callback = v[0].bind(void 0, v[1]);
-      } else {
-        delete listeners[name];
-        continue;
-      }
+      const callback: (...args: any[]) => void =
+        typeof v === "function"
+          ? v
+          : Array.isArray(v)
+          ? v.length === 1
+            ? v[0]
+            : v[0].bind(void 0, v[1])
+          : void 0;
 
-      const callbacks = listeners[name];
-      if (!callbacks) listeners[name] = [callback];
-      else callbacks.push(callback);
+      listeners[name] ? listeners[name].push(callback) : (listeners[name] = [callback]);
     }
   }
 
