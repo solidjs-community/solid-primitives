@@ -1,43 +1,45 @@
-import { Accessor, createEffect, onCleanup } from "solid-js";
+import { Accessor, createRenderEffect, onCleanup, splitProps, type ComponentProps } from "solid-js";
+import { spread } from "solid-js/web";
+
+export type ScriptProps = Omit<ComponentProps<"script">, "src" | "textContent"> & {
+  /** URL or source of the script to load. */
+  src: string | Accessor<string>;
+};
+
+const OMITTED_PROPS = ["src"] as const;
 
 /**
  * Creates a convenient script loader utility
  *
- * @param string URL or source of the script to load.
- * @param type Type value to put in the script attribute.
- * @param function Callback to trigger onLoad.
- * @param function callback on error.
- * @returns
+ * @param props The props to spread to the script element.
+ * The `src` prop is required and will be used to set the `src` or `textContent` attribute. It can be a string or an accessor.
+ * @returns The script element that was created. (will be undefined in SSR)
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/script-loader#createScriptLoader
+ *
+ * @example
+ * createScriptLoader({
+ *  src: "https://example.com/script.js",
+ *  async onLoad() {
+ *    // do your stuff...
+ *  }
+ * })
  */
-export const createScriptLoader = (opts: {
-  src: string | Accessor<string>;
-  type?: string;
-  onload?: () => void;
-  onerror?: () => void;
-}): [script: HTMLScriptElement | undefined, remove: () => void] => {
+export function createScriptLoader(props: ScriptProps): HTMLScriptElement | undefined {
   if (process.env.SSR) {
-    return [
-      undefined,
-      () => {
-        /*noop*/
-      }
-    ];
+    return undefined;
   }
   const script = document.createElement("script");
-  opts.type && (script.type = opts.type);
-  opts.onload && script.addEventListener("load", opts.onload);
-  opts.onerror && script.addEventListener("error", opts.onerror);
-  const remove = () => document.head.contains(script) && document.head.removeChild(script);
-  const load = () => {
-    const src = typeof opts.src === "string" ? opts.src : opts.src();
+  const [local, scriptProps] = splitProps(props, OMITTED_PROPS);
+  spread(script, scriptProps, false, true);
+  createRenderEffect(() => {
+    const src = typeof local.src === "string" ? local.src : local.src();
     const prop = /^(https?:|\w[\.\w-_%]+|)\//.test(src) ? "src" : "textContent";
     if (script[prop] !== src) {
       script[prop] = src;
       document.head.appendChild(script);
     }
-  };
-  load();
-  createEffect(load, false);
-  onCleanup(remove);
-  return [script, remove];
-};
+  });
+  onCleanup(() => document.head.contains(script) && document.head.removeChild(script));
+  return script;
+}

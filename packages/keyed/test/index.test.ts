@@ -103,7 +103,7 @@ describe("keyArray", () => {
       expect(changes).toBe(1);
       expect(maprun).toBe(3);
 
-      setList(p => [el1, el3, el2]);
+      setList([el1, el3, el2]);
       expect(mapped()).toEqual([
         { i: 0, v: "bread" },
         { i: 1, v: "honey" },
@@ -112,7 +112,7 @@ describe("keyArray", () => {
       expect(changes).toBe(2);
       expect(maprun).toBe(3);
 
-      setList(p => [el1, el4, el3, el2]);
+      setList([el1, el4, el3, el2]);
       expect(mapped()).toEqual([
         { i: 0, v: "bread" },
         { i: 1, v: "chips" },

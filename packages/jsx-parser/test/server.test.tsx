@@ -1,6 +1,6 @@
 import { renderToString } from "solid-js/web";
 import { describe, expect, it } from "vitest";
-import { createJSXParser } from "../src";
+import { createJSXParser, createToken, resolveTokens } from "../src";
 
 describe("jsx-parser", () => {
   const parser1 = createJSXParser<{
@@ -8,13 +8,13 @@ describe("jsx-parser", () => {
     props: { text: string };
   }>();
 
-  const MyToken1 = parser1.createToken((props: { text: string }) => ({
+  const MyToken1 = createToken(parser1, (props: { text: string }) => ({
     type: "my-token",
     props
   }));
 
   it("should work", () => {
-    const tokens = parser1.childrenTokens(() => (
+    const tokens = resolveTokens(parser1, () => (
       <>
         <MyToken1 text="foo" />
         <MyToken1 text="bar" />
@@ -22,9 +22,9 @@ describe("jsx-parser", () => {
     ));
 
     expect(tokens()).toHaveLength(2);
-    tokens().forEach(token => expect(token.type).toBe("my-token"));
-    expect(tokens()[0].props.text).toBe("foo");
-    expect(tokens()[1].props.text).toBe("bar");
+    tokens().forEach(token => expect(token.data.type).toBe("my-token"));
+    expect(tokens()[0].data.props.text).toBe("foo");
+    expect(tokens()[1].data.props.text).toBe("bar");
 
     // shouldn't throw
     <>{tokens()}</>;
@@ -33,7 +33,8 @@ describe("jsx-parser", () => {
   it("should render tokens", () => {
     const parser2 = createJSXParser();
 
-    const MyToken2 = parser2.createToken(
+    const MyToken2 = createToken(
+      parser2,
       () => ({}),
       (props: { text: string }) => <div>{props.text}</div>
     );

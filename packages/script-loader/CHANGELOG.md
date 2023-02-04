@@ -1,5 +1,11 @@
 # @solid-primitives/script-loader
 
+## 2.0.0
+
+### Major Changes
+
+- 71433cce: Change `createScriptLoader` API to not return the remove script function - should be done with disposing the owner. React to src changes with createRenderEffect. Apply all passed props using solid's `spread` funcion to the script element.
+
 ## 1.1.3
 
 ### Patch Changes
@@ -10,7 +16,7 @@
 
 ### Patch Changes
 
-- b662fe9f: Improve package export contidions for SSR (node, workers, deno)
+- b662fe9f: Improve package export conditions for SSR (node, workers, deno)
 
 ## 1.1.1
 

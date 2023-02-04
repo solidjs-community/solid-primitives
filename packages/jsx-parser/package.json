@@ -1,9 +1,11 @@
 {
   "name": "@solid-primitives/jsx-parser",
-  "version": "0.0.2",
+  "version": "0.1.1",
   "description": "A primitive to tokenize your solid-components to enable custom parsing.",
   "author": "Vincent Van Dijck <vandijckv@gmail.com>",
-  "contributors": [],
+  "contributors": [
+    "Damian Tarnawski <gthetarnav@gmail.com>"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/parser#readme",
   "repository": {
@@ -17,7 +19,10 @@
     "name": "jsx-parser",
     "stage": 0,
     "list": [
-      "createJSXParser"
+      "createJSXParser",
+      "createToken",
+      "resolveTokens",
+      "isToken"
     ],
     "category": "Utilities"
   },
@@ -57,7 +62,9 @@
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^5.1.0"
+  },
   "peerDependencies": {
     "solid-js": "^1.6.0"
   }

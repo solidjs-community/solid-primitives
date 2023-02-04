@@ -1,31 +1,32 @@
 import { Accessor, createMemo, JSX, untrack } from "solid-js";
+import { type Narrow } from "@solid-primitives/utils";
 
-function resolveChildren(resolved: unknown[], children: unknown, symbol: symbol): void {
-  if (typeof children === "function" && !children.length) {
-    if (symbol in children) resolved.push(children);
-    else resolveChildren(resolved, children(), symbol);
-  }
-  if (Array.isArray(children))
-    for (let i = 0; i < children.length; i++) resolveChildren(resolved, children[i], symbol);
-}
+export type TokenElement<T> = (() => JSX.Element) & { data: T };
 
-export type TokenComponent<T extends {}> = (() => JSX.Element) & T;
+// this is only for type inference
+declare const TYPE: unique symbol;
+
+export type JSXParser<T> = { readonly id: symbol; [TYPE]: T };
+
+export type JSXParserData<T extends JSXParser<any>> = T[typeof TYPE];
 
 /**
- * Provides the tools to create tokenized components, parse and identify tokens in JSX Elements.
+ * Creates a JSX Parser that can be used to create tokenized components and parse JSX Elements for tokens.
  *
  * @param options - Additional options for the parser
  * @param options.name - The name of the parser, used for debugging
- * @returns functions `createToken`, `childrenTokens`, `isToken` and the symbol associated with the jsx-parser `id`.
+ * @returns parser object required by `createToken`, `childrenTokens` and `isToken` functions.
  * @example
  * ```tsx
- * const { createToken, childrenTokens } = createJSXParser();
+ * const parser = createJSXParser();
  *
- * const MyToken = createToken(props => ({ type: "my-token", props }));
+ * const MyToken = createToken(parser, props => ({ type: "my-token", props }));
  *
- * const MyComponent = (props) => {
- *  const tokens = childrenTokens(() => props.children);
- *  return <ul>{tokens().map(token => <li>token.type</li>)}</ul>;
+ * const MyComponent = props => {
+ *   const tokens = resolveTokens(parser, () => props.children);
+ *   return <ul>
+ *     <For each={tokens()}>{token => <li>{token.data.type}</li>}</For>
+ *   </ul>
  * }
  *
  * <MyComponent>
@@ -34,43 +35,97 @@ export type TokenComponent<T extends {}> = (() => JSX.Element) & T;
  * </MyComponent>
  * ```
  */
-export function createJSXParser<Tokens extends {}>(options?: { name: string }) {
-  const name = options?.name || process.env.DEV ? "jsx-parser" : "";
-  const id = Symbol(name);
+export function createJSXParser<T>(options?: { name: string }): JSXParser<T> {
+  return { id: Symbol(process.env.DEV ? options?.name || "jsx-parser" : "") } as any;
+}
 
-  function createToken<Props extends { [key: string]: any }, Token extends Tokens>(
-    tokenCallback: (props: Props) => Token,
-    component?: (props: Props) => JSX.Element
-  ): (props: Props) => TokenComponent<Token> {
-    return (props: Props) =>
-      Object.assign(
-        component
-          ? () => untrack(() => component(props))
-          : () => {
-              process.env.DEV &&
-                // eslint-disable-next-line no-console
-                console.warn(`tokens can only be rendered inside a Parser with id '${name}'`);
-              return "";
-            },
-        {
-          [id]: true,
-          ...tokenCallback(props)
-        }
-      );
-  }
+/**
+ * Creates a token component associated with the corresponding jsx-parser.
+ * @param parser object returned by `createJSXParser`
+ * @param tokenData function that returns the data of the token
+ * @param render function that returns the fallback JSX Element to render
+ * @returns a token component
+ */
+export function createToken<P extends { [key: string]: any }, T extends Tokens, Tokens>(
+  parser: JSXParser<Tokens>,
+  tokenData: (props: P) => Narrow<T>,
+  render?: (props: P) => JSX.Element
+): (props: P) => TokenElement<T>;
+export function createToken<T>(
+  parser: JSXParser<T>,
+  tokenData?: undefined,
+  render?: (props: T) => JSX.Element
+): (props: T) => TokenElement<T>;
+export function createToken<T>(
+  parser: JSXParser<T>,
+  tokenData?: (props: T) => T,
+  render?: (props: T) => JSX.Element
+): (props: T) => TokenElement<T> {
+  return (props: T) => {
+    const token = (
+      render
+        ? () => untrack(() => render(props))
+        : () => {
+            process.env.DEV &&
+              // eslint-disable-next-line no-console
+              console.warn(
+                `Tokens can only be rendered inside a Parser "${parser.id.description}"`
+              );
+            return "";
+          }
+    ) as TokenElement<T>;
+    (token as any)[parser.id] = true;
+    token.data = tokenData ? tokenData(props) : props;
+    return token;
+  };
+}
 
-  function childrenTokens(fn: Accessor<JSX.Element>) {
-    const children = createMemo(fn);
-    return createMemo(() => {
-      const tokens: TokenComponent<Tokens>[] = [];
-      resolveChildren(tokens, children(), id);
-      return tokens;
-    });
-  }
+function resolveChildren(resolved: unknown[], children: unknown, symbol: symbol): any[] {
+  if (typeof children === "function" && !children.length) {
+    if (symbol in children) resolved.push(children);
+    else resolveChildren(resolved, children(), symbol);
+  } else if (Array.isArray(children))
+    for (let i = 0; i < children.length; i++) resolveChildren(resolved, children[i], symbol);
+  else if (process.env.DEV && children)
+    // eslint-disable-next-line no-console
+    console.warn(`Invalid JSX Element passed to Parser "${symbol.description}":`, children);
+  return resolved;
+}
 
-  function isToken(value: unknown | TokenComponent<Tokens>): value is TokenComponent<Tokens> {
-    return typeof value === "function" && !value.length && id in value;
-  }
+/**
+ * Resolves all tokens in a JSX Element
+ * @param parser object returned by `createJSXParser`
+ * @param fn accessor that returns a JSX Element
+ * @returns accessor that returns an array of tokens
+ */
+export function resolveTokens<T>(
+  parser: JSXParser<T>,
+  fn: Accessor<JSX.Element>
+): Accessor<TokenElement<T>[]> {
+  const children = createMemo(fn);
+  return createMemo(() => resolveChildren([], children(), parser.id));
+}
 
-  return { createToken, childrenTokens, isToken, id };
+/**
+ * Resolves all tokens in a JSX Element and returns the data of the tokens
+ * @param parser object returned by `createJSXParser`
+ * @param fn accessor that returns a JSX Element
+ * @returns accessor that returns an array of token data
+ */
+export function resolveData<T>(parser: JSXParser<T>, fn: Accessor<JSX.Element>): Accessor<T[]> {
+  const tokens = resolveTokens(parser, fn);
+  return () => tokens().map(token => token.data);
+}
+
+/**
+ * Checks if a value is a token
+ * @param parser object returned by `createJSXParser`
+ * @param value value to check
+ * @returns true if value is a token
+ */
+export function isToken<T>(
+  parser: JSXParser<T>,
+  value: unknown | TokenElement<T>
+): value is TokenElement<T> {
+  return typeof value === "function" && parser.id in value;
 }

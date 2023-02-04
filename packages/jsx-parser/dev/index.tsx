@@ -1,31 +1,31 @@
 import { Component, JSX, ParentComponent } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
-import { createJSXParser } from "../src";
+import { createJSXParser, createToken, resolveTokens } from "../src";
 
 type Props = {
   value: number;
   children?: JSX.Element | JSX.Element[];
 };
 
-const { createToken, childrenTokens } = createJSXParser<{
+const parser = createJSXParser<{
   id: "Value" | "Add" | "Subtract";
   props: Props;
 }>({ name: "calculator" });
 
 const Calculator: ParentComponent = props => {
-  const tokens = childrenTokens(() => props.children);
+  const tokens = resolveTokens(parser, () => props.children);
 
   const calculation = () => {
     let result = 0;
-    tokens().forEach(token => {
-      console.info("token is ", token);
-      if (token.id === "Value") {
-        result = token.props.value;
-      } else if (token.id === "Add") {
-        result += token.props.value;
-      } else if (token.id === "Subtract") {
-        result -= token.props.value;
+    tokens().forEach(({ data }) => {
+      console.info("token is ", data);
+      if (data.id === "Value") {
+        result = data.props.value;
+      } else if (data.id === "Add") {
+        result += data.props.value;
+      } else if (data.id === "Subtract") {
+        result -= data.props.value;
       }
       console.info("result is", result);
     });
@@ -40,6 +40,7 @@ const Calculator: ParentComponent = props => {
 };
 
 const Value = createToken(
+  parser,
   (props: Props) => ({
     props,
     id: "Value"
@@ -48,6 +49,7 @@ const Value = createToken(
 );
 
 const Add = createToken(
+  parser,
   (props: Props) => ({
     props,
     id: "Add"
@@ -56,6 +58,7 @@ const Add = createToken(
 );
 
 const Subtract = createToken(
+  parser,
   (props: Props) => ({
     props,
     id: "Subtract"
@@ -65,20 +68,18 @@ const Subtract = createToken(
 
 const App: Component = () => {
   return (
-    <div
-      style={{
-        display: "flex",
-        "align-items": "center",
-        "justify-content": "center",
-        height: "100vh"
-      }}
-    >
-      <Calculator>
-        <h1>This is a calculator</h1>
-        <Value value={1} />
-        <Add value={4} />
-        <Subtract value={2} />
-      </Calculator>
+    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
+      <div class="wrapper-v">
+        <h4>This is a calculator</h4>
+        <div class="flex">
+          <Calculator>
+            <div>Invalid element (not token)</div>
+            <Value value={1} />
+            <Add value={4} />
+            <Subtract value={2} />
+          </Calculator>
+        </div>
+      </div>
     </div>
   );
 };
