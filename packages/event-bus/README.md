@@ -51,18 +51,6 @@ bus.emit("foo");
 unsub();
 ```
 
-### Emit guard
-
-Event bus can be configured to prevent emitting events, by passing a `emitGuard` function to the config object.
-
-A function that wraps the `emit` function, it's useful for adding custom behavior to the `emit` function, like batching, or debouncing.
-
-```ts
-const bus = createEventBus<string>({
-  emitGuard: (emit, payload) => allowedEmit && emit(payload)
-});
-```
-
 ## `createEmitter`
 
 Creates an emitter with which you can listen to and emit various events.
@@ -287,16 +275,14 @@ emit(); // listener will log `null`
 emitInEffect(); // listener will log an owner object
 ```
 
-### `batchGuard`
+### `batchEmits`
 
-An emitGuard that batches executes all listeners in a single `batch` call.
+Wraps `emit` calls inside a `batch` call. It causes that listeners execute in a single batch, so they are not executed in sepatate queue ticks.
 
 ```ts
-import { createEventBus, batchGuard } from "@solid-primitives/event-bus";
+import { createEventBus, batchEmits } from "@solid-primitives/event-bus";
 
-const bus = createEventBus({
-  emitGuard: batchGuard
-});
+const bus = batchEmits(createEventBus());
 
 const [a, setA] = createSignal(0);
 const [b, setB] = createSignal(0);

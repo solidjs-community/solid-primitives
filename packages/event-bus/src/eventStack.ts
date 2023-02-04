@@ -1,6 +1,6 @@
 import { drop, filterOut, push } from "@solid-primitives/immutable";
 import { Accessor, createSignal, Setter } from "solid-js";
-import { createEventBus, Emit, EmitGuard, Listen } from "./eventBus";
+import { createEventBus, Emit, Listen } from "./eventBus";
 
 export type EventStackPayload<E, V = E> = {
   readonly event: V;
@@ -19,16 +19,12 @@ export type EventStack<E, V = E> = {
 
 export type EventStackConfig<E, V = E> = {
   readonly length?: number;
-  readonly emitGuard?: EmitGuard<E>;
   readonly toValue?: (event: E, stack: V[]) => V;
 };
 
 /**
  * Provides all the base functions of an event-emitter, functions for managing listeners, it's behavior could be customized with an config object.
  * Additionally it provides the emitted events in a list/history form, with tools to manage it.
- * 
- * @param config Options for the event-bus.
- * @param config.emitGuard A function that wraps the `emit` function, it's useful for adding custom behavior to the `emit` function, like batching, or debouncing.
  * 
  * @returns event stack: `{listen, emit, remove, clear, value, setValue}`
  * 
@@ -66,7 +62,7 @@ export function createEventStack<E, V>(
   const { toValue = (e: any) => e as V, length = 0 } = config;
 
   const [stack, setValue] = /*#__PURE__*/ createSignal<V[]>([]);
-  const eventEventBus = createEventBus<E>(config);
+  const eventEventBus = createEventBus<E>();
   const valueEventBus = createEventBus<EventStackPayload<V>>();
 
   eventEventBus.listen(event => {

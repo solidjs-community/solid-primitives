@@ -7,8 +7,6 @@ export type Listen<T = void> = (listener: Listener<T>) => VoidFunction;
 
 export type Emit<T = void> = (..._: void extends T ? [payload?: T] : [payload: T]) => void;
 
-export type EmitGuard<T = void> = (emit: Emit<T>, payload: T) => void;
-
 export class EventBusCore<T> extends Set<Listener<T>> {
   emit(..._: void extends T ? [payload?: T] : [payload: T]): void;
   emit(payload?: any) {
@@ -22,15 +20,8 @@ export interface EventBus<T> {
   readonly clear: VoidFunction;
 }
 
-export type EventBusConfig<T> = {
-  readonly emitGuard?: EmitGuard<T>;
-};
-
 /**
  * Provides a simple way to listen to and emit events. All listeners are automatically unsubscribed on cleanup.
- * 
- * @param config Options for the event-bus.
- * @param config.emitGuard A function that wraps the `emit` function, it's useful for adding custom behavior to the `emit` function, like batching, or debouncing.
  * 
  * @returns the emitter: `{listen, emit, clear}`
  * 
@@ -48,8 +39,7 @@ bus.emit("foo");
 // unsub gets called automatically on cleanup
 unsub();
  */
-export function createEventBus<T>(config: EventBusConfig<T> = {}): EventBus<T> {
-  const { emitGuard } = config;
+export function createEventBus<T>(): EventBus<T> {
   const bus = new EventBusCore<T>();
 
   return {
@@ -57,9 +47,7 @@ export function createEventBus<T>(config: EventBusConfig<T> = {}): EventBus<T> {
       bus.add(listener);
       return tryOnCleanup(bus.delete.bind(bus, listener));
     },
-    emit: emitGuard
-      ? (payload?: any) => emitGuard(bus.emit.bind(bus), payload)
-      : bus.emit.bind(bus),
+    emit: bus.emit.bind(bus),
     clear: onCleanup(bus.clear.bind(bus))
   };
 }

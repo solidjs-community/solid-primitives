@@ -13,9 +13,8 @@
     "name": "event-bus",
     "stage": 2,
     "list": [
-      "createSimpleEmitter",
-      "createEmitter",
       "createEventBus",
+      "createEmitter",
       "createEventHub",
       "createEventStack"
     ],

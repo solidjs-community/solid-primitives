@@ -1,4 +1,5 @@
 import { push } from "@solid-primitives/immutable";
+import { AnyFunction } from "@solid-primitives/utils";
 import { batch, createEffect, createSignal, on } from "solid-js";
 import { Listen, Listener, Emit } from "./eventBus";
 
@@ -6,6 +7,9 @@ import { Listen, Listener, Emit } from "./eventBus";
  * Turns a stream-like listen function, into a promise resolving when the first event is captured.
  * @param subscribe listen function from any EventBus/Emitter
  * @returns a promise resulting in the captured event value
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#toPromise
+ *
  * @example
  * const emitter = createEventBus<string>();
  * const event = await toPromise(emitter.listen);
@@ -21,6 +25,8 @@ export function toPromise<T>(subscribe: Listen<T>): Promise<T> {
  * @param listener callback called when an event is emitted
  *
  * @returns unsubscribe function
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#once
  *
  * @example
  * const { listen, emit } = createEventBus<string>();
@@ -44,6 +50,8 @@ export function once<T>(subscribe: Listen<T>, listener: Listener<T>): VoidFuncti
  * @param emit the emit function of any emitter/event-bus
  * @returns modified emit function
  *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#toEffect
+ *
  * @example
  * const { listen, emit } = createEventBus();
  * const emitInEffect = toEffect(emit);
@@ -66,8 +74,13 @@ export function toEffect<T>(emit: Emit<T>): Emit<T> {
 }
 
 /**
- * An emitGuard that batches executes all listeners in a single `batch` call.
+ * Wraps `emit` calls inside a `batch` call. It causes that listeners execute in a single batch, so they are not executed in sepatate queue ticks.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#batchEmits
  */
-export function batchGuard<T = void>(emit: Emit<T>, payload: T): void {
-  batch(() => emit(payload));
+export function batchEmits<T extends { emit: AnyFunction }>(bus: T): T {
+  return {
+    ...bus,
+    emit: (...args) => batch(() => bus.emit(...args))
+  };
 }
