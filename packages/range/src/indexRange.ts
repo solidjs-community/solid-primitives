@@ -3,9 +3,9 @@ import { abs, ceil, min, RangeProps, sign, toFunction, accessor } from "./common
 
 /**
  * Reactively maps a number range of specified `stop`, `to` and `step`, with a callback function - underlying helper for the `<IndexRange>` control flow.
- * @param start number accessor of the start of the range
- * @param to number accessor of the end of the range *(not included in the range)*
- * @param step number accessor of the difference between two points in the range *(negative step value depends on the `to` being greater/smaller than `start`, not this argument)*
+ * @param getStart number accessor of the start of the range
+ * @param getTo number accessor of the end of the range *(not included in the range)*
+ * @param getStep number accessor of the difference between two points in the range *(negative step value depends on the `to` being greater/smaller than `start`, not this argument)*
  * @param mapFn reactive function used to create mapped output item array, number value is available as a signal.
  * @param options a fallback for when the input list is empty or missing
  * @returns mapped input array signal
@@ -23,9 +23,9 @@ import { abs, ceil, min, RangeProps, sign, toFunction, accessor } from "./common
  * ```
  */
 export function indexRange<T>(
-  start: Accessor<number>,
-  to: Accessor<number>,
-  step: Accessor<number>,
+  getStart: Accessor<number>,
+  getTo: Accessor<number>,
+  getStep: Accessor<number>,
   mapFn: (n: Accessor<number>) => T,
   options: { fallback?: Accessor<T> } = {}
 ): Accessor<T[]> {
@@ -69,7 +69,7 @@ export function indexRange<T>(
 
     if (fallback) {
       fallback = false;
-      disposers[0]();
+      disposers[0]!();
       items = [];
     }
 
@@ -84,7 +84,7 @@ export function indexRange<T>(
     const bodyEnd: number = min(newLength, oldLength);
 
     // update numbers:
-    for (; i < bodyEnd; i++, n += step) setters[i](n);
+    for (; i < bodyEnd; i++, n += step) setters[i]!(n);
 
     // add at the back:
     for (; i < newLength; i++, n += step) mapper(i, n);
@@ -100,14 +100,14 @@ export function indexRange<T>(
   };
 
   return () => {
-    let _step = step();
+    let _step = getStep();
     if (_step === 0) {
       // eslint-disable-next-line no-console
       if (process.env.DEV) console.warn("Range cannot have a step of 0");
       return items;
     }
-    let _start = start();
-    let _to = to();
+    const _start = getStart();
+    const _to = getTo();
     _step = abs(_step) * sign(_to - _start || 1);
     return untrack(mapNewRange.bind(void 0, _start, _to, _step));
   };

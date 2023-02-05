@@ -106,6 +106,7 @@ export const makeAudioPlayer = (
   const play = () => player.play();
   const pause = () => player.pause();
   const seek = (time: number) =>
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     player.fastSeek ? player.fastSeek(time) : (player.currentTime = time);
   const setVolume = (volume: number) => (player.volume = volume);
   return { play, pause, seek, setVolume, player };

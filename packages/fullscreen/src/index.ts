@@ -28,7 +28,7 @@ export const createFullscreen = (
       const activeOutput = active?.() ?? true;
       if (!isActive() && activeOutput) {
         ref
-          ?.requestFullscreen?.(typeof activeOutput === "object" ? activeOutput : options)
+          .requestFullscreen(typeof activeOutput === "object" ? activeOutput : options)
           .then(() => setActive(true))
           .catch(() => {});
       } else if (!activeOutput && isActive()) {

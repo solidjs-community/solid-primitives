@@ -150,7 +150,7 @@ export const copyToClipboard = (
       write = async (data: any) => await navigator.clipboard.writeText(data);
     }
     if (opts.highlight) opts.highlight(el);
-    write!(data);
+    write(data);
   };
   el.addEventListener("click", setValue);
   onCleanup(() => el.removeEventListener("click", setValue));

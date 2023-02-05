@@ -58,8 +58,8 @@ export const withAbort: RequestModifier =
         })();
         lastRequestDataObj.signal = requestContext.abortController.signal;
         return originalFetcher(
-          requestData as FetcherArgs,
-          info as ResourceFetcherInfo<Result>
+          requestData ,
+          info 
         ).catch(err => {
           if (info.value && err.name === "AbortError") {
             return Promise.resolve(info.value);
@@ -105,7 +105,7 @@ export const withCatchAll: RequestModifier = () => requestContext => {
     originalFetcher => (requestData, info) =>
       originalFetcher(requestData, info).catch((err: Error) => {
         setError(err);
-        return Promise.resolve(info.value!);
+        return Promise.resolve(info.value);
       })
   );
   requestContext.wrapResource();
@@ -180,7 +180,7 @@ export const withRefetchEvent: RequestModifier = isServer
         wrapFetcher<Result, FetcherArgs>(requestContext, originalFetcher => (...args) => {
           lastRequestRef.current = [args as any, undefined];
           return originalFetcher(...args).then(data => {
-            lastRequestRef.current = [args as any, data as Result];
+            lastRequestRef.current = [args as any, data ];
             return data;
           });
         });

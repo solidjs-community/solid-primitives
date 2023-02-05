@@ -36,6 +36,7 @@ export const isServer: boolean = _isServer;
 export const isClient = !isServer;
 
 /** development environment */
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 export const isDev = DEV && isClient;
 /** production environment */
 export const isProd = !isDev;
@@ -108,7 +109,8 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
   fn: (value: NonNullable<V>) => void
 ) => {
   const _value = access(value);
-  typeof _value !== "undefined" && _value !== null && fn(_value as NonNullable<V>);
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  typeof _value != null && fn(_value as NonNullable<V>);
 };
 
 export const asAccessor = <A extends MaybeAccessor<unknown>>(
@@ -261,7 +263,7 @@ export function createStaticStore<T extends Readonly<AnyStatic>>(
       untrack(() => {
         batch(() => {
           for (const [key, value] of entries(accessWith(a, store) as Partial<T>))
-            setValue(key as keyof T, () => value);
+            setValue(key, () => value);
         });
       });
     else setValue(a, b);
@@ -290,12 +292,12 @@ export function handleDiffArray<T>(
   let i = 0;
 
   if (!prevLength) {
-    for (; i < currLength; i++) handleAdded(current[i]);
+    for (; i < currLength; i++) handleAdded(current[i]!);
     return;
   }
 
   if (!currLength) {
-    for (; i < prevLength; i++) handleRemoved(prev[i]);
+    for (; i < prevLength; i++) handleRemoved(prev[i]!);
     return;
   }
 

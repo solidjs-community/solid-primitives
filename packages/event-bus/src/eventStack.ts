@@ -81,7 +81,7 @@ export function createEventStack<E, V>(
   eventEmitter.listen(event => {
     const value = toValue(event, stack());
     setStack(prev => {
-      let list = push(prev, value);
+      const list = push(prev, value);
       return length && list.length > length ? drop(list) : list;
     });
     valueEmitter.emit(value, stack(), () => removeFromStack(value));

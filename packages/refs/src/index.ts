@@ -245,30 +245,30 @@ export function mapRemoved<T>(
   createComputed(
     on(list, _list => {
       const { length } = prevList;
-      const list = asArray(_list).slice();
+      const newList = asArray(_list).slice();
 
       // fast path for empty prev list
-      if (!length) return setItems((prevList = list));
+      if (!length) return setItems((prevList = newList));
 
       for (let pi = 0, ni = 0; pi < length; ) {
-        const item = prevList[pi];
+        const item = prevList[pi]!;
         // item already in both lists
-        if (list.includes(item)) pi++, ni++;
+        if (newList.includes(item)) pi++, ni++;
         // item saved from previous changes
         else if (saved.has(item)) {
-          const x = prevList.indexOf(list[ni]);
+          const x = prevList.indexOf(newList[ni]!);
           if (x !== -1 && x <= pi) ni++;
           else {
-            list.splice(ni, 0, item);
+            newList.splice(ni, 0, item);
             indexes?.get(item)?.(ni);
             pi++;
           }
         }
         // item removed in this change
-        else mapRemovedElement(list, item, pi), pi++;
+        else mapRemovedElement(newList, item, pi), pi++;
       }
 
-      setItems((prevList = list));
+      setItems((prevList = newList));
     })
   );
 
@@ -279,7 +279,7 @@ export function mapRemoved<T>(
     toRemove = [];
   };
 
-  function mapRemovedElement(list: T[], item: T, i: number) {
+  function mapRemovedElement(newList: T[], item: T, i: number) {
     createSubRoot(dispose => {
       let signal: Accessor<T | undefined>, mapped: T;
       // create index signal
@@ -300,34 +300,34 @@ export function mapRemoved<T>(
       }
 
       saved.add(mapped);
-      list.splice(i, 0, mapped);
+      newList.splice(i, 0, mapped);
       let prev: T = mapped;
 
       // prettier-ignore
-      createComputed(on(signal, item => {
+      createComputed(on(signal, signalValue => {
         saved.delete(prev)
         if (indexes) {
           const set = indexes.get(prev)
           indexes.delete(prev)
-          if (item) set && indexes.set(item, set)
+          if (signalValue) set && indexes.set(signalValue, set)
           else {
-            const list = items()
-            for (i = list.indexOf(prev); i < list.length; i++) {
-              indexes.get(list[i])?.(p => --p)
+            const listValue = items()
+            for (i = listValue.indexOf(prev); i < listValue.length; i++) {
+              indexes.get(listValue[i]!)?.(p => --p)
             }
           }
         }
         // remove saved item if changed to undefined
-        if (!item) {
+        if (!signalValue) {
           mutableRemove(prevList, prev);
           // batch setItems changes
           toRemove.push(prev);
           queueMicrotask(executeToRemove);
           return dispose();
         }
-        saved.add(item);
-        setItems(p => remove(p, prev, item));
-        prev = item;
+        saved.add(signalValue);
+        setItems(p => remove(p, prev, signalValue));
+        prev = signalValue;
       }, { defer: true }));
     }, owner);
   }
@@ -366,33 +366,33 @@ export const Children = (props: {
  * @param onChange handle children changes
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Refs
  */
-export const Refs = <E extends Element>(props: {
-  refs?: (els: E[]) => void;
-  added?: (els: E[]) => void;
-  removed?: (els: E[]) => void;
-  onChange?: (changed: { refs: E[]; added: E[]; removed: E[] }) => void;
+export const Refs = <El extends Element>(props: {
+  refs?: (els: El[]) => void;
+  added?: (els: El[]) => void;
+  removed?: (els: El[]) => void;
+  onChange?: (changed: { refs: El[]; added: El[]; removed: El[] }) => void;
   children: JSX.Element;
 }): Accessor<ResolvedChildren> => {
   const resolved = children(() => props.children);
 
   // calculate changed elements only if user listens for it
   if (props.added || props.removed || props.onChange) {
-    const [elements, added, removed] = refs(resolved);
-    const emit = (refs: E[], added: E[], removed: E[]) =>
+    const [elementList, added, removed] = refs(resolved);
+    const emit = (refValue: El[], addedValue: El[], removedValue: El[]) =>
       untrack(() => {
-        props.refs?.(refs);
-        props.added?.(added);
-        props.removed?.(removed);
-        props.onChange?.({ refs, added, removed });
+        props.refs?.(refValue);
+        props.added?.(addedValue);
+        props.removed?.(removedValue);
+        props.onChange?.({ refs: refValue, added: addedValue, removed: removedValue });
       });
-    createComputed(() => emit(elements() as E[], added() as E[], removed() as E[]));
-    onCleanup(() => emit([], [], elements() as E[]));
+    createComputed(() => emit(elementList() as El[], added() as El[], removed() as El[]));
+    onCleanup(() => emit([], [], elementList() as El[]));
   }
   // or emit only the current elements
   else if (props.refs) {
     const cb = props.refs;
-    const refs = elements(resolved);
-    createComputed(() => cb(refs() as E[]));
+    const refList = elements(resolved);
+    createComputed(() => cb(refList() as El[]));
     onCleanup(() => cb([]));
   }
 
@@ -417,9 +417,9 @@ export const Ref = <U extends Element>(props: {
 
   createComputed(() => {
     const el = (() => {
-      let el = access(resolved()) as U | undefined;
-      if (!(el instanceof Element)) el = undefined;
-      return el;
+      let newEl = access(resolved()) as U | undefined;
+      if (!(newEl instanceof Element)) newEl = undefined;
+      return newEl;
     })();
 
     untrack(() => {

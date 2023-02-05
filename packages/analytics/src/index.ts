@@ -1,5 +1,6 @@
 export enum EventType {
   Pageview = "page",
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   Event = "event",
   Social = "social"
 }
@@ -35,7 +36,7 @@ export type TrackHandler = (
 const createAnalytics = (handlers: Array<TrackHandler>): TrackHandler => {
   const track: TrackHandler = (type, data) => {
     for (const i in handlers) {
-      handlers[i](type, data);
+      handlers[i]!(type, data);
     }
   };
   return track;

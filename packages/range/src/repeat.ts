@@ -52,7 +52,7 @@ export function repeat<T>(
     {
       const diff = prevLen - len;
       if (diff > 0) {
-        for (let i = prevLen - 1; i >= len; i--) disposers[i]();
+        for (let i = prevLen - 1; i >= len; i--) disposers[i]!();
         items.splice(len, diff);
         disposers.splice(len, diff);
         return items;
@@ -72,9 +72,9 @@ export function repeat<T>(
   return () => {
     const len = memoLen();
     return untrack(() => {
-      const items = mapLength(len);
+      const newItems = mapLength(len);
       prevLen = len;
-      return items;
+      return newItems;
     });
   };
 }

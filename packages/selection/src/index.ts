@@ -2,14 +2,14 @@ import { Accessor, createEffect, createSignal, onCleanup, Setter } from "solid-j
 
 export type HTMLSelection = [node: HTMLElement | null, start: number, end: number];
 
-export const getTextNodes = (node: Node) => {
+export const getTextNodes = (startNode: Node) => {
   const textNodes: Node[] = [];
   const walkNodes = (node: Node) => {
     node instanceof Text && textNodes.push(node);
     node.firstChild && walkNodes(node.firstChild);
     node.nextSibling && walkNodes(node.nextSibling);
   };
-  walkNodes(node);
+  walkNodes(startNode);
   return textNodes;
 };
 
@@ -21,7 +21,7 @@ const getRangePos = (container: Node, offset: number, texts: Node[]) => {
 };
 
 const getParent = (node: Node | null): Node | null =>
-  node === null || (node as HTMLElement)?.contentEditable === "true"
+  node === null || (node as HTMLElement).contentEditable === "true"
     ? node
     : getParent(node.parentNode || null);
 
@@ -43,7 +43,7 @@ export const createSelection = (): [Accessor<HTMLSelection>, Setter<HTMLSelectio
       sel => (typeof sel === "function" ? sel([null, NaN, NaN]) : sel)
     ];
   }
-  const [selection, setSelection] = createSignal<HTMLSelection>([null, NaN, NaN]);
+  const [getSelection, setSelection] = createSignal<HTMLSelection>([null, NaN, NaN]);
   const [selected, setSelected] = createSignal<HTMLSelection>([null, NaN, NaN]);
   const selectionHandler = () => {
     const active = document.activeElement;
@@ -98,5 +98,5 @@ export const createSelection = (): [Accessor<HTMLSelection>, Setter<HTMLSelectio
       }
     }
   });
-  return [selection, setSelected];
+  return [getSelection, setSelected];
 };

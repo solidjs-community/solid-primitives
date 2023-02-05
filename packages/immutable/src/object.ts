@@ -129,7 +129,7 @@ export function split<
 export function split<T extends object>(object: T, ...list: (keyof T)[][] | (keyof T)[]): any {
   const _list = (typeof list[0] === "string" ? [list] : list) as (keyof T)[][];
   const copy = shallowObjectCopy(object);
-  let result: Record<keyof T, any>[] = [];
+  const result: Record<keyof T, any>[] = [];
   for (let i = 0; i < _list.length; i++) {
     const keys = _list[i] as (keyof T)[];
     result.push({} as Record<keyof T, any>);

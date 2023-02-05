@@ -63,7 +63,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
       key,
       oldValue,
       newValue: value,
-      url: globalThis.document?.URL,
+      url: globalThis.document.URL,
       storageArea: cookieStorage
     });
     window.dispatchEvent(storageEvent);

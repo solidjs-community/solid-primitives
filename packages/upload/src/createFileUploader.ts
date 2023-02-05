@@ -49,7 +49,7 @@ function createFileUploader(options?: FileUploaderOptions): FileUploader {
     target.removeEventListener("change", onChange as any);
     target.remove();
 
-    setFiles(parsedFiles || []);
+    setFiles(parsedFiles);
 
     try {
       await userCallback(parsedFiles);
@@ -72,7 +72,7 @@ function createFileUploader(options?: FileUploaderOptions): FileUploader {
   };
 
   const removeFile = (fileName: string) => {
-    setFiles(prev => (prev as UploadFile[]).filter(f => f.name !== fileName));
+    setFiles(prev => prev.filter(f => f.name !== fileName));
   };
 
   const clearFiles = () => {

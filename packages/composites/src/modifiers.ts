@@ -119,7 +119,7 @@ export const pausable = createModifier<
     toggle: (v?: boolean | ((prev: boolean) => boolean)) => boolean;
   }
 >((s, fn, options) => {
-  const [active, toggle] = createSignal(options?.active ?? true);
+  const [active, toggle] = createSignal(options.active ?? true);
   return [
     (a, b, c) => (active() ? fn(a, b, c) : c),
     {
