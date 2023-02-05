@@ -1,5 +1,11 @@
 # @solid-primitives/props
 
+## 3.0.6
+
+### Patch Changes
+
+- 0cfb9546: Improve checking event-listener keys
+
 ## 3.0.5
 
 ### Patch Changes
