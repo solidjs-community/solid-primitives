@@ -4,13 +4,6 @@ import { propTraps } from "./propTraps";
 
 const extractCSSregex = /([^:; ]*):\s*([^;]*)/g;
 
-const isEventListenerKey = (key: string): boolean =>
-  key[0] === "o" &&
-  key[1] === "n" &&
-  key.length > 2 &&
-  key[2] !== ":" &&
-  !key.startsWith("oncapture:");
-
 /**
  * converts inline string styles to object form
  * @example
@@ -103,21 +96,25 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: 
   for (const props of sources) {
     const propsObj = access(props);
     for (const key in propsObj) {
-      if (!isEventListenerKey(key)) continue;
+      // skip non event listeners
+      if (key[0] === "o" && key[1] === "n" && key[2]) {
+        const v = propsObj[key];
+        const name = key.toLowerCase();
 
-      const v = propsObj[key];
-      const name = key.toLowerCase();
+        const callback: (...args: any[]) => void =
+          typeof v === "function"
+            ? v
+            : // jsx event handlers can be tuples of [callback, arg]
+            Array.isArray(v)
+            ? v.length === 1
+              ? v[0]
+              : v[0].bind(void 0, v[1])
+            : void 0;
 
-      const callback: (...args: any[]) => void =
-        typeof v === "function"
-          ? v
-          : Array.isArray(v)
-          ? v.length === 1
-            ? v[0]
-            : v[0].bind(void 0, v[1])
-          : void 0;
-
-      listeners[name] ? listeners[name].push(callback) : (listeners[name] = [callback]);
+        if (callback)
+          listeners[name] ? listeners[name].push(callback) : (listeners[name] = [callback]);
+        else delete listeners[name];
+      }
     }
   }
 
@@ -142,9 +139,9 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: 
         }
 
         // Chain event listeners
-        if (isEventListenerKey(key)) {
+        if (key[0] === "o" && key[1] === "n" && key[2]) {
           const callbacks = listeners[key.toLowerCase()];
-          return Array.isArray(callbacks) ? chain(callbacks) : Reflect.get(merge, key);
+          return callbacks ? chain(callbacks) : Reflect.get(merge, key);
         }
 
         // Merge classes or classNames
