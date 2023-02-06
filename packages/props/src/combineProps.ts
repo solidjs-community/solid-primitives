@@ -1,15 +1,8 @@
 import { JSX, mergeProps, MergeProps } from "solid-js";
-import { AnyObject, chain } from "@solid-primitives/utils";
+import { access, AnyObject, chain, MaybeAccessor } from "@solid-primitives/utils";
 import { propTraps } from "./propTraps";
 
 const extractCSSregex = /([^:; ]*):\s*([^;]*)/g;
-
-const isEventListenerKey = (key: string): boolean =>
-  key[0] === "o" &&
-  key[1] === "n" &&
-  key.length > 2 &&
-  key[2] !== ":" &&
-  !key.startsWith("oncapture:");
 
 /**
  * converts inline string styles to object form
@@ -62,6 +55,20 @@ type PropsInput = {
   ref?: Element | ((el: any) => void);
 } & AnyObject;
 
+const reduce = <K extends keyof PropsInput>(
+  sources: MaybeAccessor<PropsInput>[],
+  key: K,
+  calc: (a: NonNullable<PropsInput[K]>, b: NonNullable<PropsInput[K]>) => PropsInput[K]
+) => {
+  let v: PropsInput[K] = undefined;
+  for (const props of sources) {
+    const propV = access(props)[key];
+    if (!v) v = propV;
+    else if (propV) v = calc(v, propV);
+  }
+  return v;
+};
+
 /**
  * A helper that reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
  *
@@ -80,52 +87,38 @@ type PropsInput = {
  * <MyButton style={{ margin: "24px" }} />
  * ```
  */
-export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
-  ...sources: T
-): MergeProps<T> {
+export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: T): MergeProps<T> {
   if (sources.length === 1) return sources[0] as MergeProps<T>;
-
-  const merge = mergeProps(...sources) as unknown as MergeProps<T>;
-
-  const reduce = <K extends keyof PropsInput>(
-    key: K,
-    calc: (a: NonNullable<PropsInput[K]>, b: NonNullable<PropsInput[K]>) => PropsInput[K]
-  ) => {
-    let v: PropsInput[K] = undefined;
-    for (const props of sources) {
-      const propV = props[key];
-      if (!v) v = propV;
-      else if (propV) v = calc(v, propV);
-    }
-    return v;
-  };
 
   // create a map of event listeners to be chained
   const listeners: Record<string, ((...args: any[]) => void)[]> = {};
 
   for (const props of sources) {
-    for (const key in props) {
-      if (!isEventListenerKey(key)) continue;
+    const propsObj = access(props);
+    for (const key in propsObj) {
+      // skip non event listeners
+      if (key[0] === "o" && key[1] === "n" && key[2]) {
+        const v = propsObj[key];
+        const name = key.toLowerCase();
 
-      const v = props[key];
-      const name = key.toLowerCase();
+        const callback: (...args: any[]) => void =
+          typeof v === "function"
+            ? v
+            : // jsx event handlers can be tuples of [callback, arg]
+            Array.isArray(v)
+            ? v.length === 1
+              ? v[0]
+              : v[0].bind(void 0, v[1])
+            : void 0;
 
-      let callback: (...args: any[]) => void;
-      if (typeof v === "function") callback = v;
-      // jsx event listeners also accept a tuple [handler, arg]
-      else if (Array.isArray(v)) {
-        if (v.length === 1) callback = v[0];
-        else callback = v[0].bind(void 0, v[1]);
-      } else {
-        delete listeners[name];
-        continue;
+        if (callback)
+          listeners[name] ? listeners[name].push(callback) : (listeners[name] = [callback]);
+        else delete listeners[name];
       }
-
-      const callbacks = listeners[name];
-      if (!callbacks) listeners[name] = [callback];
-      else callbacks.push(callback);
     }
   }
+
+  const merge = mergeProps(...sources) as unknown as MergeProps<T>;
 
   return new Proxy(
     {
@@ -133,29 +126,30 @@ export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
         if (typeof key !== "string") return Reflect.get(merge, key);
 
         // Combine style prop
-        if (key === "style") return reduce("style", combineStyle);
+        if (key === "style") return reduce(sources, "style", combineStyle);
 
         // chain props.ref assignments
         if (key === "ref") {
           const callbacks: ((el: any) => void)[] = [];
           for (const props of sources) {
-            const cb = props[key] as ((el: any) => void) | undefined;
+            const cb = access(props)[key] as ((el: any) => void) | undefined;
             if (typeof cb === "function") callbacks.push(cb);
           }
           return chain(callbacks);
         }
 
         // Chain event listeners
-        if (isEventListenerKey(key)) {
+        if (key[0] === "o" && key[1] === "n" && key[2]) {
           const callbacks = listeners[key.toLowerCase()];
-          return Array.isArray(callbacks) ? chain(callbacks) : Reflect.get(merge, key);
+          return callbacks ? chain(callbacks) : Reflect.get(merge, key);
         }
 
         // Merge classes or classNames
-        if (key === "class" || key === "className") return reduce(key, (a, b) => `${a} ${b}`);
+        if (key === "class" || key === "className")
+          return reduce(sources, key, (a, b) => `${a} ${b}`);
 
         // Merge classList objects, keys in the last object overrides all previous ones.
-        if (key === "classList") return reduce(key, (a, b) => ({ ...a, ...b }));
+        if (key === "classList") return reduce(sources, key, (a, b) => ({ ...a, ...b }));
 
         return Reflect.get(merge, key);
       },
@@ -169,6 +163,8 @@ export function combineProps<T extends [PropsInput, ...PropsInput[]]>(
     propTraps
   ) as any;
 }
+
+// type check
 
 // const com = combineProps(
 //   {

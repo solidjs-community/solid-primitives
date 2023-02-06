@@ -1,5 +1,23 @@
 # @solid-primitives/props
 
+## 3.0.6
+
+### Patch Changes
+
+- 0cfb9546: Improve checking event-listener keys
+
+## 3.0.5
+
+### Patch Changes
+
+- 9e444e21: Fix bug with checking for event-listenets on function sources
+
+## 3.0.4
+
+### Patch Changes
+
+- 93a6b4f3: Support function sources in `combineProps`
+
 ## 3.0.3
 
 ### Patch Changes

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createRoot, mergeProps } from "solid-js";
+import { createComputed, createRoot, createSignal, mergeProps } from "solid-js";
 import { spy } from "nanospy";
 import { combineProps } from "../src";
 
@@ -253,5 +253,41 @@ describe("combineProps", () => {
     expect(cb1).toBeCalledWith("foo");
     expect(cb2).toHaveBeenCalledTimes(1);
     expect(cb2).toBeCalledWith("foo");
+  });
+
+  it("accepts function sources", () => {
+    createRoot(() => {
+      const [signal, setSignal] = createSignal<any>({
+        class: "primary",
+        style: {
+          margin: "10px"
+        }
+      });
+
+      const combinedProps = combineProps(
+        signal,
+        { class: "secondary" },
+        { style: { padding: "10px" } }
+      );
+
+      let i = 0;
+
+      createComputed(() => {
+        if (i === 0) {
+          expect(combinedProps.class).toBe("primary secondary");
+          expect(combinedProps.style).toEqual({
+            margin: "10px",
+            padding: "10px"
+          });
+          i++;
+        } else {
+          expect(combinedProps.class).toBe("tertiary secondary");
+          expect(combinedProps.style).toEqual({ padding: "10px" });
+          expect(combinedProps.foo).toEqual("bar");
+        }
+      });
+
+      setSignal({ class: "tertiary", foo: "bar" });
+    });
   });
 });
