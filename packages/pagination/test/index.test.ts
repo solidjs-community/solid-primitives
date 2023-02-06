@@ -5,7 +5,7 @@ import { createInfiniteScroll, createPagination } from "../src";
 describe("createPagination", () => {
   test("createPagination returns page getter and setter", () =>
     createRoot(dispose => {
-      const [_paginationProps, page, setPage] = createPagination({ pages: 100 });
+      const [, page, setPage] = createPagination({ pages: 100 });
       expect(page(), "initial value should be 1").toBe(1);
       setPage(2);
       expect(page(), "value after change should be 2").toBe(2);
@@ -39,25 +39,21 @@ describe("createPagination", () => {
 });
 
 //@ts-ignore
-global.IntersectionObserver = class { disconnect() {} };
+global.IntersectionObserver = class {
+  disconnect() {}
+};
 
 describe("createInfiniteScroll", () => {
-  const fetcher = async (page: number) => {
-    let items = [];
-    for (let i = 0; i < page+1; i++) {
-      items.push(i);
-    }
-    return items;
-  }
+  const fetcher = async (page: number) => Array.from({ length: page + 1 }, (_, i) => i);
 
   test("createInfiniteScroll", () =>
     createRoot(dispose => {
-      const [pages, _, { page, setPage }] = createInfiniteScroll(fetcher);
+      const [pages, , { page, setPage }] = createInfiniteScroll(fetcher);
       expect(pages(), "initial value should be []").toStrictEqual([]);
 
       setPage(1);
       expect(page(), "value should be 1").toStrictEqual(1);
 
       dispose();
-  }));
+    }));
 });

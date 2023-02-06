@@ -1,6 +1,6 @@
 import { createVisibilityObserver } from "@solid-primitives/intersection-observer";
 import { access, type Directive, noop, type MaybeAccessor } from "@solid-primitives/utils";
-import type { Accessor, JSX, Setter } from "solid-js";
+import { Accessor, batch, JSX, Setter } from "solid-js";
 import { createComputed, createMemo, createResource, createSignal } from "solid-js";
 
 export type PaginationOptions = {
@@ -273,8 +273,10 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
   createComputed(() => {
     const content = contents();
     if (!content) return;
-    if (content.length === 0) setEnd(true);
-    setPages(p => [...p, ...content!]);
+    batch(() => {
+      if (content.length === 0) setEnd(true);
+      setPages(p => [...p, ...content]);
+    });
   });
 
   return [

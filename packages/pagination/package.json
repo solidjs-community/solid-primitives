@@ -75,6 +75,7 @@
     },
     "require": "./dist/index.cjs"
   },
+  "typesVersions": {},
   "scripts": {
     "dev": "vite serve dev",
     "page": "vite build dev",
@@ -88,6 +89,5 @@
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
-  },
-  "typesVersions": {}
+  }
 }
