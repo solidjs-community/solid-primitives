@@ -5,9 +5,11 @@ import { createInfiniteScroll, createPagination } from "../src";
 
 async function fetcher(page: number) {
   let elements: string[] = [];
-  let res = await fetch(`https://openlibrary.org/search.json?q=hello%20world&page=${page+1}`, { method: "GET" })
+  let res = await fetch(`https://openlibrary.org/search.json?q=hello%20world&page=${page + 1}`, {
+    method: "GET"
+  });
   if (res.ok) {
-    let json = await res.json()
+    let json = await res.json();
     json.docs.forEach((b: any) => elements.push(b.title));
   }
   return elements;
@@ -32,9 +34,9 @@ const App: Component = () => {
         </div>
       </div>
       <div class="bg-gray-800 w-1/2 text-white max-h-screen flex flex-col">
-      <div class="h-[10%] overflow-scroll flex items-center justify-center">
-        <h1>Infinite Scrolling:</h1>
-      </div>
+        <div class="h-[10%] overflow-scroll flex items-center justify-center">
+          <h1>Infinite Scrolling:</h1>
+        </div>
         <div class="h-[90%] overflow-scroll">
           <For each={pages()}>{item => <p>{item}</p>}</For>
           <Show when={!end()}>
