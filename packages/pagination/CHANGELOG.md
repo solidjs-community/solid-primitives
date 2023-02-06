@@ -1,5 +1,11 @@
 # @solid-primitives/pagination
 
+## 0.1.0
+
+### Minor Changes
+
+- a6277325: added new `createInfiniteScroll` primitive
+
 ## 0.0.103
 
 ### Patch Changes
