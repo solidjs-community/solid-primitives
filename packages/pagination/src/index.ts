@@ -1,4 +1,4 @@
-import { createVisibilityObserver } from "@solid-primitives/intersection-observer";
+import { makeIntersectionObserver } from "@solid-primitives/intersection-observer";
 import { access, type Directive, noop, type MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, batch, JSX, Setter } from "solid-js";
 import { createComputed, createMemo, createResource, createSignal } from "solid-js";
@@ -256,19 +256,17 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
     setEnd: Setter<boolean>;
   }
 ] {
-  const [loader, setLoader] = createSignal<HTMLElement>();
   const [pages, setPages] = createSignal<T[]>([]);
   const [page, setPage] = createSignal(0);
   const [end, setEnd] = createSignal(false);
 
-  const visible = createVisibilityObserver()(loader);
-  const [contents] = createResource(page, fetcher);
-
-  createComputed(() => {
-    if (visible() && !end() && !contents.loading) {
+  const { add: setLoader } = makeIntersectionObserver([], e => { 
+    if (e.length > 0 && e[0].isIntersecting && !end() && !contents.loading) {
       setPage(p => p + 1);
     }
-  });
+  })
+
+  const [contents] = createResource(page, fetcher);
 
   createComputed(() => {
     const content = contents();

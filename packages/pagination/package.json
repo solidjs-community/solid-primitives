@@ -3,7 +3,9 @@
   "version": "0.0.103",
   "description": "A primitive that creates all the reactive data to manage your pagination.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
-  "contributors": [],
+  "contributors": [
+    "Mohan <mohanavel15@protonmail.com>"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/pagination#readme",
   "repository": {
