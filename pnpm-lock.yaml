@@ -420,9 +420,11 @@ importers:
 
   packages/pagination:
     specifiers:
+      '@solid-primitives/intersection-observer': workspace:^2.0.3
       '@solid-primitives/utils': ^5.0.0
       solid-js: ^1.6.0
     dependencies:
+      '@solid-primitives/intersection-observer': link:../intersection-observer
       '@solid-primitives/utils': link:../utils
       solid-js: 1.6.9
 
