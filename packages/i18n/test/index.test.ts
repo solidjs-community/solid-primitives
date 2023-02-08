@@ -5,10 +5,7 @@ import { describe, expect, it } from "vitest";
 
 describe("createI18nContext", () => {
   it("test locale switching", async () => {
-    const [[t, { add, locale }], dispose] = createRoot(dispose => [
-      createI18nContext(dict, "en"),
-      dispose
-    ]);
+    const [t, { add, locale }] = createRoot(() => createI18nContext(dict, "en"));
     Object.entries(dict).forEach(([lang, translations]) => add(lang, translations));
     locale("en");
     expect(t("hello", { name: "Tester" })).toBe("hello Tester, how are you?");
