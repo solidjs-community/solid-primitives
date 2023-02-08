@@ -1,5 +1,11 @@
 # @solid-primitives/i18n
 
+## 1.1.4
+
+### Patch Changes
+
+- 5525fd23: Check if `navigator` is defined before using it. (Fixes #307)
+
 ## 1.1.3
 
 ### Patch Changes
