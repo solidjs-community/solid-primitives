@@ -41,13 +41,6 @@
       "require": "./dist/server.cjs"
     },
     "browser": {
-      "development": {
-        "import": {
-          "types": "./dist/index.d.ts",
-          "default": "./dist/dev.js"
-        },
-        "require": "./dist/dev.cjs"
-      },
       "import": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
@@ -68,13 +61,6 @@
       },
       "require": "./dist/server.cjs"
     },
-    "development": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/dev.js"
-      },
-      "require": "./dist/dev.cjs"
-    },
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
@@ -85,7 +71,7 @@
     "start": "vite serve dev",
     "dev": "vite serve dev",
     "page": "vite build dev",
-    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "build": "jiti ../../scripts/build.ts --ssr",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
