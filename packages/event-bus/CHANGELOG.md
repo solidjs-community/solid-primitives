@@ -1,5 +1,17 @@
 # @solid-primitives/event-bus
 
+## 1.0.0
+
+### Major Changes
+
+- 13e93e6e: Simplify the API:
+
+  - Remove createSimpleEmitter (createEventBus has the same functionality now)
+  - Remove emit/remove Guards from event buses
+  - Remove value signal of createEventBus
+  - Replace createEmitter with one that can emit various events. A multi channel functionality similar to createEventHub. When event-bus is a single channel.
+  - Add `batchEmits` helper that will wrap passed bus and it's `emit` method with Solids `batch`
+
 ## 0.1.6
 
 ### Patch Changes
