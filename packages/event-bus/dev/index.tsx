@@ -1,11 +1,4 @@
-import {
-  createEventHub,
-  Listen,
-  createSimpleEmitter,
-  createEventStack,
-  EventStack,
-  Emit
-} from "../src";
+import { createEventHub, Listen, createEventStack, EventStack, Emit, createEventBus } from "../src";
 import { Component, createSignal, For, onMount } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
@@ -55,11 +48,11 @@ const PubsubTest: Component = () => {
     );
   };
 
-  const [sub, emit] = createSimpleEmitter<boolean>();
+  const bus = createEventBus<boolean>();
   return (
     <div class="wrapper-h">
-      <Switch emit={emit} />
-      <Light subscribe={sub} />
+      <Switch emit={bus.emit} />
+      <Light subscribe={bus.listen} />
     </div>
   );
 };
@@ -140,12 +133,7 @@ const HubChildNode: Component<{
 const NotificationsTest: Component = () => {
   const [inputText, setInputText] = createSignal("my message!");
 
-  let bus!: EventStack<
-    string,
-    {
-      text: string;
-    }
-  >;
+  let bus!: EventStack<string, { text: string }>;
 
   return (
     <div class="wrapper-h">
@@ -163,7 +151,7 @@ const NotificationsTest: Component = () => {
           oninput={e => setInputText(e.currentTarget.value)}
         ></input>
         <button class="btn">SEND</button>
-        <button class="btn" type="button" onclick={() => bus.setStack([])}>
+        <button class="btn" type="button" onclick={() => bus.setValue([])}>
           CLEAR
         </button>
       </form>
@@ -173,31 +161,12 @@ const NotificationsTest: Component = () => {
 };
 
 const Toaster: Component<{
-  useEventBus: (
-    bus: EventStack<
-      string,
-      {
-        text: string;
-      }
-    >
-  ) => void;
+  useEventBus: (bus: EventStack<string, { text: string }>) => void;
 }> = props => {
-  const bus = createEventStack<
-    string,
-    {
-      text: string;
-    }
-  >({
-    toValue: e => {
+  const bus = createEventStack({
+    toValue(e: string) {
       const text = e.length > 50 ? e.substring(0, 50) + "..." : e;
       return { text };
-    },
-    beforeEmit: e => {
-      console.log("bout to be emitted", e);
-    },
-    emitGuard: (emit, event) => {
-      if (event) emit();
-      else console.log("Empty messages are not allowed");
     },
     length: 10
   });
@@ -205,11 +174,11 @@ const Toaster: Component<{
 
   return (
     <div class="fixed top-4 right-4 flex flex-col items-end space-y-4">
-      <For each={bus.stack()}>
+      <For each={bus.value()}>
         {item => (
           <div class="p-2 px-3 bg-gray-600 animate-fade-in-down animate-count-1 animate-duration-150">
             <span class="mr-2">{item.text}</span>
-            <button onClick={() => bus.removeFromStack(item)}>X</button>
+            <button onClick={() => bus.setValue(prev => prev.filter(x => x !== item))}>X</button>
           </div>
         )}
       </For>

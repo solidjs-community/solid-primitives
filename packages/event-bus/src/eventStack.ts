@@ -1,120 +1,91 @@
+import { drop, filterOut, push } from "@solid-primitives/immutable";
 import { Accessor, createSignal, Setter } from "solid-js";
-import { createEmitter, Emitter, EmitterConfig } from "./emitter";
-import { GenericEmit } from "./types";
-import { push, drop, pick, filterOut } from "@solid-primitives/immutable";
-import { Modify } from "@solid-primitives/utils";
+import { createEventBus, Emit, Listen } from "./eventBus";
 
-export type EventStackListener<V> = (event: V, stack: V[], removeFromStack: VoidFunction) => void;
+export type EventStackPayload<E, V = E> = {
+  readonly event: V;
+  readonly stack: V[];
+  readonly remove: VoidFunction;
+};
 
-export type EventStack<E, V = E> = Modify<
-  Emitter<V, V[], VoidFunction>,
-  {
-    value: Accessor<V[]>;
-    stack: Accessor<V[]>;
-    setStack: Setter<V[]>;
-    removeFromStack: (value: V) => boolean;
-    emit: GenericEmit<[E]>;
-  }
->;
+export type EventStack<E, V = E> = {
+  readonly listen: Listen<EventStackPayload<V>>;
+  readonly clear: VoidFunction;
+  readonly value: Accessor<V[]>;
+  readonly setValue: Setter<V[]>;
+  readonly remove: (value: V) => boolean;
+  readonly emit: Emit<E>;
+};
 
-type Config<E, V> = {
-  length?: number;
-  emitGuard?: EmitterConfig<E>["emitGuard"];
-  removeGuard?: EmitterConfig<V, V[], VoidFunction>["removeGuard"];
-  beforeEmit?: EmitterConfig<V, V[], VoidFunction>["beforeEmit"];
+export type EventStackConfig<E, V = E> = {
+  readonly length?: number;
+  readonly toValue?: (event: E, stack: V[]) => V;
 };
 
 /**
  * Provides all the base functions of an event-emitter, functions for managing listeners, it's behavior could be customized with an config object.
  * Additionally it provides the emitted events in a list/history form, with tools to manage it.
  * 
- * @param config Emitter configuration: `emitGuard`, `removeGuard`, `beforeEmit` functions and `toValue` parsing event to a value in stack.
- * 
- * @returns event stack: `{listen, once, emit, remove, clear, has, stack, setStack, removeFromStack}`
+ * @returns event stack: `{listen, emit, remove, clear, value, setValue}`
  * 
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventStack
  * 
  * @example
 const bus = createEventStack<{ message: string }>();
 // can be destructured:
-const { listen, emit, has, clear, stack } = bus;
+const { listen, emit, clear, value } = bus;
 
-const listener: EventStackListener<{ text: string }> = (event, stack, removeValue) => {
+const listener: EventStackListener<{ text: string }> = ({ event, stack, remove }) => {
   console.log(event, stack);
   // you can remove the value from stack
-  removeValue();
+  remove();
 };
 bus.listen(listener);
 
-bus.emit({text: "foo"});
+bus.emit({ text: "foo" });
 
 // a signal accessor:
-bus.stack() // => { text: string }[]
+bus.value() // => { text: string }[]
 
-bus.removeFromStack(value) // pass a reference to the value
-
-bus.setStack(stack => stack.filter(item => {...}))
+bus.setValue(stack => stack.filter(item => {...}))
  */
 
-// Overload 0: "toValue" was not passed
-export function createEventStack<E extends object>(config?: Config<E, E>): EventStack<E, E>;
-// Overload 1: "toValue" was set
+export function createEventStack<E extends object>(config?: EventStackConfig<E>): EventStack<E, E>;
 export function createEventStack<E, V extends object>(
-  config: Config<E, V> & {
-    toValue: (event: E, stack: V[]) => V;
-  }
+  config: EventStackConfig<E, V> & { toValue: (event: E, stack: V[]) => V }
 ): EventStack<E, V>;
-
 export function createEventStack<E, V>(
-  config: Config<E, V> & {
+  config: EventStackConfig<E> & {
     toValue?: (event: E, stack: V[]) => V;
   } = {}
 ): EventStack<E, V> {
-  const { toValue = (e: any) => e, length = 0 } = config;
+  const { toValue = (e: any) => e as V, length = 0 } = config;
 
-  const [stack, setStack] = createSignal<V[]>([]);
-  const eventEmitter = createEmitter<E>(pick(config, "emitGuard"));
-  const valueEmitter = createEmitter<V, V[], VoidFunction>(
-    pick(config, "beforeEmit", "removeGuard")
-  );
+  const [stack, setValue] = /*#__PURE__*/ createSignal<V[]>([]);
+  const eventEventBus = createEventBus<E>();
+  const valueEventBus = createEventBus<EventStackPayload<V>>();
 
-  eventEmitter.listen(event => {
+  eventEventBus.listen(event => {
     const value = toValue(event, stack());
-    setStack(prev => {
+    setValue(prev => {
       let list = push(prev, value);
       return length && list.length > length ? drop(list) : list;
     });
-    valueEmitter.emit(value, stack(), () => removeFromStack(value));
+    valueEventBus.emit({
+      event: value,
+      stack: stack(),
+      remove: () => remove(value)
+    });
   });
 
-  const removeFromStack: EventStack<E, V>["removeFromStack"] = value =>
-    !!setStack(p => filterOut(p, value)).removed;
+  const remove: EventStack<E, V>["remove"] = value => !!setValue(p => filterOut(p, value)).removed;
 
   return {
-    ...valueEmitter,
-    emit: eventEmitter.emit,
+    clear: valueEventBus.clear,
+    listen: valueEventBus.listen,
+    emit: eventEventBus.emit,
     value: stack,
-    stack,
-    setStack,
-    removeFromStack
+    setValue,
+    remove
   };
 }
-
-// /* Type Check */
-// createEventStack<string>(); //Error
-// createEventStack<string, { text: string }>(); //Error
-// createEventStack<string, { text: string }>({
-//   toValue: e => e //Error
-// });
-
-// const x = createEventStack<string[]>();
-// x.emit(["Hello", "World"]);
-// x.listen((payload, stack, remove) => {});
-// x.value();
-
-// const y = createEventStack({
-//   toValue: (e: string) => ({ text: e })
-// });
-// y.emit("Hello");
-// y.listen((payload, stack, remove) => {});
-// y.value();
