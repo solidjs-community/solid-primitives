@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createRoot } from "solid-js";
+import { createRoot, createSignal } from "solid-js";
 import { createInfiniteScroll, createPagination } from "../src";
 
 describe("createPagination", () => {
@@ -34,6 +34,50 @@ describe("createPagination", () => {
       expect(paginationProps().findIndex(({ ["aria-current"]: current }) => current)).toBe(2);
       setPage(page() + 1);
       expect(paginationProps().findIndex(({ ["aria-current"]: current }) => current)).toBe(3);
+      dispose();
+    }));
+
+  test("createPagination clamps start", () =>
+    createRoot(dispose => {
+      const [paginationProps, _page, _setPage] = createPagination({
+        pages: 10,
+        maxPages: 13
+      });
+      const extraProps = 4;
+      expect(paginationProps().length, "pages").toBe(10 + extraProps);
+      dispose();
+    }));
+
+  test("createPagination reacts to options update", () =>
+    createRoot(dispose => {
+      const commonOptions = {
+        showFirst: false,
+        showPrev: false,
+        showNext: false,
+        showLast: false
+      };
+      const [options, setOptions] = createSignal({ ...commonOptions, pages: 10, maxPages: 20 });
+      const [paginationProps, _page, _setPage] = createPagination(options);
+      expect(paginationProps().length, "initial pages").toBe(10);
+      setOptions({ ...commonOptions, pages: 5, maxPages: 10 });
+      expect(paginationProps().length, "pages after change").toBe(5);
+      dispose();
+    }));
+
+  test("createPagination pages reused", () =>
+    createRoot(dispose => {
+      const commonOptions = {
+        showFirst: false,
+        showPrev: false,
+        showNext: false,
+        showLast: false
+      };
+      const [options, setOptions] = createSignal({ ...commonOptions, pages: 3 });
+      const [paginationProps, _page, _setPage] = createPagination(options);
+      const initialPages = paginationProps();
+      setOptions({ ...commonOptions, pages: 2 });
+      const updatedPages = paginationProps();
+      expect(updatedPages.every((page, index) => Object.is(page, initialPages[index]))).toBe(true);
       dispose();
     }));
 });
