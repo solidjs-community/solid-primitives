@@ -1,5 +1,11 @@
 # @solid-primitives/pagination
 
+## 0.2.0
+
+### Minor Changes
+
+- 46a2ae79: make options reactive, prevent wrong page slice
+
 ## 0.1.0
 
 ### Minor Changes

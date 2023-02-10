@@ -1,5 +1,15 @@
 # @solid-primitives/media
 
+## 2.1.0
+
+### Minor Changes
+
+- d009dafe: Fixes hydration issue with `createMediaQuery` and `usePrefersDark` (#310)
+
+  Adds `createPrefersDark` primitive to create a `prefersDark` media query without using a shared root
+
+  Removes `watchChange` option from `createMediaQuery` primitive
+
 ## 2.0.6
 
 ### Patch Changes
