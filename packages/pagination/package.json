@@ -4,6 +4,7 @@
   "description": "A primitive that creates all the reactive data to manage your pagination.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
+    "Martin Pengelly-Phillips <dev@thisbeyond.com>",
     "Mohan <mohanavel15@protonmail.com>"
   ],
   "license": "MIT",
