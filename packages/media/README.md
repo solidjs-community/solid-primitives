@@ -14,7 +14,7 @@ Collection of reactive primitives to deal with media queries.
 - [`makeMediaQueryListener`](#makeMediaQueryListener) - Listen for changes to provided Media Query.
 - [`createMediaQuery`](#createMediaQuery) - Creates a very simple and straightforward media query monitor.
 - [`createBreakpoints`](#createBreakpoints) - Creates a multi-breakpoint monitor to make responsive components easily.
-- [`usePrefersDark`](#usePrefersDark) - Provides a signal indicating if the user has requested dark color theme.
+- [`createPrefersDark`](#createPrefersDark) - Provides a signal indicating if the user has requested dark color theme.
 
 ## Installation
 
@@ -46,6 +46,17 @@ Creates a very simple and straightforward media query monitor.
 import { createMediaQuery } from "@solid-primitives/media";
 
 const isSmall = createMediaQuery("(max-width: 767px)");
+console.log(isSmall());
+```
+
+### Server fallback
+
+`createMediaQuery` accepts a `serverFallback` argument — value that should be returned on the server — defaults to `false`.
+
+```ts
+const isSmall = createMediaQuery("(max-width: 767px)", true);
+
+// will return true on the server and during hydration on the client
 console.log(isSmall());
 ```
 
@@ -98,11 +109,34 @@ const Example: Component = () => {
 
 [Working Demo](https://codesandbox.io/s/solid-responsive-breakpoints-h4emy8?file=/src/index.tsx)
 
-## `usePrefersDark`
+## `createPrefersDark`
 
 Provides a signal indicating if the user has requested dark color theme. The setting is being watched with a [Media Query](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme).
 
 ### How to use it
+
+```ts
+import { createPrefersDark } from "@solid-primitives/media";
+
+const prefersDark = createPrefersDark();
+createEffect(() => {
+  prefersDark(); // => boolean
+});
+```
+
+### Server fallback
+
+`createPrefersDark` accepts a `serverFallback` argument — value that should be returned on the server — defaults to `false`.
+
+```ts
+const prefersDark = createPrefersDark(true);
+// will return true on the server and during hydration on the client
+prefersDark();
+```
+
+### `usePrefersDark`
+
+This primitive provides a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) variant that will reuse the same signal and media query across the whole application.
 
 ```ts
 import { usePrefersDark } from "@solid-primitives/media";
@@ -113,15 +147,7 @@ createEffect(() => {
 });
 ```
 
-### Server fallback
-
-`usePrefersDark` accepts a `serverFallback` argument — value that should be returned on the server — defaults to `false`.
-
-```ts
-const prefersDark = usePrefersDark(true);
-// will return true on the server
-prefersDark();
-```
+> Note: `usePrefersDark` will deopt to `createPrefersDark` if used during hydration. (see issue [#310](https://github.com/solidjs-community/solid-primitives/issues/310))
 
 ## Changelog
 
