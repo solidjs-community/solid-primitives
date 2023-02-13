@@ -1,4 +1,11 @@
-import { createContext, createMemo, createSignal, JSXElement, useContext } from "solid-js";
+import {
+  createComponent,
+  createContext,
+  createMemo,
+  createSignal,
+  JSXElement,
+  useContext
+} from "solid-js";
 import { createStore } from "solid-js/store";
 
 /**
@@ -23,7 +30,7 @@ import { createStore } from "solid-js/store";
  * // => 'not found'
  * ```
  */
-const deepReadObject = <T extends any>(
+const deepReadObject = <T = any>(
   obj: Record<string, unknown>,
   path: string,
   defaultValue?: unknown
@@ -179,7 +186,7 @@ export type I18nPath<T> = {
     : never;
 };
 
-const buildI18nChain = <T,>(obj: T): I18nPath<T> => {
+const buildI18nChain = <T>(obj: T): I18nPath<T> => {
   const keys = Object.keys(obj as any) as (keyof T)[];
   const paths = keys.reduce((acc, key) => {
     const value = obj[key];
@@ -202,54 +209,59 @@ const buildI18nChain = <T,>(obj: T): I18nPath<T> => {
         }
       };
     } else {
-      throw new TypeError("Unsupported data format on the keys");
+      throw new TypeError(
+        "Unsupported data format on the keys. Values must resolve to a string or a function that returns a string"
+      );
     }
   }, {} as Partial<I18nPath<T>>);
 
   return paths as I18nPath<T>;
 };
 
-export const makeChainedI18nContext = <T extends object, K extends keyof T>(props: {
+type Dictionaries<T extends object = object> = {
+  [key: string]: I18nPath<T>;
+};
+
+export const makeChainedI18nContext = <T extends Dictionaries, K extends keyof T>(props: {
   dictionaries: T;
   locale: keyof T;
   setContext?: boolean;
 }) => {
-  const [store, setStore] = createStore<{ dictionaries: T; locale: keyof T }>(props);
+  const [_locale, _setLocale] = createSignal<K>(props.locale as K);
 
   const utils = {
-    locale(locale?: K): K {
-      if (locale) {
-        setStore("locale", locale);
-        return locale;
-      }
-      return store.locale as K;
+    locale(): K {
+      return _locale();
+    },
+    setLocale(locale: K): K {
+      _setLocale(() => locale);
+      return locale;
     },
     getDictionary(locale?: K): T[K] {
-      if (locale) return store.dictionaries[locale];
-      return store.dictionaries[store.locale as K];
+      if (locale) return props.dictionaries[locale];
+      return props.dictionaries[_locale()];
     }
   };
 
-  const chainedI18n = createMemo(() => buildI18nChain(store.dictionaries[store.locale]));
+  const chainedI18n = createMemo(() => buildI18nChain(props.dictionaries[_locale()]));
 
   const translate = () => {
     return chainedI18n();
   };
 
-  const context = createContext<[typeof translate, typeof utils] | null>(
+  const chainedI18nContext = createContext<[typeof translate, typeof utils] | null>(
     props.setContext ? [translate, utils] : null
   );
 
   return {
-    I18nProvider: (props: { children: JSXElement }) => (
-      <context.Provider value={[translate, utils]}>{props.children}</context.Provider>
-    ),
-    useI18n: () => {
-      const i18nContext = useContext(context);
-      if (!i18nContext) {
-        throw new TypeError("useI18n must be used within a I18nProvider");
-      }
-      return i18nContext;
-    }
+    I18nProvider: (props: { children: JSXElement }): JSXElement => {
+      return createComponent(chainedI18nContext.Provider, {
+        value: [translate, utils],
+        get children() {
+          return props.children;
+        }
+      });
+    },
+    useI18nContext: () => useContext(chainedI18nContext)
   };
 };

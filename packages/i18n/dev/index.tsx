@@ -4,18 +4,30 @@ import { render } from "solid-js/web";
 import { makeChainedI18nContext } from "../src/index";
 import { dict } from "../test/setup";
 
-const { I18nProvider, useI18n } = makeChainedI18nContext({ dictionaries: dict, locale: "en" });
+const { I18nProvider, useI18nContext } = makeChainedI18nContext({
+  dictionaries: dict,
+  locale: "en"
+});
 
 export { useI18n };
 
+const useI18n = () => {
+  const context = useI18nContext();
+  if (!context) {
+    throw new Error("useI18n must be used within an I18nProvider");
+  }
+
+  return context;
+};
+
 const LanguageToggle: Component = () => {
-  const [, { locale }] = useI18n();
+  const [, { setLocale }] = useI18n();
 
   return (
     <div>
-      <button onClick={() => locale("en")}>English</button>
-      <button onClick={() => locale("fr")}>French</button>
-      <button onClick={() => locale("es")}>Spanish</button>
+      <button onClick={() => setLocale("en")}>English</button>
+      <button onClick={() => setLocale("fr")}>French</button>
+      <button onClick={() => setLocale("es")}>Spanish</button>
     </div>
   );
 };
@@ -31,8 +43,9 @@ const App: Component = () => {
       </p>
       <button onClick={() => setName(n => (n === "User" ? "Viewer" : "User"))}>Change Name</button>
       <div style={{ "margin-bottom": "15px" }} />
-      <h1>{t().hello({ name: name() })}</h1>
-      <h1>{t().goodbye({ name: name() })}</h1>
+      <h4>{t().hello({ name: name() })}</h4>
+      <h4>{t().goodbye({ name: name() })}</h4>
+      <h4>{t().food.meat()}</h4>
     </div>
   );
 };
