@@ -210,7 +210,9 @@ const buildI18nChain = <T>(obj: T): I18nPath<T> => {
       };
     } else {
       throw new TypeError(
-        "Unsupported data format on the keys. Values must resolve to a string or a function that returns a string"
+        `Unsupported data format on the keys. Values must resolve to a string or a function that returns a string. Key name: "${
+          key as string
+        }"`
       );
     }
   }, {} as Partial<I18nPath<T>>);
