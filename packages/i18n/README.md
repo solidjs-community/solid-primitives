@@ -118,9 +118,9 @@ const App: Component = () => {
       <button onClick={addLanguage}>add and set swedish</button>
       <input value={name()} onInput={e => setName(e.target.value)} />
       <hr />
-      <h1>{t().hello({ name: name() })}!</h1>
+      <h1>{t.hello({ name: name() })}!</h1>
       <p>{locale()}</p>
-      <p>{t().goodbye({ name: name() })}</p>
+      <p>{t.goodbye({ name: name() })}</p>
       <pre>
         <code>{JSON.stringify(getDictionary(), null, 4)}</code>
       </pre>

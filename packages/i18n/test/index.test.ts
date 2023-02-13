@@ -55,13 +55,13 @@ describe("makeChainedI18nContext", () => {
 
     const [t, { setLocale }] = useI18nContext()!;
 
-    expect(t().hello({ name: "Tester" })).toBe("hello Tester, how are you?");
-    expect(t().goodbye({ name: "Tester" })).toBe("goodbye Tester");
-    expect(t().food.meat()).toBe("meat");
+    expect(t.hello({ name: "Tester" })).toBe("hello Tester, how are you?");
+    expect(t.goodbye({ name: "Tester" })).toBe("goodbye Tester");
+    expect(t.food.meat()).toBe("meat");
 
     setLocale("fr");
-    expect(t().hello({ name: "Tester" })).toBe("bonjour Tester, comment vas-tu ?");
-    expect(t().goodbye({ name: "Tester" })).toBe("au revoir Tester");
-    expect(t().food.meat()).toBe("viande");
+    expect(t.hello({ name: "Tester" })).toBe("bonjour Tester, comment vas-tu ?");
+    expect(t.goodbye({ name: "Tester" })).toBe("au revoir Tester");
+    expect(t.food.meat()).toBe("viande");
   });
 });

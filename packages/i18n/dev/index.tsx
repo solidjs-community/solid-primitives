@@ -41,9 +41,9 @@ const App: Component = () => {
       </p>
       <button onClick={() => setName(n => (n === "User" ? "Viewer" : "User"))}>Change Name</button>
       <div style={{ "margin-bottom": "15px" }} />
-      <h4>{t().hello({ name: name() })}</h4>
-      <h4>{t().goodbye({ name: name() })}</h4>
-      <h4>{t().food.meat()}</h4>
+      <h4>{t.hello({ name: name() })}</h4>
+      <h4>{t.goodbye({ name: name() })}</h4>
+      <h4>{t.food.meat()}</h4>
     </div>
   );
 };

@@ -1,11 +1,4 @@
-import {
-  createComponent,
-  createContext,
-  createMemo,
-  createSignal,
-  JSXElement,
-  useContext
-} from "solid-js";
+import { createComponent, createContext, createSignal, JSXElement, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 /**
@@ -229,26 +222,20 @@ export const makeChainedI18nContext = <T extends Dictionaries, K extends keyof T
   locale: keyof T;
   setContext?: boolean;
 }) => {
-  const [_locale, _setLocale] = createSignal<K>(props.locale as K);
+  const [locale, _setLocale] = createSignal<K>(props.locale as K);
+  const [translate, _setTranslate] = createStore(buildI18nChain(props.dictionaries[props.locale]));
 
   const utils = {
-    locale(): K {
-      return _locale();
+    locale,
+    setLocale(newLocale: K): K {
+      _setTranslate(buildI18nChain(props.dictionaries[newLocale]));
+      _setLocale(() => newLocale);
+      return newLocale;
     },
-    setLocale(locale: K): K {
-      _setLocale(() => locale);
-      return locale;
-    },
-    getDictionary(locale?: K): T[K] {
-      if (locale) return props.dictionaries[locale];
-      return props.dictionaries[_locale()];
+    getDictionary(language?: K): T[K] {
+      if (language) return props.dictionaries[language];
+      return props.dictionaries[locale()];
     }
-  };
-
-  const chainedI18n = createMemo(() => buildI18nChain(props.dictionaries[_locale()]));
-
-  const translate = () => {
-    return chainedI18n();
   };
 
   const chainedI18nContext = createContext<[typeof translate, typeof utils] | null>(
