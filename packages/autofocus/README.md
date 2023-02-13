@@ -26,7 +26,7 @@ pnpm add @solid-primitives/autofocus
 
 ## How to use it
 
-### use:autofocus directive
+### use:autofocus
 
 ```ts
 import { autofocus } from "@solid-primitives/autofocus";
@@ -39,7 +39,7 @@ import { autofocus } from "@solid-primitives/autofocus";
 The `autofocus` directive uses the native `autofocus` attribute to determine if it should focus th element or not.
 Using this directive without `autofocus={true}` (or the shorthand `autofocus`) will not perform anything.
 
-### createAutofocus;
+### createAutofocus
 
 ```ts
 import { createAutofocus } from "@solid-primitives/autofocus";
