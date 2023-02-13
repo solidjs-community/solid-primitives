@@ -212,6 +212,7 @@ const buildI18nChain = <T,>(obj: T): I18nPath<T> => {
 export const makeChainedI18nContext = <T extends object, K extends keyof T>(props: {
   dictionaries: T;
   locale: keyof T;
+  setContext?: boolean;
 }) => {
   const [store, setStore] = createStore<{ dictionaries: T; locale: keyof T }>(props);
 
@@ -222,9 +223,6 @@ export const makeChainedI18nContext = <T extends object, K extends keyof T>(prop
         return locale;
       }
       return store.locale as K;
-    },
-    changeLocale(locale: K) {
-      setStore("locale", locale);
     },
     getDictionary(locale?: K): T[K] {
       if (locale) return store.dictionaries[locale];
@@ -238,7 +236,9 @@ export const makeChainedI18nContext = <T extends object, K extends keyof T>(prop
     return chainedI18n();
   };
 
-  const context = createContext<[typeof translate, typeof utils] | null>(null);
+  const context = createContext<[typeof translate, typeof utils] | null>(
+    props.setContext ? [translate, utils] : null
+  );
 
   return {
     I18nProvider: (props: { children: JSXElement }) => (

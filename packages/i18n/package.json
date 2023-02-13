@@ -39,7 +39,7 @@
     "dev": "vite serve dev",
     "page": "vite build dev",
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
-    "build": "jiti ../../scripts/build.ts",
+    "build": "jiti ../../scripts/build.ts --jsx",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
