@@ -15,25 +15,53 @@ describe("createI18nContext", () => {
 });
 
 describe("makeChainedI18nContext", () => {
-  it("test locale switching", async () => {
+  it("Context should be null if setContext !== true", async () => {
+    const { useI18nContext } = createRoot(() =>
+      makeChainedI18nContext({ dictionaries: dict, locale: "en" })
+    );
+
+    const context = useI18nContext();
+
+    expect(context).toBe(null);
+  });
+  it("Context should be set if setContext === true", async () => {
     const { useI18nContext } = createRoot(() =>
       makeChainedI18nContext({ dictionaries: dict, locale: "en", setContext: true })
     );
 
-    const [t, { locale, setLocale }] = useI18nContext()!;
+    const context = useI18nContext();
+
+    expect(context).not.toBe(null);
+  });
+  it("Locale switching works", async () => {
+    const { useI18nContext } = createRoot(() =>
+      makeChainedI18nContext({ dictionaries: dict, locale: "en", setContext: true })
+    );
+
+    const [, { locale, setLocale }] = useI18nContext()!;
 
     expect(locale()).toBe("en");
 
     setLocale("fr");
     expect(locale()).toBe("fr");
+
+    setLocale("en");
+    expect(locale()).toBe("en");
+  });
+  it("Translations work", async () => {
+    const { useI18nContext } = createRoot(() =>
+      makeChainedI18nContext({ dictionaries: dict, locale: "en", setContext: true })
+    );
+
+    const [t, { setLocale }] = useI18nContext()!;
+
+    expect(t().hello({ name: "Tester" })).toBe("hello Tester, how are you?");
+    expect(t().goodbye({ name: "Tester" })).toBe("goodbye Tester");
+    expect(t().food.meat()).toBe("meat");
+
+    setLocale("fr");
     expect(t().hello({ name: "Tester" })).toBe("bonjour Tester, comment vas-tu ?");
     expect(t().goodbye({ name: "Tester" })).toBe("au revoir Tester");
     expect(t().food.meat()).toBe("viande");
-
-    setLocale("en");
-    expect(t().hello({ name: "Tester" })).toBe("hello Tester, how are you?");
-    expect(t().goodbye({ name: "Tester" })).toBe("goodbye Tester");
-    expect(locale()).toBe("en");
-    expect(t().food.meat()).toBe("meat");
   });
 });
