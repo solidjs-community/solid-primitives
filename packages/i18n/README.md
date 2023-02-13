@@ -19,7 +19,7 @@ Install it:
 yarn add @solid-primitives/i18n
 ```
 
-Use it:
+createI18nContext:
 
 ```tsx
 import { render } from "solid-js/web";
@@ -73,9 +73,74 @@ render(
 );
 ```
 
+makeChainedI18nContext:
+
+```tsx
+import { render } from "solid-js/web";
+import { Component, createSignal, Component } from "solid-js";
+
+import { makeChainedI18nContext } from "@solid-primitives/i18n";
+
+const dictionaries = {
+  fr: {
+    hello: "bonjour {{ name }}, comment vas-tu ?",
+    goodbye: ({ name }: { name: string }) => `au revoir ${name}`
+  },
+  en: {
+    hello: "hello {{ name }}, how are you?",
+    goodbye: ({ name }: { name: string }) => `goodbye ${name}`
+  }
+};
+
+const { I18nProvider, useI18nContext } = makeChainedI18nContext({
+  dictionaries,
+  locale: "en", // Starting locale
+  setContext: false // If the context should be set on creation, or not until there is a provider.
+});
+
+export const useI18n = () => {
+  const context = useI18nContext();
+  if (!context) {
+    throw new Error("useI18n must be used within an I18nProvider");
+  }
+
+  return context;
+};
+
+const App: Component = () => {
+  const [t, { locale, setLocale, getDictionary }] = useI18n();
+  const [name, setName] = createSignal("Greg");
+
+  return (
+    <>
+      <button onClick={() => setLocale("fr")}>fr</button>
+      <button onClick={() => setLocale("en")}>en</button>
+      <button onClick={addLanguage}>add and set swedish</button>
+      <input value={name()} onInput={e => setName(e.target.value)} />
+      <hr />
+      <h1>{t().hello({ name: name() })}!</h1>
+      <p>{locale()}</p>
+      <p>{t().goodbye({ name: name() })}</p>
+      <pre>
+        <code>{JSON.stringify(getDictionary(), null, 4)}</code>
+      </pre>
+    </>
+  );
+};
+
+render(
+  () => (
+    <I18nContext.Provider value={value}>
+      <App />
+    </I18nContext.Provider>
+  ),
+  document.getElementById("app")
+);
+```
+
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/use-i18n-rd7jq?file=/src/index.tsx
+You may view a working example of createI18nContext here: https://codesandbox.io/s/use-i18n-rd7jq?file=/src/index.tsx
 
 ## Changelog
 

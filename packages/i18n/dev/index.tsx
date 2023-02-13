@@ -9,9 +9,7 @@ const { I18nProvider, useI18nContext } = makeChainedI18nContext({
   locale: "en"
 });
 
-export { useI18n };
-
-const useI18n = () => {
+export const useI18n = () => {
   const context = useI18nContext();
   if (!context) {
     throw new Error("useI18n must be used within an I18nProvider");
