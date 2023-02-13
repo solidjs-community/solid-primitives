@@ -36,7 +36,7 @@ import { autofocus } from "@solid-primitives/autofocus";
 </button>;
 ```
 
-The `autofocus` directive uses the native `autofocus` attribute to determine if it should focus th element or not.
+The `autofocus` directive uses the native `autofocus` attribute to determine it should focus the element or not.
 Using this directive without `autofocus={true}` (or the shorthand `autofocus`) will not perform anything.
 
 ### createAutofocus
