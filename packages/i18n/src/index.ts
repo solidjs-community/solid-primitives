@@ -167,22 +167,22 @@ export const I18nContext = createContext<I18nContextInterface>({} as I18nContext
 export const useI18n = () => useContext(I18nContext);
 
 // -------------------------- Chained I18n -------------------
-type I18nFormatArgs = Record<string, string | number>;
+export type I18nFormatOptions = Record<string, string | number>;
 
 export type I18nPath<T> = {
   [K in keyof T]: T[K] extends Record<string, unknown>
     ? I18nPath<T[K]>
-    : T[K] extends (...args: any) => string
-    ? (...args: Parameters<T[K]>) => string
+    : T[K] extends (options: infer OptionsArgs) => string
+    ? (options: OptionsArgs) => string
     : T[K] extends string
-    ? (args?: I18nFormatArgs) => string
+    ? (options?: I18nFormatOptions) => string
     : never;
 };
 
 const buildI18nChain = <T>(obj: T): I18nPath<T> => {
   const keys = Object.keys(obj as any) as (keyof T)[];
   const paths = keys.reduce((acc, key) => {
-    const value = obj[key];
+    const value = obj[key] as any;
     if (typeof value === "object") {
       return {
         ...acc,
@@ -197,7 +197,7 @@ const buildI18nChain = <T>(obj: T): I18nPath<T> => {
     if (typeof value === "string") {
       return {
         ...acc,
-        [key]: (args: I18nFormatArgs) => {
+        [key]: (args: I18nFormatOptions) => {
           return value.replace(/{{(.*?)}}/g, (_, key) => deepReadObject(args, key, ""));
         }
       };
@@ -213,7 +213,7 @@ const buildI18nChain = <T>(obj: T): I18nPath<T> => {
   return paths as I18nPath<T>;
 };
 
-type Dictionaries<T extends object = object> = {
+export type Dictionaries<T extends object = object> = {
   [key: string]: I18nPath<T>;
 };
 
