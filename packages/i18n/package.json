@@ -36,6 +36,8 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
+    "dev": "vite serve dev",
+    "page": "vite build dev",
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",

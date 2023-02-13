@@ -1,4 +1,4 @@
-import { createSignal, createContext, useContext } from "solid-js";
+import { createContext, createMemo, createSignal, JSXElement, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 /**
@@ -23,7 +23,7 @@ import { createStore } from "solid-js/store";
  * // => 'not found'
  * ```
  */
-const deepReadObject = <T = any>(
+const deepReadObject = <T extends any>(
   obj: Record<string, unknown>,
   path: string,
   defaultValue?: unknown
@@ -61,6 +61,7 @@ const template = (str: string, params: Record<string, string>, reg: RegExp = /{{
  *
  * @param [init={}] {Record<string, Record<string, any>>} - Initial dictionary of languages
  * @param [lang=navigator.language] {string} - The default language fallback to browser language if not set
+ * @param [options={}] { chained: boolean } -
  */
 export const createI18nContext = (
   init: Record<string, Record<string, any>> = {},
@@ -112,7 +113,7 @@ export const createI18nContext = (
     const val = deepReadObject(dict[locale()], key, defaultValue || "");
     if (typeof val === "function") return val(params);
     if (typeof val === "string") return template(val, params || {});
-    return val;
+    return val as string;
   };
   const actions = {
     /**
@@ -157,10 +158,98 @@ export const createI18nContext = (
      */
     dict: (lang: string) => deepReadObject(dict, lang)
   };
-  return [translate, actions];
+  return [translate, actions as any];
 };
 
 type I18nContextInterface = ReturnType<typeof createI18nContext>;
 
 export const I18nContext = createContext<I18nContextInterface>({} as I18nContextInterface);
 export const useI18n = () => useContext(I18nContext);
+
+// -------------------------- Chained I18n -------------------
+type I18nFormatArgs = Record<string, string | number>;
+
+export type I18nPath<T> = {
+  [K in keyof T]: T[K] extends Record<string, unknown>
+    ? I18nPath<T[K]>
+    : T[K] extends (...args: any) => string
+    ? (...args: Parameters<T[K]>) => string
+    : T[K] extends string
+    ? (args?: I18nFormatArgs) => string
+    : never;
+};
+
+const buildI18nChain = <T,>(obj: T): I18nPath<T> => {
+  const keys = Object.keys(obj as any) as (keyof T)[];
+  const paths = keys.reduce((acc, key) => {
+    const value = obj[key];
+    if (typeof value === "object") {
+      return {
+        ...acc,
+        [key]: buildI18nChain(value)
+      } as any;
+    } else if (typeof value === "function") {
+      return {
+        ...acc,
+        [key]: obj[key]
+      };
+    }
+    if (typeof value === "string") {
+      return {
+        ...acc,
+        [key]: (args: I18nFormatArgs) => {
+          return value.replace(/{{(.*?)}}/g, (_, key) => deepReadObject(args, key, ""));
+        }
+      };
+    } else {
+      throw new TypeError("Unsupported data format on the keys");
+    }
+  }, {} as Partial<I18nPath<T>>);
+
+  return paths as I18nPath<T>;
+};
+
+export const makeChainedI18nContext = <T extends object, K extends keyof T>(props: {
+  dictionaries: T;
+  locale: keyof T;
+}) => {
+  const [store, setStore] = createStore<{ dictionaries: T; locale: keyof T }>(props);
+
+  const utils = {
+    locale(locale?: K): K {
+      if (locale) {
+        setStore("locale", locale);
+        return locale;
+      }
+      return store.locale as K;
+    },
+    changeLocale(locale: K) {
+      setStore("locale", locale);
+    },
+    getDictionary(locale?: K): T[K] {
+      if (locale) return store.dictionaries[locale];
+      return store.dictionaries[store.locale as K];
+    }
+  };
+
+  const chainedI18n = createMemo(() => buildI18nChain(store.dictionaries[store.locale]));
+
+  const translate = () => {
+    return chainedI18n();
+  };
+
+  const context = createContext<[typeof translate, typeof utils] | null>(null);
+
+  return {
+    I18nProvider: (props: { children: JSXElement }) => (
+      <context.Provider value={[translate, utils]}>{props.children}</context.Provider>
+    ),
+    useI18n: () => {
+      const i18nContext = useContext(context);
+      if (!i18nContext) {
+        throw new TypeError("useI18n must be used within a I18nProvider");
+      }
+      return i18nContext;
+    }
+  };
+};
