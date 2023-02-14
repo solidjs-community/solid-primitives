@@ -28,7 +28,7 @@ pnpm add @solid-primitives/autofocus
 
 ### use:autofocus
 
-```ts
+```tsx
 import { autofocus } from "@solid-primitives/autofocus";
 
 <button use:autofocus autofocus={true}>
@@ -41,7 +41,7 @@ Using this directive without `autofocus={true}` (or the shorthand `autofocus`) w
 
 ### createAutofocus
 
-```ts
+```tsx
 import { createAutofocus } from "@solid-primitives/autofocus";
 
 // Using ref
