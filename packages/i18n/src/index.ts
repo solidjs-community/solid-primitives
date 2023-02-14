@@ -169,18 +169,51 @@ export const useI18n = () => useContext(I18nContext);
 // -------------------------- Chained I18n -------------------
 export type I18nFormatOptions = Record<string, string | number>;
 
-export type I18nPath<T> = {
-  [K in keyof T]: T[K] extends Record<string, unknown>
+interface I18nObject {
+  readonly [x: string]: string | ((...args: any) => any) | I18nObject;
+}
+
+type I18nFormatArgs = Record<string, string | number>;
+
+export type I18nPath<T extends I18nObject> = {
+  [K in keyof T]: T[K] extends I18nObject
     ? I18nPath<T[K]>
     : T[K] extends (options: infer OptionsArgs) => string
     ? (options: OptionsArgs) => string
-    : T[K] extends string
-    ? (options?: I18nFormatOptions) => string
-    : never;
+    : (options?: I18nFormatArgs) => string;
 };
 
-const buildI18nChain = <T>(obj: T): I18nPath<T> => {
-  const keys = Object.keys(obj as any) as (keyof T)[];
+export type Dictionaries<T extends I18nObject> = {
+  [key: string]: T;
+};
+
+type AddFunctionLengths<T> = T extends string
+  ? string
+  : T extends (...args: infer A) => unknown
+  ? T & { __length: A["length"] }
+  : {
+      [K in keyof T]: AddFunctionLengths<T[K]>;
+    };
+
+type RemoveFunctionLengths<T> = T extends string
+  ? string
+  : T extends (args: infer A) => infer R
+  ? (args: A) => R
+  : {
+      [K in keyof T]: RemoveFunctionLengths<T[K]>;
+    };
+
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void
+  ? I
+  : never;
+
+type GuaranteeIdenticalSignatures<T extends Dictionaries<I18nObject>> = Record<
+  keyof T,
+  RemoveFunctionLengths<UnionToIntersection<AddFunctionLengths<T[keyof T]>>>
+>;
+
+const buildI18nChain = <T extends I18nObject>(obj: T): I18nPath<T> => {
+  const keys = Object.keys(obj) as (keyof T)[];
   const paths = keys.reduce((acc, key) => {
     const value = obj[key] as any;
     if (typeof value === "object") {
@@ -217,8 +250,11 @@ export interface I18nDictionary {
   readonly [x: string]: string | ((...args: any) => string) | I18nDictionary;
 }
 
-export const makeChainedI18nContext = <T extends I18nDictionary, K extends keyof T>(props: {
-  dictionaries: T;
+export const makeChainedI18nContext = <
+  T extends Dictionaries<I18nObject>,
+  K extends keyof T
+>(props: {
+  dictionaries: T & GuaranteeIdenticalSignatures<T>;
   locale: keyof T;
   setContext?: boolean;
 }) => {
