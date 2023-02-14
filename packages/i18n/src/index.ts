@@ -213,11 +213,11 @@ const buildI18nChain = <T>(obj: T): I18nPath<T> => {
   return paths as I18nPath<T>;
 };
 
-export type Dictionaries<T extends object = object> = {
-  [key: string]: I18nPath<T>;
-};
+export interface I18nDictionary {
+  readonly [x: string]: string | ((...args: any) => string) | I18nDictionary;
+}
 
-export const makeChainedI18nContext = <T extends Dictionaries, K extends keyof T>(props: {
+export const makeChainedI18nContext = <T extends I18nDictionary, K extends keyof T>(props: {
   dictionaries: T;
   locale: keyof T;
   setContext?: boolean;
