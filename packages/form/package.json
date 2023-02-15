@@ -47,6 +47,13 @@
     "solid",
     "primitives"
   ],
+  "devDependencies": {
+    "@types/lodash.set": "4.3.7"
+  },
+  "dependencies": {
+    "zod": "3.20.6",
+    "lodash.set": "4.3.2"
+  },
   "peerDependencies": {
     "solid-js": "^1.6.0"
   },

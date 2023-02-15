@@ -1,46 +1,45 @@
-import { createStore } from "solid-js/store";
+import set from "lodash.set";
+import { z, ZodError } from "zod";
 
-// type FormSubmitEvent = Event & {
-//   submitter: HTMLElement;
-// } & {
-//   currentTarget: HTMLFormElement;
-//   target: Element;
-// };
+export type FormError<T> = {
+  data: T;
+  error: ZodError;
+};
 
-// export type FormErrors<F extends object> = { [K in keyof F]: boolean };
-// function createErrors<F extends object>(data: F): FormErrors<F> {
-//   const values = Object.keys(data) as Array<keyof F>;
+export type CreateFormOptions<T> = {
+  schema: z.AnyZodObject;
+  onSubmit: (data: T) => Promise<void> | void;
+  onError: (errors: FormError<T>) => void | Promise<void>;
+};
 
-//   const errors = values.reduce((acc, val) => {
-//     acc[val] = false;
-//     return acc;
-//   }, {} as Partial<FormErrors<F>>);
+type FormEvent = Event & {
+  submitter: HTMLElement;
+} & {
+  currentTarget: HTMLFormElement;
+  target: Element;
+};
 
-//   return errors as FormErrors<F>;
-// }
+export const createForm = <T>(options: CreateFormOptions<T>) => {
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
 
-export const createForm = <F extends object>(initialFormData: F) => {
-  const [formData, setFormData] = createStore<F>(initialFormData);
+    let data: Partial<T> = {};
 
-  const updateForm = <K extends keyof F>(key: K, value: F[K]): void => {
-    setFormData(key as any, value);
-  };
+    for (const [name, value] of formData.entries()) {
+      const v = isNaN(value as any) ? value : Number(value);
+      set(data, name, v);
+    }
 
-  const bulkUpdateForm = (bulkUpdateData: Partial<F>): void => {
-    setFormData(val => ({
-      ...val,
-      ...bulkUpdateData
-    }));
-  };
-
-  const overrideForm = (overrideData: F): void => {
-    setFormData(() => overrideData);
+    try {
+      options.schema.parse(data);
+      options.onSubmit(data as T);
+    } catch (e) {
+      options.onError({ data: data as T, error: e as ZodError });
+    }
   };
 
   return {
-    formData,
-    updateForm,
-    bulkUpdateForm,
-    overrideForm
+    handleSubmit
   };
 };
