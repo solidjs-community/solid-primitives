@@ -225,6 +225,15 @@ importers:
       node-fetch: 3.3.0
       solid-js: 1.6.9
 
+  packages/form:
+    specifiers:
+      solid-js: ^1.6.0
+      zod: 3.20.6
+    dependencies:
+      solid-js: 1.6.9
+    devDependencies:
+      zod: 3.20.6
+
   packages/fullscreen:
     specifiers:
       solid-js: ^1.6.0
@@ -8409,4 +8418,8 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+    dev: true
+
+  /zod/3.20.6:
+    resolution: {integrity: sha512-oyu0m54SGCtzh6EClBVqDDlAYRz4jrVtKwQ7ZnsEmMI9HnzuZFj8QFwAY1M5uniIYACdGvv0PBWPF2kO0aNofA==}
     dev: true

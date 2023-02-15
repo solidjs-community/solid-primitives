@@ -1,0 +1,57 @@
+{
+  "name": "@solid-primitives/form",
+  "version": "1.1.4",
+  "description": "Primitive to create and compose forms",
+  "author": "Tanner Scadden <tanner@scaddenfamily.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/form",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "form",
+    "stage": 3,
+    "list": [
+      "createForm"
+    ],
+    "category": "Utilities"
+  },
+  "files": [
+    "dist"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "browser": {},
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "dev": "vite serve dev",
+    "page": "vite build dev",
+    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
+    "build": "jiti ../../scripts/build.ts",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
+  "keywords": [
+    "form",
+    "solid",
+    "primitives"
+  ],
+  "devDependencies": {
+    "zod": "3.20.6"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.0"
+  },
+  "typesVersions": {}
+}
