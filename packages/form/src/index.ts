@@ -1,9 +1,8 @@
-import { ZodError } from "zod";
 import { getParseFn, Parser } from "./getParseFn";
 
 export type FormError<T> = {
   data: T;
-  error: ZodError;
+  error: unknown;
 };
 
 export type CreateFormOptions<T> = {
@@ -51,7 +50,7 @@ export const createForm = <T>(options: CreateFormOptions<T>) => {
       }
       options.onSubmit(data as T);
     } catch (e) {
-      options.onError({ data: data as T, error: e as ZodError });
+      options.onError({ data: data as T, error: e });
     }
   };
 
