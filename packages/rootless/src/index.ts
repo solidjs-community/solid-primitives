@@ -16,14 +16,11 @@ import { AnyFunction, asArray, access } from "@solid-primitives/utils";
  *    return [dispose, memo]
  * }, owner, owner2);
  */
-export function createSubRoot<T>(
-  fn: (dispose: VoidFunction) => T,
-  ...owners: typeof Owner[]
-): T {
+export function createSubRoot<T>(fn: (dispose: VoidFunction) => T, ...owners: (typeof Owner)[]): T {
   if (owners.length === 0) owners = [getOwner()];
-  return createRoot((dispose) => {
+  return createRoot(dispose => {
     asArray(access(owners)).forEach(
-      (owner) => owner && runWithOwner(owner, onCleanup.bind(void 0, dispose))
+      owner => owner && runWithOwner(owner, onCleanup.bind(void 0, dispose))
     );
     return fn(dispose);
   }, owners[0]);
