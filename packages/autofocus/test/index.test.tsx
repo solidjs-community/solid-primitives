@@ -63,17 +63,4 @@ describe("createAutofocus", () => {
     await new Promise(r => setTimeout(r, 1)); // Wait for the internal setTimeout() to run.
     expect(document.activeElement).toBe(result.container.querySelector("button"));
   });
-
-  test("createAutofocus doesn't focus when autofocus is passed false", async () => {
-    const result = render(() => {
-      let ref!: HTMLButtonElement;
-
-      createAutofocus(() => ref, false);
-
-      return <button ref={ref}>Autofocused</button>;
-    });
-
-    await new Promise(r => setTimeout(r, 1)); // Wait for the internal setTimeout() to run.
-    expect(document.activeElement).toBe(document.body);
-  });
 });

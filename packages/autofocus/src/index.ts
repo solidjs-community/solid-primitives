@@ -1,4 +1,5 @@
 import { createEffect, onMount, JSX, Accessor } from "solid-js";
+import { FalsyValue } from "../../utils";
 
 declare module "solid-js" {
   namespace JSX {
@@ -21,7 +22,7 @@ declare module "solid-js" {
  * <button use:autofocus autofocus={true}>Autofocused</button>;
  * ```
  */
-export const autofocus = (element: HTMLInputElement, autofocus: () => boolean) => {
+export const autofocus = (element: HTMLElement, autofocus: Accessor<boolean>) => {
   if (!autofocus()) {
     return;
   }
@@ -50,15 +51,10 @@ export const autofocus = (element: HTMLInputElement, autofocus: () => boolean) =
  * <button ref={ref}>Autofocused</button>;
  * ```
  */
-export const createAutofocus = (
-  ref: Accessor<HTMLElement | undefined>,
-  autofocus: boolean = true
-) => {
+export const createAutofocus = (ref: Accessor<HTMLElement | FalsyValue>) => {
   createEffect(() => {
-    if (autofocus)
-      setTimeout(() => {
-        ref()?.focus();
-      });
+    const el = ref();
+    el && setTimeout(() => el.focus());
   });
 };
 
