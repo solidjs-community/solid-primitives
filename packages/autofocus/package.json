@@ -1,0 +1,74 @@
+{
+  "name": "@solid-primitives/autofocus",
+  "version": "0.0.100",
+  "description": "Primitives for autofocusing HTML elements",
+  "author": "jer3m01 <jer3m01@jer3m01.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/autofocus#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "autofocus",
+    "stage": 0,
+    "list": [
+      "autofocus",
+      "createAutofocus"
+    ],
+    "category": "Inputs"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "focus",
+    "autofocus"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "dev": "vite serve dev",
+    "page": "vite build dev",
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.0"
+  }
+}
