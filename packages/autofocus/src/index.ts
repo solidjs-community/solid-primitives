@@ -1,5 +1,5 @@
 import { createEffect, onMount, JSX, Accessor } from "solid-js";
-import { FalsyValue } from "../../utils";
+import { FalsyValue } from "@solid-primitives/utils";
 
 declare module "solid-js" {
   namespace JSX {
