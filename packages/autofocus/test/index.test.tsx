@@ -17,7 +17,7 @@ describe("use:autofocus", () => {
   });
 
   test("use:autofocus doesn't focus when autofocus={false}", async () => {
-    const result = render(() => (
+    render(() => (
       <button use:autofocus autofocus={false}>
         Not Autofocused
       </button>
@@ -27,7 +27,7 @@ describe("use:autofocus", () => {
   });
 
   test("doesn't focus with use:autofocus={false}", async () => {
-    const result = render(() => (
+    render(() => (
       <button use:autofocus={false} autofocus>
         Not Autofocused
       </button>
