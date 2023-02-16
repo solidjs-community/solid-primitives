@@ -51,7 +51,7 @@
     "@solid-primitives/utils": "workspace:^5.0.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.0"
+    "solid-js": "^1.6.11"
   },
   "typesVersions": {}
 }
