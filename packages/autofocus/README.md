@@ -38,7 +38,9 @@ import { autofocus } from "@solid-primitives/autofocus";
 </button>;
 
 // Autofocus directive can be disabled if `false` is passed as option
-<button use:autofocus={false} autofocus>Not Autofocused</button>;
+<button use:autofocus={false} autofocus>
+  Not Autofocused
+</button>;
 ```
 
 The `autofocus` directive uses the native `autofocus` attribute to determine it should focus the element or not.
