@@ -37,8 +37,8 @@ import { autofocus } from "@solid-primitives/autofocus";
   Autofocused
 </button>;
 
-// autofocus directive can be disabled if `false` is pased as options
-<button use:autofocus={false}>Not Autofocused</button>;
+// Autofocus directive can be disabled if `false` is passed as option
+<button use:autofocus={false} autofocus>Not Autofocused</button>;
 ```
 
 The `autofocus` directive uses the native `autofocus` attribute to determine it should focus the element or not.
@@ -60,12 +60,6 @@ const [ref, setRef] = createSignal<HTMLButtonElement>();
 createAutofocus(ref);
 
 <button ref={setRef}>Autofocused</button>;
-```
-
-```ts
-createAutofocus(ref: Accessor<HTMLElement | undefined>, autofocus: boolean = true);
-
-createAutofocus(ref, false); // Will not autofocus
 ```
 
 ## Changelog
