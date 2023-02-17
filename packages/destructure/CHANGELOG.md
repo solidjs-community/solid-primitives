@@ -1,5 +1,13 @@
 # @solid-primitives/destructure
 
+## 0.1.7
+
+### Patch Changes
+
+- 22f78f52: Import MemoOptions from solid-js instead of utils
+- Updated dependencies [22f78f52]
+  - @solid-primitives/utils@5.1.1
+
 ## 0.1.6
 
 ### Patch Changes

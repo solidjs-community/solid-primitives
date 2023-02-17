@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 5.1.1
+
+### Patch Changes
+
+- 22f78f52: Improve the Narrow type
+
 ## 5.1.0
 
 ### Minor Changes
