@@ -128,7 +128,7 @@ createScheduled(fn => leading(throttle, fn, 1000));
 It returns a signal that can be used to schedule execution of a solid computation. The signal returns `true` if it's dirty _(callback should be called)_ and `false` otherwise.
 
 ```ts
-import { createScheduled } from "@solid-primitives/scheduled";
+import { createScheduled, debounce } from "@solid-primitives/scheduled";
 
 const scheduled = createScheduled(fn => debounce(fn, 1000));
 
