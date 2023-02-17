@@ -1,5 +1,6 @@
+import { createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
-import { createI18nContext, makeChainedI18nContext } from "../src/index";
+import { createChainedI18n, createI18nContext, makeChainedI18nContext } from "../src/index";
 import { dict } from "./setup";
 
 describe("createI18nContext", () => {
@@ -66,5 +67,23 @@ describe("makeChainedI18nContext", () => {
     expect(t.hello({ name: "Tester" })).toBe("bonjour Tester, comment vas-tu ?");
     expect(t.goodbye({ name: "Tester" })).toBe("au revoir Tester");
     expect(t.food.meat()).toBe("viande");
+  });
+});
+
+describe("createChainedI18n", () => {
+  it("Translations work", async () => {
+    const dictionaries = createChainedI18n(dict, ["en", "es", "fr"]);
+    const [locale, setLocale] = createSignal<keyof typeof dict>("en");
+
+    expect(dictionaries[locale()].hello({ name: "Tester" })).toBe("hello Tester, how are you?");
+    expect(dictionaries[locale()].goodbye({ name: "Tester" })).toBe("goodbye Tester");
+    expect(dictionaries[locale()].food.meat()).toBe("meat");
+
+    setLocale("fr");
+    expect(dictionaries[locale()].hello({ name: "Tester" })).toBe(
+      "bonjour Tester, comment vas-tu ?"
+    );
+    expect(dictionaries[locale()].goodbye({ name: "Tester" })).toBe("au revoir Tester");
+    expect(dictionaries[locale()].food.meat()).toBe("viande");
   });
 });

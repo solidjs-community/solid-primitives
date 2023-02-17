@@ -212,14 +212,14 @@ type GuaranteeIdenticalSignatures<T extends Dictionaries<I18nObject>> = Record<
   RemoveFunctionLengths<UnionToIntersection<AddFunctionLengths<T[keyof T]>>>
 >;
 
-const buildI18nChain = <T extends I18nObject>(obj: T): I18nPath<T> => {
+const createChainedDictionary = <T extends I18nObject>(obj: T): I18nPath<T> => {
   const keys = Object.keys(obj) as (keyof T)[];
   const paths = keys.reduce((acc, key) => {
     const value = obj[key] as any;
     if (typeof value === "object") {
       return {
         ...acc,
-        [key]: buildI18nChain(value)
+        [key]: createChainedDictionary(value)
       } as any;
     } else if (typeof value === "function") {
       return {
@@ -236,19 +236,30 @@ const buildI18nChain = <T extends I18nObject>(obj: T): I18nPath<T> => {
       };
     } else {
       throw new TypeError(
-        `Unsupported data format on the keys. Values must resolve to a string or a function that returns a string. Key name: "${
-          key as string
-        }"`
+        process.env.DEV
+          ? `Unsupported data format on the keys. Values must resolve to a string or a function that returns a string. Key name: "${
+              key as string
+            }"`
+          : ""
       );
     }
   }, {} as Partial<I18nPath<T>>);
 
   return paths as I18nPath<T>;
 };
-
 export interface I18nDictionary {
   readonly [x: string]: string | ((...args: any) => string) | I18nDictionary;
 }
+
+export const createChainedI18n = <T extends Dictionaries<I18nObject>>(
+  dictionaries: T & GuaranteeIdenticalSignatures<T>,
+  locales: (keyof T)[]
+) => {
+  return locales.reduce((acc, locale) => {
+    acc[locale] = createChainedDictionary(dictionaries[locale]);
+    return acc;
+  }, {} as I18nPath<T & GuaranteeIdenticalSignatures<T>>);
+};
 
 export const makeChainedI18nContext = <
   T extends Dictionaries<I18nObject>,
@@ -259,12 +270,16 @@ export const makeChainedI18nContext = <
   setContext?: boolean;
 }) => {
   const [locale, _setLocale] = createSignal<K>(props.locale as K);
-  const [translate, _setTranslate] = createStore(buildI18nChain(props.dictionaries[props.locale]));
+  const [translations] = createSignal(
+    (() => {
+      const locales = Object.keys(props.dictionaries) as (keyof T)[];
+      return createChainedI18n(props.dictionaries, locales);
+    })()
+  );
 
   const utils = {
     locale,
     setLocale(newLocale: K): K {
-      _setTranslate(buildI18nChain(props.dictionaries[newLocale]));
       _setLocale(() => newLocale);
       return newLocale;
     },
@@ -273,6 +288,16 @@ export const makeChainedI18nContext = <
       return props.dictionaries[locale()];
     }
   };
+
+  const handler = {
+    get(_: any, prop: any) {
+      return (translations()[locale()] as any)[prop];
+    }
+  };
+
+  const translate = new Proxy({ translate: translations()[locale()] }, handler) as ReturnType<
+    typeof translations
+  >[ReturnType<typeof locale>];
 
   const chainedI18nContext = createContext<[typeof translate, typeof utils] | null>(
     props.setContext ? [translate, utils] : null
