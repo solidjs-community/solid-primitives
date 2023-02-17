@@ -1,4 +1,4 @@
-import { Component, createMemo, createSignal, untrack } from "solid-js";
+import { Component, createEffect, createMemo, createSignal, untrack } from "solid-js";
 import { createScheduled, debounce, leading, throttle } from "../src";
 
 const Reactive: Component<{}> = props => {
@@ -19,6 +19,10 @@ const Reactive: Component<{}> = props => {
               const c = count();
               return debounced() ? c : p;
             });
+            createEffect(() => {
+              count();
+              console.log("debounced", debounced());
+            });
             return <div>Debounced: {debouncedCount()}</div>;
           })}
 
@@ -27,6 +31,10 @@ const Reactive: Component<{}> = props => {
             const throttledCount = createMemo((p: number = 0) => {
               const c = count();
               return throttled() ? c : p;
+            });
+            createEffect(() => {
+              count();
+              console.log("throttled", throttled());
             });
             return <div>Throttled: {throttledCount()}</div>;
           })}
@@ -37,6 +45,10 @@ const Reactive: Component<{}> = props => {
               const c = count();
               return leadingDebounced() ? c : p;
             });
+            createEffect(() => {
+              count();
+              console.log("leadingDebounced", leadingDebounced());
+            });
             return <div>Leading Debounced: {leadingDebouncedCount()}</div>;
           })}
 
@@ -45,6 +57,10 @@ const Reactive: Component<{}> = props => {
             const leadingThrottledCount = createMemo((p: number = 0) => {
               const c = count();
               return leadingThrottled() ? c : p;
+            });
+            createEffect(() => {
+              count();
+              console.log("leadingThrottled", leadingThrottled());
             });
             return <div>Leading Throttled: {leadingThrottledCount()}</div>;
           })}

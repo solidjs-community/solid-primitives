@@ -1,4 +1,4 @@
-import { Accessor, createSignal, getOwner, onCleanup } from "solid-js";
+import { Accessor, createSignal, getListener, getOwner, onCleanup } from "solid-js";
 
 export type ScheduleCallback = <Args extends unknown[]>(
   callback: (...args: Args) => void,
@@ -18,6 +18,8 @@ export interface Scheduled<Args extends unknown[]> {
  * @param callback The callback to debounce
  * @param wait The duration to debounce in milliseconds
  * @returns The debounced function
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#debounce
  *
  * @example
  * ```ts
@@ -49,6 +51,8 @@ export const debounce: ScheduleCallback = (callback, wait) => {
  * @param wait The duration to throttle
  * @returns The throttled callback trigger
  *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#throttle
+ *
  * @example
  * ```ts
  * const trigger = throttle((val: string) => console.log(val), 250);
@@ -61,7 +65,7 @@ export const throttle: ScheduleCallback = (callback, wait) => {
     return Object.assign(() => void 0, { clear: () => void 0 });
   }
 
-  let isThrottled: boolean = false,
+  let isThrottled = false,
     timeoutId: ReturnType<typeof setTimeout>,
     lastArgs: Parameters<typeof callback>;
 
@@ -95,6 +99,8 @@ export const throttle: ScheduleCallback = (callback, wait) => {
  * @param maxWait maximum wait time in milliseconds until the callback is called
  * @returns The throttled callback trigger
  *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#scheduleidle
+ *
  * @example
  * ```ts
  * const trigger = scheduleIdle((val: string) => console.log(val), 250);
@@ -107,7 +113,7 @@ export const scheduleIdle: ScheduleCallback = process.env.SSR
   : // requestIdleCallback is not supported in Safari
   (window.requestIdleCallback as typeof window.requestIdleCallback | undefined)
   ? (callback, maxWait) => {
-      let isDeferred: boolean = false,
+      let isDeferred = false,
         id: ReturnType<typeof requestIdleCallback>,
         lastArgs: Parameters<typeof callback>;
 
@@ -144,6 +150,8 @@ export const scheduleIdle: ScheduleCallback = process.env.SSR
  * @param callback The callback to debounce/throttle
  * @param wait timeout duration
  * @returns The scheduled callback trigger
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#leading
  *
  * @example
  * ```ts
@@ -183,18 +191,54 @@ export function leading<Args extends unknown[]>(
   return Object.assign(func, { clear });
 }
 
+/**
+ * Creates a signal used for scheduling execution of solid computations by tracking.
+ *
+ * @param schedule Schedule the invalidate function (can be {@link debounce} or {@link throttle})
+ * @returns A function used to track the signal. It returns `true` if the signal is dirty *(callback should be called)* and `false` otherwise.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#createScheduled
+ *
+ * @example
+ * ```ts
+ * const debounced = createScheduled(fn => debounce(fn, 250));
+ *
+ * createEffect(() => {
+ *   // track source signal
+ *   const value = count();
+ *   // track the debounced signal and check if it's dirty
+ *   if (debounced()) {
+ *     console.log('count', value);
+ *   }
+ * });
+ * ```
+ */
+
+// Thanks to Fabio Spampinato (https://github.com/fabiospampinato) for the idea for the primitive
+
 export function createScheduled(
   schedule: (callback: VoidFunction) => VoidFunction
 ): Accessor<boolean> {
-  let canCall = false;
+  let listeners = 0;
+  let isDirty = false;
   const [track, dirty] = createSignal(void 0, { equals: false });
   const call = schedule(() => {
-    canCall = true;
+    isDirty = true;
     dirty();
   });
-  return () => {
-    call();
-    track();
-    return canCall && !(canCall = false);
+  return (): boolean => {
+    if (!isDirty) call(), track();
+
+    if (isDirty) {
+      isDirty = !!listeners;
+      return true;
+    }
+
+    if (getListener()) {
+      listeners++;
+      onCleanup(() => listeners--);
+    }
+
+    return false;
   };
 }
