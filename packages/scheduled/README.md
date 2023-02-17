@@ -138,7 +138,7 @@ createEffect(() => {
   // track source signal
   const value = count();
   // track the debounced signal and check if it's dirty
-  if (debounced()) {
+  if (scheduled()) {
     console.log("count", value);
   }
 });
@@ -148,7 +148,7 @@ const debouncedCount = createMemo((p: number = 0) => {
   // track source signal
   const value = count();
   // track the debounced signal and check if it's dirty
-  return debounced() ? value : p;
+  return scheduled() ? value : p;
 });
 ```
 
