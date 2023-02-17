@@ -41,7 +41,7 @@
     "jsdom": "^21.1.0",
     "json-to-markdown-table": "^1.0.0",
     "prettier": "^2.8.4",
-    "solid-js": "^1.6.11",
+    "solid-js": "1.7.0-beta.0",
     "tsup": "^6.6.3",
     "tsup-preset-solid": "^0.1.5",
     "turbo": "^1.7.4",
