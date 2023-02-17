@@ -19,13 +19,13 @@ jobs:
           node-version: 18
 
       - name: Install Dependencies
-        run: pnpm install --ignore-scripts
+        run: pnpm i --ignore-scripts
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
-          version: pnpm run ci:version
+          version: pnpx changeset version && pnpm i --no-frozen-lockfile && git add .
           publish: pnpm run release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
