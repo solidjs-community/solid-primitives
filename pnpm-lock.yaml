@@ -540,11 +540,13 @@ importers:
   packages/scheduled:
     specifiers:
       '@solid-primitives/timer': workspace:^1.3.5
+      '@solidjs/router': ^0.7.0
       solid-js: ^1.6.0
     dependencies:
       solid-js: 1.6.9
     devDependencies:
       '@solid-primitives/timer': link:../timer
+      '@solidjs/router': 0.7.0_solid-js@1.6.9
 
   packages/script-loader:
     specifiers:
@@ -2845,6 +2847,14 @@ packages:
     dependencies:
       solid-js: 1.6.9
     dev: false
+
+  /@solidjs/router/0.7.0_solid-js@1.6.9:
+    resolution: {integrity: sha512-8HI84twe5FjYRebSLMAhtkL9bRuTDIlxJK56kjfjU9WKGoUCTaWpCnkuj8Hqde1bWZ0X+GOZxKDfNkn1CjtjxA==}
+    peerDependencies:
+      solid-js: ^1.5.3
+    dependencies:
+      solid-js: 1.6.9
+    dev: true
 
   /@solidjs/testing-library/0.6.1_solid-js@1.6.11:
     resolution: {integrity: sha512-cS91EDopZhpVa+F55vLxbT+xrQEtc6jIYhXEleu7aCtPRKuBAhKGYQoiOAWrxRd2cXu678dhR8kuwp7ZS2gkNQ==}

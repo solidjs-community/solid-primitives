@@ -90,7 +90,8 @@
     "throttle"
   ],
   "devDependencies": {
-    "@solid-primitives/timer": "workspace:^1.3.5"
+    "@solid-primitives/timer": "workspace:^1.3.5",
+    "@solidjs/router": "^0.7.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

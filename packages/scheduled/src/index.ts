@@ -1,4 +1,4 @@
-import { getOwner, onCleanup } from "solid-js";
+import { Accessor, createSignal, getOwner, onCleanup } from "solid-js";
 
 export type ScheduleCallback = <Args extends unknown[]>(
   callback: (...args: Args) => void,
@@ -181,4 +181,20 @@ export function leading<Args extends unknown[]>(
   };
   if (getOwner()) onCleanup(clear);
   return Object.assign(func, { clear });
+}
+
+export function createScheduled(
+  schedule: (callback: VoidFunction) => VoidFunction
+): Accessor<boolean> {
+  let canCall = false;
+  const [track, dirty] = createSignal(void 0, { equals: false });
+  const call = schedule(() => {
+    canCall = true;
+    dirty();
+  });
+  return () => {
+    call();
+    track();
+    return canCall && !(canCall = false);
+  };
 }
