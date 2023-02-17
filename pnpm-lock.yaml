@@ -81,7 +81,7 @@ importers:
       '@solid-primitives/utils': link:../utils
       solid-js: 1.6.9
     devDependencies:
-      solid-heroicons: 3.1.1
+      solid-heroicons: 3.1.1_solid-js@1.6.9
 
   packages/autofocus:
     specifiers:
@@ -183,7 +183,7 @@ importers:
 
   packages/destructure:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.1.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -7166,10 +7166,12 @@ packages:
       solid-js: 1.6.9
     dev: true
 
-  /solid-heroicons/3.1.1:
+  /solid-heroicons/3.1.1_solid-js@1.6.9:
     resolution: {integrity: sha512-wfU/SqxqxWxInvfFlKJfCBPnJ94Zq1GQFiFL3M0KwZzT81lSF5yIC4HA/Czp3DYrn+dUumjO0qdrx8Ab3cy2sA==}
     peerDependencies:
       solid-js: '>= ^1.2.5'
+    dependencies:
+      solid-js: 1.6.9
     dev: true
 
   /solid-js/1.6.11:
