@@ -26,12 +26,12 @@ export default function Root() {
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
         <script
           innerHTML={`
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          document.documentElement.classList.add('dark')
-        } else {
-          document.documentElement.classList.remove('dark')
-        }
-        `}
+          if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+          } else {
+            document.documentElement.classList.remove('dark')
+          }
+          `}
         ></script>
       </Head>
       <Body class="dark:text-[#F1F0F2]">

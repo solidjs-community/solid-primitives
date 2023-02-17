@@ -10,7 +10,6 @@ const HalfSun = () => {
       stroke-width="1.5"
       stroke-linecap="round"
       stroke-linejoin="round"
-      class="icon-tabler-shadow"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
       <circle cx="12" cy="12" r="9"></circle>
