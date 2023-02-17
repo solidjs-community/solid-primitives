@@ -17,12 +17,13 @@
   },
   "primitive": {
     "name": "scheduled",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "debounce",
       "throttle",
       "scheduleIdle",
-      "leading"
+      "leading",
+      "createSchedule"
     ],
     "category": "Utilities"
   },
