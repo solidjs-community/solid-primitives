@@ -1,6 +1,6 @@
 import { describe, test, expect, assert } from "vitest";
 import { createComputed, createRoot } from "solid-js";
-import { createStaticStore, handleDiffArray, arrayEquals } from "../src";
+import { createStaticStore, handleDiffArray, arrayEquals, createHydrateSignal } from "../src";
 
 describe("createStaticStore", () => {
   test("individual keys only update when changed", () => {
@@ -154,5 +154,13 @@ describe("arrayEquals", () => {
     assert(!arrayEquals([1, 2, 3], [1, 2, 3, 4]));
     assert(!arrayEquals([1, 2, 3], [1, 0, 3]));
     assert(!arrayEquals([1, 2, _1], [1, 2, []]));
+  });
+});
+
+describe("createHydrateSignal", () => {
+  test("createHydrateSignal() - CSR", () => {
+    const [state, setState] = createHydrateSignal("server", () => "client");
+    expect(state()).toEqual("client");
+    expect(setState).toBeInstanceOf(Function);
   });
 });
