@@ -30,6 +30,10 @@ const PrimitivesTable = () => {
         </TR>
         
         <TR>
+          <TD><PrimitiveBtn href="./autofocus">autofocus</PrimitiveBtn></TD><TD><StageBadge value={0}/></TD><TD><PrimitiveBtn href="./autofocus#autofocus">autofocus</PrimitiveBtn><PrimitiveBtn href="./autofocus#createAutofocus">createAutofocus</PrimitiveBtn></TD><TD><SizeBadge value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/autofocus.json" href="https://bundlephobia.com/package//@solid-primitives/Size"/></TD><TD><VersionBadge value="https://img.shields.io/npm/v/@solid-primitives/autofocus.json" href="https://www.npmjs.com/package//@solid-primitives/NPM"/></TD>
+        </TR>
+        
+        <TR>
           <TD><PrimitiveBtn href="./input-mask">input-mask</PrimitiveBtn></TD><TD><StageBadge value={1}/></TD><TD><PrimitiveBtn href="./input-mask#createInputMask">createInputMask</PrimitiveBtn></TD><TD><SizeBadge value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/input-mask.json" href="https://bundlephobia.com/package//@solid-primitives/Size"/></TD><TD><VersionBadge value="https://img.shields.io/npm/v/@solid-primitives/input-mask.json" href="https://www.npmjs.com/package//@solid-primitives/NPM"/></TD>
         </TR>
         
@@ -104,7 +108,7 @@ const PrimitivesTable = () => {
         </TR>
         
         <TR>
-          <TD><PrimitiveBtn href="./clipboard">clipboard</PrimitiveBtn></TD><TD><StageBadge value={3}/></TD><TD><PrimitiveBtn href="./clipboard#makeClipboard">makeClipboard</PrimitiveBtn><PrimitiveBtn href="./clipboard#createClipboard">createClipboard</PrimitiveBtn><PrimitiveBtn href="./clipboard#copyToClipboard">copyToClipboard</PrimitiveBtn></TD><TD><SizeBadge value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/clipboard.json" href="https://bundlephobia.com/package//@solid-primitives/Size"/></TD><TD><VersionBadge value="https://img.shields.io/npm/v/@solid-primitives/clipboard.json" href="https://www.npmjs.com/package//@solid-primitives/NPM"/></TD>
+          <TD><PrimitiveBtn href="./clipboard">clipboard</PrimitiveBtn></TD><TD><StageBadge value={3}/></TD><TD><PrimitiveBtn href="./clipboard#copyClipboard">copyClipboard</PrimitiveBtn><PrimitiveBtn href="./clipboard#writeClipboard">writeClipboard</PrimitiveBtn><PrimitiveBtn href="./clipboard#createClipboard">createClipboard</PrimitiveBtn></TD><TD><SizeBadge value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/clipboard.json" href="https://bundlephobia.com/package//@solid-primitives/Size"/></TD><TD><VersionBadge value="https://img.shields.io/npm/v/@solid-primitives/clipboard.json" href="https://www.npmjs.com/package//@solid-primitives/NPM"/></TD>
         </TR>
         
         <TR>
@@ -186,7 +190,7 @@ const PrimitivesTable = () => {
         </TR>
         
         <TR>
-          <TD><PrimitiveBtn href="./event-bus">event-bus</PrimitiveBtn></TD><TD><StageBadge value={2}/></TD><TD><PrimitiveBtn href="./event-bus#createSimpleEmitter">createSimpleEmitter</PrimitiveBtn><PrimitiveBtn href="./event-bus#createEmitter">createEmitter</PrimitiveBtn><PrimitiveBtn href="./event-bus#createEventBus">createEventBus</PrimitiveBtn><PrimitiveBtn href="./event-bus#createEventHub">createEventHub</PrimitiveBtn><PrimitiveBtn href="./event-bus#createEventStack">createEventStack</PrimitiveBtn></TD><TD><SizeBadge value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/event-bus.json" href="https://bundlephobia.com/package//@solid-primitives/Size"/></TD><TD><VersionBadge value="https://img.shields.io/npm/v/@solid-primitives/event-bus.json" href="https://www.npmjs.com/package//@solid-primitives/NPM"/></TD>
+          <TD><PrimitiveBtn href="./event-bus">event-bus</PrimitiveBtn></TD><TD><StageBadge value={2}/></TD><TD><PrimitiveBtn href="./event-bus#createEventBus">createEventBus</PrimitiveBtn><PrimitiveBtn href="./event-bus#createEmitter">createEmitter</PrimitiveBtn><PrimitiveBtn href="./event-bus#createEventHub">createEventHub</PrimitiveBtn><PrimitiveBtn href="./event-bus#createEventStack">createEventStack</PrimitiveBtn></TD><TD><SizeBadge value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/event-bus.json" href="https://bundlephobia.com/package//@solid-primitives/Size"/></TD><TD><VersionBadge value="https://img.shields.io/npm/v/@solid-primitives/event-bus.json" href="https://www.npmjs.com/package//@solid-primitives/NPM"/></TD>
         </TR>
         
         <TR>
@@ -202,7 +206,15 @@ const PrimitivesTable = () => {
         </TR>
         
         <TR>
+          <TD><PrimitiveBtn href="./jsx-parser">jsx-parser</PrimitiveBtn></TD><TD><StageBadge value={0}/></TD><TD><PrimitiveBtn href="./jsx-parser#createJSXParser">createJSXParser</PrimitiveBtn><PrimitiveBtn href="./jsx-parser#createToken">createToken</PrimitiveBtn><PrimitiveBtn href="./jsx-parser#resolveTokens">resolveTokens</PrimitiveBtn><PrimitiveBtn href="./jsx-parser#isToken">isToken</PrimitiveBtn></TD><TD><SizeBadge value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/jsx-parser.json" href="https://bundlephobia.com/package//@solid-primitives/Size"/></TD><TD><VersionBadge value="https://img.shields.io/npm/v/@solid-primitives/jsx-parser.json" href="https://www.npmjs.com/package//@solid-primitives/NPM"/></TD>
+        </TR>
+        
+        <TR>
           <TD><PrimitiveBtn href="./map">map</PrimitiveBtn></TD><TD><StageBadge value={2}/></TD><TD><PrimitiveBtn href="./map#ReactiveMap">ReactiveMap</PrimitiveBtn><PrimitiveBtn href="./map#ReactiveWeakMap">ReactiveWeakMap</PrimitiveBtn></TD><TD><SizeBadge value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/map.json" href="https://bundlephobia.com/package//@solid-primitives/Size"/></TD><TD><VersionBadge value="https://img.shields.io/npm/v/@solid-primitives/map.json" href="https://www.npmjs.com/package//@solid-primitives/NPM"/></TD>
+        </TR>
+        
+        <TR>
+          <TD><PrimitiveBtn href="./pagination">pagination</PrimitiveBtn></TD><TD><StageBadge value={0}/></TD><TD><PrimitiveBtn href="./pagination#createPagination">createPagination</PrimitiveBtn><PrimitiveBtn href="./pagination#createInfiniteScroll">createInfiniteScroll</PrimitiveBtn></TD><TD><SizeBadge value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/pagination.json" href="https://bundlephobia.com/package//@solid-primitives/Size"/></TD><TD><VersionBadge value="https://img.shields.io/npm/v/@solid-primitives/pagination.json" href="https://www.npmjs.com/package//@solid-primitives/NPM"/></TD>
         </TR>
         
         <TR>
@@ -230,7 +242,7 @@ const PrimitivesTable = () => {
         </TR>
         
         <TR>
-          <TD><PrimitiveBtn href="./share">share</PrimitiveBtn></TD><TD><StageBadge value={3}/></TD><TD><PrimitiveBtn href="./share#createSocialShare">createSocialShare</PrimitiveBtn></TD><TD><SizeBadge value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/share.json" href="https://bundlephobia.com/package//@solid-primitives/Size"/></TD><TD><VersionBadge value="https://img.shields.io/npm/v/@solid-primitives/share.json" href="https://www.npmjs.com/package//@solid-primitives/NPM"/></TD>
+          <TD><PrimitiveBtn href="./share">share</PrimitiveBtn></TD><TD><StageBadge value={3}/></TD><TD><PrimitiveBtn href="./share#createSocialShare">createSocialShare</PrimitiveBtn><PrimitiveBtn href="./share#createWebShare">createWebShare</PrimitiveBtn></TD><TD><SizeBadge value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/share.json" href="https://bundlephobia.com/package//@solid-primitives/Size"/></TD><TD><VersionBadge value="https://img.shields.io/npm/v/@solid-primitives/share.json" href="https://www.npmjs.com/package//@solid-primitives/NPM"/></TD>
         </TR>
         
     <TR>

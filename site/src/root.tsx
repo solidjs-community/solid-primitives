@@ -12,8 +12,10 @@ import {
   Scripts,
   Title
 } from "solid-start";
-import Header from "./components/Header/Header";
+
 import "./root.css";
+
+import Header from "./components/Header/Header";
 import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderClusterDefs";
 import Footer from "./components/Footer/Footer";
 

@@ -52,7 +52,8 @@ export const buildPage = async ({ pkg, name }: { pkg: PackageJSONData; name: str
         return `${p1}${p2}`;
       }
       return _;
-    });
+    })
+    .replace(/<br>/g, "<br/>");
 
   const output = await compile(readme, {
     jsx: true,
