@@ -1,10 +1,10 @@
 import { Accessor, Component, createContext, createSignal, useContext } from "solid-js";
 
-import { createChainedI18n } from "../src/index";
+import { createChainedI18nDictionary } from "../src/index";
 import { dict } from "../test/setup";
 
 // -------------------------- Not using context -------------------
-const dictionaries = createChainedI18n(dict, ["en", "fr", "es"]);
+const dictionaries = createChainedI18nDictionary(dict);
 
 const I18nContext = createContext<{
   dictionaries: typeof dictionaries;

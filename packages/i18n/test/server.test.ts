@@ -1,6 +1,11 @@
 import { createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
-import { createChainedI18n, createI18nContext, makeChainedI18nContext } from "../src/index";
+import {
+  createChainedI18n,
+  createI18nContext,
+  createChainedI18nContext,
+  createChainedI18nDictionary
+} from "../src/index";
 import { dict } from "./setup";
 
 describe("createI18nContext", () => {
@@ -14,31 +19,40 @@ describe("createI18nContext", () => {
   });
 });
 
-describe("makeChainedI18nContext", () => {
+describe("createChainedI18nContext", () => {
   it("Context should be null if setContext !== true", async () => {
-    const { useI18nContext } = makeChainedI18nContext({ dictionaries: dict, locale: "en" });
+    const { useI18n: useI18nContext } = createChainedI18nContext(
+      createChainedI18n({
+        dictionaries: dict,
+        locale: "en"
+      })
+    );
 
     const context = useI18nContext();
 
     expect(context).toBe(null);
   });
   it("Context should be set if setContext === true", async () => {
-    const { useI18nContext } = makeChainedI18nContext({
-      dictionaries: dict,
-      locale: "en",
-      setContext: true
-    });
+    const { useI18n: useI18nContext } = createChainedI18nContext(
+      createChainedI18n({
+        dictionaries: dict,
+        locale: "en",
+        setContext: true
+      })
+    );
 
     const context = useI18nContext();
 
     expect(context).not.toBe(null);
   });
   it("Locale switching works", async () => {
-    const { useI18nContext } = makeChainedI18nContext({
-      dictionaries: dict,
-      locale: "en",
-      setContext: true
-    });
+    const { useI18n: useI18nContext } = createChainedI18nContext(
+      createChainedI18n({
+        dictionaries: dict,
+        locale: "en",
+        setContext: true
+      })
+    );
 
     const [, { locale, setLocale }] = useI18nContext()!;
 
@@ -51,11 +65,13 @@ describe("makeChainedI18nContext", () => {
     expect(locale()).toBe("en");
   });
   it("Translations work", async () => {
-    const { useI18nContext } = makeChainedI18nContext({
-      dictionaries: dict,
-      locale: "en",
-      setContext: true
-    });
+    const { useI18n: useI18nContext } = createChainedI18nContext(
+      createChainedI18n({
+        dictionaries: dict,
+        locale: "en",
+        setContext: true
+      })
+    );
 
     const [t, { setLocale }] = useI18nContext()!;
 
@@ -70,9 +86,9 @@ describe("makeChainedI18nContext", () => {
   });
 });
 
-describe("createChainedI18n", () => {
+describe("createChainedI18nDictionary", () => {
   it("Translations work", async () => {
-    const dictionaries = createChainedI18n(dict, ["en", "es", "fr"]);
+    const dictionaries = createChainedI18nDictionary(dict);
     const [locale, setLocale] = createSignal<keyof typeof dict>("en");
 
     expect(dictionaries[locale()].hello({ name: "Tester" })).toBe("hello Tester, how are you?");

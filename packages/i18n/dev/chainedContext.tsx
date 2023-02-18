@@ -1,12 +1,14 @@
 import { Component, createSignal } from "solid-js";
 
-import { makeChainedI18nContext } from "../src/index";
+import { createChainedI18n, createChainedI18nContext } from "../src/index";
 import { dict } from "../test/setup";
 
-const { I18nProvider, useI18nContext } = makeChainedI18nContext({
-  dictionaries: dict,
-  locale: "en"
-});
+const { I18nProvider, useI18n: useI18nContext } = createChainedI18nContext(
+  createChainedI18n({
+    dictionaries: dict,
+    locale: "en"
+  })
+);
 
 export const useI18n = () => {
   const context = useI18nContext();
