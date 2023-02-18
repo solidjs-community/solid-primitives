@@ -323,11 +323,12 @@ export function handleDiffArray<T>(
  * A signal object that handle hydration.
  * @param serverValue initial value of the state on the server
  * @param update called once on the client or on hydration to initialise the value
- * @param options SignalOptions<T>
+ * @param options {@link SignalOptions}
  * @returns
  * ```ts
  * [state: Accessor<T>, setState: Setter<T>]
  * ```
+ * @see {@link createSignal}
  */
 export function createHydrateSignal<T>(
   serverValue: T,
