@@ -6,12 +6,6 @@ const Footer = () => {
           This site is built with SolidJS, SolidStart, and best of all ...{" "}
           <span class="whitespace-nowrap">Solid Primitives</span>!
         </p>
-        <p>Examples</p>
-        <ul>
-          <li>open search menu with hotkeys with createShortcut</li>
-          <li>change table header with createIntersectionObserver</li>
-          <li>toggle navigation menu animation with createTween</li>
-        </ul>
       </div>
     </footer>
   );
