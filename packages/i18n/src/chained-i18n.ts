@@ -1,12 +1,5 @@
-import {
-  Accessor,
-  createComponent,
-  createContext,
-  createSignal,
-  FlowComponent,
-  Setter,
-  useContext
-} from "solid-js";
+import { createContextProvider } from "@solid-primitives/context";
+import { Accessor, createSignal, FlowComponent, Setter } from "solid-js";
 import { deepReadObject } from "./i18n";
 
 export type I18nFormatOptions = Record<string, string | number>;
@@ -95,7 +88,6 @@ export function createChainedI18nDictionary<T extends Dictionaries<I18nObject>>(
 export function createChainedI18n<T extends Dictionaries<I18nObject>>(props: {
   dictionaries: T & GuaranteeIdenticalSignatures<T>;
   locale: keyof T;
-  setContext?: boolean;
 }): ChainedI18n<T> {
   type K = keyof T;
 
@@ -125,39 +117,17 @@ export function createChainedI18n<T extends Dictionaries<I18nObject>>(props: {
 }
 
 export function createChainedI18nContext<T extends Dictionaries<I18nObject>>(
-  i18n: ChainedI18n<T>,
+  props: Parameters<typeof createChainedI18n<T>>[0],
   setFallback: true
-): {
-  I18nProvider: FlowComponent;
-  useI18n: () => ChainedI18n<T>;
-};
+): [I18nProvider: FlowComponent, useI18n: () => ChainedI18n<T>];
 export function createChainedI18nContext<T extends Dictionaries<I18nObject>>(
-  i18n: ChainedI18n<T>,
+  props: Parameters<typeof createChainedI18n<T>>[0],
   setFallback?: boolean
-): {
-  I18nProvider: FlowComponent;
-  useI18n: () => ChainedI18n<T> | null;
-};
+): [I18nProvider: FlowComponent, useI18n: () => ChainedI18n<T> | null];
 export function createChainedI18nContext<T extends Dictionaries<I18nObject>>(
-  i18n: ChainedI18n<T>,
+  props: Parameters<typeof createChainedI18n<T>>[0],
   setFallback?: boolean
 ) {
-  const [translate, utils] = i18n;
-
-  const chainedI18nContext = createContext<[typeof translate, typeof utils] | null>(
-    setFallback ? [translate, utils] : null
-  );
-
-  const I18nProvider: FlowComponent = props =>
-    createComponent(chainedI18nContext.Provider, {
-      value: [translate, utils],
-      get children() {
-        return props.children;
-      }
-    });
-
-  return {
-    I18nProvider,
-    useI18n: () => useContext(chainedI18nContext)
-  };
+  const i18n = createChainedI18n(props);
+  return createContextProvider(() => i18n, setFallback ? i18n : null);
 }
