@@ -4,6 +4,7 @@
 
 import PrimitivePageMain from "~/components/Primitives/PrimitivePageMain";
 import CopyPackages from "~/components/CopyPackage/CopyPackages";
+import { NoHydration } from "solid-js/web";
 
 /*@jsxRuntime automatic @jsxImportSource solid-js*/
 import {useMDXComponents as _provideComponents} from "solid-mdx";

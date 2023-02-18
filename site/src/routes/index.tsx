@@ -1,6 +1,7 @@
 import { Title } from "solid-start";
 import PrimitivesTable from "~/components/Primitives/PrimitivesTable";
 import HomeSections from "~/components/Home/HomeSections";
+import { NoHydration } from "solid-js/web";
 
 export default function Home() {
   return (
@@ -113,7 +114,9 @@ export default function Home() {
       </div>
       <PrimitivesTable />
       <div class="max-w-[864px] mx-auto leading-7 mt-[125px] p-4">
-        <HomeSections />
+        <NoHydration>
+          <HomeSections />
+        </NoHydration>
       </div>
     </main>
   );

@@ -53,6 +53,7 @@ export const buildPage = async ({ pkg, name }: { pkg: PackageJSONData; name: str
       }
       return _;
     })
+    // TODO: solve/post issue, mdx should solve this
     .replace(/<br>/g, "<br/>");
 
   const output = await compile(readme, {
@@ -82,7 +83,20 @@ export const buildPage = async ({ pkg, name }: { pkg: PackageJSONData; name: str
   let outputString = output.toString();
   outputString = outputString
     .replace("export default MDXContent;", "")
-    .replace(/,\s+\{[^\}]+\}\s+=\s+_components;?/, ";");
+    .replace(/,\s+\{[^\}]+\}\s+=\s+_components;?/, ";")
+    // TODO: solve/post issue, mdx should have a config to don't hydrate only on their components
+    // Don't Hydrate markdown content, but keep injected components Hydratable
+    .replace(/(return\s*<>)([^]*)(<\/>)/, (_, p1, content: string, p3) => {
+      if (!content) return _;
+      let hasComponent = false;
+      content = content.replace(/<[A-Z][^>]*>/, component => {
+        hasComponent = true;
+        return `</NoHydration>${component}<NoHydration>`;
+      });
+      if (!hasComponent) return _;
+
+      return `${p1}<NoHydration>${content}</NoHydration>${p3}`;
+    });
 
   // const html = "";
   // const converter = new showdown.Converter();
@@ -99,6 +113,7 @@ export const buildPage = async ({ pkg, name }: { pkg: PackageJSONData; name: str
 
 import PrimitivePageMain from "~/components/Primitives/PrimitivePageMain";
 import CopyPackages from "~/components/CopyPackage/CopyPackages";
+import { NoHydration } from "solid-js/web";
 
 ${outputString}
 
