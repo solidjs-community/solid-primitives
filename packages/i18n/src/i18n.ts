@@ -42,7 +42,7 @@ export function deepReadObject<T = any>(
  *
  * @param str {string} - The string you wish to use as template
  * @param params {Record<string, string>} - The params to inject into the template
- * @param [reg=/{{(.*?)}}/g] {RegExp} - The RegExp used to find and replace
+ * @param [reg=/{{([^{}]+)}}/g] {RegExp} - The RegExp used to find and replace
  *
  * @returns {string} - The fully injected template
  *
@@ -52,8 +52,11 @@ export function deepReadObject<T = any>(
  * // => 'Hello Tom'
  * ```
  */
-const template = (str: string, params: Record<string, string>, reg: RegExp = /{{(.*?)}}/g): any =>
-  str.replace(reg, (_, key) => deepReadObject(params, key, ""));
+const template = (
+  str: string,
+  params: Record<string, string>,
+  reg: RegExp = /{{([^{}]+)}}/g
+): any => str.replace(reg, (_, key) => deepReadObject(params, key, ""));
 
 /**
  * This creates a I18nContext. It's extracted into a function to be able to type the Context

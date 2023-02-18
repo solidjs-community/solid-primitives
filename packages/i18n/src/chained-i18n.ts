@@ -53,7 +53,7 @@ function buildChainedDictionary<T extends I18nObject>(obj: T): I18nPath<T> {
         break;
       case "string":
         mapped[key] = (args: I18nFormatOptions) =>
-          value.replace(/{{(.*?)}}/g, (_, key) => deepReadObject(args, key, ""));
+          value.replace(/{{([^{}]+)}}/g, (_, key) => deepReadObject(args, key, ""));
         break;
       default:
         throw new Error(
