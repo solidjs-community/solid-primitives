@@ -4,6 +4,16 @@ export const r = (...pathSegments: string[]) => path.resolve(__dirname, ...pathS
 
 const getCommentText = (text: string, marker: "START" | "END") => `<!-- ${text}:${marker} -->`;
 
+export const regexGlobalCaptureGroup = (input: string, regex: RegExp) => {
+  const output = [];
+  let matches;
+  while ((matches = regex.exec(input))) {
+    output.push(matches[1]);
+  }
+  if (!output.length) return null;
+  return output;
+};
+
 export function insertTextBetweenComments(file: string, text: string, comment: string): string {
   const startComment = getCommentText(comment, "START");
   const endComment = getCommentText(comment, "END");

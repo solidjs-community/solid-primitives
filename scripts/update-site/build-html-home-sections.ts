@@ -6,7 +6,7 @@ import remarkGfm from "remark-gfm";
 import { readFileSync, writeFile } from "fs";
 import { r } from "../utils";
 
-// build sections by getting main README.md and grab
+// build sections by getting main README.md and CONTRIBUTING.md and grab
 
 // 1. Philosophy
 // 2.? Contribution Process
@@ -15,24 +15,34 @@ import { r } from "../utils";
 // 5. Managing Primitive Complexity
 
 export const buildAndWriteHomeSections = async () => {
-  // const { list, category, stage } = pkg.primitive;
-
-  const dir = r(`../README.md`);
-  const rootReadme = readFileSync(dir, "utf-8");
+  const dirReadMeMD = r(`../README.md`);
+  const dirContributingMD = r(`../CONTRIBUTING.md`);
+  const contributingMD = readFileSync(dirContributingMD, "utf-8");
+  const readMeMD = readFileSync(dirReadMeMD, "utf-8");
   const fileName = "HomeSections";
   const filePath = r(`../site/src/components/Home/${fileName}.tsx`);
-  const heading2List = [
-    "Philosophy",
-    // "Contribution Process",
+  const readMeH2List = ["Philosophy"];
+  const contributingH2List = [
     "Design Maxims",
     "Basic and Compound Primitives",
     "Managing Primitive Complexity"
   ];
   let sections = "";
 
-  heading2List.forEach(heading => {
-    const regex = RegExp(`(?<!#)(##\\s+${heading}\\n)((.|\\n)+?)(?=(\\n##\\s))`);
-    const match = rootReadme.match(regex);
+  const matchHeadingRegex = (heading: string) =>
+    new RegExp(`(?<!#)(##\\s+${heading}\\n)((.|\\n)+?)(?=(\\n##\\s))`);
+
+  readMeH2List.forEach(heading => {
+    const regex = matchHeadingRegex(heading);
+    const match = readMeMD.match(regex);
+
+    if (!match) return;
+
+    sections += `${match[0]}\n`;
+  });
+  contributingH2List.forEach(heading => {
+    const regex = matchHeadingRegex(heading);
+    const match = contributingMD.match(regex);
 
     if (!match) return;
 
