@@ -1,4 +1,4 @@
-import { createStoreFactory } from "../../src";
+import { createStoreFactory } from "../../dist";
 
 
 export interface CounterState {
