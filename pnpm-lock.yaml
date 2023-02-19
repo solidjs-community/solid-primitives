@@ -590,6 +590,14 @@ importers:
     dependencies:
       solid-js: 1.6.9
 
+  packages/store:
+    specifiers:
+      '@solid-primitives/utils': workspace:^5.0.0
+      solid-js: ^1.6.0
+    dependencies:
+      '@solid-primitives/utils': link:../utils
+      solid-js: 1.6.9
+
   packages/stream:
     specifiers:
       '@solid-primitives/utils': workspace:^5.0.0
