@@ -73,13 +73,13 @@ render(
 );
 ```
 
-makeChainedI18nContext:
+createChainedI18nContext/createChainedI18n
 
 ```tsx
 import { render } from "solid-js/web";
 import { Component, createSignal, Component } from "solid-js";
 
-import { makeChainedI18nContext } from "@solid-primitives/i18n";
+import { createChainedI18nContext } from "@solid-primitives/i18n";
 
 const dictionaries = {
   fr: {
@@ -92,11 +92,13 @@ const dictionaries = {
   }
 };
 
-const { I18nProvider, useI18nContext } = makeChainedI18nContext({
-  dictionaries,
-  locale: "en", // Starting locale
-  setContext: false // If the context should be set on creation, or not until there is a provider.
-});
+const { I18nProvider, useI18nContext } = makeChainedI18nContext(
+  {
+    dictionaries,
+    locale: "en" // Starting locale
+  },
+  true // Initializes the context on creation
+);
 
 export const useI18n = () => {
   const context = useI18nContext();
