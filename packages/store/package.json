@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/store",
   "version": "0.0.100",
-  "description": "SolidJS Primitives to manage creating global stores.",
+  "description": "SolidJS Primitive to simplify the creation of global stores and the ability to access and mutate them.",
   "author": "Zalexios <zalexios@outlook.com>",
   "contributors": [],
   "license": "MIT",
