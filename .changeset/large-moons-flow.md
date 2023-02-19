@@ -1,0 +1,1 @@
+---"@solid-primitives/store": patch---Add createStoreFactory
