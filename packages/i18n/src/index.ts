@@ -64,7 +64,9 @@ const template = (str: string, params: Record<string, string>, reg: RegExp = /{{
  */
 export const createI18nContext = (
   init: Record<string, Record<string, any>> = {},
-  lang: string = navigator.language in init ? navigator.language : Object.keys(init)[0]
+  lang: string = typeof navigator !== "undefined" && navigator.language in init
+    ? navigator.language
+    : Object.keys(init)[0]
 ): [
   template: (key: string, params?: Record<string, string>, defaultValue?: string) => any,
   actions: {

@@ -1,12 +1,7 @@
 import type { Accessor, Setter } from "solid-js";
 
 // export types that aren't exported by solid-js main module
-export type {
-  MemoOptions,
-  EffectOptions,
-  SignalOptions,
-  OnOptions
-} from "solid-js/types/reactive/signal";
+export type { EffectOptions, OnOptions } from "solid-js/types/reactive/signal";
 
 /**
  * Can be single or in an array
@@ -120,7 +115,9 @@ export type Position = {
   y: number;
 };
 
-export type Narrow<T> =
+type RawNarrow<T> =
   | (T extends [] ? [] : never)
   | (T extends string | number | bigint | boolean ? T : never)
-  | { [K in keyof T]: T[K] extends Function ? T[K] : Narrow<T[K]> };
+  | { [K in keyof T]: T[K] extends Function ? T[K] : RawNarrow<T[K]> };
+
+export type Narrow<T extends any> = T extends [] ? T : RawNarrow<T>;

@@ -1,29 +1,21 @@
 import { push } from "@solid-primitives/immutable";
-import { createEffect, createSignal, on } from "solid-js";
-import { GenericEmit, GenericListen, GenericListener, GenericListenProtect } from "./types";
-
-type _PromiseValue<T extends any[]> = void extends T[1] ? T[0] : T;
+import { AnyFunction } from "@solid-primitives/utils";
+import { batch, createEffect, createSignal, on } from "solid-js";
+import { Listen, Listener, Emit } from "./eventBus";
 
 /**
  * Turns a stream-like listen function, into a promise resolving when the first event is captured.
  * @param subscribe listen function from any EventBus/Emitter
  * @returns a promise resulting in the captured event value
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#toPromise
+ *
  * @example
- * const emitter = createEmitter<string>();
+ * const emitter = createEventBus<string>();
  * const event = await toPromise(emitter.listen);
  */
-export function toPromise<T extends any[]>(subscribe: GenericListen<T>): Promise<_PromiseValue<T>>;
-export function toPromise<T extends any[]>(
-  subscribe: GenericListenProtect<T>,
-  protect?: boolean
-): Promise<_PromiseValue<T>>;
-export function toPromise<T extends any[]>(
-  subscribe: GenericListenProtect<T>,
-  protect?: boolean
-): Promise<_PromiseValue<T>> {
-  return new Promise<_PromiseValue<T>>(resolve => {
-    once(subscribe, (...data) => resolve(data.length > 1 ? data : data[0]), protect);
-  });
+export function toPromise<T>(subscribe: Listen<T>): Promise<T> {
+  return new Promise<T>(resolve => once(subscribe, resolve));
 }
 
 /**
@@ -34,32 +26,21 @@ export function toPromise<T extends any[]>(
  *
  * @returns unsubscribe function
  *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#once
+ *
  * @example
- * const { listen, emit } = createEmitter<string>();
+ * const { listen, emit } = createEventBus<string>();
  * const unsub = once(listen, event => console.log(event));
  *
  * emit("foo") // will log "foo" and unsub
  *
  * emit("bar") // won't log
  */
-export function once<T extends any[] = []>(
-  subscribe: GenericListen<T>,
-  listener: GenericListener<T>
-): VoidFunction;
-export function once<T extends any[] = []>(
-  subscribe: GenericListenProtect<T>,
-  listener: GenericListener<T>,
-  protect?: boolean
-): VoidFunction;
-export function once<T extends any[] = []>(
-  subscribe: GenericListenProtect<T>,
-  listener: GenericListener<T>,
-  protect?: boolean
-): VoidFunction {
-  const unsub = subscribe((...payload) => {
+export function once<T>(subscribe: Listen<T>, listener: Listener<T>): VoidFunction {
+  const unsub = subscribe(payload => {
     unsub();
-    listener(...payload);
-  }, protect);
+    listener(payload);
+  });
   return unsub;
 }
 
@@ -69,8 +50,10 @@ export function once<T extends any[] = []>(
  * @param emit the emit function of any emitter/event-bus
  * @returns modified emit function
  *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#toEffect
+ *
  * @example
- * const { listen, emit } = createEmitter();
+ * const { listen, emit } = createEventBus();
  * const emitInEffect = toEffect(emit);
  * listen(() => console.log(getOwner()))
  *
@@ -78,14 +61,26 @@ export function once<T extends any[] = []>(
  * emit() // listener will log `null`
  * emitInEffect() // listener will log an owner object
  */
-export function toEffect<T extends any[]>(emit: GenericEmit<T>): GenericEmit<T> {
+export function toEffect<T>(emit: Emit<T>): Emit<T> {
   const [stack, setStack] = createSignal<T[]>([]);
   createEffect(
     on(stack, stack => {
       if (!stack.length) return;
-      stack.forEach(payload => emit(...payload));
       setStack([]);
+      stack.forEach(emit as Emit<any>);
     })
   );
-  return (...payload) => setStack(p => push(p, payload));
+  return (payload?: any) => void setStack(p => push(p, payload));
+}
+
+/**
+ * Wraps `emit` calls inside a `batch` call. It causes that listeners execute in a single batch, so they are not executed in sepatate queue ticks.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#batchEmits
+ */
+export function batchEmits<T extends { emit: AnyFunction }>(bus: T): T {
+  return {
+    ...bus,
+    emit: (...args) => batch(() => bus.emit(...args))
+  };
 }

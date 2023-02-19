@@ -1,5 +1,5 @@
 import { Component, createSignal, Suspense, For, Switch, Match } from "solid-js";
-import { createClipboard, copyToClipboard, newItem, input } from "../src";
+import { createClipboard, copyToClipboard, newClipboardItem, input } from "../src";
 import { render } from "solid-js/web";
 import img from "./img.png";
 import img2 from "./img2.png";
@@ -18,20 +18,20 @@ const App: Component = () => {
             <input
               use:copyToClipboard={{ highlight: input() }}
               class="p-3 text-2xl border-blue-700 border-3 rounded-md text-center"
-              value="Hello world!"
+              value="Copy me by clicking!"
             />
             <button
               class="mt-2 font-semibold p-3 text-white bg-blue-700 hover:bg-blue-600 transition cursor-pointer border-none rounded-md"
               use:copyToClipboard
             >
-              Copy this text
+              Copy button text
             </button>
             <div class="mt-2 grid grid-cols-2 gap-2">
               <button
                 class="font-semibold p-3 text-white bg-blue-700 hover:bg-blue-600 transition cursor-pointer border-none rounded-md"
                 onClick={async () => {
                   const image = await fetch(img);
-                  setClipboard([newItem("image/png", await image.blob())]);
+                  setClipboard([newClipboardItem("image/png", image.blob())]);
                 }}
               >
                 Copy Image 1
@@ -40,7 +40,7 @@ const App: Component = () => {
                 class="font-semibold p-3 text-white bg-blue-700 hover:bg-blue-600 transition cursor-pointer border-none rounded-md"
                 onClick={async () => {
                   const image = await fetch(img2);
-                  setClipboard([newItem("image/png", await image.blob())]);
+                  setClipboard([newClipboardItem("image/png", image.blob())]);
                 }}
               >
                 Copy Image 2
@@ -53,9 +53,9 @@ const App: Component = () => {
                 <For each={clipboard()}>
                   {item => (
                     <Switch>
-                      <Match when={item.type == "text/plain"}>{item.text()}</Match>
-                      <Match when={item.blob() && item.type == "image/png"}>
-                        <img class="w-full" src={URL.createObjectURL(item.blob())} />
+                      <Match when={item.type == "text/plain"}>{item.text}</Match>
+                      <Match when={item.type == "image/png"}>
+                        <img class="w-full" src={URL.createObjectURL(item.blob)} />
                       </Match>
                     </Switch>
                   )}

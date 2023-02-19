@@ -1,124 +1,53 @@
-import { Accessor, createSignal } from "solid-js";
-import { createEmitter, EmitterConfig } from "./emitter";
-import { GenericEmit, GenericListener, ListenProtect } from "./types";
+import { tryOnCleanup } from "@solid-primitives/utils";
+import { onCleanup } from "solid-js";
 
-export type EventBusListener<Event, V = Event | undefined> = GenericListener<[Event, V]>;
-export type EventBusListen<Event, V = Event | undefined> = ListenProtect<Event, V>;
+export type Listener<T = void> = (payload: T) => void;
 
-export type EventBusRemove<Event, V = Event | undefined> = (
-  listener: EventBusListener<Event, V>
-) => boolean;
+export type Listen<T = void> = (listener: Listener<T>) => VoidFunction;
 
-export type EventBus<Event, V = Event | undefined> = {
-  remove: EventBusRemove<Event, V>;
-  listen: EventBusListen<Event, V>;
-  emit: GenericEmit<[Event]>;
-  clear: VoidFunction;
-  has: (listener: EventBusListener<Event, V>) => boolean;
-  value: Accessor<V>;
-};
+export type Emit<T = void> = (..._: void extends T ? [payload?: T] : [payload: T]) => void;
+
+export class EventBusCore<T> extends Set<Listener<T>> {
+  emit(..._: void extends T ? [payload?: T] : [payload: T]): void;
+  emit(payload?: any) {
+    for (const cb of this) cb(payload);
+  }
+}
+
+export interface EventBus<T> {
+  readonly listen: Listen<T>;
+  readonly emit: Emit<T>;
+  readonly clear: VoidFunction;
+}
 
 /**
- * Provides all the base functions of an event-emitter, functions for managing listeners, it's behavior could be customized with an config object.
- * Additionally it provides a signal accessor function with last event's value.
+ * Provides a simple way to listen to and emit events. All listeners are automatically unsubscribed on cleanup.
  * 
- * @param config Emitter configuration: `emitGuard`, `removeGuard`, `beforeEmit` functions and `value` for setting initial value.
- * 
- * @returns event bus: `{listen, once, emit, remove, clear, has, value}`
+ * @returns the emitter: `{listen, emit, clear}`
  * 
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventBus
  * 
  * @example
 const bus = createEventBus<string>();
-// can be destructured:
-const { listen, emit, has, clear, value } = bus;
+// bus can be destructured:
+const { listen, emit, clear } = bus;
 
-const listener = (event, previous) => console.log(event, previous);
-bus.listen(listener);
+const unsub = bus.listen((a) => console.log(a));
 
 bus.emit("foo");
 
-bus.remove(listener);
-bus.has(listener); // false
-
-// clear all listeners
-bus.clear();
+// unsub gets called automatically on cleanup
+unsub();
  */
-
-// Initial value was NOT provided
-export function createEventBus<Event>(
-  config?: EmitterConfig<Event, Event | undefined> & {
-    value?: undefined;
-  }
-): EventBus<Event, Event | undefined>;
-// Initial value was provided
-export function createEventBus<Event>(
-  config: EmitterConfig<Event, Event> & {
-    value: Event;
-  }
-): EventBus<Event, Event>;
-export function createEventBus<Event, V>(
-  config: EmitterConfig<Event, V> & {
-    value?: V;
-  } = {}
-): EventBus<Event, V> {
-  const { value: initialValue } = config;
-  const pubsub = createEmitter<Event, V>(config);
-  const [value, setValue] = createSignal<any>(initialValue);
+export function createEventBus<T>(): EventBus<T> {
+  const bus = new EventBusCore<T>();
 
   return {
-    ...pubsub,
-    emit: payload => {
-      let prev!: V;
-      setValue(p => {
-        prev = p;
-        return payload;
-      });
-      pubsub.emit(payload, prev);
+    listen(listener) {
+      bus.add(listener);
+      return tryOnCleanup(bus.delete.bind(bus, listener));
     },
-    value
+    emit: bus.emit.bind(bus),
+    clear: onCleanup(bus.clear.bind(bus))
   };
 }
-
-// type _Value<T, I> = undefined extends I ? T | undefined : T;
-
-// function test<T = void, Init = T>(config: {
-//   initialValue: T;
-// }): {
-//   value: _Value<T, Init>;
-//   emit: (payload: T) => void;
-//   listen: (fn: (payload: T, prev: _Value<T, Init>) => void) => void;
-// };
-// function test<T = void, Init = undefined>(config?: {
-//   initialValue?: T;
-// }): {
-//   value: _Value<T, Init>;
-//   emit: (payload: T) => void;
-//   listen: (fn: (payload: T, prev: _Value<T, Init>) => void) => void;
-// };
-// function test<T = void, Init = undefined>(config?: {
-//   initialValue?: T;
-// }): {
-//   value: _Value<T, Init>;
-//   emit: (payload: T) => void;
-//   listen: (fn: (payload: T, prev: _Value<T, Init>) => void) => void;
-// } {
-//   return "" as any;
-// }
-
-// const z = test();
-// z.value; // void | undef
-// z.emit();
-// z.listen((v, p) => {});
-
-// const x = test<string>({
-//   initialValue: ""
-// });
-// x.value; // string
-// x.emit("");
-// x.listen((v, p) => {});
-
-// const y = test<string>();
-// y.value; // string | undef
-// y.emit("");
-// y.listen((v, p) => {});

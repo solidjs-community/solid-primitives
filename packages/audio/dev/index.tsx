@@ -3,7 +3,7 @@ import { createAudio, AudioState } from "../src";
 import { render } from "solid-js/web";
 import { Icon } from "solid-heroicons";
 import { play, pause } from "solid-heroicons/solid";
-import { volumeUp } from "solid-heroicons/outline";
+import { speakerWave } from "solid-heroicons/outline";
 import "uno.css";
 
 const formatTime = (time: number) => new Date(time * 1000).toISOString().substr(14, 8);
@@ -33,7 +33,7 @@ const App: Component = () => {
             </Show>
           </div>
           <input
-            onInput={evt => seek(evt.currentTarget.value)}
+            onInput={evt => seek(+evt.currentTarget.value)}
             type="range"
             min="0"
             step="0.1"
@@ -42,9 +42,9 @@ const App: Component = () => {
             class="cursor-pointer transition hover:bg-gray-300 w-40 form-range rounded-3xl appearance-none bg-gray-200 focus:outline-none focus:ring-0 "
           />
           <div class="flex px-2">
-            <Icon class="w-6 text-blue-600" path={volumeUp} />
+            <Icon class="w-6 text-blue-600" path={speakerWave} />
             <input
-              onInput={evt => setVolume(evt.currentTarget.value)}
+              onInput={evt => setVolume(+evt.currentTarget.value)}
               type="range"
               min="0"
               step="0.1"

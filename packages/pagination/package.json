@@ -1,9 +1,12 @@
 {
   "name": "@solid-primitives/pagination",
-  "version": "0.0.103",
+  "version": "0.2.0",
   "description": "A primitive that creates all the reactive data to manage your pagination.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
-  "contributors": [],
+  "contributors": [
+    "Martin Pengelly-Phillips <dev@thisbeyond.com>",
+    "Mohan <mohanavel15@protonmail.com>"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/pagination#readme",
   "repository": {
@@ -17,7 +20,8 @@
     "name": "pagination",
     "stage": 0,
     "list": [
-      "createPagination"
+      "createPagination",
+      "createInfiniteScroll"
     ],
     "category": "Utilities"
   },
@@ -74,6 +78,7 @@
     },
     "require": "./dist/index.cjs"
   },
+  "typesVersions": {},
   "scripts": {
     "dev": "vite serve dev",
     "page": "vite build dev",
@@ -82,10 +87,10 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
+    "@solid-primitives/intersection-observer": "workspace:^2.0.3",
     "@solid-primitives/utils": "^5.0.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
-  },
-  "typesVersions": {}
+  }
 }

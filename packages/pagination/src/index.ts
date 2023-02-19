@@ -1,5 +1,7 @@
-import { type Accessor, type Setter, createSignal, type JSX, createMemo } from "solid-js";
-import { access, type MaybeAccessor, noop } from "@solid-primitives/utils";
+import { makeIntersectionObserver } from "@solid-primitives/intersection-observer";
+import { access, type Directive, noop, type MaybeAccessor } from "@solid-primitives/utils";
+import { Accessor, batch, JSX, Setter } from "solid-js";
+import { createComputed, createMemo, createResource, createSignal } from "solid-js";
 
 export type PaginationOptions = {
   /** the overall number of pages */
@@ -106,25 +108,33 @@ export const createPagination = (
       }[ev.key] || noop
     )());
 
-  const pages: PaginationProps = [...Array(opts().pages)].map((_, i) =>
-    ((pageNo: number) =>
-      Object.defineProperties(
-        process.env.SSR
-          ? { children: pageNo.toString() }
-          : {
-              children: pageNo.toString(),
-              onClick: [setPage, pageNo] as const,
-              onKeyUp: [onKeyUp, pageNo] as const
-            },
-        {
-          "aria-current": {
-            get: () => (page() === pageNo ? "true" : undefined),
-            set: noop,
-            enumerable: true
-          },
-          page: { value: pageNo, enumerable: false }
-        }
-      ))(i + 1)
+  const maxPages = createMemo(() => Math.min(opts().maxPages, opts().pages));
+
+  const pages = createMemo<PaginationProps>(
+    previous =>
+      [...Array(opts().pages)].map(
+        (_, i) =>
+          previous[i] ||
+          ((pageNo: number) =>
+            Object.defineProperties(
+              process.env.SSR
+                ? { children: pageNo.toString() }
+                : {
+                    children: pageNo.toString(),
+                    onClick: [setPage, pageNo] as const,
+                    onKeyUp: [onKeyUp, pageNo] as const
+                  },
+              {
+                "aria-current": {
+                  get: () => (page() === pageNo ? "true" : undefined),
+                  set: noop,
+                  enumerable: true
+                },
+                page: { value: pageNo, enumerable: false }
+              }
+            ))(i + 1)
+      ),
+    []
   );
   const first = Object.defineProperties(
     process.env.SSR
@@ -180,7 +190,7 @@ export const createPagination = (
   );
 
   const start = createMemo(() =>
-    Math.min(opts().pages - opts().maxPages, Math.max(1, page() - (opts().maxPages >> 1)) - 1)
+    Math.min(opts().pages - maxPages(), Math.max(1, page() - (maxPages() >> 1)) - 1)
   );
   const showFirst = createMemo(() =>
     normalizeOption("showFirst", opts().showFirst, page(), opts().pages)
@@ -203,7 +213,7 @@ export const createPagination = (
     if (showPrev()) {
       props.push(back);
     }
-    props.push(...pages.slice(start(), start() + opts().maxPages));
+    props.push(...pages().slice(start(), start() + maxPages()));
     if (showNext()) {
       props.push(next);
     }
@@ -215,3 +225,75 @@ export const createPagination = (
 
   return [paginationProps, page, setPage as Setter<number>];
 };
+
+declare module "solid-js" {
+  namespace JSX {
+    interface Directives {
+      infiniteScrollLoader: boolean;
+    }
+  }
+}
+
+export type _E = JSX.Element;
+
+/**
+ * Provides an easy way to implement infinite scrolling.
+ *
+ * ```ts
+ * const [pages, loader, { page, setPage, setPages, end, setEnd }] = createInfiniteScroll(fetcher);
+ * ```
+ * @param fetcher `(page: number) => Promise<T[]>`
+ * @return `pages()` is an accessor contains array of contents
+ * @property `pages.loading` is a boolean indicator for the loading state
+ * @property `pages.error` contains any error encountered
+ * @return `infiniteScrollLoader` is a directive used to set the loader element
+ * @method `page` is an accessor that contains page number
+ * @method `setPage` allows to manually change the page number
+ * @method `setPages` allows to manually change the contents of the page
+ * @method `end` is a boolean indicator for end of the page
+ * @method `setEnd` allows to manually change the end
+ */
+export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
+  pages: Accessor<T[]>,
+  loader: Directive,
+  options: {
+    page: Accessor<number>;
+    setPage: Setter<number>;
+    setPages: Setter<T[]>;
+    end: Accessor<boolean>;
+    setEnd: Setter<boolean>;
+  }
+] {
+  const [pages, setPages] = createSignal<T[]>([]);
+  const [page, setPage] = createSignal(0);
+  const [end, setEnd] = createSignal(false);
+
+  const { add: setLoader } = makeIntersectionObserver([], e => {
+    if (e.length > 0 && e[0].isIntersecting && !end() && !contents.loading) {
+      setPage(p => p + 1);
+    }
+  });
+
+  const [contents] = createResource(page, fetcher);
+
+  createComputed(() => {
+    const content = contents();
+    if (!content) return;
+    batch(() => {
+      if (content.length === 0) setEnd(true);
+      setPages(p => [...p, ...content]);
+    });
+  });
+
+  return [
+    pages,
+    setLoader,
+    {
+      page: page,
+      setPage: setPage,
+      setPages: setPages,
+      end: end,
+      setEnd: setEnd
+    }
+  ];
+}

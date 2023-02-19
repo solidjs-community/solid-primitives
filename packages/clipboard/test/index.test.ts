@@ -1,36 +1,27 @@
 import "./setup";
-import { createEffect, createRoot, on } from "solid-js";
+import { createComputed, createRoot } from "solid-js";
 import { createClipboard } from "../src";
 import { describe, expect, it } from "vitest";
 
-const until = (value: any): Promise<void> =>
-  new Promise(resolve => {
-    const timeout = setTimeout(resolve, 2500);
-    createRoot(dispose => {
-      createEffect(
-        on(
-          value,
-          () => {
-            resolve();
-            clearTimeout(timeout);
-            dispose();
-          },
-          { defer: true }
-        )
-      );
-    });
-  });
-
 describe("createClipboard", () => {
   it("test initial read values", () =>
-    createRoot(async dispose => {
-      const [clipboard] = createClipboard();
-      await until(clipboard);
-      const items = clipboard();
-      expect(items).toHaveLength(1);
-      const txt = items![0].text;
-      await until(txt);
-      expect(txt()).toBe("InitialValue");
-      dispose();
+    createRoot(async () => {
+      const [clipboard, refetch] = createClipboard();
+      let i = 0;
+
+      await new Promise<void>(resolve => {
+        createComputed(() => {
+          const items = clipboard();
+          if (i === 0) {
+            expect(items).toHaveLength(0);
+            queueMicrotask(() => refetch());
+          } else {
+            expect(items).toHaveLength(1);
+            expect(items![0].text).toBe("InitialValue");
+            resolve();
+          }
+          i++;
+        });
+      });
     }));
 });
