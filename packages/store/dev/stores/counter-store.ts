@@ -1,6 +1,5 @@
 import { createStoreFactory } from "../../dist";
 
-
 export interface CounterState {
   id?: string;
   value: number;
@@ -16,27 +15,25 @@ export interface CounterActions {
   get: () => number;
 }
 
-const [CounterProvider, {useStore: useCounterStore, produce, unwrapped}] = createStoreFactory({
+const [CounterProvider, { useStore: useCounterStore, produce, unwrapped }] = createStoreFactory(
+  {
     value: 0,
-    initialValue: 0,
+    initialValue: 0
   } as CounterState,
   (state, setState): CounterActions => {
-
     return {
-      toString: () => `${state.id && '-'}(${state.value})`,
+      toString: () => `${state.id && "-"}(${state.value})`,
       isZero: () => state.value === 0,
       isNegative: () => state.value < 0,
       isPositive: () => state.value >= 0,
-      updateId: (newId) => setState(val => ({...val, id: newId})),
-      resetCount: (overrideValue): void => produce(v => {
-        v.value = overrideValue ?? v.initialValue;
-      }),
-      get: () => state.value,
+      updateId: newId => setState(val => ({ ...val, id: newId })),
+      resetCount: (overrideValue): void =>
+        produce(v => {
+          v.value = overrideValue ?? v.initialValue;
+        }),
+      get: () => state.value
     };
   }
 );
 
-export {
-  CounterProvider,
-  useCounterStore,
-}
+export { CounterProvider, useCounterStore };

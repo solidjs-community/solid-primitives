@@ -1,50 +1,51 @@
-
-import type { ComponentProps, JSX, JSXElement } from 'solid-js';
-import { For, createMemo } from 'solid-js';
-
+import type { ComponentProps, JSX, JSXElement } from "solid-js";
+import { For, createMemo } from "solid-js";
 
 const getRandomColor = () => {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  [...Array(6)].forEach(() => color += letters[Math.floor(Math.random() * 16)]);
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  [...Array(6)].forEach(() => (color += letters[Math.floor(Math.random() * 16)]));
   return color;
-}
+};
 
 export type BoxesDemoArgs = {
   boxes: number;
   boxSize?: string;
-} & ComponentProps<'div'>;
+} & ComponentProps<"div">;
 
 export const BoxesDemo = (props: BoxesDemoArgs) => {
   const boxes = createMemo(() => [...Array(props.boxes).keys()], [0]);
 
   return (
     <>
-      <div {...props}
-        class='flex flex-row flex-wrap justify-around gap-3 min-h-80 w-80'
+      <div
+        {...props}
+        class="flex flex-row flex-wrap justify-around gap-3 min-h-80 w-80"
         style={{
-          ...(props.style as JSX.CSSProperties || []),
-      }}>
+          ...((props.style as JSX.CSSProperties) || [])
+        }}
+      >
         <For each={boxes()} fallback={<div>No Items</div>}>
           {(_, index) => {
-
             return (
               <>
                 <div
                   class={`flex items-center justify-center`}
                   classList={{
-                    'w-[50px]': !props?.boxSize,
-                    'h-[50px]': !props?.boxSize,
+                    "w-[50px]": !props?.boxSize,
+                    "h-[50px]": !props?.boxSize
                   }}
                   style={{
-                    ...(props?.boxSize ? {
-                      'width': props.boxSize,
-                      'height': props.boxSize,
-                    } : {}),
-                    'background-color': getRandomColor(),
+                    ...(props?.boxSize
+                      ? {
+                          width: props.boxSize,
+                          height: props.boxSize
+                        }
+                      : {}),
+                    "background-color": getRandomColor()
                   }}
                 >
-                  {index()+1}
+                  {index() + 1}
                 </div>
               </>
             );
@@ -54,5 +55,3 @@ export const BoxesDemo = (props: BoxesDemoArgs) => {
     </>
   );
 };
-
-
