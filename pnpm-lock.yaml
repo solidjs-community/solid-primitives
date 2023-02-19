@@ -420,10 +420,14 @@ importers:
 
   packages/page-visibility:
     specifiers:
-      '@solid-primitives/rootless': workspace:^1.2.2
+      '@solid-primitives/event-listener': workspace:^2.2.6
+      '@solid-primitives/rootless': workspace:^1.2.3
+      '@solid-primitives/utils': workspace:^5.0.0
       solid-js: ^1.6.0
     dependencies:
+      '@solid-primitives/event-listener': link:../event-listener
       '@solid-primitives/rootless': link:../rootless
+      '@solid-primitives/utils': link:../utils
       solid-js: 1.6.9
 
   packages/pagination:
@@ -611,9 +615,11 @@ importers:
   packages/styles:
     specifiers:
       '@solid-primitives/rootless': workspace:^1.2.2
+      '@solid-primitives/utils': workspace:^5.0.0
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/rootless': link:../rootless
+      '@solid-primitives/utils': link:../utils
       solid-js: 1.6.9
 
   packages/timer:

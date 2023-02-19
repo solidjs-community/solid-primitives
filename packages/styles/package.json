@@ -98,7 +98,8 @@
     "css"
   ],
   "dependencies": {
-    "@solid-primitives/rootless": "workspace:^1.2.2"
+    "@solid-primitives/rootless": "workspace:^1.2.2",
+    "@solid-primitives/utils": "workspace:^5.0.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
