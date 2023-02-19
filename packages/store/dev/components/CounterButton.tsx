@@ -1,4 +1,5 @@
 import type { ParentComponent, ComponentProps, JSX, JSXElement } from "solid-js";
+import { splitProps } from "solid-js";
 import type { CounterState, CounterActions } from "../stores/counter-store";
 import { useCounterStore } from "../stores/counter-store";
 
@@ -14,11 +15,12 @@ export type CounterButtonType = ParentComponent<CounterButtonProps & {
 
 export const CounterButton: CounterButtonType = (props) => {
   const [counterState, counterActions] = useCounterStore();
-  const onClick = () => props.onClick(counterState, counterActions);
+  const [counterProps, buttonProps] = splitProps(props, ['onClick', 'text']);
+  const onClick = () => counterProps.onClick(counterState, counterActions);
 
   return (
     <>
-      <button {...props} onClick={onClick}>
+      <button {...buttonProps} onClick={onClick}>
         {!!props.text ? props.text : props.children}
       </button>
     </>

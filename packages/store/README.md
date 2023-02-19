@@ -81,8 +81,12 @@ pnpm add @solid-primitives/store
 
 ## Demo
 
-TODO
-<!-- You can use this template for publishing your demo on CodeSandbox: https://codesandbox.io/s/solid-primitives-demo-template-sz95h -->
+View Demo:
+https://vu5z5u-3000.preview.csb.app/
+
+Open Demo Editor:
+https://codesandbox.io/p/sandbox/solid-primitives-store-web-demo-vu5z5u
+
 
 ## Changelog
 

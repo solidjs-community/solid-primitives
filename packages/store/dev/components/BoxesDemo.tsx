@@ -21,7 +21,7 @@ export const BoxesDemo = (props: BoxesDemoArgs) => {
   return (
     <>
       <div {...props}
-        class='flex flex-row flex-wrap gap-3 min-h-80 w-80'
+        class='flex flex-row flex-wrap justify-around gap-3 min-h-80 w-80'
         style={{
           ...(props.style as JSX.CSSProperties || []),
       }}>
