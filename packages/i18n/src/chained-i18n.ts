@@ -159,7 +159,9 @@ export function createChainedI18n<T extends Dictionaries<I18nObject>>(props: {
 }
 
 /**
- * Creates chainedI18n with a context. This allows you to
+ * Creates chained I18n state wrapped in a Context Provider to be shared with the app using the component tree.
+ *
+ * Wraps {@link createChainedI18n}
  *
  * @param props Props for createChainedI18n
  * @param setFallback Sets the context on creation for a global i18n.
