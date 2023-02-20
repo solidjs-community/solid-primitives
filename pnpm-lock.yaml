@@ -59,7 +59,7 @@ importers:
   packages/active-element:
     specifiers:
       '@solid-primitives/event-listener': ^2.2.6
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/utils': ^5.2.0
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -134,7 +134,7 @@ importers:
     specifiers:
       '@solid-primitives/event-listener': ^2.2.6
       '@solid-primitives/rootless': ^1.2.3
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/utils': ^5.2.0
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -371,7 +371,7 @@ importers:
     specifiers:
       '@solid-primitives/event-listener': workspace:^2.2.6
       '@solid-primitives/rootless': workspace:^1.2.3
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.2.0
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -424,7 +424,7 @@ importers:
     specifiers:
       '@solid-primitives/event-listener': workspace:^2.2.6
       '@solid-primitives/rootless': workspace:^1.2.3
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.2.0
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -619,7 +619,7 @@ importers:
   packages/styles:
     specifiers:
       '@solid-primitives/rootless': workspace:^1.2.2
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.2.0
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/rootless': link:../rootless
