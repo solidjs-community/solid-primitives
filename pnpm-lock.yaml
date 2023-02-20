@@ -21,7 +21,7 @@ importers:
       prettier: ^2.8.4
       solid-js: ^1.6.11
       tsup: ^6.6.3
-      tsup-preset-solid: ^0.1.6
+      tsup-preset-solid: ^0.1.8
       turbo: ^1.7.4
       type-fest: ^3.6.0
       typescript: ^4.9.5
@@ -47,7 +47,7 @@ importers:
       prettier: 2.8.4
       solid-js: 1.6.11
       tsup: 6.6.3_typescript@4.9.5
-      tsup-preset-solid: 0.1.6_mpb67xq6yqcmwxkx4udi7xjn6u
+      tsup-preset-solid: 0.1.8_mpb67xq6yqcmwxkx4udi7xjn6u
       turbo: 1.7.4
       type-fest: 3.6.0
       typescript: 4.9.5
@@ -7561,8 +7561,8 @@ packages:
     resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
     dev: true
 
-  /tsup-preset-solid/0.1.6_mpb67xq6yqcmwxkx4udi7xjn6u:
-    resolution: {integrity: sha512-9vocqmBU7k53DxwcybxcL8bH/hxKjEKYNSlZEA0GFNxldsaao7pfAemE4Mjdkcc5UCRYfFWf04GsfIYscl4Sqg==}
+  /tsup-preset-solid/0.1.8_mpb67xq6yqcmwxkx4udi7xjn6u:
+    resolution: {integrity: sha512-V5TZFEZY9emACO3AZvKyCRzdoyjUcuMEEbTGcJnCma7OVvGnSNVoewFff9g0CaveJ8cZcC3u2tW9gMaxmPZ71A==}
     peerDependencies:
       tsup: ^6.5.0
     dependencies:

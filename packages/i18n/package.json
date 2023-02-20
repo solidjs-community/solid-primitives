@@ -32,12 +32,20 @@
   "browser": {},
   "types": "./dist/index.d.ts",
   "exports": {
+    "development": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/dev.js"
+      },
+      "require": "./dist/dev.cjs"
+    },
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
     "require": "./dist/index.cjs"
   },
+  "typesVersions": {},
   "scripts": {
     "dev": "vite serve dev",
     "page": "vite build dev",
@@ -55,7 +63,6 @@
   "peerDependencies": {
     "solid-js": "^1.6.0"
   },
-  "typesVersions": {},
   "dependencies": {
     "@solid-primitives/context": "workspace:^0.1.3"
   }
