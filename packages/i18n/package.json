@@ -17,7 +17,7 @@
     "stage": 3,
     "list": [
       "createI18nContext",
-      "useI18n"
+      "createChainedI18n"
     ],
     "category": "Utilities"
   },
