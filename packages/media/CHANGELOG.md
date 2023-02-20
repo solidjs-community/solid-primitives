@@ -1,5 +1,13 @@
 # @solid-primitives/media
 
+## 2.1.1
+
+### Patch Changes
+
+- 646f576a: Add `createHydrateSignal` primitive to utils and fix hydration issues
+- Updated dependencies [646f576a]
+  - @solid-primitives/utils@5.2.0
+
 ## 2.1.0
 
 ### Minor Changes
