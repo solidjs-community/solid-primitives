@@ -68,7 +68,7 @@ const value = createI18nContext(dict, "fr");
 
 <I18nContext.Provider value={value}>
   <App />
-</I18nContext.Provider>
+</I18nContext.Provider>;
 ```
 
 ## `createChainedI18n`
@@ -94,11 +94,11 @@ const dictionaries = {
 const [t, { locale, setLocale, getDictionary }] = createChainedI18n({
   dictionaries,
   locale: "en" // Starting locale
-})
+});
 
 createEffect(() => {
-  t.hello({ name: "Mathiew" })
-})
+  t.hello({ name: "Mathiew" });
+});
 ```
 
 ### `createChainedI18nContext`
@@ -139,7 +139,7 @@ const App: Component = () => {
 
 <I18nContext.Provider value={value}>
   <App />
-</I18nContext.Provider>
+</I18nContext.Provider>;
 ```
 
 ## Demo
