@@ -67,12 +67,10 @@ export const createWebShare = (
   data: Accessor<ShareData>,
   deferInitial: boolean = false
 ): ShareStatus => {
-  const [status, setStatus] = createSignal<ShareStatus>({});
-
   if (process.env.SSR) {
     return {};
   }
-
+  const [status, setStatus] = createSignal<ShareStatus>({});
   const share = makeWebShare();
   createEffect(
     on(
