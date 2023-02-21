@@ -1,3 +1,4 @@
+import { createMediaQuery } from "@solid-primitives/media";
 import { A, useLocation } from "@solidjs/router";
 import Fuse from "fuse.js";
 import { FiSearch, FiX } from "solid-icons/fi";
@@ -17,6 +18,7 @@ type TPrimitive = {
 const Search: Component<{
   setOpen: (value: boolean) => void;
 }> = props => {
+  const isSmall = createMediaQuery("(max-width: 767px)");
   const [search, setSearch] = createSignal("");
   const [searchResult, setSearchResult] = createStore<TPrimitive[]>([]);
   let input!: HTMLInputElement;
@@ -91,9 +93,15 @@ const Search: Component<{
   );
 
   return (
-    <div class="p-2 flex justify-center items-center w-screen max-w-[800px]">
+    <div class="p-4 flex justify-center items-center w-screen max-w-[800px]">
       <div class="w-full rounded-lg bg-page-main-bg">
-        <div class="sticky top-[60px]">
+        <div
+          class="sticky"
+          classList={{
+            "top-0": isSmall(),
+            "top-[60px]": !isSmall()
+          }}
+        >
           <div class="flex gap-2 p-2 bg-page-main-bg rounded-lg">
             <div
               class="flex flex-grow w-max-[350px] font-sans px-2 py-2 items-center dark:bg-page-main-bg border-[#d0e4ff87] border-2 rounded-md text-[#306FC4] hover:text-[#063983] focus-within:text-[#063983] focus-within:outline-dashed cursor-text dark:text-[#c2d5ee] dark:hover:text-white"
@@ -124,7 +132,7 @@ const Search: Component<{
             </button>
           </div>
           <div
-            class="relative border-b border-slate-300 px-2 bg-page-main-bg"
+            class="relative border-b border-slate-300 px-2 bg-page-main-bg dark:border-slate-600"
             classList={{ hidden: !searchResult.length }}
           >
             <div class="absolute top-[-16px] h-[16px] left-4 right-4  shadow-lg shadow-[#24405966] dark:shadow-[#05121dbf] -z-1" />
@@ -137,7 +145,7 @@ const Search: Component<{
               {({ name, category, description, primitives, primitivesCount }) => {
                 return (
                   <li class="py-2">
-                    <h4 class="font-semibold text-[#49494B]">
+                    <h4 class="font-semibold text-[#49494B] dark:text-[#bec5cf]">
                       <A href={`/${name}`}>{name}</A>
                     </h4>
                     <p class="text-[14px] my-[6px]">{description}</p>
@@ -145,10 +153,10 @@ const Search: Component<{
                       <For each={primitives}>
                         {item => {
                           return (
-                            <li class="">
+                            <li>
                               <A
                                 href={`/${name}#${item.toLocaleLowerCase()}`}
-                                class="text-[14px] sm:text-base text-[#063983] hover:text-black font-semibold pt-1 px-2 pb-0 bg-[#d0e4ff87] rounded-md inline-block transition-colors"
+                                class="text-[14px] sm:text-base text-[#063983] hover:text-black font-semibold px-2 pb-0 bg-[#e6f0ff] dark:text-[#b9d6ff] dark:bg-[#30455b] dark:hover:text-[#fff] rounded-md inline-block transition-colors"
                               >
                                 {item}
                               </A>

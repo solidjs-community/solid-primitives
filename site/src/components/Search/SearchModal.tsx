@@ -1,4 +1,5 @@
 // import { createShortcut } from "@solid-primitives/keyboard";
+import { createMediaQuery } from "@solid-primitives/media";
 import Dismiss from "solid-dismiss";
 import { Accessor, batch, Component, createEffect, on, onMount } from "solid-js";
 import { produce, unwrap } from "solid-js/store";
@@ -12,6 +13,7 @@ const SearchModal: Component<{
   open: Accessor<boolean>;
   setOpen: (value: boolean) => void;
 }> = ({ menuButton, open, setOpen }) => {
+  const isSmall = createMediaQuery("(max-width: 767px)");
   let prevHeaderState: typeof headerState;
   let rootApp!: HTMLElement;
   let containerEl!: HTMLElement;
@@ -89,49 +91,61 @@ const SearchModal: Component<{
       overlayElement={{
         element: (
           <div>
-            <div class="fixed top-0 left-0 right-0 h-[60px] z-[1002]" onClick={onClickClose} />
+            <div
+              class="fixed top-0 left-0 right-0 h-[60px] z-[1002]"
+              classList={{ hidden: isSmall() }}
+              onClick={onClickClose}
+            />
             <div class="fixed inset-0 z-[1000] will-change-transform" onClick={onClickClose}>
-              <div class="h-full mt-[60px] bg-[#102a62b8] dark:bg-[#001627bd] backdrop-blur-sm" />
+              <div
+                class="h-full bg-[#102a62b8] dark:bg-[#001627bd] backdrop-blur-sm"
+                classList={{ "mt-[60px]": !isSmall() }}
+              />
             </div>
           </div>
         ),
-        animation: {
-          name: "fade-opacity",
-          onEnter() {
-            prevHeaderState = structuredClone(unwrap(headerState));
-            batch(() => {
-              setHeaderState("disableScroll", true);
-              setHeaderState("showSearchBtn", false);
-              setHeaderState("showGradientBorder", false);
-              setHeaderState("showOpaqueBg", true);
-              setHeaderState("zIndex", 1001);
-            });
-            changePageLayout();
-          },
-          onExit: () => {
-            setHeaderState("showSearchBtn", true);
-          },
-          onAfterExit: () => {
-            restorePageLayout();
-
-            batch(() => {
-              setHeaderState("disableScroll", false);
-              setHeaderState("showGradientBorder", prevHeaderState.showGradientBorder);
-              setHeaderState("showOpaqueBg", prevHeaderState.showOpaqueBg);
-              setHeaderState("zIndex", prevHeaderState.zIndex);
-            });
-          }
-        }
+        animation: !isSmall()
+          ? {
+              name: "fade-opacity"
+            }
+          : undefined
       }}
       animation={{
-        name: "fade-opacity"
+        name: "fade-opacity",
+        onEnter() {
+          prevHeaderState = structuredClone(unwrap(headerState));
+          batch(() => {
+            setHeaderState("disableScroll", true);
+            setHeaderState("showSearchBtn", false);
+            setHeaderState("showGradientBorder", false);
+            setHeaderState("showOpaqueBg", true);
+            if (!isSmall()) {
+              setHeaderState("zIndex", 1001);
+            }
+          });
+          changePageLayout();
+        },
+        onExit: () => {
+          setHeaderState("showSearchBtn", true);
+        },
+        onAfterExit: () => {
+          restorePageLayout();
+
+          batch(() => {
+            setHeaderState("disableScroll", false);
+            setHeaderState("showGradientBorder", prevHeaderState.showGradientBorder);
+            setHeaderState("showOpaqueBg", prevHeaderState.showOpaqueBg);
+            setHeaderState("zIndex", prevHeaderState.zIndex);
+          });
+        }
       }}
       focusElementOnOpen="firstChild"
       ref={containerEl}
     >
       <div
         // class="fixed top-[80px] left-0 right-0 flex justify-center pointer-events-none"
-        class="mt-[80px] mb-[60px] px-2 flex justify-center pointer-events-none"
+        class="mb-[60px] flex justify-center pointer-events-none"
+        classList={{ "mt-[80px]": !isSmall() }}
         role="presentation"
         ref={dialogEl}
       >
