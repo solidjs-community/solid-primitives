@@ -18,7 +18,8 @@ export const [headerState, setHeaderState] = createStore({
   showShadow: false,
   showGradientBorder: false,
   disableScroll: false,
-  showSearchBtn: true
+  showSearchBtn: true,
+  zIndex: 10
 });
 
 function easeInOutCubic(x: number): number {
@@ -119,7 +120,7 @@ const Header = () => {
   );
 
   return (
-    <header class="fixed top-0 left-0 right-0 h-[60px] z-10">
+    <header class="fixed top-0 left-0 right-0 h-[60px]" style={{ "z-index": headerState.zIndex }}>
       <div class="relative h-full">
         <div class="max-w-[900px] mx-auto w-full h-full flex px-4 sm:px-8 items-center justify-between gap-2">
           <div
@@ -164,7 +165,7 @@ const Header = () => {
           {/* </A> */}
           <nav>
             <ul class="flex items-center gap-3">
-              <li classList={{ "opacity-0": !headerState.showSearchBtn }}>
+              <li class="transition" classList={{ "opacity-0": !headerState.showSearchBtn }}>
                 <SearchBtn ref={menuButtonSearch} />
               </li>
               <li>

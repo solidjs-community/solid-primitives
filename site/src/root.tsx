@@ -41,11 +41,13 @@ export default function Root() {
           <ErrorBoundary>
             <div id="root">
               <Header />
-              <SolidBlocksHeaderClusterDefs />
-              <Routes>
-                <FileRoutes />
-              </Routes>
-              <Footer />
+              <div id="root-subcontainer">
+                <SolidBlocksHeaderClusterDefs />
+                <Routes>
+                  <FileRoutes />
+                </Routes>
+                <Footer />
+              </div>
             </div>
           </ErrorBoundary>
         </Suspense>
