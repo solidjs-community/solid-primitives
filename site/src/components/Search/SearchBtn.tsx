@@ -1,5 +1,6 @@
+import { isWindows } from "@solid-primitives/platform";
 import { FiSearch } from "solid-icons/fi";
-import { Component } from "solid-js";
+import { Component, onMount, Show } from "solid-js";
 
 const SearchBtn: Component<{ ref: HTMLButtonElement }> = props => {
   return (
@@ -11,7 +12,13 @@ const SearchBtn: Component<{ ref: HTMLButtonElement }> = props => {
         <FiSearch />
       </div>
       <div class="hidden xs:block">Quick Search ...</div>
-      <div class="ml-auto">⌘K</div>
+      <div class="ml-auto">
+        <Show when={isWindows} fallback={<span>⌘K</span>}>
+          <span>
+            <span>Ctrl</span> <span>K</span>
+          </span>
+        </Show>
+      </div>
     </button>
   );
 };

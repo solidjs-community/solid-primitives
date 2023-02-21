@@ -5,6 +5,7 @@ import Heading from "./Heading";
 import InfoBar from "./InfoBar";
 import ON_CLIENT_DEV_MODE from "~/hooks/ON_CLIENT_DEV_MODE";
 import { isServer } from "solid-js/web";
+import { setHeaderState } from "../Header/Header";
 
 const githubRepo = "https://github.com/solidjs-community/solid-primitives";
 
@@ -31,6 +32,7 @@ const PrimitivePageMain: ParentComponent<{
   onStyleMount({
     mount: () => {
       document.documentElement.classList.add("primitives-page-main");
+      setHeaderState("showGradientBorder", false);
     },
     cleanup: () => {
       document.documentElement.classList.remove("primitives-page-main");

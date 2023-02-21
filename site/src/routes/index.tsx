@@ -9,7 +9,8 @@ export default function Home() {
       <Title>Solid Primitives</Title>
       <div class="p-4 sm:pt-[5vh] md:pt-[10vh] leading-7 max-w-[720px] mx-auto min-h-[35vh] sm:min-h-[50vh] overflow-clip">
         <p class="py-3 sm:text-lg md:text-2xl">
-          A project that strives to develop high-quality, community contributed Solid primitives.
+          A project that strives to develop high-quality, community contributed Solid{" "}
+          <strong>Primitives</strong>.
           {/* All utilities are well tested and continuously maintained. */}
         </p>
         <div class="relative mt-4 mb-10 text-[14px] sm:text-base md:text-lg">

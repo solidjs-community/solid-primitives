@@ -146,7 +146,7 @@ const Search: Component<{
                 return (
                   <li class="py-2">
                     <h4 class="font-semibold text-[#49494B] dark:text-[#bec5cf]">
-                      <A href={`/${name}`}>{name}</A>
+                      <A href={`/${name.toLowerCase()}`}>{name}</A>
                     </h4>
                     <p class="text-[14px] my-[6px]">{description}</p>
                     <ul class="flex gap-2 flex-wrap">
@@ -155,7 +155,7 @@ const Search: Component<{
                           return (
                             <li>
                               <A
-                                href={`/${name}#${item.toLocaleLowerCase()}`}
+                                href={`/${name}#${item.toLowerCase()}`}
                                 class="text-[14px] sm:text-base text-[#063983] hover:text-black font-semibold px-2 pb-0 bg-[#e6f0ff] dark:text-[#b9d6ff] dark:bg-[#30455b] dark:hover:text-[#fff] rounded-md inline-block transition-colors"
                               >
                                 {item}
