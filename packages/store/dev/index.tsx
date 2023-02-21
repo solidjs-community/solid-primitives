@@ -7,9 +7,14 @@ import { CounterControls, BoxesDemo } from "./components";
 import "uno.css";
 
 const App: Component = () => {
-  const [state, { get: count, resetCount: setCount, isZero }] = useCounterStore();
-  const isPositive = () => count() > 0;
-  const isNegative = () => count() < 0;
+  const [
+    state,
+    {
+      getters: { get: count, isNegative, isPositive, isZero },
+      actions: { resetCount: setCount }
+    }
+  ] = useCounterStore();
+
   const increment = () => setCount(count() + 1);
 
   const getBoxCount = createMemo(() => (!isPositive() ? 25 : count()), 0);
@@ -17,7 +22,7 @@ const App: Component = () => {
   return (
     <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
       <div class="wrapper-v">
-        <h4>Counter Information</h4>
+        <h4>Counter Information {state.value}</h4>
         <ul>
           <li>isZero: {isZero().toString()}</li>
           <li>isNegative: {isNegative().toString()}</li>

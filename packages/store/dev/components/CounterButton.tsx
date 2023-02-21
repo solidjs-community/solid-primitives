@@ -13,7 +13,7 @@ export type CounterButtonType = ParentComponent<
 >;
 
 export const CounterButton: CounterButtonType = props => {
-  const [counterState, counterActions] = useCounterStore();
+  const [counterState, { actions: counterActions }] = useCounterStore();
   const [counterProps, buttonProps] = splitProps(props, ["onClick", "text"]);
   const onClick = () => counterProps.onClick(counterState, counterActions);
 
