@@ -3,10 +3,11 @@ import Dismiss from "solid-dismiss";
 import { Accessor, Component, createEffect, on } from "solid-js";
 import { useLocation } from "solid-start";
 import { createShortcut } from "~/hooks/createShortcut";
+import { setHeaderState } from "../Header/Header";
 import Search from "./Search";
 
 const SearchModal: Component<{
-  menuButton: Element;
+  menuButton: HTMLElement;
   open: Accessor<boolean>;
   setOpen: (value: boolean) => void;
 }> = ({ menuButton, open, setOpen }) => {
@@ -33,11 +34,6 @@ const SearchModal: Component<{
     )
   );
 
-  let timeout: number | null = null;
-  const onFocusOut = () => {
-    setOpen(false);
-  };
-
   return (
     <Dismiss
       menuButton={menuButton}
@@ -45,7 +41,28 @@ const SearchModal: Component<{
       open={open}
       setOpen={setOpen}
       overlayElement={{
-        class: "bg-[#102a62b8] dark:bg-[#001627bd] backdrop-blur-md !top-[60px]"
+        element: (
+          <div
+            class="fixed inset-0 z-[1000] will-change-transform"
+            onClick={() => {
+              setOpen(false);
+              requestAnimationFrame(() => {
+                menuButton.focus();
+              });
+            }}
+          >
+            <div class="h-full mt-[60px] bg-[#102a62b8] dark:bg-[#001627bd] backdrop-blur-sm" />
+          </div>
+        ),
+        animation: {
+          name: "fade-opacity"
+        }
+      }}
+      onOpen={open => {
+        setHeaderState("showSearchBtn", !open);
+      }}
+      animation={{
+        name: "fade-opacity"
       }}
       focusElementOnOpen="firstChild"
     >
@@ -53,22 +70,7 @@ const SearchModal: Component<{
         class="fixed top-[80px] left-0 right-0 flex justify-center pointer-events-none"
         role="presentation"
       >
-        <div
-          class="pointer-events-auto"
-          role="dialog"
-          aria-modal="true"
-          tabindex="-1"
-          // this is a bug, I need to fix dismiss
-          // main page header has higher zindex than overlay element and when clicking on it, it doesn't close modal
-          // here's workaround
-          onFocusOut={() => {
-            window.clearTimeout(timeout!);
-            timeout = window.setTimeout(onFocusOut);
-          }}
-          onFocusIn={() => {
-            window.clearTimeout(timeout!);
-          }}
-        >
+        <div class="pointer-events-auto" role="dialog" aria-modal="true" tabindex="-1">
           <Search />
         </div>
       </div>

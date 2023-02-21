@@ -52,7 +52,7 @@ const PrimitivePageMain: ParentComponent<{
             <Heading>{props.name.replace("-", " ")}</Heading>
             <div class="relative">
               <svg
-                class="absolute sm:hidden"
+                class="absolute"
                 viewBox="0 0 88.975 79.46"
                 xml:space="preserve"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -69,7 +69,7 @@ const PrimitivePageMain: ParentComponent<{
                 target="_blank"
               >
                 <FaBrandsGithub size={28} />
-                <div class="sm:hidden absolute top-[32px] left-0 -scale-y-100 mask-image-[linear-gradient(to_bottom,transparent_12px,#000)] opacity-20 blur-[2px]">
+                <div class="absolute top-[32px] left-0 -scale-y-100 mask-image-[linear-gradient(to_bottom,transparent_12px,#000)] opacity-20 blur-[2px]">
                   <FaBrandsGithub size={28} />
                 </div>
               </a>

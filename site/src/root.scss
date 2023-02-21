@@ -1,4 +1,4 @@
-@import url("./hljs.css");
+@import url("./hljs.scss");
 
 @font-face {
   font-family: "Gordita";
@@ -95,6 +95,9 @@ h3 {
 .header-anchor {
   margin-right: 0.25em;
 }
+.dark .header-anchor {
+  color: #506472;
+}
 pre {
   min-width: 100%;
   background: transparent;
@@ -104,6 +107,10 @@ pre {
 }
 .dark .prose {
   color: #f1f0f2;
+
+  blockquote {
+    color: #f1f0f2;
+  }
 }
 .prose pre {
   font-size: inherit;
@@ -118,6 +125,9 @@ pre {
 }
 .dark .prose h2 code {
   color: #aaa !important;
+}
+.dark .prose h2 {
+  border-bottom: 1px solid #4a5b68 !important;
 }
 .prose blockquote {
   @apply mx-0;
@@ -196,6 +206,7 @@ pre {
   --table-header-box-shadow: 0px 16px 14px -10px #24405966;
   --table-header-box-shadow-hide: 0px 16px 14px -10px #24405900;
   --header-border-bottom: linear-gradient(to right, #e4f6f9, #d8dff5);
+  --slide-exit-y: 100vh;
 }
 
 html.dark {
@@ -228,9 +239,9 @@ html.dark {
 }
 
 html.dark .prose {
-  --tw-prose-headings: #aaa !important;
-  --tw-prose-code: #fafafa !important;
-  --tw-prose-bold: #fafafa !important;
+  --tw-prose-headings: #98a3b1 !important;
+  --tw-prose-code: #98a3b1 !important;
+  --tw-prose-bold: #98a3b1 !important;
 }
 
 html.dark body {
@@ -254,5 +265,47 @@ html.dark.primitives-page-main {
 .dark .prose h2 code,
 .dark .prose h3 code,
 .dark .prose h4 code {
-  color: #fafafa !important;
+  color: #bec5cf !important;
+}
+
+.slide-modal {
+  &-enter {
+    transform: translateY(100vh);
+  }
+  &-enter-to {
+    transform: translateY(0);
+  }
+  &-exit {
+    transform: translateY(0);
+  }
+  &-exit-to {
+    transform: translateY(var(--slide-exit-y));
+  }
+
+  &-enter-to,
+  &-exit,
+  &-exit-to {
+    transition: transform 300ms;
+  }
+}
+
+.fade-opacity {
+  &-enter {
+    opacity: 0.1;
+  }
+  &-enter-to {
+    opacity: 1;
+  }
+  &-exit {
+    opacity: 1;
+  }
+  &-exit-to {
+    opacity: 0;
+  }
+
+  &-enter-to,
+  &-exit,
+  &-exit-to {
+    transition: opacity 200ms;
+  }
 }

@@ -16,7 +16,9 @@ import { createTween } from "@solid-primitives/tween";
 export const [headerState, setHeaderState] = createStore({
   showOpaqueBg: false,
   showShadow: false,
-  showGradientBorder: false
+  showGradientBorder: false,
+  disableScroll: false,
+  showSearchBtn: true
 });
 
 function easeInOutCubic(x: number): number {
@@ -44,7 +46,7 @@ const Header = () => {
 
     setHeaderState("showOpaqueBg", showOpaqueBg);
 
-    if (location.pathname === "/") {
+    if (location.pathname === "/solid-primitives/") {
       return;
     }
     setHeaderState("showShadow", showShadow);
@@ -53,13 +55,7 @@ const Header = () => {
   onMount(() => {
     checkScroll();
 
-    window.addEventListener(
-      "scroll",
-      () => {
-        checkScroll();
-      },
-      { passive: true }
-    );
+    window.addEventListener("scroll", checkScroll, { passive: true });
   });
 
   let navMenuHeight = 0;
@@ -102,6 +98,21 @@ const Header = () => {
         }
 
         setFrom(0);
+      },
+      { defer: true }
+    )
+  );
+
+  createEffect(
+    on(
+      () => headerState.disableScroll,
+      disableScroll => {
+        if (disableScroll) {
+          window.removeEventListener("scroll", checkScroll);
+
+          return;
+        }
+        window.addEventListener("scroll", checkScroll, { passive: true });
       },
       { defer: true }
     )
@@ -153,7 +164,7 @@ const Header = () => {
           {/* </A> */}
           <nav>
             <ul class="flex items-center gap-3">
-              <li>
+              <li classList={{ "opacity-0": !headerState.showSearchBtn }}>
                 <SearchBtn ref={menuButtonSearch} />
               </li>
               <li>

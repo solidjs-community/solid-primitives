@@ -13,7 +13,7 @@ import {
   Title
 } from "solid-start";
 
-import "./root.css";
+import "./root.scss";
 
 import Header from "./components/Header/Header";
 import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderClusterDefs";
@@ -39,12 +39,14 @@ export default function Root() {
       <Body class="dark:text-[#F1F0F2]">
         <Suspense>
           <ErrorBoundary>
-            <Header />
-            <SolidBlocksHeaderClusterDefs />
-            <Routes>
-              <FileRoutes />
-            </Routes>
-            <Footer />
+            <div id="root">
+              <Header />
+              <SolidBlocksHeaderClusterDefs />
+              <Routes>
+                <FileRoutes />
+              </Routes>
+              <Footer />
+            </div>
           </ErrorBoundary>
         </Suspense>
         <Scripts />
