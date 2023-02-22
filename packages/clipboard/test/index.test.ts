@@ -17,7 +17,7 @@ describe("createClipboard", () => {
             queueMicrotask(() => refetch());
           } else {
             expect(items).toHaveLength(1);
-            expect(items![0].text).toBe("InitialValue");
+            expect(items[0]!.text).toBe("InitialValue");
             resolve();
           }
           i++;
