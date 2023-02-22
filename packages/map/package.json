@@ -14,7 +14,7 @@
   },
   "primitive": {
     "name": "map",
-    "stage": 2,
+    "stage": 3,
     "list": [
       "ReactiveMap",
       "ReactiveWeakMap"

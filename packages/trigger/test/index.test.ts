@@ -1,6 +1,6 @@
 import { createComputed, createRoot } from "solid-js";
 import { describe, test, expect } from "vitest";
-import { createWeakTriggerCache, createTriggerCache } from "../src";
+import { createWeakTriggerCache, createTriggerMap } from "../src";
 
 describe("createTriggerCache", () => {
   test("weak trigger cache", () =>
@@ -24,7 +24,7 @@ describe("createTriggerCache", () => {
 
   test("weak trigger cache", () =>
     createRoot(dispose => {
-      const { dirty, track, dirtyAll } = createTriggerCache();
+      const { dirty, track, dirtyAll } = createTriggerMap();
       let runs1 = -1;
       let runs2 = -1;
       const key1 = "key1";

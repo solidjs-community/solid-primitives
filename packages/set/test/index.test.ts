@@ -1,4 +1,4 @@
-import { describe, test, it, expect } from "vitest";
+import { describe, test, it, expect, vi } from "vitest";
 import { ReactiveSet, ReactiveWeakSet } from "../src";
 import { createComputed, createRoot } from "solid-js";
 
@@ -28,7 +28,7 @@ describe("ReactiveSet", () => {
     createRoot(dispose => {
       const set = new ReactiveSet([1, 1, 2, 3]);
 
-      let captured: any[] = [];
+      const captured: any[] = [];
       createComputed(() => {
         captured.push(set.has(2));
       });
@@ -51,10 +51,39 @@ describe("ReactiveSet", () => {
 
       dispose();
     }));
+
+  test("spread is reactive", () =>
+    createRoot(dispose => {
+      const set = new ReactiveSet([1, 1, 2, 3]);
+
+      const fn = vi.fn();
+      createComputed(() => fn([...set]));
+      expect(fn).toHaveBeenLastCalledWith([1, 2, 3]);
+
+      set.add(4);
+      expect(fn).toHaveBeenLastCalledWith([1, 2, 3, 4]);
+
+      set.delete(4);
+      expect(fn).toHaveBeenLastCalledWith([1, 2, 3]);
+
+      set.delete(2);
+      expect(fn).toHaveBeenLastCalledWith([1, 3]);
+
+      set.delete(2);
+      expect(fn).toBeCalledTimes(4);
+
+      set.add(2);
+      expect(fn).toHaveBeenLastCalledWith([1, 3, 2]);
+
+      set.clear();
+      expect(fn).toHaveBeenLastCalledWith([]);
+
+      dispose();
+    }));
 });
 
 describe("ReactiveWeakSet", () => {
-  test("behaves like a WeakSet", () => {
+  it("behaves like a WeakSet", () => {
     const a = {};
     const b = {};
     const c = {};
@@ -77,5 +106,33 @@ describe("ReactiveWeakSet", () => {
 
     expect(set).instanceOf(WeakSet);
     expect(set).instanceOf(ReactiveWeakSet);
+  });
+
+  it("is reactive", () => {
+    const a = {};
+    const b = {};
+    const c = {};
+    const d = {};
+    const e = {};
+
+    const set = new ReactiveWeakSet([a, a, b, c, d]);
+
+    const captured: any[] = [];
+    createComputed(() => {
+      captured.push(set.has(e));
+    });
+    expect(captured, "1").toEqual([false]);
+
+    set.add(e);
+    expect(captured, "2").toEqual([false, true]);
+
+    set.delete(e);
+    expect(captured, "3").toEqual([false, true, false]);
+
+    set.delete(a);
+    expect(captured, "4").toEqual([false, true, false]);
+
+    set.add(a);
+    expect(captured, "5").toEqual([false, true, false, true]);
   });
 });

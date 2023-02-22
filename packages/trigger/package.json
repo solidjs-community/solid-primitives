@@ -15,11 +15,10 @@
   },
   "primitive": {
     "name": "trigger",
-    "stage": 0,
+    "stage": 1,
     "list": [
       "createTrigger",
-      "createTriggerCache",
-      "createWeakTriggerCache"
+      "TriggerMap"
     ],
     "category": "Reactivity"
   },

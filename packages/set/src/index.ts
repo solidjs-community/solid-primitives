@@ -1,7 +1,7 @@
-import { Accessor } from "solid-js";
-import { createTriggerCache, createWeakTriggerCache } from "@solid-primitives/trigger";
+import { Accessor, batch } from "solid-js";
+import { TriggerMap } from "@solid-primitives/trigger";
 
-const KEYS = Symbol("track-keys");
+const $KEYS = Symbol("track-keys");
 
 /**
  * A reactive version of a Javascript built-in `Set` class.
@@ -16,7 +16,7 @@ const KEYS = Symbol("track-keys");
  * set.clear()
  */
 export class ReactiveSet<T> extends Set<T> {
-  private cache = createTriggerCache<T | typeof KEYS>();
+  #triggers = new TriggerMap<T | typeof $KEYS>();
 
   constructor(values?: readonly T[] | null) {
     super();
@@ -24,60 +24,60 @@ export class ReactiveSet<T> extends Set<T> {
   }
 
   has(v: T): boolean {
-    this.cache.track(v);
+    this.#triggers.track(v);
     return super.has(v);
   }
   add(v: T): this {
-    if (super.has(v)) return this;
-    super.add(v);
-    this.cache.dirty(v);
-    this.cache.dirty(KEYS);
+    if (!super.has(v)) {
+      super.add(v);
+      batch(() => {
+        this.#triggers.dirty(v);
+        this.#triggers.dirty($KEYS);
+      });
+    }
     return this;
   }
   delete(v: T): boolean {
     const r = super.delete(v);
     if (r) {
-      this.cache.dirty(v);
-      this.cache.dirty(KEYS);
+      batch(() => {
+        this.#triggers.dirty(v);
+        this.#triggers.dirty($KEYS);
+      });
     }
     return r;
   }
   clear(): void {
     if (super.size) {
-      super.clear();
-      this.cache.dirtyAll();
+      batch(() => {
+        for (const v of super.keys()) this.#triggers.dirty(v);
+        super.clear();
+        this.#triggers.dirty($KEYS);
+      });
     }
   }
-  set(list: T[]): void {
-    super.clear();
-    list.forEach(v => super.add(v));
-    this.cache.dirtyAll();
-  }
   forEach(callbackfn: (value: T, value2: T, set: this) => void) {
-    this.cache.track(KEYS);
-    super.forEach((value, value2) => callbackfn(value, value2, this));
+    this.#triggers.track($KEYS);
+    super.forEach(callbackfn as any);
   }
   values(): IterableIterator<T> {
-    this.cache.track(KEYS);
+    this.#triggers.track($KEYS);
     return super.values();
   }
   keys(): IterableIterator<T> {
     return this.values();
   }
   entries(): IterableIterator<[T, T]> {
-    this.cache.track(KEYS);
+    this.#triggers.track($KEYS);
     return super.entries();
   }
   get size(): number {
-    this.cache.track(KEYS);
+    this.#triggers.track($KEYS);
     return super.size;
   }
 
   [Symbol.iterator](): IterableIterator<T> {
     return this.values();
-  }
-  get [Symbol.toStringTag](): string {
-    return super[Symbol.toStringTag];
   }
 }
 
@@ -92,7 +92,7 @@ export class ReactiveSet<T> extends Set<T> {
  * set.delete(2)
  */
 export class ReactiveWeakSet<T extends object> extends WeakSet<T> {
-  private cache = createWeakTriggerCache<T>();
+  #triggers = new TriggerMap<T>(WeakMap);
 
   constructor(values?: readonly T[] | null) {
     super();
@@ -100,23 +100,20 @@ export class ReactiveWeakSet<T extends object> extends WeakSet<T> {
   }
 
   has(v: T): boolean {
-    this.cache.track(v);
+    this.#triggers.track(v);
     return super.has(v);
   }
   add(v: T): this {
-    if (super.has(v)) return this;
-    super.add(v);
-    this.cache.dirty(v);
+    if (!super.has(v)) {
+      super.add(v);
+      this.#triggers.dirty(v);
+    }
     return this;
   }
   delete(v: T): boolean {
-    const r = super.delete(v);
-    if (r) this.cache.dirty(v);
-    return r;
-  }
-
-  get [Symbol.toStringTag](): string {
-    return super[Symbol.toStringTag];
+    const deleted = super.delete(v);
+    deleted && this.#triggers.dirty(v);
+    return deleted;
   }
 }
 

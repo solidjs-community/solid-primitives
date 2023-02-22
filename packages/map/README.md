@@ -7,7 +7,7 @@
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/map?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/map)
 [![version](https://img.shields.io/npm/v/@solid-primitives/map?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/map)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fasmaps%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fasmaps%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 The reactive versions of `Map` & `WeakMap` built-in data structures.
 
@@ -20,6 +20,8 @@ The reactive versions of `Map` & `WeakMap` built-in data structures.
 npm install @solid-primitives/map
 # or
 yarn add @solid-primitives/map
+# or
+pnpm add @solid-primitives/map
 ```
 
 ## `ReactiveMap` and `ReactiveWeakMap`
@@ -57,19 +59,13 @@ userPoints.set(user1, { foo: "bar" });
 
 #### Constructor arguments
 
-`ReactiveMap`'s and `ReactiveWeakMap`'s constructor takes two optional arguments:
-
-- `initial` - initial entries of the reactive map
-- `equals` - signal equals function, determining if a change should cause an update
+`ReactiveMap`'s and `ReactiveWeakMap`'s constructor one optional argument that is the initial entries of the map.
 
 ```ts
-const map = new ReactiveMap(
-  [
-    ["foo", [1, 2, 3]],
-    ["bar", [3, 4, 5]]
-  ],
-  (a, b) => a === b || (a.length === 0 && a.length === 0)
-);
+const map = new ReactiveMap([
+  ["foo", [1, 2, 3]],
+  ["bar", [3, 4, 5]]
+]);
 ```
 
 #### Values are shallowly wrapped
