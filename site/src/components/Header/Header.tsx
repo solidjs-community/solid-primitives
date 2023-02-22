@@ -37,6 +37,7 @@ const Header = () => {
   let menuButtonSearch!: HTMLButtonElement;
   let menuButtonNavMenu!: HTMLButtonElement;
   let headerOpaqueBg!: HTMLDivElement;
+  let headerOpaqueBgContainer!: HTMLDivElement;
   let headerBottomGradientBorder!: HTMLDivElement;
   let headerShadow!: HTMLDivElement;
   let navMenu!: HTMLDivElement;
@@ -81,9 +82,20 @@ const Header = () => {
         if (openNavMenu) {
           navMenuHeight = navMenu.clientHeight;
 
+          headerOpaqueBg.classList.add(
+            "!backdrop-blur-md",
+            "!bg-white/50",
+            "dark:!bg-[#293843]/70"
+          );
           headerOpaqueBg.style.height = `${navMenuHeight + headerHeight}px`;
+          headerOpaqueBgContainer.style.height = `${navMenuHeight + headerHeight}px`;
           headerOpaqueBg.style.transform = `translateY(${-navMenuHeight}px)`;
-          setFrom(navMenuHeight);
+          headerOpaqueBg.style.top = "-1px";
+          headerOpaqueBgContainer.style.top = "1px";
+
+          requestAnimationFrame(() => {
+            setFrom(navMenuHeight);
+          });
           return;
         }
         const showOpaqueBg = window.scrollY > 30;
@@ -97,7 +109,6 @@ const Header = () => {
             }
           }, openNavMenuDuration);
         }
-
         setFrom(0);
       },
       { defer: true }
@@ -110,7 +121,6 @@ const Header = () => {
       disableScroll => {
         if (disableScroll) {
           window.removeEventListener("scroll", checkScroll);
-
           return;
         }
         window.addEventListener("scroll", checkScroll, { passive: true });
@@ -184,16 +194,24 @@ const Header = () => {
         </div>
         <SearchModal menuButton={menuButtonSearch} open={openSearch} setOpen={setOpenSearch} />
       </div>
+      {/* fixes weird shimmering top dark shadow blur during openNavMenu animation in Chrome  */}
+      {/* Still shows up in Safari, no fix  */}
       <div
-        class="absolute h-full top-0 left-0 right-0 translate-y-[calc(-100%+60px)] transition-[background-color,backdrop-filter] -z-1"
-        classList={{
-          "backdrop-blur-md bg-white/50 dark:bg-[#293843]/70":
-            headerState.showOpaqueBg || openNavMenu(),
-          "backdrop-blur-none bg-white/0 dark:bg-[#293843]/0":
-            !openNavMenu() && !headerState.showOpaqueBg
-        }}
-        ref={headerOpaqueBg}
-      />
+        class="absolute inset-0 overflow-clip pointer-events-none -z-1"
+        ref={headerOpaqueBgContainer}
+      >
+        <div
+          class="absolute inset-0 translate-y-[calc(-100%+60px)] transition-[background-color,backdrop-filter]"
+          classList={{
+            "backdrop-blur-md bg-white/50 dark:bg-[#293843]/70":
+              headerState.showOpaqueBg || openNavMenu(),
+            "backdrop-blur-none bg-white/0 dark:bg-[#293843]/0":
+              !openNavMenu() && !headerState.showOpaqueBg
+          }}
+          ref={headerOpaqueBg}
+        />
+      </div>
+      <div class="absolute h-[1px] top-0 left-0 right-0 bg-page-main-bg z-1" />
       <div
         class="max-w-[900px] mx-auto background-[var(--header-border-bottom)] h-[2px] transition-opacity duration-250"
         classList={{
@@ -214,6 +232,17 @@ const Header = () => {
             },
             onExit: (_, done) => {
               setTimeout(done, openNavMenuDuration);
+            },
+            onAfterExit: () => {
+              headerShadow.style.display = "";
+              headerOpaqueBg.classList.remove(
+                "!backdrop-blur-md",
+                "!bg-white/50",
+                "dark:!bg-[#293843]/70"
+              );
+              headerOpaqueBg.style.top = "";
+              headerOpaqueBgContainer.style.top = "";
+              headerOpaqueBgContainer.style.height = "";
             }
           }}
           ref={navMenu}

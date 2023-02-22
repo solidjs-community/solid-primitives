@@ -38,9 +38,10 @@ export const buildCategory = ({ name, pkg }: { name: string; pkg: PackageJSONDat
   data.Stage = stage ?? "2";
   data.Primitives = list
     // .map(prim => `[${prim}](${githubURL}${name}#${prim.replace(/ /g, "-").toLowerCase()})`)
-    .map(
-      prim => `<PrimitiveBtn href="./${name}#${prim.toLocaleLowerCase()}">${prim}</PrimitiveBtn>`
-    )
+    .map(prim => {
+      const primitiveRoute = `/${name}#${prim.toLowerCase().replace(/\s/g, "-")}`;
+      return `<PrimitiveBtn href="${primitiveRoute}">${prim}</PrimitiveBtn>`;
+    })
     .join("");
   // .join("<br />");
   // Merge the package into the correct category
@@ -84,6 +85,7 @@ export const writeHTMLTableFile = () => {
               const name = _name as keyof PackageData;
 
               const value = item[name];
+              const primitiveNameRoute = typeof value === "string" ? value.toLowerCase() : "";
 
               const renderComp = () => {
                 switch (name) {
@@ -94,9 +96,7 @@ export const writeHTMLTableFile = () => {
                   case "Size":
                     return `<SizeBadge value="${value}" href="${bundlephobiaURL}@solid-primitives/${item.Name}"/>`;
                   case "Name":
-                    return `<PrimitiveBtn href="./${(
-                      value as string
-                    ).toLowerCase()}">${value}</PrimitiveBtn>`;
+                    return `<PrimitiveBtn href="${primitiveNameRoute}">${value}</PrimitiveBtn>`;
                   default:
                     return value;
                 }

@@ -41,7 +41,7 @@ export default function Root() {
           <ErrorBoundary>
             <div id="root">
               <Header />
-              <div id="root-subcontainer">
+              <div id="root-subcontainer" class="md:overflow-x-clip">
                 <SolidBlocksHeaderClusterDefs />
                 <Routes>
                   <FileRoutes />

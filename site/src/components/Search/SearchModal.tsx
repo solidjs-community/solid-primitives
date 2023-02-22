@@ -1,5 +1,6 @@
 // import { createShortcut } from "@solid-primitives/keyboard";
 import { createMediaQuery } from "@solid-primitives/media";
+import { isIOS } from "@solid-primitives/platform";
 import Dismiss from "solid-dismiss";
 import { Accessor, batch, Component, createComputed, createEffect, on, onMount } from "solid-js";
 import { produce, unwrap } from "solid-js/store";
@@ -160,7 +161,8 @@ const SearchModal: Component<{
           });
         }
       }}
-      focusElementOnOpen="firstChild"
+      focusElementOnOpen={isIOS ? "none" : "firstChild"}
+      focusMenuButtonOnMouseDown={!isIOS}
       ref={containerEl}
     >
       <div

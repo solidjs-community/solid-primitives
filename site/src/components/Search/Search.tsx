@@ -2,7 +2,7 @@ import { createMediaQuery } from "@solid-primitives/media";
 import { A, useLocation } from "@solidjs/router";
 import Fuse from "fuse.js";
 import { FiSearch, FiX } from "solid-icons/fi";
-import { Component, createEffect, createSignal, For, on, Show } from "solid-js";
+import { Component, createEffect, createSignal, For, on, onMount, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 // @ts-ignore
 import primitivesJSON from "~/primitives.json";
@@ -13,6 +13,11 @@ type TPrimitive = {
   description: string;
   primitives: string[];
   primitivesCount: number;
+};
+
+let _inputEl!: HTMLInputElement;
+export const getSearchInput = () => {
+  return _inputEl;
 };
 
 const Search: Component<{
@@ -119,7 +124,10 @@ const Search: Component<{
                 value={search()}
                 type="text"
                 onInput={e => onInput(e.currentTarget.value)}
-                ref={input}
+                ref={el => {
+                  input = el;
+                  _inputEl = el;
+                }}
               />
             </div>
             <button
