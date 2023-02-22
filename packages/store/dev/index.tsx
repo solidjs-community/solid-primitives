@@ -1,19 +1,18 @@
 import type { JSX, JSXElement } from "solid-js";
 import { Component, createMemo } from "solid-js";
 import { render } from "solid-js/web";
-import { CounterProvider, useCounterStore } from "./stores/counter-store";
+import { counterStore } from "./stores/counter-store";
+import { aliceAge, bobAge, tomAge } from "./stores/ages-store";
 import { CounterControls, BoxesDemo } from "./components";
 
 import "uno.css";
 
 const App: Component = () => {
-  const [
+  const {
     state,
-    {
-      getters: { get: count, isNegative, isPositive, isZero },
-      actions: { resetCount: setCount }
-    }
-  ] = useCounterStore();
+    getters: { get: count, isNegative, isPositive, isZero },
+    actions: { resetCount: setCount }
+  } = counterStore;
 
   const increment = () => setCount(count() + 1);
 
@@ -21,6 +20,14 @@ const App: Component = () => {
 
   return (
     <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
+      <div class="wrapper-v">
+        <h4>Ages</h4>
+        <ul>
+          <li>Alice: {aliceAge.getters.yearsOld()}</li>
+          <li>Bob: {bobAge.getters.yearsOld()}</li>
+          <li>Tom: {tomAge.getters.yearsOld()}</li>
+        </ul>
+      </div>
       <div class="wrapper-v">
         <h4>Counter Information {state.value}</h4>
         <ul>
@@ -38,11 +45,4 @@ const App: Component = () => {
   );
 };
 
-render(
-  () => (
-    <CounterProvider>
-      <App />
-    </CounterProvider>
-  ),
-  document.getElementById("root")!
-);
+render(() => <App />, document.getElementById("root")!);

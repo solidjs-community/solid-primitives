@@ -17,7 +17,7 @@ export interface CounterActions {
   resetCount: (overrideValue?: number) => void;
 }
 
-const [CounterProvider, { useStore: useCounterStore }] = createSharedStore(
+export const counterStore = createSharedStore(
   {
     value: 0,
     initialValue: 0
@@ -37,5 +37,3 @@ const [CounterProvider, { useStore: useCounterStore }] = createSharedStore(
     })
   }
 );
-
-export { CounterProvider, useCounterStore };
