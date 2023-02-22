@@ -84,16 +84,16 @@ export function createStorage<O, T>(
               return result;
             }
             try {
-              return api.getItem(`${prefix}${key}`) as string | null;
+              return api.getItem(`${prefix}${key}`);
             } catch (err) {
-              handleError(err, `Error reading ${prefix}${key} from ${api.name}`);
+              handleError(err, `Error reading ${prefix}${key} from ${api["name"]}`);
               return null;
             }
           },
           null
         );
         if (value !== null && props?.deserializer) {
-          return props.deserializer(value as string, key, props?.options as O) as T;
+          return props.deserializer(value, key, props.options as O) as T;
         }
         return value as T | null;
       }
@@ -101,11 +101,7 @@ export function createStorage<O, T>(
   );
   const setter: StorageSetter<T, O> = (key, value: T, options?: O) => {
     const filteredValue = props?.serializer
-      ? (props.serializer(
-          value as any,
-          key,
-          options ?? (props?.options as O | undefined)
-        ) as string)
+      ? props.serializer(value as any, key, options ?? props.options)
       : (value as unknown as string);
     const apiKey = `${prefix}${key}`;
     apis.forEach(api => {
@@ -129,7 +125,7 @@ export function createStorage<O, T>(
   const clear = () =>
     apis.forEach(api => {
       try {
-        api?.clear?.();
+        api.clear();
       } catch (err) {
         handleError(err, `Error clearing ${api.name}`);
       }
@@ -140,7 +136,7 @@ export function createStorage<O, T>(
       if (!result.hasOwnProperty(key)) {
         const filteredValue: T | null =
           value && props?.deserializer
-            ? (props.deserializer(value, key, props?.options) as T)
+            ? (props.deserializer(value, key, props.options) as T)
             : (value as T | null);
         if (filteredValue) {
           result[key] = filteredValue;
@@ -191,7 +187,7 @@ export function createStorage<O, T>(
             );
           }
         });
-        changed && ev.key && signals.get(ev.key)?.[1]();
+        (changed as boolean) && ev.key && signals.get(ev.key)?.[1]();
       };
       if ("addEventListener" in globalThis) {
         globalThis.addEventListener("storage", listener);
@@ -289,28 +285,26 @@ export function createAsyncStorage<O, T>(
           handleError(err, `Error getting ${prefix}${key} from ${api.name}`);
         }
         if (value instanceof Promise) {
-          return value.then((value: string | null) =>
-            value && props?.deserializer ? props.deserializer(value, key, props?.options) : value
+          return value.then((newValue: string | null) =>
+            newValue && props?.deserializer
+              ? props.deserializer(newValue, key, props.options)
+              : newValue
           ) as any;
         }
         return value !== null && props?.deserializer
-          ? Promise.resolve(props.deserializer(value as string, key, props?.options as O) as T)
+          ? Promise.resolve(props.deserializer(value as string, key, props.options as O) as T)
           : (Promise.resolve(value as T | null) as any);
       }, null);
     }
   });
   const setter = (key: string, value: T, options?: O) => {
     const filteredValue = props?.serializer
-      ? props.serializer(value as any, key, options ?? props?.options)
+      ? props.serializer(value as any, key, options ?? props.options)
       : (value as unknown as string);
     return Promise.all(
       apis.map(api => {
         try {
-          api.setItem(
-            `${prefix}${key}`,
-            filteredValue,
-            options ?? (props?.options as O | undefined)
-          );
+          api.setItem(`${prefix}${key}`, filteredValue, options ?? props?.options);
         } catch (err) {
           handleError(err, `Error setting ${prefix}${key} to ${filteredValue} in ${api.name}`);
         }
@@ -356,7 +350,7 @@ export function createAsyncStorage<O, T>(
       if (!result.hasOwnProperty(key)) {
         const filteredValue: T | null =
           value && props?.deserializer
-            ? (props.deserializer(value, key, props?.options) as T)
+            ? (props.deserializer(value, key, props.options) as T)
             : (value as T | null);
         if (filteredValue) {
           result[key] = filteredValue;
@@ -403,7 +397,7 @@ export function createAsyncStorage<O, T>(
             handleError(err, "Error attempting to sync on event");
           }
         });
-        changed && ev.key && signals.get(ev.key)?.[1]();
+        (changed as boolean) && ev.key && signals.get(ev.key)?.[1]();
       };
       if ("addEventListener" in globalThis) {
         globalThis.addEventListener("storage", listener);
@@ -475,7 +469,7 @@ export function createStorageSignal<T, O = {}>(
         }
       }
       if (value !== null && props?.deserializer) {
-        return props.deserializer(value + "", key, props?.options as O) as T;
+        return props.deserializer(value + "", key, props.options as O) as T;
       }
       return value;
     }, null);
@@ -483,7 +477,7 @@ export function createStorageSignal<T, O = {}>(
   createEffect(() => {
     const value = accessor();
     const filteredValue = props?.serializer
-      ? props.serializer(value as string & T, key, props?.options)
+      ? props.serializer(value as string & T, key, props.options)
       : value + "";
     const apiKey = `${prefix}${key}`;
     try {
@@ -528,7 +522,7 @@ export function createStorageSignal<T, O = {}>(
             throw err;
           }
         }
-        changed && refetch();
+        (changed as boolean) && refetch();
       };
       if ("addEventListener" in globalThis) {
         globalThis.addEventListener("storage", listener);

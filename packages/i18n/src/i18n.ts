@@ -70,7 +70,7 @@ export const createI18nContext = (
   init: Record<string, Record<string, any>> = {},
   lang: string = typeof navigator !== "undefined" && navigator.language in init
     ? navigator.language
-    : Object.keys(init)[0]
+    : Object.keys(init)[0] ?? ""
 ): [
   template: (key: string, params?: Record<string, string>, defaultValue?: string) => any,
   actions: {
@@ -113,7 +113,7 @@ export const createI18nContext = (
     params?: Record<string, string>,
     defaultValue?: string
   ): string => {
-    const val = deepReadObject(dict[locale()], key, defaultValue || "");
+    const val = deepReadObject(dict[locale()]!, key, defaultValue || "");
     if (typeof val === "function") return val(params);
     if (typeof val === "string") return template(val, params || {});
     return val as string;
@@ -133,6 +133,7 @@ export const createI18nContext = (
      * ```
      */
     add(lang: string, table: Record<string, any>) {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       setDict(lang, t => Object.assign(t || {}, table));
     },
     /**

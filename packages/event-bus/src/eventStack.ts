@@ -68,7 +68,7 @@ export function createEventStack<E, V>(
   eventEventBus.listen(event => {
     const value = toValue(event, stack());
     setValue(prev => {
-      let list = push(prev, value);
+      const list = push(prev, value);
       return length && list.length > length ? drop(list) : list;
     });
     valueEventBus.emit({

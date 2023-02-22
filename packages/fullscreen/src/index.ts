@@ -21,14 +21,17 @@ export const createFullscreen = (
   active?: Accessor<FullscreenOptions | boolean>,
   options?: FullscreenOptions
 ): Accessor<boolean> => {
-  if (isServer) return () => false;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (isServer) {
+    return () => false;
+  }
   const [isActive, setActive] = createSignal(false);
   createEffect(() => {
     if (ref) {
       const activeOutput = active?.() ?? true;
       if (!isActive() && activeOutput) {
         ref
-          ?.requestFullscreen?.(typeof activeOutput === "object" ? activeOutput : options)
+          .requestFullscreen(typeof activeOutput === "object" ? activeOutput : options)
           .then(() => setActive(true))
           .catch(() => {});
       } else if (!activeOutput && isActive()) {

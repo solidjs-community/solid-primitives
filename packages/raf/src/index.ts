@@ -66,10 +66,10 @@ function targetFPS(
   }
   const interval =
     typeof fps === "function"
-      ? createMemo(() => Math.floor(1000 / (fps as Accessor<number>)()))
+      ? createMemo(() => Math.floor(1000 / fps()))
       : (() => {
-          const interval = Math.floor(1000 / fps);
-          return () => interval;
+          const newInterval = Math.floor(1000 / fps);
+          return () => newInterval;
         })();
 
   let elapsed = 0;

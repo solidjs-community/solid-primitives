@@ -114,22 +114,18 @@ export const createSocialShare = (
     const height =
       controller.innerHeight || document.documentElement.clientHeight || controller.screenY;
     const systemZoom = width / controller.screen.availWidth;
-    popup.popupLeft =
-      (width - popup.width) / 2 / systemZoom +
-      (controller.screenLeft !== undefined ? controller.screenLeft : controller.screenX);
-    popup.popupTop =
-      (height - popup.height) / 2 / systemZoom +
-      (controller.screenTop !== undefined ? controller.screenTop : controller.screenY);
+    popup.popupLeft = (width - popup.width) / 2 / systemZoom + controller.screenLeft;
+    popup.popupTop = (height - popup.height) / 2 / systemZoom + controller.screenTop;
   };
   const close = () => {
-    controller && controller.close();
+    controller.close();
     setIsSharing(false);
   };
   const share = (network?: Network) => {
     network = network || options().network || "";
     resizePopup();
     // If a popup window already exist, we close it and trigger a change event.
-    if (controller && popupInterval) {
+    if (popupInterval) {
       clearInterval(popupInterval);
       // Force close (for Facebook)
       controller.close();

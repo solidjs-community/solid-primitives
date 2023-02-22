@@ -70,8 +70,8 @@ export function createEventHub<M extends { readonly [key: string | number]: Even
   return {
     ...buses,
     value,
-    on: (e, a) => buses[e].listen(a),
-    emit: (e, a?: any) => buses[e].emit(a),
+    on: (e, a) => buses[e]!.listen(a),
+    emit: (e, a?: any) => buses[e]!.emit(a),
     listen: global.listen
   };
 }

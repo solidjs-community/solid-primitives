@@ -14,7 +14,7 @@ export function stringStyleToObject(style: string): JSX.CSSProperties {
   const object: Record<string, string> = {};
   let match: RegExpExecArray | null;
   while ((match = extractCSSregex.exec(style))) {
-    object[match[1]] = match[2];
+    object[match[1]!] = match[2]!;
   }
   return object;
 }
@@ -101,7 +101,7 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: 
         const v = propsObj[key];
         const name = key.toLowerCase();
 
-        const callback: (...args: any[]) => void =
+        const callback: ((...args: any[]) => void) | undefined =
           typeof v === "function"
             ? v
             : // jsx event handlers can be tuples of [callback, arg]
@@ -112,7 +112,7 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: 
             : void 0;
 
         if (callback)
-          listeners[name] ? listeners[name].push(callback) : (listeners[name] = [callback]);
+          listeners[name] ? listeners[name]!.push(callback) : (listeners[name] = [callback]);
         else delete listeners[name];
       }
     }

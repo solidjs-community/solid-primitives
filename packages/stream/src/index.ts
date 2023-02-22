@@ -178,7 +178,7 @@ export const createAmplitudeFromStream = (
     smoothingTimeConstant: 0.8
   });
 
-  let source: MediaStreamAudioSourceNode;
+  let source: MediaStreamAudioSourceNode | undefined;
   createEffect(() => {
     const currentStream = access(stream);
     if (currentStream !== undefined) {
@@ -205,15 +205,15 @@ export const createAmplitudeFromStream = (
 
   onCleanup(() => cancelAnimationFrame(id));
 
-  const teardown = () => {
-    source?.disconnect();
-    if (ctx.state !== "closed") {
-      ctx.close();
-    }
-  };
-  onCleanup(teardown);
-
-  return [amplitude, teardown];
+  return [
+    amplitude,
+    onCleanup(() => {
+      source?.disconnect();
+      if (ctx.state !== "closed") {
+        ctx.close();
+      }
+    })
+  ];
 };
 
 declare global {

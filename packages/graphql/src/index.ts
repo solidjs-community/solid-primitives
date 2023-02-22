@@ -165,7 +165,7 @@ export function makeMultipartBody(query: string, variables: object) {
   formData.append("operations", JSON.stringify({ query, variables }));
   formData.append("map", JSON.stringify(Object.fromEntries(parts.map((x, i) => [`${i}`, x.path]))));
   for (let i = 0; i < parts.length; i++) {
-    formData.append(`${i}`, parts[i].blob);
+    formData.append(`${i}`, parts[i]!.blob);
   }
   return formData;
 }

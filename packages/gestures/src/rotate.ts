@@ -20,8 +20,8 @@ function getPointersAngleDeg(activeEvents: PointerEvent[]) {
     right: { top: 0, bottom: 180 }
   };
 
-  const width = activeEvents[1].clientX - activeEvents[0].clientX;
-  const height = activeEvents[0].clientY - activeEvents[1].clientY;
+  const width = activeEvents[1]!.clientX - activeEvents[0]!.clientX;
+  const height = activeEvents[0]!.clientY - activeEvents[1]!.clientY;
 
   /*
   In quadrants 1 and 3 allworks as expected. 

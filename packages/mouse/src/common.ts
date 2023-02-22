@@ -57,7 +57,7 @@ export function makeMousePositionListener(
   if (touch) {
     const handleTouch = (e: TouchEvent) => {
       if (e.touches.length)
-        callback({ x: e.touches[0].clientX, y: e.touches[0].clientY, sourceType: "touch" });
+        callback({ x: e.touches[0]!.clientX, y: e.touches[0]!.clientY, sourceType: "touch" });
     };
     listen("touchstart", handleTouch);
     if (followTouch) listen("touchmove", handleTouch);

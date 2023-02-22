@@ -39,6 +39,7 @@ export const isServer: boolean = _isServer;
 export const isClient = !isServer;
 
 /** development environment */
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 export const isDev = DEV && isClient;
 /** production environment */
 export const isProd = !isDev;
@@ -111,7 +112,8 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
   fn: (value: NonNullable<V>) => void
 ) => {
   const _value = access(value);
-  typeof _value !== "undefined" && _value !== null && fn(_value as NonNullable<V>);
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  typeof _value != null && fn(_value as NonNullable<V>);
 };
 
 export const asAccessor = <A extends MaybeAccessor<unknown>>(
@@ -264,7 +266,7 @@ export function createStaticStore<T extends Readonly<AnyStatic>>(
       untrack(() => {
         batch(() => {
           for (const [key, value] of entries(accessWith(a, store) as Partial<T>))
-            setValue(key as keyof T, () => value);
+            setValue(key, () => value);
         });
       });
     else setValue(a, b);
@@ -293,12 +295,12 @@ export function handleDiffArray<T>(
   let i = 0;
 
   if (!prevLength) {
-    for (; i < currLength; i++) handleAdded(current[i]);
+    for (; i < currLength; i++) handleAdded(current[i]!);
     return;
   }
 
   if (!currLength) {
-    for (; i < prevLength; i++) handleRemoved(prev[i]);
+    for (; i < prevLength; i++) handleRemoved(prev[i]!);
     return;
   }
 
@@ -322,7 +324,7 @@ export function handleDiffArray<T>(
 /**
  * A signal object that handle hydration.
  * @param serverValue initial value of the state on the server
- * @param update called once on the client or on hydration to initialise the value
+ * @param update called once on the client or on hydration to initialize the value
  * @param options {@link SignalOptions}
  * @returns
  * ```ts
@@ -338,8 +340,7 @@ export function createHydrateSignal<T>(
   if (isServer) {
     return createSignal(serverValue);
   }
-  let init = !!sharedConfig.context;
-  const [state, setState] = createSignal(init ? serverValue : update(), options);
-  init && onMount(() => setState(() => update()));
+  const [state, setState] = createSignal(sharedConfig.context ? serverValue : update(), options);
+  sharedConfig.context && onMount(() => setState(() => update()));
   return [state, setState];
 }

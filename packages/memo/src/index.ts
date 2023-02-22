@@ -337,7 +337,7 @@ export function createAsyncMemo<T>(
   options: MemoOptionsWithValue<T | undefined> = {}
 ): Accessor<T | undefined> {
   if (process.env.SSR) {
-    return () => options?.value;
+    return () => options.value;
   }
   const [state, setState] = createSignal(options.value, options);
   /** pending promises from oldest to newest */

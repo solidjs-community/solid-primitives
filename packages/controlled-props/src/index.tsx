@@ -95,7 +95,7 @@ export const SelectProp = <T extends any>(
       <select
         name={props.name}
         value={initialValue.toString()}
-        onChange={ev => props.setValue(options()[ev.currentTarget.selectedIndex][1] as any)}
+        onChange={ev => props.setValue(options()[ev.currentTarget.selectedIndex]![1] as any)}
       >
         <For each={options()} fallback={<option>"options missing"</option>}>
           {([key], index) => <option value={index()}>{key}</option>}
@@ -174,14 +174,14 @@ export function createControlledProp<T>(
   if (initialValue == null) {
     throw new Error(`cannot get type for Prop ${name}`);
   }
-  const propType = (options as TestPropOptions<T>)?.options
+  const propType = (options as TestPropOptions<T>).options
     ? "object"
-    : (options as TestPropOptions<T>)?.type ?? (typeof initialValue as TestPropType);
+    : (options as TestPropOptions<T>).type ?? (typeof initialValue as TestPropType);
 
   const [value, setValue] = createSignal<T>(initialValue, { name });
   return [
-    value as Accessor<T>,
-    setValue as Setter<T>,
+    value,
+    setValue,
     propType === "boolean"
       ? () => BoolProp({ name, value: value as any, setValue: setValue as Setter<boolean> })
       : propType === "number"
@@ -191,8 +191,8 @@ export function createControlledProp<T>(
       : () =>
           SelectProp<T>({
             name,
-            value: value as Accessor<T>,
-            setValue: setValue as Setter<T>,
+            value: value,
+            setValue: setValue,
             options:
               (options as TestPropOptions<T>).options ??
               ([initialValue] as TestPropObjectOptions<T>)

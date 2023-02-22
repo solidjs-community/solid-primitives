@@ -56,7 +56,7 @@ describe("createMediaPermissionRequest", () => {
   afterAll(() => {
     navigator.mediaDevices.getUserMedia = originalGetUserMedia;
   });
-  it("requests a media stream", context => {
+  it("requests a media stream", () => {
     createMediaPermissionRequest();
     expect(allConstraints.at(-1)).toEqual({ audio: true, video: true });
   });

@@ -245,7 +245,7 @@ export function createFetch<
           options as ResourceOptions<Result>
         ) as ResourceReturn<Result, ResourceOptions<Result>>;
       }
-      return fetchContext.resource!;
+      return fetchContext.resource;
     }
   };
   fetchContext.wrapResource();

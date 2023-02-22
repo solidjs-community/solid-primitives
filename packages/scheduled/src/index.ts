@@ -32,7 +32,7 @@ export const debounce: ScheduleCallback = (callback, wait) => {
   if (process.env.SSR) {
     return Object.assign(() => void 0, { clear: () => void 0 });
   }
-  let timeoutId: ReturnType<typeof setTimeout>;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const clear = () => clearTimeout(timeoutId);
   if (getOwner()) onCleanup(clear);
   const debounced: typeof callback = (...args) => {

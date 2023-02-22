@@ -106,9 +106,7 @@ export function createChainedI18n<T extends Dictionaries<I18nObject>>(props: {
   dictionaries: T & GuaranteeIdenticalSignatures<T>;
   locale: keyof T;
 }): ChainedI18n<T> {
-  type K = keyof T;
-
-  const [locale, setLocale] = createSignal<K>(props.locale as K);
+  const [locale, setLocale] = createSignal<keyof T>(props.locale);
   const [translations] = createSignal(createChainedI18nDictionary(props.dictionaries));
 
   /**
@@ -150,7 +148,7 @@ export function createChainedI18n<T extends Dictionaries<I18nObject>>(props: {
        * @param language Optional keyof dictionaries. If one is not passed in, it uses the currently selected one.
        * @returns The dictionary of the language passed in or the currently selected locale
        */
-      getDictionary(language?: K): T[K] {
+      getDictionary(language?: keyof T): T[keyof T] {
         if (language) return props.dictionaries[language];
         return props.dictionaries[locale()];
       }

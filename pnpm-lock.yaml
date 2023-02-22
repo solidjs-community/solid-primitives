@@ -12,6 +12,7 @@ importers:
       '@typescript-eslint/parser': ^5.52.0
       cross-env: ^7.0.3
       eslint: ^8.34.0
+      eslint-plugin-eslint-comments: ^3.2.0
       eslint-plugin-no-only-tests: ^3.1.0
       eslint-plugin-solid: ^0.9.4
       fs-extra: ^11.1.0
@@ -38,6 +39,7 @@ importers:
       '@typescript-eslint/parser': 5.52.0_7kw3g6rralp5ps6mg3uyzz6azm
       cross-env: 7.0.3
       eslint: 8.34.0
+      eslint-plugin-eslint-comments: 3.2.0_eslint@8.34.0
       eslint-plugin-no-only-tests: 3.1.0
       eslint-plugin-solid: 0.9.4_7kw3g6rralp5ps6mg3uyzz6azm
       fs-extra: 11.1.0
@@ -4530,6 +4532,17 @@ packages:
       optionator: 0.8.3
     optionalDependencies:
       source-map: 0.6.1
+    dev: true
+
+  /eslint-plugin-eslint-comments/3.2.0_eslint@8.34.0:
+    resolution: {integrity: sha512-0jkOl0hfojIHHmEHgmNdqv4fmh7300NdpA9FFpF7zaoLvB/QeXOGNLIo86oAveJFrfB1p05kC8hpEMHM8DwWVQ==}
+    engines: {node: '>=6.5.0'}
+    peerDependencies:
+      eslint: '>=4.19.1'
+    dependencies:
+      escape-string-regexp: 1.0.5
+      eslint: 8.34.0
+      ignore: 5.2.4
     dev: true
 
   /eslint-plugin-no-only-tests/3.1.0:

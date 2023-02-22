@@ -103,7 +103,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
   });
 
   const removeFile = (fileName: string) => {
-    setFiles(prev => (prev as UploadFile[]).filter(f => f.name !== fileName));
+    setFiles(prev => (prev ).filter(f => f.name !== fileName));
   };
 
   const clearFiles = () => {

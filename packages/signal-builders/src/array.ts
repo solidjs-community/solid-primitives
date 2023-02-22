@@ -129,7 +129,7 @@ export const flatten = <T extends any[]>(list: MaybeAccessor<T>): Accessor<Flatt
  */
 export const filterInstance = <T, I extends AnyClass[]>(list: MaybeAccessor<T[]>, ...classes: I) =>
   (classes.length === 1
-    ? createMemo(() => access(list).filter(item => ofClass(item, classes[0])))
+    ? createMemo(() => access(list).filter(item => ofClass(item, classes[0]!)))
     : createMemo(() =>
         access(list).filter(item => item && classes.some(c => ofClass(item, c)))
       )) as Accessor<Extract<T, InstanceType<ItemsOf<I>>>[]>;
@@ -142,7 +142,7 @@ export const filterOutInstance = <T, I extends AnyClass[]>(
   ...classes: I
 ) =>
   (classes.length === 1
-    ? createMemo(() => access(list).filter(item => item && !ofClass(item, classes[0])))
+    ? createMemo(() => access(list).filter(item => item && !ofClass(item, classes[0]!)))
     : createMemo(() =>
         access(list).filter(item => item && !classes.some(c => ofClass(item, c)))
       )) as Accessor<Exclude<T, InstanceType<ItemsOf<I>>>[]>;

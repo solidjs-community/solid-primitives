@@ -90,7 +90,7 @@ export function createMutationObserver(
       item instanceof Node ? add(item, defaultOptions) : add(item[0], item[1]);
     });
   };
-  const stop = () => instance?.takeRecords().length && instance?.disconnect();
+  const stop = () => instance?.takeRecords().length && instance.disconnect();
   onMount(start);
   onCleanup(stop);
   return [

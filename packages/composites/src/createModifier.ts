@@ -31,7 +31,7 @@ export function createModifier<
   requireStop?: RequireStop
 ): Modifier<Config, Returns> {
   return (a: any, b?: any, c?: any): ModifierReturn<any, any, Returns> => {
-    const stopRequired = (requireStop as boolean) ?? false;
+    const stopRequired = requireStop ?? false;
     let source: any,
       initialCallback: (input: unknown, prevInput: unknown, prevValue?: unknown) => unknown,
       config: Config,
