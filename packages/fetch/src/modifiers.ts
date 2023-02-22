@@ -1,5 +1,4 @@
 import { createSignal, getOwner, onCleanup, ResourceFetcherInfo } from "solid-js";
-import { isServer } from "solid-js/web";
 import { RequestContext } from "./fetch";
 
 export type RequestModifier = <Result extends unknown, FetcherArgs extends any[]>(
@@ -19,6 +18,7 @@ export const wrapFetcher = <Result extends unknown, FetcherArgs extends any[]>(
   if (!originalFetcher) {
     throw new Error("could not read resource fetcher");
   }
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   requestContext.fetcher = wrapper(originalFetcher) || originalFetcher;
 };
 
@@ -57,10 +57,7 @@ export const withAbort: RequestModifier =
           return obj;
         })();
         lastRequestDataObj.signal = requestContext.abortController.signal;
-        return originalFetcher(
-          requestData ,
-          info 
-        ).catch(err => {
+        return originalFetcher(requestData, info).catch(err => {
           if (info.value && err.name === "AbortError") {
             return Promise.resolve(info.value);
           }
@@ -105,7 +102,7 @@ export const withCatchAll: RequestModifier = () => requestContext => {
     originalFetcher => (requestData, info) =>
       originalFetcher(requestData, info).catch((err: Error) => {
         setError(err);
-        return Promise.resolve(info.value);
+        return Promise.resolve(info.value) as any;
       })
   );
   requestContext.wrapResource();
@@ -166,7 +163,7 @@ export type RefetchEventOptions<Result extends unknown, FetcherArgs extends any[
   filter?: (requestData: FetcherArgs, data: Result | undefined, ev: Event) => boolean;
 };
 
-export const withRefetchEvent: RequestModifier = isServer
+export const withRefetchEvent: RequestModifier = process.env.SSR
   ? () => requestContext => {
       requestContext.wrapResource();
     }
@@ -180,7 +177,7 @@ export const withRefetchEvent: RequestModifier = isServer
         wrapFetcher<Result, FetcherArgs>(requestContext, originalFetcher => (...args) => {
           lastRequestRef.current = [args as any, undefined];
           return originalFetcher(...args).then(data => {
-            lastRequestRef.current = [args as any, data ];
+            lastRequestRef.current = [args as any, data];
             return data;
           });
         });

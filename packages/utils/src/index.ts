@@ -324,7 +324,7 @@ export function handleDiffArray<T>(
 /**
  * A signal object that handle hydration.
  * @param serverValue initial value of the state on the server
- * @param update called once on the client or on hydration to initialise the value
+ * @param update called once on the client or on hydration to initialize the value
  * @param options {@link SignalOptions}
  * @returns
  * ```ts
@@ -340,8 +340,7 @@ export function createHydrateSignal<T>(
   if (isServer) {
     return createSignal(serverValue);
   }
-  let init = !!sharedConfig.context;
-  const [state, setState] = createSignal(init ? serverValue : update(), options);
-  init && onMount(() => setState(() => update()));
+  const [state, setState] = createSignal(sharedConfig.context ? serverValue : update(), options);
+  sharedConfig.context && onMount(() => setState(() => update()));
   return [state, setState];
 }

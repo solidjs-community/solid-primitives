@@ -45,7 +45,7 @@ export function createEventDispatcher<Props>(props: Props): <
         [eventName: N, payload?: any, dispatcherOptions?: DispatcherOptions]
   ): boolean {
     const [eventName, detail, { cancelable = false } = {}] = args;
-    const propName = `${"on"}${eventName[0].toUpperCase()}${eventName.slice(1)}` as keyof Props;
+    const propName = `${"on"}${eventName[0]!.toUpperCase()}${eventName.slice(1)}` as keyof Props;
     const handler = props[propName];
 
     if (typeof handler !== "function") return true;

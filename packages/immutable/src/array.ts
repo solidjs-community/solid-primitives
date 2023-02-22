@@ -124,7 +124,7 @@ export const remove = <T>(list: readonly T[], item: T, ...insertItems: T[]): T[]
 export const removeItems = <T>(list: readonly T[], ...items: T[]): T[] => {
   const res = [];
   for (let i = 0; i < list.length; i++) {
-    const item = list[i];
+    const item = list[i]!;
     const ii = items.indexOf(item);
     if (ii !== -1) items.splice(ii, 1);
     else res.push(item);
@@ -168,7 +168,7 @@ export const filterInstance = <T, I extends AnyClass[]>(
   ...classes: I
 ): Extract<T, InstanceType<ItemsOf<I>>>[] =>
   (classes.length === 1
-    ? list.filter(item => ofClass(item, classes[0]))
+    ? list.filter(item => ofClass(item, classes[0]!))
     : list.filter(item => item && classes.some(c => ofClass(item, c)))) as any[];
 
 /**
@@ -182,5 +182,5 @@ export const filterOutInstance = <T, I extends AnyClass[]>(
   ...classes: I
 ): Exclude<T, InstanceType<ItemsOf<I>>>[] =>
   (classes.length === 1
-    ? list.filter(item => item && !ofClass(item, classes[0]))
+    ? list.filter(item => item && !ofClass(item, classes[0]!))
     : list.filter(item => item && !classes.some(c => ofClass(item, c)))) as any[];

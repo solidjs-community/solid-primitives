@@ -27,10 +27,10 @@ const constraintsFromDevice = (
     : device;
 };
 
-const stopStream = (stream: MediaStream | undefined) =>
+const stop = (stream: MediaStream | undefined) =>
   stream?.getTracks()?.forEach(track => track.stop());
 
-const muteStream = (stream: MediaStream | undefined, muted?: boolean) =>
+const mute = (stream: MediaStream | undefined, muted?: boolean) =>
   stream?.getTracks()?.forEach(track => {
     track.enabled = muted === false;
   });
@@ -86,22 +86,22 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
       constraintsFromDevice(access(streamSource) || undefined)
     ),
     (constraints, info: ResourceFetcherInfo<MediaStream>): Promise<MediaStream> =>
-      navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
-        if (info.value && mediaStream !== info.value) {
-          stopStream(info.value);
+      navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+        if (info.value && stream !== info.value) {
+          stop(info.value);
         }
-        return mediaStream;
+        return stream;
       })
   );
 
-  onCleanup(() => stopStream(stream()));
+  onCleanup(() => stop(stream()));
   return [
     stream,
     {
       mutate,
       refetch,
-      mute: (muted?: boolean) => muteStream(untrack(stream), muted),
-      stop: () => stopStream(untrack(stream))
+      mute: (muted?: boolean) => mute(untrack(stream), muted),
+      stop: () => stop(untrack(stream))
     }
   ];
 };
@@ -178,12 +178,12 @@ export const createAmplitudeFromStream = (
     smoothingTimeConstant: 0.8
   });
 
-  let source: MediaStreamAudioSourceNode;
+  let source: MediaStreamAudioSourceNode | undefined;
   createEffect(() => {
     const currentStream = access(stream);
     if (currentStream !== undefined) {
       ctx.resume();
-      source.disconnect();
+      source?.disconnect();
       source = ctx.createMediaStreamSource(currentStream);
       source.connect(analyser);
     }
@@ -205,15 +205,15 @@ export const createAmplitudeFromStream = (
 
   onCleanup(() => cancelAnimationFrame(id));
 
-  const teardown = () => {
-    source.disconnect();
-    if (ctx.state !== "closed") {
-      ctx.close();
-    }
-  };
-  onCleanup(teardown);
-
-  return [amplitude, teardown];
+  return [
+    amplitude,
+    onCleanup(() => {
+      source?.disconnect();
+      if (ctx.state !== "closed") {
+        ctx.close();
+      }
+    })
+  ];
 };
 
 declare global {
@@ -258,22 +258,22 @@ export const createScreen = (
   const [stream, { mutate, refetch }] = createResource(
     typeof screenSource === "function" ? createMemo(screenSource) : () => screenSource,
     (constraints, info: ResourceFetcherInfo<MediaStream>): Promise<MediaStream> =>
-      navigator.mediaDevices.getDisplayMedia(constraints).then(mediaStream => {
-        if (info.value && mediaStream !== info.value) {
-          stopStream(info.value);
+      navigator.mediaDevices.getDisplayMedia(constraints).then(stream => {
+        if (info.value && stream !== info.value) {
+          stop(info.value);
         }
-        return mediaStream;
+        return stream;
       })
   );
 
-  onCleanup(() => stopStream(stream()));
+  onCleanup(() => stop(stream()));
   return [
     stream,
     {
       mutate,
       refetch,
-      mute: (muted?: boolean) => muteStream(untrack(stream), muted),
-      stop: () => stopStream(untrack(stream))
+      mute: (muted?: boolean) => mute(untrack(stream), muted),
+      stop: () => stop(untrack(stream))
     }
   ];
 };
@@ -301,5 +301,5 @@ export const createMediaPermissionRequest = (
           : source
         : { audio: true, video: true }
     )
-    .then(stopStream);
+    .then(stop);
 };

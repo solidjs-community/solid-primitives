@@ -101,7 +101,7 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: 
         const v = propsObj[key];
         const name = key.toLowerCase();
 
-        const callback: (...args: any[]) => void =
+        const callback: ((...args: any[]) => void) | undefined =
           typeof v === "function"
             ? v
             : // jsx event handlers can be tuples of [callback, arg]

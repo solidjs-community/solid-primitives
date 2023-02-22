@@ -1,4 +1,4 @@
-import { DEV, ResourceOptions } from "solid-js";
+import { ResourceOptions } from "solid-js";
 import { RequestContext } from "./fetch";
 import { RequestModifier, wrapFetcher } from "./modifiers";
 
@@ -49,7 +49,6 @@ export const withCache: RequestModifier =
     options: CacheOptions = defaultCacheOptions
   ) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
-    let currentRequest: FetcherArgs;
     requestContext.cache = options.cache || requestContext.cache;
     requestContext.expires = options.expires;
     const isExpired = (entry: CacheEntry) =>
@@ -60,7 +59,6 @@ export const withCache: RequestModifier =
       requestContext,
       <T>(originalFetcher: any) =>
         (requestData, info) => {
-          currentRequest = requestData;
           const serializedRequest: string = serializeRequest(requestData);
           const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
           const shouldRead = requestContext.readCache?.(cached) !== false;
@@ -83,10 +81,11 @@ export const withCache: RequestModifier =
     const originalRefetch = requestContext.resource![1].refetch;
     const invalidate = (...requestData: FetcherArgs | []) => {
       try {
-        delete requestContext.cache[serializeRequest(requestData || currentRequest)];
+        delete requestContext.cache[serializeRequest(requestData)];
       } catch (e) {
-        // eslint-disable-next-line no-console
-        DEV && console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
+        process.env.DEV &&
+          // eslint-disable-next-line no-console
+          console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
       }
     };
     Object.assign(requestContext.resource![1], {
@@ -136,7 +135,7 @@ export const withCacheStorage: RequestModifier =
       Object.assign(requestContext.cache, loadedCache);
     } catch (e) {
       // eslint-disable-next-line no-console
-      DEV && console.warn("attempt to parse stored request cache failed with error", e);
+      process.env.DEV && console.warn("attempt to parse stored request cache failed with error", e);
     }
     const originalWriteCache = requestContext.writeCache;
     requestContext.writeCache = (...args: any[]) => {
@@ -145,7 +144,7 @@ export const withCacheStorage: RequestModifier =
         storage.setItem(key, JSON.stringify(requestContext.cache));
       } catch (e) {
         // eslint-disable-next-line no-console
-        DEV && console.warn("attempt to store request cache failed with error", e);
+        process.env.DEV && console.warn("attempt to store request cache failed with error", e);
       }
     };
     requestContext.wrapResource();

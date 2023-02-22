@@ -269,7 +269,7 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
   const [end, setEnd] = createSignal(false);
 
   const { add: setLoader } = makeIntersectionObserver([], e => {
-    if (e.length > 0 && e[0].isIntersecting && !end() && !contents.loading) {
+    if (e.length > 0 && e[0]!.isIntersecting && !end() && !contents.loading) {
       setPage(p => p + 1);
     }
   });

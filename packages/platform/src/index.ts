@@ -50,7 +50,8 @@ export const isSafari: boolean =
   w.safari?.pushNotification + "" === "[object SafariRemoteNotification]";
 
 /** Browser is Internet Explorer 6-11 */
-export const isIE = /*@cc_on!@*/ false || !!(w.document ).documentMode;
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+export const isIE = /*@cc_on!@*/ false || !!w.document.documentMode;
 
 /** is Chromium-based browser */
 export const isChromium: boolean = !!w.chrome;

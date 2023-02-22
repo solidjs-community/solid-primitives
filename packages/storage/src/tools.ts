@@ -11,8 +11,8 @@ export const addClearMethod = <S extends Storage | StorageWithOptions<any>>(
   }
   (storage as S).clear = () => {
     let key;
-    while ((key = storage.key(0))) {
-      storage.removeItem(key);
+    while ((key = storage.key!(0))) {
+      storage.removeItem!(key);
     }
   };
   return storage as S;

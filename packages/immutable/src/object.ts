@@ -134,7 +134,7 @@ export function split<T extends object>(object: T, ...list: (keyof T)[][] | (key
     const keys = _list[i] as (keyof T)[];
     result.push({} as Record<keyof T, any>);
     for (const key of keys) {
-      result[i][key] = copy[key];
+      result[i]![key] = copy[key];
       delete copy[key];
     }
   }

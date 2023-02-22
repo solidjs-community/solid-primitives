@@ -269,7 +269,7 @@ export function createVisibilityObserver(
     const callback = getCallback(isVisible, setVisible);
     let prevEl: Element | FalsyValue;
 
-    if (element && !(element instanceof Element)) {
+    if (!(element instanceof Element)) {
       createEffect(() => {
         const el = element();
         if (el === prevEl) return;
@@ -277,7 +277,7 @@ export function createVisibilityObserver(
         if (el) addEntry(el, callback);
         prevEl = el;
       });
-    } else if (element) addEntry(element, callback);
+    } else addEntry(element, callback);
 
     onCleanup(() => prevEl && removeEntry(prevEl));
 

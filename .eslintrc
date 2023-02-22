@@ -1,7 +1,7 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "no-only-tests", "solid"],
+  "plugins": ["@typescript-eslint", "no-only-tests", "solid", "eslint-comments"],
   "ignorePatterns": [
     "scripts/**",
     "**/node_modules/**",
@@ -21,11 +21,8 @@
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-unnecessary-type-assertion": "warn",
     "@typescript-eslint/no-unnecessary-condition": "warn",
-    "@typescript-eslint/no-shadow": [
-      "warn",
-      { "builtinGlobals": true, "allow": ["_", "Plugin", "JSX"] }
-    ],
     "@typescript-eslint/no-useless-empty-export": "warn",
-    "no-only-tests/no-only-tests": "warn"
+    "no-only-tests/no-only-tests": "warn",
+    "eslint-comments/no-unused-enable": "warn"
   }
 }

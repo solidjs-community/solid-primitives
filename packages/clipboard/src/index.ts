@@ -107,17 +107,21 @@ export const createClipboard = (
         return info.value!;
       }
 
-      const items = await readClipboard();
-      if (!items || !items.length) return [];
+      try {
+        const items = await readClipboard();
+        if (!items.length) return [];
 
-      return Promise.all(
-        items.map(async item => {
-          const type = item.types[item.types.length - 1];
-          const blob = await item.getType(type);
-          const text = blob.type === "text/plain" ? await blob.text() : undefined;
-          return { type, blob, text };
-        })
-      );
+        return Promise.all(
+          items.map(async item => {
+            const type = item.types[item.types.length - 1]!;
+            const blob = await item.getType(type);
+            const text = blob.type === "text/plain" ? await blob.text() : undefined;
+            return { type, blob, text };
+          })
+        );
+      } catch {
+        return [];
+      }
     },
     { initialValue: [] }
   );
@@ -197,7 +201,7 @@ export const newItem = newClipboardItem;
  */
 export const element: Highlighter = (start: number = 0, end: number = 0) => {
   return (node: HTMLElement) => {
-    const text = node.childNodes[0];
+    const text = node.childNodes[0]!;
     const range = new Range();
     range.setStart(text, start);
     range.setEnd(text, end);

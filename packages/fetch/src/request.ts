@@ -4,7 +4,7 @@ export type Request<FetcherArgs extends any[]> = <Result>(
   ...args: any[]
 ) => (requestContext: RequestContext<Result, FetcherArgs>) => void;
 
-let fetchFallback = globalThis.fetch;
+let fetchFallback = globalThis.fetch as typeof fetch | undefined;
 if (process.env.SSR && !fetchFallback) {
   try {
     const nodeFetch = require("node-fetch");

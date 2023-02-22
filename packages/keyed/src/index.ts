@@ -42,7 +42,7 @@ export function keyArray<T, U, K>(
       for (let i = 0, len = itemsRef.length; i < len; i++)
         s.push(
           mapFn(
-            () => itemsRef[i],
+            () => itemsRef[i]!,
             () => i
           )
         );
@@ -80,7 +80,7 @@ export function keyArray<T, U, K>(
         fb?.dispose();
         prev.delete(FALLBACK);
         for (let i = 0; i < list.length; i++) {
-          const item = list[i];
+          const item = list[i]!;
           const key = keyFn(item);
           addNewItem(result, item, i, key);
         }
@@ -90,7 +90,7 @@ export function keyArray<T, U, K>(
       const prevKeys = new Set(prev.keys());
 
       for (let i = 0; i < list.length; i++) {
-        const item = list[i];
+        const item = list[i]!;
         const key = keyFn(item);
         prevKeys.delete(key);
         const lookup = prev.get(key);

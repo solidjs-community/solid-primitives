@@ -9,7 +9,7 @@ export type KbdKey = ModifierKey | (string & {});
 function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
   for (let i = sequence.length - 1; i >= 0; i--) {
     const _model = model.slice(0, i + 1);
-    if (!arrayEquals(sequence[i], _model)) return false;
+    if (!arrayEquals(sequence[i]!, _model)) return false;
   }
   return true;
 }
@@ -105,7 +105,7 @@ export const useCurrentlyHeldKey = /*#__PURE__*/ createSharedRoot<Accessor<strin
     const _keys = keys();
     const prev = prevKeys;
     prevKeys = _keys;
-    if (prev.length === 0 && _keys.length === 1) return _keys[0];
+    if (prev.length === 0 && _keys.length === 1) return _keys[0]!;
     return null;
   });
 });
