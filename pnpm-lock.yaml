@@ -606,8 +606,10 @@ importers:
 
   packages/storage:
     specifiers:
+      '@solid-primitives/utils': workspace:^5.2.0
       solid-js: ^1.6.0
     dependencies:
+      '@solid-primitives/utils': link:../utils
       solid-js: 1.6.9
 
   packages/stream:

@@ -1,5 +1,7 @@
 import { Accessor, createEffect, createSignal, onCleanup, onMount, Setter } from "solid-js";
 
+import { createHydrateSignal } from "@solid-primitives/utils";
+
 import type {
   AnyStorageProps,
   AsyncStorage,
@@ -473,7 +475,11 @@ export function createStorageSignal<T, O = {}>(
       }
       return value;
     }, null);
-  const [accessor, setter] = createSignal<T | null>(read() ?? (initialValue as T), props as any);
+  const [accessor, setter] = createHydrateSignal<T | null>(
+    initialValue as T,
+    () => read() ?? (initialValue as T),
+    props as any
+  );
   createEffect(() => {
     const value = accessor();
     const filteredValue = props?.serializer
