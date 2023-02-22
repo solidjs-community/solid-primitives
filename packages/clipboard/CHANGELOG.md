@@ -1,5 +1,13 @@
 # @solid-primitives/clipboard
 
+## 1.5.0
+
+### Minor Changes
+
+- 8adcc6cf: Stop reading from clipboard initially. (Fixes #256)
+  Simplify item value returned by createClipboard.
+  Add `writeClipboard` and `readClipboard` as standalone functions.
+
 ## 1.4.7
 
 ### Patch Changes

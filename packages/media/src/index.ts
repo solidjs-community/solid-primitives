@@ -1,11 +1,7 @@
-import { createSignal, Accessor } from "solid-js";
+import { Accessor, sharedConfig } from "solid-js";
 import { makeEventListener } from "@solid-primitives/event-listener";
-import { createStaticStore, entries, noop } from "@solid-primitives/utils";
-import { getEmptyMatchesFromBreakpoints } from "./common";
-import { Breakpoints, BreakpointOptions, Matches } from "./types";
+import { createStaticStore, entries, noop, createHydrateSignal } from "@solid-primitives/utils";
 import { createSharedRoot } from "@solid-primitives/rootless";
-
-export * from "./types";
 
 /**
  * attaches a MediaQuery listener to window, listeneing to changes to provided query
@@ -35,7 +31,6 @@ export function makeMediaQueryListener(
  *
  * @param query Media query to listen for
  * @param fallbackState Server fallback state *(Defaults to `false`)*
- * @param watchChange If true watches changes and reports state reactively
  * @returns Boolean value if media query is met or not
  *
  * @example
@@ -44,19 +39,72 @@ export function makeMediaQueryListener(
  * console.log(isSmall());
  * ```
  */
-export const createMediaQuery = (
-  query: string,
-  fallbackState: boolean = false,
-  watchChange = true
-): Accessor<boolean> => {
+export function createMediaQuery(query: string, serverFallback = false) {
   if (process.env.SSR) {
-    return () => fallbackState;
+    return () => serverFallback;
   }
   const mql = window.matchMedia(query);
-  if (!watchChange) return () => mql.matches;
-  const [state, setState] = createSignal(mql.matches);
-  makeEventListener(mql, "change", () => setState(mql.matches));
+  const [state, setState] = createHydrateSignal(serverFallback, () => mql.matches);
+  const update = () => setState(mql.matches);
+  makeEventListener(mql, "change", update);
   return state;
+}
+
+/**
+ * Provides a signal indicating if the user has requested dark color theme. The setting is being watched with a [Media Query](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme).
+ *
+ * @param serverFallback value that should be returned on the server — defaults to `false`
+ *
+ * @returns a boolean signal
+ * @example
+ * const prefersDark = usePrefersDark();
+ * createEffect(() => {
+ *    prefersDark() // => boolean
+ * });
+ */
+export function createPrefersDark(serverFallback?: boolean) {
+  return createMediaQuery("(prefers-color-scheme: dark)", serverFallback);
+}
+
+const sharedPrefersDark: () => Accessor<boolean> = /*#__PURE__*/ createSharedRoot(
+  createPrefersDark.bind(void 0, false)
+);
+
+/**
+ * Provides a signal indicating if the user has requested dark color theme. The setting is being watched with a [Media Query](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme).
+ *
+ * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) except if during hydration.
+ *
+ * @returns a boolean signal
+ * @example
+ * const prefersDark = usePrefersDark();
+ * createEffect(() => {
+ *    prefersDark() // => boolean
+ * });
+ */
+export const usePrefersDark: () => Accessor<boolean> = process.env.SSR
+  ? () => () => false
+  : () => (sharedConfig.context ? createPrefersDark() : sharedPrefersDark());
+
+export type Breakpoints = Record<string, string>;
+
+export type Matches<T extends Breakpoints> = {
+  readonly [K in keyof T]: boolean;
+};
+
+export interface BreakpointOptions<T extends Breakpoints> {
+  /** If true watches changes and reports state reactively */
+  watchChange?: boolean;
+  /** Default value of `match` when `window.matchMedia` is not available like during SSR & legacy browsers */
+  fallbackState?: Matches<T>;
+  /** Use `min-width` media query for mobile first or `max-width` for desktop first. Defaults to `min-width`  */
+  mediaFeature?: string;
+}
+
+const getEmptyMatchesFromBreakpoints = <T extends Breakpoints>(breakpoints: T): Matches<T> => {
+  const matches = {} as Record<keyof T, boolean>;
+  entries(breakpoints).forEach(([key]) => (matches[key] = false));
+  return matches;
 };
 
 /**
@@ -103,24 +151,3 @@ export function createBreakpoints<T extends Breakpoints>(
 
   return matches;
 }
-/**
- * Provides a signal indicating if the user has requested dark color theme. The setting is being watched with a [Media Query](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme).
- *
- * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot).
- *
- * @param serverFallback value that should be returned on the server — defaults to `false`
- *
- * @returns a boolean signal
- * @example
- * const prefersDark = usePrefersDark();
- * createEffect(() => {
- *    prefersDark() // => boolean
- * });
- */
-export const usePrefersDark: (serverFallback?: boolean) => Accessor<boolean> = process.env.SSR
-  ? (fallback = false) =>
-      () =>
-        fallback
-  : /*#__PURE__*/ createSharedRoot(
-      createMediaQuery.bind(null, "(prefers-color-scheme: dark)", false, true)
-    );

@@ -9,7 +9,10 @@ import {
   AccessorArray,
   EffectFunction,
   NoInfer,
-  Signal
+  Signal,
+  SignalOptions,
+  sharedConfig,
+  onMount
 } from "solid-js";
 import { isServer as _isServer } from "solid-js/web";
 import type {
@@ -316,4 +319,29 @@ export function handleDiffArray<T>(
   for (currEl of current) {
     if (!prev.includes(currEl)) handleAdded(currEl);
   }
+}
+
+/**
+ * A signal object that handle hydration.
+ * @param serverValue initial value of the state on the server
+ * @param update called once on the client or on hydration to initialise the value
+ * @param options {@link SignalOptions}
+ * @returns
+ * ```ts
+ * [state: Accessor<T>, setState: Setter<T>]
+ * ```
+ * @see {@link createSignal}
+ */
+export function createHydrateSignal<T>(
+  serverValue: T,
+  update: () => T,
+  options?: SignalOptions<T>
+): Signal<T> {
+  if (isServer) {
+    return createSignal(serverValue);
+  }
+  let init = !!sharedConfig.context;
+  const [state, setState] = createSignal(init ? serverValue : update(), options);
+  init && onMount(() => setState(() => update()));
+  return [state, setState];
 }

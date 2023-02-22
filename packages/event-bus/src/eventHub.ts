@@ -1,86 +1,51 @@
-import { createEventBus } from "./eventBus";
-import { createEmitter } from "./emitter";
-import { GenericListener } from "./types";
 import { Accessor } from "solid-js";
-import { Values } from "@solid-primitives/utils";
+import { EmitterEmit, EmitterListen, EmitterOn } from "./emitter";
+import { createEventBus, Emit, Listen } from "./eventBus";
 
-type PayloadMap<ChannelMap extends Record<string, EventHubChannel>> = {
-  [Name in keyof ChannelMap]: Parameters<ChannelMap[Name]["emit"]>;
+export type EventHubPayloadMap<M> = {
+  [K in keyof M]: M[K] extends { emit: Emit<infer T> } ? T : never;
 };
 
-type ValueMap<ChannelMap extends Record<string, EventHubChannel>> = {
-  [Name in keyof ChannelMap]: ReturnType<ChannelMap[Name]["value"]>;
+export type EventHubValue<M> = {
+  [K in keyof M]: M[K] extends { value: Accessor<infer T> } ? T : never;
 };
-
-export type EventHubListener<ChannelMap extends Record<string, EventHubChannel>> = (
-  name: keyof ChannelMap,
-  payload: Values<PayloadMap<ChannelMap>>
-) => void;
-
-export type EventHubOn<ChannelMap extends Record<string, EventHubChannel>> = <
-  Name extends keyof ChannelMap
->(
-  name: Name,
-  listener: GenericListener<PayloadMap<ChannelMap>[Name]>,
-  protect?: boolean
-) => VoidFunction;
-
-export type EventHubOff<ChannelMap extends Record<string, EventHubChannel>> = <
-  Name extends keyof ChannelMap
->(
-  name: Name,
-  listener: GenericListener<PayloadMap<ChannelMap>[Name]>
-) => boolean;
-
-export type EventHubEmit<ChannelMap extends Record<string, EventHubChannel>> = <
-  Name extends keyof ChannelMap
->(
-  name: Name,
-  ...payload: PayloadMap<ChannelMap>[Name]
-) => void;
 
 /**
- * Required interface of a Emitter/EventBus, to be able to be used as a channel in the EventHub
+ * Required interface of a EventBus, to be able to be used as a channel in the EventHub
  */
-export interface EventHubChannel {
-  remove: (fn: (...payload: any[]) => void) => boolean;
-  listen: (listener: (...payload: any[]) => void, protect?: boolean) => VoidFunction;
-  emit: (...payload: any[]) => void;
-  clear: VoidFunction;
-  value: Accessor<any>;
+export interface EventHubChannel<T, V = T> {
+  readonly listen: Listen<T>;
+  readonly emit: Emit<T>;
+  readonly value?: Accessor<V>;
 }
 
-export type EventHub<ChannelMap extends Record<string, EventHubChannel>> = ChannelMap & {
-  on: EventHubOn<ChannelMap>;
-  off: EventHubOff<ChannelMap>;
-  emit: EventHubEmit<ChannelMap>;
-  clear: (event: keyof ChannelMap) => void;
-  clearAll: VoidFunction;
-  listen: (listener: EventHubListener<ChannelMap>, protect?: boolean) => VoidFunction;
-  remove: (listener: EventHubListener<ChannelMap>) => void;
-  clearGlobal: VoidFunction;
-  store: ValueMap<ChannelMap>;
-};
+export type EventHub<M extends { readonly [key: string | number]: EventHubChannel<any> }> =
+  Readonly<M> & {
+    readonly on: EmitterOn<EventHubPayloadMap<M>>;
+    readonly emit: EmitterEmit<EventHubPayloadMap<M>>;
+    readonly listen: EmitterListen<EventHubPayloadMap<M>>;
+    readonly value: EventHubValue<M>;
+  };
 
 /**
- * Provides helpers for using a group of emitters.
+ * Provides helpers for using a group of event buses.
  *
- * Can be used with `createEmitter`, `createEventBus`, `createEventStack`.
+ * Can be used with `createEventBus`, `createEventStack` or any emitter that has the same api.
  *
  * @param defineChannels object with defined channels or a defineChannels function returning channels.
  *
- * @returns hub functions: `{on, once, off, emit, clear, clearAll, listen, remove, clearGlobal, store}` + channels available by their key
+ * @returns hub functions: `{on, emit, listen, value}` + channels available by their key
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventHub
  *
  * @example
  * const hub = createEventHub({
- *    busA: createEmitter<void>(),
+ *    busA: createEventBus<void>(),
  *    busB: createEventBus<string>(),
  *    busC: createEventStack<{ text: string }>()
  * });
  * // can be destructured
- * const { busA, busB, on, off, listen, emit, clear } = hub;
+ * const { busA, busB, on, listen, emit } = hub;
  *
  * hub.on("busA", e => {});
  * hub.on("busB", e => {});
@@ -89,70 +54,24 @@ export type EventHub<ChannelMap extends Record<string, EventHubChannel>> = Chann
  * hub.emit("busB", "foo");
  */
 
-export function createEventHub<ChannelMap extends Record<string, EventHubChannel>>(
-  defineChannels: ((bus: typeof createEventBus) => ChannelMap) | ChannelMap
-): EventHub<ChannelMap> {
-  const global = createEmitter<string, any>();
+export function createEventHub<M extends { readonly [key: string | number]: EventHubChannel<any> }>(
+  defineChannels: ((bus: typeof createEventBus) => M) | M
+): EventHub<M> {
+  const global = /*#__PURE__*/ createEventBus<{ name: string; details: any }>();
   const buses =
     typeof defineChannels === "function" ? defineChannels(createEventBus) : defineChannels;
-  const store: Record<string, any> = {};
+  const value = {} as EventHubValue<M>;
 
   Object.entries(buses).forEach(([name, bus]) => {
-    Object.defineProperty(store, name, { get: bus.value, enumerable: true });
-    bus.listen((...payload) => global.emit(name, payload), true);
+    bus.value && Object.defineProperty(value, name, { get: bus.value, enumerable: true });
+    bus.listen(payload => global.emit({ name, details: payload }));
   });
 
   return {
     ...buses,
-    store: store as ValueMap<ChannelMap>,
-    on: (e, ...a) => buses[e].listen(...(a as [any])),
-    off: (e, ...a) => buses[e].remove(...(a as [any])),
-    emit: (e, ...a) => buses[e].emit(...a),
-    clear: e => buses[e].clear(),
-    clearAll: () => Object.values(buses).forEach(bus => bus.clear()),
-    listen: global.listen,
-    remove: global.remove,
-    clearGlobal: global.clear
+    value,
+    on: (e, a) => buses[e].listen(a),
+    emit: (e, a?: any) => buses[e].emit(a),
+    listen: global.listen
   };
 }
-
-// /* Type Check */
-// import { createEventStack, Emitter } from ".";
-// const hub = createEventHub(bus => ({
-//   test: bus<string>({ value: "Initial" }),
-//   other: bus<void>(),
-//   news: bus<[Date, string]>(),
-//   foo: createEmitter<Date, string, number>(),
-//   bus: createEventBus<number>(),
-//   messages: createEventStack({
-//     toValue: (e: string) => ({ text: e })
-//   })
-// }));
-
-// hub.on("news", ([date, message]) => {});
-// hub.on("foo", (date, message, number) => {});
-
-// hub.off("test", message => {});
-// hub.off("news", ([date, message]) => {});
-
-// hub.emit("news", [new Date(), "HELLO"]);
-// hub.emit("test", "HELLO");
-// hub.emit("foo", new Date(), "HELLO", 123);
-// hub.emit("other");
-
-// hub.listen((name, payload) => {});
-
-// hub.clear("other");
-// hub.clearAll();
-// // clearGlobal();
-
-// type X = PayloadMap<{
-//   a: Emitter<string, string>;
-// }>;
-
-// hub.store.test;
-// hub.store.news;
-// hub.store.bus;
-
-// hub.store.messages;
-// hub.messages.value;

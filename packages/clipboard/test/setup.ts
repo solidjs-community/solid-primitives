@@ -2,7 +2,7 @@
 class ClipboardItem {
   value: any;
   type: string = "text/plain";
-  types: string[] = [];
+  types: string[] = ["text/plain"];
   constructor(value: any) {
     return (this.value = value);
   }

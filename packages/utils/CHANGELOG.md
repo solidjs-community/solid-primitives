@@ -1,5 +1,17 @@
 # @solid-primitives/utils
 
+## 5.2.0
+
+### Minor Changes
+
+- 646f576a: Add `createHydrateSignal` primitive to utils and fix hydration issues
+
+## 5.1.1
+
+### Patch Changes
+
+- 22f78f52: Improve the Narrow type
+
 ## 5.1.0
 
 ### Minor Changes

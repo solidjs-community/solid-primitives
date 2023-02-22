@@ -9,22 +9,25 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/i18n?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/i18n)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Creates a method for internationalization support. This primitive set is largely inspired by [dlv](https://github.com/developit/dlv/blob/master/index.js) and passes all its tests.
+Library of primitives for providing internationalization support.
 
-## How to use it
-
-Install it:
+## Installation
 
 ```bash
+npm i @solid-primitives/i18n
+# or
+pnpm add @solid-primitives/i18n
+# or
 yarn add @solid-primitives/i18n
 ```
 
-Use it:
+## `createI18nContext`
+
+Creates a method for internationalization support. This primitive set is largely inspired by [dlv](https://github.com/developit/dlv/blob/master/index.js) and passes all its tests.
+
+### How to use it
 
 ```tsx
-import { render } from "solid-js/web";
-import { Component, createSignal } from "solid-js";
-
 import { I18nContext, createI18nContext, useI18n } from "@solid-primitives/i18n";
 
 const App: Component = () => {
@@ -63,19 +66,85 @@ const dict = {
 };
 const value = createI18nContext(dict, "fr");
 
-render(
-  () => (
-    <I18nContext.Provider value={value}>
-      <App />
-    </I18nContext.Provider>
-  ),
-  document.getElementById("app")
-);
+<I18nContext.Provider value={value}>
+  <App />
+</I18nContext.Provider>;
+```
+
+## `createChainedI18n`
+
+Creates a chained dictionary and manages the locale. Provides a proxy wrapper around translate so you can do chained calls that always returns with the current locale. IE t.hello()
+
+### How to use it
+
+```ts
+import { createChainedI18n } from "@solid-primitives/i18n";
+
+const dictionaries = {
+  fr: {
+    hello: "bonjour {{ name }}, comment vas-tu ?",
+    goodbye: ({ name }: { name: string }) => `au revoir ${name}`
+  },
+  en: {
+    hello: "hello {{ name }}, how are you?",
+    goodbye: ({ name }: { name: string }) => `goodbye ${name}`
+  }
+};
+
+const [t, { locale, setLocale, getDictionary }] = createChainedI18n({
+  dictionaries,
+  locale: "en" // Starting locale
+});
+
+createEffect(() => {
+  t.hello({ name: "Mathiew" });
+});
+```
+
+### `createChainedI18nContext`
+
+Creates chained I18n state wrapped in a Context Provider to be shared with the app using the component tree.
+
+```tsx
+import { createChainedI18nContext } from "@solid-primitives/i18n";
+
+const { I18nProvider, useI18nContext } = makeChainedI18nContext({
+  dictionaries,
+  locale: "en" // Starting locale
+});
+
+export const useI18n = () => {
+  const context = useI18nContext();
+  if (!context) throw new Error("useI18n must be used within an I18nProvider");
+  return context;
+};
+
+const App: Component = () => {
+  const [t, { locale, setLocale, getDictionary }] = useI18n();
+  const [name, setName] = createSignal("Greg");
+
+  return (
+    <>
+      <button onClick={() => setLocale("fr")}>fr</button>
+      <button onClick={() => setLocale("en")}>en</button>
+      <button onClick={addLanguage}>add and set swedish</button>
+      <input value={name()} onInput={e => setName(e.target.value)} />
+      <hr />
+      <h1>{t.hello({ name: name() })}!</h1>
+      <p>{locale()}</p>
+      <p>{t.goodbye({ name: name() })}</p>
+    </>
+  );
+};
+
+<I18nContext.Provider value={value}>
+  <App />
+</I18nContext.Provider>;
 ```
 
 ## Demo
 
-You may view a working example here: https://codesandbox.io/s/use-i18n-rd7jq?file=/src/index.tsx
+You may view a working example of createI18nContext here: https://codesandbox.io/s/use-i18n-rd7jq?file=/src/index.tsx
 
 ## Changelog
 

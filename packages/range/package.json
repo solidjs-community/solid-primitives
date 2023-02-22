@@ -65,7 +65,7 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "devDependencies": {
-    "solid-transition-group": "^0.0.8"
+    "solid-transition-group": "^0.0.13"
   },
   "dependencies": {
     "@solid-primitives/utils": "^5.0.0"

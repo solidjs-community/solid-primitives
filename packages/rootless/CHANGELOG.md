@@ -1,5 +1,11 @@
 # @solid-primitives/rootless
 
+## 1.2.4
+
+### Patch Changes
+
+- 60ee06f8: Allow for passing `null` to `createRoot` in `createSubRoot`.
+
 ## 1.2.3
 
 ### Patch Changes

@@ -1,104 +1,142 @@
-import { noop, tryOnCleanup } from "@solid-primitives/utils";
-import {
-  EmitGuard,
-  GenericEmit,
-  GenericListener,
-  GenericListenProtect,
-  Remove,
-  RemoveGuard
-} from "./types";
+import { tryOnCleanup } from "@solid-primitives/utils";
+import { onCleanup } from "solid-js";
+import { createEventBus, EventBusCore, Listener } from "./eventBus";
 
-export type Emitter<A0 = void, A1 = void, A2 = void> = {
-  listen: GenericListenProtect<[A0, A1, A2]>;
-  emit: GenericEmit<[A0, A1, A2]>;
-  remove: Remove<A0, A1, A2>;
-  clear: VoidFunction;
-  has: (listener: GenericListener<[A0, A1, A2]>) => boolean;
-  value: () => void;
-};
+export class EmitterCore<M extends Record<PropertyKey, any>> extends Map<
+  keyof M,
+  EventBusCore<M[any]>
+> {
+  on<K extends keyof M>(event: K, listener: Listener<M[K]>): void {
+    let bus = this.get(event);
+    bus || this.set(event, (bus = new EventBusCore<M[K]>()));
+    bus.add(listener);
+  }
 
-export type EmitterConfig<A0 = void, A1 = void, A2 = void> = {
-  emitGuard?: EmitGuard<A0, A1, A2>;
-  removeGuard?: RemoveGuard<GenericListener<[A0, A1, A2]>>;
-  beforeEmit?: GenericListener<[A0, A1, A2]>;
+  off<K extends keyof M>(event: K, listener: Listener<M[K]>): void {
+    const bus = this.get(event);
+    bus?.delete(listener) && !bus.size && this.delete(event);
+  }
+
+  emit<K extends keyof M>(
+    event: K,
+    ..._: void extends M[K] ? [payload?: M[K]] : [payload: M[K]]
+  ): void;
+  emit<K extends keyof M>(event: K, value: M[K]): void {
+    this.get(event)?.emit(value);
+  }
+}
+
+export type EmitterOn<M extends Record<PropertyKey, any>> = <K extends keyof M>(
+  event: K,
+  listener: Listener<M[K]>
+) => VoidFunction;
+
+export type EmitterEmit<M extends Record<PropertyKey, any>> = EmitterCore<M>["emit"];
+
+export type Emitter<M extends Record<PropertyKey, any>> = {
+  readonly on: EmitterOn<M>;
+  readonly emit: EmitterEmit<M>;
+  readonly clear: VoidFunction;
 };
 
 /**
- * Provides all the base functions of an event-emitter, plus additional functions for managing listeners, it's behavior could be customized with an config object.
- * 
- * @param config Emitter configuration: `emitGuard`, `removeGuard`, `beforeEmit` functions.
- * 
- * @returns the emitter: `{listen, once, emit, remove, clear, has}`
- * 
+ * Creates an emitter with which you can listen to and emit various events.
+ *
+ * @returns emitter mathods: `{on, emit, clear}`
+ *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEmitter
- * 
+ *
  * @example
-// accepts up-to-3 genetic payload types
-const emitter = createEmitter<string, number, boolean>();
-// emitter can be destructured:
-const { listen, emit, has, clear } = emitter;
-
-const listener = (a, b, c) => console.log(a, b, c);
-emitter.listen(listener);
-
-emitter.emit("foo", 123, true);
-
-emitter.remove(listener);
-emitter.has(listener); // false
+ * const emitter = createEmitter<{
+ *   foo: number;
+ *   bar: string;
+ * }>();
+ * // can be destructured
+ * const { on, emit, clear } = emitter;
+ *
+ * emitter.on("foo", e => {});
+ * emitter.on("bar", e => {});
+ *
+ * emitter.emit("foo", 0);
+ * emitter.emit("bar", "hello");
  */
-export function createEmitter<A0 = void, A1 = void, A2 = void>(
-  config: EmitterConfig<A0, A1, A2> = {}
-): Emitter<A0, A1, A2> {
-  type _Listener = GenericListener<[A0, A1, A2]>;
-  type _Listen = Emitter<A0, A1, A2>["listen"];
-  type _Emit = Emitter<A0, A1, A2>["emit"];
-  type _Remove = Emitter<A0, A1, A2>["remove"];
-
-  const { emitGuard, removeGuard, beforeEmit } = config;
-  const protectedSet = new WeakSet<_Listener>();
-  const listeners = new Set<_Listener>();
-
-  const _remove: _Remove = listener =>
-    protectedSet.has(listener) ? false : !!listeners.delete(listener);
-  const remove: _Remove = removeGuard
-    ? listener => removeGuard(() => _remove(listener), listener)
-    : _remove;
-
-  const listen: _Listen = (listener, protect) => {
-    listeners.add(listener);
-    const unsub = tryOnCleanup(() => listeners.delete(listener));
-    if (!protect) return unsub;
-    protectedSet.add(listener);
-    return () => {
-      protectedSet.delete(listener);
-      unsub();
-    };
-  };
-
-  const _emit: _Emit = (...payload) => {
-    beforeEmit?.(...payload);
-    listeners.forEach(cb => cb(...payload));
-  };
-  const emit: _Emit = emitGuard
-    ? (...payload) =>
-        emitGuard(
-          // in the emitGuard's emit function: user can choose to pass arguments or not
-          // if not then the original payload should be used
-          (...args: [A0, A1, A2] | []) => _emit(...(args.length ? args : payload)),
-          ...payload
-        )
-    : _emit;
-
-  // cleanup uses set.clear() instead of clear() to always clear all the listeners,
-  // ragardles of the conditions in the removeGuard
-  tryOnCleanup(() => listeners.clear());
+export function createEmitter<M extends Record<PropertyKey, any>>(): Emitter<M> {
+  const emitter = new EmitterCore<M>();
 
   return {
-    listen,
-    emit,
-    remove,
-    clear: () => listeners.forEach(cb => remove(cb)),
-    has: listener => listeners.has(listener),
-    value: noop
+    on(event, listener) {
+      emitter.on(event, listener);
+      return tryOnCleanup(emitter.off.bind(emitter, event, listener as any));
+    },
+    emit: emitter.emit.bind(emitter),
+    clear: onCleanup(emitter.clear.bind(emitter))
+  };
+}
+
+export type EmitterPayload<M extends Record<PropertyKey, any>> = {
+  [K in keyof M]: { readonly name: K; readonly details: M[K] };
+}[keyof M];
+
+export type EmitterListener<M extends Record<PropertyKey, any>> = (
+  payload: EmitterPayload<M>
+) => void;
+
+export type EmitterListen<M extends Record<PropertyKey, any>> = (
+  listener: EmitterListener<M>
+) => VoidFunction;
+
+export type GlobalEmitter<M extends Record<PropertyKey, any>> = {
+  readonly on: EmitterOn<M>;
+  readonly listen: EmitterListen<M>;
+  readonly emit: EmitterEmit<M>;
+  readonly clear: VoidFunction;
+};
+
+/**
+ * Creates an emitter with which you can listen to and emit various events. With this emitter you can also listen to all events.
+ *
+ * @returns emitter mathods: `{on, listen, emit, clear}`
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createGlobalEmitter
+ *
+ * @example
+ * const emitter = createGlobalEmitter<{
+ *   foo: number;
+ *   bar: string;
+ * }>();
+ * // can be destructured
+ * const { on, emit, clear, listen } = emitter;
+ *
+ * emitter.on("foo", e => {});
+ * emitter.on("bar", e => {});
+ *
+ * emitter.emit("foo", 0);
+ * emitter.emit("bar", "hello");
+ *
+ * emitter.listen(e => {
+ *   switch (e.name) {
+ *     case "foo": {
+ *       e.details;
+ *       break;
+ *     }
+ *     case "bar": {
+ *       e.details;
+ *       break;
+ *     }
+ *   }
+ * })
+ */
+export function createGlobalEmitter<M extends Record<PropertyKey, any>>(): GlobalEmitter<M> {
+  const emitter = createEmitter<M>();
+  const global = createEventBus<{ name: PropertyKey; details: any }>();
+
+  return {
+    on: emitter.on,
+    clear: emitter.clear,
+    listen: global.listen,
+    emit(name, details?: any) {
+      global.emit({ name, details });
+      emitter.emit(name, details);
+    }
   };
 }

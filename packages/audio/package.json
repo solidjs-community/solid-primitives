@@ -67,6 +67,7 @@
     },
     "require": "./dist/index.cjs"
   },
+  "typesVersions": {},
   "scripts": {
     "start": "vite serve dev",
     "dev": "vite serve dev",
@@ -81,13 +82,12 @@
     "primitives"
   ],
   "devDependencies": {
-    "solid-heroicons": "^2.0.3"
+    "solid-heroicons": "^3.1.1"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^5.0.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
-  },
-  "typesVersions": {}
+  }
 }

@@ -1,10 +1,11 @@
 {
   "name": "@solid-primitives/page-visibility",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Primitive to track page visibility",
   "author": "David Di Biase",
   "contributors": [
-    "Damian Tarnawski <gthetarnav@gmail.com>"
+    "Damian Tarnawski <gthetarnav@gmail.com>",
+    "Tom Pichaud <dev.tompichaud@icloud.com>"
   ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/page-visibility",
@@ -95,7 +96,9 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/rootless": "workspace:^1.2.2"
+    "@solid-primitives/event-listener": "workspace:^2.2.6",
+    "@solid-primitives/rootless": "workspace:^1.2.3",
+    "@solid-primitives/utils": "workspace:^5.2.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

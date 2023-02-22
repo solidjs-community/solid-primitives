@@ -1,8 +1,11 @@
 {
   "name": "@solid-primitives/clipboard",
-  "version": "1.4.7",
+  "version": "1.5.0",
   "description": "Primitives for reading and writing to clipboard.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
+  "contributors": [
+    "Damian Tarnawski <gthetarnav@gmail.com>"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/clipboard",
   "repository": {
@@ -13,9 +16,9 @@
     "name": "clipboard",
     "stage": 3,
     "list": [
-      "makeClipboard",
-      "createClipboard",
-      "copyToClipboard"
+      "copyClipboard",
+      "writeClipboard",
+      "createClipboard"
     ],
     "category": "Browser APIs"
   },
@@ -41,13 +44,6 @@
       "require": "./dist/server.cjs"
     },
     "browser": {
-      "development": {
-        "import": {
-          "types": "./dist/index.d.ts",
-          "default": "./dist/dev.js"
-        },
-        "require": "./dist/dev.cjs"
-      },
       "import": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
@@ -68,13 +64,6 @@
       },
       "require": "./dist/server.cjs"
     },
-    "development": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/dev.js"
-      },
-      "require": "./dist/dev.cjs"
-    },
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
@@ -85,7 +74,7 @@
     "start": "vite serve dev",
     "dev": "vite serve dev",
     "page": "vite build dev",
-    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "build": "jiti ../../scripts/build.ts --ssr",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },

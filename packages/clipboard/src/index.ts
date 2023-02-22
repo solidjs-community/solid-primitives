@@ -1,14 +1,31 @@
+import { access, MaybeAccessor } from "@solid-primitives/utils";
 import {
   Accessor,
-  createResource,
-  Resource,
-  on,
-  onMount,
-  onCleanup,
   createEffect,
-  createSignal
+  createResource,
+  InitializedResource,
+  on,
+  onCleanup
 } from "solid-js";
-import { MaybeAccessor, access } from "@solid-primitives/utils";
+
+export type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
+export type NewClipboardItem = (
+  type: string,
+  data: string | Blob | PromiseLike<string | Blob>
+) => ClipboardItem;
+export type HighlightModifier = (el: any) => void;
+export type Highlighter = (start?: number, end?: number) => HighlightModifier;
+export type CopyToClipboardOptions = {
+  value?: any;
+  setter?: ClipboardSetter;
+  highlight?: HighlightModifier;
+};
+
+export type ClipboardResourceItem = {
+  readonly type: string;
+  readonly text: string | undefined;
+  readonly blob: Blob;
+};
 
 declare module "solid-js" {
   namespace JSX {
@@ -19,33 +36,40 @@ declare module "solid-js" {
 }
 
 /**
- * Generates a simple non-reactive clipboard primitive for reading and writing.
- *
- * @return write - Async write to the clipboard
- * @return read - Async read from the clipboard
- * @return newItem - Helper function to wrap ClipboardItem creation.
- *
- * @example
- * ```ts
- * const [ write, read ] = makeClipboard();
- * console.log(await read());
- * ```
+ * Async write to the clipboard
+ * @param data - Data to write to the clipboard - either a string or ClipboardItem array.
+ */
+export const writeClipboard: ClipboardSetter = async data => {
+  if (process.env.SSR) {
+    return;
+  }
+
+  typeof data === "string"
+    ? await navigator.clipboard.writeText(data)
+    : await navigator.clipboard.write(data);
+};
+
+/**
+ * Async read from the clipboard
+ * @return Promise of ClipboardItem array
+ */
+export function readClipboard(): Promise<ClipboardItem[]> {
+  if (process.env.SSR) {
+    return Promise.resolve([]);
+  }
+
+  return navigator.clipboard.read();
+}
+
+/**
+ * @deprecated Use `readClipboard`, `writeClipboard` and `newClipboardItem` instead.
  */
 export const makeClipboard = (): [
-  write: ClipboardSetter,
-  read: () => Promise<ClipboardItems | undefined>,
-  newItem: NewClipboardItem
+  writeClipboard: ClipboardSetter,
+  readClipboard: () => Promise<ClipboardItems | undefined>,
+  newClipboardItem: NewClipboardItem
 ] => {
-  if (process.env.SSR) {
-    return [async () => void 0, async () => void 0, () => ({} as ClipboardItem)];
-  }
-  const read = async () => await navigator.clipboard.read();
-  const write: ClipboardSetter = async data => {
-    typeof data === "string"
-      ? await navigator.clipboard.writeText(data)
-      : await navigator.clipboard.write(data);
-  };
-  return [write, read, newItem];
+  return [writeClipboard, readClipboard, newClipboardItem];
 };
 
 /**
@@ -63,13 +87,7 @@ export const createClipboard = (
   data?: Accessor<string | ClipboardItem[]>,
   deferInitial?: boolean
 ): [
-  clipboardItems: Resource<
-    {
-      type: string;
-      text: Accessor<string>;
-      blob: Accessor<Blob>;
-    }[]
-  >,
+  clipboardItems: InitializedResource<ClipboardResourceItem[]>,
   refetch: VoidFunction,
   write: ClipboardSetter
 ] => {
@@ -80,38 +98,37 @@ export const createClipboard = (
       async () => void 0
     ];
   }
-  const [write, readClipboard] = makeClipboard();
-  const [clipboard, { refetch }] = createResource<any>(async () => {
-    const items = (await readClipboard()) || [];
-    return items.map(item => {
-      const [data, setData] = createSignal<string | Blob | undefined>(undefined);
-      const getType = () => item.types[item.types.length - 1];
-      return {
-        async load(mime: string) {
-          const blob = await item.getType(mime);
-          const nextData = blob.type === "text/plain" ? await blob.text() : blob;
-          setData(() => nextData);
-        },
-        get type(): string {
-          return getType();
-        },
-        get text() {
-          this.load("text/plain");
-          return data;
-        },
-        get blob() {
-          this.load(getType());
-          return data;
-        }
-      };
-    });
-  });
-  onMount(() => navigator.clipboard.addEventListener("clipboardchange", refetch));
+
+  let init = true;
+  const [clipboard, { refetch }] = createResource<ClipboardResourceItem[]>(
+    async (_, info) => {
+      if (init) {
+        init = false;
+        return info.value!;
+      }
+
+      const items = await readClipboard();
+      if (!items || !items.length) return [];
+
+      return Promise.all(
+        items.map(async item => {
+          const type = item.types[item.types.length - 1];
+          const blob = await item.getType(type);
+          const text = blob.type === "text/plain" ? await blob.text() : undefined;
+          return { type, blob, text };
+        })
+      );
+    },
+    { initialValue: [] }
+  );
+
+  navigator.clipboard.addEventListener("clipboardchange", refetch);
   onCleanup(() => navigator.clipboard.removeEventListener("clipboardchange", refetch));
   if (data) {
-    createEffect(on(data, () => write(data()), { defer: deferInitial || true }));
+    createEffect(on(data, () => writeClipboard(data()), { defer: deferInitial || true }));
   }
-  return [clipboard, refetch, write];
+
+  return [clipboard, refetch, writeClipboard];
 };
 
 /**
@@ -130,7 +147,7 @@ export const createClipboard = (
  * ```
  */
 export const copyToClipboard = (
-  el: HTMLElement | HTMLInputElement,
+  el: HTMLElement,
   options: MaybeAccessor<CopyToClipboardOptions>
 ) => {
   if (process.env.SSR) {
@@ -157,13 +174,19 @@ export const copyToClipboard = (
 };
 
 /**
- * newItem is a wrapper method around creating new ClipboardItems.
+ * newClipboardItem is a wrapper method around creating new ClipboardItems.
  *
  * @param type - The MIME type of the item to create
  * @param data - Data to populate the item with
  * @returns Provides a ClipboardItem object
  */
-export const newItem: NewClipboardItem = (type, data) => new ClipboardItem({ [type]: data });
+export const newClipboardItem: NewClipboardItem = (type, data) =>
+  new ClipboardItem({ [type]: data });
+
+/**
+ * @deprecated Use `newClipboardItem` instead.
+ */
+export const newItem = newClipboardItem;
 
 /**
  * A modifier that highlights/selects a range on an HTML element.

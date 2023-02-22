@@ -15,6 +15,8 @@ Primitives for creating scheduled — throttled or debounced — callbacks.
 - [`throttle`](#throttle) - Creates a callback that is **throttled** and cancellable.
 - [`scheduleIdle`](#scheduleIdle) - Creates a callback throttled using `window.requestIdleCallback()`.
 - [`leading`](#leading) - Creates a scheduled and cancellable callback that will be called on **leading** edge.
+- [`createScheduled`](#createscheduled) - Creates a signal used for scheduling execution of solid computations by tracking.
+- [Scheduling explanation](#scheduling-explanation)
 
 ## Installation
 
@@ -102,6 +104,52 @@ import { leading, throttle } from "@solid-primitives/scheduled";
 const trigger = leading(throttle, (message: string) => console.log(message), 250);
 trigger("Hello!");
 trigger.clear(); // clears a timeout in progress
+```
+
+## `createScheduled`
+
+Creates a signal used for scheduling execution of solid computations by tracking.
+
+### How to use it
+
+`createScheduled` takes only one parameter - a `schedule` function. This function is called with a callback that should be scheduled. It should return a function for triggering the timeout.
+
+```ts
+// e.g. with debounce
+createScheduled(fn => debounce(fn, 1000));
+// e.g. with throttle
+createScheduled(fn => throttle(fn, 1000));
+// e.g. with leading debounce
+createScheduled(fn => leading(debounce, fn, 1000));
+// e.g. with leading throttle
+createScheduled(fn => leading(throttle, fn, 1000));
+```
+
+It returns a signal that can be used to schedule execution of a solid computation. The signal returns `true` if it's dirty _(callback should be called)_ and `false` otherwise.
+
+```ts
+import { createScheduled, debounce } from "@solid-primitives/scheduled";
+
+const scheduled = createScheduled(fn => debounce(fn, 1000));
+
+const [count, setCount] = createSignal(0);
+
+createEffect(() => {
+  // track source signal
+  const value = count();
+  // track the debounced signal and check if it's dirty
+  if (scheduled()) {
+    console.log("count", value);
+  }
+});
+
+// or with createMemo
+const debouncedCount = createMemo((p: number = 0) => {
+  // track source signal
+  const value = count();
+  // track the debounced signal and check if it's dirty
+  return scheduled() ? value : p;
+});
 ```
 
 ## Scheduling explanation

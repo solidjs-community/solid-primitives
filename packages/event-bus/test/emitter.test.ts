@@ -1,140 +1,69 @@
-import { createEmitter } from "../src";
+import { describe, test, expect, vi } from "vitest";
 import { createRoot } from "solid-js";
-import { describe, test, expect } from "vitest";
+import { createEmitter, createGlobalEmitter } from "../src";
 
 describe("createEmitter", () => {
-  test("emitting and listening", () =>
-    createRoot(dispose => {
-      const captured: any[] = [];
-      const { listen, emit } = createEmitter<string, number, boolean>();
+  test("listening and emiting", () =>
+    createRoot(() => {
+      const hub = createEmitter<{
+        busA: number;
+        busB: string;
+      }>();
 
-      listen((...args) => captured.push(args));
+      const cbA = vi.fn();
+      const cbB = vi.fn();
 
-      emit("foo", 1, true);
-      expect(captured[0]).toEqual(["foo", 1, true]);
+      hub.on("busA", cbA);
+      hub.on("busB", cbB);
 
-      emit("bar", 2, false);
-      expect(captured[1]).toEqual(["bar", 2, false]);
+      hub.emit("busA", 0);
+      hub.emit("busA", 1);
+      hub.emit("busB", "foo");
+      hub.emit("busB", "bar");
 
-      dispose();
+      expect(cbA).toBeCalledTimes(2);
+      expect(cbA).nthCalledWith(1, 0);
+      expect(cbA).nthCalledWith(2, 1);
+
+      expect(cbB).toBeCalledTimes(2);
+      expect(cbB).nthCalledWith(1, "foo");
+      expect(cbB).nthCalledWith(2, "bar");
     }));
+});
 
-  test("clear function", () =>
-    createRoot(dispose => {
-      const captured: any[] = [];
-      const { listen, emit, clear } = createEmitter<string>();
+describe("createGlobalEmitter", () => {
+  test("listening and emiting", () =>
+    createRoot(() => {
+      const hub = createGlobalEmitter<{
+        busA: number;
+        busB: string;
+      }>();
 
-      listen(a => captured.push(a));
+      const cbA = vi.fn();
+      const cbB = vi.fn();
+      const cbAny = vi.fn();
 
-      clear();
+      hub.on("busA", cbA);
+      hub.on("busB", cbB);
+      hub.listen(cbAny);
 
-      emit("foo");
-      expect(captured.length).toBe(0);
+      hub.emit("busA", 0);
+      hub.emit("busA", 1);
+      hub.emit("busB", "foo");
+      hub.emit("busB", "bar");
 
-      dispose();
-    }));
+      expect(cbA).toBeCalledTimes(2);
+      expect(cbA).nthCalledWith(1, 0);
+      expect(cbA).nthCalledWith(2, 1);
 
-  test("clears on dispose", () =>
-    createRoot(dispose => {
-      const captured: any[] = [];
-      const { listen, emit } = createEmitter<string>();
+      expect(cbB).toBeCalledTimes(2);
+      expect(cbB).nthCalledWith(1, "foo");
+      expect(cbB).nthCalledWith(2, "bar");
 
-      listen(a => captured.push(a));
-
-      dispose();
-
-      emit("foo");
-      expect(captured.length).toBe(0);
-    }));
-
-  test("remove()", () =>
-    createRoot(dispose => {
-      const captured: any[] = [];
-      const { listen, emit, remove } = createEmitter<string>();
-
-      const listener = (a: string) => captured.push(a);
-      listen(listener);
-
-      remove(listener);
-
-      emit("foo");
-      expect(captured).toEqual([]);
-
-      const unsub = listen(listener);
-      unsub();
-
-      emit("bar");
-      expect(captured).toEqual([]);
-
-      dispose();
-    }));
-
-  test("remove protected", () =>
-    createRoot(dispose => {
-      const captured: any[] = [];
-      const { listen, emit, remove } = createEmitter<string>();
-
-      const listener = (a: string) => captured.push(a);
-      const unsub = listen(listener, true);
-
-      remove(listener);
-
-      emit("foo");
-      expect(captured, "normal remove() shouldn't remove a protected listener").toEqual(["foo"]);
-
-      unsub();
-
-      emit("bar");
-      expect(captured, "returned unsub func should remove a protected listener").toEqual(["foo"]);
-
-      dispose();
-    }));
-
-  test("has()", () =>
-    createRoot(dispose => {
-      const { listen, has } = createEmitter<string>();
-
-      const listener = () => {};
-      expect(has(listener)).toBe(false);
-      const unsub = listen(listener);
-      expect(has(listener)).toBe(true);
-      unsub();
-      expect(has(listener)).toBe(false);
-
-      dispose();
-    }));
-
-  test("config options", () =>
-    createRoot(dispose => {
-      let allowEmit = true;
-      let allowRemove = false;
-
-      const capturedBeforeEmit: any[] = [];
-
-      const { listen, has, remove, emit } = createEmitter<string>({
-        beforeEmit: a => capturedBeforeEmit.push(a),
-        emitGuard: (emit, payload) => allowEmit && emit(payload),
-        removeGuard: remove => allowRemove && remove()
-      });
-      const listener = () => {};
-
-      let unsub = listen(listener);
-      remove(listener);
-      expect(has(listener)).toBe(true);
-      unsub();
-      expect(has(listener)).toBe(false);
-
-      listen(listener);
-      allowRemove = true;
-      remove(listener);
-      expect(has(listener)).toBe(false);
-
-      emit("foo");
-      expect(capturedBeforeEmit).toEqual(["foo"]);
-      allowEmit = false;
-      emit("bar");
-      expect(capturedBeforeEmit).toEqual(["foo"]);
-
-      dispose();
+      expect(cbAny).toBeCalledTimes(4);
+      expect(cbAny).nthCalledWith(1, { name: "busA", details: 0 });
+      expect(cbAny).nthCalledWith(2, { name: "busA", details: 1 });
+      expect(cbAny).nthCalledWith(3, { name: "busB", details: "foo" });
+      expect(cbAny).nthCalledWith(4, { name: "busB", details: "bar" });
     }));
 });

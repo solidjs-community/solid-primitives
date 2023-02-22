@@ -60,8 +60,8 @@
     "@solid-primitives/utils": "^5.0.0"
   },
   "devDependencies": {
-    "solid-app-router": "^0.2.1",
-    "solid-transition-group": "^0.0.8"
+    "solid-app-router": "^0.4.2",
+    "solid-transition-group": "^0.0.13"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
