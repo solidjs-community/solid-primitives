@@ -24,7 +24,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   #keyTriggers = new TriggerCache<K | typeof $KEYS>();
   #valueTriggers = new TriggerCache<K>();
 
-  constructor(initial?: [K, V][], private equals = (a: V, b: V) => a === b) {
+  constructor(initial?: [K, V][]) {
     super();
     if (initial) for (const v of initial) super.set(v[0], v[1]);
   }
