@@ -152,7 +152,6 @@ export function mapRange<T>(
  * </Range>
  * ```
  */
-// eslint-disable-next-line @typescript-eslint/no-shadow
 export function Range<T>(
   props: RangeProps & {
     fallback?: T;

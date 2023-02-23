@@ -1,6 +1,5 @@
 export enum EventType {
   Pageview = "page",
-  // eslint-disable-next-line @typescript-eslint/no-shadow
   Event = "event",
   Social = "social"
 }
