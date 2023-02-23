@@ -98,7 +98,7 @@ const Search: Component<{
   );
 
   return (
-    <div class="p-4 flex justify-center items-center w-screen max-w-[800px]">
+    <div class="flex justify-center items-center w-full max-w-[800px]">
       <div class="w-full rounded-lg bg-page-main-bg">
         <div
           class="sticky"

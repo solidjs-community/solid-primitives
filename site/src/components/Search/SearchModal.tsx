@@ -100,28 +100,38 @@ const SearchModal: Component<{
       removeScrollbar={false}
       overlayElement={{
         element: (
-          <div class="fixed top-0">
+          <div>
             <div
               class="fixed top-0 left-0 right-0 h-[60px] z-[1002]"
               classList={{ hidden: isSmall() }}
               onClick={onClickClose}
             />
-            <div class="fixed inset-0 z-[1000] will-change-transform" onClick={onClickClose}>
+            <div
+              class="fixed inset-0 z-[1000] will-change-transform"
+              data-overlay-backdrop
+              onClick={onClickClose}
+            >
               <div
-                class="h-full bg-[#102a62b8] dark:bg-[#001627bd] backdrop-blur-sm"
+                class="h-[calc(100%+65px)] bg-[#102a62b8] dark:bg-[#001627bd] backdrop-blur-sm"
                 classList={{ "mt-[60px]": !isSmall() }}
               />
             </div>
           </div>
         ),
-        animation: !isSmall()
-          ? {
-              name: "fade-opacity"
-            }
-          : undefined
+        animation: {
+          enterClass: "opacity-0",
+          enterToClass: "opacity-100 transition duration-200",
+          exitClass: "opacity-100",
+          exitToClass: "opacity-0 transition duration-200",
+          appendToElement: "[data-overlay-backdrop]"
+        }
       }}
       animation={{
-        name: "fade-opacity",
+        enterClass: "opacity-0",
+        enterToClass: "opacity-100 transition-opacity duration-200",
+        exitClass: "opacity-100",
+        exitToClass: "opacity-0 transition-opacity duration-200",
+        appendToElement: "menuPopup",
         onBeforeEnter: () => {
           prevHeaderState = structuredClone(unwrap(headerState));
           setHeaderState("disableScroll", true);
@@ -156,18 +166,17 @@ const SearchModal: Component<{
           });
         }
       }}
-      // focusElementOnOpen={isIOS ? "none" : "firstChild"}
       focusElementOnOpen={{ target: isIOS ? "none" : "firstChild", preventScroll: true }}
       focusMenuButtonOnMouseDown={!isIOS}
       ref={containerEl}
     >
       <div
-        class="mb-[60px] flex justify-center pointer-events-none"
+        class="mb-[60px] flex justify-center pointer-events-none p-4"
         classList={{ "mt-[80px]": !isSmall() }}
         role="presentation"
       >
         <div
-          class="pointer-events-auto"
+          class="pointer-events-auto flex-grow"
           role="dialog"
           aria-modal="true"
           tabindex="-1"

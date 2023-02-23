@@ -86,17 +86,15 @@ const StageModal: Component<{
           ></div>
         ),
         animation: {
-          name: "fade-opacity"
-          // TODO:
-          // enterClass: "opacity-0",
-          // enterToClass: "opacity-100 transition-[200ms]",
-          // exitClass: "opacity-100",
-          // exitToClass: "opacity-0 transition-[200ms]"
+          enterClass: "opacity-0",
+          enterToClass: "opacity-100 transition duration-200",
+          exitClass: "opacity-100",
+          exitToClass: "opacity-0 transition duration-200"
         }
       }}
       animation={{
         name: "slide-modal",
-        onEnter() {
+        onEnter: () => {
           setHeaderState("disableScroll", true);
           changePageLayout();
         },

@@ -287,24 +287,3 @@ html.dark.primitives-page-main {
     transition: transform 300ms;
   }
 }
-
-.fade-opacity {
-  &-enter {
-    opacity: 0.1;
-  }
-  &-enter-to {
-    opacity: 1;
-  }
-  &-exit {
-    opacity: 1;
-  }
-  &-exit-to {
-    opacity: 0;
-  }
-
-  &-enter-to,
-  &-exit,
-  &-exit-to {
-    transition: opacity 200ms;
-  }
-}
