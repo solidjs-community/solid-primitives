@@ -1,4 +1,5 @@
 import { For } from "solid-js";
+import { A } from "solid-start";
 
 const NavMenu = () => {
   const list = [
@@ -15,13 +16,23 @@ const NavMenu = () => {
       <div class="p-4">
         <ul class="flex flex-col text-lg">
           <For each={list}>
-            {item => (
-              <li>
-                <a class="block py-2 font-semibold" href="#">
-                  {item}
-                </a>
-              </li>
-            )}
+            {item => {
+              const href = `#${item.replace(/\s/g, "-").toLowerCase()}`;
+
+              return (
+                <li>
+                  {/* <a
+                    class="block py-2 font-semibold"
+                    href={href}
+                  >
+                    {item}
+                  </a> */}
+                  <A class="block py-2 font-semibold" href={href}>
+                    {item}
+                  </A>
+                </li>
+              );
+            }}
           </For>
         </ul>
       </div>

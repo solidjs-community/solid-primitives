@@ -5,7 +5,9 @@ import Dismiss from "solid-dismiss";
 import { Accessor, batch, Component, createEffect, on, onMount } from "solid-js";
 import { unwrap } from "solid-js/store";
 import { useLocation } from "solid-start";
+import { BASE, BASE_NOFS } from "~/constants";
 import { createShortcut } from "~/hooks/createShortcut";
+import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 import { scrollIntoView } from "~/utils/scrollIntoView";
 import { headerState, setHeaderState } from "../Header/Header";
 import Search from "./Search";
@@ -45,7 +47,7 @@ const SearchModal: Component<{
     rootApp.style.left = "";
     rootApp.style.right = "";
 
-    if (location.pathname !== "/solid-primitives/" && !location.hash) {
+    if (!doesPathnameMatchBase(location.pathname) && !location.hash) {
       prevScrollY = 1;
     }
     window.scrollTo({ top: prevScrollY });
@@ -145,7 +147,7 @@ const SearchModal: Component<{
           scrollToLink();
           batch(() => {
             setHeaderState("disableScroll", false);
-            if (location.pathname === "/solid-primitives/") {
+            if (doesPathnameMatchBase(location.pathname)) {
               setHeaderState("showGradientBorder", prevHeaderState.showGradientBorder);
             }
             setHeaderState("showOpaqueBg", prevHeaderState.showOpaqueBg);

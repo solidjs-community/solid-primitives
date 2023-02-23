@@ -1,10 +1,8 @@
-import { createIntersectionObserver, withDirection } from "@solid-primitives/intersection-observer";
-import { createMediaQuery } from "@solid-primitives/media";
+import { createIntersectionObserver } from "@solid-primitives/intersection-observer";
 import { isIOS, isSafari } from "@solid-primitives/platform";
 import { createSignal, onMount, ParentComponent } from "solid-js";
 import reflow from "~/utils/reflow";
 import { setHeaderState } from "../Header/Header";
-import StageModal from "../Stage/StageModal";
 
 const Table: ParentComponent = props => {
   const [tableRowTargets, setTableRowTargets] = createSignal<Element[]>([]);
@@ -114,6 +112,18 @@ const Table: ParentComponent = props => {
     return result;
   };
 
+  const queryTableElements = (el: Element) => {
+    tableContainerParent = el.parentElement!;
+    tableEl = el as any;
+    tableHeader = el.querySelector("thead")!;
+    tableHeaderName = tableHeader.querySelector("th")!;
+    tableHeaders = [...tableHeader.querySelectorAll("th")!];
+    tableBody = tableEl.querySelector("tbody")!;
+    tableFirstTableRowCells = [...tableBody.querySelector("tr")!.querySelectorAll("td")!];
+    tableHeaderFirstLastSiblings = [tableHeaders[0], tableHeaders[tableHeaders.length - 1]];
+    tableHeaderRealTR = tableHeader.querySelector("#header-real-tr")!;
+  };
+
   const resetSizes = () => {
     // const tableContainerParentWidth = tableContainerParent.getBoundingClientRect().width;
     // const tableWidth = tableEl.getBoundingClientRect().width;
@@ -221,6 +231,7 @@ const Table: ParentComponent = props => {
   };
 
   onMount(() => {
+    queryTableElements(tableEl);
     tableContainerParent.addEventListener("scroll", onParentScrollX);
 
     const resizeObserver = new ResizeObserver(entries => {
@@ -267,8 +278,10 @@ const Table: ParentComponent = props => {
 
     setTableRowTargets(() => [...h4Els]);
     setTableTarget(() => [tableEl]);
-    resizeObserver.observe(tableContainerParent);
-    resizeObserver.observe(tableEl);
+    requestAnimationFrame(() => {
+      resizeObserver.observe(tableContainerParent);
+      resizeObserver.observe(tableEl);
+    });
   });
 
   createIntersectionObserver(
@@ -350,20 +363,7 @@ const Table: ParentComponent = props => {
           <table
             class="w-full relative mt-[-2px] overflow-clip"
             style="border-collapse: separate; border-spacing: 2px 2px;"
-            ref={el => {
-              tableContainerParent = el.parentElement!;
-              tableEl = el;
-              tableHeader = el.querySelector("thead")!;
-              tableHeaderName = tableHeader.querySelector("th")!;
-              tableHeaders = [...tableHeader.querySelectorAll("th")!];
-              tableBody = tableEl.querySelector("tbody")!;
-              tableFirstTableRowCells = [...tableBody.querySelector("tr")!.querySelectorAll("td")!];
-              tableHeaderFirstLastSiblings = [
-                tableHeaders[0],
-                tableHeaders[tableHeaders.length - 1]
-              ];
-              tableHeaderRealTR = tableHeader.querySelector("#header-real-tr")!;
-            }}
+            ref={tableEl}
           >
             {props.children}
           </table>

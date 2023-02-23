@@ -2,16 +2,26 @@ import solidPrimitivesLogo from "~/assets/img/solid-primitives-logo.svg";
 import solidPrimitivesDarkLogo from "~/assets/img/solid-primitives-dark-logo.svg";
 import solidPrimitivesStackedLogo from "~/assets/img/solid-primitives-stacked-logo.svg";
 import solidPrimitivesStackedDarkLogo from "~/assets/img/solid-primitives-stacked-dark-logo.svg";
-import { FiMenu, FiSearch } from "solid-icons/fi";
-import { createEffect, createSignal, on, onMount, Show } from "solid-js";
+import { FiMenu } from "solid-icons/fi";
+import {
+  createComputed,
+  createEffect,
+  createRenderEffect,
+  createSignal,
+  on,
+  onMount
+} from "solid-js";
 import SearchModal from "../Search/SearchModal";
 import ThemeBtn from "./ThemeBtn";
 import SearchBtn from "../Search/SearchBtn";
-import { useLocation } from "solid-start";
+import { A, useLocation } from "solid-start";
 import NavMenu from "./NavMenu";
 import { createStore } from "solid-js/store";
 import Dismiss from "solid-dismiss";
 import { createTween } from "@solid-primitives/tween";
+import { BASE } from "~/constants";
+import { isMobile, isSafari } from "@solid-primitives/platform";
+import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 
 export const [headerState, setHeaderState] = createStore({
   showOpaqueBg: false,
@@ -42,13 +52,16 @@ const Header = () => {
   let headerShadow!: HTMLDivElement;
   let navMenu!: HTMLDivElement;
 
+  const shouldShowShadow = () => window.scrollY > 150;
+  const shouldShowOpaqueBg = () => window.scrollY > 30;
+
   const checkScroll = () => {
-    const showOpaqueBg = window.scrollY > 30;
-    const showShadow = window.scrollY > 150;
+    const showOpaqueBg = shouldShowOpaqueBg();
+    const showShadow = shouldShowShadow();
 
     setHeaderState("showOpaqueBg", showOpaqueBg);
 
-    if (location.pathname === "/solid-primitives/") {
+    if (doesPathnameMatchBase(location.pathname)) {
       return;
     }
     setHeaderState("showShadow", showShadow);
@@ -58,6 +71,24 @@ const Header = () => {
     checkScroll();
 
     window.addEventListener("scroll", checkScroll, { passive: true });
+
+    // might remove this, hopefully this issue is temp, not that big deal of an issue, but the issue is that when safari scroll 'rubberbands' at top of page there's a big white background that covers header. It's caused by header element containing blur in backdrop-filter.
+    if (isSafari && !isMobile) {
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (openNavMenu() || openSearch()) {
+            return;
+          }
+          if (window.scrollY > 1) {
+            headerOpaqueBg.style.display = "";
+          } else {
+            headerOpaqueBg.style.display = "none";
+          }
+        },
+        { passive: true }
+      );
+    }
   });
 
   let navMenuHeight = 0;
@@ -87,6 +118,7 @@ const Header = () => {
             "!bg-white/50",
             "dark:!bg-[#293843]/70"
           );
+          headerOpaqueBg.style.display = "";
           headerOpaqueBg.style.height = `${navMenuHeight + headerHeight}px`;
           headerOpaqueBgContainer.style.height = `${navMenuHeight + headerHeight}px`;
           headerOpaqueBg.style.transform = `translateY(${-navMenuHeight}px)`;
@@ -129,6 +161,32 @@ const Header = () => {
     )
   );
 
+  createEffect(
+    on(
+      () => location.hash,
+      (currentHash, prevHash) => {
+        if (prevHash === currentHash) return;
+        setOpenNavMenu(false);
+      },
+      { defer: true }
+    )
+  );
+
+  createRenderEffect(
+    on(
+      () => location.pathname,
+      pathname => {
+        const showShadow = shouldShowShadow();
+        if (!showShadow) return;
+
+        if (doesPathnameMatchBase(pathname)) {
+          setHeaderState("showShadow", false);
+        }
+      },
+      { defer: true }
+    )
+  );
+
   return (
     <header class="fixed top-0 left-0 right-0 h-[60px]" style={{ "z-index": headerState.zIndex }}>
       <div class="relative h-full">
@@ -149,8 +207,7 @@ const Header = () => {
               }}
             />
           </div>
-          {/* <A href="/"> */}
-          <a href="/">
+          <A href="/">
             <img
               class="dark:hidden hidden sm:block h-[28px] sm:h-[40px]"
               src={solidPrimitivesLogo}
@@ -171,8 +228,7 @@ const Header = () => {
               src={solidPrimitivesStackedDarkLogo}
               alt=""
             />
-          </a>
-          {/* </A> */}
+          </A>
           <nav>
             <ul class="flex items-center gap-3">
               <li class="transition" classList={{ "opacity-0": !headerState.showSearchBtn }}>

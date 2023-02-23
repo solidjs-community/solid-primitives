@@ -13,6 +13,7 @@ module.exports = {
         "pointer-fine": {
           raw: "(pointer: fine)"
         },
+        "is-safari": { raw: "not all and (min-resolution: 0.001dpcm)" },
         xxs: { raw: "(min-width: 400px)" },
         xs: { raw: "(min-width: 520px)" }
       },

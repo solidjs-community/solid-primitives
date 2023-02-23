@@ -113,6 +113,11 @@ export default function Home() {
           /> */}
         </div>
       </div>
+      <div class="relative top-[-100px]">
+        <h2 id="primitives" class="sr-only">
+          Primitives
+        </h2>
+      </div>
       <PrimitivesTable />
       <div class="max-w-[864px] mx-auto leading-7 mt-[125px] p-4">
         <NoHydration>
