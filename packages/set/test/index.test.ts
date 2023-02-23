@@ -109,30 +109,37 @@ describe("ReactiveWeakSet", () => {
   });
 
   it("is reactive", () => {
-    const a = {};
-    const b = {};
-    const c = {};
-    const d = {};
-    const e = {};
+    createRoot(dispose => {
+      const a = {};
+      const b = {};
+      const c = {};
+      const d = {};
+      const e = {};
 
-    const set = new ReactiveWeakSet([a, a, b, c, d]);
+      const set = new ReactiveWeakSet([a, a, b, c, d]);
 
-    const captured: any[] = [];
-    createComputed(() => {
-      captured.push(set.has(e));
+      const captured: any[] = [];
+      createComputed(() => {
+        captured.push(set.has(e));
+      });
+      expect(captured, "1").toEqual([false]);
+
+      set.add(e);
+      expect(captured, "2").toEqual([false, true]);
+
+      set.delete(e);
+      expect(captured, "3").toEqual([false, true, false]);
+
+      set.delete(a);
+      expect(captured, "4").toEqual([false, true, false]);
+
+      set.add(a);
+      expect(captured, "5").toEqual([false, true, false]);
+
+      set.add(e);
+      expect(captured, "6").toEqual([false, true, false, true]);
+
+      dispose();
     });
-    expect(captured, "1").toEqual([false]);
-
-    set.add(e);
-    expect(captured, "2").toEqual([false, true]);
-
-    set.delete(e);
-    expect(captured, "3").toEqual([false, true, false]);
-
-    set.delete(a);
-    expect(captured, "4").toEqual([false, true, false]);
-
-    set.add(a);
-    expect(captured, "5").toEqual([false, true, false, true]);
   });
 });

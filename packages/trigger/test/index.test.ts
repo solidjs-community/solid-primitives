@@ -1,11 +1,11 @@
 import { createComputed, createRoot } from "solid-js";
 import { describe, test, expect } from "vitest";
-import { createWeakTriggerCache, createTriggerMap } from "../src";
+import { createTriggerCache } from "../src";
 
 describe("createTriggerCache", () => {
   test("weak trigger cache", () =>
     createRoot(dispose => {
-      const { dirty, track } = createWeakTriggerCache();
+      const [track, dirty] = createTriggerCache(WeakMap);
       let runs = -1;
       const key1 = {};
       const key2 = {};
@@ -24,7 +24,7 @@ describe("createTriggerCache", () => {
 
   test("weak trigger cache", () =>
     createRoot(dispose => {
-      const { dirty, track, dirtyAll } = createTriggerMap();
+      const [track, dirty] = createTriggerCache();
       let runs1 = -1;
       let runs2 = -1;
       const key1 = "key1";
@@ -45,9 +45,6 @@ describe("createTriggerCache", () => {
       dirty(key1);
       expect(runs1).toBe(1);
       expect(runs2).toBe(1);
-      dirtyAll();
-      expect(runs1).toBe(2);
-      expect(runs2).toBe(2);
 
       dispose();
     }));

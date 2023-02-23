@@ -1,5 +1,5 @@
 import { Accessor, batch } from "solid-js";
-import { TriggerMap } from "@solid-primitives/trigger";
+import { TriggerCache } from "@solid-primitives/trigger";
 
 const $KEYS = Symbol("track-keys");
 
@@ -21,8 +21,8 @@ const $KEYS = Symbol("track-keys");
  * userPoints.set(user1, { foo: "bar" });
  */
 export class ReactiveMap<K, V> extends Map<K, V> {
-  #keyTriggers = new TriggerMap<K | typeof $KEYS>();
-  #valueTriggers = new TriggerMap<K>();
+  #keyTriggers = new TriggerCache<K | typeof $KEYS>();
+  #valueTriggers = new TriggerCache<K>();
 
   constructor(initial?: [K, V][], private equals = (a: V, b: V) => a === b) {
     super();
@@ -35,7 +35,6 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     return super.has(key);
   }
   get(key: K): V | undefined {
-    this.#keyTriggers.track(key);
     this.#valueTriggers.track(key);
     return super.get(key);
   }
@@ -77,6 +76,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
       batch(() => {
         this.#keyTriggers.dirty(key);
         this.#keyTriggers.dirty($KEYS);
+        this.#valueTriggers.dirty(key);
       });
     }
     return r;
@@ -84,7 +84,10 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   clear(): void {
     if (super.size) {
       batch(() => {
-        for (const v of super.keys()) this.#keyTriggers.dirty(v);
+        for (const v of super.keys()) {
+          this.#keyTriggers.dirty(v);
+          this.#valueTriggers.dirty(v);
+        }
         super.clear();
         this.#keyTriggers.dirty($KEYS);
       });
@@ -119,8 +122,8 @@ export class ReactiveMap<K, V> extends Map<K, V> {
  * userPoints.set(user1, { foo: "bar" });
  */
 export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
-  #keyTriggers = new TriggerMap<K>(WeakMap);
-  #valueTriggers = new TriggerMap<K>(WeakMap);
+  #keyTriggers = new TriggerCache<K>(WeakMap);
+  #valueTriggers = new TriggerCache<K>(WeakMap);
 
   constructor(initial?: [K, V][]) {
     super();

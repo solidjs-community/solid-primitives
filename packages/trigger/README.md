@@ -12,7 +12,7 @@
 A set of primitives based on Solid signals, used to trigger computations.
 
 - [`createTrigger`](#createTrigger) - Set listeners in reactive computations and then trigger them when you want.
-- [`TriggerMap`](#TriggerMap) - A map of triggers.
+- [`createTriggerCache`](#createTriggerCache) - Creates a cache of triggers that can be used to mark dirty only specific keys.
 
 ## Installation
 
@@ -20,6 +20,8 @@ A set of primitives based on Solid signals, used to trigger computations.
 npm install @solid-primitives/trigger
 # or
 yarn add @solid-primitives/trigger
+# or
+pnpm add @solid-primitives/trigger
 ```
 
 ## `createTrigger`
@@ -42,18 +44,25 @@ createEffect(() => {
 dirty();
 ```
 
-## `TriggerMap`
+## `createTriggerCache`
 
-A map of triggers cached by a key.
+Creates a cache of triggers that can be used to mark dirty only specific keys.
+
+Cache is a `Map` or `WeakMap` depending on the `mapConstructor` argument. (default: `Map`)
+
+If `mapConstructor` is `WeakMap` then the cache will be weak and the keys will be garbage collected when they are no longer referenced.
+
+Trigger signals added to the cache only when tracked under a computation,
+and get deleted from the cache when they are no longer tracked.
 
 ### How to use it
 
 `track` and `dirty` are called with a `key` so that each tracker will trigger an update only when his individual `key` would get marked as dirty.
 
 ```ts
-import { TriggerMap } from "@solid-primitives/trigger";
+import { createTriggerCache } from "@solid-primitives/trigger";
 
-const map = new TriggerMap<number>();
+const map = createTriggerCache<number>();
 
 createEffect(() => {
   map.track(1);
@@ -68,10 +77,10 @@ map.dirty(2);
 
 ### Weak version
 
-`TriggerMap` constructor can take a `WeakMap` constructor as an argument. This will create a `WeakMap` of triggers instead of a `Map`.
+`createTriggerCache` constructor can take a `WeakMap` constructor as an argument. This will create a `WeakMap` of triggers instead of a `Map`.
 
 ```ts
-const map = new TriggerMap<object>(WeakMap);
+const map = createTriggerCache<object>(WeakMap);
 
 const obj = {};
 

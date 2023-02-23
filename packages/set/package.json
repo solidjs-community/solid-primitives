@@ -14,7 +14,7 @@
   },
   "primitive": {
     "name": "set",
-    "stage": 3,
+    "stage": 2,
     "list": [
       "ReactiveSet",
       "ReactiveWeakSet"

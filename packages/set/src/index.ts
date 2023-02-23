@@ -1,5 +1,5 @@
 import { Accessor, batch } from "solid-js";
-import { TriggerMap } from "@solid-primitives/trigger";
+import { TriggerCache } from "@solid-primitives/trigger";
 
 const $KEYS = Symbol("track-keys");
 
@@ -16,7 +16,7 @@ const $KEYS = Symbol("track-keys");
  * set.clear()
  */
 export class ReactiveSet<T> extends Set<T> {
-  #triggers = new TriggerMap<T | typeof $KEYS>();
+  #triggers = new TriggerCache<T | typeof $KEYS>();
 
   constructor(values?: readonly T[] | null) {
     super();
@@ -92,7 +92,7 @@ export class ReactiveSet<T> extends Set<T> {
  * set.delete(2)
  */
 export class ReactiveWeakSet<T extends object> extends WeakSet<T> {
-  #triggers = new TriggerMap<T>(WeakMap);
+  #triggers = new TriggerCache<T>(WeakMap);
 
   constructor(values?: readonly T[] | null) {
     super();
