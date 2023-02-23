@@ -1,11 +1,11 @@
 import { Component, JSX, ParentComponent } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
-import { createJSXParser, createToken, resolveTokens } from "../src";
+import { createJSXParser, createToken, isToken, resolveTokens } from "../src";
 
 type Props = {
   value: number;
-  children?: JSX.Element | JSX.Element[];
+  children?: JSX.Element;
 };
 
 const parser = createJSXParser<{
@@ -14,11 +14,13 @@ const parser = createJSXParser<{
 }>({ name: "calculator" });
 
 const Calculator: ParentComponent = props => {
-  const tokens = resolveTokens(parser, () => props.children);
+  const tokens = resolveTokens(parser, () => props.children, true);
 
   const calculation = () => {
     let result = 0;
-    tokens().forEach(({ data }) => {
+    tokens().forEach(el => {
+      if (!isToken(parser, el)) return;
+      const data = el.data;
       console.info("token is ", data);
       if (data.id === "Value") {
         result = data.props.value;

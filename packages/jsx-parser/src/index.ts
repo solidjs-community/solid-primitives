@@ -1,5 +1,5 @@
 import { Accessor, createMemo, JSX, untrack } from "solid-js";
-import { type Narrow } from "@solid-primitives/utils";
+import type { ResolvedJSXElement, Narrow } from "@solid-primitives/utils";
 
 export type TokenElement<T> = (() => JSX.Element) & { data: T };
 
@@ -50,17 +50,17 @@ export function createToken<P extends { [key: string]: any }, T extends Tokens, 
   parser: JSXParser<Tokens>,
   tokenData: (props: P) => Narrow<T>,
   render?: (props: P) => JSX.Element
-): (props: P) => TokenElement<T>;
+): (props: P) => JSX.Element;
 export function createToken<T>(
   parser: JSXParser<T>,
   tokenData?: undefined,
   render?: (props: T) => JSX.Element
-): (props: T) => TokenElement<T>;
+): (props: T) => JSX.Element;
 export function createToken<T>(
   parser: JSXParser<T>,
   tokenData?: (props: T) => T,
   render?: (props: T) => JSX.Element
-): (props: T) => TokenElement<T> {
+): (props: T) => JSX.Element {
   return (props: T) => {
     const token = (
       render
@@ -80,15 +80,28 @@ export function createToken<T>(
   };
 }
 
-function resolveChildren(resolved: unknown[], children: unknown, symbol: symbol): any[] {
+function resolveChildren(
+  resolved: unknown[],
+  children: unknown,
+  symbol: symbol,
+  addElements: boolean
+): any[] {
+  // function
   if (typeof children === "function" && !children.length) {
-    if (symbol in children) resolved.push(children);
-    else resolveChildren(resolved, children(), symbol);
-  } else if (Array.isArray(children))
-    for (let i = 0; i < children.length; i++) resolveChildren(resolved, children[i], symbol);
+    if (symbol in children)
+      addElements ? resolved.push(children) : resolved.push((children as any).data);
+    else resolveChildren(resolved, children(), symbol, addElements);
+  }
+  // array
+  else if (Array.isArray(children))
+    for (let i = 0; i < children.length; i++)
+      resolveChildren(resolved, children[i], symbol, addElements);
+  // other element
+  else if (addElements) resolved.push(children);
   else if (process.env.DEV && children)
     // eslint-disable-next-line no-console
     console.warn(`Invalid JSX Element passed to Parser "${symbol.description}":`, children);
+
   return resolved;
 }
 
@@ -96,25 +109,26 @@ function resolveChildren(resolved: unknown[], children: unknown, symbol: symbol)
  * Resolves all tokens in a JSX Element
  * @param parser object returned by `createJSXParser`
  * @param fn accessor that returns a JSX Element
- * @returns accessor that returns an array of tokens
+ * @param addElements if `true`, JSX Elements will be included in the result array (default: `false`)
+ * @returns accessor that returns an array of resolved tokens and JSX Elements
  */
 export function resolveTokens<T>(
   parser: JSXParser<T>,
-  fn: Accessor<JSX.Element>
-): Accessor<TokenElement<T>[]> {
+  fn: Accessor<JSX.Element>,
+  addElements: true
+): Accessor<(TokenElement<T> | ResolvedJSXElement)[]>;
+export function resolveTokens<T>(
+  parser: JSXParser<T>,
+  fn: Accessor<JSX.Element>,
+  addElements?: boolean
+): Accessor<T[]>;
+export function resolveTokens<T>(
+  parser: JSXParser<T>,
+  fn: Accessor<JSX.Element>,
+  addElements = false
+): Accessor<(TokenElement<T> | ResolvedJSXElement)[] | T[]> {
   const children = createMemo(fn);
-  return createMemo(() => resolveChildren([], children(), parser.id));
-}
-
-/**
- * Resolves all tokens in a JSX Element and returns the data of the tokens
- * @param parser object returned by `createJSXParser`
- * @param fn accessor that returns a JSX Element
- * @returns accessor that returns an array of token data
- */
-export function resolveData<T>(parser: JSXParser<T>, fn: Accessor<JSX.Element>): Accessor<T[]> {
-  const tokens = resolveTokens(parser, fn);
-  return () => tokens().map(token => token.data);
+  return createMemo(() => resolveChildren([], children(), parser.id, addElements));
 }
 
 /**
