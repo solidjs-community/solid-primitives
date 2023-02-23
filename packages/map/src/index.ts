@@ -49,10 +49,12 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   }
   values(): IterableIterator<V> {
     this.#keyTriggers.track($KEYS);
+    for (const v of super.keys()) this.#valueTriggers.track(v);
     return super.values();
   }
   entries(): IterableIterator<[K, V]> {
     this.#keyTriggers.track($KEYS);
+    for (const v of super.keys()) this.#valueTriggers.track(v);
     return super.entries();
   }
 

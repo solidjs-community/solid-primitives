@@ -1,4 +1,4 @@
-import { createSignal, getListener, SignalOptions } from "solid-js";
+import { createSignal, getListener, onCleanup, SignalOptions } from "solid-js";
 import { noop } from "@solid-primitives/utils";
 
 export type Trigger = [track: VoidFunction, dirty: VoidFunction];
@@ -47,27 +47,23 @@ export class TriggerCache<T> {
   }
 
   dirty(key: T) {
-    if (process.env.SSR) {
-      return;
-    }
-    const trigger = this.#map.get(key);
-    if (!trigger) return;
-    if (trigger.n) {
-      trigger.n = 0;
-      // if the signal is not tracked anymore after the rerun, we can delete it
-      queueMicrotask(() => trigger.n === 0 && this.#map.delete(key));
-    }
-    // triggering the signal rerun all observers (the count gets reset)
-    trigger.$$();
+    if (process.env.SSR) return;
+    this.#map.get(key)?.$$();
   }
 
   track(key: T) {
     if (!getListener()) return;
     let trigger = this.#map.get(key);
     if (!trigger) {
-      const [$, $$] = createSignal(void 0, triggerCacheOptions);
+      const [$, $$] = createSignal(undefined, triggerCacheOptions);
       this.#map.set(key, (trigger = { $, $$, n: 1 }));
     } else trigger.n++;
+    onCleanup(() => {
+      // remove the trigger when no one is listening to it
+      if (trigger!.n-- === 1)
+        // microtask is to avoid removing the trigger used by a single listener
+        queueMicrotask(() => trigger!.n === 0 && this.#map.delete(key));
+    });
     trigger.$();
   }
 }
