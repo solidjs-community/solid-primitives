@@ -119,7 +119,7 @@ const Search: Component<{
                 <FiSearch />
               </div>
               <input
-                class="outline-0 dark:bg-page-main-bg"
+                class="outline-none dark:bg-page-main-bg"
                 placeholder="Quick Search ..."
                 value={search()}
                 type="text"

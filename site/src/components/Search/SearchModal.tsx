@@ -26,7 +26,7 @@ const SearchModal: Component<{
 
   const changePageLayout = () => {
     const rootAppBCR = rootApp.getBoundingClientRect();
-    // const { scrollY } = window;
+    const { scrollY } = window;
 
     rootApp.style.position = "fixed";
     rootApp.style.top = `${rootAppBCR.top}px`;
@@ -34,7 +34,7 @@ const SearchModal: Component<{
     rootApp.style.right = "0";
 
     // weird scrollY sudden change to bottom of page, moved setting prevScrollY from window.scrollY inside computed
-    // prevScrollY = scrollY;
+    prevScrollY = scrollY;
 
     // scroll top to 1 instead of 0, to prevent iOS Safari navigation bar to fully expand if it was previously collapsed.
     window.scrollTo({ top: 1 });
@@ -79,11 +79,19 @@ const SearchModal: Component<{
     setOpen(true);
   });
 
-  createComputed(() => {
-    if (!open()) return;
-    const { scrollY } = window;
-    prevScrollY = scrollY;
-  });
+  createComputed(
+    on(
+      open,
+      open => {
+        const { scrollY } = window;
+        console.log(scrollY);
+        if (open) return;
+
+        prevScrollY = scrollY;
+      },
+      { defer: true }
+    )
+  );
 
   createEffect(
     on(
@@ -105,7 +113,7 @@ const SearchModal: Component<{
       removeScrollbar={false}
       overlayElement={{
         element: (
-          <div>
+          <div class="fixed top-0">
             <div
               class="fixed top-0 left-0 right-0 h-[60px] z-[1002]"
               classList={{ hidden: isSmall() }}
@@ -128,10 +136,12 @@ const SearchModal: Component<{
       animation={{
         name: "fade-opacity",
         onBeforeEnter: () => {
+          console.log(window.scrollY);
           prevHeaderState = structuredClone(unwrap(headerState));
           setHeaderState("disableScroll", true);
         },
         onEnter: () => {
+          changePageLayout();
           batch(() => {
             setHeaderState("showSearchBtn", false);
             setHeaderState("showGradientBorder", false);
@@ -141,7 +151,6 @@ const SearchModal: Component<{
               setHeaderState("zIndex", 1001);
             }
           });
-          changePageLayout();
         },
         onExit: () => {
           setHeaderState("showSearchBtn", true);
@@ -161,7 +170,8 @@ const SearchModal: Component<{
           });
         }
       }}
-      focusElementOnOpen={isIOS ? "none" : "firstChild"}
+      // focusElementOnOpen={isIOS ? "none" : "firstChild"}
+      focusElementOnOpen="none"
       focusMenuButtonOnMouseDown={!isIOS}
       ref={containerEl}
     >
