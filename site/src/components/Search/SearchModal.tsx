@@ -2,8 +2,8 @@
 import { createMediaQuery } from "@solid-primitives/media";
 import { isIOS } from "@solid-primitives/platform";
 import Dismiss from "solid-dismiss";
-import { Accessor, batch, Component, createComputed, createEffect, on, onMount } from "solid-js";
-import { produce, unwrap } from "solid-js/store";
+import { Accessor, batch, Component, createEffect, on, onMount } from "solid-js";
+import { unwrap } from "solid-js/store";
 import { useLocation } from "solid-start";
 import { createShortcut } from "~/hooks/createShortcut";
 import { scrollIntoView } from "~/utils/scrollIntoView";
@@ -33,7 +33,6 @@ const SearchModal: Component<{
     rootApp.style.left = "0";
     rootApp.style.right = "0";
 
-    // weird scrollY sudden change to bottom of page, moved setting prevScrollY from window.scrollY inside computed
     prevScrollY = scrollY;
 
     // scroll top to 1 instead of 0, to prevent iOS Safari navigation bar to fully expand if it was previously collapsed.
@@ -79,20 +78,6 @@ const SearchModal: Component<{
     setOpen(true);
   });
 
-  createComputed(
-    on(
-      open,
-      open => {
-        const { scrollY } = window;
-        console.log(scrollY);
-        if (open) return;
-
-        prevScrollY = scrollY;
-      },
-      { defer: true }
-    )
-  );
-
   createEffect(
     on(
       () => location.pathname,
@@ -136,7 +121,6 @@ const SearchModal: Component<{
       animation={{
         name: "fade-opacity",
         onBeforeEnter: () => {
-          console.log(window.scrollY);
           prevHeaderState = structuredClone(unwrap(headerState));
           setHeaderState("disableScroll", true);
         },
@@ -171,18 +155,22 @@ const SearchModal: Component<{
         }
       }}
       // focusElementOnOpen={isIOS ? "none" : "firstChild"}
-      focusElementOnOpen="none"
+      focusElementOnOpen={{ target: isIOS ? "none" : "firstChild", preventScroll: true }}
       focusMenuButtonOnMouseDown={!isIOS}
       ref={containerEl}
     >
       <div
-        // class="fixed top-[80px] left-0 right-0 flex justify-center pointer-events-none"
         class="mb-[60px] flex justify-center pointer-events-none"
         classList={{ "mt-[80px]": !isSmall() }}
         role="presentation"
-        ref={dialogEl}
       >
-        <div class="pointer-events-auto" role="dialog" aria-modal="true" tabindex="-1">
+        <div
+          class="pointer-events-auto"
+          role="dialog"
+          aria-modal="true"
+          tabindex="-1"
+          ref={dialogEl}
+        >
           <Search setOpen={setOpen} />
         </div>
       </div>

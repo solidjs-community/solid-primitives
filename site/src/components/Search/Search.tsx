@@ -2,7 +2,7 @@ import { createMediaQuery } from "@solid-primitives/media";
 import { A, useLocation } from "@solidjs/router";
 import Fuse from "fuse.js";
 import { FiSearch, FiX } from "solid-icons/fi";
-import { Component, createEffect, createSignal, For, on, onMount, Show } from "solid-js";
+import { Component, createEffect, createSignal, For, on, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 // @ts-ignore
 import primitivesJSON from "~/primitives.json";
@@ -109,7 +109,8 @@ const Search: Component<{
         >
           <div class="flex gap-2 p-2 bg-page-main-bg rounded-lg">
             <div
-              class="flex flex-grow w-max-[350px] font-sans px-2 py-2 items-center dark:bg-page-main-bg border-[#d0e4ff87] border-2 rounded-md text-[#306FC4] hover:text-[#063983] focus-within:text-[#063983] focus-within:outline-dashed cursor-text dark:text-[#c2d5ee] dark:hover:text-white"
+              id="search-input-container"
+              class="relative flex flex-grow w-max-[350px] font-sans px-2 py-2 items-center dark:bg-page-main-bg border-[#d0e4ff87] border-2 rounded-md text-[#306FC4] hover:text-[#063983] focus-within:text-[#063983] cursor-text dark:text-[#c2d5ee] dark:hover:text-white focus-within:after:block after:hidden after:content-[''] after:absolute after:inset-[-6px] after:pointer-events-none after:dashed-border-[color(#00006E)_dasharray(1,7)_width(4px)_radius(8)]"
               tabindex="-1"
               onFocus={() => {
                 input.focus();

@@ -190,6 +190,37 @@ module.exports = {
     plugin(function ({ matchUtilities, theme }) {
       matchUtilities(
         {
+          "dashed-border": value => {
+            const dashOffset = value.match(/dashoffset\(([^)]*)\)/)?.[1] || 0;
+            const dashArray = (value.match(/dasharray\(([^)]*)\)/)?.[1] || "1,8").replace(
+              /,/g,
+              "%2c"
+            );
+            const width = value.match(/width\(([^)]*)\)/)?.[1] || 0;
+            const radius = value.match(/radius\(([^)]*)\)/)?.[1] || "0";
+            const borderRadius = radius.match(/[^0-9]$/) ? radius : `${radius}px`;
+            const color =
+              value
+                .match(/color\(([^)]*)\)/)?.[1]
+                .replace(/_/g, " ")
+                .replace(/#/, "%23")
+                .replace(/\//g, "%2F")
+                .replace(/\s/g, "%20") || "%23000";
+            let lineCap = value.match(/linecap\(([^)]*)\)/)?.[1] || 0;
+            lineCap = ["butt", "round", "square"].includes(lineCap) ? lineCap : "square";
+
+            return {
+              backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='${radius}' ry='${radius}' stroke='${color}' stroke-width='${width}' stroke-dasharray='${dashArray}' stroke-dashoffset='${dashOffset}' stroke-linecap='${lineCap}'/%3e%3c/svg%3e")`,
+              borderRadius
+            };
+          }
+        },
+        { values: theme("dashedBorder") }
+      );
+    }),
+    plugin(function ({ matchUtilities, theme }) {
+      matchUtilities(
+        {
           background: value => ({
             background: value
           })
