@@ -363,7 +363,7 @@ importers:
 
   packages/map:
     specifiers:
-      '@solid-primitives/trigger': workspace:^0.0.4
+      '@solid-primitives/trigger': workspace:^1.0.0
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/trigger': link:../trigger
@@ -582,7 +582,7 @@ importers:
 
   packages/set:
     specifiers:
-      '@solid-primitives/trigger': workspace:^0.0.4
+      '@solid-primitives/trigger': workspace:^1.0.0
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/trigger': link:../trigger
