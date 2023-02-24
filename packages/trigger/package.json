@@ -15,11 +15,10 @@
   },
   "primitive": {
     "name": "trigger",
-    "stage": 0,
+    "stage": 1,
     "list": [
       "createTrigger",
-      "createTriggerCache",
-      "createWeakTriggerCache"
+      "createTriggerCache"
     ],
     "category": "Reactivity"
   },
@@ -102,7 +101,7 @@
     "solid-js": "^1.6.0"
   },
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^5.0.0"
+    "@solid-primitives/utils": "workspace:^5.2.0"
   },
   "typesVersions": {}
 }
