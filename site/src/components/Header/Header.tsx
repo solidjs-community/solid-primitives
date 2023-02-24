@@ -2,15 +2,7 @@ import solidPrimitivesLogo from "~/assets/img/solid-primitives-logo.svg";
 import solidPrimitivesDarkLogo from "~/assets/img/solid-primitives-dark-logo.svg";
 import solidPrimitivesStackedLogo from "~/assets/img/solid-primitives-stacked-logo.svg";
 import solidPrimitivesStackedDarkLogo from "~/assets/img/solid-primitives-stacked-dark-logo.svg";
-import { FiMenu } from "solid-icons/fi";
-import {
-  createComputed,
-  createEffect,
-  createRenderEffect,
-  createSignal,
-  on,
-  onMount
-} from "solid-js";
+import { createEffect, createRenderEffect, createSignal, on, onMount } from "solid-js";
 import SearchModal from "../Search/SearchModal";
 import ThemeBtn from "./ThemeBtn";
 import SearchBtn from "../Search/SearchBtn";
@@ -19,7 +11,6 @@ import NavMenu from "./NavMenu";
 import { createStore } from "solid-js/store";
 import Dismiss from "solid-dismiss";
 import { createTween } from "@solid-primitives/tween";
-import { BASE } from "~/constants";
 import { isMobile, isSafari } from "@solid-primitives/platform";
 import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 import Hamburger from "../Icons/Hamburger";
@@ -28,6 +19,7 @@ export const [headerState, setHeaderState] = createStore({
   showOpaqueBg: false,
   showShadow: false,
   showGradientBorder: false,
+  showGradientOverflow: false,
   disableScroll: false,
   showSearchBtn: true,
   zIndex: 10
@@ -55,10 +47,12 @@ const Header = () => {
 
   const shouldShowShadow = () => window.scrollY > 150;
   const shouldShowOpaqueBg = () => window.scrollY > 30;
+  const shouldShowGradientOverflow = () => window.scrollY > 250;
 
   const checkScroll = () => {
     const showOpaqueBg = shouldShowOpaqueBg();
     const showShadow = shouldShowShadow();
+    const showGradientOverflow = shouldShowGradientOverflow();
 
     setHeaderState("showOpaqueBg", showOpaqueBg);
 
@@ -66,6 +60,7 @@ const Header = () => {
       return;
     }
     setHeaderState("showShadow", showShadow);
+    setHeaderState("showGradientOverflow", showGradientOverflow);
   };
 
   onMount(() => {
@@ -245,6 +240,18 @@ const Header = () => {
           </nav>
         </div>
         <SearchModal menuButton={menuButtonSearch} open={openSearch} setOpen={setOpenSearch} />
+      </div>
+      <div
+        class="hidden md:flex absolute inset-0 pointer-events-none -z-1 transition"
+        classList={{
+          "opacity-0": !headerState.showGradientOverflow,
+          "opacity-100": headerState.showGradientOverflow,
+          "!transition-none": isSafari
+        }}
+      >
+        <div class="flex-grow h-[220px] bg-[linear-gradient(to_bottom,var(--page-main-bg)_60px,transparent)] -order-1" />
+        <div class="flex-grow flex-shrink-0 max-w-[900px] w-full" />
+        <div class="flex-grow h-[220px] bg-[linear-gradient(to_bottom,var(--page-main-bg)_60px,transparent)]" />
       </div>
       {/* fixes weird shimmering top dark shadow blur during openNavMenu animation in Chrome  */}
       {/* Still shows up in Safari, no fix  */}

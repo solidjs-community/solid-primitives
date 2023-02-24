@@ -18,6 +18,7 @@ const SearchModal: Component<{
   setOpen: (value: boolean) => void;
 }> = ({ menuButton, open, setOpen }) => {
   const isSmall = createMediaQuery("(max-width: 767px)");
+  let prevPathname = "";
   let prevHeaderState: typeof headerState;
   let rootApp!: HTMLElement;
   let containerEl!: HTMLElement;
@@ -47,7 +48,12 @@ const SearchModal: Component<{
     rootApp.style.left = "";
     rootApp.style.right = "";
 
-    if (!doesPathnameMatchBase(location.pathname) && !location.hash) {
+    if (
+      !doesPathnameMatchBase(location.pathname) &&
+      !location.hash &&
+      prevPathname !== location.pathname
+    ) {
+      prevPathname = location.pathname;
       prevScrollY = 1;
     }
     window.scrollTo({ top: prevScrollY });
@@ -67,6 +73,7 @@ const SearchModal: Component<{
   };
 
   onMount(() => {
+    prevPathname = location.pathname;
     rootApp = document.getElementById("root-subcontainer")!;
   });
 

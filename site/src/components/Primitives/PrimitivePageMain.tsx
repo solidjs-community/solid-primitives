@@ -51,7 +51,8 @@ const PrimitivePageMain: ParentComponent<{
               Matching Stuff Anywhere Visitor .java
             </Heading> */}
 
-            <Heading>{props.name.replace("-", " ")}</Heading>
+            {/* <Heading>{props.name.replace("-", " ")}</Heading> */}
+            <Heading>I Love java Types</Heading>
             <div class="relative">
               <svg
                 class="absolute"

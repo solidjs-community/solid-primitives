@@ -177,9 +177,9 @@ const Heading: ParentComponent = props => {
             {props.children}
           </div>
           <div
-            class="absolute top-[24px] left-0 pointer-events-none text-[#4b6a87] dark:text-[#8a9fb5] -scale-y-100 blur-[2px] mask-image-[linear-gradient(to_bottom,transparent,#000)] opacity-40 z-1"
+            class="absolute top-[32px] left-0 pointer-events-none text-[#4b6a87] dark:text-[#8a9fb5] -scale-y-100 blur-[2px] mask-image-[linear-gradient(to_bottom,transparent,#000)] opacity-[0.35] dark:opacity-30 z-1"
             aria-hidden="true"
-            style="-webkit-mask-size: 100% 28px; -webkit-mask-repeat: no-repeat; -webkit-mask-position: bottom; mask-size: 100% 28px; mask-repeat: no-repeat; mask-position: bottom;"
+            style="-webkit-mask-size: 100% 22px; -webkit-mask-repeat: no-repeat; -webkit-mask-position: bottom; mask-size: 100% 22px; mask-repeat: no-repeat; mask-position: bottom;"
           >
             {props.children}
           </div>
