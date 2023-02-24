@@ -175,14 +175,16 @@ const SearchModal: Component<{
         classList={{ "mt-[80px]": !isSmall() }}
         role="presentation"
       >
-        <div
-          class="pointer-events-auto flex-grow"
-          role="dialog"
-          aria-modal="true"
-          tabindex="-1"
-          ref={dialogEl}
-        >
-          <Search setOpen={setOpen} />
+        <div class="flex-grow">
+          <div
+            class="flex justify-center !pointer-events-none [&>div]:pointer-events-auto"
+            role="dialog"
+            aria-modal="true"
+            tabindex="-1"
+            ref={dialogEl}
+          >
+            <Search setOpen={setOpen} />
+          </div>
         </div>
       </div>
     </Dismiss>

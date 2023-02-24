@@ -81,7 +81,7 @@ const ThemeBtn = () => {
 
   return (
     <button
-      class="w-[45px] h-[45px] flex justify-center items-center text-[#306FC4] bg-#fff hover:text-[#063983] hover:bg-[#d0e4ff87] rounded-lg dark:bg-[#2f404d] dark:text-[#c2d5ee] dark:hover:text-white dark:hover:bg-[#3c5364] transition-colors"
+      class="w-[45px] h-[45px] flex justify-center items-center text-[#306FC4] bg-page-main-bg hover:text-[#063983] hover:bg-[#f4f9ff] rounded-lg dark:text-[#c2d5ee] dark:hover:text-white dark:hover:bg-[#3c5364] transition-colors"
       onClick={onClickTheme}
     >
       <Switch>

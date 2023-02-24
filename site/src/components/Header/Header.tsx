@@ -22,6 +22,7 @@ import { createTween } from "@solid-primitives/tween";
 import { BASE } from "~/constants";
 import { isMobile, isSafari } from "@solid-primitives/platform";
 import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
+import Hamburger from "../Icons/Hamburger";
 
 export const [headerState, setHeaderState] = createStore({
   showOpaqueBg: false,
@@ -238,12 +239,7 @@ const Header = () => {
                 <ThemeBtn />
               </li>
               <li>
-                <button
-                  class="w-[45px] h-[45px] flex justify-center items-center text-[#306FC4] hover:text-[#063983] mr-[-10px] dark:text-[#c2d5ee] dark:hover:text-white"
-                  ref={menuButtonNavMenu}
-                >
-                  <FiMenu size={24} />
-                </button>
+                <Hamburger active={openNavMenu()} ref={menuButtonNavMenu} />
               </li>
             </ul>
           </nav>

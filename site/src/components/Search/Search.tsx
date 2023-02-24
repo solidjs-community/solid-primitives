@@ -1,11 +1,23 @@
 import { createMediaQuery } from "@solid-primitives/media";
 import { A, useLocation } from "@solidjs/router";
 import Fuse from "fuse.js";
+import Mark from "mark.js";
 import { FiSearch, FiX } from "solid-icons/fi";
-import { Component, createEffect, createSignal, For, on, Show } from "solid-js";
+import {
+  $TRACK,
+  Component,
+  createEffect,
+  createSignal,
+  For,
+  on,
+  onMount,
+  ParentComponent,
+  Show
+} from "solid-js";
 import { createStore, produce } from "solid-js/store";
 // @ts-ignore
 import primitivesJSON from "~/primitives.json";
+import CheckBox from "./CheckBox/CheckBox";
 
 type TPrimitive = {
   name: string;
@@ -26,6 +38,15 @@ const Search: Component<{
   const isSmall = createMediaQuery("(max-width: 767px)");
   const [search, setSearch] = createSignal("");
   const [searchResult, setSearchResult] = createStore<TPrimitive[]>([]);
+  const [config, setConfig] = createStore({
+    highlight: {
+      title: { checked: false },
+      description: { checked: true },
+      primitive: { checked: false }
+    }
+  });
+  let markInstance: Mark;
+  let listContainer!: HTMLUListElement;
   let input!: HTMLInputElement;
 
   const fuseOptions = {
@@ -58,7 +79,41 @@ const Search: Component<{
 
   const onInput = (value: string) => {
     setSearch(value);
+    if (value.length <= 1) return;
+    requestAnimationFrame(() => {
+      highlightTextFromSearch(value);
+    });
   };
+
+  const highlightTextFromSearch = (value: string) => {
+    const exclude = Object.entries(config.highlight)
+      .filter(([_, item]) => !item.checked)
+      .flatMap(([key]) => [`[data-ignore-mark-${key}]`, `[data-ignore-mark-${key}] *`]);
+    console.log(exclude);
+    markInstance.mark(value, {
+      exclude,
+      separateWordSearch: false
+    });
+  };
+
+  onMount(() => {
+    markInstance = new Mark(listContainer);
+  });
+
+  createEffect(
+    on(
+      () => [
+        config.highlight.description.checked,
+        config.highlight.title.checked,
+        config.highlight.primitive.checked
+      ],
+      () => {
+        markInstance.unmark();
+        highlightTextFromSearch(search());
+      },
+      { defer: true }
+    )
+  );
 
   createEffect(
     on(
@@ -67,7 +122,7 @@ const Search: Component<{
         const result = fuse.search(search);
 
         setSearchResult(
-          result.slice(0, 8).map((_item, _, arr) => {
+          result.slice(0, 12).map((_item, _, arr) => {
             // console.log(arr);
             const item = { ...(_item.item as any) } as TPrimitive;
             const fusePrimitives = new Fuse(item.primitives, fusePrimitivesOptions);
@@ -110,7 +165,7 @@ const Search: Component<{
           <div class="flex gap-2 p-2 bg-page-main-bg rounded-lg">
             <div
               id="search-input-container"
-              class="relative flex flex-grow w-max-[350px] font-sans px-2 py-2 items-center dark:bg-page-main-bg border-[#d0e4ff87] border-2 rounded-md text-[#306FC4] hover:text-[#063983] focus-within:text-[#063983] cursor-text dark:text-[#c2d5ee] dark:hover:text-white focus-within:after:block after:hidden after:content-[''] after:absolute after:inset-[-6px] after:pointer-events-none after:dashed-border-[color(#00006E)_dasharray(1,7)_width(4px)_radius(8px)]"
+              class="relative flex flex-grow w-max-[350px] font-sans px-2 py-2 items-center dark:bg-page-main-bg border-[#bdd3f2] border-2 rounded-md text-[#306FC4] hover:text-[#063983] hover:border-[#7ea2cf] focus-within:text-[#063983] cursor-text dark:text-[#c2d5ee] dark:border-[#59728d] dark:hover:border-[#d0e4ff87] dark:hover:text-white focus-within:after:block after:hidden after:content-[''] after:absolute after:inset-[-6px] after:pointer-events-none after:dashed-border-[color(#00006E)_dasharray(1,7)_width(4px)_radius(8px)] dark:after:dashed-border-[color(#7ea2cf)_dasharray(1,7)_width(4px)_radius(8px)]"
               tabindex="-1"
               onFocus={() => {
                 input.focus();
@@ -120,7 +175,7 @@ const Search: Component<{
                 <FiSearch />
               </div>
               <input
-                class="outline-none dark:bg-page-main-bg"
+                class="flex-grow outline-none dark:bg-page-main-bg"
                 placeholder="Quick Search ..."
                 value={search()}
                 type="text"
@@ -140,6 +195,28 @@ const Search: Component<{
               <FiX size={25} />
             </button>
           </div>
+
+          <div class="flex gap-3 p-2 bg-page-main-bg items-center rounded-b-lg">
+            <div class="font-semibold text-[13px] xs:text-base">Highlight</div>
+            <div class="flex gap-[4px] md:gap-4 text-[12px] xxs:text-[14px] xs:text-[15px]">
+              <For each={Object.entries(config.highlight)}>
+                {([item, value]) => (
+                  <CheckBox
+                    checked={value.checked}
+                    onChange={checked => {
+                      // setConfig("highlight", item as "title", checked)
+                      setConfig(
+                        produce(state => (state.highlight[item as "title"].checked = checked))
+                      );
+                    }}
+                  >
+                    <span class="capitalize opacity-80">{item}</span>
+                  </CheckBox>
+                )}
+              </For>
+            </div>
+          </div>
+
           <div
             class="relative border-b border-slate-300 px-2 bg-page-main-bg dark:border-slate-600"
             classList={{ hidden: !searchResult.length }}
@@ -149,16 +226,21 @@ const Search: Component<{
         </div>
         <div class="p-2 sm:p-4" classList={{ hidden: !searchResult.length }}>
           <div class=""></div>
-          <ul>
+          <ul ref={listContainer}>
             <For each={searchResult}>
               {({ name, category, description, primitives, primitivesCount }) => {
                 return (
                   <li class="py-2">
-                    <h4 class="font-semibold text-[#49494B] dark:text-[#bec5cf]">
+                    <h4
+                      class="font-semibold text-[#49494B] dark:text-[#bec5cf]"
+                      data-ignore-mark-title
+                    >
                       <A href={`/${name.toLowerCase()}`}>{name}</A>
                     </h4>
-                    <p class="text-[14px] my-[6px]">{description}</p>
-                    <ul class="flex gap-2 flex-wrap">
+                    <p class="text-[14px] my-[6px]" data-ignore-mark-description>
+                      {description}
+                    </p>
+                    <ul class="flex gap-2 flex-wrap" data-ignore-mark-primitive>
                       <For each={primitives}>
                         {item => {
                           return (
