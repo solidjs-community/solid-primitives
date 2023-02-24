@@ -1,5 +1,11 @@
 # @solid-primitives/trigger
 
+## 1.0.0
+
+### Major Changes
+
+- d6167247: Improve `createTriggerCache` and reactive sets/maps by autocleaning signals that aren't being listened to.
+
 ## 0.0.4
 
 ### Patch Changes
