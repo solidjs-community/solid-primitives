@@ -49,6 +49,8 @@ export const buildAndWriteHomeSections = async () => {
     sections += `${match[0]}\n`;
   });
 
+  sections = "## Contribution Process\n\n <StageContent/>\n\n" + sections;
+
   const output = await compile(sections, {
     jsx: true,
     jsxImportSource: "solid-js",
@@ -73,12 +75,16 @@ export const buildAndWriteHomeSections = async () => {
     ]
     // outputFormat: "function-body"
   });
+  output;
   let outputString = output.toString();
-  outputString = outputString.replace("export default MDXContent;", "");
+  outputString = outputString
+    .replace("export default MDXContent;", "")
+    .replace(/,\s+\{[^\}]+\}\s+=\s+_components;?/, ";");
 
   const result = `
 // Do not modify
 // Generated from "./scripts/update-site/build-html-home-sections"
+import { StageContent } from "~/components/Stage/Stage"
 
 ${outputString}
 

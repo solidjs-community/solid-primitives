@@ -61,8 +61,8 @@ const StageBadge: ParentComponent<{
   let menuButton!: HTMLButtonElement;
   if (type === "static") {
     return (
-      <div class="flex justify-center">
-        <div
+      <span class="flex justify-center">
+        <span
           data-stage
           class={"flex justify-center items-center font-sans  rounded-md " + classStageColor(level)}
           classList={{
@@ -71,8 +71,8 @@ const StageBadge: ParentComponent<{
           }}
         >
           <span>{level}</span>
-        </div>
-      </div>
+        </span>
+      </span>
     );
   }
   return (
