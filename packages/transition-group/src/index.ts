@@ -1,6 +1,8 @@
 import { FalsyValue, noop } from "@solid-primitives/utils";
 import { Accessor, batch, createComputed, createSignal, untrack } from "solid-js";
 
+export type TransitionMode = "out-in" | "in-out" | "parallel";
+
 const logEl = (el: any) => (el ? el.textContent : null);
 
 const noopTransition = (el: any, done: () => void) => done();
@@ -10,7 +12,7 @@ export function createSwitchTransition<T extends object>(
   props: {
     onEnter?: (el: T, done: () => void) => void;
     onExit?: (el: T, done: () => void) => void;
-    mode?: "out-in" | "in-out" | "parallel";
+    mode?: TransitionMode;
     appear?: boolean;
   },
 ): Accessor<T[]> {
