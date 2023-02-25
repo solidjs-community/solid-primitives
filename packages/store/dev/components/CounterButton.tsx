@@ -28,13 +28,13 @@ export const CounterButton: CounterButtonType = props => {
 export default CounterButton;
 
 export const IncreaseButton: ParentComponent<CounterButtonProps> = props =>
-  CounterButton({
-    ...props,
-    onClick: (state, actions) => {
+  <CounterButton
+    {...props}
+    onClick={(state, actions) => {
       actions.resetCount(state.value + 1);
-    },
-    text: "+"
-  });
+    }}
+    text="+"
+  />
 
 export const DecreaseButton: ParentComponent<CounterButtonProps> = props =>
   CounterButton({
