@@ -163,6 +163,32 @@ export function createWritableMemo<T>(
   return [signal, setSignal];
 }
 
+/*
+
+alternative implementation to try:
+
+export function createWritableMemo<T>(fn: () => T, initialValue: T) {
+  let latest: Accessor<T>;
+  const [value, setValue] = createSignal<T>(initialValue);
+  const memo = createMemo(fn, initialValue);
+  latest = memo;
+  const combined = createMemo(() => {
+    const s = value();
+    const m = memo();
+    if (value === latest) return s;
+    else return m;
+  });
+  return [
+    combined,
+    (v: T) => {
+      latest = value;
+      return setValue(() => v);
+    }
+  ] as const;
+}
+
+*/
+
 /**
  * Solid's `createMemo` which returned signal is debounced. *(The {@link fn} callback is not debounced!)*
  *
