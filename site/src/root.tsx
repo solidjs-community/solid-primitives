@@ -43,13 +43,13 @@ export default function Root() {
         />
         <Meta name="og:image:width" content="1200" />
         <Meta name="og:image:height" content="600" />
-        <Meta name="og:image" content={`${url}/og.png`} />
-        <Meta name="og:image:url" content={`${url}/og.png`} />
-        <Meta name="og:image:secure_url" content={`${url}/og.png`} />
+        <Meta name="og:image" content={`${url}/og.jpeg`} />
+        <Meta name="og:image:url" content={`${url}/og.jpeg`} />
+        <Meta name="og:image:secure_url" content={`${url}/og.jpeg`} />
         <Meta name="og:image:alt" content="" />
         <Meta name="twitter:title" content="Solid Primitives" />
         <Meta name="twitter:card" content="summary_large_image" />
-        <Meta name="twitter:image" content={`${url}/og.png`} />
+        <Meta name="twitter:image" content={`${url}/og.jpeg`} />
         <Meta name="twitter:image:alt" content="" />
         <Meta
           name="twitter:description"
