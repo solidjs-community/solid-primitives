@@ -5,13 +5,13 @@ import {
   createResource,
   InitializedResource,
   on,
-  onCleanup
+  onCleanup,
 } from "solid-js";
 
 export type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
 export type NewClipboardItem = (
   type: string,
-  data: string | Blob | PromiseLike<string | Blob>
+  data: string | Blob | PromiseLike<string | Blob>,
 ) => ClipboardItem;
 export type HighlightModifier = (el: any) => void;
 export type Highlighter = (start?: number, end?: number) => HighlightModifier;
@@ -67,7 +67,7 @@ export function readClipboard(): Promise<ClipboardItem[]> {
 export const makeClipboard = (): [
   writeClipboard: ClipboardSetter,
   readClipboard: () => Promise<ClipboardItems | undefined>,
-  newClipboardItem: NewClipboardItem
+  newClipboardItem: NewClipboardItem,
 ] => {
   return [writeClipboard, readClipboard, newClipboardItem];
 };
@@ -85,17 +85,17 @@ export const makeClipboard = (): [
  */
 export const createClipboard = (
   data?: Accessor<string | ClipboardItem[]>,
-  deferInitial?: boolean
+  deferInitial?: boolean,
 ): [
   clipboardItems: InitializedResource<ClipboardResourceItem[]>,
   refetch: VoidFunction,
-  write: ClipboardSetter
+  write: ClipboardSetter,
 ] => {
   if (process.env.SSR) {
     return [
       Object.assign(() => [], { loading: false, error: undefined }) as any,
       () => void 0,
-      async () => void 0
+      async () => void 0,
     ];
   }
 
@@ -117,13 +117,13 @@ export const createClipboard = (
             const blob = await item.getType(type);
             const text = blob.type === "text/plain" ? await blob.text() : undefined;
             return { type, blob, text };
-          })
+          }),
         );
       } catch {
         return [];
       }
     },
-    { initialValue: [] }
+    { initialValue: [] },
   );
 
   navigator.clipboard.addEventListener("clipboardchange", refetch);
@@ -152,7 +152,7 @@ export const createClipboard = (
  */
 export const copyToClipboard = (
   el: HTMLElement,
-  options: MaybeAccessor<CopyToClipboardOptions>
+  options: MaybeAccessor<CopyToClipboardOptions>,
 ) => {
   if (process.env.SSR) {
     return undefined;

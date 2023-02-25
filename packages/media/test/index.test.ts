@@ -6,7 +6,7 @@ describe("createBreakpoints", () => {
   const breakpoints = {
     sm: "640px",
     lg: "1024px",
-    xl: "1280px"
+    xl: "1280px",
   };
 
   const matchMediaMock = vi.fn();
@@ -26,7 +26,7 @@ describe("createBreakpoints", () => {
         matches: checkMatch(query),
         query,
         addEventListener: addListenerMock,
-        removeEventListener: removeListenerMock
+        removeEventListener: removeListenerMock,
       };
     });
   });
@@ -49,7 +49,7 @@ describe("createBreakpoints", () => {
       expect(matches).toEqual({
         sm: false,
         lg: false,
-        xl: false
+        xl: false,
       });
       dispose();
     });
@@ -62,7 +62,7 @@ describe("createBreakpoints", () => {
       expect(matches).toEqual({
         sm: true,
         lg: false,
-        xl: false
+        xl: false,
       });
       dispose();
     });
@@ -75,7 +75,7 @@ describe("createBreakpoints", () => {
       expect(matches).toEqual({
         sm: true,
         lg: true,
-        xl: false
+        xl: false,
       });
       dispose();
     });
@@ -88,20 +88,20 @@ describe("createBreakpoints", () => {
       expect(matchesWithNoFallback).toEqual({
         sm: false,
         lg: false,
-        xl: false
+        xl: false,
       });
 
       const matchesWithFallback = createBreakpoints(breakpoints, {
         fallbackState: {
           sm: true,
           lg: true,
-          xl: true
-        }
+          xl: true,
+        },
       });
       expect(matchesWithFallback).toEqual({
         sm: true,
         lg: true,
-        xl: true
+        xl: true,
       });
       dispose();
     });
@@ -127,7 +127,7 @@ describe("createBreakpoints", () => {
       matchMediaMock.mockClear();
 
       createBreakpoints(breakpoints, {
-        mediaFeature: "max-width"
+        mediaFeature: "max-width",
       });
       expect(matchMediaMock.mock.calls).toMatchInlineSnapshot(`
         [
@@ -206,7 +206,7 @@ describe("createBreakpoints", () => {
   test("do not setup listeners if watchChange is false", () => {
     createRoot(dispose => {
       createBreakpoints(breakpoints, {
-        watchChange: false
+        watchChange: false,
       });
 
       onMount(() => {

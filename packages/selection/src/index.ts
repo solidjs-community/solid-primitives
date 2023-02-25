@@ -33,14 +33,14 @@ const getRangeArgs = (offset: number, texts: Node[]): [node: Node | null, offset
         : pos <= (text as Text).data.length
         ? [text, pos]
         : [null, pos - (text as Text).data.length],
-    [null, offset] as [node: Node | null, pos: number]
+    [null, offset] as [node: Node | null, pos: number],
   );
 
 export const createSelection = (): [Accessor<HTMLSelection>, Setter<HTMLSelection>] => {
   if (process.env.SSR) {
     return [
       () => [null, NaN, NaN],
-      sel => (typeof sel === "function" ? sel([null, NaN, NaN]) : sel)
+      sel => (typeof sel === "function" ? sel([null, NaN, NaN]) : sel),
     ];
   }
   const [getSelection, setSelection] = createSignal<HTMLSelection>([null, NaN, NaN]);

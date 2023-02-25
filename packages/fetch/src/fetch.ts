@@ -6,7 +6,7 @@ import {
   ResourceActions,
   ResourceFetcherInfo,
   ResourceOptions,
-  ResourceReturn
+  ResourceReturn,
 } from "solid-js";
 import { RequestModifier } from "./modifiers";
 import { fetchRequest, Request } from "./request";
@@ -15,7 +15,7 @@ export type FetchArgs = [info: RequestInfo] | [info: RequestInfo, init?: Request
 
 export type DistributeFetcherArgs<FetcherArgs extends any[], ExtraArgs extends any[]> = [
   FetcherArgs,
-  ExtraArgs
+  ExtraArgs,
 ] extends [any, any]
   ?
       | [...FetcherArgs, ...ExtraArgs]
@@ -45,7 +45,7 @@ export type FetchReturn<Result, InitialValue> = [
     abort?: () => void;
     /** if you are using withCache(), this callback will invalidate the current resource or the one specified by the fetcher args */
     invalidate?: (...fetchargs: any[]) => void;
-  }
+  },
 ];
 
 export type RequestContext<Result, FetcherArgs> = {
@@ -60,12 +60,12 @@ export type RequestContext<Result, FetcherArgs> = {
 };
 
 const isOptions = <Result, InitialValue, FetcherArgs>(
-  prop: any
+  prop: any,
 ): prop is FetchOptions<Result, InitialValue, FetcherArgs> =>
   typeof prop === "object" && ["name", "initialValue", "fetch", "request"].some(key => key in prop);
 
 const fetcherArgsFromArgs = <FetcherArgs extends any[]>(
-  args: [...fetcherArgs: FetcherArgs | [], ...rest: any[]]
+  args: [...fetcherArgs: FetcherArgs | [], ...rest: any[]],
 ): FetcherArgs | undefined => {
   const info: FetcherArgs[0] | undefined =
     typeof args[0] === "function" ? (args[0] as Accessor<FetcherArgs | FetcherArgs[0]>)() : args[0];
@@ -156,14 +156,14 @@ export function createFetch<Result, InitialValue extends Result | undefined = un
     FetchArgs,
     [
       options: FetchOptions<Result, InitialValue, FetchArgs>,
-      modifiers: ReturnType<RequestModifier>[]
+      modifiers: ReturnType<RequestModifier>[],
     ]
   >
 ): FetchReturn<Result, InitialValue>;
 export function createFetch<
   Result,
   InitialValue extends Result | undefined = undefined,
-  FetcherArgs extends any[] = FetchArgs
+  FetcherArgs extends any[] = FetchArgs,
 >(
   ...args: DistributeFetcherArgs<
     FetcherArgs,
@@ -173,20 +173,20 @@ export function createFetch<
 export function createFetch<
   Result,
   InitialValue extends Result | undefined = undefined,
-  FetcherArgs extends any[] = FetchArgs
+  FetcherArgs extends any[] = FetchArgs,
 >(
   ...args: DistributeFetcherArgs<
     FetcherArgs,
     [
       options: FetchOptions<Result, InitialValue, FetcherArgs>,
-      modifiers: ReturnType<RequestModifier>[]
+      modifiers: ReturnType<RequestModifier>[],
     ]
   >
 ): FetchReturn<Result, InitialValue>;
 export function createFetch<
   Result,
   InitialValue extends Result | undefined,
-  FetcherArgs extends any[]
+  FetcherArgs extends any[],
 >(
   ...args:
     | DistributeFetcherArgs<FetchArgs, []>
@@ -196,7 +196,7 @@ export function createFetch<
         FetchArgs,
         [
           options: FetchOptions<Result, InitialValue, FetchArgs>,
-          modifiers: ReturnType<RequestModifier>[]
+          modifiers: ReturnType<RequestModifier>[],
         ]
       >
     | DistributeFetcherArgs<FetcherArgs, [options: FetchOptions<Result, InitialValue, FetcherArgs>]>
@@ -205,7 +205,7 @@ export function createFetch<
         FetcherArgs,
         [
           options: FetchOptions<Result, InitialValue, FetcherArgs>,
-          modifiers: ReturnType<RequestModifier>[]
+          modifiers: ReturnType<RequestModifier>[],
         ]
       >
 ): FetchReturn<Result, InitialValue> {
@@ -242,11 +242,11 @@ export function createFetch<
         fetchContext.resource = createResource(
           fetchContext.urlAccessor,
           fetchContext.fetcher!,
-          options as ResourceOptions<Result>
+          options as ResourceOptions<Result>,
         ) as ResourceReturn<Result, ResourceOptions<Result>>;
       }
       return fetchContext.resource;
-    }
+    },
   };
   fetchContext.wrapResource();
   return fetchContext.resource as unknown as FetchReturn<Result, InitialValue>;

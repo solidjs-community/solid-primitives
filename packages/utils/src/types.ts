@@ -44,7 +44,7 @@ export type MaybeAccessorValue<T extends MaybeAccessor<any>> = T extends () => a
 export type OnAccessEffectFunction<S, Prev, Next extends Prev = Prev> = (
   input: AccessReturnTypes<S>,
   prevInput: AccessReturnTypes<S>,
-  v: Prev
+  v: Prev,
 ) => Next;
 
 export type AccessReturnTypes<S> = S extends MaybeAccessor<any>[]
@@ -92,7 +92,7 @@ export type Tail<T extends any[]> = ((...t: T) => void) extends (x: any, ...u: i
 
 /** `A | B => A & B` */
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
-  k: infer I
+  k: infer I,
 ) => void
   ? I
   : never;

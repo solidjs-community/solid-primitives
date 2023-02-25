@@ -29,7 +29,7 @@ const foods = [
   "milk",
   "honey",
   "chips",
-  "cookie"
+  "cookie",
 ];
 const randomIndex = (list: readonly any[]): number => Math.floor(Math.random() * list.length);
 const getRandomFood = () => foods[randomIndex(foods)];
@@ -40,7 +40,7 @@ export default function App() {
     { id: 2, value: "milk" },
     { id: 3, value: "honey" },
     { id: 4, value: "chips" },
-    { id: 5, value: "cookie" }
+    { id: 5, value: "cookie" },
   ]);
 
   const addRandom = () => {

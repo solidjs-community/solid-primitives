@@ -15,7 +15,7 @@ describe("keyArray", () => {
       const mapped = keyArray(
         () => [el1, el2, el3],
         v => v.id,
-        v => ({ ...v(), key: v().id })
+        v => ({ ...v(), key: v().id }),
       );
       expect(mapped().length).toBe(3);
       expect(mapped()[0].key).toBe(1);
@@ -32,7 +32,7 @@ describe("keyArray", () => {
       const mapped = keyArray(
         list,
         v => v.id,
-        v => v().id
+        v => v().id,
       );
       createComputed(() => mapped(), changes++);
       expect(mapped()).toEqual([1, 2, 3]);
@@ -56,7 +56,7 @@ describe("keyArray", () => {
           const item = { value: v().value };
           createComputed(() => (item.value = v().value));
           return item;
-        }
+        },
       );
       createComputed(() => mapped(), changes++);
 
@@ -88,7 +88,7 @@ describe("keyArray", () => {
           const item = { i: i(), v: v().value };
           createComputed(() => (item.i = i()), (item.v = v().value));
           return item;
-        }
+        },
       );
       createComputed(() => {
         mapped();
@@ -98,7 +98,7 @@ describe("keyArray", () => {
       expect(mapped()).toEqual([
         { i: 0, v: "bread" },
         { i: 1, v: "milk" },
-        { i: 2, v: "honey" }
+        { i: 2, v: "honey" },
       ]);
       expect(changes).toBe(1);
       expect(maprun).toBe(3);
@@ -107,7 +107,7 @@ describe("keyArray", () => {
       expect(mapped()).toEqual([
         { i: 0, v: "bread" },
         { i: 1, v: "honey" },
-        { i: 2, v: "milk" }
+        { i: 2, v: "milk" },
       ]);
       expect(changes).toBe(2);
       expect(maprun).toBe(3);
@@ -117,7 +117,7 @@ describe("keyArray", () => {
         { i: 0, v: "bread" },
         { i: 1, v: "chips" },
         { i: 2, v: "honey" },
-        { i: 3, v: "milk" }
+        { i: 3, v: "milk" },
       ]);
       expect(changes).toBe(3);
       expect(maprun).toBe(4);
@@ -130,13 +130,13 @@ describe("keyArray", () => {
       const [list, setList] = createStore([
         { i: 0, v: "foo" },
         { i: 1, v: "bar" },
-        { i: 2, v: "baz" }
+        { i: 2, v: "baz" },
       ]);
 
       const mapped = keyArray(
         () => list,
         e => e.i,
-        (item, index) => [item, index] as const
+        (item, index) => [item, index] as const,
       );
 
       const getUnwrapped = (): [number, string, number][] =>
@@ -149,7 +149,7 @@ describe("keyArray", () => {
       expect(getUnwrapped()).toEqual([
         [0, "foo", 0],
         [1, "bar", 1],
-        [2, "baz", 2]
+        [2, "baz", 2],
       ]);
 
       const [a0, a1, a2] = mapped();
@@ -157,14 +157,14 @@ describe("keyArray", () => {
       setList([
         { i: 2, v: "foo" },
         { i: 0, v: "bar" },
-        { i: 1, v: "baz" }
+        { i: 1, v: "baz" },
       ]);
 
       expect(mapped().length).toBe(3);
       expect(getUnwrapped()).toEqual([
         [2, "foo", 0],
         [0, "bar", 1],
-        [1, "baz", 2]
+        [1, "baz", 2],
       ]);
 
       const [b0, b1, b2] = mapped();
@@ -181,12 +181,12 @@ describe("keyArray", () => {
         ["0", 0],
         ["1", 1],
         ["2", 2],
-        ["3", 3]
+        ["3", 3],
       ];
       const entriesTo: [string, {}][] = [
         ["0", 0],
         ["1", 1],
-        ["2", 2]
+        ["2", 2],
       ];
 
       const [list, setList] = createSignal<[string, {}][]>(entriesFrom);
@@ -194,8 +194,8 @@ describe("keyArray", () => {
         keyArray(
           list,
           v => v[0],
-          v => v()[1]
-        )
+          v => v()[1],
+        ),
       );
       expect(mapped().length).toBe(4);
       expect(mapped()).toEqual([0, 1, 2, 3]);

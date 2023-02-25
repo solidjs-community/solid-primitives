@@ -5,13 +5,13 @@ import {
   DEFAULT_RELATIVE_ELEMENT_POSITION,
   makeMouseInsideListener,
   makeMousePositionListener,
-  getPositionToElement
+  getPositionToElement,
 } from "./common";
 import {
   FollowTouchOptions,
   MousePositionInside,
   PositionRelativeToElement,
-  UseTouchOptions
+  UseTouchOptions,
 } from "./types";
 import { Accessor, createComputed, createEffect, onMount } from "solid-js";
 
@@ -49,14 +49,14 @@ export interface PositionToElementOptions extends UseTouchOptions, FollowTouchOp
  */
 export function createMousePosition(
   target?: MaybeAccessor<Window | Document | HTMLElement>,
-  options: MousePositionOptions = {}
+  options: MousePositionOptions = {},
 ): MousePositionInside {
   if (process.env.SSR) {
     return DEFAULT_MOUSE_POSITION;
   }
   const [state, setState] = createStaticStore<MousePositionInside>({
     ...DEFAULT_MOUSE_POSITION,
-    ...options.initialValue
+    ...options.initialValue,
   });
 
   const attachListeners = (el: Window | Document | HTMLElement | undefined) => {
@@ -86,7 +86,7 @@ export function createMousePosition(
  * })
  */
 export const useMousePosition = /*#__PURE__*/ createSharedRoot(
-  createMousePosition.bind(void 0, void 0, void 0)
+  createMousePosition.bind(void 0, void 0, void 0),
 );
 
 /**
@@ -110,11 +110,11 @@ export const useMousePosition = /*#__PURE__*/ createSharedRoot(
 export function createPositionToElement(
   element: Element | Accessor<Element | undefined>,
   pos: Accessor<Position>,
-  options: PositionToElementOptions = {}
+  options: PositionToElementOptions = {},
 ): PositionRelativeToElement {
   const fallback: PositionRelativeToElement = {
     ...DEFAULT_RELATIVE_ELEMENT_POSITION,
-    ...options.initialValue
+    ...options.initialValue,
   };
   if (process.env.SSR) {
     return fallback;

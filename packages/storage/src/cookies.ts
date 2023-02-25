@@ -57,20 +57,20 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   setItem: (key: string, value: string, options?: CookieOptions) => {
     const oldValue = cookieStorage.getItem(key);
     cookieStorage._cookies[0][cookieStorage._cookies[1]] = `${key}=${value}${serializeCookieOptions(
-      options
+      options,
     )}`;
     const storageEvent = Object.assign(new Event("storage"), {
       key,
       oldValue,
       newValue: value,
       url: globalThis.document.URL,
-      storageArea: cookieStorage
+      storageArea: cookieStorage,
     });
     window.dispatchEvent(storageEvent);
   },
   removeItem: (key: string) => {
     cookieStorage._cookies[0][cookieStorage._cookies[1]] = `${key}=deleted${serializeCookieOptions({
-      expires: new Date(0)
+      expires: new Date(0),
     })}`;
   },
   key: (index: number) => {
@@ -83,7 +83,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
           key = found;
         }
         return "";
-      }
+      },
     );
     return key;
   },
@@ -94,17 +94,17 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
       (found: string) => {
         length += found ? 1 : 0;
         return "";
-      }
+      },
     );
     return length;
-  }
+  },
 });
 
 /**
  * creates a reactive store but bound to document.cookie
  */
 export const createCookieStorage = <T, O = CookieOptions, A = StorageWithOptions<CookieOptions>>(
-  props?: Omit<StorageProps<T, A, O>, "api">
+  props?: Omit<StorageProps<T, A, O>, "api">,
 ) => createStorage<O, T>({ ...props, api: cookieStorage } as any);
 
 /**
@@ -113,9 +113,9 @@ export const createCookieStorage = <T, O = CookieOptions, A = StorageWithOptions
 export const createCookieStorageSignal = <
   T,
   O = CookieOptions,
-  A = StorageWithOptions<CookieOptions>
+  A = StorageWithOptions<CookieOptions>,
 >(
   key: string,
   initialValue?: T,
-  props?: Omit<StorageSignalProps<T, A, O>, "api">
+  props?: Omit<StorageSignalProps<T, A, O>, "api">,
 ) => createStorageSignal<T, O>(key, initialValue, { ...props, api: cookieStorage } as any);

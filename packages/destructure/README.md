@@ -68,8 +68,8 @@ const [store, setStore] = createStore({
   user: {
     name: "John",
     lastName: "Brown",
-    age: 25
-  }
+    age: 25,
+  },
 });
 // disable memo (for accessors is enabled by default)
 const { name, lastName, age } = destructure(() => store.user, { memo: false });
@@ -84,12 +84,12 @@ const [store, setStore] = createStore({
   user: {
     name: "Johnny",
     lastName: "Bravo",
-    age: 19
-  }
+    age: 19,
+  },
 });
 
 const {
-  user: { name, lastName, age }
+  user: { name, lastName, age },
 } = destructure(store, { deep: true });
 
 name(); // => "Johnny"
@@ -106,14 +106,14 @@ Lazy access allows for getting hold of accessors to keys that are not in the obj
 ```ts
 const [user, setUser] = createSignal({
   name: "John",
-  lastName: "Brown"
+  lastName: "Brown",
 });
 const { age } = destructure(user, { lazy: true });
 age(); // => undefined (not an error though)
 
 setUser(p => ({
   ...p,
-  age: 34
+  age: 34,
 }));
 age(); // => 34
 ```
@@ -126,7 +126,7 @@ When [caching](#caching-keys) is enabled, eager evaluation will create memos for
 const [user, setUser] = createSignal({
   name: "John",
   lastName: "Brown",
-  age: 25
+  age: 25,
 });
 // only the `age` key will be cached
 const { age } = destructure(user, { lazy: true });

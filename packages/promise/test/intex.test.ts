@@ -36,9 +36,9 @@ describe("raceTimeout", () => {
         (async () => {
           await promiseTimeout(100);
           return "result";
-        })()
+        })(),
       ],
-      200
+      200,
     );
     expect(res).toBe("result");
     expect(performance.now() - time).toBeGreaterThan(50);
@@ -52,7 +52,7 @@ describe("raceTimeout", () => {
         [promiseTimeout(200)],
         100,
         true,
-        new Error("raceTimeout rejection reason")
+        new Error("raceTimeout rejection reason"),
       );
     } catch (e) {
       expect((e as Error).message).toBe("raceTimeout rejection reason");
@@ -154,7 +154,7 @@ describe("until", () => {
         until(() => {
           onCleanup(() => (disposed = true));
         }),
-        100
+        100,
       );
       expect(disposed).toBe(true);
     });

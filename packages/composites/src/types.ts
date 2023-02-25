@@ -12,13 +12,13 @@ export interface WatchOptions<U> {
 export type EffectArrayCallback<Source extends Fn<any>[], U> = (
   input: ReturnTypes<Source>,
   prevInput: ReturnTypes<Source>,
-  prevValue?: U
+  prevValue?: U,
 ) => U;
 
 export type EffectSignalCallback<Source extends Fn<any>, U> = (
   input: ReturnType<Source>,
   prevInput: ReturnType<Source>,
-  prevValue?: U
+  prevValue?: U,
 ) => U;
 
 export type EffectCallback<Source extends Fn<any> | Fn<any>[], U> = Source extends Fn<any>[]
@@ -36,23 +36,23 @@ export type EffectSource<Source extends Fn<any> | Fn<any>[]> = Source extends Fn
 export interface Modifier<Config extends unknown, Returns extends {}> {
   <Source extends Fn<any>[] | Fn<any>, U, NestedReturns extends {}>(
     filter: ModifierReturn<Source, U, NestedReturns>,
-    options: Config
+    options: Config,
   ): ModifierReturn<Source, U, Returns & NestedReturns>;
   <Source extends Fn<any>[], U>(
     source: [...Source],
     callback: EffectArrayCallback<Source, U>,
-    options: Config
+    options: Config,
   ): ModifierReturn<Source, U, Returns>;
   <Source extends Fn<any>, U>(
     source: Source,
     callback: EffectSignalCallback<Source, U>,
-    options: Config
+    options: Config,
   ): ModifierReturn<Source, U, Returns>;
 }
 
 export type CallbackModifier<Source extends Fn<any>[] | Fn<any>, U, Returns extends {}> = (
   callback: EffectCallback<Source, U>,
-  stop: StopEffect | undefined
+  stop: StopEffect | undefined,
 ) => [EffectCallback<Source, U>, Returns];
 
 export type ModifierReturn<Source extends Fn<any>[] | Fn<any>, U, Returns extends {}> = {

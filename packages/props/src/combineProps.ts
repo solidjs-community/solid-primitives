@@ -32,11 +32,11 @@ export function combineStyle(a: string, b: string): string;
 export function combineStyle(a: JSX.CSSProperties, b: JSX.CSSProperties): JSX.CSSProperties;
 export function combineStyle(
   a: JSX.CSSProperties | string,
-  b: JSX.CSSProperties | string
+  b: JSX.CSSProperties | string,
 ): JSX.CSSProperties;
 export function combineStyle(
   a: JSX.CSSProperties | string,
-  b: JSX.CSSProperties | string
+  b: JSX.CSSProperties | string,
 ): JSX.CSSProperties | string {
   if (typeof a === "object" && typeof b === "object") return { ...a, ...b };
   if (typeof a === "string" && typeof b === "string") return `${a};${b}`;
@@ -58,7 +58,7 @@ type PropsInput = {
 const reduce = <K extends keyof PropsInput>(
   sources: MaybeAccessor<PropsInput>[],
   key: K,
-  calc: (a: NonNullable<PropsInput[K]>, b: NonNullable<PropsInput[K]>) => PropsInput[K]
+  calc: (a: NonNullable<PropsInput[K]>, b: NonNullable<PropsInput[K]>) => PropsInput[K],
 ) => {
   let v: PropsInput[K] = undefined;
   for (const props of sources) {
@@ -158,9 +158,9 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: 
       },
       keys() {
         return Object.keys(merge);
-      }
+      },
     },
-    propTraps
+    propTraps,
   ) as any;
 }
 

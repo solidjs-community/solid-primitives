@@ -18,7 +18,7 @@ export type DispatcherOptions = {
  * @param options the dispatcherOptions is an object with one property, `cancelable`, which determines whether the created custom event is cancelable (meaning its `preventDefault()` method can be called). This arguments is optional and defaults to `{ cancelable: false }`.
  */
 export function createEventDispatcher<Props>(props: Props): <
-  N extends keyof Handlers<Props> & string
+  N extends keyof Handlers<Props> & string,
 >(
   ...args: Handlers<Props>[N] extends undefined | ((evt?: CustomEvent<infer D> | undefined) => any)
     ? // this will handle typing for callbacks with optional payloads like (e.g. onMyEvent: (evt?: CustomEvent<string> => void))

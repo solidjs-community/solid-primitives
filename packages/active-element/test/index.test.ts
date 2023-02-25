@@ -6,7 +6,7 @@ import {
   createActiveElement,
   makeFocusListener,
   createFocusSignal,
-  focus
+  focus,
 } from "../src";
 
 const dispatchFocusEvent = (target: Element | Window = window, event: "focus" | "blur" = "focus") =>

@@ -4,7 +4,7 @@ import type {
   EffectArrayCallback,
   Modifier,
   ModifierReturn,
-  EffectSignalCallback
+  EffectSignalCallback,
 } from "./types";
 import type { Fn } from "./common";
 
@@ -20,15 +20,15 @@ import type { Fn } from "./common";
 export function createModifier<
   Config extends unknown,
   Returns extends {} = {},
-  RequireStop extends boolean = false
+  RequireStop extends boolean = false,
 >(
   modifier: (
     source: Fn<any> | Fn<any>[],
     callback: EffectArrayCallback<Fn<any>[], unknown> & EffectSignalCallback<Fn<any>, unknown>,
     config: Config,
-    stop: RequireStop extends true ? StopEffect : undefined
+    stop: RequireStop extends true ? StopEffect : undefined,
   ) => [(input: unknown, prevInput: unknown, prevValue?: unknown) => unknown, Returns],
-  requireStop?: RequireStop
+  requireStop?: RequireStop,
 ): Modifier<Config, Returns> {
   return (a: any, b?: any, c?: any): ModifierReturn<any, any, Returns> => {
     const stopRequired = requireStop ?? false;
@@ -59,7 +59,7 @@ export function createModifier<
       stopRequired,
       initialCallback,
       initialSource: source,
-      modifyers: modifyers as any
+      modifyers: modifyers as any,
     };
   };
 }

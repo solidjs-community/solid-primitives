@@ -6,7 +6,7 @@ import {
   createViewportObserver,
   createVisibilityObserver,
   withOccurrence,
-  withDirection
+  withDirection,
 } from "../src";
 
 const intersectionObserverInstances: any[] = [];
@@ -17,7 +17,7 @@ const _getLastIOInstance = () =>
 const createMockIOEntry = ({
   target,
   isIntersecting = Math.random() > 0.5,
-  boundingClientRect = target.getBoundingClientRect()
+  boundingClientRect = target.getBoundingClientRect(),
 }: {
   target: Element;
   isIntersecting?: boolean;
@@ -29,7 +29,7 @@ const createMockIOEntry = ({
   isIntersecting,
   intersectionRect: {} as any,
   intersectionRatio: Math.random(),
-  boundingClientRect
+  boundingClientRect,
 });
 
 class IntersectionObserver {
@@ -91,7 +91,7 @@ describe("makeIntersectionObserver", () => {
       const { instance } = makeIntersectionObserver([], () => {});
       expect(
         intersectionObserverInstances[intersectionObserverInstances.length - 1],
-        "returned instance doesn't match instance created"
+        "returned instance doesn't match instance created",
       ).toBe(instance);
 
       dispose();
@@ -103,13 +103,13 @@ describe("makeIntersectionObserver", () => {
       const options: IntersectionObserverInit = {
         threshold: 0.6,
         root: div,
-        rootMargin: "10px 10px 10px 10px"
+        rootMargin: "10px 10px 10px 10px",
       };
       const { instance } = makeIntersectionObserver([], () => {}, options);
 
       expect(
         (instance as IntersectionObserver).options,
-        "options in IntersectionObserver don't match"
+        "options in IntersectionObserver don't match",
       ).toBe(options);
 
       dispose();
@@ -123,7 +123,7 @@ describe("makeIntersectionObserver", () => {
 
       expect(
         (instance as IntersectionObserver).elements[0],
-        "element wasn't added to the IntersectionObserver"
+        "element wasn't added to the IntersectionObserver",
       ).toBe(div);
 
       dispose();
@@ -138,7 +138,7 @@ describe("makeIntersectionObserver", () => {
 
       expect(
         (instance as IntersectionObserver).elements.length,
-        "element wasn't removed from the IntersectionObserver"
+        "element wasn't removed from the IntersectionObserver",
       ).toBe(0);
 
       dispose();
@@ -151,7 +151,7 @@ describe("makeIntersectionObserver", () => {
 
       expect(
         (instance as IntersectionObserver).elements.length,
-        "elements in array were not added to the IntersectionObserver"
+        "elements in array were not added to the IntersectionObserver",
       ).toBe(2);
 
       stop();
@@ -159,14 +159,14 @@ describe("makeIntersectionObserver", () => {
 
       expect(
         (instance as IntersectionObserver).elements.length,
-        "elements were not added to the IntersectionObserver on restart"
+        "elements were not added to the IntersectionObserver on restart",
       ).toBe(2);
 
       const { instance: instance2 } = makeIntersectionObserver([div, img], () => {});
 
       expect(
         (instance2 as IntersectionObserver).elements.length,
-        "elements passed with accessor were not added to the IntersectionObserver"
+        "elements passed with accessor were not added to the IntersectionObserver",
       ).toBe(2);
 
       dispose();
@@ -181,7 +181,7 @@ describe("makeIntersectionObserver", () => {
 
       expect(
         (instance as IntersectionObserver).elements.length,
-        "elements weren't removed from the IntersectionObserver"
+        "elements weren't removed from the IntersectionObserver",
       ).toBe(0);
 
       dispose();
@@ -198,14 +198,14 @@ describe("makeIntersectionObserver", () => {
       });
       (instance as IntersectionObserver).__TEST__onChange();
       expect(cbInstance, "IntersectionObserver instance is not passed to the callback").toBe(
-        instance
+        instance,
       );
 
       expect(cbEntries.length, "IntersectionObserver Entries are not passed to the callback").toBe(
-        2
+        2,
       );
       expect(cbEntries[0].isIntersecting, "Entry is missing isIntersecting property").toBeTypeOf(
-        "boolean"
+        "boolean",
       );
       expect(cbEntries[0].target, "Entry target doesn't match the correct element").toBe(div);
       dispose();
@@ -256,7 +256,7 @@ describe("createViewportObserver", () => {
 
       expect(
         intersectionObserverInstances[intersectionObserverInstances.length - 1],
-        "returned instance doesn't match instance created"
+        "returned instance doesn't match instance created",
       ).toBe(instance);
 
       dispose();
@@ -268,13 +268,13 @@ describe("createViewportObserver", () => {
       const options: IntersectionObserverInit = {
         threshold: 0.6,
         root: div,
-        rootMargin: "10px 10px 10px 10px"
+        rootMargin: "10px 10px 10px 10px",
       };
       const [, { instance }] = createViewportObserver(options);
 
       expect(
         (instance as IntersectionObserver).options,
-        "options in IntersectionObserver don't match"
+        "options in IntersectionObserver don't match",
       ).toBe(options);
 
       dispose();
@@ -288,7 +288,7 @@ describe("createViewportObserver", () => {
 
       expect(
         (instance as IntersectionObserver).elements[0],
-        "element wasn't added to the IntersectionObserver"
+        "element wasn't added to the IntersectionObserver",
       ).toBe(div);
 
       dispose();
@@ -303,7 +303,7 @@ describe("createViewportObserver", () => {
 
       expect(
         (instance as IntersectionObserver).elements.length,
-        "element wasn't removed from the IntersectionObserver"
+        "element wasn't removed from the IntersectionObserver",
       ).toBe(0);
 
       dispose();
@@ -317,7 +317,7 @@ describe("createViewportObserver", () => {
 
       expect(
         (instance as IntersectionObserver).elements.length,
-        "elements in array were not added to the IntersectionObserver"
+        "elements in array were not added to the IntersectionObserver",
       ).toBe(2);
 
       stop();
@@ -325,37 +325,37 @@ describe("createViewportObserver", () => {
 
       expect(
         (instance as IntersectionObserver).elements.length,
-        "elements were not added to the IntersectionObserver on restart"
+        "elements were not added to the IntersectionObserver on restart",
       ).toBe(2);
 
       const [, { start: start2, instance: instance2 }] = createViewportObserver([
         [div, () => {}],
-        [img, () => {}]
+        [img, () => {}],
       ]);
       start2();
       expect(
         (instance2 as IntersectionObserver).elements.length,
-        "elements in array of tuples were not added to the IntersectionObserver"
+        "elements in array of tuples were not added to the IntersectionObserver",
       ).toBe(2);
 
       const [, { start: start3, instance: instance3 }] = createViewportObserver(
         () => [div, img],
-        () => {}
+        () => {},
       );
       start3();
       expect(
         (instance3 as IntersectionObserver).elements.length,
-        "elements in array accessor were not added to the IntersectionObserver"
+        "elements in array accessor were not added to the IntersectionObserver",
       ).toBe(2);
 
       const [, { start: start4, instance: instance4 }] = createViewportObserver(() => [
         [div, () => {}],
-        [img, () => {}]
+        [img, () => {}],
       ]);
       start4();
       expect(
         (instance4 as IntersectionObserver).elements.length,
-        "elements in an accessor od array of tuples were not added to the IntersectionObserver"
+        "elements in an accessor od array of tuples were not added to the IntersectionObserver",
       ).toBe(2);
 
       dispose();
@@ -369,7 +369,7 @@ describe("createViewportObserver", () => {
       stop();
       expect(
         (instance as IntersectionObserver).elements.length,
-        "elements weren't removed from the IntersectionObserver"
+        "elements weren't removed from the IntersectionObserver",
       ).toBe(0);
 
       dispose();
@@ -387,13 +387,13 @@ describe("createViewportObserver", () => {
       start();
       (instance as IntersectionObserver).__TEST__onChange();
       expect(cbInstance, "IntersectionObserver instance is not passed to the callback").toBe(
-        instance
+        instance,
       );
       expect(cbEntries.length, "IntersectionObserver Entries are not passed to the callback").toBe(
-        2
+        2,
       );
       expect(cbEntries[0].isIntersecting, "Entry is missing isIntersecting property").toBeTypeOf(
-        "boolean"
+        "boolean",
       );
       expect(cbEntries[0].target, "Entry target doesn't match the correct element").toBe(div);
       dispose();
@@ -405,7 +405,7 @@ describe("createViewportObserver", () => {
       const cbEntries: Record<string, IntersectionObserverEntry> = {};
       const [add, { instance, start }] = createViewportObserver([
         [div, e => (cbEntries.div = e)],
-        [img, e => (cbEntries.img = e)]
+        [img, e => (cbEntries.img = e)],
       ]);
       start();
       add(span, e => (cbEntries.span = e));
@@ -413,11 +413,11 @@ describe("createViewportObserver", () => {
       (instance as IntersectionObserver).__TEST__onChange();
 
       expect(cbEntries.div.target, "First initial element doesn't match the entry target").toBe(
-        div
+        div,
       );
 
       expect(cbEntries.img.target, "Second initial element doesn't match the entry target").toBe(
-        img
+        img,
       );
 
       expect(cbEntries.span.target, "Added element doesn't match the entry target").toBe(span);
@@ -474,7 +474,7 @@ describe("createVisibilityObserver", () => {
       const options: IntersectionObserverInit = {
         threshold: 0.6,
         root: div,
-        rootMargin: "10px 10px 10px 10px"
+        rootMargin: "10px 10px 10px 10px",
       };
       const useVisibilityObserver = createVisibilityObserver(options);
       useVisibilityObserver(div);
@@ -494,7 +494,7 @@ describe("createVisibilityObserver", () => {
       expect(isVisible(), "signal doesn't return default initialValue").toBe(false);
 
       const options = {
-        initialValue: true
+        initialValue: true,
       };
       const useVisibilityObserver2 = createVisibilityObserver(options);
       const isVisible2 = useVisibilityObserver2(div);
@@ -560,7 +560,7 @@ describe("withOccurrence", () => {
         withOccurrence((e, { occurrence }) => {
           lastOccurrence = occurrence;
           return e.isIntersecting;
-        })
+        }),
       );
       useVisibilityObserver(div);
       const instance = _getLastIOInstance();
@@ -599,7 +599,7 @@ describe("withDirection", () => {
           lastDirectionX = directionX;
           lastDirectionY = directionY;
           return e.isIntersecting;
-        })
+        }),
       );
       useVisibilityObserver(div);
       const instance = _getLastIOInstance();
@@ -608,8 +608,8 @@ describe("withDirection", () => {
         isIntersecting: false,
         boundingClientRect: {
           top: 0,
-          left: 0
-        } as any
+          left: 0,
+        } as any,
       });
       expect(lastDirectionX).toBe("None");
       expect(lastDirectionY).toBe("None");
@@ -618,8 +618,8 @@ describe("withDirection", () => {
         isIntersecting: true,
         boundingClientRect: {
           top: 0,
-          left: 0
-        } as any
+          left: 0,
+        } as any,
       });
       expect(lastDirectionX).toBe("None");
       expect(lastDirectionY).toBe("None");
@@ -628,8 +628,8 @@ describe("withDirection", () => {
         isIntersecting: true,
         boundingClientRect: {
           top: 15,
-          left: 15
-        } as any
+          left: 15,
+        } as any,
       });
       expect(lastDirectionX).toBe("Left");
       expect(lastDirectionY).toBe("Top");
@@ -638,8 +638,8 @@ describe("withDirection", () => {
         isIntersecting: false,
         boundingClientRect: {
           top: -15,
-          left: -15
-        } as any
+          left: -15,
+        } as any,
       });
       expect(lastDirectionX).toBe("Left");
       expect(lastDirectionY).toBe("Top");
@@ -648,8 +648,8 @@ describe("withDirection", () => {
         isIntersecting: false,
         boundingClientRect: {
           top: 15,
-          left: 15
-        } as any
+          left: 15,
+        } as any,
       });
       expect(lastDirectionX).toBe("Right");
       expect(lastDirectionY).toBe("Bottom");

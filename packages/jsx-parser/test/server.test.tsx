@@ -10,7 +10,7 @@ describe("jsx-parser", () => {
 
   const MyToken1 = createToken(parser1, (props: { text: string }) => ({
     type: "my-token",
-    props
+    props,
   }));
 
   it("should work", () => {
@@ -36,7 +36,7 @@ describe("jsx-parser", () => {
     const MyToken2 = createToken(
       parser2,
       () => ({}),
-      (props: { text: string }) => <div>{props.text}</div>
+      (props: { text: string }) => <div>{props.text}</div>,
     );
 
     const rendered1 = renderToString(() => <MyToken2 text="foo" />);

@@ -15,7 +15,7 @@ describe("createInputMask", () => {
       unmount: () => {
         unmount();
         document.body.removeChild(container);
-      }
+      },
     };
   };
 
@@ -67,7 +67,7 @@ describe("createInputMask", () => {
       <input
         onInput={createInputMask([
           /[^0-9a-zäöüß\-_/]|^(https?:\/\/|)(meet\.goto\.com|gotomeet\.me|)\/?/gi,
-          () => ""
+          () => "",
         ])}
       />
     ));

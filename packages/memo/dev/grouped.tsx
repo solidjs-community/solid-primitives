@@ -12,7 +12,7 @@ const Grouped: Component = () => {
       <div
         class="ball bg-green-500"
         style={{
-          transform: `translate(${pos.x}px, ${pos.y}px)`
+          transform: `translate(${pos.x}px, ${pos.y}px)`,
         }}
       ></div>
       <Show when={debPos()} keyed>
@@ -20,7 +20,7 @@ const Grouped: Component = () => {
           <div
             class="ball bg-yellow-600"
             style={{
-              transform: `translate(${x}px, ${y}px)`
+              transform: `translate(${x}px, ${y}px)`,
             }}
           ></div>
         )}
@@ -30,7 +30,7 @@ const Grouped: Component = () => {
           <div
             class="ball bg-cyan-500"
             style={{
-              transform: `translate(${x}px, ${y}px)`
+              transform: `translate(${x}px, ${y}px)`,
             }}
           ></div>
         )}

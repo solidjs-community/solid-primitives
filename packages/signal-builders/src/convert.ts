@@ -23,5 +23,5 @@ export const int = (input: MaybeAccessor<string>, radix?: number): Accessor<numb
  */
 export const join = <T extends any[]>(
   list: MaybeAccessor<T>,
-  separator?: MaybeAccessor<string>
+  separator?: MaybeAccessor<string>,
 ): Accessor<string> => createMemo(() => access(list).join(access(separator)));

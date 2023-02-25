@@ -27,7 +27,7 @@ export function indexRange<T>(
   getTo: Accessor<number>,
   getStep: Accessor<number>,
   mapFn: (n: Accessor<number>) => T,
-  options: { fallback?: Accessor<T> } = {}
+  options: { fallback?: Accessor<T> } = {},
 ): Accessor<T[]> {
   let disposers: VoidFunction[] = [],
     items: T[] = [],
@@ -132,7 +132,7 @@ export function IndexRange<T>(
   props: RangeProps & {
     fallback?: T;
     children: ((number: Accessor<number>) => T) | T;
-  }
+  },
 ): Accessor<T[]> {
   let start: Accessor<number>, to: Accessor<number>, step: Accessor<number>;
   if ("to" in props) {

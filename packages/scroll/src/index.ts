@@ -44,11 +44,11 @@ export function getScrollPosition(target: Element | Window | undefined): {
   if (target instanceof Window)
     return {
       x: target.scrollX,
-      y: target.scrollY
+      y: target.scrollY,
     };
   return {
     x: target.scrollLeft,
-    y: target.scrollTop
+    y: target.scrollTop,
   };
 }
 
@@ -79,7 +79,7 @@ export function createScrollPosition(target: MaybeAccessor<Element | Window | un
   readonly y: number | null;
 };
 export function createScrollPosition(
-  target: MaybeAccessor<Element | Window | undefined> = window
+  target: MaybeAccessor<Element | Window | undefined> = window,
 ): {
   readonly x: number | null;
   readonly y: number | null;
@@ -109,5 +109,5 @@ export function createScrollPosition(
  * })
  */
 export const useWindowScrollPosition = /*#__PURE__*/ createSharedRoot(() =>
-  createScrollPosition(window)
+  createScrollPosition(window),
 );

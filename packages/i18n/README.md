@@ -58,11 +58,11 @@ const App: Component = () => {
 
 const dict = {
   fr: {
-    hello: "bonjour {{ name }}, comment vas-tu ?"
+    hello: "bonjour {{ name }}, comment vas-tu ?",
   },
   en: {
-    hello: "hello {{ name }}, how are you?"
-  }
+    hello: "hello {{ name }}, how are you?",
+  },
 };
 const value = createI18nContext(dict, "fr");
 
@@ -83,17 +83,17 @@ import { createChainedI18n } from "@solid-primitives/i18n";
 const dictionaries = {
   fr: {
     hello: "bonjour {{ name }}, comment vas-tu ?",
-    goodbye: ({ name }: { name: string }) => `au revoir ${name}`
+    goodbye: ({ name }: { name: string }) => `au revoir ${name}`,
   },
   en: {
     hello: "hello {{ name }}, how are you?",
-    goodbye: ({ name }: { name: string }) => `goodbye ${name}`
-  }
+    goodbye: ({ name }: { name: string }) => `goodbye ${name}`,
+  },
 };
 
 const [t, { locale, setLocale, getDictionary }] = createChainedI18n({
   dictionaries,
-  locale: "en" // Starting locale
+  locale: "en", // Starting locale
 });
 
 createEffect(() => {
@@ -110,7 +110,7 @@ import { createChainedI18nContext } from "@solid-primitives/i18n";
 
 const { I18nProvider, useI18nContext } = makeChainedI18nContext({
   dictionaries,
-  locale: "en" // Starting locale
+  locale: "en", // Starting locale
 });
 
 export const useI18n = () => {

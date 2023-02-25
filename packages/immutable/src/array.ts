@@ -152,9 +152,9 @@ export const sortBy = <T>(
       sort(source, (a, b) =>
         typeof path === "function"
           ? compare(path(a), path(b))
-          : compare(get(a as any, path), get(b as any, path))
+          : compare(get(a as any, path), get(b as any, path)),
       ),
-    arr
+    arr,
   );
 
 /**

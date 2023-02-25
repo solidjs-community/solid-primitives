@@ -1,5 +1,7 @@
 import { Accessor, createEffect, createSignal, onCleanup, onMount, Setter } from "solid-js";
 
+import { createHydrateSignal } from "@solid-primitives/utils";
+
 import type {
   AnyStorageProps,
   AsyncStorage,
@@ -13,7 +15,7 @@ import type {
   StorageSetter,
   StorageSignalProps,
   StorageWithOptions,
-  StringStorageProps
+  StringStorageProps,
 } from "./types";
 
 /**
@@ -40,17 +42,17 @@ import type {
  * ```
  */
 export function createStorage<O>(
-  props?: StringStorageProps<Storage | StorageWithOptions<O>, O>
+  props?: StringStorageProps<Storage | StorageWithOptions<O>, O>,
 ): [
   store: StorageObject<string>,
   setter: StorageSetter<string, O>,
-  actions: StorageActions<string>
+  actions: StorageActions<string>,
 ];
 export function createStorage<O, T>(
-  props?: AnyStorageProps<Storage | StorageWithOptions<O>, O, T>
+  props?: AnyStorageProps<Storage | StorageWithOptions<O>, O, T>,
 ): [store: StorageObject<T>, setter: StorageSetter<T, O>, actions: StorageActions<T>];
 export function createStorage<O, T>(
-  props?: StorageProps<T, Storage | StorageWithOptions<O>, O>
+  props?: StorageProps<T, Storage | StorageWithOptions<O>, O>,
 ): [store: StorageObject<T>, setter: StorageSetter<T, O>, actions: StorageActions<T>] {
   const [error, setError] = createSignal<Error>();
   const handleError = props?.throw
@@ -90,14 +92,14 @@ export function createStorage<O, T>(
               return null;
             }
           },
-          null
+          null,
         );
         if (value !== null && props?.deserializer) {
           return props.deserializer(value, key, props.options as O) as T;
         }
         return value as T | null;
-      }
-    }
+      },
+    },
   );
   const setter: StorageSetter<T, O> = (key, value: T, options?: O) => {
     const filteredValue = props?.serializer
@@ -183,7 +185,7 @@ export function createStorage<O, T>(
           } catch (err) {
             handleError(
               err,
-              `Error synching api ${api.name} from storage event (${ev.key}=${ev.newValue})`
+              `Error synching api ${api.name} from storage event (${ev.key}=${ev.newValue})`,
             );
           }
         });
@@ -204,8 +206,8 @@ export function createStorage<O, T>(
       clear,
       error,
       remove,
-      toJSON
-    }
+      toJSON,
+    },
   ];
 }
 
@@ -234,25 +236,25 @@ export function createStorage<O, T>(
  * ```
  */
 export function createAsyncStorage<O>(
-  props?: StringStorageProps<AsyncStorage | AsyncStorageWithOptions<O>, O>
+  props?: StringStorageProps<AsyncStorage | AsyncStorageWithOptions<O>, O>,
 ): [
   store: AsyncStorageObject<string>,
   setter: AsyncStorageSetter<string, O>,
-  actions: AsyncStorageActions<string>
+  actions: AsyncStorageActions<string>,
 ];
 export function createAsyncStorage<O, T>(
-  props?: AnyStorageProps<T, AsyncStorage | AsyncStorageWithOptions<O>, O>
+  props?: AnyStorageProps<T, AsyncStorage | AsyncStorageWithOptions<O>, O>,
 ): [
   store: AsyncStorageObject<T>,
   setter: AsyncStorageSetter<T, O>,
-  actions: AsyncStorageActions<T>
+  actions: AsyncStorageActions<T>,
 ];
 export function createAsyncStorage<O, T>(
-  props?: StorageProps<T, AsyncStorage | AsyncStorageWithOptions<O>, O>
+  props?: StorageProps<T, AsyncStorage | AsyncStorageWithOptions<O>, O>,
 ): [
   store: AsyncStorageObject<T>,
   setter: AsyncStorageSetter<T, O>,
-  actions: AsyncStorageActions<T>
+  actions: AsyncStorageActions<T>,
 ] {
   const [error, setError] = createSignal<Error>();
   const handleError = props?.throw
@@ -288,14 +290,14 @@ export function createAsyncStorage<O, T>(
           return value.then((newValue: string | null) =>
             newValue && props?.deserializer
               ? props.deserializer(newValue, key, props.options)
-              : newValue
+              : newValue,
           ) as any;
         }
         return value !== null && props?.deserializer
           ? Promise.resolve(props.deserializer(value as string, key, props.options as O) as T)
           : (Promise.resolve(value as T | null) as any);
       }, null);
-    }
+    },
   });
   const setter = (key: string, value: T, options?: O) => {
     const filteredValue = props?.serializer
@@ -308,7 +310,7 @@ export function createAsyncStorage<O, T>(
         } catch (err) {
           handleError(err, `Error setting ${prefix}${key} to ${filteredValue} in ${api.name}`);
         }
-      })
+      }),
     ).then(() => {
       const node = signals.get(key);
       node && node[1]();
@@ -322,7 +324,7 @@ export function createAsyncStorage<O, T>(
         } catch (err) {
           handleError(err, `Error removing ${prefix}${key} from ${api.name}`);
         }
-      })
+      }),
     ).then(() => {
       const node = signals.get(key);
       node && node[1]();
@@ -340,7 +342,7 @@ export function createAsyncStorage<O, T>(
             handleError(err, `Error removing ${key} from ${api.name} during clear()`);
           }
         }
-      })
+      }),
     ).then(() => {
       return;
     });
@@ -379,7 +381,7 @@ export function createAsyncStorage<O, T>(
             handleError(err, `Error attempting to get all keys from ${api.name}`);
           }
         }
-      })
+      }),
     );
     return result;
   };
@@ -414,8 +416,8 @@ export function createAsyncStorage<O, T>(
       remove,
       clear,
       error,
-      toJSON
-    }
+      toJSON,
+    },
   ];
 }
 
@@ -443,7 +445,7 @@ export function createAsyncStorage<O, T>(
 export function createStorageSignal<T, O = {}>(
   key: string,
   initialValue?: T,
-  props?: StorageSignalProps<T, Storage | StorageWithOptions<O>, O>
+  props?: StorageSignalProps<T, Storage | StorageWithOptions<O>, O>,
 ): [accessor: Accessor<T | null>, setter: Setter<T | null>, refetch: () => void] {
   const [error, setError] = createSignal<Error>();
   const apis = props?.api
@@ -462,7 +464,7 @@ export function createStorageSignal<T, O = {}>(
         value = api.getItem(`${prefix}${key}`) as T | null;
       } catch (err) {
         setError(
-          err instanceof Error ? err : new Error(`Error reading ${prefix}${key} from ${api.name}`)
+          err instanceof Error ? err : new Error(`Error reading ${prefix}${key} from ${api.name}`),
         );
         if (props?.throw) {
           throw err;
@@ -473,7 +475,11 @@ export function createStorageSignal<T, O = {}>(
       }
       return value;
     }, null);
-  const [accessor, setter] = createSignal<T | null>(read() ?? (initialValue as T), props as any);
+  const [accessor, setter] = createHydrateSignal<T | null>(
+    initialValue as T,
+    () => read() ?? (initialValue as T),
+    props as any,
+  );
   createEffect(() => {
     const value = accessor();
     const filteredValue = props?.serializer
@@ -487,14 +493,14 @@ export function createStorageSignal<T, O = {}>(
         apis.forEach(
           api =>
             api.getItem(apiKey) !== filteredValue &&
-            api.setItem(apiKey, filteredValue, props?.options)
+            api.setItem(apiKey, filteredValue, props?.options),
         );
       }
     } catch (err) {
       setError(
         err instanceof Error
           ? err
-          : new Error(`Error ${value === null ? "removing" : "writing"} value`)
+          : new Error(`Error ${value === null ? "removing" : "writing"} value`),
       );
       if (props?.throw) {
         throw err;

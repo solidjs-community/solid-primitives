@@ -20,7 +20,7 @@ export function createSubRoot<T>(fn: (dispose: VoidFunction) => T, ...owners: (t
   if (owners.length === 0) owners = [getOwner()];
   return createRoot(dispose => {
     asArray(access(owners)).forEach(
-      owner => owner && runWithOwner(owner, onCleanup.bind(void 0, dispose))
+      owner => owner && runWithOwner(owner, onCleanup.bind(void 0, dispose)),
     );
     return fn(dispose);
   }, owners[0]);
@@ -44,7 +44,7 @@ export const createBranch = createSubRoot;
  */
 export const createCallback = <T extends AnyFunction>(
   callback: T,
-  owner: Owner | null = getOwner()
+  owner: Owner | null = getOwner(),
 ): T => (owner ? (((...args) => runWithOwner(owner, () => callback(...args))) as T) : callback);
 
 /**

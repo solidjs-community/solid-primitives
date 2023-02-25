@@ -4,7 +4,7 @@ import { access, asArray, MaybeAccessor } from "@solid-primitives/utils";
 
 export type MutationObserverAdd = (
   target: Node,
-  options?: MaybeAccessor<MutationObserverInit>
+  options?: MaybeAccessor<MutationObserverInit>,
 ) => void;
 
 export type MutationObserverReturn = [
@@ -14,12 +14,12 @@ export type MutationObserverReturn = [
     stop: VoidFunction;
     instance: MutationObserver;
     isSupported: boolean;
-  }
+  },
 ];
 
 export type MutationObserverStandaloneDirectiveProps = [
   options: MutationObserverInit,
-  callback: MutationCallback
+  callback: MutationCallback,
 ];
 
 declare module "solid-js" {
@@ -60,18 +60,18 @@ export type E = JSX.Element;
 export function createMutationObserver(
   initial: MaybeAccessor<Node | Node[]>,
   options: MutationObserverInit,
-  callback: MutationCallback
+  callback: MutationCallback,
 ): MutationObserverReturn;
 
 export function createMutationObserver(
   initial: MaybeAccessor<[Node, MutationObserverInit][]>,
-  callback: MutationCallback
+  callback: MutationCallback,
 ): MutationObserverReturn;
 
 export function createMutationObserver(
   initial: MaybeAccessor<Node | Node[] | [Node, MutationObserverInit][]>,
   b: MutationObserverInit | MutationCallback,
-  c?: MutationCallback
+  c?: MutationCallback,
 ): MutationObserverReturn {
   let defaultOptions: MutationObserverInit, callback: MutationCallback;
   const isSupported = typeof window !== "undefined" && "MutationObserver" in window;
@@ -99,8 +99,8 @@ export function createMutationObserver(
       start,
       stop,
       instance: instance as MutationObserver,
-      isSupported
-    }
+      isSupported,
+    },
   ];
 }
 
@@ -120,7 +120,7 @@ export function createMutationObserver(
  */
 export const mutationObserver = (
   target: Element,
-  props: () => MutationObserverStandaloneDirectiveProps
+  props: () => MutationObserverStandaloneDirectiveProps,
 ): void => {
   const [config, cb] = props();
   const [add] = createMutationObserver([], cb);

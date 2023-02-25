@@ -50,7 +50,7 @@ const { play, pause, seek } = makeAudioPlayer("example.mp3");
 ```ts
 function makeAudioPlayer(
   src: AudioSource,
-  handlers: AudioEventHandlers = {}
+  handlers: AudioEventHandlers = {},
 ): {
   play: VoidFunction;
   pause: VoidFunction;
@@ -82,7 +82,7 @@ _Note:_ Initializing the primitive with `playing` as true works, however note th
 function makeAudioPlayer(
   src: AudioSource | Accessor<AudioSource>,
   playing?: Accessor<boolean>,
-  volume?: Accessor<number>
+  volume?: Accessor<number>,
 ): [
   {
     state: AudioState;
@@ -96,7 +96,7 @@ function makeAudioPlayer(
     setVolume: (volume: number) => void;
     play: VoidFunction;
     pause: VoidFunction;
-  }
+  },
 ];
 ```
 

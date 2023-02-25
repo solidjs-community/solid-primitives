@@ -27,7 +27,7 @@ import { UploadFile, Dropzone, DropzoneOptions } from "./types";
  * ```
  */
 function createDropzone<T extends HTMLElement = HTMLElement>(
-  options?: DropzoneOptions
+  options?: DropzoneOptions,
 ): Dropzone<T> {
   if (process.env.SSR) {
     return {
@@ -35,7 +35,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
       files: () => [],
       isDragging: () => false,
       removeFile: noop,
-      clearFiles: noop
+      clearFiles: noop,
     };
   }
   const [files, setFiles] = createSignal<UploadFile[]>([]);
@@ -115,7 +115,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
     files,
     isDragging,
     removeFile,
-    clearFiles
+    clearFiles,
   };
 }
 

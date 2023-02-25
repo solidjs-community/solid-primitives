@@ -16,7 +16,7 @@ declare type WorkerExports = [
   worker: Worker,
   start: () => void,
   stop: () => void,
-  exports?: Set<string>
+  exports?: Set<string>,
 ];
 
 declare interface PostMessageOptions {

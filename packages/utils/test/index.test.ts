@@ -13,7 +13,7 @@ describe("createStaticStore", () => {
         a: 1,
         b: 2,
         c: 3,
-        d: [0, 1, 2]
+        d: [0, 1, 2],
       });
 
       setState({ a: 9, d: [3, 2, 1] });
@@ -23,7 +23,7 @@ describe("createStaticStore", () => {
         a: 1,
         b: 2,
         c: 3,
-        d: [0, 1, 2]
+        d: [0, 1, 2],
       });
 
       let aUpdates = -1;
@@ -34,7 +34,7 @@ describe("createStaticStore", () => {
       expect(aUpdates).toBe(0);
 
       setState({
-        b: 3
+        b: 3,
       });
       expect(aUpdates).toBe(0);
       setState("a", 4);
@@ -76,7 +76,7 @@ describe("handleDiffArray", () => {
       },
       () => {
         throw "Should never run";
-      }
+      },
     );
     expect(captured.length).toBe(5);
     assert(captured.includes("foo"));
@@ -98,7 +98,7 @@ describe("handleDiffArray", () => {
       },
       item => {
         captured.push(item);
-      }
+      },
     );
     expect(captured.length).toBe(5);
     assert(captured.includes("foo"));
@@ -119,7 +119,7 @@ describe("handleDiffArray", () => {
       },
       () => {
         throw "Should never run";
-      }
+      },
     );
   });
 
@@ -132,7 +132,7 @@ describe("handleDiffArray", () => {
       b,
       a,
       item => capturedAdded.push(item),
-      item => capturedRemoved.push(item)
+      item => capturedRemoved.push(item),
     );
     expect(capturedAdded.length).toBe(2);
     assert(capturedAdded.includes("bar"));

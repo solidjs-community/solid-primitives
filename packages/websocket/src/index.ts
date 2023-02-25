@@ -22,13 +22,13 @@ const createWebsocket = (
   onError: (message: Event) => void,
   protocols?: string | Array<string>,
   reconnectLimit?: number,
-  reconnectInterval?: number
+  reconnectInterval?: number,
 ): [
   connect: () => void,
   disconnect: () => void,
   send: (message: string) => void,
   state: () => number,
-  socket: () => WebSocket
+  socket: () => WebSocket,
 ] => {
   let socket: WebSocket | undefined;
   let reconnections = 0;

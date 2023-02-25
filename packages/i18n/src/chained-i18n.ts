@@ -59,7 +59,7 @@ function buildChainedDictionary<T extends I18nObject>(obj: T): I18nPath<T> {
         throw new Error(
           process.env.DEV
             ? `Unsupported data format on the keys. Values must resolve to a string or a function that returns a string. Key name: "${key}"`
-            : ""
+            : "",
         );
     }
   }
@@ -72,7 +72,7 @@ export type ChainedI18n<T extends Dictionaries<I18nObject>> = [
     locale: Accessor<keyof T>;
     setLocale: Setter<keyof T>;
     getDictionary: (locale?: keyof T) => T[keyof T];
-  }
+  },
 ];
 
 /**
@@ -82,7 +82,7 @@ export type ChainedI18n<T extends Dictionaries<I18nObject>> = [
  * @returns dictionaries {Record<locale, Record<string, Function | Record<string, Function | etc>} chained dictionaries with callable end paths to get the translation.
  */
 export function createChainedI18nDictionary<T extends Dictionaries<I18nObject>>(
-  dictionaries: T & GuaranteeIdenticalSignatures<T>
+  dictionaries: T & GuaranteeIdenticalSignatures<T>,
 ): I18nPath<T & GuaranteeIdenticalSignatures<T>> {
   const dict = {} as I18nPath<T & GuaranteeIdenticalSignatures<T>>;
   for (const locale in dictionaries) {
@@ -128,8 +128,8 @@ export function createChainedI18n<T extends Dictionaries<I18nObject>>(props: {
     {
       get(_: any, prop: any) {
         return (translations()[locale()] as any)[prop];
-      }
-    }
+      },
+    },
   ) as I18nPath<T>[keyof T];
 
   return [
@@ -151,8 +151,8 @@ export function createChainedI18n<T extends Dictionaries<I18nObject>>(props: {
       getDictionary(language?: keyof T): T[keyof T] {
         if (language) return props.dictionaries[language];
         return props.dictionaries[locale()];
-      }
-    }
+      },
+    },
   ];
 }
 
@@ -166,15 +166,15 @@ export function createChainedI18n<T extends Dictionaries<I18nObject>>(props: {
  */
 export function createChainedI18nContext<T extends Dictionaries<I18nObject>>(
   props: Parameters<typeof createChainedI18n<T>>[0],
-  setFallback: true
+  setFallback: true,
 ): [I18nProvider: FlowComponent, useI18n: () => ChainedI18n<T>];
 export function createChainedI18nContext<T extends Dictionaries<I18nObject>>(
   props: Parameters<typeof createChainedI18n<T>>[0],
-  setFallback?: boolean
+  setFallback?: boolean,
 ): [I18nProvider: FlowComponent, useI18n: () => ChainedI18n<T> | null];
 export function createChainedI18nContext<T extends Dictionaries<I18nObject>>(
   props: Parameters<typeof createChainedI18n<T>>[0],
-  setFallback?: boolean
+  setFallback?: boolean,
 ) {
   const i18n = createChainedI18n(props);
   return createContextProvider(() => i18n, setFallback ? i18n : null);

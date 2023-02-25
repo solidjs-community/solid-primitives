@@ -17,7 +17,7 @@ import { createSharedRoot } from "@solid-primitives/rootless";
  */
 export function makeMediaQueryListener(
   query: string | MediaQueryList,
-  callback: (e: MediaQueryListEvent) => void
+  callback: (e: MediaQueryListEvent) => void,
 ): VoidFunction {
   if (process.env.SSR) {
     return noop;
@@ -67,7 +67,7 @@ export function createPrefersDark(serverFallback?: boolean) {
 }
 
 const sharedPrefersDark: () => Accessor<boolean> = /*#__PURE__*/ createSharedRoot(
-  createPrefersDark.bind(void 0, false)
+  createPrefersDark.bind(void 0, false),
 );
 
 /**
@@ -127,7 +127,7 @@ const getEmptyMatchesFromBreakpoints = <T extends Breakpoints>(breakpoints: T): 
  */
 export function createBreakpoints<T extends Breakpoints>(
   breakpoints: T,
-  options: BreakpointOptions<T> = {}
+  options: BreakpointOptions<T> = {},
 ): Matches<T> {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (process.env.SSR || !window.matchMedia)
@@ -147,7 +147,7 @@ export function createBreakpoints<T extends Breakpoints>(
       });
 
       return matches;
-    })()
+    })(),
   );
 
   return matches;

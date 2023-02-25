@@ -81,8 +81,8 @@ const OneParentManyChildren: Component = () => {
         setShow(toggleItems(show(), queue));
         setToggleQueue([]);
       },
-      500
-    )
+      500,
+    ),
   );
 
   createMutationObserver(
@@ -96,7 +96,7 @@ const OneParentManyChildren: Component = () => {
         else removed.push(record.removedNodes[0].textContent);
       });
       setLast({ added, removed });
-    }
+    },
   );
   return (
     <TestingNode heading="One Parent - Many Children" output={<DisplayRecord record={last()} />}>
@@ -138,8 +138,8 @@ const OneParentManyChildrenIndex: Component = () => {
         setShow(toggleItems(show(), queue));
         setToggleQueue([]);
       },
-      500
-    )
+      500,
+    ),
   );
 
   createMutationObserver(
@@ -153,7 +153,7 @@ const OneParentManyChildrenIndex: Component = () => {
         if (record.removedNodes.length) removed.push(record.removedNodes[0].textContent);
       });
       setLast({ added, removed });
-    }
+    },
   );
   return (
     <TestingNode heading="One Parent - Many Children" output={<DisplayRecord record={last()} />}>
@@ -191,7 +191,7 @@ const AttributesTest: Component = () => {
   createMutationObserver(
     () => parent,
     { attributes: true, subtree: true },
-    e => log(e[0])
+    e => log(e[0]),
   );
 
   return (
@@ -212,7 +212,7 @@ const AttributesTest: Component = () => {
           classList={{
             "translate-y-3": list()[1] === 1,
             "translate-x-3": list()[1] === 2,
-            "-translate-x-3": list()[1] === 3
+            "-translate-x-3": list()[1] === 3,
           }}
           onclick={() => handleClick(1)}
         >

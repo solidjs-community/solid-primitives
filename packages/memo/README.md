@@ -147,7 +147,7 @@ const memo = createAsyncMemo(
     const value = await myAsyncFunc(signal());
     return value.data;
   },
-  { value: "initial value" }
+  { value: "initial value" },
 );
 // initial value can be set to prevent returned signal from being undefined
 ```
@@ -317,11 +317,11 @@ const result = createMemoCache(number, n / divisor());
 function createMemoCache<Key, Value>(
   key: Accessor<Key>,
   calc: CacheCalculation<Key, Value>,
-  options?: CacheOptions<Value>
+  options?: CacheOptions<Value>,
 ): Accessor<Value>;
 function createMemoCache<Key, Value>(
   calc: CacheCalculation<Key, Value>,
-  options?: CacheOptions<Value>
+  options?: CacheOptions<Value>,
 ): CacheKeyAccessor<Key, Value>;
 
 type CacheCalculation<Key, Value> = (key: Key, prev: Value | undefined) => Value;
@@ -347,7 +347,7 @@ Primitive for updating signal in a predictable way. SolidJS equivalent of React'
 function createReducer<T, ActionData extends any[]>(
   dispatcher: (state: T, ...args: ActionData) => T,
   initialValue: T,
-  options?: SignalOptions<T>
+  options?: SignalOptions<T>,
 ): [accessor: Accessor<T>, dispatch: (...args: ActionData) => void];
 ```
 

@@ -59,7 +59,7 @@ const App: Component = () => {
             each={Object.entries({
               "Sample 1": "sample1.mp3",
               "Sample 2": "sample2.mp3",
-              "Sample 3": "sample3.mp3"
+              "Sample 3": "sample3.mp3",
             })}
           >
             {([label, url]) => (
@@ -70,7 +70,7 @@ const App: Component = () => {
                 class="transition cursor-pointer bg-transparent px-4 py-3 border-none"
                 classList={{
                   "text-white hover:text-gray-900": url != source(),
-                  "text-blue-800": url == source()
+                  "text-blue-800": url == source(),
                 }}
               >
                 {label}

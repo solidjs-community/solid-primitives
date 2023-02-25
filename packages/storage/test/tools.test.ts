@@ -14,7 +14,7 @@ describe("addClearMethod", () => {
     key: (index: number): string => Object.keys(data)[index],
     get length(): number {
       return Object.keys(data).length;
-    }
+    },
   };
   const mockStorageWithClear = addClearMethod(mockStorage);
 

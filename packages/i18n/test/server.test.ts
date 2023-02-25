@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   createChainedI18nContext,
   createChainedI18nDictionary,
-  createI18nContext
+  createI18nContext,
 } from "../src/index";
 import { dict } from "./setup";
 
@@ -22,7 +22,7 @@ describe("createChainedI18nContext", () => {
   it("Context should be null if setContext !== true", async () => {
     const [, useI18nContext] = createChainedI18nContext(
       { dictionaries: dict, locale: "en" },
-      false
+      false,
     );
 
     const context = useI18nContext();
@@ -76,7 +76,7 @@ describe("createChainedI18nDictionary", () => {
 
     setLocale("fr");
     expect(dictionaries[locale()].hello({ name: "Tester" })).toBe(
-      "bonjour Tester, comment vas-tu ?"
+      "bonjour Tester, comment vas-tu ?",
     );
     expect(dictionaries[locale()].goodbye({ name: "Tester" })).toBe("au revoir Tester");
     expect(dictionaries[locale()].food.meat()).toBe("viande");

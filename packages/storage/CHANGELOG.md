@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 1.3.5
+
+### Patch Changes
+
+- 51e80d27: Fix: hydration issue
+
 ## 1.3.4
 
 ### Patch Changes

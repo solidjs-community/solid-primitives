@@ -52,7 +52,7 @@ The usage is the same as [`createCompositeEffect`](#createcompositeeffect)
 ```ts
 const { ignoring } = createCompositeComputed(
   ignorable(counter, n => console.log(n)),
-  { defer: true }
+  { defer: true },
 );
 ```
 
@@ -69,7 +69,7 @@ const double = createCompositeMemo(counter, n => n * 2, { value: 0 });
 // if you don't set the "value" option, the memo might return undefined
 const [double, { pause, resume }] = createCompositeMemo(
   pausable(counter, n => n * 2),
-  { value: 0 }
+  { value: 0 },
 );
 ```
 
@@ -92,7 +92,7 @@ import {
   throttle,
   whenever,
   pausable,
-  ignorable
+  ignorable,
 } from "@solid-primitives/composites";
 ```
 
@@ -111,7 +111,7 @@ disposes itself on the first captured change. **Set the defer option to true**, 
 ```ts
 createCompositeEffect(
   once(counter, n => console.log(n)),
-  { defer: true }
+  { defer: true },
 );
 ```
 
@@ -153,8 +153,8 @@ setInterval(() => setCount(p => p + 1), 1000);
 createCompositeEffect(
   whenever(
     () => count() > 5,
-    () => console.log(count())
-  )
+    () => console.log(count()),
+  ),
 );
 // will fire on each count change, if count is gt 5
 // => 6, 7, 8, 9, 10, ...
@@ -162,8 +162,8 @@ createCompositeEffect(
 createCompositeEffect(
   whenever(
     createMemo(() => count() > 5),
-    () => console.log(count())
-  )
+    () => console.log(count()),
+  ),
 );
 // will fire only when the memo changes
 // => 6
@@ -175,7 +175,7 @@ Manually controll if the callback gets to be executed
 
 ```ts
 const { pause, resume, toggle } = createCompositeEffect(
-  pausable(counter, x => console.log(x), { active: false })
+  pausable(counter, x => console.log(x), { active: false }),
 );
 ```
 
@@ -230,9 +230,9 @@ function createModifier<Config, Returns, RequireStop>(
     source: Fn<any> | Fn<any>[], // like source of "on"
     callback: EffectCallback, // like callback of "on"
     config: Config, // config for your modifier
-    stop: StopEffect | undefined // a StopEffect if RequireStop
+    stop: StopEffect | undefined, // a StopEffect if RequireStop
   ) => [CustomCallback, Returns], // return your modified callback and custom return values
-  requireStop?: RequireStop // true if you want to use StopEffect
+  requireStop?: RequireStop, // true if you want to use StopEffect
 ): Modifier {}
 
 // modifier that doesn't use "stop()"
@@ -244,7 +244,7 @@ const yourModifier = createModifier<{ myOption: boolean }, { value: string }>(
       return callback(...a);
     };
     return [modifiedCallback, { value: "this will get returned" }];
-  }
+  },
 );
 
 // modifier that does require "stop()"
@@ -258,7 +258,7 @@ const yourModifier = createModifier<void, { value: string }, true>(
 
     return [modifiedCallback, { value: "this will get returned" }];
   },
-  true
+  true,
 );
 ```
 

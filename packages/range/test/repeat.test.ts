@@ -39,8 +39,8 @@ describe("repeat", () => {
           fallback: () => {
             captured.push("fb");
             return "fb";
-          }
-        }
+          },
+        },
       );
       expect(mapped(), "initial mapped").toEqual([0, 1, 2, 3]);
       expect(captured, "initial captured").toEqual([0, 1, 2, 3]);
@@ -67,8 +67,8 @@ describe("repeat", () => {
           fallback: () => {
             onCleanup(() => cleanups.push("fb"));
             return "fb";
-          }
-        }
+          },
+        },
       );
       // cleanups happen on access
       createComputed(mapped);

@@ -16,7 +16,7 @@ import {
   MemoOptions,
   NoInfer,
   Owner,
-  SignalOptions
+  SignalOptions,
 } from "solid-js";
 import { debounce, throttle } from "@solid-primitives/scheduled";
 import { ItemsOf, noop, EffectOptions } from "@solid-primitives/utils";
@@ -54,7 +54,7 @@ const callbackWith = <A, T>(fn: (a: A) => T, v: Accessor<A>): (() => T) =>
  */
 export function createPureReaction(
   onInvalidate: VoidFunction,
-  options?: EffectOptions
+  options?: EffectOptions,
 ): (tracking: VoidFunction) => void {
   if (process.env.SSR) {
     return () => void 0;
@@ -110,17 +110,17 @@ export function createPureReaction(
 export function createLatest<T extends Accessor<any>[]>(
   sources: T,
   value: ReturnType<ItemsOf<T>>,
-  options: SignalOptions<ReturnType<ItemsOf<T>>>
+  options: SignalOptions<ReturnType<ItemsOf<T>>>,
 ): Accessor<ReturnType<ItemsOf<T>>>;
 export function createLatest<T extends Accessor<any>[]>(
   sources: T,
   value?: ReturnType<ItemsOf<T>>,
-  options?: SignalOptions<ReturnType<ItemsOf<T>> | undefined>
+  options?: SignalOptions<ReturnType<ItemsOf<T>> | undefined>,
 ): Accessor<ReturnType<ItemsOf<T>> | undefined>;
 export function createLatest(
   sources: Accessor<any>[],
   value: any,
-  options: SignalOptions<any> = {}
+  options: SignalOptions<any> = {},
 ): Accessor<any> {
   const [last, setLast] = createSignal(value, options);
   for (const fn of sources) createComputed(on(fn, set(setLast), { defer: true }));
@@ -145,23 +145,49 @@ export const createCurtain = createLatest;
 export function createWritableMemo<T>(
   fn: (prev: T) => T,
   value: T,
-  options?: MemoOptions<T>
+  options?: MemoOptions<T>,
 ): [signal: Accessor<T>, setter: Setter<T>];
 export function createWritableMemo<T>(
   fn: (prev: T | undefined) => T,
   value?: undefined,
-  options?: MemoOptions<T | undefined>
+  options?: MemoOptions<T | undefined>,
 ): [signal: Accessor<T>, setter: Setter<T>];
 export function createWritableMemo<T>(
   fn: (prev: T | undefined) => T,
   value?: T,
-  options?: MemoOptions<T | undefined>
+  options?: MemoOptions<T | undefined>,
 ): [signal: Accessor<T>, setter: Setter<T>] {
   const [signal, setSignal] = createSignal(fn(value), options);
   const calc = callbackWith(fn, signal);
   createComputed(on(calc, set(setSignal), { defer: true }));
   return [signal, setSignal];
 }
+
+/*
+
+alternative implementation to try:
+
+export function createWritableMemo<T>(fn: () => T, initialValue: T) {
+  let latest: Accessor<T>;
+  const [value, setValue] = createSignal<T>(initialValue);
+  const memo = createMemo(fn, initialValue);
+  latest = memo;
+  const combined = createMemo(() => {
+    const s = value();
+    const m = memo();
+    if (value === latest) return s;
+    else return m;
+  });
+  return [
+    combined,
+    (v: T) => {
+      latest = value;
+      return setValue(() => v);
+    }
+  ] as const;
+}
+
+*/
 
 /**
  * Solid's `createMemo` which returned signal is debounced. *(The {@link fn} callback is not debounced!)*
@@ -179,19 +205,19 @@ export function createWritableMemo<T>(
  */
 export function createDebouncedMemo<Next extends Prev, Prev = Next>(
   fn: EffectFunction<undefined | NoInfer<Prev>, Next>,
-  timeoutMs: number
+  timeoutMs: number,
 ): Accessor<Next>;
 export function createDebouncedMemo<Next extends Prev, Init = Next, Prev = Next>(
   fn: EffectFunction<Init | Prev, Next>,
   timeoutMs: number,
   value: Init,
-  options?: MemoOptions<Next>
+  options?: MemoOptions<Next>,
 ): Accessor<Next>;
 export function createDebouncedMemo<T>(
   fn: (prev: T | undefined) => T,
   timeoutMs: number,
   value?: T,
-  options?: MemoOptions<T | undefined>
+  options?: MemoOptions<T | undefined>,
 ): Accessor<T> {
   const memo = createMemo(() => fn(value), undefined, options);
   if (process.env.SSR) {
@@ -221,21 +247,21 @@ export function createDebouncedMemo<T>(
 export function createDebouncedMemoOn<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
   fn: (input: S, prevInput: S | undefined, prev: undefined | NoInfer<Prev>) => Next,
-  timeoutMs: number
+  timeoutMs: number,
 ): Accessor<Next>;
 export function createDebouncedMemoOn<S, Next extends Prev, Init = Next, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
   fn: (input: S, prevInput: S | undefined, prev: Prev | Init) => Next,
   timeoutMs: number,
   value: Init,
-  options?: MemoOptions<Next>
+  options?: MemoOptions<Next>,
 ): Accessor<Next>;
 export function createDebouncedMemoOn<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
   fn: (input: S, prevInput: S | undefined, prev: Prev | undefined) => Next,
   timeoutMs: number,
   value?: Prev,
-  options?: MemoOptions<Next | undefined>
+  options?: MemoOptions<Next | undefined>,
 ): Accessor<Next> {
   if (process.env.SSR) {
     return createMemo(on(deps, fn as any) as () => any, value);
@@ -250,11 +276,11 @@ export function createDebouncedMemoOn<S, Next extends Prev, Prev = Next>(
             v = fn(input, prevInput, value);
             init = false;
           } else updateSignal(input, prevInput);
-        })
+        }),
       );
       return v;
     })(),
-    options
+    options,
   );
   const updateSignal = debounce((input: S, prevInput: S | undefined) => {
     setSignal(() => fn(input, prevInput, signal()));
@@ -276,19 +302,19 @@ export function createDebouncedMemoOn<S, Next extends Prev, Prev = Next>(
  */
 export function createThrottledMemo<Next extends Prev, Prev = Next>(
   fn: EffectFunction<undefined | NoInfer<Prev>, Next>,
-  timeoutMs: number
+  timeoutMs: number,
 ): Accessor<Next>;
 export function createThrottledMemo<Next extends Prev, Init = Next, Prev = Next>(
   fn: EffectFunction<Init | Prev, Next>,
   timeoutMs: number,
   value: Init,
-  options?: MemoOptions<Next>
+  options?: MemoOptions<Next>,
 ): Accessor<Next>;
 export function createThrottledMemo<T>(
   fn: (prev: T | undefined) => T,
   timeoutMs: number,
   value?: T,
-  options?: MemoOptions<T | undefined>
+  options?: MemoOptions<T | undefined>,
 ): Accessor<T> {
   if (process.env.SSR) {
     return createMemo(fn);
@@ -301,7 +327,7 @@ export function createThrottledMemo<T>(
       track(() => (v = fn(value)));
       return v;
     })(),
-    options
+    options,
   );
   onInvalidate = throttle(() => track(() => setState(fn)), timeoutMs);
   return state;
@@ -326,15 +352,15 @@ export function createThrottledMemo<T>(
  */
 export function createAsyncMemo<T>(
   calc: AsyncMemoCalculation<T, T>,
-  options: MemoOptionsWithValue<T> & { value: T }
+  options: MemoOptionsWithValue<T> & { value: T },
 ): Accessor<T>;
 export function createAsyncMemo<T>(
   calc: AsyncMemoCalculation<T>,
-  options?: MemoOptionsWithValue<T>
+  options?: MemoOptionsWithValue<T>,
 ): Accessor<T | undefined>;
 export function createAsyncMemo<T>(
   calc: AsyncMemoCalculation<T>,
-  options: MemoOptionsWithValue<T | undefined> = {}
+  options: MemoOptionsWithValue<T | undefined> = {},
 ): Accessor<T | undefined> {
   if (process.env.SSR) {
     return () => options.value;
@@ -382,18 +408,18 @@ export function createAsyncMemo<T>(
 export function createLazyMemo<T>(
   calc: (prev: T) => T,
   value: T,
-  options?: MemoOptions<T>
+  options?: MemoOptions<T>,
 ): Accessor<T>;
 // no initial value was provided
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
   value?: undefined,
-  options?: MemoOptions<T>
+  options?: MemoOptions<T>,
 ): Accessor<T>;
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
   value?: T,
-  options?: MemoOptions<T>
+  options?: MemoOptions<T>,
 ): Accessor<T> {
   if (process.env.SSR) {
     let calculated = false;
@@ -450,7 +476,7 @@ export function createLazyMemo<T>(
             return lastest!;
           },
           lastest,
-          options
+          options,
         );
       }, owner);
     }
@@ -543,11 +569,11 @@ export type CacheOptions<Value> = MemoOptions<Value> & { size?: number };
 export function createMemoCache<Key, Value>(
   key: Accessor<Key>,
   calc: CacheCalculation<Key, Value>,
-  options?: CacheOptions<Value>
+  options?: CacheOptions<Value>,
 ): Accessor<Value>;
 export function createMemoCache<Key, Value>(
   calc: CacheCalculation<Key, Value>,
-  options?: CacheOptions<Value>
+  options?: CacheOptions<Value>,
 ): CacheKeyAccessor<Key, Value>;
 export function createMemoCache<Key, Value>(
   ...args:
@@ -564,7 +590,7 @@ export function createMemoCache<Key, Value>(
   const run: CacheKeyAccessor<Key, Value> = key => {
     if (cache.has(key)) return (cache.get(key) as Accessor<Value>)();
     const memo = runWithOwner(owner, () =>
-      createLazyMemo<Value>(prev => calc(key, prev), undefined, options)
+      createLazyMemo<Value>(prev => calc(key, prev), undefined, options),
     )!;
     if (options.size === undefined || cache.size < options.size) cache.set(key, memo);
     return memo();
@@ -588,7 +614,7 @@ export function createMemoCache<Key, Value>(
 export function createReducer<T, ActionData extends Array<any>>(
   dispatcher: (state: T, ...args: ActionData) => T,
   initialValue: T,
-  options?: SignalOptions<T>
+  options?: SignalOptions<T>,
 ): [accessor: Accessor<T>, dispatch: (...args: ActionData) => void] {
   const [state, setState] = createSignal(initialValue, options);
 

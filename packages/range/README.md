@@ -47,7 +47,7 @@ function repeat<T>(
   mapFn: (i: number) => T,
   options?: {
     fallback?: Accessor<T>;
-  }
+  },
 ): Accessor<T[]>;
 ```
 
@@ -112,7 +112,7 @@ function mapRange<T>(
   mapFn: (n: number) => T,
   options?: {
     fallback?: Accessor<T>;
-  }
+  },
 ): Accessor<T[]>;
 ```
 
@@ -165,7 +165,7 @@ function Range<T>(
   props: RangeProps & {
     fallback?: T;
     children: ((number: number) => T) | T;
-  }
+  },
 ): Accessor<T[]>;
 ```
 
@@ -187,7 +187,7 @@ const mapped = indexRange(
     const [value, setValue] = createSignal(number());
     createEffect(() => handleNewNumber(number()));
     return value;
-  }
+  },
 );
 mapped(); // => [0, 0.5, 1, 1.5, 2...]
 setTo(3); // changes the output array, mapping only added indexes
@@ -203,7 +203,7 @@ function indexRange<T>(
   mapFn: (n: Accessor<number>) => T,
   options?: {
     fallback?: Accessor<T>;
-  }
+  },
 ): Accessor<T[]>;
 ```
 
@@ -256,7 +256,7 @@ function IndexRange<T>(
   props: RangeProps & {
     fallback?: T;
     children: ((number: Accessor<number>) => T) | T;
-  }
+  },
 ): Accessor<T[]>;
 ```
 

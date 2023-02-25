@@ -27,7 +27,7 @@ const getActiveElement = () =>
  * clear();
  */
 export function makeActiveElementListener(
-  callback: (element: Element | null) => void
+  callback: (element: Element | null) => void,
 ): VoidFunction {
   if (process.env.SSR) {
     return () => void 0;
@@ -71,7 +71,7 @@ export function createActiveElement(): Accessor<Element | null> {
 export function makeFocusListener(
   target: Element,
   callback: (isActive: boolean) => void,
-  useCapture = true
+  useCapture = true,
 ): VoidFunction {
   if (process.env.SSR) {
     return () => void 0;
@@ -96,7 +96,7 @@ export function createFocusSignal(target: MaybeAccessor<Element>): Accessor<bool
   }
   const [isActive, setIsActive] = createHydrateSignal(
     false,
-    () => document.activeElement === target
+    () => document.activeElement === target,
   );
   createEventListener(target, "blur", () => setIsActive(false), true);
   createEventListener(target, "focus", () => setIsActive(true), true);

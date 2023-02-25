@@ -4,7 +4,7 @@ export type PointerCallback = (activeEvents: PointerEvent[], event: PointerEvent
 function downHandler(
   downEvent: PointerEvent,
   activeEvents: Map<number, PointerEvent>,
-  downCallback: PointerCallback | undefined
+  downCallback: PointerCallback | undefined,
 ) {
   activeEvents.set(downEvent.pointerId, downEvent);
 
@@ -14,7 +14,7 @@ function downHandler(
 function moveHandler(
   moveEvent: PointerEvent,
   activeEvents: Map<number, PointerEvent>,
-  moveCallback: PointerCallback | undefined
+  moveCallback: PointerCallback | undefined,
 ) {
   activeEvents.set(moveEvent.pointerId, moveEvent);
   moveCallback?.(Array.from(activeEvents.values()), moveEvent);
@@ -25,7 +25,7 @@ function upHandler(
   downEvent: PointerEvent,
   activeEvents: Map<number, PointerEvent>,
   upCallback: PointerCallback | undefined,
-  removeHandlersCallback: () => void
+  removeHandlersCallback: () => void,
 ) {
   if (upEvent.pointerId === downEvent.pointerId) {
     activeEvents.delete(upEvent.pointerId);
@@ -41,7 +41,7 @@ export function registerPointerListener(
   node: HTMLElement,
   downCallback?: PointerCallback,
   moveCallback?: PointerCallback,
-  upCallback?: PointerCallback
+  upCallback?: PointerCallback,
 ) {
   const activeEvents = new Map<number, PointerEvent>();
 

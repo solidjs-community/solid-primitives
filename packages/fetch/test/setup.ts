@@ -1,7 +1,7 @@
 class ResponseMock {
   constructor(
     public body: BodyInit | null,
-    private init: ResponseInit & { redirected: boolean; type: "cors" | "basic"; url: string }
+    private init: ResponseInit & { redirected: boolean; type: "cors" | "basic"; url: string },
   ) {}
   get status() {
     return this.init.status || -1;
@@ -50,8 +50,8 @@ class ResponseMock {
     return () =>
       Promise.resolve(
         new Blob([(this.body ?? "").toString()], {
-          type: this.headers.get("content-type") || "text/plain"
-        })
+          type: this.headers.get("content-type") || "text/plain",
+        }),
       );
   }
   get text() {
@@ -111,5 +111,5 @@ class HeadersMock {
 Object.defineProperty(globalThis, "fetch", {
   configurable: true,
   enumerable: true,
-  value: undefined
+  value: undefined,
 });

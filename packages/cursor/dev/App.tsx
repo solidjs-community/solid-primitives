@@ -36,7 +36,7 @@ const CURSORS = [
   "w-resize",
   "wait",
   "zoom-in",
-  "zoom-out"
+  "zoom-out",
 ] as const;
 
 const BodyCursorTest: Component = () => {
@@ -93,7 +93,7 @@ const ElementCursorTest: Component = () => {
               class="node"
               onClick={() => setTarget(ref!)}
               classList={{
-                "bg-red-700": ref === target()
+                "bg-red-700": ref === target(),
               }}
             >
               {i + 1}

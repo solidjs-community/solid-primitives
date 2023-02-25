@@ -12,7 +12,7 @@ export type Fetcher<Result, FetcherArgs> = Exclude<
 
 export const wrapFetcher = <Result extends unknown, FetcherArgs extends any[]>(
   requestContext: RequestContext<Result, FetcherArgs>,
-  wrapper: (originalFetcher: Fetcher<Result, FetcherArgs>) => Fetcher<Result, FetcherArgs>
+  wrapper: (originalFetcher: Fetcher<Result, FetcherArgs>) => Fetcher<Result, FetcherArgs>,
 ) => {
   const originalFetcher = requestContext.fetcher;
   if (!originalFetcher) {
@@ -25,8 +25,8 @@ export const wrapFetcher = <Result extends unknown, FetcherArgs extends any[]>(
 export const wrapResource = <Result, FetcherArgs>(
   requestContext: RequestContext<Result, FetcherArgs>,
   wrapper: (
-    requestContext: RequestContext<Result, FetcherArgs>
-  ) => [props?: { [key: string]: any }, actions?: { [key: string]: any }]
+    requestContext: RequestContext<Result, FetcherArgs>,
+  ) => [props?: { [key: string]: any }, actions?: { [key: string]: any }],
 ) => {
   if (!requestContext.resource) {
     throw new Error("could not read resource");
@@ -63,18 +63,18 @@ export const withAbort: RequestModifier =
           }
           throw err;
         });
-      }
+      },
     );
     requestContext.wrapResource();
     wrapResource(requestContext, requestContext => [
       {
         aborted: { get: () => requestContext.abortController?.signal.aborted || false },
         status: { get: () => requestContext.response?.status },
-        response: { get: () => requestContext.response }
+        response: { get: () => requestContext.response },
       },
       {
-        abort: () => requestContext.abortController?.abort()
-      }
+        abort: () => requestContext.abortController?.abort(),
+      },
     ]);
   };
 
@@ -90,7 +90,7 @@ export const withTimeout: RequestModifier = (timeout: number) => requestContext 
         originalFetcher(requestData, info)
           .then(resolve as any)
           .catch(reject);
-      })
+      }),
   );
   requestContext.wrapResource();
 };
@@ -103,16 +103,16 @@ export const withCatchAll: RequestModifier = () => requestContext => {
       originalFetcher(requestData, info).catch((err: Error) => {
         setError(err);
         return Promise.resolve(info.value) as any;
-      })
+      }),
   );
   requestContext.wrapResource();
   const originalResource = requestContext.resource;
   requestContext.resource = [
     Object.defineProperties(() => originalResource?.[0](), {
       ...Object.getOwnPropertyDescriptors(originalResource?.[0]),
-      error: { get: () => error() }
+      error: { get: () => error() },
     }),
-    originalResource?.[1]
+    originalResource?.[1],
   ] as typeof originalResource;
 };
 
@@ -132,12 +132,12 @@ export const withRetry: RequestModifier =
   <Result extends unknown, FetcherArgs extends any[]>(
     retries: number,
     wait: number | ((attempt: number) => number) = defaultWait,
-    verify = (response?: Response) => response?.ok
+    verify = (response?: Response) => response?.ok,
   ) =>
   requestContext => {
     const waitForAttempt = (attempt: number) =>
       new Promise<void>(resolve =>
-        setTimeout(resolve, typeof wait === "number" ? wait : wait(attempt))
+        setTimeout(resolve, typeof wait === "number" ? wait : wait(attempt)),
       );
     wrapFetcher<Result, FetcherArgs>(
       requestContext as unknown as RequestContext<Result, FetcherArgs>,
@@ -148,12 +148,12 @@ export const withRetry: RequestModifier =
                 .then(data =>
                   !verify(requestContext.response)
                     ? waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1))
-                    : data
+                    : data,
                 )
                 .catch(() => waitForAttempt(attempt).then(() => wrappedFetcher(attempt + 1)))
             : originalFetcher(requestData, info);
         return wrappedFetcher(0);
-      }
+      },
     );
     requestContext.wrapResource();
   };
@@ -168,11 +168,11 @@ export const withRefetchEvent: RequestModifier = process.env.SSR
       requestContext.wrapResource();
     }
   : <Result extends unknown, FetcherArgs extends any[]>(
-        options: RefetchEventOptions<Result, FetcherArgs> = {}
+        options: RefetchEventOptions<Result, FetcherArgs> = {},
       ) =>
       (requestContext: RequestContext<Result, FetcherArgs>) => {
         const lastRequestRef: { current: [requestData: FetcherArgs, data?: Result] | undefined } = {
-          current: undefined
+          current: undefined,
         };
         wrapFetcher<Result, FetcherArgs>(requestContext, originalFetcher => (...args) => {
           lastRequestRef.current = [args as any, undefined];
@@ -219,7 +219,7 @@ export const withAggregation: RequestModifier =
               : current != null
               ? ([current, next] as Result)
               : next;
-          })
+          }),
     );
     requestContext.wrapResource();
   };

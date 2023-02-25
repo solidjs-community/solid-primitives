@@ -4,14 +4,14 @@ import {
   access,
   asArray,
   Directive,
-  tryOnCleanup
+  tryOnCleanup,
 } from "@solid-primitives/utils";
 import { Accessor, createEffect, createRenderEffect, createSignal } from "solid-js";
 import {
   EventListenerDirectiveProps,
   EventMapOf,
   TargetWithEventMap,
-  EventListenerOptions
+  EventListenerOptions,
 } from "./types";
 
 /**
@@ -33,30 +33,30 @@ import {
 export function makeEventListener<
   Target extends TargetWithEventMap,
   EventMap extends EventMapOf<Target>,
-  EventType extends keyof EventMap
+  EventType extends keyof EventMap,
 >(
   target: Target,
   type: EventType,
   handler: (event: EventMap[EventType]) => void,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): VoidFunction;
 
 // Custom Events
 export function makeEventListener<
   EventMap extends Record<string, Event>,
-  EventType extends keyof EventMap = keyof EventMap
+  EventType extends keyof EventMap = keyof EventMap,
 >(
   target: EventTarget,
   type: EventType,
   handler: (event: EventMap[EventType]) => void,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): VoidFunction;
 
 export function makeEventListener(
   target: EventTarget,
   type: string,
   handler: (event: Event) => void,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): VoidFunction {
   target.addEventListener(type, handler, options);
   return tryOnCleanup(target.removeEventListener.bind(target, type, handler, options));
@@ -82,30 +82,30 @@ export function makeEventListener(
 export function createEventListener<
   Target extends TargetWithEventMap,
   EventMap extends EventMapOf<Target>,
-  EventType extends keyof EventMap
+  EventType extends keyof EventMap,
 >(
   target: MaybeAccessor<Many<Target | undefined>>,
   type: MaybeAccessor<Many<EventType>>,
   handler: (event: EventMap[EventType]) => void,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): void;
 
 // Custom Events
 export function createEventListener<
   EventMap extends Record<string, Event>,
-  EventType extends keyof EventMap = keyof EventMap
+  EventType extends keyof EventMap = keyof EventMap,
 >(
   target: MaybeAccessor<Many<EventTarget | undefined>>,
   type: MaybeAccessor<Many<EventType>>,
   handler: (event: EventMap[EventType]) => void,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): void;
 
 export function createEventListener(
   targets: MaybeAccessor<Many<EventTarget | undefined>>,
   type: MaybeAccessor<Many<string>>,
   handler: (event: Event) => void,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): void {
   if (process.env.SSR) return;
 
@@ -152,27 +152,27 @@ export function createEventListener(
 export function createEventSignal<
   Target extends TargetWithEventMap,
   EventMap extends EventMapOf<Target>,
-  EventType extends keyof EventMap
+  EventType extends keyof EventMap,
 >(
   target: MaybeAccessor<Many<Target>>,
   type: MaybeAccessor<Many<EventType>>,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): Accessor<EventMap[EventType]>;
 
 // Custom Events
 export function createEventSignal<
   EventMap extends Record<string, Event>,
-  EventType extends keyof EventMap = keyof EventMap
+  EventType extends keyof EventMap = keyof EventMap,
 >(
   target: MaybeAccessor<Many<EventTarget>>,
   type: MaybeAccessor<Many<EventType>>,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): Accessor<EventMap[EventType]>;
 
 export function createEventSignal(
   target: MaybeAccessor<Many<EventTarget>>,
   type: MaybeAccessor<Many<string>>,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): Accessor<Event | undefined> {
   if (process.env.SSR) {
     return () => undefined;

@@ -75,7 +75,7 @@ clear();
 function makeFocusListener(
   target: Element,
   callback: (isActive: boolean) => void,
-  useCapture?: boolean
+  useCapture?: boolean,
 ): VoidFunction;
 ```
 

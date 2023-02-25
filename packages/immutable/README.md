@@ -40,7 +40,7 @@ setList(p => push(p, 4));
 
 const [user, setUser] = createSignal({
   name: "John",
-  street: { name: "Kingston Cei", number: 24 }
+  street: { name: "Kingston Cei", number: 24 },
 });
 setUser(p => update(p, "street", "number", 64));
 ```
