@@ -38,7 +38,7 @@ createEffect(() => {
     bounds.top, // => number
     bounds.left, // => number
     bounds.right, // => number
-    bounds.bottom // => number
+    bounds.bottom, // => number
   );
 });
 ```
@@ -74,7 +74,7 @@ These types of tracking are available: _(all are enabled by default)_
 // won't track mutations nor scroll events
 const bounds = createElementBounds(target, {
   trackScroll: false,
-  trackMutation: false
+  trackMutation: false,
 });
 ```
 
@@ -92,7 +92,7 @@ const throttleUpdate: UpdateGuard = fn => throttle(fn, 500);
 
 const bounds = createElementBounds(target, {
   trackMutation: throttleUpdate,
-  trackScroll: throttleUpdate
+  trackScroll: throttleUpdate,
 });
 ```
 

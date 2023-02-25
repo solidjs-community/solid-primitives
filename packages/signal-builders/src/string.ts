@@ -22,7 +22,7 @@ export const capitalize = (string: Accessor<string>) =>
 export const substring = (
   string: MaybeAccessor<string>,
   start: MaybeAccessor<number>,
-  end?: MaybeAccessor<number>
+  end?: MaybeAccessor<number>,
 ) => createMemo(() => access(string).substring(access(start), access(end)));
 
 // a string primitive harvested from @lxsmnsyc's solid-use:

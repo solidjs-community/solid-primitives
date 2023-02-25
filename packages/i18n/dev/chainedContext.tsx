@@ -5,7 +5,7 @@ import { dict } from "../test/setup";
 
 const [I18nProvider, useI18nContext] = createChainedI18nContext({
   dictionaries: dict,
-  locale: "en"
+  locale: "en",
 });
 
 export const useI18n = () => {

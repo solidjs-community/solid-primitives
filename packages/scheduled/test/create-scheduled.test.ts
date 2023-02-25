@@ -50,7 +50,7 @@ describe("createScheduled", () => {
             resolve();
             dispose();
           });
-        })
+        }),
     );
   });
 
@@ -69,7 +69,7 @@ describe("createScheduled", () => {
             resolve();
             dispose();
           });
-        })
+        }),
     );
   });
 

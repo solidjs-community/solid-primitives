@@ -53,7 +53,7 @@ createPointerListeners({
   onEnter: e => console.log("enter", e.x, e.y),
   onmove: e => console.log({ x: e.x, y: e.y }),
   onup: e => console.log("pointer up", e.x, e.y),
-  onLostCapture: e => console.log("lost")
+  onLostCapture: e => console.log("lost"),
 });
 ```
 
@@ -133,7 +133,7 @@ Primitive takes one `config` argument, of options:
 ```ts
 const position = createPointerPosition({
   target: document.querySelector("my-el"),
-  pointerTypes: ["touch"]
+  pointerTypes: ["touch"],
 });
 
 createEffect(() => {

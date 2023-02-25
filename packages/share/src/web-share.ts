@@ -67,7 +67,7 @@ export type ShareStatus = {
  */
 export const createWebShare = (
   data: Accessor<ShareData>,
-  deferInitial: boolean = false
+  deferInitial: boolean = false,
 ): ShareStatus => {
   if (process.env.SSR) {
     return {};
@@ -83,8 +83,8 @@ export const createWebShare = (
           .then(() => setStatus({ status: true }))
           .catch(e => setStatus({ status: false, message: e.toString() }));
       },
-      { defer: deferInitial } satisfies OnOptions as any
-    )
+      { defer: deferInitial } satisfies OnOptions as any,
+    ),
   );
 
   return {
@@ -93,6 +93,6 @@ export const createWebShare = (
     },
     get message() {
       return status().message;
-    }
+    },
   };
 };

@@ -35,7 +35,7 @@ describe("createScriptLoader", () => {
         src: "https://localhost:3000/script.js",
         onLoad: () => {
           loadCalled = true;
-        }
+        },
       });
       dispatchAndWait(script, "load");
       expect(loadCalled).toBe(true);
@@ -50,7 +50,7 @@ describe("createScriptLoader", () => {
         src: "https://localhost:3000/script.js",
         onError: () => {
           errorCalled = true;
-        }
+        },
       });
       dispatchAndWait(script, "error");
       expect(errorCalled).toBe(true);
@@ -65,7 +65,7 @@ describe("createScriptLoader", () => {
         const [src, setSrc] = createSignal("https://localhost:3000/script.js");
         const script = createScriptLoader({
           src: src,
-          onLoad: () => setSrc("https://localhost:3000/script2.js")
+          onLoad: () => setSrc("https://localhost:3000/script2.js"),
         });
         actualSrcUrls.push(script?.src);
         await dispatchAndWait(script, "load");
@@ -74,11 +74,11 @@ describe("createScriptLoader", () => {
           dispose();
           resolve();
         });
-      })
+      }),
     );
     expect(actualSrcUrls).toEqual([
       "https://localhost:3000/script.js",
-      "https://localhost:3000/script2.js"
+      "https://localhost:3000/script2.js",
     ]);
   });
 

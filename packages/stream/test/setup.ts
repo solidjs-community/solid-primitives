@@ -9,20 +9,20 @@ if (!window.AudioContext) {
           frequencyBinCount: 128,
           getByteFrequencyData: array => {
             array.set([...array].map(() => (Math.random() * 255) | 0));
-          }
+          },
         } as AnalyserNode,
         {
           connect: () => null,
-          disconnect: () => null
-        }
+          disconnect: () => null,
+        },
       );
     }
     createMediaStreamSource(mediaStream) {
       return Object.assign(
         {
-          mediaStream
+          mediaStream,
         } as MediaStreamAudioSourceNode,
-        { connect: () => null, disconnect: () => null }
+        { connect: () => null, disconnect: () => null },
       );
     }
     close() {
@@ -40,12 +40,12 @@ if (!window.AudioContext) {
 (window as any).__mockstream__ = Object.assign(new EventTarget(), {
   getTracks: () => [],
   getVideoTracks: () => [],
-  getAudioTracks: () => []
+  getAudioTracks: () => [],
 });
 
 (navigator as any).mediaDevices = {
   getUserMedia: (constraints: MediaStreamConstraints) => {
     const fakeMediaStream: MediaStream = (window as any).__mockstream__;
     return Promise.resolve(Object.assign(fakeMediaStream, constraints));
-  }
+  },
 };

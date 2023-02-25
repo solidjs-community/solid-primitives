@@ -9,7 +9,7 @@ describe("ReactiveMap", () => {
 
     const map = new ReactiveMap<any, any>([
       [obj1, 123],
-      [1, "foo"]
+      [1, "foo"],
     ]);
 
     expect(map.has(obj1)).toBe(true);
@@ -41,7 +41,7 @@ describe("ReactiveMap", () => {
         [1, {}],
         [1, {}],
         [2, {}],
-        [3, {}]
+        [3, {}],
       ]);
 
       const captured: any[] = [];
@@ -79,7 +79,7 @@ describe("ReactiveMap", () => {
         [1, obj1],
         [1, obj2],
         [2, obj3],
-        [3, obj4]
+        [3, obj4],
       ]);
 
       const fn = vi.fn();
@@ -114,7 +114,7 @@ describe("ReactiveMap", () => {
         [1, "a"],
         [1, "b"],
         [2, "c"],
-        [3, "d"]
+        [3, "d"],
       ]);
 
       const captured: any[] = [];
@@ -161,7 +161,7 @@ describe("ReactiveMap", () => {
         [1, {}],
         [1, {}],
         [2, {}],
-        [3, {}]
+        [3, {}],
       ]);
 
       const captured: any[] = [];
@@ -235,7 +235,7 @@ describe("ReactiveWeakMap", () => {
 
       const map = new ReactiveWeakMap<object, any>([
         [obj1, 123],
-        [obj2, 123]
+        [obj2, 123],
       ]);
 
       const captured: any[] = [];

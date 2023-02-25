@@ -15,7 +15,7 @@ export type Bounds = {
 export type NullableBounds = Bounds | typeof NULLED_BOUNDS;
 
 export type UpdateGuard = <Args extends unknown[]>(
-  update: (...args: Args) => void
+  update: (...args: Args) => void,
 ) => (...args: Args) => void;
 
 export type Options = {
@@ -30,7 +30,7 @@ const NULLED_BOUNDS = {
   bottom: null,
   right: null,
   width: null,
-  height: null
+  height: null,
 } as const;
 
 /**
@@ -49,7 +49,7 @@ export function getElementBounds(element: Element | undefined | null | false): N
     bottom: rect.bottom,
     right: rect.right,
     width: rect.width,
-    height: rect.height
+    height: rect.height,
   };
 }
 
@@ -81,15 +81,15 @@ export function getElementBounds(element: Element | undefined | null | false): N
  */
 export function createElementBounds(
   target: Accessor<Element> | Element,
-  options?: Options
+  options?: Options,
 ): Readonly<Bounds>;
 export function createElementBounds(
   target: Accessor<Element | undefined | null | false> | Element,
-  options?: Options
+  options?: Options,
 ): Readonly<NullableBounds>;
 export function createElementBounds(
   target: Accessor<Element | undefined | null | false> | Element,
-  { trackMutation = true, trackResize = true, trackScroll = true }: Options = {}
+  { trackMutation = true, trackResize = true, trackScroll = true }: Options = {},
 ): Readonly<NullableBounds> {
   if (process.env.SSR) {
     return Object.assign({}, NULLED_BOUNDS);
@@ -109,7 +109,7 @@ export function createElementBounds(
     const resizeHandler: ResizeHandler = (_, el) => updateBoundsOf(el);
     createResizeObserver(
       typeof target === "function" ? () => target() || [] : target,
-      typeof trackResize === "function" ? trackResize(resizeHandler) : resizeHandler
+      typeof trackResize === "function" ? trackResize(resizeHandler) : resizeHandler,
     );
   }
 
@@ -127,18 +127,18 @@ export function createElementBounds(
       window,
       "scroll",
       typeof trackScroll === "function" ? trackScroll(scrollHandler) : scrollHandler,
-      { capture: true }
+      { capture: true },
     );
   }
 
   if (trackMutation) {
     const mo = new MutationObserver(
-      typeof trackMutation === "function" ? trackMutation(updateBounds) : updateBounds
+      typeof trackMutation === "function" ? trackMutation(updateBounds) : updateBounds,
     );
     mo.observe(document.body, {
       attributeFilter: ["style", "class"],
       subtree: true,
-      childList: true
+      childList: true,
     });
     onCleanup(mo.disconnect.bind(mo));
   }

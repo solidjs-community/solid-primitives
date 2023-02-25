@@ -124,7 +124,7 @@ export type SignalSet<T> = Accessor<T[]> & ReactiveSet<T>;
 export function createSet<T>(initial?: T[]): SignalSet<T> {
   const set = new ReactiveSet(initial);
   return new Proxy(() => [...set], {
-    get: (_, b) => set[b as keyof ReactiveSet<T>]
+    get: (_, b) => set[b as keyof ReactiveSet<T>],
   }) as SignalSet<T>;
 }
 

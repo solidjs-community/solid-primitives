@@ -48,12 +48,12 @@ describe("createTimes", () => {
       createTimer(
         () => timeoutCount++,
         () => !paused() && delay(),
-        setTimeout
+        setTimeout,
       );
       createTimer(
         () => intervalCount++,
         () => !paused() && delay(),
-        setInterval
+        setInterval,
       );
       setPaused(true);
       await sleep(300);

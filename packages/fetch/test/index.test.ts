@@ -8,14 +8,14 @@ import {
   withCatchAll,
   withRefetchEvent,
   withRetry,
-  withTimeout
+  withTimeout,
 } from "../src/modifiers";
 import { withCache, withCacheStorage, withRefetchOnExpiry } from "../src/cache";
 
 const mockResponseBody = { ready: true };
 const mockResponse = new Response(JSON.stringify(mockResponseBody), {
   headers: new Headers({ "content-type": "application/json" }),
-  status: 200
+  status: 200,
 });
 const mockUrl = "https://test.url/ready.json";
 const mockUrl2 = "https://test.url/notready.json";
@@ -45,7 +45,7 @@ describe("fetch primitive", () => {
       createRoot(dispose => {
         const fetchMock = () =>
           Promise.resolve(
-            new Response("it works", { headers: new Headers({ "Content-Type": "text/plain" }) })
+            new Response("it works", { headers: new Headers({ "Content-Type": "text/plain" }) }),
           );
         const [ready] = createFetch<string>(mockUrl, { fetch: fetchMock });
         createEffect(() => {
@@ -85,7 +85,7 @@ describe("fetch primitive", () => {
         window.setTimeout(() => {
           dispose();
           resolve();
-        }, 20)
+        }, 20),
       );
     }));
 
@@ -95,7 +95,7 @@ describe("fetch primitive", () => {
         const fetchError = new Error("TypeError: failed to fetch");
         const fetchMock = () => Promise.reject(fetchError);
         const [ready] = createFetch(() => mockUrl, {
-          fetch: fetchMock
+          fetch: fetchMock,
         });
         createEffect(() => {
           if (ready.error) {
@@ -104,7 +104,7 @@ describe("fetch primitive", () => {
             resolve();
           }
         });
-      })
+      }),
     ));
 
   test("will not start a request with a request info accessor returning undefined", () =>
@@ -136,7 +136,7 @@ describe("fetch primitive", () => {
         const [ready] = createFetch(mockUrl, { fetch: fetchMock }, [
           withTimeout(50),
           withAbort(),
-          withCatchAll()
+          withCatchAll(),
         ]);
         createEffect((iteration: number = 0) => {
           expect(ready.error).toEqual([undefined, new Error("timeout")][iteration]);
@@ -146,7 +146,7 @@ describe("fetch primitive", () => {
           }
           return iteration + 1;
         });
-      })
+      }),
     ));
 
   test("retries request if fails on first try", () =>
@@ -160,7 +160,7 @@ describe("fetch primitive", () => {
             : Promise.reject(new Error("TypeError: Failed to fetch"));
         };
         const [ready] = createFetch<typeof mockResponseBody>(url, { fetch: fetchMock }, [
-          withRetry(1, 0)
+          withRetry(1, 0),
         ]);
         createEffect((iteration: number = 0) => {
           const data = ready();
@@ -174,7 +174,7 @@ describe("fetch primitive", () => {
           }
           return iteration + 1;
         });
-      })
+      }),
     ));
 
   test("re-fetches request after a set event", () =>
@@ -187,7 +187,7 @@ describe("fetch primitive", () => {
           return Promise.resolve(mockResponse);
         };
         const [ready] = createFetch<typeof mockResponseBody>(url, { fetch: fetchMock }, [
-          withRefetchEvent({ on: ["refetch"] })
+          withRefetchEvent({ on: ["refetch"] }),
         ]);
         createEffect(() => {
           const data = ready.error ? undefined : ready();
@@ -202,7 +202,7 @@ describe("fetch primitive", () => {
             resolve();
           }
         });
-      })
+      }),
     ));
 
   test("aggregates numbers", () =>
@@ -213,11 +213,11 @@ describe("fetch primitive", () => {
         const fetchMock = () =>
           Promise.resolve(
             new Response("" + calls++, {
-              headers: new Headers({ "Content-type": "application/json" })
-            })
+              headers: new Headers({ "Content-type": "application/json" }),
+            }),
           );
         const [numbers] = createFetch<number | number[]>(url, { fetch: fetchMock }, [
-          withAggregation()
+          withAggregation(),
         ]);
         createEffect(() => {
           const data = numbers.error ? undefined : numbers();
@@ -233,7 +233,7 @@ describe("fetch primitive", () => {
             resolve();
           }
         });
-      })
+      }),
     ));
 
   test("aggregates strings", () =>
@@ -244,8 +244,8 @@ describe("fetch primitive", () => {
         const fetchMock = () =>
           Promise.resolve(
             new Response('"' + calls++ + '"', {
-              headers: new Headers({ "Content-type": "application/json" })
-            })
+              headers: new Headers({ "Content-type": "application/json" }),
+            }),
           );
         const [strings] = createFetch<string>(url, { fetch: fetchMock }, [withAggregation()]);
         createEffect(() => {
@@ -262,7 +262,7 @@ describe("fetch primitive", () => {
             resolve();
           }
         });
-      })
+      }),
     ));
 
   test("aggregates arrays", () =>
@@ -273,8 +273,8 @@ describe("fetch primitive", () => {
         const fetchMock = () =>
           Promise.resolve(
             new Response("[" + calls++ + "]", {
-              headers: new Headers({ "Content-type": "application/json" })
-            })
+              headers: new Headers({ "Content-type": "application/json" }),
+            }),
           );
         const [array] = createFetch<number[]>(url, { fetch: fetchMock }, [withAggregation()]);
         createEffect(() => {
@@ -291,7 +291,7 @@ describe("fetch primitive", () => {
             resolve();
           }
         });
-      })
+      }),
     ));
 
   test("aggregates objects", () =>
@@ -302,11 +302,11 @@ describe("fetch primitive", () => {
         const fetchMock = () =>
           Promise.resolve(
             new Response('{ "' + calls++ + '": true }', {
-              headers: new Headers({ "Content-type": "application/json" })
-            })
+              headers: new Headers({ "Content-type": "application/json" }),
+            }),
           );
         const [array] = createFetch<Record<string, boolean>>(url, { fetch: fetchMock }, [
-          withAggregation()
+          withAggregation(),
         ]);
         createEffect(() => {
           const data = array.error ? undefined : array();
@@ -322,7 +322,7 @@ describe("fetch primitive", () => {
             resolve();
           }
         });
-      })
+      }),
     ));
 
   test("caches request instead of making them twice", () =>
@@ -336,7 +336,7 @@ describe("fetch primitive", () => {
           return Promise.resolve(mockResponse);
         };
         const [ready] = createFetch(url, { fetch: fetchMock }, [
-          withCache({ cache, expires: 100000 })
+          withCache({ cache, expires: 100000 }),
         ]);
         createEffect((iteration: number = 0) => {
           ready();
@@ -356,7 +356,7 @@ describe("fetch primitive", () => {
           }
           return iteration + 1;
         });
-      })
+      }),
     ));
 
   test("invalidates cached request", () =>
@@ -388,7 +388,7 @@ describe("fetch primitive", () => {
           }
           return iteration + 1;
         });
-      })
+      }),
     ));
 
   test("re-fetches after expiry", () =>
@@ -404,7 +404,7 @@ describe("fetch primitive", () => {
         };
         const [ready] = createFetch(url, { fetch: fetchMock }, [
           withCache({ cache, expires: 10000 }),
-          withRefetchOnExpiry()
+          withRefetchOnExpiry(),
         ]);
         createEffect((iteration: number = 0) => {
           ready();
@@ -421,7 +421,7 @@ describe("fetch primitive", () => {
           }
           return iteration + 1;
         });
-      })
+      }),
     ));
 
   test("loads and saves cache to localStorage", () =>
@@ -440,13 +440,13 @@ describe("fetch primitive", () => {
             [JSON.stringify({ url: mockUrl })]: {
               ts: new Date().getTime(),
               requestData: [mockUrl],
-              data: mockResponseBody
-            }
-          })
+              data: mockResponseBody,
+            },
+          }),
         );
         const [ready] = createFetch(url, { fetch: fetchMock }, [
           withCache({ cache, expires: 10000 }),
-          withCacheStorage()
+          withCacheStorage(),
         ]);
         createEffect((iteration: number = 0) => {
           ready();
@@ -470,6 +470,6 @@ describe("fetch primitive", () => {
           }
           return iteration + 1;
         });
-      })
+      }),
     ));
 });

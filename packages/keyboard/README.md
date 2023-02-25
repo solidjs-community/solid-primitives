@@ -137,7 +137,7 @@ createShortcut(
   () => {
     console.log("Shortcut triggered");
   },
-  { preventDefault: false, requireReset: true }
+  { preventDefault: false, requireReset: true },
 );
 ```
 

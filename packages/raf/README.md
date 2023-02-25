@@ -44,7 +44,7 @@ running(); // => true
 
 ```ts
 function createRAF(
-  callback: FrameRequestCallback
+  callback: FrameRequestCallback,
 ): [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction];
 ```
 
@@ -80,7 +80,7 @@ createRAF(targetFPS((timestamp) => {...}, fps));
 ```ts
 function targetFPS(
   callback: FrameRequestCallback,
-  fps: MaybeAccessor<number>
+  fps: MaybeAccessor<number>,
 ): FrameRequestCallback;
 ```
 

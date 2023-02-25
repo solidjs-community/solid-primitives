@@ -64,7 +64,7 @@ userPoints.set(user1, { foo: "bar" });
 ```ts
 const map = new ReactiveMap([
   ["foo", [1, 2, 3]],
-  ["bar", [3, 4, 5]]
+  ["bar", [3, 4, 5]],
 ]);
 ```
 

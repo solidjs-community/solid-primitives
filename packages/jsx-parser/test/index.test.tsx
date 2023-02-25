@@ -10,7 +10,7 @@ describe("jsx-parser", () => {
 
   const MyToken1 = createToken(parser1, (props: { text: string }) => ({
     type: "my-token",
-    props
+    props,
   }));
 
   it("should work", () => {
@@ -60,7 +60,7 @@ describe("jsx-parser", () => {
       const MyToken = createToken(
         parser,
         () => ({}),
-        (props: { text: string }) => <div>{props.text}</div>
+        (props: { text: string }) => <div>{props.text}</div>,
       );
 
       const rendered1 = children(() => <MyToken text="foo" />);
@@ -96,7 +96,7 @@ describe("jsx-parser", () => {
       const MyToken = createToken(parser, () => ({
         get n() {
           return count++;
-        }
+        },
       }));
 
       const tokens = resolveTokens(parser, () => <MyToken text="foo" />);

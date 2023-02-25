@@ -15,7 +15,7 @@ export type TimeoutSource = number | Accessor<number | false>;
 export const makeTimer = (
   fn: VoidFunction,
   delay: number,
-  timer: typeof setTimeout | typeof setInterval
+  timer: typeof setTimeout | typeof setInterval,
 ): VoidFunction => {
   if (process.env.SSR) {
     return () => void 0;
@@ -39,7 +39,7 @@ export const makeTimer = (
 export const createTimer = (
   fn: VoidFunction,
   delay: TimeoutSource,
-  timer: typeof setTimeout | typeof setInterval
+  timer: typeof setTimeout | typeof setInterval,
 ): void => {
   if (process.env.SSR) {
     return void 0;
@@ -90,7 +90,7 @@ export const createTimer = (
             callHandler();
           },
           (1 - fractionDone) * currDelay,
-          setTimeout
+          setTimeout,
         );
         return currDelay;
       }
@@ -128,7 +128,7 @@ export const createTimeoutLoop = (handler: VoidFunction, timeout: TimeoutSource)
         setCurrentTimeout(timeout);
       },
       currTimeout,
-      setInterval
+      setInterval,
     );
   });
 };
@@ -153,19 +153,19 @@ export function createPolled<T extends P, P = T>(
   fn: (prev: P | Exclude<undefined, P>) => T,
   timeout: TimeoutSource,
   value?: undefined,
-  options?: SignalOptions<T>
+  options?: SignalOptions<T>,
 ): Accessor<T>;
 export function createPolled<T extends P, I = T, P = T>(
   fn: (prev: P | I) => T,
   timeout: TimeoutSource,
   value: I,
-  options?: SignalOptions<T>
+  options?: SignalOptions<T>,
 ): Accessor<T>;
 export function createPolled<T>(
   fn: (prev: T | undefined) => T,
   timeout: TimeoutSource,
   value?: T,
-  options?: SignalOptions<T>
+  options?: SignalOptions<T>,
 ): Accessor<T> {
   if (process.env.SSR) {
     return fn as Accessor<T>;
@@ -186,7 +186,7 @@ export function createPolled<T>(
  */
 export const createIntervalCounter = (
   timeout: TimeoutSource,
-  options?: SignalOptions<number>
+  options?: SignalOptions<number>,
 ): Accessor<number> => {
   if (process.env.SSR) {
     return () => 0;

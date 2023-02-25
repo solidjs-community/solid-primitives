@@ -65,11 +65,11 @@ Chained functions will always return `void`. If you want to get the returned val
 const combined = combineProps(
   {
     onClick: e => {},
-    onclick: e => {}
+    onclick: e => {},
   },
   {
-    onClick: [(n, e) => {}, 123]
-  }
+    onClick: [(n, e) => {}, 123],
+  },
 );
 // combined.onClick() will call all 3 of the functions above
 ```
@@ -92,7 +92,7 @@ styles; // { margin: "24px", border: "1px solid #121212" }
 ```ts
 const styles = combineStyle("margin: 24px; border: 1px solid #121212", {
   margin: "2rem",
-  padding: "16px"
+  padding: "16px",
 });
 styles; // { margin: "2rem", border: "1px solid #121212", padding: "16px" }
 ```

@@ -20,7 +20,7 @@ interface MemoOptions<T> {
  */
 export function createCompositeMemo<Source extends Fn<any>[] | Fn<any>, U, Returns extends {}>(
   modifier: ModifierReturn<Source, U, Returns>,
-  options?: WatchOptions<U> & MemoOptions<U>
+  options?: WatchOptions<U> & MemoOptions<U>,
 ): [Accessor<U>, Returns];
 
 /**
@@ -38,7 +38,7 @@ export function createCompositeMemo<Source extends Fn<any>[] | Fn<any>, U, Retur
 export function createCompositeMemo<Source extends Fn<any>[], U>(
   source: [...Source],
   callback: EffectCallback<Source, U>,
-  options?: WatchOptions<U> & MemoOptions<U>
+  options?: WatchOptions<U> & MemoOptions<U>,
 ): Accessor<U>;
 
 /**
@@ -56,7 +56,7 @@ export function createCompositeMemo<Source extends Fn<any>[], U>(
 export function createCompositeMemo<Source extends Fn<any>, U>(
   source: Source,
   callback: EffectCallback<Source, U>,
-  options?: WatchOptions<U> & MemoOptions<U>
+  options?: WatchOptions<U> & MemoOptions<U>,
 ): Accessor<U>;
 
 export function createCompositeMemo(...a: any): Object {

@@ -4,7 +4,7 @@ import { StorageWithOptions } from ".";
  * adds a `.clear` method to a Storage without one only using `.key`/`.removeItem`
  */
 export const addClearMethod = <S extends Storage | StorageWithOptions<any>>(
-  storage: Omit<S, "clear"> & { clear?: () => void }
+  storage: Omit<S, "clear"> & { clear?: () => void },
 ): S => {
   if (typeof storage.clear === "function") {
     return storage as S;

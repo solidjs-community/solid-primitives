@@ -95,11 +95,11 @@ export const createWorkerPool = (
             // @ts-ignore
             return workers[current][0][method].apply(this, arguments);
           };
-        }
-      }
+        },
+      },
     ),
     start,
-    stop
+    stop,
   ];
 };
 
@@ -126,7 +126,7 @@ export const createSignaledWorker = (
       },
       () => {
         /*noop*/
-      }
+      },
     ];
   }
   const fns = [];
@@ -138,7 +138,7 @@ export const createSignaledWorker = (
           // @ts-ignore
           const result = await worker[func.name](input());
           if (output) output(result);
-        })
+        }),
       );
     }
     fns.push(func);

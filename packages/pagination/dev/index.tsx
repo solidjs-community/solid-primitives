@@ -6,7 +6,7 @@ import { createInfiniteScroll, createPagination } from "../src";
 async function fetcher(page: number) {
   let elements: string[] = [];
   let res = await fetch(`https://openlibrary.org/search.json?q=hello%20world&page=${page + 1}`, {
-    method: "GET"
+    method: "GET",
   });
   if (res.ok) {
     let json = await res.json();

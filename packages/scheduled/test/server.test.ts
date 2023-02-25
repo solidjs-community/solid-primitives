@@ -5,7 +5,7 @@ describe("on server", () => {
   const DATA: [string, (cb: (a: any) => void, time: number) => (a: any) => void][] = [
     ["debounce", (cb, time) => debounce(cb, time)],
     ["throttle", (cb, time) => throttle(cb, time)],
-    ["scheduleIdle", (cb, time) => scheduleIdle(cb, time)]
+    ["scheduleIdle", (cb, time) => scheduleIdle(cb, time)],
   ];
 
   DATA.forEach(([name, fn]) => {

@@ -27,28 +27,28 @@ export type EventHandlersMap<EventMap> = {
 // Custom Events
 export function createEventListenerMap<
   EventMap extends Record<string, Event>,
-  UsedEvents extends keyof EventMap = keyof EventMap
+  UsedEvents extends keyof EventMap = keyof EventMap,
 >(
   target: MaybeAccessor<Many<EventTarget>>,
   handlersMap: Partial<Pick<EventHandlersMap<EventMap>, UsedEvents>>,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): void;
 
 // DOM Events
 export function createEventListenerMap<
   Target extends TargetWithEventMap,
   EventMap extends EventMapOf<Target>,
-  HandlersMap extends Partial<EventHandlersMap<EventMap>>
+  HandlersMap extends Partial<EventHandlersMap<EventMap>>,
 >(
   target: MaybeAccessor<Many<Target>>,
   handlersMap: HandlersMap,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): void;
 
 export function createEventListenerMap(
   targets: MaybeAccessor<Many<EventTarget>>,
   handlersMap: Record<string, any>,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): void {
   if (process.env.SSR) {
     return;

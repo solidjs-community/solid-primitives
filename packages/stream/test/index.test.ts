@@ -17,7 +17,7 @@ describe("createStream", () => {
               resolve();
             }
           });
-        })
+        }),
     ));
 });
 
@@ -33,7 +33,7 @@ describe("createAmplitudeStream", () => {
             kind: "audioinput",
             toJSON: function () {
               return JSON.stringify(this);
-            }
+            },
           };
           const [amplitude] = createAmplitudeStream(mockDevice);
           createEffect(() => {
@@ -42,7 +42,7 @@ describe("createAmplitudeStream", () => {
               resolve();
             }
           });
-        })
+        }),
     ));
 });
 

@@ -36,8 +36,8 @@ export default defineConfig({
   plugins: [solid()],
   ssr: {
     // It allows Vite to preprocess the package
-    noExternal: ["@solid-primitives/props"]
-  }
+    noExternal: ["@solid-primitives/props"],
+  },
 });
 ```
 

@@ -15,7 +15,7 @@ describe("createSelection", () => {
       unmount: () => {
         unmount();
         document.body.removeChild(container);
-      }
+      },
     };
   };
 
@@ -105,8 +105,8 @@ describe("createSelection", () => {
         .getSelection()
         ?.addRange(
           (range => (range.setStart(div.firstChild!, 0), range.setEnd(div.firstChild!, 6), range))(
-            document.createRange()
-          )
+            document.createRange(),
+          ),
         );
       // only wrapped in createEffect, we will subscribe to changes
       await createEffect(async () => {

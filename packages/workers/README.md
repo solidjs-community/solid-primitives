@@ -55,7 +55,7 @@ createSignaledWorker({
   output: setOutput,
   func: function add([a, b]) {
     return a + b;
-  }
+  },
 });
 setInput([1, 2]);
 console.log(output());

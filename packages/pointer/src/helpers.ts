@@ -5,7 +5,7 @@ import {
   ParsedEventHandlers,
   PointerState,
   PointerStateWithActive,
-  ReverseOnEventName
+  ReverseOnEventName,
 } from "./types";
 
 /**
@@ -16,7 +16,7 @@ import {
  */
 export const getPositionToElement = <T extends Position>(
   poz: T,
-  el: Element
+  el: Element,
 ): T & { isInside: boolean } => {
   const { top, left, width, height } = el.getBoundingClientRect(),
     x = poz.x - left,
@@ -25,14 +25,14 @@ export const getPositionToElement = <T extends Position>(
     ...poz,
     x,
     y,
-    isInside: x >= 0 && y >= 0 && x <= width && y <= height
+    isInside: x >= 0 && y >= 0 && x <= width && y <= height,
   };
 };
 
 const parseOnEventName = <T extends string>(name: T) =>
   name.substring(2).toLowerCase() as ReverseOnEventName<T>;
 export const parseHandlersMap = <H extends Record<AnyOnEventName, any>>(
-  handlers: H
+  handlers: H,
 ): ParsedEventHandlers<H> => {
   const result = {} as any;
   Object.entries(handlers).forEach(([name, fn]) => (result[parseOnEventName(name)] = fn));
@@ -49,13 +49,13 @@ const pointerStateKeys: (keyof PointerState)[] = [
   "width",
   "height",
   "twist",
-  "pointerType"
+  "pointerType",
 ];
 export const toState = (e: PointerEvent): PointerState =>
   pick(e, ...pointerStateKeys) as PointerState;
 export const toStateActive = (e: PointerEvent, isActive: boolean) => ({
   ...toState(e),
-  isActive
+  isActive,
 });
 
 export const DEFAULT_STATE: PointerStateWithActive = {
@@ -69,5 +69,5 @@ export const DEFAULT_STATE: PointerStateWithActive = {
   height: 0,
   twist: 0,
   pointerType: null,
-  isActive: false
+  isActive: false,
 };

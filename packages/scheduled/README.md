@@ -76,7 +76,7 @@ import { scheduleIdle } from "@solid-primitives/scheduled";
 const trigger = scheduleIdle(
   (message: string) => console.log(message),
   // timeout passed to requestIdleCallback is a maximum timeout before the callback is called
-  250
+  250,
 );
 trigger("Hello!");
 trigger.clear(); // clears a timeout in progress

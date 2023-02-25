@@ -6,7 +6,7 @@ import {
   Directive,
   ExtractIfPossible,
   ItemsOf,
-  Many
+  Many,
 } from "@solid-primitives/utils";
 import {
   Accessor,
@@ -20,7 +20,7 @@ import {
   onMount,
   untrack,
   getOwner,
-  Setter
+  Setter,
 } from "solid-js";
 
 declare module "solid-js" {
@@ -73,7 +73,7 @@ export type ResolvedChildren = ReturnType<ReturnType<typeof children>>;
  */
 export function mergeRefs<T extends Element>(
   setRef: (el: T) => void,
-  propsRef: T | ((el: T) => void) | undefined
+  propsRef: T | ((el: T) => void) | undefined,
 ): (el: T) => void {
   return el => {
     setRef(el);
@@ -94,7 +94,7 @@ const mutableRemove = <T>(list: T[], item: T): void => {
  */
 export function getChangedItems<T>(
   prevList: readonly T[],
-  list: readonly T[]
+  list: readonly T[],
 ): [added: T[], removed: T[]] {
   const prev = prevList.slice();
   const added: T[] = [];
@@ -181,11 +181,11 @@ export function elements(fn: Accessor<any>, ...types: (typeof Element)[]): Acces
  * removed() // => [...]
  */
 export function refs<S>(
-  fn: Accessor<Many<S>>
+  fn: Accessor<Many<S>>,
 ): [
   refs: Accessor<ExtractIfPossible<S, Element>[]>,
   added: Accessor<ExtractIfPossible<S, Element>[]>,
-  removed: Accessor<ExtractIfPossible<S, Element>[]>
+  removed: Accessor<ExtractIfPossible<S, Element>[]>,
 ];
 export function refs<S, T extends (typeof Element)[]>(
   fn: Accessor<Many<S>>,
@@ -193,7 +193,7 @@ export function refs<S, T extends (typeof Element)[]>(
 ): [
   refs: Accessor<ExtractIfPossible<S, InstanceType<ItemsOf<T>>>[]>,
   added: Accessor<ExtractIfPossible<S, InstanceType<ItemsOf<T>>>[]>,
-  removed: Accessor<ExtractIfPossible<S, InstanceType<ItemsOf<T>>>[]>
+  removed: Accessor<ExtractIfPossible<S, InstanceType<ItemsOf<T>>>[]>,
 ];
 export function refs(
   fn: Accessor<any>,
@@ -234,7 +234,7 @@ export const unmount: Directive<(el: Element) => void> = (el, handler): void => 
  */
 export function mapRemoved<T>(
   list: Accessor<Many<T>>,
-  mapFn: (v: T, index: Accessor<number>) => Accessor<T | undefined> | undefined | void
+  mapFn: (v: T, index: Accessor<number>) => Accessor<T | undefined> | undefined | void,
 ): Accessor<T[]> {
   let prevList: T[] = [];
   const saved = new Set<T>();
@@ -269,7 +269,7 @@ export function mapRemoved<T>(
       }
 
       setItems((prevList = newList));
-    })
+    }),
   );
 
   let toRemove: T[] = [];

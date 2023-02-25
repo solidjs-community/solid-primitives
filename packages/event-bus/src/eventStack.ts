@@ -52,12 +52,12 @@ bus.setValue(stack => stack.filter(item => {...}))
 
 export function createEventStack<E extends object>(config?: EventStackConfig<E>): EventStack<E, E>;
 export function createEventStack<E, V extends object>(
-  config: EventStackConfig<E, V> & { toValue: (event: E, stack: V[]) => V }
+  config: EventStackConfig<E, V> & { toValue: (event: E, stack: V[]) => V },
 ): EventStack<E, V>;
 export function createEventStack<E, V>(
   config: EventStackConfig<E> & {
     toValue?: (event: E, stack: V[]) => V;
-  } = {}
+  } = {},
 ): EventStack<E, V> {
   const { toValue = (e: any) => e as V, length = 0 } = config;
 
@@ -74,7 +74,7 @@ export function createEventStack<E, V>(
     valueEventBus.emit({
       event: value,
       stack: stack(),
-      remove: () => remove(value)
+      remove: () => remove(value),
     });
   });
 
@@ -86,6 +86,6 @@ export function createEventStack<E, V>(
     emit: eventEventBus.emit,
     value: stack,
     setValue,
-    remove
+    remove,
   };
 }

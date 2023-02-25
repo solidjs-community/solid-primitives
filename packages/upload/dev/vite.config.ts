@@ -13,12 +13,12 @@ export default defineConfig({
         "wrapper-h":
           "p-6 flex justify-center items-center space-x-4 space-y-0 bg-gray-700 rounded-2xl",
         "wrapper-v": "wrapper-h flex-col space-x-0 space-y-4",
-        node: "p-4 bg-orange-600 rounded m-2"
-      }
-    })
+        node: "p-4 bg-orange-600 rounded m-2",
+      },
+    }),
   ],
   build: {
     target: "esnext",
-    polyfillDynamicImport: false
-  }
+    polyfillDynamicImport: false,
+  },
 });

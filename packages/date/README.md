@@ -122,7 +122,7 @@ import { formatRelative } from "date-fns";
 const [timeago] = createTimeAgo(1577836800000, {
   min: 10000,
   interval: 30000,
-  relativeFormatter: (target, now) => formatRelative(target, now)
+  relativeFormatter: (target, now) => formatRelative(target, now),
 });
 // => last Monday at 9:25 AM
 ```

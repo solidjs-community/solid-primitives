@@ -3,7 +3,7 @@ import { createLazyMemo } from "../src";
 
 export default function App() {
   const [data] = createResource(
-    () => new Promise<number>(resolve => setTimeout(() => resolve(4), 1000))
+    () => new Promise<number>(resolve => setTimeout(() => resolve(4), 1000)),
   );
   const [multiplier, setMultiplier] = createSignal(2);
 

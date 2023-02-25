@@ -85,7 +85,7 @@ createEffect(() => {
 ```ts
 function createMousePosition(
   target?: MaybeAccessor<Window | Document | HTMLElement>,
-  options?: MousePositionOptions
+  options?: MousePositionOptions,
 ): MousePositionInside;
 ```
 
@@ -121,7 +121,7 @@ const relative = createPositionToElement(() => ref);
 function createPositionToElement(
   element: Element | Accessor<Element | undefined>,
   pos: Accessor<Position>,
-  options?: PositionToElementOptions
+  options?: PositionToElementOptions,
 ): PositionRelativeToElement;
 ```
 

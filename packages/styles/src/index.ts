@@ -10,7 +10,7 @@ const totallyHiddenStyles: Partial<CSSStyleDeclaration> = {
   visibility: "hidden",
   position: "absolute",
   top: "-9999px",
-  left: "-9999px"
+  left: "-9999px",
 };
 
 /**

@@ -12,7 +12,7 @@ describe("createMousePosition", () => {
         x: 0,
         y: 0,
         sourceType: null,
-        isInside: false
+        isInside: false,
       });
       dispose();
     }));
@@ -20,13 +20,13 @@ describe("createMousePosition", () => {
   it("initial values can be changed", () =>
     createRoot(dispose => {
       const pos = createMousePosition(undefined, {
-        initialValue: { x: 69, y: 420 }
+        initialValue: { x: 69, y: 420 },
       });
       expect(pos).toEqual({
         x: 69,
         y: 420,
         sourceType: null,
-        isInside: false
+        isInside: false,
       });
       dispose();
     }));
@@ -46,7 +46,7 @@ describe("createMouseToElement", () => {
         height: 0,
         top: 0,
         left: 0,
-        isInside: true
+        isInside: true,
       });
 
       setPos({ x: -20, y: 30 });
@@ -58,7 +58,7 @@ describe("createMouseToElement", () => {
         height: 0,
         top: 0,
         left: 0,
-        isInside: false
+        isInside: false,
       });
 
       setPos({ x: 15 });
@@ -70,7 +70,7 @@ describe("createMouseToElement", () => {
         height: 0,
         top: 0,
         left: 0,
-        isInside: false
+        isInside: false,
       });
 
       dispose();
@@ -88,9 +88,9 @@ describe("createMouseToElement", () => {
             width: 3,
             height: 4,
             top: 5,
-            left: 6
-          }
-        }
+            left: 6,
+          },
+        },
       );
 
       expect(pos).toEqual({
@@ -100,7 +100,7 @@ describe("createMouseToElement", () => {
         height: 4,
         top: 5,
         left: 6,
-        isInside: false
+        isInside: false,
       });
 
       dispose();

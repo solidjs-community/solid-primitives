@@ -11,7 +11,7 @@ export type Update = {
     K2 extends keyof O[K0][K1],
     K3 extends keyof O[K0][K1][K2],
     K4 extends keyof O[K0][K1][K2][K3],
-    V
+    V,
   >(
     object: A,
     k0: MaybeAccessor<K0>,
@@ -19,7 +19,7 @@ export type Update = {
     k2: MaybeAccessor<K2>,
     k3: MaybeAccessor<K3>,
     k4: MaybeAccessor<K4>,
-    setter: UpdateSetter<O[K0][K1][K2][K3], K4, V>
+    setter: UpdateSetter<O[K0][K1][K2][K3], K4, V>,
   ): Accessor<
     ModifyValue<
       O,
@@ -42,14 +42,14 @@ export type Update = {
     K1 extends keyof O[K0],
     K2 extends keyof O[K0][K1],
     K3 extends keyof O[K0][K1][K2],
-    V
+    V,
   >(
     object: A,
     k0: MaybeAccessor<K0>,
     k1: MaybeAccessor<K1>,
     k2: MaybeAccessor<K2>,
     k3: MaybeAccessor<K3>,
-    setter: UpdateSetter<O[K0][K1][K2], K3, V>
+    setter: UpdateSetter<O[K0][K1][K2], K3, V>,
   ): Accessor<
     ModifyValue<
       O,
@@ -63,30 +63,30 @@ export type Update = {
     K0 extends keyof O,
     K1 extends keyof O[K0],
     K2 extends keyof O[K0][K1],
-    V
+    V,
   >(
     object: A,
     k0: MaybeAccessor<K0>,
     k1: MaybeAccessor<K1>,
     k2: MaybeAccessor<K2>,
-    setter: UpdateSetter<O[K0][K1], K2, V>
+    setter: UpdateSetter<O[K0][K1], K2, V>,
   ): Accessor<ModifyValue<O, K0, ModifyValue<O[K0], K1, ModifyValue<O[K0][K1], K2, V>>>>;
   <
     A extends MaybeAccessor<object>,
     O extends MaybeAccessorValue<A>,
     K0 extends keyof O,
     K1 extends keyof O[K0],
-    V
+    V,
   >(
     object: A,
     k0: MaybeAccessor<K0>,
     k1: MaybeAccessor<K1>,
-    setter: UpdateSetter<O[K0], K1, V>
+    setter: UpdateSetter<O[K0], K1, V>,
   ): Accessor<ModifyValue<O, K0, ModifyValue<O[K0], K1, V>>>;
   <A extends MaybeAccessor<object>, O extends MaybeAccessorValue<A>, K extends keyof O, V>(
     object: A,
     key: MaybeAccessor<K>,
-    setter: UpdateSetter<O, K, V>
+    setter: UpdateSetter<O, K, V>,
   ): Accessor<ModifyValue<O, K, V>>;
 };
 

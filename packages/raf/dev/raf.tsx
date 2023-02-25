@@ -20,7 +20,7 @@ export default (props: { targetFPS?: number }) => {
   };
 
   const [running, start, stop] = createRAF(
-    props.targetFPS ? targetFPS(eachFrame, props.targetFPS) : eachFrame
+    props.targetFPS ? targetFPS(eachFrame, props.targetFPS) : eachFrame,
   );
 
   const [avgMs, setAvgMs] = createSignal(0);

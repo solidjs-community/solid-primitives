@@ -59,8 +59,8 @@ writeClipboard("Hello World");
 
 writeClipboard([
   new ClipboardItem({
-    "text/plain": new Blob(["Hello World"], { type: "text/plain" })
-  })
+    "text/plain": new Blob(["Hello World"], { type: "text/plain" }),
+  }),
 ]);
 ```
 
@@ -114,7 +114,7 @@ function copyToClipboard(
     value?: any;
     setter?: ClipboardSetter;
     highlight?: HighlightModifier;
-  }>
+  }>,
 );
 ```
 

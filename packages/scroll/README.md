@@ -109,7 +109,7 @@ const scroll = useWindowScrollPosition();
 createEffect(() => {
   console.log(
     scroll.x, // => number
-    scroll.y //  => number
+    scroll.y, //  => number
   );
 });
 ```

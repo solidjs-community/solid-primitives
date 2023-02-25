@@ -93,7 +93,7 @@ export class TriggerCache<T> {
  * dirty(2)
  */
 export function createTriggerCache<T>(
-  mapConstructor: WeakMapConstructor | MapConstructor = Map
+  mapConstructor: WeakMapConstructor | MapConstructor = Map,
 ): [track: (key: T) => void, dirty: (key: T) => void] {
   const map = new TriggerCache(mapConstructor);
   return [map.track.bind(map), map.dirty.bind(map)];

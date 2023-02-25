@@ -4,12 +4,12 @@ function makeDelay(ms?: number): Promise<boolean> {
 
 export function sendEmailDefault(data: FormData) {
   return makeDelay().then(
-    () => `Your email was sent to ${data.get("to") || "no one"} with your default provider`
+    () => `Your email was sent to ${data.get("to") || "no one"} with your default provider`,
   );
 }
 
 export function sendEmailAlternative(data: FormData) {
   return makeDelay().then(
-    () => `Your email was sent to ${data.get("to") || "no one"} with an alternative provider`
+    () => `Your email was sent to ${data.get("to") || "no one"} with an alternative provider`,
   );
 }

@@ -169,7 +169,7 @@ export type SignalMap<K, V> = Accessor<[K, V][]> & ReactiveMap<K, V>;
 export function createMap<K, V>(initial?: [K, V][]): SignalMap<K, V> {
   const map = new ReactiveMap(initial);
   return new Proxy(() => [...map], {
-    get: (_, b) => map[b as keyof typeof map]
+    get: (_, b) => map[b as keyof typeof map],
   }) as SignalMap<K, V>;
 }
 

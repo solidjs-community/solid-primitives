@@ -33,7 +33,7 @@ export function transformFiles(files: FileList | null): UploadFile[] {
       source: URL.createObjectURL(file),
       name: file.name,
       size: file.size,
-      file
+      file,
     };
     parsedFiles.push(parsedFile);
   }

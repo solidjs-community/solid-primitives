@@ -55,7 +55,7 @@ export type EventHub<M extends { readonly [key: string | number]: EventHubChanne
  */
 
 export function createEventHub<M extends { readonly [key: string | number]: EventHubChannel<any> }>(
-  defineChannels: ((bus: typeof createEventBus) => M) | M
+  defineChannels: ((bus: typeof createEventBus) => M) | M,
 ): EventHub<M> {
   const global = /*#__PURE__*/ createEventBus<{ name: string; details: any }>();
   const buses =
@@ -72,6 +72,6 @@ export function createEventHub<M extends { readonly [key: string | number]: Even
     value,
     on: (e, a) => buses[e]!.listen(a),
     emit: (e, a?: any) => buses[e]!.emit(a),
-    listen: global.listen
+    listen: global.listen,
   };
 }
