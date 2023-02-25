@@ -1,8 +1,7 @@
 import { children, ParentComponent } from "solid-js";
-import { elements, mapRemoved, unmount } from "../src";
+import { elements, mapRemoved } from "@solid-primitives/refs";
 import { Component, createSignal, For, Show } from "solid-js";
 import { createCallbackStack } from "@solid-primitives/utils";
-unmount;
 
 const Keep: ParentComponent<{
   getClear?: (fn: VoidFunction) => void;
@@ -26,23 +25,17 @@ const Keep: ParentComponent<{
   return combined;
 };
 
-const App: Component = () => {
+const ListPage: Component = () => {
   const [show, setShow] = createSignal(false);
   const [show1, setShow1] = createSignal(false);
   const [show2, setShow2] = createSignal(true);
   const [showWrapper, setShowWrapper] = createSignal(true);
   const [count, setCount] = createSignal(5);
 
-  const [refs, setRefs] = createSignal<Element[]>([]);
-
-  const [dummy, setDummy] = createSignal(0);
-  setInterval(() => setDummy(p => ++p), 1000);
-
   let clear!: VoidFunction;
 
   return (
     <>
-      <p>Elements count: {refs().length}</p>
       <div class="wrapper-h flex-wrap">
         <button class="btn" onclick={() => setCount(p => ++p)}>
           + 1
@@ -67,7 +60,6 @@ const App: Component = () => {
         </button>
       </div>
       <div class="wrapper-h flex-wrap">
-        {/* <Refs onChange={e => console.log(e)} refs={setRefs}> */}
         <Keep getClear={fn => (clear = fn)}>
           <Show when={showWrapper()}>
             <p>Hello</p>
@@ -82,9 +74,7 @@ const App: Component = () => {
             </Show>
             {/* </Ref> */}
             <Show when={show2()}>
-              <div class="node" use:unmount={el => console.log("Unmounted", el)}>
-                ID 2
-              </div>
+              <div class="node">ID 2</div>
               <div class="node">ID 3</div>
             </Show>
             <For each={Array.from({ length: count() }, (_, i) => i)}>
@@ -92,9 +82,9 @@ const App: Component = () => {
             </For>
           </Show>
         </Keep>
-        {/* </Refs> */}
       </div>
     </>
   );
 };
-export default App;
+
+export default ListPage;

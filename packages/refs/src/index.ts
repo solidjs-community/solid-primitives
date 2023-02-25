@@ -148,6 +148,34 @@ function getResolvedElements(value: unknown): HTMLElement | HTMLElement[] | null
   return value instanceof HTMLElement ? value : null;
 }
 
+export function findFirst<T extends object>(
+  value: JSX.Element,
+  predicate: (item: unknown | T) => item is T
+): T | null {
+  if (predicate(value)) return value;
+  if (typeof value === "function" && !value.length) return findFirst(value(), predicate);
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const result = findFirst(item, predicate);
+      if (result) return result;
+    }
+  }
+  return null;
+}
+
+export function resolveFirst(fn: Accessor<JSX.Element>): Accessor<Element | null>;
+export function resolveFirst<T extends object>(
+  fn: Accessor<JSX.Element>,
+  predicate: (item: unknown | T) => item is T
+): Accessor<T | null>;
+export function resolveFirst(
+  fn: Accessor<JSX.Element>,
+  predicate = (item: unknown | Element): item is Element => item instanceof Element
+): Accessor<any | null> {
+  const memo = createMemo(fn);
+  return createMemo(() => findFirst(memo(), predicate));
+}
+
 /**
  * Reactive signal that filters out non-element items from a signal array.
  * @param fn Array signal
