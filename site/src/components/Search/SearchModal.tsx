@@ -2,10 +2,11 @@
 import { createMediaQuery } from "@solid-primitives/media";
 import { isIOS } from "@solid-primitives/platform";
 import Dismiss from "solid-dismiss";
-import { Accessor, batch, Component, createEffect, on, onMount } from "solid-js";
+import { Accessor, AccessorArray, batch, Component, createEffect, on, onMount } from "solid-js";
 import { unwrap } from "solid-js/store";
 import { useLocation } from "solid-start";
 import { BASE, BASE_NOFS } from "~/constants";
+import createEffectDeffered from "~/hooks/createEffectDeffered";
 import { createShortcut } from "~/hooks/createShortcut";
 import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 import { scrollIntoView } from "~/utils/scrollIntoView";
@@ -19,6 +20,7 @@ const SearchModal: Component<{
 }> = ({ menuButton, open, setOpen }) => {
   const isSmall = createMediaQuery("(max-width: 767px)");
   let prevPathname = "";
+  let prevHash = "";
   let prevHeaderState: typeof headerState;
   let rootApp!: HTMLElement;
   let containerEl!: HTMLElement;
@@ -61,6 +63,8 @@ const SearchModal: Component<{
 
   const scrollToLink = () => {
     if (!location.hash) return;
+    if (location.hash === prevHash) return;
+    prevHash = location.hash;
 
     scrollIntoView(`[href="${location.hash}"]`, { behavior: "auto", offset: 70 });
   };
@@ -73,13 +77,9 @@ const SearchModal: Component<{
   };
 
   onMount(() => {
-    prevPathname = location.pathname;
     rootApp = document.getElementById("root-subcontainer")!;
   });
 
-  // TODO: ONLY WORKS ONCE?? (sometimes it works again)
-  // but is same code as https://github.com/solidjs-community/solid-primitives/blob/main/packages/keyboard/dev/index.tsx#L37 and that works
-  // seems like interacting with tabbable items silences the event or something
   createShortcut(["Meta", "K"], () => {
     setOpen(true);
   });
@@ -87,15 +87,18 @@ const SearchModal: Component<{
     setOpen(true);
   });
 
-  createEffect(
-    on(
-      () => location.pathname,
-      (currentPathname, prevPathname) => {
-        if (prevPathname === currentPathname) return;
-        setOpen(false);
-      },
-      { defer: true }
-    )
+  createEffectDeffered(open, open => {
+    if (!open) return;
+    prevPathname = location.pathname;
+    prevHash = location.hash;
+  });
+
+  createEffectDeffered(
+    () => location.pathname,
+    (currentPathname, prevPathname) => {
+      if (prevPathname === currentPathname) return;
+      setOpen(false);
+    }
   );
 
   return (

@@ -15,6 +15,7 @@ import {
   Show
 } from "solid-js";
 import { createStore, produce } from "solid-js/store";
+import createEffectDeffered from "~/hooks/createEffectDeffered";
 // @ts-ignore
 import primitivesJSON from "~/primitives.json";
 import CheckBox from "./CheckBox/CheckBox";
@@ -89,7 +90,6 @@ const Search: Component<{
     const exclude = Object.entries(config.highlight)
       .filter(([_, item]) => !item.checked)
       .flatMap(([key]) => [`[data-ignore-mark-${key}]`, `[data-ignore-mark-${key}] *`]);
-    console.log(exclude);
     markInstance.mark(value, {
       exclude,
       separateWordSearch: false
@@ -100,57 +100,33 @@ const Search: Component<{
     markInstance = new Mark(listContainer);
   });
 
-  createEffect(
-    on(
-      () => [
-        config.highlight.description.checked,
-        config.highlight.title.checked,
-        config.highlight.primitive.checked
-      ],
-      () => {
-        markInstance.unmark();
-        highlightTextFromSearch(search());
-      },
-      { defer: true }
-    )
+  createEffectDeffered(
+    () => [
+      config.highlight.description.checked,
+      config.highlight.title.checked,
+      config.highlight.primitive.checked
+    ],
+    () => {
+      markInstance.unmark();
+      highlightTextFromSearch(search());
+    }
   );
 
-  createEffect(
-    on(
-      search,
-      search => {
-        const result = fuse.search(search);
+  createEffectDeffered(search, search => {
+    const result = fuse.search(search);
 
-        setSearchResult(
-          result.slice(0, 12).map((_item, _, arr) => {
-            // console.log(arr);
-            const item = { ...(_item.item as any) } as TPrimitive;
-            const fusePrimitives = new Fuse(item.primitives, fusePrimitivesOptions);
-            const result = fusePrimitives.search(search);
-            item.primitivesCount = item.primitives.length;
-            item.primitives = result.slice(0, 5).map(item => ({ ...item }.item));
+    setSearchResult(
+      result.slice(0, 12).map((_item, _, arr) => {
+        const item = { ...(_item.item as any) } as TPrimitive;
+        const fusePrimitives = new Fuse(item.primitives, fusePrimitivesOptions);
+        const result = fusePrimitives.search(search);
+        item.primitivesCount = item.primitives.length;
+        item.primitives = result.slice(0, 5).map(item => ({ ...item }.item));
 
-            return item;
-          })
-        );
-        //         setSearchResult(
-        //           produce(prev => {
-        //             // @ts-ignore
-        //             prev = result.slice(0, 1).map(_item => {
-        //               const item = _item.item as unknown as TPrimitive;
-        //               const fusePrimitives = new Fuse(item.primitives, fusePrimitivesOptions);
-        //               const result = fusePrimitives.search(search);
-        //               item.primitives = result.map(item => item.item);
-        //               console.log(item.primitives);
-        //
-        //               return { ...item };
-        //             });
-        //           })
-        //         );
-      },
-      { defer: true }
-    )
-  );
+        return item;
+      })
+    );
+  });
 
   return (
     <div class="flex justify-center items-center w-full max-w-[800px]">

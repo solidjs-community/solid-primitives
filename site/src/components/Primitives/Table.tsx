@@ -1,6 +1,7 @@
 import { createIntersectionObserver } from "@solid-primitives/intersection-observer";
 import { isIOS, isSafari } from "@solid-primitives/platform";
 import { createSignal, onMount, ParentComponent } from "solid-js";
+import { pageWidthClass } from "~/constants";
 import reflow from "~/utils/reflow";
 import { setHeaderState } from "../Header/Header";
 
@@ -348,7 +349,7 @@ const Table: ParentComponent = props => {
   );
 
   return (
-    <div class="max-w-[900px] mx-auto isolate">
+    <div class={`${pageWidthClass} mx-auto isolate`}>
       <div class="w-full relative">
         <div class="absolute top-0 left-0 w-full h-full border-[#E4F6F9] border-[7px] rounded-[30px] pointer-events-none z-10 dark:border-[#2b455a]" />
         <div

@@ -6,6 +6,7 @@ import InfoBar from "./InfoBar";
 import ON_CLIENT_DEV_MODE from "~/hooks/ON_CLIENT_DEV_MODE";
 import { isServer } from "solid-js/web";
 import { setHeaderState } from "../Header/Header";
+import { pageWidthClass } from "~/constants";
 
 const githubRepo = "https://github.com/solidjs-community/solid-primitives";
 
@@ -16,6 +17,8 @@ const onStyleMount = ({ mount, cleanup }: { mount: () => void; cleanup: () => vo
     cleanup();
   });
 };
+
+export const primitivePagePaddingTop = 140;
 
 const PrimitivePageMain: ParentComponent<{
   packageName: string;
@@ -42,8 +45,16 @@ const PrimitivePageMain: ParentComponent<{
   return (
     <>
       <Title>{props.name}</Title>
-      <div class="absolute top-0 left-0 right-0 h-[95vh] bg-[linear-gradient(to_bottom,#fff_400px,transparent)] dark:bg-[linear-gradient(to_bottom,#293843_400px,transparent)] -z-1" />
-      <main class="pt-[100px] mb-6 max-w-[900px] mx-auto overflow-x-hidden md:overflow-visible">
+      <div
+        class="absolute top-0 left-0 right-0 h-[95vh] bg-[linear-gradient(to_bottom,#fff_var(--primitive-padding-top-gr),transparent)] dark:bg-[linear-gradient(to_bottom,#293843_var(--primitive-padding-top-gr),transparent)] -z-1"
+        style={{
+          "--primitive-padding-top-gr": `${primitivePagePaddingTop + 300}px`
+        }}
+      />
+      <main
+        class={`${pageWidthClass} mb-6 mx-auto overflow-x-hidden md:overflow-visible`}
+        style={{ "padding-top": `${primitivePagePaddingTop}px` }}
+      >
         <div class="p-3 sm:p-8 rounded-3xl bg-page-main-bg">
           <div class="flex justify-between gap-[30px] sm:gap-[100px] items-center text-[#232324] dark:text-white mb-[90px]">
             {/* <Heading>
@@ -51,8 +62,7 @@ const PrimitivePageMain: ParentComponent<{
               Matching Stuff Anywhere Visitor .java
             </Heading> */}
 
-            {/* <Heading>{props.name.replace("-", " ")}</Heading> */}
-            <Heading>I Love java Types</Heading>
+            <Heading>{props.name.replace("-", " ")}</Heading>
             <div class="relative">
               <svg
                 class="absolute"
