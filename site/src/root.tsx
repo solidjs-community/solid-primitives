@@ -21,7 +21,7 @@ import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderCl
 import Footer from "./components/Footer/Footer";
 
 const ghHandle = "solidjs-community";
-const ghRepoName = "html-to-solidjsx";
+const ghRepoName = "solid-primitives";
 const url = `https://${ghHandle}.github.io/${ghRepoName}`;
 
 export default function Root() {
