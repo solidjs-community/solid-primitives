@@ -49,7 +49,6 @@ const useKeyDownList = createSharedRoot<
   const reset = () => setPressedKeys([]);
 
   makeEventListener(window, "keydown", e => {
-    console.log("fire keydown", e.key);
     // e.key may be undefined when used with <datalist> el
     // gh issue: https://github.com/solidjs-community/solid-primitives/issues/246
     if (e.repeat || typeof e.key !== "string") return;
@@ -62,7 +61,6 @@ const useKeyDownList = createSharedRoot<
   });
 
   makeEventListener(window, "keyup", e => {
-    console.log("fire keyup", e.key);
     if (typeof e.key !== "string") return;
     const key = e.key.toUpperCase();
     // fixes bug https://stackoverflow.com/questions/27380018/when-cmd-key-is-kept-pressed-keyup-is-not-triggered-for-any-other-key
@@ -74,7 +72,6 @@ const useKeyDownList = createSharedRoot<
   });
 
   makeEventListener(window, "blur", () => {
-    console.log("blur!!");
     reset();
   });
   makeEventListener(window, "contextmenu", e => {
@@ -258,7 +255,6 @@ export function createShortcut(
 
   // allow checking the sequence even if the user is still holding down keys
   const handleSequenceWithoutReset = (sequence: string[][]) => {
-    console.log({ sequence });
     const last = sequence.at(-1);
     if (!last) {
       return;
@@ -274,7 +270,6 @@ export function createShortcut(
       const prev = sequence.at(-2);
       if (!prev || arrayEquals(prev, keys.slice(0, keys.length - 1))) {
         preventDefault && event()!.preventDefault();
-        console.log("fire cb!!");
         callback();
       } else {
       }

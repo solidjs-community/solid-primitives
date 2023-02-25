@@ -7,6 +7,7 @@ import {
   FileRoutes,
   Head,
   Html,
+  Link,
   Meta,
   Routes,
   Scripts,
@@ -19,6 +20,10 @@ import Header from "./components/Header/Header";
 import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderClusterDefs";
 import Footer from "./components/Footer/Footer";
 
+const ghHandle = "solidjs-community";
+const ghRepoName = "html-to-solidjsx";
+const url = `https://${ghHandle}.github.io/${ghRepoName}`;
+
 export default function Root() {
   return (
     <Html lang="en" data-html>
@@ -26,6 +31,56 @@ export default function Root() {
         <Title>Solid Primitives</Title>
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta name="og:url" content={url} />
+        <Meta name="og:type" content="website" />
+        <Meta
+          name="description"
+          content="A project that strives to develop high-quality, community contributed Solid primitives."
+        />
+        <Meta
+          name="og:description"
+          content="A project that strives to develop high-quality, community contributed Solid primitives."
+        />
+        <Meta name="og:image:width" content="1200" />
+        <Meta name="og:image:height" content="600" />
+        <Meta name="og:image" content={`${url}/og.png`} />
+        <Meta name="og:image:url" content={`${url}/og.png`} />
+        <Meta name="og:image:secure_url" content={`${url}/og.png`} />
+        <Meta name="og:image:alt" content="" />
+        <Meta name="twitter:title" content="Solid Primitives" />
+        <Meta name="twitter:card" content="summary_large_image" />
+        <Meta name="twitter:image" content={`${url}/og.png`} />
+        <Meta name="twitter:image:alt" content="" />
+        <Meta
+          name="twitter:description"
+          content="A project that strives to develop high-quality, community contributed Solid primitives."
+        />
+        <Link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href={`/${ghRepoName}/favicons/apple-touch-icon.png`}
+        />
+        <Link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href={`/${ghRepoName}/favicons/favicon-32x32.png`}
+        />
+        <Link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href={`/${ghRepoName}/favicons/favicon-16x16.png`}
+        />
+        <Meta
+          name="msapplication-TileImage"
+          content={`/${ghRepoName}/favicons/ms-icon-144x144.png`}
+        />
+        <Meta name="msapplication-TileColor" content="#2c4f7c" />
+        <Meta name="theme-color" content="#2c4f7c" />
+        <Meta name="msapplication-TileColor" content="#2c4f7c" />
+        <Meta name="theme-color" content="#2c4f7c" />
+        <link rel="icon" type="image/png" href={`/${ghRepoName}/favicons/favicon-32x32.png`} />
         <script
           innerHTML={`
           if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {

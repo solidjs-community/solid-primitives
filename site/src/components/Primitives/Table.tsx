@@ -266,7 +266,6 @@ const Table: ParentComponent = props => {
         }
 
         if (!checkTableSameWidthAsParent()) {
-          console.log("resize table!!!");
           setTableSizeSameAsParent();
         } else {
           resetSizes();
@@ -330,7 +329,6 @@ const Table: ParentComponent = props => {
         }
         if (isIntersecting && prevY > window.scrollY) {
           prevY = window.scrollY;
-          console.log("get TOP!!!!", target);
           const els = tableRowTargets();
           const prevEl = els[els.indexOf(target) - 1];
           showActiveHeader();
