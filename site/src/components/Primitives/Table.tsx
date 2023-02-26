@@ -1,11 +1,15 @@
 import { createIntersectionObserver } from "@solid-primitives/intersection-observer";
 import { isIOS, isSafari } from "@solid-primitives/platform";
 import { createSignal, onMount, ParentComponent } from "solid-js";
+import { useLocation } from "solid-start";
 import { pageWidthClass } from "~/constants";
+import createEffectDeffered from "~/hooks/createEffectDeffered";
+import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 import reflow from "~/utils/reflow";
 import { setHeaderState } from "../Header/Header";
 
 const Table: ParentComponent = props => {
+  const location = useLocation();
   const [tableRowTargets, setTableRowTargets] = createSignal<Element[]>([]);
   const [tableTarget, setTableTarget] = createSignal<Element[]>([]);
   const [headerActive, setHeaderActive] = createSignal(false);
@@ -278,27 +282,20 @@ const Table: ParentComponent = props => {
 
         if (entry.target === tableContainerParent) {
           if (prevTableContainerParentWidth === targetWidth) {
-            console.log("prevTableContainerParentWidth === targetWidth", {
-              prevTableContainerParentWidth,
-              targetWidth
-            });
             prevTableContainerParentWidth = targetWidth;
             return;
           }
           prevTableContainerParentWidth = targetWidth;
-          console.log("set foo");
         }
 
         if (entry.target === tableEl) {
           if (prevTableWidth === targetWidth) {
             prevTableWidth = targetWidth;
-            console.log("prevTableWidth === targetWidth", true);
             return;
           }
           prevTableWidth = targetWidth;
 
           if (observeTableElInit) {
-            console.log("observeTableElInit", true);
             observeTableElInit = false;
             return;
           }
@@ -390,6 +387,7 @@ const Table: ParentComponent = props => {
             tableHeaderName.textContent = prevEl.textContent;
           } else {
             tableHeaderName.textContent = "Name";
+            console.log("hideheader");
             hideActiveHeader();
           }
           return;
@@ -399,6 +397,49 @@ const Table: ParentComponent = props => {
     { rootMargin: `-${rootMarginTop}px 0px 0px 0px` }
   );
 
+  createEffectDeffered(
+    () => location.hash,
+    (currentHash, prevHash) => {
+      if (prevHash === currentHash) return;
+      if (!doesPathnameMatchBase(location.pathname)) return;
+
+      const run = () => {
+        const tableElBCR = tableEl.getBoundingClientRect();
+
+        const top = tableElBCR.top - rootMarginTop;
+        const bottom = tableElBCR.bottom - rootMarginTop;
+
+        if (top + rootMarginTop > 0) {
+          tableHeaderName.textContent = "Name";
+          setHeaderState("showShadow", false);
+          hideActiveHeader();
+          return;
+        }
+
+        if (top < 0 && bottom >= 0) {
+          setHeaderState("showShadow", false);
+          showActiveHeader();
+          return;
+        }
+        // if (boundingClientRect.bottom > 0) return;
+        if (bottom > 0) return;
+        // if (tableSameWidthAsParent) return;
+
+        setHeaderState("showShadow", true);
+        hideActiveHeader();
+      };
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          run();
+          setTimeout(() => {
+            run();
+          });
+        });
+      });
+    }
+  );
+
   return (
     <div class={`${pageWidthClass} mx-auto isolate`}>
       <div
@@ -406,7 +447,7 @@ const Table: ParentComponent = props => {
         style={{ opacity: "0" }}
         ref={tableHeaderShadowStickyDiv}
       />
-      <div class="w-full relative">
+      <div class="w-full relative pb-[5px] rounded-[30px] overflow-clip">
         {/* despite having overflow-clip doesn't cut off overflowing table in Safari/iOS */}
         {/* so added a inverse rounded corner to hide overflowing theader text */}
         <div
@@ -422,7 +463,7 @@ const Table: ParentComponent = props => {
           class="absolute top-[7px] bottom-0 left-[120.8px] w-[15px] z-10 pointer-events-none opacity-0 transition-opacity bg-[linear-gradient(to_right,#24405966,#24405900)] dark:bg-[linear-gradient(to_right,#05121dbf,#05121d00)]"
           ref={tableVerticalScrollShadow}
         />
-        <div class="w-full rounded-[30px] overflow-x-clip p-1 pt-[2px] bg-[linear-gradient(45deg,#D8DFF5,#E4F6F9)] dark:bg-[linear-gradient(45deg,#2c4668,#2b455a)]">
+        <div class="w-full rounded-[30px] overflow-x-clip p-1 pb-0 pt-[2px] bg-[linear-gradient(45deg,#D8DFF5,#E4F6F9)] dark:bg-[linear-gradient(45deg,#2c4668,#2b455a)]">
           <table
             class="w-full relative mt-[-2px] overflow-clip"
             style="border-collapse: separate; border-spacing: 2px 2px;"

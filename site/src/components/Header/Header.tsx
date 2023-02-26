@@ -2,7 +2,7 @@ import solidPrimitivesLogo from "~/assets/img/solid-primitives-logo.svg";
 import solidPrimitivesDarkLogo from "~/assets/img/solid-primitives-dark-logo.svg";
 import solidPrimitivesStackedLogo from "~/assets/img/solid-primitives-stacked-logo.svg";
 import solidPrimitivesStackedDarkLogo from "~/assets/img/solid-primitives-stacked-dark-logo.svg";
-import { createRenderEffect, createSignal, on, onMount } from "solid-js";
+import { createEffect, createRenderEffect, createSignal, on, onMount } from "solid-js";
 import SearchModal from "../Search/SearchModal";
 import ThemeBtn from "./ThemeBtn";
 import SearchBtn from "../Search/SearchBtn";
@@ -25,6 +25,7 @@ export const [headerState, setHeaderState] = createStore({
   showGradientOverflow: false,
   disableScroll: false,
   showSearchBtn: true,
+  openNavMenu: false,
   zIndex: 10
 });
 
@@ -164,6 +165,13 @@ const Header = () => {
       setOpenNavMenu(false);
     }
   );
+
+  createEffect(() => {
+    setOpenNavMenu(headerState.openNavMenu);
+  });
+  createEffect(() => {
+    setHeaderState("openNavMenu", openNavMenu());
+  });
 
   createRenderEffect(
     on(
