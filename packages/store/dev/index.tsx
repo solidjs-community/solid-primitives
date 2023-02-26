@@ -1,8 +1,8 @@
 import type { JSX, JSXElement } from "solid-js";
 import { Component, createMemo } from "solid-js";
-import { render } from "solid-js/web";
+import { For, render } from "solid-js/web";
 import { counterStore } from "./stores/counter-store";
-import { aliceAge, bobAge, tomAge } from "./stores/ages-store";
+import { getPeople, getWizards } from "./stores/ages-store";
 import { CounterControls, BoxesDemo } from "./components";
 
 import "uno.css";
@@ -11,22 +11,31 @@ const App: Component = () => {
   const {
     state,
     getters: { get: count, isNegative, isPositive, isZero },
-    actions: { resetCount: setCount }
+    actions: { setState }
   } = counterStore;
 
-  const increment = () => setCount(count() + 1);
+  const increment = () => setState({ value: count() + 1 });
 
   const getBoxCount = createMemo(() => (!isPositive() ? 25 : count()), 0);
 
   return (
     <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
-      <div class="wrapper-v">
+      <div class="wrapper-v select-none">
         <h4>Ages</h4>
         <ul>
-          <li>Alice: {aliceAge.getters.yearsOld()}</li>
-          <li>Bob: {bobAge.getters.yearsOld()}</li>
-          <li>Tom: {tomAge.getters.yearsOld()}</li>
+          <For each={getPeople()}>
+            {person => (
+              <li>
+                <span class="hover:text-green-400" onClick={() => person.actions.birthday()}>
+                  {person.state.name}
+                </span>
+                : {person.getters.yearsOld()}{" "}
+                {person.getters.isWizard() && <i class="text-green-200"> wizard</i>}
+              </li>
+            )}
+          </For>
         </ul>
+        <footer>Wizards: {getWizards().length}</footer>
       </div>
       <div class="wrapper-v">
         <h4>Counter Information {state.value}</h4>

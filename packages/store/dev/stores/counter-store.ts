@@ -1,4 +1,5 @@
-import { createSharedStore } from "../../dist";
+import { createFluxStore } from "../../src/index";
+import type { SetStoreFunction } from "solid-js/store";
 
 export interface CounterState {
   id?: string;
@@ -13,11 +14,12 @@ export interface CounterGetters {
   get: () => number;
 }
 export interface CounterActions {
+  setState: SetStoreFunction<CounterState>;
   updateId: (newId: string) => void;
   resetCount: (overrideValue?: number) => void;
 }
 
-export const counterStore = createSharedStore(
+export const counterStore = createFluxStore(
   {
     value: 0,
     initialValue: 0
@@ -31,6 +33,7 @@ export const counterStore = createSharedStore(
       get: () => state.value
     }),
     actions: (setState): CounterActions => ({
+      setState,
       updateId: newId => setState("id", newId),
       resetCount: overrideValue =>
         setState(proxy => ({ ...proxy, value: overrideValue ?? proxy.initialValue }))
