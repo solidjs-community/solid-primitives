@@ -18,6 +18,8 @@ const Table: ParentComponent = props => {
   let tableFirstTableRowCells: HTMLTableCellElement[] = [];
   let tableHeaderFirstLastSiblings: HTMLTableCellElement[] = [];
   let tableHeaderRealTR!: HTMLElement;
+  let tableHeaderShadowTR!: HTMLElement;
+  let tableHeaderShadowStickyDiv!: HTMLDivElement;
   let tableBody!: HTMLElement;
   let tableVerticalScrollShadow!: HTMLDivElement;
   const fakeTableRow = (
@@ -49,9 +51,16 @@ const Table: ParentComponent = props => {
       tableHeader.style.top = "54px";
       tableHeader.style.left = "4px";
       tableHeader.style.transform = "translateY(4px)";
+      if (isSafari || isIOS) {
+        tableHeaderShadowStickyDiv.style.opacity = "1";
+      }
     }
-    tableHeader.style.boxShadow = "var(--table-header-box-shadow)";
-    tableHeader.style.transition = "box-shadow 200ms";
+    if (isSafari || isIOS) {
+      tableHeaderShadowTR.style.opacity = "1";
+    } else {
+      tableHeader.style.boxShadow = "var(--table-header-box-shadow)";
+      tableHeader.style.transition = "box-shadow 200ms";
+    }
     setHeaderState("showGradientBorder", true);
     tableHeaderFirstLastSiblings.forEach(item => {
       item.style.borderRadius = "0";
@@ -64,12 +73,13 @@ const Table: ParentComponent = props => {
   const hideActiveHeader = () => {
     if (!tableSameWidthAsParent) {
       const { scrollLeft } = tableContainerParent;
-
       tableHeader.style.position = "absolute";
       tableHeader.style.top = "0px";
       tableHeader.style.left = "0px";
       tableHeader.style.transform = `translate(${scrollLeft}px, 4px)`;
     }
+    tableHeaderShadowTR.style.opacity = "0";
+    tableHeaderShadowStickyDiv.style.opacity = "0";
     tableHeader.style.boxShadow = "var(--table-header-box-shadow-hide)";
     setHeaderState("showGradientBorder", false);
     tableHeaderFirstLastSiblings.forEach(item => {
@@ -83,7 +93,11 @@ const Table: ParentComponent = props => {
       requestAnimationFrame(() => {
         tableHeader.style.top = "0.1px";
         requestAnimationFrame(() => {
-          tableHeader.style.top = "0px";
+          if (tableSameWidthAsParent) {
+            tableHeader.style.top = "";
+          } else {
+            tableHeader.style.top = "0px";
+          }
         });
       });
     }
@@ -123,6 +137,7 @@ const Table: ParentComponent = props => {
     tableFirstTableRowCells = [...tableBody.querySelector("tr")!.querySelectorAll("td")!];
     tableHeaderFirstLastSiblings = [tableHeaders[0], tableHeaders[tableHeaders.length - 1]];
     tableHeaderRealTR = tableHeader.querySelector("#header-real-tr")!;
+    tableHeaderShadowTR = tableHeader.querySelector("#header-shadow")!;
   };
 
   const resetSizes = () => {
@@ -216,6 +231,7 @@ const Table: ParentComponent = props => {
     tableHeaderRealTR.style.top = "0px";
     tableHeaderRealTR.style.left = "0px";
     tableHeaderRealTR.style.width = `${tableWidth + 8}px`;
+    tableHeaderShadowTR.style.height = `${tableHeaderHeight - (tableSameWidthAsParent ? 2 : 0)}px`;
     fakeTableRow[0].style.height = `${tableHeaderHeight}px`;
     tableContainerParent.style.overflow = "auto hidden";
     if (!addedFakeTableRow) {
@@ -231,8 +247,24 @@ const Table: ParentComponent = props => {
     }
   };
 
+  if (import.meta.env.MODE === "development") {
+    onMount(() => {
+      console.clear();
+      setTimeout(() => {
+        console.warn("CLEARED annoying 300+ hydration key errors from solid-start");
+      }, 500);
+    });
+  }
+
   onMount(() => {
     queryTableElements(tableEl);
+    if (isSafari || isIOS) {
+      // Safari doesn't take borders into account, so subtrack 2px
+      tableHeader.classList.replace("top-[58px]", "top-[56px]");
+      const height = `${tableHeader.getBoundingClientRect().height - 2}px`;
+      tableHeaderShadowTR.style.height = height;
+      tableHeaderShadowStickyDiv.style.height = height;
+    }
     tableContainerParent.addEventListener("scroll", onParentScrollX);
 
     const resizeObserver = new ResizeObserver(entries => {
@@ -246,20 +278,27 @@ const Table: ParentComponent = props => {
 
         if (entry.target === tableContainerParent) {
           if (prevTableContainerParentWidth === targetWidth) {
+            console.log("prevTableContainerParentWidth === targetWidth", {
+              prevTableContainerParentWidth,
+              targetWidth
+            });
             prevTableContainerParentWidth = targetWidth;
             return;
           }
           prevTableContainerParentWidth = targetWidth;
+          console.log("set foo");
         }
 
         if (entry.target === tableEl) {
           if (prevTableWidth === targetWidth) {
             prevTableWidth = targetWidth;
+            console.log("prevTableWidth === targetWidth", true);
             return;
           }
           prevTableWidth = targetWidth;
 
           if (observeTableElInit) {
+            console.log("observeTableElInit", true);
             observeTableElInit = false;
             return;
           }
@@ -267,7 +306,9 @@ const Table: ParentComponent = props => {
 
         if (!checkTableSameWidthAsParent()) {
           setTableSizeSameAsParent();
+          console.log("setTableSizeSameAsParent");
         } else {
+          console.log("resetSizes");
           resetSizes();
         }
       }
@@ -276,11 +317,22 @@ const Table: ParentComponent = props => {
     const h4Els = tableEl.querySelectorAll("h4");
     // setHeaders([...h4Els].map(item => ({ name: item.textContent!, active: false })));
 
+    // TODO: resizing logic is broken in Safari
     setTableRowTargets(() => [...h4Els]);
     setTableTarget(() => [tableEl]);
     requestAnimationFrame(() => {
+      console.log({ prevTableContainerParentWidth });
       resizeObserver.observe(tableContainerParent);
       resizeObserver.observe(tableEl);
+
+      if (isSafari || isIOS) {
+        if (window.scrollY < 100) return;
+        setTimeout(() => {
+          setTableSizeSameAsParentInit = false;
+          prevTableContainerParentWidth = tableContainerParent.clientWidth;
+          setTableSizeSameAsParent();
+        });
+      }
     });
   });
 
@@ -323,6 +375,7 @@ const Table: ParentComponent = props => {
         if (boundingClientRect.top <= rootBounds?.top! && !isIntersecting) {
           prevY = window.scrollY;
           tableHeaderName.textContent = target.textContent;
+
           showActiveHeader();
 
           return;
@@ -348,7 +401,18 @@ const Table: ParentComponent = props => {
 
   return (
     <div class={`${pageWidthClass} mx-auto isolate`}>
+      <div
+        class="fixed top-[60px] left-0 right-0 box-shadow-[var(--table-header-box-shadow)] transition-opacity z-1 pointer-events-none"
+        style={{ opacity: "0" }}
+        ref={tableHeaderShadowStickyDiv}
+      />
       <div class="w-full relative">
+        {/* despite having overflow-clip doesn't cut off overflowing table in Safari/iOS */}
+        {/* so added a inverse rounded corner to hide overflowing theader text */}
+        <div
+          class="absolute top-0 right-0 inverse-corner-[size(30px)_color(var(--page-main-bg))_position(0,100%)] pointer-events-none z-10"
+          classList={{ hidden: !(isSafari || isIOS) }}
+        />
         <div class="absolute top-0 left-0 w-full h-full border-[#E4F6F9] border-[7px] rounded-[30px] pointer-events-none z-10 dark:border-[#2b455a]" />
         <div
           class="absolute top-0 left-0 w-full h-full border-[#D8DFF5] border-[7px] rounded-[30px] pointer-events-none z-10 dark:border-[#2c4668]"

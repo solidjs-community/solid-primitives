@@ -202,7 +202,7 @@ module.exports = {
             const borderRadius = radius.match(/[^0-9]$/) ? radius : `${radius}px`;
             const color =
               value
-                .match(/color\(([^)]*)\)/)?.[1]
+                .match(/color\(([^)]*\)?)\)/)?.[1]
                 .replace(/_/g, " ")
                 .replace(/#/, "%23")
                 .replace(/\//g, "%2F")
@@ -217,6 +217,27 @@ module.exports = {
           }
         },
         { values: theme("dashedBorder") }
+      );
+    }),
+    plugin(function ({ matchUtilities, theme }) {
+      matchUtilities(
+        {
+          "inverse-corner": value => {
+            const position = (value.match(/position\(([^)]*)\)/)?.[1] || "0,100%").replace(
+              /,/g,
+              " "
+            );
+            const _size = value.match(/size\(([^)]*)\)/)?.[1] || "0px";
+            const size = _size.match(/[^0-9]$/) ? _size : `${_size}px`;
+            const color = value.match(/color\(([^)]*\)?)\)/)?.[1] || "#000";
+            return {
+              backgroundImage: `radial-gradient(circle at ${position}, rgba(255,255,255,0) ${size}, ${color} 0)`,
+              width: size,
+              height: size
+            };
+          }
+        },
+        { values: theme("inverseCorner") }
       );
     }),
     plugin(function ({ matchUtilities, theme }) {

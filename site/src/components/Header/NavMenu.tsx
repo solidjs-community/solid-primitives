@@ -11,7 +11,7 @@ const NavMenu = () => {
     "Managing Primitive Complexity"
   ];
   return (
-    <>
+    <div>
       <div class="border-b-2 my-1 mx-4 border-slate-200 dark:border-slate-600" />
       <div class="p-4">
         <ul class="flex flex-col text-lg">
@@ -36,7 +36,7 @@ const NavMenu = () => {
           </For>
         </ul>
       </div>
-    </>
+    </div>
   );
 };
 
