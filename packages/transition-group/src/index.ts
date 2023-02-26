@@ -5,7 +5,7 @@ const noopTransition = (el: any, done: () => void) => done();
 
 export type TransitionMode = "out-in" | "in-out" | "parallel";
 
-export type OnTransition<T> = (el: NonNullable<T>, done: () => void) => void;
+export type OnTransition<T> = (el: T, done: () => void) => void;
 
 export type SwitchTransitionOptions<T> = {
   onEnter?: OnTransition<T>;
@@ -16,7 +16,7 @@ export type SwitchTransitionOptions<T> = {
 
 export function createSwitchTransition<T>(
   source: Accessor<T>,
-  options: SwitchTransitionOptions<T>,
+  options: SwitchTransitionOptions<NonNullable<T>>,
 ): Accessor<NonNullable<T>[]> {
   if (process.env.SSR) {
     let el: any = source();
