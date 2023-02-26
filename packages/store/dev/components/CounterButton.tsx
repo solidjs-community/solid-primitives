@@ -27,7 +27,7 @@ export const CounterButton: CounterButtonType = props => {
 };
 export default CounterButton;
 
-export const IncreaseButton: ParentComponent<CounterButtonProps> = props =>
+export const IncreaseButton: ParentComponent<CounterButtonProps> = props => (
   <CounterButton
     {...props}
     onClick={(state, actions) => {
@@ -35,26 +35,29 @@ export const IncreaseButton: ParentComponent<CounterButtonProps> = props =>
     }}
     text="+"
   />
+);
 
-export const DecreaseButton: ParentComponent<CounterButtonProps> = props =>
-  CounterButton({
-    ...props,
-    onClick: (state, actions) => {
+export const DecreaseButton: ParentComponent<CounterButtonProps> = props => (
+  <CounterButton
+    {...props}
+    onClick={(state, actions) => {
       actions.resetCount(state.value - 1);
-    },
-    text: "-"
-  });
+    }}
+    text="-"
+  />
+);
 
-export const ResetButton: ParentComponent<CounterButtonProps> = props =>
-  CounterButton({
-    ...props,
-    onClick: (_, actions) => {
+export const ResetButton: ParentComponent<CounterButtonProps> = props => (
+  <CounterButton
+    {...props}
+    onClick={(_, actions) => {
       actions.resetCount();
-    },
-    text: "Reset",
-    style: {
+    }}
+    text="Reset"
+    style={{
       border: "1px solid red",
       color: "red",
       ...(typeof props.style === "object" ? props.style : {})
-    }
-  });
+    }}
+  />
+);
