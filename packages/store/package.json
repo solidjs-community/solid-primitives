@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/store",
-  "version": "0.0.100",
+  "version": "0.0.200",
   "description": "SolidJS Primitive to simplify the creation of global stores and the ability to access and mutate them.",
   "author": "Zalexios <zalexios@outlook.com>",
   "contributors": [],
@@ -17,8 +17,9 @@
     "name": "store",
     "stage": 0,
     "list": [
-      "createSharedStore",
-      "createStoreFactory",
+      "createFluxStore",
+      "createFluxFactory",
+      "createActions",
       "createAction"
     ],
     "category": "Utilities"
@@ -29,7 +30,8 @@
     "context",
     "store",
     "state",
-    "primitives"
+    "primitives",
+    "flux"
   ],
   "private": false,
   "sideEffects": false,

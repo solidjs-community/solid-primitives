@@ -3,72 +3,87 @@ import { batch, untrack } from "solid-js";
 import type { SetStoreFunction } from "solid-js/store";
 import { createStore } from "solid-js/store";
 
+/**
+ * Type alias for any function with any number of arguments and any return type.
+ */
 type AnyFunction = (...args: any[]) => any;
-type Action<A extends AnyFunction> = (...args: Parameters<A>) => ReturnType<A>;
-type CreateAction = <A extends AnyFunction>(fn: A) => Action<A>;
-type CreateActions = <A extends object | undefined>(fns?: A) => A | undefined;
 
-export const createAction: CreateAction =
+/**
+ * type alias for a function that takes another function as an argument and returns a new function
+ * @param fn generic function used to infer the types of the arguments and return type
+ * @returns a new function with the same arguments as `fn` and returns the same return type
+ */
+type Action = <A extends AnyFunction>(fn: A) => (...args: Parameters<A>) => ReturnType<A>;
+
+/**
+ * type alias for an object with string keys and `Action` function values
+ * @returns a generic set of `Action` functions
+ */
+type Actions = Record<string, Action>;
+
+/**
+ * wraps a function with `batch` and `untrack` functions from `solid-js` to improve performance
+ * and prevent unnecessary re-renders
+ * @param fn the function to wrap
+ * @returns the return value of `fn`
+ */
+export const createAction: Action =
   fn =>
   (...args) =>
     batch(() => untrack(() => fn(...args)));
-export const createActions: CreateActions = actions => {
-  if (!actions) return undefined;
 
-  let result = { ...actions };
-  // for (const [name, fn] of Object.entries(result) as [keyof typeof result, AnyFunction][]) {
+/**
+ * wraps each function in `actions` with `createAction` to improve performance and prevent unnecessary
+ * re-renders and returns a new object of the same type
+ * @param actions a collection of `Action` functions to wrap
+ * @returns a new object of the same type but each function is wrapped with `createAction`
+ */
+export const createActions = <A extends Actions>(actions: A) => {
+  let result: Actions = { ...actions };
   for (const [name, fn] of Object.entries(result)) {
-    if (typeof fn !== "function") continue;
-    result = {
-      ...result,
-      [name]: createAction(fn)
-    };
+    result[name] = createAction(fn);
   }
 
-  return result;
+  return result as A;
 };
 
 /**
- * Create a shared store.
+ * Solid `Store` enforcing the Flux design pattern which emphasizes a one-way data flow. This typically
+ * consists of separate actions that mutate the Store's `state` and `getters` enabling readonly access
+ * to the Store's `state`. It is not required for a `FluxStore` to contain both `actions` and `getters`.
  *
- * @typedef SharedStore
- * @template <T: state type of the store, G: store access methods, A: store mutation methods>
- * @returns {
- *  {T} state - The current state of the store.
- *  {G} getters - Predefined methods to access the state of the store.
- *  {A} actions - Predefined methods to mutate the state of the store.
- *  {SetStoreFunction<T>} setState - A function to manually mutate the current state of the store.
- * }
+ * @template `<T: state type of the store, G: store access methods | undefined, A: store mutation methods | undefined>`
+ * @returns `{ state: T, getters: G, actions: A }`
  */
-export type SharedStore<T extends object, G = undefined, A = undefined> = {
+export type FluxStore<T extends object, G = undefined, A = undefined> = {
   state: T;
   getters: undefined extends G ? undefined : G;
   actions: undefined extends A ? undefined : A;
-  setState: SetStoreFunction<T>;
 };
 
 /**
- * Factory to create reusable stores.
+ * Encapsulates a defined `FluxStore` in a function able to create multiple instances of the store.
+ * The `initialValueOverride` is optional and can be used to override the initial state of the store.
  *
- * @typedef StoreFactory
- * @template <T: state type of the store, G: store access methods, A: store mutation methods>
- * @returns (initialValueSetter?: T | ((fallbackState: T) => T)) => SharedStore<T, G, A>
+ * @template `<T: state type of the store, G: store access methods | undefined, A: store mutation methods | undefined>`
+ * @returns `(initialValueOverride?: T | ((fallbackState: T) => T)) => FluxStore<T, G, A>`
  */
-export type StoreFactory<T extends object, G = undefined, A = undefined> = (
-  initialValueSetter?: T | ((fallbackState: T) => T)
-) => SharedStore<T, G, A>;
+export type FluxFactory<T extends object, G = undefined, A = undefined> = (
+  initialValueOverride?: T | ((fallbackState: T) => T)
+) => FluxStore<T, G, A>;
 
 /**
- * createSharedStore takes an `initialState` and an optional object containing functions to create getters and/or actions.
- * A store is created and returned along with access and mutation functions & the native `setState`.
- * @template <T: state type of the store, G: store access methods, A: store mutation methods>
+ * Create a Solid 'Store' by specifying a state type and/or provide an `initialState` and an optional
+ * `createMethods` object typically consisting of separate actions that mutate the Store's `state` and
+ * `getters` enabling readonly access to the Store's `state`. It is not required for a `FluxStore` to
+ * contain both `actions` and `getters`.
+ * @template `<T: state type of the store, G: store access methods | undefined, A: store mutation methods | undefined>`
  * @param initialState object to be wrapped in a Store
- * @param createMethods optional object containing functions to create getters and/or actions.
- * @returns `SharedStore`
+ * @param createMethods optional object containing functions to create `actions` and/or `getters`.
+ * @returns `FluxStore`
  * @example
  * ```tsx
- * // `counter-store.ts`
- * export const counterStore = createSharedStore({
+ * export const counterFluxStore = createFluxStore({
  *   value: 5,
  * }, {
  *  getters: state => ({
@@ -80,17 +95,16 @@ export type StoreFactory<T extends object, G = undefined, A = undefined> = (
  *  })
  * });
  *
- * // `Example.tsx`
- * import { counterStore } from './counter-store.ts';
  *
- * const {state: counterState, getters: {count}, actions: {increment, reset}} = counterStore;
+ *
+ * const {state: counterState, getters: {count}, actions: {increment, reset}} = counterFluxStore;
  * count() // => 5
  * increment()
  * count() // => 6
  * reset() // => 0
  * ```
  */
-export function createSharedStore<
+export function createFluxStore<
   T extends object,
   G extends object | undefined,
   A extends object | undefined
@@ -100,24 +114,24 @@ export function createSharedStore<
     getters: (state: T) => G;
     actions: (setState: SetStoreFunction<T>, state: T) => A;
   }
-): SharedStore<T, G, A>;
-export function createSharedStore<T extends object, G extends object | undefined>(
+): FluxStore<T, G, A>;
+export function createFluxStore<T extends object, G extends object | undefined>(
   initialState: T,
   createMethods: {
     getters: (state: T) => G;
   }
-): SharedStore<T, G>;
-export function createSharedStore<T extends object, A extends object | undefined>(
+): FluxStore<T, G>;
+export function createFluxStore<T extends object, A extends object | undefined>(
   initialState: T,
   createMethods: {
     actions: (setState: SetStoreFunction<T>, state: T) => A;
   }
-): SharedStore<T, undefined, A>;
-export function createSharedStore<T extends object>(
+): FluxStore<T, undefined, A>;
+export function createFluxStore<T extends object>(
   initialState: T,
   createMethods?: {}
-): SharedStore<T>;
-export function createSharedStore<
+): FluxStore<T>;
+export function createFluxStore<
   T extends object,
   G extends object | undefined,
   A extends object | undefined
@@ -130,28 +144,26 @@ export function createSharedStore<
 ) {
   const [state, setState] = createStore<T>(initialState);
   const getters = createMethods?.getters?.(state);
-  const actions = createActions(createMethods?.actions?.(setState, state));
+  const actions = createActions(createMethods?.actions?.(setState, state) as Actions) as A;
 
   return {
     state,
     getters,
-    actions,
-    setState
+    actions
   };
 }
 
 /**
- * createStoreFactory takes an `fallbackState` and an optional object containing functions to create getters and/or actions.
- * A store factory is created  and returns a function enabling rapid shared store creation. along with access and mutation
- * functions & the native `setState`.
- * @template <T: state type of the store, G: store access methods, A: store mutation methods>
+ * Create a `FluxStore` encapsulated in a `FluxFactory` function.
+ * The factory function accepts `initialValueOverride?: T | ((fallbackState: T) => T)` to optionally
+ * override the initial state of the store while creating each new instance.
+ * @template `<T: state type of the store, G: store access methods | undefined, A: store mutation methods | undefined>`
  * @param fallbackState fallback object to be wrapped in a Store if no initial value is provided.
  * @param createMethods optional object containing functions to create getters and/or actions.
- * @returns `StoreFactory`
+ * @returns `FluxFactory`
  * @example
  * ```tsx
- * // `counter-store.ts`
- * export const counterStoreFactory = createStoreFactory({
+ * export const counterFluxFactory = createFluxFactory({
  *   value: 5,
  * }, {
  *  getters: state => ({
@@ -163,17 +175,22 @@ export function createSharedStore<
  *  })
  * });
  *
- * // `Example.tsx`
- * import { counterStoreFactory } from './counter-store.ts';
  *
- * const {state: counterState, getters: {count}, actions: {increment, reset}} = counterStoreFactory({ value: 25 });
+ * const {state: counterState, getters: {count}, actions: {increment, reset}} = counterFluxFactory({ value: 25 });
+ * const {getters: {count: pageViews}, actions: {increment: newPageView, reset: resetPageViews}} = counterFluxFactory({ value: 0 });
  * count() // => 25
+ * pageViews() // => 0
  * increment()
+ * newPageView()
  * count() // => 26
+ * pageViews() // => 1
  * reset() // => 0
+ * newPageView()
+ * pageViews() // => 2
+ * resetPageViews() // => 0
  * ```
  */
-export function createStoreFactory<
+export function createFluxFactory<
   T extends object,
   G extends object | undefined,
   A extends object | undefined
@@ -183,24 +200,24 @@ export function createStoreFactory<
     getters: (state: T) => G;
     actions: (setState: SetStoreFunction<T>, state: T) => A;
   }
-): StoreFactory<T, G, A>;
-export function createStoreFactory<T extends object, G extends object | undefined>(
+): FluxFactory<T, G, A>;
+export function createFluxFactory<T extends object, G extends object | undefined>(
   fallbackState: T,
   createMethods: {
     getters: (state: T) => G;
   }
-): StoreFactory<T, G>;
-export function createStoreFactory<T extends object, A extends object | undefined>(
+): FluxFactory<T, G>;
+export function createFluxFactory<T extends object, A extends object | undefined>(
   fallbackState: T,
   createMethods: {
     actions: (setState: SetStoreFunction<T>, state: T) => A;
   }
-): StoreFactory<T, undefined, A>;
-export function createStoreFactory<T extends object>(
+): FluxFactory<T, undefined, A>;
+export function createFluxFactory<T extends object>(
   fallbackState: T,
   createMethods?: {}
-): StoreFactory<T>;
-export function createStoreFactory<
+): FluxFactory<T>;
+export function createFluxFactory<
   T extends object,
   G extends object | undefined,
   A extends object | undefined
@@ -215,15 +232,15 @@ export function createStoreFactory<
     getters: createMethods?.getters as (state: T) => G,
     actions: createMethods?.actions as (setState: SetStoreFunction<T>, state: T) => A
   };
-  return (initialValueSetter =>
-    createSharedStore(
-      !!initialValueSetter
-        ? typeof initialValueSetter === "function"
-          ? untrack(() => initialValueSetter(fallbackState))
-          : initialValueSetter
+  return (initialValueOverride =>
+    createFluxStore(
+      !!initialValueOverride
+        ? typeof initialValueOverride === "function"
+          ? untrack(() => initialValueOverride(fallbackState))
+          : initialValueOverride
         : fallbackState,
       methods
-    )) as StoreFactory<T, G, A>;
+    )) as FluxFactory<T, G, A>;
 }
 
 // This ensures the `JSX` import won't fall victim to tree shaking before
