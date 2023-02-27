@@ -172,4 +172,5 @@ configs/vitest.config.ts.timestamp-*.mjs
 pages
 
 # checking primitve size
-_temp_output_primitive_dir
+_temp_output_primitive_size_dir
+_temp_check_primitive_size.ts

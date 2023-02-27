@@ -20,7 +20,7 @@
     "pages": "turbo run page && jiti ./scripts/collectPages.ts",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts",
-    "get-size": "JITI_ESM_RESOLVE=1 jiti ./scripts/get-size.ts",
+    "get-size": "JITI_ESM_RESOLVE=1 jiti ./scripts/update-site/checkSizeOfPackage.ts",
     "update-site": "JITI_ESM_RESOLVE=1 jiti ./scripts/update-site/index.ts",
     "update-deps": "pnpm up -Lri",
     "changeset": "changeset",

@@ -13,14 +13,14 @@ const checkSizeOfPackage = async ({
   primitiveName: string;
 }) => {
   const file = `
-export { ${primitiveName} } from "./index"
+export { ${primitiveName} } from "./packages/${packageName}/src/index"
 `;
-  const fileName = "_temp_check_primitive.ts";
-  const outDir = "./_temp_output_primitive_dir";
+  const fileName = "_temp_check_primitive_size.ts";
+  const outDir = "./_temp_output_primitive_size_dir";
   const outFile = `${outDir}/main.js`;
   const packagePath = `./packages/${packageName}/src/`;
   const packageIndexPath = `${packagePath}/index.ts`;
-  const packageExportFilePath = `${packagePath}${fileName}`;
+  const packageExportFilePath = `./${fileName}`;
   if (type === "export") {
     writeFileSync(packageExportFilePath, file);
   }
@@ -44,7 +44,12 @@ export { ${primitiveName} } from "./index"
   }
   rmSync(outDir, { recursive: true });
 
-  console.log(formatBytes(minifiedSize), formatBytes(gzippedSize));
+  return {
+    minifiedSize,
+    gzippedSize
+  };
 };
+
+checkSizeOfPackage({ type: "package", packageName: "stream", primitiveName: "createStream" });
 
 export default checkSizeOfPackage;
