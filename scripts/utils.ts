@@ -24,3 +24,25 @@ export function insertTextBetweenComments(file: string, text: string, comment: s
   lines.splice(start + 1, end - start - 1, ...text.split("\n"));
   return lines.join("\n");
 }
+
+export function formatBytes(
+  bytes: string | number,
+  {
+    decimals = 2,
+    k = 1000,
+    sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+  }: {
+    decimals?: number;
+    sizes?: string[];
+    // Some manufacturers, such as Mac, considers kilobyte to be 1000 bytes while others define it as 1024 bytes https://ux.stackexchange.com/a/13850/140158
+    k?: 1000 | 1024;
+  } = {}
+) {
+  if (!+bytes) return `0 ${sizes[0]}`;
+
+  const dm = decimals < 0 ? 0 : decimals;
+
+  const i = Math.floor(Math.log(bytes as number) / Math.log(k));
+
+  return `${parseFloat(((bytes as number) / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
