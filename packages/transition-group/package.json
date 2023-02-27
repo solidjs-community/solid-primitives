@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/transition-group",
   "version": "0.0.1-beta.0",
-  "description": "A template primitive example.",
+  "description": "Reactive primitives for implementing transition effects in SolidJS",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
@@ -14,8 +14,8 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "transition",
-    "stage": 0,
+    "name": "transition-group",
+    "stage": 1,
     "list": [
       "createSwitchTransition",
       "createListTransition"
@@ -24,7 +24,10 @@
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "transition",
+    "animation",
+    "transition-group"
   ],
   "private": false,
   "sideEffects": false,

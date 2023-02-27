@@ -14,6 +14,40 @@ export type SwitchTransitionOptions<T> = {
   appear?: boolean;
 };
 
+/**
+ * Create an element transition interface for switching between single elements.
+ * It can be used to implement own transition effect, or a custom `<Transition>`-like component.
+ *
+ * It will observe {@link source} and return a signal with array of elements to be rendered (current one and exiting ones).
+ *
+ * @param source a signal with the current element. Any nullish value will mean there is no element.
+ * Any object can used as the source, but most likely you will want to use a `HTMLElement` or `SVGElement`.
+ * @param options transition options:
+ * - `onEnter` - a function to be called when a new element is entering. It receives the element and a callback to be called when the transition is done.
+ * - `onExit` - a function to be called when an exiting element is leaving. It receives the element and a callback to be called when the transition is done.
+ * - `mode` - transition mode. Defaults to `"parallel"`. Other options are `"out-in"` and `"in-out"`.
+ * - `appear` - whether to run the transition on the initial element. Defaults to `false`. If `true`, the initial element won't be rendered until the first clinet-side effect is run.
+ * @returns a signal with an array of the current element and exiting previous elements.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/transition-group#createSwitchTransition
+ *
+ * @example
+ * const [el, setEl] = createSignal<HTMLDivElement>();
+ *
+ * const rendered = createSwitchTransition(el, {
+ *   onEnter(el, done) {
+ *     // the enter callback is called before the element is inserted into the DOM
+ *     // so run the animation in the next animation frame
+ *     requestAnimationFrame(() => { ... })
+ *   },
+ *   onExit(el, done) {
+ *     // the exitting element is kept in the DOM until the done() callback is called
+ *   },
+ * })
+ *
+ * // change the source to trigger the transition
+ * setEl(refToHtmlElement);
+ */
 export function createSwitchTransition<T>(
   source: Accessor<T>,
   options: SwitchTransitionOptions<NonNullable<T>>,
@@ -107,6 +141,38 @@ export type ListTransitionOptions<T> = {
   appear?: boolean;
 };
 
+/**
+ * Create an element list transition interface for changes to the list of elements.
+ * It can be used to implement own transition effect, or a custom `<TransitionGroup>`-like component.
+ *
+ * It will observe {@link source} and return a signal with array of elements to be rendered (current ones and exiting ones).
+ *
+ * @param source a signal with the current list of elements.
+ * Any object can used as the element, but most likely you will want to use a `HTMLElement` or `SVGElement`.
+ * @param options transition options:
+ * - `onChange` - a function to be called when the list changes. It receives the list of added elements, removed elements, and moved elements. It also receives a callback to be called when the removed elements are finished animating (they can be removed from the DOM).
+ * - `appear` - whether to run the transition on the initial elements. Defaults to `false`. If `true`, the initial elements won't be rendered until the first clinet-side effect is run.
+ * @returns a signal with an array of the current elements and exiting previous elements.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/transition-group#createListTransition
+ *
+ * @example
+ * const [els, setEls] = createSignal<HTMLElement[]>([]);
+ *
+ * const rendered = createListTransition(els, {
+ *   onChange({ added, removed, moved, finishRemoved }) {
+ *     // the callback is called before the added elements are inserted into the DOM
+ *     // so run the animation in the next animation frame
+ *     requestAnimationFrame(() => { ... })
+ *
+ *     // the removed elements are kept in the DOM until the finishRemoved() callback is called
+ *     finishRemoved(removed);
+ *   }
+ * })
+ *
+ * // change the source to trigger the transition
+ * setEls([...refsToHTMLElements]);
+ */
 export function createListTransition<T>(
   source: Accessor<readonly NonNullable<T>[]>,
   options: ListTransitionOptions<NonNullable<T>>,
