@@ -44,7 +44,7 @@ const run = async () => {
       continue;
     }
 
-    buildCategory({ name, pkg });
+    await buildCategory({ name, pkg });
     buildJSONCategory({ name, pkg });
     await buildPage({ name, pkg });
   }

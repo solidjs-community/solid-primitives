@@ -12,7 +12,6 @@ const checkSizeOfPackage = async ({
   packageName: string;
   primitiveName: string;
 }) => {
-  console.log("hi");
   const file = `
 export { ${primitiveName} } from "./packages/${packageName}/src/index"
 `;
@@ -51,9 +50,4 @@ export { ${primitiveName} } from "./packages/${packageName}/src/index"
   };
 };
 
-checkSizeOfPackage({
-  type: "export",
-  packageName: "stream",
-  primitiveName: "createStream"
-});
 export default checkSizeOfPackage;

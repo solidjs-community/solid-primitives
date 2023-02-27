@@ -1,6 +1,7 @@
 import { writeFile, writeFileSync } from "fs";
 import { PackageData, PackageJSONData } from ".";
-import { r } from "../utils";
+import { formatBytes, r } from "../utils";
+import checkSizeOfPackage from "./checkSizeOfPackage";
 
 const categories: Record<string, PackageData[]> = {};
 const rootDependencies: string[] = [];
@@ -14,16 +15,26 @@ const stageShieldBaseURL =
   "https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-"; // add "<stage>.json" after
 const stageShieldLink =
   "https://github.com/solidjs-community/solid-primitives#contribution-process";
-const bundleJSAPIURL = `https://bundlejs.com/api`;
-const getBundleJSQuery = ({ packageName, primitive }: { packageName: string; primitive: string }) =>
+const bundleJSURL = `https://bundlejs.com/`;
+const getBundleJSQuery = ({
+  type,
+  packageName,
+  primitiveName
+}: {
+  type: "package" | "export";
+  packageName: string;
+  primitiveName: string;
+}) =>
   encodeURIComponent(
-    `q=@solid-primitives/${packageName}&treeshake=[{${primitive}}]&config={"esbuild":{"external":["solid-js"]}}`
+    `q=@solid-primitives/${packageName}${
+      type === "export" ? `&treeshake=[{${primitiveName}}]` : ""
+    }&config={"esbuild":{"external":["solid-js"]}}`
   );
 
 export const getSizeShield = (name: string) => `${sizeShield}${name}.json`;
 export const getNPMShield = (name: string) => `${npmShield}${name}.json`;
 
-export const buildCategory = ({ name, pkg }: { name: string; pkg: PackageJSONData }) => {
+export const buildCategory = async ({ name, pkg }: { name: string; pkg: PackageJSONData }) => {
   const { list, category, stage } = pkg.primitive;
 
   const data = {} as PackageData;
@@ -36,13 +47,40 @@ export const buildCategory = ({ name, pkg }: { name: string; pkg: PackageJSONDat
     data.NPM = "";
   } else {
     // data.Size = `[![SIZE](${sizeShield}${pkg.name}?style=for-the-badge&label=)](${bundlephobiaURL}${pkg.name})`;
-    data.Size = getSizeShield(pkg.name);
+    const getSizes = async () => {
+      const run = async () => {
+        return Promise.all(
+          list.map(async prim => {
+            const type = "export";
+            const packageName = name;
+            const primitiveName = prim;
+            const result = await checkSizeOfPackage({
+              type,
+              packageName,
+              primitiveName
+            });
+            const minifiedSize = formatBytes(result.minifiedSize);
+            const gzippedSize = formatBytes(result.gzippedSize);
+            const value = `{ gzipped: "${gzippedSize}", minified: "${minifiedSize}" }`;
+            const query = getBundleJSQuery({
+              type,
+              packageName,
+              primitiveName
+            });
+            const href = `${bundleJSURL}${query}`;
+
+            return `<SizeBadge value={${value}} href="${href}" />`;
+          })
+        );
+      };
+      return (await run()).join("");
+    };
+
+    data.Size = await getSizes();
     data.NPM = getNPMShield(pkg.name);
   }
-  // data.Stage = `[![STAGE](${stageShieldBaseURL}${stage ?? "2"}.json)](${stageShieldLink})`;
   data.Stage = stage ?? "2";
   data.Primitives = list
-    // .map(prim => `[${prim}](${githubURL}${name}#${prim.replace(/ /g, "-").toLowerCase()})`)
     .map(prim => {
       const primitiveRoute = `/${name}#${prim.toLowerCase().replace(/\s/g, "-")}`;
       return `<PrimitiveBtn href="${primitiveRoute}">${prim}</PrimitiveBtn>`;
@@ -99,7 +137,7 @@ export const writeHTMLTableFile = () => {
                   case "NPM":
                     return `<VersionBadge value="${value}" href="${npmURL}@solid-primitives/${item.Name}"/>`;
                   case "Size":
-                    return `<SizeBadge value="${value}" href="${bundlephobiaURL}@solid-primitives/${item.Name}"/>`;
+                    return value;
                   case "Name":
                     return `<PrimitiveBtn href="${primitiveNameRoute}">${value}</PrimitiveBtn>`;
                   default:
