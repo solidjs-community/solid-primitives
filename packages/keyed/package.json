@@ -82,7 +82,7 @@
   },
   "devDependencies": {
     "@solid-primitives/immutable": "^0.1.6",
-    "@solid-primitives/refs": "^0.3.6",
+    "@solid-primitives/refs": "^0.4.0-beta.0",
     "@solid-primitives/utils": "^5.0.0",
     "solid-transition-group": "^0.0.13"
   },

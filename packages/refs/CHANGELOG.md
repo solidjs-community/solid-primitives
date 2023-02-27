@@ -1,5 +1,11 @@
 # @solid-primitives/refs
 
+## 0.4.0-beta.0
+
+### Minor Changes
+
+- d8054700: Add `findFirst` and `resolveFirst` primitives
+
 ## 0.3.6
 
 ### Patch Changes

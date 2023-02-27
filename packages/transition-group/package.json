@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/transition-group",
-  "version": "0.0.100",
+  "version": "0.0.1-beta.0",
   "description": "A template primitive example.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -70,7 +70,7 @@
     "solid-js": "^1.6.0"
   },
   "devDependencies": {
-    "@solid-primitives/refs": "workspace:^0.3.6",
+    "@solid-primitives/refs": "workspace:^0.4.0-beta.0",
     "@solid-primitives/utils": "workspace:^5.2.0",
     "@solidjs/router": "^0.7.0"
   }
