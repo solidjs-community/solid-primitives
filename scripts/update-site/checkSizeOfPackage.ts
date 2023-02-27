@@ -1,12 +1,14 @@
 import { build } from "esbuild";
 import { readFileSync, writeFileSync, rmSync } from "fs";
 import { gzipSizeSync } from "gzip-size";
-import { formatBytes } from "./utils";
+import { formatBytes } from "../utils";
 
-const run = async ({
+const checkSizeOfPackage = async ({
+  type,
   packageName,
   primitiveName
 }: {
+  type: "package" | "export";
   packageName: string;
   primitiveName: string;
 }) => {
@@ -17,11 +19,14 @@ export { ${primitiveName} } from "./index"
   const outDir = "./_temp_output_primitive_dir";
   const outFile = `${outDir}/main.js`;
   const packagePath = `./packages/${packageName}/src/`;
+  const packageIndexPath = `${packagePath}/index.ts`;
   const packageExportFilePath = `${packagePath}${fileName}`;
-  writeFileSync(packageExportFilePath, file);
+  if (type === "export") {
+    writeFileSync(packageExportFilePath, file);
+  }
 
   await build({
-    entryPoints: [packageExportFilePath],
+    entryPoints: [type === "package" ? packageIndexPath : packageExportFilePath],
     outfile: outFile,
     target: ["esnext"],
     format: "esm",
@@ -34,10 +39,12 @@ export { ${primitiveName} } from "./index"
   const buffer = readFileSync(outFile);
   const minifiedSize = buffer.toString().length;
   const gzippedSize = gzipSizeSync(buffer);
-  rmSync(packageExportFilePath);
+  if (type === "export") {
+    rmSync(packageExportFilePath);
+  }
   rmSync(outDir, { recursive: true });
 
   console.log(formatBytes(minifiedSize), formatBytes(gzippedSize));
 };
 
-run({ packageName: "stream", primitiveName: "createAmplitudeStream" });
+export default checkSizeOfPackage;
