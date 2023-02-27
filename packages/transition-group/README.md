@@ -9,7 +9,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/transition-group?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/transition-group)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Provides reactive primitives for implementing transition effects on a group of elements.
+Provides reactive primitives for implementing transition effects on a group of elements, or your own `<Transition>` and `<TransitionGroup>` components.
 
 - [`createSwitchTransition`](#createSwitchTransition) - Create an element transition interface for switching between single elements.
 - [`createListTransition`](#createListTransition) - Create an element list transition interface for changes to the list of elements.
@@ -39,10 +39,13 @@ It will observe the source and return a signal with array of elements to be rend
   Any object can used as the source, but most likely you will want to use a `HTMLElement` or `SVGElement`.
 
 - `options` transition options:
+
   - `onEnter` - a function to be called when a new element is entering. It receives the element and a callback to be called when the transition is done.
   - `onExit` - a function to be called when an exiting element is leaving. It receives the element and a callback to be called when the transition is done.
   - `mode` - transition mode. Defaults to `"parallel"`. Other options are `"out-in"` and `"in-out"`.
-  - `appear` - whether to run the transition on the initial element. Defaults to `false`. If `true`, the initial element won't be rendered until the first clinet-side effect is run.
+  - `appear` - whether to run the transition on the initial element. Defaults to `false`.
+
+    If enabled, the initial element will still be included in the initial render (for SSR), but the transition fill happen when the first client-side effect is run. So to avoid the initial element to be visible, you can set the initial element's style to `display: none` and set it to `display: block` in the `onEnter` callback.
 
 Returns a signal with an array of the current element and exiting previous elements.
 
@@ -83,8 +86,11 @@ It will observe the source and return a signal with array of elements to be rend
   Any object can used as the element, but most likely you will want to use a `HTMLElement` or `SVGElement`.
 
 - `options` transition options:
+
   - `onChange` - a function to be called when the list changes. It receives the list of added elements, removed elements, and moved elements. It also receives a callback to be called when the removed elements are finished animating (they can be removed from the DOM).
-  - `appear` - whether to run the transition on the initial elements. Defaults to `false`. If `true`, the initial elements won't be rendered until the first clinet-side effect is run.
+  - `appear` - whether to run the transition on the initial elements. Defaults to `false`.
+
+  If enabled, the initial elements will still be included in the initial render (for SSR), but the transition fill happen when the first client-side effect is run. So to avoid the initial elements to be visible, you can set the initial element's style to `display: none` and set it to `display: block` in the `onEnter` callback.
 
 Returns a signal with an array of the current elements and exiting previous elements.
 

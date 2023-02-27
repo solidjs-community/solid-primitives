@@ -11,9 +11,10 @@ describe("createSwitchTransition", () => {
     expect(result()[0]).toBe(el1);
   });
 
-  it("returns empty array if appear is enabled", () => {
+  it("returns initial elements if appear is enabled", () => {
     const result = createSwitchTransition(() => el1, { appear: true });
-    expect(result()).toHaveLength(0);
+    expect(result()).toHaveLength(1);
+    expect(result()[0]).toBe(el1);
   });
 });
 
@@ -27,11 +28,13 @@ describe("createListTransition", () => {
     expect(result()[1]).toBe(el2);
   });
 
-  it("returns empty array if appear is enabled", () => {
+  it("returns initial elements if appear is enabled", () => {
     const result = createListTransition(() => [el1, el2], {
       onChange: () => {},
       appear: true,
     });
-    expect(result()).toHaveLength(0);
+    expect(result()).toHaveLength(2);
+    expect(result()[0]).toBe(el1);
+    expect(result()[1]).toBe(el2);
   });
 });

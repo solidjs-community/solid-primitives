@@ -26,7 +26,7 @@ export type SwitchTransitionOptions<T> = {
  * - `onEnter` - a function to be called when a new element is entering. It receives the element and a callback to be called when the transition is done.
  * - `onExit` - a function to be called when an exiting element is leaving. It receives the element and a callback to be called when the transition is done.
  * - `mode` - transition mode. Defaults to `"parallel"`. Other options are `"out-in"` and `"in-out"`.
- * - `appear` - whether to run the transition on the initial element. Defaults to `false`. If `true`, the initial element won't be rendered until the first clinet-side effect is run.
+ * - `appear` - whether to run the transition on the initial element. Defaults to `false`.
  * @returns a signal with an array of the current element and exiting previous elements.
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/transition-group#createSwitchTransition
@@ -53,16 +53,14 @@ export function createSwitchTransition<T>(
   options: SwitchTransitionOptions<NonNullable<T>>,
 ): Accessor<NonNullable<T>[]> {
   const initSource = untrack(source);
-  // if appear is enabled, the initial list will be empty (to be updated in effect)
-  // otherwise, it will be the initial source
-  // this way it will be consistent between server and client
-  const initReturned = options.appear ? [] : initSource ? [initSource] : [];
+  const initReturned = initSource ? [initSource] : [];
 
   if (process.env.SSR) {
     return () => initReturned;
   }
 
   const { onEnter = noopTransition, onExit = noopTransition } = options;
+  let { appear } = options;
 
   const [returned, setReturned] = createSignal<NonNullable<T>[]>(initReturned);
 
@@ -102,18 +100,16 @@ export function createSwitchTransition<T>(
           exitTransition(prev);
         };
 
-  let shouldRun = options.appear;
-
   // update elements and call transitions in effect to suspend under Suspense
   createEffect(
     (prev: T | undefined) => {
       const el = source();
 
-      // skip the first transition if appear is disabled
-      if (!shouldRun) {
-        setReturned(el ? [el] : []);
-        shouldRun = true;
-        return el;
+      if (appear) {
+        appear = false;
+        // the initial element is already in the rendered array
+        // so it needs to be removed to be added again during the enter transition
+        setReturned([]);
       }
 
       if (el !== prev) {
@@ -123,7 +119,10 @@ export function createSwitchTransition<T>(
 
       return el;
     },
-    options.appear ? undefined : initSource,
+    // enabling appear always animates the initial element in
+    // otherwise the element won't be animated,
+    // or will animate the transition if the source is different from the initial value
+    appear ? undefined : initSource,
   );
 
   return returned;
@@ -151,7 +150,7 @@ export type ListTransitionOptions<T> = {
  * Any object can used as the element, but most likely you will want to use a `HTMLElement` or `SVGElement`.
  * @param options transition options:
  * - `onChange` - a function to be called when the list changes. It receives the list of added elements, removed elements, and moved elements. It also receives a callback to be called when the removed elements are finished animating (they can be removed from the DOM).
- * - `appear` - whether to run the transition on the initial elements. Defaults to `false`. If `true`, the initial elements won't be rendered until the first clinet-side effect is run.
+ * - `appear` - whether to run the transition on the initial elements. Defaults to `false`.
  * @returns a signal with an array of the current elements and exiting previous elements.
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/transition-group#createListTransition
@@ -179,21 +178,20 @@ export function createListTransition<T>(
 ): Accessor<NonNullable<T>[]> {
   type V = NonNullable<T>;
 
-  const initSource = untrack(source);
-  // if appear is enabled, the initial list will be empty (to be updated in effect)
-  // otherwise, it will be the initial source
-  // this way it will be consistent between server and client
-  const initialReturned = options.appear ? [] : initSource.slice();
+  const initSource = untrack(source).slice();
 
   if (process.env.SSR) {
-    return () => initialReturned;
+    return () => initSource;
   }
 
   const { onChange } = options;
+  let { appear } = options;
 
-  const [returned, setReturned] = createSignal<V[]>(initialReturned);
+  const [returned, setReturned] = createSignal<V[]>(initSource);
 
-  let prevSet: ReadonlySet<V> = new Set(options.appear ? undefined : initSource);
+  // if appear is enabled, the initial transition won't have any previous elements.
+  // otherwise the elements will match and transition skipped, or transitioned if the source is different from the initial value
+  let prevSet: ReadonlySet<V> = new Set(appear ? undefined : initSource);
   const exiting = new Set<V>();
 
   function finishRemoved(els: V[]): void {
@@ -201,18 +199,16 @@ export function createListTransition<T>(
     for (const el of els) exiting.delete(el);
   }
 
-  let shouldRun = options.appear;
   // update elements and call transitions in effect to suspend under Suspense
   createEffect(() => {
     const list = source();
     (list as any)[$TRACK]; // top level store tracking
 
-    // skip the first transition if appear is disabled
-    if (!shouldRun) {
-      shouldRun = true;
-      prevSet = new Set(list);
-      setReturned(list.slice());
-      return;
+    if (appear) {
+      appear = false;
+      // the initial element is already in the rendered array
+      // so it needs to be removed to be added again during the enter transition
+      setReturned([]);
     }
 
     untrack(() =>
@@ -228,6 +224,7 @@ export function createListTransition<T>(
           (prevSet.has(el) ? moved : added).push(el);
         }
 
+        let sameOrder = true;
         for (let i = 0; i < prev.length; i++) {
           const el = prev[i]!;
           if (!nextSet.has(el)) {
@@ -237,7 +234,11 @@ export function createListTransition<T>(
             }
             next.splice(i, 0, el);
           }
+          if (sameOrder && el !== next[i]) sameOrder = false;
         }
+
+        // skip if nothing changed
+        if (!added.length && !removed.length && sameOrder) return prev;
 
         onChange({ added, removed, moved, finishRemoved });
 

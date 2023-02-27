@@ -79,7 +79,7 @@ describe("createSwitchTransition", () => {
         onEnter: fn,
         appear: true,
       });
-      expect(result()).toHaveLength(0);
+      expect(result()).toHaveLength(1);
       expect(fn).not.toHaveBeenCalled();
       return { result, dispose };
     });
@@ -231,15 +231,17 @@ describe("createSwitchTransition", () => {
     resolve();
     setRunResource(false);
 
-    expect(onEnter).not.toHaveBeenCalled();
-    expect(onExit).not.toHaveBeenCalled();
+    expect(onEnter).toHaveBeenCalledOnce();
+    expect(onEnter).toHaveBeenCalledWith(el2, expect.any(Function));
+    expect(onExit).toHaveBeenCalledOnce();
+    expect(onExit).toHaveBeenCalledWith(el1, expect.any(Function));
 
     setChildren(el3);
 
-    expect(onEnter).toHaveBeenCalledOnce();
+    expect(onEnter).toHaveBeenCalledTimes(2);
     expect(onEnter).toHaveBeenCalledWith(el3, expect.any(Function));
-    expect(onExit).toHaveBeenCalledOnce();
-    expect(onExit).toHaveBeenCalledWith(el1, expect.any(Function));
+    expect(onExit).toHaveBeenCalledTimes(2);
+    expect(onExit).toHaveBeenCalledWith(el2, expect.any(Function));
 
     dispose();
   });

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { createRenderEffect, createResource, createRoot, createSignal, Suspense } from "solid-js";
-import { createListTransition, ListTransitionOptions } from "../src";
+import { createListTransition, OnListChange } from "../src";
 
 describe("createListTransition", () => {
   const el1 = document.createElement("div");
@@ -62,7 +62,7 @@ describe("createListTransition", () => {
       removed: [el2],
       moved: [el1],
       finishRemoved: expect.any(Function),
-    } satisfies Parameters<ListTransitionOptions<Element>["onChange"]>[0]);
+    } satisfies Parameters<OnListChange<Element>>[0]);
 
     const done = fn.mock.calls[0]![0].finishRemoved;
     done([el2]);
@@ -79,7 +79,7 @@ describe("createListTransition", () => {
         onChange: fn,
         appear: true,
       });
-      expect(result()).toHaveLength(0);
+      expect(result()).toHaveLength(2);
       expect(fn).not.toHaveBeenCalled();
       return { dispose, result };
     });
@@ -171,11 +171,17 @@ describe("createListTransition", () => {
     resolve();
     setRunResource(false);
 
-    expect(onChange).not.toHaveBeenCalled();
+    expect(onChange).toHaveBeenCalledOnce();
+    expect(onChange).toHaveBeenLastCalledWith({
+      added: [el2],
+      removed: [el1],
+      moved: [],
+      finishRemoved: expect.any(Function),
+    });
 
     setChildren([el1, el3]);
 
-    expect(onChange).toHaveBeenCalledOnce();
+    expect(onChange).toHaveBeenCalledTimes(2);
     expect(onChange).toHaveBeenLastCalledWith({
       added: [el1, el3],
       removed: [el2],
