@@ -115,33 +115,38 @@ export function createFluxStore<
     actions: (setState: SetStoreFunction<T>, state: T) => A;
   }
 ): FluxStore<T, G, A>;
-export function createFluxStore<T extends object, G extends object | undefined>(
+export function createFluxStore<T extends object, G extends object>(
   initialState: T,
   createMethods: {
     getters: (state: T) => G;
+    actions?: (setState: SetStoreFunction<T>, state: T) => undefined | void;
   }
 ): FluxStore<T, G>;
-export function createFluxStore<T extends object, A extends object | undefined>(
+export function createFluxStore<T extends object, A extends object>(
   initialState: T,
   createMethods: {
+    getters?: (state: T) => undefined | void;
     actions: (setState: SetStoreFunction<T>, state: T) => A;
   }
 ): FluxStore<T, undefined, A>;
 export function createFluxStore<T extends object>(
   initialState: T,
-  createMethods?: {}
+  createMethods?: {
+    getters?: (state: T) => undefined | void;
+    actions?: (setState: SetStoreFunction<T>, state: T) => undefined | void;
+  }
 ): FluxStore<T>;
 export function createFluxStore<
   T extends object,
-  G extends object | undefined,
-  A extends object | undefined
+  G extends object | undefined = undefined,
+  A extends object | undefined = undefined
 >(
   initialState: T,
   createMethods?: {
     getters?: (state: T) => G;
     actions?: (setState: SetStoreFunction<T>, state: T) => A;
   }
-) {
+): FluxStore<T, G, A> {
   const [state, setState] = createStore<T>(initialState);
   const getters = createMethods?.getters?.(state);
   const actions = createActions(createMethods?.actions?.(setState, state) as Actions) as A;
@@ -150,7 +155,7 @@ export function createFluxStore<
     state,
     getters,
     actions
-  };
+  } as FluxStore<T, G, A>;
 }
 
 /**
@@ -201,33 +206,38 @@ export function createFluxFactory<
     actions: (setState: SetStoreFunction<T>, state: T) => A;
   }
 ): FluxFactory<T, G, A>;
-export function createFluxFactory<T extends object, G extends object | undefined>(
+export function createFluxFactory<T extends object, G extends object>(
   fallbackState: T,
   createMethods: {
     getters: (state: T) => G;
+    actions?: (setState: SetStoreFunction<T>, state: T) => undefined | void;
   }
 ): FluxFactory<T, G>;
-export function createFluxFactory<T extends object, A extends object | undefined>(
+export function createFluxFactory<T extends object, A extends object>(
   fallbackState: T,
   createMethods: {
+    getters?: (state: T) => undefined | void;
     actions: (setState: SetStoreFunction<T>, state: T) => A;
   }
 ): FluxFactory<T, undefined, A>;
 export function createFluxFactory<T extends object>(
   fallbackState: T,
-  createMethods?: {}
+  createMethods?: {
+    getters?: (state: T) => undefined | void;
+    actions?: (setState: SetStoreFunction<T>, state: T) => undefined | void;
+  }
 ): FluxFactory<T>;
 export function createFluxFactory<
   T extends object,
-  G extends object | undefined,
-  A extends object | undefined
+  G extends object | undefined = undefined,
+  A extends object | undefined = undefined
 >(
   fallbackState: T,
   createMethods?: {
     getters?: (state: T) => G;
     actions?: (setState: SetStoreFunction<T>, state: T) => A;
   }
-) {
+): FluxFactory<T, G, A> {
   const methods = {
     getters: createMethods?.getters as (state: T) => G,
     actions: createMethods?.actions as (setState: SetStoreFunction<T>, state: T) => A
