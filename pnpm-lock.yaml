@@ -351,7 +351,7 @@ importers:
   packages/keyed:
     specifiers:
       '@solid-primitives/immutable': ^0.1.6
-      '@solid-primitives/refs': ^0.3.6
+      '@solid-primitives/refs': ^0.4.0-beta.0
       '@solid-primitives/utils': ^5.0.0
       solid-js: ^1.6.0
       solid-transition-group: ^0.0.13
@@ -640,7 +640,7 @@ importers:
 
   packages/transition-group:
     specifiers:
-      '@solid-primitives/refs': workspace:^0.3.6
+      '@solid-primitives/refs': workspace:^0.4.0-beta.0
       '@solid-primitives/utils': workspace:^5.2.0
       '@solidjs/router': ^0.7.0
       solid-js: ^1.6.0
