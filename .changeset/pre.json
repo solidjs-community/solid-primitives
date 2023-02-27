@@ -70,5 +70,9 @@
     "@solid-primitives/websocket": "0.3.4",
     "@solid-primitives/workers": "0.2.3"
   },
-  "changesets": ["dirty-kiwis-exist", "fresh-maps-worry"]
+  "changesets": [
+    "dirty-kiwis-exist",
+    "fresh-maps-worry",
+    "itchy-suits-attack"
+  ]
 }
