@@ -1,4 +1,4 @@
-import { Accessor, batch, createComputed, createSignal, untrack, $TRACK } from "solid-js";
+import { Accessor, batch, createSignal, untrack, $TRACK, createEffect } from "solid-js";
 
 const noop = () => {};
 const noopTransition = (el: any, done: () => void) => done();
@@ -18,26 +18,19 @@ export function createSwitchTransition<T>(
   source: Accessor<T>,
   options: SwitchTransitionOptions<NonNullable<T>>,
 ): Accessor<NonNullable<T>[]> {
+  const initSource = untrack(source);
+  // if appear is enabled, the initial list will be empty (to be updated in effect)
+  // otherwise, it will be the initial source
+  // this way it will be consistent between server and client
+  const initReturned = options.appear ? [] : initSource ? [initSource] : [];
+
   if (process.env.SSR) {
-    let el: any = source();
-    el = el ? [el] : [];
-    return () => el;
+    return () => initReturned;
   }
 
-  // eslint-disable-next-line prefer-const
-  let { onEnter = noopTransition, onExit = noopTransition } = options;
+  const { onEnter = noopTransition, onExit = noopTransition } = options;
 
-  // skip the first enter transition if appear is disabled
-  let init = true;
-  if (!options.appear) {
-    const _onEnter = onEnter;
-    onEnter = (el, done) => {
-      onEnter = _onEnter;
-      init ? done() : onEnter(el, done);
-    };
-  }
-
-  const [returned, setReturned] = createSignal<NonNullable<T>[]>([]);
+  const [returned, setReturned] = createSignal<NonNullable<T>[]>(initReturned);
 
   let next: T | undefined;
   let isExiting = false;
@@ -75,16 +68,30 @@ export function createSwitchTransition<T>(
           exitTransition(prev);
         };
 
-  createComputed((prev: T | undefined) => {
-    const el = source();
-    if (el !== prev) {
-      next = el;
-      untrack(() => batch(() => transition(prev)));
-    }
-    return el;
-  });
+  let shouldRun = options.appear;
 
-  init = false;
+  // update elements and call transitions in effect to suspend under Suspense
+  createEffect(
+    (prev: T | undefined) => {
+      const el = source();
+
+      // skip the first transition if appear is disabled
+      if (!shouldRun) {
+        setReturned(el ? [el] : []);
+        shouldRun = true;
+        return el;
+      }
+
+      if (el !== prev) {
+        next = el;
+        untrack(() => transition(prev));
+      }
+
+      return el;
+    },
+    options.appear ? undefined : initSource,
+  );
+
   return returned;
 }
 
@@ -104,28 +111,23 @@ export function createListTransition<T>(
   source: Accessor<readonly NonNullable<T>[]>,
   options: ListTransitionOptions<NonNullable<T>>,
 ): Accessor<NonNullable<T>[]> {
-  if (process.env.SSR) {
-    const copy = source().slice();
-    return () => copy;
-  }
-
   type V = NonNullable<T>;
 
-  let { onChange } = options;
+  const initSource = untrack(source);
+  // if appear is enabled, the initial list will be empty (to be updated in effect)
+  // otherwise, it will be the initial source
+  // this way it will be consistent between server and client
+  const initialReturned = options.appear ? [] : initSource.slice();
 
-  // skip the first enter transition if appear is disabled
-  let init = true;
-  if (!options.appear) {
-    const _onChange = onChange;
-    onChange = data => {
-      onChange = _onChange;
-      init || onChange(data);
-    };
+  if (process.env.SSR) {
+    return () => initialReturned;
   }
 
-  const [returned, setReturned] = createSignal<V[]>([]);
+  const { onChange } = options;
 
-  let prevSet: ReadonlySet<V> = new Set<V>();
+  const [returned, setReturned] = createSignal<V[]>(initialReturned);
+
+  let prevSet: ReadonlySet<V> = new Set(options.appear ? undefined : initSource);
   const exiting = new Set<V>();
 
   function finishRemoved(els: V[]): void {
@@ -133,11 +135,21 @@ export function createListTransition<T>(
     for (const el of els) exiting.delete(el);
   }
 
-  createComputed(() => {
+  let shouldRun = options.appear;
+  // update elements and call transitions in effect to suspend under Suspense
+  createEffect(() => {
     const list = source();
     (list as any)[$TRACK]; // top level store tracking
 
-    untrack(() => {
+    // skip the first transition if appear is disabled
+    if (!shouldRun) {
+      shouldRun = true;
+      prevSet = new Set(list);
+      setReturned(list.slice());
+      return;
+    }
+
+    untrack(() =>
       setReturned(prev => {
         const nextSet: ReadonlySet<V> = new Set(list);
         const next: V[] = list.slice();
@@ -165,10 +177,9 @@ export function createListTransition<T>(
 
         prevSet = nextSet;
         return next;
-      });
-    });
+      }),
+    );
   });
 
-  init = false;
   return returned;
 }

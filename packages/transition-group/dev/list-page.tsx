@@ -1,4 +1,11 @@
-import { children, onCleanup, untrack } from "solid-js";
+import {
+  children,
+  createRenderEffect,
+  createResource,
+  onCleanup,
+  Suspense,
+  untrack,
+} from "solid-js";
 import { elements } from "@solid-primitives/refs";
 import { Component, createSignal, For, Show } from "solid-js";
 import { createListTransition } from "../src";
@@ -18,8 +25,21 @@ const ListPage: Component = () => {
 
   const [list, setList] = createSignal([{ n: 1 }, { n: 2 }, { n: 3 }, { n: 4 }, { n: 5 }]);
 
+  const [runResource, setRunResource] = createSignal(false);
+  let resolve = () => {};
+  const [res] = createResource(runResource, () => new Promise<void>(r => (resolve = r)));
+
   return (
     <>
+      <button
+        class="btn"
+        onClick={() => {
+          resolve();
+          setRunResource(p => !p);
+        }}
+      >
+        {runResource() ? "Stop" : "Start"} Resource
+      </button>
       <div class="wrapper-h flex-wrap">
         <button
           class="btn"
@@ -47,108 +67,113 @@ const ListPage: Component = () => {
         </button>
       </div>
       <div class="wrapper-h flex-wrap space-x-0 gap-4">
-        {untrack(() => {
-          const resolved = children(() => (
-            <Show when={showWrapper()}>
-              <p>Hello</p>
-              World
-              {show() && (
-                <div class="node" ref={grayOutOnDispose}>
-                  ID 0
-                </div>
-              )}
-              <Show when={show1()}>
-                <div class="node" ref={grayOutOnDispose}>
-                  ID 1
-                </div>
-              </Show>
-              <Show when={show2()}>
-                <div class="node" ref={grayOutOnDispose}>
-                  ID 2
-                </div>
-                <div class="node" ref={grayOutOnDispose}>
-                  ID 3
-                </div>
-              </Show>
-              <For each={list()}>
-                {({ n }, i) => (
-                  <div
-                    class="node bg-yellow-600 cursor-pointer"
-                    onClick={() =>
-                      setList(p => {
-                        const copy = p.slice();
-                        copy.splice(i(), 1);
-                        return copy;
-                      })
-                    }
-                    ref={grayOutOnDispose}
-                  >
-                    {n + 1}.
+        <Suspense fallback={<p>Suspended</p>}>
+          {untrack(() => {
+            // track the resource
+            createRenderEffect(res);
+
+            const resolved = children(() => (
+              <Show when={showWrapper()}>
+                <p>Hello</p>
+                World
+                {show() && (
+                  <div class="node" ref={grayOutOnDispose}>
+                    ID 0
                   </div>
                 )}
-              </For>
-            </Show>
-          ));
-          const refs = elements(resolved, HTMLElement);
+                <Show when={show1()}>
+                  <div class="node" ref={grayOutOnDispose}>
+                    ID 1
+                  </div>
+                </Show>
+                <Show when={show2()}>
+                  <div class="node" ref={grayOutOnDispose}>
+                    ID 2
+                  </div>
+                  <div class="node" ref={grayOutOnDispose}>
+                    ID 3
+                  </div>
+                </Show>
+                <For each={list()}>
+                  {({ n }, i) => (
+                    <div
+                      class="node bg-yellow-600 cursor-pointer"
+                      onClick={() =>
+                        setList(p => {
+                          const copy = p.slice();
+                          copy.splice(i(), 1);
+                          return copy;
+                        })
+                      }
+                      ref={grayOutOnDispose}
+                    >
+                      {n + 1}.
+                    </div>
+                  )}
+                </For>
+              </Show>
+            ));
+            const refs = elements(resolved, HTMLElement);
 
-          const options = { duration: 600, easing: "cubic-bezier(0.4, 0, 0.2, 1)" };
+            const options = { duration: 600, easing: "cubic-bezier(0.4, 0, 0.2, 1)" };
 
-          return createListTransition(refs, {
-            appear: true,
-            onChange({ added, finishRemoved, moved, removed }) {
-              added.forEach(el => {
-                el.style.opacity = "0";
-                el.style.transform = "translateY(10px)";
-                requestAnimationFrame(() => {
-                  el.animate(
-                    [
-                      { opacity: 0, transform: "translateY(-36px)" },
-                      { opacity: 1, transform: "translateY(0)" },
-                    ],
-                    { ...options, fill: "both" },
-                  );
+            return createListTransition(refs, {
+              appear: true,
+              onChange({ added, finishRemoved, moved, removed }) {
+                added.forEach(el => {
+                  el.style.opacity = "0";
+                  el.style.transform = "translateY(10px)";
+                  requestAnimationFrame(() => {
+                    el.animate(
+                      [
+                        { opacity: 0, transform: "translateY(-36px)" },
+                        { opacity: 1, transform: "translateY(0)" },
+                      ],
+                      { ...options, fill: "both" },
+                    );
+                  });
                 });
-              });
 
-              moved.forEach(el => {
-                const { left: left1, top: top1 } = el.getBoundingClientRect();
-                requestAnimationFrame(() => {
+                moved.forEach(el => {
+                  const { left: left1, top: top1 } = el.getBoundingClientRect();
+                  requestAnimationFrame(() => {
+                    const { left: left2, top: top2 } = el.getBoundingClientRect();
+                    el.animate(
+                      [
+                        { transform: `translate(${left1 - left2}px, ${top1 - top2}px)` },
+                        { transform: "none" },
+                      ],
+                      options,
+                    );
+                  });
+                });
+
+                const removedRects = removed.map(el => el.getBoundingClientRect());
+                removed.forEach(el => {
+                  el.style.transform = "none";
+                  el.style.position = "absolute";
+                });
+                removed.forEach((el, i) => {
+                  const { left: left1, top: top1 } = removedRects[i]!;
                   const { left: left2, top: top2 } = el.getBoundingClientRect();
-                  el.animate(
+
+                  const a = el.animate(
                     [
                       { transform: `translate(${left1 - left2}px, ${top1 - top2}px)` },
-                      { transform: "none" },
+                      {
+                        opacity: 0,
+                        transform: `translate(${left1 - left2}px, ${top1 - top2 + 36}px)`,
+                      },
                     ],
                     options,
                   );
+
+                  i === removed.length - 1 && a.finished.then(() => finishRemoved(removed));
                 });
-              });
-
-              const removedRects = removed.map(el => el.getBoundingClientRect());
-              removed.forEach(el => {
-                el.style.transform = "none";
-                el.style.position = "absolute";
-              });
-              removed.forEach((el, i) => {
-                const { left: left1, top: top1 } = removedRects[i]!;
-                const { left: left2, top: top2 } = el.getBoundingClientRect();
-
-                const a = el.animate(
-                  [
-                    { transform: `translate(${left1 - left2}px, ${top1 - top2}px)` },
-                    {
-                      opacity: 0,
-                      transform: `translate(${left1 - left2}px, ${top1 - top2 + 36}px)`,
-                    },
-                  ],
-                  options,
-                );
-
-                i === removed.length - 1 && a.finished.then(() => finishRemoved(removed));
-              });
-            },
-          });
-        })}
+              },
+            });
+          })}
+        </Suspense>
       </div>
     </>
   );
