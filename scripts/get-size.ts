@@ -13,7 +13,7 @@ const run = async () => {
     minify: true,
     treeShaking: true,
     platform: "browser",
-    external: ["solid-js"]
+    external: ["solid-js", "@solid-primitives/utils"]
   });
   const buffer = readFileSync("./dist/main.js");
   const minifiedSize = buffer.toString().length;

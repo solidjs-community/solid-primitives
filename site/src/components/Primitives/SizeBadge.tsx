@@ -17,7 +17,7 @@ const createFetchSize = (value: string) => {
 };
 
 const SizeBadge: ParentComponent<{ value: string; href: string }> = ({ value, href }) => {
-  const size = createFetchSize(value);
+  // const size = createFetchSize(value);
 
   return (
     <a
@@ -25,7 +25,7 @@ const SizeBadge: ParentComponent<{ value: string; href: string }> = ({ value, hr
       href={href}
       target="_blank"
     >
-      {size()}
+      {value}
     </a>
   );
 };
@@ -34,7 +34,7 @@ export const SizeBadgePill: ParentComponent<{ value: string; href: string }> = (
   value,
   href
 }) => {
-  const size = createFetchSize(value);
+  // const size = createFetchSize(value);
 
   return (
     <a
@@ -46,7 +46,7 @@ export const SizeBadgePill: ParentComponent<{ value: string; href: string }> = (
         Size
       </div>
       <div class="h-full flex justify-center items-center min-w-[90px] rounded-r-lg border-l-0 border-transparent border-[3px] font-semibold background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#cae0ff,#c0c8ff)_border-box] dark:background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#405b6e,#46659a)_border-box]">
-        {size()}
+        {value}
       </div>
     </a>
   );

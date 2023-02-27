@@ -11,7 +11,8 @@ import {
   untrack,
   Setter
 } from "solid-js";
-import { access, noop, type FalsyValue, type MaybeAccessor } from "@solid-primitives/utils";
+// import { access, noop, type FalsyValue, type MaybeAccessor } from "@solid-primitives/utils";
+import { access, noop, type FalsyValue, type MaybeAccessor } from "../../utils/src/index";
 
 export type ResourceActions<T, O = {}> = ResourceReturn<T, O>[1];
 

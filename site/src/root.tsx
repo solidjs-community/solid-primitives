@@ -35,11 +35,7 @@ export default function Root() {
         <Meta name="og:type" content="website" />
         <Meta
           name="description"
-          content="A project that strives to develop high-quality, community contributed Solid primitives."
-        />
-        <Meta
-          name="og:description"
-          content="A project that strives to develop high-quality, community contributed Solid primitives."
+          content="A library of high-quality primitives that extend SolidJS reactivity"
         />
         <Meta name="og:image:width" content="1200" />
         <Meta name="og:image:height" content="600" />
@@ -53,7 +49,7 @@ export default function Root() {
         <Meta name="twitter:image:alt" content="" />
         <Meta
           name="twitter:description"
-          content="A project that strives to develop high-quality, community contributed Solid primitives."
+          content="A library of high-quality primitives that extend SolidJS reactivity"
         />
         <Link
           rel="apple-touch-icon"

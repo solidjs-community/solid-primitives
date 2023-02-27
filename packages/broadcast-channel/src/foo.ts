@@ -1,0 +1,1 @@
+export { makeBroadcastChannel } from "./index";

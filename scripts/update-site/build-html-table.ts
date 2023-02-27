@@ -14,6 +14,11 @@ const stageShieldBaseURL =
   "https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-"; // add "<stage>.json" after
 const stageShieldLink =
   "https://github.com/solidjs-community/solid-primitives#contribution-process";
+const bundleJSAPIURL = `https://bundlejs.com/api`;
+const getBundleJSQuery = ({ packageName, primitive }: { packageName: string; primitive: string }) =>
+  encodeURIComponent(
+    `q=@solid-primitives/${packageName}&treeshake=[{${primitive}}]&config={"esbuild":{"external":["solid-js"]}}`
+  );
 
 export const getSizeShield = (name: string) => `${sizeShield}${name}.json`;
 export const getNPMShield = (name: string) => `${npmShield}${name}.json`;

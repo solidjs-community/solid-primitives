@@ -2,18 +2,8 @@ import { createMediaQuery } from "@solid-primitives/media";
 import { A, useLocation } from "@solidjs/router";
 import Fuse from "fuse.js";
 import Mark from "mark.js";
-import { FiSearch, FiX } from "solid-icons/fi";
-import {
-  $TRACK,
-  Component,
-  createEffect,
-  createSignal,
-  For,
-  on,
-  onMount,
-  ParentComponent,
-  Show
-} from "solid-js";
+import { FiChevronLeft, FiSearch, FiX } from "solid-icons/fi";
+import { Component, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import createEffectDeffered from "~/hooks/createEffectDeffered";
 // @ts-ignore
@@ -25,7 +15,7 @@ type TPrimitive = {
   category: string;
   description: string;
   primitives: string[];
-  primitivesCount: number;
+  primitivesTotalCount: number;
 };
 
 let _inputEl!: HTMLInputElement;
@@ -39,11 +29,13 @@ const Search: Component<{
   const isSmall = createMediaQuery("(max-width: 767px)");
   const [search, setSearch] = createSignal("");
   const [searchResult, setSearchResult] = createStore<TPrimitive[]>([]);
+  const [showShadow, setShowShadow] = createSignal(false);
+  const maxPrimitiveCount = 5;
   const [config, setConfig] = createStore({
     highlight: {
       title: { checked: false },
       description: { checked: true },
-      primitive: { checked: false }
+      primitive: { checked: true }
     }
   });
   let markInstance: Mark;
@@ -82,11 +74,11 @@ const Search: Component<{
     setSearch(value);
     if (value.length <= 1) return;
     requestAnimationFrame(() => {
-      highlightTextFromSearch(value);
+      highlightText(value);
     });
   };
 
-  const highlightTextFromSearch = (value: string) => {
+  const highlightText = (value: string) => {
     const exclude = Object.entries(config.highlight)
       .filter(([_, item]) => !item.checked)
       .flatMap(([key]) => [`[data-ignore-mark-${key}]`, `[data-ignore-mark-${key}] *`]);
@@ -95,9 +87,22 @@ const Search: Component<{
       separateWordSearch: false
     });
   };
+  const reHighlightTextFromSearch = () => {
+    markInstance.unmark();
+    highlightText(search());
+  };
+
+  const onScroll = () => {
+    setShowShadow(window.scrollY > 60);
+  };
 
   onMount(() => {
     markInstance = new Mark(listContainer);
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    onCleanup(() => {
+      window.removeEventListener("scroll", onScroll);
+    });
   });
 
   createEffectDeffered(
@@ -107,8 +112,7 @@ const Search: Component<{
       config.highlight.primitive.checked
     ],
     () => {
-      markInstance.unmark();
-      highlightTextFromSearch(search());
+      reHighlightTextFromSearch();
     }
   );
 
@@ -120,8 +124,9 @@ const Search: Component<{
         const item = { ...(_item.item as any) } as TPrimitive;
         const fusePrimitives = new Fuse(item.primitives, fusePrimitivesOptions);
         const result = fusePrimitives.search(search);
-        item.primitivesCount = item.primitives.length;
-        item.primitives = result.slice(0, 5).map(item => ({ ...item }.item));
+        item.primitivesTotalCount = item.primitives.length;
+        // item.primitives = result.slice(0, 5).map(item => (item.item));
+        item.primitives = result.map(item => item.item);
 
         return item;
       })
@@ -192,21 +197,43 @@ const Search: Component<{
               </For>
             </div>
           </div>
-
           <div
             class="relative border-b border-slate-300 px-2 bg-page-main-bg dark:border-slate-600"
             classList={{ hidden: !searchResult.length }}
           >
-            <div class="absolute top-[-16px] h-[16px] left-4 right-4  shadow-lg shadow-[#24405966] dark:shadow-[#05121dbf] -z-1" />
+            <div
+              class="absolute top-[-16px] h-[16px] left-4 right-4  shadow-lg shadow-[#24405966] dark:shadow-[#05121dbf] transition -z-1"
+              classList={{
+                "opacity-0": !showShadow(),
+                "opacity-100": showShadow()
+              }}
+            />
           </div>
         </div>
         <div class="p-2 sm:p-4" classList={{ hidden: !searchResult.length }}>
           <div class=""></div>
-          <ul ref={listContainer}>
+          <ul class="flex flex-col gap-y-6" ref={listContainer}>
             <For each={searchResult}>
-              {({ name, category, description, primitives, primitivesCount }) => {
+              {({ name, category, description, primitives, primitivesTotalCount }, idx) => {
+                const [showRest, setShowRest] = createSignal(false);
+
+                const onClickToggle = () => {
+                  if (!showRest()) {
+                    requestAnimationFrame(() => {
+                      reHighlightTextFromSearch();
+                    });
+                  }
+                  if (primitives.length < primitivesTotalCount) {
+                    const primitivesList = [
+                      ...new Set([...primitives, ...primitivesJSON[idx()].primitives])
+                    ];
+                    setSearchResult(idx(), "primitives", primitivesList);
+                  }
+                  setShowRest(() => !showRest());
+                };
+
                 return (
-                  <li class="py-2">
+                  <li>
                     <h4
                       class="font-semibold text-[#49494B] dark:text-[#bec5cf]"
                       data-ignore-mark-title
@@ -216,27 +243,49 @@ const Search: Component<{
                     <p class="text-[14px] my-[6px]" data-ignore-mark-description>
                       {description}
                     </p>
-                    <ul class="flex gap-2 flex-wrap" data-ignore-mark-primitive>
-                      <For each={primitives}>
-                        {item => {
-                          return (
-                            <li>
-                              <A
-                                href={`/${name}#${item.toLowerCase()}`}
-                                class="text-[14px] sm:text-base text-[#063983] hover:text-black font-semibold px-2 pb-0 bg-[#e6f0ff] dark:text-[#b9d6ff] dark:bg-[#30455b] dark:hover:text-[#fff] rounded-md inline-block transition-colors"
-                              >
-                                {item}
-                              </A>
-                            </li>
-                          );
-                        }}
-                      </For>
-                      <Show when={primitives.length && primitivesCount > primitives.length}>
-                        <li class="flex items-center text-slate-500 text-[14px]">
-                          + {primitivesCount - primitives.length}
-                        </li>
+
+                    <div class="flex justify-between gap-2">
+                      <ul class="flex gap-2 flex-wrap self-start" data-ignore-mark-primitive>
+                        <For each={primitives}>
+                          {(item, idx) => {
+                            return (
+                              <Show when={showRest() || idx() < maxPrimitiveCount}>
+                                <li>
+                                  <A
+                                    href={`/${name}#${item.toLowerCase()}`}
+                                    class="text-[14px] sm:text-base text-[#063983] hover:text-black font-semibold px-2 pb-0 bg-[#e6f0ff] dark:text-[#b9d6ff] dark:bg-[#30455b] dark:hover:text-[#fff] rounded-md inline-block transition-colors"
+                                  >
+                                    {item}
+                                  </A>
+                                </li>
+                              </Show>
+                            );
+                          }}
+                        </For>
+                        <Show when={!showRest() && maxPrimitiveCount < primitivesTotalCount}>
+                          <li class="flex items-center text-slate-500 text-[14px] hover:text-black dark:text-white transition">
+                            <button onClick={onClickToggle}>
+                              + {primitivesTotalCount - maxPrimitiveCount}
+                            </button>
+                          </li>
+                        </Show>
+                      </ul>
+                      <Show when={maxPrimitiveCount < primitivesTotalCount}>
+                        <button
+                          class="flex-shrink-0 flex justify-center items-center w-[45px] h-[25px] text-[#063983] hover:text-black dark:text-[#b9d6ff]"
+                          onClick={onClickToggle}
+                        >
+                          <div
+                            class="transition duration-200"
+                            classList={{
+                              "-rotate-90": showRest()
+                            }}
+                          >
+                            <FiChevronLeft size={24} />
+                          </div>
+                        </button>
                       </Show>
-                    </ul>
+                    </div>
                   </li>
                 );
               }}
