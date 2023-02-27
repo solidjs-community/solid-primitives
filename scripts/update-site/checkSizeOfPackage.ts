@@ -1,7 +1,7 @@
 import { build } from "esbuild";
 import { readFileSync, writeFileSync, rmSync } from "fs";
 import { gzipSizeSync } from "gzip-size";
-import { formatBytes } from "../utils";
+import { r } from "../utils";
 
 const checkSizeOfPackage = async ({
   type,
@@ -12,15 +12,16 @@ const checkSizeOfPackage = async ({
   packageName: string;
   primitiveName: string;
 }) => {
+  console.log("hi");
   const file = `
 export { ${primitiveName} } from "./packages/${packageName}/src/index"
 `;
   const fileName = "_temp_check_primitive_size.ts";
-  const outDir = "./_temp_output_primitive_size_dir";
+  const outDir = r("../_temp_output_primitive_size_dir");
   const outFile = `${outDir}/main.js`;
-  const packagePath = `./packages/${packageName}/src/`;
+  const packagePath = r(`../packages/${packageName}/src/`);
   const packageIndexPath = `${packagePath}/index.ts`;
-  const packageExportFilePath = `./${fileName}`;
+  const packageExportFilePath = r(`../${fileName}`);
   if (type === "export") {
     writeFileSync(packageExportFilePath, file);
   }
@@ -50,6 +51,9 @@ export { ${primitiveName} } from "./packages/${packageName}/src/index"
   };
 };
 
-checkSizeOfPackage({ type: "package", packageName: "stream", primitiveName: "createStream" });
-
+checkSizeOfPackage({
+  type: "export",
+  packageName: "stream",
+  primitiveName: "createStream"
+});
 export default checkSizeOfPackage;
