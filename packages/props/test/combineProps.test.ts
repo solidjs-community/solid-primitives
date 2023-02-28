@@ -41,6 +41,31 @@ describe("combineProps", () => {
     });
   });
 
+  it("calls handlers in reverse", () => {
+    createRoot(dispose => {
+      const mockFn = spy();
+      const message1 = "click1";
+      const message2 = "click2";
+      const message3 = "click3";
+
+      const combinedProps = combineProps(
+        [
+          { onEvent: () => mockFn(message1) },
+          { onEvent: () => mockFn(message2) },
+          { onEvent: () => mockFn(message3) },
+        ],
+        { reverseEventHandlers: true },
+      );
+
+      combinedProps.onEvent();
+
+      expect(mockFn.callCount).toBe(3);
+      expect(mockFn.calls).toEqual([[message3], [message2], [message1]]);
+
+      dispose();
+    });
+  });
+
   it("event handlers can be overwritten", async () => {
     createRoot(async dispose => {
       const mockFn = spy();
