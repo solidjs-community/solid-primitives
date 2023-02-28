@@ -1,5 +1,13 @@
 # @solid-primitives/map
 
+## 0.4.1
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+- Updated dependencies [865d5ee9]
+  - @solid-primitives/trigger@1.0.1
+
 ## 0.4.0
 
 ### Minor Changes

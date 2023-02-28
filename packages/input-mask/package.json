@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/input-mask",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "input masking event primitive.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [],

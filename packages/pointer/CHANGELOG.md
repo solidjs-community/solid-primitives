@@ -1,5 +1,16 @@
 # @solid-primitives/pointer
 
+## 0.2.6
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+- Updated dependencies [865d5ee9]
+  - @solid-primitives/event-listener@2.2.7
+  - @solid-primitives/immutable@0.1.7
+  - @solid-primitives/rootless@1.2.5
+  - @solid-primitives/utils@5.2.1
+
 ## 0.2.5
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @solid-primitives/permission
 
+## 1.2.3
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 1.2.2
 
 ### Patch Changes

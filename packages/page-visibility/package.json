@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/page-visibility",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Primitive to track page visibility",
   "author": "David Di Biase",
   "contributors": [
@@ -96,9 +96,9 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.6",
-    "@solid-primitives/rootless": "workspace:^1.2.3",
-    "@solid-primitives/utils": "workspace:^5.2.0"
+    "@solid-primitives/event-listener": "workspace:^2.2.7",
+    "@solid-primitives/rootless": "workspace:^1.2.5",
+    "@solid-primitives/utils": "workspace:^5.2.1"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

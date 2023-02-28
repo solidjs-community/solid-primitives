@@ -1,5 +1,11 @@
 # @solid-primitives/tween
 
+## 1.2.5
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 1.2.4
 
 ### Patch Changes

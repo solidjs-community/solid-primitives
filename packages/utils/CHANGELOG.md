@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 5.2.1
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 5.2.0
 
 ### Minor Changes

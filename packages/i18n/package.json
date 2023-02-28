@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/i18n",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Primitive to create and use i18n primitives.",
   "author": "Alexandre Mouton-Brady <amoutonbrady@gmail.com>",
   "contributors": [
@@ -64,6 +64,6 @@
     "solid-js": "^1.6.0"
   },
   "dependencies": {
-    "@solid-primitives/context": "workspace:^0.1.3"
+    "@solid-primitives/context": "workspace:^0.1.4"
   }
 }
