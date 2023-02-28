@@ -1,7 +1,7 @@
 import { FiChevronRight } from "solid-icons/fi";
 import { createSignal, onMount, ParentComponent } from "solid-js";
 import SlideModal from "../Modal/SlideModal";
-import SizeModal, { TBundleSizeItem } from "../SizeModal/SizeModal";
+import BundleSizeModal, { TBundleSizeItem } from "../BundleSizeModal/BundleSizeModal";
 
 const createFetchSize = (value: string) => {
   const [size, setSize] = createSignal("");
@@ -83,7 +83,7 @@ export const SizeBadgePill: ParentComponent<
         </div>
       </button>
       <SlideModal menuButton={menuButton} open={open} setOpen={setOpen}>
-        <SizeModal packageList={packageList} primitiveList={primitiveList} />
+        <BundleSizeModal packageList={packageList} primitiveList={primitiveList} />
       </SlideModal>
     </>
   );

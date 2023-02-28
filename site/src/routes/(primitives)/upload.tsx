@@ -33,7 +33,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/upload" name="upload" stage={0}>
+    <PrimitivePageMain packageName="@solid-primitives/upload" name="upload" stage={0} packageList={[{"name":"upload","gzipped":"1.71 KB","minified":"4.19 KB"}]} primitiveList={[{"name":"createDropzone","gzipped":"1.37 KB","minified":"3.25 KB"},{"name":"createFileUploader","gzipped":"1.3 KB","minified":"2.51 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

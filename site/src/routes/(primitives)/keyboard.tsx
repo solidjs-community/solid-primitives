@@ -37,7 +37,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/keyboard" name="keyboard" stage={1}>
+    <PrimitivePageMain packageName="@solid-primitives/keyboard" name="keyboard" stage={1} packageList={[{"name":"keyboard","gzipped":"2.13 KB","minified":"4.93 KB"}]} primitiveList={[{"name":"useCurrentlyHeldKey","gzipped":"1.73 KB","minified":"3.86 KB"},{"name":"useKeyDownSequence","gzipped":"1.72 KB","minified":"3.82 KB"},{"name":"createKeyHold","gzipped":"1.79 KB","minified":"4.03 KB"},{"name":"createShortcut","gzipped":"2 KB","minified":"4.53 KB"},{"name":"useKeyDownList","gzipped":"1.68 KB","minified":"3.71 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

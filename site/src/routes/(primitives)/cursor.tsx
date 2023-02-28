@@ -34,7 +34,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/cursor" name="cursor" stage={0}>
+    <PrimitivePageMain packageName="@solid-primitives/cursor" name="cursor" stage={0} packageList={[{"name":"cursor","gzipped":"1.01 KB","minified":"2.08 KB"}]} primitiveList={[{"name":"createBodyCursor","gzipped":"196 B","minified":"274 B"},{"name":"createElementCursor","gzipped":"966 B","minified":"1.87 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

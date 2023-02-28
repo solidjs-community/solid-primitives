@@ -39,7 +39,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/keyed" name="keyed" stage={3}>
+    <PrimitivePageMain packageName="@solid-primitives/keyed" name="keyed" stage={3} packageList={[{"name":"keyed","gzipped":"810 B","minified":"1.63 KB"}]} primitiveList={[{"name":"Key","gzipped":"675 B","minified":"1.25 KB"},{"name":"Entries","gzipped":"264 B","minified":"358 B"},{"name":"keyArray","gzipped":"604 B","minified":"1.11 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

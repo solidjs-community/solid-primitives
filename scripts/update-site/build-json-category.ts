@@ -34,8 +34,6 @@ export const buildJSONCategory = async ({
     const dir = r(`../packages/${name}/src/index.ts`);
     const indexFile = readFileSync(dir, "utf-8");
 
-    // console.log("log file", indexFile.slice(1, 100));
-
     const resultStar = regexGlobalCaptureGroup(indexFile, /export\s+\*\sfrom\s+"[^"]+\/(\w+)"/g);
 
     let concatFile = indexFile;
@@ -80,8 +78,8 @@ export const buildJSONCategory = async ({
       const minifiedSize = formatBytes(result.minifiedSize);
       const gzippedSize = formatBytes(result.gzippedSize);
 
-      global.packageName[name] = {
-        name,
+      global.primitives[primitive] = {
+        packageName: name,
         gzippedSize,
         minifiedSize
       };

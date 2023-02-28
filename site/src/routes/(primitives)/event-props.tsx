@@ -33,7 +33,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/event-props" name="event-props" stage={2}>
+    <PrimitivePageMain packageName="@solid-primitives/event-props" name="event-props" stage={2} packageList={[{"name":"event-props","gzipped":"193 B","minified":"212 B"}]} primitiveList={[{"name":"createEventProps","gzipped":"192 B","minified":"212 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

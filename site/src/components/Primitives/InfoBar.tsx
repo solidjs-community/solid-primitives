@@ -1,6 +1,6 @@
 import { FaBrandsGithub } from "solid-icons/fa";
 import { Component } from "solid-js";
-import { TBundleSizeItem } from "../SizeModal/SizeModal";
+import { TBundleSizeItem } from "../BundleSizeModal/BundleSizeModal";
 import SizeBadge, { SizeBadgePill } from "./SizeBadge";
 import StageBadge, { StageBadgePill } from "./StageBadge";
 import VersionBadge, { VersionBadgePill } from "./VersionBadge";

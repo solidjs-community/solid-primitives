@@ -35,7 +35,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/audio" name="audio" stage={3}>
+    <PrimitivePageMain packageName="@solid-primitives/audio" name="audio" stage={3} packageList={[{"name":"audio","gzipped":"1.6 KB","minified":"3.38 KB"}]} primitiveList={[{"name":"makeAudioPlayer","gzipped":"1.15 KB","minified":"2.23 KB"},{"name":"createAudio","gzipped":"1.48 KB","minified":"3.18 KB"},{"name":"makeAudio","gzipped":"304 B","minified":"402 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

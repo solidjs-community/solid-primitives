@@ -35,7 +35,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/page-visibility" name="page-visibility" stage={3}>
+    <PrimitivePageMain packageName="@solid-primitives/page-visibility" name="page-visibility" stage={3} packageList={[{"name":"page-visibility","gzipped":"1.22 KB","minified":"2.59 KB"}]} primitiveList={[{"name":"createPageVisibility","gzipped":"1.22 KB","minified":"2.57 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

@@ -7,7 +7,7 @@ import ON_CLIENT_DEV_MODE from "~/hooks/ON_CLIENT_DEV_MODE";
 import { isServer } from "solid-js/web";
 import { setHeaderState } from "../Header/Header";
 import { pageWidthClass } from "~/constants";
-import { TBundleSizeItem } from "../SizeModal/SizeModal";
+import { TBundleSizeItem } from "../BundleSizeModal/BundleSizeModal";
 
 const githubRepo = "https://github.com/solidjs-community/solid-primitives";
 

@@ -38,7 +38,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/rootless" name="rootless" stage={2}>
+    <PrimitivePageMain packageName="@solid-primitives/rootless" name="rootless" stage={2} packageList={[{"name":"rootless","gzipped":"1.1 KB","minified":"2.21 KB"}]} primitiveList={[{"name":"createCallback","gzipped":"150 B","minified":"160 B"},{"name":"createDisposable","gzipped":"983 B","minified":"1.94 KB"},{"name":"createSharedRoot","gzipped":"208 B","minified":"253 B"},{"name":"createSubRoot","gzipped":"965 B","minified":"1.89 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

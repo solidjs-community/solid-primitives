@@ -38,7 +38,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/pointer" name="pointer" stage={2}>
+    <PrimitivePageMain packageName="@solid-primitives/pointer" name="pointer" stage={2} packageList={[{"name":"pointer","gzipped":"3 KB","minified":"7.27 KB"}]} primitiveList={[{"name":"createPerPointerListeners","gzipped":"2.14 KB","minified":"4.92 KB"},{"name":"createPointerPosition","gzipped":"2.02 KB","minified":"4.48 KB"},{"name":"createPointerList","gzipped":"2.45 KB","minified":"5.63 KB"},{"name":"createPointerListeners","gzipped":"1.76 KB","minified":"3.91 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

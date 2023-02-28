@@ -63,12 +63,12 @@ export const buildCategory = async ({
     const getSizes = async () => {
       const run = async () => {
         return Promise.all(
-          list.map(async prim => {
+          list.map(async (prim, idx, self) => {
             const type = prim.match(/\s/) ? "package" : "export";
             const packageName = name;
             const primitiveName = prim;
 
-            if (type === "package") {
+            if (type === "package" || idx === 0) {
               const result = await checkSizeOfPackage({
                 type: "package",
                 packageName,

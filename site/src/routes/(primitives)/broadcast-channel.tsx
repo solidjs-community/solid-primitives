@@ -35,7 +35,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/broadcast-channel" name="broadcast-channel" stage={0}>
+    <PrimitivePageMain packageName="@solid-primitives/broadcast-channel" name="broadcast-channel" stage={0} packageList={[{"name":"broadcast-channel","gzipped":"579 B","minified":"1.28 KB"}]} primitiveList={[{"name":"createBroadcastChannel","gzipped":"571 B","minified":"1.26 KB"},{"name":"makeBroadcastChannel","gzipped":"499 B","minified":"1.06 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

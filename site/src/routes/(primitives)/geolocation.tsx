@@ -36,7 +36,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/geolocation" name="geolocation" stage={3}>
+    <PrimitivePageMain packageName="@solid-primitives/geolocation" name="geolocation" stage={3} packageList={[{"name":"geolocation","gzipped":"1.25 KB","minified":"2.51 KB"}]} primitiveList={[{"name":"createGeolocationWatcher","gzipped":"1.1 KB","minified":"2.14 KB"},{"name":"createGeolocation","gzipped":"1.14 KB","minified":"2.16 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

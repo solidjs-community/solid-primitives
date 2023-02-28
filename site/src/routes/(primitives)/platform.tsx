@@ -35,7 +35,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/platform" name="platform" stage={1}>
+    <PrimitivePageMain packageName="@solid-primitives/platform" name="platform" stage={1} packageList={[{"name":"platform","gzipped":"603 B","minified":"1.13 KB"}]} primitiveList={[{"name":"isAndroid","gzipped":"318 B","minified":"463 B"},{"name":"isWindows","gzipped":"335 B","minified":"488 B"},{"name":"isMac","gzipped":"339 B","minified":"497 B"},{"name":"isIPhone","gzipped":"318 B","minified":"462 B"},{"name":"isIPad","gzipped":"311 B","minified":"440 B"},{"name":"isIPod","gzipped":"317 B","minified":"458 B"},{"name":"isIOS","gzipped":"330 B","minified":"487 B"},{"name":"isAppleDevice","gzipped":"367 B","minified":"556 B"},{"name":"isMobile","gzipped":"319 B","minified":"463 B"},{"name":"isFirefox","gzipped":"340 B","minified":"488 B"},{"name":"isOpera","gzipped":"310 B","minified":"441 B"},{"name":"isSafari","gzipped":"310 B","minified":"442 B"},{"name":"isIE","gzipped":"309 B","minified":"438 B"},{"name":"isChromium","gzipped":"313 B","minified":"444 B"},{"name":"isEdge","gzipped":"310 B","minified":"440 B"},{"name":"isChrome","gzipped":"311 B","minified":"442 B"},{"name":"isGecko","gzipped":"327 B","minified":"468 B"},{"name":"isBlink","gzipped":"329 B","minified":"473 B"},{"name":"isWebKit","gzipped":"343 B","minified":"511 B"},{"name":"isPresto","gzipped":"329 B","minified":"473 B"},{"name":"isTrident","gzipped":"329 B","minified":"476 B"},{"name":"isEdgeHTML","gzipped":"327 B","minified":"474 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

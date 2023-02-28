@@ -36,7 +36,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/raf" name="raf" stage={3}>
+    <PrimitivePageMain packageName="@solid-primitives/raf" name="raf" stage={3} packageList={[{"name":"raf","gzipped":"1.1 KB","minified":"2.15 KB"}]} primitiveList={[{"name":"targetFPS","gzipped":"245 B","minified":"321 B"},{"name":"createRAF","gzipped":"990 B","minified":"1.89 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

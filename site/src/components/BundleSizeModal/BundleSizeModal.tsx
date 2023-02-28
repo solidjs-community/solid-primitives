@@ -5,10 +5,13 @@ export type TBundleSizeItem = {
   minified: string;
   gzipped: string;
 };
-const SizeModal: Component<{
+const BundleSizeModal: Component<{
   packageList: TBundleSizeItem[];
   primitiveList: TBundleSizeItem[];
 }> = ({ packageList, primitiveList }) => {
+  const sharedHeaders = ["Minified", "Minified + GZipped"];
+  const packageThHeaders = ["Package", ...sharedHeaders];
+  const primitiveThHeaders = ["Primitive", ...sharedHeaders];
   return (
     <div class="bg-page-main-bg rounded-md p-2 pt-3 max-w-[800px] sm:p-4">
       <h2 class="font-semibold text-lg pb-1 border-b border-slate-300 dark:border-slate-600">
@@ -28,9 +31,9 @@ const SizeModal: Component<{
           <table class="w-full my-4" style="border-collapse: separate; border-spacing: 2px 2px;">
             <thead>
               <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#dee2e5]">
-                <th class="p-2 pb-1 text-center">Package</th>
-                <th class="p-2 pb-1">Minified</th>
-                <th class="p-2 pb-1">Minified + GZipped</th>
+                <For each={packageThHeaders}>
+                  {item => <th class="p-1 text-center text-xs xxs:text-sm md:text-base">{item}</th>}
+                </For>
               </tr>
             </thead>
             <tbody>
@@ -38,9 +41,16 @@ const SizeModal: Component<{
                 {({ name, minified, gzipped }) => {
                   return (
                     <tr class="odd:bg-[#f6fbff] even:bg-page-main-bg dark:odd:bg-[#2b3f4a]">
-                      <td class="p-1 px-2">{name}</td>
-                      <td class="p-1 px-2">{minified}</td>
-                      <td class="p-1 px-2">{gzipped}</td>
+                      <td class="p-1 text-sm md:text-base">
+                        <span class="whitespace-nowrap">@solid-primitives/</span>
+                        <span>{name}</span>
+                      </td>
+                      <td class="p-1 text-sm md:text-base text-center whitespace-nowrap">
+                        {minified}
+                      </td>
+                      <td class="p-1 text-sm md:text-base text-center whitespace-nowrap">
+                        {gzipped}
+                      </td>
                     </tr>
                   );
                 }}
@@ -56,9 +66,9 @@ const SizeModal: Component<{
           <table class="w-full my-4" style="border-collapse: separate; border-spacing: 2px 2px;">
             <thead>
               <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#dee2e5]">
-                <th class="p-2 pb-1 text-center">Primitive</th>
-                <th class="p-2 pb-1">Minified</th>
-                <th class="p-2 pb-1">Minified + GZipped</th>
+                <For each={primitiveThHeaders}>
+                  {item => <th class="p-1 text-center text-xs xxs:text-sm md:text-base">{item}</th>}
+                </For>
               </tr>
             </thead>
             <tbody>
@@ -67,9 +77,13 @@ const SizeModal: Component<{
                   console.log({ name, minified, gzipped });
                   return (
                     <tr class="odd:bg-[#f6fbff] even:bg-page-main-bg dark:odd:bg-[#2b3f4a]">
-                      <td class="p-1 px-2">{name}</td>
-                      <td class="p-1 px-2">{minified}</td>
-                      <td class="p-1 px-2">{gzipped}</td>
+                      <td class="p-1 text-sm md:text-base">{name}</td>
+                      <td class="p-1 text-sm md:text-base text-center whitespace-nowrap">
+                        {minified}
+                      </td>
+                      <td class="p-1 text-sm md:text-base text-center whitespace-nowrap">
+                        {gzipped}
+                      </td>
                     </tr>
                   );
                 }}
@@ -82,4 +96,4 @@ const SizeModal: Component<{
   );
 };
 
-export default SizeModal;
+export default BundleSizeModal;

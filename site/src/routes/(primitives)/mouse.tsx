@@ -38,7 +38,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/mouse" name="mouse" stage={3}>
+    <PrimitivePageMain packageName="@solid-primitives/mouse" name="mouse" stage={3} packageList={[{"name":"mouse","gzipped":"2.25 KB","minified":"5.21 KB"}]} primitiveList={[{"name":"createPositionToElement","gzipped":"2.13 KB","minified":"4.87 KB"},{"name":"createMousePosition","gzipped":"1.91 KB","minified":"4.3 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

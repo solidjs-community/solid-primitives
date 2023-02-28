@@ -36,7 +36,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/jsx-parser" name="jsx-parser" stage={0}>
+    <PrimitivePageMain packageName="@solid-primitives/jsx-parser" name="jsx-parser" stage={0} packageList={[{"name":"jsx-parser","gzipped":"476 B","minified":"842 B"}]} primitiveList={[{"name":"createToken","gzipped":"230 B","minified":"275 B"},{"name":"resolveTokens","gzipped":"294 B","minified":"389 B"},{"name":"isToken","gzipped":"128 B","minified":"128 B"},{"name":"createJSXParser","gzipped":"153 B","minified":"155 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

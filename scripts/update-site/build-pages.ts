@@ -114,16 +114,33 @@ export const buildPage = async ({
   // 2. Online IDE (Stackblitz) / Stackblitz/Codepen
   // 3. Source code[packages/${name}/src/dev]
 
-  const packageList = Object.entries(global.packageName).map(([key, value]) => ({
-    name: key,
-    gzipped: value.gzippedSize,
-    minified: value.minifiedSize
-  }));
-  const primitiveList = Object.entries(global.primitives).map(([key, value]) => ({
-    name: key,
-    gzipped: value.gzippedSize,
-    minified: value.minifiedSize
-  }));
+  const packageList = JSON.stringify(
+    [
+      {
+        name: global.packageName[name].name,
+        gzipped: global.packageName[name].gzippedSize,
+        minified: global.packageName[name].minifiedSize
+      }
+    ]
+    // Object.entries(global.packageName).map(([key, value]) => ({
+    //   name: key,
+    //   gzipped: value.gzippedSize,
+    //   minified: value.minifiedSize
+    // }))
+  );
+  const primitiveList = JSON.stringify(
+    Object.entries(global.primitives)
+      .filter(([key, value]) => {
+        return value.packageName === name;
+      })
+      .map(([key, value]) => {
+        return {
+          name: key,
+          gzipped: value.gzippedSize,
+          minified: value.minifiedSize
+        };
+      })
+  );
 
   const pathToSitePrimitivesRoute = r(`../site/src/routes/(primitives)/${name}.tsx`);
   const pageStr = `

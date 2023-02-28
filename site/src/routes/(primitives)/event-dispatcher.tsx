@@ -35,7 +35,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/event-dispatcher" name="event-dispatcher" stage={0}>
+    <PrimitivePageMain packageName="@solid-primitives/event-dispatcher" name="event-dispatcher" stage={0} packageList={[{"name":"event-dispatcher","gzipped":"235 B","minified":"290 B"}]} primitiveList={[{"name":"createEventDispatcher","gzipped":"235 B","minified":"290 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

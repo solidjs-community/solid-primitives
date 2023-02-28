@@ -38,7 +38,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/intersection-observer" name="intersection-observer" stage={3}>
+    <PrimitivePageMain packageName="@solid-primitives/intersection-observer" name="intersection-observer" stage={3} packageList={[{"name":"intersection-observer","gzipped":"2.02 KB","minified":"4.61 KB"}]} primitiveList={[{"name":"createIntersectionObserver","gzipped":"1.23 KB","minified":"2.48 KB"},{"name":"createViewportObserver","gzipped":"1.39 KB","minified":"2.87 KB"},{"name":"createVisibilityObserver","gzipped":"1.41 KB","minified":"2.83 KB"},{"name":"makeIntersectionObserver","gzipped":"426 B","minified":"742 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

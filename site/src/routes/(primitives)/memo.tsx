@@ -41,7 +41,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/memo" name="memo" stage={3}>
+    <PrimitivePageMain packageName="@solid-primitives/memo" name="memo" stage={3} packageList={[{"name":"memo","gzipped":"2.1 KB","minified":"4.87 KB"}]} primitiveList={[{"name":"createWritableMemo","gzipped":"260 B","minified":"350 B"},{"name":"createLazyMemo","gzipped":"455 B","minified":"738 B"},{"name":"createAsyncMemo","gzipped":"330 B","minified":"466 B"},{"name":"createDebouncedMemo","gzipped":"612 B","minified":"1.29 KB"},{"name":"createDebouncedMemoOn","gzipped":"641 B","minified":"1.34 KB"},{"name":"createThrottledMemo","gzipped":"1.36 KB","minified":"2.96 KB"},{"name":"createPureReaction","gzipped":"315 B","minified":"454 B"},{"name":"createMemoCache","gzipped":"595 B","minified":"1.06 KB"},{"name":"createReducer","gzipped":"212 B","minified":"278 B"},{"name":"createLatest","gzipped":"239 B","minified":"312 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

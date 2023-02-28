@@ -36,7 +36,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/storage" name="storage" stage={3}>
+    <PrimitivePageMain packageName="@solid-primitives/storage" name="storage" stage={3} packageList={[{"name":"storage","gzipped":"2.18 KB","minified":"6.91 KB"}]} primitiveList={[{"name":"createCookieStorage","gzipped":"1.45 KB","minified":"3.13 KB"},{"name":"createAsyncStorage","gzipped":"1.03 KB","minified":"2.35 KB"},{"name":"createStorageSignal","gzipped":"689 B","minified":"1.46 KB"},{"name":"createLocalStorage","gzipped":"994 B","minified":"2.12 KB"},{"name":"createSessionStorage","gzipped":"1.01 KB","minified":"2.16 KB"},{"name":"createStorage","gzipped":"985 B","minified":"2.11 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

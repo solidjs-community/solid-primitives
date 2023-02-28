@@ -37,7 +37,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/date" name="date" stage={3}>
+    <PrimitivePageMain packageName="@solid-primitives/date" name="date" stage={3} packageList={[{"name":"date","gzipped":"3.58 KB","minified":"8.46 KB"}]} primitiveList={[{"name":"createDateNow","gzipped":"616 B","minified":"1.17 KB"},{"name":"createTimeDifference","gzipped":"2.23 KB","minified":"5.17 KB"},{"name":"createTimeDifferenceFromNow","gzipped":"2.71 KB","minified":"6.38 KB"},{"name":"createTimeAgo","gzipped":"3.3 KB","minified":"7.74 KB"},{"name":"createCountdown","gzipped":"2.36 KB","minified":"5.44 KB"},{"name":"createCountdownFromNow","gzipped":"2.84 KB","minified":"6.68 KB"},{"name":"createDate","gzipped":"2.17 KB","minified":"5.04 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )
