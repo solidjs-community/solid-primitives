@@ -66,7 +66,7 @@ const run = async () => {
     }
 
     await buildCategory({ name, pkg, global });
-    buildJSONCategory({ name, pkg, global });
+    await buildJSONCategory({ name, pkg, global });
     await buildPage({ name, pkg });
   }
 

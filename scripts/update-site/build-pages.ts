@@ -7,11 +7,19 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { compile } from "@mdx-js/mdx";
 import remarkGfm from "remark-gfm";
 import { getNPMShield, getSizeShield } from "./build-html-table";
-import { PackageJSONData } from ".";
+import { PackageJSONData, TUpdateSiteGlobal } from ".";
 
 const items: { path: string; pageStr: string }[] = [];
 
-export const buildPage = async ({ pkg, name }: { pkg: PackageJSONData; name: string }) => {
+export const buildPage = async ({
+  pkg,
+  name,
+  global
+}: {
+  pkg: PackageJSONData;
+  name: string;
+  global: TUpdateSiteGlobal;
+}) => {
   const dir = r(`../packages/${name}/README.md`);
   if (!existsSync(dir)) return;
   let readme = readFileSync(dir, "utf-8");
@@ -106,6 +114,17 @@ export const buildPage = async ({ pkg, name }: { pkg: PackageJSONData; name: str
   // 2. Online IDE (Stackblitz) / Stackblitz/Codepen
   // 3. Source code[packages/${name}/src/dev]
 
+  const packageList = Object.entries(global.packageName).map(([key, value]) => ({
+    name: key,
+    gzipped: value.gzippedSize,
+    minified: value.minifiedSize
+  }));
+  const primitiveList = Object.entries(global.primitives).map(([key, value]) => ({
+    name: key,
+    gzipped: value.gzippedSize,
+    minified: value.minifiedSize
+  }));
+
   const pathToSitePrimitivesRoute = r(`../site/src/routes/(primitives)/${name}.tsx`);
   const pageStr = `
 // Do not modify
@@ -119,7 +138,7 @@ ${outputString}
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="${pkg.name}" name="${name}" stage={${pkg.primitive.stage}} packageList={} primitiveList={}>
+    <PrimitivePageMain packageName="${pkg.name}" name="${name}" stage={${pkg.primitive.stage}} packageList={${packageList}} primitiveList={${primitiveList}}>
       <MDXContent/>
     </PrimitivePageMain>
   )

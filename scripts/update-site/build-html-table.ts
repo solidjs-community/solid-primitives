@@ -63,12 +63,12 @@ export const buildCategory = async ({
     const getSizes = async () => {
       const run = async () => {
         return Promise.all(
-          list.map(async (prim, idx, self) => {
+          list.map(async prim => {
             const type = prim.match(/\s/) ? "package" : "export";
             const packageName = name;
             const primitiveName = prim;
 
-            if (idx === 0 && self.length !== 1) {
+            if (type === "package") {
               const result = await checkSizeOfPackage({
                 type: "package",
                 packageName,
@@ -92,11 +92,13 @@ export const buildCategory = async ({
             const minifiedSize = formatBytes(result.minifiedSize);
             const gzippedSize = formatBytes(result.gzippedSize);
 
-            global.primitives[primitiveName] = {
-              packageName,
-              gzippedSize,
-              minifiedSize
-            };
+            if (type === "export") {
+              global.primitives[primitiveName] = {
+                packageName,
+                gzippedSize,
+                minifiedSize
+              };
+            }
 
             const value = `{ gzipped: "${gzippedSize}", minified: "${minifiedSize}" }`;
             const query = getBundleJSQuery({

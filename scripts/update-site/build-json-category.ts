@@ -1,6 +1,7 @@
 import { readFileSync, writeFile, writeFileSync } from "fs";
 import { TUpdateSiteGlobal } from ".";
-import { r, regexGlobalCaptureGroup } from "../utils";
+import { formatBytes, r, regexGlobalCaptureGroup } from "../utils";
+import checkSizeOfPackage from "./checkSizeOfPackage";
 
 const item: {
   name: string;
@@ -9,7 +10,7 @@ const item: {
   primitives: string[];
 }[] = [];
 
-export const buildJSONCategory = ({
+export const buildJSONCategory = async ({
   pkg,
   name,
   global
@@ -60,12 +61,32 @@ export const buildJSONCategory = ({
     capturePrimitives(concatFile);
   }
 
+  const primitives = [...new Set(pkgJSON.list)] as string[];
+
   item.push({
     name,
     category,
     description,
-    primitives: [...new Set(pkgJSON.list)] as string[]
+    primitives
   });
+
+  if (list.length === 1 && list[0].match(/list of/gi)) {
+    for (let primitive of primitives) {
+      const result = await checkSizeOfPackage({
+        type: "export",
+        packageName: name,
+        primitiveName: primitive
+      });
+      const minifiedSize = formatBytes(result.minifiedSize);
+      const gzippedSize = formatBytes(result.gzippedSize);
+
+      global.packageName[name] = {
+        name,
+        gzippedSize,
+        minifiedSize
+      };
+    }
+  }
 };
 
 export const writeJSONFile = () => {
