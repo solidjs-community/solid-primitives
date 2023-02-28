@@ -640,13 +640,11 @@ importers:
 
   packages/transition-group:
     specifiers:
-      '@solid-primitives/memo': workspace:^1.1.5
       '@solid-primitives/refs': workspace:^0.4.0-beta.0
       '@solid-primitives/utils': workspace:^5.2.0
       '@solidjs/router': ^0.7.0
       solid-js: ^1.6.0
     dependencies:
-      '@solid-primitives/memo': link:../memo
       solid-js: 1.6.11
     devDependencies:
       '@solid-primitives/refs': link:../refs

@@ -1,4 +1,12 @@
-import { Accessor, batch, createSignal, untrack, $TRACK, createEffect } from "solid-js";
+import {
+  Accessor,
+  batch,
+  createSignal,
+  untrack,
+  $TRACK,
+  createEffect,
+  createComputed,
+} from "solid-js";
 
 const noop = () => {};
 const noopTransition = (el: any, done: () => void) => done();
@@ -63,6 +71,7 @@ export function createSwitchTransition<T>(
   let { appear } = options;
 
   const [returned, setReturned] = createSignal<NonNullable<T>[]>(initReturned);
+  const [transitions, startTransitions] = createSignal<VoidFunction[]>([], { equals: false });
 
   let next: T | undefined;
   let isExiting = false;
@@ -70,13 +79,20 @@ export function createSwitchTransition<T>(
   function exitTransition(el: T | undefined, after?: () => void) {
     if (!el) return after && after();
     isExiting = true;
-    onExit(el, () => {
-      batch(() => {
-        isExiting = false;
-        setReturned(p => p.filter(e => e !== el));
-        after && after();
-      });
-    });
+    startTransitions(
+      p => (
+        p.push(() =>
+          onExit(el, () => {
+            batch(() => {
+              isExiting = false;
+              setReturned(p => p.filter(e => e !== el));
+              after && after();
+            });
+          }),
+        ),
+        p
+      ),
+    );
   }
 
   function enterTransition(after?: () => void) {
@@ -84,10 +100,10 @@ export function createSwitchTransition<T>(
     if (!el) return after && after();
     next = undefined;
     setReturned(p => [el, ...p]);
-    onEnter(el, after ?? noop);
+    startTransitions(p => (p.push(() => onEnter(el, after ?? noop)), p));
   }
 
-  const transition: (prev: T | undefined) => void =
+  const triggerTransitions: (prev: T | undefined) => void =
     options.mode === "out-in"
       ? // exit -> enter
         prev => isExiting || exitTransition(prev, enterTransition)
@@ -100,22 +116,25 @@ export function createSwitchTransition<T>(
           exitTransition(prev);
         };
 
-  // update elements and call transitions in effect to suspend under Suspense
-  createEffect(
+  // update returned array in a pure computation
+  // so that the updated list is available in user effects
+  createComputed(
     (prev: T | undefined) => {
       const el = source();
 
-      if (appear) {
-        appear = false;
-        // the initial element is already in the rendered array
-        // so it needs to be removed to be added again during the enter transition
-        setReturned([]);
-      }
+      batch(() => {
+        if (appear) {
+          appear = false;
+          // the initial element is already in the rendered array
+          // so it needs to be removed to be added again during the enter transition
+          setReturned([]);
+        }
 
-      if (el !== prev) {
-        next = el;
-        untrack(() => transition(prev));
-      }
+        if (el !== prev) {
+          next = el;
+          untrack(() => triggerTransitions(prev));
+        }
+      });
 
       return el;
     },
@@ -124,6 +143,16 @@ export function createSwitchTransition<T>(
     // or will animate the transition if the source is different from the initial value
     appear ? undefined : initSource,
   );
+
+  // call transitions in effect to suspend them under Suspense
+  createEffect(() => {
+    const queue = transitions();
+    const copy = queue.slice();
+    queue.length = 0;
+    untrack(() => {
+      for (const cb of copy) cb();
+    });
+  });
 
   return returned;
 }

@@ -1,5 +1,12 @@
-import { describe, it, expect, vi } from "vitest";
-import { createRenderEffect, createResource, createRoot, createSignal, Suspense } from "solid-js";
+import { describe, it, expect, vi, test } from "vitest";
+import {
+  createEffect,
+  createRenderEffect,
+  createResource,
+  createRoot,
+  createSignal,
+  Suspense,
+} from "solid-js";
 import { createSwitchTransition } from "../src";
 
 describe("createSwitchTransition", () => {
@@ -242,6 +249,37 @@ describe("createSwitchTransition", () => {
     expect(onEnter).toHaveBeenCalledWith(el3, expect.any(Function));
     expect(onExit).toHaveBeenCalledTimes(2);
     expect(onExit).toHaveBeenCalledWith(el2, expect.any(Function));
+
+    dispose();
+  });
+
+  test("updated list should be available in user effects", () => {
+    let effRuns = 0;
+
+    const dispose = createRoot(dispose => {
+      const [children, setChildren] = createSignal<Element | null>(el1);
+
+      createEffect(() => {
+        effRuns++;
+        children();
+        if (effRuns === 1) {
+          expect(result(), "effect after root").toHaveLength(2);
+        } else {
+          expect(result(), "affect after transitions").toHaveLength(1);
+          expect(result()[0]).toBe(el2);
+        }
+      });
+
+      const result = createSwitchTransition(children, {});
+      expect(result(), "initial").toHaveLength(1);
+
+      setChildren(el2);
+      expect(result(), "after sync assign").toHaveLength(2);
+
+      return dispose;
+    });
+
+    expect(effRuns).toBe(2);
 
     dispose();
   });
