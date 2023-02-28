@@ -1,5 +1,16 @@
 # @solid-primitives/props
 
+## 3.1.0
+
+### Minor Changes
+
+- ddc12685: Add an overload to `combineProps` which allows for passing an options object, with `reverseEventHandlers` option. This option when enabled will cause the event handlers to be called right to left.
+
+### Patch Changes
+
+- Updated dependencies [ddc12685]
+  - @solid-primitives/utils@5.3.0
+
 ## 3.0.7
 
 ### Patch Changes
