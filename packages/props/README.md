@@ -74,12 +74,12 @@ const combined = combineProps(
 // combined.onClick() will call all 3 of the functions above
 ```
 
-The default order of execution is left-to-right. If you want to change it, you can use an options object as the last argument:
+The default order of execution is left-to-right. If you want to change it, you can use an options object as the last argument: (`reverseEventHandlers: true`)
 
 ```ts
 const combined = combineProps(
   // props need to be passed in an array
-  [{ onClick: () => console.log("parent") }, { onClick: () => console.log("parent") }],
+  [{ onClick: () => console.log("parent") }, { onClick: () => console.log("child") }],
   {
     reverseEventHandlers: true,
   },
