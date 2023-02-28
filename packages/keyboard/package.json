@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/keyboard",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A library of reactive promitives helping handling user's keyboard input.",
   "author": "Damian Tarnwski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -88,9 +88,9 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.6",
-    "@solid-primitives/rootless": "workspace:^1.2.3",
-    "@solid-primitives/utils": "workspace:^5.0.0"
+    "@solid-primitives/event-listener": "workspace:^2.2.7",
+    "@solid-primitives/rootless": "workspace:^1.2.5",
+    "@solid-primitives/utils": "workspace:^5.2.1"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

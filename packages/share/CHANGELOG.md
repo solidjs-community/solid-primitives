@@ -1,5 +1,11 @@
 # @solid-primitives/share
 
+## 2.0.3
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 2.0.2
 
 ### Patch Changes

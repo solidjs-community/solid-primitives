@@ -1,5 +1,11 @@
 # @solid-primitives/gestures
 
+## 1.1.4
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 1.1.3
 
 ### Patch Changes

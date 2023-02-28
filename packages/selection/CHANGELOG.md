@@ -1,5 +1,11 @@
 # @solid-primitives/selection
 
+## 0.0.5
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 0.0.4
 
 ### Patch Changes

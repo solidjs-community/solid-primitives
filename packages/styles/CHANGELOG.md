@@ -1,5 +1,14 @@
 # @solid-primitives/styles
 
+## 0.0.104
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+- Updated dependencies [865d5ee9]
+  - @solid-primitives/rootless@1.2.5
+  - @solid-primitives/utils@5.2.1
+
 ## 0.0.103
 
 ### Patch Changes
