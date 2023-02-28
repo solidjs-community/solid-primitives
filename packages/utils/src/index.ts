@@ -70,8 +70,20 @@ export function chain<Args extends [] | any[]>(callbacks: {
   [Symbol.iterator](): IterableIterator<((...args: Args) => any) | undefined>;
 }): (...args: Args) => void {
   return (...args: Args) => {
-    for (const callback of callbacks) {
-      if (typeof callback === "function") callback(...args);
+    for (const callback of callbacks) callback && callback(...args);
+  };
+}
+
+/**
+ * Returns a function that will call all functions in the reversed order with the same arguments.
+ */
+export function reverseChain<Args extends [] | any[]>(
+  callbacks: (((...args: Args) => any) | undefined)[],
+): (...args: Args) => void {
+  return (...args: Args) => {
+    for (let i = callbacks.length - 1; i >= 0; i--) {
+      const callback = callbacks[i];
+      callback && callback(...args);
     }
   };
 }

@@ -1,5 +1,11 @@
 # @solid-primitives/workers
 
+## 0.2.4
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 0.2.3
 
 ### Patch Changes

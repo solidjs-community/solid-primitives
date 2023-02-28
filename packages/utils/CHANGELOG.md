@@ -1,5 +1,17 @@
 # @solid-primitives/utils
 
+## 5.3.0
+
+### Minor Changes
+
+- ddc12685: Add `reverseChain` util as an alternative to `chain`
+
+## 5.2.1
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 5.2.0
 
 ### Minor Changes

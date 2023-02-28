@@ -1,5 +1,11 @@
 # @solid-primitives/websocket
 
+## 0.3.5
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 0.3.4
 
 ### Patch Changes

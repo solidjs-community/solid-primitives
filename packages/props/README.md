@@ -74,6 +74,19 @@ const combined = combineProps(
 // combined.onClick() will call all 3 of the functions above
 ```
 
+The default order of execution is left-to-right. If you want to change it, you can use an options object as the last argument: (`reverseEventHandlers: true`)
+
+```ts
+const combined = combineProps(
+  // props need to be passed in an array
+  [{ onClick: () => console.log("parent") }, { onClick: () => console.log("child") }],
+  {
+    reverseEventHandlers: true,
+  },
+);
+combined.onClick(); // "child" "parent"
+```
+
 ##### For better reference of how exactly `combineProps` works, see the [TESTS](https://github.com/solidjs-community/solid-primitives/blob/main/packages/props/test/combineProps.test.ts)
 
 ### Additional helpers

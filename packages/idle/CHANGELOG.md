@@ -1,5 +1,11 @@
 # @solid-primitives/idle
 
+## 0.0.104
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 0.0.103
 
 ### Patch Changes
