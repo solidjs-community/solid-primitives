@@ -1,4 +1,4 @@
-import { build } from "esbuild";
+import { buildSync } from "esbuild";
 import { readFileSync, writeFileSync, rmSync } from "fs";
 import { gzipSizeSync } from "gzip-size";
 import { r } from "../utils";
@@ -25,7 +25,7 @@ export { ${primitiveName} } from "./packages/${packageName}/src/index"
     writeFileSync(packageExportFilePath, file);
   }
 
-  await build({
+  buildSync({
     entryPoints: [type === "package" ? packageIndexPath : packageExportFilePath],
     outfile: outFile,
     target: ["esnext"],
@@ -34,8 +34,9 @@ export { ${primitiveName} } from "./packages/${packageName}/src/index"
     minify: true,
     treeShaking: true,
     platform: "browser",
-    external: ["solid-js"]
+    external: ["solid-js", "node-fetch"]
   });
+
   const buffer = readFileSync(outFile);
   const minifiedSize = buffer.toString().length;
   const gzippedSize = gzipSizeSync(buffer);

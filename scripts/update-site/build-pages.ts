@@ -89,7 +89,7 @@ export const buildPage = async ({ pkg, name }: { pkg: PackageJSONData; name: str
     .replace(/(return\s*<>)([^]*)(<\/>)/, (_, p1, content: string, p3) => {
       if (!content) return _;
       let hasComponent = false;
-      content = content.replace(/<[A-Z][^>]*>/, component => {
+      content = content.replace(/<CopyPackages[^>]*>/, component => {
         hasComponent = true;
         return `</NoHydration>${component}<NoHydration>`;
       });
@@ -119,7 +119,7 @@ ${outputString}
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="${pkg.name}" name="${name}" stage={${pkg.primitive.stage}}>
+    <PrimitivePageMain packageName="${pkg.name}" name="${name}" stage={${pkg.primitive.stage}} packageList={} primitiveList={}>
       <MDXContent/>
     </PrimitivePageMain>
   )

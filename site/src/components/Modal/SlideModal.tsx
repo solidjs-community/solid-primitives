@@ -1,14 +1,15 @@
 import Dismiss from "solid-dismiss";
 import { FiX } from "solid-icons/fi";
-import { Accessor, Component, onMount } from "solid-js";
+import { Accessor, onMount, ParentComponent } from "solid-js";
 import { setHeaderState } from "../Header/Header";
-import Stage from "./Stage";
 
-const StageModal: Component<{
+const SlideModal: ParentComponent<{
   menuButton: Element;
   open: Accessor<boolean>;
   setOpen: (value: boolean) => void;
-}> = ({ menuButton, open, setOpen }) => {
+}> = props => {
+  const { menuButton, open, setOpen } = props;
+
   let containerEl!: HTMLElement;
   let dialogEl!: HTMLDivElement;
   let rootApp!: HTMLElement;
@@ -119,12 +120,13 @@ const StageModal: Component<{
           tabindex="-1"
           ref={dialogEl}
         >
-          <Stage />
+          {props.children}
           <button
             class="absolute top-0 right-0 w-[45px] h-[45px] rounded-lg text-[#306FC4] flex justify-center items-center dark:text-[#c2d5ee] dark:hover:text-white"
             onClick={() => {
               setOpen(false);
             }}
+            aria-label="Close Modal"
           >
             <FiX size={25} />
           </button>
@@ -134,4 +136,4 @@ const StageModal: Component<{
   );
 };
 
-export default StageModal;
+export default SlideModal;

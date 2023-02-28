@@ -1,4 +1,5 @@
 import { readFileSync, writeFile, writeFileSync } from "fs";
+import { TUpdateSiteGlobal } from ".";
 import { r, regexGlobalCaptureGroup } from "../utils";
 
 const item: {
@@ -8,7 +9,15 @@ const item: {
   primitives: string[];
 }[] = [];
 
-export const buildJSONCategory = ({ pkg, name }: { pkg: any; name: string }) => {
+export const buildJSONCategory = ({
+  pkg,
+  name,
+  global
+}: {
+  pkg: any;
+  name: string;
+  global: TUpdateSiteGlobal;
+}) => {
   const pkgJSON = JSON.parse(JSON.stringify(pkg));
   const { description } = pkgJSON as { description: string };
   const { list, category, stage } = pkgJSON.primitive as {

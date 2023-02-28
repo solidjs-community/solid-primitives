@@ -7,6 +7,7 @@ import ON_CLIENT_DEV_MODE from "~/hooks/ON_CLIENT_DEV_MODE";
 import { isServer } from "solid-js/web";
 import { setHeaderState } from "../Header/Header";
 import { pageWidthClass } from "~/constants";
+import { TBundleSizeItem } from "../SizeModal/SizeModal";
 
 const githubRepo = "https://github.com/solidjs-community/solid-primitives";
 
@@ -24,6 +25,8 @@ const PrimitivePageMain: ParentComponent<{
   packageName: string;
   name: string;
   stage: number;
+  packageList: TBundleSizeItem[];
+  primitiveList: TBundleSizeItem[];
 }> = props => {
   const githubRepoPrimitve = `${githubRepo}/tree/main/packages/${props.name}`;
 
@@ -90,7 +93,13 @@ const PrimitivePageMain: ParentComponent<{
           </div>
 
           <div class="my-8">
-            <InfoBar packageName={props.packageName} name={props.name} stage={props.stage} />
+            <InfoBar
+              packageName={props.packageName}
+              name={props.name}
+              stage={props.stage}
+              packageList={props.packageList}
+              primitiveList={props.primitiveList}
+            />
           </div>
 
           <div class="prose">{props.children}</div>

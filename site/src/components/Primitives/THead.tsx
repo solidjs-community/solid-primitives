@@ -2,7 +2,7 @@ import { ParentComponent } from "solid-js";
 
 const THead: ParentComponent = props => {
   return (
-    <thead class="sticky top-[58px] z-1">
+    <thead class="sticky top-[58px] z-[2]">
       {/* box-shadow doesn't work on thead in Safari and iOS */}
       {/* So extra row containing div to show shadow in Safari and iOS */}
       <tr

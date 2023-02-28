@@ -23,6 +23,27 @@ export type PackageJSONData = {
   };
 };
 
+export type TUpdateSiteGlobal = {
+  primitives: {
+    [key: string]: {
+      packageName: string;
+      gzippedSize: string;
+      minifiedSize: string;
+    };
+  };
+  packageName: {
+    [key: string]: {
+      name: string;
+      gzippedSize: string;
+      minifiedSize: string;
+    };
+  };
+};
+const global: TUpdateSiteGlobal = {
+  packageName: {},
+  primitives: {}
+};
+
 console.log("updateSite", "Updating site");
 
 const packageFiles = readdirSync(r(`../packages/`));
@@ -44,8 +65,8 @@ const run = async () => {
       continue;
     }
 
-    await buildCategory({ name, pkg });
-    buildJSONCategory({ name, pkg });
+    await buildCategory({ name, pkg, global });
+    buildJSONCategory({ name, pkg, global });
     await buildPage({ name, pkg });
   }
 

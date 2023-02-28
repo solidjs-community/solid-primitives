@@ -1,5 +1,6 @@
 import { FaBrandsGithub } from "solid-icons/fa";
 import { Component } from "solid-js";
+import { TBundleSizeItem } from "../SizeModal/SizeModal";
 import SizeBadge, { SizeBadgePill } from "./SizeBadge";
 import StageBadge, { StageBadgePill } from "./StageBadge";
 import VersionBadge, { VersionBadgePill } from "./VersionBadge";
@@ -17,11 +18,14 @@ const githubRepo = "https://github.com/solidjs-community/solid-primitives";
 export const getSizeShield = (name: string) => `${sizeShield}${name}.json`;
 export const getNPMShield = (name: string) => `${npmShield}${name}.json`;
 
-const InfoBar: Component<{ packageName: string; name: string; stage: number }> = ({
-  name,
-  packageName,
-  stage
-}) => {
+const InfoBar: Component<{
+  packageName: string;
+  name: string;
+  stage: number;
+
+  packageList: TBundleSizeItem[];
+  primitiveList: TBundleSizeItem[];
+}> = ({ name, packageName, stage, packageList, primitiveList }) => {
   const githubRepoPrimitve = `${githubRepo}/tree/main/packages/${name}`;
   const bundlephobiaFullURL = `${bundlephobiaURL}/${packageName}`;
   const npmFullURL = `${npmURL}/${packageName}`;
@@ -30,6 +34,8 @@ const InfoBar: Component<{ packageName: string; name: string; stage: number }> =
       <SizeBadgePill
         value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/active-element.json"
         href={bundlephobiaFullURL}
+        packageList={packageList}
+        primitiveList={primitiveList}
       />
       <VersionBadgePill
         value="https://img.shields.io/npm/v/@solid-primitives/active-element.json"

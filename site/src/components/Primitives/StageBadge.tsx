@@ -1,5 +1,6 @@
 import { createSignal, ParentComponent } from "solid-js";
-import StageModal from "../Stage/StageModal";
+import SlideModal from "../Modal/SlideModal";
+import Stage from "../Stage/Stage";
 
 const bgLevel0 = "bg-[#FA233E]";
 const bgLevel1 = "bg-[#FFA15C]";
@@ -87,7 +88,9 @@ const StageBadge: ParentComponent<{
       >
         <span>{level}</span>
       </button>
-      <StageModal menuButton={menuButton} open={open} setOpen={setOpen} />
+      <SlideModal menuButton={menuButton} open={open} setOpen={setOpen}>
+        <Stage />
+      </SlideModal>
     </div>
   );
 };
@@ -112,7 +115,9 @@ export const StageBadgePill: ParentComponent<{ value: number | string }> = ({ va
           {level}
         </div>
       </button>
-      <StageModal menuButton={menuButton} open={open} setOpen={setOpen} />
+      <SlideModal menuButton={menuButton} open={open} setOpen={setOpen}>
+        <Stage />
+      </SlideModal>
     </>
   );
 };

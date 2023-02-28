@@ -1,5 +1,5 @@
 import { writeFile, writeFileSync } from "fs";
-import { PackageData, PackageJSONData } from ".";
+import { PackageData, PackageJSONData, TUpdateSiteGlobal } from ".";
 import { formatBytes, r } from "../utils";
 import checkSizeOfPackage from "./checkSizeOfPackage";
 
@@ -24,17 +24,30 @@ const getBundleJSQuery = ({
   type: "package" | "export";
   packageName: string;
   primitiveName: string;
-}) =>
-  encodeURIComponent(
-    `q=@solid-primitives/${packageName}${
-      type === "export" ? `&treeshake=[{${primitiveName}}]` : ""
-    }&config={"esbuild":{"external":["solid-js"]}}`
-  );
+}) => {
+  const esbuild = {
+    external: ["solid-js", "node-fetch"]
+  };
+  const query = encodeURIComponent(`@solid-primitives/${packageName}`);
+  const treeshake = encodeURIComponent(`[{${primitiveName}}]`);
+  const config = encodeURIComponent(`{"esbuild":${JSON.stringify(esbuild)}}`);
+  return `q=${query}${type === "export" ? `&treeshake=${treeshake}` : ""}&config=${config}`;
+};
 
 export const getSizeShield = (name: string) => `${sizeShield}${name}.json`;
 export const getNPMShield = (name: string) => `${npmShield}${name}.json`;
 
-export const buildCategory = async ({ name, pkg }: { name: string; pkg: PackageJSONData }) => {
+const getSizes = async ({}: { packageName: string }) => {};
+
+export const buildCategory = async ({
+  name,
+  pkg,
+  global
+}: {
+  name: string;
+  pkg: PackageJSONData;
+  global: TUpdateSiteGlobal;
+}) => {
   const { list, category, stage } = pkg.primitive;
 
   const data = {} as PackageData;
@@ -50,10 +63,27 @@ export const buildCategory = async ({ name, pkg }: { name: string; pkg: PackageJ
     const getSizes = async () => {
       const run = async () => {
         return Promise.all(
-          list.map(async prim => {
-            const type = "export";
+          list.map(async (prim, idx, self) => {
+            const type = prim.match(/\s/) ? "package" : "export";
             const packageName = name;
             const primitiveName = prim;
+
+            if (idx === 0 && self.length !== 1) {
+              const result = await checkSizeOfPackage({
+                type: "package",
+                packageName,
+                primitiveName
+              });
+              const minifiedSize = formatBytes(result.minifiedSize);
+              const gzippedSize = formatBytes(result.gzippedSize);
+
+              global.packageName[packageName] = {
+                name: packageName,
+                gzippedSize,
+                minifiedSize
+              };
+            }
+
             const result = await checkSizeOfPackage({
               type,
               packageName,
@@ -61,15 +91,27 @@ export const buildCategory = async ({ name, pkg }: { name: string; pkg: PackageJ
             });
             const minifiedSize = formatBytes(result.minifiedSize);
             const gzippedSize = formatBytes(result.gzippedSize);
+
+            global.primitives[primitiveName] = {
+              packageName,
+              gzippedSize,
+              minifiedSize
+            };
+
             const value = `{ gzipped: "${gzippedSize}", minified: "${minifiedSize}" }`;
             const query = getBundleJSQuery({
               type,
               packageName,
               primitiveName
             });
-            const href = `${bundleJSURL}${query}`;
+            const href = `${bundleJSURL}?${query}`;
 
-            return `<SizeBadge value={${value}} href="${href}" />`;
+            const component = `<SizeBadge value={${value}} href="${href}" />`;
+
+            return `<SizeBadgeWrapper primitiveName="${primitiveName.replace(
+              /\s/g,
+              ""
+            )}">${component}</SizeBadgeWrapper>`;
           })
         );
       };
@@ -83,7 +125,8 @@ export const buildCategory = async ({ name, pkg }: { name: string; pkg: PackageJ
   data.Primitives = list
     .map(prim => {
       const primitiveRoute = `/${name}#${prim.toLowerCase().replace(/\s/g, "-")}`;
-      return `<PrimitiveBtn href="${primitiveRoute}">${prim}</PrimitiveBtn>`;
+      const component = `<PrimitiveBtn href="${primitiveRoute}">${prim}</PrimitiveBtn>`;
+      return `<PrimitiveBtnLineWrapper primitiveName="${prim}">${component}</PrimitiveBtnLineWrapper>`;
     })
     .join("");
   // .join("<br />");
@@ -173,9 +216,11 @@ import TH from "./TH"
 import TD from "./TD"
 import TR from "./TR"
 import SizeBadge from "./SizeBadge"
+import { SizeBadgeWrapper } from "./SizeBadge"
 import VersionBadge from "./VersionBadge"
 import StageBadge from "./StageBadge"
 import PrimitiveBtn from "./PrimitiveBtn"
+import PrimitiveBtnLineWrapper from "./PrimitiveBtnLineWrapper"
 
 const PrimitivesTable = () => {
   return (${table})
