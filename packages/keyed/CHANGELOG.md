@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.1.8
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 1.1.7
 
 ### Patch Changes

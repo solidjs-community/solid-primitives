@@ -10,7 +10,7 @@ describe("createPointerListeners", () => {
       let captured_events = {
         move: undefined as undefined | PointerEvent,
         enter: undefined as undefined | PointerEvent,
-        up: undefined as undefined | PointerEvent
+        up: undefined as undefined | PointerEvent,
       };
       const move_event = new Event("pointermove");
       const enter_event = new Event("pointerenter");
@@ -20,7 +20,7 @@ describe("createPointerListeners", () => {
         target: window,
         onMove: e => (captured_events.move = e),
         onEnter: e => (captured_events.enter = e),
-        onUp: e => (captured_events.up = e)
+        onUp: e => (captured_events.up = e),
       });
 
       window.dispatchEvent(move_event);
@@ -44,7 +44,7 @@ describe("createPointerListeners", () => {
 
       createPointerListeners({
         target: window,
-        onMove: e => captured_events++
+        onMove: e => captured_events++,
       });
 
       window.dispatchEvent(move_event);
@@ -66,7 +66,7 @@ describe("createPointerListeners", () => {
 
       createPointerListeners({
         target,
-        onMove: e => captured_events++
+        onMove: e => captured_events++,
       });
 
       window.dispatchEvent(move_event);

@@ -5,7 +5,7 @@ import {
   createDevices,
   createGyroscope,
   createMicrophones,
-  createSpeakers
+  createSpeakers,
 } from "../src";
 
 describe("API doesn't break in SSR", () => {

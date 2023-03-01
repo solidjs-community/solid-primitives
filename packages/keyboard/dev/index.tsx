@@ -44,9 +44,9 @@ const App: Component = () => {
       addMessage("Control + E + R pressed");
     },
     {
-      preventDefault: true
+      preventDefault: true,
       // requireReset: true
-    }
+    },
   );
 
   let addMessage: (message: string) => void;

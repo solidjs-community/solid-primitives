@@ -4,18 +4,18 @@ import { makeEventListener } from "./eventListener";
 
 export type WindowEventProps = {
   [K in keyof WindowEventMap as `on${Capitalize<K>}` | `on${K}`]?: (
-    event: WindowEventMap[K]
+    event: WindowEventMap[K],
   ) => void;
 };
 export type DocumentEventProps = {
   [K in keyof DocumentEventMap as `on${Capitalize<K>}` | `on${K}`]?: (
-    event: DocumentEventMap[K]
+    event: DocumentEventMap[K],
   ) => void;
 };
 
 const attachPropListeners = (
   target: typeof window | typeof document,
-  props: WindowEventProps | DocumentEventProps
+  props: WindowEventProps | DocumentEventProps,
 ) => {
   keys(props).forEach(attr => {
     if (attr.startsWith("on") && typeof props[attr] === "function")

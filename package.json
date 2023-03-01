@@ -2,7 +2,6 @@
   "name": "solid-primitives",
   "private": true,
   "description": "A collection of high-quality, community contributed building blocks.",
-  "main": "index.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -10,10 +9,8 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "postinstall": "pnpm build",
     "format": "prettier -w packages/**/*.{js,ts,json,css,tsx,jsx,md,html}",
-    "lint": "eslint --max-warnings 0 packages/*/src/** && eslint --max-warnings 0 packages/*/test/** --rule \"@typescript-eslint/no-unused-vars: off\"",
+    "lint": "eslint --max-warnings 0 packages/*/src/** && eslint packages/*/test/** --quiet --rule \"no-only-tests/no-only-tests: error\"",
     "build": "cross-env CI=true turbo run build",
     "test": "cross-env CI=true vitest -c ./configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr",
@@ -40,6 +37,7 @@
     "eslint": "^8.34.0",
     "eslint-plugin-no-only-tests": "^3.1.0",
     "eslint-plugin-solid": "^0.9.4",
+    "eslint-plugin-eslint-comments": "^3.2.0",
     "fs-extra": "^11.1.0",
     "gzip-size": "^7.0.0",
     "jiti": "^1.17.1",
@@ -52,7 +50,7 @@
     "remark-gfm": "^3.0.1",
     "solid-js": "^1.6.11",
     "tsup": "^6.6.3",
-    "tsup-preset-solid": "^0.1.5",
+    "tsup-preset-solid": "^0.1.8",
     "turbo": "^1.7.4",
     "type-fest": "^3.6.0",
     "typescript": "^4.9.5",

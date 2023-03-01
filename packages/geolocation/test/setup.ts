@@ -1,6 +1,6 @@
 export const mockCoordinates = {
   latitude: 43.65107,
-  longitude: -79.347015
+  longitude: -79.347015,
 };
 
 Object.defineProperty(global.navigator, "geolocation", {
@@ -9,16 +9,16 @@ Object.defineProperty(global.navigator, "geolocation", {
     getCurrentPosition(
       successCallback: PositionCallback,
       errorCallback?: PositionErrorCallback | null,
-      options?: PositionOptions
+      options?: PositionOptions,
     ) {
       successCallback({ coords: mockCoordinates } as GeolocationPosition);
     },
     watchPosition(
       successCallback: PositionCallback,
       errorCallback?: PositionErrorCallback | null,
-      options?: PositionOptions
+      options?: PositionOptions,
     ) {
       successCallback({ coords: mockCoordinates } as GeolocationPosition);
-    }
-  }
+    },
+  },
 });

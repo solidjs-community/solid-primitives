@@ -11,7 +11,7 @@ describe("createDateNow", () => {
       const time = now().getTime();
       expect(
         time > test_now - 100 && time < test_now + 100,
-        "the date should be 'now'"
+        "the date should be 'now'",
       ).toBeTruthy();
 
       dispose();
@@ -44,7 +44,7 @@ describe("createDateNow", () => {
         setTimeout(() => {
           const time3 = now().getTime();
           expect(time3, "the timestamp after update() should have bigger value").toBeGreaterThan(
-            time2
+            time2,
           );
           dispose();
         }, 30);

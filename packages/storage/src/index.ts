@@ -11,7 +11,7 @@ export type {
   AsyncStorageWithOptions,
   AsyncStorageObject,
   AsyncStorageSetter,
-  StorageSignalProps
+  StorageSignalProps,
 } from "./types";
 
 import {
@@ -19,7 +19,7 @@ import {
   createAsyncStorage,
   createStorageSignal,
   createLocalStorage,
-  createSessionStorage
+  createSessionStorage,
 } from "./storage";
 import { CookieOptions, cookieStorage, createCookieStorage } from "./cookies";
 import { addClearMethod } from "./tools";
@@ -32,5 +32,5 @@ export {
   createSessionStorage,
   type CookieOptions,
   cookieStorage,
-  addClearMethod
+  addClearMethod,
 };

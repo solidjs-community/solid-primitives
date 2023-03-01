@@ -1,5 +1,7 @@
 import { Accessor, createEffect, createSignal, onCleanup, onMount, Setter } from "solid-js";
 
+import { createHydrateSignal } from "@solid-primitives/utils";
+
 import type {
   AnyStorageProps,
   AsyncStorage,
@@ -13,7 +15,7 @@ import type {
   StorageSetter,
   StorageSignalProps,
   StorageWithOptions,
-  StringStorageProps
+  StringStorageProps,
 } from "./types";
 
 /**
@@ -40,17 +42,17 @@ import type {
  * ```
  */
 export function createStorage<O>(
-  props?: StringStorageProps<Storage | StorageWithOptions<O>, O>
+  props?: StringStorageProps<Storage | StorageWithOptions<O>, O>,
 ): [
   store: StorageObject<string>,
   setter: StorageSetter<string, O>,
-  actions: StorageActions<string>
+  actions: StorageActions<string>,
 ];
 export function createStorage<O, T>(
-  props?: AnyStorageProps<Storage | StorageWithOptions<O>, O, T>
+  props?: AnyStorageProps<Storage | StorageWithOptions<O>, O, T>,
 ): [store: StorageObject<T>, setter: StorageSetter<T, O>, actions: StorageActions<T>];
 export function createStorage<O, T>(
-  props?: StorageProps<T, Storage | StorageWithOptions<O>, O>
+  props?: StorageProps<T, Storage | StorageWithOptions<O>, O>,
 ): [store: StorageObject<T>, setter: StorageSetter<T, O>, actions: StorageActions<T>] {
   const [error, setError] = createSignal<Error>();
   const handleError = props?.throw
@@ -84,28 +86,24 @@ export function createStorage<O, T>(
               return result;
             }
             try {
-              return api.getItem(`${prefix}${key}`) as string | null;
+              return api.getItem(`${prefix}${key}`);
             } catch (err) {
-              handleError(err, `Error reading ${prefix}${key} from ${api.name}`);
+              handleError(err, `Error reading ${prefix}${key} from ${api["name"]}`);
               return null;
             }
           },
-          null
+          null,
         );
         if (value !== null && props?.deserializer) {
-          return props.deserializer(value as string, key, props?.options as O) as T;
+          return props.deserializer(value, key, props.options as O) as T;
         }
         return value as T | null;
-      }
-    }
+      },
+    },
   );
   const setter: StorageSetter<T, O> = (key, value: T, options?: O) => {
     const filteredValue = props?.serializer
-      ? (props.serializer(
-          value as any,
-          key,
-          options ?? (props?.options as O | undefined)
-        ) as string)
+      ? props.serializer(value as any, key, options ?? props.options)
       : (value as unknown as string);
     const apiKey = `${prefix}${key}`;
     apis.forEach(api => {
@@ -129,7 +127,7 @@ export function createStorage<O, T>(
   const clear = () =>
     apis.forEach(api => {
       try {
-        api?.clear?.();
+        api.clear();
       } catch (err) {
         handleError(err, `Error clearing ${api.name}`);
       }
@@ -140,7 +138,7 @@ export function createStorage<O, T>(
       if (!result.hasOwnProperty(key)) {
         const filteredValue: T | null =
           value && props?.deserializer
-            ? (props.deserializer(value, key, props?.options) as T)
+            ? (props.deserializer(value, key, props.options) as T)
             : (value as T | null);
         if (filteredValue) {
           result[key] = filteredValue;
@@ -187,11 +185,11 @@ export function createStorage<O, T>(
           } catch (err) {
             handleError(
               err,
-              `Error synching api ${api.name} from storage event (${ev.key}=${ev.newValue})`
+              `Error synching api ${api.name} from storage event (${ev.key}=${ev.newValue})`,
             );
           }
         });
-        changed && ev.key && signals.get(ev.key)?.[1]();
+        (changed as boolean) && ev.key && signals.get(ev.key)?.[1]();
       };
       if ("addEventListener" in globalThis) {
         globalThis.addEventListener("storage", listener);
@@ -208,8 +206,8 @@ export function createStorage<O, T>(
       clear,
       error,
       remove,
-      toJSON
-    }
+      toJSON,
+    },
   ];
 }
 
@@ -238,25 +236,25 @@ export function createStorage<O, T>(
  * ```
  */
 export function createAsyncStorage<O>(
-  props?: StringStorageProps<AsyncStorage | AsyncStorageWithOptions<O>, O>
+  props?: StringStorageProps<AsyncStorage | AsyncStorageWithOptions<O>, O>,
 ): [
   store: AsyncStorageObject<string>,
   setter: AsyncStorageSetter<string, O>,
-  actions: AsyncStorageActions<string>
+  actions: AsyncStorageActions<string>,
 ];
 export function createAsyncStorage<O, T>(
-  props?: AnyStorageProps<T, AsyncStorage | AsyncStorageWithOptions<O>, O>
+  props?: AnyStorageProps<T, AsyncStorage | AsyncStorageWithOptions<O>, O>,
 ): [
   store: AsyncStorageObject<T>,
   setter: AsyncStorageSetter<T, O>,
-  actions: AsyncStorageActions<T>
+  actions: AsyncStorageActions<T>,
 ];
 export function createAsyncStorage<O, T>(
-  props?: StorageProps<T, AsyncStorage | AsyncStorageWithOptions<O>, O>
+  props?: StorageProps<T, AsyncStorage | AsyncStorageWithOptions<O>, O>,
 ): [
   store: AsyncStorageObject<T>,
   setter: AsyncStorageSetter<T, O>,
-  actions: AsyncStorageActions<T>
+  actions: AsyncStorageActions<T>,
 ] {
   const [error, setError] = createSignal<Error>();
   const handleError = props?.throw
@@ -289,32 +287,30 @@ export function createAsyncStorage<O, T>(
           handleError(err, `Error getting ${prefix}${key} from ${api.name}`);
         }
         if (value instanceof Promise) {
-          return value.then((value: string | null) =>
-            value && props?.deserializer ? props.deserializer(value, key, props?.options) : value
+          return value.then((newValue: string | null) =>
+            newValue && props?.deserializer
+              ? props.deserializer(newValue, key, props.options)
+              : newValue,
           ) as any;
         }
         return value !== null && props?.deserializer
-          ? Promise.resolve(props.deserializer(value as string, key, props?.options as O) as T)
+          ? Promise.resolve(props.deserializer(value as string, key, props.options as O) as T)
           : (Promise.resolve(value as T | null) as any);
       }, null);
-    }
+    },
   });
   const setter = (key: string, value: T, options?: O) => {
     const filteredValue = props?.serializer
-      ? props.serializer(value as any, key, options ?? props?.options)
+      ? props.serializer(value as any, key, options ?? props.options)
       : (value as unknown as string);
     return Promise.all(
       apis.map(api => {
         try {
-          api.setItem(
-            `${prefix}${key}`,
-            filteredValue,
-            options ?? (props?.options as O | undefined)
-          );
+          api.setItem(`${prefix}${key}`, filteredValue, options ?? props?.options);
         } catch (err) {
           handleError(err, `Error setting ${prefix}${key} to ${filteredValue} in ${api.name}`);
         }
-      })
+      }),
     ).then(() => {
       const node = signals.get(key);
       node && node[1]();
@@ -328,7 +324,7 @@ export function createAsyncStorage<O, T>(
         } catch (err) {
           handleError(err, `Error removing ${prefix}${key} from ${api.name}`);
         }
-      })
+      }),
     ).then(() => {
       const node = signals.get(key);
       node && node[1]();
@@ -346,7 +342,7 @@ export function createAsyncStorage<O, T>(
             handleError(err, `Error removing ${key} from ${api.name} during clear()`);
           }
         }
-      })
+      }),
     ).then(() => {
       return;
     });
@@ -356,7 +352,7 @@ export function createAsyncStorage<O, T>(
       if (!result.hasOwnProperty(key)) {
         const filteredValue: T | null =
           value && props?.deserializer
-            ? (props.deserializer(value, key, props?.options) as T)
+            ? (props.deserializer(value, key, props.options) as T)
             : (value as T | null);
         if (filteredValue) {
           result[key] = filteredValue;
@@ -385,7 +381,7 @@ export function createAsyncStorage<O, T>(
             handleError(err, `Error attempting to get all keys from ${api.name}`);
           }
         }
-      })
+      }),
     );
     return result;
   };
@@ -403,7 +399,7 @@ export function createAsyncStorage<O, T>(
             handleError(err, "Error attempting to sync on event");
           }
         });
-        changed && ev.key && signals.get(ev.key)?.[1]();
+        (changed as boolean) && ev.key && signals.get(ev.key)?.[1]();
       };
       if ("addEventListener" in globalThis) {
         globalThis.addEventListener("storage", listener);
@@ -420,8 +416,8 @@ export function createAsyncStorage<O, T>(
       remove,
       clear,
       error,
-      toJSON
-    }
+      toJSON,
+    },
   ];
 }
 
@@ -449,7 +445,7 @@ export function createAsyncStorage<O, T>(
 export function createStorageSignal<T, O = {}>(
   key: string,
   initialValue?: T,
-  props?: StorageSignalProps<T, Storage | StorageWithOptions<O>, O>
+  props?: StorageSignalProps<T, Storage | StorageWithOptions<O>, O>,
 ): [accessor: Accessor<T | null>, setter: Setter<T | null>, refetch: () => void] {
   const [error, setError] = createSignal<Error>();
   const apis = props?.api
@@ -468,22 +464,26 @@ export function createStorageSignal<T, O = {}>(
         value = api.getItem(`${prefix}${key}`) as T | null;
       } catch (err) {
         setError(
-          err instanceof Error ? err : new Error(`Error reading ${prefix}${key} from ${api.name}`)
+          err instanceof Error ? err : new Error(`Error reading ${prefix}${key} from ${api.name}`),
         );
         if (props?.throw) {
           throw err;
         }
       }
       if (value !== null && props?.deserializer) {
-        return props.deserializer(value + "", key, props?.options as O) as T;
+        return props.deserializer(value + "", key, props.options as O) as T;
       }
       return value;
     }, null);
-  const [accessor, setter] = createSignal<T | null>(read() ?? (initialValue as T), props as any);
+  const [accessor, setter] = createHydrateSignal<T | null>(
+    initialValue as T,
+    () => read() ?? (initialValue as T),
+    props as any,
+  );
   createEffect(() => {
     const value = accessor();
     const filteredValue = props?.serializer
-      ? props.serializer(value as string & T, key, props?.options)
+      ? props.serializer(value as string & T, key, props.options)
       : value + "";
     const apiKey = `${prefix}${key}`;
     try {
@@ -493,14 +493,14 @@ export function createStorageSignal<T, O = {}>(
         apis.forEach(
           api =>
             api.getItem(apiKey) !== filteredValue &&
-            api.setItem(apiKey, filteredValue, props?.options)
+            api.setItem(apiKey, filteredValue, props?.options),
         );
       }
     } catch (err) {
       setError(
         err instanceof Error
           ? err
-          : new Error(`Error ${value === null ? "removing" : "writing"} value`)
+          : new Error(`Error ${value === null ? "removing" : "writing"} value`),
       );
       if (props?.throw) {
         throw err;
@@ -528,7 +528,7 @@ export function createStorageSignal<T, O = {}>(
             throw err;
           }
         }
-        changed && refetch();
+        (changed as boolean) && refetch();
       };
       if ("addEventListener" in globalThis) {
         globalThis.addEventListener("storage", listener);

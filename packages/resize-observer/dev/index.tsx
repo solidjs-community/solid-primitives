@@ -38,7 +38,7 @@ const App: Component = () => {
           class="w-24 h-24 bg-orange-500 rounded-md shadow-bg-gray-900 shadow-lg center-child"
           style={{
             width: `${width()}px`,
-            height: `${height()}px`
+            height: `${height()}px`,
           }}
         >
           {Math.round(es.width ?? 0)}px x {Math.round(es.height ?? 0)}px

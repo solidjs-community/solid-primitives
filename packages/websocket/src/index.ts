@@ -22,19 +22,19 @@ const createWebsocket = (
   onError: (message: Event) => void,
   protocols?: string | Array<string>,
   reconnectLimit?: number,
-  reconnectInterval?: number
+  reconnectInterval?: number,
 ): [
   connect: () => void,
   disconnect: () => void,
   send: (message: string) => void,
   state: () => number,
-  socket: () => WebSocket
+  socket: () => WebSocket,
 ] => {
-  let socket: WebSocket;
+  let socket: WebSocket | undefined;
   let reconnections = 0;
-  let reconnectId: ReturnType<typeof setTimeout>;
+  let reconnectId: ReturnType<typeof setTimeout> | undefined;
   const [state, setState] = createSignal(WebSocket.CLOSED);
-  const send = (data: string | ArrayBuffer) => socket.send(data);
+  const send = (data: string | ArrayBuffer) => socket!.send(data);
   const cancelReconnect = () => {
     if (reconnectId) {
       clearTimeout(reconnectId);
@@ -64,7 +64,7 @@ const createWebsocket = (
     socket.onmessage = onData;
   };
   onCleanup(() => disconnect);
-  return [connect, disconnect, send, state, () => socket];
+  return [connect, disconnect, send, state, () => socket!];
 };
 
 export default createWebsocket;

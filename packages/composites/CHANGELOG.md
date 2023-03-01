@@ -1,5 +1,11 @@
 # @solid-primitives/composites
 
+## 1.1.3
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 1.1.2
 
 ### Patch Changes

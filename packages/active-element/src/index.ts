@@ -1,5 +1,5 @@
-import { Accessor, createSignal, JSX } from "solid-js";
-import { MaybeAccessor, Directive } from "@solid-primitives/utils";
+import { Accessor, JSX } from "solid-js";
+import { MaybeAccessor, Directive, createHydrateSignal } from "@solid-primitives/utils";
 import { makeEventListener, createEventListener } from "@solid-primitives/event-listener";
 
 declare module "solid-js" {
@@ -27,7 +27,7 @@ const getActiveElement = () =>
  * clear();
  */
 export function makeActiveElementListener(
-  callback: (element: Element | null) => void
+  callback: (element: Element | null) => void,
 ): VoidFunction {
   if (process.env.SSR) {
     return () => void 0;
@@ -50,7 +50,7 @@ export function createActiveElement(): Accessor<Element | null> {
   if (process.env.SSR) {
     return () => null;
   }
-  const [active, setActive] = createSignal<Element | null>(getActiveElement());
+  const [active, setActive] = createHydrateSignal<Element | null>(null, getActiveElement);
   makeActiveElementListener(setActive);
   return active;
 }
@@ -71,7 +71,7 @@ export function createActiveElement(): Accessor<Element | null> {
 export function makeFocusListener(
   target: Element,
   callback: (isActive: boolean) => void,
-  useCapture = true
+  useCapture = true,
 ): VoidFunction {
   if (process.env.SSR) {
     return () => void 0;
@@ -94,7 +94,10 @@ export function createFocusSignal(target: MaybeAccessor<Element>): Accessor<bool
   if (process.env.SSR) {
     return () => false;
   }
-  const [isActive, setIsActive] = createSignal(document.activeElement === target);
+  const [isActive, setIsActive] = createHydrateSignal(
+    false,
+    () => document.activeElement === target,
+  );
   createEventListener(target, "blur", () => setIsActive(false), true);
   createEventListener(target, "focus", () => setIsActive(true), true);
   return isActive;

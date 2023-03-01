@@ -1,5 +1,19 @@
 # @solid-primitives/storage
 
+## 1.3.6
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+- Updated dependencies [865d5ee9]
+  - @solid-primitives/utils@5.2.1
+
+## 1.3.5
+
+### Patch Changes
+
+- 51e80d27: Fix: hydration issue
+
 ## 1.3.4
 
 ### Patch Changes

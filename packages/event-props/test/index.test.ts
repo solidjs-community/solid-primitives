@@ -30,6 +30,6 @@ describe("event-props", () => {
           dispose();
           resolve();
         });
-      })
+      }),
     ));
 });

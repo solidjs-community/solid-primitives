@@ -13,7 +13,7 @@ export const uppercase = (string: Accessor<string>) => createMemo(() => string()
  * Signal builder: capitalize a string input
  */
 export const capitalize = (string: Accessor<string>) =>
-  createMemo(on(string, s => s[0].toUpperCase() + s.substring(1).toLowerCase()));
+  createMemo(on(string, s => s[0]!.toUpperCase() + s.substring(1).toLowerCase()));
 /**
  * Signal builder: `String.prototype.substring()`
  * @param start The zero-based index number indicating the beginning of the substring.
@@ -22,7 +22,7 @@ export const capitalize = (string: Accessor<string>) =>
 export const substring = (
   string: MaybeAccessor<string>,
   start: MaybeAccessor<number>,
-  end?: MaybeAccessor<number>
+  end?: MaybeAccessor<number>,
 ) => createMemo(() => access(string).substring(access(start), access(end)));
 
 // a string primitive harvested from @lxsmnsyc's solid-use:

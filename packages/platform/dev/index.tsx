@@ -14,7 +14,7 @@ const App: Component = () => {
               <li>
                 <h5
                   style={{
-                    color: value ? "green" : "red"
+                    color: value ? "green" : "red",
                   }}
                 >
                   {name.substring(2)}

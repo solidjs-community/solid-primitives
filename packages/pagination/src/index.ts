@@ -49,14 +49,14 @@ export const PAGINATION_DEFAULTS = {
   firstContent: "|<",
   prevContent: "<",
   nextContent: ">",
-  lastContent: ">|"
+  lastContent: ">|",
 } as const;
 
 const normalizeOption = (
   key: "showFirst" | "showPrev" | "showNext" | "showLast",
   value: PaginationOptions["showFirst" | "showPrev" | "showNext" | "showLast"],
   page: number,
-  pages: number
+  pages: number,
 ) =>
   typeof value === "boolean"
     ? value
@@ -85,7 +85,7 @@ const normalizeOption = (
  * ```
  */
 export const createPagination = (
-  options?: MaybeAccessor<PaginationOptions>
+  options?: MaybeAccessor<PaginationOptions>,
 ): [props: Accessor<PaginationProps>, page: Accessor<number>, setPage: Setter<number>] => {
   const opts = createMemo(() => Object.assign({}, PAGINATION_DEFAULTS, access(options)));
   const [page, _setPage] = createSignal(opts().initialPage || 1);
@@ -104,7 +104,7 @@ export const createPagination = (
         Home: () => setPage(1),
         End: () => setPage(opts().pages),
         Space: () => setPage(pageNo),
-        Return: () => setPage(pageNo)
+        Return: () => setPage(pageNo),
       }[ev.key] || noop
     )());
 
@@ -122,87 +122,87 @@ export const createPagination = (
                 : {
                     children: pageNo.toString(),
                     onClick: [setPage, pageNo] as const,
-                    onKeyUp: [onKeyUp, pageNo] as const
+                    onKeyUp: [onKeyUp, pageNo] as const,
                   },
               {
                 "aria-current": {
                   get: () => (page() === pageNo ? "true" : undefined),
                   set: noop,
-                  enumerable: true
+                  enumerable: true,
                 },
-                page: { value: pageNo, enumerable: false }
-              }
-            ))(i + 1)
+                page: { value: pageNo, enumerable: false },
+              },
+            ))(i + 1),
       ),
-    []
+    [],
   );
   const first = Object.defineProperties(
     process.env.SSR
       ? ({} as PaginationProps[number])
       : ({
           onClick: [setPage, 1] as const,
-          onKeyUp: [onKeyUp, 1] as const
+          onKeyUp: [onKeyUp, 1] as const,
         } as unknown as PaginationProps[number]),
     {
       disabled: { get: () => page() <= 1, set: noop, enumerable: true },
       children: { get: () => opts().firstContent, set: noop, enumerable: true },
-      page: { value: 1, enumerable: false }
-    }
+      page: { value: 1, enumerable: false },
+    },
   );
   const back = Object.defineProperties(
     process.env.SSR
       ? ({} as PaginationProps[number])
       : ({
           onClick: () => setPage(p => (p > 1 ? p - 1 : p)),
-          onKeyUp: (ev: KeyboardEvent) => onKeyUp(page() - 1, ev)
+          onKeyUp: (ev: KeyboardEvent) => onKeyUp(page() - 1, ev),
         } as unknown as PaginationProps[number]),
     {
       disabled: { get: () => page() <= 1, set: noop, enumerable: true },
       children: { get: () => opts().prevContent, set: noop, enumerable: true },
-      page: { get: () => Math.min(1, page() - 1), enumerable: false }
-    }
+      page: { get: () => Math.min(1, page() - 1), enumerable: false },
+    },
   );
   const next = Object.defineProperties(
     process.env.SSR
       ? ({} as PaginationProps[number])
       : ({
           onClick: () => setPage(p => (p < opts().pages ? p + 1 : p)),
-          onKeyUp: (ev: KeyboardEvent) => onKeyUp(page() - 1, ev)
+          onKeyUp: (ev: KeyboardEvent) => onKeyUp(page() - 1, ev),
         } as unknown as PaginationProps[number]),
     {
       disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
       children: { get: () => opts().nextContent, set: noop, enumerable: true },
-      page: { get: () => Math.max(opts().pages, page() + 1), enumerable: false }
-    }
+      page: { get: () => Math.max(opts().pages, page() + 1), enumerable: false },
+    },
   );
   const last = Object.defineProperties(
     process.env.SSR
       ? ({} as PaginationProps[number])
       : ({
           onClick: () => setPage(opts().pages),
-          onKeyUp: (ev: KeyboardEvent) => onKeyUp(opts().pages, ev)
+          onKeyUp: (ev: KeyboardEvent) => onKeyUp(opts().pages, ev),
         } as unknown as PaginationProps[number]),
     {
       disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
       children: { get: () => opts().lastContent, set: noop, enumerable: true },
-      page: { get: () => opts().pages, enumerable: false }
-    }
+      page: { get: () => opts().pages, enumerable: false },
+    },
   );
 
   const start = createMemo(() =>
-    Math.min(opts().pages - maxPages(), Math.max(1, page() - (maxPages() >> 1)) - 1)
+    Math.min(opts().pages - maxPages(), Math.max(1, page() - (maxPages() >> 1)) - 1),
   );
   const showFirst = createMemo(() =>
-    normalizeOption("showFirst", opts().showFirst, page(), opts().pages)
+    normalizeOption("showFirst", opts().showFirst, page(), opts().pages),
   );
   const showPrev = createMemo(() =>
-    normalizeOption("showPrev", opts().showPrev, page(), opts().pages)
+    normalizeOption("showPrev", opts().showPrev, page(), opts().pages),
   );
   const showNext = createMemo(() =>
-    normalizeOption("showNext", opts().showNext, page(), opts().pages)
+    normalizeOption("showNext", opts().showNext, page(), opts().pages),
   );
   const showLast = createMemo(() =>
-    normalizeOption("showLast", opts().showLast, page(), opts().pages)
+    normalizeOption("showLast", opts().showLast, page(), opts().pages),
   );
 
   const paginationProps = createMemo<PaginationProps>(() => {
@@ -262,14 +262,14 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
     setPages: Setter<T[]>;
     end: Accessor<boolean>;
     setEnd: Setter<boolean>;
-  }
+  },
 ] {
   const [pages, setPages] = createSignal<T[]>([]);
   const [page, setPage] = createSignal(0);
   const [end, setEnd] = createSignal(false);
 
   const { add: setLoader } = makeIntersectionObserver([], e => {
-    if (e.length > 0 && e[0].isIntersecting && !end() && !contents.loading) {
+    if (e.length > 0 && e[0]!.isIntersecting && !end() && !contents.loading) {
       setPage(p => p + 1);
     }
   });
@@ -293,7 +293,7 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
       setPage: setPage,
       setPages: setPages,
       end: end,
-      setEnd: setEnd
-    }
+      setEnd: setEnd,
+    },
   ];
 }

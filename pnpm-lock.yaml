@@ -14,6 +14,7 @@ importers:
       cross-env: ^7.0.3
       esbuild: ^0.17.10
       eslint: ^8.34.0
+      eslint-plugin-eslint-comments: ^3.2.0
       eslint-plugin-no-only-tests: ^3.1.0
       eslint-plugin-solid: ^0.9.4
       fs-extra: ^11.1.0
@@ -28,7 +29,7 @@ importers:
       remark-gfm: ^3.0.1
       solid-js: ^1.6.11
       tsup: ^6.6.3
-      tsup-preset-solid: ^0.1.5
+      tsup-preset-solid: ^0.1.8
       turbo: ^1.7.4
       type-fest: ^3.6.0
       typescript: ^4.9.5
@@ -47,6 +48,7 @@ importers:
       cross-env: 7.0.3
       esbuild: 0.17.10
       eslint: 8.34.0
+      eslint-plugin-eslint-comments: 3.2.0_eslint@8.34.0
       eslint-plugin-no-only-tests: 3.1.0
       eslint-plugin-solid: 0.9.4_7kw3g6rralp5ps6mg3uyzz6azm
       fs-extra: 11.1.0
@@ -61,7 +63,7 @@ importers:
       remark-gfm: 3.0.1
       solid-js: 1.6.11
       tsup: 6.6.3_typescript@4.9.5
-      tsup-preset-solid: 0.1.5_33jyajmuvhjnhxb7klks6dlycu
+      tsup-preset-solid: 0.1.8_mpb67xq6yqcmwxkx4udi7xjn6u
       turbo: 1.7.4
       type-fest: 3.6.0
       typescript: 4.9.5
@@ -72,8 +74,8 @@ importers:
 
   packages/active-element:
     specifiers:
-      '@solid-primitives/event-listener': ^2.2.6
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/event-listener': ^2.2.7
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -88,7 +90,7 @@ importers:
 
   packages/audio:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-heroicons: ^3.1.1
       solid-js: ^1.6.0
     dependencies:
@@ -99,7 +101,7 @@ importers:
 
   packages/autofocus:
     specifiers:
-      '@solid-primitives/utils': ^5.1.0
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -107,10 +109,10 @@ importers:
 
   packages/bounds:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.6
-      '@solid-primitives/resize-observer': workspace:^2.0.9
-      '@solid-primitives/scheduled': workspace:^1.2.1
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/event-listener': workspace:^2.2.7
+      '@solid-primitives/resize-observer': workspace:^2.0.10
+      '@solid-primitives/scheduled': workspace:^1.3.1
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -128,7 +130,7 @@ importers:
 
   packages/clipboard:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -146,9 +148,9 @@ importers:
 
   packages/connectivity:
     specifiers:
-      '@solid-primitives/event-listener': ^2.2.6
-      '@solid-primitives/rootless': ^1.2.3
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/event-listener': ^2.2.7
+      '@solid-primitives/rootless': ^1.2.5
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -164,7 +166,7 @@ importers:
 
   packages/controlled-props:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -172,7 +174,7 @@ importers:
 
   packages/cursor:
     specifiers:
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -180,10 +182,10 @@ importers:
 
   packages/date:
     specifiers:
-      '@solid-primitives/event-listener': ^2.2.6
-      '@solid-primitives/memo': ^1.1.4
-      '@solid-primitives/timer': ^1.3.5
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/event-listener': ^2.2.7
+      '@solid-primitives/memo': ^1.1.5
+      '@solid-primitives/timer': ^1.3.6
+      '@solid-primitives/utils': ^5.2.1
       date-fns: ^2.29.2
       solid-js: ^1.6.0
     dependencies:
@@ -197,7 +199,7 @@ importers:
 
   packages/destructure:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.1.1
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -211,8 +213,8 @@ importers:
 
   packages/event-bus:
     specifiers:
-      '@solid-primitives/immutable': ^0.1.6
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/immutable': ^0.1.7
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/immutable': link:../immutable
@@ -227,7 +229,7 @@ importers:
 
   packages/event-listener:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -255,7 +257,7 @@ importers:
 
   packages/geolocation:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.2.1
       '@types/leaflet': ^1.7.11
       leaflet: ^1.8.0
       mapbox-gl: ^2.12.1
@@ -285,7 +287,7 @@ importers:
       '@graphql-codegen/typescript': ^3.0.0
       '@graphql-codegen/typescript-operations': ^3.0.0
       '@graphql-typed-document-node/core': ^3.1.1
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/utils': ^5.2.1
       graphql: ^16.6.0
       solid-js: ^1.6.0
     dependencies:
@@ -301,8 +303,10 @@ importers:
 
   packages/i18n:
     specifiers:
+      '@solid-primitives/context': workspace:^0.1.4
       solid-js: ^1.6.0
     dependencies:
+      '@solid-primitives/context': link:../context
       solid-js: 1.6.9
 
   packages/idle:
@@ -313,7 +317,7 @@ importers:
 
   packages/immutable:
     specifiers:
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -327,8 +331,8 @@ importers:
 
   packages/intersection-observer:
     specifiers:
-      '@solid-primitives/range': workspace:^0.1.6
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/range': workspace:^0.1.7
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -338,7 +342,7 @@ importers:
 
   packages/jsx-parser:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.1.0
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -346,9 +350,9 @@ importers:
 
   packages/keyboard:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.6
-      '@solid-primitives/rootless': workspace:^1.2.3
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/event-listener': workspace:^2.2.7
+      '@solid-primitives/rootless': workspace:^1.2.5
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -358,9 +362,9 @@ importers:
 
   packages/keyed:
     specifiers:
-      '@solid-primitives/immutable': ^0.1.6
-      '@solid-primitives/refs': ^0.3.6
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/immutable': ^0.1.7
+      '@solid-primitives/refs': ^0.3.7
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
       solid-transition-group: ^0.0.13
     dependencies:
@@ -373,7 +377,7 @@ importers:
 
   packages/map:
     specifiers:
-      '@solid-primitives/trigger': workspace:^0.0.4
+      '@solid-primitives/trigger': workspace:^1.0.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/trigger': link:../trigger
@@ -381,9 +385,9 @@ importers:
 
   packages/media:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.6
-      '@solid-primitives/rootless': workspace:^1.2.3
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/event-listener': workspace:^2.2.7
+      '@solid-primitives/rootless': workspace:^1.2.5
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -393,9 +397,9 @@ importers:
 
   packages/memo:
     specifiers:
-      '@solid-primitives/mouse': ^2.0.6
-      '@solid-primitives/scheduled': ^1.2.1
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/mouse': ^2.0.7
+      '@solid-primitives/scheduled': ^1.3.1
+      '@solid-primitives/utils': ^5.2.1
       solid-app-router: ^0.4.2
       solid-js: ^1.6.0
     dependencies:
@@ -408,10 +412,10 @@ importers:
 
   packages/mouse:
     specifiers:
-      '@solid-primitives/event-listener': ^2.2.6
-      '@solid-primitives/raf': workspace:^2.1.6
-      '@solid-primitives/rootless': ^1.2.3
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/event-listener': ^2.2.7
+      '@solid-primitives/raf': workspace:^2.1.7
+      '@solid-primitives/rootless': ^1.2.5
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -423,8 +427,8 @@ importers:
 
   packages/mutation-observer:
     specifiers:
-      '@solid-primitives/composites': workspace:^1.1.2
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/composites': workspace:^1.1.3
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -434,16 +438,20 @@ importers:
 
   packages/page-visibility:
     specifiers:
-      '@solid-primitives/rootless': workspace:^1.2.2
+      '@solid-primitives/event-listener': workspace:^2.2.7
+      '@solid-primitives/rootless': workspace:^1.2.5
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
+      '@solid-primitives/event-listener': link:../event-listener
       '@solid-primitives/rootless': link:../rootless
+      '@solid-primitives/utils': link:../utils
       solid-js: 1.6.9
 
   packages/pagination:
     specifiers:
-      '@solid-primitives/intersection-observer': workspace:^2.0.3
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/intersection-observer': workspace:^2.0.7
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/intersection-observer': link:../intersection-observer
@@ -464,10 +472,10 @@ importers:
 
   packages/pointer:
     specifiers:
-      '@solid-primitives/event-listener': ^2.2.6
-      '@solid-primitives/immutable': ^0.1.6
-      '@solid-primitives/rootless': ^1.2.3
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/event-listener': ^2.2.7
+      '@solid-primitives/immutable': ^0.1.7
+      '@solid-primitives/rootless': ^1.2.5
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -478,7 +486,7 @@ importers:
 
   packages/promise:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -486,7 +494,7 @@ importers:
 
   packages/props:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.3.0
       nanospy: ^0.5.0
       solid-js: ^1.6.0
     dependencies:
@@ -497,7 +505,7 @@ importers:
 
   packages/raf:
     specifiers:
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -505,7 +513,7 @@ importers:
 
   packages/range:
     specifiers:
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
       solid-transition-group: ^0.0.13
     dependencies:
@@ -516,9 +524,9 @@ importers:
 
   packages/refs:
     specifiers:
-      '@solid-primitives/immutable': ^0.1.6
-      '@solid-primitives/rootless': ^1.2.3
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/immutable': ^0.1.7
+      '@solid-primitives/rootless': ^1.2.5
+      '@solid-primitives/utils': ^5.2.1
       solid-app-router: ^0.4.2
       solid-js: ^1.6.0
       solid-transition-group: ^0.0.13
@@ -533,9 +541,9 @@ importers:
 
   packages/resize-observer:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.6
-      '@solid-primitives/rootless': workspace:^1.2.3
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/event-listener': workspace:^2.2.7
+      '@solid-primitives/rootless': workspace:^1.2.5
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -545,7 +553,7 @@ importers:
 
   packages/rootless:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.11
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -553,12 +561,14 @@ importers:
 
   packages/scheduled:
     specifiers:
-      '@solid-primitives/timer': workspace:^1.3.5
+      '@solid-primitives/timer': workspace:^1.3.6
+      '@solidjs/router': ^0.7.0
       solid-js: ^1.6.0
     dependencies:
       solid-js: 1.6.9
     devDependencies:
       '@solid-primitives/timer': link:../timer
+      '@solidjs/router': 0.7.0_solid-js@1.6.9
 
   packages/script-loader:
     specifiers:
@@ -568,9 +578,9 @@ importers:
 
   packages/scroll:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.6
-      '@solid-primitives/rootless': workspace:^1.2.3
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/event-listener': workspace:^2.2.7
+      '@solid-primitives/rootless': workspace:^1.2.5
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -586,7 +596,7 @@ importers:
 
   packages/set:
     specifiers:
-      '@solid-primitives/trigger': workspace:^0.0.4
+      '@solid-primitives/trigger': workspace:^1.0.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/trigger': link:../trigger
@@ -600,8 +610,8 @@ importers:
 
   packages/signal-builders:
     specifiers:
-      '@solid-primitives/immutable': ^0.1.6
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/immutable': ^0.1.7
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/immutable': link:../immutable
@@ -610,13 +620,15 @@ importers:
 
   packages/storage:
     specifiers:
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
+      '@solid-primitives/utils': link:../utils
       solid-js: 1.6.9
 
   packages/stream:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -624,10 +636,12 @@ importers:
 
   packages/styles:
     specifiers:
-      '@solid-primitives/rootless': workspace:^1.2.2
+      '@solid-primitives/rootless': workspace:^1.2.5
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/rootless': link:../rootless
+      '@solid-primitives/utils': link:../utils
       solid-js: 1.6.9
 
   packages/timer:
@@ -638,7 +652,7 @@ importers:
 
   packages/trigger:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.0.0
+      '@solid-primitives/utils': workspace:^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -652,7 +666,7 @@ importers:
 
   packages/upload:
     specifiers:
-      '@solid-primitives/utils': ^5.0.0
+      '@solid-primitives/utils': ^5.2.1
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -746,11 +760,6 @@ packages:
       '@babel/highlight': 7.18.6
     dev: true
 
-  /@babel/compat-data/7.20.10:
-    resolution: {integrity: sha512-sEnuDPpOJR/fcafHMjpcpGN5M2jbUGUHwmuWKM/YdPzeEDJg8bgmbcWQFUfE32MQjti1koACvoPVsDe8Uq+idg==}
-    engines: {node: '>=6.9.0'}
-    dev: true
-
   /@babel/compat-data/7.20.14:
     resolution: {integrity: sha512-0YpKHD6ImkWMEINCyDAD0HLLUH/lPCefG8ld9it8DJB2wnApraKuhgYTvTY1z7UFIfBTGy5LwncZ+5HWWGbhFw==}
     engines: {node: '>=6.9.0'}
@@ -762,13 +771,13 @@ packages:
     dependencies:
       '@ampproject/remapping': 2.2.0
       '@babel/code-frame': 7.18.6
-      '@babel/generator': 7.20.7
+      '@babel/generator': 7.20.14
       '@babel/helper-compilation-targets': 7.20.7_@babel+core@7.20.12
       '@babel/helper-module-transforms': 7.20.11
       '@babel/helpers': 7.20.7
-      '@babel/parser': 7.20.7
+      '@babel/parser': 7.20.15
       '@babel/template': 7.20.7
-      '@babel/traverse': 7.20.12
+      '@babel/traverse': 7.20.13
       '@babel/types': 7.20.7
       convert-source-map: 1.9.0
       debug: 4.3.4
@@ -781,15 +790,6 @@ packages:
 
   /@babel/generator/7.20.14:
     resolution: {integrity: sha512-AEmuXHdcD3A52HHXxaTmYlb8q/xMEhoRP67B3T4Oq7lbmSoqroMZzjnGj3+i1io3pdnF8iBYVu4Ilj+c4hBxYg==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/types': 7.20.7
-      '@jridgewell/gen-mapping': 0.3.2
-      jsesc: 2.5.2
-    dev: true
-
-  /@babel/generator/7.20.7:
-    resolution: {integrity: sha512-7wqMOJq8doJMZmP4ApXTzLxSr7+oO2jroJURrVEp6XShrQUObV8Tq/D0NCcoYg2uHqUrjzO0zwBjoYzelxK+sw==}
     engines: {node: '>=6.9.0'}
     dependencies:
       '@babel/types': 7.20.7
@@ -810,7 +810,7 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0
     dependencies:
-      '@babel/compat-data': 7.20.10
+      '@babel/compat-data': 7.20.14
       '@babel/core': 7.20.12
       '@babel/helper-validator-option': 7.18.6
       browserslist: 4.21.4
@@ -881,7 +881,7 @@ packages:
       '@babel/helper-split-export-declaration': 7.18.6
       '@babel/helper-validator-identifier': 7.19.1
       '@babel/template': 7.20.7
-      '@babel/traverse': 7.20.12
+      '@babel/traverse': 7.20.13
       '@babel/types': 7.20.7
     transitivePeerDependencies:
       - supports-color
@@ -907,7 +907,7 @@ packages:
       '@babel/helper-member-expression-to-functions': 7.20.7
       '@babel/helper-optimise-call-expression': 7.18.6
       '@babel/template': 7.20.7
-      '@babel/traverse': 7.20.12
+      '@babel/traverse': 7.20.13
       '@babel/types': 7.20.7
     transitivePeerDependencies:
       - supports-color
@@ -954,7 +954,7 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       '@babel/template': 7.20.7
-      '@babel/traverse': 7.20.12
+      '@babel/traverse': 7.20.13
       '@babel/types': 7.20.7
     transitivePeerDependencies:
       - supports-color
@@ -971,14 +971,6 @@ packages:
 
   /@babel/parser/7.20.15:
     resolution: {integrity: sha512-DI4a1oZuf8wC+oAJA9RW6ga3Zbe8RZFt7kD9i4qAspz3I/yHet1VvC3DiSy/fsUvv5pvJuNPh0LPOdCcqinDPg==}
-    engines: {node: '>=6.0.0'}
-    hasBin: true
-    dependencies:
-      '@babel/types': 7.20.7
-    dev: true
-
-  /@babel/parser/7.20.7:
-    resolution: {integrity: sha512-T3Z9oHybU+0vZlY9CiDSJQTD5ZapcW18ZctFMi0MOAl/4BjFF4ul7NVSARLdbGO5vDqy9eQiGTV0LtKfvCYvcg==}
     engines: {node: '>=6.0.0'}
     hasBin: true
     dependencies:
@@ -1345,24 +1337,6 @@ packages:
       '@babel/code-frame': 7.18.6
       '@babel/parser': 7.20.15
       '@babel/types': 7.20.7
-    dev: true
-
-  /@babel/traverse/7.20.12:
-    resolution: {integrity: sha512-MsIbFN0u+raeja38qboyF8TIT7K0BFzz/Yd/77ta4MsUsmP2RAnidIlwq7d5HFQrH/OZJecGV6B71C4zAgpoSQ==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/code-frame': 7.18.6
-      '@babel/generator': 7.20.7
-      '@babel/helper-environment-visitor': 7.18.9
-      '@babel/helper-function-name': 7.19.0
-      '@babel/helper-hoist-variables': 7.18.6
-      '@babel/helper-split-export-declaration': 7.18.6
-      '@babel/parser': 7.20.7
-      '@babel/types': 7.20.7
-      debug: 4.3.4
-      globals: 11.12.0
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /@babel/traverse/7.20.13:
@@ -2884,6 +2858,14 @@ packages:
       solid-js: 1.6.9
     dev: false
 
+  /@solidjs/router/0.7.0_solid-js@1.6.9:
+    resolution: {integrity: sha512-8HI84twe5FjYRebSLMAhtkL9bRuTDIlxJK56kjfjU9WKGoUCTaWpCnkuj8Hqde1bWZ0X+GOZxKDfNkn1CjtjxA==}
+    peerDependencies:
+      solid-js: ^1.5.3
+    dependencies:
+      solid-js: 1.6.9
+    dev: true
+
   /@solidjs/testing-library/0.6.1_solid-js@1.6.11:
     resolution: {integrity: sha512-cS91EDopZhpVa+F55vLxbT+xrQEtc6jIYhXEleu7aCtPRKuBAhKGYQoiOAWrxRd2cXu678dhR8kuwp7ZS2gkNQ==}
     engines: {node: '>= 14'}
@@ -3661,19 +3643,6 @@ packages:
       - debug
     dev: true
 
-  /babel-plugin-jsx-dom-expressions/0.35.14_@babel+core@7.20.12:
-    resolution: {integrity: sha512-Eywfw/7cNbBsStTgj46JRvyGTb+RLyF2EJ0AV3/W2cUwbw3R3syOBqdzFLdHN2MPOs4nJA80XtGl9kSMjEekhA==}
-    peerDependencies:
-      '@babel/core': ^7.20.12
-    dependencies:
-      '@babel/core': 7.20.12
-      '@babel/helper-module-imports': 7.18.6
-      '@babel/plugin-syntax-jsx': 7.18.6_@babel+core@7.20.12
-      '@babel/types': 7.20.7
-      html-entities: 2.3.3
-      validate-html-nesting: 1.2.0
-    dev: true
-
   /babel-plugin-jsx-dom-expressions/0.35.16_@babel+core@7.20.12:
     resolution: {integrity: sha512-Z8vaeXRdtI4qyq3bmQiLjiZnbjn2Rr0mjpXMwN+QxHbWjtlAFOJSHlkcxbrwPz/DdcfSgkmZM0Atvt/zMLeLyA==}
     peerDependencies:
@@ -3743,7 +3712,7 @@ packages:
       '@babel/core': ^7.0.0
     dependencies:
       '@babel/core': 7.20.12
-      babel-plugin-jsx-dom-expressions: 0.35.14_@babel+core@7.20.12
+      babel-plugin-jsx-dom-expressions: 0.35.16_@babel+core@7.20.12
     dev: true
 
   /bail/2.0.2:
@@ -4588,8 +4557,8 @@ packages:
       is-symbol: 1.0.4
     dev: true
 
-  /esbuild-plugin-solid/0.4.2_nthmvwso2kmvm2vudl5hl5hku4:
-    resolution: {integrity: sha512-T5GphLoud3RumjeNYO3K9WVjWDzVKG5evlS7hUEUI0n9tiCL+CnbvJh3SSwFi3xeeXpZRrnZc1gd6FWQsVobTg==}
+  /esbuild-plugin-solid/0.5.0_53k565wzpp55uni6zxdi7b642e:
+    resolution: {integrity: sha512-ITK6n+0ayGFeDVUZWNMxX+vLsasEN1ILrg4pISsNOQ+mq4ljlJJiuXotInd+HE0MzwTcA9wExT1yzDE2hsqPsg==}
     peerDependencies:
       esbuild: '>=0.12'
       solid-js: '>= 1.0'
@@ -4694,6 +4663,17 @@ packages:
       optionator: 0.8.3
     optionalDependencies:
       source-map: 0.6.1
+    dev: true
+
+  /eslint-plugin-eslint-comments/3.2.0_eslint@8.34.0:
+    resolution: {integrity: sha512-0jkOl0hfojIHHmEHgmNdqv4fmh7300NdpA9FFpF7zaoLvB/QeXOGNLIo86oAveJFrfB1p05kC8hpEMHM8DwWVQ==}
+    engines: {node: '>=6.5.0'}
+    peerDependencies:
+      eslint: '>=4.19.1'
+    dependencies:
+      escape-string-regexp: 1.0.5
+      eslint: 8.34.0
+      ignore: 5.2.4
     dev: true
 
   /eslint-plugin-no-only-tests/3.1.0:
@@ -8138,7 +8118,7 @@ packages:
     peerDependencies:
       solid-js: ^1.3
     dependencies:
-      '@babel/generator': 7.20.7
+      '@babel/generator': 7.20.14
       '@babel/helper-module-imports': 7.18.6
       '@babel/types': 7.20.7
       solid-js: 1.6.11
@@ -8573,12 +8553,12 @@ packages:
     resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
     dev: true
 
-  /tsup-preset-solid/0.1.5_33jyajmuvhjnhxb7klks6dlycu:
-    resolution: {integrity: sha512-lmXr0/0uv4reN6XFG1l79I1w7Z+yOEfVRxmPfaB+qdPmshYledIgDMEOsezsGEf///JJJzL0n3f0bKd8cmqScQ==}
+  /tsup-preset-solid/0.1.8_mpb67xq6yqcmwxkx4udi7xjn6u:
+    resolution: {integrity: sha512-V5TZFEZY9emACO3AZvKyCRzdoyjUcuMEEbTGcJnCma7OVvGnSNVoewFff9g0CaveJ8cZcC3u2tW9gMaxmPZ71A==}
     peerDependencies:
       tsup: ^6.5.0
     dependencies:
-      esbuild-plugin-solid: 0.4.2_nthmvwso2kmvm2vudl5hl5hku4
+      esbuild-plugin-solid: 0.5.0_53k565wzpp55uni6zxdi7b642e
       tsup: 6.6.3_typescript@4.9.5
       type-fest: 3.6.0
     transitivePeerDependencies:
@@ -8985,10 +8965,6 @@ packages:
 
   /v8-compile-cache-lib/3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
-    dev: true
-
-  /validate-html-nesting/1.2.0:
-    resolution: {integrity: sha512-sI65QUd3T/e5wbQkdPKjikFsIVLPIaOQK+9uowPp6/k609SN8hs5eqBLrnN5DeW9Kd932Q4Imo0fzK2dxoOsCA==}
     dev: true
 
   /validate-html-nesting/1.2.1:

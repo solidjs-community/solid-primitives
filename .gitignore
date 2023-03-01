@@ -157,7 +157,6 @@ tmp/
 temp/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,node
-.vscode/settings.json
 
 tsup.config.bundled*.mjs
 

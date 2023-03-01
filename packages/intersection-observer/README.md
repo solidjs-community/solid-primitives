@@ -48,7 +48,7 @@ const { add: intersectionObserver } = makeIntersectionObserver([], entries => {
 function makeIntersectionObserver(
   elements: Element[],
   onChange: IntersectionObserverCallback,
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ): {
   add: AddIntersectionObserverEntry;
   remove: RemoveIntersectionObserverEntry;
@@ -79,7 +79,7 @@ createIntersectionObserver(els, entries => {
 function createIntersectionObserver(
   elements: Accessor<Element[]>,
   onChange: IntersectionObserverCallback,
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ): void;
 ```
 
@@ -105,14 +105,14 @@ const [intersectionObserver] = createViewportObserver()
 function createViewportObserver(
   elements: MaybeAccessor<Element[]>,
   callback: EntryCallback,
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ): CreateViewportObserverReturnValue;
 function createViewportObserver(
   initial: MaybeAccessor<[Element, EntryCallback][]>,
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ): CreateViewportObserverReturnValue;
 function createViewportObserver(
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ): CreateViewportObserverReturnValue;
 ```
 
@@ -179,7 +179,7 @@ const useVisibilityObserver = createVisibilityObserver(
   withOccurrence((entry, { occurrence }) => {
     console.log(occurrence); // => "Entering" | "Leaving" | "Inside" | "Outside"
     return entry.isIntersecting;
-  })
+  }),
 );
 ```
 
@@ -197,7 +197,7 @@ const useVisibilityObserver = createVisibilityObserver(
       return true;
     }
     return entry.isIntersecting;
-  })
+  }),
 );
 ```
 
@@ -207,7 +207,7 @@ const useVisibilityObserver = createVisibilityObserver(
 function createViewportObserver(
   elements: MaybeAccessor<Element[]>,
   callback: EntryCallback,
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ): CreateViewportObserverReturnValue;
 ```
 

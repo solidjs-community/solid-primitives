@@ -81,7 +81,7 @@ onMount(() => {
 makeEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
   window,
   "myCustomEvent",
-  () => console.log("yup!")
+  () => console.log("yup!"),
 );
 // just don't use interfaces as EventMaps! (write them using `type` keyword)
 ```
@@ -143,7 +143,7 @@ createEventListener(() => ref, "mousemove", e => {});
 createEventListener<{ myCustomEvent: MyEvent; other: Event }, "myCustomEvent">(
   window,
   "myCustomEvent",
-  () => console.log("yup!")
+  () => console.log("yup!"),
 );
 // just don't use interfaces as EventMaps! (write them using `type` keyword)
 ```
@@ -224,7 +224,7 @@ import { createEventListenerMap } from "@solid-primitives/event-listener";
 createEventListenerMap(element, {
   mousemove: mouseHandler,
   mouseenter: e => {},
-  touchend: touchHandler
+  touchend: touchHandler,
 });
 
 // both target can be reactive:
@@ -233,9 +233,9 @@ createEventListenerMap(
   target,
   {
     mousemove: e => {},
-    touchstart: e => {}
+    touchstart: e => {},
   },
-  { passive: true }
+  { passive: true },
 );
 
 // createEventListenerMap can be used to listen to custom events
@@ -249,7 +249,7 @@ createEventListenerMap<
   "myEvent" | "custom"
 >(target, {
   myEvent: e => {},
-  custom: e => {}
+  custom: e => {},
 });
 ```
 

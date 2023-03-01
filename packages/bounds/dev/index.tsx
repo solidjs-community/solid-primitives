@@ -31,7 +31,7 @@ const App: Component = () => {
   const throttleUpdate: UpdateGuard = fn => throttle(fn, 500);
   const es = createElementBounds(() => ref, {
     trackMutation: throttleUpdate,
-    trackScroll: throttleUpdate
+    trackScroll: throttleUpdate,
   });
 
   return (
@@ -44,7 +44,7 @@ const App: Component = () => {
               class="w-24 h-24 bg-orange-500 rounded-md shadow-bg-gray-900 shadow-lg center-child"
               style={{
                 width: `${width()}px`,
-                height: `${height()}px`
+                height: `${height()}px`,
               }}
             >
               <pre>{JSON.stringify(es, undefined, 2)}</pre>

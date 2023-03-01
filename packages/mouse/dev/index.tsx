@@ -23,7 +23,7 @@ const App: Component = () => {
       x: lerp(p.x, mouse.x, 0.1),
       y: lerp(p.y, mouse.y, 0.1),
       elX: lerp(p.elX, relative.x, 0.2),
-      elY: lerp(p.elY, relative.y, 0.2)
+      elY: lerp(p.elY, relative.y, 0.2),
     }));
   });
   start();
@@ -34,11 +34,11 @@ const App: Component = () => {
         class="w-36 h-36 bg-violet-700 rounded-full filter pointer-events-none"
         classList={{
           "opacity-0": !mouse.isInside,
-          "blur-xl": !mouse.isInside
+          "blur-xl": !mouse.isInside,
         }}
         style={{
           transition: "opacity 500ms, filter 300ms",
-          transform: `translate(${pos().x - 81}px, ${pos().y - 81}px)`
+          transform: `translate(${pos().x - 81}px, ${pos().y - 81}px)`,
         }}
       ></div>
       <Show when={showContainer()}>
@@ -49,7 +49,7 @@ const App: Component = () => {
           <div
             class="w-24 h-24 rounded-full bg-amber-500 bg-opacity-80 pointer-events-none"
             style={{
-              transform: `translate(${pos().elX - 54}px, ${pos().elY - 54}px)`
+              transform: `translate(${pos().elX - 54}px, ${pos().elY - 54}px)`,
             }}
           ></div>
         </div>
@@ -58,7 +58,7 @@ const App: Component = () => {
         class="fixed z-20 top-25vh left-25vw p-6 py-4 rounded-2xl rounded-lt bg-white bg-opacity-10 border-1 border-white border-opacity-20 pointer-events-none text-opacity-50 text-white transition-opacity"
         style={{
           transform: `translate(${inElementX()}px, ${inElementY()}px)`,
-          opacity: relative.isInside ? 1 : 0
+          opacity: relative.isInside ? 1 : 0,
         }}
       >
         <DisplayRecord record={{ x: inElementX(), y: inElementY() }} />

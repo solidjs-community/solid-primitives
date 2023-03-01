@@ -14,23 +14,23 @@ const Button = (props: ComponentProps<"button">) => {
           onmouseenter: () => console.log("mouse enter"),
           onmouseleave: () => console.log("mouse leave"),
           style: {
-            color: "#eee"
-          }
+            color: "#eee",
+          },
         }),
         {
           onClick: () => console.log("click 2"),
           onmouseenter: () => console.log("mouse enter 2"),
           "aria-label": "button",
           style: {
-            padding: "8px 16px"
-          }
-        }
+            padding: "8px 16px",
+          },
+        },
       ),
       {
         onClick: () => console.log("click 3"),
         onkeydown: () => console.log("key down"),
-        "aria-label": "button 2"
-      }
+        "aria-label": "button 2",
+      },
     ),
     {
       onClick: () => console.log("click 4"),
@@ -38,9 +38,9 @@ const Button = (props: ComponentProps<"button">) => {
       "aria-label": "button 3",
       class: "btn-primary",
       style: {
-        color: "#fff"
-      }
-    }
+        color: "#fff",
+      },
+    },
   );
 
   return <button {...combinedProps} />;

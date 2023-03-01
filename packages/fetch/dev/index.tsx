@@ -11,7 +11,7 @@ const App: Component = () => {
   const [aborted, { abort }] = createFetch(
     "assets/abort.txt",
     { initialValue: "this is a fallback after abort" },
-    [withAbort()]
+    [withAbort()],
   );
 
   abort();

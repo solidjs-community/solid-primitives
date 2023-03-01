@@ -10,6 +10,7 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",

@@ -11,7 +11,7 @@ export const RPC: WorkerSignal = 1;
 export function setup(
   ctx: Worker,
   rpcMethods: { [key: string]: Function },
-  callbacks: WorkerCallbacks
+  callbacks: WorkerCallbacks,
 ) {
   const handler = ({ data }: { data: WorkerMessage }) => {
     const id = data.id;
@@ -22,7 +22,7 @@ export function setup(
         ctx.postMessage({
           id,
           type: 1,
-          error: "NO_SUCH_METHOD"
+          error: "NO_SUCH_METHOD",
         });
       } else {
         const post = (result?: string, error?: string) =>
@@ -59,7 +59,7 @@ export function cjs(code: string, exportsObjName: string, exports: Set<string>):
     (_, before, type, ws, name) => {
       exports.add(name);
       return `${before}${exportsObjName}.${name}=${type}${ws}${name}`;
-    }
+    },
   );
   return `var ${exportsObjName}={};\n${code}\n${exportsObjName};`;
 }

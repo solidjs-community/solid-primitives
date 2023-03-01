@@ -7,7 +7,7 @@ const App: Component = () => {
   const [props, controls] = createControlledProps({
     bool: true,
     number: 0,
-    string: "test"
+    string: "test",
   });
 
   return (

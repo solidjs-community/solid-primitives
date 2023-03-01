@@ -11,7 +11,7 @@ describe("createElementBounds", () => {
       bottom: null,
       right: null,
       width: null,
-      height: null
+      height: null,
     });
     expect(el).not.toBeCalled();
   });

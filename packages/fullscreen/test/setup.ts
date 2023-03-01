@@ -2,7 +2,7 @@ let currentFullscreenElement: HTMLElement | undefined;
 
 HTMLElement.prototype.requestFullscreen = function (
   this: HTMLElement,
-  options?: FullscreenOptions
+  options?: FullscreenOptions,
 ) {
   (window as any)._fullScreenOptions = options;
   currentFullscreenElement = this;
@@ -12,12 +12,12 @@ HTMLElement.prototype.requestFullscreen = function (
 
 Object.defineProperty(document, "fullscreenElement", {
   value: currentFullscreenElement,
-  writable: false
+  writable: false,
 });
 
 Object.defineProperty(document, "exitFullscreen", {
   value: () => {
     currentFullscreenElement = undefined;
   },
-  writable: false
+  writable: false,
 });

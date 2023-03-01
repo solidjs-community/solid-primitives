@@ -1,5 +1,15 @@
 # @solid-primitives/date
 
+## 2.0.8
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+- Updated dependencies [865d5ee9]
+  - @solid-primitives/memo@1.1.5
+  - @solid-primitives/timer@1.3.6
+  - @solid-primitives/utils@5.2.1
+
 ## 2.0.7
 
 ### Patch Changes

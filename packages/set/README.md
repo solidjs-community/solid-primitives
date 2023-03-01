@@ -20,6 +20,8 @@ The Javascript built-in `Set` & `WeakSet` data structures as a reactive signals.
 npm install @solid-primitives/set
 # or
 yarn add @solid-primitives/set
+# or
+pnpm add @solid-primitives/set
 ```
 
 ## `ReactiveSet`

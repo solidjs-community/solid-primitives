@@ -16,7 +16,7 @@ export type EventMapOf<Target> = Target extends Window
 export type EventListenerDirectiveProps = [
   type: string,
   handler: (e: any) => void,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ];
 
 declare module "solid-js" {

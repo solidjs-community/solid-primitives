@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/trigger",
-  "version": "0.0.4",
+  "version": "1.0.1",
   "description": "A set of primitives based on Solid signals, used to trigger computations.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -15,11 +15,10 @@
   },
   "primitive": {
     "name": "trigger",
-    "stage": 0,
+    "stage": 1,
     "list": [
       "createTrigger",
-      "createTriggerCache",
-      "createWeakTriggerCache"
+      "createTriggerCache"
     ],
     "category": "Reactivity"
   },
@@ -102,7 +101,7 @@
     "solid-js": "^1.6.0"
   },
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^5.0.0"
+    "@solid-primitives/utils": "workspace:^5.2.1"
   },
   "typesVersions": {}
 }

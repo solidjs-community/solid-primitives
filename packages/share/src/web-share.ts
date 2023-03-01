@@ -19,11 +19,13 @@ import type { OnOptions } from "solid-js/types/reactive/signal";
 export const makeWebShare = () => {
   const share = (data: ShareData) => {
     // Some browsers do not support `WebShare`, so sharing failed.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!navigator.share) {
       return Promise.reject("your browser does not support web share.");
     }
 
     // Some browsers do not support `files` and `navigator.canShare`, so sharing failed.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (data.files && (!navigator.canShare || !navigator.canShare(data))) {
       return Promise.reject("your browser does not support share files.");
     }
@@ -65,26 +67,24 @@ export type ShareStatus = {
  */
 export const createWebShare = (
   data: Accessor<ShareData>,
-  deferInitial: boolean = false
+  deferInitial: boolean = false,
 ): ShareStatus => {
-  const [status, setStatus] = createSignal<ShareStatus>({});
-
   if (process.env.SSR) {
     return {};
   }
-
+  const [status, setStatus] = createSignal<ShareStatus>({});
   const share = makeWebShare();
   createEffect(
     on(
       data,
-      data => {
+      dataValue => {
         setStatus({});
-        share(data)
+        share(dataValue)
           .then(() => setStatus({ status: true }))
           .catch(e => setStatus({ status: false, message: e.toString() }));
       },
-      { defer: deferInitial } satisfies OnOptions as any
-    )
+      { defer: deferInitial } satisfies OnOptions as any,
+    ),
   );
 
   return {
@@ -93,6 +93,6 @@ export const createWebShare = (
     },
     get message() {
       return status().message;
-    }
+    },
   };
 };

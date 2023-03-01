@@ -40,13 +40,13 @@ export const createSocialShare = (
   }> = () => ({
     url: "",
     title: "",
-    description: ""
+    description: "",
   }),
-  controller: Window = process.env.SSR ? (globalThis as any) : window
+  controller: Window = process.env.SSR ? (globalThis as any) : window,
 ): [
   share: (network: Network | undefined) => void,
   close: () => void,
-  isSharing: Accessor<boolean>
+  isSharing: Accessor<boolean>,
 ] => {
   if (process.env.SSR) {
     return [
@@ -56,7 +56,7 @@ export const createSocialShare = (
       () => {
         /*noop*/
       },
-      () => false
+      () => false,
     ];
   }
   const [isSharing, setIsSharing] = createSignal(false);
@@ -67,7 +67,7 @@ export const createSocialShare = (
     width: 436,
     popupLeft: 0,
     popupRight: 0,
-    popupTop: 0
+    popupTop: 0,
   };
   if (options().popup) {
     popup = { ...popup, ...options().popup };
@@ -114,22 +114,18 @@ export const createSocialShare = (
     const height =
       controller.innerHeight || document.documentElement.clientHeight || controller.screenY;
     const systemZoom = width / controller.screen.availWidth;
-    popup.popupLeft =
-      (width - popup.width) / 2 / systemZoom +
-      (controller.screenLeft !== undefined ? controller.screenLeft : controller.screenX);
-    popup.popupTop =
-      (height - popup.height) / 2 / systemZoom +
-      (controller.screenTop !== undefined ? controller.screenTop : controller.screenY);
+    popup.popupLeft = (width - popup.width) / 2 / systemZoom + controller.screenLeft;
+    popup.popupTop = (height - popup.height) / 2 / systemZoom + controller.screenTop;
   };
   const close = () => {
-    controller && controller.close();
+    controller.close();
     setIsSharing(false);
   };
   const share = (network?: Network) => {
     network = network || options().network || "";
     resizePopup();
     // If a popup window already exist, we close it and trigger a change event.
-    if (controller && popupInterval) {
+    if (popupInterval) {
       clearInterval(popupInterval);
       // Force close (for Facebook)
       controller.close();
@@ -148,7 +144,7 @@ export const createSocialShare = (
         ",screenX=" +
         popup.popupLeft +
         ",screenY=" +
-        popup.popupTop
+        popup.popupTop,
     );
     // If popup are prevented (AdBlocker, Mobile App context..), popup.window stays undefined and we can't display it
     if (!popupWindow) return;

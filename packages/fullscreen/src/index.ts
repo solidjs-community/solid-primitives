@@ -7,7 +7,7 @@ declare module "solid-js" {
     interface Directives {
       createFullscreen: (
         ref?: HTMLElement,
-        active?: Accessor<FullscreenOptions | boolean>
+        active?: Accessor<FullscreenOptions | boolean>,
       ) => Accessor<boolean>;
     }
   }
@@ -19,16 +19,19 @@ export type E = JSX.Element;
 export const createFullscreen = (
   ref: HTMLElement | undefined,
   active?: Accessor<FullscreenOptions | boolean>,
-  options?: FullscreenOptions
+  options?: FullscreenOptions,
 ): Accessor<boolean> => {
-  if (isServer) return () => false;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (isServer) {
+    return () => false;
+  }
   const [isActive, setActive] = createSignal(false);
   createEffect(() => {
     if (ref) {
       const activeOutput = active?.() ?? true;
       if (!isActive() && activeOutput) {
         ref
-          ?.requestFullscreen?.(typeof activeOutput === "object" ? activeOutput : options)
+          .requestFullscreen(typeof activeOutput === "object" ? activeOutput : options)
           .then(() => setActive(true))
           .catch(() => {});
       } else if (!activeOutput && isActive()) {

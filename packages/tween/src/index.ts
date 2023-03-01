@@ -14,7 +14,7 @@ import { createSignal, createEffect, onCleanup, on } from "solid-js";
  */
 export default function createTween<T extends number>(
   target: () => T,
-  { ease = (t: T) => t, duration = 100 }
+  { ease = (t: T) => t, duration = 100 },
 ): () => T {
   if (process.env.SSR) {
     return target;
@@ -28,11 +28,11 @@ export default function createTween<T extends number>(
         const elapsed = t - (start() || 0) + 1;
         // @ts-ignore
         setCurrent(c =>
-          elapsed < duration ? (target() - c) * ease((elapsed / duration) as T) + c : target()
+          elapsed < duration ? (target() - c) * ease((elapsed / duration) as T) + c : target(),
         );
       });
       onCleanup(() => cancelAnimationFrame(cancelId));
-    })
+    }),
   );
   return current;
 }

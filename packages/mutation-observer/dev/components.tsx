@@ -26,7 +26,7 @@ export const ToggleBtn: Component<
     <button
       class="bg-gray-700 text-gray-100 w-6 h-6 center-child select-none cursor-pointer rounded border-1 border-gray-600 hover:bg-gray-600"
       classList={{
-        "!bg-green-700 border-green-600 !hover:bg-green-600": props.state
+        "!bg-green-700 border-green-600 !hover:bg-green-600": props.state,
       }}
       {...attrs}
     >
@@ -61,7 +61,7 @@ export const LogMutationRecord: Component<{
     removedNodes: undefined,
     addedNodes: undefined,
     attributeName: undefined,
-    oldValue: undefined
+    oldValue: undefined,
   });
 
   const log = (e: MutationRecord) => {
@@ -70,7 +70,7 @@ export const LogMutationRecord: Component<{
       removedNodes: e.removedNodes.length,
       addedNodes: e.addedNodes.length,
       attributeName: e.attributeName,
-      oldValue: e.oldValue
+      oldValue: e.oldValue,
     });
   };
 

@@ -20,14 +20,14 @@ global.HTMLMediaElement.prototype._mock = {
   // Reset audio object mock data to the initial state
   _resetMock: function resetMock(audio: HTMLAudioElement) {
     audio._mock = Object.assign({}, global.HTMLMediaElement.prototype._mock);
-  }
+  },
 };
 
 // Get "paused" value, it is automatically set to true / false when we play / pause the audio.
 Object.defineProperty(global.HTMLMediaElement.prototype, "paused", {
   get() {
     return this._mock.paused;
-  }
+  },
 });
 
 // Get and set audio duration
@@ -39,7 +39,7 @@ Object.defineProperty(global.HTMLMediaElement.prototype, "duration", {
     // Reset the mock state to initial (paused) when we set the duration.
     this._mock._resetMock(this);
     this._mock.duration = value;
-  }
+  },
 });
 
 // Get and set audio volume
@@ -49,7 +49,7 @@ Object.defineProperty(global.HTMLMediaElement.prototype, "volume", {
   },
   set(value) {
     this._mock.volume = value;
-  }
+  },
 });
 
 // Start the playback.

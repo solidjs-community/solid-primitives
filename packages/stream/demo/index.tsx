@@ -18,16 +18,16 @@ declare module "solid-js" {
 const iceservers = {
   iceServers: [
     {
-      urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"]
-    }
+      urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"],
+    },
   ],
-  iceCandidatePoolSize: 10
+  iceCandidatePoolSize: 10,
 };
 
 enum CALL_STATE {
   IDLE,
   INITIATED,
-  ACTIVE
+  ACTIVE,
 }
 
 const App: Component = (): JSX.Element => {
@@ -52,7 +52,7 @@ const App: Component = (): JSX.Element => {
   });
 
   const [localStream, { mutate, stop }] = createStream(() =>
-    foundDevice() ? constraints : undefined
+    foundDevice() ? constraints : undefined,
   );
   const [remoteStream, setRemoteStream] = createSignal<MediaStream>();
 

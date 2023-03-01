@@ -8,7 +8,7 @@ import {
   getRemovedItems,
   mapRemoved,
   refs,
-  resolveElements
+  resolveElements,
 } from "../src";
 
 const el1 = document.createElement("div");
@@ -220,8 +220,8 @@ describe("resolveElements", () => {
         () => undefined,
         () => () => el2,
         [el3, () => el4, () => 123, (a: number) => el5],
-        el6
-      ])
+        el6,
+      ]),
     ).toEqual([el1, el2, el3, el4, el6]);
   });
 });

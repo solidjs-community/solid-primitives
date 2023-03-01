@@ -10,7 +10,7 @@ import {
   untrack,
   $TRACK,
   mapArray,
-  AccessorArray
+  AccessorArray,
 } from "solid-js";
 
 const FALLBACK = Symbol("fallback");
@@ -32,7 +32,7 @@ export function keyArray<T, U, K>(
   items: Accessor<readonly T[] | undefined | null | false>,
   keyFn: (v: T) => K,
   mapFn: (v: Accessor<T>, i: Accessor<number>) => U,
-  options: { fallback?: Accessor<U> } = {}
+  options: { fallback?: Accessor<U> } = {},
 ): Accessor<U[]> {
   // SERVER NOOP
   if (process.env.SSR) {
@@ -42,9 +42,9 @@ export function keyArray<T, U, K>(
       for (let i = 0, len = itemsRef.length; i < len; i++)
         s.push(
           mapFn(
-            () => itemsRef[i],
-            () => i
-          )
+            () => itemsRef[i]!,
+            () => i,
+          ),
         );
     } else if (options.fallback) s = [options.fallback()];
     return () => s;
@@ -80,7 +80,7 @@ export function keyArray<T, U, K>(
         fb?.dispose();
         prev.delete(FALLBACK);
         for (let i = 0; i < list.length; i++) {
-          const item = list[i];
+          const item = list[i]!;
           const key = keyFn(item);
           addNewItem(result, item, i, key);
         }
@@ -90,7 +90,7 @@ export function keyArray<T, U, K>(
       const prevKeys = new Set(prev.keys());
 
       for (let i = 0; i < list.length; i++) {
-        const item = list[i];
+        const item = list[i]!;
         const key = keyFn(item);
         prevKeys.delete(key);
         const lookup = prev.get(key);
@@ -155,8 +155,8 @@ export function Key<T>(props: {
       () => props.each,
       typeof by === "function" ? by : (v: T) => v[by],
       props.children,
-      "fallback" in props ? { fallback: () => props.fallback } : undefined
-    )
+      "fallback" in props ? { fallback: () => props.fallback } : undefined,
+    ),
   );
 }
 
@@ -188,11 +188,11 @@ export function Entries<V>(props: {
         ? key =>
             (mapFn as (key: string, v: Accessor<V>) => JSX.Element)(
               key,
-              () => props.of![key as never]
+              () => props.of![key as never],
             )
         : (key, i) => mapFn(key, () => props.of![key as never], i),
-      "fallback" in props ? { fallback: () => props.fallback } : undefined
-    )
+      "fallback" in props ? { fallback: () => props.fallback } : undefined,
+    ),
   );
 }
 
@@ -207,7 +207,7 @@ export function Rerun<S>(props: {
   children: RerunChildren<S>;
 }): Accessor<JSX.Element>;
 export function Rerun<
-  S extends (object | string | bigint | number | boolean) & { length?: never }
+  S extends (object | string | bigint | number | boolean) & { length?: never },
 >(props: { on: S; children: RerunChildren<S> }): Accessor<JSX.Element>;
 export function Rerun(props: { on: any; children: RerunChildren<any> }): Accessor<JSX.Element> {
   const key = typeof props.on === "function" || Array.isArray(props.on) ? props.on : () => props.on;
@@ -215,6 +215,6 @@ export function Rerun(props: { on: any; children: RerunChildren<any> }): Accesso
     on(key, (a, b) => {
       const child = props.children;
       return typeof child === "function" && child.length > 0 ? (child as any)(a, b) : child;
-    })
+    }),
   );
 }

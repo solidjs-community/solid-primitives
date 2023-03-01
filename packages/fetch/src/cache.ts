@@ -1,4 +1,4 @@
-import { DEV, ResourceOptions } from "solid-js";
+import { ResourceOptions } from "solid-js";
 import { RequestContext } from "./fetch";
 import { RequestModifier, wrapFetcher } from "./modifiers";
 
@@ -17,13 +17,13 @@ export type CacheOptions<T = any> = {
 
 export const defaultCacheOptions: CacheOptions = {
   expires: 5000,
-  cache: {}
+  cache: {},
 };
 
 export const serializeRequest = <FetcherArgs extends any[]>(requestData: FetcherArgs): string =>
   JSON.stringify({
     ...(typeof requestData[0] === "string" ? { url: requestData[0] } : requestData[0]),
-    ...requestData[1]
+    ...requestData[1],
   });
 
 /**
@@ -46,10 +46,9 @@ export const serializeRequest = <FetcherArgs extends any[]>(requestData: Fetcher
  */
 export const withCache: RequestModifier =
   <Result extends unknown, FetcherArgs extends any[]>(
-    options: CacheOptions = defaultCacheOptions
+    options: CacheOptions = defaultCacheOptions,
   ) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
-    let currentRequest: FetcherArgs;
     requestContext.cache = options.cache || requestContext.cache;
     requestContext.expires = options.expires;
     const isExpired = (entry: CacheEntry) =>
@@ -60,7 +59,6 @@ export const withCache: RequestModifier =
       requestContext,
       <T>(originalFetcher: any) =>
         (requestData, info) => {
-          currentRequest = requestData;
           const serializedRequest: string = serializeRequest(requestData);
           const cached: CacheEntry | undefined = requestContext.cache[serializedRequest];
           const shouldRead = requestContext.readCache?.(cached) !== false;
@@ -71,22 +69,23 @@ export const withCache: RequestModifier =
             const cacheEntry = {
               ts: new Date().getTime(),
               requestData: requestData,
-              data
+              data,
             };
             requestContext.cache[serializedRequest] = cacheEntry;
             requestContext.writeCache?.(serializedRequest, cacheEntry);
             return data;
           });
-        }
+        },
     );
     requestContext.wrapResource();
     const originalRefetch = requestContext.resource![1].refetch;
     const invalidate = (...requestData: FetcherArgs | []) => {
       try {
-        delete requestContext.cache[serializeRequest(requestData || currentRequest)];
+        delete requestContext.cache[serializeRequest(requestData)];
       } catch (e) {
-        // eslint-disable-next-line no-console
-        DEV && console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
+        process.env.DEV &&
+          // eslint-disable-next-line no-console
+          console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
       }
     };
     Object.assign(requestContext.resource![1], {
@@ -94,7 +93,7 @@ export const withCache: RequestModifier =
       refetch: (info?: ResourceOptions<Result, unknown>) => {
         invalidate();
         return originalRefetch(info);
-      }
+      },
     });
   };
 
@@ -123,7 +122,7 @@ export const withRefetchOnExpiry: RequestModifier =
           }
         }
         return originalFetcher(requestData, info);
-      }
+      },
     );
     requestContext.wrapResource();
   };
@@ -136,7 +135,7 @@ export const withCacheStorage: RequestModifier =
       Object.assign(requestContext.cache, loadedCache);
     } catch (e) {
       // eslint-disable-next-line no-console
-      DEV && console.warn("attempt to parse stored request cache failed with error", e);
+      process.env.DEV && console.warn("attempt to parse stored request cache failed with error", e);
     }
     const originalWriteCache = requestContext.writeCache;
     requestContext.writeCache = (...args: any[]) => {
@@ -145,7 +144,7 @@ export const withCacheStorage: RequestModifier =
         storage.setItem(key, JSON.stringify(requestContext.cache));
       } catch (e) {
         // eslint-disable-next-line no-console
-        DEV && console.warn("attempt to store request cache failed with error", e);
+        process.env.DEV && console.warn("attempt to store request cache failed with error", e);
       }
     };
     requestContext.wrapResource();

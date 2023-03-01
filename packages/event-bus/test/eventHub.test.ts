@@ -7,14 +7,14 @@ const syncTest = (name: string, fn: (dispose: () => void) => void) =>
     createRoot(dispose => {
       fn(dispose);
       dispose();
-    })
+    }),
   );
 
 describe("createEventHub", () => {
   syncTest("listening and emiting", () => {
     const hub = createEventHub($ => ({
       busA: $<number>(),
-      busB: $<string>()
+      busB: $<string>(),
     }));
 
     const cbA = vi.fn();
@@ -48,7 +48,7 @@ describe("createEventHub", () => {
   syncTest("accessing values", () => {
     const hub = createEventHub({
       busA: createEventBus<void>(),
-      busB: createEventStack<{ text: string }>()
+      busB: createEventStack<{ text: string }>(),
     });
 
     expect(hub.value.busA).toBe(undefined);
