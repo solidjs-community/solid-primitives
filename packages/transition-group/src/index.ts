@@ -6,6 +6,8 @@ import {
   $TRACK,
   createEffect,
   createComputed,
+  createMemo,
+  useTransition,
 } from "solid-js";
 
 const noop = () => {};
@@ -68,10 +70,11 @@ export function createSwitchTransition<T>(
   }
 
   const { onEnter = noopTransition, onExit = noopTransition } = options;
-  let { appear } = options;
 
-  const [returned, setReturned] = createSignal<NonNullable<T>[]>(initReturned);
-  const [transitions, startTransitions] = createSignal<VoidFunction[]>([], { equals: false });
+  const [returned, setReturned] = createSignal<NonNullable<T>[]>(
+    options.appear ? [] : initReturned,
+  );
+  const [transitions, setTransitions] = createSignal<VoidFunction[]>([], { equals: false });
 
   let next: T | undefined;
   let isExiting = false;
@@ -79,7 +82,7 @@ export function createSwitchTransition<T>(
   function exitTransition(el: T | undefined, after?: () => void) {
     if (!el) return after && after();
     isExiting = true;
-    startTransitions(
+    setTransitions(
       p => (
         p.push(() =>
           onExit(el, () => {
@@ -100,7 +103,7 @@ export function createSwitchTransition<T>(
     if (!el) return after && after();
     next = undefined;
     setReturned(p => [el, ...p]);
-    startTransitions(p => (p.push(() => onEnter(el, after ?? noop)), p));
+    setTransitions(p => (p.push(() => onEnter(el, after ?? noop)), p));
   }
 
   const triggerTransitions: (prev: T | undefined) => void =
@@ -122,26 +125,17 @@ export function createSwitchTransition<T>(
     (prev: T | undefined) => {
       const el = source();
 
-      batch(() => {
-        if (appear) {
-          appear = false;
-          // the initial element is already in the rendered array
-          // so it needs to be removed to be added again during the enter transition
-          setReturned([]);
-        }
-
-        if (el !== prev) {
-          next = el;
-          untrack(() => triggerTransitions(prev));
-        }
-      });
+      if (el !== prev) {
+        next = el;
+        untrack(() => triggerTransitions(prev));
+      }
 
       return el;
     },
     // enabling appear always animates the initial element in
     // otherwise the element won't be animated,
     // or will animate the transition if the source is different from the initial value
-    appear ? undefined : initSource,
+    options.appear ? undefined : initSource,
   );
 
   // call transitions in effect to suspend them under Suspense
@@ -149,24 +143,44 @@ export function createSwitchTransition<T>(
     const queue = transitions();
     const copy = queue.slice();
     queue.length = 0;
-    untrack(() => {
-      for (const cb of copy) cb();
-    });
+    untrack(() => copy.forEach(cb => cb()));
   });
 
   return returned;
 }
 
 export type OnListChange<T> = (payload: {
+  /** full list of elements to be rendered */
+  list: T[];
+  /** list of elements that were added since the last change */
   added: T[];
+  /** list of elements that were removed since the last change */
   removed: T[];
-  moved: T[];
+  /** list of elements that were already added before, and are not currently exiting */
+  unchanged: T[];
+  /** Callback for finishing the transition of exiting elements - removes them from rendered array */
   finishRemoved: (els: T[]) => void;
 }) => void;
 
+export type ExitMethod = "remove" | "move-to-end" | "keep-index";
+
 export type ListTransitionOptions<T> = {
+  /**
+   * A function to be called when the list changes. {@link OnListChange}
+   *
+   * It receives the list of current, added, removed, and unchanged elements.
+   * It also receives a callback to be called when the removed elements are finished animating (they can be removed from the DOM).
+   */
   onChange: OnListChange<T>;
+  /** whether to run the transition on the initial elements. Defaults to `false` */
   appear?: boolean;
+  /**
+   * This controls how the elements exit. {@link ExitMethod}
+   * - `"remove"` removes the element immediately.
+   * - `"move-to-end"` (default) will move elements which have exited to the end of the array.
+   * - `"keep-index"` will splice them in at their previous index.
+   */
+  exitMethod?: ExitMethod;
 };
 
 /**
@@ -177,10 +191,7 @@ export type ListTransitionOptions<T> = {
  *
  * @param source a signal with the current list of elements.
  * Any object can used as the element, but most likely you will want to use a `HTMLElement` or `SVGElement`.
- * @param options transition options:
- * - `onChange` - a function to be called when the list changes. It receives the list of added elements, removed elements, and moved elements. It also receives a callback to be called when the removed elements are finished animating (they can be removed from the DOM).
- * - `appear` - whether to run the transition on the initial elements. Defaults to `false`.
- * @returns a signal with an array of the current elements and exiting previous elements.
+ * @param options transition options {@link ListTransitionOptions}
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/transition-group#createListTransition
  *
@@ -201,59 +212,74 @@ export type ListTransitionOptions<T> = {
  * // change the source to trigger the transition
  * setEls([...refsToHTMLElements]);
  */
-export function createListTransition<T>(
-  source: Accessor<readonly NonNullable<T>[]>,
-  options: ListTransitionOptions<NonNullable<T>>,
-): Accessor<NonNullable<T>[]> {
-  type V = NonNullable<T>;
-
-  const initSource = untrack(source).slice();
+export function createListTransition<T extends object>(
+  source: Accessor<readonly T[]>,
+  options: ListTransitionOptions<T>,
+): Accessor<T[]> {
+  const initSource = untrack(source);
 
   if (process.env.SSR) {
-    return () => initSource;
+    const copy = initSource.slice();
+    return () => copy;
   }
 
   const { onChange } = options;
-  let { appear } = options;
-
-  const [returned, setReturned] = createSignal<V[]>(initSource);
 
   // if appear is enabled, the initial transition won't have any previous elements.
   // otherwise the elements will match and transition skipped, or transitioned if the source is different from the initial value
-  let prevSet: ReadonlySet<V> = new Set(appear ? undefined : initSource);
-  const exiting = new Set<V>();
+  let prevSet: ReadonlySet<T> = new Set(options.appear ? undefined : initSource);
+  const exiting = new WeakSet<T>();
 
-  function finishRemoved(els: V[]): void {
-    setReturned(p => p.filter(e => !els.includes(e)));
-    for (const el of els) exiting.delete(el);
-  }
+  const [toRemove, setToRemove] = createSignal<T[]>([], { equals: false });
+  const [isTransitionPending] = useTransition();
 
-  // update elements and call transitions in effect to suspend under Suspense
-  createEffect(() => {
-    const list = source();
-    (list as any)[$TRACK]; // top level store tracking
+  const finishRemoved: (els: T[]) => void =
+    options.exitMethod === "remove"
+      ? noop
+      : els => {
+          setToRemove(p => (p.push.apply(p, els), p));
+          for (const el of els) exiting.delete(el);
+        };
 
-    if (appear) {
-      appear = false;
-      // the initial element is already in the rendered array
-      // so it needs to be removed to be added again during the enter transition
-      setReturned([]);
-    }
+  const handleRemoved: (els: T[], el: T, i: number) => void =
+    options.exitMethod === "remove"
+      ? noop
+      : options.exitMethod === "keep-index"
+      ? (els, el, i) => els.splice(i, 0, el)
+      : (els, el) => els.push(el);
 
-    untrack(() =>
-      setReturned(prev => {
-        const nextSet: ReadonlySet<V> = new Set(list);
-        const next: V[] = list.slice();
+  return createMemo(
+    prev => {
+      const elsToRemove = toRemove();
+      const sourceList = source();
+      (sourceList as any)[$TRACK]; // top level store tracking
 
-        const added: V[] = [];
-        const removed: V[] = [];
-        const moved: V[] = [];
+      if (untrack(isTransitionPending)) {
+        // wait for pending transition to end before animating
+        isTransitionPending();
+        return prev;
+      }
 
-        for (const el of list) {
-          (prevSet.has(el) ? moved : added).push(el);
+      if (elsToRemove.length) {
+        const next = prev.filter(e => !elsToRemove.includes(e));
+        elsToRemove.length = 0;
+        onChange({ list: next, added: [], removed: [], unchanged: next, finishRemoved });
+        return next;
+      }
+
+      return untrack(() => {
+        const nextSet: ReadonlySet<T> = new Set(sourceList);
+        const next: T[] = sourceList.slice();
+
+        const added: T[] = [];
+        const removed: T[] = [];
+        const unchanged: T[] = [];
+
+        for (const el of sourceList) {
+          (prevSet.has(el) ? unchanged : added).push(el);
         }
 
-        let sameOrder = true;
+        let nothingChanged = !added.length;
         for (let i = 0; i < prev.length; i++) {
           const el = prev[i]!;
           if (!nextSet.has(el)) {
@@ -261,21 +287,20 @@ export function createListTransition<T>(
               removed.push(el);
               exiting.add(el);
             }
-            next.splice(i, 0, el);
+            handleRemoved(next, el, i);
           }
-          if (sameOrder && el !== next[i]) sameOrder = false;
+          if (nothingChanged && el !== next[i]) nothingChanged = false;
         }
 
         // skip if nothing changed
-        if (!added.length && !removed.length && sameOrder) return prev;
+        if (!removed.length && nothingChanged) return prev;
 
-        onChange({ added, removed, moved, finishRemoved });
+        onChange({ list: next, added, removed, unchanged, finishRemoved });
 
         prevSet = nextSet;
         return next;
-      }),
-    );
-  });
-
-  return returned;
+      });
+    },
+    options.appear ? [] : initSource.slice(),
+  );
 }

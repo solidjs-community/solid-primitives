@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
-import { createRenderEffect, createResource, createRoot, createSignal, Suspense } from "solid-js";
+import { createRoot, createSignal } from "solid-js";
 import { createListTransition, OnListChange } from "../src";
+
+type OnChangeParams = Parameters<OnListChange<Element>>[0];
 
 describe("createListTransition", () => {
   const el1 = document.createElement("div");
@@ -58,11 +60,12 @@ describe("createListTransition", () => {
     expect(result()).toHaveLength(4);
     expect(fn).toHaveBeenCalledOnce();
     expect(fn).toHaveBeenCalledWith({
+      list: [el3, el1, el4, el2],
       added: [el3, el4],
       removed: [el2],
-      moved: [el1],
+      unchanged: [el1],
       finishRemoved: expect.any(Function),
-    } satisfies Parameters<OnListChange<Element>>[0]);
+    } satisfies OnChangeParams);
 
     const done = fn.mock.calls[0]![0].finishRemoved;
     done([el2]);
@@ -72,28 +75,26 @@ describe("createListTransition", () => {
   });
 
   it("transitions element in on appear", () => {
-    const fn = vi.fn();
+    createRoot(dispose => {
+      const fn = vi.fn();
 
-    const { dispose, result } = createRoot(dispose => {
       const result = createListTransition(() => [el1, el2], {
         onChange: fn,
         appear: true,
       });
+
       expect(result()).toHaveLength(2);
-      expect(fn).not.toHaveBeenCalled();
-      return { dispose, result };
-    });
+      expect(fn).toHaveBeenCalledOnce();
+      expect(fn).toHaveBeenCalledWith({
+        list: [el1, el2],
+        added: [el1, el2],
+        removed: [],
+        unchanged: [],
+        finishRemoved: expect.any(Function),
+      } satisfies OnChangeParams);
 
-    expect(result()).toHaveLength(2);
-    expect(fn).toHaveBeenCalledOnce();
-    expect(fn).toHaveBeenCalledWith({
-      added: [el1, el2],
-      removed: [],
-      moved: [],
-      finishRemoved: expect.any(Function),
+      dispose();
     });
-
-    dispose();
   });
 
   it("can transition multiple leaving elements", () => {
@@ -112,11 +113,12 @@ describe("createListTransition", () => {
     expect(result()).toHaveLength(3);
     expect(fn).toHaveBeenCalledOnce();
     expect(fn).toHaveBeenCalledWith({
+      list: [el2, el3, el1],
       added: [el3],
       removed: [el1],
-      moved: [el2],
+      unchanged: [el2],
       finishRemoved: expect.any(Function),
-    });
+    } satisfies OnChangeParams);
 
     const done1 = fn.mock.calls[0]![0].finishRemoved;
 
@@ -125,11 +127,12 @@ describe("createListTransition", () => {
     expect(result()).toHaveLength(3);
     expect(fn).toHaveBeenCalledTimes(2);
     expect(fn).toHaveBeenLastCalledWith({
+      list: [el2, el3, el1],
       added: [],
       removed: [el2, el3],
-      moved: [],
+      unchanged: [],
       finishRemoved: expect.any(Function),
-    });
+    } satisfies OnChangeParams);
 
     const done2 = fn.mock.calls[1]![0].finishRemoved;
 
@@ -143,6 +146,62 @@ describe("createListTransition", () => {
 
     dispose();
   });
+
+  it("removes elements immediately if enabled", () => {
+    createRoot(dispose => {
+      const [children, setChildren] = createSignal<Element[]>([el1, el2]);
+      const fn = vi.fn();
+
+      const result = createListTransition(children, {
+        onChange: fn,
+        exitMethod: "remove",
+      });
+      expect(result()).toHaveLength(2);
+
+      setChildren([el2, el3]);
+      expect(result()).toHaveLength(2);
+      expect(fn).toHaveBeenCalledOnce();
+      expect(fn).toHaveBeenCalledWith({
+        list: [el2, el3],
+        added: [el3],
+        removed: [el1],
+        unchanged: [el2],
+        finishRemoved: expect.any(Function),
+      } satisfies OnChangeParams);
+
+      dispose();
+    });
+
+    it("keeps index if removed elements if enabled", () => {
+      createRoot(dispose => {
+        const [children, setChildren] = createSignal<Element[]>([el1, el2, el3]);
+        const fn = vi.fn();
+
+        const result = createListTransition(children, {
+          onChange: fn,
+          exitMethod: "keep-index",
+        });
+        expect(result()).toHaveLength(2);
+
+        setChildren([el1, el3]);
+        expect(result()).toHaveLength(3);
+        expect(fn).toHaveBeenCalledOnce();
+        expect(fn).toHaveBeenCalledWith({
+          list: [el1, el2, el3],
+          added: [el3],
+          removed: [el1],
+          unchanged: [el2],
+          finishRemoved: expect.any(Function),
+        } satisfies OnChangeParams);
+
+        dispose();
+      });
+    });
+  });
+
+  /*
+
+  Transitions will run even if under suspense.
 
   it("suspends under Suspense", () => {
     const onChange = vi.fn();
@@ -190,5 +249,8 @@ describe("createListTransition", () => {
     });
 
     dispose();
+
   });
+  
+  */
 });
