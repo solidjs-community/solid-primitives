@@ -39,7 +39,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/refs" name="refs" stage={1} packageList={[{"name":"refs","gzipped":"3.92 KB","minified":"14.07 KB"}]} primitiveList={[{"name":"elements","gzipped":"1.93 KB","minified":"5.85 KB"},{"name":"refs","gzipped":"2.11 KB","minified":"6.48 KB"},{"name":"mapRemoved","gzipped":"2.99 KB","minified":"10.33 KB"},{"name":"Children","gzipped":"231 B","minified":"375 B"},{"name":"Refs","gzipped":"2.31 KB","minified":"7.2 KB"},{"name":"Ref","gzipped":"1.55 KB","minified":"4.55 KB"},{"name":"unmount","gzipped":"190 B","minified":"262 B"},{"name":"mergeRefs","gzipped":"207 B","minified":"295 B"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/refs" name="refs" stage={1} packageList={[{"name":"refs","gzipped":"1.63 KB","minified":"3.52 KB"}]} primitiveList={[{"name":"elements","gzipped":"361 B","minified":"584 B"},{"name":"refs","gzipped":"500 B","minified":"866 B"},{"name":"mapRemoved","gzipped":"968 B","minified":"1.77 KB"},{"name":"Children","gzipped":"192 B","minified":"255 B"},{"name":"Refs","gzipped":"635 B","minified":"1.17 KB"},{"name":"Ref","gzipped":"376 B","minified":"658 B"},{"name":"unmount","gzipped":"167 B","minified":"204 B"},{"name":"mergeRefs","gzipped":"178 B","minified":"217 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

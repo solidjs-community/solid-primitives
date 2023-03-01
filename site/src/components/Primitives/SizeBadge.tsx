@@ -76,11 +76,8 @@ export const SizeBadgePill: ParentComponent<
         class="relative flex font-sans hover:contrast-[1.2] transition-filter"
         ref={menuButton}
       >
-        <div class="absolute top-0 left-0 bottom-0 flex items-center text-[#c0c8ff]">
-          <FiChevronRight size={26} />
-        </div>
         <div class="flex items-center rounded-l-lg h-[38px] border-[#cae0ff] px-4 border-[3px] bg-[#cae0ff40] dark:border-[#405b6e] dark:bg-[#2a4355]">
-          <span class="pl-3">Size</span>
+          <span>Size</span>
         </div>
         <div class="h-full flex justify-center items-center min-w-[90px] rounded-r-lg border-l-0 border-transparent border-[3px] font-semibold background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#cae0ff,#c0c8ff)_border-box] dark:background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#405b6e,#46659a)_border-box]">
           {packageList[0].gzipped}

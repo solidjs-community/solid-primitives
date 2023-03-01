@@ -88,8 +88,8 @@ const SlideModal: ParentComponent<{
           enterClass: "opacity-0",
           enterToClass: "opacity-100 transition duration-200",
           exitClass: "opacity-100",
-          exitToClass: "opacity-0 transition duration-200"
-        }
+          exitToClass: "opacity-0 transition duration-200",
+        },
       }}
       animation={{
         name: "slide-modal",
@@ -105,7 +105,7 @@ const SlideModal: ParentComponent<{
         onAfterExit: () => {
           setHeaderState("disableScroll", false);
           restorePageLayout();
-        }
+        },
       }}
       ref={containerEl}
     >

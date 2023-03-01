@@ -33,7 +33,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/devices" name="devices" stage={3} packageList={[{"name":"devices","gzipped":"826 B","minified":"3.05 KB"}]} primitiveList={[{"name":"createMicrophones","gzipped":"438 B","minified":"995 B"},{"name":"createSpeakers","gzipped":"438 B","minified":"987 B"},{"name":"createCameras","gzipped":"437 B","minified":"983 B"},{"name":"createAccelerometer","gzipped":"419 B","minified":"920 B"},{"name":"createGyroscope","gzipped":"407 B","minified":"883 B"},{"name":"createDevices","gzipped":"306 B","minified":"602 B"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/devices" name="devices" stage={3} packageList={[{"name":"devices","gzipped":"638 B","minified":"1.59 KB"}]} primitiveList={[{"name":"createMicrophones","gzipped":"348 B","minified":"608 B"},{"name":"createSpeakers","gzipped":"349 B","minified":"607 B"},{"name":"createCameras","gzipped":"348 B","minified":"604 B"},{"name":"createAccelerometer","gzipped":"308 B","minified":"459 B"},{"name":"createGyroscope","gzipped":"302 B","minified":"489 B"},{"name":"createDevices","gzipped":"254 B","minified":"414 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

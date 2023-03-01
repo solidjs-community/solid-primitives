@@ -35,7 +35,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/autofocus" name="autofocus" stage={0} packageList={[{"name":"autofocus","gzipped":"253 B","minified":"467 B"}]} primitiveList={[{"name":"createAutofocus","gzipped":"177 B","minified":"242 B"},{"name":"autofocus","gzipped":"211 B","minified":"321 B"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/autofocus" name="autofocus" stage={0} packageList={[{"name":"autofocus","gzipped":"173 B","minified":"239 B"}]} primitiveList={[{"name":"createAutofocus","gzipped":"138 B","minified":"142 B"},{"name":"autofocus","gzipped":"146 B","minified":"163 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

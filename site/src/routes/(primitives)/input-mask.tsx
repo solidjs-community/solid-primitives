@@ -36,7 +36,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/input-mask" name="input-mask" stage={1} packageList={[{"name":"input-mask","gzipped":"834 B","minified":"2.57 KB"}]} primitiveList={[{"name":"createInputMask","gzipped":"815 B","minified":"2.48 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/input-mask" name="input-mask" stage={1} packageList={[{"name":"input-mask","gzipped":"594 B","minified":"1.18 KB"}]} primitiveList={[{"name":"createInputMask","gzipped":"552 B","minified":"1.08 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

@@ -32,7 +32,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/stream" name="stream" stage={3} packageList={[{"name":"stream","gzipped":"2.48 KB","minified":"8.17 KB"}]} primitiveList={[{"name":"createAmplitudeStream","gzipped":"2.33 KB","minified":"6.97 KB"},{"name":"createMediaPermissionRequest","gzipped":"334 B","minified":"542 B"},{"name":"createAmplitudeFromStream","gzipped":"1.84 KB","minified":"5.26 KB"},{"name":"createScreen","gzipped":"1.68 KB","minified":"4.92 KB"},{"name":"createStream","gzipped":"1.8 KB","minified":"5.23 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/stream" name="stream" stage={3} packageList={[{"name":"stream","gzipped":"1.06 KB","minified":"2.33 KB"}]} primitiveList={[{"name":"createAmplitudeStream","gzipped":"943 B","minified":"1.73 KB"},{"name":"createMediaPermissionRequest","gzipped":"268 B","minified":"351 B"},{"name":"createAmplitudeFromStream","gzipped":"608 B","minified":"981 B"},{"name":"createScreen","gzipped":"471 B","minified":"802 B"},{"name":"createStream","gzipped":"547 B","minified":"930 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

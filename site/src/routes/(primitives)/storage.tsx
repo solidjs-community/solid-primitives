@@ -36,7 +36,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/storage" name="storage" stage={3} packageList={[{"name":"storage","gzipped":"2.76 KB","minified":"14.51 KB"}]} primitiveList={[{"name":"createCookieStorage","gzipped":"1.96 KB","minified":"6.73 KB"},{"name":"createAsyncStorage","gzipped":"1.36 KB","minified":"4.93 KB"},{"name":"createStorageSignal","gzipped":"958 B","minified":"2.85 KB"},{"name":"createLocalStorage","gzipped":"1.35 KB","minified":"4.57 KB"},{"name":"createSessionStorage","gzipped":"1.37 KB","minified":"4.63 KB"},{"name":"createStorage","gzipped":"1.33 KB","minified":"4.53 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/storage" name="storage" stage={3} packageList={[{"name":"storage","gzipped":"2.31 KB","minified":"7.19 KB"}]} primitiveList={[{"name":"createCookieStorage","gzipped":"1.44 KB","minified":"3.12 KB"},{"name":"createAsyncStorage","gzipped":"1.03 KB","minified":"2.35 KB"},{"name":"createStorageSignal","gzipped":"817 B","minified":"1.75 KB"},{"name":"createLocalStorage","gzipped":"991 B","minified":"2.11 KB"},{"name":"createSessionStorage","gzipped":"1.01 KB","minified":"2.16 KB"},{"name":"createStorage","gzipped":"982 B","minified":"2.1 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )
