@@ -114,7 +114,7 @@ const SlideModal: ParentComponent<{
         role="presentation"
       >
         <div
-          class="pointer-events-auto relative w-full outline-none"
+          class="pointer-events-auto relative w-full xxs:w-auto outline-none"
           role="dialog"
           aria-modal="true"
           tabindex="-1"

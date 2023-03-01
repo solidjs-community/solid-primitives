@@ -35,7 +35,9 @@ const SizeBadge: ParentComponent<SizeProps> = ({ value, href, unit }) => {
       target="_blank"
     >
       {typeof value === "string" ? value : value.gzipped || "0 B"}
-      <span class="text-[14px] font-semibold text-[#7689a4]">&nbsp{unit || ""}</span>
+      <span class="text-[14px] font-semibold text-[#7689a4] dark:text-[#8b9eba]">
+        &nbsp{unit || ""}
+      </span>
     </a>
   );
 };
