@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { createRoot, createSignal } from "solid-js";
+import { describe, it, test, expect, vi } from "vitest";
+import { createEffect, createRoot, createSignal, untrack } from "solid-js";
 import { createListTransition, OnListChange } from "../src";
 
 type OnChangeParams = Parameters<OnListChange<Element>>[0];
@@ -253,4 +253,35 @@ describe("createListTransition", () => {
   });
   
   */
+
+  test("updated list should be available in user effects", () => {
+    let effRuns = 0;
+
+    const dispose = createRoot(dispose => {
+      const [children, setChildren] = createSignal<Element[]>([]);
+
+      createEffect(() => {
+        effRuns++;
+        children();
+        expect(untrack(result), "effect after root").toHaveLength(1);
+        expect(untrack(result)[0]).toBe(el1);
+      });
+
+      const result = createListTransition(children, {
+        onChange: () => {},
+        exitMethod: "remove",
+      });
+      expect(result(), "initial").toHaveLength(0);
+
+      setChildren([el1]);
+      expect(result(), "after sync assign").toHaveLength(1);
+      expect(result()[0]).toBe(el1);
+
+      return dispose;
+    });
+
+    expect(effRuns).toBe(1);
+
+    dispose();
+  });
 });

@@ -4,7 +4,6 @@ import {
   createSignal,
   untrack,
   $TRACK,
-  createEffect,
   createComputed,
   createMemo,
   useTransition,
@@ -74,7 +73,7 @@ export function createSwitchTransition<T>(
   const [returned, setReturned] = createSignal<NonNullable<T>[]>(
     options.appear ? [] : initReturned,
   );
-  const [transitions, setTransitions] = createSignal<VoidFunction[]>([], { equals: false });
+  const [isTransitionPending] = useTransition();
 
   let next: T | undefined;
   let isExiting = false;
@@ -82,20 +81,13 @@ export function createSwitchTransition<T>(
   function exitTransition(el: T | undefined, after?: () => void) {
     if (!el) return after && after();
     isExiting = true;
-    setTransitions(
-      p => (
-        p.push(() =>
-          onExit(el, () => {
-            batch(() => {
-              isExiting = false;
-              setReturned(p => p.filter(e => e !== el));
-              after && after();
-            });
-          }),
-        ),
-        p
-      ),
-    );
+    onExit(el, () => {
+      batch(() => {
+        isExiting = false;
+        setReturned(p => p.filter(e => e !== el));
+        after && after();
+      });
+    });
   }
 
   function enterTransition(after?: () => void) {
@@ -103,7 +95,7 @@ export function createSwitchTransition<T>(
     if (!el) return after && after();
     next = undefined;
     setReturned(p => [el, ...p]);
-    setTransitions(p => (p.push(() => onEnter(el, after ?? noop)), p));
+    onEnter(el, after ?? noop);
   }
 
   const triggerTransitions: (prev: T | undefined) => void =
@@ -119,15 +111,19 @@ export function createSwitchTransition<T>(
           exitTransition(prev);
         };
 
-  // update returned array in a pure computation
-  // so that the updated list is available in user effects
   createComputed(
     (prev: T | undefined) => {
       const el = source();
 
+      if (untrack(isTransitionPending)) {
+        // wait for pending transition to end before animating
+        isTransitionPending();
+        return prev;
+      }
+
       if (el !== prev) {
         next = el;
-        untrack(() => triggerTransitions(prev));
+        batch(() => untrack(() => triggerTransitions(prev)));
       }
 
       return el;
@@ -137,14 +133,6 @@ export function createSwitchTransition<T>(
     // or will animate the transition if the source is different from the initial value
     options.appear ? undefined : initSource,
   );
-
-  // call transitions in effect to suspend them under Suspense
-  createEffect(() => {
-    const queue = transitions();
-    const copy = queue.slice();
-    queue.length = 0;
-    untrack(() => copy.forEach(cb => cb()));
-  });
 
   return returned;
 }

@@ -13,6 +13,8 @@ import {
 import { resolveFirst } from "@solid-primitives/refs";
 import { createSwitchTransition, TransitionMode } from "../src";
 
+const appear = localStorage.getItem("transition-group-appear") === "true";
+
 function Transition(props: ParentProps & { mode: TransitionMode }): JSX.Element {
   const el = resolveFirst(
     () => props.children,
@@ -20,7 +22,7 @@ function Transition(props: ParentProps & { mode: TransitionMode }): JSX.Element 
   );
 
   const animateIn = (el: HTMLElement, done: VoidFunction) => {
-    if (!el.isConnected) console.warn(el.textContent + " is not connected on enter!!");
+    if (!el.isConnected) return done();
     const a = el.animate(
       [
         { opacity: 0, transform: "translate(100px)" },
@@ -37,7 +39,7 @@ function Transition(props: ParentProps & { mode: TransitionMode }): JSX.Element 
   };
 
   const animateOut = (el: HTMLElement, done: VoidFunction) => {
-    if (!el.isConnected) console.warn(el.textContent + " is not connected on exit!!");
+    if (!el.isConnected) return done();
     const left1 = el.getBoundingClientRect().left;
     animationMap.get(el)?.cancel();
     const left2 = el.getBoundingClientRect().left;
@@ -56,17 +58,13 @@ function Transition(props: ParentProps & { mode: TransitionMode }): JSX.Element 
 
   return createSwitchTransition(el, {
     onEnter(el, done) {
-      // console.log("onEnter", el);
-      requestAnimationFrame(() => {
-        animateIn(el, done);
-      });
+      queueMicrotask(() => animateIn(el, done));
     },
     onExit(el, done) {
-      // console.log("onExit", el);
       animateOut(el, done);
     },
     mode: props.mode,
-    // appear: true,
+    appear,
   });
 }
 
@@ -132,15 +130,26 @@ const SwitchPage: Component = () => {
 
   return (
     <>
-      <button
-        class="btn"
-        onClick={() => {
-          resolve();
-          setRunResource(p => !p);
-        }}
-      >
-        {runResource() ? "Stop" : "Start"} Resource
-      </button>
+      <div class="flex">
+        <button
+          class="btn"
+          onClick={() => {
+            resolve();
+            setRunResource(p => !p);
+          }}
+        >
+          {runResource() ? "Stop" : "Start"} Resource
+        </button>
+        <button
+          class="btn"
+          onClick={() => {
+            localStorage.setItem("transition-group-appear", String(!appear));
+            window.location.reload();
+          }}
+        >
+          {appear ? "Disable" : "Enable"} Appear
+        </button>
+      </div>
       <h1>Toggle</h1>
       <Example mode="parallel" resource={res} />
       <Example mode="out-in" resource={res} />

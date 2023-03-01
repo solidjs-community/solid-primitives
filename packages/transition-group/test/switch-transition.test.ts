@@ -1,18 +1,10 @@
 import { describe, it, expect, vi, test } from "vitest";
-import {
-  createEffect,
-  createRenderEffect,
-  createResource,
-  createRoot,
-  createSignal,
-  Suspense,
-} from "solid-js";
+import { createEffect, createRoot, createSignal, untrack } from "solid-js";
 import { createSwitchTransition } from "../src";
 
 describe("createSwitchTransition", () => {
   const el1 = document.createElement("div");
   const el2 = document.createElement("div");
-  const el3 = document.createElement("div");
 
   it("renders items immediately on the initial run", () =>
     createRoot(dispose => {
@@ -23,19 +15,17 @@ describe("createSwitchTransition", () => {
     }));
 
   it("reacts to changes to children", () => {
-    const [children, setChildren] = createSignal<Element>();
+    createRoot(dispose => {
+      const [children, setChildren] = createSignal<Element>();
 
-    const { result, dispose } = createRoot(dispose => {
       const result = createSwitchTransition(children, {});
       expect(result()).toHaveLength(0);
-      return { result, dispose };
-    });
-    expect(result()).toHaveLength(0);
 
-    setChildren(el1);
-    expect(result()).toHaveLength(1);
-    expect(result()[0]).toBe(el1);
-    dispose();
+      setChildren(el1);
+      expect(result()).toHaveLength(1);
+      expect(result()[0]).toBe(el1);
+      dispose();
+    });
   });
 
   it("transitions element out", () => {
@@ -79,23 +69,20 @@ describe("createSwitchTransition", () => {
   });
 
   it("transitions element in on appear", () => {
-    const fn = vi.fn();
+    createRoot(dispose => {
+      const fn = vi.fn();
 
-    const { dispose, result } = createRoot(dispose => {
       const result = createSwitchTransition(() => el1, {
         onEnter: fn,
         appear: true,
       });
+
       expect(result()).toHaveLength(1);
-      expect(fn).not.toHaveBeenCalled();
-      return { result, dispose };
+      expect(fn).toHaveBeenCalledOnce();
+      expect(fn).toHaveBeenCalledWith(el1, expect.any(Function));
+
+      dispose();
     });
-
-    expect(result()).toHaveLength(1);
-    expect(fn).toHaveBeenCalledOnce();
-    expect(fn).toHaveBeenCalledWith(el1, expect.any(Function));
-
-    dispose();
   });
 
   it("toggles between two elements", () => {
@@ -208,6 +195,10 @@ describe("createSwitchTransition", () => {
     dispose();
   });
 
+  /*
+
+  The transitions are called in a pure computation, so they are still working under suspense
+
   it("suspends under Suspense", () => {
     const onEnter = vi.fn();
     const onExit = vi.fn();
@@ -253,6 +244,8 @@ describe("createSwitchTransition", () => {
     dispose();
   });
 
+  */
+
   test("updated list should be available in user effects", () => {
     let effRuns = 0;
 
@@ -262,24 +255,22 @@ describe("createSwitchTransition", () => {
       createEffect(() => {
         effRuns++;
         children();
-        if (effRuns === 1) {
-          expect(result(), "effect after root").toHaveLength(2);
-        } else {
-          expect(result(), "affect after transitions").toHaveLength(1);
-          expect(result()[0]).toBe(el2);
-        }
+        expect(untrack(result), "effect after root").toHaveLength(1);
+        expect(untrack(result)[0]).toBe(el2);
       });
 
       const result = createSwitchTransition(children, {});
       expect(result(), "initial").toHaveLength(1);
+      expect(result()[0]).toBe(el1);
 
       setChildren(el2);
-      expect(result(), "after sync assign").toHaveLength(2);
+      expect(result(), "after sync assign").toHaveLength(1);
+      expect(result()[0]).toBe(el2);
 
       return dispose;
     });
 
-    expect(effRuns).toBe(2);
+    expect(effRuns).toBe(1);
 
     dispose();
   });
