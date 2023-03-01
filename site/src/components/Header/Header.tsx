@@ -17,6 +17,7 @@ import Hamburger from "../Icons/Hamburger";
 import { primitivePagePaddingTop } from "../Primitives/PrimitivePageMain";
 import { pageWidthClass } from "~/constants";
 import createEffectDeffered from "~/hooks/createEffectDeffered";
+import reflow from "~/utils/reflow";
 
 export const [headerState, setHeaderState] = createStore({
   showOpaqueBg: false,
@@ -56,6 +57,18 @@ const Header = () => {
   const shouldShowGradientOverflow = () => window.scrollY > primitivePagePaddingTop + 150;
 
   const checkScroll = () => {
+    // might remove this, hopefully this issue is temp, not that big deal of an issue, but the issue is that when safari scroll 'rubberbands' at top of page there's a big white background that covers header. It's caused by header element containing blur in backdrop-filter.
+    if (isSafari && !isMobile) {
+      if (openNavMenu() || openSearch()) {
+        return;
+      }
+      if (window.scrollY > 2) {
+        headerOpaqueBg.style.display = "";
+      } else {
+        headerOpaqueBg.style.display = "none";
+      }
+    }
+
     const showOpaqueBg = shouldShowOpaqueBg();
     const showShadow = shouldShowShadow();
     const showGradientOverflow = shouldShowGradientOverflow();
@@ -73,24 +86,6 @@ const Header = () => {
     checkScroll();
 
     window.addEventListener("scroll", checkScroll, { passive: true });
-
-    // might remove this, hopefully this issue is temp, not that big deal of an issue, but the issue is that when safari scroll 'rubberbands' at top of page there's a big white background that covers header. It's caused by header element containing blur in backdrop-filter.
-    if (isSafari && !isMobile) {
-      window.addEventListener(
-        "scroll",
-        () => {
-          if (openNavMenu() || openSearch()) {
-            return;
-          }
-          if (window.scrollY > 1) {
-            headerOpaqueBg.style.display = "";
-          } else {
-            headerOpaqueBg.style.display = "none";
-          }
-        },
-        { passive: true }
-      );
-    }
   });
 
   let navMenuHeight = 0;

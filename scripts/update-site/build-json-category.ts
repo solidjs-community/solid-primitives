@@ -75,8 +75,8 @@ export const buildJSONCategory = async ({
         packageName: name,
         primitiveName: primitive
       });
-      const minifiedSize = formatBytes(result.minifiedSize);
-      const gzippedSize = formatBytes(result.gzippedSize);
+      const minifiedSize = formatBytes(result.minifiedSize).string;
+      const gzippedSize = formatBytes(result.gzippedSize).string;
 
       global.primitives[primitive] = {
         packageName: name,

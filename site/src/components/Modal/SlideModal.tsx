@@ -65,13 +65,10 @@ const SlideModal: ParentComponent<{
     document.documentElement.style.setProperty("--slide-exit-y", `${value}px`);
   };
 
-  const onClickClose = () => {
-    setOpen(false);
-  };
-
   onMount(() => {
     rootApp = document.getElementById("root")!;
   });
+
   return (
     <Dismiss
       menuButton={menuButton}
@@ -79,10 +76,11 @@ const SlideModal: ParentComponent<{
       open={open}
       setOpen={setOpen}
       removeScrollbar={false}
+      menuPopup={`[role="dialog"]`}
       overlayElement={{
         element: (
           <div
-            class="fixed inset-0 z-[1000] bg-[#102a62b8] dark:bg-[#001627bd] backdrop-blur-[2px]"
+            class="fixed inset-0 h-[calc(100%+100px)] z-[1000] bg-[#102a62b8] dark:bg-[#001627bd] backdrop-blur-[2px]"
             onClick={() => setOpen(false)}
           ></div>
         ),
@@ -97,7 +95,9 @@ const SlideModal: ParentComponent<{
         name: "slide-modal",
         onEnter: () => {
           setHeaderState("disableScroll", true);
-          changePageLayout();
+          requestAnimationFrame(() => {
+            changePageLayout();
+          });
         },
         onBeforeExit: () => {
           updateModalSlideExitDirectionCSSVariable();
@@ -114,7 +114,7 @@ const SlideModal: ParentComponent<{
         role="presentation"
       >
         <div
-          class="pointer-events-auto relative"
+          class="pointer-events-auto relative w-full outline-none"
           role="dialog"
           aria-modal="true"
           tabindex="-1"

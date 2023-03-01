@@ -36,7 +36,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/idle" name="idle" stage={0} packageList={[{"name":"idle","gzipped":"670 B","minified":"1.28 KB"}]} primitiveList={[{"name":"createIdleTimer","gzipped":"670 B","minified":"1.28 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/idle" name="idle" stage={0} packageList={[{"name":"idle","gzipped":"995 B","minified":"3.08 KB"}]} primitiveList={[{"name":"createIdleTimer","gzipped":"995 B","minified":"3.08 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

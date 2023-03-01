@@ -38,11 +38,26 @@ export function formatBytes(
     k?: 1000 | 1024;
   } = {}
 ) {
-  if (!+bytes) return `0 ${sizes[0]}`;
+  if (!+bytes) {
+    const unit = sizes[0];
+    const number = 0;
+
+    return {
+      string: `${number} ${unit}`,
+      number,
+      unit
+    };
+  }
 
   const dm = decimals < 0 ? 0 : decimals;
 
   const i = Math.floor(Math.log(bytes as number) / Math.log(k));
+  const number = parseFloat(((bytes as number) / Math.pow(k, i)).toFixed(dm));
+  const unit = sizes[i];
 
-  return `${parseFloat(((bytes as number) / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  return {
+    string: `${number} ${unit}`,
+    number,
+    unit
+  };
 }

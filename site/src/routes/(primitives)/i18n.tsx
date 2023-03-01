@@ -28,7 +28,7 @@ function MDXContent(props = {}) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/i18n" name="i18n" stage={3} packageList={[{"name":"i18n","gzipped":"422 B","minified":"660 B"}]} primitiveList={[{"name":"useI18n","gzipped":"136 B","minified":"165 B"},{"name":"createI18nContext","gzipped":"404 B","minified":"619 B"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/i18n" name="i18n" stage={3} packageList={[{"name":"i18n","gzipped":"893 B","minified":"2.22 KB"}]} primitiveList={[{"name":"useI18n","gzipped":"165 B","minified":"248 B"},{"name":"createI18nContext","gzipped":"873 B","minified":"2.15 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

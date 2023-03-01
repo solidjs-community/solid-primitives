@@ -2,6 +2,7 @@ import { FiChevronRight } from "solid-icons/fi";
 import { createSignal, onMount, ParentComponent } from "solid-js";
 import SlideModal from "../Modal/SlideModal";
 import BundleSizeModal, { TBundleSizeItem } from "../BundleSizeModal/BundleSizeModal";
+import Stage from "../Stage/Stage";
 
 const createFetchSize = (value: string) => {
   const [size, setSize] = createSignal("");
@@ -21,18 +22,20 @@ const createFetchSize = (value: string) => {
 
 type SizeProps = {
   value: string | { gzipped?: string; minified?: string };
+  unit?: string;
   href: string;
 };
 
-const SizeBadge: ParentComponent<SizeProps> = ({ value, href }) => {
+const SizeBadge: ParentComponent<SizeProps> = ({ value, href, unit }) => {
   // const size = createFetchSize(value);
   return (
     <a
-      class="h-[28px] min-w-[90px] uppercase flex justify-center items-center font-sans rounded-md border-[#cae0ff] bg-[#cae0ff40] border-2 hover:border-[#80a7de] hover:bg-[#cae0ff66] transition-colors dark:bg-[#6eaaff14] dark:border-[#5577a7] dark:hover:border-[#8ba8d3] dark:hover:bg-[#6eaaff33]"
+      class="h-[28px] min-w-[90px] uppercase flex justify-center items-baseline font-sans rounded-md border-[#cae0ff] bg-[#cae0ff40] border-2 hover:border-[#80a7de] hover:bg-[#cae0ff66] transition-colors dark:bg-[#6eaaff14] dark:border-[#5577a7] dark:hover:border-[#8ba8d3] dark:hover:bg-[#6eaaff33]"
       href={href}
       target="_blank"
     >
       {typeof value === "string" ? value : value.gzipped || "0 B"}
+      <span class="text-[14px] font-semibold text-[#7689a4]">&nbsp{unit || ""}</span>
     </a>
   );
 };
@@ -78,8 +81,7 @@ export const SizeBadgePill: ParentComponent<
           <span class="pl-3">Size</span>
         </div>
         <div class="h-full flex justify-center items-center min-w-[90px] rounded-r-lg border-l-0 border-transparent border-[3px] font-semibold background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#cae0ff,#c0c8ff)_border-box] dark:background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#405b6e,#46659a)_border-box]">
-          {/* {typeof value === "string" ? value : value.gzipped || "0 B"} */}
-          1.5 KB
+          {packageList[0].gzipped}
         </div>
       </button>
       <SlideModal menuButton={menuButton} open={open} setOpen={setOpen}>

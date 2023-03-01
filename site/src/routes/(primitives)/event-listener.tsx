@@ -39,7 +39,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/event-listener" name="event-listener" stage={3} packageList={[{"name":"event-listener","gzipped":"1.45 KB","minified":"3.19 KB"}]} primitiveList={[{"name":"createEventSignal","gzipped":"1.06 KB","minified":"2.13 KB"},{"name":"createEventListenerMap","gzipped":"1.06 KB","minified":"2.13 KB"},{"name":"WindowEventListener","gzipped":"1.04 KB","minified":"1.97 KB"},{"name":"DocumentEventListener","gzipped":"1.04 KB","minified":"1.98 KB"},{"name":"createEventListener","gzipped":"1.04 KB","minified":"2.05 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/event-listener" name="event-listener" stage={3} packageList={[{"name":"event-listener","gzipped":"2.14 KB","minified":"7.37 KB"}]} primitiveList={[{"name":"createEventSignal","gzipped":"1.61 KB","minified":"4.94 KB"},{"name":"createEventListenerMap","gzipped":"1.61 KB","minified":"5.01 KB"},{"name":"WindowEventListener","gzipped":"1.53 KB","minified":"4.47 KB"},{"name":"DocumentEventListener","gzipped":"1.53 KB","minified":"4.48 KB"},{"name":"createEventListener","gzipped":"1.56 KB","minified":"4.7 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

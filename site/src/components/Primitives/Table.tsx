@@ -355,7 +355,6 @@ const Table: ParentComponent = props => {
         hideActiveHeader();
       });
     },
-
     { rootMargin: `-${rootMarginTop}px 0px -${rootMarginTop}px 0px` }
   );
 
@@ -463,7 +462,7 @@ const Table: ParentComponent = props => {
           class="absolute top-[7px] bottom-0 left-[120.8px] w-[15px] z-10 pointer-events-none opacity-0 transition-opacity bg-[linear-gradient(to_right,#24405966,#24405900)] dark:bg-[linear-gradient(to_right,#05121dbf,#05121d00)]"
           ref={tableVerticalScrollShadow}
         />
-        <div class="w-full rounded-[30px] overflow-x-clip p-1 pb-0 pt-[2px] bg-[linear-gradient(45deg,#D8DFF5,#E4F6F9)] dark:bg-[linear-gradient(45deg,#2c4668,#2b455a)]">
+        <div class="w-full rounded-[30px] overflow-x-clip p-1 pb-0 pt-[2px] bg-[linear-gradient(45deg,#D8DFF5,#E4F6F9)] dark:bg-[linear-gradient(45deg,#2c4668,#2b455a)] no-scrollbar">
           <table
             class="w-full relative mt-[-2px] overflow-clip"
             style="border-collapse: separate; border-spacing: 2px 2px;"

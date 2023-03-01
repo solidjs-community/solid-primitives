@@ -38,7 +38,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/range" name="range" stage={1} packageList={[{"name":"range","gzipped":"1.35 KB","minified":"3.14 KB"}]} primitiveList={[{"name":"mapRange","gzipped":"663 B","minified":"1.05 KB"},{"name":"indexRange","gzipped":"508 B","minified":"808 B"},{"name":"Repeat","gzipped":"420 B","minified":"754 B"},{"name":"Range","gzipped":"808 B","minified":"1.38 KB"},{"name":"IndexRange","gzipped":"656 B","minified":"1.13 KB"},{"name":"repeat","gzipped":"364 B","minified":"606 B"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/range" name="range" stage={1} packageList={[{"name":"range","gzipped":"1.79 KB","minified":"7.69 KB"}]} primitiveList={[{"name":"mapRange","gzipped":"1 KB","minified":"2.85 KB"},{"name":"indexRange","gzipped":"731 B","minified":"1.96 KB"},{"name":"Repeat","gzipped":"633 B","minified":"1.73 KB"},{"name":"Range","gzipped":"1.2 KB","minified":"3.5 KB"},{"name":"IndexRange","gzipped":"938 B","minified":"2.62 KB"},{"name":"repeat","gzipped":"549 B","minified":"1.46 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

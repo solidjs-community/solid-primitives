@@ -30,6 +30,7 @@
     "@solid-primitives/keyboard": "^1.0.7",
     "@solid-primitives/media": "^2.1.0",
     "@solid-primitives/platform": "^0.0.103",
+    "@solid-primitives/resize-observer": "^2.0.10",
     "@solid-primitives/rootless": "^1.2.4",
     "@solid-primitives/scheduled": "^1.2.1",
     "@solid-primitives/tween": "^1.2.4",

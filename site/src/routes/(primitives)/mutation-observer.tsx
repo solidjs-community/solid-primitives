@@ -33,7 +33,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/mutation-observer" name="mutation-observer" stage={3} packageList={[{"name":"mutation-observer","gzipped":"1.12 KB","minified":"2.19 KB"}]} primitiveList={[{"name":"createMutationObserver","gzipped":"1.09 KB","minified":"2.12 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/mutation-observer" name="mutation-observer" stage={3} packageList={[{"name":"mutation-observer","gzipped":"1.7 KB","minified":"4.99 KB"}]} primitiveList={[{"name":"createMutationObserver","gzipped":"1.64 KB","minified":"4.82 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

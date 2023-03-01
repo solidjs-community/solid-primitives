@@ -122,7 +122,7 @@ const SearchModal: Component<{
               onClick={onClickClose}
             >
               <div
-                class="h-[calc(100%+65px)] bg-[#102a62b8] dark:bg-[#001627bd] backdrop-blur-sm"
+                class="h-[calc(100%+100px)] bg-[#102a62b8] dark:bg-[#001627bd] backdrop-blur-sm"
                 classList={{ "mt-[60px]": !isSmall() }}
               />
             </div>

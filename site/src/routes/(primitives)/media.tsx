@@ -36,7 +36,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/media" name="media" stage={3} packageList={[{"name":"media","gzipped":"1.86 KB","minified":"4.16 KB"}]} primitiveList={[{"name":"createMediaQuery","gzipped":"1.64 KB","minified":"3.57 KB"},{"name":"createBreakpoints","gzipped":"1.78 KB","minified":"3.93 KB"},{"name":"usePrefersDark","gzipped":"1.64 KB","minified":"3.57 KB"},{"name":"makeMediaQueryListener","gzipped":"1.67 KB","minified":"3.72 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/media" name="media" stage={3} packageList={[{"name":"media","gzipped":"2.92 KB","minified":"10.01 KB"}]} primitiveList={[{"name":"createMediaQuery","gzipped":"2.62 KB","minified":"8.79 KB"},{"name":"createBreakpoints","gzipped":"2.86 KB","minified":"9.64 KB"},{"name":"usePrefersDark","gzipped":"2.62 KB","minified":"8.79 KB"},{"name":"makeMediaQueryListener","gzipped":"2.67 KB","minified":"9.09 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

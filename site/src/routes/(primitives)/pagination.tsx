@@ -35,7 +35,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/pagination" name="pagination" stage={0} packageList={[{"name":"pagination","gzipped":"2.73 KB","minified":"6.64 KB"}]} primitiveList={[{"name":"createInfiniteScroll","gzipped":"1.99 KB","minified":"4.36 KB"},{"name":"createPagination","gzipped":"1.63 KB","minified":"4 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/pagination" name="pagination" stage={0} packageList={[{"name":"pagination","gzipped":"3.84 KB","minified":"14.74 KB"}]} primitiveList={[{"name":"createInfiniteScroll","gzipped":"2.86 KB","minified":"10.31 KB"},{"name":"createPagination","gzipped":"2.34 KB","minified":"8.29 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

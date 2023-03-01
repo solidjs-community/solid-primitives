@@ -35,7 +35,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/clipboard" name="clipboard" stage={3} packageList={[{"name":"clipboard","gzipped":"1.58 KB","minified":"3.25 KB"}]} primitiveList={[{"name":"writeClipboard","gzipped":"184 B","minified":"241 B"},{"name":"createClipboard","gzipped":"509 B","minified":"894 B"},{"name":"copyClipboard","gzipped":"20 B","minified":"0 B"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/clipboard" name="clipboard" stage={3} packageList={[{"name":"clipboard","gzipped":"2.23 KB","minified":"6.71 KB"}]} primitiveList={[{"name":"writeClipboard","gzipped":"228 B","minified":"339 B"},{"name":"createClipboard","gzipped":"669 B","minified":"1.6 KB"},{"name":"copyClipboard","gzipped":"20 B","minified":"0 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

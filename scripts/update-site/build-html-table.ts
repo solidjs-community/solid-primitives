@@ -74,8 +74,8 @@ export const buildCategory = async ({
                 packageName,
                 primitiveName
               });
-              const minifiedSize = formatBytes(result.minifiedSize);
-              const gzippedSize = formatBytes(result.gzippedSize);
+              const minifiedSize = formatBytes(result.minifiedSize).string;
+              const gzippedSize = formatBytes(result.gzippedSize).string;
 
               global.packageName[packageName] = {
                 name: packageName,
@@ -95,12 +95,14 @@ export const buildCategory = async ({
             if (type === "export") {
               global.primitives[primitiveName] = {
                 packageName,
-                gzippedSize,
-                minifiedSize
+                gzippedSize: gzippedSize.string,
+                minifiedSize: minifiedSize.string
               };
             }
 
-            const value = `{ gzipped: "${gzippedSize}", minified: "${minifiedSize}" }`;
+            // const value = `{ gzipped: "${gzippedSize}", minified: "${minifiedSize}" }`;
+            const value = gzippedSize.number;
+            const unit = gzippedSize.unit;
             const query = getBundleJSQuery({
               type,
               packageName,
@@ -108,7 +110,7 @@ export const buildCategory = async ({
             });
             const href = `${bundleJSURL}?${query}`;
 
-            const component = `<SizeBadge value={${value}} href="${href}" />`;
+            const component = `<SizeBadge value="${value}" unit="${unit}" href="${href}" />`;
 
             return `<SizeBadgeWrapper primitiveName="${primitiveName.replace(
               /\s/g,

@@ -32,7 +32,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/script-loader" name="script-loader" stage={3} packageList={[{"name":"script-loader","gzipped":"349 B","minified":"498 B"}]} primitiveList={[{"name":"createScriptLoader","gzipped":"349 B","minified":"498 B"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/script-loader" name="script-loader" stage={3} packageList={[{"name":"script-loader","gzipped":"465 B","minified":"856 B"}]} primitiveList={[{"name":"createScriptLoader","gzipped":"465 B","minified":"856 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

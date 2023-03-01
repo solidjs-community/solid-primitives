@@ -39,7 +39,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/destructure" name="destructure" stage={2} packageList={[{"name":"destructure","gzipped":"1.16 KB","minified":"2.34 KB"}]} primitiveList={[{"name":"destructure","gzipped":"1.16 KB","minified":"2.34 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/destructure" name="destructure" stage={2} packageList={[{"name":"destructure","gzipped":"1.73 KB","minified":"5.35 KB"}]} primitiveList={[{"name":"destructure","gzipped":"1.73 KB","minified":"5.35 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )
