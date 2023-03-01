@@ -303,9 +303,7 @@ const Table: ParentComponent = props => {
 
         if (!checkTableSameWidthAsParent()) {
           setTableSizeSameAsParent();
-          console.log("setTableSizeSameAsParent");
         } else {
-          console.log("resetSizes");
           resetSizes();
         }
       }
@@ -318,7 +316,6 @@ const Table: ParentComponent = props => {
     setTableRowTargets(() => [...h4Els]);
     setTableTarget(() => [tableEl]);
     requestAnimationFrame(() => {
-      console.log({ prevTableContainerParentWidth });
       resizeObserver.observe(tableContainerParent);
       resizeObserver.observe(tableEl);
 
@@ -386,7 +383,6 @@ const Table: ParentComponent = props => {
             tableHeaderName.textContent = prevEl.textContent;
           } else {
             tableHeaderName.textContent = "Name";
-            console.log("hideheader");
             hideActiveHeader();
           }
           return;
