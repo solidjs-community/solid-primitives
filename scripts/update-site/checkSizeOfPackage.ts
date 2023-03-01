@@ -31,7 +31,7 @@ export { ${primitiveName} } from "./packages/${packageName}/src/index"
     target: ["esnext"],
     format: "esm",
     bundle: true,
-    // minify: true,
+    minify: true,
     treeShaking: true,
     platform: "browser",
     external: ["solid-js", "node-fetch"]
