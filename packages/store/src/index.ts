@@ -246,9 +246,9 @@ export function createFluxFactory<
     createFluxStore(
       !!initialValueOverride
         ? typeof initialValueOverride === "function"
-          ? untrack(() => initialValueOverride(fallbackState))
-          : initialValueOverride
-        : fallbackState,
+          ? untrack(() => initialValueOverride({ ...fallbackState }))
+          : { ...initialValueOverride }
+        : { ...fallbackState },
       methods
     )) as FluxFactory<T, G, A>;
 }
