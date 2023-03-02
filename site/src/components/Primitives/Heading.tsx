@@ -15,9 +15,9 @@ const Heading: ParentComponent = props => {
           xmlns="http://www.w3.org/2000/svg"
           style="z-index: 1; right: -159px; width: 247px; pointer-events: none; bottom: -89px;"
         >
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-30 -26)" />
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-45 -17)" />
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-16 -16.5)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-30 -26)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-45 -17)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-16 -16.5)" />
         </svg>
         <svg
           class="absolute sm:hidden"
@@ -29,7 +29,7 @@ const Heading: ParentComponent = props => {
         >
           <use
             opacity="0.8"
-            xlink:href="#solid-blocks-header-cluster-e"
+            href="#solid-blocks-header-cluster-e"
             transform="translate(-16 -16.5)"
           />
         </svg>
@@ -43,8 +43,8 @@ const Heading: ParentComponent = props => {
           xmlns="http://www.w3.org/2000/svg"
           style="z-index: 2; left: -152px; width: 247px; top: 1px; pointer-events: none;"
         >
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-18 -24)" />
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-33 -14)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-18 -24)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-33 -14)" />
         </svg>
         <svg
           class="absolute top-0 left-0"
@@ -54,14 +54,14 @@ const Heading: ParentComponent = props => {
           xmlns="http://www.w3.org/2000/svg"
           style="z-index: 1; left: -239px; width: 247px; top: -78px; pointer-events: none;"
         >
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-44 1)" />
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-31 -22.2)" />
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-46 -13.2)" />
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-16.2 -13.3)" />
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-31 -4.2)" />
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(13 -13.3)" />
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-1.5 -4.3)" />
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-16.2 4.7)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-44 1)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-31 -22.2)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-46 -13.2)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-16.2 -13.3)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-31 -4.2)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(13 -13.3)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-1.5 -4.3)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-16.2 4.7)" />
         </svg>
         {/* <svg
           class="absolute top-0 left-0 opacity-80"
@@ -71,8 +71,8 @@ const Heading: ParentComponent = props => {
           xmlns="http://www.w3.org/2000/svg"
           style="z-index: 0; left: -97px; width: 247px; top: -65px; pointer-events: none;"
         >
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-1.5 -4.3)" />
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-16.2 4.7)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-1.5 -4.3)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-16.2 4.7)" />
         </svg> */}
         <svg
           class="absolute top-0 left-0"
@@ -84,7 +84,7 @@ const Heading: ParentComponent = props => {
         >
           <use
             opacity="0.6"
-            xlink:href="#solid-blocks-header-cluster-e"
+            href="#solid-blocks-header-cluster-e"
             transform="translate(13 -13.3)"
           />
         </svg>
@@ -96,9 +96,9 @@ const Heading: ParentComponent = props => {
           xmlns="http://www.w3.org/2000/svg"
           style="z-index: 5; left: -239px; width: 247px; top: -120px; pointer-events: none;"
         >
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-30 -26)" />
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-45 -17)" />
-          <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-16 -16.5)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-30 -26)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-45 -17)" />
+          <use href="#solid-blocks-header-cluster-e" transform="translate(-16 -16.5)" />
         </svg>
         <svg
           class="absolute"

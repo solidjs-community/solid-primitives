@@ -40,68 +40,67 @@ export default function Home() {
           >
             <g style="transform: scale(1.26) translate(-27px, 12px); transform-origin: center;">
               <use
-                // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(75 -27)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(115 -2)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(64 19)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(113 12)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(98 19)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(16 -21)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(1 3)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(17 12)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(62 -18)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(49 -7.5)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(34 1)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(78 -8)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(64 1)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(49 9.5)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(93.3 0.5)"
               />
-              <use // @ts-ignore
-                xlink:href="#solid-blocks-header-cluster-e"
+              <use 
+                href="#solid-blocks-header-cluster-e"
                 transform="translate(79 9.5)"
               />
             </g>

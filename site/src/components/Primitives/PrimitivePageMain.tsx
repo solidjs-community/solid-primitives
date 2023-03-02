@@ -75,9 +75,9 @@ const PrimitivePageMain: ParentComponent<{
                 xmlns="http://www.w3.org/2000/svg"
                 style="top: 13px; left: -30px; width: 247px; pointer-events: none;"
               >
-                <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-44 -38)" />
-                <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-44 -38)" />
-                <use xlink:href="#solid-blocks-header-cluster-e" transform="translate(-29 -29)" />
+                <use href="#solid-blocks-header-cluster-e" transform="translate(-44 -38)" />
+                <use href="#solid-blocks-header-cluster-e" transform="translate(-44 -38)" />
+                <use href="#solid-blocks-header-cluster-e" transform="translate(-29 -29)" />
               </svg>
               <a
                 class="relative inline-block scale-90 sm:scale-100 hover:opacity-70 transition-opacity"

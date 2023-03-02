@@ -35,7 +35,6 @@ const SolidBlocksHeaderClusterDefs = () => {
         <linearGradient
           // @ts-ignore
           href="#solid-blocks-header-cluster-a"
-          xlink:href="#solid-blocks-header-cluster-a"
           id="solid-blocks-header-cluster-f"
           gradientUnits="userSpaceOnUse"
           x1="902.184"
@@ -47,7 +46,6 @@ const SolidBlocksHeaderClusterDefs = () => {
         <linearGradient
           // @ts-ignore
           href="#solid-blocks-header-cluster-b"
-          xlink:href="#solid-blocks-header-cluster-b"
           id="solid-blocks-header-cluster-h"
           gradientUnits="userSpaceOnUse"
           x1="902.184"
@@ -58,7 +56,6 @@ const SolidBlocksHeaderClusterDefs = () => {
         <linearGradient
           // @ts-ignore
           href="#solid-blocks-header-cluster-c"
-          xlink:href="#solid-blocks-header-cluster-c"
           id="solid-blocks-header-cluster-j"
           gradientUnits="userSpaceOnUse"
           gradientTransform="translate(609.278 -383.962)"
@@ -70,7 +67,6 @@ const SolidBlocksHeaderClusterDefs = () => {
         <linearGradient
           // @ts-ignore
           href="#solid-blocks-header-cluster-d"
-          xlink:href="#solid-blocks-header-cluster-d"
           id="solid-blocks-header-cluster-k"
           gradientUnits="userSpaceOnUse"
           gradientTransform="translate(609.278 -383.962)"
