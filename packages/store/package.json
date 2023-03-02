@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/store",
-  "version": "0.0.200",
+  "version": "0.0.500",
   "description": "SolidJS Primitive to simplify the creation of global stores and the ability to access and mutate them.",
   "author": "Zalexios <zalexios@outlook.com>",
   "contributors": [],

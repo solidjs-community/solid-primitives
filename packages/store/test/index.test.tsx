@@ -1,122 +1,276 @@
-import { describe, test, expect } from "vitest";
 import type { JSX } from "solid-js";
-import { createRoot } from "solid-js";
-import { render } from "solid-js/web";
-import { createStoreFactory } from "../src";
+import { describe, test, expect } from "vitest";
+import { produce } from "solid-js/store";
+import { createFluxFactory, createFluxStore } from "../dist/index";
 
-const initialState = { value: true };
+const id = 'test id';
+const initialState = { id, value: true };
+const testState = { id, value: true };
 
-const [FactoryProvider, { useStore, produce, unwrapped, state }] = createStoreFactory(
+const fluxFactory = createFluxFactory(
   initialState,
-  (state, setState) => ({
-    toggle: () => setState(val => ({ ...val, value: !val.value })),
-    get: () => state.value
-  })
+  {
+    actions: (setState, state) => ({
+      set: setState,
+      toggle: () => setState("value", !state.value),
+    }),
+    getters: (state) => ({
+      get: () => state.value,
+      getId: () => state.id,
+    })
+  }
 );
 
-describe("createStoreFactory", () => {
-  test("render state value", () => {
-    const [_, { get }] = useStore();
-    const TestChild = () => <div>{get().toString()}</div>;
-    const container = document.createElement("div");
-    document.body.appendChild(container);
+describe("createFluxFactory", () => {
 
-    const unmount = render(
-      () => (
-        <FactoryProvider>
-          <TestChild />
-        </FactoryProvider>
-      ),
-      container
-    );
+  test("get default state value", () => {
+    const { state, getters, actions } = fluxFactory();
 
-    expect(container.innerHTML, "Not correctly rendered").toBe(
-      `<div>${initialState.value.toString()}</div>`
-    );
-
-    unmount();
-    document.body.removeChild(container);
+    expect(state.value).toBe(testState.value);
+    expect(getters.get()).toBe(testState.value);
   });
 
   test("toggle state value with actions", () => {
-    const [_, { toggle, get }] = useStore();
-    const TestChild = () => <div>{get().toString()}</div>;
-    const container = document.createElement("div");
-    document.body.appendChild(container);
+    const { state, getters, actions } = fluxFactory();
 
-    const unmount = render(
-      () => (
-        <FactoryProvider>
-          <TestChild />
-        </FactoryProvider>
-      ),
-      container
-    );
-
-    expect(container.innerHTML, "Not correctly rendered").toBe(
-      `<div>${initialState.value.toString()}</div>`
-    );
-    toggle();
-    expect(container.innerHTML, "Not correctly rendered").toBe(
-      `<div>${!initialState.value.toString()}</div>`
-    );
-
-    unmount();
-    document.body.removeChild(container);
+    expect(state.value).toBe(testState.value);
+    expect(getters.get()).toBe(testState.value);
+    actions.toggle();
+    expect(state.value).toBe(!testState.value);
+    expect(getters.get()).toBe(!testState.value);
   });
 
-  test("toggle state value with localized mutation via `produce`", () => {
-    const [_, { get }] = useStore();
-    const TestChild = () => <div>{get().toString()}</div>;
-    const container = document.createElement("div");
-    document.body.appendChild(container);
+  test("override default state value", () => {
+    const { state, getters, actions } = fluxFactory({ id, value: false });
 
-    const unmount = render(
-      () => (
-        <FactoryProvider>
-          <TestChild />
-        </FactoryProvider>
-      ),
-      container
-    );
-
-    expect(container.innerHTML, "Not correctly rendered").toBe(
-      `<div>${initialState.value.toString()}</div>`
-    );
-    produce(s => ({ ...s, value: !s.value }));
-    expect(container.innerHTML, "Not correctly rendered").toBe(
-      `<div>${!initialState.value.toString()}</div>`
-    );
-
-    unmount();
-    document.body.removeChild(container);
+    expect(state.value).toBe(!testState.value);
+    expect(getters.get()).toBe(!testState.value);
   });
 
-  test("unwrapped", () => {
-    const [_, { get }] = useStore();
-    const TestChild = () => <div>{get().toString()}</div>;
-    const container = document.createElement("div");
-    document.body.appendChild(container);
+  test("create multiple instances with factory using initial state", () => {
+    const { state: state1, getters: getters1, actions: actions1 } = fluxFactory();
+    const { state: state2, getters: getters2, actions: actions2 } = fluxFactory();
 
-    const unmount = render(
-      () => (
-        <FactoryProvider>
-          <TestChild />
-        </FactoryProvider>
-      ),
-      container
-    );
-
-    expect(container.innerHTML, "Not correctly rendered").toBe(
-      `<div>${initialState.value.toString()}</div>`
-    );
-
-    expect(state, "Should return a proxy to the data").to.not.eq(initialState);
-
-    const unwrappedState = unwrapped();
-    expect(unwrappedState, "Should return underlying data without a proxy").toBe(initialState);
-
-    unmount();
-    document.body.removeChild(container);
+    expect(state1.value).toBe(testState.value);
+    expect(state2.value).toBe(testState.value);
+    expect(getters1.get()).toBe(testState.value);
+    expect(getters2.get()).toBe(testState.value);
+    actions2.toggle();
+    expect(state1.value).toBe(testState.value);
+    expect(state2.value).toBe(!testState.value);
+    expect(getters1.get()).toBe(testState.value);
+    expect(getters2.get()).toBe(!testState.value);
+    actions1.toggle();
+    expect(state1.value).toBe(!testState.value);
+    expect(state2.value).toBe(!testState.value);
+    expect(getters1.get()).toBe(!testState.value);
+    expect(getters2.get()).toBe(!testState.value);
   });
+
+  test("create multiple instances with factory using object to override", () => {
+    const overrideState = { id, value: false };
+    const { state: state1, getters: getters1, actions: actions1 } = fluxFactory(overrideState);
+    const { state: state2, getters: getters2, actions: actions2 } = fluxFactory(overrideState);
+
+    expect(state1.value).toBe(!testState.value);
+    expect(state2.value).toBe(!testState.value);
+    expect(getters1.get()).toBe(!testState.value);
+    expect(getters2.get()).toBe(!testState.value);
+    actions2.toggle();
+    expect(state1.value).toBe(!testState.value);
+    expect(state2.value).toBe(testState.value);
+    expect(getters1.get()).toBe(!testState.value);
+    expect(getters2.get()).toBe(testState.value);
+    actions1.toggle();
+    expect(state1.value).toBe(testState.value);
+    expect(state2.value).toBe(testState.value);
+    expect(getters1.get()).toBe(testState.value);
+    expect(getters2.get()).toBe(testState.value);
+  });
+
+  test("create multiple instances with factory using function to override", () => {
+    const { state: state1, getters: getters1, actions: actions1 } = fluxFactory(s => ({ ...s, value: false }));
+    const { state: state2, getters: getters2, actions: actions2 } = fluxFactory(s => ({ ...s, value: false }));
+
+    expect(state1.value).toBe(!testState.value);
+    expect(state2.value).toBe(!testState.value);
+    expect(getters1.get()).toBe(!testState.value);
+    expect(getters2.get()).toBe(!testState.value);
+    actions2.toggle();
+    expect(state1.value).toBe(!testState.value);
+    expect(state2.value).toBe(testState.value);
+    expect(getters1.get()).toBe(!testState.value);
+    expect(getters2.get()).toBe(testState.value);
+    actions1.toggle();
+    expect(state1.value).toBe(testState.value);
+    expect(state2.value).toBe(testState.value);
+    expect(getters1.get()).toBe(testState.value);
+    expect(getters2.get()).toBe(testState.value);
+  });
+
+  test("manually change multiple instances with factory using initial state", () => {
+    const { state: state1, getters: getters1, actions: actions1 } = fluxFactory();
+    const { state: state2, getters: getters2, actions: actions2 } = fluxFactory();
+
+    expect(state1.value).toBe(testState.value);
+    expect(state2.value).toBe(testState.value);
+    expect(getters1.get()).toBe(testState.value);
+    expect(getters2.get()).toBe(testState.value);
+    actions2.set("value", !testState.value);
+    expect(state1.value).toBe(testState.value);
+    expect(state2.value).toBe(!testState.value);
+    expect(getters1.get()).toBe(testState.value);
+    expect(getters2.get()).toBe(!testState.value);
+    actions1.set("value", !testState.value);
+    expect(state1.value).toBe(!testState.value);
+    expect(state2.value).toBe(!testState.value);
+    expect(getters1.get()).toBe(!testState.value);
+    expect(getters2.get()).toBe(!testState.value);
+  });
+
+  test("locally change multiple instances with factory using initial state", () => {
+    const { state: state1, getters: getters1, actions: actions1 } = fluxFactory();
+    const { state: state2, getters: getters2, actions: actions2 } = fluxFactory();
+
+    expect(state1.value).toBe(testState.value);
+    expect(state2.value).toBe(testState.value);
+    expect(getters1.get()).toBe(testState.value);
+    expect(getters2.get()).toBe(testState.value);
+    actions2.set(produce(s => s.value = !s.value));
+    expect(state1.value).toBe(testState.value);
+    expect(state2.value).toBe(!testState.value);
+    expect(getters1.get()).toBe(testState.value);
+    expect(getters2.get()).toBe(!testState.value);
+    actions1.set(produce(s => s.value = !s.value));
+    expect(state1.value).toBe(!testState.value);
+    expect(state2.value).toBe(!testState.value);
+    expect(getters1.get()).toBe(!testState.value);
+    expect(getters2.get()).toBe(!testState.value);
+  });
+
+  test("manually change state value", () => {
+    const { state, getters, actions } = fluxFactory();
+
+    expect(state.value).toBe(testState.value);
+    expect(getters.get()).toBe(testState.value);
+    actions.set("value", !testState.value);
+    expect(state.value).toBe(!testState.value);
+    expect(getters.get()).toBe(!testState.value);
+    expect(state.id).toBe(id);
+    expect(getters.getId()).toBe(id);
+  });
+
+  test("locally change state value", () => {
+    const { state, getters, actions } = fluxFactory();
+
+    expect(state.value).toBe(testState.value);
+    expect(getters.get()).toBe(testState.value);
+    actions.set(produce(s => s.value = !s.value));
+    expect(state.value).toBe(!testState.value);
+    expect(getters.get()).toBe(!testState.value);
+    expect(state.id).toBe(id);
+    expect(getters.getId()).toBe(id);
+  });
+
 });
+
+describe("createFluxStore", () => {
+  const getInitialState = () => ({ ...initialState });
+
+  test("get default state value", () => {
+    const { state, getters, actions } = createFluxStore(
+      getInitialState(),
+      {
+        actions: (setState, state) => ({
+          set: setState,
+          toggle: () => setState("value", !state.value),
+        }),
+        getters: (state) => ({
+          get: () => state.value,
+          getId: () => state.id,
+        })
+      }
+    );
+
+    expect(state.value).toBe(testState.value);
+    expect(getters.get()).toBe(testState.value);
+  });
+
+  test("toggle state value with actions", () => {
+    const { state, getters, actions } = createFluxStore(
+      getInitialState(),
+      {
+        actions: (setState, state) => ({
+          set: setState,
+          toggle: () => setState("value", !state.value),
+        }),
+        getters: (state) => ({
+          get: () => state.value,
+          getId: () => state.id,
+        })
+      }
+    );
+
+    expect(state.value).toBe(testState.value);
+    expect(getters.get()).toBe(testState.value);
+    expect(state.id).toBe(id);
+    expect(getters.getId()).toBe(id);
+    actions.toggle();
+    expect(state.value).toBe(!testState.value);
+    expect(getters.get()).toBe(!testState.value);
+    expect(state.id).toBe(id);
+    expect(getters.getId()).toBe(id);
+  });
+
+  test("manually change state value with actions", () => {
+    const { state, getters, actions } = createFluxStore(
+      getInitialState(),
+      {
+        actions: (setState, state) => ({
+          set: setState,
+          toggle: () => setState("value", !state.value),
+        }),
+        getters: (state) => ({
+          get: () => state.value,
+          getId: () => state.id,
+        })
+      }
+    );
+
+    expect(state.value).toBe(testState.value);
+    expect(getters.get()).toBe(testState.value);
+    expect(state.id).toBe(id);
+    expect(getters.getId()).toBe(id);
+    actions.set("value", !testState.value);
+    expect(state.value).toBe(!testState.value);
+    expect(getters.get()).toBe(!testState.value);
+    expect(state.id).toBe(id);
+    expect(getters.getId()).toBe(id);
+  });
+
+  test("locally change state value with actions", () => {
+    const { state, getters, actions } = createFluxStore(
+      getInitialState(),
+      {
+        actions: (setState, state) => ({
+          set: setState,
+          toggle: () => setState("value", !state.value),
+        }),
+        getters: (state) => ({
+          get: () => state.value,
+          getId: () => state.id,
+        })
+      }
+    );
+
+    expect(state.value).toBe(testState.value);
+    expect(getters.get()).toBe(testState.value);
+    actions.set(produce(s => s.value = !s.value));
+    expect(state.value).toBe(!testState.value);
+    expect(getters.get()).toBe(!testState.value);
+    expect(state.id).toBe(id);
+    expect(getters.getId()).toBe(id);
+  });
+
+});
+
