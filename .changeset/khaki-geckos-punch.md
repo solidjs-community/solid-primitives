@@ -9,3 +9,5 @@ Major API changes. Bump stage to 2.
 Add `getResolvedElements`, `resolveElements`, `getFirstChild` and `resolveFirst` primitives.
 
 Improve `mergeRefs` to allow an array of refs to be passed in.
+
+Ensure SSR support for `resolveElements` and `resolveFirst`.

@@ -85,7 +85,7 @@ import { children } from "solid-js";
 import { createSwitchTransition } from "@solid-primitives/transition-group";
 
 const resolved = children(() => props.children);
-const filtered = createMemo(() => resolved.asArray().find(el => el instanceof HTMLElement));
+const filtered = createMemo(() => resolved.toArray().find(el => el instanceof HTMLElement));
 return createSwitchTransition(filtered, {
   /*...*/
 });
@@ -166,8 +166,20 @@ import { children } from "solid-js";
 import { createListTransition } from "@solid-primitives/transition-group";
 
 const resolved = children(() => props.children);
-const filtered = createMemo(() => resolved.asArray().filter(el => el instanceof HTMLElement));
+const filtered = createMemo(() => resolved.toArray().filter(el => el instanceof HTMLElement));
 return createListTransition(filtered, {
+  /*...*/
+});
+```
+
+Or use a `resolveElements` helper from `@solid-primitives/refs`
+
+```ts
+import { resolveElements } from "@solid-primitives/refs";
+import { createSwitchTransition } from "@solid-primitives/transition-group";
+
+const resolved = resolveElements(() => props.children);
+return createListTransition(resolved, {
   /*...*/
 });
 ```
