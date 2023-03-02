@@ -1,5 +1,11 @@
 # @solid-primitives/transition-group
 
+## 0.0.1-beta.2
+
+### Patch Changes
+
+- Remove effects - change the rendered array and call transitions in a pure computation.
+
 ## 0.0.1-beta.1
 
 ### Patch Changes

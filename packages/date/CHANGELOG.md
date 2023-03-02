@@ -1,5 +1,12 @@
 # @solid-primitives/date
 
+## 2.0.9-beta.0
+
+### Patch Changes
+
+- Updated dependencies [d7b907e6]
+  - @solid-primitives/memo@1.2.0-beta.0
+
 ## 2.0.8
 
 ### Patch Changes
