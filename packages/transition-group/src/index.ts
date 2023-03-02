@@ -141,9 +141,6 @@ export function createSwitchTransition<T>(
 
       return el;
     },
-    // enabling appear always animates the initial element in
-    // otherwise the element won't be animated,
-    // or will animate the transition if the source is different from the initial value
     options.appear ? undefined : initSource,
   );
 

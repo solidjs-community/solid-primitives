@@ -11,16 +11,13 @@
   },
   "primitive": {
     "name": "refs",
-    "stage": 1,
+    "stage": 2,
     "list": [
       "mergeRefs",
+      "resolveElements",
+      "resolveFirst",
       "elements",
-      "refs",
-      "mapRemoved",
-      "Children",
-      "Refs",
-      "Ref",
-      "unmount"
+      "Children"
     ],
     "category": "Control Flow"
   },
@@ -56,7 +53,6 @@
   ],
   "dependencies": {
     "@solid-primitives/immutable": "^0.1.7",
-    "@solid-primitives/rootless": "^1.2.5",
     "@solid-primitives/utils": "^5.2.1"
   },
   "devDependencies": {

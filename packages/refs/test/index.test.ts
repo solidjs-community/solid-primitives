@@ -1,15 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createRoot, createSignal } from "solid-js";
 import { push, remove, removeItems } from "@solid-primitives/immutable";
-import {
-  elements,
-  getAddedItems,
-  getChangedItems,
-  getRemovedItems,
-  mapRemoved,
-  refs,
-  resolveElements,
-} from "../src";
+import { elements, resolveElements } from "../src";
 
 const el1 = document.createElement("div");
 const el2 = document.createElement("span");
