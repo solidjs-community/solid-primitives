@@ -17,9 +17,26 @@ export type TransitionMode = "out-in" | "in-out" | "parallel";
 export type OnTransition<T> = (el: T, done: () => void) => void;
 
 export type SwitchTransitionOptions<T> = {
+  /**
+   * a function to be called when a new element is entering. {@link OnTransition}
+   *
+   * It receives the element and a callback to be called when the transition is done.
+   */
   onEnter?: OnTransition<T>;
+  /**
+   * a function to be called when an exiting element is leaving. {@link OnTransition}
+   *
+   * It receives the element and a callback to be called when the transition is done.
+   * The element is kept in the DOM until the done() callback is called.
+   */
   onExit?: OnTransition<T>;
+  /**
+   * transition mode. {@link TransitionMode}
+   *
+   * Defaults to `"parallel"`. Other options are `"out-in"` and `"in-out"`.
+   */
   mode?: TransitionMode;
+  /** whether to run the transition on the initial elements. Defaults to `false` */
   appear?: boolean;
 };
 
@@ -31,11 +48,7 @@ export type SwitchTransitionOptions<T> = {
  *
  * @param source a signal with the current element. Any nullish value will mean there is no element.
  * Any object can used as the source, but most likely you will want to use a `HTMLElement` or `SVGElement`.
- * @param options transition options:
- * - `onEnter` - a function to be called when a new element is entering. It receives the element and a callback to be called when the transition is done.
- * - `onExit` - a function to be called when an exiting element is leaving. It receives the element and a callback to be called when the transition is done.
- * - `mode` - transition mode. Defaults to `"parallel"`. Other options are `"out-in"` and `"in-out"`.
- * - `appear` - whether to run the transition on the initial element. Defaults to `false`.
+ * @param options transition options {@link SwitchTransitionOptions}
  * @returns a signal with an array of the current element and exiting previous elements.
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/transition-group#createSwitchTransition
@@ -46,8 +59,8 @@ export type SwitchTransitionOptions<T> = {
  * const rendered = createSwitchTransition(el, {
  *   onEnter(el, done) {
  *     // the enter callback is called before the element is inserted into the DOM
- *     // so run the animation in the next animation frame
- *     requestAnimationFrame(() => { ... })
+ *     // so run the animation in the next animation frame / microtask
+ *     queueMicrotask(() => { ... })
  *   },
  *   onExit(el, done) {
  *     // the exitting element is kept in the DOM until the done() callback is called
@@ -187,10 +200,10 @@ export type ListTransitionOptions<T> = {
  * const [els, setEls] = createSignal<HTMLElement[]>([]);
  *
  * const rendered = createListTransition(els, {
- *   onChange({ added, removed, moved, finishRemoved }) {
+ *   onChange({ list, added, removed, unchanged, finishRemoved }) {
  *     // the callback is called before the added elements are inserted into the DOM
- *     // so run the animation in the next animation frame
- *     requestAnimationFrame(() => { ... })
+ *     // so run the animation in the next animation frame / microtask
+ *     queueMicrotask(() => { ... })
  *
  *     // the removed elements are kept in the DOM until the finishRemoved() callback is called
  *     finishRemoved(removed);

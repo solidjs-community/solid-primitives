@@ -41,8 +41,11 @@ It will observe the source and return a signal with array of elements to be rend
 - `options` transition options:
 
   - `onEnter` - a function to be called when a new element is entering. It receives the element and a callback to be called when the transition is done.
+
   - `onExit` - a function to be called when an exiting element is leaving. It receives the element and a callback to be called when the transition is done.
+
   - `mode` - transition mode. Defaults to `"parallel"`. Other options are `"out-in"` and `"in-out"`.
+
   - `appear` - whether to run the transition on the initial element. Defaults to `false`.
 
     If enabled, the initial element will still be included in the initial render (for SSR), but the transition fill happen when the first client-side effect is run. So to avoid the initial element to be visible, you can set the initial element's style to `display: none` and set it to `display: block` in the `onEnter` callback.
@@ -57,8 +60,8 @@ const [el, setEl] = createSignal<HTMLDivElement>();
 const rendered = createSwitchTransition(el, {
   onEnter(el, done) {
     // the enter callback is called before the element is inserted into the DOM
-    // so run the animation in the next animation frame
-    requestAnimationFrame(() => {
+    // so run the animation in the next animation frame / microtask
+    queueMicrotask(() => {
       /*...*/
     });
   },
@@ -69,6 +72,35 @@ const rendered = createSwitchTransition(el, {
 
 // change the source to trigger the transition
 setEl(refToHtmlElement);
+```
+
+### Resolving JSX
+
+Usually the source will be a JSX element, and you will want to resolve it to a DOM element before passing it to `createSwitchTransition`. It leaves the resolving to you, so you can do it in any way you want.
+
+For example, you can `children` helper from `solid-js`, to get the first found HTML element.
+
+```ts
+import { children } from "solid-js";
+import { createSwitchTransition } from "@solid-primitives/transition-group";
+
+const resolved = children(() => props.children);
+const filtered = createMemo(() => resolved.asArray().find(el => el instanceof HTMLElement));
+return createSwitchTransition(filtered, {
+  /*...*/
+});
+```
+
+Or use a `resolveFirst` helper from `@solid-primitives/refs`
+
+```ts
+import { resolveFirst } from "@solid-primitives/refs";
+import { createSwitchTransition } from "@solid-primitives/transition-group";
+
+const resolved = resolveFirst(() => props.children);
+return createSwitchTransition(resolved, {
+  /*...*/
+});
 ```
 
 ## `createListTransition`
@@ -88,9 +120,16 @@ It will observe the source and return a signal with array of elements to be rend
 - `options` transition options:
 
   - `onChange` - a function to be called when the list changes. It receives the list of added elements, removed elements, and moved elements. It also receives a callback to be called when the removed elements are finished animating (they can be removed from the DOM).
+
   - `appear` - whether to run the transition on the initial elements. Defaults to `false`.
 
-  If enabled, the initial elements will still be included in the initial render (for SSR), but the transition fill happen when the first client-side effect is run. So to avoid the initial elements to be visible, you can set the initial element's style to `display: none` and set it to `display: block` in the `onEnter` callback.
+  If enabled, the initial elements will still be included in the initial render (for SSR), but the transition fill happen when the first client-side effect is run. So to avoid the initial elements to be visible, you can set the initial element's style to `display: none` and set it to `display: block` in the `onChange` callback.
+
+  - `exitMethod` - This controls how the elements exit.
+
+    - `"remove"` removes the element immediately.
+    - `"move-to-end"` (default) will move elements which have exited to the end of the array.
+    - `"keep-index"` will splice them in at their previous index.
 
 Returns a signal with an array of the current elements and exiting previous elements.
 
@@ -100,10 +139,10 @@ import { createListTransition } from "@solid-primitives/transition-group";
 const [els, setEls] = createSignal<HTMLElement[]>([]);
 
 const rendered = createListTransition(els, {
-  onChange({ added, removed, moved, finishRemoved }) {
+  onChange({ list, added, removed, unchanged, finishRemoved }) {
     // the callback is called before the added elements are inserted into the DOM
-    // so run the animation in the next animation frame
-    requestAnimationFrame(() => {
+    // so run the animation in the next animation frame / microtask
+    queueMicrotask(() => {
       /*...*/
     });
 
@@ -114,6 +153,23 @@ const rendered = createListTransition(els, {
 
 // change the source to trigger the transition
 setEls([...refsToHTMLElements]);
+```
+
+### Resolving JSX
+
+Usually the source will be a JSX Element, and you will want to resolve it to a list of DOM elements before passing it to `createListTransition`. It leaves the resolving to you, so you can do it in any way you want.
+
+For example, you can `children` helper from `solid-js`, and filter out non-HTML elements:
+
+```ts
+import { children } from "solid-js";
+import { createListTransition } from "@solid-primitives/transition-group";
+
+const resolved = children(() => props.children);
+const filtered = createMemo(() => resolved.asArray().filter(el => el instanceof HTMLElement));
+return createListTransition(filtered, {
+  /*...*/
+});
 ```
 
 ## Demo
