@@ -55,6 +55,7 @@ const VersionBadge: ParentComponent<{ value: string; href: string }> = ({ value,
     <a
       class="h-[28px] min-w-[90px] flex justify-center items-baseline font-sans rounded-md border-[#cae0ff] bg-[#cae0ff40] border-2 hover:border-[#80a7de] hover:bg-[#cae0ff66] transition-colors dark:bg-[#6eaaff14] dark:border-[#5577a7] dark:hover:border-[#8ba8d3] dark:hover:bg-[#6eaaff33]"
       href={href}
+      rel="noopener"
       target="_blank"
     >
       <span class="text-[14px] font-semibold text-[#7689a4] dark:text-[#8b9eba]">v</span>
@@ -70,7 +71,7 @@ export const VersionBadgePill: ParentComponent<{ value: string; href: string }> 
   const version = createFetchVersion(value);
 
   return (
-    <a class="flex font-sans hover:contrast-[1.2] transition-filter" href={href} target="_blank">
+    <a class="flex font-sans hover:contrast-[1.2] transition-filter" href={href} target="_blank" rel="noopener">
       <div class="flex items-center rounded-l-lg h-[38px] border-[#cae0ff] px-4 border-[3px] bg-[#cae0ff40] dark:border-[#405b6e] dark:bg-[#2a4355]">
         NPM
       </div>

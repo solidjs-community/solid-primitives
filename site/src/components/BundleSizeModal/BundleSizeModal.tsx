@@ -102,7 +102,7 @@ const BundleSizeModal: Component<{
       <div>
         <p>
           Package and Primitive sizes calculated by{" "}
-          <a href="https://esbuild.github.io/" target="_blank">
+          <a href="https://esbuild.github.io/" target="_blank" rel="noopener">
             esbuild
           </a>
           .
