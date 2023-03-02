@@ -42,11 +42,11 @@ const getSizes = async ({}: { packageName: string }) => {};
 export const buildCategory = async ({
   name,
   pkg,
-  global
+  globalState,
 }: {
   name: string;
   pkg: PackageJSONData;
-  global: TUpdateSiteGlobal;
+  globalState: TUpdateSiteGlobal;
 }) => {
   const { list, category, stage } = pkg.primitive;
 
@@ -77,7 +77,7 @@ export const buildCategory = async ({
               const minifiedSize = formatBytes(result.minifiedSize).string;
               const gzippedSize = formatBytes(result.gzippedSize).string;
 
-              global.packageName[packageName] = {
+              globalState.packageName[packageName] = {
                 name: packageName,
                 gzippedSize,
                 minifiedSize
@@ -93,7 +93,7 @@ export const buildCategory = async ({
             const gzippedSize = formatBytes(result.gzippedSize);
 
             if (type === "export") {
-              global.primitives[primitiveName] = {
+              globalState.primitives[primitiveName] = {
                 packageName,
                 gzippedSize: gzippedSize.string,
                 minifiedSize: minifiedSize.string
@@ -136,7 +136,7 @@ export const buildCategory = async ({
   // .join("<br />");
   // Merge the package into the correct category
   let cat = category || "Misc";
-  categories[cat] = Array.isArray(categories[cat]) ? [...categories[cat], data] : [data];
+  categories[cat] = Array.isArray(categories[cat]) ? [...categories[cat]!, data] : [data];
 
   // build
 };

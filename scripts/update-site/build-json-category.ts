@@ -13,11 +13,11 @@ const item: {
 export const buildJSONCategory = async ({
   pkg,
   name,
-  global
+  globalState,
 }: {
   pkg: any;
   name: string;
-  global: TUpdateSiteGlobal;
+  globalState: TUpdateSiteGlobal;
 }) => {
   const pkgJSON = JSON.parse(JSON.stringify(pkg));
   const { description } = pkgJSON as { description: string };
@@ -29,7 +29,7 @@ export const buildJSONCategory = async ({
 
   pkgJSON.list = list;
 
-  if (list.length === 1 && list[0].match(/list of/gi)) {
+  if (list.length === 1 && list[0]!.match(/list of/gi)) {
     // get primitives from src directory
     const dir = r(`../packages/${name}/src/index.ts`);
     const indexFile = readFileSync(dir, "utf-8");
@@ -68,7 +68,7 @@ export const buildJSONCategory = async ({
     primitives
   });
 
-  if (list.length === 1 && list[0].match(/list of/gi)) {
+  if (list.length === 1 && list[0]!.match(/list of/gi)) {
     for (let primitive of primitives) {
       const result = await checkSizeOfPackage({
         type: "export",
@@ -78,7 +78,7 @@ export const buildJSONCategory = async ({
       const minifiedSize = formatBytes(result.minifiedSize).string;
       const gzippedSize = formatBytes(result.gzippedSize).string;
 
-      global.primitives[primitive] = {
+      globalState.primitives[primitive] = {
         packageName: name,
         gzippedSize,
         minifiedSize

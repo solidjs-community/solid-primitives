@@ -14,11 +14,11 @@ const items: { path: string; pageStr: string }[] = [];
 export const buildPage = async ({
   pkg,
   name,
-  global
+  globalState,
 }: {
   pkg: PackageJSONData;
   name: string;
-  global: TUpdateSiteGlobal;
+  globalState: TUpdateSiteGlobal;
 }) => {
   const dir = r(`../packages/${name}/README.md`);
   if (!existsSync(dir)) return;
@@ -30,9 +30,9 @@ export const buildPage = async ({
 
   readme = readme
     // remove heading-1
-    .replace(/#\s+.+\n/m, "")
+    .replace(/#\s+.+\n+/m, "")
     // remove solid img banner
-    .replace(/<p[^>]*>(?:\n|\s)+<img[^>]+\/?>(?:\n|\s)+<\/p>/, "")
+    .replace(/<p[^>]*>(?:\n+|\s+)+<img[^>]+\/?>(?:\n+|\s+)+<\/p>/, "")
     // remove stage, version, size ect img banners
     .replace(/^\[!\[\w+].+$/gm, "")
     // replace Installation with package install component
@@ -117,9 +117,9 @@ export const buildPage = async ({
   const packageList = JSON.stringify(
     [
       {
-        name: global.packageName[name].name,
-        gzipped: global.packageName[name].gzippedSize,
-        minified: global.packageName[name].minifiedSize
+        name: globalState.packageName[name]!.name,
+        gzipped: globalState.packageName[name]!.gzippedSize,
+        minified: globalState.packageName[name]!.minifiedSize
       }
     ]
     // Object.entries(global.packageName).map(([key, value]) => ({
@@ -129,7 +129,7 @@ export const buildPage = async ({
     // }))
   );
   const primitiveList = JSON.stringify(
-    Object.entries(global.primitives)
+    Object.entries(globalState.primitives)
       .filter(([key, value]) => {
         return value.packageName === name;
       })

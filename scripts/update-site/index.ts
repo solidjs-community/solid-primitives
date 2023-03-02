@@ -39,7 +39,7 @@ export type TUpdateSiteGlobal = {
     };
   };
 };
-const global: TUpdateSiteGlobal = {
+const globalState: TUpdateSiteGlobal = {
   packageName: {},
   primitives: {}
 };
@@ -65,9 +65,9 @@ const run = async () => {
       continue;
     }
 
-    await buildCategory({ name, pkg, global });
-    await buildJSONCategory({ name, pkg, global });
-    await buildPage({ name, pkg, global });
+    await buildCategory({ name, pkg, globalState });
+    await buildJSONCategory({ name, pkg, globalState });
+    await buildPage({ name, pkg, globalState: globalState });
   }
 
   writeJSONFile();
