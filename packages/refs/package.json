@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/refs",
-  "version": "0.3.7",
+  "version": "1.0.0",
   "description": "Library of primitives, components and directives for SolidJS that help managing references to JSX elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -11,16 +11,13 @@
   },
   "primitive": {
     "name": "refs",
-    "stage": 1,
+    "stage": 2,
     "list": [
       "mergeRefs",
-      "elements",
-      "refs",
-      "mapRemoved",
-      "Children",
-      "Refs",
+      "resolveElements",
+      "resolveFirst",
       "Ref",
-      "unmount"
+      "Refs"
     ],
     "category": "Control Flow"
   },
@@ -30,21 +27,53 @@
     "dist"
   ],
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
   "types": "./dist/index.d.ts",
-  "browser": {},
+  "browser": {
+    "./dist/server.js": "./dist/index.js",
+    "./dist/server.cjs": "./dist/index.cjs"
+  },
   "exports": {
+    "worker": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": "./dist/server.cjs"
+    },
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
     "require": "./dist/index.cjs"
   },
+  "typesVersions": {},
   "scripts": {
     "dev": "vite serve dev",
     "page": "vite build dev",
-    "build": "jiti ../../scripts/build.ts",
+    "build": "jiti ../../scripts/build.ts --ssr",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
@@ -55,16 +84,14 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/immutable": "^0.1.7",
-    "@solid-primitives/rootless": "^1.2.5",
-    "@solid-primitives/utils": "^5.2.1"
+    "@solid-primitives/utils": "^5.4.0"
   },
   "devDependencies": {
     "solid-app-router": "^0.4.2",
-    "solid-transition-group": "^0.0.13"
+    "solid-transition-group": "^0.0.13",
+    "@solid-primitives/immutable": "^0.1.8"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
-  },
-  "typesVersions": {}
+  }
 }

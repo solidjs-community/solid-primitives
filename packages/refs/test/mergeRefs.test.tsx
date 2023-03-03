@@ -1,10 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createRoot, onMount } from "solid-js";
-import { mergeRefs } from "../src";
-
-interface ButtonProps {
-  ref?: HTMLButtonElement | ((el: HTMLButtonElement) => void);
-}
+import { mergeRefs, RefProps } from "../src";
 
 describe("mergeRefs", () => {
   test("passes ref to props and local var", () =>
@@ -12,7 +8,7 @@ describe("mergeRefs", () => {
       let local!: HTMLButtonElement;
       let forwared!: HTMLButtonElement;
 
-      const Button = (props: ButtonProps) => {
+      const Button = (props: RefProps<HTMLButtonElement>) => {
         return <button ref={mergeRefs(el => (local = el), props.ref)} />;
       };
 

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/connectivity",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "description": "A navigator.onLine signal.",
   "author": "Klemen Slavič <krof.drakula@gmail.com>",
   "contributors": [
@@ -83,9 +83,9 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/event-listener": "^2.2.7",
-    "@solid-primitives/rootless": "^1.2.5",
-    "@solid-primitives/utils": "^5.2.1"
+    "@solid-primitives/event-listener": "^2.2.8",
+    "@solid-primitives/rootless": "^1.2.6",
+    "@solid-primitives/utils": "^5.4.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

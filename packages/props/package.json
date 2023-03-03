@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/props",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Library of primitives focused around component props.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -49,7 +49,7 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^5.3.0"
+    "@solid-primitives/utils": "workspace:^5.4.0"
   },
   "devDependencies": {
     "nanospy": "^0.5.0"

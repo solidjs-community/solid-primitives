@@ -1,5 +1,19 @@
 # @solid-primitives/controlled-props
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0
+
+## 0.0.7-beta.0
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0-beta.0
+
 ## 0.0.6
 
 ### Patch Changes

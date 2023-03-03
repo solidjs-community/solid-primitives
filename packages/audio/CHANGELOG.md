@@ -1,5 +1,19 @@
 # @solid-primitives/audio
 
+## 1.3.9
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0
+
+## 1.3.9-beta.0
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0-beta.0
+
 ## 1.3.8
 
 ### Patch Changes
