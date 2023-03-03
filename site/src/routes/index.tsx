@@ -2,8 +2,13 @@ import { Title } from "solid-start";
 import PrimitivesTable from "~/components/Primitives/PrimitivesTable";
 import HomeSections from "~/components/Home/HomeSections";
 import { NoHydration } from "solid-js/web";
+import onPreMount from "~/hooks/onPreMount";
 
 export default function Home() {
+  onPreMount(() => {
+    document.documentElement.classList.remove("primitives-page-main");
+  });
+
   return (
     <main class="pt-[60px]">
       <Title>Solid Primitives</Title>
@@ -39,70 +44,22 @@ export default function Home() {
             xmlns="http://www.w3.org/2000/svg"
           >
             <g style="transform: scale(1.26) translate(-27px, 12px); transform-origin: center;">
-              <use
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(75 -27)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(115 -2)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(64 19)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(113 12)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(98 19)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(16 -21)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(1 3)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(17 12)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(62 -18)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(49 -7.5)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(34 1)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(78 -8)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(64 1)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(49 9.5)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(93.3 0.5)"
-              />
-              <use 
-                href="#solid-blocks-header-cluster-e"
-                transform="translate(79 9.5)"
-              />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(75 -27)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(115 -2)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(64 19)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(113 12)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(98 19)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(16 -21)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(1 3)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(17 12)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(62 -18)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(49 -7.5)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(34 1)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(78 -8)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(64 1)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(49 9.5)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(93.3 0.5)" />
+              <use href="#solid-blocks-header-cluster-e" transform="translate(79 9.5)" />
             </g>
           </svg>
           {/* <img
