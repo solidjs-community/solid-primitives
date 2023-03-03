@@ -37,7 +37,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/keyboard" name="keyboard" stage={1} packageList={[{"name":"keyboard","gzipped":"1.08 KB","minified":"2.38 KB"}]} primitiveList={[{"name":"useCurrentlyHeldKey","gzipped":"685 B","minified":"1.33 KB"},{"name":"useKeyDownSequence","gzipped":"666 B","minified":"1.29 KB"},{"name":"createKeyHold","gzipped":"745 B","minified":"1.5 KB"},{"name":"createShortcut","gzipped":"946 B","minified":"1.98 KB"},{"name":"useKeyDownList","gzipped":"625 B","minified":"1.19 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/keyboard" name="keyboard" stage={1} packageList={[{"name":"keyboard","gzipped":"1.06 KB","minified":"2.38 KB"}]} primitiveList={[{"name":"useCurrentlyHeldKey","gzipped":"665 B","minified":"1.33 KB"},{"name":"useKeyDownSequence","gzipped":"646 B","minified":"1.29 KB"},{"name":"createKeyHold","gzipped":"725 B","minified":"1.5 KB"},{"name":"createShortcut","gzipped":"926 B","minified":"1.98 KB"},{"name":"useKeyDownList","gzipped":"605 B","minified":"1.19 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

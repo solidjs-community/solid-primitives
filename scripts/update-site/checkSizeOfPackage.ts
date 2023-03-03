@@ -37,9 +37,10 @@ export { ${primitiveName} } from "./packages/${packageName}/src/index"
     external: ["solid-js", "node-fetch"]
   });
 
+  const gzipHeadersAndMetadataSize = 20 // 20 bytes
   const buffer = readFileSync(outFile);
   const minifiedSize = buffer.toString().length;
-  const gzippedSize = gzipSizeSync(buffer);
+  const gzippedSize = gzipSizeSync(buffer) - gzipHeadersAndMetadataSize;
   if (type === "export") {
     rmSync(packageExportFilePath);
   }

@@ -28,7 +28,7 @@ const BundleSizeModal: Component<{
     () => [theadEl],
     ({ height }) => {
       setTheadHeight(height);
-    }
+    },
   );
   createIntersectionObserver(
     target,
@@ -38,7 +38,7 @@ const BundleSizeModal: Component<{
         setShowShadow(isIntersecting);
       });
     },
-    { rootMargin: "0px 0px -100%", threshold: 0 }
+    { rootMargin: "0px 0px -100%", threshold: 0 },
   );
 
   const fitFont = () => {
@@ -63,7 +63,7 @@ const BundleSizeModal: Component<{
         const span = el.querySelector("[data-primitive-span]") as HTMLElement;
         return {
           span: span,
-          spanBCR: span.getBoundingClientRect()
+          spanBCR: span.getBoundingClientRect(),
         };
       })
       .filter(({ spanBCR }) => {
@@ -204,6 +204,16 @@ const BundleSizeModal: Component<{
           </table>
         </div>
       </div>
+      <p>
+        <a
+          class=" anchor-tag text-sm dark:opacity-60 hover:opacity-100"
+          href="https://jvns.ca/blog/2013/10/23/day-15-how-gzip-works/"
+          target="_blank"
+          rel="noopener"
+        >
+          Gzip headers and metadata not included (~20 bytes)
+        </a>
+      </p>
     </div>
   );
 };

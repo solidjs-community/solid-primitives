@@ -36,7 +36,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/timer" name="timer" stage={3} packageList={[{"name":"timer","gzipped":"550 B","minified":"1.13 KB"}]} primitiveList={[{"name":"createTimer","gzipped":"391 B","minified":"702 B"},{"name":"createTimeoutLoop","gzipped":"267 B","minified":"397 B"},{"name":"createPolled","gzipped":"449 B","minified":"829 B"},{"name":"createIntervalCounter","gzipped":"479 B","minified":"890 B"},{"name":"makeTimer","gzipped":"183 B","minified":"223 B"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/timer" name="timer" stage={3} packageList={[{"name":"timer","gzipped":"530 B","minified":"1.13 KB"}]} primitiveList={[{"name":"createTimer","gzipped":"371 B","minified":"702 B"},{"name":"createTimeoutLoop","gzipped":"247 B","minified":"397 B"},{"name":"createPolled","gzipped":"429 B","minified":"829 B"},{"name":"createIntervalCounter","gzipped":"459 B","minified":"890 B"},{"name":"makeTimer","gzipped":"163 B","minified":"223 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

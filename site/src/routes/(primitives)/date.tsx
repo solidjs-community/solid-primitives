@@ -37,7 +37,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/date" name="date" stage={3} packageList={[{"name":"date","gzipped":"1.89 KB","minified":"4.17 KB"}]} primitiveList={[{"name":"createDateNow","gzipped":"519 B","minified":"1.01 KB"},{"name":"createTimeDifference","gzipped":"574 B","minified":"1.1 KB"},{"name":"createTimeDifferenceFromNow","gzipped":"1.01 KB","minified":"2.13 KB"},{"name":"createTimeAgo","gzipped":"1.6 KB","minified":"3.47 KB"},{"name":"createCountdown","gzipped":"700 B","minified":"1.35 KB"},{"name":"createCountdownFromNow","gzipped":"1.14 KB","minified":"2.41 KB"},{"name":"createDate","gzipped":"517 B","minified":"974 B"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/date" name="date" stage={3} packageList={[{"name":"date","gzipped":"1.86 KB","minified":"4.17 KB"}]} primitiveList={[{"name":"createDateNow","gzipped":"499 B","minified":"1.01 KB"},{"name":"createTimeDifference","gzipped":"554 B","minified":"1.1 KB"},{"name":"createTimeDifferenceFromNow","gzipped":"994 B","minified":"2.13 KB"},{"name":"createTimeAgo","gzipped":"1.58 KB","minified":"3.47 KB"},{"name":"createCountdown","gzipped":"680 B","minified":"1.35 KB"},{"name":"createCountdownFromNow","gzipped":"1.12 KB","minified":"2.41 KB"},{"name":"createDate","gzipped":"497 B","minified":"974 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

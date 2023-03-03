@@ -37,7 +37,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/scroll" name="scroll" stage={2} packageList={[{"name":"scroll","gzipped":"1.05 KB","minified":"2.18 KB"}]} primitiveList={[{"name":"useWindowScrollPosition","gzipped":"922 B","minified":"1.81 KB"},{"name":"createScrollPosition","gzipped":"808 B","minified":"1.56 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/scroll" name="scroll" stage={2} packageList={[{"name":"scroll","gzipped":"1.03 KB","minified":"2.18 KB"}]} primitiveList={[{"name":"useWindowScrollPosition","gzipped":"902 B","minified":"1.81 KB"},{"name":"createScrollPosition","gzipped":"788 B","minified":"1.56 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

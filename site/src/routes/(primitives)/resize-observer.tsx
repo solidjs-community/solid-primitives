@@ -37,7 +37,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/resize-observer" name="resize-observer" stage={3} packageList={[{"name":"resize-observer","gzipped":"1.35 KB","minified":"2.96 KB"}]} primitiveList={[{"name":"createWindowSize","gzipped":"684 B","minified":"1.29 KB"},{"name":"createElementSize","gzipped":"1.06 KB","minified":"2.18 KB"},{"name":"createResizeObserver","gzipped":"673 B","minified":"1.23 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/resize-observer" name="resize-observer" stage={3} packageList={[{"name":"resize-observer","gzipped":"1.33 KB","minified":"2.96 KB"}]} primitiveList={[{"name":"createWindowSize","gzipped":"664 B","minified":"1.29 KB"},{"name":"createElementSize","gzipped":"1.04 KB","minified":"2.18 KB"},{"name":"createResizeObserver","gzipped":"653 B","minified":"1.23 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

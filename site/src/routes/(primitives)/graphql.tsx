@@ -36,7 +36,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/graphql" name="graphql" stage={3} packageList={[{"name":"graphql","gzipped":"4.69 KB","minified":"14.09 KB"}]} primitiveList={[{"name":"createGraphQLClient","gzipped":"4.33 KB","minified":"13.12 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/graphql" name="graphql" stage={3} packageList={[{"name":"graphql","gzipped":"4.67 KB","minified":"14.09 KB"}]} primitiveList={[{"name":"createGraphQLClient","gzipped":"4.31 KB","minified":"13.12 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

@@ -33,7 +33,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/fullscreen" name="fullscreen" stage={3} packageList={[{"name":"fullscreen","gzipped":"337 B","minified":"562 B"}]} primitiveList={[{"name":"createFullscreen","gzipped":"337 B","minified":"562 B"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/fullscreen" name="fullscreen" stage={3} packageList={[{"name":"fullscreen","gzipped":"317 B","minified":"562 B"}]} primitiveList={[{"name":"createFullscreen","gzipped":"317 B","minified":"562 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

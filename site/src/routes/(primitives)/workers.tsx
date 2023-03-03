@@ -29,7 +29,7 @@ function MDXContent(props = {}) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/workers" name="workers" stage={0} packageList={[{"name":"workers","gzipped":"1.19 KB","minified":"2.12 KB"}]} primitiveList={[{"name":"createWorkerPool","gzipped":"1.08 KB","minified":"1.87 KB"},{"name":"createSignaledWorker","gzipped":"1.05 KB","minified":"1.79 KB"},{"name":"createWorker","gzipped":"946 B","minified":"1.57 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/workers" name="workers" stage={0} packageList={[{"name":"workers","gzipped":"1.17 KB","minified":"2.12 KB"}]} primitiveList={[{"name":"createWorkerPool","gzipped":"1.06 KB","minified":"1.87 KB"},{"name":"createSignaledWorker","gzipped":"1.03 KB","minified":"1.79 KB"},{"name":"createWorker","gzipped":"926 B","minified":"1.57 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

@@ -37,7 +37,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/event-bus" name="event-bus" stage={2} packageList={[{"name":"event-bus","gzipped":"1.07 KB","minified":"2.28 KB"}]} primitiveList={[{"name":"createEmitter","gzipped":"368 B","minified":"657 B"},{"name":"createEventHub","gzipped":"458 B","minified":"732 B"},{"name":"createEventStack","gzipped":"570 B","minified":"1.01 KB"},{"name":"createEventBus","gzipped":"294 B","minified":"443 B"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/event-bus" name="event-bus" stage={2} packageList={[{"name":"event-bus","gzipped":"1.05 KB","minified":"2.28 KB"}]} primitiveList={[{"name":"createEmitter","gzipped":"348 B","minified":"657 B"},{"name":"createEventHub","gzipped":"438 B","minified":"732 B"},{"name":"createEventStack","gzipped":"550 B","minified":"1.01 KB"},{"name":"createEventBus","gzipped":"274 B","minified":"443 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

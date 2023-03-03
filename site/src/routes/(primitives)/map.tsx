@@ -38,7 +38,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/map" name="map" stage={2} packageList={[{"name":"map","gzipped":"692 B","minified":"1.98 KB"}]} primitiveList={[{"name":"ReactiveWeakMap","gzipped":"623 B","minified":"1.82 KB"},{"name":"ReactiveMap","gzipped":"591 B","minified":"1.39 KB"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/map" name="map" stage={2} packageList={[{"name":"map","gzipped":"672 B","minified":"1.98 KB"}]} primitiveList={[{"name":"ReactiveWeakMap","gzipped":"603 B","minified":"1.82 KB"},{"name":"ReactiveMap","gzipped":"571 B","minified":"1.39 KB"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

@@ -35,7 +35,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/trigger" name="trigger" stage={1} packageList={[{"name":"trigger","gzipped":"489 B","minified":"844 B"}]} primitiveList={[{"name":"createTriggerCache","gzipped":"382 B","minified":"567 B"},{"name":"createTrigger","gzipped":"279 B","minified":"445 B"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/trigger" name="trigger" stage={1} packageList={[{"name":"trigger","gzipped":"469 B","minified":"844 B"}]} primitiveList={[{"name":"createTriggerCache","gzipped":"362 B","minified":"567 B"},{"name":"createTrigger","gzipped":"259 B","minified":"445 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )

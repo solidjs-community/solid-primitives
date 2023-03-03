@@ -35,7 +35,7 @@ function _missingMdxReference(id, component) {
 
 export default function Index () {
   return (
-    <PrimitivePageMain packageName="@solid-primitives/transition-group" name="transition-group" stage={1} packageList={[{"name":"transition-group","gzipped":"863 B","minified":"1.59 KB"}]} primitiveList={[{"name":"createListTransition","gzipped":"623 B","minified":"1.05 KB"},{"name":"createSwitchTransition","gzipped":"451 B","minified":"690 B"}]}>
+    <PrimitivePageMain packageName="@solid-primitives/transition-group" name="transition-group" stage={1} packageList={[{"name":"transition-group","gzipped":"843 B","minified":"1.59 KB"}]} primitiveList={[{"name":"createListTransition","gzipped":"603 B","minified":"1.05 KB"},{"name":"createSwitchTransition","gzipped":"431 B","minified":"690 B"}]}>
       <MDXContent/>
     </PrimitivePageMain>
   )
