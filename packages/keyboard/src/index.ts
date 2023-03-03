@@ -62,7 +62,11 @@ export const useKeyDownList = /*#__PURE__*/ createSharedRoot<
   makeEventListener(window, "keyup", e => {
     if (typeof e.key !== "string") return;
     const key = e.key.toUpperCase();
-    setPressedKeys(prev => prev.filter(_key => _key !== key));
+    if (key === "META") {
+      setPressedKeys([]);
+    } else {
+      setPressedKeys(prev => prev.filter(_key => _key !== key));
+    }
   });
 
   makeEventListener(window, "blur", reset);
