@@ -2,11 +2,11 @@
   <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=store" alt="Solid Primitives store">
 </p>
 
-# @solid-primitives/store
+# @solid-primitives/flux-store
 
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/store?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/store)
-[![version](https://img.shields.io/npm/v/@solid-primitives/store?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/store)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/flux-store?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/flux-store)
+[![version](https://img.shields.io/npm/v/@solid-primitives/flux-store?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/flux-store)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A primitive to help with the creation, access and mutation of a state store via SolidJS `Provider`, `Context` and `Store`:
@@ -16,11 +16,11 @@ A primitive to help with the creation, access and mutation of a state store via 
 ## Installation
 
 ```bash
-npm install @solid-primitives/store
+npm install @solid-primitives/flux-store
 # or
-yarn add @solid-primitives/store
+yarn add @solid-primitives/flux-store
 # or
-pnpm add @solid-primitives/store
+pnpm add @solid-primitives/flux-store
 ```
 
 ## `createStoreFactory`
@@ -49,16 +49,16 @@ pnpm add @solid-primitives/store
 
 ```ts
 // `counter-store.ts`
-import { createStoreFactory } from "@solid-primitives/store";
+import { createStoreFactory } from "@solid-primitives/flux-store";
 const [CounterProvider, { useStore: useCounterStore }] = createStoreFactory(
   {
-    value: 5
+    value: 5,
   },
   (state, setState) => ({
     count: () => state.value,
     increment: () => setState(val => ({ value: val.value + 1 })),
-    reset: () => setState({ value: 0 })
-  })
+    reset: () => setState({ value: 0 }),
+  }),
 );
 export { CounterProvider, useCounterStore };
 ```

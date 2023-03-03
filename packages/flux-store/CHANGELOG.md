@@ -1,4 +1,4 @@
-# @solid-primitives/store
+# @solid-primitives/flux-store
 
 ## 0.0.100
 
