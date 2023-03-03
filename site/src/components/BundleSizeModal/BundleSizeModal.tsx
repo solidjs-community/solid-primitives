@@ -211,7 +211,7 @@ const BundleSizeModal: Component<{
           target="_blank"
           rel="noopener"
         >
-          Gzip headers and metadata not included (~20 bytes)
+          GZip headers and metadata not included (~20 bytes)
         </a>
       </p>
     </div>
