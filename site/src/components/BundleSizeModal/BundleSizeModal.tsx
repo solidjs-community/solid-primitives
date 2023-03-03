@@ -112,7 +112,7 @@ const BundleSizeModal: Component<{
           <div class="absolute top-0 left-0 right-0 bottom-0 border-[#e5ecf3] border-2 rounded-xl pointer-events-none dark:border-[#2b455a] z-1"></div>
           <table class="w-full my-4" style="border-collapse: separate; border-spacing: 2px 2px;">
             <thead>
-              <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#dee2e5]">
+              <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#b7c1d0]">
                 <For each={packageThHeaders}>
                   {item => (
                     <th class="p-1 text-center text-xs xxs:text-sm md:px-3 md:text-base">{item}</th>
@@ -166,7 +166,7 @@ const BundleSizeModal: Component<{
               classList={{ "top-[-2px]": isSafari || isIOS, "top-0": !(isSafari || isIOS) }}
               ref={theadEl}
             >
-              <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#dee2e5]">
+              <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#b7c1d0]">
                 <For each={primitiveThHeaders}>
                   {item => (
                     <th class="p-1 md:px-3 text-center text-xs xxs:text-sm md:text-base">{item}</th>

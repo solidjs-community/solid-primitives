@@ -16,15 +16,15 @@ const Content = () => {
   const items = [
     {
       stage: "X",
-      description: "Deprecated or rejected"
+      description: "Deprecated or rejected",
     },
     {
       stage: "0",
-      description: "Initial Submission"
+      description: "Initial Submission",
     },
     {
       stage: "1",
-      description: "Demonstrations and examples"
+      description: "Demonstrations and examples",
     },
     {
       stage: "2",
@@ -32,7 +32,7 @@ const Content = () => {
         <>
           General use <span class="opacity-60">(experimental)</span>
         </>
-      )
+      ),
     },
     {
       stage: "3",
@@ -40,12 +40,12 @@ const Content = () => {
         <>
           Pre-shipping <span class="opacity-60">(final effort)</span>
         </>
-      )
+      ),
     },
     {
       stage: "4",
-      description: "Accepted/Shipped"
-    }
+      description: "Accepted/Shipped",
+    },
   ];
   return (
     <div>
@@ -53,7 +53,7 @@ const Content = () => {
         <div class="absolute top-0 left-0 right-0 bottom-0 border-[#e5ecf3] border-2 rounded-xl pointer-events-none dark:border-[#2b455a]"></div>
         <table class="w-full my-4" style="border-collapse: separate; border-spacing: 2px 2px;">
           <thead>
-            <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#dee2e5]">
+            <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#b7c1d0]">
               <th class="p-2 pb-1 text-center">Stage</th>
               <th class="p-2 pb-1">Description</th>
             </tr>
