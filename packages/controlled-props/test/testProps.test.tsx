@@ -59,7 +59,7 @@ describe("createControlledProp", () => {
       const languages = ["de", "en", "it", "pl"];
       const [value, setValue, field] = createControlledProp("value", {
         initialValue: "en",
-        options: languages
+        options: languages,
       });
       expect(value()).toBe("en");
       setValue("pl");
@@ -81,11 +81,11 @@ describe("createControlledProp", () => {
         Zero,
         One,
         Two,
-        Three
+        Three,
       }
       const [value, setValue, field] = createControlledProp("enum", {
         initialValue: Test.Two,
-        options: Test
+        options: Test,
       });
       expect(value()).toBe(Test.Two);
       setValue(Test.One);
@@ -108,14 +108,14 @@ describe("createControlledProp", () => {
         Zero,
         One,
         Two,
-        Three
+        Three,
       }
       const [props, fields] = createControlledProps({
         boolean: true,
         number: 42,
         string: "text",
         array: { initialValue: "en", options: languages },
-        enum: { initialValue: Test.Three, options: Test }
+        enum: { initialValue: Test.Three, options: Test },
       });
       expect(props.boolean()).toBe(true);
       expect(props.number()).toBe(42);

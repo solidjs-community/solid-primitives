@@ -7,7 +7,7 @@ declare module "solid-js" {
     interface Directives {
       createFullscreen: (
         ref?: HTMLElement,
-        active?: Accessor<FullscreenOptions | boolean>
+        active?: Accessor<FullscreenOptions | boolean>,
       ) => Accessor<boolean>;
     }
   }
@@ -19,7 +19,7 @@ export type E = JSX.Element;
 export const createFullscreen = (
   ref: HTMLElement | undefined,
   active?: Accessor<FullscreenOptions | boolean>,
-  options?: FullscreenOptions
+  options?: FullscreenOptions,
 ): Accessor<boolean> => {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (isServer) {

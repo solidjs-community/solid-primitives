@@ -1,5 +1,11 @@
 # @solid-primitives/fetch
 
+## 2.4.4
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 2.4.3
 
 ### Patch Changes

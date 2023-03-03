@@ -15,7 +15,7 @@ declare module "solid-js" {
 function getPointersDistance(activeEvents: PointerEvent[]) {
   return Math.hypot(
     activeEvents[0]!.clientX - activeEvents[1]!.clientX,
-    activeEvents[0]!.clientY - activeEvents[1]!.clientY
+    activeEvents[0]!.clientY - activeEvents[1]!.clientY,
   );
 }
 

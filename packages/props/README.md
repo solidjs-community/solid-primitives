@@ -65,13 +65,26 @@ Chained functions will always return `void`. If you want to get the returned val
 const combined = combineProps(
   {
     onClick: e => {},
-    onclick: e => {}
+    onclick: e => {},
   },
   {
-    onClick: [(n, e) => {}, 123]
-  }
+    onClick: [(n, e) => {}, 123],
+  },
 );
 // combined.onClick() will call all 3 of the functions above
+```
+
+The default order of execution is left-to-right. If you want to change it, you can use an options object as the last argument: (`reverseEventHandlers: true`)
+
+```ts
+const combined = combineProps(
+  // props need to be passed in an array
+  [{ onClick: () => console.log("parent") }, { onClick: () => console.log("child") }],
+  {
+    reverseEventHandlers: true,
+  },
+);
+combined.onClick(); // "child" "parent"
 ```
 
 ##### For better reference of how exactly `combineProps` works, see the [TESTS](https://github.com/solidjs-community/solid-primitives/blob/main/packages/props/test/combineProps.test.ts)
@@ -92,7 +105,7 @@ styles; // { margin: "24px", border: "1px solid #121212" }
 ```ts
 const styles = combineStyle("margin: 24px; border: 1px solid #121212", {
   margin: "2rem",
-  padding: "16px"
+  padding: "16px",
 });
 styles; // { margin: "2rem", border: "1px solid #121212", padding: "16px" }
 ```

@@ -138,7 +138,7 @@ describe("createModifier", () => {
       }, true);
 
       const returns = createCompositeEffect(
-        modifier1(modifier2(count, initialCB, { val2: 2 }), { val1: 1 })
+        modifier1(modifier2(count, initialCB, { val2: 2 }), { val1: 1 }),
       );
 
       expect(returns.test_return1).toBe("1");

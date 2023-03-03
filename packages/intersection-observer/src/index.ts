@@ -7,11 +7,11 @@ export type RemoveIntersectionObserverEntry = (el: Element) => void;
 
 export type EntryCallback = (
   entry: IntersectionObserverEntry,
-  instance: IntersectionObserver
+  instance: IntersectionObserver,
 ) => void;
 export type AddViewportObserverEntry = (
   el: Element,
-  callback: MaybeAccessor<EntryCallback>
+  callback: MaybeAccessor<EntryCallback>,
 ) => void;
 export type RemoveViewportObserverEntry = (el: Element) => void;
 
@@ -22,7 +22,7 @@ export type CreateViewportObserverReturnValue = [
     start: () => void;
     stop: () => void;
     instance: IntersectionObserver;
-  }
+  },
 ];
 
 declare module "solid-js" {
@@ -57,7 +57,7 @@ export type E = JSX.Element;
 export function makeIntersectionObserver(
   elements: Element[],
   onChange: IntersectionObserverCallback,
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ): {
   add: AddIntersectionObserverEntry;
   remove: RemoveIntersectionObserverEntry;
@@ -73,7 +73,7 @@ export function makeIntersectionObserver(
       start: () => void 0,
       reset: () => void 0,
       stop: () => void 0,
-      instance: {} as unknown as IntersectionObserver
+      instance: {} as unknown as IntersectionObserver,
     };
 
   const instance = new IntersectionObserver(onChange, options);
@@ -83,7 +83,7 @@ export function makeIntersectionObserver(
       // eslint-disable-next-line no-console
       console.warn(
         `[@solid-primitives/intersection-observer/makeIntersectionObserver] IntersectionObserver is not able to observe elements with 'display: "contents"' style:`,
-        el
+        el,
       );
       return;
     }
@@ -118,7 +118,7 @@ export function makeIntersectionObserver(
 export function createIntersectionObserver(
   elements: Accessor<Element[]>,
   onChange: IntersectionObserverCallback,
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ): void {
   if (process.env.SSR) return;
   const { add, reset } = makeIntersectionObserver([], onChange, options);
@@ -151,16 +151,16 @@ export function createIntersectionObserver(
 export function createViewportObserver(
   elements: MaybeAccessor<Element[]>,
   callback: EntryCallback,
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ): CreateViewportObserverReturnValue;
 
 export function createViewportObserver(
   initial: MaybeAccessor<[Element, EntryCallback][]>,
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ): CreateViewportObserverReturnValue;
 
 export function createViewportObserver(
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ): CreateViewportObserverReturnValue;
 
 export function createViewportObserver(...a: any) {
@@ -203,7 +203,7 @@ export function createViewportObserver(...a: any) {
 
 export type VisibilitySetter<Ctx extends {} = {}> = (
   entry: IntersectionObserverEntry,
-  context: Ctx & { visible: boolean }
+  context: Ctx & { visible: boolean },
 ) => boolean;
 
 /**
@@ -232,7 +232,7 @@ export function createVisibilityObserver(
   options?: IntersectionObserverInit & {
     initialValue?: boolean;
   },
-  setter?: MaybeAccessor<VisibilitySetter>
+  setter?: MaybeAccessor<VisibilitySetter>,
 ): (element: Accessor<Element | FalsyValue> | Element) => Accessor<boolean> {
   if (process.env.SSR) {
     return () => () => false;
@@ -245,7 +245,7 @@ export function createVisibilityObserver(
     (entries, instance) => {
       entries.forEach(entry => callbacks.get(entry.target)?.(entry, instance));
     },
-    options
+    options,
   );
 
   function removeEntry(el: Element) {
@@ -289,7 +289,7 @@ export enum Occurrence {
   Entering = "Entering",
   Leaving = "Leaving",
   Inside = "Inside",
-  Outside = "Outside"
+  Outside = "Outside",
 }
 
 /**
@@ -297,7 +297,7 @@ export enum Occurrence {
  */
 export function getOccurrence(
   isIntersecting: boolean,
-  prevIsIntersecting: boolean | undefined
+  prevIsIntersecting: boolean | undefined,
 ): Occurrence {
   if (process.env.SSR) {
     return Occurrence.Outside;
@@ -327,7 +327,7 @@ export function getOccurrence(
  * ```
  */
 export function withOccurrence<Ctx extends {}>(
-  setter: MaybeAccessor<VisibilitySetter<Ctx & { occurrence: Occurrence }>>
+  setter: MaybeAccessor<VisibilitySetter<Ctx & { occurrence: Occurrence }>>,
 ): () => VisibilitySetter<Ctx> {
   if (process.env.SSR) {
     return () => () => false;
@@ -348,13 +348,13 @@ export function withOccurrence<Ctx extends {}>(
 export enum DirectionX {
   Left = "Left",
   Right = "Right",
-  None = "None"
+  None = "None",
 }
 
 export enum DirectionY {
   Top = "Top",
   Bottom = "Bottom",
-  None = "None"
+  None = "None",
 }
 
 /**
@@ -364,12 +364,12 @@ export enum DirectionY {
 export function getDirection(
   rect: DOMRectReadOnly,
   prevRect: DOMRectReadOnly | undefined,
-  intersecting: boolean
+  intersecting: boolean,
 ): { directionX: DirectionX; directionY: DirectionY } {
   if (process.env.SSR) {
     return {
       directionX: DirectionX.None,
-      directionY: DirectionY.None
+      directionY: DirectionY.None,
     };
   }
   let directionX = DirectionX.None;
@@ -403,7 +403,7 @@ export function getDirection(
 export function withDirection<Ctx extends {}>(
   callback: MaybeAccessor<
     VisibilitySetter<Ctx & { directionX: DirectionX; directionY: DirectionY }>
-  >
+  >,
 ): () => VisibilitySetter<Ctx> {
   if (process.env.SSR) {
     return () => () => false;

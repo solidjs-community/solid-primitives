@@ -64,7 +64,7 @@ export const StringProp: Component<TestPropProps<string>> = props => (
 );
 
 const filterEnum = <O extends Record<string, any>>(
-  options: O
+  options: O,
 ): [key: string, value: number | string][] => {
   const entries = Object.entries(options);
   if (Object.keys(options).every(key => key === options[options[key] as keyof O].toString())) {
@@ -81,12 +81,12 @@ const filterEnum = <O extends Record<string, any>>(
 };
 
 export const SelectProp = <T extends any>(
-  props: TestPropProps<T> & { options: TestPropObjectOptions<T> }
+  props: TestPropProps<T> & { options: TestPropObjectOptions<T> },
 ): JSX.Element => {
   const options = createMemo<[boolean | number | string, T][]>(() =>
     Array.isArray(props.options)
       ? props.options.map((option: any) => [option, option])
-      : filterEnum(props.options)
+      : filterEnum(props.options),
   );
   const initialValue = options().findIndex(([, value]) => value === props.value());
   return (
@@ -109,7 +109,7 @@ const defaultInitialValues: Record<TestPropType & string, boolean | number | str
   boolean: false,
   number: 0,
   string: "",
-  object: undefined
+  object: undefined,
 };
 
 /**
@@ -130,23 +130,23 @@ const defaultInitialValues: Record<TestPropType & string, boolean | number | str
  */
 export function createControlledProp<T extends undefined>(
   name: string,
-  options?: TestPropOptions<T>
+  options?: TestPropOptions<T>,
 ): TestPropReturn<T>;
 export function createControlledProp<T = boolean>(
   name: string,
-  options: TestPropOptions<T> | T
+  options: TestPropOptions<T> | T,
 ): TestPropReturn<T>;
 export function createControlledProp<T = number>(
   name: string,
-  options: TestPropOptions<T> | T
+  options: TestPropOptions<T> | T,
 ): TestPropReturn<T>;
 export function createControlledProp<T = string>(
   name: string,
-  options: TestPropOptions<T> | T
+  options: TestPropOptions<T> | T,
 ): TestPropReturn<T>;
 export function createControlledProp<T = any>(
   name: string,
-  options: TestPropOptions<T>
+  options: TestPropOptions<T>,
 ): TestPropReturn<T>;
 export function createControlledProp<T>(
   name: string,
@@ -154,11 +154,11 @@ export function createControlledProp<T>(
     ? never
     : T extends object
     ? TestPropOptions<T>
-    : TestPropOptions<T> | T
+    : TestPropOptions<T> | T,
 ): TestPropReturn<T>;
 export function createControlledProp<T>(
   name: string,
-  options?: TestPropOptions<T> | T
+  options?: TestPropOptions<T> | T,
 ): TestPropReturn<T> {
   const initialValue: T | undefined =
     options == null
@@ -195,17 +195,17 @@ export function createControlledProp<T>(
             setValue: setValue,
             options:
               (options as TestPropOptions<T>).options ??
-              ([initialValue] as TestPropObjectOptions<T>)
-          })
+              ([initialValue] as TestPropObjectOptions<T>),
+          }),
   ];
 }
 
 export type CreateTestProps = <
   Props extends {
     [name: string]: boolean | number | string | TestPropOptions<boolean | number | string | object>;
-  }
+  },
 >(
-  props: Props
+  props: Props,
 ) => [
   props: {
     [name in keyof Props]: Accessor<
@@ -228,7 +228,7 @@ export type CreateTestProps = <
         : Props[name]
     >;
   },
-  fields: JSX.Element[]
+  fields: JSX.Element[],
 ];
 
 /**
@@ -267,5 +267,5 @@ export const createControlledProps: CreateTestProps = props =>
       result[1].push(field({}));
       return result;
     },
-    [{} as any, [] as JSX.Element[]]
+    [{} as any, [] as JSX.Element[]],
   );

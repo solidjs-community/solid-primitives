@@ -3,21 +3,21 @@ export const dict = {
     hello: "bonjour {{ name }}, comment vas-tu ?",
     goodbye: ({ name }: { name: string }) => `au revoir ${name}`,
     food: {
-      meat: "viande"
-    }
+      meat: "viande",
+    },
   },
   en: {
     hello: "hello {{ name }}, how are you?",
     goodbye: ({ name }: { name: string }) => `goodbye ${name}`,
     food: {
-      meat: "meat"
-    }
+      meat: "meat",
+    },
   },
   es: {
     hello: "hola {{ name }}, como usted?",
     goodbye: ({ name }: { name: string }) => `adios ${name}`,
     food: {
-      meat: "carne"
-    }
-  }
+      meat: "carne",
+    },
+  },
 };

@@ -12,7 +12,7 @@ const headings: Record<TimelinesKeys, string> = {
   deb: "Debounce",
   ldeb: "Leading Debounce",
   thr: "Throttle",
-  lthr: "Leading Throttle"
+  lthr: "Leading Throttle",
 };
 
 const getEmptyTieline = () => Array.from({ length: LENGTH }, () => false);
@@ -21,7 +21,7 @@ const getEmptyTimelines = (): Record<TimelinesKeys, boolean[]> => ({
   deb: getEmptyTieline(),
   ldeb: getEmptyTieline(),
   thr: getEmptyTieline(),
-  lthr: getEmptyTieline()
+  lthr: getEmptyTieline(),
 });
 
 const Timeline: Component = () => {
@@ -32,7 +32,7 @@ const Timeline: Component = () => {
       return p;
     },
     TRANSITION,
-    0
+    0,
   );
   const isCurrent = createSelector(current);
 
@@ -73,7 +73,7 @@ const Timeline: Component = () => {
                   <div
                     class={`h-10vh bg-white rounded-sm transition-opacity duration-${TRANSITION}`}
                     style={{
-                      opacity: state() ? 1 : isCurrent(index) ? 0.2 : 0.05
+                      opacity: state() ? 1 : isCurrent(index) ? 0.2 : 0.05,
                     }}
                   ></div>
                 )}

@@ -26,7 +26,7 @@ import { createStore } from "solid-js/store";
 export function deepReadObject<T = any>(
   obj: Record<string, unknown>,
   path: string,
-  defaultValue?: unknown
+  defaultValue?: unknown,
 ): T {
   const value = path
     .trim()
@@ -55,7 +55,7 @@ export function deepReadObject<T = any>(
 const template = (
   str: string,
   params: Record<string, string>,
-  reg: RegExp = /{{([^{}]+)}}/g
+  reg: RegExp = /{{([^{}]+)}}/g,
 ): any => str.replace(reg, (_, key) => deepReadObject(params, key, ""));
 
 /**
@@ -70,14 +70,14 @@ export const createI18nContext = (
   init: Record<string, Record<string, any>> = {},
   lang: string = typeof navigator !== "undefined" && navigator.language in init
     ? navigator.language
-    : Object.keys(init)[0] ?? ""
+    : Object.keys(init)[0] ?? "",
 ): [
   template: (key: string, params?: Record<string, string>, defaultValue?: string) => any,
   actions: {
     add(lang: string, table: Record<string, any>): void;
     locale: (lang?: string) => string;
     dict: (lang: string) => Record<string, Record<string, any>>;
-  }
+  },
 ] => {
   const [locale, setLocale] = createSignal(lang);
   const [dict, setDict] = createStore(init);
@@ -111,7 +111,7 @@ export const createI18nContext = (
   const translate = (
     key: string,
     params?: Record<string, string>,
-    defaultValue?: string
+    defaultValue?: string,
   ): string => {
     const val = deepReadObject(dict[locale()]!, key, defaultValue || "");
     if (typeof val === "function") return val(params);
@@ -160,7 +160,7 @@ export const createI18nContext = (
      *
      * @param lang {string} - The language to retrieve from
      */
-    dict: (lang: string) => deepReadObject(dict, lang)
+    dict: (lang: string) => deepReadObject(dict, lang),
   };
   return [translate, actions as any];
 };

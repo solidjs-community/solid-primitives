@@ -40,13 +40,13 @@ export const createSocialShare = (
   }> = () => ({
     url: "",
     title: "",
-    description: ""
+    description: "",
   }),
-  controller: Window = process.env.SSR ? (globalThis as any) : window
+  controller: Window = process.env.SSR ? (globalThis as any) : window,
 ): [
   share: (network: Network | undefined) => void,
   close: () => void,
-  isSharing: Accessor<boolean>
+  isSharing: Accessor<boolean>,
 ] => {
   if (process.env.SSR) {
     return [
@@ -56,7 +56,7 @@ export const createSocialShare = (
       () => {
         /*noop*/
       },
-      () => false
+      () => false,
     ];
   }
   const [isSharing, setIsSharing] = createSignal(false);
@@ -67,7 +67,7 @@ export const createSocialShare = (
     width: 436,
     popupLeft: 0,
     popupRight: 0,
-    popupTop: 0
+    popupTop: 0,
   };
   if (options().popup) {
     popup = { ...popup, ...options().popup };
@@ -144,7 +144,7 @@ export const createSocialShare = (
         ",screenX=" +
         popup.popupLeft +
         ",screenY=" +
-        popup.popupTop
+        popup.popupTop,
     );
     // If popup are prevented (AdBlocker, Mobile App context..), popup.window stays undefined and we can't display it
     if (!popupWindow) return;

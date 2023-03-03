@@ -166,7 +166,7 @@ export const useKeyDownSequence = /*#__PURE__*/ createSharedRoot<Accessor<string
  */
 export function createKeyHold(
   key: KbdKey,
-  options: { preventDefault?: boolean } = {}
+  options: { preventDefault?: boolean } = {},
 ): Accessor<boolean> {
   if (process.env.SSR) {
     return () => false;
@@ -211,7 +211,7 @@ export function createShortcut(
   options: {
     preventDefault?: boolean;
     requireReset?: boolean;
-  } = {}
+  } = {},
 ): void {
   if (process.env.SSR || !keys.length) {
     return;

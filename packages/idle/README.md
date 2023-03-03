@@ -32,7 +32,7 @@ const App: Component = () => {
   const { isIdle, isPrompted, reset } = createIdleTimer({
     onIdle: logout,
     idleTimeout: 300_000,
-    promptTimeout: 60_000
+    promptTimeout: 60_000,
   });
   return (
     <Switch fallback={<ClientPage />}>

@@ -49,17 +49,17 @@ export function createJSXParser<T>(options?: { name: string }): JSXParser<T> {
 export function createToken<P extends { [key: string]: any }, T extends Tokens, Tokens>(
   parser: JSXParser<Tokens>,
   tokenData: (props: P) => Narrow<T>,
-  render?: (props: P) => JSX.Element
+  render?: (props: P) => JSX.Element,
 ): (props: P) => JSX.Element;
 export function createToken<T>(
   parser: JSXParser<T>,
   tokenData?: undefined,
-  render?: (props: T) => JSX.Element
+  render?: (props: T) => JSX.Element,
 ): (props: T) => JSX.Element;
 export function createToken<T>(
   parser: JSXParser<T>,
   tokenData?: (props: T) => T,
-  render?: (props: T) => JSX.Element
+  render?: (props: T) => JSX.Element,
 ): (props: T) => JSX.Element {
   return (props: T) => {
     const token = (
@@ -69,7 +69,7 @@ export function createToken<T>(
             process.env.DEV &&
               // eslint-disable-next-line no-console
               console.warn(
-                `Tokens can only be rendered inside a Parser "${parser.id.description}"`
+                `Tokens can only be rendered inside a Parser "${parser.id.description}"`,
               );
             return "";
           }
@@ -84,7 +84,7 @@ function resolveChildren(
   resolved: unknown[],
   children: unknown,
   symbol: symbol,
-  addElements: boolean
+  addElements: boolean,
 ): any[] {
   // function
   if (typeof children === "function" && !children.length) {
@@ -115,17 +115,17 @@ function resolveChildren(
 export function resolveTokens<T>(
   parser: JSXParser<T>,
   fn: Accessor<JSX.Element>,
-  addElements: true
+  addElements: true,
 ): Accessor<(TokenElement<T> | ResolvedJSXElement)[]>;
 export function resolveTokens<T>(
   parser: JSXParser<T>,
   fn: Accessor<JSX.Element>,
-  addElements?: boolean
+  addElements?: boolean,
 ): Accessor<T[]>;
 export function resolveTokens<T>(
   parser: JSXParser<T>,
   fn: Accessor<JSX.Element>,
-  addElements = false
+  addElements = false,
 ): Accessor<(TokenElement<T> | ResolvedJSXElement)[] | T[]> {
   const children = createMemo(fn);
   return createMemo(() => resolveChildren([], children(), parser.id, addElements));
@@ -139,7 +139,7 @@ export function resolveTokens<T>(
  */
 export function isToken<T>(
   parser: JSXParser<T>,
-  value: unknown | TokenElement<T>
+  value: unknown | TokenElement<T>,
 ): value is TokenElement<T> {
   return typeof value === "function" && parser.id in value;
 }

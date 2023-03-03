@@ -1,5 +1,5 @@
 import { JSX, mergeProps, MergeProps } from "solid-js";
-import { access, AnyObject, chain, MaybeAccessor } from "@solid-primitives/utils";
+import { access, chain, reverseChain, MaybeAccessor } from "@solid-primitives/utils";
 import { propTraps } from "./propTraps";
 
 const extractCSSregex = /([^:; ]*):\s*([^;]*)/g;
@@ -32,11 +32,11 @@ export function combineStyle(a: string, b: string): string;
 export function combineStyle(a: JSX.CSSProperties, b: JSX.CSSProperties): JSX.CSSProperties;
 export function combineStyle(
   a: JSX.CSSProperties | string,
-  b: JSX.CSSProperties | string
+  b: JSX.CSSProperties | string,
 ): JSX.CSSProperties;
 export function combineStyle(
   a: JSX.CSSProperties | string,
-  b: JSX.CSSProperties | string
+  b: JSX.CSSProperties | string,
 ): JSX.CSSProperties | string {
   if (typeof a === "object" && typeof b === "object") return { ...a, ...b };
   if (typeof a === "string" && typeof b === "string") return `${a};${b}`;
@@ -53,12 +53,12 @@ type PropsInput = {
   classList?: Record<string, boolean | undefined>;
   style?: JSX.CSSProperties | string;
   ref?: Element | ((el: any) => void);
-} & AnyObject;
+} & Record<string, any>;
 
 const reduce = <K extends keyof PropsInput>(
   sources: MaybeAccessor<PropsInput>[],
   key: K,
-  calc: (a: NonNullable<PropsInput[K]>, b: NonNullable<PropsInput[K]>) => PropsInput[K]
+  calc: (a: NonNullable<PropsInput[K]>, b: NonNullable<PropsInput[K]>) => PropsInput[K],
 ) => {
   let v: PropsInput[K] = undefined;
   for (const props of sources) {
@@ -67,6 +67,15 @@ const reduce = <K extends keyof PropsInput>(
     else if (propV) v = calc(v, propV);
   }
   return v;
+};
+
+export type CombinePropsOptions = {
+  /**
+   * by default the event handlers will be called left-to-right,
+   * following the order of the sources.
+   * If this option is set to true, the handlers will be called right-to-left.
+   */
+  reverseEventHandlers?: boolean;
 };
 
 /**
@@ -87,8 +96,25 @@ const reduce = <K extends keyof PropsInput>(
  * <MyButton style={{ margin: "24px" }} />
  * ```
  */
-export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: T): MergeProps<T> {
+export function combineProps<T extends [] | MaybeAccessor<PropsInput>[]>(
+  sources: T,
+  options?: CombinePropsOptions,
+): MergeProps<T>;
+export function combineProps<T extends [] | MaybeAccessor<PropsInput>[]>(
+  ...sources: T
+): MergeProps<T>;
+export function combineProps<T extends MaybeAccessor<PropsInput>[]>(
+  ...args: T | [sources: T, options?: CombinePropsOptions]
+): MergeProps<T> {
+  const restArgs = Array.isArray(args[0]);
+  const sources = (restArgs ? args[0] : args) as T;
+
   if (sources.length === 1) return sources[0] as MergeProps<T>;
+
+  const chainFn =
+    restArgs && (args[1] as CombinePropsOptions | undefined)?.reverseEventHandlers
+      ? reverseChain
+      : chain;
 
   // create a map of event listeners to be chained
   const listeners: Record<string, ((...args: any[]) => void)[]> = {};
@@ -135,13 +161,13 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: 
             const cb = access(props)[key] as ((el: any) => void) | undefined;
             if (typeof cb === "function") callbacks.push(cb);
           }
-          return chain(callbacks);
+          return chainFn(callbacks);
         }
 
         // Chain event listeners
         if (key[0] === "o" && key[1] === "n" && key[2]) {
           const callbacks = listeners[key.toLowerCase()];
-          return callbacks ? chain(callbacks) : Reflect.get(merge, key);
+          return callbacks ? chainFn(callbacks) : Reflect.get(merge, key);
         }
 
         // Merge classes or classNames
@@ -158,9 +184,9 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(...sources: 
       },
       keys() {
         return Object.keys(merge);
-      }
+      },
     },
-    propTraps
+    propTraps,
   ) as any;
 }
 

@@ -1,5 +1,11 @@
 # @solid-primitives/script-loader
 
+## 2.0.1
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 2.0.0
 
 ### Major Changes

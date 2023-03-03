@@ -16,7 +16,7 @@ const App: Component = () => {
         console.log(e.x, e.y);
         setData2(`${e.x}, ${e.y}`);
       },
-      { passive: true }
+      { passive: true },
     );
     // ref.addEventListener("lostpointercapture", e => {
     //   console.log("lost");

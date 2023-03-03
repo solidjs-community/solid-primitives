@@ -6,12 +6,12 @@ const exampleElements = [
   document.createElement("p"),
   document.createElement("li"),
   document.createElement("button"),
-  document.createElement("img")
+  document.createElement("img"),
 ];
 
 const createMockMutationRecord = (
   target: Node = exampleElements[Math.floor(Math.random() * exampleElements.length)],
-  type: MutationRecordType = "childList"
+  type: MutationRecordType = "childList",
 ): MutationRecord => {
   return {
     addedNodes: (Math.random() > 0.5
@@ -26,7 +26,7 @@ const createMockMutationRecord = (
       ? [exampleElements[Math.floor(Math.random() * exampleElements.length)]]
       : []) as any,
     target,
-    type
+    type,
   };
 };
 

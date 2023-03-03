@@ -7,7 +7,7 @@ export type EventListenerStackOn<EventMap extends Record<string, any>> = {
   <T extends keyof EventMap>(
     type: T,
     handler: (event: EventMap[T]) => void,
-    options?: EventListenerOptions
+    options?: EventListenerOptions,
   ): VoidFunction;
 };
 
@@ -27,21 +27,21 @@ export type EventListenerStackOn<EventMap extends Record<string, any>> = {
 // DOM Events
 export function makeEventListenerStack<
   Target extends TargetWithEventMap,
-  EventMap extends EventMapOf<Target>
+  EventMap extends EventMapOf<Target>,
 >(
   target: Target,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): [listen: EventListenerStackOn<EventMap>, clear: VoidFunction];
 
 // Custom Events
 export function makeEventListenerStack<EventMap extends Record<string, Event>>(
   target: EventTarget,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): [listen: EventListenerStackOn<EventMap>, clear: VoidFunction];
 
 export function makeEventListenerStack(
   target: EventTarget,
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): [listen: EventListenerStackOn<Record<string, Event>>, clear: VoidFunction] {
   if (process.env.SSR) {
     return [() => () => void 0, () => void 0];
@@ -53,6 +53,6 @@ export function makeEventListenerStack(
       push(clear);
       return clear;
     },
-    onCleanup(execute)
+    onCleanup(execute),
   ];
 }

@@ -32,7 +32,7 @@ export const trackGoogleAnalytics: TrackHandler = (event, data) => {
         hitType: "social",
         socialNetwork: data.network,
         socialAction: data.action,
-        socialTarget: data.target
+        socialTarget: data.target,
       });
       break;
     case EventType.Event:
@@ -41,7 +41,7 @@ export const trackGoogleAnalytics: TrackHandler = (event, data) => {
         eventAction: data.action,
         eventLabel: data.label,
         eventValue: data.value,
-        ...data.other
+        ...data.other,
       });
       break;
   }

@@ -53,7 +53,7 @@ const [data, { refetch }] = newQuery(
       }
     }
   `,
-  { path: "home" }
+  { path: "home" },
 );
 ```
 
@@ -82,7 +82,7 @@ const [countries] = newQuery<{ countries: { name: string }[] }>(
         code
       }
     }
-  `
+  `,
 );
 countries(); // T: { countries: { name: string }[] } | undefined
 ```
@@ -104,7 +104,7 @@ const [countries] = newQuery<{ countries: { name: string }[] }>(
   // no variables
   undefined,
   // the initial value
-  { countries: [] }
+  { countries: [] },
 );
 countries(); // T: { countries: { name: string }[] }
 ```
@@ -125,8 +125,8 @@ const [data] = query(
   `,
   // function returning an object
   () => ({
-    code: code()
-  })
+    code: code(),
+  }),
 );
 ```
 
@@ -148,8 +148,8 @@ const result = multipartRequest(
     }
   `,
   {
-    variables: { caption: "A nice image", file: inputElement.files[0] }
-  }
+    variables: { caption: "A nice image", file: inputElement.files[0] },
+  },
 );
 ```
 

@@ -10,7 +10,7 @@ const Counter: Component<{ timer: typeof setTimeout | typeof setInterval }> = pr
   const [paused, setPaused] = createSignal(false);
   const increment = () => setCount(count() + 1);
   createEffect(
-    () => (key(), (setCount(0), createTimer(increment, () => !paused() && delay(), props.timer)))
+    () => (key(), (setCount(0), createTimer(increment, () => !paused() && delay(), props.timer))),
   );
   return (
     <div class="wrapper-v">

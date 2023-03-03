@@ -15,7 +15,7 @@ import type { EffectCallback, StopEffect } from "./types";
  */
 export const stoppable = createModifier<void, { stop: StopEffect }, true>(
   (s, callback, o, stop) => [callback, { stop }],
-  true
+  true,
 );
 
 /**
@@ -32,9 +32,9 @@ export const once = createModifier<void, {}, true>(
       stop();
       return callback(...a);
     },
-    {}
+    {},
   ],
-  true
+  true,
 );
 
 /**
@@ -129,8 +129,8 @@ export const pausable = createModifier<
         if (typeof v !== "undefined") toggle(v);
         else toggle(p => !p);
         return active();
-      }
-    }
+      },
+    },
   ];
 });
 

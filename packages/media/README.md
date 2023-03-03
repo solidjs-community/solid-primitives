@@ -72,7 +72,7 @@ import { createBreakpoints } from "@solid-primitives/media";
 const breakpoints = {
   sm: "640px",
   lg: "1024px",
-  xl: "1280px"
+  xl: "1280px",
 };
 
 const Example: Component = () => {
@@ -90,7 +90,7 @@ const Example: Component = () => {
         "text-tiny flex flex-column": true, // tiny text with flex column layout
         "text-small": matches.sm, // small text with flex column layout
         "text-base flex-row": matches.lg, // base text with flex row layout
-        "text-huge": matches.xl // huge text with flex row layout
+        "text-huge": matches.xl, // huge text with flex row layout
       }}
     >
       <Switch fallback={<div>Smallest</div>}>

@@ -27,7 +27,7 @@ export function mapRange<T>(
   getTo: Accessor<number>,
   getStep: Accessor<number>,
   mapFn: (n: number) => T,
-  options: { fallback?: Accessor<T> } = {}
+  options: { fallback?: Accessor<T> } = {},
 ): Accessor<T[]> {
   let disposers: VoidFunction[] = [],
     items: T[] = [],
@@ -156,7 +156,7 @@ export function Range<T>(
   props: RangeProps & {
     fallback?: T;
     children: ((number: number) => T) | T;
-  }
+  },
 ): Accessor<T[]> {
   let start: Accessor<number>, to: Accessor<number>, step: Accessor<number>;
   if ("to" in props) {

@@ -131,14 +131,14 @@ import { createEventHub } from "@solid-primitives/event-bus";
 const hub = createEventHub({
   busA: createEventBus(),
   busB: createEventBus<string>(),
-  busC: createEventStack<{ text: string }>()
+  busC: createEventStack<{ text: string }>(),
 });
 
 // by passing a function
 const hub = createEventHub(bus => ({
   busA: bus<number>(),
   busB: bus<string>(),
-  busC: createEventStack<{ text: string }>()
+  busC: createEventStack<{ text: string }>(),
 }));
 
 // hub can be destructured
@@ -151,7 +151,7 @@ const { busA, busB, on, emit, listen, value } = hub;
 const hub = createEventHub({
   busA: createEventBus<void>(),
   busB: createEventBus<string>(),
-  busC: createEventStack<{ text: string }>()
+  busC: createEventStack<{ text: string }>(),
 });
 // can be destructured
 const { busA, busB, on, listen, emit } = hub;

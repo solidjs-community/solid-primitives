@@ -24,7 +24,7 @@ export function useTrackPages(id?: string) {
   const [store, setStore] = createStore<TPage>({
     id: pageId,
     count: 1,
-    pages: { [pageId]: true }
+    pages: { [pageId]: true },
   });
 
   let intervalId: number = 0;
@@ -42,14 +42,14 @@ export function useTrackPages(id?: string) {
           prev.pages = { ...prev.pages, ...ids, [id]: true };
         }
         prev.count = Object.keys(prev.pages).length;
-      })
+      }),
     );
 
     if (state === "open") {
       postMessage({
         id: pageId,
         state: "open::success",
-        ids: JSON.parse(JSON.stringify(store.pages))
+        ids: JSON.parse(JSON.stringify(store.pages)),
       });
     }
     if (state === "open::success") {
@@ -70,7 +70,7 @@ export function useTrackPages(id?: string) {
     e => {
       postMessage({ id: pageId, state: "close" });
     },
-    false
+    false,
   );
 
   return store;

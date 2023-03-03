@@ -30,7 +30,7 @@ describe("createPagination", () => {
         "9",
         "10",
         ">",
-        ">|"
+        ">|",
       ]);
       expect(paginationProps().findIndex(({ ["aria-current"]: current }) => current)).toBe(2);
       setPage(page() + 1);
@@ -42,7 +42,7 @@ describe("createPagination", () => {
     createRoot(dispose => {
       const [paginationProps, _page, _setPage] = createPagination({
         pages: 10,
-        maxPages: 13
+        maxPages: 13,
       });
       const extraProps = 4;
       expect(paginationProps().length, "pages").toBe(10 + extraProps);
@@ -55,7 +55,7 @@ describe("createPagination", () => {
         showFirst: false,
         showPrev: false,
         showNext: false,
-        showLast: false
+        showLast: false,
       };
       const [options, setOptions] = createSignal({ ...commonOptions, pages: 3 });
       const [paginationProps, _page, _setPage] = createPagination(options);
@@ -88,7 +88,7 @@ describe("createInfiniteScroll", () => {
 
             run++;
             return "";
-          }
+          },
         });
       });
     });

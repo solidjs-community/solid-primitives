@@ -1,5 +1,11 @@
 # @solid-primitives/timer
 
+## 1.3.6
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 1.3.5
 
 ### Patch Changes

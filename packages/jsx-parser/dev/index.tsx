@@ -45,27 +45,27 @@ const Value = createToken(
   parser,
   (props: Props) => ({
     props,
-    id: "Value"
+    id: "Value",
   }),
-  props => <>{props.value}</>
+  props => <>{props.value}</>,
 );
 
 const Add = createToken(
   parser,
   (props: Props) => ({
     props,
-    id: "Add"
+    id: "Add",
   }),
-  props => <> + {props.value}</>
+  props => <> + {props.value}</>,
 );
 
 const Subtract = createToken(
   parser,
   (props: Props) => ({
     props,
-    id: "Subtract"
+    id: "Subtract",
   }),
-  props => <> - {props.value}</>
+  props => <> - {props.value}</>,
 );
 
 const App: Component = () => {

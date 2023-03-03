@@ -28,7 +28,7 @@ function createFileUploader(options?: FileUploaderOptions): FileUploader {
       files: () => [],
       selectFiles: noop,
       removeFile: noop,
-      clearFiles: noop
+      clearFiles: noop,
     };
   }
   const [files, setFiles] = createSignal<UploadFile[]>([]);
@@ -83,7 +83,7 @@ function createFileUploader(options?: FileUploaderOptions): FileUploader {
     files,
     selectFiles,
     removeFile,
-    clearFiles
+    clearFiles,
   };
 }
 

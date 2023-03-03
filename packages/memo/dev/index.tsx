@@ -1,7 +1,7 @@
 /* @refresh reload */
 import { Component, lazy } from "solid-js";
 import { render } from "solid-js/web";
-import { Router, Routes, Route, Link } from "solid-app-router";
+import { Router, Routes, Route, Link } from "@solidjs/router";
 import "uno.css";
 
 const Lazy = lazy(() => import("./lazy"));
@@ -9,7 +9,7 @@ const LazySuspense = lazy(() => import("./lazy-suspense"));
 const Async = lazy(() => import("./async"));
 const Grouped = lazy(() => import("./grouped"));
 const Cache = lazy(() => import("./cache"));
-const Writable = lazy(() => import("./writable"));
+const Writable = lazy(() => import("./writable-page"));
 
 const App: Component = () => {
   return (

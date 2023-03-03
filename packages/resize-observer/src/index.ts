@@ -4,7 +4,7 @@ import {
   Many,
   MaybeAccessor,
   handleDiffArray,
-  createStaticStore
+  createStaticStore,
 } from "@solid-primitives/utils";
 import { createSharedRoot } from "@solid-primitives/rootless";
 import { makeEventListener } from "@solid-primitives/event-listener";
@@ -12,7 +12,7 @@ import { makeEventListener } from "@solid-primitives/event-listener";
 export type ResizeHandler = (
   rect: DOMRectReadOnly,
   element: Element,
-  entry: ResizeObserverEntry
+  entry: ResizeObserverEntry,
 ) => void;
 
 /**
@@ -24,7 +24,7 @@ export type ResizeHandler = (
  */
 export function makeResizeObserver<T extends Element>(
   callback: ResizeObserverCallback,
-  options?: ResizeObserverOptions
+  options?: ResizeObserverOptions,
 ): {
   observe: (ref: T) => void;
   unobserve: (ref: T) => void;
@@ -32,14 +32,14 @@ export function makeResizeObserver<T extends Element>(
   if (process.env.SSR) {
     return {
       observe: () => {},
-      unobserve: () => {}
+      unobserve: () => {},
     };
   }
   const resizeObserver = new ResizeObserver(callback);
   onCleanup(resizeObserver.disconnect.bind(resizeObserver));
   return {
     observe: ref => resizeObserver.observe(ref, options),
-    unobserve: resizeObserver.unobserve.bind(resizeObserver)
+    unobserve: resizeObserver.unobserve.bind(resizeObserver),
   };
 }
 
@@ -61,7 +61,7 @@ export function makeResizeObserver<T extends Element>(
 export function createResizeObserver(
   targets: MaybeAccessor<Many<Element>>,
   onResize: ResizeHandler,
-  options?: ResizeObserverOptions
+  options?: ResizeObserverOptions,
 ): void {
   if (process.env.SSR) return;
 
@@ -98,7 +98,7 @@ export function createResizeObserver(
   }
 
   createEffect(
-    on(refs, (current, prev = []) => handleDiffArray(current, prev, observe, unobserve))
+    on(refs, (current, prev = []) => handleDiffArray(current, prev, observe, unobserve)),
   );
 }
 
@@ -112,7 +112,7 @@ export function getWindowSize(): {
   if (process.env.SSR) return { width: 0, height: 0 };
   return {
     width: window.innerWidth,
-    height: window.innerHeight
+    height: window.innerHeight,
   };
 }
 
@@ -156,7 +156,7 @@ export const useWindowSize: typeof createWindowSize =
  * @returns object with width and height dimensions of provided {@link target} element.
  */
 export function getElementSize(
-  target: Element | false | undefined | null
+  target: Element | false | undefined | null,
 ): { width: number; height: number } | { width: null; height: null } {
   if (process.env.SSR || !target) return { width: null, height: null };
 
@@ -179,7 +179,7 @@ export function createElementSize(target: Element): {
   readonly height: number;
 };
 export function createElementSize(
-  target: Accessor<Element | false | undefined | null>
+  target: Accessor<Element | false | undefined | null>,
 ):
   | { readonly width: number; readonly height: number }
   | { readonly width: null; readonly height: null };
@@ -197,7 +197,7 @@ export function createElementSize(target: Accessor<Element | false | undefined |
       : (() => {
           onMount(() => setSize(getElementSize(target())));
           return { width: null, height: null };
-        })()
+        })(),
   );
   const updateSize = (e: DOMRectReadOnly) => setSize({ width: e.width, height: e.height });
   createResizeObserver(typeof target === "function" ? () => target() || [] : target, updateSize);

@@ -9,7 +9,7 @@ const [CounterProvider, useCounter] = createContextProvider((props: { initial: n
 
   return {
     count,
-    increment
+    increment,
   };
 });
 

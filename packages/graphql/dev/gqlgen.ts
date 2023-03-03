@@ -151,9 +151,9 @@ export const CountryQueryDocument = {
           variable: { kind: "Variable", name: { kind: "Name", value: "code" } },
           type: {
             kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } }
-          }
-        }
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
       ],
       selectionSet: {
         kind: "SelectionSet",
@@ -165,18 +165,18 @@ export const CountryQueryDocument = {
               {
                 kind: "Argument",
                 name: { kind: "Name", value: "code" },
-                value: { kind: "Variable", name: { kind: "Name", value: "code" } }
-              }
+                value: { kind: "Variable", name: { kind: "Name", value: "code" } },
+              },
             ],
             selectionSet: {
               kind: "SelectionSet",
-              selections: [{ kind: "Field", name: { kind: "Name", value: "name" } }]
-            }
-          }
-        ]
-      }
-    }
-  ]
+              selections: [{ kind: "Field", name: { kind: "Name", value: "name" } }],
+            },
+          },
+        ],
+      },
+    },
+  ],
 } as unknown as DocumentNode<CountryQueryQuery, CountryQueryQueryVariables>;
 export const CountriesQueryDocument = {
   kind: "Document",
@@ -195,12 +195,12 @@ export const CountriesQueryDocument = {
               kind: "SelectionSet",
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "name" } },
-                { kind: "Field", name: { kind: "Name", value: "code" } }
-              ]
-            }
-          }
-        ]
-      }
-    }
-  ]
+                { kind: "Field", name: { kind: "Name", value: "code" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
 } as unknown as DocumentNode<CountriesQueryQuery, CountriesQueryQueryVariables>;

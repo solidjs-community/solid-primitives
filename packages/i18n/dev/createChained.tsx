@@ -17,7 +17,7 @@ const useI18nContext = () => {
 
   return [
     () => i18n.dictionaries[i18n.locale()],
-    { locale: i18n.locale, setLocale: i18n.setLocale }
+    { locale: i18n.locale, setLocale: i18n.setLocale },
   ] as const;
 };
 

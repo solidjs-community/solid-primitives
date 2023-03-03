@@ -61,7 +61,7 @@ export type CursorProperty =
  */
 export function createElementCursor(
   target: Accessor<HTMLElement | FalsyValue> | HTMLElement,
-  cursor: MaybeAccessor<CursorProperty>
+  cursor: MaybeAccessor<CursorProperty>,
 ): void {
   if (process.env.SSR) return;
 

@@ -2,7 +2,7 @@
   <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=JSX%20Parser" alt="Solid Primitives JSX Parser">
 </p>
 
-# @solid-primitives/parser
+# @solid-primitives/jsx-parser
 
 A primitive to extend the types of values JSX can return. These JSX-elements are named `tokens`.
 
@@ -61,11 +61,11 @@ const TokenExample = createToken(
     const value = Math.random();
     return {
       props,
-      value
+      value,
     };
   },
   // function that returns the fallback JSX Element to render - called when the token rendered by Solid
-  props => <span>{props.id}</span>
+  props => <span>{props.id}</span>,
 );
 ```
 

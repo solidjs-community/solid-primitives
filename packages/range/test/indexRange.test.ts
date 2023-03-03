@@ -10,15 +10,15 @@ describe("indexRange", () => {
           () => -3.5,
           () => 0.2,
           () => 1.5,
-          n => n()
-        )()
+          n => n(),
+        )(),
       ).toEqual([-3.5, -2, -0.5]);
 
       const a = indexRange(
         () => 0,
         () => 2,
         () => 0.2,
-        n => n()
+        n => n(),
       )();
       for (let n = 0, i = 0; i < 10; n += 0.2, i++) {
         expect(a[i]).toBe(n);
@@ -29,8 +29,8 @@ describe("indexRange", () => {
           () => 5,
           () => -5,
           () => 2,
-          n => n()
-        )()
+          n => n(),
+        )(),
       ).toEqual([5, 3, 1, -1, -3]);
 
       expect(
@@ -38,8 +38,8 @@ describe("indexRange", () => {
           () => 0,
           () => 0.5,
           () => 1,
-          n => n()
-        )()
+          n => n(),
+        )(),
       ).toEqual([0]);
 
       expect(
@@ -47,8 +47,8 @@ describe("indexRange", () => {
           () => 0.5,
           () => 0,
           () => 1,
-          n => n()
-        )()
+          n => n(),
+        )(),
       ).toEqual([0.5]);
 
       dispose();
@@ -155,7 +155,7 @@ describe("indexRange", () => {
       const [step, setStep] = createSignal(1);
 
       const mapped = indexRange<string | number>(start, to, step, n => n(), {
-        fallback: () => "fb"
+        fallback: () => "fb",
       });
 
       setStart(0);

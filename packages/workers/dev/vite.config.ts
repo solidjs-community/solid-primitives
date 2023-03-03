@@ -6,6 +6,6 @@ export default defineConfig({
   plugins: [solidPlugin(), Unocss({})],
   build: {
     target: "esnext",
-    polyfillDynamicImport: false
-  }
+    polyfillDynamicImport: false,
+  },
 });

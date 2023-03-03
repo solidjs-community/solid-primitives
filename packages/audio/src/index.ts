@@ -9,7 +9,7 @@ export enum AudioState {
   COMPLETE = "complete",
   STOPPED = "stopped",
   READY = "ready",
-  ERROR = "error"
+  ERROR = "error",
 }
 
 export type AudioSource =
@@ -44,7 +44,7 @@ const unwrapSource = (src: AudioSource) => {
  */
 export const makeAudio = (
   src: AudioSource,
-  handlers: AudioEventHandlers = {}
+  handlers: AudioEventHandlers = {},
 ): HTMLAudioElement => {
   if (process.env.SSR) {
     return {} as HTMLAudioElement;
@@ -54,8 +54,8 @@ export const makeAudio = (
     Object.entries(handlers).forEach(([evt, handler]) =>
       player[enabled ? "addEventListener" : "removeEventListener"](
         evt,
-        handler as EventListenerOrEventListenerObject
-      )
+        handler as EventListenerOrEventListenerObject,
+      ),
     );
   };
   onMount(() => listeners(true));
@@ -85,7 +85,7 @@ export const makeAudio = (
  */
 export const makeAudioPlayer = (
   src: AudioSource,
-  handlers: AudioEventHandlers = {}
+  handlers: AudioEventHandlers = {},
 ): {
   play: () => Promise<void>;
   pause: VoidFunction;
@@ -99,7 +99,7 @@ export const makeAudioPlayer = (
       play: async () => noop(),
       player: {} as HTMLAudioElement,
       seek: noop,
-      setVolume: noop
+      setVolume: noop,
     };
   }
   const player = makeAudio(src, handlers);
@@ -142,7 +142,7 @@ export const makeAudioPlayer = (
 export const createAudio = (
   src: AudioSource | Accessor<AudioSource>,
   playing?: Accessor<boolean>,
-  volume?: Accessor<number>
+  volume?: Accessor<number>,
 ): [
   {
     state: AudioState;
@@ -156,7 +156,7 @@ export const createAudio = (
     setVolume: (volume: number) => void;
     play: () => Promise<void>;
     pause: VoidFunction;
-  }
+  },
 ] => {
   if (process.env.SSR) {
     return [
@@ -165,14 +165,14 @@ export const createAudio = (
         currentTime: 0,
         duration: 0,
         volume: 0,
-        player: {} as HTMLAudioElement
+        player: {} as HTMLAudioElement,
       },
       {
         seek: noop,
         setVolume: noop,
         play: async () => noop(),
-        pause: noop
-      }
+        pause: noop,
+      },
     ];
   }
   const player = unwrapSource(access(src));
@@ -185,13 +185,13 @@ export const createAudio = (
     },
     get volume() {
       return this.player.volume;
-    }
+    },
   });
   const { play, pause, setVolume, seek } = makeAudioPlayer(store.player, {
     loadeddata: () => {
       setStore({
         state: AudioState.READY,
-        duration: player.duration
+        duration: player.duration,
       });
       if (playing && playing() == true) {
         play().catch((e: DOMException) => {
@@ -205,7 +205,7 @@ export const createAudio = (
     loadstart: () => setStore("state", AudioState.LOADING),
     playing: () => setStore("state", AudioState.PLAYING),
     pause: () => setStore("state", AudioState.PAUSED),
-    error: () => setStore("state", AudioState.ERROR)
+    error: () => setStore("state", AudioState.ERROR),
   });
   // Bind reactive properties as needed
   if (src instanceof Function) {

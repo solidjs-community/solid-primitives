@@ -5,7 +5,7 @@ import type {
   EffectSource,
   ModifierReturn,
   StopEffect,
-  WatchOptions
+  WatchOptions,
 } from "./types";
 
 //
@@ -34,10 +34,10 @@ export const withAccess = <T>(value: MaybeAccessor<T>, fn: (value: NonNullable<T
 export const promiseTimeout = (
   ms: number,
   throwOnTimeout = false,
-  reason = "Timeout"
+  reason = "Timeout",
 ): Promise<void> =>
   new Promise((resolve, reject) =>
-    throwOnTimeout ? setTimeout(() => reject(reason), ms) : setTimeout(resolve, ms)
+    throwOnTimeout ? setTimeout(() => reject(reason), ms) : setTimeout(resolve, ms),
   );
 
 //
@@ -70,7 +70,7 @@ export const parseCompositeArgs = <O extends {}>(a: [any, any, any]) => {
     initialCallback,
     options,
     stopRequired,
-    modifyers
+    modifyers,
   };
 };
 
@@ -80,7 +80,7 @@ export const createComputationWatcher = <O extends Object>(
   initialCallback: EffectCallback<any, any>,
   modifyers: CallbackModifier<any, any, Object>[],
   options: WatchOptions<any> & O,
-  stop?: StopEffect
+  stop?: StopEffect,
 ) => {
   const returns: Record<string, any> = {};
   // Callbacks needs to be additionally stopped after root disposal

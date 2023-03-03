@@ -18,8 +18,8 @@ export const __permissions__: Record<"microphone" | "camera", Permission> = {
     removeEventListener: (e, cb) =>
       __permissions__.microphone.__listeners.splice(
         __permissions__.microphone.__listeners.indexOf(cb),
-        1
-      )
+        1,
+      ),
   },
   camera: {
     state: "denied",
@@ -30,10 +30,10 @@ export const __permissions__: Record<"microphone" | "camera", Permission> = {
     },
     addEventListener: (e, cb) => __permissions__.camera.__listeners.push(cb),
     removeEventListener: (e, cb) =>
-      __permissions__.camera.__listeners.splice(__permissions__.camera.__listeners.indexOf(cb), 1)
-  }
+      __permissions__.camera.__listeners.splice(__permissions__.camera.__listeners.indexOf(cb), 1),
+  },
 };
 
 (navigator as any).permissions = {
-  query: ({ name }) => Promise.resolve(__permissions__[name])
+  query: ({ name }) => Promise.resolve(__permissions__[name]),
 };

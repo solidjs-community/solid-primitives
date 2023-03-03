@@ -7,7 +7,7 @@ import {
   createSpeakers,
   createCameras,
   createAccelerometer,
-  createGyroscope
+  createGyroscope,
 } from "../src";
 
 let fakeDeviceCount = 0;
@@ -19,7 +19,7 @@ const fakeDeviceInfo = (overrides: Partial<MediaDeviceInfo> = {}): MediaDeviceIn
   toJSON: function () {
     return JSON.stringify(this);
   },
-  ...overrides
+  ...overrides,
 });
 const setDevices = (devices: MediaDeviceInfo[]) => {
   (window as any).__devices__ = devices;
@@ -33,7 +33,7 @@ describe("devices", () => {
           const deviceFakes = [
             fakeDeviceInfo(),
             fakeDeviceInfo({ kind: "audiooutput" }),
-            fakeDeviceInfo({ kind: "videoinput" })
+            fakeDeviceInfo({ kind: "videoinput" }),
           ];
           setDevices(deviceFakes);
           const devices = createDevices();
@@ -45,7 +45,7 @@ describe("devices", () => {
               resolve();
             }
           });
-        })
+        }),
     ));
 
   it("initially reads all microphones", () =>
@@ -55,7 +55,7 @@ describe("devices", () => {
           const deviceFakes = [
             fakeDeviceInfo(),
             fakeDeviceInfo({ kind: "audiooutput" }),
-            fakeDeviceInfo({ kind: "videoinput" })
+            fakeDeviceInfo({ kind: "videoinput" }),
           ];
           setDevices(deviceFakes);
           const microphones = createMicrophones();
@@ -67,7 +67,7 @@ describe("devices", () => {
               resolve();
             }
           });
-        })
+        }),
     ));
 
   it("initially reads all speakers", () =>
@@ -77,7 +77,7 @@ describe("devices", () => {
           const deviceFakes = [
             fakeDeviceInfo(),
             fakeDeviceInfo({ kind: "audiooutput" }),
-            fakeDeviceInfo({ kind: "videoinput" })
+            fakeDeviceInfo({ kind: "videoinput" }),
           ];
           setDevices(deviceFakes);
           const speakers = createSpeakers();
@@ -89,7 +89,7 @@ describe("devices", () => {
               resolve();
             }
           });
-        })
+        }),
     ));
 
   it("initially reads all cameras", () =>
@@ -99,7 +99,7 @@ describe("devices", () => {
           const deviceFakes = [
             fakeDeviceInfo(),
             fakeDeviceInfo({ kind: "audiooutput" }),
-            fakeDeviceInfo({ kind: "videoinput" })
+            fakeDeviceInfo({ kind: "videoinput" }),
           ];
           setDevices(deviceFakes);
           const cameras = createCameras();
@@ -111,7 +111,7 @@ describe("devices", () => {
               resolve();
             }
           });
-        })
+        }),
     ));
 
   it("reads updated devices", () =>
@@ -121,7 +121,7 @@ describe("devices", () => {
           const deviceFakes = [
             fakeDeviceInfo(),
             fakeDeviceInfo({ kind: "audiooutput" }),
-            fakeDeviceInfo({ kind: "videoinput" })
+            fakeDeviceInfo({ kind: "videoinput" }),
           ];
           setDevices(deviceFakes.slice(0, 1));
           const devices = createDevices();
@@ -138,7 +138,7 @@ describe("devices", () => {
               resolve();
             }
           });
-        })
+        }),
     ));
 
   it("reads the accelerometer", () => {
@@ -153,7 +153,7 @@ describe("devices", () => {
             { x: 0, y: 0, z: 0 },
             { x: 1, y: 0, z: 0 },
             { x: 0, y: 1, z: 0 },
-            { x: 0, y: 0, z: 1 }
+            { x: 0, y: 0, z: 1 },
           ];
           moveDevice(expectedAcceleration[1]);
           createEffect(() => {
@@ -165,7 +165,7 @@ describe("devices", () => {
               moveDevice(expectedAcceleration[0]);
             }
           });
-        })
+        }),
     );
   });
 
@@ -178,13 +178,13 @@ describe("devices", () => {
           const orientation = createGyroscope(0);
           const expectedOrientations = [
             { alpha: 0, beta: 0, gamma: 0 },
-            { alpha: 1, beta: 0, gamma: 1 }
+            { alpha: 1, beta: 0, gamma: 1 },
           ];
           createEffect(() => {
             expect({
               alpha: orientation.alpha,
               beta: orientation.beta,
-              gamma: orientation.gamma
+              gamma: orientation.gamma,
             }).toEqual(expectedOrientations.shift());
             if (expectedOrientations.length === 0) {
               dispose();
@@ -193,6 +193,6 @@ describe("devices", () => {
               turnDevice(expectedOrientations[0]);
             }
           });
-        })
+        }),
     ));
 });

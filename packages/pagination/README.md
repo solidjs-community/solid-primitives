@@ -161,7 +161,7 @@ function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
     setPages: Setter<T[]>;
     end: Accessor<boolean>;
     setEnd: Setter<boolean>;
-  }
+  },
 ];
 ```
 

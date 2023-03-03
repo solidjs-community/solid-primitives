@@ -14,7 +14,7 @@ const App: Component = () => {
     },
     function subtract(a, b) {
       return a - b;
-    }
+    },
   );
   const calculate = async () => setResult(await worker.add(...values()));
 
@@ -28,7 +28,7 @@ const App: Component = () => {
     },
     function subtract(a, b) {
       return a - b;
-    }
+    },
   );
   const calculatePooled = async () => setPoolResult(await pool.add(...poolValues()));
   calculate();
@@ -42,7 +42,7 @@ const App: Component = () => {
     output: setOutput,
     func: function add([a, b]) {
       return a + b;
-    }
+    },
   });
 
   return (

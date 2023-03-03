@@ -11,12 +11,12 @@ const App: Component = () => {
         <Transition
           onEnter={(el, done) => {
             el.animate([{ opacity: 0 }, { opacity: 1 }], {
-              duration: 600
+              duration: 600,
             }).finished.then(done);
           }}
           onExit={(el, done) => {
             el.animate([{ opacity: 1 }, { opacity: 0 }], {
-              duration: 600
+              duration: 600,
             }).finished.then(done);
           }}
           mode="outin"

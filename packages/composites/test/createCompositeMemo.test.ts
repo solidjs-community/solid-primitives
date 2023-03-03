@@ -32,8 +32,8 @@ describe("createCompositeMemo", () => {
           return a * 2;
         },
         {
-          value: 10
-        }
+          value: 10,
+        },
       );
       expect(catchPrev).toEqual([10]);
 
@@ -49,7 +49,7 @@ describe("createCompositeMemo", () => {
       const [count, setCount] = createSignal(2);
 
       const [double, { resume, pause }] = createCompositeMemo(
-        pausable(count, x => x * 2, { active: false })
+        pausable(count, x => x * 2, { active: false }),
       );
       expect(double()).toBeUndefined();
 

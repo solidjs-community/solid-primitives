@@ -11,10 +11,10 @@ const [TestProvider, useTestContext] = createContextProvider(
     if (props.text) return { message: props.text, children: props.children };
     return {
       message: context.message,
-      children: props.children
+      children: props.children,
     };
   },
-  fallback
+  fallback,
 );
 const TestChild = () => <div>{useTestContext().message}</div>;
 
@@ -28,7 +28,7 @@ describe("createContextProvider", () => {
           <TestChild />
         </TestProvider>
       ),
-      container
+      container,
     );
 
     expect(container.innerHTML, "Not correctly rendered").toBe(`<div>${context.message}</div>`);
@@ -61,7 +61,7 @@ describe("createContextProvider", () => {
 
     const unmount = render(
       () => <TestProvider text="REPLACE">{TextComp}</TestProvider>,
-      document.createElement("div")
+      document.createElement("div"),
     );
     expect(capture).toBe("REPLACE");
     expect(captureChildren).toBe(TextComp);

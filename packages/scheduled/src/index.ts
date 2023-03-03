@@ -2,7 +2,7 @@ import { Accessor, createSignal, getListener, getOwner, onCleanup } from "solid-
 
 export type ScheduleCallback = <Args extends unknown[]>(
   callback: (...args: Args) => void,
-  wait?: number
+  wait?: number,
 ) => Scheduled<Args>;
 
 export interface Scheduled<Args extends unknown[]> {
@@ -126,7 +126,7 @@ export const scheduleIdle: ScheduleCallback = process.env.SSR
             callback(...lastArgs);
             isDeferred = false;
           },
-          { timeout: maxWait }
+          { timeout: maxWait },
         );
       };
 
@@ -163,7 +163,7 @@ export const scheduleIdle: ScheduleCallback = process.env.SSR
 export function leading<Args extends unknown[]>(
   schedule: ScheduleCallback,
   callback: (...args: Args) => void,
-  wait?: number
+  wait?: number,
 ): Scheduled<Args> {
   if (process.env.SSR) {
     let called = false;
@@ -217,7 +217,7 @@ export function leading<Args extends unknown[]>(
 // Thanks to Fabio Spampinato (https://github.com/fabiospampinato) for the idea for the primitive
 
 export function createScheduled(
-  schedule: (callback: VoidFunction) => VoidFunction
+  schedule: (callback: VoidFunction) => VoidFunction,
 ): Accessor<boolean> {
   let listeners = 0;
   let isDirty = false;

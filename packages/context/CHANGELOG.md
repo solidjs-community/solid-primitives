@@ -1,5 +1,11 @@
 # @solid-primitives/context
 
+## 0.1.4
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
 ## 0.1.3
 
 ### Patch Changes

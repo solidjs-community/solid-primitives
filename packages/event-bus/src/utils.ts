@@ -68,7 +68,7 @@ export function toEffect<T>(emit: Emit<T>): Emit<T> {
       if (!stack.length) return;
       setStack([]);
       stack.forEach(emit as Emit<any>);
-    })
+    }),
   );
   return (payload?: any) => void setStack(p => push(p, payload));
 }
@@ -81,6 +81,6 @@ export function toEffect<T>(emit: Emit<T>): Emit<T> {
 export function batchEmits<T extends { emit: AnyFunction }>(bus: T): T {
   return {
     ...bus,
-    emit: (...args) => batch(() => bus.emit(...args))
+    emit: (...args) => batch(() => bus.emit(...args)),
   };
 }

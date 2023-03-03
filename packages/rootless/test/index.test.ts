@@ -6,7 +6,7 @@ import {
   createRoot,
   createSignal,
   getOwner,
-  onCleanup
+  onCleanup,
 } from "solid-js";
 import { createCallback, createSubRoot, createDisposable, createSharedRoot } from "../src";
 
@@ -58,7 +58,7 @@ describe("createSubRoot", () => {
         expect(captured, "after dispose()").toEqual([0, 1]);
       },
       o1,
-      o2
+      o2,
     );
     dispose2();
   });

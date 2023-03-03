@@ -6,7 +6,7 @@ export {
   withRetry,
   withRefetchEvent,
   wrapFetcher,
-  wrapResource
+  wrapResource,
 } from "./modifiers";
 export { withCache, withRefetchOnExpiry, withCacheStorage, serializeRequest } from "./cache";
 export { fetchRequest } from "./request";

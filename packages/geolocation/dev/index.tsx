@@ -12,13 +12,13 @@ const App: Component = () => {
   const [location] = createGeolocation({
     enableHighAccuracy: false,
     maximumAge: 0,
-    timeout: Number.POSITIVE_INFINITY
+    timeout: Number.POSITIVE_INFINITY,
   });
   onMount(() => {
     map = L.map(ref).setView([37.0643592, -26.1593362], 1);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
-      attribution: "© OpenStreetMap"
+      attribution: "© OpenStreetMap",
     }).addTo(map);
   });
   createEffect(() => {

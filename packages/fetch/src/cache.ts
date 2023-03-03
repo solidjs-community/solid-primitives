@@ -17,13 +17,13 @@ export type CacheOptions<T = any> = {
 
 export const defaultCacheOptions: CacheOptions = {
   expires: 5000,
-  cache: {}
+  cache: {},
 };
 
 export const serializeRequest = <FetcherArgs extends any[]>(requestData: FetcherArgs): string =>
   JSON.stringify({
     ...(typeof requestData[0] === "string" ? { url: requestData[0] } : requestData[0]),
-    ...requestData[1]
+    ...requestData[1],
   });
 
 /**
@@ -46,7 +46,7 @@ export const serializeRequest = <FetcherArgs extends any[]>(requestData: Fetcher
  */
 export const withCache: RequestModifier =
   <Result extends unknown, FetcherArgs extends any[]>(
-    options: CacheOptions = defaultCacheOptions
+    options: CacheOptions = defaultCacheOptions,
   ) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
     requestContext.cache = options.cache || requestContext.cache;
@@ -69,13 +69,13 @@ export const withCache: RequestModifier =
             const cacheEntry = {
               ts: new Date().getTime(),
               requestData: requestData,
-              data
+              data,
             };
             requestContext.cache[serializedRequest] = cacheEntry;
             requestContext.writeCache?.(serializedRequest, cacheEntry);
             return data;
           });
-        }
+        },
     );
     requestContext.wrapResource();
     const originalRefetch = requestContext.resource![1].refetch;
@@ -93,7 +93,7 @@ export const withCache: RequestModifier =
       refetch: (info?: ResourceOptions<Result, unknown>) => {
         invalidate();
         return originalRefetch(info);
-      }
+      },
     });
   };
 
@@ -122,7 +122,7 @@ export const withRefetchOnExpiry: RequestModifier =
           }
         }
         return originalFetcher(requestData, info);
-      }
+      },
     );
     requestContext.wrapResource();
   };

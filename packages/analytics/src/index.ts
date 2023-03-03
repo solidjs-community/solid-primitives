@@ -1,7 +1,7 @@
 export enum EventType {
   Pageview = "page",
   Event = "event",
-  Social = "social"
+  Social = "social",
 }
 export type TrackEventData = {
   category?: string;
@@ -22,7 +22,7 @@ export type TrackPageview = {
 };
 export type TrackHandler = (
   type: EventType,
-  data: TrackEventData | TrackSocialData | TrackPageview
+  data: TrackEventData | TrackSocialData | TrackPageview,
 ) => void;
 
 /**

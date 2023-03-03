@@ -20,7 +20,7 @@ import { Accessor, createMemo, createRoot, onCleanup, untrack } from "solid-js";
 export function repeat<T>(
   times: Accessor<number>,
   mapFn: (i: number) => T,
-  options: { fallback?: Accessor<T> } = {}
+  options: { fallback?: Accessor<T> } = {},
 ): Accessor<T[]> {
   let disposers: (() => void)[] = [],
     items: T[] = [],
@@ -99,7 +99,7 @@ export function Repeat<T>(props: {
 }): Accessor<T[]> {
   const fallback = props.fallback ? () => props.fallback as T : undefined;
   const mapFn = (typeof props.children === "function" ? props.children : () => props.children) as (
-    i: number
+    i: number,
   ) => T;
   const length = () => props.times;
   return repeat(length, mapFn, { fallback });
