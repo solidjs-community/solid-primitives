@@ -10,6 +10,7 @@ const Heading: ParentComponent = props => {
         <svg
           class="absolute hidden @[290px]/heading:block"
           viewBox="0 0 88.975 79.46"
+          // @ts-ignore
           xml:space="preserve"
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xmlns="http://www.w3.org/2000/svg"
@@ -22,6 +23,7 @@ const Heading: ParentComponent = props => {
         <svg
           class="absolute sm:hidden"
           viewBox="0 0 88.975 79.46"
+          // @ts-ignore
           xml:space="preserve"
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xmlns="http://www.w3.org/2000/svg"
@@ -38,6 +40,7 @@ const Heading: ParentComponent = props => {
         <svg
           class="absolute top-0 left-0"
           viewBox="0 0 88.975 79.46"
+          // @ts-ignore
           xml:space="preserve"
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xmlns="http://www.w3.org/2000/svg"
@@ -49,6 +52,7 @@ const Heading: ParentComponent = props => {
         <svg
           class="absolute top-0 left-0"
           viewBox="0 0 88.975 79.46"
+          // @ts-ignore
           xml:space="preserve"
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xmlns="http://www.w3.org/2000/svg"
@@ -77,20 +81,7 @@ const Heading: ParentComponent = props => {
         <svg
           class="absolute top-0 left-0"
           viewBox="0 0 88.975 79.46"
-          xml:space="preserve"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-          xmlns="http://www.w3.org/2000/svg"
-          style="z-index: 0; left: -174px; width: 247px; top: -88px; pointer-events: none;"
-        >
-          <use
-            opacity="0.6"
-            href="#solid-blocks-header-cluster-e"
-            transform="translate(13 -13.3)"
-          />
-        </svg>
-        <svg
-          class="absolute top-0 left-0"
-          viewBox="0 0 88.975 79.46"
+          // @ts-ignore
           xml:space="preserve"
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xmlns="http://www.w3.org/2000/svg"
@@ -103,6 +94,7 @@ const Heading: ParentComponent = props => {
         <svg
           class="absolute"
           viewBox="0 0 88.975 79.46"
+          // @ts-ignore
           xml:space="preserve"
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xmlns="http://www.w3.org/2000/svg"
@@ -131,6 +123,7 @@ const Heading: ParentComponent = props => {
         <svg
           class="absolute"
           viewBox="0 0 16.57 79.46"
+          // @ts-ignore
           xml:space="preserve"
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xmlns="http://www.w3.org/2000/svg"
@@ -152,6 +145,7 @@ const Heading: ParentComponent = props => {
         <svg
           class="absolute"
           viewBox="0 0 88.975 79.46"
+          // @ts-ignore
           xml:space="preserve"
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xmlns="http://www.w3.org/2000/svg"
