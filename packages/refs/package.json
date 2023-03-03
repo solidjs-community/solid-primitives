@@ -16,7 +16,8 @@
       "mergeRefs",
       "resolveElements",
       "resolveFirst",
-      "Children"
+      "Ref",
+      "Refs"
     ],
     "category": "Control Flow"
   },

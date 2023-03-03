@@ -1,5 +1,5 @@
-import { chain, ResolvedChildren } from "@solid-primitives/utils";
-import { Accessor, children, createComputed, createMemo, JSX, on, onCleanup } from "solid-js";
+import { chain, arrayEquals } from "@solid-primitives/utils";
+import { Accessor, children, createComputed, createMemo, JSX, onCleanup, untrack } from "solid-js";
 
 export type { ResolvedChildren, ResolvedJSXElement } from "@solid-primitives/utils";
 
@@ -193,24 +193,66 @@ export function resolveFirst(
 }
 
 /**
- * Solid's `children` helper in component form. Access it's children elements by `get` property.
- * @property `get` – get resolved elements, fired every time the children change
+ * Get up-to-date references of the multiple children elements.
+ * @param ref Getter of current array of elements
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Refs
  * @example
  * ```tsx
- * const [children, setChildren] = createSignal<ResolvedJSXElement>();
- *
- * <Children get={setChildren}>
- *    <div></div>
- *    ...
- * </Children>
+ * const [refs, setRefs] = createSignal<Element[]>([]);
+ * <Refs ref={setRefs}>
+ *   {props.children}
+ * </Refs>
  * ```
  */
-export function Children(props: {
-  get: (resolved: ResolvedChildren) => void;
-  children: JSX.Element;
-}): JSX.Element {
-  const resolved = children(() => props.children);
-  createComputed(on(resolved, props.get));
-  onCleanup(() => props.get(undefined));
+export function Refs(props: { ref: Ref<Element[]>; children: JSX.Element }): JSX.Element {
+  if (process.env.SSR) {
+    return props.children;
+  }
+
+  const cb = props.ref as (els: Element[]) => void,
+    resolved = children(() => props.children);
+
+  let prev: Element[] = [];
+
+  createComputed(() => {
+    const els = resolved.toArray().filter(defaultElementPredicate);
+    if (!arrayEquals(prev, els)) untrack(() => cb(els));
+    prev = els;
+  }, []);
+  onCleanup(() => prev.length && cb([]));
+
+  return resolved;
+}
+
+/**
+ * Get up-to-date reference to a single child element.
+ * @param ref Getter of current element *(or `undefined` if not mounted)*
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/refs#Ref
+ * @example
+ * ```tsx
+ * const [ref, setRef] = createSignal<Element | undefined>();
+ * <Ref ref={setRef}>
+ *   {props.children}
+ * </Ref>
+ * ```
+ */
+export function Ref(props: { ref: Ref<Element | undefined>; children: JSX.Element }): JSX.Element {
+  if (process.env.SSR) {
+    return props.children;
+  }
+
+  const cb = props.ref as (el: Element | undefined) => void,
+    resolved = children(() => props.children);
+
+  let prev: Element | undefined;
+
+  createComputed(() => {
+    const el = resolved.toArray().find(defaultElementPredicate);
+    if (el !== prev) untrack(() => cb(el));
+    prev = el;
+  });
+
+  onCleanup(() => prev && cb(undefined));
+
   return resolved;
 }

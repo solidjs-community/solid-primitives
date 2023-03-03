@@ -16,7 +16,8 @@ Collection of primitives, components and directives that help managing reference
 - [`mergeRefs`](#mergeRefs) - Utility for chaining multiple `ref` assignments with `props.ref` forwarding.
 - [`resolveElements`](#resolveElements) - Utility for resolving recursively nested JSX children to a single element or an array of elements.
 - [`resolveFirst`](#resolveFirst) - Utility for resolving recursively nested JSX children in search of the first element that matches a predicate.
-- [`Children`](#Children) - Solid's `children` helper in component form. Access it's children elements by `get` property.
+- [`<Refs>`](#refs) - Get up-to-date references of the multiple children elements.
+- [`<Ref>`](#ref) - Get up-to-date reference to a single child element.
 
 ## Installation
 
@@ -127,22 +128,41 @@ function Button(props: ParentProps) {
 
 `resolveFirst` also accepts a custom predicate as a second argument. See [`Using a custom predicate`](#using-a-custom-predicate) section for more details.
 
-## `<Children>`
+## `<Ref>`
 
-Solid's `children` helper in component form. Access it's children elements by `get` property.
+Get up-to-date reference to a single child element.
 
 ### How to use it
 
+`<Ref>` accepts only a `ref` property for getting the current element or `undefined`, and requires `children` to be passed in.
+
 ```tsx
-import { Children, ResolvedChildren } from "@solid-primitives/refs"
+import { Ref } from "@solid-primitives/refs";
 
-// typing as JSX.Element also works
-const [children, setChildren] = createSignal<ResolvedChildren>([])
+const [ref, setRef] = createSignal<Element | undefined>();
 
-<Children get={setChildren}>
-   <div></div>
-   ...
-</Children>
+<Ref ref={setRef}>{props.children}</Ref>;
+```
+
+## `<Refs>`
+
+Get up-to-date references of the multiple children elements.
+
+### How to use it
+
+`<Refs>` accepts only a `ref` property for getting the current array of elements, and requires `children` to be passed in.
+
+```tsx
+import { Refs } from "@solid-primitives/refs";
+
+const [refs, setRefs] = createSignal<Element[]>([]);
+
+<Refs ref={setRefs}>
+  <For each={my_list()}>{item => <div>{item}</div>}</For>
+  <Show when={show()}>
+    <div>Hello</div>
+  </Show>
+</Refs>;
 ```
 
 #### Demo
