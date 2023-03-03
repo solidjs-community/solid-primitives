@@ -6,11 +6,13 @@ import { r } from "../utils";
 const checkSizeOfPackage = async ({
   type,
   packageName,
-  primitiveName
+  primitiveName,
+  excludeGzipHeadersAndMetadataSize
 }: {
   type: "package" | "export";
   packageName: string;
   primitiveName: string;
+  excludeGzipHeadersAndMetadataSize?: boolean;
 }) => {
   const file = `
 export { ${primitiveName} } from "./packages/${packageName}/src/index"
@@ -40,7 +42,7 @@ export { ${primitiveName} } from "./packages/${packageName}/src/index"
   const gzipHeadersAndMetadataSize = 20 // 20 bytes
   const buffer = readFileSync(outFile);
   const minifiedSize = buffer.toString().length;
-  const gzippedSize = gzipSizeSync(buffer) - gzipHeadersAndMetadataSize;
+  const gzippedSize = gzipSizeSync(buffer) - (excludeGzipHeadersAndMetadataSize ? gzipHeadersAndMetadataSize: 0);
   if (type === "export") {
     rmSync(packageExportFilePath);
   }

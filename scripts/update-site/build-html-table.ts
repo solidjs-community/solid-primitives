@@ -72,7 +72,8 @@ export const buildCategory = async ({
               const result = await checkSizeOfPackage({
                 type: "package",
                 packageName,
-                primitiveName
+                primitiveName,
+                excludeGzipHeadersAndMetadataSize: true
               });
               const minifiedSize = formatBytes(result.minifiedSize).string;
               const gzippedSize = formatBytes(result.gzippedSize).string;
@@ -87,7 +88,8 @@ export const buildCategory = async ({
             const result = await checkSizeOfPackage({
               type,
               packageName,
-              primitiveName
+              primitiveName,
+              excludeGzipHeadersAndMetadataSize: true
             });
             const minifiedSize = formatBytes(result.minifiedSize);
             const gzippedSize = formatBytes(result.gzippedSize);

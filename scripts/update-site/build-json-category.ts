@@ -73,7 +73,8 @@ export const buildJSONCategory = async ({
       const result = await checkSizeOfPackage({
         type: "export",
         packageName: name,
-        primitiveName: primitive
+        primitiveName: primitive,
+        excludeGzipHeadersAndMetadataSize: true
       });
       const minifiedSize = formatBytes(result.minifiedSize).string;
       const gzippedSize = formatBytes(result.gzippedSize).string;
