@@ -30,11 +30,11 @@ export const buildPage = async ({
 
   readme = readme
     // remove heading-1
-    .replace(/#\s+.+\n+/m, "")
+    .replace(/#\s+.+\n+/, "")
     // remove solid img banner
-    .replace(/<p[^>]*>(?:\n+|\s+)+<img[^>]+\/?>(?:\n+|\s+)+<\/p>/, "")
-    // remove stage, version, size ect img banners
-    .replace(/^\[!\[\w+].+$/gm, "")
+    .replace(/(?:<p[^>]*>)?(?:\n|\s)*<img[^>]*(?:src="https?:\/\/assets.solidjs.com\/banner[^"]+")[^>]*\/?>(?:\n|\s)*(?:<\/p>)?/, "")
+    // remove turborepo, size, version, stage ect... img banners
+    .replace(/^\[!\[(?:turborepo|size|version|stage|lerna)\].+$/gm, "")
     // replace Installation with package install component
     .replace(/(##\s+installation\n+)(```[^`]+```)/i, (_, p1, p2) => {
       if (p2) {
