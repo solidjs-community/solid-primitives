@@ -1,5 +1,16 @@
 # @solid-primitives/memo
 
+## 1.2.0
+
+### Minor Changes
+
+- d7b907e6: Major improvements to how createWritableMemo and createLatest works.
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0
+
 ## 1.2.0-beta.1
 
 ### Patch Changes

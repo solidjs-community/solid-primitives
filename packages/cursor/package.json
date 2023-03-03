@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/cursor",
-  "version": "0.0.107-beta.0",
+  "version": "0.0.107",
   "description": "Two simple primitives for setting cursor css property reactively.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -84,7 +84,7 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/utils": "^5.4.0-beta.0"
+    "@solid-primitives/utils": "^5.4.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

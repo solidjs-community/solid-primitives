@@ -1,5 +1,12 @@
 # @solid-primitives/storage
 
+## 1.3.7
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0
+
 ## 1.3.7-beta.0
 
 ### Patch Changes

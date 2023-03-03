@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 5.4.0
+
+### Minor Changes
+
+- d6559a32: Export `ResolvedJSXElement` and `ResolvedChildren` types from utils
+
 ## 5.4.0-beta.0
 
 ### Minor Changes

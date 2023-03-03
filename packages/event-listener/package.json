@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-listener",
-  "version": "2.2.8-beta.0",
+  "version": "2.2.8",
   "description": "SolidJS Primitives to manage creating event listeners.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -87,7 +87,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^5.4.0-beta.0"
+    "@solid-primitives/utils": "workspace:^5.4.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
