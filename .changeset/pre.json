@@ -71,10 +71,11 @@
     "@solid-primitives/workers": "0.2.3"
   },
   "changesets": [
-    "dirty-kiwis-exist",
     "fair-kangaroos-beam",
+    "flat-fishes-pay",
     "fresh-maps-worry",
     "itchy-suits-attack",
+    "khaki-geckos-punch",
     "seven-onions-smile"
   ]
 }

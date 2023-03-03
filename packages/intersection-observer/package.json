@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/intersection-observer",
-  "version": "2.0.7",
+  "version": "2.0.8-beta.0",
   "description": "Primitives to support using the intersection observer API.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -101,10 +101,10 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solid-primitives/range": "workspace:^0.1.7"
+    "@solid-primitives/range": "workspace:^0.1.8-beta.0"
   },
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^5.2.1"
+    "@solid-primitives/utils": "workspace:^5.4.0-beta.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

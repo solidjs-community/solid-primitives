@@ -81,9 +81,9 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "devDependencies": {
-    "@solid-primitives/immutable": "^0.1.7",
-    "@solid-primitives/refs": "^0.4.0-beta.0",
-    "@solid-primitives/utils": "^5.2.1",
+    "@solid-primitives/immutable": "^0.1.8-beta.0",
+    "@solid-primitives/refs": "^1.0.0-beta.1",
+    "@solid-primitives/utils": "^5.4.0-beta.0",
     "solid-transition-group": "^0.0.13"
   },
   "peerDependencies": {
