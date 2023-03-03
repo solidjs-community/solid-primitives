@@ -67,7 +67,7 @@ const mapped = keyArray(source, (model, index) => {
       return index();
     },
     setName,
-    setDescription
+    setDescription,
   };
 });
 ```

@@ -23,7 +23,7 @@ export const UNITS: Unit[] = [
   { max: 518400000, value: DAY, name: "day" },
   { max: 2419200000, value: WEEK, name: "week" },
   { max: 28512000000, value: MONTH, name: "month" },
-  { max: Infinity, value: YEAR, name: "year" }
+  { max: Infinity, value: YEAR, name: "year" },
 ];
 
 /** @internal */
@@ -40,5 +40,5 @@ export const DEFAULT_MESSAGES: RelativeFormatMessages = {
     n === 1 ? (past ? "last week" : "next week") : `${n} week${n > 1 ? "s" : ""}`,
   hour: n => `${n} hour${n > 1 ? "s" : ""}`,
   minute: n => `${n} minute${n > 1 ? "s" : ""}`,
-  second: n => `${n} second${n > 1 ? "s" : ""}`
+  second: n => `${n} second${n > 1 ? "s" : ""}`,
 };

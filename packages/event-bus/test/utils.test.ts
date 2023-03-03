@@ -53,14 +53,14 @@ describe("toEffect", () => {
         emit("foo");
         expect(
           capturedOwner,
-          "owner will should not be available inside listener after using normal emit"
+          "owner will should not be available inside listener after using normal emit",
         ).toBe(null);
 
         emitInEffect("bar");
         expect(captured).toEqual(["foo", "bar"]);
         expect(
           capturedOwner,
-          "owner will should be available inside listener after using emitInEffect"
+          "owner will should be available inside listener after using emitInEffect",
         ).not.toBe(null);
         dispose();
       }, 0);

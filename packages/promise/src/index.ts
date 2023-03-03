@@ -18,10 +18,10 @@ import { asArray, Truthy } from "@solid-primitives/utils";
 export const promiseTimeout = (
   ms: number,
   throwOnTimeout = false,
-  reason: any = "Timeout"
+  reason: any = "Timeout",
 ): Promise<void> =>
   new Promise((resolve, reject) =>
-    throwOnTimeout ? setTimeout(() => reject(reason), ms) : setTimeout(resolve, ms)
+    throwOnTimeout ? setTimeout(() => reject(reason), ms) : setTimeout(resolve, ms),
   );
 
 /**
@@ -47,19 +47,19 @@ export function raceTimeout<T>(
   promises: T,
   ms: number,
   throwOnTimeout: true,
-  reason?: any
+  reason?: any,
 ): T extends any[] ? Promise<Awaited<T[number]>> : Promise<Awaited<T>>;
 export function raceTimeout<T>(
   promises: T,
   ms: number,
   throwOnTimeout?: boolean,
-  reason?: any
+  reason?: any,
 ): T extends any[] ? Promise<Awaited<T[number]> | undefined> : Promise<Awaited<T> | undefined>;
 export function raceTimeout(
   input: any,
   ms: number,
   throwOnTimeout = false,
-  reason: any = "Timeout"
+  reason: any = "Timeout",
 ): Promise<any> {
   return new Promise<void>((resolve, reject) => {
     let resolved = false;
@@ -78,7 +78,7 @@ export function raceTimeout(
         // it will be called when the first promise resolves, to stop the rest
         (p: any) => {
           p && typeof p === "object" && typeof p.dispose === "function" && p.dispose();
-        }
+        },
       );
     });
   });

@@ -76,8 +76,8 @@ const [CounterProvider, useCounter] = createContextProvider(
   },
   {
     count: () => 0,
-    increment: () => {}
-  }
+    increment: () => {},
+  },
 );
 
 // then when using the context:
@@ -95,17 +95,17 @@ const useDefiniteCounter = () => useCounter()!;
 ```ts
 function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T,
-  defaults: T
+  defaults: T,
 ): [provider: ContextProvider<P>, useContext: () => T];
 function createContextProvider<T, P extends ContextProviderProps>(
-  factoryFn: (props: P) => T
+  factoryFn: (props: P) => T,
 ): [provider: ContextProvider<P>, useContext: () => T | undefined];
 
 type ContextProviderProps = {
   children?: JSX.Element;
 } & Record<string, unknown>;
 type ContextProvider<T extends ContextProviderProps> = (
-  props: { children: JSX.Element } & T
+  props: { children: JSX.Element } & T,
 ) => JSX.Element;
 ```
 

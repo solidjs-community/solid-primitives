@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/raf",
-  "version": "2.1.6",
+  "version": "2.1.8",
   "description": "Primitive that facilitates RAF functionality",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -98,7 +98,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "^5.0.0"
+    "@solid-primitives/utils": "^5.4.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

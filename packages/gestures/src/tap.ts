@@ -8,7 +8,6 @@ type Props = {
 };
 
 declare module "solid-js" {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
       ["use:tap"]?: Props;

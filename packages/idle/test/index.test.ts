@@ -9,13 +9,13 @@ describe("createIdleTimer", () => {
     await createRoot(async dispose => {
       const { isIdle, isPrompted, stop } = createIdleTimer({
         idleTimeout: 5,
-        promptTimeout: 5
+        promptTimeout: 5,
       });
 
       await new Promise(resolve =>
         onMount(() => {
           resolve(true);
-        })
+        }),
       );
 
       await sleep(2);
@@ -38,13 +38,13 @@ describe("createIdleTimer", () => {
     await createRoot(async dispose => {
       const { isIdle, reset, start, stop } = createIdleTimer({
         idleTimeout: 5,
-        startManually: true
+        startManually: true,
       });
 
       await new Promise(resolve =>
         onMount(() => {
           resolve(true);
-        })
+        }),
       );
 
       await sleep(0);
@@ -68,7 +68,7 @@ describe("createIdleTimer", () => {
       await sleep(50);
       expect(
         isIdle(),
-        "user is still not idle, event listeners are unbound, timers have not restarted"
+        "user is still not idle, event listeners are unbound, timers have not restarted",
       ).toBe(false);
 
       dispose();
@@ -87,13 +87,13 @@ describe("createIdleTimer", () => {
         onIdle: () => (currStatus = "idle"),
         onPrompt: () => (currStatus = "prompted"),
         element: div,
-        events: ["click"]
+        events: ["click"],
       });
 
       await new Promise(resolve =>
         onMount(() => {
           resolve(true);
-        })
+        }),
       );
 
       await sleep(10);
@@ -104,22 +104,22 @@ describe("createIdleTimer", () => {
       await sleep(50);
       expect(
         currStatus,
-        "timers have started, user should be in the prompt phase, onPrompt should have been called by now"
+        "timers have started, user should be in the prompt phase, onPrompt should have been called by now",
       ).toBe("prompted");
       await sleep(60);
       expect(currStatus, "prompt timer has expired, onIdle should have been called by now").toBe(
-        "idle"
+        "idle",
       );
 
       div.dispatchEvent(new KeyboardEvent("keydown", { key: "a" }));
       expect(currStatus, "idle status should persist if the fired event is not in the list").toBe(
-        "idle"
+        "idle",
       );
 
       div.click();
       expect(
         currStatus,
-        "click is on the event list, it should trigger onActive when dispatched on the observed element"
+        "click is on the event list, it should trigger onActive when dispatched on the observed element",
       ).toBe("active");
 
       stop();

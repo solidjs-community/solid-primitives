@@ -48,6 +48,6 @@ export function createEventBus<T>(): EventBus<T> {
       return tryOnCleanup(bus.delete.bind(bus, listener));
     },
     emit: bus.emit.bind(bus),
-    clear: onCleanup(bus.clear.bind(bus))
+    clear: onCleanup(bus.clear.bind(bus)),
   };
 }

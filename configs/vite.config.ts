@@ -1,4 +1,5 @@
 import { defineConfig } from "vitest/config";
+import devtools from "solid-devtools/vite";
 import solid from "vite-plugin-solid";
 import Unocss from "unocss/vite";
 
@@ -7,6 +8,9 @@ export const viteConfig = defineConfig({
     port: 3000
   },
   plugins: [
+    devtools({
+      autoname: true
+    }),
     solid(),
     Unocss({
       shortcuts: {

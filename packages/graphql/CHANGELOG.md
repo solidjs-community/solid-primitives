@@ -1,5 +1,27 @@
 # @solid-primitives/graphql
 
+## 1.5.4
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0
+
+## 1.5.4-beta.0
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0-beta.0
+
+## 1.5.3
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+- Updated dependencies [865d5ee9]
+  - @solid-primitives/utils@5.2.1
+
 ## 1.5.2
 
 ### Patch Changes

@@ -21,7 +21,7 @@ const App: Component = () => {
     onLostCapture: e => console.log("LostCapture"),
     onDown: e => console.log("Down"),
     onUp: e => console.log("Up"),
-    onMove: e => setPoz({ x: e.x, y: e.y })
+    onMove: e => setPoz({ x: e.x, y: e.y }),
   });
 
   const points = createPointerList();
@@ -59,7 +59,7 @@ const App: Component = () => {
       <div
         class="p-24 box-border w-full min-h-150vh flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white"
         classList={{
-          "!bg-cyan-700": isHovering()
+          "!bg-cyan-700": isHovering(),
         }}
         style={{ "touch-action": "pan-y" }}
       >
@@ -77,7 +77,7 @@ const App: Component = () => {
           <div
             class="ball bg-yellow-600"
             style={{
-              transform: `translate(${poz().x}px, ${poz().y}px)`
+              transform: `translate(${poz().x}px, ${poz().y}px)`,
             }}
           ></div>
         )}

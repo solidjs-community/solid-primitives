@@ -16,7 +16,7 @@ const App: Component = () => {
   const [state, setState] = createStore({
     start: 5,
     to: -5,
-    step: 2
+    step: 2,
   });
 
   const shuffle = () => {

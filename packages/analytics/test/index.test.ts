@@ -8,7 +8,7 @@ describe("createPrimitiveTemplate", () => {
     const handlers = [...new Array(5)].map(
       (_, i) =>
         (...args) =>
-          (called[i] = args)
+          (called[i] = args),
     );
     const track = createAnalytics(handlers);
     const eventData = {};

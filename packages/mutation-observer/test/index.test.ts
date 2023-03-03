@@ -10,7 +10,7 @@ describe("mutation-observer", () => {
       const [add, { start, stop, instance, isSupported }] = createMutationObserver(
         parent,
         { childList: true },
-        e => {}
+        e => {},
       );
 
       expect(add).toBeInstanceOf(Function);
@@ -61,14 +61,14 @@ describe("mutation-observer", () => {
       const [, { instance, start, stop }] = createMutationObserver(
         [parent, parent1, parent2],
         config,
-        e => {}
+        e => {},
       );
       start();
 
       expect((instance as MutationObserver).records).toEqual([
         [parent, config],
         [parent1, config],
-        [parent2, config]
+        [parent2, config],
       ]);
 
       stop();
@@ -91,16 +91,16 @@ describe("mutation-observer", () => {
         [
           [parent, config],
           [parent1, config1],
-          [parent2, config2]
+          [parent2, config2],
         ],
-        e => {}
+        e => {},
       );
       start();
 
       expect((instance as MutationObserver).records).toEqual([
         [parent, config],
         [parent1, config1],
-        [parent2, config2]
+        [parent2, config2],
       ]);
 
       stop();

@@ -6,7 +6,7 @@ import "./style.css";
 const breakpoints = {
   sm: "640px",
   lg: "1024px",
-  xl: "1280px"
+  xl: "1280px",
 };
 
 const App: Component = () => {
@@ -24,10 +24,10 @@ const App: Component = () => {
         "text-tiny flex flex-column": true,
         "text-small": matches.sm,
         "text-base flex-row": matches.lg,
-        "text-huge": matches.xl
+        "text-huge": matches.xl,
       }}
       style={{
-        gap: matches.lg ? "50px" : "10px"
+        gap: matches.lg ? "50px" : "10px",
       }}
     >
       <p>

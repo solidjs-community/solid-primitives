@@ -16,9 +16,9 @@ export function createWorker(...args: (Function | object)[]): WorkerExports {
   const exports = new Set<string>();
   let code = "";
   let options = {};
-  for (let i in arguments) {
+  for (const i in arguments) {
     if (typeof arguments[i] === "object") {
-      options = args[i];
+      options = args[i]!;
       continue;
     }
     const exportObj = `__xpo${Math.random().toString().substring(2)}__`;
@@ -27,21 +27,21 @@ export function createWorker(...args: (Function | object)[]): WorkerExports {
   }
   const url = URL.createObjectURL(new Blob([code], { type: "text/javascript" }));
   const worker = new Worker(url, options);
-  let callbacks: WorkerCallbacks = new Map();
+  const callbacks: WorkerCallbacks = new Map();
   let counter = 0;
   const terminate = () => {
     URL.revokeObjectURL(url);
     worker.terminate.call(worker);
   };
-  const send = (message: WorkerMessage, options: PostMessageOptions = {}) =>
-    worker.postMessage(message, options);
+  const send = (message: WorkerMessage, postOptions: PostMessageOptions = {}) =>
+    worker.postMessage(message, postOptions);
   const stop = () => {
     send({ type: KILL, signal: 0 });
     terminate();
   };
   const call = (method: string, params: any) =>
     new Promise((resolve, reject) => {
-      let id = `rpc${counter++}`;
+      const id = `rpc${counter++}`;
       callbacks.set(id, [resolve, reject]);
       send({ type: RPC, id, method, params });
     });
@@ -76,7 +76,7 @@ export const createWorkerPool = (
     return [new EventTarget() as unknown as Worker, () => {}, () => {}];
   }
   let current = -1;
-  let workers: WorkerExports[] = [];
+  const workers: WorkerExports[] = [];
   const start = () => {
     for (let i = 0; i < concurrency; i += 1) {
       workers.push(createWorker(...args));
@@ -95,11 +95,11 @@ export const createWorkerPool = (
             // @ts-ignore
             return workers[current][0][method].apply(this, arguments);
           };
-        }
-      }
+        },
+      },
     ),
     start,
-    stop
+    stop,
   ];
 };
 
@@ -126,19 +126,19 @@ export const createSignaledWorker = (
       },
       () => {
         /*noop*/
-      }
+      },
     ];
   }
-  let fns = [];
+  const fns = [];
   for (const i in args) {
-    const { input, output, func } = args[i];
+    const { input, output, func } = args[i]!;
     if (input) {
       createEffect(
         on(input, async () => {
           // @ts-ignore
           const result = await worker[func.name](input());
           if (output) output(result);
-        })
+        }),
       );
     }
     fns.push(func);

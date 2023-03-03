@@ -31,10 +31,10 @@ export const propTraps: ProxyHandler<{
         return _.get(property);
       },
       set: trueFn,
-      deleteProperty: trueFn
+      deleteProperty: trueFn,
     };
   },
   ownKeys(_) {
     return _.keys();
-  }
+  },
 };

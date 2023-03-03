@@ -12,7 +12,7 @@ const Content = (props: { page: TPage; channelName: string }) => {
   const [list, setList] = createStore<{ id: string; count: number }[]>([]);
 
   const { message, postMessage } = createBroadcastChannel<{ id: string; count: number }>(
-    props.channelName
+    props.channelName,
   );
 
   //   const { onMessage } = makeBroadcastChannel(props.channelName);
@@ -32,11 +32,11 @@ const Content = (props: { page: TPage; channelName: string }) => {
         setList(
           produce(prev => {
             prev.push(data!);
-          })
+          }),
         );
       },
-      { defer: true }
-    )
+      { defer: true },
+    ),
   );
 
   const onBtnClick = () => {
@@ -54,7 +54,7 @@ const Content = (props: { page: TPage; channelName: string }) => {
           class="btn flex gap-2 "
           classList={{
             ["cursor-default"]: !hasMultiplePages(),
-            ["hover:bg-teal-600"]: !hasMultiplePages()
+            ["hover:bg-teal-600"]: !hasMultiplePages(),
           }}
           disabled={!hasMultiplePages()}
           onClick={onBtnClick}

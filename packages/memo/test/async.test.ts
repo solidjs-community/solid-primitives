@@ -21,7 +21,7 @@ describe("createAsyncMemo", () => {
           new Promise(res => {
             const n = count();
             setTimeout(() => res(n), 0);
-          })
+          }),
       );
       expect(memo()).toBe(undefined);
       setCount(1);
@@ -46,7 +46,7 @@ describe("createAsyncMemo", () => {
             } else {
               setTimeout(() => res(n), 0);
             }
-          })
+          }),
       );
       setCount(1);
       setTimeout(() => {

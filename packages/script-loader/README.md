@@ -37,7 +37,7 @@ createScriptLoader({
     await grecaptcha.enterprise.ready();
     const token = await grecaptcha.enterprise.execute("my_token", { action: "login" });
     // do your stuff...
-  }
+  },
 });
 
 // or pinterest embeds:
@@ -45,7 +45,7 @@ createScriptLoader({
   src: '!function(a,b,c){var d,e,f;d="PIN_"+~~((new Date).getTime()/864e5),...',
   onLoad() {
     window?.PinUtils?.build();
-  }
+  },
 });
 ```
 

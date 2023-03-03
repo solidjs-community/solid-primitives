@@ -4,7 +4,7 @@ export type Request<FetcherArgs extends any[]> = <Result>(
   ...args: any[]
 ) => (requestContext: RequestContext<Result, FetcherArgs>) => void;
 
-let fetchFallback = globalThis.fetch;
+let fetchFallback = globalThis.fetch as typeof fetch | undefined;
 if (process.env.SSR && !fetchFallback) {
   try {
     const nodeFetch = require("node-fetch");
@@ -13,7 +13,7 @@ if (process.env.SSR && !fetchFallback) {
     fetchFallback = () => {
       // eslint-disable-next-line no-console
       console.warn(
-        '"\x1b[33m⚠️ package missing to run createFetch on the server.\n Please run:\x1b[0m\n\nnpm i node-fetch\n"'
+        '"\x1b[33m⚠️ package missing to run createFetch on the server.\n Please run:\x1b[0m\n\nnpm i node-fetch\n"',
       );
       return Promise.reject(new Error("fetch not available"));
     };
@@ -23,7 +23,7 @@ if (process.env.SSR && !fetchFallback) {
 export const fetchRequest: Request<[info: RequestInfo, init?: RequestInit]> =
   fetchFn => requestContext => {
     requestContext.fetcher = <Result extends unknown>(
-      requestData: [info: RequestInfo, init?: RequestInit]
+      requestData: [info: RequestInfo, init?: RequestInit],
     ) =>
       (fetchFn || fetchFallback)?.(...requestData).then((response: Response) => {
         requestContext.response = response;

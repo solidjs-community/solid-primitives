@@ -83,11 +83,11 @@ mutationObserver;
 function createMutationObserver(
   initial: MaybeAccessor<Node | Node[]>,
   options: MutationObserverInit,
-  callback: MutationCallback
+  callback: MutationCallback,
 ): MutationObserverReturn;
 function createMutationObserver(
   initial: MaybeAccessor<[Node, MutationObserverInit][]>,
-  callback: MutationCallback
+  callback: MutationCallback,
 ): MutationObserverReturn;
 
 type MutationObserverReturn = [
@@ -97,7 +97,7 @@ type MutationObserverReturn = [
     stop: Fn;
     instance: MutationObserver;
     isSupported: boolean;
-  }
+  },
 ];
 
 type MutationObserverAdd = (target: Node, options?: MaybeAccessor<MutationObserverInit>) => void;

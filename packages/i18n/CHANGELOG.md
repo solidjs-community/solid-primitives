@@ -1,5 +1,19 @@
 # @solid-primitives/i18n
 
+## 1.2.1
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+- Updated dependencies [865d5ee9]
+  - @solid-primitives/context@0.1.4
+
+## 1.2.0
+
+### Minor Changes
+
+- 205bc4af: Added a chained typesafe provider into the i18n package
+
 ## 1.1.4
 
 ### Patch Changes

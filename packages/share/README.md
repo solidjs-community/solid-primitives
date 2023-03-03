@@ -35,7 +35,7 @@ import { createSocialShare, TWITTER } from "@solid-primitives/share";
 const [share, close] = createSocialShare(() => ({
   title: "SolidJS.com",
   url: "https://www.solidjs.com",
-  description: "Simple and well-behaved reactivity!"
+  description: "Simple and well-behaved reactivity!",
 }));
 share(TWITTER);
 ```
@@ -56,7 +56,7 @@ function createSocialShare(
     tag?: string;
     popup?: SharePopupOptions;
   }>,
-  controller: Window = window
+  controller: Window = window,
 ): [share: (network: Network | undefined) => void, close: () => void, isSharing: Accessor<boolean>];
 ```
 

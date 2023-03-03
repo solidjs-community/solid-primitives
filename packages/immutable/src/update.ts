@@ -11,7 +11,7 @@ export type Update = {
     K2 extends keyof O[K0][K1],
     K3 extends keyof O[K0][K1][K2],
     K4 extends keyof O[K0][K1][K2][K3],
-    V
+    V,
   >(
     object: O,
     k0: K0,
@@ -19,7 +19,7 @@ export type Update = {
     k2: K2,
     k3: K3,
     k4: K4,
-    setter: UpdateSetter<O[K0][K1][K2][K3], K4, V>
+    setter: UpdateSetter<O[K0][K1][K2][K3], K4, V>,
   ): ModifyValue<
     O,
     K0,
@@ -39,14 +39,14 @@ export type Update = {
     K1 extends keyof O[K0],
     K2 extends keyof O[K0][K1],
     K3 extends keyof O[K0][K1][K2],
-    V
+    V,
   >(
     object: O,
     k0: K0,
     k1: K1,
     k2: K2,
     k3: K3,
-    setter: UpdateSetter<O[K0][K1][K2], K3, V>
+    setter: UpdateSetter<O[K0][K1][K2], K3, V>,
   ): ModifyValue<
     O,
     K0,
@@ -57,18 +57,18 @@ export type Update = {
     k0: K0,
     k1: K1,
     k2: K2,
-    setter: UpdateSetter<O[K0][K1], K2, V>
+    setter: UpdateSetter<O[K0][K1], K2, V>,
   ): ModifyValue<O, K0, ModifyValue<O[K0], K1, ModifyValue<O[K0][K1], K2, V>>>;
   <O extends object, K0 extends keyof O, K1 extends keyof O[K0], V>(
     object: O,
     k0: K0,
     k1: K1,
-    setter: UpdateSetter<O[K0], K1, V>
+    setter: UpdateSetter<O[K0], K1, V>,
   ): ModifyValue<O, K0, ModifyValue<O[K0], K1, V>>;
   <O extends object, K extends keyof O, V>(
     object: O,
     key: K,
-    setter: UpdateSetter<O, K, V>
+    setter: UpdateSetter<O, K, V>,
   ): ModifyValue<O, K, V>;
 };
 

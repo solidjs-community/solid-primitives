@@ -8,7 +8,7 @@ const memo = createRoot(() =>
   createLazyMemo(() => {
     setRuns(p => p + 1);
     return count();
-  })
+  }),
 );
 
 const TestComponent: Component = () => {

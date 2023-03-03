@@ -35,7 +35,7 @@ or with options:
 const [location, refetch] = createGeolocation({
   enableHighAccuracy: false,
   maximumAge: 0,
-  timeout: 200
+  timeout: 200,
 });
 ```
 
@@ -94,7 +94,7 @@ The options property defaults to the following value unless overwritten:
 const geolocationDefaults: PositionOptions = {
   enableHighAccuracy: false,
   maximumAge: 0,
-  timeout: Number.POSITIVE_INFINITY
+  timeout: Number.POSITIVE_INFINITY,
 };
 ```
 

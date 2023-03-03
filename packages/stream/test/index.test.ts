@@ -17,7 +17,7 @@ describe("createStream", () => {
               resolve();
             }
           });
-        })
+        }),
     ));
 });
 
@@ -33,7 +33,7 @@ describe("createAmplitudeStream", () => {
             kind: "audioinput",
             toJSON: function () {
               return JSON.stringify(this);
-            }
+            },
           };
           const [amplitude] = createAmplitudeStream(mockDevice);
           createEffect(() => {
@@ -42,7 +42,7 @@ describe("createAmplitudeStream", () => {
               resolve();
             }
           });
-        })
+        }),
     ));
 });
 
@@ -56,7 +56,7 @@ describe("createMediaPermissionRequest", () => {
   afterAll(() => {
     navigator.mediaDevices.getUserMedia = originalGetUserMedia;
   });
-  it("requests a media stream", context => {
+  it("requests a media stream", () => {
     createMediaPermissionRequest();
     expect(allConstraints.at(-1)).toEqual({ audio: true, video: true });
   });

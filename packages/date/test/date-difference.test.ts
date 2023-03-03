@@ -8,7 +8,7 @@ import {
   MINUTE,
   MONTH,
   WEEK,
-  YEAR
+  YEAR,
 } from "../src";
 
 describe("createTimeAgo", () => {
@@ -16,7 +16,7 @@ describe("createTimeAgo", () => {
     createRoot(dispose => {
       const [date, setDate] = createSignal<number>(Date.now());
       const [timeago] = createTimeAgo(date, {
-        interval: 0
+        interval: 0,
       });
 
       expect(timeago()).toBe("just now");
@@ -57,7 +57,7 @@ describe("createTimeAgo", () => {
           captured_now = now;
           captured_diff = diff;
           return "relative";
-        }
+        },
       });
 
       expect(timeago(), "'now' should still be 'just now'").toBe("just now");
@@ -69,7 +69,7 @@ describe("createTimeAgo", () => {
       expect(now(), "captured now should match the returned one").toBe(captured_now);
       expect(
         captured_diff,
-        "captured diff should be the same as calculated from now() and target()"
+        "captured diff should be the same as calculated from now() and target()",
       ).toBe(target().getTime() - now().getTime());
 
       dispose();
@@ -87,7 +87,7 @@ describe("createTimeAgo", () => {
         dateFormatter: date => {
           capturedDate = date;
           return "absolute";
-        }
+        },
       });
 
       expect(timeago()).toBe("just now");
@@ -111,12 +111,12 @@ describe("createTimeAgo", () => {
         justNow: "NOW",
         future: n => `in the next ${n}`,
         day: (n, past) => `${n} DAY${n > 1 ? "S" : ""}`,
-        week: (n, past) => (n === 1 ? "week" : `${n} weeks`)
+        week: (n, past) => (n === 1 ? "week" : `${n} weeks`),
       };
 
       const [timeago] = createTimeAgo(date, {
         interval: 0,
-        messages
+        messages,
       });
 
       expect(timeago()).toBe("NOW");

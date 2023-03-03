@@ -3,7 +3,7 @@ import {
   createStream,
   createAmplitudeStream,
   createMediaPermissionRequest,
-  createScreen
+  createScreen,
 } from "../src";
 
 describe("API doesn't break in SSR", () => {

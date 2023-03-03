@@ -42,7 +42,7 @@ export const createDate = (init: MaybeAccessor<DateInit>): [Accessor<Date>, Date
  * ```
  */
 export function createDateNow(
-  interval: TimeoutSource = MINUTE / 2
+  interval: TimeoutSource = MINUTE / 2,
 ): [Accessor<Date>, VoidFunction] {
   const [track, trigger] = createSignal(undefined, { equals: false });
   const memo = createPolled(
@@ -52,7 +52,7 @@ export function createDateNow(
     },
     interval,
     undefined,
-    { equals: (a, b) => a.getTime() === b.getTime() }
+    { equals: (a, b) => a.getTime() === b.getTime() },
   );
   return [memo, trigger];
 }
@@ -75,7 +75,7 @@ export function createDateNow(
  */
 export function createTimeDifference(
   from: MaybeAccessor<DateInit>,
-  to: MaybeAccessor<DateInit>
+  to: MaybeAccessor<DateInit>,
 ): [difference: Accessor<number>, extra: { from: Accessor<Date>; to: Accessor<Date> }] {
   const [fromDate] = createDate(from),
     [toDate] = createDate(to);
@@ -103,10 +103,10 @@ export function createTimeDifference(
 export function createTimeDifferenceFromNow(
   to: MaybeAccessor<DateInit>,
   updateInterval: number | GetUpdateInterval = diff =>
-    Math.abs(diff) <= HOUR ? MINUTE / 2 : HOUR / 2
+    Math.abs(diff) <= HOUR ? MINUTE / 2 : HOUR / 2,
 ): [
   difference: Accessor<number>,
-  extra: { now: Accessor<Date>; target: Accessor<Date>; update: VoidFunction }
+  extra: { now: Accessor<Date>; target: Accessor<Date>; update: VoidFunction },
 ] {
   const interval =
     typeof updateInterval === "function" ? () => updateInterval(diff()) : updateInterval;
@@ -138,7 +138,7 @@ export function createTimeDifferenceFromNow(
  */
 export function createTimeAgo(
   to: MaybeAccessor<DateInit>,
-  options: TimeAgoOptions = {}
+  options: TimeAgoOptions = {},
 ): [
   timeago: Accessor<string>,
   extra: {
@@ -146,14 +146,14 @@ export function createTimeAgo(
     target: Accessor<Date>;
     update: VoidFunction;
     difference: Accessor<number>;
-  }
+  },
 ] {
   const {
     min = MINUTE,
     max = Infinity,
     dateFormatter = formatDate,
     messages,
-    relativeFormatter = (a, b, diff) => formatDateRelative(diff, messages)
+    relativeFormatter = (a, b, diff) => formatDateRelative(diff, messages),
   } = options;
 
   const [difference, extra] = createTimeDifferenceFromNow(to, options.interval);
@@ -190,12 +190,12 @@ export function createTimeAgo(
  */
 export function createCountdown(
   from: MaybeAccessor<DateInit>,
-  to: MaybeAccessor<DateInit>
+  to: MaybeAccessor<DateInit>,
 ): Store<Countdown>;
 export function createCountdown(difference: Accessor<number>): Store<Countdown>;
 export function createCountdown(
   a: MaybeAccessor<DateInit> | Accessor<number>,
-  b?: MaybeAccessor<DateInit>
+  b?: MaybeAccessor<DateInit>,
 ): Store<Countdown> {
   let difference: Accessor<number>;
   if (b !== undefined) difference = createTimeDifference(a, b)[0];
@@ -228,10 +228,10 @@ export function createCountdown(
  */
 export function createCountdownFromNow(
   to: MaybeAccessor<DateInit>,
-  updateInterval: TimeoutSource | GetUpdateInterval = 1000
+  updateInterval: TimeoutSource | GetUpdateInterval = 1000,
 ): [
   countdown: Store<Countdown>,
-  extra: { now: Accessor<Date>; target: Accessor<Date>; update: VoidFunction }
+  extra: { now: Accessor<Date>; target: Accessor<Date>; update: VoidFunction },
 ] {
   const [difference, extra] = createTimeDifferenceFromNow(to, updateInterval);
   const countdown = createCountdown(difference);

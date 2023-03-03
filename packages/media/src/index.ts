@@ -1,6 +1,6 @@
-import { createSignal, Accessor, sharedConfig, createEffect } from "solid-js";
+import { Accessor, sharedConfig } from "solid-js";
 import { makeEventListener } from "@solid-primitives/event-listener";
-import { createStaticStore, entries, noop } from "@solid-primitives/utils";
+import { createStaticStore, entries, noop, createHydrateSignal } from "@solid-primitives/utils";
 import { createSharedRoot } from "@solid-primitives/rootless";
 
 /**
@@ -17,7 +17,7 @@ import { createSharedRoot } from "@solid-primitives/rootless";
  */
 export function makeMediaQueryListener(
   query: string | MediaQueryList,
-  callback: (e: MediaQueryListEvent) => void
+  callback: (e: MediaQueryListEvent) => void,
 ): VoidFunction {
   if (process.env.SSR) {
     return noop;
@@ -44,15 +44,8 @@ export function createMediaQuery(query: string, serverFallback = false) {
     return () => serverFallback;
   }
   const mql = window.matchMedia(query);
-  let init = !!sharedConfig.context;
-  const [state, setState] = createSignal(init ? serverFallback : mql.matches, {
-    equals(a, b) {
-      if (init) return (init = false);
-      return a === b;
-    }
-  });
+  const [state, setState] = createHydrateSignal(serverFallback, () => mql.matches);
   const update = () => setState(mql.matches);
-  init && createEffect(update);
   makeEventListener(mql, "change", update);
   return state;
 }
@@ -74,13 +67,13 @@ export function createPrefersDark(serverFallback?: boolean) {
 }
 
 const sharedPrefersDark: () => Accessor<boolean> = /*#__PURE__*/ createSharedRoot(
-  createPrefersDark.bind(void 0, false)
+  createPrefersDark.bind(void 0, false),
 );
 
 /**
  * Provides a signal indicating if the user has requested dark color theme. The setting is being watched with a [Media Query](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme).
  *
- * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot).
+ * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) except if during hydration.
  *
  * @returns a boolean signal
  * @example
@@ -91,10 +84,7 @@ const sharedPrefersDark: () => Accessor<boolean> = /*#__PURE__*/ createSharedRoo
  */
 export const usePrefersDark: () => Accessor<boolean> = process.env.SSR
   ? () => () => false
-  : // do not use a shared root if during hydration
-    // this is to avoid a mismatch between the server and client
-    // see issue: https://github.com/solidjs-community/solid-primitives/issues/310
-    () => (sharedConfig.context ? createPrefersDark() : sharedPrefersDark());
+  : () => (sharedConfig.context ? createPrefersDark() : sharedPrefersDark());
 
 export type Breakpoints = Record<string, string>;
 
@@ -137,8 +127,9 @@ const getEmptyMatchesFromBreakpoints = <T extends Breakpoints>(breakpoints: T): 
  */
 export function createBreakpoints<T extends Breakpoints>(
   breakpoints: T,
-  options: BreakpointOptions<T> = {}
+  options: BreakpointOptions<T> = {},
 ): Matches<T> {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (process.env.SSR || !window.matchMedia)
     return options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints);
 
@@ -150,13 +141,13 @@ export function createBreakpoints<T extends Breakpoints>(
 
       entries(breakpoints).forEach(([token, width]) => {
         const mql = window.matchMedia(`(${mediaFeature}: ${width})`);
-        matches[token as keyof T] = mql.matches;
+        matches[token] = mql.matches;
 
         if (watchChange) makeEventListener(mql, "change", e => setMatches(token, e.matches as any));
       });
 
       return matches;
-    })()
+    })(),
   );
 
   return matches;

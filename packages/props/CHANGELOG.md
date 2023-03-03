@@ -1,5 +1,38 @@
 # @solid-primitives/props
 
+## 3.1.1
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0
+
+## 3.1.1-beta.0
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0-beta.0
+
+## 3.1.0
+
+### Minor Changes
+
+- ddc12685: Add an overload to `combineProps` which allows for passing an options object, with `reverseEventHandlers` option. This option when enabled will cause the event handlers to be called right to left.
+
+### Patch Changes
+
+- Updated dependencies [ddc12685]
+  - @solid-primitives/utils@5.3.0
+
+## 3.0.7
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+- Updated dependencies [865d5ee9]
+  - @solid-primitives/utils@5.2.1
+
 ## 3.0.6
 
 ### Patch Changes

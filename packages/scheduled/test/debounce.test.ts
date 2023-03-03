@@ -1,10 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createRoot } from "solid-js";
 import { debounce, leading } from "../src";
-
-function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+import sleep from "./sleep";
 
 describe("debounce", () => {
   test("setup and trigger debounce", () =>

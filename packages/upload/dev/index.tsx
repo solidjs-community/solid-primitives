@@ -48,7 +48,7 @@ const SingleFileUpload: Component = () => {
 const MultipleFileUpload: Component = () => {
   const { files, selectFiles } = createFileUploader({
     multiple: true,
-    accept: "image/*"
+    accept: "image/*",
   });
 
   return (
@@ -72,7 +72,7 @@ const Dropzone: Component = () => {
       await doStuff(2);
       files.forEach(f => console.log(f));
     },
-    onDragOver: files => console.log("over", files.length)
+    onDragOver: files => console.log("over", files.length),
   });
 
   return (
@@ -101,7 +101,7 @@ const FileUploaderDirective: Component = () => {
         multiple
         use:fileUploader={{
           userCallback: fs => fs.forEach(f => console.log(f)),
-          setFiles
+          setFiles,
         }}
       />
       <For each={files()}>{file => <p>{file.name}</p>}</For>

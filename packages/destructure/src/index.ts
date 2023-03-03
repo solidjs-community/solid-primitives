@@ -48,8 +48,8 @@ function createProxyCache(obj: object, get: (key: any) => any): any {
         Reflect.set(target, key, value);
         return value;
       },
-      set: () => false
-    }
+      set: () => false,
+    },
   );
 }
 
@@ -73,7 +73,7 @@ function createProxyCache(obj: object, get: (key: any) => any): any {
  */
 export function destructure<T extends ReactiveSource, O extends DestructureOptions<T>>(
   source: MaybeAccessor<T>,
-  options?: O
+  options?: O,
 ): O extends { lazy: true; deep: true }
   ? DeepDestructure<T>
   : O["lazy"] extends true

@@ -11,7 +11,7 @@ describe("destructure", () => {
       const updates = {
         a: 0,
         b: 0,
-        c: 0
+        c: 0,
       };
       createComputed(() => {
         first();
@@ -51,14 +51,14 @@ describe("destructure", () => {
       const [numbers, setNumbers] = createSignal({
         a: 1,
         b: 2,
-        c: 3
+        c: 3,
       });
       const { a, b, c } = destructure(numbers);
 
       const updates = {
         a: 0,
         b: 0,
-        c: 0
+        c: 0,
       };
       createComputed(() => {
         a();
@@ -84,7 +84,7 @@ describe("destructure", () => {
       setNumbers({
         a: 1,
         b: 6,
-        c: 7
+        c: 7,
       });
       expect(a()).toBe(1);
       expect(b()).toBe(6);
@@ -100,7 +100,7 @@ describe("destructure", () => {
   test("spread is eager", () =>
     createRoot(dispose => {
       const [numbers, setNumbers] = createSignal<{ a: number; b?: number }>({
-        a: 0
+        a: 0,
       });
 
       const { a, b } = destructure(numbers);
@@ -110,7 +110,7 @@ describe("destructure", () => {
 
       setNumbers({
         a: 2,
-        b: 3
+        b: 3,
       });
 
       expect(a()).toBe(2);
@@ -124,14 +124,14 @@ describe("destructure", () => {
       const [numbers, setNumbers] = createSignal({
         a: 1,
         b: 2,
-        c: 3
+        c: 3,
       });
       const { a, b, c } = destructure(numbers, { lazy: true });
 
       const updates = {
         a: 0,
         b: 0,
-        c: 0
+        c: 0,
       };
       createComputed(() => {
         a();
@@ -157,7 +157,7 @@ describe("destructure", () => {
       setNumbers({
         a: 1,
         b: 6,
-        c: 7
+        c: 7,
       });
       expect(a()).toBe(1);
       expect(b()).toBe(6);
@@ -173,7 +173,7 @@ describe("destructure", () => {
   test("destructure is lazy", () =>
     createRoot(dispose => {
       const [numbers, setNumbers] = createSignal<{ a: number; b?: number }>({
-        a: 0
+        a: 0,
       });
 
       const { a, b } = destructure(numbers, { lazy: true });
@@ -183,7 +183,7 @@ describe("destructure", () => {
 
       setNumbers({
         a: 2,
-        b: 3
+        b: 3,
       });
 
       expect(a()).toBe(2);
@@ -198,17 +198,17 @@ describe("destructure", () => {
         nested: {
           a: 1,
           b: 2,
-          c: 3
-        }
+          c: 3,
+        },
       });
       const {
-        nested: { a, b, c }
+        nested: { a, b, c },
       } = destructure(numbers, { deep: true });
 
       const updates = {
         a: 0,
         b: 0,
-        c: 0
+        c: 0,
       };
       createComputed(() => {
         a();
@@ -235,8 +235,8 @@ describe("destructure", () => {
         nested: {
           a: 1,
           b: 6,
-          c: 7
-        }
+          c: 7,
+        },
       });
       expect(a()).toBe(1);
       expect(b()).toBe(6);

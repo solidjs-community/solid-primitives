@@ -4,7 +4,7 @@ export type ContextProviderProps = {
   children?: JSX.Element;
 } & Record<string, unknown>;
 export type ContextProvider<T extends ContextProviderProps> = (
-  props: { children: JSX.Element } & T
+  props: { children: JSX.Element } & T,
 ) => JSX.Element;
 
 /**
@@ -30,14 +30,14 @@ export type ContextProvider<T extends ContextProviderProps> = (
  */
 export function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T,
-  defaults: T
+  defaults: T,
 ): [provider: ContextProvider<P>, useContext: () => T];
 export function createContextProvider<T, P extends ContextProviderProps>(
-  factoryFn: (props: P) => T
+  factoryFn: (props: P) => T,
 ): [provider: ContextProvider<P>, useContext: () => T | undefined];
 export function createContextProvider<T, P extends ContextProviderProps>(
   factoryFn: (props: P) => T,
-  defaults?: T
+  defaults?: T,
 ): [provider: ContextProvider<P>, useContext: () => T | undefined] {
   const ctx = createContext(defaults);
   const Provider: ContextProvider<P> = props => {
@@ -45,7 +45,7 @@ export function createContextProvider<T, P extends ContextProviderProps>(
       value: factoryFn(props),
       get children() {
         return props.children;
-      }
+      },
     });
   };
   const useProvider = () => useContext(ctx);

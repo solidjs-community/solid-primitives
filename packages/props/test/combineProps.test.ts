@@ -29,13 +29,38 @@ describe("combineProps", () => {
       const combinedProps = combineProps(
         { onEvent: () => mockFn(message1) },
         { onEvent: () => mockFn(message2) },
-        { onEvent: () => mockFn(message3) }
+        { onEvent: () => mockFn(message3) },
       );
 
       combinedProps.onEvent();
 
       expect(mockFn.callCount).toBe(3);
       expect(mockFn.calls).toEqual([[message1], [message2], [message3]]);
+
+      dispose();
+    });
+  });
+
+  it("calls handlers in reverse", () => {
+    createRoot(dispose => {
+      const mockFn = spy();
+      const message1 = "click1";
+      const message2 = "click2";
+      const message3 = "click3";
+
+      const combinedProps = combineProps(
+        [
+          { onEvent: () => mockFn(message1) },
+          { onEvent: () => mockFn(message2) },
+          { onEvent: () => mockFn(message3) },
+        ],
+        { reverseEventHandlers: true },
+      );
+
+      combinedProps.onEvent();
+
+      expect(mockFn.callCount).toBe(3);
+      expect(mockFn.calls).toEqual([[message3], [message2], [message1]]);
 
       dispose();
     });
@@ -52,7 +77,7 @@ describe("combineProps", () => {
         { onEvent: () => mockFn(message1) },
         { onEvent: () => mockFn(message2) },
         { onEvent: "should ignore this" },
-        { onEvent: () => mockFn(message3) }
+        { onEvent: () => mockFn(message3) },
       );
 
       combinedProps.onEvent();
@@ -74,7 +99,7 @@ describe("combineProps", () => {
         { onEvent: () => mockFn(message1) },
         { onEvent: () => mockFn(message2) },
         { onEvent: "overwrites" },
-        {}
+        {},
       );
 
       expect(combinedProps.onEvent).toBe("overwrites");
@@ -93,7 +118,7 @@ describe("combineProps", () => {
       const combinedProps = combineProps(
         { onClick: () => mockFn(message1) },
         { onClick: [mockFn, message2] },
-        { onClick: [mockFn, message3] }
+        { onClick: [mockFn, message3] },
       );
 
       (combinedProps as any).onClick();
@@ -116,7 +141,7 @@ describe("combineProps", () => {
       const combinedProps = combineProps(
         { onClick: () => mockFn(click1) },
         { onHover: () => mockFn(hover), styles: { margin } },
-        { onClick: () => mockFn(click2), onFocus: () => mockFn(focus) }
+        { onClick: () => mockFn(click2), onFocus: () => mockFn(focus) },
       );
 
       combinedProps.onClick();
@@ -146,7 +171,7 @@ describe("combineProps", () => {
       const combinedProps = combineProps(
         { class: className1 },
         { class: className2 },
-        { class: className3 }
+        { class: className3 },
       );
 
       expect(combinedProps.class).toBe("primary hover focus");
@@ -154,7 +179,7 @@ describe("combineProps", () => {
       const combinedProps2 = combineProps(
         { className: className1 },
         { className: className2 },
-        { className: className3 }
+        { className: className3 },
       );
 
       expect(combinedProps2.className).toBe("primary hover focus");
@@ -168,12 +193,12 @@ describe("combineProps", () => {
       const classList1 = {
         primary: true,
         outline: true,
-        compact: true
+        compact: true,
       };
 
       const classList2 = {
         large: true,
-        compact: false
+        compact: false,
       };
 
       const combinedProps = combineProps({ classList: classList1 }, { classList: classList2 });
@@ -182,7 +207,7 @@ describe("combineProps", () => {
         primary: true,
         outline: true,
         large: true,
-        compact: false
+        compact: false,
       });
 
       dispose();
@@ -200,7 +225,7 @@ describe("combineProps", () => {
         `;
       const objStyles = {
         margin: "10px",
-        "font-size": "2rem"
+        "font-size": "2rem",
       };
 
       const combinedProps = combineProps({ style: stringStyles }, { style: objStyles });
@@ -211,7 +236,7 @@ describe("combineProps", () => {
         "background-color": "red",
         border: "1px solid #123456 ",
         "--x": "123\n        ",
-        "font-size": "2rem"
+        "font-size": "2rem",
       });
 
       dispose();
@@ -223,11 +248,11 @@ describe("combineProps", () => {
       let ref2!: HTMLButtonElement;
 
       const props1 = {
-        ref: (el => (ref1 = el)) as HTMLButtonElement | ((el: HTMLButtonElement) => void)
+        ref: (el => (ref1 = el)) as HTMLButtonElement | ((el: HTMLButtonElement) => void),
       };
 
       const props2 = {
-        ref: (el => (ref2 = el)) as HTMLButtonElement | ((el: HTMLButtonElement) => void)
+        ref: (el => (ref2 = el)) as HTMLButtonElement | ((el: HTMLButtonElement) => void),
       };
 
       const combinedProps = combineProps(props1, props2);
@@ -260,14 +285,14 @@ describe("combineProps", () => {
       const [signal, setSignal] = createSignal<any>({
         class: "primary",
         style: {
-          margin: "10px"
-        }
+          margin: "10px",
+        },
       });
 
       const combinedProps = combineProps(
         signal,
         { class: "secondary" },
-        { style: { padding: "10px" } }
+        { style: { padding: "10px" } },
       );
 
       let i = 0;
@@ -277,7 +302,7 @@ describe("combineProps", () => {
           expect(combinedProps.class).toBe("primary secondary");
           expect(combinedProps.style).toEqual({
             margin: "10px",
-            padding: "10px"
+            padding: "10px",
           });
           i++;
         } else {

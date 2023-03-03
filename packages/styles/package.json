@@ -1,9 +1,11 @@
 {
   "name": "@solid-primitives/styles",
-  "version": "0.0.102",
+  "version": "0.0.105",
   "description": "Collection of reactive primitives focused on styles.",
   "author": "Damian Tarnawski <gthetaranv@gmail.com>",
-  "contributors": [],
+  "contributors": [
+    "Tom Pichaud <dev.tompichaud@icloud.com>"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/styles#readme",
   "repository": {
@@ -98,7 +100,8 @@
     "css"
   ],
   "dependencies": {
-    "@solid-primitives/rootless": "workspace:^1.2.2"
+    "@solid-primitives/rootless": "workspace:^1.2.6",
+    "@solid-primitives/utils": "workspace:^5.4.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

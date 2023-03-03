@@ -7,7 +7,7 @@ import {
   eventListener,
   EventListenerDirectiveProps,
   makeEventListener,
-  makeEventListenerStack
+  makeEventListenerStack,
 } from "../src";
 
 describe("makeEventListener", () => {
@@ -205,7 +205,7 @@ describe("eventListener directive", () => {
       const captured2: any[] = [];
       const [props, setProps] = createSignal<EventListenerDirectiveProps>([
         "load",
-        e => captured.push(e)
+        e => captured.push(e),
       ]);
       eventListener(window as any, props);
       dispatchFakeEvent("load", testEvent);
@@ -225,7 +225,7 @@ describe("eventListener directive", () => {
           dispatchFakeEvent("load", testEvent);
           expect(
             captured.length,
-            "events should no longer be captured by the previous handler"
+            "events should no longer be captured by the previous handler",
           ).toBe(2);
           expect(captured2.length).toBe(1);
           dispose();

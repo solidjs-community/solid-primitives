@@ -43,7 +43,7 @@ const [files, setFiles] = createSignal<UploadFile[]>([]);
   multiple
   use:fileUploader={{
     userCallback: fs => fs.forEach(f => console.log(f)),
-    setFiles
+    setFiles,
   }}
 />;
 ```

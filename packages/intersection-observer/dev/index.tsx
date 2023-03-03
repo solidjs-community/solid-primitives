@@ -13,8 +13,8 @@ const App: Component = () => {
           return true;
         }
         return entry.isIntersecting;
-      })
-    )
+      }),
+    ),
   );
 
   const [enabled, setEnabled] = createSignal(true);
@@ -48,7 +48,7 @@ const App: Component = () => {
                         class="h-20 w-90 flex-shrink-0 center-child transition duration-1500 rounded-lg m-5 text-white"
                         classList={{
                           "bg-slate-500 scale-x-75": !isVisible(),
-                          "bg-blue-900": isVisible()
+                          "bg-blue-900": isVisible(),
                         }}
                       >
                         Item_{x}_{y}

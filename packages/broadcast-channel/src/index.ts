@@ -39,7 +39,7 @@ export function makeBroadcastChannel<T>(name: string) {
       postMessage: () => void 0 as unknown as (props: T) => void,
       close: () => void 0,
       channelName: name,
-      instance: {} as unknown as BroadcastChannel
+      instance: {} as unknown as BroadcastChannel,
     };
 
   const id = Symbol();
@@ -48,7 +48,7 @@ export function makeBroadcastChannel<T>(name: string) {
 
   const onMessage = (
     cb: (e: MessageEvent<T>) => void,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ) => {
     const { onMessageCBList, instance } = map[name]!;
     const bcObjectInstance = instance.instance;
@@ -77,7 +77,7 @@ export function makeBroadcastChannel<T>(name: string) {
     if (!willClose) {
       currentInstance.instanceCount = currentInstance.instanceCount - 1;
       currentInstance.onMessageCBList = currentInstance.onMessageCBList.filter(
-        item => item.id !== id
+        item => item.id !== id,
       );
       return;
     }
@@ -96,18 +96,18 @@ export function makeBroadcastChannel<T>(name: string) {
     return {
       onMessage,
       postMessage: foundInstance.instance.postMessage.bind(foundInstance.instance.instance) as (
-        props: T
+        props: T,
       ) => void,
       close,
       channelName: foundInstance.instance.channelName,
-      instance: foundInstance.instance.instance
+      instance: foundInstance.instance.instance,
     };
   }
 
   const newInstance = {
     instanceCount: 1,
     onMessageCBList: [],
-    instance: null as any
+    instance: null as any,
   } as TBroadcastChannelInstance;
 
   const instance = new BroadcastChannel(name);
@@ -118,7 +118,7 @@ export function makeBroadcastChannel<T>(name: string) {
     postMessage: postMessage.bind(instance),
     close,
     channelName,
-    instance
+    instance,
   };
 
   newInstance.instance = result;

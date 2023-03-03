@@ -12,7 +12,7 @@ describe("createEventListenerMap", () => {
       let captured1: any;
       createEventListenerMap(window, {
         map_0: e => (captured = e),
-        map_1: e => (captured1 = e)
+        map_1: e => (captured1 = e),
       });
 
       dispatchFakeEvent("map_0", testEvent);
@@ -31,7 +31,7 @@ describe("createEventListenerMap", () => {
       let captured1: any;
       createEventListenerMap(() => window, {
         map_0: e => (captured = e),
-        map_1: e => (captured1 = e)
+        map_1: e => (captured1 = e),
       });
 
       onMount(() => {
@@ -52,7 +52,7 @@ describe("createEventListenerMap", () => {
       let captured1: any;
       createEventListenerMap(window, {
         map_0: e => (captured = e),
-        map_1: e => (captured1 = e)
+        map_1: e => (captured1 = e),
       });
 
       onMount(() => {
@@ -71,7 +71,7 @@ describe("createEventListenerMap", () => {
       const testEvent = new Event("map_0");
       let captured: any;
       createEventListenerMap<{ map_0: Event }>(() => window, {
-        map_0: e => (captured = e)
+        map_0: e => (captured = e),
       });
 
       onMount(() => {

@@ -5,7 +5,7 @@ import {
   createStream,
   createAmplitudeStream,
   createMediaPermissionRequest,
-  createScreen
+  createScreen,
 } from "../src";
 import "uno.css";
 

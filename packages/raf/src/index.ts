@@ -16,7 +16,7 @@ import { createSignal, createMemo, Accessor, onCleanup } from "solid-js";
  * });
  */
 function createRAF(
-  callback: FrameRequestCallback
+  callback: FrameRequestCallback,
 ): [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction] {
   if (process.env.SSR) {
     return [() => false, noop, noop];
@@ -59,17 +59,17 @@ function createRAF(
  */
 function targetFPS(
   callback: FrameRequestCallback,
-  fps: MaybeAccessor<number>
+  fps: MaybeAccessor<number>,
 ): FrameRequestCallback {
   if (process.env.SSR) {
     return callback;
   }
   const interval =
     typeof fps === "function"
-      ? createMemo(() => Math.floor(1000 / (fps as Accessor<number>)()))
+      ? createMemo(() => Math.floor(1000 / fps()))
       : (() => {
-          const interval = Math.floor(1000 / fps);
-          return () => interval;
+          const newInterval = Math.floor(1000 / fps);
+          return () => newInterval;
         })();
 
   let elapsed = 0;

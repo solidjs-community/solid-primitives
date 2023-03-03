@@ -16,7 +16,7 @@ import { createComputationWatcher, Fn, parseCompositeArgs } from "./common";
 export function createCompositeRenderEffect<
   Source extends Fn<any>[] | Fn<any>,
   U,
-  Returns extends {}
+  Returns extends {},
 >(modifier: ModifierReturn<Source, U, Returns>, options?: WatchOptions<U>): Returns;
 
 /**
@@ -34,7 +34,7 @@ export function createCompositeRenderEffect<
 export function createCompositeRenderEffect<Source extends Fn<any>[], U>(
   source: [...Source],
   callback: EffectCallback<Source, U>,
-  options?: WatchOptions<U>
+  options?: WatchOptions<U>,
 ): void;
 
 /**
@@ -52,7 +52,7 @@ export function createCompositeRenderEffect<Source extends Fn<any>[], U>(
 export function createCompositeRenderEffect<Source extends Fn<any>, U>(
   source: Source,
   callback: EffectCallback<Source, U>,
-  options?: WatchOptions<U>
+  options?: WatchOptions<U>,
 ): void;
 
 export function createCompositeRenderEffect(...a: any): Object {

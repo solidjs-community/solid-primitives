@@ -7,13 +7,14 @@ import { Accessor, createEffect, createSignal, on, onCleanup } from "solid-js";
  * @returns "unknown" | "denied" | "granted" | "prompt"
  */
 export const createPermission = (
-  name: PermissionDescriptor | PermissionName | "microphone" | "camera"
+  name: PermissionDescriptor | PermissionName | "microphone" | "camera",
 ): Accessor<PermissionState | "unknown"> => {
   if (process.env.SSR) {
     return () => "unknown";
   }
   const [permission, setPermission] = createSignal<PermissionState | "unknown">("unknown");
   const [status, setStatus] = createSignal<PermissionStatus>();
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (navigator) {
     navigator.permissions
       .query(typeof name === "string" ? { name: name as PermissionName } : name)
@@ -48,7 +49,7 @@ export const createPermission = (
           status.addEventListener("change", listener);
           onCleanup(() => status.removeEventListener("change", listener));
         }
-      })
+      }),
     );
   }
   return permission;
