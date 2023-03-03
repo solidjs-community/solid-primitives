@@ -27,15 +27,20 @@ export const buildPage = async ({
   const codeSandboxName = "codesandbox";
   const stackBlitzName = "stackblitz";
   const githubPagesURL = `https://solidjs-community.github.io/solid-primitives/${name}/`;
+  const githubChangelogURL = `https://github.com/solidjs-community/solid-primitives/blob/main/packages/${name}/CHANGELOG.md`
 
   readme = readme
     // remove heading-1
     .replace(/#\s+.+\n*/, "")
     // remove solid img banner
-    // .replace(/(?:<p[^>]*>)?(?:\n|\s)+<img[^>]+(?:src="https?:\/\/assets.solidjs.com\/banner[^"]+")[^>]*\/?>(?:\n|\s)+(?:<\/p>)?/, "")
-    .replace(/<p>(?=[^]*?<img(?=[^>]+?src="https?:\/\/assets\.solidjs\.com\/banner[^"]+")[^>]*?>)[^]*?<\/p>/, "")
+    .replace(/<p>(?=[^]*?<img(?=[^>]+?src="https:\/\/assets\.solidjs\.com\/banner[^"]+")[^>]*?>)[^]*?<\/p>/, "")
     // remove turborepo, size, version, stage ect... img banners
     .replace(/^\[!\[(?:turborepo|size|version|stage|lerna)\].+$/gm, "")
+    // replace changelog relative url to github repo changelog
+    .replace(/(\[CHANGELOG\.md\])(\(\.\/CHANGELOG\.md\))/i, (_, p1, p2) => {
+      if(!p2) return _
+      return `${p1}(${githubChangelogURL})`
+    })
     // replace Installation with package install component
     .replace(/(##\s+installation\n+)(```[^`]+```)/i, (_, p1, p2) => {
       if (p2) {
@@ -75,6 +80,7 @@ export const buildPage = async ({
 
     // jsxRuntime: "solid-jsx",
 
+    
     remarkPlugins: [remarkGfm],
     rehypePlugins: [
       rehypeHighlight,
