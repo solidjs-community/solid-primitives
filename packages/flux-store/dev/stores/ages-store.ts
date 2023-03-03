@@ -1,21 +1,21 @@
-import { createFluxFactory } from "../../src/index";
+import { createFluxStoreFactory } from "../../src/index";
 
-const agesFluxFactory = createFluxFactory(
+const agesFluxFactory = createFluxStoreFactory(
   {
     age: 0,
     mana: 100,
-    name: "unknown"
+    name: "unknown",
   },
   {
     getters: state => ({
       days: () => state.age * 365,
       yearsOld: () => `${state.age} years old`,
-      isWizard: () => state.mana > 100 || state.age >= 50
+      isWizard: () => state.mana > 100 || state.age >= 50,
     }),
     actions: (setState, state) => ({
-      birthday: () => setState("age", state.age + 1)
-    })
-  }
+      birthday: () => setState("age", state.age + 1),
+    }),
+  },
 );
 
 export type Person = ReturnType<typeof agesFluxFactory>;

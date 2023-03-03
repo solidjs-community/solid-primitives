@@ -1,12 +1,12 @@
 import { describe, test, expect } from "vitest";
 import { produce } from "solid-js/store";
-import { createFluxFactory, createFluxStore } from "../src";
+import { createFluxStoreFactory, createFluxStore } from "../src";
 
 const id = "test id";
 const initialState = { id, value: true };
 const testState = { id, value: true };
 
-const fluxFactory = createFluxFactory(initialState, {
+const fluxFactory = createFluxStoreFactory(initialState, {
   actions: (setState, state) => ({
     set: setState,
     toggle: () => setState("value", !state.value),

@@ -148,7 +148,7 @@ export function createFluxStore<
  * @returns `FluxFactory`
  * @example
  * ```tsx
- * export const counterFluxFactory = createFluxFactory({
+ * export const counterFluxFactory = createFluxStoreFactory({
  *   value: 5,
  * }, {
  *  getters: state => ({
@@ -175,7 +175,7 @@ export function createFluxStore<
  * resetPageViews() // => 0
  * ```
  */
-export function createFluxFactory<
+export function createFluxStoreFactory<
   TState extends object,
   TActions extends AnyFunctionsRecord,
   TGetters extends AnyFunctionsRecord,
@@ -186,13 +186,13 @@ export function createFluxFactory<
     actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
   },
 ): FluxFactory<TState, TActions, TGetters>;
-export function createFluxFactory<TState extends object, TActions extends AnyFunctionsRecord>(
+export function createFluxStoreFactory<TState extends object, TActions extends AnyFunctionsRecord>(
   fallbackState: TState,
   createMethods: {
     actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
   },
 ): FluxFactory<TState, TActions>;
-export function createFluxFactory<
+export function createFluxStoreFactory<
   TState extends object,
   TActions extends AnyFunctionsRecord,
   TGetters extends AnyFunctionsRecord,

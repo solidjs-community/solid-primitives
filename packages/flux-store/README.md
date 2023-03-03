@@ -9,9 +9,10 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/flux-store?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/flux-store)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A primitive to help with the creation, access and mutation of a state store via SolidJS `Provider`, `Context` and `Store`:
+A library for creating Solid stores with implementing state management through explicit getters for reads and actions for writes.
 
-- [`createStoreFactory`](#createStoreFactory) — Returns a `Provider` and functions to access and mutate a Context derived state store.
+- [`createFluxStore`](#createFluxStore) — Creates a store instance with explicit getters and actions.
+- [`createFluxStoreFactory`](#createFluxStoreFactory) — Create a `FluxStore` encapsulated in a factory function for reusable store implementation.
 
 ## Installation
 
@@ -23,73 +24,95 @@ yarn add @solid-primitives/flux-store
 pnpm add @solid-primitives/flux-store
 ```
 
-## `createStoreFactory`
+## `createFluxStore`
 
-##### Returns `[Provider, {useStore, produce, unwrapped, ...extras}]`
+Creates a `FluxStore` instance - a solid store that implements state management through explicit getters for reads and actions for writes.
 
-- **`Provider` -** the `Provider` control flow enabling access to the Context derived state store.
-- **`useStore` -** a function returning the current state and optional access/mutation functions, similar to manually using `useContext(Context)`.
-- **`produce` -** a modified function derived from the standard **SolidJS** `produce` function, pre-wrapped with `setState`, simplifying use.
-- **`unwrapped` -** a function returning the results of the standard **SolidJS** `unwrap` function that's automatically been passed the proxy store object.
+### How to use it
 
-##### Extras
+`createFluxStore` takes two arguments:
 
-- **`store` -** reactive store that can be read through a proxy object and written with a setter function.
-  - `const [state, setState] = createStore(initialState);`
-  - **Note:** This is the same object returned if manually passing an initial state to the **SolidJS** `createStore` function.
-- For convenience, the `state` and `setState` objects are also returned alongside `useStore`, `produce`, `unwrapped` and `store`.
-  - **`state` -** a readonly proxy object typically returned in the first position of the **SolidJS** `createStore` function.
-  - **`setState` -** a setter function typically returned in the second position of the **SolidJS** `createStore` function.
+- `initialState` - the initial state of the store.
 
-#### How to use it
+- `createMethods` - object containing functions to create getters and/or actions.
 
-##### Create Store
-
-###### stores/counter-store.ts
+  - `getters` - functions that return a value from the store's state.
+  - `actions` - untracked and batched functions that update the store's state.
 
 ```ts
-// `counter-store.ts`
-import { createStoreFactory } from "@solid-primitives/flux-store";
-const [CounterProvider, { useStore: useCounterStore }] = createStoreFactory(
+import { createFluxStore } from "@solid-primitives/flux-store";
+
+const counterState = createFluxStore(
+  // initial state
   {
     value: 5,
   },
-  (state, setState) => ({
-    count: () => state.value,
-    increment: () => setState(val => ({ value: val.value + 1 })),
-    reset: () => setState({ value: 0 }),
+  {
+    // reads
+    getters: state => ({
+      count() {
+        return state.value;
+      },
+    }),
+    // writes
+    actions: setState => ({
+      increment(by = 1) {
+        setState("value", p => p + by);
+      },
+      reset() {
+        setState("value", 0);
+      },
+    }),
+  },
+);
+
+// read
+counterState.getters.count(); // => 5
+
+// write
+counterState.actions.increment();
+counterState.getters.count(); // => 6
+```
+
+## `createFluxStoreFactory`
+
+Creates a [`FluxStore`](#createfluxstore) encapsulated in a factory function for reusable store implementation.
+
+### How to use it
+
+```ts
+const createToggleState = createFluxStoreFactory(
+  // initial state
+  {
+    value: false,
+  },
+  // reads
+  getters: state => ({
+    isOn() {
+      return state.value;
+    },
+  }),
+  // writes
+  actions: setState => ({
+    toggle() {
+      setState("value", p => !p);
+    },
   }),
 );
-export { CounterProvider, useCounterStore };
-```
 
-##### Add Provider
 
-###### App.tsx
+// state factory can be reused in different components
+const toggleState = createToggleState(
+  // initial state can be overridden
+  { value: true },
+);
 
-```tsx
-// `App.tsx`
-import { CounterProvider } from "./stores/counter-store.ts";
+// read
+toggleState.getters.isOn(); // => true
 
-// Wrap the app in the store's Provider
-<CounterProvider>
-  <App />
-</CounterProvider>;
-```
-
-##### Consume Store
-
-###### pages/Example.tsx
-
-```tsx
-// `Example.tsx`
-import { useCounterStore } from "../stores/counter-store.ts";
-
-const [counterState, { count, increment, reset }] = useCounterStore();
-count(); // => 5
-increment();
-count(); // => 6
-reset(); // => 0
+// write
+toggleState.actions.toggle();
+toggleState.getters.isOn(); // => false
 ```
 
 ## Demo
