@@ -111,6 +111,11 @@ export type ResolveChildrenReturn<T extends object> = Accessor<T | T[] | null> &
  * ```
  */
 export function resolveElements(fn: Accessor<JSX.Element>): ResolveChildrenReturn<Element>;
+export function resolveElements<T extends object & JSX.Element>(
+  fn: Accessor<JSX.Element>,
+  predicate: (item: JSX.Element) => item is T,
+  serverPredicate?: (item: JSX.Element) => item is T,
+): ResolveChildrenReturn<T>;
 export function resolveElements<T extends object>(
   fn: Accessor<JSX.Element>,
   predicate: (item: JSX.Element | T) => item is T,
@@ -178,6 +183,11 @@ export function getFirstChild<T extends object>(
  * ```
  */
 export function resolveFirst(fn: Accessor<JSX.Element>): Accessor<Element | null>;
+export function resolveFirst<T extends object & JSX.Element>(
+  fn: Accessor<JSX.Element>,
+  predicate: (item: JSX.Element) => item is T,
+  serverPredicate?: (item: JSX.Element) => item is T,
+): Accessor<T | null>;
 export function resolveFirst<T extends object>(
   fn: Accessor<JSX.Element>,
   predicate: (item: JSX.Element | T) => item is T,

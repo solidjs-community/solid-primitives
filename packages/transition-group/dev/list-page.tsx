@@ -8,7 +8,7 @@ import {
   untrack,
   useTransition,
 } from "solid-js";
-import { elements } from "@solid-primitives/refs";
+import { resolveElements } from "@solid-primitives/refs";
 import { Component, createSignal, For, Show } from "solid-js";
 import { createListTransition } from "../src";
 
@@ -99,58 +99,60 @@ const ListPage: Component = () => {
               // track the resource
               createRenderEffect(res);
 
-              const resolved = children(() => (
-                <>
-                  <p>Hello</p>
-                  World
-                  {show() && (
-                    <div
-                      class="node"
-                      ref={el => {
-                        onMount(() => console.log("mounted", el.isConnected));
-                        grayOutOnDispose(el);
-                      }}
-                    >
-                      ID 0
-                    </div>
-                  )}
-                  <Show when={show1()}>
-                    <div class="node" ref={grayOutOnDispose}>
-                      ID 1
-                    </div>
-                  </Show>
-                  <Show when={show2()}>
-                    <div class="node" ref={grayOutOnDispose}>
-                      ID 2
-                    </div>
-                    <div class="node" ref={grayOutOnDispose}>
-                      ID 3
-                    </div>
-                  </Show>
-                  <For each={list()}>
-                    {({ n }, i) => (
+              const resolved = resolveElements(
+                () => (
+                  <>
+                    <p>Hello</p>
+                    World
+                    {show() && (
                       <div
-                        class="node bg-yellow-600 cursor-pointer"
-                        onClick={() =>
-                          setList(p => {
-                            const copy = p.slice();
-                            copy.splice(i(), 1);
-                            return copy;
-                          })
-                        }
-                        ref={grayOutOnDispose}
+                        class="node"
+                        ref={el => {
+                          onMount(() => console.log("mounted", el.isConnected));
+                          grayOutOnDispose(el);
+                        }}
                       >
-                        {n + 1}.
+                        ID 0
                       </div>
                     )}
-                  </For>
-                </>
-              ));
-              const refs = elements(resolved, HTMLElement);
+                    <Show when={show1()}>
+                      <div class="node" ref={grayOutOnDispose}>
+                        ID 1
+                      </div>
+                    </Show>
+                    <Show when={show2()}>
+                      <div class="node" ref={grayOutOnDispose}>
+                        ID 2
+                      </div>
+                      <div class="node" ref={grayOutOnDispose}>
+                        ID 3
+                      </div>
+                    </Show>
+                    <For each={list()}>
+                      {({ n }, i) => (
+                        <div
+                          class="node bg-yellow-600 cursor-pointer"
+                          onClick={() =>
+                            setList(p => {
+                              const copy = p.slice();
+                              copy.splice(i(), 1);
+                              return copy;
+                            })
+                          }
+                          ref={grayOutOnDispose}
+                        >
+                          {n + 1}.
+                        </div>
+                      )}
+                    </For>
+                  </>
+                ),
+                (el): el is HTMLElement => el instanceof HTMLElement,
+              );
 
               const options = { duration: 600, easing: "cubic-bezier(0.4, 0, 0.2, 1)" };
 
-              return createListTransition(refs, {
+              return createListTransition(resolved.toArray, {
                 appear,
                 onChange({ added, finishRemoved, unchanged, removed }) {
                   added.forEach(el => {

@@ -179,7 +179,7 @@ import { resolveElements } from "@solid-primitives/refs";
 import { createSwitchTransition } from "@solid-primitives/transition-group";
 
 const resolved = resolveElements(() => props.children);
-return createListTransition(resolved, {
+return createListTransition(resolved.toArray, {
   /*...*/
 });
 ```
