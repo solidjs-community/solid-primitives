@@ -3,8 +3,7 @@
   "scripts": {
     "dev": "solid-start dev --host",
     "build": "solid-start build",
-    "start": "solid-start start",
-    "foobar": "bundle-phobia mark.js"
+    "start": "solid-start start"
   },
   "type": "module",
   "devDependencies": {

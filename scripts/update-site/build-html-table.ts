@@ -1,7 +1,7 @@
 import { writeFile, writeFileSync } from "fs";
 import { PackageData, PackageJSONData, TUpdateSiteGlobal } from ".";
 import { formatBytes, r } from "../utils";
-import checkSizeOfPackage from "./checkSizeOfPackage";
+import checkSizeOfPackage from "../checkSizeOfPackage";
 
 const categories: Record<string, PackageData[]> = {};
 const rootDependencies: string[] = [];

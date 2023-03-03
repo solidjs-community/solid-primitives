@@ -1,7 +1,7 @@
 import { readFileSync, writeFile, writeFileSync } from "fs";
 import { TUpdateSiteGlobal } from ".";
 import { formatBytes, r, regexGlobalCaptureGroup } from "../utils";
-import checkSizeOfPackage from "./checkSizeOfPackage";
+import checkSizeOfPackage from "../checkSizeOfPackage";
 
 const item: {
   name: string;

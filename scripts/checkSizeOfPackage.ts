@@ -1,7 +1,7 @@
 import { buildSync } from "esbuild";
 import { readFileSync, writeFileSync, rmSync } from "fs";
 import { gzipSizeSync } from "gzip-size";
-import { r } from "../utils";
+import { r } from "./utils";
 
 const checkSizeOfPackage = async ({
   type,
@@ -39,7 +39,7 @@ export { ${primitiveName} } from "./packages/${packageName}/src/index"
     external: ["solid-js", "node-fetch"]
   });
 
-  const gzipHeadersAndMetadataSize = 20 // 20 bytes
+  const gzipHeadersAndMetadataSize = 20 // around 20 bytes
   const buffer = readFileSync(outFile);
   const minifiedSize = buffer.toString().length;
   const gzippedSize = gzipSizeSync(buffer) - (excludeGzipHeadersAndMetadataSize ? gzipHeadersAndMetadataSize: 0);
