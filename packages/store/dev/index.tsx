@@ -1,4 +1,3 @@
-import type { JSX, JSXElement } from "solid-js";
 import { Component, createMemo } from "solid-js";
 import { For, render } from "solid-js/web";
 import { counterStore } from "./stores/counter-store";
@@ -11,7 +10,7 @@ const App: Component = () => {
   const {
     state,
     getters: { get: count, isNegative, isPositive, isZero },
-    actions: { setState }
+    actions: { setState },
   } = counterStore;
 
   const increment = () => setState({ value: count() + 1 });

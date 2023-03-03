@@ -1,4 +1,3 @@
-import type { JSX } from "solid-js";
 import { batch, untrack } from "solid-js";
 import type { SetStoreFunction } from "solid-js/store";
 import { createStore } from "solid-js/store";
@@ -6,31 +5,24 @@ import { createStore } from "solid-js/store";
 /**
  * Type alias for any function with any number of arguments and any return type.
  */
-type AnyFunction = (...args: any[]) => any;
-
-/**
- * type alias for a function that takes another function as an argument and returns a new function
- * @param fn generic function used to infer the types of the arguments and return type
- * @returns a new function with the same arguments as `fn` and returns the same return type
- */
-type Action = <A extends AnyFunction>(fn: A) => (...args: Parameters<A>) => ReturnType<A>;
+export type AnyFunction = (...args: any[]) => any;
+export type AnyFunctionsRecord = { readonly [K in string]: AnyFunction };
 
 /**
  * type alias for an object with string keys and `Action` function values
  * @returns a generic set of `Action` functions
  */
-type Actions = Record<string, Action>;
+export type Actions<T extends AnyFunctionsRecord> = { readonly [K in keyof T]: T[K] };
 
 /**
- * wraps a function with `batch` and `untrack` functions from `solid-js` to improve performance
- * and prevent unnecessary re-renders
+ * Identify function creating an action - function for mutating the state.
+ * Actions are `batch`ed and `untrack`ed by default - no need to wrap them in `batch` and `untrack`.
  * @param fn the function to wrap
- * @returns the return value of `fn`
+ * @returns function of the same signature as `fn` but wrapped in `batch` and `untrack`
  */
-export const createAction: Action =
-  fn =>
-  (...args) =>
-    batch(() => untrack(() => fn(...args)));
+export function createAction<T extends AnyFunction>(fn: T): T {
+  return ((...args) => batch(() => untrack(() => fn(...args)))) as T;
+}
 
 /**
  * wraps each function in `actions` with `createAction` to improve performance and prevent unnecessary
@@ -38,14 +30,13 @@ export const createAction: Action =
  * @param actions a collection of `Action` functions to wrap
  * @returns a new object of the same type but each function is wrapped with `createAction`
  */
-export const createActions = <A extends Actions>(actions: A) => {
-  let result: Actions = { ...actions };
-  for (const [name, fn] of Object.entries(result)) {
-    result[name] = createAction(fn);
+export function createActions<T extends AnyFunctionsRecord>(functions: T): Actions<T> {
+  const actions: Record<string, AnyFunction> = { ...functions };
+  for (const [name, fn] of Object.entries(functions)) {
+    actions[name] = createAction(fn);
   }
-
-  return result as A;
-};
+  return actions as any;
+}
 
 /**
  * Solid `Store` enforcing the Flux design pattern which emphasizes a one-way data flow. This typically
@@ -55,10 +46,14 @@ export const createActions = <A extends Actions>(actions: A) => {
  * @template `<T: state type of the store, G: store access methods | undefined, A: store mutation methods | undefined>`
  * @returns `{ state: T, getters: G, actions: A }`
  */
-export type FluxStore<T extends object, G = undefined, A = undefined> = {
-  state: T;
-  getters: undefined extends G ? undefined : G;
-  actions: undefined extends A ? undefined : A;
+export type FluxStore<
+  TState extends object,
+  TActions extends AnyFunctionsRecord,
+  TGetters extends AnyFunctionsRecord = {},
+> = {
+  state: TState;
+  getters: TGetters;
+  actions: Actions<TActions>;
 };
 
 /**
@@ -68,18 +63,21 @@ export type FluxStore<T extends object, G = undefined, A = undefined> = {
  * @template `<T: state type of the store, G: store access methods | undefined, A: store mutation methods | undefined>`
  * @returns `(initialValueOverride?: T | ((fallbackState: T) => T)) => FluxStore<T, G, A>`
  */
-export type FluxFactory<T extends object, G = undefined, A = undefined> = (
-  initialValueOverride?: T | ((fallbackState: T) => T)
-) => FluxStore<T, G, A>;
+export type FluxFactory<
+  TState extends object,
+  TActions extends AnyFunctionsRecord,
+  TGetters extends AnyFunctionsRecord = {},
+> = (
+  initialValueOverride?: TState | ((fallbackState: TState) => TState),
+) => FluxStore<TState, TActions, TGetters>;
 
 /**
- * Create a Solid 'Store' by specifying a state type and/or provide an `initialState` and an optional
+ * Create a Solid 'Store' by specifying a state type and/or provide an `initialState` and
  * `createMethods` object typically consisting of separate actions that mutate the Store's `state` and
- * `getters` enabling readonly access to the Store's `state`. It is not required for a `FluxStore` to
- * contain both `actions` and `getters`.
+ * `getters` enabling readonly access to the Store's `state`.
  * @template `<T: state type of the store, G: store access methods | undefined, A: store mutation methods | undefined>`
  * @param initialState object to be wrapped in a Store
- * @param createMethods optional object containing functions to create `actions` and/or `getters`.
+ * @param createMethods object containing functions to create `actions` and/or `getters`.
  * @returns `FluxStore`
  * @example
  * ```tsx
@@ -105,57 +103,39 @@ export type FluxFactory<T extends object, G = undefined, A = undefined> = (
  * ```
  */
 export function createFluxStore<
-  T extends object,
-  G extends object | undefined,
-  A extends object | undefined
+  TState extends object,
+  TActions extends AnyFunctionsRecord,
+  TGetters extends AnyFunctionsRecord,
 >(
-  initialState: T,
+  initialState: TState,
   createMethods: {
-    getters: (state: T) => G;
-    actions: (setState: SetStoreFunction<T>, state: T) => A;
-  }
-): FluxStore<T, G, A>;
-export function createFluxStore<T extends object, G extends object>(
-  initialState: T,
+    getters: (state: TState) => TGetters;
+    actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
+  },
+): FluxStore<TState, TActions, TGetters>;
+export function createFluxStore<TState extends object, TActions extends AnyFunctionsRecord>(
+  initialState: TState,
   createMethods: {
-    getters: (state: T) => G;
-    actions?: (setState: SetStoreFunction<T>, state: T) => undefined | void;
-  }
-): FluxStore<T, G>;
-export function createFluxStore<T extends object, A extends object>(
-  initialState: T,
-  createMethods: {
-    getters?: (state: T) => undefined | void;
-    actions: (setState: SetStoreFunction<T>, state: T) => A;
-  }
-): FluxStore<T, undefined, A>;
-export function createFluxStore<T extends object>(
-  initialState: T,
-  createMethods?: {
-    getters?: (state: T) => undefined | void;
-    actions?: (setState: SetStoreFunction<T>, state: T) => undefined | void;
-  }
-): FluxStore<T>;
+    actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
+  },
+): FluxStore<TState, TActions>;
 export function createFluxStore<
-  T extends object,
-  G extends object | undefined = undefined,
-  A extends object | undefined = undefined
+  TState extends object,
+  TActions extends AnyFunctionsRecord,
+  TGetters extends AnyFunctionsRecord,
 >(
-  initialState: T,
-  createMethods?: {
-    getters?: (state: T) => G;
-    actions?: (setState: SetStoreFunction<T>, state: T) => A;
-  }
-): FluxStore<T, G, A> {
-  const [state, setState] = createStore<T>(initialState);
-  const getters = createMethods?.getters?.(state);
-  const actions = createActions(createMethods?.actions?.(setState, state) as Actions) as A;
-
+  initialState: TState,
+  createMethods: {
+    getters?: (state: TState) => TGetters;
+    actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
+  },
+): FluxStore<TState, TActions, TGetters | {}> {
+  const [state, setState] = createStore(initialState);
   return {
     state,
-    getters,
-    actions
-  } as FluxStore<T, G, A>;
+    getters: createMethods.getters ? createMethods.getters(state) : {},
+    actions: createActions(createMethods.actions(setState, state)),
+  };
 }
 
 /**
@@ -164,7 +144,7 @@ export function createFluxStore<
  * override the initial state of the store while creating each new instance.
  * @template `<T: state type of the store, G: store access methods | undefined, A: store mutation methods | undefined>`
  * @param fallbackState fallback object to be wrapped in a Store if no initial value is provided.
- * @param createMethods optional object containing functions to create getters and/or actions.
+ * @param createMethods object containing functions to create getters and/or actions.
  * @returns `FluxFactory`
  * @example
  * ```tsx
@@ -196,63 +176,40 @@ export function createFluxStore<
  * ```
  */
 export function createFluxFactory<
-  T extends object,
-  G extends object | undefined,
-  A extends object | undefined
+  TState extends object,
+  TActions extends AnyFunctionsRecord,
+  TGetters extends AnyFunctionsRecord,
 >(
-  fallbackState: T,
+  fallbackState: TState,
   createMethods: {
-    getters: (state: T) => G;
-    actions: (setState: SetStoreFunction<T>, state: T) => A;
-  }
-): FluxFactory<T, G, A>;
-export function createFluxFactory<T extends object, G extends object>(
-  fallbackState: T,
+    getters: (state: TState) => TGetters;
+    actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
+  },
+): FluxFactory<TState, TActions, TGetters>;
+export function createFluxFactory<TState extends object, TActions extends AnyFunctionsRecord>(
+  fallbackState: TState,
   createMethods: {
-    getters: (state: T) => G;
-    actions?: (setState: SetStoreFunction<T>, state: T) => undefined | void;
-  }
-): FluxFactory<T, G>;
-export function createFluxFactory<T extends object, A extends object>(
-  fallbackState: T,
-  createMethods: {
-    getters?: (state: T) => undefined | void;
-    actions: (setState: SetStoreFunction<T>, state: T) => A;
-  }
-): FluxFactory<T, undefined, A>;
-export function createFluxFactory<T extends object>(
-  fallbackState: T,
-  createMethods?: {
-    getters?: (state: T) => undefined | void;
-    actions?: (setState: SetStoreFunction<T>, state: T) => undefined | void;
-  }
-): FluxFactory<T>;
+    actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
+  },
+): FluxFactory<TState, TActions>;
 export function createFluxFactory<
-  T extends object,
-  G extends object | undefined = undefined,
-  A extends object | undefined = undefined
+  TState extends object,
+  TActions extends AnyFunctionsRecord,
+  TGetters extends AnyFunctionsRecord,
 >(
-  fallbackState: T,
-  createMethods?: {
-    getters?: (state: T) => G;
-    actions?: (setState: SetStoreFunction<T>, state: T) => A;
-  }
-): FluxFactory<T, G, A> {
-  const methods = {
-    getters: createMethods?.getters as (state: T) => G,
-    actions: createMethods?.actions as (setState: SetStoreFunction<T>, state: T) => A
-  };
-  return (initialValueOverride =>
+  fallbackState: TState,
+  createMethods: {
+    getters?: (state: TState) => TGetters;
+    actions: (setState: SetStoreFunction<TState>, state: TState) => TActions;
+  },
+): FluxFactory<TState, TActions, TGetters | {}> {
+  return initialValueOverride =>
     createFluxStore(
       !!initialValueOverride
         ? typeof initialValueOverride === "function"
           ? untrack(() => initialValueOverride({ ...fallbackState }))
           : { ...initialValueOverride }
         : { ...fallbackState },
-      methods
-    )) as FluxFactory<T, G, A>;
+      createMethods,
+    );
 }
-
-// This ensures the `JSX` import won't fall victim to tree shaking before
-// TypesScript can use it
-export type E = JSX.Element;

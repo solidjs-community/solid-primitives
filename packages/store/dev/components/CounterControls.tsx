@@ -1,4 +1,4 @@
-import type { ParentComponent, ComponentProps, JSX, JSXElement } from "solid-js";
+import type { ParentComponent, ComponentProps } from "solid-js";
 import { IncreaseButton, DecreaseButton, ResetButton } from "./CounterButton";
 
 export const CounterControls: ParentComponent<ComponentProps<"div">> = props => (
@@ -8,7 +8,7 @@ export const CounterControls: ParentComponent<ComponentProps<"div">> = props => 
       style={{
         display: "flex",
         "flex-direction": "row",
-        ...(typeof props.style === "object" ? props.style : {})
+        ...(typeof props.style === "object" ? props.style : {}),
       }}
     >
       <IncreaseButton />

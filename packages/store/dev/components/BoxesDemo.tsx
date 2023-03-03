@@ -1,4 +1,4 @@
-import type { ComponentProps, JSX, JSXElement } from "solid-js";
+import type { ComponentProps, JSX } from "solid-js";
 import { For, createMemo } from "solid-js";
 
 const getRandomColor = () => {
@@ -22,7 +22,7 @@ export const BoxesDemo = (props: BoxesDemoArgs) => {
         {...props}
         class="flex flex-row flex-wrap justify-around gap-3 min-h-80 w-80"
         style={{
-          ...((props.style as JSX.CSSProperties) || [])
+          ...((props.style as JSX.CSSProperties) || []),
         }}
       >
         <For each={boxes()} fallback={<div>No Items</div>}>
@@ -33,16 +33,16 @@ export const BoxesDemo = (props: BoxesDemoArgs) => {
                   class={`flex items-center justify-center`}
                   classList={{
                     "w-[50px]": !props?.boxSize,
-                    "h-[50px]": !props?.boxSize
+                    "h-[50px]": !props?.boxSize,
                   }}
                   style={{
                     ...(props?.boxSize
                       ? {
                           width: props.boxSize,
-                          height: props.boxSize
+                          height: props.boxSize,
                         }
                       : {}),
-                    "background-color": getRandomColor()
+                    "background-color": getRandomColor(),
                   }}
                 >
                   {index() + 1}

@@ -1,4 +1,4 @@
-import type { ParentComponent, ComponentProps, JSX, JSXElement } from "solid-js";
+import type { ParentComponent, ComponentProps } from "solid-js";
 import { splitProps } from "solid-js";
 import type { CounterState, CounterActions } from "../stores/counter-store";
 import { counterStore } from "../stores/counter-store";
@@ -57,7 +57,7 @@ export const ResetButton: ParentComponent<CounterButtonProps> = props => (
     style={{
       border: "1px solid red",
       color: "red",
-      ...(typeof props.style === "object" ? props.style : {})
+      ...(typeof props.style === "object" ? props.style : {}),
     }}
   />
 );
