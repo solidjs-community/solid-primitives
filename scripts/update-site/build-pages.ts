@@ -30,7 +30,7 @@ export const buildPage = async ({
 
   readme = readme
     // remove heading-1
-    .replace(/#\s+.+\n+/, "")
+    .replace(/#\s+.+\n*/, "")
     // remove solid img banner
     .replace(/(?:<p[^>]*>)?(?:\n|\s)*<img[^>]*(?:src="https?:\/\/assets.solidjs.com\/banner[^"]+")[^>]*\/?>(?:\n|\s)*(?:<\/p>)?/, "")
     // remove turborepo, size, version, stage ect... img banners
