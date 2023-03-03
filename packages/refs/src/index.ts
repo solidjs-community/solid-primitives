@@ -1,6 +1,7 @@
-import { filterInstance } from "@solid-primitives/immutable";
-import { asArray, chain, ExtractIfPossible, Many, ResolvedChildren } from "@solid-primitives/utils";
+import { chain, ResolvedChildren } from "@solid-primitives/utils";
 import { Accessor, children, createComputed, createMemo, JSX, on, onCleanup } from "solid-js";
+
+export type { ResolvedChildren, ResolvedJSXElement } from "@solid-primitives/utils";
 
 /**
  * Type for the `ref` prop
@@ -20,14 +21,14 @@ export interface RefProps<T> {
 }
 
 /**
- * Utility for using jsx refs both for local variables and providing it to the `props.ref` for component consumers.
+ * Utility for chaining multiple `ref` assignments with `props.ref` forwarding.
  * @param refs list of ref setters. Can be a `props.ref` prop for ref forwarding or a setter to a local variable (`el => ref = el`).
  * @example
  * ```tsx
  * interface ButtonProps {
  *    ref?: Ref<HTMLButtonElement>
  * }
- * const Button = (props: ButtonProps) => {
+ * function Button (props: ButtonProps) {
  *    let ref: HTMLButtonElement | undefined
  *    onMount(() => {
  *        // use the local ref
@@ -189,27 +190,6 @@ export function resolveFirst(
 ): Accessor<any | null> {
   const children = createMemo(fn);
   return createMemo(() => getFirstChild(children(), process.env.SSR ? serverPredicate : predicate));
-}
-
-/**
- * Reactive signal that filters out non-element items from a signal array.
- * @param fn Array signal
- * @returns Array signal
- * @example
- * const resolved = children(() => props.children);
- * const refs = elements(resolved);
- * refs() // T: Element[]
- * // or narrow down type of the Element
- * const refs = elements(resolved, HTMLElement);
- * refs() // T: HTMLElement[]
- */
-export function elements<S>(fn: Accessor<Many<S>>): Accessor<ExtractIfPossible<S, Element>[]>;
-export function elements<S, T extends (typeof Element)[]>(
-  fn: Accessor<Many<S>>,
-  ...types: T
-): Accessor<ExtractIfPossible<S, InstanceType<T[number]>>[]>;
-export function elements(fn: Accessor<any>, ...types: (typeof Element)[]): Accessor<Element[]> {
-  return createMemo(() => filterInstance(asArray(fn()), ...(types.length ? types : [Element])));
 }
 
 /**

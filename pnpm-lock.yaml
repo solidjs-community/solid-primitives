@@ -518,10 +518,10 @@ importers:
       solid-js: ^1.6.0
       solid-transition-group: ^0.0.13
     dependencies:
-      '@solid-primitives/immutable': link:../immutable
       '@solid-primitives/utils': link:../utils
       solid-js: 1.6.11
     devDependencies:
+      '@solid-primitives/immutable': link:../immutable
       solid-app-router: 0.4.2_solid-js@1.6.11
       solid-transition-group: 0.0.13_solid-js@1.6.11
 

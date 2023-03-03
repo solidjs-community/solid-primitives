@@ -16,7 +16,6 @@
       "mergeRefs",
       "resolveElements",
       "resolveFirst",
-      "elements",
       "Children"
     ],
     "category": "Control Flow"
@@ -84,12 +83,12 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/immutable": "^0.1.7",
     "@solid-primitives/utils": "^5.2.1"
   },
   "devDependencies": {
     "solid-app-router": "^0.4.2",
-    "solid-transition-group": "^0.0.13"
+    "solid-transition-group": "^0.0.13",
+    "@solid-primitives/immutable": "^0.1.7"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
