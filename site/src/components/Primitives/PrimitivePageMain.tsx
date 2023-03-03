@@ -64,6 +64,7 @@ const PrimitivePageMain: ParentComponent<{
                 class="relative inline-block scale-90 sm:scale-100 hover:opacity-70 transition-opacity"
                 href={githubRepoPrimitve}
                 target="_blank"
+                rel="noopener"
               >
                 <FaBrandsGithub size={28} />
                 <div class="absolute top-[32px] left-0 -scale-y-100 mask-image-[linear-gradient(to_bottom,transparent_12px,#000)] opacity-20 blur-[2px]">
