@@ -204,7 +204,7 @@ module.exports = {
               value
                 .match(/color\(([^)]*\)?)\)/)?.[1]
                 .replace(/_/g, " ")
-                .replace(/#/, "%23")
+                .replace(/#+/, "%23")
                 .replace(/\//g, "%2F")
                 .replace(/\s/g, "%20") || "%23000";
             let lineCap = value.match(/linecap\(([^)]*)\)/)?.[1] || 0;
