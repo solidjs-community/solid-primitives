@@ -7,313 +7,162 @@
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/refs?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/refs)
 [![version](https://img.shields.io/npm/v/@solid-primitives/refs?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/refs)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Collection of primitives, components and directives that help managing references to JSX elements, keeping track of mounted/unmounted elements.
 
 ##### Primitives:
 
-- [`mergeRefs`](#mergeRefs) - Utility for using jsx refs both for local variables and providing it to the `props.ref` for component consumers.
-- [`elements`](#elements) - Reactive signal that filters out non-element items from a signal array. _(Can be used with `children` primitive)_
-- [`refs`](#refs) - Get signal references to Elements of the reactive input. Which were added, which were removed. _(Can be used with `children` primitive)_
-- [`mapRemoved`](#mapRemoved) - Similar to Solid's `mapArray`, but you map the elements that were removed from source array. Leting you keep them for longer.
-- [`resolveElements`](#resolveElements) — Will resolve value to a flat list of HTML elements or a single element or `null`.
-
-##### Directive:
-
-- [`unmount`](#unmount) - A directive that calls handler when the element get's unmounted from DOM.
-
-##### Components:
-
-- [`<Children>`](#children) - Solid's `children` helper in component form. Access it's children elements by `get` property.
-- [`<Refs>`](#refs-1) - Get up-to-date references of the multiple children elements.
+- [`mergeRefs`](#mergeRefs) - Utility for chaining multiple `ref` assignments with `props.ref` forwarding.
+- [`resolveElements`](#resolveElements) - Utility for resolving recursively nested JSX children to a single element or an array of elements.
+- [`resolveFirst`](#resolveFirst) - Utility for resolving recursively nested JSX children in search of the first element that matches a predicate.
+- [`<Refs>`](#refs) - Get up-to-date references of the multiple children elements.
 - [`<Ref>`](#ref) - Get up-to-date reference to a single child element.
-
-##### Types:
-
-- [`RefProps`](#RefProps) - Component properties with types for `ref`
-- [`ResolvedChildren`](#ResolvedChildren) - Type of resolved JSX elements provided by Solid's `children` helper.
-
-##### Vanilla helpers:
-
-- `getChangedItems` - Tells you which elements got added to the array, and which got removed
-- `getAddedItems` - Tells you elements got added to the array
-- `getRemovedItems` - Tells you which elements got removed from the array
 
 ## Installation
 
 ```bash
 npm install @solid-primitives/refs
 # or
+pnpm add @solid-primitives/refs
+# or
 yarn add @solid-primitives/refs
 ```
 
-## Primitives
+## `mergeRefs`
 
----
+Utility for chaining multiple `ref` assignments with `props.ref` forwarding.
 
-### `mergeRefs`
-
-Utility for using jsx refs both for local variables and providing it to the `props.ref` for component consumers.
-
-#### How to use it
+### How to use it
 
 ```tsx
-import { mergeRefs } from "@solid-primitives/refs";
+import { mergeRefs, Ref } from "@solid-primitives/refs";
 
 interface ButtonProps {
-  ref?: HTMLButtonElement | ((el: HTMLButtonElement) => void);
+  ref?: Ref<HTMLButtonElement>;
 }
 
-const Button = (props: ButtonProps) => {
-  let ref!: HTMLButtonElement;
+function Button(props: ButtonProps) {
+  let ref: HTMLButtonElement | undefined;
   onMount(() => {
     // use the local ref
   });
-  return <button ref={mergeRefs(el => (ref = el), props.ref)} />;
-};
+
+  return <button ref={mergeRefs(props.ref, el => (ref = el))} />;
+}
 
 // in consumer's component:
-let ref!: HTMLButtonElement;
+let ref: HTMLButtonElement | undefined;
 <Button ref={ref} />;
 ```
 
-### `elements`
+## `resolveElements`
 
-Reactive signal that filters out non-element items from a signal array. _(Can be used with `children` primitive)_
+Utility for resolving recursively nested JSX children to a single element or an array of elements using a predicate.
 
-#### How to use it
+### How to use it
 
-```ts
-import { elements } from "@solid-primitives/refs";
-
-const resolved = children(() => props.children);
-const els = elements(resolved);
-els(); // T: Element[]
-
-// or narrow down the element type
-const divs = elements(resolved, HTMLDivElement);
-divs(); // T: HTMLDivElement[]
-```
-
-### `refs`
-
-Get signal references to Elements of the reactive input. Which were added, which were removed. _(Can be used with `children` primitive)_
-
-Used internally by [`<Refs>`](#<Refs>) component.
-
-#### How to use it
-
-```ts
-import { refs } from "@solid-primitives/refs";
-
-const resolved = children(() => props.children);
-const [els, added, removed] = refs(resolved);
-els(); // T: Element[]
-added(); // T: Element[]
-removed(); // T: Element[]
-
-// or narrow down the element type
-const [els, added, removed] = refs(resolved, HTMLDivElement);
-els(); // T: HTMLDivElement[]
-added(); // T: HTMLDivElement[]
-removed(); // T: HTMLDivElement[]
-```
-
-### `mapRemoved`
-
-Reactively map removed items from a reactive signal array. If the mapping function return an element signal, this element will be placed in the array returned from primitive.
-
-#### How to use it
-
-```ts
-import { mapRemoved } from "@solid-primitives/refs";
-
-const MyComp = props => {
-  const resolved = children(() => props.children);
-
-  const combined = mapRemoved(resolved, (ref, index) => {
-    const [el, setEl] = createSignal(ref);
-
-    // apply styles/animations to removed element
-    ref.style.filter = "grayscale(100%)";
-
-    // computations can be created inside the mapping fn
-    createEffect(() => {
-      // index is a signal
-      index();
-    });
-
-    const remove = () => {
-      // ...later
-      // by setting returned signal to undefined
-      // element get's removed from combined array permanently
-      setEl(undefined);
-    };
-
-    // you can return a signal with element to keep it in the combined array
-    return el;
-  });
-
-  return combined;
-};
-```
-
-### `resolveElements`
-
-Similarly to `children()` helper from `solid-js` will resolve provided value to a flat list of HTML elements or a single element or `null`. But doesn't create a computation.
-
-```ts
-import { resolveElements } from "@solid-primitives/refs";
-
-const MyComponent: ParentComponent = props => {
-  createEffect(() => {
-    const resolved = resolveElements(props.children);
-    resolved; // T: HTMLElement | HTMLElement[] | null
-  });
-  return "Don't access props.children here again — it'll create new dom nodes";
-};
-```
-
-## Directive
-
----
-
-### `unmount`
-
-A directive that calls handler when the element get's unmounted from DOM.
-
-#### Import
-
-```ts
-import { unmount } from "@solid-primitives/refs";
-// place it somewhere in the code to prevent it from being tree-shaken
-unmount;
-```
-
-#### How to use it
+`resolveElements`'s API is similar to Solid's `children` helper. It accepts a function that returns JSX children and a predicate function that filters the elements.
 
 ```tsx
-const [ref, setRef] = createSignal<Element | undefined>();
+function Button(props: ParentProps) {
+  const children = resolveElements(() => props.children);
+  //      ^?: Accessor<Element | Element[] | null>
 
-<div ref={el => setRef(el)} use:unmount={() => setRef(undefined)}>
-  Hello
-</div>;
+  return (
+    // Similarly to `children` helper, a `toArray` method is available
+    <For each={children.toArray()}>
+      {child => (
+        <div>
+          {child.localName}: {child}
+        </div>
+      )}
+    </For>
+  );
+}
 ```
 
-## Components
+### Using a custom predicate
 
----
-
-### `<Children>`
-
-Solid's `children` helper in component form. Access it's children elements by `get` property.
-
-#### How to use it
+The default predicate is `el => el instanceof Element`. You can provide a custom predicate to `resolveElements` to filter the elements.
 
 ```tsx
-import {Children, ResolvedJSXElement} from "@solid-primitives/refs"
+const els = resolveElements(
+  () => props.children,
+  (el): el is HTMLDivElement => el instanceof HTMLDivElement,
+);
 
-// typing as JSX.Element also works
-const [children, setChildren] = createSignal<ResolvedJSXElement>([])
-
-<Children get={setChildren}>
-   <div></div>
-   ...
-</Children>
+els(); // => HTMLDivElement | HTMLDivElement[] | null
 ```
 
-### `<Ref>`
+On the server side the custom predicate will be ignored, but can be overridden by passing it as a third argument.
+
+The default predicate can be imported from `@solid-primitives/refs`:
+
+```tsx
+import { defaultElementPredicate } from "@solid-primitives/refs";
+```
+
+On the client it uses `instanceof Element` check, on the server it checks for the object with `t` property. (generated by compiling JSX)
+
+## `resolveFirst`
+
+Utility for resolving recursively nested JSX children in search of the first element that matches a predicate.
+
+### How to use it
+
+`resolveFirst` matches the API of [`resolveElements`](#resolveElements) but returns only the first element that matches the predicate.
+
+```tsx
+function Button(props: ParentProps) {
+  const child = resolveFirst(() => props.children);
+  //     ^?: Accessor<Element | null>
+
+  return (
+    <div>
+      {child()?.localName}: {child()}
+    </div>
+  );
+}
+```
+
+`resolveFirst` also accepts a custom predicate as a second argument. See [`Using a custom predicate`](#using-a-custom-predicate) section for more details.
+
+## `<Ref>`
 
 Get up-to-date reference to a single child element.
 
-#### Import
+### How to use it
 
-```ts
-import { Ref } from "@solid-primitives/refs";
-```
-
-#### How to use it
-
-`<Ref>` accepts these properties:
-
-- `ref` - Getter of current element _(or `undefined` if not mounted)_
-- `onMount` - handle the child element getting mounted to the dom
-- `onUnmount` - handle the child element getting unmounted from the dom
+`<Ref>` accepts only a `ref` property for getting the current element or `undefined`, and requires `children` to be passed in.
 
 ```tsx
+import { Ref } from "@solid-primitives/refs";
+
 const [ref, setRef] = createSignal<Element | undefined>();
 
-<Ref
-  ref={setRef}
-  onMount={el => console.log("Mounted", el)}
-  onUnmount={el => console.log("Unmounted", el)}
->
-  <Show when={show()}>
-    <div>Hello</div>
-  </Show>
-</Ref>;
+<Ref ref={setRef}>{props.children}</Ref>;
 ```
 
-##### Providing generic Element type
-
-```tsx
-<Ref<HTMLDivElement>
-  ref={el => {...}} // HTMLDivElement | undefined
-  onMount={el => {...}} // HTMLDivElement
-  onUnmount={el => {...}} // HTMLDivElement
->
-  <div>Hello</div>
-</Ref>
-```
-
-### `<Refs>`
+## `<Refs>`
 
 Get up-to-date references of the multiple children elements.
 
-#### Import
+### How to use it
 
-```ts
-import { Refs } from "@solid-primitives/refs";
-```
-
-#### How to use it
-
-`<Refs>` accepts these properties:
-
-- `refs` - Getter of current array of elements
-- `added` - Getter of added elements since the last change
-- `removed` - Getter of removed elements since the last change
-- `onChange` - handle children changes
+`<Refs>` accepts only a `ref` property for getting the current array of elements, and requires `children` to be passed in.
 
 ```tsx
+import { Refs } from "@solid-primitives/refs";
+
 const [refs, setRefs] = createSignal<Element[]>([]);
 
-<Refs
-  refs={setRefs}
-  added={els => console.log("Added elements", els)}
-  removed={els => console.log("Removed elements", els)}
-  onChange={e => console.log(e)}
->
+<Refs ref={setRefs}>
   <For each={my_list()}>{item => <div>{item}</div>}</For>
   <Show when={show()}>
     <div>Hello</div>
   </Show>
 </Refs>;
-```
-
-##### Providing generic Element type
-
-```tsx
-<Refs<HTMLDivElement>
-  refs={els => {}} // HTMLDivElement[]
-  added={els => {}} // HTMLDivElement[]
-  removed={els => {}} // HTMLDivElement[]
-  // { refs: HTMLDivElement[]; added: HTMLDivElement[]; removed: HTMLDivElement[] }
-  onChange={e => {}}
->
-  <div>Hello</div>
-</Refs>
 ```
 
 #### Demo
@@ -324,22 +173,22 @@ https://stackblitz.com/edit/solid-vite-unocss-bkbgap?file=index.tsx
 
 ## Types
 
-### `RefProps`
+### `Ref`
 
-Component properties with types for `ref`
+Type for the `ref` prop
 
 ```ts
-interface RefProps<T extends Element> {
-  ref?: T | ((el: T) => void);
-}
+export type Ref<T> = T | ((el: T) => void) | undefined;
 ```
 
-### `ResolvedChildren`
+### `RefProps`
 
-Type of resolved JSX elements provided by Solid's `children` helper.
+Component properties with types for `ref` prop
 
 ```ts
-type ResolvedChildren = ResolvedJSXElement | ResolvedJSXElement[];
+interface RefProps<T> {
+  ref?: Ref<T>;
+}
 ```
 
 ## Changelog

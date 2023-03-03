@@ -1,5 +1,12 @@
 # @solid-primitives/until
 
+## 1.0.8-beta.0
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0-beta.0
+
 ## 1.0.7
 
 ### Patch Changes

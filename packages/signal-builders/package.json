@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/signal-builders",
-  "version": "0.1.7",
+  "version": "0.1.8-beta.0",
   "description": "A collection of chainable and composable reactive signal calculations, aka Signal Builders.",
   "author": "Your Name <you@youremail.com>",
   "license": "MIT",
@@ -45,8 +45,8 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/immutable": "^0.1.7",
-    "@solid-primitives/utils": "^5.2.1"
+    "@solid-primitives/immutable": "^0.1.8-beta.0",
+    "@solid-primitives/utils": "^5.4.0-beta.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"

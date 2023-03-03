@@ -19,16 +19,10 @@ import {
   SignalOptions,
 } from "solid-js";
 import { debounce, throttle } from "@solid-primitives/scheduled";
-import { ItemsOf, noop, EffectOptions } from "@solid-primitives/utils";
+import { noop, EffectOptions } from "@solid-primitives/utils";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
-
-const set =
-  <T>(setter: Setter<T>) =>
-  (v: T): void => {
-    setter(() => v);
-  };
 
 const callbackWith = <A, T>(fn: (a: A) => T, v: Accessor<A>): (() => T) =>
   fn.length > 0 ? () => fn(untrack(v)) : (fn as () => T);
@@ -109,26 +103,12 @@ export function createPureReaction(
  */
 export function createLatest<T extends Accessor<any>[]>(
   sources: T,
-  value: ReturnType<ItemsOf<T>>,
-  options: SignalOptions<ReturnType<ItemsOf<T>>>,
-): Accessor<ReturnType<ItemsOf<T>>>;
-export function createLatest<T extends Accessor<any>[]>(
-  sources: T,
-  value?: ReturnType<ItemsOf<T>>,
-  options?: SignalOptions<ReturnType<ItemsOf<T>> | undefined>,
-): Accessor<ReturnType<ItemsOf<T>> | undefined>;
-export function createLatest(
-  sources: Accessor<any>[],
-  value: any,
-  options: SignalOptions<any> = {},
-): Accessor<any> {
-  const [last, setLast] = createSignal(value, options);
-  for (const fn of sources) createComputed(on(fn, set(setLast), { defer: true }));
-  return last;
+  options?: SignalOptions<ReturnType<T[number]>>,
+): Accessor<ReturnType<T[number]>> {
+  const [signal, setSignal] = createSignal(0);
+  const memos = sources.map((source, i) => createMemo(() => (setSignal(i), source())));
+  return createMemo(() => memos.map(m => m())[signal()]!, undefined, options);
 }
-
-/** @deprecated use `createLatest` instead */
-export const createCurtain = createLatest;
 
 /**
  * Solid's `createMemo` which value can be overwritten by a setter. Signal value will be the last one, set by a setter or a memo calculation.
@@ -142,52 +122,33 @@ export const createCurtain = createLatest;
  * const [result, setResult] = createWritableMemo(() => count() * 2);
  * setResult(5) // overwrites calculation result
  */
-export function createWritableMemo<T>(
-  fn: (prev: T) => T,
-  value: T,
-  options?: MemoOptions<T>,
-): [signal: Accessor<T>, setter: Setter<T>];
-export function createWritableMemo<T>(
-  fn: (prev: T | undefined) => T,
-  value?: undefined,
-  options?: MemoOptions<T | undefined>,
-): [signal: Accessor<T>, setter: Setter<T>];
+export function createWritableMemo<Next extends Prev, Prev = Next>(
+  fn: EffectFunction<undefined | NoInfer<Prev>, Next>,
+): [signal: Accessor<Next>, setter: Setter<Next>];
+export function createWritableMemo<Next extends Prev, Init = Next, Prev = Next>(
+  fn: EffectFunction<Init | Prev, Next>,
+  value: Init,
+  options?: MemoOptions<Next>,
+): [signal: Accessor<Next>, setter: Setter<Next>];
 export function createWritableMemo<T>(
   fn: (prev: T | undefined) => T,
   value?: T,
   options?: MemoOptions<T | undefined>,
 ): [signal: Accessor<T>, setter: Setter<T>] {
-  const [signal, setSignal] = createSignal(fn(value), options);
-  const calc = callbackWith(fn, signal);
-  createComputed(on(calc, set(setSignal), { defer: true }));
-  return [signal, setSignal];
-}
+  let combined: Accessor<T> = () => value as T;
+  const [signal, setSignal] = createSignal(value as T),
+    memo = createMemo(
+      callbackWith(fn, () => combined()),
+      value,
+    );
 
-/*
-
-alternative implementation to try:
-
-export function createWritableMemo<T>(fn: () => T, initialValue: T) {
-  let latest: Accessor<T>;
-  const [value, setValue] = createSignal<T>(initialValue);
-  const memo = createMemo(fn, initialValue);
-  latest = memo;
-  const combined = createMemo(() => {
-    const s = value();
-    const m = memo();
-    if (value === latest) return s;
-    else return m;
-  });
   return [
-    combined,
-    (v: T) => {
-      latest = value;
-      return setValue(() => v);
-    }
-  ] as const;
+    (combined = createLatest([signal, memo], options)),
+    ((setter: any): T =>
+      setSignal(() => (typeof setter === "function" ? setter(untrack(combined)) : setter))
+        .v) as Setter<T>,
+  ];
 }
-
-*/
 
 /**
  * Solid's `createMemo` which returned signal is debounced. *(The {@link fn} callback is not debounced!)*
