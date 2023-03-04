@@ -6,7 +6,7 @@ import {
   isToken,
   JSXParserData,
   resolveTokens,
-  TokenElement
+  TokenElement,
 } from "../src";
 
 describe("jsx-parser", () => {
@@ -31,7 +31,7 @@ describe("jsx-parser", () => {
             <MyToken1 text="bar" />
           </>
         ),
-        true
+        { includeJSXElements: true },
       );
 
       expect(tokens()).toHaveLength(3);
@@ -39,11 +39,11 @@ describe("jsx-parser", () => {
       expect(tokens()[0]).toBeInstanceOf(HTMLDivElement);
       expect(isToken(parser1, tokens()[0])).toBe(false);
       expect(
-        (tokens()[1] as unknown as TokenElement<JSXParserData<typeof parser1>>).data.props.text
+        (tokens()[1] as unknown as TokenElement<JSXParserData<typeof parser1>>).data.props.text,
       ).toBe("foo");
       expect(isToken(parser1, tokens()[1])).toBe(true);
       expect(
-        (tokens()[2] as unknown as TokenElement<JSXParserData<typeof parser1>>).data.props.text
+        (tokens()[2] as unknown as TokenElement<JSXParserData<typeof parser1>>).data.props.text,
       ).toBe("bar");
       expect(isToken(parser1, tokens()[2])).toBe(true);
 
@@ -63,9 +63,9 @@ describe("jsx-parser", () => {
       ));
 
       expect(tokens()).toHaveLength(2);
-      tokens().forEach(data => expect(data.type).toBe("my-token"));
-      expect(tokens()[0]!.props.text).toBe("foo");
-      expect(tokens()[1]!.props.text).toBe("bar");
+      tokens().forEach(token => expect(token.data.type).toBe("my-token"));
+      expect(tokens()[0]!.data.props.text).toBe("foo");
+      expect(tokens()[1]!.data.props.text).toBe("bar");
     });
   });
 
@@ -121,8 +121,8 @@ describe("jsx-parser", () => {
       ));
 
       expect(tokens()).toHaveLength(2);
-      expect(tokens()[0]!.text).toBe("foo");
-      expect(tokens()[1]!.text).toBe("bar");
+      expect(tokens()[0]!.data.text).toBe("foo");
+      expect(tokens()[1]!.data.text).toBe("bar");
     });
   });
 
@@ -138,8 +138,8 @@ describe("jsx-parser", () => {
 
       const tokens = resolveTokens(parser, () => <MyToken text="foo" />);
 
-      expect(tokens()[0]!.n).toBe(0);
-      expect(tokens()[0]!.n).toBe(1);
+      expect(tokens()[0]!.data.n).toBe(0);
+      expect(tokens()[0]!.data.n).toBe(1);
     });
   });
 });

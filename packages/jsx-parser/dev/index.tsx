@@ -14,7 +14,9 @@ const parser = createJSXParser<{
 }>({ name: "calculator" });
 
 const Calculator: ParentComponent = props => {
-  const tokens = resolveTokens(parser, () => props.children, true);
+  const tokens = resolveTokens(parser, () => props.children, {
+    includeJSXElements: true,
+  });
 
   const calculation = () => {
     let result = 0;
@@ -75,7 +77,9 @@ const App: Component = () => {
         <h4>This is a calculator</h4>
         <div class="flex">
           <Calculator>
-            <div>Invalid element (not token)</div>
+            <p>
+              <i>(I'am not a token)</i>
+            </p>
             <Value value={1} />
             <Add value={4} />
             <Subtract value={2} />

@@ -90,9 +90,12 @@ It is useful if you want to access the data passed with the tokens, but also the
 
 - `parser` object returned by `createJSXParser`
 - `fn` accessor that returns a JSX Element
-- `addElements` if `true`, JSX Elements will be included in the result array (default: `false`)
+- `options` options for the resolver:
+  - `includeJSXElements` - if `true`, other JSX Elements will be included in the result array (default: `false`)
 
-`resolveTokens` will return a signal that returns an array of token data or tokens and resolved JSX Elements.
+`resolveTokens` will return a signal that returns an array of resolved tokens and JSX Elements.
+
+Token data is available on the `data` property of the token.
 
 ```tsx
 import { resolveTokens } from "@solid-primitives/jsx-parser";
@@ -101,24 +104,28 @@ const tokens = resolveTokens(parser, () => props.children);
 
 createEffect(() => {
   tokens().forEach(token => {
-    // token is the data returned by the tokenData function
-    console.log(token);
+    // token is a function that returns the JSX Element fallback
+    // token.data is the data returned by the tokenData function
+    console.log(token.data);
   });
 });
+
+// the return value of resolveTokens can be used in JSX (will render the fallback JSX Elements)
+return <>{els()}</>;
 ```
 
 ### Resolve JSX Elements with `resolveTokens`
 
-If you want to resolve the JSX Elements as well, you can pass `true` as the third parameter to `resolveTokens`.
-
-Token data is available on the `data` property of the token.
+If you want to resolve the JSX Elements as well, you can pass `{ includeJSXElements: true }` as the third parameter to `resolveTokens`.
 
 Use [`isToken`](#istoken) to validate if a value is a token created by the corresponding jsx-parser.
 
 ```tsx
 import { resolveTokens, isToken } from "@solid-primitives/jsx-parser";
 
-const els = resolveTokens(parser, () => props.children, true);
+const els = resolveTokens(parser, () => props.children, {
+  includeJSXElements: true,
+});
 
 createEffect(() => {
   els().forEach(el => {

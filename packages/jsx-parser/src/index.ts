@@ -80,22 +80,21 @@ export function createToken<T>(
   };
 }
 
-function resolveChildren(
+function getResolvedTokens(
   resolved: unknown[],
   children: unknown,
   symbol: symbol,
-  addElements: boolean,
+  addElements: boolean | undefined,
 ): any[] {
   // function
   if (typeof children === "function" && !children.length) {
-    if (symbol in children)
-      addElements ? resolved.push(children) : resolved.push((children as any).data);
-    else resolveChildren(resolved, children(), symbol, addElements);
+    if (symbol in children) resolved.push(children);
+    else getResolvedTokens(resolved, children(), symbol, addElements);
   }
   // array
   else if (Array.isArray(children))
     for (let i = 0; i < children.length; i++)
-      resolveChildren(resolved, children[i], symbol, addElements);
+      getResolvedTokens(resolved, children[i], symbol, addElements);
   // other element
   else if (addElements) resolved.push(children);
   else if (process.env.DEV && children)
@@ -109,26 +108,35 @@ function resolveChildren(
  * Resolves all tokens in a JSX Element
  * @param parser object returned by `createJSXParser`
  * @param fn accessor that returns a JSX Element
- * @param addElements if `true`, JSX Elements will be included in the result array (default: `false`)
+ * @param options options for the resolver
+ * - `includeJSXElements` - if `true`, other JSX Elements will be included in the result array (default: `false`)
  * @returns accessor that returns an array of resolved tokens and JSX Elements
  */
 export function resolveTokens<T>(
   parser: JSXParser<T>,
   fn: Accessor<JSX.Element>,
-  addElements: true,
+  options?: {
+    includeJSXElements?: false;
+  },
+): Accessor<TokenElement<T>[]>;
+export function resolveTokens<T>(
+  parser: JSXParser<T>,
+  fn: Accessor<JSX.Element>,
+  options: {
+    includeJSXElements: true;
+  },
 ): Accessor<(TokenElement<T> | ResolvedJSXElement)[]>;
 export function resolveTokens<T>(
   parser: JSXParser<T>,
   fn: Accessor<JSX.Element>,
-  addElements?: boolean,
-): Accessor<T[]>;
-export function resolveTokens<T>(
-  parser: JSXParser<T>,
-  fn: Accessor<JSX.Element>,
-  addElements = false,
-): Accessor<(TokenElement<T> | ResolvedJSXElement)[] | T[]> {
+  options?: {
+    includeJSXElements?: boolean;
+  },
+): Accessor<(TokenElement<T> | ResolvedJSXElement)[]> {
   const children = createMemo(fn);
-  return createMemo(() => resolveChildren([], children(), parser.id, addElements));
+  return createMemo(() =>
+    getResolvedTokens([], children(), parser.id, options?.includeJSXElements),
+  );
 }
 
 /**
