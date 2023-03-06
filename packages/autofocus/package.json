@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "autofocus",
-    "stage": 0,
+    "stage": 1,
     "list": [
       "autofocus",
       "createAutofocus"
