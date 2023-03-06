@@ -1,5 +1,11 @@
 # @solid-primitives/jsx-parser
 
+## 0.2.0
+
+### Minor Changes
+
+- b1bf1d74: Merge `resolveData` and `resolveTokens` together. Add option to resolve JSX Elements as well.
+
 ## 0.1.3
 
 ### Patch Changes
