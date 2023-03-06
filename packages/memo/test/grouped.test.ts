@@ -34,7 +34,7 @@ describe("createThrottledMemo", () => {
           return 123;
         },
         0,
-        0
+        0,
       );
       expect(memo()).toBe(123);
       expect(capturedPrev).toEqual([0]);
@@ -125,7 +125,7 @@ describe("createDebouncedMemoOn", () => {
           runs++;
           return v;
         },
-        50
+        50,
       );
       expect(memo()).toBe(0);
       expect(runs).toBe(1);

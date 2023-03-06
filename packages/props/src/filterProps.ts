@@ -29,9 +29,9 @@ export function filterProps<T extends object>(props: T, predicate: (key: keyof T
       },
       keys() {
         return Object.keys(props).filter(predicate as (key: string) => boolean);
-      }
+      },
     },
-    propTraps
+    propTraps,
   ) as unknown as T;
 }
 
@@ -55,7 +55,7 @@ export function filterProps<T extends object>(props: T, predicate: (key: keyof T
  */
 export function createPropsPredicate<T extends object>(
   props: T,
-  predicate: (key: keyof T) => boolean
+  predicate: (key: keyof T) => boolean,
 ): (key: keyof T) => boolean {
   const cache = createMemo(
     (): Partial<Record<keyof T, boolean>> => {
@@ -64,7 +64,7 @@ export function createPropsPredicate<T extends object>(
       return {};
     },
     undefined,
-    { equals: false }
+    { equals: false },
   );
   return key => {
     const cacheRef = cache();

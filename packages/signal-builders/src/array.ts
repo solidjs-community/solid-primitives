@@ -5,7 +5,7 @@ import {
   ItemsOf,
   MaybeAccessor,
   MaybeAccessorValue,
-  ofClass
+  ofClass,
 } from "@solid-primitives/utils";
 import * as _ from "@solid-primitives/immutable";
 import { Accessor, createMemo } from "solid-js";
@@ -17,7 +17,7 @@ import type { MappingFn, Predicate, FlattenArray } from "@solid-primitives/immut
 export const push = <
   A extends MaybeAccessor<any[]>,
   V extends ItemsOf<MaybeAccessorValue<A>>,
-  T extends MaybeAccessor<V>[]
+  T extends MaybeAccessor<V>[],
 >(
   list: A,
   ...items: T
@@ -41,7 +41,7 @@ export const dropRight = <T extends any[]>(list: MaybeAccessor<T>, n?: number): 
  */
 export const filter = <A extends MaybeAccessor<any[]>, V extends ItemsOf<MaybeAccessorValue<A>>>(
   list: A,
-  predicate: Predicate<V>
+  predicate: Predicate<V>,
 ): Accessor<V[]> => createMemo(() => _.filter(access(list), predicate));
 
 /**
@@ -49,7 +49,7 @@ export const filter = <A extends MaybeAccessor<any[]>, V extends ItemsOf<MaybeAc
  */
 export const filterOut = <A extends MaybeAccessor<any[]>, V extends ItemsOf<MaybeAccessorValue<A>>>(
   list: A,
-  item: MaybeAccessor<V>
+  item: MaybeAccessor<V>,
 ): Accessor<V[]> => createMemo(() => _.filterOut(access(list), access(item)));
 
 /**
@@ -57,7 +57,7 @@ export const filterOut = <A extends MaybeAccessor<any[]>, V extends ItemsOf<Mayb
  */
 export const sort = <A extends MaybeAccessor<any[]>, V extends ItemsOf<MaybeAccessorValue<A>>>(
   list: A,
-  compareFn?: (a: V, b: V) => number
+  compareFn?: (a: V, b: V) => number,
 ): Accessor<V[]> => createMemo(() => _.sort(access(list), compareFn));
 
 /**
@@ -65,7 +65,7 @@ export const sort = <A extends MaybeAccessor<any[]>, V extends ItemsOf<MaybeAcce
  */
 export const map = <A extends MaybeAccessor<any[]>, T>(
   list: A,
-  mapFn: MappingFn<ItemsOf<MaybeAccessorValue<A>>, T>
+  mapFn: MappingFn<ItemsOf<MaybeAccessorValue<A>>, T>,
 ): Accessor<T[]> => createMemo(() => _.map(access(list), mapFn));
 
 /**
@@ -74,7 +74,7 @@ export const map = <A extends MaybeAccessor<any[]>, T>(
 export const slice = <T extends any[]>(
   list: MaybeAccessor<T>,
   start?: number,
-  end?: number
+  end?: number,
 ): Accessor<T> => createMemo(() => _.slice(access(list), start, end) as T);
 
 /**
@@ -83,7 +83,7 @@ export const slice = <T extends any[]>(
 export const splice = <
   A extends MaybeAccessor<any[]>,
   V extends ItemsOf<MaybeAccessorValue<A>>,
-  T extends MaybeAccessor<V>[]
+  T extends MaybeAccessor<V>[],
 >(
   list: A,
   start: MaybeAccessor<number>,
@@ -91,7 +91,7 @@ export const splice = <
   ...items: T
 ): Accessor<(V | MaybeAccessorValue<ItemsOf<T>>)[]> =>
   createMemo(() =>
-    _.splice(access(list), access(start), access(deleteCount), ...accessArray(items))
+    _.splice(access(list), access(start), access(deleteCount), ...accessArray(items)),
   );
 
 /**
@@ -99,7 +99,7 @@ export const splice = <
  */
 export const remove = <A extends MaybeAccessor<any[]>, V extends ItemsOf<MaybeAccessorValue<A>>>(
   list: A,
-  item: MaybeAccessor<V>
+  item: MaybeAccessor<V>,
 ): Accessor<V[]> => createMemo(() => _.remove(access(list), access(item)));
 
 /**
@@ -129,9 +129,9 @@ export const flatten = <T extends any[]>(list: MaybeAccessor<T>): Accessor<Flatt
  */
 export const filterInstance = <T, I extends AnyClass[]>(list: MaybeAccessor<T[]>, ...classes: I) =>
   (classes.length === 1
-    ? createMemo(() => access(list).filter(item => ofClass(item, classes[0])))
+    ? createMemo(() => access(list).filter(item => ofClass(item, classes[0]!)))
     : createMemo(() =>
-        access(list).filter(item => item && classes.some(c => ofClass(item, c)))
+        access(list).filter(item => item && classes.some(c => ofClass(item, c))),
       )) as Accessor<Extract<T, InstanceType<ItemsOf<I>>>[]>;
 
 /**
@@ -142,7 +142,7 @@ export const filterOutInstance = <T, I extends AnyClass[]>(
   ...classes: I
 ) =>
   (classes.length === 1
-    ? createMemo(() => access(list).filter(item => item && !ofClass(item, classes[0])))
+    ? createMemo(() => access(list).filter(item => item && !ofClass(item, classes[0]!)))
     : createMemo(() =>
-        access(list).filter(item => item && !classes.some(c => ofClass(item, c)))
+        access(list).filter(item => item && !classes.some(c => ofClass(item, c))),
       )) as Accessor<Exclude<T, InstanceType<ItemsOf<I>>>[]>;

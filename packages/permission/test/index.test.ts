@@ -16,7 +16,7 @@ describe("permission", () => {
             resolve();
           }
         });
-      })
+      }),
     ));
 
   it("reads permission updates", () =>
@@ -35,6 +35,6 @@ describe("permission", () => {
             resolve();
           }
         });
-      })
+      }),
     ));
 });

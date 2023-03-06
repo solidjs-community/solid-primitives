@@ -60,7 +60,7 @@ describe("filterProps + createPropsPredicate", () => {
       const props = { a: 1, b: 2, c: 3, d: 4 };
       const filtered = filterProps(
         props,
-        createPropsPredicate(props, key => key !== "b")
+        createPropsPredicate(props, key => key !== "b"),
       );
       expect(filtered).toEqual({ a: 1, c: 3, d: 4 });
       expect(Object.keys(filtered)).toEqual(["a", "c", "d"]);
@@ -77,7 +77,7 @@ describe("filterProps + createPropsPredicate", () => {
         createPropsPredicate(props, key => {
           checked.push(key);
           return true;
-        })
+        }),
       );
       expect(checked.length).toBe(0);
 
@@ -105,7 +105,7 @@ describe("filterProps + createPropsPredicate", () => {
         createPropsPredicate(proxy, key => {
           checked.push(key);
           return key !== "b" && key !== "d";
-        })
+        }),
       );
       let captured: any;
       createComputed(() => {

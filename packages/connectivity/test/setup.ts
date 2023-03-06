@@ -6,5 +6,5 @@ export const setOnline = (value: boolean) => {
 };
 
 Object.defineProperty(navigator, "onLine", {
-  get: () => online
+  get: () => online,
 });

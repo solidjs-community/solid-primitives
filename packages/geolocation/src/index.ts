@@ -5,7 +5,7 @@ import { access, MaybeAccessor, createStaticStore } from "@solid-primitives/util
 const geolocationDefaults: PositionOptions = {
   enableHighAccuracy: false,
   maximumAge: 0,
-  timeout: Number.POSITIVE_INFINITY
+  timeout: Number.POSITIVE_INFINITY,
 };
 
 /**
@@ -23,14 +23,14 @@ const geolocationDefaults: PositionOptions = {
  * ```
  */
 export const createGeolocation = (
-  options?: MaybeAccessor<PositionOptions>
+  options?: MaybeAccessor<PositionOptions>,
 ): [location: Resource<GeolocationCoordinates | undefined>, refetch: VoidFunction] => {
   if (process.env.SSR) {
     return [
       Object.assign(() => {}, { error: undefined, loading: true }) as Resource<undefined>,
       () => {
         /* noop */
-      }
+      },
     ];
   }
   const [location, { refetch }] = createResource(
@@ -43,9 +43,9 @@ export const createGeolocation = (
         navigator.geolocation.getCurrentPosition(
           res => resolve(res.coords),
           error => reject(Object.assign(new Error(error.message), error)),
-          options
+          options,
         );
-      })
+      }),
   );
   return [location, refetch];
 };
@@ -67,7 +67,7 @@ export const createGeolocation = (
  */
 export const createGeolocationWatcher = (
   enabled: MaybeAccessor<boolean>,
-  options?: MaybeAccessor<PositionOptions>
+  options?: MaybeAccessor<PositionOptions>,
 ): {
   location: GeolocationCoordinates | null;
   error: GeolocationPositionError | null;
@@ -80,7 +80,7 @@ export const createGeolocationWatcher = (
     error: null | GeolocationPositionError;
   }>({
     location: null,
-    error: null
+    error: null,
   });
   let registeredHandlerID: number | null;
   const clearGeolocator = () =>
@@ -91,7 +91,7 @@ export const createGeolocationWatcher = (
       return (registeredHandlerID = navigator.geolocation.watchPosition(
         res => setStore({ location: res.coords, error: null }),
         error => setStore({ location: null, error }),
-        Object.assign(geolocationDefaults, access(options))
+        Object.assign(geolocationDefaults, access(options)),
       ));
     }
     clearGeolocator();

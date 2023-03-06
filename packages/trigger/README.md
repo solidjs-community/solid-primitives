@@ -7,13 +7,12 @@
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/trigger?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/trigger)
 [![version](https://img.shields.io/npm/v/@solid-primitives/trigger?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/trigger)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A set of primitives based on Solid signals, used to trigger computations.
 
 - [`createTrigger`](#createTrigger) - Set listeners in reactive computations and then trigger them when you want.
-- [`createTriggerCache`](#createTriggerCache) - A map of triggers cached by a key.
-- [`createWeakTriggerCache`](#createWeakTriggerCache) - A weakmap of triggers cached by a weak key.
+- [`createTriggerCache`](#createTriggerCache) - Creates a cache of triggers that can be used to mark dirty only specific keys.
 
 ## Installation
 
@@ -21,6 +20,8 @@ A set of primitives based on Solid signals, used to trigger computations.
 npm install @solid-primitives/trigger
 # or
 yarn add @solid-primitives/trigger
+# or
+pnpm add @solid-primitives/trigger
 ```
 
 ## `createTrigger`
@@ -45,7 +46,14 @@ dirty();
 
 ## `createTriggerCache`
 
-A map of triggers cached by a key.
+Creates a cache of triggers that can be used to mark dirty only specific keys.
+
+Cache is a `Map` or `WeakMap` depending on the `mapConstructor` argument. (default: `Map`)
+
+If `mapConstructor` is `WeakMap` then the cache will be weak and the keys will be garbage collected when they are no longer referenced.
+
+Trigger signals added to the cache only when tracked under a computation,
+and get deleted from the cache when they are no longer tracked.
 
 ### How to use it
 
@@ -54,42 +62,35 @@ A map of triggers cached by a key.
 ```ts
 import { createTriggerCache } from "@solid-primitives/trigger";
 
-const { track, dirty } = createTriggerCache();
+const map = createTriggerCache<number>();
 
 createEffect(() => {
-  track(1);
+  map.track(1);
   //  ...
 });
 
 // later
-dirty(1);
+map.dirty(1);
 // this won't cause an update:
-dirty(2);
+map.dirty(2);
 ```
 
-## `createWeakTriggerCache`
+### Weak version
 
-A weakmap of triggers cached by a weak key.
-
-### How to use it
-
-`track` and `dirty` are called with a `key` so that each tracker will trigger an update only when his individual `key` would get marked as dirty.
+`createTriggerCache` constructor can take a `WeakMap` constructor as an argument. This will create a `WeakMap` of triggers instead of a `Map`.
 
 ```ts
-import { createWeakTriggerCache } from "@solid-primitives/trigger";
+const map = createTriggerCache<object>(WeakMap);
 
-const { track, dirty } = createWeakTriggerCache();
-const key = {};
+const obj = {};
 
 createEffect(() => {
-  track(key);
+  map.track(obj);
   //  ...
 });
 
 // later
-dirty(key);
-// this won't cause an update:
-dirty({});
+map.dirty(obj);
 ```
 
 ## Demo

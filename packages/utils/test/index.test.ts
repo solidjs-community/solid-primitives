@@ -1,6 +1,6 @@
 import { describe, test, expect, assert } from "vitest";
 import { createComputed, createRoot } from "solid-js";
-import { createStaticStore, handleDiffArray, arrayEquals } from "../src";
+import { createStaticStore, handleDiffArray, arrayEquals, createHydrateSignal } from "../src";
 
 describe("createStaticStore", () => {
   test("individual keys only update when changed", () => {
@@ -13,7 +13,7 @@ describe("createStaticStore", () => {
         a: 1,
         b: 2,
         c: 3,
-        d: [0, 1, 2]
+        d: [0, 1, 2],
       });
 
       setState({ a: 9, d: [3, 2, 1] });
@@ -23,7 +23,7 @@ describe("createStaticStore", () => {
         a: 1,
         b: 2,
         c: 3,
-        d: [0, 1, 2]
+        d: [0, 1, 2],
       });
 
       let aUpdates = -1;
@@ -34,7 +34,7 @@ describe("createStaticStore", () => {
       expect(aUpdates).toBe(0);
 
       setState({
-        b: 3
+        b: 3,
       });
       expect(aUpdates).toBe(0);
       setState("a", 4);
@@ -76,7 +76,7 @@ describe("handleDiffArray", () => {
       },
       () => {
         throw "Should never run";
-      }
+      },
     );
     expect(captured.length).toBe(5);
     assert(captured.includes("foo"));
@@ -98,7 +98,7 @@ describe("handleDiffArray", () => {
       },
       item => {
         captured.push(item);
-      }
+      },
     );
     expect(captured.length).toBe(5);
     assert(captured.includes("foo"));
@@ -119,7 +119,7 @@ describe("handleDiffArray", () => {
       },
       () => {
         throw "Should never run";
-      }
+      },
     );
   });
 
@@ -132,7 +132,7 @@ describe("handleDiffArray", () => {
       b,
       a,
       item => capturedAdded.push(item),
-      item => capturedRemoved.push(item)
+      item => capturedRemoved.push(item),
     );
     expect(capturedAdded.length).toBe(2);
     assert(capturedAdded.includes("bar"));
@@ -154,5 +154,13 @@ describe("arrayEquals", () => {
     assert(!arrayEquals([1, 2, 3], [1, 2, 3, 4]));
     assert(!arrayEquals([1, 2, 3], [1, 0, 3]));
     assert(!arrayEquals([1, 2, _1], [1, 2, []]));
+  });
+});
+
+describe("createHydrateSignal", () => {
+  test("createHydrateSignal() - CSR", () => {
+    const [state, setState] = createHydrateSignal("server", () => "client");
+    expect(state()).toEqual("client");
+    expect(setState).toBeInstanceOf(Function);
   });
 });

@@ -10,7 +10,7 @@ describe("jsx-parser", () => {
 
   const MyToken1 = createToken(parser1, (props: { text: string }) => ({
     type: "my-token",
-    props
+    props,
   }));
 
   it("should work", () => {
@@ -23,8 +23,8 @@ describe("jsx-parser", () => {
 
     expect(tokens()).toHaveLength(2);
     tokens().forEach(token => expect(token.data.type).toBe("my-token"));
-    expect(tokens()[0].data.props.text).toBe("foo");
-    expect(tokens()[1].data.props.text).toBe("bar");
+    expect(tokens()[0]!.data.props.text).toBe("foo");
+    expect(tokens()[1]!.data.props.text).toBe("bar");
 
     // shouldn't throw
     <>{tokens()}</>;
@@ -36,7 +36,7 @@ describe("jsx-parser", () => {
     const MyToken2 = createToken(
       parser2,
       () => ({}),
-      (props: { text: string }) => <div>{props.text}</div>
+      (props: { text: string }) => <div>{props.text}</div>,
     );
 
     const rendered1 = renderToString(() => <MyToken2 text="foo" />);

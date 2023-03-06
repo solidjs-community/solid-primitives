@@ -4,6 +4,6 @@ export {
   makeMouseInsideListener,
   getPositionToElement,
   getPositionToScreen,
-  getPositionInElement
+  getPositionInElement,
 } from "./common";
 export * from "./primitives";

@@ -2,7 +2,7 @@ import {
   makeIntersectionObserver,
   createIntersectionObserver,
   createViewportObserver,
-  createVisibilityObserver
+  createVisibilityObserver,
 } from "../src";
 import { describe, test, expect, vi } from "vitest";
 

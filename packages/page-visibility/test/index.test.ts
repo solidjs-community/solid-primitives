@@ -9,7 +9,7 @@ describe("createPageVisibility", () => {
       Object.defineProperty(document, "visibilityState", {
         get() {
           return doc_visibility;
-        }
+        },
       });
 
       const visibility = createPageVisibility();

@@ -39,7 +39,7 @@ class Blob {
 }
 
 let clipboardEntries: ClipboardItems = [
-  new ClipboardItem("InitialValue")
+  new ClipboardItem("InitialValue"),
 ] as unknown as ClipboardItems;
 export const getLastClipboardEntry = () => clipboardEntries[clipboardEntries.length - 1];
 
@@ -60,7 +60,7 @@ const clipboard: typeof navigator.clipboard = {
       clipboardEntries = value;
       res();
     }),
-  dispatchEvent: (_event: Event) => true
+  dispatchEvent: (_event: Event) => true,
 };
 
 Object.assign(global.navigator, { clipboard });

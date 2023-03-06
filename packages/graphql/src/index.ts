@@ -18,12 +18,12 @@ export type GraphQLClientQuery = {
   <T = unknown, V extends object = {}>(
     query: string | DocumentNode | TypedDocumentNode<T, V>,
     variables: MaybeAccessor<V | FalsyValue> | undefined,
-    initialValue: T
+    initialValue: T,
   ): ResourceReturn<T>;
   <T = unknown, V extends object = {}>(
     query: string | DocumentNode | TypedDocumentNode<T, V>,
     variables?: MaybeAccessor<V | FalsyValue>,
-    initialValue?: undefined
+    initialValue?: undefined,
   ): ResourceReturn<T | undefined>;
 };
 
@@ -50,7 +50,7 @@ export const createGraphQLClient =
         const variables = typeof vars === "boolean" ? {} : vars;
         return request(access(url), query, { ...options, variables });
       },
-      { initialValue }
+      { initialValue },
     );
 
 /**
@@ -64,7 +64,7 @@ export const createGraphQLClient =
 export async function request<T = any, V extends object = {}>(
   url: string,
   query: string | DocumentNode | TypedDocumentNode<T, V>,
-  options: RequestOptions<V> = {}
+  options: RequestOptions<V> = {},
 ): Promise<T> {
   const { fetcher = fetch, variables = {}, headers = {}, method = "POST" } = options;
   const query_ = typeof query == "string" ? query : print(query);
@@ -75,8 +75,8 @@ export async function request<T = any, V extends object = {}>(
     body: JSON.stringify({ query: query_, variables }),
     headers: {
       "content-type": "application/json",
-      ...headers
-    }
+      ...headers,
+    },
   })
     .then((r: any) => r.json())
     .then(({ data, errors }: any) => {
@@ -98,7 +98,7 @@ export async function request<T = any, V extends object = {}>(
 export async function multipartRequest<T = any, V extends object = {}>(
   url: string,
   query: string | DocumentNode | TypedDocumentNode<T, V>,
-  options: Omit<RequestOptions<V>, "method"> = {}
+  options: Omit<RequestOptions<V>, "method"> = {},
 ): Promise<T> {
   const { fetcher = fetch, variables = {}, headers = {} } = options;
   const query_ = typeof query == "string" ? query : print(query);
@@ -109,8 +109,8 @@ export async function multipartRequest<T = any, V extends object = {}>(
     body: makeMultipartBody(query_, variables),
     headers: {
       "content-type": "multipart/form-data",
-      ...headers
-    }
+      ...headers,
+    },
   })
     .then((r: any) => r.json())
     .then(({ data, errors }: any) => {
@@ -137,7 +137,7 @@ export function makeMultipartBody(query: string, variables: object) {
     if (v instanceof Blob) {
       parts.push({
         blob: v,
-        path: path.join(".") + "." + k
+        path: path.join(".") + "." + k,
       });
       r[k] = null;
     } else {
@@ -165,7 +165,7 @@ export function makeMultipartBody(query: string, variables: object) {
   formData.append("operations", JSON.stringify({ query, variables }));
   formData.append("map", JSON.stringify(Object.fromEntries(parts.map((x, i) => [`${i}`, x.path]))));
   for (let i = 0; i < parts.length; i++) {
-    formData.append(`${i}`, parts[i].blob);
+    formData.append(`${i}`, parts[i]!.blob);
   }
   return formData;
 }

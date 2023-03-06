@@ -1,6 +1,13 @@
 import { children, createRoot, createSignal, Show } from "solid-js";
 import { describe, expect, it } from "vitest";
-import { createJSXParser, createToken, resolveTokens } from "../src";
+import {
+  createJSXParser,
+  createToken,
+  isToken,
+  JSXParserData,
+  resolveTokens,
+  TokenElement,
+} from "../src";
 
 describe("jsx-parser", () => {
   const parser1 = createJSXParser<{
@@ -10,13 +17,46 @@ describe("jsx-parser", () => {
 
   const MyToken1 = createToken(parser1, (props: { text: string }) => ({
     type: "my-token",
-    props
+    props,
   }));
 
-  it("should work", () => {
+  it("should resolve tokens", () => {
+    createRoot(() => {
+      const tokens = resolveTokens(
+        parser1,
+        () => (
+          <>
+            <div />
+            <MyToken1 text="foo" />
+            <MyToken1 text="bar" />
+          </>
+        ),
+        { includeJSXElements: true },
+      );
+
+      expect(tokens()).toHaveLength(3);
+
+      expect(tokens()[0]).toBeInstanceOf(HTMLDivElement);
+      expect(isToken(parser1, tokens()[0])).toBe(false);
+      expect(
+        (tokens()[1] as unknown as TokenElement<JSXParserData<typeof parser1>>).data.props.text,
+      ).toBe("foo");
+      expect(isToken(parser1, tokens()[1])).toBe(true);
+      expect(
+        (tokens()[2] as unknown as TokenElement<JSXParserData<typeof parser1>>).data.props.text,
+      ).toBe("bar");
+      expect(isToken(parser1, tokens()[2])).toBe(true);
+
+      // shouldn't throw
+      <>{tokens()}</>;
+    });
+  });
+
+  it("should resolve data", () => {
     createRoot(() => {
       const tokens = resolveTokens(parser1, () => (
         <>
+          <div />
           <MyToken1 text="foo" />
           <MyToken1 text="bar" />
         </>
@@ -24,11 +64,8 @@ describe("jsx-parser", () => {
 
       expect(tokens()).toHaveLength(2);
       tokens().forEach(token => expect(token.data.type).toBe("my-token"));
-      expect(tokens()[0].data.props.text).toBe("foo");
-      expect(tokens()[1].data.props.text).toBe("bar");
-
-      // shouldn't throw
-      <>{tokens()}</>;
+      expect(tokens()[0]!.data.props.text).toBe("foo");
+      expect(tokens()[1]!.data.props.text).toBe("bar");
     });
   });
 
@@ -60,7 +97,7 @@ describe("jsx-parser", () => {
       const MyToken = createToken(
         parser,
         () => ({}),
-        (props: { text: string }) => <div>{props.text}</div>
+        (props: { text: string }) => <div>{props.text}</div>,
       );
 
       const rendered1 = children(() => <MyToken text="foo" />);
@@ -84,8 +121,8 @@ describe("jsx-parser", () => {
       ));
 
       expect(tokens()).toHaveLength(2);
-      expect(tokens()[0].data.text).toBe("foo");
-      expect(tokens()[1].data.text).toBe("bar");
+      expect(tokens()[0]!.data.text).toBe("foo");
+      expect(tokens()[1]!.data.text).toBe("bar");
     });
   });
 
@@ -96,13 +133,13 @@ describe("jsx-parser", () => {
       const MyToken = createToken(parser, () => ({
         get n() {
           return count++;
-        }
+        },
       }));
 
       const tokens = resolveTokens(parser, () => <MyToken text="foo" />);
 
-      expect(tokens()[0].data.n).toBe(0);
-      expect(tokens()[0].data.n).toBe(1);
+      expect(tokens()[0]!.data.n).toBe(0);
+      expect(tokens()[0]!.data.n).toBe(1);
     });
   });
 });

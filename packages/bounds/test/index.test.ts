@@ -20,7 +20,7 @@ describe("getElementBounds", () => {
       bottom: 0,
       right: 0,
       width: 0,
-      height: 0
+      height: 0,
     });
   });
 });
@@ -35,7 +35,7 @@ describe("createElementBounds", () => {
         bottom: 0,
         right: 0,
         width: 0,
-        height: 0
+        height: 0,
       });
       dispose();
     }));
@@ -49,7 +49,7 @@ describe("createElementBounds", () => {
         bottom: null,
         right: null,
         width: null,
-        height: null
+        height: null,
       });
       dispose();
     }));

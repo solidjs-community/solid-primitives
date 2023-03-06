@@ -23,7 +23,7 @@ const App: Component = () => {
   const meetingIdMask = anyMaskToFn("999-999-999");
   const meetingNameMask = anyMaskToFn([
     /[^0-9a-zäöüß\-_/]|^(https?:\/\/|)(meet\.goto\.com|gotomeet\.me|)\/?/gi,
-    () => ""
+    () => "",
   ]);
   const meetingMask = (value: string, selection: Selection): [string, Selection] =>
     potentialNumericId.test(value)

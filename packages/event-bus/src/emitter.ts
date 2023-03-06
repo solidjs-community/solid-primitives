@@ -28,7 +28,7 @@ export class EmitterCore<M extends Record<PropertyKey, any>> extends Map<
 
 export type EmitterOn<M extends Record<PropertyKey, any>> = <K extends keyof M>(
   event: K,
-  listener: Listener<M[K]>
+  listener: Listener<M[K]>,
 ) => VoidFunction;
 
 export type EmitterEmit<M extends Record<PropertyKey, any>> = EmitterCore<M>["emit"];
@@ -69,7 +69,7 @@ export function createEmitter<M extends Record<PropertyKey, any>>(): Emitter<M> 
       return tryOnCleanup(emitter.off.bind(emitter, event, listener as any));
     },
     emit: emitter.emit.bind(emitter),
-    clear: onCleanup(emitter.clear.bind(emitter))
+    clear: onCleanup(emitter.clear.bind(emitter)),
   };
 }
 
@@ -78,11 +78,11 @@ export type EmitterPayload<M extends Record<PropertyKey, any>> = {
 }[keyof M];
 
 export type EmitterListener<M extends Record<PropertyKey, any>> = (
-  payload: EmitterPayload<M>
+  payload: EmitterPayload<M>,
 ) => void;
 
 export type EmitterListen<M extends Record<PropertyKey, any>> = (
-  listener: EmitterListener<M>
+  listener: EmitterListener<M>,
 ) => VoidFunction;
 
 export type GlobalEmitter<M extends Record<PropertyKey, any>> = {
@@ -137,6 +137,6 @@ export function createGlobalEmitter<M extends Record<PropertyKey, any>>(): Globa
     emit(name, details?: any) {
       global.emit({ name, details });
       emitter.emit(name, details);
-    }
+    },
   };
 }

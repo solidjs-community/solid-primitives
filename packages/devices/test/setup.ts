@@ -12,5 +12,5 @@ const listeners: (() => void)[] = [];
   enumerateDevices: () => Promise.resolve((window as any).__devices__ as MediaDeviceInfo[]),
   addEventListener: (ev: string, cb: () => void) => listeners.push(cb),
   removeEventListener: (ev: string, cb: () => void) => listeners.splice(listeners.indexOf(cb), 1),
-  dispatchFakeEvent: () => listeners.forEach(cb => cb())
+  dispatchFakeEvent: () => listeners.forEach(cb => cb()),
 };

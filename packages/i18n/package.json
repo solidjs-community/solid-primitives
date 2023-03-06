@@ -1,8 +1,11 @@
 {
   "name": "@solid-primitives/i18n",
-  "version": "1.1.4",
+  "version": "1.2.1",
   "description": "Primitive to create and use i18n primitives.",
   "author": "Alexandre Mouton-Brady <amoutonbrady@gmail.com>",
+  "contributors": [
+    "Tanner Scadden <tanner@scaddenfamily.com>"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/i18n",
   "repository": {
@@ -14,7 +17,7 @@
     "stage": 3,
     "list": [
       "createI18nContext",
-      "useI18n"
+      "createChainedI18n"
     ],
     "category": "Utilities"
   },
@@ -29,15 +32,24 @@
   "browser": {},
   "types": "./dist/index.d.ts",
   "exports": {
+    "development": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/dev.js"
+      },
+      "require": "./dist/dev.cjs"
+    },
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
     "require": "./dist/index.cjs"
   },
+  "typesVersions": {},
   "scripts": {
-    "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
-    "build": "jiti ../../scripts/build.ts",
+    "dev": "vite serve dev",
+    "page": "vite build dev",
+    "build": "jiti ../../scripts/build.ts --dev",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
@@ -51,5 +63,7 @@
   "peerDependencies": {
     "solid-js": "^1.6.0"
   },
-  "typesVersions": {}
+  "dependencies": {
+    "@solid-primitives/context": "workspace:^0.1.4"
+  }
 }

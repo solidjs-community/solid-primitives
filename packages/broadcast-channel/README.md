@@ -113,8 +113,8 @@ createEffect(
     data => {
       console.log(data); // { id: 2, message: "hi" }
     },
-    { defer: true }
-  )
+    { defer: true },
+  ),
 );
 ```
 
@@ -155,8 +155,8 @@ createEffect(
 
       consumeDataCorrect(data!); // ✅
     },
-    { defer: true }
-  )
+    { defer: true },
+  ),
 );
 
 const consumeDataIncorrect = (data: { id: string; message: string }) => {

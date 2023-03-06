@@ -43,7 +43,7 @@ export const createMicrophones = () => {
   const devices = createDevices();
   return createMemo(() => devices().filter(device => device.kind === "audioinput"), [], {
     name: "microphones",
-    equals: equalDeviceLists
+    equals: equalDeviceLists,
   });
 };
 
@@ -63,7 +63,7 @@ export const createSpeakers = () => {
   const devices = createDevices();
   return createMemo(() => devices().filter(device => device.kind === "audiooutput"), [], {
     name: "speakers",
-    equals: equalDeviceLists
+    equals: equalDeviceLists,
   });
 };
 
@@ -83,7 +83,7 @@ export const createCameras = () => {
   const devices = createDevices();
   return createMemo(() => devices().filter(device => device.kind === "videoinput"), [], {
     name: "cameras",
-    equals: equalDeviceLists
+    equals: equalDeviceLists,
   });
 };
 
@@ -98,7 +98,7 @@ export const createAccelerometer = (includeGravity: boolean = false, interval: n
     return () => ({
       x: 0,
       y: 0,
-      z: 0
+      z: 0,
     });
   }
   const [acceleration, setAcceleration] = createSignal<DeviceMotionEventAcceleration>();
@@ -141,7 +141,7 @@ export const createGyroscope = (interval: number = 100) => {
     setOrientation({
       alpha: e.alpha ? e.alpha : 0,
       beta: e.beta ? e.beta : 0,
-      gamma: e.gamma ? e.gamma : 0
+      gamma: e.gamma ? e.gamma : 0,
     });
   };
 

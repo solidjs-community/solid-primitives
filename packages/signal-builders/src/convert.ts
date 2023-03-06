@@ -9,19 +9,19 @@ export const string = (from: any): Accessor<string> => createMemo(() => access(f
 /**
  * signal-builder turning passed string to an float number
  */
-export const float = (string: MaybeAccessor<string>): Accessor<number> =>
-  createMemo(() => Number.parseFloat(access(string)));
+export const float = (input: MaybeAccessor<string>): Accessor<number> =>
+  createMemo(() => Number.parseFloat(access(input)));
 
 /**
  * signal-builder turning passed string to an intiger
  */
-export const int = (string: MaybeAccessor<string>, radix?: number): Accessor<number> =>
-  createMemo(() => Number.parseInt(access(string), radix));
+export const int = (input: MaybeAccessor<string>, radix?: number): Accessor<number> =>
+  createMemo(() => Number.parseInt(access(input), radix));
 
 /**
  * signal-builder joining array with a separator to a string
  */
 export const join = <T extends any[]>(
   list: MaybeAccessor<T>,
-  separator?: MaybeAccessor<string>
+  separator?: MaybeAccessor<string>,
 ): Accessor<string> => createMemo(() => access(list).join(access(separator)));

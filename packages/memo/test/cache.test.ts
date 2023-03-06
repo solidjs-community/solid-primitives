@@ -99,7 +99,7 @@ describe("createMemoCache", () => {
           runs++;
           return n;
         },
-        { size: 1 }
+        { size: 1 },
       );
 
       expect(runs).toBe(0);

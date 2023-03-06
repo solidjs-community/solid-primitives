@@ -5,7 +5,6 @@ type Props = {
 };
 
 declare module "solid-js" {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
       ["use:rotate"]?: Props;
@@ -17,11 +16,11 @@ function getPointersAngleDeg(activeEvents: PointerEvent[]) {
   // instead of hell lot of conditions we use an object mapping
   const quadrantsMap = {
     left: { top: 360, bottom: 180 },
-    right: { top: 0, bottom: 180 }
+    right: { top: 0, bottom: 180 },
   };
 
-  const width = activeEvents[1].clientX - activeEvents[0].clientX;
-  const height = activeEvents[0].clientY - activeEvents[1].clientY;
+  const width = activeEvents[1]!.clientX - activeEvents[0]!.clientX;
+  const height = activeEvents[0]!.clientY - activeEvents[1]!.clientY;
 
   /*
   In quadrants 1 and 3 allworks as expected. 

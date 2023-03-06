@@ -13,7 +13,7 @@ const EVENTS: EventTypeName[] = [
   "pointerdown",
   "touchstart",
   "touchmove",
-  "visibilitychange"
+  "visibilitychange",
 ];
 /**
  * A primitive to observe the user's idle state and react to its changes.
@@ -45,7 +45,7 @@ export const createIdleTimer = ({
   onActive,
   onIdle,
   onPrompt,
-  startManually = false
+  startManually = false,
 }: IdleTimerOptions = {}): IdleTimerReturn => {
   if (process.env.SSR) {
     return {
@@ -53,7 +53,7 @@ export const createIdleTimer = ({
       isPrompted: () => false,
       reset: () => {},
       start: () => {},
-      stop: () => {}
+      stop: () => {},
     };
   }
   let listenersAreOn = false;
@@ -164,6 +164,6 @@ export const createIdleTimer = ({
     isPrompted,
     start: () => startListening(),
     reset: () => timerReset(new CustomEvent("manualreset")),
-    stop: stopListening
+    stop: stopListening,
   };
 };

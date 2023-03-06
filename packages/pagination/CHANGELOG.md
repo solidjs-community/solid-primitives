@@ -1,5 +1,30 @@
 # @solid-primitives/pagination
 
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0
+  - @solid-primitives/intersection-observer@2.0.8
+
+## 0.2.2-beta.0
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0-beta.0
+  - @solid-primitives/intersection-observer@2.0.8-beta.0
+
+## 0.2.1
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+- Updated dependencies [865d5ee9]
+  - @solid-primitives/intersection-observer@2.0.7
+  - @solid-primitives/utils@5.2.1
+
 ## 0.2.0
 
 ### Minor Changes

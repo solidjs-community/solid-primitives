@@ -9,7 +9,10 @@ import {
   AccessorArray,
   EffectFunction,
   NoInfer,
-  Signal
+  Signal,
+  SignalOptions,
+  sharedConfig,
+  onMount,
 } from "solid-js";
 import { isServer as _isServer } from "solid-js/web";
 import type {
@@ -20,7 +23,7 @@ import type {
   AnyObject,
   AnyFunction,
   SetterParam,
-  AnyStatic
+  AnyStatic,
 } from "./types";
 
 export * from "./types";
@@ -36,6 +39,7 @@ export const isServer: boolean = _isServer;
 export const isClient = !isServer;
 
 /** development environment */
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 export const isDev = DEV && isClient;
 /** production environment */
 export const isProd = !isDev;
@@ -66,8 +70,20 @@ export function chain<Args extends [] | any[]>(callbacks: {
   [Symbol.iterator](): IterableIterator<((...args: Args) => any) | undefined>;
 }): (...args: Args) => void {
   return (...args: Args) => {
-    for (const callback of callbacks) {
-      if (typeof callback === "function") callback(...args);
+    for (const callback of callbacks) callback && callback(...args);
+  };
+}
+
+/**
+ * Returns a function that will call all functions in the reversed order with the same arguments.
+ */
+export function reverseChain<Args extends [] | any[]>(
+  callbacks: (((...args: Args) => any) | undefined)[],
+): (...args: Args) => void {
+  return (...args: Args) => {
+    for (let i = callbacks.length - 1; i >= 0; i--) {
+      const callback = callbacks[i];
+      callback && callback(...args);
     }
   };
 }
@@ -95,7 +111,7 @@ export const asArray = <T>(value: T): (T extends any[] ? T[number] : T)[] =>
  * const newList = accessArray(list) // T: number[]
  */
 export const accessArray = <A extends MaybeAccessor<any>>(
-  list: readonly A[]
+  list: readonly A[],
 ): MaybeAccessorValue<A>[] => list.map(v => access(v));
 
 /**
@@ -105,14 +121,15 @@ export const accessArray = <A extends MaybeAccessor<any>>(
  */
 export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue<A>>(
   value: A,
-  fn: (value: NonNullable<V>) => void
+  fn: (value: NonNullable<V>) => void,
 ) => {
   const _value = access(value);
-  typeof _value !== "undefined" && _value !== null && fn(_value as NonNullable<V>);
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  typeof _value != null && fn(_value as NonNullable<V>);
 };
 
 export const asAccessor = <A extends MaybeAccessor<unknown>>(
-  v: A
+  v: A,
 ): Accessor<MaybeAccessorValue<A>> => (typeof v === "function" ? (v as any) : () => v);
 
 /** If value is a function – call it with a given arguments – otherwise get the value as is */
@@ -133,17 +150,17 @@ export function accessWith<T>(
 export function defer<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
-  initialValue: Next
+  initialValue: Next,
 ): EffectFunction<undefined | NoInfer<Next>, NoInfer<Next>>;
 export function defer<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
-  initialValue?: undefined
+  initialValue?: undefined,
 ): EffectFunction<undefined | NoInfer<Next>>;
 export function defer<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
-  initialValue?: Next
+  initialValue?: Next,
 ): EffectFunction<undefined | NoInfer<Next>> {
   const isArray = Array.isArray(deps);
   let prevInput: S;
@@ -193,7 +210,7 @@ export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(
       stack.forEach(cb => cb(arg0, arg1, arg2, arg3));
       clear();
     },
-    clear
+    clear,
   };
 };
 
@@ -226,7 +243,7 @@ export type StaticStoreSetter<T extends Readonly<AnyStatic>> = {
  * ```
  */
 export function createStaticStore<T extends Readonly<AnyStatic>>(
-  init: T
+  init: T,
 ): [access: T, write: StaticStoreSetter<T>] {
   const copy = { ...init };
   const store = {} as T;
@@ -236,7 +253,7 @@ export function createStaticStore<T extends Readonly<AnyStatic>>(
     const saved = cache.get(key);
     if (saved) return saved[0]();
     const signal = createSignal<any>(copy[key], {
-      name: typeof key === "string" ? key : undefined
+      name: typeof key === "string" ? key : undefined,
     });
     cache.set(key, signal);
     delete copy[key];
@@ -252,7 +269,7 @@ export function createStaticStore<T extends Readonly<AnyStatic>>(
   for (const key of keys(init)) {
     store[key] = undefined as any;
     Object.defineProperty(store, key, {
-      get: getValue.bind(void 0, key)
+      get: getValue.bind(void 0, key),
     });
   }
 
@@ -261,7 +278,7 @@ export function createStaticStore<T extends Readonly<AnyStatic>>(
       untrack(() => {
         batch(() => {
           for (const [key, value] of entries(accessWith(a, store) as Partial<T>))
-            setValue(key as keyof T, () => value);
+            setValue(key, () => value);
         });
       });
     else setValue(a, b);
@@ -283,19 +300,19 @@ export function handleDiffArray<T>(
   current: readonly T[],
   prev: readonly T[],
   handleAdded: (item: T) => void,
-  handleRemoved: (item: T) => void
+  handleRemoved: (item: T) => void,
 ): void {
   const currLength = current.length;
   const prevLength = prev.length;
   let i = 0;
 
   if (!prevLength) {
-    for (; i < currLength; i++) handleAdded(current[i]);
+    for (; i < currLength; i++) handleAdded(current[i]!);
     return;
   }
 
   if (!currLength) {
-    for (; i < prevLength; i++) handleRemoved(prev[i]);
+    for (; i < prevLength; i++) handleRemoved(prev[i]!);
     return;
   }
 
@@ -314,4 +331,28 @@ export function handleDiffArray<T>(
   for (currEl of current) {
     if (!prev.includes(currEl)) handleAdded(currEl);
   }
+}
+
+/**
+ * A signal object that handle hydration.
+ * @param serverValue initial value of the state on the server
+ * @param update called once on the client or on hydration to initialize the value
+ * @param options {@link SignalOptions}
+ * @returns
+ * ```ts
+ * [state: Accessor<T>, setState: Setter<T>]
+ * ```
+ * @see {@link createSignal}
+ */
+export function createHydrateSignal<T>(
+  serverValue: T,
+  update: () => T,
+  options?: SignalOptions<T>,
+): Signal<T> {
+  if (isServer) {
+    return createSignal(serverValue);
+  }
+  const [state, setState] = createSignal(sharedConfig.context ? serverValue : update(), options);
+  sharedConfig.context && onMount(() => setState(() => update()));
+  return [state, setState];
 }

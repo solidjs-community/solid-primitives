@@ -39,10 +39,10 @@ const PubsubTest: Component = () => {
       <div
         class="w-18 h-18 bg-gray-500 rounded-full"
         classList={{
-          "bg-yellow-200": on()
+          "bg-yellow-200": on(),
         }}
         style={{
-          "box-shadow": on() ? "0 0 24px rgb(254, 239, 179)" : ""
+          "box-shadow": on() ? "0 0 24px rgb(254, 239, 179)" : "",
         }}
       ></div>
     );
@@ -60,7 +60,7 @@ const PubsubTest: Component = () => {
 const HubParentNode: Component = () => {
   const { emit, spin, wiggle } = createEventHub(_ => ({
     spin: _<number>(),
-    wiggle: _<void>()
+    wiggle: _<void>(),
   }));
 
   return (
@@ -104,10 +104,10 @@ const HubChildNode: Component<{
           "translate3d(4px, 0, 0)",
           "translate3d(-4px, 0, 0)",
           "translate3d(2px, 0, 0)",
-          "translate3d(-1px, 0, 0)"
-        ]
+          "translate3d(-1px, 0, 0)",
+        ],
       },
-      { duration: 500 }
+      { duration: 500 },
     );
     anim = new Animation(keyframes);
   });
@@ -121,7 +121,7 @@ const HubChildNode: Component<{
       <div
         class="w-32 h-24 center-child bg-orange-700 bg-opacity-80 rounded-lg transition-transform duration-300"
         style={{
-          transform: `rotate(${angle()}deg)`
+          transform: `rotate(${angle()}deg)`,
         }}
       >
         Child
@@ -168,7 +168,7 @@ const Toaster: Component<{
       const text = e.length > 50 ? e.substring(0, 50) + "..." : e;
       return { text };
     },
-    length: 10
+    length: 10,
   });
   props.useEventBus(bus);
 

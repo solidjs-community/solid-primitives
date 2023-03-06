@@ -8,7 +8,7 @@ import {
   merge,
   removeItems,
   filterInstance,
-  filterOutInstance
+  filterOutInstance,
 } from "../src";
 
 const cloneDeep = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
@@ -18,7 +18,7 @@ describe("update", () => {
     const original = {
       a: 123,
       b: { inner: { c: "yo", d: [0, 1, 2], test: "test" } },
-      arr: [1, 2, 3]
+      arr: [1, 2, 3],
     };
     const originalClone = cloneDeep(original);
 
@@ -86,7 +86,7 @@ describe("get", () => {
       a: 123,
       b: "foo",
       c: { inner: { x: "baz" } },
-      d: [1, 2, ["bar"]] as [number, number, string[]]
+      d: [1, 2, ["bar"]] as [number, number, string[]],
     };
     const originalCopy = cloneDeep(original);
 
@@ -103,28 +103,28 @@ describe("sortBy", () => {
       { x: "b", y: 4 },
       { x: "a", y: 2 },
       { x: "b", y: 3 },
-      { x: "a", y: 1 }
+      { x: "a", y: 1 },
     ];
 
     expect(sortBy(source, ({ x }) => x)).toEqual([
       { x: "a", y: 2 },
       { x: "a", y: 1 },
       { x: "b", y: 4 },
-      { x: "b", y: 3 }
+      { x: "b", y: 3 },
     ]);
 
     expect(sortBy(source, ["x", "y"])).toEqual([
       { x: "a", y: 1 },
       { x: "a", y: 2 },
       { x: "b", y: 3 },
-      { x: "b", y: 4 }
+      { x: "b", y: 4 },
     ]);
 
     expect(sortBy(source, ({ y }) => y / 10)).toEqual([
       { x: "a", y: 1 },
       { x: "a", y: 2 },
       { x: "b", y: 3 },
-      { x: "b", y: 4 }
+      { x: "b", y: 4 },
     ]);
   });
 });

@@ -1,6 +1,7 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { createSharedRoot } from "@solid-primitives/rootless";
-import { Accessor, createSignal } from "solid-js";
+import { createHydrateSignal } from "@solid-primitives/utils";
+import { Accessor, sharedConfig } from "solid-js";
 
 /**
  * Attaches event listeners and fires callback whenever `window.onLine` changes.
@@ -34,19 +35,23 @@ export function createConnectivitySignal(): Accessor<boolean> {
   if (process.env.SSR) {
     return () => true;
   }
-  const [status, setStatus] = createSignal<boolean>(navigator.onLine);
+  const [status, setStatus] = createHydrateSignal<boolean>(true, () => navigator.onLine);
   makeConnectivityListener(setStatus);
   return status;
 }
 
+const sharedConnectivitySignal = /*#__PURE__*/ createSharedRoot(createConnectivitySignal);
+
 /**
  * A signal representing the browser's interpretation of whether it is on- or offline.
  *
- * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot).
+ * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) except if during hydration.
  *
  * @return Returns a signal representing the online status. Read-only.
  * @example
  * const isOnline = useConnectivitySignal()
  * isOnline() // T: boolean
  */
-export const useConnectivitySignal = /*#__PURE__*/ createSharedRoot(createConnectivitySignal);
+export const useConnectivitySignal: () => Accessor<boolean> = process.env.SSR
+  ? () => () => true
+  : () => (sharedConfig.context ? createConnectivitySignal() : sharedConnectivitySignal());

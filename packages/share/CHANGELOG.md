@@ -1,5 +1,17 @@
 # @solid-primitives/share
 
+## 2.0.3
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
+## 2.0.2
+
+### Patch Changes
+
+- 646f576a: Add `createHydrateSignal` primitive to utils and fix hydration issues
+
 ## 2.0.1
 
 ### Patch Changes

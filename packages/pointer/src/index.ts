@@ -12,7 +12,7 @@ import {
   PointerListItem,
   PointerPositionDirectiveProps,
   PointerStateWithActive,
-  PointerType
+  PointerType,
 } from "./types";
 
 export { getPositionToElement } from "./helpers";
@@ -24,7 +24,7 @@ export type {
   PointerPositionDirectiveProps,
   PointerState,
   PointerStateWithActive,
-  PointerType
+  PointerType,
 } from "./types";
 
 /**
@@ -52,7 +52,7 @@ export function createPointerListeners(
     target?: MaybeAccessor<EventTarget | undefined>;
     pointerTypes?: PointerType[];
     passive?: boolean;
-  }
+  },
 ): void {
   if (process.env.SSR) {
     return;
@@ -62,12 +62,12 @@ export function createPointerListeners(
     config,
     "target",
     "pointerTypes",
-    "passive"
+    "passive",
   );
   const [{ gotcapture: onGotCapture, lostcapture: onLostCapture }, nativeHandlers] = split(
     parseHandlersMap(handlers),
     "gotcapture",
-    "lostcapture"
+    "lostcapture",
   );
 
   const guardCB = (handler: Handler) => (event: PointerEvent) =>
@@ -76,7 +76,7 @@ export function createPointerListeners(
     createEventListener(target, type, guardCB(fn) as any, { passive });
 
   entries(nativeHandlers).forEach(
-    ([name, fn]) => fn && addEventListener(`pointer${name}` as keyof HTMLElementEventMap, fn)
+    ([name, fn]) => fn && addEventListener(`pointer${name}` as keyof HTMLElementEventMap, fn),
   );
   if (onGotCapture) addEventListener("gotpointercapture", onGotCapture);
   if (onLostCapture) addEventListener("lostpointercapture", onLostCapture);
@@ -114,7 +114,7 @@ export function createPerPointerListeners(
         event: PointerEvent,
         handlers: Readonly<
           OnEventRecord<"down" | "move" | "up" | "leave" | "cancel", (handler: Handler) => void>
-        >
+        >,
       ) => void
     > &
       OnEventRecord<
@@ -122,10 +122,10 @@ export function createPerPointerListeners(
         (
           event: PointerEvent,
           onMove: (handler: Handler) => void,
-          onUp: (handler: Handler) => void
+          onUp: (handler: Handler) => void,
         ) => void
       >
-  >
+  >,
 ) {
   if (process.env.SSR) {
     return;
@@ -135,7 +135,7 @@ export function createPerPointerListeners(
     config,
     "pointerTypes",
     "target",
-    "passive"
+    "passive",
   );
   const { down: onDown, enter: onEnter } = parseHandlersMap(handlers);
   const owner = getOwner();
@@ -148,7 +148,7 @@ export function createPerPointerListeners(
         (!pointerTypes || pointerTypes.includes(e.pointerType as PointerType)) &&
         (!pointerId || e.pointerId === pointerId) &&
         fn(e)) as any,
-      { passive }
+      { passive },
     );
 
   if (onEnter) {
@@ -164,7 +164,7 @@ export function createPerPointerListeners(
             onLeave?.(e);
             dispose();
           },
-          pointerId
+          pointerId,
         );
 
         onEnter(
@@ -183,9 +183,9 @@ export function createPerPointerListeners(
                   if (type === "pointerleave") onLeave = fn;
                   else addListener(type, fn, pointerId);
                 };
-              }
-            }
-          ) as any
+              },
+            },
+          ) as any,
         );
         init = false;
       }, owner);
@@ -206,7 +206,7 @@ export function createPerPointerListeners(
             onUp?.(e);
             dispose();
           },
-          pointerId
+          pointerId,
         );
 
         onDown(
@@ -226,7 +226,7 @@ export function createPerPointerListeners(
               // eslint-disable-next-line no-console
               console.warn(onlyInitMessage);
             }
-          }
+          },
         );
         init = false;
       }, owner);
@@ -254,7 +254,7 @@ export function createPointerPosition(
     target?: MaybeAccessor<EventTarget>;
     pointerTypes?: PointerType[];
     value?: PointerStateWithActive;
-  } = {}
+  } = {},
 ): Accessor<PointerStateWithActive> {
   if (process.env.SSR) {
     return () => DEFAULT_STATE;
@@ -279,7 +279,7 @@ export function createPointerPosition(
         pointer = null;
         handler(e, false);
       }
-    }
+    },
   });
   return state;
 }
@@ -306,7 +306,7 @@ export function createPointerList(
   config: {
     target?: MaybeAccessor<EventTarget>;
     pointerTypes?: PointerType[];
-  } = {}
+  } = {},
 ): Accessor<Accessor<PointerListItem>[]> {
   if (process.env.SSR) {
     return () => [];
@@ -318,14 +318,14 @@ export function createPointerList(
     onEnter(e, { onMove, onDown, onUp, onLeave }) {
       const [pointer, setPointer] = createSignal<PointerListItem>({
         ...toState(e),
-        isDown: false
+        isDown: false,
       });
       setPointers(p => [...p, pointer]);
       onMove(e => setPointer(p => ({ ...toState(e), isDown: p.isDown })));
       onDown(e => setPointer({ ...toState(e), isDown: true }));
       onUp(e => setPointer({ ...toState(e), isDown: false }));
       onLeave(() => setPointers(p => remove(p, pointer)));
-    }
+    },
   });
   return pointers;
 }
@@ -361,7 +361,7 @@ export const pointerPosition: Directive<PointerPositionDirectiveProps> = (el, pr
         pointer = null;
         runHandler(e, false);
       }
-    }
+    },
   });
 };
 
@@ -384,6 +384,6 @@ export const pointerHover: Directive<PointerHoverDirectiveProps> = (el, props) =
     onLeave: e => {
       pointers.delete(e.pointerId);
       if (pointers.size === 0) handler(false, el);
-    }
+    },
   });
 };

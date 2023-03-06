@@ -38,5 +38,5 @@ export const floor = (a: MaybeAccessor<number>) => createMemo(() => Math.floor(a
 export const clamp = (
   value: MaybeAccessor<number>,
   min: MaybeAccessor<number>,
-  max: MaybeAccessor<number>
+  max: MaybeAccessor<number>,
 ) => createMemo(() => _.clamp(access(value), access(min), access(max)));

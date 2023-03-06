@@ -14,11 +14,11 @@ const Node: Component<{ x: number; y: number; size: number }> = props => {
       use:focus={setIsFocused}
       class="fixed top-0 left-0 w-48 h-48 rounded-full bg-orange-700 border-none cursor-pointer hover:bg-orange-600 text-4xl font-extrabold text-gray-900"
       classList={{
-        "!bg-indigo-700 !hover:bg-indigo-600": isFocused()
+        "!bg-indigo-700 !hover:bg-indigo-600": isFocused(),
       }}
       style={{
         transform: `translate(${props.x}px, ${props.y}px) scale(${props.size})`,
-        transition: "transform 500ms, background 200ms"
+        transition: "transform 500ms, background 200ms",
       }}
     >
       {props.children}

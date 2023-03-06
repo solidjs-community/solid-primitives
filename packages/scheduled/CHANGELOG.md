@@ -1,5 +1,17 @@
 # @solid-primitives/scheduled
 
+## 1.3.1
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
+## 1.3.0
+
+### Minor Changes
+
+- d05313a1: Add `createScheduled` primitive.
+
 ## 1.2.1
 
 ### Patch Changes

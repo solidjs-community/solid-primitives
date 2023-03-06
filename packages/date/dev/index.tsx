@@ -6,7 +6,7 @@ import {
   SECOND,
   WEEK,
   YEAR,
-  createCountdown
+  createCountdown,
 } from "../src";
 import { Component, createMemo, createSignal } from "solid-js";
 import { render } from "solid-js/web";
@@ -29,7 +29,7 @@ const App: Component = () => {
   const [customTimeago] = createTimeAgo(targetTimestamp, {
     min: SECOND * 10,
     interval: MINUTE / 2,
-    relativeFormatter: (from, to) => formatRelative(to, from)
+    relativeFormatter: (from, to) => formatRelative(to, from),
   });
 
   // custom absolute formatter using date-fns
@@ -37,7 +37,7 @@ const App: Component = () => {
     min: 0,
     max: WEEK * 2,
     interval: diff => (diff <= MINUTE ? SECOND : diff <= HOUR ? MINUTE / 2 : HOUR / 2),
-    dateFormatter: date => format(date, "d MMM yyyy — HH:mm")
+    dateFormatter: date => format(date, "d MMM yyyy — HH:mm"),
   });
 
   // autoupdating current date

@@ -106,7 +106,7 @@ const DirectiveUsage: Component = () => {
 const EventMap: Component = () => {
   let ref!: HTMLDivElement;
   const lastEvent = createEventSignal(() => ref, ["mouseenter", "mouseleave", "click", "wheel"], {
-    passive: true
+    passive: true,
   });
 
   return (

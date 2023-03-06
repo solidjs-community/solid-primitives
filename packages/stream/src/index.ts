@@ -9,20 +9,20 @@ import {
   ResourceReturn,
   ResourceFetcherInfo,
   untrack,
-  Setter
+  Setter,
 } from "solid-js";
 import { access, noop, type FalsyValue, type MaybeAccessor } from "@solid-primitives/utils";
 
 export type ResourceActions<T, O = {}> = ResourceReturn<T, O>[1];
 
 const constraintsFromDevice = (
-  device?: MediaDeviceInfo | MediaStreamConstraints
+  device?: MediaDeviceInfo | MediaStreamConstraints,
 ): MediaStreamConstraints | undefined => {
   return device && "deviceId" in device
     ? {
         [device.kind === "videoinput" ? "video" : "audio"]: {
-          deviceId: { exact: device.deviceId }
-        }
+          deviceId: { exact: device.deviceId },
+        },
       }
     : device;
 };
@@ -48,7 +48,7 @@ export type StreamReturn = [
     stop: () => void;
     /** if called with false, unmute, otherwise mute the stream */
     mute: (muted?: boolean) => void;
-  }
+  },
 ];
 
 /**
@@ -77,13 +77,13 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
         mutate: noop as Setter<MediaStream | undefined>,
         refetch: () => void 0,
         mute: noop,
-        stop: noop
-      }
+        stop: noop,
+      },
     ];
   }
   const [stream, { mutate, refetch }] = createResource(
     createMemo<MediaStreamConstraints | undefined>(() =>
-      constraintsFromDevice(access(streamSource) || undefined)
+      constraintsFromDevice(access(streamSource) || undefined),
     ),
     (constraints, info: ResourceFetcherInfo<MediaStream>): Promise<MediaStream> =>
       navigator.mediaDevices.getUserMedia(constraints).then(stream => {
@@ -91,7 +91,7 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
           stop(info.value);
         }
         return stream;
-      })
+      }),
   );
 
   onCleanup(() => stop(stream()));
@@ -101,8 +101,8 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
       mutate,
       refetch,
       mute: (muted?: boolean) => mute(untrack(stream), muted),
-      stop: () => stop(untrack(stream))
-    }
+      stop: () => stop(untrack(stream)),
+    },
   ];
 };
 
@@ -123,7 +123,7 @@ export const createStream = (streamSource: StreamSourceDescription): StreamRetur
  * The stream will be stopped on cleanup automatically.
  */
 export const createAmplitudeStream = (
-  streamSource?: StreamSourceDescription
+  streamSource?: StreamSourceDescription,
 ): [
   Resource<number>,
   {
@@ -131,7 +131,7 @@ export const createAmplitudeStream = (
     refetch: () => void;
     stream: Resource<MediaStream | undefined>;
     stop: () => void;
-  }
+  },
 ] => {
   const [stream, { mutate, refetch, stop }] = createStream(streamSource);
   const [amplitude, amplitudeStop] = createAmplitudeFromStream(stream);
@@ -145,9 +145,9 @@ export const createAmplitudeStream = (
   return [
     Object.defineProperties(amplitude, {
       error: { get: () => stream.error },
-      loading: { get: () => stream.loading }
+      loading: { get: () => stream.loading },
     }) as Resource<number>,
-    { stream, mutate, refetch, stop: teardown }
+    { stream, mutate, refetch, stop: teardown },
   ];
 };
 
@@ -163,7 +163,7 @@ export const createAmplitudeStream = (
  * The amplitude will be stopped on cleanup automatically.
  */
 export const createAmplitudeFromStream = (
-  stream: MaybeAccessor<MediaStream | undefined>
+  stream: MaybeAccessor<MediaStream | undefined>,
 ): [amplitude: Accessor<number>, stop: () => void] => {
   if (process.env.SSR) {
     return [() => 0, noop];
@@ -175,10 +175,10 @@ export const createAmplitudeFromStream = (
     fftSize: 128,
     minDecibels: -60,
     maxDecibels: -10,
-    smoothingTimeConstant: 0.8
+    smoothingTimeConstant: 0.8,
   });
 
-  let source: MediaStreamAudioSourceNode;
+  let source: MediaStreamAudioSourceNode | undefined;
   createEffect(() => {
     const currentStream = access(stream);
     if (currentStream !== undefined) {
@@ -205,15 +205,15 @@ export const createAmplitudeFromStream = (
 
   onCleanup(() => cancelAnimationFrame(id));
 
-  const teardown = () => {
-    source?.disconnect();
-    if (ctx.state !== "closed") {
-      ctx.close();
-    }
-  };
-  onCleanup(teardown);
-
-  return [amplitude, teardown];
+  return [
+    amplitude,
+    onCleanup(() => {
+      source?.disconnect();
+      if (ctx.state !== "closed") {
+        ctx.close();
+      }
+    }),
+  ];
 };
 
 declare global {
@@ -240,7 +240,7 @@ declare global {
  * The stream will be stopped on cleanup automatically.
  */
 export const createScreen = (
-  screenSource: MaybeAccessor<DisplayMediaStreamConstraints | undefined>
+  screenSource: MaybeAccessor<DisplayMediaStreamConstraints | undefined>,
 ): StreamReturn => {
   if (process.env.SSR) {
     return [
@@ -251,8 +251,8 @@ export const createScreen = (
         mutate: noop as Setter<MediaStream | undefined>,
         refetch: () => void 0,
         mute: noop,
-        stop: noop
-      }
+        stop: noop,
+      },
     ];
   }
   const [stream, { mutate, refetch }] = createResource(
@@ -263,7 +263,7 @@ export const createScreen = (
           stop(info.value);
         }
         return stream;
-      })
+      }),
   );
 
   onCleanup(() => stop(stream()));
@@ -273,8 +273,8 @@ export const createScreen = (
       mutate,
       refetch,
       mute: (muted?: boolean) => mute(untrack(stream), muted),
-      stop: () => stop(untrack(stream))
-    }
+      stop: () => stop(untrack(stream)),
+    },
   ];
 };
 
@@ -288,7 +288,7 @@ export const createScreen = (
  * If no source is given, both microphone and camera permissions will be requested. You can read the permissions with the `createPermission` primitive from the `@solid-primitives/permission` package.
  */
 export const createMediaPermissionRequest = (
-  source?: MediaStreamConstraints | "audio" | "video"
+  source?: MediaStreamConstraints | "audio" | "video",
 ) => {
   if (process.env.SSR) {
     return Promise.resolve();
@@ -299,7 +299,7 @@ export const createMediaPermissionRequest = (
         ? typeof source === "string"
           ? { [source]: true }
           : source
-        : { audio: true, video: true }
+        : { audio: true, video: true },
     )
     .then(stop);
 };

@@ -16,8 +16,8 @@ describe("createStorage", () => {
           newValue: value,
           oldValue,
           storageArea: mockStorage,
-          url: window.document.URL
-        })
+          url: window.document.URL,
+        }),
       );
     },
     clear: () => {
@@ -29,7 +29,7 @@ describe("createStorage", () => {
     key: (index: number): string => Object.keys(data)[index],
     get length(): number {
       return Object.keys(data).length;
-    }
+    },
   };
 
   it("creates a storage", () =>
@@ -53,7 +53,7 @@ describe("createStorage", () => {
         ...mockStorage,
         setItem: () => {
           throw new Error("Throws");
-        }
+        },
       };
       const [_storage, setStorage, { error }] = createStorage({ api: mockErrorStorage });
       expect(() => setStorage("test3", "1")).not.toThrow();
@@ -66,11 +66,11 @@ describe("createStorage", () => {
         ...mockStorage,
         setItem: () => {
           throw new Error("Throws");
-        }
+        },
       };
       const [_storage, setStorage, { error }] = createStorage({
         api: mockErrorStorage,
-        throw: true
+        throw: true,
       });
       expect(() => setStorage("test3", "1")).toThrow();
       expect(error()).toBeInstanceOf(Error);
@@ -91,8 +91,8 @@ describe("createAsyncStorage", () => {
           newValue: value,
           oldValue,
           storageArea: mockAsyncStorage,
-          url: window.document.URL
-        })
+          url: window.document.URL,
+        }),
       );
       return Promise.resolve();
     },
@@ -107,13 +107,13 @@ describe("createAsyncStorage", () => {
     key: (index: number) => Promise.resolve(Object.keys(data)[index]),
     get length(): number {
       return Object.keys(data).length;
-    }
+    },
   };
 
   it("creates an async storage", () =>
     createRoot(async dispose => {
       const [storage, setStorage, { remove, clear }] = createAsyncStorage({
-        api: mockAsyncStorage
+        api: mockAsyncStorage,
       });
       await setStorage("test", "1" as any);
       await mockAsyncStorage.setItem("test2", "2");
@@ -144,13 +144,13 @@ describe("createStorageSignal", () => {
     key: (index: number): string => Object.keys(data)[index],
     get length(): number {
       return Object.keys(data).length;
-    }
+    },
   };
 
   it("creates a signal", () =>
     createRoot(dispose => {
       const [storageItem, setStorageItem] = createStorageSignal<string | null>("test", null, {
-        api: mockStorage
+        api: mockStorage,
       });
       expect(storageItem()).toBe(null);
       setStorageItem("1");

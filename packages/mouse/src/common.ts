@@ -5,7 +5,7 @@ import {
   MousePosition,
   MousePositionInside,
   PositionRelativeToElement,
-  UseTouchOptions
+  UseTouchOptions,
 } from "./types";
 
 const PASSIVE = { passive: true };
@@ -15,7 +15,7 @@ export const DEFAULT_MOUSE_POSITION: MousePositionInside = {
   x: 0,
   y: 0,
   isInside: false,
-  sourceType: null
+  sourceType: null,
 };
 
 /** @internal */
@@ -26,7 +26,7 @@ export const DEFAULT_RELATIVE_ELEMENT_POSITION: PositionRelativeToElement = {
   left: 0,
   width: 0,
   height: 0,
-  isInside: false
+  isInside: false,
 };
 
 /**
@@ -42,7 +42,7 @@ export const DEFAULT_RELATIVE_ELEMENT_POSITION: PositionRelativeToElement = {
 export function makeMousePositionListener(
   target: HTMLElement | Window | Document = window,
   callback: (position: MousePosition) => void,
-  options: UseTouchOptions & FollowTouchOptions = {}
+  options: UseTouchOptions & FollowTouchOptions = {},
 ): VoidFunction {
   if (process.env.SSR) {
     return noop;
@@ -57,7 +57,7 @@ export function makeMousePositionListener(
   if (touch) {
     const handleTouch = (e: TouchEvent) => {
       if (e.touches.length)
-        callback({ x: e.touches[0].clientX, y: e.touches[0].clientY, sourceType: "touch" });
+        callback({ x: e.touches[0]!.clientX, y: e.touches[0]!.clientY, sourceType: "touch" });
     };
     listen("touchstart", handleTouch);
     if (followTouch) listen("touchmove", handleTouch);
@@ -79,7 +79,7 @@ export function makeMousePositionListener(
 export function makeMouseInsideListener(
   target: HTMLElement | Window | Document = window,
   callback: (isInside: boolean) => void,
-  options: UseTouchOptions = {}
+  options: UseTouchOptions = {},
 ): VoidFunction {
   if (process.env.SSR) {
     return noop;
@@ -113,7 +113,7 @@ export function makeMouseInsideListener(
 export const getPositionToElement = (
   pageX: number,
   pageY: number,
-  el: Element
+  el: Element,
 ): PositionRelativeToElement => {
   if (process.env.SSR) {
     return DEFAULT_RELATIVE_ELEMENT_POSITION;
@@ -131,7 +131,7 @@ export const getPositionToElement = (
     left,
     width,
     height,
-    isInside: x >= 0 && y >= 0 && x <= width && y <= height
+    isInside: x >= 0 && y >= 0 && x <= width && y <= height,
   };
 };
 
@@ -141,7 +141,7 @@ export const getPositionToElement = (
 export const getPositionInElement = (
   pageX: number,
   pageY: number,
-  el: Element
+  el: Element,
 ): PositionRelativeToElement => {
   if (process.env.SSR) {
     return DEFAULT_RELATIVE_ELEMENT_POSITION;
@@ -150,7 +150,7 @@ export const getPositionInElement = (
   return {
     ...relative,
     x: clamp(relative.x, 0, relative.width),
-    y: clamp(relative.y, 0, relative.height)
+    y: clamp(relative.y, 0, relative.height),
   };
 };
 
@@ -161,5 +161,5 @@ export const getPositionToScreen = process.env.SSR
   ? (): Position => DEFAULT_MOUSE_POSITION
   : (pageX: number, pageY: number): Position => ({
       x: pageX - window.scrollX,
-      y: pageY - window.screenY
+      y: pageY - window.screenY,
     });

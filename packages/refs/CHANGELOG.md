@@ -1,5 +1,63 @@
 # @solid-primitives/refs
 
+## 1.0.0
+
+### Major Changes
+
+- d6559a32: Major API changes. Bump stage to 2.
+
+  `mapRemoved`, `Children`, `unmount`, `refs`, `elements`, `getChangedItems`, `getAddedItems` and `getRemovedItems` has been removed.
+
+  Add `getResolvedElements`, `resolveElements`, `getFirstChild` and `resolveFirst` primitives.
+
+  Improve `mergeRefs` to allow an array of refs to be passed in.
+
+  Ensure SSR support for `resolveElements`, `resolveFirst`, `<Ref>` and `<Refs>`.
+
+  Removes `"@solid-primitives/immutable"` dependency.
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0
+
+## 1.0.0-beta.1
+
+### Major Changes
+
+- d6559a32: Major API changes. Bump stage to 2.
+
+  `mapRemoved`, `Refs`, `Ref`, `unmount`, `refs`, `elements`, `getChangedItems`, `getAddedItems` and `getRemovedItems` has been removed.
+
+  Add `getResolvedElements`, `resolveElements`, `getFirstChild` and `resolveFirst` primitives.
+
+  Improve `mergeRefs` to allow an array of refs to be passed in.
+
+  Ensure SSR support for `resolveElements` and `resolveFirst`.
+
+  Removes `"@solid-primitives/immutable"` dependency.
+
+### Patch Changes
+
+- Updated dependencies [d6559a32]
+  - @solid-primitives/utils@5.4.0-beta.0
+
+## 0.4.0-beta.0
+
+### Minor Changes
+
+- d8054700: Add `findFirst` and `resolveFirst` primitives
+
+## 0.3.7
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+- Updated dependencies [865d5ee9]
+  - @solid-primitives/immutable@0.1.7
+  - @solid-primitives/rootless@1.2.5
+  - @solid-primitives/utils@5.2.1
+
 ## 0.3.6
 
 ### Patch Changes

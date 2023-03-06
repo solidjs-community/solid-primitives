@@ -1,5 +1,35 @@
 # @solid-primitives/utils
 
+## 5.4.0
+
+### Minor Changes
+
+- d6559a32: Export `ResolvedJSXElement` and `ResolvedChildren` types from utils
+
+## 5.4.0-beta.0
+
+### Minor Changes
+
+- d6559a32: Export `ResolvedJSXElement` and `ResolvedChildren` types from utils
+
+## 5.3.0
+
+### Minor Changes
+
+- ddc12685: Add `reverseChain` util as an alternative to `chain`
+
+## 5.2.1
+
+### Patch Changes
+
+- 865d5ee9: Fix build. (remove keepNames option)
+
+## 5.2.0
+
+### Minor Changes
+
+- 646f576a: Add `createHydrateSignal` primitive to utils and fix hydration issues
+
 ## 5.1.1
 
 ### Patch Changes

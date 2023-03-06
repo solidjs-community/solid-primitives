@@ -5,13 +5,13 @@ import {
   createResource,
   InitializedResource,
   on,
-  onCleanup
+  onCleanup,
 } from "solid-js";
 
 export type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
 export type NewClipboardItem = (
   type: string,
-  data: string | Blob | PromiseLike<string | Blob>
+  data: string | Blob | PromiseLike<string | Blob>,
 ) => ClipboardItem;
 export type HighlightModifier = (el: any) => void;
 export type Highlighter = (start?: number, end?: number) => HighlightModifier;
@@ -67,7 +67,7 @@ export function readClipboard(): Promise<ClipboardItem[]> {
 export const makeClipboard = (): [
   writeClipboard: ClipboardSetter,
   readClipboard: () => Promise<ClipboardItems | undefined>,
-  newClipboardItem: NewClipboardItem
+  newClipboardItem: NewClipboardItem,
 ] => {
   return [writeClipboard, readClipboard, newClipboardItem];
 };
@@ -85,17 +85,17 @@ export const makeClipboard = (): [
  */
 export const createClipboard = (
   data?: Accessor<string | ClipboardItem[]>,
-  deferInitial?: boolean
+  deferInitial?: boolean,
 ): [
   clipboardItems: InitializedResource<ClipboardResourceItem[]>,
   refetch: VoidFunction,
-  write: ClipboardSetter
+  write: ClipboardSetter,
 ] => {
   if (process.env.SSR) {
     return [
       Object.assign(() => [], { loading: false, error: undefined }) as any,
       () => void 0,
-      async () => void 0
+      async () => void 0,
     ];
   }
 
@@ -107,19 +107,23 @@ export const createClipboard = (
         return info.value!;
       }
 
-      const items = await readClipboard();
-      if (!items || !items.length) return [];
+      try {
+        const items = await readClipboard();
+        if (!items.length) return [];
 
-      return Promise.all(
-        items.map(async item => {
-          const type = item.types[item.types.length - 1];
-          const blob = await item.getType(type);
-          const text = blob.type === "text/plain" ? await blob.text() : undefined;
-          return { type, blob, text };
-        })
-      );
+        return Promise.all(
+          items.map(async item => {
+            const type = item.types[item.types.length - 1]!;
+            const blob = await item.getType(type);
+            const text = blob.type === "text/plain" ? await blob.text() : undefined;
+            return { type, blob, text };
+          }),
+        );
+      } catch {
+        return [];
+      }
     },
-    { initialValue: [] }
+    { initialValue: [] },
   );
 
   navigator.clipboard.addEventListener("clipboardchange", refetch);
@@ -148,7 +152,7 @@ export const createClipboard = (
  */
 export const copyToClipboard = (
   el: HTMLElement,
-  options: MaybeAccessor<CopyToClipboardOptions>
+  options: MaybeAccessor<CopyToClipboardOptions>,
 ) => {
   if (process.env.SSR) {
     return undefined;
@@ -167,7 +171,7 @@ export const copyToClipboard = (
       write = async (data: any) => await navigator.clipboard.writeText(data);
     }
     if (opts.highlight) opts.highlight(el);
-    write!(data);
+    write(data);
   };
   el.addEventListener("click", setValue);
   onCleanup(() => el.removeEventListener("click", setValue));
@@ -197,7 +201,7 @@ export const newItem = newClipboardItem;
  */
 export const element: Highlighter = (start: number = 0, end: number = 0) => {
   return (node: HTMLElement) => {
-    const text = node.childNodes[0];
+    const text = node.childNodes[0]!;
     const range = new Range();
     range.setStart(text, start);
     range.setEnd(text, end);

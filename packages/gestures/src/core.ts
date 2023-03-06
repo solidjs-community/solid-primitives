@@ -4,7 +4,7 @@ export type PointerCallback = (activeEvents: PointerEvent[], event: PointerEvent
 function downHandler(
   downEvent: PointerEvent,
   activeEvents: Map<number, PointerEvent>,
-  downCallback: PointerCallback | undefined
+  downCallback: PointerCallback | undefined,
 ) {
   activeEvents.set(downEvent.pointerId, downEvent);
 
@@ -14,7 +14,7 @@ function downHandler(
 function moveHandler(
   moveEvent: PointerEvent,
   activeEvents: Map<number, PointerEvent>,
-  moveCallback: PointerCallback | undefined
+  moveCallback: PointerCallback | undefined,
 ) {
   activeEvents.set(moveEvent.pointerId, moveEvent);
   moveCallback?.(Array.from(activeEvents.values()), moveEvent);
@@ -25,7 +25,7 @@ function upHandler(
   downEvent: PointerEvent,
   activeEvents: Map<number, PointerEvent>,
   upCallback: PointerCallback | undefined,
-  removeHandlersCallback: () => void
+  removeHandlersCallback: () => void,
 ) {
   if (upEvent.pointerId === downEvent.pointerId) {
     activeEvents.delete(upEvent.pointerId);
@@ -41,7 +41,7 @@ export function registerPointerListener(
   node: HTMLElement,
   downCallback?: PointerCallback,
   moveCallback?: PointerCallback,
-  upCallback?: PointerCallback
+  upCallback?: PointerCallback,
 ) {
   const activeEvents = new Map<number, PointerEvent>();
 
@@ -70,10 +70,10 @@ export const DEFAULT_MIN_SWIPE_DISTANCE = 60; // in pixels
 
 export function getCenterOfTwoPoints(node: HTMLElement, activeEvents: PointerEvent[]) {
   const rect = node.getBoundingClientRect();
-  const xDistance = Math.abs(activeEvents[0].clientX - activeEvents[1].clientX);
-  const yDistance = Math.abs(activeEvents[0].clientY - activeEvents[1].clientY);
-  const minX = Math.min(activeEvents[0].clientX, activeEvents[1].clientX);
-  const minY = Math.min(activeEvents[0].clientY, activeEvents[1].clientY);
+  const xDistance = Math.abs(activeEvents[0]!.clientX - activeEvents[1]!.clientX);
+  const yDistance = Math.abs(activeEvents[0]!.clientY - activeEvents[1]!.clientY);
+  const minX = Math.min(activeEvents[0]!.clientX, activeEvents[1]!.clientX);
+  const minY = Math.min(activeEvents[0]!.clientY, activeEvents[1]!.clientY);
   const centerX = minX + xDistance / 2;
   const centerY = minY + yDistance / 2;
 

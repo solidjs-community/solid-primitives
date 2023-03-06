@@ -6,7 +6,7 @@ import {
   createMemo,
   createSignal,
   on,
-  onMount
+  onMount,
 } from "solid-js";
 import { clamp, pToVal, valToP } from "./utils";
 
@@ -39,8 +39,8 @@ export const Slider: Component<{
         const w = bar.offsetWidth;
         setP(clamp(valToP(x, 0, w), 0, 1));
       },
-      { defer: true }
-    )
+      { defer: true },
+    ),
   );
   createEffect(() => props.ondrag(Math.round(value())));
 

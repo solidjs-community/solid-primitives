@@ -385,8 +385,8 @@ describe("createBroadcastChannel", () => {
               message => {
                 resolve(message!);
               },
-              { defer: true }
-            )
+              { defer: true },
+            ),
           );
 
           mockedBCInstance.postMessage("hi");
@@ -419,8 +419,8 @@ describe("createBroadcastChannel", () => {
               message => {
                 postedMessage += `${message}1`;
               },
-              { defer: true }
-            )
+              { defer: true },
+            ),
           );
 
           createEffect(
@@ -429,8 +429,8 @@ describe("createBroadcastChannel", () => {
               message => {
                 postedMessage += `${message}2`;
               },
-              { defer: true }
-            )
+              { defer: true },
+            ),
           );
 
           mockedBCInstance.postMessage("hi");

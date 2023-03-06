@@ -2,7 +2,7 @@
   <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=JSX%20Parser" alt="Solid Primitives JSX Parser">
 </p>
 
-# @solid-primitives/parser
+# @solid-primitives/jsx-parser
 
 A primitive to extend the types of values JSX can return. These JSX-elements are named `tokens`.
 
@@ -61,11 +61,11 @@ const TokenExample = createToken(
     const value = Math.random();
     return {
       props,
-      value
+      value,
     };
   },
   // function that returns the fallback JSX Element to render - called when the token rendered by Solid
-  props => <span>{props.id}</span>
+  props => <span>{props.id}</span>,
 );
 ```
 
@@ -81,7 +81,8 @@ TokenExample is typed as a JSXElement, this is so TokenExample can be used in JS
 
 ## `resolveTokens`
 
-A function similar to Solid's [`children()`](https://www.solidjs.com/docs/latest#children), but that will only return valid token elements created by the corresponding parser's `createToken`
+A function similar to Solid's [`children()`](https://www.solidjs.com/docs/latest#children), but it will preserve token elements created by the corresponding parser's `createToken`.
+It is useful if you want to access the data passed with the tokens, but also the other resolved JSX Elements.
 
 ### How to use it
 
@@ -89,9 +90,10 @@ A function similar to Solid's [`children()`](https://www.solidjs.com/docs/latest
 
 - `parser` object returned by `createJSXParser`
 - `fn` accessor that returns a JSX Element
-- `render` function that returns the fallback JSX Element to render
+- `options` options for the resolver:
+  - `includeJSXElements` - if `true`, other JSX Elements will be included in the result array (default: `false`)
 
-`resolveTokens` will return accessor of tokens associated with the corresponding jsx-parser
+`resolveTokens` will return a signal that returns an array of resolved tokens and JSX Elements.
 
 Token data is available on the `data` property of the token.
 
@@ -107,23 +109,38 @@ createEffect(() => {
     console.log(token.data);
   });
 });
+
+// the return value of resolveTokens can be used in JSX (will render the fallback JSX Elements)
+return <>{els()}</>;
 ```
 
-### `resolveData`
+### Resolve JSX Elements with `resolveTokens`
 
-If you never intend to render the tokens, you can use `resolveData` instead of `resolveTokens`. This will return the data of the tokens instead of the JSX Element fallback.
+If you want to resolve the JSX Elements as well, you can pass `{ includeJSXElements: true }` as the third parameter to `resolveTokens`.
+
+Use [`isToken`](#istoken) to validate if a value is a token created by the corresponding jsx-parser.
 
 ```tsx
-import { resolveData } from "@solid-primitives/jsx-parser";
+import { resolveTokens, isToken } from "@solid-primitives/jsx-parser";
 
-const tokens = resolveData(parser, () => props.children);
+const els = resolveTokens(parser, () => props.children, {
+  includeJSXElements: true,
+});
 
 createEffect(() => {
-  tokens().forEach(token => {
-    // token is the data returned by the tokenData function
-    console.log(token);
+  els().forEach(el => {
+    if (!isToken(parser, el)) {
+      // el is a normal JSX Element
+      return;
+    }
+    // token is a function that returns the JSX Element fallback
+    // token.data is the data returned by the tokenData function
+    console.log(token.data);
   });
 });
+
+// the return value of resolveTokens can be used in JSX
+return <>{els()}</>;
 ```
 
 ## `isToken`

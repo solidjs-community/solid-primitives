@@ -3,9 +3,9 @@ import { abs, accessor, ceil, floor, min, RangeProps, toFunction } from "./commo
 
 /**
  * Reactively maps a number range of specified `stop`, `to` and `step`, with a callback function - underlying helper for the `<Range>` control flow.
- * @param start number accessor of the start of the range
- * @param to number accessor of the end of the range *(not included in the range)*
- * @param step number accessor of the difference between two points in the range *(negative step value depends on the `to` being greater/smaller than `start`, not this argument)*
+ * @param getStart number accessor of the start of the range
+ * @param getTo number accessor of the end of the range *(not included in the range)*
+ * @param getStep number accessor of the difference between two points in the range *(negative step value depends on the `to` being greater/smaller than `start`, not this argument)*
  * @param mapFn reactive function used to create mapped output item array
  * @param options a fallback for when the input list is empty or missing
  * @returns mapped input array signal
@@ -23,25 +23,25 @@ import { abs, accessor, ceil, floor, min, RangeProps, toFunction } from "./commo
  * ```
  */
 export function mapRange<T>(
-  start: Accessor<number>,
-  to: Accessor<number>,
-  step: Accessor<number>,
+  getStart: Accessor<number>,
+  getTo: Accessor<number>,
+  getStep: Accessor<number>,
   mapFn: (n: number) => T,
-  options: { fallback?: Accessor<T> } = {}
+  options: { fallback?: Accessor<T> } = {},
 ): Accessor<T[]> {
   let disposers: VoidFunction[] = [],
     items: T[] = [],
     prevStart = 0,
     prevTo = 0,
-    prevStep = step(),
+    prevStep = getStep(),
     fallback = false;
 
   onCleanup(() => disposers.forEach(f => f()));
 
-  const mapper = (i: number, n: number, items: T[], disposers: VoidFunction[]): void =>
+  const mapper = (i: number, n: number, itemsList: T[], disposersList: VoidFunction[]): void =>
     createRoot(dispose => {
-      disposers[i] = dispose;
-      items[i] = mapFn(n);
+      disposersList[i] = dispose;
+      itemsList[i] = mapFn(n);
     });
 
   const mapNewRange = (start: number, to: number, step: number): T[] => {
@@ -66,7 +66,7 @@ export function mapRange<T>(
 
     if (fallback) {
       fallback = false;
-      disposers[0]();
+      disposers[0]!();
       items = [];
     }
 
@@ -94,8 +94,8 @@ export function mapRange<T>(
       let index = (n - prevStart) / prevStep;
       if (Number.isInteger(index) || (index < 1 && index + Number.EPSILON > 1)) {
         index = ceil(index);
-        newItems[i] = items[index];
-        newDisposers[i] = disposers[index];
+        newItems[i] = items[index]!;
+        newDisposers[i] = disposers[index]!;
         oldDisposers[index] = undefined;
       } else {
         mapper(i, n, newItems, newDisposers);
@@ -113,18 +113,18 @@ export function mapRange<T>(
   };
 
   return () => {
-    let _step = step();
+    let _step = getStep();
     if (_step === 0) {
       // eslint-disable-next-line no-console
       if (process.env.DEV) console.warn("Range cannot have a step of 0");
       return items;
     }
-    let _start = start();
-    let _to = to();
+    let _start = getStart();
+    let _to = getTo();
     _step = abs(_step);
     const positive = _start <= _to;
     if (!positive) {
-      let temp = _start;
+      const temp = _start;
       const x = (_start - _to) / _step;
       _start = _start - (Number.isInteger(x) ? x - 1 : floor(x)) * _step;
       _to = temp + _step;
@@ -156,7 +156,7 @@ export function Range<T>(
   props: RangeProps & {
     fallback?: T;
     children: ((number: number) => T) | T;
-  }
+  },
 ): Accessor<T[]> {
   let start: Accessor<number>, to: Accessor<number>, step: Accessor<number>;
   if ("to" in props) {
