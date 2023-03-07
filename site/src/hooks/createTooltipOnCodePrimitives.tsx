@@ -6,6 +6,7 @@ import { batch, Component, createSignal, Match, onMount, Switch } from "solid-js
 // import { roundArrow } from "tippy.js";
 import { useTippy } from "solid-tippy";
 import { Content } from "tippy.js";
+import { BASE } from "~/constants";
 import primitivesJSON from "~/primitives.json";
 
 const TooltipContent = (el: HTMLElement) => {
@@ -42,12 +43,18 @@ const TooltipContent = (el: HTMLElement) => {
         <Switch>
           <Match when={type === "make"}>
             <span>
-              make ( not <strong>reactive</strong> )
+              make{" "}
+              <a class="anchor-tag-underline" href={`${BASE}#make-non-reactive-vs-create-reactive`}>
+                ( not <strong>reactive</strong> )
+              </a>
             </span>
           </Match>
           <Match when={type === "create"}>
             <span>
-              create ( is <strong>reactive</strong> )
+              create{" "}
+              <a class="anchor-tag-underline" href={`${BASE}#make-non-reactive-vs-create-reactive`}>
+                ( is <strong>reactive</strong> )
+              </a>
             </span>
           </Match>
           <Match when={type === "component"}>
