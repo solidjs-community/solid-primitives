@@ -1,0 +1,54 @@
+{
+  "name": "site",
+  "scripts": {
+    "dev": "solid-start dev --host",
+    "build": "solid-start build",
+    "start": "solid-start start"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.0",
+    "@tailwindcss/typography": "^0.5.8",
+    "@types/mark.js": "^8.11.8",
+    "@types/node": "^18.11.18",
+    "autoprefixer": "^10.4.13",
+    "esbuild": "^0.14.54",
+    "postcss": "^8.4.21",
+    "solid-start": "^0.2.21",
+    "solid-start-node": "^0.2.21",
+    "solid-start-static": "^0.2.20",
+    "tailwindcss": "^3.2.4",
+    "tailwindcss-dir": "^4.0.0",
+    "typescript": "^4.9.4",
+    "vite": "^4.1.1"
+  },
+  "dependencies": {
+    "@solid-primitives/clipboard": "^1.5.0",
+    "@solid-primitives/event-listener": "^2.2.6",
+    "@solid-primitives/intersection-observer": "^2.0.6",
+    "@solid-primitives/keyboard": "^1.0.7",
+    "@solid-primitives/media": "^2.1.0",
+    "@solid-primitives/platform": "^0.0.103",
+    "@solid-primitives/resize-observer": "^2.0.10",
+    "@solid-primitives/rootless": "^1.2.4",
+    "@solid-primitives/scheduled": "^1.2.1",
+    "@solid-primitives/tween": "^1.2.4",
+    "@solid-primitives/utils": "^5.1.1",
+    "@solidjs/meta": "^0.28.2",
+    "@solidjs/router": "^0.7.0",
+    "fuse.js": "^6.6.2",
+    "mark.js": "^8.11.1",
+    "sass": "^1.58.3",
+    "solid-dismiss": "^1.6.74",
+    "solid-icons": "^1.0.4",
+    "solid-js": "^1.6.11",
+    "solid-jsx": "^0.9.1",
+    "solid-mdx": "^0.0.6",
+    "solid-tippy": "^0.2.1",
+    "tippy.js": "^6.3.7",
+    "undici": "^5.15.1"
+  },
+  "engines": {
+    "node": ">=16.8"
+  }
+}
