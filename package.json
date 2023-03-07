@@ -9,10 +9,10 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "format": "prettier -w packages/**/*.{js,ts,json,css,tsx,jsx,md,html}",
+    "format": "prettier -w {site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html} --ignore-path .gitignore",
     "lint": "eslint --max-warnings 0 packages/*/src/** && eslint packages/*/test/** --quiet --rule \"no-only-tests/no-only-tests: error\"",
-    "build": "cross-env CI=true turbo run build",
-    "build:package": "cross-env CI=true turbo run build --filter=!site",
+    "build": "cross-env CI=true turbo run build --filter='./packages/*'",
+    "build:package": "cross-env CI=true turbo run build --filter='./packages/*'",
     "build:site": "turbo run build --filter=site",
     "test": "cross-env CI=true vitest -c ./configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr",
