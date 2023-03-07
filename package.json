@@ -9,9 +9,9 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "format": "prettier -w **/*.{js,ts,json,css,tsx,jsx,md,html} --ignore-path .gitignore",
+    "format": "prettier -w {site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html} --ignore-path .gitignore",
     "lint": "eslint --max-warnings 0 packages/*/src/** && eslint packages/*/test/** --quiet --rule \"no-only-tests/no-only-tests: error\"",
-    "build": "cross-env CI=true turbo run build --filter ./packages/*",
+    "build": "cross-env CI=true turbo run build --filter='./packages/*'",
     "test": "cross-env CI=true vitest -c ./configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr",
     "pages": "turbo run page && jiti ./scripts/collectPages.ts",
