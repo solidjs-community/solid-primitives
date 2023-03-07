@@ -26,7 +26,7 @@
     "update-deps": "pnpm up -Lri",
     "changeset": "changeset",
     "version": "changeset version && pnpm i --no-frozen-lockfile && git add .",
-    "release": "pnpm build && changeset publish"
+    "release": "pnpm build:packages && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.0",
