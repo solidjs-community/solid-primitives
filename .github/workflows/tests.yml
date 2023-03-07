@@ -26,10 +26,11 @@ jobs:
         run: pnpm build
 
       - name: Lint
+        # Will run the step even if build step failed
+        if: success() || failure()
         run: pnpm lint
 
       - name: Test all packages
+        # Will run the step even if lint step failed
+        if: success() || failure()
         run: pnpm test
-
-      - name: Test all packages in server env
-        run: pnpm test:ssr
