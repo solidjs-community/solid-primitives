@@ -1,5 +1,5 @@
 import { createMediaQuery } from "@solid-primitives/media";
-import { A, useLocation } from "@solidjs/router";
+import { A } from "@solidjs/router";
 import Fuse from "fuse.js";
 import Mark from "mark.js";
 import { FiChevronLeft, FiSearch, FiX } from "solid-icons/fi";
@@ -15,6 +15,7 @@ type TPrimitive = {
   description: string;
   primitives: string[];
   primitivesTotalCount: number;
+  tags: string[];
 };
 
 let _inputEl!: HTMLInputElement;
@@ -35,6 +36,7 @@ const Search: Component<{
       title: { checked: false },
       description: { checked: true },
       primitive: { checked: true },
+      tag: { checked: true },
     },
   });
   let markInstance: Mark;
@@ -52,11 +54,14 @@ const Search: Component<{
         name: "name",
         weight: 2,
       },
-      // "category",
       "description",
       {
         name: "primitives",
         weight: 2,
+      },
+      {
+        name: "tags",
+        weight: 0.75,
       },
     ],
   };
@@ -67,7 +72,13 @@ const Search: Component<{
     ignoreLocation: true,
   };
 
-  const fuse = new Fuse(primitivesJSON, fuseOptions);
+  const fuse = new Fuse(
+    structuredClone(primitivesJSON).map(item => {
+      item.primitives = item.primitives.map(item => item.name);
+      return item;
+    }),
+    fuseOptions,
+  );
 
   const onInput = (value: string) => {
     setSearch(value);
@@ -109,6 +120,7 @@ const Search: Component<{
       config.highlight.description.checked,
       config.highlight.title.checked,
       config.highlight.primitive.checked,
+      config.highlight.tag.checked,
     ],
     () => {
       reHighlightTextFromSearch();
@@ -133,10 +145,10 @@ const Search: Component<{
   });
 
   return (
-    <div class="flex justify-center items-center w-full max-w-[800px]">
+    <div class="flex justify-center items-center w-[calc(100vw-32px)] xs:w-full max-w-[800px]">
       <div class="w-full rounded-lg bg-page-main-bg">
         <div
-          class="sticky"
+          class="sticky z-1"
           classList={{
             "top-0": isSmall(),
             "top-[60px]": !isSmall(),
@@ -178,7 +190,7 @@ const Search: Component<{
 
           <div class="flex gap-3 p-2 bg-page-main-bg items-center rounded-b-lg">
             <div class="font-semibold text-[13px] xs:text-base">Highlight</div>
-            <div class="flex gap-[4px] md:gap-4 text-[12px] xxs:text-[14px] xs:text-[15px]">
+            <div class="flex gap-[4px] overflow-auto py-[2px] md:gap-4 text-[12px] xxs:text-[14px] xs:text-[15px]">
               <For each={Object.entries(config.highlight)}>
                 {([item, value]) => (
                   <CheckBox
@@ -213,7 +225,7 @@ const Search: Component<{
           <div class=""></div>
           <ul class="flex flex-col gap-y-6" ref={listContainer}>
             <For each={searchResult}>
-              {({ name, category, description, primitives, primitivesTotalCount }, idx) => {
+              {({ name, category, description, primitives, primitivesTotalCount, tags }, idx) => {
                 const [showRest, setShowRest] = createSignal(false);
 
                 const onClickToggle = () => {
@@ -224,7 +236,10 @@ const Search: Component<{
                   }
                   if (primitives.length < primitivesTotalCount) {
                     const primitivesList = [
-                      ...new Set([...primitives, ...primitivesJSON[idx()].primitives]),
+                      ...new Set([
+                        ...primitives,
+                        ...primitivesJSON[idx()].primitives.map(item => item.name),
+                      ]),
                     ];
                     setSearchResult(idx(), "primitives", primitivesList);
                   }
@@ -234,7 +249,7 @@ const Search: Component<{
                 return (
                   <li>
                     <h4
-                      class="font-semibold text-[#49494B] dark:text-[#bec5cf]"
+                      class="text-lg font-semibold text-[#49494B] dark:text-[#bec5cf]"
                       data-ignore-mark-title
                     >
                       <A href={`/${name.toLowerCase()}`}>{name}</A>
@@ -285,6 +300,22 @@ const Search: Component<{
                         </button>
                       </Show>
                     </div>
+                    <Show when={tags.length}>
+                      <ul class="flex gap-4 gap-y-2 flex-wrap self-start pt-2" data-ignore-mark-tag>
+                        <For each={tags}>
+                          {item => {
+                            return (
+                              <li>
+                                <span class="text-[12px] sm:text-[14px] text-slate-500 dark:text-slate-400">
+                                  <span class="opacity-50">{"#"}</span>
+                                  {item}
+                                </span>
+                              </li>
+                            );
+                          }}
+                        </For>
+                      </ul>
+                    </Show>
                   </li>
                 );
               }}

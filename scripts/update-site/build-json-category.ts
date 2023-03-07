@@ -1,13 +1,18 @@
 import { readFileSync, writeFile, writeFileSync } from "fs";
-import { TUpdateSiteGlobal } from ".";
+import { PackageJSONData, TSize, TUpdateSiteGlobal } from ".";
 import { formatBytes, r, regexGlobalCaptureGroup } from "../utils";
 import checkSizeOfPackage from "../checkSizeOfPackage";
+import { primitiveTags } from "./tags";
 
 const item: {
   name: string;
   category: string;
   description: string;
-  primitives: string[];
+  primitives: {
+    name: string;
+    size: TSize;
+  }[];
+  tags: string[];
 }[] = [];
 
 export const buildJSONCategory = async ({
@@ -15,19 +20,14 @@ export const buildJSONCategory = async ({
   name,
   globalState,
 }: {
-  pkg: any;
+  pkg: PackageJSONData;
   name: string;
   globalState: TUpdateSiteGlobal;
 }) => {
-  const pkgJSON = JSON.parse(JSON.stringify(pkg));
-  const { description } = pkgJSON as { description: string };
-  const { list, category, stage } = pkgJSON.primitive as {
-    list: string[];
-    category: string;
-    stage: number;
-  };
-
-  pkgJSON.list = list;
+  const pkgJSON = pkg;
+  const { description } = pkgJSON;
+  const { list, category, stage } = pkgJSON.primitive;
+  let expandedList: string[] = list;
 
   if (list.length === 1 && list[0]!.match(/list of/gi)) {
     // get primitives from src directory
@@ -41,10 +41,10 @@ export const buildJSONCategory = async ({
     const capturePrimitives = (fileStr: string) => {
       const resultExport = regexGlobalCaptureGroup(
         fileStr,
-        /export\s+(?:default|const|function|let)\s(\w+)/g
+        /export\s+(?:default|const|function|let)\s(\w+)/g,
       );
       if (resultExport) {
-        pkgJSON.list = resultExport;
+        expandedList = resultExport;
       }
     };
 
@@ -59,33 +59,49 @@ export const buildJSONCategory = async ({
     capturePrimitives(concatFile);
   }
 
-  const primitives = [...new Set(pkgJSON.list)] as string[];
+  const _primitives = [...new Set(expandedList)] as string[];
+
+  if (list.length === 1 && list[0]!.match(/list of/gi)) {
+    for (let primitive of _primitives) {
+      const result = await checkSizeOfPackage({
+        type: "export",
+        packageName: name,
+        primitiveName: primitive,
+        excludeGzipHeadersAndMetadataSize: true,
+      });
+      const minified = formatBytes(result.minifiedSize);
+      const gzipped = formatBytes(result.gzippedSize);
+
+      globalState.primitives[primitive] = {
+        packageName: name,
+        size: {
+          gzipped,
+          minified,
+        },
+      };
+    }
+  }
+
+  const primitives = _primitives.map(item => {
+    const { size } = globalState.primitives[item]!;
+    return {
+      name: item,
+      size: {
+        gzipped: size.gzipped.string,
+        minified: size.minified.string,
+      },
+    } as any;
+  });
+
+  const tags = primitiveTags.find(item => item.name === name)?.tags || [];
 
   item.push({
     name,
     category,
     description,
-    primitives
+    primitives,
+    tags,
   });
-
-  if (list.length === 1 && list[0]!.match(/list of/gi)) {
-    for (let primitive of primitives) {
-      const result = await checkSizeOfPackage({
-        type: "export",
-        packageName: name,
-        primitiveName: primitive,
-        excludeGzipHeadersAndMetadataSize: true
-      });
-      const minifiedSize = formatBytes(result.minifiedSize).string;
-      const gzippedSize = formatBytes(result.gzippedSize).string;
-
-      globalState.primitives[primitive] = {
-        packageName: name,
-        gzippedSize,
-        minifiedSize
-      };
-    }
-  }
 };
 
 export const writeJSONFile = () => {

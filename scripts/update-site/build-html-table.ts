@@ -19,14 +19,14 @@ const bundleJSURL = `https://bundlejs.com/`;
 const getBundleJSQuery = ({
   type,
   packageName,
-  primitiveName
+  primitiveName,
 }: {
   type: "package" | "export";
   packageName: string;
   primitiveName: string;
 }) => {
   const esbuild = {
-    external: ["solid-js", "node-fetch"]
+    external: ["solid-js", "node-fetch"],
   };
   const query = encodeURIComponent(`@solid-primitives/${packageName}`);
   const treeshake = encodeURIComponent(`[{${primitiveName}}]`);
@@ -36,8 +36,6 @@ const getBundleJSQuery = ({
 
 export const getSizeShield = (name: string) => `${sizeShield}${name}.json`;
 export const getNPMShield = (name: string) => `${npmShield}${name}.json`;
-
-const getSizes = async ({}: { packageName: string }) => {};
 
 export const buildCategory = async ({
   name,
@@ -73,15 +71,17 @@ export const buildCategory = async ({
                 type: "package",
                 packageName,
                 primitiveName,
-                excludeGzipHeadersAndMetadataSize: true
+                excludeGzipHeadersAndMetadataSize: true,
               });
-              const minifiedSize = formatBytes(result.minifiedSize).string;
-              const gzippedSize = formatBytes(result.gzippedSize).string;
+              const minified = formatBytes(result.minifiedSize);
+              const gzipped = formatBytes(result.gzippedSize);
 
               globalState.packageName[packageName] = {
                 name: packageName,
-                gzippedSize,
-                minifiedSize
+                size: {
+                  gzipped,
+                  minified,
+                },
               };
             }
 
@@ -89,26 +89,28 @@ export const buildCategory = async ({
               type,
               packageName,
               primitiveName,
-              excludeGzipHeadersAndMetadataSize: true
+              excludeGzipHeadersAndMetadataSize: true,
             });
-            const minifiedSize = formatBytes(result.minifiedSize);
-            const gzippedSize = formatBytes(result.gzippedSize);
+            const minified = formatBytes(result.minifiedSize);
+            const gzipped = formatBytes(result.gzippedSize);
 
             if (type === "export") {
               globalState.primitives[primitiveName] = {
                 packageName,
-                gzippedSize: gzippedSize.string,
-                minifiedSize: minifiedSize.string
+                size: {
+                  gzipped,
+                  minified,
+                },
               };
             }
 
             // const value = `{ gzipped: "${gzippedSize}", minified: "${minifiedSize}" }`;
-            const value = gzippedSize.number;
-            const unit = gzippedSize.unit;
+            const value = gzipped.number;
+            const unit = gzipped.unit;
             const query = getBundleJSQuery({
               type,
               packageName,
-              primitiveName
+              primitiveName,
             });
             const href = `${bundleJSURL}?${query}`;
 
@@ -116,9 +118,9 @@ export const buildCategory = async ({
 
             return `<SizeBadgeWrapper primitiveName="${primitiveName.replace(
               /\s/g,
-              ""
+              "",
             )}">${component}</SizeBadgeWrapper>`;
-          })
+          }),
         );
       };
       return (await run()).join("");

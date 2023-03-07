@@ -292,3 +292,7 @@ html.dark.primitives-page-main {
     transition: transform 300ms;
   }
 }
+
+.tippy-box[data-animation="fade"][data-state="hidden"] {
+  opacity: 0;
+}

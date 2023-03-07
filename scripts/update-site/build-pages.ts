@@ -27,19 +27,29 @@ export const buildPage = async ({
   const codeSandboxName = "codesandbox";
   const stackBlitzName = "stackblitz";
   const githubPagesURL = `https://solidjs-community.github.io/solid-primitives/${name}/`;
-  const githubChangelogURL = `https://github.com/solidjs-community/solid-primitives/blob/main/packages/${name}/CHANGELOG.md`
+  const githubChangelogURL = `https://github.com/solidjs-community/solid-primitives/blob/main/packages/${name}/CHANGELOG.md`;
+  // console.log(pkg.primitive.list.join("|"));
+  const primitiveCodeElRegex = new RegExp(
+    `<((?:_components\\.)?code)>{?(?:"|')?(<?(?:${pkg.primitive.list.join(
+      "|",
+    )})>?)(?:"|')?}?<\\/((?:_components\\.)?code)>`,
+    "g",
+  );
 
   readme = readme
     // remove heading-1
     .replace(/#\s+.+\n*/, "")
     // remove solid img banner
-    .replace(/<p>(?=[^]*?<img(?=[^>]+?src="https:\/\/assets\.solidjs\.com\/banner[^"]+")[^>]*?>)[^]*?<\/p>/, "")
+    .replace(
+      /<p>(?=[^]*?<img(?=[^>]+?src="https:\/\/assets\.solidjs\.com\/banner[^"]+")[^>]*?>)[^]*?<\/p>/,
+      "",
+    )
     // remove turborepo, size, version, stage ect... img banners
     .replace(/^\[!\[(?:turborepo|size|version|stage|lerna)\].+$/gm, "")
     // replace changelog relative url to github repo changelog
     .replace(/(\[CHANGELOG\.md\])(\(\.\/CHANGELOG\.md\))/i, (_, p1, p2) => {
-      if(!p2) return _
-      return `${p1}(${githubChangelogURL})`
+      if (!p2) return _;
+      return `${p1}(${githubChangelogURL})`;
     })
     // replace Installation with package install component
     .replace(/(##\s+installation\n+)(```[^`]+```)/i, (_, p1, p2) => {
@@ -80,7 +90,6 @@ export const buildPage = async ({
 
     // jsxRuntime: "solid-jsx",
 
-    
     remarkPlugins: [remarkGfm],
     rehypePlugins: [
       rehypeHighlight,
@@ -89,10 +98,10 @@ export const buildPage = async ({
         rehypeAutolinkHeadings,
         {
           properties: { class: "header-anchor" },
-          content: { type: "text", value: "#" }
-        }
-      ]
-    ]
+          content: { type: "text", value: "#" },
+        },
+      ],
+    ],
     // outputFormat: "function-body"
   });
   let outputString = output.toString();
@@ -111,6 +120,14 @@ export const buildPage = async ({
       if (!hasComponent) return _;
 
       return `${p1}<NoHydration>${content}</NoHydration>${p3}`;
+    })
+    // update code tag that contains primitives to have attribute
+    .replace(primitiveCodeElRegex, (_, p1, p2, p3) => {
+      if (!p2) return _;
+      return `<${p1} data-code-primitive-name="${p2.replace(
+        /\<|\>/g,
+        "",
+      )}" data-code-package-name="${name}">{"${p2}"}</${p3}>`;
     });
 
   // const html = "";
@@ -121,20 +138,13 @@ export const buildPage = async ({
   // 2. Online IDE (Stackblitz) / Stackblitz/Codepen
   // 3. Source code[packages/${name}/src/dev]
 
-  const packageList = JSON.stringify(
-    [
-      {
-        name: globalState.packageName[name]!.name,
-        gzipped: globalState.packageName[name]!.gzippedSize,
-        minified: globalState.packageName[name]!.minifiedSize
-      }
-    ]
-    // Object.entries(global.packageName).map(([key, value]) => ({
-    //   name: key,
-    //   gzipped: value.gzippedSize,
-    //   minified: value.minifiedSize
-    // }))
-  );
+  const packageList = JSON.stringify([
+    {
+      name: globalState.packageName[name]!.name,
+      gzipped: globalState.packageName[name]!.size.gzipped.string,
+      minified: globalState.packageName[name]!.size.minified.string,
+    },
+  ]);
   const primitiveList = JSON.stringify(
     Object.entries(globalState.primitives)
       .filter(([key, value]) => {
@@ -143,10 +153,10 @@ export const buildPage = async ({
       .map(([key, value]) => {
         return {
           name: key,
-          gzipped: value.gzippedSize,
-          minified: value.minifiedSize
+          gzipped: value.size.gzipped.string,
+          minified: value.size.minified.string,
         };
-      })
+      }),
   );
 
   const pathToSitePrimitivesRoute = r(`../site/src/routes/(primitives)/${name}.tsx`);
@@ -155,6 +165,7 @@ export const buildPage = async ({
 // Generated from "./scripts/update-site/build-pages"
 
 import PrimitivePageMain from "~/components/Primitives/PrimitivePageMain";
+import CodePrimitive from "~/components/Primitives/CodePrimitive";
 import CopyPackages from "~/components/CopyPackage/CopyPackages";
 import { NoHydration } from "solid-js/web";
 

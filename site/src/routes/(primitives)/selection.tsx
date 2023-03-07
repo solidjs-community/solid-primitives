@@ -3,6 +3,7 @@
 // Generated from "./scripts/update-site/build-pages"
 
 import PrimitivePageMain from "~/components/Primitives/PrimitivePageMain";
+import CodePrimitive from "~/components/Primitives/CodePrimitive";
 import CopyPackages from "~/components/CopyPackage/CopyPackages";
 import { NoHydration } from "solid-js/web";
 

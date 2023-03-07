@@ -15,6 +15,7 @@ export type PackageData = {
 
 export type PackageJSONData = {
   name: string;
+  description: string;
   primitive: {
     name?: string;
     list: string[];
@@ -23,25 +24,36 @@ export type PackageJSONData = {
   };
 };
 
+export type TSize = {
+  gzipped: {
+    string: string;
+    number: number;
+    unit: string;
+  };
+  minified: {
+    string: string;
+    number: number;
+    unit: string;
+  };
+};
+
 export type TUpdateSiteGlobal = {
   primitives: {
     [key: string]: {
       packageName: string;
-      gzippedSize: string;
-      minifiedSize: string;
+      size: TSize;
     };
   };
   packageName: {
     [key: string]: {
       name: string;
-      gzippedSize: string;
-      minifiedSize: string;
+      size: TSize;
     };
   };
 };
 const globalState: TUpdateSiteGlobal = {
   packageName: {},
-  primitives: {}
+  primitives: {},
 };
 
 console.log("updateSite", "Updating site");
@@ -60,7 +72,7 @@ const run = async () => {
 
     if (pkg.primitive.name !== name) {
       console.warn(
-        `directory name (${name}) and name in package info ${pkg.primitive.name} do not match`
+        `directory name (${name}) and name in package info ${pkg.primitive.name} do not match`,
       );
       continue;
     }

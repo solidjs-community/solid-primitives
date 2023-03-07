@@ -736,8 +736,10 @@ importers:
       solid-start: ^0.2.21
       solid-start-node: ^0.2.21
       solid-start-static: ^0.2.20
+      solid-tippy: ^0.2.1
       tailwindcss: ^3.2.4
       tailwindcss-dir: ^4.0.0
+      tippy.js: ^6.3.7
       typescript: ^4.9.4
       undici: ^5.15.1
       vite: ^4.1.1
@@ -763,6 +765,8 @@ importers:
       solid-js: 1.6.11
       solid-jsx: 0.9.1_solid-js@1.6.11
       solid-mdx: 0.0.6_solid-js@1.6.11+vite@4.1.4
+      solid-tippy: 0.2.1_5x3gysl2ztosqv4zwt27hpnmpa
+      tippy.js: 6.3.7
       undici: 5.20.0
     devDependencies:
       '@tailwindcss/container-queries': 0.1.0_tailwindcss@3.2.7
@@ -3565,6 +3569,10 @@ packages:
   /@polka/url/1.0.0-next.21:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
     dev: true
+
+  /@popperjs/core/2.11.6:
+    resolution: {integrity: sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==}
+    dev: false
 
   /@repeaterjs/repeater/3.0.4:
     resolution: {integrity: sha512-AW8PKd6iX3vAZ0vA43nOUOnbq/X5ihgU+mSXXqunMkeQADGiqw/PY0JNeYtD5sr0PAy51YPgAPbDoeapv9r8WA==}
@@ -10299,7 +10307,6 @@ packages:
   /solid-start/0.2.22_juyfzio7agobqr6l64ql2e3ejy:
     resolution: {integrity: sha512-9SfYRNyXUMzNVBx13nzuOqAGGJdsSG1E6gIM3CRDl0x85Nt+1zQTm74rRsBVMecI2EgI0gFOUEKFVM/dP4x8yA==}
     hasBin: true
-    requiresBuild: true
     peerDependencies:
       '@solidjs/meta': ^0.28.0
       '@solidjs/router': ^0.7.0
@@ -10370,6 +10377,17 @@ packages:
       - supports-color
     dev: true
     optional: true
+
+  /solid-tippy/0.2.1_5x3gysl2ztosqv4zwt27hpnmpa:
+    resolution: {integrity: sha512-8qB6X1iMn7nBd5BX+x7tS+5mDVragw5vCaXLOxEQFWUsyRRGKAY8JmbmmyVFIMIvF+pgkIIVIArhNfAGGtYVLA==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      solid-js: ^1.2
+      tippy.js: ^6.3
+    dependencies:
+      solid-js: 1.6.11
+      tippy.js: 6.3.7
+    dev: false
 
   /solid-transition-group/0.0.13_solid-js@1.6.11:
     resolution: {integrity: sha512-VA1V0ip4dsNOQJ/dCluCiAPBUuHspYFm4WYG91jpNmcP4rC4DY1S1EGds44JjiUAP7qEoEZdMhPaiS6lqTF7AA==}
@@ -10767,6 +10785,12 @@ packages:
     resolution: {integrity: sha512-UVq5AXt/gQlti7oxoIg5oi/9r0WpF7DGEVwXgqWSMmyN16+e3tl5lIvTaOpJ3TAtu5xFzWccFRM4R5NaWHF+4g==}
     engines: {node: '>=14.0.0'}
     dev: true
+
+  /tippy.js/6.3.7:
+    resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
+    dependencies:
+      '@popperjs/core': 2.11.6
+    dev: false
 
   /title-case/3.0.3:
     resolution: {integrity: sha512-e1zGYRvbffpcHIrnuqT0Dh+gEJtDaxDSoG4JAIpq4oDFyooziLBIiYQv0GBT4FUAnUop5uZ1hiIAj7oAF6sOCA==}

@@ -143,6 +143,25 @@ module.exports = {
       function ({ matchUtilities, theme }) {
         matchUtilities(
           {
+            "stop-color": value => ({
+              stopColor: value
+            })
+          },
+          { values: theme("stopColor") }
+        );
+      },
+      {
+        theme: {
+          stopColor: {
+            none: "none"
+          }
+        }
+      }
+    ),
+    plugin(
+      function ({ matchUtilities, theme }) {
+        matchUtilities(
+          {
             "tap-highlight-color": value => ({
               WebkitTapHighlightColor: value
             })

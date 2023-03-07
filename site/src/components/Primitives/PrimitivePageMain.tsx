@@ -1,5 +1,5 @@
 import { FaBrandsGithub } from "solid-icons/fa";
-import { ParentComponent } from "solid-js";
+import { onMount, ParentComponent } from "solid-js";
 import { Title } from "solid-start";
 import Heading from "./Heading";
 import InfoBar from "./InfoBar";
@@ -7,6 +7,7 @@ import { setHeaderState } from "../Header/Header";
 import { pageWidthClass } from "~/constants";
 import { TBundleSizeItem } from "../BundleSizeModal/BundleSizeModal";
 import onPreMount from "~/hooks/onPreMount";
+import createTooltipOnCodePrimitives from "~/hooks/createTooltipOnCodePrimitives";
 
 const githubRepo = "https://github.com/solidjs-community/solid-primitives";
 
@@ -25,6 +26,8 @@ const PrimitivePageMain: ParentComponent<{
     document.documentElement.classList.add("primitives-page-main");
     setHeaderState("showGradientBorder", false);
   });
+
+  createTooltipOnCodePrimitives();
 
   return (
     <>
@@ -51,6 +54,7 @@ const PrimitivePageMain: ParentComponent<{
               <svg
                 class="absolute"
                 viewBox="0 0 88.975 79.46"
+                // @ts-ignore
                 xml:space="preserve"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
                 xmlns="http://www.w3.org/2000/svg"
@@ -90,5 +94,7 @@ const PrimitivePageMain: ParentComponent<{
     </>
   );
 };
+
+const addTooltip = () => {};
 
 export default PrimitivePageMain;
