@@ -230,6 +230,35 @@ function _createMdxContent(props) {
           </_components.code>
         </_components.pre>
         {"\n"}
+        <_components.h2 id="demo">
+          <_components.a className="header-anchor" href="#demo">
+            {"#"}
+          </_components.a>
+          {"Demo"}
+        </_components.h2>
+        {"\n"}
+        <_components.p>
+          <_components.a href="https://solidjs-community.github.io/solid-primitives/autofocus/">
+            {"Live Site"}
+          </_components.a>
+        </_components.p>
+        {"\n"}
+        <_components.p>
+          {"You may see the working example here: "}
+          <_components.a href="https://solidjs-community.github.io">
+            {"https://solidjs-community.github.io"}
+          </_components.a>
+        </_components.p>
+        {"\n"}
+        <_components.p>
+          {"Source code: "}
+          <_components.a href="https://github.com/solidjs-community/solid-primitives/blob/main/packages/autofocus/dev/index.tsx">
+            {
+              "https://github.com/solidjs-community/solid-primitives/blob/main/packages/autofocus/dev/index.tsx"
+            }
+          </_components.a>
+        </_components.p>
+        {"\n"}
         <_components.h2 id="changelog">
           <_components.a className="header-anchor" href="#changelog">
             {"#"}
@@ -273,7 +302,7 @@ export default function Index() {
     <PrimitivePageMain
       packageName="@solid-primitives/autofocus"
       name="autofocus"
-      stage={0}
+      stage={1}
       packageList={[{ name: "autofocus", gzipped: "153 B", minified: "239 B" }]}
       primitiveList={[
         { name: "createAutofocus", gzipped: "118 B", minified: "142 B" },

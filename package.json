@@ -26,6 +26,7 @@
     "update-deps": "pnpm up -Lri",
     "changeset": "changeset",
     "version": "changeset version && pnpm i --no-frozen-lockfile && git add .",
+    "deploy-netlify": "pnpm build:packages && pnpm update-site && pnpm build:site",
     "release": "pnpm build && changeset publish"
   },
   "devDependencies": {

@@ -80,7 +80,7 @@ const PrimitivesTable = () => {
             <PrimitiveBtn href="autofocus">autofocus</PrimitiveBtn>
           </TD>
           <TD>
-            <StageBadge value={0} />
+            <StageBadge value={1} />
           </TD>
           <TD>
             <PrimitiveBtnLineWrapper primitiveName="autofocus">
@@ -1929,21 +1929,21 @@ const PrimitivesTable = () => {
             </SizeBadgeWrapper>
             <SizeBadgeWrapper primitiveName="createToken">
               <SizeBadge
-                value="210"
+                value="211"
                 unit="B"
                 href="https://bundlejs.com/?q=%40solid-primitives%2Fjsx-parser&treeshake=%5B%7BcreateToken%7D%5D&config=%7B%22esbuild%22%3A%7B%22external%22%3A%5B%22solid-js%22%2C%22node-fetch%22%5D%7D%7D"
               />
             </SizeBadgeWrapper>
             <SizeBadgeWrapper primitiveName="resolveTokens">
               <SizeBadge
-                value="274"
+                value="295"
                 unit="B"
                 href="https://bundlejs.com/?q=%40solid-primitives%2Fjsx-parser&treeshake=%5B%7BresolveTokens%7D%5D&config=%7B%22esbuild%22%3A%7B%22external%22%3A%5B%22solid-js%22%2C%22node-fetch%22%5D%7D%7D"
               />
             </SizeBadgeWrapper>
             <SizeBadgeWrapper primitiveName="isToken">
               <SizeBadge
-                value="108"
+                value="109"
                 unit="B"
                 href="https://bundlejs.com/?q=%40solid-primitives%2Fjsx-parser&treeshake=%5B%7BisToken%7D%5D&config=%7B%22esbuild%22%3A%7B%22external%22%3A%5B%22solid-js%22%2C%22node-fetch%22%5D%7D%7D"
               />

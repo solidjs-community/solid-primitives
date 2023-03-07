@@ -299,9 +299,9 @@
     "description": "A primitive to tokenize your solid-components to enable custom parsing.",
     "primitives": [
       { "name": "createJSXParser", "size": { "gzipped": "133 B", "minified": "155 B" } },
-      { "name": "createToken", "size": { "gzipped": "210 B", "minified": "275 B" } },
-      { "name": "resolveTokens", "size": { "gzipped": "274 B", "minified": "389 B" } },
-      { "name": "isToken", "size": { "gzipped": "108 B", "minified": "128 B" } }
+      { "name": "createToken", "size": { "gzipped": "211 B", "minified": "275 B" } },
+      { "name": "resolveTokens", "size": { "gzipped": "295 B", "minified": "431 B" } },
+      { "name": "isToken", "size": { "gzipped": "109 B", "minified": "128 B" } }
     ],
     "tags": []
   },
