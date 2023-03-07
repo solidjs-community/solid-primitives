@@ -12,7 +12,8 @@
     "format": "prettier -w packages/**/*.{js,ts,json,css,tsx,jsx,md,html}",
     "lint": "eslint --max-warnings 0 packages/*/src/** && eslint packages/*/test/** --quiet --rule \"no-only-tests/no-only-tests: error\"",
     "build": "cross-env CI=true turbo run build",
-    "build-packages-only": "cross-env CI=true turbo run build --filter=!site",
+    "build:package": "cross-env CI=true turbo run build --filter=!site",
+    "build:site": "turbo run build --filter=site",
     "test": "cross-env CI=true vitest -c ./configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr",
     "pages": "turbo run page && jiti ./scripts/collectPages.ts",
@@ -22,8 +23,7 @@
     "update-deps": "pnpm up -Lri",
     "changeset": "changeset",
     "version": "changeset version && pnpm i --no-frozen-lockfile && git add .",
-    "build-site": "cd ./site && pnpm build",
-    "deploy-netlify": "pnpm build-packages-only && pnpm update-site && pnpm build-site",
+    "deploy-netlify": "pnpm build:package && pnpm update-site && pnpm build:site",
     "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
