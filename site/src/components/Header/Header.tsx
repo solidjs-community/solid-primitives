@@ -16,8 +16,7 @@ import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 import Hamburger from "../Icons/Hamburger";
 import { primitivePagePaddingTop } from "../Primitives/PrimitivePageMain";
 import { pageWidthClass } from "~/constants";
-import createEffectDeffered from "~/hooks/createEffectDeffered";
-import reflow from "~/utils/reflow";
+import { defer } from "@solid-primitives/utils";
 
 export const [headerState, setHeaderState] = createStore({
   showOpaqueBg: false,
@@ -90,75 +89,83 @@ const Header = () => {
 
   let navMenuHeight = 0;
 
-  createEffectDeffered(tweenedValue, tweenedValue => {
-    navMenu.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
-    headerBottomGradientBorder.style.transform = `translateY(${tweenedValue}px)`;
-    headerShadow.style.transform = `translateY(${tweenedValue}px)`;
-    headerOpaqueBg.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
-    gradientOverflowLeftBG.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
-    gradientOverflowRightBG.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
-  });
-
-  createEffectDeffered(openNavMenu, openNavMenu => {
-    if (openNavMenu) {
-      navMenuHeight = navMenu.clientHeight;
-
-      headerOpaqueBg.classList.add("!backdrop-blur-md", "!bg-white/50", "dark:!bg-[#293843]/70");
-      headerOpaqueBg.style.display = "";
-      headerOpaqueBg.style.height = `${navMenuHeight + headerHeight}px`;
-      gradientOverflowLeftBG.style.height = `${navMenuHeight + 220}px`;
-      gradientOverflowRightBG.style.height = `${navMenuHeight + 220}px`;
-      gradientOverflowLeftBG.style.setProperty(
-        "--header-gradient-overflow-start",
-        `${navMenuHeight + 60}px`,
-      );
-      gradientOverflowRightBG.style.setProperty(
-        "--header-gradient-overflow-start",
-        `${navMenuHeight + 60}px`,
-      );
-      headerOpaqueBgContainer.style.height = `${navMenuHeight + headerHeight}px`;
-      headerOpaqueBg.style.transform = `translateY(${-navMenuHeight}px)`;
-      gradientOverflowLeftBG.style.transform = `translateY(${-navMenuHeight}px)`;
-      gradientOverflowRightBG.style.transform = `translateY(${-navMenuHeight}px)`;
-      headerOpaqueBg.style.top = "-1px";
-      headerOpaqueBgContainer.style.top = "1px";
-
-      requestAnimationFrame(() => {
-        setFrom(navMenuHeight);
-      });
-      return;
-    }
-    const showOpaqueBg = window.scrollY > 30;
-
-    if (!showOpaqueBg) {
-      setHeaderState("showOpaqueBg", true);
-      setTimeout(() => {
-        const showOpaqueBg = window.scrollY > 30;
-        if (!showOpaqueBg) {
-          setHeaderState("showOpaqueBg", false);
-        }
-      }, openNavMenuDuration);
-    }
-    setFrom(0);
-  });
-
-  createEffectDeffered(
-    () => headerState.disableScroll,
-    disableScroll => {
-      if (disableScroll) {
-        window.removeEventListener("scroll", checkScroll);
-        return;
-      }
-      window.addEventListener("scroll", checkScroll, { passive: true });
-    },
+  createEffect(
+    defer(tweenedValue, tweenedValue => {
+      navMenu.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
+      headerBottomGradientBorder.style.transform = `translateY(${tweenedValue}px)`;
+      headerShadow.style.transform = `translateY(${tweenedValue}px)`;
+      headerOpaqueBg.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
+      gradientOverflowLeftBG.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
+      gradientOverflowRightBG.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
+    }),
   );
 
-  createEffectDeffered(
-    () => location.hash,
-    (currentHash, prevHash) => {
-      if (prevHash === currentHash) return;
-      setOpenNavMenu(false);
-    },
+  createEffect(
+    defer(openNavMenu, openNavMenu => {
+      if (openNavMenu) {
+        navMenuHeight = navMenu.clientHeight;
+
+        headerOpaqueBg.classList.add("!backdrop-blur-md", "!bg-white/50", "dark:!bg-[#293843]/70");
+        headerOpaqueBg.style.display = "";
+        headerOpaqueBg.style.height = `${navMenuHeight + headerHeight}px`;
+        gradientOverflowLeftBG.style.height = `${navMenuHeight + 220}px`;
+        gradientOverflowRightBG.style.height = `${navMenuHeight + 220}px`;
+        gradientOverflowLeftBG.style.setProperty(
+          "--header-gradient-overflow-start",
+          `${navMenuHeight + 60}px`,
+        );
+        gradientOverflowRightBG.style.setProperty(
+          "--header-gradient-overflow-start",
+          `${navMenuHeight + 60}px`,
+        );
+        headerOpaqueBgContainer.style.height = `${navMenuHeight + headerHeight}px`;
+        headerOpaqueBg.style.transform = `translateY(${-navMenuHeight}px)`;
+        gradientOverflowLeftBG.style.transform = `translateY(${-navMenuHeight}px)`;
+        gradientOverflowRightBG.style.transform = `translateY(${-navMenuHeight}px)`;
+        headerOpaqueBg.style.top = "-1px";
+        headerOpaqueBgContainer.style.top = "1px";
+
+        requestAnimationFrame(() => {
+          setFrom(navMenuHeight);
+        });
+        return;
+      }
+      const showOpaqueBg = window.scrollY > 30;
+
+      if (!showOpaqueBg) {
+        setHeaderState("showOpaqueBg", true);
+        setTimeout(() => {
+          const showOpaqueBg = window.scrollY > 30;
+          if (!showOpaqueBg) {
+            setHeaderState("showOpaqueBg", false);
+          }
+        }, openNavMenuDuration);
+      }
+      setFrom(0);
+    }),
+  );
+
+  createEffect(
+    defer(
+      () => headerState.disableScroll,
+      disableScroll => {
+        if (disableScroll) {
+          window.removeEventListener("scroll", checkScroll);
+          return;
+        }
+        window.addEventListener("scroll", checkScroll, { passive: true });
+      },
+    ),
+  );
+
+  createEffect(
+    defer(
+      () => location.hash,
+      (currentHash, prevHash) => {
+        if (prevHash === currentHash) return;
+        setOpenNavMenu(false);
+      },
+    ),
   );
 
   createEffect(() => {

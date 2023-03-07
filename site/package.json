@@ -34,7 +34,7 @@
     "@solid-primitives/rootless": "^1.2.4",
     "@solid-primitives/scheduled": "^1.2.1",
     "@solid-primitives/tween": "^1.2.4",
-    "@solid-primitives/utils": "^5.1.1",
+    "@solid-primitives/utils": "^5.4.0",
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.7.0",
     "fuse.js": "^6.6.2",
