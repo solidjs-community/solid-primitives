@@ -18,12 +18,22 @@ const SlideModal: ParentComponent<{
 
   const changePageLayout = () => {
     const rootAppBCR = rootApp.getBoundingClientRect();
+    const containerBCR = containerEl.getBoundingClientRect();
+    const documentHeight = document.documentElement.clientHeight;
     const { scrollY } = window;
+    const containerMarginTop = 100;
+    const containerMarginBottom = 60;
+    const containerHeight = containerBCR.height + containerMarginTop + containerMarginBottom;
 
     rootApp.style.position = "fixed";
     rootApp.style.top = `${rootAppBCR.top}px`;
     rootApp.style.left = "0";
     rootApp.style.right = "0";
+
+    if (containerHeight <= documentHeight) {
+      document.documentElement.style.overflow = "hidden";
+      rootApp.style.overflow = "hidden";
+    }
 
     // or
     // const documentWidth = document.documentElement.clientWidth;
@@ -40,6 +50,8 @@ const SlideModal: ParentComponent<{
     rootApp.style.top = "";
     rootApp.style.left = "";
     rootApp.style.right = "";
+    rootApp.style.overflow = "";
+    document.documentElement.style.overflow = "";
     window.scrollTo({ top: prevScrollY });
   };
 
