@@ -23,7 +23,7 @@ jobs:
         run: pnpm install --ignore-scripts
 
       - name: Build all packages
-        run: pnpm build
+        run: pnpm build:packages
 
       - name: Lint
         # Will run the step even if build step failed
