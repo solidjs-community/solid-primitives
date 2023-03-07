@@ -1,11 +1,12 @@
 {
   "name": "site",
+  "private": true,
+  "type": "module",
   "scripts": {
     "dev": "solid-start dev --host",
     "build": "solid-start build",
     "start": "solid-start start"
   },
-  "type": "module",
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.0",
     "@tailwindcss/typography": "^0.5.8",
