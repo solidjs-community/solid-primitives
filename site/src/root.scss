@@ -309,6 +309,20 @@ html.dark.primitives-page-main {
   }
 }
 
+html.full-page {
+  &,
+  body,
+  #root,
+  #root-subcontainer {
+    height: 100%;
+  }
+
+  #root-subcontainer {
+    display: grid;
+    grid-template-rows: 1fr min-content;
+  }
+}
+
 .tippy-box[data-animation="fade"][data-state="hidden"] {
   opacity: 0;
 }
