@@ -1,7 +1,7 @@
 import { usePrefersDark } from "@solid-primitives/media";
+import { defer } from "@solid-primitives/utils";
 import { FiMoon, FiSun } from "solid-icons/fi";
 import { createEffect, createSignal, Match, on, onMount, Switch } from "solid-js";
-import createEffectDeffered from "~/hooks/createEffectDeffered";
 import HalfSun from "../Icons/HalfSun";
 
 const ThemeBtn = () => {
@@ -57,15 +57,17 @@ const ThemeBtn = () => {
     }
   };
 
-  createEffectDeffered(prefersDark, prefersDark => {
-    if (theme() !== "os") return;
+  createEffect(
+    defer(prefersDark, prefersDark => {
+      if (theme() !== "os") return;
 
-    if (prefersDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  });
+      if (prefersDark) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }),
+  );
 
   onMount(() => {
     let lsTheme = localStorage.theme;
