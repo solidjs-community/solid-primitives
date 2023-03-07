@@ -27,7 +27,7 @@ export const [headerState, setHeaderState] = createStore({
   disableScroll: false,
   showSearchBtn: true,
   openNavMenu: false,
-  zIndex: 10
+  zIndex: 10,
 });
 
 function easeInOutCubic(x: number): number {
@@ -110,11 +110,11 @@ const Header = () => {
       gradientOverflowRightBG.style.height = `${navMenuHeight + 220}px`;
       gradientOverflowLeftBG.style.setProperty(
         "--header-gradient-overflow-start",
-        `${navMenuHeight + 60}px`
+        `${navMenuHeight + 60}px`,
       );
       gradientOverflowRightBG.style.setProperty(
         "--header-gradient-overflow-start",
-        `${navMenuHeight + 60}px`
+        `${navMenuHeight + 60}px`,
       );
       headerOpaqueBgContainer.style.height = `${navMenuHeight + headerHeight}px`;
       headerOpaqueBg.style.transform = `translateY(${-navMenuHeight}px)`;
@@ -150,7 +150,7 @@ const Header = () => {
         return;
       }
       window.addEventListener("scroll", checkScroll, { passive: true });
-    }
+    },
   );
 
   createEffectDeffered(
@@ -158,7 +158,7 @@ const Header = () => {
     (currentHash, prevHash) => {
       if (prevHash === currentHash) return;
       setOpenNavMenu(false);
-    }
+    },
   );
 
   createEffect(() => {
@@ -179,8 +179,8 @@ const Header = () => {
           setHeaderState("showShadow", false);
         }
       },
-      { defer: true }
-    )
+      { defer: true },
+    ),
   );
 
   return (
@@ -194,7 +194,7 @@ const Header = () => {
               class={`${pageWidthClass} w-full absolute top-0 left-0 bottom-0 right-0 mx-auto box-shadow-[var(--header-box-shadow)] -z-1 transition-opacity duration-250`}
               classList={{
                 "opacity-100": headerState.showShadow || openNavMenu(),
-                "opacity-0": !headerState.showShadow
+                "opacity-0": !headerState.showShadow,
               }}
               ref={headerShadow}
             >
@@ -202,7 +202,7 @@ const Header = () => {
                 class="h-full box-shadow-[var(--header-big-box-shadow)] -z-1 transition-composite duration-250"
                 classList={{
                   "opacity-100": openNavMenu(),
-                  "opacity-0": !openNavMenu()
+                  "opacity-0": !openNavMenu(),
                 }}
               />
             </div>
@@ -256,7 +256,7 @@ const Header = () => {
               "backdrop-blur-md bg-white/50 dark:bg-[#293843]/70":
                 headerState.showOpaqueBg || openNavMenu(),
               "backdrop-blur-none bg-white/0 dark:bg-[#293843]/0":
-                !openNavMenu() && !headerState.showOpaqueBg
+                !openNavMenu() && !headerState.showOpaqueBg,
             }}
             ref={headerOpaqueBg}
           />
@@ -266,7 +266,7 @@ const Header = () => {
           class={`${pageWidthClass} mx-auto background-[var(--header-border-bottom)] h-[2px] transition-opacity duration-250`}
           classList={{
             "opacity-100": headerState.showGradientBorder,
-            "opacity-0": !headerState.showGradientBorder
+            "opacity-0": !headerState.showGradientBorder,
           }}
           ref={headerBottomGradientBorder}
         />
@@ -288,12 +288,12 @@ const Header = () => {
                 headerOpaqueBg.classList.remove(
                   "!backdrop-blur-md",
                   "!bg-white/50",
-                  "dark:!bg-[#293843]/70"
+                  "dark:!bg-[#293843]/70",
                 );
                 headerOpaqueBg.style.top = "";
                 headerOpaqueBgContainer.style.top = "";
                 headerOpaqueBgContainer.style.height = "";
-              }
+              },
             }}
             ref={navMenu}
           >
@@ -306,7 +306,7 @@ const Header = () => {
         classList={{
           "opacity-0": !headerState.showGradientOverflow,
           "opacity-100": headerState.showGradientOverflow,
-          "!transition-none": isSafari
+          "!transition-none": isSafari,
         }}
       >
         <div

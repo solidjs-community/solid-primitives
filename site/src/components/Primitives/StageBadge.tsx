@@ -68,7 +68,7 @@ const StageBadge: ParentComponent<{
           class={"flex justify-center items-center font-sans  rounded-md " + classStageColor(level)}
           classList={{
             "w-[25px] sm:w-[32.25px] h-[28px]": !size,
-            "w-[22px] h-[24px]": size === "small"
+            "w-[22px] h-[24px]": size === "small",
           }}
         >
           <span>{level}</span>

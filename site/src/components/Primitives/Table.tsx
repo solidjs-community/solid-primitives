@@ -352,7 +352,7 @@ const Table: ParentComponent = props => {
         hideActiveHeader();
       });
     },
-    { rootMargin: `-${rootMarginTop}px 0px -${rootMarginTop}px 0px` }
+    { rootMargin: `-${rootMarginTop}px 0px -${rootMarginTop}px 0px` },
   );
 
   createIntersectionObserver(
@@ -389,7 +389,7 @@ const Table: ParentComponent = props => {
         }
       });
     },
-    { rootMargin: `-${rootMarginTop}px 0px 0px 0px` }
+    { rootMargin: `-${rootMarginTop}px 0px 0px 0px` },
   );
 
   createEffectDeffered(
@@ -432,7 +432,7 @@ const Table: ParentComponent = props => {
           });
         });
       });
-    }
+    },
   );
 
   return (

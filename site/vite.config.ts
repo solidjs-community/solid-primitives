@@ -5,7 +5,7 @@ export default defineConfig({
   base: "/solid-primitives/",
   plugins: [
     solid({
-      adapter: "solid-start-static"
-    })
-  ]
+      adapter: "solid-start-static",
+    }),
+  ],
 });

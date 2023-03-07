@@ -11,7 +11,7 @@ const NavMenu = () => {
     "Philosophy",
     "Design Maxims",
     "Basic and Compound Primitives",
-    "Managing Primitive Complexity"
+    "Managing Primitive Complexity",
   ];
   return (
     <div>

@@ -6,7 +6,7 @@ import { Accessor, AccessorArray, createEffect, on } from "solid-js";
  */
 function createEffectDeffered<S, U>(
   deps: Accessor<S> | AccessorArray<S>,
-  fn: (input: S, prevInput: S | undefined, prevValue: U | undefined) => U
+  fn: (input: S, prevInput: S | undefined, prevValue: U | undefined) => U,
 ) {
   // @ts-ignore
   createEffect(on(deps, fn, { defer: true }));

@@ -10,7 +10,7 @@ import { debounce } from "@solid-primitives/scheduled";
 
 const CopyPackage: Component<{ type: "npm" | "yarn" | "pnpm"; packageName: string }> = ({
   type,
-  packageName
+  packageName,
 }) => {
   const [write] = makeClipboard();
   const [hasCopied, setHasCopied] = createSignal(false);
@@ -24,20 +24,20 @@ const CopyPackage: Component<{ type: "npm" | "yarn" | "pnpm"; packageName: strin
       monochromeLogo: NpmMonochrome,
       logo: NpmLogo,
       text: `${type} install ${packageName}`,
-      ariaLabel: getAriaLabel("NPM")
+      ariaLabel: getAriaLabel("NPM"),
     },
     yarn: {
       monochromeLogo: YarnMonochrome,
       logo: YarnLogo,
       text: `${type} add ${packageName}`,
-      ariaLabel: getAriaLabel("Yarn")
+      ariaLabel: getAriaLabel("Yarn"),
     },
     pnpm: {
       monochromeLogo: PnpmMonochrome,
       logo: PnpmLogo,
       text: `${type} add ${packageName}`,
-      ariaLabel: getAriaLabel("PNPM")
-    }
+      ariaLabel: getAriaLabel("PNPM"),
+    },
   };
 
   const setHasCopiedDebounced = debounce(() => setHasCopied(false), 1500);

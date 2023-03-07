@@ -4,7 +4,7 @@
  */
 export const focusInputAndKeepVirtualKeyboardOpen = (
   input: HTMLElement | (() => HTMLElement),
-  { timeout }: { timeout?: number } = {}
+  { timeout }: { timeout?: number } = {},
 ) => {
   // create invisible dummy input to receive the focus first
   const fakeInput = document.createElement("input");

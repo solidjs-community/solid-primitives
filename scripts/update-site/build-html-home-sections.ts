@@ -25,7 +25,7 @@ export const buildAndWriteHomeSections = async () => {
   const contributingH2List = [
     "Design Maxims",
     "Basic and Compound Primitives",
-    "Managing Primitive Complexity"
+    "Managing Primitive Complexity",
   ];
   let sections = "";
 
@@ -69,10 +69,10 @@ export const buildAndWriteHomeSections = async () => {
         rehypeAutolinkHeadings,
         {
           properties: { class: "header-anchor" },
-          content: { type: "text", value: "#" }
-        }
-      ]
-    ]
+          content: { type: "text", value: "#" },
+        },
+      ],
+    ],
     // outputFormat: "function-body"
   });
   output;

@@ -31,7 +31,7 @@ const VersionBadge: ParentComponent<{ value: string; href: string }> = ({ value,
       | "orange"
       | "red"
       | "blue"
-      | "lightgrey"
+      | "lightgrey",
   ) => {
     switch (color) {
       case "brightgreen":
@@ -66,12 +66,17 @@ const VersionBadge: ParentComponent<{ value: string; href: string }> = ({ value,
 
 export const VersionBadgePill: ParentComponent<{ value: string; href: string }> = ({
   value,
-  href
+  href,
 }) => {
   const version = createFetchVersion(value);
 
   return (
-    <a class="flex font-sans hover:contrast-[1.2] transition-filter" href={href} target="_blank" rel="noopener">
+    <a
+      class="flex font-sans hover:contrast-[1.2] transition-filter"
+      href={href}
+      target="_blank"
+      rel="noopener"
+    >
       <div class="flex items-center rounded-l-lg h-[38px] border-[#cae0ff] px-4 border-[3px] bg-[#cae0ff40] dark:border-[#405b6e] dark:bg-[#2a4355]">
         NPM
       </div>

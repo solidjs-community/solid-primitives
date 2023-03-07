@@ -98,7 +98,7 @@ const SearchModal: Component<{
     (currentPathname, prevPathname) => {
       if (prevPathname === currentPathname) return;
       setOpen(false);
-    }
+    },
   );
 
   return (
@@ -133,8 +133,8 @@ const SearchModal: Component<{
           enterToClass: "opacity-100 transition duration-200",
           exitClass: "opacity-100",
           exitToClass: "opacity-0 transition duration-200",
-          appendToElement: "[data-overlay-backdrop]"
-        }
+          appendToElement: "[data-overlay-backdrop]",
+        },
       }}
       animation={{
         enterClass: "opacity-0",
@@ -174,7 +174,7 @@ const SearchModal: Component<{
             setHeaderState("showShadow", prevHeaderState.showShadow);
             setHeaderState("zIndex", prevHeaderState.zIndex);
           });
-        }
+        },
       }}
       focusElementOnOpen={{ target: isIOS ? "none" : "firstChild", preventScroll: true }}
       focusMenuButtonOnMouseDown={!isIOS}

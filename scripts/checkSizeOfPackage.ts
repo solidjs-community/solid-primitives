@@ -7,7 +7,7 @@ const checkSizeOfPackage = async ({
   type,
   packageName,
   primitiveName,
-  excludeGzipHeadersAndMetadataSize
+  excludeGzipHeadersAndMetadataSize,
 }: {
   type: "package" | "export";
   packageName: string;
@@ -36,13 +36,14 @@ export { ${primitiveName} } from "./packages/${packageName}/src/index"
     minify: true,
     treeShaking: true,
     platform: "browser",
-    external: ["solid-js", "node-fetch"]
+    external: ["solid-js", "node-fetch"],
   });
 
-  const gzipHeadersAndMetadataSize = 20 // around 20 bytes
+  const gzipHeadersAndMetadataSize = 20; // around 20 bytes
   const buffer = readFileSync(outFile);
   const minifiedSize = buffer.toString().length;
-  const gzippedSize = gzipSizeSync(buffer) - (excludeGzipHeadersAndMetadataSize ? gzipHeadersAndMetadataSize: 0);
+  const gzippedSize =
+    gzipSizeSync(buffer) - (excludeGzipHeadersAndMetadataSize ? gzipHeadersAndMetadataSize : 0);
   if (type === "export") {
     rmSync(packageExportFilePath);
   }
@@ -50,7 +51,7 @@ export { ${primitiveName} } from "./packages/${packageName}/src/index"
 
   return {
     minifiedSize,
-    gzippedSize
+    gzippedSize,
   };
 };
 
