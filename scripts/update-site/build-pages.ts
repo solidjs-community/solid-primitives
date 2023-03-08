@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFile, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFile, writeFileSync } from "fs";
 // import { promises as fs } from "node:fs";
 import { r } from "../utils";
 import rehypeHighlight from "rehype-highlight";
@@ -10,6 +10,8 @@ import { getNPMShield, getSizeShield } from "./build-html-table";
 import { PackageJSONData, TUpdateSiteGlobal } from ".";
 
 const items: { path: string; pageStr: string }[] = [];
+
+const routeName = "package";
 
 export const buildPage = async ({
   pkg,
@@ -159,7 +161,7 @@ export const buildPage = async ({
       }),
   );
 
-  const pathToSitePrimitivesRoute = r(`../site/src/routes/(primitives)/${name}.tsx`);
+  const pathToSitePrimitivesRoute = r(`../site/src/routes/${routeName}/${name}.tsx`);
   const pageStr = `
 // Do not modify
 // Generated from "./scripts/update-site/build-pages"
@@ -184,6 +186,10 @@ export default function Index () {
 };
 
 export const writePages = () => {
+  const pathToSitePrimitivesRouteDir = r(`../site/src/routes/${routeName}`);
+  if (!existsSync(pathToSitePrimitivesRouteDir)) {
+    mkdirSync(pathToSitePrimitivesRouteDir);
+  }
   items.forEach(({ path, pageStr }) => {
     writeFile(path, pageStr, err => {
       if (err) console.log(err);

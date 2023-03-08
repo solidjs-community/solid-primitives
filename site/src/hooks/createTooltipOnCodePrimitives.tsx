@@ -1,13 +1,11 @@
-// import { arrow, autoUpdate, computePosition, flip, offset } from "@floating-ui/dom";
-// import { useFloating } from "solid-floating-ui";
 import { createResizeObserver } from "@solid-primitives/resize-observer";
 import { batch, Component, createSignal, Match, onMount, Switch } from "solid-js";
-// import "tippy.js/dist/svg-arrow.css";
-// import { roundArrow } from "tippy.js";
 import { useTippy } from "solid-tippy";
 import { Content } from "tippy.js";
 import { BASE } from "~/constants";
-import primitivesJSON from "~/primitives.json";
+import { TPrimitiveJson } from "~/ts/primitivesJson";
+import _primitivesJSON from "~/_generated/primitives.json";
+const primitivesJSON: TPrimitiveJson = _primitivesJSON;
 
 const TooltipContent = (el: HTMLElement) => {
   if (!el) return;

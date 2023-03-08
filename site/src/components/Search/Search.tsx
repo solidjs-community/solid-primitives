@@ -6,8 +6,11 @@ import { FiChevronLeft, FiSearch, FiX } from "solid-icons/fi";
 import { Component, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import createEffectDeffered from "~/hooks/createEffectDeffered";
-import primitivesJSON from "~/primitives.json";
+import { TPrimitiveJson } from "~/ts/primitivesJson";
+import _primitivesJSON from "~/_generated/primitives.json";
 import CheckBox from "./CheckBox/CheckBox";
+
+const primitivesJSON: TPrimitiveJson = _primitivesJSON;
 
 type TPrimitive = {
   name: string;
@@ -252,7 +255,7 @@ const Search: Component<{
                       class="text-lg font-semibold text-[#49494B] dark:text-[#bec5cf]"
                       data-ignore-mark-title
                     >
-                      <A href={`/${name.toLowerCase()}`}>{name}</A>
+                      <A href={`/package/${name.toLowerCase()}`}>{name}</A>
                     </h4>
                     <p class="text-[14px] my-[6px]" data-ignore-mark-description>
                       {description}
@@ -266,7 +269,7 @@ const Search: Component<{
                               <Show when={showRest() || idx() < maxPrimitiveCount}>
                                 <li>
                                   <A
-                                    href={`/${name}#${item.toLowerCase()}`}
+                                    href={`/package/${name}#${item.toLowerCase()}`}
                                     class="text-[14px] sm:text-base text-[#063983] hover:text-black font-semibold px-2 py-[2px] bg-[#e6f0ff] dark:text-[#b9d6ff] dark:bg-[#30455b] dark:hover:text-[#fff] rounded-md inline-block transition-colors [&>mark]:background-[linear-gradient(0deg,#ffaf1d,#ffaf1d)_center_/_100%_75%_no-repeat]"
                                   >
                                     {item}

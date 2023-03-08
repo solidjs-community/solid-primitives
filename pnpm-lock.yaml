@@ -723,6 +723,7 @@ importers:
       '@types/mark.js': ^8.11.8
       '@types/node': ^18.11.18
       autoprefixer: ^10.4.13
+      dotenv: ^16.0.3
       esbuild: ^0.14.54
       fuse.js: ^6.6.2
       mark.js: ^8.11.1
@@ -736,7 +737,7 @@ importers:
       solid-start: ^0.2.21
       solid-start-netlify: ^0.2.23
       solid-start-node: ^0.2.21
-      solid-start-static: ^0.2.20
+      solid-start-static: ^0.2.22
       solid-tippy: ^0.2.1
       tailwindcss: ^3.2.4
       tailwindcss-dir: ^4.0.0
@@ -775,6 +776,7 @@ importers:
       '@types/mark.js': 8.11.8
       '@types/node': 18.14.4
       autoprefixer: 10.4.13_postcss@8.4.21
+      dotenv: 16.0.3
       esbuild: 0.14.54
       postcss: 8.4.21
       solid-start: 0.2.22_hey3sgxzyrk7abcae4er76pdei

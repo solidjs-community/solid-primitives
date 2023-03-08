@@ -1,6 +1,6 @@
 import { Title } from "solid-start";
-import PrimitivesTable from "~/components/Primitives/PrimitivesTable";
-import HomeSections from "~/components/Home/HomeSections";
+import PrimitivesTable from "~/_generated/Primitives/PrimitivesTable";
+import HomeSections from "~/_generated/Home/HomeSections";
 import { NoHydration } from "solid-js/web";
 import onPreMount from "~/hooks/onPreMount";
 

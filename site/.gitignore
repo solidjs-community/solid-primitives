@@ -22,5 +22,9 @@ gitignore
 .DS_Store
 Thumbs.db
 
+# TEMP
+src/routes/package/*
+src/_generated/*
+
 # TEMP, even though repo uses pnpm, at the moment there's hmr infinite loop on refresh, so using npm
 package-lock.json
