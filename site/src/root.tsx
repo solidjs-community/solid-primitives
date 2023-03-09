@@ -1,5 +1,5 @@
 // @refresh reload
-import { Suspense } from "solid-js";
+import { onMount, Suspense } from "solid-js";
 import {
   A,
   Body,
@@ -28,6 +28,26 @@ if (isServer) {
 }
 
 export default function Root() {
+  // Primitives/Table.tsx produces a lot of hydration warnings in development mode.
+  if (import.meta.env.MODE === "development" && !isServer) {
+    const keys: string[] = [];
+    const cw = console.warn;
+    console.warn = (...args) => {
+      if (args[0] === "Unable to find DOM nodes for hydration key:") {
+        keys.push(args[1]);
+      } else cw(...args);
+    };
+    onMount(() => {
+      setTimeout(() => {
+        console.warn = cw;
+        if (!keys.length) return;
+        console.groupCollapsed(`There were ${keys.length} hydration warnings.`);
+        keys.forEach(key => console.warn("Unable to find DOM nodes for hydration key:", key));
+        console.groupEnd();
+      }, 500);
+    });
+  }
+
   return (
     <Html lang="en" data-html>
       <Head>

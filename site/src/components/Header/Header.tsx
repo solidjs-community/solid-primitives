@@ -176,7 +176,7 @@ const Header = () => {
   });
 
   createRenderEffect(
-    on(
+    defer(
       () => location.pathname,
       pathname => {
         const showShadow = shouldShowShadow();
@@ -186,7 +186,6 @@ const Header = () => {
           setHeaderState("showShadow", false);
         }
       },
-      { defer: true },
     ),
   );
 

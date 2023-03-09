@@ -251,15 +251,6 @@ const Table: ParentComponent = props => {
     }
   };
 
-  if (import.meta.env.MODE === "development") {
-    onMount(() => {
-      console.clear();
-      setTimeout(() => {
-        console.warn("CLEARED annoying 300+ hydration key errors from solid-start");
-      }, 500);
-    });
-  }
-
   onMount(() => {
     queryTableElements(tableEl);
     if (isSafari || isIOS) {
