@@ -290,6 +290,9 @@ const Header = () => {
                 setTimeout(done, openNavMenuDuration);
               },
               onAfterExit: () => {
+                // clear the styles only if the nav menu is closed
+                if (openNavMenu()) return;
+
                 headerShadow.style.display = "";
                 headerOpaqueBg.classList.remove(
                   "!backdrop-blur-md",
