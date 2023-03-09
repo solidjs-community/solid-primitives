@@ -1,12 +1,10 @@
 import { existsSync, mkdirSync, readFileSync, writeFile, writeFileSync } from "fs";
-// import { promises as fs } from "node:fs";
 import { r } from "../utils";
 import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { compile } from "@mdx-js/mdx";
 import remarkGfm from "remark-gfm";
-import { getNPMShield, getSizeShield } from "./build-html-table";
 import { PackageJSONData, TUpdateSiteGlobal } from ".";
 
 const items: { path: string; pageStr: string }[] = [];
