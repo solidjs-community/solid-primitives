@@ -1,4 +1,4 @@
-import { readdirSync, existsSync, readFileSync, writeFileSync } from "fs";
+import { readdirSync, existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { r } from "../utils";
 import { buildAndWriteHomeSections } from "./build-html-home-sections";
 import { buildCategory, writeHTMLTableFile } from "./build-html-table";
@@ -58,6 +58,10 @@ const globalState: TUpdateSiteGlobal = {
 
 console.log("updateSite", "Updating site");
 
+const generatedDir = r(`../site/src/_generated`);
+if (!existsSync(generatedDir)) {
+  mkdirSync(generatedDir);
+}
 const packageFiles = readdirSync(r(`../packages/`));
 const run = async () => {
   for (const name of packageFiles) {

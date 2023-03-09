@@ -105,7 +105,7 @@ export const buildJSONCategory = async ({
 };
 
 export const writeJSONFile = () => {
-  const pathToJSONFile = r("../site/src/primitives.json");
+  const pathToJSONFile = r("../site/src/_generated/primitives.json");
   writeFile(pathToJSONFile, JSON.stringify(item), err => {
     if (err) console.log(err);
   });

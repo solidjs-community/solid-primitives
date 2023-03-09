@@ -1,15 +1,15 @@
-import { existsSync, readFileSync, writeFile, writeFileSync } from "fs";
-// import { promises as fs } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFile } from "fs";
 import { r } from "../utils";
 import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { compile } from "@mdx-js/mdx";
 import remarkGfm from "remark-gfm";
-import { getNPMShield, getSizeShield } from "./build-html-table";
 import { PackageJSONData, TUpdateSiteGlobal } from ".";
 
 const items: { path: string; pageStr: string }[] = [];
+
+const routeName = "package";
 
 export const buildPage = async ({
   pkg,
@@ -159,7 +159,7 @@ export const buildPage = async ({
       }),
   );
 
-  const pathToSitePrimitivesRoute = r(`../site/src/routes/(primitives)/${name}.tsx`);
+  const pathToSitePrimitivesRoute = r(`../site/src/routes/${routeName}/${name}.tsx`);
   const pageStr = `
 // Do not modify
 // Generated from "./scripts/update-site/build-pages"
@@ -184,6 +184,10 @@ export default function Index () {
 };
 
 export const writePages = () => {
+  const pathToSitePrimitivesRouteDir = r(`../site/src/routes/${routeName}`);
+  if (!existsSync(pathToSitePrimitivesRouteDir)) {
+    mkdirSync(pathToSitePrimitivesRouteDir);
+  }
   items.forEach(({ path, pageStr }) => {
     writeFile(path, pageStr, err => {
       if (err) console.log(err);

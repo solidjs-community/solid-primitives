@@ -13,6 +13,7 @@
     "@types/mark.js": "^8.11.8",
     "@types/node": "^18.11.18",
     "autoprefixer": "^10.4.13",
+    "dotenv": "^16.0.3",
     "esbuild": "^0.14.54",
     "postcss": "^8.4.21",
     "solid-start": "^0.2.21",

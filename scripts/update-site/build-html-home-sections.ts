@@ -3,7 +3,7 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { compile } from "@mdx-js/mdx";
 import remarkGfm from "remark-gfm";
-import { readFileSync, writeFile } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFile } from "fs";
 import { r } from "../utils";
 
 // build sections by getting main README.md and CONTRIBUTING.md and grab
@@ -20,7 +20,7 @@ export const buildAndWriteHomeSections = async () => {
   const contributingMD = readFileSync(dirContributingMD, "utf-8");
   const readMeMD = readFileSync(dirReadMeMD, "utf-8");
   const fileName = "HomeSections";
-  const filePath = r(`../site/src/components/Home/${fileName}.tsx`);
+  const filePath = r(`../site/src/_generated/Home/${fileName}.tsx`);
   const readMeH2List = ["Philosophy"];
   const contributingH2List = [
     "Design Maxims",
@@ -97,6 +97,10 @@ export default function ${fileName} () {
 }
 `;
 
+  const homeDir = r(`../site/src/_generated/Home`);
+  if (!existsSync(homeDir)) {
+    mkdirSync(homeDir);
+  }
   writeFile(filePath, result, err => {
     if (err) console.log(err);
   });

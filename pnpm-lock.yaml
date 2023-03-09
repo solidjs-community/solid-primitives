@@ -725,6 +725,7 @@ importers:
       '@types/mark.js': ^8.11.8
       '@types/node': ^18.11.18
       autoprefixer: ^10.4.13
+      dotenv: ^16.0.3
       esbuild: ^0.14.54
       fuse.js: ^6.6.2
       mark.js: ^8.11.1
@@ -776,6 +777,7 @@ importers:
       '@types/mark.js': 8.11.8
       '@types/node': 18.14.4
       autoprefixer: 10.4.13_postcss@8.4.21
+      dotenv: 16.0.3
       esbuild: 0.14.54
       postcss: 8.4.21
       solid-start: 0.2.22_cyrmaqctztuvb6bzoulrl3iawa
@@ -11484,7 +11486,7 @@ packages:
       kolorist: 1.7.0
       sirv: 2.0.2
       ufo: 1.1.1
-      vite: 4.1.4_@types+node@18.14.4
+      vite: 4.1.4_ljrjoypxov5se64ibfjelu4vsu
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -11519,7 +11521,7 @@ packages:
       merge-anything: 5.1.4
       solid-js: 1.6.11
       solid-refresh: 0.5.0_solid-js@1.6.11
-      vite: 4.1.4_@types+node@18.14.4
+      vite: 4.1.4_ljrjoypxov5se64ibfjelu4vsu
       vitefu: 0.2.4_vite@4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -11634,7 +11636,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.1.4_@types+node@18.14.4
+      vite: 4.1.4_ljrjoypxov5se64ibfjelu4vsu
     dev: true
 
   /vitest/0.28.5_jsdom@21.1.0:

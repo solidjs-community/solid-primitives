@@ -1,4 +1,4 @@
-import { writeFile, writeFileSync } from "fs";
+import { existsSync, mkdirSync, writeFile, writeFileSync } from "fs";
 import { PackageData, PackageJSONData, TUpdateSiteGlobal } from ".";
 import { formatBytes, r } from "../utils";
 import checkSizeOfPackage from "../checkSizeOfPackage";
@@ -146,7 +146,7 @@ export const buildCategory = async ({
 };
 
 export const writeHTMLTableFile = () => {
-  const pathToTableComponent = r("../site/src/components/Primitives/PrimitivesTable.tsx");
+  const pathToTableComponent = r("../site/src/_generated/Primitives/PrimitivesTable.tsx");
   // let tableComp = readFileSync(pathToTableComponent).toString();
 
   // Update Primitives Table
@@ -218,23 +218,28 @@ export const writeHTMLTableFile = () => {
 // Do not modify
 // Generated from "./scripts/update-site/build-html-table"
 
-import THead from "./THead"
-import Table from "./Table"
-import TH from "./TH"
-import TD from "./TD"
-import TR from "./TR"
-import SizeBadge from "./SizeBadge"
-import { SizeBadgeWrapper } from "./SizeBadge"
-import VersionBadge from "./VersionBadge"
-import StageBadge from "./StageBadge"
-import PrimitiveBtn from "./PrimitiveBtn"
-import PrimitiveBtnLineWrapper from "./PrimitiveBtnLineWrapper"
+import THead from "~/components/Primitives/THead"
+import Table from "~/components/Primitives/Table"
+import TH from "~/components/Primitives/TH"
+import TD from "~/components/Primitives/TD"
+import TR from "~/components/Primitives/TR"
+import SizeBadge from "~/components/Primitives/SizeBadge"
+import { SizeBadgeWrapper } from "~/components/Primitives/SizeBadge"
+import VersionBadge from "~/components/Primitives/VersionBadge"
+import StageBadge from "~/components/Primitives/StageBadge"
+import PrimitiveBtn from "~/components/Primitives/PrimitiveBtn"
+import PrimitiveBtnLineWrapper from "~/components/Primitives/PrimitiveBtnLineWrapper"
 
 const PrimitivesTable = () => {
   return (${table})
 }
 export default PrimitivesTable
 `;
+
+  const pathToPrimitivesDir = r("../site/src/_generated/Primitives");
+  if (!existsSync(pathToPrimitivesDir)) {
+    mkdirSync(pathToPrimitivesDir);
+  }
 
   writeFile(pathToTableComponent, componentStr, err => {
     if (err) console.log(err);
