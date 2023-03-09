@@ -1,5 +1,11 @@
 # @solid-primitives/keyboard
 
+## 1.0.10
+
+### Patch Changes
+
+- 2b001076: Fix exports (missing server entry)
+
 ## 1.0.9
 
 ### Patch Changes
