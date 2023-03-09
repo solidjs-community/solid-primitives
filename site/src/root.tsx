@@ -13,13 +13,14 @@ import {
   Scripts,
   Title,
 } from "solid-start";
+import { isServer } from "solid-js/web";
+import { debounce } from "@solid-primitives/scheduled";
 
 import "./root.scss";
 
 import Header from "./components/Header/Header";
 import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderClusterDefs";
 import Footer from "./components/Footer/Footer";
-import { isServer } from "solid-js/web";
 
 let url = "";
 if (isServer) {
@@ -35,17 +36,15 @@ export default function Root() {
     console.warn = (...args) => {
       if (args[0] === "Unable to find DOM nodes for hydration key:") {
         keys.push(args[1]);
+        logStoredWarnings();
       } else cw(...args);
     };
-    onMount(() => {
-      setTimeout(() => {
-        console.warn = cw;
-        if (!keys.length) return;
-        console.groupCollapsed(`There were ${keys.length} hydration warnings.`);
-        keys.forEach(key => console.warn("Unable to find DOM nodes for hydration key:", key));
-        console.groupEnd();
-      }, 500);
-    });
+    const logStoredWarnings = debounce(() => {
+      console.groupCollapsed(`There were ${keys.length} hydration warnings.`);
+      keys.forEach(key => cw("Unable to find DOM nodes for hydration key:", key));
+      console.groupEnd();
+      keys.length = 0;
+    }, 1000);
   }
 
   return (
