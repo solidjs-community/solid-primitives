@@ -737,8 +737,9 @@ importers:
       solid-jsx: ^0.9.1
       solid-mdx: ^0.0.6
       solid-start: ^0.2.21
+      solid-start-netlify: ^0.2.23
       solid-start-node: ^0.2.21
-      solid-start-static: ^0.2.20
+      solid-start-static: ^0.2.22
       solid-tippy: ^0.2.1
       tailwindcss: ^3.2.4
       tailwindcss-dir: ^4.0.0
@@ -780,7 +781,8 @@ importers:
       dotenv: 16.0.3
       esbuild: 0.14.54
       postcss: 8.4.21
-      solid-start: 0.2.22_cyrmaqctztuvb6bzoulrl3iawa
+      solid-start: 0.2.22_hey3sgxzyrk7abcae4er76pdei
+      solid-start-netlify: 0.2.23_solid-start@0.2.22
       solid-start-node: 0.2.22_ppwjshleycygoco43sslduznmy
       solid-start-static: 0.2.22_ppwjshleycygoco43sslduznmy
       tailwindcss: 3.2.7_postcss@8.4.21
@@ -3582,6 +3584,25 @@ packages:
     resolution: {integrity: sha512-AW8PKd6iX3vAZ0vA43nOUOnbq/X5ihgU+mSXXqunMkeQADGiqw/PY0JNeYtD5sr0PAy51YPgAPbDoeapv9r8WA==}
     dev: true
 
+  /@rollup/plugin-babel/6.0.3_a5lozykpytg33uq3o54uvv7c3m:
+    resolution: {integrity: sha512-fKImZKppa1A/gX73eg4JGo+8kQr/q1HBQaCGKECZ0v4YBBv3lFqi14+7xyApECzvkLTHCifx+7ntcrvtBIRcpg==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      '@babel/core': ^7.0.0
+      '@types/babel__core': ^7.1.9
+      rollup: ^1.20.0||^2.0.0||^3.0.0
+    peerDependenciesMeta:
+      '@types/babel__core':
+        optional: true
+      rollup:
+        optional: true
+    dependencies:
+      '@babel/core': 7.21.0
+      '@babel/helper-module-imports': 7.18.6
+      '@rollup/pluginutils': 5.0.2_rollup@3.18.0
+      rollup: 3.18.0
+    dev: true
+
   /@rollup/plugin-commonjs/24.0.1_rollup@3.18.0:
     resolution: {integrity: sha512-15LsiWRZk4eOGqvrJyu3z3DaBu5BhXIMeWnijSRvd8irrrg9SHpQ1pH+BUK4H6Z9wL9yOxZJMTLU+Au86XHxow==}
     engines: {node: '>=14.0.0'}
@@ -5772,6 +5793,12 @@ packages:
   /encodeurl/1.0.2:
     resolution: {integrity: sha512-TPJXq8JqFaVYm2CWmPvnP2Iyo4ZSM7/QKcSmuMLDObfpH5fi7RUGmd/rTDf+rut/saiDiQEeVTNgAmJEdAOx0w==}
     engines: {node: '>= 0.8'}
+    dev: true
+
+  /encoding/0.1.13:
+    resolution: {integrity: sha512-ETBauow1T35Y/WZMkio9jiM0Z5xjHHmJ4XmjZOq1l/dXz3lr2sRn87nJy20RupqSh1F2m3HHPSp8ShIPQJrJ3A==}
+    dependencies:
+      iconv-lite: 0.6.3
     dev: true
 
   /enquirer/2.3.6:
@@ -10210,6 +10237,26 @@ packages:
     resolution: {integrity: sha512-ieG1NemdbGOOfKrCZdUNktfQJlrYSg4Nr2PG2CSoO/KCHs2PBIe3PsjLenvbiTop0qAQgHkSf2pNgcz5VoJzaw==}
     dev: true
 
+  /solid-start-netlify/0.2.23_solid-start@0.2.22:
+    resolution: {integrity: sha512-kO9cK5ZpRCKscM7sObZgUvbkiiZbcVtTsE3RKWxP6ubVv7fv/0cFkkffrOv3BirliRiGqxY5uj1SsCq43TPuXg==}
+    peerDependencies:
+      solid-start: '*'
+    dependencies:
+      '@babel/core': 7.21.0
+      '@babel/preset-env': 7.20.2_@babel+core@7.21.0
+      '@rollup/plugin-babel': 6.0.3_a5lozykpytg33uq3o54uvv7c3m
+      '@rollup/plugin-commonjs': 24.0.1_rollup@3.18.0
+      '@rollup/plugin-json': 6.0.0_rollup@3.18.0
+      '@rollup/plugin-node-resolve': 13.3.0_rollup@3.18.0
+      encoding: 0.1.13
+      rollup: 3.18.0
+      solid-start: 0.2.22_hey3sgxzyrk7abcae4er76pdei
+      terser: 5.16.5
+    transitivePeerDependencies:
+      - '@types/babel__core'
+      - supports-color
+    dev: true
+
   /solid-start-node/0.2.22_ppwjshleycygoco43sslduznmy:
     resolution: {integrity: sha512-BOLYzp9mkBRs2CvhFLxz66J1hlyxZoJd2x6BT9pKitm3qdbyTZTm0mLsMchgMNsXTBTxnhXOMATe3lectsV7fA==}
     peerDependencies:
@@ -10224,7 +10271,7 @@ packages:
       polka: 1.0.0-next.22
       rollup: 3.18.0
       sirv: 2.0.2
-      solid-start: 0.2.22_cyrmaqctztuvb6bzoulrl3iawa
+      solid-start: 0.2.22_hey3sgxzyrk7abcae4er76pdei
       terser: 5.16.5
       undici: 5.20.0
       vite: 4.1.4_ljrjoypxov5se64ibfjelu4vsu
@@ -10245,12 +10292,12 @@ packages:
       rollup: 3.18.0
       sirv-cli: 2.0.2
       solid-ssr: 1.6.3
-      solid-start: 0.2.22_cyrmaqctztuvb6bzoulrl3iawa
+      solid-start: 0.2.22_hey3sgxzyrk7abcae4er76pdei
       undici: 5.20.0
       vite: 4.1.4_ljrjoypxov5se64ibfjelu4vsu
     dev: true
 
-  /solid-start/0.2.22_cyrmaqctztuvb6bzoulrl3iawa:
+  /solid-start/0.2.22_hey3sgxzyrk7abcae4er76pdei:
     resolution: {integrity: sha512-9SfYRNyXUMzNVBx13nzuOqAGGJdsSG1E6gIM3CRDl0x85Nt+1zQTm74rRsBVMecI2EgI0gFOUEKFVM/dP4x8yA==}
     hasBin: true
     peerDependencies:
@@ -10313,6 +10360,7 @@ packages:
       set-cookie-parser: 2.5.1
       sirv: 2.0.2
       solid-js: 1.6.11
+      solid-start-netlify: 0.2.23_solid-start@0.2.22
       solid-start-node: 0.2.22_ppwjshleycygoco43sslduznmy
       solid-start-static: 0.2.22_ppwjshleycygoco43sslduznmy
       terser: 5.16.5

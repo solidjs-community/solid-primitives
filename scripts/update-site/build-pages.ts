@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFile } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFile, writeFileSync } from "fs";
 import { r } from "../utils";
 import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
