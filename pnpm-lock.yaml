@@ -712,7 +712,7 @@ importers:
       '@solid-primitives/intersection-observer': ^2.0.6
       '@solid-primitives/keyboard': ^1.0.7
       '@solid-primitives/media': ^2.1.0
-      '@solid-primitives/platform': ^0.0.103
+      '@solid-primitives/platform': ^0.0.104
       '@solid-primitives/resize-observer': ^2.0.10
       '@solid-primitives/rootless': ^1.2.4
       '@solid-primitives/scheduled': ^1.2.1
@@ -752,7 +752,7 @@ importers:
       '@solid-primitives/intersection-observer': link:../packages/intersection-observer
       '@solid-primitives/keyboard': link:../packages/keyboard
       '@solid-primitives/media': link:../packages/media
-      '@solid-primitives/platform': 0.0.103_solid-js@1.6.11
+      '@solid-primitives/platform': link:../packages/platform
       '@solid-primitives/resize-observer': link:../packages/resize-observer
       '@solid-primitives/rootless': link:../packages/rootless
       '@solid-primitives/scheduled': link:../packages/scheduled
@@ -3789,6 +3789,7 @@ packages:
       solid-js: ^1.6.0
     dependencies:
       solid-js: 1.6.11
+    dev: true
 
   /@solid-primitives/refs/0.3.7_solid-js@1.6.11:
     resolution: {integrity: sha512-aqidj/Sw5b2FvXgvNP8zH5HC2jEzDbFju+xRUCxZguaBmDJJyzec12fpZ9JV6SiWCyk08nZ/N4rfPNQnt1af1Q==}
