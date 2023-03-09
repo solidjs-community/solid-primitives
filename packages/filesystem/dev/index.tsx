@@ -1,33 +1,45 @@
 import { createSignal, Show, For, Component } from "solid-js";
 import { render } from "solid-js/web";
-import { FSDir, createFileSystem, createObjectFileSystem } from "../src/index";
+import { createFileSystem, makeObjectFileSystem, SyncFileSystem } from "../src/index";
 import "uno.css";
 
-const Dir = (props: { fs: FSDir; path?: string }) => {
-  const [name, setName] = createSignal("")
+const File = (props: { fs: SyncFileSystem, path: string }) => {
+  const content = props.fs.readFile(props.path);
+  const setContent = (data: string) => props.fs.writeFile(props.path, data);
+  return <details>
+    <summary>{props.path.split("/").at(-1)}</summary>
+    <textarea value={/*@once*/content()} onInput={(ev) => setContent(ev.currentTarget.value)} />
+  </details>
+}
+
+const Dir = (props: { fs: SyncFileSystem, path: string }) => {
+  const [name, setName] = createSignal("");
+  const list = props.fs.readdir(props.path);
   return (
     <>
-      {props.fs.uri || "/"} <input onInput={(ev) => setName(ev.currentTarget.value)} />
+      {props.path.split("/").at(-1) || "/"} <input onInput={(ev) => setName(ev.currentTarget.value)} />
       <Show when={name() !== ""}>
-        <button onClick={() => props.fs.mkfile(name())}>
+        <button onClick={() => props.fs.writeFile(`${props.path === "/" ? "" : props.path}/${name()}`, "")}>
           New File
         </button>
-        <button onClick={() => props.fs.mkdir(name())}>
+        <button onClick={() => props.fs.mkdir(`${props.path === "/" ? "" : props.path}/${name()}`)}>
           New Dir
         </button>
       </Show>
       <ul>
-        <For each={props.fs.items}>
-          {(item) => (            
-            <li>{(console.log(item, props.fs[item]?.type), "")}
-              <Show when={props.fs[item]?.type === "dir"} fallback={item}>
-                <Dir
-                  fs={props.fs[item] as FSDir}
-                  path={(props.path || "").split("/").concat([item]).join("/")}
-                />
+        <For each={list()}>
+          {(item) => {
+            return (            
+            <li data-path={item}>{(console.log(item, props.fs.getType(item)()), "")}
+              <Show
+                when={props.fs.getType(item)() === "dir"}
+                fallback={<File fs={props.fs} path={`${props.path === "/" ? "" : props.path}/${item}`} />}
+              >
+                <Dir fs={props.fs} path={item} />
               </Show>
             </li>
-          )}
+            )
+          }}
         </For>
       </ul>
     </>
@@ -35,16 +47,17 @@ const Dir = (props: { fs: FSDir; path?: string }) => {
 };
 
 const App: Component = () => {
-  const fs = createFileSystem(createObjectFileSystem({
+  const ofs = makeObjectFileSystem({
     src: { "index.ts": "console.log(0);\n" },
-  }));
-  //window._fs = fs;
+  }, localStorage);
+  const fs = createFileSystem(ofs);
   return (
     <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
       <div class="wrapper-v">
         <div>
           <h4>FileSystem primitive</h4>
-          <Dir fs={fs} />
+          <p>Object virtual file system (localStorage persistence)</p>
+          <Dir fs={fs} path="/" />
         </div>
       </div>
     </div>
