@@ -177,6 +177,7 @@ export const gql = (query: TemplateStringsArray, ...expressions: any[]) =>
   query
     .map((s, i) => `${s}${expressions[i] ?? ""}`)
     .join("")
-    .replace(/#[^\r\n]*[\r\n]|[\r\n]/gs, " ")
+    .replace(/#.+\r?\n|\r/g, "")
+    .replace(/\r?\n|\r/g, "")
     .replace(/\s{2,}/g, " ")
     .trim();
