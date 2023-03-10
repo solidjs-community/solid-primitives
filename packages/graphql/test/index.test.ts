@@ -1,5 +1,49 @@
-import { makeMultipartBody } from "../src";
+import { gql, makeMultipartBody } from "../src";
 import { describe, test, expect } from "vitest";
+
+describe("gql", () => {
+  test("creates a GraphQL query string", () => {
+    const query = gql`
+      query {
+        hello
+      }
+    `;
+    expect(query).toEqual("query { hello }");
+  });
+
+  test("supports interpolation", () => {
+    const name = "world";
+    const query = gql`
+      query {
+        hello(name: ${name})
+      }
+    `;
+    expect(query).toEqual("query { hello(name: world) }");
+  });
+
+  test("supports interpolation with variables", () => {
+    const name = "world";
+    const query = gql`
+      query {
+        hello(name: ${name})
+      }
+    `;
+    expect(query).toEqual("query { hello(name: world) }");
+  });
+
+  test("supports interpolation with variables and fragments", () => {
+    const name = "world";
+    const query = gql`
+      query {
+        hello(name: ${name})
+      }
+      fragment Hello on Query {
+        hello
+      }
+    `;
+    expect(query).toEqual("query { hello(name: world) } fragment Hello on Query { hello }");
+  });
+});
 
 describe("makeMultipartBody", () => {
   test("top-level and nested blobs are correctly replaced", () => {

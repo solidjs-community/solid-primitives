@@ -173,10 +173,10 @@ export function makeMultipartBody(query: string, variables: object) {
 /**
  * Creates a GraphQL query string.
  */
-export const gql = (query: TemplateStringsArray) =>
+export const gql = (query: TemplateStringsArray, ...expressions: any[]) =>
   query
-    .join(" ")
-    .replace(/#.+\r?\n|\r/g, "")
-    .replace(/\r?\n|\r/g, "")
+    .map((s, i) => `${s}${expressions[i] ?? ""}`)
+    .join("")
+    .replace(/#[^\r\n]*[\r\n]|[\r\n]/gs, " ")
     .replace(/\s{2,}/g, " ")
     .trim();
