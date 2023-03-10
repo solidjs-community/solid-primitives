@@ -11,27 +11,27 @@ module.exports = {
     extend: {
       screens: {
         "pointer-fine": {
-          raw: "(pointer: fine)"
+          raw: "(pointer: fine)",
         },
         "is-safari": { raw: "not all and (min-resolution: 0.001dpcm)" },
         xxs: { raw: "(min-width: 400px)" },
-        xs: { raw: "(min-width: 520px)" }
+        xs: { raw: "(min-width: 520px)" },
       },
       transitionDuration: {
-        250: "250ms"
+        250: "250ms",
       },
       colors: {
-        "page-main-bg": "var(--page-main-bg)"
+        "page-main-bg": "var(--page-main-bg)",
       },
       boxShadow: {
         ring: "0px 0px 4px 4px rgb(0, 0, 0)",
         "ring-white": "0px 0px 0px 2.7px #fff",
-        "ring-black": "0px 0px 0px 2.7px #000"
+        "ring-black": "0px 0px 0px 2.7px #000",
       },
       fontFamily: {
         display: ["Gordita", ...defaultTheme.fontFamily.sans],
         body: ["Gordita", ...defaultTheme.fontFamily.sans],
-        gordita: "Gordita"
+        gordita: "Gordita",
       },
       typography: ({ theme }) => ({
         DEFAULT: {
@@ -55,43 +55,44 @@ module.exports = {
               borderBottom: "1px solid #e5e7eb",
               paddingBottom: "1rem",
               marginTop: "2rem",
-              color: "var(--tw-prose-headings)"
+              color: "var(--tw-prose-headings)",
             },
             h2: {
               fontWeight: "600",
               borderBottom: "1px solid #e5e7eb",
               paddingBottom: "1rem",
               marginTop: "2rem",
-              color: "var(--tw-prose-headings)"
+              color: "var(--tw-prose-headings)",
             },
             a: {
               color: "#999",
               textDecoration: "none",
               fontWeight: "600",
               "&:hover": {
-                color: "#2c4f7c"
-              }
-            }
-          }
-        }
+                color: "#2c4f7c",
+              },
+            },
+          },
+        },
       }),
       transitionProperty: {
         composite: "transform, opacity",
         filter: "filter",
         "composite-visible": "transform, opacity, visibility",
         visible: "visibility",
-        "transform-visible": "transform, visibility"
+        "transform-visible": "transform, visibility",
       },
       zIndex: {
         negative: -1,
-        1: 1
-      }
-    }
+        "-1": -1,
+        1: 1,
+      },
+    },
   },
   variants: {
     extend: {
-      backgroundColor: ["group-hover"]
-    }
+      backgroundColor: ["group-hover"],
+    },
   },
   plugins: [
     require("@tailwindcss/typography"),
@@ -107,14 +108,14 @@ module.exports = {
       values.forEach(value => {
         newUtilities[`.w-fit-parent-${value}px`] = {
           width: `calc(100% + ${value}px)`,
-          "margin-left": `-${Math.floor(value / 2)}px`
+          "margin-left": `-${Math.floor(value / 2)}px`,
         };
       });
       newUtilities[".contrast-content"] = {
-        filter: "invert(1) grayscale(1) contrast(9)"
+        filter: "invert(1) grayscale(1) contrast(9)",
       };
       newUtilities[".contrast-content-harsh"] = {
-        filter: "invert(1) grayscale(1) contrast(999)"
+        filter: "invert(1) grayscale(1) contrast(999)",
       };
 
       addUtilities(newUtilities);
@@ -125,67 +126,67 @@ module.exports = {
           {
             "mask-image": value => ({
               webkitMaskImage: value,
-              maskImage: value
-            })
+              maskImage: value,
+            }),
           },
-          { values: theme("maskImage") }
+          { values: theme("maskImage") },
         );
       },
       {
         theme: {
           maskImage: {
-            none: "none"
-          }
-        }
-      }
+            none: "none",
+          },
+        },
+      },
     ),
     plugin(
       function ({ matchUtilities, theme }) {
         matchUtilities(
           {
             "stop-color": value => ({
-              stopColor: value
-            })
+              stopColor: value,
+            }),
           },
-          { values: theme("stopColor") }
+          { values: theme("stopColor") },
         );
       },
       {
         theme: {
           stopColor: {
-            none: "none"
-          }
-        }
-      }
+            none: "none",
+          },
+        },
+      },
     ),
     plugin(
       function ({ matchUtilities, theme }) {
         matchUtilities(
           {
             "tap-highlight-color": value => ({
-              WebkitTapHighlightColor: value
-            })
+              WebkitTapHighlightColor: value,
+            }),
           },
-          { values: theme("tapHighlightColor") }
+          { values: theme("tapHighlightColor") },
         );
       },
       {
         theme: {
           tapHighlightColor: {
             none: "transparent",
-            auto: "auto"
-          }
-        }
-      }
+            auto: "auto",
+          },
+        },
+      },
     ),
     plugin(function ({ matchUtilities, theme }) {
       matchUtilities(
         {
           "box-shadow": value => ({
-            boxShadow: value.replace("_", " ")
-          })
+            boxShadow: value.replace("_", " "),
+          }),
         },
-        { values: theme("boxShadow") }
+        { values: theme("boxShadow") },
       );
     }),
     plugin(
@@ -193,19 +194,19 @@ module.exports = {
         matchUtilities(
           {
             "bg-image": value => ({
-              backgroundImage: value.replace("_", " ")
-            })
+              backgroundImage: value.replace("_", " "),
+            }),
           },
-          { values: theme("bgImage") }
+          { values: theme("bgImage") },
         );
       },
       {
         theme: {
           bgImage: {
-            none: "none"
-          }
-        }
-      }
+            none: "none",
+          },
+        },
+      },
     ),
     plugin(function ({ matchUtilities, theme }) {
       matchUtilities(
@@ -214,7 +215,7 @@ module.exports = {
             const dashOffset = value.match(/dashoffset\(([^)]*)\)/)?.[1] || 0;
             const dashArray = (value.match(/dasharray\(([^)]*)\)/)?.[1] || "1,8").replace(
               /,/g,
-              "%2c"
+              "%2c",
             );
             const width = value.match(/width\(([^)]*)\)/)?.[1] || 0;
             const radius = value.match(/radius\(([^)]*)\)/)?.[1] || "0";
@@ -231,11 +232,11 @@ module.exports = {
 
             return {
               backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='${radius}' ry='${radius}' stroke='${color}' stroke-width='${width}' stroke-dasharray='${dashArray}' stroke-dashoffset='${dashOffset}' stroke-linecap='${lineCap}'/%3e%3c/svg%3e")`,
-              borderRadius
+              borderRadius,
             };
-          }
+          },
         },
-        { values: theme("dashedBorder") }
+        { values: theme("dashedBorder") },
       );
     }),
     plugin(function ({ matchUtilities, theme }) {
@@ -244,7 +245,7 @@ module.exports = {
           "inverse-corner": value => {
             const position = (value.match(/position\(([^)]*)\)/)?.[1] || "0,100%").replace(
               /,/g,
-              " "
+              " ",
             );
             const _size = value.match(/size\(([^)]*)\)/)?.[1] || "0px";
             const size = _size.match(/[^0-9]$/) ? _size : `${_size}px`;
@@ -252,38 +253,38 @@ module.exports = {
             return {
               backgroundImage: `radial-gradient(circle at ${position}, rgba(255,255,255,0) ${size}, ${color} 0)`,
               width: size,
-              height: size
+              height: size,
             };
-          }
+          },
         },
-        { values: theme("inverseCorner") }
+        { values: theme("inverseCorner") },
       );
     }),
     plugin(function ({ matchUtilities, theme }) {
       matchUtilities(
         {
           background: value => ({
-            background: value
-          })
+            background: value,
+          }),
         },
-        { values: theme("background") }
+        { values: theme("background") },
       );
     }),
     plugin(function ({ addVariant, e, postcss }) {
       addVariant("has-backdrop-filter", ({ container, separator }) => {
         const isRule = postcss.atRule({
           name: "supports",
-          params: "((-webkit-backdrop-filter: none) or (backdrop-filter: none))"
+          params: "((-webkit-backdrop-filter: none) or (backdrop-filter: none))",
         });
         isRule.append(container.nodes);
         container.append(isRule);
         isRule.walkRules(rule => {
           rule.selector = `.${e(`has-backdrop-filter${separator}${rule.selector.slice(1)}`).replace(
             /\\\\/g,
-            ""
+            "",
           )}`;
         });
       });
-    })
-  ]
+    }),
+  ],
 };
