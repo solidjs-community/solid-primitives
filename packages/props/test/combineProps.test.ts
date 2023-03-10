@@ -219,7 +219,7 @@ describe("combineProps", () => {
       const stringStyles = `
       margin: 24px;;;
         padding:2;
-        background-color: red;
+        background-image: url('http://example.com/image.png');
         border: 1px solid #123456 ;
         --x:  123
         `;
@@ -233,7 +233,7 @@ describe("combineProps", () => {
       expect(combinedProps.style).toEqual({
         margin: "10px",
         padding: "2",
-        "background-color": "red",
+        "background-image": "url('http://example.com/image.png')",
         border: "1px solid #123456 ",
         "--x": "123\n        ",
         "font-size": "2rem",
