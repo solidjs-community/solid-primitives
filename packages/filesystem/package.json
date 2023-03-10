@@ -65,8 +65,11 @@
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
+  "devDependencies": {
+    "@tauri-apps/api": "^1.2.0",
+    "@types/wicg-file-system-access": "2020.9.5"
+  },
   "peerDependencies": {
-    "solid-js": "^1.6.0",
-    "@tauri-apps/api": "^1.2.0"
+    "solid-js": "^1.6.0"
   }
 }

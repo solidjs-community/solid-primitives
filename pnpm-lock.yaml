@@ -254,10 +254,13 @@ importers:
   packages/filesystem:
     specifiers:
       '@tauri-apps/api': ^1.2.0
+      '@types/wicg-file-system-access': 2020.9.5
       solid-js: ^1.6.0
     dependencies:
-      '@tauri-apps/api': 1.2.0
       solid-js: 1.6.12
+    devDependencies:
+      '@tauri-apps/api': 1.2.0
+      '@types/wicg-file-system-access': 2020.9.5
 
   packages/flux-store:
     specifiers:
@@ -4135,7 +4138,7 @@ packages:
   /@tauri-apps/api/1.2.0:
     resolution: {integrity: sha512-lsI54KI6HGf7VImuf/T9pnoejfgkNoXveP14pVV7XarrQ46rOejIVJLFqHI9sRReJMGdh2YuCoI3cc/yCWCsrw==}
     engines: {node: '>= 14.6.0', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
-    dev: false
+    dev: true
 
   /@testing-library/dom/8.20.0:
     resolution: {integrity: sha512-d9ULIT+a4EXLX3UU8FBjauG9NnsZHkHztXoIcTsOKoOw030fyjheN9svkTULjJxtYag9DZz5Jz5qkWZDPxTFwA==}
@@ -4341,6 +4344,10 @@ packages:
 
   /@types/unist/2.0.6:
     resolution: {integrity: sha512-PBjIUxZHOuj0R15/xuwJYjFi+KZdNFrehocChv4g5hu6aFroHue8m0lBP0POdK2nKzbw0cgV1mws8+V/JAcEkQ==}
+    dev: true
+
+  /@types/wicg-file-system-access/2020.9.5:
+    resolution: {integrity: sha512-UYK244awtmcUYQfs7FR8710MJcefL2WvkyHMjA8yJzxd1mo0Gfn88sRZ1Bls7hiUhA2w7ne1gpJ9T5g3G0wOyA==}
     dev: true
 
   /@types/ws/8.5.4:
