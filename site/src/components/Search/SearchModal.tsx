@@ -1,12 +1,11 @@
 // import { createShortcut } from "@solid-primitives/keyboard";
 import { createMediaQuery } from "@solid-primitives/media";
 import { isIOS } from "@solid-primitives/platform";
+import { defer } from "@solid-primitives/utils";
 import Dismiss from "solid-dismiss";
-import { Accessor, AccessorArray, batch, Component, createEffect, on, onMount } from "solid-js";
+import { Accessor, batch, Component, createEffect, onMount } from "solid-js";
 import { unwrap } from "solid-js/store";
 import { useLocation } from "solid-start";
-import { BASE, BASE_NOFS } from "~/constants";
-import createEffectDeffered from "~/hooks/createEffectDeffered";
 import { createShortcut } from "~/hooks/createShortcut";
 import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 import { scrollIntoView } from "~/utils/scrollIntoView";
@@ -87,18 +86,22 @@ const SearchModal: Component<{
     setOpen(true);
   });
 
-  createEffectDeffered(open, open => {
-    if (!open) return;
-    prevPathname = location.pathname;
-    prevHash = location.hash;
-  });
+  createEffect(
+    defer(open, open => {
+      if (!open) return;
+      prevPathname = location.pathname;
+      prevHash = location.hash;
+    }),
+  );
 
-  createEffectDeffered(
-    () => location.pathname,
-    (currentPathname, prevPathname) => {
-      if (prevPathname === currentPathname) return;
-      setOpen(false);
-    },
+  createEffect(
+    defer(
+      () => location.pathname,
+      (currentPathname, prevPathname) => {
+        if (prevPathname === currentPathname) return;
+        setOpen(false);
+      },
+    ),
   );
 
   return (

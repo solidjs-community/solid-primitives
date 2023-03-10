@@ -1,9 +1,9 @@
 import { createIntersectionObserver } from "@solid-primitives/intersection-observer";
 import { isIOS, isSafari } from "@solid-primitives/platform";
-import { createSignal, onMount, ParentComponent } from "solid-js";
+import { defer } from "@solid-primitives/utils";
+import { createEffect, createSignal, onMount, ParentComponent } from "solid-js";
 import { useLocation } from "solid-start";
 import { pageWidthClass } from "~/constants";
-import createEffectDeffered from "~/hooks/createEffectDeffered";
 import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 import reflow from "~/utils/reflow";
 import { setHeaderState } from "../Header/Header";
@@ -251,15 +251,6 @@ const Table: ParentComponent = props => {
     }
   };
 
-  if (import.meta.env.MODE === "development") {
-    onMount(() => {
-      console.clear();
-      setTimeout(() => {
-        console.warn("CLEARED annoying 300+ hydration key errors from solid-start");
-      }, 500);
-    });
-  }
-
   onMount(() => {
     queryTableElements(tableEl);
     if (isSafari || isIOS) {
@@ -392,47 +383,49 @@ const Table: ParentComponent = props => {
     { rootMargin: `-${rootMarginTop}px 0px 0px 0px` },
   );
 
-  createEffectDeffered(
-    () => location.hash,
-    (currentHash, prevHash) => {
-      if (prevHash === currentHash) return;
-      if (!doesPathnameMatchBase(location.pathname)) return;
+  createEffect(
+    defer(
+      () => location.hash,
+      (currentHash, prevHash) => {
+        if (prevHash === currentHash) return;
+        if (!doesPathnameMatchBase(location.pathname)) return;
 
-      const run = () => {
-        const tableElBCR = tableEl.getBoundingClientRect();
+        const run = () => {
+          const tableElBCR = tableEl.getBoundingClientRect();
 
-        const top = tableElBCR.top - rootMarginTop;
-        const bottom = tableElBCR.bottom - rootMarginTop;
+          const top = tableElBCR.top - rootMarginTop;
+          const bottom = tableElBCR.bottom - rootMarginTop;
 
-        if (top + rootMarginTop > 0) {
-          tableHeaderName.textContent = "Name";
-          setHeaderState("showShadow", false);
+          if (top + rootMarginTop > 0) {
+            tableHeaderName.textContent = "Name";
+            setHeaderState("showShadow", false);
+            hideActiveHeader();
+            return;
+          }
+
+          if (top < 0 && bottom >= 0) {
+            setHeaderState("showShadow", false);
+            showActiveHeader();
+            return;
+          }
+          // if (boundingClientRect.bottom > 0) return;
+          if (bottom > 0) return;
+          // if (tableSameWidthAsParent) return;
+
+          setHeaderState("showShadow", true);
           hideActiveHeader();
-          return;
-        }
+        };
 
-        if (top < 0 && bottom >= 0) {
-          setHeaderState("showShadow", false);
-          showActiveHeader();
-          return;
-        }
-        // if (boundingClientRect.bottom > 0) return;
-        if (bottom > 0) return;
-        // if (tableSameWidthAsParent) return;
-
-        setHeaderState("showShadow", true);
-        hideActiveHeader();
-      };
-
-      requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          run();
-          setTimeout(() => {
+          requestAnimationFrame(() => {
             run();
+            setTimeout(() => {
+              run();
+            });
           });
         });
-      });
-    },
+      },
+    ),
   );
 
   return (

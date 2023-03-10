@@ -174,10 +174,10 @@ pre {
 .dark .prose a:not(.header-anchor) {
   color: #ccc;
   background-image: linear-gradient(#666, #666);
-}
-.dark .prose a:not(.header-anchor):hover {
-  color: #ddd;
-  background-image: linear-gradient(#888, #888);
+  &:hover {
+    color: #ddd;
+    background-image: linear-gradient(#888, #888);
+  }
 }
 
 .prose a:not(.header-anchor):hover {
