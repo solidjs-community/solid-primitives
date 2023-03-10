@@ -1,334 +1,291 @@
-import solidPrimitivesLogo from "~/assets/img/solid-primitives-logo.svg";
-import solidPrimitivesDarkLogo from "~/assets/img/solid-primitives-dark-logo.svg";
-import solidPrimitivesStackedLogo from "~/assets/img/solid-primitives-stacked-logo.svg";
-import solidPrimitivesStackedDarkLogo from "~/assets/img/solid-primitives-stacked-dark-logo.svg";
-import { createEffect, createRenderEffect, createSignal, on, onMount } from "solid-js";
-import SearchModal from "../Search/SearchModal";
-import ThemeBtn from "./ThemeBtn";
-import SearchBtn from "../Search/SearchBtn";
-import { A, useLocation } from "solid-start";
-import NavMenu from "./NavMenu";
-import { createStore } from "solid-js/store";
-import Dismiss from "solid-dismiss";
-import { createTween } from "@solid-primitives/tween";
+import { makeEventListener } from "@solid-primitives/event-listener";
 import { isMobile, isSafari } from "@solid-primitives/platform";
-import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
-import Hamburger from "../Icons/Hamburger";
-import { primitivePagePaddingTop } from "../Primitives/PrimitivePageMain";
+import { createScrollPosition } from "@solid-primitives/scroll";
+import { createTween } from "@solid-primitives/tween";
+import { defer, tryOnCleanup } from "@solid-primitives/utils";
+import Dismiss from "solid-dismiss";
+import {
+  Accessor,
+  batch,
+  Component,
+  createEffect,
+  createMemo,
+  createSignal,
+  untrack,
+} from "solid-js";
+import { createStore } from "solid-js/store";
+import { A, useLocation } from "solid-start";
+import solidPrimitivesDarkLogo from "~/assets/img/solid-primitives-dark-logo.svg";
+import solidPrimitivesLogo from "~/assets/img/solid-primitives-logo.svg";
+import solidPrimitivesStackedDarkLogo from "~/assets/img/solid-primitives-stacked-dark-logo.svg";
+import solidPrimitivesStackedLogo from "~/assets/img/solid-primitives-stacked-logo.svg";
 import { pageWidthClass } from "~/constants";
-import { defer } from "@solid-primitives/utils";
+import Hamburger from "../Icons/Hamburger";
+import { PRIMITIVE_PAGE_PADDING_TOP } from "../Primitives/PrimitivePageMain";
+import SearchBtn from "../Search/SearchBtn";
+import SearchModal from "../Search/SearchModal";
+import NavMenu from "./NavMenu";
+import ThemeBtn from "./ThemeBtn";
 
-export const [headerState, setHeaderState] = createStore({
-  showOpaqueBg: false,
-  showShadow: false,
-  showGradientBorder: false,
-  showGradientOverflow: false,
-  disableScroll: false,
-  showSearchBtn: true,
-  openNavMenu: false,
-  zIndex: 10,
-});
+export const [isScrollEnabled, setScrollEnabled] = createSignal(false);
+
+const [signalOverridingShadow, setSignalOverridingShadow] = createSignal<Accessor<boolean>>();
+const isOverridingShadow = () => signalOverridingShadow()?.() ?? false;
+
+export function overrideShadow(signal: Accessor<boolean>) {
+  setSignalOverridingShadow(() => signal);
+  tryOnCleanup(() => setSignalOverridingShadow(p => (p === signal ? undefined : p)));
+}
 
 function easeInOutCubic(x: number): number {
   return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 }
 
-const Header = () => {
-  const [openSearch, setOpenSearch] = createSignal(false);
-  const [openNavMenu, setOpenNavMenu] = createSignal(false);
-  const [from, setFrom] = createSignal(0);
-  const openNavMenuDuration = 500;
-  const tweenedValue = createTween(from, { ease: easeInOutCubic, duration: openNavMenuDuration });
+const OPEN_NAV_DURATION = 500;
+const HEADER_HEIGHT = 60;
+
+const Header: Component = () => {
+  const windowScroll = createScrollPosition(() => window);
   const location = useLocation();
-  const headerHeight = 60;
-  let gradientOverflowLeftBG!: HTMLDivElement;
-  let gradientOverflowRightBG!: HTMLDivElement;
+
+  const [isNavOpen, setIsNavOpen] = createSignal(false);
+  const [isSearchOpen, setIsSearchOpen] = createSignal(false);
+  const [from, setFrom] = createSignal(0);
+
+  createEffect(
+    defer(
+      createMemo(() => location.hash),
+      () => setIsNavOpen(false),
+    ),
+  );
+
+  const [styles, setStyles] = createStore({
+    gradientOverflow: { "--header-gradient-overflow-start": "60px", height: "", transform: "" },
+    headerOpaqueBgContainer: { height: "", top: "" },
+    headerOpaqueBg: {
+      transform: "",
+      display: "",
+      height: "",
+      top: "",
+    },
+    headerBottomGradientBorder: { transform: "" },
+    headerShadow: { transform: "" },
+  });
+
   let menuButtonSearch!: HTMLButtonElement;
   let menuButtonNavMenu!: HTMLButtonElement;
-  let headerOpaqueBg!: HTMLDivElement;
-  let headerOpaqueBgContainer!: HTMLDivElement;
-  let headerBottomGradientBorder!: HTMLDivElement;
-  let headerShadow!: HTMLDivElement;
   let navMenu!: HTMLDivElement;
 
-  const shouldShowShadow = () => window.scrollY > primitivePagePaddingTop + 50;
-  const shouldShowOpaqueBg = () => window.scrollY > 30;
-  const shouldShowGradientOverflow = () => window.scrollY > primitivePagePaddingTop + 150;
-
-  const checkScroll = () => {
-    // might remove this, hopefully this issue is temp, not that big deal of an issue, but the issue is that when safari scroll 'rubberbands' at top of page there's a big white background that covers header. It's caused by header element containing blur in backdrop-filter.
-    if (isSafari && !isMobile) {
-      if (openNavMenu() || openSearch()) {
-        return;
+  // might remove this, hopefully this issue is temp, not that big deal of an issue,
+  // but the issue is that when safari scroll 'rubberbands' at top of page there's a big white background that covers header.
+  // It's caused by header element containing blur in backdrop-filter.
+  if (isSafari && !isMobile) {
+    const checkScroll = () => {
+      if (!isNavOpen() && !isSearchOpen()) {
+        setStyles("headerOpaqueBg", "display", window.scrollY > 2 ? "" : "none");
       }
-      if (window.scrollY > 2) {
-        headerOpaqueBg.style.display = "";
-      } else {
-        headerOpaqueBg.style.display = "none";
+    };
+
+    createEffect(() => {
+      if (isScrollEnabled()) {
+        untrack(checkScroll);
+        makeEventListener(window, "scroll", checkScroll, { passive: true });
       }
-    }
-
-    const showOpaqueBg = shouldShowOpaqueBg();
-    const showShadow = shouldShowShadow();
-    const showGradientOverflow = shouldShowGradientOverflow();
-
-    setHeaderState("showOpaqueBg", showOpaqueBg);
-
-    if (doesPathnameMatchBase(location.pathname)) {
-      return;
-    }
-    setHeaderState("showShadow", showShadow);
-    setHeaderState("showGradientOverflow", showGradientOverflow);
-  };
-
-  onMount(() => {
-    checkScroll();
-
-    window.addEventListener("scroll", checkScroll, { passive: true });
-  });
+    });
+  }
 
   let navMenuHeight = 0;
 
   createEffect(
-    defer(tweenedValue, tweenedValue => {
-      navMenu.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
-      headerBottomGradientBorder.style.transform = `translateY(${tweenedValue}px)`;
-      headerShadow.style.transform = `translateY(${tweenedValue}px)`;
-      headerOpaqueBg.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
-      gradientOverflowLeftBG.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
-      gradientOverflowRightBG.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
-    }),
+    defer(
+      createTween(from, { ease: easeInOutCubic, duration: OPEN_NAV_DURATION }),
+      tweenedValue => {
+        const tweenedTranslateWithoutHeight = `translateY(${-navMenuHeight + tweenedValue}px)`;
+        navMenu.style.transform = tweenedTranslateWithoutHeight;
+        setStyles(
+          ["headerBottomGradientBorder", "headerShadow"],
+          "transform",
+          `translateY(${tweenedValue}px)`,
+        );
+        setStyles(
+          ["gradientOverflow", "headerOpaqueBg"],
+          "transform",
+          tweenedTranslateWithoutHeight,
+        );
+      },
+    ),
   );
 
+  // effect is needed to read from `navMenu` ref after it's added to DOM
   createEffect(
-    defer(openNavMenu, openNavMenu => {
-      if (openNavMenu) {
+    defer(isNavOpen, isNavOpen => {
+      if (isNavOpen) {
         navMenuHeight = navMenu.clientHeight;
 
-        headerOpaqueBg.classList.add("!backdrop-blur-md", "!bg-white/50", "dark:!bg-[#293843]/70");
-        headerOpaqueBg.style.display = "";
-        headerOpaqueBg.style.height = `${navMenuHeight + headerHeight}px`;
-        gradientOverflowLeftBG.style.height = `${navMenuHeight + 220}px`;
-        gradientOverflowRightBG.style.height = `${navMenuHeight + 220}px`;
-        gradientOverflowLeftBG.style.setProperty(
-          "--header-gradient-overflow-start",
-          `${navMenuHeight + 60}px`,
-        );
-        gradientOverflowRightBG.style.setProperty(
-          "--header-gradient-overflow-start",
-          `${navMenuHeight + 60}px`,
-        );
-        headerOpaqueBgContainer.style.height = `${navMenuHeight + headerHeight}px`;
-        headerOpaqueBg.style.transform = `translateY(${-navMenuHeight}px)`;
-        gradientOverflowLeftBG.style.transform = `translateY(${-navMenuHeight}px)`;
-        gradientOverflowRightBG.style.transform = `translateY(${-navMenuHeight}px)`;
-        headerOpaqueBg.style.top = "-1px";
-        headerOpaqueBgContainer.style.top = "1px";
+        const newTransform = `translateY(${-navMenuHeight}px)`,
+          newHeight = `${navMenuHeight + HEADER_HEIGHT}px`;
+
+        setStyles("headerOpaqueBg", {
+          display: "",
+          height: newHeight,
+          transform: newTransform,
+          top: "-1px",
+        });
+
+        setStyles("gradientOverflow", {
+          height: `${navMenuHeight + 220}px`,
+          "--header-gradient-overflow-start": `${navMenuHeight + 60}px`,
+          transform: newTransform,
+        });
+
+        setStyles("headerOpaqueBgContainer", {
+          height: newHeight,
+          top: "1px",
+        });
 
         requestAnimationFrame(() => {
           setFrom(navMenuHeight);
         });
         return;
       }
-      const showOpaqueBg = window.scrollY > 30;
 
-      if (!showOpaqueBg) {
-        setHeaderState("showOpaqueBg", true);
-        setTimeout(() => {
-          const showOpaqueBg = window.scrollY > 30;
-          if (!showOpaqueBg) {
-            setHeaderState("showOpaqueBg", false);
-          }
-        }, openNavMenuDuration);
-      }
       setFrom(0);
     }),
   );
 
-  createEffect(
-    defer(
-      () => headerState.disableScroll,
-      disableScroll => {
-        if (disableScroll) {
-          window.removeEventListener("scroll", checkScroll);
-          return;
-        }
-        window.addEventListener("scroll", checkScroll, { passive: true });
-      },
-    ),
-  );
-
-  createEffect(
-    defer(
-      () => location.hash,
-      (currentHash, prevHash) => {
-        if (prevHash === currentHash) return;
-        setOpenNavMenu(false);
-      },
-    ),
-  );
-
-  createEffect(() => {
-    setOpenNavMenu(headerState.openNavMenu);
-  });
-  createEffect(() => {
-    setHeaderState("openNavMenu", openNavMenu());
-  });
-
-  createRenderEffect(
-    defer(
-      () => location.pathname,
-      pathname => {
-        const showShadow = shouldShowShadow();
-        if (!showShadow) return;
-
-        if (doesPathnameMatchBase(pathname)) {
-          setHeaderState("showShadow", false);
-        }
-      },
-    ),
-  );
-
   return (
     <>
-      <header class="fixed top-0 left-0 right-0 h-[60px]" style={{ "z-index": headerState.zIndex }}>
+      <header
+        class="fixed top-0 left-0 right-0 z-10 h-[60px]"
+        classList={{
+          "md:z-[1001]": isSearchOpen(),
+        }}
+      >
         <div class="relative h-full">
           <div
-            class={`${pageWidthClass} mx-auto w-full h-full flex px-4 sm:px-8 items-center justify-between gap-2`}
+            class={`${pageWidthClass} mx-auto flex h-full w-full items-center justify-between gap-2 px-4 sm:px-8`}
           >
             <div
-              class={`${pageWidthClass} w-full absolute top-0 left-0 bottom-0 right-0 mx-auto box-shadow-[var(--header-box-shadow)] -z-1 transition-opacity duration-250`}
+              class={`${pageWidthClass} box-shadow-[var(--header-box-shadow)] -z-1 duration-250
+              absolute top-0 left-0 bottom-0 right-0 mx-auto w-full opacity-0 transition-opacity`}
               classList={{
-                "opacity-100": headerState.showShadow || openNavMenu(),
-                "opacity-0": !headerState.showShadow,
+                // show the shadow when scrolled down or when the nav menu is open,
+                // but not when the search modal is open or when the table-sub-nav is shown
+                "opacity-100":
+                  isNavOpen() ||
+                  (!isSearchOpen() &&
+                    !isOverridingShadow() &&
+                    windowScroll.y > PRIMITIVE_PAGE_PADDING_TOP + 50),
               }}
-              ref={headerShadow}
+              style={styles.headerShadow}
             >
               <div
-                class="h-full box-shadow-[var(--header-big-box-shadow)] -z-1 transition-composite duration-250"
+                class="box-shadow-[var(--header-big-box-shadow)] -z-1 transition-composite duration-250 h-full opacity-0"
                 classList={{
-                  "opacity-100": openNavMenu(),
-                  "opacity-0": !openNavMenu(),
+                  "opacity-100": isNavOpen(),
                 }}
               />
             </div>
             <A href="/">
               <img
-                class="dark:hidden hidden sm:block h-[28px] sm:h-[40px]"
+                class="hidden h-[28px] dark:hidden sm:block sm:h-[40px]"
                 src={solidPrimitivesLogo}
                 alt=""
               />
               <img
-                class="hidden dark:sm:block h-[28px] sm:h-[40px]"
+                class="hidden h-[28px] sm:h-[40px] dark:sm:block"
                 src={solidPrimitivesDarkLogo}
                 alt=""
               />
               <img
-                class="dark:hidden sm:hidden h-[28px] sm:h-[40px]"
+                class="h-[28px] dark:hidden sm:hidden sm:h-[40px]"
                 src={solidPrimitivesStackedLogo}
                 alt=""
               />
               <img
-                class="hidden dark:block sm:!hidden h-[28px] sm:h-[40px]"
+                class="hidden h-[28px] dark:block sm:!hidden sm:h-[40px]"
                 src={solidPrimitivesStackedDarkLogo}
                 alt=""
               />
             </A>
             <nav>
               <ul class="flex items-center gap-3">
-                <li class="transition" classList={{ "opacity-0": !headerState.showSearchBtn }}>
+                <li class="transition" classList={{ "opacity-0": isSearchOpen() }}>
                   <SearchBtn ref={menuButtonSearch} />
                 </li>
                 <li>
                   <ThemeBtn />
                 </li>
                 <li>
-                  <Hamburger active={openNavMenu()} ref={menuButtonNavMenu} />
+                  <Hamburger active={isNavOpen()} ref={menuButtonNavMenu} />
                 </li>
               </ul>
             </nav>
           </div>
-          <SearchModal menuButton={menuButtonSearch} open={openSearch} setOpen={setOpenSearch} />
+          <SearchModal
+            menuButton={menuButtonSearch}
+            open={isSearchOpen()}
+            setOpen={setIsSearchOpen}
+          />
         </div>
         {/* fixes weird shimmering top dark shadow blur during openNavMenu animation in Chrome  */}
         {/* Still shows up in Safari, no fix  */}
         <div
-          class="absolute inset-0 overflow-clip pointer-events-none -z-1"
-          ref={headerOpaqueBgContainer}
+          class="-z-1 pointer-events-none absolute inset-0 overflow-clip"
+          style={styles.headerOpaqueBgContainer}
         >
           <div
-            class="absolute inset-0 translate-y-[calc(-100%+60px)] transition-[background-color,backdrop-filter]"
-            classList={{
-              "backdrop-blur-md bg-white/50 dark:bg-[#293843]/70":
-                headerState.showOpaqueBg || openNavMenu(),
-              "backdrop-blur-none bg-white/0 dark:bg-[#293843]/0":
-                !openNavMenu() && !headerState.showOpaqueBg,
-            }}
-            ref={headerOpaqueBg}
+            class="absolute inset-0 translate-y-[calc(-100%+60px)]
+            bg-white/50 backdrop-blur-md
+            transition-[background-color,backdrop-filter] dark:bg-[#293843]/70"
+            style={styles.headerOpaqueBg}
           />
         </div>
-        <div class="absolute h-[1px] top-0 left-0 right-0 bg-page-main-bg z-1" />
+        <div class="bg-page-main-bg z-1 absolute top-0 left-0 right-0 h-[1px]" />
         <div
-          class={`${pageWidthClass} mx-auto background-[var(--header-border-bottom)] h-[2px] transition-opacity duration-250`}
-          classList={{
-            "opacity-100": headerState.showGradientBorder,
-            "opacity-0": !headerState.showGradientBorder,
-          }}
-          ref={headerBottomGradientBorder}
+          class={`${pageWidthClass} background-[var(--header-border-bottom)] duration-250 mx-auto h-[2px] opacity-0 transition-opacity`}
+          classList={{ "opacity-100": isOverridingShadow() && !isSearchOpen() }}
+          style={styles.headerBottomGradientBorder}
         />
-        <div class={`${pageWidthClass} relative mx-auto top-[-2px] overflow-clip`}>
+        <div class={`${pageWidthClass} relative top-[-2px] mx-auto overflow-clip`}>
           <Dismiss
             menuButton={menuButtonNavMenu}
-            open={openNavMenu}
-            setOpen={setOpenNavMenu}
+            open={isNavOpen}
+            setOpen={state => setIsNavOpen(state)}
             class="-translate-y-full"
             animation={{
               onEnter: (_, done) => {
-                setTimeout(done, openNavMenuDuration);
+                setTimeout(done, OPEN_NAV_DURATION);
               },
               onExit: (_, done) => {
-                setTimeout(done, openNavMenuDuration);
+                setTimeout(done, OPEN_NAV_DURATION);
               },
               onAfterExit: () => {
                 // clear the styles only if the nav menu is closed
-                if (openNavMenu()) return;
+                if (isNavOpen()) return;
 
-                headerShadow.style.display = "";
-                headerOpaqueBg.classList.remove(
-                  "!backdrop-blur-md",
-                  "!bg-white/50",
-                  "dark:!bg-[#293843]/70",
-                );
-                headerOpaqueBg.style.top = "";
-                headerOpaqueBgContainer.style.top = "";
-                headerOpaqueBgContainer.style.height = "";
+                batch(() => {
+                  setStyles("headerOpaqueBg", { top: "" });
+                  setStyles("headerOpaqueBgContainer", { top: "", height: "" });
+                });
               },
             }}
             ref={navMenu}
           >
-            <NavMenu />
+            <NavMenu onClose={() => setIsNavOpen(false)} />
           </Dismiss>
         </div>
       </header>
-      <div
-        class="hidden md:flex fixed top-0 left-0 right-0 pointer-events-none -z-1 transition"
-        classList={{
-          "opacity-0": !headerState.showGradientOverflow,
-          "opacity-100": headerState.showGradientOverflow,
-          "!transition-none": isSafari,
-        }}
-      >
+      <div class="-z-1 pointer-events-none fixed top-0 left-0 right-0 hidden md:flex">
         <div
-          class="flex-grow h-[220px] bg-[linear-gradient(to_bottom,var(--page-main-bg)_var(--header-gradient-overflow-start),transparent)] -order-1"
-          style={{ "--header-gradient-overflow-start": "60px" }}
-          ref={gradientOverflowLeftBG}
+          class="-order-1 h-[220px] flex-grow bg-[linear-gradient(to_bottom,var(--page-main-bg)_var(--header-gradient-overflow-start),transparent)]"
+          style={styles.gradientOverflow}
         />
 
-        <div class={`${pageWidthClass} w-full flex-grow flex-shrink-0`} />
+        <div class={`${pageWidthClass} w-full flex-shrink-0 flex-grow`} />
         <div
-          class="flex-grow h-[220px] bg-[linear-gradient(to_bottom,var(--page-main-bg)_var(--header-gradient-overflow-start),transparent)]"
-          style={{ "--header-gradient-overflow-start": "60px" }}
-          ref={gradientOverflowRightBG}
+          class="h-[220px] flex-grow bg-[linear-gradient(to_bottom,var(--page-main-bg)_var(--header-gradient-overflow-start),transparent)]"
+          style={styles.gradientOverflow}
         />
       </div>
     </>

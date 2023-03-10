@@ -1,9 +1,9 @@
-import { For } from "solid-js";
+import { RefProps } from "@solid-primitives/refs";
+import { Component, For } from "solid-js";
 import { A, useLocation } from "solid-start";
 import { scrollIntoView } from "~/utils/scrollIntoView";
-import { setHeaderState } from "./Header";
 
-const NavMenu = () => {
+const NavMenu: Component<RefProps<HTMLDivElement> & { onClose: () => void }> = props => {
   const location = useLocation();
   const list = [
     "Primitives",
@@ -14,8 +14,8 @@ const NavMenu = () => {
     "Managing Primitive Complexity",
   ];
   return (
-    <div>
-      <div class="border-b-2 my-1 mx-4 border-slate-200 dark:border-slate-600" />
+    <div ref={props.ref}>
+      <div class="my-1 mx-4 border-b-2 border-slate-200 dark:border-slate-600" />
       <div class="p-4">
         <ul class="flex flex-col text-lg">
           <For each={list}>
@@ -32,7 +32,7 @@ const NavMenu = () => {
                       if (location.hash === href) {
                         const anchor = document.querySelector(`a[href="${href}"]`)!;
                         scrollIntoView(anchor, { offset: 70, behavior: "auto" });
-                        setHeaderState("openNavMenu", false);
+                        props.onClose();
                       }
                     }}
                   >
