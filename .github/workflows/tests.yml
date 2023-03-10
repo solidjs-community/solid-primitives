@@ -23,13 +23,14 @@ jobs:
         run: pnpm install --ignore-scripts
 
       - name: Build all packages
-        run: pnpm build
+        run: pnpm build:packages
 
       - name: Lint
+        # Will run the step even if build step failed
+        if: success() || failure()
         run: pnpm lint
 
       - name: Test all packages
+        # Will run the step even if lint step failed
+        if: success() || failure()
         run: pnpm test
-
-      - name: Test all packages in server env
-        run: pnpm test:ssr

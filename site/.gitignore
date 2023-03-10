@@ -1,0 +1,30 @@
+dist
+.solid
+.output
+.vercel
+.netlify
+netlify
+
+# dependencies
+/node_modules
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+*.launch
+.settings/
+
+# Temp
+gitignore
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# TEMP
+src/routes/package/*
+src/_generated/*
+
+# TEMP, even though repo uses pnpm, at the moment there's hmr infinite loop on refresh, so using npm
+package-lock.json

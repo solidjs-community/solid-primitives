@@ -26,7 +26,7 @@ readdirSync(r(`../packages/`)).forEach(name => {
 
   const changelogMatch =
     /\<details\>\r?\n?\<summary\>\<b\>Expand Changelog\<\/b\>\<\/summary\>([\S\s]+)<\/details>/g.exec(
-      changelogChunk
+      changelogChunk,
     );
   if (!changelogMatch) {
     console.log(`No changelog found for ${name}`);

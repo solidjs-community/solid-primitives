@@ -1,0 +1,26 @@
+<svg width="50" height="50" viewBox="0 0 13.229 13.229" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path id="pnpm-d" d="M237.6 95h-50V45h50v50z"/>
+    <path id="pnpm-b" d="M182.59 95h-50V45h50v50z"/>
+    <path id="pnpm-h" d="M127.59 95h-50V45h50v50z"/>
+    <path id="pnpm-a" d="M237.6 150h-50v-50h50v50z"/>
+    <path id="pnpm-g" d="M182.59 150h-50v-50h50v50z"/>
+    <path id="pnpm-f" d="M182.59 205h-50v-50h50v50z"/>
+    <path id="pnpm-c" d="M237.6 205h-50v-50h50v50z"/>
+    <path id="pnpm-e" d="M127.59 205h-50v-50h50v50z"/>
+  </defs>
+  <g>
+    <g transform="matrix(.07606 0 0 .07606 -5.373 -2.893)">
+      <use width="100%" height="100%" href="#pnpm-d"/>
+      <use width="100%" height="100%" href="#pnpm-b"/>
+      <use width="100%" height="100%" href="#pnpm-h"/>
+      <use width="100%" height="100%" href="#pnpm-a"/>
+    </g>
+    <g fill="#000" transform="matrix(.07606 0 0 .07606 -5.373 -2.893)">
+      <use width="100%" height="100%" href="#pnpm-g"/>
+      <use width="100%" height="100%" href="#pnpm-f"/>
+      <use width="100%" height="100%" href="#pnpm-c"/>
+      <use width="100%" height="100%" href="#pnpm-e"/>
+    </g>
+  </g>
+</svg>

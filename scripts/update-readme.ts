@@ -41,7 +41,7 @@ readdirSync(r(`../packages/`)).forEach(name => {
     return console.warn(`package ${name} doesn't have primitive field in package.json`);
   if (pkg.primitive.name !== name)
     return console.warn(
-      `directory name (${name}) and name in package info ${pkg.primitive.name} do not match`
+      `directory name (${name}) and name in package info ${pkg.primitive.name} do not match`,
     );
 
   const { list, category, stage } = pkg.primitive as {
@@ -90,7 +90,7 @@ readme = insertTextBetweenComments(readme, table, "INSERT-PRIMITIVES-TABLE");
 // Update Combined Downloads Badge
 
 const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://combined-npm-downloads.deno.dev/${rootDependencies.join(
-  ","
+  ",",
 )})](https://dash.deno.com/playground/combined-npm-downloads)`;
 
 readme = insertTextBetweenComments(readme, combinedDownloadsBadge, "INSERT-NPM-DOWNLOADS-BADGE");

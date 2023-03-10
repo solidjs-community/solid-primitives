@@ -29,11 +29,11 @@ const copyPage = async () => {
       if (await isDir(pkgPath)) {
         await cp(pkgPath, path.resolve(pagesPath, pkg), {
           recursive: true,
-          force: true
+          force: true,
         });
         pages.push(pkg);
       }
-    })
+    }),
   );
   return pages;
 };
@@ -62,7 +62,7 @@ const writeIndex = async (pages: string[]) => {
   </body>
 </html>
 `,
-    "utf-8"
+    "utf-8",
   );
 };
 

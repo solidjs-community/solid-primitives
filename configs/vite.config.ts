@@ -5,11 +5,11 @@ import Unocss from "unocss/vite";
 
 export const viteConfig = defineConfig({
   server: {
-    port: 3000
+    port: 3000,
   },
   plugins: [
     devtools({
-      autoname: true
+      autoname: true,
     }),
     solid(),
     Unocss({
@@ -22,8 +22,8 @@ export const viteConfig = defineConfig({
         "wrapper-v": "wrapper-h flex-col space-x-0 space-y-4",
         node: "p-4 bg-orange-600 rounded m-2",
         input: "bg-gray-800 rounded border border-gray-600 px-3 py-2 text-white",
-        ball: "w-8 h-8 fixed -top-4 -left-4 opacity-50 rounded-full pointer-events-none"
-      }
+        ball: "w-8 h-8 fixed -top-4 -left-4 opacity-50 rounded-full pointer-events-none",
+      },
     }),
     {
       name: "process.env variables",
@@ -36,14 +36,14 @@ export const viteConfig = defineConfig({
           .replace(/process\.env\.DEV/g, '"1"')
           .replace(/process\.env\.PROD/g, '""')
           .replace(/process\.env\.NODE_ENV/g, '"development"');
-      }
-    }
+      },
+    },
   ],
   optimizeDeps: {
-    exclude: ["@solid-primitives/utils"]
+    exclude: ["@solid-primitives/utils"],
   },
   build: {
-    target: "esnext"
+    target: "esnext",
   },
   // required to serve from a sub-path (github pages):
   base: "./",
@@ -52,7 +52,7 @@ export const viteConfig = defineConfig({
       NODE_ENV: "development",
       DEV: "1",
       SSR: "",
-      PROD: ""
-    }
-  }
+      PROD: "",
+    },
+  },
 });

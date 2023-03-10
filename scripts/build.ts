@@ -29,14 +29,14 @@ const printExports = !writeExports;
     {
       entry: `src/index.${jsxEntry ? "tsx" : "ts"}`,
       devEntry: devEntry,
-      serverEntry: ssrEntry
+      serverEntry: ssrEntry,
     },
     {
       cjs: true,
       writePackageJson: writeExports,
       printInstructions: printExports,
-      dropConsole: true
-    }
+      dropConsole: true,
+    },
   );
 
   if (typeof options === "function") {

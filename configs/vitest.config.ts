@@ -14,8 +14,8 @@ export default defineConfig(({ mode }) => {
         // https://github.com/solidjs/solid-refresh/issues/29
         hot: false,
         // For testing SSR we need to do a SSR JSX transform
-        solid: { generate: testSSR ? "ssr" : "dom" }
-      })
+        solid: { generate: testSSR ? "ssr" : "dom" },
+      }),
     ],
     test: {
       watch: false,
@@ -24,12 +24,12 @@ export default defineConfig(({ mode }) => {
         NODE_ENV: testSSR ? "production" : "development",
         DEV: testSSR ? "" : "1",
         SSR: testSSR ? "1" : "",
-        PROD: testSSR ? "1" : ""
+        PROD: testSSR ? "1" : "",
       },
       passWithNoTests: true,
       environment: testSSR ? "node" : "jsdom",
       transformMode: {
-        web: [/\.[jt]sx$/]
+        web: [/\.[jt]sx$/],
       },
       ...(fromRoot
         ? // Testing all packages from root
@@ -37,20 +37,20 @@ export default defineConfig(({ mode }) => {
             ...(testSSR && { include: ["packages/*/test/server.test.{ts,tsx}"] }),
             ...(!testSSR && {
               include: ["packages/*/test/*.test.{ts,tsx}"],
-              exclude: ["packages/*/test/server.test.{ts,tsx}"]
-            })
+              exclude: ["packages/*/test/server.test.{ts,tsx}"],
+            }),
           }
         : // Testing a single package
           {
             ...(testSSR && { include: ["test/server.test.{ts,tsx}"] }),
             ...(!testSSR && {
               include: ["test/*.test.{ts,tsx}"],
-              exclude: ["test/server.test.{ts,tsx}"]
-            })
-          })
+              exclude: ["test/server.test.{ts,tsx}"],
+            }),
+          }),
     },
     resolve: {
-      conditions: testSSR ? ["node"] : ["browser", "development"]
-    }
+      conditions: testSSR ? ["node"] : ["browser", "development"],
+    },
   };
 });
