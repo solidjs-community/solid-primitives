@@ -1,39 +1,48 @@
 {
-  "name": "@solid-primitives/props",
-  "version": "3.1.2",
-  "description": "Library of primitives focused around component props.",
-  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
+  "name": "@solid-primitives/flux-store",
+  "version": "0.0.1",
+  "description": "SolidJS Primitive to simplify the creation of global stores and the ability to access and mutate them.",
+  "author": "Zalexios <zalexios@outlook.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/props",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/flux-store#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
   "primitive": {
-    "name": "props",
-    "stage": 3,
+    "name": "flux-store",
+    "stage": 0,
     "list": [
-      "combineProps",
-      "filterProps"
+      "createFluxStore",
+      "createFluxFactory",
+      "createActions",
+      "createAction"
     ],
     "category": "Utilities"
   },
   "keywords": [
-    "props",
     "solid",
-    "primitives"
-  ],
-  "files": [
-    "dist"
+    "provider",
+    "context",
+    "store",
+    "state",
+    "primitives",
+    "flux"
   ],
   "private": false,
   "sideEffects": false,
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "browser": {},
+  "types": "./dist/index.d.ts",
   "exports": {
     "import": {
       "types": "./dist/index.d.ts",
@@ -48,14 +57,7 @@
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
-  "dependencies": {
-    "@solid-primitives/utils": "workspace:^5.4.0"
-  },
-  "devDependencies": {
-    "nanospy": "^0.5.0"
-  },
   "peerDependencies": {
     "solid-js": "^1.6.0"
-  },
-  "typesVersions": {}
+  }
 }

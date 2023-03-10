@@ -1,5 +1,11 @@
 # @solid-primitives/graphql
 
+## 1.5.5
+
+### Patch Changes
+
+- 48100cf3: Improve `gql` function and used regex
+
 ## 1.5.4
 
 ### Patch Changes

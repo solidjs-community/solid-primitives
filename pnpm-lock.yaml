@@ -253,6 +253,12 @@ importers:
       node-fetch: 3.3.0
       solid-js: 1.6.11
 
+  packages/flux-store:
+    specifiers:
+      solid-js: ^1.6.0
+    dependencies:
+      solid-js: 1.6.11
+
   packages/fullscreen:
     specifiers:
       solid-js: ^1.6.0
