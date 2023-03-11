@@ -185,22 +185,22 @@ const Header: Component = () => {
             <A href="/">
               <img
                 class="hidden h-[28px] dark:hidden sm:block sm:h-[40px]"
-                src="img/solid-primitives-logo.svg"
+                src="/img/solid-primitives-logo.svg"
                 alt=""
               />
               <img
                 class="hidden h-[28px] sm:h-[40px] dark:sm:block"
-                src="img/solid-primitives-dark-logo.svg"
+                src="/img/solid-primitives-dark-logo.svg"
                 alt=""
               />
               <img
                 class="h-[28px] dark:hidden sm:hidden sm:h-[40px]"
-                src="img/solid-primitives-stacked-logo.svg"
+                src="/img/solid-primitives-stacked-logo.svg"
                 alt=""
               />
               <img
                 class="hidden h-[28px] dark:block sm:!hidden sm:h-[40px]"
-                src="img/solid-primitives-stacked-dark-logo.svg"
+                src="/img/solid-primitives-stacked-dark-logo.svg"
                 alt=""
               />
             </A>
