@@ -1,4 +1,3 @@
-// @refresh reload
 import { Suspense } from "solid-js";
 import {
   Body,
