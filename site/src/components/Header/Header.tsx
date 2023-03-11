@@ -15,10 +15,6 @@ import {
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import { A, useLocation } from "solid-start";
-import solidPrimitivesDarkLogo from "~/assets/img/solid-primitives-dark-logo.svg";
-import solidPrimitivesLogo from "~/assets/img/solid-primitives-logo.svg";
-import solidPrimitivesStackedDarkLogo from "~/assets/img/solid-primitives-stacked-dark-logo.svg";
-import solidPrimitivesStackedLogo from "~/assets/img/solid-primitives-stacked-logo.svg";
 import { pageWidthClass } from "~/constants";
 import Hamburger from "../Icons/Hamburger";
 import { PRIMITIVE_PAGE_PADDING_TOP } from "../Primitives/PrimitivePageMain";
@@ -189,22 +185,22 @@ const Header: Component = () => {
             <A href="/">
               <img
                 class="hidden h-[28px] dark:hidden sm:block sm:h-[40px]"
-                src={solidPrimitivesLogo}
+                src="img/solid-primitives-logo.svg"
                 alt=""
               />
               <img
                 class="hidden h-[28px] sm:h-[40px] dark:sm:block"
-                src={solidPrimitivesDarkLogo}
+                src="img/solid-primitives-dark-logo.svg"
                 alt=""
               />
               <img
                 class="h-[28px] dark:hidden sm:hidden sm:h-[40px]"
-                src={solidPrimitivesStackedLogo}
+                src="img/solid-primitives-stacked-logo.svg"
                 alt=""
               />
               <img
                 class="hidden h-[28px] dark:block sm:!hidden sm:h-[40px]"
-                src={solidPrimitivesStackedDarkLogo}
+                src="img/solid-primitives-stacked-dark-logo.svg"
                 alt=""
               />
             </A>
