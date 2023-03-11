@@ -34,18 +34,24 @@ export const buildJSONCategory = async ({
     const dir = r(`../packages/${name}/src/index.ts`);
     const indexFile = readFileSync(dir, "utf-8");
 
-    const resultStar = regexGlobalCaptureGroup(indexFile, /export\s+\*\sfrom\s+"[^"]+\/(\w+)"/g);
+    const resultStar = regexGlobalCaptureGroup(
+      indexFile,
+      /export\s+\*\sfrom\s+"[^"]+\/([a-z-_]+)"/gi,
+    );
 
     let concatFile = indexFile;
 
     const capturePrimitives = (fileStr: string) => {
-      const resultExport = regexGlobalCaptureGroup(
+      const resultExportDeclarations = regexGlobalCaptureGroup(
         fileStr,
-        /export\s+(?:default|const|function|let)\s(\w+)/g,
+        /export\s+(?:(?:async|default)\s+)?(?:const|function\*?|let|class)\s+(\w+)/g,
       );
-      if (resultExport) {
-        expandedList = resultExport;
-      }
+
+      const resultExportList = regexGlobalCaptureGroup(fileStr, /export\s+\{([^}]+)\}/g)
+        ?.flatMap(item => item.replace(/(type|as|default)\s\w+/g, "").match(/\w+/g))
+        .filter(item => item);
+
+      expandedList = [...(resultExportDeclarations || []), ...(resultExportList || [])];
     };
 
     if (resultStar) {
@@ -59,7 +65,10 @@ export const buildJSONCategory = async ({
     capturePrimitives(concatFile);
   }
 
-  const _primitives = [...new Set(expandedList)] as string[];
+  const _primitives = [...new Set(expandedList)]
+    // remove CONSTANTS
+    .filter(item => item !== item?.toUpperCase())
+    .sort();
 
   if (list.length === 1 && list[0]!.match(/list of/gi)) {
     for (let primitive of _primitives) {
