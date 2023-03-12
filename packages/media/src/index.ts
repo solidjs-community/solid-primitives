@@ -1,7 +1,12 @@
-import { Accessor, sharedConfig } from "solid-js";
+import { Accessor } from "solid-js";
 import { makeEventListener } from "@solid-primitives/event-listener";
-import { createStaticStore, entries, noop, createHydrateSignal } from "@solid-primitives/utils";
-import { createSharedRoot } from "@solid-primitives/rootless";
+import {
+  createHydratableStaticStore,
+  entries,
+  noop,
+  createHydratableSignal,
+} from "@solid-primitives/utils";
+import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 
 /**
  * attaches a MediaQuery listener to window, listeneing to changes to provided query
@@ -44,7 +49,7 @@ export function createMediaQuery(query: string, serverFallback = false) {
     return () => serverFallback;
   }
   const mql = window.matchMedia(query);
-  const [state, setState] = createHydrateSignal(serverFallback, () => mql.matches);
+  const [state, setState] = createHydratableSignal(serverFallback, () => mql.matches);
   const update = () => setState(mql.matches);
   makeEventListener(mql, "change", update);
   return state;
@@ -66,14 +71,10 @@ export function createPrefersDark(serverFallback?: boolean) {
   return createMediaQuery("(prefers-color-scheme: dark)", serverFallback);
 }
 
-const sharedPrefersDark: () => Accessor<boolean> = /*#__PURE__*/ createSharedRoot(
-  createPrefersDark.bind(void 0, false),
-);
-
 /**
  * Provides a signal indicating if the user has requested dark color theme. The setting is being watched with a [Media Query](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme).
  *
- * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) except if during hydration.
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) except if during hydration.
  *
  * @returns a boolean signal
  * @example
@@ -82,9 +83,9 @@ const sharedPrefersDark: () => Accessor<boolean> = /*#__PURE__*/ createSharedRoo
  *    prefersDark() // => boolean
  * });
  */
-export const usePrefersDark: () => Accessor<boolean> = process.env.SSR
-  ? () => () => false
-  : () => (sharedConfig.context ? createPrefersDark() : sharedPrefersDark());
+export const usePrefersDark: () => Accessor<boolean> = /*#__PURE__*/ createHydratableSingletonRoot(
+  createPrefersDark.bind(void 0, false),
+);
 
 export type Breakpoints = Record<string, string>;
 
@@ -129,26 +130,25 @@ export function createBreakpoints<T extends Breakpoints>(
   breakpoints: T,
   options: BreakpointOptions<T> = {},
 ): Matches<T> {
+  const fallback = options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints);
+
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (process.env.SSR || !window.matchMedia)
-    return options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints);
+  if (process.env.SSR || !window.matchMedia) return fallback;
 
   const { mediaFeature = "min-width", watchChange = true } = options;
 
-  const [matches, setMatches] = createStaticStore<Matches<T>>(
-    (() => {
-      const matches = {} as Record<keyof T, boolean>;
+  const [matches, setMatches] = createHydratableStaticStore<Matches<T>>(fallback, () => {
+    const matches = {} as Record<keyof T, boolean>;
 
-      entries(breakpoints).forEach(([token, width]) => {
-        const mql = window.matchMedia(`(${mediaFeature}: ${width})`);
-        matches[token] = mql.matches;
+    entries(breakpoints).forEach(([token, width]) => {
+      const mql = window.matchMedia(`(${mediaFeature}: ${width})`);
+      matches[token] = mql.matches;
 
-        if (watchChange) makeEventListener(mql, "change", e => setMatches(token, e.matches as any));
-      });
+      if (watchChange) makeEventListener(mql, "change", e => setMatches(token, e.matches as any));
+    });
 
-      return matches;
-    })(),
-  );
+    return matches;
+  });
 
   return matches;
 }

@@ -1,4 +1,4 @@
-import { createRoot, getOwner, onCleanup, runWithOwner, Owner } from "solid-js";
+import { createRoot, getOwner, onCleanup, runWithOwner, Owner, sharedConfig } from "solid-js";
 import { AnyFunction, asArray, access } from "@solid-primitives/utils";
 
 /**
@@ -73,12 +73,12 @@ export function createDisposable(
 }
 
 /**
- * Creates a reactive root that is shared across every instance it was used in. Shared root gets created when the returned function gets first called, and disposed when last reactive context listening to it gets disposed. Only to be recreated again when a new listener appears.
+ * Creates a reactive root that is shared across every instance it was used in. Singleton root gets created when the returned function gets first called, and disposed when last reactive context listening to it gets disposed. Only to be recreated again when a new listener appears.
  * @param factory function where you initialize your reactive primitives
  * @returns function, registering reactive owner as one of the listeners, returns the value {@link factory} returned.
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/rootless#createSharedRoot
+ * @see https://github.com/davedbase/solid-primitives/tree/main/packages/rootless#createSingletonRoot
  * @example
- * const useState = createSharedScope(() => {
+ * const useState = createSingletonRoot(() => {
  *    return createMemo(() => {...})
  * });
  *
@@ -91,31 +91,52 @@ export function createDisposable(
  * const state = useState();
  * ...
  */
-export function createSharedRoot<T>(factory: (dispose: VoidFunction) => T): () => T {
-  let listeners = 0;
-  let value: T | undefined;
-  let dispose: VoidFunction | undefined;
+export function createSingletonRoot<T>(
+  factory: (dispose: VoidFunction) => T,
+  detachedOwner: Owner | null = getOwner(),
+): () => T {
+  let listeners = 0,
+    value: T | undefined,
+    disposeRoot: VoidFunction | undefined;
 
   return () => {
-    if (!dispose) {
-      createRoot(_dispose => {
-        value = factory(_dispose);
-        dispose = _dispose;
-      });
-    }
-
     listeners++;
-    getOwner() &&
-      onCleanup(() => {
-        listeners--;
-        queueMicrotask(() => {
-          if (listeners || !dispose) return;
-          dispose();
-          dispose = undefined;
-          value = undefined;
-        });
+    onCleanup(() => {
+      listeners--;
+      queueMicrotask(() => {
+        if (!listeners && disposeRoot) {
+          disposeRoot();
+          disposeRoot = value = undefined;
+        }
       });
+    });
+
+    if (!disposeRoot) {
+      createRoot(dispose => (value = factory((disposeRoot = dispose))), detachedOwner);
+    }
 
     return value!;
   };
+}
+
+/** @deprecated Renamed to `createSingletonRoot` */
+export const createSharedRoot = createSingletonRoot;
+
+/**
+ * @warning Experimental API - there might be a better way so solve singletons with SSR and hydration.
+ *
+ * A hydratable version of {@link createSingletonRoot}.
+ * It will create a singleton root, unless it's running in SSR or during hydration.
+ * Then it will deopt to a calling the {@link factory} function with a regular root.
+ * @param factory function where you initialize your reactive primitives
+ * @returns
+ * ```ts
+ * // function that returns the value returned by factory
+ * () => T
+ * ```
+ */
+export function createHydratableSingletonRoot<T>(factory: (dispose: VoidFunction) => T): () => T {
+  const owner = getOwner();
+  const singleton = createSingletonRoot(factory, owner);
+  return () => (process.env.SSR || sharedConfig.context ? createRoot(factory, owner) : singleton());
 }

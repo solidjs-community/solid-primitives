@@ -29,7 +29,7 @@ yarn add @solid-primitives/keyboard
 
 Provides a signal with the list of currently held keys, ordered from least recent to most recent.
 
-This is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive that will reuse event listeners and signals across dependents.
+This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
 
 ### How to use it
 
@@ -54,7 +54,7 @@ createEffect(() => {
 
 Provides a signal with the currently held single key. Pressing any other key at the same time will reset the signal to `null`.
 
-This is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive that will reuse event listeners and signals across dependents.
+This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
 
 ### How to use it
 
@@ -74,7 +74,7 @@ createEffect(() => {
 
 Provides a signal with a sequence of currently held keys, as they were pressed down and up.
 
-This is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive that will reuse event listeners and signals across dependents.
+This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
 
 ### How to use it
 

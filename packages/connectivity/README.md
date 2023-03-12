@@ -55,7 +55,7 @@ isOnline(); // T: boolean
 
 ### `useConnectivitySignal`
 
-This primitive provides a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) variant that will reuse event listeners and signals across dependents.
+This primitive provides a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) variant that will reuse event listeners and signals across dependents.
 
 It's behavior is the same as [`createConnectivitySignal`](#createConnectivitySignal).
 

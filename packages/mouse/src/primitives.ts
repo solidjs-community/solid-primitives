@@ -1,5 +1,5 @@
 import { createStaticStore, MaybeAccessor, Position } from "@solid-primitives/utils";
-import { createSharedRoot } from "@solid-primitives/rootless";
+import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import {
   DEFAULT_MOUSE_POSITION,
   DEFAULT_RELATIVE_ELEMENT_POSITION,
@@ -13,7 +13,7 @@ import {
   PositionRelativeToElement,
   UseTouchOptions,
 } from "./types";
-import { Accessor, createComputed, createEffect, onMount } from "solid-js";
+import { Accessor, createComputed, createEffect, onMount, sharedConfig } from "solid-js";
 
 export interface MousePositionOptions extends UseTouchOptions, FollowTouchOptions {
   /**
@@ -51,13 +51,16 @@ export function createMousePosition(
   target?: MaybeAccessor<Window | Document | HTMLElement>,
   options: MousePositionOptions = {},
 ): MousePositionInside {
-  if (process.env.SSR) {
-    return DEFAULT_MOUSE_POSITION;
-  }
-  const [state, setState] = createStaticStore<MousePositionInside>({
+  const fallback: MousePositionInside = {
     ...DEFAULT_MOUSE_POSITION,
     ...options.initialValue,
-  });
+  };
+
+  if (process.env.SSR) {
+    return fallback;
+  }
+
+  const [state, setState] = createStaticStore(fallback);
 
   const attachListeners = (el: Window | Document | HTMLElement | undefined) => {
     makeMousePositionListener(el, setState, options);
@@ -73,7 +76,7 @@ export function createMousePosition(
 /**
  * Attaches event listeners to `window` to provide a reactive object of current mouse position on the page.
  *
- * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot).
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot).
  * @returns reactive object of current mouse position on the page
  * ```ts
  * { x: number, y: number, sourceType: MouseSourceType, isInside: boolean }
@@ -85,7 +88,7 @@ export function createMousePosition(
  *   console.log(pos.x, pos.y)
  * })
  */
-export const useMousePosition = /*#__PURE__*/ createSharedRoot(
+export const useMousePosition = /*#__PURE__*/ createHydratableSingletonRoot(
   createMousePosition.bind(void 0, void 0, void 0),
 );
 
@@ -116,24 +119,36 @@ export function createPositionToElement(
     ...DEFAULT_RELATIVE_ELEMENT_POSITION,
     ...options.initialValue,
   };
+
   if (process.env.SSR) {
     return fallback;
   }
+
+  const isFn = typeof element === "function";
+
   const calcState = (el: Element) => {
     const { x, y } = pos();
     return getPositionToElement(x, y, el);
   };
-  const getState =
-    typeof element === "function"
+
+  const [state, setState] = createStaticStore<PositionRelativeToElement>(
+    isFn || sharedConfig.context ? fallback : calcState(element),
+  );
+
+  const getState = isFn
       ? () => {
           const el = element();
           return el ? calcState(el) : fallback;
         }
-      : calcState.bind(void 0, element);
+      : calcState.bind(void 0, element),
+    updateState = () => setState(getState());
 
-  const [state, setState] = createStaticStore<PositionRelativeToElement>(fallback);
-  createComputed(() => setState(getState()));
-  if (typeof element === "function") onMount(() => setState(getState()));
+  if (sharedConfig.context) {
+    onMount(() => createComputed(updateState));
+  } else {
+    createComputed(updateState);
+    if (isFn) onMount(updateState);
+  }
 
   return state;
 }

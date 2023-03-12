@@ -1,5 +1,5 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
-import { createSharedRoot } from "@solid-primitives/rootless";
+import { createSingletonRoot } from "@solid-primitives/rootless";
 import { arrayEquals } from "@solid-primitives/utils";
 import { Accessor, batch, createEffect, createMemo, createSignal, on, untrack } from "solid-js";
 
@@ -17,7 +17,7 @@ function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
 /**
  * Provides a signal with the list of currently held keys, ordered from least recent to most recent.
  *
- * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot). *(signals and event-listeners are reused across dependents)*
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot). *(signals and event-listeners are reused across dependents)*
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#useKeyDownList
  *
@@ -35,7 +35,7 @@ function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
  * })
  * ```
  */
-export const useKeyDownList = /*#__PURE__*/ createSharedRoot<
+export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<
   [keys: Accessor<string[]>, other: { event: Accessor<KeyboardEvent | null> }]
 >(() => {
   if (process.env.SSR) {
@@ -76,7 +76,7 @@ export const useKeyDownList = /*#__PURE__*/ createSharedRoot<
 /**
  * Provides a signal with the currently held single key. Pressing any other key at the same time will reset the signal to `null`.
  *
- * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot). *(signals and event-listeners are reused across dependents)*
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot). *(signals and event-listeners are reused across dependents)*
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#useCurrentlyHeldKey
  *
@@ -93,27 +93,29 @@ export const useKeyDownList = /*#__PURE__*/ createSharedRoot<
  * })
  * ```
  */
-export const useCurrentlyHeldKey = /*#__PURE__*/ createSharedRoot<Accessor<string | null>>(() => {
-  if (process.env.SSR) {
-    return () => null;
-  }
+export const useCurrentlyHeldKey = /*#__PURE__*/ createSingletonRoot<Accessor<string | null>>(
+  () => {
+    if (process.env.SSR) {
+      return () => null;
+    }
 
-  const [keys] = useKeyDownList();
-  let prevKeys = untrack(keys);
+    const [keys] = useKeyDownList();
+    let prevKeys = untrack(keys);
 
-  return createMemo(() => {
-    const _keys = keys();
-    const prev = prevKeys;
-    prevKeys = _keys;
-    if (prev.length === 0 && _keys.length === 1) return _keys[0]!;
-    return null;
-  });
-});
+    return createMemo(() => {
+      const _keys = keys();
+      const prev = prevKeys;
+      prevKeys = _keys;
+      if (prev.length === 0 && _keys.length === 1) return _keys[0]!;
+      return null;
+    });
+  },
+);
 
 /**
  * Provides a signal with a sequence of currently held keys, as they were pressed down and up.
  *
- * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot). *(signals and event-listeners are reused across dependents)*
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot). *(signals and event-listeners are reused across dependents)*
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#useKeyDownSequence
  *
@@ -131,7 +133,7 @@ export const useCurrentlyHeldKey = /*#__PURE__*/ createSharedRoot<Accessor<strin
  * })
  * ```
  */
-export const useKeyDownSequence = /*#__PURE__*/ createSharedRoot<Accessor<string[][]>>(() => {
+export const useKeyDownSequence = /*#__PURE__*/ createSingletonRoot<Accessor<string[][]>>(() => {
   if (process.env.SSR) {
     return () => [];
   }

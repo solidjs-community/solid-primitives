@@ -1,12 +1,23 @@
-import { createEffect, onCleanup, on, $PROXY, $TRACK, Accessor, onMount } from "solid-js";
+import {
+  createEffect,
+  onCleanup,
+  on,
+  $PROXY,
+  $TRACK,
+  Accessor,
+  onMount,
+  sharedConfig,
+} from "solid-js";
 import {
   asArray,
   Many,
   MaybeAccessor,
   handleDiffArray,
+  createHydratableStaticStore,
   createStaticStore,
+  access,
 } from "@solid-primitives/utils";
-import { createSharedRoot } from "@solid-primitives/rootless";
+import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { makeEventListener } from "@solid-primitives/event-listener";
 
 export type ResizeHandler = (
@@ -102,6 +113,8 @@ export function createResizeObserver(
   );
 }
 
+const WINDOW_SIZE_FALLBACK = { width: 0, height: 0 } as const;
+
 /**
  * @returns object with width and height dimensions of window, page and screen.
  */
@@ -109,7 +122,7 @@ export function getWindowSize(): {
   width: number;
   height: number;
 } {
-  if (process.env.SSR) return { width: 0, height: 0 };
+  if (process.env.SSR) return { ...WINDOW_SIZE_FALLBACK };
   return {
     width: window.innerWidth,
     height: window.innerHeight,
@@ -129,18 +142,17 @@ export function createWindowSize(): {
   readonly height: number;
 } {
   if (process.env.SSR) {
-    return getWindowSize();
+    return WINDOW_SIZE_FALLBACK;
   }
-  const [size, setSize] = createStaticStore(getWindowSize());
-  const updateSize = () => setSize(getWindowSize());
-  makeEventListener(window, "resize", updateSize);
+  const [size, setSize] = createHydratableStaticStore(WINDOW_SIZE_FALLBACK, getWindowSize);
+  makeEventListener(window, "resize", () => setSize(getWindowSize()));
   return size;
 }
 
 /**
  * Returns a reactive store-like object of current width and height dimensions of window, page and screen.
  *
- * This is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive.
+ * This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive.
  *
  * @example
  * const size = useWindowSize();
@@ -149,7 +161,9 @@ export function createWindowSize(): {
  * })
  */
 export const useWindowSize: typeof createWindowSize =
-  /*#__PURE__*/ createSharedRoot(createWindowSize);
+  /*#__PURE__*/ createHydratableSingletonRoot(createWindowSize);
+
+const ELEMENT_SIZE_FALLBACK = { width: null, height: null } as const;
 
 /**
  * @param target html element
@@ -158,8 +172,9 @@ export const useWindowSize: typeof createWindowSize =
 export function getElementSize(
   target: Element | false | undefined | null,
 ): { width: number; height: number } | { width: null; height: null } {
-  if (process.env.SSR || !target) return { width: null, height: null };
-
+  if (process.env.SSR || !target) {
+    return { ...ELEMENT_SIZE_FALLBACK };
+  }
   const { width, height } = target.getBoundingClientRect();
   return { width, height };
 }
@@ -188,18 +203,20 @@ export function createElementSize(target: Accessor<Element | false | undefined |
   readonly height: number | null;
 } {
   if (process.env.SSR) {
-    return { width: null, height: null };
+    return ELEMENT_SIZE_FALLBACK;
   }
 
+  const isFn = typeof target === "function";
+  const initWithFallback = isFn || sharedConfig.context;
+
   const [size, setSize] = createStaticStore(
-    typeof target !== "function"
-      ? getElementSize(target)
-      : (() => {
-          onMount(() => setSize(getElementSize(target())));
-          return { width: null, height: null };
-        })(),
+    initWithFallback ? ELEMENT_SIZE_FALLBACK : getElementSize(target),
   );
-  const updateSize = (e: DOMRectReadOnly) => setSize({ width: e.width, height: e.height });
-  createResizeObserver(typeof target === "function" ? () => target() || [] : target, updateSize);
+
+  initWithFallback && onMount(() => setSize(getElementSize(access(target))));
+
+  createResizeObserver(isFn ? () => target() || [] : target, e =>
+    setSize({ width: e.width, height: e.height }),
+  );
   return size;
 }

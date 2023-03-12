@@ -100,7 +100,7 @@ describe("createMouseToElement", () => {
         height: 4,
         top: 5,
         left: 6,
-        isInside: false,
+        isInside: true,
       });
 
       dispose();

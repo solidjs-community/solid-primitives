@@ -1,7 +1,7 @@
-import { createComputed, on, onMount } from "solid-js";
-import { access, createStaticStore, MaybeAccessor } from "@solid-primitives/utils";
+import { createComputed, onMount, sharedConfig } from "solid-js";
+import { createStaticStore, MaybeAccessor } from "@solid-primitives/utils";
 import { createEventListener } from "@solid-primitives/event-listener";
-import { createSharedRoot } from "@solid-primitives/rootless";
+import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 
 export function getScrollParent(node: Element | null): Element {
   if (process.env.SSR) {
@@ -22,6 +22,9 @@ export function isScrollable(node: Element): boolean {
   return /(auto|scroll)/.test(style.overflow + style.overflowX + style.overflowY);
 }
 
+const SERVER_SCROLL_POSITION = { x: 0, y: 0 } as const;
+const NULL_SCROLL_POSITION = { x: null, y: null } as const;
+
 /**
  * Get an `{ x: number, y: number }` object of element/window scroll position.
  */
@@ -38,9 +41,9 @@ export function getScrollPosition(target: Element | Window | undefined): {
   y: number | null;
 } {
   if (process.env.SSR) {
-    return { x: 0, y: 0 };
+    return { ...SERVER_SCROLL_POSITION };
   }
-  if (!target) return { x: null, y: null };
+  if (!target) return { ...NULL_SCROLL_POSITION };
   if (target instanceof Window)
     return {
       x: target.scrollX,
@@ -85,22 +88,36 @@ export function createScrollPosition(
   readonly y: number | null;
 } {
   if (process.env.SSR) {
-    return { x: 0, y: 0 };
+    return SERVER_SCROLL_POSITION;
   }
-  const [pos, setPos] = createStaticStore(getScrollPosition(access(target)));
-  const updatePos = () => setPos(getScrollPosition(access(target)));
-  if (typeof target === "function") {
-    createComputed(on(target, ref => setPos(getScrollPosition(ref)), { defer: true }));
+
+  const isFn = typeof target === "function";
+
+  const getTargetPos = isFn ? () => getScrollPosition(target()) : () => getScrollPosition(target);
+  const updatePos = () => setPos(getTargetPos());
+
+  const [pos, setPos] = createStaticStore(
+    isFn || sharedConfig.context ? NULL_SCROLL_POSITION : getTargetPos(),
+  );
+
+  if (sharedConfig.context) {
+    onMount(isFn ? () => createComputed(updatePos) : updatePos);
+  } else if (isFn) {
+    createComputed(updatePos);
     onMount(updatePos);
+  } else {
+    updatePos();
   }
+
   createEventListener(target, "scroll", updatePos);
+
   return pos;
 }
 
 /**
  * Returns a reactive object with current window scroll position.
  *
- * This is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive.
+ * This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive.
  *
  * @example
  * const scroll = useWindowScrollPosition();
@@ -108,6 +125,6 @@ export function createScrollPosition(
  *   console.log(scroll.x, scroll.y)
  * })
  */
-export const useWindowScrollPosition = /*#__PURE__*/ createSharedRoot(() =>
+export const useWindowScrollPosition = /*#__PURE__*/ createHydratableSingletonRoot(() =>
   createScrollPosition(window),
 );

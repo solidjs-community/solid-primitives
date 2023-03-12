@@ -97,7 +97,7 @@
   },
   "devDependencies": {
     "@solid-primitives/mouse": "^2.0.8",
-    "@solidjs/router": "^0.7.0"
+    "@solidjs/router": "^0.8.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0"
