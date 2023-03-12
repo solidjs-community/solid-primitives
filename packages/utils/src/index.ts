@@ -14,7 +14,7 @@ import {
   sharedConfig,
   onMount,
 } from "solid-js";
-import { isServer as _isServer } from "solid-js/web";
+import { isServer } from "solid-js/web";
 import type {
   AnyClass,
   MaybeAccessor,
@@ -37,7 +37,7 @@ export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
-export const isServer: boolean = _isServer;
+export { isServer };
 export const isClient = !isServer;
 
 /** development environment */
