@@ -1,5 +1,15 @@
 # @solid-primitives/media
 
+## 2.1.4
+
+### Patch Changes
+
+- 464248f7: Improve behavior of primitives under hydration.
+- Updated dependencies [464248f7]
+- Updated dependencies [464248f7]
+  - @solid-primitives/rootless@1.3.0
+  - @solid-primitives/utils@5.5.0
+
 ## 2.1.3
 
 ### Patch Changes
