@@ -23,7 +23,8 @@
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "deep"
   ],
   "private": false,
   "sideEffects": false,
