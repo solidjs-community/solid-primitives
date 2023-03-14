@@ -24,7 +24,7 @@ import { Store } from "solid-js/store";
  * ```
  */
 export function deepTrack<T>(store: Store<T>): T {
-  return deepTraverse(store);
+  return deepTraverse(store, new Set());
 }
 
 /**
@@ -33,21 +33,13 @@ export function deepTrack<T>(store: Store<T>): T {
  * @returns an object with all values traversed
  * @private
  * */
-function deepTraverse<T>(value: Store<T>, seen?: Set<unknown>): T {
-  if (!isWrappable(value)) {
-    return value;
+function deepTraverse<T>(value: Store<T>, seen: Set<unknown>): T {
+  if (!seen.has(value) && isWrappable(value)) {
+    seen.add(value);
+    for (const key in value) {
+      deepTraverse(value[key], seen);
+    }
   }
-
-  seen = seen || new Set();
-  if (seen.has(value)) {
-    return value;
-  }
-  seen.add(value);
-
-  for (const key in value) {
-    deepTraverse(value[key], seen);
-  }
-
   return value;
 }
 
