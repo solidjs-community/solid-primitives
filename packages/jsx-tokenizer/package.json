@@ -24,7 +24,7 @@
       "resolveTokens",
       "isToken"
     ],
-    "category": "Utilities"
+    "category": "Control Flow"
   },
   "keywords": [
     "solid",
