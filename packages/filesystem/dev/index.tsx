@@ -1,6 +1,6 @@
 import { createSignal, Show, For, Component, createResource, ErrorBoundary } from "solid-js";
 import { render } from "solid-js/web";
-import { AsyncFileSystem, createFileSystem, makeObjectFileSystem, makeWebAccessFileSystem, SyncFileSystem } from "../src/index";
+import { AsyncFileSystem, createFileSystem, makeVirtualFileSystem, makeWebAccessFileSystem, SyncFileSystem } from "../src/index";
 import "uno.css";
 
 const SyncFile = (props: { fs: SyncFileSystem, path: string }) => {
@@ -95,7 +95,7 @@ const AsyncDir = (props: { path: string, fs: AsyncFileSystem }) => {
 }
 
 const App: Component = () => {
-  const ofs = makeObjectFileSystem({
+  const ofs = makeVirtualFileSystem({
     src: { "index.ts": "console.log(0);\n" },
   }, localStorage);
   const vfs = createFileSystem(ofs);

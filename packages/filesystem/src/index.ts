@@ -1,179 +1,6 @@
 ///<reference path="../node_modules/@types/wicg-file-system-access/index.d.ts" />
-import { createEffect, createResource, createSignal, getOwner, on, runWithOwner } from "solid-js";
-import type { Accessor, Owner, Resource, ResourceActions, Setter } from "solid-js";
-
-export type FSItem = {
-  delete: () => void;
-  readonly length: number;
-  uri: string;
-  rename: (name: string) => void;
-  type: "dir" | "file";
-};
-export type FSDir<Items extends string[] = string[]> = FSItem & {
-  [name in Items[number]]: FSDir<Items> | FSFile;
-} & {
-  readonly items: Items;
-  mkdir: (uri: string) => void | Promise<void>;
-  mkfile: (uri: string, data?: string) => void | Promise<void>;
-  type: "dir";
-};
-export type FSFile = FSItem & {
-  // accessor for synchronous fs, resource for async fs
-  data: () => string | undefined;
-  setData: (data: string) => void;
-  type: "file";
-};
-
-export type FileSystem = FSDir;
-
-export type FSSignals = Map<string, [Accessor<void>, Setter<void>]>;
-
-const applyItem = (dir: FSDir, getNode: (uri: string) => FSDir | FSFile) => (item: string) => {
-  Object.defineProperty(dir, item, {
-    configurable: true,
-    enumerable: true,
-    get: () => getNode(`${dir.uri}/${item}`),
-    set: () => {
-      throw new Error("attempting to write fs tree");
-    },
-  });
-};
-
-const createNode = (
-  uri: string,
-  fs: FileSystemAdapter,
-  signals: FSSignals,
-  owner?: Owner | null,
-): FSDir | FSFile => {
-  uri = uri.startsWith("/") ? uri.slice(1) : uri;
-  const path: string[] = uri.split("/");
-  if (fs.async) {
-    throw new Error("TODO: async file system not yet supported");
-  } else {
-    const type = fs.getType(uri);
-    if (type === undefined) {
-      throw new Error(`cannot read filesystem entry (uri "${uri}" yields undefined)`);
-    }
-    if (!signals.has(uri)) {
-      signals.set(uri, createSignal<void>(undefined, { equals: false }));
-    }
-    const [change, changed] = signals.get(uri) as [Accessor<void>, Setter<void>];
-    if (type === "file") {
-      let initial = true;
-      let data: string | undefined;
-      const file: FSFile = {
-        uri,
-        type: "file" as const,
-        data: () => {
-          change();
-          if (initial) {
-            initial = false;
-            data = fs.readFile(uri);
-          }
-          return data;
-        },
-        delete: () => {
-          data = undefined;
-          fs.rm(uri);
-          setTimeout(() => {
-            signals.delete(uri);
-            signals.get(uri.split("/").slice(0, -1).join("/"))?.[1]();
-          }, 0);
-        },
-        get length() {
-          return file.data()?.length || 0;
-        },
-        rename: name => {
-          const dest = name.indexOf("/") === -1 ? `${path.slice(0, -1).join("/")}/${name}` : name;
-          if (uri === dest) {
-            return;
-          }
-          if (typeof fs.rename === "function") {
-            fs.rename(uri, dest);
-          } else {
-            fs.writeFile(dest, file.data() || "");
-            fs.rm(uri);
-          }
-          changed();
-          setTimeout(() => {
-            signals.delete(uri);
-            signals.set(dest, createSignal<void>(undefined, { equals: false }));
-            signals.get(dest.split("/").slice(0, -1).join("/"))?.[1]();
-          }, 0);
-        },
-        setData(update) {
-          data = update;
-          fs.writeFile(uri, update);
-          changed();
-        },
-      };
-      return file;
-    }
-    const [items, setItems] = createSignal<string[]>(fs.readdir(uri));
-    const dir = {
-      uri,
-      get items() {
-        return items();
-      },
-      type: "dir" as const,
-      get length() {
-        return items().length;
-      },
-      rename: (name: string) => {
-        const dest = (
-          name.indexOf("/") === -1 ? `${path.slice(0, -1).join("/")}/${name}` : name
-        ).replace(/^\//, "");
-        if (typeof fs.rename === "function") {
-          fs.rename(uri, dest);
-        } else {
-          fs.mkdir(dest);
-          for (let i = 0; i < items.length; i++) {
-            fs.writeFile(`${dest}/${items()[i]}`, fs.readFile(`${uri}/${items()[i]}`));
-          }
-          fs.rm(uri);
-        }
-        dir.uri = dest;
-        changed();
-        signals.get(dest.split("/").slice(0, -1).join("/"))?.[1]();
-      },
-      delete: () => {
-        fs.rm(uri);
-        changed();
-        signals.get(uri.split("/").slice(0, -1).join("/"))?.[1]();
-      },
-      mkdir: (name: string) => {
-        const dest = uri !== "/" ? `${uri}/${name}` : name;
-        fs.mkdir(dest);
-        signals.set(dest, createSignal<void>(undefined, { equals: false }));
-        applyItem(dir, uri => createNode(uri, fs, signals, owner))(dest);
-        setTimeout(changed, 10);
-      },
-      mkfile: (name: string, data: string | undefined) => {
-        const dest = uri !== "/" ? `${uri}/${name}` : name;
-        fs.writeFile(dest, data || "");
-        signals.set(dest, createSignal<void>(undefined, { equals: false }));
-        applyItem(dir, uri => createNode(uri, fs, signals, owner))(dest);
-        setTimeout(changed, 10);
-      },
-    } as FSDir;
-    const effect = on(change, () => setItems(fs.readdir(uri)), { defer: true });
-    owner
-      ? runWithOwner(owner, () => {
-          createEffect(effect);
-          items().forEach(applyItem(dir, uri => createNode(uri, fs, signals, owner)));
-        })
-      : () => {
-          createEffect(effect);
-          items().forEach(applyItem(dir, uri => createNode(uri, fs, signals, owner)));
-        };
-    return dir;
-  }
-};
-
-export const createFileSystemStore = (adapter: FileSystemAdapter): FileSystem => {
-  const signals: FSSignals = new Map();
-  return createNode("", adapter, signals, getOwner()) as FileSystem;
-};
+import { createResource, createSignal } from "solid-js";
+import type { Accessor, Resource, ResourceActions, Setter } from "solid-js";
 
 export type FileType = "dir" | "file" | undefined;
 
@@ -249,7 +76,6 @@ export const createSyncFileSystem = (adapter: SyncFileSystemAdapter): SyncFileSy
     },
     mkdir: path => {
       adapter.mkdir(path);
-      console.log(getParentDir(path));
       readdirMap.get(getParentDir(path))?.[1](items => [...items, path] as [string, ...string[]]);
       fs.readdir(path)();
     },
@@ -432,14 +258,26 @@ export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter): AsyncFil
   return fs;
 };
 
-export type ObjectFileSystem = { [id: string]: string | ObjectFileSystem };
-type ObjectFileSystemItem = ObjectFileSystem | string | undefined;
+export function createFileSystem(fs: SyncFileSystemAdapter): SyncFileSystem;
+export function createFileSystem(fs: AsyncFileSystemAdapter): AsyncFileSystem;
+export function createFileSystem(fs: Promise<AsyncFileSystemAdapter>): Promise<AsyncFileSystem>;
+export function createFileSystem(fs: FileSystemAdapter | Promise<AsyncFileSystemAdapter>): 
+SyncFileSystem | AsyncFileSystem | Promise<AsyncFileSystem> {
+  return fs instanceof Promise
+    ? fs.then(fs => createAsyncFileSystem(fs))
+    : fs.async
+    ? createAsyncFileSystem(fs)
+    : createSyncFileSystem(fs);
+}
 
-export const makeObjectFileSystem = (
+export type ObjectFileSystem = { [id: string]: string | ObjectFileSystem };
+export type ObjectFileSystemItem = ObjectFileSystem | string | undefined;
+
+export const makeVirtualFileSystem = (
   initial?: ObjectFileSystem,
   storage?: Storage,
   key = "solid-primitive-filesystem",
-): SyncFileSystemAdapter => {
+): SyncFileSystemAdapter & { toMap: () => Map<string, string>} => {
   let storedValue;
   try {
     storedValue = JSON.parse(storage?.getItem(key) || "null");
@@ -463,8 +301,23 @@ export const makeObjectFileSystem = (
     });
     return ref;
   };
-  return {
-    async: false,
+  function getFiles(): [string, string][];
+  function getFiles(filter: (path: string, content: string) => string): string[];
+  function getFiles(filter: (path: string, content: string) => [string, string]): [string, string][];
+  function getFiles(filter: any = (path: string, content: string) => [path, content]): any {
+    const files: ReturnType<typeof filter>[] = [];
+    const walker = (ref: ObjectFileSystemItem = fs || {}, path = "/") => {
+      typeof ref === 'object' && Object.keys(ref).forEach((item: string) =>
+        typeof ref[item] === "string"
+        ? files.push(filter(`${path}${item}`, ref[item] as string))
+        : walker(ref[item], `${path}${item}/`)
+      )
+    }
+    walker();
+    return files;
+  }
+  const ofs = {
+    async: false as const,
     getType: (path: string): FileType => {
       if (path === "" || path === "/") {
         return "dir";
@@ -569,20 +422,33 @@ export const makeObjectFileSystem = (
           return (ref = ref[part]);
         }
       }),
+    toMap: () => {
+      const fsMap = {
+        clear: () => ofs.rm("/"),
+        delete: (path) => ofs.getType(path) === "file" && ofs.rm(path),
+        entries: () => getFiles()[Symbol.iterator](),
+        forEach: (handler: (value: string, key: string, map: Map<string, string>) => void) => {
+          getFiles().forEach(([key, value]) => handler(value, key, fsMap));
+        },
+        get: (path) => { try { return ofs.readFile(path) } catch(e) {} },
+        has: (path) => ofs.getType(path) === "file",
+        keys: () => getFiles((path) => path)[Symbol.iterator](),
+        set: (path, data) => {
+          const parent = getParentDir(path);
+          ofs.getType(parent) !== "dir" && ofs.mkdir(parent);
+          ofs.writeFile(path, data);
+          return fsMap;
+        },
+        get size() { return getFiles().length },
+        values: () => getFiles((_, value) => value)[Symbol.iterator](),
+        [Symbol.iterator]: () => fsMap.entries(),
+        [Symbol.toStringTag]: "Map",
+      } as Map<string, string>;
+      return fsMap;
+    },
   };
+  return ofs;
 };
-
-export function createFileSystem(fs: SyncFileSystemAdapter): SyncFileSystem;
-export function createFileSystem(fs: AsyncFileSystemAdapter): AsyncFileSystem;
-export function createFileSystem(fs: Promise<AsyncFileSystemAdapter>): Promise<AsyncFileSystem>;
-export function createFileSystem(fs: FileSystemAdapter | Promise<AsyncFileSystemAdapter>): 
-SyncFileSystem | AsyncFileSystem | Promise<AsyncFileSystem> {
-  return fs instanceof Promise
-    ? fs.then(fs => createAsyncFileSystem(fs))
-    : fs.async
-    ? createAsyncFileSystem(fs)
-    : createSyncFileSystem(fs);
-}
 
 export const makeNoFileSystem = (): SyncFileSystemAdapter => ({
   async: false,
@@ -608,28 +474,31 @@ export const makeNoAsyncFileSystem = (): AsyncFileSystemAdapter => ({
 
 
 export const makeNodeFileSystem = process.env.SSR
-  ? (): AsyncFileSystemAdapter => {
-      const fs = require("fs/promises");
+  ? async (): Promise<AsyncFileSystemAdapter> => {
+      const fs = await import("fs/promises");
       return {
         async: true,
         getType: (path: string) =>
           fs
             .stat(path)
-            .then((stat: { isDirectory: () => boolean }) => (stat.isDirectory() ? "dir" : "file"))
+            .then((stat: { isDirectory: () => boolean }) => 
+              (stat.isDirectory() ? "dir" : "file"))
             .catch(() => undefined),
-        mkdir: (path: string) => fs.mkdir(path, { recursive: true }),
-        readdir: (path: string) => fs.readdir(path),
+        mkdir: (path: string) => fs.mkdir(path, { recursive: true }).then(() => undefined),
+        readdir: (path: string) => fs.readdir(path) as Promise<[] | [string, ...string[]]>,
         readFile: (path: string) => fs.readFile(path, { encoding: "utf8" }),
         rename: (previous: string, next: string) => fs.rename(previous, next),
         rm: (path: string) => fs.rm(path, { recursive: true }),
-        writeFile: (path: string, data: string) => fs.writeFile(path, { encoding: "utf8" }, data),
+        writeFile: (path: string, data: string) => 
+          fs.writeFile(path, data, { encoding: "utf8" }),
       };
     }
-  : makeNoFileSystem;
+  : makeNoAsyncFileSystem;
 
+// TODO: use solid-start/server for Filesystem access
 // TODO: use WebAPIs for Filesystem access
 
-export const makeWebAccessFileSystem =
+export const makeWebAccessFileSystem = process.env.SSR ? () => Promise.resolve(makeNoAsyncFileSystem()) :
   typeof globalThis.showDirectoryPicker === "function"
     ? async (options?: DirectoryPickerOptions | undefined): Promise<AsyncFileSystemAdapter> => {
         const handle = await globalThis.showDirectoryPicker(options);
@@ -654,7 +523,8 @@ export const makeWebAccessFileSystem =
           return currentHandle;
         };
         const getNext = (handle: FileSystemDirectoryHandle | FileSystemFileHandle, part: string) =>
-          handle.kind === "directory" ? handle.getDirectoryHandle(part).catch(e => undefined) : undefined;
+          handle.kind === "directory" ? handle.getDirectoryHandle(part)
+            .catch(() => handle.getFileHandle(part)).catch(() => undefined) : undefined;
         return {
           async: true,
           getType: async path =>
