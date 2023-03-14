@@ -248,21 +248,21 @@ function ParentComponent(props) {
 
 Also if you should be wary of placing context providers in between the component resolving the tokens and tokens passed as children. This will cause the context to be available in the `tokenData` function, but not necessarily when resolving the children of the tokens - as it might happen asynchronously under a different owner.
 
-For example, [`@solidjs/router`](https://github.com/solidjs/solid-router) which uses the same pattern, will break if you put a context provider between the `<Router />` and `<Route />` components.
+For example, [`@solidjs/router`](https://github.com/solidjs/solid-router) which uses the same pattern, will break if you put a context provider between the `<Routes />` and `<Route />` components.
 
 ```tsx
 // this will break
 function App() {
   return (
-    <Router>
+    <Routes>
       <MyContext.Provider value={{} /* some value */}>
         {/*
-          <Route> component prop is not rendered immediately, it is rendered within <Router>
+          <Route> component prop is not rendered immediately, it is rendered within <Routes>
           as later time, so the context will not be available in Home component
         */}
         <Route path="/" component={Home} />
       </MyContext.Provider>
-    </Router>
+    </Routes>
   );
 }
 
@@ -275,9 +275,9 @@ function Home() {
 function App() {
   return (
     <MyContext.Provider value={{} /* some value */}>
-      <Router>
+      <Routes>
         <Route path="/" component={Home} />
-      </Router>
+      </Routes>
     </MyContext.Provider>
   );
 }
