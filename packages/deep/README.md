@@ -25,6 +25,8 @@ pnpm add @solid-primitives/deep
 
 ## How to use it
 
+You can explicitly pass dependencies to effect functions like `on` and `defer` to deeply track its dependencies.
+
 ```ts
 createEffect(
   on(
@@ -34,6 +36,16 @@ createEffect(
     },
   ),
 );
+```
+
+Or since this has a composable design, you can create _derivative_ functions and use them similar to derivative signals.
+
+```ts
+const deeplyTrackedStore = () => deepTrack(sign);
+createEffect(() => {
+  console.log("Store is: ", deeplyTrackedStore());
+  //                        ^ this causes a re-execution of the effect on deep changes of properties
+});
 ```
 
 ## Demo
