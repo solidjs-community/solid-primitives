@@ -52,10 +52,8 @@ function deepTraverse<T>(value: Store<T>): T {
 }
 
 /**
- * isWrappable - copied from
- * /packages/solid/store/src/store.ts
- *
- * exported only for ´DEV´ mode so we need to copy it here
+ * isWrappable - copied from `/packages/solid/store/src/store.ts`
+ * as it is only exported for ´DEV´ mode, so we need to copy it here
  */
 function isWrappable(obj: any) {
   let proto;

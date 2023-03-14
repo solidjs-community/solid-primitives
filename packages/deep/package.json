@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/deep",
   "version": "0.0.100",
-  "description": "Create a Deep effect for Stores.",
+  "description": "Deep trigger effects for Stores.",
   "author": "Samuel Burbano <me@iosamuel.dev>",
   "contributors": [],
   "license": "MIT",
