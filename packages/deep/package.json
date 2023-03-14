@@ -1,0 +1,57 @@
+{
+  "name": "@solid-primitives/deep",
+  "version": "0.0.100",
+  "description": "Deep trigger effects for Stores.",
+  "author": "Samuel Burbano <me@iosamuel.dev>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/deep#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "deep",
+    "stage": 0,
+    "list": [
+      "deepTrack"
+    ],
+    "category": "Reactivity"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "deep"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "browser": {},
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "dev": "vite serve dev",
+    "page": "vite build dev",
+    "build": "jiti ../../scripts/build.ts",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.0"
+  },
+  "typesVersions": {}
+}
