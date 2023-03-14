@@ -1,9 +1,9 @@
 import { renderToString } from "solid-js/web";
 import { describe, expect, it } from "vitest";
-import { createJSXParser, createToken, resolveTokens } from "../src";
+import { createTokenizer, createToken, resolveTokens } from "../src";
 
 describe("jsx-parser", () => {
-  const parser1 = createJSXParser<{
+  const parser1 = createTokenizer<{
     type: "my-token";
     props: { text: string };
   }>();
@@ -31,7 +31,7 @@ describe("jsx-parser", () => {
   });
 
   it("should render tokens", () => {
-    const parser2 = createJSXParser();
+    const parser2 = createTokenizer();
 
     const MyToken2 = createToken(
       parser2,
