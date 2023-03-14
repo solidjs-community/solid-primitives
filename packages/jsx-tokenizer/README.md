@@ -226,6 +226,63 @@ import { resolveTokens } from "@solid-primitives/jsx-tokenizer";
 const els = resolveTokens([tokenizer1, tokenizer2, MyTokenComponent], () => props.children);
 ```
 
+### Usage with Context API
+
+Since `resolveTokens` is eagerly resolving the JSX structure, if you want to provide context for the tokens to be accessed in the `tokenData` function, you have to wrap `resolveTokens` with the provider:
+
+```tsx
+function ParentComponent(props) {
+  return (
+    <MyContext.Provider value={{} /* some value */}>
+      {untrack(() => {
+        const tokens = resolveTokens(tokenizer, () => props.children);
+
+        // handle tokens ...
+
+        return <>{tokens()}</>;
+      })}
+    </MyContext.Provider>
+  );
+}
+```
+
+Also if you should be wary of placing context providers in between the component resolving the tokens and tokens passed as children. This will cause the context to be available in the `tokenData` function, but not necessarily when resolving the children of the tokens - as it might happen asynchronously under a different owner.
+
+For example, [`@solidjs/router`](https://github.com/solidjs/solid-router) which uses the same pattern, will break if you put a context provider between the `<Router />` and `<Route />` components.
+
+```tsx
+// this will break
+function App() {
+  return (
+    <Router>
+      <MyContext.Provider value={{} /* some value */}>
+        {/*
+          <Route> component prop is not rendered immediately, it is rendered within <Router>
+          as later time, so the context will not be available in Home component
+        */}
+        <Route path="/" component={Home} />
+      </MyContext.Provider>
+    </Router>
+  );
+}
+
+function Home() {
+  const ctx = useContext(MyContext);
+  ctx; // => undefined
+}
+
+// do this instead
+function App() {
+  return (
+    <MyContext.Provider value={{} /* some value */}>
+      <Router>
+        <Route path="/" component={Home} />
+      </Router>
+    </MyContext.Provider>
+  );
+}
+```
+
 ## `isToken`
 
 A function to validate if a value is a token created by the corresponding jsx-tokenizer.
