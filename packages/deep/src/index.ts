@@ -38,14 +38,8 @@ function deepTraverse<T>(value: Store<T>): T {
     return value;
   }
 
-  if (Array.isArray(value)) {
-    for (let i = 0; i < value.length; i++) {
-      deepTraverse(value[i]);
-    }
-  } else if (isWrappable(value)) {
-    for (const key in value) {
-      deepTraverse(value[key]);
-    }
+  for (const key in value) {
+    deepTraverse(value[key]);
   }
 
   return value;
