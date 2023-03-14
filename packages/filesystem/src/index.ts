@@ -1,5 +1,5 @@
 ///<reference path="../node_modules/@types/wicg-file-system-access/index.d.ts" />
-import { createResource, createSignal } from "solid-js";
+import { batch, createResource, createSignal } from "solid-js";
 import type { Accessor, Resource, ResourceActions, Setter } from "solid-js";
 
 export type FileType = "dir" | "file" | undefined;
@@ -208,11 +208,13 @@ export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter): AsyncFil
     },
     writeFile: (path, data) =>
       adapter.writeFile(path, data).then(() => {
-        readFileMap.get(path)?.[1].mutate(data)
+        readFileMap.get(path)?.[1].mutate(data);
         const name = path.split("/").at(-1);
-        readdirMap.get(getParentDir(path))?.[1].mutate(
-          (items) => items.includes(name) ? items : [...items, name] as [string, ...string[]]
-        );
+        readdirMap
+          .get(getParentDir(path))?.[1]
+          .mutate(items =>
+            items.includes(name) ? items : ([...items, name] as [string, ...string[]]),
+          );
       }),
     rename: async (previous, next) => {
       const previousType = await adapter.getType(previous);
@@ -236,11 +238,16 @@ export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter): AsyncFil
         } else {
           await adapter.writeFile(next, await adapter.readFile(previous));
         }
+        await adapter.rm(previous);
       }
-      getTypeMap.get(previous)?.[1].mutate(undefined);
-      getTypeMap.delete(previous);
-      readdirMap.get(getParentDir(previous))?.[1].refetch();
-      readdirMap.get(getParentDir(next))?.[1].refetch();
+      batch(() => {
+        getTypeMap.get(previous)?.[1].mutate(undefined);
+        getTypeMap.delete(previous);
+        const previousParent = getParentDir(previous);
+        readdirMap.get(previousParent)?.[1].refetch();
+        const nextParent = getParentDir(next);
+        if (previousParent !== nextParent) readdirMap.get(nextParent)?.[1].refetch();
+      });
     },
     rm: path =>
       adapter.rm(path).then(() => {
@@ -261,8 +268,9 @@ export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter): AsyncFil
 export function createFileSystem(fs: SyncFileSystemAdapter): SyncFileSystem;
 export function createFileSystem(fs: AsyncFileSystemAdapter): AsyncFileSystem;
 export function createFileSystem(fs: Promise<AsyncFileSystemAdapter>): Promise<AsyncFileSystem>;
-export function createFileSystem(fs: FileSystemAdapter | Promise<AsyncFileSystemAdapter>): 
-SyncFileSystem | AsyncFileSystem | Promise<AsyncFileSystem> {
+export function createFileSystem(
+  fs: FileSystemAdapter | Promise<AsyncFileSystemAdapter>,
+): SyncFileSystem | AsyncFileSystem | Promise<AsyncFileSystem> {
   return fs instanceof Promise
     ? fs.then(fs => createAsyncFileSystem(fs))
     : fs.async
@@ -277,7 +285,7 @@ export const makeVirtualFileSystem = (
   initial?: ObjectFileSystem,
   storage?: Storage,
   key = "solid-primitive-filesystem",
-): SyncFileSystemAdapter & { toMap: () => Map<string, string>} => {
+): SyncFileSystemAdapter & { toMap: () => Map<string, string> } => {
   let storedValue;
   try {
     storedValue = JSON.parse(storage?.getItem(key) || "null");
@@ -303,16 +311,19 @@ export const makeVirtualFileSystem = (
   };
   function getFiles(): [string, string][];
   function getFiles(filter: (path: string, content: string) => string): string[];
-  function getFiles(filter: (path: string, content: string) => [string, string]): [string, string][];
+  function getFiles(
+    filter: (path: string, content: string) => [string, string],
+  ): [string, string][];
   function getFiles(filter: any = (path: string, content: string) => [path, content]): any {
     const files: ReturnType<typeof filter>[] = [];
     const walker = (ref: ObjectFileSystemItem = fs || {}, path = "/") => {
-      typeof ref === 'object' && Object.keys(ref).forEach((item: string) =>
-        typeof ref[item] === "string"
-        ? files.push(filter(`${path}${item}`, ref[item] as string))
-        : walker(ref[item], `${path}${item}/`)
-      )
-    }
+      typeof ref === "object" &&
+        Object.keys(ref).forEach((item: string) =>
+          typeof ref[item] === "string"
+            ? files.push(filter(`${path}${item}`, ref[item] as string))
+            : walker(ref[item], `${path}${item}/`),
+        );
+    };
     walker();
     return files;
   }
@@ -425,21 +436,27 @@ export const makeVirtualFileSystem = (
     toMap: () => {
       const fsMap = {
         clear: () => ofs.rm("/"),
-        delete: (path) => ofs.getType(path) === "file" && ofs.rm(path),
+        delete: path => ofs.getType(path) === "file" && ofs.rm(path),
         entries: () => getFiles()[Symbol.iterator](),
         forEach: (handler: (value: string, key: string, map: Map<string, string>) => void) => {
           getFiles().forEach(([key, value]) => handler(value, key, fsMap));
         },
-        get: (path) => { try { return ofs.readFile(path) } catch(e) {} },
-        has: (path) => ofs.getType(path) === "file",
-        keys: () => getFiles((path) => path)[Symbol.iterator](),
+        get: path => {
+          try {
+            return ofs.readFile(path);
+          } catch (e) {}
+        },
+        has: path => ofs.getType(path) === "file",
+        keys: () => getFiles(path => path)[Symbol.iterator](),
         set: (path, data) => {
           const parent = getParentDir(path);
           ofs.getType(parent) !== "dir" && ofs.mkdir(parent);
           ofs.writeFile(path, data);
           return fsMap;
         },
-        get size() { return getFiles().length },
+        get size() {
+          return getFiles().length;
+        },
         values: () => getFiles((_, value) => value)[Symbol.iterator](),
         [Symbol.iterator]: () => fsMap.entries(),
         [Symbol.toStringTag]: "Map",
@@ -472,120 +489,148 @@ export const makeNoAsyncFileSystem = (): AsyncFileSystemAdapter => ({
   writeFile: () => Promise.resolve(),
 });
 
+export const limitPath =
+  (basePath: string) =>
+  (path: string): string => {
+    const parts = (basePath + "/" + path).split("/").filter(part => !!part);
+    let nextDots: number;
+    while ((nextDots = parts.indexOf("..")) > -1) {
+      if (nextDots === 0) {
+        throw new Error(`cannot go below root path: ${path}`);
+      }
+      parts.splice(nextDots - 1, 2);
+    }
+    const result = (basePath.startsWith("/") ? "/" : "") + parts.join("/");
+    if (!result.startsWith(basePath)) {
+      throw new Error(`cannot go below base path: ${path}`);
+    }
+    return result;
+  };
 
 export const makeNodeFileSystem = process.env.SSR
-  ? async (): Promise<AsyncFileSystemAdapter> => {
+  ? async (basePath: string = "/"): Promise<AsyncFileSystemAdapter> => {
       const fs = await import("fs/promises");
+      const p = limitPath(basePath);
       return {
         async: true,
         getType: (path: string) =>
           fs
-            .stat(path)
-            .then((stat: { isDirectory: () => boolean }) => 
-              (stat.isDirectory() ? "dir" : "file"))
+            .stat(p(path))
+            .then((stat: { isDirectory: () => boolean }) => (stat.isDirectory() ? "dir" : "file"))
             .catch(() => undefined),
-        mkdir: (path: string) => fs.mkdir(path, { recursive: true }).then(() => undefined),
-        readdir: (path: string) => fs.readdir(path) as Promise<[] | [string, ...string[]]>,
-        readFile: (path: string) => fs.readFile(path, { encoding: "utf8" }),
-        rename: (previous: string, next: string) => fs.rename(previous, next),
-        rm: (path: string) => fs.rm(path, { recursive: true }),
-        writeFile: (path: string, data: string) => 
-          fs.writeFile(path, data, { encoding: "utf8" }),
+        mkdir: (path: string) => fs.mkdir(p(path), { recursive: true }).then(() => undefined),
+        readdir: (path: string) => fs.readdir(p(path)) as Promise<[] | [string, ...string[]]>,
+        readFile: (path: string) => fs.readFile(p(path), { encoding: "utf8" }),
+        rename: (previous: string, next: string) => fs.rename(p(previous), p(next)),
+        rm: (path: string) => fs.rm(p(path), { recursive: true }),
+        writeFile: (path: string, data: string) =>
+          fs.writeFile(p(path), data, { encoding: "utf8" }),
       };
     }
   : makeNoAsyncFileSystem;
 
-// TODO: use solid-start/server for Filesystem access
-// TODO: use WebAPIs for Filesystem access
-
-export const makeWebAccessFileSystem = process.env.SSR ? () => Promise.resolve(makeNoAsyncFileSystem()) :
-  typeof globalThis.showDirectoryPicker === "function"
-    ? async (options?: DirectoryPickerOptions | undefined): Promise<AsyncFileSystemAdapter> => {
-        const handle = await globalThis.showDirectoryPicker(options);
-        const walk = async (
-          path: string,
-          handler: (
-            handle: FileSystemDirectoryHandle | FileSystemFileHandle,
-            part: string,
-            index: number,
-            parts: string[],
-          ) => Promise<void | FileSystemDirectoryHandle | FileSystemFileHandle | undefined> | undefined,
-        ): Promise<FileSystemDirectoryHandle | FileSystemFileHandle | undefined> => {
-          const parts = path.split("/").filter(part => part);
-          let currentHandle: FileSystemDirectoryHandle | FileSystemFileHandle | undefined = handle;
-          for (let index = 0; index < parts.length; index++) {
-            const part = parts[index]!;
-            currentHandle = await handler(currentHandle, part, index, parts) || undefined;
-            if (!currentHandle) {
-              return undefined;
-            }
+export const makeWebAccessFileSystem = process.env.SSR
+  ? () => Promise.resolve(makeNoAsyncFileSystem())
+  : typeof globalThis.showDirectoryPicker === "function"
+  ? async (options?: DirectoryPickerOptions | undefined): Promise<AsyncFileSystemAdapter> => {
+      const handle = await globalThis.showDirectoryPicker(options);
+      const walk = async (
+        path: string,
+        handler: (
+          handle: FileSystemDirectoryHandle | FileSystemFileHandle,
+          part: string,
+          index: number,
+          parts: string[],
+        ) =>
+          | Promise<void | FileSystemDirectoryHandle | FileSystemFileHandle | undefined>
+          | undefined,
+      ): Promise<FileSystemDirectoryHandle | FileSystemFileHandle | undefined> => {
+        const parts = path.split("/").filter(part => part);
+        let currentHandle: FileSystemDirectoryHandle | FileSystemFileHandle | undefined = handle;
+        for (let index = 0; index < parts.length; index++) {
+          const part = parts[index]!;
+          currentHandle = (await handler(currentHandle, part, index, parts)) || undefined;
+          if (!currentHandle) {
+            return undefined;
           }
-          return currentHandle;
-        };
-        const getNext = (handle: FileSystemDirectoryHandle | FileSystemFileHandle, part: string) =>
-          handle.kind === "directory" ? handle.getDirectoryHandle(part)
-            .catch(() => handle.getFileHandle(part)).catch(() => undefined) : undefined;
-        return {
-          async: true,
-          getType: async path =>
-            walk(path, getNext)
-              .then(handle => (handle?.kind === "directory" ? "dir" : handle?.kind))
-              .catch(() => undefined),
-          readdir: async path =>
-            walk(path, getNext).then(async handle => {
-              if (handle?.kind !== "directory") {
-                return [];
-              }
-              const items: string[] = [];
-              for await (const name of handle.keys()) {
-                items.push(name);
-              }
-              return items as [] | [string, ...string[]];
-            }),
-          mkdir: async path => {
-            await walk(path, (handle, part, index, parts) =>
-              handle.kind === "file"
-                ? Promise.reject(
-                    new Error(
-                      `attempt to create directory "${path}" failed - "${parts
-                        .slice(0, index)
-                        .join("/")} is a file`,
-                    ),
-                  )
-                : handle.getDirectoryHandle(part, { create: true }),
-            );
-          },
-          readFile: async path => await walk(path, (handle, part, index, parts) =>
+        }
+        return currentHandle;
+      };
+      const getNext = (handle: FileSystemDirectoryHandle | FileSystemFileHandle, part: string) =>
+        handle.kind === "directory"
+          ? handle
+              .getDirectoryHandle(part)
+              .catch(() => handle.getFileHandle(part))
+              .catch(() => undefined)
+          : undefined;
+      return {
+        async: true,
+        getType: async path =>
+          walk(path, getNext)
+            .then(handle => (handle?.kind === "directory" ? "dir" : handle?.kind))
+            .catch(() => undefined),
+        readdir: async path =>
+          walk(path, getNext).then(async handle => {
+            if (handle?.kind !== "directory") {
+              return [];
+            }
+            const items: string[] = [];
+            for await (const name of handle.keys()) {
+              items.push(name);
+            }
+            return items as [] | [string, ...string[]];
+          }),
+        mkdir: async path => {
+          await walk(path, (handle, part, index, parts) =>
+            handle.kind === "file"
+              ? Promise.reject(
+                  new Error(
+                    `attempt to create directory "${path}" failed - "${parts
+                      .slice(0, index)
+                      .join("/")} is a file`,
+                  ),
+                )
+              : handle.getDirectoryHandle(part, { create: true }),
+          );
+        },
+        readFile: async path =>
+          await walk(path, (handle, part, index, parts) =>
             index < parts.length - 1
-            ? getNext(handle, part)
-            : handle.kind === "directory"
-            ? handle.getFileHandle(part)
-            : undefined
-          ).then(
-            handle => handle?.kind === "file"
+              ? getNext(handle, part)
+              : handle.kind === "directory"
+              ? handle.getFileHandle(part)
+              : undefined,
+          ).then(handle =>
+            handle?.kind === "file"
               ? handle.getFile().then(file => file.text())
-              : Promise.reject(`reading file "${path}" failed - not a file`)
+              : Promise.reject(`reading file "${path}" failed - not a file`),
           ),
-          writeFile: async (path, data) => void await walk(path, (handle, part, index, parts) => 
+        writeFile: async (path, data) =>
+          void (await walk(path, (handle, part, index, parts) =>
             index < parts.length - 1
-            ? getNext(handle, part)
-            : handle.kind === "directory"
-            ? handle.getFileHandle(part, { create: true }).then(
-                fileHandle => fileHandle.createWritable()
-                  .then(writable => writable.write(data).then(() => writable.close()))
-                  .then(() => fileHandle)
-              )
-            : Promise.reject(new Error(`could not write file ${path}, since path is no parent directory`))
-          ),
-          rm: async path => void await walk(path, (handle, part, index, parts) => index < parts.length - 1
-            ? getNext(handle, part)
-            : handle.kind === "directory"
-            ? handle.removeEntry(part, { recursive: true })
-            : Promise.reject(new Error(`${path} not found; could not be removed`))
-          ),
-        };
-      }
-    : () => Promise.resolve(makeNoAsyncFileSystem());
+              ? getNext(handle, part)
+              : handle.kind === "directory"
+              ? handle.getFileHandle(part, { create: true }).then(fileHandle =>
+                  fileHandle
+                    .createWritable()
+                    .then(writable => writable.write(data).then(() => writable.close()))
+                    .then(() => fileHandle),
+                )
+              : Promise.reject(
+                  new Error(`could not write file ${path}, since path is no parent directory`),
+                ),
+          )),
+        rm: async path =>
+          void (await walk(path, (handle, part, index, parts) =>
+            index < parts.length - 1
+              ? getNext(handle, part)
+              : handle.kind === "directory"
+              ? handle.removeEntry(part, { recursive: true })
+              : Promise.reject(new Error(`${path} not found; could not be removed`)),
+          )),
+      };
+    }
+  : () => Promise.resolve(makeNoAsyncFileSystem());
 
 import type { FileEntry, FsDirOptions } from "@tauri-apps/api/fs";
 

@@ -8,7 +8,7 @@ import {
   FileSystemAdapter,
   makeWebAccessFileSystem,
 } from "../src";
-import { createEffect, createRoot } from "solid-js";
+import { createEffect, createRoot, onError } from "solid-js";
 
 describe("makeNoFileSystem", () => {
   const fs = makeNoFileSystem();
@@ -143,11 +143,18 @@ describe("createFileSystem (async) calls the underlying fs", () => {
 });
 
 const testReactive = (testcase: (done: () => void) => void): Promise<void> => {
-  const context: { promise?: Promise<void>; done?: () => void; dispose?: () => void } = {};
-  context.promise = new Promise<void>(resolve => {
+  const context: {
+    promise?: Promise<void>;
+    done?: () => void;
+    fail?: (error: any) => void;
+    dispose?: () => void;
+  } = {};
+  context.promise = new Promise<void>((resolve, reject) => {
     context.done = resolve;
+    context.fail = reject;
   });
   context.dispose = createRoot(dispose => {
+    onError(err => context.fail?.(err));
     testcase(() => {
       context.done?.();
       dispose();
@@ -208,13 +215,84 @@ describe("createFileSystem(makeWebAccessFileSystem)", async () => {
         if (run === 0) {
           expect(rootItems()).toEqual([]);
         } else if (run === 1) {
-          expect(rootItems()).toEqual(["src"]);
+          expect(rootItems()).toEqual(["src", "data"]);
           fs.mkdir("/test");
         } else {
-          expect(rootItems()).toEqual(["src", "test"]);
+          expect(rootItems()).toEqual(["src", "data", "test"]);
           done();
         }
         return run + 1;
       });
     }));
+
+  test("fs.readFile returns the content", () =>
+    testReactive(done => {
+      const fileData = fs.readFile("/src/index.ts");
+      createEffect((run: number = 0) => {
+        if (run === 0) {
+          expect(fileData()).toBe("");
+        } else {
+          expect(fileData()).toBe("// test");
+          done();
+        }
+        return run + 1;
+      });
+    }));
+
+  test("fs.writeFile updates a readFile resource", () =>
+    testReactive(done => {
+      const fileData = fs.readFile("/data/data.json");
+      createEffect((run: number = 0) => {
+        if (run === 0) {
+          expect(fileData()).toBe("");
+        } else if (run === 1) {
+          expect(fileData()).toBe("[1, 2, 3]");
+          fs.writeFile("/data/data.json", "[1, 2, 3, 4]");
+        } else {
+          expect(fileData()).toBe("[1, 2, 3, 4]");
+          done();
+        }
+        return run + 1;
+      });
+    }));
+
+  test("fs.rm udpates a readdir resource", async () => {
+    await fs.mkdir("/src/subdir");
+    return testReactive(done => {
+      const dataItems = fs.readdir("/src");
+      createEffect((run: number = 0) => {
+        if (run === 0) {
+          expect(dataItems()).toEqual([]);
+        } else if (run === 1) {
+          expect(dataItems()).toEqual(["index.ts", "subdir"]);
+          fs.rm("/src/subdir");
+        } else {
+          expect(dataItems()).toEqual(["index.ts"]);
+          done();
+        }
+        return run + 1;
+      });
+    });
+  });
+
+  test("fs.rename updates a readdir resource", async () => {
+    await fs.mkdir("/data/subdir");
+    await fs.writeFile("/data/subdir/test.ts", "// test");
+    return testReactive(done => {
+      const subdirItems = fs.readdir("/data/subdir");
+      createEffect((run: number = 0) => {
+        if (run === 0) {
+          expect(subdirItems()).toEqual([]);
+        } else if (run === 1) {
+          expect(subdirItems()).toEqual(["test.ts"]);
+          fs.rename("/data/subdir/test.ts", "/data/subdir/index.ts");
+        } else {
+          expect(subdirItems()).toEqual(["index.ts"]);
+          fs.rm("/data/subdir");
+          done();
+        }
+        return run + 1;
+      });
+    });
+  });
 });

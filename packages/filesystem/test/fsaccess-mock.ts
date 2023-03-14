@@ -30,7 +30,8 @@ export class FileSystemFileHandle extends FileSystemHandle {
     return Promise.resolve(writable);
   }
   getFile() {
-    return Promise.resolve(this.data);
+    const file = this;
+    return new Promise(resolve => setTimeout(() => resolve({ text: () => file.data }), 20));
   }
 }
 
@@ -99,7 +100,8 @@ export class FileSystemDirectoryHandle extends FileSystemHandle {
         await dir.removeEntry(entry, { recursive: true });
       }
     }
-    this.contents = this.contents.splice(itemIndex, 1);
+    this.contents.splice(itemIndex, 1);
+    return Promise.resolve();
   }
 }
 
@@ -125,7 +127,10 @@ export const createFromObject = (
   }
 };
 
-(globalThis as any).currentFileSystem = createFromObject({ src: { "index.ts": "// test" } });
+(globalThis as any).currentFileSystem = createFromObject({
+  src: { "index.ts": "// test" },
+  data: { "data.json": "[1, 2, 3]" }
+});
 
 (globalThis as any).showDirectoryPicker = () =>
   Promise.resolve((globalThis as any).currentFileSystem);
