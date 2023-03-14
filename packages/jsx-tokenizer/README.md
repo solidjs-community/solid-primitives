@@ -1,15 +1,20 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=JSX%20Parser" alt="Solid Primitives JSX Parser">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=JSX%20Tokenizer" alt="Solid Primitives JSX Tokenizer">
 </p>
 
 # @solid-primitives/jsx-tokenizer
 
-A primitive to extend the types of values JSX can return. These JSX-elements are named `tokens`.
+[![version](https://img.shields.io/npm/v/@solid-primitives/jsx-tokenizer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/jsx-tokenizer)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-- [`createJSXParser`](#createJSXParser) — Creates a JSX Parser that can be used to create tokenized components and parse JSX Elements for tokens.
-- [`createToken`](#createToken) — Creates a token component associated with the corresponding jsx-tokenizer.
-- [`resolveTokens`](#resolveTokens) — A function similar to Solid's `children()`, but that will only return valid token elements created by the corresponding parser's `createToken`
-- [`isToken`](#isToken) — A function to validate if an element is a `token` created by the corresponding parser's `createToken`
+A set of primitives that help safely pass data through JSX to the parent component using [token components](#createToken).
+
+This pattern is very useful when you want to use JSX to create a declarative API for your components. It lets you resolve the JSX structure and pass the data to the parent component without triggering rendering of the children - it puts the parent in control over what getting rendered.
+
+- [`createTokenizer`](#createTokenizer) — Creates a JSX Tokenizer that can be used to create multiple token components with the same id.
+- [`createToken`](#createToken) — Creates a token component for passing custom data through JSX structure.
+- [`resolveTokens`](#resolveTokens) — Resolves passed JSX structure, searching for tokens with the given tokenizer id.
+- [`isToken`](#isToken) — Checks if passed value is a token created by the corresponding jsx-tokenizer.
 
 ## Installation
 
@@ -21,40 +26,66 @@ pnpm add @solid-primitives/jsx-tokenizer
 yarn add @solid-primitives/jsx-tokenizer
 ```
 
-## `createJSXParser`
+## `createTokenizer`
 
-Creates a JSX Parser that can be used to create tokenized components and parse JSX Elements for tokens.
+Creates a JSX Tokenizer that can be used to create multiple token components with the same id and resolve their data from the JSX Element structure.
 
 ### How to use it
 
-`createJSXParser` takes an optional options param with `name` property to identify the parser during development.
+`createTokenizer` takes an optional options param with `name` property to identify the parser during development.
 
-It also takes as a generic the union of accepted token-types.
+It also a generic type representing the union of accepted token data.
 
 ```tsx
-import { createJSXParser } from "@solid-primitives/jsx-tokenizer";
+import { createTokenizer, createToken, resolveTokens } from "@solid-primitives/jsx-tokenizer";
 
-type UnionOfAcceptedTokens = Token1 | Token2 | ...
+const Tokenizer = createTokenizer<Token1 | Token2>({
+  name: "Example Tokenizer", // optional (used for warnings during development)
+});
 
-const parser = createJSXParser<UnionOfAcceptedTokens>('parser-example');
+// lets you create multiple token components with the same id:
+const MyTokenA = createToken(Tokenizer, props => ({ type: "A" }));
+
+const MyTokenB = createToken(Tokenizer, props => ({ type: "B" }));
+
+function ParentComponent(props) {
+  const tokens = resolveTokens(Tokenizer, () => props.children);
+  return (
+    <ul>
+      <For each={tokens()}>{token => <li>{token.data.type}</li>}</For>
+    </ul>
+  );
+}
+
+<ParentComponent>
+  <MyTokenA />
+  <MyTokenB />
+</ParentComponent>;
 ```
 
 ## `createToken`
 
-Creates a token component associated with the corresponding jsx-tokenizer.
+Creates a token component for passing custom data through JSX structure.
+
+The token component can be used as a normal component in JSX.
+
+When resolved by [`resolveTokens`](#resolvetokens) it will return the data passed to it.
+
+But when resolved normally (e.g. using the `children()` helper) it will return the fallback JSX Element.
 
 ### How to use it
 
-`createToken` takes three parameters:
+`createToken` takes three parameters: (all are optional)
 
-- `parser` object returned by `createJSXParser`
-- `tokenData` function that returns the data of the token _(if one isn't passed, props will be used as data)_
-- `render` function that returns the fallback JSX Element to render _(if one isn't passed, nothing will get rendred)_
+- `tokenizer` - identity object returned by [`createTokenizer`](#createtokenizer) or other token component. If not passed, a new tokenizer id will be created. _(If not passed, a new tokenizer id will be created.)_
+- `tokenData` - function that returns the data of the token _(if one isn't passed, props will be used as data)_
+- `render` - function that returns the fallback JSX Element to render _(If not passed, the token will render nothing and warn in development.)_
 
 ```tsx
 import { createToken } from "@solid-primitives/jsx-tokenizer";
 
 const TokenExample = createToken(
+  // identity object returned by `createTokenizer` or other token component
   parser,
   // function that returns the data of the token - called when the token is resolved by `resolveTokens`
   (props: { id: string }) => {
@@ -72,24 +103,66 @@ const TokenExample = createToken(
 This token can then be used inside JSX as a component:
 
 ```tsx
-const App = () => {
+const Child = () => {
   return <TokenExample id="id" />;
 };
 ```
 
 TokenExample is typed as a JSXElement, this is so TokenExample can be used in JSX without causing type-errors.
 
+### Using without tokenizer
+
+If `createToken` is called without a tokenizer, it will create a new tokenizer id by itself. Then the token component can be used in `resolveTokens` as the tokenizer in the same way as if it was created with `createTokenizer`.
+
+```tsx
+type TabProps<T> = { value: T };
+
+function Tabs<T>(props: {
+  children: (Tab: Component<TabProps<T>>) => JSX.Element;
+  active: T;
+  onSelect: (item: T) => void;
+}) {
+  const Tab = createToken((props: TabProps<T>) => props.value);
+  // resolveTokens will look for tokens created by Tab component
+  const tokens = resolveTokens(Tab, () => props.children(Tab));
+
+  return (
+    <ul>
+      <For each={tokens()}>
+        {token => (
+          <li
+            onClick={() => props.onSelect(token.data)}
+            classList={{ active: token.data === props.active }}
+          >
+            {token.data}
+          </li>
+        )}
+      </For>
+    </ul>
+  );
+}
+
+// usage
+<Tabs active="tab1" onSelect={tab => console.log(tab)}>
+  {Tab => (
+    <>
+      <Tab value="tab1" />
+      <Tab value="tab2" />
+    </>
+  )}
+</Tabs>;
+```
+
 ## `resolveTokens`
 
-A function similar to Solid's [`children()`](https://www.solidjs.com/docs/latest#children), but it will preserve token elements created by the corresponding parser's `createToken`.
-It is useful if you want to access the data passed with the tokens, but also the other resolved JSX Elements.
+A function similar to Solid's [`children()`](https://www.solidjs.com/docs/latest#children). Resolves passed JSX structure, searching for tokens with the given tokenizer id.
 
 ### How to use it
 
-`createToken` takes three parameters:
+`resolveTokens` takes three parameters:
 
-- `parser` object returned by `createJSXParser`
-- `fn` accessor that returns a JSX Element
+- `tokenizer` - identity object returned by [`createTokenizer`](#createTokenizer) or a token component. An array of multiple tokenizers can be passed.
+- `fn` accessor that returns a JSX Element (e.g. `() => props.children`)
 - `options` options for the resolver:
   - `includeJSXElements` - if `true`, other JSX Elements will be included in the result array (default: `false`)
 
@@ -100,7 +173,7 @@ Token data is available on the `data` property of the token.
 ```tsx
 import { resolveTokens } from "@solid-primitives/jsx-tokenizer";
 
-const tokens = resolveTokens(parser, () => props.children);
+const tokens = resolveTokens(tokenizer, () => props.children);
 
 createEffect(() => {
   tokens().forEach(token => {
@@ -123,13 +196,13 @@ Use [`isToken`](#istoken) to validate if a value is a token created by the corre
 ```tsx
 import { resolveTokens, isToken } from "@solid-primitives/jsx-tokenizer";
 
-const els = resolveTokens(parser, () => props.children, {
+const els = resolveTokens(tokenizer, () => props.children, {
   includeJSXElements: true,
 });
 
 createEffect(() => {
   els().forEach(el => {
-    if (!isToken(parser, el)) {
+    if (!isToken(tokenizer, el)) {
       // el is a normal JSX Element
       return;
     }
@@ -143,6 +216,16 @@ createEffect(() => {
 return <>{els()}</>;
 ```
 
+### Resolve multiple tokenizers
+
+If you want to resolve multiple tokenizers at once, you can pass an array of tokenizers as the first parameter to `resolveTokens`.
+
+```tsx
+import { resolveTokens } from "@solid-primitives/jsx-tokenizer";
+
+const els = resolveTokens([tokenizer1, tokenizer2, MyTokenComponent], () => props.children);
+```
+
 ## `isToken`
 
 A function to validate if a value is a token created by the corresponding jsx-tokenizer.
@@ -152,15 +235,20 @@ A function to validate if a value is a token created by the corresponding jsx-to
 `isToken` takes a value, often this would be a JSXElement. The function returns `false` in case the value is not a token created by the corresponding jsx-tokenizer. In case the value is a token `isToken` returns the value cast to a `token`.
 
 ```tsx
-const value = props.children[0]; // value is typed as a JSXElement
-const token = isToken(value);
-if (!token) return;
+const token = props.children[0]; // value is typed as a JSXElement
+if (!isToken(tokenizer, token)) return;
 token; // token is typed as UnionOfAcceptedTokens
+```
+
+`isToken` can take an array of tokenizers as the first parameter. In this case it will return `false` if the value is not a token created by any of the tokenizers.
+
+```tsx
+isToken([tokenizer1, tokenizer2, MyTokenComponent], token);
 ```
 
 ## Demo
 
-A working example can be found in the [dev folder](./dev/index.tsx).
+[Live Example](https://solidjs-community.github.io/solid-primitives/) | [Source Code](./dev/index.tsx)
 
 ## Changelog
 

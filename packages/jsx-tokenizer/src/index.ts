@@ -67,9 +67,9 @@ export function createTokenizer<T>(options?: { name: string }): JSXTokenizer<T> 
  * When resolved by {@link resolveTokens} it will return the data passed to it.
  * But when resolved normally (e.g. using the `children()` helper) it will return the fallback JSX Element.
  *
- * @param tokenizer identity object returned by {@link createTokenizer} or other {@link TokenComponent}. If not passed, a new tokenizer id will be created.
- * @param tokenData function that returns the data of the token. If not passed, the props will be used as the data.
- * @param render function that returns the fallback JSX Element to render. If not passed, the token will render nothing and warn in development.
+ * @param tokenizer identity object returned by {@link createTokenizer} or other {@link TokenComponent}. _(If not passed, a new tokenizer id will be created.)_
+ * @param tokenData function that returns the data of the token. _(if one isn't passed, props will be used as data)_
+ * @param render function that returns the fallback JSX Element to render. _(If not passed, the token will render nothing and warn in development.)_
  * @returns a token component ({@link TokenComponent}) that can be used as a normal component in JSX.
  */
 export function createToken<TProps extends object, TData extends TDataUnion, TDataUnion>(
@@ -149,7 +149,7 @@ function getResolvedTokens(
 }
 
 /**
- * Resolves all tokens in a JSX Element structure.
+ * A function similar to Solid's [`children()`](https://www.solidjs.com/docs/latest#children). Resolves passed JSX structure, searching for tokens with the given tokenizer id.
  * @param tokenizer identity object returned by {@link createTokenizer} or a {@link TokenComponent}. An array of multiple tokenizers can be passed.
  * @param fn accessor that returns a JSX Element structure (e.g. `() => props.children`)
  * @param options options for the resolver
@@ -201,7 +201,7 @@ export function resolveTokens<T>(
 }
 
 /**
- * Checks if a value is a token {@link TokenElement}
+ * Checks if passed value is a {@link TokenElement} created by the corresponding jsx-tokenizer.
  * @param tokenizer identity object returned by {@link createTokenizer} or a {@link TokenComponent}. An array of multiple tokenizers can be passed.
  * @param value value to check
  * @returns true if value is a {@link TokenElement}

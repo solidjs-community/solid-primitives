@@ -17,7 +17,7 @@
   },
   "primitive": {
     "name": "jsx-tokenizer",
-    "stage": 0,
+    "stage": 2,
     "list": [
       "createTokenizer",
       "createToken",
@@ -58,6 +58,7 @@
   "typesVersions": {},
   "scripts": {
     "dev": "vite serve dev",
+    "page": "vite build dev",
     "build": "jiti ../../scripts/build.ts --dev",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
