@@ -35,4 +35,36 @@ describe("deepTrack", () => {
     set("a", "b", "minds");
     expect(temp!).toBe('impure {"a":{"b":"thoughts"}}');
   });
+
+  test("deep derivative", () => {
+    let temp: string;
+    const [sign, set] = createStore({ a: { b: "thoughts" } });
+    createRoot(() => {
+      const derivativeDeep = () => deepTrack(sign);
+      createEffect(() => {
+        temp = `impure ${JSON.stringify(derivativeDeep())}`;
+      });
+    });
+    expect(temp!).toBe('impure {"a":{"b":"thoughts"}}');
+    set("a", "b", "minds");
+    expect(temp!).toBe('impure {"a":{"b":"minds"}}');
+  });
+
+  test("deep circular references", () => {
+    let temp: any;
+    const initialObject = { a: { b: "thoughts" } } as any;
+    initialObject.a.c = initialObject;
+    const [sign, set] = createStore(initialObject);
+
+    createRoot(() => {
+      const storeDeep = () => deepTrack(sign);
+      createEffect(() => {
+        temp = storeDeep();
+      });
+    });
+
+    expect(temp!.a.c).toBe(sign);
+    set("a", "c", "minds");
+    expect(temp!.a.c).toBe("minds");
+  });
 });

@@ -33,13 +33,19 @@ export function deepTrack<T>(store: Store<T>): T {
  * @returns an object with all values traversed
  * @private
  * */
-function deepTraverse<T>(value: Store<T>): T {
+function deepTraverse<T>(value: Store<T>, seen?: Set<unknown>): T {
   if (!isWrappable(value)) {
     return value;
   }
 
+  seen = seen || new Set();
+  if (seen.has(value)) {
+    return value;
+  }
+  seen.add(value);
+
   for (const key in value) {
-    deepTraverse(value[key]);
+    deepTraverse(value[key], seen);
   }
 
   return value;
