@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/jsx-parser": minor
+"@solid-primitives/jsx-tokenizer": minor
 ---
 
 Improved jsdoc comments with better descriptions.

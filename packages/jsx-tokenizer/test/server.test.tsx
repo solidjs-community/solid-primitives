@@ -2,7 +2,7 @@ import { renderToString } from "solid-js/web";
 import { describe, expect, it } from "vitest";
 import { createTokenizer, createToken, resolveTokens } from "../src";
 
-describe("jsx-parser", () => {
+describe("jsx-tokenizer", () => {
   const parser1 = createTokenizer<{
     type: "my-token";
     props: { text: string };

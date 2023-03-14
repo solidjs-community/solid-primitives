@@ -67,7 +67,7 @@ const Add = createToken(
 
 const Subtract = createToken(
   (props: Props) => ({
-    props,
+    props: props as Props,
     id: "Subtract" as const,
   }),
   props => <> - {props.value}</>,

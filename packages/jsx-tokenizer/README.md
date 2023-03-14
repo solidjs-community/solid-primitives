@@ -2,23 +2,23 @@
   <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=JSX%20Parser" alt="Solid Primitives JSX Parser">
 </p>
 
-# @solid-primitives/jsx-parser
+# @solid-primitives/jsx-tokenizer
 
 A primitive to extend the types of values JSX can return. These JSX-elements are named `tokens`.
 
 - [`createJSXParser`](#createJSXParser) — Creates a JSX Parser that can be used to create tokenized components and parse JSX Elements for tokens.
-- [`createToken`](#createToken) — Creates a token component associated with the corresponding jsx-parser.
+- [`createToken`](#createToken) — Creates a token component associated with the corresponding jsx-tokenizer.
 - [`resolveTokens`](#resolveTokens) — A function similar to Solid's `children()`, but that will only return valid token elements created by the corresponding parser's `createToken`
 - [`isToken`](#isToken) — A function to validate if an element is a `token` created by the corresponding parser's `createToken`
 
 ## Installation
 
 ```bash
-npm install @solid-primitives/jsx-parser
+npm install @solid-primitives/jsx-tokenizer
 # or
-pnpm add @solid-primitives/jsx-parser
+pnpm add @solid-primitives/jsx-tokenizer
 # or
-yarn add @solid-primitives/jsx-parser
+yarn add @solid-primitives/jsx-tokenizer
 ```
 
 ## `createJSXParser`
@@ -32,7 +32,7 @@ Creates a JSX Parser that can be used to create tokenized components and parse J
 It also takes as a generic the union of accepted token-types.
 
 ```tsx
-import { createJSXParser } from "@solid-primitives/jsx-parser";
+import { createJSXParser } from "@solid-primitives/jsx-tokenizer";
 
 type UnionOfAcceptedTokens = Token1 | Token2 | ...
 
@@ -41,7 +41,7 @@ const parser = createJSXParser<UnionOfAcceptedTokens>('parser-example');
 
 ## `createToken`
 
-Creates a token component associated with the corresponding jsx-parser.
+Creates a token component associated with the corresponding jsx-tokenizer.
 
 ### How to use it
 
@@ -52,7 +52,7 @@ Creates a token component associated with the corresponding jsx-parser.
 - `render` function that returns the fallback JSX Element to render _(if one isn't passed, nothing will get rendred)_
 
 ```tsx
-import { createToken } from "@solid-primitives/jsx-parser";
+import { createToken } from "@solid-primitives/jsx-tokenizer";
 
 const TokenExample = createToken(
   parser,
@@ -98,7 +98,7 @@ It is useful if you want to access the data passed with the tokens, but also the
 Token data is available on the `data` property of the token.
 
 ```tsx
-import { resolveTokens } from "@solid-primitives/jsx-parser";
+import { resolveTokens } from "@solid-primitives/jsx-tokenizer";
 
 const tokens = resolveTokens(parser, () => props.children);
 
@@ -118,10 +118,10 @@ return <>{els()}</>;
 
 If you want to resolve the JSX Elements as well, you can pass `{ includeJSXElements: true }` as the third parameter to `resolveTokens`.
 
-Use [`isToken`](#istoken) to validate if a value is a token created by the corresponding jsx-parser.
+Use [`isToken`](#istoken) to validate if a value is a token created by the corresponding jsx-tokenizer.
 
 ```tsx
-import { resolveTokens, isToken } from "@solid-primitives/jsx-parser";
+import { resolveTokens, isToken } from "@solid-primitives/jsx-tokenizer";
 
 const els = resolveTokens(parser, () => props.children, {
   includeJSXElements: true,
@@ -145,11 +145,11 @@ return <>{els()}</>;
 
 ## `isToken`
 
-A function to validate if a value is a token created by the corresponding jsx-parser.
+A function to validate if a value is a token created by the corresponding jsx-tokenizer.
 
 ### How to use it
 
-`isToken` takes a value, often this would be a JSXElement. The function returns `false` in case the value is not a token created by the corresponding jsx-parser. In case the value is a token `isToken` returns the value cast to a `token`.
+`isToken` takes a value, often this would be a JSXElement. The function returns `false` in case the value is not a token created by the corresponding jsx-tokenizer. In case the value is a token `isToken` returns the value cast to a `token`.
 
 ```tsx
 const value = props.children[0]; // value is typed as a JSXElement

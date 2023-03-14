@@ -9,7 +9,7 @@ import {
   TokenElement,
 } from "../src";
 
-describe("jsx-parser", () => {
+describe("jsx-tokenizer", () => {
   const parser1 = createTokenizer<{
     type: "my-token";
     props: { text: string };

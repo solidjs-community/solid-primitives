@@ -1,4 +1,4 @@
-import { Accessor, Component, createMemo, JSX, untrack } from "solid-js";
+import { Accessor, Component, createComponent, createMemo, JSX } from "solid-js";
 import type { ResolvedJSXElement, Narrow, Many } from "@solid-primitives/utils";
 import { asArray } from "@solid-primitives/utils";
 
@@ -57,7 +57,7 @@ export type TokenComponent<TProps extends object, TData = TProps> = Component<TP
  */
 export function createTokenizer<T>(options?: { name: string }): JSXTokenizer<T> {
   return {
-    [$TOKENIZER]: Symbol(process.env.DEV ? options?.name || "jsx-parser" : ""),
+    [$TOKENIZER]: Symbol(process.env.DEV ? options?.name || "jsx-tokenizer" : ""),
   } as JSXTokenizer<T>;
 }
 
@@ -104,7 +104,7 @@ export function createToken<P extends object, T>(
   const comp = ((props: P) => {
     const token = (
       args[1]
-        ? () => untrack(() => args[1](props))
+        ? () => createComponent(args[1], props)
         : () => {
             process.env.DEV &&
               // eslint-disable-next-line no-console
