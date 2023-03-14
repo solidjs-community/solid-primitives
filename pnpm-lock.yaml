@@ -356,7 +356,7 @@ importers:
     devDependencies:
       '@solid-primitives/range': link:../range
 
-  packages/jsx-parser:
+  packages/jsx-tokenizer:
     specifiers:
       '@solid-primitives/utils': workspace:^5.4.0
       solid-js: ^1.6.0

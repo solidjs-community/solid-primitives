@@ -1,4 +1,4 @@
-# @solid-primitives/jsx-parser
+# @solid-primitives/jsx-tokenizer
 
 ## 0.2.0
 
