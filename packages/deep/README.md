@@ -9,9 +9,9 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/deep?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/deep)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-An effect function to allow `watch` on deep properties for a store:
+A function to allow to trigger effects on deep properties for a store:
 
-`createDeep` - Provides an effect function to use as the `createEffect` value.
+`deepTrack` - Provides a traversed store object.
 
 ## Installation
 
@@ -27,8 +27,8 @@ pnpm add @solid-primitives/deep
 
 ```ts
 createEffect(
-  createDeep(
-    () => store,
+  on(
+    () => deepTrack(sign),
     () => {
       /* function to execute */
     },

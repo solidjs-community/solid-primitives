@@ -5,10 +5,10 @@ import { Store } from "solid-js/store";
  * deepTrack - create a deep getter on the given object
  * ```typescript
  * export function deepTrack<T>(
- *   dep: Store<T>
+ *   store: Store<T>
  * ): T;
  * ```
- * @param dep reactive dependency
+ * @param store reactive store dependency
  * @returns same dependency, just traversed deeply to trigger effects on deeply nested properties. For example:
  *
  * ```typescript
@@ -23,7 +23,7 @@ import { Store } from "solid-js/store";
  * );
  * ```
  */
-export function deepTrack<T>(store: Store<T>): Store<T> {
+export function deepTrack<T>(store: Store<T>): T {
   return deepTraverse(store);
 }
 
