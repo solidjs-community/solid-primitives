@@ -100,21 +100,22 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
 }): JSX.Element {
   const { values } = props;
   const fn = (i: number) => {
-    if (i >= values.length) return props.children;
+    let item: any = values[i];
 
-    let provider: any = values[i];
+    if (!item) return props.children;
+
     const ctxProps: { value?: any; children: JSX.Element } = {
       get children() {
         return fn(i + 1);
       },
     };
-    if (Array.isArray(provider)) {
-      ctxProps.value = provider[1];
-      provider = provider[0];
-      if (typeof provider !== "function") provider = provider.Provider;
+    if (Array.isArray(item)) {
+      ctxProps.value = item[1];
+      item = item[0];
+      if (typeof item !== "function") item = item.Provider;
     }
 
-    return createComponent(provider, ctxProps);
+    return createComponent(item, ctxProps);
   };
   return fn(0);
 }
