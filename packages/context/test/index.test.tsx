@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createContext, createRoot, JSX, untrack, useContext } from "solid-js";
+import { createContext, createRoot, FlowComponent, JSX, untrack, useContext } from "solid-js";
 import { render } from "solid-js/web";
 import { createContextProvider, MultiProvider } from "../src";
 
@@ -81,8 +81,14 @@ describe("MultiProvider", () => {
       let capture2;
       let capture3;
 
+      const BoundProvider: FlowComponent = props => {
+        expect(useContext(Ctx1)).toBe("Hello");
+        expect(useContext(Ctx2)).toBe("World");
+        return <TestProvider>{props.children}</TestProvider>;
+      };
+
       <MultiProvider
-        values={[[Ctx1, "Ignored"], [Ctx1, "Hello"], [Ctx2.Provider, "World"], TestProvider]}
+        values={[[Ctx1, "Ignored"], [Ctx1, "Hello"], [Ctx2.Provider, "World"], BoundProvider]}
       >
         {untrack(() => {
           runs++;
