@@ -2,8 +2,8 @@ import { describe, test, expect } from "vitest";
 import { limitPath } from "../src";
 
 describe("limitPath", () => {
-  test("do not change path for empty base path", () => {
-    expect(limitPath("")("/test")).toBe("/test");
+  test("handle empty base path and root path correctly", () => {
+    expect(limitPath("")("/test")).toBe("test");
     expect(limitPath("/")("/test")).toBe("/test");
   });
 

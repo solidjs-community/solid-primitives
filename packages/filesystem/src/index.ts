@@ -2,11 +2,11 @@
 import { batch, createResource, createSignal } from "solid-js";
 import type { Accessor, Resource, ResourceActions, Setter } from "solid-js";
 
-export type FileType = "dir" | "file" | undefined;
+export type ItemType = "dir" | "file" | undefined;
 
 export type SyncFileSystemAdapter = {
   async: false;
-  getType: (path: string) => FileType;
+  getType: (path: string) => ItemType;
   mkdir: (path: string) => void;
   readdir: (path: string) => [] | [string, ...string[]];
   readFile: (path: string) => string;
@@ -17,7 +17,7 @@ export type SyncFileSystemAdapter = {
 
 export type AsyncFileSystemAdapter = {
   async: true;
-  getType: (path: string) => Promise<FileType>;
+  getType: (path: string) => Promise<ItemType>;
   mkdir: (path: string) => Promise<void>;
   readdir: (path: string) => Promise<[] | [string, ...string[]]>;
   readFile: (path: string) => Promise<string>;
@@ -29,7 +29,7 @@ export type AsyncFileSystemAdapter = {
 export type FileSystemAdapter = SyncFileSystemAdapter | AsyncFileSystemAdapter;
 
 export type SyncFileSystem = {
-  getType: (path: string) => Accessor<FileType>;
+  getType: (path: string) => Accessor<ItemType>;
   mkdir: (path: string) => void;
   readdir: (path: string) => Accessor<[] | [string, ...string[]]>;
   readFile: (path: string) => Accessor<string>;
@@ -38,7 +38,7 @@ export type SyncFileSystem = {
   writeFile: (path: string, data: string) => void;
 };
 export type AsyncFileSystem = {
-  getType: (path: string) => Resource<FileType>;
+  getType: (path: string) => Resource<ItemType>;
   mkdir: (path: string) => Promise<void>;
   readdir: (path: string) => Resource<[] | [string, ...string[]]>;
   readFile: (path: string) => Resource<string>;
@@ -54,7 +54,7 @@ const getParentDir = (path: string) => path.split("/").slice(0, -1).join("/") ||
 
 /** makes a synchronous filesystem reactive */
 export const createSyncFileSystem = (adapter: SyncFileSystemAdapter): SyncFileSystem => {
-  const getTypeMap: SignalMap<FileType> = new Map();
+  const getTypeMap: SignalMap<ItemType> = new Map();
   const readdirMap: SignalMap<[] | [string, ...string[]]> = new Map();
   const readFileMap: SignalMap<string> = new Map();
   const fs: SyncFileSystem = {
@@ -152,7 +152,7 @@ export const createSyncFileSystem = (adapter: SyncFileSystemAdapter): SyncFileSy
 
 /** makes an asynchronous filesystem reactive */
 export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter): AsyncFileSystem => {
-  const getTypeMap: ResourceMap<FileType> = new Map();
+  const getTypeMap: ResourceMap<ItemType> = new Map();
   const readdirMap: ResourceMap<[] | [string, ...string[]]> = new Map();
   const readFileMap: ResourceMap<string> = new Map();
   const fs: AsyncFileSystem = {
@@ -329,7 +329,7 @@ export const makeVirtualFileSystem = (
   }
   const ofs = {
     async: false as const,
-    getType: (path: string): FileType => {
+    getType: (path: string): ItemType => {
       if (path === "" || path === "/") {
         return "dir";
       }
