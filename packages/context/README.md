@@ -118,9 +118,9 @@ import { MultiProvider } from "@solid-primitives/context";
     [FooContext, "foo"],
     [BarContext, "bar"],
     [BazContext, "baz"],
-    // you can also provide a component, the value will be passed to a `value` prop
+    // you can also provide a component, the value will be passed to it a `value` prop
     [MyCustomProviderComponent, "hello-world"],
-    // if you have a provider that doesn't accept a `value` prop, you can just pass a function
+    // if you have a provider that doesn't accept a `value` prop, you can just pass it a function
     BoundContextProvider,
   ]}
 >
