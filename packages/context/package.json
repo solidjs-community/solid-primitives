@@ -16,9 +16,10 @@
     "name": "context",
     "stage": 2,
     "list": [
-      "createContextProvider"
+      "createContextProvider",
+      "MultiProvider"
     ],
-    "category": "Utilities"
+    "category": "Control Flow"
   },
   "files": [
     "dist"

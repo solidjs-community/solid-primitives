@@ -1,17 +1,18 @@
 import { describe, test, expect } from "vitest";
-import { JSX } from "solid-js";
+import { createContext, createRoot, JSX, untrack, useContext } from "solid-js";
 import { render } from "solid-js/web";
-import { createContextProvider } from "../src";
+import { createContextProvider, MultiProvider } from "../src";
 
 const context = { message: "Hello, Context!" };
 const fallback = { message: "FALLBACK", children: undefined };
 
 const [TestProvider, useTestContext] = createContextProvider(
   (props: { text?: string; children: JSX.Element }) => {
-    if (props.text) return { message: props.text, children: props.children };
     return {
-      message: context.message,
-      children: props.children,
+      message: props.text ?? context.message,
+      get children() {
+        return props.children;
+      },
     };
   },
   fallback,
@@ -66,5 +67,36 @@ describe("createContextProvider", () => {
     expect(capture).toBe("REPLACE");
     expect(captureChildren).toBe(TextComp);
     unmount();
+  });
+});
+
+describe("MultiProvider", () => {
+  test("provides multiple contexts", () => {
+    createRoot(() => {
+      const Ctx1 = createContext<string>();
+      const Ctx2 = createContext<string>();
+
+      let runs = 0;
+      let capture1;
+      let capture2;
+      let capture3;
+
+      <MultiProvider
+        values={[[Ctx1, "Ignored"], [Ctx1, "Hello"], [Ctx2.Provider, "World"], TestProvider]}
+      >
+        {untrack(() => {
+          runs++;
+          capture1 = useContext(Ctx1);
+          capture2 = useContext(Ctx2);
+          capture3 = useTestContext().message;
+          return "";
+        })}
+      </MultiProvider>;
+
+      expect(runs).toBe(1);
+      expect(capture1).toBe("Hello");
+      expect(capture2).toBe("World");
+      expect(capture3).toBe(context.message);
+    });
   });
 });

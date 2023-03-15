@@ -1,4 +1,5 @@
-import { createContext, createComponent, useContext, JSX } from "solid-js";
+import { createContext, createComponent, useContext, JSX, Context, FlowComponent } from "solid-js";
+import type { ContextProviderComponent } from "solid-js/types/reactive/signal";
 
 export type ContextProviderProps = {
   children?: JSX.Element;
@@ -40,14 +41,80 @@ export function createContextProvider<T, P extends ContextProviderProps>(
   defaults?: T,
 ): [provider: ContextProvider<P>, useContext: () => T | undefined] {
   const ctx = createContext(defaults);
-  const Provider: ContextProvider<P> = props => {
-    return createComponent(ctx.Provider, {
-      value: factoryFn(props),
-      get children() {
-        return props.children;
-      },
-    });
+  return [
+    props => {
+      return createComponent(ctx.Provider, {
+        value: factoryFn(props),
+        get children() {
+          return props.children;
+        },
+      });
+    },
+    () => useContext(ctx),
+  ];
+}
+
+/*
+
+MultiProvider inspired by the preact-multi-provider package from Marvin Hagemeister
+See https://github.com/marvinhagemeister/preact-multi-provider
+
+
+Type validation of the `values` array thanks to the amazing @otonashixav (https://github.com/otonashixav)
+
+*/
+
+/**
+ * A component that allows you to provide multiple contexts at once. It will work exactly like nesting multiple providers as separate components, but it will save you from the nesting.
+ *
+ * @param values Array of tuples of `[ContextProviderComponent, value]` or `[Context, value]` or bound `ContextProviderComponent` (that doesn't take a `value` property).
+ *
+ * @example
+ * ```tsx
+ * // before
+ * <CounterCtx.Provider value={1}>
+ *   <NameCtx.Provider value="John">
+ *     <App/>
+ *   </NameCtx.Provider>
+ * </CounterCtx.Provider>
+ *
+ * // after
+ * <MultiProvider values={[
+ *  [CounterCtx.Provider, 1],
+ *  [NameCtx.Provider, "John"]
+ * ]}>
+ *  <App/>
+ * </MultiProvider>
+ * ```
+ */
+export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props: {
+  values: {
+    [K in keyof T]:
+      | readonly [
+          Context<T[K]> | ContextProviderComponent<T[K]>,
+          [T[K]][T extends unknown ? 0 : never],
+        ]
+      | FlowComponent;
   };
-  const useProvider = () => useContext(ctx);
-  return [Provider, useProvider];
+  children: JSX.Element;
+}): JSX.Element {
+  const { values } = props;
+  const fn = (i: number) => {
+    if (i >= values.length) return props.children;
+
+    let provider: any = values[i];
+    const ctxProps: { value?: any; children: JSX.Element } = {
+      get children() {
+        return fn(i + 1);
+      },
+    };
+    if (Array.isArray(provider)) {
+      ctxProps.value = provider[1];
+      provider = provider[0];
+      if (typeof provider !== "function") provider = provider.Provider;
+    }
+
+    return createComponent(provider, ctxProps);
+  };
+  return fn(0);
 }
