@@ -1,0 +1,107 @@
+///<reference path="../node_modules/@types/wicg-file-system-access/index.d.ts" />
+import { makeNoAsyncFileSystem } from "./adapter-mocks";
+import type { AsyncFileSystemAdapter } from "./types";
+
+export const makeWebAccessFileSystem = process.env.SSR
+  ? () => Promise.resolve(makeNoAsyncFileSystem())
+  : typeof globalThis.showDirectoryPicker === "function"
+  ? async (options?: DirectoryPickerOptions | undefined): Promise<AsyncFileSystemAdapter> => {
+      const handle = await globalThis.showDirectoryPicker(options);
+      const walk = async (
+        path: string,
+        handler: (
+          handle: FileSystemDirectoryHandle | FileSystemFileHandle,
+          part: string,
+          index: number,
+          parts: string[],
+        ) =>
+          | Promise<void | FileSystemDirectoryHandle | FileSystemFileHandle | undefined>
+          | undefined,
+      ): Promise<FileSystemDirectoryHandle | FileSystemFileHandle | undefined> => {
+        const parts = path.split("/").filter(part => part);
+        let currentHandle: FileSystemDirectoryHandle | FileSystemFileHandle | undefined = handle;
+        for (let index = 0; index < parts.length; index++) {
+          const part = parts[index]!;
+          currentHandle = (await handler(currentHandle, part, index, parts)) || undefined;
+          if (!currentHandle) {
+            return undefined;
+          }
+        }
+        return currentHandle;
+      };
+      const getNext = (handle: FileSystemDirectoryHandle | FileSystemFileHandle, part: string) =>
+        handle.kind === "directory"
+          ? handle
+              .getDirectoryHandle(part)
+              .catch(() => handle.getFileHandle(part))
+              .catch(() => undefined)
+          : undefined;
+      return {
+        async: true,
+        getType: async path =>
+          walk(path, getNext)
+            .then(handle => (handle?.kind === "directory" ? "dir" : handle?.kind))
+            .catch(() => undefined),
+        readdir: async path =>
+          walk(path, getNext).then(async handle => {
+            if (handle?.kind !== "directory") {
+              return [];
+            }
+            const items: string[] = [];
+            for await (const name of handle.keys()) {
+              items.push(name);
+            }
+            return items as [] | [string, ...string[]];
+          }),
+        mkdir: async path => {
+          await walk(path, (handle, part, index, parts) =>
+            handle.kind === "file"
+              ? Promise.reject(
+                  new Error(
+                    `attempt to create directory "${path}" failed - "${parts
+                      .slice(0, index)
+                      .join("/")} is a file`,
+                  ),
+                )
+              : handle.getDirectoryHandle(part, { create: true }),
+          );
+        },
+        readFile: async path =>
+          await walk(path, (handle, part, index, parts) =>
+            index < parts.length - 1
+              ? getNext(handle, part)
+              : handle.kind === "directory"
+              ? handle.getFileHandle(part)
+              : undefined,
+          ).then(handle =>
+            handle?.kind === "file"
+              ? handle.getFile().then(file => file.text())
+              : Promise.reject(`reading file "${path}" failed - not a file`),
+          ),
+        writeFile: async (path, data) =>
+          void (await walk(path, (handle, part, index, parts) =>
+            index < parts.length - 1
+              ? getNext(handle, part)
+              : handle.kind === "directory"
+              ? handle.getFileHandle(part, { create: true }).then(fileHandle =>
+                  fileHandle
+                    .createWritable()
+                    .then(writable => writable.write(data).then(() => writable.close()))
+                    .then(() => fileHandle),
+                )
+              : Promise.reject(
+                  new Error(`could not write file ${path}, since path is no parent directory`),
+                ),
+          )),
+        rm: async path =>
+          void (await walk(path, (handle, part, index, parts) =>
+            index < parts.length - 1
+              ? getNext(handle, part)
+              : handle.kind === "directory"
+              ? handle.removeEntry(part, { recursive: true })
+              : Promise.reject(new Error(`${path} not found; could not be removed`)),
+          )),
+      };
+    }
+  : () => Promise.resolve(makeNoAsyncFileSystem());
+  

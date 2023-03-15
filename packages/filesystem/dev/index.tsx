@@ -1,98 +1,76 @@
-import { createSignal, Show, For, Component, createResource, ErrorBoundary } from "solid-js";
+import {
+  createSignal,
+  Show,
+  For,
+  Component,
+  createResource,
+  ErrorBoundary,
+  createMemo,
+} from "solid-js";
 import { render } from "solid-js/web";
-import { AsyncFileSystem, createFileSystem, makeVirtualFileSystem, makeWebAccessFileSystem, SyncFileSystem } from "../src/index";
+import {
+  AsyncFileSystem,
+  createFileSystem,
+  makeVirtualFileSystem,
+  makeWebAccessFileSystem,
+  SyncFileSystem,
+  getItemName
+} from "../src/index";
 import "uno.css";
 
-const SyncFile = (props: { fs: SyncFileSystem, path: string }) => {
-  const content = props.fs.readFile(props.path);
+const FsFile = (props: { fs: SyncFileSystem | AsyncFileSystem, path: string }) => {
+  const [open, setOpen] = createSignal(false);
+  const content = createMemo((prev) => prev || open() ? props.fs.readFile(props.path) : undefined);
   const setContent = (data: string) => props.fs.writeFile(props.path, data);
-  return <details>
-    <summary>{props.path.split("/").at(-1)}</summary>
-    <textarea value={/*@once*/content()} onInput={(ev) => setContent(ev.currentTarget.value)} />
-  </details>
+  return <div>
+    <p>
+      <button onClick={() => setOpen(!open())}>{open() ? "-" : "+"}</button>
+      {getItemName(props.path)}
+    </p>
+    <Show when={open()}>
+      <textarea value={content()?.()} onInput={(ev) => setContent(ev.currentTarget.value)} />
+    </Show>
+  </div>
 }
 
-const SyncDir = (props: { fs: SyncFileSystem, path: string }) => {
+const FsDir = (props: { fs: SyncFileSystem | AsyncFileSystem, path: string }) => {
+  const [open, setOpen] = createSignal(props.path === "/");
   const [name, setName] = createSignal("");
-  const list = props.fs.readdir(props.path);
+  const list = createMemo((prev) => prev || open() && props.fs.readdir(props.path));
   return (
     <>
-      {props.path.split("/").at(-1) || "/"} <input onInput={(ev) => setName(ev.currentTarget.value)} />
-      <Show when={name() !== ""}>
-        <button onClick={() => props.fs.writeFile(`${props.path === "/" ? "" : props.path}/${name()}`, "")}>
-          New File
-        </button>
-        <button onClick={() => props.fs.mkdir(`${props.path === "/" ? "" : props.path}/${name()}`)}>
-          New Dir
-        </button>
+      <div><button onClick={() => setOpen(!open())}>{open() ? "-" : "+"}</button> {getItemName(props.path) || "/"} <input onInput={(ev) => setName(ev.currentTarget.value)} />
+        <Show when={name() !== ""}>
+          <button onClick={() => props.fs.writeFile(`${props.path === "/" ? "" : props.path}/${name()}`, "")}>
+            New File
+          </button>
+          <button onClick={() => props.fs.mkdir(`${props.path === "/" ? "" : props.path}/${name()}`)}>
+            New Dir
+          </button>
+        </Show>
+      </div>
+      <Show when={open()}>
+        <ul>
+          <For each={list()()}>
+            {(item) => {
+              const itemType = props.fs.getType(item);
+              return (            
+              <li>
+                <Show
+                  when={itemType() === "dir"}
+                  fallback={<FsFile fs={props.fs} path={`${props.path === "/" ? "" : props.path}/${item}`} />}
+                >
+                  <FsDir fs={props.fs} path={item} />
+                </Show>
+              </li>
+              )
+            }}
+          </For>
+        </ul>
       </Show>
-      <ul>
-        <For each={list()}>
-          {(item) => {
-            const itemType = props.fs.getType(item);
-            return (            
-            <li>
-              <Show
-                when={itemType() === "dir"}
-                fallback={<SyncFile fs={props.fs} path={`${props.path === "/" ? "" : props.path}/${item}`} />}
-              >
-                <SyncDir fs={props.fs} path={item} />
-              </Show>
-            </li>
-            )
-          }}
-        </For>
-      </ul>
     </>
   );
 };
-
-const AsyncFile = (props: { path: string, fs: AsyncFileSystem}) => {
-  const content = props.fs.readFile(props.path);
-  const setContent = (data: string) => props.fs.writeFile(props.path, data);
-  return <details>
-    <summary>{props.path.split("/").at(-1)} <button onClick={() => props.fs.rm(props.path)}>Delete</button></summary>
-    <Show when={!content.loading && !content.error}>
-      <textarea value={content()} onInput={(ev) => setContent(ev.currentTarget.value)} />
-    </Show>
-  </details>
-}
-
-const AsyncDir = (props: { path: string, fs: AsyncFileSystem }) => {
-  const [name, setName] = createSignal("");
-  const list = props.fs.readdir(props.path);
-  return (
-    <>
-      {props.path.split("/").at(-1) || "/"} <input onInput={(ev) => setName(ev.currentTarget.value)} />
-      <Show when={name() !== ""}>
-        <button onClick={() => props.fs.writeFile(`${props.path === "/" ? "" : props.path}/${name()}`, "")}>
-          New File
-        </button>
-        <button onClick={() => props.fs.mkdir(`${props.path === "/" ? "" : props.path}/${name()}`)}>
-          New Dir
-        </button>
-      </Show>
-      <button onClick={() => props.fs.rm(props.path)}>Delete</button>
-      <ul>
-        <For each={list()}>
-          {(item) => {
-            const itemType = props.fs.getType(item);
-            return (            
-            <li data-path={item}>
-              <Show
-                when={itemType() === "dir"}
-                fallback={<AsyncFile fs={props.fs} path={`${props.path === "/" ? "" : props.path}/${item}`} />}
-              >
-                <AsyncDir fs={props.fs} path={item} />
-              </Show>
-            </li>
-            )
-          }}
-        </For>
-      </ul>
-    </>
-  );
-}
 
 const App: Component = () => {
   const ofs = makeVirtualFileSystem({
@@ -108,7 +86,7 @@ const App: Component = () => {
           <ErrorBoundary fallback={(err, reset) => <div>Error: {err} <button onClick={reset}>reset</button></div>}>
             <h4>FileSystem primitive</h4>
             <p>Object virtual file system (localStorage persistence)</p>
-            <SyncDir fs={vfs} path="/" />
+            <FsDir fs={vfs} path="/" />
             <Show when={!afs.loading && !afs.error && afs()} fallback={
               <button disabled={afs.loading} onClick={() => setStartAfs(true)}>
                 Request directory access
@@ -116,7 +94,7 @@ const App: Component = () => {
             }>
               <p>Web Filesystem Access file system</p>
               <p><em>Warning!</em> This can overwrite or delete actual files!</p>
-              <AsyncDir fs={afs()!} path="/" />
+              <FsDir fs={afs()!} path="/" />
             </Show>
           </ErrorBoundary>
         </div>

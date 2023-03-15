@@ -11,7 +11,9 @@
 
 A primitive that allows to manage different file system access methods:
 
-* `createFileSystem` - Provides a reactive interface to one of the file system adapters
+* `createFileSystem` - Provides a reactive interface to one of the file system adapters - a convenience method that calls the correct wrapper
+* `createSyncFileSystem` - Wraps a synchronous file system adapter like `makeNoFileSystem` or `makeVirtualFileSystem` in a reactive interface
+* `createAsyncFileSystem` - Adds a reactive layer to an asynchronous file system adapter
 * `makeNoFileSystem` - Adapter that provides a synchronous mock file system
 * `makeNoAsyncFileSystem` - Adapter that provides an asynchronous mock file system
 * `makeVirtualFileSystem` - Adapter that provides a virtual file system that doubles as FsMap for `typescript-vfs` with its `.toMap()` method.
@@ -31,7 +33,7 @@ pnpm add @solid-primitives/filesystem
 
 ## How to use it
 
-The synchronous adapters have the following interface:
+The synchronous adapters, which are primarily meant for virtual file systems or in-memory-databases, have the following interface:
 
 ```tsx
 export type SyncFileSystemAdapter = {
@@ -61,7 +63,9 @@ export type AsyncFileSystemAdapter = {
 };
 ```
 
-If no rename method is given, mkdir/writeFile/rm are used to achieve the same effect. An actual rename call might be more performant, though.
+To support an unsupported file system, you can provide a wrapper with one of the same APIs.
+
+If no rename method is given, mkdir/writeFile/rm are used to achieve the same effect. An actual rename call will be more performant, though.
 
 The `createFileSystem` call then creates a reactive surface above each of these APIs so that the return values of all reading calls are signals for synchronous and resources for asynchronous filesystem adapters; writing methods for asynchronous APIs will return the same promise for convenience reasons. These getters returned from reading methods are bound to Solid's reactivity so that they will automatically cause effects using them outside of untrack() to re-run on updates. Asynchronous getters will initially return undefined, but will update to the correct value once evaluated.
 
@@ -86,30 +90,32 @@ const indexText = fs.readFile("/src/index.ts");
 // the file is written by the same fs
 createEffect(() => console.log("/src/index.ts", indexText()));
 
-const Item = (props: { path: string, fs: SyncFileSystem }) => (
+// isomorphic file system reader with lazy evaluation
+const Item = (props: { path: string, fs: SyncFileSystem | AsyncFileSystem }) => (
   const itemType = props.fs.getType(props.path);
-  const name = () => path.split("/").at(-1);
-  const [dirOpen, setDirOpen] = createSignal(false);
-  let entries;
-  createEffect(() => {
-    if (dirOpen() && !entries) {
-      entries = props.fs.readDir(path);
-    }
-  });
+  const name = () => getItemName(props.path);
+  const [open, setOpen] = createSignal(false);
+  const content = createMemo(() => open()
+    ? itemType() === "dir"
+      ? props.fs.readdir(props.path)
+      : props.fs.readFile(props.path)
+    : undefined
+  );
 
-  <Switch>
-    <Match when={itemType() === "file"}>
-      {name()}
-    </Match>
-    <Match when={itemType() === "dir"}>
-      <button onClick={() => setDirOpen(o => !o)}>{dirOpen() ? "-" : "+"}</button>
-      <Show when={dirOpen() && entries}>
-        <For each={entries()}>
+  return <>
+    <button onClick={() => setOpen(!open())}>{open() ? "-" : "+"}</button>
+    {itemType() === "dir" ? "[DIR]" : "[FILE]"} {name()}
+    <Switch>
+      <Match when={open() && itemType() === "file"}>
+        <pre>{content()?.()}</pre>
+      </Match>
+      <Match when={open() && itemType() === "dir"}>
+        <For each={content()?.()}>
           {(entry) => <div><Item path={entry} fs={props.fs} /></div>}
         </For>
-      </Show>
-    </Match>
-  </Switch>
+      </Match>
+    </Switch>
+  </>
 );
 ```
 
