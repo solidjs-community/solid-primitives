@@ -74,4 +74,17 @@ describe("createWritableMemo", () => {
       dispose();
     });
   });
+
+  test("return value of setter equals the new value", () => {
+    createRoot(dispose => {
+      const [source] = createSignal(1);
+      const [memo, setMemo] = createWritableMemo(source, -2);
+
+      expect(setMemo(5)).toBe(5);
+      expect(memo()).toBe(5);
+      expect(setMemo(v => v + 1)).toBe(6);
+
+      dispose();
+    });
+  });
 });
