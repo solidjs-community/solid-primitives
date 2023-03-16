@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/memo": minor
+"@solid-primitives/memo": patch
 ---
 
 Fix createWritableMemo setter return
