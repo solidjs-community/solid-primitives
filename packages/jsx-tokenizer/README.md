@@ -115,25 +115,20 @@ TokenExample is typed as a JSXElement, this is so TokenExample can be used in JS
 If `createToken` is called without a tokenizer, it will create a new tokenizer id by itself. Then the token component can be used in `resolveTokens` as the tokenizer in the same way as if it was created with `createTokenizer`.
 
 ```tsx
-type TabProps<T> = { value: T };
+import { createToken, resolveTokens } from "@solid-primitives/jsx-tokenizer";
 
 function Tabs<T>(props: {
-  children: (Tab: Component<TabProps<T>>) => JSX.Element;
+  children: (Tab: Component<{ value: T }>) => JSX.Element;
   active: T;
-  onSelect: (item: T) => void;
 }) {
-  const Tab = createToken((props: TabProps<T>) => props.value);
+  const Tab = createToken((props: { value: T }) => props.value);
   // resolveTokens will look for tokens created by Tab component
   const tokens = resolveTokens(Tab, () => props.children(Tab));
-
   return (
     <ul>
       <For each={tokens()}>
-        {token => (
-          <li
-            onClick={() => props.onSelect(token.data)}
-            classList={{ active: token.data === props.active }}
-          >
+        {(token) => (
+          <li classList={{ active: token.data === props.active }}>
             {token.data}
           </li>
         )}
@@ -143,8 +138,8 @@ function Tabs<T>(props: {
 }
 
 // usage
-<Tabs active="tab1" onSelect={tab => console.log(tab)}>
-  {Tab => (
+<Tabs active="tab1">
+  {(Tab) => (
     <>
       <Tab value="tab1" />
       <Tab value="tab2" />
