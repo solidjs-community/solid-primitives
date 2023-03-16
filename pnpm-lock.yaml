@@ -309,7 +309,7 @@ importers:
 
   packages/i18n:
     specifiers:
-      '@solid-primitives/context': workspace:^0.1.4
+      '@solid-primitives/context': workspace:^0.2.0
       solid-js: ^1.6.0
     dependencies:
       '@solid-primitives/context': link:../context

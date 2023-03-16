@@ -1,5 +1,12 @@
 # @solid-primitives/i18n
 
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [4135c9bf]
+  - @solid-primitives/context@0.2.0
+
 ## 1.2.1
 
 ### Patch Changes
