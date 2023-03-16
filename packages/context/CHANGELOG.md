@@ -1,5 +1,11 @@
 # @solid-primitives/context
 
+## 0.2.0
+
+### Minor Changes
+
+- 4135c9bf: Add `MultiProvider` for providing multiple contexts at once.
+
 ## 0.1.4
 
 ### Patch Changes
