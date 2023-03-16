@@ -145,8 +145,9 @@ export function createWritableMemo<T>(
   return [
     (combined = createLatest([signal, memo], options)),
     ((setter: any): T =>
-      setSignal(() => (typeof setter === "function" ? setter(untrack(combined)) : setter))
-        .v) as Setter<T>,
+      setSignal(() =>
+        typeof setter === "function" ? setter(untrack(combined)) : setter,
+      )) as Setter<T>,
   ];
 }
 
