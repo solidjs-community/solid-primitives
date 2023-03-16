@@ -117,21 +117,14 @@ If `createToken` is called without a tokenizer, it will create a new tokenizer i
 ```tsx
 import { createToken, resolveTokens } from "@solid-primitives/jsx-tokenizer";
 
-function Tabs<T>(props: {
-  children: (Tab: Component<{ value: T }>) => JSX.Element;
-  active: T;
-}) {
+function Tabs<T>(props: { children: (Tab: Component<{ value: T }>) => JSX.Element; active: T }) {
   const Tab = createToken((props: { value: T }) => props.value);
   // resolveTokens will look for tokens created by Tab component
   const tokens = resolveTokens(Tab, () => props.children(Tab));
   return (
     <ul>
       <For each={tokens()}>
-        {(token) => (
-          <li classList={{ active: token.data === props.active }}>
-            {token.data}
-          </li>
-        )}
+        {token => <li classList={{ active: token.data === props.active }}>{token.data}</li>}
       </For>
     </ul>
   );
@@ -139,7 +132,7 @@ function Tabs<T>(props: {
 
 // usage
 <Tabs active="tab1">
-  {(Tab) => (
+  {Tab => (
     <>
       <Tab value="tab1" />
       <Tab value="tab2" />
