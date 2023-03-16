@@ -82,6 +82,7 @@ describe("createWritableMemo", () => {
 
       expect(setMemo(5)).toBe(5);
       expect(memo()).toBe(5);
+      expect(setMemo(v => v + 1)).toBe(6);
 
       dispose();
     });
