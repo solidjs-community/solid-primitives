@@ -57,7 +57,7 @@ function buildChainedDictionary<T extends I18nObject>(obj: T, readFn: <A = any>(
         break;
       case "string":
         mapped[key] = (args: I18nFormatOptions) =>
-          value.replace(/{{([^{}]+)}}/g, (_, key) => readFn(args, key, ""));
+          value.replace(/{{([^{}]+)}}/g, (_, key) => readFn(args, key, "").toString());
         break;
       default:
         throw new Error(
