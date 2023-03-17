@@ -312,6 +312,7 @@ const Table: ParentComponent = props => {
 
       if (isSafari || isIOS) {
         if (window.scrollY < 100) return;
+        checkTableSameWidthAsParent();
         setTimeout(() => {
           setTableSizeSameAsParentInit = false;
           prevTableContainerParentWidth = tableContainerParent.clientWidth;
