@@ -8,7 +8,7 @@ import { TBundleSizeItem } from "../BundleSizeModal/BundleSizeModal";
 import Heading from "./Heading";
 import InfoBar from "./InfoBar";
 
-const GUTHUB_REPO = "https://github.com/solidjs-community/solid-primitives";
+const GITHUB_REPO = "https://github.com/solidjs-community/solid-primitives";
 
 export const PRIMITIVE_PAGE_PADDING_TOP = 140;
 
@@ -19,7 +19,7 @@ const PrimitivePageMain: ParentComponent<{
   packageList: TBundleSizeItem[];
   primitiveList: TBundleSizeItem[];
 }> = props => {
-  const githubRepoPrimitive = `${GUTHUB_REPO}/tree/main/packages/${props.name}`;
+  const githubRepoPrimitive = `${GITHUB_REPO}/tree/main/packages/${props.name}`;
 
   onPreMount(() => {
     document.documentElement.classList.add("primitives-page-main");
