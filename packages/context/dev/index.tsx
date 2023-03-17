@@ -1,5 +1,12 @@
-import { createContextProvider } from "../src";
-import { Component, createSignal } from "solid-js";
+import { createContextProvider, MultiProvider } from "../src";
+import {
+  Component,
+  createContext,
+  createSignal,
+  FlowComponent,
+  untrack,
+  useContext,
+} from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
 
@@ -14,7 +21,7 @@ const [CounterProvider, useCounter] = createContextProvider((props: { initial: n
 });
 
 const Counter: Component = () => {
-  const { count, increment } = useCounter();
+  const { count, increment } = useCounter()!;
 
   return (
     <button class="btn" onClick={increment}>
@@ -22,6 +29,12 @@ const Counter: Component = () => {
     </button>
   );
 };
+
+const TestCtx = createContext<{ title: string }>();
+
+const BoundProvider: FlowComponent = props => (
+  <TestCtx.Provider value={{ title: "foo" }}>{props.children}</TestCtx.Provider>
+);
 
 const App: Component = () => {
   return (
@@ -32,9 +45,27 @@ const App: Component = () => {
         <CounterProvider initial={1}>
           <Counter />
         </CounterProvider>
+
+        <MultiProvider
+          values={[
+            [TestCtx, { title: "Hello Context" }],
+            [TestCtx.Provider, { title: "Hello Provider" }],
+            [TestCtx, { title: 123 }],
+            [TestCtx.Provider, { title: 321 }],
+            [TestCtx, undefined],
+            [TestCtx.Provider, undefined],
+            BoundProvider,
+            CounterProvider,
+          ]}
+        >
+          {untrack(() => {
+            const ctx = useContext(TestCtx);
+            return <>{ctx?.title}</>;
+          })}
+        </MultiProvider>
       </div>
     </div>
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+render(() => <App />, document.getElementById("root")!);

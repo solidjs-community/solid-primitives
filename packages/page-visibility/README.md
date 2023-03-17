@@ -10,7 +10,7 @@
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 - [`createPageVisibility`](#createPageVisibility) - Creates a signal with a boolean value identifying the page visibility state
-- [`usePageVisibility`](#usePageVisibility) - A [shared-root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) alternative.
+- [`usePageVisibility`](#usePageVisibility) - A [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) alternative.
 
 ## Installation
 
@@ -38,7 +38,7 @@ createEffect(() => {
 
 ## `usePageVisibility`
 
-`usePageVisibility` is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive. It is providing the same signal as `createPageVisibility`, but the event-listener and the signal are shared between dependents, making it more optimized to use in multiple places at once.
+`usePageVisibility` is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive. It is providing the same signal as `createPageVisibility`, but the event-listener and the signal are shared between dependents, making it more optimized to use in multiple places at once.
 
 ### How to use it
 

@@ -312,6 +312,7 @@ const Table: ParentComponent = props => {
 
       if (isSafari || isIOS) {
         if (window.scrollY < 100) return;
+        checkTableSameWidthAsParent();
         setTimeout(() => {
           setTableSizeSameAsParentInit = false;
           prevTableContainerParentWidth = tableContainerParent.clientWidth;
@@ -426,7 +427,7 @@ const Table: ParentComponent = props => {
   return (
     <div class={`${pageWidthClass} isolate mx-auto`}>
       <div
-        class="box-shadow-[var(--table-header-box-shadow)] z-1 pointer-events-none fixed top-[60px] left-0 right-0 transition-opacity"
+        class="fixed top-[60px] left-0 right-0 box-shadow-[var(--table-header-box-shadow)] transition-opacity z-2 pointer-events-none"
         style={{ opacity: "0" }}
         ref={tableHeaderShadowStickyDiv}
       />

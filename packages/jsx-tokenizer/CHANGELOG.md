@@ -1,4 +1,18 @@
-# @solid-primitives/jsx-parser
+# @solid-primitives/jsx-tokenizer
+
+## 1.0.0
+
+### Major Changes
+
+- 60d7ac20: Package got renamed from `jsx-parser` to `jsx-tokenizer`.
+
+  Improved jsdoc comments with better descriptions.
+
+  `createJSXParser` renamed to `createTokenizer`.
+
+  `isToken` and `resolveTokens` can now accept an array of tokenizers to match.
+
+  `createToken` can be used without passing a tokenizer. This will create a token with the component function as the tokenizer.
 
 ## 0.2.0
 

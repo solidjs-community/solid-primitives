@@ -112,7 +112,7 @@ memo(); // T: number
 
 ### Usage caveats
 
-There are vary few actual good applications of a lazy memo, that couldn't be solved with other means — like improving the data architecture. For example, you can always only create memos in places that you intend to use it in, instead of declaring it prematurely.
+There are very few actual good applications of a lazy memo, that couldn't be solved with other means — like improving the data architecture. For example, you can always only create memos in places that you intend to use it in, instead of declaring it prematurely.
 
 ```ts
 // instead of memo, distribute only a calculation function

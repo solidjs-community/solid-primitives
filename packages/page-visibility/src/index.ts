@@ -1,6 +1,6 @@
-import { Accessor, sharedConfig } from "solid-js";
-import { createSharedRoot } from "@solid-primitives/rootless";
-import { createHydrateSignal } from "@solid-primitives/utils";
+import { Accessor } from "solid-js";
+import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
+import { createHydratableSignal, trueFn } from "@solid-primitives/utils";
 import { makeEventListener } from "@solid-primitives/event-listener";
 
 /**
@@ -17,22 +17,18 @@ import { makeEventListener } from "@solid-primitives/event-listener";
  */
 export const createPageVisibility = (): Accessor<boolean> => {
   if (process.env.SSR) {
-    return () => true;
+    return trueFn;
   }
-  const isVisible = () => document.visibilityState === "visible";
-  const [state, setState] = createHydrateSignal(true, isVisible);
-  const update = () => setState(isVisible());
-  makeEventListener(document, "visibilitychange", update);
-  return state;
+  const checkVisibility = () => document.visibilityState === "visible";
+  const [isVisible, setVisible] = createHydratableSignal(true, checkVisibility);
+  makeEventListener(document, "visibilitychange", () => setVisible(checkVisibility));
+  return isVisible;
 };
-
-const sharedPageVisibility: () => Accessor<boolean> =
-  /*#__PURE__*/ createSharedRoot(createPageVisibility);
 
 /**
  * Returns a signal with a boolean value identifying the page visibility state.
  *
- * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) except if during hydration.
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) except if during hydration.
  *
  * @example
  * ```ts
@@ -43,6 +39,5 @@ const sharedPageVisibility: () => Accessor<boolean> =
  * })
  * ```
  */
-export const usePageVisibility: () => Accessor<boolean> = process.env.SSR
-  ? () => () => false
-  : () => (sharedConfig.context ? createPageVisibility() : sharedPageVisibility());
+export const usePageVisibility: () => Accessor<boolean> =
+  /*#__PURE__*/ createHydratableSingletonRoot(createPageVisibility);

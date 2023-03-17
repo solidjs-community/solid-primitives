@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "transition-group",
-    "stage": 1,
+    "stage": 2,
     "list": [
       "createSwitchTransition",
       "createListTransition"
@@ -75,6 +75,6 @@
   "devDependencies": {
     "@solid-primitives/refs": "workspace:^1.0.0",
     "@solid-primitives/utils": "workspace:^5.4.0",
-    "@solidjs/router": "^0.7.0"
+    "@solidjs/router": "^0.8.0"
   }
 }

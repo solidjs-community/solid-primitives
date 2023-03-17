@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 5.5.0
+
+### Minor Changes
+
+- 464248f7: Add `createHydratableSignal` (deprecated createHydrateSignal) and `createHydratableStore`
+
 ## 5.4.0
 
 ### Minor Changes

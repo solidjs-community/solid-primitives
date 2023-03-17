@@ -1,29 +1,33 @@
 import { Component, JSX, ParentComponent } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
-import { createJSXParser, createToken, isToken, resolveTokens } from "../src";
+import { createTokenizer, createToken, isToken, resolveTokens } from "../src";
 
 type Props = {
   value: number;
   children?: JSX.Element;
 };
 
-const parser = createJSXParser<{
-  id: "Value" | "Add" | "Subtract";
+const parser = createTokenizer<{
+  id: "Value" | "Add";
   props: Props;
 }>({ name: "calculator" });
 
 const Calculator: ParentComponent = props => {
-  const tokens = resolveTokens(parser, () => props.children, {
+  const tokens = resolveTokens([parser, Subtract], () => props.children, {
     includeJSXElements: true,
   });
 
   const calculation = () => {
     let result = 0;
     tokens().forEach(el => {
-      if (!isToken(parser, el)) return;
+      if (!isToken([parser, Subtract], el)) {
+        console.info("not a token element:", el);
+        return;
+      }
+      console.info("token element:", el);
       const data = el.data;
-      console.info("token is ", data);
+      console.info("token data is", data);
       if (data.id === "Value") {
         result = data.props.value;
       } else if (data.id === "Add") {
@@ -62,10 +66,9 @@ const Add = createToken(
 );
 
 const Subtract = createToken(
-  parser,
   (props: Props) => ({
-    props,
-    id: "Subtract",
+    props: props as Props,
+    id: "Subtract" as const,
   }),
   props => <> - {props.value}</>,
 );

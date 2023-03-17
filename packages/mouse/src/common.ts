@@ -26,7 +26,7 @@ export const DEFAULT_RELATIVE_ELEMENT_POSITION: PositionRelativeToElement = {
   left: 0,
   width: 0,
   height: 0,
-  isInside: false,
+  isInside: true,
 };
 
 /**
@@ -118,12 +118,14 @@ export const getPositionToElement = (
   if (process.env.SSR) {
     return DEFAULT_RELATIVE_ELEMENT_POSITION;
   }
+
   const bounds = el.getBoundingClientRect(),
     top = bounds.top + window.scrollY,
     left = bounds.left + window.scrollX,
     x = pageX - left,
     y = pageY - top,
     { width, height } = bounds;
+
   return {
     x,
     y,

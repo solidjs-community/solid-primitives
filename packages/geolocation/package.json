@@ -97,7 +97,7 @@
     "@types/leaflet": "^1.7.11",
     "leaflet": "^1.8.0",
     "mapbox-gl": "^2.12.1",
-    "solid-map-gl": "^1.6.4",
+    "solid-map-gl": "^1.7.1",
     "vite-plugin-mkcert": "^1.13.1"
   },
   "dependencies": {

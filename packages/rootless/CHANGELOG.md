@@ -1,5 +1,18 @@
 # @solid-primitives/rootless
 
+## 1.3.0
+
+### Minor Changes
+
+- 464248f7: Rename `createSharedRoot` to `createSingletonRoot`.
+
+  Add experimental `createHydratableSingletonRoot` optimized for SSR and hydration.
+
+### Patch Changes
+
+- Updated dependencies [464248f7]
+  - @solid-primitives/utils@5.5.0
+
 ## 1.2.6
 
 ### Patch Changes

@@ -3,11 +3,14 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**"],
+      "inputs": ["src/**/*"]
     },
     "page": {
       "dependsOn": ["^build"],
-      "outputs": ["dev/dist/**"]
+      "outputs": ["dev/dist/**"],
+      "inputs": ["src/**/*", "dev/**/*", "!dev/dist/**/*"]
     }
-  }
+  },
+  "globalDependencies": ["tsconfig.json", "scripts/build"]
 }

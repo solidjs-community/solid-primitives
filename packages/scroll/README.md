@@ -101,7 +101,7 @@ https://codesandbox.io/s/solid-primitives-scroll-xy19c8?file=/index.tsx
 
 Returns a reactive object with current window scroll position.
 
-`useWindowScrollPosition` is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive, hence the object instance, signals and event-listeners are shared between dependents, making it more optimized to use in multiple places at once.
+`useWindowScrollPosition` is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive, hence the object instance, signals and event-listeners are shared between dependents, making it more optimized to use in multiple places at once.
 
 ```ts
 const scroll = useWindowScrollPosition();
