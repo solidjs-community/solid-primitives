@@ -1,7 +1,7 @@
 import Dismiss from "solid-dismiss";
 import { FiX } from "solid-icons/fi";
 import { Accessor, onMount, ParentComponent } from "solid-js";
-import { setHeaderState } from "../Header/Header";
+import * as Header from "../Header/Header";
 
 const SlideModal: ParentComponent<{
   menuButton: Element;
@@ -92,7 +92,7 @@ const SlideModal: ParentComponent<{
       overlayElement={{
         element: (
           <div
-            class="fixed inset-0 h-[calc(100%+100px)] z-[1000] bg-[#102a62b8] dark:bg-[#001627bd] backdrop-blur-[2px]"
+            class="fixed inset-0 z-[1000] h-[calc(100%+100px)] bg-[#102a62b8] backdrop-blur-[2px] dark:bg-[#001627bd]"
             onClick={() => setOpen(false)}
           ></div>
         ),
@@ -106,7 +106,7 @@ const SlideModal: ParentComponent<{
       animation={{
         name: "slide-modal",
         onEnter: () => {
-          setHeaderState("disableScroll", true);
+          Header.setScrollEnabled(false);
           requestAnimationFrame(() => {
             changePageLayout();
           });
@@ -115,18 +115,18 @@ const SlideModal: ParentComponent<{
           updateModalSlideExitDirectionCSSVariable();
         },
         onAfterExit: () => {
-          setHeaderState("disableScroll", false);
+          Header.setScrollEnabled(true);
           restorePageLayout();
         },
       }}
       ref={containerEl}
     >
       <div
-        class="mt-[100px] mb-[60px] px-2 flex justify-center pointer-events-none"
+        class="pointer-events-none mt-[100px] mb-[60px] flex justify-center px-2"
         role="presentation"
       >
         <div
-          class="pointer-events-auto relative w-full xxs:w-auto outline-none"
+          class="xxs:w-auto pointer-events-auto relative w-full outline-none"
           role="dialog"
           aria-modal="true"
           tabindex="-1"
@@ -134,7 +134,7 @@ const SlideModal: ParentComponent<{
         >
           {props.children}
           <button
-            class="absolute top-0 right-0 w-[45px] h-[45px] rounded-lg text-[#306FC4] flex justify-center items-center dark:text-[#c2d5ee] dark:hover:text-white"
+            class="absolute top-0 right-0 flex h-[45px] w-[45px] items-center justify-center rounded-lg text-[#306FC4] dark:text-[#c2d5ee] dark:hover:text-white"
             onClick={() => {
               setOpen(false);
             }}

@@ -17,7 +17,7 @@ export default defineConfig(() => {
         },
       }),
       solid({
-        hot: false,
+        // hot: false,
         adapter: staticAdapter(),
       }),
     ],
