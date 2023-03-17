@@ -14,6 +14,7 @@ import SearchModal from "../Search/SearchModal";
 import NavMenu from "./NavMenu";
 import ThemeBtn from "./ThemeBtn";
 import clsx from "clsx";
+import { createTween } from "@solid-primitives/tween";
 
 export const [isScrollEnabled, setScrollEnabled] = createSignal(false);
 
@@ -30,10 +31,93 @@ const HEADER_HEIGHT = 60;
 
 const Header: Component = () => {
   const windowScroll = createScrollPosition(() => window);
-  const location = useLocation();
-
-  const [isNavOpen, setIsNavOpen] = createSignal(false);
   const [isSearchOpen, setIsSearchOpen] = createSignal(false);
+  const [isNavOpen, setIsNavOpen] = createSignal(false);
+  const [from, setFrom] = createSignal(0);
+  const easeInOutCubic = (x: number): number => {
+    return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  };
+  const tweenedValue = createTween(from, { ease: easeInOutCubic, duration: OPEN_NAV_DURATION });
+  const location = useLocation();
+  let gradientOverflowLeftBG!: HTMLDivElement;
+  let gradientOverflowRightBG!: HTMLDivElement;
+  let menuButtonSearch!: HTMLButtonElement;
+  let menuButtonNavMenu!: HTMLButtonElement;
+  let headerOpaqueBg!: HTMLDivElement;
+  let headerSolidBg!: HTMLDivElement;
+  let headerOpaqueBgContainer!: HTMLDivElement;
+  let headerBottomGradientBorder!: HTMLDivElement;
+  let headerShadow!: HTMLDivElement;
+  let navMenu!: HTMLDivElement;
+  let navMenuHeight = 0;
+
+  // Issue is that when safari scroll 'rubberbands' at top of page there's a big white background that temporary covers header.
+  // It's caused by header elements, one containing blur in backdrop-filter and other containing solid white background.
+  if (isSafari && !isMobile) {
+    const checkScroll = () => {
+      if (!isNavOpen() && !isSearchOpen()) {
+        if (window.scrollY > 2) {
+          headerOpaqueBg.style.display = "";
+          headerSolidBg.style.display = "";
+        } else {
+          headerOpaqueBg.style.display = "none";
+          headerSolidBg.style.display = "none";
+        }
+      }
+    };
+
+    createEffect(() => {
+      if (isScrollEnabled()) {
+        untrack(checkScroll);
+        makeEventListener(window, "scroll", checkScroll, { passive: true });
+      } else {
+        removeEventListener("scroll", checkScroll);
+      }
+    });
+  }
+
+  createEffect(
+    defer(tweenedValue, tweenedValue => {
+      navMenu.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
+      headerBottomGradientBorder.style.transform = `translateY(${tweenedValue}px)`;
+      headerShadow.style.transform = `translateY(${tweenedValue}px)`;
+      headerOpaqueBg.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
+      gradientOverflowLeftBG.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
+      gradientOverflowRightBG.style.transform = `translateY(${-navMenuHeight + tweenedValue}px)`;
+    }),
+  );
+
+  createEffect(
+    defer(isNavOpen, isNavOpen => {
+      if (isNavOpen) {
+        navMenuHeight = navMenu.clientHeight;
+
+        headerOpaqueBg.style.height = `${navMenuHeight + HEADER_HEIGHT}px`;
+        gradientOverflowLeftBG.style.height = `${navMenuHeight + 220}px`;
+        gradientOverflowRightBG.style.height = `${navMenuHeight + 220}px`;
+        gradientOverflowLeftBG.style.setProperty(
+          "--header-gradient-overflow-start",
+          `${navMenuHeight + 60}px`,
+        );
+        gradientOverflowRightBG.style.setProperty(
+          "--header-gradient-overflow-start",
+          `${navMenuHeight + 60}px`,
+        );
+        headerOpaqueBgContainer.style.height = `${navMenuHeight + HEADER_HEIGHT}px`;
+        headerOpaqueBg.style.transform = `translateY(${-navMenuHeight}px)`;
+        gradientOverflowLeftBG.style.transform = `translateY(${-navMenuHeight}px)`;
+        gradientOverflowRightBG.style.transform = `translateY(${-navMenuHeight}px)`;
+        headerOpaqueBg.style.top = "-1px";
+        headerOpaqueBgContainer.style.top = "1px";
+
+        requestAnimationFrame(() => {
+          setFrom(navMenuHeight);
+        });
+        return;
+      }
+      setFrom(0);
+    }),
+  );
 
   createEffect(
     defer(
@@ -42,43 +126,6 @@ const Header: Component = () => {
     ),
   );
 
-  const [navMenu, setNavMenu] = createSignal<HTMLDivElement>();
-
-  const navMenuSize = createElementSize(navMenu);
-  const navMenuHeight = createMemo(() => navMenuSize.height ?? 0);
-
-  // might remove this, hopefully this issue is temp, not that big deal of an issue,
-  // but the issue is that when safari scroll 'rubberbands' at top of page there's a big white background that covers header.
-  // It's caused by header element containing blur in backdrop-filter.
-  if (isSafari && !isMobile) {
-    const checkScroll = () => {
-      if (!isNavOpen() && !isSearchOpen()) {
-        // TODO
-        // setStyles("headerOpaqueBg", "display", window.scrollY > 2 ? "" : "none");
-      }
-    };
-
-    createEffect(() => {
-      if (isScrollEnabled()) {
-        untrack(checkScroll);
-        makeEventListener(window, "scroll", checkScroll, { passive: true });
-      }
-    });
-  }
-
-  // because navMenu ref is dynamic - a new element is added to DOM when nav is opened
-  // the transform needs to be applied in the next frame instead of instantly with a class
-  // so that the enter transition is visible
-  createEffect(() => {
-    const el = navMenu();
-    if (el) {
-      const open = isNavOpen();
-      requestAnimationFrame(() => (el.style.transform = `translateY(${open ? 0 : "-100%"})`));
-    }
-  });
-
-  let menuButtonSearch!: HTMLButtonElement;
-  let menuButtonNavMenu!: HTMLButtonElement;
   return (
     <>
       <header
@@ -93,8 +140,8 @@ const Header: Component = () => {
           >
             <div
               class={`${pageWidthClass} box-shadow-[var(--header-box-shadow)] -z-1 
-              transition-composite absolute top-0 left-0 bottom-0 right-0 mx-auto w-full opacity-0
-              duration-300 ease-out`}
+              absolute top-0 left-0 bottom-0 right-0 mx-auto w-full opacity-0 transition-opacity
+              duration-200`}
               classList={{
                 // show the shadow when scrolled down or when the nav menu is open,
                 // but not when the search modal is open or when the table-sub-nav is shown
@@ -104,12 +151,10 @@ const Header: Component = () => {
                     !isOverridingShadow() &&
                     windowScroll.y > PRIMITIVE_PAGE_PADDING_TOP + 50),
               }}
-              style={{
-                transform: `translateY(${isNavOpen() ? navMenuHeight() : 0}px)`,
-              }}
+              ref={headerShadow}
             >
               <div
-                class="box-shadow-[var(--header-big-box-shadow)] -z-1 h-full opacity-0 transition-opacity duration-300 ease-out"
+                class="box-shadow-[var(--header-big-box-shadow)] -z-1 duration-250 h-full opacity-0 transition-opacity"
                 classList={{ "opacity-100": isNavOpen() }}
               />
             </div>
@@ -158,70 +203,62 @@ const Header: Component = () => {
         {/* fixes weird shimmering top dark shadow blur during openNavMenu animation in Chrome  */}
         {/* Still shows up in Safari, no fix  */}
         <div
-          class="-z-1 pointer-events-none absolute inset-0 top-px overflow-clip"
-          style={{
-            height: `${navMenuHeight() + HEADER_HEIGHT}px`,
-          }}
+          class="-z-1 pointer-events-none absolute inset-0 overflow-clip"
+          ref={headerOpaqueBgContainer}
         >
           <div
             class="absolute inset-0 translate-y-[calc(-100%+60px)]
-            bg-white/50 backdrop-blur-md 
-            transition-transform duration-300 ease-out
+            bg-white/50 backdrop-blur-md
             dark:bg-[#293843]/70"
-            style={{
-              height: `${navMenuHeight() + HEADER_HEIGHT}px`,
-              transform: isNavOpen() ? `translateY(0)` : "",
-            }}
+            ref={headerOpaqueBg}
           />
         </div>
-        <div class="bg-page-main-bg z-1 absolute top-0 left-0 right-0 h-px" />
+        <div
+          class="bg-page-main-bg z-1 absolute top-0 left-0 right-0 h-[1px]"
+          ref={headerSolidBg}
+        />
         <div
           class={`${pageWidthClass} background-[var(--header-border-bottom)] duration-250 mx-auto h-[2px] opacity-0 transition-opacity`}
           classList={{ "opacity-100": isOverridingShadow() && !isSearchOpen() }}
-          style={{
-            transform: `translateY(${isNavOpen() ? navMenuHeight() : 0}px)`,
-          }}
+          ref={headerBottomGradientBorder}
         />
         <div class={`${pageWidthClass} relative top-[-2px] mx-auto overflow-clip`}>
           <Dismiss
             menuButton={menuButtonNavMenu}
             open={isNavOpen}
-            setOpen={state => setIsNavOpen(state)}
-            class="-translate-y-full transition-transform duration-300 ease-out"
+            setOpen={setIsNavOpen}
+            class="-translate-y-full"
             animation={{
-              onEnter(_, done) {
+              onEnter: (_, done) => {
                 setTimeout(done, OPEN_NAV_DURATION);
               },
-              onExit(_, done) {
+              onExit: (_, done) => {
                 setTimeout(done, OPEN_NAV_DURATION);
               },
             }}
-            ref={setNavMenu}
+            ref={navMenu}
           >
             <NavMenu onClose={() => setIsNavOpen(false)} />
           </Dismiss>
         </div>
       </header>
-      <div class="-z-1 pointer-events-none fixed top-0 left-0 right-0 hidden md:flex">
+      <div class="-z-1 pointer-events-none fixed top-0 left-0 right-0 hidden transition md:flex">
         {untrack(() => {
-          const Gradient = (props: { class?: string }) => (
+          const Gradient = (props: { class?: string; ref: HTMLDivElement }) => (
             <div
               class={clsx(
                 props.class,
                 "h-[220px] flex-grow bg-[linear-gradient(to_bottom,var(--page-main-bg)_var(--header-gradient-overflow-start),transparent)]",
-                "transition-[height] duration-300 ease-out",
               )}
-              style={{
-                "--header-gradient-overflow-start": `${(isNavOpen() ? navMenuHeight() : 0) + 60}px`,
-                height: `${(isNavOpen() ? navMenuHeight() : 0) + 220}px`,
-              }}
+              style={{ "--header-gradient-overflow-start": "60px" }}
+              ref={props.ref}
             />
           );
           return (
             <>
-              <Gradient class="-order-1" />
+              <Gradient class="-order-1" ref={gradientOverflowLeftBG} />
               <div class={`${pageWidthClass} w-full flex-shrink-0 flex-grow`} />
-              <Gradient />
+              <Gradient ref={gradientOverflowRightBG} />
             </>
           );
         })}
