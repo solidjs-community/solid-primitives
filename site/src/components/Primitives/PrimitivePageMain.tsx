@@ -3,7 +3,6 @@ import { onMount, ParentComponent } from "solid-js";
 import { Title } from "solid-start";
 import Heading from "./Heading";
 import InfoBar from "./InfoBar";
-import { setHeaderState } from "../Header/Header";
 import { pageWidthClass } from "~/constants";
 import { TBundleSizeItem } from "../BundleSizeModal/BundleSizeModal";
 import onPreMount from "~/hooks/onPreMount";
@@ -24,7 +23,6 @@ const PrimitivePageMain: ParentComponent<{
 
   onPreMount(() => {
     document.documentElement.classList.add("primitives-page-main");
-    setHeaderState("showGradientBorder", false);
   });
 
   createTooltipOnCodePrimitives();
@@ -32,6 +30,7 @@ const PrimitivePageMain: ParentComponent<{
   return (
     <>
       <Title>{props.name}</Title>
+      <script>document.documentElement.classList.add("primitives-page-main")</script>
       <div
         class="absolute top-0 left-0 right-0 h-[95vh] bg-[linear-gradient(to_bottom,#fff_var(--primitive-padding-top-gr),transparent)] dark:bg-[linear-gradient(to_bottom,#293843_var(--primitive-padding-top-gr),transparent)] -z-1"
         style={{
