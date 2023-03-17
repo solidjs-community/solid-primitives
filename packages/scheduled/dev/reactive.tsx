@@ -5,7 +5,7 @@ const Reactive: Component<{}> = props => {
   const [count, setCount] = createSignal(0);
 
   return (
-    <div class="p-4 pb-0 center-child">
+    <div class="center-child p-4 pb-0">
       <div class="wrapper-v">
         <button class="btn" onClick={() => setCount(p => ++p)}>
           Increment

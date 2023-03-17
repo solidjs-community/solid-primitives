@@ -65,7 +65,7 @@ const StageBadge: ParentComponent<{
       <span class="flex justify-center">
         <span
           data-stage
-          class={"flex justify-center items-center font-sans  rounded-md " + classStageColor(level)}
+          class={"flex items-center justify-center rounded-md  font-sans " + classStageColor(level)}
           classList={{
             "w-[25px] sm:w-[32.25px] h-[28px]": !size,
             "w-[22px] h-[24px]": size === "small",
@@ -81,7 +81,7 @@ const StageBadge: ParentComponent<{
       <button
         data-stage
         class={
-          "flex justify-center items-center font-sans w-[25px] sm:w-[32.25px] h-[28px] border-[rgba(0,0,0,0.15)] border-2 hover:border-black/40 hover:brightness-110 rounded-md dark:border-black/20 dark:hover:border-black/60 transition-[border-color,filter] " +
+          "flex h-[28px] w-[25px] items-center justify-center rounded-md border-2 border-[rgba(0,0,0,0.15)] font-sans transition-[border-color,filter] hover:border-black/40 hover:brightness-110 dark:border-black/20 dark:hover:border-black/60 sm:w-[32.25px] " +
           classStageColor(level)
         }
         ref={menuButton}
@@ -101,13 +101,13 @@ export const StageBadgePill: ParentComponent<{ value: number | string }> = ({ va
 
   return (
     <>
-      <button class="flex font-sans hover:contrast-[1.2] transition-filter" ref={menuButton}>
-        <div class="flex items-center rounded-l-lg h-[38px] border-[#cae0ff] px-4 border-[3px] bg-[#cae0ff40] dark:border-[#405b6e] dark:bg-[#2a4355]">
+      <button class="transition-filter flex font-sans hover:contrast-[1.2]" ref={menuButton}>
+        <div class="flex h-[38px] items-center rounded-l-lg border-[3px] border-[#cae0ff] bg-[#cae0ff40] px-4 dark:border-[#405b6e] dark:bg-[#2a4355]">
           Stage
         </div>
         <div
           class={
-            "flex justify-center items-center rounded-r-lg px-6 h-full font-semibold border-[3px] border-transparent " +
+            "flex h-full items-center justify-center rounded-r-lg border-[3px] border-transparent px-6 font-semibold " +
             classStageColor(level)
           }
           style={styleStageColor(level)}

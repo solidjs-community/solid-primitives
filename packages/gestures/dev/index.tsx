@@ -36,9 +36,9 @@ const App: Component = () => {
       //     console.log(x, y);
       //   }
       // }}
-      class="box-border w-full min-h-screen flex flex-col justify-center items-center space-y-12 bg-gray-800 text-white"
+      class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-12 bg-gray-800 text-white"
     >
-      <div class="w-36 h-36 rounded-3xl bg-orange-400">
+      <div class="h-36 w-36 rounded-3xl bg-orange-400">
         {data()}
         <br />
         {data2()}

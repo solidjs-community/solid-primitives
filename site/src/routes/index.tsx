@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <main class="pt-[60px]">
       <Title>Solid Primitives</Title>
-      <div class="p-4 sm:pt-[5vh] md:pt-[10vh] leading-7 max-w-[720px] mx-auto min-h-[35vh] sm:min-h-[50vh] overflow-clip">
+      <div class="mx-auto min-h-[35vh] max-w-[720px] overflow-clip p-4 leading-7 sm:min-h-[50vh] sm:pt-[5vh] md:pt-[10vh]">
         <p class="py-3 sm:text-lg md:text-2xl">
           A project that strives to develop high-quality, community contributed Solid{" "}
           <strong>Primitives</strong>.
@@ -21,22 +21,22 @@ export default function Home() {
         <div class="relative mt-4 mb-10 text-[14px] sm:text-base md:text-lg">
           <ul class="flex gap-4">
             <li>
-              <div class="text-[#30889c] dark:text-[#44bfdb] font-semibold">Small</div>
+              <div class="font-semibold text-[#30889c] dark:text-[#44bfdb]">Small</div>
               <div>
                 aggregate <span class="whitespace-nowrap">tree-shaking</span> benefits
               </div>
             </li>
             <li>
-              <div class="text-[#3769a5] dark:text-[#5aa5ff] font-semibold">Isomorphic</div>
+              <div class="font-semibold text-[#3769a5] dark:text-[#5aa5ff]">Isomorphic</div>
               <div>client and server side functionality</div>
             </li>
             <li>
-              <div class="text-[#3c5098] dark:text-[#6586ff] font-semibold">Stable</div>
+              <div class="font-semibold text-[#3c5098] dark:text-[#6586ff]">Stable</div>
               <div>consistent and managed testing + maintenance</div>
             </li>
           </ul>
           <svg
-            class="absolute top-[20%] -left-6 -right-8 sm:-left-4 sm:-right-4 -z-1 opacity-60 pointer-events-none mask-image-[linear-gradient(to_bottom,transparent,#000_30%)] sm:mask-image-[linear-gradient(to_bottom,transparent,#000_20%)]"
+            class="-z-1 mask-image-[linear-gradient(to_bottom,transparent,#000_30%)] sm:mask-image-[linear-gradient(to_bottom,transparent,#000_20%)] pointer-events-none absolute top-[20%] -left-6 -right-8 opacity-60 sm:-left-4 sm:-right-4"
             viewBox="0 0 188.975 179.46"
             // @ts-ignore
             xml:space="preserve"
@@ -75,7 +75,7 @@ export default function Home() {
         </h2>
       </div>
       <PrimitivesTable />
-      <div class="max-w-[864px] mx-auto leading-7 mt-[125px] p-4">
+      <div class="mx-auto mt-[125px] max-w-[864px] p-4 leading-7">
         <NoHydration>
           <HomeSections />
         </NoHydration>

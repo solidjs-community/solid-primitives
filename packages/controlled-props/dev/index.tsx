@@ -11,7 +11,7 @@ const App: Component = () => {
   });
 
   return (
-    <div class="p-24 box-border w-full min-h-screen overflow-hidden flex flex-col justify-center items-center">
+    <div class="box-border flex min-h-screen w-full flex-col items-center justify-center overflow-hidden p-24">
       <h2>Props</h2>
       <ul>
         <li>bool: {props.bool() ? "true" : "false"}</li>

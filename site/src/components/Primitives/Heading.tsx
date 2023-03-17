@@ -2,13 +2,13 @@ import { ParentComponent } from "solid-js";
 
 const Heading: ParentComponent = props => {
   return (
-    <div class="text-3xl sm:text-4xl font-bold capitalize">
-      <div class="@container/heading relative container-s mb-[-60px]">
+    <div class="text-3xl font-bold capitalize sm:text-4xl">
+      <div class="@container/heading container-s relative mb-[-60px]">
         <div aria-hidden="true" style="visibility: hidden;">
           {props.children}
         </div>
         <svg
-          class="absolute hidden @[290px]/heading:block"
+          class="@[290px]/heading:block absolute hidden"
           viewBox="0 0 88.975 79.46"
           // @ts-ignore
           xml:space="preserve"
@@ -162,16 +162,16 @@ const Heading: ParentComponent = props => {
           </g>
         </svg>
         <div class="absolute top-[10px] left-[8px] right-[8px]">
-          <div class="relative top-[3px] w-full h-[43.63px] bg-[linear-gradient(to_right,#f5f7ff,#f5f7ff)] dark:bg-[linear-gradient(to_right,#2a3d4b,#2b3c4b)]" />
-          <div class="w-full h-[11px] bg-[linear-gradient(to_right,#dbe0f2,#d7ddf2)] dark:bg-[linear-gradient(to_right,#263544,#263442)] box-shadow-[0px_6px_17px_0px_#c4d3f4] dark:box-shadow-[0px_6px_17px_0px_#202d3b]" />
+          <div class="relative top-[3px] h-[43.63px] w-full bg-[linear-gradient(to_right,#f5f7ff,#f5f7ff)] dark:bg-[linear-gradient(to_right,#2a3d4b,#2b3c4b)]" />
+          <div class="box-shadow-[0px_6px_17px_0px_#c4d3f4] dark:box-shadow-[0px_6px_17px_0px_#202d3b] h-[11px] w-full bg-[linear-gradient(to_right,#dbe0f2,#d7ddf2)] dark:bg-[linear-gradient(to_right,#263544,#263442)]" />
         </div>
-        <h1 class="absolute bottom-[-40px] left-0 z-1">{props.children}</h1>
-        <div class="relative z-1">
-          <div aria-hidden="true" class="h-0 p-0 m-0" style="visibility: hidden;">
+        <h1 class="z-1 absolute bottom-[-40px] left-0">{props.children}</h1>
+        <div class="z-1 relative">
+          <div aria-hidden="true" class="m-0 h-0 p-0" style="visibility: hidden;">
             {props.children}
           </div>
           <div
-            class="absolute top-[32px] left-0 pointer-events-none text-[#4b6a87] dark:text-[#8a9fb5] -scale-y-100 blur-[2px] mask-image-[linear-gradient(to_bottom,transparent,#000)] select-none opacity-[0.35] dark:opacity-30 z-1"
+            class="mask-image-[linear-gradient(to_bottom,transparent,#000)] z-1 pointer-events-none absolute top-[32px] left-0 -scale-y-100 select-none text-[#4b6a87] opacity-[0.35] blur-[2px] dark:text-[#8a9fb5] dark:opacity-30"
             aria-hidden="true"
             style="-webkit-mask-size: 100% 22px; -webkit-mask-repeat: no-repeat; -webkit-mask-position: bottom; mask-size: 100% 22px; mask-repeat: no-repeat; mask-position: bottom;"
           >

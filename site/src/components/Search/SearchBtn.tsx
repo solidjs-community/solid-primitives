@@ -7,7 +7,7 @@ import { getSearchInput } from "./Search";
 const SearchBtn: Component<{ ref: HTMLButtonElement }> = props => {
   return (
     <button
-      class="flex xs:w-[250px] lg:w-[350px] font-sans px-2 py-2 items-center bg-white border-[#bdd3f2] border-2 rounded-md text-[#306FC4] hover:text-[#063983] hover:bg-[#f4f9ff] dark:bg-[#293742] dark:border-[#59728d] dark:text-[#c2d5ee] dark:hover:bg-[#394e5d]"
+      class="xs:w-[250px] flex items-center rounded-md border-2 border-[#bdd3f2] bg-white px-2 py-2 font-sans text-[#306FC4] hover:bg-[#f4f9ff] hover:text-[#063983] dark:border-[#59728d] dark:bg-[#293742] dark:text-[#c2d5ee] dark:hover:bg-[#394e5d] lg:w-[350px]"
       onClick={() => {
         if (isIOS) {
           focusInputAndKeepVirtualKeyboardOpen(getSearchInput);
@@ -18,7 +18,7 @@ const SearchBtn: Component<{ ref: HTMLButtonElement }> = props => {
       <div class="mr-2">
         <FiSearch />
       </div>
-      <div class="hidden xs:block">Quick Search ...</div>
+      <div class="xs:block hidden">Quick Search ...</div>
       <div class="ml-auto">
         <Show when={isWindows} fallback={<span>⌘K</span>}>
           <span>

@@ -31,11 +31,11 @@ const App: Component = () => {
   const es = createElementSize(() => ref);
 
   return (
-    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
+    <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
       <div class="center-child min-h-82">
         <div
           ref={e => (ref = e)}
-          class="w-24 h-24 bg-orange-500 rounded-md shadow-bg-gray-900 shadow-lg center-child"
+          class="shadow-bg-gray-900 center-child h-24 w-24 rounded-md bg-orange-500 shadow-lg"
           style={{
             width: `${width()}px`,
             height: `${height()}px`,

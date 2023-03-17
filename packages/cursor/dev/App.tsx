@@ -84,7 +84,7 @@ const ElementCursorTest: Component = () => {
           {enable() ? "Disable" : "Enable"}
         </button>
       </div>
-      <div class="flex sapce-x-2">
+      <div class="sapce-x-2 flex">
         {Array.from({ length: 4 }).map((_, i) => {
           let ref: HTMLDivElement | undefined;
           return (
@@ -107,7 +107,7 @@ const ElementCursorTest: Component = () => {
 
 export const App: Component = () => {
   return (
-    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
+    <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
       <BodyCursorTest />
       <ElementCursorTest />
     </div>

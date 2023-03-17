@@ -92,7 +92,7 @@ const ListPage: Component = () => {
           toggle wrapper
         </button>
       </div>
-      <div class="wrapper-h flex-wrap space-x-0 gap-4">
+      <div class="wrapper-h flex-wrap gap-4 space-x-0">
         <Suspense fallback={<p>Suspended</p>}>
           <Show when={showWrapper()}>
             {untrack(() => {
@@ -131,7 +131,7 @@ const ListPage: Component = () => {
                     <For each={list()}>
                       {({ n }, i) => (
                         <div
-                          class="node bg-yellow-600 cursor-pointer"
+                          class="node cursor-pointer bg-yellow-600"
                           onClick={() =>
                             setList(p => {
                               const copy = p.slice();

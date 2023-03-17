@@ -47,7 +47,7 @@ const ManyParents: Component = () => {
   return (
     <TestingNode heading="Many Parents - One Child" output={message}>
       <p class="caption">Using {"<Index/>"}</p>
-      <div class="flex flex-wrap justify-center gap-4 max-w-42">
+      <div class="max-w-42 flex flex-wrap justify-center gap-4">
         <Index each={list()}>
           {(show, i) => (
             <div
@@ -110,11 +110,11 @@ const OneParentManyChildren: Component = () => {
         </For>
       </div>
       <p class="text-xs text-gray-500">using {"<For>"}</p>
-      <div ref={parent} class="flex flex-wrap justify-center content-start gap-4 max-w-42 min-h-24">
+      <div ref={parent} class="max-w-42 min-h-24 flex flex-wrap content-start justify-center gap-4">
         <For each={show()}>
           {(show, i) => (
             <Show when={show}>
-              <div class="w-14 h-10 bg-teal-600 flex justify-center items-center">{i()}</div>
+              <div class="flex h-10 w-14 items-center justify-center bg-teal-600">{i()}</div>
             </Show>
           )}
         </For>
@@ -167,11 +167,11 @@ const OneParentManyChildrenIndex: Component = () => {
         </For>
       </div>
       <p class="caption">using {"<Index>"}</p>
-      <div ref={parent} class="flex flex-wrap justify-center content-start gap-4 max-w-42 min-h-24">
+      <div ref={parent} class="max-w-42 min-h-24 flex flex-wrap content-start justify-center gap-4">
         <Index each={show()}>
           {(show, i) => (
             <Show when={show()}>
-              <div class="w-14 h-10 bg-teal-600 flex justify-center items-center">{i}</div>
+              <div class="flex h-10 w-14 items-center justify-center bg-teal-600">{i}</div>
             </Show>
           )}
         </Index>
@@ -199,16 +199,16 @@ const AttributesTest: Component = () => {
       heading="Attributes"
       output={<LogMutationRecord setupLogFunc={fn => (log = fn)} />}
     >
-      <div ref={parent} class="flex gap-4 justify-center">
+      <div ref={parent} class="flex justify-center gap-4">
         <div
-          class="w-16 h-16 group cursor-pointer"
+          class="group h-16 w-16 cursor-pointer"
           style={{ transform: `rotate(${list()[0] * 90}deg)` }}
           onclick={() => handleClick(0)}
         >
-          <div class="w-10 h-full ml-3 bg-gradient-to-b from-teal-700 to-cyan-700 rounded opacity-90 group-hover:opacity-100"></div>
+          <div class="ml-3 h-full w-10 rounded bg-gradient-to-b from-teal-700 to-cyan-700 opacity-90 group-hover:opacity-100"></div>
         </div>
         <div
-          class="w-16 h-16 group transform cursor-pointer"
+          class="group h-16 w-16 transform cursor-pointer"
           classList={{
             "translate-y-3": list()[1] === 1,
             "translate-x-3": list()[1] === 2,
@@ -216,14 +216,14 @@ const AttributesTest: Component = () => {
           }}
           onclick={() => handleClick(1)}
         >
-          <div class="w-10 h-full ml-3 bg-gradient-to-b from-teal-700 to-cyan-700 rounded opacity-90 group-hover:opacity-100"></div>
+          <div class="ml-3 h-full w-10 rounded bg-gradient-to-b from-teal-700 to-cyan-700 opacity-90 group-hover:opacity-100"></div>
         </div>
         <button
-          class="m-0 p-0 w-16 h-16 group transform bg-transparent border-0 not-disabled:opacity-60 cursor-pointer"
+          class="not-disabled:opacity-60 group m-0 h-16 w-16 transform cursor-pointer border-0 bg-transparent p-0"
           disabled={list()[2] % 2 === 1}
         >
           <div
-            class="w-10 h-full ml-3 bg-gradient-to-b from-teal-700 to-cyan-700 rounded"
+            class="ml-3 h-full w-10 rounded bg-gradient-to-b from-teal-700 to-cyan-700"
             classList={{ "opacity-50": list()[2] % 2 === 1 }}
             onclick={() => handleClick(2)}
           ></div>
@@ -235,7 +235,7 @@ const AttributesTest: Component = () => {
 
 const App: Component = () => {
   return (
-    <div class="p-24 box-border w-full min-h-screen bg-black text-white flex justify-center items-center flex-wrap gap-12">
+    <div class="box-border flex min-h-screen w-full flex-wrap items-center justify-center gap-12 bg-black p-24 text-white">
       <AttributesTest />
       <SingleParentTest />
       <ManyParents />

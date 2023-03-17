@@ -6,11 +6,11 @@ import "uno.css";
 import { createStore } from "solid-js/store";
 
 const Ball = (props: { n: number }) => (
-  <div class="w-4 h-4 center-child rounded-full bg-cyan-500 transition-all duration-500">
+  <div class="center-child h-4 w-4 rounded-full bg-cyan-500 transition-all duration-500">
     {props.n}
   </div>
 );
-const Fallback = () => <div class="p-2 bg-gray-600 transition-all duration-500">fallback</div>;
+const Fallback = () => <div class="bg-gray-600 p-2 transition-all duration-500">fallback</div>;
 
 const App: Component = () => {
   const [state, setState] = createStore({
@@ -39,7 +39,7 @@ const App: Component = () => {
   onCleanup(() => clearInterval(i));
 
   return (
-    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
+    <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
       <div class="wrapper-v">
         <h4>
           Start: {state.start}, To: {state.to}, Step: {state.step}

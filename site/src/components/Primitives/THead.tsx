@@ -8,17 +8,17 @@ const THead: ParentComponent = props => {
       <tr
         id="header-shadow"
         aria-hidden="true"
-        class="absolute top-0 left-0 right-0 h-0 -z-1 pointer-events-none transition-opacity"
+        class="-z-1 pointer-events-none absolute top-0 left-0 right-0 h-0 transition-opacity"
         style="opacity: 0;"
       >
         <td class="h-0">
           {/* <div class="absolute h-[8px] top-0 left-0 right-0 bg-white"></div> */}
-          <div class="absolute inset-0 box-shadow-[var(--table-header-box-shadow)]" />
+          <div class="box-shadow-[var(--table-header-box-shadow)] absolute inset-0" />
         </td>
       </tr>
       <tr
         id="header-real-tr"
-        class="[&>th:first-child]:sticky [&>th:first-child]:left-[2px] [&>th:first-child]:rounded-tl-[26px] [&>th:last-child]:rounded-tr-[26px] text-[#49494B] dark:text-[#dee2e5]"
+        class="text-[#49494B] dark:text-[#dee2e5] [&>th:first-child]:sticky [&>th:first-child]:left-[2px] [&>th:first-child]:rounded-tl-[26px] [&>th:last-child]:rounded-tr-[26px]"
       >
         {props.children}
       </tr>

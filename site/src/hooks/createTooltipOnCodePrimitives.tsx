@@ -33,7 +33,7 @@ const TooltipContent = (el: HTMLElement) => {
 
   return (
     <div
-      class="relative bg-[#2d466d] text-white dark:bg-[#a6c6df] dark:text-black p-3 rounded-[9px]"
+      class="relative rounded-[9px] bg-[#2d466d] p-3 text-white dark:bg-[#a6c6df] dark:text-black"
       ref={el => setTarget([el])}
     >
       <h2 class="font-semibold opacity-80">Type</h2>
@@ -65,10 +65,10 @@ const TooltipContent = (el: HTMLElement) => {
       </div>
       <h2 class="font-semibold opacity-80">Size</h2>
       <div class="w-min">
-        <div class="flex justify-between gap-2 text-[14px] whitespace-nowrap">
+        <div class="flex justify-between gap-2 whitespace-nowrap text-[14px]">
           Minified <span>{primitiveData.size.minified}</span>
         </div>
-        <div class="flex justify-between gap-2 text-[14px] whitespace-nowrap">
+        <div class="flex justify-between gap-2 whitespace-nowrap text-[14px]">
           GZipped <span>{primitiveData.size.gzipped}</span>
         </div>
       </div>
@@ -94,7 +94,7 @@ const TooltipSVG: Component<{
   const widthFoo = () => props.width / 2 - widthOfArrow / 2 + 1.5;
   return (
     <div
-      class="absolute inset-0 pointer-events-none"
+      class="pointer-events-none absolute inset-0"
       style={{
         transform: props.placement === "bottom" ? "rotate(180deg)" : undefined,
       }}

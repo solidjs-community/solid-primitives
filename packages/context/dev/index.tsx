@@ -38,7 +38,7 @@ const BoundProvider: FlowComponent = props => (
 
 const App: Component = () => {
   return (
-    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
+    <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
       <div class="wrapper-v">
         <h4>Counter component</h4>
         <p class="caption">it's the best we've got...</p>

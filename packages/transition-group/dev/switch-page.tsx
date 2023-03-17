@@ -87,7 +87,7 @@ function Example(props: {
 
   return (
     <div class="wrapper-h h-26 relative">
-      <h4 class="absolute m-auto pointer-events-none">{mode}</h4>
+      <h4 class="pointer-events-none absolute m-auto">{mode}</h4>
       <button class="btn absolute left-16" onClick={() => setToggle(!toggle())}>
         {toggle() ? "Hide" : "Show"}
       </button>
@@ -103,7 +103,7 @@ function Example(props: {
                 fallback={
                   withFallback && (
                     <div
-                      class="absolute z-1 right-16 p-4 bg-orange-600 rounded"
+                      class="z-1 absolute right-16 rounded bg-orange-600 p-4"
                       ref={grayOutOnDispose}
                     >
                       B{i++}
@@ -111,7 +111,7 @@ function Example(props: {
                   )
                 }
               >
-                <div class="absolute z-1 right-16 p-4 bg-green-600 rounded" ref={grayOutOnDispose}>
+                <div class="z-1 absolute right-16 rounded bg-green-600 p-4" ref={grayOutOnDispose}>
                   A{i++}
                 </div>
               </Show>

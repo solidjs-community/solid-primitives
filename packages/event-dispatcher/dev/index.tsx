@@ -8,7 +8,7 @@ const App: Component = () => {
   const [count, setCount] = createSignal(0);
 
   return (
-    <div class="p-2 box-border w-full min-h-screen grid grid-rows-3 justify-center space-y-4 bg-gray-800 text-white">
+    <div class="box-border grid min-h-screen w-full grid-rows-3 justify-center space-y-4 bg-gray-800 p-2 text-white">
       <Counter
         onCleanCounter={() => setCount(0)}
         onValueChange={evt => setCount(count() + (evt?.detail ?? 1))}

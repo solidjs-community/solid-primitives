@@ -55,27 +55,27 @@ const CopyPackage: Component<{ type: "npm" | "yarn" | "pnpm"; packageName: strin
   };
 
   return (
-    <div class="relative flex items-center h-[40px] my-4">
+    <div class="relative my-4 flex h-[40px] items-center">
       <button
-        class="h-full group flex gap-2 items-center border border-[#99999a] rounded-l-lg font-semibold px-2 pl-3 text-[#555] dark:text-[#ccc] hover:border-[#0030b1] dark:hover:border-[#b1bfe4] transition-colors"
+        class="group flex h-full items-center gap-2 rounded-l-lg border border-[#99999a] px-2 pl-3 font-semibold text-[#555] transition-colors hover:border-[#0030b1] dark:text-[#ccc] dark:hover:border-[#b1bfe4]"
         aria-label={packageManagers[type].ariaLabel}
         onClick={onCopyClick}
       >
-        <div class="group-hover:text-black dark:group-hover:text-white transition-colors">
+        <div class="transition-colors group-hover:text-black dark:group-hover:text-white">
           {hasCopied() ? "Copied!" : "Copy"}
         </div>
         <div class="relative h-full py-2">
-          <div class="flex justify-center items-center h-full w-[40px] relative delay-[0] transition-opacity group-hover:opacity-0 group-hover:delay-100">
+          <div class="relative flex h-full w-[40px] items-center justify-center transition-opacity delay-[0] group-hover:opacity-0 group-hover:delay-100">
             {packageManagers[type].monochromeLogo()}
           </div>
-          <div class="flex justify-center items-center py-2 absolute top-0 left-0 bottom-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div class="absolute top-0 left-0 bottom-0 right-0 flex items-center justify-center py-2 opacity-0 transition-opacity group-hover:opacity-100">
             {packageManagers[type].logo()}
           </div>
         </div>
 
-        <div class="absolute top-0 left-0 bottom-0 right-0 rounded-lg pointer-events-none border border-transparent group-hover:border-[#0030b1] dark:group-hover:border-[#b1bfe4] group-hover:box-shadow-[0_5px_0_0_#c5d4e4] dark:group-hover:box-shadow-[0_5px_0_0_#3f5d73] transition-[border-color_box-shadow]" />
+        <div class="group-hover:box-shadow-[0_5px_0_0_#c5d4e4] dark:group-hover:box-shadow-[0_5px_0_0_#3f5d73] pointer-events-none absolute top-0 left-0 bottom-0 right-0 rounded-lg border border-transparent transition-[border-color_box-shadow] group-hover:border-[#0030b1] dark:group-hover:border-[#b1bfe4]" />
       </button>
-      <div class="flex-grow h-full border border-[#99999a] border-l-0 rounded-r-lg flex items-center px-2 pr-3 text-[13px] xs:text-sm sm:text-base whitespace-nowrap overflow-auto">
+      <div class="xs:text-sm flex h-full flex-grow items-center overflow-auto whitespace-nowrap rounded-r-lg border border-l-0 border-[#99999a] px-2 pr-3 text-[13px] sm:text-base">
         {packageManagers[type].text}
       </div>
     </div>

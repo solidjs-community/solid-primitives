@@ -29,9 +29,9 @@ const App: Component = () => {
   start();
 
   return (
-    <div class="box-border w-full h-screen overflow-hidden bg-indigo-800 text-white">
+    <div class="box-border h-screen w-full overflow-hidden bg-indigo-800 text-white">
       <div
-        class="w-36 h-36 bg-violet-700 rounded-full filter pointer-events-none"
+        class="pointer-events-none h-36 w-36 rounded-full bg-violet-700 filter"
         classList={{
           "opacity-0": !mouse.isInside,
           "blur-xl": !mouse.isInside,
@@ -44,10 +44,10 @@ const App: Component = () => {
       <Show when={showContainer()}>
         <div
           ref={setRef}
-          class="fixed z-10 top-25vh left-25vw w-50vw h-50vh bg-gray-300 bg-opacity-15 backdrop-filter backdrop-blur border-1 border-gray-400 border-opacity-40 rounded-3xl overflow-hidden"
+          class="top-25vh left-25vw w-50vw h-50vh bg-opacity-15 border-1 fixed z-10 overflow-hidden rounded-3xl border-gray-400 border-opacity-40 bg-gray-300 backdrop-blur backdrop-filter"
         >
           <div
-            class="w-24 h-24 rounded-full bg-amber-500 bg-opacity-80 pointer-events-none"
+            class="pointer-events-none h-24 w-24 rounded-full bg-amber-500 bg-opacity-80"
             style={{
               transform: `translate(${pos().elX - 54}px, ${pos().elY - 54}px)`,
             }}
@@ -55,7 +55,7 @@ const App: Component = () => {
         </div>
       </Show>
       <div
-        class="fixed z-20 top-25vh left-25vw p-6 py-4 rounded-2xl rounded-lt bg-white bg-opacity-10 border-1 border-white border-opacity-20 pointer-events-none text-opacity-50 text-white transition-opacity"
+        class="top-25vh left-25vw rounded-lt border-1 pointer-events-none fixed z-20 rounded-2xl border-white border-opacity-20 bg-white bg-opacity-10 p-6 py-4 text-white text-opacity-50 transition-opacity"
         style={{
           transform: `translate(${inElementX()}px, ${inElementY()}px)`,
           opacity: relative.isInside ? 1 : 0,
@@ -63,11 +63,11 @@ const App: Component = () => {
       >
         <DisplayRecord record={{ x: inElementX(), y: inElementY() }} />
       </div>
-      <div class="fixed top-6 left-6 caption text-opacity-60 select-none text-white">
+      <div class="caption fixed top-6 left-6 select-none text-white text-opacity-60">
         <DisplayRecord record={mouse} />
       </div>
       <button
-        class="fixed top-6 right-6 bg-gray-300 bg-opacity-25 rounded-lg text-gray-300 font-medium p-2 border-none opacity-80 hover:opacity-100 cursor-pointer"
+        class="fixed top-6 right-6 cursor-pointer rounded-lg border-none bg-gray-300 bg-opacity-25 p-2 font-medium text-gray-300 opacity-80 hover:opacity-100"
         onclick={() => setShowContainer(p => !p)}
       >
         Toggle Container

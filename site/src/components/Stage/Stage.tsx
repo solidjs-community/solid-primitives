@@ -3,8 +3,8 @@ import StageBadge from "../Primitives/StageBadge";
 
 const Stage = () => {
   return (
-    <div class="bg-page-main-bg rounded-md p-2 pt-3 max-w-[800px] sm:p-4">
-      <h2 class="font-semibold text-lg pb-1 border-b border-slate-300 dark:border-slate-600">
+    <div class="bg-page-main-bg max-w-[800px] rounded-md p-2 pt-3 sm:p-4">
+      <h2 class="border-b border-slate-300 pb-1 text-lg font-semibold dark:border-slate-600">
         Contribution Procress
       </h2>
       <Content />
@@ -49,9 +49,9 @@ const Content = () => {
   ];
   return (
     <div>
-      <div class="max-w-[420px] rounded-xl overflow-clip relative bg-[#e5ecf3] dark:bg-[#2b455a]">
-        <div class="absolute top-0 left-0 right-0 bottom-0 border-[#e5ecf3] border-2 rounded-xl pointer-events-none dark:border-[#2b455a]"></div>
-        <table class="w-full my-4" style="border-collapse: separate; border-spacing: 2px 2px;">
+      <div class="relative max-w-[420px] overflow-clip rounded-xl bg-[#e5ecf3] dark:bg-[#2b455a]">
+        <div class="pointer-events-none absolute top-0 left-0 right-0 bottom-0 rounded-xl border-2 border-[#e5ecf3] dark:border-[#2b455a]"></div>
+        <table class="my-4 w-full" style="border-collapse: separate; border-spacing: 2px 2px;">
           <thead>
             <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#b7c1d0]">
               <th class="p-2 pb-1 text-center">Stage</th>
@@ -62,7 +62,7 @@ const Content = () => {
             <For each={items}>
               {({ stage, description }) => {
                 return (
-                  <tr class="odd:bg-[#f6fbff] even:bg-page-main-bg dark:odd:bg-[#2b3f4a]">
+                  <tr class="even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
                     <td class="p-1 px-2">
                       <StageBadge type="static" value={stage as any} />
                     </td>

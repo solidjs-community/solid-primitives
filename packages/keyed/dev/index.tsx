@@ -5,7 +5,7 @@ import "uno.css";
 
 const App: Component = () => {
   return (
-    <div class="p-24 box-border w-full min-h-screen space-y-4 bg-gray-800 text-white overflow-hidden">
+    <div class="box-border min-h-screen w-full space-y-4 overflow-hidden bg-gray-800 p-24 text-white">
       <Key />
     </div>
   );

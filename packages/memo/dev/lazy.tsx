@@ -12,7 +12,7 @@ const memo = createRoot(() =>
 );
 
 const TestComponent: Component = () => {
-  return <div class="p-4 bg-orange-200 text-gray-800 select-none">in component: {memo()}</div>;
+  return <div class="select-none bg-orange-200 p-4 text-gray-800">in component: {memo()}</div>;
 };
 
 const TestEffect: Component = () => {

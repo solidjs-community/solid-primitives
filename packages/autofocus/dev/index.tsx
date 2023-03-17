@@ -33,7 +33,7 @@ const App: Component = () => {
   const [toggle, setToggle] = createSignal(0);
 
   return (
-    <div class="flex gap-4 m-4">
+    <div class="m-4 flex gap-4">
       <button onClick={() => setToggle((toggle() + 1) % 6)}>toggle</button>
 
       <Switch fallback={<button>no autofocus</button>}>

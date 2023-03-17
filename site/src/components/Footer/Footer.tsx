@@ -2,8 +2,8 @@ import { Component } from "solid-js";
 
 const Footer: Component = () => {
   return (
-    <footer class="bg-[#F3F5F7] dark:bg-slate-800/50 mt-10">
-      <div class="max-w-[864px] mx-auto leading-7 p-4 py-8 prose">
+    <footer class="mt-10 bg-[#F3F5F7] dark:bg-slate-800/50">
+      <div class="prose mx-auto max-w-[864px] p-4 py-8 leading-7">
         <p class="text-center">
           This site is built with{" "}
           <a class="text-link" href="https://www.solidjs.com" target="_blank">

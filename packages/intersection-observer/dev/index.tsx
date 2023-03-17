@@ -21,7 +21,7 @@ const App: Component = () => {
   const [length, setLength] = createSignal(20);
 
   return (
-    <div class="center-child box-border w-full h-screen overflow-hidden bg-gray-900">
+    <div class="center-child box-border h-screen w-full overflow-hidden bg-gray-900">
       <div class="flex flex-col items-center">
         <div class="flex">
           <button class="btn" onClick={() => setEnabled(p => !p)}>
@@ -34,7 +34,7 @@ const App: Component = () => {
             Remove
           </button>
         </div>
-        <div class="h-100 w-100 rounded-lg shadow-lg overflow-y-scroll bg-white">
+        <div class="h-100 w-100 overflow-y-scroll rounded-lg bg-white shadow-lg">
           <Repeat times={length()}>
             {x => (
               <div class="flex">
@@ -45,7 +45,7 @@ const App: Component = () => {
                     return (
                       <div
                         ref={el => (ref = el)}
-                        class="h-20 w-90 flex-shrink-0 center-child transition duration-1500 rounded-lg m-5 text-white"
+                        class="w-90 center-child duration-1500 m-5 h-20 flex-shrink-0 rounded-lg text-white transition"
                         classList={{
                           "bg-slate-500 scale-x-75": !isVisible(),
                           "bg-blue-900": isVisible(),

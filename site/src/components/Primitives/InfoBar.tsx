@@ -30,7 +30,7 @@ const InfoBar: Component<{
   const bundlephobiaFullURL = `${bundlephobiaURL}/${packageName}`;
   const npmFullURL = `${npmURL}/${packageName}`;
   return (
-    <div class="flex gap-2 flex-wrap">
+    <div class="flex flex-wrap gap-2">
       <SizeBadgePill
         value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/active-element.json"
         href={bundlephobiaFullURL}

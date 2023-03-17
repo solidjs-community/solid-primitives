@@ -39,7 +39,7 @@ const App: Component = () => {
   // setTimeout(() => setList([{}, {}, {}]), 6000);
 
   return (
-    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
+    <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
       <div class="wrapper-v" onclick={() => setCount(p => ++p)}>
         <button class="btn">{count()}</button>
       </div>
