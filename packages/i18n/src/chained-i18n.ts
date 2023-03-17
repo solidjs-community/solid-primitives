@@ -12,10 +12,10 @@ type I18nFormatArgs = Record<string, string | number>;
 
 export type I18nPath<T extends I18nObject> = {
   [K in keyof T]: T[K] extends I18nObject
-    ? I18nPath<T[K]>
-    : T[K] extends (options: infer OptionsArgs) => string
-    ? (options: OptionsArgs) => string
-    : (options?: I18nFormatArgs) => string;
+  ? I18nPath<T[K]>
+  : T[K] extends (options: infer OptionsArgs) => string
+  ? (options: OptionsArgs) => string
+  : (options?: I18nFormatArgs) => string;
 };
 
 export type Dictionaries<T extends I18nObject> = { [key: string]: T };
@@ -41,19 +41,23 @@ type GuaranteeIdenticalSignatures<T extends Dictionaries<I18nObject>> = Record<
   RemoveFunctionLengths<UnionToIntersection<AddFunctionLengths<T[keyof T]>>>
 >;
 
-function buildChainedDictionary<T extends I18nObject>(obj: T): I18nPath<T> {
+function buildChainedDictionary<T extends I18nObject>(obj: T, readFn: <A = any>(
+  obj: Record<string, A>,
+  path: string,
+  defaultValue?: unknown,
+) => A = deepReadObject): I18nPath<T> {
   const mapped = {} as Record<string, any>;
   for (const [key, value] of Object.entries(obj)) {
     switch (typeof value) {
       case "object":
-        mapped[key] = buildChainedDictionary(value);
+        mapped[key] = buildChainedDictionary(value, readFn);
         break;
       case "function":
         mapped[key] = value;
         break;
       case "string":
         mapped[key] = (args: I18nFormatOptions) =>
-          value.replace(/{{([^{}]+)}}/g, (_, key) => deepReadObject(args, key, ""));
+          value.replace(/{{([^{}]+)}}/g, (_, key) => readFn(args, key, ""));
         break;
       default:
         throw new Error(
@@ -67,7 +71,7 @@ function buildChainedDictionary<T extends I18nObject>(obj: T): I18nPath<T> {
 }
 
 export type ChainedI18n<T extends Dictionaries<I18nObject>> = [
-  tranlate: I18nPath<T>[keyof T],
+  translate: I18nPath<T>[keyof T],
   utils: {
     locale: Accessor<keyof T>;
     setLocale: Setter<keyof T>;
@@ -79,14 +83,20 @@ export type ChainedI18n<T extends Dictionaries<I18nObject>> = [
  * Creates chained dictionaries with callable end paths. IE dictionaries.en.hello()
  *
  * @param dictionaries {Record<string, Record<string, string | Function>} objects to parse for translations. End paths can be a string or function that returns a string
+ * @param [readFn=deepReadObject] {<T = any>(obj: Record<string, unknown>, path: string, defaultValue?: unknown) => T} - Read function used to read the dictionary
  * @returns dictionaries {Record<locale, Record<string, Function | Record<string, Function | etc>} chained dictionaries with callable end paths to get the translation.
  */
 export function createChainedI18nDictionary<T extends Dictionaries<I18nObject>>(
   dictionaries: T & GuaranteeIdenticalSignatures<T>,
+  readFn: <A = any>(
+    obj: Record<string, unknown>,
+    path: string,
+    defaultValue?: unknown,
+  ) => A = deepReadObject
 ): I18nPath<T & GuaranteeIdenticalSignatures<T>> {
   const dict = {} as I18nPath<T & GuaranteeIdenticalSignatures<T>>;
   for (const locale in dictionaries) {
-    dict[locale] = buildChainedDictionary(dictionaries[locale]);
+    dict[locale] = buildChainedDictionary(dictionaries[locale], readFn);
   }
   return dict;
 }
@@ -94,7 +104,7 @@ export function createChainedI18nDictionary<T extends Dictionaries<I18nObject>>(
 /**
  * Creates a chained dictionary and manages the locale. Provides a proxy wrapper around translate so you can do chained calls that always returns with the current locale. IE t.hello()
  *
- * @param props {{ dictionaries: Record<string, Record<string, string | Function | Record<>>; locale: keyof dictionaries. IE 'en' | 'es' | 'fr' }}
+ * @param props {{ dictionaries: Record<string, Record<string, string | Function | Record<>>; locale: keyof dictionaries. IE 'en' | 'es' | 'fr'; readFn: <T = any>(obj: Record<string, unknown>, path: string, defaultValue?: unknown ) => T }}
  * @returns [{ translate: chained dictionary with current locale path }, { locale: Accessor for current locale, setLocale: (locale: keyof dictionaries): => void; getDictionary(locale?: keyof dictionaries) => dictionaries[locale] }]
  *
  * @example
@@ -105,9 +115,14 @@ export function createChainedI18nDictionary<T extends Dictionaries<I18nObject>>(
 export function createChainedI18n<T extends Dictionaries<I18nObject>>(props: {
   dictionaries: T & GuaranteeIdenticalSignatures<T>;
   locale: keyof T;
+  readFn?: <A = any>(
+    obj: Record<string, unknown>,
+    path: string,
+    defaultValue?: unknown,
+  ) => A;
 }): ChainedI18n<T> {
   const [locale, setLocale] = createSignal<keyof T>(props.locale);
-  const [translations] = createSignal(createChainedI18nDictionary(props.dictionaries));
+  const [translations] = createSignal(createChainedI18nDictionary(props.dictionaries, props.readFn || deepReadObject));
 
   /**
    * Translate function for i18n. Wrapped with a proxy so you always get the current locales dictionary and do not need to call it as it's invoked in the proxy. Example builds off of the example for createChainedI18n

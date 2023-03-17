@@ -5,6 +5,7 @@ export const dict = {
     food: {
       meat: "viande",
     },
+    "keys.with.dots": "salut"
   },
   en: {
     hello: "hello {{ name }}, how are you?",
@@ -12,6 +13,7 @@ export const dict = {
     food: {
       meat: "meat",
     },
+    "keys.with.dots": "hi"
   },
   es: {
     hello: "hola {{ name }}, como usted?",
@@ -19,5 +21,6 @@ export const dict = {
     food: {
       meat: "carne",
     },
+    "keys.with.dots": "hola"
   },
 };

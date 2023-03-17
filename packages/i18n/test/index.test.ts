@@ -8,7 +8,7 @@ import {
 import { dict } from "./setup";
 
 describe("createI18nContext", () => {
-  it("test locale switching", async () => {
+  it("Locale switching", async () => {
     const [t, { add, locale }] = createRoot(() => createI18nContext(dict, "en"));
     Object.entries(dict).forEach(([lang, translations]) => add(lang, translations));
     locale("en");
@@ -16,6 +16,25 @@ describe("createI18nContext", () => {
     locale("fr");
     expect(t("hello", { name: "Tester" })).toBe("bonjour Tester, comment vas-tu ?");
   });
+  it("Custom read function works", async () => {
+    const [t, { add, locale }] = createRoot(() => createI18nContext(dict, "en", <T = any>(dict: Record<string, unknown>, key: string): T => dict[key] as T));
+    Object.entries(dict).forEach(([lang, translations]) => add(lang, translations));
+    locale("en");
+    expect(t("keys.with.dots")).toBe("hi");
+    locale("fr");
+    expect(t("keys.with.dots")).toBe("salut");
+  });
+  it("Dotted keys access nested objects", async () => {
+    const [t, { add, locale }] = createRoot(() => createI18nContext(dict, "en"));
+    Object.entries(dict).forEach(([lang, translations]) => add(lang, translations));
+    locale("en");
+    expect(t("food.meat")).toBe("meat");
+    expect(t("keys.with.dots")).toBe('');
+    locale("fr");
+    expect(t("food.meat")).toBe("viande");
+    expect(t("keys.with.dots")).toBe('');
+  });
+
 });
 
 describe("createChainedI18nContext", () => {
@@ -67,6 +86,18 @@ describe("createChainedI18nContext", () => {
     expect(t.hello({ name: "Tester" })).toBe("bonjour Tester, comment vas-tu ?");
     expect(t.goodbye({ name: "Tester" })).toBe("au revoir Tester");
     expect(t.food.meat()).toBe("viande");
+  });
+  it("Custom read function works", async () => {
+    const readFn = <T = any>(dict: Record<string, unknown>, key: string): T => dict[key] as T;
+    const [, useI18nContext] = createRoot(() =>
+      createChainedI18nContext({ dictionaries: dict, locale: "en", readFn }, true),
+    );
+
+    const [t, { setLocale }] = useI18nContext()!;
+
+    expect(t["keys.with.dots"]()).toBe("hi");
+    setLocale("fr");
+    expect(t["keys.with.dots"]()).toBe("salut");
   });
 });
 

@@ -64,21 +64,26 @@ const template = (
  *
  * @param [init={}] {Record<string, Record<string, any>>} - Initial dictionary of languages
  * @param [lang=navigator.language] {string} - The default language fallback to browser language if not set
- * @param [options={}] { chained: boolean } -
+ * @param [readFn=deepReadObject] {<T = any>(obj: Record<string, unknown>, path: string, defaultValue?: unknown) => T} - Read function used to read the dictionary
  */
 export const createI18nContext = (
   init: Record<string, Record<string, any>> = {},
   lang: string = typeof navigator !== "undefined" && navigator.language in init
     ? navigator.language
     : Object.keys(init)[0] ?? "",
+  readFn: <T = any>(
+    obj: Record<string, unknown>,
+    path: string,
+    defaultValue?: unknown,
+  ) => T = deepReadObject,
 ): [
-  template: (key: string, params?: Record<string, string>, defaultValue?: string) => any,
-  actions: {
-    add(lang: string, table: Record<string, any>): void;
-    locale: (lang?: string) => string;
-    dict: (lang: string) => Record<string, Record<string, any>>;
-  },
-] => {
+    template: (key: string, params?: Record<string, string>, defaultValue?: string) => any,
+    actions: {
+      add(lang: string, table: Record<string, any>): void;
+      locale: (lang?: string) => string;
+      dict: (lang: string) => Record<string, Record<string, any>>;
+    },
+  ] => {
   const [locale, setLocale] = createSignal(lang);
   const [dict, setDict] = createStore(init);
   /**
@@ -113,7 +118,7 @@ export const createI18nContext = (
     params?: Record<string, string>,
     defaultValue?: string,
   ): string => {
-    const val = deepReadObject(dict[locale()]!, key, defaultValue || "");
+    const val = readFn(dict[locale()]!, key, defaultValue || "");
     if (typeof val === "function") return val(params);
     if (typeof val === "string") return template(val, params || {});
     return val as string;
