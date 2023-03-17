@@ -70,6 +70,10 @@
     "@types/wicg-file-system-access": "2020.9.5"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.0"
+    "solid-js": "^1.6.0",
+    "chokidar": "^3.5.3"
+  },
+  "peerDependenciesMeta": {
+    "chokidar": { "optional": true }
   }
 }

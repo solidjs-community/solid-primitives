@@ -14,7 +14,7 @@ export const makeTauriFileSystem = taurifs
                 .readdir(path)
                 .then(() => "dir" as const)
                 .catch(() => "file" as const)
-            : undefined,
+            : null,
         ),
       mkdir: (path: string) => taurifs.createDir(path, { ...options, recursive: true }),
       readdir: (path: string) =>

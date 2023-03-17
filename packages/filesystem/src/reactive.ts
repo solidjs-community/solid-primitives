@@ -8,6 +8,8 @@ import type {
   FileSystemAdapter,
   SyncFileSystemAdapter,
   AsyncFileSystemAdapter,
+  DirEntries,
+  Watcher,
 } from "./types";
 
 import { getItemName, getParentDir } from "./tools";
@@ -16,48 +18,53 @@ type SignalMap<T> = Map<string, [Accessor<T>, Setter<T>]>;
 type ResourceMap<T> = Map<string, [Resource<T>, ResourceActions<T>]>;
 
 /** makes a synchronous filesystem reactive */
-export const createSyncFileSystem = (adapter: SyncFileSystemAdapter): SyncFileSystem => {
-  const getTypeMap: SignalMap<ItemType> = new Map();
-  const readdirMap: SignalMap<[] | [string, ...string[]]> = new Map();
-  const readFileMap: SignalMap<string> = new Map();
+export const createSyncFileSystem = (adapter: SyncFileSystemAdapter, watcher?: Watcher): SyncFileSystem => {
+  const getTypeMap: SignalMap<ItemType | undefined> = new Map();
+  const readdirMap: SignalMap<DirEntries | undefined> = new Map();
+  const readFileMap: SignalMap<string | undefined> = new Map();
   const fs: SyncFileSystem = {
-    getType: path => {
+    getType: (path, refresh) => {
       if (!getTypeMap.has(path)) {
         getTypeMap.set(path, createSignal());
       }
       const [fileType, setFileType] = getTypeMap.get(path)!;
-      setFileType(adapter.getType(path));
-      return fileType;
+      if (refresh || fileType() === undefined) {
+        setFileType(adapter.getType(path));
+      }
+      return fileType();
     },
-    readdir: path => {
+    readdir: (path, refresh) => {
       if (!readdirMap.has(path)) {
-        readdirMap.set(path, createSignal([]));
+        readdirMap.set(path, createSignal());
       }
       const [files, setFiles] = readdirMap.get(path)!;
-      setFiles(adapter.readdir(path));
-      return files;
+      if (refresh || files() === undefined) {
+        setFiles(adapter.readdir(path));
+      }
+      return files();
     },
     mkdir: path => {
       adapter.mkdir(path);
-      readdirMap.get(getParentDir(path))?.[1](items => [...items, path] as [string, ...string[]]);
-      fs.readdir(path)();
+      readdirMap.get(getParentDir(path))?.[1]((items = []) => [...items, path] as DirEntries);
     },
-    readFile: path => {
+    readFile: (path, refresh) => {
       if (!readFileMap.has(path)) {
-        readFileMap.set(path, createSignal(""));
+        readFileMap.set(path, createSignal());
       }
       const [data, setData] = readFileMap.get(path)!;
-      setData(adapter.readFile(path));
-      return data;
+      if (refresh || data() === undefined) {
+        setData(adapter.readFile(path));
+      }
+      return data();
     },
     writeFile: (path, data) => {
-      const newFile = adapter.getType(path) === undefined;
+      const newFile = adapter.getType(path) === null;
       adapter.writeFile(path, data);
       readFileMap.get(path)?.[1](data);
       if (newFile) {
-        fs.getType(path)();
+        fs.getType(path, true);
         readdirMap.get(getParentDir(path))?.[1](
-          items => [...items, getItemName(path)] as [string, ...string[]],
+          (items = []) => [...items, getItemName(path)] as DirEntries,
         );
       }
     },
@@ -74,7 +81,7 @@ export const createSyncFileSystem = (adapter: SyncFileSystemAdapter): SyncFileSy
         adapter.rename(previous, next);
       } else {
         if (previousType === "dir") {
-          if (nextType === undefined) {
+          if (nextType === null) {
             adapter.mkdir(next);
           }
           adapter
@@ -87,11 +94,11 @@ export const createSyncFileSystem = (adapter: SyncFileSystemAdapter): SyncFileSy
       getTypeMap.get(previous)?.[1](undefined);
       getTypeMap.delete(previous);
       readdirMap.get(getParentDir(previous))?.[1](
-        items =>
-          items.filter(item => item === getItemName(previous)) as [] | [string, ...string[]],
+        (items = []) =>
+          items.filter(item => item === getItemName(previous)) as [] | DirEntries,
       );
       readdirMap.get(getParentDir(next))?.[1](
-        items => [...items, getItemName(next)] as [string, ...string[]],
+        (items = []) => [...items, getItemName(next)] as DirEntries,
       );
     },
     rm: path => {
@@ -105,45 +112,59 @@ export const createSyncFileSystem = (adapter: SyncFileSystemAdapter): SyncFileSy
         }
       });
       readdirMap.get(getParentDir(path))?.[1](
-        items =>
-          items.filter(item => item === getItemName(path)) as [] | [string, ...string[]],
+        (items = []) =>
+          items.filter(item => item === getItemName(path)) as [] | DirEntries,
       );
     },
   };
+  if (watcher) {
+    watcher((operation, path) => {
+      if (operation === "mkdir" || operation === "rm") {
+        readdirMap.get(getParentDir(path))?.[1](
+          (items = []) => items.includes(path) ? items : [...items, path]);
+      } 
+      if (operation === "rm") {
+        getTypeMap.get(path)?.[1](null);
+      }
+      if (operation === "writeFile" && readFileMap.has(path)) {
+        fs.readFile(path, true);
+      }
+    });
+  }
   return fs;
 };
 
 /** makes an asynchronous filesystem reactive */
-export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter): AsyncFileSystem => {
-  const getTypeMap: ResourceMap<ItemType> = new Map();
-  const readdirMap: ResourceMap<[] | [string, ...string[]]> = new Map();
-  const readFileMap: ResourceMap<string> = new Map();
+export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter, watcher?: Watcher): AsyncFileSystem => {
+  const getTypeMap: ResourceMap<ItemType | undefined> = new Map();
+  const readdirMap: ResourceMap<DirEntries | undefined> = new Map();
+  const readFileMap: ResourceMap<string | undefined> = new Map();
   const fs: AsyncFileSystem = {
-    getType: path => {
+    getType: (path, refresh) => {
       if (!getTypeMap.has(path)) {
         getTypeMap.set(
           path,
           createResource(() => adapter.getType(path)),
         );
-      } else {
-        getTypeMap.get(path)![1].refetch();
       }
-      const [fileType] = getTypeMap.get(path)!;
-      return fileType;
+      const [fileType, { refetch }] = getTypeMap.get(path)!;
+      if (refresh) {
+        refetch();
+      }
+      return fileType();
     },
-    readdir: path => {
+    readdir: (path, refresh) => {
       if (!readdirMap.has(path)) {
         readdirMap.set(
           path,
-          createResource<[] | [string, ...string[]]>(() => adapter.readdir(path), {
-            initialValue: [],
-          }),
+          createResource<DirEntries | undefined>(() => adapter.readdir(path)),
         );
-      } else {
-        readdirMap.get(path)![1].refetch();
       }
-      const [files] = readdirMap.get(path)!;
-      return files;
+      const [files, { refetch }] = readdirMap.get(path)!;
+      if (refresh) {
+        refetch();
+      }
+      return files();
     },
     mkdir: path =>
       adapter.mkdir(path).then(() => {
@@ -157,17 +178,18 @@ export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter): AsyncFil
         });
         readdirMap.get(getParentDir(path))?.[1].refetch();
       }),
-    readFile: path => {
+    readFile: (path, refresh) => {
       if (!readFileMap.has(path)) {
         readFileMap.set(
           path,
-          createResource(() => adapter.readFile(path), { initialValue: "" }),
+          createResource(() => adapter.readFile(path)),
         );
-      } else {
-        readFileMap.get(path)![1].refetch();
       }
-      const [data] = readFileMap.get(path)!;
-      return data;
+      const [data, { refetch }] = readFileMap.get(path)!;
+      if (refresh) {
+        refetch();
+      }
+      return data();
     },
     writeFile: (path, data) =>
       adapter.writeFile(path, data).then(() => {
@@ -175,8 +197,8 @@ export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter): AsyncFil
         const name = getItemName(path);
         readdirMap
           .get(getParentDir(path))?.[1]
-          .mutate(items =>
-            items.includes(name) ? items : ([...items, name] as [string, ...string[]]),
+          .mutate((items = []) =>
+            items.includes(name) ? items : ([...items, name] as DirEntries),
           );
       }),
     rename: async (previous, next) => {
@@ -192,7 +214,7 @@ export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter): AsyncFil
         await adapter.rename(previous, next);
       } else {
         if (previousType === "dir") {
-          if (nextType === undefined) {
+          if (nextType === null) {
             await adapter.mkdir(next);
           }
           (await adapter.readdir(previous)).forEach(item =>
@@ -225,18 +247,33 @@ export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter): AsyncFil
         readdirMap.get(getParentDir(path))?.[1].refetch();
       }),
   };
+  if (watcher) {
+    watcher((operation, path) => {
+      if (operation === "mkdir" || operation === "rm") {
+        readdirMap.get(getParentDir(path))?.[1].mutate(
+          (items = []) => items.includes(path) ? items : [...items, path]);
+      } 
+      if (operation === "rm") {
+        getTypeMap.get(path)?.[1].mutate(null);
+      }
+      if (operation === "writeFile") {
+        readFileMap.get(path)?.[1].refetch()
+      }
+    });
+  }
   return fs;
 };
 
-export function createFileSystem(fs: SyncFileSystemAdapter): SyncFileSystem;
-export function createFileSystem(fs: AsyncFileSystemAdapter): AsyncFileSystem;
-export function createFileSystem(fs: Promise<AsyncFileSystemAdapter>): Promise<AsyncFileSystem>;
+export function createFileSystem(fs: SyncFileSystemAdapter, watcher?: Watcher): SyncFileSystem;
+export function createFileSystem(fs: AsyncFileSystemAdapter, watcher?: Watcher): AsyncFileSystem;
+export function createFileSystem(fs: Promise<AsyncFileSystemAdapter>, watcher?: Watcher): Promise<AsyncFileSystem>;
 export function createFileSystem(
   fs: FileSystemAdapter | Promise<AsyncFileSystemAdapter>,
+  watcher?: Watcher
 ): SyncFileSystem | AsyncFileSystem | Promise<AsyncFileSystem> {
   return fs instanceof Promise
-    ? fs.then(fs => createAsyncFileSystem(fs))
+    ? fs.then(fs => createAsyncFileSystem(fs, watcher))
     : fs.async
-    ? createAsyncFileSystem(fs)
-    : createSyncFileSystem(fs);
+    ? createAsyncFileSystem(fs, watcher)
+    : createSyncFileSystem(fs, watcher);
 }

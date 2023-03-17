@@ -20,6 +20,7 @@ A primitive that allows to manage different file system access methods:
 * `makeWebAccessFileSystem` (client only) - Adapter that provides access to the actual filesystem in the browser using a directory picker
 * `makeNodeFileSystem` (server only) - Adapter that abstracts the node fs/promises module for the use with this primitive
 * `makeTauriFileSystem` (tauri with fs access enabled only) - Adapter that connects to the tauri fs module
+* `makeChokidarWatcher` - (experimental): use chokidar to watch for file system changes and trigger reactive updates
 
 ## Installation
 
@@ -67,7 +68,11 @@ To support an unsupported file system, you can provide a wrapper with one of the
 
 If no rename method is given, mkdir/writeFile/rm are used to achieve the same effect. An actual rename call will be more performant, though.
 
-The `createFileSystem` call then creates a reactive surface above each of these APIs so that the return values of all reading calls are signals for synchronous and resources for asynchronous filesystem adapters; writing methods for asynchronous APIs will return the same promise for convenience reasons. These getters returned from reading methods are bound to Solid's reactivity so that they will automatically cause effects using them outside of untrack() to re-run on updates. Asynchronous getters will initially return undefined, but will update to the correct value once evaluated.
+The `createFileSystem` call then creates a reactive surface above each of these APIs so that the return values of all reading calls are signals for synchronous and resources for asynchronous filesystem adapters; writing methods for asynchronous APIs will return the same promise for convenience reasons.
+
+There is experimental support for a watcher as second argument in `createFileSystems`, which triggers reactive updates on external filesystem changes. Currently, there is only experimental support for chokidar for the node filesystem.
+
+These getters returned from reading methods are bound to Solid's reactivity so that they will automatically cause effects using them outside of untrack() to re-run on updates. Getters may initially return undefined, but will update to the correct value once evaluated.
 
 ```tsx
 const vfs = makeVirtualFileSystem({});
@@ -76,31 +81,28 @@ const fs = createFileSystem(vfs);
 fs.mkdir("/src");
 // create or overwrite a file
 fs.writeFile("/src/index.ts", "console.log(0);");
-// checking entry type: "file" | "dir" | undefined
-const itemType = fs.getType("/src");
-createEffect(() => console.log("/src type", itemType()));
+// checking entry type: "file" | "dir" | null (file not found) | undefined (not yet ready)
+// will be called again if the file or directory is deleted (-> null)
+createEffect(() => console.log("/src type", fs.getType("/src")));
 // read a directory
-const rootEntries = fs.readdir("/");
 // will be called again if the contents of "/" change due to
 // writing a new file or deleting an existing file or directory
-createEffect(() => console.log("/", rootEntries()));
+createEffect(() => console.log("/", fs.readdir("/")));
 // reading files
-const indexText = fs.readFile("/src/index.ts");
 // this signal (or resource for async adapters) will update if
 // the file is written by the same fs
-createEffect(() => console.log("/src/index.ts", indexText()));
+createEffect(() => console.log("/src/index.ts", fs.readFile("/src/index.ts")));
 
 // isomorphic file system reader with lazy evaluation
-const Item = (props: { path: string, fs: SyncFileSystem | AsyncFileSystem }) => (
-  const itemType = props.fs.getType(props.path);
+const Item = (props: { path: string, fs: SyncFileSystem | AsyncFileSystem }) => {
+  const itemType = () => props.fs.getType(props.path);
   const name = () => getItemName(props.path);
   const [open, setOpen] = createSignal(false);
-  const content = createMemo(() => open()
+  const content = () => open()
     ? itemType() === "dir"
       ? props.fs.readdir(props.path)
       : props.fs.readFile(props.path)
-    : undefined
-  );
+    : undefined;
 
   return <>
     <button onClick={() => setOpen(!open())}>{open() ? "-" : "+"}</button>
@@ -110,13 +112,13 @@ const Item = (props: { path: string, fs: SyncFileSystem | AsyncFileSystem }) => 
         <pre>{content()?.()}</pre>
       </Match>
       <Match when={open() && itemType() === "dir"}>
-        <For each={content()?.()}>
+        <For each={content() || []}>
           {(entry) => <div><Item path={entry} fs={props.fs} /></div>}
         </For>
       </Match>
     </Switch>
   </>
-);
+};
 ```
 
 ## Demo

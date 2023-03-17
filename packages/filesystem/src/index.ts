@@ -6,3 +6,4 @@ export * from "./adapter-vfs";
 export * from "./reactive";
 export * from "./tools";
 export * from "./types";
+export * from "./watcher-chokidar";

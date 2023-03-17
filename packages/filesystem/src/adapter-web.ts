@@ -2,6 +2,12 @@
 import { makeNoAsyncFileSystem } from "./adapter-mocks";
 import type { AsyncFileSystemAdapter } from "./types";
 
+/**
+ * Adapter that provides access to the actual filesystem in the browser using a directory picker
+ * receives the options for showDirectoryPicker(options: DirectoryPickerOptions) as optional argument
+ * 
+ * relies on https://wicg.github.io/file-system-access/ - basic api (https://caniuse.com/native-filesystem-api)
+ */
 export const makeWebAccessFileSystem = process.env.SSR
   ? () => Promise.resolve(makeNoAsyncFileSystem())
   : typeof globalThis.showDirectoryPicker === "function"
@@ -40,8 +46,8 @@ export const makeWebAccessFileSystem = process.env.SSR
         async: true,
         getType: async path =>
           walk(path, getNext)
-            .then(handle => (handle?.kind === "directory" ? "dir" : handle?.kind))
-            .catch(() => undefined),
+            .then(handle => (handle?.kind === "directory" ? "dir" : handle?.kind || null))
+            .catch(() => null),
         readdir: async path =>
           walk(path, getNext).then(async handle => {
             if (handle?.kind !== "directory") {

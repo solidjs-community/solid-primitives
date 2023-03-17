@@ -4,16 +4,30 @@ import { getParentDir } from "./tools";
 export type ObjectFileSystem = { [id: string]: string | ObjectFileSystem };
 export type ObjectFileSystemItem = ObjectFileSystem | string | undefined;
 
+/**
+ * Creates a virtual file system adapter
+ * @param initial optional object to prefill the file system
+ * @param storage optional localStorage/localForage type storage
+ * @param key optional key in the storage
+ * 
+ * ⚠ Warning! localStorage is limited to 5MB; use [localforage](https://localforage.github.io/localForage/) instead if you need more.
+ */
 export const makeVirtualFileSystem = (
   initial?: ObjectFileSystem,
   storage?: Storage,
   key = "solid-primitive-filesystem",
 ): SyncFileSystemAdapter & { toMap: () => Map<string, string> } => {
   let storedValue;
+  const storageValue = storage?.getItem(key);
   try {
-    storedValue = JSON.parse(storage?.getItem(key) || "null");
+    storedValue = JSON.parse(typeof storageValue === "string" ? storageValue : "null");
   } catch (e) {}
-  const fs = storedValue || initial;
+  let fs = storedValue || initial || {};
+  if ((storageValue as unknown) instanceof Promise) {
+    (storageValue as unknown as Promise<string>).then(storedValue => {
+      fs = Object.assign(storedValue || {}, fs);
+    });
+  }
   const save = () => storage?.setItem(key, JSON.stringify(fs));
   save();
   const walk = (
@@ -57,7 +71,7 @@ export const makeVirtualFileSystem = (
         return "dir";
       }
       const item = walk(path, (ref, part) => (typeof ref === "object" ? ref[part] : undefined));
-      return item === undefined ? undefined : typeof item === "string" ? "file" : "dir";
+      return item === undefined ? null : typeof item === "string" ? "file" : "dir";
     },
     mkdir: (path: string): void => (
       walk(path, (ref, part, index, parts) => {

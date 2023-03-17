@@ -1,8 +1,9 @@
 import { SyncFileSystemAdapter, AsyncFileSystemAdapter } from "./types";
 
+/** Mocks a synchronous file system adapter */
 export const makeNoFileSystem = (): SyncFileSystemAdapter => ({
   async: false,
-  getType: () => undefined,
+  getType: () => null,
   mkdir: () => undefined,
   readdir: () => [],
   readFile: () => "",
@@ -11,9 +12,10 @@ export const makeNoFileSystem = (): SyncFileSystemAdapter => ({
   writeFile: () => undefined,
 });
 
+/** Mocks an asynchronous file system adapter */
 export const makeNoAsyncFileSystem = (): AsyncFileSystemAdapter => ({
   async: true,
-  getType: () => Promise.resolve(undefined),
+  getType: () => Promise.resolve(null),
   mkdir: () => Promise.resolve(),
   readdir: () => Promise.resolve([]),
   readFile: () => Promise.resolve(""),

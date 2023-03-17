@@ -12,7 +12,7 @@ export const makeNodeFileSystem = process.env.SSR
           fs
             .stat(p(path))
             .then((stat: { isDirectory: () => boolean }) => (stat.isDirectory() ? "dir" : "file"))
-            .catch(() => undefined),
+            .catch(() => null),
         mkdir: (path: string) => fs.mkdir(p(path), { recursive: true }).then(() => undefined),
         readdir: (path: string) => fs.readdir(p(path)) as Promise<[] | [string, ...string[]]>,
         readFile: (path: string) => fs.readFile(p(path), { encoding: "utf8" }),

@@ -28,7 +28,7 @@ const FsFile = (props: { fs: SyncFileSystem | AsyncFileSystem, path: string }) =
       {getItemName(props.path)}
     </p>
     <Show when={open()}>
-      <textarea value={content()?.()} onInput={(ev) => setContent(ev.currentTarget.value)} />
+      <textarea value={content()} onInput={(ev) => setContent(ev.currentTarget.value)} />
     </Show>
   </div>
 }
@@ -36,7 +36,7 @@ const FsFile = (props: { fs: SyncFileSystem | AsyncFileSystem, path: string }) =
 const FsDir = (props: { fs: SyncFileSystem | AsyncFileSystem, path: string }) => {
   const [open, setOpen] = createSignal(props.path === "/");
   const [name, setName] = createSignal("");
-  const list = createMemo((prev) => prev || open() && props.fs.readdir(props.path));
+  const list = () => open() && props.fs.readdir(props.path);
   return (
     <>
       <div><button onClick={() => setOpen(!open())}>{open() ? "-" : "+"}</button> {getItemName(props.path) || "/"} <input onInput={(ev) => setName(ev.currentTarget.value)} />
@@ -49,22 +49,19 @@ const FsDir = (props: { fs: SyncFileSystem | AsyncFileSystem, path: string }) =>
           </button>
         </Show>
       </div>
-      <Show when={open()}>
+      <Show when={list() !== undefined}>
         <ul>
-          <For each={list()()}>
-            {(item) => {
-              const itemType = props.fs.getType(item);
-              return (            
+          <For each={list()!}>
+            {(item) => (           
               <li>
                 <Show
-                  when={itemType() === "dir"}
+                  when={props.fs.getType(item) === "dir"}
                   fallback={<FsFile fs={props.fs} path={`${props.path === "/" ? "" : props.path}/${item}`} />}
                 >
                   <FsDir fs={props.fs} path={item} />
                 </Show>
               </li>
-              )
-            }}
+            )}
           </For>
         </ul>
       </Show>

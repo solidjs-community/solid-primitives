@@ -185,7 +185,7 @@ importers:
       date-fns: ^2.29.2
       solid-js: ^1.6.0
     dependencies:
-      '@solid-primitives/memo': link:../memo
+      '@solid-primitives/memo': 1.2.1_solid-js@1.6.12
       '@solid-primitives/timer': link:../timer
       '@solid-primitives/utils': link:../utils
       solid-js: 1.6.12
@@ -255,8 +255,10 @@ importers:
     specifiers:
       '@tauri-apps/api': ^1.2.0
       '@types/wicg-file-system-access': 2020.9.5
+      chokidar: ^3.5.3
       solid-js: ^1.6.0
     dependencies:
+      chokidar: 3.5.3
       solid-js: 1.6.12
     devDependencies:
       '@tauri-apps/api': 1.2.0
@@ -1019,14 +1021,6 @@ packages:
     resolution: {integrity: sha512-eyAYAsQmB80jNfg4baAtLeWAQHfHFiR483rzFK+BhETlGZaQC9bsfrugfXDCbRHLQbIA7U5NxhhOxN7p/dWIcg==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/types': 7.21.2
-    dev: true
-
-  /@babel/helper-function-name/7.19.0:
-    resolution: {integrity: sha512-WAwHBINyrpqywkUH0nTnNgI5ina5TFn85HKS0pbPDfxFfhyR/aNQEn4hGi1P1JyT//I0t4OgXUlofzWILRvS5w==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/template': 7.20.7
       '@babel/types': 7.21.2
     dev: true
 
@@ -4009,6 +4003,16 @@ packages:
       solid-js: 1.6.12
     dev: true
 
+  /@solid-primitives/memo/1.2.1_solid-js@1.6.12:
+    resolution: {integrity: sha512-ORYPOaN9Jo/UrQtsEDaTIjSqOAqnZ9JDdfN4OCAHa5QzjNEk9fOTfMUPTQfIV/2tqApbaiB/RxtJOMdi51jVpw==}
+    peerDependencies:
+      solid-js: ^1.6.0
+    dependencies:
+      '@solid-primitives/scheduled': 1.3.1_solid-js@1.6.12
+      '@solid-primitives/utils': 5.5.0_solid-js@1.6.12
+      solid-js: 1.6.12
+    dev: false
+
   /@solid-primitives/platform/0.0.103_solid-js@1.6.12:
     resolution: {integrity: sha512-C/S4STL0cHb3+AOa3uljdph0UVWovDJOF9D/BvNKhin+QGTeHYV5N5Ypsmx8SDG4zgp9ZyuIuV6OOnxSsUzTIg==}
     peerDependencies:
@@ -4054,7 +4058,6 @@ packages:
       solid-js: ^1.6.0
     dependencies:
       solid-js: 1.6.12
-    dev: true
 
   /@solid-primitives/styles/0.0.101_solid-js@1.6.12:
     resolution: {integrity: sha512-tHkeUMntlS/w+/zDzXJv82hhMy3J3q7tVV3ZTbahRo0hZienAM8ZJrCYZNK/fu2px8NHVSZFRufxv9qhIclPTw==}
@@ -4080,7 +4083,6 @@ packages:
       solid-js: ^1.6.0
     dependencies:
       solid-js: 1.6.12
-    dev: true
 
   /@solidjs/meta/0.28.2_solid-js@1.6.12:
     resolution: {integrity: sha512-avlLgBPdk4KVxzRGFlYp/MIJo8B5jVgXPgk6OUnUP8km21Z+ovO+DUd7ZPA7ejv8PBdWi9GE3zCzw8RU2YuV2Q==}
