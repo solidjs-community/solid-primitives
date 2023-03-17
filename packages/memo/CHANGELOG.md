@@ -1,5 +1,11 @@
 # @solid-primitives/memo
 
+## 1.2.1
+
+### Patch Changes
+
+- c9e84c7f: Fix createWritableMemo setter return
+
 ## 1.2.0
 
 ### Minor Changes
