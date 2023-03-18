@@ -1,20 +1,12 @@
-import { existsSync, mkdirSync, writeFile, writeFileSync } from "fs";
-import { PackageData, PackageJSONData, TUpdateSiteGlobal } from ".";
-import { formatBytes, r } from "../utils";
-import checkSizeOfPackage from "../checkSizeOfPackage";
+import { existsSync, mkdirSync, writeFile } from "fs";
+import { PackageData, TPackageData } from ".";
+import { r } from "../utils";
 
 const categories: Record<string, PackageData[]> = {};
-const rootDependencies: string[] = [];
 
-const githubURL = "https://github.com/solidjs-community/solid-primitives/tree/main/packages/";
 const sizeShield = "https://img.shields.io/bundlephobia/minzip/";
-const bundlephobiaURL = "https://bundlephobia.com/package/";
 const npmShield = "https://img.shields.io/npm/v/";
 const npmURL = "https://www.npmjs.com/package/";
-const stageShieldBaseURL =
-  "https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-"; // add "<stage>.json" after
-const stageShieldLink =
-  "https://github.com/solidjs-community/solid-primitives#contribution-process";
 const bundleJSURL = `https://bundlejs.com/`;
 const getBundleJSQuery = ({
   type,
@@ -37,16 +29,16 @@ const getBundleJSQuery = ({
 export const getSizeShield = (name: string) => `${sizeShield}${name}.json`;
 export const getNPMShield = (name: string) => `${npmShield}${name}.json`;
 
-export const buildCategory = async ({
-  name,
-  pkg,
-  globalState,
-}: {
-  name: string;
-  pkg: PackageJSONData;
-  globalState: TUpdateSiteGlobal;
-}) => {
-  const { list, category, stage } = pkg.primitive;
+export const buildCategory = async ({ name, pkg }: { name: string; pkg: TPackageData }) => {
+  const { category, stage } = pkg.primitive;
+  const list = !pkg.primitive.isListCollapsed
+    ? pkg.primitive.list
+    : ([
+        {
+          name: pkg.primitive.collapsedContent,
+          size: pkg.size,
+        },
+      ] as TPackageData["primitive"]["list"]);
 
   const data = {} as PackageData;
 
@@ -57,84 +49,41 @@ export const buildCategory = async ({
     data.Size = "";
     data.NPM = "";
   } else {
-    // data.Size = `[![SIZE](${sizeShield}${pkg.name}?style=for-the-badge&label=)](${bundlephobiaURL}${pkg.name})`;
-    const getSizes = async () => {
-      const run = async () => {
-        return Promise.all(
-          list.map(async (prim, idx, self) => {
-            const type = prim.match(/\s/) ? "package" : "export";
-            const packageName = name;
-            const primitiveName = prim;
+    const getSize = () => {
+      return list
+        .map(primitive => {
+          const type = pkg.primitive.isListCollapsed ? "package" : "export";
+          const packageName = pkg.primitive.name;
+          const primitiveName = primitive.name;
 
-            if (type === "package" || idx === 0) {
-              const result = await checkSizeOfPackage({
-                type: "package",
-                packageName,
-                primitiveName,
-                excludeGzipHeadersAndMetadataSize: true,
-              });
-              const minified = formatBytes(result.minifiedSize);
-              const gzipped = formatBytes(result.gzippedSize);
+          const value = primitive.size.gzipped.number;
+          const unit = primitive.size.gzipped.unit;
 
-              globalState.packageName[packageName] = {
-                name: packageName,
-                size: {
-                  gzipped,
-                  minified,
-                },
-              };
-            }
+          const query = getBundleJSQuery({
+            type,
+            packageName,
+            primitiveName,
+          });
+          const href = `${bundleJSURL}?${query}`;
 
-            const result = await checkSizeOfPackage({
-              type,
-              packageName,
-              primitiveName,
-              excludeGzipHeadersAndMetadataSize: true,
-            });
-            const minified = formatBytes(result.minifiedSize);
-            const gzipped = formatBytes(result.gzippedSize);
+          const component = `<SizeBadge value="${value}" unit="${unit}" href="${href}" />`;
 
-            if (type === "export") {
-              globalState.primitives[primitiveName] = {
-                packageName,
-                size: {
-                  gzipped,
-                  minified,
-                },
-              };
-            }
-
-            // const value = `{ gzipped: "${gzippedSize}", minified: "${minifiedSize}" }`;
-            const value = gzipped.number;
-            const unit = gzipped.unit;
-            const query = getBundleJSQuery({
-              type,
-              packageName,
-              primitiveName,
-            });
-            const href = `${bundleJSURL}?${query}`;
-
-            const component = `<SizeBadge value="${value}" unit="${unit}" href="${href}" />`;
-
-            return `<SizeBadgeWrapper primitiveName="${primitiveName.replace(
-              /\s/g,
-              "",
-            )}">${component}</SizeBadgeWrapper>`;
-          }),
-        );
-      };
-      return (await run()).join("");
+          return `<SizeBadgeWrapper primitiveName="${primitiveName.replace(
+            /\s/g,
+            "",
+          )}">${component}</SizeBadgeWrapper>`;
+        })
+        .join("");
     };
-
-    data.Size = await getSizes();
-    data.NPM = getNPMShield(pkg.name);
+    data.Size = getSize();
+    data.NPM = pkg.version;
   }
   data.Stage = stage ?? "2";
   data.Primitives = list
-    .map(prim => {
-      const primitiveRoute = `/${name}#${prim.toLowerCase().replace(/\s/g, "-")}`;
-      const component = `<PrimitiveBtn href="${primitiveRoute}">${prim}</PrimitiveBtn>`;
-      return `<PrimitiveBtnLineWrapper primitiveName="${prim}">${component}</PrimitiveBtnLineWrapper>`;
+    .map(primitive => {
+      const primitiveRoute = `${name}#${primitive.name.toLowerCase().replace(/\s/g, "-")}`;
+      const component = `<PrimitiveBtn href="${primitiveRoute}">${primitive.name}</PrimitiveBtn>`;
+      return `<PrimitiveBtnLineWrapper primitiveName="${primitive.name}">${component}</PrimitiveBtnLineWrapper>`;
     })
     .join("");
   // .join("<br />");
@@ -172,13 +121,13 @@ export const writeHTMLTableFile = () => {
     `;
 
     tr += items
-      .map(item => {
+      .map(items => {
         const renderItems = () => {
           return headers
             .map(_name => {
               const name = _name as keyof PackageData;
 
-              const value = item[name];
+              const value = items[name];
               const primitiveNameRoute = typeof value === "string" ? value.toLowerCase() : "";
 
               const renderComp = () => {
@@ -186,7 +135,7 @@ export const writeHTMLTableFile = () => {
                   case "Stage":
                     return `<StageBadge value={${value}}/>`;
                   case "NPM":
-                    return `<VersionBadge value="${value}" href="${npmURL}@solid-primitives/${item.Name}"/>`;
+                    return `<VersionBadge value="${value}"/>`;
                   case "Size":
                     return value;
                   case "Name":

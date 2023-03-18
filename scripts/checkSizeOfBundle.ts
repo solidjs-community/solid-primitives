@@ -3,19 +3,26 @@ import { readFileSync, writeFileSync, rmSync } from "fs";
 import { gzipSizeSync } from "gzip-size";
 import { r } from "./utils";
 
-const checkSizeOfPackage = async ({
+let recursive = false;
+const checkSizeOfBundle = async ({
   type,
   packageName,
-  primitiveName,
+  exportName,
   excludeGzipHeadersAndMetadataSize,
+  isExportDefault,
 }: {
   type: "package" | "export";
   packageName: string;
-  primitiveName: string;
+  exportName?: string;
   excludeGzipHeadersAndMetadataSize?: boolean;
-}) => {
+  isExportDefault?: boolean;
+}): Promise<{
+  minifiedSize: number;
+  gzippedSize: number;
+}> => {
+  const exportValue = isExportDefault ? `{ default as ${exportName} }` : `{ ${exportName} }`;
   const file = `
-export { ${primitiveName} } from "./packages/${packageName}/src/index"
+export ${exportValue} from "./packages/${packageName}/src/index"
 `;
   const fileName = "_temp_check_primitive_size.ts";
   const outDir = r("../_temp_output_primitive_size_dir");
@@ -42,6 +49,7 @@ export { ${primitiveName} } from "./packages/${packageName}/src/index"
   const gzipHeadersAndMetadataSize = 20; // around 20 bytes
   const buffer = readFileSync(outFile);
   const minifiedSize = buffer.toString().length;
+
   const gzippedSize =
     gzipSizeSync(buffer) - (excludeGzipHeadersAndMetadataSize ? gzipHeadersAndMetadataSize : 0);
   if (type === "export") {
@@ -49,10 +57,28 @@ export { ${primitiveName} } from "./packages/${packageName}/src/index"
   }
   rmSync(outDir, { recursive: true });
 
-  return {
+  const result = {
     minifiedSize,
     gzippedSize,
   };
+
+  if (minifiedSize <= 0) {
+    if (recursive) {
+      recursive = false;
+      return result;
+    }
+    recursive = true;
+
+    return await checkSizeOfBundle({
+      packageName,
+      type,
+      excludeGzipHeadersAndMetadataSize,
+      exportName,
+      isExportDefault: !isExportDefault,
+    });
+  }
+
+  return result;
 };
 
-export default checkSizeOfPackage;
+export default checkSizeOfBundle;

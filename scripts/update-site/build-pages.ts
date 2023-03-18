@@ -1,25 +1,17 @@
-import { existsSync, mkdirSync, readFileSync, writeFile, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFile } from "fs";
 import { r } from "../utils";
 import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { compile } from "@mdx-js/mdx";
 import remarkGfm from "remark-gfm";
-import { PackageJSONData, TUpdateSiteGlobal } from ".";
+import { TPackageData } from ".";
 
 const items: { path: string; pageStr: string }[] = [];
 
 const routeName = "package";
 
-export const buildPage = async ({
-  pkg,
-  name,
-  globalState,
-}: {
-  pkg: PackageJSONData;
-  name: string;
-  globalState: TUpdateSiteGlobal;
-}) => {
+export const buildPage = async ({ pkg, name }: { pkg: TPackageData; name: string }) => {
   const dir = r(`../packages/${name}/README.md`);
   if (!existsSync(dir)) return;
   let readme = readFileSync(dir, "utf-8");
@@ -140,23 +132,19 @@ export const buildPage = async ({
 
   const packageList = JSON.stringify([
     {
-      name: globalState.packageName[name]!.name,
-      gzipped: globalState.packageName[name]!.size.gzipped.string,
-      minified: globalState.packageName[name]!.size.minified.string,
+      name: pkg.name,
+      gzipped: pkg.size.gzipped.string,
+      minified: pkg.size.minified.string,
     },
   ]);
   const primitiveList = JSON.stringify(
-    Object.entries(globalState.primitives)
-      .filter(([key, value]) => {
-        return value.packageName === name;
-      })
-      .map(([key, value]) => {
-        return {
-          name: key,
-          gzipped: value.size.gzipped.string,
-          minified: value.size.minified.string,
-        };
-      }),
+    pkg.primitive.list.map(primitive => {
+      return {
+        name: primitive.name,
+        gzipped: primitive.size.gzipped.string,
+        minified: primitive.size.minified.string,
+      };
+    }),
   );
 
   const pathToSitePrimitivesRoute = r(`../site/src/routes/${routeName}/${name}.tsx`);
