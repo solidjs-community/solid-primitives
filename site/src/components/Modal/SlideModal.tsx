@@ -2,6 +2,7 @@ import Dismiss from "solid-dismiss";
 import { FiX } from "solid-icons/fi";
 import { Accessor, onMount, ParentComponent } from "solid-js";
 import * as Header from "../Header/Header";
+import * as Table from "../Primitives/Table";
 
 const SlideModal: ParentComponent<{
   menuButton: Element;
@@ -43,9 +44,12 @@ const SlideModal: ParentComponent<{
     prevScrollY = scrollY;
     // scroll top to 1 instead of 0, to prevent iOS Safari navigation bar to fully expand if it was previously collapsed.
     window.scrollTo({ top: 1 });
+
+    Table.setTranslateStickyTheader(true);
   };
 
   const restorePageLayout = () => {
+    Table.setTranslateStickyTheader(false);
     rootApp.style.position = "";
     rootApp.style.top = "";
     rootApp.style.left = "";

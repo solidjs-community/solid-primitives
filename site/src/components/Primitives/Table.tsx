@@ -8,6 +8,8 @@ import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 import reflow from "~/utils/reflow";
 import * as Header from "../Header/Header";
 
+export const [translateStickyTheader, setTranslateStickyTheader] = createSignal(false);
+
 const Table: ParentComponent = props => {
   const location = useLocation();
   const [tableRowTargets, setTableRowTargets] = createSignal<Element[]>([]);
@@ -422,6 +424,25 @@ const Table: ParentComponent = props => {
         });
       },
     ),
+  );
+
+  createEffect(
+    defer(translateStickyTheader, translateStickyTheader => {
+      if (!tableEl || !tableSameWidthAsParent || !headerActive()) return;
+
+      if (translateStickyTheader) {
+        const tableBCR = tableEl.getBoundingClientRect();
+        const theadPositionTop = 58;
+        const theadBorderWidth = 2;
+        tableHeader.style.transform = `translateY(${-(
+          tableBCR.top -
+          (theadPositionTop - theadBorderWidth)
+        )}px)`;
+        return;
+      } else {
+        tableHeader.style.transform = "";
+      }
+    }),
   );
 
   return (
