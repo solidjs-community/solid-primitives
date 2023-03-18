@@ -68,7 +68,7 @@ export const VersionBadgePill: ParentComponent<{ value: string; href?: string }>
   value,
   href,
 }) => {
-  // const version = createFetchVersion(value);
+  const version = createFetchVersion(value);
 
   return (
     <a
@@ -82,7 +82,7 @@ export const VersionBadgePill: ParentComponent<{ value: string; href?: string }>
       </div>
       <div class="background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#cae0ff,#c0c8ff)_border-box] dark:background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#405b6e,#46659a)_border-box] flex h-full min-w-[90px] items-center justify-center rounded-r-lg border-[3px] border-l-0 border-transparent font-semibold">
         <span>v</span>
-        {value}
+        {version()}
       </div>
     </a>
   );
