@@ -20,11 +20,10 @@ export const buildPage = async ({ pkg, name }: { pkg: TPackageData; name: string
   const stackBlitzName = "stackblitz";
   const githubPagesURL = `https://solidjs-community.github.io/solid-primitives/${name}/`;
   const githubChangelogURL = `https://github.com/solidjs-community/solid-primitives/blob/main/packages/${name}/CHANGELOG.md`;
-  // console.log(pkg.primitive.list.join("|"));
   const primitiveCodeElRegex = new RegExp(
-    `<((?:_components\\.)?code)>{?(?:"|')?(<?(?:${pkg.primitive.list.join(
-      "|",
-    )})>?)(?:"|')?}?<\\/((?:_components\\.)?code)>`,
+    `<((?:_components\\.)?code)>{?(?:"|')?(<?(?:${pkg.primitive.list
+      .map(item => item.name)
+      .join("|")})>?)(?:"|')?}?<\\/((?:_components\\.)?code)>`,
     "g",
   );
 

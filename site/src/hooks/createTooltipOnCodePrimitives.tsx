@@ -1,5 +1,16 @@
 import { createResizeObserver } from "@solid-primitives/resize-observer";
-import { batch, Component, createSignal, Match, onMount, Switch } from "solid-js";
+import { createMutationObserver } from "@solid-primitives/mutation-observer";
+import {
+  batch,
+  Component,
+  createEffect,
+  createRoot,
+  createSignal,
+  Match,
+  onCleanup,
+  onMount,
+  Switch,
+} from "solid-js";
 import { useTippy } from "solid-tippy";
 import { Content } from "tippy.js";
 import { BASE } from "~/constants";
@@ -31,45 +42,69 @@ const TooltipContent = (el: HTMLElement) => {
     });
   });
 
+  createMutationObserver(
+    () => {
+      const el = target()[0]?.parentElement?.parentElement;
+      return el ? [el] : [];
+    },
+    { attributes: true, attributeFilter: ["data-placement"], attributeOldValue: true },
+    records => {
+      records.forEach(record => {
+        const dataPlacement = record.target.getAttribute(record.attributeName);
+        setPlacement(dataPlacement);
+      });
+    },
+  );
+
   return (
     <div
       class="relative rounded-[9px] bg-[#2d466d] p-3 text-white dark:bg-[#a6c6df] dark:text-black"
       ref={el => setTarget([el])}
     >
-      <h2 class="font-semibold opacity-80">Type</h2>
-      <div class="text-[14px]">
-        <Switch>
-          <Match when={type === "make"}>
-            <span>
-              make{" "}
-              <a class="anchor-tag-underline" href={`${BASE}#make-non-reactive-vs-create-reactive`}>
-                ( not <strong>reactive</strong> )
-              </a>
-            </span>
-          </Match>
-          <Match when={type === "create"}>
-            <span>
-              create{" "}
-              <a class="anchor-tag-underline" href={`${BASE}#make-non-reactive-vs-create-reactive`}>
-                ( is <strong>reactive</strong> )
-              </a>
-            </span>
-          </Match>
-          <Match when={type === "component"}>
-            <span>JSX Component</span>
-          </Match>
-          <Match when={type === "utility"}>
-            <span>Utility Function</span>
-          </Match>
-        </Switch>
-      </div>
-      <h2 class="font-semibold opacity-80">Size</h2>
-      <div class="w-min">
-        <div class="flex justify-between gap-2 whitespace-nowrap text-[14px]">
-          Minified <span>{primitiveData.size.minified}</span>
+      <div class="mb-2">
+        <h2 class="font-semibold opacity-80">Type</h2>
+        <div class="text-[14px]">
+          <Switch>
+            <Match when={type === "make"}>
+              <span>
+                make{" "}
+                <a
+                  class="anchor-tag-underline"
+                  href={`${BASE}#make-non-reactive-vs-create-reactive`}
+                >
+                  ( not <strong>reactive</strong> )
+                </a>
+              </span>
+            </Match>
+            <Match when={type === "create"}>
+              <span>
+                create{" "}
+                <a
+                  class="anchor-tag-underline"
+                  href={`${BASE}#make-non-reactive-vs-create-reactive`}
+                >
+                  ( is <strong>reactive</strong> )
+                </a>
+              </span>
+            </Match>
+            <Match when={type === "component"}>
+              <span>JSX Component</span>
+            </Match>
+            <Match when={type === "utility"}>
+              <span>Utility Function</span>
+            </Match>
+          </Switch>
         </div>
-        <div class="flex justify-between gap-2 whitespace-nowrap text-[14px]">
-          GZipped <span>{primitiveData.size.gzipped}</span>
+      </div>
+      <div>
+        <h2 class="font-semibold opacity-80">Size</h2>
+        <div class="w-min">
+          <div class="flex justify-between gap-2 whitespace-nowrap text-[14px]">
+            Minified <span>{primitiveData.size.minified}</span>
+          </div>
+          <div class="flex justify-between gap-2 whitespace-nowrap text-[14px]">
+            GZipped <span>{primitiveData.size.gzipped}</span>
+          </div>
         </div>
       </div>
 
@@ -92,11 +127,12 @@ const TooltipSVG: Component<{
   const widthOfArrow = 16;
   const heightOfArrow = 8.721;
   const widthFoo = () => props.width / 2 - widthOfArrow / 2 + 1.5;
+
   return (
     <div
       class="pointer-events-none absolute inset-0"
       style={{
-        transform: props.placement === "bottom" ? "rotate(180deg)" : undefined,
+        transform: props.placement === "bottom" ? "rotate(180deg)" : "none",
       }}
     >
       <svg
@@ -198,10 +234,17 @@ const createTooltipOnCodePrimitives = () => {
       .querySelector("main .prose")!
       .querySelectorAll("[data-code-primitive-name]") as NodeListOf<HTMLElement>;
     els.forEach(el => {
+      let dispose: () => void;
       useTippy(() => el, {
         props: {
           onMount: instance => {
-            instance.setContent(TooltipContent(el) as Content);
+            createRoot(_dispose => {
+              dispose = _dispose;
+              instance.setContent(TooltipContent(el) as Content);
+            });
+          },
+          onHidden: () => {
+            dispose();
           },
           interactive: true,
           appendTo: () => document.body,
