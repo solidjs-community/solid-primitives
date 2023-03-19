@@ -4,7 +4,7 @@ import checkSizeOfBundle from "../checkSizeOfBundle";
 import { formatBytes, r, regexGlobalCaptureGroup } from "../utils";
 import { primitiveTags } from "./tags";
 
-console.log("build package data", "Updating packages' package.json");
+console.log("get package data", "Getting packages' package.json");
 
 const generatedDir = r(`../site/src/_generated`);
 if (!existsSync(generatedDir)) {
@@ -23,7 +23,7 @@ const packageNameCategoryMap = [
 ];
 
 const packageFiles = readdirSync(r(`../packages/`));
-export const readPackageFiles = async () => {
+export const getPackageData = async () => {
   const packageData: TPackageData[] = [];
   for (const name of packageFiles) {
     const packageJsonPath = r(`../packages/${name}/package.json`);

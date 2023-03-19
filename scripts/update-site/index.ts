@@ -3,7 +3,7 @@ import { r } from "../utils";
 import { buildAndWriteHomeSections } from "./build-html-home-sections";
 import { buildCategory, writeHTMLTableFile } from "./build-html-table";
 import { buildJSONCategory, writeJSONFile } from "./build-json-category";
-import { readPackageFiles } from "./build-package-data";
+import { getPackageData } from "./get-package-data";
 import { buildPage, writePages } from "./build-pages";
 
 export type PackageData = {
@@ -66,7 +66,7 @@ if (!existsSync(generatedDir)) {
 }
 
 const run = async () => {
-  const packageData = await readPackageFiles();
+  const packageData = await getPackageData();
 
   for (const packageItem of packageData) {
     const { primitive } = packageItem;
