@@ -68,7 +68,7 @@ export const buildCategory = async ({ name, pkg }: { name: string; pkg: TPackage
 
           const component = `<SizeBadge value="${value}" unit="${unit}" href="${href}" />`;
 
-          return `<SizeBadgeWrapper primitiveName="${primitiveName.replace(
+          return `<SizeBadgeWrapper primitiveName="${packageName}_${primitiveName.replace(
             /\s/g,
             "",
           )}">${component}</SizeBadgeWrapper>`;
@@ -82,8 +82,12 @@ export const buildCategory = async ({ name, pkg }: { name: string; pkg: TPackage
   data.Primitives = list
     .map(primitive => {
       const primitiveRoute = `${name}#${primitive.name.toLowerCase().replace(/\s/g, "-")}`;
+      const packageName = pkg.primitive.name;
       const component = `<PrimitiveBtn href="${primitiveRoute}">${primitive.name}</PrimitiveBtn>`;
-      return `<PrimitiveBtnLineWrapper primitiveName="${primitive.name}">${component}</PrimitiveBtnLineWrapper>`;
+      return `<PrimitiveBtnLineWrapper primitiveName="${packageName}_${primitive.name.replace(
+        /\s/g,
+        "",
+      )}">${component}</PrimitiveBtnLineWrapper>`;
     })
     .join("");
   // .join("<br />");

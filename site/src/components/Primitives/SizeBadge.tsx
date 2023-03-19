@@ -49,7 +49,9 @@ export const SizeBadgeWrapper: ParentComponent<{ primitiveName: string }> = prop
     <div
       class="py-[6px]"
       onMouseEnter={() => {
-        el = document.querySelector(`[data-line-primitive="${props.primitiveName}"`) as HTMLElement;
+        el = document.querySelector(
+          `[data-line-primitive-id="${props.primitiveName}"`,
+        ) as HTMLElement;
         el.style.opacity = "1";
       }}
       onMouseLeave={() => {
