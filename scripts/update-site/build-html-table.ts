@@ -135,7 +135,7 @@ export const writeHTMLTableFile = () => {
                   case "Stage":
                     return `<StageBadge value={${value}}/>`;
                   case "NPM":
-                    return `<VersionBadge value="${value}"/>`;
+                    return `<VersionBadge value="${value}" href="${npmURL}@solid-primitives/${items.Name}"/>`;
                   case "Size":
                     return value;
                   case "Name":
