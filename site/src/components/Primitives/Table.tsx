@@ -448,7 +448,7 @@ const Table: ParentComponent = props => {
   return (
     <div class={`${pageWidthClass} isolate mx-auto`}>
       <div
-        class="box-shadow-[var(--table-header-box-shadow)] z-2 pointer-events-none fixed top-[60px] left-0 right-0 transition-opacity"
+        class="box-shadow-[var(--table-header-box-shadow)] pointer-events-none fixed top-[60px] left-0 right-0 z-[2] transition-opacity"
         style={{ opacity: "0" }}
         ref={tableHeaderShadowStickyDiv}
       />
