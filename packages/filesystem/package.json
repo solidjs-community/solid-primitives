@@ -1,0 +1,79 @@
+{
+  "name": "@solid-primitives/filesystem",
+  "version": "0.0.100",
+  "description": "A primitive for convenient file system access.",
+  "author": "Alex Lohr <alex.lohr@logmein.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/filesystem#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "filesystem",
+    "stage": 0,
+    "list": [
+      "createFileSystem"
+    ],
+    "category": "Display & Media"
+  },
+  "keywords": [
+    "solid",
+    "primitives"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/server.cjs",
+  "module": "./dist/server.js",
+  "browser": {
+    "./dist/server.cjs": "./dist/index.cjs",
+    "./dist/server.js": "./dist/index.js"
+  },
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "worker": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "browser": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "deno": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "node": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    },
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "dev": "vite serve dev",
+    "page": "vite build dev",
+    "build": "jiti ../../scripts/build.ts --ssr",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
+  "devDependencies": {
+    "@tauri-apps/api": "^1.2.0",
+    "@types/wicg-file-system-access": "2020.9.5"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.0",
+    "chokidar": "^3.5.3"
+  },
+  "peerDependenciesMeta": {
+    "chokidar": { "optional": true }
+  }
+}
