@@ -1,5 +1,13 @@
 # @solid-primitives/memo
 
+## 1.2.2
+
+### Patch Changes
+
+- 4d461d50: Simplify `createLazyMemo`
+
+  If won't run if disposed even if stale anymore.
+
 ## 1.2.1
 
 ### Patch Changes
