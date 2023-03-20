@@ -131,7 +131,7 @@ export const buildPage = async ({ pkg, name }: { pkg: TPackageData; name: string
 
   const packageList = JSON.stringify([
     {
-      name: pkg.name,
+      name: pkg.primitive.name,
       gzipped: pkg.size.gzipped.string,
       minified: pkg.size.minified.string,
     },
