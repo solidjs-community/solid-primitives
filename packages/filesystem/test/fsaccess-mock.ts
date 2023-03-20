@@ -25,7 +25,7 @@ export class FileSystemFileHandle extends FileSystemHandle {
       close: () => {
         file.data = content;
         return Promise.resolve();
-      }
+      },
     };
     return Promise.resolve(writable);
   }
@@ -45,7 +45,7 @@ export class FileSystemDirectoryHandle extends FileSystemHandle {
   async getDirectoryHandle(name: string, options?: { create?: boolean }) {
     const directory = this.contents.find(item => item[0] === name);
     if (directory?.[1].kind === "file") {
-      throw new Error("TypeMismatchError")
+      throw new Error("TypeMismatchError");
     }
     if (directory) {
       return Promise.resolve(directory[1] as FileSystemDirectoryHandle);
@@ -60,7 +60,7 @@ export class FileSystemDirectoryHandle extends FileSystemHandle {
   async getFileHandle(name: string, options?: { create?: boolean }) {
     const file = this.contents.find(item => item[0] === name);
     if (file?.[1].kind === "directory") {
-      throw new Error("TypeMismatchError")
+      throw new Error("TypeMismatchError");
     }
     if (file) {
       return Promise.resolve(file[1] as FileSystemFileHandle);
@@ -129,7 +129,7 @@ export const createFromObject = (
 
 (globalThis as any).currentFileSystem = createFromObject({
   src: { "index.ts": "// test" },
-  data: { "data.json": "[1, 2, 3]" }
+  data: { "data.json": "[1, 2, 3]" },
 });
 
 (globalThis as any).showDirectoryPicker = () =>

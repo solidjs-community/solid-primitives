@@ -11,16 +11,16 @@
 
 A primitive that allows to manage different file system access methods:
 
-* `createFileSystem` - Provides a reactive interface to one of the file system adapters - a convenience method that calls the correct wrapper
-* `createSyncFileSystem` - Wraps a synchronous file system adapter like `makeNoFileSystem` or `makeVirtualFileSystem` in a reactive interface
-* `createAsyncFileSystem` - Adds a reactive layer to an asynchronous file system adapter
-* `makeNoFileSystem` - Adapter that provides a synchronous mock file system
-* `makeNoAsyncFileSystem` - Adapter that provides an asynchronous mock file system
-* `makeVirtualFileSystem` - Adapter that provides a virtual file system that doubles as FsMap for `typescript-vfs` with its `.toMap()` method.
-* `makeWebAccessFileSystem` (client only) - Adapter that provides access to the actual filesystem in the browser using a directory picker
-* `makeNodeFileSystem` (server only) - Adapter that abstracts the node fs/promises module for the use with this primitive
-* `makeTauriFileSystem` (tauri with fs access enabled only) - Adapter that connects to the tauri fs module
-* `makeChokidarWatcher` - (experimental): use chokidar to watch for file system changes and trigger reactive updates
+- `createFileSystem` - Provides a reactive interface to one of the file system adapters - a convenience method that calls the correct wrapper
+- `createSyncFileSystem` - Wraps a synchronous file system adapter like `makeNoFileSystem` or `makeVirtualFileSystem` in a reactive interface
+- `createAsyncFileSystem` - Adds a reactive layer to an asynchronous file system adapter
+- `makeNoFileSystem` - Adapter that provides a synchronous mock file system
+- `makeNoAsyncFileSystem` - Adapter that provides an asynchronous mock file system
+- `makeVirtualFileSystem` - Adapter that provides a virtual file system that doubles as FsMap for `typescript-vfs` with its `.toMap()` method.
+- `makeWebAccessFileSystem` (client only) - Adapter that provides access to the actual filesystem in the browser using a directory picker
+- `makeNodeFileSystem` (server only) - Adapter that abstracts the node fs/promises module for the use with this primitive
+- `makeTauriFileSystem` (tauri with fs access enabled only) - Adapter that connects to the tauri fs module
+- `makeChokidarWatcher` - (experimental): use chokidar to watch for file system changes and trigger reactive updates
 
 ## Installation
 
@@ -94,36 +94,43 @@ createEffect(() => console.log("/", fs.readdir("/")));
 createEffect(() => console.log("/src/index.ts", fs.readFile("/src/index.ts")));
 
 // isomorphic file system reader with lazy evaluation
-const Item = (props: { path: string, fs: SyncFileSystem | AsyncFileSystem }) => {
+const Item = (props: { path: string; fs: SyncFileSystem | AsyncFileSystem }) => {
   const itemType = () => props.fs.getType(props.path);
   const name = () => getItemName(props.path);
   const [open, setOpen] = createSignal(false);
-  const content = () => open()
-    ? itemType() === "dir"
-      ? props.fs.readdir(props.path)
-      : props.fs.readFile(props.path)
-    : undefined;
+  const content = () =>
+    open()
+      ? itemType() === "dir"
+        ? props.fs.readdir(props.path)
+        : props.fs.readFile(props.path)
+      : undefined;
 
-  return <>
-    <button onClick={() => setOpen(!open())}>{open() ? "-" : "+"}</button>
-    {itemType() === "dir" ? "[DIR]" : "[FILE]"} {name()}
-    <Switch>
-      <Match when={open() && itemType() === "file"}>
-        <pre>{content()?.()}</pre>
-      </Match>
-      <Match when={open() && itemType() === "dir"}>
-        <For each={content() || []}>
-          {(entry) => <div><Item path={entry} fs={props.fs} /></div>}
-        </For>
-      </Match>
-    </Switch>
-  </>
+  return (
+    <>
+      <button onClick={() => setOpen(!open())}>{open() ? "-" : "+"}</button>
+      {itemType() === "dir" ? "[DIR]" : "[FILE]"} {name()}
+      <Switch>
+        <Match when={open() && itemType() === "file"}>
+          <pre>{content()?.()}</pre>
+        </Match>
+        <Match when={open() && itemType() === "dir"}>
+          <For each={content() || []}>
+            {entry => (
+              <div>
+                <Item path={entry} fs={props.fs} />
+              </div>
+            )}
+          </For>
+        </Match>
+      </Switch>
+    </>
+  );
 };
 ```
 
 ## Demo
 
-You may view a working example of createFileSystem/makeVirtualFileSystem/makeWebAccessFileSystem here: 
+You may view a working example of createFileSystem/makeVirtualFileSystem/makeWebAccessFileSystem here:
 https://solidjs-community.github.io/solid-primitives/filesystem/
 
 ## Changelog

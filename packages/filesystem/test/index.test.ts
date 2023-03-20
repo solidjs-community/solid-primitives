@@ -22,8 +22,7 @@ describe("makeNoFileSystem", () => {
 
 describe("makeNoAsyncFileSystem", () => {
   const fs = makeNoAsyncFileSystem();
-  test("fs.getType returns null", async () =>
-    expect(await fs.getType("/any/file")).toBeNull());
+  test("fs.getType returns null", async () => expect(await fs.getType("/any/file")).toBeNull());
   test("fs.readDir returns an empty array", async () => expect(await fs.readdir("/")).toEqual([]));
   test("fs.mkdir returns void", async () => expect(await fs.mkdir("test")).toBeUndefined());
   test("fs.readFile returns an empty string", async () =>

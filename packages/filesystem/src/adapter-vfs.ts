@@ -9,7 +9,7 @@ export type ObjectFileSystemItem = ObjectFileSystem | string | undefined;
  * @param initial optional object to prefill the file system
  * @param storage optional localStorage/localForage type storage
  * @param key optional key in the storage
- * 
+ *
  * ⚠ Warning! localStorage is limited to 5MB; use [localforage](https://localforage.github.io/localForage/) instead if you need more.
  */
 export const makeVirtualFileSystem = (

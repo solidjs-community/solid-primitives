@@ -1,7 +1,7 @@
 import { batch, createResource, createSignal } from "solid-js";
 import type { Accessor, Resource, ResourceActions, Setter } from "solid-js";
 
-import type { 
+import type {
   ItemType,
   SyncFileSystem,
   AsyncFileSystem,
@@ -18,7 +18,10 @@ type SignalMap<T> = Map<string, [Accessor<T>, Setter<T>]>;
 type ResourceMap<T> = Map<string, [Resource<T>, ResourceActions<T>]>;
 
 /** makes a synchronous filesystem reactive */
-export const createSyncFileSystem = (adapter: SyncFileSystemAdapter, watcher?: Watcher): SyncFileSystem => {
+export const createSyncFileSystem = (
+  adapter: SyncFileSystemAdapter,
+  watcher?: Watcher,
+): SyncFileSystem => {
   const getTypeMap: SignalMap<ItemType | undefined> = new Map();
   const readdirMap: SignalMap<DirEntries | undefined> = new Map();
   const readFileMap: SignalMap<string | undefined> = new Map();
@@ -94,8 +97,7 @@ export const createSyncFileSystem = (adapter: SyncFileSystemAdapter, watcher?: W
       getTypeMap.get(previous)?.[1](undefined);
       getTypeMap.delete(previous);
       readdirMap.get(getParentDir(previous))?.[1](
-        (items = []) =>
-          items.filter(item => item === getItemName(previous)) as [] | DirEntries,
+        (items = []) => items.filter(item => item === getItemName(previous)) as [] | DirEntries,
       );
       readdirMap.get(getParentDir(next))?.[1](
         (items = []) => [...items, getItemName(next)] as DirEntries,
@@ -112,17 +114,17 @@ export const createSyncFileSystem = (adapter: SyncFileSystemAdapter, watcher?: W
         }
       });
       readdirMap.get(getParentDir(path))?.[1](
-        (items = []) =>
-          items.filter(item => item === getItemName(path)) as [] | DirEntries,
+        (items = []) => items.filter(item => item === getItemName(path)) as [] | DirEntries,
       );
     },
   };
   if (watcher) {
     watcher((operation, path) => {
       if (operation === "mkdir" || operation === "rm") {
-        readdirMap.get(getParentDir(path))?.[1](
-          (items = []) => items.includes(path) ? items : [...items, path]);
-      } 
+        readdirMap.get(getParentDir(path))?.[1]((items = []) =>
+          items.includes(path) ? items : [...items, path],
+        );
+      }
       if (operation === "rm") {
         getTypeMap.get(path)?.[1](null);
       }
@@ -135,7 +137,10 @@ export const createSyncFileSystem = (adapter: SyncFileSystemAdapter, watcher?: W
 };
 
 /** makes an asynchronous filesystem reactive */
-export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter, watcher?: Watcher): AsyncFileSystem => {
+export const createAsyncFileSystem = (
+  adapter: AsyncFileSystemAdapter,
+  watcher?: Watcher,
+): AsyncFileSystem => {
   const getTypeMap: ResourceMap<ItemType | undefined> = new Map();
   const readdirMap: ResourceMap<DirEntries | undefined> = new Map();
   const readFileMap: ResourceMap<string | undefined> = new Map();
@@ -250,14 +255,15 @@ export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter, watcher?:
   if (watcher) {
     watcher((operation, path) => {
       if (operation === "mkdir" || operation === "rm") {
-        readdirMap.get(getParentDir(path))?.[1].mutate(
-          (items = []) => items.includes(path) ? items : [...items, path]);
-      } 
+        readdirMap
+          .get(getParentDir(path))?.[1]
+          .mutate((items = []) => (items.includes(path) ? items : [...items, path]));
+      }
       if (operation === "rm") {
         getTypeMap.get(path)?.[1].mutate(null);
       }
       if (operation === "writeFile") {
-        readFileMap.get(path)?.[1].refetch()
+        readFileMap.get(path)?.[1].refetch();
       }
     });
   }
@@ -266,10 +272,13 @@ export const createAsyncFileSystem = (adapter: AsyncFileSystemAdapter, watcher?:
 
 export function createFileSystem(fs: SyncFileSystemAdapter, watcher?: Watcher): SyncFileSystem;
 export function createFileSystem(fs: AsyncFileSystemAdapter, watcher?: Watcher): AsyncFileSystem;
-export function createFileSystem(fs: Promise<AsyncFileSystemAdapter>, watcher?: Watcher): Promise<AsyncFileSystem>;
+export function createFileSystem(
+  fs: Promise<AsyncFileSystemAdapter>,
+  watcher?: Watcher,
+): Promise<AsyncFileSystem>;
 export function createFileSystem(
   fs: FileSystemAdapter | Promise<AsyncFileSystemAdapter>,
-  watcher?: Watcher
+  watcher?: Watcher,
 ): SyncFileSystem | AsyncFileSystem | Promise<AsyncFileSystem> {
   return fs instanceof Promise
     ? fs.then(fs => createAsyncFileSystem(fs, watcher))
