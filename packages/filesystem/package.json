@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/filesystem",
-  "version": "0.0.100",
+  "version": "1.0.0",
   "description": "A primitive for convenient file system access.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [],
@@ -74,6 +74,8 @@
     "chokidar": "^3.5.3"
   },
   "peerDependenciesMeta": {
-    "chokidar": { "optional": true }
+    "chokidar": {
+      "optional": true
+    }
   }
 }
