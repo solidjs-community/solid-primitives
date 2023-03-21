@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.1.9
+
+### Patch Changes
+
+- 06ab3e0c: Prepare component types for changes to JSX types in solid-js@1.7.0
+
 ## 1.1.8
 
 ### Patch Changes
