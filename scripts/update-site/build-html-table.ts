@@ -12,13 +12,15 @@ const getBundleJSQuery = ({
   type,
   packageName,
   primitiveName,
+  peerDependencies,
 }: {
   type: "package" | "export";
   packageName: string;
   primitiveName: string;
+  peerDependencies: { [key: string]: string };
 }) => {
   const esbuild = {
-    external: ["solid-js", "node-fetch"],
+    external: Object.keys(peerDependencies),
   };
   const query = encodeURIComponent(`@solid-primitives/${packageName}`);
   const treeshake = encodeURIComponent(`[{${primitiveName}}]`);
@@ -55,6 +57,7 @@ export const buildCategory = async ({ name, pkg }: { name: string; pkg: TPackage
           const type = pkg.primitive.isListCollapsed ? "package" : "export";
           const packageName = pkg.primitive.name;
           const primitiveName = primitive.name;
+          const peerDependencies = pkg.peerDependencies;
 
           const value = primitive.size.gzipped.number;
           const unit = primitive.size.gzipped.unit;
@@ -63,6 +66,7 @@ export const buildCategory = async ({ name, pkg }: { name: string; pkg: TPackage
             type,
             packageName,
             primitiveName,
+            peerDependencies,
           });
           const href = `${bundleJSURL}?${query}`;
 

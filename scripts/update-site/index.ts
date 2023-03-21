@@ -24,6 +24,7 @@ export type PackageJSONData = {
     category: string;
     stage: number;
   };
+  peerDependencies: { [key: string]: string };
 };
 
 export type TSize = {
@@ -56,6 +57,7 @@ export type TPackageData = {
   };
   version: string;
   tags: string[];
+  peerDependencies: { [key: string]: string };
 };
 
 console.log("updateSite", "Updating site");

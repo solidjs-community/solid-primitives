@@ -13,12 +13,16 @@ if (!existsSync(generatedDir)) {
 const packageCollapsedListOfPrimitives = ["signal-builders", "platform"];
 const maximumPrimitivesCount = 30;
 
-const packageNameCategoryMap = [
+const packageNameAdditionalDataMap = [
   {
     package: "utils",
     category: "Support / Helper",
     isListCollapsed: true,
     collapsedContent: "List of utilities",
+  },
+  {
+    package: "filesystem",
+    peerDependencies: ["fs"],
   },
 ];
 
@@ -31,11 +35,22 @@ export const getPackageData = async () => {
     const pkgFile = readFileSync(packageJsonPath, "utf8");
     const pkg = JSON.parse(pkgFile) as PackageJSONData;
 
+    if (pkg.primitive) {
+      const foundPackageMap = packageNameAdditionalDataMap.find(
+        item => item.package === pkg.primitive.name,
+      );
+      if (foundPackageMap) {
+        foundPackageMap.peerDependencies?.forEach(dep => {
+          pkg.peerDependencies[dep] = "";
+        });
+      }
+    }
+
     if (!pkg.primitive) {
       console.warn(`package ${name} doesn't have primitive field in package.json`);
       // continue;
       const packageName = pkg.name.replace(/^.+\//, "");
-      const foundPackage = packageNameCategoryMap.find(pkg => pkg.package === packageName);
+      const foundPackage = packageNameAdditionalDataMap.find(pkg => pkg.package === packageName);
       const category = foundPackage?.category || "Misc";
       const isListCollapsed = !!foundPackage?.isListCollapsed;
       const collapsedContent = foundPackage?.collapsedContent;
@@ -113,6 +128,7 @@ export const getPackageData = async () => {
             packageName: pkg.primitive.name!,
             exportName: primitive,
             excludeGzipHeadersAndMetadataSize: true,
+            peerDependencies: Object.keys(pkg.peerDependencies),
           });
           const minified = formatBytes(result.minifiedSize);
           const gzipped = formatBytes(result.gzippedSize);

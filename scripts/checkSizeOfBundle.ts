@@ -10,12 +10,14 @@ const checkSizeOfBundle = async ({
   exportName,
   excludeGzipHeadersAndMetadataSize,
   isExportDefault,
+  peerDependencies,
 }: {
   type: "package" | "export";
   packageName: string;
   exportName?: string;
   excludeGzipHeadersAndMetadataSize?: boolean;
   isExportDefault?: boolean;
+  peerDependencies?: string[];
 }): Promise<{
   minifiedSize: number;
   gzippedSize: number;
@@ -43,7 +45,7 @@ export ${exportValue} from "./packages/${packageName}/src/index"
     minify: true,
     treeShaking: true,
     platform: "browser",
-    external: ["solid-js", "node-fetch"],
+    external: peerDependencies || ["solid-js", "node-fetch", "chokidar", "fs"],
   });
 
   const gzipHeadersAndMetadataSize = 20; // around 20 bytes
