@@ -744,12 +744,14 @@ importers:
       '@tailwindcss/container-queries': ^0.1.0
       '@tailwindcss/typography': ^0.5.8
       '@types/mark.js': ^8.11.8
+      '@types/marked': ^4.0.8
       '@types/node': ^18.15.0
       autoprefixer: ^10.4.14
       clsx: ^1.2.1
       dotenv: ^16.0.3
       fuse.js: ^6.6.2
       mark.js: ^8.11.1
+      marked: ^4.2.12
       postcss: ^8.4.21
       sass: ^1.59.2
       solid-dismiss: ^1.6.74
@@ -798,9 +800,11 @@ importers:
       '@tailwindcss/container-queries': 0.1.0_tailwindcss@3.2.7
       '@tailwindcss/typography': 0.5.9_tailwindcss@3.2.7
       '@types/mark.js': 8.11.8
+      '@types/marked': 4.0.8
       '@types/node': 18.15.0
       autoprefixer: 10.4.14_postcss@8.4.21
       dotenv: 16.0.3
+      marked: 4.2.12
       postcss: 8.4.21
       solid-start: 0.2.23_yjvc5rivu6xe6xnbqx42gpemy4
       solid-start-netlify: 0.2.23_solid-start@0.2.23
@@ -4281,6 +4285,10 @@ packages:
     resolution: {integrity: sha512-BoWCd9ydi1hZxDfu/lF0v1hHMsNUjuxZEDJsdHlmm6GlKk4qxlLya7D3FS81QmabwFbYPpoDOh9603JESUkHbA==}
     dependencies:
       '@types/jquery': 3.5.16
+    dev: true
+
+  /@types/marked/4.0.8:
+    resolution: {integrity: sha512-HVNzMT5QlWCOdeuBsgXP8EZzKUf0+AXzN+sLmjvaB3ZlLqO+e4u0uXrdw9ub69wBKFs+c6/pA4r9sy6cCDvImw==}
     dev: true
 
   /@types/mdast/3.0.10:
@@ -8303,6 +8311,12 @@ packages:
 
   /markdown-table/3.0.3:
     resolution: {integrity: sha512-Z1NL3Tb1M9wH4XESsCDEksWoKTdlUafKc4pt0GRwjUyXaCFZ+dc3g2erqB6zm3szA2IUSi7VnPI+o/9jnxh9hw==}
+    dev: true
+
+  /marked/4.2.12:
+    resolution: {integrity: sha512-yr8hSKa3Fv4D3jdZmtMMPghgVt6TWbk86WQaWhDloQjRSQhMMYCAro7jP7VDJrjjdV8pxVxMssXS8B8Y5DZ5aw==}
+    engines: {node: '>= 12'}
+    hasBin: true
     dev: true
 
   /mdast-util-definitions/5.1.2:

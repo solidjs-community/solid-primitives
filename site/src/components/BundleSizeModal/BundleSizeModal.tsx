@@ -1,13 +1,14 @@
 import { createIntersectionObserver } from "@solid-primitives/intersection-observer";
 import { isIOS, isSafari } from "@solid-primitives/platform";
-import { createResizeObserver, createElementSize } from "@solid-primitives/resize-observer";
+import { createResizeObserver } from "@solid-primitives/resize-observer";
 import { Component, createSignal, For, onMount } from "solid-js";
 
 export type TBundleSizeItem = {
   name: string;
-  minified: string;
-  gzipped: string;
+  min: string;
+  gzip: string;
 };
+
 const BundleSizeModal: Component<{
   packageList: TBundleSizeItem[];
   primitiveList: TBundleSizeItem[];
@@ -122,7 +123,7 @@ const BundleSizeModal: Component<{
             </thead>
             <tbody>
               <For each={packageList}>
-                {({ name, minified, gzipped }) => {
+                {({ name, min, gzip }) => {
                   return (
                     <tr class="even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
                       <td class="p-1 text-sm md:px-3 md:text-base">
@@ -132,10 +133,10 @@ const BundleSizeModal: Component<{
                         </span>
                       </td>
                       <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                        {minified}
+                        {min}
                       </td>
                       <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                        {gzipped}
+                        {gzip}
                       </td>
                     </tr>
                   );
@@ -182,7 +183,7 @@ const BundleSizeModal: Component<{
             </thead>
             <tbody>
               <For each={primitiveList}>
-                {({ name, minified, gzipped }) => {
+                {({ name, min, gzip }) => {
                   return (
                     <tr class="even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
                       <td class="p-1 text-sm md:px-3 md:text-base" data-primitive-td>
@@ -191,10 +192,10 @@ const BundleSizeModal: Component<{
                         </span>
                       </td>
                       <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                        {minified}
+                        {min}
                       </td>
                       <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                        {gzipped}
+                        {gzip}
                       </td>
                     </tr>
                   );

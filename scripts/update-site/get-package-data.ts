@@ -1,7 +1,7 @@
-import { readdirSync, existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
+import { readdirSync, existsSync, readFileSync, mkdirSync } from "fs";
 import { PackageJSONData, TPackageData } from ".";
-import checkSizeOfBundle from "../checkSizeOfBundle";
-import { formatBytes, r, regexGlobalCaptureGroup } from "../utils";
+import { getExportBundlesize, formatBytes } from "../calculate-bundlesize";
+import { r, regexGlobalCaptureGroup } from "../utils";
 import { primitiveTags } from "./tags";
 
 console.log("get package data", "Getting packages' package.json");
@@ -10,7 +10,7 @@ const generatedDir = r(`../site/src/_generated`);
 if (!existsSync(generatedDir)) {
   mkdirSync(generatedDir);
 }
-const packageCollapsedListOfPrimitives = ["signal-builders", "platform"];
+const packageCollapsedListOfPrimitives = ["signal-builders", "platform", "immutable"];
 const maximumPrimitivesCount = 30;
 
 const packageNameAdditionalDataMap = [
@@ -123,11 +123,10 @@ export const getPackageData = async () => {
         .sort()
         .map(async (primitive, _, self) => {
           const type = self.length > 1 ? "export" : "package";
-          const result = await checkSizeOfBundle({
+          const result = await getExportBundlesize({
             type,
             packageName: pkg.primitive.name!,
             exportName: primitive,
-            excludeGzipHeadersAndMetadataSize: true,
             peerDependencies: Object.keys(pkg.peerDependencies),
           });
           const minified = formatBytes(result.minifiedSize);
@@ -153,10 +152,9 @@ export const getPackageData = async () => {
       );
     }
 
-    const result = await checkSizeOfBundle({
+    const result = await getExportBundlesize({
       type: "package",
       packageName: pkg.primitive.name,
-      excludeGzipHeadersAndMetadataSize: true,
     });
     const minified = formatBytes(result.minifiedSize);
     const gzipped = formatBytes(result.gzippedSize);

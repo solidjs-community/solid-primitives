@@ -1,23 +1,24 @@
-import { defineConfig } from "vite";
+import { defineConfig, UserConfig } from "vite";
 import devtools from "solid-devtools/vite";
 import solid from "solid-start/vite";
 // @ts-ignore
 import staticAdapter from "solid-start-static";
-import dotenv from "dotenv";
 
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
+import { generatePackagesData } from "./scripts/generate-modules-data";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+declare global {
+  var _viteConfig: UserConfig | undefined;
+}
 
-const packageNames = fs.readdirSync(path.join(__dirname, "..", "packages"));
-const packageRoutes = packageNames.map(name => `/package/${name}`);
+export default defineConfig(async () => {
+  // when generating static site, vite.config.ts is executed multiple times
+  if (globalThis._viteConfig) {
+    return globalThis._viteConfig;
+  }
 
-export default defineConfig(() => {
-  dotenv.config();
-  return {
+  const modules = await generatePackagesData();
+
+  return (globalThis._viteConfig = {
     plugins: [
       devtools({
         autoname: true,
@@ -27,10 +28,9 @@ export default defineConfig(() => {
         },
       }),
       solid({
-        // hot: false,
         adapter: staticAdapter(),
-        prerenderRoutes: ["/", ...packageRoutes],
+        prerenderRoutes: ["/", ...modules.map(name => `/package/${name}`)],
       }),
     ],
-  };
+  });
 });

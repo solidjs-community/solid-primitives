@@ -19,14 +19,13 @@ export const getSizeShield = (name: string) => `${sizeShield}${name}.json`;
 export const getNPMShield = (name: string) => `${npmShield}${name}.json`;
 
 const InfoBar: Component<{
-  packageName: string;
   name: string;
   stage: number;
-
   packageList: TBundleSizeItem[];
   primitiveList: TBundleSizeItem[];
-}> = ({ name, packageName, stage, packageList, primitiveList }) => {
-  const githubRepoPrimitve = `${githubRepo}/tree/main/packages/${name}`;
+}> = props => {
+  const packageName = `@solid-primitives/${props.name}`;
+  const githubRepoPrimitve = `${githubRepo}/tree/main/packages/${props.name}`;
   const bundlephobiaFullURL = `${bundlephobiaURL}/${packageName}`;
   const npmFullURL = `${npmURL}/${packageName}`;
   return (
@@ -34,14 +33,14 @@ const InfoBar: Component<{
       <SizeBadgePill
         value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/active-element.json"
         href={bundlephobiaFullURL}
-        packageList={packageList}
-        primitiveList={primitiveList}
+        packageList={props.packageList}
+        primitiveList={props.primitiveList}
       />
       <VersionBadgePill
         value="https://img.shields.io/npm/v/@solid-primitives/active-element.json"
         href={npmFullURL}
       />
-      <StageBadgePill value={stage} />
+      <StageBadgePill value={props.stage} />
     </div>
   );
 };

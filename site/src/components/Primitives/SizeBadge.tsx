@@ -83,7 +83,7 @@ export const SizeBadgePill: ParentComponent<
           <span>Size</span>
         </div>
         <div class="background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#cae0ff,#c0c8ff)_border-box] dark:background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#405b6e,#46659a)_border-box] flex h-full min-w-[90px] items-center justify-center rounded-r-lg border-[3px] border-l-0 border-transparent font-semibold">
-          {packageList[0].gzipped}
+          {packageList[0]?.gzip}
         </div>
       </button>
       <SlideModal menuButton={menuButton} open={open} setOpen={setOpen}>

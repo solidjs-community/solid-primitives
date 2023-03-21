@@ -13,7 +13,6 @@ const GITHUB_REPO = "https://github.com/solidjs-community/solid-primitives";
 export const PRIMITIVE_PAGE_PADDING_TOP = 140;
 
 const PrimitivePageMain: ParentComponent<{
-  packageName: string;
   name: string;
   stage: number;
   packageList: TBundleSizeItem[];
@@ -79,7 +78,6 @@ const PrimitivePageMain: ParentComponent<{
 
           <div class="my-8">
             <InfoBar
-              packageName={props.packageName}
               name={props.name}
               stage={props.stage}
               packageList={props.packageList}
@@ -93,7 +91,5 @@ const PrimitivePageMain: ParentComponent<{
     </>
   );
 };
-
-const addTooltip = () => {};
 
 export default PrimitivePageMain;

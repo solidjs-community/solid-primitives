@@ -1,7 +1,8 @@
-import { readdirSync, existsSync, readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 // @ts-expect-error ts-missing-module
 import tablemark from "json-to-markdown-table";
 import { insertTextBetweenComments, r } from "./utils";
+import { getModulesData } from "./get-modules-data";
 
 type PackageData = {
   Name: string;
@@ -11,6 +12,7 @@ type PackageData = {
   Primitives: string;
 };
 
+// eslint-disable-next-line no-console
 console.log("updateReadme", "Updating README documentation");
 
 const githubURL = "https://github.com/solidjs-community/solid-primitives/tree/main/packages/";
@@ -26,73 +28,58 @@ const stageShieldLink =
 const categories: Record<string, PackageData[]> = {};
 const rootDependencies: string[] = [];
 
-readdirSync(r(`../packages/`)).forEach(name => {
-  const dir = r(`../packages/${name}/package.json`);
-  if (!existsSync(dir)) return;
-  const pkg = JSON.parse(readFileSync(dir, "utf8"));
+(async () => {
+  const modulesData = await getModulesData();
 
-  const { dependencies } = pkg;
+  for (const { name, category, primitives, stage, dependencies } of modulesData) {
+    if (dependencies.local.length === 0) {
+      rootDependencies.push(`@solid-primitives/${name}`);
+    }
 
-  if (!dependencies || Object.keys(dependencies).every(d => !d.includes("@solid-primitives/"))) {
-    rootDependencies.push(`@solid-primitives/${name}`);
+    const data = {} as PackageData;
+
+    data.Name = `[${name}](${githubURL}${name}#readme)`;
+    // Detect the stage and build size/version only if needed
+    if (data.Stage == "X" || data.Stage == 0) {
+      data.Size = "";
+      data.NPM = "";
+    } else {
+      data.Size = `[![SIZE](${sizeShield}${name}?style=for-the-badge&label=)](${bundlephobiaURL}${name})`;
+      data.NPM = `[![VERSION](${npmShield}${name}?style=for-the-badge&label=)](${npmURL}${name})`;
+    }
+    data.Stage = `[![STAGE](${stageShieldBaseURL}${stage}.json)](${stageShieldLink})`;
+    data.Primitives = primitives
+      .map(prim => `[${prim}](${githubURL}${name}#${prim.replace(/ /g, "-").toLowerCase()})`)
+      .join("<br />");
+    // Merge the package into the correct category
+    const cat = categories[category];
+    categories[category] = cat ? [...cat, data] : [data];
   }
 
-  if (!pkg.primitive)
-    return console.warn(`package ${name} doesn't have primitive field in package.json`);
-  if (pkg.primitive.name !== name)
-    return console.warn(
-      `directory name (${name}) and name in package info ${pkg.primitive.name} do not match`,
-    );
+  const pathToREADME = r("../README.md");
+  let readme = readFileSync(pathToREADME).toString();
 
-  const { list, category, stage } = pkg.primitive as {
-    list: string[];
-    category: string;
-    stage: number;
-  };
+  // Update Primitives Table
 
-  const data = {} as PackageData;
+  const table = Object.entries(categories).reduce((md, [category, items]) => {
+    // Some MD jousting to get the table to render nicely
+    // with consistent columns
+    md += `|<h4>*${category}*</h4>|\n`;
+    md += tablemark(items, ["Name", "Stage", "Primitives", "Size", "NPM"])
+      .replace("|Name|Stage|Primitives|Size|NPM|\n", "")
+      .replace("|----|----|----|----|----|\n", "");
+    return md;
+  }, "|Name|Stage|Primitives|Size|NPM|\n|----|----|----|----|----|\n");
 
-  data.Name = `[${name}](${githubURL}${name}#readme)`;
-  // Detect the stage and build size/version only if needed
-  if (data.Stage == "X" || data.Stage == 0) {
-    data.Size = "";
-    data.NPM = "";
-  } else {
-    data.Size = `[![SIZE](${sizeShield}${pkg.name}?style=for-the-badge&label=)](${bundlephobiaURL}${pkg.name})`;
-    data.NPM = `[![VERSION](${npmShield}${pkg.name}?style=for-the-badge&label=)](${npmURL}${pkg.name})`;
-  }
-  data.Stage = `[![STAGE](${stageShieldBaseURL}${stage ?? "2"}.json)](${stageShieldLink})`;
-  data.Primitives = list
-    .map(prim => `[${prim}](${githubURL}${name}#${prim.replace(/ /g, "-").toLowerCase()})`)
-    .join("<br />");
-  // Merge the package into the correct category
-  let cat = category || "Misc";
-  categories[cat] = Array.isArray(categories[cat]) ? [...categories[cat], data] : [data];
-});
+  readme = insertTextBetweenComments(readme, table, "INSERT-PRIMITIVES-TABLE");
 
-const pathToREADME = r("../README.md");
-let readme = readFileSync(pathToREADME).toString();
+  // Update Combined Downloads Badge
 
-// Update Primitives Table
+  const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://combined-npm-downloads.deno.dev/${rootDependencies.join(
+    ",",
+  )})](https://dash.deno.com/playground/combined-npm-downloads)`;
 
-const table = Object.entries(categories).reduce((md, [category, items]) => {
-  // Some MD jousting to get the table to render nicely
-  // with consistent columns
-  md += `|<h4>*${category}*</h4>|\n`;
-  md += tablemark(items, ["Name", "Stage", "Primitives", "Size", "NPM"])
-    .replace("|Name|Stage|Primitives|Size|NPM|\n", "")
-    .replace("|----|----|----|----|----|\n", "");
-  return md;
-}, "|Name|Stage|Primitives|Size|NPM|\n|----|----|----|----|----|\n");
+  readme = insertTextBetweenComments(readme, combinedDownloadsBadge, "INSERT-NPM-DOWNLOADS-BADGE");
 
-readme = insertTextBetweenComments(readme, table, "INSERT-PRIMITIVES-TABLE");
-
-// Update Combined Downloads Badge
-
-const combinedDownloadsBadge = `[![combined-downloads](https://img.shields.io/endpoint?style=for-the-badge&url=https://combined-npm-downloads.deno.dev/${rootDependencies.join(
-  ",",
-)})](https://dash.deno.com/playground/combined-npm-downloads)`;
-
-readme = insertTextBetweenComments(readme, combinedDownloadsBadge, "INSERT-NPM-DOWNLOADS-BADGE");
-
-writeFileSync(pathToREADME, readme);
+  writeFileSync(pathToREADME, readme);
+})();
