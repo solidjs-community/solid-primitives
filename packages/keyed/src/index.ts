@@ -148,7 +148,7 @@ export function Key<T>(props: {
   by: ((v: T) => any) | keyof T;
   fallback?: JSX.Element;
   children: (v: Accessor<T>, i: Accessor<number>) => JSX.Element;
-}): Accessor<JSX.Element[]> {
+}): JSX.Element {
   const { by } = props;
   return createMemo(
     keyArray<T, JSX.Element, any>(
@@ -157,7 +157,7 @@ export function Key<T>(props: {
       props.children,
       "fallback" in props ? { fallback: () => props.fallback } : undefined,
     ),
-  );
+  ) as unknown as JSX.Element;
 }
 
 /**
@@ -179,7 +179,7 @@ export function Entries<V>(props: {
   of: Record<string, V> | ArrayLike<V> | undefined | null | false;
   fallback?: JSX.Element;
   children: (key: string, v: Accessor<V>, i: Accessor<number>) => JSX.Element;
-}): Accessor<JSX.Element[]> {
+}): JSX.Element {
   const mapFn = props.children;
   return createMemo(
     mapArray(
@@ -193,7 +193,7 @@ export function Entries<V>(props: {
         : (key, i) => mapFn(key, () => props.of![key as never], i),
       "fallback" in props ? { fallback: () => props.fallback } : undefined,
     ),
-  );
+  ) as unknown as JSX.Element;
 }
 
 export type RerunChildren<T> = ((input: T, prevInput: T | undefined) => JSX.Element) | JSX.Element;
@@ -205,16 +205,16 @@ export type RerunChildren<T> = ((input: T, prevInput: T | undefined) => JSX.Elem
 export function Rerun<S>(props: {
   on: AccessorArray<S> | Accessor<S>;
   children: RerunChildren<S>;
-}): Accessor<JSX.Element>;
+}): JSX.Element;
 export function Rerun<
   S extends (object | string | bigint | number | boolean) & { length?: never },
->(props: { on: S; children: RerunChildren<S> }): Accessor<JSX.Element>;
-export function Rerun(props: { on: any; children: RerunChildren<any> }): Accessor<JSX.Element> {
+>(props: { on: S; children: RerunChildren<S> }): JSX.Element;
+export function Rerun(props: { on: any; children: RerunChildren<any> }): JSX.Element {
   const key = typeof props.on === "function" || Array.isArray(props.on) ? props.on : () => props.on;
   return createMemo(
     on(key, (a, b) => {
       const child = props.children;
       return typeof child === "function" && child.length > 0 ? (child as any)(a, b) : child;
     }),
-  );
+  ) as unknown as JSX.Element;
 }

@@ -5,6 +5,7 @@
     "newLine": "LF",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "moduleResolution": "node",
+    "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "esModuleInterop": true,
