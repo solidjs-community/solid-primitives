@@ -24,7 +24,7 @@ const MessageStack: Component<{
         "
     >
       <For each={messages()}>
-        {({ text }) => <li class="text-white bg-red-500 p-2 border-b border-b-red-700">{text}</li>}
+        {({ text }) => <li class="border-b border-b-red-700 bg-red-500 p-2 text-white">{text}</li>}
       </For>
     </ul>
   );
@@ -52,7 +52,7 @@ const App: Component = () => {
   let addMessage: (message: string) => void;
 
   return (
-    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
+    <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
       <div class="wrapper-v">
         <h4>Is pressing Shift?</h4>
         <p>{pressing() ? "YES" : "NO"}</p>

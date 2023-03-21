@@ -1,5 +1,11 @@
 # @solid-primitives/props
 
+## 3.1.2
+
+### Patch Changes
+
+- e4c7e59c: Improve regex used to extract CSS properties from inline styles.
+
 ## 3.1.1
 
 ### Patch Changes

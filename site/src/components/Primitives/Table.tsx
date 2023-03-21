@@ -6,13 +6,17 @@ import { useLocation } from "solid-start";
 import { pageWidthClass } from "~/constants";
 import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 import reflow from "~/utils/reflow";
-import { setHeaderState } from "../Header/Header";
+import * as Header from "../Header/Header";
+
+export const [translateStickyTheader, setTranslateStickyTheader] = createSignal(false);
 
 const Table: ParentComponent = props => {
   const location = useLocation();
   const [tableRowTargets, setTableRowTargets] = createSignal<Element[]>([]);
   const [tableTarget, setTableTarget] = createSignal<Element[]>([]);
   const [headerActive, setHeaderActive] = createSignal(false);
+  Header.overrideShadow(headerActive);
+
   // const isSmall = createMediaQuery("(max-width: 767px)");
   let tableContainerParent!: HTMLElement;
   let tableEl!: HTMLTableElement;
@@ -65,7 +69,6 @@ const Table: ParentComponent = props => {
       tableHeader.style.boxShadow = "var(--table-header-box-shadow)";
       tableHeader.style.transition = "box-shadow 200ms";
     }
-    setHeaderState("showGradientBorder", true);
     tableHeaderFirstLastSiblings.forEach(item => {
       item.style.borderRadius = "0";
       item.style.transition = "border-radius 200ms";
@@ -85,7 +88,6 @@ const Table: ParentComponent = props => {
     tableHeaderShadowTR.style.opacity = "0";
     tableHeaderShadowStickyDiv.style.opacity = "0";
     tableHeader.style.boxShadow = "var(--table-header-box-shadow-hide)";
-    setHeaderState("showGradientBorder", false);
     tableHeaderFirstLastSiblings.forEach(item => {
       item.style.borderRadius = "";
     });
@@ -251,15 +253,6 @@ const Table: ParentComponent = props => {
     }
   };
 
-  if (import.meta.env.MODE === "development") {
-    onMount(() => {
-      console.clear();
-      setTimeout(() => {
-        console.warn("CLEARED annoying 300+ hydration key errors from solid-start");
-      }, 500);
-    });
-  }
-
   onMount(() => {
     queryTableElements(tableEl);
     if (isSafari || isIOS) {
@@ -321,6 +314,7 @@ const Table: ParentComponent = props => {
 
       if (isSafari || isIOS) {
         if (window.scrollY < 100) return;
+        checkTableSameWidthAsParent();
         setTimeout(() => {
           setTableSizeSameAsParentInit = false;
           prevTableContainerParentWidth = tableContainerParent.clientWidth;
@@ -339,7 +333,6 @@ const Table: ParentComponent = props => {
         const bottom = boundingClientRect.bottom - rootMarginTop;
 
         if (top < 0 && bottom >= 0) {
-          setHeaderState("showShadow", false);
           showActiveHeader();
           return;
         }
@@ -348,7 +341,6 @@ const Table: ParentComponent = props => {
         if (bottom > 0) return;
         // if (tableSameWidthAsParent) return;
 
-        setHeaderState("showShadow", true);
         hideActiveHeader();
       });
     },
@@ -407,13 +399,11 @@ const Table: ParentComponent = props => {
 
           if (top + rootMarginTop > 0) {
             tableHeaderName.textContent = "Name";
-            setHeaderState("showShadow", false);
             hideActiveHeader();
             return;
           }
 
           if (top < 0 && bottom >= 0) {
-            setHeaderState("showShadow", false);
             showActiveHeader();
             return;
           }
@@ -421,7 +411,6 @@ const Table: ParentComponent = props => {
           if (bottom > 0) return;
           // if (tableSameWidthAsParent) return;
 
-          setHeaderState("showShadow", true);
           hideActiveHeader();
         };
 
@@ -437,32 +426,51 @@ const Table: ParentComponent = props => {
     ),
   );
 
+  createEffect(
+    defer(translateStickyTheader, translateStickyTheader => {
+      if (!tableEl || !tableSameWidthAsParent || !headerActive()) return;
+
+      if (translateStickyTheader) {
+        const tableBCR = tableEl.getBoundingClientRect();
+        const theadPositionTop = 58;
+        const theadBorderWidth = 2;
+        tableHeader.style.transform = `translateY(${-(
+          tableBCR.top -
+          (theadPositionTop - theadBorderWidth)
+        )}px)`;
+        return;
+      } else {
+        tableHeader.style.transform = "";
+      }
+    }),
+  );
+
   return (
-    <div class={`${pageWidthClass} mx-auto isolate`}>
+    <div class={`${pageWidthClass} isolate mx-auto`}>
       <div
-        class="fixed top-[60px] left-0 right-0 box-shadow-[var(--table-header-box-shadow)] transition-opacity z-1 pointer-events-none"
+        class="box-shadow-[var(--table-header-box-shadow)] pointer-events-none fixed top-[60px] left-0 right-0 z-[2] transition-opacity"
         style={{ opacity: "0" }}
         ref={tableHeaderShadowStickyDiv}
       />
-      <div class="w-full relative pb-[5px] rounded-[30px] overflow-clip">
+      <div class="relative w-full overflow-clip rounded-[30px] pb-[5px]">
         {/* despite having overflow-clip doesn't cut off overflowing table in Safari/iOS */}
         {/* so added a inverse rounded corner to hide overflowing theader text */}
         <div
-          class="absolute top-0 right-0 inverse-corner-[size(30px)_color(var(--page-main-bg))_position(0,100%)] pointer-events-none z-10"
+          class="inverse-corner-[size(30px)_color(var(--page-main-bg))_position(0,100%)] pointer-events-none absolute top-0 right-0 z-10"
           classList={{ hidden: !(isSafari || isIOS) }}
         />
-        <div class="absolute top-0 left-0 w-full h-full border-[#E4F6F9] border-[7px] rounded-[30px] pointer-events-none z-10 dark:border-[#2b455a]" />
+        <div class="pointer-events-none absolute top-0 left-0 z-10 h-full w-full rounded-[30px] border-[7px] border-[#E4F6F9] dark:border-[#2b455a]" />
         <div
-          class="absolute top-0 left-0 w-full h-full border-[#D8DFF5] border-[7px] rounded-[30px] pointer-events-none z-10 dark:border-[#2c4668]"
+          class="pointer-events-none absolute top-0 left-0 z-10 h-full w-full rounded-[30px] border-[7px] border-[#D8DFF5] dark:border-[#2c4668]"
           style="-webkit-mask-image: linear-gradient(to right, transparent 0px, rgb(0, 0, 0)); mask-image: linear-gradient(to right, transparent 0px, rgb(0, 0, 0))"
         />
         <div
-          class="absolute top-[7px] bottom-0 left-[120.8px] w-[15px] z-10 pointer-events-none opacity-0 transition-opacity bg-[linear-gradient(to_right,#24405966,#24405900)] dark:bg-[linear-gradient(to_right,#05121dbf,#05121d00)]"
+          class="pointer-events-none absolute top-[7px] bottom-0 left-[120.8px] z-10 w-[15px] bg-[linear-gradient(to_right,#24405966,#24405900)] opacity-0 transition-opacity dark:bg-[linear-gradient(to_right,#05121dbf,#05121d00)]"
           ref={tableVerticalScrollShadow}
         />
-        <div class="w-full rounded-[30px] overflow-x-clip p-1 pb-0 pt-[2px] bg-[linear-gradient(45deg,#D8DFF5,#E4F6F9)] dark:bg-[linear-gradient(45deg,#2c4668,#2b455a)] no-scrollbar">
+        <div class="no-scrollbar w-full overflow-x-clip rounded-[30px] bg-[linear-gradient(45deg,#D8DFF5,#E4F6F9)] p-1 pb-0 pt-[2px] dark:bg-[linear-gradient(45deg,#2c4668,#2b455a)]">
           <table
-            class="w-full relative mt-[-2px] overflow-clip"
+            class="relative mt-[-2px] w-full overflow-clip"
             style="border-collapse: separate; border-spacing: 2px 2px;"
             ref={tableEl}
           >

@@ -11,24 +11,24 @@ const App: Component = () => {
   const [data, setClipboard] = createSignal<string | ClipboardItem[]>("");
   const [clipboard, read] = createClipboard(data);
   return (
-    <div class="flex justify-center items-center box-border w-full h-screen overflow-hidden bg-gray-900">
+    <div class="box-border flex h-screen w-full items-center justify-center overflow-hidden bg-gray-900">
       <div class="flex flex-col items-center">
-        <div class="flex flex-col space-y-3 max-w-lg">
-          <div class="flex flex-col bg-white rounded-lg p-5 shadow">
+        <div class="flex max-w-lg flex-col space-y-3">
+          <div class="flex flex-col rounded-lg bg-white p-5 shadow">
             <input
               use:copyToClipboard={{ highlight: input() }}
-              class="p-3 text-2xl border-blue-700 border-3 rounded-md text-center"
+              class="border-3 rounded-md border-blue-700 p-3 text-center text-2xl"
               value="Copy me by clicking!"
             />
             <button
-              class="mt-2 font-semibold p-3 text-white bg-blue-700 hover:bg-blue-600 transition cursor-pointer border-none rounded-md"
+              class="mt-2 cursor-pointer rounded-md border-none bg-blue-700 p-3 font-semibold text-white transition hover:bg-blue-600"
               use:copyToClipboard
             >
               Copy button text
             </button>
             <div class="mt-2 grid grid-cols-2 gap-2">
               <button
-                class="font-semibold p-3 text-white bg-blue-700 hover:bg-blue-600 transition cursor-pointer border-none rounded-md"
+                class="cursor-pointer rounded-md border-none bg-blue-700 p-3 font-semibold text-white transition hover:bg-blue-600"
                 onClick={async () => {
                   const image = await fetch(img);
                   setClipboard([newClipboardItem("image/png", image.blob())]);
@@ -37,7 +37,7 @@ const App: Component = () => {
                 Copy Image 1
               </button>
               <button
-                class="font-semibold p-3 text-white bg-blue-700 hover:bg-blue-600 transition cursor-pointer border-none rounded-md"
+                class="cursor-pointer rounded-md border-none bg-blue-700 p-3 font-semibold text-white transition hover:bg-blue-600"
                 onClick={async () => {
                   const image = await fetch(img2);
                   setClipboard([newClipboardItem("image/png", image.blob())]);
@@ -47,7 +47,7 @@ const App: Component = () => {
               </button>
             </div>
           </div>
-          <div class="flex rounded-lg overflow-hidden text-center bg-white">
+          <div class="flex overflow-hidden rounded-lg bg-white text-center">
             <div class="w-full p-5">
               <Suspense fallback={"Loading..."}>
                 <For each={clipboard()}>
@@ -63,7 +63,7 @@ const App: Component = () => {
               </Suspense>
             </div>
             <button
-              class="p-4 bg-blue-700 border-none font-semibold text-white hover:bg-blue-600 transition cursor-pointer"
+              class="cursor-pointer border-none bg-blue-700 p-4 font-semibold text-white transition hover:bg-blue-600"
               onClick={read}
             >
               Read

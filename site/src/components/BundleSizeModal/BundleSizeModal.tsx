@@ -95,8 +95,8 @@ const BundleSizeModal: Component<{
   });
 
   return (
-    <div class="bg-page-main-bg rounded-md p-2 pt-3 max-w-[800px] sm:p-4">
-      <h2 class="font-semibold text-lg pb-1 border-b border-slate-300 dark:border-slate-600">
+    <div class="bg-page-main-bg max-w-[800px] rounded-md p-2 pt-3 sm:p-4">
+      <h2 class="border-b border-slate-300 pb-1 text-lg font-semibold dark:border-slate-600">
         Bundle Size
       </h2>
       <div>
@@ -108,14 +108,14 @@ const BundleSizeModal: Component<{
           .
         </p>
         <h3 class="my-4">Total Size of Package</h3>
-        <div class="rounded-xl overflow-clip relative bg-[#e5ecf3] dark:bg-[#2b455a]">
-          <div class="absolute top-0 left-0 right-0 bottom-0 border-[#e5ecf3] border-2 rounded-xl pointer-events-none dark:border-[#2b455a] z-1"></div>
-          <table class="w-full my-4" style="border-collapse: separate; border-spacing: 2px 2px;">
+        <div class="relative overflow-clip rounded-xl bg-[#e5ecf3] dark:bg-[#2b455a]">
+          <div class="z-1 pointer-events-none absolute top-0 left-0 right-0 bottom-0 rounded-xl border-2 border-[#e5ecf3] dark:border-[#2b455a]"></div>
+          <table class="my-4 w-full" style="border-collapse: separate; border-spacing: 2px 2px;">
             <thead>
               <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#b7c1d0]">
                 <For each={packageThHeaders}>
                   {item => (
-                    <th class="p-1 text-center text-xs xxs:text-sm md:px-3 md:text-base">{item}</th>
+                    <th class="xxs:text-sm p-1 text-center text-xs md:px-3 md:text-base">{item}</th>
                   )}
                 </For>
               </tr>
@@ -124,17 +124,17 @@ const BundleSizeModal: Component<{
               <For each={packageList}>
                 {({ name, minified, gzipped }) => {
                   return (
-                    <tr class="odd:bg-[#f6fbff] even:bg-page-main-bg dark:odd:bg-[#2b3f4a]">
+                    <tr class="even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
                       <td class="p-1 text-sm md:px-3 md:text-base">
                         <span class="flex flex-wrap">
                           <span class="whitespace-nowrap">@solid-primitives/</span>
                           <span>{name}</span>
                         </span>
                       </td>
-                      <td class="p-1 text-sm md:px-3 md:text-base text-center whitespace-nowrap">
+                      <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
                         {minified}
                       </td>
-                      <td class="p-1 text-sm md:px-3 md:text-base text-center whitespace-nowrap">
+                      <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
                         {gzipped}
                       </td>
                     </tr>
@@ -148,13 +148,13 @@ const BundleSizeModal: Component<{
           Size of Primitives <span class="opacity-60">( tree-shakeable )</span>
         </h3>
         <div
-          class="rounded-xl overflow-clip relative bg-[#e5ecf3] dark:bg-[#2b455a]"
+          class="relative overflow-clip rounded-xl bg-[#e5ecf3] dark:bg-[#2b455a]"
           ref={tableContainerEl}
         >
-          <div class="absolute top-0 left-0 right-0 bottom-0 border-[#e5ecf3] border-2 rounded-xl pointer-events-none dark:border-[#2b455a] z-1" />
+          <div class="z-1 pointer-events-none absolute top-0 left-0 right-0 bottom-0 rounded-xl border-2 border-[#e5ecf3] dark:border-[#2b455a]" />
           <table
             // fake <th> element for th shadow causes table to lose width equivalent to border-spacing, which is 2px, so make up for up for it by setting width to 100% + 2px.
-            class="w-[calc(100%+2px)] my-4"
+            class="my-4 w-[calc(100%+2px)]"
             style="border-collapse: separate; border-spacing: 2px 2px;"
             ref={el => {
               setTarget([el]);
@@ -169,12 +169,12 @@ const BundleSizeModal: Component<{
               <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#b7c1d0]">
                 <For each={primitiveThHeaders}>
                   {item => (
-                    <th class="p-1 md:px-3 text-center text-xs xxs:text-sm md:text-base">{item}</th>
+                    <th class="xxs:text-sm p-1 text-center text-xs md:px-3 md:text-base">{item}</th>
                   )}
                 </For>
                 <th
                   aria-label="hidden"
-                  class="absolute top-0 left-0 right-0 bottom-0 pointer-events-none box-shadow-[var(--table-header-box-shadow)] will-change-transform transition-opacity"
+                  class="box-shadow-[var(--table-header-box-shadow)] pointer-events-none absolute top-0 left-0 right-0 bottom-0 transition-opacity will-change-transform"
                   classList={{ "opacity-0": !showShadow(), "opacity-100": showShadow() }}
                   style={{ height: `${theadHeight() - 2}px` }}
                 />
@@ -184,16 +184,16 @@ const BundleSizeModal: Component<{
               <For each={primitiveList}>
                 {({ name, minified, gzipped }) => {
                   return (
-                    <tr class="odd:bg-[#f6fbff] even:bg-page-main-bg dark:odd:bg-[#2b3f4a]">
+                    <tr class="even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
                       <td class="p-1 text-sm md:px-3 md:text-base" data-primitive-td>
                         <span class="inline-block" data-primitive-span>
                           {name}
                         </span>
                       </td>
-                      <td class="p-1 text-sm md:px-3 md:text-base text-center whitespace-nowrap">
+                      <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
                         {minified}
                       </td>
-                      <td class="p-1 text-sm md:px-3 md:text-base text-center whitespace-nowrap">
+                      <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
                         {gzipped}
                       </td>
                     </tr>
@@ -206,7 +206,7 @@ const BundleSizeModal: Component<{
       </div>
       <p>
         <a
-          class=" anchor-tag text-sm dark:opacity-60 hover:opacity-100"
+          class=" anchor-tag text-sm hover:opacity-100 dark:opacity-60"
           href="https://jvns.ca/blog/2013/10/23/day-15-how-gzip-works/"
           target="_blank"
           rel="noopener"

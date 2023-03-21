@@ -86,12 +86,12 @@ export default function App() {
             <Key
               each={list()}
               by="id"
-              fallback={<p class="bg-yellow-500 transition-all p-1">No items in the list.</p>}
+              fallback={<p class="bg-yellow-500 p-1 transition-all">No items in the list.</p>}
             >
               {(item, index) => (
                 <div class="node relative transition-all duration-500">
                   {index()}. {item().value}
-                  <div class="absolute -bottom-2 left-2 px-1 bg-dark-500 text-light-900">
+                  <div class="bg-dark-500 text-light-900 absolute -bottom-2 left-2 px-1">
                     ID: {item().id}
                   </div>
                 </div>

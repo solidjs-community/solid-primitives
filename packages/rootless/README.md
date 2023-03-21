@@ -14,12 +14,14 @@ A collection of helpers that aim to simplify using reactive primitives outside o
 - [`createSubRoot`](#createSubRoot) - Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
 - [`createCallback`](#createCallback) - A wrapper for creating callbacks with `runWithOwner`.
 - [`createDisposable`](#createDisposable) - For disposing computations early – before the root cleanup.
-- [`createSharedRoot`](#createSharedRoot) - Share "global primitives" across multiple reactive scopes.
+- [`createSingletonRoot`](#createSingletonRoot) - Share "global primitives" across multiple reactive scopes.
 
 ## Installation
 
 ```bash
 npm install @solid-primitives/rootless
+# or
+pnpm add @solid-primitives/rootless
 # or
 yarn add @solid-primitives/rootless
 ```
@@ -115,9 +117,7 @@ type runWithRootReturn<T> = T extends void | undefined | null
 const createDisposable = <T>(fn: () => T, detachedOwner?: Owner): runWithRootReturn<T>
 ```
 
-## `createSharedRoot`
-
-###### Added in `@1.1.0`
+## `createSingletonRoot`
 
 Creates a reactive root that is shared across every instance it was used in. Shared root gets created when the returned function gets first called, and disposed when last reactive context listening to it gets disposed. Only to be recreated again when a new listener appears.
 
@@ -125,16 +125,16 @@ Designed to make "global primitives" shareable, without instanciating them (recr
 
 ### How to use it
 
-`createSharedRoot` primitive takes a single argument:
+`createSingletonRoot` primitive takes a single argument:
 
 - `factory` - a function where can you initialize some reactive primitives, returned value will be shared across instances.
 
 And returns a function registering reactive owner as one of the listeners, returns the value `factory` function returned.
 
 ```ts
-import { createSharedRoot } from "@solid-primitives/rootless";
+import { createSingletonRoot } from "@solid-primitives/rootless";
 
-const useState = createSharedRoot(() => {
+const useState = createSingletonRoot(() => {
    return createMemo(() => {...})
 });
 
@@ -151,12 +151,21 @@ const state = useState();
 ### Type Definition
 
 ```ts
-function createSharedRoot<T>(factory: (dispose: Fn) => T): () => T;
+function createSingletonRoot<T>(factory: (dispose: Fn) => T): () => T;
 ```
+
+### `createHydratableSingletonRoot`
+
+A experimental version of `createSingletonRoot` that will deopt of creating a singleton root if used in SSR or during hydration.
+
+The reason for this is that `createSingletonRoot` will create a root that will be shared across all instances of the primitive, and this could mean state leaking between different requests.
+And during hydration, if you were to update the shared state before the hydration is finished, it could cause a mismatch between the server and client.
+
+The API is experimental, and likely to change or be merged into `createSingletonRoot` in the future.
 
 ### Demo
 
-Usage of combining `createSharedRoot` with `createMousePosition`: https://codesandbox.io/s/shared-root-demo-fjl1l9?file=/index.tsx
+Usage of combining `createSingletonRoot` with `createMousePosition`: https://codesandbox.io/s/shared-root-demo-fjl1l9?file=/index.tsx
 
 ## Changelog
 

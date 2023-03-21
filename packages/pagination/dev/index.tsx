@@ -20,8 +20,8 @@ const App: Component = () => {
   const [pages, infiniteScrollLoader, { end }] = createInfiniteScroll(fetcher);
 
   return (
-    <div class="w-full min-h-screen flex">
-      <div class="p-24 box-border w-1/2 flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
+    <div class="flex min-h-screen w-full">
+      <div class="box-border flex w-1/2 flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
         <div class="wrapper-v">
           <h4>Pagination component</h4>
           <p>Current page: {page()} / 100</p>
@@ -33,8 +33,8 @@ const App: Component = () => {
           </button>
         </div>
       </div>
-      <div class="bg-gray-800 w-1/2 text-white max-h-screen flex flex-col">
-        <div class="h-[10%] overflow-scroll flex items-center justify-center">
+      <div class="flex max-h-screen w-1/2 flex-col bg-gray-800 text-white">
+        <div class="flex h-[10%] items-center justify-center overflow-scroll">
           <h1>Infinite Scrolling:</h1>
         </div>
         <div class="h-[90%] overflow-scroll">

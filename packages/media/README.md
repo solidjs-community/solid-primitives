@@ -136,7 +136,7 @@ prefersDark();
 
 ### `usePrefersDark`
 
-This primitive provides a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) variant that will reuse the same signal and media query across the whole application.
+This primitive provides a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) variant that will reuse the same signal and media query across the whole application.
 
 ```ts
 import { usePrefersDark } from "@solid-primitives/media";

@@ -119,7 +119,7 @@ createEffect(() => {
 
 ### `useWindowSize`
 
-`useWindowSize` is a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) primitive. It is providing the same reactive object as `createWindowSize`, but the object instance, signals and event-listeners are shared between dependents, making it more optimized to use in multiple places at once.
+`useWindowSize` is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive. It is providing the same reactive object as `createWindowSize`, but the object instance, signals and event-listeners are shared between dependents, making it more optimized to use in multiple places at once.
 
 ```ts
 import { useWindowSize } from "@solid-primitives/resize-observer";

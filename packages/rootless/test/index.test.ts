@@ -8,7 +8,7 @@ import {
   getOwner,
   onCleanup,
 } from "solid-js";
-import { createCallback, createSubRoot, createDisposable, createSharedRoot } from "../src";
+import { createCallback, createSubRoot, createDisposable, createSingletonRoot } from "../src";
 
 describe("createSubRoot", () => {
   test("behaves like a root", () =>
@@ -114,7 +114,7 @@ describe("createSharedRoot", () => {
 
     let runs = 0;
     let disposes = 0;
-    const useMemo = createSharedRoot(() => {
+    const useMemo = createSingletonRoot(() => {
       onCleanup(() => disposes++);
       return createMemo(() => {
         runs++;
@@ -143,7 +143,7 @@ describe("createSharedRoot", () => {
 
     let runs = 0;
     let disposes = 0;
-    const useMemo = createSharedRoot(() => {
+    const useMemo = createSingletonRoot(() => {
       onCleanup(() => disposes++);
       return createMemo(() => {
         runs++;
@@ -189,7 +189,7 @@ describe("createSharedRoot", () => {
   test("multiple dependents disposing in one tick", () =>
     createRoot(dispose => {
       let alive = false;
-      const track = createSharedRoot(() => {
+      const track = createSingletonRoot(() => {
         alive = true;
         onCleanup(() => (alive = false));
       });

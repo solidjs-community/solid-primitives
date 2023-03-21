@@ -16,7 +16,7 @@ const App: Component = () => {
           /key
         </Link>
       </nav>
-      <div class="p-24 box-border w-full min-h-screen space-y-4 bg-gray-800 text-white">
+      <div class="box-border min-h-screen w-full space-y-4 bg-gray-800 p-24 text-white">
         <Routes>
           <Route path="/key" element={<Key />} />
         </Routes>

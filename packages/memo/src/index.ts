@@ -9,7 +9,6 @@ import {
   runWithOwner,
   Setter,
   on,
-  getListener,
   createRoot,
   AccessorArray,
   EffectFunction,
@@ -105,9 +104,9 @@ export function createLatest<T extends Accessor<any>[]>(
   sources: T,
   options?: SignalOptions<ReturnType<T[number]>>,
 ): Accessor<ReturnType<T[number]>> {
-  const [signal, setSignal] = createSignal(0);
-  const memos = sources.map((source, i) => createMemo(() => (setSignal(i), source())));
-  return createMemo(() => memos.map(m => m())[signal()]!, undefined, options);
+  let index = 0;
+  const memos = sources.map((source, i) => createMemo(() => ((index = i), source())));
+  return createMemo(() => memos.map(m => m())[index]!, undefined, options);
 }
 
 /**
@@ -145,8 +144,9 @@ export function createWritableMemo<T>(
   return [
     (combined = createLatest([signal, memo], options)),
     ((setter: any): T =>
-      setSignal(() => (typeof setter === "function" ? setter(untrack(combined)) : setter))
-        .v) as Setter<T>,
+      setSignal(() =>
+        typeof setter === "function" ? setter(untrack(combined)) : setter,
+      )) as Setter<T>,
   ];
 }
 
@@ -295,21 +295,7 @@ export function createThrottledMemo<T>(
 }
 
 /**
- * Solid's `createMemo` that allows for asynchronous calculations.
- *
- * @param calc reactive calculation returning a promise
- * @param options specify initial value *(by default it will be undefined)*
- * @returns signal of values resolved from running calculations
- *
- * **calculation will track reactive reads synchronously — untracks after first `await`**
- *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createAsyncMemo
- *
- * @example
- * const memo = createAsyncMemo(async prev => {
- *    const value = await myAsyncFunc(signal())
- *    return value.data
- * }, { value: 'initial value' })
+ * @deprecated Please just use `createResource` instead.
  */
 export function createAsyncMemo<T>(
   calc: AsyncMemoCalculation<T, T>,
@@ -364,23 +350,22 @@ export function createAsyncMemo<T>(
  * @example
  * const double = createLazyMemo(() => count() * 2)
  */
-
-// initial value was provided
 export function createLazyMemo<T>(
   calc: (prev: T) => T,
   value: T,
-  options?: MemoOptions<T>,
+  options?: EffectOptions,
 ): Accessor<T>;
-// no initial value was provided
+
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
   value?: undefined,
-  options?: MemoOptions<T>,
+  options?: EffectOptions,
 ): Accessor<T>;
+
 export function createLazyMemo<T>(
   calc: (prev: T | undefined) => T,
   value?: T,
-  options?: MemoOptions<T>,
+  options?: EffectOptions,
 ): Accessor<T> {
   if (process.env.SSR) {
     let calculated = false;
@@ -393,57 +378,16 @@ export function createLazyMemo<T>(
     };
   }
 
-  /** original root in which the primitive was initially run */
-  const owner = getOwner() ?? undefined;
-  /** number of places where the state is being tracked */
-  let listeners = 0;
-  /** lastly calculated value */
-  let lastest: T | undefined = value;
-  /** does the value need to be recalculated? — for reading outside of tracking scopes */
-  let dirty = true;
-  let memo: Accessor<T> | undefined;
-  let dispose: VoidFunction | undefined;
-  let disposed = false;
-  onCleanup(() => {
-    dispose && dispose();
-    disposed = true;
-  });
+  let isStale = true;
 
-  // marks the lastest value as dirty if the sources updated
-  const track = createPureReaction(() => (dirty = !memo));
+  const [isDirty, setDirty] = createSignal({ v: false }),
+    memo = createMemo<T>(
+      p => (isDirty().v ? ((isStale = isDirty().v = false), calc(p)) : ((isStale = true), p)),
+      value as T,
+      { equals: false, name: options?.name },
+    );
 
-  return () => {
-    // path for access outside of tracking scopes
-    if (disposed || !getListener()) {
-      if (memo) return memo();
-      if (dirty) {
-        track(() => (lastest = calc(lastest)));
-        dirty = false;
-      }
-      return lastest!;
-    }
-
-    listeners++;
-    onCleanup(() => listeners--);
-
-    if (!memo) {
-      createRoot(_dispose => {
-        dispose = _dispose;
-        memo = createMemo(
-          () => {
-            if (listeners) return (lastest = calc(lastest));
-            dispose!();
-            dispose = memo = undefined;
-            return lastest!;
-          },
-          lastest,
-          options,
-        );
-      }, owner);
-    }
-
-    return memo!();
-  };
+  return (): T => (isStale && setDirty({ v: true }), memo());
 }
 
 /*

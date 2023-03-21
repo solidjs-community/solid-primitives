@@ -44,7 +44,7 @@ createEffect(() => {
 
 ### `useRemSize`
 
-This primitive provides a [shared root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot) variant that will reuse signals, HTML elements and the ResizeObserver instance across all dependents that use it.
+This primitive provides a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) variant that will reuse signals, HTML elements and the ResizeObserver instance across all dependents that use it.
 
 It's behavior is the same as [`createRemSize`](#createRemSize).
 

@@ -6,7 +6,7 @@ const TD: ParentComponent<{ h4?: boolean }> = props => {
 
     return (
       <td ref={el} class="px-1 py-3 sm:px-3 sm:py-6">
-        <h4 class="font-bold text-lg text-[#49494B] dark:text-[#dee2e5]">{props.children}</h4>
+        <h4 class="text-lg font-bold text-[#49494B] dark:text-[#dee2e5]">{props.children}</h4>
       </td>
     );
   }

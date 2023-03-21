@@ -57,7 +57,7 @@ const App: Component = () => {
   return (
     <>
       <div
-        class="p-24 box-border w-full min-h-150vh flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white"
+        class="min-h-150vh box-border flex w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white"
         classList={{
           "!bg-cyan-700": isHovering(),
         }}

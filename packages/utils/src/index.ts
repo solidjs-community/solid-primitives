@@ -14,7 +14,7 @@ import {
   sharedConfig,
   onMount,
 } from "solid-js";
-import { isServer as _isServer } from "solid-js/web";
+import { isServer } from "solid-js/web";
 import type {
   AnyClass,
   MaybeAccessor,
@@ -34,8 +34,10 @@ export * from "./types";
 
 /** no operation */
 export const noop = (() => void 0) as Noop;
+export const trueFn: () => boolean = () => true;
+export const falseFn: () => boolean = () => false;
 
-export const isServer: boolean = _isServer;
+export { isServer };
 export const isClient = !isServer;
 
 /** development environment */
@@ -228,6 +230,37 @@ export function createMicrotask<A extends any[] | []>(fn: (...a: A) => void): (.
   };
 }
 
+/**
+ * A hydratable version of the {@link createSignal}. It will use the serverValue on the server and the update function on the client. If initialized during hydration it will use serverValue as the initial value and update it once hydration is complete.
+ *
+ * @param serverValue initial value of the state on the server
+ * @param update called once on the client or on hydration to initialize the value
+ * @param options {@link SignalOptions}
+ * @returns
+ * ```ts
+ * [state: Accessor<T>, setState: Setter<T>]
+ * ```
+ * @see {@link createSignal}
+ */
+export function createHydratableSignal<T>(
+  serverValue: T,
+  update: () => T,
+  options?: SignalOptions<T>,
+): ReturnType<typeof createSignal<T>> {
+  if (isServer) {
+    return createSignal(serverValue, options);
+  }
+  if (sharedConfig.context) {
+    const [state, setState] = createSignal(serverValue, options);
+    onMount(() => setState(() => update()));
+    return [state, setState];
+  }
+  return createSignal(update(), options);
+}
+
+/** @deprecated use {@link createHydratableSignal} instead */
+export const createHydrateSignal = createHydratableSignal;
+
 export type StaticStoreSetter<T extends Readonly<AnyStatic>> = {
   (setter: (prev: T) => Partial<T>): T;
   (state: Partial<T>): T;
@@ -246,14 +279,14 @@ export function createStaticStore<T extends Readonly<AnyStatic>>(
   init: T,
 ): [access: T, write: StaticStoreSetter<T>] {
   const copy = { ...init };
-  const store = {} as T;
+  const store = { ...init };
   const cache = new Map<PropertyKey, Signal<any>>();
 
   const getValue = <K extends keyof T>(key: K): T[K] => {
     const saved = cache.get(key);
     if (saved) return saved[0]();
     const signal = createSignal<any>(copy[key], {
-      name: typeof key === "string" ? key : undefined,
+      internal: true,
     });
     cache.set(key, signal);
     delete copy[key];
@@ -266,26 +299,46 @@ export function createStaticStore<T extends Readonly<AnyStatic>>(
     if (key in copy) copy[key] = accessWith(value, [copy[key]]);
   };
 
-  for (const key of keys(init)) {
-    store[key] = undefined as any;
-    Object.defineProperty(store, key, {
-      get: getValue.bind(void 0, key),
-    });
+  for (const key in init) {
+    Object.defineProperty(store, key, { get: getValue.bind(void 0, key) });
   }
 
   const setter = (a: ((prev: T) => Partial<T>) | Partial<T> | keyof T, b?: SetterParam<any>) => {
-    if (isObject(a))
-      untrack(() => {
-        batch(() => {
-          for (const [key, value] of entries(accessWith(a, store) as Partial<T>))
-            setValue(key, () => value);
-        });
+    if (isObject(a)) {
+      const entries = untrack(
+        () => Object.entries(accessWith(a, store) as Partial<T>) as [any, any][],
+      );
+      batch(() => {
+        for (const [key, value] of entries) setValue(key, () => value);
       });
-    else setValue(a, b);
+    } else setValue(a, b);
     return store;
   };
 
   return [store, setter];
+}
+
+/**
+ * A hydratable version of the {@link createStaticStore}. It will use the serverValue on the server and the update function on the client. If initialized during hydration it will use serverValue as the initial value and update it once hydration is complete.
+ *
+ * @param serverValue initial value of the state on the server
+ * @param update called once on the client or on hydration to initialize the value
+ * @returns
+ * ```ts
+ * [access: Readonly<T>, write: StaticStoreSetter<T>]
+ * ```
+ */
+export function createHydratableStaticStore<T extends Readonly<AnyStatic>>(
+  serverValue: T,
+  update: () => T,
+): ReturnType<typeof createStaticStore<T>> {
+  if (isServer) return createStaticStore(serverValue);
+  if (sharedConfig.context) {
+    const [state, setState] = createStaticStore(serverValue);
+    onMount(() => setState(update()));
+    return [state, setState];
+  }
+  return createStaticStore(update());
 }
 
 /**
@@ -331,28 +384,4 @@ export function handleDiffArray<T>(
   for (currEl of current) {
     if (!prev.includes(currEl)) handleAdded(currEl);
   }
-}
-
-/**
- * A signal object that handle hydration.
- * @param serverValue initial value of the state on the server
- * @param update called once on the client or on hydration to initialize the value
- * @param options {@link SignalOptions}
- * @returns
- * ```ts
- * [state: Accessor<T>, setState: Setter<T>]
- * ```
- * @see {@link createSignal}
- */
-export function createHydrateSignal<T>(
-  serverValue: T,
-  update: () => T,
-  options?: SignalOptions<T>,
-): Signal<T> {
-  if (isServer) {
-    return createSignal(serverValue);
-  }
-  const [state, setState] = createSignal(sharedConfig.context ? serverValue : update(), options);
-  sharedConfig.context && onMount(() => setState(() => update()));
-  return [state, setState];
 }

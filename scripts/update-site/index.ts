@@ -1,8 +1,9 @@
-import { readdirSync, existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync } from "fs";
 import { r } from "../utils";
 import { buildAndWriteHomeSections } from "./build-html-home-sections";
 import { buildCategory, writeHTMLTableFile } from "./build-html-table";
 import { buildJSONCategory, writeJSONFile } from "./build-json-category";
+import { getPackageData } from "./get-package-data";
 import { buildPage, writePages } from "./build-pages";
 
 export type PackageData = {
@@ -16,12 +17,14 @@ export type PackageData = {
 export type PackageJSONData = {
   name: string;
   description: string;
+  version: string;
   primitive: {
-    name?: string;
+    name: string;
     list: string[];
     category: string;
     stage: number;
   };
+  peerDependencies: { [key: string]: string };
 };
 
 export type TSize = {
@@ -37,49 +40,42 @@ export type TSize = {
   };
 };
 
-export type TUpdateSiteGlobal = {
-  primitives: {
-    [key: string]: {
-      packageName: string;
-      size: TSize;
-    };
-  };
-  packageName: {
-    [key: string]: {
+export type TPackageData = {
+  name: string;
+  description: string;
+  size: TSize;
+  primitive: {
+    name: string;
+    list: {
       name: string;
       size: TSize;
-    };
+    }[];
+    isListCollapsed: boolean;
+    collapsedContent?: string;
+    category: string;
+    stage: number;
   };
-};
-const globalState: TUpdateSiteGlobal = {
-  packageName: {},
-  primitives: {},
+  version: string;
+  tags: string[];
+  peerDependencies: { [key: string]: string };
 };
 
 console.log("updateSite", "Updating site");
 
-const packageFiles = readdirSync(r(`../packages/`));
+const generatedDir = r(`../site/src/_generated`);
+if (!existsSync(generatedDir)) {
+  mkdirSync(generatedDir);
+}
+
 const run = async () => {
-  for (const name of packageFiles) {
-    const dir = r(`../packages/${name}/package.json`);
-    if (!existsSync(dir)) return;
-    const pkg = JSON.parse(readFileSync(dir, "utf8")) as PackageJSONData;
+  const packageData = await getPackageData();
 
-    if (!pkg.primitive) {
-      console.warn(`package ${name} doesn't have primitive field in package.json`);
-      continue;
-    }
+  for (const packageItem of packageData) {
+    const { primitive } = packageItem;
 
-    if (pkg.primitive.name !== name) {
-      console.warn(
-        `directory name (${name}) and name in package info ${pkg.primitive.name} do not match`,
-      );
-      continue;
-    }
-
-    await buildCategory({ name, pkg, globalState });
-    await buildJSONCategory({ name, pkg, globalState });
-    await buildPage({ name, pkg, globalState: globalState });
+    await buildCategory({ name: primitive.name!, pkg: packageItem });
+    await buildJSONCategory({ name: primitive.name!, pkg: packageItem });
+    await buildPage({ name: primitive.name!, pkg: packageItem });
   }
 
   writeJSONFile();

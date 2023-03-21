@@ -35,13 +35,13 @@ const App: Component = () => {
   });
 
   return (
-    <div class="p-24 box-border w-full h-150vh flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
+    <div class="h-150vh box-border flex w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
       <div class="w-60vw overflow-x-scroll p-8">
         <div class="w-80vw">
           <div class="center-child min-h-82">
             <div
               ref={e => (ref = e)}
-              class="w-24 h-24 bg-orange-500 rounded-md shadow-bg-gray-900 shadow-lg center-child"
+              class="shadow-bg-gray-900 center-child h-24 w-24 rounded-md bg-orange-500 shadow-lg"
               style={{
                 width: `${width()}px`,
                 height: `${height()}px`,

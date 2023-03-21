@@ -5,7 +5,7 @@ import "uno.css";
 
 const App: Component = () => {
   return (
-    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-12 bg-gray-800 text-white">
+    <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-12 bg-gray-800 p-24 text-white">
       <PubsubTest />
       <HubParentNode />
       <NotificationsTest />
@@ -24,7 +24,7 @@ const PubsubTest: Component = () => {
         return !p;
       });
     return (
-      <button class="w-12 h-8 bg-white border-none rounded font-semibold" onclick={toggle}>
+      <button class="h-8 w-12 rounded border-none bg-white font-semibold" onclick={toggle}>
         {on() ? "ON" : "OFF"}
       </button>
     );
@@ -37,7 +37,7 @@ const PubsubTest: Component = () => {
     props.subscribe(setOn);
     return (
       <div
-        class="w-18 h-18 bg-gray-500 rounded-full"
+        class="w-18 h-18 rounded-full bg-gray-500"
         classList={{
           "bg-yellow-200": on(),
         }}
@@ -73,7 +73,7 @@ const HubParentNode: Component = () => {
           WIGGLE!
         </button>
       </div>
-      <div class="flex justify-center flex-wrap gap-8 !mt-12">
+      <div class="!mt-12 flex flex-wrap justify-center gap-8">
         <HubChildNode listenToSpin={spin.listen} listenToWiggle={wiggle.listen} />
         <HubChildNode listenToSpin={spin.listen} listenToWiggle={wiggle.listen} />
         <HubChildNode listenToSpin={spin.listen} listenToWiggle={wiggle.listen} />
@@ -119,7 +119,7 @@ const HubChildNode: Component<{
   return (
     <div ref={ref}>
       <div
-        class="w-32 h-24 center-child bg-orange-700 bg-opacity-80 rounded-lg transition-transform duration-300"
+        class="center-child h-24 w-32 rounded-lg bg-orange-700 bg-opacity-80 transition-transform duration-300"
         style={{
           transform: `rotate(${angle()}deg)`,
         }}
@@ -176,7 +176,7 @@ const Toaster: Component<{
     <div class="fixed top-4 right-4 flex flex-col items-end space-y-4">
       <For each={bus.value()}>
         {item => (
-          <div class="p-2 px-3 bg-gray-600 animate-fade-in-down animate-count-1 animate-duration-150">
+          <div class="animate-fade-in-down animate-count-1 animate-duration-150 bg-gray-600 p-2 px-3">
             <span class="mr-2">{item.text}</span>
             <button onClick={() => bus.setValue(prev => prev.filter(x => x !== item))}>X</button>
           </div>

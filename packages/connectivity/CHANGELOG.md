@@ -1,5 +1,15 @@
 # @solid-primitives/connectivity
 
+## 0.3.10
+
+### Patch Changes
+
+- 464248f7: Improve behavior of primitives under hydration.
+- Updated dependencies [464248f7]
+- Updated dependencies [464248f7]
+  - @solid-primitives/rootless@1.3.0
+  - @solid-primitives/utils@5.5.0
+
 ## 0.3.9
 
 ### Patch Changes

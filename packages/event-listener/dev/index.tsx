@@ -7,7 +7,7 @@ eventListener;
 
 const App: Component = () => {
   return (
-    <div class="p-24 box-border w-full min-h-screen overflow-hidden bg-indigo-800 text-white flex flex-col justify-center items-center space-y-16">
+    <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-16 overflow-hidden bg-indigo-800 p-24 text-white">
       <WindowMousemove />
       <List />
       <CustomEvents />
@@ -52,7 +52,7 @@ const List: Component = () => {
           {i => (
             <div
               ref={el => setItems(p => [...p, el])}
-              class="p-6 bg-yellow-500 text-gray-900 select-none cursor-pointer"
+              class="cursor-pointer select-none bg-yellow-500 p-6 text-gray-900"
             >
               {i}
             </div>
@@ -115,7 +115,7 @@ const EventMap: Component = () => {
       <p>Last event: {lastEvent()?.type}</p>
       <div
         ref={ref}
-        class="w-46 h-32 bg-green-500 bg-opacity-70 rounded-lg select-none center-child"
+        class="w-46 center-child h-32 select-none rounded-lg bg-green-500 bg-opacity-70"
       >
         <p>TARGET</p>
       </div>

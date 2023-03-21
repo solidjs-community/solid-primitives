@@ -18,7 +18,7 @@ function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
 /**
  * Provides a signal with the list of currently held keys, ordered from least recent to most recent.
  *
- * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot). *(signals and event-listeners are reused across dependents)*
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot). *(signals and event-listeners are reused across dependents)*
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#useKeyDownList
  *
@@ -84,7 +84,7 @@ const useKeyDownList = createSharedRoot<
 /**
  * Provides a signal with the currently held single key. Pressing any other key at the same time will reset the signal to `null`.
  *
- * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot). *(signals and event-listeners are reused across dependents)*
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot). *(signals and event-listeners are reused across dependents)*
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#useCurrentlyHeldKey
  *
@@ -121,7 +121,7 @@ export const useCurrentlyHeldKey = /*#__PURE__*/ createSharedRoot<Accessor<strin
 /**
  * Provides a signal with a sequence of currently held keys, as they were pressed down and up.
  *
- * This is a [shared root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSharedRoot). *(signals and event-listeners are reused across dependents)*
+ * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot). *(signals and event-listeners are reused across dependents)*
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#useKeyDownSequence
  *

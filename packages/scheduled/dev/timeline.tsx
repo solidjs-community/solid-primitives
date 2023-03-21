@@ -55,23 +55,23 @@ const Timeline: Component = () => {
 
   return (
     <>
-      <div class="p-4 pb-0 center-child">
+      <div class="center-child p-4 pb-0">
         <button class="btn" onClick={trigger}>
           TRIGGER!
         </button>
       </div>
-      <div class="p-4 pt-2 space-y-4">
+      <div class="space-y-4 p-4 pt-2">
         {(Object.keys(timelines) as TimelinesKeys[]).map(name => (
           <div>
             <h3>{headings[name]}</h3>
             <div
-              class="w-full grid gap-x-1.5"
+              class="grid w-full gap-x-1.5"
               style={`grid-template-columns: repeat(${LENGTH}, 1fr`}
             >
               <Index each={timelines[name]}>
                 {(state, index) => (
                   <div
-                    class={`h-10vh bg-white rounded-sm transition-opacity duration-${TRANSITION}`}
+                    class={`h-10vh rounded-sm bg-white transition-opacity duration-${TRANSITION}`}
                     style={{
                       opacity: state() ? 1 : isCurrent(index) ? 0.2 : 0.05,
                     }}

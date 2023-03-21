@@ -1,5 +1,12 @@
-import { createContextProvider } from "../src";
-import { Component, createSignal } from "solid-js";
+import { createContextProvider, MultiProvider } from "../src";
+import {
+  Component,
+  createContext,
+  createSignal,
+  FlowComponent,
+  untrack,
+  useContext,
+} from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
 
@@ -14,7 +21,7 @@ const [CounterProvider, useCounter] = createContextProvider((props: { initial: n
 });
 
 const Counter: Component = () => {
-  const { count, increment } = useCounter();
+  const { count, increment } = useCounter()!;
 
   return (
     <button class="btn" onClick={increment}>
@@ -23,18 +30,42 @@ const Counter: Component = () => {
   );
 };
 
+const TestCtx = createContext<{ title: string }>();
+
+const BoundProvider: FlowComponent = props => (
+  <TestCtx.Provider value={{ title: "foo" }}>{props.children}</TestCtx.Provider>
+);
+
 const App: Component = () => {
   return (
-    <div class="p-24 box-border w-full min-h-screen flex flex-col justify-center items-center space-y-4 bg-gray-800 text-white">
+    <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
       <div class="wrapper-v">
         <h4>Counter component</h4>
         <p class="caption">it's the best we've got...</p>
         <CounterProvider initial={1}>
           <Counter />
         </CounterProvider>
+
+        <MultiProvider
+          values={[
+            [TestCtx, { title: "Hello Context" }],
+            [TestCtx.Provider, { title: "Hello Provider" }],
+            [TestCtx, { title: 123 }],
+            [TestCtx.Provider, { title: 321 }],
+            [TestCtx, undefined],
+            [TestCtx.Provider, undefined],
+            BoundProvider,
+            CounterProvider,
+          ]}
+        >
+          {untrack(() => {
+            const ctx = useContext(TestCtx);
+            return <>{ctx?.title}</>;
+          })}
+        </MultiProvider>
       </div>
     </div>
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+render(() => <App />, document.getElementById("root")!);

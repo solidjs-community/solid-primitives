@@ -3,24 +3,22 @@ import { createMediaQuery } from "@solid-primitives/media";
 import { isIOS } from "@solid-primitives/platform";
 import { defer } from "@solid-primitives/utils";
 import Dismiss from "solid-dismiss";
-import { Accessor, batch, Component, createEffect, onMount } from "solid-js";
-import { unwrap } from "solid-js/store";
+import { Component, createEffect, onMount } from "solid-js";
 import { useLocation } from "solid-start";
 import { createShortcut } from "~/hooks/createShortcut";
 import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 import { scrollIntoView } from "~/utils/scrollIntoView";
-import { headerState, setHeaderState } from "../Header/Header";
+import * as Header from "../Header/Header";
 import Search from "./Search";
 
 const SearchModal: Component<{
   menuButton: HTMLElement;
-  open: Accessor<boolean>;
+  open: boolean;
   setOpen: (value: boolean) => void;
-}> = ({ menuButton, open, setOpen }) => {
+}> = props => {
   const isSmall = createMediaQuery("(max-width: 767px)");
   let prevPathname = "";
   let prevHash = "";
-  let prevHeaderState: typeof headerState;
   let rootApp!: HTMLElement;
   let containerEl!: HTMLElement;
   let dialogEl!: HTMLDivElement;
@@ -69,9 +67,9 @@ const SearchModal: Component<{
   };
 
   const onClickClose = () => {
-    setOpen(false);
+    props.setOpen(false);
     requestAnimationFrame(() => {
-      menuButton.focus();
+      props.menuButton.focus();
     });
   };
 
@@ -79,19 +77,18 @@ const SearchModal: Component<{
     rootApp = document.getElementById("root-subcontainer")!;
   });
 
-  createShortcut(["Meta", "K"], () => {
-    setOpen(true);
-  });
-  createShortcut(["Control", "K"], () => {
-    setOpen(true);
-  });
+  createShortcut(["Meta", "K"], () => props.setOpen(true));
+  createShortcut(["Control", "K"], () => props.setOpen(true));
 
   createEffect(
-    defer(open, open => {
-      if (!open) return;
-      prevPathname = location.pathname;
-      prevHash = location.hash;
-    }),
+    defer(
+      () => props.open,
+      open => {
+        if (!open) return;
+        prevPathname = location.pathname;
+        prevHash = location.hash;
+      },
+    ),
   );
 
   createEffect(
@@ -99,23 +96,23 @@ const SearchModal: Component<{
       () => location.pathname,
       (currentPathname, prevPathname) => {
         if (prevPathname === currentPathname) return;
-        setOpen(false);
+        props.setOpen(false);
       },
     ),
   );
 
   return (
     <Dismiss
-      menuButton={menuButton}
+      menuButton={props.menuButton}
       modal
-      open={open}
-      setOpen={setOpen}
+      open={() => props.open}
+      setOpen={props.setOpen}
       removeScrollbar={false}
       overlayElement={{
         element: (
           <div>
             <div
-              class="fixed top-0 left-0 right-0 h-[60px] z-[1002]"
+              class="fixed top-0 left-0 right-0 z-[1002] h-[60px]"
               classList={{ hidden: isSmall() }}
               onClick={onClickClose}
             />
@@ -125,7 +122,7 @@ const SearchModal: Component<{
               onClick={onClickClose}
             >
               <div
-                class="h-[calc(100%+100px)] bg-[#102a62b8] dark:bg-[#001627bd] backdrop-blur-sm"
+                class="h-[calc(100%+100px)] bg-[#102a62b8] backdrop-blur-sm dark:bg-[#001627bd]"
                 classList={{ "mt-[60px]": !isSmall() }}
               />
             </div>
@@ -146,37 +143,18 @@ const SearchModal: Component<{
         exitToClass: "opacity-0 transition-opacity duration-200",
         appendToElement: "menuPopup",
         onBeforeEnter: () => {
-          prevHeaderState = structuredClone(unwrap(headerState));
-          setHeaderState("disableScroll", true);
+          Header.setScrollEnabled(false);
         },
         onEnter: () => {
           changePageLayout();
-          batch(() => {
-            setHeaderState("showSearchBtn", false);
-            setHeaderState("showGradientBorder", false);
-            setHeaderState("showShadow", false);
-            setHeaderState("showOpaqueBg", true);
-            if (!isSmall()) {
-              setHeaderState("zIndex", 1001);
-            }
-          });
         },
         onExit: () => {
-          setHeaderState("showSearchBtn", true);
           rootApp.style.top = "1";
         },
         onAfterExit: () => {
           restorePageLayout();
           scrollToLink();
-          batch(() => {
-            setHeaderState("disableScroll", false);
-            if (doesPathnameMatchBase(location.pathname)) {
-              setHeaderState("showGradientBorder", prevHeaderState.showGradientBorder);
-            }
-            setHeaderState("showOpaqueBg", prevHeaderState.showOpaqueBg);
-            setHeaderState("showShadow", prevHeaderState.showShadow);
-            setHeaderState("zIndex", prevHeaderState.zIndex);
-          });
+          Header.setScrollEnabled(true);
         },
       }}
       focusElementOnOpen={{ target: isIOS ? "none" : "firstChild", preventScroll: true }}
@@ -184,19 +162,19 @@ const SearchModal: Component<{
       ref={containerEl}
     >
       <div
-        class="mb-[60px] flex justify-center pointer-events-none p-4"
+        class="pointer-events-none mb-[60px] flex justify-center p-4"
         classList={{ "mt-[80px]": !isSmall() }}
         role="presentation"
       >
         <div class="flex-grow">
           <div
-            class="flex justify-center !pointer-events-none [&>div]:pointer-events-auto"
+            class="!pointer-events-none flex justify-center [&>div]:pointer-events-auto"
             role="dialog"
             aria-modal="true"
             tabindex="-1"
             ref={dialogEl}
           >
-            <Search setOpen={setOpen} />
+            <Search setOpen={props.setOpen} />
           </div>
         </div>
       </div>

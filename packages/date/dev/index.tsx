@@ -47,7 +47,7 @@ const App: Component = () => {
   const countdown = createCountdown(dateNow, targetTimestamp);
 
   return (
-    <div class="w-screen min-h-screen overflow-hidden flex flex-col justify-center items-center space-y-12 bg-gray-50">
+    <div class="flex min-h-screen w-screen flex-col items-center justify-center space-y-12 overflow-hidden bg-gray-50">
       <div class="card">
         <div>
           NOW: <span>{format(dateNow(), "d MMM yyyy — HH:mm:ss:SSS")}</span>

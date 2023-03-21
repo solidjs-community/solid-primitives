@@ -30,9 +30,9 @@ const App: Component = () => {
     }
   });
   return (
-    <div class="flex justify-center items-center box-border w-full h-screen overflow-hidden bg-gray-900">
+    <div class="box-border flex h-screen w-full items-center justify-center overflow-hidden bg-gray-900">
       <div class="flex flex-col items-center">
-        <div class="flex flex-col justify-center shadow items-center bg-white/30 text-white rounded-lg p-0 overflow-hidden shadow-lg">
+        <div class="flex flex-col items-center justify-center overflow-hidden rounded-lg bg-white/30 p-0 text-white shadow shadow-lg">
           <Show
             fallback={<div class="p-4">Could not detect coordinates, check permissions.</div>}
             when={!location.error}

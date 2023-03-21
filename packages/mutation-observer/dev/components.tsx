@@ -2,15 +2,15 @@ import { Component, createSignal, For, JSX, Show, splitProps } from "solid-js";
 
 export const TestingNode: Component<{ output?: JSX.Element; heading?: string }> = props => {
   return (
-    <div class="bg-gray-900 rounded-lg border-1 border-gray-800">
+    <div class="border-1 rounded-lg border-gray-800 bg-gray-900">
       <Show when={props.heading}>
-        <div class="border-0 border-b border-gray-800 py-3 px-6 center-child">
+        <div class="center-child border-0 border-b border-gray-800 py-3 px-6">
           <h5>{props.heading}</h5>
         </div>
       </Show>
-      <div class="p-6 flex flex-col items-center space-y-2">{props.children}</div>
+      <div class="flex flex-col items-center space-y-2 p-6">{props.children}</div>
       <Show when={props.output}>
-        <div class="border-0 border-t border-gray-800 p-3 flex flex-col items-center space-y-1 text-xs font-mono text-gray-500 leading-tight">
+        <div class="flex flex-col items-center space-y-1 border-0 border-t border-gray-800 p-3 font-mono text-xs leading-tight text-gray-500">
           {props.output}
         </div>
       </Show>
@@ -24,7 +24,7 @@ export const ToggleBtn: Component<
   const [, attrs] = splitProps(props, ["children", "state"]);
   return (
     <button
-      class="bg-gray-700 text-gray-100 w-6 h-6 center-child select-none cursor-pointer rounded border-1 border-gray-600 hover:bg-gray-600"
+      class="center-child border-1 h-6 w-6 cursor-pointer select-none rounded border-gray-600 bg-gray-700 text-gray-100 hover:bg-gray-600"
       classList={{
         "!bg-green-700 border-green-600 !hover:bg-green-600": props.state,
       }}

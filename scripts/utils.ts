@@ -7,8 +7,19 @@ const getCommentText = (text: string, marker: "START" | "END") => `<!-- ${text}:
 export const regexGlobalCaptureGroup = (input: string, regex: RegExp) => {
   const output = [];
   let matches;
+
+  const getMatch = (match: any[]) => {
+    for (let i = 1; i < match.length; i++) {
+      const value = match[i];
+      if (value) return value;
+    }
+  };
+
   while ((matches = regex.exec(input))) {
-    output.push(matches[1]!);
+    const captured = getMatch(matches);
+    if (captured) {
+      output.push(captured);
+    }
   }
   if (!output.length) return null;
   return output;
@@ -30,7 +41,7 @@ export function formatBytes(
   {
     decimals = 2,
     k = 1000,
-    sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
+    sizes = ["B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
   }: {
     decimals?: number;
     sizes?: string[];

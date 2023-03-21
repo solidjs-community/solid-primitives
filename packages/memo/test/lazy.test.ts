@@ -256,24 +256,4 @@ describe("createLazyMemo", () => {
 
       dispose();
     }));
-
-  it("won't run after disposeing", () =>
-    createRoot(dispose => {
-      const [count, setCount] = createSignal(0);
-      let runs = 0;
-      const memo = createLazyMemo(() => {
-        runs++;
-        return count();
-      });
-
-      dispose();
-
-      // has to run at least once
-      expect(memo(), "result before dispose").toBe(0);
-      expect(runs, "runs before dispose").toBe(1);
-
-      setCount(5);
-      expect(memo(), "result after dispose").toBe(0);
-      expect(runs, "runs after dispose").toBe(1);
-    }));
 });
