@@ -9,14 +9,12 @@ import {
 } from "solid-js";
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { isMobile, isSafari } from "@solid-primitives/platform";
-import { createElementSize } from "@solid-primitives/resize-observer";
 import { createScrollPosition } from "@solid-primitives/scroll";
 import { defer } from "@solid-primitives/utils";
 import Dismiss from "solid-dismiss";
 import { A, useLocation } from "solid-start";
 import { pageWidthClass } from "~/constants";
 import Hamburger from "../Icons/Hamburger";
-import { PRIMITIVE_PAGE_PADDING_TOP } from "../Primitives/PrimitivePageMain";
 import SearchBtn from "../Search/SearchBtn";
 import SearchModal from "../Search/SearchModal";
 import NavMenu from "./NavMenu";
@@ -36,6 +34,7 @@ export function overrideShadow(signal: Accessor<boolean>) {
 
 const OPEN_NAV_DURATION = 500;
 const HEADER_HEIGHT = 60;
+export const PRIMITIVE_PAGE_PADDING_TOP = 140;
 
 const Header: Component = () => {
   const windowScroll = createScrollPosition(() => window);

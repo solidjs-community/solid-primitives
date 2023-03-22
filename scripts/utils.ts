@@ -35,3 +35,5 @@ export function insertTextBetweenComments(file: string, text: string, comment: s
   lines.splice(start + 1, end - start - 1, ...text.split("\n"));
   return lines.join("\n");
 }
+
+export const isNonNullable = <T>(i: T): i is NonNullable<T> => i != null;

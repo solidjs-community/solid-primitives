@@ -14,3 +14,5 @@ export type PackageData = Omit<ModuleData, "primitives"> & {
   primitives: BundlesizeItem[];
   packageSize: Bundlesize | null;
 };
+
+export const GITHUB_REPO = "https://github.com/solidjs-community/solid-primitives";

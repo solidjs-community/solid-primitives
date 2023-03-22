@@ -3,6 +3,7 @@ import fs from "fs";
 import fsp from "fs/promises";
 import { fileURLToPath } from "url";
 import { PackageJson } from "type-fest";
+import { isNonNullable } from "./utils";
 
 export type ModulePkg = PackageJson & {
   primitive?: {
@@ -42,13 +43,15 @@ export async function getModulesData<T = ModuleData>(
     const packageJsonPath = path.join(packagePath, "package.json");
     if (!fs.existsSync(packageJsonPath)) {
       // eslint-disable-next-line no-console
-      return console.warn(`package ${name} doesn't have package.json`);
+      console.warn(`package ${name} doesn't have package.json`);
+      return null;
     }
 
     const pkg = JSON.parse(await fsp.readFile(packageJsonPath, "utf8")) as ModulePkg;
     if (!pkg.primitive) {
       // eslint-disable-next-line no-console
-      return console.warn(`package ${name} doesn't have primitive field in package.json`);
+      console.warn(`package ${name} doesn't have primitive field in package.json`);
+      return null;
     }
 
     const dependencies = Object.keys(pkg.dependencies ?? {});
@@ -74,5 +77,5 @@ export async function getModulesData<T = ModuleData>(
     };
   });
 
-  return (await Promise.all(promises)).filter(<T>(a: T | void): a is T => !!a).map(a => a.data);
+  return (await Promise.all(promises)).filter(isNonNullable).map(a => a.data);
 }
