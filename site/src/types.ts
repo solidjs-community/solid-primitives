@@ -1,14 +1,16 @@
 import type { ModuleData } from "../../scripts/get-modules-data";
 
-export type PackageData = ModuleData & {
+export type Bundlesize = {
+  min: string;
+  gzip: string;
+};
+
+export type BundlesizeItem = Bundlesize & {
+  name: string;
+};
+
+export type PackageData = Omit<ModuleData, "primitives"> & {
   readme: string;
-  exports: {
-    name: string;
-    min: string;
-    gzip: string;
-  }[];
-  packageSize: {
-    min: string;
-    gzip: string;
-  } | null;
+  primitives: BundlesizeItem[];
+  packageSize: Bundlesize | null;
 };

@@ -1,23 +1,19 @@
-import { createIntersectionObserver } from "@solid-primitives/intersection-observer";
+import { createVisibilityObserver } from "@solid-primitives/intersection-observer";
 import { isIOS, isSafari } from "@solid-primitives/platform";
 import { createResizeObserver } from "@solid-primitives/resize-observer";
 import { Component, createSignal, For, onMount } from "solid-js";
-
-export type TBundleSizeItem = {
-  name: string;
-  min: string;
-  gzip: string;
-};
+import { Bundlesize, BundlesizeItem } from "~/types";
 
 const BundleSizeModal: Component<{
-  packageList: TBundleSizeItem[];
-  primitiveList: TBundleSizeItem[];
-}> = ({ packageList, primitiveList }) => {
+  name: string;
+  packageSize: Bundlesize | null;
+  primitives: BundlesizeItem[];
+}> = props => {
   const sharedHeaders = ["Minified", "Minified + GZipped"];
   const packageThHeaders = ["Package", ...sharedHeaders];
   const primitiveThHeaders = ["Primitive", ...sharedHeaders];
-  const [showShadow, setShowShadow] = createSignal(false);
-  const [target, setTarget] = createSignal<Element[]>([]);
+
+  const [target, setTarget] = createSignal<Element>();
   let theadEl!: HTMLTableSectionElement;
   let tableEl!: HTMLTableElement;
   let tableContainerEl!: HTMLTableElement;
@@ -31,15 +27,9 @@ const BundleSizeModal: Component<{
       setTheadHeight(height);
     },
   );
-  createIntersectionObserver(
+
+  const isTargetVisible = createVisibilityObserver({ rootMargin: "0px 0px -100%", threshold: 0 })(
     target,
-    entries => {
-      entries.forEach(entry => {
-        const { isIntersecting } = entry;
-        setShowShadow(isIntersecting);
-      });
-    },
-    { rootMargin: "0px 0px -100%", threshold: 0 },
   );
 
   const fitFont = () => {
@@ -122,26 +112,20 @@ const BundleSizeModal: Component<{
               </tr>
             </thead>
             <tbody>
-              <For each={packageList}>
-                {({ name, min, gzip }) => {
-                  return (
-                    <tr class="even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
-                      <td class="p-1 text-sm md:px-3 md:text-base">
-                        <span class="flex flex-wrap">
-                          <span class="whitespace-nowrap">@solid-primitives/</span>
-                          <span>{name}</span>
-                        </span>
-                      </td>
-                      <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                        {min}
-                      </td>
-                      <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                        {gzip}
-                      </td>
-                    </tr>
-                  );
-                }}
-              </For>
+              <tr class="even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
+                <td class="p-1 text-sm md:px-3 md:text-base">
+                  <span class="flex flex-wrap">
+                    <span class="whitespace-nowrap">@solid-primitives/</span>
+                    <span>{props.name}</span>
+                  </span>
+                </td>
+                <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
+                  {props.packageSize?.min ?? "N/A"}
+                </td>
+                <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
+                  {props.packageSize?.gzip ?? "N/A"}
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -157,10 +141,7 @@ const BundleSizeModal: Component<{
             // fake <th> element for th shadow causes table to lose width equivalent to border-spacing, which is 2px, so make up for up for it by setting width to 100% + 2px.
             class="my-4 w-[calc(100%+2px)]"
             style="border-collapse: separate; border-spacing: 2px 2px;"
-            ref={el => {
-              setTarget([el]);
-              tableEl = el;
-            }}
+            ref={el => setTarget((tableEl = el))}
           >
             <thead
               class="sticky"
@@ -176,30 +157,27 @@ const BundleSizeModal: Component<{
                 <th
                   aria-label="hidden"
                   class="box-shadow-[var(--table-header-box-shadow)] pointer-events-none absolute top-0 left-0 right-0 bottom-0 transition-opacity will-change-transform"
-                  classList={{ "opacity-0": !showShadow(), "opacity-100": showShadow() }}
-                  style={{ height: `${theadHeight() - 2}px` }}
+                  style={{ height: `${theadHeight() - 2}px`, opacity: isTargetVisible() ? 1 : 0 }}
                 />
               </tr>
             </thead>
             <tbody>
-              <For each={primitiveList}>
-                {({ name, min, gzip }) => {
-                  return (
-                    <tr class="even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
-                      <td class="p-1 text-sm md:px-3 md:text-base" data-primitive-td>
-                        <span class="inline-block" data-primitive-span>
-                          {name}
-                        </span>
-                      </td>
-                      <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                        {min}
-                      </td>
-                      <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                        {gzip}
-                      </td>
-                    </tr>
-                  );
-                }}
+              <For each={props.primitives}>
+                {item => (
+                  <tr class="even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
+                    <td class="p-1 text-sm md:px-3 md:text-base" data-primitive-td>
+                      <span class="inline-block" data-primitive-span>
+                        {item.name}
+                      </span>
+                    </td>
+                    <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
+                      {item.min}
+                    </td>
+                    <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
+                      {item.gzip}
+                    </td>
+                  </tr>
+                )}
               </For>
             </tbody>
           </table>

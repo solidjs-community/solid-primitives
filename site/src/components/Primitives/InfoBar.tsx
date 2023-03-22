@@ -1,46 +1,48 @@
-import { FaBrandsGithub } from "solid-icons/fa";
-import { Component } from "solid-js";
-import { TBundleSizeItem } from "../BundleSizeModal/BundleSizeModal";
-import SizeBadge, { SizeBadgePill } from "./SizeBadge";
-import StageBadge, { StageBadgePill } from "./StageBadge";
-import VersionBadge, { VersionBadgePill } from "./VersionBadge";
+import { Component, Show } from "solid-js";
+import { PackageData } from "~/types";
+import { SizeBadgePill } from "./SizeBadge";
+import { StageBadgePill } from "./StageBadge";
+import { VersionBadgePill } from "./VersionBadge";
 
 const sizeShield = "https://img.shields.io/bundlephobia/minzip/";
 const bundlephobiaURL = "https://bundlephobia.com/package/";
 const npmShield = "https://img.shields.io/npm/v/";
 const npmURL = "https://www.npmjs.com/package/";
-const stageShieldBaseURL =
-  "https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-"; // add "<stage>.json" after
-const stageShieldLink =
-  "https://github.com/solidjs-community/solid-primitives#contribution-process";
-const githubRepo = "https://github.com/solidjs-community/solid-primitives";
+// const stageShieldBaseURL =
+//   "https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-"; // add "<stage>.json" after
+// const stageShieldLink =
+//   "https://github.com/solidjs-community/solid-primitives#contribution-process";
+// const githubRepo = "https://github.com/solidjs-community/solid-primitives";
 
 export const getSizeShield = (name: string) => `${sizeShield}${name}.json`;
 export const getNPMShield = (name: string) => `${npmShield}${name}.json`;
 
-const InfoBar: Component<{
-  name: string;
-  stage: number;
-  packageList: TBundleSizeItem[];
-  primitiveList: TBundleSizeItem[];
-}> = props => {
-  const packageName = `@solid-primitives/${props.name}`;
-  const githubRepoPrimitve = `${githubRepo}/tree/main/packages/${props.name}`;
-  const bundlephobiaFullURL = `${bundlephobiaURL}/${packageName}`;
-  const npmFullURL = `${npmURL}/${packageName}`;
+const InfoBar: Component<{ data: PackageData | null }> = props => {
   return (
     <div class="flex flex-wrap gap-2">
-      <SizeBadgePill
-        value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/active-element.json"
-        href={bundlephobiaFullURL}
-        packageList={props.packageList}
-        primitiveList={props.primitiveList}
-      />
-      <VersionBadgePill
-        value="https://img.shields.io/npm/v/@solid-primitives/active-element.json"
-        href={npmFullURL}
-      />
-      <StageBadgePill value={props.stage} />
+      <Show when={props.data} keyed>
+        {data => {
+          // const githubRepoPrimitve = () => `${githubRepo}/tree/main/packages/${props.name}`;
+          const packageName = () => `@solid-primitives/${props.data?.name}`;
+
+          return (
+            <>
+              <SizeBadgePill
+                value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/active-element.json"
+                href={`${bundlephobiaURL}/${packageName()}`}
+                name={data.name}
+                packageSize={data.packageSize}
+                primitives={data.primitives}
+              />
+              <VersionBadgePill
+                value="https://img.shields.io/npm/v/@solid-primitives/active-element.json"
+                href={`${npmURL}/${packageName()}`}
+              />
+              <StageBadgePill value={data.stage} />
+            </>
+          );
+        }}
+      </Show>
     </div>
   );
 };

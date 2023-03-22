@@ -1,8 +1,6 @@
-import { FiChevronRight } from "solid-icons/fi";
-import { createSignal, onMount, ParentComponent } from "solid-js";
+import { ComponentProps, createSignal, onMount, ParentComponent } from "solid-js";
 import SlideModal from "../Modal/SlideModal";
-import BundleSizeModal, { TBundleSizeItem } from "../BundleSizeModal/BundleSizeModal";
-import Stage from "../Stage/Stage";
+import BundleSizeModal from "../BundleSizeModal/BundleSizeModal";
 
 const createFetchSize = (value: string) => {
   const [size, setSize] = createSignal("");
@@ -65,11 +63,8 @@ export const SizeBadgeWrapper: ParentComponent<{ primitiveName: string }> = prop
 };
 
 export const SizeBadgePill: ParentComponent<
-  SizeProps & {
-    packageList: TBundleSizeItem[];
-    primitiveList: TBundleSizeItem[];
-  }
-> = ({ value, href, packageList, primitiveList }) => {
+  SizeProps & ComponentProps<typeof BundleSizeModal>
+> = props => {
   const [open, setOpen] = createSignal(false);
   let menuButton!: HTMLButtonElement;
 
@@ -83,11 +78,11 @@ export const SizeBadgePill: ParentComponent<
           <span>Size</span>
         </div>
         <div class="background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#cae0ff,#c0c8ff)_border-box] dark:background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#405b6e,#46659a)_border-box] flex h-full min-w-[90px] items-center justify-center rounded-r-lg border-[3px] border-l-0 border-transparent font-semibold">
-          {packageList[0]?.gzip}
+          {props.packageSize?.gzip ?? "N/A"}
         </div>
       </button>
       <SlideModal menuButton={menuButton} open={open} setOpen={setOpen}>
-        <BundleSizeModal packageList={packageList} primitiveList={primitiveList} />
+        <BundleSizeModal {...props} />
       </SlideModal>
     </>
   );

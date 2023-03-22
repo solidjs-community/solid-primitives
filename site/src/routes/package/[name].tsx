@@ -1,4 +1,4 @@
-import { Component, createResource, Show } from "solid-js";
+import { Component, createResource } from "solid-js";
 import { useParams, useRouteData } from "solid-start";
 import PrimitivePageMain from "~/components/Primitives/PrimitivePageMain";
 import { PackageData } from "~/types";
@@ -21,18 +21,9 @@ const Page: Component = () => {
   const data = useRouteData<typeof routeData>();
 
   return (
-    <Show when={data()} keyed>
-      {data => (
-        <PrimitivePageMain
-          name={data.name}
-          stage={data.stage}
-          packageList={[]}
-          primitiveList={data.exports}
-        >
-          <div innerHTML={data.readme} />
-        </PrimitivePageMain>
-      )}
-    </Show>
+    <PrimitivePageMain data={data() ?? null}>
+      <div innerHTML={data()?.readme} />
+    </PrimitivePageMain>
   );
 };
 

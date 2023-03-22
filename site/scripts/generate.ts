@@ -23,7 +23,7 @@ const PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES = ["signal-builders", "platform", "im
   }
 
   const modules = await getModulesData(async module => {
-    const [readme, exports, packageSize] = await Promise.all([
+    const [readme, primitives, packageSize] = await Promise.all([
       // parse readme and generate html
       (async () => {
         const readme = await fsp.readFile(path.join(module.path, "README.md"), "utf8");
@@ -56,7 +56,7 @@ const PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES = ["signal-builders", "platform", "im
       })(),
     ] as const);
 
-    const data: PackageData = { ...module, readme, exports, packageSize };
+    const data: PackageData = { ...module, readme, primitives, packageSize };
 
     // write data to individual json file
     const outputFilename = path.join(packagesDist, `${module.name}.json`);
@@ -67,4 +67,7 @@ const PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES = ["signal-builders", "platform", "im
 
   // gather all module names into one json file
   await fsp.writeFile(listDist, JSON.stringify(modules, null, 2));
+
+  // eslint-disable-next-line no-console
+  console.log(`\nGenerated data for ${modules.length} packages.\n`);
 })();

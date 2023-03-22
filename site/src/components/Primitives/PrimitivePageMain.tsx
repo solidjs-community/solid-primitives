@@ -4,7 +4,7 @@ import { Title } from "solid-start";
 import { pageWidthClass } from "~/constants";
 import createTooltipOnCodePrimitives from "~/hooks/createTooltipOnCodePrimitives";
 import onPreMount from "~/hooks/onPreMount";
-import { TBundleSizeItem } from "../BundleSizeModal/BundleSizeModal";
+import { PackageData } from "~/types";
 import Heading from "./Heading";
 import InfoBar from "./InfoBar";
 
@@ -13,13 +13,8 @@ const GITHUB_REPO = "https://github.com/solidjs-community/solid-primitives";
 export const PRIMITIVE_PAGE_PADDING_TOP = 140;
 
 const PrimitivePageMain: ParentComponent<{
-  name: string;
-  stage: number;
-  packageList: TBundleSizeItem[];
-  primitiveList: TBundleSizeItem[];
+  data: PackageData | null;
 }> = props => {
-  const githubRepoPrimitive = `${GITHUB_REPO}/tree/main/packages/${props.name}`;
-
   onPreMount(() => {
     document.documentElement.classList.add("primitives-page-main");
   });
@@ -28,7 +23,7 @@ const PrimitivePageMain: ParentComponent<{
 
   return (
     <>
-      <Title>{props.name}</Title>
+      {props.data && <Title>{props.data.name}</Title>}
       <script>document.documentElement.classList.add("primitives-page-main")</script>
       <div
         class="-z-1 absolute top-0 left-0 right-0 h-[95vh] bg-[linear-gradient(to_bottom,#fff_var(--primitive-padding-top-gr),transparent)] dark:bg-[linear-gradient(to_bottom,#293843_var(--primitive-padding-top-gr),transparent)]"
@@ -47,7 +42,7 @@ const PrimitivePageMain: ParentComponent<{
               Matching Stuff Anywhere Visitor .java
             </Heading> */}
 
-            <Heading>{props.name.replace("-", " ")}</Heading>
+            <Heading>{props.data?.name.replace("-", " ")}</Heading>
             <div class="relative">
               <svg
                 class="absolute"
@@ -64,7 +59,7 @@ const PrimitivePageMain: ParentComponent<{
               </svg>
               <a
                 class="relative inline-block scale-90 transition-opacity hover:opacity-70 sm:scale-100"
-                href={githubRepoPrimitive}
+                href={`${GITHUB_REPO}/tree/main/packages/${props.data?.name}`}
                 target="_blank"
                 rel="noopener"
               >
@@ -77,12 +72,7 @@ const PrimitivePageMain: ParentComponent<{
           </div>
 
           <div class="my-8">
-            <InfoBar
-              name={props.name}
-              stage={props.stage}
-              packageList={props.packageList}
-              primitiveList={props.primitiveList}
-            />
+            <InfoBar data={props.data} />
           </div>
 
           <div class="prose">{props.children}</div>
