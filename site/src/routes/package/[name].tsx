@@ -1,7 +1,7 @@
 import { Component, createResource, Show } from "solid-js";
 import { useParams, useRouteData } from "solid-start";
 import PrimitivePageMain from "~/components/Primitives/PrimitivePageMain";
-import { PackageData } from "~/../scripts/generate-modules-data";
+import { PackageData } from "~/types";
 
 type Params = {
   name: string;

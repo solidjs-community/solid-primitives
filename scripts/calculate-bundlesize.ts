@@ -10,22 +10,18 @@ const __dirname = path.dirname(__filename);
 
 const GZIP_HEADERS_AND_METADATA_SIZE = 20; // around 20 bytes
 
-export const getExportBundlesize = async ({
-  type,
-  packageName,
-  exportName,
-  isExportDefault,
-  peerDependencies,
-}: {
-  type: "package" | "export";
-  packageName: string;
-  exportName?: string;
-  isExportDefault?: boolean;
-  peerDependencies?: string[];
-}): Promise<{
-  minifiedSize: number;
-  gzippedSize: number;
-} | null> => {
+export const getPackageBundlesize = async (
+  packageName: string,
+  {
+    exportName,
+    isExportDefault,
+    peerDependencies,
+  }: {
+    exportName?: string;
+    isExportDefault?: boolean;
+    peerDependencies?: string[];
+  } = {},
+): Promise<{ min: number; gzip: number } | null> => {
   const randomHash = Math.random().toString(36).substring(2, 15);
 
   const tempDir = path.join(__dirname, "_temp_calculate-bundlesize");
@@ -38,11 +34,15 @@ export const getExportBundlesize = async ({
 
   const tempFilename = `${exportName ? `${packageName}_${exportName}` : packageName}_${randomHash}`;
   const packagePath = path.join(__dirname, `../packages/${packageName}`);
-  const indexFilepath = path.join(packagePath, `/src/index.ts`);
   const outFilepath = path.join(tempDir, `${tempFilename}.js`);
   const exportFilepath = path.join(tempDir, `${tempFilename}.ts`);
 
-  if (type === "export") {
+  let indexFilepath = path.join(packagePath, `/src/index.ts`);
+  if (!fs.existsSync(indexFilepath)) {
+    indexFilepath = path.join(packagePath, `/src/index.tsx`);
+  }
+
+  if (exportName) {
     await fsp.writeFile(
       exportFilepath,
       `export ${
@@ -54,7 +54,7 @@ export const getExportBundlesize = async ({
   try {
     await build({
       logLevel: "silent",
-      entryPoints: [type === "package" ? indexFilepath : exportFilepath],
+      entryPoints: [exportName ? exportFilepath : indexFilepath],
       outfile: outFilepath,
       target: ["esnext"],
       format: "esm",
@@ -76,13 +76,8 @@ export const getExportBundlesize = async ({
 
   const gzippedSize = (await gzipSize(buffer)) - GZIP_HEADERS_AND_METADATA_SIZE;
 
-  await fsp.rm(exportFilepath);
-  await fsp.rm(outFilepath);
-
-  const result = {
-    minifiedSize,
-    gzippedSize,
-  };
+  fs.existsSync(exportFilepath) && (await fsp.rm(exportFilepath));
+  fs.existsSync(outFilepath) && (await fsp.rm(outFilepath));
 
   // if (minifiedSize <= 0) {
   //   if (recursive) {
@@ -99,7 +94,10 @@ export const getExportBundlesize = async ({
   //   });
   // }
 
-  return result;
+  return {
+    min: minifiedSize,
+    gzip: gzippedSize,
+  };
 };
 
 export type FormattedBytes = {

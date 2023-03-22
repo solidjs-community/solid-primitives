@@ -1,24 +1,18 @@
-import { defineConfig, UserConfig } from "vite";
+import { defineConfig } from "vite";
 import devtools from "solid-devtools/vite";
 import solid from "solid-start/vite";
 // @ts-ignore
 import staticAdapter from "solid-start-static";
 
-import { generatePackagesData } from "./scripts/generate-modules-data";
-
-declare global {
-  var _viteConfig: UserConfig | undefined;
+let packages: string[] = [];
+try {
+  packages = await import("./src/_generated/packages.json");
+} catch (e) {
+  throw new Error("No packages found. Did you run `pnpm generate`?");
 }
 
-export default defineConfig(async () => {
-  // when generating static site, vite.config.ts is executed multiple times
-  if (globalThis._viteConfig) {
-    return globalThis._viteConfig;
-  }
-
-  const modules = await generatePackagesData();
-
-  return (globalThis._viteConfig = {
+export default defineConfig(() => {
+  return {
     plugins: [
       devtools({
         autoname: true,
@@ -29,8 +23,8 @@ export default defineConfig(async () => {
       }),
       solid({
         adapter: staticAdapter(),
-        prerenderRoutes: ["/", ...modules.map(name => `/package/${name}`)],
+        prerenderRoutes: ["/", ...packages.map(name => `/package/${name}`)],
       }),
     ],
-  });
+  };
 });

@@ -1,6 +1,6 @@
 import { readdirSync, existsSync, readFileSync, mkdirSync } from "fs";
 import { PackageJSONData, TPackageData } from ".";
-import { getExportBundlesize, formatBytes } from "../calculate-bundlesize";
+import { getPackageBundlesize, formatBytes } from "../calculate-bundlesize";
 import { r, regexGlobalCaptureGroup } from "../utils";
 import { primitiveTags } from "./tags";
 
@@ -123,7 +123,7 @@ export const getPackageData = async () => {
         .sort()
         .map(async (primitive, _, self) => {
           const type = self.length > 1 ? "export" : "package";
-          const result = await getExportBundlesize({
+          const result = await getPackageBundlesize({
             type,
             packageName: pkg.primitive.name!,
             exportName: primitive,
@@ -152,7 +152,7 @@ export const getPackageData = async () => {
       );
     }
 
-    const result = await getExportBundlesize({
+    const result = await getPackageBundlesize({
       type: "package",
       packageName: pkg.primitive.name,
     });

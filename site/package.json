@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "generate": "jiti ./scripts/generate.ts",
     "dev": "solid-start dev --host",
     "build": "solid-start build",
     "start": "solid-start start"
