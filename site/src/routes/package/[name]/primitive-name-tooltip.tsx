@@ -53,27 +53,10 @@ function createTooltipContent(
         <h2 class="font-semibold opacity-80">Type</h2>
         <div class="text-[14px]">
           <Switch>
-            <Match when={type === "make"}>
-              <span>
-                make{" "}
-                <a
-                  class="anchor-tag-underline"
-                  href={`${BASE}#make-non-reactive-vs-create-reactive`}
-                >
-                  ( not <strong>reactive</strong> )
-                </a>
-              </span>
-            </Match>
-            <Match when={type === "create"}>
-              <span>
-                create{" "}
-                <a
-                  class="anchor-tag-underline"
-                  href={`${BASE}#make-non-reactive-vs-create-reactive`}
-                >
-                  ( is <strong>reactive</strong> )
-                </a>
-              </span>
+            <Match when={type === "reactive"}>
+              <a class="anchor-tag-underline" href={`${BASE}#make-non-reactive-vs-create-reactive`}>
+                A <strong>reactive</strong> primitive
+              </a>
             </Match>
             <Match when={type === "component"}>
               <span>JSX Component</span>
@@ -208,9 +191,8 @@ const TooltipSVG: Component<{
 };
 
 const getTypeOfPrimitive = (input: string) => {
-  if (input.match(/^make[A-Z]/)) return "make";
-  if (input.match(/^create[A-Z]/)) return "create";
-  if (input.match(/^[A-Z]/)) return "component";
+  if (input.match(/^(?:create|use)[A-Z]/)) return "reactive";
+  if (input.match(/^[A-Z][a-z]?/)) return "component";
   return "utility";
 };
 
