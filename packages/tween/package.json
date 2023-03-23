@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/tween",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Primitive that creates tween functions",
   "author": "Ryan Carniato <ryancarniato@gmail.com>",
   "license": "MIT",

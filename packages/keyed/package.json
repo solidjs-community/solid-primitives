@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/keyed",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "Control Flow primitives and components that require specifying explicit keys to identify or rerender elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -50,9 +50,9 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "devDependencies": {
-    "@solid-primitives/immutable": "^0.1.8-beta.0",
-    "@solid-primitives/refs": "^1.0.0-beta.1",
-    "@solid-primitives/utils": "^5.4.0-beta.0",
+    "@solid-primitives/immutable": "^0.1.9",
+    "@solid-primitives/refs": "^1.0.1",
+    "@solid-primitives/utils": "^5.5.1",
     "solid-transition-group": "^0.0.13"
   },
   "peerDependencies": {

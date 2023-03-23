@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/bounds",
-  "version": "0.0.109",
+  "version": "0.0.110",
   "description": "Primitives for tracking HTML element size and position on screen as it changes.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -53,12 +53,12 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "devDependencies": {
-    "@solid-primitives/scheduled": "workspace:^1.3.1"
+    "@solid-primitives/scheduled": "workspace:^1.3.2"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.8",
-    "@solid-primitives/resize-observer": "workspace:^2.0.11",
-    "@solid-primitives/utils": "workspace:^5.4.0"
+    "@solid-primitives/event-listener": "workspace:^2.2.9",
+    "@solid-primitives/resize-observer": "workspace:^2.0.13",
+    "@solid-primitives/utils": "workspace:^5.5.1"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"
