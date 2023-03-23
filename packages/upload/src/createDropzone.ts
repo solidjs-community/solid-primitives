@@ -1,5 +1,6 @@
-import { noop } from "@solid-primitives/utils";
 import { createSignal, JSX, onCleanup, onMount } from "solid-js";
+import { isServer } from "solid-js/web";
+import { noop } from "@solid-primitives/utils";
 import { transformFiles } from "./helpers";
 import { UploadFile, Dropzone, DropzoneOptions } from "./types";
 
@@ -29,7 +30,7 @@ import { UploadFile, Dropzone, DropzoneOptions } from "./types";
 function createDropzone<T extends HTMLElement = HTMLElement>(
   options?: DropzoneOptions,
 ): Dropzone<T> {
-  if (process.env.SSR) {
+  if (isServer) {
     return {
       setRef: noop,
       files: () => [],

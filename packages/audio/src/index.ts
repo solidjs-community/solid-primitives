@@ -1,4 +1,5 @@
 import { Accessor, onMount, onCleanup, createEffect } from "solid-js";
+import { isServer } from "solid-js/web";
 import { createStaticStore, access, noop } from "@solid-primitives/utils";
 
 // Set of control enums
@@ -46,7 +47,7 @@ export const makeAudio = (
   src: AudioSource,
   handlers: AudioEventHandlers = {},
 ): HTMLAudioElement => {
-  if (process.env.SSR) {
+  if (isServer) {
     return {} as HTMLAudioElement;
   }
   const player = unwrapSource(src);
@@ -93,7 +94,7 @@ export const makeAudioPlayer = (
   setVolume: (volume: number) => void;
   player: HTMLAudioElement;
 } => {
-  if (process.env.SSR) {
+  if (isServer) {
     return {
       pause: noop,
       play: async () => noop(),
@@ -158,7 +159,7 @@ export const createAudio = (
     pause: VoidFunction;
   },
 ] => {
-  if (process.env.SSR) {
+  if (isServer) {
     return [
       {
         state: AudioState.LOADING,

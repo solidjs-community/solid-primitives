@@ -1,4 +1,5 @@
 import { Accessor, createEffect, createSignal, onCleanup, Setter } from "solid-js";
+import { isServer } from "solid-js/web";
 
 export type HTMLSelection = [node: HTMLElement | null, start: number, end: number];
 
@@ -37,7 +38,7 @@ const getRangeArgs = (offset: number, texts: Node[]): [node: Node | null, offset
   );
 
 export const createSelection = (): [Accessor<HTMLSelection>, Setter<HTMLSelection>] => {
-  if (process.env.SSR) {
+  if (isServer) {
     return [
       () => [null, NaN, NaN],
       sel => (typeof sel === "function" ? sel([null, NaN, NaN]) : sel),

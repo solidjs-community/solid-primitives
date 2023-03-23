@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/tween",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Primitive that creates tween functions",
   "author": "Ryan Carniato <ryancarniato@gmail.com>",
   "license": "MIT",
@@ -29,42 +29,11 @@
   "type": "module",
   "private": false,
   "sideEffects": false,
-  "main": "./dist/server.cjs",
-  "module": "./dist/server.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "browser": {
-    "./dist/server.js": "./dist/index.js",
-    "./dist/server.cjs": "./dist/index.cjs"
-  },
+  "browser": {},
   "exports": {
-    "worker": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/server.js"
-      },
-      "require": "./dist/server.cjs"
-    },
-    "browser": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "require": "./dist/index.cjs"
-    },
-    "deno": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/server.js"
-      },
-      "require": "./dist/server.cjs"
-    },
-    "node": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/server.js"
-      },
-      "require": "./dist/server.cjs"
-    },
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
@@ -72,12 +41,12 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "jiti ../../scripts/build.ts --ssr",
+    "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.0"
+    "solid-js": "^1.6.12"
   },
   "typesVersions": {}
 }

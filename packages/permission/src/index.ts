@@ -1,4 +1,5 @@
 import { Accessor, createEffect, createSignal, on, onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
 
 /**
  * Querying the permission API
@@ -9,7 +10,7 @@ import { Accessor, createEffect, createSignal, on, onCleanup } from "solid-js";
 export const createPermission = (
   name: PermissionDescriptor | PermissionName | "microphone" | "camera",
 ): Accessor<PermissionState | "unknown"> => {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => "unknown";
   }
   const [permission, setPermission] = createSignal<PermissionState | "unknown">("unknown");

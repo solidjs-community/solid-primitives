@@ -1,4 +1,5 @@
 import { createSignal, onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
 
 type OnMessageCB = (e: MessageEvent<any>) => void;
 
@@ -33,7 +34,7 @@ const map: {
  * - `instance` - the underlying [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) instance
  */
 export function makeBroadcastChannel<T>(name: string) {
-  if (process.env.SSR)
+  if (isServer)
     return {
       onMessage: () => void 0,
       postMessage: () => void 0 as unknown as (props: T) => void,

@@ -1,5 +1,6 @@
 import { EventTypeName, IdleTimerOptions, IdleTimerReturn } from "./types";
 import { batch, createSignal, onMount, onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
 
 const THROTTLE_DELAY: number = 250;
 const FIFTEEN_MINUTES: number = 900_000; // 15 minutes
@@ -47,7 +48,7 @@ export const createIdleTimer = ({
   onPrompt,
   startManually = false,
 }: IdleTimerOptions = {}): IdleTimerReturn => {
-  if (process.env.SSR) {
+  if (isServer) {
     return {
       isIdle: () => false,
       isPrompted: () => false,

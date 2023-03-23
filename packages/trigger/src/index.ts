@@ -1,12 +1,13 @@
 import { createSignal, getListener, onCleanup, SignalOptions } from "solid-js";
+import { isServer, isDev } from "solid-js/web";
 import { noop } from "@solid-primitives/utils";
 
 export type Trigger = [track: VoidFunction, dirty: VoidFunction];
 
-const triggerOptions: SignalOptions<any> = process.env.DEV
+const triggerOptions: SignalOptions<any> = isDev
   ? { equals: false, name: "trigger" }
   : { equals: false };
-const triggerCacheOptions: SignalOptions<any> = process.env.DEV
+const triggerCacheOptions: SignalOptions<any> = isDev
   ? { equals: false, internal: true }
   : triggerOptions;
 
@@ -23,7 +24,7 @@ const triggerCacheOptions: SignalOptions<any> = process.env.DEV
  * dirty()
  */
 export function createTrigger(): Trigger {
-  if (process.env.SSR) {
+  if (isServer) {
     return [noop, noop];
   }
   return createSignal(undefined, triggerOptions);
@@ -47,7 +48,7 @@ export class TriggerCache<T> {
   }
 
   dirty(key: T) {
-    if (process.env.SSR) return;
+    if (isServer) return;
     this.#map.get(key)?.$$();
   }
 

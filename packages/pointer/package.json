@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/pointer",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "A collection of primitives, giving you a nicer API to handle pointer events in a reactive context.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -35,56 +35,11 @@
     "dist"
   ],
   "type": "module",
-  "main": "./dist/server.cjs",
-  "module": "./dist/server.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "browser": {
-    "./dist/server.js": "./dist/index.js",
-    "./dist/server.cjs": "./dist/index.cjs"
-  },
+  "browser": {},
   "exports": {
-    "worker": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/server.js"
-      },
-      "require": "./dist/server.cjs"
-    },
-    "browser": {
-      "development": {
-        "import": {
-          "types": "./dist/index.d.ts",
-          "default": "./dist/dev.js"
-        },
-        "require": "./dist/dev.cjs"
-      },
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "require": "./dist/index.cjs"
-    },
-    "deno": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/server.js"
-      },
-      "require": "./dist/server.cjs"
-    },
-    "node": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/server.js"
-      },
-      "require": "./dist/server.cjs"
-    },
-    "development": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/dev.js"
-      },
-      "require": "./dist/dev.cjs"
-    },
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
@@ -94,18 +49,18 @@
   "scripts": {
     "dev": "vite serve dev",
     "page": "vite build dev",
-    "build": "jiti ../../scripts/build.ts --ssr --dev",
+    "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "^2.2.8",
-    "@solid-primitives/immutable": "^0.1.8",
-    "@solid-primitives/rootless": "^1.2.6",
-    "@solid-primitives/utils": "^5.4.0"
+    "@solid-primitives/event-listener": "^2.2.9",
+    "@solid-primitives/immutable": "^0.1.9",
+    "@solid-primitives/rootless": "^1.3.1",
+    "@solid-primitives/utils": "^5.5.1"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.0"
+    "solid-js": "^1.6.12"
   },
   "typesVersions": {}
 }

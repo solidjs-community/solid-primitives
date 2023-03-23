@@ -1,4 +1,5 @@
 import { createSignal, createEffect, onCleanup, on } from "solid-js";
+import { isServer } from "solid-js/web";
 
 /**
  * Creates a simple tween method.
@@ -16,9 +17,10 @@ export default function createTween<T extends number>(
   target: () => T,
   { ease = (t: T) => t, duration = 100 },
 ): () => T {
-  if (process.env.SSR) {
+  if (isServer) {
     return target;
   }
+
   const [start, setStart] = createSignal(document.timeline.currentTime);
   const [current, setCurrent] = createSignal<T>(target());
   createEffect(on(target, () => setStart(document.timeline.currentTime), { defer: true }));

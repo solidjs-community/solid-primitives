@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/broadcast-channel",
-  "version": "0.0.102",
+  "version": "0.0.103",
   "description": "Primitives to manage Broadcast Channel API",
   "author": "Caleb Taylor <aquaductape@gmail.com>",
   "contributors": [],
@@ -33,42 +33,11 @@
     "dist"
   ],
   "type": "module",
-  "main": "./dist/server.cjs",
-  "module": "./dist/server.js",
-  "browser": {
-    "./dist/server.js": "./dist/index.js",
-    "./dist/server.cjs": "./dist/index.cjs"
-  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "browser": {},
   "types": "./dist/index.d.ts",
   "exports": {
-    "worker": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/server.js"
-      },
-      "require": "./dist/server.cjs"
-    },
-    "browser": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "require": "./dist/index.cjs"
-    },
-    "deno": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/server.js"
-      },
-      "require": "./dist/server.cjs"
-    },
-    "node": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/server.js"
-      },
-      "require": "./dist/server.cjs"
-    },
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
@@ -78,12 +47,12 @@
   "scripts": {
     "dev": "vite serve dev",
     "page": "vite build dev",
-    "build": "jiti ../../scripts/build.ts --ssr",
+    "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.0"
+    "solid-js": "^1.6.12"
   },
   "typesVersions": {}
 }

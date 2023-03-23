@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/transition-group",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Reactive primitives for implementing transition effects in SolidJS",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -35,46 +35,31 @@
     "dist"
   ],
   "type": "module",
-  "main": "./dist/server.cjs",
-  "module": "./dist/server.js",
-  "browser": {
-    "./dist/server.cjs": "./dist/index.cjs",
-    "./dist/server.js": "./dist/index.js"
-  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "browser": {},
   "types": "./dist/index.d.ts",
   "exports": {
-    "worker": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
-    "browser": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "deno": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
-    },
-    "node": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
-    },
-    "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
   "scripts": {
     "dev": "vite serve dev",
     "page": "vite build dev",
-    "build": "jiti ../../scripts/build.ts --ssr",
+    "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.0"
+    "solid-js": "^1.6.12"
   },
   "devDependencies": {
-    "@solid-primitives/refs": "workspace:^1.0.0",
-    "@solid-primitives/utils": "workspace:^5.4.0",
+    "@solid-primitives/refs": "workspace:^1.0.1",
+    "@solid-primitives/utils": "workspace:^5.5.1",
     "@solidjs/router": "^0.8.0"
-  }
+  },
+  "typesVersions": {}
 }

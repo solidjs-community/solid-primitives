@@ -1,11 +1,12 @@
 import { RequestContext } from "./fetch";
+import { isServer } from "solid-js/web";
 
 export type Request<FetcherArgs extends any[]> = <Result>(
   ...args: any[]
 ) => (requestContext: RequestContext<Result, FetcherArgs>) => void;
 
 let fetchFallback = globalThis.fetch as typeof fetch | undefined;
-if (process.env.SSR && !fetchFallback) {
+if (isServer && !fetchFallback) {
   try {
     const nodeFetch = require("node-fetch");
     fetchFallback = nodeFetch;

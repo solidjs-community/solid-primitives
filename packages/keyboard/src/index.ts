@@ -2,6 +2,7 @@ import { makeEventListener } from "@solid-primitives/event-listener";
 import { createSingletonRoot } from "@solid-primitives/rootless";
 import { arrayEquals } from "@solid-primitives/utils";
 import { Accessor, batch, createEffect, createMemo, createSignal, on, untrack } from "solid-js";
+import { isServer } from "solid-js/web";
 
 export type ModifierKey = "Alt" | "Control" | "Meta" | "Shift";
 export type KbdKey = ModifierKey | (string & {});
@@ -38,7 +39,7 @@ function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
 export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<
   [keys: Accessor<string[]>, other: { event: Accessor<KeyboardEvent | null> }]
 >(() => {
-  if (process.env.SSR) {
+  if (isServer) {
     return [() => [], { event: () => null }];
   }
 
@@ -95,7 +96,7 @@ export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<
  */
 export const useCurrentlyHeldKey = /*#__PURE__*/ createSingletonRoot<Accessor<string | null>>(
   () => {
-    if (process.env.SSR) {
+    if (isServer) {
       return () => null;
     }
 
@@ -134,7 +135,7 @@ export const useCurrentlyHeldKey = /*#__PURE__*/ createSingletonRoot<Accessor<st
  * ```
  */
 export const useKeyDownSequence = /*#__PURE__*/ createSingletonRoot<Accessor<string[][]>>(() => {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => [];
   }
   const [keys] = useKeyDownList();
@@ -170,7 +171,7 @@ export function createKeyHold(
   key: KbdKey,
   options: { preventDefault?: boolean } = {},
 ): Accessor<boolean> {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => false;
   }
 
@@ -215,7 +216,7 @@ export function createShortcut(
     requireReset?: boolean;
   } = {},
 ): void {
-  if (process.env.SSR || !keys.length) {
+  if (isServer || !keys.length) {
     return;
   }
 

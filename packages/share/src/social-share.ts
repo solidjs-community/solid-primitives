@@ -1,4 +1,5 @@
 import { Accessor, createSignal } from "solid-js";
+import { isServer } from "solid-js/web";
 import { Network } from "./networks";
 
 export type SharePopupOptions = {
@@ -42,13 +43,13 @@ export const createSocialShare = (
     title: "",
     description: "",
   }),
-  controller: Window = process.env.SSR ? (globalThis as any) : window,
+  controller: Window = isServer ? (globalThis as any) : window,
 ): [
   share: (network: Network | undefined) => void,
   close: () => void,
   isSharing: Accessor<boolean>,
 ] => {
-  if (process.env.SSR) {
+  if (isServer) {
     return [
       () => {
         /*noop*/

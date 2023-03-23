@@ -1,5 +1,13 @@
-import { createSignal, onCleanup, createEffect, untrack, Accessor, createComputed } from "solid-js";
-import { SignalOptions } from "solid-js/types/reactive/signal";
+import {
+  createSignal,
+  onCleanup,
+  createEffect,
+  untrack,
+  Accessor,
+  createComputed,
+  SignalOptions,
+} from "solid-js";
+import { isServer } from "solid-js/web";
 
 export type TimeoutSource = number | Accessor<number | false>;
 
@@ -17,7 +25,7 @@ export const makeTimer = (
   delay: number,
   timer: typeof setTimeout | typeof setInterval,
 ): VoidFunction => {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => void 0;
   }
   const intervalId = timer(fn, delay);
@@ -41,7 +49,7 @@ export const createTimer = (
   delay: TimeoutSource,
   timer: typeof setTimeout | typeof setInterval,
 ): void => {
-  if (process.env.SSR) {
+  if (isServer) {
     return void 0;
   }
   if (typeof delay === "number") {
@@ -111,7 +119,7 @@ export const createTimer = (
  * between executions of {@link handler} in ms, or false to disable looping.
  */
 export const createTimeoutLoop = (handler: VoidFunction, timeout: TimeoutSource): void => {
-  if (process.env.SSR) {
+  if (isServer) {
     return void 0;
   }
   if (typeof timeout === "number") {
@@ -167,7 +175,7 @@ export function createPolled<T>(
   value?: T,
   options?: SignalOptions<T>,
 ): Accessor<T> {
-  if (process.env.SSR) {
+  if (isServer) {
     return fn as Accessor<T>;
   }
   const [polled, setPolled] = createSignal(untrack(fn.bind(void 0, value)), options);
@@ -188,7 +196,7 @@ export const createIntervalCounter = (
   timeout: TimeoutSource,
   options?: SignalOptions<number>,
 ): Accessor<number> => {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => 0;
   }
   return createPolled(prev => prev + 1, timeout, -1, options);

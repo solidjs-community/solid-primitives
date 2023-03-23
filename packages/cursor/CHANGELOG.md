@@ -1,5 +1,15 @@
 # @solid-primitives/cursor
 
+## 0.0.108
+
+### Patch Changes
+
+- 3fad3789: Revert from publishing separate server, development, and production builds that has to rely on export conditions
+  to publishing a single build that can be used in any environment.
+  Envs will be checked at with `isDev`and `isServer` consts exported by `"solid-js/web"` so it's still tree-shakeable.
+- Updated dependencies [3fad3789]
+  - @solid-primitives/utils@5.5.1
+
 ## 0.0.107
 
 ### Patch Changes

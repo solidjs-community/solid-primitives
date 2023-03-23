@@ -1,4 +1,5 @@
 import { Accessor, createRoot, createSignal, onCleanup, Setter, untrack } from "solid-js";
+import { isDev } from "solid-js/web";
 import { abs, ceil, min, RangeProps, sign, toFunction, accessor } from "./common";
 
 /**
@@ -103,7 +104,7 @@ export function indexRange<T>(
     let _step = getStep();
     if (_step === 0) {
       // eslint-disable-next-line no-console
-      if (process.env.DEV) console.warn("Range cannot have a step of 0");
+      if (isDev) console.warn("Range cannot have a step of 0");
       return items;
     }
     const _start = getStart();

@@ -102,7 +102,7 @@ const useKeyDownList = createSharedRoot<
  * ```
  */
 export const useCurrentlyHeldKey = /*#__PURE__*/ createSharedRoot<Accessor<string | null>>(() => {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => null;
   }
 
@@ -140,7 +140,7 @@ export const useCurrentlyHeldKey = /*#__PURE__*/ createSharedRoot<Accessor<strin
  * ```
  */
 export const useKeyDownSequence = /*#__PURE__*/ createSharedRoot<Accessor<string[][]>>(() => {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => [];
   }
   const [keys] = useKeyDownList();
@@ -176,7 +176,7 @@ export function createKeyHold(
   key: KbdKey,
   options: { preventDefault?: boolean } = {},
 ): Accessor<boolean> {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => false;
   }
 
@@ -221,7 +221,7 @@ export function createShortcut(
     requireReset?: boolean;
   } = {},
 ): void {
-  if (process.env.SSR || !keys.length) {
+  if (isServer || !keys.length) {
     return;
   }
 

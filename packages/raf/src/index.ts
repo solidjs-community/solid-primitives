@@ -1,5 +1,6 @@
 import { MaybeAccessor, noop } from "@solid-primitives/utils";
 import { createSignal, createMemo, Accessor, onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
 
 /**
  * A primitive creating reactive `window.requestAnimationFrame`, that is automatically disposed onCleanup.
@@ -18,7 +19,7 @@ import { createSignal, createMemo, Accessor, onCleanup } from "solid-js";
 function createRAF(
   callback: FrameRequestCallback,
 ): [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction] {
-  if (process.env.SSR) {
+  if (isServer) {
     return [() => false, noop, noop];
   }
   const [running, setRunning] = createSignal(false);
@@ -61,7 +62,7 @@ function targetFPS(
   callback: FrameRequestCallback,
   fps: MaybeAccessor<number>,
 ): FrameRequestCallback {
-  if (process.env.SSR) {
+  if (isServer) {
     return callback;
   }
   const interval =

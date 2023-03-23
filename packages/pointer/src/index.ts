@@ -3,6 +3,7 @@ import { remove, split } from "@solid-primitives/immutable";
 import { createSubRoot } from "@solid-primitives/rootless";
 import { Directive, entries, Many, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createSignal, getOwner } from "solid-js";
+import { isServer, isDev } from "solid-js/web";
 import { DEFAULT_STATE, parseHandlersMap, toState, toStateActive } from "./helpers";
 import {
   Handler,
@@ -54,7 +55,7 @@ export function createPointerListeners(
     passive?: boolean;
   },
 ): void {
-  if (process.env.SSR) {
+  if (isServer) {
     return;
   }
 
@@ -127,7 +128,7 @@ export function createPerPointerListeners(
       >
   >,
 ) {
-  if (process.env.SSR) {
+  if (isServer) {
     return;
   }
 
@@ -177,7 +178,7 @@ export function createPerPointerListeners(
                 return (fn: Handler) => {
                   if (!init) {
                     // eslint-disable-next-line no-console
-                    if (process.env.DEV) console.warn(onlyInitMessage);
+                    if (isDev) console.warn(onlyInitMessage);
                     return;
                   }
                   if (type === "pointerleave") onLeave = fn;
@@ -214,7 +215,7 @@ export function createPerPointerListeners(
           // onMove()
           fn => {
             if (init) addListener("pointermove", fn, pointerId);
-            else if (process.env.DEV) {
+            else if (isDev) {
               // eslint-disable-next-line no-console
               console.warn(onlyInitMessage);
             }
@@ -222,7 +223,7 @@ export function createPerPointerListeners(
           // onUp()
           fn => {
             if (init) onUp = fn;
-            else if (process.env.DEV) {
+            else if (isDev) {
               // eslint-disable-next-line no-console
               console.warn(onlyInitMessage);
             }
@@ -256,7 +257,7 @@ export function createPointerPosition(
     value?: PointerStateWithActive;
   } = {},
 ): Accessor<PointerStateWithActive> {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => DEFAULT_STATE;
   }
 
@@ -308,7 +309,7 @@ export function createPointerList(
     pointerTypes?: PointerType[];
   } = {},
 ): Accessor<Accessor<PointerListItem>[]> {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => [];
   }
 

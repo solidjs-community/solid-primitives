@@ -2,6 +2,7 @@ import { makeEventListener } from "@solid-primitives/event-listener";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createHydratableSignal, trueFn } from "@solid-primitives/utils";
 import { Accessor } from "solid-js";
+import { isServer } from "solid-js/web";
 
 /**
  * Attaches event listeners and fires callback whenever `window.onLine` changes.
@@ -15,7 +16,7 @@ import { Accessor } from "solid-js";
  * clear()
  */
 export function makeConnectivityListener(callback: (isOnline: boolean) => void): VoidFunction {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => {};
   }
   const clear1 = makeEventListener(window, "online", callback.bind(void 0, true));
@@ -35,7 +36,7 @@ export function makeConnectivityListener(callback: (isOnline: boolean) => void):
  * isOnline() // T: boolean
  */
 export function createConnectivitySignal(): Accessor<boolean> {
-  if (process.env.SSR) {
+  if (isServer) {
     return trueFn;
   }
   const [status, setStatus] = createHydratableSignal<boolean>(true, () => navigator.onLine);

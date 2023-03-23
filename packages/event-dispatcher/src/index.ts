@@ -1,3 +1,5 @@
+import { isServer } from "solid-js/web";
+
 export type Handlers<T> = {
   [Property in keyof T as Property extends `on${infer EventName}`
     ? Uncapitalize<EventName>
@@ -29,7 +31,7 @@ export function createEventDispatcher<Props>(props: Props): <
     : // this will handle callbacks with no arguments (e.g. onMyEvent: () => void)
       [eventName: N, payload?: any, dispatcherOptions?: DispatcherOptions]
 ) => boolean {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => false;
   }
   return function <N extends keyof Handlers<Props> & string>(

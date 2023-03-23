@@ -1,4 +1,5 @@
 import { createSignal, getOwner, onCleanup, ResourceFetcherInfo } from "solid-js";
+import { isServer } from "solid-js/web";
 import { RequestContext } from "./fetch";
 
 export type RequestModifier = <Result extends unknown, FetcherArgs extends any[]>(
@@ -163,7 +164,7 @@ export type RefetchEventOptions<Result extends unknown, FetcherArgs extends any[
   filter?: (requestData: FetcherArgs, data: Result | undefined, ev: Event) => boolean;
 };
 
-export const withRefetchEvent: RequestModifier = process.env.SSR
+export const withRefetchEvent: RequestModifier = isServer
   ? () => requestContext => {
       requestContext.wrapResource();
     }

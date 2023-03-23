@@ -1,7 +1,16 @@
 import { makeIntersectionObserver } from "@solid-primitives/intersection-observer";
 import { access, type Directive, noop, type MaybeAccessor } from "@solid-primitives/utils";
-import { Accessor, batch, JSX, Setter } from "solid-js";
-import { createComputed, createMemo, createResource, createSignal } from "solid-js";
+import {
+  Accessor,
+  batch,
+  JSX,
+  Setter,
+  createComputed,
+  createMemo,
+  createResource,
+  createSignal,
+} from "solid-js";
+import { isServer } from "solid-js/web";
 
 export type PaginationOptions = {
   /** the overall number of pages */
@@ -117,7 +126,7 @@ export const createPagination = (
           previous[i] ||
           ((pageNo: number) =>
             Object.defineProperties(
-              process.env.SSR
+              isServer
                 ? { children: pageNo.toString() }
                 : {
                     children: pageNo.toString(),
@@ -137,7 +146,7 @@ export const createPagination = (
     [],
   );
   const first = Object.defineProperties(
-    process.env.SSR
+    isServer
       ? ({} as PaginationProps[number])
       : ({
           onClick: [setPage, 1] as const,
@@ -150,7 +159,7 @@ export const createPagination = (
     },
   );
   const back = Object.defineProperties(
-    process.env.SSR
+    isServer
       ? ({} as PaginationProps[number])
       : ({
           onClick: () => setPage(p => (p > 1 ? p - 1 : p)),
@@ -163,7 +172,7 @@ export const createPagination = (
     },
   );
   const next = Object.defineProperties(
-    process.env.SSR
+    isServer
       ? ({} as PaginationProps[number])
       : ({
           onClick: () => setPage(p => (p < opts().pages ? p + 1 : p)),
@@ -176,7 +185,7 @@ export const createPagination = (
     },
   );
   const last = Object.defineProperties(
-    process.env.SSR
+    isServer
       ? ({} as PaginationProps[number])
       : ({
           onClick: () => setPage(opts().pages),

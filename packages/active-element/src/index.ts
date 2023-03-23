@@ -1,5 +1,6 @@
 import { Accessor, JSX } from "solid-js";
-import { MaybeAccessor, Directive, createHydrateSignal } from "@solid-primitives/utils";
+import { isServer } from "solid-js/web";
+import { MaybeAccessor, Directive, createHydratableSignal } from "@solid-primitives/utils";
 import { makeEventListener, createEventListener } from "@solid-primitives/event-listener";
 
 declare module "solid-js" {
@@ -29,7 +30,7 @@ const getActiveElement = () =>
 export function makeActiveElementListener(
   callback: (element: Element | null) => void,
 ): VoidFunction {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => void 0;
   }
   const handleChange = () => callback(getActiveElement());
@@ -47,10 +48,10 @@ export function makeActiveElementListener(
  * activeEl() // T: Element | null
  */
 export function createActiveElement(): Accessor<Element | null> {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => null;
   }
-  const [active, setActive] = createHydrateSignal<Element | null>(null, getActiveElement);
+  const [active, setActive] = createHydratableSignal<Element | null>(null, getActiveElement);
   makeActiveElementListener(setActive);
   return active;
 }
@@ -73,7 +74,7 @@ export function makeFocusListener(
   callback: (isActive: boolean) => void,
   useCapture = true,
 ): VoidFunction {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => void 0;
   }
   const clear1 = makeEventListener(target, "blur", callback.bind(void 0, false), useCapture);
@@ -91,10 +92,10 @@ export function makeFocusListener(
  * isFocused() // T: boolean
  */
 export function createFocusSignal(target: MaybeAccessor<Element>): Accessor<boolean> {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => false;
   }
-  const [isActive, setIsActive] = createHydrateSignal(
+  const [isActive, setIsActive] = createHydratableSignal(
     false,
     () => document.activeElement === target,
   );
@@ -113,7 +114,7 @@ export function createFocusSignal(target: MaybeAccessor<Element>): Accessor<bool
  * <input use:focus={setActive} />
  */
 export const focus: Directive<(isActive: boolean) => void> = (target, props) => {
-  if (process.env.SSR) {
+  if (isServer) {
     return;
   }
   const callback = props();

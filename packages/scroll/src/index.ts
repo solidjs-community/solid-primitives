@@ -1,10 +1,11 @@
 import { createComputed, onMount, sharedConfig } from "solid-js";
+import { isServer } from "solid-js/web";
 import { createStaticStore, MaybeAccessor } from "@solid-primitives/utils";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 
 export function getScrollParent(node: Element | null): Element {
-  if (process.env.SSR) {
+  if (isServer) {
     return {} as Element;
   }
   while (node && !isScrollable(node)) {
@@ -15,7 +16,7 @@ export function getScrollParent(node: Element | null): Element {
 }
 
 export function isScrollable(node: Element): boolean {
-  if (process.env.SSR) {
+  if (isServer) {
     return false;
   }
   const style = window.getComputedStyle(node);
@@ -40,7 +41,7 @@ export function getScrollPosition(target: Element | Window | undefined): {
   x: number | null;
   y: number | null;
 } {
-  if (process.env.SSR) {
+  if (isServer) {
     return { ...SERVER_SCROLL_POSITION };
   }
   if (!target) return { ...NULL_SCROLL_POSITION };
@@ -87,7 +88,7 @@ export function createScrollPosition(
   readonly x: number | null;
   readonly y: number | null;
 } {
-  if (process.env.SSR) {
+  if (isServer) {
     return SERVER_SCROLL_POSITION;
   }
 

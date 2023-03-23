@@ -8,6 +8,7 @@ import {
   createMemo,
   useTransition,
 } from "solid-js";
+import { isServer } from "solid-js/web";
 
 const noop = () => {};
 const noopTransition = (el: any, done: () => void) => done();
@@ -77,7 +78,7 @@ export function createSwitchTransition<T>(
   const initSource = untrack(source);
   const initReturned = initSource ? [initSource] : [];
 
-  if (process.env.SSR) {
+  if (isServer) {
     return () => initReturned;
   }
 
@@ -216,7 +217,7 @@ export function createListTransition<T extends object>(
 ): Accessor<T[]> {
   const initSource = untrack(source);
 
-  if (process.env.SSR) {
+  if (isServer) {
     const copy = initSource.slice();
     return () => copy;
   }

@@ -17,6 +17,7 @@ import {
   Owner,
   SignalOptions,
 } from "solid-js";
+import { isServer } from "solid-js/web";
 import { debounce, throttle } from "@solid-primitives/scheduled";
 import { noop, EffectOptions } from "@solid-primitives/utils";
 
@@ -49,7 +50,7 @@ export function createPureReaction(
   onInvalidate: VoidFunction,
   options?: EffectOptions,
 ): (tracking: VoidFunction) => void {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => void 0;
   }
 
@@ -181,7 +182,7 @@ export function createDebouncedMemo<T>(
   options?: MemoOptions<T | undefined>,
 ): Accessor<T> {
   const memo = createMemo(() => fn(value), undefined, options);
-  if (process.env.SSR) {
+  if (isServer) {
     return memo;
   }
   const [signal, setSignal] = createSignal(untrack(memo));
@@ -224,7 +225,7 @@ export function createDebouncedMemoOn<S, Next extends Prev, Prev = Next>(
   value?: Prev,
   options?: MemoOptions<Next | undefined>,
 ): Accessor<Next> {
-  if (process.env.SSR) {
+  if (isServer) {
     return createMemo(on(deps, fn as any) as () => any, value);
   }
   let init = true;
@@ -277,7 +278,7 @@ export function createThrottledMemo<T>(
   value?: T,
   options?: MemoOptions<T | undefined>,
 ): Accessor<T> {
-  if (process.env.SSR) {
+  if (isServer) {
     return createMemo(fn);
   }
   let onInvalidate: VoidFunction = noop;
@@ -309,7 +310,7 @@ export function createAsyncMemo<T>(
   calc: AsyncMemoCalculation<T>,
   options: MemoOptionsWithValue<T | undefined> = {},
 ): Accessor<T | undefined> {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => options.value;
   }
   const [state, setState] = createSignal(options.value, options);
@@ -367,7 +368,7 @@ export function createLazyMemo<T>(
   value?: T,
   options?: EffectOptions,
 ): Accessor<T> {
-  if (process.env.SSR) {
+  if (isServer) {
     let calculated = false;
     return () => {
       if (!calculated) {

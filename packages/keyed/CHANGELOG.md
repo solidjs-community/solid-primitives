@@ -1,5 +1,19 @@
 # @solid-primitives/keyed
 
+## 1.1.10
+
+### Patch Changes
+
+- 3fad3789: Revert from publishing separate server, development, and production builds that has to rely on export conditions
+  to publishing a single build that can be used in any environment.
+  Envs will be checked at with `isDev`and `isServer` consts exported by `"solid-js/web"` so it's still tree-shakeable.
+
+## 1.1.9
+
+### Patch Changes
+
+- 06ab3e0c: Prepare component types for changes to JSX types in solid-js@1.7.0
+
 ## 1.1.8
 
 ### Patch Changes

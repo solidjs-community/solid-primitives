@@ -8,6 +8,7 @@ import {
   onMount,
   sharedConfig,
 } from "solid-js";
+import { isServer } from "solid-js/web";
 import {
   asArray,
   Many,
@@ -40,7 +41,7 @@ export function makeResizeObserver<T extends Element>(
   observe: (ref: T) => void;
   unobserve: (ref: T) => void;
 } {
-  if (process.env.SSR) {
+  if (isServer) {
     return {
       observe: () => {},
       unobserve: () => {},
@@ -74,7 +75,7 @@ export function createResizeObserver(
   onResize: ResizeHandler,
   options?: ResizeObserverOptions,
 ): void {
-  if (process.env.SSR) return;
+  if (isServer) return;
 
   const previousMap = new WeakMap<Element, { width: number; height: number }>();
   const { observe, unobserve } = makeResizeObserver(handleObserverCallback, options);
@@ -122,7 +123,7 @@ export function getWindowSize(): {
   width: number;
   height: number;
 } {
-  if (process.env.SSR) return { ...WINDOW_SIZE_FALLBACK };
+  if (isServer) return { ...WINDOW_SIZE_FALLBACK };
   return {
     width: window.innerWidth,
     height: window.innerHeight,
@@ -141,7 +142,7 @@ export function createWindowSize(): {
   readonly width: number;
   readonly height: number;
 } {
-  if (process.env.SSR) {
+  if (isServer) {
     return WINDOW_SIZE_FALLBACK;
   }
   const [size, setSize] = createHydratableStaticStore(WINDOW_SIZE_FALLBACK, getWindowSize);
@@ -172,7 +173,7 @@ const ELEMENT_SIZE_FALLBACK = { width: null, height: null } as const;
 export function getElementSize(
   target: Element | false | undefined | null,
 ): { width: number; height: number } | { width: null; height: null } {
-  if (process.env.SSR || !target) {
+  if (isServer || !target) {
     return { ...ELEMENT_SIZE_FALLBACK };
   }
   const { width, height } = target.getBoundingClientRect();
@@ -202,7 +203,7 @@ export function createElementSize(target: Accessor<Element | false | undefined |
   readonly width: number | null;
   readonly height: number | null;
 } {
-  if (process.env.SSR) {
+  if (isServer) {
     return ELEMENT_SIZE_FALLBACK;
   }
 

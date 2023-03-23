@@ -1,4 +1,5 @@
 import { Accessor, Setter, createSignal, JSX } from "solid-js";
+import { isServer } from "solid-js/web";
 
 /**
  * A template example of how to create a new primitive.
@@ -9,8 +10,7 @@ import { Accessor, Setter, createSignal, JSX } from "solid-js";
 export const createPrimitiveTemplate = (
   param: boolean,
 ): [get: Accessor<boolean>, set: Setter<boolean>] => {
-  // `process.env.SSR` will be replaced at build time and tree-shaken
-  if (process.env.SSR) {
+  if (isServer) {
     return [() => param, () => undefined];
   }
 

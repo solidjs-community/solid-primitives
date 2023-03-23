@@ -1,3 +1,4 @@
+import { isServer } from "solid-js/web";
 import { keys } from "@solid-primitives/utils";
 import { Component } from "solid-js";
 import { makeEventListener } from "./eventListener";
@@ -32,7 +33,7 @@ const attachPropListeners = (
  * <WindowEventListener onMouseMove={e => console.log(e.x, e.y)} />
  */
 export const WindowEventListener: Component<WindowEventProps> = props => {
-  if (process.env.SSR) return null;
+  if (isServer) return null;
   attachPropListeners(window, props);
 };
 
@@ -45,6 +46,6 @@ export const WindowEventListener: Component<WindowEventProps> = props => {
  * <DocumentEventListener onMouseMove={e => console.log(e.x, e.y)} />
  */
 export const DocumentEventListener: Component<DocumentEventProps> = props => {
-  if (process.env.SSR) return null;
+  if (isServer) return null;
   attachPropListeners(document, props);
 };

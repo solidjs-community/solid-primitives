@@ -1,4 +1,5 @@
 import { Accessor, createComputed, on, onCleanup, onMount } from "solid-js";
+import { isServer } from "solid-js/web";
 import { access, createStaticStore } from "@solid-primitives/utils";
 import { createResizeObserver, ResizeHandler } from "@solid-primitives/resize-observer";
 import { makeEventListener } from "@solid-primitives/event-listener";
@@ -39,7 +40,7 @@ const NULLED_BOUNDS = {
 export function getElementBounds(element: Element): Bounds;
 export function getElementBounds(element: Element | undefined | null | false): NullableBounds;
 export function getElementBounds(element: Element | undefined | null | false): NullableBounds {
-  if (process.env.SSR || !element) {
+  if (isServer || !element) {
     return Object.assign({}, NULLED_BOUNDS);
   }
   const rect = element.getBoundingClientRect();
@@ -91,7 +92,7 @@ export function createElementBounds(
   target: Accessor<Element | undefined | null | false> | Element,
   { trackMutation = true, trackResize = true, trackScroll = true }: Options = {},
 ): Readonly<NullableBounds> {
-  if (process.env.SSR) {
+  if (isServer) {
     return Object.assign({}, NULLED_BOUNDS);
   }
 

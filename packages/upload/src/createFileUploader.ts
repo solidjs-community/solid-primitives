@@ -1,5 +1,6 @@
-import { noop } from "@solid-primitives/utils";
 import { createSignal, JSX } from "solid-js";
+import { isServer } from "solid-js/web";
+import { noop } from "@solid-primitives/utils";
 import { transformFiles, createInputComponent } from "./helpers";
 import { FileUploader, FileUploaderOptions, UploadFile, UserCallback } from "./types";
 
@@ -23,7 +24,7 @@ import { FileUploader, FileUploaderOptions, UploadFile, UserCallback } from "./t
  * ```
  */
 function createFileUploader(options?: FileUploaderOptions): FileUploader {
-  if (process.env.SSR) {
+  if (isServer) {
     return {
       files: () => [],
       selectFiles: noop,
