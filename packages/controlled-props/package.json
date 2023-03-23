@@ -41,7 +41,7 @@
     "start": "vite serve dev --host",
     "dev": "vite serve dev",
     "page": "vite build dev",
-    "build": "jiti ../../scripts/build.ts --jsx",
+    "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
@@ -56,6 +56,6 @@
     "@solid-primitives/utils": "workspace:^5.4.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.0"
+    "solid-js": "^1.6.12"
   }
 }

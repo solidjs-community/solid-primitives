@@ -1,6 +1,7 @@
 ///<reference path="../node_modules/@types/wicg-file-system-access/index.d.ts" />
 import { makeNoAsyncFileSystem } from "./adapter-mocks";
 import type { AsyncFileSystemAdapter } from "./types";
+import { isServer } from "solid-js/web";
 
 /**
  * Adapter that provides access to the actual filesystem in the browser using a directory picker
@@ -8,7 +9,7 @@ import type { AsyncFileSystemAdapter } from "./types";
  *
  * relies on https://wicg.github.io/file-system-access/ - basic api (https://caniuse.com/native-filesystem-api)
  */
-export const makeWebAccessFileSystem = process.env.SSR
+export const makeWebAccessFileSystem = isServer
   ? () => Promise.resolve(makeNoAsyncFileSystem())
   : typeof globalThis.showDirectoryPicker === "function"
   ? async (options?: DirectoryPickerOptions | undefined): Promise<AsyncFileSystemAdapter> => {

@@ -8,6 +8,7 @@ import {
   ResourceOptions,
   ResourceReturn,
 } from "solid-js";
+import { isServer } from "solid-js/web";
 import { RequestModifier } from "./modifiers";
 import { fetchRequest, Request } from "./request";
 

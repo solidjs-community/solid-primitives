@@ -1,8 +1,9 @@
 import { makeNoAsyncFileSystem } from "./adapter-mocks";
 import { limitPath } from "./tools";
 import type { AsyncFileSystemAdapter } from "./types";
+import { isServer } from "solid-js/web";
 
-export const makeNodeFileSystem = process.env.SSR
+export const makeNodeFileSystem = isServer
   ? async (basePath: string = "/"): Promise<AsyncFileSystemAdapter> => {
       const fs = await import("fs/promises");
       const p = limitPath(basePath);

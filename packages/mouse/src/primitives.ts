@@ -14,6 +14,7 @@ import {
   UseTouchOptions,
 } from "./types";
 import { Accessor, createComputed, createEffect, onMount, sharedConfig } from "solid-js";
+import { isServer } from "solid-js/web";
 
 export interface MousePositionOptions extends UseTouchOptions, FollowTouchOptions {
   /**
@@ -56,7 +57,7 @@ export function createMousePosition(
     ...options.initialValue,
   };
 
-  if (process.env.SSR) {
+  if (isServer) {
     return fallback;
   }
 
@@ -120,7 +121,7 @@ export function createPositionToElement(
     ...options.initialValue,
   };
 
-  if (process.env.SSR) {
+  if (isServer) {
     return fallback;
   }
 

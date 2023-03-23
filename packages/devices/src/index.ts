@@ -1,4 +1,5 @@
 import { createMemo, createSignal, getOwner, onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
 import { createStore } from "solid-js/store";
 
 /**
@@ -11,7 +12,7 @@ import { createStore } from "solid-js/store";
  * If the array does not contain a device of a certain kind, you cannot get permissions, as requesting permissions requires requesting a stream on any device of the kind.
  */
 export const createDevices = () => {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => [];
   }
   const [devices, setDevices] = createSignal<MediaDeviceInfo[]>([]);
@@ -37,7 +38,7 @@ const equalDeviceLists = (prev: MediaDeviceInfo[], next: MediaDeviceInfo[]) =>
  * Without a device, you cannot get permissions, as requesting permissions requires requesting a stream on any device of the kind.
  */
 export const createMicrophones = () => {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => [];
   }
   const devices = createDevices();
@@ -57,7 +58,7 @@ export const createMicrophones = () => {
  * Microphone permissions automatically include speaker permissions. You can use the device id of the speaker to use the setSinkId-API of any audio tag.
  */
 export const createSpeakers = () => {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => [];
   }
   const devices = createDevices();
@@ -77,7 +78,7 @@ export const createSpeakers = () => {
  * Without a device, you cannot get permissions, as requesting permissions requires requesting a stream on any device of the kind.
  */
 export const createCameras = () => {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => [];
   }
   const devices = createDevices();
@@ -94,7 +95,7 @@ export const createCameras = () => {
  * @returnValue Acceleration: Accessor<DeviceMotionEventAcceleration | undefined>
  */
 export const createAccelerometer = (includeGravity: boolean = false, interval: number = 100) => {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => ({
       x: 0,
       y: 0,
@@ -126,7 +127,7 @@ export const createAccelerometer = (includeGravity: boolean = false, interval: n
  * @returnValue { alpha: 0, beta: 0, gamma: 0 }
  */
 export const createGyroscope = (interval: number = 100) => {
-  if (process.env.SSR) {
+  if (isServer) {
     return { alpha: 0, beta: 0, gamma: 0 };
   }
   const [orientation, setOrientation] = createStore({ alpha: 0, beta: 0, gamma: 0 });

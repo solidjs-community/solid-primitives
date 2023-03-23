@@ -1,5 +1,6 @@
-import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { Accessor, onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
+import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createHydratableSignal } from "@solid-primitives/utils";
 
 let serverRemSize = 16;
@@ -17,7 +18,7 @@ const totallyHiddenStyles: Partial<CSSStyleDeclaration> = {
  * Reads the current rem size from the document root.
  */
 export const getRemSize = (): number =>
-  process.env.SSR ? serverRemSize : parseFloat(getComputedStyle(document.documentElement).fontSize);
+  isServer ? serverRemSize : parseFloat(getComputedStyle(document.documentElement).fontSize);
 
 /**
  * Creates a reactive signal with value of the current rem size, and tracks it's changes.
@@ -28,7 +29,7 @@ export const getRemSize = (): number =>
  * console.log(remSize()); // 16
  */
 export function createRemSize(): Accessor<number> {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => serverRemSize;
   }
 
@@ -70,7 +71,7 @@ export const useRemSize: () => Accessor<number> =
 /**
  * Set the server fallback value for the rem size. {@link getRemSize}, {@link createRemSize} and {@link useRemSize} will return this value on the server.
  */
-export const setServerRemSize = process.env.SSR
+export const setServerRemSize = isServer
   ? (size: number) => {
       serverRemSize = size;
     }

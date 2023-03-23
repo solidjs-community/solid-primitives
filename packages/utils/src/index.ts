@@ -3,7 +3,6 @@ import {
   onCleanup,
   createSignal,
   Accessor,
-  DEV,
   untrack,
   batch,
   AccessorArray,
@@ -14,7 +13,7 @@ import {
   sharedConfig,
   onMount,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer, isDev } from "solid-js/web";
 import type {
   AnyClass,
   MaybeAccessor,
@@ -37,13 +36,8 @@ export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
-export { isServer };
+export { isServer, isDev };
 export const isClient = !isServer;
-
-/** development environment */
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-export const isDev = DEV && isClient;
-/** production environment */
 export const isProd = !isDev;
 
 /**

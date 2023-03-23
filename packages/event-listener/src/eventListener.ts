@@ -7,6 +7,7 @@ import {
   tryOnCleanup,
 } from "@solid-primitives/utils";
 import { Accessor, createEffect, createRenderEffect, createSignal } from "solid-js";
+import { isServer } from "solid-js/web";
 import {
   EventListenerDirectiveProps,
   EventMapOf,
@@ -107,7 +108,7 @@ export function createEventListener(
   handler: (event: Event) => void,
   options?: EventListenerOptions,
 ): void {
-  if (process.env.SSR) return;
+  if (isServer) return;
 
   const attachListeners = () => {
     asArray(access(targets)).forEach(el => {
@@ -174,7 +175,7 @@ export function createEventSignal(
   type: MaybeAccessor<Many<string>>,
   options?: EventListenerOptions,
 ): Accessor<Event | undefined> {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => undefined;
   }
   const [lastEvent, setLastEvent] = createSignal<Event>();

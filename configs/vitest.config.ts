@@ -20,12 +20,6 @@ export default defineConfig(({ mode }) => {
     test: {
       watch: false,
       isolate: !testSSR,
-      env: {
-        NODE_ENV: testSSR ? "production" : "development",
-        DEV: testSSR ? "" : "1",
-        SSR: testSSR ? "1" : "",
-        PROD: testSSR ? "1" : "",
-      },
       passWithNoTests: true,
       environment: testSSR ? "node" : "jsdom",
       transformMode: {

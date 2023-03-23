@@ -1,4 +1,5 @@
 import { JSX, onCleanup, onMount } from "solid-js";
+import { isServer } from "solid-js/web";
 import { transformFiles } from "./helpers";
 import { FileUploaderDirective } from "./types";
 
@@ -11,7 +12,7 @@ declare module "solid-js" {
 }
 
 export const fileUploader = (element: HTMLInputElement, options: () => FileUploaderDirective) => {
-  if (process.env.SSR) {
+  if (isServer) {
     return;
   }
   const { userCallback, setFiles } = options();

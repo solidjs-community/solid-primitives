@@ -53,7 +53,7 @@
     "@solid-primitives/utils": "^5.4.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.0"
+    "solid-js": "^1.6.12"
   },
   "typesVersions": {}
 }

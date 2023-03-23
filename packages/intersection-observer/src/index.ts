@@ -1,5 +1,6 @@
 import { onMount, onCleanup, createSignal, createEffect, untrack, Setter } from "solid-js";
 import type { JSX, Accessor } from "solid-js";
+import { isServer, isDev } from "solid-js/web";
 import { access, FalsyValue, MaybeAccessor } from "@solid-primitives/utils";
 
 export type AddIntersectionObserverEntry = (el: Element) => void;
@@ -66,7 +67,7 @@ export function makeIntersectionObserver(
   stop: VoidFunction;
   instance: IntersectionObserver;
 } {
-  if (process.env.SSR)
+  if (isServer)
     return {
       add: () => void 0,
       remove: () => void 0,
@@ -79,7 +80,7 @@ export function makeIntersectionObserver(
   const instance = new IntersectionObserver(onChange, options);
   const add: AddIntersectionObserverEntry = el => {
     // Elements with 'display: "contents"' don't work with IO, even if they are visible by users (https://github.com/solidjs-community/solid-primitives/issues/116)
-    if (process.env.DEV && el instanceof HTMLElement && el.style.display === "contents") {
+    if (isDev && el instanceof HTMLElement && el.style.display === "contents") {
       // eslint-disable-next-line no-console
       console.warn(
         `[@solid-primitives/intersection-observer/makeIntersectionObserver] IntersectionObserver is not able to observe elements with 'display: "contents"' style:`,
@@ -120,7 +121,7 @@ export function createIntersectionObserver(
   onChange: IntersectionObserverCallback,
   options?: IntersectionObserverInit,
 ): void {
-  if (process.env.SSR) return;
+  if (isServer) return;
   const { add, reset } = makeIntersectionObserver([], onChange, options);
   createEffect(() => {
     reset();
@@ -164,7 +165,7 @@ export function createViewportObserver(
 ): CreateViewportObserverReturnValue;
 
 export function createViewportObserver(...a: any) {
-  if (process.env.SSR) {
+  if (isServer) {
     return [() => void 0, { start: () => void 0, stop: () => void 0 }];
   }
 
@@ -234,7 +235,7 @@ export function createVisibilityObserver(
   },
   setter?: MaybeAccessor<VisibilitySetter>,
 ): (element: Accessor<Element | FalsyValue> | Element) => Accessor<boolean> {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => () => false;
   }
 
@@ -299,7 +300,7 @@ export function getOccurrence(
   isIntersecting: boolean,
   prevIsIntersecting: boolean | undefined,
 ): Occurrence {
-  if (process.env.SSR) {
+  if (isServer) {
     return Occurrence.Outside;
   }
   return isIntersecting
@@ -329,7 +330,7 @@ export function getOccurrence(
 export function withOccurrence<Ctx extends {}>(
   setter: MaybeAccessor<VisibilitySetter<Ctx & { occurrence: Occurrence }>>,
 ): () => VisibilitySetter<Ctx> {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => () => false;
   }
   return () => {
@@ -366,7 +367,7 @@ export function getDirection(
   prevRect: DOMRectReadOnly | undefined,
   intersecting: boolean,
 ): { directionX: DirectionX; directionY: DirectionY } {
-  if (process.env.SSR) {
+  if (isServer) {
     return {
       directionX: DirectionX.None,
       directionY: DirectionY.None,
@@ -405,7 +406,7 @@ export function withDirection<Ctx extends {}>(
     VisibilitySetter<Ctx & { directionX: DirectionX; directionY: DirectionY }>
   >,
 ): () => VisibilitySetter<Ctx> {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => () => false;
   }
   return () => {

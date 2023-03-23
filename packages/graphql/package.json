@@ -64,7 +64,7 @@
     "graphql": "^16.6.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.0"
+    "solid-js": "^1.6.12"
   },
   "typesVersions": {}
 }

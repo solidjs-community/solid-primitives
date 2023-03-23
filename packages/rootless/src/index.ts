@@ -1,4 +1,5 @@
 import { createRoot, getOwner, onCleanup, runWithOwner, Owner, sharedConfig } from "solid-js";
+import { isServer } from "solid-js/web";
 import { AnyFunction, asArray, access } from "@solid-primitives/utils";
 
 /**
@@ -138,5 +139,5 @@ export const createSharedRoot = createSingletonRoot;
 export function createHydratableSingletonRoot<T>(factory: (dispose: VoidFunction) => T): () => T {
   const owner = getOwner();
   const singleton = createSingletonRoot(factory, owner);
-  return () => (process.env.SSR || sharedConfig.context ? createRoot(factory, owner) : singleton());
+  return () => (isServer || sharedConfig.context ? createRoot(factory, owner) : singleton());
 }

@@ -1,4 +1,5 @@
 import { Accessor } from "solid-js";
+import { isServer } from "solid-js/web";
 import { makeEventListener } from "@solid-primitives/event-listener";
 import {
   createHydratableStaticStore,
@@ -24,7 +25,7 @@ export function makeMediaQueryListener(
   query: string | MediaQueryList,
   callback: (e: MediaQueryListEvent) => void,
 ): VoidFunction {
-  if (process.env.SSR) {
+  if (isServer) {
     return noop;
   }
   const mql = typeof query === "string" ? window.matchMedia(query) : query;
@@ -45,7 +46,7 @@ export function makeMediaQueryListener(
  * ```
  */
 export function createMediaQuery(query: string, serverFallback = false) {
-  if (process.env.SSR) {
+  if (isServer) {
     return () => serverFallback;
   }
   const mql = window.matchMedia(query);
@@ -133,7 +134,7 @@ export function createBreakpoints<T extends Breakpoints>(
   const fallback = options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints);
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (process.env.SSR || !window.matchMedia) return fallback;
+  if (isServer || !window.matchMedia) return fallback;
 
   const { mediaFeature = "min-width", watchChange = true } = options;
 

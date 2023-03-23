@@ -11,6 +11,7 @@ import {
   untrack,
   Setter,
 } from "solid-js";
+import { isServer } from "solid-js/web";
 import { access, noop, type FalsyValue, type MaybeAccessor } from "@solid-primitives/utils";
 
 export type ResourceActions<T, O = {}> = ResourceReturn<T, O>[1];
@@ -68,7 +69,7 @@ export type StreamReturn = [
  * The stream will be stopped on cleanup automatically.
  */
 export const createStream = (streamSource: StreamSourceDescription): StreamReturn => {
-  if (process.env.SSR) {
+  if (isServer) {
     return [
       Object.assign(() => undefined, { loading: true, error: undefined }) as Resource<
         MediaStream | undefined
@@ -165,7 +166,7 @@ export const createAmplitudeStream = (
 export const createAmplitudeFromStream = (
   stream: MaybeAccessor<MediaStream | undefined>,
 ): [amplitude: Accessor<number>, stop: () => void] => {
-  if (process.env.SSR) {
+  if (isServer) {
     return [() => 0, noop];
   }
   const [amplitude, setAmplitude] = createSignal(0);
@@ -242,7 +243,7 @@ declare global {
 export const createScreen = (
   screenSource: MaybeAccessor<DisplayMediaStreamConstraints | undefined>,
 ): StreamReturn => {
-  if (process.env.SSR) {
+  if (isServer) {
     return [
       Object.assign(() => undefined, { loading: true, error: undefined }) as Resource<
         MediaStream | undefined
@@ -290,7 +291,7 @@ export const createScreen = (
 export const createMediaPermissionRequest = (
   source?: MediaStreamConstraints | "audio" | "video",
 ) => {
-  if (process.env.SSR) {
+  if (isServer) {
     return Promise.resolve();
   }
   return navigator.mediaDevices

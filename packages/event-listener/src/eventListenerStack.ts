@@ -2,6 +2,7 @@ import { createCallbackStack } from "@solid-primitives/utils";
 import { onCleanup } from "solid-js";
 import { makeEventListener } from "./eventListener";
 import { EventMapOf, TargetWithEventMap, EventListenerOptions } from "./types";
+import { isServer } from "solid-js/web";
 
 export type EventListenerStackOn<EventMap extends Record<string, any>> = {
   <T extends keyof EventMap>(
@@ -43,7 +44,7 @@ export function makeEventListenerStack(
   target: EventTarget,
   options?: EventListenerOptions,
 ): [listen: EventListenerStackOn<Record<string, Event>>, clear: VoidFunction] {
-  if (process.env.SSR) {
+  if (isServer) {
     return [() => () => void 0, () => void 0];
   }
   const { push, execute } = createCallbackStack();

@@ -1,6 +1,8 @@
-const w = process.env.SSR ? { document: {}, navigator: { userAgent: "" } } : (window as any);
+import { isServer } from "solid-js/web";
+
+const w = isServer ? { document: {}, navigator: { userAgent: "" } } : (window as any);
 const n = w.navigator;
-const ua = process.env.SSR ? "" : n.userAgent;
+const ua = isServer ? "" : n.userAgent;
 
 //
 // Devices

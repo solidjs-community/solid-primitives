@@ -12,6 +12,7 @@ import {
   mapArray,
   AccessorArray,
 } from "solid-js";
+import { isServer } from "solid-js/web";
 
 const FALLBACK = Symbol("fallback");
 
@@ -35,7 +36,7 @@ export function keyArray<T, U, K>(
   options: { fallback?: Accessor<U> } = {},
 ): Accessor<U[]> {
   // SERVER NOOP
-  if (process.env.SSR) {
+  if (isServer) {
     const itemsRef = items();
     let s: U[] = [];
     if (itemsRef && itemsRef.length) {

@@ -7,6 +7,7 @@ import {
   PositionRelativeToElement,
   UseTouchOptions,
 } from "./types";
+import { isServer } from "solid-js/web";
 
 const PASSIVE = { passive: true };
 
@@ -44,7 +45,7 @@ export function makeMousePositionListener(
   callback: (position: MousePosition) => void,
   options: UseTouchOptions & FollowTouchOptions = {},
 ): VoidFunction {
-  if (process.env.SSR) {
+  if (isServer) {
     return noop;
   }
   const { touch = true, followTouch = true } = options;
@@ -81,7 +82,7 @@ export function makeMouseInsideListener(
   callback: (isInside: boolean) => void,
   options: UseTouchOptions = {},
 ): VoidFunction {
-  if (process.env.SSR) {
+  if (isServer) {
     return noop;
   }
   const { touch = true } = options;
@@ -115,7 +116,7 @@ export const getPositionToElement = (
   pageY: number,
   el: Element,
 ): PositionRelativeToElement => {
-  if (process.env.SSR) {
+  if (isServer) {
     return DEFAULT_RELATIVE_ELEMENT_POSITION;
   }
 
@@ -145,7 +146,7 @@ export const getPositionInElement = (
   pageY: number,
   el: Element,
 ): PositionRelativeToElement => {
-  if (process.env.SSR) {
+  if (isServer) {
     return DEFAULT_RELATIVE_ELEMENT_POSITION;
   }
   const relative = getPositionToElement(pageX, pageY, el);
@@ -159,7 +160,7 @@ export const getPositionInElement = (
 /**
  * Turn position relative to the page, into position relative to the screen.
  */
-export const getPositionToScreen = process.env.SSR
+export const getPositionToScreen = isServer
   ? (): Position => DEFAULT_MOUSE_POSITION
   : (pageX: number, pageY: number): Position => ({
       x: pageX - window.scrollX,

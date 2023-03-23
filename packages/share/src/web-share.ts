@@ -1,5 +1,5 @@
-import { Accessor, createEffect, createSignal, on } from "solid-js";
-import type { OnOptions } from "solid-js/types/reactive/signal";
+import { Accessor, createEffect, createSignal, on, OnOptions } from "solid-js";
+import { isServer } from "solid-js/web";
 
 /**
  * Generates a simple non-reactive WebShare primitive for sharing.
@@ -69,7 +69,7 @@ export const createWebShare = (
   data: Accessor<ShareData>,
   deferInitial: boolean = false,
 ): ShareStatus => {
-  if (process.env.SSR) {
+  if (isServer) {
     return {};
   }
   const [status, setStatus] = createSignal<ShareStatus>({});

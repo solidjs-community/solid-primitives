@@ -1,5 +1,5 @@
 import { Accessor, createRenderEffect, onCleanup, splitProps, type ComponentProps } from "solid-js";
-import { spread } from "solid-js/web";
+import { spread, isServer } from "solid-js/web";
 
 export type ScriptProps = Omit<ComponentProps<"script">, "src" | "textContent"> & {
   /** URL or source of the script to load. */
@@ -26,7 +26,7 @@ const OMITTED_PROPS = ["src"] as const;
  * })
  */
 export function createScriptLoader(props: ScriptProps): HTMLScriptElement | undefined {
-  if (process.env.SSR) {
+  if (isServer) {
     return undefined;
   }
   const script = document.createElement("script");

@@ -1,4 +1,5 @@
 import { Accessor } from "solid-js";
+import { isServer } from "solid-js/web";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createHydratableSignal, trueFn } from "@solid-primitives/utils";
 import { makeEventListener } from "@solid-primitives/event-listener";
@@ -16,7 +17,7 @@ import { makeEventListener } from "@solid-primitives/event-listener";
  * ```
  */
 export const createPageVisibility = (): Accessor<boolean> => {
-  if (process.env.SSR) {
+  if (isServer) {
     return trueFn;
   }
   const checkVisibility = () => document.visibilityState === "visible";

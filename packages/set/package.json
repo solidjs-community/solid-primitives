@@ -50,7 +50,7 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.0"
+    "solid-js": "^1.6.12"
   },
   "dependencies": {
     "@solid-primitives/trigger": "workspace:^1.0.2"

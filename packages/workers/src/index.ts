@@ -1,4 +1,5 @@
 import { Accessor, Setter, createEffect, on, onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
 
 import { cjs, setup, KILL, RPC } from "./utils";
 
@@ -10,7 +11,7 @@ import { cjs, setup, KILL, RPC } from "./utils";
  * @returns An array with worker, start and stop methods
  */
 export function createWorker(...args: (Function | object)[]): WorkerExports {
-  if (process.env.SSR) {
+  if (isServer) {
     return [new EventTarget() as unknown as Worker, () => {}, () => {}, new Set()];
   }
   const exports = new Set<string>();
@@ -72,7 +73,7 @@ export const createWorkerPool = (
   concurrency: number = 1,
   ...args: (Function | object)[]
 ): WorkerExports => {
-  if (process.env.SSR) {
+  if (isServer) {
     return [new EventTarget() as unknown as Worker, () => {}, () => {}];
   }
   let current = -1;
@@ -119,7 +120,7 @@ export type WorkerInstruction = {
 export const createSignaledWorker = (
   ...args: WorkerInstruction[]
 ): [start: () => void, stop: () => void] => {
-  if (process.env.SSR) {
+  if (isServer) {
     return [
       () => {
         /*noop*/

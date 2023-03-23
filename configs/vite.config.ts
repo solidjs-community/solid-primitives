@@ -25,19 +25,6 @@ export const viteConfig = defineConfig({
         ball: "w-8 h-8 fixed -top-4 -left-4 opacity-50 rounded-full pointer-events-none",
       },
     }),
-    {
-      name: "process.env variables",
-      transform(code, id) {
-        if (id.includes("node_modules")) {
-          return code;
-        }
-        return code
-          .replace(/process\.env\.SSR/g, '""')
-          .replace(/process\.env\.DEV/g, '"1"')
-          .replace(/process\.env\.PROD/g, '""')
-          .replace(/process\.env\.NODE_ENV/g, '"development"');
-      },
-    },
   ],
   optimizeDeps: {
     exclude: ["@solid-primitives/utils"],
@@ -47,12 +34,4 @@ export const viteConfig = defineConfig({
   },
   // required to serve from a sub-path (github pages):
   base: "./",
-  define: {
-    "process.env": {
-      NODE_ENV: "development",
-      DEV: "1",
-      SSR: "",
-      PROD: "",
-    },
-  },
 });

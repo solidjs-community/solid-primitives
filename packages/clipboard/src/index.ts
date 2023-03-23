@@ -7,6 +7,7 @@ import {
   on,
   onCleanup,
 } from "solid-js";
+import { isServer } from "solid-js/web";
 
 export type ClipboardSetter = (data: string | ClipboardItem[]) => Promise<void>;
 export type NewClipboardItem = (
@@ -40,7 +41,7 @@ declare module "solid-js" {
  * @param data - Data to write to the clipboard - either a string or ClipboardItem array.
  */
 export const writeClipboard: ClipboardSetter = async data => {
-  if (process.env.SSR) {
+  if (isServer) {
     return;
   }
 
@@ -54,7 +55,7 @@ export const writeClipboard: ClipboardSetter = async data => {
  * @return Promise of ClipboardItem array
  */
 export function readClipboard(): Promise<ClipboardItem[]> {
-  if (process.env.SSR) {
+  if (isServer) {
     return Promise.resolve([]);
   }
 
@@ -91,7 +92,7 @@ export const createClipboard = (
   refetch: VoidFunction,
   write: ClipboardSetter,
 ] => {
-  if (process.env.SSR) {
+  if (isServer) {
     return [
       Object.assign(() => [], { loading: false, error: undefined }) as any,
       () => void 0,
@@ -154,7 +155,7 @@ export const copyToClipboard = (
   el: HTMLElement,
   options: MaybeAccessor<CopyToClipboardOptions>,
 ) => {
-  if (process.env.SSR) {
+  if (isServer) {
     return undefined;
   }
   const setValue = () => {

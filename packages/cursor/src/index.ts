@@ -1,4 +1,5 @@
 import { Accessor, createEffect, onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
 import { access, FalsyValue, MaybeAccessor } from "@solid-primitives/utils";
 
 export type CursorProperty =
@@ -63,7 +64,7 @@ export function createElementCursor(
   target: Accessor<HTMLElement | FalsyValue> | HTMLElement,
   cursor: MaybeAccessor<CursorProperty>,
 ): void {
-  if (process.env.SSR) return;
+  if (isServer) return;
 
   createEffect(() => {
     const el = access(target);
@@ -91,7 +92,7 @@ export function createElementCursor(
  * ```
  */
 export function createBodyCursor(cursor: Accessor<CursorProperty | FalsyValue>): void {
-  if (process.env.SSR) return;
+  if (isServer) return;
 
   createEffect(() => {
     const cursorValue = cursor();

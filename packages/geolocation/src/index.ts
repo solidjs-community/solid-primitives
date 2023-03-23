@@ -1,4 +1,5 @@
 import type { Resource } from "solid-js";
+import { isServer } from "solid-js/web";
 import { createComputed, onCleanup, createResource } from "solid-js";
 import { access, MaybeAccessor, createStaticStore } from "@solid-primitives/utils";
 
@@ -25,7 +26,7 @@ const geolocationDefaults: PositionOptions = {
 export const createGeolocation = (
   options?: MaybeAccessor<PositionOptions>,
 ): [location: Resource<GeolocationCoordinates | undefined>, refetch: VoidFunction] => {
-  if (process.env.SSR) {
+  if (isServer) {
     return [
       Object.assign(() => {}, { error: undefined, loading: true }) as Resource<undefined>,
       () => {
@@ -72,7 +73,7 @@ export const createGeolocationWatcher = (
   location: GeolocationCoordinates | null;
   error: GeolocationPositionError | null;
 } => {
-  if (process.env.SSR) {
+  if (isServer) {
     return { location: null, error: null };
   }
   const [store, setStore] = createStaticStore<{

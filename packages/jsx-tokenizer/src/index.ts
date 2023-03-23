@@ -1,11 +1,12 @@
 import { Accessor, Component, createComponent, createMemo, JSX } from "solid-js";
+import { isDev } from "solid-js/web";
 import type { ResolvedJSXElement, Narrow, Many } from "@solid-primitives/utils";
 import { asArray } from "@solid-primitives/utils";
 
 /** @internal $TYPE is only used for type inference */
 declare const $TYPE: unique symbol;
 /** @internal */
-const $TOKENIZER = Symbol(process.env.DEV ? "jsx-tokenizer" : "");
+const $TOKENIZER = Symbol(isDev ? "jsx-tokenizer" : "");
 
 /**
  * Identifies a JSX Tokenizer. It is returned by {@link createTokenizer} (or {@link createToken}) and used by {@link createToken} and {@link resolveTokens}.
@@ -57,7 +58,7 @@ export type TokenComponent<TProps extends object, TData = TProps> = Component<TP
  */
 export function createTokenizer<T>(options?: { name: string }): JSXTokenizer<T> {
   return {
-    [$TOKENIZER]: Symbol(process.env.DEV ? options?.name || "jsx-tokenizer" : ""),
+    [$TOKENIZER]: Symbol(isDev ? options?.name || "jsx-tokenizer" : ""),
   } as JSXTokenizer<T>;
 }
 
@@ -99,14 +100,14 @@ export function createToken<P extends object, T>(
 ): TokenComponent<P, T> {
   const symbol =
     (args[0]?.[$TOKENIZER] ? (args.shift()[$TOKENIZER] as symbol) : undefined) ??
-    Symbol(process.env.DEV ? args[0]?.name || args[1]?.name || "jsx-token" : "");
+    Symbol(isDev ? args[0]?.name || args[1]?.name || "jsx-token" : "");
 
   const comp = ((props: P) => {
     const token = (
       args[1]
         ? () => createComponent(args[1], props)
         : () => {
-            process.env.DEV &&
+            isDev &&
               // eslint-disable-next-line no-console
               console.warn(
                 `Tokens can only be rendered with resolveTokens. ("${symbol.description}")`,
@@ -141,7 +142,7 @@ function getResolvedTokens(
       getResolvedTokens(resolved, value[i], symbols, addElements);
   // other element
   else if (addElements) resolved.push(value);
-  else if (process.env.DEV && value)
+  else if (isDev && value)
     // eslint-disable-next-line no-console
     console.warn(`Invalid JSX Element passed to token resolver:`, value);
 

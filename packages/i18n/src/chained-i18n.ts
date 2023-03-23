@@ -1,5 +1,6 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { Accessor, createSignal, FlowComponent, Setter } from "solid-js";
+import { isDev } from "solid-js/web";
 import { deepReadObject } from "./i18n";
 
 export type I18nFormatOptions = Record<string, string | number>;
@@ -57,7 +58,7 @@ function buildChainedDictionary<T extends I18nObject>(obj: T): I18nPath<T> {
         break;
       default:
         throw new Error(
-          process.env.DEV
+          isDev
             ? `Unsupported data format on the keys. Values must resolve to a string or a function that returns a string. Key name: "${key}"`
             : "",
         );

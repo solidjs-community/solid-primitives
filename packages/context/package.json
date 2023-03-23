@@ -52,7 +52,7 @@
     "primitives"
   ],
   "peerDependencies": {
-    "solid-js": "^1.6.0"
+    "solid-js": "^1.6.12"
   },
   "typesVersions": {}
 }

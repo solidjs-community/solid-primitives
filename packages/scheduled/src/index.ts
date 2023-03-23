@@ -1,4 +1,5 @@
 import { Accessor, createSignal, getListener, getOwner, onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
 
 export type ScheduleCallback = <Args extends unknown[]>(
   callback: (...args: Args) => void,
@@ -29,7 +30,7 @@ export interface Scheduled<Args extends unknown[]> {
  * ```
  */
 export const debounce: ScheduleCallback = (callback, wait) => {
-  if (process.env.SSR) {
+  if (isServer) {
     return Object.assign(() => void 0, { clear: () => void 0 });
   }
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -61,7 +62,7 @@ export const debounce: ScheduleCallback = (callback, wait) => {
  * ```
  */
 export const throttle: ScheduleCallback = (callback, wait) => {
-  if (process.env.SSR) {
+  if (isServer) {
     return Object.assign(() => void 0, { clear: () => void 0 });
   }
 
@@ -108,7 +109,7 @@ export const throttle: ScheduleCallback = (callback, wait) => {
  * trigger.clear() // clears a timeout in progress
  * ```
  */
-export const scheduleIdle: ScheduleCallback = process.env.SSR
+export const scheduleIdle: ScheduleCallback = isServer
   ? () => Object.assign(() => void 0, { clear: () => void 0 })
   : // requestIdleCallback is not supported in Safari
   (window.requestIdleCallback as typeof window.requestIdleCallback | undefined)
@@ -165,7 +166,7 @@ export function leading<Args extends unknown[]>(
   callback: (...args: Args) => void,
   wait?: number,
 ): Scheduled<Args> {
-  if (process.env.SSR) {
+  if (isServer) {
     let called = false;
     const scheduled = (...args: Args) => {
       if (called) return;
