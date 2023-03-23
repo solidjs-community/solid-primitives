@@ -15,7 +15,6 @@ export type ModulePkg = PackageJson & {
 
 export type ModuleData = {
   name: string;
-  path: string;
   category: string;
   stage: number;
   primitives: string[];
@@ -39,8 +38,7 @@ export async function getModulesData<T = ModuleData>(
   const packageNames = await fsp.readdir(packagesPath);
 
   const promises = packageNames.map(async name => {
-    const packagePath = path.join(packagesPath, name);
-    const packageJsonPath = path.join(packagePath, "package.json");
+    const packageJsonPath = path.join(packagesPath, name, "package.json");
     if (!fs.existsSync(packageJsonPath)) {
       // eslint-disable-next-line no-console
       console.warn(`package ${name} doesn't have package.json`);
@@ -65,7 +63,6 @@ export async function getModulesData<T = ModuleData>(
     return {
       data: await mapFn({
         name,
-        path: packagePath,
         category: pkg.primitive.category ?? "Misc",
         stage: pkg.primitive.stage ?? 0,
         primitives: pkg.primitive.list ?? [],

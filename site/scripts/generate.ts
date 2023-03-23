@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 import { getModulesData, ModuleData } from "../../scripts/get-modules-data";
 import { getPackageBundlesize, formatBytes } from "../../scripts/calculate-bundlesize";
 import { isNonNullable } from "../../scripts/utils";
-import { PackageData, GITHUB_REPO } from "../src/types";
+import { PackageData, GITHUB_REPO, PackageListItem } from "../src/types";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
@@ -20,6 +20,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const sitePath = path.join(__dirname, "..");
+const packagesPath = path.join(__dirname, "..", "..", "packages");
 const generatedDirPath = path.join(sitePath, "src", "_generated");
 const packagesDist = path.join(generatedDirPath, "packages");
 const listDist = path.join(generatedDirPath, "packages.json");
@@ -27,7 +28,8 @@ const listDist = path.join(generatedDirPath, "packages.json");
 const PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES = ["signal-builders", "platform", "immutable"] as const;
 
 async function generateReadme(module: ModuleData) {
-  let readme = await fsp.readFile(path.join(module.path, "README.md"), "utf8");
+  const readmePath = path.join(packagesPath, module.name, "README.md");
+  let readme = await fsp.readFile(readmePath, "utf8");
 
   readme = readme
     // remove heading-1
@@ -137,25 +139,37 @@ async function generatePackageSize(module: ModuleData) {
     await fsp.mkdir(packagesDist);
   }
 
-  const modules = await getModulesData(async module => {
+  const packages = await getModulesData<PackageListItem>(async module => {
     const [readme, primitives, packageSize] = await Promise.all([
       generateReadme(module),
       generatePrimitiveSizes(module),
       generatePackageSize(module),
     ] as const);
 
-    const data: PackageData = { ...module, readme, primitives, packageSize };
+    const itemData: PackageListItem = {
+      name: module.name,
+      category: module.category,
+      stage: module.stage,
+      dependencies: module.dependencies,
+      primitives,
+      packageSize,
+    };
+
+    const data: PackageData = {
+      ...itemData,
+      readme,
+    };
 
     // write data to individual json file
     const outputFilename = path.join(packagesDist, `${module.name}.json`);
     await fsp.writeFile(outputFilename, JSON.stringify(data, null, 2));
 
-    return module.name;
+    return itemData;
   });
 
   // gather all module names into one json file
-  await fsp.writeFile(listDist, JSON.stringify(modules, null, 2));
+  await fsp.writeFile(listDist, JSON.stringify(packages, null, 2));
 
   // eslint-disable-next-line no-console
-  console.log(`\nGenerated data for ${modules.length} packages.\n`);
+  console.log(`\nGenerated data for ${packages.length} packages.\n`);
 })();

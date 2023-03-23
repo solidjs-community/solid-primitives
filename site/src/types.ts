@@ -9,10 +9,11 @@ export type BundlesizeItem = Bundlesize & {
   name: string;
 };
 
-export type PackageData = Omit<ModuleData, "primitives"> & {
-  readme: string;
+export type PackageListItem = Omit<ModuleData, "primitives"> & {
   primitives: BundlesizeItem[];
   packageSize: Bundlesize | null;
 };
+
+export type PackageData = PackageListItem & { readme: string };
 
 export const GITHUB_REPO = "https://github.com/solidjs-community/solid-primitives";

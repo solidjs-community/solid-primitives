@@ -1,4 +1,4 @@
-import { Component, createEffect, createResource, onCleanup } from "solid-js";
+import { Component, createEffect, createResource, mergeProps, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 import { Title, useParams, useRouteData } from "solid-start";
 import { PRIMITIVE_PAGE_PADDING_TOP } from "~/components/Header/Header";
@@ -8,6 +8,7 @@ import { pageWidthClass } from "~/constants";
 import { PackageData } from "~/types";
 import { PackageInstallation } from "./package-installation";
 import { createPrimitiveNameTooltips } from "./primitive-name-tooltip";
+import { fetchPackageData, getCachedPackageListItemData } from "~/packageData";
 
 type Params = {
   name: string;
@@ -16,15 +17,17 @@ type Params = {
 export function routeData() {
   const { name } = useParams<Params>();
 
-  const [data] = createResource<PackageData>(
-    () => import(`../../../_generated/packages/${name}.json`),
-  );
+  const listItemData = getCachedPackageListItemData(name);
 
-  return data;
+  const [dataResource] = createResource<PackageData>(() => fetchPackageData(name));
+
+  return { name, dataResource, listItemData };
 }
 
 const Page: Component = () => {
-  const data = useRouteData<typeof routeData>();
+  const { name, dataResource, listItemData } = useRouteData<typeof routeData>();
+
+  const data: Partial<PackageData> = mergeProps(listItemData, dataResource);
 
   if (!isServer) {
     document.documentElement.classList.add("primitives-page-main");
@@ -33,11 +36,11 @@ const Page: Component = () => {
     });
   }
 
-  const packageName = () => `@solid-primitives/${data()?.name}`;
+  const packageName = `@solid-primitives/${name}`;
 
   return (
     <>
-      {data() && <Title>{data()!.name}</Title>}
+      <Title>{name}</Title>
       <div
         class="-z-1 absolute top-0 left-0 right-0 h-[95vh]
         bg-[linear-gradient(to_bottom,#fff_var(--primitive-padding-top-gr),transparent)]
@@ -52,31 +55,36 @@ const Page: Component = () => {
       >
         <div class="bg-page-main-bg rounded-3xl p-3 sm:p-8">
           <div class="mb-[90px] flex items-center justify-between gap-[30px] text-[#232324] dark:text-white sm:gap-[100px]">
-            <Heading name={data()?.name} />
+            <Heading name={name} />
           </div>
 
           <div class="my-8">
-            <InfoBar data={data() ?? null} packageName={packageName()} />
+            <InfoBar
+              name={name}
+              packageName={packageName}
+              packageSize={data.packageSize}
+              primitives={data.primitives}
+              stage={data.stage}
+            />
           </div>
 
           <div
             class="prose"
             ref={el => {
               createEffect(() => {
-                const dataValue = data();
-                if (!dataValue) return;
-                createPrimitiveNameTooltips({
-                  target: el,
-                  primitives: dataValue.primitives,
-                });
+                data.primitives &&
+                  createPrimitiveNameTooltips({
+                    target: el,
+                    primitives: data.primitives,
+                  });
               });
             }}
           >
             <H2 text="Installation" />
-            <PackageInstallation packageName={packageName()} />
+            <PackageInstallation packageName={packageName} />
 
             <H2 text="Readme" />
-            <div innerHTML={data()?.readme} />
+            <div innerHTML={data.readme} />
           </div>
         </div>
       </main>

@@ -1,4 +1,4 @@
-import { Component, Show } from "solid-js";
+import { Component } from "solid-js";
 import { PackageData } from "~/types";
 import { SizeBadgePill } from "./SizeBadge";
 import { StageBadgePill } from "./StageBadge";
@@ -17,28 +17,28 @@ const npmURL = "https://www.npmjs.com/package/";
 export const getSizeShield = (name: string) => `${sizeShield}${name}.json`;
 export const getNPMShield = (name: string) => `${npmShield}${name}.json`;
 
-const InfoBar: Component<{ data: PackageData | null; packageName: string }> = props => {
+const InfoBar: Component<{
+  name: string;
+  packageName: string;
+  packageSize: PackageData["packageSize"] | undefined;
+  stage: PackageData["stage"] | undefined;
+  primitives: PackageData["primitives"] | undefined;
+}> = props => {
   // const githubRepoPrimitve = () => `${githubRepo}/tree/main/packages/${props.name}`;
   return (
     <div class="flex flex-wrap gap-2">
-      <Show when={props.data} keyed>
-        {data => (
-          <>
-            <SizeBadgePill
-              value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/active-element.json"
-              href={`${bundlephobiaURL}/${props.packageName}`}
-              name={data.name}
-              packageSize={data.packageSize}
-              primitives={data.primitives}
-            />
-            <VersionBadgePill
-              value="https://img.shields.io/npm/v/@solid-primitives/active-element.json"
-              href={`${npmURL}/${props.packageName}`}
-            />
-            <StageBadgePill value={data.stage} />
-          </>
-        )}
-      </Show>
+      <SizeBadgePill
+        value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/active-element.json"
+        href={`${bundlephobiaURL}/${props.packageName}`}
+        name={props.name}
+        packageSize={props.packageSize || undefined}
+        primitives={props.primitives || []}
+      />
+      <VersionBadgePill
+        value="https://img.shields.io/npm/v/@solid-primitives/active-element.json"
+        href={`${npmURL}/${props.packageName}`}
+      />
+      <StageBadgePill value={props.stage} />
     </div>
   );
 };

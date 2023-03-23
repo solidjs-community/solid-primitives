@@ -7,15 +7,15 @@ import { GITHUB_REPO } from "~/types";
     Matching Stuff Anywhere Visitor .java
   </Heading> */
 
-const Heading: Component<{ name: string | undefined }> = props => {
-  const formattedName = () => props.name?.replace("-", " ");
+const Heading: Component<{ name: string }> = props => {
+  const formattedName = props.name.replace("-", " ");
 
   return (
     <>
       <div class="text-3xl font-bold capitalize sm:text-4xl">
         <div class="@container/heading container-s relative mb-[-60px]">
           <div aria-hidden="true" style="visibility: hidden;">
-            {formattedName()}
+            {formattedName}
           </div>
           <svg
             class="@[290px]/heading:block absolute hidden"
@@ -175,22 +175,22 @@ const Heading: Component<{ name: string | undefined }> = props => {
             <div class="relative top-[3px] h-[43.63px] w-full bg-[linear-gradient(to_right,#f5f7ff,#f5f7ff)] dark:bg-[linear-gradient(to_right,#2a3d4b,#2b3c4b)]" />
             <div class="box-shadow-[0px_6px_17px_0px_#c4d3f4] dark:box-shadow-[0px_6px_17px_0px_#202d3b] h-[11px] w-full bg-[linear-gradient(to_right,#dbe0f2,#d7ddf2)] dark:bg-[linear-gradient(to_right,#263544,#263442)]" />
           </div>
-          <h1 class="z-1 absolute bottom-[-40px] left-0">{formattedName()}</h1>
+          <h1 class="z-1 absolute bottom-[-40px] left-0">{formattedName}</h1>
           <div class="z-1 relative">
             <div aria-hidden="true" class="m-0 h-0 p-0" style="visibility: hidden;">
-              {formattedName()}
+              {formattedName}
             </div>
             <div
               class="mask-image-[linear-gradient(to_bottom,transparent,#000)] z-1 pointer-events-none absolute top-[32px] left-0 -scale-y-100 select-none text-[#4b6a87] opacity-[0.35] blur-[2px] dark:text-[#8a9fb5] dark:opacity-30"
               aria-hidden="true"
               style="-webkit-mask-size: 100% 22px; -webkit-mask-repeat: no-repeat; -webkit-mask-position: bottom; mask-size: 100% 22px; mask-repeat: no-repeat; mask-position: bottom;"
             >
-              {formattedName()}
+              {formattedName}
             </div>
           </div>
         </div>
         <div aria-hidden="true" class="mb-[-40px] max-h-[80px]" style="visibility: hidden;">
-          {formattedName()}
+          {formattedName}
         </div>
       </div>
       <div class="relative">

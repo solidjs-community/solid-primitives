@@ -4,15 +4,15 @@ import { createResizeObserver } from "@solid-primitives/resize-observer";
 import { Component, createSignal, For, onMount } from "solid-js";
 import { Bundlesize, BundlesizeItem } from "~/types";
 
+const SHARED_HEADERS = ["Minified", "Minified + GZipped"] as const;
+const PACKAGE_TH_HEADERS = ["Package", ...SHARED_HEADERS] as const;
+const PRIMITIVE_TH_HEADERS = ["Primitive", ...SHARED_HEADERS] as const;
+
 const BundleSizeModal: Component<{
   name: string;
-  packageSize: Bundlesize | null;
+  packageSize: Bundlesize | undefined;
   primitives: BundlesizeItem[];
 }> = props => {
-  const sharedHeaders = ["Minified", "Minified + GZipped"];
-  const packageThHeaders = ["Package", ...sharedHeaders];
-  const primitiveThHeaders = ["Primitive", ...sharedHeaders];
-
   const [target, setTarget] = createSignal<Element>();
   let theadEl!: HTMLTableSectionElement;
   let tableEl!: HTMLTableElement;
@@ -104,7 +104,7 @@ const BundleSizeModal: Component<{
           <table class="my-4 w-full" style="border-collapse: separate; border-spacing: 2px 2px;">
             <thead>
               <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#b7c1d0]">
-                <For each={packageThHeaders}>
+                <For each={PACKAGE_TH_HEADERS}>
                   {item => (
                     <th class="xxs:text-sm p-1 text-center text-xs md:px-3 md:text-base">{item}</th>
                   )}
@@ -149,7 +149,7 @@ const BundleSizeModal: Component<{
               ref={theadEl}
             >
               <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#b7c1d0]">
-                <For each={primitiveThHeaders}>
+                <For each={PRIMITIVE_TH_HEADERS}>
                   {item => (
                     <th class="xxs:text-sm p-1 text-center text-xs md:px-3 md:text-base">{item}</th>
                   )}

@@ -1,22 +1,22 @@
-import { ComponentProps, createSignal, onMount, ParentComponent } from "solid-js";
+import { ComponentProps, createSignal, ParentComponent } from "solid-js";
 import SlideModal from "../Modal/SlideModal";
 import BundleSizeModal from "../BundleSizeModal/BundleSizeModal";
 
-const createFetchSize = (value: string) => {
-  const [size, setSize] = createSignal("");
-  onMount(() => {
-    const fetchValue = async () => {
-      try {
-        const response = await fetch(value);
-        const json = (await response.json()) as { value: string };
-        setSize(json.value);
-      } catch (err) {}
-    };
-    fetchValue();
-  });
+// const createFetchSize = (value: string) => {
+//   const [size, setSize] = createSignal("");
+//   onMount(() => {
+//     const fetchValue = async () => {
+//       try {
+//         const response = await fetch(value);
+//         const json = (await response.json()) as { value: string };
+//         setSize(json.value);
+//       } catch (err) {}
+//     };
+//     fetchValue();
+//   });
 
-  return size;
-};
+//   return size;
+// };
 
 type SizeProps = {
   value: string | { gzipped?: string; minified?: string };
