@@ -1,57 +1,45 @@
 import { createResizeObserver } from "@solid-primitives/resize-observer";
 import { createMutationObserver } from "@solid-primitives/mutation-observer";
-import {
-  batch,
-  Component,
-  createEffect,
-  createRoot,
-  createSignal,
-  Match,
-  onCleanup,
-  onMount,
-  Switch,
-} from "solid-js";
+import { batch, Component, createRoot, createSignal, Match, onMount, Switch } from "solid-js";
 import { useTippy } from "solid-tippy";
 import { Content } from "tippy.js";
 import { BASE } from "~/constants";
-import { TPrimitiveJson } from "~/ts/primitivesJson";
-import _primitivesJSON from "~/_generated/primitives.json";
-const primitivesJSON: TPrimitiveJson = _primitivesJSON;
+import { BundlesizeItem } from "~/types";
 
-const TooltipContent = (el: HTMLElement) => {
-  if (!el) return;
-  const packageName = el.getAttribute("data-code-package-name")!;
-  const primitiveName = el.getAttribute("data-code-primitive-name")!;
-  const packageData = primitivesJSON.find(item => item.name === packageName)!;
-  const primitiveData = packageData.primitives.find(item => item.name === primitiveName)!;
-  const type = getTypeOfPrimitive(primitiveName);
-  const [target, setTarget] = createSignal<HTMLDivElement[]>([]);
+function createTooltipContent(
+  el: HTMLElement,
+  data: BundlesizeItem,
+  type: ReturnType<typeof getTypeOfPrimitive>,
+): Content {
+  const [target, setTarget] = createSignal<HTMLDivElement>();
   const [elSize, setElSize] = createSignal({ height: 0, width: 0 });
   const [placement, setPlacement] = createSignal("top");
 
-  createResizeObserver(target, () => {
-    const el = target()[0];
-    if (!el) return;
-    const dataPlacement = el.parentElement?.parentElement!.getAttribute("data-placement")!;
-    const { height, width } = el.getBoundingClientRect();
-    if (!(height > 0 && width > 0)) return;
+  createResizeObserver(
+    () => (target() ? [target()!] : []),
+    () => {
+      const dataPlacement = el.parentElement?.parentElement!.getAttribute("data-placement")!;
+      const { height, width } = target()!.getBoundingClientRect();
+      if (!(height > 0 && width > 0)) return;
 
-    batch(() => {
-      setPlacement(dataPlacement);
-      setElSize({ height, width });
-    });
-  });
+      batch(() => {
+        setPlacement(dataPlacement);
+        setElSize({ height, width });
+      });
+    },
+  );
 
   createMutationObserver(
     () => {
-      const el = target()[0]?.parentElement?.parentElement;
+      const el = target()?.parentElement?.parentElement;
       return el ? [el] : [];
     },
     { attributes: true, attributeFilter: ["data-placement"], attributeOldValue: true },
     records => {
       records.forEach(record => {
+        if (!(record.target instanceof Element) || !record.attributeName) return;
         const dataPlacement = record.target.getAttribute(record.attributeName);
-        setPlacement(dataPlacement);
+        dataPlacement && setPlacement(dataPlacement);
       });
     },
   );
@@ -59,7 +47,7 @@ const TooltipContent = (el: HTMLElement) => {
   return (
     <div
       class="relative rounded-[9px] bg-[#2d466d] p-3 text-white dark:bg-[#a6c6df] dark:text-black"
-      ref={el => setTarget([el])}
+      ref={setTarget}
     >
       <div class="mb-2">
         <h2 class="font-semibold opacity-80">Type</h2>
@@ -100,10 +88,10 @@ const TooltipContent = (el: HTMLElement) => {
         <h2 class="font-semibold opacity-80">Size</h2>
         <div class="w-min">
           <div class="flex justify-between gap-2 whitespace-nowrap text-[14px]">
-            Minified <span>{primitiveData.size.minified}</span>
+            Minified <span>{data.min}</span>
           </div>
           <div class="flex justify-between gap-2 whitespace-nowrap text-[14px]">
-            GZipped <span>{primitiveData.size.gzipped}</span>
+            GZipped <span>{data.gzip}</span>
           </div>
         </div>
       </div>
@@ -114,16 +102,14 @@ const TooltipContent = (el: HTMLElement) => {
         placement={placement() as "top"}
       />
     </div>
-  );
-};
+  ) as Content;
+}
 
 const TooltipSVG: Component<{
   width: number;
   height: number;
   placement: "top" | "bottom";
 }> = props => {
-  const totalWidth = () => props.width - 3;
-  const totalHeight = () => props.height - 3;
   const widthOfArrow = 16;
   const heightOfArrow = 8.721;
   const widthFoo = () => props.width / 2 - widthOfArrow / 2 + 1.5;
@@ -228,31 +214,38 @@ const getTypeOfPrimitive = (input: string) => {
   return "utility";
 };
 
-const createTooltipOnCodePrimitives = () => {
-  return onMount(() => {
-    const els = document
-      .querySelector("main .prose")!
-      .querySelectorAll("[data-code-primitive-name]") as NodeListOf<HTMLElement>;
-    els.forEach(el => {
+export function createPrimitiveNameTooltips(props: {
+  target: HTMLElement;
+  primitives: BundlesizeItem[];
+}): void {
+  onMount(() => {
+    const els = props.target.querySelectorAll<HTMLElement>("h2 code, a code");
+
+    for (const el of els) {
+      const primitiveName = el.textContent;
+      if (!primitiveName) continue;
+
+      const data = props.primitives.find(primitive => primitive.name === primitiveName);
+      if (!data) continue;
+
+      const type = getTypeOfPrimitive(data.name);
+
       let dispose: () => void;
+
       useTippy(() => el, {
         props: {
-          onMount: instance => {
+          onMount(instance) {
             createRoot(_dispose => {
               dispose = _dispose;
-              instance.setContent(TooltipContent(el) as Content);
+              instance.setContent(createTooltipContent(el, data, type));
             });
           },
-          onHidden: () => {
-            dispose();
-          },
+          onHidden: () => dispose(),
           interactive: true,
           appendTo: () => document.body,
         },
         hidden: true,
       });
-    });
+    }
   });
-};
-
-export default createTooltipOnCodePrimitives;
+}

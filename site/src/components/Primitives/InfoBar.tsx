@@ -17,31 +17,27 @@ const npmURL = "https://www.npmjs.com/package/";
 export const getSizeShield = (name: string) => `${sizeShield}${name}.json`;
 export const getNPMShield = (name: string) => `${npmShield}${name}.json`;
 
-const InfoBar: Component<{ data: PackageData | null }> = props => {
+const InfoBar: Component<{ data: PackageData | null; packageName: string }> = props => {
+  // const githubRepoPrimitve = () => `${githubRepo}/tree/main/packages/${props.name}`;
   return (
     <div class="flex flex-wrap gap-2">
       <Show when={props.data} keyed>
-        {data => {
-          // const githubRepoPrimitve = () => `${githubRepo}/tree/main/packages/${props.name}`;
-          const packageName = () => `@solid-primitives/${props.data?.name}`;
-
-          return (
-            <>
-              <SizeBadgePill
-                value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/active-element.json"
-                href={`${bundlephobiaURL}/${packageName()}`}
-                name={data.name}
-                packageSize={data.packageSize}
-                primitives={data.primitives}
-              />
-              <VersionBadgePill
-                value="https://img.shields.io/npm/v/@solid-primitives/active-element.json"
-                href={`${npmURL}/${packageName()}`}
-              />
-              <StageBadgePill value={data.stage} />
-            </>
-          );
-        }}
+        {data => (
+          <>
+            <SizeBadgePill
+              value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/active-element.json"
+              href={`${bundlephobiaURL}/${props.packageName}`}
+              name={data.name}
+              packageSize={data.packageSize}
+              primitives={data.primitives}
+            />
+            <VersionBadgePill
+              value="https://img.shields.io/npm/v/@solid-primitives/active-element.json"
+              href={`${npmURL}/${props.packageName}`}
+            />
+            <StageBadgePill value={data.stage} />
+          </>
+        )}
       </Show>
     </div>
   );

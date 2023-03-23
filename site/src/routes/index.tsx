@@ -2,13 +2,8 @@ import { Title } from "solid-start";
 import PrimitivesTable from "~/_generated/Primitives/PrimitivesTable";
 import HomeSections from "~/_generated/Home/HomeSections";
 import { NoHydration } from "solid-js/web";
-import onPreMount from "~/hooks/onPreMount";
 
 export default function Home() {
-  onPreMount(() => {
-    document.documentElement.classList.remove("primitives-page-main");
-  });
-
   return (
     <main class="pt-[60px]">
       <Title>Solid Primitives</Title>
