@@ -1,10 +1,10 @@
 import { Component, createEffect, createResource, onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
 import { Title, useParams, useRouteData } from "solid-start";
 import { PRIMITIVE_PAGE_PADDING_TOP } from "~/components/Header/Header";
 import Heading from "~/components/Primitives/Heading";
 import InfoBar from "~/components/Primitives/InfoBar";
 import { pageWidthClass } from "~/constants";
-import onPreMount from "~/hooks/onPreMount";
 import { PackageData } from "~/types";
 import { PackageInstallation } from "./package-installation";
 import { createPrimitiveNameTooltips } from "./primitive-name-tooltip";
@@ -26,12 +26,12 @@ export function routeData() {
 const Page: Component = () => {
   const data = useRouteData<typeof routeData>();
 
-  onPreMount(() => {
+  if (!isServer) {
     document.documentElement.classList.add("primitives-page-main");
     onCleanup(() => {
       document.documentElement.classList.remove("primitives-page-main");
     });
-  });
+  }
 
   const packageName = () => `@solid-primitives/${data()?.name}`;
 

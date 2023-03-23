@@ -1,17 +1,16 @@
-import { FiArrowLeft } from "solid-icons/fi";
 import { onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
 import { A, Title } from "solid-start";
 import { HttpStatusCode } from "solid-start/server";
 import { pageWidthClass } from "~/constants";
-import onPreMount from "~/hooks/onPreMount";
 
 export default function NotFound() {
-  onPreMount(() => {
+  if (!isServer) {
     document.documentElement.classList.add("full-page");
     onCleanup(() => {
       document.documentElement.classList.remove("full-page");
     });
-  });
+  }
 
   return (
     <main
