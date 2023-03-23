@@ -8,7 +8,7 @@ import { pageWidthClass } from "~/constants";
 import { PackageData } from "~/types";
 import { PackageInstallation } from "./package-installation";
 import { createPrimitiveNameTooltips } from "./primitive-name-tooltip";
-import { fetchPackageData, getCachedPackageListItemData } from "~/packageData";
+import { fetchPackageData, getCachedPackageListItemData } from "~/package-data";
 
 type Params = {
   name: string;
