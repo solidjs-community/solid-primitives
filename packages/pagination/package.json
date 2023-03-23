@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/pagination",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A primitive that creates all the reactive data to manage your pagination.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
@@ -56,8 +56,8 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/intersection-observer": "workspace:^2.0.8",
-    "@solid-primitives/utils": "^5.4.0"
+    "@solid-primitives/intersection-observer": "workspace:^2.0.9",
+    "@solid-primitives/utils": "^5.5.1"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

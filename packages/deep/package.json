@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/deep",
-  "version": "0.0.101",
+  "version": "0.0.102",
   "description": "Deep trigger effects for Stores.",
   "author": "Samuel Burbano <me@iosamuel.dev>",
   "contributors": [],
