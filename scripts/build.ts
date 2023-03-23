@@ -48,7 +48,7 @@ const cwd = process.cwd();
       tsupOptions(o) {
         if (nodePlatform) {
           // by default, the platform is "browser" - it'll prevent using node builtins
-          o.platform = "neutral";
+          o.platform = "node";
         }
         return o;
       },
