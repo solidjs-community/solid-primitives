@@ -100,11 +100,7 @@ export const getPackageBundlesize = async (
   };
 };
 
-export type FormattedBytes = {
-  string: string;
-  number: number;
-  unit: string;
-};
+export type FormattedBytes = [value: number, unit: string];
 
 export function formatBytes(
   bytes: string | number,
@@ -123,11 +119,7 @@ export function formatBytes(
     const unit = sizes[0]!;
     const number = 0;
 
-    return {
-      string: `${number} ${unit}`,
-      number,
-      unit,
-    };
+    return [number, unit];
   }
 
   const dm = decimals < 0 ? 0 : decimals;
@@ -136,9 +128,5 @@ export function formatBytes(
   const number = parseFloat(((bytes as number) / Math.pow(k, i)).toFixed(dm));
   const unit = sizes[i]!;
 
-  return {
-    string: `${number} ${unit}`,
-    number,
-    unit,
-  };
+  return [number, unit];
 }

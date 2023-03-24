@@ -1,8 +1,11 @@
+import type { FormattedBytes } from "../../scripts/calculate-bundlesize";
 import type { ModuleData } from "../../scripts/get-modules-data";
 
+export { FormattedBytes, ModuleData };
+
 export type Bundlesize = {
-  min: string;
-  gzip: string;
+  min: FormattedBytes;
+  gzip: FormattedBytes;
 };
 
 export type BundlesizeItem = Bundlesize & {

@@ -5,7 +5,7 @@ import { StageBadgePill } from "./StageBadge";
 import { VersionBadgePill } from "./VersionBadge";
 
 const sizeShield = "https://img.shields.io/bundlephobia/minzip/";
-const bundlephobiaURL = "https://bundlephobia.com/package/";
+// const bundlephobiaURL = "https://bundlephobia.com/package/";
 const npmShield = "https://img.shields.io/npm/v/";
 // const stageShieldBaseURL =
 //   "https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-"; // add "<stage>.json" after
@@ -27,8 +27,7 @@ const InfoBar: Component<{
   return (
     <div class="flex flex-wrap gap-2">
       <SizeBadgePill
-        value="https://img.shields.io/bundlephobia/minzip/@solid-primitives/active-element.json"
-        href={`${bundlephobiaURL}/${props.packageName}`}
+        // href={`${bundlephobiaURL}/${props.packageName}`}
         name={props.name}
         packageSize={props.packageSize || undefined}
         primitives={props.primitives || []}

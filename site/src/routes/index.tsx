@@ -4,7 +4,7 @@ import { Title, useRouteData } from "solid-start";
 import { fetchHomeContent, fetchPackageList } from "~/api";
 import PrimitiveBtn from "~/components/Primitives/PrimitiveBtn";
 import PrimitiveBtnLineWrapper from "~/components/Primitives/PrimitiveBtnLineWrapper";
-import SizeBadge, { SizeBadgeWrapper } from "~/components/Primitives/SizeBadge";
+import { SizeBadgeWrapper, SizeBadge } from "~/components/Primitives/SizeBadge";
 import StageBadge from "~/components/Primitives/StageBadge";
 import { VersionBadge } from "~/components/Primitives/VersionBadge";
 import { H2 } from "~/components/prose";
@@ -77,8 +77,9 @@ const Header: Component = () => {
 /*
 
 - [x] include package version in data
-- [ ] separate export size to [value: number, unit: string]
+- [x] separate export size to [value: number, unit: string]
 - [ ] include peerDependencies in data
+- [ ] generate bundle.js link
 
 */
 
@@ -134,7 +135,7 @@ const PrimitivesTable: Component<{ packages: PackageListItem[] | undefined }> = 
                       <Table.TD>
                         {pkg.primitives.map(primitive => (
                           <SizeBadgeWrapper primitiveName={`${pkg.name}_${primitive.name}`}>
-                            <SizeBadge value={primitive.gzip} unit="B" href="" />
+                            <SizeBadge value={primitive.gzip} href="" />
                           </SizeBadgeWrapper>
                         ))}
                       </Table.TD>

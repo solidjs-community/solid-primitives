@@ -120,8 +120,8 @@ async function generatePrimitiveSizes(module: ModuleData) {
       if (!result) return null;
       return {
         name: primitive,
-        min: formatBytes(result.min).string,
-        gzip: formatBytes(result.gzip).string,
+        min: formatBytes(result.min),
+        gzip: formatBytes(result.gzip),
       };
     }),
   );
@@ -133,8 +133,8 @@ async function generatePackageSize(module: ModuleData) {
   const result = await getPackageBundlesize(module.name);
   if (!result) return null;
   return {
-    min: formatBytes(result.min).string,
-    gzip: formatBytes(result.gzip).string,
+    min: formatBytes(result.min),
+    gzip: formatBytes(result.gzip),
   };
 }
 
