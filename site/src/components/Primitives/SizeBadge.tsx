@@ -19,16 +19,31 @@ import { FormattedBytes } from "~/types";
 //   return size;
 // };
 
-export type SizeProps = {
-  value: FormattedBytes;
-  href: string;
+const getBundleJSHref = ({
+  packageName,
+  exportName,
+  peerDependencies,
+}: {
+  packageName: string;
+  exportName?: string;
+  peerDependencies: string[];
+}) => {
+  const query = encodeURIComponent(`@solid-primitives/${packageName}`);
+  const config = encodeURIComponent(
+    `{"esbuild":${JSON.stringify({ external: peerDependencies })}}`,
+  );
+  return `https://bundlejs.com/?q=${query}${
+    exportName ? `&treeshake=${encodeURIComponent(`[{${exportName}}]`)}` : ""
+  }&config=${config}`;
 };
 
-export const SizeBadge: Component<SizeProps> = props => {
+export const SizeBadge: Component<
+  { value: FormattedBytes } & Parameters<typeof getBundleJSHref>[0]
+> = props => {
   return (
     <a
       class="flex h-[28px] min-w-[90px] items-baseline justify-center rounded-md border-2 border-[#cae0ff] bg-[#cae0ff40] font-sans transition-colors hover:border-[#80a7de] hover:bg-[#cae0ff66] dark:border-[#5577a7] dark:bg-[#6eaaff14] dark:hover:border-[#8ba8d3] dark:hover:bg-[#6eaaff33]"
-      href={props.href}
+      href={getBundleJSHref(props)}
       rel="noopener"
       target="_blank"
     >

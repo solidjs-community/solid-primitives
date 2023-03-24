@@ -63,11 +63,14 @@ export const getPackageBundlesize = async (
       treeShaking: true,
       platform: "browser",
       conditions: ["production", "browser"],
-      external: peerDependencies || ["solid-js", "node-fetch", "chokidar", "fs"],
+      external: ["solid-js", "node-fetch", "chokidar", "fs", ...(peerDependencies ?? [])],
     });
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.error(e);
+    console.error(
+      `Error when building ${exportName ? `${packageName}_${exportName}` : packageName}:\n`,
+      e,
+    );
     return null;
   }
 

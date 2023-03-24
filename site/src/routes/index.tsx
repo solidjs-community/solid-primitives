@@ -74,15 +74,6 @@ const Header: Component = () => {
   );
 };
 
-/*
-
-- [x] include package version in data
-- [x] separate export size to [value: number, unit: string]
-- [ ] include peerDependencies in data
-- [ ] generate bundle.js link
-
-*/
-
 const PrimitivesTable: Component<{ packages: PackageListItem[] | undefined }> = props => {
   // TODO - table should be dynamic - don't assume all elements are static
   return (
@@ -135,7 +126,12 @@ const PrimitivesTable: Component<{ packages: PackageListItem[] | undefined }> = 
                       <Table.TD>
                         {pkg.primitives.map(primitive => (
                           <SizeBadgeWrapper primitiveName={`${pkg.name}_${primitive.name}`}>
-                            <SizeBadge value={primitive.gzip} href="" />
+                            <SizeBadge
+                              value={primitive.gzip}
+                              packageName={pkg.name}
+                              exportName={primitive.name}
+                              peerDependencies={pkg.peerDependencies}
+                            />
                           </SizeBadgeWrapper>
                         ))}
                       </Table.TD>

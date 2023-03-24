@@ -31,8 +31,8 @@ const rootDependencies: string[] = [];
 (async () => {
   const modulesData = await getModulesData();
 
-  for (const { name, category, primitives, stage, dependencies } of modulesData) {
-    if (dependencies.local.length === 0) {
+  for (const { name, category, primitives, stage, localDependencies } of modulesData) {
+    if (localDependencies.length === 0) {
       rootDependencies.push(`@solid-primitives/${name}`);
     }
 

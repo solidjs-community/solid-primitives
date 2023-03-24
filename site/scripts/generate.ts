@@ -116,7 +116,10 @@ async function generatePrimitiveSizes(module: ModuleData) {
 
   const sizes = await Promise.all(
     module.primitives.map(async primitive => {
-      const result = await getPackageBundlesize(module.name, { exportName: primitive });
+      const result = await getPackageBundlesize(module.name, {
+        exportName: primitive,
+        peerDependencies: module.peerDependencies,
+      });
       if (!result) return null;
       return {
         name: primitive,
@@ -130,7 +133,9 @@ async function generatePrimitiveSizes(module: ModuleData) {
 }
 
 async function generatePackageSize(module: ModuleData) {
-  const result = await getPackageBundlesize(module.name);
+  const result = await getPackageBundlesize(module.name, {
+    peerDependencies: module.peerDependencies,
+  });
   if (!result) return null;
   return {
     min: formatBytes(result.min),
@@ -156,20 +161,9 @@ async function generatePackageSize(module: ModuleData) {
       generatePackageSize(module),
     ] as const);
 
-    const itemData: PackageListItem = {
-      name: module.name,
-      version: module.version,
-      category: module.category,
-      stage: module.stage,
-      dependencies: module.dependencies,
-      primitives,
-      packageSize,
-    };
+    const itemData: PackageListItem = { ...module, primitives, packageSize };
 
-    const data: PackageData = {
-      ...itemData,
-      readme,
-    };
+    const data: PackageData = { ...itemData, readme };
 
     // write data to individual json file
     const outputFilename = path.join(packagesDirDist, `${module.name}.json`);

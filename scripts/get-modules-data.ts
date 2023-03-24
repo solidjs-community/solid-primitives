@@ -19,10 +19,8 @@ export type ModuleData = {
   category: string;
   stage: number;
   primitives: string[];
-  dependencies: {
-    local: string[];
-    external: string[];
-  };
+  localDependencies: string[];
+  peerDependencies: string[];
 };
 
 const __filename = fileURLToPath(import.meta.url);
@@ -55,11 +53,7 @@ export async function getModulesData<T = ModuleData>(
 
     const dependencies = Object.keys(pkg.dependencies ?? {});
     const peerDependencies = Object.keys(pkg.peerDependencies ?? {});
-
     const localDependencies = dependencies.filter(dep => dep.startsWith("@solid-primitives/"));
-    const externalDependencies = dependencies
-      .concat(peerDependencies)
-      .filter(dep => !localDependencies.includes(dep) && dep !== "solid-js");
 
     return {
       data: await mapFn({
@@ -68,10 +62,8 @@ export async function getModulesData<T = ModuleData>(
         category: pkg.primitive.category ?? "Misc",
         stage: pkg.primitive.stage ?? 0,
         primitives: pkg.primitive.list ?? [],
-        dependencies: {
-          local: localDependencies,
-          external: externalDependencies,
-        },
+        localDependencies,
+        peerDependencies,
       }),
     };
   });
