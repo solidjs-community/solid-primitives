@@ -7,7 +7,6 @@ import { VersionBadgePill } from "./VersionBadge";
 const sizeShield = "https://img.shields.io/bundlephobia/minzip/";
 const bundlephobiaURL = "https://bundlephobia.com/package/";
 const npmShield = "https://img.shields.io/npm/v/";
-const npmURL = "https://www.npmjs.com/package/";
 // const stageShieldBaseURL =
 //   "https://img.shields.io/endpoint?style=for-the-badge&label=&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-"; // add "<stage>.json" after
 // const stageShieldLink =
@@ -34,10 +33,7 @@ const InfoBar: Component<{
         packageSize={props.packageSize || undefined}
         primitives={props.primitives || []}
       />
-      <VersionBadgePill
-        value="https://img.shields.io/npm/v/@solid-primitives/active-element.json"
-        href={`${npmURL}/${props.packageName}`}
-      />
+      <VersionBadgePill name={props.name} />
       <StageBadgePill value={props.stage} />
     </div>
   );

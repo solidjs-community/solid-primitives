@@ -158,6 +158,7 @@ async function generatePackageSize(module: ModuleData) {
 
     const itemData: PackageListItem = {
       name: module.name,
+      version: module.version,
       category: module.category,
       stage: module.stage,
       dependencies: module.dependencies,

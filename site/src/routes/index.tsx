@@ -6,7 +6,7 @@ import PrimitiveBtn from "~/components/Primitives/PrimitiveBtn";
 import PrimitiveBtnLineWrapper from "~/components/Primitives/PrimitiveBtnLineWrapper";
 import SizeBadge, { SizeBadgeWrapper } from "~/components/Primitives/SizeBadge";
 import StageBadge from "~/components/Primitives/StageBadge";
-import VersionBadge from "~/components/Primitives/VersionBadge";
+import { VersionBadge } from "~/components/Primitives/VersionBadge";
 import { H2 } from "~/components/prose";
 import { StageContent } from "~/components/Stage/Stage";
 import * as Table from "~/components/table";
@@ -76,7 +76,7 @@ const Header: Component = () => {
 
 /*
 
-- [ ] include package version in data
+- [x] include package version in data
 - [ ] separate export size to [value: number, unit: string]
 - [ ] include peerDependencies in data
 
@@ -139,10 +139,7 @@ const PrimitivesTable: Component<{ packages: PackageListItem[] | undefined }> = 
                         ))}
                       </Table.TD>
                       <Table.TD>
-                        <VersionBadge
-                          value="1.0.0"
-                          href={`https://www.npmjs.com/package/@solid-primitives/${pkg.name}`}
-                        />
+                        <VersionBadge name={pkg.name} />
                       </Table.TD>
                     </Table.TR>
                   ))}
