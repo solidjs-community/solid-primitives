@@ -1,32 +1,70 @@
-import path from "path";
 import fs from "fs";
 import fsp from "fs/promises";
-import { fileURLToPath } from "url";
-import { getModulesData, ModuleData } from "../../scripts/get-modules-data";
-import { getPackageBundlesize, formatBytes } from "../../scripts/calculate-bundlesize";
-import { isNonNullable } from "../../scripts/utils";
-import { PackageData, GITHUB_REPO, PackageListItem } from "../src/types";
-import { unified } from "unified";
+import path from "path";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeHighlight from "rehype-highlight";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+import rehypeSlug from "rehype-slug";
+import rehypeStringify from "rehype-stringify";
+import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
-import rehypeStringify from "rehype-stringify";
-import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
-import rehypeHighlight from "rehype-highlight";
-import rehypeSlug from "rehype-slug";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import remarkGfm from "remark-gfm";
+import { unified } from "unified";
+import { fileURLToPath } from "url";
+import { formatBytes, getPackageBundlesize } from "../../scripts/calculate-bundlesize";
+import { getModulesData, ModuleData } from "../../scripts/get-modules-data";
+import { isNonNullable } from "../../scripts/utils";
+import { GITHUB_REPO, PackageData, PackageListItem } from "../src/types";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const sitePath = path.join(__dirname, "..");
-const packagesPath = path.join(__dirname, "..", "..", "packages");
-const generatedDirPath = path.join(sitePath, "src", "_generated");
-const packagesDist = path.join(generatedDirPath, "packages");
-const listDist = path.join(generatedDirPath, "packages.json");
+const rootPath = path.join(__dirname, "..", "..");
+const packagesPath = path.join(rootPath, "packages");
+const generatedDirPath = path.join(__dirname, "..", "src", "_generated");
 
-const PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES = ["signal-builders", "platform", "immutable"] as const;
+const PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES: ReadonlySet<string> = new Set([
+  "signal-builders",
+  "platform",
+  "immutable",
+]);
 
+const markdownProcessor = unified()
+  .use(remarkParse)
+  .use(remarkRehype)
+  // support GitHub Flavored Markdown
+  .use(remarkGfm)
+  .use(rehypeSanitize, {
+    ...defaultSchema,
+    attributes: {
+      ...defaultSchema.attributes,
+      // https://github.com/rehypejs/rehype-highlight#example-sanitation
+      code: [
+        ...(defaultSchema.attributes?.code || []),
+        [
+          "className",
+          // List of all allowed languages:
+          ...["js", "jsx", "ts", "tsx", "css", "md", "html", "json", "diff", "bash"].map(
+            lang => `language-${lang}`,
+          ),
+        ],
+      ],
+    },
+  })
+  // highlight code blocks
+  .use(rehypeHighlight)
+  // add id to headings
+  .use(rehypeSlug)
+  // add # to headings
+  .use(rehypeAutolinkHeadings, {
+    properties: { class: "header-anchor" },
+    content: { type: "text", value: "#" },
+  })
+  .use(rehypeStringify);
+
+/**
+ * Parse README.md of each package and generate HTML
+ */
 async function generateReadme(module: ModuleData) {
   const readmePath = path.join(packagesPath, module.name, "README.md");
   let readme = await fsp.readFile(readmePath, "utf8");
@@ -47,7 +85,7 @@ async function generateReadme(module: ModuleData) {
       return `${p1}(${GITHUB_REPO}/blob/main/packages/${module.name}/CHANGELOG.md)`;
     })
     // remove Installation section
-    .replace(/##\s+installation[\r?\n]+```[^`]+```/gi, "")
+    .replace(/##\s+installation[\r\n]+```[^`]+```/gi, "")
     // replace Demo links with Live Site, Codesandbox/Stackblitz, Dev Source Code
     .replace(/(?<!#)(##\s+demo\n)((.|\n)+?)(?=(\n##\s))/i, (_, p1, p2) => {
       if (p2) {
@@ -68,45 +106,11 @@ async function generateReadme(module: ModuleData) {
       return _;
     });
 
-  const file = await unified()
-    .use(remarkParse)
-    .use(remarkRehype)
-    // support GitHub Flavored Markdown
-    .use(remarkGfm)
-    .use(rehypeSanitize, {
-      ...defaultSchema,
-      attributes: {
-        ...defaultSchema.attributes,
-        // https://github.com/rehypejs/rehype-highlight#example-sanitation
-        code: [
-          ...(defaultSchema.attributes?.code || []),
-          [
-            "className",
-            // List of all allowed languages:
-            ...["js", "jsx", "ts", "tsx", "css", "md", "html", "json", "diff", "bash"].map(
-              lang => `language-${lang}`,
-            ),
-          ],
-        ],
-      },
-    })
-    // highlight code blocks
-    .use(rehypeHighlight)
-    // add id to headings
-    .use(rehypeSlug)
-    // add # to headings
-    .use(rehypeAutolinkHeadings, {
-      properties: { class: "header-anchor" },
-      content: { type: "text", value: "#" },
-    })
-    .use(rehypeStringify)
-    .process(readme);
-
-  return String(file);
+  return String(await markdownProcessor.process(readme));
 }
 
 async function generatePrimitiveSizes(module: ModuleData) {
-  if (PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES.includes(module.name as any)) {
+  if (PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES.has(module.name)) {
     return [];
   }
 
@@ -134,9 +138,15 @@ async function generatePackageSize(module: ModuleData) {
   };
 }
 
+/**
+ * Generate data for all packages
+ */
 (async () => {
-  if (!fs.existsSync(packagesDist)) {
-    await fsp.mkdir(packagesDist);
+  const packagesDirDist = path.join(generatedDirPath, "packages");
+  const packagesDist = path.join(generatedDirPath, "packages.json");
+
+  if (!fs.existsSync(packagesDirDist)) {
+    await fsp.mkdir(packagesDirDist);
   }
 
   const packages = await getModulesData<PackageListItem>(async module => {
@@ -161,15 +171,47 @@ async function generatePackageSize(module: ModuleData) {
     };
 
     // write data to individual json file
-    const outputFilename = path.join(packagesDist, `${module.name}.json`);
+    const outputFilename = path.join(packagesDirDist, `${module.name}.json`);
     await fsp.writeFile(outputFilename, JSON.stringify(data, null, 2));
 
     return itemData;
   });
 
   // gather all module names into one json file
-  await fsp.writeFile(listDist, JSON.stringify(packages, null, 2));
+  await fsp.writeFile(packagesDist, JSON.stringify(packages, null, 2));
 
   // eslint-disable-next-line no-console
   console.log(`\nGenerated data for ${packages.length} packages.\n`);
+})();
+
+/**
+ * Parse root README.md and CONTRIBUTING.md to generate HTML content for the home page
+ */
+(async () => {
+  const readmeMD = await fsp.readFile(path.join(rootPath, "README.md"), "utf8");
+  const contributingMD = await fsp.readFile(path.join(rootPath, "CONTRIBUTING.md"), "utf8");
+  const distPath = path.join(generatedDirPath, "home-content.html");
+
+  const headings: [string, string[]][] = [
+    [readmeMD, ["Philosophy"]],
+    [
+      contributingMD,
+      ["Design Maxims", "Basic and Compound Primitives", "Managing Primitive Complexity"],
+    ],
+  ];
+
+  const sections = headings.reduce((acc, [file, headings]) => {
+    for (const heading of headings) {
+      const regex = new RegExp(
+        `(?<!#)(##\\s+${heading}[\\r\\n])((.|[\\r\\n])+?)(?=([\\r\\n]##\\s))`,
+      );
+      const match = file.match(regex);
+      if (match) acc += `${match[0]}\n`;
+    }
+    return acc;
+  }, "");
+
+  const html = String(await markdownProcessor.process(sections));
+
+  await fsp.writeFile(distPath, html);
 })();

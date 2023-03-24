@@ -31,3 +31,7 @@ export async function fetchPackageList(): Promise<PackageListItem[]> {
 
   return data;
 }
+
+export async function fetchHomeContent(): Promise<string> {
+  return (await import(`./${GEN_DIR}/home-content.html?raw`)).default;
+}

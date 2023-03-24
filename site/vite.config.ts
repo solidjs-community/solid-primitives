@@ -4,12 +4,13 @@ import solid from "solid-start/vite";
 // @ts-ignore
 import staticAdapter from "solid-start-static";
 
-let packages: string[] = [];
-try {
-  packages = await import("./src/_generated/packages.json");
-} catch (e) {
-  throw new Error("No packages found. Did you run `pnpm generate`?");
-}
+const packages = await (async () => {
+  try {
+    return (await import("./src/_generated/packages.json")).default;
+  } catch (e) {
+    throw new Error("No packages found. Did you run `pnpm generate`?");
+  }
+})();
 
 export default defineConfig(() => {
   return {
@@ -23,7 +24,7 @@ export default defineConfig(() => {
       }),
       solid({
         adapter: staticAdapter(),
-        prerenderRoutes: ["/", ...packages.map(name => `/package/${name}`)],
+        prerenderRoutes: ["/", ...packages.map(({ name }) => `/package/${name}`)],
       }),
     ],
   };

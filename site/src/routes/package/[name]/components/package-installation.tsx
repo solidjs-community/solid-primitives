@@ -1,12 +1,12 @@
 import { writeClipboard } from "@solid-primitives/clipboard";
 import { debounce } from "@solid-primitives/scheduled";
 import { Component, createSignal } from "solid-js";
-import NpmLogo from "../../../components/Icons/NpmLogo";
-import NpmMonochrome from "../../../components/Icons/NpmMonochrome";
-import PnpmLogo from "../../../components/Icons/PnpmLogo";
-import PnpmMonochrome from "../../../components/Icons/PnpmMonochrome";
-import YarnLogo from "../../../components/Icons/YarnLogo";
-import YarnMonochrome from "../../../components/Icons/YarnMonochrome";
+import NpmLogo from "~/components/Icons/NpmLogo";
+import NpmMonochrome from "~/components/Icons/NpmMonochrome";
+import PnpmLogo from "~/components/Icons/PnpmLogo";
+import PnpmMonochrome from "~/components/Icons/PnpmMonochrome";
+import YarnLogo from "~/components/Icons/YarnLogo";
+import YarnMonochrome from "~/components/Icons/YarnMonochrome";
 
 const CopyPackage: Component<{ type: "npm" | "yarn" | "pnpm"; packageName: string }> = props => {
   const [hasCopied, setHasCopied] = createSignal(false);
