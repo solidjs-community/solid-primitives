@@ -6,11 +6,68 @@ import { useLocation } from "solid-start";
 import { pageWidthClass } from "~/constants";
 import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 import reflow from "~/utils/reflow";
-import * as Header from "../Header/Header";
+import * as Header from "./Header/Header";
+
+export const TR: ParentComponent = props => {
+  return (
+    <tr
+      class="[&>td:first-child]:z-1 [&:nth-child(odd)>td:first-child]:bg-page-main-bg odd:bg-page-main-bg border-spacing-1 even:bg-[linear-gradient(90deg,#f8fafcc4,#f8fafc)] dark:even:bg-[linear-gradient(90deg,#2b3e4a,#2b3e4ae3)] [&:nth-child(even)>td:first-child]:bg-[#f8fafc] dark:[&:nth-child(even)>td:first-child]:bg-[#2b3e4a]
+    [&>td:first-child]:sticky [&>td:first-child]:left-[2px]"
+    >
+      {props.children}
+    </tr>
+  );
+};
+
+export const THead: ParentComponent = props => {
+  return (
+    <thead class="sticky top-[58px] z-[2]">
+      {/* box-shadow doesn't work on thead in Safari and iOS */}
+      {/* So extra row containing div to show shadow in Safari and iOS */}
+      <tr
+        id="header-shadow"
+        aria-hidden="true"
+        class="-z-1 pointer-events-none absolute top-0 left-0 right-0 h-0 transition-opacity"
+        style="opacity: 0;"
+      >
+        <td class="h-0">
+          {/* <div class="absolute h-[8px] top-0 left-0 right-0 bg-white"></div> */}
+          <div class="box-shadow-[var(--table-header-box-shadow)] absolute inset-0" />
+        </td>
+      </tr>
+      <tr
+        id="header-real-tr"
+        class="text-[#49494B] dark:text-[#dee2e5] [&>th:first-child]:sticky [&>th:first-child]:left-[2px] [&>th:first-child]:overflow-clip [&>th:first-child]:text-ellipsis [&>th:first-child]:rounded-tl-[26px] [&>th:last-child]:rounded-tr-[26px]"
+      >
+        {props.children}
+      </tr>
+    </thead>
+  );
+};
+
+export const TH: ParentComponent = props => {
+  return (
+    <th class="dark:bg-page-main-bg overflow-hidden text-ellipsis whitespace-nowrap bg-white py-1 px-[2px] text-[12px] sm:px-5 sm:text-sm md:text-base">
+      {props.children}
+    </th>
+  );
+};
+
+export const TD: ParentComponent<{ withH4?: boolean }> = props => {
+  if (props.withH4) {
+    return (
+      <td class="px-1 py-3 sm:px-3 sm:py-6">
+        <h4 class="text-lg font-bold text-[#49494B] dark:text-[#dee2e5]">{props.children}</h4>
+      </td>
+    );
+  }
+
+  return <td class="px-1 py-1 sm:px-3 sm:py-2">{props.children}</td>;
+};
 
 export const [translateStickyTheader, setTranslateStickyTheader] = createSignal(false);
 
-const Table: ParentComponent = props => {
+export const Table: ParentComponent = props => {
   const location = useLocation();
   const [tableRowTargets, setTableRowTargets] = createSignal<Element[]>([]);
   const [tableTarget, setTableTarget] = createSignal<Element[]>([]);
@@ -481,5 +538,3 @@ const Table: ParentComponent = props => {
     </div>
   );
 };
-
-export default Table;

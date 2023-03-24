@@ -19,37 +19,37 @@ const createFetchVersion = (value: string) => {
 };
 
 const VersionBadge: ParentComponent<{ value: string; href?: string }> = ({ value, href }) => {
-  const [color, setColor] = createSignal("");
+  // const [color, setColor] = createSignal("");
   // const version = createFetchVersion(value);
 
-  const updateColor = (
-    color:
-      | "brightgreen"
-      | "green"
-      | "yellowgreen"
-      | "yellow"
-      | "orange"
-      | "red"
-      | "blue"
-      | "lightgrey",
-  ) => {
-    switch (color) {
-      case "brightgreen":
-      case "yellowgreen":
-      case "yellow":
-        return "bg-[#E9DE47] text-black";
-      case "orange":
-        return "bg-[#FFA15C] text-black";
-      case "red":
-        return "bg-[#FFA15C] text-black";
-      case "blue":
-        return "bg-[#2962FF] text-white";
-      case "lightgrey":
-        return "bg-[lightgrey] text-white";
-      default:
-        return "bg-[lightgrey] text-white";
-    }
-  };
+  // const updateColor = (
+  //   color:
+  //     | "brightgreen"
+  //     | "green"
+  //     | "yellowgreen"
+  //     | "yellow"
+  //     | "orange"
+  //     | "red"
+  //     | "blue"
+  //     | "lightgrey",
+  // ) => {
+  //   switch (color) {
+  //     case "brightgreen":
+  //     case "yellowgreen":
+  //     case "yellow":
+  //       return "bg-[#E9DE47] text-black";
+  //     case "orange":
+  //       return "bg-[#FFA15C] text-black";
+  //     case "red":
+  //       return "bg-[#FFA15C] text-black";
+  //     case "blue":
+  //       return "bg-[#2962FF] text-white";
+  //     case "lightgrey":
+  //       return "bg-[lightgrey] text-white";
+  //     default:
+  //       return "bg-[lightgrey] text-white";
+  //   }
+  // };
 
   return (
     <a

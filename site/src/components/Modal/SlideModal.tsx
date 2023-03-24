@@ -2,7 +2,7 @@ import Dismiss from "solid-dismiss";
 import { FiX } from "solid-icons/fi";
 import { Accessor, onMount, ParentComponent } from "solid-js";
 import * as Header from "../Header/Header";
-import * as Table from "../Primitives/Table";
+import * as Table from "~/components/table";
 
 const SlideModal: ParentComponent<{
   menuButton: Element;

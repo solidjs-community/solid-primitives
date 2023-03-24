@@ -185,7 +185,7 @@ async function generatePackageSize(module: ModuleData) {
 })();
 
 /**
- * Parse root README.md and CONTRIBUTING.md to generate HTML content for the home page
+ * Parse root README.md and CONTRIBUTING.md to generate HTML content for the home page (home-content.html)
  */
 (async () => {
   const readmeMD = await fsp.readFile(path.join(rootPath, "README.md"), "utf8");

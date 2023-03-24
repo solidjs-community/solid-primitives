@@ -1,10 +1,16 @@
-import { Component, createResource, Suspense } from "solid-js";
+import { Component, createResource, Show, Suspense } from "solid-js";
 import { NoHydration } from "solid-js/web";
 import { Title, useRouteData } from "solid-start";
-import { StageContent } from "~/components/Stage/Stage";
+import { fetchHomeContent, fetchPackageList } from "~/api";
+import PrimitiveBtn from "~/components/Primitives/PrimitiveBtn";
+import PrimitiveBtnLineWrapper from "~/components/Primitives/PrimitiveBtnLineWrapper";
+import SizeBadge, { SizeBadgeWrapper } from "~/components/Primitives/SizeBadge";
+import StageBadge from "~/components/Primitives/StageBadge";
+import VersionBadge from "~/components/Primitives/VersionBadge";
 import { H2 } from "~/components/prose";
-import PrimitivesTable from "~/_generated/Primitives/PrimitivesTable";
-import { fetchHomeContent } from "~/api";
+import { StageContent } from "~/components/Stage/Stage";
+import * as Table from "~/components/table";
+import { PackageListItem } from "~/types";
 
 const Header: Component = () => {
   return (
@@ -68,14 +74,97 @@ const Header: Component = () => {
   );
 };
 
+/*
+
+- [ ] include package version in data
+- [ ] separate export size to [value: number, unit: string]
+- [ ] include peerDependencies in data
+
+*/
+
+const PrimitivesTable: Component<{ packages: PackageListItem[] | undefined }> = props => {
+  // TODO - table should be dynamic - don't assume all elements are static
+  return (
+    <Show when={props.packages} keyed>
+      {packages => {
+        // group packages by category
+        const categories = packages.reduce((acc: Record<string, PackageListItem[]>, pkg) => {
+          const category = acc[pkg.category];
+          if (category) category.push(pkg);
+          else acc[pkg.category] = [pkg];
+          return acc;
+        }, {});
+
+        return (
+          <Table.Table>
+            <Table.THead>
+              <Table.TH>Name</Table.TH>
+              <Table.TH>Stage</Table.TH>
+              <Table.TH>Primitives</Table.TH>
+              <Table.TH>Size</Table.TH>
+              <Table.TH>NPM</Table.TH>
+            </Table.THead>
+            <tbody>
+              {Object.entries(categories).map(([category, packages]) => (
+                <>
+                  <Table.TR>
+                    <Table.TD withH4>{category}</Table.TD>
+                    <Table.TD></Table.TD>
+                    <Table.TD></Table.TD>
+                    <Table.TD></Table.TD>
+                    <Table.TD></Table.TD>
+                  </Table.TR>
+                  {packages.map(pkg => (
+                    <Table.TR>
+                      <Table.TD>
+                        <PrimitiveBtn href={pkg.name}>{pkg.name}</PrimitiveBtn>
+                      </Table.TD>
+                      <Table.TD>
+                        <StageBadge value={pkg.stage} />
+                      </Table.TD>
+                      <Table.TD>
+                        {pkg.primitives.map(primitive => (
+                          <PrimitiveBtnLineWrapper primitiveName={`${pkg.name}_${primitive.name}`}>
+                            <PrimitiveBtn href={`${pkg.name}#${primitive.name}`}>
+                              {primitive.name}
+                            </PrimitiveBtn>
+                          </PrimitiveBtnLineWrapper>
+                        ))}
+                      </Table.TD>
+                      <Table.TD>
+                        {pkg.primitives.map(primitive => (
+                          <SizeBadgeWrapper primitiveName={`${pkg.name}_${primitive.name}`}>
+                            <SizeBadge value={primitive.gzip} unit="B" href="" />
+                          </SizeBadgeWrapper>
+                        ))}
+                      </Table.TD>
+                      <Table.TD>
+                        <VersionBadge
+                          value="1.0.0"
+                          href={`https://www.npmjs.com/package/@solid-primitives/${pkg.name}`}
+                        />
+                      </Table.TD>
+                    </Table.TR>
+                  ))}
+                </>
+              ))}
+            </tbody>
+          </Table.Table>
+        );
+      }}
+    </Show>
+  );
+};
+
 export function routeData() {
   const [content] = createResource(() => fetchHomeContent());
+  const [packages] = createResource(() => fetchPackageList());
 
-  return content;
+  return { content, packages };
 }
 
 export default function Home() {
-  const content = useRouteData<typeof routeData>();
+  const { content, packages } = useRouteData<typeof routeData>();
 
   return (
     <main class="pt-[60px]">
@@ -87,7 +176,7 @@ export default function Home() {
           Primitives
         </h2>
       </div>
-      <PrimitivesTable />
+      <PrimitivesTable packages={packages()} />
 
       <div class="mx-auto mt-[125px] max-w-[864px] p-4 leading-7">
         <NoHydration>
