@@ -55,7 +55,7 @@
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
     "solid-devtools": "^0.26.0",
-    "solid-js": "1.6.15",
+    "solid-js": "1.6.12",
     "tsup": "^6.6.3",
     "tsup-preset-solid": "^0.1.8",
     "turbo": "^1.8.5",
