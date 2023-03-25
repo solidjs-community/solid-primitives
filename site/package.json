@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@solid-primitives/clipboard": "^1.5.3",
+    "@solid-primitives/deep": "workspace:^0.0.102",
     "@solid-primitives/event-bus": "workspace:^1.0.3",
     "@solid-primitives/event-listener": "^2.2.9",
     "@solid-primitives/intersection-observer": "^2.0.9",

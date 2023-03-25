@@ -16,11 +16,11 @@ import { A, useLocation } from "solid-start";
 import { pageWidthClass } from "~/constants";
 import Hamburger from "../Icons/Hamburger";
 import SearchBtn from "../Search/SearchBtn";
-import SearchModal from "../Search/SearchModal";
 import NavMenu from "./NavMenu";
 import ThemeBtn from "./ThemeBtn";
 import clsx from "clsx";
 import { createTween } from "@solid-primitives/tween";
+import SearchModal from "../Search/SearchModal";
 
 export const [isScrollEnabled, setScrollEnabled] = createSignal(false);
 
@@ -77,8 +77,6 @@ const Header: Component = () => {
       if (isScrollEnabled()) {
         untrack(checkScroll);
         makeEventListener(window, "scroll", checkScroll, { passive: true });
-      } else {
-        removeEventListener("scroll", checkScroll);
       }
     });
   }

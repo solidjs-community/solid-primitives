@@ -725,6 +725,7 @@ importers:
   site:
     specifiers:
       '@solid-primitives/clipboard': ^1.5.3
+      '@solid-primitives/deep': workspace:^0.0.102
       '@solid-primitives/event-bus': workspace:^1.0.3
       '@solid-primitives/event-listener': ^2.2.9
       '@solid-primitives/intersection-observer': ^2.0.9
@@ -773,6 +774,7 @@ importers:
       unified: ^10.1.2
     dependencies:
       '@solid-primitives/clipboard': link:../packages/clipboard
+      '@solid-primitives/deep': link:../packages/deep
       '@solid-primitives/event-bus': link:../packages/event-bus
       '@solid-primitives/event-listener': link:../packages/event-listener
       '@solid-primitives/intersection-observer': link:../packages/intersection-observer

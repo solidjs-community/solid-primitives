@@ -1,6 +1,6 @@
 import { FaBrandsGithub } from "solid-icons/fa";
 import { Component } from "solid-js";
-import { GITHUB_REPO } from "~/types";
+import { GITHUB_REPO } from "~/constants";
 
 /* <Heading>
     Has This Type Pattern Tried To Sneak In Some Generic Or Parameterized Type Pattern

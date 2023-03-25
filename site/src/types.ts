@@ -18,5 +18,3 @@ export type PackageListItem = Omit<ModuleData, "primitives"> & {
 };
 
 export type PackageData = PackageListItem & { readme: string };
-
-export const GITHUB_REPO = "https://github.com/solidjs-community/solid-primitives";
