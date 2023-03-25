@@ -122,7 +122,7 @@ export const createSyncFileSystem = (
     watcher((operation, path) => {
       if (operation === "mkdir" || operation === "rm") {
         readdirMap.get(getParentDir(path))?.[1]((items = []) =>
-          items.includes(path) ? items : [...items, path],
+          items.includes(path as never) ? items : [...items, path],
         );
       }
       if (operation === "rm") {
@@ -203,7 +203,7 @@ export const createAsyncFileSystem = (
         readdirMap
           .get(getParentDir(path))?.[1]
           .mutate((items = []) =>
-            items.includes(name) ? items : ([...items, name] as DirEntries),
+            items.includes(name as never) ? items : ([...items, name] as DirEntries),
           );
       }),
     rename: async (previous, next) => {
@@ -257,7 +257,7 @@ export const createAsyncFileSystem = (
       if (operation === "mkdir" || operation === "rm") {
         readdirMap
           .get(getParentDir(path))?.[1]
-          .mutate((items = []) => (items.includes(path) ? items : [...items, path]));
+          .mutate((items = []) => (items.includes(path as never) ? items : [...items, path]));
       }
       if (operation === "rm") {
         getTypeMap.get(path)?.[1].mutate(null);
