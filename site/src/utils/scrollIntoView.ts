@@ -7,6 +7,6 @@ export const scrollIntoView = (
 
   window.scrollTo({
     behavior,
-    top: el!.getBoundingClientRect().top - document.body.getBoundingClientRect().top - offset,
+    top: el.getBoundingClientRect().top - document.body.getBoundingClientRect().top - offset,
   });
 };

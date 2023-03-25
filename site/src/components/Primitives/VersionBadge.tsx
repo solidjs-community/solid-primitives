@@ -1,4 +1,11 @@
-import { createSignal, ParentComponent, sharedConfig } from "solid-js";
+import {
+  Accessor,
+  createMemo,
+  createSignal,
+  ParentComponent,
+  sharedConfig,
+  untrack,
+} from "solid-js";
 import { isServer } from "solid-js/web";
 import { getCachedPackageListItemData } from "~/api";
 
@@ -47,28 +54,36 @@ async function fetchPackageVersion(name: string): Promise<string> {
   return data["dist-tags"].latest;
 }
 
-function createPackageVersion(name: string) {
-  const cached = versionCache.get(name);
+function createPackageVersion(source: Accessor<string>) {
+  const memo = createMemo(() => {
+    const name = source();
 
-  const [version, setVersion] = createSignal(
-    // use cached version if available (if not hydrating to avoid mismatches)
-    cached ||
-      (!isServer && !sharedConfig.context && getCachedPackageListItemData(name)?.version) ||
-      "0.0.0",
-  );
+    return untrack(() => {
+      const cached = versionCache.get(name);
 
-  // fetch the version on the client so it won't be out of sync with SSG build
-  if (!isServer && !cached) {
-    fetchPackageVersion(name).then(v => {
-      setVersion(v);
-      versionCache.set(name, v);
+      const [version, setVersion] = createSignal(
+        // use cached version if available (if not hydrating to avoid mismatches)
+        cached ||
+          (!isServer && !sharedConfig.context && getCachedPackageListItemData(name)?.version) ||
+          "0.0.0",
+      );
+
+      // fetch the version on the client so it won't be out of sync with SSG build
+      if (!isServer && !cached) {
+        fetchPackageVersion(name).then(v => {
+          setVersion(v);
+          versionCache.set(name, v);
+        });
+      }
+      return version;
     });
-  }
-  return version;
+  });
+
+  return () => memo()();
 }
 
 export const VersionBadge: ParentComponent<{ name: string }> = props => {
-  const version = createPackageVersion(props.name);
+  const version = createPackageVersion(() => props.name);
 
   return (
     <a
@@ -84,7 +99,7 @@ export const VersionBadge: ParentComponent<{ name: string }> = props => {
 };
 
 export const VersionBadgePill: ParentComponent<{ name: string }> = props => {
-  const version = createPackageVersion(props.name);
+  const version = createPackageVersion(() => props.name);
 
   return (
     <a
