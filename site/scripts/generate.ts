@@ -114,22 +114,20 @@ async function generatePrimitiveSizes(module: ModuleData) {
     return [];
   }
 
-  const sizes = await Promise.all(
-    module.primitives.map(async primitive => {
-      const result = await getPackageBundlesize(module.name, {
-        exportName: primitive,
-        peerDependencies: module.peerDependencies,
-      });
-      if (!result) return null;
-      return {
-        name: primitive,
-        min: formatBytes(result.min),
-        gzip: formatBytes(result.gzip),
-      };
-    }),
-  );
+  const sizes = module.primitives.map(async primitive => {
+    const result = await getPackageBundlesize(module.name, {
+      exportName: primitive,
+      peerDependencies: module.peerDependencies,
+    });
+    if (!result) return null;
+    return {
+      name: primitive,
+      min: formatBytes(result.min),
+      gzip: formatBytes(result.gzip),
+    };
+  });
 
-  return sizes.filter(isNonNullable);
+  return (await Promise.all(sizes)).filter(isNonNullable);
 }
 
 async function generatePackageSize(module: ModuleData) {
