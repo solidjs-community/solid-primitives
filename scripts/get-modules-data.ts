@@ -16,6 +16,8 @@ export type ModulePkg = PackageJson & {
 export type ModuleData = {
   name: string;
   version: string;
+  description: string;
+  tags: string[];
   category: string;
   stage: number;
   primitives: string[];
@@ -59,6 +61,8 @@ export async function getModulesData<T = ModuleData>(
       data: await mapFn({
         name,
         version: pkg.version ?? "0.0.0",
+        description: pkg.description ?? "",
+        tags: pkg.keywords ?? [],
         category: pkg.primitive.category ?? "Misc",
         stage: pkg.primitive.stage ?? 0,
         primitives: pkg.primitive.list ?? [],

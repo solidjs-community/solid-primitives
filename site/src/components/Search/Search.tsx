@@ -1,7 +1,7 @@
 import { deepTrack } from "@solid-primitives/deep";
-import { makeEventListener } from "@solid-primitives/event-listener";
 import { createMediaQuery } from "@solid-primitives/media";
-import { defer } from "@solid-primitives/utils";
+import { useWindowScrollPosition } from "@solid-primitives/scroll";
+import { throttle } from "@solid-primitives/scheduled";
 import { A } from "@solidjs/router";
 import Fuse from "fuse.js";
 import Mark from "mark.js";
@@ -15,9 +15,11 @@ import {
   For,
   onMount,
   Show,
+  untrack,
 } from "solid-js";
-import { createStore, produce } from "solid-js/store";
+import { createStore } from "solid-js/store";
 import { fetchPackageList } from "~/api";
+import { PackageListItem } from "~/types";
 import CheckBox from "./CheckBox/CheckBox";
 
 let _inputEl!: HTMLInputElement;
@@ -27,37 +29,42 @@ export const getSearchInput = () => {
 
 const MAX_PRIMITIVES_COUNT = 5;
 
-const FUSE_PRIMITIVES_OPTIONS = {
+const FUSE_PRIMITIVES_OPTIONS: Fuse.IFuseOptions<unknown> = {
   findAllMatches: true,
   threshold: 0.9,
   ignoreLocation: true,
 };
 
-const FUSE_OPTIONS = {
+const FUSE_OPTION_KEYS: (
+  | keyof PackageListItem
+  | ({ name: keyof PackageListItem } & Fuse.FuseOptionKey<unknown>)
+)[] = [
+  {
+    name: "name",
+    weight: 2,
+  },
+  "description",
+  {
+    name: "primitives",
+    weight: 2,
+  },
+  {
+    name: "category",
+    weight: 1,
+  },
+  {
+    name: "tags",
+    weight: 0.75,
+  },
+];
+
+const FUSE_OPTIONS: Fuse.IFuseOptions<unknown> = {
   threshold: 0.9,
   ignoreLocation: true,
   // includeScore: true,
   // ignoreFieldNorm: false,
   // fieldNormWeight: 1,
-  keys: [
-    {
-      name: "name",
-      weight: 2,
-    },
-    // "description",
-    {
-      name: "primitives",
-      weight: 2,
-    },
-    {
-      name: "category",
-      weight: 1,
-    },
-    // {
-    //   name: "tags",
-    //   weight: 0.75,
-    // },
-  ],
+  keys: FUSE_OPTION_KEYS,
 };
 
 const Search: Component<{
@@ -65,7 +72,6 @@ const Search: Component<{
 }> = props => {
   const isSmall = createMediaQuery("(max-width: 767px)");
   const [search, setSearch] = createSignal("");
-  const [showShadow, setShowShadow] = createSignal(false);
   const [config, setConfig] = createStore({
     highlight: {
       title: { checked: false },
@@ -85,9 +91,11 @@ const Search: Component<{
   const searchablePackages = createMemo(() =>
     packages().map(pkg => ({
       name: pkg.name,
+      description: pkg.description,
       category: pkg.category,
-      primitives: pkg.primitives.map(primitive => primitive.name),
-      pkg,
+      tags: pkg.tags,
+      primitives: pkg.primitives.map(({ name }) => name),
+      data: pkg,
     })),
   );
 
@@ -97,62 +105,51 @@ const Search: Component<{
     const fuseValue = fuse();
     const searchValue = search();
 
-    const result = fuseValue.search(searchValue).slice(0, 12);
-
-    return result.map(({ item }) => {
-      const fusePrim = new Fuse(item.primitives, FUSE_PRIMITIVES_OPTIONS);
-      return {
+    return fuseValue
+      .search(searchValue)
+      .slice(0, 12)
+      .map(({ item }) => ({
         ...item,
         // order the primitives by search match
-        primitives: fusePrim.search(searchValue).map(item => item.item),
-      };
-    });
+        primitives: new Fuse(item.primitives, FUSE_PRIMITIVES_OPTIONS)
+          .search(searchValue)
+          .map(item => item.item),
+      }));
   });
+
+  const scroll = useWindowScrollPosition();
+  const showShadow = () => scroll.y > 60;
 
   let markInstance: Mark;
+  onMount(() => (markInstance = new Mark(listContainer)));
 
-  onMount(() => {
-    markInstance = new Mark(listContainer);
-
-    makeEventListener(
-      window,
-      "scroll",
-      () => {
-        setShowShadow(window.scrollY > 60);
-      },
-      { passive: true },
-    );
-  });
-
-  const highlightText = (value: string) => {
-    const exclude = Object.entries(config.highlight)
-      .filter(([, item]) => !item.checked)
-      .flatMap(([key]) => [`[data-ignore-mark-${key}]`, `[data-ignore-mark-${key}] *`]);
-    markInstance.mark(value, {
-      exclude,
-      separateWordSearch: false,
+  const forceHighlightText = (value: string, forceUnmark = false) => {
+    requestAnimationFrame(() => {
+      if (value.length <= 2) {
+        markInstance.unmark();
+        return;
+      }
+      if (forceUnmark) {
+        markInstance.unmark();
+      }
+      markInstance.mark(value, {
+        exclude: Object.entries(config.highlight)
+          .filter(([, item]) => !item.checked)
+          .flatMap(([key]) => [`[data-ignore-mark-${key}]`, `[data-ignore-mark-${key}] *`]),
+        separateWordSearch: false,
+      });
     });
   };
-  const reHighlightTextFromSearch = () => {
-    markInstance.unmark();
-    highlightText(search());
-  };
+  const highlightText = throttle(forceHighlightText, 40);
 
   createEffect(() => {
-    const value = search();
-    if (value.length > 1) {
-      requestAnimationFrame(() => highlightText(value));
-    }
+    highlightText(search());
   });
 
-  createEffect(
-    defer(
-      () => deepTrack(config.highlight),
-      () => {
-        reHighlightTextFromSearch();
-      },
-    ),
-  );
+  createEffect(() => {
+    deepTrack(config.highlight);
+    forceHighlightText(untrack(search), true);
+  });
 
   return (
     <div class="xs:w-full flex w-[calc(100vw-32px)] max-w-[800px] items-center justify-center">
@@ -195,20 +192,14 @@ const Search: Component<{
             <div class="xs:text-base text-[13px] font-semibold">Highlight</div>
             <div class="xxs:text-[14px] xs:text-[15px] flex gap-[4px] overflow-auto py-[2px] text-[12px] md:gap-4">
               <For each={Object.keys(config.highlight) as (keyof typeof config.highlight)[]}>
-                {item => {
-                  const value = () => config.highlight[item];
-                  return (
-                    <CheckBox
-                      checked={value().checked}
-                      onChange={checked => {
-                        // setConfig("highlight", item, checked)
-                        setConfig(produce(state => (state.highlight[item].checked = checked)));
-                      }}
-                    >
-                      <span class="capitalize opacity-80">{item}</span>
-                    </CheckBox>
-                  );
-                }}
+                {item => (
+                  <CheckBox
+                    checked={config.highlight[item].checked}
+                    onChange={checked => setConfig("highlight", item, "checked", checked)}
+                  >
+                    <span class="capitalize opacity-80">{item}</span>
+                  </CheckBox>
+                )}
               </For>
             </div>
           </div>
@@ -235,7 +226,7 @@ const Search: Component<{
 
                 createEffect(() => {
                   showRest();
-                  requestAnimationFrame(reHighlightTextFromSearch);
+                  forceHighlightText(untrack(search), true);
                 });
 
                 return (
@@ -247,7 +238,7 @@ const Search: Component<{
                       <A href={`/package/${match.name.toLowerCase()}`}>{match.name}</A>
                     </h4>
                     <p class="my-[6px] text-[14px]" data-ignore-mark-description>
-                      "There is no description yet"
+                      {match.description}
                     </p>
 
                     <div class="flex justify-between gap-2">
@@ -292,22 +283,20 @@ const Search: Component<{
                         </button>
                       </Show>
                     </div>
-                    {/* <Show when={tags.length}>
+                    <Show when={match.tags.length}>
                       <ul class="flex flex-wrap gap-4 gap-y-2 self-start pt-2" data-ignore-mark-tag>
-                        <For each={tags}>
-                          {item => {
-                            return (
-                              <li>
-                                <span class="text-[12px] text-slate-500 dark:text-slate-400 sm:text-[14px]">
-                                  <span class="opacity-50">{"#"}</span>
-                                  {item}
-                                </span>
-                              </li>
-                            );
-                          }}
+                        <For each={match.tags}>
+                          {item => (
+                            <li>
+                              <span class="text-[12px] text-slate-500 dark:text-slate-400 sm:text-[14px]">
+                                <span class="opacity-50">{"#"}</span>
+                                {item}
+                              </span>
+                            </li>
+                          )}
                         </For>
                       </ul>
-                    </Show> */}
+                    </Show>
                   </li>
                 );
               }}

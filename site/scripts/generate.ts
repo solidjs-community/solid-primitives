@@ -14,7 +14,8 @@ import { fileURLToPath } from "url";
 import { formatBytes, getPackageBundlesize } from "../../scripts/calculate-bundlesize";
 import { getModulesData, ModuleData } from "../../scripts/get-modules-data";
 import { isNonNullable } from "../../scripts/utils";
-import { GITHUB_REPO, PackageData, PackageListItem } from "../src/types";
+import { PackageData, PackageListItem } from "../src/types";
+import { GITHUB_REPO } from "../src/constants";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
