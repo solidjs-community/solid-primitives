@@ -6,6 +6,7 @@
     "generate": "jiti ./scripts/generate.ts",
     "dev": "solid-start dev --host",
     "build": "solid-start build",
+    "deploy": "pnpm generate && pnpm build",
     "preview": "vite preview --outDir dist/public"
   },
   "devDependencies": {

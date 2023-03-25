@@ -13,20 +13,17 @@
     "lint:packages": "eslint --ignore-path .gitignore --max-warnings 0 packages/*/src/**",
     "lint:tests": "eslint --ignore-path .gitignore packages/*/test/** --quiet --rule \"no-only-tests/no-only-tests: error\"",
     "lint": "concurrently pnpm:lint:*",
-    "build": "cross-env CI=true turbo run build --filter='./packages/*'",
-    "build:site": "pnpm -dir site run build",
     "test:client": "cross-env CI=true vitest -c ./configs/vitest.config.ts",
     "test:ssr": "pnpm run test:client --mode ssr",
     "test": "pnpm run test:client && pnpm run test:ssr",
+    "build": "cross-env CI=true turbo run build --filter='./packages/*'",
     "pages": "turbo run page && jiti ./scripts/collectPages.ts",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts",
-    "update-site": "cross-env JITI_ESM_RESOLVE=1 jiti ./scripts/update-site/index.ts",
     "update-deps": "pnpm up -Lri",
-    "changeset": "changeset",
     "version": "changeset version && pnpm i --no-frozen-lockfile && git add .",
     "release": "pnpm build && changeset publish",
-    "deploy-netlify": "pnpm build && pnpm update-site && pnpm build:site"
+    "deploy-site": "pnpm build && pnpm -dir site run deploy"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.0",

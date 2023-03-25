@@ -39,23 +39,11 @@ const FUSE_OPTION_KEYS: (
   | keyof PackageListItem
   | ({ name: keyof PackageListItem } & Fuse.FuseOptionKey<unknown>)
 )[] = [
-  {
-    name: "name",
-    weight: 2,
-  },
+  { name: "name", weight: 2 },
   "description",
-  {
-    name: "primitives",
-    weight: 2,
-  },
-  {
-    name: "category",
-    weight: 1,
-  },
-  {
-    name: "tags",
-    weight: 0.75,
-  },
+  { name: "primitives", weight: 2 },
+  { name: "category", weight: 1 },
+  { name: "tags", weight: 0.75 },
 ];
 
 const FUSE_OPTIONS: Fuse.IFuseOptions<unknown> = {
