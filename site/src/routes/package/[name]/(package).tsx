@@ -79,18 +79,7 @@ const Page: Component = () => {
             />
           </div>
 
-          <div
-            class="prose"
-            ref={el => {
-              createEffect(() => {
-                data.primitives &&
-                  createPrimitiveNameTooltips({
-                    target: el,
-                    primitives: data.primitives,
-                  });
-              });
-            }}
-          >
+          <div class="prose">
             <H2 text="Installation" />
             <PackageInstallation packageName={packageName()} />
 
@@ -105,11 +94,17 @@ const Page: Component = () => {
                     el.style.opacity = "0";
                     el.style.transition = "opacity 0.3s ease-in-out";
                     onMount(() => {
-                      requestAnimationFrame(() => {
-                        el.style.opacity = "";
-                      });
+                      requestAnimationFrame(() => (el.style.opacity = ""));
                     });
                   }
+                  // create tooltips for primitive names
+                  createEffect(() => {
+                    data.primitives &&
+                      createPrimitiveNameTooltips({
+                        target: el,
+                        primitives: data.primitives,
+                      });
+                  });
                 }}
                 innerHTML={data.readme}
               />

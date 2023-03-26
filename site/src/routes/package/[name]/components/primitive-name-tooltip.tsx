@@ -1,16 +1,54 @@
 import { createResizeObserver } from "@solid-primitives/resize-observer";
 import { createMutationObserver } from "@solid-primitives/mutation-observer";
-import { batch, Component, createRoot, createSignal, Match, onMount, Switch } from "solid-js";
+import { Accessor, batch, Component, createRoot, createSignal, JSX, onMount } from "solid-js";
 import { useTippy } from "solid-tippy";
 import { Content } from "tippy.js";
 import { BASE } from "~/constants";
 import { BundlesizeItem } from "~/types";
 
-function createTooltipContent(
-  el: HTMLElement,
-  data: BundlesizeItem,
-  type: ReturnType<typeof getTypeOfPrimitive>,
-): Content {
+export type PrimitiveType = "create" | "use" | "make" | "get" | "component" | "utility";
+
+const getTypeOfPrimitive = (input: string): PrimitiveType => {
+  if (input.match(/^(?:create)[A-Z]/)) return "create";
+  if (input.match(/^(?:use)[A-Z]/)) return "use";
+  if (input.match(/^(?:make)[A-Z]/)) return "make";
+  if (input.match(/^(?:get)[A-Z]/)) return "get";
+  if (input.match(/^[A-Z][a-z]?/)) return "component";
+  return "utility";
+};
+
+const LintToExplanation: Component<{ isReactive?: true }> = props => (
+  <a class="anchor-tag-underline" href={`${BASE}#make-non-reactive-vs-create-reactive`}>
+    ( {props.isReactive ? "is" : "not"} <strong>reactive</strong> )
+  </a>
+);
+
+const TypeDescriptionContentMap: Record<PrimitiveType, Accessor<JSX.Element>> = {
+  get: () => (
+    <>
+      get <LintToExplanation />
+    </>
+  ),
+  make: () => (
+    <>
+      make <LintToExplanation />
+    </>
+  ),
+  create: () => (
+    <>
+      create <LintToExplanation isReactive />
+    </>
+  ),
+  use: () => (
+    <>
+      use <LintToExplanation isReactive />
+    </>
+  ),
+  component: () => "JSX Component",
+  utility: () => "Utility Function",
+};
+
+function createTooltipContent(el: HTMLElement, data: BundlesizeItem, type: PrimitiveType): Content {
   const [target, setTarget] = createSignal<HTMLDivElement>();
   const [elSize, setElSize] = createSignal({ height: 0, width: 0 });
   const [placement, setPlacement] = createSignal("top");
@@ -51,21 +89,7 @@ function createTooltipContent(
     >
       <div class="mb-2">
         <h2 class="font-semibold opacity-80">Type</h2>
-        <div class="text-[14px]">
-          <Switch>
-            <Match when={type === "reactive"}>
-              <a class="anchor-tag-underline" href={`${BASE}#make-non-reactive-vs-create-reactive`}>
-                A <strong>reactive</strong> primitive
-              </a>
-            </Match>
-            <Match when={type === "component"}>
-              <span>JSX Component</span>
-            </Match>
-            <Match when={type === "utility"}>
-              <span>Utility Function</span>
-            </Match>
-          </Switch>
-        </div>
+        <div class="text-[14px]">{TypeDescriptionContentMap[type]()}</div>
       </div>
       <div>
         <h2 class="font-semibold opacity-80">Size</h2>
@@ -188,12 +212,6 @@ const TooltipSVG: Component<{
       </svg>
     </div>
   );
-};
-
-const getTypeOfPrimitive = (input: string) => {
-  if (input.match(/^(?:create|use)[A-Z]/)) return "reactive";
-  if (input.match(/^[A-Z][a-z]?/)) return "component";
-  return "utility";
 };
 
 export function createPrimitiveNameTooltips(props: {
