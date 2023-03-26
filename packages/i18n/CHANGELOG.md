@@ -1,5 +1,11 @@
 # @solid-primitives/i18n
 
+## 1.2.4
+
+### Patch Changes
+
+- 83843698: Use `!isServer && DEV` for checking development env to support versions prior to 1.6.12
+
 ## 1.2.3
 
 ### Patch Changes

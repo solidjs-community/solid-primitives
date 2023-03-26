@@ -1,5 +1,13 @@
 # @solid-primitives/pointer
 
+## 0.2.9
+
+### Patch Changes
+
+- 83843698: Use `!isServer && DEV` for checking development env to support versions prior to 1.6.12
+- Updated dependencies [83843698]
+  - @solid-primitives/utils@5.5.2
+
 ## 0.2.8
 
 ### Patch Changes
