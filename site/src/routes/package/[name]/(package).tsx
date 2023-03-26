@@ -1,13 +1,4 @@
-import {
-  Component,
-  createEffect,
-  createMemo,
-  createResource,
-  onCleanup,
-  onMount,
-  Suspense,
-} from "solid-js";
-import { isServer } from "solid-js/web";
+import { Component, createEffect, createMemo, createResource, onMount, Suspense } from "solid-js";
 import { Title, useParams, useRouteData } from "solid-start";
 import { fetchPackageData, getCachedPackageListItemData } from "~/api";
 import { PRIMITIVE_PAGE_PADDING_TOP } from "~/components/Header/Header";
@@ -19,6 +10,7 @@ import { kebabCaseToCapitalized } from "~/utils";
 import { Heading } from "./components/heading";
 import { PackageInstallation } from "./components/package-installation";
 import { createPrimitiveNameTooltips } from "./components/primitive-name-tooltip";
+import { DocumentClass } from "~/primitives/document-class";
 
 type Params = {
   name: string;
@@ -53,20 +45,13 @@ export function routeData() {
 const Page: Component = () => {
   const data = useRouteData<typeof routeData>();
 
-  if (!isServer) {
-    document.documentElement.classList.add("primitives-page-main");
-    onCleanup(() => {
-      document.documentElement.classList.remove("primitives-page-main");
-    });
-  }
-
   const packageName = () => `@solid-primitives/${data.name}`;
   const formattedName = createMemo(() => kebabCaseToCapitalized(data.name));
 
   return (
     <>
       <Title>{formattedName()} — Solid Primitives</Title>
-      <script>document.documentElement.classList.add("primitives-page-main")</script>
+      <DocumentClass class="primitives-page-main" />
       <div
         class="-z-1 absolute top-0 left-0 right-0 h-[95vh]
         bg-[linear-gradient(to_bottom,#fff_var(--primitive-padding-top-gr),transparent)]

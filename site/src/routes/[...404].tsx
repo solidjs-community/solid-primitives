@@ -1,23 +1,16 @@
-import { onCleanup } from "solid-js";
-import { isServer } from "solid-js/web";
 import { A, Title } from "solid-start";
 import { HttpStatusCode } from "solid-start/server";
 import { pageWidthClass } from "~/constants";
+import { DocumentClass } from "~/primitives/document-class";
 
 export default function NotFound() {
-  if (!isServer) {
-    document.documentElement.classList.add("full-page");
-    onCleanup(() => {
-      document.documentElement.classList.remove("full-page");
-    });
-  }
-
   return (
     <main
       class={`${pageWidthClass} mx-auto min-h-[calc(100vh-250px)] w-full p-4 pt-[100px] lg:pt-[150px]`}
     >
       <Title>Not Found</Title>
       <HttpStatusCode code={404} />
+      <DocumentClass class="full-page" />
       <h1 class="mb-12 text-center text-xl">Primitive not Found</h1>
       <div class="flex justify-center overflow-x-clip">
         <div class="flex text-[100px] font-bold">
