@@ -66,6 +66,7 @@ const Page: Component = () => {
   return (
     <>
       <Title>{formattedName()} — Solid Primitives</Title>
+      <script>document.documentElement.classList.add("primitives-page-main")</script>
       <div
         class="-z-1 absolute top-0 left-0 right-0 h-[95vh]
         bg-[linear-gradient(to_bottom,#fff_var(--primitive-padding-top-gr),transparent)]
