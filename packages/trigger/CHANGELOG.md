@@ -1,5 +1,13 @@
 # @solid-primitives/trigger
 
+## 1.0.4
+
+### Patch Changes
+
+- 83843698: Use `!isServer && DEV` for checking development env to support versions prior to 1.6.12
+- Updated dependencies [83843698]
+  - @solid-primitives/utils@5.5.2
+
 ## 1.0.3
 
 ### Patch Changes

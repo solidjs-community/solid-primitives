@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 5.5.2
+
+### Patch Changes
+
+- 83843698: Use `!isServer && DEV` for checking development env to support versions prior to 1.6.12
+
 ## 5.5.1
 
 ### Patch Changes
