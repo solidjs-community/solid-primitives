@@ -1,11 +1,11 @@
 {
-  "name": "@solid-primitives/bounds",
-  "version": "0.0.110",
-  "description": "Primitives for tracking HTML element size and position on screen as it changes.",
-  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
+  "name": "@solid-primitives/static-store",
+  "version": "0.0.100",
+  "description": "A template primitive example.",
+  "author": "Your Name <you@youremail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/bounds#readme",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/static-store#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -14,19 +14,16 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "bounds",
-    "stage": 1,
+    "name": "static-store",
+    "stage": 0,
     "list": [
-      "createElementBounds"
+      "createPrimitiveTemplate"
     ],
     "category": "Display & Media"
   },
   "keywords": [
     "solid",
-    "primitives",
-    "size",
-    "position",
-    "bounds"
+    "primitives"
   ],
   "private": false,
   "sideEffects": false,
@@ -45,6 +42,7 @@
     },
     "require": "./dist/index.cjs"
   },
+  "typesVersions": {},
   "scripts": {
     "dev": "vite serve dev",
     "page": "vite build dev",
@@ -52,17 +50,10 @@
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
-  "devDependencies": {
-    "@solid-primitives/scheduled": "workspace:^1.3.2"
-  },
-  "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.9",
-    "@solid-primitives/resize-observer": "workspace:^2.0.13",
-    "@solid-primitives/static-store": "workspace:^0.0.100",
-    "@solid-primitives/utils": "workspace:^5.5.1"
-  },
   "peerDependencies": {
     "solid-js": "^1.6.12"
   },
-  "typesVersions": {}
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^5.5.2"
+  }
 }
