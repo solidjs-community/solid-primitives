@@ -2,8 +2,8 @@ import { createEventListener } from "@solid-primitives/event-listener";
 import { remove, split } from "@solid-primitives/immutable";
 import { createSubRoot } from "@solid-primitives/rootless";
 import { Directive, entries, Many, MaybeAccessor } from "@solid-primitives/utils";
-import { Accessor, createSignal, getOwner } from "solid-js";
-import { isServer, isDev } from "solid-js/web";
+import { Accessor, createSignal, getOwner, DEV } from "solid-js";
+import { isServer } from "solid-js/web";
 import { DEFAULT_STATE, parseHandlersMap, toState, toStateActive } from "./helpers";
 import {
   Handler,
@@ -177,8 +177,8 @@ export function createPerPointerListeners(
                 const type = "pointer" + key.substring(2).toLowerCase();
                 return (fn: Handler) => {
                   if (!init) {
-                    // eslint-disable-next-line no-console
-                    if (isDev) console.warn(onlyInitMessage);
+                    // eslint-disable-next-line no-console, @typescript-eslint/no-unnecessary-condition
+                    if (!isServer && DEV) console.warn(onlyInitMessage);
                     return;
                   }
                   if (type === "pointerleave") onLeave = fn;
@@ -215,18 +215,14 @@ export function createPerPointerListeners(
           // onMove()
           fn => {
             if (init) addListener("pointermove", fn, pointerId);
-            else if (isDev) {
-              // eslint-disable-next-line no-console
-              console.warn(onlyInitMessage);
-            }
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-console
+            else if (!isServer && DEV) console.warn(onlyInitMessage);
           },
           // onUp()
           fn => {
             if (init) onUp = fn;
-            else if (isDev) {
-              // eslint-disable-next-line no-console
-              console.warn(onlyInitMessage);
-            }
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-console
+            else if (!isServer && DEV) console.warn(onlyInitMessage);
           },
         );
         init = false;

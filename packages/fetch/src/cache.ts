@@ -1,5 +1,5 @@
-import { ResourceOptions } from "solid-js";
-import { isDev } from "solid-js/web";
+import { ResourceOptions, DEV } from "solid-js";
+import { isServer } from "solid-js/web";
 import { RequestContext } from "./fetch";
 import { RequestModifier, wrapFetcher } from "./modifiers";
 
@@ -84,7 +84,9 @@ export const withCache: RequestModifier =
       try {
         delete requestContext.cache[serializeRequest(requestData)];
       } catch (e) {
-        isDev &&
+        !isServer &&
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          DEV &&
           // eslint-disable-next-line no-console
           console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
       }
@@ -135,8 +137,11 @@ export const withCacheStorage: RequestModifier =
       const loadedCache = JSON.parse(storage.getItem(key) || "{}");
       Object.assign(requestContext.cache, loadedCache);
     } catch (e) {
-      // eslint-disable-next-line no-console
-      isDev && console.warn("attempt to parse stored request cache failed with error", e);
+      !isServer &&
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        DEV &&
+        // eslint-disable-next-line no-console
+        console.warn("attempt to parse stored request cache failed with error", e);
     }
     const originalWriteCache = requestContext.writeCache;
     requestContext.writeCache = (...args: any[]) => {
@@ -144,8 +149,8 @@ export const withCacheStorage: RequestModifier =
       try {
         storage.setItem(key, JSON.stringify(requestContext.cache));
       } catch (e) {
-        // eslint-disable-next-line no-console
-        isDev && console.warn("attempt to store request cache failed with error", e);
+        // eslint-disable-next-line no-console, @typescript-eslint/no-unnecessary-condition
+        !isServer && DEV && console.warn("attempt to store request cache failed with error", e);
       }
     };
     requestContext.wrapResource();

@@ -12,8 +12,9 @@ import {
   SignalOptions,
   sharedConfig,
   onMount,
+  DEV,
 } from "solid-js";
-import { isServer, isDev } from "solid-js/web";
+import { isServer } from "solid-js/web";
 import type {
   AnyClass,
   MaybeAccessor,
@@ -36,8 +37,9 @@ export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
-export { isServer, isDev };
+export { isServer };
 export const isClient = !isServer;
+export const isDev = isClient && !!DEV;
 export const isProd = !isDev;
 
 /**

@@ -1,6 +1,6 @@
 import { createContextProvider } from "@solid-primitives/context";
-import { Accessor, createSignal, FlowComponent, Setter } from "solid-js";
-import { isDev } from "solid-js/web";
+import { Accessor, createSignal, FlowComponent, Setter, DEV } from "solid-js";
+import { isServer } from "solid-js/web";
 import { deepReadObject } from "./i18n";
 
 export type I18nFormatOptions = Record<string, string | number>;
@@ -58,7 +58,8 @@ function buildChainedDictionary<T extends I18nObject>(obj: T): I18nPath<T> {
         break;
       default:
         throw new Error(
-          isDev
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          !isServer && DEV
             ? `Unsupported data format on the keys. Values must resolve to a string or a function that returns a string. Key name: "${key}"`
             : "",
         );

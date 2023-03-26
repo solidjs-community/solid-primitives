@@ -1,5 +1,5 @@
-import { Accessor, createRoot, onCleanup, untrack } from "solid-js";
-import { isDev } from "solid-js/web";
+import { Accessor, createRoot, onCleanup, untrack, DEV } from "solid-js";
+import { isServer } from "solid-js/web";
 import { abs, accessor, ceil, floor, min, RangeProps, toFunction } from "./common";
 
 /**
@@ -116,8 +116,8 @@ export function mapRange<T>(
   return () => {
     let _step = getStep();
     if (_step === 0) {
-      // eslint-disable-next-line no-console
-      if (isDev) console.warn("Range cannot have a step of 0");
+      // eslint-disable-next-line no-console, @typescript-eslint/no-unnecessary-condition
+      if (!isServer && DEV) console.warn("Range cannot have a step of 0");
       return items;
     }
     let _start = getStart();

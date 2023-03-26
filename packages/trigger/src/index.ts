@@ -1,15 +1,15 @@
-import { createSignal, getListener, onCleanup, SignalOptions } from "solid-js";
-import { isServer, isDev } from "solid-js/web";
+import { createSignal, getListener, onCleanup, SignalOptions, DEV } from "solid-js";
+import { isServer } from "solid-js/web";
 import { noop } from "@solid-primitives/utils";
 
 export type Trigger = [track: VoidFunction, dirty: VoidFunction];
 
-const triggerOptions: SignalOptions<any> = isDev
-  ? { equals: false, name: "trigger" }
-  : { equals: false };
-const triggerCacheOptions: SignalOptions<any> = isDev
-  ? { equals: false, internal: true }
-  : triggerOptions;
+const triggerOptions: SignalOptions<any> =
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  !isServer && DEV ? { equals: false, name: "trigger" } : { equals: false };
+const triggerCacheOptions: SignalOptions<any> =
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  !isServer && DEV ? { equals: false, internal: true } : triggerOptions;
 
 /**
  * Set listeners in reactive computations and then trigger them when you want.
