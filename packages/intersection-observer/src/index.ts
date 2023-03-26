@@ -1,6 +1,6 @@
-import { onMount, onCleanup, createSignal, createEffect, untrack, Setter } from "solid-js";
+import { onMount, onCleanup, createSignal, createEffect, untrack, Setter, DEV } from "solid-js";
 import type { JSX, Accessor } from "solid-js";
-import { isServer, isDev } from "solid-js/web";
+import { isServer } from "solid-js/web";
 import { access, FalsyValue, MaybeAccessor } from "@solid-primitives/utils";
 
 export type AddIntersectionObserverEntry = (el: Element) => void;
@@ -79,8 +79,10 @@ export function makeIntersectionObserver(
 
   const instance = new IntersectionObserver(onChange, options);
   const add: AddIntersectionObserverEntry = el => {
-    // Elements with 'display: "contents"' don't work with IO, even if they are visible by users (https://github.com/solidjs-community/solid-primitives/issues/116)
-    if (isDev && el instanceof HTMLElement && el.style.display === "contents") {
+    // Elements with 'display: "contents"' don't work with IO, even if they are visible by users
+    // (https://github.com/solidjs-community/solid-primitives/issues/116)
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!isServer && DEV && el instanceof HTMLElement && el.style.display === "contents") {
       // eslint-disable-next-line no-console
       console.warn(
         `[@solid-primitives/intersection-observer/makeIntersectionObserver] IntersectionObserver is not able to observe elements with 'display: "contents"' style:`,

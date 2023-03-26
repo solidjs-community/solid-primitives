@@ -1,5 +1,11 @@
 # @solid-primitives/fetch
 
+## 2.4.6
+
+### Patch Changes
+
+- 83843698: Use `!isServer && DEV` for checking development env to support versions prior to 1.6.12
+
 ## 2.4.5
 
 ### Patch Changes
