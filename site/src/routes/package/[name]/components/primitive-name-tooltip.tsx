@@ -219,7 +219,7 @@ export function createPrimitiveNameTooltips(props: {
   primitives: BundlesizeItem[];
 }): void {
   onMount(() => {
-    const els = props.target.querySelectorAll<HTMLElement>("h2 code, a code");
+    const els = props.target.querySelectorAll<HTMLElement>("[data-code-primitive-name]");
 
     for (const el of els) {
       const primitiveName = el.textContent;

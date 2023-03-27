@@ -67,6 +67,12 @@ const markdownProcessor = unified()
  * Parse README.md of each package and generate HTML
  */
 async function generateReadme(module: ModuleData) {
+  const primitiveCodeElRegex = new RegExp(
+    `<((?:_components\\.)?code)>{?(?:"|')?(<?(?:${module.primitives.join(
+      "|",
+    )})>?)(?:"|')?}?<\\/((?:_components\\.)?code)>`,
+    "g",
+  );
   const readmePath = path.join(packagesPath, module.name, "README.md");
   let readme = await fsp.readFile(readmePath, "utf8");
 
@@ -107,7 +113,14 @@ async function generateReadme(module: ModuleData) {
       return _;
     });
 
-  return String(await markdownProcessor.process(readme));
+  return (
+    String(await markdownProcessor.process(readme))
+      // update code tag that contains primitives to have attribute
+      .replace(primitiveCodeElRegex, (_, p1, p2, p3) => {
+        if (!p2) return _;
+        return `<${p1} data-code-primitive-name>${p2}</${p3}>`;
+      })
+  );
 }
 
 async function generatePrimitiveSizes(module: ModuleData) {
