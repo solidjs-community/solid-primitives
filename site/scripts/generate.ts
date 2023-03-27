@@ -68,9 +68,7 @@ const markdownProcessor = unified()
  */
 async function generateReadme(module: ModuleData) {
   const primitiveCodeElRegex = new RegExp(
-    `<((?:_components\\.)?code)>{?(?:"|')?(<?(?:${module.primitives.join(
-      "|",
-    )})>?)(?:"|')?}?<\\/((?:_components\\.)?code)>`,
+    `<(code)>((?:&#x3C;|<)?(?:${module.primitives.join("|")})>?)<\/(code)>`,
     "g",
   );
   const readmePath = path.join(packagesPath, module.name, "README.md");
@@ -118,7 +116,7 @@ async function generateReadme(module: ModuleData) {
       // update code tag that contains primitives to have attribute
       .replace(primitiveCodeElRegex, (_, p1, p2, p3) => {
         if (!p2) return _;
-        return `<${p1} data-code-primitive-name>${p2}</${p3}>`;
+        return `<${p1} data-code-primitive-name="${p2.replace(/\<|\>|&#x3C;/g, "")}">${p2}</${p3}>`;
       })
   );
 }
