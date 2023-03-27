@@ -17,9 +17,10 @@
     "name": "static-store",
     "stage": 0,
     "list": [
-      "createPrimitiveTemplate"
+      "createStaticStore",
+      "createDerivedStaticStore"
     ],
-    "category": "Display & Media"
+    "category": "Reactivity"
   },
   "keywords": [
     "solid",

@@ -46,44 +46,44 @@ export type StaticStoreSetter<T extends object> = {
 export function createStaticStore<T extends object>(
   init: T,
 ): [access: T, write: StaticStoreSetter<T>] {
-  const copy = { ...init };
-  const store = { ...init };
-  const cache = new Map<PropertyKey, Signal<any>>();
+  const copy = { ...init },
+    store = { ...init },
+    cache: Partial<Record<PropertyKey, Signal<T[keyof T]>>> = {};
 
-  const getValue = <K extends keyof T>(key: K): T[K] => {
-    const saved = cache.get(key);
-    if (saved) return saved[0]();
-    const signal = createSignal<any>(copy[key], {
-      internal: true,
-    });
-    cache.set(key, signal);
-    delete copy[key];
+  const getValue = (key: keyof T): T[keyof T] => {
+    let signal = cache[key];
+    if (!signal) {
+      if (!getListener()) return copy[key];
+      cache[key] = signal = createSignal(copy[key], { internal: true });
+      delete copy[key];
+    }
     return signal[0]();
   };
 
-  const setValue = <K extends keyof T>(key: K, value: SetterParam<any>): void => {
-    const saved = cache.get(key);
-    if (saved) return saved[1](value);
+  for (const key in init) {
+    Object.defineProperty(store, key, { get: () => getValue(key), enumerable: true });
+  }
+
+  const setValue = (key: keyof T, value: SetterParam<any>): void => {
+    const signal = cache[key];
+    if (signal) return signal[1](value);
     if (key in copy) copy[key] = accessWith(value, [copy[key]]);
   };
 
-  for (const key in init) {
-    Object.defineProperty(store, key, { get: getValue.bind(void 0, key) });
-  }
-
-  const setter = (a: ((prev: T) => Partial<T>) | Partial<T> | keyof T, b?: SetterParam<any>) => {
-    if (isObject(a)) {
-      const entries = untrack(
-        () => Object.entries(accessWith(a, store) as Partial<T>) as [any, any][],
-      );
-      batch(() => {
-        for (const [key, value] of entries) setValue(key, () => value);
-      });
-    } else setValue(a, b);
-    return store;
-  };
-
-  return [store, setter];
+  return [
+    store,
+    (a: ((prev: T) => Partial<T>) | Partial<T> | keyof T, b?: SetterParam<any>) => {
+      if (isObject(a)) {
+        const entries = untrack(
+          () => Object.entries(accessWith(a, store) as Partial<T>) as [any, any][],
+        );
+        batch(() => {
+          for (const [key, value] of entries) setValue(key, () => value);
+        });
+      } else setValue(a, b);
+      return store;
+    },
+  ];
 }
 
 /**
@@ -143,20 +143,20 @@ export function createDerivedStaticStore<T extends object>(
   value?: T,
   options?: MemoOptions<T>,
 ): T {
-  const cache = new Map<keyof T, Accessor<T[keyof T]>>(),
-    o = getOwner(),
+  const o = getOwner(),
     fnMemo = createMemo(fn, value, options),
-    store = { ...untrack(fnMemo) };
+    store = { ...untrack(fnMemo) },
+    cache: Partial<Record<keyof T, Accessor<T[keyof T]>>> = {};
 
   for (const key in store)
     Object.defineProperty(store, key, {
       get() {
-        let propMemo = cache.get(key);
-        if (!propMemo) {
+        let keyMemo = cache[key];
+        if (!keyMemo) {
           if (!getListener()) return fnMemo()[key];
-          runWithOwner(o, () => cache.set(key, (propMemo = createMemo(() => fnMemo()[key]))));
+          runWithOwner(o, () => (cache[key] = keyMemo = createMemo(() => fnMemo()[key])));
         }
-        return propMemo!();
+        return keyMemo!();
       },
       enumerable: true,
     });

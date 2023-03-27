@@ -19,7 +19,7 @@
       "ReactiveMap",
       "ReactiveWeakMap"
     ],
-    "category": "Utilities"
+    "category": "Reactivity"
   },
   "keywords": [
     "map",

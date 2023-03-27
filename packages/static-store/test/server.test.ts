@@ -1,9 +1,27 @@
-import { describe, test, expect } from "vitest";
-import { createPrimitiveTemplate } from "../src";
+import { describe, expect, test } from "vitest";
+import { createHydratableStaticStore, createStaticStore, createDerivedStaticStore } from "../src";
 
-describe("createPrimitiveTemplate", () => {
+describe("createStaticStore", () => {
   test("doesn't break in SSR", () => {
-    const [value, setValue] = createPrimitiveTemplate(true);
-    expect(value(), "initial value should be true").toBe(true);
+    const [state, setState] = createStaticStore({ foo: "server" });
+    expect(state).toEqual({ foo: "server" });
+    expect(setState).toBeInstanceOf(Function);
+  });
+});
+
+describe("createHydratableStaticStore", () => {
+  test("createHydratableStaticStore() - SSR", () => {
+    const [state, setState] = createHydratableStaticStore({ foo: "server" }, () => ({
+      foo: "client",
+    }));
+    expect(state).toEqual({ foo: "server" });
+    expect(setState).toBeInstanceOf(Function);
+  });
+});
+
+describe("createDerivedStaticStore", () => {
+  test("createDerivedStaticStore() - SSR", () => {
+    const state = createDerivedStaticStore(() => ({ foo: "server" }));
+    expect(state).toEqual({ foo: "server" });
   });
 });
