@@ -26,10 +26,11 @@ export type StaticStoreSetter<T extends object> = {
 /**
  * A shallowly wrapped reactive store object. It behaves similarly to the createStore, but with limited features to keep it simple. Designed to be used for reactive objects with static keys, but dynamic values, like reactive Event State, location, etc.
  * @param init initial value of the store
- * @returns
+ * @returns tuple with the store object and a setter function
  * ```ts
- * [access: Readonly<T>, write: StaticStoreSetter<T>]
+ * [access: T, write: StaticStoreSetter<T>]
  * ```
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/static-store#createStaticStore
  * @example
  * ```ts
  * const [size, setSize] = createStaticStore({ width: 0, height: 0 });
@@ -87,14 +88,15 @@ export function createStaticStore<T extends object>(
 }
 
 /**
- * A hydratable version of the {@link createStaticStore}. It will use the serverValue on the server and the update function on the client. If initialized during hydration it will use serverValue as the initial value and update it once hydration is complete.
+ * A hydratable version of the {@link createStaticStore}. It will use the {@link serverValue} on the server and the {@link update} function on the client. If initialized during hydration it will use {@link serverValue} as the initial value and update it once hydration is complete.
  *
  * @param serverValue initial value of the state on the server
  * @param update called once on the client or on hydration to initialize the value
- * @returns
+ * @returns tuple with the store object and a setter function
  * ```ts
- * [access: Readonly<T>, write: StaticStoreSetter<T>]
+ * [access: T, write: StaticStoreSetter<T>]
  * ```
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/static-store#createHydratableStaticStore
  */
 export function createHydratableStaticStore<T extends object>(
   serverValue: T,
@@ -115,6 +117,7 @@ export function createHydratableStaticStore<T extends object>(
  * A derived version of the {@link createStaticStore}. It will use the update function to derive the value of the store. It will only update when the dependencies of the update function change.
  * @param fn a reactive function to derive the value of the store
  * @returns a shallow, reactive, static store object
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/static-store#createDerivedStaticStore
  * @example
  * ```ts
  * const [size, setSize] = createSignal({ width: 0, height: 0 });
