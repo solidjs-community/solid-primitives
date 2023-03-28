@@ -1,14 +1,12 @@
-import { makeNoAsyncFileSystem } from "./adapter-mocks";
 import { limitPath } from "./tools";
-import type { AsyncFileSystemAdapter } from "./types";
 import { isServer } from "solid-js/web";
 
 export const makeNodeFileSystem = isServer
-  ? async (basePath: string = "/"): Promise<AsyncFileSystemAdapter> => {
+  ? async (basePath: string = "/") => {
       const fs = await import("fs/promises");
       const p = limitPath(basePath);
       return {
-        async: true,
+        async: true as const,
         getType: (path: string) =>
           fs
             .stat(p(path))
@@ -23,4 +21,4 @@ export const makeNodeFileSystem = isServer
           fs.writeFile(p(path), data, { encoding: "utf8" }),
       };
     }
-  : makeNoAsyncFileSystem;
+  : () => Promise.resolve(null);

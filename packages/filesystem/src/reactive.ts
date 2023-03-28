@@ -5,7 +5,6 @@ import type {
   ItemType,
   SyncFileSystem,
   AsyncFileSystem,
-  FileSystemAdapter,
   SyncFileSystemAdapter,
   AsyncFileSystemAdapter,
   DirEntries,
@@ -277,9 +276,12 @@ export function createFileSystem(
   watcher?: Watcher,
 ): Promise<AsyncFileSystem>;
 export function createFileSystem(
-  fs: FileSystemAdapter | Promise<AsyncFileSystemAdapter>,
+  fs: SyncFileSystemAdapter | AsyncFileSystemAdapter | Promise<AsyncFileSystemAdapter> | null,
   watcher?: Watcher,
 ): SyncFileSystem | AsyncFileSystem | Promise<AsyncFileSystem> {
+  if (fs === null) {
+    throw new Error("file system adapter is null");
+  }
   return fs instanceof Promise
     ? fs.then(fs => createAsyncFileSystem(fs, watcher))
     : fs.async

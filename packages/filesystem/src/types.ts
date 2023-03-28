@@ -1,6 +1,6 @@
 export type ItemType = "dir" | "file" | null;
 
-export type DirEntries = [] | [string, ...string[]];
+export type DirEntries = string[];
 
 export type SyncFileSystemAdapter = {
   async: false;

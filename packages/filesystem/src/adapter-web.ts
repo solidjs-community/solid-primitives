@@ -1,7 +1,6 @@
 ///<reference path="../node_modules/@types/wicg-file-system-access/index.d.ts" />
-import { makeNoAsyncFileSystem } from "./adapter-mocks";
-import type { AsyncFileSystemAdapter } from "./types";
 import { isServer } from "solid-js/web";
+import { DirEntries } from "./types";
 
 /**
  * Adapter that provides access to the actual filesystem in the browser using a directory picker
@@ -10,9 +9,9 @@ import { isServer } from "solid-js/web";
  * relies on https://wicg.github.io/file-system-access/ - basic api (https://caniuse.com/native-filesystem-api)
  */
 export const makeWebAccessFileSystem = isServer
-  ? () => Promise.resolve(makeNoAsyncFileSystem())
+  ? () => Promise.resolve(null)
   : typeof globalThis.showDirectoryPicker === "function"
-  ? async (options?: DirectoryPickerOptions | undefined): Promise<AsyncFileSystemAdapter> => {
+  ? async (options?: DirectoryPickerOptions | undefined) => {
       const handle = await globalThis.showDirectoryPicker(options);
       const walk = async (
         path: string,
@@ -44,12 +43,12 @@ export const makeWebAccessFileSystem = isServer
               .catch(() => undefined)
           : undefined;
       return {
-        async: true,
-        getType: async path =>
+        async: true as const,
+        getType: async (path: string) =>
           walk(path, getNext)
             .then(handle => (handle?.kind === "directory" ? "dir" : handle?.kind || null))
             .catch(() => null),
-        readdir: async path =>
+        readdir: async (path: string) =>
           walk(path, getNext).then(async handle => {
             if (handle?.kind !== "directory") {
               return [];
@@ -58,9 +57,9 @@ export const makeWebAccessFileSystem = isServer
             for await (const name of handle.keys()) {
               items.push(name);
             }
-            return items as [] | [string, ...string[]];
+            return items as DirEntries;
           }),
-        mkdir: async path => {
+        mkdir: async (path: string) => {
           await walk(path, (handle, part, index, parts) =>
             handle.kind === "file"
               ? Promise.reject(
@@ -73,7 +72,7 @@ export const makeWebAccessFileSystem = isServer
               : handle.getDirectoryHandle(part, { create: true }),
           );
         },
-        readFile: async path =>
+        readFile: async (path: string) =>
           await walk(path, (handle, part, index, parts) =>
             index < parts.length - 1
               ? getNext(handle, part)
@@ -85,7 +84,7 @@ export const makeWebAccessFileSystem = isServer
               ? handle.getFile().then(file => file.text())
               : Promise.reject(`reading file "${path}" failed - not a file`),
           ),
-        writeFile: async (path, data) =>
+        writeFile: async (path: string, data: string) =>
           void (await walk(path, (handle, part, index, parts) =>
             index < parts.length - 1
               ? getNext(handle, part)
@@ -100,7 +99,7 @@ export const makeWebAccessFileSystem = isServer
                   new Error(`could not write file ${path}, since path is no parent directory`),
                 ),
           )),
-        rm: async path =>
+        rm: async (path: string) =>
           void (await walk(path, (handle, part, index, parts) =>
             index < parts.length - 1
               ? getNext(handle, part)
@@ -110,4 +109,4 @@ export const makeWebAccessFileSystem = isServer
           )),
       };
     }
-  : () => Promise.resolve(makeNoAsyncFileSystem());
+  : () => Promise.resolve(null);
