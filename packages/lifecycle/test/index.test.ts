@@ -1,14 +1,31 @@
 import { describe, test, expect } from "vitest";
-import { createRoot } from "solid-js";
-import { createPrimitiveTemplate } from "../src";
+import { createEffect, createRoot } from "solid-js";
+import { createIsMounted, isHydrated, isHydrating } from "../src";
 
-describe("createPrimitiveTemplate", () => {
-  test("createPrimitiveTemplate return values", () =>
+describe("createIsMounted", () => {
+  test("createIsMounted", () => {
     createRoot(dispose => {
-      const [value, setValue] = createPrimitiveTemplate(true);
-      expect(value(), "initial value should be true").toBe(true);
-      setValue(false);
-      expect(value(), "value after change should be false").toBe(false);
-      dispose();
-    }));
+      const isMounted = createIsMounted();
+      expect(isMounted()).toBe(false);
+
+      createEffect(() => {
+        expect(isMounted()).toBe(true);
+        dispose();
+      });
+    });
+
+    expect(createIsMounted()()).toBe(true);
+  });
+});
+
+describe("isHydrated", () => {
+  test("isHydrated", () => {
+    expect(isHydrated()).toBe(true);
+  });
+});
+
+describe("isHydrating", () => {
+  test("isHydrating", () => {
+    expect(isHydrating()).toBe(false);
+  });
 });
