@@ -396,6 +396,12 @@ importers:
       '@solid-primitives/utils': link:../utils
       solid-transition-group: 0.0.13_solid-js@1.6.15
 
+  packages/lifecycle:
+    specifiers:
+      '@solid-primitives/utils': workspace:^5.5.2
+    dependencies:
+      '@solid-primitives/utils': link:../utils
+
   packages/map:
     specifiers:
       '@solid-primitives/trigger': workspace:^1.0.3
@@ -11771,7 +11777,7 @@ packages:
       kolorist: 1.7.0
       sirv: 2.0.2
       ufo: 1.1.1
-      vite: 4.1.4_x7dzuadbe27hczg4caescy3qve
+      vite: 4.1.4_@types+node@18.15.0
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -11806,7 +11812,7 @@ packages:
       merge-anything: 5.1.4
       solid-js: 1.6.15
       solid-refresh: 0.5.0_solid-js@1.6.15
-      vite: 4.1.4_x7dzuadbe27hczg4caescy3qve
+      vite: 4.1.4_@types+node@18.15.0
       vitefu: 0.2.4_vite@4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -11921,7 +11927,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.1.4_x7dzuadbe27hczg4caescy3qve
+      vite: 4.1.4_@types+node@18.15.0
     dev: true
 
   /vitest/0.29.2_jsdom@21.1.0:
