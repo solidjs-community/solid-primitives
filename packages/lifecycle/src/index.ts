@@ -1,12 +1,9 @@
-import { falseFn, trueFn } from "@solid-primitives/utils";
-import { Accessor, createSignal, onCleanup, onMount, sharedConfig } from "solid-js";
+import { Accessor, createSignal, getListener, onCleanup, onMount, sharedConfig } from "solid-js";
 import { isServer } from "solid-js/web";
-
-export { tryOnCleanup } from "@solid-primitives/utils";
 
 /**
  * @returns a signal accessor that will return a `false` initially,
- * and then update to`true` once the owner is mounted.
+ * and then update to `true` once the owner is mounted.
  * @example
  * ```tsx
  * let ref: HTMLElement
@@ -14,31 +11,14 @@ export { tryOnCleanup } from "@solid-primitives/utils";
  * const windowWidth = createMemo(() => isMounted() ? ref.offsetWidth : 0)
  * <div ref={ref}>{windowWidth()}</div>
  * ```
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#createIsMounted
  */
 export function createIsMounted(): Accessor<boolean> {
-  if (isServer) return falseFn;
+  if (isServer) return () => false;
   const [isMounted, setIsMounted] = createSignal(false);
   onMount(() => setIsMounted(true));
   return isMounted;
 }
-
-/**
- * @returns a signal accessor that will return a `boolean` value representing if the owner is currently hydrating.
- *
- * - `false` during SSR
- * - `false` on the client if the owner evaluation is during a hydration process.
- * - `true` on the client if the owner evaluates after hydration or during clinet-side rendering.
- *
- * @example
- * ```tsx
- * let ref: HTMLElement
- * const isHydrated = createIsHydrated();
- * const windowWidth = createMemo(() => isHydrated() ? ref.offsetWidth : 0)
- * <div ref={ref}>{windowWidth()}</div>
- * ```
- */
-export const createIsHydrated = (): Accessor<boolean> =>
-  isServer || sharedConfig.context ? createIsMounted() : trueFn;
 
 /**
  * @returns a `boolean` value representing if the hydration process of the current owner is complete.
@@ -48,9 +28,11 @@ export const createIsHydrated = (): Accessor<boolean> =>
  * - `true` on the client if the component evaluates after hydration or during clinet-side rendering.
  *
  * Switching from `false` to `true` will trigger the signal to update.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#isHydrated
  */
 export const isHydrated = (): boolean =>
-  !isServer && (!sharedConfig.context || createIsMounted()());
+  !isServer && (!sharedConfig.context || (!!getListener() && createIsMounted()()));
 
 /**
  * @returns a `boolean` value representing if the component is currently hydrating.
@@ -61,6 +43,8 @@ export const isHydrated = (): boolean =>
  * - `false` on the client if the component evaluates after hydration or during clinet-side rendering.
  *
  * Switching from `true` to `false` will trigger the signal to update. (on the client)
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#isHydrating
  */
 export const isHydrating = (): boolean => (isServer ? !!sharedConfig.context : !isHydrated());
 
@@ -80,6 +64,7 @@ export const isHydrating = (): boolean => (isServer ? !!sharedConfig.context : !
  *   })
  * }} />
  * ```
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#onConnect
  */
 export function onConnect(el: Element, fn: VoidFunction): void {
   if (isServer) return;

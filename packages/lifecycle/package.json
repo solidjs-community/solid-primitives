@@ -1,8 +1,8 @@
 {
   "name": "@solid-primitives/lifecycle",
   "version": "0.0.100",
-  "description": "A template primitive example.",
-  "author": "Your Name <you@youremail.com>",
+  "description": "Package providing extra layer of lifecycle primitives for Solid.",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#readme",
@@ -17,13 +17,17 @@
     "name": "lifecycle",
     "stage": 0,
     "list": [
-      "createPrimitiveTemplate"
+      "createIsMounted",
+      "isHydrating",
+      "onConnect"
     ],
-    "category": "Display & Media"
+    "category": "Reactivity"
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "lifecycle",
+    "hydration"
   ],
   "private": false,
   "sideEffects": false,
@@ -52,8 +56,5 @@
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"
-  },
-  "dependencies": {
-    "@solid-primitives/utils": "workspace:^5.5.2"
   }
 }

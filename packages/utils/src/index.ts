@@ -193,7 +193,6 @@ export const keys = Object.keys as <T extends object>(object: T) => (keyof T)[];
 /**
  * Solid's `onCleanup` that doesn't warn in development if used outside of a component.
  */
-// TODO move it to /lifecycle in the next major release
 export const tryOnCleanup: typeof onCleanup = isDev
   ? fn => (getOwner() ? onCleanup(fn) : fn)
   : onCleanup;
