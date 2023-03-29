@@ -29,6 +29,9 @@ pnpm add @solid-primitives/lifecycle
 
 Returns a boolean signal indicating whether the component is mounted or not.
 
+It's a simple wrapper around `createSignal` and `onMount`,
+but it can make your code feel more declarative - especially when used with `createMemo`.
+
 ```tsx
 import { createIsMounted } from "@solid-primitives/lifecycle";
 
@@ -41,7 +44,7 @@ let ref: HTMLElement;
 
 ## `isHydrated`
 
-A signal with the same behavior as [`isHydrating`](#isHydrating) but this one focused only on client-side updates.
+A signal accessor indicating if the owner is done hydrating.
 
 - `false` during SSR (always)
 - `false` on the client if the component evaluation is during a hydration process.
@@ -49,6 +52,10 @@ A signal with the same behavior as [`isHydrating`](#isHydrating) but this one fo
 
 If it returns `false` it means that you can safely change the initial values of signals
 that are used in the JSX, without causing a mismatch between the server and client.
+
+It can be used in computations as a signal, and it will trigger a re-evaluation when the hydration state changes.
+
+But it can also be used as a simple check of the hydration state.
 
 ```tsx
 import { isHydrated } from "@solid-primitives/lifecycle";
