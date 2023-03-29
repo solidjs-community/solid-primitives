@@ -13,7 +13,7 @@ Package providing extra layer of lifecycle primitives for Solid.
 
 - [`createIsMounted`](#createIsMounted) - Returns a boolean signal indicating whether the component is mounted or not.
 - [`isHydrated`](#isHydrated) - A signal with the same behavior as [`isHydrating`](#isHydrating) but this one focused only on client-side updates.
-- [`onConnect`](#onConnect) - Calls the given callback when the target element is connected to the DOM.
+- [`onElementConnect`](#onElementConnect) - Calls the given callback when the target element is connected to the DOM.
 
 ## Installation
 
@@ -90,7 +90,7 @@ export const ClientOnly: FlowComponent = props => {
 </ClientOnly>;
 ```
 
-## `onConnect`
+## `onElementConnect`
 
 `onMount` is a common lifecycle hook that is used to perform side-effects when the component is mounted.
 However, it is not certain that the elements are actually connected to the DOM when the mount callback is called.
@@ -99,7 +99,7 @@ However, it is not certain that the elements are actually connected to the DOM w
 >
 > And if this is something intentional, you probably already have a way to hook into the actual DOM rendering.
 >
-> If you are not sure, you can use `onConnect` instead of `onMount` to make sure that you are caling your callback when the elements are connected to the DOM.
+> If you are not sure, you can use `onElementConnect` instead of `onMount` to make sure that you are caling your callback when the elements are connected to the DOM.
 
 ```tsx
 <div
@@ -112,7 +112,7 @@ However, it is not certain that the elements are actually connected to the DOM w
       el.isConnected;
     });
 
-    onConnect(el, () => {
+    onElementConnect(el, () => {
       // always true
       el.isConnected;
     });

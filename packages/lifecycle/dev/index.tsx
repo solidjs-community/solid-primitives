@@ -1,7 +1,7 @@
 import { children, createSignal, JSX, onMount } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
-import { onConnect } from "../src";
+import { onElementConnect } from "../src";
 
 // const App: Component = () => {
 //   const [count, setCount] = createSignal(0);
@@ -29,7 +29,7 @@ function App() {
   onMount(() => {
     console.log("onMount", ref.isConnected);
 
-    onConnect(ref, () => {
+    onElementConnect(ref, () => {
       console.log("onConnect", ref.isConnected);
     });
   });

@@ -52,7 +52,7 @@ export const isHydrated = (): boolean =>
  * ```
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#onConnect
  */
-export function onConnect(el: Element, fn: VoidFunction): void {
+export function onElementConnect(el: Element, fn: VoidFunction): void {
   if (isServer) return;
   if (el.isConnected) return fn();
   const observer: ResizeObserver = new ResizeObserver(
