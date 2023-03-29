@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=static-store" alt="Solid Primitives static-store">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=static-store" alt="Solid Primitives Static Store">
 </p>
 
 # @solid-primitives/static-store
@@ -55,9 +55,34 @@ el.addEventListener("resize", () => {
 setSize("new-property", "value");
 ```
 
-### `createHydratableStaticStore`
+## `createDerivedStaticStore`
 
-A hydratable version of the [`createStaticStore`](#createStaticStore). It will use the `serverValue` on the server and the `update` function on the client. If initialized during hydration it will use `serverValue` as the initial value and update it once hydration is complete.
+A derived version of the [`createStaticStore`](#createStaticStore). It will use the update function to derive the value of the store. It will only update when the dependencies of the update function change.
+
+### How to use it
+
+It works similarly to the `createMemo` primitive and it takes the same arguments, but it returns a reactive object rather than an accessor function.
+
+```ts
+// source
+const [size, setSize] = createSignal({ width: 0, height: 0 });
+
+const store = createDerivedStaticStore(size);
+
+createEffect(() => {
+  // both of these are separate signals, that can be listened to independently
+  console.log(store.width, store.height);
+});
+
+el.addEventListener("resize", () => {
+  // only the changed properties that changed will trigger their observers
+  setSize(p => ({ ...p, height: el.offsetHeight }));
+});
+```
+
+## `createHydratableStaticStore`
+
+A "hydratable" version of the [`createStaticStore`](#createStaticStore) - it will use the `serverValue` on the server and the `update` function on the client. If initialized during hydration it will use `serverValue` as the initial value and update it once hydration is complete.
 
 > **Warning** This primitive version is experimental, and mostly used internally by other primitives. It is not recommended to use it directly.
 
@@ -79,28 +104,6 @@ const [size, setSize] = createHydratableStaticStore(
 
 createEffect(() => {
   console.log(size.width, size.height);
-});
-```
-
-## `createDerivedStaticStore`
-
-A derived version of the {@link createStaticStore}. It will use the update function to derive the value of the store. It will only update when the dependencies of the update function change.
-
-### How to use it
-
-It takes the same arguments as `createMemo`, but it returns a reactive object rather than an accessor function.
-
-```ts
-const [size, setSize] = createSignal({ width: 0, height: 0 });
-
-el.addEventListener("resize", () => {
-  setSize({ width: el.offsetWidth, height: el.offsetHeight });
-});
-
-const store = createDerivedStaticStore(size);
-
-createEffect(() => {
-  console.log(store.width, store.height);
 });
 ```
 
