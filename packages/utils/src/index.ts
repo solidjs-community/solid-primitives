@@ -187,9 +187,11 @@ export const entries = Object.entries as <T extends object>(obj: T) => [keyof T,
 export const keys = Object.keys as <T extends object>(object: T) => (keyof T)[];
 
 /**
- * Solid's `onCleanup` that is registered only if there is a root.
+ * Solid's `onCleanup` that doesn't warn in development if used outside of a component.
  */
-export const tryOnCleanup: typeof onCleanup = fn => (getOwner() ? onCleanup(fn) : fn);
+export const tryOnCleanup: typeof onCleanup = isDev
+  ? fn => (getOwner() ? onCleanup(fn) : fn)
+  : onCleanup;
 
 export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(): {
   push: (...callbacks: ((arg0: A0, arg1: A1, arg2: A2, arg3: A3) => void)[]) => void;
