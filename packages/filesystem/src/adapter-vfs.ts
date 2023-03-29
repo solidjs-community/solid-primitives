@@ -1,4 +1,4 @@
-import type { ItemType, SyncFileSystemAdapter } from "./types";
+import type { ItemType } from "./types";
 import { getParentDir } from "./tools";
 
 export type ObjectFileSystem = { [id: string]: string | ObjectFileSystem };
@@ -16,7 +16,7 @@ export const makeVirtualFileSystem = (
   initial?: ObjectFileSystem,
   storage?: Storage,
   key = "solid-primitive-filesystem",
-): SyncFileSystemAdapter & { toMap: () => Map<string, string> } => {
+) => {
   let storedValue;
   const storageValue = storage?.getItem(key);
   try {
