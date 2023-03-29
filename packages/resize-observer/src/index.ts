@@ -1,31 +1,26 @@
+import { makeEventListener } from "@solid-primitives/event-listener";
+import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
+import { createHydratableStaticStore, createStaticStore } from "@solid-primitives/static-store";
 import {
-  createEffect,
-  onCleanup,
-  on,
-  $PROXY,
-  $TRACK,
-  Accessor,
-  onMount,
-  sharedConfig,
-} from "solid-js";
-import { isServer } from "solid-js/web";
-import {
+  access,
   asArray,
+  handleDiffArray,
   Many,
   MaybeAccessor,
-  handleDiffArray,
-  createHydratableStaticStore,
-  createStaticStore,
-  access,
+  noop,
+  filterNonNullable,
 } from "@solid-primitives/utils";
-import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
-import { makeEventListener } from "@solid-primitives/event-listener";
+import { Accessor, createEffect, onCleanup, sharedConfig } from "solid-js";
+import { isServer } from "solid-js/web";
 
 export type ResizeHandler = (
   rect: DOMRectReadOnly,
   element: Element,
   entry: ResizeObserverEntry,
 ) => void;
+
+export type Size = { width: number; height: number };
+export type NullableSize = { width: number; height: number } | { width: null; height: null };
 
 /**
  * Instantiate a new ResizeObserver that automatically get's disposed on cleanup.
@@ -42,16 +37,13 @@ export function makeResizeObserver<T extends Element>(
   unobserve: (ref: T) => void;
 } {
   if (isServer) {
-    return {
-      observe: () => {},
-      unobserve: () => {},
-    };
+    return { observe: noop, unobserve: noop };
   }
-  const resizeObserver = new ResizeObserver(callback);
-  onCleanup(resizeObserver.disconnect.bind(resizeObserver));
+  const observer = new ResizeObserver(callback);
+  onCleanup(observer.disconnect.bind(observer));
   return {
-    observe: ref => resizeObserver.observe(ref, options),
-    unobserve: resizeObserver.unobserve.bind(resizeObserver),
+    observe: ref => observer.observe(ref, options),
+    unobserve: observer.unobserve.bind(observer),
   };
 }
 
@@ -71,58 +63,39 @@ export function makeResizeObserver<T extends Element>(
  * ```
  */
 export function createResizeObserver(
-  targets: MaybeAccessor<Many<Element>>,
+  targets: MaybeAccessor<Many<Element | undefined | null>>,
   onResize: ResizeHandler,
   options?: ResizeObserverOptions,
 ): void {
   if (isServer) return;
 
-  const previousMap = new WeakMap<Element, { width: number; height: number }>();
-  const { observe, unobserve } = makeResizeObserver(handleObserverCallback, options);
-
-  function handleObserverCallback(entries: ResizeObserverEntry[]) {
-    for (const entry of entries) {
-      const { contentRect, target } = entry;
-      const width = Math.round(contentRect.width);
-      const height = Math.round(contentRect.height);
-      const previous = previousMap.get(target);
-      if (!previous || previous.width !== width || previous.height !== height) {
-        onResize(contentRect, entry.target, entry);
-        previousMap.set(target, { width, height });
+  const previousMap = new WeakMap<Element, Size>(),
+    { observe, unobserve } = makeResizeObserver(entries => {
+      for (const entry of entries) {
+        const { contentRect, target } = entry,
+          width = Math.round(contentRect.width),
+          height = Math.round(contentRect.height),
+          previous = previousMap.get(target);
+        if (!previous || previous.width !== width || previous.height !== height) {
+          onResize(contentRect, target, entry);
+          previousMap.set(target, { width, height });
+        }
       }
-    }
-  }
+    }, options);
 
-  let refs: Accessor<Element[]> | undefined;
-  // is an signal
-  if (typeof targets === "function") refs = () => asArray(targets()).slice();
-  // is a store array
-  else if (Array.isArray(targets) && $PROXY in targets)
-    refs = () => {
-      // track top-level store array
-      (targets as any)[$TRACK];
-      return targets.slice();
-    };
-  // is not reactive
-  else {
-    asArray(targets).forEach(observe);
-    return;
-  }
-
-  createEffect(
-    on(refs, (current, prev = []) => handleDiffArray(current, prev, observe, unobserve)),
-  );
+  createEffect((prev: Element[]) => {
+    const refs = filterNonNullable(asArray(access(targets)));
+    handleDiffArray(refs, prev, observe, unobserve);
+    return refs;
+  }, []);
 }
 
-const WINDOW_SIZE_FALLBACK = { width: 0, height: 0 } as const;
+const WINDOW_SIZE_FALLBACK = { width: 0, height: 0 } as const satisfies Size;
 
 /**
  * @returns object with width and height dimensions of window, page and screen.
  */
-export function getWindowSize(): {
-  width: number;
-  height: number;
-} {
+export function getWindowSize(): Size {
   if (isServer) return { ...WINDOW_SIZE_FALLBACK };
   return {
     width: window.innerWidth,
@@ -138,10 +111,7 @@ export function getWindowSize(): {
  *   console.log(size.width, size.height)
  * })
  */
-export function createWindowSize(): {
-  readonly width: number;
-  readonly height: number;
-} {
+export function createWindowSize(): Readonly<Size> {
   if (isServer) {
     return WINDOW_SIZE_FALLBACK;
   }
@@ -164,15 +134,13 @@ export function createWindowSize(): {
 export const useWindowSize: typeof createWindowSize =
   /*#__PURE__*/ createHydratableSingletonRoot(createWindowSize);
 
-const ELEMENT_SIZE_FALLBACK = { width: null, height: null } as const;
+const ELEMENT_SIZE_FALLBACK = { width: null, height: null } as const satisfies NullableSize;
 
 /**
  * @param target html element
  * @returns object with width and height dimensions of provided {@link target} element.
  */
-export function getElementSize(
-  target: Element | false | undefined | null,
-): { width: number; height: number } | { width: null; height: null } {
+export function getElementSize(target: Element | false | undefined | null): NullableSize {
   if (isServer || !target) {
     return { ...ELEMENT_SIZE_FALLBACK };
   }
@@ -190,34 +158,31 @@ export function getElementSize(
  *   console.log(size.width, size.height)
  * })
  */
-export function createElementSize(target: Element): {
-  readonly width: number;
-  readonly height: number;
-};
+export function createElementSize(target: Element): Readonly<Size>;
 export function createElementSize(
   target: Accessor<Element | false | undefined | null>,
-):
-  | { readonly width: number; readonly height: number }
-  | { readonly width: null; readonly height: null };
-export function createElementSize(target: Accessor<Element | false | undefined | null> | Element): {
-  readonly width: number | null;
-  readonly height: number | null;
-} {
+): Readonly<NullableSize>;
+export function createElementSize(
+  target: Accessor<Element | false | undefined | null> | Element,
+): Readonly<NullableSize> {
   if (isServer) {
     return ELEMENT_SIZE_FALLBACK;
   }
 
-  const isFn = typeof target === "function";
-  const initWithFallback = isFn || sharedConfig.context;
-
   const [size, setSize] = createStaticStore(
-    initWithFallback ? ELEMENT_SIZE_FALLBACK : getElementSize(target),
+    sharedConfig.context ? ELEMENT_SIZE_FALLBACK : getElementSize(access(target)),
   );
 
-  initWithFallback && onMount(() => setSize(getElementSize(access(target))));
+  const ro = new ResizeObserver(([e]) => setSize(e!.contentRect));
+  onCleanup(() => ro.disconnect());
 
-  createResizeObserver(isFn ? () => target() || [] : target, e =>
-    setSize({ width: e.width, height: e.height }),
-  );
+  createEffect(() => {
+    const el = access(target);
+    if (el) {
+      ro.observe(el);
+      onCleanup(() => ro.unobserve(el));
+    }
+  });
+
   return size;
 }

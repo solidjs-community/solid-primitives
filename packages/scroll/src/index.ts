@@ -1,7 +1,7 @@
-import { createComputed, onMount, sharedConfig } from "solid-js";
+import { Accessor, createSignal, onMount, sharedConfig } from "solid-js";
 import { isServer } from "solid-js/web";
-import { createStaticStore, MaybeAccessor } from "@solid-primitives/utils";
 import { createEventListener } from "@solid-primitives/event-listener";
+import { createDerivedStaticStore } from "@solid-primitives/static-store";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 
 export function getScrollParent(node: Element | null): Element {
@@ -23,28 +23,20 @@ export function isScrollable(node: Element): boolean {
   return /(auto|scroll)/.test(style.overflow + style.overflowX + style.overflowY);
 }
 
-const SERVER_SCROLL_POSITION = { x: 0, y: 0 } as const;
-const NULL_SCROLL_POSITION = { x: null, y: null } as const;
+export type Position = {
+  x: number;
+  y: number;
+};
+
+const FALLBACK_SCROLL_POSITION = { x: 0, y: 0 } as const satisfies Position;
 
 /**
  * Get an `{ x: number, y: number }` object of element/window scroll position.
  */
-export function getScrollPosition(target: Element | Window): {
-  x: number;
-  y: number;
-};
-export function getScrollPosition(target: Element | Window | undefined): {
-  x: number | null;
-  y: number | null;
-};
-export function getScrollPosition(target: Element | Window | undefined): {
-  x: number | null;
-  y: number | null;
-} {
-  if (isServer) {
-    return { ...SERVER_SCROLL_POSITION };
+export function getScrollPosition(target: Element | Window | undefined): Position {
+  if (isServer || !target) {
+    return { ...FALLBACK_SCROLL_POSITION };
   }
-  if (!target) return { ...NULL_SCROLL_POSITION };
   if (target instanceof Window)
     return {
       x: target.scrollX,
@@ -70,47 +62,32 @@ export function getScrollPosition(target: Element | Window | undefined): {
  *   windowScroll.y; // => number
  * });
  */
-export function createScrollPosition(target?: MaybeAccessor<Window>): {
-  readonly x: number;
-  readonly y: number;
-};
-export function createScrollPosition(target: MaybeAccessor<Element | Window>): {
-  readonly x: number;
-  readonly y: number;
-};
-export function createScrollPosition(target: MaybeAccessor<Element | Window | undefined>): {
-  readonly x: number | null;
-  readonly y: number | null;
-};
 export function createScrollPosition(
-  target: MaybeAccessor<Element | Window | undefined> = window,
-): {
-  readonly x: number | null;
-  readonly y: number | null;
-} {
+  target?: Accessor<Element | Window | undefined> | Element | Window,
+): Readonly<Position> {
   if (isServer) {
-    return SERVER_SCROLL_POSITION;
+    return FALLBACK_SCROLL_POSITION;
   }
 
-  const isFn = typeof target === "function";
+  target = target || window;
 
-  const getTargetPos = isFn ? () => getScrollPosition(target()) : () => getScrollPosition(target);
-  const updatePos = () => setPos(getTargetPos());
+  const isFn = typeof target === "function",
+    isHydrating = sharedConfig.context,
+    getTargetPos = isFn
+      ? () => getScrollPosition((target as Extract<typeof target, Function>)())
+      : () => getScrollPosition(target as Element | Window),
+    // changing the calc signal will trigger the derived store to update
+    [calc, setCalc] = createSignal(isHydrating ? () => FALLBACK_SCROLL_POSITION : getTargetPos, {
+      equals: false,
+    }),
+    trigger = () => setCalc(() => getTargetPos),
+    pos = createDerivedStaticStore(() => calc()());
 
-  const [pos, setPos] = createStaticStore(
-    isFn || sharedConfig.context ? NULL_SCROLL_POSITION : getTargetPos(),
-  );
+  // update the position on mount if we are hydrating (initial pos is null)
+  // or if target is a function (which means it could be a ref that will be populated onMount)
+  if (isHydrating || isFn) onMount(trigger);
 
-  if (sharedConfig.context) {
-    onMount(isFn ? () => createComputed(updatePos) : updatePos);
-  } else if (isFn) {
-    createComputed(updatePos);
-    onMount(updatePos);
-  } else {
-    updatePos();
-  }
-
-  createEventListener(target, "scroll", updatePos);
+  createEventListener(target, "scroll", trigger);
 
   return pos;
 }

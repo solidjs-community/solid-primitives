@@ -49,6 +49,10 @@ export function isObject(value: any): value is AnyObject {
   return value !== null && (typeof value === "object" || typeof value === "function");
 }
 
+export const isNonNullable = <T>(i: T): i is NonNullable<T> => i != null;
+export const filterNonNullable = <T extends readonly unknown[]>(arr: T): NonNullable<T[number]>[] =>
+  arr.filter(isNonNullable);
+
 export const compare = (a: any, b: any): number => (a < b ? -1 : a > b ? 1 : 0);
 
 /**
@@ -95,8 +99,8 @@ export const clamp = (n: number, min: number, max: number) => Math.min(Math.max(
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
   typeof v === "function" && !v.length ? v() : v;
 
-export const asArray = <T>(value: T): (T extends any[] ? T[number] : T)[] =>
-  Array.isArray(value) ? (value as any) : [value];
+export const asArray = <T>(value: T): (T extends any[] ? T[number] : NonNullable<T>)[] =>
+  Array.isArray(value) ? (value as any) : value ? [value] : [];
 
 /**
  * Access an array of MaybeAccessors

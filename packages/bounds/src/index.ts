@@ -87,7 +87,7 @@ export function createElementBounds(
   { trackMutation = true, trackResize = true, trackScroll = true }: Options = {},
 ): Readonly<NullableBounds> {
   if (isServer) {
-    return { ...NULLED_BOUNDS };
+    return NULLED_BOUNDS;
   }
 
   const isFn = typeof target === "function",

@@ -21,6 +21,7 @@ class TestResizeObserver {
     this._targets.delete(target);
   }
   disconnect() {
+    this._targets.clear();
     disconnect_count++;
   }
 }
@@ -36,66 +37,71 @@ describe("createResizeObserver", () => {
       expect(disconnect_count).toBe(1);
     }));
 
-  test("adds initial target", () =>
-    createRoot(dispose => {
-      const targets = (_targets = new Set<Element>());
+  test("adds initial target", () => {
+    const targets = (_targets = new Set<Element>());
+    const dispose = createRoot(dispose => {
       createResizeObserver(div1, () => {});
-      expect(targets.size).toBe(1);
-      expect(targets.has(div1)).toBeTruthy();
-      dispose();
-    }));
+      return dispose;
+    });
 
-  test("adds initial targets", () =>
-    createRoot(dispose => {
-      const targets = (_targets = new Set<Element>());
+    expect(targets.size).toBe(1);
+    expect(targets.has(div1)).toBeTruthy();
+    dispose();
+    expect(targets.size).toBe(0);
+  });
+
+  test("adds initial targets", () => {
+    const targets = (_targets = new Set<Element>());
+    const dispose = createRoot(dispose => {
       createResizeObserver([div1, div2], () => {});
-      expect(targets.size).toBe(2);
-      expect(targets.has(div1)).toBeTruthy();
-      expect(targets.has(div2)).toBeTruthy();
-      dispose();
-    }));
+      return dispose;
+    });
+    expect(targets.size).toBe(2);
+    expect(targets.has(div1)).toBeTruthy();
+    expect(targets.has(div2)).toBeTruthy();
+    dispose();
+    expect(targets.size).toBe(0);
+  });
 
-  test("observes signal targets", () =>
-    createRoot(dispose => {
-      const targets = (_targets = new Set<Element>());
+  test("observes signal targets", () => {
+    const targets = (_targets = new Set<Element>());
+    const { dispose, setRefs } = createRoot(dispose => {
       const [refs, setRefs] = createSignal([div1]);
       createResizeObserver(refs, () => {});
       expect(targets.size, "targets shouldn't be connected synchronously").toBe(0);
-      queueMicrotask(() => {
-        expect(targets.size).toBe(1);
-        expect(targets.has(div1)).toBeTruthy();
+      return { dispose, setRefs };
+    });
 
-        setRefs([div2, div3]);
-        queueMicrotask(() => {
-          expect(targets.size).toBe(2);
-          expect(targets.has(div2)).toBeTruthy();
-          expect(targets.has(div3)).toBeTruthy();
+    expect(targets.size).toBe(1);
+    expect(targets.has(div1)).toBeTruthy();
 
-          dispose();
-        });
-      });
-    }));
+    setRefs([div2, div3]);
+    expect(targets.size).toBe(2);
+    expect(targets.has(div2)).toBeTruthy();
+    expect(targets.has(div3)).toBeTruthy();
 
-  test("observes store top-level targets", () =>
-    createRoot(dispose => {
-      const targets = (_targets = new Set<Element>());
+    dispose();
+  });
+
+  test("observes store top-level targets", () => {
+    const targets = (_targets = new Set<Element>());
+    const { dispose, setRefs } = createRoot(dispose => {
       const [refs, setRefs] = createStore([div1]);
       createResizeObserver(refs, () => {});
       expect(targets.size, "targets shouldn't be connected synchronously").toBe(0);
-      queueMicrotask(() => {
-        expect(targets.size).toBe(1);
-        expect(targets.has(div1)).toBeTruthy();
+      return { dispose, setRefs };
+    });
 
-        setRefs([div2, div3]);
-        queueMicrotask(() => {
-          expect(targets.size).toBe(2);
-          expect(targets.has(div2)).toBeTruthy();
-          expect(targets.has(div3)).toBeTruthy();
+    expect(targets.size).toBe(1);
+    expect(targets.has(div1)).toBeTruthy();
 
-          dispose();
-        });
-      });
-    }));
+    setRefs([div2, div3]);
+    expect(targets.size).toBe(2);
+    expect(targets.has(div2)).toBeTruthy();
+    expect(targets.has(div3)).toBeTruthy();
+
+    dispose();
+  });
 });
 
 describe("getWindowSize", () => {
