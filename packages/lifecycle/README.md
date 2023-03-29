@@ -12,7 +12,6 @@
 Package providing extra layer of lifecycle primitives for Solid.
 
 - [`createIsMounted`](#createIsMounted) - Returns a boolean signal indicating whether the component is mounted or not.
-- [`isHydrating`](#isHydrating) - A signal accessor indicating if the owner is currently hydrating.
 - [`isHydrated`](#isHydrated) - A signal with the same behavior as [`isHydrating`](#isHydrating) but this one focused only on client-side updates.
 - [`onConnect`](#onConnect) - Calls the given callback when the target element is connected to the DOM.
 
@@ -40,31 +39,6 @@ let ref: HTMLElement;
 <div ref={ref}>{windowWidth()}</div>;
 ```
 
-## `isHydrating`
-
-A signal accessor indicating if the owner is currently hydrating.
-
-- `true` if the SSR process is for a hydratable markup
-- `false` if the SSR process isn't for a hydratable markup (e.g. under `<NoHydration>`)
-- `true` on the client if the component evaluation is during a hydration process.
-- `false` on the client if the component evaluates after hydration or during clinet-side rendering.
-
-If it returns `false` it means that you can safely change the initial values of signals
-that are used in the JSX, without causing a mismatch between the server and client.
-
-```tsx
-import { isHydrating } from "@solid-primitives/lifecycle";
-
-const [show, setShow] = createSignal(true);
-
-if (!isHydrating()) {
-  // this would cause a mismatch on the client if the component is hydrated
-  setCount(false);
-}
-
-<>{show() && <div>hello</div>}</>;
-```
-
 ## `isHydrated`
 
 A signal with the same behavior as [`isHydrating`](#isHydrating) but this one focused only on client-side updates.
@@ -72,6 +46,9 @@ A signal with the same behavior as [`isHydrating`](#isHydrating) but this one fo
 - `false` during SSR (always)
 - `false` on the client if the component evaluation is during a hydration process.
 - `true` on the client if the component evaluates after hydration or during clinet-side rendering.
+
+If it returns `false` it means that you can safely change the initial values of signals
+that are used in the JSX, without causing a mismatch between the server and client.
 
 ```tsx
 import { isHydrated } from "@solid-primitives/lifecycle";
@@ -88,13 +65,17 @@ const [vw, setVw] = createSignal(
 
 ### Implementing `ClientOnly` component
 
+`isHydrated` can be used to easily implement a `ClientOnly` component that will only render its children on the client.
+
 ```tsx
 import { createMemo, FlowComponent, JSX } from "solid-js";
 import { isHydrated } from "@solid-primitives/lifecycle";
 
 // This component will only render its children on the client
-export const ClientOnly: FlowComponent = props =>
-  createMemo(() => isHydrated() && props.children) as unknown as JSX.Element;
+export const ClientOnly: FlowComponent = props => {
+  const children = createMemo(() => isHydrated() && props.children);
+  return <>{children()}</>;
+};
 
 // Usage
 <ClientOnly>

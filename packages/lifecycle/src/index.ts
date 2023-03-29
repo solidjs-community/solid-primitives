@@ -35,20 +35,6 @@ export const isHydrated = (): boolean =>
   !isServer && (!sharedConfig.context || (!!getListener() && createIsMounted()()));
 
 /**
- * @returns a `boolean` value representing if the component is currently hydrating.
- *
- * - `true` if the SSR process is for a hydratable markup
- * - `false` if the SSR process isn't for a hydratable markup (e.g. under `<NoHydration>`)
- * - `true` on the client if the component evaluation is during a hydration process.
- * - `false` on the client if the component evaluates after hydration or during clinet-side rendering.
- *
- * Switching from `true` to `false` will trigger the signal to update. (on the client)
- *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/lifecycle#isHydrating
- */
-export const isHydrating = (): boolean => (isServer ? !!sharedConfig.context : !isHydrated());
-
-/**
  * Calls the {@link fn} callback when the {@link el} is connected to the DOM.
  * @param el target element
  * @param fn callback

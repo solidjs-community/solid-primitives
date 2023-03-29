@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createEffect, createRoot } from "solid-js";
-import { createIsMounted, isHydrated, isHydrating } from "../src";
+import { createIsMounted, isHydrated } from "../src";
 
 describe("createIsMounted", () => {
   test("createIsMounted", () => {
@@ -21,11 +21,5 @@ describe("createIsMounted", () => {
 describe("isHydrated", () => {
   test("isHydrated", () => {
     expect(isHydrated()).toBe(true);
-  });
-});
-
-describe("isHydrating", () => {
-  test("isHydrating", () => {
-    expect(isHydrating()).toBe(false);
   });
 });

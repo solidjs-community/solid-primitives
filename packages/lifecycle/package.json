@@ -18,7 +18,7 @@
     "stage": 0,
     "list": [
       "createIsMounted",
-      "isHydrating",
+      "isHydrated",
       "onConnect"
     ],
     "category": "Reactivity"
