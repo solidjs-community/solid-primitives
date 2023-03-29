@@ -396,6 +396,12 @@ importers:
       '@solid-primitives/utils': link:../utils
       solid-transition-group: 0.0.13_solid-js@1.6.15
 
+  packages/lifecycle:
+    specifiers:
+      solid-js: ^1.6.12
+    dependencies:
+      solid-js: 1.6.15
+
   packages/map:
     specifiers:
       '@solid-primitives/trigger': workspace:^1.0.3
