@@ -1,11 +1,4 @@
-import {
-  Component,
-  createResource,
-  createSignal,
-  For,
-  onCleanup,
-  Show,
-} from "solid-js";
+import { Component, createResource, createSignal, For, onCleanup, Show } from "solid-js";
 import { render } from "solid-js/web";
 import { makeAbortable, makeCache, makeRetrying } from "../src";
 import "uno.css";

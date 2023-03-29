@@ -34,13 +34,10 @@ Here's an example of all of them combined:
 // abort signal will abort the resource in-flight if it takes more then 10000ms
 const [signal, abort] = makeAbortable({ timeout: 10000 });
 
-const fetcher = (url: string) => fetch(url, { signal: signal() }).then(r => r.json())
+const fetcher = (url: string) => fetch(url, { signal: signal() }).then(r => r.json());
 
 // cached fetcher will only be called if `url` source changes, or gets invalidated
-const [cachedFetcher, invalidate] = makeCache(
-  fetcher,
-  { storage: localStorage }
-);
+const [cachedFetcher, invalidate] = makeCache(fetcher, { storage: localStorage });
 
 // works with createResource, or any wrapping API with the same interface
 const [data, { refetch }] = createResource(address, fetcher);
@@ -109,9 +106,11 @@ const [
     }
   );
 ```
+
 Wraps the fetcher to use a cache. Returns the wrapped fetcher, an invalidate callback that requires the source to invalidate the request and a signal accessor with the last automatically invalidated request.
 
 Can be customized with the following optional options:
+
 - `cache` - allows to use a local cache instead of the global one
 - `expires` - allows to define a custom timeout; either accepts a number or a function that receives an object with source and data of the request and returns a number in Milliseconds
 - `serialize` - a tuple [serialize, deserialize] used for persistence, default is `[JSON.stringify, JSON.parse]`
@@ -126,17 +125,15 @@ Can be customized with the following optional options:
 Creates a fetcher that retries multiple times in case of errors.
 
 ```ts
-const fetcher = makeRetrying(
-  (url) => fetch(url).then(r => r.json()),
-  { retries: 5, delay: 500 }
-);
+const fetcher = makeRetrying(url => fetch(url).then(r => r.json()), { retries: 5, delay: 500 });
 ```
+
 Receives the fetcher and an optional options object and returns a wrapped fetcher that retries on error after a delay multiple times.
 
 The optional options object contains the following optional properties:
+
 - `delay` - number of Milliseconds to wait before retrying; default is 5s
 - `retries` - number of times a request should be repeated before giving up throwing the last error; default is 3 times
-
 
 ### Recipes: the missing pieces
 
@@ -155,7 +152,7 @@ import { createConnectivitySignal } from "@solid-primitives/connectivity";
 
 const isOnline = createConnectivitySignal();
 const source = () => isOnline() && url();
-const [data] = createResource(source, (url) => fetch(url));
+const [data] = createResource(source, url => fetch(url));
 ```
 
 #### Window focus refetching
@@ -187,20 +184,22 @@ In TanStack Query, mutations are requests that mutate data on the server, so we 
 ```ts
 const [todos, { mutate, refetch }] = createResource(getTodos);
 
-const addTodo = (todo) => {
+const addTodo = todo => {
   [mutation] = createResource(() => addTodo(todo));
   const current = todos();
   // optimistic update
   mutate(todos => [...current, todo]);
   // refetch after mutating on the server or error
-  createRoot(done => createEffect(() => {
-    if (mutation.error || !mutation.loading) {
-      refetch();
-      done();
-    }
-  }));
+  createRoot(done =>
+    createEffect(() => {
+      if (mutation.error || !mutation.loading) {
+        refetch();
+        done();
+      }
+    }),
+  );
   return () => mutation.state;
-}
+};
 ```
 
 #### Scroll Restoration
