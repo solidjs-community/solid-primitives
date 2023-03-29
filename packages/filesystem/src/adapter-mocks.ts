@@ -1,25 +1,26 @@
-import { SyncFileSystemAdapter, AsyncFileSystemAdapter } from "./types";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { DirEntries, ItemType, SyncFileSystemAdapter } from "./types";
 
 /** Mocks a synchronous file system adapter */
-export const makeNoFileSystem = (): SyncFileSystemAdapter => ({
-  async: false,
-  getType: () => null,
-  mkdir: () => undefined,
-  readdir: () => [],
-  readFile: () => "",
-  rename: () => undefined,
-  rm: () => undefined,
-  writeFile: () => undefined,
+export const makeNoFileSystem = () => ({
+  async: false as const,
+  getType: (path: string): ItemType => null,
+  mkdir: (path: string) => undefined,
+  readdir: (path: string): DirEntries => [],
+  readFile: (path: string) => "",
+  rename: (prev: string, next: string) => undefined,
+  rm: (path: string) => undefined,
+  writeFile: (path: string, data: string) => undefined,
 });
 
 /** Mocks an asynchronous file system adapter */
-export const makeNoAsyncFileSystem = (): AsyncFileSystemAdapter => ({
-  async: true,
-  getType: () => Promise.resolve(null),
-  mkdir: () => Promise.resolve(),
-  readdir: () => Promise.resolve([]),
-  readFile: () => Promise.resolve(""),
-  rename: () => Promise.resolve(),
-  rm: () => Promise.resolve(),
-  writeFile: () => Promise.resolve(),
+export const makeNoAsyncFileSystem = () => ({
+  async: true as const,
+  getType: (path: string): Promise<ItemType> => Promise.resolve(null),
+  mkdir: (path: string) => Promise.resolve(),
+  readdir: (path: string): Promise<DirEntries> => Promise.resolve([]),
+  readFile: (path: string) => Promise.resolve(""),
+  rename: (prev: string, next: string) => Promise.resolve(),
+  rm: (path: string) => Promise.resolve(),
+  writeFile: (path: string, data: string) => Promise.resolve(),
 });
