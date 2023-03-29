@@ -7,7 +7,7 @@
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/static-store?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/static-store)
 [![version](https://img.shields.io/npm/v/@solid-primitives/static-store?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/static-store)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Primitives for creating small reactive objects that doesn't change their shape over time - don't need a proxy wrapper.
 
@@ -37,18 +37,29 @@ import { createStaticStore } from "@solid-primitives/static-store";
 
 const [size, setSize] = createStaticStore({ width: 0, height: 0 });
 
+createEffect(() => {
+  // both of these are separate signals, that can be listened to independently
+  console.log(size.width, size.height);
+});
+
+// changing the property will trigger observers of that property only
+setSize("width", 100);
+
 el.addEventListener("resize", () => {
+  // passed object will get merged with the existing store
   setSize({ width: el.offsetWidth, height: el.offsetHeight });
 });
 
-createEffect(() => {
-  console.log(size.width, size.height);
-});
+// adding a new property will NOT work
+// the shape of the store is static
+setSize("new-property", "value");
 ```
 
 ### `createHydratableStaticStore`
 
 A hydratable version of the [`createStaticStore`](#createStaticStore). It will use the `serverValue` on the server and the `update` function on the client. If initialized during hydration it will use `serverValue` as the initial value and update it once hydration is complete.
+
+> **Warning** This primitive version is experimental, and mostly used internally by other primitives. It is not recommended to use it directly.
 
 ```ts
 import { createHydratableStaticStore } from "@solid-primitives/static-store";

@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "static-store",
-    "stage": 0,
+    "stage": 2,
     "list": [
       "createStaticStore",
       "createDerivedStaticStore"
@@ -46,7 +46,7 @@
   "typesVersions": {},
   "scripts": {
     "dev": "vite serve dev",
-    "page": "vite build dev",
+    "page": "echo TODO",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
