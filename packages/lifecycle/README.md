@@ -120,6 +120,10 @@ However, it is not certain that the elements are actually connected to the DOM w
 />
 ```
 
+## Demo
+
+You can see the primitives in action in the following sandbox: https://solidjs-community.github.io/solid-primitives/lifecycle/
+
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
