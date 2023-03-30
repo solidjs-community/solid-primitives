@@ -293,7 +293,7 @@ importers:
       leaflet: 1.9.3
       mapbox-gl: 2.13.0
       solid-map-gl: 1.7.1_mapbox-gl@2.13.0
-      vite-plugin-mkcert: 1.13.4_vite@4.2.1
+      vite-plugin-mkcert: 1.14.0_vite@4.2.1
 
   packages/gestures:
     specifiers:
@@ -808,7 +808,7 @@ importers:
       remark-parse: 10.0.1
       remark-rehype: 10.1.0
       sass: 1.60.0
-      solid-dismiss: 1.6.75_solid-js@1.7.0
+      solid-dismiss: 1.7.0_solid-js@1.7.0
       solid-icons: 1.0.4_solid-js@1.7.0
       solid-jsx: 0.9.1_solid-js@1.7.0
       solid-mdx: 0.0.6_solid-js@1.7.0+vite@4.2.1
@@ -4804,7 +4804,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001473
-      electron-to-chromium: 1.4.345
+      electron-to-chromium: 1.4.346
       node-releases: 2.0.10
       update-browserslist-db: 1.0.10_browserslist@4.21.5
     dev: true
@@ -5586,8 +5586,8 @@ packages:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
     dev: true
 
-  /electron-to-chromium/1.4.345:
-    resolution: {integrity: sha512-znGhOQK2TUYLICgS25uaM0a7pHy66rSxbre7l762vg9AUoCcJK+Bu+HCPWpjL/U/kK8/Hf+6E0szAUJSyVYb3Q==}
+  /electron-to-chromium/1.4.346:
+    resolution: {integrity: sha512-9ZpKQD8hyWAoYf5bccm2qpaWogAGxb833DVC0arHo9nIbiAMh+aAKHZWABR2P9sK4a3zoCq7eXg8tylqPAnuNw==}
     dev: true
 
   /emoji-regex/8.0.0:
@@ -9987,8 +9987,8 @@ packages:
       - supports-color
     dev: true
 
-  /solid-dismiss/1.6.75_solid-js@1.7.0:
-    resolution: {integrity: sha512-XTPRwYB4Z1TsMKkfqAI/W3gMgg/YeAqk73JhcfOOy0DwFHmL/2CB/BqKWqE4VNgcZRS2PkwFQ64YK6zpaPeHhw==}
+  /solid-dismiss/1.7.0_solid-js@1.7.0:
+    resolution: {integrity: sha512-DG3s+173tvsA/ymiM+ydDObbV/O22fRK41Z2CLpEPEQPjwScHGTCdnmbMXlGfxbY/HgVUzZJymVCDmX8fZDqeQ==}
     peerDependencies:
       solid-js: '1'
     dependencies:
@@ -11276,8 +11276,8 @@ packages:
       - supports-color
     dev: true
 
-  /vite-plugin-mkcert/1.13.4_vite@4.2.1:
-    resolution: {integrity: sha512-sBk/VOoqJijXG0yBir4nqdwktGqhkl6sm260wJLh27KEHPi1wz+dAHs2OfcJszfMbFXKcVzMZKoXwRrKze+NYg==}
+  /vite-plugin-mkcert/1.14.0_vite@4.2.1:
+    resolution: {integrity: sha512-TXLqRYeKKv2kGIpDVMXPLAlTQLXfZ5/VtC4VVhV0ky2vKt5W/TDvFKpmelQPmn0IB7uz9KXvQj8Op+pkT9Ln9A==}
     engines: {node: '>=v16.7.0'}
     peerDependencies:
       vite: '>=3'
