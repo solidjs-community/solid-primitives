@@ -57,12 +57,14 @@ export async function getModulesData<T = ModuleData>(
     const peerDependencies = Object.keys(pkg.peerDependencies ?? {});
     const localDependencies = dependencies.filter(dep => dep.startsWith("@solid-primitives/"));
 
+    const excludedKeywords = ["primitive", "solid", pkg.name];
+
     return {
       data: await mapFn({
         name,
         version: pkg.version ?? "0.0.0",
         description: pkg.description ?? "",
-        tags: pkg.keywords ?? [],
+        tags: pkg.keywords?.filter(keyword => !excludedKeywords.includes(keyword)) ?? [],
         category: pkg.primitive.category ?? "Misc",
         stage: pkg.primitive.stage ?? 0,
         primitives: pkg.primitive.list ?? [],
