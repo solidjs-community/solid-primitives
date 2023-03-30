@@ -8,7 +8,7 @@ const THead: ParentComponent = props => {
       <tr
         id="header-shadow"
         aria-hidden="true"
-        class="-z-1 pointer-events-none absolute top-0 left-0 right-0 h-0 transition-opacity"
+        class="-z-1 pointer-events-none absolute left-0 right-0 top-0 h-0 transition-opacity"
         style="opacity: 0;"
       >
         <td class="h-0">

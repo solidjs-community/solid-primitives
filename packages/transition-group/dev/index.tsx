@@ -8,7 +8,7 @@ import "uno.css";
 render(
   () => (
     <Router>
-      <nav class="fixed top-2 left-2 flex space-x-4">
+      <nav class="fixed left-2 top-2 flex space-x-4">
         <A class="text-yellow-400" href="/list">
           /list
         </A>

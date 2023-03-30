@@ -32,7 +32,7 @@ const PrimitivePageMain: ParentComponent<{
       <Title>{props.name}</Title>
       <script>document.documentElement.classList.add("primitives-page-main")</script>
       <div
-        class="-z-1 absolute top-0 left-0 right-0 h-[95vh] bg-[linear-gradient(to_bottom,#fff_var(--primitive-padding-top-gr),transparent)] dark:bg-[linear-gradient(to_bottom,#293843_var(--primitive-padding-top-gr),transparent)]"
+        class="-z-1 absolute left-0 right-0 top-0 h-[95vh] bg-[linear-gradient(to_bottom,#fff_var(--primitive-padding-top-gr),transparent)] dark:bg-[linear-gradient(to_bottom,#293843_var(--primitive-padding-top-gr),transparent)]"
         style={{
           "--primitive-padding-top-gr": `${PRIMITIVE_PAGE_PADDING_TOP + 300}px`,
         }}
@@ -70,7 +70,7 @@ const PrimitivePageMain: ParentComponent<{
                 rel="noopener"
               >
                 <FaBrandsGithub size={28} />
-                <div class="mask-image-[linear-gradient(to_bottom,transparent_12px,#000)] absolute top-[32px] left-0 -scale-y-100 opacity-20 blur-[2px]">
+                <div class="mask-image-[linear-gradient(to_bottom,transparent_12px,#000)] absolute left-0 top-[32px] -scale-y-100 opacity-20 blur-[2px]">
                   <FaBrandsGithub size={28} />
                 </div>
               </a>

@@ -68,12 +68,12 @@ const CopyPackage: Component<{ type: "npm" | "yarn" | "pnpm"; packageName: strin
           <div class="relative flex h-full w-[40px] items-center justify-center transition-opacity delay-[0] group-hover:opacity-0 group-hover:delay-100">
             {packageManagers[type].monochromeLogo()}
           </div>
-          <div class="absolute top-0 left-0 bottom-0 right-0 flex items-center justify-center py-2 opacity-0 transition-opacity group-hover:opacity-100">
+          <div class="absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center py-2 opacity-0 transition-opacity group-hover:opacity-100">
             {packageManagers[type].logo()}
           </div>
         </div>
 
-        <div class="group-hover:box-shadow-[0_5px_0_0_#c5d4e4] dark:group-hover:box-shadow-[0_5px_0_0_#3f5d73] pointer-events-none absolute top-0 left-0 bottom-0 right-0 rounded-lg border border-transparent transition-[border-color_box-shadow] group-hover:border-[#0030b1] dark:group-hover:border-[#b1bfe4]" />
+        <div class="group-hover:box-shadow-[0_5px_0_0_#c5d4e4] dark:group-hover:box-shadow-[0_5px_0_0_#3f5d73] pointer-events-none absolute bottom-0 left-0 right-0 top-0 rounded-lg border border-transparent transition-[border-color_box-shadow] group-hover:border-[#0030b1] dark:group-hover:border-[#b1bfe4]" />
       </button>
       <div class="xs:text-sm flex h-full flex-grow items-center overflow-auto whitespace-nowrap rounded-r-lg border border-l-0 border-[#99999a] px-2 pr-3 text-[13px] sm:text-base">
         {packageManagers[type].text}

@@ -12,7 +12,7 @@ const Node: Component<{ x: number; y: number; size: number }> = props => {
   return (
     <button
       use:focus={setIsFocused}
-      class="fixed top-0 left-0 h-48 w-48 cursor-pointer rounded-full border-none bg-orange-700 text-4xl font-extrabold text-gray-900 hover:bg-orange-600"
+      class="fixed left-0 top-0 h-48 w-48 cursor-pointer rounded-full border-none bg-orange-700 text-4xl font-extrabold text-gray-900 hover:bg-orange-600"
       classList={{
         "!bg-indigo-700 !hover:bg-indigo-600": isFocused(),
       }}
@@ -41,12 +41,12 @@ const App: Component = () => {
         )}
       </Index>
       <button
-        class="fixed top-1/2 left-1/2 -mt-8 -ml-32 h-16 w-64 cursor-pointer rounded-lg border-none bg-transparent text-5xl font-extrabold text-white hover:text-yellow-200"
+        class="fixed left-1/2 top-1/2 -ml-32 -mt-8 h-16 w-64 cursor-pointer rounded-lg border-none bg-transparent text-5xl font-extrabold text-white hover:text-yellow-200"
         onclick={shuffle}
       >
         Shuffle!
       </button>
-      <div class="absolute top-6 left-6 text-4xl font-extrabold">
+      <div class="absolute left-6 top-6 text-4xl font-extrabold">
         Active Element:{" "}
         {activeEl() && activeEl()?.tagName !== "BODY" ? activeEl()?.textContent : "null"}
       </div>
