@@ -1,16 +1,16 @@
-import { Component, createEffect, createMemo, createResource, onMount, Suspense } from "solid-js";
+import { Component, createMemo, createResource, onMount, Suspense } from "solid-js";
 import { Title, useParams, useRouteData } from "solid-start";
 import { fetchPackageData, getCachedPackageListItemData } from "~/api";
 import { PRIMITIVE_PAGE_PADDING_TOP } from "~/components/Header/Header";
 import InfoBar from "~/components/Primitives/InfoBar";
 import { H2 } from "~/components/prose";
 import { pageWidthClass } from "~/constants";
+import { DocumentClass } from "~/primitives/document-class";
 import { PackageData } from "~/types";
 import { kebabCaseToCapitalized } from "~/utils";
 import { Heading } from "./components/heading";
 import { PackageInstallation } from "./components/package-installation";
-import { createPrimitiveNameTooltips } from "./components/primitive-name-tooltip";
-import { DocumentClass } from "~/primitives/document-class";
+import { createPrimitiveNameTooltips } from "./components/primitive-name-tooltips";
 
 type Params = {
   name: string;
@@ -97,14 +97,8 @@ const Page: Component = () => {
                       requestAnimationFrame(() => (el.style.opacity = ""));
                     });
                   }
-                  // create tooltips for primitive names
-                  createEffect(() => {
-                    data.primitives &&
-                      createPrimitiveNameTooltips({
-                        target: el,
-                        primitives: data.primitives,
-                      });
-                  });
+
+                  createPrimitiveNameTooltips(el, () => data.primitives);
                 }}
                 innerHTML={data.readme}
               />
