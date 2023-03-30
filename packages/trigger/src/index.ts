@@ -5,10 +5,8 @@ import { noop } from "@solid-primitives/utils";
 export type Trigger = [track: VoidFunction, dirty: VoidFunction];
 
 const triggerOptions: SignalOptions<any> =
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   !isServer && DEV ? { equals: false, name: "trigger" } : { equals: false };
 const triggerCacheOptions: SignalOptions<any> =
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   !isServer && DEV ? { equals: false, internal: true } : triggerOptions;
 
 /**

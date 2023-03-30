@@ -1,5 +1,7 @@
 import { createSignal, onCleanup } from "solid-js";
 
+export type WebsocketState = 0 | 1 | 2 | 3;
+
 /**
  * Handles opening managing and reconnecting to a Websocket.
  *
@@ -27,13 +29,13 @@ const createWebsocket = (
   connect: () => void,
   disconnect: () => void,
   send: (message: string) => void,
-  state: () => number,
+  state: () => WebsocketState,
   socket: () => WebSocket,
 ] => {
   let socket: WebSocket | undefined;
   let reconnections = 0;
   let reconnectId: ReturnType<typeof setTimeout> | undefined;
-  const [state, setState] = createSignal(WebSocket.CLOSED);
+  const [state, setState] = createSignal<WebsocketState>(WebSocket.CLOSED);
   const send = (data: string | ArrayBuffer) => socket!.send(data);
   const cancelReconnect = () => {
     if (reconnectId) {

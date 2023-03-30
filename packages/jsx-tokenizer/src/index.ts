@@ -6,7 +6,6 @@ import { asArray } from "@solid-primitives/utils";
 /** @internal $TYPE is only used for type inference */
 declare const $TYPE: unique symbol;
 /** @internal */
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 const $TOKENIZER = Symbol(!isServer && DEV ? "jsx-tokenizer" : "");
 
 /**
@@ -59,7 +58,6 @@ export type TokenComponent<TProps extends object, TData = TProps> = Component<TP
  */
 export function createTokenizer<T>(options?: { name: string }): JSXTokenizer<T> {
   return {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     [$TOKENIZER]: Symbol(!isServer && DEV ? options?.name || "jsx-tokenizer" : ""),
   } as JSXTokenizer<T>;
 }
@@ -102,7 +100,6 @@ export function createToken<P extends object, T>(
 ): TokenComponent<P, T> {
   const symbol =
     (args[0]?.[$TOKENIZER] ? (args.shift()[$TOKENIZER] as symbol) : undefined) ??
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     Symbol(!isServer && DEV ? args[0]?.name || args[1]?.name || "jsx-token" : "");
 
   const comp = ((props: P) => {
@@ -111,7 +108,6 @@ export function createToken<P extends object, T>(
         ? () => createComponent(args[1], props)
         : () => {
             !isServer &&
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
               DEV &&
               // eslint-disable-next-line no-console
               console.warn(
@@ -123,7 +119,7 @@ export function createToken<P extends object, T>(
     token.data = args[0] ? args[0](props) : props;
     token[$TOKENIZER] = symbol;
 
-    return token as JSX.Element;
+    return token as unknown as JSX.Element;
   }) as TokenComponent<P, T>;
   comp[$TOKENIZER] = symbol;
 
@@ -147,7 +143,6 @@ function getResolvedTokens(
       getResolvedTokens(resolved, value[i], symbols, addElements);
   // other element
   else if (addElements) resolved.push(value);
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   else if (!isServer && DEV && value)
     // eslint-disable-next-line no-console
     console.warn(`Invalid JSX Element passed to token resolver:`, value);

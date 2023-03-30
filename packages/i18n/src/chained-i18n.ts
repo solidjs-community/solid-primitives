@@ -58,7 +58,6 @@ function buildChainedDictionary<T extends I18nObject>(obj: T): I18nPath<T> {
         break;
       default:
         throw new Error(
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           !isServer && DEV
             ? `Unsupported data format on the keys. Values must resolve to a string or a function that returns a string. Key name: "${key}"`
             : "",
