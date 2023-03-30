@@ -45,8 +45,8 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/immutable": "^0.1.9",
-    "@solid-primitives/utils": "^5.5.1"
+    "@solid-primitives/immutable": "workspace:^0.1.9",
+    "@solid-primitives/utils": "workspace:^5.5.2"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

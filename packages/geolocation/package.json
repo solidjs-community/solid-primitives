@@ -49,11 +49,11 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "devDependencies": {
-    "@types/leaflet": "^1.7.11",
-    "leaflet": "^1.8.0",
-    "mapbox-gl": "^2.12.1",
+    "@types/leaflet": "^1.9.3",
+    "leaflet": "^1.9.3",
+    "mapbox-gl": "^2.13.0",
     "solid-map-gl": "^1.7.1",
-    "vite-plugin-mkcert": "^1.13.1"
+    "vite-plugin-mkcert": "^1.13.4"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^5.5.1"

@@ -31,33 +31,18 @@
     "dist"
   ],
   "type": "module",
-  "main": "./dist/server.cjs",
-  "module": "./dist/server.js",
-  "browser": {
-    "./dist/server.cjs": "./dist/index.cjs",
-    "./dist/server.js": "./dist/index.js"
-  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "browser": {},
   "exports": {
-    "worker": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
-    "browser": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "deno": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
-    },
-    "node": {
-      "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
-    },
-    "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
+  "typesVersions": {},
   "scripts": {
     "dev": "vite serve dev",
     "page": "vite build dev",

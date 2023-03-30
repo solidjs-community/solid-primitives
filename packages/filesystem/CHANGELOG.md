@@ -1,5 +1,11 @@
 # @solid-primitives/filesystem
 
+## 1.0.0
+
+### Major Changes
+
+- 51b5bec5: improve fail case (return null instead of mock)
+
 ## 0.0.101
 
 ### Patch Changes

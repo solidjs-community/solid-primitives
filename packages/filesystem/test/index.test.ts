@@ -5,8 +5,10 @@ import {
   makeNoFileSystem,
   makeNoAsyncFileSystem,
   makeVirtualFileSystem,
+  makeNodeFileSystem,
   FileSystemAdapter,
   makeWebAccessFileSystem,
+  makeTauriFileSystem,
 } from "../src";
 import { createEffect, createRoot, onError } from "solid-js";
 
@@ -165,6 +167,9 @@ const testReactive = (testcase: (done: () => void) => void): Promise<void> => {
 
 describe("createFileSystem(makeWebAccessFileSystem)", async () => {
   const wfs = await makeWebAccessFileSystem();
+  if (wfs === null) {
+    throw new Error("web fs access mock broke for some reason, see fsaccess-mock.fs");
+  }
   const fs = createFileSystem(wfs);
   test("fs.getType returns the correct output", async () => {
     await testReactive(done => {
@@ -292,6 +297,15 @@ describe("createFileSystem(makeWebAccessFileSystem)", async () => {
         }
         return run + 1;
       });
+    });
+  });
+  describe("fallbacks", () => {
+    test("makeNodeFileSystem returns null on client", async () => {
+      expect(await makeNodeFileSystem()).toBeNull();
+    });
+
+    test("makeTauriFileSystem returns null on client", () => {
+      expect(makeTauriFileSystem()).toBeNull();
     });
   });
 });

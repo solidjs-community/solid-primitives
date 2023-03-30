@@ -100,7 +100,7 @@ const BundleSizeModal: Component<{
         </p>
         <h3 class="my-4">Total Size of Package</h3>
         <div class="relative overflow-clip rounded-xl bg-[#e5ecf3] dark:bg-[#2b455a]">
-          <div class="z-1 pointer-events-none absolute top-0 left-0 right-0 bottom-0 rounded-xl border-2 border-[#e5ecf3] dark:border-[#2b455a]"></div>
+          <div class="z-1 pointer-events-none absolute bottom-0 left-0 right-0 top-0 rounded-xl border-2 border-[#e5ecf3] dark:border-[#2b455a]"></div>
           <table class="my-4 w-full" style="border-collapse: separate; border-spacing: 2px 2px;">
             <thead>
               <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#b7c1d0]">
@@ -136,7 +136,7 @@ const BundleSizeModal: Component<{
           class="relative overflow-clip rounded-xl bg-[#e5ecf3] dark:bg-[#2b455a]"
           ref={tableContainerEl}
         >
-          <div class="z-1 pointer-events-none absolute top-0 left-0 right-0 bottom-0 rounded-xl border-2 border-[#e5ecf3] dark:border-[#2b455a]" />
+          <div class="z-1 pointer-events-none absolute bottom-0 left-0 right-0 top-0 rounded-xl border-2 border-[#e5ecf3] dark:border-[#2b455a]" />
           <table
             // fake <th> element for th shadow causes table to lose width equivalent to border-spacing, which is 2px, so make up for up for it by setting width to 100% + 2px.
             class="my-4 w-[calc(100%+2px)]"

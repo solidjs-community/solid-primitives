@@ -59,8 +59,8 @@
     "@graphql-codegen/typescript-operations": "^3.0.2"
   },
   "dependencies": {
-    "@graphql-typed-document-node/core": "^3.1.1",
-    "@solid-primitives/utils": "^5.5.1",
+    "@graphql-typed-document-node/core": "^3.2.0",
+    "@solid-primitives/utils": "workspace:^5.5.2",
     "graphql": "^16.6.0"
   },
   "peerDependencies": {

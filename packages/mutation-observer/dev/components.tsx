@@ -4,7 +4,7 @@ export const TestingNode: Component<{ output?: JSX.Element; heading?: string }> 
   return (
     <div class="border-1 rounded-lg border-gray-800 bg-gray-900">
       <Show when={props.heading}>
-        <div class="center-child border-0 border-b border-gray-800 py-3 px-6">
+        <div class="center-child border-0 border-b border-gray-800 px-6 py-3">
           <h5>{props.heading}</h5>
         </div>
       </Show>

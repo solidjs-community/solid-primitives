@@ -22,7 +22,7 @@ const WindowMousemove: Component = () => {
   const [mouse, setMouse] = createSignal({ x: 0, y: 0 });
 
   return (
-    <div class="fixed top-4 left-4">
+    <div class="fixed left-4 top-4">
       <Show when={listen()}>
         <WindowEventListener onmousemove={({ x, y }) => setMouse({ x, y })} />
       </Show>

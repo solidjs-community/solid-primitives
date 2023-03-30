@@ -63,11 +63,11 @@ const App: Component = () => {
       >
         <DisplayRecord record={{ x: inElementX(), y: inElementY() }} />
       </div>
-      <div class="caption fixed top-6 left-6 select-none text-white text-opacity-60">
+      <div class="caption fixed left-6 top-6 select-none text-white text-opacity-60">
         <DisplayRecord record={mouse} />
       </div>
       <button
-        class="fixed top-6 right-6 cursor-pointer rounded-lg border-none bg-gray-300 bg-opacity-25 p-2 font-medium text-gray-300 opacity-80 hover:opacity-100"
+        class="fixed right-6 top-6 cursor-pointer rounded-lg border-none bg-gray-300 bg-opacity-25 p-2 font-medium text-gray-300 opacity-80 hover:opacity-100"
         onclick={() => setShowContainer(p => !p)}
       >
         Toggle Container

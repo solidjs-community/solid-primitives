@@ -505,7 +505,7 @@ export const Table: ParentComponent = props => {
   return (
     <div class={`${pageWidthClass} isolate mx-auto`}>
       <div
-        class="box-shadow-[var(--table-header-box-shadow)] pointer-events-none fixed top-[60px] left-0 right-0 z-[2] transition-opacity"
+        class="box-shadow-[var(--table-header-box-shadow)] pointer-events-none fixed left-0 right-0 top-[60px] z-[2] transition-opacity"
         style={{ opacity: "0" }}
         ref={tableHeaderShadowStickyDiv}
       />
@@ -513,16 +513,16 @@ export const Table: ParentComponent = props => {
         {/* despite having overflow-clip doesn't cut off overflowing table in Safari/iOS */}
         {/* so added a inverse rounded corner to hide overflowing theader text */}
         <div
-          class="inverse-corner-[size(30px)_color(var(--page-main-bg))_position(0,100%)] pointer-events-none absolute top-0 right-0 z-10"
+          class="inverse-corner-[size(30px)_color(var(--page-main-bg))_position(0,100%)] pointer-events-none absolute right-0 top-0 z-10"
           classList={{ hidden: !(isSafari || isIOS) }}
         />
-        <div class="pointer-events-none absolute top-0 left-0 z-10 h-full w-full rounded-[30px] border-[7px] border-[#E4F6F9] dark:border-[#2b455a]" />
+        <div class="pointer-events-none absolute left-0 top-0 z-10 h-full w-full rounded-[30px] border-[7px] border-[#E4F6F9] dark:border-[#2b455a]" />
         <div
-          class="pointer-events-none absolute top-0 left-0 z-10 h-full w-full rounded-[30px] border-[7px] border-[#D8DFF5] dark:border-[#2c4668]"
+          class="pointer-events-none absolute left-0 top-0 z-10 h-full w-full rounded-[30px] border-[7px] border-[#D8DFF5] dark:border-[#2c4668]"
           style="-webkit-mask-image: linear-gradient(to right, transparent 0px, rgb(0, 0, 0)); mask-image: linear-gradient(to right, transparent 0px, rgb(0, 0, 0))"
         />
         <div
-          class="pointer-events-none absolute top-[7px] bottom-0 left-[120.8px] z-10 w-[15px] bg-[linear-gradient(to_right,#24405966,#24405900)] opacity-0 transition-opacity dark:bg-[linear-gradient(to_right,#05121dbf,#05121d00)]"
+          class="pointer-events-none absolute bottom-0 left-[120.8px] top-[7px] z-10 w-[15px] bg-[linear-gradient(to_right,#24405966,#24405900)] opacity-0 transition-opacity dark:bg-[linear-gradient(to_right,#05121dbf,#05121d00)]"
           ref={tableVerticalScrollShadow}
         />
         <div class="no-scrollbar w-full overflow-x-clip rounded-[30px] bg-[linear-gradient(45deg,#D8DFF5,#E4F6F9)] p-1 pb-0 pt-[2px] dark:bg-[linear-gradient(45deg,#2c4668,#2b455a)]">

@@ -126,7 +126,7 @@ const SlideModal: ParentComponent<{
       ref={containerEl}
     >
       <div
-        class="pointer-events-none mt-[100px] mb-[60px] flex justify-center px-2"
+        class="pointer-events-none mb-[60px] mt-[100px] flex justify-center px-2"
         role="presentation"
       >
         <div
@@ -138,7 +138,7 @@ const SlideModal: ParentComponent<{
         >
           {props.children}
           <button
-            class="absolute top-0 right-0 flex h-[45px] w-[45px] items-center justify-center rounded-lg text-[#306FC4] dark:text-[#c2d5ee] dark:hover:text-white"
+            class="absolute right-0 top-0 flex h-[45px] w-[45px] items-center justify-center rounded-lg text-[#306FC4] dark:text-[#c2d5ee] dark:hover:text-white"
             onClick={() => {
               setOpen(false);
             }}

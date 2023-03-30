@@ -134,7 +134,7 @@ const Header: Component = () => {
   return (
     <>
       <header
-        class="fixed top-0 left-0 right-0 z-10 h-[60px]"
+        class="fixed left-0 right-0 top-0 z-10 h-[60px]"
         classList={{
           "md:z-[1001]": isSearchOpen(),
         }}
@@ -145,7 +145,7 @@ const Header: Component = () => {
           >
             <div
               class={`${pageWidthClass} box-shadow-[var(--header-box-shadow)] -z-1 
-              absolute top-0 left-0 bottom-0 right-0 mx-auto w-full opacity-0 transition-opacity
+              absolute bottom-0 left-0 right-0 top-0 mx-auto w-full opacity-0 transition-opacity
               duration-200`}
               classList={{
                 // show the shadow when scrolled down or when the nav menu is open,
@@ -219,7 +219,7 @@ const Header: Component = () => {
           />
         </div>
         <div
-          class="bg-page-main-bg z-1 absolute top-0 left-0 right-0 h-[1px]"
+          class="bg-page-main-bg z-1 absolute left-0 right-0 top-0 h-[1px]"
           ref={headerSolidBg}
         />
         <div
@@ -247,7 +247,7 @@ const Header: Component = () => {
           </Dismiss>
         </div>
       </header>
-      <div class="-z-1 pointer-events-none fixed top-0 left-0 right-0 hidden transition md:flex">
+      <div class="-z-1 pointer-events-none fixed left-0 right-0 top-0 hidden transition md:flex">
         {untrack(() => {
           const Gradient = (props: { class?: string; ref: HTMLDivElement }) => (
             <div

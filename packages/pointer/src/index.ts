@@ -177,7 +177,7 @@ export function createPerPointerListeners(
                 const type = "pointer" + key.substring(2).toLowerCase();
                 return (fn: Handler) => {
                   if (!init) {
-                    // eslint-disable-next-line no-console, @typescript-eslint/no-unnecessary-condition
+                    // eslint-disable-next-line no-console
                     if (!isServer && DEV) console.warn(onlyInitMessage);
                     return;
                   }
@@ -215,13 +215,13 @@ export function createPerPointerListeners(
           // onMove()
           fn => {
             if (init) addListener("pointermove", fn, pointerId);
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-console
+            // eslint-disable-next-line no-console
             else if (!isServer && DEV) console.warn(onlyInitMessage);
           },
           // onUp()
           fn => {
             if (init) onUp = fn;
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-console
+            // eslint-disable-next-line no-console
             else if (!isServer && DEV) console.warn(onlyInitMessage);
           },
         );
