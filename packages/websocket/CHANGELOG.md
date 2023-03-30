@@ -1,5 +1,11 @@
 # @solid-primitives/websocket
 
+## 0.3.7
+
+### Patch Changes
+
+- 43ac489f: Add `WebsocketState` type
+
 ## 0.3.6
 
 ### Patch Changes
