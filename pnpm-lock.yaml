@@ -336,6 +336,16 @@ importers:
     dependencies:
       solid-js: 1.7.0
 
+  packages/immutabe-store:
+    specifiers:
+      '@solid-primitives/memo': workspace:^1.2.3
+      redux: ^4.2.1
+      solid-js: ^1.6.12
+    dependencies:
+      '@solid-primitives/memo': link:../memo
+      redux: 4.2.1
+      solid-js: 1.7.0
+
   packages/immutable:
     specifiers:
       '@solid-primitives/utils': workspace:^5.5.2
@@ -2088,7 +2098,6 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.13.11
-    dev: true
 
   /@babel/template/7.20.7:
     resolution: {integrity: sha512-8SegXApWe6VoNw0r9JHpSteLKTpTiLZ4rMlGIm9JQ18KiCtyQiAMEazujAHrUS5flrcqYZa75ukev3P6QmUwUw==}
@@ -9428,6 +9437,12 @@ packages:
       postcss-value-parser: 3.3.1
     dev: true
 
+  /redux/4.2.1:
+    resolution: {integrity: sha512-LAUYz4lc+Do8/g7aeRa8JkyDErK6ekstQaqWQrNRW//MY1TvCEpMtpTWvlQ+FPbWCx+Xixu/6SHt5N0HR+SB4w==}
+    dependencies:
+      '@babel/runtime': 7.21.0
+    dev: false
+
   /regenerate-unicode-properties/10.1.0:
     resolution: {integrity: sha512-d1VudCLoIGitcU/hEg2QqvyGZQmdC0Lf8BqdOMXGFSvJP4bNV1+XqbPQeHHLD51Jh4QJJ225dlIFvY4Ly6MXmQ==}
     engines: {node: '>=4'}
@@ -9441,7 +9456,6 @@ packages:
 
   /regenerator-runtime/0.13.11:
     resolution: {integrity: sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==}
-    dev: true
 
   /regenerator-transform/0.15.1:
     resolution: {integrity: sha512-knzmNAcuyxV+gQCufkYcvOqX/qIIfHLv0u5x79kRxuGojfYVky1f15TzZEu2Avte8QGepvUNTnLskf8E6X6Vyg==}
@@ -11314,7 +11328,7 @@ packages:
       kolorist: 1.7.0
       sirv: 2.0.2
       ufo: 1.1.1
-      vite: 4.2.1_hghbulspu73jfdazs4i6yiqype
+      vite: 4.2.1_@types+node@18.15.11
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -11349,7 +11363,7 @@ packages:
       merge-anything: 5.1.4
       solid-js: 1.7.0
       solid-refresh: 0.5.2_solid-js@1.7.0
-      vite: 4.2.1_hghbulspu73jfdazs4i6yiqype
+      vite: 4.2.1_@types+node@18.15.11
       vitefu: 0.2.4_vite@4.2.1
     transitivePeerDependencies:
       - supports-color
@@ -11464,7 +11478,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.2.1_hghbulspu73jfdazs4i6yiqype
+      vite: 4.2.1_@types+node@18.15.11
     dev: true
 
   /vitest/0.29.8_jsdom@21.1.1:

@@ -1,0 +1,60 @@
+{
+  "name": "@solid-primitives/immutabe-store",
+  "version": "0.0.100",
+  "description": "A template primitive example.",
+  "author": "Your Name <you@youremail.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/immutabe-store#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "immutabe-store",
+    "stage": 0,
+    "list": [
+      "createPrimitiveTemplate"
+    ],
+    "category": "Display & Media"
+  },
+  "keywords": [
+    "solid",
+    "primitives"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "require": "./dist/index.cjs"
+  },
+  "typesVersions": {},
+  "scripts": {
+    "dev": "vite serve dev",
+    "page": "vite build dev",
+    "build": "jiti ../../scripts/build.ts",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.12"
+  },
+  "dependencies": {
+    "@solid-primitives/memo": "workspace:^1.2.3",
+    "redux": "^4.2.1"
+  }
+}
