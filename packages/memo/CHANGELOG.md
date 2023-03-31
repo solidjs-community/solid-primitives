@@ -1,5 +1,13 @@
 # @solid-primitives/memo
 
+## 1.2.4
+
+### Patch Changes
+
+- a1b88c95: Improve lazy memo reads in another memo.
+- Updated dependencies [2f6d3732]
+  - @solid-primitives/utils@6.0.0
+
 ## 1.2.3
 
 ### Patch Changes

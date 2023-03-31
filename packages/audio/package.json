@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/audio",
-  "version": "1.3.10",
+  "version": "1.3.11",
   "description": "Primitives to manage audio and single sounds.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -54,8 +54,8 @@
     "solid-heroicons": "^3.1.1"
   },
   "dependencies": {
-    "@solid-primitives/static-store": "workspace:^0.0.1",
-    "@solid-primitives/utils": "workspace:^5.5.1"
+    "@solid-primitives/static-store": "workspace:^0.0.2",
+    "@solid-primitives/utils": "workspace:^6.0.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

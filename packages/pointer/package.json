@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/pointer",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "A collection of primitives, giving you a nicer API to handle pointer events in a reactive context.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -54,10 +54,10 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.9",
-    "@solid-primitives/immutable": "workspace:^0.1.9",
-    "@solid-primitives/rootless": "workspace:^1.3.1",
-    "@solid-primitives/utils": "workspace:^5.5.2"
+    "@solid-primitives/event-listener": "workspace:^2.2.10",
+    "@solid-primitives/immutable": "workspace:^0.1.10",
+    "@solid-primitives/rootless": "workspace:^1.3.2",
+    "@solid-primitives/utils": "workspace:^6.0.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"
