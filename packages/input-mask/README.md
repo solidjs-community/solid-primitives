@@ -97,16 +97,13 @@ To use the mask handler with [solid-js-form](https://github.com/niliadu/solid-js
 
 ```tsx
 // don't
-const {field, form} = useField(props.name);
+const { field, form } = useField(props.name);
 const formHandler = form.formHandler;
-<input onInput={inputMask} use:formHandler />
+<input onInput={inputMask} use:formHandler />;
 
 // do
-const {field, form} = useField(props.name);
-<input
-  onBlur={form.handleBlur}
-  onInput={ev => (inputMask(ev), form.handleChange(ev))}
-/>
+const { field, form } = useField(props.name);
+<input onBlur={form.handleBlur} onInput={ev => (inputMask(ev), form.handleChange(ev))} />;
 ```
 
 To use the mask handler with [Modular Forms](https://modularforms.dev/), you may need to overwrite the re-validation handler:
@@ -120,7 +117,7 @@ To use the mask handler with [Modular Forms](https://modularforms.dev/), you may
   keepActive={…}
   keepState={…}
 >
-  {(field) => 
+  {(field) =>
     <input
       {...field.props}
       onInput={ev => (inputMask(ev), field.props.onInput.?(ev))}

@@ -1,50 +1,43 @@
 import { Component, For, Show } from "solid-js";
 import { render } from "solid-js/web";
-import {
-  createAccelerometer,
-  createCameras,
-  createMicrophones,
-  createSpeakers
-} from "../src";
-import { createPermission } from "../../permission"
+import { createAccelerometer, createCameras, createMicrophones, createSpeakers } from "../src";
+import { createPermission } from "../../permission";
 import { createMediaPermissionRequest } from "../../stream";
 import "uno.css";
 
 const Cameras: Component = () => {
   const cameras = createCameras();
-  return <>    
-    <h3>Cameras</h3>
-    <Show when={cameras().length > 0} fallback={<p>No cameras found</p>}>
-      <ul>
-        <For each={cameras()}>
-          {camera => (<li>{camera.label}</li>)}
-        </For>
-      </ul>
-    </Show>
-  </>
+  return (
+    <>
+      <h3>Cameras</h3>
+      <Show when={cameras().length > 0} fallback={<p>No cameras found</p>}>
+        <ul>
+          <For each={cameras()}>{camera => <li>{camera.label}</li>}</For>
+        </ul>
+      </Show>
+    </>
+  );
 };
 
 const AudioDevices: Component = () => {
   const microphones = createMicrophones();
   const speakers = createSpeakers();
-  return <>
-    <h3>Microphones</h3>
-    <Show when={microphones().length > 0} fallback={<p>No microphones found</p>}>
-      <ul>
-        <For each={microphones()}>
-          {microphone => (<li>{microphone.label}</li>)}
-        </For>
-      </ul>
-    </Show>
-    <h3>Speakers</h3>
-    <Show when={speakers().length > 0} fallback={<p>No speakers found</p>}>
-      <ul>
-        <For each={speakers()}>
-          {speaker => (<li>{speaker.label}</li>)}
-        </For>
-      </ul>
-    </Show>
-  </>
+  return (
+    <>
+      <h3>Microphones</h3>
+      <Show when={microphones().length > 0} fallback={<p>No microphones found</p>}>
+        <ul>
+          <For each={microphones()}>{microphone => <li>{microphone.label}</li>}</For>
+        </ul>
+      </Show>
+      <h3>Speakers</h3>
+      <Show when={speakers().length > 0} fallback={<p>No speakers found</p>}>
+        <ul>
+          <For each={speakers()}>{speaker => <li>{speaker.label}</li>}</For>
+        </ul>
+      </Show>
+    </>
+  );
 };
 
 const App: Component = () => {
@@ -58,7 +51,7 @@ const App: Component = () => {
         <h2>Accelerometer</h2>
         <p>
           <Show when={accel()} fallback={"not supported"} keyed>
-            {(accel) => `x=${accel.x} y=${accel.y} z=${accel.z}`}
+            {accel => `x=${accel.x} y=${accel.y} z=${accel.z}`}
           </Show>
         </p>
         <h2>Devices</h2>
