@@ -2,6 +2,7 @@ import { createIntersectionObserver } from "@solid-primitives/intersection-obser
 import { isIOS, isSafari } from "@solid-primitives/platform";
 import { defer } from "@solid-primitives/utils";
 import { createEffect, createSignal, onMount, ParentComponent } from "solid-js";
+import { NoHydration } from "solid-js/web";
 import { useLocation } from "solid-start";
 import { pageWidthClass } from "~/constants";
 import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
@@ -87,15 +88,17 @@ export const Table: ParentComponent = props => {
   let tableBody!: HTMLElement;
   let tableVerticalScrollShadow!: HTMLDivElement;
   const fakeTableRow = (
-    <>
-      <tr aria-hidden="true" style="visibility: hidden;">
-        <td aria-hidden="true" style="visibility: hidden;"></td>
-      </tr>
-      {/* To preserve odd/even row colors */}
-      <tr aria-hidden="true" style="display: none;">
-        <td aria-hidden="true"></td>
-      </tr>
-    </>
+    <NoHydration>
+      <>
+        <tr aria-hidden="true" style="visibility: hidden;">
+          <td aria-hidden="true" style="visibility: hidden;"></td>
+        </tr>
+        {/* To preserve odd/even row colors */}
+        <tr aria-hidden="true" style="display: none;">
+          <td aria-hidden="true"></td>
+        </tr>
+      </>
+    </NoHydration>
   ) as HTMLElement[];
   let tableSameWidthAsParent = false;
   let addedFakeTableRow = false;
