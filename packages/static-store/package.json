@@ -1,10 +1,11 @@
 {
-  "name": "@solid-primitives/map",
-  "version": "0.4.3",
-  "description": "The Map & WeakMap data structures as a reactive signals.",
-  "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
+  "name": "@solid-primitives/static-store",
+  "version": "0.0.1",
+  "description": "Primitives for creating small reactive objects that doesn't change their shape over time - don't need a proxy wrapper.",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
+  "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/utils#readme",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/static-store#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -13,17 +14,15 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "map",
+    "name": "static-store",
     "stage": 2,
     "list": [
-      "ReactiveMap",
-      "ReactiveWeakMap"
+      "createStaticStore",
+      "createDerivedStaticStore"
     ],
     "category": "Reactivity"
   },
   "keywords": [
-    "map",
-    "weakmap",
     "solid",
     "primitives"
   ],
@@ -44,9 +43,10 @@
     },
     "require": "./dist/index.cjs"
   },
+  "typesVersions": {},
   "scripts": {
     "dev": "vite serve dev",
-    "page": "vite build dev",
+    "page": "echo TODO",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
@@ -55,7 +55,6 @@
     "solid-js": "^1.6.12"
   },
   "dependencies": {
-    "@solid-primitives/trigger": "workspace:^1.0.3"
-  },
-  "typesVersions": {}
+    "@solid-primitives/utils": "workspace:^5.5.2"
+  }
 }

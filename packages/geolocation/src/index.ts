@@ -1,7 +1,8 @@
+import { createStaticStore } from "@solid-primitives/static-store";
+import { access, MaybeAccessor } from "@solid-primitives/utils";
 import type { Resource } from "solid-js";
+import { createComputed, createResource, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
-import { createComputed, onCleanup, createResource } from "solid-js";
-import { access, MaybeAccessor, createStaticStore } from "@solid-primitives/utils";
 
 const geolocationDefaults: PositionOptions = {
   enableHighAccuracy: false,

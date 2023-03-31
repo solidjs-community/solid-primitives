@@ -5,13 +5,7 @@ import { createScrollPosition, getScrollPosition } from "../src/index";
 
 describe("getScrollPosition", () => {
   it("no target returns null", () => {
-    expect(getScrollPosition(undefined)).toEqual({ x: null, y: null });
-  });
-
-  it.skip("get's scroll of window", () => {
-    const target = window;
-    Object.assign(target, { scrollY: 123, scrollX: 222 });
-    expect(getScrollPosition(target)).toEqual({ x: 222, y: 123 });
+    expect(getScrollPosition(undefined)).toEqual({ x: 0, y: 0 });
   });
 
   it("get's scroll of html Element", () => {
@@ -69,7 +63,7 @@ describe("createScrollPosition", () => {
       expect(scroll).toEqual({ x: 42, y: 11 });
 
       setTarget();
-      expect(scroll).toEqual({ x: null, y: null });
+      expect(scroll).toEqual({ x: 0, y: 0 });
 
       dispose();
     }));

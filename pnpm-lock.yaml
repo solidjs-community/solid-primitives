@@ -96,10 +96,12 @@ importers:
 
   packages/audio:
     specifiers:
+      '@solid-primitives/static-store': workspace:^0.0.1
       '@solid-primitives/utils': workspace:^5.5.1
       solid-heroicons: ^3.1.1
       solid-js: ^1.6.12
     dependencies:
+      '@solid-primitives/static-store': link:../static-store
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
     devDependencies:
@@ -118,11 +120,13 @@ importers:
       '@solid-primitives/event-listener': workspace:^2.2.9
       '@solid-primitives/resize-observer': workspace:^2.0.13
       '@solid-primitives/scheduled': workspace:^1.3.2
+      '@solid-primitives/static-store': workspace:^0.0.1
       '@solid-primitives/utils': workspace:^5.5.1
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
       '@solid-primitives/resize-observer': link:../resize-observer
+      '@solid-primitives/static-store': link:../static-store
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
     devDependencies:
@@ -278,6 +282,7 @@ importers:
 
   packages/geolocation:
     specifiers:
+      '@solid-primitives/static-store': workspace:^0.0.1
       '@solid-primitives/utils': workspace:^5.5.1
       '@types/leaflet': ^1.9.3
       leaflet: ^1.9.3
@@ -286,6 +291,7 @@ importers:
       solid-map-gl: ^1.7.1
       vite-plugin-mkcert: ^1.13.4
     dependencies:
+      '@solid-primitives/static-store': link:../static-store
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
     devDependencies:
@@ -414,11 +420,13 @@ importers:
     specifiers:
       '@solid-primitives/event-listener': workspace:^2.2.9
       '@solid-primitives/rootless': workspace:^1.3.1
+      '@solid-primitives/static-store': workspace:^0.0.1
       '@solid-primitives/utils': workspace:^5.5.1
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
       '@solid-primitives/rootless': link:../rootless
+      '@solid-primitives/static-store': link:../static-store
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
 
@@ -442,11 +450,13 @@ importers:
       '@solid-primitives/event-listener': workspace:^2.2.9
       '@solid-primitives/raf': workspace:^2.1.9
       '@solid-primitives/rootless': workspace:^1.3.1
+      '@solid-primitives/static-store': workspace:^0.0.1
       '@solid-primitives/utils': workspace:^5.5.2
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
       '@solid-primitives/rootless': link:../rootless
+      '@solid-primitives/static-store': link:../static-store
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
     devDependencies:
@@ -568,11 +578,13 @@ importers:
     specifiers:
       '@solid-primitives/event-listener': workspace:^2.2.9
       '@solid-primitives/rootless': workspace:^1.3.1
+      '@solid-primitives/static-store': workspace:^0.0.1
       '@solid-primitives/utils': workspace:^5.5.1
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
       '@solid-primitives/rootless': link:../rootless
+      '@solid-primitives/static-store': link:../static-store
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
 
@@ -611,12 +623,12 @@ importers:
     specifiers:
       '@solid-primitives/event-listener': workspace:^2.2.9
       '@solid-primitives/rootless': workspace:^1.3.1
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/static-store': workspace:^0.0.1
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
       '@solid-primitives/rootless': link:../rootless
-      '@solid-primitives/utils': link:../utils
+      '@solid-primitives/static-store': link:../static-store
       solid-js: 1.7.0
 
   packages/selection:
@@ -646,6 +658,14 @@ importers:
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/immutable': link:../immutable
+      '@solid-primitives/utils': link:../utils
+      solid-js: 1.7.0
+
+  packages/static-store:
+    specifiers:
+      '@solid-primitives/utils': workspace:^5.5.2
+      solid-js: ^1.6.12
+    dependencies:
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
 

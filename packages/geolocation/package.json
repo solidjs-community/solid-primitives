@@ -56,6 +56,7 @@
     "vite-plugin-mkcert": "^1.13.4"
   },
   "dependencies": {
+    "@solid-primitives/static-store": "workspace:^0.0.1",
     "@solid-primitives/utils": "workspace:^5.5.1"
   },
   "peerDependencies": {

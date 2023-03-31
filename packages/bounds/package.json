@@ -58,6 +58,7 @@
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^2.2.9",
     "@solid-primitives/resize-observer": "workspace:^2.0.13",
+    "@solid-primitives/static-store": "workspace:^0.0.1",
     "@solid-primitives/utils": "workspace:^5.5.1"
   },
   "peerDependencies": {

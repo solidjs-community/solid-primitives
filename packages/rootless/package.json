@@ -37,6 +37,7 @@
     },
     "require": "./dist/index.cjs"
   },
+  "typesVersions": {},
   "scripts": {
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
@@ -52,6 +53,5 @@
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"
-  },
-  "typesVersions": {}
+  }
 }
