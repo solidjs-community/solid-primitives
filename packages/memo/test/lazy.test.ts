@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { createLazyMemo } from "../src";
-import { createComputed, createEffect, createRoot, createSignal } from "solid-js";
+import { createComputed, createEffect, createMemo, createRoot, createSignal } from "solid-js";
 
 describe("createLazyMemo", () => {
   it("won't run if not accessed", () =>
@@ -256,4 +256,23 @@ describe("createLazyMemo", () => {
 
       dispose();
     }));
+
+  it("stays in sync when read in a memo", () => {
+    const { dispose, setA, memo } = createRoot(dispose => {
+      const [a, setA] = createSignal(1);
+      const b = createLazyMemo(() => a());
+
+      const memo = createMemo(() => {
+        expect(a()).toBe(b());
+      });
+
+      return { dispose, setA, memo };
+    });
+
+    memo();
+    setA(2);
+    memo();
+
+    dispose();
+  });
 });
