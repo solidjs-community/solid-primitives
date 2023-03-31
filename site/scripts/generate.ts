@@ -24,6 +24,10 @@ const rootPath = path.join(__dirname, "..", "..");
 const packagesPath = path.join(rootPath, "packages");
 const generatedDirPath = path.join(__dirname, "..", "src", "_generated");
 
+if (!fs.existsSync(generatedDirPath)) {
+  fs.mkdirSync(generatedDirPath);
+}
+
 const PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES: ReadonlySet<string> = new Set([
   "signal-builders",
   "platform",
