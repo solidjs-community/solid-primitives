@@ -69,7 +69,8 @@ export function getResolvedElements<T extends object>(
   predicate: (item: JSX.Element | T) => item is T,
 ): T | T[] | null {
   if (predicate(value)) return value;
-  if (typeof value === "function" && !value.length) return getResolvedElements(value(), predicate);
+  if (typeof value === "function" && !(value as () => JSX.Element).length)
+    return getResolvedElements((value as () => JSX.Element)(), predicate);
   if (Array.isArray(value)) {
     const results: T[] = [];
     for (const item of value) {
@@ -151,7 +152,8 @@ export function getFirstChild<T extends object>(
   predicate: (item: JSX.Element | T) => item is T,
 ): T | null {
   if (predicate(value)) return value;
-  if (typeof value === "function" && !value.length) return getFirstChild(value(), predicate);
+  if (typeof value === "function" && !(value as () => JSX.Element).length)
+    return getFirstChild((value as () => JSX.Element)(), predicate);
   if (Array.isArray(value)) {
     for (const item of value) {
       const result = getFirstChild(item, predicate);
@@ -231,7 +233,7 @@ export function Refs(props: { ref: Ref<Element[]>; children: JSX.Element }): JSX
   }, []);
   onCleanup(() => prev.length && cb([]));
 
-  return resolved;
+  return resolved as unknown as JSX.Element;
 }
 
 /**
@@ -264,5 +266,5 @@ export function Ref(props: { ref: Ref<Element | undefined>; children: JSX.Elemen
 
   onCleanup(() => prev && cb(undefined));
 
-  return resolved;
+  return resolved as unknown as JSX.Element;
 }

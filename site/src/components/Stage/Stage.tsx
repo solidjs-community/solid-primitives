@@ -50,7 +50,7 @@ const Content = () => {
   return (
     <div>
       <div class="relative max-w-[420px] overflow-clip rounded-xl bg-[#e5ecf3] dark:bg-[#2b455a]">
-        <div class="pointer-events-none absolute top-0 left-0 right-0 bottom-0 rounded-xl border-2 border-[#e5ecf3] dark:border-[#2b455a]"></div>
+        <div class="pointer-events-none absolute bottom-0 left-0 right-0 top-0 rounded-xl border-2 border-[#e5ecf3] dark:border-[#2b455a]"></div>
         <table class="my-4 w-full" style="border-collapse: separate; border-spacing: 2px 2px;">
           <thead>
             <tr class="bg-page-main-bg font-semibold text-[#49494B] dark:text-[#b7c1d0]">

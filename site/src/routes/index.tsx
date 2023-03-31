@@ -18,7 +18,7 @@ export default function Home() {
           <strong>Primitives</strong>.
           {/* All utilities are well tested and continuously maintained. */}
         </p>
-        <div class="relative mt-4 mb-10 text-[14px] sm:text-base md:text-lg">
+        <div class="relative mb-10 mt-4 text-[14px] sm:text-base md:text-lg">
           <ul class="flex gap-4">
             <li>
               <div class="font-semibold text-[#30889c] dark:text-[#44bfdb]">Small</div>
@@ -36,7 +36,7 @@ export default function Home() {
             </li>
           </ul>
           <svg
-            class="-z-1 mask-image-[linear-gradient(to_bottom,transparent,#000_30%)] sm:mask-image-[linear-gradient(to_bottom,transparent,#000_20%)] pointer-events-none absolute top-[20%] -left-6 -right-8 opacity-60 sm:-left-4 sm:-right-4"
+            class="-z-1 mask-image-[linear-gradient(to_bottom,transparent,#000_30%)] sm:mask-image-[linear-gradient(to_bottom,transparent,#000_20%)] pointer-events-none absolute -left-6 -right-8 top-[20%] opacity-60 sm:-left-4 sm:-right-4"
             viewBox="0 0 188.975 179.46"
             // @ts-ignore
             xml:space="preserve"

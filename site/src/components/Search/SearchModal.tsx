@@ -112,7 +112,7 @@ const SearchModal: Component<{
         element: (
           <div>
             <div
-              class="fixed top-0 left-0 right-0 z-[1002] h-[60px]"
+              class="fixed left-0 right-0 top-0 z-[1002] h-[60px]"
               classList={{ hidden: isSmall() }}
               onClick={onClickClose}
             />

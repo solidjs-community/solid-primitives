@@ -19,7 +19,7 @@ const MessageStack: Component<{
   return (
     <ul
       class="
-        fixed top-4 right-4
+        fixed right-4 top-4
         flex flex-col items-end
         "
     >

@@ -15,7 +15,7 @@ const NavMenu: Component<RefProps<HTMLDivElement> & { onClose: () => void }> = p
   ];
   return (
     <div ref={props.ref}>
-      <div class="my-1 mx-4 border-b-2 border-slate-200 dark:border-slate-600" />
+      <div class="mx-4 my-1 border-b-2 border-slate-200 dark:border-slate-600" />
       <div class="p-4">
         <ul class="flex flex-col text-lg">
           <For each={list}>

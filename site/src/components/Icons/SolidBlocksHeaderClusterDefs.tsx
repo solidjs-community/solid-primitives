@@ -1,7 +1,7 @@
 const SolidBlocksHeaderClusterDefs = () => {
   return (
     <svg
-      class="absolute top-0 left-0 h-0 w-0 opacity-0"
+      class="absolute left-0 top-0 h-0 w-0 opacity-0"
       // @ts-ignore
       xml:space="preserve"
       xmlns:xlink="http://www.w3.org/1999/xlink"

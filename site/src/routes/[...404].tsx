@@ -25,13 +25,13 @@ export default function NotFound() {
           <span class="relative" style="left: 3px; top: -34px;">
             4
             <span
-              class="mask-image-[linear-gradient(to_bottom,transparent_95px,#000)] pointer-events-none absolute top-[58%] left-0 block -scale-y-100 select-none opacity-40 blur-[2px] dark:opacity-25"
+              class="mask-image-[linear-gradient(to_bottom,transparent_95px,#000)] pointer-events-none absolute left-0 top-[58%] block -scale-y-100 select-none opacity-40 blur-[2px] dark:opacity-25"
               aria-hidden="true"
             >
               4
             </span>
             <svg
-              class="-z-1 absolute top-0 left-0"
+              class="-z-1 absolute left-0 top-0"
               viewBox="0 0 88.975 79.46"
               // @ts-ignore
               xml:space="preserve"
@@ -48,13 +48,13 @@ export default function NotFound() {
           <span class="relative">
             0
             <span
-              class="mask-image-[linear-gradient(to_bottom,transparent_100px,#000)] pointer-events-none absolute top-[58%] left-0 block -scale-y-100 select-none opacity-40 blur-[2px] dark:opacity-25"
+              class="mask-image-[linear-gradient(to_bottom,transparent_100px,#000)] pointer-events-none absolute left-0 top-[58%] block -scale-y-100 select-none opacity-40 blur-[2px] dark:opacity-25"
               aria-hidden="true"
             >
               0
             </span>
             <svg
-              class="-z-1 absolute top-0 left-0"
+              class="-z-1 absolute left-0 top-0"
               viewBox="0 0 88.975 79.46"
               // @ts-ignore
               xml:space="preserve"
@@ -71,13 +71,13 @@ export default function NotFound() {
           <span class="relative" style="left: -5px; top: -41px;">
             4
             <span
-              class="mask-image-[linear-gradient(to_bottom,transparent_95px,#000)] pointer-events-none absolute top-[58%] left-0 block -scale-y-100 select-none opacity-40 blur-[2px] dark:opacity-25"
+              class="mask-image-[linear-gradient(to_bottom,transparent_95px,#000)] pointer-events-none absolute left-0 top-[58%] block -scale-y-100 select-none opacity-40 blur-[2px] dark:opacity-25"
               aria-hidden="true"
             >
               4
             </span>
             <svg
-              class="-z-1 absolute top-0 left-0"
+              class="-z-1 absolute left-0 top-0"
               viewBox="0 0 88.975 79.46"
               // @ts-ignore
               xml:space="preserve"
@@ -94,7 +94,7 @@ export default function NotFound() {
         </div>
       </div>
       <div class="mt-24 flex justify-center">
-        <A href="/" class="flex items-center gap-4 py-2 px-4 hover:opacity-70">
+        <A href="/" class="flex items-center gap-4 px-4 py-2 hover:opacity-70">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"

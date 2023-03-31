@@ -85,7 +85,6 @@ export const withCache: RequestModifier =
         delete requestContext.cache[serializeRequest(requestData)];
       } catch (e) {
         !isServer &&
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           DEV &&
           // eslint-disable-next-line no-console
           console.warn("attempt to invalidate cache for", requestData, "failed with error", e);
@@ -138,7 +137,6 @@ export const withCacheStorage: RequestModifier =
       Object.assign(requestContext.cache, loadedCache);
     } catch (e) {
       !isServer &&
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         DEV &&
         // eslint-disable-next-line no-console
         console.warn("attempt to parse stored request cache failed with error", e);
@@ -149,7 +147,7 @@ export const withCacheStorage: RequestModifier =
       try {
         storage.setItem(key, JSON.stringify(requestContext.cache));
       } catch (e) {
-        // eslint-disable-next-line no-console, @typescript-eslint/no-unnecessary-condition
+        // eslint-disable-next-line no-console
         !isServer && DEV && console.warn("attempt to store request cache failed with error", e);
       }
     };

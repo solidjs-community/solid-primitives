@@ -50,7 +50,7 @@ export const Slider: Component<{
   return (
     <div ref={bar} class="relative my-4 h-6 w-[80vw] rounded-full bg-gray-100">
       <div
-        class="absolute left-1/2 -top-0.5 -ml-3 box-content h-6 w-6 select-none rounded-full border-2 border-blue-400 bg-blue-400"
+        class="absolute -top-0.5 left-1/2 -ml-3 box-content h-6 w-6 select-none rounded-full border-2 border-blue-400 bg-blue-400"
         style={{ transform: `translateX(${left() ?? 0 - 2}px)` }}
         onmousedown={e => {
           setPageX(e.pageX);

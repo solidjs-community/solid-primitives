@@ -38,7 +38,7 @@ const Heading: ParentComponent = props => {
       </div>
       <div class="relative">
         <svg
-          class="absolute top-0 left-0"
+          class="absolute left-0 top-0"
           viewBox="0 0 88.975 79.46"
           // @ts-ignore
           xml:space="preserve"
@@ -50,7 +50,7 @@ const Heading: ParentComponent = props => {
           <use href="#solid-blocks-header-cluster-e" transform="translate(-33 -14)" />
         </svg>
         <svg
-          class="absolute top-0 left-0"
+          class="absolute left-0 top-0"
           viewBox="0 0 88.975 79.46"
           // @ts-ignore
           xml:space="preserve"
@@ -79,7 +79,7 @@ const Heading: ParentComponent = props => {
           <use href="#solid-blocks-header-cluster-e" transform="translate(-16.2 4.7)" />
         </svg> */}
         <svg
-          class="absolute top-0 left-0"
+          class="absolute left-0 top-0"
           viewBox="0 0 88.975 79.46"
           // @ts-ignore
           xml:space="preserve"
@@ -161,7 +161,7 @@ const Heading: ParentComponent = props => {
             />
           </g>
         </svg>
-        <div class="absolute top-[10px] left-[8px] right-[8px]">
+        <div class="absolute left-[8px] right-[8px] top-[10px]">
           <div class="relative top-[3px] h-[43.63px] w-full bg-[linear-gradient(to_right,#f5f7ff,#f5f7ff)] dark:bg-[linear-gradient(to_right,#2a3d4b,#2b3c4b)]" />
           <div class="box-shadow-[0px_6px_17px_0px_#c4d3f4] dark:box-shadow-[0px_6px_17px_0px_#202d3b] h-[11px] w-full bg-[linear-gradient(to_right,#dbe0f2,#d7ddf2)] dark:bg-[linear-gradient(to_right,#263544,#263442)]" />
         </div>
@@ -171,7 +171,7 @@ const Heading: ParentComponent = props => {
             {props.children}
           </div>
           <div
-            class="mask-image-[linear-gradient(to_bottom,transparent,#000)] z-1 pointer-events-none absolute top-[32px] left-0 -scale-y-100 select-none text-[#4b6a87] opacity-[0.35] blur-[2px] dark:text-[#8a9fb5] dark:opacity-30"
+            class="mask-image-[linear-gradient(to_bottom,transparent,#000)] z-1 pointer-events-none absolute left-0 top-[32px] -scale-y-100 select-none text-[#4b6a87] opacity-[0.35] blur-[2px] dark:text-[#8a9fb5] dark:opacity-30"
             aria-hidden="true"
             style="-webkit-mask-size: 100% 22px; -webkit-mask-repeat: no-repeat; -webkit-mask-position: bottom; mask-size: 100% 22px; mask-repeat: no-repeat; mask-position: bottom;"
           >

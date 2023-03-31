@@ -102,7 +102,7 @@ const App: Component = () => {
 
   return (
     <div class="flex min-h-screen justify-between gap-4 bg-gray-800 p-5 pt-[80px] text-white">
-      <header class="fixed top-0 left-0 z-10 flex h-[60px] w-full items-center gap-8 bg-gray-800 px-5">
+      <header class="fixed left-0 top-0 z-10 flex h-[60px] w-full items-center gap-8 bg-gray-800 px-5">
         <h1>
           Page Id: <span class="font-mono">{page.id}</span>
         </h1>

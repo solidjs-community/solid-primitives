@@ -95,7 +95,7 @@ export const ClientOnly: FlowComponent = props => {
 `onMount` is a common lifecycle hook that is used to perform side-effects when the component is mounted.
 However, it is not certain that the elements are actually connected to the DOM when the mount callback is called.
 
-> **Note:** If that's the case, it might be a sign that you are executing components that are not visible to the users my mistake.
+> **Note** If that's the case, it might be a sign that you are executing components that are not visible to the users my mistake.
 >
 > And if this is something intentional, you probably already have a way to hook into the actual DOM rendering.
 >
