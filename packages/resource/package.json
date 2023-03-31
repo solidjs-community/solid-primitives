@@ -20,8 +20,7 @@
       "createAggregated",
       "makeAbortable",
       "makeCache",
-      "makeRetrying",
-      "handleResponse"
+      "makeRetrying"
     ],
     "category": "Reactivity"
   },
