@@ -3,22 +3,6 @@ import SlideModal from "../Modal/SlideModal";
 import BundleSizeModal from "../BundleSizeModal/BundleSizeModal";
 import { FormattedBytes } from "~/types";
 
-// const createFetchSize = (value: string) => {
-//   const [size, setSize] = createSignal("");
-//   onMount(() => {
-//     const fetchValue = async () => {
-//       try {
-//         const response = await fetch(value);
-//         const json = (await response.json()) as { value: string };
-//         setSize(json.value);
-//       } catch (err) {}
-//     };
-//     fetchValue();
-//   });
-
-//   return size;
-// };
-
 const getBundleJSHref = ({
   packageName,
   exportName,

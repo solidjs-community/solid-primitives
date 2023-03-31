@@ -9,38 +9,6 @@ import {
 import { isServer } from "solid-js/web";
 import { getCachedPackageListItemData } from "~/api";
 
-// const [color, setColor] = createSignal("");
-// const version = createFetchVersion(value);
-
-// const updateColor = (
-//   color:
-//     | "brightgreen"
-//     | "green"
-//     | "yellowgreen"
-//     | "yellow"
-//     | "orange"
-//     | "red"
-//     | "blue"
-//     | "lightgrey",
-// ) => {
-//   switch (color) {
-//     case "brightgreen":
-//     case "yellowgreen":
-//     case "yellow":
-//       return "bg-[#E9DE47] text-black";
-//     case "orange":
-//       return "bg-[#FFA15C] text-black";
-//     case "red":
-//       return "bg-[#FFA15C] text-black";
-//     case "blue":
-//       return "bg-[#2962FF] text-white";
-//     case "lightgrey":
-//       return "bg-[lightgrey] text-white";
-//     default:
-//       return "bg-[lightgrey] text-white";
-//   }
-// };
-
 const NPM_URL = "https://www.npmjs.com/package/";
 
 const versionCache = new Map<string, string>();

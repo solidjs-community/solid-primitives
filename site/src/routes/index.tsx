@@ -64,11 +64,6 @@ const Header: Component = () => {
             <use href="#solid-blocks-header-cluster-e" transform="translate(79 9.5)" />
           </g>
         </svg>
-        {/* <img
-     class="absolute top-[20%] left-0 right-0 bottom-0 -z-1 opacity-70 object-cover"
-     src={solidSquaresImg}
-     alt=""
-   /> */}
       </div>
     </div>
   );

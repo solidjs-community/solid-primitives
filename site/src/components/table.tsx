@@ -31,7 +31,6 @@ export const THead: ParentComponent = props => {
         style="opacity: 0;"
       >
         <td class="h-0">
-          {/* <div class="absolute h-[8px] top-0 left-0 right-0 bg-white"></div> */}
           <div class="box-shadow-[var(--table-header-box-shadow)] absolute inset-0" />
         </td>
       </tr>
