@@ -1,5 +1,16 @@
 # @solid-primitives/mouse
 
+## 2.0.11
+
+### Patch Changes
+
+- 2f6d3732: Use the static-store package for creating reactive objects. Minor overall improvements
+- Updated dependencies [2f6d3732]
+  - @solid-primitives/utils@6.0.0
+  - @solid-primitives/event-listener@2.2.10
+  - @solid-primitives/rootless@1.3.2
+  - @solid-primitives/static-store@0.0.2
+
 ## 2.0.10
 
 ### Patch Changes

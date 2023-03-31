@@ -80,8 +80,8 @@ importers:
 
   packages/active-element:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.9
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/event-listener': workspace:^2.2.10
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -96,10 +96,12 @@ importers:
 
   packages/audio:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/static-store': workspace:^0.0.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-heroicons: ^3.1.1
       solid-js: ^1.6.12
     dependencies:
+      '@solid-primitives/static-store': link:../static-store
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
     devDependencies:
@@ -107,7 +109,7 @@ importers:
 
   packages/autofocus:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -115,14 +117,16 @@ importers:
 
   packages/bounds:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.9
-      '@solid-primitives/resize-observer': workspace:^2.0.13
+      '@solid-primitives/event-listener': workspace:^2.2.10
+      '@solid-primitives/resize-observer': workspace:^2.0.14
       '@solid-primitives/scheduled': workspace:^1.3.2
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/static-store': workspace:^0.0.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
       '@solid-primitives/resize-observer': link:../resize-observer
+      '@solid-primitives/static-store': link:../static-store
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
     devDependencies:
@@ -136,7 +140,7 @@ importers:
 
   packages/clipboard:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -144,9 +148,9 @@ importers:
 
   packages/connectivity:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.9
-      '@solid-primitives/rootless': workspace:^1.3.1
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/event-listener': workspace:^2.2.10
+      '@solid-primitives/rootless': workspace:^1.3.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -162,7 +166,7 @@ importers:
 
   packages/controlled-props:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -170,7 +174,7 @@ importers:
 
   packages/cursor:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -178,10 +182,10 @@ importers:
 
   packages/date:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.9
-      '@solid-primitives/memo': workspace:^1.2.3
+      '@solid-primitives/event-listener': workspace:^2.2.10
+      '@solid-primitives/memo': workspace:^1.2.4
       '@solid-primitives/timer': workspace:^1.3.7
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/utils': workspace:^6.0.0
       date-fns: ^2.29.3
       solid-js: ^1.6.12
     dependencies:
@@ -201,7 +205,7 @@ importers:
 
   packages/destructure:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -215,8 +219,8 @@ importers:
 
   packages/event-bus:
     specifiers:
-      '@solid-primitives/immutable': workspace:^0.1.9
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/immutable': workspace:^0.1.10
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/immutable': link:../immutable
@@ -231,7 +235,7 @@ importers:
 
   packages/event-listener:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -278,7 +282,8 @@ importers:
 
   packages/geolocation:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/static-store': workspace:^0.0.2
+      '@solid-primitives/utils': workspace:^6.0.0
       '@types/leaflet': ^1.9.3
       leaflet: ^1.9.3
       mapbox-gl: ^2.13.0
@@ -286,6 +291,7 @@ importers:
       solid-map-gl: ^1.7.1
       vite-plugin-mkcert: ^1.13.4
     dependencies:
+      '@solid-primitives/static-store': link:../static-store
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
     devDependencies:
@@ -308,7 +314,7 @@ importers:
       '@graphql-codegen/typescript': ^3.0.2
       '@graphql-codegen/typescript-operations': ^3.0.2
       '@graphql-typed-document-node/core': ^3.2.0
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/utils': workspace:^6.0.0
       graphql: ^16.6.0
       solid-js: ^1.6.12
     dependencies:
@@ -348,7 +354,7 @@ importers:
 
   packages/immutable:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -362,8 +368,8 @@ importers:
 
   packages/intersection-observer:
     specifiers:
-      '@solid-primitives/range': workspace:^0.1.10
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/range': workspace:^0.1.11
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -373,7 +379,7 @@ importers:
 
   packages/jsx-tokenizer:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -381,9 +387,9 @@ importers:
 
   packages/keyboard:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.9
-      '@solid-primitives/rootless': workspace:^1.3.1
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/event-listener': workspace:^2.2.10
+      '@solid-primitives/rootless': workspace:^1.3.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -393,9 +399,9 @@ importers:
 
   packages/keyed:
     specifiers:
-      '@solid-primitives/immutable': workspace:^0.1.9
-      '@solid-primitives/refs': workspace:^1.0.1
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/immutable': workspace:^0.1.10
+      '@solid-primitives/refs': workspace:^1.0.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
       solid-transition-group: ^0.2.2
     dependencies:
@@ -422,21 +428,23 @@ importers:
 
   packages/media:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.9
-      '@solid-primitives/rootless': workspace:^1.3.1
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/event-listener': workspace:^2.2.10
+      '@solid-primitives/rootless': workspace:^1.3.2
+      '@solid-primitives/static-store': workspace:^0.0.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
       '@solid-primitives/rootless': link:../rootless
+      '@solid-primitives/static-store': link:../static-store
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
 
   packages/memo:
     specifiers:
-      '@solid-primitives/mouse': workspace:^2.0.10
+      '@solid-primitives/mouse': workspace:^2.0.11
       '@solid-primitives/scheduled': workspace:^1.3.2
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/utils': workspace:^6.0.0
       '@solidjs/router': ^0.8.2
       solid-js: ^1.6.12
     dependencies:
@@ -449,14 +457,16 @@ importers:
 
   packages/mouse:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.9
-      '@solid-primitives/raf': workspace:^2.1.9
-      '@solid-primitives/rootless': workspace:^1.3.1
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/event-listener': workspace:^2.2.10
+      '@solid-primitives/raf': workspace:^2.1.10
+      '@solid-primitives/rootless': workspace:^1.3.2
+      '@solid-primitives/static-store': workspace:^0.0.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
       '@solid-primitives/rootless': link:../rootless
+      '@solid-primitives/static-store': link:../static-store
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
     devDependencies:
@@ -465,7 +475,7 @@ importers:
   packages/mutation-observer:
     specifiers:
       '@solid-primitives/composites': ^1.1.1
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -475,9 +485,9 @@ importers:
 
   packages/page-visibility:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.9
-      '@solid-primitives/rootless': workspace:^1.3.1
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/event-listener': workspace:^2.2.10
+      '@solid-primitives/rootless': workspace:^1.3.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -487,8 +497,8 @@ importers:
 
   packages/pagination:
     specifiers:
-      '@solid-primitives/intersection-observer': workspace:^2.0.9
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/intersection-observer': workspace:^2.0.11
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/intersection-observer': link:../intersection-observer
@@ -509,10 +519,10 @@ importers:
 
   packages/pointer:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.9
-      '@solid-primitives/immutable': workspace:^0.1.9
-      '@solid-primitives/rootless': workspace:^1.3.1
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/event-listener': workspace:^2.2.10
+      '@solid-primitives/immutable': workspace:^0.1.10
+      '@solid-primitives/rootless': workspace:^1.3.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
@@ -523,7 +533,7 @@ importers:
 
   packages/promise:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -531,7 +541,7 @@ importers:
 
   packages/props:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/utils': workspace:^6.0.0
       nanospy: ^0.5.0
       solid-js: ^1.6.12
     dependencies:
@@ -542,7 +552,7 @@ importers:
 
   packages/raf:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -550,7 +560,7 @@ importers:
 
   packages/range:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
       solid-transition-group: ^0.2.2
     dependencies:
@@ -561,8 +571,8 @@ importers:
 
   packages/refs:
     specifiers:
-      '@solid-primitives/immutable': workspace:^0.1.9
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/immutable': workspace:^0.1.10
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-app-router: ^0.4.2
       solid-js: ^1.6.12
       solid-transition-group: ^0.2.2
@@ -576,13 +586,15 @@ importers:
 
   packages/resize-observer:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.9
-      '@solid-primitives/rootless': workspace:^1.3.1
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/event-listener': workspace:^2.2.10
+      '@solid-primitives/rootless': workspace:^1.3.2
+      '@solid-primitives/static-store': workspace:^0.0.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
       '@solid-primitives/rootless': link:../rootless
+      '@solid-primitives/static-store': link:../static-store
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
 
@@ -594,7 +606,7 @@ importers:
 
   packages/rootless:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -619,14 +631,14 @@ importers:
 
   packages/scroll:
     specifiers:
-      '@solid-primitives/event-listener': workspace:^2.2.9
-      '@solid-primitives/rootless': workspace:^1.3.1
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/event-listener': workspace:^2.2.10
+      '@solid-primitives/rootless': workspace:^1.3.2
+      '@solid-primitives/static-store': workspace:^0.0.2
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
       '@solid-primitives/rootless': link:../rootless
-      '@solid-primitives/utils': link:../utils
+      '@solid-primitives/static-store': link:../static-store
       solid-js: 1.7.0
 
   packages/selection:
@@ -651,17 +663,25 @@ importers:
 
   packages/signal-builders:
     specifiers:
-      '@solid-primitives/immutable': workspace:^0.1.9
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/immutable': workspace:^0.1.10
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/immutable': link:../immutable
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
 
+  packages/static-store:
+    specifiers:
+      '@solid-primitives/utils': workspace:^6.0.0
+      solid-js: ^1.6.12
+    dependencies:
+      '@solid-primitives/utils': link:../utils
+      solid-js: 1.7.0
+
   packages/storage:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -669,7 +689,7 @@ importers:
 
   packages/stream:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -677,8 +697,8 @@ importers:
 
   packages/styles:
     specifiers:
-      '@solid-primitives/rootless': workspace:^1.3.1
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/rootless': workspace:^1.3.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/rootless': link:../rootless
@@ -693,8 +713,8 @@ importers:
 
   packages/transition-group:
     specifiers:
-      '@solid-primitives/refs': workspace:^1.0.1
-      '@solid-primitives/utils': workspace:^5.5.1
+      '@solid-primitives/refs': workspace:^1.0.2
+      '@solid-primitives/utils': workspace:^6.0.0
       '@solidjs/router': ^0.8.2
       solid-js: ^1.6.12
     dependencies:
@@ -706,7 +726,7 @@ importers:
 
   packages/trigger:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -720,7 +740,7 @@ importers:
 
   packages/upload:
     specifiers:
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': link:../utils
@@ -746,22 +766,22 @@ importers:
 
   site:
     specifiers:
-      '@solid-primitives/clipboard': workspace:^1.5.3
-      '@solid-primitives/event-bus': workspace:^1.0.3
-      '@solid-primitives/event-listener': workspace:^2.2.9
+      '@solid-primitives/clipboard': workspace:^1.5.4
+      '@solid-primitives/event-bus': workspace:^1.0.4
+      '@solid-primitives/event-listener': workspace:^2.2.10
       '@solid-primitives/flux-store': workspace:^0.0.2
-      '@solid-primitives/intersection-observer': workspace:^2.0.10
-      '@solid-primitives/keyboard': workspace:^1.0.11
-      '@solid-primitives/media': workspace:^2.1.5
-      '@solid-primitives/mutation-observer': workspace:^1.1.9
+      '@solid-primitives/intersection-observer': workspace:^2.0.11
+      '@solid-primitives/keyboard': workspace:^1.0.12
+      '@solid-primitives/media': workspace:^2.1.6
+      '@solid-primitives/mutation-observer': workspace:^1.1.10
       '@solid-primitives/platform': workspace:^0.0.105
-      '@solid-primitives/refs': workspace:^1.0.1
-      '@solid-primitives/resize-observer': workspace:^2.0.13
-      '@solid-primitives/rootless': workspace:^1.3.1
+      '@solid-primitives/refs': workspace:^1.0.2
+      '@solid-primitives/resize-observer': workspace:^2.0.14
+      '@solid-primitives/rootless': workspace:^1.3.2
       '@solid-primitives/scheduled': workspace:^1.3.2
-      '@solid-primitives/scroll': workspace:^2.0.12
+      '@solid-primitives/scroll': workspace:^2.0.13
       '@solid-primitives/tween': workspace:^1.2.6
-      '@solid-primitives/utils': workspace:^5.5.2
+      '@solid-primitives/utils': workspace:^6.0.0
       '@solidjs/meta': ^0.28.2
       '@solidjs/router': ^0.8.2
       '@tailwindcss/container-queries': ^0.1.0

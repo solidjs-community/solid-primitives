@@ -1,11 +1,14 @@
-import { createStaticStore, MaybeAccessor, Position } from "@solid-primitives/utils";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
+import { createDerivedStaticStore, createStaticStore } from "@solid-primitives/static-store";
+import { asAccessor, MaybeAccessor, Position } from "@solid-primitives/utils";
+import { Accessor, createEffect, createSignal, onMount, sharedConfig } from "solid-js";
+import { isServer } from "solid-js/web";
 import {
   DEFAULT_MOUSE_POSITION,
   DEFAULT_RELATIVE_ELEMENT_POSITION,
+  getPositionToElement,
   makeMouseInsideListener,
   makeMousePositionListener,
-  getPositionToElement,
 } from "./common";
 import {
   FollowTouchOptions,
@@ -13,8 +16,6 @@ import {
   PositionRelativeToElement,
   UseTouchOptions,
 } from "./types";
-import { Accessor, createComputed, createEffect, onMount, sharedConfig } from "solid-js";
-import { isServer } from "solid-js/web";
 
 export interface MousePositionOptions extends UseTouchOptions, FollowTouchOptions {
   /**
@@ -125,31 +126,17 @@ export function createPositionToElement(
     return fallback;
   }
 
-  const isFn = typeof element === "function";
+  const isFn = typeof element === "function",
+    isHydrating = sharedConfig.context,
+    getEl = asAccessor(element),
+    [shouldFallback, setShouldFallback] = createSignal(!!isHydrating, { equals: false });
 
-  const calcState = (el: Element) => {
+  if (isHydrating || isFn) onMount(() => setShouldFallback(false));
+
+  return createDerivedStaticStore(() => {
+    let el!: Element | undefined;
+    if (shouldFallback() || !(el = getEl())) return fallback;
     const { x, y } = pos();
     return getPositionToElement(x, y, el);
-  };
-
-  const [state, setState] = createStaticStore<PositionRelativeToElement>(
-    isFn || sharedConfig.context ? fallback : calcState(element),
-  );
-
-  const getState = isFn
-      ? () => {
-          const el = element();
-          return el ? calcState(el) : fallback;
-        }
-      : calcState.bind(void 0, element),
-    updateState = () => setState(getState());
-
-  if (sharedConfig.context) {
-    onMount(() => createComputed(updateState));
-  } else {
-    createComputed(updateState);
-    if (isFn) onMount(updateState);
-  }
-
-  return state;
+  });
 }

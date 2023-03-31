@@ -16,6 +16,7 @@ import {
   NoInfer,
   Owner,
   SignalOptions,
+  DEV,
 } from "solid-js";
 import { isServer } from "solid-js/web";
 import { debounce, throttle } from "@solid-primitives/scheduled";
@@ -338,6 +339,8 @@ export function createAsyncMemo<T>(
   return state;
 }
 
+const EQUALS_FALSE = { equals: false } as const;
+
 /**
  * Lazily evaluated `createMemo`. Will run the calculation only if is being listened to.
  *
@@ -379,16 +382,23 @@ export function createLazyMemo<T>(
     };
   }
 
-  let isStale = true;
+  let isReading = false,
+    isStale: boolean | undefined = true;
 
-  const [isDirty, setDirty] = createSignal({ v: false }),
+  const [track, trigger] = createSignal(void 0, EQUALS_FALSE),
     memo = createMemo<T>(
-      p => (isDirty().v ? ((isStale = isDirty().v = false), calc(p)) : ((isStale = true), p)),
+      p => (isReading ? calc(p) : ((isStale = !track()), p)),
       value as T,
-      { equals: false, name: options?.name },
+      DEV ? { name: options?.name, equals: false } : EQUALS_FALSE,
     );
 
-  return (): T => (isStale && setDirty({ v: true }), memo());
+  return (): T => {
+    isReading = true;
+    if (isStale) isStale = trigger();
+    const v = memo();
+    isReading = false;
+    return v;
+  };
 }
 
 /*

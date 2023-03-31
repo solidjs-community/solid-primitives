@@ -19,7 +19,7 @@
       "ReactiveSet",
       "ReactiveWeakSet"
     ],
-    "category": "Utilities"
+    "category": "Reactivity"
   },
   "keywords": [
     "solid",

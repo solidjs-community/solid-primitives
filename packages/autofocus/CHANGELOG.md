@@ -1,5 +1,12 @@
 # @solid-primitives/autofocus
 
+## 0.0.104
+
+### Patch Changes
+
+- Updated dependencies [2f6d3732]
+  - @solid-primitives/utils@6.0.0
+
 ## 0.0.103
 
 ### Patch Changes

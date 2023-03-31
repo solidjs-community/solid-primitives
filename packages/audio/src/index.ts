@@ -1,6 +1,7 @@
 import { Accessor, onMount, onCleanup, createEffect } from "solid-js";
 import { isServer } from "solid-js/web";
-import { createStaticStore, access, noop } from "@solid-primitives/utils";
+import { access, noop } from "@solid-primitives/utils";
+import { createStaticStore } from "@solid-primitives/static-store";
 
 // Set of control enums
 export enum AudioState {

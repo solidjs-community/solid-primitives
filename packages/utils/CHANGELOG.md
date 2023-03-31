@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 6.0.0
+
+### Major Changes
+
+- 2f6d3732: Move createStaticStore to a separate `static-store` package.
+
 ## 5.5.2
 
 ### Patch Changes
