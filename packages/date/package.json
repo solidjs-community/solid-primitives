@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/date",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "description": "Collection of reactive primitives and utility functions, providing easier ways to deal with dates in SolidJS",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -55,13 +55,13 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.9",
+    "@solid-primitives/event-listener": "workspace:^2.2.10",
     "date-fns": "^2.29.3"
   },
   "dependencies": {
-    "@solid-primitives/memo": "workspace:^1.2.3",
+    "@solid-primitives/memo": "workspace:^1.2.4",
     "@solid-primitives/timer": "workspace:^1.3.7",
-    "@solid-primitives/utils": "workspace:^5.5.2"
+    "@solid-primitives/utils": "workspace:^6.0.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

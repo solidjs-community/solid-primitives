@@ -1,5 +1,14 @@
 # @solid-primitives/geolocation
 
+## 1.4.8
+
+### Patch Changes
+
+- 2f6d3732: Use the static-store package for creating reactive objects. Minor overall improvements
+- Updated dependencies [2f6d3732]
+  - @solid-primitives/utils@6.0.0
+  - @solid-primitives/static-store@0.0.2
+
 ## 1.4.7
 
 ### Patch Changes

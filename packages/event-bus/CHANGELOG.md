@@ -1,5 +1,13 @@
 # @solid-primitives/event-bus
 
+## 1.0.4
+
+### Patch Changes
+
+- Updated dependencies [2f6d3732]
+  - @solid-primitives/utils@6.0.0
+  - @solid-primitives/immutable@0.1.10
+
 ## 1.0.3
 
 ### Patch Changes

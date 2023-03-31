@@ -1,5 +1,14 @@
 # @solid-primitives/scroll
 
+## 2.0.13
+
+### Patch Changes
+
+- 2f6d3732: Use the static-store package for creating reactive objects. Minor overall improvements
+  - @solid-primitives/event-listener@2.2.10
+  - @solid-primitives/rootless@1.3.2
+  - @solid-primitives/static-store@0.0.2
+
 ## 2.0.12
 
 ### Patch Changes
