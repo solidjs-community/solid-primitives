@@ -26,7 +26,7 @@ pnpm add @solid-primitives/static-store
 
 ## `createStaticStore`
 
-A shallowly wrapped reactive store object. It behaves similarly to the createStore, but with limited features to keep it simple. Designed to be used for reactive objects with static keys, but dynamic values, like reactive Event State, location, etc.
+Creates read-only object that is shallowly reactive — only reactive on its first level and for the enumerable properties specified in the initial value — and a setter. It behaves similarly to createStore, but with limited features to keep it simple and performant. Designed to be used for reactive objects with static keys and dynamic values, like reactive Event State, location, etc.
 
 ### How to use it
 
