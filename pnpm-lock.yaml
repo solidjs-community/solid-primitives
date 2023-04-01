@@ -342,16 +342,6 @@ importers:
     dependencies:
       solid-js: 1.7.0
 
-  packages/immutabe-store:
-    specifiers:
-      '@solid-primitives/memo': workspace:^1.2.3
-      redux: ^4.2.1
-      solid-js: ^1.6.12
-    dependencies:
-      '@solid-primitives/memo': link:../memo
-      redux: 4.2.1
-      solid-js: 1.7.0
-
   packages/immutable:
     specifiers:
       '@solid-primitives/utils': workspace:^6.0.0
@@ -359,6 +349,19 @@ importers:
     dependencies:
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.0
+
+  packages/immutable-store:
+    specifiers:
+      '@solid-primitives/utils': workspace:^6.0.0
+      redux: ^4.2.1
+      solid-js: ^1.6.12
+      solid-transition-group: ^0.2.2
+    dependencies:
+      '@solid-primitives/utils': link:../utils
+      redux: 4.2.1
+      solid-js: 1.7.0
+    devDependencies:
+      solid-transition-group: 0.2.2_solid-js@1.7.0
 
   packages/input-mask:
     specifiers:
@@ -11348,7 +11351,7 @@ packages:
       kolorist: 1.7.0
       sirv: 2.0.2
       ufo: 1.1.1
-      vite: 4.2.1_@types+node@18.15.11
+      vite: 4.2.1_hghbulspu73jfdazs4i6yiqype
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -11383,7 +11386,7 @@ packages:
       merge-anything: 5.1.4
       solid-js: 1.7.0
       solid-refresh: 0.5.2_solid-js@1.7.0
-      vite: 4.2.1_@types+node@18.15.11
+      vite: 4.2.1_hghbulspu73jfdazs4i6yiqype
       vitefu: 0.2.4_vite@4.2.1
     transitivePeerDependencies:
       - supports-color
@@ -11498,7 +11501,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.2.1_@types+node@18.15.11
+      vite: 4.2.1_hghbulspu73jfdazs4i6yiqype
     dev: true
 
   /vitest/0.29.8_jsdom@21.1.1:

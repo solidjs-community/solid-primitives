@@ -1,7 +1,15 @@
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 import { defineConfig } from "vitest/config";
 import devtools from "solid-devtools/vite";
 import solid from "vite-plugin-solid";
 import Unocss from "unocss/vite";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const styles = fs.readFileSync(path.join(__dirname, "./styles.css"), "utf-8");
 
 export const viteConfig = defineConfig({
   server: {
@@ -13,6 +21,7 @@ export const viteConfig = defineConfig({
     }),
     solid(),
     Unocss({
+      preflights: [{ getCSS: () => styles }],
       shortcuts: {
         "center-child": "flex justify-center items-center",
         caption: "text-sm font-mono leading-tight",

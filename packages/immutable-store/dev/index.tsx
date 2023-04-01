@@ -1,15 +1,16 @@
-import { For } from "solid-js";
+import { $TRACK, For, createEffect, createSignal, untrack } from "solid-js";
 import { render } from "solid-js/web";
 import { onCleanup } from "solid-js";
-import { createStore, reconcile } from "solid-js/store";
+// import { createStore, reconcile } from "solid-js/store";
 import * as redux from "redux";
+import { createImmutable, nMemos } from "../src";
 import "uno.css";
+import { TransitionGroup } from "solid-transition-group";
 
-function useRedux(store, actions) {
-  const [state, setState] = createStore(store.getState());
-  const unsubscribe = store.subscribe(() => setState(reconcile(store.getState())));
-  onCleanup(() => unsubscribe());
-  return [state, mapActions(store, actions)];
+function useRedux<T, A>(store: redux.Store<T, A>, actions): [T, typeof actions] {
+  const [state, setState] = createSignal(store.getState());
+  onCleanup(store.subscribe(() => setState(store.getState())));
+  return [createImmutable(state), mapActions(store, actions)];
 }
 
 function mapActions(store, actions) {
@@ -61,9 +62,33 @@ const reduxStore = redux.createStore((state: { todos: Todo[] } = { todos: [] }, 
 const App = () => {
   const [store, { addTodo, toggleTodo }] = useRedux(reduxStore, actions);
 
+  // createEffect((p: typeof store.todos) => {
+  //   const arr = store.todos;
+  //   arr[$TRACK];
+
+  //   return untrack(() => {
+  //     const copy = [...arr];
+
+  //     console.group("Effect");
+  //     let i = 0;
+  //     for (; i < p.length; i++) {
+  //       console.log(i, p[i] === copy[i]);
+  //     }
+  //     for (; i < copy.length; i++) {
+  //       console.log(i, "new", copy[i]);
+  //     }
+  //     console.groupEnd();
+  //     return copy;
+  //   });
+  // }, []);
+
   let input!: HTMLInputElement;
   return (
-    <>
+    <div class="m-24">
+      <p>There are {nMemos()} memos</p>
+
+      <h1>Todo List</h1>
+
       <div>
         <form
           onSubmit={e => {
@@ -77,21 +102,22 @@ const App = () => {
           <button>Add Todo</button>
         </form>
       </div>
-      <For each={store.todos}>
-        {todo => {
-          const { id, text } = todo;
-          console.log("Create", text);
-          return (
-            <div>
-              <input type="checkbox" checked={todo.completed} onchange={[toggleTodo, id]} />
-              <span style={{ "text-decoration": todo.completed ? "line-through" : "none" }}>
-                {text}
-              </span>
-            </div>
-          );
-        }}
-      </For>
-    </>
+      <TransitionGroup name="v-group">
+        <For each={(console.log("Reconcile"), store.todos)}>
+          {todo => {
+            const { id, text } = todo;
+            return (
+              <div class="group-item">
+                <input type="checkbox" checked={todo.completed} onchange={() => toggleTodo(id)} />
+                <span style={{ "text-decoration": todo.completed ? "line-through" : "none" }}>
+                  {text}_{id}
+                </span>
+              </div>
+            );
+          }}
+        </For>
+      </TransitionGroup>
+    </div>
   );
 };
 
