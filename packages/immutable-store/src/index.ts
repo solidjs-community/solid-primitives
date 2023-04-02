@@ -13,7 +13,8 @@ import {
   Accessor,
 } from "solid-js";
 import { $RAW } from "solid-js/store";
-import { trueFn } from "@solid-primitives/utils";
+import { trueFn, arrayEquals } from "@solid-primitives/utils";
+import { keyArray } from "@solid-primitives/keyed";
 
 export const [nMemos, setNMemos] = createSignal(0);
 
@@ -30,27 +31,6 @@ export type ImmutablePrimitive = string | number | boolean | null | undefined;
 export type ImmutableObject = { [key: string]: ImmutableValue; id?: ImmutablePrimitive };
 export type ImmutableArray = ImmutableValue[];
 export type ImmutableValue = ImmutablePrimitive | ImmutableObject | ImmutableArray;
-
-/**
- * Compares two arrays for immutable changes
- */
-function arrayEquals(a: any[], b: any[]) {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) {
-    const aVal = a[i],
-      bVal = b[i];
-    if (
-      aVal !== bVal &&
-      (!aVal ||
-        !bVal ||
-        typeof aVal !== "object" ||
-        typeof bVal !== "object" ||
-        aVal.id !== bVal.id)
-    )
-      return false;
-  }
-  return true;
-}
 
 class CommonTraps<T extends ImmutableObject | ImmutableArray> implements ProxyHandler<T> {
   trackKeys?: Accessor<Array<string | symbol>>;
@@ -109,28 +89,8 @@ class ObjectTraps extends CommonTraps<ImmutableObject> implements ProxyHandler<I
     let cached = this.cache.get(property);
     if (cached) return this.getCachedValue(cached);
 
-    let id: ImmutableValue;
-    let prevValue: ImmutableValue;
-    let prevResult: ImmutableValue;
-
     cached = {
-      get: () => {
-        const v = this.getSourceValue(property);
-
-        if (v === prevValue) return prevResult;
-        prevValue = v;
-
-        return untrack(() => {
-          if (v && typeof v === "object") {
-            if (v.id === id && prevResult) return prevResult;
-            id = v.id;
-            return (prevResult = wrap(v, () => this.getSourceValue(property)));
-          }
-
-          id = undefined;
-          return (prevResult = v);
-        });
-      },
+      get: createWrapper(() => this.getSourceValue(property)),
       memo: false,
     };
     this.cache.set(property, cached);
@@ -140,46 +100,33 @@ class ObjectTraps extends CommonTraps<ImmutableObject> implements ProxyHandler<I
 
 type ArrayTrapsCached = { get: () => ImmutableValue; dispose: VoidFunction | undefined };
 class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<ImmutableArray> {
-  #cache: ArrayTrapsCached[] = [];
+  #trackLength!: Accessor<number>;
 
-  #trackLength: Accessor<number>;
+  #trackItems!: Accessor<ArrayTrapsCached[]>;
 
   constructor(source: Accessor<ImmutableArray>) {
     super(source);
 
-    this.#trackLength = runWithOwner(this.owner, () =>
-      createMemo(p => {
-        const { length } = this.source();
+    runWithOwner(this.owner, () => {
+      this.#trackItems = createMemo(
+        keyArray(
+          this.source,
+          (item, index) => (item && typeof item === "object" && "id" in item ? item.id : index),
+          item => {
+            const cached: ArrayTrapsCached = {
+              get: createWrapper(item),
+              dispose: undefined,
+            };
+            onCleanup(() => cached.dispose?.());
+            return cached;
+          },
+        ),
+        [],
+        { equals: arrayEquals },
+      );
 
-        if (length !== p) {
-          for (let i = length; i < p; i++) this.#cache[i]!.dispose?.();
-          this.#cache.length = length;
-        }
-
-        return length;
-      }, 0),
-    )!;
-  }
-
-  #trackItemsMemo?: Accessor<boolean>;
-  #trackItems() {
-    if (getListener()) {
-      if (!this.#trackItemsMemo)
-        runWithOwner(this.owner, () => {
-          let prev: unknown[] = [];
-          this.#trackItemsMemo = createMemo(
-            () => {
-              const arr = this.source();
-              const prevArr = prev;
-              prev = arr;
-              return Array.isArray(arr) && arrayEquals(arr, prevArr);
-            },
-            true,
-            { equals: (_, b) => b },
-          );
-        });
-      this.#trackItemsMemo!();
-    }
+      this.#trackLength = createMemo(() => this.#trackItems().length, 0);
+    });
   }
 
   #getCachedValue(cached: ArrayTrapsCached) {
@@ -192,8 +139,6 @@ class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<Imm
   }
 
   get(target: ImmutableArray, property: PropertyKey, receiver: unknown) {
-    log("GET", property);
-
     if (property === $RAW) return untrack(this.source);
     if (property === $PROXY) return receiver;
     if (property === $TRACK) {
@@ -201,9 +146,9 @@ class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<Imm
       return receiver;
     }
 
-    if (property === Symbol.iterator) {
+    if (property === Symbol.iterator || property === "slice") {
       this.#trackItems();
-      return untrack(this.source)[Symbol.iterator];
+      return untrack(this.source)[property as any];
     }
 
     if (property === "length") return this.#trackLength();
@@ -216,47 +161,48 @@ class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<Imm
       else return this.getSourceValue(property);
     }
 
-    if (property >= this.#trackLength()) return this.getSourceValue(property);
+    if (property >= untrack(this.#trackLength))
+      return this.#trackLength(), this.getSourceValue(property);
 
-    const cached = this.#cache[property];
-    if (cached) return this.#getCachedValue(cached);
-
-    let id: ImmutableValue;
-    let prevValue: ImmutableValue;
-    let prevResult: ImmutableValue;
-
-    return this.#getCachedValue(
-      (this.#cache[property] = {
-        get: () => {
-          const v = this.getSourceValue(property);
-
-          if (v === prevValue) return prevResult;
-          prevValue = v;
-
-          return untrack(() => {
-            if (v && typeof v === "object") {
-              if (v.id === id && prevResult) return prevResult;
-              id = v.id;
-              return (prevResult = wrap(v, () => this.getSourceValue(property)));
-            }
-
-            id = undefined;
-            return (prevResult = v);
-          });
-        },
-        dispose: undefined,
-      }),
-    );
+    const cached = untrack(this.#trackItems)[property];
+    return cached ? this.#getCachedValue(cached) : undefined;
   }
 }
 
-function wrap<T extends ImmutableObject | ImmutableArray>(source: T, sourceMemo: () => T): T {
-  return new Proxy(
-    source.constructor(),
-    new (Array.isArray(source) ? ArrayTraps : ObjectTraps)(sourceMemo as any),
+function createWrapper<T extends ImmutableValue>(source: () => T): () => T {
+  let id: ImmutableValue;
+  let prev: ImmutableValue;
+  let prevResult: ImmutableValue;
+
+  return () => {
+    const v = source() as any;
+
+    if (v === prev) return prevResult;
+    prev = v;
+
+    if (v && typeof v === "object") {
+      if (v.id === id && prevResult) return prevResult;
+
+      id = v.id;
+      return (prevResult = wrap(v, source));
+    }
+
+    id = undefined;
+    return (prevResult = v);
+  };
+}
+
+function wrap<T extends ImmutableObject | ImmutableArray>(initialValue: T, source: () => T): T {
+  return untrack(
+    () =>
+      new Proxy(
+        initialValue.constructor(),
+        new (Array.isArray(initialValue) ? ArrayTraps : ObjectTraps)(source as any),
+      ),
   );
 }
 
 export function createImmutable<T extends ImmutableObject | ImmutableArray>(source: () => T): T {
-  return wrap(source(), createMemo(source));
+  const memo = createMemo(source);
+  return wrap(memo(), memo);
 }

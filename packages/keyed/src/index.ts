@@ -31,7 +31,7 @@ function dispose(list: Iterable<{ dispose: VoidFunction }>) {
  */
 export function keyArray<T, U, K>(
   items: Accessor<readonly T[] | undefined | null | false>,
-  keyFn: (v: T) => K,
+  keyFn: (item: T, index: number) => K,
   mapFn: (v: Accessor<T>, i: Accessor<number>) => U,
   options: { fallback?: Accessor<U> } = {},
 ): Accessor<U[]> {
@@ -82,7 +82,7 @@ export function keyArray<T, U, K>(
         prev.delete(FALLBACK);
         for (let i = 0; i < list.length; i++) {
           const item = list[i]!;
-          const key = keyFn(item);
+          const key = keyFn(item, i);
           addNewItem(result, item, i, key);
         }
         return result;
@@ -92,7 +92,7 @@ export function keyArray<T, U, K>(
 
       for (let i = 0; i < list.length; i++) {
         const item = list[i]!;
-        const key = keyFn(item);
+        const key = keyFn(item, i);
         prevKeys.delete(key);
         const lookup = prev.get(key);
 

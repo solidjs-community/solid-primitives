@@ -54,6 +54,7 @@
     "solid-js": "^1.6.12"
   },
   "dependencies": {
+    "@solid-primitives/keyed": "workspace:^1.1.10",
     "@solid-primitives/utils": "workspace:^6.0.0",
     "redux": "^4.2.1"
   },

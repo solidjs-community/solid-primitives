@@ -1,4 +1,4 @@
-import { For, createSignal } from "solid-js";
+import { $TRACK, For, createEffect, createSignal, untrack } from "solid-js";
 import { render } from "solid-js/web";
 import { TransitionGroup } from "solid-transition-group";
 import { createImmutable, nMemos } from "../src";
@@ -20,7 +20,7 @@ const todo = createSlice({
   reducers: {
     todoAdded(state, action: PayloadAction<string>) {
       state.push({
-        id: nextTodoId++,
+        id: `id:${nextTodoId++}`,
         text: action.payload,
         completed: false,
       });
@@ -55,6 +55,25 @@ const App = () => {
   store.subscribe(() => setState(store.getState()));
 
   const todos = createImmutable(state);
+
+  // createEffect((p: typeof todos) => {
+  //   todos[$TRACK];
+
+  //   return untrack(() => {
+  //     const copy = [...todos];
+
+  //     console.group("Effect");
+  //     let i = 0;
+  //     for (; i < p.length; i++) {
+  //       console.log(i, p[i] === copy[i]);
+  //     }
+  //     for (; i < copy.length; i++) {
+  //       console.log(i, "new", copy[i]);
+  //     }
+  //     console.groupEnd();
+  //     return copy;
+  //   });
+  // }, []);
 
   let input!: HTMLInputElement;
   return (
