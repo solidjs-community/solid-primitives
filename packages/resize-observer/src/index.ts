@@ -173,7 +173,10 @@ export function createElementSize(
     sharedConfig.context ? ELEMENT_SIZE_FALLBACK : getElementSize(access(target)),
   );
 
-  const ro = new ResizeObserver(([e]) => setSize(e!.contentRect));
+  const ro = new ResizeObserver(([e]) => {
+    const { width, height } = e!.contentRect;
+    setSize({ width, height });
+  });
   onCleanup(() => ro.disconnect());
 
   createEffect(() => {
