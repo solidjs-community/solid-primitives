@@ -1,33 +1,10 @@
-import { $TRACK, For, createEffect, createSignal, untrack } from "solid-js";
+import { For, createSignal } from "solid-js";
 import { render } from "solid-js/web";
-import { onCleanup } from "solid-js";
-// import { createStore, reconcile } from "solid-js/store";
-import * as redux from "redux";
-import { createImmutable, nMemos } from "../src";
-import "uno.css";
 import { TransitionGroup } from "solid-transition-group";
+import { createImmutable, nMemos } from "../src";
+import { PayloadAction, createSlice, configureStore } from "@reduxjs/toolkit";
 
-function useRedux<T, A>(store: redux.Store<T, A>, actions): [T, typeof actions] {
-  const [state, setState] = createSignal(store.getState());
-  onCleanup(store.subscribe(() => setState(store.getState())));
-  return [createImmutable(state), mapActions(store, actions)];
-}
-
-function mapActions(store, actions) {
-  const mapped = {};
-  for (const key in actions) {
-    mapped[key] = (...args) => store.dispatch(actions[key](...args));
-  }
-  return mapped;
-}
-
-let nextTodoId = 0;
-const actions = {
-  addTodo: (text: string) => ({ type: "ADD_TODO", id: ++nextTodoId, text } as const),
-  toggleTodo: (id: number) => ({ type: "TOGGLE_TODO", id } as const),
-};
-
-type Action = ReturnType<(typeof actions)[keyof typeof actions]>;
+import "uno.css";
 
 type Todo = {
   id: number;
@@ -35,52 +12,49 @@ type Todo = {
   completed: boolean;
 };
 
-const reduxStore = redux.createStore((state: { todos: Todo[] } = { todos: [] }, action: Action) => {
-  switch (action.type) {
-    case "ADD_TODO":
-      return {
-        todos: [
-          ...state.todos,
-          {
-            id: action.id,
-            text: action.text,
-            completed: false,
-          },
-        ],
-      };
-    case "TOGGLE_TODO":
-      return {
-        todos: state.todos.map(todo =>
-          todo.id === action.id ? { ...todo, completed: !todo.completed } : todo,
-        ),
-      };
-    default:
-      return state;
-  }
+let nextTodoId = 0;
+
+const todo = createSlice({
+  name: "todos",
+  initialState: [] as Todo[],
+  reducers: {
+    todoAdded(state, action: PayloadAction<string>) {
+      state.push({
+        id: nextTodoId++,
+        text: action.payload,
+        completed: false,
+      });
+    },
+    todoToggled(state, action: PayloadAction<number>) {
+      const todo = state.find(todo => todo.id === action.payload);
+      if (todo) todo.completed = !todo.completed;
+    },
+    todoRemoved(state, action: PayloadAction<number>) {
+      const index = state.findIndex(todo => todo.id === action.payload);
+      if (index !== -1) state.splice(index, 1);
+    },
+  },
 });
 
 const App = () => {
-  const [store, { addTodo, toggleTodo }] = useRedux(reduxStore, actions);
+  const store = configureStore({ reducer: todo.reducer });
 
-  // createEffect((p: typeof store.todos) => {
-  //   const arr = store.todos;
-  //   arr[$TRACK];
+  const addTodo = (text: string) => {
+    store.dispatch(todo.actions.todoAdded(text));
+  };
 
-  //   return untrack(() => {
-  //     const copy = [...arr];
+  const toggleTodo = (id: number) => {
+    store.dispatch(todo.actions.todoToggled(id));
+  };
 
-  //     console.group("Effect");
-  //     let i = 0;
-  //     for (; i < p.length; i++) {
-  //       console.log(i, p[i] === copy[i]);
-  //     }
-  //     for (; i < copy.length; i++) {
-  //       console.log(i, "new", copy[i]);
-  //     }
-  //     console.groupEnd();
-  //     return copy;
-  //   });
-  // }, []);
+  const removeTodo = (id: number) => {
+    store.dispatch(todo.actions.todoRemoved(id));
+  };
+
+  const [state, setState] = createSignal(store.getState());
+  store.subscribe(() => setState(store.getState()));
+
+  const todos = createImmutable(state);
 
   let input!: HTMLInputElement;
   return (
@@ -88,7 +62,6 @@ const App = () => {
       <p>There are {nMemos()} memos</p>
 
       <h1>Todo List</h1>
-
       <div>
         <form
           onSubmit={e => {
@@ -102,21 +75,28 @@ const App = () => {
           <button>Add Todo</button>
         </form>
       </div>
-      <TransitionGroup name="v-group">
-        <For each={(console.log("Reconcile"), store.todos)}>
-          {todo => {
-            const { id, text } = todo;
-            return (
-              <div class="group-item">
-                <input type="checkbox" checked={todo.completed} onchange={() => toggleTodo(id)} />
-                <span style={{ "text-decoration": todo.completed ? "line-through" : "none" }}>
-                  {text}_{id}
-                </span>
-              </div>
-            );
-          }}
-        </For>
-      </TransitionGroup>
+
+      <div class="mt-4 flex flex-col items-start space-y-2">
+        <TransitionGroup name="v-group">
+          <For each={(console.log("Reconcile"), todos)}>
+            {todo => {
+              const { id, text } = todo;
+              return (
+                <div class="group-item flex items-center rounded bg-gray-700 p-1">
+                  <input type="checkbox" checked={todo.completed} onchange={() => toggleTodo(id)} />
+                  <div
+                    class="px-2"
+                    style={{ "text-decoration": todo.completed ? "line-through" : "none" }}
+                  >
+                    {text}
+                  </div>
+                  <button onclick={() => removeTodo(id)}>x</button>
+                </div>
+              );
+            }}
+          </For>
+        </TransitionGroup>
+      </div>
     </div>
   );
 };
