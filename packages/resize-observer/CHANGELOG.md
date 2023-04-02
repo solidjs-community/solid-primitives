@@ -1,5 +1,11 @@
 # @solid-primitives/resize-observer
 
+## 2.0.15
+
+### Patch Changes
+
+- 6fbee971: Fix createElementSize not updating.
+
 ## 2.0.14
 
 ### Patch Changes
