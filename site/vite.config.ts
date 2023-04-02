@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import devtools from "solid-devtools/vite";
 import solid from "solid-start/vite";
+import dotenv from "dotenv";
 // @ts-ignore
 import staticAdapter from "solid-start-static";
 
@@ -13,6 +14,7 @@ const packages = await (async () => {
 })();
 
 export default defineConfig(() => {
+  dotenv.config();
   return {
     plugins: [
       devtools({
