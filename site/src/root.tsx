@@ -19,7 +19,9 @@ import Header from "./components/Header/Header";
 import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderClusterDefs";
 import Footer from "./components/Footer/Footer";
 
-let url = "";
+const { VITE_SITE_URL } = import.meta.env;
+
+let url = VITE_SITE_URL || "";
 if (isServer) {
   const { SITE_URL } = process.env;
   url = SITE_URL!;
