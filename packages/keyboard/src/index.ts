@@ -210,7 +210,7 @@ export function createKeyHold(
  */
 export function createShortcut(
   keys: KbdKey[],
-  callback: VoidFunction,
+  callback: (event: KeyboardEvent) => void,
   options: {
     preventDefault?: boolean;
     requireReset?: boolean;
@@ -243,7 +243,7 @@ export function createShortcut(
       reset = true;
       if (equalsKeyHoldSequence(sequence, keys)) {
         preventDefault && event()!.preventDefault();
-        callback();
+        callback(event()!);
       }
     }
   };
