@@ -19,7 +19,7 @@
     "test:client": "cross-env CI=true vitest -c ./configs/vitest.config.ts",
     "test:ssr": "pnpm run test:client --mode ssr",
     "test": "pnpm run test:client && pnpm run test:ssr",
-    "pages": "turbo run page && jiti ./scripts/collectPages.ts",
+    "pages": "pnpm run build:packages && turbo run page && jiti ./scripts/collectPages.ts",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts",
     "update-site": "cross-env JITI_ESM_RESOLVE=1 jiti ./scripts/update-site/index.ts",
