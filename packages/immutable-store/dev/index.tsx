@@ -1,7 +1,7 @@
-import { $TRACK, Component, For, createEffect, createSignal, getListener, untrack } from "solid-js";
+import { Component, For, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import { TransitionGroup } from "solid-transition-group";
-import { createImmutable, nMemos } from "../src";
+import { createImmutable } from "../src";
 import { PayloadAction, createSlice, configureStore } from "@reduxjs/toolkit";
 
 import "uno.css";
@@ -163,7 +163,6 @@ const Todos: Component<{ slice: typeof todoArray | typeof todoObject }> = props 
 render(
   () => (
     <>
-      <p>There are {nMemos()} memos</p>
       <Todos slice={todoArray} />
       <Todos slice={todoObject} />
     </>
