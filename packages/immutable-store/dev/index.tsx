@@ -1,4 +1,4 @@
-import { $TRACK, For, createEffect, createSignal, untrack } from "solid-js";
+import { $TRACK, Component, For, createEffect, createSignal, getListener, untrack } from "solid-js";
 import { render } from "solid-js/web";
 import { TransitionGroup } from "solid-transition-group";
 import { createImmutable, nMemos } from "../src";
@@ -8,47 +8,83 @@ import "uno.css";
 
 type Todo = {
   id: number;
-  text: string;
-  completed: boolean;
+  data: {
+    text: string;
+    completed: boolean;
+  };
 };
 
 let nextTodoId = 0;
 
-const todo = createSlice({
-  name: "todos",
+const todoArray = createSlice({
+  name: "todos-arr",
   initialState: [] as Todo[],
   reducers: {
     todoAdded(state, action: PayloadAction<string>) {
       state.push({
-        id: `id:${nextTodoId++}`,
-        text: action.payload,
-        completed: false,
+        id: nextTodoId++,
+        data: {
+          text: action.payload,
+          completed: false,
+        },
       });
     },
     todoToggled(state, action: PayloadAction<number>) {
       const todo = state.find(todo => todo.id === action.payload);
-      if (todo) todo.completed = !todo.completed;
+      if (todo) todo.data.completed = !todo.data.completed;
     },
     todoRemoved(state, action: PayloadAction<number>) {
       const index = state.findIndex(todo => todo.id === action.payload);
       if (index !== -1) state.splice(index, 1);
     },
+    chnageRandom(state) {
+      const todo = state[Math.floor(Math.random() * state.length)];
+      if (todo) todo.data.text += "!";
+    },
   },
 });
 
-const App = () => {
-  const store = configureStore({ reducer: todo.reducer });
+const todoObject = createSlice({
+  name: "todos-obj",
+  initialState: {} as Record<number, Todo>,
+  reducers: {
+    todoAdded(state, action: PayloadAction<string>) {
+      const id = nextTodoId++;
+      state[id] = {
+        id,
+        data: {
+          text: action.payload,
+          completed: false,
+        },
+      };
+    },
+    todoToggled(state, action: PayloadAction<number>) {
+      const todo = state[action.payload];
+      if (todo) todo.data.completed = !todo.data.completed;
+    },
+    todoRemoved(state, action: PayloadAction<number>) {
+      delete state[action.payload];
+    },
+    chnageRandom(state) {
+      const todo = state[Math.floor(Math.random() * Object.keys(state).length)];
+      if (todo) todo.data.text += "!";
+    },
+  },
+});
+
+const Todos: Component<{ slice: typeof todoArray | typeof todoObject }> = props => {
+  const store = configureStore({ reducer: props.slice.reducer });
 
   const addTodo = (text: string) => {
-    store.dispatch(todo.actions.todoAdded(text));
+    store.dispatch(props.slice.actions.todoAdded(text));
   };
 
   const toggleTodo = (id: number) => {
-    store.dispatch(todo.actions.todoToggled(id));
+    store.dispatch(props.slice.actions.todoToggled(id));
   };
 
   const removeTodo = (id: number) => {
-    store.dispatch(todo.actions.todoRemoved(id));
+    store.dispatch(props.slice.actions.todoRemoved(id));
   };
 
   const [state, setState] = createSignal(store.getState());
@@ -78,8 +114,6 @@ const App = () => {
   let input!: HTMLInputElement;
   return (
     <div class="m-24">
-      <p>There are {nMemos()} memos</p>
-
       <h1>Todo List</h1>
       <div>
         <form
@@ -95,19 +129,25 @@ const App = () => {
         </form>
       </div>
 
+      <div>
+        <button onclick={() => store.dispatch(props.slice.actions.chnageRandom())}>
+          Change random todo
+        </button>
+      </div>
+
       <div class="mt-4 flex flex-col items-start space-y-2">
         <TransitionGroup name="v-group">
-          <For each={(console.log("Reconcile"), todos)}>
+          <For each={Array.isArray(todos) ? todos : Object.values(todos)}>
             {todo => {
-              const { id, text } = todo;
+              const { id, data } = todo;
               return (
                 <div class="group-item flex items-center rounded bg-gray-700 p-1">
-                  <input type="checkbox" checked={todo.completed} onchange={() => toggleTodo(id)} />
+                  <input type="checkbox" checked={data.completed} onchange={() => toggleTodo(id)} />
                   <div
                     class="px-2"
-                    style={{ "text-decoration": todo.completed ? "line-through" : "none" }}
+                    style={{ "text-decoration": data.completed ? "line-through" : "none" }}
                   >
-                    {text}
+                    {data.text}
                   </div>
                   <button onclick={() => removeTodo(id)}>x</button>
                 </div>
@@ -120,4 +160,13 @@ const App = () => {
   );
 };
 
-render(App, document.getElementById("root")!);
+render(
+  () => (
+    <>
+      <p>There are {nMemos()} memos</p>
+      <Todos slice={todoArray} />
+      <Todos slice={todoObject} />
+    </>
+  ),
+  document.getElementById("root")!,
+);
