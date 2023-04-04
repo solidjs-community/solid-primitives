@@ -156,7 +156,7 @@ const BundleSizeModal: Component<{
                 </For>
                 <th
                   aria-label="hidden"
-                  class="box-shadow-[var(--table-header-box-shadow)] pointer-events-none absolute top-0 left-0 right-0 bottom-0 transition-opacity will-change-transform"
+                  class="box-shadow-[var(--table-header-box-shadow)] pointer-events-none absolute bottom-0 left-0 right-0 top-0 transition-opacity will-change-transform"
                   style={{ height: `${theadHeight() - 2}px`, opacity: isTargetVisible() ? 1 : 0 }}
                 />
               </tr>

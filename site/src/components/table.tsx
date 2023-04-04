@@ -27,7 +27,7 @@ export const THead: ParentComponent = props => {
       <tr
         id="header-shadow"
         aria-hidden="true"
-        class="-z-1 pointer-events-none absolute top-0 left-0 right-0 h-0 transition-opacity"
+        class="-z-1 pointer-events-none absolute left-0 right-0 top-0 h-0 transition-opacity"
         style="opacity: 0;"
       >
         <td class="h-0">
@@ -46,7 +46,7 @@ export const THead: ParentComponent = props => {
 
 export const TH: ParentComponent = props => {
   return (
-    <th class="dark:bg-page-main-bg overflow-hidden text-ellipsis whitespace-nowrap bg-white py-1 px-[2px] text-[12px] sm:px-5 sm:text-sm md:text-base">
+    <th class="dark:bg-page-main-bg overflow-hidden text-ellipsis whitespace-nowrap bg-white px-[2px] py-1 text-[12px] sm:px-5 sm:text-sm md:text-base">
       {props.children}
     </th>
   );
@@ -87,15 +87,15 @@ export const Table: ParentComponent = props => {
   let tableBody!: HTMLElement;
   let tableVerticalScrollShadow!: HTMLDivElement;
   const fakeTableRow = (
-      <>
-        <tr aria-hidden="true" style="visibility: hidden;">
-          <td aria-hidden="true" style="visibility: hidden;"></td>
-        </tr>
-        {/* To preserve odd/even row colors */}
-        <tr aria-hidden="true" style="display: none;">
-          <td aria-hidden="true"></td>
-        </tr>
-      </>
+    <>
+      <tr aria-hidden="true" style="visibility: hidden;">
+        <td aria-hidden="true" style="visibility: hidden;"></td>
+      </tr>
+      {/* To preserve odd/even row colors */}
+      <tr aria-hidden="true" style="display: none;">
+        <td aria-hidden="true"></td>
+      </tr>
+    </>
   ) as HTMLElement[];
   let tableSameWidthAsParent = false;
   let addedFakeTableRow = false;
