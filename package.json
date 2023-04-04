@@ -22,8 +22,7 @@
     "update-readme": "jiti ./scripts/update-readme.ts",
     "update-deps": "pnpm up -Lri",
     "version": "changeset version && pnpm i --no-frozen-lockfile && git add .",
-    "release": "pnpm build && changeset publish",
-    "deploy-site": "pnpm build && pnpm -dir site run deploy"
+    "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.1",
