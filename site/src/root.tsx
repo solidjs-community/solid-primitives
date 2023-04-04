@@ -18,7 +18,7 @@ import Header from "./components/Header/Header";
 import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderClusterDefs";
 import Footer from "./components/Footer/Footer";
 
-const SITE_URL = import.meta.env.VITE_SITE_URL ?? "";
+const { VITE_SITE_URL } = import.meta.env;
 
 export default function Root() {
   return (
@@ -27,7 +27,7 @@ export default function Root() {
         <Title>Solid Primitives</Title>
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta name="og:url" content={SITE_URL} />
+        <Meta name="og:url" content={VITE_SITE_URL} />
         <Meta name="og:type" content="website" />
         <Meta
           name="description"
@@ -35,13 +35,13 @@ export default function Root() {
         />
         <Meta name="og:image:width" content="1200" />
         <Meta name="og:image:height" content="600" />
-        <Meta name="og:image" content={`${SITE_URL}/og.jpeg`} />
-        <Meta name="og:image:url" content={`${SITE_URL}/og.jpeg`} />
-        <Meta name="og:image:secure_url" content={`${SITE_URL}/og.jpeg`} />
+        <Meta name="og:image" content={`${VITE_SITE_URL}/og.jpeg`} />
+        <Meta name="og:image:url" content={`${VITE_SITE_URL}/og.jpeg`} />
+        <Meta name="og:image:secure_url" content={`${VITE_SITE_URL}/og.jpeg`} />
         <Meta name="og:image:alt" content="" />
         <Meta name="twitter:title" content="Solid Primitives" />
         <Meta name="twitter:card" content="summary_large_image" />
-        <Meta name="twitter:image" content={`${SITE_URL}/og.jpeg`} />
+        <Meta name="twitter:image" content={`${VITE_SITE_URL}/og.jpeg`} />
         <Meta name="twitter:image:alt" content="" />
         <Meta
           name="twitter:description"
