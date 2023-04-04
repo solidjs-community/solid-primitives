@@ -112,7 +112,8 @@ return (
 
 ### Demo
 
-TODO
+You may view a working example here:
+https://solidjs-community.github.io/solid-primitives/pagination/
 
 ## `createInfiniteScroll`
 

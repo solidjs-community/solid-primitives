@@ -1,8 +1,9 @@
-import { Accessor, createComputed, on, onCleanup, onMount } from "solid-js";
-import { isServer } from "solid-js/web";
-import { access, createStaticStore } from "@solid-primitives/utils";
-import { createResizeObserver, ResizeHandler } from "@solid-primitives/resize-observer";
 import { makeEventListener } from "@solid-primitives/event-listener";
+import { createResizeObserver } from "@solid-primitives/resize-observer";
+import { createDerivedStaticStore } from "@solid-primitives/static-store";
+import { access, FalsyValue } from "@solid-primitives/utils";
+import { Accessor, createSignal, onCleanup, onMount, sharedConfig } from "solid-js";
+import { isServer } from "solid-js/web";
 
 export type Bounds = {
   top: number;
@@ -13,7 +14,7 @@ export type Bounds = {
   height: number;
 };
 
-export type NullableBounds = Bounds | typeof NULLED_BOUNDS;
+export type NullableBounds = Record<keyof Bounds, number | null>;
 
 export type UpdateGuard = <Args extends unknown[]>(
   update: (...args: Args) => void,
@@ -38,10 +39,10 @@ const NULLED_BOUNDS = {
  * @returns object of element's boundingClientRect with enumerable properties
  */
 export function getElementBounds(element: Element): Bounds;
-export function getElementBounds(element: Element | undefined | null | false): NullableBounds;
-export function getElementBounds(element: Element | undefined | null | false): NullableBounds {
+export function getElementBounds(element: Element | FalsyValue): NullableBounds;
+export function getElementBounds(element: Element | FalsyValue): NullableBounds {
   if (isServer || !element) {
-    return Object.assign({}, NULLED_BOUNDS);
+    return { ...NULLED_BOUNDS };
   }
   const rect = element.getBoundingClientRect();
   return {
@@ -80,50 +81,52 @@ export function getElementBounds(element: Element | undefined | null | false): N
  * });
  * ```
  */
+
 export function createElementBounds(
-  target: Accessor<Element> | Element,
-  options?: Options,
-): Readonly<Bounds>;
-export function createElementBounds(
-  target: Accessor<Element | undefined | null | false> | Element,
-  options?: Options,
-): Readonly<NullableBounds>;
-export function createElementBounds(
-  target: Accessor<Element | undefined | null | false> | Element,
+  target: Accessor<Element | FalsyValue> | Element,
   { trackMutation = true, trackResize = true, trackScroll = true }: Options = {},
 ): Readonly<NullableBounds> {
   if (isServer) {
-    return Object.assign({}, NULLED_BOUNDS);
+    return NULLED_BOUNDS;
   }
 
-  const [bounds, setBounds] = createStaticStore(getElementBounds(access(target)));
-  const updateBounds = () => setBounds(getElementBounds(access(target)));
-  const updateBoundsOf = (el: Element | undefined | null | false) =>
-    setBounds(getElementBounds(el));
+  const isFn = typeof target === "function",
+    [track, trigger] = createSignal(void 0, { equals: false }) as [() => void, () => void];
 
-  if (typeof target === "function") {
-    onMount(() => updateBoundsOf(target()));
-    createComputed(on(target, updateBoundsOf, { defer: true }));
+  let calc: () => NullableBounds;
+  // during hydration we need to make sure the initial state is the same as the server
+  if (sharedConfig.context) {
+    calc = () => NULLED_BOUNDS;
+    onMount(() => {
+      calc = () => getElementBounds(access(target));
+      trigger();
+    });
   }
+  // a function target might be a jsx ref, so it may not be reactive - retrigger manually on mount
+  else if (isFn) {
+    calc = () => getElementBounds(target());
+    onMount(trigger);
+  }
+  // otherwise we can just use the target directly - it will never change
+  else calc = () => getElementBounds(target);
+
+  const bounds = createDerivedStaticStore(() => (track(), calc()));
 
   if (trackResize) {
-    const resizeHandler: ResizeHandler = (_, el) => updateBoundsOf(el);
     createResizeObserver(
-      typeof target === "function" ? () => target() || [] : target,
-      typeof trackResize === "function" ? trackResize(resizeHandler) : resizeHandler,
+      isFn ? () => target() || [] : target,
+      typeof trackResize === "function" ? trackResize(trigger) : trigger,
     );
   }
 
   if (trackScroll) {
-    const scrollHandler =
-      typeof target === "function"
-        ? (e: Event) => {
-            const el = target();
-            if (el && e.target instanceof Node && e.target.contains(el)) updateBoundsOf(el);
-          }
-        : (e: Event) => {
-            if (e.target instanceof Node && e.target.contains(target)) updateBoundsOf(target);
-          };
+    const scrollHandler = isFn
+      ? (e: Event) => {
+          const el = target();
+          el && e.target instanceof Node && e.target.contains(el) && trigger();
+        }
+      : (e: Event) => e.target instanceof Node && e.target.contains(target) && trigger();
+
     makeEventListener(
       window,
       "scroll",
@@ -134,14 +137,14 @@ export function createElementBounds(
 
   if (trackMutation) {
     const mo = new MutationObserver(
-      typeof trackMutation === "function" ? trackMutation(updateBounds) : updateBounds,
+      typeof trackMutation === "function" ? trackMutation(trigger) : trigger,
     );
     mo.observe(document.body, {
       attributeFilter: ["style", "class"],
       subtree: true,
       childList: true,
     });
-    onCleanup(mo.disconnect.bind(mo));
+    onCleanup(() => mo.disconnect());
   }
 
   return bounds;

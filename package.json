@@ -17,7 +17,7 @@
     "test:ssr": "pnpm run test:client --mode ssr",
     "test": "pnpm run test:client && pnpm run test:ssr",
     "build": "cross-env CI=true turbo run build --filter='./packages/*'",
-    "pages": "turbo run page && jiti ./scripts/collectPages.ts",
+    "pages": "pnpm run build && turbo run page && jiti ./scripts/collectPages.ts",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts",
     "update-deps": "pnpm up -Lri",

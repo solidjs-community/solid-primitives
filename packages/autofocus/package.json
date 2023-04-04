@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/autofocus",
-  "version": "0.0.103",
+  "version": "0.0.105",
   "description": "Primitives for autofocusing HTML elements",
   "author": "jer3m01 <jer3m01@jer3m01.com>",
   "contributors": [],
@@ -56,7 +56,7 @@
     "solid-js": "^1.6.12"
   },
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^5.5.2"
+    "@solid-primitives/utils": "workspace:^6.0.0"
   },
   "typesVersions": {}
 }

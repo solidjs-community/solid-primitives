@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/resize-observer",
-  "version": "2.0.13",
+  "version": "2.0.15",
   "description": "Reactive primitives for observing resizing of HTML elements.",
   "author": "Moshe Udimar",
   "contributors": [
@@ -53,9 +53,10 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.9",
-    "@solid-primitives/rootless": "workspace:^1.3.1",
-    "@solid-primitives/utils": "workspace:^5.5.1"
+    "@solid-primitives/event-listener": "workspace:^2.2.10",
+    "@solid-primitives/rootless": "workspace:^1.3.2",
+    "@solid-primitives/static-store": "workspace:^0.0.2",
+    "@solid-primitives/utils": "workspace:^6.0.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

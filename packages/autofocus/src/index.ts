@@ -17,13 +17,14 @@ declare module "solid-js" {
  *
  * @example
  * ```ts
- * import { autofocus } from "@solid-primitives/autofocus";
+ * <button autofocus use:autofocus>Autofocused</button>;
  *
- * <button use:autofocus autofocus={true}>Autofocused</button>;
+ * // or with ref
+ * <button autofocus ref={autofocus}>Autofocused</button>;
  * ```
  */
-export const autofocus = (element: HTMLElement, autofocus: Accessor<boolean>) => {
-  if (!autofocus()) {
+export const autofocus = (element: HTMLElement, autofocus?: Accessor<boolean>) => {
+  if (autofocus?.() === false) {
     return;
   }
 

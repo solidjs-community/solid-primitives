@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/graphql",
-  "version": "1.5.6",
+  "version": "1.5.7",
   "description": "Primitive that generates a client and reactive GraphQL queries",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "@graphql-typed-document-node/core": "^3.2.0",
-    "@solid-primitives/utils": "workspace:^5.5.2",
+    "@solid-primitives/utils": "workspace:^6.0.0",
     "graphql": "^16.6.0"
   },
   "peerDependencies": {

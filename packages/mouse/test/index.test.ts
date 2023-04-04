@@ -1,4 +1,4 @@
-import { createStaticStore } from "@solid-primitives/utils";
+import { createStaticStore } from "@solid-primitives/static-store";
 import { createRoot } from "solid-js";
 import { describe, expect, it } from "vitest";
 

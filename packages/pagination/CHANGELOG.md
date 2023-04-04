@@ -1,5 +1,13 @@
 # @solid-primitives/pagination
 
+## 0.2.4
+
+### Patch Changes
+
+- Updated dependencies [2f6d3732]
+  - @solid-primitives/utils@6.0.0
+  - @solid-primitives/intersection-observer@2.0.11
+
 ## 0.2.3
 
 ### Patch Changes

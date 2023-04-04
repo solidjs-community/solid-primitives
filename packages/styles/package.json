@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/styles",
-  "version": "0.0.107",
+  "version": "0.0.108",
   "description": "Collection of reactive primitives focused on styles.",
   "author": "Damian Tarnawski <gthetaranv@gmail.com>",
   "contributors": [
@@ -55,8 +55,8 @@
     "css"
   ],
   "dependencies": {
-    "@solid-primitives/rootless": "workspace:^1.3.1",
-    "@solid-primitives/utils": "workspace:^5.5.1"
+    "@solid-primitives/rootless": "workspace:^1.3.2",
+    "@solid-primitives/utils": "workspace:^6.0.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

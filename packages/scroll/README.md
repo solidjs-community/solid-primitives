@@ -65,9 +65,9 @@ const [target, setTarget] = createSignal<Element | undefined>(element);
 
 const scroll = createScrollPosition(target);
 
-// if target is undefined, scroll values will be null
-scroll.x; // => number | null
-scroll.y; // => number | null
+// if target is undefined, scroll values will be 0
+scroll.x; // => number
+scroll.y; // => number
 
 // update the tracking element
 setTarget(ref);
