@@ -2,7 +2,7 @@
 
 // declare import.meta.env
 interface ImportMetaEnv {
-  readonly VITE_SITE_URL: string;
+  readonly VITE_SITE_URL: string | undefined;
 }
 
 interface ImportMeta {
