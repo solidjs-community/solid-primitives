@@ -777,10 +777,8 @@ importers:
       '@tailwindcss/container-queries': ^0.1.0
       '@tailwindcss/typography': ^0.5.9
       '@types/mark.js': ^8.11.8
-      '@types/node': ^18.15.11
       autoprefixer: ^10.4.14
       clsx: ^1.2.1
-      dotenv: ^16.0.3
       fuse.js: ^6.6.2
       mark.js: ^8.11.1
       postcss: ^8.4.21
@@ -836,9 +834,7 @@ importers:
       '@tailwindcss/container-queries': 0.1.0_tailwindcss@3.3.0
       '@tailwindcss/typography': 0.5.9_tailwindcss@3.3.0
       '@types/mark.js': 8.11.8
-      '@types/node': 18.15.11
       autoprefixer: 10.4.14_postcss@8.4.21
-      dotenv: 16.0.3
       postcss: 8.4.21
       solid-start: 0.2.24_7nowx3wci5qcrjzviwquizm4ka
       solid-start-static: 0.2.24_e3jdctozwqr272oblu5r5mgpw4
@@ -10123,7 +10119,7 @@ packages:
       solid-ssr: 1.7.0
       solid-start: 0.2.24_7nowx3wci5qcrjzviwquizm4ka
       undici: 5.21.0
-      vite: 4.2.1_hghbulspu73jfdazs4i6yiqype
+      vite: 4.2.1_sass@1.60.0
     dev: true
 
   /solid-start/0.2.24_7nowx3wci5qcrjzviwquizm4ka:
@@ -10192,7 +10188,7 @@ packages:
       solid-start-static: 0.2.24_e3jdctozwqr272oblu5r5mgpw4
       terser: 5.16.8
       undici: 5.21.0
-      vite: 4.2.1_hghbulspu73jfdazs4i6yiqype
+      vite: 4.2.1_sass@1.60.0
       vite-plugin-inspect: 0.7.18_rollup@3.20.2+vite@4.2.1
       vite-plugin-solid: 2.7.0_solid-js@1.7.2+vite@4.2.1
       wait-on: 6.0.1_debug@4.3.4
@@ -11319,7 +11315,7 @@ packages:
       kolorist: 1.7.0
       sirv: 2.0.2
       ufo: 1.1.1
-      vite: 4.2.1_hghbulspu73jfdazs4i6yiqype
+      vite: 4.2.1_sass@1.60.0
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -11354,7 +11350,7 @@ packages:
       merge-anything: 5.1.4
       solid-js: 1.7.2
       solid-refresh: 0.5.2_solid-js@1.7.2
-      vite: 4.2.1_hghbulspu73jfdazs4i6yiqype
+      vite: 4.2.1_sass@1.60.0
       vitefu: 0.2.4_vite@4.2.1
     transitivePeerDependencies:
       - supports-color
@@ -11427,7 +11423,7 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vite/4.2.1_hghbulspu73jfdazs4i6yiqype:
+  /vite/4.2.1_sass@1.60.0:
     resolution: {integrity: sha512-7MKhqdy0ISo4wnvwtqZkjke6XN4taqQ2TBaTccLIpOKv7Vp2h4Y+NpmWCnGDeSvvn45KxvWgGyb0MkHvY1vgbg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -11452,7 +11448,6 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 18.15.11
       esbuild: 0.17.14
       postcss: 8.4.21
       resolve: 1.22.1
@@ -11470,7 +11465,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.2.1_hghbulspu73jfdazs4i6yiqype
+      vite: 4.2.1_sass@1.60.0
     dev: true
 
   /vitest/0.29.8_jsdom@21.1.1:

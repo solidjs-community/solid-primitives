@@ -13,9 +13,7 @@
     "@tailwindcss/container-queries": "^0.1.0",
     "@tailwindcss/typography": "^0.5.9",
     "@types/mark.js": "^8.11.8",
-    "@types/node": "^18.15.11",
     "autoprefixer": "^10.4.14",
-    "dotenv": "^16.0.3",
     "postcss": "^8.4.21",
     "solid-start": "^0.2.24",
     "solid-start-static": "^0.2.24",
@@ -57,6 +55,6 @@
     "unified": "^10.1.2"
   },
   "engines": {
-    "node": ">=16.8"
+    "node": ">=18.0.0"
   }
 }
