@@ -12,7 +12,7 @@ import {
   Accessor,
 } from "solid-js";
 import { $RAW } from "solid-js/store";
-import { trueFn, arrayEquals } from "@solid-primitives/utils";
+import { trueFn, arrayEquals, noop } from "@solid-primitives/utils";
 import { keyArray } from "@solid-primitives/keyed";
 
 export type ImmutablePrimitive = string | number | boolean | null | undefined;
@@ -23,14 +23,12 @@ export type ImmutableValue = ImmutablePrimitive | ImmutableObject | ImmutableArr
 const arrayEqualsOptions = { equals: arrayEquals };
 
 class CommonTraps<T extends ImmutableObject | ImmutableArray> implements ProxyHandler<T> {
-  owner: Owner;
+  o = getOwner()!;
 
-  constructor(public source: Accessor<T>) {
-    this.owner = getOwner()!;
-  }
+  constructor(public s: Accessor<T>) {}
 
-  getValue(property: PropertyKey) {
-    const s = this.source() as any;
+  getProp(property: PropertyKey) {
+    const s = this.s() as any;
     return s && typeof s === "object" && property in s ? s[property] : undefined;
   }
 
@@ -38,30 +36,26 @@ class CommonTraps<T extends ImmutableObject | ImmutableArray> implements ProxyHa
     if (property === $RAW || property === $PROXY || property === $TRACK || property === "__proto__")
       return true;
     this.ownKeys();
-    return property in untrack(this.source);
+    return property in untrack(this.s);
   }
 
   #trackKeys?: Accessor<Array<string | symbol>>;
   ownKeys(): (string | symbol)[] {
     if (!this.#trackKeys && getListener())
       runWithOwner(
-        this.owner,
+        this.o,
         () =>
-          (this.#trackKeys = createMemo(
-            () => Reflect.ownKeys(this.source()),
-            [],
-            arrayEqualsOptions,
-          )),
+          (this.#trackKeys = createMemo(() => Reflect.ownKeys(this.s()), [], arrayEqualsOptions)),
       );
 
-    return this.#trackKeys ? this.#trackKeys() : Reflect.ownKeys(this.source());
+    return this.#trackKeys ? this.#trackKeys() : Reflect.ownKeys(this.s());
   }
   getOwnPropertyDescriptor(target: T, property: PropertyKey): PropertyDescriptor | undefined {
     this.ownKeys();
-    return property in untrack(this.source)
+    return property in untrack(this.s)
       ? {
           enumerable: true,
-          get: () => this.getValue(property),
+          get: () => this.getProp(property),
           configurable: true,
         }
       : undefined;
@@ -71,50 +65,50 @@ class CommonTraps<T extends ImmutableObject | ImmutableArray> implements ProxyHa
 }
 
 class ObjectTraps extends CommonTraps<ImmutableObject> implements ProxyHandler<ImmutableObject> {
-  #cache = new Map<PropertyKey, Accessor<ImmutableValue>>();
+  #cache = new Map<PropertyKey, PropertyWrapper>();
 
   constructor(source: Accessor<ImmutableObject>) {
     super(source);
   }
 
   get(target: ImmutableObject, property: PropertyKey, receiver: unknown) {
-    if (property === $RAW) return untrack(this.source);
+    if (property === $RAW) return untrack(this.s);
     if (property === $PROXY || property === $TRACK) return receiver;
     if (property === Symbol.iterator) return undefined;
-    if (property === "id") return untrack(this.source).id;
+    if (property === "id") return untrack(this.s).id;
 
     let cached = this.#cache.get(property);
-    if (cached) return cached();
+    if (cached) return cached.get();
 
-    let valueAccessor = () => this.getValue(property),
+    let valueAccessor = () => this.getProp(property),
       memo = false;
 
     const value = () => {
       if (!memo && getListener()) {
-        valueAccessor = runWithOwner(this.owner, () => createMemo(valueAccessor))!;
+        runWithOwner(this.o, () => (valueAccessor = createMemo(valueAccessor)));
         memo = true;
       }
       return valueAccessor();
     };
 
-    this.#cache.set(property, (cached = createWrapper(value, this.owner)));
-    return cached();
+    this.#cache.set(property, (cached = new PropertyWrapper(value, this.o)));
+    return cached.get();
   }
 }
 
 class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<ImmutableArray> {
   #trackLength!: Accessor<number>;
 
-  #trackItems!: Accessor<Accessor<ImmutableValue>[]>;
+  #trackItems!: Accessor<PropertyWrapper[]>;
 
   constructor(source: Accessor<ImmutableArray>) {
     super(source);
 
     this.#trackItems = createMemo(
       keyArray(
-        this.source,
+        this.s,
         (item, index) => (item && typeof item === "object" && "id" in item ? item.id : index),
-        item => createWrapper(item, getOwner()!),
+        item => new PropertyWrapper(item, getOwner()!),
       ),
       [],
       arrayEqualsOptions,
@@ -124,72 +118,66 @@ class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<Imm
   }
 
   get(target: ImmutableArray, property: PropertyKey, receiver: unknown) {
-    if (property === $RAW) return untrack(this.source);
+    if (property === $RAW) return untrack(this.s);
     if (property === $PROXY) return receiver;
-    if (property === $TRACK) {
-      this.#trackItems();
-      return receiver;
-    }
+    if (property === $TRACK) return this.#trackItems(), receiver;
 
-    if (property === Symbol.iterator) {
-      this.#trackItems();
-      return untrack(this.source)[property as any];
-    }
-
+    if (property === Symbol.iterator) return this.#trackItems(), untrack(this.s)[property as any];
     if (property === "length") return this.#trackLength();
 
-    if (typeof property === "symbol") return this.getValue(property);
+    if (typeof property === "symbol") return this.getProp(property);
 
-    if (property in Array.prototype) {
-      return Array.prototype[property as any].bind(receiver);
-    }
+    if (property in Array.prototype) return Array.prototype[property as any].bind(receiver);
 
     if (typeof property === "string") {
       const num = Number(property);
-      if (num === num) property = num;
-      else return this.getValue(property);
+      if (isNaN(num)) return this.getProp(property);
+      property = num;
     }
 
-    if (property >= untrack(this.#trackLength)) return this.#trackLength(), this.getValue(property);
+    if (property >= untrack(this.#trackLength)) return this.#trackLength(), this.getProp(property);
 
-    return untrack(this.#trackItems)[property]?.();
+    return untrack(this.#trackItems)[property]?.get();
   }
 }
 
-function createWrapper(source: Accessor<ImmutableValue>, owner: Owner): Accessor<ImmutableValue> {
-  let id: ImmutableValue,
-    prev: ImmutableValue,
-    prevResult: ImmutableValue,
-    dispose: VoidFunction | undefined,
-    memo = false,
-    get = () => {
-      const v = source() as any;
+class PropertyWrapper {
+  s: Accessor<ImmutableValue>;
+  o: Owner;
+  constructor(source: Accessor<ImmutableValue>, owner: Owner) {
+    this.s = source;
+    this.o = owner;
+    runWithOwner(owner, () => onCleanup(() => this.#dispose()));
+  }
 
-      if (v === prev) return prevResult;
-      prev = v;
+  #id: ImmutableValue;
+  #prev: ImmutableValue;
+  #dispose: VoidFunction = noop;
+  #memo: Accessor<ImmutableValue> | undefined;
+  #calc(): ImmutableValue {
+    const v = this.s() as any;
 
-      if (!v || typeof v !== "object") {
-        id = undefined;
-        dispose?.();
-        return (prevResult = v);
-      }
-
-      if (v.id === id && prevResult) return prevResult;
-
-      id = v.id;
-      dispose?.();
-      return createRoot(_dispose => ((dispose = _dispose), (prevResult = wrap(v, source))), owner);
-    };
-
-  runWithOwner(owner, () => onCleanup(() => dispose?.()));
-
-  return () => {
-    if (!memo && getListener()) {
-      memo = true;
-      get = runWithOwner(owner, () => createMemo(get))!;
+    if (!v || typeof v !== "object") {
+      this.#id = undefined;
+      this.#dispose();
+      return (this.#prev = v);
     }
-    return get();
-  };
+
+    if (v.id === this.#id && this.#prev && typeof this.#prev === "object") return this.#prev;
+
+    this.#id = v.id;
+    this.#dispose();
+    return createRoot(
+      _dispose => ((this.#dispose = _dispose), (this.#prev = wrap(v, this.s))),
+      this.o,
+    );
+  }
+
+  get(): ImmutableValue {
+    if (!this.#memo && getListener())
+      runWithOwner(this.o, () => (this.#memo = createMemo(() => this.#calc())));
+    return this.#memo ? this.#memo() : this.#calc();
+  }
 }
 
 function wrap<T extends ImmutableObject | ImmutableArray>(initialValue: T, source: Accessor<T>): T {
