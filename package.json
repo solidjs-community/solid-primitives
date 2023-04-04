@@ -29,6 +29,7 @@
     "@mdx-js/mdx": "^2.3.0",
     "@solidjs/testing-library": "^0.7.0",
     "@types/fs-extra": "^11.0.1",
+    "@types/jsdom": "^21.1.1",
     "@types/node": "^18.15.11",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
