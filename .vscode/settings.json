@@ -3,5 +3,5 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": false
   },
-  "cSpell.words": ["Biase", "deopt"]
+  "cSpell.words": ["Biase", "deopt", "gzipped", "rehype"]
 }

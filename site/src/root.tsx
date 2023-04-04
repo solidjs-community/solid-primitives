@@ -11,7 +11,6 @@ import {
   Scripts,
   Title,
 } from "solid-start";
-import { isServer } from "solid-js/web";
 
 import "./root.scss";
 
@@ -19,11 +18,7 @@ import Header from "./components/Header/Header";
 import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderClusterDefs";
 import Footer from "./components/Footer/Footer";
 
-let url = "";
-if (isServer) {
-  const { SITE_URL } = process.env;
-  url = SITE_URL!;
-}
+const SITE_URL = import.meta.env.VITE_SITE_URL;
 
 export default function Root() {
   return (
@@ -32,7 +27,7 @@ export default function Root() {
         <Title>Solid Primitives</Title>
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta name="og:url" content={url} />
+        <Meta name="og:url" content={SITE_URL} />
         <Meta name="og:type" content="website" />
         <Meta
           name="description"
@@ -40,13 +35,13 @@ export default function Root() {
         />
         <Meta name="og:image:width" content="1200" />
         <Meta name="og:image:height" content="600" />
-        <Meta name="og:image" content={`${url}/og.jpeg`} />
-        <Meta name="og:image:url" content={`${url}/og.jpeg`} />
-        <Meta name="og:image:secure_url" content={`${url}/og.jpeg`} />
+        <Meta name="og:image" content={`${SITE_URL}/og.jpeg`} />
+        <Meta name="og:image:url" content={`${SITE_URL}/og.jpeg`} />
+        <Meta name="og:image:secure_url" content={`${SITE_URL}/og.jpeg`} />
         <Meta name="og:image:alt" content="" />
         <Meta name="twitter:title" content="Solid Primitives" />
         <Meta name="twitter:card" content="summary_large_image" />
-        <Meta name="twitter:image" content={`${url}/og.jpeg`} />
+        <Meta name="twitter:image" content={`${SITE_URL}/og.jpeg`} />
         <Meta name="twitter:image:alt" content="" />
         <Meta
           name="twitter:description"
