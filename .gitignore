@@ -172,3 +172,6 @@ pages
 
 # temp
 _temp_*
+
+# Local Netlify folder
+.netlify
