@@ -26,7 +26,9 @@ const stageShieldLink =
   "https://github.com/solidjs-community/solid-primitives/blob/main/CONTRIBUTING.md#contribution-process";
 
 const categories: Record<string, PackageData[]> = {};
-const rootDependencies: string[] = [];
+const rootDependencies: string[] = [
+  `@solid-primitives/utils`, // utils are not included in the modulesData
+];
 
 (async () => {
   const modulesData = await getModulesData();
