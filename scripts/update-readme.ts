@@ -32,8 +32,10 @@ const rootDependencies: string[] = [];
   const modulesData = await getModulesData();
 
   for (const { name, category, primitives, stage, localDependencies } of modulesData) {
+    const packageName = `@solid-primitives/${name}`;
+
     if (localDependencies.length === 0) {
-      rootDependencies.push(`@solid-primitives/${name}`);
+      rootDependencies.push(packageName);
     }
 
     const data = {} as PackageData;
@@ -44,8 +46,8 @@ const rootDependencies: string[] = [];
       data.Size = "";
       data.NPM = "";
     } else {
-      data.Size = `[![SIZE](${sizeShield}${name}?style=for-the-badge&label=)](${bundlephobiaURL}${name})`;
-      data.NPM = `[![VERSION](${npmShield}${name}?style=for-the-badge&label=)](${npmURL}${name})`;
+      data.Size = `[![SIZE](${sizeShield}${packageName}?style=for-the-badge&label=)](${bundlephobiaURL}${packageName})`;
+      data.NPM = `[![VERSION](${npmShield}${packageName}?style=for-the-badge&label=)](${npmURL}${packageName})`;
     }
     data.Stage = `[![STAGE](${stageShieldBaseURL}${stage}.json)](${stageShieldLink})`;
     data.Primitives = primitives
