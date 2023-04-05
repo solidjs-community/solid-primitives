@@ -3,6 +3,7 @@ import { render } from "solid-js/web";
 import { TransitionGroup } from "solid-transition-group";
 import { createImmutable } from "../src";
 import { PayloadAction, createSlice, configureStore } from "@reduxjs/toolkit";
+import { createStore, reconcile } from "solid-js/store";
 
 import "uno.css";
 
@@ -37,9 +38,15 @@ const todoArray = createSlice({
       const index = state.findIndex(todo => todo.id === action.payload);
       if (index !== -1) state.splice(index, 1);
     },
-    chnageRandom(state) {
+    changeRandom(state) {
       const todo = state[Math.floor(Math.random() * state.length)];
       if (todo) todo.data.text += "!";
+    },
+    shuffle(state) {
+      for (let i = state.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [state[i], state[j]] = [state[j]!, state[i]!];
+      }
     },
   },
 });
@@ -65,9 +72,17 @@ const todoObject = createSlice({
     todoRemoved(state, action: PayloadAction<number>) {
       delete state[action.payload];
     },
-    chnageRandom(state) {
+    changeRandom(state) {
       const todo = state[Math.floor(Math.random() * Object.keys(state).length)];
       if (todo) todo.data.text += "!";
+    },
+    shuffle(state) {
+      const keys = Object.keys(state);
+      for (let i = keys.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        // @ts-expect-error
+        [state[keys[i]], state[keys[j]]] = [state[keys[j]], state[keys[i]]];
+      }
     },
   },
 });
@@ -90,7 +105,10 @@ const Todos: Component<{ slice: typeof todoArray | typeof todoObject }> = props 
   const [state, setState] = createSignal(store.getState());
   store.subscribe(() => setState(store.getState()));
 
-  const todos = createImmutable(state);
+  const todos = createImmutable(state, {
+    // key: null,
+    // merge: true,
+  });
 
   // createEffect((p: typeof todos) => {
   //   todos[$TRACK];
@@ -129,11 +147,11 @@ const Todos: Component<{ slice: typeof todoArray | typeof todoObject }> = props 
         </form>
       </div>
 
-      <div>
-        <button onclick={() => store.dispatch(props.slice.actions.chnageRandom())}>
-          Change random todo
-        </button>
-      </div>
+      <br />
+      <button onclick={() => store.dispatch(props.slice.actions.changeRandom())}>
+        Change random todo
+      </button>
+      <button onclick={() => store.dispatch(props.slice.actions.shuffle())}>Shuffle todos</button>
 
       <div class="mt-4 flex flex-col items-start space-y-2">
         <TransitionGroup name="v-group">
