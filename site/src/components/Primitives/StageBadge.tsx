@@ -95,7 +95,7 @@ const StageBadge: ParentComponent<{
   );
 };
 
-export const StageBadgePill: ParentComponent<{ value: number | string }> = ({ value: level }) => {
+export const StageBadgePill: ParentComponent<{ value: number | undefined }> = props => {
   const [open, setOpen] = createSignal(false);
   let menuButton!: HTMLButtonElement;
 
@@ -108,11 +108,11 @@ export const StageBadgePill: ParentComponent<{ value: number | string }> = ({ va
         <div
           class={
             "flex h-full items-center justify-center rounded-r-lg border-[3px] border-transparent px-6 font-semibold " +
-            classStageColor(level)
+            classStageColor(props.value ?? "X")
           }
-          style={styleStageColor(level)}
+          style={styleStageColor(props.value ?? "X")}
         >
-          {level}
+          {props.value}
         </div>
       </button>
       <SlideModal menuButton={menuButton} open={open} setOpen={setOpen}>

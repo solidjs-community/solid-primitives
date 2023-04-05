@@ -36,39 +36,4 @@ export function insertTextBetweenComments(file: string, text: string, comment: s
   return lines.join("\n");
 }
 
-export function formatBytes(
-  bytes: string | number,
-  {
-    decimals = 2,
-    k = 1000,
-    sizes = ["B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
-  }: {
-    decimals?: number;
-    sizes?: string[];
-    // Some manufacturers, such as Mac, considers kilobyte to be 1000 bytes while others define it as 1024 bytes https://ux.stackexchange.com/a/13850/140158
-    k?: 1000 | 1024;
-  } = {},
-) {
-  if (!+bytes) {
-    const unit = sizes[0]!;
-    const number = 0;
-
-    return {
-      string: `${number} ${unit}`,
-      number,
-      unit,
-    };
-  }
-
-  const dm = decimals < 0 ? 0 : decimals;
-
-  const i = Math.floor(Math.log(bytes as number) / Math.log(k));
-  const number = parseFloat(((bytes as number) / Math.pow(k, i)).toFixed(dm));
-  const unit = sizes[i]!;
-
-  return {
-    string: `${number} ${unit}`,
-    number,
-    unit,
-  };
-}
+export const isNonNullable = <T>(i: T): i is NonNullable<T> => i != null;

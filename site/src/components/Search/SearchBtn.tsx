@@ -1,6 +1,6 @@
-import { isIOS, isSafari, isWindows } from "@solid-primitives/platform";
+import { isIOS, isWindows } from "@solid-primitives/platform";
 import { FiSearch } from "solid-icons/fi";
-import { Component, onMount, Show } from "solid-js";
+import { Component, Show } from "solid-js";
 import { focusInputAndKeepVirtualKeyboardOpen } from "~/utils/focusInputAndKeepVirtualKeyboardOpen";
 import { getSearchInput } from "./Search";
 

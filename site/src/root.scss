@@ -268,17 +268,17 @@ html.dark body {
 
 html {
   background: var(--page-main-bg);
+
+  &.primitives-page-main {
+    /* background: #f2f8fa; */
+    background-image: linear-gradient(94deg, #f2f8fa, #f1f3fa);
+    &.dark {
+      /* background: #263541; */
+      background-image: linear-gradient(94deg, #263541, #24303f);
+    }
+  }
 }
 
-html.primitives-page-main {
-  /* background: #f2f8fa; */
-  background-image: linear-gradient(94deg, #f2f8fa, #f1f3fa);
-}
-
-html.dark.primitives-page-main {
-  /* background: #263541; */
-  background-image: linear-gradient(94deg, #263541, #24303f);
-}
 
 .dark .prose h2 code,
 .dark .prose h3 code,

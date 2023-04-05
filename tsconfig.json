@@ -17,6 +17,5 @@
     "jsxImportSource": "solid-js",
     "types": ["node"]
   },
-  "exclude": ["node_modules", "./packages/*/dist"],
-  "include": ["./packages/*/src", "./packages/*/test", "./packages/*/dev", "./scripts", "./configs"]
+  "exclude": ["node_modules", "dist"]
 }

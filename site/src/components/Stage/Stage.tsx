@@ -113,6 +113,6 @@ const Content = () => {
   );
 };
 
-export const StageContent = Content;
+export { Content as StageContent };
 
 export default Stage;

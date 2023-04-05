@@ -91,9 +91,73 @@ return (
 
 In most cases you'll want to use `onInput` and `onPaste`.
 
+## Usage with form handling libraries
+
+To use the mask handler with [solid-js-form](https://github.com/niliadu/solid-js-form), you need to steer clear of the `use:formHandler` directive, as it overwrites the input event with DOM level 2 events. Instead use the `handleChange`and `handleBlur` event handlers instead:
+
+```tsx
+// don't
+const { field, form } = useField(props.name);
+const formHandler = form.formHandler;
+<input onInput={inputMask} use:formHandler />;
+
+// do
+const { field, form } = useField(props.name);
+<input onBlur={form.handleBlur} onInput={ev => (inputMask(ev), form.handleChange(ev))} />;
+```
+
+To use the mask handler with [Modular Forms](https://modularforms.dev/), you may need to overwrite the re-validation handler:
+
+```tsx
+<Field
+  of={…}
+  name={…}
+  initialValue={…}
+  validate={…}
+  keepActive={…}
+  keepState={…}
+>
+  {(field) =>
+    <input
+      {...field.props}
+      onInput={ev => (inputMask(ev), field.props.onInput.?(ev))}
+    />}
+</Field>
+```
+
+The usage with [solid-form-handler](https://solid-form-handler.com/) is pretty similar:
+
+```tsx
+const formHandler = useFormHandler(...);
+
+return <Field
+  mode="input"
+  name="email"
+  formHandler={formHandler}
+  render={(field) => (
+    <>
+      <label class="form-label" for={field.props.id}>
+        Email
+      </label>
+      <input
+        {...field.props}
+        class="form-control"
+        classList={{ 'is-invalid': field.helpers.error }}
+        onInput={ev => (inputMask(ev), field.props.onInput.?(ev))}
+      />
+      <Show when={field.helpers.error}>
+        <div class="invalid-feedback">{field.helpers.errorMessage}</div>
+      </Show>
+    </>
+  )}
+/>;
+```
+
+With [solar-forms](https://github.com/kajetansw/solar-forms), the only way to use the mask handler at the moment is to use the `keyup` instead of the `input` event, since this library seizes total control over the latter. If you're the author and want to change this, either [open an issue](https://github.com/solidjs-community/solid-primitives/issues) or ping me (Alex Lohr) on the Solid.js discord.
+
 ## FAQ
 
-- **Why not support contenteditable?**<br> In most cases, you ain't gonna need it and a lower bundle size is always good. In those rare cases you do need it, check the [selection](../selection/README.md) package, it shows you how to employ the mask filter functions together with a selection that supports contenteditable.
+- **Why not support contenteditable?**<br> In most reasonable cases, you won't need it. In those rare cases you do need it, check the [selection](../selection/README.md) package, it shows you how to employ the mask filter functions together with a selection that supports contenteditable.
 - **Why `oninput`/`onchange` instead of e.g. `onkeyup`?**<br> There are a few things happening after keydown, -press and -up, which would result in flickering. Generally, you could use `onblur`, but then you'd attempt to apply the mask even if nothing changed, which just seems unnecessarily wasteful.
 - **Will it work with actual events?**<br> Yes, it will work with composed as well as native events, even with React's synthetic events; `createInputMask` has an optional generic that you can use to type the output events. Solid's composed events are more performant than DOM events, so it is best practice to use them.
 - **Is there a server version?**<br> No, since it only creates an event handler that will solely run on the client; it makes no sense to create a server version.
