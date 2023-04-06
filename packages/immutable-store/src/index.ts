@@ -205,6 +205,25 @@ const wrap = (
     new (Array.isArray(initialValue) ? ArrayTraps : ObjectTraps)(source as any, config),
   );
 
+/**
+ * Creates a deeply nested reactive object derived from the given immutable source. The source can be any signal that is updated in an immutable fashion.
+ * @param source reactive function returning an immutable object
+ * @param options optional configuration
+ * - `key` property name to use as unique identifier for objects when their reference changes
+ * - `merge` controls how objects witohut a unique identifier are identified when reconciling an array. If `true` the index is used, otherwise the object reference itself is used.
+ * @returns a reactive object derived from the given source
+ * @example
+ * ```ts
+ * const [data, setData] = createSignal({ a: 1, b: 2 });
+ * const state = createImmutable(data);
+ * const a = () => state().a;
+ * const b = () => state().b;
+ * createEffect(() => console.log(a(), b()));
+ * // logs 1 2
+ * setData({ a: 2, b: 3 });
+ * // logs 2 3
+ * ```
+ */
 export function createImmutable<T extends ImmutableObject | ImmutableArray>(
   source: Accessor<T>,
   options: ReconcileOptions = {},
