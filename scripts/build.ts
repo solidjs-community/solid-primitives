@@ -1,5 +1,5 @@
 import { build } from "tsup";
-import { defineConfig } from "tsup-preset-solid";
+import { EntryOptions, defineConfig } from "tsup-preset-solid";
 import path from "path";
 import fs from "fs";
 
@@ -30,13 +30,27 @@ const writeExports = process.argv.includes("--write") || process.argv.includes("
 const printExports = !writeExports;
 const cwd = process.cwd();
 
+const customOptions: Record<string, EntryOptions | EntryOptions[]> = {
+  "controlled-props": {
+    entry: "src/index.tsx",
+  },
+  utils: [
+    {
+      entry: "src/index.ts",
+    },
+    {
+      name: "immutable",
+      entry: "src/immutable/index.ts",
+    },
+  ],
+};
 (async () => {
-  // preserve jsx if the entry file is .tsx
-  const jsxEntry = fs.existsSync(path.resolve(cwd, "src", "index.tsx"));
+  const packageJson = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
+  const packageName = packageJson.name!.replace("@solid-primitives/", "");
 
   let options = defineConfig(
-    {
-      entry: `src/index.${jsxEntry ? "tsx" : "ts"}`,
+    customOptions[packageName] ?? {
+      entry: `src/index.ts`,
       // devEntry: devEntry,
       // serverEntry: ssrEntry,
     },

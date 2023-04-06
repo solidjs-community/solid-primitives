@@ -1,4 +1,4 @@
-import { push } from "@solid-primitives/immutable";
+import { push } from "@solid-primitives/utils/immutable";
 import { AnyFunction } from "@solid-primitives/utils";
 import { batch, createEffect, createSignal, on } from "solid-js";
 import { Listen, Listener, Emit } from "./eventBus";

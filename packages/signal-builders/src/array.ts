@@ -7,9 +7,9 @@ import {
   MaybeAccessorValue,
   ofClass,
 } from "@solid-primitives/utils";
-import * as _ from "@solid-primitives/immutable";
+import * as _ from "@solid-primitives/utils/immutable";
 import { Accessor, createMemo } from "solid-js";
-import type { MappingFn, Predicate, FlattenArray } from "@solid-primitives/immutable";
+import type { MappingFn, Predicate, FlattenArray } from "@solid-primitives/utils/immutable";
 
 /**
  * signal-builder `Array.prototype.push()`

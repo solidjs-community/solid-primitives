@@ -1,6 +1,6 @@
 import { createComputed, createMemo, createRoot, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
-import { update } from "@solid-primitives/immutable";
+import { update } from "@solid-primitives/utils/immutable";
 import { describe, expect, test } from "vitest";
 import { keyArray } from "../src";
 

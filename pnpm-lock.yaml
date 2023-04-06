@@ -219,11 +219,9 @@ importers:
 
   packages/event-bus:
     specifiers:
-      '@solid-primitives/immutable': workspace:^0.1.10
       '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
-      '@solid-primitives/immutable': link:../immutable
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.2
 
@@ -344,14 +342,6 @@ importers:
 
   packages/immutable:
     specifiers:
-      '@solid-primitives/utils': workspace:^6.0.0
-      solid-js: ^1.6.12
-    dependencies:
-      '@solid-primitives/utils': link:../utils
-      solid-js: 1.7.2
-
-  packages/immutable-store:
-    specifiers:
       '@reduxjs/toolkit': ^1.9.3
       '@solid-primitives/keyed': workspace:^1.1.10
       '@solid-primitives/utils': workspace:^6.0.0
@@ -406,7 +396,6 @@ importers:
 
   packages/keyed:
     specifiers:
-      '@solid-primitives/immutable': workspace:^0.1.10
       '@solid-primitives/refs': workspace:^1.0.2
       '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
@@ -414,7 +403,6 @@ importers:
     dependencies:
       solid-js: 1.7.2
     devDependencies:
-      '@solid-primitives/immutable': link:../immutable
       '@solid-primitives/refs': link:../refs
       '@solid-primitives/utils': link:../utils
       solid-transition-group: 0.2.2_solid-js@1.7.2
@@ -527,13 +515,11 @@ importers:
   packages/pointer:
     specifiers:
       '@solid-primitives/event-listener': workspace:^2.2.10
-      '@solid-primitives/immutable': workspace:^0.1.10
       '@solid-primitives/rootless': workspace:^1.3.2
       '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/event-listener': link:../event-listener
-      '@solid-primitives/immutable': link:../immutable
       '@solid-primitives/rootless': link:../rootless
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.2
@@ -578,7 +564,6 @@ importers:
 
   packages/refs:
     specifiers:
-      '@solid-primitives/immutable': workspace:^0.1.10
       '@solid-primitives/utils': workspace:^6.0.0
       solid-app-router: ^0.4.2
       solid-js: ^1.6.12
@@ -587,7 +572,6 @@ importers:
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.2
     devDependencies:
-      '@solid-primitives/immutable': link:../immutable
       solid-app-router: 0.4.2_solid-js@1.7.2
       solid-transition-group: 0.2.2_solid-js@1.7.2
 
@@ -670,11 +654,9 @@ importers:
 
   packages/signal-builders:
     specifiers:
-      '@solid-primitives/immutable': workspace:^0.1.10
       '@solid-primitives/utils': workspace:^6.0.0
       solid-js: ^1.6.12
     dependencies:
-      '@solid-primitives/immutable': link:../immutable
       '@solid-primitives/utils': link:../utils
       solid-js: 1.7.2
 

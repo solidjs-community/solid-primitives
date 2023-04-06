@@ -1,5 +1,5 @@
 import { createEventListener } from "@solid-primitives/event-listener";
-import { remove, split } from "@solid-primitives/immutable";
+import { remove, split } from "@solid-primitives/utils/immutable";
 import { createSubRoot } from "@solid-primitives/rootless";
 import { Directive, entries, Many, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createSignal, getOwner, DEV } from "solid-js";

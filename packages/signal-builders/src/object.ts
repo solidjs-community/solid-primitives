@@ -6,7 +6,7 @@ import {
   Modify,
 } from "@solid-primitives/utils";
 import { Accessor, createMemo } from "solid-js";
-import * as _ from "@solid-primitives/immutable";
+import * as _ from "@solid-primitives/utils/immutable";
 
 /**
  * Signal Builder: Create a new subset object without the provided keys

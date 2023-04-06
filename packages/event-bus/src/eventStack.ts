@@ -1,4 +1,4 @@
-import { drop, filterOut, push } from "@solid-primitives/immutable";
+import { drop, filterOut, push } from "@solid-primitives/utils/immutable";
 import { Accessor, createSignal, Setter } from "solid-js";
 import { createEventBus, Emit, Listen } from "./eventBus";
 

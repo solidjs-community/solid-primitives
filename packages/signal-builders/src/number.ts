@@ -1,5 +1,5 @@
 import { access, accessArray, MaybeAccessor } from "@solid-primitives/utils";
-import * as _ from "@solid-primitives/immutable";
+import * as _ from "@solid-primitives/utils/immutable";
 import { Accessor, createMemo } from "solid-js";
 
 /** signal-builder `a + b + c + ...` */

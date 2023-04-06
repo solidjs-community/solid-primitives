@@ -1,5 +1,5 @@
 import { withObjectCopy, shallowObjectCopy } from "./copy";
-import { Modify } from "@solid-primitives/utils";
+import { Modify } from "..";
 
 /**
  * Create a new subset object without the provided keys
