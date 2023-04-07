@@ -1,9 +1,8 @@
 import path from "path";
 import fs from "fs";
 import fsp from "fs/promises";
-import { fileURLToPath } from "url";
 import { PackageJson } from "type-fest";
-import { isNonNullable } from "./utils";
+import { PACKAGES_DIR, isNonNullable } from "./utils";
 
 export type ModulePkg = PackageJson & {
   primitive?: {
@@ -25,21 +24,15 @@ export type ModuleData = {
   peerDependencies: string[];
 };
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const rootPath = path.join(__dirname, "..");
-const packagesPath = path.join(rootPath, "packages");
-
 export async function getModulesData(): Promise<ModuleData[]>;
 export async function getModulesData<T>(mapFn: (data: ModuleData) => T | Promise<T>): Promise<T[]>;
 export async function getModulesData<T = ModuleData>(
   mapFn: (data: ModuleData) => T = moduleData => moduleData as unknown as T,
 ): Promise<T[]> {
-  const packageNames = await fsp.readdir(packagesPath);
+  const packageNames = await fsp.readdir(PACKAGES_DIR);
 
   const promises = packageNames.map(async name => {
-    const packageJsonPath = path.join(packagesPath, name, "package.json");
+    const packageJsonPath = path.join(PACKAGES_DIR, name, "package.json");
     if (!fs.existsSync(packageJsonPath)) {
       // eslint-disable-next-line no-console
       console.warn(`package ${name} doesn't have package.json`);

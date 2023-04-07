@@ -1,8 +1,10 @@
 import path from "path";
 
-export const r = (...pathSegments: string[]) => path.resolve(__dirname, ...pathSegments);
+export const ROOT_DIR = path.join(__dirname, "..", "..");
+export const PACKAGES_DIR = path.join(ROOT_DIR, "packages");
 
-const getCommentText = (text: string, marker: "START" | "END") => `<!-- ${text}:${marker} -->`;
+export const checkValidPackageName = (name: string) =>
+  /[a-z0-9\-]+/.test(name) && name.match(/[a-z0-9\-]+/)![0].length === name.length;
 
 export const regexGlobalCaptureGroup = (input: string, regex: RegExp) => {
   const output = [];
@@ -24,6 +26,8 @@ export const regexGlobalCaptureGroup = (input: string, regex: RegExp) => {
   if (!output.length) return null;
   return output;
 };
+
+const getCommentText = (text: string, marker: "START" | "END") => `<!-- ${text}:${marker} -->`;
 
 export function insertTextBetweenComments(file: string, text: string, comment: string): string {
   const startComment = getCommentText(comment, "START");

@@ -82,9 +82,9 @@ Available node scripts for managing packages and creating new ones:
 - `pnpm run new-package name-of-your-package` - A helper to create a new package based on a template.
 - `pnpm run build` - Builds all the packages.
 - `pnpm run test` - Tests all packages.
-- `pnpm run test:ssr` - Tests all packages in SSR mode.
 - `pnpm run lint` - Lints all packages.
 - `pnpm run format` - Formats all packages.
+- `pnpm run measure name-of-the-package` - Measures the bundle size of the package.
 
 ### Package CLI Helpers
 

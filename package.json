@@ -17,9 +17,10 @@
     "test:ssr": "pnpm run test:client --mode ssr",
     "test": "pnpm run test:client && pnpm run test:ssr",
     "build": "cross-env CI=true turbo run build --filter='./packages/*'",
-    "pages": "pnpm run build && turbo run page && jiti ./scripts/collectPages.ts",
+    "pages": "pnpm run build && turbo run page && jiti ./scripts/collect-pages.ts",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts",
+    "measure": "jiti ./scripts/measure.ts",
     "update-deps": "pnpm up -Lri",
     "version": "changeset version && pnpm i --no-frozen-lockfile && git add .",
     "release": "pnpm build && changeset publish"

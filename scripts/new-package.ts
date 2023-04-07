@@ -1,16 +1,17 @@
-import { join } from "path";
+/* eslint-disable no-console */
+import path from "path";
 import { copy, readFile, writeFile, pathExists } from "fs-extra";
-import { r } from "./utils";
+import { checkValidPackageName } from "./utils";
 
 const name = process.argv.pop();
 
-if (!name || !/[a-z0-9\-]+/.test(name) || name.match(/[a-z0-9\-]+/)![0].length !== name.length)
-  throw `Incorrect package name argument: ${name}`;
+if (!name || !checkValidPackageName(name))
+  throw new Error(`Incorrect package name argument: "${name}"`);
 
-const templateSrc = r("../template");
-const destSrc = r("../packages", name);
-const pkgPath = join(destSrc, "package.json");
-const readmePath = join(destSrc, "README.md");
+const templateSrc = path.resolve(__dirname, "../template");
+const destSrc = path.resolve(__dirname, "../packages", name);
+const pkgPath = path.join(destSrc, "package.json");
+const readmePath = path.join(destSrc, "README.md");
 
 (async () => {
   const alreadyExists = await pathExists(destSrc);
