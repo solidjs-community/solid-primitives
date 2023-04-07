@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/immutable",
-  "version": "0.0.100",
-  "description": "A template primitive example.",
+  "version": "1.0.0",
+  "description": "Primitive for rectifying immutable values and dealing with immutability in Solid.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
@@ -57,11 +57,11 @@
   },
   "dependencies": {
     "@solid-primitives/keyed": "workspace:^1.1.10",
-    "@solid-primitives/utils": "workspace:^6.0.0",
-    "redux": "^4.2.1"
+    "@solid-primitives/utils": "workspace:^6.0.0"
   },
   "devDependencies": {
     "@reduxjs/toolkit": "^1.9.3",
+    "redux": "^4.2.1",
     "solid-transition-group": "^0.2.2"
   }
 }
