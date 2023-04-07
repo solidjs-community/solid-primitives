@@ -87,7 +87,7 @@ export function createScrollPosition(
   // or if target is a function (which means it could be a ref that will be populated onMount)
   if (isHydrating || isFn) onMount(trigger);
 
-  createEventListener(target, "scroll", trigger);
+  createEventListener(target, "scroll", trigger, { passive: true });
 
   return pos;
 }
