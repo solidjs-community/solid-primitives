@@ -1,5 +1,11 @@
 # @solid-primitives/scroll
 
+## 2.0.14
+
+### Patch Changes
+
+- 54c33ba5: use passive event listener for createScrollPosition
+
 ## 2.0.13
 
 ### Patch Changes
