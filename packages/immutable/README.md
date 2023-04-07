@@ -47,11 +47,8 @@ const [data, setData] = createSignal({ a: 1, b: 2 });
 // reactive state derived from the source
 const state = createImmutable(data);
 
-const a = () => state().a;
-const b = () => state().b;
-
 // just like in Solid stores, the updates are fine-grained - only the changed values are updated
-createEffect(() => console.log(a(), b()));
+createEffect(() => console.log(state.a, state.b));
 // logs 1 2
 
 setData({ a: 2, b: 3 });
@@ -121,10 +118,7 @@ const [data, { refetch }] = createResource(() =>
 
 const state = createImmutable(data);
 
-const title = () => state().title;
-const completed = () => state().completed;
-
-createEffect(() => console.log(title(), completed()));
+createEffect(() => console.log(state.title, state.completed));
 
 // newely fetched data will be merged with the previous state
 refetch();
