@@ -2,7 +2,8 @@ import Dismiss from "solid-dismiss";
 import { FiX } from "solid-icons/fi";
 import { Accessor, onMount, ParentComponent } from "solid-js";
 import * as Header from "../Header/Header";
-import * as Table from "../Primitives/Table";
+import * as Table from "~/components/table";
+import { NoHydration } from "solid-js/web";
 
 const SlideModal: ParentComponent<{
   menuButton: Element;
@@ -95,10 +96,12 @@ const SlideModal: ParentComponent<{
       menuPopup={`[role="dialog"]`}
       overlayElement={{
         element: (
-          <div
-            class="fixed inset-0 z-[1000] h-[calc(100%+100px)] bg-[#102a62b8] backdrop-blur-[2px] dark:bg-[#001627bd]"
-            onClick={() => setOpen(false)}
-          ></div>
+          <NoHydration>
+            <div
+              class="fixed inset-0 z-[1000] h-[calc(100%+100px)] bg-[#102a62b8] backdrop-blur-[2px] dark:bg-[#001627bd]"
+              onClick={() => setOpen(false)}
+            ></div>
+          </NoHydration>
         ),
         animation: {
           enterClass: "opacity-0",

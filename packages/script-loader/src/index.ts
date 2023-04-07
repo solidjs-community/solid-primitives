@@ -20,7 +20,7 @@ const OMITTED_PROPS = ["src"] as const;
  * @example
  * createScriptLoader({
  *  src: "https://example.com/script.js",
- *  async onLoad() {
+ *  onLoad() {
  *    // do your stuff...
  *  }
  * })

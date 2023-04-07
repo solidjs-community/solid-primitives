@@ -1,5 +1,11 @@
 # @solid-primitives/autofocus
 
+## 0.0.105
+
+### Patch Changes
+
+- e0d87bcf: Make `autofocus` usable with `ref`
+
 ## 0.0.104
 
 ### Patch Changes

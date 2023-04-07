@@ -13,8 +13,8 @@ Primitives for autofocusing HTML elements.
 
 The native autofocus attribute only works on page load, which makes it incompatible with SolidJS. These primitives run on render, allowing autofocus on initial render as well as dynamically added components.
 
-- `autofocus` - Directive to autofocus an element on render.
-- `createAutofocus` - Reactive primitive to autofocus an element on render.
+- [`autofocus`](#autofocus) - Directive to autofocus an element on render.
+- [`createAutofocus`](#createAutofocus) - Reactive primitive to autofocus an element on render.
 
 ## Installation
 
@@ -26,12 +26,19 @@ yarn add @solid-primitives/autofocus
 pnpm add @solid-primitives/autofocus
 ```
 
-## How to use it
+## `autofocus`
 
-### use:autofocus
+### How to use it
+
+The `autofocus` directive uses the native `autofocus` attribute to determine it should focus the element or not.
+Using this directive without `autofocus={true}` (or the shorthand `autofocus`) will not perform anything.
+
+As a directive:
 
 ```tsx
 import { autofocus } from "@solid-primitives/autofocus";
+// prevents from being tree-shaken by TS
+autofocus
 
 <button use:autofocus autofocus>
   Autofocused
@@ -43,10 +50,19 @@ import { autofocus } from "@solid-primitives/autofocus";
 </button>;
 ```
 
-The `autofocus` directive uses the native `autofocus` attribute to determine it should focus the element or not.
-Using this directive without `autofocus={true}` (or the shorthand `autofocus`) will not perform anything.
+Or with `ref`
 
-### createAutofocus
+```tsx
+import { autofocus } from "@solid-primitives/autofocus";
+
+<button ref={autofocus} autofocus>
+  Autofocused
+</button>;
+```
+
+### `createAutofocus`
+
+`createAutofocus` reactively autofocuses an element passid in as a signal.
 
 ```tsx
 import { createAutofocus } from "@solid-primitives/autofocus";

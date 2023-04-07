@@ -1,20 +1,26 @@
+import {
+  Accessor,
+  Component,
+  createEffect,
+  createMemo,
+  createSignal,
+  untrack,
+  onCleanup,
+} from "solid-js";
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { isMobile, isSafari } from "@solid-primitives/platform";
-import { createElementSize } from "@solid-primitives/resize-observer";
 import { createScrollPosition } from "@solid-primitives/scroll";
-import { defer, tryOnCleanup } from "@solid-primitives/utils";
+import { defer } from "@solid-primitives/utils";
 import Dismiss from "solid-dismiss";
-import { Accessor, Component, createEffect, createMemo, createSignal, untrack } from "solid-js";
 import { A, useLocation } from "solid-start";
 import { pageWidthClass } from "~/constants";
 import Hamburger from "../Icons/Hamburger";
-import { PRIMITIVE_PAGE_PADDING_TOP } from "../Primitives/PrimitivePageMain";
 import SearchBtn from "../Search/SearchBtn";
-import SearchModal from "../Search/SearchModal";
 import NavMenu from "./NavMenu";
 import ThemeBtn from "./ThemeBtn";
 import clsx from "clsx";
 import { createTween } from "@solid-primitives/tween";
+import SearchModal from "../Search/SearchModal";
 
 export const [isScrollEnabled, setScrollEnabled] = createSignal(false);
 
@@ -23,11 +29,12 @@ const isOverridingShadow = () => signalOverridingShadow()?.() ?? false;
 
 export function overrideShadow(signal: Accessor<boolean>) {
   setSignalOverridingShadow(() => signal);
-  tryOnCleanup(() => setSignalOverridingShadow(p => (p === signal ? undefined : p)));
+  onCleanup(() => setSignalOverridingShadow(p => (p === signal ? undefined : p)));
 }
 
 const OPEN_NAV_DURATION = 500;
 const HEADER_HEIGHT = 60;
+export const PRIMITIVE_PAGE_PADDING_TOP = 140;
 
 const Header: Component = () => {
   const windowScroll = createScrollPosition(() => window);
@@ -70,8 +77,6 @@ const Header: Component = () => {
       if (isScrollEnabled()) {
         untrack(checkScroll);
         makeEventListener(window, "scroll", checkScroll, { passive: true });
-      } else {
-        removeEventListener("scroll", checkScroll);
       }
     });
   }
