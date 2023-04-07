@@ -11,9 +11,13 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { fileURLToPath } from "url";
-import { formatBytes, getPackageBundlesize } from "../../scripts/calculate-bundlesize";
-import { getModulesData, ModuleData } from "../../scripts/get-modules-data";
-import { isNonNullable } from "../../scripts/utils";
+import {
+  formatBytes,
+  getPackageBundlesize,
+  getModulesData,
+  ModuleData,
+  isNonNullable,
+} from "../../scripts/utils";
 import { PackageData, PackageListItem } from "../src/types";
 import { GITHUB_REPO } from "../src/constants";
 
