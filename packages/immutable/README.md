@@ -11,7 +11,7 @@
 
 Primitive for rectifying immutable values and dealing with immutability in Solid.
 
-- [`createImmutable`](#createImmutable) - Creates a deeply nested reactive object derived from the given immutable source.
+- [`createImmutable`](#createImmutable) - Creates a store derived from the given immutable source.
 
 ## Installation
 
@@ -25,7 +25,9 @@ pnpm add @solid-primitives/immutable
 
 ## `createImmutable`
 
-Creates a deeply nested reactive object derived from the given immutable source. The source can be any signal that is updated in an immutable fashion.
+Creates a store _(deeply nested reactive object)_ derived from the given immutable source. The source can be any signal that is updated in an immutable fashion.
+
+It's an **experimental** primitive, a proof of concept of derived nested reactivity. It's not meant to be used in production, but rather as a playground for experimenting with new ideas.
 
 ### How to use it
 
