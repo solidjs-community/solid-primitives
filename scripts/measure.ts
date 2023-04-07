@@ -38,7 +38,7 @@ class ConsoleTable {
       return columnWidths;
     }, [] as number[]);
 
-    const separator = columnWidths.map(columnWidth => "-".repeat(columnWidth)).join(" | ");
+    const separator = columnWidths.map(columnWidth => "—".repeat(columnWidth)).join(" + ");
 
     for (const row of this.rows) {
       logLine(
