@@ -924,7 +924,7 @@ importers:
         specifier: ^2.0.11
         version: link:../packages/intersection-observer
       '@solid-primitives/keyboard':
-        specifier: ^1.0.12
+        specifier: ^1.1.0
         version: link:../packages/keyboard
       '@solid-primitives/media':
         specifier: ^2.1.6

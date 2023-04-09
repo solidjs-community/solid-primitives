@@ -1,5 +1,11 @@
 # @solid-primitives/keyboard
 
+## 1.1.0
+
+### Minor Changes
+
+- aa269605: pass the keyboard event to the callback in createShortcut
+
 ## 1.0.12
 
 ### Patch Changes
