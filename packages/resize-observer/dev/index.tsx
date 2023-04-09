@@ -1,7 +1,7 @@
 import { Component, createSignal, Setter } from "solid-js";
 import { render } from "solid-js/web";
 import "uno.css";
-import { createElementSize, createWindowSize } from "../src";
+import { createElementSize, createWindowSize, createResizeObserver } from "../src";
 
 const NumberInput: Component<{ value: number; setValue: Setter<number>; name: string }> = props => {
   return (
@@ -29,6 +29,11 @@ const App: Component = () => {
   let ref: HTMLDivElement | undefined;
   const ws = createWindowSize();
   const es = createElementSize(() => ref);
+
+  createResizeObserver(
+    () => ref,
+    ({ width, height }) => console.log("ResizeObserver event", { width, height }),
+  );
 
   return (
     <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
