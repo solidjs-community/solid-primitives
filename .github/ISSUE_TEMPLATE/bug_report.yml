@@ -1,0 +1,31 @@
+name: "🐛 Bug report"
+description: Create a report to help us improve
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue :pray:.
+
+        The more information you fill in, the better the community can help you.
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: Provide a clear and concise description of the challenge you are running into.
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Minimal Reproduction Link
+      description: |
+        Please provide a link to a minimal reproduction of the bug you are running into.
+        It makes the process of verifying and fixing the bug much easier.
+        Note:
+        - Your bug will may get fixed much faster if we can run your code and it doesn't have dependencies other than the solid-js and solid-primitives.
+        - To create a shareable code example you can use [Stackblitz](https://stackblitz.com/) (https://solid.new). Please no localhost URLs.
+        - Please read these tips for providing a minimal example: https://stackoverflow.com/help/mcve.
+      placeholder: |
+        e.g. https://stackblitz.com/edit/...... OR Github Repo
+    validations:
+      required: true
