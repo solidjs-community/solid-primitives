@@ -210,7 +210,7 @@ export function createKeyHold(
  */
 export function createShortcut(
   keys: KbdKey[],
-  callback: VoidFunction,
+  callback: (event: KeyboardEvent) => void,
   options: {
     preventDefault?: boolean;
     requireReset?: boolean;
@@ -231,19 +231,20 @@ export function createShortcut(
   const handleSequenceWithReset = (sequence: string[][]) => {
     if (!sequence.length) return (reset = false);
     if (reset) return;
+    const e = event()!;
 
     if (sequence.length < keys.length) {
       // optimistically preventDefault behavior if we yet don't have enough keys
       if (equalsKeyHoldSequence(sequence, keys.slice(0, sequence.length))) {
-        preventDefault && event()!.preventDefault();
+        preventDefault && e.preventDefault();
       } else {
         reset = true;
       }
     } else {
       reset = true;
       if (equalsKeyHoldSequence(sequence, keys)) {
-        preventDefault && event()!.preventDefault();
-        callback();
+        preventDefault && e.preventDefault();
+        callback(e);
       }
     }
   };
@@ -252,18 +253,20 @@ export function createShortcut(
   const handleSequenceWithoutReset = (sequence: string[][]) => {
     const last = sequence.at(-1);
     if (!last) return;
+    const e = event()!;
+
     // optimistically preventDefault behavior if we yet don't have enough keys
     if (preventDefault && last.length < keys.length) {
       if (arrayEquals(last, keys.slice(0, keys.length - 1))) {
-        event()!.preventDefault();
+        e.preventDefault();
       }
       return;
     }
     if (arrayEquals(last, keys)) {
       const prev = sequence.at(-2);
       if (!prev || arrayEquals(prev, keys.slice(0, keys.length - 1))) {
-        preventDefault && event()!.preventDefault();
-        callback();
+        preventDefault && e.preventDefault();
+        callback(e);
       }
     }
   };
