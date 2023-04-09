@@ -1,9 +1,8 @@
 import { cp, mkdir, readdir, stat, writeFile } from "fs/promises";
 import path from "path";
+import { ROOT_DIR, PACKAGES_DIR } from "./utils";
 
-const cwd = process.cwd();
-const pagesPath = path.resolve(cwd, "pages");
-const packagesPath = path.resolve(cwd, "packages");
+const pagesPath = path.resolve(ROOT_DIR, "pages");
 
 const isDir = async (dir: string) => {
   try {
@@ -23,9 +22,9 @@ const copyPage = async () => {
   const pages: string[] = [];
   await Promise.all(
     (
-      await readdir(packagesPath)
+      await readdir(PACKAGES_DIR)
     ).map(async pkg => {
-      const pkgPath = path.resolve(packagesPath, pkg, `dev/dist`);
+      const pkgPath = path.resolve(PACKAGES_DIR, pkg, `dev/dist`);
       if (await isDir(pkgPath)) {
         await cp(pkgPath, path.resolve(pagesPath, pkg), {
           recursive: true,

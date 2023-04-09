@@ -4,11 +4,14 @@ import path from "path";
 import { build } from "esbuild";
 import { gzipSize } from "gzip-size";
 import { fileURLToPath } from "url";
+import { PACKAGES_DIR } from "./utils";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const GZIP_HEADERS_AND_METADATA_SIZE = 20; // around 20 bytes
+
+export type Bundlesize = { min: number; gzip: number };
 
 export const getPackageBundlesize = async (
   packageName: string,
@@ -21,7 +24,7 @@ export const getPackageBundlesize = async (
     isExportDefault?: boolean;
     peerDependencies?: string[];
   } = {},
-): Promise<{ min: number; gzip: number } | null> => {
+): Promise<Bundlesize | null> => {
   const randomHash = Math.random().toString(36).substring(2, 15);
 
   const tempDir = path.join(__dirname, "_temp_calculate-bundlesize");
@@ -33,13 +36,13 @@ export const getPackageBundlesize = async (
   }
 
   const tempFilename = `${exportName ? `${packageName}_${exportName}` : packageName}_${randomHash}`;
-  const packagePath = path.join(__dirname, `../packages/${packageName}`);
+  const packagePath = path.join(PACKAGES_DIR, packageName);
   const outFilepath = path.join(tempDir, `${tempFilename}.js`);
   const exportFilepath = path.join(tempDir, `${tempFilename}.ts`);
 
-  let indexFilepath = path.join(packagePath, `/src/index.ts`);
+  let indexFilepath = path.join(packagePath, "src", `index.ts`);
   if (!fs.existsSync(indexFilepath)) {
-    indexFilepath = path.join(packagePath, `/src/index.tsx`);
+    indexFilepath = path.join(packagePath, "src", `index.tsx`);
   }
 
   if (exportName) {
@@ -47,7 +50,7 @@ export const getPackageBundlesize = async (
       exportFilepath,
       `export ${
         isExportDefault ? `{ default as ${exportName} }` : `{ ${exportName} }`
-      } from "../../packages/${packageName}/src"`,
+      } from "../../../packages/${packageName}/src"`,
     );
   }
 

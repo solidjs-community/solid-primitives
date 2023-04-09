@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync } from "fs";
+import path from "path";
 // @ts-expect-error ts-missing-module
 import tablemark from "json-to-markdown-table";
-import { insertTextBetweenComments, r } from "./utils";
-import { getModulesData } from "./get-modules-data";
+import { insertTextBetweenComments, getModulesData, ROOT_DIR } from "./utils";
 
 type PackageData = {
   Name: string;
@@ -60,7 +60,7 @@ const rootDependencies: string[] = [
     categories[category] = cat ? [...cat, data] : [data];
   }
 
-  const pathToREADME = r("../README.md");
+  const pathToREADME = path.join(ROOT_DIR, "README.md");
   let readme = readFileSync(pathToREADME).toString();
 
   // Update Primitives Table
