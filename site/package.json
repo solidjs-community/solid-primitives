@@ -26,7 +26,7 @@
     "@solid-primitives/event-bus": "workspace:^1.0.4",
     "@solid-primitives/event-listener": "^2.2.10",
     "@solid-primitives/intersection-observer": "^2.0.11",
-    "@solid-primitives/keyboard": "^1.0.12",
+    "@solid-primitives/keyboard": "^1.1.0",
     "@solid-primitives/media": "^2.1.6",
     "@solid-primitives/mutation-observer": "workspace:^1.1.10",
     "@solid-primitives/platform": "workspace:^0.0.105",
