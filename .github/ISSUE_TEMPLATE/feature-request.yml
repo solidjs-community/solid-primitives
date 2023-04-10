@@ -1,0 +1,27 @@
+name: "Feature Request"
+description: For feature requests and primitive proposals. Please search for existing issues first. Also see CONTRIBUTING.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for bringing your ideas here :pray:.
+
+        The more information you fill in, the better the community can understand your idea.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Describe The Problem To Be Solved
+      description: Provide a clear and concise description of the challenge you are running into.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Suggest A Solution
+      description: |
+        A concise description of your preferred solution. Things to address include:
+        - Details of the technical implementation
+        - Tradeoffs made in design decisions
+        - Caveats and considerations for the future
+    validations:
+      required: true
