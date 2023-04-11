@@ -1,6 +1,6 @@
 import { Accessor, Component, createComponent, createMemo, JSX, DEV } from "solid-js";
 import { isServer } from "solid-js/web";
-import type { ResolvedJSXElement, Narrow, Many } from "@solid-primitives/utils";
+import type { ResolvedJSXElement, NoInfer, Many } from "@solid-primitives/utils";
 import { asArray } from "@solid-primitives/utils";
 
 /** @internal $TYPE is only used for type inference */
@@ -21,7 +21,7 @@ export type JSXTokenizerData<TParser extends JSXTokenizer<any>> = TParser[typeof
 /**
  * Type of the element returned by {@link TokenComponent} and {@link resolveTokens}.
  */
-export type TokenElement<TData> = (() => JSX.Element) & { data: TData; [$TOKENIZER]: symbol };
+export type TokenElement<TData> = JSX.Element & { data: TData; [$TOKENIZER]: symbol };
 
 /**
  * Type of the component returned by {@link createToken}.
@@ -73,9 +73,9 @@ export function createTokenizer<T>(options?: { name: string }): JSXTokenizer<T> 
  * @param render function that returns the fallback JSX Element to render. _(If not passed, the token will render nothing and warn in development.)_
  * @returns a token component ({@link TokenComponent}) that can be used as a normal component in JSX.
  */
-export function createToken<TProps extends object, TData extends TDataUnion, TDataUnion>(
-  tokenizer: JSXTokenizer<TDataUnion>,
-  tokenData: (props: TProps) => Narrow<TData>,
+export function createToken<TProps extends object, TData>(
+  tokenizer: JSXTokenizer<TData>,
+  tokenData: NoInfer<(props: TProps) => TData>,
   render?: (props: TProps) => JSX.Element,
 ): TokenComponent<TProps, TData>;
 
@@ -103,19 +103,17 @@ export function createToken<P extends object, T>(
     Symbol(!isServer && DEV ? args[0]?.name || args[1]?.name || "jsx-token" : "");
 
   const comp = ((props: P) => {
-    const token = (
-      args[1]
-        ? () => createComponent(args[1], props)
-        : () => {
-            !isServer &&
-              DEV &&
-              // eslint-disable-next-line no-console
-              console.warn(
-                `Tokens can only be rendered with resolveTokens. ("${symbol.description}")`,
-              );
-            return "";
-          }
-    ) as TokenElement<T>;
+    const token = (args[1]
+      ? () => createComponent(args[1], props)
+      : () => {
+          !isServer &&
+            DEV &&
+            // eslint-disable-next-line no-console
+            console.warn(
+              `Tokens can only be rendered with resolveTokens. ("${symbol.description}")`,
+            );
+          return "";
+        }) as unknown as TokenElement<T>;
     token.data = args[0] ? args[0](props) : props;
     token[$TOKENIZER] = symbol;
 

@@ -80,11 +80,6 @@ export type NonIterable<T> = T & {
   [Symbol.iterator]: never;
 };
 
-/** Unwraps the type definition of an object, making it more readable */
-export type Simplify<T> = T extends object ? { [K in keyof T]: T[K] } : T;
-/** Unboxes type definition, making it more readable */
-export type UnboxLazy<T> = T extends () => infer U ? U : T;
-
 /** Get the required keys of an object */
 export type RequiredKeys<T> = keyof {
   [K in keyof T as T extends { [_ in K]: unknown } ? K : never]: 0;
@@ -120,9 +115,24 @@ export type Position = {
   y: number;
 };
 
+export type Size = {
+  width: number;
+  height: number;
+};
+
+/** Unwraps the type definition of an object, making it more readable */
+export type Simplify<T> = T extends object ? { [K in keyof T]: T[K] } : T;
+/** Unboxes type definition, making it more readable */
+export type UnboxLazy<T> = T extends () => infer U ? U : T;
+
 type RawNarrow<T> =
   | (T extends [] ? [] : never)
   | (T extends string | number | bigint | boolean ? T : never)
   | { [K in keyof T]: T[K] extends Function ? T[K] : RawNarrow<T[K]> };
 
 export type Narrow<T extends any> = T extends [] ? T : RawNarrow<T>;
+
+// Magic type that when used at sites where generic types are inferred from, will prevent those sites from being involved in the inference.
+// https://github.com/microsoft/TypeScript/issues/14829
+// TypeScript Discord conversation: https://discord.com/channels/508357248330760243/508357248330760249/911266491024949328
+export type NoInfer<T> = [T][T extends any ? 0 : never];
