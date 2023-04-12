@@ -35,7 +35,6 @@ if (!fs.existsSync(generatedDirPath)) {
 const PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES: ReadonlySet<string> = new Set([
   "signal-builders",
   "platform",
-  "immutable",
 ]);
 
 const markdownProcessor = unified()
