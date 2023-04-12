@@ -1,5 +1,15 @@
 # @solid-primitives/utils
 
+## 6.1.0
+
+### Minor Changes
+
+- 1edee005: Moves the exiting immutable helpers from the `immutable` package to `utils/immutable` submodule.
+
+  The immutable package is replaced with a new `createImmutable` primitive for creating stores derived from immutable structures. (issue #140)
+
+- 6415f2ba: Add `NoInfer` type
+
 ## 6.0.0
 
 ### Major Changes

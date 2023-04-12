@@ -1,5 +1,14 @@
 # @solid-primitives/signal-builders
 
+## 0.1.11
+
+### Patch Changes
+
+- 1edee005: Use immutable helpers from `"utils/immutable"`
+- Updated dependencies [1edee005]
+- Updated dependencies [6415f2ba]
+  - @solid-primitives/utils@6.1.0
+
 ## 0.1.10
 
 ### Patch Changes

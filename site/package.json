@@ -23,7 +23,7 @@
   "dependencies": {
     "@solid-primitives/clipboard": "^1.5.4",
     "@solid-primitives/deep": "workspace:^0.0.102",
-    "@solid-primitives/event-bus": "workspace:^1.0.4",
+    "@solid-primitives/event-bus": "workspace:^1.0.5",
     "@solid-primitives/event-listener": "^2.2.10",
     "@solid-primitives/intersection-observer": "^2.0.11",
     "@solid-primitives/keyboard": "^1.1.0",
@@ -36,7 +36,7 @@
     "@solid-primitives/scheduled": "workspace:^1.3.2",
     "@solid-primitives/scroll": "workspace:^2.0.14",
     "@solid-primitives/tween": "workspace:^1.2.6",
-    "@solid-primitives/utils": "workspace:^6.0.0",
+    "@solid-primitives/utils": "workspace:^6.1.0",
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.8.2",
     "clsx": "^1.2.1",
