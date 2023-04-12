@@ -1,5 +1,14 @@
 # @solid-primitives/event-bus
 
+## 1.0.5
+
+### Patch Changes
+
+- 1edee005: Use immutable helpers from `"utils/immutable"`
+- Updated dependencies [1edee005]
+- Updated dependencies [6415f2ba]
+  - @solid-primitives/utils@6.1.0
+
 ## 1.0.4
 
 ### Patch Changes

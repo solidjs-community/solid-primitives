@@ -1,5 +1,21 @@
 # @solid-primitives/immutable
 
+## 1.0.0
+
+### Major Changes
+
+- 1edee005: Moves the exiting immutable helpers from the `immutable` package to `utils/immutable` submodule.
+
+  The immutable package is replaced with a new `createImmutable` primitive for creating stores derived from immutable structures. (issue #140)
+
+### Patch Changes
+
+- Updated dependencies [1edee005]
+- Updated dependencies [1edee005]
+- Updated dependencies [6415f2ba]
+  - @solid-primitives/utils@6.1.0
+  - @solid-primitives/keyed@1.2.0
+
 ## 0.1.10
 
 ### Patch Changes

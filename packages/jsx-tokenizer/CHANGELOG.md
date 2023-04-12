@@ -1,5 +1,14 @@
 # @solid-primitives/jsx-tokenizer
 
+## 1.0.4
+
+### Patch Changes
+
+- 6415f2ba: Improve the type generics in `createToken`. Thanks @otonashixav
+- Updated dependencies [1edee005]
+- Updated dependencies [6415f2ba]
+  - @solid-primitives/utils@6.1.0
+
 ## 1.0.3
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.2.0
+
+### Minor Changes
+
+- 1edee005: Expose index of the item in the `keyFn` callback
+
 ## 1.1.10
 
 ### Patch Changes

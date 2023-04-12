@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-bus",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A collection of SolidJS primitives providing various features of a pubsub/event-emitter/event-bus.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -54,7 +54,7 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^6.0.0"
+    "@solid-primitives/utils": "workspace:^6.1.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"
