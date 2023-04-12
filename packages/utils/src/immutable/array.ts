@@ -1,4 +1,4 @@
-import { AnyClass, compare, ItemsOf, Many, ofClass } from "@solid-primitives/utils";
+import { AnyClass, compare, ItemsOf, Many, ofClass } from "..";
 import { withArrayCopy } from "./copy";
 import { get } from "./object";
 import { FlattenArray, MappingFn, Predicate } from "./types";

@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Immutable" alt="Solid Primitives Immutable">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=immutable" alt="Solid Primitives Immutable">
 </p>
 
 # @solid-primitives/immutable
@@ -7,9 +7,11 @@
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/immutable?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/immutable)
 [![version](https://img.shields.io/npm/v/@solid-primitives/immutable?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/immutable)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Functional programming helpers for making non-mutating changes to data. Keeping it immutable.
+Primitive for rectifying immutable values and dealing with immutability in Solid.
+
+- [`createImmutable`](#createImmutable) - Creates a store derived from the given immutable source.
 
 ## Installation
 
@@ -17,85 +19,116 @@ Functional programming helpers for making non-mutating changes to data. Keeping 
 npm install @solid-primitives/immutable
 # or
 yarn add @solid-primitives/immutable
+# or
+pnpm add @solid-primitives/immutable
 ```
 
-## How to use it
+## `createImmutable`
+
+Creates a store _(deeply nested reactive object)_ derived from the given immutable source. The source can be any signal that is updated in an immutable fashion.
+
+It's an **experimental** primitive, a proof of concept of derived nested reactivity. It's not meant to be used in production, but rather as a playground for experimenting with new ideas.
+
+### How to use it
+
+`createImmutable` is a function that takes a reactive function as the first param, and an optional configuration object as the second param:
+
+- `source` reactive function returning an immutable object
+- `options` optional configuration
+  - `key` property name to use as unique identifier for objects when their reference changes
+  - `merge` controls how objects witohut a unique identifier are identified when reconciling an array. If `true` the index is used, otherwise the object reference itself is used.
 
 ```ts
-import { pick } from "@solid-primitives/immutable";
+import { createImmutable } from "@solid-primitives/immutable";
 
-const original = { foo: 123, bar: "baz" };
-const newObj = pick(original, "foo");
-original; // { foo: 123, bar: "baz" }
-newObj; // { foo: 123 }
+// source - can be any reactive function returning an immutable object
+const [data, setData] = createSignal({ a: 1, b: 2 });
+
+// reactive state derived from the source
+const state = createImmutable(data);
+
+// just like in Solid stores, the updates are fine-grained - only the changed values are updated
+createEffect(() => console.log(state.a, state.b));
+// logs 1 2
+
+setData({ a: 2, b: 3 });
+// logs 2 3
 ```
 
-Use it for changing signals:
+### Usage with immutable state management libraries
 
-```ts
-import { push, update } from "@solid-primitives/immutable";
+There are many state management libraries that provide immutable data structures, such as [Immer](https://immerjs.github.io/immer/), [Redux Toolkit](https://redux-toolkit.js.org/), [XState](https://xstate.js.org/docs/), etc.
 
-const [list, setList] = createSignal([1, 2, 3]);
-setList(p => push(p, 4));
+`createImmutable` can help you turn them into reactive objects, only updating the changed values.
 
-const [user, setUser] = createSignal({
-  name: "John",
-  street: { name: "Kingston Cei", number: 24 },
+> **Warning** `createStore` with `reconcile` will give you the similar result, while being more efficient.
+
+```tsx
+import { createSlice, configureStore } from "@reduxjs/toolkit";
+import { createImmutable } from "@solid-primitives/immutable";
+
+const slice = createSlice({
+  initialState: [
+    { id: 1, title: "Learn Solid", completed: false },
+    { id: 2, title: "Learn Redux", completed: false },
+  ],
+  reducers: {
+    /* ... (immutable actions) */
+  },
 });
-setUser(p => update(p, "street", "number", 64));
+
+const store = configureStore({
+  reducer: slice.reducer,
+});
+
+const [source, setSource] = createSignal(store.getState());
+store.subscribe(() => setSource(store.getState()));
+
+const todos = createImmutable(source);
+
+// the references of todos will be preserved, even though they were destructured in the store
+<For each={todos}>
+  {todo => (
+    <div>
+      <input
+        type="checkbox"
+        checked={todo.completed}
+        onClick={() => store.dispatch(slice.actions.toggleTodo(todo.id))}
+      />
+      {todo.title}
+    </div>
+  )}
+</For>;
 ```
 
-## List of functions:
+### Usage with `createResource`
 
-### Copying
+Data fetched from the server is immutable, so `createImmutable` can help you turn it into a reactive object, only updating the changed values.
 
-- **`shallowArrayCopy`** - make shallow copy of an array
-- **`shallowObjectCopy`** - make shallow copy of an object
-- **`shallowCopy`** - make shallow copy of an array/object
-- **`withArrayCopy`** - apply mutations to the an array without changing the original
-- **`withObjectCopy`** - apply mutations to the an object without changing the original
-- **`withCopy`** - apply mutations to the an object/array without changing the original
+> **Warning** `createResource` provides an experimental `storage` option that can be used together with `createStore` and `reconcile` to achieve the similar result, while being more efficient
+> https://www.solidjs.com/docs/latest/api#createresource
 
-### Array
+```ts
+import { createResource } from "solid-js";
+import { createImmutable } from "@solid-primitives/immutable";
 
-- **`push`** - non-mutating `Array.prototype.push()`
-- **`drop`** - non-mutating function that drops n items from the array start
-- **`dropRight`** - non-mutating function that drops n items from the array end
-- **`filterOut`** - standalone `Array.prototype.filter()` that filters out passed item
-- **`filter`** - standalone `Array.prototype.filter()`
-- **`sort`** - non-mutating `Array.prototype.sort()` as a standalone function
-- **`sortBy`** - Sort an array by object key, or multiple keys
-- **`map`** - standalone `Array.prototype.map()` function
-- **`slice`** - standalone `Array.prototype.slice()` function
-- **`splice`** - non-mutating `Array.prototype.splice()` as a standalone function
-- **`fill`** - non-mutating `Array.prototype.fill()` as a standalone function
-- **`concat`** - Creates a new array concatenating array with any additional arrays and/or values.
-- **`remove`** - Remove item from array
-- **`removeItems`** - Remove multiple items from an array
-- **`flatten`** - Flattens a nested array into a one-level array
-- **`filterInstance`** - Flattens a nested array into a one-level array
-- **`filterOutInstance`** - Flattens a nested array into a one-level array
+const [data, { refetch }] = createResource(() =>
+  fetch("https://jsonplaceholder.typicode.com/todos/1").then(res => res.json()),
+);
 
-### Object
+const state = createImmutable(data);
 
-- **`omit`** - Create a new subset object without the provided keys
-- **`pick`** - Create a new subset object with only the provided keys
-- **`split`** - Split object into multiple subset objects.
-- **`merge`** - Merges multiple objects into a single one.
+createEffect(() => console.log(state.title, state.completed));
 
-### Object/Array
+// newely fetched data will be merged with the previous state
+refetch();
+```
 
-- **`get`** - Get a single property value of an object by specifying a path to it.
-- **`update`** - Change single value in an object by key, or series of recursing keys.
+## Demo
 
-### Number
+You can see the live demo [here](https://solidjs-community.github.io/solid-primitives/immutable).
 
-- **`add`** - `a + b + c + ...` _(works for numbers or strings)_
-- **`substract`** - `a - b - c - ...`
-- **`multiply`** - `a * b * c * ...`
-- **`divide`** - `a / b / c / ...`
-- **`power`** - `a ** b ** c ** ...`
-- **`clamp`** - clamp a number value between two other values
+[Source code](./dev/index.tsx)
 
 ## Changelog
 

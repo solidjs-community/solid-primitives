@@ -1,170 +1,165 @@
-import { describe, expect, test } from "vitest";
-import {
-  update,
-  concat,
-  split,
-  get,
-  sortBy,
-  merge,
-  removeItems,
-  filterInstance,
-  filterOutInstance,
-} from "../src";
+import { describe, test, expect } from "vitest";
+import { createRoot, createSignal } from "solid-js";
+import { createImmutable } from "../src";
+import { unwrap } from "solid-js/store";
 
-const cloneDeep = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
-
-describe("update", () => {
-  test("update()", () => {
-    const original = {
-      a: 123,
-      b: { inner: { c: "yo", d: [0, 1, 2], test: "test" } },
-      arr: [1, 2, 3],
-    };
-    const originalClone = cloneDeep(original);
-
-    let captirePrev: any;
-    const x = update(original, "a", prev => {
-      captirePrev = prev;
-      return "69";
+describe("createImmutable", () => {
+  test("Reconcile a simple object", () => {
+    createRoot(() => {
+      const [data, setData] = createSignal<{ data: number; missing?: string }>({
+        data: 2,
+        missing: "soon",
+      });
+      const state = createImmutable(data);
+      expect(state.data).toBe(2);
+      expect(state.missing).toBe("soon");
+      setData({ data: 5 });
+      expect(state.data).toBe(5);
+      expect(state.missing).toBeUndefined();
     });
-    expect(x.a).toBe("69");
-    expect(captirePrev).toBe(123);
-
-    const y = update(original, "b", "inner", "69");
-    expect(y.b.inner).toBe("69");
-
-    const z = update(original, "b", "inner", "c", { aha: 123 });
-    expect(z.b.inner.c.aha).toBe(123);
-    expect(z.b.inner.d).toEqual([0, 1, 2]);
-
-    const a = update(original, "arr", 0, "yoo");
-    expect(a.arr).toEqual(["yoo", 2, 3]);
-
-    const theSame = update(original, "b", "inner", "c", "yo");
-    expect(theSame, "no changes makes no changes").toEqual(originalClone);
-
-    const fnUpdate = update(original, "b", "inner", "d", list => [...list, 3]);
-    expect(fnUpdate.b.inner.d).toEqual([0, 1, 2, 3]);
-    expect(original.b.inner.d).toEqual([0, 1, 2]);
-
-    expect(original).toEqual(originalClone);
   });
-});
 
-describe("concat", () => {
-  test("concat()", () => {
-    const originalArgs = [1, 2, ["a", "b"], "c", [3, [4, 5]]];
-    const copiedArgs = cloneDeep(originalArgs);
-
-    const a = concat(...originalArgs);
-    expect(a).toEqual([1, 2, "a", "b", "c", 3, [4, 5]]);
-    expect(originalArgs).toEqual(copiedArgs);
+  test("Reconcile array with nulls", () => {
+    createRoot(() => {
+      const [data, setData] = createSignal([null, "a"]);
+      const state = createImmutable(data);
+      expect(state[0]).toBe(null);
+      expect(state[1]).toBe("a");
+      setData(["b", null]);
+      expect(state[0]).toBe("b");
+      expect(state[1]).toBe(null);
+    });
   });
-});
 
-describe("split", () => {
-  test("split()", () => {
-    const original = { a: 123, b: "foo", c: { inner: 1 }, d: [1, 2, 3] };
-    const originalCopy = cloneDeep(original);
-
-    const [a, b] = split(original, "a", "c");
-    expect(a).toEqual({ a: 123, c: { inner: 1 } });
-    expect(b).toEqual({ b: "foo", d: [1, 2, 3] });
-
-    const [c, d, e] = split(original, ["a"], ["c", "b"]);
-    expect(c).toEqual({ a: 123 });
-    expect(d).toEqual({ b: "foo", c: { inner: 1 } });
-    expect(e).toEqual({ d: [1, 2, 3] });
-
-    expect(original).toEqual(originalCopy);
+  test("Reconcile a simple object on a nested path", () => {
+    createRoot(() => {
+      const [data, setData] = createSignal<{
+        data: { user: { firstName: string; middleName: string; lastName?: string } };
+      }>({
+        data: { user: { firstName: "John", middleName: "", lastName: "Snow" } },
+      });
+      const state = createImmutable(data);
+      expect(state.data.user.firstName).toBe("John");
+      expect(state.data.user.lastName).toBe("Snow");
+      setData({ data: { user: { firstName: "Jake", middleName: "R" } } });
+      expect(state.data.user.firstName).toBe("Jake");
+      expect(state.data.user.middleName).toBe("R");
+      expect(state.data.user.lastName).toBeUndefined();
+    });
   });
-});
 
-describe("get", () => {
-  test("get()", () => {
-    const original = {
-      a: 123,
-      b: "foo",
-      c: { inner: { x: "baz" } },
-      d: [1, 2, ["bar"]] as [number, number, string[]],
-    };
-    const originalCopy = cloneDeep(original);
-
-    expect(get(original, "a")).toBe(123);
-    expect(get(original, "c", "inner", "x")).toBe("baz");
-    expect(get(original, "d", 2, 0)).toBe("bar");
-    expect(original).toEqual(originalCopy);
+  test("Reconcile a simple object on a nested path with no prev state", () => {
+    createRoot(() => {
+      const [data, setData] = createSignal<{ user?: { firstName: string; middleName: string } }>(
+        {},
+      );
+      const state = createImmutable(data);
+      expect(state.user).toBeUndefined();
+      setData({ user: { firstName: "Jake", middleName: "R" } });
+      expect(state.user!.firstName).toBe("Jake");
+      expect(state.user!.middleName).toBe("R");
+    });
   });
-});
 
-describe("sortBy", () => {
-  test("sortBy()", () => {
-    const source = [
-      { x: "b", y: 4 },
-      { x: "a", y: 2 },
-      { x: "b", y: 3 },
-      { x: "a", y: 1 },
-    ];
-
-    expect(sortBy(source, ({ x }) => x)).toEqual([
-      { x: "a", y: 2 },
-      { x: "a", y: 1 },
-      { x: "b", y: 4 },
-      { x: "b", y: 3 },
-    ]);
-
-    expect(sortBy(source, ["x", "y"])).toEqual([
-      { x: "a", y: 1 },
-      { x: "a", y: 2 },
-      { x: "b", y: 3 },
-      { x: "b", y: 4 },
-    ]);
-
-    expect(sortBy(source, ({ y }) => y / 10)).toEqual([
-      { x: "a", y: 1 },
-      { x: "a", y: 2 },
-      { x: "b", y: 3 },
-      { x: "b", y: 4 },
-    ]);
+  test("Reconcile reorder a keyed array", () => {
+    createRoot(() => {
+      const JOHN = { id: 1, firstName: "John", lastName: "Snow" },
+        NED = { id: 2, firstName: "Ned", lastName: "Stark" },
+        BRANDON = { id: 3, firstName: "Brandon", lastName: "Start" },
+        ROBERT = { id: 4, firstName: "Robert", lastName: "Start" };
+      const [data, setData] = createSignal({ users: [JOHN, NED, BRANDON] });
+      const state = createImmutable(data);
+      expect(Object.is(unwrap(state.users[0]), JOHN)).toBe(true);
+      expect(Object.is(unwrap(state.users[1]), NED)).toBe(true);
+      expect(Object.is(unwrap(state.users[2]), BRANDON)).toBe(true);
+      setData({ users: [NED, JOHN, BRANDON] });
+      expect(Object.is(unwrap(state.users[0]), NED)).toBe(true);
+      expect(Object.is(unwrap(state.users[1]), JOHN)).toBe(true);
+      expect(Object.is(unwrap(state.users[2]), BRANDON)).toBe(true);
+      setData({ users: [NED, BRANDON, JOHN] });
+      expect(Object.is(unwrap(state.users[0]), NED)).toBe(true);
+      expect(Object.is(unwrap(state.users[1]), BRANDON)).toBe(true);
+      expect(Object.is(unwrap(state.users[2]), JOHN)).toBe(true);
+      setData({ users: [NED, BRANDON, JOHN, ROBERT] });
+      expect(Object.is(unwrap(state.users[0]), NED)).toBe(true);
+      expect(Object.is(unwrap(state.users[1]), BRANDON)).toBe(true);
+      expect(Object.is(unwrap(state.users[2]), JOHN)).toBe(true);
+      expect(Object.is(unwrap(state.users[3]), ROBERT)).toBe(true);
+      setData({ users: [BRANDON, JOHN, ROBERT] });
+      expect(Object.is(unwrap(state.users[0]), BRANDON)).toBe(true);
+      expect(Object.is(unwrap(state.users[1]), JOHN)).toBe(true);
+      expect(Object.is(unwrap(state.users[2]), ROBERT)).toBe(true);
+    });
   });
-});
 
-describe("merge", () => {
-  test("merges", () => {
-    const a = { foo: "bar", arr: [1, 2, 3] };
-    const a_copy = cloneDeep(a);
-    const b = { foo: "baz", arr: [1, 2, 3], inner: { z: 123 } };
-    const b_copy = cloneDeep(b);
-    const c = { arr: [1, 2, 3, 4], inner: { z: 321 } };
-    const c_copy = cloneDeep(c);
-    const x = merge(a, b, c);
-    expect(a_copy).toEqual(a);
-    expect(b_copy).toEqual(b);
-    expect(c_copy).toEqual(c);
-    expect(x).toEqual({ foo: "baz", arr: [1, 2, 3, 4], inner: { z: 321 } });
+  test("Reconcile overwrite in non-keyed merge mode", () => {
+    createRoot(() => {
+      const JOHN = { id: 1, firstName: "John", lastName: "Snow" },
+        NED = { id: 2, firstName: "Ned", lastName: "Stark" },
+        BRANDON = { id: 3, firstName: "Brandon", lastName: "Start" };
+      const [data, setData] = createSignal({
+        users: [{ ...JOHN }, { ...NED }, { ...BRANDON }],
+      });
+      const state = createImmutable(data, {
+        merge: true,
+        key: null,
+      });
+      expect(state.users[0]!.id).toBe(1);
+      expect(state.users[0]!.firstName).toBe("John");
+      expect(state.users[1]!.id).toBe(2);
+      expect(state.users[1]!.firstName).toBe("Ned");
+      expect(state.users[2]!.id).toBe(3);
+      expect(state.users[2]!.firstName).toBe("Brandon");
+      setData({ users: [{ ...NED }, { ...JOHN }, { ...BRANDON }] });
+      expect(state.users[0]!.id).toBe(2);
+      expect(state.users[0]!.firstName).toBe("Ned");
+      expect(state.users[1]!.id).toBe(1);
+      expect(state.users[1]!.firstName).toBe("John");
+      expect(state.users[2]!.id).toBe(3);
+      expect(state.users[2]!.firstName).toBe("Brandon");
+    });
   });
-});
 
-describe("removeItems", () => {
-  test("removeItems", () => {
-    const res = removeItems([1, 2, 3, 4, 5, 6, 7, 8, 9], 2, 6, 7, 11);
-    expect(res).toEqual([1, 3, 4, 5, 8, 9]);
+  test("Reconcile top level key mismatch", () => {
+    createRoot(() => {
+      const JOHN = { id: 1, firstName: "John", lastName: "Snow" },
+        NED = { id: 2, firstName: "Ned", lastName: "Stark" };
+
+      const [data, setData] = createSignal(JOHN);
+      const user = createImmutable(data);
+      expect(user.id).toBe(1);
+      expect(user.firstName).toBe("John");
+      setData(NED);
+      expect(user.id).toBe(2);
+      expect(user.firstName).toBe("Ned");
+    });
   });
-});
 
-describe("filterInstance()", () => {
-  test("*", () => {
-    const num = 12345;
-    const string = "hello";
-    const el = document.createElement("div");
-    const svg = document.createElement("svg");
-    const list = [num, string, el, svg, string, null, undefined, NaN];
-    const copy = [num, string, el, svg, string, null, undefined, NaN];
+  test("Reconcile nested top level key mismatch", () => {
+    createRoot(() => {
+      const JOHN = { id: 1, firstName: "John", lastName: "Snow" },
+        NED = { id: 2, firstName: "Ned", lastName: "Stark" };
 
-    const a = filterInstance(list, Element, Number);
-    expect(a).toEqual([num, el, svg]);
-    const b = filterOutInstance(list, Element, Number);
-    expect(b).toEqual([string, string]);
-    expect(list, "nonmutable").toEqual(copy);
+      const [data, setData] = createSignal({ user: JOHN });
+      const user = createImmutable(data);
+      expect(user.user.id).toBe(1);
+      expect(user.user.firstName).toBe("John");
+      setData({ user: NED });
+      expect(user.user.id).toBe(2);
+      expect(user.user.firstName).toBe("Ned");
+    });
+  });
+
+  test("Reconcile top level key missing", () => {
+    createRoot(() => {
+      const [data, setData] = createSignal<{ id?: number; value?: string }>({
+        id: 0,
+        value: "value",
+      });
+      const store = createImmutable(data);
+      setData({});
+      expect(store.id).toBe(undefined);
+      expect(store.value).toBe(undefined);
+    });
   });
 });

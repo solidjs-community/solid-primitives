@@ -10,7 +10,7 @@
   "license": "MIT",
   "scripts": {
     "format": "prettier -w {site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html} --ignore-path .gitignore",
-    "lint:packages": "eslint --ignore-path .gitignore --max-warnings 0 packages/*/src/**",
+    "lint:packages": "eslint --ignore-path .gitignore --max-warnings 0 packages/*/src/**/*",
     "lint:tests": "eslint --ignore-path .gitignore packages/*/test/** --quiet --rule \"no-only-tests/no-only-tests: error\"",
     "lint": "concurrently pnpm:lint:*",
     "test:client": "cross-env CI=true vitest -c ./configs/vitest.config.ts",

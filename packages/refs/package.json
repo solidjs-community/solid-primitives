@@ -56,7 +56,6 @@
     "@solid-primitives/utils": "workspace:^6.0.0"
   },
   "devDependencies": {
-    "@solid-primitives/immutable": "workspace:^0.1.10",
     "solid-app-router": "^0.4.2",
     "solid-transition-group": "^0.2.2"
   },

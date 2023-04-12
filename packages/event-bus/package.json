@@ -54,7 +54,6 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/immutable": "workspace:^0.1.10",
     "@solid-primitives/utils": "workspace:^6.0.0"
   },
   "peerDependencies": {

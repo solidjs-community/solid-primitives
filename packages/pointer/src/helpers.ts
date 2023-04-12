@@ -1,4 +1,4 @@
-import { pick } from "@solid-primitives/immutable";
+import { pick } from "@solid-primitives/utils/immutable";
 import { Position } from "@solid-primitives/utils";
 import {
   AnyOnEventName,

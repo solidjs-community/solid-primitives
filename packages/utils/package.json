@@ -21,18 +21,33 @@
     "dist"
   ],
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index/index.cjs",
+  "module": "./dist/index/index.js",
+  "types": "./dist/index/index.d.ts",
   "browser": {},
   "exports": {
-    "import": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+    ".": {
+      "import": {
+        "types": "./dist/index/index.d.ts",
+        "default": "./dist/index/index.js"
+      },
+      "require": "./dist/index/index.cjs"
     },
-    "require": "./dist/index.cjs"
+    "./immutable": {
+      "import": {
+        "types": "./dist/immutable/index.d.ts",
+        "default": "./dist/immutable/index.js"
+      },
+      "require": "./dist/immutable/index.cjs"
+    }
   },
-  "typesVersions": {},
+  "typesVersions": {
+    "*": {
+      "immutable": [
+        "./dist/immutable/index.d.ts"
+      ]
+    }
+  },
   "scripts": {
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
