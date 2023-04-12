@@ -1,5 +1,5 @@
 import { Refs } from "@solid-primitives/refs";
-import { splice, update } from "@solid-primitives/immutable";
+import { splice, update } from "@solid-primitives/utils/immutable";
 import { createSignal } from "solid-js";
 import { Key } from "../src";
 import { TransitionGroup } from "solid-transition-group";
