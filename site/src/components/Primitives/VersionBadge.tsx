@@ -50,9 +50,7 @@ function createPackageVersion(source: Accessor<string>) {
   return () => memo()();
 }
 
-export const VersionBadge: ParentComponent<{ name: string }> = props => {
-  const version = createPackageVersion(() => props.name);
-
+export const VersionBadge: ParentComponent<{ name: string; version: string }> = props => {
   return (
     <a
       class="flex h-[28px] min-w-[90px] items-baseline justify-center rounded-md border-2 border-[#cae0ff] bg-[#cae0ff40] font-sans transition-colors hover:border-[#80a7de] hover:bg-[#cae0ff66] dark:border-[#5577a7] dark:bg-[#6eaaff14] dark:hover:border-[#8ba8d3] dark:hover:bg-[#6eaaff33]"
@@ -61,7 +59,7 @@ export const VersionBadge: ParentComponent<{ name: string }> = props => {
       target="_blank"
     >
       <span class="text-[14px] font-semibold text-[#7689a4] dark:text-[#8b9eba]">v</span>
-      {version()}
+      {props.version}
     </a>
   );
 };

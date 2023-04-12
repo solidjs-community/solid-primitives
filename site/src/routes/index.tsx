@@ -133,7 +133,7 @@ const PrimitivesTable: Component<{ packages: PackageListItem[] | undefined }> = 
                         ))}
                       </Table.TD>
                       <Table.TD>
-                        <VersionBadge name={pkg.name} />
+                        <VersionBadge name={pkg.name} version={pkg.version} />
                       </Table.TD>
                     </Table.TR>
                   ))}
