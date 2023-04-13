@@ -64,9 +64,10 @@ export const VersionBadge: ParentComponent<{ name: string; version: string }> = 
   );
 };
 
-export const VersionBadgePill: ParentComponent<{ name: string }> = props => {
-  const version = createPackageVersion(() => props.name);
-
+export const VersionBadgePill: ParentComponent<{
+  name: string;
+  version: string | undefined;
+}> = props => {
   return (
     <a
       class="transition-filter flex font-sans hover:contrast-[1.2]"
@@ -79,7 +80,7 @@ export const VersionBadgePill: ParentComponent<{ name: string }> = props => {
       </div>
       <div class="background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#cae0ff,#c0c8ff)_border-box] dark:background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#405b6e,#46659a)_border-box] flex h-full min-w-[90px] items-center justify-center rounded-r-lg border-[3px] border-l-0 border-transparent font-semibold">
         <span>v</span>
-        {version()}
+        {props.version}
       </div>
     </a>
   );
