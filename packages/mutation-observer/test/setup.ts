@@ -32,18 +32,54 @@ const createMockMutationRecord = (
 
 // @ts-ignore
 export class MutationObserver {
-  public records: [Node, MutationObserverInit][] = [];
+  public elements: [Node, MutationObserverInit][] = [];
+  public records: MutationRecord[] = [];
+  private abortCallbacks: (() => void)[] = [];
+
   constructor(public callback: MutationCallback) {
     instances.push(this);
   }
+
   disconnect() {
     this.records = [];
+    this.elements = [];
+    this.__abort();
   }
   observe(el: Node, options: MutationObserverInit) {
-    this.records.push([el, options]);
+    this.elements.push([el, options]);
   }
   takeRecords(): MutationRecord[] {
-    return this.records.map(([node]) => createMockMutationRecord(node));
+    const records = this.records;
+    this.records = [];
+    this.__abort();
+    return records;
+  }
+
+  __abort() {
+    this.abortCallbacks.forEach(cb => cb());
+    this.abortCallbacks = [];
+  }
+  __simulateMutation() {
+    if (this.elements.length === 0) return;
+
+    this.records.push(...this.elements.map(([node]) => createMockMutationRecord(node)));
+
+    let isAborted = false;
+    const stop = () => {
+      isAborted = true;
+    };
+    this.abortCallbacks.push(stop);
+
+    queueMicrotask(() => {
+      if (!isAborted) {
+        this.callback(this.records, this);
+        this.records = [];
+        this.abortCallbacks.splice(this.abortCallbacks.indexOf(stop), 1);
+        stop();
+      }
+    });
+
+    return stop;
   }
 }
 global.MutationObserver = MutationObserver;
