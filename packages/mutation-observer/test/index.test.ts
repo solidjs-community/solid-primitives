@@ -42,10 +42,10 @@ describe("mutation-observer", () => {
       const [, { instance, start, stop }] = createMutationObserver(parent, config, e => {});
       start();
 
-      expect((instance as MutationObserver).records[0]).toEqual([parent, config]);
+      expect((instance as MutationObserver).elements[0]).toEqual([parent, config]);
 
       stop();
-      expect((instance as MutationObserver).records).toHaveLength(0);
+      expect((instance as MutationObserver).elements).toHaveLength(0);
 
       dispose();
     }));
@@ -65,14 +65,14 @@ describe("mutation-observer", () => {
       );
       start();
 
-      expect((instance as MutationObserver).records).toEqual([
+      expect((instance as MutationObserver).elements).toEqual([
         [parent, config],
         [parent1, config],
         [parent2, config],
       ]);
 
       stop();
-      expect((instance as MutationObserver).records).toHaveLength(0);
+      expect((instance as MutationObserver).elements).toHaveLength(0);
 
       dispose();
     }));
@@ -97,14 +97,14 @@ describe("mutation-observer", () => {
       );
       start();
 
-      expect((instance as MutationObserver).records).toEqual([
+      expect((instance as MutationObserver).elements).toEqual([
         [parent, config],
         [parent1, config1],
         [parent2, config2],
       ]);
 
       stop();
-      expect((instance as MutationObserver).records).toHaveLength(0);
+      expect((instance as MutationObserver).elements).toHaveLength(0);
 
       dispose();
     }));
@@ -122,19 +122,19 @@ describe("mutation-observer", () => {
 
       const [add, { instance, start, stop }] = createMutationObserver(parent, config, e => {});
       start();
-      expect((instance as MutationObserver).records[0]).toEqual([parent, config]);
+      expect((instance as MutationObserver).elements[0]).toEqual([parent, config]);
 
       add(parent1, config1);
-      expect((instance as MutationObserver).records[1]).toEqual([parent1, config1]);
+      expect((instance as MutationObserver).elements[1]).toEqual([parent1, config1]);
 
       add(parent2);
-      expect((instance as MutationObserver).records[2]).toEqual([parent2, config]);
+      expect((instance as MutationObserver).elements[2]).toEqual([parent2, config]);
 
       add(parent3, () => config2);
-      expect((instance as MutationObserver).records[3]).toEqual([parent3, config2]);
+      expect((instance as MutationObserver).elements[3]).toEqual([parent3, config2]);
 
       stop();
-      expect((instance as MutationObserver).records).toHaveLength(0);
+      expect((instance as MutationObserver).elements).toHaveLength(0);
 
       dispose();
     }));
@@ -146,7 +146,85 @@ describe("mutation-observer", () => {
 
       mutationObserver(parent, () => [config, () => {}]);
 
-      expect(instances[instances.length - 1].records).toEqual([[parent, config]]);
+      expect(instances[instances.length - 1].elements).toEqual([[parent, config]]);
+
+      dispose();
+    }));
+
+  it("fire mutation events", () =>
+    createRoot(async dispose => {
+      const config = { childList: true };
+      const parent = document.createElement("div");
+
+      let count = 0;
+      const [, { start }] = createMutationObserver(parent, config, e => {
+        count++;
+      });
+      start();
+
+      instances[instances.length - 1].__simulateMutation();
+
+      await new Promise(resolve => setTimeout(resolve, 0));
+      expect(count).toBe(1);
+
+      dispose();
+    }));
+
+  it("stop firing on stop", () =>
+    createRoot(async dispose => {
+      const config = { childList: true };
+      const parent = document.createElement("div");
+
+      let count = 0;
+      const [, { start, stop }] = createMutationObserver(parent, config, e => {
+        count++;
+      });
+      start();
+
+      stop();
+
+      instances[instances.length - 1].__simulateMutation();
+      await new Promise(resolve => setTimeout(resolve, 0));
+      expect(count).toBe(0);
+
+      dispose();
+    }));
+
+  it("stop firing on dispose", () =>
+    createRoot(async dispose => {
+      const config = { childList: true };
+      const parent = document.createElement("div");
+
+      let count = 0;
+      const [, { start }] = createMutationObserver(parent, config, e => {
+        count++;
+      });
+      start();
+
+      dispose();
+
+      instances[instances.length - 1].__simulateMutation();
+      await new Promise(resolve => setTimeout(resolve, 0));
+      expect(count).toBe(0);
+    }));
+
+  it("stop firing on stop while still have pending records", () =>
+    createRoot(async dispose => {
+      const config = { childList: true };
+      const parent = document.createElement("div");
+
+      let count = 0;
+      const [, { start, stop }] = createMutationObserver(parent, config, e => {
+        count++;
+      });
+      start();
+
+      instances[instances.length - 1].__simulateMutation();
+
+      stop();
+
+      await new Promise(resolve => setTimeout(resolve, 0));
+      expect(count).toBe(0);
 
       dispose();
     }));
