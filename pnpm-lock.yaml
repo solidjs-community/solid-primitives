@@ -108,7 +108,7 @@ importers:
         version: 0.50.6(postcss@8.4.21)(rollup@3.20.2)(vite@4.2.1)
       vite:
         specifier: ^4.2.1
-        version: 4.2.1(@types/node@18.15.11)
+        version: 4.2.1(@types/node@18.15.11)(sass@1.60.0)
       vite-plugin-solid:
         specifier: ^2.7.0
         version: 2.7.0(solid-js@1.7.2)(vite@4.2.1)
@@ -126,13 +126,13 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/analytics:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/audio:
     dependencies:
@@ -144,11 +144,11 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       solid-heroicons:
         specifier: ^3.1.1
-        version: 3.1.1(solid-js@1.7.0)
+        version: 3.1.1(solid-js@1.7.2)
 
   packages/autofocus:
     dependencies:
@@ -157,7 +157,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/bounds:
     dependencies:
@@ -175,7 +175,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       '@solid-primitives/scheduled':
         specifier: workspace:^1.3.2
@@ -185,7 +185,7 @@ importers:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/clipboard:
     dependencies:
@@ -194,7 +194,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/connectivity:
     dependencies:
@@ -209,13 +209,13 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/context:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/controlled-props:
     dependencies:
@@ -224,7 +224,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/cursor:
     dependencies:
@@ -233,7 +233,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/date:
     dependencies:
@@ -248,7 +248,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       '@solid-primitives/event-listener':
         specifier: workspace:^2.2.10
@@ -261,7 +261,7 @@ importers:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/destructure:
     dependencies:
@@ -270,13 +270,13 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/devices:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/event-bus:
     dependencies:
@@ -285,13 +285,13 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/event-dispatcher:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/event-listener:
     dependencies:
@@ -300,13 +300,13 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/event-props:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/fetch:
     dependencies:
@@ -315,7 +315,7 @@ importers:
         version: 3.3.1
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/filesystem:
     dependencies:
@@ -324,7 +324,7 @@ importers:
         version: 3.5.3
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       '@tauri-apps/api':
         specifier: ^1.2.0
@@ -337,13 +337,13 @@ importers:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/fullscreen:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/geolocation:
     dependencies:
@@ -355,7 +355,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       '@types/leaflet':
         specifier: ^1.9.3
@@ -377,7 +377,7 @@ importers:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/graphql:
     dependencies:
@@ -392,11 +392,11 @@ importers:
         version: 16.6.0
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       '@graphql-codegen/cli':
         specifier: ^3.2.2
-        version: 3.2.2(@babel/core@7.21.3)(graphql@16.6.0)
+        version: 3.2.2(@babel/core@7.21.3)(@types/node@18.15.11)(graphql@16.6.0)
       '@graphql-codegen/typed-document-node':
         specifier: ^3.0.2
         version: 3.0.2(graphql@16.6.0)
@@ -414,13 +414,13 @@ importers:
         version: link:../context
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/idle:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/immutable:
     dependencies:
@@ -432,7 +432,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       '@reduxjs/toolkit':
         specifier: ^1.9.3
@@ -442,13 +442,13 @@ importers:
         version: 4.2.1
       solid-transition-group:
         specifier: ^0.2.2
-        version: 0.2.2(solid-js@1.7.0)
+        version: 0.2.2(solid-js@1.7.2)
 
   packages/input-mask:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/intersection-observer:
     dependencies:
@@ -457,7 +457,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       '@solid-primitives/range':
         specifier: workspace:^0.1.11
@@ -470,7 +470,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/keyboard:
     dependencies:
@@ -485,13 +485,13 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/keyed:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       '@solid-primitives/refs':
         specifier: workspace:^1.0.2
@@ -501,13 +501,13 @@ importers:
         version: link:../utils
       solid-transition-group:
         specifier: ^0.2.2
-        version: 0.2.2(solid-js@1.7.0)
+        version: 0.2.2(solid-js@1.7.2)
 
   packages/lifecycle:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/map:
     dependencies:
@@ -516,7 +516,7 @@ importers:
         version: link:../trigger
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/media:
     dependencies:
@@ -534,7 +534,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/memo:
     dependencies:
@@ -546,14 +546,14 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       '@solid-primitives/mouse':
         specifier: workspace:^2.0.11
         version: link:../mouse
       '@solidjs/router':
         specifier: ^0.8.2
-        version: 0.8.2(solid-js@1.7.0)
+        version: 0.8.2(solid-js@1.7.2)
 
   packages/mouse:
     dependencies:
@@ -571,7 +571,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       '@solid-primitives/raf':
         specifier: workspace:^2.1.10
@@ -584,11 +584,11 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       '@solid-primitives/composites':
         specifier: ^1.1.1
-        version: 1.1.1(solid-js@1.7.0)
+        version: 1.1.1(solid-js@1.7.2)
 
   packages/page-visibility:
     dependencies:
@@ -603,7 +603,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/pagination:
     dependencies:
@@ -615,19 +615,19 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/permission:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/platform:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/pointer:
     dependencies:
@@ -642,7 +642,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/promise:
     dependencies:
@@ -651,7 +651,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/props:
     dependencies:
@@ -660,7 +660,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       nanospy:
         specifier: ^0.5.0
@@ -673,7 +673,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/range:
     dependencies:
@@ -682,11 +682,11 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       solid-transition-group:
         specifier: ^0.2.2
-        version: 0.2.2(solid-js@1.7.0)
+        version: 0.2.2(solid-js@1.7.2)
 
   packages/refs:
     dependencies:
@@ -695,14 +695,14 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       solid-app-router:
         specifier: ^0.4.2
-        version: 0.4.2(solid-js@1.7.0)
+        version: 0.4.2(solid-js@1.7.2)
       solid-transition-group:
         specifier: ^0.2.2
-        version: 0.2.2(solid-js@1.7.0)
+        version: 0.2.2(solid-js@1.7.2)
 
   packages/resize-observer:
     dependencies:
@@ -720,13 +720,13 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/resource:
     dependencies:
       solid-js:
         specifier: ^1.6.0
-        version: 1.7.0
+        version: 1.7.2
 
   packages/rootless:
     dependencies:
@@ -735,26 +735,26 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/scheduled:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       '@solid-primitives/timer':
         specifier: workspace:^1.3.7
         version: link:../timer
       '@solidjs/router':
         specifier: ^0.8.2
-        version: 0.8.2(solid-js@1.7.0)
+        version: 0.8.2(solid-js@1.7.2)
 
   packages/script-loader:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/scroll:
     dependencies:
@@ -769,13 +769,13 @@ importers:
         version: link:../static-store
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/selection:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/set:
     dependencies:
@@ -784,13 +784,13 @@ importers:
         version: link:../trigger
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/share:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/signal-builders:
     dependencies:
@@ -799,7 +799,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/static-store:
     dependencies:
@@ -808,7 +808,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/storage:
     dependencies:
@@ -817,7 +817,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/stream:
     dependencies:
@@ -826,7 +826,7 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/styles:
     dependencies:
@@ -838,19 +838,19 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/timer:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/transition-group:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
     devDependencies:
       '@solid-primitives/refs':
         specifier: workspace:^1.0.2
@@ -860,7 +860,7 @@ importers:
         version: link:../utils
       '@solidjs/router':
         specifier: ^0.8.2
-        version: 0.8.2(solid-js@1.7.0)
+        version: 0.8.2(solid-js@1.7.2)
 
   packages/trigger:
     dependencies:
@@ -869,13 +869,13 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/tween:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/upload:
     dependencies:
@@ -884,25 +884,25 @@ importers:
         version: link:../utils
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/utils:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/websocket:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   packages/workers:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.0
+        version: 1.7.2
 
   site:
     dependencies:
@@ -2769,7 +2769,7 @@ packages:
       purgecss: 2.3.0
     dev: true
 
-  /@graphql-codegen/cli@3.2.2(@babel/core@7.21.3)(graphql@16.6.0):
+  /@graphql-codegen/cli@3.2.2(@babel/core@7.21.3)(@types/node@18.15.11)(graphql@16.6.0):
     resolution: {integrity: sha512-u+dm/SW1heLnUL4Tyf5Uv0AxOFhTCmUPHKwRLq2yE8MPhv7+Ti4vxxUP/XGoaMNRuHlN37wLI7tpFLV1Hhm22Q==}
     hasBin: true
     peerDependencies:
@@ -2787,8 +2787,8 @@ packages:
       '@graphql-tools/graphql-file-loader': 7.5.16(graphql@16.6.0)
       '@graphql-tools/json-file-loader': 7.4.17(graphql@16.6.0)
       '@graphql-tools/load': 7.8.13(graphql@16.6.0)
-      '@graphql-tools/prisma-loader': 7.2.66(graphql@16.6.0)
-      '@graphql-tools/url-loader': 7.17.14(graphql@16.6.0)
+      '@graphql-tools/prisma-loader': 7.2.66(@types/node@18.15.11)(graphql@16.6.0)
+      '@graphql-tools/url-loader': 7.17.14(@types/node@18.15.11)(graphql@16.6.0)
       '@graphql-tools/utils': 9.2.1(graphql@16.6.0)
       '@parcel/watcher': 2.1.0
       '@whatwg-node/fetch': 0.8.4
@@ -2797,7 +2797,7 @@ packages:
       debounce: 1.2.1
       detect-indent: 6.1.0
       graphql: 16.6.0
-      graphql-config: 4.5.0(graphql@16.6.0)
+      graphql-config: 4.5.0(@types/node@18.15.11)(graphql@16.6.0)
       inquirer: 8.2.5
       is-glob: 4.0.3
       jiti: 1.18.2
@@ -3003,7 +3003,7 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@graphql-tools/executor-http@0.1.9(graphql@16.6.0):
+  /@graphql-tools/executor-http@0.1.9(@types/node@18.15.11)(graphql@16.6.0):
     resolution: {integrity: sha512-tNzMt5qc1ptlHKfpSv9wVBVKCZ7gks6Yb/JcYJluxZIT4qRV+TtOFjpptfBU63usgrGVOVcGjzWc/mt7KhmmpQ==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
@@ -3014,7 +3014,7 @@ packages:
       dset: 3.1.2
       extract-files: 11.0.0
       graphql: 16.6.0
-      meros: 1.2.1
+      meros: 1.2.1(@types/node@18.15.11)
       tslib: 2.5.0
       value-or-promise: 1.0.12
     transitivePeerDependencies:
@@ -3168,12 +3168,12 @@ packages:
       tslib: 2.5.0
     dev: true
 
-  /@graphql-tools/prisma-loader@7.2.66(graphql@16.6.0):
+  /@graphql-tools/prisma-loader@7.2.66(@types/node@18.15.11)(graphql@16.6.0):
     resolution: {integrity: sha512-20YuvZbVMD3ZFjE4fkmLIiNy4Py7L5NALRB2LNl6lAfX6+2tTfItbVrs4kRzxDviT+3e4FfexLCZIBPD3Sp9kg==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
-      '@graphql-tools/url-loader': 7.17.14(graphql@16.6.0)
+      '@graphql-tools/url-loader': 7.17.14(@types/node@18.15.11)(graphql@16.6.0)
       '@graphql-tools/utils': 9.2.1(graphql@16.6.0)
       '@types/js-yaml': 4.0.5
       '@types/json-stable-stringify': 1.0.34
@@ -3226,7 +3226,7 @@ packages:
       value-or-promise: 1.0.12
     dev: true
 
-  /@graphql-tools/url-loader@7.17.14(graphql@16.6.0):
+  /@graphql-tools/url-loader@7.17.14(@types/node@18.15.11)(graphql@16.6.0):
     resolution: {integrity: sha512-7boEmrZlbViqQSSvu2VFCGi9YAY7E0BCVObiv1sLYbFR+62mo825As0haU5l7wlx1zCDyUlOleNz+X2jVvBbSQ==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
@@ -3234,7 +3234,7 @@ packages:
       '@ardatan/sync-fetch': 0.0.1
       '@graphql-tools/delegate': 9.0.28(graphql@16.6.0)
       '@graphql-tools/executor-graphql-ws': 0.0.12(graphql@16.6.0)
-      '@graphql-tools/executor-http': 0.1.9(graphql@16.6.0)
+      '@graphql-tools/executor-http': 0.1.9(@types/node@18.15.11)(graphql@16.6.0)
       '@graphql-tools/executor-legacy-ws': 0.0.9(graphql@16.6.0)
       '@graphql-tools/utils': 9.2.1(graphql@16.6.0)
       '@graphql-tools/wrap': 9.3.8(graphql@16.6.0)
@@ -3766,7 +3766,7 @@ packages:
       '@solid-primitives/cursor': 0.0.105(solid-js@1.7.2)
       '@solid-primitives/event-bus': 1.0.3(solid-js@1.7.2)
       '@solid-primitives/event-listener': 2.2.10(solid-js@1.7.2)
-      '@solid-primitives/keyboard': 1.0.12(solid-js@1.7.2)
+      '@solid-primitives/keyboard': 1.1.0(solid-js@1.7.2)
       '@solid-primitives/platform': 0.0.103(solid-js@1.7.2)
       '@solid-primitives/scheduled': 1.3.2(solid-js@1.7.2)
       '@solid-primitives/utils': 5.5.2(solid-js@1.7.2)
@@ -3802,14 +3802,14 @@ packages:
       solid-js: 1.7.2
     dev: true
 
-  /@solid-primitives/composites@1.1.1(solid-js@1.7.0):
+  /@solid-primitives/composites@1.1.1(solid-js@1.7.2):
     resolution: {integrity: sha512-eNi1jnUJehBjcVQvod8N1uz91Cn3KvJn/HJIPHUVpnpDj8dFhu5eHJtsiEdNBFJFOR/pPmf9RhJG0pKoTdPz6g==}
     peerDependencies:
       solid-js: ^1.3.1
     dependencies:
-      '@solid-primitives/debounce': 1.3.0(solid-js@1.7.0)
-      '@solid-primitives/throttle': 1.2.0(solid-js@1.7.0)
-      solid-js: 1.7.0
+      '@solid-primitives/debounce': 1.3.0(solid-js@1.7.2)
+      '@solid-primitives/throttle': 1.2.0(solid-js@1.7.2)
+      solid-js: 1.7.2
     dev: true
 
   /@solid-primitives/cursor@0.0.105(solid-js@1.7.2):
@@ -3821,13 +3821,13 @@ packages:
       solid-js: 1.7.2
     dev: true
 
-  /@solid-primitives/debounce@1.3.0(solid-js@1.7.0):
+  /@solid-primitives/debounce@1.3.0(solid-js@1.7.2):
     resolution: {integrity: sha512-Cen4ccCPTuEtQM7o9aEKuOJ0LRlAnzKvN7loEBBOQ+zKdu7/7kYKr7HHE/WS8JAI3QeQr5v2ModYRIZLERw5zw==}
     deprecated: debounce primitive moved to @solid-primitives/scheduled
     peerDependencies:
       solid-js: '>=1.0.0'
     dependencies:
-      solid-js: 1.7.0
+      solid-js: 1.7.2
     dev: true
 
   /@solid-primitives/event-bus@1.0.3(solid-js@1.7.2):
@@ -3858,8 +3858,8 @@ packages:
       solid-js: 1.7.2
     dev: true
 
-  /@solid-primitives/keyboard@1.0.12(solid-js@1.7.2):
-    resolution: {integrity: sha512-MbuFr6fhRJLGNtXqw7IarNeJvajL1S7kMuZwNTI74jZz4jD1g6LVsniIkEMlMUDi42h8QIY3JsSF8MhqdIAKmQ==}
+  /@solid-primitives/keyboard@1.1.0(solid-js@1.7.2):
+    resolution: {integrity: sha512-1DLX2bfkxqlBjzyhtAtuXoWfySTrmop0v3xZYpBNhDF7XlZLLqnwZJWip4SkPOMOmNEhvXaBM5OAe86Nh3T52g==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
@@ -3900,13 +3900,13 @@ packages:
       solid-js: 1.7.2
     dev: true
 
-  /@solid-primitives/refs@1.0.1(solid-js@1.7.0):
+  /@solid-primitives/refs@1.0.1(solid-js@1.7.2):
     resolution: {integrity: sha512-1DYJCbAYVr1qGtKhexxYt0IA4VKgQFmgO6pSqW98p6XwNO2kqJwKb6wVMBSCggLdresE0mqBSTyYPPIE1sxMJQ==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
-      '@solid-primitives/utils': 5.5.2(solid-js@1.7.0)
-      solid-js: 1.7.0
+      '@solid-primitives/utils': 5.5.2(solid-js@1.7.2)
+      solid-js: 1.7.2
     dev: true
 
   /@solid-primitives/resize-observer@2.0.13(solid-js@1.7.2):
@@ -3955,29 +3955,21 @@ packages:
       solid-js: 1.7.2
     dev: true
 
-  /@solid-primitives/throttle@1.2.0(solid-js@1.7.0):
+  /@solid-primitives/throttle@1.2.0(solid-js@1.7.2):
     resolution: {integrity: sha512-qYKYEgGl/nSCF+wq7H6zFFi8s2e/woFZJkZbCbyUrtbEIvCze4xSZRr64Xi067GlBE+T/N4LZX/htJmLfwkAeg==}
     deprecated: throttle primitive moved to @solid-primitives/scheduled
     peerDependencies:
       solid-js: ^1.3.1
     dependencies:
-      solid-js: 1.7.0
+      solid-js: 1.7.2
     dev: true
 
-  /@solid-primitives/transition-group@1.0.1(solid-js@1.7.0):
+  /@solid-primitives/transition-group@1.0.1(solid-js@1.7.2):
     resolution: {integrity: sha512-StVQs7BVGQa1uo6dD19wqOgfGMxu3gL/bvPHUV/NBJaiNX5R5e7dPb6lz6zR1RdTho3M+3Mv8jUHKd/aKuhL4w==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
-      solid-js: 1.7.0
-    dev: true
-
-  /@solid-primitives/utils@5.5.2(solid-js@1.7.0):
-    resolution: {integrity: sha512-L52ig3eHKU6CqbPCKJIb4lweBuINHBOERcE1duApyKozEN8+zCqEKwD1Qo9ljKeEzJTBGWClxNpwEiNTUWTGvg==}
-    peerDependencies:
-      solid-js: ^1.6.12
-    dependencies:
-      solid-js: 1.7.0
+      solid-js: 1.7.2
     dev: true
 
   /@solid-primitives/utils@5.5.2(solid-js@1.7.2):
@@ -4002,14 +3994,6 @@ packages:
       solid-js: '>=1.4.0'
     dependencies:
       solid-js: 1.7.2
-
-  /@solidjs/router@0.8.2(solid-js@1.7.0):
-    resolution: {integrity: sha512-gUKW+LZqxtX6y/Aw6JKyy4gQ9E7dLqp513oB9pSYJR1HM5c56Pf7eijzyXX+b3WuXig18Cxqah4tMtF0YGu80w==}
-    peerDependencies:
-      solid-js: ^1.5.3
-    dependencies:
-      solid-js: 1.7.0
-    dev: true
 
   /@solidjs/router@0.8.2(solid-js@1.7.2):
     resolution: {integrity: sha512-gUKW+LZqxtX6y/Aw6JKyy4gQ9E7dLqp513oB9pSYJR1HM5c56Pf7eijzyXX+b3WuXig18Cxqah4tMtF0YGu80w==}
@@ -4582,7 +4566,7 @@ packages:
       chokidar: 3.5.3
       fast-glob: 3.2.12
       magic-string: 0.30.0
-      vite: 4.2.1(@types/node@18.15.11)
+      vite: 4.2.1(@types/node@18.15.11)(sass@1.60.0)
     transitivePeerDependencies:
       - rollup
     dev: true
@@ -5465,7 +5449,7 @@ packages:
     dev: true
 
   /concat-map@0.0.1:
-    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
+    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
     dev: true
 
   /concurrently@8.0.1:
@@ -5871,7 +5855,7 @@ packages:
     dev: true
 
   /ee-first@1.1.1:
-    resolution: {integrity: sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=}
+    resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
     dev: true
 
   /electron-to-chromium@1.4.345:
@@ -6947,7 +6931,7 @@ packages:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
     dev: true
 
-  /graphql-config@4.5.0(graphql@16.6.0):
+  /graphql-config@4.5.0(@types/node@18.15.11)(graphql@16.6.0):
     resolution: {integrity: sha512-x6D0/cftpLUJ0Ch1e5sj1TZn6Wcxx4oMfmhaG9shM0DKajA9iR+j1z86GSTQ19fShbGvrSSvbIQsHku6aQ6BBw==}
     engines: {node: '>= 10.0.0'}
     peerDependencies:
@@ -6961,7 +6945,7 @@ packages:
       '@graphql-tools/json-file-loader': 7.4.17(graphql@16.6.0)
       '@graphql-tools/load': 7.8.13(graphql@16.6.0)
       '@graphql-tools/merge': 8.4.0(graphql@16.6.0)
-      '@graphql-tools/url-loader': 7.17.14(graphql@16.6.0)
+      '@graphql-tools/url-loader': 7.17.14(@types/node@18.15.11)(graphql@16.6.0)
       '@graphql-tools/utils': 9.2.1(graphql@16.6.0)
       cosmiconfig: 8.0.0
       graphql: 16.6.0
@@ -8416,7 +8400,7 @@ packages:
     engines: {node: '>= 8'}
     dev: true
 
-  /meros@1.2.1:
+  /meros@1.2.1(@types/node@18.15.11):
     resolution: {integrity: sha512-R2f/jxYqCAGI19KhAvaxSOxALBMkaXWH2a7rOyqQw+ZmizX5bKkEYWLzdhC+U82ZVVPVp6MCXe3EkVligh+12g==}
     engines: {node: '>=13'}
     peerDependencies:
@@ -8424,6 +8408,8 @@ packages:
     peerDependenciesMeta:
       '@types/node':
         optional: true
+    dependencies:
+      '@types/node': 18.15.11
     dev: true
 
   /micromark-core-commonmark@1.0.6:
@@ -10267,12 +10253,12 @@ packages:
       tslib: 2.5.0
     dev: true
 
-  /solid-app-router@0.4.2(solid-js@1.7.0):
+  /solid-app-router@0.4.2(solid-js@1.7.2):
     resolution: {integrity: sha512-+NrLcmqYssx8DcbpcLBaYPqfTRtS+rkfbxMhLH8MHfTcTkdZfrkWQK7lsUvuPCebGEzfaPZJvHqBwhPrCXAmxg==}
     peerDependencies:
       solid-js: ^1.3.5
     dependencies:
-      solid-js: 1.7.0
+      solid-js: 1.7.2
     dev: true
 
   /solid-devtools@0.26.0(@solidjs/meta@0.28.2)(@solidjs/router@0.8.2)(solid-js@1.7.2)(vite@4.2.1):
@@ -10290,9 +10276,9 @@ packages:
       '@solid-primitives/utils': 5.5.2(solid-js@1.7.2)
       solid-js: 1.7.2
       type-fest: 3.7.2
-      vite: 4.2.1(@types/node@18.15.11)
+      vite: 4.2.1(@types/node@18.15.11)(sass@1.60.0)
     optionalDependencies:
-      solid-start: 0.2.24(@solidjs/meta@0.28.2)(@solidjs/router@0.8.2)(solid-js@1.7.2)(vite@4.2.1)
+      solid-start: 0.2.24(@solidjs/meta@0.28.2)(@solidjs/router@0.8.2)(solid-js@1.7.2)(solid-start-static@0.2.24)(vite@4.2.1)
     transitivePeerDependencies:
       - '@solidjs/meta'
       - '@solidjs/router'
@@ -10315,12 +10301,12 @@ packages:
       solid-js: 1.7.2
     dev: false
 
-  /solid-heroicons@3.1.1(solid-js@1.7.0):
+  /solid-heroicons@3.1.1(solid-js@1.7.2):
     resolution: {integrity: sha512-wfU/SqxqxWxInvfFlKJfCBPnJ94Zq1GQFiFL3M0KwZzT81lSF5yIC4HA/Czp3DYrn+dUumjO0qdrx8Ab3cy2sA==}
     peerDependencies:
       solid-js: '>= ^1.2.5'
     dependencies:
-      solid-js: 1.7.0
+      solid-js: 1.7.2
     dev: true
 
   /solid-icons@1.0.4(solid-js@1.7.2):
@@ -10331,12 +10317,6 @@ packages:
     dependencies:
       solid-js: 1.7.2
     dev: false
-
-  /solid-js@1.7.0:
-    resolution: {integrity: sha512-tLG68KWlVRgzYeAW003G3E70emZqTcqCKJR9QoGr0rcuiLIuKrlUoezT8jLME1YSl3Wfu35jzgeY10iLEY4YQQ==}
-    dependencies:
-      csstype: 3.1.1
-      seroval: 0.5.1
 
   /solid-js@1.7.2:
     resolution: {integrity: sha512-01f8GIc+HTTlfDXtK+TFku3AllHyJ3hNsIpxM2qpObRP4VbEGVIP6VbULnThPlpse+J1y/I/1N9QeQ9MNkE8Ow==}
@@ -10382,7 +10362,7 @@ packages:
       solid-ssr: 1.7.0
       solid-start: 0.2.24(@solidjs/meta@0.28.2)(@solidjs/router@0.8.2)(solid-js@1.7.2)(solid-start-static@0.2.24)(vite@4.2.1)
       undici: 5.21.0
-      vite: 4.2.1(sass@1.60.0)
+      vite: 4.2.1(@types/node@18.15.11)(sass@1.60.0)
     dev: true
 
   /solid-start@0.2.24(@solidjs/meta@0.28.2)(@solidjs/router@0.8.2)(solid-js@1.7.2)(solid-start-static@0.2.24)(vite@4.2.1):
@@ -10451,87 +10431,13 @@ packages:
       solid-start-static: 0.2.24(solid-start@0.2.24)(undici@5.21.0)(vite@4.2.1)
       terser: 5.16.8
       undici: 5.21.0
-      vite: 4.2.1(sass@1.60.0)
+      vite: 4.2.1(@types/node@18.15.11)(sass@1.60.0)
       vite-plugin-inspect: 0.7.18(rollup@3.20.2)(vite@4.2.1)
-      vite-plugin-solid: 2.6.1(solid-js@1.7.2)(vite@4.2.1)
+      vite-plugin-solid: 2.7.0(solid-js@1.7.2)(vite@4.2.1)
       wait-on: 6.0.1(debug@4.3.4)
     transitivePeerDependencies:
       - supports-color
     dev: true
-
-  /solid-start@0.2.24(@solidjs/meta@0.28.2)(@solidjs/router@0.8.2)(solid-js@1.7.2)(vite@4.2.1):
-    resolution: {integrity: sha512-7nbl4mRiWwts7KN4ep1vT4eRcjacB6StdP/JalaCWtovpX0EctcEwXpJQeHKkGCL+J0n3M+aph0qkzUyJ5tD6Q==}
-    hasBin: true
-    peerDependencies:
-      '@solidjs/meta': ^0.28.0
-      '@solidjs/router': ^0.8.2
-      solid-js: ^1.6.2
-      solid-start-aws: '*'
-      solid-start-cloudflare-pages: '*'
-      solid-start-cloudflare-workers: '*'
-      solid-start-deno: '*'
-      solid-start-netlify: '*'
-      solid-start-node: '*'
-      solid-start-static: '*'
-      solid-start-vercel: '*'
-      vite: ^4.1.4
-    peerDependenciesMeta:
-      solid-start-aws:
-        optional: true
-      solid-start-cloudflare-pages:
-        optional: true
-      solid-start-cloudflare-workers:
-        optional: true
-      solid-start-deno:
-        optional: true
-      solid-start-netlify:
-        optional: true
-      solid-start-node:
-        optional: true
-      solid-start-static:
-        optional: true
-      solid-start-vercel:
-        optional: true
-    dependencies:
-      '@babel/core': 7.21.3
-      '@babel/generator': 7.21.3
-      '@babel/plugin-syntax-jsx': 7.18.6(@babel/core@7.21.3)
-      '@babel/preset-env': 7.20.2(@babel/core@7.21.3)
-      '@babel/preset-typescript': 7.21.0(@babel/core@7.21.3)
-      '@babel/template': 7.20.7
-      '@solidjs/meta': 0.28.2(solid-js@1.7.2)
-      '@solidjs/router': 0.8.2(solid-js@1.7.2)
-      '@types/cookie': 0.5.1
-      chokidar: 3.5.3
-      compression: 1.7.4
-      connect: 3.7.0
-      debug: 4.3.4
-      dequal: 2.0.3
-      dotenv: 16.0.3
-      es-module-lexer: 1.2.1
-      esbuild: 0.14.54
-      esbuild-plugin-solid: 0.4.2(esbuild@0.14.54)(solid-js@1.7.2)
-      fast-glob: 3.2.12
-      get-port: 6.1.2
-      parse-multipart-data: 1.5.0
-      picocolors: 1.0.0
-      rollup: 3.20.2
-      rollup-plugin-visualizer: 5.9.0(rollup@3.20.2)
-      rollup-route-manifest: 1.0.0(rollup@3.20.2)
-      sade: 1.8.1
-      set-cookie-parser: 2.6.0
-      sirv: 2.0.2
-      solid-js: 1.7.2
-      terser: 5.16.8
-      undici: 5.21.0
-      vite: 4.2.1(@types/node@18.15.11)
-      vite-plugin-inspect: 0.7.18(rollup@3.20.2)(vite@4.2.1)
-      vite-plugin-solid: 2.6.1(solid-js@1.7.2)(vite@4.2.1)
-      wait-on: 6.0.1(debug@4.3.4)
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-    optional: true
 
   /solid-tippy@0.2.1(solid-js@1.7.2)(tippy.js@6.3.7):
     resolution: {integrity: sha512-8qB6X1iMn7nBd5BX+x7tS+5mDVragw5vCaXLOxEQFWUsyRRGKAY8JmbmmyVFIMIvF+pgkIIVIArhNfAGGtYVLA==}
@@ -10544,14 +10450,14 @@ packages:
       tippy.js: 6.3.7
     dev: false
 
-  /solid-transition-group@0.2.2(solid-js@1.7.0):
+  /solid-transition-group@0.2.2(solid-js@1.7.2):
     resolution: {integrity: sha512-6nB90UM2PB6VsIo/UCkmZmlIJb9mnmP7QPGrePqQJWtpUiRs5PbhkB8fvdyv9g/RPHWYpdJhQgxL6n++WmTt5A==}
     peerDependencies:
       solid-js: ^1.6.12
     dependencies:
-      '@solid-primitives/refs': 1.0.1(solid-js@1.7.0)
-      '@solid-primitives/transition-group': 1.0.1(solid-js@1.7.0)
-      solid-js: 1.7.0
+      '@solid-primitives/refs': 1.0.1(solid-js@1.7.2)
+      '@solid-primitives/transition-group': 1.0.1(solid-js@1.7.2)
+      solid-js: 1.7.2
     dev: true
 
   /source-map-js@1.0.2:
@@ -11489,7 +11395,7 @@ packages:
     dev: true
 
   /utils-merge@1.0.1:
-    resolution: {integrity: sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=}
+    resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
     dev: true
 
@@ -11554,7 +11460,7 @@ packages:
       mlly: 1.2.0
       pathe: 1.1.0
       picocolors: 1.0.0
-      vite: 4.2.1(@types/node@18.15.11)
+      vite: 4.2.1(@types/node@18.15.11)(sass@1.60.0)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -11578,7 +11484,7 @@ packages:
       kolorist: 1.7.0
       sirv: 2.0.2
       ufo: 1.1.1
-      vite: 4.2.1(sass@1.60.0)
+      vite: 4.2.1(@types/node@18.15.11)(sass@1.60.0)
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -11594,28 +11500,9 @@ packages:
       axios: 1.3.4(debug@4.3.4)
       debug: 4.3.4
       picocolors: 1.0.0
-      vite: 4.2.1
+      vite: 4.2.1(@types/node@18.15.11)(sass@1.60.0)
     transitivePeerDependencies:
       - encoding
-      - supports-color
-    dev: true
-
-  /vite-plugin-solid@2.6.1(solid-js@1.7.2)(vite@4.2.1):
-    resolution: {integrity: sha512-/khM/ha3B5/pTWQWVJd/0n6ODPIrOcajwhbrD8Gnv37XmJJssu+KA8ssN73raMIicf2eiQKiTAV39w7dSl4Irg==}
-    peerDependencies:
-      solid-js: ^1.3.17 || ^1.4.0 || ^1.5.0 || ^1.6.0
-      vite: ^3.0.0 || ^4.0.0
-    dependencies:
-      '@babel/core': 7.21.3
-      '@babel/preset-typescript': 7.21.0(@babel/core@7.21.3)
-      '@types/babel__core': 7.20.0
-      babel-preset-solid: 1.7.2(@babel/core@7.21.3)
-      merge-anything: 5.1.4
-      solid-js: 1.7.2
-      solid-refresh: 0.5.2(solid-js@1.7.2)
-      vite: 4.2.1(sass@1.60.0)
-      vitefu: 0.2.4(vite@4.2.1)
-    transitivePeerDependencies:
       - supports-color
     dev: true
 
@@ -11632,46 +11519,13 @@ packages:
       merge-anything: 5.1.4
       solid-js: 1.7.2
       solid-refresh: 0.5.2(solid-js@1.7.2)
-      vite: 4.2.1(@types/node@18.15.11)
+      vite: 4.2.1(@types/node@18.15.11)(sass@1.60.0)
       vitefu: 0.2.4(vite@4.2.1)
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /vite@4.2.1:
-    resolution: {integrity: sha512-7MKhqdy0ISo4wnvwtqZkjke6XN4taqQ2TBaTccLIpOKv7Vp2h4Y+NpmWCnGDeSvvn45KxvWgGyb0MkHvY1vgbg==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      esbuild: 0.17.14
-      postcss: 8.4.21
-      resolve: 1.22.1
-      rollup: 3.20.2
-    optionalDependencies:
-      fsevents: 2.3.2
-    dev: true
-
-  /vite@4.2.1(@types/node@18.15.11):
+  /vite@4.2.1(@types/node@18.15.11)(sass@1.60.0):
     resolution: {integrity: sha512-7MKhqdy0ISo4wnvwtqZkjke6XN4taqQ2TBaTccLIpOKv7Vp2h4Y+NpmWCnGDeSvvn45KxvWgGyb0MkHvY1vgbg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -11701,39 +11555,6 @@ packages:
       postcss: 8.4.21
       resolve: 1.22.1
       rollup: 3.20.2
-    optionalDependencies:
-      fsevents: 2.3.2
-    dev: true
-
-  /vite@4.2.1(sass@1.60.0):
-    resolution: {integrity: sha512-7MKhqdy0ISo4wnvwtqZkjke6XN4taqQ2TBaTccLIpOKv7Vp2h4Y+NpmWCnGDeSvvn45KxvWgGyb0MkHvY1vgbg==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      esbuild: 0.17.14
-      postcss: 8.4.21
-      resolve: 1.22.1
-      rollup: 3.20.2
       sass: 1.60.0
     optionalDependencies:
       fsevents: 2.3.2
@@ -11747,7 +11568,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.2.1(sass@1.60.0)
+      vite: 4.2.1(@types/node@18.15.11)(sass@1.60.0)
     dev: true
 
   /vitest@0.29.8(jsdom@21.1.1):
@@ -11803,7 +11624,7 @@ packages:
       tinybench: 2.4.0
       tinypool: 0.4.0
       tinyspy: 1.1.1
-      vite: 4.2.1(@types/node@18.15.11)
+      vite: 4.2.1(@types/node@18.15.11)(sass@1.60.0)
       vite-node: 0.29.8(@types/node@18.15.11)
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
