@@ -55,9 +55,9 @@
     "primitives"
   ],
   "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.10",
-    "@solid-primitives/rootless": "workspace:^1.3.2",
-    "@solid-primitives/static-store": "workspace:^0.0.2"
+    "@solid-primitives/event-listener": "workspace:^",
+    "@solid-primitives/rootless": "workspace:^",
+    "@solid-primitives/static-store": "workspace:^"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

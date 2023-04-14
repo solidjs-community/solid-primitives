@@ -55,13 +55,13 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.10",
+    "@solid-primitives/event-listener": "workspace:^",
     "date-fns": "^2.29.3"
   },
   "dependencies": {
-    "@solid-primitives/memo": "workspace:^1.2.4",
-    "@solid-primitives/timer": "workspace:^1.3.7",
-    "@solid-primitives/utils": "workspace:^6.0.0"
+    "@solid-primitives/memo": "workspace:^",
+    "@solid-primitives/timer": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

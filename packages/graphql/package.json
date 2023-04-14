@@ -53,14 +53,14 @@
     "primitives"
   ],
   "devDependencies": {
-    "@graphql-codegen/cli": "^3.2.2",
+    "@graphql-codegen/cli": "^3.3.0",
     "@graphql-codegen/typed-document-node": "^3.0.2",
-    "@graphql-codegen/typescript": "^3.0.2",
-    "@graphql-codegen/typescript-operations": "^3.0.2"
+    "@graphql-codegen/typescript": "^3.0.3",
+    "@graphql-codegen/typescript-operations": "^3.0.3"
   },
   "dependencies": {
     "@graphql-typed-document-node/core": "^3.2.0",
-    "@solid-primitives/utils": "workspace:^6.0.0",
+    "@solid-primitives/utils": "workspace:^",
     "graphql": "^16.6.0"
   },
   "peerDependencies": {

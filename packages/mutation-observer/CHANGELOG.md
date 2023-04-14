@@ -1,5 +1,11 @@
 # @solid-primitives/mutation-observer
 
+## 1.1.11
+
+### Patch Changes
+
+- 7e1511f7: Fix MutationObserver doesn't disconnect when there're no pending notifications
+
 ## 1.1.10
 
 ### Patch Changes

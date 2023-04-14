@@ -51,13 +51,13 @@
   "devDependencies": {
     "@types/leaflet": "^1.9.3",
     "leaflet": "^1.9.3",
-    "mapbox-gl": "^2.13.0",
-    "solid-map-gl": "^1.7.1",
-    "vite-plugin-mkcert": "^1.13.4"
+    "mapbox-gl": "^2.14.1",
+    "solid-map-gl": "^1.7.2",
+    "vite-plugin-mkcert": "^1.14.0"
   },
   "dependencies": {
-    "@solid-primitives/static-store": "workspace:^0.0.2",
-    "@solid-primitives/utils": "workspace:^6.0.0"
+    "@solid-primitives/static-store": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"
