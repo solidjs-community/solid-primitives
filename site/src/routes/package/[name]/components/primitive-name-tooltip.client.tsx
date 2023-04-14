@@ -1,6 +1,6 @@
 import { createResizeObserver } from "@solid-primitives/resize-observer";
 import { createMutationObserver } from "@solid-primitives/mutation-observer";
-import { Accessor, batch, Component, createRoot, createSignal, JSX, onMount } from "solid-js";
+import { Accessor, Component, createRoot, createSignal, JSX, onMount } from "solid-js";
 import { useTippy } from "solid-tippy";
 import { Content } from "tippy.js";
 import { BASE } from "~/constants";
@@ -56,14 +56,10 @@ function createTooltipContent(el: HTMLElement, data: BundlesizeItem, type: Primi
   createResizeObserver(
     () => (target() ? [target()!] : []),
     () => {
-      const dataPlacement = el.parentElement?.parentElement!.getAttribute("data-placement")!;
       const { height, width } = target()!.getBoundingClientRect();
       if (!(height > 0 && width > 0)) return;
 
-      batch(() => {
-        setPlacement(dataPlacement);
-        setElSize({ height, width });
-      });
+      setElSize({ height, width });
     },
   );
 
@@ -119,7 +115,7 @@ const TooltipSVG: Component<{
 }> = props => {
   const widthOfArrow = 16;
   const heightOfArrow = 8.721;
-  const widthFoo = () => props.width / 2 - widthOfArrow / 2 + 1.5;
+  const halfedWidthSection = () => props.width / 2 - widthOfArrow / 2 + 1.5;
 
   return (
     <div
@@ -129,8 +125,6 @@ const TooltipSVG: Component<{
       }}
     >
       <svg
-        // width={totalWidth()}
-        // height={totalHeight()}
         width={props.width}
         height={props.height + heightOfArrow}
         version="1.1"
@@ -143,7 +137,7 @@ const TooltipSVG: Component<{
               // d="m -4.1602,-6.638771 v 65.502 h 22.66 v -18.697 h 16 v 18.697 h 22.164 v -65.502 z"
               d={`M -3,-0 v ${
                 props.height + 3
-              } h ${widthFoo()} v -20 h ${widthOfArrow} v 20 h ${widthFoo()} v -${
+              } h ${halfedWidthSection()} v -20 h ${widthOfArrow} v 20 h ${halfedWidthSection()} v -${
                 props.height + 3
               } z`}
               //
