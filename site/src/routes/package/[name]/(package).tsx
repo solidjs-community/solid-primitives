@@ -27,6 +27,9 @@ export function routeData() {
     get name() {
       return params.name;
     },
+    get version() {
+      return cachedData()?.version ?? dataResource()?.version;
+    },
     get packageSize() {
       return cachedData()?.packageSize ?? dataResource()?.packageSize;
     },
@@ -72,6 +75,7 @@ const Page: Component = () => {
           <div class="my-8">
             <InfoBar
               name={data.name}
+              version={data.version}
               packageName={packageName()}
               packageSize={data.packageSize}
               primitives={data.primitives}

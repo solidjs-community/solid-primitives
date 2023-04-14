@@ -18,6 +18,7 @@ export const getNPMShield = (name: string) => `${npmShield}${name}.json`;
 
 const InfoBar: Component<{
   name: string;
+  version: string | undefined;
   packageName: string;
   packageSize: PackageData["packageSize"] | undefined;
   stage: PackageData["stage"] | undefined;
@@ -32,7 +33,7 @@ const InfoBar: Component<{
         packageSize={props.packageSize || undefined}
         primitives={props.primitives || []}
       />
-      <VersionBadgePill name={props.name} />
+      <VersionBadgePill name={props.name} version={props.version} />
       <StageBadgePill value={props.stage} />
     </div>
   );

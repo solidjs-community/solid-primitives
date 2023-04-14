@@ -1,54 +1,6 @@
-import {
-  Accessor,
-  createMemo,
-  createSignal,
-  ParentComponent,
-  sharedConfig,
-  untrack,
-} from "solid-js";
-import { isServer } from "solid-js/web";
-import { getCachedPackageListItemData } from "~/api";
+import { ParentComponent } from "solid-js";
 
 const NPM_URL = "https://www.npmjs.com/package/";
-
-const versionCache = new Map<string, string>();
-
-async function fetchPackageVersion(name: string): Promise<string> {
-  if (!name.startsWith("@solid-primitives/")) {
-    name = `@solid-primitives/${name}`;
-  }
-  const r = await fetch(`https://registry.npmjs.org/${name}`);
-  const data = await r.json();
-  return data["dist-tags"].latest;
-}
-
-function createPackageVersion(source: Accessor<string>) {
-  const memo = createMemo(() => {
-    const name = source();
-
-    return untrack(() => {
-      const cached = versionCache.get(name);
-
-      const [version, setVersion] = createSignal(
-        // use cached version if available (if not hydrating to avoid mismatches)
-        cached ||
-          (!isServer && !sharedConfig.context && getCachedPackageListItemData(name)?.version) ||
-          "0.0.0",
-      );
-
-      // fetch the version on the client so it won't be out of sync with SSG build
-      if (!isServer && !cached) {
-        fetchPackageVersion(name).then(v => {
-          setVersion(v);
-          versionCache.set(name, v);
-        });
-      }
-      return version;
-    });
-  });
-
-  return () => memo()();
-}
 
 export const VersionBadge: ParentComponent<{ name: string; version: string }> = props => {
   return (
@@ -64,9 +16,10 @@ export const VersionBadge: ParentComponent<{ name: string; version: string }> = 
   );
 };
 
-export const VersionBadgePill: ParentComponent<{ name: string }> = props => {
-  const version = createPackageVersion(() => props.name);
-
+export const VersionBadgePill: ParentComponent<{
+  name: string;
+  version: string | undefined;
+}> = props => {
   return (
     <a
       class="transition-filter flex font-sans hover:contrast-[1.2]"
@@ -79,7 +32,7 @@ export const VersionBadgePill: ParentComponent<{ name: string }> = props => {
       </div>
       <div class="background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#cae0ff,#c0c8ff)_border-box] dark:background-[linear-gradient(var(--page-main-bg),var(--page-main-bg))_padding-box,_linear-gradient(to_right,#405b6e,#46659a)_border-box] flex h-full min-w-[90px] items-center justify-center rounded-r-lg border-[3px] border-l-0 border-transparent font-semibold">
         <span>v</span>
-        {version()}
+        {props.version}
       </div>
     </a>
   );
