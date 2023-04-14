@@ -193,6 +193,25 @@ module.exports = {
       function ({ matchUtilities, theme }) {
         matchUtilities(
           {
+            "word-spacing": value => ({
+              wordSpacing: value,
+            }),
+          },
+          { values: theme("wordSpacing") },
+        );
+      },
+      {
+        theme: {
+          wordSpacing: {
+            normal: "normal",
+          },
+        },
+      },
+    ),
+    plugin(
+      function ({ matchUtilities, theme }) {
+        matchUtilities(
+          {
             "bg-image": value => ({
               backgroundImage: value.replace("_", " "),
             }),

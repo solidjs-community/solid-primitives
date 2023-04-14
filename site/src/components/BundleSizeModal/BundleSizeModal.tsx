@@ -112,18 +112,18 @@ const BundleSizeModal: Component<{
               </tr>
             </thead>
             <tbody>
-              <tr class="even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
-                <td class="p-1 text-sm md:px-3 md:text-base">
+              <tr class="word-spacing-[-2px] even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
+                <td class="word-spacing-normal p-1 text-sm md:px-3 md:text-base">
                   <span class="flex flex-wrap">
                     <span class="whitespace-nowrap">@solid-primitives/</span>
                     <span>{props.name}</span>
                   </span>
                 </td>
                 <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                  {props.packageSize?.min ?? "N/A"}
+                  {props.packageSize?.min.join(" ") ?? "N/A"}
                 </td>
                 <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                  {props.packageSize?.gzip ?? "N/A"}
+                  {props.packageSize?.gzip.join(" ") ?? "N/A"}
                 </td>
               </tr>
             </tbody>
@@ -164,17 +164,17 @@ const BundleSizeModal: Component<{
             <tbody>
               <For each={props.primitives}>
                 {item => (
-                  <tr class="even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
+                  <tr class="word-spacing-[-2px] even:bg-page-main-bg odd:bg-[#f6fbff] dark:odd:bg-[#2b3f4a]">
                     <td class="p-1 text-sm md:px-3 md:text-base" data-primitive-td>
                       <span class="inline-block" data-primitive-span>
                         {item.name}
                       </span>
                     </td>
                     <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                      {item.min}
+                      {item.min.join(" ")}
                     </td>
                     <td class="whitespace-nowrap p-1 text-center text-sm md:px-3 md:text-base">
-                      {item.gzip}
+                      {item.gzip.join(" ")}
                     </td>
                   </tr>
                 )}
