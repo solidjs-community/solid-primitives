@@ -928,7 +928,7 @@ importers:
         specifier: ^2.1.6
         version: link:../packages/media
       '@solid-primitives/mutation-observer':
-        specifier: workspace:^1.1.10
+        specifier: workspace:^1.1.11
         version: link:../packages/mutation-observer
       '@solid-primitives/platform':
         specifier: workspace:^0.0.105

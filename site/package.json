@@ -28,7 +28,7 @@
     "@solid-primitives/intersection-observer": "^2.0.11",
     "@solid-primitives/keyboard": "^1.1.0",
     "@solid-primitives/media": "^2.1.6",
-    "@solid-primitives/mutation-observer": "workspace:^1.1.10",
+    "@solid-primitives/mutation-observer": "workspace:^1.1.11",
     "@solid-primitives/platform": "workspace:^0.0.105",
     "@solid-primitives/refs": "workspace:^1.0.2",
     "@solid-primitives/resize-observer": "workspace:^2.0.15",
