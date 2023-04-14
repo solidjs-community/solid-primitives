@@ -57,8 +57,8 @@
     "solid-js": "^1.6.12"
   },
   "devDependencies": {
-    "@solid-primitives/refs": "workspace:^1.0.2",
-    "@solid-primitives/utils": "workspace:^6.0.0",
+    "@solid-primitives/refs": "workspace:^",
+    "@solid-primitives/utils": "workspace:^",
     "@solidjs/router": "^0.8.2"
   },
   "typesVersions": {}

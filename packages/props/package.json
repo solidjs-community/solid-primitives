@@ -49,7 +49,7 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^6.0.0"
+    "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
     "nanospy": "^0.5.0"

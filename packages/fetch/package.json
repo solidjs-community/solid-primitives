@@ -56,5 +56,8 @@
       "optional": true
     }
   },
-  "typesVersions": {}
+  "typesVersions": {},
+  "dependencies": {
+    "node-fetch": "^3.3.1"
+  }
 }

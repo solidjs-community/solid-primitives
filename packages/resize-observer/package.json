@@ -53,10 +53,10 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.10",
-    "@solid-primitives/rootless": "workspace:^1.3.2",
-    "@solid-primitives/static-store": "workspace:^0.0.2",
-    "@solid-primitives/utils": "workspace:^6.0.0"
+    "@solid-primitives/event-listener": "workspace:^",
+    "@solid-primitives/rootless": "workspace:^",
+    "@solid-primitives/static-store": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

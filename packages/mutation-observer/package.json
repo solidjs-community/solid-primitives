@@ -50,7 +50,7 @@
     "@solid-primitives/composites": "^1.1.1"
   },
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^6.0.0"
+    "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

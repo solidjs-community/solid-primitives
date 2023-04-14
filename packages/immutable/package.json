@@ -56,8 +56,8 @@
     "solid-js": "^1.6.12"
   },
   "dependencies": {
-    "@solid-primitives/keyed": "workspace:^1.2.0",
-    "@solid-primitives/utils": "workspace:^6.1.0"
+    "@solid-primitives/keyed": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
     "@reduxjs/toolkit": "^1.9.3",

@@ -61,11 +61,11 @@
     "memo"
   ],
   "dependencies": {
-    "@solid-primitives/scheduled": "workspace:^1.3.2",
-    "@solid-primitives/utils": "workspace:^6.0.0"
+    "@solid-primitives/scheduled": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
-    "@solid-primitives/mouse": "workspace:^2.0.11",
+    "@solid-primitives/mouse": "workspace:^",
     "@solidjs/router": "^0.8.2"
   },
   "peerDependencies": {

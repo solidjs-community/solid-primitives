@@ -61,7 +61,7 @@
     "solid-transition-group": "^0.2.2"
   },
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^6.0.0"
+    "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

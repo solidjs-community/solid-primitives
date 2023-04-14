@@ -56,10 +56,10 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solid-primitives/range": "workspace:^0.1.11"
+    "@solid-primitives/range": "workspace:^"
   },
   "dependencies": {
-    "@solid-primitives/utils": "workspace:^6.0.0"
+    "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

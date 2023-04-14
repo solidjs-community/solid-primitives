@@ -53,13 +53,13 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "devDependencies": {
-    "@solid-primitives/scheduled": "workspace:^1.3.2"
+    "@solid-primitives/scheduled": "workspace:^"
   },
   "dependencies": {
-    "@solid-primitives/event-listener": "workspace:^2.2.10",
-    "@solid-primitives/resize-observer": "workspace:^2.0.14",
-    "@solid-primitives/static-store": "workspace:^0.0.2",
-    "@solid-primitives/utils": "workspace:^6.0.0"
+    "@solid-primitives/event-listener": "workspace:^",
+    "@solid-primitives/resize-observer": "workspace:^",
+    "@solid-primitives/static-store": "workspace:^",
+    "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

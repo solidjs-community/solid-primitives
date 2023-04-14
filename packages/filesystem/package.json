@@ -51,11 +51,12 @@
   },
   "devDependencies": {
     "@tauri-apps/api": "^1.2.0",
-    "@types/wicg-file-system-access": "2020.9.5"
+    "@types/wicg-file-system-access": "2020.9.5",
+    "chokidar": "^3.5.3"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12",
-    "chokidar": "^3.5.3"
+    "chokidar": "^3.5.3",
+    "solid-js": "^1.6.12"
   },
   "peerDependenciesMeta": {
     "chokidar": {
