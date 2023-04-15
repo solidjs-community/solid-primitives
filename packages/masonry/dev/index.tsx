@@ -26,16 +26,15 @@ const App: Component = () => {
     xl: "1280px",
   });
 
-  const cols = createMemo(() => {
-    if (br.xl) return 6;
-    if (br.lg) return 4;
-    if (br.md) return 3;
-    if (br.sm) return 2;
-    return 1;
-  });
-
   const masonry = createMasonry({
     source: items,
+    columns: () => {
+      if (br.xl) return 6;
+      if (br.lg) return 4;
+      if (br.md) return 3;
+      if (br.sm) return 2;
+      return 1;
+    },
     mapHeight(item) {
       return () => item.height() + 24;
     },
@@ -61,7 +60,6 @@ const App: Component = () => {
         </div>
       );
     },
-    columns: cols,
   });
 
   return (

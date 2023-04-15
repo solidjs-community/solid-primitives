@@ -161,16 +161,14 @@ const br = createBreakpoints({
   xl: "1280px",
 });
 
-const cols = createMemo(() => {
-  if (br.xl) return 6;
-  if (br.lg) return 4;
-  if (br.md) return 3;
-  if (br.sm) return 2;
-  return 1;
-});
-
 const masonry = createMasonry({
-  columns: cols,
+  columns() {
+    if (br.xl) return 6;
+    if (br.lg) return 4;
+    if (br.md) return 3;
+    if (br.sm) return 2;
+    return 1;
+  },
   // ...
 });
 ```
