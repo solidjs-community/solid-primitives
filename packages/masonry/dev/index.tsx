@@ -77,7 +77,7 @@ const App: Component = () => {
 
       <div
         class="w-80vw flex flex-col flex-wrap items-stretch justify-start gap-6"
-        style={{ height: `${masonry.height()}px` }}
+        style={{ height: `${masonry.height() - 24}px` }}
       >
         {masonry()}
       </div>

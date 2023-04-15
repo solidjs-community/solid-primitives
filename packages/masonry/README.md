@@ -173,6 +173,39 @@ const masonry = createMasonry({
 });
 ```
 
+### Grid gap
+
+You can freely add a gap between the items using the `gap` property or a margin on the items.
+
+But that space needs to be accounted for in the height of the items. Otherwise the layout will be broken.
+
+```tsx
+const gap = 10;
+
+const masonry = createMasonry({
+  mapHeight(item) {
+    return getItemHeight(item) + gap;
+  },
+  // ...
+});
+
+return (
+  <div
+    style={{
+      display: "flex",
+      "flex-direction": "column",
+      "flex-wrap": "wrap",
+      gap: `${gap}px`,
+      // Exclude the size of the gap from the height of the container
+      // to remove the bottom margin created by the last row.
+      height: masonry.height() - gap,
+    }}
+  >
+    {masonry()}
+  </div>
+);
+```
+
 ### Observing item's height
 
 The `mapHeight` function is not reactive, it will be called only once for each item. But it can be used to return an accessor to provide a reactive height. The layout will be recalculated when the height changes.
