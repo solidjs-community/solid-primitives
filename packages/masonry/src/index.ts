@@ -1,13 +1,6 @@
 import { Accessor, createMemo, createSignal, mapArray } from "solid-js";
 import { MaybeAccessor, asAccessor } from "@solid-primitives/utils";
 
-function getShortestColumn(heights: number[]): number {
-  let min = 0;
-  for (let i = 0, record = Infinity; i < heights.length; i++)
-    if (heights[i]! < record) record = heights[(min = i)]!;
-  return min;
-}
-
 const $SET_ITEM = Symbol("set-item");
 
 const noopIndex = () => 0;
@@ -185,8 +178,12 @@ export function createMasonry<T>(
           heights = new Array(columns.length).fill(0);
 
         for (let i = 0; i < items.length; i++) {
-          const item = items[i]!,
-            col = getShortestColumn(heights);
+          const item = items[i]!;
+
+          // find the shortest column
+          let col = 0;
+          for (let i = 0, record = Infinity; i < heights.length; i++)
+            if (heights[i]! < record) record = heights[(col = i)]!;
 
           columns[col]!.push(item);
           heights[col] += item.height();
