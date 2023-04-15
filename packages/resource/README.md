@@ -68,14 +68,15 @@ Objects and Arrays are re-created on each operation, but the values will be left
 
 ### createDeepSignal
 
-This is an optimized implementation of what is required by the [resource storage option](https://www.solidjs.com/docs/latest/api#createresource:~:text=Resources%20can%20be%20set%20with%20custom%20defined%20storage):
+Usually resources in Solid.js are immutable. Every time the resource updates, every subscriber of it is updated. Starting with Solid.js 1.5, `createResource` allows to receive a function returning something akin to a signal in [`options.storage`](https://www.solidjs.com/docs/latest/api#createresource:~:text=Resources%20can%20be%20set%20with%20custom%20defined%20storage). This allows to provide the underlying storage for the resource in order to change its reactivity. This allows to add fine-grained reactivity to resources so that you can subscribe to nested properties and only trigger updates as they actually occur:
 
 ```ts
 // this adds fine-grained reactivity to the contents of data():
 const [data, { refetch }] = createResource(fetcher, { storage: createDeepSignal });
 ```
 
-> ⚠ if your resource is a deep signal, you can no longer rely on reactive changes to the base signal. If you want to combine this with [`createAggregated`](#createaggregated), you will need to wrap the resource to either call [`deepTrack`](https://solid-primitives.netlify.app/package/deep#deeptrack) or read one of the reactive parts that you know for certain will change every time:
+> **Warning**
+> if your resource is a deep signal, you can no longer rely on reactive changes to the base signal. If you want to combine this with [`createAggregated`](#createaggregated), you will need to wrap the resource to either call [`deepTrack`](https://solid-primitives.netlify.app/package/deep#deeptrack) or read one of the reactive parts that you know for certain will change every time:
 
 ```ts
 import { deepTrack } from "@solid-primitives/deep";

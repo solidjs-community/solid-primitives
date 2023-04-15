@@ -244,6 +244,13 @@ export function createAggregated<R, I extends R | R[]>(res: Accessor<R>, initial
   }, initialValue);
 }
 
+/**
+ * **Creates a store-based signal for fine-grained resources**
+ * ```ts
+ * const [data] = createResource(fetcher, { storage, createDeepSignal });
+ * ```
+ * @see https://www.solidjs.com/docs/latest/api#createresource:~:text=Resources%20can%20be%20set%20with%20custom%20defined%20storage
+ */
 export function createDeepSignal<T>(): Signal<T | undefined>;
 export function createDeepSignal<T>(value: T): Signal<T>;
 export function createDeepSignal<T>(v?: T): Signal<T> {
