@@ -54,10 +54,7 @@
     "solid-js": "^1.6.12"
   },
   "devDependencies": {
-    "@solid-primitives/media": "workspace:^2.1.6",
-    "@solid-primitives/refs": "workspace:^",
-    "@solid-primitives/resize-observer": "workspace:^",
-    "solid-transition-group": "^0.2.2"
+    "@solid-primitives/media": "workspace:^2.1.6"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"

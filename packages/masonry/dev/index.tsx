@@ -1,22 +1,23 @@
-import { Component, For, createMemo, createRenderEffect, createSignal } from "solid-js";
+import { Component, createMemo, createSignal } from "solid-js";
 import { render } from "solid-js/web";
-import { createMasonryLayout } from "../src";
-import { resolveElements } from "@solid-primitives/refs";
-import { createResizeObserver } from "@solid-primitives/resize-observer";
 import { createBreakpoints } from "@solid-primitives/media";
-import { TransitionGroup } from "solid-transition-group";
+import { createMasonry } from "../src";
 
 import "uno.css";
 
-const getRandomColor = () =>
-  `#${Math.floor(Math.random() * 16777215)
-    .toString(16)
-    .padStart(6, "0")}`;
+const getRandomHeight = () => Math.floor(Math.random() * 300) + 100;
 
 const App: Component = () => {
-  const [items, setItems] = createSignal([
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-  ]);
+  const [items, setItems] = createSignal(
+    Array.from({ length: 100 }, (_, i) => {
+      const [height, setHeight] = createSignal(getRandomHeight());
+      return {
+        height,
+        updateHeight: () => setHeight(getRandomHeight()),
+        i,
+      };
+    }),
+  );
 
   const br = createBreakpoints({
     sm: "640px",
@@ -33,54 +34,53 @@ const App: Component = () => {
     return 1;
   });
 
-  const elements = resolveElements(
-    () => (
-      <For each={items()}>
-        {item => {
-          const color = getRandomColor();
-          const height = Math.floor(Math.random() * 100) + 10 * item;
-          return (
-            <div
-              class="transition-composite center-child rounded p-6 outline-dashed duration-500"
-              style={{
-                height: `${height}px`,
-                width: `calc(${(1 / cols()) * 100}% - ${(cols() - 1) / cols()} * 24px)`,
-                background: color,
-              }}
-            >
-              <span class="bg-slate-900 text-2xl font-medium text-gray-100">{item}</span>
-            </div>
-          );
-        }}
-      </For>
-    ),
-    (e): e is HTMLElement => e instanceof HTMLElement,
-  );
-
-  const masonry = createMasonryLayout({
-    items: elements.toArray,
-    mapItem(item, margin) {
-      const [height, setHeight] = createSignal(
-        item.style.height ? parseInt(item.style.height) : 50,
+  const masonry = createMasonry({
+    source: items,
+    mapHeight(item) {
+      return () => item.height() + 24;
+    },
+    mapElement(item, i) {
+      const s = Math.random() * 50 + 25;
+      const l = Math.random() * 50 + 25;
+      return (
+        <div
+          class="center-child cursor-pointer rounded outline-dashed 
+          hover:z-10 hover:scale-105 hover:shadow-lg"
+          style={{
+            height: `${item.source.height()}px`,
+            "margin-bottom": `${item.margin()}px`,
+            order: item.order(),
+            background: `hsl(${item.column() * 60}, ${s}%, ${l}%)`,
+          }}
+          onClick={item.source.updateHeight}
+        >
+          <span class="bg-slate-900 text-2xl font-medium text-gray-100">
+            {item.source.i}_{i()}
+          </span>
+        </div>
       );
-      // createResizeObserver(item, () => setHeight(item.offsetHeight));
-      // createRenderEffect(() => {
-      //   item.style.marginBottom = `${margin()}px`;
-      // });
-      return height;
     },
     columns: cols,
-    gap: 24,
   });
 
   return (
     <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 p-24 text-white">
+      <h1>Masonry Layout</h1>
+
+      <div class="flex flex-row space-x-4">
+        <button
+          class="btn"
+          onClick={() => setItems(p => p.slice().sort(() => Math.random() - 0.5))}
+        >
+          Shuffle
+        </button>
+      </div>
+
       <div
-        class="w-80vw flex flex-col flex-wrap content-start items-stretch justify-start gap-6"
+        class="w-80vw flex flex-col flex-wrap items-stretch justify-start gap-6"
         style={{ height: `${masonry.height()}px` }}
       >
-        {/* {masonry()} */}
-        <TransitionGroup name="v-group">{masonry()}</TransitionGroup>
+        {masonry()}
       </div>
     </div>
   );

@@ -530,15 +530,6 @@ importers:
       '@solid-primitives/media':
         specifier: workspace:^2.1.6
         version: link:../media
-      '@solid-primitives/refs':
-        specifier: workspace:^
-        version: link:../refs
-      '@solid-primitives/resize-observer':
-        specifier: workspace:^
-        version: link:../resize-observer
-      solid-transition-group:
-        specifier: ^0.2.2
-        version: 0.2.2(solid-js@1.7.3)
 
   packages/media:
     dependencies:

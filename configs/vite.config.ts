@@ -16,9 +16,9 @@ export const viteConfig = defineConfig({
     port: 3000,
   },
   plugins: [
-    devtools({
-      autoname: true,
-    }),
+    // devtools({
+    //   autoname: true,
+    // }),
     solid(),
     Unocss({
       preflights: [{ getCSS: () => styles }],
