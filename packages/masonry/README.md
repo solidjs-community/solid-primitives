@@ -11,7 +11,7 @@
 
 Primitives for creating a reactive masonry layout.
 
-- [`createMasonry`](#createMasonry) - Creates a masonry layout calculation from a reactive source array.
+- [`createMasonry`](#createMasonry) - Creates a reactive masonry layout data from a reactive source array.
 
 ## Installation
 
@@ -25,11 +25,11 @@ pnpm add @solid-primitives/masonry
 
 ## `createMasonry`
 
-Creates a masonry layout calculation from a reactive source array.
+Creates a reactive masonry layout data from a reactive source array.
 
 It splits the items into columns and calculates the order based on the height of each item.
 
-The masonary is expected to be rendreded in a flex container with `flex-direction: column`, `flex-wrap: wrap` and limited height
+The masonary is expected to be rendered in a flex container with `flex-direction: column`, `flex-wrap: wrap` and limited height
 to force the items to wrap.
 
 ## How to use it
@@ -105,7 +105,7 @@ return (
 );
 ```
 
-### Maping the elements in JSX
+### Mapping the elements in JSX
 
 If `mapElement` is not provided, the source items with layout data will be returned. Those items cannot be rendered directly in JSX, but they can be mapped to elements with `<For>` component.
 

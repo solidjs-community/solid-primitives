@@ -74,24 +74,23 @@ const mapData = <TSource, TElement>(
     marginValue = 0,
     columnValue = 0;
 
-  const data = {
+  const data: MasonryItemData<TSource> & {
+    [$SET_ITEM]: (col: number, order: number, margin: number) => void;
+    element?: TElement;
+  } = {
     source,
     order: () => (track(), orderValue),
     margin: () => (track(), marginValue),
     column: () => (track(), columnValue),
     height: asAccessor(mapHeight(source)),
-  } as MasonryItemData<TSource> & {
-    [$SET_ITEM]: (col: number, order: number, margin: number) => void;
-    element?: any;
+    [$SET_ITEM](col, order, margin) {
+      columnValue = col;
+      orderValue = order;
+      marginValue = margin;
+    },
   };
 
   if (mapElement) data.element = mapElement(data, index);
-
-  data[$SET_ITEM] = (col, order, margin) => {
-    columnValue = col;
-    orderValue = order;
-    marginValue = margin;
-  };
 
   return data;
 };
