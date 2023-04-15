@@ -1,7 +1,14 @@
-import { createEffect, createResource, createSignal } from "solid-js";
+import { createEffect, createResource, createSignal, on } from "solid-js";
 import { describe, test, expect, vi } from "vitest";
 import { testEffect } from "@solidjs/testing-library";
-import { makeAbortable, createAggregated, serializer, makeCache, makeRetrying } from "../src";
+import {
+  makeAbortable,
+  createAggregated,
+  serializer,
+  makeCache,
+  makeRetrying,
+  createDeepSignal,
+} from "../src";
 
 describe("makeAbortable", () => {
   test("makes a fetcher abortable", () => {
@@ -319,6 +326,48 @@ describe("makeRetrying", () => {
         } else if (run === 1) {
           expect(fetcher).toHaveBeenCalledTimes(2);
           expect(data.error).toEqual(new Error("2"));
+          done();
+        }
+        return run + 1;
+      });
+    }));
+});
+
+describe("createDeepSignal", () => {
+  test("provides resources with fine-grained reactivity", () =>
+    testEffect(done => {
+      const responses = [
+        { x: "test", y: "test" },
+        { x: "test2", y: "test" },
+        { x: "test3", y: "test2" },
+      ];
+      const [answers, setAnswers] = createSignal<{ x: string[]; y: string[] }>({ x: [], y: [] });
+      const fetcher = () => Promise.resolve(responses.shift());
+      const [data, { refetch }] = createResource(fetcher, { storage: createDeepSignal });
+      createEffect(
+        on(
+          () => data()?.x,
+          answer => answer && setAnswers(a => ({ x: [...a.x, answer], y: a.y })),
+        ),
+      );
+      createEffect(
+        on(
+          () => data()?.y,
+          answer => answer && setAnswers(a => ({ x: a.x, y: [...a.y, answer] })),
+        ),
+      );
+      createEffect(() => {
+        data();
+        data()?.x;
+        data()?.y;
+        if (responses.length) {
+          refetch();
+        }
+      });
+      createEffect((run: number = 0) => {
+        answers();
+        if (run === 3) {
+          expect(answers()).toEqual({ x: ["test", "test2", "test3"], y: ["test", "test2"] });
           done();
         }
         return run + 1;

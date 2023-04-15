@@ -12,6 +12,7 @@
 A collection of composable primitives to augment [`createResource`](https://www.solidjs.com/docs/latest/api#createresource)
 
 - [`createAggregated`](#createaggregated) - wraps the resource to aggregate data instead of overwriting it
+- [`createDeepSignal`](#createdeepsignal) - provides a fine-grained signal for the [resource storage option](https://www.solidjs.com/docs/latest/api#createresource:~:text=Resources%20can%20be%20set%20with%20custom%20defined%20storage)
 - [`makeAbortable`](#makeabortable) - wraps the fetcher to be abortable and auto-abort on re-fetch or timeout
 - [`makeCache`](#makecache) - wraps the fetcher to cache the responses for a certain amount of time
 - [`makeRetrying`](#makeretrying) - wraps the fetcher to retry requests after a delay
@@ -64,6 +65,24 @@ const pages = createAggregated(currentPage, []);
 - otherwise the incoming data will be put into an array
 
 Objects and Arrays are re-created on each operation, but the values will be left untouched, so `<For>` should work fine.
+
+### createDeepSignal
+
+This is an optimized implementation of what is required by the [resource storage option](https://www.solidjs.com/docs/latest/api#createresource:~:text=Resources%20can%20be%20set%20with%20custom%20defined%20storage):
+
+```ts
+// this adds fine-grained reactivity to the contents of data():
+const [data, { refetch }] = createResource(fetcher, { storage: createDeepSignal });
+```
+
+> ⚠ if your resource is a deep signal, you can no longer rely on reactive changes to the base signal. If you want to combine this with [`createAggregated`](#createaggregated), you will need to wrap the resource to either call [`deepTrack`](https://solid-primitives.netlify.app/package/deep#deeptrack) or read one of the reactive parts that you know for certain will change every time:
+
+```ts
+import { deepTrack } from "@solid-primitives/deep";
+
+const [data] = createResource(source, fetcher, { storage: createDeepSignal });
+const aggregated = makeAggregated(() => deepTrack(data()));
+```
 
 ### makeAbortable
 
@@ -176,6 +195,23 @@ const [data, { refetch }] = createResource(() => fetch("url"));
 const runRefetch = throttle(refetch, 5000);
 createEventListener(document, "visibilitychange", () => document.hidden || runRefetch());
 ```
+
+### Stopping a refetch interval when hidden or offline
+
+If you are polling, this approach might come useful:
+
+```ts
+import { createConnectivitySignal } from "@solid-primitives/connectivity";
+import { createEventSignal } from "@solid-primitives/event-listener";
+import { createTimer } from "@solid-primitives/timer";
+
+const [data, { refetch }] = createResource(() => fetch("url").then(r => r.json()));
+const [setPaused] = createTimer(refetch, 5000, setInterval);
+const visibilityChange = createEventSignal(document, "visibilitychange");
+const isOnline = createConnectivitySignal();
+createEffect(() => setPaused((visibilityChange(), document.hidden) || !isOnline());
+```
+
 
 #### Mutations
 

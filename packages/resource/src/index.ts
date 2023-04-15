@@ -4,7 +4,10 @@ import {
   type Accessor,
   type ResourceFetcher,
   type ResourceFetcherInfo,
+  type Signal,
+  untrack,
 } from "solid-js";
+import { createStore, reconcile, unwrap } from "solid-js/store";
 
 export type AbortableOptions = {
   noAutoAbort?: true;
@@ -232,11 +235,23 @@ export function createAggregated<R, I extends R | R[]>(res: Accessor<R>, initial
       : Array.isArray(previous || current)
       ? [...toArray(previous), ...toArray(current)]
       : typeof (previous || current) === "object"
-      ? Object.assign({}, previous || {}, current || {})
+      ? { ...previous, ...current }
       : typeof previous === "string" || typeof current === "string"
       ? (previous?.toString() || "") + (current || "")
       : previous
       ? [previous, current]
       : [current];
   }, initialValue);
+}
+
+export function createDeepSignal<T>(): Signal<T | undefined>;
+export function createDeepSignal<T>(value: T): Signal<T>;
+export function createDeepSignal<T>(v?: T): Signal<T> {
+  const [store, setStore] = createStore([v]);
+  return [
+    () => store[0],
+    (update: T) => (
+      setStore(0, reconcile(typeof update === "function" ? update(unwrap(store[0])) : v)), store[0]
+    ),
+  ] as Signal<T>;
 }
