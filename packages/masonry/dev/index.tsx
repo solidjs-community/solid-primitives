@@ -47,8 +47,9 @@ const App: Component = () => {
           class="center-child cursor-pointer rounded outline-dashed 
           hover:z-10 hover:scale-105 hover:shadow-lg"
           style={{
-            height: `${item.source.height()}px`,
-            "margin-bottom": `${item.margin()}px`,
+            height: `${item.source.height() + item.margin()}px`,
+            // "margin-bottom": `${item.margin()}px`,
+            // "flex-grow": item.margin() ? 1 : 0,
             order: item.order(),
             background: `hsl(${item.column() * 60}, ${s}%, ${l}%)`,
           }}

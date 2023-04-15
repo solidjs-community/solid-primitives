@@ -528,7 +528,7 @@ importers:
         version: 1.7.3
     devDependencies:
       '@solid-primitives/media':
-        specifier: workspace:^2.1.6
+        specifier: workspace:^
         version: link:../media
 
   packages/media:

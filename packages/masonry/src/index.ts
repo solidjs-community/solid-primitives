@@ -8,9 +8,15 @@ function getShortestColumn(heights: number[]): number {
   return min;
 }
 
-const getNColumns = (n: number): any => Array.from({ length: n }, () => []);
+const getNColumns = (n: number): any[] => Array.from({ length: n }, () => []);
 
-const $SET_STYLE = Symbol("set-style");
+function memoIfReactive<T, U>(source: Accessor<T> | T, fn: (v: T) => U): Accessor<U> {
+  if (typeof source === "function") return createMemo(() => fn((source as any)()));
+  const v = fn(source);
+  return () => v;
+}
+
+const $SET_ITEM = Symbol("set-item");
 
 const noopIndex = () => 0;
 
@@ -90,13 +96,13 @@ const mapData = <TSource, TElement>(
     column: () => (track(), columnValue),
     height: asAccessor(mapHeight(source)),
   } as MasonryItemData<TSource> & {
-    [$SET_STYLE]: (col: number, order: number, margin: number) => void;
+    [$SET_ITEM]: (col: number, order: number, margin: number) => void;
     element?: any;
   };
 
   if (mapElement) data.element = mapElement(data, index);
 
-  data[$SET_STYLE] = (col, order, margin) => {
+  data[$SET_ITEM] = (col, order, margin) => {
     columnValue = col;
     orderValue = order;
     marginValue = margin;
@@ -172,13 +178,7 @@ export function createMasonry<T>(
           : source => mapData(source, () => memo()?.(), mapHeight, mapElement, noopIndex),
       ),
     ),
-    getColumns: Accessor<ReturnType<typeof mapped>[]> =
-      typeof columns === "number"
-        ? (() => {
-            const cols = getNColumns(columns);
-            return () => cols;
-          })()
-        : createMemo(() => getNColumns(columns())),
+    getColumns: Accessor<ReturnType<typeof mapped>[]> = memoIfReactive(columns, getNColumns),
     height = setMemo(() =>
       createMemo(() => {
         const items = mapped(),
@@ -197,7 +197,7 @@ export function createMasonry<T>(
         for (let colIndex = 0, order = 0; colIndex < columns.length; colIndex++) {
           const col = columns[colIndex]!;
           for (let i = 0; i < col.length; i++, order++)
-            col[i]![$SET_STYLE](
+            col[i]![$SET_ITEM](
               colIndex,
               order,
               i === col.length - 1 ? height - heights[colIndex]! : 0,

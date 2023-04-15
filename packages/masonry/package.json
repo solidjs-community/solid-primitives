@@ -1,8 +1,8 @@
 {
   "name": "@solid-primitives/masonry",
-  "version": "0.0.100",
+  "version": "0.0.1",
   "description": "A template primitive example.",
-  "author": "Your Name <you@youremail.com>",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/masonry#readme",
@@ -17,13 +17,15 @@
     "name": "masonry",
     "stage": 0,
     "list": [
-      "createPrimitiveTemplate"
+      "createMasonry"
     ],
-    "category": "Display & Media"
+    "category": "Layout"
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "masonry",
+    "layout"
   ],
   "private": false,
   "sideEffects": false,
@@ -54,7 +56,7 @@
     "solid-js": "^1.6.12"
   },
   "devDependencies": {
-    "@solid-primitives/media": "workspace:^2.1.6"
+    "@solid-primitives/media": "workspace:^"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
