@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/masonry",
   "version": "0.0.1",
-  "description": "A template primitive example.",
+  "description": "Primitives for creating a reactive masonry layout.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",

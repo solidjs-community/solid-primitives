@@ -8,14 +8,6 @@ function getShortestColumn(heights: number[]): number {
   return min;
 }
 
-const getNColumns = (n: number): any[] => Array.from({ length: n }, () => []);
-
-function memoIfReactive<T, U>(source: Accessor<T> | T, fn: (v: T) => U): Accessor<U> {
-  if (typeof source === "function") return createMemo(() => fn((source as any)()));
-  const v = fn(source);
-  return () => v;
-}
-
 const $SET_ITEM = Symbol("set-item");
 
 const noopIndex = () => 0;
@@ -54,6 +46,11 @@ export type MasonryOptions<TSource, TElement> = {
    */
   source: Accessor<readonly TSource[] | false | null | undefined>;
   /**
+   * The number of columns to split the items into.
+   * This can be an accessor to provide a reactive number of columns.
+   */
+  columns: MaybeAccessor<number>;
+  /**
    * A function that maps the source item to a height.
    * This function is not reactive, it will be called only once for each item.
    * To provede a reactice height, return an accessor.
@@ -64,11 +61,6 @@ export type MasonryOptions<TSource, TElement> = {
    * This function is not reactive, it will be called only once for each item.
    */
   mapElement: (data: MasonryItemData<TSource>, index: Accessor<number>) => TElement;
-  /**
-   * The number of columns to split the items into.
-   * This can be an accessor to provide a reactive number of columns.
-   */
-  columns: MaybeAccessor<number>;
 };
 
 /**
@@ -129,6 +121,8 @@ const mapData = <TSource, TElement>(
  * Accessor<TElement[]> & { height: Accessor<number> }
  * ```
  *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/active-element#createMasonry
+ *
  * @example
  * ```tsx
  * const [source, setSource] = createSignal([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
@@ -168,7 +162,7 @@ export function createMasonry<TSource>(
 export function createMasonry<T>(
   options: MasonryOptionsNoElements<T> | MasonryOptions<T, any>,
 ): Accessor<any[]> & { height: Accessor<number> } {
-  const { source, mapHeight, mapElement, columns } = options,
+  const { source, mapHeight, mapElement } = options,
     [memo, setMemo] = createSignal<VoidFunction>(),
     mapped = createMemo(
       mapArray(
@@ -178,7 +172,12 @@ export function createMasonry<T>(
           : source => mapData(source, () => memo()?.(), mapHeight, mapElement, noopIndex),
       ),
     ),
-    getColumns: Accessor<ReturnType<typeof mapped>[]> = memoIfReactive(columns, getNColumns),
+    columns = asAccessor(options.columns),
+    getColumns = createMemo(
+      () => Array.from({ length: columns() }, (): ReturnType<typeof mapped> => []),
+      void 0,
+      { equals: (a, b) => a.length === b.length },
+    ),
     height = setMemo(() =>
       createMemo(() => {
         const items = mapped(),
