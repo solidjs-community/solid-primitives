@@ -107,6 +107,28 @@ const Example: Component = () => {
 };
 ```
 
+As a convenience feature, the return value of `createBreakpoints` also contains a non-enumerable `.toString` method that will return the last matching breakpoint id to allow using it as an object key:
+
+```ts
+import { createBreakpoints } from "@solid-primitives/media";
+
+const breakpoints = {
+  sm: "640px",
+  lg: "1024px",
+  xl: "1280px",
+};
+
+const matches = createBreakpoints(breakpoints);
+
+const moduleSize = () => ({
+  sm: 2,
+  lg: 4,
+  xl: 6,
+})[matches];
+```
+
+This can be very helpful for things like the `mapHeight` option in [`createMasonry`](https://solid-primitives.netlify.app/package/masonry#createMasonry).
+
 [Working Demo](https://codesandbox.io/s/solid-responsive-breakpoints-h4emy8?file=/src/index.tsx)
 
 ## `createPrefersDark`

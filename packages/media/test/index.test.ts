@@ -81,6 +81,15 @@ describe("createBreakpoints", () => {
     });
   });
 
+  test("provides the first found breakpoint as .toString() value", () => {
+    createRoot(dispose => {
+      matchingBreakpoints = [breakpoints.sm, breakpoints.lg];
+      const matches = createBreakpoints(breakpoints);
+      expect(matches.toString()).toBe('lg');
+      dispose();
+    });
+  }); 
+
   test("match fallback breakpoint when window.matchMedia is not available", () => {
     window.matchMedia = undefined as unknown as typeof window.matchMedia;
     createRoot(dispose => {
