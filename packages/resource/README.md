@@ -213,7 +213,6 @@ const isOnline = createConnectivitySignal();
 createEffect(() => setPaused((visibilityChange(), document.hidden) || !isOnline());
 ```
 
-
 #### Mutations
 
 In TanStack Query, mutations are requests that mutate data on the server, so we are less interested in the answer and more in the timing. Fortunately, Solid already comes with a mutate action in the `createResource` return value:
