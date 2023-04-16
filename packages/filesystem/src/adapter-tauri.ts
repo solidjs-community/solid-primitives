@@ -1,6 +1,6 @@
-import { BaseDirectory, type FileEntry, type FsDirOptions } from "@tauri-apps/api/fs";
+import { type BaseDirectory, type FileEntry, type FsDirOptions } from "@tauri-apps/api/fs";
 
-export const makeTauriFileSystem = (options: FsDirOptions = { dir: BaseDirectory.AppData }) =>
+export const makeTauriFileSystem = (options: FsDirOptions = { dir: 22 as BaseDirectory.AppData }) =>
   (taurifs =>
     taurifs
       ? {
