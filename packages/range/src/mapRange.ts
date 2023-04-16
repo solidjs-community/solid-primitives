@@ -1,4 +1,4 @@
-import { Accessor, createRoot, onCleanup, untrack, DEV } from "solid-js";
+import { Accessor, createRoot, onCleanup, untrack, DEV, JSX, createMemo } from "solid-js";
 import { isServer } from "solid-js/web";
 import { abs, accessor, ceil, floor, min, RangeProps, toFunction } from "./common";
 
@@ -158,7 +158,7 @@ export function Range<T>(
     fallback?: T;
     children: ((number: number) => T) | T;
   },
-): Accessor<T[]> {
+): JSX.Element {
   let start: Accessor<number>, to: Accessor<number>, step: Accessor<number>;
   if ("to" in props) {
     start = () => props.start ?? 0;
@@ -169,7 +169,13 @@ export function Range<T>(
     to = accessor(() => props[1]);
     step = accessor(() => props[2] ?? 1);
   }
-  const fallback = props.fallback ? () => props.fallback as T : undefined;
-  const mapFn = toFunction(() => props.children);
-  return mapRange(start, to, step, mapFn, { fallback });
+  return createMemo(
+    mapRange(
+      start,
+      to,
+      step,
+      toFunction(() => props.children),
+      "fallback" in props ? { fallback: () => props.fallback } : undefined,
+    ),
+  ) as unknown as JSX.Element;
 }

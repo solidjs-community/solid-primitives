@@ -1,5 +1,5 @@
-import { MaybeAccessor, MaybeAccessorValue } from "@solid-primitives/utils";
-import { Accessor } from "solid-js";
+import type { MaybeAccessor, MaybeAccessorValue } from "@solid-primitives/utils";
+import type { Accessor } from "solid-js";
 
 export type RangeProps =
   | { start?: number; to: number; step?: number }
