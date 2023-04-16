@@ -25,7 +25,7 @@ pnpm add @solid-primitives/masonry
 
 ## `createMasonry`
 
-Creates a reactive masonry layout data from a reactive source array.
+Calculates reactive masonry layout data from a reactive source array.
 
 It splits the items into columns and calculates the order based on the height of each item.
 
@@ -45,9 +45,9 @@ to force the items to wrap.
 
   This can be an accessor to provide a reactive number of columns.
 
-- `mapHeight` - A function that maps the source item to a height.
+- `mapHeight` - A function that maps the source item to a numeric height value.
 
-  This function is not reactive, it will be called only once for each item.
+  This function is not reactive, it will be called only once for each item. The value may relate to any unit of your choosing.
   To provede a reactice height, return an accessor.
 
 - `mapElement` - A function that maps the source item to an element to render.
@@ -107,7 +107,7 @@ return (
 
 ### Mapping the elements in JSX
 
-If `mapElement` is not provided, the source items with layout data will be returned. Those items cannot be rendered directly in JSX, but they can be mapped to elements with `<For>` component.
+If a `mapElement` option is not provided, the source items with layout data will be returned. Those items cannot be rendered directly in JSX, but they can be mapped to elements with Solid's [`<For>`](https://www.solidjs.com/docs/latest/api#for) component.
 
 ```tsx
 const masonry = createMasonry({
@@ -149,7 +149,7 @@ The number of columns can be provided as an accessor to provide a reactive numbe
 
 This is useful when the number of columns should change based on the width of the container, size of the items, or a media query.
 
-For example it can be used with [`createBreakpoints` from `@solid-primitives/media`](https://primitives.solidjs.community/package/media#createmediaquery) to change the number of columns based on the screen size.
+For example, it can be used with [`createBreakpoints` from `@solid-primitives/media`](https://primitives.solidjs.community/package/media#createmediaquery) to change the number of columns based on the screen size.
 
 ```ts
 import { createBreakpoints } from "@solid-primitives/media";
@@ -177,7 +177,7 @@ const masonry = createMasonry({
 
 You can freely add a gap between the items using the `gap` property or a margin on the items.
 
-But that space needs to be accounted for in the height of the items. Otherwise the layout will be broken.
+But that space needs to be accounted for in the height of the items. Otherwise, the layout will be broken.
 
 ```tsx
 const gap = 10;
@@ -210,7 +210,7 @@ return (
 
 The `mapHeight` function is not reactive, it will be called only once for each item. But it can be used to return an accessor to provide a reactive height. The layout will be recalculated when the height changes.
 
-For example it can be used with [`createElementSize` from `@solid-primitives/resize-observer`](https://primitives.solidjs.community/package/resize-observer#createElementSize) to observe the height of the elements.
+For example, it can be used with [`createElementSize` from `@solid-primitives/resize-observer`](https://primitives.solidjs.community/package/resize-observer#createElementSize) to observe the height of the elements.
 
 ```ts
 import { createElementSize } from "@solid-primitives/resize-observer";
