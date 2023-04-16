@@ -1,5 +1,11 @@
 # @solid-primitives/resource
 
+## 0.1.0
+
+### Minor Changes
+
+- bffdc14f: add `createDeepSignal` primitive
+
 ## 0.0.101
 
 ### Patch Changes
