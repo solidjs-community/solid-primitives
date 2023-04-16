@@ -1,0 +1,64 @@
+{
+  "name": "@solid-primitives/masonry",
+  "version": "0.0.1",
+  "description": "Primitives for creating a reactive masonry layout.",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/masonry#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "masonry",
+    "stage": 0,
+    "list": [
+      "createMasonry"
+    ],
+    "category": "Layout"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "masonry",
+    "layout"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "require": "./dist/index.cjs"
+  },
+  "typesVersions": {},
+  "scripts": {
+    "dev": "vite serve dev",
+    "page": "vite build dev",
+    "build": "jiti ../../scripts/build.ts",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.12"
+  },
+  "devDependencies": {
+    "@solid-primitives/media": "workspace:^"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  }
+}
