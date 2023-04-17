@@ -311,13 +311,15 @@ describe("createFileSystem(makeWebAccessFileSystem)", async () => {
   });
 });
 
-describe('rsync', () => {
-  test('it copies parts of a file system using the adapter', async () => {
-    const sourceobj = { test: { 
-      "file.json": "[1, 2, 3]",
-      "file.ts": "console.log(1);",
-      folder: { folder2: { folder3: { "test.txt": "test" } } }
-    } };
+describe("rsync", () => {
+  test("it copies parts of a file system using the adapter", async () => {
+    const sourceobj = {
+      test: {
+        "file.json": "[1, 2, 3]",
+        "file.ts": "console.log(1);",
+        folder: { folder2: { folder3: { "test.txt": "test" } } },
+      },
+    };
     const destobj = {};
     const sourcevfs = makeVirtualFileSystem(sourceobj);
     const destvfs = makeVirtualFileSystem(destobj);
@@ -325,12 +327,14 @@ describe('rsync', () => {
     expect(destobj).toEqual(sourceobj);
   });
 
-  test('it copies from a file system adapter to a file system', async () => {
-    const sourceobj = { test: { 
-      "file.json": "[1, 2, 3]",
-      "file.ts": "console.log(1);",
-      folder: { folder2: { folder3: { "test.txt": "test" } } }
-    } };
+  test("it copies from a file system adapter to a file system", async () => {
+    const sourceobj = {
+      test: {
+        "file.json": "[1, 2, 3]",
+        "file.ts": "console.log(1);",
+        folder: { folder2: { folder3: { "test.txt": "test" } } },
+      },
+    };
     const destobj = {};
     const sourcevfs = makeVirtualFileSystem(sourceobj);
     const destvfs = makeVirtualFileSystem(destobj);
@@ -339,12 +343,14 @@ describe('rsync', () => {
     expect(destobj).toEqual(sourceobj);
   });
 
-  test('it copies from a file system to a file system adapter', async () => {
-    const sourceobj = { test: { 
-      "file.json": "[1, 2, 3]",
-      "file.ts": "console.log(1);",
-      folder: { folder2: { folder3: { "test.txt": "test" } } }
-    } };
+  test("it copies from a file system to a file system adapter", async () => {
+    const sourceobj = {
+      test: {
+        "file.json": "[1, 2, 3]",
+        "file.ts": "console.log(1);",
+        folder: { folder2: { folder3: { "test.txt": "test" } } },
+      },
+    };
     const destobj = {};
     const sourcevfs = makeVirtualFileSystem(sourceobj);
     const sourcefs = createFileSystem(sourcevfs);
@@ -353,12 +359,14 @@ describe('rsync', () => {
     expect(destobj).toEqual(sourceobj);
   });
 
-  test('it copies from a file system to a file system', async () => {
-    const sourceobj = { test: { 
-      "file.json": "[1, 2, 3]",
-      "file.ts": "console.log(1);",
-      folder: { folder2: { folder3: { "test.txt": "test" } } }
-    } };
+  test("it copies from a file system to a file system", async () => {
+    const sourceobj = {
+      test: {
+        "file.json": "[1, 2, 3]",
+        "file.ts": "console.log(1);",
+        folder: { folder2: { folder3: { "test.txt": "test" } } },
+      },
+    };
     const destobj = {};
     const sourcevfs = makeVirtualFileSystem(sourceobj);
     const sourcefs = createFileSystem(sourcevfs);
