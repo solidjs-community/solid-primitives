@@ -17,7 +17,17 @@
     "name": "filesystem",
     "stage": 0,
     "list": [
-      "createFileSystem"
+      "createFileSystem",
+      "createSyncFileSystem",
+      "createAsyncFileSystem",
+      "makeNoFileSystem",
+      "makeNoAsyncFileSystem",
+      "makeVirtualFileSystem",
+      "makeWebAccessFileSystem",
+      "makeNodeFileSystem",
+      "makeTauriFileSystem",
+      "makeChokidarWatcher",
+      "rsync"
     ],
     "category": "Display & Media"
   },

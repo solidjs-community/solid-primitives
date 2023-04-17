@@ -21,6 +21,7 @@ A primitive that allows to manage different file system access methods:
 - `makeNodeFileSystem` (server only) - Adapter that abstracts the node fs/promises module for the use with this primitive
 - `makeTauriFileSystem` (tauri with fs access enabled only) - Adapter that connects to the tauri fs module
 - `makeChokidarWatcher` - (experimental): use chokidar to watch for file system changes and trigger reactive updates
+- `rsync` - small tool to copy over recursively from one file system or adapter to another
 
 ## Installation
 
@@ -126,6 +127,14 @@ const Item = (props: { path: string; fs: SyncFileSystem | AsyncFileSystem }) => 
     </>
   );
 };
+```
+
+### rsync
+
+In some cases, you might need to move data from one file system (or adapter) to another one. In order to do so, this package comes with an rsync utility:
+
+```ts
+rsync(srcFs, srcPath, destFs, destPath): Promise<void>;
 ```
 
 ## Demo
