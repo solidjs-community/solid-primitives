@@ -1,4 +1,14 @@
-import { Accessor, createRoot, createSignal, onCleanup, Setter, untrack, DEV } from "solid-js";
+import {
+  Accessor,
+  createRoot,
+  createSignal,
+  onCleanup,
+  Setter,
+  untrack,
+  DEV,
+  JSX,
+  createMemo,
+} from "solid-js";
 import { isServer } from "solid-js/web";
 import { abs, ceil, min, RangeProps, sign, toFunction, accessor } from "./common";
 
@@ -134,7 +144,7 @@ export function IndexRange<T>(
     fallback?: T;
     children: ((number: Accessor<number>) => T) | T;
   },
-): Accessor<T[]> {
+): JSX.Element {
   let start: Accessor<number>, to: Accessor<number>, step: Accessor<number>;
   if ("to" in props) {
     start = () => props.start ?? 0;
@@ -145,7 +155,13 @@ export function IndexRange<T>(
     to = accessor(() => props[1]);
     step = accessor(() => props[2] ?? 1);
   }
-  const fallback = props.fallback ? () => props.fallback as T : undefined;
-  const mapFn = toFunction(() => props.children);
-  return indexRange(start, to, step, mapFn, { fallback });
+  return createMemo(
+    indexRange(
+      start,
+      to,
+      step,
+      toFunction(() => props.children),
+      "fallback" in props ? { fallback: () => props.fallback } : undefined,
+    ),
+  ) as unknown as JSX.Element;
 }

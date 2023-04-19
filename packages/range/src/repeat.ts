@@ -1,4 +1,5 @@
-import { Accessor, createMemo, createRoot, onCleanup, untrack } from "solid-js";
+import { Accessor, JSX, createMemo, createRoot, onCleanup, untrack } from "solid-js";
+import { toFunction } from "./common";
 
 /**
  * Reactively maps a number range of specified length with a callback function - underlying helper for the `<Repeat>` control flow.
@@ -96,11 +97,12 @@ export function Repeat<T>(props: {
   times: number;
   fallback?: T;
   children: ((index: number) => T) | T;
-}): Accessor<T[]> {
-  const fallback = props.fallback ? () => props.fallback as T : undefined;
-  const mapFn = (typeof props.children === "function" ? props.children : () => props.children) as (
-    i: number,
-  ) => T;
-  const length = () => props.times;
-  return repeat(length, mapFn, { fallback });
+}): JSX.Element {
+  return createMemo(
+    repeat(
+      () => props.times,
+      toFunction(() => props.children),
+      "fallback" in props ? { fallback: () => props.fallback } : undefined,
+    ),
+  ) as unknown as JSX.Element;
 }
