@@ -1,5 +1,11 @@
 # @solid-primitives/range
 
+## 0.1.12
+
+### Patch Changes
+
+- 5c941798: Fix component types to support Solid 1.7
+
 ## 0.1.11
 
 ### Patch Changes
