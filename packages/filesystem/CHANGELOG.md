@@ -1,5 +1,11 @@
 # @solid-primitives/filesystem
 
+## 1.1.0
+
+### Minor Changes
+
+- 3525d165: filesystem: rsync utility
+
 ## 1.0.0
 
 ### Major Changes
