@@ -620,9 +620,6 @@ importers:
 
   packages/pagination:
     dependencies:
-      '@solid-primitives/intersection-observer':
-        specifier: workspace:^
-        version: link:../intersection-observer
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils

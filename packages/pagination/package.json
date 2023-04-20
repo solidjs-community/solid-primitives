@@ -56,7 +56,6 @@
     "test:ssr": "pnpm run test --mode ssr"
   },
   "dependencies": {
-    "@solid-primitives/intersection-observer": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
