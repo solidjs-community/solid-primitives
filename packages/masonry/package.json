@@ -19,7 +19,7 @@
     "list": [
       "createMasonry"
     ],
-    "category": "Layout"
+    "category": "UI Patterns"
   },
   "keywords": [
     "solid",

@@ -23,7 +23,7 @@
       "createPagination",
       "createInfiniteScroll"
     ],
-    "category": "Utilities"
+    "category": "UI Patterns"
   },
   "keywords": [
     "solid",
