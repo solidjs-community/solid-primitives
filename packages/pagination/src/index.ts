@@ -283,12 +283,19 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
   const [page, setPage] = createSignal(0);
   const [end, setEnd] = createSignal(false);
 
-  const io = new IntersectionObserver(e => {
-    if (e.length > 0 && e[0]!.isIntersecting && !end() && !contents.loading) {
-      setPage(p => p + 1);
-    }
-  });
-  onCleanup(() => io.disconnect());
+  let add: (el: Element) => void = noop;
+  if (!isServer) {
+    const io = new IntersectionObserver(e => {
+      if (e.length > 0 && e[0]!.isIntersecting && !end() && !contents.loading) {
+        setPage(p => p + 1);
+      }
+    });
+    onCleanup(() => io.disconnect());
+    add = (el: Element) => {
+      io.observe(el);
+      tryOnCleanup(() => io.unobserve(el));
+    };
+  }
 
   const [contents] = createResource(page, fetcher);
 
@@ -303,10 +310,7 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
 
   return [
     pages,
-    (el: Element) => {
-      io.observe(el);
-      tryOnCleanup(() => io.unobserve(el));
-    },
+    add,
     {
       page: page,
       setPage: setPage,
