@@ -1,5 +1,11 @@
 # @solid-primitives/intersection-observer
 
+## 2.1.0
+
+### Minor Changes
+
+- 5cb1e95b: Deprecate `makeIntersectionObserver`, improve `createIntersectionObserver` targets diffing logic
+
 ## 2.0.11
 
 ### Patch Changes

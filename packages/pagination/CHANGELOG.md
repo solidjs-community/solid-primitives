@@ -1,5 +1,11 @@
 # @solid-primitives/pagination
 
+## 0.2.5
+
+### Patch Changes
+
+- f2f77197: Remove intersection-observer package dependency
+
 ## 0.2.4
 
 ### Patch Changes

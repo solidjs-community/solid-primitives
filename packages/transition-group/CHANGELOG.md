@@ -1,5 +1,11 @@
 # @solid-primitives/transition-group
 
+## 1.0.2
+
+### Patch Changes
+
+- ef0c0a0e: fix homepage url in package.json
+
 ## 1.0.1
 
 ### Patch Changes
