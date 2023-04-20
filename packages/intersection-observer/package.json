@@ -19,7 +19,6 @@
     "name": "intersection-observer",
     "stage": 3,
     "list": [
-      "makeIntersectionObserver",
       "createIntersectionObserver",
       "createViewportObserver",
       "createVisibilityObserver"

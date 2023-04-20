@@ -11,7 +11,6 @@
 
 A range of IntersectionObserver API utilities great for different types of use cases:
 
-- [`makeIntersectionObserver`](#makeIntersectionObserver) - Creates a basic non-reactive Intersection Observer exposing methods to manage the observable.
 - [`createIntersectionObserver`](#createIntersectionObserver) - A reactive observer primitive.
 - [`createViewportObserver`](#createViewportObserver) - More advanced tracker that creates a store of element signals.
 - [`createVisibilityObserver`](#createVisibilityObserver) - Basic visibility observer using a signal.
@@ -21,42 +20,9 @@ A range of IntersectionObserver API utilities great for different types of use c
 ```bash
 npm install @solid-primitives/intersection-observer
 # or
+pnpm add @solid-primitives/intersection-observer
+# or
 yarn add @solid-primitives/intersection-observer
-```
-
-## `makeIntersectionObserver`
-
-```tsx
-import { makeIntersectionObserver } from '@solid-primitives/intersection-observer';
-
-// Basic usage:
-const { add, remove, start, stop, instance }] = makeIntersectionObserver(els, entries => {
-  entries.forEach(e => console.log(e.isIntersecting));
-});
-add(el)
-
-// Directive usage:
-const { add: intersectionObserver } = makeIntersectionObserver([], entries => {
-  entries.forEach(e => console.log(e.isIntersecting));
-});
-<div use:intersectionObserver></div>
-```
-
-### Definition
-
-```ts
-function makeIntersectionObserver(
-  elements: Element[],
-  onChange: IntersectionObserverCallback,
-  options?: IntersectionObserverInit,
-): {
-  add: AddIntersectionObserverEntry;
-  remove: RemoveIntersectionObserverEntry;
-  start: VoidFunction;
-  reset: VoidFunction;
-  stop: VoidFunction;
-  instance: IntersectionObserver;
-};
 ```
 
 ## `createIntersectionObserver`
@@ -172,7 +138,7 @@ const useVisibilityObserver = createVisibilityObserver({ threshold: 0.8 }, entry
 It provides information about element occurrence in the viewport — `"Entering"`, `"Leaving"`, `"Inside"` or `"Outside"`.
 
 ```tsx
-import { useVisibilityObserver, withOccurrence } from "@solid-primitives/intersection-observer";
+import { createVisibilityObserver, withOccurrence } from "@solid-primitives/intersection-observer";
 
 const useVisibilityObserver = createVisibilityObserver(
   { threshold: 0.8 },
@@ -188,7 +154,7 @@ const useVisibilityObserver = createVisibilityObserver(
 It provides information about element direction on the screen — `"Left"`, `"Right"`, `"Top"`, `"Bottom"` or `"None"`.
 
 ```ts
-import { useVisibilityObserver, withDirection } from "@solid-primitives/intersection-observer";
+import { createVisibilityObserver, withDirection } from "@solid-primitives/intersection-observer";
 
 const useVisibilityObserver = createVisibilityObserver(
   { threshold: 0.8 },

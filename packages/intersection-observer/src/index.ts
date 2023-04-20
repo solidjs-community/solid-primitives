@@ -1,7 +1,7 @@
 import { onMount, onCleanup, createSignal, createEffect, untrack, Setter, DEV } from "solid-js";
 import type { JSX, Accessor } from "solid-js";
 import { isServer } from "solid-js/web";
-import { access, FalsyValue, MaybeAccessor } from "@solid-primitives/utils";
+import { access, FalsyValue, MaybeAccessor, handleDiffArray } from "@solid-primitives/utils";
 
 export type AddIntersectionObserverEntry = (el: Element) => void;
 export type RemoveIntersectionObserverEntry = (el: Element) => void;
@@ -38,22 +38,21 @@ declare module "solid-js" {
 // TypesScript can use it
 export type E = JSX.Element;
 
+function observe(el: Element, instance: IntersectionObserver): void {
+  // Elements with 'display: "contents"' don't work with IO, even if they are visible by users
+  // (https://github.com/solidjs-community/solid-primitives/issues/116)
+  if (DEV && el instanceof HTMLElement && el.style.display === "contents") {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[@solid-primitives/intersection-observer] IntersectionObserver is not able to observe elements with 'display: "contents"' style:`,
+      el,
+    );
+  }
+  instance.observe(el);
+}
+
 /**
- * Generates a very basic Intersection Observer with basic control interface.
- *
- * @param elements - A list of elements to watch
- * @param onChange - An event handler that returns an array of observer entires
- * @param options - IntersectionObserver constructor options:
- * - `root` — The Element or Document whose bounds are used as the bounding box when testing for intersection.
- * - `rootMargin` — A string which specifies a set of offsets to add to the root's bounding_box when calculating intersections, effectively shrinking or growing the root for calculation purposes.
- * - `threshold` — Either a single number or an array of numbers between 0.0 and 1.0, specifying a ratio of intersection area to total bounding box area for the observed target.
- *
- * @example
- * ```tsx
- * const { add, remove, start, stop, instance } = makeIntersectionObserver(els, entries =>
- *   console.log(entries)
- * );
- * ```
+ * @deprecated Please use native {@link IntersectionObserver}, or {@link createIntersectionObserver} instead.
  */
 export function makeIntersectionObserver(
   elements: Element[],
@@ -78,26 +77,12 @@ export function makeIntersectionObserver(
     };
 
   const instance = new IntersectionObserver(onChange, options);
-  const add: AddIntersectionObserverEntry = el => {
-    // Elements with 'display: "contents"' don't work with IO, even if they are visible by users
-    // (https://github.com/solidjs-community/solid-primitives/issues/116)
-    if (!isServer && DEV && el instanceof HTMLElement && el.style.display === "contents") {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `[@solid-primitives/intersection-observer/makeIntersectionObserver] IntersectionObserver is not able to observe elements with 'display: "contents"' style:`,
-        el,
-      );
-      return;
-    }
-    instance.observe(el);
-  };
+  const add: AddIntersectionObserverEntry = el => observe(el, instance);
   const remove: RemoveIntersectionObserverEntry = el => instance.unobserve(el);
   const start = () => elements.forEach(add);
-  const stop = () => instance.disconnect();
   const reset = () => instance.takeRecords().forEach(el => remove(el.target));
   start();
-  onCleanup(stop);
-  return { add, remove, start, stop, reset, instance };
+  return { add, remove, start, stop: onCleanup(() => instance.disconnect()), reset, instance };
 }
 
 /**
@@ -123,11 +108,20 @@ export function createIntersectionObserver(
   options?: IntersectionObserverInit,
 ): void {
   if (isServer) return;
-  const { add, reset } = makeIntersectionObserver([], onChange, options);
-  createEffect(() => {
-    reset();
-    access(elements).forEach(el => add(el));
-  });
+
+  const io = new IntersectionObserver(onChange, options);
+  onCleanup(() => io.disconnect());
+
+  createEffect((p: Element[]) => {
+    const list = elements();
+    handleDiffArray(
+      list,
+      p,
+      el => observe(el, io),
+      el => io.unobserve(el),
+    );
+    return list;
+  }, []);
 }
 
 /**
@@ -242,20 +236,17 @@ export function createVisibilityObserver(
 
   const callbacks = new WeakMap<Element, EntryCallback>();
 
-  const { add, remove } = makeIntersectionObserver(
-    [],
-    (entries, instance) => {
-      entries.forEach(entry => callbacks.get(entry.target)?.(entry, instance));
-    },
-    options,
-  );
+  const io = new IntersectionObserver((entries, instance) => {
+    for (const entry of entries) callbacks.get(entry.target)?.(entry, instance);
+  }, options);
+  onCleanup(() => io.disconnect());
 
   function removeEntry(el: Element) {
-    remove(el);
+    io.unobserve(el);
     callbacks.delete(el);
   }
   function addEntry(el: Element, callback: EntryCallback) {
-    add(el);
+    observe(el, io);
     callbacks.set(el, callback);
   }
 
