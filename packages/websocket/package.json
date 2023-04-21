@@ -22,6 +22,15 @@
     "dist"
   ],
   "sideEffects": false,
+  "primitive": {
+    "name": "websocket",
+    "stage": 2,
+    "list": [
+      "makeWs",
+      "createWs"
+    ],
+    "category": "Reactivity"
+  },
   "scripts": {
     "build": "jiti ../../scripts/build.ts"
   },

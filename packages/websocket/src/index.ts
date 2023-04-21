@@ -2,71 +2,31 @@ import { createSignal, onCleanup } from "solid-js";
 
 export type WebsocketState = 0 | 1 | 2 | 3;
 
-/**
- * Handles opening managing and reconnecting to a Websocket.
- *
- * @param url - Path to the websocket server
- * @param onData - A function supplied that messages will be reported to
- * @param onError - A function supplied that errors will be reported to
- * @param procotols - List of protocols to support
- * @param reconnectLimit - Amount of reconnection attempts
- * @param reconnectInterval - Time in between connection attempts
- * @return Returns an array containing websocket management options
- *
- * @example
- * ```ts
- * const [ connect, disconnect ] = createWebsocket('http://localhost', '', 3, 5000);
- * ```
- */
-const createWebsocket = (
-  url: string,
-  onData: (message: MessageEvent) => void,
-  onError: (message: Event) => void,
-  protocols?: string | Array<string>,
-  reconnectLimit?: number,
-  reconnectInterval?: number,
-): [
-  connect: () => void,
-  disconnect: () => void,
-  send: (message: string) => void,
-  state: () => WebsocketState,
-  socket: () => WebSocket,
-] => {
-  let socket: WebSocket | undefined;
-  let reconnections = 0;
-  let reconnectId: ReturnType<typeof setTimeout> | undefined;
-  const [state, setState] = createSignal<WebsocketState>(WebSocket.CLOSED);
-  const send = (data: string | ArrayBuffer) => socket!.send(data);
-  const cancelReconnect = () => {
-    if (reconnectId) {
-      clearTimeout(reconnectId);
-    }
-  };
-  const disconnect = () => {
-    cancelReconnect();
-    reconnectLimit = Number.NEGATIVE_INFINITY;
-    if (socket) {
-      socket.close();
-    }
-  };
-  // Connect the socket to the server
-  const connect = () => {
-    cancelReconnect();
-    setState(WebSocket.CONNECTING);
-    socket = new WebSocket(url, protocols);
-    socket.onopen = () => setState(WebSocket.OPEN);
-    socket.onclose = () => {
-      setState(WebSocket.CLOSED);
-      if (reconnectLimit && reconnectLimit > reconnections) {
-        reconnections += 1;
-        reconnectId = setTimeout(connect, reconnectInterval);
-      }
-    };
-    socket.onerror = onError;
-    socket.onmessage = onData;
-  };
-  onCleanup(() => disconnect);
-  return [connect, disconnect, send, state, () => socket!];
-};
+export type WSExtraProps = {
+  _send: (message: string) => void,
+  message: () => string | undefined,
+  state: number
+}
 
-export default createWebsocket;
+export function makeWs(url: string, options: any): WebSocket & WSExtraProps {
+  const sendQueue: string[] = [];
+  const ws: WebSocket & Partial<WSExtraProps> = new WebSocket(url, options);
+  const [message, setMessage] = createSignal<string>(); 
+  ws._send = ws.send;
+  ws.message = message;
+  ws.send = (msg: string) => ws.readyState == 1
+    ? ws._send!(msg)
+    : sendQueue.push(msg);
+  ws.addEventListener("open", () => {
+    while (sendQueue.length) ws._send!(sendQueue.shift() || "")
+  });
+  ws.addEventListener("message", ({ data }) => setMessage(data));
+  return ws as WebSocket & WSExtraProps;
+}
+
+export function createWs(url: string, options: any) {
+  const ws = makeWs(url, options);
+  onCleanup(() => ws.state == 1 && ws.close());
+  return ws;
+}
+

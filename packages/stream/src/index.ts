@@ -304,3 +304,48 @@ export const createMediaPermissionRequest = (
     )
     .then(stop);
 };
+
+export const makeMediaRecorder = (
+  stream: MediaStream,
+  options = {} as MediaRecorderOptions & { download?: string },
+): [recorder: MediaRecorder, download: () => void] => {
+  /*if (isServer) {
+    return [
+      Object.assign(new EventTarget(), {
+        pause: noop,
+        requestData: noop,
+        resume: noop,
+        start: noop,
+        state: "inactive",
+        stop: noop,
+      }) as MediaRecorder,
+      noop,
+    ];
+  }*/
+  if (!options.mimeType) {
+    options.mimeType = !stream.getVideoTracks().length ? "audio/ogg" : "video/webm";
+  }
+  const recorder = new MediaRecorder(stream, options);
+  const chunks: Blob[] = [];
+  recorder.addEventListener("dataavailable", ev => chunks.push(ev.data));
+  return [
+    recorder,
+    () => {
+      const mimeType = options.mimeType || chunks[0]?.type;
+      if (!mimeType) {
+        return;
+      }
+      const href = URL.createObjectURL(new Blob(chunks, { type: mimeType }));
+      const link = Object.assign(document.createElement("a"), {
+        href,
+        style: "display: none;",
+        download:
+          options.download || `recorded.${options.mimeType?.replace(/.*\/([^;]+).*/, "$1")}`,
+      });
+      document.body.appendChild(link);
+      link.click();
+      URL.revokeObjectURL(href);
+      document.body.removeChild(link);
+    },
+  ];
+};
