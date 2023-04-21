@@ -7,7 +7,7 @@ const disposeAll = (list: { dispose: VoidFunction }[]) => {
 export function createHighlight<T>(
   mapElement: (text: Accessor<string>) => T,
   cacheLimit = 100,
-): (inputText: string, query: string) => (string | T)[] {
+): (string: string, regex: RegExp) => (string | T)[] {
   type Reusable = { el: T; set(test: string): void; dispose: VoidFunction };
 
   const toReuse: Reusable[] = [],
@@ -21,19 +21,16 @@ export function createHighlight<T>(
   const limitCache = () =>
     toReuse.length > cacheLimit && disposeAll(toReuse.splice(0, toReuse.length - cacheLimit));
 
-  return (inputText, query) => {
-    if (!query) return [inputText];
-
-    const regex = new RegExp(query, "gi"),
-      parts: (string | T)[] = [],
+  return (string, regex) => {
+    const parts: (string | T)[] = [],
       reusableList: Reusable[] = [];
 
     let match: RegExpExecArray | null,
       lastIndex = 0,
       reuseIndex = 0;
 
-    while ((match = regex.exec(inputText))) {
-      parts.push(inputText.slice(lastIndex, match.index));
+    while ((match = regex.exec(string))) {
+      parts.push(string.slice(lastIndex, match.index));
       const matchText = match[0];
       let reusable = toReuse[reuseIndex];
       if (reusable) {
@@ -57,7 +54,7 @@ export function createHighlight<T>(
       setTimeout(limitCache);
     });
 
-    parts.push(inputText.slice(lastIndex));
+    parts.push(string.slice(lastIndex));
 
     return parts;
   };

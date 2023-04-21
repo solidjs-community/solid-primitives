@@ -91,9 +91,12 @@ const Search: Component<{
   const rawHighlight = createHighlight(text => <mark>{text()}</mark>);
   const toHighlight = createMemo(() => {
     const searchValue = search();
-    return searchValue.length > 1 ? searchValue : "";
+    return searchValue.length > 1 && new RegExp(searchValue, "gi");
   });
-  const highlight = (text: string) => rawHighlight(text, toHighlight());
+  const highlight = (text: string) => {
+    const regex = toHighlight();
+    return regex ? rawHighlight(text, regex) : text;
+  };
 
   return (
     <div class="xs:w-full flex w-[calc(100vw-32px)] max-w-[800px] items-center justify-center">
