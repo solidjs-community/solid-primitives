@@ -1,31 +1,21 @@
-import { deepTrack } from "@solid-primitives/deep";
 import { createMediaQuery } from "@solid-primitives/media";
 import { useWindowScrollPosition } from "@solid-primitives/scroll";
-import { throttle } from "@solid-primitives/scheduled";
 import { A } from "@solidjs/router";
 import Fuse from "fuse.js";
-import Mark from "mark.js";
 import { FiChevronLeft, FiSearch, FiX } from "solid-icons/fi";
-import {
-  Component,
-  createEffect,
-  createMemo,
-  createResource,
-  createSignal,
-  For,
-  onMount,
-  Show,
-  untrack,
-} from "solid-js";
+import { Component, createMemo, createResource, createSignal, For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { fetchPackageList } from "~/api";
 import { PackageListItem } from "~/types";
 import CheckBox from "./CheckBox/CheckBox";
+import { focusInputAndKeepVirtualKeyboardOpen } from "~/utils/focusInputAndKeepVirtualKeyboardOpen";
+import { createHighlight } from "~/primitives/highlight";
 
-let _inputEl!: HTMLInputElement;
-export const getSearchInput = () => {
-  return _inputEl;
-};
+let inputEl: HTMLInputElement | undefined;
+
+export function focusSearchInput() {
+  inputEl && focusInputAndKeepVirtualKeyboardOpen(inputEl);
+}
 
 const MAX_PRIMITIVES_COUNT = 5;
 
@@ -108,36 +98,12 @@ const Search: Component<{
   const scroll = useWindowScrollPosition();
   const showShadow = () => scroll.y > 60;
 
-  let markInstance: Mark;
-  onMount(() => (markInstance = new Mark(listContainer)));
-
-  const forceHighlightText = (value: string, forceUnmark = false) => {
-    requestAnimationFrame(() => {
-      if (value.length <= 2) {
-        markInstance.unmark();
-        return;
-      }
-      if (forceUnmark) {
-        markInstance.unmark();
-      }
-      markInstance.mark(value, {
-        exclude: Object.entries(config.highlight)
-          .filter(([, item]) => !item.checked)
-          .flatMap(([key]) => [`[data-ignore-mark-${key}]`, `[data-ignore-mark-${key}] *`]),
-        separateWordSearch: false,
-      });
-    });
-  };
-  const highlightText = throttle(forceHighlightText, 40);
-
-  createEffect(() => {
-    highlightText(search());
+  const rawHighlight = createHighlight(text => <mark>{text()}</mark>);
+  const toHighlight = createMemo(() => {
+    const searchValue = search();
+    return searchValue.length > 1 ? searchValue : "";
   });
-
-  createEffect(() => {
-    deepTrack(config.highlight);
-    forceHighlightText(untrack(search), true);
-  });
+  const highlight = (text: string) => rawHighlight(text, toHighlight());
 
   return (
     <div class="xs:w-full flex w-[calc(100vw-32px)] max-w-[800px] items-center justify-center">
@@ -165,7 +131,7 @@ const Search: Component<{
                 value={search()}
                 type="text"
                 onInput={e => setSearch(e.currentTarget.value)}
-                ref={el => ((input = el), (_inputEl = el))}
+                ref={el => ((input = el), (inputEl = el))}
               />
             </div>
             <button
@@ -212,40 +178,31 @@ const Search: Component<{
                 const [showRest, setShowRest] = createSignal(false);
                 const toggleShowRest = () => setShowRest(p => !p);
 
-                createEffect(() => {
-                  showRest();
-                  forceHighlightText(untrack(search), true);
-                });
-
                 return (
                   <li>
                     <h4
                       class="text-lg font-semibold text-[#49494B] dark:text-[#bec5cf]"
                       data-ignore-mark-title
                     >
-                      <A href={`/package/${match.name.toLowerCase()}`}>{match.name}</A>
+                      <A href={`/package/${match.name.toLowerCase()}`}>{highlight(match.name)}</A>
                     </h4>
-                    <p class="my-[6px] text-[14px]" data-ignore-mark-description>
-                      {match.description}
-                    </p>
+                    <p class="my-[6px] text-[14px]">{highlight(match.description)}</p>
 
                     <div class="flex justify-between gap-2">
-                      <ul class="flex flex-wrap gap-2 self-start" data-ignore-mark-primitive>
+                      <ul class="flex flex-wrap gap-2 self-start">
                         <For each={match.primitives}>
-                          {(primitive, idx) => {
-                            return (
-                              <Show when={showRest() || idx() < MAX_PRIMITIVES_COUNT}>
-                                <li>
-                                  <A
-                                    href={`/package/${match.name.toLowerCase()}#${primitive.toLowerCase()}`}
-                                    class="[&>mark]:background-[linear-gradient(0deg,#ffaf1d,#ffaf1d)_center_/_100%_75%_no-repeat] inline-block rounded-md bg-[#e6f0ff] px-2 py-[2px] text-[14px] font-semibold text-[#063983] transition-colors hover:text-black dark:bg-[#30455b] dark:text-[#b9d6ff] dark:hover:text-[#fff] sm:text-base"
-                                  >
-                                    {primitive}
-                                  </A>
-                                </li>
-                              </Show>
-                            );
-                          }}
+                          {(primitive, idx) => (
+                            <Show when={showRest() || idx() < MAX_PRIMITIVES_COUNT}>
+                              <li>
+                                <A
+                                  href={`/package/${match.name.toLowerCase()}#${primitive.toLowerCase()}`}
+                                  class="[&>mark]:background-[linear-gradient(0deg,#ffaf1d,#ffaf1d)_center_/_100%_75%_no-repeat] inline-block rounded-md bg-[#e6f0ff] px-2 py-[2px] text-[14px] font-semibold text-[#063983] transition-colors hover:text-black dark:bg-[#30455b] dark:text-[#b9d6ff] dark:hover:text-[#fff] sm:text-base"
+                                >
+                                  {highlight(primitive)}
+                                </A>
+                              </li>
+                            </Show>
+                          )}
                         </For>
                         <Show when={!showRest() && MAX_PRIMITIVES_COUNT < match.primitives.length}>
                           <li class="flex items-center text-[14px] text-slate-500 transition hover:text-black dark:text-white">
@@ -272,13 +229,13 @@ const Search: Component<{
                       </Show>
                     </div>
                     <Show when={match.tags.length}>
-                      <ul class="flex flex-wrap gap-4 gap-y-2 self-start pt-2" data-ignore-mark-tag>
+                      <ul class="flex flex-wrap gap-4 gap-y-2 self-start pt-2">
                         <For each={match.tags}>
                           {item => (
                             <li>
                               <span class="text-[12px] text-slate-500 dark:text-slate-400 sm:text-[14px]">
                                 <span class="opacity-50">{"#"}</span>
-                                {item}
+                                {highlight(item)}
                               </span>
                             </li>
                           )}
