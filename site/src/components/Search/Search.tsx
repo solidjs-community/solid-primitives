@@ -4,10 +4,8 @@ import { A } from "@solidjs/router";
 import Fuse from "fuse.js";
 import { FiChevronLeft, FiSearch, FiX } from "solid-icons/fi";
 import { Component, createMemo, createResource, createSignal, For, Show } from "solid-js";
-import { createStore } from "solid-js/store";
 import { fetchPackageList } from "~/api";
 import { PackageListItem } from "~/types";
-import CheckBox from "./CheckBox/CheckBox";
 import { focusInputAndKeepVirtualKeyboardOpen } from "~/utils/focusInputAndKeepVirtualKeyboardOpen";
 import { createHighlight } from "~/primitives/highlight";
 
@@ -50,14 +48,6 @@ const Search: Component<{
 }> = props => {
   const isSmall = createMediaQuery("(max-width: 767px)");
   const [search, setSearch] = createSignal("");
-  const [config, setConfig] = createStore({
-    highlight: {
-      title: { checked: false },
-      description: { checked: true },
-      primitive: { checked: true },
-      tag: { checked: true },
-    },
-  });
 
   let listContainer!: HTMLUListElement;
   let input!: HTMLInputElement;
@@ -142,21 +132,6 @@ const Search: Component<{
             </button>
           </div>
 
-          <div class="bg-page-main-bg flex items-center gap-3 rounded-b-lg p-2">
-            <div class="xs:text-base text-[13px] font-semibold">Highlight</div>
-            <div class="xxs:text-[14px] xs:text-[15px] flex gap-[4px] overflow-auto py-[2px] text-[12px] md:gap-4">
-              <For each={Object.keys(config.highlight) as (keyof typeof config.highlight)[]}>
-                {item => (
-                  <CheckBox
-                    checked={config.highlight[item].checked}
-                    onChange={checked => setConfig("highlight", item, "checked", checked)}
-                  >
-                    <span class="capitalize opacity-80">{item}</span>
-                  </CheckBox>
-                )}
-              </For>
-            </div>
-          </div>
           <div
             class="bg-page-main-bg relative border-b border-slate-300 px-2 dark:border-slate-600"
             classList={{ hidden: !result().length }}
