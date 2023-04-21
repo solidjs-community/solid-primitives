@@ -1,7 +1,7 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { createSingletonRoot } from "@solid-primitives/rootless";
 import { arrayEquals } from "@solid-primitives/utils";
-import { Accessor, batch, createEffect, createMemo, createSignal, on, untrack } from "solid-js";
+import { Accessor, createEffect, createMemo, createSignal, on, untrack } from "solid-js";
 import { isServer } from "solid-js/web";
 
 export type ModifierKey = "Alt" | "Control" | "Meta" | "Shift";
@@ -16,6 +16,53 @@ function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
 }
 
 /**
+ * Provides a signal with the last keydown event.
+ *
+ * The signal is `null` initially, and is reset to that after a timeout.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#useKeyDownEvent
+ *
+ * @returns
+ * Returns a signal of the last keydown event
+ * ```ts
+ * Accessor<KeyboardEvent | null>
+ * ```
+ *
+ * @example
+ * ```ts
+ * const event = useKeyDownEvent();
+ *
+ * createEffect(() => {
+ *   const e = event();
+ *   console.log(e) // => KeyboardEvent | null
+ *
+ *   if (e) {
+ *     console.log(e.key) // => "Q" | "ALT" | ... or null
+ *     e.preventDefault(); // prevent default behavior or last keydown event
+ *   }
+ * })
+ * ```
+ */
+export const useKeyDownEvent = /*#__PURE__*/ createSingletonRoot<Accessor<KeyboardEvent | null>>(
+  () => {
+    if (isServer) {
+      return () => null;
+    }
+
+    const [event, setEvent] = createSignal<KeyboardEvent | null>(null);
+
+    makeEventListener(window, "keydown", e => {
+      setEvent(e);
+      setTimeout(() => setEvent(null));
+    });
+
+    return event;
+  },
+);
+
+type OldPressedKeys = [Accessor<string[]>, { event: Accessor<KeyboardEvent | null> }];
+
+/**
  * Provides a signal with the list of currently held keys, ordered from least recent to most recent.
  *
  * This is a [singleton root primitive](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot). *(signals and event-listeners are reused across dependents)*
@@ -23,41 +70,63 @@ function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#useKeyDownList
  *
  * @returns
- * Returns a signal of a list of keys, and a signal of last keydown event.
+ * Returns a signal of a list of keys
  * ```ts
- * [keys: Accessor<string[]>, other: { event: Accessor<KeyboardEvent | null> }]
+ * Accessor<string[]>
  * ```
  *
  * @example
  * ```ts
- * const [keys] = useKeyDownList();
+ * const keys = useKeyDownList();
  * createEffect(() => {
  *    console.log(keys()) // => ["ALT", "CONTROL", "Q", "A"]
  * })
  * ```
  */
-export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<
-  [keys: Accessor<string[]>, other: { event: Accessor<KeyboardEvent | null> }]
->(() => {
+export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[]>>(() => {
   if (isServer) {
-    return [() => [], { event: () => null }];
+    const keys = () => [];
+    (keys as any as OldPressedKeys)[0] = keys;
+    (keys as any as OldPressedKeys)[1] = { event: () => null };
+    (keys as any as OldPressedKeys)[Symbol.iterator] = function* () {
+      yield (keys as any as OldPressedKeys)[0];
+      yield (keys as any as OldPressedKeys)[1];
+    };
+    return keys;
   }
 
-  const [pressedKeys, setPressedKeys] = createSignal<string[]>([]);
-  const [event, setEvent] = createSignal<KeyboardEvent | null>(null);
-
-  const reset = () => setPressedKeys([]);
+  const [pressedKeys, setPressedKeys] = createSignal<string[]>([]),
+    reset = () => setPressedKeys([]),
+    event = useKeyDownEvent();
 
   makeEventListener(window, "keydown", e => {
     // e.key may be undefined when used with <datalist> el
     // gh issue: https://github.com/solidjs-community/solid-primitives/issues/246
     if (e.repeat || typeof e.key !== "string") return;
-    const key = e.key.toUpperCase();
-    if (pressedKeys().includes(key)) return;
-    batch(() => {
-      setEvent(e);
-      setPressedKeys(prev => [...prev, key]);
-    });
+
+    const key = e.key.toUpperCase(),
+      currentKeys = pressedKeys();
+
+    if (currentKeys.includes(key)) return;
+
+    const keys = [...currentKeys, key];
+
+    // if the modifier is pressed before we start listening
+    // we should add it to the list
+    if (
+      currentKeys.length === 0 &&
+      key !== "ALT" &&
+      key !== "CONTROL" &&
+      key !== "META" &&
+      key !== "SHIFT"
+    ) {
+      if (e.shiftKey) keys.unshift("SHIFT");
+      if (e.altKey) keys.unshift("ALT");
+      if (e.ctrlKey) keys.unshift("CONTROL");
+      if (e.metaKey) keys.unshift("META");
+    }
+
+    setPressedKeys(keys);
   });
 
   makeEventListener(window, "keyup", e => {
@@ -71,7 +140,17 @@ export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<
     e.defaultPrevented || reset();
   });
 
-  return [pressedKeys, { event }];
+  // this is for backwards compatibility
+  // TODO remove in the next major version
+  (pressedKeys as any as OldPressedKeys)[0] = pressedKeys;
+  (pressedKeys as any as OldPressedKeys)[1] = { event };
+
+  (pressedKeys as any as OldPressedKeys)[Symbol.iterator] = function* () {
+    yield (pressedKeys as any as OldPressedKeys)[0];
+    yield (pressedKeys as any as OldPressedKeys)[1];
+  };
+
+  return pressedKeys;
 });
 
 /**
@@ -100,7 +179,7 @@ export const useCurrentlyHeldKey = /*#__PURE__*/ createSingletonRoot<Accessor<st
       return () => null;
     }
 
-    const [keys] = useKeyDownList();
+    const keys = useKeyDownList();
     let prevKeys = untrack(keys);
 
     return createMemo(() => {
@@ -138,7 +217,9 @@ export const useKeyDownSequence = /*#__PURE__*/ createSingletonRoot<Accessor<str
   if (isServer) {
     return () => [];
   }
-  const [keys] = useKeyDownList();
+
+  const keys = useKeyDownList();
+
   return createMemo(prev => {
     if (keys().length === 0) return [];
     return [...prev, keys()];
@@ -176,18 +257,11 @@ export function createKeyHold(
   }
 
   key = key.toUpperCase();
-  const { preventDefault = true } = options;
+  const { preventDefault = true } = options,
+    event = useKeyDownEvent(),
+    heldKey = useCurrentlyHeldKey();
 
-  const [, { event }] = useKeyDownList();
-  const heldKey = useCurrentlyHeldKey();
-
-  return createMemo(() => {
-    if (heldKey() === key) {
-      preventDefault && event()!.preventDefault();
-      return true;
-    }
-    return false;
-  });
+  return createMemo(() => heldKey() === key && (preventDefault && event()?.preventDefault(), true));
 }
 
 /**
@@ -210,7 +284,7 @@ export function createKeyHold(
  */
 export function createShortcut(
   keys: KbdKey[],
-  callback: (event: KeyboardEvent) => void,
+  callback: (event: KeyboardEvent | null) => void,
   options: {
     preventDefault?: boolean;
     requireReset?: boolean;
@@ -221,29 +295,28 @@ export function createShortcut(
   }
 
   keys = keys.map(key => key.toUpperCase());
-  const { preventDefault = true, requireReset = false } = options;
-
-  const [, { event }] = useKeyDownList();
-  const sequence = useKeyDownSequence();
+  const { preventDefault = true } = options,
+    event = useKeyDownEvent(),
+    sequence = useKeyDownSequence();
 
   let reset = false;
   // allow to check the sequence only once the user has released all keys
   const handleSequenceWithReset = (sequence: string[][]) => {
     if (!sequence.length) return (reset = false);
     if (reset) return;
-    const e = event()!;
+    const e = event();
 
     if (sequence.length < keys.length) {
       // optimistically preventDefault behavior if we yet don't have enough keys
       if (equalsKeyHoldSequence(sequence, keys.slice(0, sequence.length))) {
-        preventDefault && e.preventDefault();
+        preventDefault && e && e.preventDefault();
       } else {
         reset = true;
       }
     } else {
       reset = true;
       if (equalsKeyHoldSequence(sequence, keys)) {
-        preventDefault && e.preventDefault();
+        preventDefault && e && e.preventDefault();
         callback(e);
       }
     }
@@ -253,23 +326,25 @@ export function createShortcut(
   const handleSequenceWithoutReset = (sequence: string[][]) => {
     const last = sequence.at(-1);
     if (!last) return;
-    const e = event()!;
+    const e = event();
 
     // optimistically preventDefault behavior if we yet don't have enough keys
     if (preventDefault && last.length < keys.length) {
       if (arrayEquals(last, keys.slice(0, keys.length - 1))) {
-        e.preventDefault();
+        e && e.preventDefault();
       }
       return;
     }
     if (arrayEquals(last, keys)) {
       const prev = sequence.at(-2);
       if (!prev || arrayEquals(prev, keys.slice(0, keys.length - 1))) {
-        preventDefault && e.preventDefault();
+        preventDefault && e && e.preventDefault();
         callback(e);
       }
     }
   };
 
-  createEffect(on(sequence, requireReset ? handleSequenceWithReset : handleSequenceWithoutReset));
+  createEffect(
+    on(sequence, options.requireReset ? handleSequenceWithReset : handleSequenceWithoutReset),
+  );
 }

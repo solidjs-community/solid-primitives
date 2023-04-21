@@ -31,11 +31,15 @@ const MessageStack: Component<{
 };
 
 const App: Component = () => {
-  const [pressedKeys] = useKeyDownList();
+  const pressedKeys = useKeyDownList();
   const pressing = createKeyHold("Shift");
 
   createShortcut(["Q"], () => {
     addMessage("Q pressed");
+  });
+
+  createShortcut(["Control", "P"], () => {
+    addMessage("Control P pressed");
   });
 
   createShortcut(

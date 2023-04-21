@@ -11,6 +11,7 @@
 
 A library of reactive promitives helping handling user's keyboard input.
 
+- [`useKeyDownEvent`](#useKeyDownEvent) — Provides a signal with the last keydown event.
 - [`useKeyDownList`](#useKeyDownList) — Provides a signal with the list of currently held keys
 - [`useCurrentlyHeldKey`](#useCurrentlyHeldKey) — Provides a signal with the currently held single key.
 - [`useKeyDownSequence`](#useKeyDownSequence) — Provides a signal with a sequence of currently held keys, as they were pressed down and up.
@@ -22,7 +23,35 @@ A library of reactive promitives helping handling user's keyboard input.
 ```bash
 npm install @solid-primitives/keyboard
 # or
+pnpm add @solid-primitives/keyboard
+# or
 yarn add @solid-primitives/keyboard
+```
+
+## `useKeyDownEvent`
+
+Provides a signal with the last keydown event.
+
+This is a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) primitive that will reuse event listeners and signals across dependents.
+
+### How to use it
+
+`useKeyDownEvent` takes no arguments, and returns a signal with the last keydown event.
+
+```tsx
+import { useKeyDownEvent } from "@solid-primitives/keyboard";
+
+const event = useKeyDownEvent();
+
+createEffect(() => {
+  const e = event();
+  console.log(e); // => KeyboardEvent | null
+
+  if (e) {
+    console.log(e.key); // => "Q" | "ALT" | ... or null
+    e.preventDefault(); // prevent default behavior or last keydown event
+  }
+});
 ```
 
 ## `useKeyDownList`
@@ -33,16 +62,15 @@ This is a [singleton root](https://github.com/solidjs-community/solid-primitives
 
 ### How to use it
 
-`useKeyDownList` takes no arguments, and returns a signal with the list of currently held keys, and last keydown event.
+`useKeyDownList` takes no arguments, and returns a signal with the list of currently held keys
 
 ```tsx
 import { useKeyDownList } from "@solid-primitives/keyboard";
 
-const [keys, { event }] = useKeyDownList();
+const keys = useKeyDownList();
 
 createEffect(() => {
   console.log(keys()); // => string[] — list of currently held keys
-  console.log(event()); // => KeyboardEvent | null — last keydown event
 });
 
 <For each={keys()}>
