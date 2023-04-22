@@ -49,9 +49,6 @@ const Search: Component<{
   const isSmall = createMediaQuery("(max-width: 767px)");
   const [search, setSearch] = createSignal("");
 
-  let listContainer!: HTMLUListElement;
-  let input!: HTMLInputElement;
-
   const [packages] = createResource(fetchPackageList, {
     initialValue: [],
   });
@@ -113,7 +110,7 @@ const Search: Component<{
               id="search-input-container"
               class="w-max-[350px] dark:bg-page-main-bg after:dashed-border-[color(#00006E)_dasharray(1,7)_width(4px)_radius(8px)] dark:after:dashed-border-[color(#7ea2cf)_dasharray(1,7)_width(4px)_radius(8px)] relative flex flex-grow cursor-text items-center rounded-md border-2 border-[#bdd3f2] px-2 py-2 font-sans text-[#306FC4] after:pointer-events-none after:absolute after:inset-[-6px] after:hidden after:content-[''] focus-within:text-[#063983] focus-within:after:block hover:border-[#7ea2cf] hover:text-[#063983] dark:border-[#59728d] dark:text-[#c2d5ee] dark:hover:border-[#d0e4ff87] dark:hover:text-white"
               tabindex="-1"
-              onFocus={() => input.focus()}
+              onFocus={() => inputEl?.focus()}
             >
               <div class="mr-2">
                 <FiSearch />
@@ -123,8 +120,8 @@ const Search: Component<{
                 placeholder="Quick Search ..."
                 value={search()}
                 type="text"
-                onInput={e => setSearch(e.currentTarget.value)}
-                ref={el => ((input = el), (inputEl = el))}
+                onInput={e => setSearch(e.target.value)}
+                ref={el => (inputEl = el)}
               />
             </div>
             <button
@@ -150,7 +147,7 @@ const Search: Component<{
         </div>
         <div class="p-2 sm:p-4" classList={{ hidden: !result().length }}>
           <div class=""></div>
-          <ul class="flex flex-col gap-y-6" ref={listContainer}>
+          <ul class="flex flex-col gap-y-6">
             <For each={result()}>
               {match => {
                 const [showRest, setShowRest] = createSignal(false);
