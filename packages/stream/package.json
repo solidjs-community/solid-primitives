@@ -17,8 +17,7 @@
       "createAmplitudeStream",
       "createMediaPermissionRequest",
       "createAmplitudeFromStream",
-      "createScreen",
-      "createMediaRecorder"
+      "createScreen"
     ],
     "category": "Network"
   },
