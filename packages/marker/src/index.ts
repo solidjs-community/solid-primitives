@@ -11,13 +11,13 @@ const disposeAll = (list: { dispose: VoidFunction }[]) => {
  *
  * @param mapMatch A callback for mapping the matched string to a value to be added to the returned array.
  * @param options Options for the marker.
- * - `cacheLimit` The maximum number of elements to cache for reuse. Defaults to 100.
+ * - `cacheSize` The maximum number of elements to cache for reuse. Defaults to 100.
  *
  * @returns A function that takes a string input and a regex to match the input, and returns an array of strings and mapped values.
  *
  * @example
  * ```tsx
- * const highlight = createMarker((text) => <mark>{text}</mark>);
+ * const highlight = createMarker((text) => <mark>{text()}</mark>);
  *
  * <p>
  *   {highlight("Hello world!", /\w+/g)} // => <mark>Hello</mark> <mark>world</mark>!
@@ -26,10 +26,10 @@ const disposeAll = (list: { dispose: VoidFunction }[]) => {
  */
 export function createMarker<T>(
   mapMatch: (match: Accessor<string>) => T,
-  options?: { cacheLimit?: number },
+  options?: { cacheSize?: number },
 ): (string: string, regex: RegExp) => (string | T)[] {
-  const { cacheLimit = 100 } = options ?? {},
-    toReuse: { el: T; set(test: string): void; dispose: VoidFunction }[] = [],
+  const { cacheSize = 100 } = options ?? {},
+    toReuse: { el: T; set(test: string): void; dispose(): void }[] = [],
     owner = getOwner();
 
   onCleanup(() => {
@@ -38,14 +38,15 @@ export function createMarker<T>(
   });
 
   const limitCache = () =>
-    toReuse.length > cacheLimit && disposeAll(toReuse.splice(0, toReuse.length - cacheLimit));
+    toReuse.length > cacheSize && disposeAll(toReuse.splice(0, toReuse.length - cacheSize));
 
   return (string, regex) => {
     let match = regex.exec(string),
       lastIndex = 0,
       reuseIndex = 0;
 
-    if (!match) return [string];
+    // fast path for no matches and empty regex
+    if (!match || !match[0]) return [string];
 
     const parts: (string | T)[] = [],
       reusableList: typeof toReuse = [];
@@ -62,7 +63,8 @@ export function createMarker<T>(
           reusable = { el: mapMatch(text), set, dispose };
         }, owner);
       }
-      parts.push(string.slice(lastIndex, match.index), reusable!.el);
+      lastIndex !== match.index && parts.push(string.slice(lastIndex, match.index));
+      parts.push(reusable!.el);
       reusableList.push(reusable!);
       lastIndex = match.index + matchText.length;
     } while ((match = regex.exec(string)));

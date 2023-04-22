@@ -7,11 +7,9 @@
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/marker?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/marker)
 [![version](https://img.shields.io/npm/v/@solid-primitives/marker?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/marker)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A sample primitive that is made up for templating with the following options:
-
-`createPrimitiveTemplate` - Provides a getter and setter for the primitive.
+A reactive primitive for marking parts of a string that match a regular expression. Useful for highlighting search results.
 
 ## Installation
 
@@ -25,13 +23,58 @@ pnpm add @solid-primitives/marker
 
 ## How to use it
 
-```ts
-const [value, setValue] = createPrimitiveTemplate(false);
+`createMarker` creates a function for marking parts of a string that match a regex. Each match will be mapped by `mapMatch` callback and returned as an array of strings and mapped values.
+
+```tsx
+import { createMarker } from "@solid-primitives/marker";
+
+const highlight = createMarker(matchedText => {
+  // matchedText param is the sting matched by regex
+  // it's an accessor, because each mapped value is reused between marker calls
+  return <mark>{matchedText()}</mark>;
+});
+
+<p>
+  {highlight("Hello world!", /\w+/g)} {/* <mark>Hello</mark> <mark>world</mark>! */}
+</p>;
 ```
+
+## Mapping matches
+
+The `mapMatch` callback is **not** reactive. The value returned by it is cached and reused between marker calls. This is useful for performance reasons, but it also means that the callback should handle the matched text as an accessor.
+
+It behaves similarly to the `mapFn` param of `indexArray`, where the returned element is reused for different values.
+
+Any computations created in that callback will be disposed when `createMarker` get's disposed, not on each marker call, because the results are cached between calls.
+
+```tsx
+const mark = createMarker(text => {
+  // you can safely create computations here
+  createEffect(() => {
+    console.log(text());
+  });
+
+  return <mark>{text()}</mark>;
+});
+```
+
+## Caching
+
+The marker callback is cached between calls.
+
+This way returned elements are reused as much as possible.
+
+But every cache needs a limit. By default the cache size is 100. You can change it by passing the `cacheSize` option to `createMarker`.
+
+```tsx
+const mark = createMarker(text => <mark>{text()}</mark>, { cacheSize: 1000 });
+```
+
+The marker will still be able to handle more than 1000 different regexes, but it will start to dispose the unused ones that exceed the limit.
 
 ## Demo
 
-You can use this template for publishing your demo on CodeSandbox: https://codesandbox.io/s/solid-primitives-demo-template-sz95h
+[Deployed example](https://solidjs-community.github.io/solid-primitives/marker) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/marker/dev)
 
 ## Changelog
 
