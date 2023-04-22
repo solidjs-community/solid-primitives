@@ -1,5 +1,6 @@
 import { createMediaQuery } from "@solid-primitives/media";
 import { useWindowScrollPosition } from "@solid-primitives/scroll";
+import { createMarker } from "@solid-primitives/marker";
 import { A } from "@solidjs/router";
 import Fuse from "fuse.js";
 import { FiChevronLeft, FiSearch, FiX } from "solid-icons/fi";
@@ -7,7 +8,6 @@ import { Component, createMemo, createResource, createSignal, For, Show } from "
 import { fetchPackageList } from "~/api";
 import { PackageListItem } from "~/types";
 import { focusInputAndKeepVirtualKeyboardOpen } from "~/utils/focusInputAndKeepVirtualKeyboardOpen";
-import { createHighlight } from "~/primitives/highlight";
 
 let inputEl: HTMLInputElement | undefined;
 
@@ -88,13 +88,13 @@ const Search: Component<{
   const scroll = useWindowScrollPosition();
   const showShadow = () => scroll.y > 60;
 
-  const rawHighlight = createHighlight(text => <mark>{text()}</mark>);
-  const toHighlight = createMemo(() => {
+  const rawHighlight = createMarker(text => <mark>{text()}</mark>);
+  const highlightRegex = createMemo(() => {
     const searchValue = search();
     return searchValue.length > 1 && new RegExp(searchValue, "gi");
   });
   const highlight = (text: string) => {
-    const regex = toHighlight();
+    const regex = highlightRegex();
     return regex ? rawHighlight(text, regex) : text;
   };
 

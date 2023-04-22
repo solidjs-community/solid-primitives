@@ -26,6 +26,7 @@
     "@solid-primitives/event-listener": "workspace:^",
     "@solid-primitives/intersection-observer": "workspace:^",
     "@solid-primitives/keyboard": "workspace:^",
+    "@solid-primitives/marker": "workspace:^",
     "@solid-primitives/media": "workspace:^",
     "@solid-primitives/mutation-observer": "workspace:^",
     "@solid-primitives/platform": "workspace:^",
