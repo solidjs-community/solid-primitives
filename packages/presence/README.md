@@ -59,9 +59,9 @@ type Options = {
   /** Duration in milliseconds used both for enter and exit transitions. */
   transitionDuration: number;
   /** Duration in milliseconds used for enter transitions (overrides `transitionDuration` if provided). */
-  enterTransitionDuration: number;
+  enterDuration: number;
   /** Duration in milliseconds used for exit transitions (overrides `transitionDuration` if provided). */
-  exitTransitionDuration: number;
+  exitDuration: number;
   /** Opt-in to animating the entering of an element if `isVisible` is `true` during the initial mount. */
   initialEnter?: boolean;
 };

@@ -1,4 +1,4 @@
-import { createSignal, createEffect, onCleanup, type Accessor } from "solid-js";
+import { createSignal, createEffect, onCleanup, type Accessor, createMemo } from "solid-js";
 
 type SharedTransitionConfig = {
   /** Duration in milliseconds used both for enter and exit transitions. */
@@ -7,9 +7,9 @@ type SharedTransitionConfig = {
 
 type SeparateTransitionConfig = {
   /** Duration in milliseconds used for enter transitions (overrides `transitionDuration` if provided). */
-  enterTransitionDuration: number;
+  enterDuration: number;
   /** Duration in milliseconds used for exit transitions (overrides `transitionDuration` if provided). */
-  exitTransitionDuration: number;
+  exitDuration: number;
 };
 
 type Options = (
@@ -30,27 +30,23 @@ export default function createPresence(
   optsValue: Options | Accessor<Options>,
 ) {
   const opts = () => (typeof optsValue === "function" ? optsValue() : optsValue);
-  const exitTransitionDuration = () => {
+  const exitDuration = createMemo(() => {
     const optsValue = opts();
-    return "exitTransitionDuration" in optsValue
-      ? optsValue.exitTransitionDuration
-      : optsValue.transitionDuration;
-  };
-  const enterTransitionDuration = () => {
+    return "exitDuration" in optsValue ? optsValue.exitDuration : optsValue.transitionDuration;
+  });
+  const enterDuration = createMemo(() => {
     const optsValue = opts();
-    return "enterTransitionDuration" in optsValue
-      ? optsValue.enterTransitionDuration
-      : optsValue.transitionDuration;
-  };
+    return "enterDuration" in optsValue ? optsValue.enterDuration : optsValue.transitionDuration;
+  });
 
   const initialEnter = opts().initialEnter ?? false;
   const [animateIsVisible, setAnimateIsVisible] = createSignal(initialEnter ? false : isVisible());
   const [isMounted, setIsMounted] = createSignal(isVisible());
   const [hasEntered, setHasEntered] = createSignal(initialEnter ? false : isVisible());
 
-  const isExiting = () => isMounted() && !isVisible();
-  const isEntering = () => isVisible() && !hasEntered();
-  const isAnimating = () => isEntering() || isExiting();
+  const isExiting = createMemo(() => isMounted() && !isVisible());
+  const isEntering = createMemo(() => isVisible() && !hasEntered());
+  const isAnimating = createMemo(() => isEntering() || isExiting());
 
   createEffect(() => {
     if (isVisible()) {
@@ -64,7 +60,7 @@ export default function createPresence(
 
       const timeoutId = setTimeout(() => {
         setIsMounted(false);
-      }, exitTransitionDuration());
+      }, exitDuration());
 
       onCleanup(() => clearTimeout(timeoutId));
     }
@@ -90,7 +86,7 @@ export default function createPresence(
     if (animateIsVisible() && !hasEntered()) {
       const timeoutId = setTimeout(() => {
         setHasEntered(true);
-      }, enterTransitionDuration());
+      }, enterDuration());
 
       onCleanup(() => clearTimeout(timeoutId));
     }
