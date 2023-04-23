@@ -43,12 +43,10 @@ export default function createPresence(
       : optsValue.transitionDuration;
   };
 
-  const initialEnter = () => opts().initialEnter ?? false;
-  const [animateIsVisible, setAnimateIsVisible] = createSignal(
-    initialEnter() ? false : isVisible(),
-  );
+  const initialEnter = opts().initialEnter ?? false;
+  const [animateIsVisible, setAnimateIsVisible] = createSignal(initialEnter ? false : isVisible());
   const [isMounted, setIsMounted] = createSignal(isVisible());
-  const [hasEntered, setHasEntered] = createSignal(initialEnter() ? false : isVisible());
+  const [hasEntered, setHasEntered] = createSignal(initialEnter ? false : isVisible());
 
   const isExiting = () => isMounted() && !isVisible();
   const isEntering = () => isVisible() && !hasEntered();
