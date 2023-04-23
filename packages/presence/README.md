@@ -1,4 +1,4 @@
-# @solid-primitives/presence-signal
+# @solid-primitives/presence
 
 ## [Example](https://stackblitz.com/edit/solidjs-templates-8eqpxz?file=src%2FApp.tsx)
 
@@ -17,7 +17,7 @@ This utility provides a lightweight solution where the animating element is only
 
 ## Example
 
-```jsx
+```tsx
 const FirstExample = () => {
   const [showStuff, setShowStuff] = createSignal(true);
   const { isVisible, isMounted } = createPresenceSignal(showStuff, {
@@ -106,15 +106,16 @@ createPresenceSwitchSignal<ItemType>(
 
 ### Example
 
-```jsx
+```tsx
 const SecondExample = () => {
   const items = ["foo", "bar", "baz", "qux"];
-  const [item, setItem] =
-    (createSignal < typeof items[number]) | (undefined > items[0]);
-  const { isMounted, mountedItem, isEntering, isVisible, isExiting } =
-    createPresenceSwitchSignal(item, {
+  const [item, setItem] = createSignal<(typeof items)[number] | undefined>(items[0]);
+  const { isMounted, mountedItem, isEntering, isVisible, isExiting } = createPresenceSwitchSignal(
+    item,
+    {
       transitionDuration: 500,
-    });
+    },
+  );
 
   return (
     <div
@@ -126,7 +127,7 @@ const SecondExample = () => {
       }}
     >
       <For each={items}>
-        {(currItem) => (
+        {currItem => (
           <button
             onclick={() => {
               if (item() === currItem) {

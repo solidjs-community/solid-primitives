@@ -24,7 +24,7 @@ type Options = (
 /**
  * Animates the appearance of its children.
  */
-export default function createPresenceSignal(
+export default function createPresence(
   /** Indicates whether the component that the resulting values will be used upon should be visible to the user. */
   isVisible: Accessor<boolean>,
   optsValue: Options | Accessor<Options>,

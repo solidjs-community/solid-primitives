@@ -1,7 +1,7 @@
 import { createSignal, createEffect, type Accessor } from "solid-js";
-import createPresenceSignal from "./createPresenceSignal";
+import createPresenceSignal from "./createPresence";
 
-export default function createPresenceSwitchSignal<ItemType>(
+export default function createPresenceSwitch<ItemType>(
   item: Accessor<ItemType | undefined>,
   opts: Parameters<typeof createPresenceSignal>[1],
 ) {

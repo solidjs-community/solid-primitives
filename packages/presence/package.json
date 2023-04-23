@@ -1,20 +1,20 @@
 {
-  "name": "@solid-primitives/presence-signal",
+  "name": "@solid-primitives/presence",
   "version": "1.0.0",
   "description": "Utility to animate the presence of an element based on the existance of data or lack therof.",
   "author": "Ethan Standel <ethan@standel.io>",
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/presence-signal#readme",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/presence#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
   },
   "primitive": {
-    "name": "presence-signal",
+    "name": "presence",
     "stage": 0,
     "list": [
-      "createPresenceSignal",
-      "createPresenceSwitchSignal"
+      "createPresence",
+      "createPresenceSwitch"
     ],
     "category": "Animation"
   },
