@@ -11,17 +11,30 @@
 
 Primitive to help establish, maintain and operate a websocket connection.
 
-`createWebsocket` - Core primitive that setups up a basic outbound connection.
+- `makeWS` - sets up a web socket connection with a buffered send
+- `createWS` - sets up a web socket connection that disconnects on cleanup
+- `makeReconnectingWS` - sets up a web socket connection that reconnects if involuntarily closed
+- `createReconnectingWS` - sets up a reconnecting web socket connection that disconnects on cleanup
 
 ## How to use it
 
 ```ts
-const [connect, disconnect] = createWebsocket("http://localhost", "", 3, 5000);
+const ws = createWS("ws://localhost:5000");
+ws.send("it works");
+createEffect(on(
+  ws.message,
+  (msg) => console.log(msg),
+  { defer: true }
+));
+
+const socket = makeReconnectingWS(`ws://${location.hostName}/api/ws`);
+onCleanup(() => socket.close());
+socket.send("this will reconnect if connection fails");
 ```
 
 ## Demo
 
-You may find a semi-functional example here: https://codesandbox.io/s/solid-websocket-65ynu?file=/src/index.tsx
+TODO
 
 ## Changelog
 

@@ -1,72 +1,88 @@
-import { createSignal, onCleanup } from "solid-js";
+import { createMemo, createSignal, onCleanup, type Accessor } from "solid-js";
 
-export type WebsocketState = 0 | 1 | 2 | 3;
+export type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
+
+export type WSExtension = {
+  message: Accessor<WSMessage | undefined>
+}
 
 /**
- * Handles opening managing and reconnecting to a Websocket.
- *
- * @param url - Path to the websocket server
- * @param onData - A function supplied that messages will be reported to
- * @param onError - A function supplied that errors will be reported to
- * @param procotols - List of protocols to support
- * @param reconnectLimit - Amount of reconnection attempts
- * @param reconnectInterval - Time in between connection attempts
- * @return Returns an array containing websocket management options
- *
- * @example
+ * opens a web socket connection with a queued send and a message signal
  * ```ts
- * const [ connect, disconnect ] = createWebsocket('http://localhost', '', 3, 5000);
+ * const ws = makeWS("ws:localhost:5000");
+ * createEffect(() => ws.send(serverMessage()));
+ * createEffect(() => console.log(ws.message()));
+ * onCleanup(() => ws.close());
  * ```
+ * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
+ *
+ * It will not close the connection on cleanup. To do that, use `createWS`
  */
-const createWebsocket = (
+export const makeWS = (
   url: string,
-  onData: (message: MessageEvent) => void,
-  onError: (message: Event) => void,
-  protocols?: string | Array<string>,
-  reconnectLimit?: number,
-  reconnectInterval?: number,
-): [
-  connect: () => void,
-  disconnect: () => void,
-  send: (message: string) => void,
-  state: () => WebsocketState,
-  socket: () => WebSocket,
-] => {
-  let socket: WebSocket | undefined;
-  let reconnections = 0;
-  let reconnectId: ReturnType<typeof setTimeout> | undefined;
-  const [state, setState] = createSignal<WebsocketState>(WebSocket.CLOSED);
-  const send = (data: string | ArrayBuffer) => socket!.send(data);
-  const cancelReconnect = () => {
-    if (reconnectId) {
-      clearTimeout(reconnectId);
-    }
-  };
-  const disconnect = () => {
-    cancelReconnect();
-    reconnectLimit = Number.NEGATIVE_INFINITY;
-    if (socket) {
-      socket.close();
-    }
-  };
-  // Connect the socket to the server
-  const connect = () => {
-    cancelReconnect();
-    setState(WebSocket.CONNECTING);
-    socket = new WebSocket(url, protocols);
-    socket.onopen = () => setState(WebSocket.OPEN);
-    socket.onclose = () => {
-      setState(WebSocket.CLOSED);
-      if (reconnectLimit && reconnectLimit > reconnections) {
-        reconnections += 1;
-        reconnectId = setTimeout(connect, reconnectInterval);
-      }
-    };
-    socket.onerror = onError;
-    socket.onmessage = onData;
-  };
-  onCleanup(() => disconnect);
-  return [connect, disconnect, send, state, () => socket!];
+  protocols?: string | string[]
+): WebSocket & { message: Accessor<WSMessage | undefined> } => {
+  const [message, setMessage] = createSignal<WSMessage>();
+  const ws: WebSocket & { message: Accessor<WSMessage | undefined> } = Object.assign(
+    new WebSocket(url, protocols),
+    { message }
+  );
+  const _send = ws.send.bind(ws);
+  const queue: WSMessage[] = [];
+  ws.send = (msg: WSMessage) => 
+    ws.readyState == 1 ? _send(msg) : queue.push(msg);
+  ws.addEventListener('message', ({ data }) => setMessage(data));
+  ws.addEventListener('open', () => {
+    while (queue.length)
+      _send(queue.shift()!);
+  });
+  return ws;
 };
 
-export default createWebsocket;
+export const createWS = (
+  url: string,
+  protocols?: string | string[],
+): WebSocket & WSExtension => {
+  const ws = makeWS(url, protocols);
+  onCleanup(() => ws.close());
+  return ws;
+}
+
+export type WSReconnectOptions = {
+  timeout: number,
+  retries: number,
+}
+
+export const makeReconnectingWS = (
+  url: string,
+  protocols?: string | string[],
+  options?: WSReconnectOptions
+): Accessor<WebSocket & Accessor<WSMessage | undefined>> => {
+  const [connection, setConnection] = createSignal(makeWS(url, protocols));
+  let retries = options?.retries || Infinity;
+  const retryingConnection = createMemo(() => {
+    const ws = connection();
+    const _close = ws.close.bind(ws);
+    ws.close = (...args) => ((retries = -1), _close(...args));
+    ws.addEventListener('close', () =>
+      retries-- > 0 &&
+        setTimeout(
+          () => setConnection(makeWS(ws.url, ws.protocol)),
+          options?.timeout || 3000
+        )
+    );
+    return ws;
+  });
+  return retryingConnection;
+}
+
+export const createReconnectingWS = (
+  url: string,
+  protocols?: string | string[],
+  options?: WSReconnectOptions
+): Accessor<WebSocket & Accessor<WSMessage | undefined>> => {
+  const ws = makeReconnectingWS(url, protocols, options);
+  onCleanup(() => ws().close());
+  return ws;
+}
+
