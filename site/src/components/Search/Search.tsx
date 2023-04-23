@@ -71,8 +71,7 @@ const Search: Component<{
     const searchValue = search();
 
     return fuseValue
-      .search(searchValue)
-      .slice(0, 12)
+      .search(searchValue, { limit: 12 })
       .map(({ item }) => ({
         ...item,
         // order the primitives by search match
