@@ -1,6 +1,6 @@
 import { Accessor, createRoot, createSignal, getOwner, onCleanup } from "solid-js";
 
-const SANITIZE_REGEX = /\W/g,
+const SANITIZE_REGEX = /[^\w ]/g,
   EMPTY_REGEX = /(?:)/;
 
 /**
@@ -51,15 +51,14 @@ export function createMarker<T>(
 ): (string: string, regex: RegExp) => (string | T)[] {
   const { cacheSize = 100 } = options ?? {},
     toReuse: { el: T; set(test: string): void; dispose(): void }[] = [],
-    owner = getOwner();
+    owner = getOwner(),
+    limitCache = () =>
+      toReuse.length > cacheSize && disposeAll(toReuse.splice(0, toReuse.length - cacheSize));
 
   onCleanup(() => {
     disposeAll(toReuse);
     toReuse.length = 0;
   });
-
-  const limitCache = () =>
-    toReuse.length > cacheSize && disposeAll(toReuse.splice(0, toReuse.length - cacheSize));
 
   return (string, regex) => {
     let match = regex.exec(string),
