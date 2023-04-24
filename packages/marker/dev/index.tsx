@@ -1,7 +1,8 @@
 import { Component, createMemo, createSignal } from "solid-js";
 import { render } from "solid-js/web";
+import { createMarker, makeSearchRegex } from "../src";
+
 import "uno.css";
-import { createMarker } from "../src";
 
 const LOREM_IPSUM = [
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ligula tortor, mollis congue augue ac, sagittis sodales odio. Duis vulputate feugiat metus. Curabitur in nisl ac felis vestibulum facilisis vitae eu lectus. In justo metus, viverra non leo quis, laoreet finibus lacus. Phasellus consectetur arcu orci, non varius ligula ornare ac. Nulla facilisi. Maecenas dignissim nulla et sodales venenatis. Nunc purus nunc, consequat vitae convallis sit amet, bibendum quis augue. Pellentesque purus turpis, aliquet eget libero ut, imperdiet fermentum lacus. In sit amet finibus nunc, faucibus tincidunt eros. Praesent pretium lobortis turpis, nec rhoncus dui interdum aliquet. Nulla fermentum tellus nec dui fermentum rhoncus. Ut cursus purus ligula, sed tincidunt diam vulputate sit amet. Sed in eleifend eros.",
@@ -12,7 +13,7 @@ const App: Component = () => {
   const [search, setSearch] = createSignal("");
 
   const highlight = createMarker(text => <mark>{text()}</mark>);
-  const regex = createMemo(() => new RegExp(search(), "gi"));
+  const regex = createMemo(() => makeSearchRegex(search()));
 
   return (
     <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">

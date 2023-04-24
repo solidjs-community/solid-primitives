@@ -45,7 +45,7 @@ The `mapMatch` callback is **not** reactive. The value returned by it is cached 
 
 It behaves similarly to the `mapFn` param of `indexArray`, where the returned element is reused for different values.
 
-Any computations created in that callback will be disposed when `createMarker` get's disposed, not on each marker call, because the results are cached between calls.
+Any computations created in that callback will be disposed when `createMarker` gets disposed, not on each marker call, because the results are cached between calls.
 
 ```tsx
 const mark = createMarker(text => {
@@ -64,13 +64,43 @@ The marker callback is cached between calls.
 
 This way returned elements are reused as much as possible.
 
-But every cache needs a limit. By default the cache size is 100. You can change it by passing the `cacheSize` option to `createMarker`.
+But every cache needs a limit. By default, the cache size is 100. You can change it by passing the `cacheSize` option to `createMarker`.
 
 ```tsx
 const mark = createMarker(text => <mark>{text()}</mark>, { cacheSize: 1000 });
 ```
 
 The marker will still be able to handle more than 1000 different regexes, but it will start to dispose the unused ones that exceed the limit.
+
+## Search highlighting
+
+`createMarker` is very useful for highlighting the searched text in a search results list.
+
+But when used alone, it can be easy to forget to escape the regex special characters. This can lead to unexpected results.
+
+To avoid this, you can use the `makeSearchRegex` helper function to create a regex that will match the searched text.
+
+```tsx
+import { createMarker, makeSearchRegex } from "@solid-primitives/marker";
+
+const [search, setSearch] = createSignal("");
+
+const regex = createMemo(() => makeSearchRegex(search()));
+
+const highlight = createMarker(text => <mark>{text()}</mark>);
+
+<>
+  <input onInput={e => setSearch(e.target.value)} />
+  <p>{highlight(textToHighlight, regex())}</p>
+</>;
+```
+
+Regex returned by `makeSearchRegex` will:
+
+- match the searched text case-insensitively
+- escape all regex special characters (only words can be matched)
+- trim the searched text
+- match multiple words independently
 
 ## Demo
 

@@ -1,6 +1,6 @@
 import { createMediaQuery } from "@solid-primitives/media";
 import { useWindowScrollPosition } from "@solid-primitives/scroll";
-import { createMarker } from "@solid-primitives/marker";
+import { createMarker, makeSearchRegex } from "@solid-primitives/marker";
 import { A } from "@solidjs/router";
 import Fuse from "fuse.js";
 import { FiChevronLeft, FiSearch, FiX } from "solid-icons/fi";
@@ -70,15 +70,13 @@ const Search: Component<{
     const fuseValue = fuse();
     const searchValue = search();
 
-    return fuseValue
-      .search(searchValue, { limit: 12 })
-      .map(({ item }) => ({
-        ...item,
-        // order the primitives by search match
-        primitives: new Fuse(item.primitives, FUSE_PRIMITIVES_OPTIONS)
-          .search(searchValue)
-          .map(item => item.item),
-      }));
+    return fuseValue.search(searchValue, { limit: 12 }).map(({ item }) => ({
+      ...item,
+      // order the primitives by search match
+      primitives: new Fuse(item.primitives, FUSE_PRIMITIVES_OPTIONS)
+        .search(searchValue)
+        .map(item => item.item),
+    }));
   });
 
   const scroll = useWindowScrollPosition();
@@ -87,7 +85,7 @@ const Search: Component<{
   const rawHighlight = createMarker(text => <mark>{text()}</mark>);
   const highlightRegex = createMemo(() => {
     const searchValue = search();
-    return searchValue.length > 1 && new RegExp(searchValue, "gi");
+    return searchValue.length > 1 && makeSearchRegex(searchValue);
   });
   const highlight = (text: string) => {
     const regex = highlightRegex();
