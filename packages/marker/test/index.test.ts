@@ -1,6 +1,37 @@
 import { describe, test, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { createMarker } from "../src";
+import { createMarker, makeSearchRegex } from "../src";
+
+describe("makeSearchRegex", () => {
+  test("empty string", () => {
+    expect(makeSearchRegex("").test("hello")).toBe(false);
+    expect(makeSearchRegex("").test("")).toBe(false);
+  });
+
+  test("is case-insensitive", () => {
+    expect(makeSearchRegex("Abc").test("hello ABC")).toBe(true);
+    expect(makeSearchRegex("Abc").test("aabcc")).toBe(true);
+    expect(makeSearchRegex("Abc").test("a b c")).toBe(false);
+  });
+
+  test("matches multiple words", () => {
+    expect(makeSearchRegex("abc def").test("hello abc def")).toBe(true);
+    expect(makeSearchRegex("abc def").test("hello abc")).toBe(true);
+    expect(makeSearchRegex("abc def").test("hello def")).toBe(true);
+    expect(makeSearchRegex("abc def").test("hello abc def ghi")).toBe(true);
+    expect(makeSearchRegex("abc def").test("hello")).toBe(false);
+  });
+
+  test("ignores non-word characters", () => {
+    expect(makeSearchRegex("a.bc").test("abc")).toBe(true);
+    expect(makeSearchRegex("a.bc").test("a.bc")).toBe(false);
+  });
+
+  test("trims search", () => {
+    expect(makeSearchRegex("   abc   ").test("abc")).toBe(true);
+    expect(makeSearchRegex("   abc   ").test("hello abc")).toBe(true);
+  });
+});
 
 describe("createMarker", () => {
   test("marking test", () =>

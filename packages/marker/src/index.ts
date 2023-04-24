@@ -1,7 +1,8 @@
 import { Accessor, createRoot, createSignal, getOwner, onCleanup } from "solid-js";
 
-const SANITIZE_REGEX = /[^\w ]/g,
-  EMPTY_REGEX = /(?:)/;
+const SANITIZE_REGEX = /[^\w\s]/g,
+  SPLIT_WORDS_REGEX = /\s+/g,
+  NEVER_REGEX = /.^/;
 
 /**
  * Creates a regex from a search string. This regex can be used to match any of the words in the search string.
@@ -10,15 +11,15 @@ const SANITIZE_REGEX = /[^\w ]/g,
  * @returns A regex that matches any of the words in the search string.
  */
 export function makeSearchRegex(search: string): RegExp {
-  // sanitize search string (remove non-word characters)
+  // sanitize search string (trim and remove non-word characters)
   search = search.trim().replace(SANITIZE_REGEX, "");
   return search
     ? new RegExp(
         // join words `|` to match any of them
-        search.replace(/\s+/g, "|"),
+        search.replace(SPLIT_WORDS_REGEX, "|"),
         "gi",
       )
-    : EMPTY_REGEX;
+    : NEVER_REGEX;
 }
 
 const disposeAll = (list: { dispose: VoidFunction }[]) => {
