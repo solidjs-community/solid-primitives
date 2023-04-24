@@ -2,8 +2,6 @@
   <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=Websocket" alt="Solid Primitives Websocket">
 </p>
 
-## Warning: This package is under active development and will change.
-
 # @solid-primitives/websocket
 
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
@@ -27,7 +25,8 @@ createEffect(on(
   { defer: true }
 ));
 
-const socket = makeReconnectingWS(`ws://${location.hostName}/api/ws`);
+const socket = makeReconnectingWS(`ws://${location.hostName}/api/ws`, undefined, { timeout: 500 });
+// with the primitives starting with `make...`, one needs to manually clean up:
 onCleanup(() => socket.close());
 socket.send("this will reconnect if connection fails");
 ```

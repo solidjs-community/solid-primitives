@@ -44,43 +44,45 @@ export const createWS = (
   protocols?: string | string[],
 ): WebSocket & WSExtension => {
   const ws = makeWS(url, protocols);
-  onCleanup(() => ws.close());
+  onCleanup(() => (console.warn("test"), ws.close()));
   return ws;
 }
 
 export type WSReconnectOptions = {
-  timeout: number,
-  retries: number,
+  timeout?: number,
+  retries?: number,
 }
 
 export const makeReconnectingWS = (
   url: string,
   protocols?: string | string[],
-  options?: WSReconnectOptions
-): Accessor<WebSocket & Accessor<WSMessage | undefined>> => {
-  const [connection, setConnection] = createSignal(makeWS(url, protocols));
-  let retries = options?.retries || Infinity;
-  const retryingConnection = createMemo(() => {
-    const ws = connection();
-    const _close = ws.close.bind(ws);
-    ws.close = (...args) => ((retries = -1), _close(...args));
-    ws.addEventListener('close', () =>
-      retries-- > 0 &&
-        setTimeout(
-          () => setConnection(makeWS(ws.url, ws.protocol)),
-          options?.timeout || 3000
-        )
-    );
-    return ws;
-  });
-  return retryingConnection;
+  options: WSReconnectOptions = {}
+) => {
+  let retries = options.retries || Infinity;
+  let makeWrappedWS: () => WebSocket & { message: Accessor<WSMessage | undefined> };
+  const [socket, setSocket] = createSignal<WebSocket & { message: Accessor<WSMessage | undefined> }>(
+    (makeWrappedWS = () => {
+      const ws = makeWS(url, protocols);
+      const _close = ws.close.bind(ws);
+      ws.close = (...args) => ((retries = 0), _close(...args));
+      ws.addEventListener('close', () =>
+        retries-- > 0 && 
+          setTimeout(
+            () => setSocket(makeWrappedWS),
+            options.timeout || 2999
+          )
+      );
+      return ws;
+    })()
+  );
+  return socket;
 }
 
 export const createReconnectingWS = (
   url: string,
   protocols?: string | string[],
   options?: WSReconnectOptions
-): Accessor<WebSocket & Accessor<WSMessage | undefined>> => {
+) => {
   const ws = makeReconnectingWS(url, protocols, options);
   onCleanup(() => ws().close());
   return ws;

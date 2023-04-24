@@ -3,7 +3,9 @@
   "version": "0.4.0",
   "description": "Primitive to create a web socket connection",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
-  "contributors": ["Alex Lohr <alex.lohr@logmein.com>"],
+  "contributors": [
+    "Alex Lohr <alex.lohr@logmein.com>"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/websocket",
   "repository": {
@@ -39,7 +41,8 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "jiti ../../scripts/build.ts"
+    "build": "jiti ../../scripts/build.ts",
+    "test": "vitest"
   },
   "keywords": [
     "websocket",
