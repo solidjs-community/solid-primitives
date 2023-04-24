@@ -43,7 +43,8 @@
   "scripts": {
     "dev": "vite serve dev",
     "page": "vite build dev",
-    "build": "jiti ../../scripts/build.ts"
+    "build": "jiti ../../scripts/build.ts",
+    "test": "vitest -c ../../configs/vitest.config.ts"
   },
   "dependencies": {},
   "peerDependencies": {
