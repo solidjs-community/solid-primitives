@@ -2,6 +2,7 @@ import { Component, For, Show, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import createPresenceSignal from "../src/createPresence";
 import createPresenceSwitchSignal from "../src/createPresenceSwitch";
+import "uno.css";
 
 const App: Component = () => {
   return (
