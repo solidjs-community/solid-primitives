@@ -11,9 +11,11 @@ import {
   createRenderEffect,
   createSignal,
   Signal,
+  batch,
+  Setter,
 } from "solid-js";
 import { isServer } from "solid-js/web";
-import { AnyFunction, asArray, access, noop } from "@solid-primitives/utils";
+import { AnyFunction, asArray, access, noop, createMicrotask } from "@solid-primitives/utils";
 
 /**
  * Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
@@ -179,22 +181,35 @@ const disposeAll = (list: { dispose: VoidFunction }[]) => {
   for (const item of list) item.dispose();
 };
 
-export function createRootPool<TArgs extends [] | any[] = [], TValue = unknown>(options: {
+// TODO
+// - suspend in batch
+// - prefill cache
+
+export type RootPoolOptions = {
   limit?: number;
   suspend?: boolean;
-}): (args: TArgs, fn: (args: Accessor<TArgs>) => TValue) => TValue {
-  type Root = { v: TValue; set(args: TArgs): void; dispose(): void; suspend(on: boolean): void };
+};
 
+export function createRootPool<TResult>(
+  fn: () => TResult,
+  options?: RootPoolOptions,
+): () => TResult;
+export function createRootPool<TArg, TResult>(
+  fn: (args: Accessor<TArg>) => TResult,
+  options?: RootPoolOptions,
+): (args: TArg) => TResult;
+export function createRootPool<TArg, TResult>(
+  fn: (args: Accessor<TArg>) => TResult,
+  options: RootPoolOptions = {},
+): (args: TArg) => TResult {
+  type Root = { v: TResult; set: Setter<TArg>; dispose(): void; suspend(on: boolean): void };
+
+  // let toSuspend = 0;
   const { limit = 1000 } = options,
     pool: Root[] = [],
     owner = getOwner(),
-    limitPool = () => pool.length > limit && disposeAll(pool.splice(0, pool.length - limit)),
-    mapRoot: (
-      dispose: VoidFunction,
-      signal: Signal<TArgs>,
-      fn: (args: Accessor<TArgs>) => TValue,
-    ) => Root = options.suspend
-      ? (dispose, [args, set], fn) => {
+    mapRoot: (dispose: VoidFunction, signal: Signal<TArg>) => Root = options.suspend
+      ? (dispose, [args, set]) => {
           const [suspended, suspend] = createSignal(false);
           return {
             dispose,
@@ -203,22 +218,30 @@ export function createRootPool<TArgs extends [] | any[] = [], TValue = unknown>(
             v: createSuspense(suspended, () => fn(args)),
           };
         }
-      : (dispose, [args, set], fn) => ({ v: fn(args), set, dispose, suspend: noop });
+      : (dispose, [args, set]) => ({ v: fn(args), set, dispose, suspend: noop }),
+    limitPool = createMicrotask(
+      () => pool.length > limit && disposeAll(pool.splice(0, pool.length - limit)),
+    );
 
   onCleanup(() => {
     disposeAll(pool);
+    // pool.length = toSuspend = 0;
     pool.length = 0;
   });
 
-  return (newArgs, fn) => {
+  return arg => {
     let root: Root;
 
-    if (pool.length) (root = pool.pop()!).set(newArgs);
-    else root = createRoot(dispose => mapRoot(dispose, createSignal(newArgs), fn), owner);
+    if (pool.length) {
+      (root = pool.pop()!).set(() => arg);
+      root.suspend(false);
+    } else root = createRoot(dispose => mapRoot(dispose, createSignal(arg)), owner);
 
     onCleanup(() => {
       pool.push(root);
-      queueMicrotask(limitPool);
+      root.suspend(true);
+      // toSuspend++;
+      limitPool();
     });
 
     return root.v;
