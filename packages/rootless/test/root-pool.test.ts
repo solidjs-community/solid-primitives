@@ -63,28 +63,54 @@ describe("createRootPool", () => {
     });
   });
 
-  test("roots are disposed with the pool", () => {
-    let cleanup = false;
+  test("roots are disposed with the pool", async () => {
+    await createRoot(async dispose => {
+      let cleanup = false;
 
-    const root = createRoot(dispose => ({
-      dispose,
-      pool: createRootPool(() => {
+      const pool = createRootPool(() => {
         onCleanup(() => (cleanup = true));
-      }),
-    }));
+      });
 
-    createRoot(dispose => {
-      root.pool();
+      await createRoot(async d => {
+        pool();
 
-      expect(cleanup).toBe(false);
+        expect(cleanup).toBe(false);
 
-      dispose();
+        d();
+        await sleep();
 
-      expect(cleanup).toBe(false);
+        expect(cleanup).toBe(false);
 
-      root.dispose();
+        dispose();
 
-      expect(cleanup).toBe(true);
+        expect(cleanup).toBe(true);
+      });
+    });
+  });
+
+  test("pool limit can be set to 0", async () => {
+    await createRoot(async dispose => {
+      let cleanup = false;
+
+      const pool = createRootPool(
+        () => {
+          onCleanup(() => (cleanup = true));
+        },
+        { limit: 0 },
+      );
+
+      await createRoot(async d => {
+        pool();
+
+        expect(cleanup).toBe(false);
+
+        d();
+        await sleep();
+
+        expect(cleanup).toBe(true);
+
+        dispose();
+      });
     });
   });
 

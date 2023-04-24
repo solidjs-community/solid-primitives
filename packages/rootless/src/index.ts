@@ -167,7 +167,7 @@ export function createSuspense<T>(when: Accessor<boolean>, fn: () => T): T {
   );
 
   Suspense({
-    // @ts-expect-error children don't have to return shit
+    // @ts-expect-error children don't have to return anything
     get children() {
       createRenderEffect(resource);
       value = fn();
@@ -176,14 +176,6 @@ export function createSuspense<T>(when: Accessor<boolean>, fn: () => T): T {
 
   return value!;
 }
-
-const disposeAll = (list: { dispose: VoidFunction }[]) => {
-  for (const item of list) item.dispose();
-};
-
-// TODO
-// - suspend in batch
-// - prefill cache
 
 export type RootPoolOptions = {
   limit?: number;
@@ -204,9 +196,9 @@ export function createRootPool<TArg, TResult>(
 ): (args: TArg) => TResult {
   type Root = { v: TResult; set: Setter<TArg>; dispose(): void; suspend(on: boolean): void };
 
-  // let toSuspend = 0;
+  let length = 0;
   const { limit = 1000 } = options,
-    pool: Root[] = [],
+    pool: Root[] = new Array(limit),
     owner = getOwner(),
     mapRoot: (dispose: VoidFunction, signal: Signal<TArg>) => Root = options.suspend
       ? (dispose, [args, set]) => {
@@ -219,28 +211,36 @@ export function createRootPool<TArg, TResult>(
           };
         }
       : (dispose, [args, set]) => ({ v: fn(args), set, dispose, suspend: noop }),
-    limitPool = createMicrotask(
-      () => pool.length > limit && disposeAll(pool.splice(0, pool.length - limit)),
-    );
+    limitPool = createMicrotask(() => {
+      if (length > limit) {
+        for (let i = limit; i < length; i++) {
+          pool[i]!.dispose();
+          pool[i] = undefined!;
+        }
+        length = limit;
+      }
+    });
 
   onCleanup(() => {
-    disposeAll(pool);
-    // pool.length = toSuspend = 0;
-    pool.length = 0;
+    for (let i = 0; i < length; i++) pool[i]!.dispose();
+    length = 0;
   });
 
   return arg => {
-    let root: Root;
+    let root!: Root;
 
-    if (pool.length) {
-      (root = pool.pop()!).set(() => arg);
-      root.suspend(false);
+    if (length) {
+      root = pool[--length]!;
+      pool[length] = undefined!;
+      batch(() => {
+        root.set(() => arg);
+        root.suspend(false);
+      });
     } else root = createRoot(dispose => mapRoot(dispose, createSignal(arg)), owner);
 
     onCleanup(() => {
-      pool.push(root);
+      pool[length++] = root;
       root.suspend(true);
-      // toSuspend++;
       limitPool();
     });
 
