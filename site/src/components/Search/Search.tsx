@@ -1,31 +1,19 @@
-import { deepTrack } from "@solid-primitives/deep";
 import { createMediaQuery } from "@solid-primitives/media";
 import { useWindowScrollPosition } from "@solid-primitives/scroll";
-import { throttle } from "@solid-primitives/scheduled";
+import { createMarker, makeSearchRegex } from "@solid-primitives/marker";
 import { A } from "@solidjs/router";
 import Fuse from "fuse.js";
-import Mark from "mark.js";
 import { FiChevronLeft, FiSearch, FiX } from "solid-icons/fi";
-import {
-  Component,
-  createEffect,
-  createMemo,
-  createResource,
-  createSignal,
-  For,
-  onMount,
-  Show,
-  untrack,
-} from "solid-js";
-import { createStore } from "solid-js/store";
+import { Component, createMemo, createResource, createSignal, For, Show } from "solid-js";
 import { fetchPackageList } from "~/api";
 import { PackageListItem } from "~/types";
-import CheckBox from "./CheckBox/CheckBox";
+import { focusInputAndKeepVirtualKeyboardOpen } from "~/utils/focusInputAndKeepVirtualKeyboardOpen";
 
-let _inputEl!: HTMLInputElement;
-export const getSearchInput = () => {
-  return _inputEl;
-};
+let inputEl: HTMLInputElement | undefined;
+
+export function focusSearchInput() {
+  inputEl && focusInputAndKeepVirtualKeyboardOpen(inputEl);
+}
 
 const MAX_PRIMITIVES_COUNT = 5;
 
@@ -60,17 +48,6 @@ const Search: Component<{
 }> = props => {
   const isSmall = createMediaQuery("(max-width: 767px)");
   const [search, setSearch] = createSignal("");
-  const [config, setConfig] = createStore({
-    highlight: {
-      title: { checked: false },
-      description: { checked: true },
-      primitive: { checked: true },
-      tag: { checked: true },
-    },
-  });
-
-  let listContainer!: HTMLUListElement;
-  let input!: HTMLInputElement;
 
   const [packages] = createResource(fetchPackageList, {
     initialValue: [],
@@ -93,51 +70,27 @@ const Search: Component<{
     const fuseValue = fuse();
     const searchValue = search();
 
-    return fuseValue
-      .search(searchValue)
-      .slice(0, 12)
-      .map(({ item }) => ({
-        ...item,
-        // order the primitives by search match
-        primitives: new Fuse(item.primitives, FUSE_PRIMITIVES_OPTIONS)
-          .search(searchValue)
-          .map(item => item.item),
-      }));
+    return fuseValue.search(searchValue, { limit: 12 }).map(({ item }) => ({
+      ...item,
+      // order the primitives by search match
+      primitives: new Fuse(item.primitives, FUSE_PRIMITIVES_OPTIONS)
+        .search(searchValue)
+        .map(item => item.item),
+    }));
   });
 
   const scroll = useWindowScrollPosition();
   const showShadow = () => scroll.y > 60;
 
-  let markInstance: Mark;
-  onMount(() => (markInstance = new Mark(listContainer)));
-
-  const forceHighlightText = (value: string, forceUnmark = false) => {
-    requestAnimationFrame(() => {
-      if (value.length <= 2) {
-        markInstance.unmark();
-        return;
-      }
-      if (forceUnmark) {
-        markInstance.unmark();
-      }
-      markInstance.mark(value, {
-        exclude: Object.entries(config.highlight)
-          .filter(([, item]) => !item.checked)
-          .flatMap(([key]) => [`[data-ignore-mark-${key}]`, `[data-ignore-mark-${key}] *`]),
-        separateWordSearch: false,
-      });
-    });
+  const rawHighlight = createMarker(text => <mark>{text()}</mark>);
+  const highlightRegex = createMemo(() => {
+    const searchValue = search();
+    return searchValue.length > 1 && makeSearchRegex(searchValue);
+  });
+  const highlight = (text: string) => {
+    const regex = highlightRegex();
+    return regex ? rawHighlight(text, regex) : text;
   };
-  const highlightText = throttle(forceHighlightText, 40);
-
-  createEffect(() => {
-    highlightText(search());
-  });
-
-  createEffect(() => {
-    deepTrack(config.highlight);
-    forceHighlightText(untrack(search), true);
-  });
 
   return (
     <div class="xs:w-full flex w-[calc(100vw-32px)] max-w-[800px] items-center justify-center">
@@ -154,7 +107,7 @@ const Search: Component<{
               id="search-input-container"
               class="w-max-[350px] dark:bg-page-main-bg after:dashed-border-[color(#00006E)_dasharray(1,7)_width(4px)_radius(8px)] dark:after:dashed-border-[color(#7ea2cf)_dasharray(1,7)_width(4px)_radius(8px)] relative flex flex-grow cursor-text items-center rounded-md border-2 border-[#bdd3f2] px-2 py-2 font-sans text-[#306FC4] after:pointer-events-none after:absolute after:inset-[-6px] after:hidden after:content-[''] focus-within:text-[#063983] focus-within:after:block hover:border-[#7ea2cf] hover:text-[#063983] dark:border-[#59728d] dark:text-[#c2d5ee] dark:hover:border-[#d0e4ff87] dark:hover:text-white"
               tabindex="-1"
-              onFocus={() => input.focus()}
+              onFocus={() => inputEl?.focus()}
             >
               <div class="mr-2">
                 <FiSearch />
@@ -164,8 +117,8 @@ const Search: Component<{
                 placeholder="Quick Search ..."
                 value={search()}
                 type="text"
-                onInput={e => setSearch(e.currentTarget.value)}
-                ref={el => ((input = el), (_inputEl = el))}
+                onInput={e => setSearch(e.target.value)}
+                ref={el => (inputEl = el)}
               />
             </div>
             <button
@@ -176,21 +129,6 @@ const Search: Component<{
             </button>
           </div>
 
-          <div class="bg-page-main-bg flex items-center gap-3 rounded-b-lg p-2">
-            <div class="xs:text-base text-[13px] font-semibold">Highlight</div>
-            <div class="xxs:text-[14px] xs:text-[15px] flex gap-[4px] overflow-auto py-[2px] text-[12px] md:gap-4">
-              <For each={Object.keys(config.highlight) as (keyof typeof config.highlight)[]}>
-                {item => (
-                  <CheckBox
-                    checked={config.highlight[item].checked}
-                    onChange={checked => setConfig("highlight", item, "checked", checked)}
-                  >
-                    <span class="capitalize opacity-80">{item}</span>
-                  </CheckBox>
-                )}
-              </For>
-            </div>
-          </div>
           <div
             class="bg-page-main-bg relative border-b border-slate-300 px-2 dark:border-slate-600"
             classList={{ hidden: !result().length }}
@@ -206,16 +144,11 @@ const Search: Component<{
         </div>
         <div class="p-2 sm:p-4" classList={{ hidden: !result().length }}>
           <div class=""></div>
-          <ul class="flex flex-col gap-y-6" ref={listContainer}>
+          <ul class="flex flex-col gap-y-6">
             <For each={result()}>
               {match => {
                 const [showRest, setShowRest] = createSignal(false);
                 const toggleShowRest = () => setShowRest(p => !p);
-
-                createEffect(() => {
-                  showRest();
-                  forceHighlightText(untrack(search), true);
-                });
 
                 return (
                   <li>
@@ -223,29 +156,25 @@ const Search: Component<{
                       class="text-lg font-semibold text-[#49494B] dark:text-[#bec5cf]"
                       data-ignore-mark-title
                     >
-                      <A href={`/package/${match.name.toLowerCase()}`}>{match.name}</A>
+                      <A href={`/package/${match.name.toLowerCase()}`}>{highlight(match.name)}</A>
                     </h4>
-                    <p class="my-[6px] text-[14px]" data-ignore-mark-description>
-                      {match.description}
-                    </p>
+                    <p class="my-[6px] text-[14px]">{highlight(match.description)}</p>
 
                     <div class="flex justify-between gap-2">
-                      <ul class="flex flex-wrap gap-2 self-start" data-ignore-mark-primitive>
+                      <ul class="flex flex-wrap gap-2 self-start">
                         <For each={match.primitives}>
-                          {(primitive, idx) => {
-                            return (
-                              <Show when={showRest() || idx() < MAX_PRIMITIVES_COUNT}>
-                                <li>
-                                  <A
-                                    href={`/package/${match.name.toLowerCase()}#${primitive.toLowerCase()}`}
-                                    class="[&>mark]:background-[linear-gradient(0deg,#ffaf1d,#ffaf1d)_center_/_100%_75%_no-repeat] inline-block rounded-md bg-[#e6f0ff] px-2 py-[2px] text-[14px] font-semibold text-[#063983] transition-colors hover:text-black dark:bg-[#30455b] dark:text-[#b9d6ff] dark:hover:text-[#fff] sm:text-base"
-                                  >
-                                    {primitive}
-                                  </A>
-                                </li>
-                              </Show>
-                            );
-                          }}
+                          {(primitive, idx) => (
+                            <Show when={showRest() || idx() < MAX_PRIMITIVES_COUNT}>
+                              <li>
+                                <A
+                                  href={`/package/${match.name.toLowerCase()}#${primitive.toLowerCase()}`}
+                                  class="[&>mark]:background-[linear-gradient(0deg,#ffaf1d,#ffaf1d)_center_/_100%_75%_no-repeat] inline-block rounded-md bg-[#e6f0ff] px-2 py-[2px] text-[14px] font-semibold text-[#063983] transition-colors hover:text-black dark:bg-[#30455b] dark:text-[#b9d6ff] dark:hover:text-[#fff] sm:text-base"
+                                >
+                                  {highlight(primitive)}
+                                </A>
+                              </li>
+                            </Show>
+                          )}
                         </For>
                         <Show when={!showRest() && MAX_PRIMITIVES_COUNT < match.primitives.length}>
                           <li class="flex items-center text-[14px] text-slate-500 transition hover:text-black dark:text-white">
@@ -272,13 +201,13 @@ const Search: Component<{
                       </Show>
                     </div>
                     <Show when={match.tags.length}>
-                      <ul class="flex flex-wrap gap-4 gap-y-2 self-start pt-2" data-ignore-mark-tag>
+                      <ul class="flex flex-wrap gap-4 gap-y-2 self-start pt-2">
                         <For each={match.tags}>
                           {item => (
                             <li>
                               <span class="text-[12px] text-slate-500 dark:text-slate-400 sm:text-[14px]">
                                 <span class="opacity-50">{"#"}</span>
-                                {item}
+                                {highlight(item)}
                               </span>
                             </li>
                           )}

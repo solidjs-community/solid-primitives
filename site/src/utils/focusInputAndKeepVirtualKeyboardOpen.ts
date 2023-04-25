@@ -28,7 +28,7 @@ export const focusInputAndKeepVirtualKeyboardOpen = (
     if (typeof input === "function") {
       input()!.focus();
     } else {
-      input!.focus();
+      input.focus();
     }
     fakeInput.remove();
   };
