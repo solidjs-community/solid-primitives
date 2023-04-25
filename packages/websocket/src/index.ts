@@ -31,7 +31,7 @@ export const makeWS = (
   const queue: WSMessage[] = [];
   ws.send = (msg: WSMessage) => 
     ws.readyState == 1 ? _send(msg) : queue.push(msg);
-  ws.addEventListener('message', ({ data }) => setMessage(data));
+  ws.addEventListener('message', (ev) => setMessage(ev.data));
   ws.addEventListener('open', () => {
     while (queue.length)
       _send(queue.shift()!);
@@ -44,7 +44,7 @@ export const createWS = (
   protocols?: string | string[],
 ): WebSocket & WSExtension => {
   const ws = makeWS(url, protocols);
-  onCleanup(() => (console.warn("test"), ws.close()));
+  onCleanup(() => ws.close());
   return ws;
 }
 
