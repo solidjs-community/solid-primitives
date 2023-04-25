@@ -194,6 +194,12 @@ export function createRootPool<TArg, TResult>(
   fn: (args: Accessor<TArg>) => TResult,
   options: RootPoolOptions = {},
 ): (args: TArg) => TResult {
+  // don't cache roots on the server
+  if (isServer) {
+    const owner = getOwner();
+    return args => runWithOwner(owner, () => fn(() => args))!;
+  }
+
   type Root = { v: TResult; set: Setter<TArg>; dispose(): void; suspend(on: boolean): void };
 
   let length = 0;
