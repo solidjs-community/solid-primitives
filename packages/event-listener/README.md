@@ -115,14 +115,6 @@ Reactive version of [`makeEventListener`](#makeEventListener), that can take sig
 ```tsx
 import { createEventListener } from "@solid-primitives/event-listener";
 
-createEventListener(
-  document.getElementById("myButton"),
-  "mousemove",
-  e => console.log("x:", e.pageX, "y:", e.pageY),
-  { passive: true }
-);
-
-
 // target element and event name can be reactive signals
 const [ref, setRef] = createSignal<HTMLElement>();
 const [type, setType] = createSignal("mousemove");
@@ -133,6 +125,14 @@ createEventListener(ref, type, e => {...});
 let ref;
 createEventListener(() => ref, "mousemove", e => {});
 <div ref={ref} />;
+
+// it can also be used with any HTML Element if you can get a reference to it
+createEventListener(
+  document.getElementById("myButton"),
+  "mousemove",
+  e => console.log("x:", e.pageX, "y:", e.pageY),
+  { passive: true }
+);
 ```
 
 #### Custom events
