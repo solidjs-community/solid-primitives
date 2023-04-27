@@ -25,6 +25,7 @@
       "makeMediaQueryListener",
       "createMediaQuery",
       "createBreakpoints",
+      "sortBreakpoints",
       "usePrefersDark"
     ],
     "category": "Display & Media"

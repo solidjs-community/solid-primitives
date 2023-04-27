@@ -15,6 +15,7 @@ Collection of reactive primitives to deal with media queries.
 - [`createMediaQuery`](#createMediaQuery) - Creates a very simple and straightforward media query monitor.
 - [`createBreakpoints`](#createBreakpoints) - Creates a multi-breakpoint monitor to make responsive components easily.
 - [`createPrefersDark`](#createPrefersDark) - Provides a signal indicating if the user has requested dark color theme.
+- [`sortBreakpoints`](#sortBreakpoints) - Sorts the breakpoints from small to large (to enable correct string coercion of the output of `createBreakpoints`).
 
 ## Installation
 
@@ -129,6 +130,8 @@ const moduleSize = () => ({
 
 This can be very helpful for things like the `mapHeight` option in [`createMasonry`](https://solid-primitives.netlify.app/package/masonry#createMasonry).
 
+> **Warning** for this feature to work, the breakpoints needs to be ordered from small to large. If you cannot ensure this, use the `sortBreakpoints` helper.
+
 [Working Demo](https://codesandbox.io/s/solid-responsive-breakpoints-h4emy8?file=/src/index.tsx)
 
 ## `createPrefersDark`
@@ -155,6 +158,16 @@ const prefersDark = createPrefersDark(true);
 // will return true on the server and during hydration on the client
 prefersDark();
 ```
+
+### `sortBreakpoints`
+
+This helper creates a sorted copy of the breakpoints object required for [`createBreakpoints`](#createBreakpoints) in order to enable correct string coercion.
+
+```ts
+const matches = createBreakpoints(sortBreakpoints(breakpoints));
+```
+
+This is mostly helpful if the breakpoints object comes from some legacy system that you cannot directly influence.
 
 ### `usePrefersDark`
 
