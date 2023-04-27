@@ -15,7 +15,14 @@ import {
   Setter,
 } from "solid-js";
 import { isServer } from "solid-js/web";
-import { AnyFunction, asArray, access, noop, createMicrotask } from "@solid-primitives/utils";
+import {
+  AnyFunction,
+  asArray,
+  access,
+  noop,
+  createMicrotask,
+  trueFn,
+} from "@solid-primitives/utils";
 
 /**
  * Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
@@ -179,44 +186,52 @@ export function createSuspense<T>(when: Accessor<boolean>, fn: () => T): T {
 
 export type RootPoolOptions = {
   limit?: number;
-  suspend?: boolean;
 };
 
-export function createRootPool<TResult>(
-  fn: () => TResult,
-  options?: RootPoolOptions,
-): () => TResult;
+export type RootPoolFunction<TArg, TResult> = (
+  arg: Accessor<TArg>,
+  isActive: Accessor<boolean>,
+) => TResult;
+
 export function createRootPool<TArg, TResult>(
-  fn: (args: Accessor<TArg>) => TResult,
+  fn: RootPoolFunction<TArg, TResult>,
   options?: RootPoolOptions,
-): (args: TArg) => TResult;
+): (..._: void extends TArg ? [arg?: TArg] : [arg: TArg]) => TResult;
 export function createRootPool<TArg, TResult>(
-  fn: (args: Accessor<TArg>) => TResult,
+  fn: RootPoolFunction<TArg, TResult>,
   options: RootPoolOptions = {},
-): (args: TArg) => TResult {
+): (arg: TArg) => TResult {
   // don't cache roots on the server
   if (isServer) {
     const owner = getOwner();
-    return args => runWithOwner(owner, () => fn(() => args))!;
+    return args => runWithOwner(owner, () => fn(() => args, trueFn))!;
   }
 
-  type Root = { v: TResult; set: Setter<TArg>; dispose(): void; suspend(on: boolean): void };
+  type Root = {
+    v: TResult;
+    set: Setter<TArg>;
+    dispose(): void;
+    setA(value: boolean): boolean;
+    active: Accessor<boolean>;
+  };
 
   let length = 0;
   const { limit = 1000 } = options,
     pool: Root[] = new Array(limit),
     owner = getOwner(),
-    mapRoot: (dispose: VoidFunction, signal: Signal<TArg>) => Root = options.suspend
-      ? (dispose, [args, set]) => {
-          const [suspended, suspend] = createSignal(false);
-          return {
+    mapRoot: (dispose: VoidFunction, signal: Signal<TArg>) => Root =
+      fn.length > 1
+        ? (dispose, [args, set]) => {
+            const [active, setA] = createSignal(true);
+            return { dispose, set, setA, active, v: fn(args, active) };
+          }
+        : (dispose, [args, set]) => ({
             dispose,
             set,
-            suspend,
-            v: createSuspense(suspended, () => fn(args)),
-          };
-        }
-      : (dispose, [args, set]) => ({ v: fn(args), set, dispose, suspend: noop }),
+            setA: trueFn,
+            active: trueFn,
+            v: fn(args, trueFn),
+          }),
     limitPool = createMicrotask(() => {
       if (length > limit) {
         for (let i = limit; i < length; i++) {
@@ -240,13 +255,13 @@ export function createRootPool<TArg, TResult>(
       pool[length] = undefined!;
       batch(() => {
         root.set(() => arg);
-        root.suspend(false);
+        root.setA(true);
       });
     } else root = createRoot(dispose => mapRoot(dispose, createSignal(arg)), owner);
 
     onCleanup(() => {
       pool[length++] = root;
-      root.suspend(true);
+      root.setA(false);
       limitPool();
     });
 

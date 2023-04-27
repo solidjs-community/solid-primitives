@@ -240,22 +240,19 @@ describe("createRootPool", () => {
     });
   });
 
-  test("roots are suspended if in pool", async () => {
+  test("pooled state is a signal", async () => {
     await createRoot(async dispose => {
       const [count, setCount] = createSignal(1);
       let i = 0;
       const captured = [0, 0];
       const owner = getOwner();
 
-      const pool = createRootPool(
-        () => {
-          const index = i++;
-          createEffect(() => {
-            captured[index] = count();
-          });
-        },
-        { suspend: true },
-      );
+      const pool = createRootPool((arg, active) => {
+        const index = i++;
+        createEffect(() => {
+          if (active()) captured[index] = count();
+        });
+      });
 
       await sleep();
 
