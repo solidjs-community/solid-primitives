@@ -85,10 +85,10 @@ describe("createBreakpoints", () => {
     createRoot(dispose => {
       matchingBreakpoints = [breakpoints.sm, breakpoints.lg];
       const matches = createBreakpoints(breakpoints);
-      expect(matches.toString()).toBe('lg');
+      expect(matches.toString()).toBe("lg");
       dispose();
     });
-  }); 
+  });
 
   test("match fallback breakpoint when window.matchMedia is not available", () => {
     window.matchMedia = undefined as unknown as typeof window.matchMedia;
@@ -242,14 +242,16 @@ describe("createBreakpoints", () => {
 
 describe("sortBreakpoints", () => {
   test("sorts from small to large", () => {
-    expect(sortBreakpoints({
-      fhd: "1920px",
-      hd: "1280px",
-      sd: "720px",
-    })).toEqual({
+    expect(
+      sortBreakpoints({
+        fhd: "1920px",
+        hd: "1280px",
+        sd: "720px",
+      }),
+    ).toEqual({
       sd: "720px",
       hd: "1280px",
       fhd: "1920px",
     });
-  })
-})
+  });
+});

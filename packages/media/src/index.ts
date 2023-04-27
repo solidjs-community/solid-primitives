@@ -100,10 +100,13 @@ export interface BreakpointOptions<T extends Breakpoints> {
 }
 
 const getEmptyMatchesFromBreakpoints = <T extends Breakpoints>(breakpoints: T): Matches<T> =>
-  entries(breakpoints).reduce<Record<keyof T, boolean>>((matches, [key]: [key: keyof T, value: string]) => {
-    matches[key] = false;
-    return matches;
-  }, {} as Record<keyof T, boolean>) as Matches<T>;
+  entries(breakpoints).reduce<Record<keyof T, boolean>>(
+    (matches, [key]: [key: keyof T, value: string]) => {
+      matches[key] = false;
+      return matches;
+    },
+    {} as Record<keyof T, boolean>,
+  ) as Matches<T>;
 
 /**
  * Creates a multi-breakpoint monitor to make responsive components easily.
@@ -140,17 +143,19 @@ export function createBreakpoints<T extends Breakpoints>(
     entries(breakpoints).forEach(([token, width]: [t: keyof T, w: string]) => {
       const mql = window.matchMedia(`(${mediaFeature}: ${width})`);
       matches[token] = mql.matches;
-      if (watchChange) makeEventListener(mql, "change", (e: MediaQueryListEvent) => setMatches(token, e.matches as any));
+      if (watchChange)
+        makeEventListener(mql, "change", (e: MediaQueryListEvent) =>
+          setMatches(token, e.matches as any),
+        );
     });
 
     return matches;
   });
 
-  Object.defineProperty(
-    matches,
-    'toString', 
-    { enumerable: false, value: () => Object.keys(matches).findLast(token => matches[token]) }
-  );
+  Object.defineProperty(matches, "toString", {
+    enumerable: false,
+    value: () => Object.keys(matches).findLast(token => matches[token]),
+  });
 
   return matches;
 }
@@ -158,7 +163,7 @@ export function createBreakpoints<T extends Breakpoints>(
 /**
  * Creates a sorted copy of the Breakpoints Object
  * If you want to use the result of `createBreakpoints()` with string coercion:
- * ```ts 
+ * ```ts
  * createBreakpoints(sortBreakpoints({ tablet: "980px", mobile: "640px" }))
  * ```
  */
@@ -170,4 +175,3 @@ export function sortBreakpoints(breakpoints: Breakpoints): Breakpoints {
     return obj;
   }, {});
 }
-
