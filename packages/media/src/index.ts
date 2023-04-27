@@ -137,7 +137,7 @@ export function createBreakpoints<T extends Breakpoints>(
   const [matches, setMatches] = createHydratableStaticStore<Matches<T>>(fallback, () => {
     const matches = {} as Record<keyof T, boolean>;
 
-    entries(breakpoints).forEach(([token, width]: [token: string & keyof T, width: string]) => {
+    entries(breakpoints).forEach<[keyof T, T[keyof T]][]>(([token, width]) => {
       const mql = window.matchMedia(`(${mediaFeature}: ${width})`);
       matches[token] = mql.matches;
 
@@ -155,3 +155,13 @@ export function createBreakpoints<T extends Breakpoints>(
 
   return matches;
 }
+
+export function sortBreakpoints<B extends Breakpoints>(breakpoints: B): B {
+  const sorted = Object.entries(breakpoints);
+  sorted.sort((x, y) => parseInt(x[1], 10) - parseInt(y[1], 10);
+  return sorted.reduce((obj, [key, value]) => {
+    obj[key] = value;
+    return object
+  }, {} as B);
+}
+
