@@ -301,4 +301,48 @@ describe("createRootPool", () => {
       expect(captured).toEqual([5, 5]);
     });
   });
+
+  test("roots can be disposed manually", () => {
+    createRoot(disposeOuter => {
+      const count = { added: 0, removed: 0 };
+
+      let disposePooled!: VoidFunction;
+
+      const pool = createRootPool((a, b, d) => {
+        disposePooled = d;
+        count.added++;
+        onCleanup(() => count.removed++);
+      });
+
+      let disposeNested = createRoot(d => {
+        pool();
+        return d;
+      });
+      expect(count).toEqual({ added: 1, removed: 0 });
+
+      disposeNested(); // add to the pool
+      expect(count).toEqual({ added: 1, removed: 0 });
+
+      disposePooled(); // remove from the pool
+      expect(count).toEqual({ added: 1, removed: 1 });
+
+      disposeNested = createRoot(d => {
+        pool(); // should create a new one, instead of reuseing the disposed one
+        return d;
+      });
+      expect(count).toEqual({ added: 2, removed: 1 });
+
+      disposePooled(); // dispose, prevent reuse
+      expect(count).toEqual({ added: 2, removed: 2 });
+
+      disposeNested(); // does nothing
+      expect(count).toEqual({ added: 2, removed: 2 });
+
+      pool(); // create a new one
+      expect(count).toEqual({ added: 3, removed: 2 });
+
+      disposeOuter();
+      expect(count).toEqual({ added: 3, removed: 3 });
+    });
+  });
 });

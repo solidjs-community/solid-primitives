@@ -190,7 +190,8 @@ export type RootPoolOptions = {
 
 export type RootPoolFunction<TArg, TResult> = (
   arg: Accessor<TArg>,
-  isActive: Accessor<boolean>,
+  active: Accessor<boolean>,
+  dispose: VoidFunction,
 ) => TResult;
 
 export function createRootPool<TArg, TResult>(
@@ -204,7 +205,7 @@ export function createRootPool<TArg, TResult>(
   // don't cache roots on the server
   if (isServer) {
     const owner = getOwner();
-    return args => runWithOwner(owner, () => fn(() => args, trueFn))!;
+    return args => createRoot(dispose => fn(() => args, trueFn, dispose), owner);
   }
 
   type Root = {
@@ -223,14 +224,21 @@ export function createRootPool<TArg, TResult>(
       fn.length > 1
         ? (dispose, [args, set]) => {
             const [active, setA] = createSignal(true);
-            return { dispose, set, setA, active, v: fn(args, active) };
+            const root: Root = {
+              dispose,
+              set,
+              setA,
+              active,
+              v: fn(args, active, () => disposeRoot(root)),
+            };
+            return root;
           }
         : (dispose, [args, set]) => ({
             dispose,
             set,
             setA: trueFn,
             active: trueFn,
-            v: fn(args, trueFn),
+            v: fn(args, trueFn, noop),
           }),
     limitPool = createMicrotask(() => {
       if (length > limit) {
@@ -240,7 +248,23 @@ export function createRootPool<TArg, TResult>(
         }
         length = limit;
       }
-    });
+    }),
+    cleanupRoot = (root: Root) => {
+      if (root.dispose !== noop) {
+        pool[length++] = root;
+        root.setA(false);
+        limitPool();
+      }
+    },
+    disposeRoot = (root: Root) => {
+      root.dispose();
+      root.dispose = noop;
+      if (root.active()) root.setA(false);
+      else {
+        pool[pool.indexOf(root)] = pool[--length]!;
+        pool[length] = undefined!;
+      }
+    };
 
   onCleanup(() => {
     for (let i = 0; i < length; i++) pool[i]!.dispose();
@@ -259,11 +283,7 @@ export function createRootPool<TArg, TResult>(
       });
     } else root = createRoot(dispose => mapRoot(dispose, createSignal(arg)), owner);
 
-    onCleanup(() => {
-      pool[length++] = root;
-      root.setA(false);
-      limitPool();
-    });
+    onCleanup(() => cleanupRoot(root));
 
     return root.v;
   };
