@@ -14,8 +14,10 @@ declare global {
 
 (global as any).WSMessages = new Map<WebSocket | MockWebSocket, WSMessage>();
 
+const readyStates = new Map<MockWebSocket, WSReadyState>();
+
 class MockWebSocket extends EventTarget {
-  private state: WSReadyState = 0;
+  public readyState: WSReadyState = 0;
   constructor(
     public url: string,
     public protocol?: string | string[]
@@ -23,23 +25,23 @@ class MockWebSocket extends EventTarget {
     super();
     WSMessages.set(this, [] as WSMessage[]);
     setTimeout(() => {
-      this.state = 1;
+      this.readyState = 1;
       this.dispatchEvent(new Event("open"));
-    });
+    }, 10);
     this.addEventListener("error", this.close.bind(this));
     this.addEventListener("close", function(this: MockWebSocket) { 
-      this.state = 3;
+      this.readyState = 3;
       WSMessages.delete(this);
     }.bind(this));
   }
   close() {
-    this.state = 2;
+    this.readyState = 2;
     setTimeout(function(this: MockWebSocket) {
       this.dispatchEvent(new Event("close"));
     }.bind(this), 50);
   }
   send(msg: string | ArrayBufferLike | ArrayBufferView | Blob) {
-    if (this.state !== 1)
+    if (this.readyState !== 1)
       throw new Error("cannot sent through a non-open connection")
     const sent = WSMessages.get(this);
     sent?.push(msg);
@@ -50,9 +52,6 @@ class MockWebSocket extends EventTarget {
   }
   get bufferedAmount() {
     return 0;
-  }
-  get readyState() {
-    return this.state;
   }
   get extensions() {
     return "";

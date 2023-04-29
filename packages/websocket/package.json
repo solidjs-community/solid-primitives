@@ -18,6 +18,7 @@
     "list": [
       "makeWS",
       "createWS",
+      "createMessageWS",
       "makeReconnectingWS",
       "createReconnectingWS"
     ],
