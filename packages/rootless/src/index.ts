@@ -96,7 +96,7 @@ export function createDisposable(
  * Creates a reactive root that is shared across every instance it was used in. Singleton root gets created when the returned function gets first called, and disposed when last reactive context listening to it gets disposed. Only to be recreated again when a new listener appears.
  * @param factory function where you initialize your reactive primitives
  * @returns function, registering reactive owner as one of the listeners, returns the value {@link factory} returned.
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/rootless#createSingletonRoot
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot
  * @example
  * const useState = createSingletonRoot(() => {
  *    return createMemo(() => {...})
@@ -203,7 +203,7 @@ export type RootPoolFunction<TArg, TResult> = (
  * @param options Options for the root pool. See {@link RootPoolOptions}.
  * @returns A function that creates and reuses roots. See {@link RootPoolFunction}.
  *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/rootless#createRootPool
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createRootPool
  *
  * @example
  * ```tsx
