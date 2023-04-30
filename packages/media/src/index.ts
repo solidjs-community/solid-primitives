@@ -130,7 +130,11 @@ export function createBreakpoints<T extends Breakpoints>(
   breakpoints: T,
   options: BreakpointOptions<T> = {},
 ): Matches<T> {
-  const fallback = options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints);
+  const fallback = Object.defineProperty(
+    options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints),
+    'toString',
+    { enumerable: false, value: () => "" }
+  ) as Matches<T>;
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (isServer || !window.matchMedia) return fallback;
@@ -152,13 +156,11 @@ export function createBreakpoints<T extends Breakpoints>(
     return matches;
   });
 
-  Object.defineProperty(matches, "toString", {
+  return Object.defineProperty(matches, "toString", {
     enumerable: false,
-    value: () => Object.keys(matches).findLast(token => matches[token]),
-  });
-
-  return matches;
-}
+    value: () => Object.keys(matches).findLast(token => matches[token]) || "",
+  }) as Matches<T>;
+};
 
 /**
  * Creates a sorted copy of the Breakpoints Object
