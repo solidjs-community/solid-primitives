@@ -15,7 +15,6 @@ A collection of helpers that aim to simplify using reactive primitives outside o
 - [`createCallback`](#createCallback) - A wrapper for creating callbacks with `runWithOwner`.
 - [`createDisposable`](#createDisposable) - For disposing computations early – before the root cleanup.
 - [`createSingletonRoot`](#createSingletonRoot) - Share "global primitives" across multiple reactive scopes.
-- [`createSuspense`](#createSuspense) - Creates a suspense boundary controlled by a signal source.
 - [`createRootPool`](#createRootPool) - Creates a pool of reactive roots, that can be reused.
 
 ## Installation
@@ -169,50 +168,54 @@ The API is experimental, and likely to change or be merged into `createSingleton
 
 Usage of combining `createSingletonRoot` with `createMousePosition`: https://codesandbox.io/s/shared-root-demo-fjl1l9?file=/index.tsx
 
-## `createSuspense`
-
-Creates a suspense boundary that will suspend execution of effects inside the callback function.
-The suspense is controlled by a signal source, suspense will be active only when the signal is `true`.
-
-### How to use it
-
-`createSuspense` primitive takes two arguments:
-
-- `when` - A reactive source that will be used to determine if the callback should be suspended.
-- `fn` - A callback executed during creation under a suspense boundary.
-
-Returns the value `fn` function returned.
-
-```ts
-import { createSuspense } from "@solid-primitives/rootless";
-
-const [isSuspended, setSuspended] = createSignal(true);
-
-const value = createSuspense(isSuspended, () => {
-  // this will be suspended until isSuspended is false
-  createEffect(() => {...})
-
-  return "value"
-})
-
-value // "value"
-
-// will unsuspend the effect
-setSuspended(false)
-```
-
-### Type Definition
-
-```ts
-function createSuspense<T>(when: Accessor<boolean>, fn: () => T): T;
-```
-
 ## `createRootPool`
 
 Creates a pool of roots, that can be reused. Useful for creating components that are mounted and unmounted frequently.
 When the root is created, it will call the factory function.
 Roots are created by calling the returned function, after cleanup they won't be disposed but instead put back into the pool to be reused.
 Next time the function is called, it will reuse the root from the pool and update it with the new data.
+
+### How to use it
+
+`createRootPool` primitive takes two arguments:
+
+- `factory` - A function that will be called when a new root is created.
+- `options` - Options for the root pool.
+  - `limit` - Pool limit, defaults to `100`. Roots that are not used will be disposed when the limit is reached.
+
+Returns a function that creates and reuses roots.
+
+```tsx
+import { createRootPool } from "@solid-primitives/rootless";
+
+const useCounter = createRootPool((arg, active, dispose) => {
+  const [count, setCount] = createSignal(arg());
+
+  createEffect(() => {
+    if (!active()) return;
+    // so some side effect
+    console.log("count", count());
+  });
+
+  return <button onClick={() => setCount(count() + 1)}>Count: {count()}</button>;
+});
+
+return <Show when={frequentlyChangedCondidion()}>{useCounter(1)}</Show>;
+```
+
+### Usage with `<For>`
+
+`createRootPool` can be combined with `<For>` (or any other control-flow component) to reuse already created HTML Elements while getting the same benefits of stable connection between rendered elements and the reference to the source item.
+
+```tsx
+const pool = createRootPool(item => <MyListItem item={item()}>)
+
+return <For each={items()}>{item => pool(item)}</For>
+```
+
+> **Warning**
+> Using `createRootPool` with `<For>` creates an un-keyed control-flow — meaning that a single element can be reused by more than one item (not at the same time). Which can cause styles, animations, and other side effects to leak between items.
+> It's meant to be used only as a performance optimization, and only when you're sure that the side effects won't leak between items.
 
 ## Changelog
 

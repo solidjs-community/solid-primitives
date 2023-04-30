@@ -16,7 +16,8 @@
       "createSubRoot",
       "createCallback",
       "createDisposable",
-      "createSharedRoot"
+      "createSharedRoot",
+      "createRootPool"
     ],
     "category": "Reactivity"
   },

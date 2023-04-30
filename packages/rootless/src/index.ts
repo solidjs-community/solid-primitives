@@ -6,9 +6,6 @@ import {
   Owner,
   sharedConfig,
   Accessor,
-  Suspense,
-  createResource,
-  createRenderEffect,
   createSignal,
   Signal,
   batch,
@@ -162,52 +159,6 @@ export function createHydratableSingletonRoot<T>(factory: (dispose: VoidFunction
   const owner = getOwner();
   const singleton = createSingletonRoot(factory, owner);
   return () => (isServer || sharedConfig.context ? createRoot(factory, owner) : singleton());
-}
-
-/**
- * Creates a suspense boundary that will suspend execution of effects inside the {@link fn} function
- * but only when {@link when} is true, which is a reactive source.
- *
- * @param when A reactive source that will be used to determine if the {@link fn} should be suspended.
- * @param fn A callback executed during creation under a suspense boundary.
- * @returns The return value of {@link fn}.
- *
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/rootless#createSuspense
- *
- * @example
- * ```ts
- * const [isSuspended, setSuspended] = createSignal(true);
- *
- * const value = createSuspense(isSuspended, () => {
- *    // this will be suspended until isSuspended is false
- *    createEffect(() => {...})
- *    return "value"
- * })
- *
- * value // "value"
- *
- * // will unsuspend the effect
- * setSuspended(false)
- * ```
- */
-export function createSuspense<T>(when: Accessor<boolean>, fn: () => T): T {
-  let value: T,
-    resolve = noop;
-
-  const [resource] = /*#__PURE__*/ createResource(
-    () => when() || resolve(),
-    () => new Promise<void>(r => (resolve = r)),
-  );
-
-  Suspense({
-    // @ts-expect-error children don't have to return anything
-    get children() {
-      isServer || createRenderEffect(resource);
-      value = fn();
-    },
-  });
-
-  return value!;
 }
 
 /**
