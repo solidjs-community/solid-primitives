@@ -194,7 +194,7 @@ export function createSuspense<T>(when: Accessor<boolean>, fn: () => T): T {
   let value: T,
     resolve = noop;
 
-  const [resource] = createResource(
+  const [resource] = /*#__PURE__*/ createResource(
     () => when() || resolve(),
     () => new Promise<void>(r => (resolve = r)),
   );
@@ -202,7 +202,7 @@ export function createSuspense<T>(when: Accessor<boolean>, fn: () => T): T {
   Suspense({
     // @ts-expect-error children don't have to return anything
     get children() {
-      createRenderEffect(resource);
+      isServer || createRenderEffect(resource);
       value = fn();
     },
   });
@@ -243,7 +243,7 @@ export type RootPoolFunction<TArg, TResult> = (
 ) => TResult;
 
 /**
- * Creates a pool of roots that can be reused. Useful for creating components that are mounted and unmounted frequently.
+ * Creates a pool of roots, that can be reused. Useful for creating components that are mounted and unmounted frequently.
  * When the root is created, it will call the {@link factory} function with a {@link RootPoolFactory} callback.
  * Roots are created by calling the returned function, after cleanup they won't be disposed but instead put back into the pool to be reused.
  * Next time the function is called, it will reuse the root from the pool and update it with the new {@link arg}.
