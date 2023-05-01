@@ -87,8 +87,8 @@ export const usePrefersDark: () => Accessor<boolean> = /*#__PURE__*/ createHydra
 export type Breakpoints = Record<string, string>;
 
 export type Matches<T extends Breakpoints> = {
-  readonly [K in keyof T]: boolean;
-};
+  readonly [K in keyof T]: K extends "key" ? never : boolean;
+} & { key: keyof T };
 
 export interface BreakpointOptions<T extends Breakpoints> {
   /** If true watches changes and reports state reactively */
@@ -132,8 +132,8 @@ export function createBreakpoints<T extends Breakpoints>(
 ): Matches<T> {
   const fallback = Object.defineProperty(
     options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints),
-    'toString',
-    { enumerable: false, value: () => "" }
+    'key',
+    { enumerable: false, get: () => Object.keys(breakpoints).pop() }
   ) as Matches<T>;
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -153,13 +153,13 @@ export function createBreakpoints<T extends Breakpoints>(
         );
     });
 
-    return matches;
+    return Object.defineProperty(matches, "key", {
+      enumerable: false,
+      get: () => Object.keys(matches).findLast(token => matches[token]) as keyof T,
+    }) as Matches<T>;
   });
-
-  return Object.defineProperty(matches, "toString", {
-    enumerable: false,
-    value: () => Object.keys(matches).findLast(token => matches[token]) || "",
-  }) as Matches<T>;
+  
+  return matches;
 };
 
 /**

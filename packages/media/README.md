@@ -109,7 +109,7 @@ const Example: Component = () => {
 
 ### `.toString` method
 
-As a convenience feature, the return value of `createBreakpoints` also contains a non-enumerable `.toString` method that will return the last matching breakpoint id to allow using it as an object key:
+As a convenience feature, the return value of `createBreakpoints` also contains a non-enumerable `.key` property that will return the last matching breakpoint id to allow using it as an object key:
 
 ```ts
 import { createBreakpoints } from "@solid-primitives/media";
@@ -127,7 +127,7 @@ const moduleSize = () =>
     sm: 2,
     lg: 4,
     xl: 6,
-  }[matches]); // TS requires you to use `matches.toString()`
+  }[matches.key]);
 ```
 
 This can be very helpful for things like the `mapHeight` option in [`createMasonry`](https://solid-primitives.netlify.app/package/masonry#createMasonry).
@@ -136,9 +136,16 @@ This can be very helpful for things like the `mapHeight` option in [`createMason
 
 ### `sortBreakpoints` helper
 
-If you cannot ensure the order of the breakpoints from smallest to largest, this small helper does it for you:
+If you cannot rely on the order of the breakpoints from smallest to largest, this small helper fixes it for you:
 
 ```ts
+// unfortunately in the wrong order:
+const breakpoints = {
+  xl: "1280px",
+  lg: "1024px",
+  sm: "640px",
+};
+
 const matches = createBreakpoints(sortBreakpoints(breakpoints));
 
 const moduleSize = () =>
@@ -146,7 +153,7 @@ const moduleSize = () =>
     sm: 2,
     lg: 4,
     xl: 6,
-  }[matches]);
+  }[matches.key]);
 ```
 
 ### Demo
