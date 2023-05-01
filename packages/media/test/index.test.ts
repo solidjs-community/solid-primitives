@@ -81,11 +81,11 @@ describe("createBreakpoints", () => {
     });
   });
 
-  test("provides the first found breakpoint as .toString() value", () => {
+  test("provides the first found breakpoint as .key value", () => {
     createRoot(dispose => {
       matchingBreakpoints = [breakpoints.sm, breakpoints.lg];
       const matches = createBreakpoints(breakpoints);
-      expect(matches.toString()).toBe("lg");
+      expect(matches.key).toBe("lg");
       dispose();
     });
   });

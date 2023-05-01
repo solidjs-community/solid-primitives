@@ -152,14 +152,14 @@ export function createBreakpoints<T extends Breakpoints>(
           setMatches(token, e.matches as any),
         );
     });
-
-    return Object.defineProperty(matches, "key", {
-      enumerable: false,
-      get: () => Object.keys(matches).findLast(token => matches[token]) as keyof T,
-    }) as Matches<T>;
-  });
   
-  return matches;
+    return matches as Matches<T>;
+  });
+ 
+  return Object.defineProperty(matches, "key", {
+    enumerable: false,
+    get: () => Object.keys(matches).findLast(token => matches[token]) as keyof T,
+  }) as Matches<T>;
 };
 
 /**
