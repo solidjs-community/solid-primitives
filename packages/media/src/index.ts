@@ -132,8 +132,8 @@ export function createBreakpoints<T extends Breakpoints>(
 ): Matches<T> {
   const fallback = Object.defineProperty(
     options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints),
-    'key',
-    { enumerable: false, get: () => Object.keys(breakpoints).pop() }
+    "key",
+    { enumerable: false, get: () => Object.keys(breakpoints).pop() },
   ) as Matches<T>;
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -152,15 +152,15 @@ export function createBreakpoints<T extends Breakpoints>(
           setMatches(token, e.matches as any),
         );
     });
-  
+
     return matches as Matches<T>;
   });
- 
+
   return Object.defineProperty(matches, "key", {
     enumerable: false,
     get: () => Object.keys(matches).findLast(token => matches[token]) as keyof T,
   }) as Matches<T>;
-};
+}
 
 /**
  * Creates a sorted copy of the Breakpoints Object
