@@ -109,10 +109,7 @@ const { field, form } = useField(props.name);
 To use the mask handler with [Modular Forms](https://modularforms.dev/), from version 0.13.1, you can use its [Transform inputs API](https://modularforms.dev/solid/guides/transform-inputs):
 
 ```tsx
-<Field
-  name="ccard"
-  transform={toCustom((_, event) => ccmask(event), { on: "input" })}
->
+<Field name="ccard" transform={toCustom((_, event) => ccmask(event), { on: "input" })}>
   {(field, props) => <input {...props} value={field.value} />}
 </Field>
 ```
