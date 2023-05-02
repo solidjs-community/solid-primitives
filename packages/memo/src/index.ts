@@ -136,9 +136,9 @@ export function createLatestMany<T>(
     obj.memo = createMemo(() => ((obj.dirty = true), source()));
     return obj;
   });
-  return createMemo(
+  return createLazyMemo<T[]>(
     () =>
-      mappedSources.reduce((acc, data) => {
+      mappedSources.reduce((acc: T[], data) => {
         // always track all memos to force updates
         const v = data.memo();
         if (data.dirty) {
@@ -146,7 +146,7 @@ export function createLatestMany<T>(
           acc.push(v);
         }
         return acc;
-      }, [] as T[]),
+      }, []),
     undefined,
     options,
   );

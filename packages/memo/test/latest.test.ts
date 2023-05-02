@@ -42,7 +42,7 @@ describe("createLatestMany", () => {
       expect(latest()).toEqual([{ b: 4 }]);
       setB({ b: 5 });
       setA({ a: 6 });
-      expect(latest()).toEqual([{ a: 6 }]);
+      expect(latest()).toEqual([{ a: 6 }, { b: 5 }]);
       setB({ b: 7 });
       expect(latest()).toEqual([{ b: 7 }]);
       batch(() => {
