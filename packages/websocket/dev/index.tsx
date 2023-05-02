@@ -1,13 +1,13 @@
 import { Component, For, createEffect, createSignal, on } from "solid-js";
 import { createStore } from "solid-js/store";
 import { render } from "solid-js/web";
-import { createWS, WSMessage } from "../src";
+import { createWS, createMessageWS, WSMessage } from "../src";
 import "uno.css";
 
 const App: Component = () => {
   const [textArea, setTextArea] = createSignal<HTMLTextAreaElement>();
   const [messageBox, setMessageBox] = createSignal<HTMLDivElement>();
-  const ws = createWS("wss://socketsbay.com/wss/v2/1/demo/");
+  const ws = createMessageWS(createWS("wss://socketsbay.com/wss/v2/1/demo/"));
   const [messages, setMessages] = createStore<WSMessage[]>([]);
   const addMessage = (msg: WSMessage) => setMessages(messages.length, msg);
   createEffect(on(ws.message, (msg) => msg && (

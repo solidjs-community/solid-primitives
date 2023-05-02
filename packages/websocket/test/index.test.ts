@@ -1,7 +1,7 @@
 import "./setup";
 import { describe, expect, it, vi } from "vitest";
 import { createRoot } from "solid-js";
-import { createWS, createReconnectingWS, createMessageWS, makeReconnectingWS, makeWS } from "../src";
+import { createWS, createReconnectingWS, createMessageWS, makeReconnectingWS, makeHeartbeatWS, makeWS } from "../src";
 
 describe("makeWS", () => {
   it("creates a web socket and opens it", () => {
@@ -40,7 +40,7 @@ describe("createMessageWS", () => {
 describe("createWS", () => {
   it("closes the web socket on disposal", () => new Promise<void>(resolve => {
     createRoot((dispose) => {
-      const ws = createWS("ws://localhost:5000");      
+      const ws = createWS("ws://localhost:5000");
       vi.spyOn(ws, 'close').mockImplementation(() => resolve());
       dispose();
     });
@@ -60,10 +60,10 @@ describe("makeReconnectingWS", () => {
   });
   it("does not reconnect if manually closed", () => {
     vi.useFakeTimers();
-      const ws = makeReconnectingWS("ws://localhost:5000", undefined, { delay: 100 });
-      ws.close();
-      vi.advanceTimersByTime(500);
-      expect(ws.readyState).toBe(3);
+    const ws = makeReconnectingWS("ws://localhost:5000", undefined, { delay: 100 });
+    ws.close();
+    vi.advanceTimersByTime(500);
+    expect(ws.readyState).toBe(3);
   });
 });
 
@@ -75,5 +75,28 @@ describe("createReconnectingWS", () => {
       dispose();
     });
   }));
+});
+
+describe("makeHeartbeatWS", () => {
+  it("sends a heartbeat", () => {
+    vi.useFakeTimers();
+    const previousSockets = [...WSMessages.keys()];
+    const ws = makeHeartbeatWS(makeReconnectingWS("ws://localhost:5000", undefined, { delay: 100 }));
+    const wsRef = [...WSMessages.keys()].find((socket) => !previousSockets.includes(socket)); 
+    vi.advanceTimersByTime(2500);
+    expect(WSMessages.get(wsRef!)).toEqual(["ping"]);
+    expect(ws.readyState).toBe(1);
+  });
+  it("reconnects after the pong is missing", () => {
+    vi.useFakeTimers();
+    const previousSockets = [...WSMessages.keys()];
+    const ws = makeHeartbeatWS(makeReconnectingWS("ws://localhost:5000", undefined, { delay: 100 }));
+    const wsRef = [...WSMessages.keys()].find((socket) => !previousSockets.includes(socket));
+    wsRef && previousSockets.push(wsRef);
+    vi.advanceTimersByTime(6000);
+    const wsRef2 = [...WSMessages.keys()].find((socket) => !previousSockets.includes(socket)); 
+    expect(wsRef2).not.toBeUndefined();
+    expect(ws.readyState).toBe(1);
+  });
 });
 

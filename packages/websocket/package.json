@@ -20,7 +20,8 @@
       "createWS",
       "createMessageWS",
       "makeReconnectingWS",
-      "createReconnectingWS"
+      "createReconnectingWS",
+      "makeHeartbeatWS"
     ],
     "category": "network"
   },

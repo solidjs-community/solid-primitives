@@ -65,6 +65,12 @@ export type WSReconnectOptions = {
   retries?: number,
 }
 
+export type ReconnectingWebSocket = WebSocket & {
+  reconnect: () => void,
+  /** required for the heartbeat implementation; do not overwrite if you want to use this with heartbeat */
+  send: WebSocket["send"] & { before?: () => void },
+};
+
 /**
  * Returns a WebSocket-like object that under the hood opens new connections on disconnect:
  * ```ts
@@ -82,45 +88,48 @@ export const makeReconnectingWS = (
   options: WSReconnectOptions = {}
 ) => {
   let retries = options.retries || Infinity;
+  let ws: ReconnectingWebSocket;
   const queue: WSMessage[] = [];
-  const events: Parameters<WebSocket["addEventListener"]>[] = [];
-  let ws: WebSocket;
-  const getWS = (): WebSocket => {
-    let s = makeWS(url, protocols, queue);
-    s.addEventListener('close', () =>
-      retries-- > 0 &&
-        setTimeout(() => {        
-          ws = makeWS(url, protocols, queue);
-          events.forEach((args) => ws.addEventListener(...args));
-        }, options.delay || 3000)
-    );
-    return s;
+  let events: Parameters<WebSocket["addEventListener"]>[] = [
+    ["close", () => {
+      retries-- > 0 && setTimeout(getWS, options.delay || 3000)
+    }]
+  ];
+  const getWS = () => {
+    if (ws && ws.readyState < 2) ws.close();
+    ws = Object.assign(makeWS(url, protocols, queue), {
+      reconnect: getWS
+    });
+    events.forEach(args => ws.addEventListener(...args));
   }
-  ws = getWS();
-  const wws = {
-    close: (...args: Parameters<WebSocket["close"]>) => {    
+  getWS();
+  const wws: Partial<ReconnectingWebSocket> = {
+    close: (...args: Parameters<WebSocket["close"]>) => { 
       retries = 0;
       return ws.close(...args);
     },
-    addEventListener: (...args: Parameters<WebSocket["addEventListener"]>) => { 
+    addEventListener: (...args: Parameters<WebSocket["addEventListener"]>) => {
       events.push(args);
       return ws.addEventListener(...args);
     },
     removeEventListener: (...args: Parameters<WebSocket["removeEventListener"]>) => {
-      const pos = events.findIndex((ev) => args[0] === ev[0] && args[1] == ev[1]);
-      pos > -1 && events.splice(pos, 1);
+      events = events.filter((ev) => args[0] !== ev[0] || args[1] !== ev[1]);
       return ws.removeEventListener(...args);
+    },
+    send: (msg: WSMessage) => {
+      wws.send!.before?.();
+      return ws.send(msg);
     }
   }
-  for (let name in ws)
+  for (let name in ws!)
     wws[name as keyof typeof wws] == null &&
-    Object.defineProperty(wws, name, {
-      enumerable: true,
-      get: () => typeof ws[name as keyof typeof ws] === 'function'
-        ? (ws[name as keyof typeof ws] as Function).bind(ws)
-        : ws[name as keyof typeof ws]
-    });
-  return wws as WebSocket;
+      Object.defineProperty(wws, name, {
+        enumerable: true,
+        get: () => typeof ws[name as keyof typeof ws] === 'function'
+          ? (ws[name as keyof typeof ws] as Function).bind(ws)
+          : ws[name as keyof typeof ws]
+      });
+  return wws as ReconnectingWebSocket;
 };
 
 /**
@@ -140,4 +149,51 @@ export const createReconnectingWS = (
   onCleanup(() => ws.close());
   return ws;
 }
+
+export type WSHeartbeatOptions = {
+  /**
+   * Heartbeat message being sent to the server in order to validate the connection 
+   * @default "ping"
+   */
+  message?: WSMessage,
+  /**
+   * The time between messages being sent in milliseconds
+   * @default 1000
+   */
+  interval?: number,
+  /**
+   * The time after the heartbeat message being sent to wait for the next message in milliseconds
+   * @default 1500
+   */
+  wait?: number,
+}
+
+/**
+ * Wraps a reconnecting WebSocket to send a heartbeat to check the connection
+ * ```ts
+ * const ws = makeHeartbeatWS(createReconnectingWS('ws://localhost:5000'))
+ * ```
+ * Dispatches a close event to initiate the reconnection of the defunct web socket.
+ */
+export const makeHeartbeatWS = (
+  ws: ReconnectingWebSocket,
+  options: WSHeartbeatOptions = {}
+): WebSocket & { reconnect: () => void } => {
+  let pingtimer: ReturnType<typeof setTimeout> | undefined;
+  let pongtimer: ReturnType<typeof setTimeout> | undefined;
+  const clearTimers = () => (clearTimeout(pingtimer), clearTimeout(pongtimer));
+  ws.send.before = () => {
+    clearTimers();
+    pongtimer = setTimeout(ws.reconnect, options.wait || 1500);
+  }
+  ws.addEventListener('close', clearTimers);
+  const receiveMessage = () => {
+    clearTimers();
+    pingtimer = setTimeout(() => ws.send(options.message || "ping"), options.interval || 1000);
+  };
+  ws.addEventListener('message', receiveMessage);
+  setTimeout(receiveMessage, options.interval || 1000);
+  return ws;
+}
+
 

@@ -13,8 +13,10 @@ Primitive to help establish, maintain and operate a websocket connection.
 - `createWS` - sets up a web socket connection that disconnects on cleanup
 - `makeReconnectingWS` - sets up a web socket connection that reconnects if involuntarily closed
 - `createReconnectingWS` - sets up a reconnecting web socket connection that disconnects on cleanup
+- `makeHeartbeatWS` - wraps a reconnecting web socket to send a heart beat and reconnect if the answer fails
 
 All of them return a WebSocket instance extended with a `message` prop containing an accessor for the last received message for convenience and the ability to receive messages to send before the connection is opened.
+
 ## How to use it
 
 ```ts
@@ -26,9 +28,12 @@ createEffect(on(
   { defer: true }
 ));
 
-const socket = makeReconnectingWS(`ws://${location.hostName}/api/ws`, undefined, { timeout: 500 });
+const socket = makeHeartbeatWS(makeReconnectingWS(
+  `ws://${location.hostName}/api/ws`,
+  undefined,
+  { timeout: 500 }
+), { message: '👍'});
 // with the primitives starting with `make...`, one needs to manually clean up:
-onCleanup(() => socket.close());
 socket.send("this will reconnect if connection fails");
 ```
 
@@ -45,16 +50,27 @@ type WSEventMap = {
   message: MessageEvent,
   open: Event
 };
-interface ExtendedWebSocket extends EventTarget {
-  send(message: WSMessage) => void;
-  close(code?: number, reason?: string/* max 123bytes */) => void;
-  message() => WSMessage;
-  readonly readyState: WSReadyState;
-  readonly binaryType: "blob" | "arraybuffer"/* depending on what binary type is received */;
-  readonly bufferedAmount: number;
-  readonly extensions: string;
-  readonly protocol: string;
-  readonly url: string;
+type ReconnectingWebSocket = WebSocket & {
+  reconnect: () => void,
+  // ws.send.before is meant to be used by heartbeat
+  send: ((msg: WSMessage) => void) & { before: () => void }
+}
+type WSHeartbeatOptions = {
+  /**
+   * Heartbeat message being sent to the server in order to validate the connection 
+   * @default "ping"
+   */
+  message?: WSMessage,
+  /**
+   * The time between messages being sent in milliseconds
+   * @default 1000
+   */
+  interval?: number,
+  /**
+   * The time after the heartbeat message being sent to wait for the next message in milliseconds
+   * @default 1500
+   */
+  wait?: number,
 }
 ```
 
@@ -66,3 +82,4 @@ https://solidjs-community.github.io/solid-primitives/websocket/
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
+
