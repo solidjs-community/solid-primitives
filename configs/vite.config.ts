@@ -25,7 +25,7 @@ export const viteConfig = defineConfig({
       shortcuts: {
         "center-child": "flex justify-center items-center",
         caption: "text-sm font-mono leading-tight",
-        btn: "bg-teal-600 border-1 border-teal-500 hover:bg-teal-500 rounded cursor-pointer center-child select-none text-white font-semibold p-4 py-3 m-2",
+        btn: "bg-teal-600 border-1 border-teal-500 hover:bg-teal-500 rounded cursor-pointer center-child select-none text-white font-semibold p-4 py-3 m-2 disabled:bg-teal-700 disabled:saturate-50 disabled:hover:bg-teal-700 disabled:cursor-not-allowed",
         "wrapper-h":
           "p-6 flex justify-center items-center space-x-4 space-y-0 bg-gray-700 rounded-2xl",
         "wrapper-v": "wrapper-h flex-col space-x-0 space-y-4",
