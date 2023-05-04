@@ -1,11 +1,6 @@
-import { createMicrotask, falseFn, noop } from "@solid-primitives/utils";
+import { Many, createMicrotask, falseFn, noop } from "@solid-primitives/utils";
 import { Accessor, Signal, batch, createMemo, createSignal, untrack } from "solid-js";
 import { isServer } from "solid-js/web";
-
-const untracked =
-  <T>(fn: () => T): (() => T) =>
-  () =>
-    untrack(fn);
 
 /**
  * Configuration object for {@link createUndoHistory}.
@@ -26,26 +21,22 @@ export type UndoHistoryReturn = {
    * @returns `true` if an undo step is available, `false` otherwise.
    *
    * @see {@link UndoHistoryReturn.undo}
-   *
-   * This accessor is not memoized and should be used in a {@link createMemo} to ensure it.
    */
-  getCanUndo: Accessor<boolean>;
+  canUndo: Accessor<boolean>;
   /**
    * @returns `true` if an redo step is available, `false` otherwise.
    *
    * @see {@link UndoHistoryReturn.redo}
-   *
-   * This accessor is not memoized and should be used in a {@link createMemo} to ensure it.
    */
-  getCanRedo: Accessor<boolean>;
+  canRedo: Accessor<boolean>;
   /**
-   * Undo the last step. Does nothing if {@link UndoHistoryReturn.getCanUndo} is `false`.
+   * Undo the last step. Does nothing if {@link UndoHistoryReturn.canUndo} is `false`.
    *
    * It calls the callback returned from the {@link createUndoHistory} source.
    */
   undo: VoidFunction;
   /**
-   * Redo the last step. Does nothing if {@link UndoHistoryReturn.getCanRedo} is `false`.
+   * Redo the last step. Does nothing if {@link UndoHistoryReturn.canRedo} is `false`.
    *
    * It calls the callback returned from the {@link createUndoHistory} source.
    */
@@ -53,13 +44,13 @@ export type UndoHistoryReturn = {
 };
 
 export function createUndoHistory(
-  source: Accessor<VoidFunction>,
+  source: Many<Accessor<VoidFunction>>,
   options?: UndoHistoryOptions,
 ): UndoHistoryReturn {
   if (isServer) {
     return {
-      getCanUndo: falseFn,
-      getCanRedo: falseFn,
+      canUndo: falseFn,
+      canRedo: falseFn,
       undo: noop,
       redo: noop,
     };
@@ -67,47 +58,51 @@ export function createUndoHistory(
 
   let ignoreNext = false;
 
-  // +1 to account for the current state
-  const limit = (options?.limit ?? 100) + 1,
-    history: VoidFunction[] = [],
+  const limit = options?.limit ?? 100,
+    sources = Array.isArray(source) ? source.map(s => createMemo(s)) : [source],
     clearIgnore = createMicrotask(() => (ignoreNext = false)),
-    memo = createMemo<{ count: Signal<number> }>(
+    history = createMemo<{ count: Signal<number>; list: VoidFunction[][] }>(
       p => {
-        const setter = source();
+        // always track the sources
+        const setters = sources.map(s => s());
 
         if (ignoreNext) {
           ignoreNext = false;
           return p;
         }
 
-        const count = untrack(p.count[0]);
+        const count = untrack(p.count[0]),
+          newLength = p.list.length - count,
+          newHistory = p.list.slice(Math.max(0, newLength - limit), newLength);
+        newHistory.push(setters);
 
-        history.splice(history.length - count, count, setter);
-
-        if (history.length > limit) {
-          history.splice(0, history.length - limit);
-        }
-
-        return { count: count ? createSignal(0) : p.count };
+        return { count: count ? createSignal(0) : p.count, list: newHistory };
       },
-      { count: createSignal(0) },
+      { list: [], count: createSignal(0) },
     ),
-    getCanUndo = () => {
-      // access memo first to ensure history is up to date
-      const { count } = memo();
-      return history.length - count[0]() > 1;
-    },
-    getCanRedo = () => memo().count[0]() > 0,
+    canUndo = createMemo(() => {
+      const h = history();
+      return h.list.length - h.count[0]() > 1;
+    }),
+    canRedo = createMemo(() => history().count[0]() > 0),
     move = (n: -1 | 1) => {
       ignoreNext = true;
       clearIgnore();
-      batch(() => history[history.length - memo().count[1](p => p + n) - 1]!());
+      const h = history(),
+        newCount = h.count[1](p => p + n),
+        newIndex = h.list.length - newCount - 1,
+        prevSetters = h.list[newIndex + n]!,
+        setters = h.list[newIndex]!;
+      for (let i = 0; i < setters.length; i++) {
+        // only call the setter if the current value is different
+        if (setters[i] !== prevSetters[i]) setters[i]!();
+      }
     };
 
   return {
-    getCanUndo,
-    getCanRedo,
-    undo: untracked(() => getCanUndo() && move(1)),
-    redo: untracked(() => getCanRedo() && move(-1)),
+    canUndo,
+    canRedo,
+    undo: () => untrack(() => canUndo() && batch(() => move(1))),
+    redo: () => untrack(() => canRedo() && batch(() => move(-1))),
   };
 }

@@ -12,52 +12,52 @@ describe("createUndoHistory", () => {
         return () => setA(v);
       });
 
-      expect(history.getCanUndo()).toBe(false);
-      expect(history.getCanRedo()).toBe(false);
+      expect(history.canUndo()).toBe(false);
+      expect(history.canRedo()).toBe(false);
 
       setA(1);
 
-      expect(history.getCanUndo()).toBe(true);
-      expect(history.getCanRedo()).toBe(false);
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(false);
 
       history.undo();
 
-      expect(history.getCanUndo()).toBe(false);
-      expect(history.getCanRedo()).toBe(true);
+      expect(history.canUndo()).toBe(false);
+      expect(history.canRedo()).toBe(true);
       expect(a()).toBe(0);
 
       history.redo();
 
-      expect(history.getCanUndo()).toBe(true);
-      expect(history.getCanRedo()).toBe(false);
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(false);
       expect(a()).toBe(1);
 
       setA(2);
 
-      expect(history.getCanUndo()).toBe(true);
-      expect(history.getCanRedo()).toBe(false);
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(false);
 
       history.undo();
 
-      expect(history.getCanUndo()).toBe(true);
-      expect(history.getCanRedo()).toBe(true);
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(true);
       expect(a()).toBe(1);
 
       history.undo();
 
-      expect(history.getCanUndo()).toBe(false);
-      expect(history.getCanRedo()).toBe(true);
+      expect(history.canUndo()).toBe(false);
+      expect(history.canRedo()).toBe(true);
       expect(a()).toBe(0);
 
       setA(3);
 
-      expect(history.getCanUndo()).toBe(true);
-      expect(history.getCanRedo()).toBe(false);
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(false);
 
       history.undo();
 
-      expect(history.getCanUndo()).toBe(false);
-      expect(history.getCanRedo()).toBe(true);
+      expect(history.canUndo()).toBe(false);
+      expect(history.canRedo()).toBe(true);
       expect(a()).toBe(0);
 
       dispose();
@@ -75,13 +75,13 @@ describe("createUndoHistory", () => {
         { limit: 0 },
       );
 
-      expect(history.getCanUndo()).toBe(false);
-      expect(history.getCanRedo()).toBe(false);
+      expect(history.canUndo()).toBe(false);
+      expect(history.canRedo()).toBe(false);
 
       setA(1);
 
-      expect(history.getCanUndo()).toBe(false);
-      expect(history.getCanRedo()).toBe(false);
+      expect(history.canUndo()).toBe(false);
+      expect(history.canRedo()).toBe(false);
 
       dispose();
     });
@@ -101,30 +101,30 @@ describe("createUndoHistory", () => {
         };
       });
 
-      expect(history.getCanUndo()).toBe(false);
-      expect(history.getCanRedo()).toBe(false);
+      expect(history.canUndo()).toBe(false);
+      expect(history.canRedo()).toBe(false);
 
       setA(1);
 
-      expect(history.getCanUndo()).toBe(true);
-      expect(history.getCanRedo()).toBe(false);
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(false);
 
       setB(1);
 
-      expect(history.getCanUndo()).toBe(true);
-      expect(history.getCanRedo()).toBe(false);
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(false);
 
       history.undo();
 
-      expect(history.getCanUndo()).toBe(true);
-      expect(history.getCanRedo()).toBe(true);
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(true);
       expect(a()).toBe(1);
       expect(b()).toBe(0);
 
       history.undo();
 
-      expect(history.getCanUndo()).toBe(false);
-      expect(history.getCanRedo()).toBe(true);
+      expect(history.canUndo()).toBe(false);
+      expect(history.canRedo()).toBe(true);
       expect(a()).toBe(0);
       expect(b()).toBe(0);
 
