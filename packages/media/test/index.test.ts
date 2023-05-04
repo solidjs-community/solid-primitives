@@ -1,6 +1,6 @@
 import { describe, test, expect, vi, beforeEach, beforeAll, afterAll } from "vitest";
 import { createRoot, onMount } from "solid-js";
-import { createBreakpoints } from "../src/index";
+import { createBreakpoints, sortBreakpoints } from "../src/index";
 
 describe("createBreakpoints", () => {
   const breakpoints = {
@@ -77,6 +77,15 @@ describe("createBreakpoints", () => {
         lg: true,
         xl: false,
       });
+      dispose();
+    });
+  });
+
+  test("provides the first found breakpoint as .key value", () => {
+    createRoot(dispose => {
+      matchingBreakpoints = [breakpoints.sm, breakpoints.lg];
+      const matches = createBreakpoints(breakpoints);
+      expect(matches.key).toBe("lg");
       dispose();
     });
   });
@@ -228,5 +237,21 @@ describe("createBreakpoints", () => {
       });
     });
     expect(removeListenerMock).not.toBeCalled();
+  });
+});
+
+describe("sortBreakpoints", () => {
+  test("sorts from small to large", () => {
+    expect(
+      sortBreakpoints({
+        fhd: "1920px",
+        hd: "1280px",
+        sd: "720px",
+      }),
+    ).toEqual({
+      sd: "720px",
+      hd: "1280px",
+      fhd: "1920px",
+    });
   });
 });

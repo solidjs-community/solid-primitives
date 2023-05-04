@@ -106,17 +106,18 @@ const { field, form } = useField(props.name);
 <input onBlur={form.handleBlur} onInput={ev => (inputMask(ev), form.handleChange(ev))} />;
 ```
 
-To use the mask handler with [Modular Forms](https://modularforms.dev/), you may need to overwrite the re-validation handler:
+To use the mask handler with [Modular Forms](https://modularforms.dev/), from version 0.13.1, you can use its [Transform inputs API](https://modularforms.dev/solid/guides/transform-inputs):
 
 ```tsx
-<Field
-  of={…}
-  name={…}
-  initialValue={…}
-  validate={…}
-  keepActive={…}
-  keepState={…}
->
+<Field name="ccard" transform={toCustom((_, event) => ccmask(event), { on: "input" })}>
+  {(field, props) => <input {...props} value={field.value} />}
+</Field>
+```
+
+For older versions than 0.13.x which don't support this helpful API, you may need to overwrite the re-validation handler:
+
+```tsx
+<Field of={…} name={…}>
   {(field) =>
     <input
       {...field.props}

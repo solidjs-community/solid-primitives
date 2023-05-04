@@ -107,6 +107,57 @@ const Example: Component = () => {
 };
 ```
 
+### `.toString` method
+
+As a convenience feature, the return value of `createBreakpoints` also contains a non-enumerable `.key` property that will return the last matching breakpoint id to allow using it as an object key:
+
+```ts
+import { createBreakpoints } from "@solid-primitives/media";
+
+const breakpoints = {
+  sm: "640px",
+  lg: "1024px",
+  xl: "1280px",
+};
+
+const matches = createBreakpoints(breakpoints);
+
+const moduleSize = () =>
+  ({
+    sm: 2,
+    lg: 4,
+    xl: 6,
+  }[matches.key]);
+```
+
+This can be very helpful for things like the `mapHeight` option in [`createMasonry`](https://solid-primitives.netlify.app/package/masonry#createMasonry).
+
+> **Warning** for this feature to work, the breakpoints needs to be ordered from small to large. If you cannot ensure this, use the `sortBreakpoints` helper.
+
+### `sortBreakpoints` helper
+
+If you cannot rely on the order of the breakpoints from smallest to largest, this small helper fixes it for you:
+
+```ts
+// unfortunately in the wrong order:
+const breakpoints = {
+  xl: "1280px",
+  lg: "1024px",
+  sm: "640px",
+};
+
+const matches = createBreakpoints(sortBreakpoints(breakpoints));
+
+const moduleSize = () =>
+  ({
+    sm: 2,
+    lg: 4,
+    xl: 6,
+  }[matches.key]);
+```
+
+### Demo
+
 [Working Demo](https://codesandbox.io/s/solid-responsive-breakpoints-h4emy8?file=/src/index.tsx)
 
 ## `createPrefersDark`
