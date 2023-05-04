@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/history",
-  "version": "0.0.100",
-  "description": "A template primitive example.",
+  "version": "0.0.1",
+  "description": "Primitives for managing undo/redo history in Solid.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",

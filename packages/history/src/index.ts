@@ -43,6 +43,33 @@ export type UndoHistoryReturn = {
   redo: VoidFunction;
 };
 
+/**
+ * Creates an undo history from a reactive source for going back and forth between state snapshots.
+ *
+ * @param source A function or an array thereof that tracks the state to be restored, and returns a callback to restore it.
+ * @param options Configuration object. See {@link UndoHistoryOptions}.
+ * @returns An object for interacting with the undo history. See {@link UndoHistoryReturn}.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/history#createUndoHistory
+ *
+ * @example
+ * ```ts
+ * const [count, setCount] = createSignal(0);
+ *
+ * const history = createUndoHistory(() => {
+ *   // track the changes to the state (and clone if you need to)
+ *   const v = count();
+ *   // return a callback to set the state back to the tracked value
+ *   return () => setCount(v);
+ * });
+ *
+ * // undo the last change
+ * history.undo();
+ *
+ * // redo the last change
+ * history.redo();
+ * ```
+ */
 export function createUndoHistory(
   source: Many<Accessor<VoidFunction>>,
   options?: UndoHistoryOptions,
@@ -102,7 +129,11 @@ export function createUndoHistory(
   return {
     canUndo,
     canRedo,
-    undo: () => untrack(() => canUndo() && batch(() => move(1))),
-    redo: () => untrack(() => canRedo() && batch(() => move(-1))),
+    undo() {
+      untrack(() => canUndo() && batch(() => move(1)));
+    },
+    redo() {
+      untrack(() => canRedo() && batch(() => move(-1)));
+    },
   };
 }
