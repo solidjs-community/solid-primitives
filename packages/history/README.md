@@ -133,6 +133,50 @@ setA(1);
 history.undo(); // will only call setA(0)
 ```
 
+### Changing souces or clearing history
+
+If you want to change what sources get tracked, or clear the history, you can wrap the `createUndoHistory` call in a `createMemo`:
+
+Example of clearing the history:
+
+```ts
+const [trackClear, clear] = createSignal(undefined, { equals: false });
+
+const history = createMemo(() => {
+  // track what should rerun the memo
+  trackClear();
+  return createUndoHistory(/* ... */);
+});
+
+// history is now a signal
+history().undo();
+
+// clear the history
+clear();
+```
+
+Example of changing the source:
+
+```ts
+const [a, setA] = createSignal(0);
+const [b, setB] = createSignal(0);
+const [useA, setUseA] = createSignal(true);
+
+const history = createMemo(() =>
+  createUndoHistory(
+    useA()
+      ? () => {
+          const aVal = a();
+          return () => setA(aVal);
+        }
+      : () => {
+          const bVal = b();
+          return () => setB(bVal);
+        },
+  ),
+);
+```
+
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
