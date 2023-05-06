@@ -34,7 +34,7 @@ pnpm add @solid-primitives/presence
 
 ## How to use it
 
-### `createPresence` example
+### `createPresence` boolean example
 
 ```tsx
 const FirstExample = () => {
@@ -71,47 +71,15 @@ const FirstExample = () => {
 };
 ```
 
-### `createPresence` options API
+### `createPresence` switching example
 
-```tsx
-type Options = {
-  /** Duration in milliseconds used both for enter and exit transitions. */
-  transitionDuration: number;
-  /** Duration in milliseconds used for enter transitions (overrides `transitionDuration` if provided). */
-  enterDuration: number;
-  /** Duration in milliseconds used for exit transitions (overrides `transitionDuration` if provided). */
-  exitDuration: number;
-  /** Opt-in to animating the entering of an element if `isVisible` is `true` during the initial mount. */
-  initialEnter?: boolean;
-};
-createPresenceSignal(
-  /** Indicates whether the component that the resulting values will be used upon should be visible to the user. */
-  isVisible: Accessor<boolean>,
-  /** Options may be a signal getter if you need to update it */
-  opts: Options | Accessor<Options>
-): {
-  /** Should the component be returned from render? */
-  isMounted: Accessor<boolean>;
-  /** Should the component have its visible styles applied? */
-  isVisible: Accessor<boolean>;
-  /** Is the component either entering or exiting currently? */
-  isAnimating: Accessor<boolean>;
-  /** Is the component entering currently? */
-  isEntering: Accessor<boolean>;
-  /** Is the component exiting currently? */
-  isExiting: Accessor<boolean>;
-}
-```
-
-### `createPresenceSwitch` example
-
-If you have multiple items where only one is visible at a time, you can use the supplemental `createPresenceSwitch` utility to animate the items in and out. Previous items will exit before the next item transitions in.
+The first argument of `createPresence` is a signal accessor of arbitrary type. This allows you to use it with any kind of data, not just booleans. This is useful if you want to animate between different items. If you utilize the returned `mountedItem` property, you can get the data which should be currently mounted regardless of the animation state
 
 ```tsx
 const SecondExample = () => {
   const items = ["foo", "bar", "baz", "qux"];
   const [item, setItem] = createSignal<(typeof items)[number] | undefined>(items[0]);
-  const { isMounted, mountedItem, isEntering, isVisible, isExiting } = createPresenceSwitch(item, {
+  const { isMounted, mountedItem, isEntering, isVisible, isExiting } = createPresence(item, {
     transitionDuration: 500,
   });
 
@@ -165,25 +133,41 @@ const SecondExample = () => {
 };
 ```
 
-### `createPresenceSwitch` options API
+### `createPresence` options API
 
 ```tsx
-createPresenceSwitchSignal<ItemType>(
-  /** The current item that should be visible. If `undefined` is passed, the previous item will animate out. */
-  item: Accessor(ItemType | undefined>,
-  /** The same `opts` argument of `createPresenceSignal`. */
+type Options = {
+  /** Duration in milliseconds used both for enter and exit transitions. */
+  transitionDuration: number;
+  /** Duration in milliseconds used for enter transitions (overrides `transitionDuration` if provided). */
+  enterDuration: number;
+  /** Duration in milliseconds used for exit transitions (overrides `transitionDuration` if provided). */
+  exitDuration: number;
+  /** Opt-in to animating the entering of an element if `isVisible` is `true` during the initial mount. */
+  initialEnter?: boolean;
+};
+createPresenceSignal(
+  /** Indicates whether the component that the resulting values will be used upon should be visible to the user. */
+  isVisible: Accessor<boolean>,
+  /** Options may be a signal getter if you need to update it */
   opts: Options | Accessor<Options>
 ): {
-  /** The item that should currently be rendered. */
-  mountedItem: Accessor<ItemType | undefined>;
-  /** Returns all other properties from `createPresenceSignal`. */
-  ...rest
+  /** Should the component be returned from render? */
+  isMounted: Accessor<boolean>;
+  /** Should the component have its visible styles applied? */
+  isVisible: Accessor<boolean>;
+  /** Is the component either entering or exiting currently? */
+  isAnimating: Accessor<boolean>;
+  /** Is the component entering currently? */
+  isEntering: Accessor<boolean>;
+  /** Is the component exiting currently? */
+  isExiting: Accessor<boolean>;
 }
 ```
 
 ## Demo
 
-Demo can be seen [here](https://stackblitz.com/edit/solidjs-templates-8eqpxz?file=src%2FApp.tsx).
+Demo can be seen [here](https://stackblitz.com/edit/presence-demo).
 
 ## Changelog
 

@@ -1,7 +1,6 @@
 import { Component, For, Show, createSignal } from "solid-js";
 import { render } from "solid-js/web";
-import createPresenceSignal from "../src/createPresence";
-import createPresenceSwitchSignal from "../src/createPresenceSwitch";
+import createPresence from "../src/createPresence";
 import "uno.css";
 
 const App: Component = () => {
@@ -15,7 +14,7 @@ const App: Component = () => {
 
 const FirstExample = () => {
   const [showStuff, setShowStuff] = createSignal(true);
-  const { isVisible, isMounted } = createPresenceSignal(showStuff, {
+  const { isVisible, isMounted } = createPresence(showStuff, {
     transitionDuration: 500,
   });
 
@@ -49,12 +48,9 @@ const FirstExample = () => {
 const SecondExample = () => {
   const items = ["foo", "bar", "baz", "qux"];
   const [item, setItem] = createSignal<(typeof items)[number] | undefined>(items[0]);
-  const { isMounted, mountedItem, isEntering, isVisible, isExiting } = createPresenceSwitchSignal(
-    item,
-    {
-      transitionDuration: 500,
-    },
-  );
+  const { isMounted, mountedItem, isEntering, isVisible, isExiting } = createPresence(item, {
+    transitionDuration: 500,
+  });
 
   return (
     <div

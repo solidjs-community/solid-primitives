@@ -24,9 +24,9 @@ type Options = (
 /**
  * Animates the appearance of its children.
  */
-export default function createPresence(
+function createPresenceBase(
   /** Indicates whether the component that the resulting values will be used upon should be visible to the user. */
-  isVisible: Accessor<boolean>,
+  source: Accessor<boolean>,
   optsValue: Options | Accessor<Options>,
 ) {
   const opts = () => (typeof optsValue === "function" ? optsValue() : optsValue);
@@ -40,16 +40,16 @@ export default function createPresence(
   });
 
   const initialEnter = opts().initialEnter ?? false;
-  const [animateIsVisible, setAnimateIsVisible] = createSignal(initialEnter ? false : isVisible());
-  const [isMounted, setIsMounted] = createSignal(isVisible());
-  const [hasEntered, setHasEntered] = createSignal(initialEnter ? false : isVisible());
+  const [animateIsVisible, setAnimateIsVisible] = createSignal(initialEnter ? false : source());
+  const [isMounted, setIsMounted] = createSignal(source());
+  const [hasEntered, setHasEntered] = createSignal(initialEnter ? false : source());
 
-  const isExiting = createMemo(() => isMounted() && !isVisible());
-  const isEntering = createMemo(() => isVisible() && !hasEntered());
+  const isExiting = createMemo(() => isMounted() && !source());
+  const isEntering = createMemo(() => source() && !hasEntered());
   const isAnimating = createMemo(() => isEntering() || isExiting());
 
   createEffect(() => {
-    if (isVisible()) {
+    if (source()) {
       // `animateVisible` needs to be set to `true` in a second step, as
       // when both flags would be flipped at the same time, there would
       // be no transition. See the second effect below.
@@ -67,13 +67,8 @@ export default function createPresence(
   });
 
   createEffect(() => {
-    if (isVisible() && isMounted() && !animateIsVisible()) {
-      // Force a reflow so the initial styles are flushed to the DOM
-      if (typeof document !== undefined) {
-        // We need a side effect so Terser doesn't remove this statement
-        (window as any)._usePresenceReflow = document.body.offsetHeight;
-      }
-
+    if (source() && isMounted() && !animateIsVisible()) {
+      document.body.offsetHeight; // force reflow
       const animationFrameId = requestAnimationFrame(() => {
         setAnimateIsVisible(true);
       });
@@ -98,5 +93,37 @@ export default function createPresence(
     isAnimating,
     isEntering,
     isExiting,
+  };
+}
+
+const itemShouldBeMounted = <ItemType>(item: ItemType) => item !== false && item != null;
+
+export default function createPresence<ItemType>(
+  item: Accessor<ItemType | undefined>,
+  opts: Options | Accessor<Options>,
+) {
+  const [mountedItem, setMountedItem] = createSignal(item());
+  const [shouldBeMounted, setShouldBeMounted] = createSignal(itemShouldBeMounted(item()));
+  const { isMounted, ...rest } = createPresenceBase(shouldBeMounted, opts);
+
+  createEffect(() => {
+    if (mountedItem() !== item()) {
+      if (isMounted()) {
+        setShouldBeMounted(false);
+      } else if (itemShouldBeMounted(item())) {
+        setMountedItem(() => item());
+        setShouldBeMounted(true);
+      }
+    } else if (!itemShouldBeMounted(item())) {
+      setShouldBeMounted(false);
+    } else if (itemShouldBeMounted(item())) {
+      setShouldBeMounted(true);
+    }
+  });
+
+  return {
+    ...rest,
+    isMounted: () => isMounted() && mountedItem() !== undefined,
+    mountedItem,
   };
 }

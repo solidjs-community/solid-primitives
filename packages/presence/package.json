@@ -13,8 +13,7 @@
     "name": "presence",
     "stage": 0,
     "list": [
-      "createPresence",
-      "createPresenceSwitch"
+      "createPresence"
     ],
     "category": "Animation"
   },

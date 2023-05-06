@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createPresence, createPresenceSwitch } from "../src";
+import { createPresence } from "../src";
 import { createSignal } from "solid-js";
 
 describe("on server", () => {
@@ -21,9 +21,9 @@ describe("on server", () => {
     expect(second.isVisible()).toBe(false);
   });
 
-  test("createPresenceSwitch initializes requested state as expected", () => {
+  test("createPresence initializes requested switching state as expected", () => {
     const [data] = createSignal("foo");
-    const first = createPresenceSwitch(data, { transitionDuration: 50, initialEnter: true });
+    const first = createPresence(data, { transitionDuration: 50, initialEnter: true });
     expect(first.mountedItem()).toBe("foo");
     expect(first.isAnimating()).toBe(true);
     expect(first.isEntering()).toBe(true);
@@ -32,7 +32,7 @@ describe("on server", () => {
     expect(first.isVisible()).toBe(false);
 
     const [noData] = createSignal();
-    const second = createPresenceSwitch(noData, { transitionDuration: 50 });
+    const second = createPresence(noData, { transitionDuration: 50 });
     expect(second.mountedItem()).toBe(undefined);
     expect(second.isAnimating()).toBe(false);
     expect(second.isEntering()).toBe(false);
