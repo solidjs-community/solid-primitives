@@ -1,5 +1,11 @@
 # @solid-primitives/media
 
+## 2.2.0
+
+### Minor Changes
+
+- b64a8552: add `.key` property to `createBreakpoints` to get the name of the currently matching breakpoint.
+
 ## 2.1.6
 
 ### Patch Changes
