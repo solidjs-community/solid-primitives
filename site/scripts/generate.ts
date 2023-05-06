@@ -9,6 +9,7 @@ import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
+import remarkEmoji from "remark-emoji";
 import { unified } from "unified";
 import { fileURLToPath } from "url";
 import {
@@ -38,6 +39,7 @@ const PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES: ReadonlySet<string> = new Set([
 ]);
 
 const markdownProcessor = unified()
+  .use(remarkEmoji)
   .use(remarkParse)
   .use(remarkRehype)
   // support GitHub Flavored Markdown

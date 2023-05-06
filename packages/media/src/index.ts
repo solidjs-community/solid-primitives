@@ -87,8 +87,8 @@ export const usePrefersDark: () => Accessor<boolean> = /*#__PURE__*/ createHydra
 export type Breakpoints = Record<string, string>;
 
 export type Matches<T extends Breakpoints> = {
-  readonly [K in keyof T]: boolean;
-};
+  readonly [K in keyof T]: K extends "key" ? never : boolean;
+} & { key: keyof T };
 
 export interface BreakpointOptions<T extends Breakpoints> {
   /** If true watches changes and reports state reactively */
@@ -99,11 +99,14 @@ export interface BreakpointOptions<T extends Breakpoints> {
   mediaFeature?: string;
 }
 
-const getEmptyMatchesFromBreakpoints = <T extends Breakpoints>(breakpoints: T): Matches<T> => {
-  const matches = {} as Record<keyof T, boolean>;
-  entries(breakpoints).forEach(([key]) => (matches[key] = false));
-  return matches;
-};
+const getEmptyMatchesFromBreakpoints = <T extends Breakpoints>(breakpoints: T): Matches<T> =>
+  entries(breakpoints).reduce<Record<keyof T, boolean>>(
+    (matches, [key]: [key: keyof T, value: string]) => {
+      matches[key] = false;
+      return matches;
+    },
+    {} as Record<keyof T, boolean>,
+  ) as Matches<T>;
 
 /**
  * Creates a multi-breakpoint monitor to make responsive components easily.
@@ -127,7 +130,11 @@ export function createBreakpoints<T extends Breakpoints>(
   breakpoints: T,
   options: BreakpointOptions<T> = {},
 ): Matches<T> {
-  const fallback = options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints);
+  const fallback = Object.defineProperty(
+    options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints),
+    "key",
+    { enumerable: false, get: () => Object.keys(breakpoints).pop() },
+  ) as Matches<T>;
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (isServer || !window.matchMedia) return fallback;
@@ -137,15 +144,36 @@ export function createBreakpoints<T extends Breakpoints>(
   const [matches, setMatches] = createHydratableStaticStore<Matches<T>>(fallback, () => {
     const matches = {} as Record<keyof T, boolean>;
 
-    entries(breakpoints).forEach(([token, width]) => {
+    entries(breakpoints).forEach(([token, width]: [t: keyof T, w: string]) => {
       const mql = window.matchMedia(`(${mediaFeature}: ${width})`);
       matches[token] = mql.matches;
-
-      if (watchChange) makeEventListener(mql, "change", e => setMatches(token, e.matches as any));
+      if (watchChange)
+        makeEventListener(mql, "change", (e: MediaQueryListEvent) =>
+          setMatches(token, e.matches as any),
+        );
     });
 
-    return matches;
+    return matches as Matches<T>;
   });
 
-  return matches;
+  return Object.defineProperty(matches, "key", {
+    enumerable: false,
+    get: () => Object.keys(matches).findLast(token => matches[token]) as keyof T,
+  }) as Matches<T>;
+}
+
+/**
+ * Creates a sorted copy of the Breakpoints Object
+ * If you want to use the result of `createBreakpoints()` with string coercion:
+ * ```ts
+ * createBreakpoints(sortBreakpoints({ tablet: "980px", mobile: "640px" }))
+ * ```
+ */
+export function sortBreakpoints(breakpoints: Breakpoints): Breakpoints {
+  const sorted = entries(breakpoints);
+  sorted.sort((x, y) => parseInt(x[1], 10) - parseInt(y[1], 10));
+  return sorted.reduce<Breakpoints>((obj, [key, value]) => {
+    obj[key] = value;
+    return obj;
+  }, {});
 }
