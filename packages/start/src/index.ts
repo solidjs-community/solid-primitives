@@ -14,17 +14,18 @@ type UserThemeOptions = {
   cookieMaxAge: Number;
   cookieName: String;
 };
-export const createUserTheme = <T>(
+export const createUserTheme = <T extends String>(
   defaultTheme: T,
-  options: UserThemeOptions = { cookieMaxAge: 365 * 24 * 60 * 60, cookieName: "theme" },
+  options?: UserThemeOptions,
 ): [get: Accessor<T>, set: Setter<T>] => {
+  const { cookieMaxAge = 365 * 24 * 60 * 60, cookieName = "theme" } = options ?? {};
   const event = useRequest();
   const userTheme = parseCookie(
     isServer ? event.request.headers.get("cookie") ?? "" : document.cookie,
   )["theme"] as T | undefined;
   const [theme, setTheme] = createSignal<T>(userTheme ?? defaultTheme);
   createEffect(() => {
-    document.cookie = `${options.cookieName}=${theme()};max-age=${options.cookieMaxAge}`;
+    document.cookie = `${cookieName}=${theme()};max-age=${cookieMaxAge}`;
   });
   return [theme, setTheme];
 };
