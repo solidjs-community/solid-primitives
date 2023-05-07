@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import { render } from "solid-js/web";
-import "uno.css";
+
 import { createScrollPosition } from "../src";
 
 const App: Component = () => {

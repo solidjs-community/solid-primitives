@@ -2,7 +2,7 @@ import { createMutationObserver, mutationObserver } from "../src";
 import { Component, createSignal, For, Index, Show } from "solid-js";
 import { render } from "solid-js/web";
 import { createCompositeEffect, debounce } from "@solid-primitives/composites";
-import "uno.css";
+
 import { DisplayRecord, LogMutationRecord, TestingNode, ToggleBtn } from "./components";
 import { toggleItems, updateItem } from "./utils";
 

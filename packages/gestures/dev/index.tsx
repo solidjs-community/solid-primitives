@@ -1,7 +1,7 @@
 import { pan } from "../src";
 import { Component, createSignal, onMount } from "solid-js";
 import { render } from "solid-js/web";
-import "uno.css";
+
 pan;
 
 const App: Component = () => {

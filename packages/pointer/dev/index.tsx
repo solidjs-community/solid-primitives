@@ -1,7 +1,7 @@
 import { createPointerListeners, pointerHover, createPointerList } from "../src";
 import { Component, createSignal, For } from "solid-js";
 import { render } from "solid-js/web";
-import "uno.css";
+
 pointerHover;
 
 const App: Component = () => {

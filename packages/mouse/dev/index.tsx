@@ -3,7 +3,7 @@ import { Component, createMemo, createSignal, Show } from "solid-js";
 import { render } from "solid-js/web";
 import createRAF from "@solid-primitives/raf";
 import { lerp } from "./utils";
-import "uno.css";
+
 import { DisplayRecord } from "./components";
 import { clamp } from "@solid-primitives/utils";
 

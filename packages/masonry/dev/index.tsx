@@ -3,8 +3,6 @@ import { render } from "solid-js/web";
 import { createBreakpoints } from "@solid-primitives/media";
 import { createMasonry } from "../src";
 
-import "uno.css";
-
 const getRandomHeight = () => Math.floor(Math.random() * 300) + 100;
 
 const App: Component = () => {

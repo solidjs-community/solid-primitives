@@ -5,8 +5,6 @@ import { createStream } from "../src";
 import { createPermission } from "../../permission/src";
 import { createCameras, createMicrophones } from "../../devices/src";
 
-import "uno.css";
-
 declare module "solid-js" {
   namespace JSX {
     interface ExplicitProperties {

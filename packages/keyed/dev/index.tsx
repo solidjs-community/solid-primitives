@@ -1,7 +1,6 @@
 import { Component } from "solid-js";
 import { render } from "solid-js/web";
 import Key from "./key";
-import "uno.css";
 
 const App: Component = () => {
   return (

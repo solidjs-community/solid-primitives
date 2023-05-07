@@ -1,6 +1,6 @@
 import { children, createSignal, JSX, onMount } from "solid-js";
 import { render } from "solid-js/web";
-import "uno.css";
+
 import { onElementConnect } from "../src";
 
 function App() {

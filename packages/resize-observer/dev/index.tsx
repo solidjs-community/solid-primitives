@@ -1,6 +1,6 @@
 import { Component, createSignal, Setter } from "solid-js";
 import { render } from "solid-js/web";
-import "uno.css";
+
 import { createElementSize, createWindowSize, createResizeObserver } from "../src";
 
 const NumberInput: Component<{ value: number; setValue: Setter<number>; name: string }> = props => {

@@ -2,7 +2,7 @@ import { Repeat, Range, IndexRange } from "../src";
 import { Component, createSignal, onCleanup } from "solid-js";
 import { render } from "solid-js/web";
 import { TransitionGroup } from "solid-transition-group";
-import "uno.css";
+
 import { createStore } from "solid-js/store";
 
 const Ball = (props: { n: number }) => (

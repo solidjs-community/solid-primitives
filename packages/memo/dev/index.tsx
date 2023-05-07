@@ -2,7 +2,6 @@
 import { Component, lazy } from "solid-js";
 import { render } from "solid-js/web";
 import { Router, Routes, Route, Link } from "@solidjs/router";
-import "uno.css";
 
 const Lazy = lazy(() => import("./lazy"));
 const LazySuspense = lazy(() => import("./lazy-suspense"));

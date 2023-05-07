@@ -3,7 +3,6 @@ import { createClipboard, copyToClipboard, newClipboardItem, input } from "../sr
 import { render } from "solid-js/web";
 import img from "./img.png";
 import img2 from "./img2.png";
-import "uno.css";
 
 copyToClipboard;
 

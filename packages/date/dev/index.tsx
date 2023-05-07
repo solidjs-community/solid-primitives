@@ -12,7 +12,6 @@ import { Component, createMemo, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import { format, formatRelative } from "date-fns";
 import { Slider } from "./lib";
-import "uno.css";
 
 const App: Component = () => {
   const timeRange = YEAR;

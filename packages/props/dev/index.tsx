@@ -1,6 +1,6 @@
 import { Component, ComponentProps, createSignal, Show } from "solid-js";
 import { render } from "solid-js/web";
-import "uno.css";
+
 import { combineProps } from "../src";
 
 const Button = (props: ComponentProps<"button">) => {

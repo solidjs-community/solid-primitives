@@ -3,8 +3,6 @@ import { render } from "solid-js/web";
 import ListPage from "./list-page";
 import SwitchPage from "./switch-page";
 
-import "uno.css";
-
 render(
   () => (
     <Router>

@@ -1,7 +1,6 @@
 import type { Component } from "solid-js";
 import { render } from "solid-js/web";
 import { createConnectivitySignal } from "../src";
-import "uno.css";
 
 const App: Component = () => {
   const onLine = createConnectivitySignal();

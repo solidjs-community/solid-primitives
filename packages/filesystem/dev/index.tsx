@@ -16,7 +16,6 @@ import {
   SyncFileSystem,
   getItemName,
 } from "../src/index";
-import "uno.css";
 
 const FsFile = (props: { fs: SyncFileSystem | AsyncFileSystem; path: string }) => {
   const [open, setOpen] = createSignal(false);

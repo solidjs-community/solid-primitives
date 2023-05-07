@@ -1,7 +1,7 @@
 import { Component, createEffect, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
 import * as L from "leaflet";
-import "uno.css";
+
 import "leaflet/dist/leaflet.css";
 import { createGeolocation } from "../src/index";
 

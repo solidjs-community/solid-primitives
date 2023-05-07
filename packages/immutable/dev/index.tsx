@@ -5,8 +5,6 @@ import { createImmutable } from "../src";
 import { PayloadAction, createSlice, configureStore } from "@reduxjs/toolkit";
 import { createStore, reconcile } from "solid-js/store";
 
-import "uno.css";
-
 type Todo = {
   id: number;
   data: {

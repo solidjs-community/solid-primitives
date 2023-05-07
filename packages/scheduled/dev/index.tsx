@@ -2,7 +2,7 @@
 import { Component } from "solid-js";
 import { render } from "solid-js/web";
 import { Router, Routes, Route, A } from "@solidjs/router";
-import "uno.css";
+
 import Timeline from "./timeline";
 import Reactive from "./reactive";
 

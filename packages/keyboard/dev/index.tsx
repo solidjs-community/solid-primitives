@@ -1,7 +1,7 @@
 /* @refresh reload */
 import { Component, createSignal, For } from "solid-js";
 import { render } from "solid-js/web";
-import "uno.css";
+
 import { useKeyDownList, createKeyHold, createShortcut } from "../src";
 
 const MessageStack: Component<{

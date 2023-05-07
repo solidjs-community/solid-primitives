@@ -1,12 +1,11 @@
 import { createActiveElement, focus } from "../src";
-import { Component, createSignal, Index } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
+import { Component, createSignal, Index, ParentComponent } from "solid-js";
+
 import { genNodeList } from "./utils";
 // prevent tree-shaking
 focus;
 
-const Node: Component<{ x: number; y: number; size: number }> = props => {
+const Node: ParentComponent<{ x: number; y: number; size: number }> = props => {
   const [isFocused, setIsFocused] = createSignal(false);
 
   return (
@@ -54,4 +53,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root") as HTMLElement);
+export default App;

@@ -2,7 +2,7 @@ import { WindowEventListener, eventListener, createEventListener, createEventSig
 import { Component, createSignal, For, Show } from "solid-js";
 import { render } from "solid-js/web";
 import { DisplayRecord } from "./components";
-import "uno.css";
+
 eventListener;
 
 const App: Component = () => {

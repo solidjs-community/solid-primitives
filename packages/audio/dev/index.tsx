@@ -4,7 +4,6 @@ import { render } from "solid-js/web";
 import { Icon } from "solid-heroicons";
 import { play, pause } from "solid-heroicons/solid";
 import { speakerWave } from "solid-heroicons/outline";
-import "uno.css";
 
 const formatTime = (time: number) => new Date(time * 1000).toISOString().substr(14, 8);
 

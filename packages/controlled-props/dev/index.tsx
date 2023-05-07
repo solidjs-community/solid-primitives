@@ -1,6 +1,6 @@
 import { Component, createSignal, JSX } from "solid-js";
 import { render } from "solid-js/web";
-import "uno.css";
+
 import { createControlledProps } from "../src";
 
 const App: Component = () => {

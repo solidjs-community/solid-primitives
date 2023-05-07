@@ -4,8 +4,6 @@ import { counterStore } from "./stores/counter-store";
 import { getPeople, getWizards } from "./stores/ages-store";
 import { CounterControls, BoxesDemo } from "./components";
 
-import "uno.css";
-
 const App: Component = () => {
   const {
     state,

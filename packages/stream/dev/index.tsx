@@ -7,7 +7,6 @@ import {
   createMediaPermissionRequest,
   createScreen,
 } from "../src";
-import "uno.css";
 
 declare module "solid-js" {
   namespace JSX {
