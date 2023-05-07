@@ -59,7 +59,6 @@
     "turbo": "^1.9.1",
     "type-fest": "^3.8.0",
     "typescript": "~5.0.4",
-    "unocss": "^0.50.8",
     "vite": "^4.2.1",
     "vite-plugin-solid": "^2.7.0",
     "vitest": "^0.29.8"
