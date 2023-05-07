@@ -10,35 +10,46 @@ import { useRequest } from "solid-start/server";
  * @param cookieName The name of the cookie to be set
  * @return Returns an accessor and setter to manage the user's current theme
  */
-type ServerCookieOptions = {
-  cookieMaxAge?: number;
-  isValid?: (item: string) => boolean;
+type ParseCookie<T> = {
+  toValue: (str?: string) => T | null;
+  toString: (value: T) => string;
 };
-export const createServerCookie = (
-  defaultValue: string,
+type ServerCookieOptions<T> = {
+  defaultValue?: T;
+  cookieMaxAge?: number;
+  CookieParser?: ParseCookie<T>;
+};
+export const createServerCookie = <T = string>(
   name: string,
-  options?: ServerCookieOptions,
-): Signal<string> => {
-  const { cookieMaxAge = 365 * 24 * 60 * 60, isValid = (item: string) => true } = options ?? {};
+  options?: ServerCookieOptions<T>,
+): Signal<T | null> => {
+  const {
+    CookieParser = {
+      toValue: (str?: string) => str,
+      toString: String,
+    },
+    cookieMaxAge = 365 * 24 * 60 * 60,
+    defaultValue = "light",
+  } = options ?? {};
   const event = useRequest();
   const userTheme = parseCookie(
     isServer ? event.request.headers.get("cookie") ?? "" : document.cookie,
   )[name];
-  const [cookie, setCookie] = createSignal(userTheme ?? defaultValue);
+  const [cookie, setCookie] = createSignal<T | null>(
+    (CookieParser.toValue(userTheme) ?? defaultValue) as T,
+  );
   createEffect(() => {
-    if (!isValid(cookie())) return;
     document.cookie = `${name}=${cookie()};max-age=${cookieMaxAge}`;
   });
   return [cookie, setCookie];
 };
 
-export const createUserTheme = (themes: string[], defaultTheme: string): Signal<string> => {
-  const [theme, setTheme] = createServerCookie(defaultTheme, "theme", {
-    isValid(item) {
-      if (themes.includes(item)) return true;
-      return false;
+export const createUserTheme = (name?: string) => {
+  const [theme, setTheme] = createServerCookie(name ?? "theme", {
+    CookieParser: {
+      toValue: str => (str === "light" || str === "dark" ? str : null),
+      toString: String,
     },
   });
-
   return [theme, setTheme];
 };
