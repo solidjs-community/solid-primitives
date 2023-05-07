@@ -88,6 +88,9 @@ importers:
       solid-js:
         specifier: 1.7.3
         version: 1.7.3
+      solid-start:
+        specifier: ^0.2.26
+        version: 0.2.26(@solidjs/meta@0.28.4)(@solidjs/router@0.8.2)(solid-js@1.7.3)(solid-start-static@0.2.26)(vite@4.2.1)
       tsup:
         specifier: ^6.7.0
         version: 6.7.0(postcss@8.4.21)(typescript@5.0.4)
@@ -1034,9 +1037,6 @@ importers:
       postcss:
         specifier: ^8.4.21
         version: 8.4.21
-      solid-start:
-        specifier: ^0.2.26
-        version: 0.2.26(@solidjs/meta@0.28.4)(@solidjs/router@0.8.2)(solid-js@1.7.3)(solid-start-static@0.2.26)(vite@4.2.1)
       solid-start-static:
         specifier: ^0.2.26
         version: 0.2.26(solid-start@0.2.26)(undici@5.21.2)(vite@4.2.1)

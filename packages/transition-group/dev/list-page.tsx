@@ -1,5 +1,4 @@
 import {
-  children,
   createRenderEffect,
   createResource,
   onCleanup,
@@ -32,7 +31,8 @@ const ListPage: Component = () => {
   const [res] = createResource(runResource, () => new Promise<void>(r => (resolve = r)));
   const [isTransitioning, startTransition] = useTransition();
 
-  const appear = localStorage.getItem("transition-group-appear") === "true";
+  // const appear = localStorage.getItem("transition-group-appear") === "true";
+  const appear = true;
 
   return (
     <>
@@ -152,7 +152,7 @@ const ListPage: Component = () => {
 
               const options = { duration: 600, easing: "cubic-bezier(0.4, 0, 0.2, 1)" };
 
-              return createListTransition(resolved.toArray, {
+              const transition = createListTransition(resolved.toArray, {
                 appear,
                 onChange({ added, finishRemoved, unchanged, removed }) {
                   added.forEach(el => {
@@ -216,6 +216,8 @@ const ListPage: Component = () => {
                   });
                 },
               });
+
+              return <>{transition()}</>;
             })}
           </Show>
         </Suspense>

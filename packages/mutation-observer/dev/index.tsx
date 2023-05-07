@@ -1,7 +1,5 @@
 import { createMutationObserver, mutationObserver } from "../src";
-import { Component, createSignal, For, Index, Show } from "solid-js";
-
-import { createCompositeEffect, debounce } from "@solid-primitives/composites";
+import { Component, createSignal, For, Index, onMount, Show } from "solid-js";
 
 import { DisplayRecord, LogMutationRecord, TestingNode, ToggleBtn } from "./components";
 import { toggleItems, updateItem } from "./utils";
@@ -234,13 +232,19 @@ const AttributesTest: Component = () => {
 };
 
 const App: Component = () => {
+  const [mounted, setMounted] = createSignal(false);
+  onMount(() => setMounted(true));
   return (
     <div class="box-border flex min-h-screen w-full flex-wrap items-center justify-center gap-12 bg-black p-24 text-white">
-      <AttributesTest />
-      <SingleParentTest />
-      <ManyParents />
-      <OneParentManyChildren />
-      <OneParentManyChildrenIndex />
+      {mounted() && (
+        <>
+          <AttributesTest />
+          <SingleParentTest />
+          <ManyParents />
+          <OneParentManyChildren />
+          <OneParentManyChildrenIndex />
+        </>
+      )}
     </div>
   );
 };
