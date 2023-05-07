@@ -1,5 +1,13 @@
 # @solid-primitives/geolocation
 
+## 1.4.9
+
+### Patch Changes
+
+- Updated dependencies [2e0bcedf]
+  - @solid-primitives/utils@6.1.1
+  - @solid-primitives/static-store@0.0.3
+
 ## 1.4.8
 
 ### Patch Changes

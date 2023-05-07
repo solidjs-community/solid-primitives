@@ -1,5 +1,15 @@
 # @solid-primitives/bounds
 
+## 0.0.112
+
+### Patch Changes
+
+- Updated dependencies [2e0bcedf]
+  - @solid-primitives/utils@6.1.1
+  - @solid-primitives/event-listener@2.2.11
+  - @solid-primitives/resize-observer@2.0.16
+  - @solid-primitives/static-store@0.0.3
+
 ## 0.0.111
 
 ### Patch Changes
