@@ -1,5 +1,5 @@
 import { Component, For, createSignal } from "solid-js";
-import { render } from "solid-js/web";
+
 import { TransitionGroup } from "solid-transition-group";
 import { createImmutable } from "../src";
 import { PayloadAction, createSlice, configureStore } from "@reduxjs/toolkit";

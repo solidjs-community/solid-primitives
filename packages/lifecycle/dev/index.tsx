@@ -1,5 +1,4 @@
 import { children, createSignal, JSX, onMount } from "solid-js";
-import { render } from "solid-js/web";
 
 import { onElementConnect } from "../src";
 

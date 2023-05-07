@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import { render } from "solid-js/web";
+
 import { anyMaskToFn, createInputMask, maskArrayToFn, Selection } from "../src";
 
 const App: Component = () => {
@@ -90,4 +90,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

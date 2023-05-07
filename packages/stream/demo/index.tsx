@@ -1,4 +1,3 @@
-import { render } from "solid-js/web";
 import { type Component, type JSX, createEffect, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import { createStream } from "../src";
@@ -171,4 +170,4 @@ const App: Component = (): JSX.Element => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

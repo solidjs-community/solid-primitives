@@ -1,5 +1,5 @@
 import { Component, createEffect, createSignal } from "solid-js";
-import { render } from "solid-js/web";
+
 import { createSelection } from "../src";
 
 const App: Component = () => {
@@ -74,4 +74,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

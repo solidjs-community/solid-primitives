@@ -1,5 +1,4 @@
 import { Component, JSX, ParentComponent } from "solid-js";
-import { render } from "solid-js/web";
 
 import { createTokenizer, createToken, isToken, resolveTokens } from "../src";
 
@@ -93,4 +92,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

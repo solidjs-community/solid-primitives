@@ -1,5 +1,4 @@
 import { Component, createSignal, Setter } from "solid-js";
-import { render } from "solid-js/web";
 
 import { createElementSize, createWindowSize, createResizeObserver } from "../src";
 
@@ -60,4 +59,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

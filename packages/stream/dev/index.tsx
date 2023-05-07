@@ -1,6 +1,6 @@
 import type { Component, JSX } from "solid-js";
 import { createSignal, Show } from "solid-js";
-import { render } from "solid-js/web";
+
 import {
   createStream,
   createAmplitudeStream,
@@ -57,4 +57,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

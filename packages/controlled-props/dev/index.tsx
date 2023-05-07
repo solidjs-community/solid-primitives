@@ -1,5 +1,4 @@
 import { Component, createSignal, JSX } from "solid-js";
-import { render } from "solid-js/web";
 
 import { createControlledProps } from "../src";
 
@@ -24,4 +23,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

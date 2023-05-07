@@ -1,5 +1,5 @@
 import { Component, createSignal } from "solid-js";
-import { render } from "solid-js/web";
+
 import { Repeat } from "@solid-primitives/range";
 import { createVisibilityObserver, withDirection, withOccurrence, DirectionY } from "../src";
 
@@ -64,4 +64,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

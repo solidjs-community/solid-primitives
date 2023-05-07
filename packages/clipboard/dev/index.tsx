@@ -1,6 +1,6 @@
 import { Component, createSignal, Suspense, For, Switch, Match } from "solid-js";
 import { createClipboard, copyToClipboard, newClipboardItem, input } from "../src";
-import { render } from "solid-js/web";
+
 import img from "./img.png";
 import img2 from "./img2.png";
 

@@ -7,7 +7,6 @@ import {
   untrack,
   useContext,
 } from "solid-js";
-import { render } from "solid-js/web";
 
 const [CounterProvider, useCounter] = createContextProvider((props: { initial: number }) => {
   const [count, setCount] = createSignal(props.initial);
@@ -67,4 +66,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

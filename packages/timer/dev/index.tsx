@@ -1,5 +1,4 @@
 import { Component, createSignal, createEffect } from "solid-js";
-import { render } from "solid-js/web";
 
 import { createTimer } from "../src";
 
@@ -44,4 +43,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

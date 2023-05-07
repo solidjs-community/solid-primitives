@@ -1,5 +1,5 @@
 import { Component, createSignal, Show, For } from "solid-js";
-import { render } from "solid-js/web";
+
 import { gql, createGraphQLClient, request, multipartRequest } from "../src";
 import { CountryQueryDocument } from "./gqlgen";
 
@@ -88,4 +88,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

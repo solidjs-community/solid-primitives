@@ -1,5 +1,5 @@
 import { Component, createMemo, createSignal } from "solid-js";
-import { render } from "solid-js/web";
+
 import { createBreakpoints } from "@solid-primitives/media";
 import { createMasonry } from "../src";
 
@@ -83,4 +83,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

@@ -7,7 +7,7 @@ import {
   ErrorBoundary,
   createMemo,
 } from "solid-js";
-import { render } from "solid-js/web";
+
 import {
   AsyncFileSystem,
   createFileSystem,
@@ -130,4 +130,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

@@ -1,5 +1,5 @@
 import { Component, createEffect, onMount, Show } from "solid-js";
-import { render } from "solid-js/web";
+
 import * as L from "leaflet";
 
 import "leaflet/dist/leaflet.css";

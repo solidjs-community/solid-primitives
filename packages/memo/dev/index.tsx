@@ -1,6 +1,6 @@
 /* @refresh reload */
 import { Component, lazy } from "solid-js";
-import { render } from "solid-js/web";
+
 import { Router, Routes, Route, Link } from "@solidjs/router";
 
 const Lazy = lazy(() => import("./lazy"));
@@ -50,4 +50,4 @@ const App: Component = () => {
     </Router>
   );
 };
-render(() => <App />, document.getElementById("root")!);
+export default App;

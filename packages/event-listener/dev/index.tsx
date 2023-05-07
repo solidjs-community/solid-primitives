@@ -1,6 +1,6 @@
 import { WindowEventListener, eventListener, createEventListener, createEventSignal } from "../src";
 import { Component, createSignal, For, Show } from "solid-js";
-import { render } from "solid-js/web";
+
 import { DisplayRecord } from "./components";
 
 eventListener;
@@ -123,4 +123,4 @@ const EventMap: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

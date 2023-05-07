@@ -1,5 +1,4 @@
 import { Component } from "solid-js";
-import { render } from "solid-js/web";
 
 import * as platform from "../src";
 
@@ -28,4 +27,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

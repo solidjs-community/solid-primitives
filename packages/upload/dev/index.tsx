@@ -1,5 +1,5 @@
 import { Component, createSignal, For } from "solid-js";
-import { render } from "solid-js/web";
+
 import { createDropzone, createFileUploader, fileUploader } from "../src";
 import { doStuff } from "../src/helpers";
 

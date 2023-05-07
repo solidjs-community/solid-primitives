@@ -1,5 +1,4 @@
 import { Component } from "solid-js";
-import { render } from "solid-js/web";
 
 import { withAbort } from "../src/modifiers";
 
@@ -31,4 +30,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

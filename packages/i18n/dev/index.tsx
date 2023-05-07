@@ -1,5 +1,3 @@
-import { render } from "solid-js/web";
-
 import { ChainedContextApp } from "./chainedContext";
 import { NoContextI18nApp } from "./createChained";
 

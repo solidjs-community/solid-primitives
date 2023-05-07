@@ -9,7 +9,7 @@ import {
   createCountdown,
 } from "../src";
 import { Component, createMemo, createSignal } from "solid-js";
-import { render } from "solid-js/web";
+
 import { format, formatRelative } from "date-fns";
 import { Slider } from "./lib";
 
@@ -82,4 +82,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

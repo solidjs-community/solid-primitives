@@ -1,5 +1,5 @@
 import { Component, createResource, createSignal, For, onCleanup, Show } from "solid-js";
-import { render } from "solid-js/web";
+
 import { makeAbortable, makeCache, makeRetrying } from "../src";
 
 const setsPath = "https://api.tcgdex.net/v2/en/sets";
@@ -190,4 +190,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

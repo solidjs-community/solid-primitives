@@ -1,5 +1,5 @@
 import { A, Route, Router, Routes } from "@solidjs/router";
-import { render } from "solid-js/web";
+
 import ListPage from "./list-page";
 import SwitchPage from "./switch-page";
 

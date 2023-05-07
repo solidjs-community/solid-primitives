@@ -1,5 +1,5 @@
 import { Component, createMemo, createSignal } from "solid-js";
-import { render } from "solid-js/web";
+
 import { createMarker, makeSearchRegex } from "../src";
 
 const LOREM_IPSUM = [
@@ -28,4 +28,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

@@ -1,5 +1,4 @@
 import { Component, ComponentProps, createSignal, Show } from "solid-js";
-import { render } from "solid-js/web";
 
 import { combineProps } from "../src";
 
@@ -68,4 +67,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

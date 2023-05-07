@@ -1,5 +1,5 @@
 import { Component, createEffect, Match, Switch } from "solid-js";
-import { render } from "solid-js/web";
+
 import { createBreakpoints } from "../src";
 import "./style.css";
 
@@ -43,4 +43,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

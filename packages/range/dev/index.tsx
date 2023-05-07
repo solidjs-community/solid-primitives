@@ -1,6 +1,6 @@
 import { Repeat, Range, IndexRange } from "../src";
 import { Component, createSignal, onCleanup } from "solid-js";
-import { render } from "solid-js/web";
+
 import { TransitionGroup } from "solid-transition-group";
 
 import { createStore } from "solid-js/store";
@@ -78,4 +78,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

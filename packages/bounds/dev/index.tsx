@@ -1,5 +1,5 @@
 import { Component, createSignal, Setter } from "solid-js";
-import { render } from "solid-js/web";
+
 import { throttle } from "@solid-primitives/scheduled";
 
 import { createElementBounds, UpdateGuard } from "../src";
@@ -60,4 +60,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

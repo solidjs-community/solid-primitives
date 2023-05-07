@@ -1,6 +1,6 @@
 import { useMousePosition, createPositionToElement } from "../src";
 import { Component, createMemo, createSignal, Show } from "solid-js";
-import { render } from "solid-js/web";
+
 import createRAF from "@solid-primitives/raf";
 import { lerp } from "./utils";
 
@@ -76,4 +76,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

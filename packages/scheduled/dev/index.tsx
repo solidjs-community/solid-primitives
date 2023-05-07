@@ -1,6 +1,6 @@
 /* @refresh reload */
 import { Component } from "solid-js";
-import { render } from "solid-js/web";
+
 import { Router, Routes, Route, A } from "@solidjs/router";
 
 import Timeline from "./timeline";
@@ -27,4 +27,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

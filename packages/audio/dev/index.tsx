@@ -1,6 +1,6 @@
 import { Component, For, Show, createSignal } from "solid-js";
 import { createAudio, AudioState } from "../src";
-import { render } from "solid-js/web";
+
 import { Icon } from "solid-heroicons";
 import { play, pause } from "solid-heroicons/solid";
 import { speakerWave } from "solid-heroicons/outline";

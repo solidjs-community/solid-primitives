@@ -1,5 +1,4 @@
 import { Component, For, Show } from "solid-js";
-import { render } from "solid-js/web";
 
 import { createInfiniteScroll, createPagination } from "../src";
 
@@ -48,4 +47,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

@@ -1,5 +1,4 @@
 import { Component, createSignal } from "solid-js";
-import { render } from "solid-js/web";
 
 import { createWorker, createWorkerPool, createSignaledWorker } from "../src/index";
 

@@ -1,6 +1,5 @@
 /* @refresh reload */
 import { Component, createSignal, For } from "solid-js";
-import { render } from "solid-js/web";
 
 import { useKeyDownList, createKeyHold, createShortcut } from "../src";
 
@@ -70,4 +69,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;
