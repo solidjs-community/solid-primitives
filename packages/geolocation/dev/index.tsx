@@ -56,4 +56,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root") as HTMLElement);
+export default App;
