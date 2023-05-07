@@ -1,4 +1,4 @@
-import { createSignal, createEffect, Setter, Accessor } from "solid-js";
+import { createSignal, createEffect, Signal } from "solid-js";
 import { isServer } from "solid-js/web";
 import { parseCookie } from "solid-start";
 import { useRequest } from "solid-start/server";
@@ -11,18 +11,18 @@ import { useRequest } from "solid-start/server";
  * @return Returns an accessor and setter to manage the user's current theme
  */
 type UserThemeOptions = {
-  cookieMaxAge: Number;
-  cookieName: String;
+  cookieMaxAge: number;
+  cookieName: string;
 };
-export const createUserTheme = <T extends String>(
+export const createUserTheme = <T extends string>(
   defaultTheme: T,
   options?: UserThemeOptions,
-): [get: Accessor<T>, set: Setter<T>] => {
+): Signal<T> => {
   const { cookieMaxAge = 365 * 24 * 60 * 60, cookieName = "theme" } = options ?? {};
   const event = useRequest();
   const userTheme = parseCookie(
     isServer ? event.request.headers.get("cookie") ?? "" : document.cookie,
-  )["theme"] as T | undefined;
+  )[cookieName] as T | undefined;
   const [theme, setTheme] = createSignal<T>(userTheme ?? defaultTheme);
   createEffect(() => {
     document.cookie = `${cookieName}=${theme()};max-age=${cookieMaxAge}`;

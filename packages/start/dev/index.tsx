@@ -1,14 +1,14 @@
 import { Component, createSignal } from "solid-js";
 import { render } from "solid-js/web";
+// import { Route, Routes } from "solid-start";
 import "uno.css";
-import { createUserTheme } from "../src/index";
+// import { Route, Routes } from "solid-start";
 type Theme = "dark" | "light";
 const App: Component = () => {
   const [count, setCount] = createSignal(0);
   const increment = () => setCount(count() + 1);
-  const [theme, setTheme] = createUserTheme<Theme>("dark");
   return (
-    <div class={`min-h-screen ${theme() == "dark" ? "dark" : ""}`}>
+    <div class={`min-h-screen ${"dark" == "dark" ? "dark" : ""}`}>
       <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
         <div class="wrapper-v">
           <h4>Counter component</h4>
