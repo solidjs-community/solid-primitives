@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/start",
   "version": "0.0.100",
-  "description": "A template primitive example.",
+  "description": "A set of primitives for Solid Start",
   "author": "Your Name <you@youremail.com>",
   "contributors": [],
   "license": "MIT",
