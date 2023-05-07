@@ -17,9 +17,10 @@
     "name": "start",
     "stage": 0,
     "list": [
+      "createServerCookie",
       "createUserTheme"
     ],
-    "category": "Display & Media"
+    "category": "Solid Start"
   },
   "keywords": [
     "solid",
