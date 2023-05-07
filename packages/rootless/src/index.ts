@@ -1,6 +1,25 @@
-import { createRoot, getOwner, onCleanup, runWithOwner, Owner, sharedConfig } from "solid-js";
+import {
+  createRoot,
+  getOwner,
+  onCleanup,
+  runWithOwner,
+  Owner,
+  sharedConfig,
+  Accessor,
+  createSignal,
+  Signal,
+  batch,
+  Setter,
+} from "solid-js";
 import { isServer } from "solid-js/web";
-import { AnyFunction, asArray, access } from "@solid-primitives/utils";
+import {
+  AnyFunction,
+  asArray,
+  access,
+  noop,
+  createMicrotask,
+  trueFn,
+} from "@solid-primitives/utils";
 
 /**
  * Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
@@ -77,7 +96,7 @@ export function createDisposable(
  * Creates a reactive root that is shared across every instance it was used in. Singleton root gets created when the returned function gets first called, and disposed when last reactive context listening to it gets disposed. Only to be recreated again when a new listener appears.
  * @param factory function where you initialize your reactive primitives
  * @returns function, registering reactive owner as one of the listeners, returns the value {@link factory} returned.
- * @see https://github.com/davedbase/solid-primitives/tree/main/packages/rootless#createSingletonRoot
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot
  * @example
  * const useState = createSingletonRoot(() => {
  *    return createMemo(() => {...})
@@ -140,4 +159,162 @@ export function createHydratableSingletonRoot<T>(factory: (dispose: VoidFunction
   const owner = getOwner();
   const singleton = createSingletonRoot(factory, owner);
   return () => (isServer || sharedConfig.context ? createRoot(factory, owner) : singleton());
+}
+
+/**
+ * Options for {@link createRootPool}.
+ */
+export type RootPoolOptions = {
+  /**
+   * Size of the root pool. Defaults to `100`.
+   */
+  limit?: number;
+};
+
+/**
+ * Callback function for {@link createRootPool}. Called when a new root is created.
+ * @param arg An accessor that returns the argument passed to {@link RootPoolFunction}.
+ * @param active An accessor that returns the active state of the root.
+ * When `false`, root is not being used and is waiting in the pool to be reused.
+ * @param dispose A function that disposes the root and prevents it from being reused.
+ * @returns The result of {@link RootPoolFunction}.
+ */
+export type RootPoolFactory<TArg, TResult> = (
+  arg: Accessor<TArg>,
+  active: Accessor<boolean>,
+  dispose: VoidFunction,
+) => TResult;
+
+/**
+ * A function returned by {@link createRootPool}.
+ * @param arg The argument passed to {@link RootPoolFactory}.
+ */
+export type RootPoolFunction<TArg, TResult> = (
+  ..._: void extends TArg ? [arg?: TArg] : [arg: TArg]
+) => TResult;
+
+/**
+ * Creates a pool of roots, that can be reused. Useful for creating components that are mounted and unmounted frequently.
+ * When the root is created, it will call the {@link factory} function with a {@link RootPoolFactory} callback.
+ * Roots are created by calling the returned function, after cleanup they won't be disposed but instead put back into the pool to be reused.
+ * Next time the function is called, it will reuse the root from the pool and update it with the new {@link arg}.
+ *
+ * @param factory A function that will be called when a new root is created. See {@link RootPoolFactory}.
+ * @param options Options for the root pool. See {@link RootPoolOptions}.
+ * @returns A function that creates and reuses roots. See {@link RootPoolFunction}.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createRootPool
+ *
+ * @example
+ * ```tsx
+ * const useCounter = createRootPool((arg, active, dispose) => {
+ *   const [count, setCount] = createSignal(arg())
+ *
+ *   createEffect(() => {
+ *     if (!active()) return
+ *     // so some side effect
+ *     console.log("count", count())
+ *   })
+ *
+ *   return <button onClick={() => setCount(count() + 1)}>Count: {count()}</button>
+ * })
+ *
+ * return <Show when={frequentlyChangedCondidion()}>
+ *  {useCounter(1)}
+ * </Show>
+ * ```
+ */
+export function createRootPool<TArg, TResult>(
+  factory: RootPoolFactory<TArg, TResult>,
+  options?: RootPoolOptions,
+): RootPoolFunction<TArg, TResult>;
+export function createRootPool<TArg, TResult>(
+  factory: RootPoolFactory<TArg, TResult>,
+  options: RootPoolOptions = {},
+): (arg: TArg) => TResult {
+  // don't cache roots on the server
+  if (isServer) {
+    const owner = getOwner();
+    return args => createRoot(dispose => factory(() => args, trueFn, dispose), owner);
+  }
+
+  type Root = {
+    v: TResult;
+    set: Setter<TArg>;
+    dispose(): void;
+    setA(value: boolean): boolean;
+    active: Accessor<boolean>;
+  };
+
+  let length = 0;
+  const { limit = 100 } = options,
+    pool: Root[] = new Array(limit),
+    owner = getOwner(),
+    mapRoot: (dispose: VoidFunction, signal: Signal<TArg>) => Root =
+      factory.length > 1
+        ? (dispose, [args, set]) => {
+            const [active, setA] = createSignal(true);
+            const root: Root = {
+              dispose,
+              set,
+              setA,
+              active,
+              v: factory(args, active, () => disposeRoot(root)),
+            };
+            return root;
+          }
+        : (dispose, [args, set]) => ({
+            dispose,
+            set,
+            setA: trueFn,
+            active: trueFn,
+            v: factory(args, trueFn, noop),
+          }),
+    limitPool = createMicrotask(() => {
+      if (length > limit) {
+        for (let i = limit; i < length; i++) {
+          pool[i]!.dispose();
+          pool[i] = undefined!;
+        }
+        length = limit;
+      }
+    }),
+    cleanupRoot = (root: Root) => {
+      if (root.dispose !== noop) {
+        pool[length++] = root;
+        root.setA(false);
+        limitPool();
+      }
+    },
+    disposeRoot = (root: Root) => {
+      root.dispose();
+      root.dispose = noop;
+      if (root.active()) root.setA(false);
+      else {
+        pool[pool.indexOf(root)] = pool[--length]!;
+        pool[length] = undefined!;
+      }
+    };
+
+  onCleanup(() => {
+    for (let i = 0; i < length; i++) pool[i]!.dispose();
+    length = 0;
+  });
+
+  return arg => {
+    let root!: Root;
+
+    if (length) {
+      root = pool[--length]!;
+      pool[length] = undefined!;
+      batch(() => {
+        root.set(() => arg);
+        root.setA(true);
+      });
+    } else root = createRoot(dispose => mapRoot(dispose, createSignal(arg)), owner);
+
+    onCleanup(() => cleanupRoot(root));
+
+    return root.v;
+  };
 }
