@@ -1,5 +1,12 @@
 # @solid-primitives/cursor
 
+## 0.0.110
+
+### Patch Changes
+
+- Updated dependencies [2e0bcedf]
+  - @solid-primitives/utils@6.1.1
+
 ## 0.0.109
 
 ### Patch Changes

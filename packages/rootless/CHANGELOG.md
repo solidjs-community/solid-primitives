@@ -1,5 +1,16 @@
 # @solid-primitives/rootless
 
+## 1.4.0
+
+### Minor Changes
+
+- 5ea65ea9: Add `createRootPool` primitive.
+
+### Patch Changes
+
+- Updated dependencies [2e0bcedf]
+  - @solid-primitives/utils@6.1.1
+
 ## 1.3.2
 
 ### Patch Changes
