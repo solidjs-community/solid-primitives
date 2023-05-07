@@ -4,28 +4,34 @@ import { parseCookie } from "solid-start";
 import { useRequest } from "solid-start/server";
 
 /**
- * A template example of how to create a new primitive.
+ * A primitive for creating a cookie that can be accessed isomorphically on the client, or the server
  *
  * @param cookieMaxAge The max age of the cookie to be set, in seconds
  * @param cookieName The name of the cookie to be set
  * @return Returns an accessor and setter to manage the user's current theme
  */
-type UserThemeOptions = {
+type ServerCookieOptions = {
   cookieMaxAge: number;
-  cookieName: string;
 };
-export const createUserTheme = <T extends string>(
-  defaultTheme: T,
-  options?: UserThemeOptions,
-): Signal<T> => {
-  const { cookieMaxAge = 365 * 24 * 60 * 60, cookieName = "theme" } = options ?? {};
+export const createServerCookie = (
+  defaultValue: string,
+  name: string,
+  options?: ServerCookieOptions,
+): Signal<string> => {
+  const { cookieMaxAge = 365 * 24 * 60 * 60 } = options ?? {};
   const event = useRequest();
   const userTheme = parseCookie(
     isServer ? event.request.headers.get("cookie") ?? "" : document.cookie,
-  )[cookieName] as T | undefined;
-  const [theme, setTheme] = createSignal<T>(userTheme ?? defaultTheme);
+  )[name];
+  const [cookie, setCookie] = createSignal(userTheme ?? defaultValue);
   createEffect(() => {
-    document.cookie = `${cookieName}=${theme()};max-age=${cookieMaxAge}`;
+    document.cookie = `${name}=${cookie()};max-age=${cookieMaxAge}`;
   });
+  return [cookie, setCookie];
+};
+
+export const createUserTheme = (themes: string[], defaultTheme: string) => {
+  const [theme, setTheme] = createServerCookie(defaultTheme, "theme");
+  
   return [theme, setTheme];
 };
