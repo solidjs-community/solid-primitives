@@ -1,56 +1,70 @@
-import { createSignal, createEffect, Signal, NoInfer } from "solid-js";
+import { createSignal, createEffect, Signal } from "solid-js";
 import { isServer } from "solid-js/web";
 import { parseCookie } from "solid-start";
 import { useRequest } from "solid-start/server";
 
+type ServerCookieOptions<T = string> = {
+  cookieMaxAge?: number;
+  toValue?: (str: string | undefined) => T;
+  toString?: (value: T) => string;
+};
+
 /**
  * A primitive for creating a cookie that can be accessed isomorphically on the client, or the server
  *
- * @param cookieMaxAge The max age of the cookie to be set, in seconds
- * @param cookieName The name of the cookie to be set
+ * @param name The name of the cookie to be set
+ * @param options Options for the cookie {@see ServerCookieOptions}
  * @return Returns an accessor and setter to manage the user's current theme
  */
-type ParseCookie<T> = {
-  toValue: (str?: string) => T | null;
-  toString: (value: T) => string;
-};
-type ServerCookieOptions<T> = {
-  defaultValue?: NoInfer<T>;
-  cookieMaxAge?: number;
-  CookieParser?: ParseCookie<T>;
-};
-export const createServerCookie = <T = "light" | "dark" | null>(
+export function createServerCookie<T>(
   name: string,
-  options?: ServerCookieOptions<T>,
-): Signal<T | null> => {
+  options: ServerCookieOptions<T> & {
+    toValue: (str: string) => T;
+    toString: (value: T) => string;
+  },
+): Signal<T>;
+export function createServerCookie(
+  name: string,
+  options?: ServerCookieOptions,
+): Signal<string | undefined>;
+export function createServerCookie<T>(
+  name: string,
+  options?: ServerCookieOptions<T | undefined>,
+): Signal<T | undefined> {
   const {
-    CookieParser = {
-      toValue: (str?: string) => (str === "light" || str === "dark" ? str : null),
-      toString: String,
-    },
+    toValue = (v: any) => v as T,
+    toString = String,
     cookieMaxAge = 365 * 24 * 60 * 60,
-    defaultValue = "light",
   } = options ?? {};
-  const event = useRequest();
-  const userTheme = parseCookie(
-    isServer ? event.request.headers.get("cookie") ?? "" : document.cookie,
-  )[name];
-  const [cookie, setCookie] = createSignal<T | null>(
-    (CookieParser.toValue(userTheme) ?? defaultValue) as T,
-  );
-  createEffect(() => {
-    document.cookie = `${name}=${cookie()};max-age=${cookieMaxAge}`;
-  });
-  return [cookie, setCookie];
-};
 
-export const createUserTheme = (name?: string) => {
-  const [theme, setTheme] = createServerCookie(name ?? "theme", {
-    defaultValue: "light",
-    CookieParser: {
-      toValue: str => (str === "light" || str === "dark" ? str : null),
-      toString: String,
-    },
+  const [cookie, setCookie] = createSignal(
+    toValue(
+      parseCookie(isServer ? useRequest().request.headers.get("cookie") ?? "" : document.cookie)[
+        name
+      ],
+    ),
+  );
+
+  createEffect(p => {
+    const string = toString(cookie());
+    if (p !== string) {
+      document.cookie = `${name}=${toString(cookie())};max-age=${cookieMaxAge}`;
+    }
+    return string;
   });
-  return [theme, setTheme];
-};
+
+  return [cookie, setCookie];
+}
+
+export type Theme = "light" | "dark";
+
+export function createUserTheme(name: string | undefined, defaultValue: Theme): Signal<Theme>;
+export function createUserTheme(name?: string): Signal<Theme | null>;
+export function createUserTheme(
+  name = "theme",
+  defaultValue: Theme | null = null,
+): Signal<Theme | null> {
+  return createServerCookie(name, {
+    toValue: str => (str === "light" || str === "dark" ? str : defaultValue),
+  });
+}
