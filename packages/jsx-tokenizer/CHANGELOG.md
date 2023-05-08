@@ -1,5 +1,12 @@
 # @solid-primitives/jsx-tokenizer
 
+## 1.0.5
+
+### Patch Changes
+
+- Updated dependencies [2e0bcedf]
+  - @solid-primitives/utils@6.1.1
+
 ## 1.0.4
 
 ### Patch Changes

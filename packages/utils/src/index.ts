@@ -222,6 +222,7 @@ export const createCallbackStack = <A0 = void, A1 = void, A2 = void, A3 = void>(
 export function createMicrotask<A extends any[] | []>(fn: (...a: A) => void): (...a: A) => void {
   let calls = 0;
   let args: A;
+  onCleanup(() => (calls = 0));
   return (...a: A) => {
     (args = a), calls++;
     queueMicrotask(() => --calls === 0 && fn(...args));

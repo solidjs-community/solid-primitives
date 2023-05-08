@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/cursor",
-  "version": "0.0.109",
+  "version": "0.0.110",
   "description": "Two simple primitives for setting cursor css property reactively.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/rootless",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "A collection of helpers that aim to simplify using reactive primitives outside of reactive roots, and managing disposal of reactive roots.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -16,7 +16,8 @@
       "createSubRoot",
       "createCallback",
       "createDisposable",
-      "createSharedRoot"
+      "createSharedRoot",
+      "createRootPool"
     ],
     "category": "Reactivity"
   },
@@ -39,14 +40,18 @@
   },
   "typesVersions": {},
   "scripts": {
+    "dev": "vite serve dev",
+    "page": "vite build dev",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
   },
   "keywords": [
-    "root",
     "solid",
-    "primitives"
+    "primitives",
+    "reactivity",
+    "root",
+    "ownership"
   ],
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
