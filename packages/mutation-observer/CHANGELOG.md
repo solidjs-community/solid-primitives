@@ -1,5 +1,12 @@
 # @solid-primitives/mutation-observer
 
+## 1.1.12
+
+### Patch Changes
+
+- Updated dependencies [2e0bcedf]
+  - @solid-primitives/utils@6.1.1
+
 ## 1.1.11
 
 ### Patch Changes

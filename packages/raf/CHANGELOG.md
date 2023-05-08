@@ -1,5 +1,12 @@
 # @solid-primitives/raf
 
+## 2.1.11
+
+### Patch Changes
+
+- Updated dependencies [2e0bcedf]
+  - @solid-primitives/utils@6.1.1
+
 ## 2.1.10
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @solid-primitives/media
 
+## 2.2.1
+
+### Patch Changes
+
+- Updated dependencies [2e0bcedf]
+- Updated dependencies [5ea65ea9]
+  - @solid-primitives/utils@6.1.1
+  - @solid-primitives/rootless@1.4.0
+  - @solid-primitives/event-listener@2.2.11
+  - @solid-primitives/static-store@0.0.3
+
 ## 2.2.0
 
 ### Minor Changes
