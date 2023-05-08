@@ -1,8 +1,5 @@
 import { Accessor, Component, For, batch, createSignal } from "solid-js";
 import { StoreSetter, createStore, unwrap } from "solid-js/store";
-import { render } from "solid-js/web";
-
-import "uno.css";
 import { createRootPool } from "../src";
 
 type TodoItem = { title: string; done: boolean };
@@ -65,4 +62,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

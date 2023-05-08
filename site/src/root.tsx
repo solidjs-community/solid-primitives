@@ -1,4 +1,4 @@
-import { JSX, Suspense, lazy } from "solid-js";
+import { Suspense } from "solid-js";
 import {
   Body,
   ErrorBoundary,
@@ -11,23 +11,12 @@ import {
   Scripts,
   Title,
 } from "solid-start";
-import { RouteDefinition } from "@solidjs/router";
 
 import "./root.scss";
 
 import Header from "./components/Header/Header";
 import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderClusterDefs";
 import Footer from "./components/Footer/Footer";
-
-const modules = import.meta.glob("../../packages/*/dev/index.tsx");
-
-const playgroundRoutes: RouteDefinition[] = Object.entries(modules).map(([path, fn]) => {
-  const name = path.split("/")[3];
-  return {
-    path: `/playground/${name}`,
-    component: lazy(fn as any),
-  };
-});
 
 const SITE_URL = import.meta.env.VITE_SITE_URL;
 
@@ -86,7 +75,6 @@ export default function Root() {
                 <SolidBlocksHeaderClusterDefs />
                 <Routes>
                   <FileRoutes />
-                  {playgroundRoutes as any as JSX.Element}
                 </Routes>
                 <Footer />
               </div>
