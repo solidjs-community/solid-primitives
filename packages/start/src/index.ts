@@ -19,13 +19,13 @@ type ServerCookieOptions<T> = {
   cookieMaxAge?: number;
   CookieParser?: ParseCookie<T>;
 };
-export const createServerCookie = <T = string>(
+export const createServerCookie = <T = "light" | "dark" | null>(
   name: string,
   options?: ServerCookieOptions<T>,
 ): Signal<T | null> => {
   const {
     CookieParser = {
-      toValue: (str?: string) => str,
+      toValue: (str?: string) => (str === "light" || str === "dark" ? str : null),
       toString: String,
     },
     cookieMaxAge = 365 * 24 * 60 * 60,
