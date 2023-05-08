@@ -1,4 +1,4 @@
-import { createSignal, createEffect, Signal } from "solid-js";
+import { createSignal, createEffect, Signal, NoInfer } from "solid-js";
 import { isServer } from "solid-js/web";
 import { parseCookie } from "solid-start";
 import { useRequest } from "solid-start/server";
@@ -15,7 +15,7 @@ type ParseCookie<T> = {
   toString: (value: T) => string;
 };
 type ServerCookieOptions<T> = {
-  defaultValue?: T;
+  defaultValue?: NoInfer<T>;
   cookieMaxAge?: number;
   CookieParser?: ParseCookie<T>;
 };
@@ -46,6 +46,7 @@ export const createServerCookie = <T = string>(
 
 export const createUserTheme = (name?: string) => {
   const [theme, setTheme] = createServerCookie(name ?? "theme", {
+    defaultValue: "light",
     CookieParser: {
       toValue: str => (str === "light" || str === "dark" ? str : null),
       toString: String,
