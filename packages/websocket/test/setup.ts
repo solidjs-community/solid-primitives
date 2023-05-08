@@ -9,7 +9,7 @@ import { WSMessage } from "../src";
 type WSReadyState = 0 | 1 | 2 | 3;
 
 declare global {
-  const WSMessages: Map<WebSocket | MockWebSocket, WSMessage[]>
+  const WSMessages: Map<WebSocket | MockWebSocket, WSMessage[]>;
 }
 
 (global as any).WSMessages = new Map<WebSocket | MockWebSocket, WSMessage>();
@@ -18,10 +18,7 @@ const readyStates = new Map<MockWebSocket, WSReadyState>();
 
 class MockWebSocket extends EventTarget {
   public readyState: WSReadyState = 0;
-  constructor(
-    public url: string,
-    public protocol?: string | string[]
-  ) {
+  constructor(public url: string, public protocol?: string | string[]) {
     super();
     WSMessages.set(this, [] as WSMessage[]);
     setTimeout(() => {
@@ -29,20 +26,25 @@ class MockWebSocket extends EventTarget {
       this.dispatchEvent(new Event("open"));
     }, 10);
     this.addEventListener("error", this.close.bind(this));
-    this.addEventListener("close", function(this: MockWebSocket) { 
-      this.readyState = 3;
-      WSMessages.delete(this);
-    }.bind(this));
+    this.addEventListener(
+      "close",
+      function (this: MockWebSocket) {
+        this.readyState = 3;
+        WSMessages.delete(this);
+      }.bind(this),
+    );
   }
   close() {
     this.readyState = 2;
-    setTimeout(function(this: MockWebSocket) {
-      this.dispatchEvent(new Event("close"));
-    }.bind(this), 50);
+    setTimeout(
+      function (this: MockWebSocket) {
+        this.dispatchEvent(new Event("close"));
+      }.bind(this),
+      50,
+    );
   }
   send(msg: string | ArrayBufferLike | ArrayBufferView | Blob) {
-    if (this.readyState !== 1)
-      throw new Error("cannot sent through a non-open connection")
+    if (this.readyState !== 1) throw new Error("cannot sent through a non-open connection");
     const sent = WSMessages.get(this);
     sent?.push(msg);
   }

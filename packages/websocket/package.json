@@ -18,12 +18,11 @@
     "list": [
       "makeWS",
       "createWS",
-      "createMessageWS",
       "makeReconnectingWS",
       "createReconnectingWS",
       "makeHeartbeatWS"
     ],
-    "category": "network"
+    "category": "Network"
   },
   "private": false,
   "type": "module",
@@ -44,7 +43,7 @@
   "sideEffects": false,
   "scripts": {
     "dev": "vite serve dev",
-    "page": "vite build dev",    
+    "page": "vite build dev",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest"
   },
