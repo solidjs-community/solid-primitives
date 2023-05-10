@@ -669,6 +669,15 @@ importers:
         specifier: ^1.6.12
         version: 1.7.3
 
+  packages/presence:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+      solid-js:
+        specifier: ^1.6.12
+        version: 1.7.3
+
   packages/promise:
     dependencies:
       '@solid-primitives/utils':

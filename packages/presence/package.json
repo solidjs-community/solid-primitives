@@ -1,0 +1,57 @@
+{
+  "name": "@solid-primitives/presence",
+  "version": "0.0.1",
+  "description": "Utility to animate the presence of an element based on the existence of data or lack thereof.",
+  "author": "Ethan Standel <ethan@standel.io>",
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/presence#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "presence",
+    "stage": 0,
+    "list": [
+      "createPresence"
+    ],
+    "category": "Animation"
+  },
+  "files": [
+    "dist"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "require": "./dist/index.cjs"
+  },
+  "keywords": [
+    "animation",
+    "animate",
+    "presence",
+    "transition"
+  ],
+  "scripts": {
+    "dev": "vite serve dev",
+    "page": "vite build dev",
+    "build": "jiti ../../scripts/build.ts",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.12"
+  },
+  "typesVersions": {}
+}
