@@ -1,72 +1,178 @@
-import { createSignal, onCleanup } from "solid-js";
+import { onCleanup } from "solid-js";
 
-export type WebsocketState = 0 | 1 | 2 | 3;
+export type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
 
 /**
- * Handles opening managing and reconnecting to a Websocket.
- *
- * @param url - Path to the websocket server
- * @param onData - A function supplied that messages will be reported to
- * @param onError - A function supplied that errors will be reported to
- * @param procotols - List of protocols to support
- * @param reconnectLimit - Amount of reconnection attempts
- * @param reconnectInterval - Time in between connection attempts
- * @return Returns an array containing websocket management options
- *
- * @example
+ * opens a web socket connection with a queued send
  * ```ts
- * const [ connect, disconnect ] = createWebsocket('http://localhost', '', 3, 5000);
+ * const ws = makeWS("ws:localhost:5000");
+ * createEffect(() => ws.send(serverMessage()));
+ * onCleanup(() => ws.close());
  * ```
+ * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
+ *
+ * It will not close the connection on cleanup. To do that, use `createWS`.
  */
-const createWebsocket = (
+export const makeWS = (
   url: string,
-  onData: (message: MessageEvent) => void,
-  onError: (message: Event) => void,
-  protocols?: string | Array<string>,
-  reconnectLimit?: number,
-  reconnectInterval?: number,
-): [
-  connect: () => void,
-  disconnect: () => void,
-  send: (message: string) => void,
-  state: () => WebsocketState,
-  socket: () => WebSocket,
-] => {
-  let socket: WebSocket | undefined;
-  let reconnections = 0;
-  let reconnectId: ReturnType<typeof setTimeout> | undefined;
-  const [state, setState] = createSignal<WebsocketState>(WebSocket.CLOSED);
-  const send = (data: string | ArrayBuffer) => socket!.send(data);
-  const cancelReconnect = () => {
-    if (reconnectId) {
-      clearTimeout(reconnectId);
-    }
-  };
-  const disconnect = () => {
-    cancelReconnect();
-    reconnectLimit = Number.NEGATIVE_INFINITY;
-    if (socket) {
-      socket.close();
-    }
-  };
-  // Connect the socket to the server
-  const connect = () => {
-    cancelReconnect();
-    setState(WebSocket.CONNECTING);
-    socket = new WebSocket(url, protocols);
-    socket.onopen = () => setState(WebSocket.OPEN);
-    socket.onclose = () => {
-      setState(WebSocket.CLOSED);
-      if (reconnectLimit && reconnectLimit > reconnections) {
-        reconnections += 1;
-        reconnectId = setTimeout(connect, reconnectInterval);
-      }
-    };
-    socket.onerror = onError;
-    socket.onmessage = onData;
-  };
-  onCleanup(() => disconnect);
-  return [connect, disconnect, send, state, () => socket!];
+  protocols?: string | string[],
+  sendQueue: WSMessage[] = [],
+): WebSocket => {
+  const ws: WebSocket = new WebSocket(url, protocols);
+  const _send = ws.send.bind(ws);
+  ws.send = (msg: WSMessage) => (ws.readyState == 1 ? _send(msg) : sendQueue.push(msg));
+  ws.addEventListener("open", () => {
+    while (sendQueue.length) _send(sendQueue.shift()!);
+  });
+  return ws;
 };
 
-export default createWebsocket;
+/**
+ * opens a web socket connection with a queued send that closes on cleanup
+ * ```ts
+ * const ws = makeWS("ws:localhost:5000");
+ * createEffect(() => ws.send(serverMessage()));
+ * ```
+ * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
+ */
+export const createWS = (url: string, protocols?: string | string[]): WebSocket => {
+  const ws = makeWS(url, protocols);
+  onCleanup(() => ws.close());
+  return ws;
+};
+
+export type WSReconnectOptions = {
+  delay?: number;
+  retries?: number;
+};
+
+export type ReconnectingWebSocket = WebSocket & {
+  reconnect: () => void;
+  /** required for the heartbeat implementation; do not overwrite if you want to use this with heartbeat */
+  send: WebSocket["send"] & { before?: () => void };
+};
+
+/**
+ * Returns a WebSocket-like object that under the hood opens new connections on disconnect:
+ * ```ts
+ * const ws = makeReconnectingWS("ws:localhost:5000");
+ * createEffect(() => ws.send(serverMessage()));
+ * onCleanup(() => ws.close());
+ * ```
+ * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
+ *
+ * It will not close the connection on cleanup. To do that, use `createReconnectingWS`.
+ */
+export const makeReconnectingWS = (
+  url: string,
+  protocols?: string | string[],
+  options: WSReconnectOptions = {},
+) => {
+  let retries = options.retries || Infinity;
+  let ws: ReconnectingWebSocket;
+  const queue: WSMessage[] = [];
+  let events: Parameters<WebSocket["addEventListener"]>[] = [
+    [
+      "close",
+      () => {
+        retries-- > 0 && setTimeout(getWS, options.delay || 3000);
+      },
+    ],
+  ];
+  const getWS = () => {
+    if (ws && ws.readyState < 2) ws.close();
+    ws = Object.assign(makeWS(url, protocols, queue), {
+      reconnect: getWS,
+    });
+    events.forEach(args => ws.addEventListener(...args));
+  };
+  getWS();
+  const wws: Partial<ReconnectingWebSocket> = {
+    close: (...args: Parameters<WebSocket["close"]>) => {
+      retries = 0;
+      return ws.close(...args);
+    },
+    addEventListener: (...args: Parameters<WebSocket["addEventListener"]>) => {
+      events.push(args);
+      return ws.addEventListener(...args);
+    },
+    removeEventListener: (...args: Parameters<WebSocket["removeEventListener"]>) => {
+      events = events.filter(ev => args[0] !== ev[0] || args[1] !== ev[1]);
+      return ws.removeEventListener(...args);
+    },
+    send: (msg: WSMessage) => {
+      wws.send!.before?.();
+      return ws.send(msg);
+    },
+  };
+  for (let name in ws!)
+    wws[name as keyof typeof wws] == null &&
+      Object.defineProperty(wws, name, {
+        enumerable: true,
+        get: () =>
+          typeof ws[name as keyof typeof ws] === "function"
+            ? (ws[name as keyof typeof ws] as Function).bind(ws)
+            : ws[name as keyof typeof ws],
+      });
+  return wws as ReconnectingWebSocket;
+};
+
+/**
+ * Returns a WebSocket-like object that under the hood opens new connections on disconnect and closes on cleanup:
+ * ```ts
+ * const ws = makeReconnectingWS("ws:localhost:5000");
+ * createEffect(() => ws.send(serverMessage()));
+ * ```
+ * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
+ */
+export const createReconnectingWS: typeof makeReconnectingWS = (url, protocols, options) => {
+  const ws = makeReconnectingWS(url, protocols, options);
+  onCleanup(() => ws.close());
+  return ws;
+};
+
+export type WSHeartbeatOptions = {
+  /**
+   * Heartbeat message being sent to the server in order to validate the connection
+   * @default "ping"
+   */
+  message?: WSMessage;
+  /**
+   * The time between messages being sent in milliseconds
+   * @default 1000
+   */
+  interval?: number;
+  /**
+   * The time after the heartbeat message being sent to wait for the next message in milliseconds
+   * @default 1500
+   */
+  wait?: number;
+};
+
+/**
+ * Wraps a reconnecting WebSocket to send a heartbeat to check the connection
+ * ```ts
+ * const ws = makeHeartbeatWS(createReconnectingWS('ws://localhost:5000'))
+ * ```
+ * Dispatches a close event to initiate the reconnection of the defunct web socket.
+ */
+export const makeHeartbeatWS = (
+  ws: ReconnectingWebSocket,
+  options: WSHeartbeatOptions = {},
+): WebSocket & { reconnect: () => void } => {
+  let pingtimer: ReturnType<typeof setTimeout> | undefined;
+  let pongtimer: ReturnType<typeof setTimeout> | undefined;
+  const clearTimers = () => (clearTimeout(pingtimer), clearTimeout(pongtimer));
+  ws.send.before = () => {
+    clearTimers();
+    pongtimer = setTimeout(ws.reconnect, options.wait || 1500);
+  };
+  ws.addEventListener("close", clearTimers);
+  const receiveMessage = () => {
+    clearTimers();
+    pingtimer = setTimeout(() => ws.send(options.message || "ping"), options.interval || 1000);
+  };
+  ws.addEventListener("message", receiveMessage);
+  setTimeout(receiveMessage, options.interval || 1000);
+  return ws;
+};
