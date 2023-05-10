@@ -1,4 +1,4 @@
-import { createSignal, onCleanup, type Accessor } from "solid-js";
+import { onCleanup } from "solid-js";
 
 export type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
 
