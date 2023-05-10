@@ -1,0 +1,63 @@
+{
+  "name": "@solid-primitives/history",
+  "version": "0.0.1",
+  "description": "Primitives for managing undo/redo history in Solid.",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/history#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "history",
+    "stage": 0,
+    "list": [
+      "createUndoHistory"
+    ],
+    "category": "Utilities"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "undo",
+    "redo",
+    "history",
+    "time travel"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "require": "./dist/index.cjs"
+  },
+  "typesVersions": {},
+  "scripts": {
+    "dev": "vite serve dev",
+    "page": "vite build dev",
+    "build": "jiti ../../scripts/build.ts",
+    "test": "vitest -c ../../configs/vitest.config.ts",
+    "test:ssr": "pnpm run test --mode ssr"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.12"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  }
+}
