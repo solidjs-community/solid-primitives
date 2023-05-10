@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/websocket": patch
+"@solid-primitives/websocket": major
 ---
 
 websocket: rewrite
