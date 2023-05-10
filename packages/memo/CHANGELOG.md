@@ -1,5 +1,13 @@
 # @solid-primitives/memo
 
+## 1.3.0
+
+### Minor Changes
+
+- 5e1f19e0: Add `createLatestMany`
+
+  Deprecate scheduled memos (`createDebouncedMemo`, `createDebouncedMemoOn`, `createThrottledMemo`) in favor of using the `createSchedule` primitive from the `scheduled` package
+
 ## 1.2.5
 
 ### Patch Changes
