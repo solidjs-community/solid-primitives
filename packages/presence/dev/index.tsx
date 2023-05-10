@@ -1,6 +1,6 @@
 import { Component, For, Show, createSignal } from "solid-js";
 import { render } from "solid-js/web";
-import createPresence from "../src/createPresence";
+import { createPresence } from "../src";
 import "uno.css";
 
 const App: Component = () => {

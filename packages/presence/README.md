@@ -78,8 +78,8 @@ The first argument of `createPresence` is a signal accessor of arbitrary type. T
 ```tsx
 const SecondExample = () => {
   const items = ["foo", "bar", "baz", "qux"];
-  const [item, setItem] = createSignal<(typeof items)[number] | undefined>(items[0]);
-  const { isMounted, mountedItem, isEntering, isVisible, isExiting } = createPresence(item, {
+  const [activeItem, setActiveItem] = createSignal(items[0]);
+  const presence = createPresence(activeItem, {
     transitionDuration: 500,
   });
 
@@ -93,39 +93,31 @@ const SecondExample = () => {
       }}
     >
       <For each={items}>
-        {currItem => (
-          <button
-            onclick={() => {
-              if (item() === currItem) {
-                setItem(undefined);
-              } else {
-                setItem(currItem);
-              }
-            }}
-          >
-            {currItem}
+        {item => (
+          <button onClick={() => setActiveItem(p => (p === item ? undefined : item))}>
+            {item}
           </button>
         )}
       </For>
-      <Show when={isMounted()}>
+      <Show when={presence.isMounted()}>
         <div
           style={{
             transition: "all .5s linear",
-            ...(isEntering() && {
+            ...(presence.isEntering() && {
               opacity: "0",
               transform: "translateX(-25px)",
             }),
-            ...(isExiting() && {
+            ...(presence.isExiting() && {
               opacity: "0",
               transform: "translateX(25px)",
             }),
-            ...(isVisible() && {
+            ...(presence.isVisible() && {
               opacity: "1",
               transform: "translateX(0)",
             }),
           }}
         >
-          {mountedItem()}
+          {presence.mountedItem()}
         </div>
       </Show>
     </div>
@@ -135,25 +127,28 @@ const SecondExample = () => {
 
 ### `createPresence` options API
 
-```tsx
+```ts
+function createPresence<TItem>(
+  item: Accessor<TItem | undefined>,
+  options: Options,
+): PresenceResult<TItem>;
+
 type Options = {
   /** Duration in milliseconds used both for enter and exit transitions. */
-  transitionDuration: number;
+  transitionDuration: MaybeAccessor<number>;
   /** Duration in milliseconds used for enter transitions (overrides `transitionDuration` if provided). */
-  enterDuration: number;
+  enterDuration: MaybeAccessor<number>;
   /** Duration in milliseconds used for exit transitions (overrides `transitionDuration` if provided). */
-  exitDuration: number;
+  exitDuration: MaybeAccessor<number>;
   /** Opt-in to animating the entering of an element if `isVisible` is `true` during the initial mount. */
   initialEnter?: boolean;
 };
-createPresenceSignal(
-  /** Indicates whether the component that the resulting values will be used upon should be visible to the user. */
-  isVisible: Accessor<boolean>,
-  /** Options may be a signal getter if you need to update it */
-  opts: Options | Accessor<Options>
-): {
+
+type PresenceResult<TItem> = {
   /** Should the component be returned from render? */
   isMounted: Accessor<boolean>;
+  /** The item that is currently mounted. */
+  mountedItem: Accessor<TItem | undefined>;
   /** Should the component have its visible styles applied? */
   isVisible: Accessor<boolean>;
   /** Is the component either entering or exiting currently? */
@@ -162,7 +157,7 @@ createPresenceSignal(
   isEntering: Accessor<boolean>;
   /** Is the component exiting currently? */
   isExiting: Accessor<boolean>;
-}
+};
 ```
 
 ## Demo
