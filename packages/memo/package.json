@@ -18,12 +18,9 @@
     "stage": 3,
     "list": [
       "createLatest",
+      "createLatestMany",
       "createWritableMemo",
       "createLazyMemo",
-      "createAsyncMemo",
-      "createDebouncedMemo",
-      "createDebouncedMemoOn",
-      "createThrottledMemo",
       "createPureReaction",
       "createMemoCache",
       "createReducer"
