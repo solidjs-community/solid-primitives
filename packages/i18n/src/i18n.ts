@@ -168,4 +168,10 @@ export const createI18nContext = (
 export type I18nContextInterface = ReturnType<typeof createI18nContext>;
 
 export const I18nContext = createContext<I18nContextInterface>({} as I18nContextInterface);
+
 export const useI18n = () => useContext(I18nContext);
+
+export const useScopedI18n = (scope: string): I18nContextInterface => {
+  const [translate, actions] = useContext(I18nContext);
+  return [(key, ...rest) => translate(`${scope}.${key}`, ...rest), actions];
+};

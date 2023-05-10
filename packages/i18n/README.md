@@ -142,6 +142,36 @@ const App: Component = () => {
 </I18nContext.Provider>;
 ```
 
+## `useScopedI18n`
+
+Use `useScopedI18n` to create a module-specific translate.
+
+```tsx
+
+const dict = {
+  en: {
+    login: {
+      username: 'User name',
+      password: 'Password',
+      login: 'Login'
+  },
+  fr: {
+     ...
+  }
+ }
+}
+
+export const LoginView = () => {
+  const [t] = useScopedI18n('login');
+  return <>
+      <div>{t('username')}<input /></div>
+      <div>{t('password')}<input /></div>
+      <button>{t('login') }</button>
+  </>
+}
+
+```
+
 ## Demo
 
 You may view a working example of createI18nContext here: https://codesandbox.io/s/use-i18n-rd7jq?file=/src/index.tsx

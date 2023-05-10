@@ -1,5 +1,12 @@
 # @solid-primitives/refs
 
+## 1.0.3
+
+### Patch Changes
+
+- Updated dependencies [2e0bcedf]
+  - @solid-primitives/utils@6.1.1
+
 ## 1.0.2
 
 ### Patch Changes

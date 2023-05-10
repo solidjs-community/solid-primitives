@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 6.1.1
+
+### Patch Changes
+
+- 2e0bcedf: Don't call the next createMicrotask callback if cleanup happens
+
 ## 6.1.0
 
 ### Minor Changes

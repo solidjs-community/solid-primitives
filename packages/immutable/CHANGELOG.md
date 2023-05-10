@@ -1,5 +1,13 @@
 # @solid-primitives/immutable
 
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [2e0bcedf]
+  - @solid-primitives/utils@6.1.1
+  - @solid-primitives/keyed@1.2.0
+
 ## 1.0.0
 
 ### Major Changes

@@ -1,5 +1,12 @@
 # @solid-primitives/props
 
+## 3.1.5
+
+### Patch Changes
+
+- Updated dependencies [2e0bcedf]
+  - @solid-primitives/utils@6.1.1
+
 ## 3.1.4
 
 ### Patch Changes
