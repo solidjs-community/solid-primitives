@@ -149,7 +149,7 @@ Use `useScopedI18n` to create a module-specific translate.
 ```tsx
 
 const dict = {
-  en: { 
+  en: {
     login: {
       username: 'User name',
       password: 'Password',
