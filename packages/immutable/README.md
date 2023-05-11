@@ -126,7 +126,7 @@ refetch();
 
 ## Demo
 
-You can see the live demo [here](https://solidjs-community.github.io/solid-primitives/immutable).
+You can see the live demo [here](https://primitives.solidjs.community/playground/immutable).
 
 [Source code](./dev/index.tsx)
 

@@ -43,7 +43,7 @@ const gyroscope = createGyroscope();
 ## Demo
 
 You may view a working example here:
-https://solidjs-community.github.io/solid-primitives/devices/
+https://primitives.solidjs.community/playground/devices/
 
 ## Reference
 
