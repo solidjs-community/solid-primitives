@@ -1,5 +1,5 @@
 import { createActiveElement, focus } from "../src";
-import { Component, createSignal, Index, ParentComponent } from "solid-js";
+import { Component, createSignal, Index, onMount, ParentComponent } from "solid-js";
 
 import { genNodeList } from "./utils";
 // prevent tree-shaking
@@ -25,7 +25,7 @@ const Node: ParentComponent<{ x: number; y: number; size: number }> = props => {
   );
 };
 
-const App: Component = () => {
+const Client: Component = () => {
   const [list, setList] = createSignal(genNodeList());
   const shuffle = () => setList(genNodeList());
   const activeEl = createActiveElement();
@@ -53,4 +53,8 @@ const App: Component = () => {
   );
 };
 
-export default App;
+export default function App() {
+  const [mounted, setMounted] = createSignal(false);
+  onMount(() => setMounted(true));
+  return <>{mounted() && <Client />}</>;
+}
