@@ -7,7 +7,7 @@ import { H2 } from "~/components/prose";
 import { pageWidthClass } from "~/constants";
 import { DocumentClass } from "~/primitives/document-class";
 import { PackageData } from "~/types";
-import { kebabCaseToCapitalized } from "~/utils";
+import { kebabCaseToCapitalized } from "~/utils/utils";
 import { Heading } from "./components/heading";
 import { PackageInstallation } from "./components/package-installation";
 import { createPrimitiveNameTooltips } from "./components/primitive-name-tooltips";
