@@ -91,24 +91,65 @@ export function createPureReaction(
 /**
  * A combined memo of multiple sources, last updated source will be the value of the returned signal.
  * @param sources list of reactive calculations/signals/memos
- * @param value specify initial value of the returned signal
  * @param options signal options
  * @returns signal with value of the last updated source
  * @example
  * const [count, setCount] = createSignal(1);
- * const number = createMemo(() => otherValue() * 2);
- * const lastUpdated = createLatest([count, number]);
- * lastUpdated() // => undefined
+ * const [text, setText] = createSignal("hello");
+ * const lastUpdated = createLatest([count, text]);
+ * lastUpdated() // => "hello"
  * setCount(4)
  * lastUpdated() // => 4
  */
-export function createLatest<T extends Accessor<any>[]>(
+export function createLatest<T extends readonly Accessor<any>[]>(
   sources: T,
-  options?: SignalOptions<ReturnType<T[number]>>,
+  options?: MemoOptions<ReturnType<T[number]>>,
 ): Accessor<ReturnType<T[number]>> {
   let index = 0;
   const memos = sources.map((source, i) => createMemo(() => ((index = i), source())));
   return createMemo(() => memos.map(m => m())[index]!, undefined, options);
+}
+
+/**
+ * A combined memo of multiple sources, returns the values of sources updated in the last tick.
+ * @param sources list of reactive calculations/signals/memos
+ * @param options signal options
+ * @returns signal with value of the last updated sources
+ * @example
+ * const [count, setCount] = createSignal(1);
+ * const [text, setText] = createSignal("hello");
+ * const lastUpdated = createLatest([count, text]);
+ * lastUpdated() // => [1, "hello"]
+ * setCount(4)
+ * lastUpdated() // => [4]
+ */
+export function createLatestMany<T extends readonly Accessor<any>[]>(
+  sources: T,
+  options?: EffectOptions,
+): Accessor<ReturnType<T[number]>[]>;
+export function createLatestMany<T>(
+  sources: readonly Accessor<T>[],
+  options?: EffectOptions,
+): Accessor<T[]> {
+  const mappedSources = sources.map(source => {
+    const obj: { dirty: boolean; memo: Accessor<T> } = { dirty: true, memo: null as any };
+    obj.memo = createMemo(() => ((obj.dirty = true), source()));
+    return obj;
+  });
+  return createLazyMemo<T[]>(
+    () =>
+      mappedSources.reduce((acc: T[], data) => {
+        // always track all memos to force updates
+        const v = data.memo();
+        if (data.dirty) {
+          data.dirty = false;
+          acc.push(v);
+        }
+        return acc;
+      }, []),
+    undefined,
+    options,
+  );
 }
 
 /**
@@ -153,18 +194,7 @@ export function createWritableMemo<T>(
 }
 
 /**
- * Solid's `createMemo` which returned signal is debounced. *(The {@link fn} callback is not debounced!)*
- *
- * @param fn reactive calculation returning signals value
- * @param timeoutMs The duration to debounce in ms
- * @param value specify initial value *(by default it will be undefined)*
- * @param options
- * @returns signal with debounced value
- *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createDebouncedMemo
- *
- * @example
- * const double = createDebouncedMemo(() => count() * 2, 200)
+ * @deprecated Please use `createSchedule` from `@solid-primitives/schedule` instead.
  */
 export function createDebouncedMemo<Next extends Prev, Prev = Next>(
   fn: EffectFunction<undefined | NoInfer<Prev>, Next>,
@@ -193,19 +223,7 @@ export function createDebouncedMemo<T>(
 }
 
 /**
- * Solid's `createMemo` with explicit sources, and debounced callback.
- *
- * @param sources signal or a list of reactive signals *(Similar to `on` helper)*
- * @param calc reactive calculation returning signals value
- * @param timeoutMs The duration to debounce in ms
- * @param value specify initial value *(by default it will be undefined)*
- * @param options
- * @returns signal with debounced value
- *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createDebouncedMemoOn
- *
- * @example
- * const double = createDebouncedMemoOn(count, v => v * 2, 200)
+ * @deprecated Please use `createSchedule` from `@solid-primitives/schedule` instead.
  */
 export function createDebouncedMemoOn<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
@@ -252,16 +270,7 @@ export function createDebouncedMemoOn<S, Next extends Prev, Prev = Next>(
 }
 
 /**
- * Solid's `createMemo` which callback execution is throttled.
- *
- * @param fn reactive calculation returning signals value
- * @param timeoutMs The duration to throttle in ms
- * @param options specify initial value *(by default it will be undefined)*
- *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createThrottledMemo
- *
- * @example
- * const double = createThrottledMemo(() => count() * 2, 200)
+ * @deprecated Please use `createSchedule` from `@solid-primitives/schedule` instead.
  */
 export function createThrottledMemo<Next extends Prev, Prev = Next>(
   fn: EffectFunction<undefined | NoInfer<Prev>, Next>,

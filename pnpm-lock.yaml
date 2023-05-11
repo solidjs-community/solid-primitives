@@ -407,6 +407,15 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3(graphql@16.6.0)
 
+  packages/history:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+      solid-js:
+        specifier: ^1.6.12
+        version: 1.7.3
+
   packages/i18n:
     dependencies:
       '@solid-primitives/context':
@@ -653,6 +662,15 @@ importers:
       '@solid-primitives/rootless':
         specifier: workspace:^
         version: link:../rootless
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+      solid-js:
+        specifier: ^1.6.12
+        version: 1.7.3
+
+  packages/presence:
+    dependencies:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
