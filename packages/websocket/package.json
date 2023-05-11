@@ -42,8 +42,6 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "dev": "vite serve dev",
-    "page": "vite build dev",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest"
   },

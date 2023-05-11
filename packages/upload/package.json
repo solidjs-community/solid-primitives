@@ -43,7 +43,6 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "dev": "yarn start",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"

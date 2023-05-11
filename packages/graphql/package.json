@@ -39,8 +39,6 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "dev": "vite serve dev",
-    "page": "vite build dev",
     "gqlgen": "graphql-codegen --config dev/codegen.yml",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
