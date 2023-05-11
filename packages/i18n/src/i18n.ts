@@ -1,5 +1,6 @@
 import { createContext, createSignal, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
+import type { UseScopedI18n, I18nContextInterface } from "./types";
 
 /**
  * Safely access deep values in an object via a string path seperated by `.`
@@ -162,16 +163,17 @@ export const createI18nContext = (
      */
     dict: (lang: string) => deepReadObject(dict, lang),
   };
-  return [translate, actions as any];
+  return [translate, actions];
 };
-
-export type I18nContextInterface = ReturnType<typeof createI18nContext>;
 
 export const I18nContext = createContext<I18nContextInterface>({} as I18nContextInterface);
 
-export const useI18n = () => useContext(I18nContext);
+export const useI18n = <T = unknown>() => useContext(I18nContext) as I18nContextInterface<T>;
 
-export const useScopedI18n = (scope: string): I18nContextInterface => {
-  const [translate, actions] = useContext(I18nContext);
-  return [(key, ...rest) => translate(`${scope}.${key}`, ...rest), actions];
+export const useScopedI18n: UseScopedI18n = <T = unknown>(scope: string) => {
+  const [translate, actions] = useI18n();
+  return [
+    (key, ...rest) => translate(`${scope}.${key}`, ...rest),
+    actions,
+  ] satisfies I18nContextInterface as unknown as I18nContextInterface<T>;
 };

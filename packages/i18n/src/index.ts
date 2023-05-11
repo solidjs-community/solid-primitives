@@ -1,5 +1,5 @@
 export { createI18nContext, I18nContext, useI18n, useScopedI18n } from "./i18n";
-export type { I18nContextInterface } from "./i18n";
+export type { I18nContextInterface } from "./types";
 
 export {
   createChainedI18nDictionary,
