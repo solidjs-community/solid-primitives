@@ -42,6 +42,7 @@
   ],
   "sideEffects": false,
   "scripts": {
+    "dev": "jiti ../../scripts/dev.ts",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest"
   },

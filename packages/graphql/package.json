@@ -40,6 +40,7 @@
   },
   "scripts": {
     "gqlgen": "graphql-codegen --config dev/codegen.yml",
+    "dev": "jiti ../../scripts/dev.ts",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
