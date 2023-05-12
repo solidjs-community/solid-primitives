@@ -11,13 +11,10 @@
 
 Collection of custom `createMemo` primitives. They extend it's functionality while keeping the usage similar.
 
-- [`createLatest`](#createLatest) - A combined memo of a list of sources, where last updated will be the value.
+- [`createLatest`](#createLatest) - A combined memo of a list of sources, returns the value of last updated one.
+- [`createLatestMany`](#createLatestMany) - A combined memo of a list of sources, returns the value of all last updated ones.
 - [`createWritableMemo`](#createWritableMemo) - Solid's `createMemo` which value can be overwritten by a setter.
 - [`createLazyMemo`](#createLazyMemo) - Lazily evaluated memo. Will run the calculation only if is being listened to.
-- [`createAsyncMemo`](#createAsyncMemo) - Memo that allows for asynchronous calculations.
-- [`createDebouncedMemo`](#createDebouncedMemo) - Memo which returned signal is debounced.
-- [`createDebouncedMemoOn`](#createDebouncedMemoOn) - Memo which callback is debounced.
-- [`createThrottledMemo`](#createThrottledMemo) - Memo which callback is throttled.
 - [`createPureReaction`](#createPureReaction) - A `createReaction` that runs before render _(non-batching)_.
 - [`createMemoCache`](#createMemoCache) - Custom, lazily-evaluated, memo, with caching based on keys.
 - [`createReducer`](#createReducer) - Primitive for updating signal in a predictable way.
@@ -26,6 +23,8 @@ Collection of custom `createMemo` primitives. They extend it's functionality whi
 
 ```bash
 npm install @solid-primitives/memo
+# or
+pnpm add @solid-primitives/memo
 # or
 yarn add @solid-primitives/memo
 ```
@@ -36,11 +35,10 @@ A combined memo of multiple sources, last updated source will be the value of th
 
 ### How to use it
 
-`createLatest` takes three arguments:
+`createLatest` takes two arguments:
 
 - `sources` - list of reactive calculations/signals/memos
-- `value` - initial value of returned signal
-- `options` - signal options
+- `options` - memo options
 
 And returns a signal with value of the last change
 
@@ -48,14 +46,39 @@ And returns a signal with value of the last change
 import { createLatest } from "@solid-primitives/memo";
 
 const [count, setCount] = createSignal(1);
-const [x, setX] = createSignal(2);
-const number = createMemo(() => otherValue() * 2);
-const lastUpdated = createLatest([count, number, () => x() / 3]);
-lastUpdated(); // => undefined
+const [text, setText] = createSignal("hello");
+
+const lastUpdated = createLatest([count, text]);
+
+lastUpdated(); // => "hello"
 setCount(4);
 lastUpdated(); // => 4
-setX(9);
-lastUpdated(); // => 3
+```
+
+## `createLatestMany`
+
+A combined memo of multiple sources, returns the values of sources updated in the last tick.
+
+### How to use it
+
+`createLatestMany` takes two arguments:
+
+- `sources` - list of reactive calculations/signals/memos
+- `options` - memo options
+
+And returns a signal with value of the last updated sources
+
+```ts
+import { createLatestMany } from "@solid-primitives/memo";
+
+const [count, setCount] = createSignal(1);
+const [text, setText] = createSignal("hello");
+
+const lastUpdated = createLatest([count, text]);
+
+lastUpdated(); // => [1, "hello"]
+setCount(4);
+lastUpdated(); // => [4]
 ```
 
 ## `createWritableMemo`
@@ -129,107 +152,35 @@ There is a performance cost, from recreating and disposing computations, involve
 
 https://codesandbox.io/s/solid-primitives-memo-demo-3w0oz?file=/index.tsx
 
-## `createAsyncMemo`
-
-Solid's `createMemo` that allows for asynchronous calculations.
-
-### How to use it
-
-It's usage is almost the same as Solid's `createMemo`. Similarly it should be placed inside a reactive root — component or createRoot.
-
-The function argument can return a promise. Promises will be handled with preserving the order of execution, that means if a promise would take more time to execute it won't overwrite thouse that start after it but finish quicker.
-
-```ts
-import { createAsyncMemo } from "@solid-primitives/memo";
-
-const memo = createAsyncMemo(
-  async prev => {
-    const value = await myAsyncFunc(signal());
-    return value.data;
-  },
-  { value: "initial value" },
-);
-// initial value can be set to prevent returned signal from being undefined
-```
-
-**calculation will track reactive reads synchronously — stops tracking after first `await`**
-
-```ts
-const memo = createAsyncMemo(async prev => {
-  // signal() will be tracked
-  const value = await myAsyncFunc(signal());
-  // otherSignal() is after await so it won't be tracked
-  const data = otherSignal() + value;
-  return value;
-});
-```
-
-### Demo
-
-Demo uses fetching because it is the simplest example to make, but **please don't use it instead of createResource for fetching data.**
-
-https://codesandbox.io/s/solid-primitives-async-memo-fetch-demo-htne6?file=/index.tsx
-
-```ts
-// createResource also can reactively refetch once source changes
-const [data] = createResource(signal, value => {...})
-```
-
 ## `createDebouncedMemo`
 
-Solid's `createMemo` which returned signal is debounced. _(The callback is not debounced!)_
-
-### How to use it
+`createDebouncedMemo` is deprecated. Please use `createSchedule` from [`@solid-primitives/schedule`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) instead.
 
 ```ts
-import { createDebouncedMemo } from "@solid-primitives/memo";
+import { createSchedule, debounce } from "@solid-primitives/schedule";
 
-// base usage:
-const double = createDebouncedMemo(prev => count() * 2, 200);
+const scheduled = createScheduled(fn => debounce(fn, 200));
 
-// with initial value:
-const double = createDebouncedMemo(prev => count() * 2, 200, 0);
+const double = createMemo(p => {
+  const value = count();
+  return scheduled() ? value * 2 : p;
+}, 0);
 ```
-
-> **Note** The callback is not perfectly debounced, it will be fired every time the source changes. It's the updates of the returned signal that are debounced. If you want to debounce the callback, use [`createDebouncedMemoOn`](#createDebouncedMemoOn) instead.
-
-## `createDebouncedMemoOn`
-
-Solid's `createMemo` with explicit sources, and debounced callback execution.
-
-The `deps` and `fn` arguments are the same as in Solid's `on` halper.
-
-### How to use it
-
-```ts
-import { createDebouncedMemoOn } from "@solid-primitives/memo";
-
-const double = createDebouncedMemoOn(count, v => v * 2, 200);
-```
-
-### Demo
-
-A stackblitz demo of the primitive: https://stackblitz.com/edit/solid-vite-unocss-xmnubd?file=index.tsx
 
 ## `createThrottledMemo`
 
-Solid's `createMemo` which callback execution is throttled.
-
-### How to use it
+`createThrottledMemo` is deprecated. Please use `createSchedule` from [`@solid-primitives/schedule`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) instead.
 
 ```ts
-import { createThrottledMemo } from "@solid-primitives/memo";
+import { createSchedule, throttle } from "@solid-primitives/schedule";
 
-// base usage:
-const double = createThrottledMemo(prev => count() * 2, 200);
+const scheduled = createScheduled(fn => throttle(fn, 200));
 
-// with initial value:
-const double = createThrottledMemo(prev => count() * 2, 200, 0);
+const double = createMemo(p => {
+  const value = count();
+  return scheduled() ? value * 2 : p;
+}, 0);
 ```
-
-### Demo
-
-A stackblitz demo of the primitive: https://stackblitz.com/edit/solid-vite-unocss-xmnubd?file=index.tsx
 
 ## `createPureReaction`
 

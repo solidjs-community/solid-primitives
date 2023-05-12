@@ -1,5 +1,11 @@
 # @solid-primitives/websocket
 
+## 1.0.0
+
+### Major Changes
+
+- 01b581ed: websocket: rewrite
+
 ## 0.3.7
 
 ### Patch Changes
