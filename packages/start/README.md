@@ -11,8 +11,8 @@
 
 A set of primitives for Solid Start/
 
-- `createServerCookie` - Provides a getter and setter for a reactive cookie, which works isomorphically/
-- `createUserTheme` - Creates a Server Cookie providing a type safe way to store a theme and access it on the server or client/
+- [`createServerCookie`](#createservercookie) - Provides a getter and setter for a reactive cookie, which works isomorphically.
+- [`createUserTheme`](#createusertheme) - Creates a Server Cookie providing a type safe way to store a theme and access it on the server or client.
 
 ## Installation
 
@@ -26,13 +26,13 @@ pnpm add @solid-primitives/start
 
 ## How to use it
 
-### createServerCookie
+## `createServerCookie`
 
 ```ts
 const [cookie, setCookie] = createServerCookie("cookieName");
 ```
 
-### createUserTheme
+## `createUserTheme`
 
 ```ts
 const [cookie, setCookie] = createUserTheme("cookieName");
