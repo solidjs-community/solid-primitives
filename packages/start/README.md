@@ -32,6 +32,15 @@ pnpm add @solid-primitives/start
 const [cookie, setCookie] = createServerCookie("cookieName");
 ```
 
+### Custom cookie serialisers and deserialisers can also be implemented
+
+```ts
+const [serverCookie, setServerCookie] = createServerCookie("coolCookie", {
+  toValue: str => str?.split(" "), // Deserialises cookie into a string[]
+  toString: val => val?.join(" ") as string, // Reserialises the value back into a string
+});
+```
+
 ## `createUserTheme`
 
 ```ts
