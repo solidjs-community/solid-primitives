@@ -13,7 +13,8 @@ import {
 import { resolveFirst } from "@solid-primitives/refs";
 import { createSwitchTransition, TransitionMode } from "../src";
 
-const appear = localStorage.getItem("transition-group-appear") === "true";
+// const appear = localStorage.getItem("transition-group-appear") === "true";
+const appear = true;
 
 function Transition(props: ParentProps & { mode: TransitionMode }): JSX.Element {
   const el = resolveFirst(
@@ -56,7 +57,7 @@ function Transition(props: ParentProps & { mode: TransitionMode }): JSX.Element 
 
   const animationMap = new Map<Element, Animation>();
 
-  return createSwitchTransition(el, {
+  const transition = createSwitchTransition(el, {
     onEnter(el, done) {
       queueMicrotask(() => animateIn(el, done));
     },
@@ -66,6 +67,8 @@ function Transition(props: ParentProps & { mode: TransitionMode }): JSX.Element 
     mode: props.mode,
     appear,
   });
+
+  return <>{transition()}</>;
 }
 
 const grayOutOnDispose = (el: HTMLElement) => {

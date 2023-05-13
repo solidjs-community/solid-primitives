@@ -1,7 +1,6 @@
 import { Component, createEffect, For } from "solid-js";
-import { render } from "solid-js/web";
+
 import { ReactiveSet } from "../src";
-import "uno.css";
 
 const App: Component = () => {
   const set = new ReactiveSet([1, 2, 3]);
@@ -25,4 +24,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

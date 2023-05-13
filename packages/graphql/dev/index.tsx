@@ -1,8 +1,7 @@
 import { Component, createSignal, Show, For } from "solid-js";
-import { render } from "solid-js/web";
+
 import { gql, createGraphQLClient, request, multipartRequest } from "../src";
 import { CountryQueryDocument } from "./gqlgen";
-import "uno.css";
 
 // This query will be used by `graphql-code-generator` to generate `CountryQueryDocument`.
 // Normally it would be defined inside it's own file, but this is just
@@ -89,4 +88,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

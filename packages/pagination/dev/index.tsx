@@ -1,6 +1,5 @@
 import { Component, For, Show } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
+
 import { createInfiniteScroll, createPagination } from "../src";
 
 async function fetcher(page: number) {
@@ -48,4 +47,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

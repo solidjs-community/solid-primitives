@@ -122,7 +122,7 @@ However, it is not certain that the elements are actually connected to the DOM w
 
 ## Demo
 
-You can see the primitives in action in the following sandbox: https://solidjs-community.github.io/solid-primitives/lifecycle/
+You can see the primitives in action in the following sandbox: https://primitives.solidjs.community/playground/lifecycle/
 
 ## Changelog
 

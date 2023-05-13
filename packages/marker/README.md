@@ -104,7 +104,7 @@ Regex returned by `makeSearchRegex` will:
 
 ## Demo
 
-[Deployed example](https://solidjs-community.github.io/solid-primitives/marker) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/marker/dev)
+[Deployed example](https://primitives.solidjs.community/playground/marker) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/marker/dev)
 
 ## Changelog
 

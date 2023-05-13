@@ -179,7 +179,7 @@ function createViewportObserver(
 
 ## Demo
 
-[a working example](https://solidjs-community.github.io/solid-primitives/intersection-observer/) ([source](https://github.com/solidjs-community/solid-primitives/tree/main/packages/intersection-observer/dev))
+[a working example](https://primitives.solidjs.community/playground/intersection-observer/) ([source](https://github.com/solidjs-community/solid-primitives/tree/main/packages/intersection-observer/dev))
 
 ## Changelog
 

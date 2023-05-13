@@ -9,6 +9,7 @@
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "dev": "pnpm -dir site run dev",
     "format": "prettier -w {site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html} --ignore-path .gitignore",
     "lint:packages": "eslint --ignore-path .gitignore --max-warnings 0 packages/*/src/**/*",
     "lint:tests": "eslint --ignore-path .gitignore packages/*/test/** --quiet --rule \"no-only-tests/no-only-tests: error\"",
@@ -17,11 +18,9 @@
     "test:ssr": "pnpm run test:client --mode ssr",
     "test": "pnpm run test:client && pnpm run test:ssr",
     "build": "cross-env CI=true turbo run build --filter='./packages/*'",
-    "pages": "pnpm run build && turbo run page && jiti ./scripts/collect-pages.ts",
     "new-package": "jiti ./scripts/new-package.ts",
     "update-readme": "jiti ./scripts/update-readme.ts",
     "measure": "jiti ./scripts/measure.ts",
-    "update-deps": "pnpm up -Lri",
     "version": "changeset version && pnpm i --no-frozen-lockfile && git add .",
     "release": "pnpm build && changeset publish"
   },
@@ -60,7 +59,6 @@
     "turbo": "^1.9.1",
     "type-fest": "^3.8.0",
     "typescript": "~5.0.4",
-    "unocss": "^0.50.8",
     "vite": "^4.2.1",
     "vite-plugin-solid": "^2.7.0",
     "vitest": "^0.29.8"

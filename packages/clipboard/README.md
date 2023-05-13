@@ -145,7 +145,7 @@ function newItem(type: string, data: ClipboardItemData): ClipboardItem;
 
 ## Demo
 
-You may view a working example in [the /dev playground](./dev/index.tsx) deplayed on [solidjs-community.github.io/solid-primitives/clipboard](https://solidjs-community.github.io/solid-primitives/clipboard/)
+You may view a working example in [the /dev playground](./dev/index.tsx) deplayed on [primitives.solidjs.community/playground/clipboard](https://primitives.solidjs.community/playground/clipboard/)
 
 ## Changelog
 

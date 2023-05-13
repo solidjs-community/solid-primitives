@@ -1,7 +1,5 @@
 import { createEventHub, Listen, createEventStack, EventStack, Emit, createEventBus } from "../src";
 import { Component, createSignal, For, onMount } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
 
 const App: Component = () => {
   return (
@@ -186,4 +184,4 @@ const Toaster: Component<{
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

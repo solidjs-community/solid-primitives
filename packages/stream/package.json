@@ -39,12 +39,10 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
+    "dev": "jiti ../../scripts/dev.ts",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr",
-    "start": "vite serve dev --host",
-    "dev": "vite serve dev",
-    "page": "vite build dev",
     "demo": "vite serve demo --host"
   },
   "keywords": [

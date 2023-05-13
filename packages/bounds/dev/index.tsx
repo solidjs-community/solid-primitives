@@ -1,7 +1,7 @@
 import { Component, createSignal, Setter } from "solid-js";
-import { render } from "solid-js/web";
+
 import { throttle } from "@solid-primitives/scheduled";
-import "uno.css";
+
 import { createElementBounds, UpdateGuard } from "../src";
 
 const NumberInput: Component<{ value: number; setValue: Setter<number>; name: string }> = props => {
@@ -60,4 +60,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

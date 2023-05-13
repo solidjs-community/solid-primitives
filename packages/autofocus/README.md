@@ -82,7 +82,7 @@ createAutofocus(ref);
 
 ## Demo
 
-You may see the working example here: https://solidjs-community.github.io/solid-primitives/autofocus/
+You may see the working example here: https://primitives.solidjs.community/playground/autofocus/
 
 Source code: https://github.com/solidjs-community/solid-primitives/blob/main/packages/autofocus/dev/index.tsx
 

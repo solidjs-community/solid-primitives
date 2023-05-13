@@ -186,7 +186,7 @@ return createListTransition(resolved.toArray, {
 
 ## Demo
 
-[Deployed example](https://solidjs-community.github.io/solid-primitives/transition-group) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/transition-group/dev)
+[Deployed example](https://primitives.solidjs.community/playground/transition-group) | [Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/transition-group/dev)
 
 ## Usage references
 

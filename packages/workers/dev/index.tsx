@@ -1,6 +1,4 @@
-import { Component, createSignal } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
+import { Component, createSignal, onMount } from "solid-js";
 
 import { createWorker, createWorkerPool, createSignaledWorker } from "../src/index";
 
@@ -118,4 +116,8 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+export default function () {
+  const [mounted, setMounted] = createSignal(false);
+  onMount(() => setMounted(true));
+  return <>{mounted() && <App />}</>;
+}

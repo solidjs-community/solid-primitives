@@ -38,6 +38,7 @@
   },
   "scripts": {
     "start": "vite -r ./dev/ -c ./dev/vite.config.ts",
+    "dev": "jiti ../../scripts/dev.ts",
     "build": "jiti ../../scripts/build.ts"
   },
   "keywords": [

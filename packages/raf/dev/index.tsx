@@ -1,5 +1,5 @@
 import { Component, createSignal, Show, createEffect } from "solid-js";
-import { render } from "solid-js/web";
+
 import RAF from "./raf";
 
 const App: Component = () => {
@@ -25,4 +25,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

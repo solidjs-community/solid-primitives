@@ -7,7 +7,7 @@ import {
   ErrorBoundary,
   createMemo,
 } from "solid-js";
-import { render } from "solid-js/web";
+
 import {
   AsyncFileSystem,
   createFileSystem,
@@ -16,7 +16,6 @@ import {
   SyncFileSystem,
   getItemName,
 } from "../src/index";
-import "uno.css";
 
 const FsFile = (props: { fs: SyncFileSystem | AsyncFileSystem; path: string }) => {
   const [open, setOpen] = createSignal(false);
@@ -131,4 +130,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

@@ -1,11 +1,8 @@
 import { Component, For, createSignal } from "solid-js";
-import { render } from "solid-js/web";
+
 import { TransitionGroup } from "solid-transition-group";
 import { createImmutable } from "../src";
 import { PayloadAction, createSlice, configureStore } from "@reduxjs/toolkit";
-import { createStore, reconcile } from "solid-js/store";
-
-import "uno.css";
 
 type Todo = {
   id: number;
@@ -178,12 +175,11 @@ const Todos: Component<{ slice: typeof todoArray | typeof todoObject }> = props 
   );
 };
 
-render(
-  () => (
+export default function App() {
+  return (
     <>
       <Todos slice={todoArray} />
       <Todos slice={todoObject} />
     </>
-  ),
-  document.getElementById("root")!,
-);
+  );
+}

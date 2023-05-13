@@ -2,6 +2,7 @@ import { Component, createResource, Show, Suspense } from "solid-js";
 import { NoHydration } from "solid-js/web";
 import { Title, useRouteData } from "solid-start";
 import { fetchHomeContent, fetchPackageList } from "~/api";
+import { HEADER_HEIGHT } from "~/components/Header/Header";
 import PrimitiveBtn from "~/components/Primitives/PrimitiveBtn";
 import PrimitiveBtnLineWrapper from "~/components/Primitives/PrimitiveBtnLineWrapper";
 import { SizeBadgeWrapper, SizeBadge } from "~/components/Primitives/SizeBadge";
@@ -158,7 +159,7 @@ export default function Home() {
   const { content, packages } = useRouteData<typeof routeData>();
 
   return (
-    <main class="pt-[60px]">
+    <main style={{ "padding-top": `${HEADER_HEIGHT}px` }}>
       <Title>Solid Primitives</Title>
       <Header />
 

@@ -1,7 +1,7 @@
 import { Component, For, createSignal } from "solid-js";
-import { render } from "solid-js/web";
+
 import { ReactiveMap } from "../src";
-import "uno.css";
+
 import { onCleanup } from "solid-js";
 import { createEffect } from "solid-js";
 
@@ -47,4 +47,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+export default App;
