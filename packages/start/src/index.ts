@@ -6,7 +6,7 @@ import { useRequest } from "solid-start/server";
 type ServerCookieOptions<T = string> = {
   cookieMaxAge?: number;
   toValue?: (str: string | undefined) => T;
-  toString?: (value: T) => string;
+  toStr?: (value: T) => string;
 };
 
 /**
@@ -19,8 +19,8 @@ type ServerCookieOptions<T = string> = {
 export function createServerCookie<T>(
   name: string,
   options: ServerCookieOptions<T> & {
-    toValue: (str: string) => T;
-    toString: (value: T) => string;
+    toValue?: (str: string) => T;
+    toStr?: (value: T) => string;
   },
 ): Signal<T>;
 export function createServerCookie(
@@ -33,7 +33,7 @@ export function createServerCookie<T>(
 ): Signal<T | undefined> {
   const {
     toValue = (v: any) => v as T,
-    toString = String,
+    toStr = String,
     cookieMaxAge = 365 * 24 * 60 * 60,
   } = options ?? {};
 
@@ -46,9 +46,9 @@ export function createServerCookie<T>(
   );
 
   createEffect(p => {
-    const string = toString(cookie());
+    const string = toStr(cookie());
     if (p !== string) {
-      document.cookie = `${name}=${toString(cookie())};max-age=${cookieMaxAge}`;
+      document.cookie = `${name}=${toStr(cookie())};max-age=${cookieMaxAge}`;
     }
     return string;
   });
