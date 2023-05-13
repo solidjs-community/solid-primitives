@@ -1,8 +1,6 @@
 import { Component, createMemo, createSignal } from "solid-js";
-import { render } from "solid-js/web";
-import { createMarker, makeSearchRegex } from "../src";
 
-import "uno.css";
+import { createMarker, makeSearchRegex } from "../src";
 
 const LOREM_IPSUM = [
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ligula tortor, mollis congue augue ac, sagittis sodales odio. Duis vulputate feugiat metus. Curabitur in nisl ac felis vestibulum facilisis vitae eu lectus. In justo metus, viverra non leo quis, laoreet finibus lacus. Phasellus consectetur arcu orci, non varius ligula ornare ac. Nulla facilisi. Maecenas dignissim nulla et sodales venenatis. Nunc purus nunc, consequat vitae convallis sit amet, bibendum quis augue. Pellentesque purus turpis, aliquet eget libero ut, imperdiet fermentum lacus. In sit amet finibus nunc, faucibus tincidunt eros. Praesent pretium lobortis turpis, nec rhoncus dui interdum aliquet. Nulla fermentum tellus nec dui fermentum rhoncus. Ut cursus purus ligula, sed tincidunt diam vulputate sit amet. Sed in eleifend eros. 123456789",
@@ -30,4 +28,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

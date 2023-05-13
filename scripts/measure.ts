@@ -1,6 +1,12 @@
 import path from "path";
 import fs from "fs";
-import { PACKAGES_DIR, checkValidPackageName, formatBytes, getPackageBundlesize } from "./utils";
+import {
+  PACKAGES_DIR,
+  checkValidPackageName,
+  formatBytes,
+  getPackageBundlesize,
+  logLine,
+} from "./utils";
 import { PackageJson } from "type-fest";
 
 if (process.argv.length < 3)
@@ -14,9 +20,6 @@ if (!name || !checkValidPackageName(name))
   throw new Error(`Incorrect package name argument: "${name}"`);
 
 const packageDir = path.join(PACKAGES_DIR, name);
-
-// eslint-disable-next-line no-console
-const logLine = (string: string) => console.log(`\x1b[34m${string}\x1b[0m`);
 
 class ConsoleTable {
   rows: string[][] = [];

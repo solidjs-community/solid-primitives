@@ -1,7 +1,5 @@
 import { Component, For, Show, createSignal } from "solid-js";
-import { render } from "solid-js/web";
 import { createPresence } from "../src";
-import "uno.css";
 
 const App: Component = () => {
   return (
@@ -101,4 +99,4 @@ const SecondExample = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

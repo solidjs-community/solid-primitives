@@ -33,7 +33,7 @@ export function overrideShadow(signal: Accessor<boolean>) {
 }
 
 const OPEN_NAV_DURATION = 500;
-const HEADER_HEIGHT = 60;
+export const HEADER_HEIGHT = 60;
 export const PRIMITIVE_PAGE_PADDING_TOP = 140;
 
 const Header: Component = () => {

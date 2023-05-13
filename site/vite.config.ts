@@ -24,7 +24,10 @@ export default defineConfig(() => {
       }),
       solid({
         adapter: staticAdapter(),
-        prerenderRoutes: ["/", ...packages.map(({ name }) => `/package/${name}`)],
+        prerenderRoutes: [
+          "/",
+          ...packages.flatMap(({ name }) => [`/package/${name}`, `/playground/${name}`]),
+        ],
       }),
     ],
   };

@@ -1,8 +1,6 @@
-import { Component, For, createEffect, createSignal, on } from "solid-js";
+import { Component, For, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
-import { render } from "solid-js/web";
 import { type WSMessage, createReconnectingWS } from "../src";
-import "uno.css";
 
 const App: Component = () => {
   const [textArea, setTextArea] = createSignal<HTMLTextAreaElement>();
@@ -63,4 +61,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

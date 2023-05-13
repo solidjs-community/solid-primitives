@@ -1,8 +1,6 @@
 import { sendEmailDefault, sendEmailAlternative } from "./utils";
 import { createEventDispatcher } from "../src";
 import { Component, createSignal } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
 
 const App: Component = () => {
   const [count, setCount] = createSignal(0);
@@ -80,4 +78,4 @@ const EmailForm: Component<{
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

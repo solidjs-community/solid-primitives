@@ -1,7 +1,6 @@
 import { pan } from "../src";
 import { Component, createSignal, onMount } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
+
 pan;
 
 const App: Component = () => {
@@ -47,4 +46,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root"));
+export default App;

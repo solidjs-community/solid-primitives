@@ -1,9 +1,8 @@
 import { Component, For, Show } from "solid-js";
-import { render } from "solid-js/web";
+
 import { createAccelerometer, createCameras, createMicrophones, createSpeakers } from "../src";
 import { createPermission } from "../../permission";
 import { createMediaPermissionRequest } from "../../stream";
-import "uno.css";
 
 const Cameras: Component = () => {
   const cameras = createCameras();
@@ -72,4 +71,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

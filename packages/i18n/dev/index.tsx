@@ -1,9 +1,7 @@
-import { render } from "solid-js/web";
-
 import { ChainedContextApp } from "./chainedContext";
 import { NoContextI18nApp } from "./createChained";
 
-const Root = () => {
+const App = () => {
   return (
     <div>
       <NoContextI18nApp />
@@ -13,4 +11,4 @@ const Root = () => {
   );
 };
 
-render(() => <Root />, document.getElementById("root")!);
+export default App;

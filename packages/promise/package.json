@@ -37,6 +37,7 @@
     "dist"
   ],
   "scripts": {
+    "dev": "jiti ../../scripts/dev.ts",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"

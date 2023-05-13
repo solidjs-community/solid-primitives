@@ -1,7 +1,6 @@
 import { Component, createEffect, createSignal, For, on, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
-import { render } from "solid-js/web";
-import "uno.css";
+
 import { createBroadcastChannel, makeBroadcastChannel } from "../src";
 import { TPage, useTrackPages } from "./hooks/useTrackPages";
 
@@ -136,4 +135,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

@@ -1,12 +1,10 @@
 import { A, Route, Router, Routes } from "@solidjs/router";
-import { render } from "solid-js/web";
+
 import ListPage from "./list-page";
 import SwitchPage from "./switch-page";
 
-import "uno.css";
-
-render(
-  () => (
+function App() {
+  return (
     <Router>
       <nav class="fixed left-2 top-2 flex space-x-4">
         <A class="text-yellow-400" href="/list">
@@ -23,6 +21,7 @@ render(
         </Routes>
       </div>
     </Router>
-  ),
-  document.getElementById("root")!,
-);
+  );
+}
+
+export default App;

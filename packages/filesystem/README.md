@@ -140,7 +140,7 @@ rsync(srcFs, srcPath, destFs, destPath): Promise<void>;
 ## Demo
 
 You may view a working example of createFileSystem/makeVirtualFileSystem/makeWebAccessFileSystem here:
-https://solidjs-community.github.io/solid-primitives/filesystem/
+https://primitives.solidjs.community/playground/filesystem/
 
 ## Changelog
 

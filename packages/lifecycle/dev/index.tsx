@@ -1,9 +1,8 @@
 import { children, createSignal, JSX, onMount } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
+
 import { onElementConnect } from "../src";
 
-function App() {
+function Button() {
   const [count, setCount] = createSignal(1);
   const increment = () => setCount(count() + 1);
 
@@ -24,9 +23,11 @@ function App() {
   );
 }
 
-render(() => {
-  const r = children(() => <App />);
+function App() {
+  const r = children(() => <Button />);
   const [s, set] = createSignal<JSX.Element>();
-  setTimeout(() => set(() => r), 1000);
-  return s;
-}, document.getElementById("root")!);
+  setTimeout(() => set(() => r as any as JSX.Element), 1000);
+  return <>{s()}</>;
+}
+
+export default App;

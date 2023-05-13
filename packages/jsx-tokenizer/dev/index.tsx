@@ -1,6 +1,5 @@
 import { Component, JSX, ParentComponent } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
+
 import { createTokenizer, createToken, isToken, resolveTokens } from "../src";
 
 type Props = {
@@ -93,4 +92,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

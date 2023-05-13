@@ -3,6 +3,9 @@ import path from "path";
 export const ROOT_DIR = path.join(__dirname, "..", "..");
 export const PACKAGES_DIR = path.join(ROOT_DIR, "packages");
 
+// eslint-disable-next-line no-console
+export const logLine = (string: string) => console.log(`\x1b[34m${string}\x1b[0m`);
+
 export const checkValidPackageName = (name: string) =>
   /[a-z0-9\-]+/.test(name) && name.match(/[a-z0-9\-]+/)![0].length === name.length;
 

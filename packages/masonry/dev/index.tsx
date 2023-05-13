@@ -1,9 +1,7 @@
 import { Component, createMemo, createSignal } from "solid-js";
-import { render } from "solid-js/web";
+
 import { createBreakpoints } from "@solid-primitives/media";
 import { createMasonry } from "../src";
-
-import "uno.css";
 
 const getRandomHeight = () => Math.floor(Math.random() * 300) + 100;
 
@@ -85,4 +83,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

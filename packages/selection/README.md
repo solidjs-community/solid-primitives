@@ -81,7 +81,7 @@ At some point, this might move into the [utils](../utils/README.md) package if u
 
 ### DEMO
 
-https://solidjs-community.github.io/solid-primitives/selection
+https://primitives.solidjs.community/playground/selection
 
 ## Changelog
 

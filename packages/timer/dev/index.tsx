@@ -1,6 +1,5 @@
 import { Component, createSignal, createEffect } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
+
 import { createTimer } from "../src";
 
 const Counter: Component<{ timer: typeof setTimeout | typeof setInterval }> = props => {
@@ -44,4 +43,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

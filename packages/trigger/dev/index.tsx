@@ -1,6 +1,4 @@
 import { Component, createSignal } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
 
 const App: Component = () => {
   // const [count, setCount] = createSignal(0);
@@ -19,4 +17,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

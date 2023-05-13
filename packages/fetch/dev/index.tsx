@@ -1,6 +1,5 @@
 import { Component } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
+
 import { withAbort } from "../src/modifiers";
 
 import { createFetch } from "../src/fetch";
@@ -31,4 +30,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

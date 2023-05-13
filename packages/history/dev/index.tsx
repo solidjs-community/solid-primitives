@@ -1,6 +1,6 @@
 import { Component, JSX, createSignal } from "solid-js";
 import { render } from "solid-js/web";
-import "uno.css";
+
 import { createUndoHistory } from "../src";
 
 const Button = (props: {
@@ -71,4 +71,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

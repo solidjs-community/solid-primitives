@@ -1,7 +1,6 @@
 import { Component } from "solid-js";
-import { render } from "solid-js/web";
+
 import { createPermission } from "../src";
-import "uno.css";
 
 const App: Component = () => {
   const micPermission = createPermission("microphone");
@@ -29,4 +28,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

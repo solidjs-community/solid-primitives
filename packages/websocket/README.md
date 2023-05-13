@@ -144,7 +144,7 @@ Otherwise, in order to set up your own production-use websocket server, we recom
 ## Demo
 
 You may view a working example here:
-https://solidjs-community.github.io/solid-primitives/websocket/
+https://primitives.solidjs.community/playground/websocket/
 
 ## Changelog
 

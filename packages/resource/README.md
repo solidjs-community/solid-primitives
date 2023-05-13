@@ -249,7 +249,7 @@ Just use an interval with refetch; ideally, also use [`makeAbortable`](#makeabor
 ## Demo
 
 You may view a working example of createFileSystem/makeVirtualFileSystem/makeWebAccessFileSystem here:
-https://solidjs-community.github.io/solid-primitives/resource/
+https://primitives.solidjs.community/playground/resource/
 
 ## Changelog
 

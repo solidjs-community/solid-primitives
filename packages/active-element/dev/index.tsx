@@ -1,12 +1,11 @@
 import { createActiveElement, focus } from "../src";
-import { Component, createSignal, Index } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
+import { Component, createSignal, Index, onMount, ParentComponent } from "solid-js";
+
 import { genNodeList } from "./utils";
 // prevent tree-shaking
 focus;
 
-const Node: Component<{ x: number; y: number; size: number }> = props => {
+const Node: ParentComponent<{ x: number; y: number; size: number }> = props => {
   const [isFocused, setIsFocused] = createSignal(false);
 
   return (
@@ -26,7 +25,7 @@ const Node: Component<{ x: number; y: number; size: number }> = props => {
   );
 };
 
-const App: Component = () => {
+const Client: Component = () => {
   const [list, setList] = createSignal(genNodeList());
   const shuffle = () => setList(genNodeList());
   const activeEl = createActiveElement();
@@ -54,4 +53,8 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root") as HTMLElement);
+export default function App() {
+  const [mounted, setMounted] = createSignal(false);
+  onMount(() => setMounted(true));
+  return <>{mounted() && <Client />}</>;
+}

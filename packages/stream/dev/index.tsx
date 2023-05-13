@@ -1,13 +1,12 @@
 import type { Component, JSX } from "solid-js";
 import { createSignal, Show } from "solid-js";
-import { render } from "solid-js/web";
+
 import {
   createStream,
   createAmplitudeStream,
   createMediaPermissionRequest,
   createScreen,
 } from "../src";
-import "uno.css";
 
 declare module "solid-js" {
   namespace JSX {
@@ -58,4 +57,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

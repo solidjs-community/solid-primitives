@@ -1,7 +1,6 @@
 import { Component, lazy } from "solid-js";
-import { render } from "solid-js/web";
+
 import { Router, Routes, Route, Link } from "solid-app-router";
-import "uno.css";
 
 const Key = lazy(() => import("./key"));
 
@@ -24,4 +23,4 @@ const App: Component = () => {
     </Router>
   );
 };
-render(() => <App />, document.getElementById("root")!);
+export default App;

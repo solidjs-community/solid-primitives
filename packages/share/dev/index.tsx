@@ -1,6 +1,4 @@
 import { Component, createEffect, createSignal } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
 
 import { createWebShare } from "../src/index";
 
@@ -28,4 +26,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

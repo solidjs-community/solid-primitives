@@ -1,0 +1,40 @@
+/*
+
+Styles applied in the package playgrounds.
+
+*/
+
+.package-playground {
+  .center-child {
+    @apply flex items-center justify-center;
+  }
+
+  .caption {
+    @apply font-mono text-sm leading-tight;
+  }
+
+  button {
+    @apply border-1 flex cursor-pointer select-none items-center justify-center rounded border-teal-500 bg-teal-600 p-3 py-2 font-semibold text-white hover:bg-teal-500 disabled:cursor-not-allowed disabled:bg-teal-700 disabled:saturate-50 disabled:hover:bg-teal-700;
+  }
+
+  .wrapper-h {
+    @apply flex items-center justify-center space-x-4 space-y-0 rounded-2xl bg-gray-700 p-6;
+  }
+
+  .wrapper-v {
+    @apply flex items-center justify-center space-x-4 space-y-0 rounded-2xl bg-gray-700 p-6;
+    @apply flex-col space-x-0 space-y-4;
+  }
+
+  .node {
+    @apply m-2 rounded bg-orange-600 p-4;
+  }
+
+  input {
+    @apply rounded border border-gray-600 bg-gray-800 px-3 py-2 text-white;
+  }
+
+  .ball {
+    @apply pointer-events-none fixed -left-4 -top-4 h-8 w-8 rounded-full opacity-50;
+  }
+}

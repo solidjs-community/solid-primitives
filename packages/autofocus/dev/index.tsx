@@ -1,7 +1,5 @@
-import { JSX, Component, createSignal, Switch, Match } from "solid-js";
-import { render } from "solid-js/web";
+import { Component, createSignal, Switch, Match } from "solid-js";
 import { autofocus, createAutofocus } from "../src";
-import "uno.css";
 
 autofocus;
 
@@ -18,7 +16,11 @@ const AutofocusRef: Component = () => {
 
   createAutofocus(() => ref);
 
-  return <button ref={ref}>ref</button>;
+  return (
+    <button class="btn" ref={ref}>
+      ref
+    </button>
+  );
 };
 
 const AutofocusRefSignal: Component = () => {
@@ -26,29 +28,37 @@ const AutofocusRefSignal: Component = () => {
 
   createAutofocus(ref);
 
-  return <button ref={setRef}>ref signal</button>;
+  return (
+    <button class="btn" ref={setRef}>
+      ref signal
+    </button>
+  );
 };
 
 const App: Component = () => {
   const [toggle, setToggle] = createSignal(0);
 
   return (
-    <div class="m-4 flex gap-4">
-      <button onClick={() => setToggle((toggle() + 1) % 6)}>toggle</button>
+    <div class="center-child h-screen w-screen">
+      <div class="m-4 flex gap-4">
+        <button class="btn" onClick={() => setToggle((toggle() + 1) % 6)}>
+          toggle
+        </button>
 
-      <Switch fallback={<button>no autofocus</button>}>
-        <Match when={toggle() === 0}>
-          <AutofocusDirective />
-        </Match>
-        <Match when={toggle() === 2}>
-          <AutofocusRef />
-        </Match>
-        <Match when={toggle() === 4}>
-          <AutofocusRefSignal />
-        </Match>
-      </Switch>
+        <Switch fallback={<button>no autofocus</button>}>
+          <Match when={toggle() === 0}>
+            <AutofocusDirective />
+          </Match>
+          <Match when={toggle() === 2}>
+            <AutofocusRef />
+          </Match>
+          <Match when={toggle() === 4}>
+            <AutofocusRefSignal />
+          </Match>
+        </Switch>
+      </div>
     </div>
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

@@ -1,7 +1,5 @@
 import { destructure } from "../src";
 import { Component, createEffect, createSignal } from "solid-js";
-import { render } from "solid-js/web";
-import "uno.css";
 
 const Inner: Component<{ seconds: number; count: number; list: { n?: number }[] }> = props => {
   const { seconds, count } = destructure(props, { lazy: true });
@@ -48,4 +46,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;
