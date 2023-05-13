@@ -37,7 +37,7 @@ const [cookie, setCookie] = createServerCookie("cookieName");
 ```ts
 const [serverCookie, setServerCookie] = createServerCookie("coolCookie", {
   toValue: str => str?.split(" "), // Deserialises cookie into a string[]
-  toString: val => val?.join(" ") as string, // Reserialises the value back into a string
+  toStr: val => val?.join(" ") as string, // Reserialises the value back into a string
 });
 ```
 
