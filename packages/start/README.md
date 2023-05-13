@@ -49,7 +49,7 @@ const [cookie, setCookie] = createUserTheme("cookieName");
 
 ## Demo
 
-You can use this template for publishing your demo on CodeSandbox: https://codesandbox.io/s/solid-primitives-demo-template-sz95h
+You can view a demo of this primitive here: <https://codesandbox.io/p/sandbox/amazing-easley-wqk38i?file=%2Fsrc%2Fstart_primitive%2Findex.ts%3A36%2C20>
 
 ## Changelog
 
