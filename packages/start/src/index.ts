@@ -3,11 +3,25 @@ import { isServer } from "solid-js/web";
 import { parseCookie } from "solid-start";
 import { useRequest } from "solid-start/server";
 
-type ServerCookieOptions<T = string> = {
+export type MaxAgeOptions = {
+  /**
+   * The maximum age of the cookie in seconds. Defaults to 1 year.
+   */
   cookieMaxAge?: number;
-  toValue?: (str: string | undefined) => T;
-  toStr?: (value: T) => string;
 };
+
+export type ServerCookieOptions<T = string> = MaxAgeOptions & {
+  /**
+   * A function to deserialize the cookie value to be used as signal value
+   */
+  deserialize?: (str: string | undefined) => T;
+  /**
+   * A function to serialize the signal value to be used as cookie value
+   */
+  serialize?: (value: T) => string;
+};
+
+const YEAR = 365 * 24 * 60 * 60;
 
 /**
  * A primitive for creating a cookie that can be accessed isomorphically on the client, or the server
@@ -19,8 +33,8 @@ type ServerCookieOptions<T = string> = {
 export function createServerCookie<T>(
   name: string,
   options: ServerCookieOptions<T> & {
-    toValue?: (str: string) => T;
-    toStr?: (value: T) => string;
+    deserialize: (str: string | undefined) => T;
+    serialize: (value: T) => string;
   },
 ): Signal<T>;
 export function createServerCookie(
@@ -32,13 +46,13 @@ export function createServerCookie<T>(
   options?: ServerCookieOptions<T | undefined>,
 ): Signal<T | undefined> {
   const {
-    toValue = (v: any) => v as T,
-    toStr = String,
-    cookieMaxAge = 365 * 24 * 60 * 60,
+    deserialize = (v: any) => v as T,
+    serialize = String,
+    cookieMaxAge = YEAR,
   } = options ?? {};
 
   const [cookie, setCookie] = createSignal(
-    toValue(
+    deserialize(
       parseCookie(isServer ? useRequest().request.headers.get("cookie") ?? "" : document.cookie)[
         name
       ],
@@ -46,10 +60,8 @@ export function createServerCookie<T>(
   );
 
   createEffect(p => {
-    const string = toStr(cookie());
-    if (p !== string) {
-      document.cookie = `${name}=${toStr(cookie())};max-age=${cookieMaxAge}`;
-    }
+    const string = serialize(cookie());
+    if (p !== string) document.cookie = `${name}=${string};max-age=${cookieMaxAge}`;
     return string;
   });
 
@@ -58,13 +70,32 @@ export function createServerCookie<T>(
 
 export type Theme = "light" | "dark";
 
-export function createUserTheme(name: string | undefined, defaultValue: Theme): Signal<Theme>;
-export function createUserTheme(name?: string): Signal<Theme | null>;
+export type UserThemeOptions = MaxAgeOptions & {
+  /**
+   * The default theme to be used if the cookie is not set
+   */
+  defaultValue?: Theme;
+};
+
+/**
+ * Composes {@link createServerCookie} to provide a type safe way to store a theme and access it on the server or client.
+ *
+ * @param name The name of the cookie to be set
+ * @param options Options for the cookie {@link UserThemeOptions}
+ */
 export function createUserTheme(
-  name = "theme",
-  defaultValue: Theme | null = null,
-): Signal<Theme | null> {
+  name: string | undefined,
+  options: UserThemeOptions & { defaultValue: Theme },
+): Signal<Theme>;
+export function createUserTheme(
+  name?: string,
+  options?: UserThemeOptions,
+): Signal<Theme | undefined>;
+export function createUserTheme(name = "theme", options?: UserThemeOptions): Signal<any> {
+  const defaultValue = options?.defaultValue;
   return createServerCookie(name, {
-    toValue: str => (str === "light" || str === "dark" ? str : defaultValue),
+    ...options,
+    deserialize: str => (str === "light" || str === "dark" ? str : defaultValue),
+    serialize: String,
   });
 }

@@ -1,9 +1,5 @@
 import { Component, createSignal } from "solid-js";
-import { render } from "solid-js/web";
-// import { Route, Routes } from "solid-start";
-import "uno.css";
-// import { Route, Routes } from "solid-start";
-type Theme = "dark" | "light";
+
 const App: Component = () => {
   const [count, setCount] = createSignal(0);
   const increment = () => setCount(count() + 1);
@@ -22,4 +18,4 @@ const App: Component = () => {
   );
 };
 
-render(() => <App />, document.getElementById("root")!);
+export default App;

@@ -9,7 +9,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/start?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/start)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A set of primitives for Solid Start/
+A set of primitives for Solid Start
 
 - [`createServerCookie`](#createservercookie) - Provides a getter and setter for a reactive cookie, which works isomorphically.
 - [`createUserTheme`](#createusertheme) - Creates a Server Cookie providing a type safe way to store a theme and access it on the server or client.
@@ -28,23 +28,42 @@ pnpm add @solid-primitives/start
 
 ## `createServerCookie`
 
+A primitive for creating a cookie that can be accessed isomorphically on the client, or the server.
+
 ```ts
 const [cookie, setCookie] = createServerCookie("cookieName");
+
+cookie(); // => string | undefined
 ```
 
-### Custom cookie serialisers and deserialisers can also be implemented
+### Custom serialization
+
+Custom cookie serializers and deserializers can also be implemented
 
 ```ts
 const [serverCookie, setServerCookie] = createServerCookie("coolCookie", {
-  toValue: str => str?.split(" "), // Deserialises cookie into a string[]
-  toStr: val => val?.join(" ") as string, // Reserialises the value back into a string
+  deserialize: str => (str ? str.split(" ") : []), // Deserializes cookie into a string[]
+  serialize: val => (val ? val.join(" ") : ""), // serializes the value back into a string
 });
+
+serverCookie(); // => string[]
 ```
 
 ## `createUserTheme`
 
+Composes `createServerCookie` to provide a type safe way to store a theme and access it on the server or client.
+
 ```ts
-const [cookie, setCookie] = createUserTheme("cookieName");
+const [theme, setTheme] = createUserTheme("cookieName");
+
+theme(); // => "light" | "dark" | undefined
+
+// with default value
+const [theme, setTheme] = createUserTheme("cookieName", {
+  defaultValue: "light",
+});
+
+theme(); // => "light" | "dark"
 ```
 
 ## Demo

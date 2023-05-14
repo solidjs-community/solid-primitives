@@ -1,9 +1,11 @@
 {
   "name": "@solid-primitives/start",
-  "version": "0.0.100",
+  "version": "0.0.1",
   "description": "A set of primitives for Solid Start",
-  "author": "Your Name <you@youremail.com>",
-  "contributors": [],
+  "author": "Thomas",
+  "contributors": [
+    "Damian Tarnawski <gthetarnav@gmail.com>"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/start#readme",
   "repository": {
@@ -24,7 +26,9 @@
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "solid-start",
+    "ssr"
   ],
   "private": false,
   "sideEffects": false,
@@ -45,8 +49,7 @@
   },
   "typesVersions": {},
   "scripts": {
-    "dev": "vite serve dev",
-    "page": "vite build dev",
+    "dev": "jiti ../../scripts/dev.ts",
     "build": "jiti ../../scripts/build.ts",
     "test": "vitest -c ../../configs/vitest.config.ts",
     "test:ssr": "pnpm run test --mode ssr"
