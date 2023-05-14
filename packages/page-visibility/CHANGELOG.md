@@ -1,5 +1,12 @@
 # @solid-primitives/page-visibility
 
+## 2.0.11
+
+### Patch Changes
+
+- Updated dependencies [f03c47b0]
+  - @solid-primitives/event-listener@2.2.12
+
 ## 2.0.10
 
 ### Patch Changes
