@@ -1,4 +1,4 @@
-import { entries, Many, MaybeAccessor } from "@solid-primitives/utils";
+import { AnyFunction, entries, Many, MaybeAccessor } from "@solid-primitives/utils";
 import { createEventListener } from "./eventListener";
 import { EventMapOf, TargetWithEventMap, EventListenerOptions } from "./types";
 import { isServer } from "solid-js/web";
@@ -25,16 +25,6 @@ export type EventHandlersMap<EventMap> = {
  * });
  */
 
-// Custom Events
-export function createEventListenerMap<
-  EventMap extends Record<string, Event>,
-  UsedEvents extends keyof EventMap = keyof EventMap,
->(
-  target: MaybeAccessor<Many<EventTarget>>,
-  handlersMap: Partial<Pick<EventHandlersMap<EventMap>, UsedEvents>>,
-  options?: EventListenerOptions,
-): void;
-
 // DOM Events
 export function createEventListenerMap<
   Target extends TargetWithEventMap,
@@ -46,9 +36,16 @@ export function createEventListenerMap<
   options?: EventListenerOptions,
 ): void;
 
+// Custom Events
+export function createEventListenerMap<EventMap extends Record<string, Event>>(
+  target: MaybeAccessor<Many<EventTarget>>,
+  handlersMap: Partial<EventHandlersMap<EventMap>>,
+  options?: EventListenerOptions,
+): void;
+
 export function createEventListenerMap(
   targets: MaybeAccessor<Many<EventTarget>>,
-  handlersMap: Record<string, any>,
+  handlersMap: Record<string, AnyFunction | undefined>,
   options?: EventListenerOptions,
 ): void {
   if (isServer) {
@@ -59,35 +56,28 @@ export function createEventListenerMap(
   }
 }
 
-// /* Type Check */
-// const mouseHandler = (e: MouseEvent) => {};
-// const touchHandler = (e: TouchEvent) => {};
-// const eventHandler = (e: Event) => {};
+// /* TypeCheck */
+
 // const el = document.createElement("div");
+
 // createEventListenerMap(el, {
-//   mousemove: mouseHandler,
-//   mouseenter: e => {},
-//   touchend: touchHandler
+//   mouseenter: e => e.clientX,
+//   touchend: e => e.touches,
+//   // @ts-expect-error
+//   keydown: e => e.clientX,
+// });
+
+// createEventListenerMap(el, {
+//   keydown: e => e.key,
 // });
 
 // createEventListenerMap<{
 //   test: Event;
-//   custom: MouseEvent;
+//   custom: KeyboardEvent;
 //   unused: Event;
 // }>(el, {
-//   test: eventHandler,
-//   custom: e => {}
-// });
-
-// createEventListenerMap<
-//   {
-//     test: Event;
-//     custom: MouseEvent;
-//     unused: Event;
-//   },
-//   "test" | "custom"
-// >(el, {
-//   test: eventHandler,
-//   custom: e => {},
-//   unused: e => {} // ERROR
+//   test: e => e,
+//   custom: e => e.key,
+//   // @ts-expect-error
+//   wrong: () => {},
 // });

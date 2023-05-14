@@ -240,14 +240,11 @@ createEventListenerMap(
 
 // createEventListenerMap can be used to listen to custom events
 // fill both type generics for the best type support
-createEventListenerMap<
-  {
-    myEvent: MyEvent;
-    custom: Event;
-    other: Event;
-  },
-  "myEvent" | "custom"
->(target, {
+createEventListenerMap<{
+  myEvent: MyEvent;
+  custom: Event;
+  other: Event;
+}>(target, {
   myEvent: e => {},
   custom: e => {},
 });
