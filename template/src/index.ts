@@ -18,7 +18,7 @@ export const createPrimitiveTemplate = (
   return [value, setValue];
 };
 
-// While making primitives, there ane many patterns in our arsenal
+// While making primitives, there are many patterns in our arsenal
 // There are functions like one above, but we also can use components, directives, element properties, etc.
 // Solid's tutorial on directives: https://www.solidjs.com/tutorial/bindings_directives
 // Example package that uses directives: https://github.com/solidjs-community/solid-primitives/tree/main/packages/intersection-observer
