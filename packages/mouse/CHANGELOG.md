@@ -1,5 +1,12 @@
 # @solid-primitives/mouse
 
+## 2.0.13
+
+### Patch Changes
+
+- Updated dependencies [f03c47b0]
+  - @solid-primitives/event-listener@2.2.12
+
 ## 2.0.12
 
 ### Patch Changes

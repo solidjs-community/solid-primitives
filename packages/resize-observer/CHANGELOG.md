@@ -1,5 +1,12 @@
 # @solid-primitives/resize-observer
 
+## 2.0.17
+
+### Patch Changes
+
+- Updated dependencies [f03c47b0]
+  - @solid-primitives/event-listener@2.2.12
+
 ## 2.0.16
 
 ### Patch Changes
