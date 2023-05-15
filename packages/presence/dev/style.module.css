@@ -1,0 +1,34 @@
+.hidden {
+  color: red;
+  opacity: 0;
+}
+
+.fadein {
+  animation: 0.5s linear fadein;
+}
+
+.fadeout {
+  animation: 0.5s linear fadeout;
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+    color: red;
+  }
+  100% {
+    opacity: 1;
+    color: green;
+  }
+}
+
+@keyframes fadeout {
+  0% {
+    opacity: 1;
+    color: green;
+  }
+  100% {
+    opacity: 0;
+    color: blue;
+  }
+}

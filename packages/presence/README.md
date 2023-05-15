@@ -9,19 +9,6 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/presence?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/presence)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A small SolidJS utility to animate the presence of an element. Inspired by & directly forked from [`use-presence`](https://www.npmjs.com/package/use-presence).
-
-### The problem
-
-There are two problems that you have to solve when animating the presence of an element:
-
-1. During enter animations, you have to render an initial state where the element is hidden and only after the latest state has propagated to the DOM, you can can animate the final state that the element should animate towards.
-2. Exit animations are a bit tricky in SolidJS, since this typically means that a component unmounts. However when the component has already unmounted, you can't animate it anymore. A workaround is often to keep the element mounted, but that keeps unnecessary elements around and can hurt accessibility, as hidden interactive elements might still be focusable.
-
-### This solution
-
-This utility provides a lightweight solution where the animating element is only mounted the minimum of time, while making sure the animation is fully visible to the user. The rendering is left to the user to support all kinds of styling solutions.
-
 ## Installation
 
 ```bash
@@ -32,92 +19,43 @@ yarn add @solid-primitives/presence
 pnpm add @solid-primitives/presence
 ```
 
-## How to use it
+A small, reactive utility to exert stronger control over an element's presence in the DOM in order to apply enter and exit transitions/animations.
 
-### `createPresence` boolean example
+## How to use it?
 
-```tsx
-const FirstExample = () => {
-  const [showStuff, setShowStuff] = createSignal(true);
-  const { isVisible, isMounted } = createPresence(showStuff, {
-    transitionDuration: 500,
-  });
+```typescript
+const App = () => {
+  const [show, setShow] = createSignal(true);
+  const state = createPresence(show, { duration: 300, initialRun: true });
+  const isMounted = createMemo(() => state() !== "exited");
 
   return (
-    <div
-      style={{
-        padding: "2em",
-        margin: "2em",
-        "border-radius": "2em",
-        "box-shadow": "-5px 0px 10px rgba(0, 0, 0, 0.2)",
-      }}
-    >
-      <button onclick={() => setShowStuff(!showStuff())}>{`${
-        showStuff() ? "Hide" : "Show"
-      } stuff`}</button>
+    <div>
+      <div>
+        <button onClick={() => setShow(p => !p)}>{show() ? "Hide" : "Show"}</button>
+      </div>
       <Show when={isMounted()}>
         <div
           style={{
-            transition: "all .5s ease",
-            opacity: isVisible() ? "1" : "0",
-            transform: isVisible() ? "translateX(0)" : "translateX(50px)",
-          }}
-        >
-          I am the stuff!
-        </div>
-      </Show>
-    </div>
-  );
-};
-```
+            transition: "all .3s linear",
 
-### `createPresence` switching example
-
-The first argument of `createPresence` is a signal accessor of arbitrary type. This allows you to use it with any kind of data, not just booleans. This is useful if you want to animate between different items. If you utilize the returned `mountedItem` property, you can get the data which should be currently mounted regardless of the animation state
-
-```tsx
-const SecondExample = () => {
-  const items = ["foo", "bar", "baz", "qux"];
-  const [activeItem, setActiveItem] = createSignal(items[0]);
-  const presence = createPresence(activeItem, {
-    transitionDuration: 500,
-  });
-
-  return (
-    <div
-      style={{
-        padding: "2em",
-        margin: "2em",
-        "border-radius": "2em",
-        "box-shadow": "-5px 0px 10px rgba(0, 0, 0, 0.2)",
-      }}
-    >
-      <For each={items}>
-        {item => (
-          <button onClick={() => setActiveItem(p => (p === item ? undefined : item))}>
-            {item}
-          </button>
-        )}
-      </For>
-      <Show when={presence.isMounted()}>
-        <div
-          style={{
-            transition: "all .5s linear",
-            ...(presence.isEntering() && {
+            ...(state() === "initial" && {
               opacity: "0",
               transform: "translateX(-25px)",
             }),
-            ...(presence.isExiting() && {
-              opacity: "0",
-              transform: "translateX(25px)",
-            }),
-            ...(presence.isVisible() && {
+
+            ...(state() === "entering" && {
               opacity: "1",
               transform: "translateX(0)",
             }),
+
+            ...(state() === "exiting" && {
+              opacity: "0",
+              transform: "translateX(25px)",
+            }),
           }}
         >
-          {presence.mountedItem()}
+          Hello World!
         </div>
       </Show>
     </div>
@@ -125,50 +63,140 @@ const SecondExample = () => {
 };
 ```
 
-### `createPresence` options API
+Here is how to run css animations:
 
-```ts
-function createPresence<TItem>(
-  item: Accessor<TItem | undefined>,
-  options: Options,
-): PresenceResult<TItem>;
+```css
+.hidden {
+  opacity: 0;
+}
 
-type Options = {
-  /** Duration in milliseconds used both for enter and exit transitions. */
-  transitionDuration: MaybeAccessor<number>;
-  /** Duration in milliseconds used for enter transitions (overrides `transitionDuration` if provided). */
-  enterDuration: MaybeAccessor<number>;
-  /** Duration in milliseconds used for exit transitions (overrides `transitionDuration` if provided). */
-  exitDuration: MaybeAccessor<number>;
-  /** Opt-in to animating the entering of an element if `isVisible` is `true` during the initial mount. */
-  initialEnter?: boolean;
-};
+.fadein {
+  animation: 0.5s linear fadein;
+}
 
-type PresenceResult<TItem> = {
-  /** Should the component be returned from render? */
-  isMounted: Accessor<boolean>;
-  /** The item that is currently mounted. */
-  mountedItem: Accessor<TItem | undefined>;
-  /** Should the component have its visible styles applied? */
-  isVisible: Accessor<boolean>;
-  /** Is the component either entering or exiting currently? */
-  isAnimating: Accessor<boolean>;
-  /** Is the component entering currently? */
-  isEntering: Accessor<boolean>;
-  /** Is the component exiting currently? */
-  isExiting: Accessor<boolean>;
-};
+.fadeout {
+  animation: 0.5s linear fadeout;
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+    color: red;
+  }
+  100% {
+    opacity: 1;
+    color: green;
+  }
+}
+
+@keyframes fadeout {
+  0% {
+    opacity: 1;
+    color: green;
+  }
+  100% {
+    opacity: 0;
+    color: blue;
+  }
+}
 ```
 
-## Demo
+```typescript
+ <Show when={isMounted()}>
+  <div
+    classList={{
+      hidden: state() === 'initial',
+      fadein: state() === 'entering',
+      fadeout: state() === 'exiting',
+    }}
+  >
+    Hello World!
+  </div>
+</Show>
+```
 
-Demo can be seen [here](https://stackblitz.com/edit/presence-demo).
+
+
+## How it works?
+
+When an elements visibilty tied to a signal, the elements gets mounted and unmounted abruptly, not permitting to apply any css transitions.
+
+```ts
+<Show when={show()}>
+  <div>Hello World!</div>
+</Show>
+```
+
+`createPresence` creates a derived signal, through which we transition from `false` to `true` in two steps, `entering` and `entered`, and again from `true` to `false` in two steps `exiting` and `exited`.
+
+```ts
+const [show, setShow] = createSignal(true);
+
+const state = createPresence(show, {
+  duration: 500,
+  initialTransition: true,
+});
+```
+
+This allows us to apply enter and exit transitions on an element but first we need to hand over the control of the element's visibilty to the `state`:
+
+```ts
+const isMounted = () => state() !== 'exited';
+<Show when={isMounted()}>
+  <div>Hello World!</div>
+</Show>
+```
+
+`createPresence` returns a derived signal with five states, three of them being resting states, `initial`, `entered`, `exited` and two of them being transitioning states, `entering` and `exiting`.
+
+```ts
+type State = "initial" | "entering" | "entered" | "exiting" | "exited";
+```
+
+Element is mounted at `initial` state. This state is short-lived since `entering` is flushed immediately via event loop however it can be used to set css properties.
+
+When `show` is set to `true`, component gets mounted at `initial` state which changes to `entering` almost immediately and remain there for the duration of `500ms`, then moves to `entered` state and remain there indefinitely.
+
+This allow us to transition from a property loaded with `entering` state to the one loaded with `entered` state:
+
+```ts
+<div
+  style={{
+    transition: 'all .5s linear',
+    
+    ...(state() === 'entering' && {
+      color: 'green',
+    }),
+    
+    ...(state() === 'entered' && {
+      color: 'red',
+    }),
+  }}
+>
+  Hello World!
+</div>
+```
+
+Now, when `show` is set to `false`, the `div` elemement does not disappear immediately but waits for the duration of `exiting` state. In other words, we extended element's presence in the DOM for `500ms` which allows us to apply exit transitions:
+
+```ts
+<div
+  style={{
+    transition: 'all .5s linear',
+  
+    ...(state() === 'exiting' && {
+      color: 'orange',
+    }),
+    
+    ...(state() === 'exited' && {
+      color: 'blue',
+    }),
+  }}
+>
+  Hello World!
+</div>
+```
 
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
-
-## Related
-
-- [`use-presence`](https://www.npmjs.com/package/use-presence)
-- [`@solid-primitives/transition-group`](https://www.npmjs.com/package/@solid-primitives/transition-group)

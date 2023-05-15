@@ -1,8 +1,8 @@
 {
   "name": "@solid-primitives/presence",
-  "version": "0.0.1",
-  "description": "Utility to animate the presence of an element based on the existence of data or lack thereof.",
-  "author": "Ethan Standel <ethan@standel.io>",
+  "version": "0.0.2",
+  "description": "A small utility to exert stronger control over an element's presence in the DOM in order to apply enter and exit transitions/animations.",
+  "author": "snnsnn (https://github.com/snnsnn)",
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/presence#readme",
   "repository": {
@@ -35,6 +35,7 @@
     "require": "./dist/index.cjs"
   },
   "keywords": [
+    "css",
     "animation",
     "animate",
     "presence",

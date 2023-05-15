@@ -1,100 +1,88 @@
-import { Component, For, Show, createSignal } from "solid-js";
+import { Component, Show, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 import { createPresence } from "../src";
 
-const App: Component = () => {
-  return (
-    <>
-      <FirstExample />
-      <SecondExample />
-    </>
-  );
-};
+import style from './style.module.css';
 
-const FirstExample = () => {
-  const [showStuff, setShowStuff] = createSignal(true);
-  const { isVisible, isMounted } = createPresence(showStuff, {
-    transitionDuration: 500,
-  });
+const DemoOne = () => {
+  const [show, setShow] = createSignal(false);
+  const state = createPresence(show, { duration: 300, initialRun: true });
+  const isMounted = createMemo(() => state() !== "exited");
 
   return (
-    <div
-      style={{
-        padding: "2em",
-        margin: "2em",
-        "border-radius": "2em",
-        "box-shadow": "-5px 0px 10px rgba(0, 0, 0, 0.2)",
-      }}
-    >
-      <button onclick={() => setShowStuff(!showStuff())}>{`${
-        showStuff() ? "Hide" : "Show"
-      } stuff`}</button>
+    <div>
+      <h2>Demo With Styles</h2>
       <Show when={isMounted()}>
         <div
           style={{
-            transition: "all .5s ease",
-            opacity: isVisible() ? "1" : "0",
-            transform: isVisible() ? "translateX(0)" : "translateX(50px)",
+            transition: "all .3s linear",
+
+            ...(state() === "initial" && {
+              opacity: "0",
+              transform: "translateX(-25px)",
+              "background-color": "red",
+            }),
+
+            ...(state() === "entering" && {
+              opacity: "1",
+              transform: "translateX(0)",
+              "background-color": "green",
+            }),
+
+            ...(state() === "exiting" && {
+              opacity: "0",
+              transform: "translateX(25px)",
+              "background-color": "blue",
+            }),
           }}
         >
-          I am the stuff!
+          Hello World!
         </div>
       </Show>
+      <div>
+        <button style={{ "font-size": "15px", padding: "5px" }} onClick={() => setShow(p => !p)}>
+          {show() ? "Hide" : "Show"}
+        </button>
+        {` `}
+        <span>State: {state()}</span>
+      </div>
     </div>
   );
 };
 
-const SecondExample = () => {
-  const items = ["foo", "bar", "baz", "qux"];
-  const [item, setItem] = createSignal<(typeof items)[number] | undefined>(items[0]);
-  const { isMounted, mountedItem, isEntering, isVisible, isExiting } = createPresence(item, {
-    transitionDuration: 500,
-  });
+const DemoTwo = () => {
+  const [show, setShow] = createSignal(false);
+  const state = createPresence(show, { duration: 500, initialRun: true });
+  const isMounted = createMemo(() => state() !== "exited");
 
   return (
-    <div
-      style={{
-        padding: "2em",
-        margin: "2em",
-        "border-radius": "2em",
-        "box-shadow": "-5px 0px 10px rgba(0, 0, 0, 0.2)",
-      }}
-    >
-      <For each={items}>
-        {currItem => (
-          <button
-            onclick={() => {
-              if (item() === currItem) {
-                setItem(undefined);
-              } else {
-                setItem(currItem);
-              }
-            }}
-          >
-            {currItem}
-          </button>
-        )}
-      </For>
+    <div>
+      <h2>Demo With Classes</h2>
       <Show when={isMounted()}>
         <div
-          style={{
-            transition: "all .5s linear",
-            ...(isEntering() && {
-              opacity: "0",
-              transform: "translateX(-25px)",
-            }),
-            ...(isExiting() && {
-              opacity: "0",
-              transform: "translateX(25px)",
-            }),
-            ...(isVisible() && {
-              opacity: "1",
-              transform: "translateX(0)",
-            }),
+          classList={{
+            [style.hidden]: state() === 'initial',
+            [style.fadein]: state() === 'entering',
+            [style.fadeout]: state() === 'exiting',
           }}
         >
-          {mountedItem()}
+          Hello World!
         </div>
       </Show>
+      <div>
+        <button style={{ "font-size": "15px", padding: "5px" }} onClick={() => setShow(p => !p)}>
+          {show() ? "Hide" : "Show"}
+        </button>
+      </div>
+      <div>{state()}</div>
+    </div>
+  );
+};
+
+const App: Component<{}> = props => {
+  return (
+    <div>
+      <DemoOne />
+      <DemoTwo />
     </div>
   );
 };
