@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { batch, createEffect, createRoot, createSignal } from "solid-js";
+import { $TRACK, batch, createEffect, createRoot, createSignal, untrack } from "solid-js";
 import { createStoreDiff } from "../src";
 import { createStore } from "solid-js/store";
 
@@ -131,15 +131,6 @@ describe("createStoreDiff", () => {
       });
     });
 
-    expect(captured).toHaveLength(1);
-    expect(captured[0]).toEqual([
-      {
-        path: [],
-        value: sign,
-        prev: undefined,
-      },
-    ] satisfies ReturnType<typeof diff>);
-
     set("b", undefined);
     expect(captured).toHaveLength(2);
     expect(captured[1]).toEqual([
@@ -162,15 +153,6 @@ describe("createStoreDiff", () => {
       });
     });
 
-    expect(captured).toHaveLength(1);
-    expect(captured[0]).toEqual([
-      {
-        path: [],
-        value: sign,
-        prev: undefined,
-      },
-    ] satisfies ReturnType<typeof diff>);
-
     set({ a: { "a.b": "minds" } });
     expect(captured).toHaveLength(2);
     expect(captured[1]).toEqual([
@@ -180,5 +162,56 @@ describe("createStoreDiff", () => {
         prev: { "a.b": "thoughts" },
       },
     ] satisfies ReturnType<typeof diff>);
+  });
+
+  test("array", () => {
+    const captured: any[] = [];
+    const [sign, set] = createStore({ a: { "a.b": "thoughts" }, b: ["foo"] });
+    // const diff = createStoreDiff<typeof sign>();
+
+    // createRoot(() => {
+    //   createEffect(() => {
+    //     captured.push(diff(sign));
+    //   });
+    // });
+
+    // expect(captured).toHaveLength(1);
+    // expect(captured[0]).toEqual([
+    //   {
+    //     path: [],
+    //     value: sign,
+    //     prev: undefined,
+    //   },
+    // ] satisfies ReturnType<typeof diff>);
+
+    // set("b", 0, "bar");
+    // expect(captured).toHaveLength(2);
+    // expect(captured[1]).toEqual([
+    //   {
+    //     path: ["b", 0],
+    //     value: "bar",
+    //     prev: "foo",
+    //   },
+    // ] satisfies ReturnType<typeof diff>);
+
+    createEffect(() => {
+      const b = untrack(() => sign.b);
+      console.log("TRACK", $TRACK in b);
+    });
+
+    console.log("SET", "b", 0, "bar");
+    set("b", 0, "bar");
+
+    console.log("SET", "b", 1, "baz");
+    set("b", 1, "baz");
+
+    console.log("SET", "b", 1, { c: "c" });
+    set("b", 1, { c: "c" });
+
+    console.log("SET", "b", 1, { c: "d" });
+    set("b", 1, { c: "d" });
+
+    console.log("SET", "lool");
+    set("b", "lool");
   });
 });

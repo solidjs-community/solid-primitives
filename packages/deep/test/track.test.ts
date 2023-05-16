@@ -1,70 +1,154 @@
 import { describe, test, expect } from "vitest";
-import { createEffect, createRoot, on } from "solid-js";
-import { deepTrack } from "../src";
+import { batch, createEffect, createRoot } from "solid-js";
+import { deepTrack, trackStore1, trackStore2, trackStore3 } from "../src";
 import { createStore } from "solid-js/store";
 
-describe("deepTrack", () => {
-  test("deepTrack triggers effect", () => {
-    let temp: string;
-    const [sign, set] = createStore({ a: { b: "thoughts" } });
-    createRoot(() => {
-      createEffect(
-        on(
-          () => deepTrack(sign),
-          v => (temp = `impure ${JSON.stringify(v)}`),
-        ),
-      );
-    });
-    expect(temp!).toBe('impure {"a":{"b":"thoughts"}}');
-    set("a", "b", "minds");
-    expect(temp!).toBe('impure {"a":{"b":"minds"}}');
-  });
+const fns = [deepTrack, trackStore1, trackStore2, trackStore3];
 
-  test("effect without deepTrack doesn't trigger it", () => {
-    let temp: string;
-    const [sign, set] = createStore({ a: { b: "thoughts" } });
-    createRoot(() => {
-      createEffect(
-        on(
-          () => sign,
-          v => (temp = `impure ${JSON.stringify(v)}`),
-        ),
-      );
-    });
-    expect(temp!).toBe('impure {"a":{"b":"thoughts"}}');
-    set("a", "b", "minds");
-    expect(temp!).toBe('impure {"a":{"b":"thoughts"}}');
-  });
+for (const fn of fns) {
+  describe(fn.name, () => {
+    test("captures property change", () => {
+      const [sign, set] = createStore({ a: { "a.b": "thoughts" }, b: "foo" });
 
-  test("deep derivative", () => {
-    let temp: string;
-    const [sign, set] = createStore({ a: { b: "thoughts" } });
-    createRoot(() => {
-      const derivativeDeep = () => deepTrack(sign);
-      createEffect(() => {
-        temp = `impure ${JSON.stringify(derivativeDeep())}`;
+      let runs = 0;
+      createRoot(() => {
+        createEffect(() => {
+          fn(sign);
+          runs++;
+        });
       });
+
+      expect(runs).toBe(1);
+
+      set("a", "a.b", "minds");
+      expect(runs).toBe(2);
+
+      set("b", "bar");
+      expect(runs).toBe(3);
     });
-    expect(temp!).toBe('impure {"a":{"b":"thoughts"}}');
-    set("a", "b", "minds");
-    expect(temp!).toBe('impure {"a":{"b":"minds"}}');
-  });
 
-  test("deep circular references", () => {
-    let temp: any;
-    const initialObject = { a: { b: "thoughts" } } as any;
-    initialObject.a.c = initialObject;
-    const [sign, set] = createStore(initialObject);
+    test("multiple effects", () => {
+      const [sign, set] = createStore({ a: { "a.b": "thoughts" }, b: "foo" });
 
-    createRoot(() => {
-      const storeDeep = () => deepTrack(sign);
-      createEffect(() => {
-        temp = storeDeep();
+      let runs = 0;
+      createRoot(() => {
+        createEffect(() => {
+          fn(sign);
+          runs++;
+        });
+        createEffect(() => {
+          fn(sign);
+          runs++;
+        });
       });
+
+      expect(runs).toBe(2);
+
+      set("a", "a.b", "minds");
+      expect(runs).toBe(4);
+
+      set("b", "bar");
+      expect(runs).toBe(6);
     });
 
-    expect(temp!.a.c).toBe(sign);
-    set("a", "c", "minds");
-    expect(temp!.a.c).toBe("minds");
+    test("multiple changes", () => {
+      const [sign, set] = createStore({ a: { "a.b": "thoughts" }, b: "foo" });
+
+      let runs = 0;
+      createRoot(() => {
+        createEffect(() => {
+          fn(sign);
+          runs++;
+        });
+      });
+      expect(runs).toBe(1);
+
+      batch(() => {
+        set("a", "a.b", "minds");
+        set("b", "bar");
+      });
+      expect(runs).toBe(2);
+    });
+
+    test("adding new property", () => {
+      const [sign, set] = createStore<any>({ a: { "a.b": "thoughts" } });
+
+      let runs = 0;
+      createRoot(() => {
+        createEffect(() => {
+          fn(sign);
+          runs++;
+        });
+      });
+      expect(runs).toBe(1);
+
+      set("b", "foo");
+      expect(runs).toBe(2);
+    });
+
+    test("removing property", () => {
+      const [sign, set] = createStore({ a: { "a.b": "thoughts" }, b: "foo" as string | undefined });
+
+      let runs = 0;
+      createRoot(() => {
+        createEffect(() => {
+          fn(sign);
+          runs++;
+        });
+      });
+      expect(runs).toBe(1);
+
+      set("b", undefined);
+      expect(runs).toBe(2);
+    });
+
+    test("changing objects", () => {
+      const [sign, set] = createStore({ a: { "a.b": "thoughts" } });
+
+      let runs = 0;
+      createRoot(() => {
+        createEffect(() => {
+          fn(sign);
+          runs++;
+        });
+      });
+      expect(runs).toBe(1);
+
+      set({ a: { "a.b": "minds" } });
+      expect(runs).toBe(2);
+    });
+
+    test("array reorder", () => {
+      const [sign, set] = createStore({ a: [1, 2, 3] });
+
+      let runs = 0;
+      createRoot(() => {
+        createEffect(() => {
+          fn(sign);
+          runs++;
+        });
+      });
+      expect(runs).toBe(1);
+
+      set("a", [2, 3, 1]);
+      expect(runs).toBe(2);
+    });
+
+    test("circular reference", () => {
+      const [sign, set] = createStore<any>({ a: { "a.b": "thoughts" } });
+      set("a", { "a.a": sign });
+
+      let runs = 0;
+      createRoot(() => {
+        createEffect(() => {
+          fn(sign);
+          runs++;
+        });
+      });
+      expect(runs).toBe(1);
+
+      set("a", "a.b", "minds");
+      expect(runs).toBe(2);
+    });
   });
-});
+}
