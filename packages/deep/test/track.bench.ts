@@ -1,9 +1,9 @@
 import { describe, bench } from "vitest";
 import { batch, createEffect, createRoot } from "solid-js";
-import { deepTrack, trackStore1, trackStore2, trackStore3 } from "../src";
+import { deepTrack, trackStore3, trackStore4 } from "../src";
 import { createStore } from "solid-js/store";
 
-const fns = [deepTrack, trackStore1, trackStore2, trackStore3];
+const fns = [JSON.stringify.bind(JSON), deepTrack, trackStore3, trackStore4];
 
 const createStoreTrackingEffect = (fn: (typeof fns)[number], store: object, nEffects: number) => {
   return createRoot(dispose => {

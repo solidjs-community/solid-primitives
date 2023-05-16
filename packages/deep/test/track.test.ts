@@ -1,9 +1,9 @@
 import { describe, test, expect } from "vitest";
 import { batch, createEffect, createRoot } from "solid-js";
-import { deepTrack, trackStore1, trackStore2, trackStore3 } from "../src";
+import { deepTrack, trackStore3, trackStore4 } from "../src";
 import { createStore } from "solid-js/store";
 
-const fns = [deepTrack, trackStore1, trackStore2, trackStore3];
+const fns = [deepTrack, trackStore3, trackStore4];
 
 for (const fn of fns) {
   describe(fn.name, () => {
@@ -116,6 +116,9 @@ for (const fn of fns) {
 
       set({ a: { "a.b": "minds" } });
       expect(runs).toBe(2);
+
+      set("a", "a.b", "thoughts");
+      expect(runs).toBe(3);
     });
 
     test("array reorder", () => {
@@ -138,17 +141,50 @@ for (const fn of fns) {
       const [sign, set] = createStore<any>({ a: { "a.b": "thoughts" } });
       set("a", { "a.a": sign });
 
-      let runs = 0;
+      let rootRuns = 0;
       createRoot(() => {
         createEffect(() => {
           fn(sign);
+          rootRuns++;
+        });
+      });
+
+      let leafRuns = 0;
+      createRoot(() => {
+        const a = sign.a;
+        createEffect(() => {
+          fn(a);
+          leafRuns++;
+        });
+      });
+      expect(rootRuns).toBe(1);
+      expect(leafRuns).toBe(1);
+
+      set("a", "a.b", "minds");
+      expect(rootRuns).toBe(2);
+      expect(leafRuns).toBe(2);
+
+      set("a", "a.a", "a.a.b", "thoughts");
+      expect(rootRuns).toBe(3);
+      expect(leafRuns).toBe(3);
+    });
+
+    test("doesn't trigger on unrelated changes", () => {
+      const [sign, set] = createStore<any>({ a: { "a.b": "thoughts" } });
+
+      let runs = 0;
+      createRoot(() => {
+        createEffect(() => fn(sign));
+        const a = sign.a;
+        createEffect(() => {
+          fn(a);
           runs++;
         });
       });
       expect(runs).toBe(1);
 
-      set("a", "a.b", "minds");
-      expect(runs).toBe(2);
+      set("b", "foo");
+      expect(runs).toBe(1);
     });
   });
 }

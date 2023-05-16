@@ -1,6 +1,8 @@
 import { createLazyMemo } from "@solid-primitives/memo";
-import { $PROXY, $TRACK, Accessor, createMemo, createRoot, untrack } from "solid-js";
+import { $PROXY, $TRACK, Accessor, createMemo, createRoot, createSignal, untrack } from "solid-js";
 import { Store, unwrap } from "solid-js/store";
+
+const EQUALS_FALSE = { equals: false } as const;
 
 /**
  * deepTrack - create a deep getter on the given object
@@ -61,6 +63,85 @@ function isWrappable(obj: any) {
   );
 }
 
+export const { trackStore4 } = (() => {
+  type StoreNode = object & Record<typeof $TRACK, unknown>;
+
+  const isStoreNode = (value: unknown): value is StoreNode =>
+    value != null && typeof value === "object" && $TRACK in value;
+
+  const TrackStoreCache = new WeakMap<StoreNode, VoidFunction>();
+  let Tracked: WeakSet<VoidFunction>;
+
+  // custom lazy memo to support circular dependencies
+  // maybe it won't be needed in 2.0
+  function createStoreTrack(calc: VoidFunction): VoidFunction {
+    let isReading = false,
+      isStale: boolean | undefined = true,
+      alreadyTracked = false;
+
+    const [track, trigger] = createSignal(void 0, EQUALS_FALSE),
+      memo = createMemo(() => (isReading ? calc() : (isStale = !track())), undefined, {
+        equals: () => alreadyTracked,
+      });
+
+    return () => {
+      isReading = true;
+      if (isStale) isStale = trigger();
+      alreadyTracked = Tracked.has(memo);
+      alreadyTracked || Tracked.add(memo);
+      memo();
+      isReading = false;
+    };
+  }
+
+  function walkTrackValue(value: unknown): VoidFunction | undefined {
+    if (!isStoreNode(value)) return;
+
+    let track = TrackStoreCache.get(value);
+
+    if (!track) {
+      createRoot(() => {
+        let prevVersion = 0;
+        const self = createLazyMemo(p => (value[$TRACK], p + 1), prevVersion);
+
+        const getChildren = Array.isArray(value)
+          ? () => value
+          : () => untrack(() => Object.values(value));
+
+        let childrenSignals: VoidFunction[] = [];
+
+        track = createStoreTrack(() => {
+          const version = self();
+
+          if (version !== prevVersion) {
+            prevVersion = version;
+            childrenSignals = [];
+
+            for (const child of getChildren()) {
+              const trackChild = walkTrackValue(child);
+              trackChild && childrenSignals.push(trackChild);
+            }
+          }
+
+          for (const child of childrenSignals) child();
+        });
+
+        TrackStoreCache.set(value, track);
+      });
+    }
+
+    return track;
+  }
+
+  function trackStore4<T extends object>(store: Store<T>): T {
+    Tracked = new Set();
+    walkTrackValue(store)?.();
+    return store;
+  }
+
+  return { trackStore4 };
+})();
+
 export const { trackStore3 } = (() => {
   type StoreNode = object & Record<typeof $TRACK, unknown>;
 
@@ -79,7 +160,9 @@ export const { trackStore3 } = (() => {
       let prevV = 0;
       const self = createRoot(() => createLazyMemo(p => (value[$TRACK], p + 1), prevV));
 
-      const children = untrack(() => (Array.isArray(value) ? value : Object.values(value)));
+      const children = Array.isArray(value)
+        ? () => value
+        : () => untrack(() => Object.values(value));
       let childrenMemos: VoidFunction[] = [];
 
       track = () => {
@@ -88,7 +171,7 @@ export const { trackStore3 } = (() => {
           prevV = v;
           childrenMemos = [];
 
-          for (const child of children) {
+          for (const child of children()) {
             const childMemo = walkTrackValue(child);
             if (childMemo) childrenMemos.push(childMemo);
           }
@@ -113,140 +196,15 @@ export const { trackStore3 } = (() => {
 
   function trackStore3<T extends object>(store: Store<T>): T {
     ToTrack = new Set();
-    walkTrackValue(store)?.();
-    for (const tracked of ToTrack) tracked();
+    const trackRoot = walkTrackValue(store);
+    if (trackRoot) {
+      ToTrack.add(trackRoot);
+      for (const tracked of ToTrack) tracked();
+    }
     return store;
   }
 
   return { trackStore3 };
-})();
-
-export const { trackStore2 } = (() => {
-  const TrackKeysCache = new WeakMap<object, Accessor<number>>();
-
-  function trackProxyKeys(proxy: StoreNode): number {
-    let memo = TrackKeysCache.get(proxy);
-
-    if (!memo)
-      TrackKeysCache.set(
-        proxy,
-        (memo = createRoot(() => createLazyMemo(p => (proxy[$TRACK], p + 1), 0))),
-      );
-
-    return memo();
-  }
-
-  type StoreNode = object & Record<typeof $TRACK, unknown>;
-
-  type TrackStoreNode = {
-    version: number;
-    children: StoreNode[];
-  };
-
-  const TrackStoreCache = new WeakMap<object, TrackStoreNode>();
-
-  let TrackStoreList!: Set<StoreNode>;
-
-  const isStoreNode = (value: unknown): value is StoreNode =>
-    value != null && typeof value === "object" && $TRACK in value;
-
-  function walkStoreNodeChildren(value: StoreNode): StoreNode[] {
-    const children: StoreNode[] = [];
-
-    for (const child of Array.isArray(value) ? (value as unknown[]) : Object.values(value)) {
-      if (isStoreNode(child)) {
-        children.push(child);
-        walkTrackValue(child);
-      }
-    }
-
-    return children;
-  }
-
-  function walkTrackValue(value: StoreNode): void {
-    if (TrackStoreList.has(value)) return;
-
-    TrackStoreList.add(value);
-
-    const v = trackProxyKeys(value);
-
-    let node = TrackStoreCache.get(value);
-
-    if (node) {
-      if (node.version === v) {
-        TrackStoreList.add(value);
-
-        for (const child of node.children) {
-          walkTrackValue(child);
-        }
-      } else {
-        node.version = v;
-        node.children = walkStoreNodeChildren(value);
-      }
-    } else {
-      TrackStoreCache.set(value, (node = { version: v, children: walkStoreNodeChildren(value) }));
-    }
-  }
-
-  function trackStore2<T extends Store<object>>(store: T): T {
-    if (!isStoreNode(store)) return store;
-
-    TrackStoreList = new Set();
-
-    untrack(() => walkTrackValue(store));
-
-    for (const storeNode of TrackStoreList) trackProxyKeys(storeNode);
-
-    return store;
-  }
-
-  return { trackStore2 };
-})();
-
-export const { trackStore1 } = (() => {
-  const TrackKeysCache = new WeakMap<object, Accessor<number>>();
-
-  function trackProxyKeys(proxy: object): number {
-    if (!($TRACK in proxy)) return -1;
-
-    let memo = TrackKeysCache.get(proxy);
-
-    if (!memo)
-      TrackKeysCache.set(
-        proxy,
-        (memo = createRoot(() => createLazyMemo(p => (proxy[$TRACK], p + 1), 0))),
-      );
-
-    return memo();
-  }
-
-  let TrackStoreList!: Set<Object>;
-
-  function walkTrackValue(value: unknown): void {
-    if (
-      value == null ||
-      typeof value !== "object" ||
-      !($TRACK in value) ||
-      TrackStoreList.has(value)
-    )
-      return;
-
-    TrackStoreList.add(value);
-
-    for (const child of Array.isArray(value) ? value : Object.values(value)) walkTrackValue(child);
-  }
-
-  function trackStore1<T extends Store<object>>(store: T): T {
-    TrackStoreList = new Set();
-
-    untrack(() => walkTrackValue(store));
-
-    for (const storeNode of TrackStoreList) trackProxyKeys(storeNode);
-
-    return store;
-  }
-
-  return { trackStore1 };
 })();
 
 /*
