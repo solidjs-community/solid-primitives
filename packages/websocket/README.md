@@ -11,6 +11,7 @@ Primitive to help establish, maintain and operate a websocket connection.
 
 - `makeWS` - sets up a web socket connection with a buffered send
 - `createWS` - sets up a web socket connection that disconnects on cleanup
+- `craeteWSState` - creates a reactive signal containing the readyState of a websocket
 - `makeReconnectingWS` - sets up a web socket connection that reconnects if involuntarily closed
 - `createReconnectingWS` - sets up a reconnecting web socket connection that disconnects on cleanup
 - `makeHeartbeatWS` - wraps a reconnecting web socket to send a heart beat and reconnect if the answer fails
@@ -21,8 +22,11 @@ All of them return a WebSocket instance extended with a `message` prop containin
 
 ```ts
 const ws = createWS("ws://localhost:5000");
+const state = createWSState(ws);
+const states = ["Connecting", "Connected", "Disconnecting", "Disconnected"];
 ws.send("it works");
 createEffect(on(ws.message, msg => console.log(msg), { defer: true }));
+return <p>Connection: {states[state()]}</p>;
 
 const socket = makeHeartbeatWS(
   makeReconnectingWS(`ws://${location.hostName}/api/ws`, undefined, { timeout: 500 }),
@@ -38,7 +42,7 @@ socket.send("this will reconnect if connection fails");
 /** Arguments of the primitives */
 type WSProps = [url: string, protocols?: string | string[]];
 type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
-type WSReadyState = 0 /* Connecting */ | 1 /* Connected */ | 2 /* Closing */ | 3 /* Closed */;
+type WSReadyState = WebSocket.CONNECTING | WebSocket.OPEN | WebSocket.CLOSING | WebSocket.CLOSED;
 type WSEventMap = {
   close: CloseEvent;
   error: Event;
