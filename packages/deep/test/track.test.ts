@@ -1,9 +1,10 @@
 import { describe, test, expect } from "vitest";
 import { batch, createEffect, createRoot } from "solid-js";
-import { deepTrack, trackStore3, trackStore4 } from "../src";
-import { createStore } from "solid-js/store";
+import { trackDeep, trackStore } from "../src";
+import { deepTrack } from "../src/deep-track";
+import { createStore, reconcile } from "solid-js/store";
 
-const fns = [deepTrack, trackStore3, trackStore4];
+const fns = [deepTrack, trackDeep, trackStore];
 
 for (const fn of fns) {
   describe(fn.name, () => {
@@ -185,6 +186,25 @@ for (const fn of fns) {
 
       set("b", "foo");
       expect(runs).toBe(1);
+    });
+
+    test("reconcile", () => {
+      const [sign, set] = createStore<any>({ a: { "a.b": "thoughts" } });
+
+      let runs = 0;
+      createRoot(() => {
+        createEffect(() => {
+          fn(sign);
+          runs++;
+        });
+      });
+      expect(runs).toBe(1);
+
+      set("a", reconcile({ foo: "bar" }));
+      expect(runs).toBe(2);
+
+      set("a", "foo", "baz");
+      expect(runs).toBe(3);
     });
   });
 }

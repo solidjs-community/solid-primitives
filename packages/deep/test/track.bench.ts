@@ -1,9 +1,10 @@
 import { describe, bench } from "vitest";
 import { batch, createEffect, createRoot } from "solid-js";
-import { deepTrack, trackStore3, trackStore4 } from "../src";
+import { trackDeep, trackStore } from "../src";
+import { deepTrack } from "../src/deep-track";
 import { createStore } from "solid-js/store";
 
-const fns = [JSON.stringify.bind(JSON), deepTrack, trackStore3, trackStore4];
+const fns = [JSON.stringify, deepTrack, trackDeep, trackStore];
 
 const createStoreTrackingEffect = (fn: (typeof fns)[number], store: object, nEffects: number) => {
   return createRoot(dispose => {
@@ -27,11 +28,13 @@ for (const nEffects of [1, 10]) {
 
         const dispose = createStoreTrackingEffect(fn, sign, nEffects);
 
-        for (let i = 0; i < 10; i++) {
-          batch(() => {
-            set(i * 10, "a", "a.b", "minds");
-            set(i * 10, "b", "bar");
-          });
+        for (let n = 0; n < 2; n++) {
+          for (let i = 0; i < 10; i++) {
+            batch(() => {
+              set(i * 10, "a", "a.b", "minds" + n);
+              set(i * 10, "b", "bar" + n);
+            });
+          }
         }
 
         dispose();
@@ -63,8 +66,10 @@ for (const nEffects of [1, 10]) {
 
         const dispose = createStoreTrackingEffect(fn, sign, nEffects);
 
-        for (let i = 0; i < 10; i++) {
-          set(i, "a", "array", i, "array", i, "done", true);
+        for (let n = 0; n < 2; n++) {
+          for (let i = 0; i < 10; i++) {
+            set(i, "a", "array", i, "array", i, "done", p => !p);
+          }
         }
 
         dispose();
@@ -96,8 +101,10 @@ for (const nEffects of [1, 10]) {
 
         const dispose = createStoreTrackingEffect(fn, sign, nEffects);
 
-        for (let i = 0; i < 10; i++) {
-          set(i, "b", "foo" + i);
+        for (let n = 0; n < 2; n++) {
+          for (let i = 0; i < 10; i++) {
+            set(i, "b", "foo" + i + n);
+          }
         }
 
         dispose();
