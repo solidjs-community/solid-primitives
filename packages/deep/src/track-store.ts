@@ -40,21 +40,17 @@ function getTrackStoreNode(value: StoreNode): VoidFunction | undefined {
 
       track = createLazyMemo(() => {
         value[$TRACK];
-        const toTrack: VoidFunction[] = [];
-        untrack(() => {
-          for (const [key, child] of Object.entries(unwrapped)) {
-            let obj: StoreNode;
-            if (
-              child != null &&
-              typeof child === "object" &&
-              ((obj = (child as any)[$PROXY]) || ((obj = (value as any)[key]) && $TRACK in obj))
-            ) {
-              const trackChild = getTrackStoreNode(obj);
-              trackChild && toTrack.push(trackChild);
-            }
+        for (const [key, child] of Object.entries(unwrapped)) {
+          let obj: StoreNode;
+          if (
+            child != null &&
+            typeof child === "object" &&
+            ((obj = (child as any)[$PROXY]) ||
+              ((obj = untrack(() => (value as any)[key])) && $TRACK in obj))
+          ) {
+            getTrackStoreNode(obj)?.();
           }
-        });
-        for (const trackChild of toTrack) trackChild();
+        }
       });
 
       TrackStoreCache.set(value, track);
@@ -64,6 +60,24 @@ function getTrackStoreNode(value: StoreNode): VoidFunction | undefined {
   return track;
 }
 
+/**
+ * Tracks all nested changes to passed {@link store}.
+ *
+ * @param store a reactive store proxy
+ * @returns same {@link store} that was passed in
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/deep#trackStore
+ *
+ * @example
+ * ```ts
+ * createEffect(on(
+ *   () => trackStore(store),
+ *   () => {
+ *     // this effect will run when any property of store changes
+ *   }
+ * ));
+ * ```
+ */
 function trackStore<T extends object>(store: Store<T>): T {
   TrackVersion++;
   $TRACK in store && getTrackStoreNode(store)?.();

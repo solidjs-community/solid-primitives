@@ -1,10 +1,11 @@
 import { describe, test, expect } from "vitest";
 import { batch, createEffect, createRoot } from "solid-js";
 import { trackDeep, trackStore } from "../src";
-import { deepTrack } from "../src/deep-track";
-import { createStore, reconcile } from "solid-js/store";
+import { createStore, reconcile, unwrap } from "solid-js/store";
 
-const fns = [deepTrack, trackDeep, trackStore];
+const fns = [trackDeep, trackStore];
+
+const worksWithPOJO = [trackDeep];
 
 for (const fn of fns) {
   describe(fn.name, () => {
@@ -205,6 +206,39 @@ for (const fn of fns) {
 
       set("a", "foo", "baz");
       expect(runs).toBe(3);
+    });
+
+    test("unwrapped", () => {
+      const [sign, set] = createStore({ a: { "a.b": "thoughts" } });
+      const unwrapped = unwrap(sign);
+
+      let runs = 0;
+      createRoot(() => {
+        createEffect(() => {
+          fn(unwrapped);
+          runs++;
+        });
+      });
+      expect(runs).toBe(1);
+
+      set("a", "a.b", "minds");
+      expect(runs).toBe(1);
+    });
+
+    test("traversing POJOs", () => {
+      const [sign, set] = createStore({ a: { "a.b": "thoughts" } });
+
+      let runs = 0;
+      createRoot(() => {
+        createEffect(() => {
+          fn({ sign });
+          runs++;
+        });
+      });
+      expect(runs).toBe(1);
+
+      set("a", "a.b", "minds");
+      expect(runs).toBe(worksWithPOJO.includes(fn) ? 2 : 1);
     });
   });
 }

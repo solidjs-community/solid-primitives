@@ -2,10 +2,10 @@ import { $PROXY } from "solid-js";
 import { Store } from "solid-js/store";
 
 /**
- * Iterate over all properties of a store and to track it deeply.
+ * Tracks all properties of a {@link store} by iterating over them recursively.
  *
  * @param store reactive store dependency
- * @returns same dependency, just traversed deeply to trigger effects on deeply nested properties.
+ * @returns same {@link store} that was passed in
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/deep#trackDeep
  *
@@ -42,4 +42,9 @@ function traverse<T>(value: Store<T>, seen: Set<unknown>): void {
   }
 }
 
-export { trackDeep };
+/**
+ * @deprecated Renamed to {@link trackDeep}
+ */
+const deepTrack = trackDeep;
+
+export { trackDeep, deepTrack };
