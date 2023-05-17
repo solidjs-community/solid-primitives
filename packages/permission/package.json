@@ -37,9 +37,9 @@
   "scripts": {
     "dev": "jiti ../../scripts/dev.ts",
     "build": "jiti ../../scripts/build.ts",
-    "dev": "vite serve dev --host",
-    "test": "vitest -c ../../configs/vitest.config.ts",
-    "test:ssr": "pnpm run test --mode ssr"
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

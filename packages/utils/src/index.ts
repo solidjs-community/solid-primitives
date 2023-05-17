@@ -28,15 +28,21 @@ export * from "./types";
 // GENERAL HELPERS:
 //
 
+export { isServer };
+export const isClient = !isServer;
+export const isDev = isClient && !!DEV;
+export const isProd = !isDev;
+
 /** no operation */
 export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
-export { isServer };
-export const isClient = !isServer;
-export const isDev = isClient && !!DEV;
-export const isProd = !isDev;
+/** default `equals` camparator. `(a, b) => a === b` */
+export const defaultEquals = (a: unknown, b: unknown): boolean => a === b;
+
+export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
+export const INTERNAL_OPTIONS = { internal: true } as const satisfies SignalOptions<unknown>;
 
 /**
  * Check if the value is an instance of ___

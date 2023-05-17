@@ -1,5 +1,12 @@
 # @solid-primitives/media
 
+## 2.2.2
+
+### Patch Changes
+
+- Updated dependencies [f03c47b0]
+  - @solid-primitives/event-listener@2.2.12
+
 ## 2.2.1
 
 ### Patch Changes

@@ -18,6 +18,7 @@
     "list": [
       "makeWS",
       "createWS",
+      "createWSState",
       "makeReconnectingWS",
       "createReconnectingWS",
       "makeHeartbeatWS"
@@ -44,7 +45,9 @@
   "scripts": {
     "dev": "jiti ../../scripts/dev.ts",
     "build": "jiti ../../scripts/build.ts",
-    "test": "vitest"
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
   },
   "keywords": [
     "websocket",

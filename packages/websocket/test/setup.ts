@@ -17,6 +17,10 @@ declare global {
 const readyStates = new Map<MockWebSocket, WSReadyState>();
 
 class MockWebSocket extends EventTarget {
+  public CONNECTING = 0;
+  public OPEN = 1;
+  public CLOSING = 2;
+  public CLOSED = 3;
   public readyState: WSReadyState = 0;
   constructor(public url: string, public protocol?: string | string[]) {
     super();

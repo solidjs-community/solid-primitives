@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/media",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Primitives for media query and device features",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -58,8 +58,9 @@
   "scripts": {
     "dev": "jiti ../../scripts/dev.ts",
     "build": "jiti ../../scripts/build.ts",
-    "test": "vitest -c ../../configs/vitest.config.ts",
-    "test:ssr": "pnpm run test --mode ssr"
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
   },
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",

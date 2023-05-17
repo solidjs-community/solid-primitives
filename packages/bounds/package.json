@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/bounds",
-  "version": "0.0.112",
+  "version": "0.0.113",
   "description": "Primitives for tracking HTML element size and position on screen as it changes.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -48,8 +48,9 @@
   "scripts": {
     "dev": "jiti ../../scripts/dev.ts",
     "build": "jiti ../../scripts/build.ts",
-    "test": "vitest -c ../../configs/vitest.config.ts",
-    "test:ssr": "pnpm run test --mode ssr"
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
   },
   "devDependencies": {
     "@solid-primitives/scheduled": "workspace:^"

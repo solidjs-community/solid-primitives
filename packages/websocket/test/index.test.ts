@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createRoot } from "solid-js";
 import {
   createWS,
+  createWSState,
   createReconnectingWS,
   makeReconnectingWS,
   makeHeartbeatWS,
@@ -38,6 +39,27 @@ describe("createWS", () => {
         const ws = createWS("ws://localhost:5000");
         vi.spyOn(ws, "close").mockImplementation(() => resolve());
         dispose();
+      });
+    }));
+});
+
+describe("createWSState", () => {
+  it("reacts to all changes of readyState", () =>
+    new Promise<void>(resolve => {
+      createRoot(dispose => {
+        vi.useFakeTimers();
+        const ws = createWS("ws://localhost:5000");
+        const state = createWSState(ws);
+        expect(state()).toEqual(ws.CONNECTING);
+        vi.advanceTimersByTime(20);
+        expect(state()).toEqual(ws.OPEN);
+        vi.advanceTimersByTime(100);
+        ws.close();
+        expect(state()).toEqual(ws.CLOSING);
+        vi.advanceTimersByTime(80);
+        expect(state()).toEqual(ws.CLOSED);
+        dispose();
+        resolve();
       });
     }));
 });

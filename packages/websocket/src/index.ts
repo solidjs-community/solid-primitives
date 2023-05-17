@@ -1,11 +1,11 @@
-import { onCleanup } from "solid-js";
+import { type Accessor, onCleanup, createSignal } from "solid-js";
 
 export type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
 
 /**
  * opens a web socket connection with a queued send
  * ```ts
- * const ws = makeWS("ws:localhost:5000");
+ * const ws = makeWS("ws://localhost:5000");
  * createEffect(() => ws.send(serverMessage()));
  * onCleanup(() => ws.close());
  * ```
@@ -30,7 +30,7 @@ export const makeWS = (
 /**
  * opens a web socket connection with a queued send that closes on cleanup
  * ```ts
- * const ws = makeWS("ws:localhost:5000");
+ * const ws = makeWS("ws://localhost:5000");
  * createEffect(() => ws.send(serverMessage()));
  * ```
  * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
@@ -39,6 +39,33 @@ export const createWS = (url: string, protocols?: string | string[]): WebSocket 
   const ws = makeWS(url, protocols);
   onCleanup(() => ws.close());
   return ws;
+};
+
+/**
+ * Returns a reactive state signal for the web socket's readyState:
+ *
+ * WebSocket.CONNECTING = 0
+ * WebSocket.OPEN = 1
+ * WebSocket.CLOSING = 2
+ * WebSocket.CLOSED = 3
+ *
+ * ```ts
+ * const ws = createWS('ws://localhost:5000');
+ * const state = createWSState(ws);
+ * const states = ["Connecting", "Open", "Closing", "Closed"] as const;
+ * return <div>{states[state()]}</div>
+ * ```
+ */
+export const createWSState = (ws: WebSocket): Accessor<0 | 1 | 2 | 3> => {
+  const [state, setState] = createSignal(ws.readyState as 0 | 1 | 2 | 3);
+  const _close = ws.close.bind(ws);
+  ws.addEventListener("open", () => setState(1));
+  ws.close = (...args) => {
+    _close(...args);
+    setState(2);
+  };
+  ws.addEventListener("close", () => setState(3));
+  return state;
 };
 
 export type WSReconnectOptions = {
