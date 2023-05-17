@@ -18,6 +18,7 @@
     "list": [
       "makeWS",
       "createWS",
+      "createWSState",
       "makeReconnectingWS",
       "createReconnectingWS",
       "makeHeartbeatWS"
