@@ -106,7 +106,7 @@ fields == JSX.Element[];
 
 ### Demo
 
-https://primitives.solidjs.community/playground/controlled-props/
+https://solidjs-community.github.io/solid-primitives/controlled-props/
 
 ## Changelog
 
