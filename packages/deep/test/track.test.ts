@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { batch, createEffect, createRoot } from "solid-js";
+import { batch, createEffect, createRoot, createSignal } from "solid-js";
 import { trackDeep, trackStore } from "../src";
 import { createStore, reconcile, unwrap } from "solid-js/store";
 
@@ -239,6 +239,27 @@ for (const fn of fns) {
 
       set("a", "a.b", "minds");
       expect(runs).toBe(worksWithPOJO.includes(fn) ? 2 : 1);
+    });
+
+    test("getters", () => {
+      const [count, setCount] = createSignal(0);
+      const [sign] = createStore({
+        get count() {
+          return count();
+        },
+      });
+
+      let runs = 0;
+      createRoot(() => {
+        createEffect(() => {
+          fn(sign);
+          runs++;
+        });
+      });
+      expect(runs).toBe(1);
+
+      setCount(1);
+      expect(runs).toBe(2);
     });
   });
 }
