@@ -2,37 +2,32 @@ import { $PROXY } from "solid-js";
 import { Store } from "solid-js/store";
 
 /**
- * deepTrack - create a deep getter on the given object
- * ```ts
- * export function deepTrack<T>(
- *   store: Store<T>
- * ): T;
- * ```
+ * Iterate over all properties of a store and to track it deeply.
+ *
  * @param store reactive store dependency
  * @returns same dependency, just traversed deeply to trigger effects on deeply nested properties.
  *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/deep#deeptrack
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/deep#trackDeep
  *
  * @example
  * ```ts
- * createEffect(
- *   on(
- *     deepTrack(store),
- *     () => {
- *       // this effect will run when any property of store changes
- *     }
- *   )
- * );
+ * createEffect(on(
+ *   () => trackDeep(store),
+ *   () => {
+ *     // this effect will run when any property of store changes
+ *   }
+ * ));
  * ```
  */
-export function trackDeep<T extends Store<object>>(store: T): T {
-  deepTraverse(store, new Set());
+function trackDeep<T extends Store<object>>(store: T): T {
+  traverse(store, new Set());
   return store;
 }
 
-function deepTraverse<T>(value: Store<T>, seen: Set<unknown>): void {
+function traverse<T>(value: Store<T>, seen: Set<unknown>): void {
   let isArray: boolean;
   let proto;
+  // check the same conditions as in `isWrappable` from `/packages/solid/store/src/store.ts`
   if (
     value != null &&
     typeof value === "object" &&
@@ -43,7 +38,8 @@ function deepTraverse<T>(value: Store<T>, seen: Set<unknown>): void {
       proto === Object.prototype)
   ) {
     seen.add(value);
-    for (const child of isArray ? (value as any[]) : Object.values(value))
-      deepTraverse(child, seen);
+    for (const child of isArray ? (value as any[]) : Object.values(value)) traverse(child, seen);
   }
 }
+
+export { trackDeep };

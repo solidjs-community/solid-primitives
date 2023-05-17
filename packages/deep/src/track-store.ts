@@ -64,8 +64,10 @@ function getTrackStoreNode(value: StoreNode): VoidFunction | undefined {
   return track;
 }
 
-export function trackStore<T extends object>(store: Store<T>): T {
+function trackStore<T extends object>(store: Store<T>): T {
   TrackVersion++;
   $TRACK in store && getTrackStoreNode(store)?.();
   return store;
 }
+
+export { trackStore };

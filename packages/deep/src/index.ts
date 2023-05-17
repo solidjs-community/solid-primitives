@@ -1,3 +1,2 @@
-export * from "./track-deep";
-export * from "./track-store";
-export * from "./diff-store";
+export { trackDeep } from "./track-deep";
+export { trackStore } from "./track-store";
