@@ -31,29 +31,29 @@ function createLazyMemo(calc: VoidFunction): VoidFunction {
   };
 }
 
-function getTrackStoreNode(value: StoreNode): VoidFunction | undefined {
-  let track = TrackStoreCache.get(value);
+function getTrackStoreNode(node: StoreNode): VoidFunction | undefined {
+  let track = TrackStoreCache.get(node);
 
   if (!track) {
     createRoot(() => {
-      const unwrapped = unwrap(value);
+      const unwrapped = unwrap(node);
 
       track = createLazyMemo(() => {
-        value[$TRACK];
+        node[$TRACK];
         for (const [key, child] of Object.entries(unwrapped)) {
-          let obj: StoreNode;
+          let childNode: StoreNode;
           if (
             child != null &&
             typeof child === "object" &&
-            ((obj = (child as any)[$PROXY]) ||
-              ((obj = untrack(() => (value as any)[key])) && $TRACK in obj))
+            ((childNode = (child as any)[$PROXY]) ||
+              ((childNode = untrack(() => (node as any)[key])) && $TRACK in childNode))
           ) {
-            getTrackStoreNode(obj)?.();
+            getTrackStoreNode(childNode)?.();
           }
         }
       });
 
-      TrackStoreCache.set(value, track);
+      TrackStoreCache.set(node, track);
     });
   }
 
