@@ -33,11 +33,12 @@ import { createGraphQLClient, gql, request } from "@solid-primitives/graphql";
 
 #### Using the client
 
-`createGraphQLClient` takes 3 arguments:
+`createGraphQLClient` takes 2 arguments:
 
 - `url` - target api endpoint, as string or signal
-- `headers` - _optional_, A list of request headers to supply the client
-- `fetchFn` - _optional_, A fetch function to replace the default one, that is Fetch API on browser and `node-fetch` on server.
+- `options` - _optional_, Options for the `fetch` function, `headers`, the `fetcher` method etc.
+  - `fetcher` - A fetch function to replace the default one, that is Fetch API on browser and `node-fetch` on server.
+  - `headers` - A headers object to be passed to the `fetch` function.
 
 ```ts
 import { createGraphQLClient, gql } from "@solid-primitives/graphql";
@@ -103,8 +104,10 @@ const [countries] = newQuery<{ countries: { name: string }[] }>(
   `,
   // no variables
   undefined,
-  // the initial value
-  { countries: [] },
+  // resource options with the initial value
+  {
+    initialValue: { countries: [] },
+  },
 );
 countries(); // T: { countries: { name: string }[] }
 ```
