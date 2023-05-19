@@ -1,12 +1,12 @@
 import { describe, test, expect } from "vitest";
 import { batch, createEffect, createRoot, createSignal } from "solid-js";
-import { createStoreDelta } from "../src";
+import { captureStoreUpdates } from "../src";
 import { createStore } from "solid-js/store";
 
 describe("createStoreDelta", () => {
   test("initial value", () => {
     const [sign] = createStore({ a: { "a.b": "thoughts" } });
-    const diff = createStoreDelta(sign);
+    const diff = captureStoreUpdates(sign);
 
     expect(diff()).toEqual([
       {
@@ -19,7 +19,7 @@ describe("createStoreDelta", () => {
   test("captures property change", () => {
     const captured: any[] = [];
     const [sign, set] = createStore({ a: { "a.b": "thoughts" }, b: "foo" });
-    const diff = createStoreDelta(sign);
+    const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
       createEffect(() => {
@@ -49,7 +49,7 @@ describe("createStoreDelta", () => {
   test("multiple changes", () => {
     const captured: any[] = [];
     const [sign, set] = createStore({ a: { ab: "thoughts" }, b: { ba: 1 } });
-    const diff = createStoreDelta(sign);
+    const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
       createEffect(() => {
@@ -78,7 +78,7 @@ describe("createStoreDelta", () => {
   test("ignore leafs on root changes", () => {
     const captured: any[] = [];
     const [sign, set] = createStore({ a: { "a.b": "thoughts" }, b: "foo" });
-    const diff = createStoreDelta(sign);
+    const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
       createEffect(() => {
@@ -103,7 +103,7 @@ describe("createStoreDelta", () => {
   test("returns empty array with no change", () => {
     const captured: any[] = [];
     const [sign] = createStore({ a: { "a.b": "thoughts" } });
-    const diff = createStoreDelta(sign);
+    const diff = captureStoreUpdates(sign);
     const [track, trigger] = createSignal(undefined, { equals: false });
 
     createRoot(() => {
@@ -121,7 +121,7 @@ describe("createStoreDelta", () => {
   test("adding new property", () => {
     const captured: any[] = [];
     const [sign, set] = createStore<any>({ a: { "a.b": "thoughts" } });
-    const diff = createStoreDelta(sign);
+    const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
       createEffect(() => {
@@ -142,7 +142,7 @@ describe("createStoreDelta", () => {
   test("removing property", () => {
     const captured: any[] = [];
     const [sign, set] = createStore({ a: { "a.b": "thoughts" }, b: "foo" as string | undefined });
-    const diff = createStoreDelta(sign);
+    const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
       createEffect(() => {
@@ -163,7 +163,7 @@ describe("createStoreDelta", () => {
   test("changing objects", () => {
     const captured: any[] = [];
     const [sign, set] = createStore({ a: { "a.b": "thoughts" } });
-    const diff = createStoreDelta(sign);
+    const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
       createEffect(() => {
@@ -184,7 +184,7 @@ describe("createStoreDelta", () => {
   test("array", () => {
     const captured: any[] = [];
     const [sign, set] = createStore({ a: { "a.b": "thoughts" }, b: ["foo"] });
-    const diff = createStoreDelta(sign);
+    const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
       createEffect(() => {
@@ -214,7 +214,7 @@ describe("createStoreDelta", () => {
   test("nested array", () => {
     const captured: any[] = [];
     const [sign, set] = createStore([{ n: 0 }, { n: 1 }]);
-    const diff = createStoreDelta(sign);
+    const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
       createEffect(() => {
@@ -235,7 +235,7 @@ describe("createStoreDelta", () => {
   test("circular reference", () => {
     const captured: any[] = [];
     const [sign, set] = createStore<any>({ a: { aa: "thoughts" } });
-    const diff = createStoreDelta(sign);
+    const diff = captureStoreUpdates(sign);
 
     createRoot(() => {
       createEffect(() => {

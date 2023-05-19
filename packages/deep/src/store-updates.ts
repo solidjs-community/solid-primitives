@@ -63,20 +63,18 @@ export type NestedUpdate<T> = {
   value: AllNestedObjects<T>;
 };
 
-export type StoreDelta<T> = NestedUpdate<T>[];
-
-type StoreDeltaCache = {
+type StoreUpdateCache = {
   [K in string | number]: {
     children: StoreNodeChildren;
-    record: StoreDeltaCache;
+    record: StoreUpdateCache;
   };
 };
 
-let CurrentDelta!: StoreDelta<any>;
+let CurrentUpdates!: NestedUpdate<any>[];
 let SeenNodes!: WeakSet<StoreNode>;
 
-function newCacheNode(children: StoreNodeChildren): StoreDeltaCache[number] {
-  const record: StoreDeltaCache = { ...children } as any;
+function newCacheNode(children: StoreNodeChildren): StoreUpdateCache[number] {
+  const record: StoreUpdateCache = { ...children } as any;
 
   for (const [key, node] of entries(children)) {
     if (SeenNodes.has(node)) continue;
@@ -89,7 +87,7 @@ function newCacheNode(children: StoreNodeChildren): StoreDeltaCache[number] {
 
 function compareStoreWithCache(
   node: StoreNode,
-  parent: StoreDeltaCache,
+  parent: StoreUpdateCache,
   key: string | number,
   path: (string | number)[],
 ): void {
@@ -105,11 +103,34 @@ function compareStoreWithCache(
     }
   } else {
     parent[key] = newCacheNode(children);
-    CurrentDelta.push({ path, value: node });
+    CurrentUpdates.push({ path, value: node });
   }
 }
 
-export function createStoreDelta<T extends Static>(store: T): () => StoreDelta<T> {
+/**
+ * Creates a function for tracking and capturing updates to a {@link store}.
+ *
+ * Each execution of the returned function will return an array of updates to the store since the last execution.
+ *
+ * @param store - The store to track.
+ * @returns A function that returns an array of updates to the store since the last execution.
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/deep#captureStoreUpdates
+ *
+ * @example
+ * ```ts
+ * const [state, setState] = createStore({ todos: [] });
+ *
+ * const getDelta = captureStoreUpdates(state);
+ *
+ * getDelta(); // [{ path: [], value: { todos: [] } }]
+ *
+ * setState("todos", ["foo"]);
+ *
+ * getDelta(); // [{ path: ["todos"], value: ["foo"] }]
+ * ```
+ */
+export function captureStoreUpdates<T extends Static>(store: T): () => NestedUpdate<T>[] {
   // on the server you cannot check if the passed object is a store
   // so we just return the whole store always
   if (isServer || !($TRACK in store)) {
@@ -122,15 +143,15 @@ export function createStoreDelta<T extends Static>(store: T): () => StoreDelta<T
     return () => (init ? ((init = false), [{ path: [], value: store as any }]) : []);
   }
 
-  const cache: StoreDeltaCache = {};
+  const cache: StoreUpdateCache = {};
 
   return () => {
     // set globals before each cycle
-    CurrentDelta = [];
+    CurrentUpdates = [];
     SeenNodes = new WeakSet();
 
     compareStoreWithCache(store, cache, "root", []);
 
-    return CurrentDelta;
+    return CurrentUpdates;
   };
 }

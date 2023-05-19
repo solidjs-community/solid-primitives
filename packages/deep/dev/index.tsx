@@ -1,6 +1,6 @@
-import { createSignal, For, createMemo, untrack, onMount } from "solid-js";
+import { For, createMemo } from "solid-js";
 import { createStore, produce } from "solid-js/store";
-import { createStoreDelta } from "../src";
+import { captureStoreUpdates } from "../src";
 
 type TodoItem = { title: string; done: boolean };
 
@@ -10,7 +10,7 @@ const App = () => {
     todos: [] as TodoItem[],
   });
 
-  const updates = createMemo(createStoreDelta(state));
+  const updates = createMemo(captureStoreUpdates(state));
 
   return (
     <div class="my-32 grid gap-8" style={`grid-template-columns: 1fr 1fr`}>
