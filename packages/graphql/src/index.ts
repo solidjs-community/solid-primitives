@@ -50,7 +50,7 @@ export const createGraphQLClient =
         const variables = typeof vars === "boolean" ? {} : vars;
         return request(access(url), query, { ...options, variables });
       },
-      { initialValue },
+      initialValue !== undefined ? { initialValue } : undefined,
     );
 
 /**
