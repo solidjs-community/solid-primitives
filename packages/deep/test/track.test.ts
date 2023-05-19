@@ -1,21 +1,28 @@
 import { describe, test, expect } from "vitest";
 import { batch, createEffect, createRoot, createSignal } from "solid-js";
-import { trackDeep, trackStore } from "../src";
+import { captureStoreUpdates, trackDeep, trackStore } from "../src";
 import { createStore, reconcile, unwrap } from "solid-js/store";
 
-const fns = [trackDeep, trackStore];
+const fns = {
+  trackDeep: store => () => trackDeep(store),
+  trackStore: store => () => trackStore(store),
+  captureUpdates: captureStoreUpdates,
+} as const satisfies Record<string, (store: any) => () => void>;
+type FnKeys = keyof typeof fns;
 
-const worksWithPOJO = [trackDeep];
+const worksWithPOJO: FnKeys[] = ["trackDeep"];
 
-for (const fn of fns) {
-  describe(fn.name, () => {
+for (const [fnName, createFn] of Object.entries(fns) as [FnKeys, (typeof fns)[FnKeys]][]) {
+  describe(fnName, () => {
     test("captures property change", () => {
       const [sign, set] = createStore({ a: { "a.b": "thoughts" }, b: "foo" });
+
+      const fn = createFn(sign);
 
       let runs = 0;
       createRoot(() => {
         createEffect(() => {
-          fn(sign);
+          fn();
           runs++;
         });
       });
@@ -31,15 +38,16 @@ for (const fn of fns) {
 
     test("multiple effects", () => {
       const [sign, set] = createStore({ a: { "a.b": "thoughts" }, b: "foo" });
+      const fn = createFn(sign);
 
       let runs = 0;
       createRoot(() => {
         createEffect(() => {
-          fn(sign);
+          fn();
           runs++;
         });
         createEffect(() => {
-          fn(sign);
+          fn();
           runs++;
         });
       });
@@ -55,11 +63,12 @@ for (const fn of fns) {
 
     test("multiple changes", () => {
       const [sign, set] = createStore({ a: { "a.b": "thoughts" }, b: "foo" });
+      const fn = createFn(sign);
 
       let runs = 0;
       createRoot(() => {
         createEffect(() => {
-          fn(sign);
+          fn();
           runs++;
         });
       });
@@ -74,11 +83,12 @@ for (const fn of fns) {
 
     test("adding new property", () => {
       const [sign, set] = createStore<any>({ a: { "a.b": "thoughts" } });
+      const fn = createFn(sign);
 
       let runs = 0;
       createRoot(() => {
         createEffect(() => {
-          fn(sign);
+          fn();
           runs++;
         });
       });
@@ -90,11 +100,12 @@ for (const fn of fns) {
 
     test("removing property", () => {
       const [sign, set] = createStore({ a: { "a.b": "thoughts" }, b: "foo" as string | undefined });
+      const fn = createFn(sign);
 
       let runs = 0;
       createRoot(() => {
         createEffect(() => {
-          fn(sign);
+          fn();
           runs++;
         });
       });
@@ -106,11 +117,12 @@ for (const fn of fns) {
 
     test("changing objects", () => {
       const [sign, set] = createStore({ a: { "a.b": "thoughts" } });
+      const fn = createFn(sign);
 
       let runs = 0;
       createRoot(() => {
         createEffect(() => {
-          fn(sign);
+          fn();
           runs++;
         });
       });
@@ -125,11 +137,12 @@ for (const fn of fns) {
 
     test("array reorder", () => {
       const [sign, set] = createStore({ a: [1, 2, 3] });
+      const fn = createFn(sign);
 
       let runs = 0;
       createRoot(() => {
         createEffect(() => {
-          fn(sign);
+          fn();
           runs++;
         });
       });
@@ -142,11 +155,12 @@ for (const fn of fns) {
     test("circular reference", () => {
       const [sign, set] = createStore<any>({ a: { "a.b": "thoughts" } });
       set("a", { "a.a": sign });
+      const fn = createFn(sign);
 
       let rootRuns = 0;
       createRoot(() => {
         createEffect(() => {
-          fn(sign);
+          fn();
           rootRuns++;
         });
       });
@@ -154,8 +168,9 @@ for (const fn of fns) {
       let leafRuns = 0;
       createRoot(() => {
         const a = sign.a;
+        const fn = createFn(a);
         createEffect(() => {
-          fn(a);
+          fn();
           leafRuns++;
         });
       });
@@ -173,13 +188,14 @@ for (const fn of fns) {
 
     test("doesn't trigger on unrelated changes", () => {
       const [sign, set] = createStore<any>({ a: { "a.b": "thoughts" } });
+      const fn = createFn(sign);
 
       let runs = 0;
       createRoot(() => {
-        createEffect(() => fn(sign));
+        createEffect(() => fn);
         const a = sign.a;
         createEffect(() => {
-          fn(a);
+          createFn(a);
           runs++;
         });
       });
@@ -191,11 +207,12 @@ for (const fn of fns) {
 
     test("reconcile", () => {
       const [sign, set] = createStore<any>({ a: { "a.b": "thoughts" } });
+      const fn = createFn(sign);
 
       let runs = 0;
       createRoot(() => {
         createEffect(() => {
-          fn(sign);
+          fn();
           runs++;
         });
       });
@@ -211,11 +228,12 @@ for (const fn of fns) {
     test("unwrapped", () => {
       const [sign, set] = createStore({ a: { "a.b": "thoughts" } });
       const unwrapped = unwrap(sign);
+      const fn = createFn(unwrapped);
 
       let runs = 0;
       createRoot(() => {
         createEffect(() => {
-          fn(unwrapped);
+          fn();
           runs++;
         });
       });
@@ -227,18 +245,19 @@ for (const fn of fns) {
 
     test("traversing POJOs", () => {
       const [sign, set] = createStore({ a: { "a.b": "thoughts" } });
+      const fn = createFn({ sign });
 
       let runs = 0;
       createRoot(() => {
         createEffect(() => {
-          fn({ sign });
+          fn();
           runs++;
         });
       });
       expect(runs).toBe(1);
 
       set("a", "a.b", "minds");
-      expect(runs).toBe(worksWithPOJO.includes(fn) ? 2 : 1);
+      expect(runs).toBe(worksWithPOJO.includes(fnName) ? 2 : 1);
     });
 
     test("getters", () => {
@@ -249,10 +268,12 @@ for (const fn of fns) {
         },
       });
 
+      const fn = createFn(sign);
+
       let runs = 0;
       createRoot(() => {
         createEffect(() => {
-          fn(sign);
+          fn();
           runs++;
         });
       });
