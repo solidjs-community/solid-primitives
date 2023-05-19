@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mutation-observer",
-  "version": "1.1.12",
+  "version": "1.1.13",
   "description": "Primitive providing the ability to watch for changes made to the DOM tree.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -41,7 +41,6 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "dev": "vite -r ./dev/ -c ./dev/vite.config.ts",
     "dev": "jiti ../../scripts/dev.ts",
     "build": "jiti ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",

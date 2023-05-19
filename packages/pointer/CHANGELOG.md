@@ -1,5 +1,14 @@
 # @solid-primitives/pointer
 
+## 0.2.14
+
+### Patch Changes
+
+- Updated dependencies [3c007b92]
+  - @solid-primitives/utils@6.2.0
+  - @solid-primitives/event-listener@2.2.13
+  - @solid-primitives/rootless@1.4.1
+
 ## 0.2.13
 
 ### Patch Changes

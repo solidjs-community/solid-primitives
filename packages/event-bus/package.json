@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-bus",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A collection of SolidJS primitives providing various features of a pubsub/event-emitter/event-bus.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
