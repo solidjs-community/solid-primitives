@@ -15,7 +15,7 @@
     "skipLibCheck": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["node"]
+    "types": ["node", "vite/client"]
   },
   "exclude": ["node_modules", "dist"]
 }
