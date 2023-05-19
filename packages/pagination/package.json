@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/pagination",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "A primitive that creates all the reactive data to manage your pagination.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [

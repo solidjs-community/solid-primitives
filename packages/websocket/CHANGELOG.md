@@ -1,5 +1,11 @@
 # @solid-primitives/websocket
 
+## 1.1.0
+
+### Minor Changes
+
+- eb3e9a2d: ready state signal for websockets
+
 ## 1.0.0
 
 ### Major Changes

@@ -1,5 +1,23 @@
 # @solid-primitives/graphql
 
+## 2.0.0
+
+### Major Changes
+
+- 58c3c43d: **Breaking:** The query primitive now accepts a `ResourceOptions` object, instead of just `initialValue`.
+
+  Changes to `url` or `options` will invalidate the resource now. Fixes #328
+
+  Changes `@graphql-typed-document-node/core` and `graphql` to be peer dependencies.
+
+## 1.5.9
+
+### Patch Changes
+
+- c4fd5890: fix resource states by omitting `initialValue` option if passed `undefined`
+- Updated dependencies [3c007b92]
+  - @solid-primitives/utils@6.2.0
+
 ## 1.5.8
 
 ### Patch Changes

@@ -1,7 +1,13 @@
-import { createResource, ResourceReturn } from "solid-js";
-import { DocumentNode, print } from "graphql";
-import { TypedDocumentNode } from "@graphql-typed-document-node/core";
-import { access, FalsyValue, MaybeAccessor, Modify } from "@solid-primitives/utils";
+import {
+  createResource,
+  type InitializedResourceOptions,
+  type NoInfer,
+  type ResourceOptions,
+  type ResourceReturn,
+} from "solid-js";
+import { print, type DocumentNode } from "graphql";
+import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
+import { asAccessor, type MaybeAccessor, type Modify } from "@solid-primitives/utils";
 
 export type RequestHeaders = { [key: string]: string };
 
@@ -14,17 +20,32 @@ export type RequestOptions<V extends object = {}> = Modify<
   }
 >;
 
+export type GraphQLResourceSource<V extends object = {}> = {
+  url: string;
+  options: RequestOptions<V>;
+};
+
+/**
+ * A function returned by {@link createGraphQLClient}.
+ * It wraps {@link createResource} and performs a GraphQL fetch to endpoint form the client.
+ *
+ * @param query GraphQL query string *(use {@link gql} function or `DocumentNode`/`TypedDocumentNode` type)*
+ * @param variables variables for the GraphQL query
+ * @param options options passed to {@link createResource}
+ */
 export type GraphQLClientQuery = {
-  <T = unknown, V extends object = {}>(
-    query: string | DocumentNode | TypedDocumentNode<T, V>,
-    variables: MaybeAccessor<V | FalsyValue> | undefined,
-    initialValue: T,
-  ): ResourceReturn<T>;
-  <T = unknown, V extends object = {}>(
-    query: string | DocumentNode | TypedDocumentNode<T, V>,
-    variables?: MaybeAccessor<V | FalsyValue>,
-    initialValue?: undefined,
-  ): ResourceReturn<T | undefined>;
+  // initialized
+  <TResult = unknown, TVariables extends object = {}>(
+    query: string | DocumentNode | TypedDocumentNode<TResult, TVariables>,
+    variables: MaybeAccessor<TVariables | false | undefined | null> | undefined,
+    options: InitializedResourceOptions<NoInfer<TResult>, GraphQLResourceSource<TVariables>>,
+  ): ResourceReturn<TResult>;
+  // not initialized
+  <TResult = unknown, TVariables extends object = {}>(
+    query: string | DocumentNode | TypedDocumentNode<TResult, TVariables>,
+    variables?: MaybeAccessor<TVariables | false | undefined | null>,
+    options?: ResourceOptions<NoInfer<TResult>, GraphQLResourceSource<TVariables>>,
+  ): ResourceReturn<TResult | undefined>;
 };
 
 /**
@@ -42,16 +63,25 @@ export type GraphQLClientQuery = {
  * ```
  */
 export const createGraphQLClient =
-  (url: MaybeAccessor<string>, options?: Omit<RequestOptions, "variables">): GraphQLClientQuery =>
-  (query, variables: any = {}, initialValue) =>
-    createResource(
-      () => access(variables),
-      (vars: any) => {
-        const variables = typeof vars === "boolean" ? {} : vars;
-        return request(access(url), query, { ...options, variables });
+  (
+    url: MaybeAccessor<string>,
+    options: MaybeAccessor<Omit<RequestOptions, "variables">> = {},
+  ): GraphQLClientQuery =>
+  (query, variables: any = {}, resourceOptions) => {
+    const getUrl = asAccessor(url),
+      getVariables = asAccessor(variables),
+      getOptions = asAccessor(options);
+    return createResource(
+      () => {
+        const url = getUrl(),
+          variables = getVariables(),
+          options = getOptions();
+        return url && variables && { url, options: { ...options, variables } };
       },
-      { initialValue },
+      ({ url, options }) => request(url, query, options),
+      resourceOptions,
     );
+  };
 
 /**
  * Performs a GraphQL fetch to provided endpoint.

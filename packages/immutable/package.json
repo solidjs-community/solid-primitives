@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/immutable",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Primitive for rectifying immutable values and dealing with immutability in Solid.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],

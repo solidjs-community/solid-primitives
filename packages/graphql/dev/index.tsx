@@ -1,4 +1,4 @@
-import { Component, createSignal, Show, For } from "solid-js";
+import { Component, createSignal, Show, For, Suspense } from "solid-js";
 
 import { gql, createGraphQLClient, request, multipartRequest } from "../src";
 import { CountryQueryDocument } from "./gqlgen";
@@ -40,7 +40,7 @@ const App: Component = () => {
     () => ({
       code: code(),
     }),
-    { country: { name: "loading..." } },
+    { initialValue: { country: { name: "loading..." } } },
   );
 
   // Send a simple mutation with the multipart option. This will never work with the
@@ -68,22 +68,26 @@ const App: Component = () => {
       <h3>Get country by code</h3>
       <input value={code()} oninput={e => setCode(e.currentTarget.value.toUpperCase())}></input>
       <h4>
-        <Show when={countryData()?.country?.name} fallback="not found">
-          <p>{countryData()!.country!.name}</p>
-        </Show>
+        <Suspense fallback="loading country name...">
+          <Show when={countryData()?.country?.name} fallback="not found">
+            <p>{countryData()!.country!.name}</p>
+          </Show>
+        </Suspense>
       </h4>
       <h3>Countries:</h3>
-      <Show when={countriesData()}>
-        <ul>
-          <For each={countriesData()!.countries}>
-            {country => (
-              <li>
-                {country.code} - {country.name}
-              </li>
-            )}
-          </For>
-        </ul>
-      </Show>
+      <Suspense fallback="loading countries...">
+        <Show when={countriesData()}>
+          <ul>
+            <For each={countriesData()!.countries}>
+              {country => (
+                <li>
+                  {country.code} - {country.name}
+                </li>
+              )}
+            </For>
+          </ul>
+        </Show>
+      </Suspense>
     </div>
   );
 };

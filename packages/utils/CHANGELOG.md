@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 6.2.0
+
+### Minor Changes
+
+- 3c007b92: Add more of common constants to utils
+
 ## 6.1.1
 
 ### Patch Changes
