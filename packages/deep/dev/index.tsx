@@ -69,22 +69,14 @@ const App = () => {
       <div style={`min-width: `}>
         <h3>Latest updates:</h3>
         <ol>
-          {untrack(() => {
-            const [mounted, setMounted] = createSignal(false);
-            onMount(() => setMounted(true));
-            return (
-              <>
-                {updates().map(update => (
-                  <li class="mt-2 w-fit rounded bg-slate-600 p-2">
-                    <div>Path: {JSON.stringify(update.path, null, 2)}</div>
-                    <div>
-                      Value: <pre>{JSON.stringify(update.value, null, 2)}</pre>
-                    </div>
-                  </li>
-                ))}
-              </>
-            );
-          })}
+          {updates().map(update => (
+            <li class="mt-2 w-fit rounded bg-slate-600 p-2">
+              <div>Path: {JSON.stringify(update.path, null, 2)}</div>
+              <div>
+                Value: <pre>{JSON.stringify(update.value, null, 2)}</pre>
+              </div>
+            </li>
+          ))}
         </ol>
       </div>
     </div>
