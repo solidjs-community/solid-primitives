@@ -231,4 +231,25 @@ describe("createStoreDelta", () => {
       },
     ] satisfies ReturnType<typeof diff>);
   });
+
+  test("circular reference", () => {
+    const captured: any[] = [];
+    const [sign, set] = createStore<any>({ a: { aa: "thoughts" } });
+    const diff = createStoreDelta<typeof sign>();
+
+    createRoot(() => {
+      createEffect(() => {
+        captured.push(diff(sign));
+      });
+    });
+
+    set("a", "ab", sign);
+    expect(captured).toHaveLength(2);
+    expect(captured[1]).toEqual([
+      {
+        path: ["a"],
+        value: sign.a,
+      },
+    ] satisfies ReturnType<typeof diff>);
+  });
 });
