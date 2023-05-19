@@ -1,7 +1,7 @@
 {
   "name": "@solid-primitives/deep",
   "version": "0.0.102",
-  "description": "Deep trigger effects for Stores.",
+  "description": "Primitives for tracking and observing nested reactive objects in Solid.",
   "author": "Samuel Burbano <me@iosamuel.dev>",
   "contributors": [
     "Damian Tarnawski <gthetarnav@gmail.com>"
@@ -20,7 +20,8 @@
     "stage": 1,
     "list": [
       "trackDeep",
-      "trackStore"
+      "trackStore",
+      "captureStoreUpdates"
     ],
     "category": "Reactivity"
   },
@@ -29,7 +30,8 @@
     "primitives",
     "deep",
     "store",
-    "reactivity"
+    "reactivity",
+    "delta"
   ],
   "private": false,
   "sideEffects": false,

@@ -9,10 +9,11 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/deep?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/deep)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Primitives for tracking changes in stores.
+Primitives for tracking and observing nested reactive objects in Solid.
 
 - [`trackDeep`](#trackDeep) - Tracks all properties of a store by iterating over them recursively.
 - [`trackStore`](#trackStore) - A more performant alternative to `trackDeep` utilizing specific store implementations.
+- [`captureStoreUpdates`](#captureStoreUpdates) - A utility function that captures all updates to a store and returns them as an array.
 
 ## Installation
 
@@ -97,6 +98,64 @@ createEffect(() => {
   /* execute some logic whenever the state changes */
 });
 ```
+
+## `captureStoreUpdates`
+
+Creates a function for tracking and capturing updates to a store.
+
+It could be useful for implementing [undo/redo functionality](https://primitives.solidjs.community/package/history) or for turning a store into a immutable stream of updates.
+
+### How to use it
+
+Each execution of the returned function will return an array of updates to the store since the last execution.
+
+```ts
+const [state, setState] = createStore({ todos: [] });
+
+const getDelta = captureStoreUpdates(state);
+
+getDelta(); // [{ path: [], value: { todos: [] } }]
+
+setState("todos", ["foo"]);
+
+getDelta(); // [{ path: ["todos"], value: ["foo"] }]
+```
+
+The returned function will track all updates to a store (just like [`trackStore`](#trackStore)), so it can be used inside a tracking scope.
+
+```ts
+const [state, setState] = createStore({ todos: [] });
+
+const getDelta = captureStoreUpdates(state);
+
+createEffect(() => {
+  const delta = getDelta();
+  /* execute some logic whenever the state changes */
+  console.log(delta);
+});
+```
+
+The returned function is not a signal - it won't get updated by itself, it has to be called manually, or under a tracking scope to capture new updates.
+
+But it can be turned into a signal by using `createMemo`:
+
+```ts
+const [state, setState] = createStore({ todos: [] });
+
+const delta = createMemo(captureStoreUpdates(state));
+
+// both of these effects will receive the same delta
+createEffect(() => {
+  console.log(delta());
+});
+createEffect(() => {
+  console.log(delta());
+});
+```
+
+### Demo
+
+See a demo of this primitive in action [here](https://primitives.solidjs.community/playground/deep).
 
 ## Changelog
 
