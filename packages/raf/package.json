@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/raf",
-  "version": "2.1.11",
+  "version": "2.1.12",
   "description": "Primitive that facilitates RAF functionality",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [

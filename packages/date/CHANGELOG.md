@@ -1,5 +1,13 @@
 # @solid-primitives/date
 
+## 2.0.14
+
+### Patch Changes
+
+- Updated dependencies [3c007b92]
+  - @solid-primitives/utils@6.2.0
+  - @solid-primitives/memo@1.3.1
+
 ## 2.0.13
 
 ### Patch Changes

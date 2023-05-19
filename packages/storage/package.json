@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/storage",
-  "version": "1.3.10",
+  "version": "1.3.11",
   "description": "Primitive that provides reactive wrappers for storage access",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [

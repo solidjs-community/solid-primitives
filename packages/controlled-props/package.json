@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/controlled-props",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "The primitives in this package allow you to create controlls for component props.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [],

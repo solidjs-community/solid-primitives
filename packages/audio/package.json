@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/audio",
-  "version": "1.3.12",
+  "version": "1.3.13",
   "description": "Primitives to manage audio and single sounds.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
