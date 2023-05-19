@@ -1,6 +1,7 @@
 import { createLazyMemo } from "@solid-primitives/memo";
 import { $PROXY, $TRACK, Accessor, createRoot, untrack } from "solid-js";
 import { unwrap } from "solid-js/store";
+import { isDev } from "solid-js/web";
 
 type Static<T = unknown> = { [K in number | string]: T } | T[];
 
@@ -108,15 +109,24 @@ function compareStoreWithCache(
   }
 }
 
-export function createStoreDelta<T extends Static>(): (store: T) => StoreDelta<T> {
+export function createStoreDelta<T extends Static>(store: T): () => StoreDelta<T> {
+  if (!($TRACK in store)) {
+    if (isDev) {
+      // eslint-disable-next-line no-console
+      console.warn("createStoreDelta expects a store, got", store);
+    }
+
+    return () => [];
+  }
+
   const cache: StoreDeltaCache = {};
 
-  return (store: T) => {
+  return () => {
     // set globals before each cycle
     CurrentDelta = [];
     SeenNodes = new WeakSet();
 
-    $TRACK in store && compareStoreWithCache(store, cache, "root", []);
+    compareStoreWithCache(store, cache, "root", []);
 
     return CurrentDelta;
   };
