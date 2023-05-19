@@ -1,7 +1,7 @@
 import { createLazyMemo } from "@solid-primitives/memo";
 import { $PROXY, $TRACK, Accessor, createRoot, untrack } from "solid-js";
 import { unwrap } from "solid-js/store";
-import { isDev } from "solid-js/web";
+import { isDev, isServer } from "solid-js/web";
 
 type Static<T = unknown> = { [K in number | string]: T } | T[];
 
@@ -110,13 +110,16 @@ function compareStoreWithCache(
 }
 
 export function createStoreDelta<T extends Static>(store: T): () => StoreDelta<T> {
-  if (!($TRACK in store)) {
+  // on the server you cannot check if the passed object is a store
+  // so we just return the whole store always
+  if (isServer || !($TRACK in store)) {
     if (isDev) {
       // eslint-disable-next-line no-console
       console.warn("createStoreDelta expects a store, got", store);
     }
 
-    return () => [];
+    let init = true;
+    return () => (init ? ((init = false), [{ path: [], value: store as any }]) : []);
   }
 
   const cache: StoreDeltaCache = {};
