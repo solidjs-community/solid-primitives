@@ -234,4 +234,57 @@ describe("createUndoHistory", () => {
       dispose();
     });
   });
+
+  test("pausing tracking", () => {
+    createRoot(dispose => {
+      const [count, setCount] = createSignal(0);
+      const [track, setTrack] = createSignal(true);
+
+      const history = createUndoHistory(() => {
+        if (track()) {
+          const v = count();
+          return () => setCount(v);
+        }
+      });
+
+      setCount(1);
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(false);
+
+      setTrack(false); // disable tracking
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(false);
+
+      setCount(2); // will NOT create a point in history
+      setCount(3); // will NOT create a point in history
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(false);
+
+      setTrack(true); // enable tracking, and create a point in history for the last change
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(false);
+
+      history.undo(); // will set count to 1
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(true);
+      expect(count()).toBe(1);
+
+      history.undo(); // will set count to 0
+      expect(history.canUndo()).toBe(false);
+      expect(history.canRedo()).toBe(true);
+      expect(count()).toBe(0);
+
+      history.redo(); // will set count to 1
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(true);
+      expect(count()).toBe(1);
+
+      history.redo(); // will set count to 3
+      expect(history.canUndo()).toBe(true);
+      expect(history.canRedo()).toBe(false);
+      expect(count()).toBe(3);
+
+      dispose();
+    });
+  });
 });

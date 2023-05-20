@@ -71,7 +71,7 @@ export type UndoHistoryReturn = {
  * ```
  */
 export function createUndoHistory(
-  source: Many<Accessor<VoidFunction>>,
+  source: Many<Accessor<VoidFunction | false | undefined | null>>,
   options?: UndoHistoryOptions,
 ): UndoHistoryReturn {
   if (isServer) {
@@ -91,9 +91,13 @@ export function createUndoHistory(
     history = createMemo<{ count: Signal<number>; list: VoidFunction[][] }>(
       p => {
         // always track the sources
-        const setters = sources.map(s => s());
+        const setters: VoidFunction[] = [];
+        for (const s of sources) {
+          const setter = s();
+          if (setter) setters.push(setter);
+        }
 
-        if (ignoreNext) {
+        if (ignoreNext || !setters.length) {
           ignoreNext = false;
           return p;
         }
