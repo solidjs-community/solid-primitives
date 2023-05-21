@@ -13,6 +13,7 @@ A set of primitives for Solid Start
 
 - [`createServerCookie`](#createservercookie) - Provides a getter and setter for a reactive cookie, which works isomorphically.
 - [`createUserTheme`](#createusertheme) - Creates a Server Cookie providing a type safe way to store a theme and access it on the server or client.
+- [`useUserAgent`](#useuseragent) - Creates a Server Cookie providing a type safe way to store a theme and access it on the server or client.
 
 ## Installation
 
@@ -64,6 +65,14 @@ const [theme, setTheme] = createUserTheme("cookieName", {
 });
 
 theme(); // => "light" | "dark"
+```
+
+## `useUserAgent`
+
+Provides the value of the `userAgent` string isomorphically on the client or server
+
+```ts
+const userAgent: string | null = useUserAgent();
 ```
 
 ## Demo
