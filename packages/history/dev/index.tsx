@@ -1,5 +1,4 @@
 import { Component, JSX, createSignal } from "solid-js";
-import { render } from "solid-js/web";
 
 import { createUndoHistory } from "../src";
 
@@ -23,22 +22,23 @@ const Button = (props: {
 const App: Component = () => {
   const [a, setA] = createSignal(0);
   const [b, setB] = createSignal(0);
+  const [tracking, setTracking] = createSignal(true);
 
   const history = createUndoHistory(
-    // createMultiHistorySource(
     (
       [
         ["a", a, setA],
         ["b", b, setB],
       ] as const
     ).map(([name, get, set]) => () => {
-      const v = get();
-      return () => {
-        console.log("set", name, v);
-        set(v);
-      };
+      if (tracking()) {
+        const v = get();
+        return () => {
+          console.log("set", name, v);
+          set(v);
+        };
+      }
     }),
-    // ),
   );
 
   return (
@@ -52,6 +52,9 @@ const App: Component = () => {
           </Button>
           <Button onClick={() => setB(p => p + 1)} onRightClick={() => setB(p => p - 1)}>
             B: {b()}
+          </Button>
+          <Button onClick={() => setTracking(p => !p)} onRightClick={() => setTracking(p => !p)}>
+            Tracking: {tracking() ? "ON" : "OFF"}
           </Button>
         </div>
       </div>
