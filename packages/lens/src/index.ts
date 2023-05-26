@@ -43,6 +43,31 @@ type Test2 = EvaluatePath<{ a: { b: { c: number } } }, ["a", "b"]>;
 type Test3 = EvaluatePath<{ a: { b: { c: number } } }, ["a"]>;
 type Test4 = EvaluatePath<{ a: { b: { c: number } } }, []>;
 
+type PathSegment<T> = T extends Record<PropertyKey, unknown> ? keyof T : never;
+
+/**
+ * Returns path P unaltered if it is valid on object T, otherwise returns never.
+ *
+ * By only evaluating options for the very last path segment, it avoids an
+ * exhaustive tree search to generate all possible paths. Intellisense still
+ * works for the last parameter in the chain. If there is a type error, the
+ * whole chain will show as invalid (`never` type).
+ */
+type ValidPath<T, P extends Path> = P extends []
+  ? P
+  : P extends [...infer K, infer Last]
+  ? K extends Path
+    ? Last extends PathSegment<EvaluatePath<T, K>>
+      ? P
+      : never
+    : never
+  : never;
+
+type Test5 = ValidPath<{ a: { b: { c: number } } }, ["a", "b", "c"]>; // ["a", "b", "c"]
+type Test6 = ValidPath<{ a: { b: { c: number } } }, ["a", "b", "c", "d"]>; // never
+
+type Test7 = ValidPath<{ a: { b: { c: { d: 0 } } } }, ["a"]>;
+
 type FocusedSetter<T, P extends Path> = <P2 extends Path>(
   ...args: [...P2, EvaluatePath<EvaluatePath<T, P>, P2>]
 ) => void;
@@ -85,7 +110,7 @@ const [store, setStore] = createStore({ a: { b: { c: { d: 0 } } } });
 setStore("a", "b", "c", "d", 1);
 
 const [lens, setLens] = createLens([store, setStore], "a");
-setLens("b", "c", "d", 2);
+setLens("b", "c", "d", 1);
 
 // Tradeoff: no intellisense for path segments
 
