@@ -61,6 +61,7 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
+    "@solid-primitives/deep": "workspace:^",
     "solid-js": "1.7.5"
   }
 }

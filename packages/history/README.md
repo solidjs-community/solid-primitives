@@ -83,6 +83,25 @@ const history = createUndoHistory(() => {
 });
 ```
 
+To use `stricturedClone` instead of `JSON.parse(JSON.stringify())`, you can use the [`trackStore` utility from `@solid-primitives/deep`](https://primitives.solidjs.community/package/deep#trackstore):
+
+```ts
+import { trackStore } from "@solid-primitives/deep";
+
+const history = createUndoHistory(() => {
+  // track any update to the store
+  trackStore(state);
+  // clone the object underneath the store
+  const copy = stricturedClone(unwrap(state));
+  // reconcile the state back to the tracked value
+  return () => setState(reconcile(copy));
+});
+```
+
+To clone only the parts of the store that changed, you can use the [`captureStoreUpdates` utility from `@solid-primitives/deep`](https://primitives.solidjs.community/package/deep#captureStoreUpdates). This is useful for large stores where you want to avoid unnecessary cloning and reconciliation.
+
+The code for this example you'll find [in the source code of the DEMO](https://github.com/solidjs-community/solid-primitives/blob/main/packages/history/dev/index.tsx).
+
 ### Observing multiple sources
 
 You can track as many signals in the `source` callback as you want. Then any updates will create a point in history for all of them.

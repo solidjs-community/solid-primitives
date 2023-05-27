@@ -66,7 +66,7 @@ const App = () => {
           )}
         </For>
       </div>
-      <div style={`min-width: `}>
+      <div>
         <h3>Latest updates:</h3>
         <ol>
           {updates().map(update => (
