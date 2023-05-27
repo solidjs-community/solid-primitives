@@ -40,7 +40,7 @@ You can call this function with any store under a tracking scope and it will ite
 ```ts
 import { trackDeep } from "@solid-primitives/deep";
 
-const [state, setState] = createSignal({ name: "John", age: 42 });
+const [state, setState] = createStore({ name: "John", age: 42 });
 
 createEffect(() => {
   trackDeep(state);
@@ -91,7 +91,7 @@ It can be used in almost the same way as `trackDeep`, the only difference is tha
 ```ts
 import { trackStore } from "@solid-primitives/deep";
 
-const [state, setState] = createSignal({ name: "John", age: 42 });
+const [state, setState] = createStore({ name: "John", age: 42 });
 
 createEffect(() => {
   trackStore(state);

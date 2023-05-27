@@ -50,6 +50,7 @@
     },
     "require": "./dist/index.cjs"
   },
+  "typesVersions": {},
   "scripts": {
     "dev": "jiti ../../scripts/dev.ts",
     "build": "jiti ../../scripts/build.ts",
@@ -57,11 +58,13 @@
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
+  "dependencies": {
+    "@solid-primitives/memo": "workspace:^"
+  },
   "peerDependencies": {
     "solid-js": "^1.6.12"
   },
-  "typesVersions": {},
-  "dependencies": {
-    "@solid-primitives/memo": "workspace:^"
+  "devDependencies": {
+    "solid-js": "1.7.5"
   }
 }

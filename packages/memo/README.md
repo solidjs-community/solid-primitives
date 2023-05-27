@@ -105,6 +105,24 @@ setResult(5); // overwrites calculation result
 result(); // => 10
 ```
 
+### Props derived signals
+
+Using `createWritableMemo` will let you create a signal from a prop, that can be overwritten by a setter. This is useful for creating a signal from a prop, that can be used in a child component, but also be overwritten by a parent.
+
+```tsx
+const Child: Component<{ selectedId: string }> = props => {
+  const [selectedId, setSelectedId] = createWritableMemo(() => props.selectedId);
+
+  return (
+    <div>
+      <div>Selected id: {selectedId()}</div>
+      <button onClick={() => setSelectedId("1")}>Select 1</button>
+      <button onClick={() => setSelectedId("2")}>Select 2</button>
+    </div>
+  );
+};
+```
+
 ## `createLazyMemo`
 
 Lazily evaluated `createMemo`. Will run the calculation only if is being listened to.
