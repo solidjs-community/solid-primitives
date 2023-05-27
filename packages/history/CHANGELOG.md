@@ -1,5 +1,11 @@
 # @solid-primitives/history
 
+## 0.1.1
+
+### Patch Changes
+
+- 2c9d3238: Add `void` as a possible return type.
+
 ## 0.1.0
 
 ### Minor Changes
