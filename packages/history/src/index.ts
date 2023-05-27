@@ -71,7 +71,7 @@ export type UndoHistoryReturn = {
  * ```
  */
 export function createUndoHistory(
-  source: Many<Accessor<VoidFunction | false | undefined | null>>,
+  source: Many<Accessor<VoidFunction | false | undefined | null | void>>,
   options?: UndoHistoryOptions,
 ): UndoHistoryReturn {
   if (isServer) {
