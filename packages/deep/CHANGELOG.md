@@ -1,5 +1,11 @@
 # @solid-primitives/deep
 
+## 0.2.0
+
+### Minor Changes
+
+- 04e837cf: Add `captureStoreUpdates` primitive for tracking and capturing updates to a store.
+
 ## 0.1.0
 
 ### Minor Changes
