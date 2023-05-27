@@ -52,6 +52,7 @@
     "@types/leaflet": "^1.9.3",
     "leaflet": "^1.9.3",
     "mapbox-gl": "^2.14.1",
+    "solid-js": "1.7.3",
     "solid-map-gl": "^1.7.2",
     "vite-plugin-mkcert": "^1.14.0"
   },

@@ -62,6 +62,7 @@
   "devDependencies": {
     "@reduxjs/toolkit": "^1.9.3",
     "redux": "^4.2.1",
+    "solid-js": "1.7.3",
     "solid-transition-group": "^0.2.2"
   }
 }
