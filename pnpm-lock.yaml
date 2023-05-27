@@ -124,14 +124,15 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/analytics:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/audio:
@@ -142,21 +143,22 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       solid-heroicons:
         specifier: ^3.1.1
         version: 3.1.1(solid-js@1.7.3)
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/autofocus:
     dependencies:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/bounds:
@@ -173,18 +175,18 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@solid-primitives/scheduled':
         specifier: workspace:^
         version: link:../scheduled
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/broadcast-channel:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/clipboard:
@@ -192,8 +194,9 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/connectivity:
@@ -207,14 +210,15 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/context:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/controlled-props:
@@ -222,8 +226,9 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/cursor:
@@ -231,8 +236,9 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/date:
@@ -246,9 +252,6 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@solid-primitives/event-listener':
         specifier: workspace:^
@@ -256,14 +259,14 @@ importers:
       date-fns:
         specifier: ^2.29.3
         version: 2.29.3
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/deep:
-    dependencies:
-      '@solid-primitives/memo':
-        specifier: workspace:^
-        version: link:../memo
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/destructure:
@@ -271,14 +274,15 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/devices:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/event-bus:
@@ -286,14 +290,15 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/event-dispatcher:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/event-listener:
@@ -301,14 +306,15 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/event-props:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/fetch:
@@ -316,15 +322,12 @@ importers:
       node-fetch:
         specifier: ^3.3.1
         version: 3.3.1
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/filesystem:
-    dependencies:
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@tauri-apps/api':
         specifier: ^1.2.0
@@ -335,17 +338,20 @@ importers:
       chokidar:
         specifier: ^3.5.3
         version: 3.5.3
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/flux-store:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/fullscreen:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/geolocation:
@@ -356,9 +362,6 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@types/leaflet':
         specifier: ^1.9.3
@@ -369,6 +372,9 @@ importers:
       mapbox-gl:
         specifier: ^2.14.1
         version: 2.14.1
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
       solid-map-gl:
         specifier: ^1.7.2
         version: 1.7.2(mapbox-gl@2.14.1)
@@ -377,9 +383,9 @@ importers:
         version: 1.14.0(vite@4.2.1)
 
   packages/gestures:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/graphql:
@@ -387,9 +393,6 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@graphql-codegen/cli':
         specifier: ^3.3.0
@@ -409,14 +412,18 @@ importers:
       graphql:
         specifier: ^16.6.0
         version: 16.6.0
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/history:
     dependencies:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/i18n:
@@ -424,14 +431,15 @@ importers:
       '@solid-primitives/context':
         specifier: workspace:^
         version: link:../context
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/idle:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/immutable:
@@ -442,9 +450,6 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@reduxjs/toolkit':
         specifier: ^1.9.3
@@ -452,14 +457,17 @@ importers:
       redux:
         specifier: ^4.2.1
         version: 4.2.1
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
       solid-transition-group:
         specifier: ^0.2.2
         version: 0.2.2(solid-js@1.7.3)
 
   packages/input-mask:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/intersection-observer:
@@ -467,21 +475,22 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@solid-primitives/range':
         specifier: workspace:^
         version: link:../range
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/jsx-tokenizer:
     dependencies:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/keyboard:
@@ -495,15 +504,12 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/keyed:
-    dependencies:
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@solid-primitives/refs':
         specifier: workspace:^
@@ -511,6 +517,9 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
       solid-transition-group:
         specifier: ^0.2.2
         version: 0.2.2(solid-js@1.7.3)
@@ -522,9 +531,9 @@ importers:
         version: 1.7.3
 
   packages/lifecycle:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/map:
@@ -532,14 +541,15 @@ importers:
       '@solid-primitives/trigger':
         specifier: workspace:^
         version: link:../trigger
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/marker:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/masonry:
@@ -547,13 +557,13 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@solid-primitives/media':
         specifier: workspace:^
         version: link:../media
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/media:
     dependencies:
@@ -569,8 +579,9 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/memo:
@@ -581,9 +592,6 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@solid-primitives/mouse':
         specifier: workspace:^
@@ -591,6 +599,9 @@ importers:
       '@solidjs/router':
         specifier: ^0.8.2
         version: 0.8.2(solid-js@1.7.3)
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/mouse:
     dependencies:
@@ -606,26 +617,26 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@solid-primitives/raf':
         specifier: workspace:^
         version: link:../raf
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/mutation-observer:
     dependencies:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@solid-primitives/composites':
         specifier: ^1.1.1
         version: 1.1.1(solid-js@1.7.3)
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/page-visibility:
     dependencies:
@@ -638,8 +649,9 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/pagination:
@@ -647,20 +659,21 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/permission:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/platform:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/pointer:
@@ -674,8 +687,9 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/presence:
@@ -683,8 +697,9 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/promise:
@@ -692,8 +707,9 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/props:
@@ -701,21 +717,22 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       nanospy:
         specifier: ^0.5.0
         version: 0.5.0
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/raf:
     dependencies:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/range:
@@ -723,10 +740,10 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
       solid-transition-group:
         specifier: ^0.2.2
         version: 0.2.2(solid-js@1.7.3)
@@ -736,13 +753,13 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       solid-app-router:
         specifier: ^0.4.2
         version: 0.4.2(solid-js@1.7.3)
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
       solid-transition-group:
         specifier: ^0.2.2
         version: 0.2.2(solid-js@1.7.3)
@@ -761,14 +778,15 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/resource:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.0
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/rootless:
@@ -776,15 +794,12 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/scheduled:
-    dependencies:
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@solid-primitives/timer':
         specifier: workspace:^
@@ -792,11 +807,14 @@ importers:
       '@solidjs/router':
         specifier: ^0.8.2
         version: 0.8.2(solid-js@1.7.3)
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/script-loader:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/scroll:
@@ -810,14 +828,15 @@ importers:
       '@solid-primitives/static-store':
         specifier: workspace:^
         version: link:../static-store
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/selection:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/set:
@@ -825,14 +844,15 @@ importers:
       '@solid-primitives/trigger':
         specifier: workspace:^
         version: link:../trigger
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/share:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/signal-builders:
@@ -840,26 +860,29 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/start:
     dependencies:
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
       solid-start:
         specifier: ^0.2.26
         version: 0.2.26(@solidjs/meta@0.28.4)(@solidjs/router@0.8.2)(solid-js@1.7.3)(solid-start-static@0.2.26)(vite@4.2.1)
+    devDependencies:
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/static-store:
     dependencies:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/storage:
@@ -867,8 +890,9 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/stream:
@@ -876,8 +900,9 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/styles:
@@ -888,21 +913,18 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/timer:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/transition-group:
-    dependencies:
-      solid-js:
-        specifier: ^1.6.12
-        version: 1.7.3
     devDependencies:
       '@solid-primitives/refs':
         specifier: workspace:^
@@ -913,20 +935,24 @@ importers:
       '@solidjs/router':
         specifier: ^0.8.2
         version: 0.8.2(solid-js@1.7.3)
+      solid-js:
+        specifier: 1.7.3
+        version: 1.7.3
 
   packages/trigger:
     dependencies:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/tween:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/upload:
@@ -934,26 +960,27 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/utils:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/websocket:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   packages/workers:
-    dependencies:
+    devDependencies:
       solid-js:
-        specifier: ^1.6.12
+        specifier: 1.7.3
         version: 1.7.3
 
   site:

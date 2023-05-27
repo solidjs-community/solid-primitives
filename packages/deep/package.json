@@ -61,7 +61,7 @@
     "solid-js": "^1.6.12"
   },
   "typesVersions": {},
-  "dependencies": {
-    "@solid-primitives/memo": "workspace:^"
+  "devDependencies": {
+    "solid-js": "1.7.3"
   }
 }
