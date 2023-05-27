@@ -120,7 +120,7 @@ const Child: Component<{ selectedId: string }> = props => {
       <button onClick={() => setSelectedId("2")}>Select 2</button>
     </div>
   );
-}
+};
 ```
 
 ## `createLazyMemo`
