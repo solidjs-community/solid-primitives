@@ -3,37 +3,61 @@
 import { JSX } from "solid-js";
 import { createStore, type SetStoreFunction } from "solid-js/store";
 
-// /** @source https://github.com/type-challenges/type-challenges/blob/main/questions/15260-hard-tree-path-array/README.md */
-// type Path<T> = T extends Record<PropertyKey, unknown>
-//   ? {
-//       [P in keyof T]: [P, ...Path<T[P]>] | [P];
-//     }[keyof T]
-//   : never;
+/** @source https://github.com/type-challenges/type-challenges/blob/main/questions/15260-hard-tree-path-array/README.md */
+type Path<T> = T extends Record<PropertyKey, unknown>
+  ? {
+      [P in keyof T]: [P, ...Path<T[P]>] | [P];
+    }[keyof T]
+  : never;
 
-// type Test = Path<{ a: { b: 0 } }>; // ["a", "b"] | ["a"]
+type EmptyTest = Path<{}>; // never (should it be []?)
 
-// type EvaluatePath<T, P extends PropertyKey[]> = P extends []
-//   ? T
-//   : P extends [infer K, ...infer Rest]
-//   ? K extends keyof T
-//     ? Rest extends PropertyKey[] // base case; all path segments consumed
-//       ? T // return the type of the current property (specified by key K)
-//       : Rest extends PropertyKey[] // recursive case
-//       ? EvaluatePath<T[K], Rest>
-//       : never // ...Rest was an invalid path (impossible)
-//     : never // a path segment was an invalid key
-//   : never; // P was not even an array to begin with (impossible)
+const _bigTest: Path<{
+  a: {
+    a: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    b: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    c: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    d: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    e: { a: {}; b: {}; c: {}; d: {}; e: {} };
+  };
+  b: {
+    a: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    b: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    c: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    d: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    e: { a: {}; b: {}; c: {}; d: {}; e: {} };
+  };
+  c: {
+    a: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    b: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    c: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    d: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    e: { a: {}; b: {}; c: {}; d: {}; e: {} };
+  };
+  d: {
+    a: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    b: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    c: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    d: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    e: { a: {}; b: {}; c: {}; d: {}; e: {} };
+  };
+  e: {
+    a: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    b: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    c: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    d: { a: {}; b: {}; c: {}; d: {}; e: {} };
+    e: { a: {}; b: {}; c: {}; d: {}; e: {} };
+  };
+}> = ["b", "d", "a"];
 
-/** An object path which may or *may not* be valid for a given object. */
-type Path = PropertyKey[];
-
-type EvaluatePath<T, P extends Path> = P extends []
+/** Resolves to the type specified by following the path `P` on base type `T`. */
+type EvaluatePath<T, P extends Path<T>> = P extends []
   ? T // base case; empty path array (return the whole object)
   : P extends [infer K, ...infer Rest] // bind to array head and tail
   ? K extends keyof T
     ? Rest extends []
       ? T[K] // alternate base case; this is the last path segment
-      : Rest extends Path // recursive case
+      : Rest extends Path<T[K]> // recursive case
       ? EvaluatePath<T[K], Rest>
       : never // tail was an invalid path (impossible)
     : never // a path segment was an invalid key
@@ -41,53 +65,19 @@ type EvaluatePath<T, P extends Path> = P extends []
 
 type Test2 = EvaluatePath<{ a: { b: { c: number } } }, ["a", "b"]>;
 type Test3 = EvaluatePath<{ a: { b: { c: number } } }, ["a"]>;
-type Test4 = EvaluatePath<{ a: { b: { c: number } } }, []>;
-
-type PathSegment<T> = T extends Record<PropertyKey, unknown> ? keyof T : never;
+// type Test4 = EvaluatePath<{ a: { b: { c: number } } }, []>;
 
 /**
- * Returns path P unaltered if it is valid on object T, otherwise returns never.
- *
- * By only evaluating options for the very last path segment, it avoids an
- * exhaustive tree search to generate all possible paths. Intellisense still
- * works for the last parameter in the chain. If there is a type error, the
- * whole chain will show as invalid (`never` type).
- */
-type ValidPath<T, P extends Path> = P extends []
-  ? P
-  : P extends [...infer K, infer Last]
-  ? K extends Path
-    ? Last extends PathSegment<EvaluatePath<T, K>>
-      ? P
-      : never
-    : never
-  : never;
-
-type Test5 = ValidPath<{ a: { b: { c: number } } }, ["a", "b", "c"]>; // ["a", "b", "c"]
-type Test6 = ValidPath<{ a: { b: { c: number } } }, ["a", "b", "c", "d"]>; // never
-
-type Test7 = ValidPath<{ a: { b: { c: { d: 0 } } } }, ["a"]>;
-
-type FocusedSetter<T, P extends Path> = <P2 extends Path>(
-  ...args: [...P2, EvaluatePath<EvaluatePath<T, P>, P2>]
-) => void;
-
-// TODO: handle filter functions
-// TODO: composability
-// TODO: partial `makeFocusedSetter()` function
-
-/**
- * Focuses a Store on a particular path within the object, returning a derived
- * getter and setter.
+ * Given a path within a Store object, return a derived or "focused" getter and setter.
  *
  * @param store A store getter and setter tuple, as returned by `createStore`
  * @param {...*} path a path array within the store, same as the parameters of `setStore`
- * @return A derived or "focused" Store setter
+ * @return A derived or "focused" Store, as a getter & setter tuple
  */
-export const createLens = <T, P extends Path, V extends EvaluatePath<T, P>>(
+export const createLens = <T, P extends Path<T>, V extends EvaluatePath<T, P>>(
   store: [get: T, set: SetStoreFunction<T>],
   ...path: P
-): [get: V, set: FocusedSetter<T, P>] => {
+): [get: V, set: SetStoreFunction<V>] => {
   const [getStore, setStore] = store;
 
   // Challenge #1: Evaluate path syntax the way `setStore` does for updating the store
@@ -95,7 +85,7 @@ export const createLens = <T, P extends Path, V extends EvaluatePath<T, P>>(
   const get: V = getStore as unknown as V;
 
   // Challenge #2: Preserve type information for the path syntax of the derived setter
-  const set: FocusedSetter<T, P> = (...localPath) => {
+  const set: SetStoreFunction<V> = (...localPath: any) => {
     const combinedPath = [...path, ...localPath] as unknown as Parameters<SetStoreFunction<T>>;
     return setStore(...combinedPath);
   };
@@ -103,21 +93,17 @@ export const createLens = <T, P extends Path, V extends EvaluatePath<T, P>>(
   return [get, set];
 };
 
-type test = FocusedSetter<EvaluatePath<{ a: { b: number } }, ["a"]>, ["b"]>;
-
 // Test code for typechecking:
 const [store, setStore] = createStore({ a: { b: { c: { d: 0 } } } });
 setStore("a", "b", "c", "d", 1);
 
 const [lens, setLens] = createLens([store, setStore], "a");
-setLens("b", "c", "d", 1);
+setLens("b", "c", "d", 2);
 
-// Tradeoff: no intellisense for path segments
-
-// However, invalid paths will always be marked with a `never` on the final
-// setter parameter (since they attempt to assign to a path that doesn't exist)
-
-// Can we do better, and retain intellisense for path segments?
+// TODO: handle arrays without exploding (???)
+// TODO: handle filter functions
+// TODO: composability ✅ returns an ordinary `SetStoreFunction`
+// TODO: extract partial `makeFocusedSetter()` function
 
 // ...
 
