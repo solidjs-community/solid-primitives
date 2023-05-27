@@ -426,6 +426,9 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solid-primitives/deep':
+        specifier: workspace:^
+        version: link:../deep
       solid-js:
         specifier: 1.7.5
         version: 1.7.5
