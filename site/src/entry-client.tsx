@@ -1,6 +1,8 @@
 import { debounce } from "@solid-primitives/scheduled";
 import { mount, StartClient } from "solid-start/entry-client";
 
+import "solid-devtools";
+
 // Primitives/Table.tsx produces a lot of hydration warnings in development mode.
 if (import.meta.env.MODE === "development") {
   const keys: string[] = [];
