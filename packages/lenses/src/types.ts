@@ -9,21 +9,12 @@ export type StorePath<T> = T extends readonly unknown[]
     }[keyof T]
   : never;
 
-type ArrayTest = StorePath<number[]>;
-type ArrayTest2 = StorePath<number[][]>;
-type EmptyTest = StorePath<{}>; // never (should it be []?)
-type MultipleFilterTest = StorePath<number[][]>;
-
 /** Resolves to the type specified by following the path `P` on base type `T`. */
 export type EvaluatePath<T, P extends StorePath<T>> = T extends unknown[]
   ? EvaluateArrayPath<T, P>
   : T extends Record<PropertyKey, unknown>
   ? EvaluateObjectPath<T, P>
   : T;
-
-type Test2 = EvaluatePath<{ a: { b: { c: number } } }, ["a", "b"]>;
-type Test3 = EvaluatePath<{ a: { b: { c: number } } }, ["a"]>;
-type Test4 = EvaluatePath<[{ a: 1 }, { a: 2 }, { a: 3 }], [0, "a"]>;
 
 export type EvaluateObjectPath<
   T extends Record<PropertyKey, unknown>,
@@ -68,44 +59,3 @@ export type EvaluateArrayPath<T extends unknown[], P extends StorePath<T>> = P e
       : never // Three repeated edge-cases: last array item
     : never // unsupported array index
   : never; // not an array (impossible)
-
-type TestArray = EvaluateArrayPath<[1, 2, 3], [0]>; // number
-type TestNestedArray = EvaluateArrayPath<number[][], [number, number]>; // number
-
-// const _bigTest: Path<{
-//   a: {
-//     a: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     b: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     c: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     d: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     e: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//   };
-//   b: {
-//     a: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     b: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     c: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     d: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     e: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//   };
-//   c: {
-//     a: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     b: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     c: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     d: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     e: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//   };
-//   d: {
-//     a: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     b: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     c: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     d: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     e: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//   };
-//   e: {
-//     a: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     b: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     c: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     d: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//     e: { a: {}; b: {}; c: {}; d: {}; e: {} };
-//   };
-// }> = ["b", "d", "a"];

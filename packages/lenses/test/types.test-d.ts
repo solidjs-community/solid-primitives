@@ -92,4 +92,13 @@ describe("EvaluatePath", () => {
     expectTypeOf<DerivedStoreType>().toMatchTypeOf<{ doubleNested: string }>();
     expectTypeOf<DerivedStoreType>().not.toMatchTypeOf<string>();
   });
+
+  test("produces type error for invalid types", () => {
+    type StoreType = { array: { nested: { doubleNested: string }[][] }[] };
+    type MyPath = ["a", "b", "c"];
+    // @ts-expect-error invalid path
+    type DerivedStoreType = EvaluatePath<StoreType, MyPath>;
+    expectTypeOf<DerivedStoreType>().toMatchTypeOf<never>();
+    expectTypeOf<DerivedStoreType>().not.toMatchTypeOf<any>();
+  });
 });
