@@ -1,12 +1,12 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=lens" alt="Solid Primitives lens">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=lenses" alt="Solid Primitives lenses">
 </p>
 
-# @solid-primitives/lens
+# @solid-primitives/lenses
 
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/lens?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/lens)
-[![version](https://img.shields.io/npm/v/@solid-primitives/lens?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/lens)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/lenses?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/lenses)
+[![version](https://img.shields.io/npm/v/@solid-primitives/lenses?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/lenses)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A sample primitive that is made up for templating with the following options:
@@ -16,11 +16,11 @@ A sample primitive that is made up for templating with the following options:
 ## Installation
 
 ```bash
-npm install @solid-primitives/lens
+npm install @solid-primitives/lenses
 # or
-yarn add @solid-primitives/lens
+yarn add @solid-primitives/lenses
 # or
-pnpm add @solid-primitives/lens
+pnpm add @solid-primitives/lenses
 ```
 
 ## How to use it
