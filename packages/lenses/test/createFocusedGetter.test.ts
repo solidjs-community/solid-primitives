@@ -1,0 +1,56 @@
+import { createEffect, createRoot, createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
+import { describe, expect, test } from "vitest";
+import { createFocusedGetter } from "../src";
+
+describe("createFocusedGetter", () => {
+  test("should get data from store by path", () =>
+    createRoot(dispose => {
+      const [store] = createStore({ message: "hello" });
+      const message = createFocusedGetter(store, "message");
+      expect(message()).toBe("hello");
+      dispose();
+    }));
+
+  test("getter should be reactive", () =>
+    createRoot(dispose => {
+      const [store, setStore] = createStore({ message: "hello" });
+      const message = createFocusedGetter(store, "message");
+      setStore("message", "goodbye");
+      expect(message()).toBe("goodbye");
+      dispose();
+    }));
+
+  test("getter should work with createEffect", () =>
+    createRoot(dispose => {
+      const [store, setStore] = createStore({ message: "hello" });
+      const message = createFocusedGetter(store, "message");
+
+      setStore("message", "goodbye");
+      return new Promise<void>(resolve =>
+        createEffect(() => {
+          expect(message()).toEqual("goodbye");
+          dispose();
+          resolve();
+        }),
+      );
+    }));
+
+  test("getter should be composable with derived signals", () =>
+    createRoot(dispose => {
+      const [store, setStore] = createStore({ greeting: "hello" });
+      const greeting = createFocusedGetter(store, "greeting");
+      const [name, setName] = createSignal("wilfred");
+
+      const message = () => `${greeting()} ${name()}`;
+      expect(message()).toBe("hello wilfred");
+
+      setStore("greeting", "goodbye");
+      expect(message()).toBe("goodbye wilfred");
+
+      setName("wilma");
+      expect(message()).toBe("goodbye wilma");
+
+      dispose();
+    }));
+});

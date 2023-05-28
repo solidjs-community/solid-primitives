@@ -1,6 +1,6 @@
-import { JSX } from "solid-js";
-import { type SetStoreFunction } from "solid-js/store";
-import { type EvaluatePath, type StorePath } from "./types";
+import type { Accessor, JSX } from "solid-js";
+import { SetStoreFunction, StoreNode, unwrap } from "solid-js/store";
+import type { EvaluatePath, StorePath } from "./types";
 
 /**
  * Given a path within a Store object, return a derived or "focused" getter and setter.
@@ -28,24 +28,67 @@ export const createLens = <T, P extends StorePath<T>, V extends EvaluatePath<T, 
   return [get, set];
 };
 
-// Test code for typechecking:
-// const [store, setStore] = createStore({ a: { b: { c: { d: 0 } } } });
-// setStore("a", "b", "c", "d", 1);
+export function createFocusedGetter<T, P extends StorePath<T>, V extends EvaluatePath<T, P>>(
+  store: T,
+  ...path: P
+): Accessor<V> {
+  const unwrappedStore = unwrap((store || {}) as T);
+  const isArray = Array.isArray(unwrappedStore);
+  function getValue() {
+    if (isArray) throw new Error("array getter not implemented yet");
+    const value = getValueByPath(unwrappedStore as StoreNode, [...path]) as V;
+    return value;
+  }
+  return getValue;
+}
 
-// const [lens, setLens] = createLens([store, setStore], "a");
-// setLens("b", "c", "d", 2);
+/**
+ * Same algorithm as `updatePath` in `solid-js/store`, but does not modify
+ * values.
+ */
+export function getValueByPath(
+  current: StoreNode,
+  path: any[],
+  traversed: PropertyKey[] = [],
+): any {
+  if (path.length === 0) return current;
 
-// const [arrayStore, setArrayStore] = createStore<{ a: number }[]>([]);
-// setArrayStore(0, "a", 1);
+  // RE `path.shift()`: Beware that this has a side effect that mutates the
+  // array that is passed in! This doesn't affect anything in `updatePath` from
+  // `solid-store` because a new array is passed in every time. However, in the
+  // case of `createFocusedGetter`, the same path argument is re-used every
+  // time. That means it should be cloned before being passed to
+  // `getValueByPath`.
+  const part = path.shift(),
+    partType = typeof part,
+    isArray = Array.isArray(current);
 
-// const [arrayLens, setArrayLens] = createLens([arrayStore, setArrayStore], 0);
-// setArrayLens("a", 4);
-
-// TODO: handle arrays without exploding (???) ✅ constraint: allow only one filter function or range
-// TODO: handle filter functions ✅
-// TODO: composability ✅ returns an ordinary `SetStoreFunction`
-// TODO: derive getter
-// TODO: extract partial `makeFocusedSetter()` function
+  if (Array.isArray(part)) {
+    // Ex. update('data', [2, 23], 'label', l => l + ' !!!');
+    const value: any[] = [];
+    for (let i = 0; i < part.length; i++) {
+      value.push(getValueByPath(current, [part[i]].concat(path), traversed));
+    }
+    return value;
+  } else if (isArray && partType === "function") {
+    // Ex. update('data', i => i.id === 42, 'label', l => l + ' !!!');
+    const value: any[] = [];
+    for (let i = 0; i < current.length; i++) {
+      if (part(current[i], i)) value.push(getValueByPath(current, [i].concat(path), traversed));
+    }
+    return value;
+  } else if (isArray && partType === "object") {
+    // Ex. update('data', { from: 3, to: 12, by: 2 }, 'label', l => l + ' !!!');
+    const { from = 0, to = current.length - 1, by = 1 } = part;
+    const value: any[] = [];
+    for (let i = from; i <= to; i += by) {
+      value.push(getValueByPath(current, [i].concat(path), traversed));
+    }
+    return value;
+  } else {
+    return getValueByPath(current[part], path, [part].concat(traversed));
+  }
+}
 
 // ...
 
