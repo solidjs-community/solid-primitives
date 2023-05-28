@@ -11,7 +11,25 @@
 
 A sample primitive that is made up for templating with the following options:
 
-`createPrimitiveTemplate` - Provides a getter and setter for the primitive.
+`createLens` - Given a path within a Store object, return a derived or "focused"
+getter and setter pair.
+
+`createFocusedGetter` - The first half of the lens tuple; a derived signal
+using path syntax on an object.
+
+`createFocusedSetter` - The second half of the lens tuple; a Setter
+for a specific path within a Store.
+
+## TODO
+
+- [X] Type-safe path syntax
+- [X] Handle arrays
+- [ ] Handle multiple array index syntax
+- [ ] Export separate primitives for Getter and Setter
+  - [ ] `createFocusedGetter`
+  - [ ] `createFocusedSetter`
+- [ ] Test all variations of path syntax
+- [ ] Test edge case: repeated filter functions in array path
 
 ## Installation
 
@@ -31,7 +49,7 @@ const [value, setValue] = createPrimitiveTemplate(false);
 
 ## Demo
 
-You can use this template for publishing your demo on CodeSandbox: https://codesandbox.io/s/solid-primitives-demo-template-sz95h
+You can use this template for publishing your demo on CodeSandbox: <https://codesandbox.io/s/solid-primitives-demo-template-sz95h>
 
 ## Changelog
 
