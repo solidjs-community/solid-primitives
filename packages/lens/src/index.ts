@@ -107,14 +107,16 @@ type EvaluateArrayPath<T extends unknown[], P extends Path<T>> = P extends [infe
       : never // Three repeated edge-cases: last array item
     : K extends ArrayFilterFn<T[number]>
     ? Rest extends Path<T>
-      ? EvaluateArrayPath<T, Rest> // ⚠ self-recursion/infinite regress
-      : Rest extends []
+      ? EvaluateAnyPath<T[number], Rest> // ⚠ self-recursion/infinite regress
+      : // ❕ Resolved by disallowing repeated filter functions or ranges
+      Rest extends []
       ? T
       : never // Three repeated edge-cases: last array item
     : K extends StorePathRange
     ? Rest extends Path<T>
-      ? EvaluateArrayPath<T, Rest> // ⚠ self-recursion/infinite regress
-      : Rest extends []
+      ? EvaluateAnyPath<T[number], Rest> // ⚠ self-recursion/infinite regress
+      : // ❕ Resolved by disallowing repeated filter functions or ranges
+      Rest extends []
       ? T
       : never // Three repeated edge-cases: last array item
     : never // unsupported array index
@@ -150,7 +152,7 @@ export const createLens = <T, P extends Path<T>, V extends EvaluateAnyPath<T, P>
   const get: V = getStore as unknown as V;
 
   // Challenge #2: Preserve type information for the path syntax of the derived setter
-  const set: SetStoreFunction<V> = (...localPath: any) => {
+  const set: any = (...localPath: any) => {
     const combinedPath = [...path, ...localPath] as unknown as Parameters<SetStoreFunction<T>>;
     return setStore(...combinedPath);
   };
@@ -165,9 +167,16 @@ setStore("a", "b", "c", "d", 1);
 const [lens, setLens] = createLens([store, setStore], "a");
 setLens("b", "c", "d", 2);
 
-// TODO: handle arrays without exploding (???)
-// TODO: handle filter functions
+const [arrayStore, setArrayStore] = createStore<{ a: number }[]>([]);
+setArrayStore(0, "a", 1);
+
+const [arrayLens, setArrayLens] = createLens([arrayStore, setArrayStore], 0);
+setArrayLens("a", 4);
+
+// TODO: handle arrays without exploding (???) ✅ constraint: allow only one filter function or range
+// TODO: handle filter functions ✅
 // TODO: composability ✅ returns an ordinary `SetStoreFunction`
+// TODO: derive getter
 // TODO: extract partial `makeFocusedSetter()` function
 
 // ...
