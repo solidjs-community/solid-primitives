@@ -1,6 +1,6 @@
-import { type ArrayFilterFn, type StorePathRange } from "solid-js/store";
+import type { ArrayFilterFn, StorePathRange } from "solid-js/store";
 import { describe, expectTypeOf, test } from "vitest";
-import { type StorePath } from "../src/types";
+import type { EvaluatePath, StorePath } from "../src/types";
 
 // Run via `pnpm typecheck` inside `/packages/lenses`
 
@@ -15,6 +15,12 @@ describe("StorePath", () => {
     type StoreType = { a: number };
     type MyPath = ["b"];
     expectTypeOf<MyPath>().not.toMatchTypeOf<StorePath<StoreType>>();
+  });
+
+  test("invalid paths give type errors", () => {
+    type StoreType = { a: number };
+    expectTypeOf<["a", "b"]>().not.toMatchTypeOf<StorePath<StoreType>>();
+    expectTypeOf<[0]>().not.toMatchTypeOf<StorePath<StoreType>>();
   });
 
   test("objects can be nested", () => {
@@ -59,5 +65,31 @@ describe("StorePath", () => {
     type MyPath = [{ from: number; to: number }];
     expectTypeOf<MyPath>().toMatchTypeOf<StorePath<StoreType>>();
     expectTypeOf<MyPath[0]>().toMatchTypeOf<StorePathRange>();
+  });
+});
+
+describe("EvaluatePath", () => {
+  test("navigates an object type", () => {
+    type StoreType = { a: { b: { c: string } } };
+    type MyPath = ["a", "b", "c"];
+    type DerivedStoreType = EvaluatePath<StoreType, MyPath>;
+    expectTypeOf<DerivedStoreType>().toMatchTypeOf<string>();
+    expectTypeOf<DerivedStoreType>().not.toMatchTypeOf<Record<string, any>>();
+  });
+
+  test("navigates an array type", () => {
+    type StoreType = number[][];
+    type MyPath = [0, 0];
+    type DerivedStoreType = EvaluatePath<StoreType, MyPath>;
+    expectTypeOf<DerivedStoreType>().toMatchTypeOf<number>();
+    expectTypeOf<DerivedStoreType>().not.toMatchTypeOf<Record<string, any>>();
+  });
+
+  test("navigates nested objects and arrays", () => {
+    type StoreType = { array: { nested: { doubleNested: string }[][] }[] };
+    type MyPath = ["array", 0, "nested", 0, 0];
+    type DerivedStoreType = EvaluatePath<StoreType, MyPath>;
+    expectTypeOf<DerivedStoreType>().toMatchTypeOf<{ doubleNested: string }>();
+    expectTypeOf<DerivedStoreType>().not.toMatchTypeOf<string>();
   });
 });
