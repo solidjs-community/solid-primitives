@@ -24,9 +24,9 @@ for a specific path within a Store.
 
 - [X] Type-safe path syntax
 - [X] Handle arrays
-- [ ] Export separate primitives for Getter and Setter
+- [X] Export separate primitives for Getter and Setter
   - [X] `createFocusedGetter`
-  - [ ] `createFocusedSetter`
+  - [X] `createFocusedSetter`
 - [ ] Handle multiple array index syntax
 - [ ] Test all variations of path syntax
 - [ ] Test edge case: repeated filter functions in array path

@@ -12,26 +12,17 @@ import type { EvaluatePath, StorePath } from "./types";
 export const createLens = <T, P extends StorePath<T>, V extends EvaluatePath<T, P>>(
   store: [get: T, set: SetStoreFunction<T>],
   ...path: P
-): [get: V, set: SetStoreFunction<V>] => {
+): [get: Accessor<V>, set: SetStoreFunction<V>] => {
   const [getStore, setStore] = store;
 
-  // Challenge #1: Evaluate path syntax the way `setStore` does for updating the store
-  // https://github.com/solidjs/solid/blob/44a0fdeb585c4f5a3b9bccbf4b7d6c60c7db3ecd/packages/solid/store/src/store.ts#L509
-  const get: V = getStore as unknown as V;
-
-  // Challenge #2: Preserve type information for the path syntax of the derived setter
-  const set: any = (...localPath: any) => {
-    const combinedPath = [...path, ...localPath] as unknown as Parameters<SetStoreFunction<T>>;
-    return setStore(...combinedPath);
-  };
+  const get: Accessor<V> = createFocusedGetter(getStore, ...path);
+  const set: any = createFocusedSetter(setStore, ...path);
 
   return [get, set];
 };
 
-/**
- * Creates a derived Signal from a Store or object by using the same path syntax that
- * `SetStoreFunction` accepts.
- */
+/** Create a derived Signal from a Store using the same path syntax as
+ * `setStore`. */
 export function createFocusedGetter<T, P extends StorePath<T>, V extends EvaluatePath<T, P>>(
   store: T,
   ...path: P
@@ -44,15 +35,23 @@ export function createFocusedGetter<T, P extends StorePath<T>, V extends Evaluat
   return getValue;
 }
 
+/** Create a derived setter for a Store, given a partial path within the Store object. */
+export function createFocusedSetter<T, P extends StorePath<T>, V extends EvaluatePath<T, P>>(
+  setStore: SetStoreFunction<T>,
+  ...path: P
+): SetStoreFunction<V> {
+  const set: any = (...localPath: any) => {
+    const combinedPath = [...path, ...localPath] as unknown as Parameters<SetStoreFunction<T>>;
+    return setStore(...combinedPath);
+  };
+  return set;
+}
+
 /**
  * Same algorithm as `updatePath` in `solid-js/store`, but does not modify
  * any values.
  */
-export function getValueByPath(
-  current: StoreNode,
-  path: any[],
-  traversed: PropertyKey[] = [],
-): any {
+function getValueByPath(current: StoreNode, path: any[], traversed: PropertyKey[] = []): any {
   if (path.length === 0) return current;
 
   // RE `path.shift()`: Beware that this has a side effect that mutates the
