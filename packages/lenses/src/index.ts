@@ -1,5 +1,5 @@
 import { JSX } from "solid-js";
-import { createStore, type SetStoreFunction } from "solid-js/store";
+import { type SetStoreFunction } from "solid-js/store";
 import { type EvaluatePath, type StorePath } from "./types";
 
 /**
@@ -29,17 +29,17 @@ export const createLens = <T, P extends StorePath<T>, V extends EvaluatePath<T, 
 };
 
 // Test code for typechecking:
-const [store, setStore] = createStore({ a: { b: { c: { d: 0 } } } });
-setStore("a", "b", "c", "d", 1);
+// const [store, setStore] = createStore({ a: { b: { c: { d: 0 } } } });
+// setStore("a", "b", "c", "d", 1);
 
-const [lens, setLens] = createLens([store, setStore], "a");
-setLens("b", "c", "d", 2);
+// const [lens, setLens] = createLens([store, setStore], "a");
+// setLens("b", "c", "d", 2);
 
-const [arrayStore, setArrayStore] = createStore<{ a: number }[]>([]);
-setArrayStore(0, "a", 1);
+// const [arrayStore, setArrayStore] = createStore<{ a: number }[]>([]);
+// setArrayStore(0, "a", 1);
 
-const [arrayLens, setArrayLens] = createLens([arrayStore, setArrayStore], 0);
-setArrayLens("a", 4);
+// const [arrayLens, setArrayLens] = createLens([arrayStore, setArrayStore], 0);
+// setArrayLens("a", 4);
 
 // TODO: handle arrays without exploding (???) ✅ constraint: allow only one filter function or range
 // TODO: handle filter functions ✅
