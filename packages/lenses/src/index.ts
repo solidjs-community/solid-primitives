@@ -1,6 +1,6 @@
 import { JSX } from "solid-js";
 import { createStore, type SetStoreFunction } from "solid-js/store";
-import { type EvaluateAnyPath, type Path } from "./types";
+import { type EvaluatePath, type StorePath } from "./types";
 
 /**
  * Given a path within a Store object, return a derived or "focused" getter and setter.
@@ -9,7 +9,7 @@ import { type EvaluateAnyPath, type Path } from "./types";
  * @param {...*} path a path array within the store, same as the parameters of `setStore`
  * @return A derived or "focused" Store, as a getter & setter tuple
  */
-export const createLens = <T, P extends Path<T>, V extends EvaluateAnyPath<T, P>>(
+export const createLens = <T, P extends StorePath<T>, V extends EvaluatePath<T, P>>(
   store: [get: T, set: SetStoreFunction<T>],
   ...path: P
 ): [get: V, set: SetStoreFunction<V>] => {
