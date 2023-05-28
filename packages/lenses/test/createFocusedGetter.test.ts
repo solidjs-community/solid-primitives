@@ -67,4 +67,17 @@ describe("createFocusedGetter", () => {
 
       dispose();
     }));
+
+  test("getter works with top-level array", () =>
+    createRoot(dispose => {
+      const [store, setStore] = createStore([1, 2, 3]);
+      const middleItem = createFocusedGetter(store, 1);
+
+      expect(middleItem()).toBe(2);
+
+      setStore([4, 5, 6]);
+      expect(middleItem()).toBe(5);
+
+      dispose();
+    }));
 });

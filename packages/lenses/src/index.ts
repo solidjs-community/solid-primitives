@@ -37,9 +37,7 @@ export function createFocusedGetter<T, P extends StorePath<T>, V extends Evaluat
   ...path: P
 ): Accessor<V> {
   const unwrappedStore = unwrap((store || {}) as T);
-  const isArray = Array.isArray(unwrappedStore);
   function getValue() {
-    if (isArray) throw new Error("array getter not implemented yet");
     const value = getValueByPath(unwrappedStore as StoreNode, [...path]) as V;
     return value;
   }
@@ -48,7 +46,7 @@ export function createFocusedGetter<T, P extends StorePath<T>, V extends Evaluat
 
 /**
  * Same algorithm as `updatePath` in `solid-js/store`, but does not modify
- * values.
+ * any values.
  */
 export function getValueByPath(
   current: StoreNode,
