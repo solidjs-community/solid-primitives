@@ -53,4 +53,18 @@ describe("createFocusedGetter", () => {
 
       dispose();
     }));
+
+  test("getter is equivalent to a derived signal", () =>
+    createRoot(dispose => {
+      const [store, setStore] = createStore({ foo: { bar: 1 } });
+      const fooBarA = createFocusedGetter(store, "foo", "bar");
+      const fooBarB = () => store.foo.bar;
+
+      expect(fooBarA()).toEqual(fooBarB());
+
+      setStore("foo", { bar: 2 });
+      expect(fooBarA()).toEqual(fooBarB());
+
+      dispose();
+    }));
 });

@@ -28,6 +28,10 @@ export const createLens = <T, P extends StorePath<T>, V extends EvaluatePath<T, 
   return [get, set];
 };
 
+/**
+ * Creates a derived Signal from a Store or object by using the same path syntax that
+ * `SetStoreFunction` accepts.
+ */
 export function createFocusedGetter<T, P extends StorePath<T>, V extends EvaluatePath<T, P>>(
   store: T,
   ...path: P
