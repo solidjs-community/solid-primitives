@@ -25,11 +25,13 @@ for a specific path within a Store.
 - [X] Type-safe path syntax
 - [X] Handle arrays
 - [ ] Export separate primitives for Getter and Setter
-  - [ ] `createFocusedGetter`
+  - [X] `createFocusedGetter`
   - [ ] `createFocusedSetter`
 - [ ] Handle multiple array index syntax
 - [ ] Test all variations of path syntax
 - [ ] Test edge case: repeated filter functions in array path
+  - This may differ from `SetStoreFunction`
+- [ ] Check and/or replicate official SolidJS Store test cases for parity
 
 ## Installation
 
