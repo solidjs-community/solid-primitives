@@ -48,7 +48,8 @@
     "build": "jiti ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
-    "test:ssr": "pnpm run vitest --mode ssr"
+    "test:ssr": "pnpm run vitest --mode ssr",
+    "typecheck": "pnpm run vitest typecheck"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

@@ -2,11 +2,19 @@ import { type ArrayFilterFn, type StorePathRange } from "solid-js/store";
 import { describe, expectTypeOf, test } from "vitest";
 import { type StorePath } from "../src/types";
 
+// Run via `pnpm typecheck` inside `/packages/lenses`
+
 describe("StorePath", () => {
   test("objects can be indexed by string", () => {
     type StoreType = { a: number };
     type MyPath = ["a"];
     expectTypeOf<MyPath>().toMatchTypeOf<StorePath<StoreType>>();
+  });
+
+  test("object keys must be valid", () => {
+    type StoreType = { a: number };
+    type MyPath = ["b"];
+    expectTypeOf<MyPath>().not.toMatchTypeOf<StorePath<StoreType>>();
   });
 
   test("objects can be nested", () => {
