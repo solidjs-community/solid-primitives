@@ -10,7 +10,7 @@ import type { EvaluatePath, StorePath } from "./types";
  * @return A derived or "focused" Store, as a getter & setter tuple
  */
 export const createLens = <T, P extends StorePath<T>, V extends EvaluatePath<T, P>>(
-  store: [get: T, set: SetStoreFunction<T>],
+  store: [get: T | Accessor<T>, set: SetStoreFunction<T>],
   ...path: P
 ): [get: Accessor<V>, set: SetStoreFunction<V>] => {
   const [getStore, setStore] = store;
@@ -24,12 +24,13 @@ export const createLens = <T, P extends StorePath<T>, V extends EvaluatePath<T, 
 /** Create a derived Signal from a Store using the same path syntax as
  * `setStore`. */
 export function createFocusedGetter<T, P extends StorePath<T>, V extends EvaluatePath<T, P>>(
-  store: T,
+  store: T | Accessor<T>,
   ...path: P
 ): Accessor<V> {
   const unwrappedStore = unwrap((store || {}) as T);
   function getValue() {
-    const value = getValueByPath(unwrappedStore as StoreNode, [...path]) as V;
+    const store = unwrappedStore instanceof Function ? unwrappedStore() : unwrappedStore;
+    const value = getValueByPath(store as StoreNode, [...path]) as V;
     return value;
   }
   return getValue;
@@ -47,10 +48,7 @@ export function createFocusedSetter<T, P extends StorePath<T>, V extends Evaluat
   return set;
 }
 
-/**
- * Same algorithm as `updatePath` in `solid-js/store`, but does not modify
- * any values.
- */
+/** Same algorithm as `updatePath` in `solid-js/store`, but only for getting values. */
 function getValueByPath(current: StoreNode, path: any[], traversed: PropertyKey[] = []): any {
   if (path.length === 0) return current;
 
