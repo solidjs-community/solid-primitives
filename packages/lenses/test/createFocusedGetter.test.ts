@@ -4,7 +4,7 @@ import { describe, expect, test } from "vitest";
 import { createFocusedGetter } from "../src";
 
 describe("createFocusedGetter", () => {
-  test("should get data from store by path", () =>
+  test("gets data from store by path", () =>
     createRoot(dispose => {
       const [store] = createStore({ message: "hello" });
       const message = createFocusedGetter(store, "message");
@@ -12,7 +12,7 @@ describe("createFocusedGetter", () => {
       dispose();
     }));
 
-  test("getter should be reactive", () =>
+  test("is reactive", () =>
     createRoot(dispose => {
       const [store, setStore] = createStore({ message: "hello" });
       const message = createFocusedGetter(store, "message");
@@ -21,7 +21,7 @@ describe("createFocusedGetter", () => {
       dispose();
     }));
 
-  test("getter should work with createEffect", () =>
+  test("works with createEffect", () =>
     createRoot(dispose => {
       const [store, setStore] = createStore({ message: "hello" });
       const message = createFocusedGetter(store, "message");
@@ -36,7 +36,7 @@ describe("createFocusedGetter", () => {
       );
     }));
 
-  test("getter should be composable with derived signals", () =>
+  test("composable with derived signals", () =>
     createRoot(dispose => {
       const [store, setStore] = createStore({ greeting: "hello" });
       const greeting = createFocusedGetter(store, "greeting");
@@ -54,7 +54,7 @@ describe("createFocusedGetter", () => {
       dispose();
     }));
 
-  test("getter is equivalent to a derived signal", () =>
+  test("equivalent to derived signal", () =>
     createRoot(dispose => {
       const [store, setStore] = createStore({ foo: { bar: 1 } });
       const fooBarA = createFocusedGetter(store, "foo", "bar");
@@ -68,7 +68,7 @@ describe("createFocusedGetter", () => {
       dispose();
     }));
 
-  test("getter works with top-level array", () =>
+  test("works with top-level array", () =>
     createRoot(dispose => {
       const [store, setStore] = createStore([1, 2, 3]);
       const middleItem = createFocusedGetter(store, 1);
@@ -77,6 +77,19 @@ describe("createFocusedGetter", () => {
 
       setStore([4, 5, 6]);
       expect(middleItem()).toBe(5);
+
+      dispose();
+    }));
+
+  test("works with an accessor", () =>
+    createRoot(dispose => {
+      const [signal, setSignal] = createSignal({ foo: { bar: 1 } });
+      const fooBar = createFocusedGetter(signal, "foo", "bar");
+
+      expect(fooBar()).toBe(1);
+
+      setSignal({ foo: { bar: 2 } });
+      expect(fooBar()).toBe(2);
 
       dispose();
     }));

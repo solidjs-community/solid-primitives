@@ -27,11 +27,13 @@ for a specific path within a Store.
 - [X] Export separate primitives for Getter and Setter
   - [X] `createFocusedGetter`
   - [X] `createFocusedSetter`
-- [ ] Handle multiple array index syntax
-- [ ] Test all variations of path syntax
+- [X] Handle accessors in `createFocusedGetter`
+- [ ] Handle multiple array index syntax (`setStore([1, 2], old => old + 1)`)
+- [ ] Test and/or implement mutation syntax setter (`prev => next`)
+- [ ] Test all variations of path syntax (for both setter and getter)
 - [ ] Test edge case: repeated filter functions in array path
   - This may differ from `SetStoreFunction`
-- [ ] Check and/or replicate official SolidJS Store test cases for parity
+- [ ] Check and/or replicate official SolidJS Store unit tests for parity
 
 ## Installation
 

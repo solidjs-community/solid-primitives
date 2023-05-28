@@ -1,4 +1,8 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 importers:
 
@@ -531,7 +535,7 @@ importers:
     dependencies:
       solid-js:
         specifier: ^1.6.12
-        version: 1.7.3
+        version: 1.7.5
 
   packages/lifecycle:
     devDependencies:
