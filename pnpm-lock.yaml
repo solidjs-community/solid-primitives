@@ -535,6 +535,12 @@ importers:
         specifier: ^0.2.2
         version: 0.2.2(solid-js@1.7.5)
 
+  packages/lenses:
+    dependencies:
+      solid-js:
+        specifier: ^1.6.12
+        version: 1.7.5
+
   packages/lifecycle:
     devDependencies:
       solid-js:
