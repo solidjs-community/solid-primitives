@@ -9,7 +9,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/input-mask?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/input-mask)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Primitive that returns an event handler to mask the inputs of an text input element (`<input>`, `<textarea>`) when applied in `oninput` or `onchange`.
+Primitive that returns an event handler to mask the inputs of an text input element (`<input>`, `<textarea>`) when applied in `oninput` or `onchange` and set attributes to handle pattern display.
 
 ## Installation
 
@@ -23,7 +23,7 @@ yarn add @solid-primitives/input-mask
 
 For convenience reasons, the handler returns the current value, which allows you to use it to fill a signal or assign a let variable. The masks come in 4 different formats: function, regex-replacer, array and string. There are tools to convert string masks to array masks and regex-replacer and array masks to function masks.
 
-```ts
+```tsx
 import {
   stringMaskToArray,
   regexMaskToFn,
@@ -90,6 +90,34 @@ return (
 ```
 
 In most cases you'll want to use `onInput` and `onPaste`.
+
+
+## Showing the pattern during input
+
+The placeholder attribute is nice, but it cannot show the pattern during input. In order to rectify this shortcoming, this package has a `createMaskPattern` export:
+
+```tsx
+import { createInputMask, createMaskPattern } from "@solid-primitives/input-mask";
+
+return <>
+  <style>{`
+    input { border: 0.1rem solid currentColor; padding: 0.5rem 0.75rem; }
+    label[data-mask-value] { position: absolute; padding: 0.5rem 0.75rem; border: 0.1rem solid transparent; }
+    label[data-mask-value]::before { content: attr(data-mask-value); color: transparent; }
+    label[data-mask-pattern]::after { content: attr(data-mask-pattern); opacity: 0.7; }
+  `}</style>
+  <label for="datefield">ISO Date:</label>
+  <label for="datefield"></label>
+  <input 
+    id="datefield"
+    placeholder="YYYY-MM-DD"
+    onInput={createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD")}
+  />
+</>;
+```
+
+As you can see, this function requires an empty label as `previousElementSibling` to the input field, which will be automatically given two attributes, `data-mask-value` and `data-mask-pattern`, which can be used to display the pattern over the input. This label must be formatted so that its content will match the text in the adjacent input; use a transparent border and padding to achieve this effect.
+
 
 ## Usage with form handling libraries
 
