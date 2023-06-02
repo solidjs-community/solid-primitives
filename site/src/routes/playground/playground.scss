@@ -5,6 +5,8 @@ Styles applied in the package playgrounds.
 */
 
 .package-playground {
+  @apply relative;
+
   .center-child {
     @apply flex items-center justify-center;
   }
