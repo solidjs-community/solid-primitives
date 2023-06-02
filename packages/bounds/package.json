@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@solid-primitives/scheduled": "workspace:^",
-    "solid-js": "1.7.5"
+    "solid-js": "1.7.6"
   },
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",

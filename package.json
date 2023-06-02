@@ -52,7 +52,7 @@
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
     "solid-devtools": "^0.27.0",
-    "solid-js": "1.7.5",
+    "solid-js": "1.7.6",
     "solid-start": "^0.2.26",
     "tsup": "^6.7.0",
     "tsup-preset-solid": "^0.1.8",
@@ -63,7 +63,7 @@
     "vite-plugin-solid": "^2.7.0",
     "vitest": "^0.31.1"
   },
-  "packageManager": "pnpm@8.5.0",
+  "packageManager": "pnpm@8.6.0",
   "engines": {
     "node": ">=18.0.0"
   }
