@@ -1,5 +1,11 @@
 # @solid-primitives/input-mask
 
+## 0.2.0
+
+### Minor Changes
+
+- 281006e4: added mask-pattern primitive
+
 ## 0.1.7
 
 ### Patch Changes
