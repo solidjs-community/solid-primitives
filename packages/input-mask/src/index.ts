@@ -121,9 +121,10 @@ export const createInputMask = <
 };
 
 /**
- * Adds a data-attribute with the remaining pattern to be used in ::after
- * ```tsx
- * <style>
+ * Adds a data-attributes with value and remaining pattern to be used in ::before/::after
+ * > Requires an extra empty element (e.g. label) directly before the input
+ * ### CSS:
+ * ```css
  * label[data-mask-value] {
  *
  * }
@@ -135,14 +136,17 @@ export const createInputMask = <
  *   content: attr(data-mask-pattern);
  *   opacity: 0.7;
  * }
- * </style>
+ * ```
+ *
+ * ### JSX/TSX:
+ * ```tsx
  * <div>
  *   <label></label>
  *   <input
  *     placeholder="YYYY-MM-DD"
  *     onInput={createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD")}
  *   />
- *</div>
+ * </div>
  * ```
  */
 export const createMaskPattern = <
