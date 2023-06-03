@@ -125,18 +125,24 @@ export const createInputMask = <
  * ```tsx
  * <style>
  * label[data-mask-value] {
- *   
+ *
  * }
  * label[data-mask-value]::before {
  *   content: attr(data-mask-value);
- *   opacity: 0;
+ *   color: transparent;
  * }
  * label[data-mask-pattern]::after {
  *   content: attr(data-mask-pattern);
  *   opacity: 0.7;
  * }
  * </style>
- * <input onInput={createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD")} />
+ * <div>
+ *   <label></label>
+ *   <input
+ *     placeholder="YYYY-MM-DD"
+ *     onInput={createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD")}
+ *   />
+ *</div>
  * ```
  */
 export const createMaskPattern = <
@@ -150,10 +156,9 @@ export const createMaskPattern = <
     const ref = (ev.currentTarget || ev.target) as HTMLInputElement | HTMLTextAreaElement;
     const prev = ref.previousElementSibling as HTMLElement;
     const fn = value === "" ? "removeAttribute" : "setAttribute";
-    prev[fn]('data-mask-value', value);
-    prev[fn]('data-mask-pattern', pattern(value).slice(value.length));
+    prev[fn]("data-mask-value", value);
+    prev[fn]("data-mask-pattern", pattern(value).slice(value.length));
     return value;
   };
   return handler;
-}
-
+};

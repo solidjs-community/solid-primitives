@@ -102,7 +102,7 @@ import { createInputMask, createMaskPattern } from "@solid-primitives/input-mask
 return <>
   <style>{`
     input { border: 0.1rem solid currentColor; padding: 0.5rem 0.75rem; }
-    label[data-mask-value] { position: absolute; padding: 0.5rem 0.75rem; border: 0.1rem solid transparent; }
+    label[data-mask-value] { position: absolute; border: 0.1rem solid transparent; padding: 0.5rem 0.75rem; }
     label[data-mask-value]::before { content: attr(data-mask-value); color: transparent; }
     label[data-mask-pattern]::after { content: attr(data-mask-pattern); opacity: 0.7; }
   `}</style>
@@ -116,7 +116,7 @@ return <>
 </>;
 ```
 
-As you can see, this function requires an empty label as `previousElementSibling` to the input field, which will be automatically given two attributes, `data-mask-value` and `data-mask-pattern`, which can be used to display the pattern over the input. This label must be formatted so that its content will match the text in the adjacent input; use a transparent border and padding to achieve this effect.
+As you can see, this function requires an empty label as `previousElementSibling` to the input field, which will be automatically given two attributes, `data-mask-value` and `data-mask-pattern`, which can be used to display the pattern over the input. This label must be formatted so that its content will match the text in the adjacent input; use a transparent border and padding to achieve this effect. You need not use an inline style; you can also use your favorite way to deploy the CSS (e.g. tailwind or solid-styled).
 
 
 ## Usage with form handling libraries
