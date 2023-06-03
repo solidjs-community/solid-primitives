@@ -477,6 +477,9 @@ importers:
 
   packages/input-mask:
     devDependencies:
+      '@solidjs/testing-library':
+        specifier: ^0.7.1
+        version: 0.7.1(solid-js@1.7.6)
       solid-js:
         specifier: 1.7.6
         version: 1.7.6

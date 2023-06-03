@@ -17,7 +17,8 @@
     "name": "input-mask",
     "stage": 1,
     "list": [
-      "createInputMask"
+      "createInputMask",
+      "createMaskPattern"
     ],
     "category": "Inputs"
   },
@@ -58,6 +59,7 @@
   },
   "typesVersions": {},
   "devDependencies": {
+    "@solidjs/testing-library": "^0.7.1",
     "solid-js": "1.7.6"
   }
 }
