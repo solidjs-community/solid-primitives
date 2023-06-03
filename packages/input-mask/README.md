@@ -206,7 +206,7 @@ return <input ref={ref} onInput={e => useMask && mask(e)} onPaste={e => useMask 
 
 ### DEMO
 
-https://codesandbox.io/s/solid-primitives-input-mask-demo-fnvg76?file=/index.tsx
+Here is a [working demonstration](https://primitives.solidjs.community/playground/input-mask/) ([Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/input-mask/dev)).
 
 ## Changelog
 
