@@ -91,7 +91,6 @@ return (
 
 In most cases you'll want to use `onInput` and `onPaste`.
 
-
 ## Showing the pattern during input
 
 The placeholder attribute is nice, but it cannot show the pattern during input. In order to rectify this shortcoming, this package has a `createMaskPattern` export:
@@ -99,20 +98,22 @@ The placeholder attribute is nice, but it cannot show the pattern during input. 
 ```tsx
 import { createInputMask, createMaskPattern } from "@solid-primitives/input-mask";
 
-return <>
-  <label for="datefield">ISO Date:</label>
-  <div>
-    <label for="datefield" id="datefield-pattern-view"></label>
-    <input 
-      id="datefield"
-      placeholder="YYYY-MM-DD"
-      onInput={createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD")}
-    />
-  </div>
-</>;
+return (
+  <>
+    <label for="datefield">ISO Date:</label>
+    <div>
+      <label for="datefield" id="datefield-pattern-view"></label>
+      <input
+        id="datefield"
+        placeholder="YYYY-MM-DD"
+        onInput={createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD")}
+      />
+    </div>
+  </>
+);
 ```
 
-This uses something like the following CSS to make sure that the empty label: 
+This uses something like the following CSS to make sure that the empty label:
 
 ```css
 input {
@@ -138,7 +139,6 @@ label[data-mask-pattern]::after {
 ```
 
 As you can see, this function requires an empty label as `previousElementSibling` to the input field, which will be automatically given two attributes, `data-mask-value` and `data-mask-pattern`, which can be used to display the pattern over the input. This label must be formatted so that its content will match the text in the adjacent input; use a transparent border and padding to achieve this effect. You need not use an inline style; you can also use your favorite way to deploy the CSS (e.g. tailwind or solid-styled).
-
 
 ## Usage with form handling libraries
 
