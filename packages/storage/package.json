@@ -21,7 +21,9 @@
       "createAsyncStorage",
       "createStorageSignal",
       "createLocalStorage",
-      "createSessionStorage"
+      "createSessionStorage",
+      "cookieStorage",
+      "makePersisted"
     ],
     "category": "Browser APIs"
   },
@@ -60,7 +62,11 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "solid-js": "^1.6.12",
+    "solid-start": "^0.2.26"
+  },
+  "peerDependenciesMeta": {
+    "solid-start": { "optional": true }
   },
   "typesVersions": {},
   "devDependencies": {

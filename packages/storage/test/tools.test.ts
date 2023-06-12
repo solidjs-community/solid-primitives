@@ -11,7 +11,7 @@ describe("addClearMethod", () => {
     removeItem: (key: string): void => {
       delete data[key];
     },
-    key: (index: number): string => Object.keys(data)[index],
+    key: (index: number): string => Object.keys(data)[index] || "",
     get length(): number {
       return Object.keys(data).length;
     },

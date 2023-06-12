@@ -40,6 +40,7 @@ import type {
  *   }
  * ]
  * ```
+ * @deprecated in favor of makePersisted
  */
 export function createStorage<O>(
   props?: StringStorageProps<Storage | StorageWithOptions<O>, O>,
@@ -234,6 +235,7 @@ export function createStorage<O, T>(
  *   }
  * ]
  * ```
+ * @deprecated in favor of makePersisted
  */
 export function createAsyncStorage<O>(
   props?: StringStorageProps<AsyncStorage | AsyncStorageWithOptions<O>, O>,
@@ -441,6 +443,7 @@ export function createAsyncStorage<O, T>(
  *   refetch: () => void // reloads from storage
  * ]
  * ```
+ * @deprecated in favor of makePersisted
  */
 export function createStorageSignal<T, O = {}>(
   key: string,
@@ -541,7 +544,9 @@ export function createStorageSignal<T, O = {}>(
   return [Object.assign(accessor, { error }), setter, refetch];
 }
 
+/** @deprecated in favor of makePersistent */
 export const createLocalStorage = createStorage;
 
+/** @deprecated in favor of makePersistent */
 export const createSessionStorage = <T, O = {}>(props: StorageProps<T, Storage, O>) =>
   createStorage({ ...props, api: globalThis.sessionStorage } as any);
