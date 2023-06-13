@@ -67,7 +67,7 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
       : (data: string) => (signal[1] as SetStoreFunction<T>)(reconcile(deserialize(data)));
   let unchanged = true;
   if (init instanceof Promise) {
-    (init as Promise<string>).then((data: string) => unchanged && set(data));
+    (init as Promise<string>).then((data: string) => unchanged && data && set(data));
   } else if (init) {
     set(init);
   }
