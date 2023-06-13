@@ -9,7 +9,7 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/storage?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/storage)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Creates a primitive to reactively access both synchronous and asynchronous persistent storage APIs similar to localStorage.
+Creates a primitive to reactively access both synchronous and asynchronous persistent storage APIs similar to `localStorage`.
 
 ## Installation
 
@@ -21,9 +21,38 @@ yarn add @solid-primitives/storage
 
 ## How to use it
 
-### Basic Usage
+`makePersisted` allows you to persist a signal or store in any synchronous or asynchronous Storage API:
 
-`createStorage` is meant to wrap any localStorage-like API to be as accessible as a [Solid Store](https://www.solidjs.com/docs/latest/api#createstore). The main differences are
+```ts
+const [signal, setSignal] = makePersisted(createSignal("initial"), { storage: sessionStorage });
+const [store, setStore] = makePersisted(createStore({ test: true }), { name: "testing" });
+type PersistedOptions<Type, StorageOptions> = {
+  // localStorage is defualt
+  storage?: Storage | StorageWithOptions | AsyncStorage | AsyncStorageWithOptions,
+  // only required for storage APIs with options
+  storageOptions?: StorageOptions,
+  // key in the storage API
+  name?: "...",
+  // JSON.stringify is the default
+  serializer?: (value: Type) => value.toString(),
+  // JSON.parse is the default
+  deserializer?: (value: string) => Type(value),
+};
+```
+
+- if no storage is given in options, `localStorage` is used
+- if no name is given in options, a unique identifier from `solid-js` will be the default
+- initial values of signals or stores are not persisted, so they can be safely changed
+- values persisted in asynchronous storage APIs will not overwrite already changed signals or stores
+- setting a persisted signal to undefined or null will remove the item from the storage
+
+---
+
+### Deprecated primitives:
+
+The previous implementation proved to be confusing and cumbersome for most people who just wanted to persist their signals and stores, so they are now deprecated.
+
+`createStorage` is meant to wrap any `localStorage`-like API to be as accessible as a [Solid Store](https://www.solidjs.com/docs/latest/api#createstore). The main differences are
 
 - that this store is persisted in whatever API is used,
 - that you can only use the topmost layer of the object and
@@ -43,16 +72,16 @@ store.key; // 'value'
 The props object support the following parameters:
 
 `api`
-: an array of or a single localStorage-like storage API; default will be localStorage if it exists; an empty array or no API will not throw an error, but only ever get `null` and not actually persist anything
+: An array of or a single `localStorage`-like storage API; default will be `localStorage` if it exists; an empty array or no API will not throw an error, but only ever get `null` and not actually persist anything
 
 `prefix`
-: a string that will be prefixed every key inside the API on set and get operations
+: A string that will be prefixed every key inside the API on set and get operations
 
 `serializer / deserializer`
-: a set of function to filter the input and output; the serializer takes an arbitrary object and returns a string, e.g. JSON.stringify, whereas the deserializer takes a string and returns the requested object again.
+: A set of function to filter the input and output; the `serializer` takes an arbitrary object and returns a string, e.g. `JSON.stringify`, whereas the `deserializer` takes a string and returns the requested object again.
 
 `options`
-: for APIs that support options as third argument in the `getItem` and `setItem` method (see helper type `StorageWithOptions<O>`), you can add options they will receive on every operation.
+: For APIs that support options as third argument in the `getItem` and `setItem` method (see helper type `StorageWithOptions<O>`), you can add options they will receive on every operation.
 
 ---
 
@@ -66,9 +95,9 @@ createCookieStorage();
 
 ---
 
-### Asynchronous storage APIs
+#### Asynchronous storage APIs
 
-In case you have APIs that persist data on the server or via ServiceWorker in a [CookieStore](https://wicg.github.io/cookie-store/#CookieStore), you can wrap them into an `AsyncStorage` or `AsyncStorageWithOptions` API and use them with `createAsyncStorage`:
+In case you have APIs that persist data on the server or via `ServiceWorker` in a [`CookieStore`](https://wicg.github.io/cookie-store/#CookieStore), you can wrap them into an asynchronous storage (`AsyncStorage` or `AsyncStorageWithOptions` API) and use them with `createAsyncStorage`:
 
 ```ts
 type CookieStoreOptions = {
@@ -106,9 +135,9 @@ await setStore('key', 'value');
 await store.key; // 'value'
 ```
 
-It works exactly like a synchronous storage, with the exception that you have to `await` every single return value. Once the CookieStore API becomes more prevalent, we will integrate support out of the box.
+It works exactly like a synchronous storage, with the exception that you have to `await` every single return value. Once the `CookieStore` API becomes more prevalent, we will integrate support out of the box.
 
-If you cannot use document.cookie, you can overwrite the entry point using the following tuple:
+If you cannot use `document.cookie`, you can overwrite the entry point using the following tuple:
 
 ```ts
 import { cookieStorage } from '@solid-primitives/storage';
@@ -149,16 +178,16 @@ As a convenient additional method, you can also use `createCookieStorageSignal(k
 
 The properties of your `createStorage`/`createAsyncStorage`/`createStorageSignal` props are:
 
-- `api`: the (sync or async) [Storage-like API](https://developer.mozilla.org/de/docs/Web/API/Web_Storage_API), default is localStorage
-- `deserializer` (optional): a deserializer or parser for the stored data
-- `serializer` (optional): a serializer or string converter for the stored data
+- `api`: the (synchronous or asynchronous) [Storage-like API](https://developer.mozilla.org/de/docs/Web/API/Web_Storage_API), default is `localStorage`
+- `deserializer` (optional): a `deserializer` or parser for the stored data
+- `serializer` (optional): a `serializer` or string converter for the stored data
 - `options` (optional): default options for the set-call of Storage-like API, if supported
 - `prefix` (optional): a prefix for the Storage keys
 - `sync` (optional): if set to false, [event synchronization](https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent) is disabled
 
 ### Tools
 
-If you want to build your own Storage and don't want to do a .clear() method youself:
+If you want to build your own Storage and don't want to do a `.clear()` method yourself:
 
 ```ts
 const storageWithClearMethod = addClearMethod(storage_without_clear_method);
