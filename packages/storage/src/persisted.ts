@@ -53,7 +53,10 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
   signal: [Accessor<T>, Setter<T>] | [Store<T>, SetStoreFunction<T>],
   options: PersistenceOptions<T, O> = {},
 ): [Accessor<T>, Setter<T>] | [Store<T>, SetStoreFunction<T>] {
-  const storage = options.storage || localStorage;
+  const storage = options.storage || globalThis.localStorage;
+  if (!storage) {
+    return signal;
+  }
   const name = options.name || `storage-${createUniqueId()}`;
   const serialize: (data: T) => string = options.serialize || JSON.stringify.bind(JSON);
   const deserialize: (data: string) => T = options.deserialize || JSON.parse.bind(JSON);
@@ -82,10 +85,10 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
         }
       : (...args: Parameters<SetStoreFunction<T>>) => {
           (signal[1] as SetStoreFunction<T>)(...args);
-          // @ts-ignore
           storage.setItem(
             name,
             serialize(untrack(() => signal[0] as Store<T>)),
+            // @ts-ignore
             options.storageOptions,
           );
           unchanged = false;

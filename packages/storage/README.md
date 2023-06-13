@@ -46,6 +46,14 @@ type PersistedOptions<Type, StorageOptions> = {
 - values persisted in asynchronous storage APIs will not overwrite already changed signals or stores
 - setting a persisted signal to undefined or null will remove the item from the storage
 
+### Different storage APIs
+
+In the browser, we already have `localStorage`, which persists values for the same hostname indefinitely, and `sessionStorage`, which does the same for the duration of the browser session, but loses persistence after closing the browser.
+
+As another storage, `cookieStorage` from this package can be used, which is a `localStorage`-like API to set cookies. It will work in the browser and also allows reading cookies on solid-start. Using it in the server without solid-start will not cause errors, but instead emit a warning message. You can also supply your own implementations of `cookieStorage._read(key)` and `cookieStorage._write(key, value, options)` if neither of those fit your need.
+
+There is also [`localForage`](https://localforage.github.io/localForage/), which uses `IndexedDB`, `WebSQL` or `localStorage` to provide an asynchronous Storage API that can ideally store much more than the few Megabytes that are available in most browsers.
+
 ---
 
 ### Deprecated primitives:
@@ -195,7 +203,7 @@ const storageWithClearMethod = addClearMethod(storage_without_clear_method);
 
 ## Demo
 
-TODO
+[Live Demo](https://primitives.solidjs.community/playground/storage) - [Sources](https://github.com/solidjs-community/solid-primitives/tree/main/packages/storage/dev)
 
 ## Changelog
 
