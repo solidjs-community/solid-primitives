@@ -24,7 +24,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   #keyTriggers = new TriggerCache<K | typeof $KEYS>();
   #valueTriggers = new TriggerCache<K>();
 
-  constructor(initial?: [K, V][]) {
+  constructor(initial?: Iterable<readonly [K, V]> | null) {
     super();
     if (initial) for (const v of initial) super.set(v[0], v[1]);
   }
@@ -127,7 +127,7 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
   #keyTriggers = new TriggerCache<K>(WeakMap);
   #valueTriggers = new TriggerCache<K>(WeakMap);
 
-  constructor(initial?: [K, V][]) {
+  constructor(initial?: Iterable<readonly [K, V]> | null) {
     super();
     if (initial) for (const v of initial) super.set(v[0], v[1]);
   }
