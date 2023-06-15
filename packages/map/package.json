@@ -57,5 +57,8 @@
   "dependencies": {
     "@solid-primitives/trigger": "workspace:^"
   },
-  "typesVersions": {}
+  "typesVersions": {},
+  "devDependencies": {
+    "solid-js": "1.7.6"
+  }
 }

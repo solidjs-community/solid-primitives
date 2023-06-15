@@ -48,7 +48,8 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "devDependencies": {
-    "@solid-primitives/composites": "^1.1.1"
+    "@solid-primitives/composites": "^1.1.1",
+    "solid-js": "1.7.6"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"

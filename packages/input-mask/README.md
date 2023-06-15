@@ -9,7 +9,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/input-mask?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/input-mask)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Primitive that returns an event handler to mask the inputs of an text input element (`<input>`, `<textarea>`) when applied in `oninput` or `onchange`.
+Primitive that returns an event handler to mask the inputs of a text input element (`<input>`, `<textarea>`) when applied in `oninput` or `onchange` and set attributes to handle pattern display.
 
 ## Installation
 
@@ -23,7 +23,7 @@ yarn add @solid-primitives/input-mask
 
 For convenience reasons, the handler returns the current value, which allows you to use it to fill a signal or assign a let variable. The masks come in 4 different formats: function, regex-replacer, array and string. There are tools to convert string masks to array masks and regex-replacer and array masks to function masks.
 
-```ts
+```tsx
 import {
   stringMaskToArray,
   regexMaskToFn,
@@ -91,9 +91,58 @@ return (
 
 In most cases you'll want to use `onInput` and `onPaste`.
 
+## Showing the pattern during input
+
+The placeholder attribute is nice, but it cannot show the pattern during input. In order to rectify this shortcoming, this package has a `createMaskPattern` export:
+
+```tsx
+import { createInputMask, createMaskPattern } from "@solid-primitives/input-mask";
+
+return (
+  <>
+    <label for="datefield">ISO Date:</label>
+    <div>
+      <label for="datefield" id="datefield-pattern-view"></label>
+      <input
+        id="datefield"
+        placeholder="YYYY-MM-DD"
+        onInput={createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD")}
+      />
+    </div>
+  </>
+);
+```
+
+This uses something like the following CSS to make sure that the empty label:
+
+```css
+input {
+  border: 0.1rem solid currentColor;
+  padding: 0.5rem 0.75rem;
+}
+/* make sure the pattern text is displayed at the exact position of the input text */
+label[data-mask-value] {
+  position: absolute;
+  border: 0.1rem solid transparent;
+  padding: 0.5rem 0.75rem;
+}
+/* Render the value in a transparent color to move the pattern to the correct position */
+label[data-mask-value]::before {
+  content: attr(data-mask-value);
+  color: transparent;
+}
+/* Render the visible pattern after the invisible value */
+label[data-mask-pattern]::after {
+  content: attr(data-mask-pattern);
+  opacity: 0.7;
+}
+```
+
+As you can see, this function requires an empty label as `previousElementSibling` to the input field, which will be automatically given two attributes, `data-mask-value` and `data-mask-pattern`, which can be used to display the pattern over the input. This label must be formatted so that its content will match the text in the adjacent input; use a transparent border and padding to achieve this effect. You need not use an inline style; you can also use your favorite way to deploy the CSS (e.g. tailwind or solid-styled).
+
 ## Usage with form handling libraries
 
-To use the mask handler with [solid-js-form](https://github.com/niliadu/solid-js-form), you need to steer clear of the `use:formHandler` directive, as it overwrites the input event with DOM level 2 events. Instead use the `handleChange`and `handleBlur` event handlers instead:
+To use the mask handler with [`solid-js-form`](https://github.com/niliadu/solid-js-form), you need to steer clear of the `use:formHandler` directive, as it overwrites the input event with DOM level 2 events. Instead, use the `handleChange`and `handleBlur` event handlers instead:
 
 ```tsx
 // don't
@@ -158,8 +207,8 @@ With [solar-forms](https://github.com/kajetansw/solar-forms), the only way to us
 
 ## FAQ
 
-- **Why not support contenteditable?**<br> In most reasonable cases, you won't need it. In those rare cases you do need it, check the [selection](../selection/README.md) package, it shows you how to employ the mask filter functions together with a selection that supports contenteditable.
-- **Why `oninput`/`onchange` instead of e.g. `onkeyup`?**<br> There are a few things happening after keydown, -press and -up, which would result in flickering. Generally, you could use `onblur`, but then you'd attempt to apply the mask even if nothing changed, which just seems unnecessarily wasteful.
+- **Why not support `contenteditable`?**<br> In most reasonable cases, you won't need it. In those rare cases you do need it, check the [selection](../selection/README.md) package, it shows you how to employ the mask filter functions together with a selection that supports `contenteditable`.
+- **Why `oninput`/`onchange` instead of e.g. `onkeyup`?**<br> There are a few things happening after `keydown`, `keypress` and `keyup`, which would result in flickering. Generally, you could use `onblur`, but then you'd attempt to apply the mask even if nothing changed, which just seems unnecessarily wasteful.
 - **Will it work with actual events?**<br> Yes, it will work with composed as well as native events, even with React's synthetic events; `createInputMask` has an optional generic that you can use to type the output events. Solid's composed events are more performant than DOM events, so it is best practice to use them.
 - **Is there a server version?**<br> No, since it only creates an event handler that will solely run on the client; it makes no sense to create a server version.
 - **Does this provide any error handling?**<br> There is no error handling, but it should work well together with any form handling library.
@@ -178,7 +227,7 @@ return <input ref={ref} onInput={e => useMask && mask(e)} onPaste={e => useMask 
 
 ### DEMO
 
-https://codesandbox.io/s/solid-primitives-input-mask-demo-fnvg76?file=/index.tsx
+Here is a [working demonstration](https://primitives.solidjs.community/playground/input-mask/) ([Source code](https://github.com/solidjs-community/solid-primitives/tree/main/packages/input-mask/dev)).
 
 ## Changelog
 

@@ -1,62 +1,98 @@
-import { Component, JSX, createSignal } from "solid-js";
-
+import { For } from "solid-js";
+import { createStore, produce, reconcile, unwrap } from "solid-js/store";
+import { captureStoreUpdates } from "@solid-primitives/deep";
 import { createUndoHistory } from "../src";
 
-const Button = (props: {
-  onClick: () => void;
-  onRightClick: () => void;
-  children: JSX.Element;
-}) => (
-  <button
-    class="btn"
-    onClick={() => props.onClick()}
-    onContextMenu={e => {
-      e.preventDefault();
-      props.onRightClick();
-    }}
-  >
-    {props.children}
-  </button>
-);
+type TodoItem = { title: string; done: boolean; id: number };
 
-const App: Component = () => {
-  const [a, setA] = createSignal(0);
-  const [b, setB] = createSignal(0);
-  const [tracking, setTracking] = createSignal(true);
+let LastId = 0;
 
-  const history = createUndoHistory(
-    (
-      [
-        ["a", a, setA],
-        ["b", b, setB],
-      ] as const
-    ).map(([name, get, set]) => () => {
-      if (tracking()) {
-        const v = get();
-        return () => {
-          console.log("set", name, v);
-          set(v);
-        };
+const App = () => {
+  const [state, setState] = createStore({
+    new: { title: "" },
+    todos: [] as TodoItem[],
+  });
+
+  const getDelta = captureStoreUpdates(state);
+
+  let clonedState: any;
+
+  const history = createUndoHistory(() => {
+    const delta = getDelta();
+    if (!delta.length) return;
+
+    for (const { path, value } of delta) {
+      if (path.length === 0) {
+        clonedState = structuredClone(unwrap(value));
+      } else {
+        let target = { ...clonedState };
+        for (const key of path.slice(0, -1)) {
+          target[key] = Array.isArray(target[key]) ? [...target[key]] : { ...target[key] };
+          target = target[key];
+        }
+        target[path[path.length - 1]!] = structuredClone(unwrap(value));
+        clonedState = target;
       }
-    }),
-  );
+    }
+
+    const snapshot = clonedState;
+    return () => setState(reconcile(snapshot));
+  });
 
   return (
-    <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
-      <div class="wrapper-v">
-        <h4>Counter component</h4>
-        <p class="caption">it's very important...</p>
-        <div class="flex flex-row space-x-4">
-          <Button onClick={() => setA(p => p + 1)} onRightClick={() => setA(p => p - 1)}>
-            A: {a()}
-          </Button>
-          <Button onClick={() => setB(p => p + 1)} onRightClick={() => setB(p => p - 1)}>
-            B: {b()}
-          </Button>
-          <Button onClick={() => setTracking(p => !p)} onRightClick={() => setTracking(p => !p)}>
-            Tracking: {tracking() ? "ON" : "OFF"}
-          </Button>
-        </div>
+    <div class="my-32 grid gap-8" style={`grid-template-columns: 1fr 1fr`}>
+      <div class="ml-auto">
+        <h3>Simple Todos Example</h3>
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            setState(
+              produce(proxy => {
+                proxy.todos.push({
+                  title: proxy.new.title,
+                  done: false,
+                  id: LastId++,
+                });
+                proxy.new.title = "";
+              }),
+            );
+          }}
+          class="flex"
+        >
+          <input
+            placeholder="enter todo and click +"
+            required
+            value={state.new.title}
+            onChange={e => setState("new", "title", e.currentTarget.value)}
+          />
+          <button>+</button>
+        </form>
+        <For each={state.todos}>
+          {(todo, i) => (
+            <div class="mt-4 flex">
+              <input
+                type="checkbox"
+                checked={todo.done}
+                onChange={e => setState("todos", i(), "done", e.currentTarget.checked)}
+              />
+              <input
+                type="text"
+                value={todo.title}
+                onChange={e => setState("todos", i(), "title", e.currentTarget.value)}
+              />
+              <button
+                onClick={() =>
+                  setState(
+                    "todos",
+                    produce(todos => todos.splice(i(), 1)),
+                  )
+                }
+              >
+                x
+              </button>
+            </div>
+          )}
+        </For>
       </div>
       <div class="wrapper-v">
         <h4>History</h4>
@@ -67,8 +103,8 @@ const App: Component = () => {
           Redo
         </button>
         {/* <button class="btn" onClick={history.clear}>
-          Clear
-        </button> */}
+           Clear
+         </button> */}
       </div>
     </div>
   );

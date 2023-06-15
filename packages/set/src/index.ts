@@ -18,7 +18,7 @@ const $KEYS = Symbol("track-keys");
 export class ReactiveSet<T> extends Set<T> {
   #triggers = new TriggerCache<T | typeof $KEYS>();
 
-  constructor(values?: readonly T[] | null) {
+  constructor(values?: Iterable<T> | null) {
     super();
     if (values) for (const v of values) super.add(v);
   }
@@ -94,7 +94,7 @@ export class ReactiveSet<T> extends Set<T> {
 export class ReactiveWeakSet<T extends object> extends WeakSet<T> {
   #triggers = new TriggerCache<T>(WeakMap);
 
-  constructor(values?: readonly T[] | null) {
+  constructor(values?: Iterable<T> | null) {
     super();
     if (values) for (const v of values) super.add(v);
   }

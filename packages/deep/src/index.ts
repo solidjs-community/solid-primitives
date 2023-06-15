@@ -1,2 +1,3 @@
-export { trackDeep, deepTrack } from "./track-deep";
-export { trackStore } from "./track-store";
+export * from "./track-deep";
+export * from "./track-store";
+export * from "./store-updates";

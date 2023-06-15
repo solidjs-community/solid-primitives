@@ -52,6 +52,7 @@
   "devDependencies": {
     "@solid-primitives/refs": "workspace:^",
     "@solid-primitives/utils": "workspace:^",
+    "solid-js": "1.7.6",
     "solid-transition-group": "^0.2.2"
   },
   "peerDependencies": {

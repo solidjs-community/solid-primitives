@@ -51,7 +51,8 @@
     "primitives"
   ],
   "devDependencies": {
-    "@solid-primitives/raf": "workspace:^"
+    "@solid-primitives/raf": "workspace:^",
+    "solid-js": "1.7.6"
   },
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",

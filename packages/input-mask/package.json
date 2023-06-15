@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/input-mask",
-  "version": "0.1.7",
+  "version": "0.2.0",
   "description": "input masking event primitive.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [],
@@ -17,7 +17,8 @@
     "name": "input-mask",
     "stage": 1,
     "list": [
-      "createInputMask"
+      "createInputMask",
+      "createMaskPattern"
     ],
     "category": "Inputs"
   },
@@ -56,5 +57,9 @@
   "peerDependencies": {
     "solid-js": "^1.6.12"
   },
-  "typesVersions": {}
+  "typesVersions": {},
+  "devDependencies": {
+    "@solidjs/testing-library": "^0.7.1",
+    "solid-js": "1.7.6"
+  }
 }

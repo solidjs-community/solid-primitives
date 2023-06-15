@@ -56,5 +56,8 @@
   "peerDependencies": {
     "solid-js": "^1.6.0"
   },
-  "typesVersions": {}
+  "typesVersions": {},
+  "devDependencies": {
+    "solid-js": "1.7.6"
+  }
 }

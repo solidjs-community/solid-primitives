@@ -53,7 +53,8 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "devDependencies": {
-    "@solid-primitives/scheduled": "workspace:^"
+    "@solid-primitives/scheduled": "workspace:^",
+    "solid-js": "1.7.6"
   },
   "dependencies": {
     "@solid-primitives/event-listener": "workspace:^",

@@ -56,7 +56,8 @@
   ],
   "devDependencies": {
     "@solid-primitives/event-listener": "workspace:^",
-    "date-fns": "^2.29.3"
+    "date-fns": "^2.30.0",
+    "solid-js": "1.7.6"
   },
   "dependencies": {
     "@solid-primitives/memo": "workspace:^",

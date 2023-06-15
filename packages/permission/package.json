@@ -50,5 +50,8 @@
     "solid",
     "primitives"
   ],
-  "typesVersions": {}
+  "typesVersions": {},
+  "devDependencies": {
+    "solid-js": "1.7.6"
+  }
 }

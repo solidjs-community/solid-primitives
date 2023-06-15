@@ -60,8 +60,9 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {
-    "@reduxjs/toolkit": "^1.9.3",
+    "@reduxjs/toolkit": "^1.9.5",
     "redux": "^4.2.1",
+    "solid-js": "1.7.6",
     "solid-transition-group": "^0.2.2"
   }
 }

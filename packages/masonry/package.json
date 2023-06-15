@@ -56,7 +56,8 @@
     "solid-js": "^1.6.12"
   },
   "devDependencies": {
-    "@solid-primitives/media": "workspace:^"
+    "@solid-primitives/media": "workspace:^",
+    "solid-js": "1.7.6"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"

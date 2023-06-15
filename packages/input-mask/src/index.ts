@@ -96,9 +96,9 @@ export interface EventLike {
 
 /**
  * Create input mask handler
- * @param mask string or array or function mask
- * @param regexps optional object with regexps for string replacements used for string masks
- * @returns event handler to effectuate the input mask
+ * ```tsx
+ * <input onInput={createInputMask("9999-99-99")} />
+ * ```
  */
 export const createInputMask = <
   MaskEvent extends EventLike = KeyboardEvent | InputEvent | ClipboardEvent,
@@ -115,6 +115,53 @@ export const createInputMask = <
     ]);
     ref.value = value;
     ref.setSelectionRange(...selection);
+    return value;
+  };
+  return handler;
+};
+
+/**
+ * Adds a data-attributes with value and remaining pattern to be used in ::before/::after
+ * > Requires an extra empty element (e.g. label) directly before the input
+ * ### CSS:
+ * ```css
+ * label[data-mask-value] {
+ *
+ * }
+ * label[data-mask-value]::before {
+ *   content: attr(data-mask-value);
+ *   color: transparent;
+ * }
+ * label[data-mask-pattern]::after {
+ *   content: attr(data-mask-pattern);
+ *   opacity: 0.7;
+ * }
+ * ```
+ *
+ * ### JSX/TSX:
+ * ```tsx
+ * <div>
+ *   <label></label>
+ *   <input
+ *     placeholder="YYYY-MM-DD"
+ *     onInput={createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD")}
+ *   />
+ * </div>
+ * ```
+ */
+export const createMaskPattern = <
+  MaskEvent extends EventLike = KeyboardEvent | InputEvent | ClipboardEvent,
+>(
+  inputMask: (ev: MaskEvent) => string,
+  pattern: (value?: string) => string,
+): ((ev: MaskEvent) => string) => {
+  const handler = (ev: MaskEvent) => {
+    const value = inputMask(ev);
+    const ref = (ev.currentTarget || ev.target) as HTMLInputElement | HTMLTextAreaElement;
+    const prev = ref.previousElementSibling as HTMLElement;
+    const fn = value === "" ? "removeAttribute" : "setAttribute";
+    prev[fn]("data-mask-value", value);
+    prev[fn]("data-mask-pattern", pattern(value).slice(value.length));
     return value;
   };
   return handler;

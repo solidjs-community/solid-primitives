@@ -1,10 +1,10 @@
 import { Component } from "solid-js";
 
-import { anyMaskToFn, createInputMask, maskArrayToFn, Selection } from "../src";
+import { anyMaskToFn, createInputMask, createMaskPattern, maskArrayToFn, Selection } from "../src";
 
 const App: Component = () => {
   // ISO Date
-  const isoDateHandler = createInputMask("9999-99-99");
+  const isoDateHandler = createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD");
 
   // Card Expiry Date
   const cardExpiryHandler = createInputMask([/\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/]);
@@ -32,20 +32,37 @@ const App: Component = () => {
 
   // Hex Color
   const hexMask = maskArrayToFn(["#", /[0-9a-f]{0,6}/i]);
-  const hexHandler = createInputMask(hexMask);
+  const hexHandler = createMaskPattern(createInputMask(hexMask), () => "#000000");
 
   return (
     <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
       <div class="wrapper-v items-start">
+        <style>{`
+          label[data-mask-pattern] {
+            position: absolute;
+            padding: 0.55rem 0.8rem;
+          }
+          label[data-mask-value]::before {
+            content: attr(data-mask-value);
+            color: transparent;
+          }
+          label[data-mask-pattern]::after {
+            content: attr(data-mask-pattern);
+            opacity: 0.7;
+          }
+        `}</style>
         <h4>Input Mask</h4>
         <label for="isodate">ISO Date:</label>
-        <input
-          type="text"
-          id="isodate"
-          placeholder="YYYY-MM-DD"
-          onInput={isoDateHandler}
-          onPaste={isoDateHandler}
-        />
+        <div>
+          <label for="isodate"></label>
+          <input
+            type="text"
+            id="isodate"
+            placeholder="YYYY-MM-DD"
+            onInput={isoDateHandler}
+            onPaste={isoDateHandler}
+          />
+        </div>
         <br />
         <label for="cardexpiry">Card Expiry:</label>
         <input
@@ -77,13 +94,16 @@ const App: Component = () => {
         />
         <br />
         <label for="hex">Hex:</label>
-        <input
-          type="text"
-          id="hex"
-          placeholder="#000000"
-          onInput={hexHandler}
-          onPaste={hexHandler}
-        />
+        <div>
+          <label for="hex"></label>
+          <input
+            type="text"
+            id="hex"
+            placeholder="#000000"
+            onInput={hexHandler}
+            onPaste={hexHandler}
+          />
+        </div>
         <br />
       </div>
     </div>

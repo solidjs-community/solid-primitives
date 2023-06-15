@@ -50,10 +50,11 @@
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.3",
-    "leaflet": "^1.9.3",
-    "mapbox-gl": "^2.14.1",
+    "leaflet": "^1.9.4",
+    "mapbox-gl": "^2.15.0",
+    "solid-js": "1.7.6",
     "solid-map-gl": "^1.7.2",
-    "vite-plugin-mkcert": "^1.14.0"
+    "vite-plugin-mkcert": "^1.15.0"
   },
   "dependencies": {
     "@solid-primitives/static-store": "workspace:^",
