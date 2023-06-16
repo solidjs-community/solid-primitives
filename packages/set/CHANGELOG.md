@@ -1,5 +1,11 @@
 # @solid-primitives/set
 
+## 0.4.6
+
+### Patch Changes
+
+- 52a00ca5: Update `ReactiveSet`/`ReactiveMap` constructors to allow passing any iterable as the initial value.
+
 ## 0.4.5
 
 ### Patch Changes
