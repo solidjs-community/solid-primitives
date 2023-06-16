@@ -1,5 +1,11 @@
 # @solid-primitives/filesystem
 
+## 1.2.0
+
+### Minor Changes
+
+- 15a45a50: filesystem: support for webkitEntries
+
 ## 1.1.0
 
 ### Minor Changes
