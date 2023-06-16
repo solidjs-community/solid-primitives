@@ -135,15 +135,22 @@ The previous `<Item>` component can also be used in combination with a file inpu
 
 ```tsx
 const [webkitEntry, setWebkitEntry] = createSignal();
-const fs = createMemo(() => webkitEntry() &&
-  createFileSystem(makeWebAccessFileSystem({ webkitEntry: webkitEntry() })));
+const fs = createMemo(
+  () => webkitEntry() && createFileSystem(makeWebAccessFileSystem({ webkitEntry: webkitEntry() })),
+);
 
-return <>
-  <input type="file" webkitdirectory onChange={e => setWebkitEntry(e.currentTarget.webkitEntry)} />
-  <Show when={fs()}>
-    <Item fs={fs()} path="/" />
-  </Show>
-</>
+return (
+  <>
+    <input
+      type="file"
+      webkitdirectory
+      onChange={e => setWebkitEntry(e.currentTarget.webkitEntry)}
+    />
+    <Show when={fs()}>
+      <Item fs={fs()} path="/" />
+    </Show>
+  </>
+);
 ```
 
 ### rsync
