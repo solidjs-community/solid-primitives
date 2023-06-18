@@ -11,8 +11,12 @@ import { DirEntries } from "./types";
 export const makeWebAccessFileSystem = isServer
   ? () => Promise.resolve(null)
   : typeof globalThis.showDirectoryPicker === "function"
-  ? async (options?: DirectoryPickerOptions | undefined) => {
-      const handle = await globalThis.showDirectoryPicker(options);
+  ? async (
+      options?: DirectoryPickerOptions | { webkitEntry: FileSystemDirectoryHandle } | undefined,
+    ) => {
+      const handle =
+        (options as { webkitEntry: FileSystemDirectoryHandle })?.webkitEntry ||
+        (await globalThis.showDirectoryPicker(options));
       const walk = async (
         path: string,
         handler: (

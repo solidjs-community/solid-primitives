@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/filesystem",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A primitive for convenient file system access.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [],

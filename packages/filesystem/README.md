@@ -16,11 +16,11 @@ A primitive that allows to manage different file system access methods:
 - `createAsyncFileSystem` - Adds a reactive layer to an asynchronous file system adapter
 - `makeNoFileSystem` - Adapter that provides a synchronous mock file system
 - `makeNoAsyncFileSystem` - Adapter that provides an asynchronous mock file system
-- `makeVirtualFileSystem` - Adapter that provides a virtual file system that doubles as FsMap for `typescript-vfs` with its `.toMap()` method.
-- `makeWebAccessFileSystem` (client only) - Adapter that provides access to the actual filesystem in the browser using a directory picker
-- `makeNodeFileSystem` (server only) - Adapter that abstracts the node fs/promises module for the use with this primitive
-- `makeTauriFileSystem` (tauri with fs access enabled only) - Adapter that connects to the tauri fs module
-- `makeChokidarWatcher` - (experimental): use chokidar to watch for file system changes and trigger reactive updates
+- `makeVirtualFileSystem` - Adapter that provides a virtual file system that doubles as `FsMap` for `typescript-vfs` with its `.toMap()` method.
+- `makeWebAccessFileSystem` (client only) - Adapter that provides access to the actual file system in the browser using a directory picker or a given `webkitEntry` from an input with the `webkitdirectory` attribute set
+- `makeNodeFileSystem` (server only) - Adapter that abstracts the node `fs/promises` module for the use with this primitive
+- `makeTauriFileSystem` (`tauri` with `fs` access enabled only) - Adapter that connects to the `tauri fs` module
+- `makeChokidarWatcher` - (experimental): use `chokidar` to watch for file system changes and trigger reactive updates
 - `rsync` - small tool to copy over recursively from one file system or adapter to another
 
 ## Installation
@@ -67,13 +67,13 @@ export type AsyncFileSystemAdapter = {
 
 To support an unsupported file system, you can provide a wrapper with one of the same APIs.
 
-If no rename method is given, mkdir/writeFile/rm are used to achieve the same effect. An actual rename call will be more performant, though.
+If no `rename` method is given, `mkdir/writeFile/rm` are used to achieve the same effect. An actual `rename` call will be more performant, though.
 
-The `createFileSystem` call then creates a reactive surface above each of these APIs so that the return values of all reading calls are signals for synchronous and resources for asynchronous filesystem adapters; writing methods for asynchronous APIs will return the same promise for convenience reasons.
+The `createFileSystem` call then creates a reactive surface above each of these APIs so that the return values of all reading calls are signals for synchronous and resources for asynchronous file system adapters; writing methods for asynchronous APIs will return the same promise for convenience reasons.
 
-There is experimental support for a watcher as second argument in `createFileSystems`, which triggers reactive updates on external filesystem changes. Currently, there is only experimental support for chokidar for the node filesystem.
+There is experimental support for a watcher as second argument in `createFileSystems`, which triggers reactive updates on external file system changes. Currently, there is only experimental support for `chokidar` for the node file system.
 
-These getters returned from reading methods are bound to Solid's reactivity so that they will automatically cause effects using them outside of untrack() to re-run on updates. Getters may initially return undefined, but will update to the correct value once evaluated.
+These getters returned from reading methods are bound to Solid's reactivity so that they will automatically cause effects using them outside `untrack()` to re-run on updates. Getters may initially return undefined, but will update to the correct value once evaluated.
 
 ```tsx
 const vfs = makeVirtualFileSystem({});
@@ -129,9 +129,33 @@ const Item = (props: { path: string; fs: SyncFileSystem | AsyncFileSystem }) => 
 };
 ```
 
+### Using `makeWebAccessFileSystem` with a `webkitdirectory` input
+
+The previous `<Item>` component can also be used in combination with a file input with the `webkitdirectory` attribute set:
+
+```tsx
+const [webkitEntry, setWebkitEntry] = createSignal();
+const fs = createMemo(
+  () => webkitEntry() && createFileSystem(makeWebAccessFileSystem({ webkitEntry: webkitEntry() })),
+);
+
+return (
+  <>
+    <input
+      type="file"
+      webkitdirectory
+      onChange={e => setWebkitEntry(e.currentTarget.webkitEntry)}
+    />
+    <Show when={fs()}>
+      <Item fs={fs()} path="/" />
+    </Show>
+  </>
+);
+```
+
 ### rsync
 
-In some cases, you might need to move data from one file system (or adapter) to another one. In order to do so, this package comes with an rsync utility:
+In some cases, you might need to move data from one file system (or adapter) to another one. In order to do so, this package comes with a rsync utility:
 
 ```ts
 rsync(srcFs, srcPath, destFs, destPath): Promise<void>;
@@ -139,7 +163,7 @@ rsync(srcFs, srcPath, destFs, destPath): Promise<void>;
 
 ## Demo
 
-You may view a working example of createFileSystem/makeVirtualFileSystem/makeWebAccessFileSystem here:
+You may view a working example of `createFileSystem/makeVirtualFileSystem/makeWebAccessFileSystem` here:
 https://primitives.solidjs.community/playground/filesystem/
 
 ## Changelog
