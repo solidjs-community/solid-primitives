@@ -182,7 +182,7 @@ Type validation of the `values` array thanks to the amazing @otonashixav (https:
  * const NumberContext = createContext<number>
  * const StringContext = createContext<string>
  * const children = withContext(
- *    () => children(props.children),
+ *    () => props.children,
  *    [
  *      [NumberContext, 1],
  *      [StringContext, "string"]
