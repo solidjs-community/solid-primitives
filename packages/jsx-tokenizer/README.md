@@ -293,7 +293,7 @@ isToken([tokenizer1, tokenizer2, MyTokenComponent], token);
 
 ## Demo
 
-[Live Example](https://primitives.solidjs.community/playground/) | [Source Code](./dev/index.tsx)
+[Live Example](https://primitives.solidjs.community/playground/jsx-tokenizer) | [Source Code](./dev/index.tsx)
 
 ## Changelog
 
