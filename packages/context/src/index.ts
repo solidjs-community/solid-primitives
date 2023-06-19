@@ -1,4 +1,13 @@
-import { createContext, createComponent, useContext, JSX, Context, FlowComponent } from "solid-js";
+import {
+  createContext,
+  createComponent,
+  useContext,
+  JSX,
+  Context,
+  FlowComponent,
+  Accessor,
+  untrack,
+} from "solid-js";
 import type { ContextProviderComponent } from "solid-js/types/reactive/signal";
 
 export type ContextProviderProps = {
@@ -118,4 +127,70 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
     return createComponent(item, ctxProps);
   };
   return fn(0);
+}
+
+/**
+ * A utility-helper to provide context to unresolved JSX-elements.
+ *
+ * @param elements Array of tuples of `[ContextProviderComponent, value]` or `[Context, value]` or bound `ContextProviderComponent` (that doesn't take a `value` property).
+ * @param values Array of tuples of `[ContextProviderComponent, value]` or `[Context, value]` or bound `ContextProviderComponent` (that doesn't take a `value` property).
+ * @param values Array of tuples of `[ContextProviderComponent, value]` or `[Context, value]` or bound `ContextProviderComponent` (that doesn't take a `value` property).
+ *
+ * @example
+ * ```tsx
+ * // single context
+ * const resolvedChildren = withContext(
+ *    () => children(props.children),
+ *    CounterContext,
+ *    1
+ * )
+ *
+ * // multiple contexts
+ * const resolvedChildren = withContext(
+ *    () => children(props.children),
+ *    [[CounterContext, 1]]
+ * ```
+ */
+export function withContext<T extends unknown, U extends unknown>(
+  children: Accessor<U>,
+  context: Context<T>,
+  value: T,
+): U;
+export function withContext<T extends [unknown?, ...unknown[]], U extends unknown>(
+  children: Accessor<U>,
+  contexts: {
+    [K in keyof T]: readonly [Context<T[K]>, [T[K]][T extends unknown ? 0 : never]];
+  },
+): U;
+export function withContext<
+  T extends any[],
+  U extends Element,
+  V extends {
+    [K in keyof T]: readonly [Context<T[K]>, [T[K]][T extends unknown ? 0 : never]];
+  },
+>(children: Accessor<U>, contexts: V | Context<T>, value?: T) {
+  let result: U;
+
+  let values = Array.isArray(contexts) ? contexts : ([[contexts, value]] as unknown as V);
+
+  const fn = (i: number) => {
+    let item: any = values[i];
+
+    if (!item) return (result = children());
+
+    const ctxProps: { value?: any; children: JSX.Element } = {
+      get children() {
+        return fn(i + 1);
+      },
+    };
+    if (Array.isArray(item)) {
+      ctxProps.value = item[1];
+      item = item[0];
+      if (typeof item !== "function") item = item.Provider;
+    }
+
+    return createComponent(item, ctxProps);
+  };
+
+  return result!;
 }
