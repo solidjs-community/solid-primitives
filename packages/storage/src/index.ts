@@ -23,6 +23,7 @@ import {
 } from "./storage";
 import { CookieOptions, cookieStorage, createCookieStorage } from "./cookies";
 import { addClearMethod } from "./tools";
+import { PersistenceOptions, makePersisted } from "./persisted";
 export {
   createStorage,
   createAsyncStorage,
@@ -33,4 +34,6 @@ export {
   type CookieOptions,
   cookieStorage,
   addClearMethod,
+  type PersistenceOptions,
+  makePersisted
 };
