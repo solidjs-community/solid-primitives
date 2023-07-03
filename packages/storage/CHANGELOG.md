@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 2.0.0
+
+### Major Changes
+
+- d0453ccf: new makePersisted primitive, deprecated old API
+
 ## 1.3.11
 
 ### Patch Changes
