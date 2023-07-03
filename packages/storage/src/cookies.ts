@@ -33,17 +33,17 @@ const serializeCookieOptions = (options?: CookieOptions) => {
   return memo;
 };
 
-let useRequest: () => ({ request: Request })
+let useRequest: () => { request: Request };
 try {
-  useRequest = require('solid-start/server').useRequest;
+  useRequest = require("solid-start/server").useRequest;
 } catch (e) {
   useRequest = () => {
-    console.warn('It seems you attempt to use cookieStorage on the server without having solid-start installed');
+    console.warn(
+      "It seems you attempt to use cookieStorage on the server without having solid-start installed",
+    );
     return { request: { headers: { get: () => "" } } as unknown as Request };
   };
 }
-
-
 
 /**
  * handle cookies exactly like you would handle localStorage
@@ -63,21 +63,20 @@ try {
  * Also, you can use its _read and _write properties to change reading and writing
  */
 export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
-  _read: isServer ? () => useRequest().request.headers.get('Cookie') : () => document.cookie,
+  _read: isServer ? () => useRequest().request.headers.get("Cookie") : () => document.cookie,
   _write: isServer
-    ?  (_key: string, _value: string, _options?: CookieOptions) => ""
+    ? (_key: string, _value: string, _options?: CookieOptions) => ""
     : (key: string, value: string, options?: CookieOptions) => {
-      document.cookie = `${key}=${value}${serializeCookieOptions(
-        options,
-      )}`;
-    },
+        document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
+      },
   getItem: (key: string) =>
-    cookieStorage._read()
+    cookieStorage
+      ._read()
       .match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")
       ?.pop() ?? null,
   setItem: (key: string, value: string, options?: CookieOptions) => {
     const oldValue = cookieStorage.getItem(key);
-    cookieStorage._write(key, value, options)
+    cookieStorage._write(key, value, options);
     const storageEvent = Object.assign(new Event("storage"), {
       key,
       oldValue,
@@ -88,31 +87,25 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
     window.dispatchEvent(storageEvent);
   },
   removeItem: (key: string) => {
-    cookieStorage._write(key, 'deleted', { expires: new Date(0) });
+    cookieStorage._write(key, "deleted", { expires: new Date(0) });
   },
   key: (index: number) => {
     let key: string | null = null;
     let count = 0;
-    cookieStorage._read().replace(
-      /(?:^|;)\s*(.+?)\s*=\s*[^;]+/g,
-      (_: string, found: string) => {
-        if (!key && found && count++ === index) {
-          key = found;
-        }
-        return "";
-      },
-    );
+    cookieStorage._read().replace(/(?:^|;)\s*(.+?)\s*=\s*[^;]+/g, (_: string, found: string) => {
+      if (!key && found && count++ === index) {
+        key = found;
+      }
+      return "";
+    });
     return key;
   },
   get length() {
     let length = 0;
-    cookieStorage._read().replace(
-      /(?:^|;)\s*.+?\s*=\s*[^;]+/g,
-      (found: string) => {
-        length += found ? 1 : 0;
-        return "";
-      },
-    );
+    cookieStorage._read().replace(/(?:^|;)\s*.+?\s*=\s*[^;]+/g, (found: string) => {
+      length += found ? 1 : 0;
+      return "";
+    });
     return length;
   },
 });

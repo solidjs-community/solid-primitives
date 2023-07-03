@@ -35,5 +35,5 @@ export {
   cookieStorage,
   addClearMethod,
   type PersistenceOptions,
-  makePersisted
+  makePersisted,
 };

@@ -47,7 +47,6 @@ type PersistedOptions<Type, StorageOptions> = {
 - setting a persisted signal to undefined or null will remove the item from the storage
 - to use `makePersisted` with other state management APIs, you need some adapter that will project your API to either the output of `createSignal` or `createStore`
 
-
 ### Using `makePersisted` with resources
 
 Instead of wrapping the resource itself, it is far simpler to use the `storage` option of the resource to provide a persisted signal or [deep signal](../resource/#createdeepsignal):
@@ -57,7 +56,6 @@ const [resource] = createResource(fetcher, { storage: makePersisted(createSignal
 ```
 
 If you are using an asynchronous storage to persist the state of a resource, it might receive an update due to being initialized from the storage before or after the fetcher resolved. If the initialization resolves after the fetcher, its result is discarded not to overwrite more current data.
-
 
 ### Different storage APIs
 

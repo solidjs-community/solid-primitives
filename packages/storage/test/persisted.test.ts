@@ -133,4 +133,3 @@ describe("makePersisted", () => {
     expect(signal()).toBe("overwritten");
   });
 });
-
