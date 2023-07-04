@@ -21,9 +21,9 @@ yarn add @solid-primitives/signal-builders
 
 ## How to use it
 
-Signal buildres are creating computations when used, so they need to be used under a reactive root.
+Signal builders create computations when used, so they need to be used under a reactive root.
 
-Note, since all of signal builders use [`createMemo`](https://www.solidjs.com/docs/latest/api#creatememo) to wrap the calculaion, updates will be caused only when the calcualted value changes. Also the calculations should stay 'pure' – try to not cause side effects inside them.
+Note, since all of the signal builders use [`createMemo`](https://www.solidjs.com/docs/latest/api#creatememo) to wrap the calculation, updates will be caused only when the calculated value changes. Also the calculations should stay 'pure' – try to not cause side effects inside them.
 
 ### Array
 
