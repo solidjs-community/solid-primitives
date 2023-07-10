@@ -99,6 +99,16 @@ describe("leadingAndTrailing debounce", () => {
     expect(val).toBe(5);
   });
 
+  test("debounce only called once if only triggered once", async () => {
+    let callCount = 0;
+    const trigger = leadingAndTrailing(debounce, () => (callCount += 1), 10);
+    expect(callCount).toBe(0);
+    trigger();
+    expect(callCount).toBe(1);
+    await sleep(30);
+    expect(callCount).toBe(1);
+  });
+
   test("trigger debounces with pauses", async () => {
     let val = 0;
     const trigger = leadingAndTrailing(debounce, (current: number) => (val = current), 20);
