@@ -23,7 +23,8 @@
       "throttle",
       "scheduleIdle",
       "leading",
-      "createScheduled"
+      "createScheduled",
+      "leadingAndTrailing"
     ],
     "category": "Utilities"
   },

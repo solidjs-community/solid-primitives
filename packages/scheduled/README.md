@@ -106,7 +106,7 @@ trigger("Hello!");
 trigger.clear(); // clears a timeout in progress
 ```
 
-## `leading`
+## `leadingAndTrailing`
 
 Creates a scheduled and cancellable callback that will be called on **leading** edge for the first call, and **trailing** edge thereafter.
 
