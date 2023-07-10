@@ -1,5 +1,5 @@
-import { describe, test, expect, vi } from "vitest";
-import { debounce, leading, throttle, scheduleIdle } from "../src";
+import { describe, expect, test, vi } from "vitest";
+import { debounce, leading, leadingAndTrailing, scheduleIdle, throttle } from "../src";
 
 describe("on server", () => {
   const DATA: [string, (cb: (a: any) => void, time: number) => (a: any) => void][] = [
@@ -22,6 +22,17 @@ describe("on server", () => {
   test("leading is noop", () => {
     const cb = vi.fn();
     const trigger = leading(debounce, cb, 100);
+    trigger("foo");
+    expect(cb).toHaveBeenCalledTimes(1);
+    expect(cb).toHaveBeenCalledWith("foo");
+    vi.clearAllTimers();
+    trigger("baz");
+    expect(cb).toHaveBeenCalledTimes(1);
+  });
+
+  test("leadingAndTrailing is noop", () => {
+    const cb = vi.fn();
+    const trigger = leadingAndTrailing(debounce, cb, 100);
     trigger("foo");
     expect(cb).toHaveBeenCalledTimes(1);
     expect(cb).toHaveBeenCalledWith("foo");
