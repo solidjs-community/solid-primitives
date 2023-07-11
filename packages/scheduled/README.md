@@ -197,8 +197,8 @@ BOTTOM: called user callback
 2.        █         █
 3. █
 4. █         █
-5. █      █         █
-6. █                █
+5. █                █
+6. █      █         █
 ```
 
 [**Interactive DEMO of the schematic above**](https://codesandbox.io/s/solid-primitives-scheduled-demo-0uk8xc?file=/index.tsx)
