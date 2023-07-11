@@ -227,38 +227,36 @@ export function leadingAndTrailing<Args extends unknown[]>(
   }
 
   // We have three separate reasons to call the scheduled function:
-  // 1. Because we need to set up the schedule for the first time.
-  //    This represents the "leading" (1) call -- by the time the scheduled
+  const LEADING = 0; // Because we need to set up the schedule for the first time.
+  //    This represents the leading call -- by the time the scheduled
   //    function is called, the leading call has already happened, so
   //    the scheduled function does nothing.
-  // 2. Because the scheduled function was called before the wait time
-  //    elapsed. This represents the "trailing" (2) call -- when the scheduled
+  const TRAILING = 1; // Because the scheduled function was called before the wait time
+  //    elapsed. This represents the trailing call -- when the scheduled
   //    function is called, the wait time has elapsed, so we should call
   //    the callback.
-  // 3. Because we have waited for the wait time to elapse to see if further
+  const RESET = 2; // Because we have waited for the wait time to elapse to see if further
   //    calls to the scheduled function happen. If no calls have happened, we
   //    should reset the state entirely.  Otherwise, the trailing calls will
   //    have happened in the 'trailing' call, so we should do nothing.
-  type CallType =
-    | 1 // leading
-    | 2 // trailing
-    | 3; // complete
+
+  type CallType = typeof LEADING | typeof TRAILING | typeof RESET;
 
   let firstCall = true;
-  const onTrail = (callType: CallType, ...args: Args) => {
-    if (callType === 3) {
+  const onTrail = (callType: CallType, args: Args) => {
+    if (callType === RESET) {
       firstCall = true;
       return;
     }
-    if (callType === 2) callback(...args);
+    if (callType === TRAILING) callback(...args);
 
     // @ts-expect-error args aren't used for "complete" call type, so we don't need to pass them
-    setTimeout(() => scheduled(3), 0);
+    setTimeout(() => scheduled(RESET), 0);
   };
   const scheduled = schedule(onTrail, wait);
   const func: typeof callback = (...args) => {
     if (firstCall) callback(...args);
-    scheduled(firstCall ? 1 : 2, ...args);
+    scheduled(firstCall ? LEADING : TRAILING, args);
     firstCall = false;
   };
   const clear = () => {
