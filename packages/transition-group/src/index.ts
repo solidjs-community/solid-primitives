@@ -10,6 +10,9 @@ import {
   onCleanup,
   createRoot,
   Setter,
+  createEffect,
+  getOwner,
+  runWithOwner,
 } from "solid-js";
 import { isServer } from "solid-js/web";
 
@@ -169,6 +172,7 @@ export type ExitMethod = "remove" | "move-to-end" | "keep-index";
 export type ListTransitionOptions = {
   /** whether to run the transition on the initial elements. Defaults to `false` */
   appear?: boolean;
+  cancellable?: boolean;
   /**
    * This controls how the elements exit. {@link ExitMethod}
    * - `"remove"` removes the element immediately.
@@ -180,15 +184,19 @@ export type ListTransitionOptions = {
 
 type TransitionState = "initial" | "entering" | "entered" | "exiting" | "exited";
 
+type TransitionCallback = (done: () => void) => void;
+
 type TransitionItem = {
   state: Accessor<TransitionState>;
-  useOnEnter(callback: () => unknown): void;
-  useOnExit(callback: () => unknown): void;
+  useOnEnter(callback: TransitionCallback): void;
+  useOnExit(callback: TransitionCallback): void;
+  useOnRemain(callback: () => void): void;
 };
 
 type TransitionItemControls = {
   enter(): Promise<void>;
   exit(): Promise<void>;
+  remain(): void;
 };
 
 function makeSetItem<T>(set: Set<T>, item: T) {
@@ -198,12 +206,14 @@ function makeSetItem<T>(set: Set<T>, item: T) {
   });
 }
 
-function allCallbacks(set: Set<() => unknown>): Promise<unknown> {
-  return Promise.all(Array.from(set.values()).map(callback => callback()));
+function allCallbacks(set: Set<TransitionCallback>): Promise<unknown> {
+  return Promise.all(
+    Array.from(set.values()).map(callback => new Promise<void>(resolve => callback(resolve))),
+  );
 }
 
 function makeTransitionControl(
-  callbacks: Set<() => unknown>,
+  callbacks: Set<TransitionCallback>,
   getDispose: Accessor<(() => void) | undefined>,
   setDispose: Setter<(() => void) | undefined>,
   onStart: () => void,
@@ -227,18 +237,19 @@ function createTransitionItem(): [TransitionItem, TransitionItemControls] {
   const [state, setState] = createSignal<TransitionState>("initial");
   const [getDispose, setDispose] = createSignal<() => void>();
 
-  const enterCallbacks = new Set<() => unknown>();
-  const exitCallbacks = new Set<() => unknown>();
+  const enterCallbacks = new Set<TransitionCallback>();
+  const exitCallbacks = new Set<TransitionCallback>();
 
   return [
     {
       state,
-      useOnEnter(callback: () => unknown) {
+      useOnEnter(callback: TransitionCallback) {
         makeSetItem(enterCallbacks, callback);
       },
-      useOnExit(callback: () => unknown) {
+      useOnExit(callback: TransitionCallback) {
         makeSetItem(exitCallbacks, callback);
       },
+      useOnRemain(callback: () => void) {},
     },
     {
       enter: makeTransitionControl(
@@ -249,7 +260,7 @@ function createTransitionItem(): [TransitionItem, TransitionItemControls] {
           setState("entering");
         },
         () => {
-          setState("exiting");
+          setState("entered");
         },
       ),
       exit: makeTransitionControl(
@@ -263,6 +274,7 @@ function createTransitionItem(): [TransitionItem, TransitionItemControls] {
           setState("exited");
         },
       ),
+      remain() {},
     },
   ];
 }
@@ -273,6 +285,15 @@ function arrayEquals<T extends Array<unknown>>(a: T, b: T): boolean {
     if (a[i] !== b[i]) return false;
   }
   return true;
+}
+
+function trackTransitionPending(isPending: Accessor<boolean>, callback: () => void): void {
+  if (untrack(isPending)) {
+    isPending();
+    return;
+  } else {
+    callback();
+  }
 }
 
 /**
@@ -319,6 +340,7 @@ export function createListTransition<T extends object>(
             state: () => "initial",
             useOnEnter() {},
             useOnExit() {},
+            useOnRemain() {},
           },
         ] as [T, TransitionItem],
     );
@@ -329,17 +351,21 @@ export function createListTransition<T extends object>(
   // otherwise the elements will match and transition skipped, or transitioned if the source is different from the initial value
   let prevSet: ReadonlySet<T> = new Set(options.appear ? undefined : initSource);
 
-  const [toRemove, setToRemove] = createSignal<T[]>([], { equals: false });
+  const [result, setResult] = createSignal<[T, TransitionItem, TransitionItemControls][]>(
+    options.appear ? [] : initSource.slice().map(item => [item, ...createTransitionItem()]),
+    { equals: arrayEquals },
+  );
+
   const [isTransitionPending] = useTransition();
 
   const finishRemoved: (el: T) => void =
     options.exitMethod === "remove"
       ? noop
       : el => {
-          setToRemove(p => (p.push.call(p, el), p));
+          setResult(prev => prev.filter(([prevEl]) => prevEl !== el));
         };
 
-  const handleRemoved: (
+  const handleExiting: (
     els: [T, TransitionItem, TransitionItemControls][],
     el: [T, TransitionItem, TransitionItemControls],
     i: number,
@@ -350,55 +376,60 @@ export function createListTransition<T extends object>(
       ? (els, el, i) => els.splice(i, 0, el)
       : (els, el) => els.push(el);
 
-  return createMemo<[T, TransitionItem, TransitionItemControls][]>(
-    prev => {
-      const elsToRemove = toRemove();
-      const sourceList = source();
-      (sourceList as any)[$TRACK]; // top level store tracking
+  const owner = getOwner();
 
-      if (untrack(isTransitionPending)) {
-        // wait for pending transition to end before animating
-        isTransitionPending();
-        return prev;
-      }
+  createComputed(() => {
+    const sourceList = source();
+    (sourceList as any)[$TRACK]; // top level store tracking
 
-      if (elsToRemove.length) {
-        return prev.filter(([el]) => !elsToRemove.includes(el));
-      }
-
-      return untrack(() => {
+    trackTransitionPending(isTransitionPending, () => {
+      untrack(() => {
+        const prev = result();
         const nextSet: ReadonlySet<T> = new Set(sourceList);
         const next: [T, TransitionItem, TransitionItemControls][] = [];
 
         for (let i = 0; i < sourceList.length; i++) {
           const el = sourceList[i]!;
           if (prevSet.has(el)) {
-            next.push(prev.find(([prevEl]) => prevEl === el)!);
+            const tuple = prev.find(([prevEl]) => prevEl === el)!;
+            next.push(tuple);
+            const [, , controls] = tuple;
+            controls.remain();
           } else {
+            console.log("add", el);
             const [item, controls] = createTransitionItem();
             next.push([el, item, controls]);
-            controls.enter();
-          }
-        }
-
-        for (let i = 0; i < prev.length; i++) {
-          const item = prev[i]!;
-          const [el, , controls] = item;
-          if (!nextSet.has(el)) {
-            handleRemoved(next, item, i);
-            controls.exit().then(() => {
-              finishRemoved(el);
+            queueMicrotask(() => {
+              controls.enter();
             });
           }
         }
 
-        // skip if nothing changed
-        if (arrayEquals(next, prev)) return prev;
+        for (let i = 0; i < prev.length; i++) {
+          const tuple = prev[i]!;
+          const [el, , controls] = tuple;
+          if (!nextSet.has(el)) {
+            handleExiting(next, tuple, i);
+            if (prevSet.has(el)) {
+              console.log("remove");
+              controls.exit().then(() => {
+                runWithOwner(owner, () => {
+                  createComputed(() => {
+                    trackTransitionPending(isTransitionPending, () => {
+                      finishRemoved(el);
+                    });
+                  });
+                });
+              });
+            }
+          }
+        }
 
         prevSet = nextSet;
-        return next;
+        setResult(next);
       });
-    },
-    options.appear ? [] : initSource.slice().map(item => [item, ...createTransitionItem()]),
-  ) as unknown as Accessor<[T, TransitionItem][]>;
+    });
+  });
+
+  return result as unknown as Accessor<[T, TransitionItem][]>;
 }

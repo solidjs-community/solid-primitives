@@ -1,6 +1,8 @@
 import {
+  createEffect,
   createRenderEffect,
   createResource,
+  mapArray,
   onCleanup,
   onMount,
   Suspense,
@@ -152,72 +154,49 @@ const ListPage: Component = () => {
 
               const options = { duration: 600, easing: "cubic-bezier(0.4, 0, 0.2, 1)" };
 
-              const transition = createListTransition(resolved.toArray, {
-                appear,
-                onChange({ added, finishRemoved, unchanged, removed }) {
-                  added.forEach(el => {
-                    queueMicrotask(() => {
-                      if (!el.isConnected) return;
-                      el.style.opacity = "0";
-                      el.style.transform = "translateY(10px)";
-                      el.animate(
-                        [
-                          { opacity: 0, transform: "translateY(-36px)" },
-                          { opacity: 1, transform: "translateY(0)" },
-                        ],
-                        { ...options, fill: "both" },
-                      );
-                    });
+              const transition = createListTransition(resolved.toArray, { appear });
+
+              const els = mapArray(transition, ([el, { state, useOnEnter, useOnExit }]) => {
+                createEffect(() => {
+                  console.log("state", state(), el);
+                });
+
+                useOnEnter(done => {
+                  console.log("onEnter", el);
+                  const animation = el.animate(
+                    [
+                      { opacity: 0, transform: "translateY(-30px)" },
+                      { opacity: 1, transform: "translateY(0)" },
+                    ],
+                    { ...options, fill: "both" },
+                  );
+                  onCleanup(() => {
+                    animation.commitStyles();
+                    animation.cancel();
                   });
+                  animation.finished.then(done).catch(done);
+                });
 
-                  unchanged.forEach(el => {
-                    const { left: left1, top: top1 } = el.getBoundingClientRect();
-                    if (!el.isConnected) return;
-                    queueMicrotask(() => {
-                      const { left: left2, top: top2 } = el.getBoundingClientRect();
-                      el.animate(
-                        [
-                          { transform: `translate(${left1 - left2}px, ${top1 - top2}px)` },
-                          { transform: "none" },
-                        ],
-                        options,
-                      );
-                    });
+                useOnExit(done => {
+                  console.log("onExit", el);
+                  const animation = el.animate(
+                    [
+                      { opacity: 1, transform: "translateY(0)" },
+                      { opacity: 0, transform: "translateY(30px)" },
+                    ],
+                    { ...options, fill: "both" },
+                  );
+                  onCleanup(() => {
+                    animation.commitStyles();
+                    animation.cancel();
                   });
+                  animation.finished.then(done).catch(done);
+                });
 
-                  const removedRects = removed.map(el => el.getBoundingClientRect());
-                  removed.forEach(el => {
-                    el.style.transform = "none";
-                    el.style.position = "absolute";
-                  });
-                  queueMicrotask(() => {
-                    removed.forEach((el, i) => {
-                      if (!el.isConnected) return finishRemoved([el]);
-
-                      const { left: left1, top: top1 } = removedRects[i]!;
-                      const { left: left2, top: top2 } = el.getBoundingClientRect();
-
-                      const a = el.animate(
-                        [
-                          { transform: `translate(${left1 - left2}px, ${top1 - top2}px)` },
-                          {
-                            opacity: 0,
-                            transform: `translate(${left1 - left2}px, ${top1 - top2 + 36}px)`,
-                          },
-                        ],
-                        options,
-                      );
-
-                      i === removed.length - 1 &&
-                        a.finished
-                          .then(() => finishRemoved(removed))
-                          .catch(() => finishRemoved(removed));
-                    });
-                  });
-                },
+                return el;
               });
 
-              return <>{transition()}</>;
+              return <>{els()}</>;
             })}
           </Show>
         </Suspense>
