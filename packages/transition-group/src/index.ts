@@ -7,10 +7,12 @@ import {
   createComputed,
   useTransition,
   onCleanup,
+  createEffect,
 } from "solid-js";
 import { isServer } from "solid-js/web";
 
 const noop = () => {};
+const noopAsync = async () => {};
 const noopTransition = (el: any, done: () => void) => done();
 
 export type TransitionMode = "out-in" | "in-out" | "parallel";
@@ -163,7 +165,7 @@ export type OnListChange<T> = (payload: {
 
 export type ExitMethod = "remove" | "move-to-end" | "keep-index";
 
-export type InterruptMethod = "cancel" | "wait" | "none" | "clone";
+export type InterruptMethod = "cancel" | "wait" | "none";
 
 export type ListTransitionOptions = {
   /** whether to run the transition on the initial elements. Defaults to `false` */
@@ -173,7 +175,6 @@ export type ListTransitionOptions = {
    * - `"cancel"` (default) abandons the current transition and starts the interrupting one as soon as it happens.
    * - `"wait"` waits for the current transition to complete before starting the most recently interrupting transition.
    * - `"none"` ignores the interrupting transition entirely
-   * - `"clone"` behaves the same as "wait" when the element is entering. If it is exiting, it clones the element and performs the enter transition on the clone instead.
    */
   interruptMethod?: InterruptMethod;
   /**
@@ -217,42 +218,7 @@ function allCallbacks(set: Set<TransitionCallback>): Promise<unknown> {
   );
 }
 
-class TransitionCancelError extends Error {}
-
-function makeTransitionControl(
-  callbackSet: Set<TransitionCallback>,
-  cancelSet: Set<() => void>,
-  onStart: () => void,
-  onEnd: () => void,
-): () => Promise<void> {
-  return async () => {
-    for (const cancel of cancelSet) {
-      cancel();
-    }
-
-    let cancel: () => void;
-
-    const cancelPromise = new Promise((_, reject) => {
-      cancel = () => reject(new TransitionCancelError());
-      cancelSet.add(cancel);
-    });
-
-    onStart();
-
-    return Promise.race([allCallbacks(callbackSet), cancelPromise])
-      .then(() => {
-        onEnd();
-      })
-      .catch(error => {
-        if (!(error instanceof TransitionCancelError)) {
-          throw error;
-        }
-      })
-      .finally(() => {
-        cancelSet.delete(cancel);
-      });
-  };
-}
+class TransitionInterruptError extends Error {}
 
 function createTransitionItem(
   options: ListTransitionOptions,
@@ -262,6 +228,78 @@ function createTransitionItem(
   const enterCallbacks = new Set<TransitionCallback>();
   const exitCallbacks = new Set<TransitionCallback>();
   const remainCallbacks = new Set<() => {}>();
+  let pendingControl: (() => Promise<void>) | undefined;
+
+  const makeTransitionControl: (
+    callbackSet: Set<TransitionCallback>,
+    startState: TransitionItemState,
+    endState: TransitionItemState,
+  ) => () => Promise<void> =
+    options.interruptMethod === "none"
+      ? (callbackSet, startState, endState) => async () => {
+          if (!pendingControl) {
+            pendingControl = noopAsync;
+            setState(startState);
+            return allCallbacks(callbackSet)
+              .then(() => {
+                setState(endState);
+              })
+              .finally(() => {
+                pendingControl = undefined;
+              });
+          } else {
+            throw new TransitionInterruptError();
+          }
+        }
+      : options.interruptMethod === "wait"
+      ? (callbackSet, startState, endState) =>
+          async function control() {
+            if (!pendingControl) {
+              pendingControl = noopAsync;
+              setState(startState);
+              return allCallbacks(callbackSet)
+                .then(() => {
+                  setState(endState);
+                  const control = pendingControl;
+                  pendingControl = undefined;
+                  control?.();
+                })
+                .catch(error => {
+                  pendingControl = undefined;
+                  if (error) {
+                    throw error;
+                  }
+                });
+            } else {
+              return new Promise((resolve, reject) => {
+                pendingControl = () => {
+                  return control().then(resolve).catch(reject);
+                };
+              });
+            }
+          }
+      : (callbackSet, startState, endState) => async () => {
+          for (const cancel of cancelSet) {
+            cancel();
+          }
+
+          let cancel: () => void;
+
+          const cancelPromise = new Promise((_, reject) => {
+            cancel = () => reject(new TransitionInterruptError());
+            cancelSet.add(cancel);
+          });
+
+          setState(startState);
+
+          return Promise.race([allCallbacks(callbackSet), cancelPromise])
+            .then(() => {
+              setState(endState);
+            })
+            .finally(() => {
+              cancelSet.delete(cancel);
+            });
+        };
 
   return [
     {
@@ -277,26 +315,8 @@ function createTransitionItem(
       },
     },
     {
-      enter: makeTransitionControl(
-        enterCallbacks,
-        cancelSet,
-        () => {
-          setState("entering");
-        },
-        () => {
-          setState("entered");
-        },
-      ),
-      exit: makeTransitionControl(
-        exitCallbacks,
-        cancelSet,
-        () => {
-          setState("exiting");
-        },
-        () => {
-          setState("exited");
-        },
-      ),
+      enter: makeTransitionControl(enterCallbacks, "entering", "entered"),
+      exit: makeTransitionControl(exitCallbacks, "exiting", "exited"),
       remain() {
         return allCallbacks(remainCallbacks);
       },
@@ -389,7 +409,7 @@ export function createListTransition<T extends object>(
     options.exitMethod === "remove"
       ? noop
       : el => {
-          setToRemove(p => (p.push.call(p, el), p));
+          setToRemove(p => [...p, el]);
         };
 
   const handleExiting: (items: TransitionItem<T>[], item: TransitionItem<T>, i: number) => void =
@@ -410,7 +430,7 @@ export function createListTransition<T extends object>(
 
         if (elsToRemove.length) {
           const next = prev.filter(([el]) => !elsToRemove.includes(el));
-          elsToRemove.length = 0;
+          setToRemove([]);
           setResult(next);
           return;
         }
@@ -442,9 +462,16 @@ export function createListTransition<T extends object>(
             handleExiting(next, tuple, i);
             if (prevSet.has(el)) {
               console.log("remove", el);
-              controls.exit().then(() => {
-                finishRemoved(el);
-              });
+              controls
+                .exit()
+                .then(() => {
+                  finishRemoved(el);
+                })
+                .catch(error => {
+                  if (!(error instanceof TransitionInterruptError)) {
+                    throw error;
+                  }
+                });
             }
           }
         }

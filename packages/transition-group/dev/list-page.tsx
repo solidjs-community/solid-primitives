@@ -134,6 +134,7 @@ const ListPage: Component = () => {
                       {({ n }, i) => (
                         <div
                           class="node cursor-pointer bg-yellow-600"
+                          data-index={i()}
                           onClick={() =>
                             setList(p => {
                               const copy = p.slice();
@@ -152,9 +153,13 @@ const ListPage: Component = () => {
                 (el): el is HTMLElement => el instanceof HTMLElement,
               );
 
-              const options = { duration: 600, easing: "cubic-bezier(0.4, 0, 0.2, 1)" };
+              const options = { duration: 1000, easing: "cubic-bezier(0.4, 0, 0.2, 1)" };
 
-              const transition = createListTransition(resolved.toArray, { appear });
+              const transition = createListTransition(resolved.toArray, {
+                appear,
+                interruptMethod: "wait",
+                exitMethod: "keep-index",
+              });
 
               const els = mapArray(transition, ([el, { state, useOnEnter, useOnExit }]) => {
                 createEffect(() => {
@@ -177,12 +182,17 @@ const ListPage: Component = () => {
                     { ...options, fill: "both" },
                   );
 
-                  animation.play();
                   animation.finished.then(done).catch(done);
                 });
 
                 useOnExit(done => {
                   console.log("onExit", el);
+
+                  for (const animation of el.getAnimations()) {
+                    animation.commitStyles();
+                    animation.cancel();
+                  }
+
                   const animation = el.animate(
                     [
                       { opacity: 1, transform: "translateY(0)" },
@@ -190,9 +200,7 @@ const ListPage: Component = () => {
                     ],
                     { ...options, fill: "both" },
                   );
-                  onCleanup(() => {
-                    animation.cancel();
-                  });
+
                   animation.finished.then(done).catch(done);
                 });
 
