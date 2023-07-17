@@ -163,6 +163,12 @@ const ListPage: Component = () => {
 
                 useOnEnter(done => {
                   console.log("onEnter", el);
+
+                  for (const animation of el.getAnimations()) {
+                    animation.commitStyles();
+                    animation.cancel();
+                  }
+
                   const animation = el.animate(
                     [
                       { opacity: 0, transform: "translateY(-30px)" },
@@ -170,10 +176,8 @@ const ListPage: Component = () => {
                     ],
                     { ...options, fill: "both" },
                   );
-                  onCleanup(() => {
-                    animation.commitStyles();
-                    animation.cancel();
-                  });
+
+                  animation.play();
                   animation.finished.then(done).catch(done);
                 });
 
@@ -187,7 +191,6 @@ const ListPage: Component = () => {
                     { ...options, fill: "both" },
                   );
                   onCleanup(() => {
-                    animation.commitStyles();
                     animation.cancel();
                   });
                   animation.finished.then(done).catch(done);

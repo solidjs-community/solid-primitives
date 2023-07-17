@@ -5,14 +5,8 @@ import {
   untrack,
   $TRACK,
   createComputed,
-  createMemo,
   useTransition,
   onCleanup,
-  createRoot,
-  Setter,
-  createEffect,
-  getOwner,
-  runWithOwner,
 } from "solid-js";
 import { isServer } from "solid-js/web";
 
@@ -169,10 +163,19 @@ export type OnListChange<T> = (payload: {
 
 export type ExitMethod = "remove" | "move-to-end" | "keep-index";
 
+export type InterruptMethod = "cancel" | "wait" | "none" | "clone";
+
 export type ListTransitionOptions = {
   /** whether to run the transition on the initial elements. Defaults to `false` */
   appear?: boolean;
-  cancellable?: boolean;
+  /**
+   * This controls what happens when a transition is interrupted. This can happen when an element exits before an enter transition has completed, or vice versa. {@link InterruptMethod}
+   * - `"cancel"` (default) abandons the current transition and starts the interrupting one as soon as it happens.
+   * - `"wait"` waits for the current transition to complete before starting the most recently interrupting transition.
+   * - `"none"` ignores the interrupting transition entirely
+   * - `"clone"` behaves the same as "wait" when the element is entering. If it is exiting, it clones the element and performs the enter transition on the clone instead.
+   */
+  interruptMethod?: InterruptMethod;
   /**
    * This controls how the elements exit. {@link ExitMethod}
    * - `"remove"` removes the element immediately.
@@ -182,12 +185,12 @@ export type ListTransitionOptions = {
   exitMethod?: ExitMethod;
 };
 
-type TransitionState = "initial" | "entering" | "entered" | "exiting" | "exited";
+type TransitionItemState = "initial" | "entering" | "entered" | "exiting" | "exited";
 
 type TransitionCallback = (done: () => void) => void;
 
-type TransitionItem = {
-  state: Accessor<TransitionState>;
+type TransitionItemContext = {
+  state: Accessor<TransitionItemState>;
   useOnEnter(callback: TransitionCallback): void;
   useOnExit(callback: TransitionCallback): void;
   useOnRemain(callback: () => void): void;
@@ -198,6 +201,8 @@ type TransitionItemControls = {
   exit(): Promise<void>;
   remain(): void;
 };
+
+type TransitionItem<T> = [T, TransitionItemContext, TransitionItemControls];
 
 function makeSetItem<T>(set: Set<T>, item: T) {
   set.add(item);
@@ -212,33 +217,51 @@ function allCallbacks(set: Set<TransitionCallback>): Promise<unknown> {
   );
 }
 
+class TransitionCancelError extends Error {}
+
 function makeTransitionControl(
-  callbacks: Set<TransitionCallback>,
-  getDispose: Accessor<(() => void) | undefined>,
-  setDispose: Setter<(() => void) | undefined>,
+  callbackSet: Set<TransitionCallback>,
+  cancelSet: Set<() => void>,
   onStart: () => void,
   onEnd: () => void,
 ): () => Promise<void> {
-  return () => {
-    getDispose()?.();
-    onStart();
-    return createRoot(async dispose => {
-      setDispose(() => dispose);
-      onCleanup(() => {
-        setDispose(undefined);
-      });
-      await allCallbacks(callbacks);
-      onEnd();
+  return async () => {
+    for (const cancel of cancelSet) {
+      cancel();
+    }
+
+    let cancel: () => void;
+
+    const cancelPromise = new Promise((_, reject) => {
+      cancel = () => reject(new TransitionCancelError());
+      cancelSet.add(cancel);
     });
+
+    onStart();
+
+    return Promise.race([allCallbacks(callbackSet), cancelPromise])
+      .then(() => {
+        onEnd();
+      })
+      .catch(error => {
+        if (!(error instanceof TransitionCancelError)) {
+          throw error;
+        }
+      })
+      .finally(() => {
+        cancelSet.delete(cancel);
+      });
   };
 }
 
-function createTransitionItem(): [TransitionItem, TransitionItemControls] {
-  const [state, setState] = createSignal<TransitionState>("initial");
-  const [getDispose, setDispose] = createSignal<() => void>();
-
+function createTransitionItem(
+  options: ListTransitionOptions,
+): [TransitionItemContext, TransitionItemControls] {
+  const [state, setState] = createSignal<TransitionItemState>("initial");
+  const cancelSet = new Set<() => void>();
   const enterCallbacks = new Set<TransitionCallback>();
   const exitCallbacks = new Set<TransitionCallback>();
+  const remainCallbacks = new Set<() => {}>();
 
   return [
     {
@@ -249,13 +272,14 @@ function createTransitionItem(): [TransitionItem, TransitionItemControls] {
       useOnExit(callback: TransitionCallback) {
         makeSetItem(exitCallbacks, callback);
       },
-      useOnRemain(callback: () => void) {},
+      useOnRemain(callback: () => void) {
+        makeSetItem(remainCallbacks, callback);
+      },
     },
     {
       enter: makeTransitionControl(
         enterCallbacks,
-        getDispose,
-        setDispose,
+        cancelSet,
         () => {
           setState("entering");
         },
@@ -265,8 +289,7 @@ function createTransitionItem(): [TransitionItem, TransitionItemControls] {
       ),
       exit: makeTransitionControl(
         exitCallbacks,
-        getDispose,
-        setDispose,
+        cancelSet,
         () => {
           setState("exiting");
         },
@@ -274,7 +297,9 @@ function createTransitionItem(): [TransitionItem, TransitionItemControls] {
           setState("exited");
         },
       ),
-      remain() {},
+      remain() {
+        return allCallbacks(remainCallbacks);
+      },
     },
   ];
 }
@@ -328,7 +353,7 @@ function trackTransitionPending(isPending: Accessor<boolean>, callback: () => vo
 export function createListTransition<T extends object>(
   source: Accessor<readonly T[]>,
   options: ListTransitionOptions,
-): Accessor<[T, TransitionItem][]> {
+): Accessor<[T, TransitionItemContext][]> {
   const initSource = untrack(source);
 
   if (isServer) {
@@ -342,7 +367,7 @@ export function createListTransition<T extends object>(
             useOnExit() {},
             useOnRemain() {},
           },
-        ] as [T, TransitionItem],
+        ] as [T, TransitionItemContext],
     );
     return () => copy;
   }
@@ -351,10 +376,12 @@ export function createListTransition<T extends object>(
   // otherwise the elements will match and transition skipped, or transitioned if the source is different from the initial value
   let prevSet: ReadonlySet<T> = new Set(options.appear ? undefined : initSource);
 
-  const [result, setResult] = createSignal<[T, TransitionItem, TransitionItemControls][]>(
-    options.appear ? [] : initSource.slice().map(item => [item, ...createTransitionItem()]),
+  const [result, setResult] = createSignal<TransitionItem<T>[]>(
+    options.appear ? [] : initSource.slice().map(item => [item, ...createTransitionItem(options)]),
     { equals: arrayEquals },
   );
+
+  const [toRemove, setToRemove] = createSignal<T[]>([], { equals: false });
 
   const [isTransitionPending] = useTransition();
 
@@ -362,31 +389,34 @@ export function createListTransition<T extends object>(
     options.exitMethod === "remove"
       ? noop
       : el => {
-          setResult(prev => prev.filter(([prevEl]) => prevEl !== el));
+          setToRemove(p => (p.push.call(p, el), p));
         };
 
-  const handleExiting: (
-    els: [T, TransitionItem, TransitionItemControls][],
-    el: [T, TransitionItem, TransitionItemControls],
-    i: number,
-  ) => void =
+  const handleExiting: (items: TransitionItem<T>[], item: TransitionItem<T>, i: number) => void =
     options.exitMethod === "remove"
       ? noop
       : options.exitMethod === "keep-index"
-      ? (els, el, i) => els.splice(i, 0, el)
-      : (els, el) => els.push(el);
-
-  const owner = getOwner();
+      ? (items, item, i) => items.splice(i, 0, item)
+      : (items, item) => items.push(item);
 
   createComputed(() => {
     const sourceList = source();
+    const elsToRemove = toRemove();
     (sourceList as any)[$TRACK]; // top level store tracking
 
     trackTransitionPending(isTransitionPending, () => {
       untrack(() => {
         const prev = result();
+
+        if (elsToRemove.length) {
+          const next = prev.filter(([el]) => !elsToRemove.includes(el));
+          elsToRemove.length = 0;
+          setResult(next);
+          return;
+        }
+
         const nextSet: ReadonlySet<T> = new Set(sourceList);
-        const next: [T, TransitionItem, TransitionItemControls][] = [];
+        const next: TransitionItem<T>[] = [];
 
         for (let i = 0; i < sourceList.length; i++) {
           const el = sourceList[i]!;
@@ -397,8 +427,8 @@ export function createListTransition<T extends object>(
             controls.remain();
           } else {
             console.log("add", el);
-            const [item, controls] = createTransitionItem();
-            next.push([el, item, controls]);
+            const [context, controls] = createTransitionItem(options);
+            next.push([el, context, controls]);
             queueMicrotask(() => {
               controls.enter();
             });
@@ -411,15 +441,9 @@ export function createListTransition<T extends object>(
           if (!nextSet.has(el)) {
             handleExiting(next, tuple, i);
             if (prevSet.has(el)) {
-              console.log("remove");
+              console.log("remove", el);
               controls.exit().then(() => {
-                runWithOwner(owner, () => {
-                  createComputed(() => {
-                    trackTransitionPending(isTransitionPending, () => {
-                      finishRemoved(el);
-                    });
-                  });
-                });
+                finishRemoved(el);
               });
             }
           }
@@ -431,5 +455,5 @@ export function createListTransition<T extends object>(
     });
   });
 
-  return result as unknown as Accessor<[T, TransitionItem][]>;
+  return result as unknown as Accessor<[T, TransitionItemContext][]>;
 }
