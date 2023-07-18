@@ -110,7 +110,7 @@ const ListPage: Component = () => {
       });
     });
 
-    return mapArray(
+    const els = mapArray(
       () => transition()(),
       ([el, { state, useOnEnter, useOnExit, useOnRemain }]) => {
         createEffect(() => {
@@ -145,10 +145,10 @@ const ListPage: Component = () => {
           }
 
           const { top: top1, left: left1 } = el.getBoundingClientRect();
-          el.style.position = "absolute";
-          el.style.transform = "";
 
           queueMicrotask(() => {
+            el.style.position = "absolute";
+            el.style.transform = "";
             const { top: top2, left: left2 } = el.getBoundingClientRect();
 
             const animation = el.animate(
@@ -177,18 +177,20 @@ const ListPage: Component = () => {
           }
 
           const { top: top1, left: left1 } = el.getBoundingClientRect();
-          el.style.transform = "";
 
           queueMicrotask(() => {
-            const { top: top2, left: left2 } = el.getBoundingClientRect();
+            queueMicrotask(() => {
+              el.style.transform = "";
+              const { top: top2, left: left2 } = el.getBoundingClientRect();
 
-            el.animate(
-              [
-                { transform: `translate(${left1 - left2}px, ${top1 - top2}px)` },
-                { opacity: 1, transform: `translate(0px, 0px)` },
-              ],
-              animationOptions,
-            );
+              el.animate(
+                [
+                  { transform: `translate(${left1 - left2}px, ${top1 - top2}px)` },
+                  { opacity: 1, transform: `translate(0px, 0px)` },
+                ],
+                animationOptions,
+              );
+            });
           });
         });
 
@@ -196,7 +198,7 @@ const ListPage: Component = () => {
       },
     );
 
-    return <>{els()()}</>;
+    return <>{els()}</>;
   };
 
   return (

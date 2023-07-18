@@ -426,6 +426,7 @@ export function createListTransition<T extends object>(
       : (items, item) => items.push(item);
 
   createComputed(() => {
+    console.log("computed");
     const sourceList = source();
     const elsToRemove = toRemove();
     (sourceList as any)[$TRACK]; // top level store tracking
