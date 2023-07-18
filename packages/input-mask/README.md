@@ -29,13 +29,21 @@ import {
   regexMaskToFn,
   arrayMaskToFn,
   anyMaskToFn,
-  createInputMask
+  createInputMask,
+  stringMaskRegExp,
 } from "@solid-primitives/input-mask";
 // string mask:
 // 9 = any number,
+// 0 = any number (optional),
 // a = any letter,
-// * = any alphanumeric character
+// z = any letter (optional),
+// * = any alphanumeric character,
+// ? = any alphanumeric character (optional)
 // any other letter becomes a fixed placeholder
+// this list of replacements for string masks is exported as
+// stringMaskRegExp, so you can add your own regex to it
+// add "u" for upper case letters:
+stringMaskRegExp.u = /[A-Z]/;
 const isodate = "9999-99-99";
 // array mask: RegExp to match variable parts, strings for fixed placeholders
 const meetingId = [/\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/]);

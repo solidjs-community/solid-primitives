@@ -22,6 +22,7 @@ export default defineConfig(({ mode }) => {
       isolate: !testSSR,
       passWithNoTests: true,
       environment: testSSR ? "node" : "jsdom",
+      deps: { registerNodeLoader: false },
       transformMode: {
         web: [/\.[jt]sx$/],
       },
