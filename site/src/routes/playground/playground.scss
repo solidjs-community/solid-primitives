@@ -15,8 +15,13 @@ Styles applied in the package playgrounds.
     @apply font-mono text-sm leading-tight;
   }
 
-  button {
+  button,
+  select {
     @apply border-1 flex cursor-pointer select-none items-center justify-center rounded border-teal-500 bg-teal-600 p-3 py-2 font-semibold text-white hover:bg-teal-500 disabled:cursor-not-allowed disabled:bg-teal-700 disabled:saturate-50 disabled:hover:bg-teal-700;
+  }
+
+  label:has(select) {
+    @apply flex items-center gap-2;
   }
 
   .wrapper-h {
