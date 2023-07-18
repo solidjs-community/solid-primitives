@@ -1,5 +1,11 @@
 # @solid-primitives/date
 
+## 2.0.15
+
+### Patch Changes
+
+- @solid-primitives/memo@1.3.2
+
 ## 2.0.14
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @solid-primitives/scheduled
 
+## 1.4.0
+
+### Minor Changes
+
+- a2c9ab03: Add new function `leadingAndTrailing`
+
 ## 1.3.2
 
 ### Patch Changes

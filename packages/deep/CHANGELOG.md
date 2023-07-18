@@ -1,5 +1,11 @@
 # @solid-primitives/deep
 
+## 0.2.1
+
+### Patch Changes
+
+- @solid-primitives/memo@1.3.2
+
 ## 0.2.0
 
 ### Minor Changes
