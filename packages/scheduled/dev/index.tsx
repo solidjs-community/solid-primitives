@@ -1,28 +1,24 @@
-/* @refresh reload */
-import { Component } from "solid-js";
-
-import { Router, Routes, Route, A } from "@solidjs/router";
-
-import Timeline from "./timeline";
+import { Component, createSignal } from "solid-js";
+import { Dynamic } from "solid-js/web";
 import Reactive from "./reactive";
+import Timeline from "./timeline";
 
 const App: Component = () => {
+  type Page = typeof Timeline | typeof Reactive;
+
+  const [page, setPage] = createSignal<Page>(Timeline);
+
   return (
     <div class="min-h-screen overflow-hidden bg-gray-900 text-white">
-      <Router>
-        <nav class="fixed left-2 top-2 flex space-x-4">
-          <A class="text-yellow-400" href="/">
-            Timeline
-          </A>
-          <A class="text-yellow-400" href="/page-reactive">
-            createScheduled
-          </A>
-        </nav>
-        <Routes>
-          <Route path="/" element={<Timeline />} />
-          <Route path="/page-reactive" element={<Reactive />} />
-        </Routes>
-      </Router>
+      <nav class="m-2 flex space-x-4">
+        <button class="text-yellow-400" onClick={() => setPage(() => Timeline)}>
+          Timeline
+        </button>
+        <button class="text-yellow-400" onClick={() => setPage(() => Reactive)}>
+          createScheduled
+        </button>
+      </nav>
+      <Dynamic component={page()} />
     </div>
   );
 };

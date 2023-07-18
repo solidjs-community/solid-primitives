@@ -201,7 +201,7 @@ BOTTOM: called user callback
 6. █      █         █
 ```
 
-[**Interactive DEMO of the schematic above**](https://codesandbox.io/s/solid-primitives-scheduled-demo-0uk8xc?file=/index.tsx)
+[**Interactive DEMO of the schematic above**](https://primitives.solidjs.community/playground/scheduled)
 
 ## Changelog
 

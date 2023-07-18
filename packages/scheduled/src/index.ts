@@ -250,7 +250,7 @@ export function leadingAndTrailing<Args extends unknown[]>(
     }
     if (callType === TRAILING) callback(...args);
 
-    // @ts-expect-error args aren't used for "complete" call type, so we don't need to pass them
+    // @ts-expect-error args aren't used for RESET call type, so we don't need to pass them
     setTimeout(() => scheduled(RESET), 0);
   };
   const scheduled = schedule(onTrail, wait);
