@@ -193,6 +193,81 @@ export function leading<Args extends unknown[]>(
 }
 
 /**
+ * Creates a scheduled and cancellable callback that will be called on the **leading** edge for the first call, and **trailing** edge for other calls.
+ *
+ * The timeout will be automatically cleared on root dispose.
+ *
+ * @param schedule {@link debounce} or {@link throttle}
+ * @param callback The callback to debounce/throttle
+ * @param wait timeout duration
+ * @returns The scheduled callback trigger
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#leadingAndTrailing
+ *
+ * @example
+ * ```ts
+ * const trigger = leadingAndTrailing(throttle, (val: string) => console.log(val), 250);
+ * trigger('my-new-value');
+ * trigger.clear() // clears a timeout in progress
+ * ```
+ */
+export function leadingAndTrailing<Args extends unknown[]>(
+  schedule: ScheduleCallback,
+  callback: (...args: Args) => void,
+  wait?: number,
+): Scheduled<Args> {
+  if (isServer) {
+    let called = false;
+    const scheduled = (...args: Args) => {
+      if (called) return;
+      called = true;
+      callback(...args);
+    };
+    return Object.assign(scheduled, { clear: () => void 0 });
+  }
+
+  // We have three separate reasons to call the scheduled function:
+  const LEADING = 0; // Because we need to set up the schedule for the first time.
+  //    This represents the leading call -- by the time the scheduled
+  //    function is called, the leading call has already happened, so
+  //    the scheduled function does nothing.
+  const TRAILING = 1; // Because the scheduled function was called before the wait time
+  //    elapsed. This represents the trailing call -- when the scheduled
+  //    function is called, the wait time has elapsed, so we should call
+  //    the callback.
+  const RESET = 2; // Because we have waited for the wait time to elapse to see if further
+  //    calls to the scheduled function happen. If no calls have happened, we
+  //    should reset the state entirely.  Otherwise, the trailing calls will
+  //    have happened in the 'trailing' call, so we should do nothing.
+
+  type CallType = typeof LEADING | typeof TRAILING | typeof RESET;
+
+  let firstCall = true;
+  const onTrail = (callType: CallType, args: Args) => {
+    if (callType === RESET) {
+      firstCall = true;
+      return;
+    }
+    if (callType === TRAILING) callback(...args);
+
+    // @ts-expect-error args aren't used for RESET call type, so we don't need to pass them
+    setTimeout(() => scheduled(RESET), 0);
+  };
+  const scheduled = schedule(onTrail, wait);
+  const func: typeof callback = (...args) => {
+    if (firstCall) callback(...args);
+    scheduled(firstCall ? LEADING : TRAILING, args);
+    firstCall = false;
+  };
+  const clear = () => {
+    firstCall = true;
+    scheduled.clear();
+  };
+  if (getOwner()) onCleanup(clear);
+  return Object.assign(func, { clear });
+}
+
+/**
  * Creates a signal used for scheduling execution of solid computations by tracking.
  *
  * @param schedule Schedule the invalidate function (can be {@link debounce} or {@link throttle})

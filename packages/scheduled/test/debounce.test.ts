@@ -1,6 +1,6 @@
-import { describe, test, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { debounce, leading } from "../src";
+import { describe, expect, test } from "vitest";
+import { debounce, leading, leadingAndTrailing } from "../src";
 import sleep from "./sleep";
 
 describe("debounce", () => {
@@ -88,4 +88,65 @@ describe("leading debounce", () => {
       expect(val).toBe(10);
       dispose();
     }));
+});
+
+describe("leadingAndTrailing debounce", () => {
+  test("setup and trigger debounce", async () => {
+    let val = 0;
+    const trigger = leadingAndTrailing(debounce, (current: number) => (val = current), 20);
+    expect(val).toBe(0);
+    trigger(5);
+    expect(val).toBe(5);
+  });
+
+  test("debounce only called once if only triggered once", async () => {
+    let callCount = 0;
+    const trigger = leadingAndTrailing(debounce, () => (callCount += 1), 10);
+    expect(callCount).toBe(0);
+    trigger();
+    expect(callCount).toBe(1);
+    await sleep(30);
+    expect(callCount).toBe(1);
+  });
+
+  test("trigger debounces with pauses", async () => {
+    let val = 0;
+    const trigger = leadingAndTrailing(debounce, (current: number) => (val = current), 20);
+    trigger(5);
+    trigger(1);
+    expect(val).toBe(5);
+    await sleep(15); // do not sleep long enough for debounce to clear
+    trigger(1);
+    expect(val).toBe(5);
+    trigger(10);
+    expect(val).toBe(5);
+    await sleep(25); // sleep long enough for debounce to clear, but not long enough to reset to leading-edge calls
+    expect(val).toBe(10);
+    trigger(15);
+    expect(val).toBe(10);
+    await sleep(60); // sleep long enough for debounce to clear and reset to leading-edge calls
+    expect(val).toBe(15);
+    trigger(20);
+    expect(val).toBe(20);
+  });
+
+  test("clearing", async () => {
+    let val = 0;
+    const trigger = leadingAndTrailing(debounce, (current: number) => (val = current), 20);
+    trigger(5);
+    trigger.clear();
+    trigger(10);
+    expect(val).toBe(10);
+  });
+
+  test("autoclearing", async () => {
+    createRoot(dispose => {
+      let val = 0;
+      const trigger = leadingAndTrailing(debounce, (current: number) => (val = current), 150);
+      trigger(5);
+      dispose();
+      trigger(10);
+      expect(val).toBe(10);
+    });
+  });
 });

@@ -1,8 +1,42 @@
-import { Component, createEffect, createMemo, createSignal, untrack } from "solid-js";
-import { createScheduled, debounce, leading, throttle } from "../src";
+import { Component, createEffect, createMemo, createSignal } from "solid-js";
+import { createScheduled, debounce, leading, leadingAndTrailing, throttle } from "../src";
 
-const Reactive: Component<{}> = props => {
+const Reactive: Component = props => {
   const [count, setCount] = createSignal(0);
+
+  const TIMEOUT = 1000;
+
+  type ExampleData = {
+    name: string;
+    schedule: (callback: VoidFunction) => VoidFunction;
+  };
+
+  const examples: ExampleData[] = [
+    {
+      name: "debounce",
+      schedule: fn => debounce(fn, TIMEOUT),
+    },
+    {
+      name: "throttle",
+      schedule: fn => throttle(fn, TIMEOUT),
+    },
+    {
+      name: "leading debounce",
+      schedule: fn => leading(debounce, fn, TIMEOUT),
+    },
+    {
+      name: "leading throttle",
+      schedule: fn => leading(throttle, fn, TIMEOUT),
+    },
+    {
+      name: "leading and trailing debounce",
+      schedule: fn => leadingAndTrailing(debounce, fn, TIMEOUT),
+    },
+    {
+      name: "leading and trailing throttle",
+      schedule: fn => leadingAndTrailing(throttle, fn, TIMEOUT),
+    },
+  ];
 
   return (
     <div class="center-child p-4 pb-0">
@@ -13,56 +47,21 @@ const Reactive: Component<{}> = props => {
         <div class="mt-4">
           <div>Count: {count()}</div>
 
-          {untrack(() => {
-            const debounced = createScheduled(fn => debounce(fn, 1000));
-            const debouncedCount = createMemo((p: number = 0) => {
+          {examples.map(({ name, schedule }) => {
+            const scheduled = createScheduled(schedule);
+            const memo = createMemo((p: number = 0) => {
               const c = count();
-              return debounced() ? c : p;
+              return scheduled() ? c : p;
             });
             createEffect(() => {
               count();
-              console.log("debounced", debounced());
+              console.log(name, scheduled());
             });
-            return <div>Debounced: {debouncedCount()}</div>;
-          })}
-
-          {untrack(() => {
-            const throttled = createScheduled(fn => throttle(fn, 1000));
-            const throttledCount = createMemo((p: number = 0) => {
-              const c = count();
-              return throttled() ? c : p;
-            });
-            createEffect(() => {
-              count();
-              console.log("throttled", throttled());
-            });
-            return <div>Throttled: {throttledCount()}</div>;
-          })}
-
-          {untrack(() => {
-            const leadingDebounced = createScheduled(fn => leading(debounce, fn, 1000));
-            const leadingDebouncedCount = createMemo((p: number = 0) => {
-              const c = count();
-              return leadingDebounced() ? c : p;
-            });
-            createEffect(() => {
-              count();
-              console.log("leadingDebounced", leadingDebounced());
-            });
-            return <div>Leading Debounced: {leadingDebouncedCount()}</div>;
-          })}
-
-          {untrack(() => {
-            const leadingThrottled = createScheduled(fn => leading(throttle, fn, 1000));
-            const leadingThrottledCount = createMemo((p: number = 0) => {
-              const c = count();
-              return leadingThrottled() ? c : p;
-            });
-            createEffect(() => {
-              count();
-              console.log("leadingThrottled", leadingThrottled());
-            });
-            return <div>Leading Throttled: {leadingThrottledCount()}</div>;
+            return (
+              <div>
+                {name}: {memo()}
+              </div>
+            );
           })}
         </div>
       </div>

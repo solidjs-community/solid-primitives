@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -809,12 +809,12 @@ importers:
 
   packages/scheduled:
     devDependencies:
+      '@solid-primitives/event-listener':
+        specifier: workspace:^
+        version: link:../event-listener
       '@solid-primitives/timer':
         specifier: workspace:^
         version: link:../timer
-      '@solidjs/router':
-        specifier: ^0.8.2
-        version: 0.8.2(solid-js@1.7.6)
       solid-js:
         specifier: 1.7.6
         version: 1.7.6

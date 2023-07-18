@@ -106,6 +106,30 @@ trigger("Hello!");
 trigger.clear(); // clears a timeout in progress
 ```
 
+## `leadingAndTrailing`
+
+Creates a scheduled and cancellable callback that will be called on **leading** edge for the first call, and **trailing** edge thereafter.
+
+The timeout will be automatically cleared on root dispose.
+
+### How to use it
+
+```ts
+// with debounce
+import { leadingAndTrailing, debounce } from "@solid-primitives/scheduled";
+
+const trigger = leadingAndTrailing(debounce, (message: string) => console.log(message), 250);
+trigger("Hello!");
+trigger.clear(); // clears a timeout in progress
+
+// with throttle
+import { leadingAndTrailing, throttle } from "@solid-primitives/scheduled";
+
+const trigger = leadingAndTrailing(throttle, (message: string) => console.log(message), 250);
+trigger("Hello!");
+trigger.clear(); // clears a timeout in progress
+```
+
 ## `createScheduled`
 
 Creates a signal used for scheduling execution of solid computations by tracking.
@@ -164,6 +188,8 @@ BOTTOM: called user callback
 2. throttle
 3. leading debounce
 4. leading throttle
+5. leadingAndTrailing debounce
+6. leadingAndTrailing throttle
 
    █   █     █
 ------------------------>
@@ -171,9 +197,11 @@ BOTTOM: called user callback
 2.        █         █
 3. █
 4. █         █
+5. █                █
+6. █      █         █
 ```
 
-[**Interactive DEMO of the schematic above**](https://codesandbox.io/s/solid-primitives-scheduled-demo-0uk8xc?file=/index.tsx)
+[**Interactive DEMO of the schematic above**](https://primitives.solidjs.community/playground/scheduled)
 
 ## Changelog
 
