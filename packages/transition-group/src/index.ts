@@ -6,10 +6,9 @@ import {
   $TRACK,
   createComputed,
   useTransition,
-  onCleanup,
-  createEffect,
 } from "solid-js";
 import { isServer } from "solid-js/web";
+import { allCallbacks, arrayEquals, makeSetItem, trackTransitionPending } from "./utils";
 
 const noop = () => {};
 const noopAsync = async () => {};
@@ -205,20 +204,13 @@ type TransitionItemControls = {
 
 type TransitionItem<T> = [T, TransitionItemContext, TransitionItemControls];
 
-function makeSetItem<T>(set: Set<T>, item: T) {
-  set.add(item);
-  onCleanup(() => {
-    set.delete(item);
-  });
+class TransitionInterruptError extends Error {
+  static ignore(error: any) {
+    if (!(error instanceof TransitionInterruptError)) {
+      throw error;
+    }
+  }
 }
-
-function allCallbacks(set: Set<TransitionCallback>): Promise<unknown> {
-  return Promise.all(
-    Array.from(set.values()).map(callback => new Promise<void>(resolve => callback(resolve))),
-  );
-}
-
-class TransitionInterruptError extends Error {}
 
 function createTransitionItem(
   options: ListTransitionOptions,
@@ -322,29 +314,6 @@ function createTransitionItem(
       },
     },
   ];
-}
-
-function ignoreTransitionInterruptError(error: any) {
-  if (!(error instanceof TransitionInterruptError)) {
-    throw error;
-  }
-}
-
-function arrayEquals<T extends Array<unknown>>(a: T, b: T): boolean {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
-}
-
-function trackTransitionPending(isPending: Accessor<boolean>, callback: () => void): void {
-  if (untrack(isPending)) {
-    isPending();
-    return;
-  } else {
-    callback();
-  }
 }
 
 /**
@@ -456,7 +425,7 @@ export function createListTransition<T extends object>(
             const [context, controls] = createTransitionItem(options);
             next.push([el, context, controls]);
             queueMicrotask(() => {
-              controls.enter().catch(ignoreTransitionInterruptError);
+              controls.enter().catch(TransitionInterruptError.ignore);
             });
           }
         }
@@ -473,7 +442,7 @@ export function createListTransition<T extends object>(
                 .then(() => {
                   finishRemoved(el);
                 })
-                .catch(ignoreTransitionInterruptError);
+                .catch(TransitionInterruptError.ignore);
             }
           }
         }

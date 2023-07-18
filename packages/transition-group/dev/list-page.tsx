@@ -7,7 +7,6 @@ import {
   onCleanup,
   onMount,
   Suspense,
-  untrack,
   useTransition,
 } from "solid-js";
 import { resolveElements } from "@solid-primitives/refs";
