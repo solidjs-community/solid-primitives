@@ -324,6 +324,12 @@ function createTransitionItem(
   ];
 }
 
+function ignoreTransitionInterruptError(error: any) {
+  if (!(error instanceof TransitionInterruptError)) {
+    throw error;
+  }
+}
+
 function arrayEquals<T extends Array<unknown>>(a: T, b: T): boolean {
   if (a.length !== b.length) return false;
   for (let i = 0; i < a.length; i++) {
@@ -427,16 +433,15 @@ export function createListTransition<T extends object>(
     trackTransitionPending(isTransitionPending, () => {
       untrack(() => {
         const prev = result();
+        const nextSet: ReadonlySet<T> = new Set(sourceList);
+        const next: TransitionItem<T>[] = [];
 
         if (elsToRemove.length) {
           const next = prev.filter(([el]) => !elsToRemove.includes(el));
-          setToRemove([]);
+          elsToRemove.length = 0;
           setResult(next);
           return;
         }
-
-        const nextSet: ReadonlySet<T> = new Set(sourceList);
-        const next: TransitionItem<T>[] = [];
 
         for (let i = 0; i < sourceList.length; i++) {
           const el = sourceList[i]!;
@@ -450,7 +455,7 @@ export function createListTransition<T extends object>(
             const [context, controls] = createTransitionItem(options);
             next.push([el, context, controls]);
             queueMicrotask(() => {
-              controls.enter();
+              controls.enter().catch(ignoreTransitionInterruptError);
             });
           }
         }
@@ -467,11 +472,7 @@ export function createListTransition<T extends object>(
                 .then(() => {
                   finishRemoved(el);
                 })
-                .catch(error => {
-                  if (!(error instanceof TransitionInterruptError)) {
-                    throw error;
-                  }
-                });
+                .catch(ignoreTransitionInterruptError);
             }
           }
         }

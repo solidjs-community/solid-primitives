@@ -15,7 +15,7 @@ import { createListTransition } from "../src";
 
 const grayOutOnDispose = (el: HTMLElement) => {
   onCleanup(() => {
-    el.style.filter = "grayscale(60%)";
+    el.style.filter = "grayscale(100%)";
     el.style.zIndex = "0";
   });
 };
@@ -153,59 +153,101 @@ const ListPage: Component = () => {
                 (el): el is HTMLElement => el instanceof HTMLElement,
               );
 
-              const options = { duration: 1000, easing: "cubic-bezier(0.4, 0, 0.2, 1)" };
+              const options = { duration: 1000, easing: "cubic-bezier(0.22, 1, 0.36, 1)" };
 
               const transition = createListTransition(resolved.toArray, {
                 appear,
-                interruptMethod: "wait",
-                exitMethod: "keep-index",
               });
 
-              const els = mapArray(transition, ([el, { state, useOnEnter, useOnExit }]) => {
-                createEffect(() => {
-                  console.log("state", state(), el);
-                });
+              const els = mapArray(
+                transition,
+                ([el, { state, useOnEnter, useOnExit, useOnRemain }]) => {
+                  createEffect(() => {
+                    console.log("state", state(), el);
+                  });
 
-                useOnEnter(done => {
-                  console.log("onEnter", el);
+                  useOnEnter(done => {
+                    console.log("onEnter", el);
 
-                  for (const animation of el.getAnimations()) {
-                    animation.commitStyles();
-                    animation.cancel();
-                  }
+                    for (const animation of el.getAnimations()) {
+                      animation.commitStyles();
+                      animation.cancel();
+                    }
 
-                  const animation = el.animate(
-                    [
-                      { opacity: 0, transform: "translateY(-30px)" },
-                      { opacity: 1, transform: "translateY(0)" },
-                    ],
-                    { ...options, fill: "both" },
-                  );
+                    const animation = el.animate(
+                      [
+                        { opacity: 0, transform: "translateY(-30px)" },
+                        { opacity: 1, transform: "translateY(0)" },
+                      ],
+                      options,
+                    );
 
-                  animation.finished.then(done).catch(done);
-                });
+                    animation.finished.then(done).catch(done);
+                  });
 
-                useOnExit(done => {
-                  console.log("onExit", el);
+                  useOnExit(done => {
+                    console.log("onExit", el);
 
-                  for (const animation of el.getAnimations()) {
-                    animation.commitStyles();
-                    animation.cancel();
-                  }
+                    for (const animation of el.getAnimations()) {
+                      animation.commitStyles();
+                      animation.cancel();
+                    }
 
-                  const animation = el.animate(
-                    [
-                      { opacity: 1, transform: "translateY(0)" },
-                      { opacity: 0, transform: "translateY(30px)" },
-                    ],
-                    { ...options, fill: "both" },
-                  );
+                    const { top: top1, left: left1 } = el.getBoundingClientRect();
+                    el.style.position = "absolute";
+                    el.style.transform = "";
 
-                  animation.finished.then(done).catch(done);
-                });
+                    queueMicrotask(() => {
+                      const { top: top2, left: left2 } = el.getBoundingClientRect();
 
-                return el;
-              });
+                      const animation = el.animate(
+                        [
+                          {
+                            transform: `translate(${left1 - left2}px, ${
+                              top1 - top2
+                            }px) translateY(0px)`,
+                          },
+                          {
+                            opacity: 0,
+                            transform: `translate(${left1 - left2}px, ${
+                              top1 - top2
+                            }px) translateY(30px)`,
+                          },
+                        ],
+                        options,
+                      );
+
+                      animation.finished.then(done).catch(done);
+                    });
+                  });
+
+                  useOnRemain(() => {
+                    console.log("onRemain", el);
+
+                    for (const animation of el.getAnimations()) {
+                      animation.commitStyles();
+                      animation.cancel();
+                    }
+
+                    const { top: top1, left: left1 } = el.getBoundingClientRect();
+                    el.style.transform = "";
+
+                    queueMicrotask(() => {
+                      const { top: top2, left: left2 } = el.getBoundingClientRect();
+
+                      el.animate(
+                        [
+                          { transform: `translate(${left1 - left2}px, ${top1 - top2}px)` },
+                          { opacity: 1, transform: `translate(0px, 0px)` },
+                        ],
+                        options,
+                      );
+                    });
+                  });
+
+                  return el;
+                },
+              );
 
               return <>{els()}</>;
             })}
