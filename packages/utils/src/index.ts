@@ -11,6 +11,7 @@ import {
   sharedConfig,
   onMount,
   DEV,
+  equalFn
 } from "solid-js";
 import { isServer } from "solid-js/web";
 import type {
@@ -38,8 +39,8 @@ export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
-/** default `equals` camparator. `(a, b) => a === b` */
-export const defaultEquals = (a: unknown, b: unknown): boolean => a === b;
+/** @deprecated use {@link equalFn} from "solid-js" */
+export const defaultEquals = equalFn
 
 export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
 export const INTERNAL_OPTIONS = { internal: true } as const satisfies SignalOptions<unknown>;
