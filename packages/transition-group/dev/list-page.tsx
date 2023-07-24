@@ -22,6 +22,47 @@ const grayOutOnDispose = (el: HTMLElement) => {
   });
 };
 
+interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+function fixPosition(el: HTMLElement) {
+  const style = getComputedStyle(el);
+  if (style.position !== "absolute" && style.position !== "fixed") {
+    const { width, height } = style;
+    const startRect = el.getBoundingClientRect();
+    el.style.position = "absolute";
+    el.style.width = width;
+    el.style.height = height;
+    addTransform(el, startRect);
+  }
+}
+
+function unfixPosition(el: HTMLElement) {
+  el.style.removeProperty("position");
+  el.style.removeProperty("width");
+  el.style.removeProperty("height");
+  removeTransform(el);
+}
+
+function addTransform(el: HTMLElement, startRect: Rect) {
+  const endRect = el.getBoundingClientRect();
+  if (startRect.x !== endRect.x || startRect.y !== endRect.y) {
+    const style = getComputedStyle(el);
+    const transform = style.transform === "none" ? "" : style.transform;
+    el.style.transform = `${transform} translate(${startRect.x - endRect.x}px, ${
+      startRect.y - endRect.y
+    }px)`;
+  }
+}
+
+function removeTransform(el: HTMLElement) {
+  el.style.removeProperty("transform");
+}
+
 const ListPage: Component = () => {
   const [show, setShow] = createSignal(false);
   const [show1, setShow1] = createSignal(false);
@@ -48,22 +89,24 @@ const ListPage: Component = () => {
   const Content: Component = () => {
     createRenderEffect(res);
 
+    const node0 = (
+      <div
+        class="node"
+        ref={el => {
+          onMount(() => console.log("mounted", el.isConnected));
+          grayOutOnDispose(el);
+        }}
+      >
+        ID 0
+      </div>
+    );
+
     const resolved = resolveElements(
       () => (
         <>
           <p>Hello</p>
           World
-          {show() && (
-            <div
-              class="node"
-              ref={el => {
-                onMount(() => console.log("mounted", el.isConnected));
-                grayOutOnDispose(el);
-              }}
-            >
-              ID 0
-            </div>
-          )}
+          {show() && node0}
           <Show when={show1()}>
             <div class="node" ref={grayOutOnDispose}>
               ID 1
@@ -101,7 +144,6 @@ const ListPage: Component = () => {
     );
 
     const transition = createMemo(() => {
-      console.log("memo");
       return createListTransition(resolved.toArray, {
         appear,
         interruptMethod: interruptMethod(),
@@ -111,32 +153,13 @@ const ListPage: Component = () => {
 
     const els = mapArray(
       () => transition()(),
-      ([el, { state, useOnEnter, useOnExit, useOnRemain }]) => {
+      ([el, { state, useEnter, useExit, useRemain }]) => {
         createEffect(() => {
           console.log("state", state(), el);
         });
 
-        useOnEnter(done => {
-          console.log("onEnter", el);
-
-          for (const animation of el.getAnimations()) {
-            animation.commitStyles();
-            animation.cancel();
-          }
-
-          const animation = el.animate(
-            [
-              { opacity: 0, transform: "translateY(-30px)" },
-              { opacity: 1, transform: "translateY(0)" },
-            ],
-            animationOptions,
-          );
-
-          animation.finished.then(done).catch(done);
-        });
-
-        useOnExit(done => {
-          console.log("onExit", el);
+        useEnter(() => {
+          console.log("enter", el);
 
           for (const animation of el.getAnimations()) {
             animation.commitStyles();
@@ -145,30 +168,62 @@ const ListPage: Component = () => {
 
           const { top: top1, left: left1 } = el.getBoundingClientRect();
 
-          queueMicrotask(() => {
+          return () => {
+            el.removeAttribute("style");
+            const { top: top2, left: left2 } = el.getBoundingClientRect();
+
+            return el
+              .animate(
+                [
+                  {
+                    opacity: 0,
+                    transform: `translate(${left1 - left2}px, ${top1 - top2}px) translateY(-30px)`,
+                  },
+                  {
+                    opacity: 1,
+                    transform: `translate(0px, 0px) translateY(0px)`,
+                  },
+                ],
+                animationOptions,
+              )
+              .finished.catch(() => {});
+          };
+        });
+
+        useExit(() => {
+          console.log("exit", el);
+
+          for (const animation of el.getAnimations()) {
+            animation.commitStyles();
+            animation.cancel();
+          }
+
+          const { top: top1, left: left1 } = el.getBoundingClientRect();
+
+          return () => {
             el.style.position = "absolute";
             el.style.transform = "";
             const { top: top2, left: left2 } = el.getBoundingClientRect();
 
-            const animation = el.animate(
-              [
-                {
-                  transform: `translate(${left1 - left2}px, ${top1 - top2}px) translateY(0px)`,
-                },
-                {
-                  opacity: 0,
-                  transform: `translate(${left1 - left2}px, ${top1 - top2}px) translateY(30px)`,
-                },
-              ],
-              animationOptions,
-            );
-
-            animation.finished.then(done).catch(done);
-          });
+            return el
+              .animate(
+                [
+                  {
+                    transform: `translate(${left1 - left2}px, ${top1 - top2}px) translateY(0px)`,
+                  },
+                  {
+                    opacity: 0,
+                    transform: `translate(${left1 - left2}px, ${top1 - top2}px) translateY(30px)`,
+                  },
+                ],
+                animationOptions,
+              )
+              .finished.catch(() => {});
+          };
         });
 
-        useOnRemain(() => {
-          console.log("onRemain", el);
+        useRemain(() => {
+          // console.log("remain", el);
 
           for (const animation of el.getAnimations()) {
             animation.commitStyles();
@@ -177,20 +232,20 @@ const ListPage: Component = () => {
 
           const { top: top1, left: left1 } = el.getBoundingClientRect();
 
-          queueMicrotask(() => {
-            queueMicrotask(() => {
-              el.style.transform = "";
-              const { top: top2, left: left2 } = el.getBoundingClientRect();
+          return () => {
+            el.style.transform = "";
+            const { top: top2, left: left2 } = el.getBoundingClientRect();
 
-              el.animate(
+            return el
+              .animate(
                 [
                   { transform: `translate(${left1 - left2}px, ${top1 - top2}px)` },
                   { opacity: 1, transform: `translate(0px, 0px)` },
                 ],
                 animationOptions,
-              );
-            });
-          });
+              )
+              .finished.catch(() => {});
+          };
         });
 
         return el;

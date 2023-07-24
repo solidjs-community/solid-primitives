@@ -7,12 +7,6 @@ export function makeSetItem<T>(set: Set<T>, item: T) {
   });
 }
 
-export function allCallbacks(set: Set<(done: () => void) => void>): Promise<unknown> {
-  return Promise.all(
-    Array.from(set.values()).map(callback => new Promise<void>(resolve => callback(resolve))),
-  );
-}
-
 export function arrayEquals<T extends Array<unknown>>(a: T, b: T): boolean {
   if (a.length !== b.length) return false;
   for (let i = 0; i < a.length; i++) {

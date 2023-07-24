@@ -8,7 +8,7 @@ import {
   useTransition,
 } from "solid-js";
 import { isServer } from "solid-js/web";
-import { allCallbacks, arrayEquals, makeSetItem, trackTransitionPending } from "./utils";
+import { arrayEquals, makeSetItem, trackTransitionPending } from "./utils";
 
 const noop = () => {};
 const noopAsync = async () => {};
@@ -187,19 +187,21 @@ export type ListTransitionOptions = {
 
 type TransitionItemState = "initial" | "entering" | "entered" | "exiting" | "exited";
 
-type TransitionCallback = (done: () => void) => void;
+type TransitionCallback = () => () => Promise<unknown>;
+
+type TransitionControl = () => () => Promise<void>;
 
 type TransitionItemContext = {
   state: Accessor<TransitionItemState>;
-  useOnEnter(callback: TransitionCallback): void;
-  useOnExit(callback: TransitionCallback): void;
-  useOnRemain(callback: () => void): void;
+  useEnter(callback: TransitionCallback): void;
+  useExit(callback: TransitionCallback): void;
+  useRemain(callback: TransitionCallback): void;
 };
 
 type TransitionItemControls = {
-  enter(): Promise<void>;
-  exit(): Promise<void>;
-  remain(): void;
+  enter: TransitionControl;
+  exit: TransitionControl;
+  remain: TransitionControl;
 };
 
 type TransitionItem<T> = [T, TransitionItemContext, TransitionItemControls];
@@ -212,65 +214,40 @@ class TransitionInterruptError extends Error {
   }
 }
 
-function createTransitionItem(
-  options: ListTransitionOptions,
-): [TransitionItemContext, TransitionItemControls] {
+function createTransitionItem<T>(el: T, options: ListTransitionOptions): TransitionItem<T> {
   const [state, setState] = createSignal<TransitionItemState>("initial");
   const cancelSet = new Set<() => void>();
   const enterCallbacks = new Set<TransitionCallback>();
   const exitCallbacks = new Set<TransitionCallback>();
-  const remainCallbacks = new Set<() => {}>();
-  let pendingControl: (() => Promise<void>) | undefined;
+  const remainCallbacks = new Set<TransitionCallback>();
+  let controlIsRunning: boolean = false;
 
   const makeTransitionControl: (
     callbackSet: Set<TransitionCallback>,
     startState: TransitionItemState,
     endState: TransitionItemState,
-  ) => () => Promise<void> =
+  ) => TransitionControl =
     options.interruptMethod === "none"
-      ? (callbackSet, startState, endState) => async () => {
-          if (!pendingControl) {
-            pendingControl = noopAsync;
-            setState(startState);
-            return allCallbacks(callbackSet)
+      ? (callbackSet, startState, endState) => () => {
+          if (controlIsRunning) {
+            return noopAsync;
+          }
+
+          controlIsRunning = true;
+
+          const callbacks = Array.from(callbackSet).map(callback => callback());
+          setState(startState);
+
+          return () =>
+            Promise.all(callbacks.map(callback => callback()))
               .then(() => {
                 setState(endState);
               })
               .finally(() => {
-                pendingControl = undefined;
+                controlIsRunning = false;
               });
-          } else {
-            throw new TransitionInterruptError();
-          }
         }
-      : options.interruptMethod === "wait"
-      ? (callbackSet, startState, endState) =>
-          async function control() {
-            if (!pendingControl) {
-              pendingControl = noopAsync;
-              setState(startState);
-              return allCallbacks(callbackSet)
-                .then(() => {
-                  setState(endState);
-                  const control = pendingControl;
-                  pendingControl = undefined;
-                  control?.();
-                })
-                .catch(error => {
-                  pendingControl = undefined;
-                  if (error) {
-                    throw error;
-                  }
-                });
-            } else {
-              return new Promise((resolve, reject) => {
-                pendingControl = () => {
-                  return control().then(resolve).catch(reject);
-                };
-              });
-            }
-          }
-      : (callbackSet, startState, endState) => async () => {
+      : (callbackSet, startState, endState) => () => {
           for (const cancel of cancelSet) {
             cancel();
           }
@@ -278,31 +255,37 @@ function createTransitionItem(
           let cancel: () => void;
 
           const cancelPromise = new Promise((_, reject) => {
-            cancel = () => reject(new TransitionInterruptError());
+            cancel = () => {
+              reject(new TransitionInterruptError());
+            };
             cancelSet.add(cancel);
           });
 
+          const callbacks = Array.from(callbackSet).map(callback => callback());
+
           setState(startState);
 
-          return Promise.race([allCallbacks(callbackSet), cancelPromise])
-            .then(() => {
-              setState(endState);
-            })
-            .finally(() => {
-              cancelSet.delete(cancel);
-            });
+          return () =>
+            Promise.race([Promise.all(callbacks.map(callback => callback())), cancelPromise])
+              .then(() => {
+                setState(endState);
+              })
+              .finally(() => {
+                cancelSet.delete(cancel);
+              });
         };
 
   return [
+    el,
     {
       state,
-      useOnEnter(callback: TransitionCallback) {
+      useEnter(callback: TransitionCallback) {
         makeSetItem(enterCallbacks, callback);
       },
-      useOnExit(callback: TransitionCallback) {
+      useExit(callback: TransitionCallback) {
         makeSetItem(exitCallbacks, callback);
       },
-      useOnRemain(callback: () => void) {
+      useRemain(callback: TransitionCallback) {
         makeSetItem(remainCallbacks, callback);
       },
     },
@@ -310,7 +293,8 @@ function createTransitionItem(
       enter: makeTransitionControl(enterCallbacks, "entering", "entered"),
       exit: makeTransitionControl(exitCallbacks, "exiting", "exited"),
       remain() {
-        return allCallbacks(remainCallbacks);
+        return () =>
+          Promise.all(Array.from(remainCallbacks).map(callback => callback()())).then(noop);
       },
     },
   ];
@@ -352,18 +336,15 @@ export function createListTransition<T extends object>(
   const initSource = untrack(source);
 
   if (isServer) {
-    const copy = initSource.slice().map(
-      item =>
-        [
-          item,
-          {
-            state: () => "initial",
-            useOnEnter() {},
-            useOnExit() {},
-            useOnRemain() {},
-          },
-        ] as [T, TransitionItemContext],
-    );
+    const copy = initSource.slice().map<[T, TransitionItemContext]>(item => [
+      item,
+      {
+        state: () => "initial",
+        useEnter() {},
+        useExit() {},
+        useRemain() {},
+      },
+    ]);
     return () => copy;
   }
 
@@ -372,7 +353,7 @@ export function createListTransition<T extends object>(
   let prevSet: ReadonlySet<T> = new Set(options.appear ? undefined : initSource);
 
   const [result, setResult] = createSignal<TransitionItem<T>[]>(
-    options.appear ? [] : initSource.slice().map(item => [item, ...createTransitionItem(options)]),
+    options.appear ? [] : initSource.slice().map(el => createTransitionItem(el, options)),
     { equals: arrayEquals },
   );
 
@@ -403,52 +384,77 @@ export function createListTransition<T extends object>(
     trackTransitionPending(isTransitionPending, () => {
       untrack(() => {
         const prev = result();
-        const nextSet: ReadonlySet<T> = new Set(sourceList);
-        const next: TransitionItem<T>[] = [];
 
         if (elsToRemove.length) {
+          console.log("elsToRemove", elsToRemove);
           const next = prev.filter(([el]) => !elsToRemove.includes(el));
           elsToRemove.length = 0;
           setResult(next);
           return;
         }
 
+        const nextSet: ReadonlySet<T> = new Set(sourceList);
+        const next: TransitionItem<T>[] = [];
+        const entering: TransitionItem<T>[] = [];
+        const exiting: TransitionItem<T>[] = [];
+        const remaining: TransitionItem<T>[] = [];
+
         for (let i = 0; i < sourceList.length; i++) {
           const el = sourceList[i]!;
           if (prevSet.has(el)) {
-            const tuple = prev.find(([prevEl]) => prevEl === el)!;
-            next.push(tuple);
-            const [, , controls] = tuple;
-            controls.remain();
+            const item = prev.find(([prevEl]) => prevEl === el)!;
+            next.push(item);
+            remaining.push(item);
           } else {
             console.log("add", el);
-            const [context, controls] = createTransitionItem(options);
-            next.push([el, context, controls]);
-            queueMicrotask(() => {
-              controls.enter().catch(TransitionInterruptError.ignore);
-            });
+            const item = createTransitionItem(el, options);
+            next.push(item);
+            entering.push(item);
           }
         }
 
         for (let i = 0; i < prev.length; i++) {
-          const tuple = prev[i]!;
-          const [el, , controls] = tuple;
+          const item = prev[i]!;
+          const [el] = item;
           if (!nextSet.has(el)) {
-            handleExiting(next, tuple, i);
+            handleExiting(next, item, i);
             if (prevSet.has(el)) {
               console.log("remove", el);
-              controls
-                .exit()
-                .then(() => {
-                  finishRemoved(el);
-                })
-                .catch(TransitionInterruptError.ignore);
+              exiting.push(item);
             }
           }
         }
 
         prevSet = nextSet;
         setResult(next);
+
+        queueMicrotask(() => {
+          const callbacks: Array<() => Promise<void>> = [];
+
+          for (let i = 0; i < exiting.length; i++) {
+            const [el, , controls] = exiting[i]!;
+            const callback = controls.exit();
+            callbacks.push(() =>
+              callback().then(() => {
+                finishRemoved(el);
+              }),
+            );
+          }
+
+          for (let i = 0; i < entering.length; i++) {
+            const [, , controls] = entering[i]!;
+            callbacks.push(controls.enter());
+          }
+
+          for (let i = 0; i < remaining.length; i++) {
+            const [, , controls] = remaining[i]!;
+            callbacks.push(controls.remain());
+          }
+
+          for (let i = 0; i < callbacks.length; i++) {
+            callbacks[i]?.().catch(TransitionInterruptError.ignore);
+          }
+        });
       });
     });
   });
