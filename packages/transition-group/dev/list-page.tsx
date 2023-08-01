@@ -1,22 +1,67 @@
 import {
+  createEffect,
+  createMemo,
   createRenderEffect,
   createResource,
+  mapArray,
   onCleanup,
   onMount,
   Suspense,
-  untrack,
   useTransition,
 } from "solid-js";
 import { resolveElements } from "@solid-primitives/refs";
 import { Component, createSignal, For, Show } from "solid-js";
-import { createListTransition } from "../src";
+import { createListTransition, ExitMethod, InterruptMethod } from "../src";
+
+const animationOptions = { duration: 1000, easing: "cubic-bezier(0.22, 1, 0.36, 1)" };
 
 const grayOutOnDispose = (el: HTMLElement) => {
   onCleanup(() => {
-    el.style.filter = "grayscale(60%)";
+    el.style.filter = "grayscale(100%)";
     el.style.zIndex = "0";
   });
 };
+
+interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+function fixPosition(el: HTMLElement) {
+  const style = getComputedStyle(el);
+  if (style.position !== "absolute" && style.position !== "fixed") {
+    const { width, height } = style;
+    const startRect = el.getBoundingClientRect();
+    el.style.position = "absolute";
+    el.style.width = width;
+    el.style.height = height;
+    addTransform(el, startRect);
+  }
+}
+
+function unfixPosition(el: HTMLElement) {
+  el.style.removeProperty("position");
+  el.style.removeProperty("width");
+  el.style.removeProperty("height");
+  removeTransform(el);
+}
+
+function addTransform(el: HTMLElement, startRect: Rect) {
+  const endRect = el.getBoundingClientRect();
+  if (startRect.x !== endRect.x || startRect.y !== endRect.y) {
+    const style = getComputedStyle(el);
+    const transform = style.transform === "none" ? "" : style.transform;
+    el.style.transform = `${transform} translate(${startRect.x - endRect.x}px, ${
+      startRect.y - endRect.y
+    }px)`;
+  }
+}
+
+function removeTransform(el: HTMLElement) {
+  el.style.removeProperty("transform");
+}
 
 const ListPage: Component = () => {
   const [show, setShow] = createSignal(false);
@@ -34,9 +79,185 @@ const ListPage: Component = () => {
   // const appear = localStorage.getItem("transition-group-appear") === "true";
   const appear = true;
 
+  const [exitMethod, setExitMethod] = createSignal<ExitMethod>("move-to-end");
+  const [interruptMethod, setInterruptMethod] = createSignal<InterruptMethod>("cancel");
+
+  createEffect(() => {
+    console.log(exitMethod(), interruptMethod());
+  });
+
+  const Content: Component = () => {
+    createRenderEffect(res);
+
+    const node0 = (
+      <div
+        class="node"
+        ref={el => {
+          onMount(() => console.log("mounted", el.isConnected));
+          grayOutOnDispose(el);
+        }}
+      >
+        ID 0
+      </div>
+    );
+
+    const resolved = resolveElements(
+      () => (
+        <>
+          <p>Hello</p>
+          World
+          {show() && node0}
+          <Show when={show1()}>
+            <div class="node" ref={grayOutOnDispose}>
+              ID 1
+            </div>
+          </Show>
+          <Show when={show2()}>
+            <div class="node" ref={grayOutOnDispose}>
+              ID 2
+            </div>
+            <div class="node" ref={grayOutOnDispose}>
+              ID 3
+            </div>
+          </Show>
+          <For each={list()}>
+            {({ n }, i) => (
+              <div
+                class="node cursor-pointer bg-yellow-600"
+                data-index={i()}
+                onClick={() =>
+                  setList(p => {
+                    const copy = p.slice();
+                    copy.splice(i(), 1);
+                    return copy;
+                  })
+                }
+                ref={grayOutOnDispose}
+              >
+                {n + 1}.
+              </div>
+            )}
+          </For>
+        </>
+      ),
+      (el): el is HTMLElement => el instanceof HTMLElement,
+    );
+
+    const transition = createMemo(() => {
+      return createListTransition(resolved.toArray, {
+        appear,
+        interruptMethod: interruptMethod(),
+        exitMethod: exitMethod(),
+      });
+    });
+
+    const els = mapArray(
+      () => transition()(),
+      ([el, { state, useEnter, useExit, useRemain }]) => {
+        createEffect(() => {
+          console.log("state", state(), el);
+        });
+
+        useEnter(() => {
+          console.log("enter", el);
+
+          for (const animation of el.getAnimations()) {
+            animation.commitStyles();
+            animation.cancel();
+          }
+
+          const { top: top1, left: left1 } = el.getBoundingClientRect();
+
+          return () => {
+            el.removeAttribute("style");
+            const { top: top2, left: left2 } = el.getBoundingClientRect();
+
+            return el
+              .animate(
+                [
+                  {
+                    opacity: 0,
+                    transform: `translate(${left1 - left2}px, ${top1 - top2}px) translateY(-30px)`,
+                  },
+                  {
+                    opacity: 1,
+                    transform: `translate(0px, 0px) translateY(0px)`,
+                  },
+                ],
+                animationOptions,
+              )
+              .finished.catch(() => {});
+          };
+        });
+
+        useExit(() => {
+          console.log("exit", el);
+
+          for (const animation of el.getAnimations()) {
+            animation.commitStyles();
+            animation.cancel();
+          }
+
+          const { top: top1, left: left1 } = el.getBoundingClientRect();
+
+          return () => {
+            el.style.position = "absolute";
+            el.style.transform = "";
+            const { top: top2, left: left2 } = el.getBoundingClientRect();
+
+            return el
+              .animate(
+                [
+                  {
+                    transform: `translate(${left1 - left2}px, ${top1 - top2}px) translateY(0px)`,
+                  },
+                  {
+                    opacity: 0,
+                    transform: `translate(${left1 - left2}px, ${top1 - top2}px) translateY(30px)`,
+                  },
+                ],
+                animationOptions,
+              )
+              .finished.catch(() => {});
+          };
+        });
+
+        useRemain(() => {
+          // console.log("remain", el);
+
+          for (const animation of el.getAnimations()) {
+            animation.commitStyles();
+            animation.cancel();
+          }
+
+          const { top: top1, left: left1 } = el.getBoundingClientRect();
+
+          return () => {
+            el.style.transform = "";
+            const { top: top2, left: left2 } = el.getBoundingClientRect();
+
+            return el
+              .animate(
+                [
+                  { transform: `translate(${left1 - left2}px, ${top1 - top2}px)` },
+                  { opacity: 1, transform: `translate(0px, 0px)` },
+                ],
+                animationOptions,
+              )
+              .finished.catch(() => {});
+          };
+        });
+
+        return el;
+      },
+    );
+
+    return <>{els()}</>;
+  };
+
   return (
     <>
-      <div class="flex">
+      <div class="flex flex-wrap gap-4">
         <button
           class="btn"
           onClick={() => {
@@ -64,6 +285,32 @@ const ListPage: Component = () => {
         >
           {appear ? "Disable" : "Enable"} Appear
         </button>
+        <label>
+          Interrupt method
+          <select
+            value={interruptMethod()}
+            onChange={event => {
+              setInterruptMethod(event.currentTarget.value as InterruptMethod);
+            }}
+          >
+            <option value="cancel">Cancel</option>
+            <option value="wait">Wait</option>
+            <option value="none">None</option>
+          </select>
+        </label>
+        <label>
+          Exit method
+          <select
+            value={exitMethod()}
+            onChange={event => {
+              setExitMethod(event.currentTarget.value as ExitMethod);
+            }}
+          >
+            <option value="remove">Remove</option>
+            <option value="move-to-end">Move to end</option>
+            <option value="keep-index">Keep index</option>
+          </select>
+        </label>
       </div>
 
       <div class="wrapper-h flex-wrap">
@@ -95,130 +342,7 @@ const ListPage: Component = () => {
       <div class="wrapper-h flex-wrap gap-4 space-x-0">
         <Suspense fallback={<p>Suspended</p>}>
           <Show when={showWrapper()}>
-            {untrack(() => {
-              // track the resource
-              createRenderEffect(res);
-
-              const resolved = resolveElements(
-                () => (
-                  <>
-                    <p>Hello</p>
-                    World
-                    {show() && (
-                      <div
-                        class="node"
-                        ref={el => {
-                          onMount(() => console.log("mounted", el.isConnected));
-                          grayOutOnDispose(el);
-                        }}
-                      >
-                        ID 0
-                      </div>
-                    )}
-                    <Show when={show1()}>
-                      <div class="node" ref={grayOutOnDispose}>
-                        ID 1
-                      </div>
-                    </Show>
-                    <Show when={show2()}>
-                      <div class="node" ref={grayOutOnDispose}>
-                        ID 2
-                      </div>
-                      <div class="node" ref={grayOutOnDispose}>
-                        ID 3
-                      </div>
-                    </Show>
-                    <For each={list()}>
-                      {({ n }, i) => (
-                        <div
-                          class="node cursor-pointer bg-yellow-600"
-                          onClick={() =>
-                            setList(p => {
-                              const copy = p.slice();
-                              copy.splice(i(), 1);
-                              return copy;
-                            })
-                          }
-                          ref={grayOutOnDispose}
-                        >
-                          {n + 1}.
-                        </div>
-                      )}
-                    </For>
-                  </>
-                ),
-                (el): el is HTMLElement => el instanceof HTMLElement,
-              );
-
-              const options = { duration: 600, easing: "cubic-bezier(0.4, 0, 0.2, 1)" };
-
-              const transition = createListTransition(resolved.toArray, {
-                appear,
-                onChange({ added, finishRemoved, unchanged, removed }) {
-                  added.forEach(el => {
-                    queueMicrotask(() => {
-                      if (!el.isConnected) return;
-                      el.style.opacity = "0";
-                      el.style.transform = "translateY(10px)";
-                      el.animate(
-                        [
-                          { opacity: 0, transform: "translateY(-36px)" },
-                          { opacity: 1, transform: "translateY(0)" },
-                        ],
-                        { ...options, fill: "both" },
-                      );
-                    });
-                  });
-
-                  unchanged.forEach(el => {
-                    const { left: left1, top: top1 } = el.getBoundingClientRect();
-                    if (!el.isConnected) return;
-                    queueMicrotask(() => {
-                      const { left: left2, top: top2 } = el.getBoundingClientRect();
-                      el.animate(
-                        [
-                          { transform: `translate(${left1 - left2}px, ${top1 - top2}px)` },
-                          { transform: "none" },
-                        ],
-                        options,
-                      );
-                    });
-                  });
-
-                  const removedRects = removed.map(el => el.getBoundingClientRect());
-                  removed.forEach(el => {
-                    el.style.transform = "none";
-                    el.style.position = "absolute";
-                  });
-                  queueMicrotask(() => {
-                    removed.forEach((el, i) => {
-                      if (!el.isConnected) return finishRemoved([el]);
-
-                      const { left: left1, top: top1 } = removedRects[i]!;
-                      const { left: left2, top: top2 } = el.getBoundingClientRect();
-
-                      const a = el.animate(
-                        [
-                          { transform: `translate(${left1 - left2}px, ${top1 - top2}px)` },
-                          {
-                            opacity: 0,
-                            transform: `translate(${left1 - left2}px, ${top1 - top2 + 36}px)`,
-                          },
-                        ],
-                        options,
-                      );
-
-                      i === removed.length - 1 &&
-                        a.finished
-                          .then(() => finishRemoved(removed))
-                          .catch(() => finishRemoved(removed));
-                    });
-                  });
-                },
-              });
-
-              return <>{transition()}</>;
-            })}
+            <Content />
           </Show>
         </Suspense>
       </div>

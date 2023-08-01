@@ -5,12 +5,13 @@ import {
   untrack,
   $TRACK,
   createComputed,
-  createMemo,
   useTransition,
 } from "solid-js";
 import { isServer } from "solid-js/web";
+import { arrayEquals, makeSetItem, trackTransitionPending } from "./utils";
 
 const noop = () => {};
+const noopAsync = async () => {};
 const noopTransition = (el: any, done: () => void) => done();
 
 export type TransitionMode = "out-in" | "in-out" | "parallel";
@@ -163,16 +164,18 @@ export type OnListChange<T> = (payload: {
 
 export type ExitMethod = "remove" | "move-to-end" | "keep-index";
 
-export type ListTransitionOptions<T> = {
-  /**
-   * A function to be called when the list changes. {@link OnListChange}
-   *
-   * It receives the list of current, added, removed, and unchanged elements.
-   * It also receives a callback to be called when the removed elements are finished animating (they can be removed from the DOM).
-   */
-  onChange: OnListChange<T>;
+export type InterruptMethod = "cancel" | "wait" | "none";
+
+export type ListTransitionOptions = {
   /** whether to run the transition on the initial elements. Defaults to `false` */
   appear?: boolean;
+  /**
+   * This controls what happens when a transition is interrupted. This can happen when an element exits before an enter transition has completed, or vice versa. {@link InterruptMethod}
+   * - `"cancel"` (default) abandons the current transition and starts the interrupting one as soon as it happens.
+   * - `"wait"` waits for the current transition to complete before starting the most recently interrupting transition.
+   * - `"none"` ignores the interrupting transition entirely
+   */
+  interruptMethod?: InterruptMethod;
   /**
    * This controls how the elements exit. {@link ExitMethod}
    * - `"remove"` removes the element immediately.
@@ -181,6 +184,121 @@ export type ListTransitionOptions<T> = {
    */
   exitMethod?: ExitMethod;
 };
+
+type TransitionItemState = "initial" | "entering" | "entered" | "exiting" | "exited";
+
+type TransitionCallback = () => () => Promise<unknown>;
+
+type TransitionControl = () => () => Promise<void>;
+
+type TransitionItemContext = {
+  state: Accessor<TransitionItemState>;
+  useEnter(callback: TransitionCallback): void;
+  useExit(callback: TransitionCallback): void;
+  useRemain(callback: TransitionCallback): void;
+};
+
+type TransitionItemControls = {
+  enter: TransitionControl;
+  exit: TransitionControl;
+  remain: TransitionControl;
+};
+
+type TransitionItem<T> = [T, TransitionItemContext, TransitionItemControls];
+
+class TransitionInterruptError extends Error {
+  static ignore(error: any) {
+    if (!(error instanceof TransitionInterruptError)) {
+      throw error;
+    }
+  }
+}
+
+function createTransitionItem<T>(el: T, options: ListTransitionOptions): TransitionItem<T> {
+  const [state, setState] = createSignal<TransitionItemState>("initial");
+  const cancelSet = new Set<() => void>();
+  const enterCallbacks = new Set<TransitionCallback>();
+  const exitCallbacks = new Set<TransitionCallback>();
+  const remainCallbacks = new Set<TransitionCallback>();
+  let controlIsRunning: boolean = false;
+
+  const makeTransitionControl: (
+    callbackSet: Set<TransitionCallback>,
+    startState: TransitionItemState,
+    endState: TransitionItemState,
+  ) => TransitionControl =
+    options.interruptMethod === "none"
+      ? (callbackSet, startState, endState) => () => {
+          if (controlIsRunning) {
+            return noopAsync;
+          }
+
+          controlIsRunning = true;
+
+          const callbacks = Array.from(callbackSet).map(callback => callback());
+          setState(startState);
+
+          return () =>
+            Promise.all(callbacks.map(callback => callback()))
+              .then(() => {
+                setState(endState);
+              })
+              .finally(() => {
+                controlIsRunning = false;
+              });
+        }
+      : (callbackSet, startState, endState) => () => {
+          for (const cancel of cancelSet) {
+            cancel();
+          }
+
+          let cancel: () => void;
+
+          const cancelPromise = new Promise((_, reject) => {
+            cancel = () => {
+              reject(new TransitionInterruptError());
+            };
+            cancelSet.add(cancel);
+          });
+
+          const callbacks = Array.from(callbackSet).map(callback => callback());
+
+          setState(startState);
+
+          return () =>
+            Promise.race([Promise.all(callbacks.map(callback => callback())), cancelPromise])
+              .then(() => {
+                setState(endState);
+              })
+              .finally(() => {
+                cancelSet.delete(cancel);
+              });
+        };
+
+  return [
+    el,
+    {
+      state,
+      useEnter(callback: TransitionCallback) {
+        makeSetItem(enterCallbacks, callback);
+      },
+      useExit(callback: TransitionCallback) {
+        makeSetItem(exitCallbacks, callback);
+      },
+      useRemain(callback: TransitionCallback) {
+        makeSetItem(remainCallbacks, callback);
+      },
+    },
+    {
+      enter: makeTransitionControl(enterCallbacks, "entering", "entered"),
+      exit: makeTransitionControl(exitCallbacks, "exiting", "exited"),
+      remain() {
+        return () =>
+          Promise.all(Array.from(remainCallbacks).map(callback => callback()())).then(noop);
+      },
+    },
+  ];
+}
 
 /**
  * Create an element list transition interface for changes to the list of elements.
@@ -213,93 +331,133 @@ export type ListTransitionOptions<T> = {
  */
 export function createListTransition<T extends object>(
   source: Accessor<readonly T[]>,
-  options: ListTransitionOptions<T>,
-): Accessor<T[]> {
+  options: ListTransitionOptions,
+): Accessor<[T, TransitionItemContext][]> {
   const initSource = untrack(source);
 
   if (isServer) {
-    const copy = initSource.slice();
+    const copy = initSource.slice().map<[T, TransitionItemContext]>(item => [
+      item,
+      {
+        state: () => "initial",
+        useEnter() {},
+        useExit() {},
+        useRemain() {},
+      },
+    ]);
     return () => copy;
   }
-
-  const { onChange } = options;
 
   // if appear is enabled, the initial transition won't have any previous elements.
   // otherwise the elements will match and transition skipped, or transitioned if the source is different from the initial value
   let prevSet: ReadonlySet<T> = new Set(options.appear ? undefined : initSource);
-  const exiting = new WeakSet<T>();
+
+  const [result, setResult] = createSignal<TransitionItem<T>[]>(
+    options.appear ? [] : initSource.slice().map(el => createTransitionItem(el, options)),
+    { equals: arrayEquals },
+  );
 
   const [toRemove, setToRemove] = createSignal<T[]>([], { equals: false });
+
   const [isTransitionPending] = useTransition();
 
-  const finishRemoved: (els: T[]) => void =
+  const finishRemoved: (el: T) => void =
     options.exitMethod === "remove"
       ? noop
-      : els => {
-          setToRemove(p => (p.push.apply(p, els), p));
-          for (const el of els) exiting.delete(el);
+      : el => {
+          setToRemove(p => [...p, el]);
         };
 
-  const handleRemoved: (els: T[], el: T, i: number) => void =
+  const handleExiting: (items: TransitionItem<T>[], item: TransitionItem<T>, i: number) => void =
     options.exitMethod === "remove"
       ? noop
       : options.exitMethod === "keep-index"
-      ? (els, el, i) => els.splice(i, 0, el)
-      : (els, el) => els.push(el);
+      ? (items, item, i) => items.splice(i, 0, item)
+      : (items, item) => items.push(item);
 
-  return createMemo(
-    prev => {
-      const elsToRemove = toRemove();
-      const sourceList = source();
-      (sourceList as any)[$TRACK]; // top level store tracking
+  createComputed(() => {
+    console.log("computed");
+    const sourceList = source();
+    const elsToRemove = toRemove();
+    (sourceList as any)[$TRACK]; // top level store tracking
 
-      if (untrack(isTransitionPending)) {
-        // wait for pending transition to end before animating
-        isTransitionPending();
-        return prev;
-      }
+    trackTransitionPending(isTransitionPending, () => {
+      untrack(() => {
+        const prev = result();
 
-      if (elsToRemove.length) {
-        const next = prev.filter(e => !elsToRemove.includes(e));
-        elsToRemove.length = 0;
-        onChange({ list: next, added: [], removed: [], unchanged: next, finishRemoved });
-        return next;
-      }
+        if (elsToRemove.length) {
+          console.log("elsToRemove", elsToRemove);
+          const next = prev.filter(([el]) => !elsToRemove.includes(el));
+          elsToRemove.length = 0;
+          setResult(next);
+          return;
+        }
 
-      return untrack(() => {
         const nextSet: ReadonlySet<T> = new Set(sourceList);
-        const next: T[] = sourceList.slice();
+        const next: TransitionItem<T>[] = [];
+        const entering: TransitionItem<T>[] = [];
+        const exiting: TransitionItem<T>[] = [];
+        const remaining: TransitionItem<T>[] = [];
 
-        const added: T[] = [];
-        const removed: T[] = [];
-        const unchanged: T[] = [];
-
-        for (const el of sourceList) {
-          (prevSet.has(el) ? unchanged : added).push(el);
-        }
-
-        let nothingChanged = !added.length;
-        for (let i = 0; i < prev.length; i++) {
-          const el = prev[i]!;
-          if (!nextSet.has(el)) {
-            if (!exiting.has(el)) {
-              removed.push(el);
-              exiting.add(el);
-            }
-            handleRemoved(next, el, i);
+        for (let i = 0; i < sourceList.length; i++) {
+          const el = sourceList[i]!;
+          if (prevSet.has(el)) {
+            const item = prev.find(([prevEl]) => prevEl === el)!;
+            next.push(item);
+            remaining.push(item);
+          } else {
+            console.log("add", el);
+            const item = createTransitionItem(el, options);
+            next.push(item);
+            entering.push(item);
           }
-          if (nothingChanged && el !== next[i]) nothingChanged = false;
         }
 
-        // skip if nothing changed
-        if (!removed.length && nothingChanged) return prev;
-
-        onChange({ list: next, added, removed, unchanged, finishRemoved });
+        for (let i = 0; i < prev.length; i++) {
+          const item = prev[i]!;
+          const [el] = item;
+          if (!nextSet.has(el)) {
+            handleExiting(next, item, i);
+            if (prevSet.has(el)) {
+              console.log("remove", el);
+              exiting.push(item);
+            }
+          }
+        }
 
         prevSet = nextSet;
-        return next;
+        setResult(next);
+
+        queueMicrotask(() => {
+          const callbacks: Array<() => Promise<void>> = [];
+
+          for (let i = 0; i < exiting.length; i++) {
+            const [el, , controls] = exiting[i]!;
+            const callback = controls.exit();
+            callbacks.push(() =>
+              callback().then(() => {
+                finishRemoved(el);
+              }),
+            );
+          }
+
+          for (let i = 0; i < entering.length; i++) {
+            const [, , controls] = entering[i]!;
+            callbacks.push(controls.enter());
+          }
+
+          for (let i = 0; i < remaining.length; i++) {
+            const [, , controls] = remaining[i]!;
+            callbacks.push(controls.remain());
+          }
+
+          for (let i = 0; i < callbacks.length; i++) {
+            callbacks[i]?.().catch(TransitionInterruptError.ignore);
+          }
+        });
       });
-    },
-    options.appear ? [] : initSource.slice(),
-  );
+    });
+  });
+
+  return result as unknown as Accessor<[T, TransitionItemContext][]>;
 }
