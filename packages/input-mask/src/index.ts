@@ -15,8 +15,11 @@ export type InputMask = InputMaskFn | InputMaskArray | InputMaskRegex | string;
 
 export const stringMaskRegExp: Record<string, RegExp> = {
   9: /\d/,
+  0: /\d?/,
   a: /[a-z]/i,
+  o: /[a-z]?/i,
   "*": /\w/,
+  "?": /\w?/,
 };
 
 /** Convert a string mask to an array mask */
