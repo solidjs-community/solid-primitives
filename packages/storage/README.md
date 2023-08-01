@@ -61,7 +61,9 @@ If you are using an asynchronous storage to persist the state of a resource, it 
 
 In the browser, we already have `localStorage`, which persists values for the same hostname indefinitely, and `sessionStorage`, which does the same for the duration of the browser session, but loses persistence after closing the browser.
 
-As another storage, `cookieStorage` from this package can be used, which is a `localStorage`-like API to set cookies. It will work in the browser and also allows reading cookies on solid-start. Using it in the server without solid-start will not cause errors, but instead emit a warning message. You can also supply your own implementations of `cookieStorage._read(key)` and `cookieStorage._write(key, value, options)` if neither of those fit your need.
+As another storage, `cookieStorage` from this package can be used, which is a `localStorage`-like API to set cookies. It will work in the browser and also allows reading cookies on solid-start. Using it in the server without solid-start will not cause errors (unless you are using stackblitz), but instead emit a warning message. You can also supply your own implementations of `cookieStorage._read(key)` and `cookieStorage._write(key, value, options)` if neither of those fit your need.
+
+If you are not using solid-start or are using stackblitz and want to use cookieStorage on the server, you can supply optional getRequest (either something like useRequest from solid-start or a function that returns the current request) and setCookie options.
 
 There is also [`localForage`](https://localforage.github.io/localForage/), which uses `IndexedDB`, `WebSQL` or `localStorage` to provide an asynchronous Storage API that can ideally store much more than the few Megabytes that are available in most browsers.
 
