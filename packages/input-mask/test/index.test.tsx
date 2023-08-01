@@ -13,7 +13,6 @@ const dispatchInputEvent = (node: HTMLElement) =>
 describe("createInputMask", () => {
   it("adds placeholder (e.g. to an iso date)", async () => {
     const { container } = render(() => <input onInput={createInputMask("9999-99-99")} />);
-    console.warn(container.innerHTML);
     const input = container.querySelector("input") as HTMLInputElement;
     input.value = "11111";
     await dispatchInputEvent(input);
