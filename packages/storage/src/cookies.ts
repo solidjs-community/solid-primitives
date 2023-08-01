@@ -2,6 +2,7 @@ import { isServer } from "solid-js/web";
 import { StorageProps, StorageWithOptions, StorageSignalProps } from "./types";
 import { addClearMethod } from "./tools";
 import { createStorage, createStorageSignal } from "./storage";
+import type { PageEvent } from "solid-start";
 
 export type CookieOptions = {
   domain?: string;
@@ -11,6 +12,8 @@ export type CookieOptions = {
   httpOnly?: boolean;
   maxAge?: number;
   sameSite?: "None" | "Lax" | "Strict";
+  getRequest?: (() => Request) | (() => PageEvent);
+  setCookie?: (key: string, value: string, options: CookieOptions) => void;
 };
 
 const serializeCookieOptions = (options?: CookieOptions) => {
@@ -33,7 +36,7 @@ const serializeCookieOptions = (options?: CookieOptions) => {
   return memo;
 };
 
-let useRequest: () => { request: Request };
+let useRequest: () => PageEvent;
 try {
   useRequest = require("solid-start/server").useRequest;
 } catch (e) {
@@ -41,7 +44,7 @@ try {
     console.warn(
       "It seems you attempt to use cookieStorage on the server without having solid-start installed",
     );
-    return { request: { headers: { get: () => "" } } as unknown as Request };
+    return { request: { headers: { get: () => "" } } as unknown as Request } as unknown as PageEvent;
   };
 }
 
@@ -58,20 +61,28 @@ try {
  *   httpOnly?: boolean;
  *   maxAge?: number;
  *   sameSite?: "None" | "Lax" | "Strict";
+ *   getRequest?: () => Request | () => PageEvent // (useRequest from solid-start)
+ *   setCookie?: (key, value, options) => void // set cookie on the server
  * };
  * ```
  * Also, you can use its _read and _write properties to change reading and writing
  */
 export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
-  _read: isServer ? () => useRequest().request.headers.get("Cookie") : () => document.cookie,
+  _read: isServer
+    ? (options?: CookieOptions) => {
+      const eventOrRequest = options?.getRequest?.() || useRequest?.();
+      const request = eventOrRequest && ('request' in eventOrRequest ? eventOrRequest.request : eventOrRequest);
+      return request?.headers.get("Cookie") || "";
+    }
+    : () => document.cookie,
   _write: isServer
-    ? (_key: string, _value: string, _options?: CookieOptions) => ""
+    ? (key: string, value: string, options?: CookieOptions) => options?.setCookie?.(key, value, options)
     : (key: string, value: string, options?: CookieOptions) => {
         document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
       },
-  getItem: (key: string) =>
+  getItem: (key: string, options?: CookieOptions) =>
     cookieStorage
-      ._read()
+      ._read(options)
       .match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")
       ?.pop() ?? null,
   setItem: (key: string, value: string, options?: CookieOptions) => {
