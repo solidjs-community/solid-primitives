@@ -60,7 +60,7 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
   const name = options.name || `storage-${createUniqueId()}`;
   const serialize: (data: T) => string = options.serialize || JSON.stringify.bind(JSON);
   const deserialize: (data: string) => T = options.deserialize || JSON.parse.bind(JSON);
-  const init = storage.getItem(name);
+  const init = storage.getItem(name, (options as unknown as { storageOptions: O }).storageOptions);
   const set =
     typeof signal[0] === "function"
       ? (data: string) => (signal[1] as Setter<T>)(() => deserialize(data))
