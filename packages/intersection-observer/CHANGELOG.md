@@ -1,5 +1,12 @@
 # @solid-primitives/intersection-observer
 
+## 2.1.3
+
+### Patch Changes
+
+- Updated dependencies [92c1e5c4]
+  - @solid-primitives/utils@6.2.1
+
 ## 2.1.2
 
 ### Patch Changes

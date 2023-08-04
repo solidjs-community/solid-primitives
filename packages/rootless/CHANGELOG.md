@@ -1,5 +1,12 @@
 # @solid-primitives/rootless
 
+## 1.4.2
+
+### Patch Changes
+
+- Updated dependencies [92c1e5c4]
+  - @solid-primitives/utils@6.2.1
+
 ## 1.4.1
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @solid-primitives/storage
 
+## 2.1.0
+
+### Minor Changes
+
+- 92041fd3: allow providing request getter / cookie setter on the server
+
+### Patch Changes
+
+- Updated dependencies [92c1e5c4]
+  - @solid-primitives/utils@6.2.1
+
 ## 2.0.0
 
 ### Major Changes
