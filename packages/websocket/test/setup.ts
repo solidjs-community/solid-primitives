@@ -22,7 +22,10 @@ class MockWebSocket extends EventTarget {
   public CLOSING = 2;
   public CLOSED = 3;
   public readyState: WSReadyState = 0;
-  constructor(public url: string, public protocol?: string | string[]) {
+  constructor(
+    public url: string,
+    public protocol?: string | string[],
+  ) {
     super();
     WSMessages.set(this, [] as WSMessage[]);
     setTimeout(() => {

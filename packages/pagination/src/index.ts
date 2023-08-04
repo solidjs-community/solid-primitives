@@ -112,16 +112,16 @@ export const createPagination = (
   };
 
   const onKeyUp = (pageNo: number, ev: KeyboardEvent) =>
-    ((
-      {
+    (
+      ({
         ArrowLeft: () => setPage(p => p - 1),
         ArrowRight: () => setPage(p => p + 1),
         Home: () => setPage(1),
         End: () => setPage(opts().pages),
         Space: () => setPage(pageNo),
         Return: () => setPage(pageNo),
-      }[ev.key] || noop
-    )());
+      })[ev.key] || noop
+    )();
 
   const maxPages = createMemo(() => Math.min(opts().maxPages, opts().pages));
 

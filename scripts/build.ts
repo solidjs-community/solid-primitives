@@ -1,6 +1,6 @@
 import { build } from "tsup";
 import { EntryOptions } from "tsup-preset-solid";
-import * as preset from 'tsup-preset-solid'
+import * as preset from "tsup-preset-solid";
 import path from "path";
 import fs from "fs";
 
@@ -32,11 +32,11 @@ const printExports = !writeExports;
 const cwd = process.cwd();
 
 export const CI =
-    process.env['CI'] === 'true' ||
-    process.env['CI'] === '"1"' ||
-    process.env['GITHUB_ACTIONS'] === 'true' ||
-    process.env['GITHUB_ACTIONS'] === '"1"' ||
-    !!process.env['TURBO_HASH']
+  process.env["CI"] === "true" ||
+  process.env["CI"] === '"1"' ||
+  process.env["GITHUB_ACTIONS"] === "true" ||
+  process.env["GITHUB_ACTIONS"] === '"1"' ||
+  !!process.env["TURBO_HASH"];
 
 const customOptions: Record<string, EntryOptions | EntryOptions[]> = {
   "controlled-props": {
@@ -58,22 +58,22 @@ const customOptions: Record<string, EntryOptions | EntryOptions[]> = {
   const package_name = package_json.name!.replace("@solid-primitives/", "");
 
   const parsed_options = preset.parsePresetOptions({
-    entries: customOptions[package_name] ?? {entry: `src/index.ts`},
+    entries: customOptions[package_name] ?? { entry: `src/index.ts` },
     cjs: true,
-  })
+  });
 
   if (!CI) {
-    const package_fields = preset.generatePackageExports(parsed_options)
+    const package_fields = preset.generatePackageExports(parsed_options);
 
     if (writeExports) {
-      preset.writePackageJson(package_fields)
+      preset.writePackageJson(package_fields);
     } else {
       // eslint-disable-next-line no-console
-      console.log("Package json exports:",JSON.stringify(package_fields, null, 2))
+      console.log("Package json exports:", JSON.stringify(package_fields, null, 2));
     }
   }
 
-  const tsup_options = preset.generateTsupOptions(parsed_options)
+  const tsup_options = preset.generateTsupOptions(parsed_options);
 
   if (nodePlatform) {
     for (const option of tsup_options) {

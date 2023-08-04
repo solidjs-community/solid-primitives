@@ -4,14 +4,20 @@ export class FileSystemHandle {
   get kind(): "file" | "directory" {
     return this._kind;
   }
-  constructor(private _kind: "file" | "directory", public name: string) {}
+  constructor(
+    private _kind: "file" | "directory",
+    public name: string,
+  ) {}
   isSameEntry(entry: FileSystemHandle) {
     return entry == this;
   }
 }
 
 export class FileSystemFileHandle extends FileSystemHandle {
-  constructor(public name: string, private data: string) {
+  constructor(
+    public name: string,
+    private data: string,
+  ) {
     super("file", name);
   }
   createWritable() {

@@ -86,10 +86,13 @@ export function createDisposable(
   fn: (dispose: VoidFunction) => void,
   ...owners: (Owner | null)[]
 ): VoidFunction {
-  return createSubRoot(dispose => {
-    fn(dispose);
-    return dispose;
-  }, ...owners);
+  return createSubRoot(
+    dispose => {
+      fn(dispose);
+      return dispose;
+    },
+    ...owners,
+  );
 }
 
 /**

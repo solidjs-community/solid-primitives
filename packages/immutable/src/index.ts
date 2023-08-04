@@ -33,7 +33,10 @@ const isObject = (v: unknown): v is Record<PropertyKey, any> => !!v && typeof v 
 abstract class CommonTraps<T extends ImmutableObject | ImmutableArray> implements ProxyHandler<T> {
   o = getOwner()!;
 
-  constructor(public s: Accessor<T>, public c: Config) {}
+  constructor(
+    public s: Accessor<T>,
+    public c: Config,
+  ) {}
 
   has(target: T, property: PropertyKey) {
     if (property === $RAW || property === $PROXY || property === $TRACK || property === "__proto__")
@@ -160,7 +163,11 @@ class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<Imm
 }
 
 class PropertyWrapper {
-  constructor(private s: Accessor<ImmutableValue>, private o: Owner, private c: Config) {
+  constructor(
+    private s: Accessor<ImmutableValue>,
+    private o: Owner,
+    private c: Config,
+  ) {
     runWithOwner(o, () => onCleanup(() => this.#dispose()));
   }
 

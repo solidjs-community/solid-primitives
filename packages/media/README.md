@@ -127,7 +127,7 @@ const moduleSize = () =>
     sm: 2,
     lg: 4,
     xl: 6,
-  }[matches.key]);
+  })[matches.key];
 ```
 
 This can be very helpful for things like the `mapHeight` option in [`createMasonry`](https://solid-primitives.netlify.app/package/masonry#createMasonry).
@@ -153,7 +153,7 @@ const moduleSize = () =>
     sm: 2,
     lg: 4,
     xl: 6,
-  }[matches.key]);
+  })[matches.key];
 ```
 
 ### Demo
