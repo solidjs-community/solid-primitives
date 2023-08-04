@@ -121,8 +121,8 @@ export function createSwitchTransition<T>(
         prev => enterTransition(() => exitTransition(prev))
       : // exit & enter
         prev => {
-          enterTransition();
           exitTransition(prev);
+          enterTransition();
         };
 
   createComputed(
