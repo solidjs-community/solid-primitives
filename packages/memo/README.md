@@ -151,7 +151,25 @@ memo(); // T: number
 
 ###### See [the tests](https://github.com/solidjs-community/solid-primitives/blob/main/packages/memo/test/lazy.test.ts) for better usage reference.
 
-### Usage caveats
+### No `equals`
+
+The lazy memo, as it is implemented now, doesn't allow for setting a `equals` function like you could with normal memo. It is always set to `equals: false` as a lazy memo cannot eagerly evaluate to check if the next value is the same as the previous, it needs to always notify it's observers so they can read from it and evaluate the memo.
+
+### Not ownerless
+
+Lazy memos in Solid 2.0 will be ownerless — the reactive context of the callback will depend of the place of read, not creation.
+
+This implementation will always execute it's callback with the context of owner it was created under. So ti won't work with [Suspense](https://www.solidjs.com/docs/latest/api#<suspense>) the way you might expect — meaning that it won't activate any Suspense that is below place of creation.
+
+Although if you only need the ownerless characteristics so that the memo can be garbage-collected when not referenced, instead of waiting for owner cleanup, you can wrap it with [`runWithOwner`](https://www.solidjs.com/docs/latest/api#runwithowner) to create it without an owner:
+
+```ts
+const memo = runWithOwner(null, () => {
+  return createLazyMemo(() => /* ... */)
+})
+```
+
+### You may not need a lazy memo
 
 There are very few actual good applications of a lazy memo, that couldn't be solved with other means — like improving the data architecture. For example, you can always only create memos in places that you intend to use it in, instead of declaring it prematurely.
 
@@ -161,10 +179,6 @@ const getDouble = (n: number) => n * 2;
 // and only declare memo where you want to use it
 const double = createMemo(() => getDouble(count()));
 ```
-
-A lazy memo won't work reliably with [Suspense](https://www.solidjs.com/docs/latest/api#<suspense>).
-
-There is a performance cost, from recreating and disposing computations, involved with using it over normal memo.
 
 ### Demo
 
