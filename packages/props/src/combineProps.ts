@@ -29,22 +29,27 @@ export function stringStyleToObject(style: string): JSX.CSSProperties {
  * styles; // { margin: "2rem", border: "1px solid #121212", padding: "16px" }
  */
 export function combineStyle(a: string, b: string): string;
-export function combineStyle(a: JSX.CSSProperties, b: JSX.CSSProperties): JSX.CSSProperties;
 export function combineStyle(
-  a: JSX.CSSProperties | string,
-  b: JSX.CSSProperties | string,
+  a: JSX.CSSProperties | undefined,
+  b: JSX.CSSProperties | undefined,
 ): JSX.CSSProperties;
 export function combineStyle(
-  a: JSX.CSSProperties | string,
-  b: JSX.CSSProperties | string,
+  a: JSX.CSSProperties | string | undefined,
+  b: JSX.CSSProperties | string | undefined,
+): JSX.CSSProperties;
+export function combineStyle(
+  a: JSX.CSSProperties | string | undefined,
+  b: JSX.CSSProperties | string | undefined,
 ): JSX.CSSProperties | string {
-  if (typeof a === "object" && typeof b === "object") return { ...a, ...b };
-  if (typeof a === "string" && typeof b === "string") return `${a};${b}`;
+  if (typeof a === "string") {
+    if (typeof b === "string") return `${a};${b}`;
 
-  const objA = typeof a === "object" ? a : stringStyleToObject(a);
-  const objB = typeof b === "object" ? b : stringStyleToObject(b);
+    a = stringStyleToObject(a);
+  } else if (typeof b === "string") {
+    b = stringStyleToObject(b);
+  }
 
-  return { ...objA, ...objB };
+  return { ...a, ...b };
 }
 
 type PropsInput = {
