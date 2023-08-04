@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 6.2.1
+
+### Patch Changes
+
+- 92c1e5c4: Deprecate and replace `defaultEquals` with `equalFn` from "solid-js"
+
 ## 6.2.0
 
 ### Minor Changes

@@ -1,5 +1,12 @@
 # @solid-primitives/upload
 
+## 0.0.114
+
+### Patch Changes
+
+- Updated dependencies [92c1e5c4]
+  - @solid-primitives/utils@6.2.1
+
 ## 0.0.113
 
 ### Patch Changes
