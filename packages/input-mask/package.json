@@ -59,7 +59,7 @@
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/testing-library": "^0.7.1",
-    "solid-js": "1.7.6"
+    "@solidjs/testing-library": "^0.8.4",
+    "solid-js": "1.7.9"
   }
 }

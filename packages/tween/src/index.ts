@@ -21,9 +21,9 @@ export default function createTween<T extends number>(
     return target;
   }
 
-  const [start, setStart] = createSignal(document.timeline.currentTime);
+  const [start, setStart] = createSignal(performance.now());
   const [current, setCurrent] = createSignal<T>(target());
-  createEffect(on(target, () => setStart(document.timeline.currentTime), { defer: true }));
+  createEffect(on(target, () => setStart(performance.now()), { defer: true }));
   createEffect(
     on([start, current], () => {
       const cancelId = requestAnimationFrame(t => {

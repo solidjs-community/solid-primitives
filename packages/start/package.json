@@ -60,7 +60,7 @@
     "solid-start": "^0.2.26"
   },
   "devDependencies": {
-    "solid-js": "1.7.6",
-    "solid-start": "^0.2.26"
+    "solid-js": "1.7.9",
+    "solid-start": "^0.2.30"
   }
 }

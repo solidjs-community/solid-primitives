@@ -134,7 +134,7 @@ export function createBreakpoints<T extends Breakpoints>(
     options.fallbackState ?? getEmptyMatchesFromBreakpoints(breakpoints),
     "key",
     { enumerable: false, get: () => Object.keys(breakpoints).pop() },
-  ) as Matches<T>;
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (isServer || !window.matchMedia) return fallback;
@@ -159,7 +159,7 @@ export function createBreakpoints<T extends Breakpoints>(
   return Object.defineProperty(matches, "key", {
     enumerable: false,
     get: () => Object.keys(matches).findLast(token => matches[token]) as keyof T,
-  }) as Matches<T>;
+  });
 }
 
 /**

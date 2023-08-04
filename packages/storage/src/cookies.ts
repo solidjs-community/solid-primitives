@@ -36,11 +36,12 @@ const serializeCookieOptions = (options?: CookieOptions) => {
   return memo;
 };
 
-let useRequest: () => PageEvent;
+let useRequest: () => PageEvent | undefined;
 try {
   useRequest = require("solid-start/server").useRequest;
 } catch (e) {
   useRequest = () => {
+    // eslint-disable-next-line no-console
     console.warn(
       "It seems you attempt to use cookieStorage on the server without having solid-start installed",
     );
@@ -72,7 +73,7 @@ try {
 export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   _read: isServer
     ? (options?: CookieOptions) => {
-        const eventOrRequest = options?.getRequest?.() || useRequest?.();
+        const eventOrRequest = options?.getRequest?.() || useRequest();
         const request =
           eventOrRequest && ("request" in eventOrRequest ? eventOrRequest.request : eventOrRequest);
         return request?.headers.get("Cookie") || "";

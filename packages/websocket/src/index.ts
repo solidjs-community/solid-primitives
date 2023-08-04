@@ -107,6 +107,7 @@ export const makeReconnectingWS = (
     ],
   ];
   const getWS = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (ws && ws.readyState < 2) ws.close();
     ws = Object.assign(makeWS(url, protocols, queue), {
       reconnect: getWS,
@@ -132,7 +133,7 @@ export const makeReconnectingWS = (
       return ws.send(msg);
     },
   };
-  for (let name in ws!)
+  for (const name in ws!)
     wws[name as keyof typeof wws] == null &&
       Object.defineProperty(wws, name, {
         enumerable: true,
