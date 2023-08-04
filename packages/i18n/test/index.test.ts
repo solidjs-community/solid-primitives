@@ -16,6 +16,13 @@ describe("createI18nContext", () => {
     locale("fr");
     expect(t("hello", { name: "Tester" })).toBe("bonjour Tester, comment vas-tu ?");
   });
+  it("translate key with dot", async () => {
+    const [t, { add, locale }] = createRoot(() => createI18nContext(dict, "en"));
+    Object.entries(dict).forEach(([lang, translations]) => add(lang, translations));
+    locale("en");
+    expect(t("hello.name", { name: "Tester" })).toBe("hello Tester, how are you?");
+    expect(t("food.meat")).toBe("meat");
+  });
 });
 
 describe("createChainedI18nContext", () => {

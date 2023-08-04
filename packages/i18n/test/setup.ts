@@ -8,6 +8,7 @@ export const dict = {
   },
   en: {
     hello: "hello {{ name }}, how are you?",
+    "hello.name": "hello {{ name }}, how are you?",
     goodbye: ({ name }: { name: string }) => `goodbye ${name}`,
     food: {
       meat: "meat",
