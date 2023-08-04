@@ -44,7 +44,9 @@ try {
     console.warn(
       "It seems you attempt to use cookieStorage on the server without having solid-start installed",
     );
-    return { request: { headers: { get: () => "" } } as unknown as Request } as unknown as PageEvent;
+    return {
+      request: { headers: { get: () => "" } } as unknown as Request,
+    } as unknown as PageEvent;
   };
 }
 
@@ -70,13 +72,15 @@ try {
 export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   _read: isServer
     ? (options?: CookieOptions) => {
-      const eventOrRequest = options?.getRequest?.() || useRequest?.();
-      const request = eventOrRequest && ('request' in eventOrRequest ? eventOrRequest.request : eventOrRequest);
-      return request?.headers.get("Cookie") || "";
-    }
+        const eventOrRequest = options?.getRequest?.() || useRequest?.();
+        const request =
+          eventOrRequest && ("request" in eventOrRequest ? eventOrRequest.request : eventOrRequest);
+        return request?.headers.get("Cookie") || "";
+      }
     : () => document.cookie,
   _write: isServer
-    ? (key: string, value: string, options?: CookieOptions) => options?.setCookie?.(key, value, options)
+    ? (key: string, value: string, options?: CookieOptions) =>
+        options?.setCookie?.(key, value, options)
     : (key: string, value: string, options?: CookieOptions) => {
         document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
       },
