@@ -1,9 +1,19 @@
-import { describe, test, expect } from "vitest";
-import { createPrimitiveTemplate } from "../src";
+import { describe, test } from "vitest";
+import { createRoot } from "solid-js";
+import { createMachine } from "../src";
 
-describe("createPrimitiveTemplate", () => {
-  test("doesn't break in SSR", () => {
-    const [value, setValue] = createPrimitiveTemplate(true);
-    expect(value(), "initial value should be true").toBe(true);
-  });
+describe("createMachine", () => {
+  test("works", () =>
+    createRoot(() => {
+      createMachine<{
+        idle: { value: "foo" };
+        loading: { value: "bar" };
+      }>({
+        initial: "idle",
+        states: {
+          idle: () => "foo",
+          loading: () => "bar",
+        },
+      });
+    }));
 });

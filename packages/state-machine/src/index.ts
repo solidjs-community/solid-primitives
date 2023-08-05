@@ -28,8 +28,8 @@ export type StateValue<T extends { value?: any }> = T extends { value: infer Val
  * @example
  * ```ts
  * const states: MachineStates<{
- *   idle: { input: void; value: "foo"; to: ["loading"] };
- *   loading: { input: void; value: "bar"; to: ["idle"] };
+ *   idle: { value: "foo"; to: ["loading"] };
+ *   loading: { value: "bar"; to: ["idle"] };
  * }> = {
  *   idle: () => "foo",
  *   loading(input, next) {
@@ -115,6 +115,8 @@ export type MachineNext<T extends StatesBase<keyof T>, TKey extends keyof T> = {
   ...args: T[K] extends { input: infer Input } ? [to: K, input: Input] : [to: K, input?: undefined]
 ) => void);
 
+const EQUALS_OPTIONS = { equals: (a: { type: any }, b: { type: any }) => a === b };
+
 /**
  * Creates a reactive state machine.
  *
@@ -125,7 +127,7 @@ export type MachineNext<T extends StatesBase<keyof T>, TKey extends keyof T> = {
  * @example
  * ```ts
  * const state = createMachine<{
- *   idle: { input: void; value: "foo"; to: ["loading"] };
+ *   idle: { value: "foo"; to: ["loading"] };
  *   loading: { input: number; value: "bar"; to: ["idle"] };
  * }>({
  *   initial: "idle",
@@ -163,7 +165,7 @@ export function createMachine<T extends StatesBase<keyof T>>(
       type: keyof T;
       input: any;
     },
-    { equals: (a, b) => a.type === b.type },
+    EQUALS_OPTIONS,
   );
 
   const to = (type: keyof T, input: any) => {
