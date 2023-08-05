@@ -5,8 +5,17 @@ import { createMemo, createSignal, type Accessor } from "solid-js";
  */
 export type StatesBase<TStateNames extends PropertyKey> = {
   [K in TStateNames]: {
+    /**
+     * Value to be passed to the state callback when the machine enters that state.
+     */
     readonly input?: any;
+    /**
+     * Value returned from the state callback.
+     */
     readonly value?: any;
+    /**
+     * Array of state names that can be transitioned to from this state.
+     */
     readonly to?: TStateNames[];
   };
 };
