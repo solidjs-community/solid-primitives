@@ -1,80 +1,183 @@
-import { createMemo, createSignal, type Accessor, type SignalOptions } from "solid-js";
+import { createMemo, createSignal, type Accessor } from "solid-js";
 
-export type MachineStatesBase<TStateNames extends PropertyKey> = {
-  [K in TStateNames]: { input: any; value: any; to?: TStateNames[] };
-};
-
-export type MachineStates<TStates extends MachineStatesBase<keyof TStates>> = {
-  [K in keyof TStates]: (
-    input: TStates[K]["input"],
-    next: MachineNext<TStates, K>,
-  ) => TStates[K]["value"];
-};
-
-export type MachineInitial<TStates extends MachineStatesBase<keyof TStates>> = {
-  [K in keyof TStates]:
-    | { type: K; input: TStates[K]["input"] }
-    | (TStates[K]["input"] extends void ? K : never);
-}[keyof TStates];
-
-export type MachineState<
-  TStates extends MachineStatesBase<keyof TStates>,
-  TKey extends keyof TStates,
-> = {
-  [K in keyof TStates]: {
-    readonly type: K;
-    readonly value: TStates[K]["value"];
-    readonly to: MachineNext<TStates, K>;
+/**
+ * Used for restricting the user type input in {@link createMachine} generic.
+ */
+export type StatesBase<TStateNames extends PropertyKey> = {
+  [K in TStateNames]: {
+    readonly input?: any;
+    readonly value?: any;
+    readonly to?: TStateNames[];
   };
-}[TKey];
-
-export type PossibleNextStates<
-  TStates extends MachineStatesBase<keyof TStates>,
-  TKey extends keyof TStates,
-> = Exclude<
-  // @ts-expect-error
-  Extract<keyof TStates, TStates[TKey] extends { to: infer To } ? To[number] : any>,
-  TKey | symbol
->;
-
-export type MachineNext<
-  TStates extends MachineStatesBase<keyof TStates>,
-  TKey extends keyof TStates,
-> = {
-  readonly [K in PossibleNextStates<TStates, TKey>]: (input: TStates[K]["input"]) => void;
-} & (<K extends PossibleNextStates<TStates, TKey>>(
-  ...args: TStates[K]["input"] extends void
-    ? [to: K, input?: void | undefined]
-    : [to: K, input: TStates[K]["input"]]
-) => void);
-
-const TYPE_EQUALS: SignalOptions<{ type: PropertyKey }> = {
-  equals: (a, b) => a.type === b.type,
 };
 
 /**
+ * Extracts the input type from a state definition.
  */
-export function createStateMachine<T extends MachineStatesBase<keyof T>>(options: {
+export type StateInput<T extends { input?: any }> = T extends { input: infer Input } ? Input : void;
+
+/**
+ * Extracts the value type from a state definition.
+ */
+export type StateValue<T extends { value?: any }> = T extends { value: infer Value }
+  ? Value
+  : undefined;
+
+/**
+ * States object with function implementations.
+ * @example
+ * ```ts
+ * const states: MachineStates<{
+ *   idle: { input: void; value: "foo"; to: ["loading"] };
+ *   loading: { input: void; value: "bar"; to: ["idle"] };
+ * }> = {
+ *   idle: () => "foo",
+ *   loading(input, next) {
+ *     next("idle");
+ *     return "bar";
+ *   }
+ * }
+ * ```
+ */
+export type MachineStates<T extends StatesBase<keyof T>> = {
+  [K in keyof T]: (input: StateInput<T[K]>, next: MachineNext<T, K>) => StateValue<T[K]>;
+};
+
+type MachineInitialDiscriminator<T extends StatesBase<keyof T>> = {
+  [K in keyof T]: { type: K; input: StateInput<T[K]> } | (T[K] extends { input: any } ? never : K);
+};
+
+/**
+ * Union of all possible initial states.
+ */
+export type MachineInitial<T extends StatesBase<keyof T>> = MachineInitialDiscriminator<T>[keyof T];
+
+/**
+ * Options object for {@link createMachine}.
+ */
+export type MachineOptions<T extends StatesBase<keyof T>> = {
   states: MachineStates<T>;
   initial: MachineInitial<T>;
-}): Accessor<MachineState<T, keyof T>> & MachineState<T, keyof T> {
+};
+
+type MachineStateDiscriminator<T extends StatesBase<keyof T>> = {
+  [K in keyof T]: {
+    readonly type: K;
+    readonly value: StateValue<T[K]>;
+    readonly to: MachineNext<T, K>;
+  };
+};
+
+/**
+ * Type of the state object returned by {@link createMachine}.
+ *
+ * Use with a specific state name to get the state object for that state.
+ * @example
+ * ```ts
+ * type IdleState = MachineState<States, "idle">
+ * ```
+ *
+ * Use with `keyof States` to get the union of all state objects.
+ * @example
+ * ```ts
+ * type AllStates = MachineState<States, keyof States>
+ * ```
+ */
+export type MachineState<
+  T extends StatesBase<keyof T>,
+  K extends keyof T,
+> = MachineStateDiscriminator<T>[K];
+
+type PossibleNextKeys<T extends StatesBase<keyof T>, TKey extends keyof T> = Exclude<
+  // @ts-expect-error
+  Extract<keyof T, T[TKey] extends { to: infer To } ? To[number] : any>,
+  TKey | symbol
+>;
+
+/**
+ * Type of the `next` function passed to state functions. Or the `to` property of the state object.
+ *
+ * Use with a specific state name to get the `next` function for that state.
+ * @example
+ * ```ts
+ * type IdleNext = MachineNext<States, "idle">
+ * ```
+ *
+ * Use with `keyof States` to get the union of all `next` functions.
+ * @example
+ * ```ts
+ * type AllNext = MachineNext<States, keyof States>
+ * ```
+ */
+export type MachineNext<T extends StatesBase<keyof T>, TKey extends keyof T> = {
+  readonly [K in PossibleNextKeys<T, TKey>]: (input: StateInput<T[K]>) => void;
+} & (<K extends PossibleNextKeys<T, TKey>>(
+  ...args: T[K] extends { input: infer Input } ? [to: K, input: Input] : [to: K, input?: undefined]
+) => void);
+
+/**
+ * Creates a reactive state machine.
+ *
+ * @param options {@link MachineOptions} object.
+ *
+ * @returns A signal with the current state object.
+ *
+ * @example
+ * ```ts
+ * const state = createMachine<{
+ *   idle: { input: void; value: "foo"; to: ["loading"] };
+ *   loading: { input: number; value: "bar"; to: ["idle"] };
+ * }>({
+ *   initial: "idle",
+ *   states: {
+ *     idle(input, to) {
+ *       return "foo";
+ *     },
+ *     loading(input, to) {
+ *       setTimeout(() => to("idle"), input);
+ *       return "bar";
+ *     }
+ *   }
+ * })
+ *
+ * state.type // "idle"
+ * state.value // "foo"
+ *
+ * if (state.type === "idle") {
+ *   state.to.loading(1000)
+ *
+ *   state.type // "loading"
+ *   state.value // "bar"
+ * }
+ * ```
+ */
+export function createMachine<T extends StatesBase<keyof T>>(
+  options: MachineOptions<T>,
+): Accessor<MachineState<T, keyof T>> & MachineState<T, keyof T> {
   const { states, initial } = options;
 
-  const [payload, setPayload] = createSignal<{ type: keyof T; input: any }>(
-      typeof initial === "object"
-        ? { type: initial.type, input: initial.input }
-        : { type: initial as keyof T, input: undefined },
-      TYPE_EQUALS,
-    ),
-    to = (type: any, input?: any) => setPayload({ type, input });
+  const [payload, setPayload] = createSignal(
+    (typeof initial === "object"
+      ? { type: initial.type, input: initial.input }
+      : { type: initial, input: undefined }) as {
+      type: keyof T;
+      input: any;
+    },
+    { equals: (a, b) => a.type === b.type },
+  );
+
+  const to = (type: keyof T, input: any) => {
+    setPayload({ type, input });
+  };
 
   for (const key of Object.keys(states)) {
-    (to as any)[key] = (input: any) => to(key, input);
+    // @ts-expect-error
+    to[key as any] = (input: any) => to(key, input);
   }
 
   const memo = createMemo(() => {
     const { type, input } = payload();
-    return { type, value: states[type](input, to), to };
+    return { type, value: states[type](input, to as any), to };
   }) as any;
 
   Object.defineProperties(memo, {

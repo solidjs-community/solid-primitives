@@ -17,13 +17,15 @@
     "name": "state-machine",
     "stage": 0,
     "list": [
-      "createPrimitiveTemplate"
+      "createMachine"
     ],
-    "category": "Display & Media"
+    "category": "State"
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "state-machine",
+    "state"
   ],
   "private": false,
   "sideEffects": false,

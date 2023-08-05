@@ -882,6 +882,12 @@ importers:
         specifier: ^0.2.30
         version: 0.2.30(@solidjs/meta@0.28.6)(@solidjs/router@0.8.2)(solid-js@1.7.9)(solid-start-static@0.2.30)(vite@4.4.8)
 
+  packages/state-machine:
+    dependencies:
+      solid-js:
+        specifier: ^1.7.0
+        version: 1.7.9
+
   packages/static-store:
     dependencies:
       '@solid-primitives/utils':
