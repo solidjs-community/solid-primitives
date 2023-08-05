@@ -9,7 +9,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/state-machine?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/state-machine)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A primitive for creating a reactive state machine. For expressing possible states and transitions, and bounding reactive computations to the lifecycle of those states.
+A primitive for creating a reactive state machine. For expressing possible exclusive states and transitions, and bounding reactive computations to the lifecycle of those states.
 
 ## Installation
 
@@ -38,6 +38,8 @@ pnpm add @solid-primitives/state-machine
 - `to` - Array of state names that can be transitioned to from this state. If not provided, any state can be transitioned to from this state.
 
 ```ts
+import { createMachine } from "@solid-primitives/state-machine";
+
 const state = createMachine<{
   idle: {
     value: "foo";
@@ -281,6 +283,35 @@ function TodoItem(props: TodoProps) {
   });
 
   return <div>{state.value}</div>;
+}
+```
+
+### Typing expected state
+
+If you expect a specific state, e.g. in component props, you can use the `MachineState` type:
+
+```ts
+import { MachineState } from "@solid-primitives/state-machine";
+
+// states definition passed to createMachine
+type MyStates = {
+  idle: {
+    value: string;
+  };
+  loading: {
+    value: number;
+  };
+};
+
+type IdleState = MachineState<MyStates, "idle">;
+
+type Props = {
+  state: IdleState;
+};
+
+function MyComponent(props: Props) {
+  props.state.type; // "idle"
+  props.state.value; // string
 }
 ```
 
