@@ -16,7 +16,7 @@ export type StatesBase<TStateNames extends PropertyKey> = {
     /**
      * Array of state names that can be transitioned to from this state.
      */
-    readonly to?: TStateNames[];
+    readonly to?: TStateNames;
   };
 };
 
@@ -98,8 +98,7 @@ export type MachineState<
 > = MachineStateDiscriminator<T>[K];
 
 type PossibleNextKeys<T extends StatesBase<keyof T>, TKey extends keyof T> = Exclude<
-  // @ts-expect-error
-  Extract<keyof T, T[TKey] extends { to: infer To } ? To[number] : any>,
+  Extract<keyof T, T[TKey] extends { to: infer To } ? To : any>,
   TKey | symbol
 >;
 
@@ -136,8 +135,8 @@ const EQUALS_OPTIONS = { equals: (a: { type: any }, b: { type: any }) => a === b
  * @example
  * ```ts
  * const state = createMachine<{
- *   idle: { value: "foo"; to: ["loading"] };
- *   loading: { input: number; value: "bar"; to: ["idle"] };
+ *   idle: { value: "foo"; to: "loading" };
+ *   loading: { input: number; value: "bar"; to: "idle" };
  * }>({
  *   initial: "idle",
  *   states: {

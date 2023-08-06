@@ -35,7 +35,7 @@ pnpm add @solid-primitives/state-machine
 
 - `value` - Value returned from the state callback.
 
-- `to` - Array of state names that can be transitioned to from this state. If not provided, any state can be transitioned to from this state.
+- `to` - Union of state names that can be transitioned to from this state. If not provided, any state can be transitioned to from this state. `never` will create a terminal state.
 
 ```ts
 import { createMachine } from "@solid-primitives/state-machine";
@@ -196,14 +196,15 @@ const state = createMachine<{
   red: {
     value: Events;
     // you can limit the states that can be transitioned to
-    to: ["yellow"];
+    to: "yellow";
   };
   yellow: {
     value: Events;
+    to: "green" | "red";
   };
   green: {
     value: Events;
-    to: ["red"];
+    to: "red";
   };
 }>({
   initial: "red",
