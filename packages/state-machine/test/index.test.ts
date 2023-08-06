@@ -79,7 +79,7 @@ describe("createMachine", () => {
       }
 
       expect(state.type).toBe("idle");
-      expect(state.value).toBe("b");
+      expect(state.value).toBe("a");
     });
   });
 

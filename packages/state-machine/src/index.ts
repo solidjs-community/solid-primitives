@@ -123,7 +123,7 @@ export type MachineNext<T extends StatesBase<keyof T>, TKey extends keyof T> = {
   ...args: T[K] extends { input: infer Input } ? [to: K, input: Input] : [to: K, input?: undefined]
 ) => void);
 
-const EQUALS_OPTIONS = { equals: (a: { type: any }, b: { type: any }) => a === b };
+const EQUALS_OPTIONS = { equals: (a: { type: any }, b: { type: any }) => a.type === b.type };
 
 /**
  * Creates a reactive state machine.
@@ -164,33 +164,25 @@ const EQUALS_OPTIONS = { equals: (a: { type: any }, b: { type: any }) => a === b
 export function createMachine<T extends StatesBase<keyof T>>(
   options: MachineOptions<T>,
 ): Accessor<MachineState<T, keyof T>> & MachineState<T, keyof T> {
-  const { states, initial } = options;
-
-  const [payload, setPayload] = createSignal(
-    (typeof initial === "object"
-      ? { type: initial.type, input: initial.input }
-      : { type: initial, input: undefined }) as {
-      type: keyof T;
-      input: any;
+  const { states, initial } = options,
+    to: any = (type: keyof T, value: any) => {
+      setPayload({ type, value, to });
     },
-    EQUALS_OPTIONS,
-  );
-
-  const to: any = (type: keyof T, input: any) => {
-    setPayload({ type, input });
-  };
+    [payload, setPayload] = createSignal(
+      typeof initial === "object"
+        ? { type: initial.type, value: initial.input as any, to }
+        : { type: initial as keyof T, value: undefined, to },
+      EQUALS_OPTIONS,
+    );
 
   for (const key of Object.keys(states)) {
     to[key as any] = (input: any) => to(key, input);
   }
 
   const memo = createMemo(() => {
-    const { type, input } = payload();
-    return {
-      type,
-      value: untrack(() => states[type](input, to)),
-      to,
-    };
+    const next = payload();
+    next.value = untrack(() => states[next.type](next.value, to));
+    return next;
   }) as any;
 
   Object.defineProperties(memo, {
