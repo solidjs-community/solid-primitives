@@ -195,12 +195,15 @@ type Events = {
 const state = createMachine<{
   red: {
     value: Events;
+    // you can limit the states that can be transitioned to
+    to: ["yellow"];
   };
   yellow: {
     value: Events;
   };
   green: {
     value: Events;
+    to: ["red"];
   };
 }>({
   initial: "red",
@@ -313,6 +316,55 @@ function MyComponent(props: Props) {
   props.state.type; // "idle"
   props.state.value; // string
 }
+```
+
+### Using name references
+
+Using strings as state names is easy, but won't let you use your TypeScript's LSP to its full potential for refactoring and looking up usages.
+
+As an alternative you can make use of `const` variables or TypeScript `enums`:
+
+```ts
+const states = {
+  idle: {/* ... */};
+  loading: {/* ... */};
+};
+
+type States = keyof typeof states;
+
+state.to.idle();
+
+//
+// or with const variables
+//
+
+const IDLE = "idle";
+const LOADING = "loading";
+
+const states = {
+  [IDLE]: {/* ... */};
+  [LOADING]: {/* ... */};
+};
+
+type States = typeof IDLE | typeof LOADING;
+
+state.to(IDLE);
+
+//
+// or with TypeScript enums
+//
+
+enum States {
+  Idle = "idle",
+  Loading = "loading",
+}
+
+const states = {
+  [States.Idle]: {/* ... */};
+  [States.Loading]: {/* ... */};
+};
+
+state.to(States.Idle);
 ```
 
 ## Demo
