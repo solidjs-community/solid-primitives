@@ -1,4 +1,4 @@
-import { createMemo, createSignal, type Accessor } from "solid-js";
+import { createMemo, createSignal, type Accessor, untrack } from "solid-js";
 
 /**
  * Used for restricting the user type input in {@link createMachine} generic.
@@ -176,18 +176,21 @@ export function createMachine<T extends StatesBase<keyof T>>(
     EQUALS_OPTIONS,
   );
 
-  const to = (type: keyof T, input: any) => {
+  const to: any = (type: keyof T, input: any) => {
     setPayload({ type, input });
   };
 
   for (const key of Object.keys(states)) {
-    // @ts-expect-error
     to[key as any] = (input: any) => to(key, input);
   }
 
   const memo = createMemo(() => {
     const { type, input } = payload();
-    return { type, value: states[type](input, to as any), to };
+    return {
+      type,
+      value: untrack(() => states[type](input, to)),
+      to,
+    };
   }) as any;
 
   Object.defineProperties(memo, {
