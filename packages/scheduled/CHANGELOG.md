@@ -1,5 +1,11 @@
 # @solid-primitives/scheduled
 
+## 1.4.1
+
+### Patch Changes
+
+- 722eeafb: Correct `leadingAndTrailing` timing
+
 ## 1.4.0
 
 ### Minor Changes
