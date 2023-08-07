@@ -19,7 +19,7 @@
     "list": [
       "createMachine"
     ],
-    "category": "State"
+    "category": "Reactivity"
   },
   "keywords": [
     "solid",
