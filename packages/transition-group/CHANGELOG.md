@@ -1,5 +1,11 @@
 # @solid-primitives/transition-group
 
+## 1.0.3
+
+### Patch Changes
+
+- a6e6cf9f: Correct order of callbacks in parallel switch transition.
+
 ## 1.0.2
 
 ### Patch Changes

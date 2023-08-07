@@ -1,5 +1,11 @@
 # @solid-primitives/i18n
 
+## 1.4.1
+
+### Patch Changes
+
+- 63a20689: Add support for translations with dot
+
 ## 1.4.0
 
 ### Minor Changes
