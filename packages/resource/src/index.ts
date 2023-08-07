@@ -5,7 +5,6 @@ import {
   type ResourceFetcher,
   type ResourceFetcherInfo,
   type Signal,
-  untrack,
 } from "solid-js";
 import { createStore, reconcile, unwrap } from "solid-js/store";
 

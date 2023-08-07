@@ -1,0 +1,58 @@
+{
+  "name": "@solid-primitives/state-machine",
+  "version": "0.0.1",
+  "description": "A primitive for creating reactive state machines.",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/state-machine#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "state-machine",
+    "stage": 0,
+    "list": [
+      "createMachine"
+    ],
+    "category": "Reactivity"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "state-machine",
+    "state"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "require": "./dist/index.cjs"
+  },
+  "typesVersions": {},
+  "scripts": {
+    "dev": "jiti ../../scripts/dev.ts",
+    "build": "jiti ../../scripts/build.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.7.0"
+  }
+}

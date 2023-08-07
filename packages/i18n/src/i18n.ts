@@ -29,10 +29,12 @@ export function deepReadObject<T = any>(
   path: string,
   defaultValue?: unknown,
 ): T {
-  const value = path
-    .trim()
-    .split(".")
-    .reduce<any>((a, b) => (a ? a[b] : undefined), obj);
+  const value =
+    obj[path] ||
+    path
+      .trim()
+      .split(".")
+      .reduce<any>((a, b) => (a ? a[b] : undefined), obj);
   return value !== undefined ? value : defaultValue;
 }
 

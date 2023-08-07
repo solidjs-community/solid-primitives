@@ -177,13 +177,14 @@ export function leading<Args extends unknown[]>(
   }
 
   let isScheduled = false;
-  const onTrail = () => (isScheduled = false);
-  const scheduled = schedule(onTrail, wait);
+  const scheduled = schedule(() => (isScheduled = false), wait);
+
   const func: typeof callback = (...args) => {
     if (!isScheduled) callback(...args);
     isScheduled = true;
     scheduled();
   };
+
   const clear = () => {
     isScheduled = false;
     scheduled.clear();
@@ -226,45 +227,34 @@ export function leadingAndTrailing<Args extends unknown[]>(
     return Object.assign(scheduled, { clear: () => void 0 });
   }
 
-  // We have three separate reasons to call the scheduled function:
-  const LEADING = 0; // Because we need to set up the schedule for the first time.
-  //    This represents the leading call -- by the time the scheduled
-  //    function is called, the leading call has already happened, so
-  //    the scheduled function does nothing.
-  const TRAILING = 1; // Because the scheduled function was called before the wait time
-  //    elapsed. This represents the trailing call -- when the scheduled
-  //    function is called, the wait time has elapsed, so we should call
-  //    the callback.
-  const RESET = 2; // Because we have waited for the wait time to elapse to see if further
-  //    calls to the scheduled function happen. If no calls have happened, we
-  //    should reset the state entirely.  Otherwise, the trailing calls will
-  //    have happened in the 'trailing' call, so we should do nothing.
+  const enum State {
+    Ready, // 0 - default state, not scheduled
+    Leading, // 1 - scheduled, called leading edge, triggered only once
+    Trailing, // 2 - triggered more than once, will be called on trailing edge
+  }
 
-  type CallType = typeof LEADING | typeof TRAILING | typeof RESET;
+  let state = State.Ready;
 
-  let firstCall = true;
-  const onTrail = (callType: CallType, args: Args) => {
-    if (callType === RESET) {
-      firstCall = true;
-      return;
+  const scheduled = schedule((args: Args) => {
+    state === State.Trailing && callback(...args);
+    state = State.Ready;
+  }, wait);
+
+  const fn: typeof callback = (...args) => {
+    if (state !== State.Trailing) {
+      if (state === State.Ready) callback(...args);
+      state += 1;
     }
-    if (callType === TRAILING) callback(...args);
+    scheduled(args);
+  };
 
-    // @ts-expect-error args aren't used for RESET call type, so we don't need to pass them
-    setTimeout(() => scheduled(RESET), 0);
-  };
-  const scheduled = schedule(onTrail, wait);
-  const func: typeof callback = (...args) => {
-    if (firstCall) callback(...args);
-    scheduled(firstCall ? LEADING : TRAILING, args);
-    firstCall = false;
-  };
   const clear = () => {
-    firstCall = true;
+    state = State.Ready;
     scheduled.clear();
   };
   if (getOwner()) onCleanup(clear);
-  return Object.assign(func, { clear });
+
+  return Object.assign(fn, { clear });
 }
 
 /**

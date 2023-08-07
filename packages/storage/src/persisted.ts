@@ -54,23 +54,27 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
   options: PersistenceOptions<T, O> = {},
 ): [Accessor<T>, Setter<T>] | [Store<T>, SetStoreFunction<T>] {
   const storage = options.storage || globalThis.localStorage;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!storage) {
     return signal;
   }
+
   const name = options.name || `storage-${createUniqueId()}`;
   const serialize: (data: T) => string = options.serialize || JSON.stringify.bind(JSON);
   const deserialize: (data: string) => T = options.deserialize || JSON.parse.bind(JSON);
   const init = storage.getItem(name, (options as unknown as { storageOptions: O }).storageOptions);
   const set =
     typeof signal[0] === "function"
-      ? (data: string) => (signal[1] as Setter<T>)(() => deserialize(data))
-      : (data: string) => (signal[1] as SetStoreFunction<T>)(reconcile(deserialize(data)));
+      ? (data: string) => (signal[1] as any)(() => deserialize(data))
+      : (data: string) => (signal[1] as any)(reconcile(deserialize(data)));
   let unchanged = true;
+
   if (init instanceof Promise) {
-    (init as Promise<string>).then((data: string) => unchanged && data && set(data));
+    init.then(data => unchanged && data && set(data));
   } else if (init) {
     set(init);
   }
+
   return [
     signal[0],
     typeof signal[0] === "function"
@@ -83,11 +87,11 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
           unchanged = false;
           return output;
         }
-      : (...args: Parameters<SetStoreFunction<T>>) => {
-          (signal[1] as SetStoreFunction<T>)(...args);
+      : (...args: any[]) => {
+          (signal[1] as any)(...args);
           storage.setItem(
             name,
-            serialize(untrack(() => signal[0] as Store<T>)),
+            serialize(untrack(() => signal[0] as any)),
             // @ts-ignore
             options.storageOptions,
           );

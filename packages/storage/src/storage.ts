@@ -1,7 +1,13 @@
-import { Accessor, createEffect, createSignal, onCleanup, onMount, Setter } from "solid-js";
-
-import { createHydrateSignal } from "@solid-primitives/utils";
-
+import { createHydratableSignal } from "@solid-primitives/utils";
+import {
+  createEffect,
+  createSignal,
+  onCleanup,
+  onMount,
+  type Accessor,
+  type Setter,
+  type Signal,
+} from "solid-js";
 import type {
   AnyStorageProps,
   AsyncStorage,
@@ -70,7 +76,7 @@ export function createStorage<O, T>(
       : [props.api]
     : [globalThis.localStorage].filter(Boolean);
   const prefix = props?.prefix ? `${props.prefix}.` : "";
-  const signals = new Map<string, ReturnType<typeof createSignal>>();
+  const signals = new Map<string, Signal<undefined>>();
   const store = new Proxy<Record<string, T>>(
     {},
     {
@@ -269,7 +275,7 @@ export function createAsyncStorage<O, T>(
       };
   const apis = props?.api ? (Array.isArray(props.api) ? props.api : [props.api]) : [];
   const prefix = props?.prefix ? `${props.prefix}.` : "";
-  const signals = new Map<string, ReturnType<typeof createSignal>>();
+  const signals = new Map<string, Signal<undefined>>();
   const store: AsyncStorageObject<T> = new Proxy({} as AsyncStorageObject<T>, {
     get(_, key: string) {
       let node = signals.get(key);
@@ -478,7 +484,7 @@ export function createStorageSignal<T, O = {}>(
       }
       return value;
     }, null);
-  const [accessor, setter] = createHydrateSignal<T | null>(
+  const [accessor, setter] = createHydratableSignal<T | null>(
     initialValue as T,
     () => read() ?? (initialValue as T),
     props as any,

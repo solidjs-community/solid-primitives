@@ -23,10 +23,13 @@ export const omit = <O extends object, K extends keyof O>(object: O, ...keys: K[
  * ```
  */
 export const pick = <O extends object, K extends keyof O>(object: O, ...keys: K[]): Pick<O, K> =>
-  keys.reduce((n, k) => {
-    if (k in object) n[k] = object[k];
-    return n;
-  }, {} as Pick<O, K>);
+  keys.reduce(
+    (n, k) => {
+      if (k in object) n[k] = object[k];
+      return n;
+    },
+    {} as Pick<O, K>,
+  );
 
 /**
  * Get a single property value of an object by specifying a path to it.

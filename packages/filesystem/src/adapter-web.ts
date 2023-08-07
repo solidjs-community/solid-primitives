@@ -15,7 +15,7 @@ export const makeWebAccessFileSystem = isServer
       options?: DirectoryPickerOptions | { webkitEntry: FileSystemDirectoryHandle } | undefined,
     ) => {
       const handle =
-        (options as { webkitEntry: FileSystemDirectoryHandle })?.webkitEntry ||
+        (options as { webkitEntry?: FileSystemDirectoryHandle } | undefined)?.webkitEntry ||
         (await globalThis.showDirectoryPicker(options));
       const walk = async (
         path: string,

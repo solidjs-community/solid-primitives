@@ -75,16 +75,14 @@ refetch(); // will refetch the second time
 
 ```ts
 // query function accepts type generic for the response:
-const [countries] = newQuery<{ countries: { name: string }[] }>(
-  gql`
-    query {
-      countries {
-        name
-        code
-      }
+const [countries] = newQuery<{ countries: { name: string }[] }>(gql`
+  query {
+    countries {
+      name
+      code
     }
-  `,
-);
+  }
+`);
 countries(); // T: { countries: { name: string }[] } | undefined
 ```
 

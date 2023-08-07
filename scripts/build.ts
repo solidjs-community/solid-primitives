@@ -1,5 +1,6 @@
 import { build } from "tsup";
-import { EntryOptions, defineConfig } from "tsup-preset-solid";
+import { EntryOptions } from "tsup-preset-solid";
+import * as preset from "tsup-preset-solid";
 import path from "path";
 import fs from "fs";
 
@@ -30,6 +31,13 @@ const writeExports = process.argv.includes("--write") || process.argv.includes("
 const printExports = !writeExports;
 const cwd = process.cwd();
 
+export const CI =
+  process.env["CI"] === "true" ||
+  process.env["CI"] === '"1"' ||
+  process.env["GITHUB_ACTIONS"] === "true" ||
+  process.env["GITHUB_ACTIONS"] === '"1"' ||
+  !!process.env["TURBO_HASH"];
+
 const customOptions: Record<string, EntryOptions | EntryOptions[]> = {
   "controlled-props": {
     entry: "src/index.tsx",
@@ -44,38 +52,35 @@ const customOptions: Record<string, EntryOptions | EntryOptions[]> = {
     },
   ],
 };
+
 (async () => {
-  const packageJson = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
-  const packageName = packageJson.name!.replace("@solid-primitives/", "");
+  const package_json = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
+  const package_name = package_json.name!.replace("@solid-primitives/", "");
 
-  let options = defineConfig(
-    customOptions[packageName] ?? {
-      entry: `src/index.ts`,
-      // devEntry: devEntry,
-      // serverEntry: ssrEntry,
-    },
-    {
-      cjs: true,
-      writePackageJson: writeExports,
-      printInstructions: printExports,
-      // dropConsole: true,
-      tsupOptions(o) {
-        if (nodePlatform) {
-          // by default, the platform is "browser" - it'll prevent using node builtins
-          o.platform = "node";
-        }
-        return o;
-      },
-    },
-  );
+  const parsed_options = preset.parsePresetOptions({
+    entries: customOptions[package_name] ?? { entry: `src/index.ts` },
+    cjs: true,
+  });
 
-  if (typeof options === "function") {
-    options = await options({});
+  if (!CI) {
+    const package_fields = preset.generatePackageExports(parsed_options);
+
+    if (writeExports) {
+      preset.writePackageJson(package_fields);
+    } else {
+      // eslint-disable-next-line no-console
+      console.log("Package json exports:", JSON.stringify(package_fields, null, 2));
+    }
   }
 
-  if (!Array.isArray(options)) {
-    options = [options];
+  const tsup_options = preset.generateTsupOptions(parsed_options);
+
+  if (nodePlatform) {
+    for (const option of tsup_options) {
+      // by default, the platform is "browser" - it'll prevent using node builtins
+      option.platform = "node";
+    }
   }
 
-  options.forEach(build);
+  tsup_options.forEach(build);
 })();

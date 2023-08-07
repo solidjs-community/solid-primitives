@@ -183,11 +183,11 @@ export function createControlledProp<T>(
     value,
     setValue,
     propType === "boolean"
-      ? () => BoolProp({ name, value: value as any, setValue: setValue as Setter<boolean> })
+      ? () => BoolProp({ name, value: value as any, setValue: setValue as any as Setter<boolean> })
       : propType === "number"
-      ? () => NumberProp({ name, value: value as any, setValue: setValue as Setter<number> })
+      ? () => NumberProp({ name, value: value as any, setValue: setValue as any as Setter<number> })
       : propType === "string"
-      ? () => StringProp({ name, value: value as any, setValue: setValue as Setter<string> })
+      ? () => StringProp({ name, value: value as any, setValue: setValue as any as Setter<string> })
       : () =>
           SelectProp<T>({
             name,

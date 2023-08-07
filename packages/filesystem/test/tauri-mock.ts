@@ -10,7 +10,7 @@ const vfs = makeVirtualFileSystem();
     createDir: (path: string, options: FsDirOptions) => (vfs.mkdir(path), Promise.resolve()),
     readdir: (path: string, options: FsDirOptions) =>
       vfs.getType(path) === "dir"
-        ? Promise.resolve(vfs.readdir(path).map(name => ({ name } as unknown as FileEntry)))
+        ? Promise.resolve(vfs.readdir(path).map(name => ({ name }) as unknown as FileEntry))
         : Promise.reject(new Error("not a directory")),
     readTextFile: (path: string, options: FsDirOptions) => Promise.resolve(vfs.readFile(path)),
     renameFile: (prev: string, next: string) => Promise.resolve(vfs.rename(prev, next)),

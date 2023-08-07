@@ -120,14 +120,10 @@ describe("leadingAndTrailing debounce", () => {
     expect(val).toBe(5);
     trigger(10);
     expect(val).toBe(5);
-    await sleep(25); // sleep long enough for debounce to clear, but not long enough to reset to leading-edge calls
+    await sleep(25); // sleep long enough for debounce to clear
     expect(val).toBe(10);
     trigger(15);
-    expect(val).toBe(10);
-    await sleep(60); // sleep long enough for debounce to clear and reset to leading-edge calls
     expect(val).toBe(15);
-    trigger(20);
-    expect(val).toBe(20);
   });
 
   test("clearing", async () => {

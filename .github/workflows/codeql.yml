@@ -20,18 +20,18 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v1
+        uses: github/codeql-action/init@v2
         with:
           languages: javascript
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
+        uses: github/codeql-action/analyze@v2
         with:
           upload: false
           output: sarif-results
 
       - name: filter-sarif
-        uses: advanced-security/filter-sarif@main
+        uses: advanced-security/filter-sarif@v1
         with:
           patterns: |
             -/packages/*/dev/**/*.*
@@ -42,6 +42,6 @@ jobs:
           output: sarif-results/javascript.sarif
 
       - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@v1
+        uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: sarif-results/javascript.sarif
