@@ -50,7 +50,7 @@ A signal accessor indicating if the owner is done hydrating.
 - `false` on the client if the component evaluation is during a hydration process.
 - `true` on the client if the component evaluates after hydration or during clinet-side rendering.
 
-If it returns `false` it means that you can safely change the initial values of signals
+If it returns `true` it means that you can safely change the initial values of signals
 that are used in the JSX, without causing a mismatch between the server and client.
 
 It can be used in computations as a signal, and it will trigger a re-evaluation when the hydration state changes.
