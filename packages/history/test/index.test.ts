@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { batch, createRoot, createSignal } from "solid-js";
-import { createUndoHistory } from "../src";
+import { createUndoHistory } from "../src/index.js";
 
 describe("createUndoHistory", () => {
   test("single source", () =>

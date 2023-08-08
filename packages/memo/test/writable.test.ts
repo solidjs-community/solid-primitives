@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createWritableMemo } from "../src";
+import { createWritableMemo } from "../src/index.js";
 import { batch, createRoot, createSignal } from "solid-js";
 
 describe("createWritableMemo", () => {

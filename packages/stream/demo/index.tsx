@@ -1,8 +1,8 @@
 import { type Component, type JSX, createEffect, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
-import { createStream } from "../src";
-import { createPermission } from "../../permission/src";
-import { createCameras, createMicrophones } from "../../devices/src";
+import { createStream } from "../src/index.js";
+import { createPermission } from "../../permission/src/index.js";
+import { createCameras, createMicrophones } from "../../devices/src/index.js";
 
 declare module "solid-js" {
   namespace JSX {

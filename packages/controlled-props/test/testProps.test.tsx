@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { createRoot } from "solid-js";
-import { createControlledProp, createControlledProps } from "../src";
+import { createControlledProp, createControlledProps } from "../src/index.js";
 
 describe("createControlledProp", () => {
   test("will output a boolean prop signal and a field", () =>

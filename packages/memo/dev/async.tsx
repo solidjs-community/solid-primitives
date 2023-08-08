@@ -1,4 +1,4 @@
-import { createAsyncMemo } from "../src";
+import { createAsyncMemo } from "../src/index.js";
 import { Component, createSignal } from "solid-js";
 
 const Async: Component = () => {

@@ -1,6 +1,6 @@
 import { Component, createEffect, Match, Switch } from "solid-js";
 
-import { createBreakpoints } from "../src";
+import { createBreakpoints } from "../src/index.js";
 import "./style.css";
 
 const breakpoints = {

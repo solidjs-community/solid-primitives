@@ -1,6 +1,6 @@
 import { Component, createSignal, Setter } from "solid-js";
 
-import { createElementSize, createWindowSize, createResizeObserver } from "../src";
+import { createElementSize, createWindowSize, createResizeObserver } from "../src/index.js";
 
 const NumberInput: Component<{ value: number; setValue: Setter<number>; name: string }> = props => {
   return (

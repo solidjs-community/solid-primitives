@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createBroadcastChannel, makeBroadcastChannel } from "../src";
+import { createBroadcastChannel, makeBroadcastChannel } from "../src/index.js";
 
 describe("API doesn't break in SSR", () => {
   test("makeBroadcastChannel() - SSR", () => {

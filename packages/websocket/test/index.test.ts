@@ -8,7 +8,7 @@ import {
   makeReconnectingWS,
   makeHeartbeatWS,
   makeWS,
-} from "../src";
+} from "../src/index.js";
 
 describe("makeWS", () => {
   it("creates a web socket and opens it", () => {

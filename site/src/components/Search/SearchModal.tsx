@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "solid-js";
 import { ClientOnly } from "~/primitives/client-only";
-import type * as API from "./ClientSearchModal";
+import type * as API from "./ClientSearchModal.js";
 
 const ClientSearchModal = lazy(() => import("./ClientSearchModal"));
 

@@ -6,7 +6,7 @@ import {
   formatBytes,
   getPackageBundlesize,
   logLine,
-} from "./utils";
+} from "./utils/index.js";
 import { PackageJson } from "type-fest";
 
 if (process.argv.length < 3)

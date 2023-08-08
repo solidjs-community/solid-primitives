@@ -1,6 +1,6 @@
 import { Component, createResource, createSignal, For, onCleanup, Show } from "solid-js";
 
-import { makeAbortable, makeCache, makeRetrying } from "../src";
+import { makeAbortable, makeCache, makeRetrying } from "../src/index.js";
 
 const setsPath = "https://api.tcgdex.net/v2/en/sets";
 const cardPath = "https://api.tcgdex.net/v2/en/cards";

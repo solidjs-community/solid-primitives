@@ -6,7 +6,7 @@ import {
   MousePositionInside,
   PositionRelativeToElement,
   UseTouchOptions,
-} from "./types";
+} from "./types.js";
 import { isServer } from "solid-js/web";
 
 const PASSIVE = { passive: true };

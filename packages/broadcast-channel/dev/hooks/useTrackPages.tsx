@@ -1,5 +1,5 @@
 import { createStore, produce } from "solid-js/store";
-import { makeBroadcastChannel } from "../../src";
+import { makeBroadcastChannel } from "../../src/index.js";
 
 const getSmallId = () => {
   const date = new Date();

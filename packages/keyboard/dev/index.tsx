@@ -1,7 +1,7 @@
 /* @refresh reload */
 import { Component, createSignal, For } from "solid-js";
 
-import { useKeyDownList, createKeyHold, createShortcut } from "../src";
+import { useKeyDownList, createKeyHold, createShortcut } from "../src/index.js";
 
 const MessageStack: Component<{
   messageTrigger: (cb: (message: string) => void) => void;

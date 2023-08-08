@@ -1,5 +1,5 @@
-import { sendEmailDefault, sendEmailAlternative } from "./utils";
-import { createEventDispatcher } from "../src";
+import { sendEmailDefault, sendEmailAlternative } from "./utils.js";
+import { createEventDispatcher } from "../src/index.js";
 import { Component, createSignal } from "solid-js";
 
 const App: Component = () => {

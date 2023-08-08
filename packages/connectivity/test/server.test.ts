@@ -1,5 +1,5 @@
 import { describe, expect, vi, it } from "vitest";
-import { makeConnectivityListener, createConnectivitySignal } from "../src";
+import { makeConnectivityListener, createConnectivitySignal } from "../src/index.js";
 
 describe("makeConnectivityListener", () => {
   it("works in server", () => {

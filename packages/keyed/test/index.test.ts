@@ -2,7 +2,7 @@ import { createComputed, createMemo, createRoot, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import { update } from "@solid-primitives/utils/immutable";
 import { describe, expect, test } from "vitest";
-import { keyArray } from "../src";
+import { keyArray } from "../src/index.js";
 
 const el1 = { id: 1, value: "bread" };
 const el2 = { id: 2, value: "milk" };

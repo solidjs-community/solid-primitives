@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { createMasonry } from "../src";
+import { createMasonry } from "../src/index.js";
 
 describe("createMasonry", () => {
   test("ordering equal items", () => {

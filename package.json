@@ -8,6 +8,7 @@
   },
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "dev": "pnpm -dir site run dev",
     "format": "prettier -w {site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html} --ignore-path .gitignore",

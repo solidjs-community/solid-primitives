@@ -1,6 +1,6 @@
 import { Component, createSignal, JSX } from "solid-js";
 
-import { createControlledProps } from "../src";
+import { createControlledProps } from "../src/index.js";
 
 const App: Component = () => {
   const [props, controls] = createControlledProps({

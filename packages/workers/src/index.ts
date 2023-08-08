@@ -1,7 +1,7 @@
 import { Accessor, Setter, createEffect, on, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 
-import { cjs, setup, KILL, RPC } from "./utils";
+import { cjs, setup, KILL, RPC } from "./utils.js";
 
 /**
  * Creates a very basic WebWorker based on provided code.

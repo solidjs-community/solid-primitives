@@ -8,9 +8,9 @@ import { pageWidthClass } from "~/constants";
 import { DocumentClass } from "~/primitives/document-class";
 import { PackageData } from "~/types";
 import { kebabCaseToCapitalized } from "~/utils/utils";
-import { Heading } from "./components/heading";
-import { PackageInstallation } from "./components/package-installation";
-import { createPrimitiveNameTooltips } from "./components/primitive-name-tooltips";
+import { Heading } from "./components/heading.js";
+import { PackageInstallation } from "./components/package-installation.js";
+import { createPrimitiveNameTooltips } from "./components/primitive-name-tooltips.js";
 
 type Params = {
   name: string;

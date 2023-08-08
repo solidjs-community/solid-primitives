@@ -1,4 +1,4 @@
-import { createDebouncedMemoOn, createThrottledMemo } from "../src";
+import { createDebouncedMemoOn, createThrottledMemo } from "../src/index.js";
 import { Component, Show } from "solid-js";
 import { createMousePosition } from "@solid-primitives/mouse";
 

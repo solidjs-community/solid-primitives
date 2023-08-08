@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { filterInstance, filterOutInstance, push, sort, template } from "../src";
+import { filterInstance, filterOutInstance, push, sort, template } from "../src/index.js";
 import { createRoot, createSignal } from "solid-js";
 import { compare } from "@solid-primitives/utils";
 

@@ -1,6 +1,6 @@
 import { createComputed, createRoot, createSignal } from "solid-js";
 import { describe, it, expect } from "vitest";
-import { createScheduled, debounce, leading } from "../src";
+import { createScheduled, debounce, leading } from "../src/index.js";
 
 describe("createScheduled", () => {
   it("returns true after invalidated", () => {

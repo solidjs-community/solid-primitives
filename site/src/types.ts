@@ -1,5 +1,5 @@
-import type { FormattedBytes } from "../../scripts/utils/calculate-bundlesize";
-import type { ModuleData } from "../../scripts/utils/get-modules-data";
+import type { FormattedBytes } from "../../scripts/utils/calculate-bundlesize.js";
+import type { ModuleData } from "../../scripts/utils/get-modules-data.js";
 
 export { FormattedBytes, ModuleData };
 

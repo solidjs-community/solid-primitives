@@ -1,7 +1,7 @@
-import { AnyClass, compare, ItemsOf, Many, ofClass } from "..";
-import { withArrayCopy } from "./copy";
-import { get } from "./object";
-import { FlattenArray, MappingFn, Predicate } from "./types";
+import { AnyClass, compare, ItemsOf, Many, ofClass } from "../index.js";
+import { withArrayCopy } from "./copy.js";
+import { get } from "./object.js";
+import { FlattenArray, MappingFn, Predicate } from "./types.js";
 
 /**
  * non-mutating `Array.prototype.push()`
@@ -137,7 +137,7 @@ export const removeItems = <T>(list: readonly T[], ...items: T[]): T[] => {
  * @returns changed array copy
  */
 export const flatten = <T extends any[]>(arr: T): FlattenArray<T>[] =>
-  arr.reduce((flat, next) => flat.concat(Array.isArray(next) ? flatten(next) : next), []);
+  arr.reduce((flat, next) => flat.concat(Array.isArray(next) ? (flatten as any)(next) : next), []);
 
 /**
  * Sort an array by object key, or multiple keys

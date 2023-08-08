@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addClearMethod } from "../src/tools";
+import { addClearMethod } from "../src/tools.js";
 
 describe("addClearMethod", () => {
   const data: Record<string, string> = {};

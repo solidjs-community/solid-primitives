@@ -1,6 +1,6 @@
 import { Component, ComponentProps, createSignal, Show } from "solid-js";
 
-import { combineProps } from "../src";
+import { combineProps } from "../src/index.js";
 
 const Button = (props: ComponentProps<"button">) => {
   const combinedProps = combineProps(

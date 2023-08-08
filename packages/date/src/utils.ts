@@ -1,5 +1,5 @@
-import { Countdown, DateInit, RelativeFormatMessages, Unit } from "./types";
-import { DAY, DEFAULT_MESSAGES, HOUR, MINUTE, SECOND, UNITS } from "./variables";
+import { Countdown, DateInit, RelativeFormatMessages, Unit } from "./types.js";
+import { DAY, DEFAULT_MESSAGES, HOUR, MINUTE, SECOND, UNITS } from "./variables.js";
 
 /**
  * @param init timestamp `number` | date `string` | `Date` instance

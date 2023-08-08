@@ -1,7 +1,7 @@
-import { createActiveElement, focus } from "../src";
+import { createActiveElement, focus } from "../src/index.js";
 import { Component, createSignal, Index, onMount, ParentComponent } from "solid-js";
 
-import { genNodeList } from "./utils";
+import { genNodeList } from "./utils.js";
 // prevent tree-shaking
 focus;
 

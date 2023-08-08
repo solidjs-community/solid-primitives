@@ -8,7 +8,12 @@ import {
   getOwner,
   onCleanup,
 } from "solid-js";
-import { createCallback, createSubRoot, createDisposable, createSingletonRoot } from "../src";
+import {
+  createCallback,
+  createSubRoot,
+  createDisposable,
+  createSingletonRoot,
+} from "../src/index.js";
 
 describe("createSubRoot", () => {
   test("behaves like a root", () =>

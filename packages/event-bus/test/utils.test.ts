@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createRoot, getOwner } from "solid-js";
-import { createEventBus, once, toEffect, toPromise } from "../src";
+import { createEventBus, once, toEffect, toPromise } from "../src/index.js";
 
 describe("toPromise", () => {
   test("toPromise turns subscription into a promise", () =>

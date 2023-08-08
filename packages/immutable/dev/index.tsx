@@ -1,7 +1,7 @@
 import { Component, For, createSignal } from "solid-js";
 
 import { TransitionGroup } from "solid-transition-group";
-import { createImmutable } from "../src";
+import { createImmutable } from "../src/index.js";
 import { PayloadAction, createSlice, configureStore } from "@reduxjs/toolkit";
 
 type Todo = {

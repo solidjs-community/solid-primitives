@@ -1,6 +1,6 @@
 import { renderToString } from "solid-js/web";
 import { describe, expect, test } from "vitest";
-import { resolveElements, resolveFirst } from "../src";
+import { resolveElements, resolveFirst } from "../src/index.js";
 
 describe("SSR", () => {
   test("resolveElements", () => {

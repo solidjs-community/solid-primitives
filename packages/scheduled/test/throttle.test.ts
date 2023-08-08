@@ -1,7 +1,7 @@
 import { createRoot } from "solid-js";
 import { describe, expect, test } from "vitest";
-import { leading, leadingAndTrailing, throttle } from "../src";
-import sleep from "./sleep";
+import { leading, leadingAndTrailing, throttle } from "../src/index.js";
+import sleep from "./sleep.js";
 
 describe("throttle", () => {
   test("setup and trigger throttle", async () => {

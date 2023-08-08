@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { createRoot, createSignal } from "solid-js";
-import { createMasonry } from "../src";
+import { createMasonry } from "../src/index.js";
 
 describe("createMasonry", () => {
   test("ordering equal items", () => {

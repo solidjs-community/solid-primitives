@@ -1,6 +1,6 @@
 import { JSX, mergeProps, MergeProps } from "solid-js";
 import { access, chain, reverseChain, MaybeAccessor } from "@solid-primitives/utils";
-import { propTraps } from "./propTraps";
+import { propTraps } from "./propTraps.js";
 
 const extractCSSregex = /((?:--)?(?:\w+-?)+)\s*:\s*([^;]*)/g;
 

@@ -1,7 +1,7 @@
 import { createComputed, createRoot, createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { createScrollPosition, getScrollPosition } from "../src/index";
+import { createScrollPosition, getScrollPosition } from "../src/index.js";
 
 describe("getScrollPosition", () => {
   it("no target returns null", () => {

@@ -2,7 +2,7 @@ import { createUniqueId, untrack } from "solid-js";
 import { reconcile } from "solid-js/store";
 import type { Accessor, Setter } from "solid-js";
 import type { Store, SetStoreFunction } from "solid-js/store";
-import type { StorageWithOptions, AsyncStorage, AsyncStorageWithOptions } from "./types";
+import type { StorageWithOptions, AsyncStorage, AsyncStorageWithOptions } from "./types.js";
 
 export type PersistenceOptions<T, O extends Record<string, any> = {}> =
   | {

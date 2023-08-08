@@ -1,6 +1,6 @@
 import { describe, test } from "vitest";
 import { createRoot } from "solid-js";
-import { createMachine } from "../src";
+import { createMachine } from "../src/index.js";
 
 describe("createMachine", () => {
   test("works", () =>

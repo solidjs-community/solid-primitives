@@ -4,7 +4,7 @@ import { createSubRoot } from "@solid-primitives/rootless";
 import { Directive, entries, Many, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createSignal, getOwner, DEV } from "solid-js";
 import { isServer } from "solid-js/web";
-import { DEFAULT_STATE, parseHandlersMap, toState, toStateActive } from "./helpers";
+import { DEFAULT_STATE, parseHandlersMap, toState, toStateActive } from "./helpers.js";
 import {
   Handler,
   OnEventRecord,
@@ -14,9 +14,9 @@ import {
   PointerPositionDirectiveProps,
   PointerStateWithActive,
   PointerType,
-} from "./types";
+} from "./types.js";
 
-export { getPositionToElement } from "./helpers";
+export { getPositionToElement } from "./helpers.js";
 export type {
   PointerHoverDirectiveHandler,
   PointerHoverDirectiveProps,
@@ -26,7 +26,7 @@ export type {
   PointerState,
   PointerStateWithActive,
   PointerType,
-} from "./types";
+} from "./types.js";
 
 /**
  * Setups event listeners for pointer events, that will get automatically removed on cleanup.

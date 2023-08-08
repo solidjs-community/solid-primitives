@@ -1,4 +1,4 @@
-import { pan } from "../src";
+import { pan } from "../src/index.js";
 import { Component, createSignal, onMount } from "solid-js";
 
 pan;

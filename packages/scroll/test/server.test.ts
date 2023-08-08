@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createScrollPosition, getScrollPosition } from "../src/index";
+import { createScrollPosition, getScrollPosition } from "../src/index.js";
 
 describe("getScrollPosition", () => {
   it("returns null", () => {

@@ -13,7 +13,7 @@ import {
   EventMapOf,
   TargetWithEventMap,
   EventListenerOptions,
-} from "./types";
+} from "./types.js";
 
 /**
  * Creates an event listener, that will be automatically disposed on cleanup.

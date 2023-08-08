@@ -1,4 +1,4 @@
-import { createClipboard } from "../src";
+import { createClipboard } from "../src/index.js";
 import { describe, expect, it } from "vitest";
 
 describe("API doesn't break in SSR", () => {

@@ -1,9 +1,9 @@
-export * from "./types";
+export * from "./types.js";
 export {
   makeMousePositionListener,
   makeMouseInsideListener,
   getPositionToElement,
   getPositionToScreen,
   getPositionInElement,
-} from "./common";
-export * from "./primitives";
+} from "./common.js";
+export * from "./primitives.js";

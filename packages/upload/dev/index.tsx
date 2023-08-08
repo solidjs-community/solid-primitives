@@ -1,9 +1,9 @@
 import { Component, createSignal, For } from "solid-js";
 
-import { createDropzone, createFileUploader, fileUploader } from "../src";
-import { doStuff } from "../src/helpers";
+import { createDropzone, createFileUploader, fileUploader } from "../src/index.js";
+import { doStuff } from "../src/helpers.js";
 
-import { UploadFile } from "../src/types";
+import { UploadFile } from "../src/types.js";
 
 fileUploader;
 

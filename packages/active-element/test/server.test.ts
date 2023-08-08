@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from "vitest";
-import { makeActiveElementListener, createActiveElement, createFocusSignal } from "../src";
+import { makeActiveElementListener, createActiveElement, createFocusSignal } from "../src/index.js";
 
 describe("API doesn't break in SSR", () => {
   // check if the API doesn't throw when calling it in SSR

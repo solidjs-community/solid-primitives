@@ -1,3 +1,3 @@
-export * from "./propTraps";
-export * from "./filterProps";
-export * from "./combineProps";
+export * from "./propTraps.js";
+export * from "./filterProps.js";
+export * from "./combineProps.js";

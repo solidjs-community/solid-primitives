@@ -1,4 +1,4 @@
-import { registerPointerListener, getCenterOfTwoPoints } from "./core";
+import { registerPointerListener, getCenterOfTwoPoints } from "./core.js";
 
 type Props = {
   callback: (scale: number, pinchCenter: { x: number; y: number }) => any;

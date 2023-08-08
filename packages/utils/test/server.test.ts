@@ -1,4 +1,4 @@
-import { createHydratableSignal } from "../src";
+import { createHydratableSignal } from "../src/index.js";
 import { describe, expect, test } from "vitest";
 
 describe("API doesn't break in SSR", () => {

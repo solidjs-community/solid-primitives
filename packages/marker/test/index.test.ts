@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { createMarker, makeSearchRegex } from "../src";
+import { createMarker, makeSearchRegex } from "../src/index.js";
 
 describe("makeSearchRegex", () => {
   test("empty string", () => {

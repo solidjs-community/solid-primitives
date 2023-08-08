@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createEffect, createRoot } from "solid-js";
-import { createEventProps } from "../src/index";
+import { createEventProps } from "../src/index.js";
 
 describe("event-props", () => {
   //# test type errors - run `yarn typecheck to find them`

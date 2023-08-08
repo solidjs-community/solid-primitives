@@ -1,6 +1,6 @@
 import { createRoot, createSignal, onCleanup } from "solid-js";
 import { describe, test, expect } from "vitest";
-import { until, changed, promiseTimeout, raceTimeout } from "../src";
+import { until, changed, promiseTimeout, raceTimeout } from "../src/index.js";
 
 describe("promiseTimeout", () => {
   test("resolves after timeout", async () => {

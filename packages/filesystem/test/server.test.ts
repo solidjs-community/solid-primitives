@@ -5,7 +5,7 @@ import {
   makeNodeFileSystem,
   makeTauriFileSystem,
   makeWebAccessFileSystem,
-} from "../src";
+} from "../src/index.js";
 import { mkdtemp, rm } from "fs/promises";
 
 describe("limitPath", () => {

@@ -1,8 +1,8 @@
-import { createMutationObserver, mutationObserver } from "../src";
+import { createMutationObserver, mutationObserver } from "../src/index.js";
 import { Component, createSignal, For, Index, onMount, Show } from "solid-js";
 
-import { DisplayRecord, LogMutationRecord, TestingNode, ToggleBtn } from "./components";
-import { toggleItems, updateItem } from "./utils";
+import { DisplayRecord, LogMutationRecord, TestingNode, ToggleBtn } from "./components.js";
+import { toggleItems, updateItem } from "./utils.js";
 
 // avoids tree shaking directive:
 mutationObserver;

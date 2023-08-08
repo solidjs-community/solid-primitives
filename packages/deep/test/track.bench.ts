@@ -1,6 +1,6 @@
 import { describe, bench } from "vitest";
 import { batch, createEffect, createRoot } from "solid-js";
-import { captureStoreUpdates, trackDeep, trackStore } from "../src";
+import { captureStoreUpdates, trackDeep, trackStore } from "../src/index.js";
 import { createStore } from "solid-js/store";
 
 const fns = {

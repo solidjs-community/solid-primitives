@@ -1,6 +1,6 @@
 import { Component, createEffect, createSignal } from "solid-js";
 
-import { createSelection } from "../src";
+import { createSelection } from "../src/index.js";
 
 const App: Component = () => {
   const [selection, setSelection] = createSelection();

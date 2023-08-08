@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createRoot, Suspense, createSignal } from "solid-js";
-import { createInfiniteScroll, createPagination } from "../src";
+import { createInfiniteScroll, createPagination } from "../src/index.js";
 import { renderToStringAsync } from "solid-js/web";
 
 describe("createPagination", () => {

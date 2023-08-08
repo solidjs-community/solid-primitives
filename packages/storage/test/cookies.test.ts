@@ -1,8 +1,8 @@
 import { createRoot } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { cookieStorage } from "../src";
-import { createCookieStorage, createCookieStorageSignal } from "../src/cookies";
+import { cookieStorage } from "../src/index.js";
+import { createCookieStorage, createCookieStorageSignal } from "../src/cookies.js";
 
 describe("cookieStorage", () => {
   it("adds/gets/removes an item", () => {

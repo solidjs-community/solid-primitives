@@ -1,5 +1,5 @@
 import { Component, For, JSX, onMount } from "solid-js";
-import { MachineStates, createMachine } from "../src";
+import { MachineStates, createMachine } from "../src/index.js";
 import { createStore } from "solid-js/store";
 
 type Todo = {

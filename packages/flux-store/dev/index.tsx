@@ -1,8 +1,8 @@
 import { Component, createMemo } from "solid-js";
 import { For, render } from "solid-js/web";
-import { counterStore } from "./stores/counter-store";
-import { getPeople, getWizards } from "./stores/ages-store";
-import { CounterControls, BoxesDemo } from "./components";
+import { counterStore } from "./stores/counter-store.js";
+import { getPeople, getWizards } from "./stores/ages-store.js";
+import { CounterControls, BoxesDemo } from "./components/index.js";
 
 const App: Component = () => {
   const {

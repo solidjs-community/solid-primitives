@@ -1,6 +1,6 @@
 import { createSignal, getOwner, onCleanup, ResourceFetcherInfo } from "solid-js";
 import { isServer } from "solid-js/web";
-import { RequestContext } from "./fetch";
+import { RequestContext } from "./fetch.js";
 
 export type RequestModifier = <Result extends unknown, FetcherArgs extends any[]>(
   ...args: any[]

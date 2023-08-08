@@ -4,7 +4,7 @@
     "target": "ESNext",
     "newLine": "LF",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,

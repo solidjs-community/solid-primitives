@@ -1,5 +1,5 @@
 import { Component, createEffect, createMemo, createSignal } from "solid-js";
-import { createScheduled, debounce, leading, leadingAndTrailing, throttle } from "../src";
+import { createScheduled, debounce, leading, leadingAndTrailing, throttle } from "../src/index.js";
 
 const Reactive: Component = props => {
   const [count, setCount] = createSignal(0);

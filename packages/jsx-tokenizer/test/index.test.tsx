@@ -7,7 +7,7 @@ import {
   JSXTokenizerData,
   resolveTokens,
   TokenElement,
-} from "../src";
+} from "../src/index.js";
 
 describe("jsx-tokenizer", () => {
   const parser1 = createTokenizer<{

@@ -1,5 +1,5 @@
-import { MutationObserver, instances } from "./setup";
-import { createMutationObserver, mutationObserver } from "../src";
+import { MutationObserver, instances } from "./setup.js";
+import { createMutationObserver, mutationObserver } from "../src/index.js";
 import { createRoot } from "solid-js";
 import { describe, expect, it } from "vitest";
 

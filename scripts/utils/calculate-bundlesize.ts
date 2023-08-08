@@ -4,7 +4,7 @@ import path from "path";
 import { build } from "esbuild";
 import { gzipSize } from "gzip-size";
 import { fileURLToPath } from "url";
-import { PACKAGES_DIR } from "./utils";
+import { PACKAGES_DIR } from "./utils.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,7 +50,7 @@ export const getPackageBundlesize = async (
       exportFilepath,
       `export ${
         isExportDefault ? `{ default as ${exportName} }` : `{ ${exportName} }`
-      } from "../../../packages/${packageName}/src"`,
+      } from "../../../packages/${packageName}/src/index.js"`,
     );
   }
 

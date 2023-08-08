@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { createHydratableStaticStore, createStaticStore, createDerivedStaticStore } from "../src";
+import {
+  createHydratableStaticStore,
+  createStaticStore,
+  createDerivedStaticStore,
+} from "../src/index.js";
 
 describe("createStaticStore", () => {
   test("doesn't break in SSR", () => {

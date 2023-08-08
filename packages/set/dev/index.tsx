@@ -1,6 +1,6 @@
 import { Component, createEffect, For } from "solid-js";
 
-import { ReactiveSet } from "../src";
+import { ReactiveSet } from "../src/index.js";
 
 const App: Component = () => {
   const set = new ReactiveSet([1, 2, 3]);

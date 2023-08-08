@@ -1,7 +1,9 @@
 import { Component, createSignal, Suspense, For, Switch, Match } from "solid-js";
-import { createClipboard, copyToClipboard, newClipboardItem, input } from "../src";
+import { createClipboard, copyToClipboard, newClipboardItem, input } from "../src/index.js";
 
+// @ts-ignore
 import img from "./img.png";
+// @ts-ignore
 import img2 from "./img2.png";
 
 copyToClipboard;

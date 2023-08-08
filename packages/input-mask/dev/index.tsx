@@ -1,6 +1,12 @@
 import { Component } from "solid-js";
 
-import { anyMaskToFn, createInputMask, createMaskPattern, maskArrayToFn, Selection } from "../src";
+import {
+  anyMaskToFn,
+  createInputMask,
+  createMaskPattern,
+  maskArrayToFn,
+  Selection,
+} from "../src/index.js";
 
 const App: Component = () => {
   // ISO Date

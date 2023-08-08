@@ -1,7 +1,7 @@
 import { Component, createSignal } from "solid-js";
 import { Dynamic } from "solid-js/web";
-import Reactive from "./reactive";
-import Timeline from "./timeline";
+import Reactive from "./reactive.js";
+import Timeline from "./timeline.js";
 
 const App: Component = () => {
   type Page = typeof Timeline | typeof Reactive;

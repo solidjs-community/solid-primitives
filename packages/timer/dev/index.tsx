@@ -1,6 +1,6 @@
 import { Component, createSignal, createEffect } from "solid-js";
 
-import { createTimer } from "../src";
+import { createTimer } from "../src/index.js";
 
 const Counter: Component<{ timer: typeof setTimeout | typeof setInterval }> = props => {
   const [key, reset] = createSignal(undefined, { equals: false });

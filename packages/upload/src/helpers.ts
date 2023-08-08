@@ -1,4 +1,4 @@
-import { FileUploaderOptions, UploadFile } from "./types";
+import { FileUploaderOptions, UploadFile } from "./types.js";
 
 export const doStuff = (s: number): Promise<void> => {
   return new Promise(res => setTimeout(res, s * 1000));

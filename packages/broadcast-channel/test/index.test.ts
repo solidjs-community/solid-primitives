@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createEffect, createRoot, on } from "solid-js";
-import { createBroadcastChannel, makeBroadcastChannel } from "../src";
+import { createBroadcastChannel, makeBroadcastChannel } from "../src/index.js";
 
 type MsgType = string;
 

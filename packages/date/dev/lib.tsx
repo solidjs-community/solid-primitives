@@ -8,7 +8,7 @@ import {
   on,
   onMount,
 } from "solid-js";
-import { clamp, pToVal, valToP } from "./utils";
+import { clamp, pToVal, valToP } from "./utils.js";
 
 export const Slider: Component<{
   ondrag: (value: number) => void;

@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createRoot, createSignal } from "solid-js";
-import { createImmutable } from "../src";
+import { createImmutable } from "../src/index.js";
 import { unwrap } from "solid-js/store";
 
 describe("createImmutable", () => {

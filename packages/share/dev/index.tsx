@@ -1,6 +1,6 @@
 import { Component, createEffect, createSignal } from "solid-js";
 
-import { createWebShare } from "../src/index";
+import { createWebShare } from "../src/index.js";
 
 const App: Component = () => {
   const [data, setData] = createSignal<ShareData>({});

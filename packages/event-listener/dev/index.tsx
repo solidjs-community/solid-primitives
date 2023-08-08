@@ -1,7 +1,12 @@
-import { WindowEventListener, eventListener, createEventListener, createEventSignal } from "../src";
+import {
+  WindowEventListener,
+  eventListener,
+  createEventListener,
+  createEventSignal,
+} from "../src/index.js";
 import { Component, createSignal, For, Show } from "solid-js";
 
-import { DisplayRecord } from "./components";
+import { DisplayRecord } from "./components.js";
 
 eventListener;
 

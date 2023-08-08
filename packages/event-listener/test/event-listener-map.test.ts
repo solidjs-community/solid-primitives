@@ -1,7 +1,7 @@
-import { dispatchFakeEvent } from "./setup";
+import { dispatchFakeEvent } from "./setup.js";
 import { describe, test, expect } from "vitest";
 import { createRoot, onMount } from "solid-js";
-import { createEventListenerMap } from "../src";
+import { createEventListenerMap } from "../src/index.js";
 
 describe("createEventListenerMap", () => {
   test("will listen to multiple events", () =>

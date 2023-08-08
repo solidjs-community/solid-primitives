@@ -15,7 +15,7 @@ import {
   makeWebAccessFileSystem,
   SyncFileSystem,
   getItemName,
-} from "../src/index";
+} from "../src/index.js";
 
 const FsFile = (props: { fs: SyncFileSystem | AsyncFileSystem; path: string }) => {
   const [open, setOpen] = createSignal(false);

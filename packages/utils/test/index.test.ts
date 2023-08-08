@@ -1,5 +1,5 @@
 import { describe, test, expect, assert } from "vitest";
-import { handleDiffArray, arrayEquals, createHydratableSignal } from "../src";
+import { handleDiffArray, arrayEquals, createHydratableSignal } from "../src/index.js";
 
 describe("handleDiffArray", () => {
   test("handleAdded called for new array", () => {

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { createRoot, createSignal } from "solid-js";
-import { createPresence } from "../src";
+import { createPresence } from "../src/index.js";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 // The state transitions often take an extra ~20ms to changeover

@@ -1,7 +1,7 @@
 import { createRoot } from "solid-js";
 import { describe, expect, test } from "vitest";
-import { debounce, leading, leadingAndTrailing } from "../src";
-import sleep from "./sleep";
+import { debounce, leading, leadingAndTrailing } from "../src/index.js";
+import sleep from "./sleep.js";
 
 describe("debounce", () => {
   test("setup and trigger debounce", () =>

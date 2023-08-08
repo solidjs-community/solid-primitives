@@ -1,6 +1,6 @@
 import { Component, createSignal, Show, createEffect } from "solid-js";
 
-import RAF from "./raf";
+import RAF from "./raf.js";
 
 const App: Component = () => {
   return (

@@ -1,6 +1,6 @@
 import { createContext, createSignal, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
-import type { UseScopedI18n, I18nContextInterface } from "./types";
+import type { UseScopedI18n, I18nContextInterface } from "./types.js";
 
 /**
  * Safely access deep values in an object via a string path seperated by `.`

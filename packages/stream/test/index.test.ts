@@ -1,7 +1,7 @@
 import "./setup";
 import { afterAll, describe, expect, it } from "vitest";
 import { createEffect, createRoot } from "solid-js";
-import { createStream, createAmplitudeStream, createMediaPermissionRequest } from "../src";
+import { createStream, createAmplitudeStream, createMediaPermissionRequest } from "../src/index.js";
 
 describe("createStream", () => {
   it("gets a stream", () =>

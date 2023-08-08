@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "moduleResolution": "Node16",
     "resolveJsonModule": true,
     "types": ["vite/client", "node"],
     "baseUrl": "./",
@@ -8,5 +9,5 @@
       "~/*": ["./src/*"]
     }
   },
-  "include": ["./src", "./scripts"]
+  "include": ["./src", "./scripts", "./vite.config.ts"]
 }

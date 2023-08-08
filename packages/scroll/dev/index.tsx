@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 
-import { createScrollPosition } from "../src";
+import { createScrollPosition } from "../src/index.js";
 
 const App: Component = () => {
   const ws = createScrollPosition();

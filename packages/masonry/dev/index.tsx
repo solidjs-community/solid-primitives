@@ -1,7 +1,7 @@
 import { Component, createMemo, createSignal } from "solid-js";
 
 import { createBreakpoints } from "@solid-primitives/media";
-import { createMasonry } from "../src";
+import { createMasonry } from "../src/index.js";
 
 const getRandomHeight = () => Math.floor(Math.random() * 300) + 100;
 

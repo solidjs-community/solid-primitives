@@ -1,5 +1,5 @@
-import { registerPointerListener } from "./core";
-import type { PointerCallback } from "./core";
+import { registerPointerListener } from "./core.js";
+import type { PointerCallback } from "./core.js";
 
 type Props = {
   callback: (position: { x: number; y: number }) => any;

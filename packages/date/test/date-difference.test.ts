@@ -9,7 +9,7 @@ import {
   MONTH,
   WEEK,
   YEAR,
-} from "../src";
+} from "../src/index.js";
 
 describe("createTimeAgo", () => {
   it("formats timeago correctly", () => {

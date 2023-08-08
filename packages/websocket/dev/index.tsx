@@ -1,6 +1,6 @@
 import { Component, For, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
-import { type WSMessage, createReconnectingWS } from "../src";
+import { type WSMessage, createReconnectingWS } from "../src/index.js";
 
 const App: Component = () => {
   const [textArea, setTextArea] = createSignal<HTMLTextAreaElement>();

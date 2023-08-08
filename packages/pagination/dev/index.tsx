@@ -1,6 +1,6 @@
 import { Component, For, Show } from "solid-js";
 
-import { createInfiniteScroll, createPagination } from "../src";
+import { createInfiniteScroll, createPagination } from "../src/index.js";
 
 async function fetcher(page: number) {
   let elements: string[] = [];

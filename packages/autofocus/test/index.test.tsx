@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createSignal } from "solid-js";
-import { autofocus, createAutofocus } from "../src";
+import { autofocus, createAutofocus } from "../src/index.js";
 import { render } from "@solidjs/testing-library";
 
 autofocus;

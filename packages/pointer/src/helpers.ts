@@ -6,7 +6,7 @@ import {
   PointerState,
   PointerStateWithActive,
   ReverseOnEventName,
-} from "./types";
+} from "./types.js";
 
 /**
  * A non-reactive helper function. It turns a position relative to the screen/window, to be relative to an element.

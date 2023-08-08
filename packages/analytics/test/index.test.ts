@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import createAnalytics, { EventType } from "../src/index";
+import createAnalytics, { EventType } from "../src/index.js";
 
 describe("createPrimitiveTemplate", () => {
   it("track function calls all handlers with the event", () => {

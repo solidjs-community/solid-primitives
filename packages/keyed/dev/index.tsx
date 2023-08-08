@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 
-import Key from "./key";
+import Key from "./key.js";
 
 const App: Component = () => {
   return (

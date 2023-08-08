@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs";
 import fsp from "fs/promises";
 import { PackageJson } from "type-fest";
-import { PACKAGES_DIR, isNonNullable } from "./utils";
+import { PACKAGES_DIR, isNonNullable } from "./utils.js";
 
 export type ModulePkg = PackageJson & {
   primitive?: {

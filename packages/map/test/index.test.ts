@@ -1,6 +1,6 @@
 import { createComputed, createRoot } from "solid-js";
 import { expect, describe, it, test, vi } from "vitest";
-import { ReactiveMap, ReactiveWeakMap } from "../src";
+import { ReactiveMap, ReactiveWeakMap } from "../src/index.js";
 
 describe("ReactiveMap", () => {
   it("behaves like a Map", () => {

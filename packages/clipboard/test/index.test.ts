@@ -1,6 +1,6 @@
 import "./setup";
 import { createComputed, createRoot } from "solid-js";
-import { createClipboard } from "../src";
+import { createClipboard } from "../src/index.js";
 import { describe, expect, it } from "vitest";
 
 describe("createClipboard", () => {

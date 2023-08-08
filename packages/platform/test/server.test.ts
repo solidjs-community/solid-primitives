@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import * as platform from "../src";
+import * as platform from "../src/index.js";
 
 describe("platform", () => {
   it("should work on the server", () => {

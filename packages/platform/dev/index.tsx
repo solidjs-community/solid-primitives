@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 
-import * as platform from "../src";
+import * as platform from "../src/index.js";
 
 const App: Component = () => {
   return (

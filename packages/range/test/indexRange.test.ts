@@ -1,6 +1,6 @@
 import { expect, describe, it } from "vitest";
 import { createRoot, createSignal, onCleanup } from "solid-js";
-import { indexRange } from "../src";
+import { indexRange } from "../src/index.js";
 
 describe("indexRange", () => {
   it("returns a correct array", () =>

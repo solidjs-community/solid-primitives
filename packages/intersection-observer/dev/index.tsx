@@ -1,7 +1,12 @@
 import { Component, createSignal } from "solid-js";
 
 import { Repeat } from "@solid-primitives/range";
-import { createVisibilityObserver, withDirection, withOccurrence, DirectionY } from "../src";
+import {
+  createVisibilityObserver,
+  withDirection,
+  withOccurrence,
+  DirectionY,
+} from "../src/index.js";
 
 const App: Component = () => {
   const useVisibilityObserver = createVisibilityObserver(

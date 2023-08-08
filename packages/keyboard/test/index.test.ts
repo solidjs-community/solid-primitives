@@ -1,6 +1,11 @@
 import { createComputed, createRoot } from "solid-js";
 import { describe, test, expect } from "vitest";
-import { createKeyHold, useKeyDownList, useCurrentlyHeldKey, useKeyDownSequence } from "../src";
+import {
+  createKeyHold,
+  useKeyDownList,
+  useCurrentlyHeldKey,
+  useKeyDownSequence,
+} from "../src/index.js";
 
 const dispatchKeyEvent = (key: string, type: "keydown" | "keyup") => {
   let ev = new Event(type) as any;

@@ -10,7 +10,7 @@ import {
   makeWebAccessFileSystem,
   makeTauriFileSystem,
   rsync,
-} from "../src";
+} from "../src/index.js";
 import { createEffect, createRoot, onError } from "solid-js";
 
 describe("makeNoFileSystem", () => {

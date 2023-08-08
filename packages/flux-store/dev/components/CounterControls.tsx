@@ -1,5 +1,5 @@
 import type { ParentComponent, ComponentProps } from "solid-js";
-import { IncreaseButton, DecreaseButton, ResetButton } from "./CounterButton";
+import { IncreaseButton, DecreaseButton, ResetButton } from "./CounterButton.js";
 
 export const CounterControls: ParentComponent<ComponentProps<"div">> = props => (
   <>

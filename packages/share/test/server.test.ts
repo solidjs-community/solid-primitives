@@ -1,6 +1,6 @@
 import { createRoot, createSignal } from "solid-js";
 import { describe, test, expect } from "vitest";
-import { createWebShare } from "../src";
+import { createWebShare } from "../src/index.js";
 
 describe("createWebShare", () => {
   test("doesn't break in SSR", () => {

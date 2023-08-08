@@ -8,7 +8,7 @@ import {
   makeCache,
   makeRetrying,
   createDeepSignal,
-} from "../src";
+} from "../src/index.js";
 
 describe("makeAbortable", () => {
   test("makes a fetcher abortable", () => {

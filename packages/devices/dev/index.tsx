@@ -1,8 +1,13 @@
 import { Component, For, Show } from "solid-js";
 
-import { createAccelerometer, createCameras, createMicrophones, createSpeakers } from "../src";
-import { createPermission } from "../../permission";
-import { createMediaPermissionRequest } from "../../stream";
+import {
+  createAccelerometer,
+  createCameras,
+  createMicrophones,
+  createSpeakers,
+} from "../src/index.js";
+import { createPermission } from "../../permission/src/index.js";
+import { createMediaPermissionRequest } from "../../stream/src/index.js";
 
 const Cameras: Component = () => {
   const cameras = createCameras();

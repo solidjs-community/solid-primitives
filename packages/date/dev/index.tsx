@@ -7,11 +7,11 @@ import {
   WEEK,
   YEAR,
   createCountdown,
-} from "../src";
+} from "../src/index.js";
 import { Component, createMemo, createSignal } from "solid-js";
 
 import { format, formatRelative } from "date-fns";
-import { Slider } from "./lib";
+import { Slider } from "./lib.js";
 
 const App: Component = () => {
   const timeRange = YEAR;

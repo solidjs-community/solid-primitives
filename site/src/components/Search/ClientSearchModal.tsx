@@ -8,8 +8,8 @@ import { useLocation } from "solid-start";
 import { createShortcut } from "~/primitives/createShortcut";
 import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 import { scrollIntoView } from "~/utils/scrollIntoView";
-import * as Header from "../Header/Header";
-import Search from "./Search";
+import * as Header from "../Header/Header.js";
+import Search from "./Search.js";
 
 const ClientSearchModal: Component<{
   menuButton: HTMLElement;

@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from "vitest";
 import { createRoot } from "solid-js";
-import { createEventBus, createEventHub, createEventStack } from "../src";
+import { createEventBus, createEventHub, createEventStack } from "../src/index.js";
 
 const syncTest = (name: string, fn: (dispose: () => void) => void) =>
   test(name, () =>

@@ -1,5 +1,5 @@
 import childProcess from "node:child_process";
-import { ROOT_DIR, logLine } from "./utils";
+import { ROOT_DIR, logLine } from "./utils/index.js";
 
 const cwd = process.cwd();
 const args = process.argv.slice(2);

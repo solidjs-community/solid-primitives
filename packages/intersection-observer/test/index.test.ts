@@ -7,7 +7,7 @@ import {
   createVisibilityObserver,
   withOccurrence,
   withDirection,
-} from "../src";
+} from "../src/index.js";
 
 const intersectionObserverInstances: any[] = [];
 

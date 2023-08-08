@@ -12,7 +12,7 @@ export type {
   AsyncStorageObject,
   AsyncStorageSetter,
   StorageSignalProps,
-} from "./types";
+} from "./types.js";
 
 import {
   createStorage,
@@ -20,10 +20,10 @@ import {
   createStorageSignal,
   createLocalStorage,
   createSessionStorage,
-} from "./storage";
-import { CookieOptions, cookieStorage, createCookieStorage } from "./cookies";
-import { addClearMethod } from "./tools";
-import { PersistenceOptions, makePersisted } from "./persisted";
+} from "./storage.js";
+import { CookieOptions, cookieStorage, createCookieStorage } from "./cookies.js";
+import { addClearMethod } from "./tools.js";
+import { PersistenceOptions, makePersisted } from "./persisted.js";
 export {
   createStorage,
   createAsyncStorage,

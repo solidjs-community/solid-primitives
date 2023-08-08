@@ -14,9 +14,9 @@ import {
 
 import "./root.scss";
 
-import Header from "./components/Header/Header";
-import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderClusterDefs";
-import Footer from "./components/Footer/Footer";
+import Header from "./components/Header/Header.js";
+import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderClusterDefs.js";
+import Footer from "./components/Footer/Footer.js";
 
 const SITE_URL = import.meta.env.VITE_SITE_URL;
 

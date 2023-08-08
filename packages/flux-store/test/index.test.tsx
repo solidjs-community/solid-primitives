@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { produce } from "solid-js/store";
-import { createFluxStoreFactory, createFluxStore } from "../src";
+import { createFluxStoreFactory, createFluxStore } from "../src/index.js";
 
 const id = "test id";
 const initialState = { id, value: true };
