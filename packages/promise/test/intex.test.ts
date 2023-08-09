@@ -1,161 +1,181 @@
 import { createRoot, createSignal, onCleanup } from "solid-js";
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterAll } from "vitest";
 import { until, changed, promiseTimeout, raceTimeout } from "../src/index.js";
+
+vi.useFakeTimers();
+
+beforeEach(() => {
+  vi.clearAllTimers();
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 describe("promiseTimeout", () => {
   test("resolves after timeout", async () => {
-    let time = performance.now();
-    await promiseTimeout(100);
-    expect(performance.now() - time).toBeGreaterThan(50);
+    let done = false;
+    promiseTimeout(100).then(() => (done = true));
+    expect(done).toBe(false);
+    await vi.advanceTimersByTimeAsync(50);
+    expect(done).toBe(false);
+    await vi.advanceTimersByTimeAsync(100);
+    expect(done).toBe(true);
   });
 
   test("rejects after timeout", async () => {
-    let time = performance.now();
-    try {
-      await promiseTimeout(100, true, "rejection reason");
-    } catch (e) {
-      expect(e).toBe("rejection reason");
-    }
-    expect(performance.now() - time).toBeGreaterThan(50);
+    let done: unknown;
+    const reason = new Error("promiseTimeout rejection reason");
+    promiseTimeout(100, true, reason)
+      .then(() => (done = true))
+      .catch(r => (done = r));
+    expect(done).toBe(undefined);
+    await vi.advanceTimersByTimeAsync(50);
+    expect(done).toBe(undefined);
+    await vi.advanceTimersByTimeAsync(100);
+    expect(done).toBe(reason);
   });
 });
 
 describe("raceTimeout", () => {
   test("resolves after timeout", async () => {
-    let time = performance.now();
-    await raceTimeout([promiseTimeout(200)], 100);
-    expect(performance.now() - time).toBeGreaterThan(50);
-    expect(performance.now() - time).toBeLessThan(170);
-  }, 100);
+    let done = false;
+    raceTimeout([promiseTimeout(200)], 100).then(() => (done = true));
+    expect(done).toBe(false);
+    await vi.advanceTimersByTimeAsync(50);
+    expect(done).toBe(false);
+    await vi.advanceTimersByTimeAsync(100);
+    expect(done).toBe(true);
+  });
 
   test("resolves before timeout", async () => {
-    let time = performance.now();
-    const res = await raceTimeout(
-      [
-        new Promise(() => {}),
-        (async () => {
-          await promiseTimeout(100);
-          return "result";
-        })(),
-      ],
-      200,
+    let done: unknown;
+    const result = "raceTimeout result";
+    raceTimeout([new Promise(() => {}), promiseTimeout(100).then(() => result)], 200).then(
+      res => (done = res),
     );
-    expect(res).toBe("result");
-    expect(performance.now() - time).toBeGreaterThan(50);
-    expect(performance.now() - time).toBeLessThan(170);
-  }, 100);
+    expect(done).toBe(undefined);
+    await vi.advanceTimersByTimeAsync(50);
+    expect(done).toBe(undefined);
+    await vi.advanceTimersByTimeAsync(100);
+    expect(done).toBe(result);
+  });
 
   test("rejects after timeout", async () => {
-    let time = performance.now();
-    try {
-      await raceTimeout(
-        [promiseTimeout(200)],
-        100,
-        true,
-        new Error("raceTimeout rejection reason"),
-      );
-    } catch (e) {
-      expect((e as Error).message).toBe("raceTimeout rejection reason");
-    }
-    expect(performance.now() - time).toBeGreaterThan(50);
-    expect(performance.now() - time).toBeLessThan(170);
-  }, 100);
+    let done: unknown;
+    const reason = new Error("raceTimeout rejection reason");
+    raceTimeout([promiseTimeout(200)], 100, true, reason)
+      .then(() => (done = true))
+      .catch(r => (done = r));
+    expect(done).toBe(undefined);
+    await vi.advanceTimersByTimeAsync(50);
+    expect(done).toBe(undefined);
+    await vi.advanceTimersByTimeAsync(100);
+    expect(done).toBe(reason);
+  });
 });
 
 describe("until", () => {
-  test("return values", () => {
-    const returned = until(() => true);
-    expect(returned).toBeInstanceOf(Promise);
-    expect(returned.dispose).toBeTypeOf("function");
+  test("awaits reactive condition", async () => {
+    const [state, setState] = createSignal(false);
+    let done: unknown;
+
+    const dispose = createRoot(dispose => {
+      until(state).then(res => (done = res));
+      return dispose;
+    });
+
+    expect(done).toBe(undefined);
+
+    setState(true);
+    expect(done).toBe(undefined);
+
+    await Promise.resolve();
+    expect(done).toBe(true);
+
+    dispose();
   });
 
-  test("awaits reactive condition", () =>
-    createRoot(dispose => {
-      const [state, setState] = createSignal(false);
+  test("computation stops when root disposes", async () => {
+    const [state, setState] = createSignal(false);
+    let value = false;
+    let threw = false;
 
-      until(state).then(res => {
-        expect(res).toBe(true);
-        dispose();
-      });
-
-      setTimeout(() => {
-        setState(true);
-      }, 0);
-    }));
-
-  test("computation stops when root disposes", () =>
-    createRoot(dispose => {
-      const [state, setState] = createSignal(false);
-      let captured: any;
-      let threw = false;
-
+    const dispose = createRoot(dispose => {
       until(state)
-        .then(res => (captured = res))
+        .then(() => (value = true))
         .catch(() => (threw = true));
 
-      dispose();
-      setState(true);
+      return dispose;
+    });
 
-      setTimeout(() => {
-        expect(captured).toBe(undefined);
-        expect(threw).toBe(true);
-      }, 0);
-    }));
+    dispose();
+    setState(true);
 
-  test(".dispose() will stop computation", () => {
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(value).toBe(false);
+    expect(threw).toBe(true);
+  });
+
+  test(".dispose() will stop computation", async () => {
     const [state, setState] = createSignal(false);
-    let captured: any;
+    let value = false;
     let threw = false;
 
     const res = until(state);
-    res.then(res => (captured = res)).catch(() => (threw = true));
+    res.then(() => (value = true)).catch(() => (threw = true));
 
     res.dispose();
+    setState(true);
 
-    setTimeout(() => {
-      setState(true);
+    await Promise.resolve();
+    await Promise.resolve();
 
-      setTimeout(() => {
-        expect(captured).toBe(undefined);
-        expect(threw).toBe(true);
-      }, 0);
-    }, 0);
+    expect(value).toBe(false);
+    expect(threw).toBe(true);
   });
 
   describe("changed", () => {
-    test("resolves after changes", () =>
-      createRoot(dispose => {
-        const [count, setCount] = createSignal(0);
-        let captured: any;
-        until(changed(count, 2)).then(v => (captured = v));
+    test("resolves after changes", async () => {
+      const [count, setCount] = createSignal(0);
+      let value: unknown;
 
-        setCount(1);
-        setTimeout(() => {
-          expect(captured).toBe(undefined);
+      const dispose = createRoot(dispose => {
+        until(changed(count, 2)).then(v => (value = v));
+        return dispose;
+      });
 
-          setCount(1);
-          setTimeout(() => {
-            expect(captured).toBe(undefined);
+      setCount(1);
+      await Promise.resolve();
+      expect(value).toBe(undefined);
 
-            setCount(2);
-            setTimeout(() => {
-              expect(captured).toBe(true);
-              dispose();
-            }, 0);
-          }, 0);
-        }, 0);
-      }));
+      setCount(1);
+      await Promise.resolve();
+      expect(value).toBe(undefined);
+
+      setCount(2);
+      await Promise.resolve();
+      expect(value).toBe(true);
+
+      dispose();
+    });
   });
 
   describe("raceTimeout", () => {
     test("computation get's disposed when timeout", async () => {
       let disposed = false;
-      await raceTimeout(
+
+      raceTimeout(
         until(() => {
           onCleanup(() => (disposed = true));
         }),
         100,
       );
+
+      await vi.advanceTimersByTimeAsync(100);
+
       expect(disposed).toBe(true);
     });
   });
