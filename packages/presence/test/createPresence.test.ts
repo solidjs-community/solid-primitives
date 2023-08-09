@@ -1,8 +1,17 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterAll } from "vitest";
 import { createRoot, createSignal } from "solid-js";
 import { createPresence } from "../src/index.js";
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+vi.useFakeTimers();
+
+beforeEach(() => {
+  vi.clearAllTimers();
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
+
 // The state transitions often take an extra ~20ms to changeover
 // because the transition currently has an awaited animation frame
 // which Vitest seems to just assume is (1 / 60Hz) seconds
@@ -73,17 +82,17 @@ describe("createPresence", () => {
       expect(isMounted()).toBe(false);
       expect(isAnimating()).toBe(false);
       setShouldRender(true);
-      await sleep(0);
+      await vi.advanceTimersByTimeAsync(0);
       expect(isMounted()).toBe(true);
       expect(isAnimating()).toBe(true);
-      await sleep(transitionDuration + transitionTimeOffset);
+      await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
       expect(isMounted()).toBe(true);
       expect(isAnimating()).toBe(false);
       setShouldRender(false);
-      await sleep(0);
+      await vi.advanceTimersByTimeAsync(0);
       expect(isMounted()).toBe(true);
       expect(isAnimating()).toBe(true);
-      await sleep(transitionDuration + transitionTimeOffset);
+      await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
       expect(isMounted()).toBe(false);
       expect(isAnimating()).toBe(false);
       dispose();
@@ -103,20 +112,20 @@ describe("createPresence", () => {
       expect(isMounted()).toBe(false);
       expect(isAnimating()).toBe(false);
       setShouldRender(true);
-      await sleep(0);
+      await vi.advanceTimersByTimeAsync(0);
       expect(isMounted()).toBe(true);
       expect(isAnimating()).toBe(true);
       // ensure that we're not done animating after the shorter time
-      await sleep(exitDuration + transitionTimeOffset);
+      await vi.advanceTimersByTimeAsync(exitDuration + transitionTimeOffset);
       expect(isAnimating()).toBe(true);
-      await sleep(exitDuration + transitionTimeOffset);
+      await vi.advanceTimersByTimeAsync(exitDuration + transitionTimeOffset);
       expect(isMounted()).toBe(true);
       expect(isAnimating()).toBe(false);
       setShouldRender(false);
-      await sleep(0);
+      await vi.advanceTimersByTimeAsync(0);
       expect(isMounted()).toBe(true);
       expect(isAnimating()).toBe(true);
-      await sleep(exitDuration + transitionTimeOffset);
+      await vi.advanceTimersByTimeAsync(exitDuration + transitionTimeOffset);
       expect(isMounted()).toBe(false);
       expect(isAnimating()).toBe(false);
       dispose();
@@ -158,7 +167,7 @@ describe("createPresence", () => {
       });
       expect(mountedItem()).toBe("foo");
       expect(isAnimating()).toBe(true);
-      await sleep(transitionDuration + transitionTimeOffset);
+      await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
       expect(isAnimating()).toBe(false);
       dispose();
     }));
@@ -172,17 +181,17 @@ describe("createPresence", () => {
       });
       expect(isAnimating()).toBe(false);
       setData("bar");
-      await sleep(0);
+      await vi.advanceTimersByTimeAsync(0);
       expect(isAnimating()).toBe(true);
       expect(mountedItem()).toBe("foo");
       expect(isExiting()).toBe(true);
       expect(isEntering()).toBe(false);
-      await sleep(transitionDuration + transitionTimeOffset);
+      await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
       expect(isAnimating()).toBe(true);
       expect(mountedItem()).toBe("bar");
       expect(isEntering()).toBe(true);
       expect(isExiting()).toBe(false);
-      await sleep(transitionDuration + transitionTimeOffset);
+      await vi.advanceTimersByTimeAsync(transitionDuration + transitionTimeOffset);
       expect(isAnimating()).toBe(false);
       expect(isEntering()).toBe(false);
       expect(isExiting()).toBe(false);
