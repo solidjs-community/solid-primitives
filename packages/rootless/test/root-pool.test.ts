@@ -13,8 +13,6 @@ import {
   runWithOwner,
 } from "solid-js";
 
-const sleep = (ms: number = 0) => new Promise(resolve => setTimeout(resolve, ms));
-
 describe("createRootPool", () => {
   test("creates individual roots", () => {
     createRoot(dispose => {
@@ -77,7 +75,7 @@ describe("createRootPool", () => {
         expect(cleanup).toBe(false);
 
         d();
-        await sleep();
+        await Promise.resolve();
 
         expect(cleanup).toBe(false);
 
@@ -105,7 +103,7 @@ describe("createRootPool", () => {
         expect(cleanup).toBe(false);
 
         d();
-        await sleep();
+        await Promise.resolve();
 
         expect(cleanup).toBe(true);
 
@@ -192,7 +190,7 @@ describe("createRootPool", () => {
         });
       });
 
-      await sleep();
+      await Promise.resolve();
 
       expect(captured).toEqual([0, 0]);
 
@@ -205,37 +203,37 @@ describe("createRootPool", () => {
         });
       });
 
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([1, 1]);
       setCount(2);
 
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([2, 2]);
       disposeRoot();
 
       setCount(3);
 
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([3, 3]);
 
       setCount(4);
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([4, 4]);
 
       runWithOwner(owner, pool);
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([4, 4]);
 
       setCount(5);
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([5, 5]);
 
       dispose();
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([5, 5]);
 
       setCount(6);
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([5, 5]);
     });
   });
@@ -254,7 +252,7 @@ describe("createRootPool", () => {
         });
       });
 
-      await sleep();
+      await Promise.resolve();
 
       expect(captured).toEqual([0, 0]);
 
@@ -267,37 +265,37 @@ describe("createRootPool", () => {
         });
       });
 
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([1, 1]);
       setCount(2);
 
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([2, 2]);
       disposeRoot();
 
       setCount(3);
 
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([3, 2]);
 
       setCount(4);
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([4, 2]);
 
       runWithOwner(owner, pool);
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([4, 4]);
 
       setCount(5);
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([5, 5]);
 
       dispose();
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([5, 5]);
 
       setCount(6);
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([5, 5]);
     });
   });
