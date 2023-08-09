@@ -1,6 +1,16 @@
-import { createComputed, createRoot, createSignal } from "solid-js";
-import { describe, it, expect } from "vitest";
+import { createComputed, createEffect, createRoot, createSignal } from "solid-js";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createScheduled, debounce, leading } from "../src/index.js";
+
+vi.useFakeTimers();
+
+beforeEach(() => {
+  vi.clearAllTimers();
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 describe("createScheduled", () => {
   it("returns true after invalidated", () => {
@@ -34,43 +44,74 @@ describe("createScheduled", () => {
     });
   });
 
-  it("debounces", async () => {
-    await createRoot(
-      dispose =>
-        new Promise<void>(resolve => {
-          const scheduled = createScheduled(fn => debounce(fn, 20));
-          const [track, trigger] = createSignal(undefined, { equals: false });
-          let i = 0;
-          createComputed(() => {
-            i++;
-            track();
-            expect(scheduled(), `run ${i}`).toBe(i === 3);
-            if (i === 1) return trigger();
-            if (i === 2) return;
-            resolve();
-            dispose();
-          });
-        }),
-    );
+  it("debounces", () => {
+    const [track, trigger] = createSignal(undefined, { equals: false });
+
+    let i = 0;
+    let value: boolean | undefined;
+
+    const dispose = createRoot(dispose => {
+      const scheduled = createScheduled(fn => debounce(fn, 20));
+
+      createEffect(() => {
+        track();
+        i++;
+        value = scheduled();
+      });
+
+      return dispose;
+    });
+
+    expect(value).toBe(false);
+    expect(i).toBe(1);
+
+    trigger();
+
+    expect(value).toBe(false);
+    expect(i).toBe(2);
+
+    vi.advanceTimersByTime(50);
+
+    expect(value).toBe(true);
+    expect(i).toBe(3);
+
+    if (i === 1) return trigger();
+    if (i === 2) return;
+    dispose();
   });
 
-  it("debounces with leading", async () => {
-    await createRoot(
-      dispose =>
-        new Promise<void>(resolve => {
-          const scheduled = createScheduled(fn => leading(debounce, fn, 20));
-          let i = 0;
-          const [track, trigger] = createSignal(undefined, { equals: false });
-          createComputed(() => {
-            i++;
-            track();
-            expect(scheduled(), `run ${i}`).toBe(i === 1);
-            if (i === 1) return trigger();
-            resolve();
-            dispose();
-          });
-        }),
-    );
+  it("debounces with leading", () => {
+    const [track, trigger] = createSignal(undefined, { equals: false });
+
+    let i = 0;
+    let value: boolean | undefined;
+
+    const dispose = createRoot(dispose => {
+      const scheduled = createScheduled(fn => leading(debounce, fn, 20));
+
+      createEffect(() => {
+        track();
+        i++;
+        value = scheduled();
+      });
+
+      return dispose;
+    });
+
+    expect(value).toBe(true);
+    expect(i).toBe(1);
+
+    trigger();
+
+    expect(value).toBe(false);
+    expect(i).toBe(2);
+
+    vi.advanceTimersByTime(50);
+
+    expect(value).toBe(false);
+    expect(i).toBe(2);
+
+    dispose();
   });
 
   it("works with multiple computations", () => {

@@ -1,4 +1,4 @@
-import { dispatchFakeEvent } from "./setup.js";
+import { dispatchFakeEvent, event_target } from "./setup.js";
 import { describe, test, expect } from "vitest";
 import { createRoot, createSignal, onMount } from "solid-js";
 import {
@@ -15,7 +15,7 @@ describe("makeEventListener", () => {
     createRoot(dispose => {
       const testEvent = new Event("test");
       let capturedEvent!: Event;
-      makeEventListener<{ test: Event }>(window, "test", ev => {
+      makeEventListener<{ test: Event }>(event_target, "test", ev => {
         capturedEvent = ev;
       });
       dispatchFakeEvent("test", testEvent);
@@ -27,7 +27,7 @@ describe("makeEventListener", () => {
     createRoot(dispose => {
       const testEvent = new Event("test");
       let capturedEvent!: Event;
-      const clear = makeEventListener<{ test: Event }>(window, "test", ev => {
+      const clear = makeEventListener<{ test: Event }>(event_target, "test", ev => {
         capturedEvent = ev;
       });
       clear();
@@ -40,7 +40,7 @@ describe("makeEventListener", () => {
     createRoot(dispose => {
       const testEvent = new Event("test");
       let capturedEvent!: Event;
-      makeEventListener<{ test: Event }>(window, "test", ev => {
+      makeEventListener<{ test: Event }>(event_target, "test", ev => {
         capturedEvent = ev;
       });
       dispose();
@@ -54,7 +54,7 @@ describe("makeEventListenerStack", () => {
     createRoot(dispose => {
       const testEvent = new Event("test");
       let capturedEvent: any;
-      const [listen] = makeEventListenerStack<{ test: Event }>(window);
+      const [listen] = makeEventListenerStack<{ test: Event }>(event_target);
       listen("test", ev => (capturedEvent = ev));
       dispatchFakeEvent("test", testEvent);
       expect(capturedEvent).toBe(testEvent);
@@ -68,7 +68,7 @@ describe("makeEventListenerStack", () => {
     createRoot(dispose => {
       const testEvent = new Event("test");
       let capturedEvent: any;
-      const [listen, clear] = makeEventListenerStack<{ test: Event }>(window);
+      const [listen, clear] = makeEventListenerStack<{ test: Event }>(event_target);
       listen("test", ev => (capturedEvent = ev));
       clear();
       dispatchFakeEvent("test", testEvent);
@@ -78,11 +78,11 @@ describe("makeEventListenerStack", () => {
 });
 
 describe("createEventListener", () => {
-  test("single window target", () => {
+  test("single event_target target", () => {
     createRoot(dispose => {
       const testEvent = new Event("test");
       let capturedEvent!: Event;
-      createEventListener<{ test: Event }>(window, "test", ev => {
+      createEventListener<{ test: Event }>(event_target, "test", ev => {
         capturedEvent = ev;
       });
       dispatchFakeEvent("test", testEvent);
@@ -91,22 +91,28 @@ describe("createEventListener", () => {
     });
   });
 
-  test("array window target", () => {
+  test("array event_target target", () => {
     createRoot(dispose => {
       const testEvent = new Event("test");
       let capturedEvent!: Event;
-      createEventListener<{ test: Event }>([window, document.createElement("p")], "test", ev => {
-        capturedEvent = ev;
-      });
+      createEventListener<{ test: Event }>(
+        [event_target, document.createElement("p")],
+        "test",
+        ev => {
+          capturedEvent = ev;
+        },
+      );
       dispatchFakeEvent("test", testEvent);
       expect(capturedEvent).toBe(testEvent);
       dispose();
     });
   });
 
-  test("accessor window target", () => {
+  test("accessor event_target target", () => {
     createRoot(dispose => {
-      const [target, setTarget] = createSignal<Window | []>(window, { name: "target" });
+      const [target, setTarget] = createSignal<typeof event_target | []>(event_target, {
+        name: "target",
+      });
       const testEvent = new Event("test");
       let captured_times = 0;
       createEventListener<{ test: Event }>(target, "test", ev => captured_times++);
@@ -119,7 +125,7 @@ describe("createEventListener", () => {
         setTimeout(() => {
           dispatchFakeEvent("test", testEvent);
           expect(captured_times).toBe(1);
-          setTarget(window);
+          setTarget(event_target);
           setTimeout(() => {
             dispatchFakeEvent("test", testEvent);
             expect(captured_times).toBe(2);
@@ -135,7 +141,7 @@ describe("createEventListener", () => {
       const event1 = new Event("test1");
       const event2 = new Event("test2");
       let capturedEvent!: Event;
-      createEventListener<{ test1: Event; test2: Event }>(window, ["test1", "test2"], ev => {
+      createEventListener<{ test1: Event; test2: Event }>(event_target, ["test1", "test2"], ev => {
         capturedEvent = ev;
       });
       dispatchFakeEvent("test1", event1);
@@ -150,7 +156,7 @@ describe("createEventListener", () => {
     createRoot(dispose => {
       const testEvent = new Event("test2");
       let count = 0;
-      createEventListener<{ test2: Event }>(window, "test2", ev => {
+      createEventListener<{ test2: Event }>(event_target, "test2", ev => {
         count++;
       });
       setTimeout(() => {
@@ -165,7 +171,7 @@ describe("createEventListener", () => {
     createRoot(dispose => {
       const testEvent = new Event("test3");
       let count = 0;
-      createEventListener<{ test3: Event }>(window, "test3", () => {
+      createEventListener<{ test3: Event }>(event_target, "test3", () => {
         count++;
       });
 
@@ -185,7 +191,7 @@ describe("createEventSignal", () => {
   test("return autoupdating signal", () =>
     createRoot(dispose => {
       const testEvent = new Event("sig_test");
-      const lastEvent = createEventSignal<{ sig_test: Event }>(window, "sig_test");
+      const lastEvent = createEventSignal<{ sig_test: Event }>(event_target, "sig_test");
       expect(lastEvent, "returned value is an accessor").toBeTypeOf("function");
       expect(lastEvent(), "returned value is undefined").toBeTypeOf("undefined");
 
@@ -207,7 +213,7 @@ describe("eventListener directive", () => {
         "load",
         e => captured.push(e),
       ]);
-      eventListener(window as any, props);
+      eventListener(event_target as any, props);
       dispatchFakeEvent("load", testEvent);
       expect(captured.length, "event are not listened before the first effect").toBe(0);
 

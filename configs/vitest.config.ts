@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
     ],
     test: {
       watch: false,
-      isolate: !testSSR,
+      isolate: false,
       passWithNoTests: true,
       environment: testSSR ? "node" : "jsdom",
       deps: { registerNodeLoader: false },
@@ -47,9 +47,9 @@ export default defineConfig(({ mode }) => {
     resolve: {
       conditions: testSSR ? ["node"] : ["browser", "development"],
       // fix issues with stores and node@20:
-      ...(!testSSR && { 
+      ...(!testSSR && {
         alias: {
-          "solid-js/store": "solid-js/store/dist/store.js"
+          "solid-js/store": "solid-js/store/dist/store.js",
         },
       }),
     },

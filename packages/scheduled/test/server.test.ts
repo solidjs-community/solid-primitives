@@ -1,5 +1,15 @@
-import { describe, expect, test, vi } from "vitest";
+import { afterAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { debounce, leading, leadingAndTrailing, scheduleIdle, throttle } from "../src/index.js";
+
+vi.useFakeTimers();
+
+beforeEach(() => {
+  vi.clearAllTimers();
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 describe("on server", () => {
   const DATA: [string, (cb: (a: any) => void, time: number) => (a: any) => void][] = [
@@ -14,7 +24,7 @@ describe("on server", () => {
       const trigger = fn(cb, 100);
       trigger("foo");
       expect(cb).not.toHaveBeenCalled();
-      vi.clearAllTimers();
+      vi.runAllTimers();
       expect(cb).not.toHaveBeenCalled();
     });
   });
@@ -25,7 +35,7 @@ describe("on server", () => {
     trigger("foo");
     expect(cb).toHaveBeenCalledTimes(1);
     expect(cb).toHaveBeenCalledWith("foo");
-    vi.clearAllTimers();
+    vi.runAllTimers();
     trigger("baz");
     expect(cb).toHaveBeenCalledTimes(1);
   });
@@ -36,7 +46,7 @@ describe("on server", () => {
     trigger("foo");
     expect(cb).toHaveBeenCalledTimes(1);
     expect(cb).toHaveBeenCalledWith("foo");
-    vi.clearAllTimers();
+    vi.runAllTimers();
     trigger("baz");
     expect(cb).toHaveBeenCalledTimes(1);
   });
