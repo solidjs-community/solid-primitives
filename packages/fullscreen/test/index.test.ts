@@ -1,58 +1,78 @@
+import { setup_state } from "./setup.js";
+
 import { createRoot, createEffect, createSignal } from "solid-js";
 import { createFullscreen } from "../src/index.js";
 import { describe, it, expect } from "vitest";
-import "./setup.ts";
 
 describe("createFullscreen", () => {
   const ref = document.createElement("div");
 
-  it("will call the fullscreen method", () =>
-    new Promise<void>(resolve => {
-      createRoot(dispose => {
-        const active = createFullscreen(ref);
-        const expected = [false, true];
-        createEffect(() => {
-          expect(active()).toBe(expected.shift());
-          if (expected.length === 0) {
-            dispose();
-            resolve();
-          }
-        });
-      });
-    }));
+  it("will call the fullscreen method", async () => {
+    let captured: unknown;
 
-  it("will exit fullscreen on reactive change", () =>
-    new Promise<void>(resolve => {
-      createRoot(dispose => {
-        const [fs, setFs] = createSignal(true);
-        const active = createFullscreen(ref, fs);
-        const expected = [false, true, false];
-        createEffect(() => {
-          expect(active()).toBe(expected.shift());
-          if (expected.length === 2) {
-            setTimeout(() => setFs(false), 50);
-          } else if (expected.length === 0) {
-            dispose();
-            resolve();
-          }
-        });
-      });
-    }));
+    const dispose = createRoot(dispose => {
+      const active = createFullscreen(ref);
 
-  it("will open fullscreen with options", () =>
-    new Promise<void>(resolve => {
-      createRoot(dispose => {
-        const options: FullscreenOptions = { navigationUI: "hide" };
-        const active = createFullscreen(ref, undefined, options);
-        const expected = [false, true];
-        createEffect(() => {
-          expect(active()).toBe(expected.shift());
-          if (expected.length === 0) {
-            expect((window as any)._fullScreenOptions).toBe(options);
-            dispose();
-            resolve();
-          }
-        });
+      createEffect(() => {
+        captured = active();
       });
-    }));
+
+      return dispose;
+    });
+
+    expect(captured).toEqual(false);
+
+    await Promise.resolve();
+    expect(captured).toEqual(true);
+
+    dispose();
+  });
+
+  it("will exit fullscreen on reactive change", async () => {
+    const [fs, setFs] = createSignal(true);
+    let captured: unknown;
+
+    const dispose = createRoot(dispose => {
+      const active = createFullscreen(ref, fs);
+
+      createEffect(() => {
+        captured = active();
+      });
+
+      return dispose;
+    });
+
+    expect(captured).toEqual(false);
+
+    await Promise.resolve();
+    expect(captured).toEqual(true);
+
+    setFs(false);
+    expect(captured).toEqual(false);
+
+    dispose();
+  });
+
+  it("will open fullscreen with options", async () => {
+    const options: FullscreenOptions = { navigationUI: "hide" };
+    let captured: unknown;
+
+    const dispose = createRoot(dispose => {
+      const active = createFullscreen(ref, undefined, options);
+
+      createEffect(() => {
+        captured = active();
+      });
+
+      return dispose;
+    });
+
+    expect(captured).toEqual(false);
+
+    await Promise.resolve();
+    expect(captured).toEqual(true);
+    expect(setup_state.current_options).toBe(options);
+
+    dispose();
+  });
 });

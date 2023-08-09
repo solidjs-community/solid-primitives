@@ -34,6 +34,7 @@ export const __permissions__: Record<"microphone" | "camera", Permission> = {
   },
 };
 
-(navigator as any).permissions = {
-  query: ({ name }) => Promise.resolve(__permissions__[name]),
+(navigator as any).permissions ??= {} as any;
+navigator.permissions.query = function ({ name }) {
+  return Promise.resolve((__permissions__ as any)[name]);
 };
