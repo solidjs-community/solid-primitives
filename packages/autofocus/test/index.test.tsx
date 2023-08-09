@@ -1,66 +1,133 @@
-import { describe, test, expect } from "vitest";
-import { createSignal } from "solid-js";
+import { describe, test, expect, vi, beforeEach, afterAll } from "vitest";
+import { createRoot, createSignal } from "solid-js";
 import { autofocus, createAutofocus } from "../src/index.js";
-import { render } from "@solidjs/testing-library";
 
 autofocus;
 
+let focused: HTMLElement | null = null;
+
+const original_focus = HTMLElement.prototype.focus;
+HTMLElement.prototype.focus = function (this) {
+  focused = this;
+};
+
+vi.useFakeTimers();
+
+beforeEach(() => {
+  vi.clearAllTimers();
+  focused = null;
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+  HTMLElement.prototype.focus = original_focus;
+});
+
 describe("use:autofocus", () => {
-  test("use:autofocus focuses the element", async () => {
-    const result = render(() => (
-      <button use:autofocus autofocus>
-        Autofocused
-      </button>
-    ));
-    await new Promise(r => setTimeout(r, 1)); // Wait for the internal setTimeout() to run.
-    expect(document.activeElement).toBe(result.container.querySelector("button"));
+  test("use:autofocus focuses the element", () => {
+    const result = createRoot(dispose => ({
+      dispose,
+      el: (
+        <button use:autofocus autofocus>
+          Autofocused
+        </button>
+      ) as HTMLButtonElement,
+    }));
+
+    expect(focused).toBe(null);
+
+    vi.runAllTimers();
+    expect(focused).toBe(result.el);
+
+    result.dispose();
   });
 
-  test("use:autofocus doesn't focus when autofocus={false}", async () => {
-    render(() => (
-      <button use:autofocus autofocus={false}>
-        Not Autofocused
-      </button>
-    ));
-    await new Promise(r => setTimeout(r, 1)); // Wait for the internal setTimeout() to run.
-    expect(document.activeElement).toBe(document.body);
+  test("use:autofocus doesn't focus when autofocus={false}", () => {
+    const result = createRoot(dispose => ({
+      dispose,
+      el: (
+        <button use:autofocus autofocus={false}>
+          Autofocused
+        </button>
+      ) as HTMLButtonElement,
+    }));
+
+    expect(focused).toBe(null);
+
+    vi.runAllTimers();
+    expect(focused).toBe(null);
+
+    result.dispose();
   });
 
   test("doesn't focus with use:autofocus={false}", async () => {
-    render(() => (
-      <button use:autofocus={false} autofocus>
-        Not Autofocused
-      </button>
-    ));
-    await new Promise(r => setTimeout(r, 1)); // Wait for the internal setTimeout() to run.
-    expect(document.activeElement).toBe(document.body);
+    const result = createRoot(dispose => ({
+      dispose,
+      el: (
+        <button use:autofocus={false} autofocus>
+          Autofocused
+        </button>
+      ) as HTMLButtonElement,
+    }));
+
+    expect(focused).toBe(null);
+
+    vi.runAllTimers();
+    expect(focused).toBe(null);
+
+    result.dispose();
   });
 });
 
 describe("createAutofocus", () => {
-  test("createAutofocus focuses the element", async () => {
-    const result = render(() => {
-      let ref!: HTMLButtonElement;
+  const el = document.createElement("button"),
+    el2 = document.createElement("button");
 
-      createAutofocus(() => ref);
-
-      return <button ref={ref}>Autofocused</button>;
+  test("createAutofocus focuses the element", () => {
+    const dispose = createRoot(dispose => {
+      createAutofocus(() => el);
+      return dispose;
     });
 
-    await new Promise(r => setTimeout(r, 1)); // Wait for the internal setTimeout() to run.
-    expect(document.activeElement).toBe(result.container.querySelector("button"));
+    expect(focused).toBe(null);
+
+    vi.runAllTimers();
+    expect(focused).toBe(el);
+
+    dispose();
   });
 
-  test("createAutofocus works with signal", async () => {
-    const result = render(() => {
-      const [ref, setRef] = createSignal<HTMLButtonElement>();
+  test("createAutofocus works with signal", () => {
+    const [ref, setRef] = createSignal<HTMLButtonElement>();
 
+    const dispose = createRoot(dispose => {
       createAutofocus(ref);
-
-      return <button ref={setRef}>Autofocused</button>;
+      return dispose;
     });
 
-    await new Promise(r => setTimeout(r, 1)); // Wait for the internal setTimeout() to run.
-    expect(document.activeElement).toBe(result.container.querySelector("button"));
+    expect(focused).toBe(null);
+
+    vi.runAllTimers();
+    expect(focused).toBe(null);
+
+    setRef(el);
+    expect(focused).toBe(null);
+
+    vi.runAllTimers();
+    expect(focused).toBe(el);
+
+    setRef(el2);
+    expect(focused).toBe(el);
+
+    vi.runAllTimers();
+    expect(focused).toBe(el2);
+
+    dispose();
+
+    setRef(el);
+    expect(focused).toBe(el2);
+
+    vi.runAllTimers();
+    expect(focused).toBe(el2);
   });
 });
