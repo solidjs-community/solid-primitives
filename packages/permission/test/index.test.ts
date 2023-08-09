@@ -1,7 +1,7 @@
-import { __permissions__ } from "./setup";
+import { __permissions__ } from "./setup.js";
 import { createEffect, createRoot } from "solid-js";
 import { it, describe, expect } from "vitest";
-import { createPermission } from "../src";
+import { createPermission } from "../src/index.js";
 
 describe("permission", () => {
   it("reads permission", () =>

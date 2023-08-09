@@ -1,4 +1,4 @@
-import { createEventBus } from "../src";
+import { createEventBus } from "../src/index.js";
 import { createRoot } from "solid-js";
 import { describe, test, expect } from "vitest";
 

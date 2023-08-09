@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { createComputed, createRoot, createSignal, mergeProps } from "solid-js";
 import { spy } from "nanospy";
-import { combineProps } from "../src";
+import { combineProps } from "../src/index.js";
 
 describe("combineProps", () => {
   it("handles one argument", () =>

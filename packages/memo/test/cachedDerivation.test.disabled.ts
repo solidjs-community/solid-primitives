@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { createEffect, createRoot, createSignal } from "solid-js";
-import { createCachedDerivation } from "../src";
+import { createCachedDerivation } from "../src/index.js";
 
 describe("createCachedDerivation", () => {
   it("caches the result", () => {

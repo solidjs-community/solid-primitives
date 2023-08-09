@@ -1,6 +1,6 @@
 import { children, createSignal, JSX, onMount } from "solid-js";
 
-import { onElementConnect } from "../src";
+import { onElementConnect } from "../src/index.js";
 
 function Button() {
   const [count, setCount] = createSignal(1);

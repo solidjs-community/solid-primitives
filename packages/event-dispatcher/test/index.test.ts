@@ -1,4 +1,4 @@
-import { createEventDispatcher } from "../src";
+import { createEventDispatcher } from "../src/index.js";
 import { createRoot, createSignal } from "solid-js";
 import { describe, test, expect } from "vitest";
 interface Props {

@@ -1,3 +1,3 @@
-export * from "./networks";
-export * from "./social-share";
-export * from "./web-share";
+export * from "./networks.js";
+export * from "./social-share.js";
+export * from "./web-share.js";

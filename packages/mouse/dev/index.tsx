@@ -1,10 +1,10 @@
-import { useMousePosition, createPositionToElement } from "../src";
+import { useMousePosition, createPositionToElement } from "../src/index.js";
 import { Component, createMemo, createSignal, Show } from "solid-js";
 
 import createRAF from "@solid-primitives/raf";
-import { lerp } from "./utils";
+import { lerp } from "./utils.js";
 
-import { DisplayRecord } from "./components";
+import { DisplayRecord } from "./components.js";
 import { clamp } from "@solid-primitives/utils";
 
 const App: Component = () => {

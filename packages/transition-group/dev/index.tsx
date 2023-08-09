@@ -1,5 +1,5 @@
-import ListPage from "./list-page";
-import SwitchPage from "./switch-page";
+import ListPage from "./list-page.js";
+import SwitchPage from "./switch-page.js";
 import { Match, Switch, createSignal } from "solid-js";
 
 function App() {

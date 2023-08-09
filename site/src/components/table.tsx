@@ -6,7 +6,7 @@ import { useLocation } from "solid-start";
 import { pageWidthClass } from "~/constants";
 import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
 import reflow from "~/utils/reflow";
-import * as Header from "./Header/Header";
+import * as Header from "./Header/Header.js";
 
 export const TR: ParentComponent = props => {
   return (

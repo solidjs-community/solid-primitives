@@ -9,9 +9,9 @@ import type {
   AsyncFileSystemAdapter,
   DirEntries,
   Watcher,
-} from "./types";
+} from "./types.js";
 
-import { getItemName, getParentDir } from "./tools";
+import { getItemName, getParentDir } from "./tools.js";
 
 type SignalMap<T> = Map<string, [Accessor<T>, Setter<T>]>;
 type ResourceMap<T> = Map<string, [Resource<T>, ResourceActions<T>]>;

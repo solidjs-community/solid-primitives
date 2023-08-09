@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createLazyMemo } from "../src";
+import { createLazyMemo } from "../src/index.js";
 import { createComputed, createEffect, createMemo, createRoot, createSignal } from "solid-js";
 
 describe("createLazyMemo", () => {

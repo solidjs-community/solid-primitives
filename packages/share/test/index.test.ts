@@ -1,6 +1,6 @@
 import { describe, test, expect, it } from "vitest";
 import { createRoot, createSignal } from "solid-js";
-import { createWebShare } from "../src";
+import { createWebShare } from "../src/index.js";
 
 describe("createWebShare", () => {
   test("createWebShare initial values", () =>

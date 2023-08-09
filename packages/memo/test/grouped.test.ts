@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createEffect, createMemo, createRoot, createSignal } from "solid-js";
-import { createDebouncedMemo, createDebouncedMemoOn, createThrottledMemo } from "../src";
+import { createDebouncedMemo, createDebouncedMemoOn, createThrottledMemo } from "../src/index.js";
 
 describe("createThrottledMemo", () => {
   test("writes to signal are throttled", () =>

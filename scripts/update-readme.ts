@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from "fs";
 import path from "path";
 // @ts-expect-error ts-missing-module
 import tablemark from "json-to-markdown-table";
-import { insertTextBetweenComments, getModulesData, ROOT_DIR } from "./utils";
+import { insertTextBetweenComments, getModulesData, ROOT_DIR } from "./utils/index.js";
 
 type PackageData = {
   Name: string;

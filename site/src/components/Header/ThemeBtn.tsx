@@ -2,7 +2,7 @@ import { usePrefersDark } from "@solid-primitives/media";
 import { defer } from "@solid-primitives/utils";
 import { FiMoon, FiSun } from "solid-icons/fi";
 import { createEffect, createSignal, Match, on, onMount, Switch } from "solid-js";
-import HalfSun from "../Icons/HalfSun";
+import HalfSun from "../Icons/HalfSun.js";
 
 const ThemeBtn = () => {
   const [theme, setTheme] = createSignal<"light" | "dark" | "os">("os");

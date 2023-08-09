@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from "vitest";
 import { createMemo, createRoot, onCleanup, untrack } from "solid-js";
-import { createMachine } from "../src";
+import { createMachine } from "../src/index.js";
 
 describe("createMachine", () => {
   test("switches state", () =>

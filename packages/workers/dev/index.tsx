@@ -1,6 +1,6 @@
 import { Component, createSignal, onMount } from "solid-js";
 
-import { createWorker, createWorkerPool, createSignaledWorker } from "../src/index";
+import { createWorker, createWorkerPool, createSignaledWorker } from "../src/index.js";
 
 const App: Component = () => {
   // Worker

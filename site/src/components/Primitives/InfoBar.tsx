@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
 import { PackageData } from "~/types";
-import { SizeBadgePill } from "./SizeBadge";
-import { StageBadgePill } from "./StageBadge";
-import { VersionBadgePill } from "./VersionBadge";
+import { SizeBadgePill } from "./SizeBadge.js";
+import { StageBadgePill } from "./StageBadge.js";
+import { VersionBadgePill } from "./VersionBadge.js";
 
 const sizeShield = "https://img.shields.io/bundlephobia/minzip/";
 // const bundlephobiaURL = "https://bundlephobia.com/package/";

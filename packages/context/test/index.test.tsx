@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createContext, createRoot, FlowComponent, JSX, untrack, useContext } from "solid-js";
 import { render } from "solid-js/web";
-import { createContextProvider, MultiProvider } from "../src";
+import { createContextProvider, MultiProvider } from "../src/index.js";
 
 const context = { message: "Hello, Context!" };
 const fallback = { message: "FALLBACK", children: undefined };

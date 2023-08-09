@@ -1,5 +1,5 @@
 import { isServer } from "solid-js/web";
-import { PackageData, PackageListItem } from "./types";
+import { PackageData, PackageListItem } from "./types.js";
 
 const GEN_DIR = "_generated";
 

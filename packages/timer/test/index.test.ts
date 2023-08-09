@@ -1,6 +1,6 @@
 import { batch, createRoot, createSignal } from "solid-js";
 import { describe, test, expect } from "vitest";
-import { createTimer } from "../src";
+import { createTimer } from "../src/index.js";
 
 const sleep = (delay: number) => new Promise<void>(resolve => setTimeout(resolve, delay));
 

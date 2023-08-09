@@ -1,4 +1,4 @@
-import { StorageWithOptions } from ".";
+import { StorageWithOptions } from "./index.js";
 
 /**
  * adds a `.clear` method to a Storage without one only using `.key`/`.removeItem`

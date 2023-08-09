@@ -8,7 +8,7 @@ import {
   createCameras,
   createAccelerometer,
   createGyroscope,
-} from "../src";
+} from "../src/index.js";
 
 let fakeDeviceCount = 0;
 const fakeDeviceInfo = (overrides: Partial<MediaDeviceInfo> = {}): MediaDeviceInfo => ({

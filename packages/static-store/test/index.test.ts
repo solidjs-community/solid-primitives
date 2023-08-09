@@ -1,6 +1,10 @@
 import { createEffect, createRoot, createSignal } from "solid-js";
 import { describe, expect, test } from "vitest";
-import { createDerivedStaticStore, createHydratableStaticStore, createStaticStore } from "../src";
+import {
+  createDerivedStaticStore,
+  createHydratableStaticStore,
+  createStaticStore,
+} from "../src/index.js";
 
 describe("createStaticStore", () => {
   test("individual keys only update when changed", () => {

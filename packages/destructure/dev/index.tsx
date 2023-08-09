@@ -1,4 +1,4 @@
-import { destructure } from "../src";
+import { destructure } from "../src/index.js";
 import { Component, createEffect, createSignal } from "solid-js";
 
 const Inner: Component<{ seconds: number; count: number; list: { n?: number }[] }> = props => {

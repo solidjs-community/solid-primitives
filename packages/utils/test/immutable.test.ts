@@ -9,7 +9,7 @@ import {
   removeItems,
   filterInstance,
   filterOutInstance,
-} from "../src/immutable";
+} from "../src/immutable/index.js";
 
 const cloneDeep = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
 

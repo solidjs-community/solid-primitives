@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createRootPool } from "../src";
+import { createRootPool } from "../src/index.js";
 import {
   createRoot,
   getOwner,

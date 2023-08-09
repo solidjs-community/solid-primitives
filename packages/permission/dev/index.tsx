@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 
-import { createPermission } from "../src";
+import { createPermission } from "../src/index.js";
 
 const App: Component = () => {
   const micPermission = createPermission("microphone");

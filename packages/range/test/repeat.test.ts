@@ -1,6 +1,6 @@
 import { expect, describe, it } from "vitest";
 import { createComputed, createRoot, createSignal, onCleanup } from "solid-js";
-import { repeat } from "../src";
+import { repeat } from "../src/index.js";
 
 describe("repeat", () => {
   it("maps only added items", () =>

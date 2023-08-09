@@ -1,4 +1,4 @@
-import { Repeat, Range, IndexRange } from "../src";
+import { Repeat, Range, IndexRange } from "../src/index.js";
 import { Component, createSignal, onCleanup } from "solid-js";
 
 import { TransitionGroup } from "solid-transition-group";

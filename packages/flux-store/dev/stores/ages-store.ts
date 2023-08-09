@@ -1,4 +1,4 @@
-import { createFluxStoreFactory } from "../../src/index";
+import { createFluxStoreFactory } from "../../src/index.js";
 
 const agesFluxFactory = createFluxStoreFactory(
   {

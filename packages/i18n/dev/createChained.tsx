@@ -1,7 +1,7 @@
 import { Accessor, Component, createContext, createSignal, useContext } from "solid-js";
 
-import { createChainedI18nDictionary } from "../src/index";
-import { dict } from "../test/setup";
+import { createChainedI18nDictionary } from "../src/index.js";
+import { dict } from "../test/setup.js";
 
 // -------------------------- Not using context -------------------
 const dictionaries = createChainedI18nDictionary(dict);

@@ -1,7 +1,7 @@
 import { isServer } from "solid-js/web";
 import { keys } from "@solid-primitives/utils";
 import { Component } from "solid-js";
-import { makeEventListener } from "./eventListener";
+import { makeEventListener } from "./eventListener.js";
 
 export type WindowEventProps = {
   [K in keyof WindowEventMap as `on${Capitalize<K>}` | `on${K}`]?: (

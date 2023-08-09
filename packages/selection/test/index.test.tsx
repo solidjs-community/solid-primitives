@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { render } from "solid-js/web";
 
-import { createSelection } from "../src/index";
+import { createSelection } from "../src/index.js";
 import { createEffect, createRoot, type JSX } from "solid-js";
 
 describe("createSelection", () => {

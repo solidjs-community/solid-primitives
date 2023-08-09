@@ -1,5 +1,5 @@
 import { describe, test, it, expect, vi } from "vitest";
-import { ReactiveSet, ReactiveWeakSet } from "../src";
+import { ReactiveSet, ReactiveWeakSet } from "../src/index.js";
 import { createComputed, createRoot } from "solid-js";
 
 describe("ReactiveSet", () => {

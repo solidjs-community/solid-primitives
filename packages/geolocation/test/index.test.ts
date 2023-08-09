@@ -1,9 +1,9 @@
 import "./setup";
-import { mockCoordinates } from "./setup";
+import { mockCoordinates } from "./setup.js";
 import { createRoot, createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { createGeolocation, createGeolocationWatcher } from "../src/index";
+import { createGeolocation, createGeolocationWatcher } from "../src/index.js";
 
 describe("createGeolocation", () => {
   it("test basic geolocation", () =>

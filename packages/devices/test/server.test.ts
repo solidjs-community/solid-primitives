@@ -6,7 +6,7 @@ import {
   createGyroscope,
   createMicrophones,
   createSpeakers,
-} from "../src";
+} from "../src/index.js";
 
 describe("API doesn't break in SSR", () => {
   // check if the API doesn't throw when calling it in SSR

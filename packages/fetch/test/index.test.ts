@@ -1,7 +1,7 @@
 import "./setup";
 import { test, expect, describe, vitest } from "vitest";
 import { createRoot, createEffect, createSignal } from "solid-js";
-import { createFetch } from "../src/fetch";
+import { createFetch } from "../src/fetch.js";
 import {
   withAbort,
   withAggregation,
@@ -9,8 +9,8 @@ import {
   withRefetchEvent,
   withRetry,
   withTimeout,
-} from "../src/modifiers";
-import { withCache, withCacheStorage, withRefetchOnExpiry } from "../src/cache";
+} from "../src/modifiers.js";
+import { withCache, withCacheStorage, withRefetchOnExpiry } from "../src/cache.js";
 
 const mockResponseBody = { ready: true };
 const mockResponse = new Response(JSON.stringify(mockResponseBody), {

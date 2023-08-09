@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
 
-import { withAbort } from "../src/modifiers";
+import { withAbort } from "../src/modifiers.js";
 
-import { createFetch } from "../src/fetch";
+import { createFetch } from "../src/fetch.js";
 
 const App: Component = () => {
   const [text] = createFetch("assets/test.txt");

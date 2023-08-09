@@ -1,6 +1,6 @@
 import { describe, test, expect, vi, beforeEach, beforeAll, afterAll } from "vitest";
 import { createRoot, onMount } from "solid-js";
-import { createBreakpoints, sortBreakpoints } from "../src/index";
+import { createBreakpoints, sortBreakpoints } from "../src/index.js";
 
 describe("createBreakpoints", () => {
   const breakpoints = {

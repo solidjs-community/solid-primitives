@@ -1,7 +1,7 @@
-import { setOnline } from "./setup";
+import { setOnline } from "./setup.js";
 import { describe, expect, it } from "vitest";
 import { createRoot } from "solid-js";
-import { makeConnectivityListener, createConnectivitySignal } from "../src";
+import { makeConnectivityListener, createConnectivitySignal } from "../src/index.js";
 
 describe("makeConnectivityListener", () => {
   it("works", () =>

@@ -1,6 +1,6 @@
 import type { Component } from "solid-js";
 
-import { createConnectivitySignal } from "../src";
+import { createConnectivitySignal } from "../src/index.js";
 
 const App: Component = () => {
   const onLine = createConnectivitySignal();

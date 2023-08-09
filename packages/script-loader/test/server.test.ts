@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createScriptLoader } from "../src";
+import { createScriptLoader } from "../src/index.js";
 
 describe("API doesn't break in SSR", () => {
   it("createScriptLoader() - SSR", () => {

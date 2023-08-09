@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { createElementBounds, getElementBounds } from "../src";
+import { createElementBounds, getElementBounds } from "../src/index.js";
 
 class TestResizeObserver {
   constructor() {}

@@ -2,7 +2,7 @@ import { createStaticStore } from "@solid-primitives/static-store";
 import { createRoot } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { createMousePosition, createPositionToElement } from "../src";
+import { createMousePosition, createPositionToElement } from "../src/index.js";
 
 describe("createMousePosition", () => {
   it("returns fallback", () =>

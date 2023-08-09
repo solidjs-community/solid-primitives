@@ -1,7 +1,7 @@
 import { JSX, onCleanup, onMount } from "solid-js";
 import { isServer } from "solid-js/web";
-import { transformFiles } from "./helpers";
-import { FileUploaderDirective } from "./types";
+import { transformFiles } from "./helpers.js";
+import { FileUploaderDirective } from "./types.js";
 
 declare module "solid-js" {
   namespace JSX {
@@ -38,6 +38,6 @@ export const fileUploader = (element: HTMLInputElement, options: () => FileUploa
   });
 };
 
-export { createFileUploader } from "./createFileUploader";
-export { createDropzone } from "./createDropzone";
-export * from "./types";
+export { createFileUploader } from "./createFileUploader.js";
+export { createDropzone } from "./createDropzone.js";
+export * from "./types.js";

@@ -1,4 +1,4 @@
-import { dispatchFakeEvent } from "./setup";
+import { dispatchFakeEvent } from "./setup.js";
 import { describe, test, expect } from "vitest";
 import { createRoot, createSignal, onMount } from "solid-js";
 import {
@@ -8,7 +8,7 @@ import {
   EventListenerDirectiveProps,
   makeEventListener,
   makeEventListenerStack,
-} from "../src";
+} from "../src/index.js";
 
 describe("makeEventListener", () => {
   test("listens to events", () =>

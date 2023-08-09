@@ -3,7 +3,7 @@ import {
   createIntersectionObserver,
   createViewportObserver,
   createVisibilityObserver,
-} from "../src";
+} from "../src/index.js";
 import { describe, test, expect, vi } from "vitest";
 
 describe("API works in SSR", () => {

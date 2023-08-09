@@ -1,5 +1,5 @@
 import { For } from "solid-js";
-import StageBadge from "../Primitives/StageBadge";
+import StageBadge from "../Primitives/StageBadge.js";
 
 const Stage = () => {
   return (

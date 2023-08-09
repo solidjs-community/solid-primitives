@@ -1,4 +1,4 @@
-import { Rerun } from "../../keyed/src";
+import { Rerun } from "../../keyed/src/index.js";
 import { Component, createSignal } from "solid-js";
 import { Transition } from "solid-transition-group";
 

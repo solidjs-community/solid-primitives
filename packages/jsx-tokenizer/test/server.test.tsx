@@ -1,6 +1,6 @@
 import { renderToString } from "solid-js/web";
 import { describe, expect, it } from "vitest";
-import { createTokenizer, createToken, resolveTokens } from "../src";
+import { createTokenizer, createToken, resolveTokens } from "../src/index.js";
 
 describe("jsx-tokenizer", () => {
   const parser1 = createTokenizer<{

@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from "vitest";
-import { createResizeObserver, createElementSize, createWindowSize } from "../src";
+import { createResizeObserver, createElementSize, createWindowSize } from "../src/index.js";
 
 describe("server", () => {
   test("createResizeObserver", () => {

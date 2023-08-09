@@ -22,7 +22,7 @@ import type {
   StorageSignalProps,
   StorageWithOptions,
   StringStorageProps,
-} from "./types";
+} from "./types.js";
 
 /**
  * like createStore, but bound to a localStorage-like API

@@ -1,6 +1,6 @@
 import { Component, For, createSignal } from "solid-js";
 
-import { ReactiveMap } from "../src";
+import { ReactiveMap } from "../src/index.js";
 
 import { onCleanup } from "solid-js";
 import { createEffect } from "solid-js";

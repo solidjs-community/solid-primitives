@@ -1,5 +1,5 @@
 import { Accessor, JSX, createMemo, createRoot, onCleanup, untrack } from "solid-js";
-import { toFunction } from "./common";
+import { toFunction } from "./common.js";
 
 /**
  * Reactively maps a number range of specified length with a callback function - underlying helper for the `<Repeat>` control flow.

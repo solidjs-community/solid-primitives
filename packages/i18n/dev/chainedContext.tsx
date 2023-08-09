@@ -1,7 +1,7 @@
 import { Component, createSignal } from "solid-js";
 
-import { createChainedI18nContext } from "../src/index";
-import { dict } from "../test/setup";
+import { createChainedI18nContext } from "../src/index.js";
+import { dict } from "../test/setup.js";
 
 const [I18nProvider, useI18nContext] = createChainedI18nContext({
   dictionaries: dict,

@@ -1,6 +1,6 @@
 import { createSignal, ParentComponent } from "solid-js";
-import SlideModal from "../Modal/SlideModal";
-import Stage from "../Stage/Stage";
+import SlideModal from "../Modal/SlideModal.js";
+import Stage from "../Stage/Stage.js";
 
 const bgLevel0 = "bg-[#FA233E]";
 const bgLevel1 = "bg-[#FFA15C]";

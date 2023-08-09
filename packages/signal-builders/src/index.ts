@@ -1,16 +1,16 @@
 // CONVERT
-export * from "./convert";
+export * from "./convert.js";
 
 // STRING
 
-export * from "./string";
+export * from "./string.js";
 
 // NUMBER
-export * from "./number";
+export * from "./number.js";
 
 // ARRAY
-export * from "./array";
+export * from "./array.js";
 
 // OBJECT
-export * from "./object";
-export * from "./update";
+export * from "./object.js";
+export * from "./update.js";

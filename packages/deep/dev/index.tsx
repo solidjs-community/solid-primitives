@@ -1,6 +1,6 @@
 import { For, createMemo } from "solid-js";
 import { createStore, produce } from "solid-js/store";
-import { captureStoreUpdates } from "../src";
+import { captureStoreUpdates } from "../src/index.js";
 
 type TodoItem = { title: string; done: boolean };
 

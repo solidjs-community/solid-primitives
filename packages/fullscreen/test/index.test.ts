@@ -1,5 +1,5 @@
 import { createRoot, createEffect, createSignal } from "solid-js";
-import { createFullscreen } from "../src";
+import { createFullscreen } from "../src/index.js";
 import { describe, it, expect } from "vitest";
 import "./setup.ts";
 

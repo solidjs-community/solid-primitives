@@ -1,6 +1,6 @@
 import { describe, it, test, expect } from "vitest";
 import { createRoot, createSignal } from "solid-js";
-import { createPointerListeners } from "../src";
+import { createPointerListeners } from "../src/index.js";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 

@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { batch, createEffect, createRoot, createSignal } from "solid-js";
-import { captureStoreUpdates, trackDeep, trackStore } from "../src";
+import { captureStoreUpdates, trackDeep, trackStore } from "../src/index.js";
 import { createStore, reconcile, unwrap } from "solid-js/store";
 
 const fns = {

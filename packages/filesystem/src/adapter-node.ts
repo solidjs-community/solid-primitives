@@ -1,4 +1,4 @@
-import { limitPath } from "./tools";
+import { limitPath } from "./tools.js";
 import { isServer } from "solid-js/web";
 
 export const makeNodeFileSystem = isServer

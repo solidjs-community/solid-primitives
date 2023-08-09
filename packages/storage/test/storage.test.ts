@@ -1,7 +1,7 @@
 import { createRoot } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { createAsyncStorage, createStorage, createStorageSignal } from "../src/storage";
+import { createAsyncStorage, createStorage, createStorageSignal } from "../src/storage.js";
 
 describe("createStorage", () => {
   let data: Record<string, string> = {};

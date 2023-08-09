@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
-import { debounce, leading, leadingAndTrailing, scheduleIdle, throttle } from "../src";
+import { debounce, leading, leadingAndTrailing, scheduleIdle, throttle } from "../src/index.js";
 
 describe("on server", () => {
   const DATA: [string, (cb: (a: any) => void, time: number) => (a: any) => void][] = [

@@ -1,6 +1,6 @@
 import { createComputed, createRoot, createSignal } from "solid-js";
 import { describe, test, expect } from "vitest";
-import { createTriggerCache } from "../src";
+import { createTriggerCache } from "../src/index.js";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 

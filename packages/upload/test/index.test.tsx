@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { createFileUploader } from "../src";
+import { createFileUploader } from "../src/index.js";
 
 describe("createFileUploader", () => {
   it("file upload", () => {

@@ -1,4 +1,4 @@
-import { gql, makeMultipartBody } from "../src";
+import { gql, makeMultipartBody } from "../src/index.js";
 import { describe, test, expect } from "vitest";
 
 describe("gql", () => {

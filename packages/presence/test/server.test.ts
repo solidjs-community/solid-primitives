@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createPresence } from "../src";
+import { createPresence } from "../src/index.js";
 import { createSignal } from "solid-js";
 
 describe("on server", () => {

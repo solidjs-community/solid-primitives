@@ -1,5 +1,5 @@
 import { Component, createSignal, untrack } from "solid-js";
-import { makePersisted } from "../src";
+import { makePersisted } from "../src/index.js";
 
 const App: Component = () => {
   const [value, setValue] = makePersisted(createSignal("initial value"), { name: "value" });

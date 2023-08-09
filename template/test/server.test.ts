@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createPrimitiveTemplate } from "../src";
+import { createPrimitiveTemplate } from "../src/index.js";
 
 describe("createPrimitiveTemplate", () => {
   test("doesn't break in SSR", () => {

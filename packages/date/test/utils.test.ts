@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getDate, getTime } from "../src";
+import { getDate, getTime } from "../src/index.js";
 
 describe("getDate", () => {
   it("transforms init values to a date", () => {

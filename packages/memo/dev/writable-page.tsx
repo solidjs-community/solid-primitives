@@ -1,5 +1,5 @@
 import { batch, createEffect, createSignal } from "solid-js";
-import { createWritableMemo } from "../src";
+import { createWritableMemo } from "../src/index.js";
 
 export default function Cache() {
   const [source, setSource] = createSignal(1);

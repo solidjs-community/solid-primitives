@@ -14,13 +14,13 @@ import { defer } from "@solid-primitives/utils";
 import Dismiss from "solid-dismiss";
 import { A, useLocation } from "solid-start";
 import { pageWidthClass } from "~/constants";
-import Hamburger from "../Icons/Hamburger";
-import SearchBtn from "../Search/SearchBtn";
-import NavMenu from "./NavMenu";
-import ThemeBtn from "./ThemeBtn";
+import Hamburger from "../Icons/Hamburger.js";
+import SearchBtn from "../Search/SearchBtn.js";
+import NavMenu from "./NavMenu.js";
+import ThemeBtn from "./ThemeBtn.js";
 import clsx from "clsx";
 import { createTween } from "@solid-primitives/tween";
-import SearchModal from "../Search/SearchModal";
+import SearchModal from "../Search/SearchModal.js";
 
 export const [isScrollEnabled, setScrollEnabled] = createSignal(false);
 

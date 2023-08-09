@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createRoot, createSignal } from "solid-js";
-import { createAsyncMemo } from "../src";
+import { createAsyncMemo } from "../src/index.js";
 
 describe("createAsyncMemo", () => {
   test("resolves synchronous functions", () =>

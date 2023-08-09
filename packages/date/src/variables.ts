@@ -1,4 +1,4 @@
-import { RelativeFormatMessages, Unit } from "./types";
+import { RelativeFormatMessages, Unit } from "./types.js";
 
 /** one second in ms */
 export const SECOND = 1000,

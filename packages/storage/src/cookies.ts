@@ -1,7 +1,7 @@
 import { isServer } from "solid-js/web";
-import { StorageProps, StorageWithOptions, StorageSignalProps } from "./types";
-import { addClearMethod } from "./tools";
-import { createStorage, createStorageSignal } from "./storage";
+import { StorageProps, StorageWithOptions, StorageSignalProps } from "./types.js";
+import { addClearMethod } from "./tools.js";
+import { createStorage, createStorageSignal } from "./storage.js";
 import type { PageEvent } from "solid-start";
 
 export type CookieOptions = {

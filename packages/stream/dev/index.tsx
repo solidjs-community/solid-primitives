@@ -6,7 +6,7 @@ import {
   createAmplitudeStream,
   createMediaPermissionRequest,
   createScreen,
-} from "../src";
+} from "../src/index.js";
 
 declare module "solid-js" {
   namespace JSX {

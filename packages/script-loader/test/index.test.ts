@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { createRoot, createSignal } from "solid-js";
 import { afterAll, describe, expect, it } from "vitest";
-import { createScriptLoader } from "../src";
+import { createScriptLoader } from "../src/index.js";
 import { JSDOM } from "jsdom";
 
 const dom = new JSDOM("<!doctype html><title>.</title>", {

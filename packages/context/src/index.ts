@@ -1,5 +1,5 @@
 import { createContext, createComponent, useContext, JSX, Context, FlowComponent } from "solid-js";
-import type { ContextProviderComponent } from "solid-js/types/reactive/signal";
+import type { ContextProviderComponent } from "../node_modules/solid-js/types/reactive/signal.js";
 
 export type ContextProviderProps = {
   children?: JSX.Element;

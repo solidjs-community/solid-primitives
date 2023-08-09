@@ -1,3 +1,3 @@
-export * from "./calculate-bundlesize";
-export * from "./get-modules-data";
-export * from "./utils";
+export * from "./calculate-bundlesize.js";
+export * from "./get-modules-data.js";
+export * from "./utils.js";

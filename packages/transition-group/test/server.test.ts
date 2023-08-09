@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createSwitchTransition, createListTransition } from "../src";
+import { createSwitchTransition, createListTransition } from "../src/index.js";
 
 const el1 = { t: "<div>1</div>" };
 const el2 = { t: "<div>2</div>" };

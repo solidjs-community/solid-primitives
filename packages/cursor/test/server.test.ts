@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createBodyCursor, createElementCursor } from "../src";
+import { createBodyCursor, createElementCursor } from "../src/index.js";
 
 describe("createBodyCursor", () => {
   it("works in ssr", () => {

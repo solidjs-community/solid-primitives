@@ -1,5 +1,5 @@
 import { Component, For, Show, createSignal } from "solid-js";
-import { createPresence } from "../src";
+import { createPresence } from "../src/index.js";
 
 const App: Component = () => {
   return (

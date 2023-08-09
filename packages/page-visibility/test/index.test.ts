@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createRoot } from "solid-js";
-import { createPageVisibility } from "../src";
+import { createPageVisibility } from "../src/index.js";
 
 describe("createPageVisibility", () => {
   it("observes visibilitychange events", () =>

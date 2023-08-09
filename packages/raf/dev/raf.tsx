@@ -1,6 +1,6 @@
 import { createSignal, Show } from "solid-js";
 
-import createRAF, { targetFPS } from "../src";
+import createRAF, { targetFPS } from "../src/index.js";
 
 const targetRuns = 500;
 

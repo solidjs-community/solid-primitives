@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { createReducer } from "../src";
+import { createReducer } from "../src/index.js";
 
 describe("createReducer", () => {
   test("reducer works", () =>

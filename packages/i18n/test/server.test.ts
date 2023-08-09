@@ -4,8 +4,8 @@ import {
   createChainedI18nContext,
   createChainedI18nDictionary,
   createI18nContext,
-} from "../src/index";
-import { dict } from "./setup";
+} from "../src/index.js";
+import { dict } from "./setup.js";
 
 describe("createI18nContext", () => {
   it("test locale switching", async () => {

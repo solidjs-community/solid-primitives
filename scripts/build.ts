@@ -28,7 +28,6 @@ The exports configuration is taken from the solid-js package.json.
 // const jsxEntry = process.argv.includes("--jsx");
 const nodePlatform = process.argv.includes("--node");
 const writeExports = process.argv.includes("--write") || process.argv.includes("-w");
-const printExports = !writeExports;
 const cwd = process.cwd();
 
 export const CI =

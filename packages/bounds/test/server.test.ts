@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createElementBounds } from "../src";
+import { createElementBounds } from "../src/index.js";
 
 describe("createElementBounds", () => {
   it("is a noop on the server", () => {

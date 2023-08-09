@@ -1,4 +1,4 @@
-import { WSMessage } from "../src";
+import { WSMessage } from "../src/index.js";
 /**
  * Connection state of the WebSocket:
  * - 0 Connecting

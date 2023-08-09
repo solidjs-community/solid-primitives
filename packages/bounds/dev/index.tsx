@@ -2,7 +2,7 @@ import { Component, createSignal, Setter } from "solid-js";
 
 import { throttle } from "@solid-primitives/scheduled";
 
-import { createElementBounds, UpdateGuard } from "../src";
+import { createElementBounds, UpdateGuard } from "../src/index.js";
 
 const NumberInput: Component<{ value: number; setValue: Setter<number>; name: string }> = props => {
   return (

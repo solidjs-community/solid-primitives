@@ -2,7 +2,7 @@ import { createEventListener } from "@solid-primitives/event-listener";
 import { createPolled } from "@solid-primitives/timer";
 import { Component, createSelector, Index, untrack } from "solid-js";
 import { createStore } from "solid-js/store";
-import { debounce, leading, leadingAndTrailing, throttle } from "../src";
+import { debounce, leading, leadingAndTrailing, throttle } from "../src/index.js";
 
 type TimelinesKeys = "source" | `${"l" | "lt" | ""}${"deb" | "thr"}`;
 const LENGTH = 30;

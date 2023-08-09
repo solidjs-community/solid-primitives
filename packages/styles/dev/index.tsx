@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 
-import { createRemSize } from "../src";
+import { createRemSize } from "../src/index.js";
 
 const App: Component = () => {
   const remSize = createRemSize();

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { render } from "@solidjs/testing-library";
 
-import { createInputMask, createMaskPattern } from "../src/index";
+import { createInputMask, createMaskPattern } from "../src/index.js";
 
 const dispatchInputEvent = (node: HTMLElement) =>
   new Promise<void>(resolve => {

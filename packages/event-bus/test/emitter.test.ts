@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from "vitest";
 import { createRoot } from "solid-js";
-import { createEmitter, createGlobalEmitter } from "../src";
+import { createEmitter, createGlobalEmitter } from "../src/index.js";
 
 describe("createEmitter", () => {
   test("listening and emiting", () =>

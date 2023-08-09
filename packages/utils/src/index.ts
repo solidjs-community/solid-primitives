@@ -21,9 +21,9 @@ import type {
   Noop,
   AnyObject,
   AnyFunction,
-} from "./types";
+} from "./types.js";
 
-export * from "./types";
+export * from "./types.js";
 
 //
 // GENERAL HELPERS:

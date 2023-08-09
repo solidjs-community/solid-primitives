@@ -1,7 +1,7 @@
 import "./setup";
 import { createRoot, createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
-import { makeAudio, makeAudioPlayer, createAudio } from "../src/index";
+import { makeAudio, makeAudioPlayer, createAudio } from "../src/index.js";
 
 const testPath =
   "https://github.com/solidjs-community/solid-primitives/blob/audio/packages/audio/dev/sample1.mp3?raw=true";

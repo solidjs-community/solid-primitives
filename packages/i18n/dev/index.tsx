@@ -1,5 +1,5 @@
-import { ChainedContextApp } from "./chainedContext";
-import { NoContextI18nApp } from "./createChained";
+import { ChainedContextApp } from "./chainedContext.js";
+import { NoContextI18nApp } from "./createChained.js";
 
 const App = () => {
   return (

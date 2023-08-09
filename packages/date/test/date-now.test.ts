@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { createDateNow } from "../src";
+import { createDateNow } from "../src/index.js";
 
 describe("createDateNow", () => {
   it("returns an signal an update function", () => {

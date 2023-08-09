@@ -1,6 +1,6 @@
 import { describe, it, test, expect, vi } from "vitest";
 import { createEffect, createRoot, createSignal, untrack } from "solid-js";
-import { createListTransition, OnListChange } from "../src";
+import { createListTransition, OnListChange } from "../src/index.js";
 
 type OnChangeParams = Parameters<OnListChange<Element>>[0];
 

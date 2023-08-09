@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createRoot, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
-import { createResizeObserver, getElementSize, getWindowSize } from "../src";
+import { createResizeObserver, getElementSize, getWindowSize } from "../src/index.js";
 
 const div1 = document.createElement("div");
 const div2 = document.createElement("div");

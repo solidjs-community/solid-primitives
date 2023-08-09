@@ -1,5 +1,5 @@
 import { Component, For, Show, createSignal } from "solid-js";
-import { createAudio, AudioState } from "../src";
+import { createAudio, AudioState } from "../src/index.js";
 
 import { Icon } from "solid-heroicons";
 import { play, pause } from "solid-heroicons/solid";

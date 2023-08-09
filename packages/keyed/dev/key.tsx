@@ -1,7 +1,7 @@
 import { Refs } from "@solid-primitives/refs";
 import { splice, update } from "@solid-primitives/utils/immutable";
 import { createSignal } from "solid-js";
-import { Key } from "../src";
+import { Key } from "../src/index.js";
 import { TransitionGroup } from "solid-transition-group";
 
 const foods = [

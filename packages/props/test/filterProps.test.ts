@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createComputed, createRoot, createSignal, mergeProps } from "solid-js";
-import { filterProps, createPropsPredicate } from "../src";
+import { filterProps, createPropsPredicate } from "../src/index.js";
 
 describe("filterProps", () => {
   test("filters props", () => {

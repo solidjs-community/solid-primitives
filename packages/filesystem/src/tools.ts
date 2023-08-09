@@ -1,5 +1,5 @@
 import { createEffect, createRoot } from "solid-js";
-import type { AsyncFileSystem, SyncFileSystem, FileSystemAdapter, DirEntries } from "./types";
+import type { AsyncFileSystem, SyncFileSystem, FileSystemAdapter, DirEntries } from "./types.js";
 
 export const getParentDir = (path: string) => path.split("/").slice(0, -1).join("/") || "/";
 

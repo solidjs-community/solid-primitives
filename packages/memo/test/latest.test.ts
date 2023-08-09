@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { batch, createRoot, createSignal } from "solid-js";
-import { createLatest, createLatestMany } from "../src";
+import { createLatest, createLatestMany } from "../src/index.js";
 
 describe("createLatest", () => {
   test("should return the latest value", () => {

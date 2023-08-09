@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import path from "path";
 import { copy, readFile, writeFile, pathExists } from "fs-extra";
-import { checkValidPackageName } from "./utils";
+import { checkValidPackageName } from "./utils/index.js";
 
 const name = process.argv.pop();
 

@@ -1,7 +1,7 @@
 import { Component, createSignal, Show, For, Suspense } from "solid-js";
 
-import { gql, createGraphQLClient, request, multipartRequest } from "../src";
-import { CountryQueryDocument } from "./gqlgen";
+import { gql, createGraphQLClient, request, multipartRequest } from "../src/index.js";
+import { CountryQueryDocument } from "./gqlgen.js";
 
 // This query will be used by `graphql-code-generator` to generate `CountryQueryDocument`.
 // Normally it would be defined inside it's own file, but this is just

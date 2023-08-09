@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createRoot, createSignal } from "solid-js";
-import { createMemoCache } from "../src";
+import { createMemoCache } from "../src/index.js";
 
 describe("createMemoCache", () => {
   test("cashes values by key", () =>

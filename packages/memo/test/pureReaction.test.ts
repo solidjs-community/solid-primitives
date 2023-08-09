@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createPureReaction } from "../src";
+import { createPureReaction } from "../src/index.js";
 import { createEffect, createMemo, createRoot, createSignal } from "solid-js";
 
 describe("createPureReaction", () => {

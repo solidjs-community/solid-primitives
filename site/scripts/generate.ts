@@ -6,21 +6,21 @@ import rehypeHighlight from "rehype-highlight";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeSlug from "rehype-slug";
 import rehypeStringify from "rehype-stringify";
+import remarkEmoji from "remark-emoji";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
-import remarkEmoji from "remark-emoji";
 import { unified } from "unified";
 import { fileURLToPath } from "url";
 import {
-  formatBytes,
-  getPackageBundlesize,
-  getModulesData,
   ModuleData,
+  formatBytes,
+  getModulesData,
+  getPackageBundlesize,
   isNonNullable,
-} from "../../scripts/utils";
-import { PackageData, PackageListItem } from "../src/types";
-import { GITHUB_REPO } from "../src/constants";
+} from "../../scripts/utils/index.js";
+import { GITHUB_REPO } from "../src/constants.js";
+import { PackageData, PackageListItem } from "../src/types.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -1,5 +1,5 @@
 import { createResource, createSignal, Show, Suspense } from "solid-js";
-import { createLazyMemo } from "../src";
+import { createLazyMemo } from "../src/index.js";
 
 export default function App() {
   const [data] = createResource(

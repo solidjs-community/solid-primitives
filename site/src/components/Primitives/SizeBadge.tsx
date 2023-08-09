@@ -1,6 +1,6 @@
 import { Component, ComponentProps, createSignal, ParentComponent } from "solid-js";
-import SlideModal from "../Modal/SlideModal";
-import BundleSizeModal from "../BundleSizeModal/BundleSizeModal";
+import SlideModal from "../Modal/SlideModal.js";
+import BundleSizeModal from "../BundleSizeModal/BundleSizeModal.js";
 import { FormattedBytes } from "~/types";
 
 const getBundleJSHref = ({

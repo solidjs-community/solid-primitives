@@ -1,4 +1,4 @@
-import { createContextProvider, MultiProvider } from "../src";
+import { createContextProvider, MultiProvider } from "../src/index.js";
 import {
   Component,
   createContext,

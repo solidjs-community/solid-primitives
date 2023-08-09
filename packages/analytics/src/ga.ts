@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { TrackHandler, EventType } from "./index";
+import { TrackHandler, EventType } from "./index.js";
 
 type GoogleAnalyticsOptions = {
   trackingId: string;

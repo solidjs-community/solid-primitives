@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createComputed, createRoot } from "solid-js";
-import { createEventStack } from "../src";
+import { createEventStack } from "../src/index.js";
 
 describe("createEventStack", () => {
   test("emitting and listening", () =>

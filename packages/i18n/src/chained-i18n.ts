@@ -1,7 +1,7 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { Accessor, createSignal, FlowComponent, Setter, DEV } from "solid-js";
 import { isServer } from "solid-js/web";
-import { deepReadObject } from "./i18n";
+import { deepReadObject } from "./i18n.js";
 
 export type I18nFormatOptions = Record<string, string | number>;
 

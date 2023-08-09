@@ -1,5 +1,5 @@
 import { createSignal } from "solid-js";
-import { createMemoCache } from "../src";
+import { createMemoCache } from "../src/index.js";
 
 export default function Cache() {
   const [number, setNumber] = createSignal(1);

@@ -1,4 +1,4 @@
-export { createFetch, type FetchReturn, type FetchOptions, type RequestContext } from "./fetch";
+export { createFetch, type FetchReturn, type FetchOptions, type RequestContext } from "./fetch.js";
 export {
   withAbort,
   withCatchAll,
@@ -7,6 +7,6 @@ export {
   withRefetchEvent,
   wrapFetcher,
   wrapResource,
-} from "./modifiers";
-export { withCache, withRefetchOnExpiry, withCacheStorage, serializeRequest } from "./cache";
-export { fetchRequest } from "./request";
+} from "./modifiers.js";
+export { withCache, withRefetchOnExpiry, withCacheStorage, serializeRequest } from "./cache.js";
+export { fetchRequest } from "./request.js";

@@ -1,5 +1,5 @@
 import { createMemo } from "solid-js";
-import { propTraps } from "./propTraps";
+import { propTraps } from "./propTraps.js";
 
 /**
  * An alternative primitive to Solid's [splitProps](https://www.solidjs.com/docs/latest/api#splitprops) allowing you to create a new props object with only the property names that match the predicate.

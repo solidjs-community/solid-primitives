@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, test } from "vitest";
 import { createEffect, createRoot, createSignal, untrack } from "solid-js";
-import { createSwitchTransition } from "../src";
+import { createSwitchTransition } from "../src/index.js";
 
 describe("createSwitchTransition", () => {
   const el1 = document.createElement("div");

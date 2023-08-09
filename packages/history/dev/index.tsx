@@ -1,7 +1,7 @@
 import { For } from "solid-js";
 import { createStore, produce, reconcile, unwrap } from "solid-js/store";
 import { captureStoreUpdates } from "@solid-primitives/deep";
-import { createUndoHistory } from "../src";
+import { createUndoHistory } from "../src/index.js";
 
 type TodoItem = { title: string; done: boolean; id: number };
 

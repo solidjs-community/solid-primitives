@@ -1,7 +1,7 @@
 import Dismiss from "solid-dismiss";
 import { FiX } from "solid-icons/fi";
 import { Accessor, onMount, ParentComponent } from "solid-js";
-import * as Header from "../Header/Header";
+import * as Header from "../Header/Header.js";
 import * as Table from "~/components/table";
 import { NoHydration } from "solid-js/web";
 

@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createComputed, createRoot, createSignal } from "solid-js";
-import { destructure } from "../src";
+import { destructure } from "../src/index.js";
 
 describe("destructure", () => {
   test("spread array", () =>

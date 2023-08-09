@@ -1,4 +1,4 @@
-import { createFluxStore } from "../../src/index";
+import { createFluxStore } from "../../src/index.js";
 
 export type CounterState = {
   id?: string;

@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { createPrimitiveTemplate } from "../src";
+import { createPrimitiveTemplate } from "../src/index.js";
 
 describe("createPrimitiveTemplate", () => {
   test("createPrimitiveTemplate return values", () =>

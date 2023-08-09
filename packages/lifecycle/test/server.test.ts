@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createRoot } from "solid-js";
-import { createIsMounted, isHydrated } from "../src";
+import { createIsMounted, isHydrated } from "../src/index.js";
 import { renderToString } from "solid-js/web";
 
 describe("createIsMounted", () => {

@@ -1,6 +1,6 @@
 import { Component, Switch, Match } from "solid-js";
 
-import { createIdleTimer } from "../src";
+import { createIdleTimer } from "../src/index.js";
 
 const divStyle = {
   background: "black",

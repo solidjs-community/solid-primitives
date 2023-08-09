@@ -1,4 +1,4 @@
-import { EventTypeName, IdleTimerOptions, IdleTimerReturn } from "./types";
+import { EventTypeName, IdleTimerOptions, IdleTimerReturn } from "./types.js";
 import { batch, createSignal, onMount, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 

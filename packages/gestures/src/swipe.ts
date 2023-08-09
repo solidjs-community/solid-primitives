@@ -1,4 +1,4 @@
-import { registerPointerListener, DEFAULT_DELAY, DEFAULT_MIN_SWIPE_DISTANCE } from "./core";
+import { registerPointerListener, DEFAULT_DELAY, DEFAULT_MIN_SWIPE_DISTANCE } from "./core.js";
 
 type Props = {
   callback: (direction: "top" | "right" | "bottom" | "left") => any;
