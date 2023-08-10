@@ -28,9 +28,6 @@ export const makeTimer = (
   if (isServer) {
     return () => void 0;
   }
-
-  ("TEST TEST TEST TEST");
-
   const intervalId = timer(fn, delay);
   const clear = () => clearInterval(intervalId);
   return onCleanup(clear);
