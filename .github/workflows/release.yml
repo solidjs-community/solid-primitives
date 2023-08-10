@@ -27,9 +27,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules/.cache/turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          key: turbo-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-turbo-
+            turbo-
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
