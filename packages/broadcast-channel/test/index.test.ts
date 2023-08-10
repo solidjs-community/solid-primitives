@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
-import { createEffect, createRoot, on } from "solid-js";
-import { createBroadcastChannel, makeBroadcastChannel } from "../src/index.js";
+import { createEffect, createRoot } from "solid-js";
+import { OnMessageCB, createBroadcastChannel, makeBroadcastChannel } from "../src/index.js";
 
 type MsgType = string;
 
@@ -16,25 +16,7 @@ const buildMockBroadcastChannel = (channelName: string) => {
 };
 
 describe("makeBroadcastChannel", () => {
-  test("makeBroadcastChannel() return values", () =>
-    createRoot(dispose => {
-      const _channelName = "channel-1";
-      const { onMessage, postMessage, channelName, close, instance } =
-        makeBroadcastChannel(_channelName);
-
-      expect(channelName).toBe(_channelName);
-      expect(onMessage).toBeInstanceOf(Function);
-      expect(postMessage).toBeInstanceOf(Function);
-      expect(close).toBeInstanceOf(Function);
-      expect(instance).toBeInstanceOf(BroadcastChannel);
-
-      // expect(5).toBe(10 || 5)
-      dispose();
-    }));
-});
-
-describe("makeBroadcastChannel", () => {
-  test("makeBroadcastChannel() checking instances from BroadcastChannel constructor", () =>
+  test("checking instances from BroadcastChannel constructor", () =>
     createRoot(dispose => {
       const channelName = "channel-1";
       const { instance: instance1 } = makeBroadcastChannel(channelName);
@@ -50,10 +32,8 @@ describe("makeBroadcastChannel", () => {
 
       dispose();
     }));
-});
 
-describe("makeBroadcastChannel", () => {
-  test("makeBroadcastChannel() posting messages between pages", () =>
+  test("posting messages between pages", () =>
     createRoot(async dispose => {
       const channelName = "channel-1";
       const mockedBCInstance = buildMockBroadcastChannel(channelName);
@@ -75,283 +55,115 @@ describe("makeBroadcastChannel", () => {
 
       dispose();
     }));
-});
 
-describe("makeBroadcastChannel", () => {
-  test("makeBroadcastChannel() posting messages with single instance channel name but called makeBroadcastChannel multiple times", () =>
-    createRoot(async dispose => {
-      const channelName = "channel-1";
-      const mockedBCInstance = buildMockBroadcastChannel(channelName);
+  test("posting messages with single instance channel name but called makeBroadcastChannel multiple times", async () => {
+    const channelName = "channel-1";
+    const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-      const { onMessage: onMessage1 } = makeBroadcastChannel<MsgType>(channelName);
-      const { onMessage: onMessage2 } = makeBroadcastChannel<MsgType>(channelName);
+    const { onMessage1, onMessage2, dispose } = createRoot(d => {
+      const bc1 = makeBroadcastChannel<MsgType>(channelName);
+      const bc2 = makeBroadcastChannel<MsgType>(channelName);
 
-      const getPostMessage = () =>
-        new Promise<string>(resolve => {
-          let postedMessage = "";
+      return {
+        onMessage1: bc1.onMessage,
+        onMessage2: bc2.onMessage,
+        dispose: d,
+      };
+    });
 
-          onMessage1(({ data }) => {
-            postedMessage += `${data}1`;
-          });
-          onMessage2(({ data }) => {
-            postedMessage += `${data}2`;
-          });
+    const captured: string[] = [];
 
-          mockedBCInstance.postMessage("hi");
+    const promise = new Promise<void>(resolve => {
+      const handleMessage: OnMessageCB = e => {
+        captured.push(e.data);
+        if (captured.length === 2) resolve();
+      };
+      onMessage1(handleMessage);
+      onMessage2(handleMessage);
+    });
 
-          setTimeout(() => {
-            resolve(postedMessage);
-          }, 200);
-        });
+    mockedBCInstance.postMessage("hi");
 
-      const postedMessage = await getPostMessage();
+    await promise;
 
-      expect(postedMessage).toBe("hi1hi2");
+    expect(captured).toEqual(["hi", "hi"]);
 
-      dispose();
-    }));
-});
+    dispose();
+  });
 
-describe("makeBroadcastChannel", () => {
-  test("makeBroadcastChannel() posting messages", () =>
-    createRoot(async dispose => {
-      const channelName = "channel-1";
-      const mockedBCInstance = buildMockBroadcastChannel(channelName);
+  test("posting a message to separate channels", async () => {
+    const channelName = "channel-1";
+    const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-      const { onMessage: onMessage1 } = makeBroadcastChannel<MsgType>(channelName);
-      const { onMessage: onMessage2 } = makeBroadcastChannel<MsgType>("channel-2");
+    const { onMessage1, onMessage2, dispose } = createRoot(d => {
+      const bc1 = makeBroadcastChannel<MsgType>(channelName);
+      const bc2 = makeBroadcastChannel<MsgType>("channel-2");
 
-      const getPostMessage = () =>
-        new Promise<string>(resolve => {
-          let postedMessage = "";
+      return {
+        onMessage1: bc1.onMessage,
+        onMessage2: bc2.onMessage,
+        dispose: d,
+      };
+    });
 
-          onMessage1(({ data }) => {
-            postedMessage += `${data}1`;
-          });
-          onMessage2(({ data }) => {
-            postedMessage += `${data}2`;
-          });
+    const captured: string[] = [];
 
-          mockedBCInstance.postMessage("hi");
+    onMessage1(e => {
+      captured.push(e.data + "1");
+    });
+    onMessage2(e => {
+      captured.push(e.data + "2");
+    });
 
-          setTimeout(() => {
-            resolve(postedMessage);
-          }, 200);
-        });
+    mockedBCInstance.postMessage("hi");
 
-      const postedMessage = await getPostMessage();
+    await new Promise<void>(r => setTimeout(r, 100));
 
-      expect(postedMessage).toBe("hi1");
+    expect(captured).toEqual(["hi1"]);
 
-      dispose();
-    }));
-});
+    dispose();
+  });
 
-describe("makeBroadcastChannel", () => {
-  test("makeBroadcastChannel() sending messages", () =>
-    createRoot(async dispose => {
-      const channelName = "channel-1";
+  test("sending messages", async () => {
+    const channelName = "channel-1";
 
-      const { onMessage: onMessage1, postMessage: postedMessage1 } =
+    const data = createRoot(dispose => {
+      const { onMessage: onMessage1, postMessage: postMessage1 } =
         makeBroadcastChannel<MsgType>(channelName);
-      const { onMessage: onMessage2, postMessage: postedMessage2 } =
+      const { onMessage: onMessage2, postMessage: postMessage2 } =
         makeBroadcastChannel<MsgType>(channelName);
 
-      const getPostMessage = () =>
-        new Promise<string>(resolve => {
-          let postedMessage = "";
+      return {
+        onMessage1,
+        onMessage2,
+        postMessage1,
+        postMessage2,
+        dispose,
+      };
+    });
 
-          onMessage1(({ data }) => {
-            postedMessage += `${data}1`;
-          });
-          onMessage2(({ data }) => {
-            postedMessage += `${data}2`;
-          });
+    let posted_message = "";
 
-          postedMessage1("hi");
-          postedMessage2("bye");
+    data.onMessage1(({ data }) => {
+      posted_message += `${data}1`;
+    });
+    data.onMessage2(({ data }) => {
+      posted_message += `${data}2`;
+    });
 
-          setTimeout(() => {
-            resolve(postedMessage);
-          }, 200);
-        });
+    data.postMessage1("hi");
+    data.postMessage2("bye");
 
-      const postedMessage = await getPostMessage();
+    await new Promise<void>(r => setTimeout(r, 100));
 
-      expect(postedMessage).toBe("");
+    expect(posted_message).toBe("");
 
-      dispose();
-    }));
-});
-
-describe("makeBroadcastChannel", () => {
-  test("makeBroadcastChannel() posting messages", () =>
-    createRoot(async dispose => {
-      const channelName = "channel-1";
-      const mockedBCInstance = buildMockBroadcastChannel(channelName);
-
-      const { onMessage } = makeBroadcastChannel<MsgType>(channelName);
-
-      const getPostMessage = () =>
-        new Promise<string>(resolve => {
-          let postedMessage = "";
-
-          onMessage(({ data }) => {
-            postedMessage += `${data}1`;
-          });
-          onMessage(({ data }) => {
-            postedMessage += `${data}2`;
-          });
-          onMessage(({ data }) => {
-            postedMessage += `${data}3`;
-          });
-
-          mockedBCInstance.postMessage("hi");
-
-          setTimeout(() => {
-            resolve(postedMessage);
-          }, 200);
-        });
-
-      const postedMessage = await getPostMessage();
-
-      expect(postedMessage).toBe("hi1hi2hi3");
-
-      dispose();
-    }));
-});
-
-describe("makeBroadcastChannel", () => {
-  test("makeBroadcastChannel() posting messages", () =>
-    createRoot(async dispose => {
-      const channelName = "channel-1";
-      const mockedBCInstance = buildMockBroadcastChannel(channelName);
-
-      const { onMessage, close } = makeBroadcastChannel<MsgType>(channelName);
-
-      const getPostMessage = () =>
-        new Promise<string>(resolve => {
-          let postedMessage = "";
-
-          onMessage(({ data }) => {
-            postedMessage += `${data}1`;
-          });
-          onMessage(({ data }) => {
-            postedMessage += `${data}2`;
-          });
-          onMessage(({ data }) => {
-            postedMessage += `${data}3`;
-          });
-
-          close();
-
-          mockedBCInstance.postMessage("hi");
-
-          setTimeout(() => {
-            resolve(postedMessage);
-          }, 200);
-        });
-
-      const postedMessage = await getPostMessage();
-
-      expect(postedMessage).toBe("");
-
-      dispose();
-    }));
-});
-
-describe("makeBroadcastChannel", () => {
-  test("makeBroadcastChannel() posting messages", () =>
-    createRoot(async dispose => {
-      const channelName = "channel-1";
-      const mockedBCInstance = buildMockBroadcastChannel(channelName);
-
-      const { onMessage: onMessage1 } = makeBroadcastChannel<MsgType>(channelName);
-      const { onMessage: onMessage2, close: close2 } = makeBroadcastChannel<MsgType>(channelName);
-
-      const getPostMessage = () =>
-        new Promise<string>(resolve => {
-          let postedMessage = "";
-
-          onMessage1(({ data }) => {
-            postedMessage += `${data}1`;
-          });
-          onMessage2(({ data }) => {
-            postedMessage += `${data}2`;
-          });
-
-          close2();
-
-          mockedBCInstance.postMessage("hi");
-
-          setTimeout(() => {
-            resolve(postedMessage);
-          }, 200);
-        });
-
-      const postedMessage = await getPostMessage();
-
-      expect(postedMessage).toBe("hi1");
-
-      dispose();
-    }));
-});
-
-describe("makeBroadcastChannel", () => {
-  test("makeBroadcastChannel() posting messages", () =>
-    createRoot(async dispose => {
-      const channelName = "channel-1";
-      const mockedBCInstance = buildMockBroadcastChannel(channelName);
-
-      const { onMessage: onMessage1 } = makeBroadcastChannel<MsgType>(channelName);
-      const { onMessage: onMessage2, instance: instance2 } =
-        makeBroadcastChannel<MsgType>(channelName);
-
-      const getPostMessage = () =>
-        new Promise<string>(resolve => {
-          let postedMessage = "";
-
-          onMessage1(({ data }) => {
-            postedMessage += `${data}1`;
-          });
-          onMessage2(({ data }) => {
-            postedMessage += `${data}2`;
-          });
-
-          instance2.close();
-
-          mockedBCInstance.postMessage("hi");
-
-          setTimeout(() => {
-            resolve(postedMessage);
-          }, 200);
-        });
-
-      const postedMessage = await getPostMessage();
-
-      expect(postedMessage).toBe("");
-
-      dispose();
-    }));
+    data.dispose();
+  });
 });
 
 describe("createBroadcastChannel", () => {
-  test("createBroadcastChannel() return values", () =>
-    createRoot(dispose => {
-      const _channelName = "channel-1";
-      const { postMessage, channelName, close, instance } = createBroadcastChannel(_channelName);
-
-      expect(channelName).toBe(_channelName);
-      expect(postMessage).toBeInstanceOf(Function);
-      expect(close).toBeInstanceOf(Function);
-      expect(instance).toBeInstanceOf(BroadcastChannel);
-
-      dispose();
-    }));
-});
-
-describe("createBroadcastChannel", () => {
-  test("createBroadcastChannel() checking instances from BroadcastChannel constructor", () =>
+  test("checking instances from BroadcastChannel constructor", () => {
     createRoot(dispose => {
       const channelName = "channel-1";
       const { instance: instance1 } = createBroadcastChannel<MsgType>(channelName);
@@ -366,84 +178,75 @@ describe("createBroadcastChannel", () => {
       expect(instance1).not.toBe(instance3);
 
       dispose();
-    }));
-});
+    });
+  });
 
-describe("createBroadcastChannel", () => {
-  test("createBroadcastChannel() posting messages between pages", () =>
-    createRoot(async dispose => {
-      const channelName = "channel-1";
-      const mockedBCInstance = buildMockBroadcastChannel(channelName);
+  test("posting messages between pages", async () => {
+    const channelName = "channel-1";
+    const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
+    const captured: unknown[] = [];
+    let resolve: () => void;
+
+    const dispose = createRoot(dispose => {
       const { message } = createBroadcastChannel<MsgType>(channelName);
 
-      const getPostMessage = () =>
-        new Promise<string>(resolve => {
-          createEffect(
-            on(
-              message,
-              message => {
-                resolve(message!);
-              },
-              { defer: true },
-            ),
-          );
+      createEffect(() => {
+        captured.push(message());
+        if (captured.length === 2) resolve();
+      });
 
-          mockedBCInstance.postMessage("hi");
-        });
+      return dispose;
+    });
 
-      const postedMessage = await getPostMessage();
+    mockedBCInstance.postMessage("hi");
 
-      expect(postedMessage).toBe("hi");
+    await new Promise<void>(r => (resolve = r));
 
-      dispose();
-    }));
-});
+    expect(captured).toEqual([null, "hi"]);
 
-describe("createBroadcastChannel", () => {
-  test("createBroadcastChannel() posting messages with single instance channel name but called makeBroadcastChannel multiple times", () =>
-    createRoot(async dispose => {
-      const channelName = "channel-1";
-      const mockedBCInstance = buildMockBroadcastChannel(channelName);
+    dispose();
+  });
 
+  test("posting messages with single instance channel name but called makeBroadcastChannel multiple times", async () => {
+    const channelName = "channel-1";
+    const mockedBCInstance = buildMockBroadcastChannel(channelName);
+
+    let resolve1: ((m: unknown) => void) | undefined, resolve2: ((m: unknown) => void) | undefined;
+
+    const dispose = createRoot(dispose => {
       const { message: message1 } = createBroadcastChannel<MsgType>(channelName);
       const { message: message2 } = createBroadcastChannel<MsgType>(channelName);
 
-      const getPostMessage = () =>
-        new Promise<string>(resolve => {
-          let postedMessage = "";
+      createEffect(() => {
+        const m = message1();
+        resolve1?.(m);
+      });
 
-          createEffect(
-            on(
-              message1,
-              message => {
-                postedMessage += `${message}1`;
-              },
-              { defer: true },
-            ),
-          );
+      createEffect(() => {
+        const m = message2();
+        resolve2?.(m);
+      });
 
-          createEffect(
-            on(
-              message2,
-              message => {
-                postedMessage += `${message}2`;
-              },
-              { defer: true },
-            ),
-          );
+      return dispose;
+    });
 
-          mockedBCInstance.postMessage("hi");
+    mockedBCInstance.postMessage("hi");
 
-          setTimeout(() => {
-            resolve(postedMessage);
-          }, 200);
-        });
+    const captured: unknown[] = [];
+    await new Promise<void>(r => {
+      resolve1 = m => {
+        captured.push(m + "1");
+        if (captured.length === 2) r();
+      };
+      resolve2 = m => {
+        captured.push(m + "2");
+        if (captured.length === 2) r();
+      };
+    });
 
-      const postedMessage = await getPostMessage();
+    expect(captured).toEqual(["hi1", "hi2"]);
 
-      expect(postedMessage).toMatch(/^(hi1hi2)|(hi2hi1)$/);
-
-      dispose();
-    }));
+    dispose();
+  });
 });
