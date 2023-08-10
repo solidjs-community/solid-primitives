@@ -12,12 +12,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - uses: pnpm/action-setup@v2.2.4
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --ignore-scripts
