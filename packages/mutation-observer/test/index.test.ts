@@ -1,16 +1,21 @@
-import { MutationObserver, instances } from "./setup.js";
+import { MutationObserver, getLastInstance, instances } from "./setup.js";
 import { createMutationObserver, mutationObserver } from "../src/index.js";
 import { createRoot } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 describe("mutation-observer", () => {
+  const config = { childList: true },
+    parent = document.createElement("div"),
+    parent1 = document.createElement("div"),
+    parent2 = document.createElement("div"),
+    parent3 = document.createElement("div");
+
   it("returns correct values", () =>
     createRoot(dispose => {
-      const parent = document.createElement("div");
       const [add, { start, stop, instance, isSupported }] = createMutationObserver(
         parent,
-        { childList: true },
-        e => {},
+        config,
+        _ => {},
       );
 
       expect(add).toBeInstanceOf(Function);
@@ -25,8 +30,7 @@ describe("mutation-observer", () => {
   it("creates a new MutationObserver instance", () =>
     createRoot(dispose => {
       const prevLength = instances.length;
-      const parent = document.createElement("div");
-      const [, { instance }] = createMutationObserver(parent, { childList: true }, e => {});
+      const [, { instance }] = createMutationObserver(parent, config, _ => {});
 
       expect(instances.length).toBe(prevLength + 1);
       expect(instance).toBe(instances[prevLength]);
@@ -36,10 +40,7 @@ describe("mutation-observer", () => {
 
   it("single initial element is observed", () =>
     createRoot(dispose => {
-      const config = { childList: true };
-      const parent = document.createElement("div");
-
-      const [, { instance, start, stop }] = createMutationObserver(parent, config, e => {});
+      const [, { instance, start, stop }] = createMutationObserver(parent, config, _ => {});
       start();
 
       expect((instance as MutationObserver).elements[0]).toEqual([parent, config]);
@@ -52,16 +53,10 @@ describe("mutation-observer", () => {
 
   it("initial elements are being observed", () =>
     createRoot(dispose => {
-      const config = { childList: true };
-
-      const parent = document.createElement("div"),
-        parent1 = document.createElement("div"),
-        parent2 = document.createElement("div");
-
       const [, { instance, start, stop }] = createMutationObserver(
         [parent, parent1, parent2],
         config,
-        e => {},
+        _ => {},
       );
       start();
 
@@ -79,13 +74,8 @@ describe("mutation-observer", () => {
 
   it("initial elements with individual configs", () =>
     createRoot(dispose => {
-      const config = { childList: true },
-        config1 = {},
+      const config1 = {},
         config2 = { attributes: true };
-
-      const parent = document.createElement("div"),
-        parent1 = document.createElement("div"),
-        parent2 = document.createElement("div");
 
       const [, { instance, start, stop }] = createMutationObserver(
         [
@@ -93,7 +83,7 @@ describe("mutation-observer", () => {
           [parent1, config1],
           [parent2, config2],
         ],
-        e => {},
+        _ => {},
       );
       start();
 
@@ -111,16 +101,10 @@ describe("mutation-observer", () => {
 
   it("observe method", () =>
     createRoot(dispose => {
-      const config = { childList: true },
-        config1 = {},
+      const config1 = {},
         config2 = { attributes: true };
 
-      const parent = document.createElement("div"),
-        parent1 = document.createElement("div"),
-        parent2 = document.createElement("div"),
-        parent3 = document.createElement("div");
-
-      const [add, { instance, start, stop }] = createMutationObserver(parent, config, e => {});
+      const [add, { instance, start, stop }] = createMutationObserver(parent, config, _ => {});
       start();
       expect((instance as MutationObserver).elements[0]).toEqual([parent, config]);
 
@@ -141,91 +125,95 @@ describe("mutation-observer", () => {
 
   it("standalone mutationObserver directive", () =>
     createRoot(dispose => {
-      const config = { childList: true };
-      const parent = document.createElement("div");
-
       mutationObserver(parent, () => [config, () => {}]);
 
-      expect(instances[instances.length - 1].elements).toEqual([[parent, config]]);
+      expect(getLastInstance()!.elements).toEqual([[parent, config]]);
 
       dispose();
     }));
 
-  it("fire mutation events", () =>
-    createRoot(async dispose => {
-      const config = { childList: true };
-      const parent = document.createElement("div");
+  it("fire mutation events", async () => {
+    let count = 0;
 
-      let count = 0;
-      const [, { start }] = createMutationObserver(parent, config, e => {
+    const dispose = createRoot(dispose => {
+      const [, { start }] = createMutationObserver(parent, config, _ => {
         count++;
       });
       start();
 
-      instances[instances.length - 1].__simulateMutation();
+      return dispose;
+    });
 
-      await new Promise(resolve => setTimeout(resolve, 0));
-      expect(count).toBe(1);
+    getLastInstance()!.__simulateMutation();
 
-      dispose();
-    }));
+    await Promise.resolve();
+    expect(count).toBe(1);
 
-  it("stop firing on stop", () =>
-    createRoot(async dispose => {
-      const config = { childList: true };
-      const parent = document.createElement("div");
+    dispose();
+  });
 
-      let count = 0;
-      const [, { start, stop }] = createMutationObserver(parent, config, e => {
+  it("stop firing on stop", async () => {
+    let count = 0;
+
+    const { start, stop, dispose } = createRoot(dispose => {
+      const [, { start, stop }] = createMutationObserver(parent, config, _ => {
         count++;
       });
-      start();
 
-      stop();
+      return { start, stop, dispose };
+    });
 
-      instances[instances.length - 1].__simulateMutation();
-      await new Promise(resolve => setTimeout(resolve, 0));
-      expect(count).toBe(0);
+    start();
 
-      dispose();
-    }));
+    getLastInstance()!.__simulateMutation();
+    await Promise.resolve();
+    expect(count).toBe(1);
 
-  it("stop firing on dispose", () =>
-    createRoot(async dispose => {
-      const config = { childList: true };
-      const parent = document.createElement("div");
+    stop();
 
-      let count = 0;
-      const [, { start }] = createMutationObserver(parent, config, e => {
+    getLastInstance()!.__simulateMutation();
+    await Promise.resolve();
+    expect(count).toBe(1);
+
+    dispose();
+  });
+
+  it("stop firing on dispose", async () => {
+    let count = 0;
+
+    const { start, dispose } = createRoot(dispose => {
+      const [, { start }] = createMutationObserver(parent, config, _ => {
         count++;
       });
-      start();
 
-      dispose();
+      return { start, dispose };
+    });
 
-      instances[instances.length - 1].__simulateMutation();
-      await new Promise(resolve => setTimeout(resolve, 0));
-      expect(count).toBe(0);
-    }));
+    start();
+    dispose();
 
-  it("stop firing on stop while still have pending records", () =>
-    createRoot(async dispose => {
-      const config = { childList: true };
-      const parent = document.createElement("div");
+    getLastInstance()!.__simulateMutation();
+    await Promise.resolve();
+    expect(count).toBe(0);
+  });
 
-      let count = 0;
-      const [, { start, stop }] = createMutationObserver(parent, config, e => {
+  it("stop firing on stop while still have pending records", async () => {
+    let count = 0;
+
+    const { start, stop, dispose } = createRoot(dispose => {
+      const [, { start, stop }] = createMutationObserver(parent, config, _ => {
         count++;
       });
-      start();
 
-      instances[instances.length - 1].__simulateMutation();
+      return { start, stop, dispose };
+    });
 
-      stop();
+    start();
+    getLastInstance()!.__simulateMutation();
+    stop();
+    await Promise.resolve();
+    expect(count).toBe(0);
 
-      await new Promise(resolve => setTimeout(resolve, 0));
-      expect(count).toBe(0);
-
-      dispose();
-    }));
+    dispose();
+  });
 });

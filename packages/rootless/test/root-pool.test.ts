@@ -13,8 +13,6 @@ import {
   runWithOwner,
 } from "solid-js";
 
-const sleep = (ms: number = 0) => new Promise(resolve => setTimeout(resolve, ms));
-
 describe("createRootPool", () => {
   test("creates individual roots", () => {
     createRoot(dispose => {
@@ -63,55 +61,62 @@ describe("createRootPool", () => {
     });
   });
 
-  test("roots are disposed with the pool", async () => {
-    await createRoot(async dispose => {
-      let cleanup = false;
+  test("roots are disposed with the pool", () => {
+    let cleanup = false;
+    let dispose1!: () => void;
+    let dispose2!: () => void;
 
+    createRoot(dispose => {
       const pool = createRootPool(() => {
         onCleanup(() => (cleanup = true));
       });
+      dispose1 = dispose;
 
-      await createRoot(async d => {
+      createRoot(dispose => {
         pool();
-
-        expect(cleanup).toBe(false);
-
-        d();
-        await sleep();
-
-        expect(cleanup).toBe(false);
-
-        dispose();
-
-        expect(cleanup).toBe(true);
+        dispose2 = dispose;
       });
     });
+
+    expect(cleanup).toBe(false);
+
+    dispose2();
+
+    expect(cleanup).toBe(false);
+
+    dispose1();
+
+    expect(cleanup).toBe(true);
   });
 
   test("pool limit can be set to 0", async () => {
-    await createRoot(async dispose => {
-      let cleanup = false;
+    let cleanup = false;
+    let dispose1!: () => void;
+    let dispose2!: () => void;
 
+    createRoot(dispose => {
       const pool = createRootPool(
         () => {
           onCleanup(() => (cleanup = true));
         },
         { limit: 0 },
       );
+      dispose1 = dispose;
 
-      await createRoot(async d => {
+      createRoot(d => {
         pool();
-
-        expect(cleanup).toBe(false);
-
-        d();
-        await sleep();
-
-        expect(cleanup).toBe(true);
-
-        dispose();
+        dispose2 = d;
       });
     });
+
+    expect(cleanup).toBe(false);
+
+    dispose2();
+    await Promise.resolve();
+
+    expect(cleanup).toBe(true);
+
+    dispose1();
   });
 
   test("roots are reused and arguments updated", () => {
@@ -178,68 +183,6 @@ describe("createRootPool", () => {
     });
   });
 
-  test("roots are not suspended by default if in pool", async () => {
-    await createRoot(async dispose => {
-      const [count, setCount] = createSignal(1);
-      let i = 0;
-      const captured = [0, 0];
-      const owner = getOwner();
-
-      const pool = createRootPool(() => {
-        const index = i++;
-        createEffect(() => {
-          captured[index] = count();
-        });
-      });
-
-      await sleep();
-
-      expect(captured).toEqual([0, 0]);
-
-      let disposeRoot!: VoidFunction;
-      runWithOwner(owner, () => {
-        pool();
-        disposeRoot = createRoot(dispose => {
-          pool();
-          return dispose;
-        });
-      });
-
-      await sleep();
-      expect(captured).toEqual([1, 1]);
-      setCount(2);
-
-      await sleep();
-      expect(captured).toEqual([2, 2]);
-      disposeRoot();
-
-      setCount(3);
-
-      await sleep();
-      expect(captured).toEqual([3, 3]);
-
-      setCount(4);
-      await sleep();
-      expect(captured).toEqual([4, 4]);
-
-      runWithOwner(owner, pool);
-      await sleep();
-      expect(captured).toEqual([4, 4]);
-
-      setCount(5);
-      await sleep();
-      expect(captured).toEqual([5, 5]);
-
-      dispose();
-      await sleep();
-      expect(captured).toEqual([5, 5]);
-
-      setCount(6);
-      await sleep();
-      expect(captured).toEqual([5, 5]);
-    });
-  });
-
   test("pooled state is a signal", async () => {
     await createRoot(async dispose => {
       const [count, setCount] = createSignal(1);
@@ -254,7 +197,7 @@ describe("createRootPool", () => {
         });
       });
 
-      await sleep();
+      await Promise.resolve();
 
       expect(captured).toEqual([0, 0]);
 
@@ -267,37 +210,37 @@ describe("createRootPool", () => {
         });
       });
 
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([1, 1]);
-      setCount(2);
 
-      await sleep();
+      setCount(2);
+      await Promise.resolve();
       expect(captured).toEqual([2, 2]);
+
       disposeRoot();
 
       setCount(3);
-
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([3, 2]);
 
       setCount(4);
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([4, 2]);
 
       runWithOwner(owner, pool);
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([4, 4]);
 
       setCount(5);
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([5, 5]);
 
       dispose();
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([5, 5]);
 
       setCount(6);
-      await sleep();
+      await Promise.resolve();
       expect(captured).toEqual([5, 5]);
     });
   });

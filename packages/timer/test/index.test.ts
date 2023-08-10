@@ -1,114 +1,110 @@
 import { batch, createRoot, createSignal } from "solid-js";
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterAll } from "vitest";
 import { createTimer } from "../src/index.js";
 
-const sleep = (delay: number) => new Promise<void>(resolve => setTimeout(resolve, delay));
+vi.useFakeTimers();
+
+beforeEach(() => {
+  vi.clearAllTimers();
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 describe("createTimes", () => {
-  test("createTimer calls and disposes when expected with number", async () => {
-    let timeoutCount = 0;
-    let intervalCount = 0;
+  test("disposing of root disposes of timers", () => {
+    let timeout_count = 0;
+    let interval_count = 0;
 
-    await createRoot(async dispose => {
-      createTimer(() => timeoutCount++, 100, setTimeout);
-      createTimer(() => intervalCount++, 100, setInterval);
-      await sleep(50);
+    createRoot(dispose => {
+      createTimer(() => timeout_count++, 20, setTimeout);
+      createTimer(() => interval_count++, 20, setInterval);
       dispose();
     });
-    await sleep(100);
-    expect(timeoutCount).toBe(0);
-    expect(intervalCount).toBe(0);
 
-    await createRoot(async dispose => {
-      createTimer(() => timeoutCount++, 100, setTimeout);
-      createTimer(() => intervalCount++, 100, setInterval);
-      await sleep(50); // 0.5, account for drift
-      expect(timeoutCount).toBe(0);
-      expect(intervalCount).toBe(0);
-      await sleep(100); // 1.5
-      expect(timeoutCount).toBe(1);
-      expect(intervalCount).toBe(1);
-      await sleep(100); // 2.5
-      expect(timeoutCount).toBe(1);
-      expect(intervalCount).toBe(2);
-      dispose();
-    });
-    await sleep(100); // 3.5
-    expect(timeoutCount).toBe(1);
-    expect(intervalCount).toBe(2);
+    vi.advanceTimersByTime(50);
+
+    expect(timeout_count).toBe(0);
+    expect(interval_count).toBe(0);
   });
 
-  test("createInterval calls when expected with accessor", async () => {
-    let timeoutCount = 0;
-    let intervalCount = 0;
+  test("createTimer calls and disposes when expected with number", () => {
+    let timeout_count = 0;
+    let interval_count = 0;
 
-    await createRoot(async dispose => {
-      const [paused, setPaused] = createSignal(false);
-      const [delay, setDelay] = createSignal(50);
+    const dispose = createRoot(dispose => {
+      createTimer(() => timeout_count++, 100, setTimeout);
+      createTimer(() => interval_count++, 100, setInterval);
+      return dispose;
+    });
+
+    vi.advanceTimersByTime(50); // 0.5, account for drift
+    expect(timeout_count).toBe(0);
+    expect(interval_count).toBe(0);
+
+    vi.advanceTimersByTime(100); // 1.5
+    expect(timeout_count).toBe(1);
+    expect(interval_count).toBe(1);
+
+    vi.advanceTimersByTime(100); // 2.5
+    expect(timeout_count).toBe(1);
+    expect(interval_count).toBe(2);
+
+    dispose();
+    vi.advanceTimersByTime(100); // 3.5
+    expect(timeout_count).toBe(1);
+    expect(interval_count).toBe(2);
+  });
+
+  test("createInterval calls when expected with accessor", () => {
+    let timeout_count = 0;
+    let interval_count = 0;
+
+    const [paused, setPaused] = createSignal(false);
+    const [delay, setDelay] = createSignal(50);
+
+    const dispose = createRoot(dispose => {
       createTimer(
-        () => timeoutCount++,
+        () => timeout_count++,
         () => !paused() && delay(),
         setTimeout,
       );
       createTimer(
-        () => intervalCount++,
+        () => interval_count++,
         () => !paused() && delay(),
         setInterval,
       );
-      setPaused(true);
-      await sleep(300);
-      setPaused(false);
-      expect(timeoutCount).toBe(0);
-      expect(intervalCount).toBe(0);
-      setPaused(true);
-      await sleep(100);
-      batch(() => {
-        setPaused(false);
-        setDelay(100);
-      });
-      await sleep(10);
-      expect(timeoutCount).toBe(0);
-      expect(intervalCount).toBe(0);
-      await sleep(160);
-      expect(timeoutCount).toBe(1);
-      expect(intervalCount).toBe(1);
-      dispose();
+      return dispose;
     });
 
-    // Disabled because the test above covers use with an accessor already
-    // and this test is flaky on CI.
+    setPaused(true);
 
-    // timeoutCount = 0;
-    // intervalCount = 0;
+    vi.advanceTimersByTime(300);
 
-    // await createRoot(async dispose => {
-    //   const [delay, setDelay] = createSignal(100);
-    //   createTimer(() => timeoutCount++, delay, setTimeout);
-    //   createTimer(() => intervalCount++, delay, setInterval);
-    //   await sleep(50); // 0.5, account for drift
-    //   expect(timeoutCount).toBe(0);
-    //   expect(intervalCount).toBe(0);
-    //   await sleep(100); // 1.5
-    //   expect(timeoutCount).toBe(1);
-    //   expect(intervalCount).toBe(1);
-    //   await sleep(60); // 2.1
-    //   expect(timeoutCount).toBe(1);
-    //   expect(intervalCount).toBe(2);
-    //   setDelay(200);
-    //   await sleep(100); // 3
-    //   expect(timeoutCount).toBe(1);
-    //   expect(intervalCount).toBe(2);
-    //   await sleep(130); // 4.5
-    //   expect(timeoutCount).toBe(1);
-    //   expect(intervalCount).toBe(3);
-    //   await sleep(200); // 6
-    //   expect(timeoutCount).toBe(1);
-    //   expect(intervalCount).toBe(4);
-    //   dispose();
-    // });
+    setPaused(false);
+    expect(timeout_count).toBe(0);
+    expect(interval_count).toBe(0);
 
-    // await sleep(200); // 5.2
-    // expect(timeoutCount).toBe(1);
-    // expect(intervalCount).toBe(4);
+    setPaused(true);
+
+    vi.advanceTimersByTime(100);
+
+    batch(() => {
+      setPaused(false);
+      setDelay(100);
+    });
+
+    vi.advanceTimersByTime(10);
+
+    expect(timeout_count).toBe(0);
+    expect(interval_count).toBe(0);
+
+    vi.advanceTimersByTime(160);
+
+    expect(timeout_count).toBe(1);
+    expect(interval_count).toBe(1);
+
+    dispose();
   });
 });

@@ -30,10 +30,7 @@ export const autofocus = (element: HTMLElement, autofocus?: Accessor<boolean>) =
 
   onMount(() => {
     // Using a timeout makes it consistent
-    if (element.hasAttribute("autofocus"))
-      setTimeout(() => {
-        element.focus();
-      });
+    if (element.hasAttribute("autofocus")) setTimeout(() => element.focus());
   });
 };
 

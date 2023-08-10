@@ -1,4 +1,4 @@
-import { dispatchFakeEvent } from "./setup.js";
+import { dispatchFakeEvent, event_target } from "./setup.js";
 import { describe, test, expect } from "vitest";
 import { createRoot, onMount } from "solid-js";
 import { createEventListenerMap } from "../src/index.js";
@@ -10,7 +10,7 @@ describe("createEventListenerMap", () => {
       const testEvent1 = new Event("map_1");
       let captured: any;
       let captured1: any;
-      createEventListenerMap(window, {
+      createEventListenerMap(event_target, {
         map_0: e => (captured = e),
         map_1: e => (captured1 = e),
       });
@@ -29,7 +29,7 @@ describe("createEventListenerMap", () => {
       const testEvent1 = new Event("map_1");
       let captured: any;
       let captured1: any;
-      createEventListenerMap(() => window, {
+      createEventListenerMap(() => event_target, {
         map_0: e => (captured = e),
         map_1: e => (captured1 = e),
       });
@@ -50,7 +50,7 @@ describe("createEventListenerMap", () => {
       const testEvent1 = new Event("map_1");
       let captured: any;
       let captured1: any;
-      createEventListenerMap(window, {
+      createEventListenerMap(event_target, {
         map_0: e => (captured = e),
         map_1: e => (captured1 = e),
       });
@@ -70,7 +70,7 @@ describe("createEventListenerMap", () => {
     createRoot(dispose => {
       const testEvent = new Event("map_0");
       let captured: any;
-      createEventListenerMap<{ map_0: Event }>(() => window, {
+      createEventListenerMap<{ map_0: Event }>(() => event_target, {
         map_0: e => (captured = e),
       });
 

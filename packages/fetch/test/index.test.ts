@@ -1,5 +1,5 @@
 import "./setup";
-import { test, expect, describe, vitest } from "vitest";
+import { test, expect, describe, vitest, vi } from "vitest";
 import { createRoot, createEffect, createSignal } from "solid-js";
 import { createFetch } from "../src/fetch.js";
 import {
@@ -62,32 +62,22 @@ describe("fetch primitive", () => {
       });
     }));
 
-  test("will abort a request without an error", () =>
-    createRoot(dispose => {
-      const fetchMock = (info: RequestInfo | URL, _init?: RequestInit) =>
-        new Promise<typeof mockResponse>((resolve, reject) => {
-          const signal: AbortSignal | undefined = (info as any).signal;
-          const timer = setTimeout(() => resolve(mockResponse), 100);
-          signal?.addEventListener("aborted", () => {
-            clearTimeout(timer);
-            reject(Object.assign(new Error("aborted"), { name: "AbortError" }));
-          });
-        });
-      const [ready, { abort }] = createFetch(mockUrl, { fetch: fetchMock }, [withAbort()]);
-      abort!();
-      expect(ready.aborted).toBe(true);
-      createEffect(() => {
-        if (ready.error) {
-          throw ready.error;
-        }
-      });
-      return new Promise<void>(resolve =>
-        window.setTimeout(() => {
-          dispose();
-          resolve();
-        }, 20),
+  test("will abort a request without an error", () => {
+    const { ready, abort, dispose } = createRoot(dispose => {
+      const [ready, { abort }] = createFetch(
+        mockUrl,
+        { fetch: () => new Promise<Response>(() => {}) },
+        [withAbort()],
       );
-    }));
+      return { ready, abort, dispose };
+    });
+
+    abort!();
+    expect(ready.aborted).toBe(true);
+    expect(ready.error).toEqual(undefined);
+
+    dispose();
+  });
 
   test("will make a request error accessible otherwise", () =>
     new Promise<void>(resolve =>
@@ -128,26 +118,34 @@ describe("fetch primitive", () => {
       });
     }));
 
-  test("will abort the request on timeout and catchAll the error", () =>
-    new Promise<void>(resolve =>
-      createRoot(dispose => {
-        const fetchMock = () =>
-          new Promise<typeof mockResponse>(r => setTimeout(() => r(mockResponse), 1000));
-        const [ready] = createFetch(mockUrl, { fetch: fetchMock }, [
-          withTimeout(50),
-          withAbort(),
-          withCatchAll(),
-        ]);
-        createEffect((iteration: number = 0) => {
-          expect(ready.error).toEqual([undefined, new Error("timeout")][iteration]);
-          if (iteration === 1) {
-            dispose();
-            resolve();
-          }
-          return iteration + 1;
-        });
-      }),
-    ));
+  test("will abort the request on timeout and catchAll the error", async () => {
+    vi.useFakeTimers();
+
+    let captured_error: unknown = null;
+
+    const dispose = createRoot(dispose => {
+      const [ready] = createFetch(mockUrl, { fetch: () => new Promise<Response>(() => {}) }, [
+        withTimeout(50),
+        withAbort(),
+        withCatchAll(),
+      ]);
+
+      createEffect(() => {
+        captured_error = ready.error;
+      });
+
+      return dispose;
+    });
+
+    expect(captured_error).toEqual(undefined);
+
+    await vi.advanceTimersByTimeAsync(100);
+
+    expect(captured_error).toEqual(new Error("timeout"));
+
+    dispose();
+    vi.useRealTimers();
+  });
 
   test("retries request if fails on first try", () =>
     new Promise<void>(resolve =>
@@ -178,7 +176,7 @@ describe("fetch primitive", () => {
     ));
 
   test("re-fetches request after a set event", () =>
-    new Promise<void>((resolve, reject) =>
+    new Promise<void>(resolve =>
       createRoot(dispose => {
         let calls = 0;
         const [url, setUrl] = createSignal<string | undefined>(undefined, { equals: false });

@@ -1,85 +1,88 @@
-import { describe, test, expect } from "vitest";
-import { createRoot, onMount } from "solid-js";
+import { describe, test, expect, beforeEach, vi, afterAll } from "vitest";
+import { createRoot } from "solid-js";
 import { createIdleTimer } from "../src/index.js";
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+vi.useFakeTimers();
+
+beforeEach(() => {
+  vi.clearAllTimers();
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 describe("createIdleTimer", () => {
-  test("signals when the user is prompted and idle according to the configuration timeouts", async () =>
-    await createRoot(async dispose => {
-      const { isIdle, isPrompted, stop } = createIdleTimer({
+  test("signals when the user is prompted and idle according to the configuration timeouts", () => {
+    const timer = createRoot(dispose => {
+      const timer = createIdleTimer({
         idleTimeout: 5,
         promptTimeout: 5,
       });
 
-      await new Promise(resolve =>
-        onMount(() => {
-          resolve(true);
-        }),
-      );
+      return { ...timer, dispose };
+    });
 
-      await sleep(2);
-      expect(isPrompted(), "user is not prompted yet").toBe(false);
-      expect(isIdle(), "user is not idle yet").toBe(false);
+    vi.advanceTimersByTime(2);
 
-      await sleep(5);
-      expect(isPrompted(), "user has been prompted").toBe(true);
-      expect(isIdle(), "user is not idle yet").toBe(false);
+    expect(timer.isPrompted(), "user is not prompted yet").toBe(false);
+    expect(timer.isIdle(), "user is not idle yet").toBe(false);
 
-      await sleep(5);
-      expect(isPrompted(), "user is not in the prompted phase anymore").toBe(false);
-      expect(isIdle(), "user is idle").toBe(true);
+    vi.advanceTimersByTime(5);
+    expect(timer.isPrompted(), "user has been prompted").toBe(true);
+    expect(timer.isIdle(), "user is not idle yet").toBe(false);
 
-      stop();
-      dispose();
-    }));
+    vi.advanceTimersByTime(5);
+    expect(timer.isPrompted(), "user is not in the prompted phase anymore").toBe(false);
+    expect(timer.isIdle(), "user is idle").toBe(true);
 
-  test("start and stop should successfully bind, unbind the event listeners, reset should clean and restart the timers", async () =>
-    await createRoot(async dispose => {
-      const { isIdle, reset, start, stop } = createIdleTimer({
+    timer.stop();
+    timer.dispose();
+  });
+
+  test("start and stop should successfully bind, unbind the event listeners, reset should clean and restart the timers", () => {
+    const timer = createRoot(dispose => {
+      const timer = createIdleTimer({
         idleTimeout: 5,
         startManually: true,
       });
 
-      await new Promise(resolve =>
-        onMount(() => {
-          resolve(true);
-        }),
-      );
+      return { ...timer, dispose };
+    });
 
-      await sleep(0);
-      expect(isIdle(), "user is not idle yet, events are not bound yet").toBe(false);
+    expect(timer.isIdle(), "user is not idle yet, events are not bound yet").toBe(false);
 
-      start();
+    timer.start();
 
-      await sleep(50);
-      expect(isIdle(), "user is idle, timer should have expired by now").toBe(true);
+    vi.advanceTimersByTime(50);
+    expect(timer.isIdle(), "user is idle, timer should have expired by now").toBe(true);
 
-      reset();
+    timer.reset();
 
-      await sleep(4);
-      expect(isIdle(), "user is not idle yet, timers have restarted").toBe(false);
-      await sleep(50);
-      expect(isIdle(), "user is idle again").toBe(true);
+    vi.advanceTimersByTime(4);
+    expect(timer.isIdle(), "user is not idle yet, timers have restarted").toBe(false);
+    vi.advanceTimersByTime(50);
+    expect(timer.isIdle(), "user is idle again").toBe(true);
 
-      stop();
-      await sleep(1);
-      expect(isIdle(), "user is not idle anymore, timers have been cleaned up").toBe(false);
-      await sleep(50);
-      expect(
-        isIdle(),
-        "user is still not idle, event listeners are unbound, timers have not restarted",
-      ).toBe(false);
+    timer.stop();
+    vi.advanceTimersByTime(1);
+    expect(timer.isIdle(), "user is not idle anymore, timers have been cleaned up").toBe(false);
 
-      dispose();
-    }));
+    vi.advanceTimersByTime(50);
+    expect(
+      timer.isIdle(),
+      "user is still not idle, event listeners are unbound, timers have not restarted",
+    ).toBe(false);
 
-  test("configuration options shall work", async () =>
-    await createRoot(async dispose => {
-      let currStatus: "initial" | "idle" | "active" | "prompted" = "initial";
-      const div = document.createElement("div");
+    timer.dispose();
+  });
 
-      const { start, stop } = createIdleTimer({
+  test("configuration options shall work", () => {
+    let currStatus: "initial" | "idle" | "active" | "prompted" = "initial";
+    const div = document.createElement("div");
+
+    const timer = createRoot(dispose => {
+      const timer = createIdleTimer({
         promptTimeout: 30,
         idleTimeout: 30,
         startManually: true,
@@ -90,40 +93,37 @@ describe("createIdleTimer", () => {
         events: ["click"],
       });
 
-      await new Promise(resolve =>
-        onMount(() => {
-          resolve(true);
-        }),
-      );
+      return { ...timer, dispose };
+    });
 
-      await sleep(10);
-      expect(currStatus, "events are not bound yet, the status has not changed").toBe("initial");
+    vi.advanceTimersByTime(10);
+    expect(currStatus, "events are not bound yet, the status has not changed").toBe("initial");
 
-      start();
+    timer.start();
 
-      await sleep(50);
-      expect(
-        currStatus,
-        "timers have started, user should be in the prompt phase, onPrompt should have been called by now",
-      ).toBe("prompted");
-      await sleep(60);
-      expect(currStatus, "prompt timer has expired, onIdle should have been called by now").toBe(
-        "idle",
-      );
+    vi.advanceTimersByTime(50);
+    expect(
+      currStatus,
+      "timers have started, user should be in the prompt phase, onPrompt should have been called by now",
+    ).toBe("prompted");
+    vi.advanceTimersByTime(60);
+    expect(currStatus, "prompt timer has expired, onIdle should have been called by now").toBe(
+      "idle",
+    );
 
-      div.dispatchEvent(new KeyboardEvent("keydown", { key: "a" }));
-      expect(currStatus, "idle status should persist if the fired event is not in the list").toBe(
-        "idle",
-      );
+    div.dispatchEvent(new KeyboardEvent("keydown", { key: "a" }));
+    expect(currStatus, "idle status should persist if the fired event is not in the list").toBe(
+      "idle",
+    );
 
-      div.click();
-      expect(
-        currStatus,
-        "click is on the event list, it should trigger onActive when dispatched on the observed element",
-      ).toBe("active");
+    div.click();
+    expect(
+      currStatus,
+      "click is on the event list, it should trigger onActive when dispatched on the observed element",
+    ).toBe("active");
 
-      stop();
+    timer.stop();
 
-      dispose();
-    }));
+    timer.dispose();
+  });
 });

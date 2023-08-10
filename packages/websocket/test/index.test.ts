@@ -1,5 +1,5 @@
 import "./setup";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createRoot } from "solid-js";
 import {
   createWS,
@@ -10,9 +10,18 @@ import {
   makeWS,
 } from "../src/index.js";
 
+vi.useFakeTimers();
+
+beforeEach(() => {
+  vi.clearAllTimers();
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
+
 describe("makeWS", () => {
   it("creates a web socket and opens it", () => {
-    vi.useFakeTimers();
     const ws = makeWS("ws://localhost:5000");
     expect(ws).toBeInstanceOf(WebSocket);
     expect(ws.readyState).toBe(0);
@@ -21,7 +30,6 @@ describe("makeWS", () => {
     ws.close();
   });
   it("does not throw when attempting to send while not yet open", () => {
-    vi.useFakeTimers();
     const ws = makeWS("ws://localhost:5000");
     expect(ws.readyState).toBe(0);
     expect(() => ws.send("it works")).not.toThrow();
@@ -47,7 +55,6 @@ describe("createWSState", () => {
   it("reacts to all changes of readyState", () =>
     new Promise<void>(resolve => {
       createRoot(dispose => {
-        vi.useFakeTimers();
         const ws = createWS("ws://localhost:5000");
         const state = createWSState(ws);
         expect(state()).toEqual(ws.CONNECTING);
@@ -66,7 +73,6 @@ describe("createWSState", () => {
 
 describe("makeReconnectingWS", () => {
   it("reconnects after being closed by external circumstances", () => {
-    vi.useFakeTimers();
     const ws = makeReconnectingWS("ws://localhost:5000", undefined, { delay: 100 });
     expect(ws.readyState).toBe(0);
     vi.advanceTimersByTime(10);
@@ -76,7 +82,6 @@ describe("makeReconnectingWS", () => {
     expect(ws.readyState).toBe(1);
   });
   it("does not reconnect if manually closed", () => {
-    vi.useFakeTimers();
     const ws = makeReconnectingWS("ws://localhost:5000", undefined, { delay: 100 });
     ws.close();
     vi.advanceTimersByTime(500);
@@ -97,7 +102,6 @@ describe("createReconnectingWS", () => {
 
 describe("makeHeartbeatWS", () => {
   it("sends a heartbeat", () => {
-    vi.useFakeTimers();
     const previousSockets = [...WSMessages.keys()];
     const ws = makeHeartbeatWS(
       makeReconnectingWS("ws://localhost:5000", undefined, { delay: 100 }),
@@ -108,7 +112,6 @@ describe("makeHeartbeatWS", () => {
     expect(ws.readyState).toBe(1);
   });
   it("reconnects after the pong is missing", () => {
-    vi.useFakeTimers();
     const previousSockets = [...WSMessages.keys()];
     const ws = makeHeartbeatWS(
       makeReconnectingWS("ws://localhost:5000", undefined, { delay: 100 }),

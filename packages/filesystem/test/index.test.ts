@@ -11,7 +11,7 @@ import {
   makeTauriFileSystem,
   rsync,
 } from "../src/index.js";
-import { createEffect, createRoot, onError } from "solid-js";
+import { createEffect, createRoot } from "solid-js";
 
 describe("makeNoFileSystem", () => {
   const fs = makeNoFileSystem();
@@ -144,162 +144,209 @@ describe("createFileSystem (async) calls the underlying fs", () => {
   });
 });
 
-const testReactive = (testcase: (done: () => void) => void): Promise<void> => {
-  const context: {
-    promise?: Promise<void>;
-    done?: () => void;
-    fail?: (error: any) => void;
-    dispose?: () => void;
-  } = {};
-  context.promise = new Promise<void>((resolve, reject) => {
-    context.done = resolve;
-    context.fail = reject;
-  });
-  context.dispose = createRoot(dispose => {
-    onError(err => context.fail?.(err));
-    testcase(() => {
-      context.done?.();
-      dispose();
-    });
-    return dispose;
-  });
-  return context.promise;
-};
-
 describe("createFileSystem(makeWebAccessFileSystem)", async () => {
   const wfs = await makeWebAccessFileSystem();
   if (wfs === null) {
     throw new Error("web fs access mock broke for some reason, see fsaccess-mock.fs");
   }
+
   const fs = createFileSystem(wfs);
+
   test("fs.getType returns the correct output", async () => {
-    await testReactive(done => {
-      createEffect((run: number = 0) => {
-        const fileType = fs.getType("/src/index.ts");
-        if (run === 0) {
-          expect(fileType).toBeUndefined();
-        } else {
-          expect(fileType).toBe("file");
-          done();
-        }
-        return run + 1;
+    let resolve: (() => void) | undefined;
+    let captured: unknown;
+
+    let dispose = createRoot(dispose => {
+      createEffect(() => {
+        captured = fs.getType("/src/index.ts");
+        resolve?.();
       });
+
+      return dispose;
     });
-    await testReactive(done => {
-      createEffect((run: number = 0) => {
-        const dirType = fs.getType("/src");
-        if (run === 0) {
-          expect(dirType).toBeUndefined();
-        } else {
-          expect(dirType).toBe("dir");
-          done();
-        }
-        return run + 1;
+
+    expect(captured).toEqual(undefined);
+
+    await new Promise<void>(r => (resolve = r));
+    expect(captured).toEqual("file");
+
+    dispose();
+
+    dispose = createRoot(dispose => {
+      createEffect(() => {
+        captured = fs.getType("/src");
+        resolve?.();
       });
+
+      return dispose;
     });
+
+    expect(captured).toEqual(undefined);
+
+    await new Promise<void>(r => (resolve = r));
+    expect(captured).toEqual("dir");
+
+    dispose();
   });
 
-  test("fs.readdir returns the correct output", () =>
-    testReactive(done => {
-      createEffect((run: number = 0) => {
-        const srcFiles = fs.readdir("src");
-        if (run === 0) {
-          expect(srcFiles).toBeUndefined();
-        } else {
-          expect(srcFiles).toEqual(["index.ts"]);
-          done();
-        }
-        return run + 1;
-      });
-    }));
+  test("fs.readdir returns the correct output", async () => {
+    let resolve: (() => void) | undefined;
+    let captured: unknown;
 
-  test("fs.mkdir updates existing readdir", () =>
-    testReactive(done => {
-      createEffect((run: number = 0) => {
-        const rootItems = fs.readdir("/");
-        if (run === 0) {
-          expect(rootItems).toBeUndefined();
-        } else if (run === 1) {
-          expect(rootItems).toEqual(["src", "data"]);
-          fs.mkdir("/test");
-        } else {
-          expect(rootItems).toEqual(["src", "data", "test"]);
-          done();
-        }
-        return run + 1;
+    const dispose = createRoot(dispose => {
+      createEffect(() => {
+        captured = fs.readdir("src");
+        resolve?.();
       });
-    }));
 
-  test("fs.readFile returns the content", () =>
-    testReactive(done => {
-      createEffect((run: number = 0) => {
-        const fileData = fs.readFile("/src/index.ts");
-        if (run === 0) {
-          expect(fileData).toBeUndefined();
-        } else {
-          expect(fileData).toBe("// test");
-          done();
-        }
-        return run + 1;
-      });
-    }));
+      return dispose;
+    });
 
-  test("fs.writeFile updates a readFile resource", () =>
-    testReactive(done => {
-      createEffect((run: number = 0) => {
-        const fileData = fs.readFile("/data/data.json");
-        if (run === 0) {
-          expect(fileData).toBeUndefined();
-        } else if (run === 1) {
-          expect(fileData).toBe("[1, 2, 3]");
-          fs.writeFile("/data/data.json", "[1, 2, 3, 4]");
-        } else {
-          expect(fileData).toBe("[1, 2, 3, 4]");
-          done();
-        }
-        return run + 1;
+    expect(captured).toEqual(undefined);
+
+    await new Promise<void>(r => (resolve = r));
+    expect(captured).toEqual(["index.ts"]);
+
+    dispose();
+  });
+
+  test("fs.mkdir updates existing readdir", async () => {
+    let resolve: (() => void) | undefined;
+    const captured: unknown[] = [];
+
+    const dispose = createRoot(dispose => {
+      createEffect(() => {
+        captured.push(fs.readdir("/"));
+        resolve?.();
       });
-    }));
+
+      return dispose;
+    });
+
+    expect(captured).toEqual([undefined]);
+    captured.length = 0;
+
+    await new Promise<void>(r => (resolve = r));
+    expect(captured).toEqual([["src", "data"]]);
+    captured.length = 0;
+
+    fs.mkdir("/test");
+    await new Promise<void>(r => (resolve = r));
+    expect(captured).toEqual([["src", "data", "test"]]);
+
+    dispose();
+  });
+
+  test("fs.readFile returns the content", async () => {
+    let resolve: (() => void) | undefined;
+    const captured: unknown[] = [];
+
+    const dispose = createRoot(dispose => {
+      createEffect(() => {
+        captured.push(fs.readFile("/src/index.ts"));
+        resolve?.();
+      });
+
+      return dispose;
+    });
+
+    expect(captured).toEqual([undefined]);
+    captured.length = 0;
+
+    await new Promise<void>(r => (resolve = r));
+    expect(captured).toEqual(["// test"]);
+    captured.length = 0;
+
+    dispose();
+  });
+
+  test("fs.writeFile updates a readFile resource", async () => {
+    let resolve: (() => void) | undefined;
+    const captured: unknown[] = [];
+
+    const dispose = createRoot(dispose => {
+      createEffect(() => {
+        captured.push(fs.readFile("/data/data.json"));
+        resolve?.();
+      });
+
+      return dispose;
+    });
+
+    expect(captured).toEqual([undefined]);
+    captured.length = 0;
+
+    await new Promise<void>(r => (resolve = r));
+    expect(captured).toEqual(["[1, 2, 3]"]);
+    captured.length = 0;
+
+    fs.writeFile("/data/data.json", "[1, 2, 3, 4]");
+    await new Promise<void>(r => (resolve = r));
+    expect(captured).toEqual(["[1, 2, 3, 4]"]);
+
+    dispose();
+  });
 
   test("fs.rm udpates a readdir resource", async () => {
     await fs.mkdir("/src/subdir");
-    return testReactive(done => {
-      createEffect((run: number = 0) => {
-        const dataItems = fs.readdir("/src");
-        if (run === 0) {
-          expect(dataItems).toBeUndefined();
-        } else if (run === 1) {
-          expect(dataItems).toEqual(["index.ts", "subdir"]);
-          fs.rm("/src/subdir");
-        } else {
-          expect(dataItems).toEqual(["index.ts"]);
-          done();
-        }
-        return run + 1;
+
+    let resolve: (() => void) | undefined;
+    const captured: unknown[] = [];
+
+    const dispose = createRoot(dispose => {
+      createEffect(() => {
+        captured.push(fs.readdir("/src"));
+        resolve?.();
       });
+
+      return dispose;
     });
+
+    expect(captured).toEqual([undefined]);
+    captured.length = 0;
+
+    await new Promise<void>(r => (resolve = r));
+    expect(captured).toEqual([["index.ts", "subdir"]]);
+    captured.length = 0;
+
+    fs.rm("/src/subdir");
+    await new Promise<void>(r => (resolve = r));
+    expect(captured).toEqual([["index.ts"]]);
+
+    dispose();
   });
 
   test("fs.rename updates a readdir resource", async () => {
     await fs.mkdir("/data/subdir");
     await fs.writeFile("/data/subdir/test.ts", "// test");
-    return testReactive(done => {
-      createEffect((run: number = 0) => {
-        const subdirItems = fs.readdir("/data/subdir");
-        if (run === 0) {
-          expect(subdirItems).toBeUndefined();
-        } else if (run === 1) {
-          expect(subdirItems).toEqual(["test.ts"]);
-          fs.rename("/data/subdir/test.ts", "/data/subdir/index.ts");
-        } else {
-          expect(subdirItems).toEqual(["index.ts"]);
-          fs.rm("/data/subdir");
-          done();
-        }
-        return run + 1;
+
+    let resolve: (() => void) | undefined;
+    const captured: unknown[] = [];
+
+    const dispose = createRoot(dispose => {
+      createEffect(() => {
+        captured.push(fs.readdir("/data/subdir"));
+        resolve?.();
       });
+
+      return dispose;
     });
+
+    expect(captured).toEqual([undefined]);
+    captured.length = 0;
+
+    await new Promise<void>(r => (resolve = r));
+    expect(captured).toEqual([["test.ts"]]);
+    captured.length = 0;
+
+    fs.rename("/data/subdir/test.ts", "/data/subdir/index.ts");
+    await new Promise<void>(r => (resolve = r));
+    expect(captured).toEqual([["index.ts"]]);
+
+    fs.rm("/data/subdir");
+    dispose();
   });
+
   describe("fallbacks", () => {
     test("makeNodeFileSystem returns null on client", async () => {
       expect(await makeNodeFileSystem()).toBeNull();

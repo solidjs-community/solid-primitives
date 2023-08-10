@@ -1,5 +1,7 @@
 export const instances: MutationObserver[] = [];
 
+export const getLastInstance = () => instances[instances.length - 1];
+
 const exampleElements = [
   document.createElement("div"),
   document.createElement("span"),

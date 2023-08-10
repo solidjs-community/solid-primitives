@@ -1,5 +1,5 @@
 import { createEffect, createResource, createSignal, on } from "solid-js";
-import { describe, test, expect, vi } from "vitest";
+import { describe, test, expect, vi, afterAll, beforeEach } from "vitest";
 import { testEffect } from "@solidjs/testing-library";
 import {
   makeAbortable,
@@ -9,6 +9,16 @@ import {
   makeRetrying,
   createDeepSignal,
 } from "../src/index.js";
+
+vi.useFakeTimers();
+
+beforeEach(() => {
+  vi.clearAllTimers();
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 describe("makeAbortable", () => {
   test("makes a fetcher abortable", () => {
@@ -237,7 +247,6 @@ describe("makeCache", () => {
     }));
   test("invalidates cache", () =>
     testEffect(done => {
-      vi.useFakeTimers();
       const cache = {};
       const getData = vi.fn(() => Promise.resolve("data"));
       const [fetcher, invalidate] = makeCache(getData, { cache, expires: 1000 });
@@ -257,7 +266,6 @@ describe("makeCache", () => {
           expect(cache, "cache is filled again").toHaveProperty("true");
           invalidate();
           expect(cache, "manual invalidation").not.toHaveProperty("true");
-          vi.useRealTimers();
           done();
         }
         return run + 1;
@@ -265,7 +273,6 @@ describe("makeCache", () => {
     }));
   test("provides an accessor for automatically invalidated results", () =>
     testEffect(done => {
-      vi.useFakeTimers();
       const cache = {};
       const getData = () => Promise.resolve(Math.random());
       const [fetcher, _, invalidated] = makeCache(getData, { cache, expires: 1000 });
@@ -279,7 +286,6 @@ describe("makeCache", () => {
           refetch();
         } else if (run === 2) {
           expect(invalidated()).toHaveProperty("source", true);
-          vi.useRealTimers();
           done();
         }
         return run + 1;
