@@ -18,7 +18,7 @@ Reactive primitives for observing resizing of HTML elements.
 
 ## Installation
 
-```
+```bash
 npm install @solid-primitives/resize-observer
 # or
 pnpm add @solid-primitives/resize-observer
