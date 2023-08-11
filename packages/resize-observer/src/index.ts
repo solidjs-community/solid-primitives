@@ -169,8 +169,10 @@ export function createElementSize(
     return ELEMENT_SIZE_FALLBACK;
   }
 
+  const isFn = typeof target === "function";
+
   const [size, setSize] = createStaticStore(
-    sharedConfig.context ? ELEMENT_SIZE_FALLBACK : getElementSize(access(target)),
+    sharedConfig.context || isFn ? ELEMENT_SIZE_FALLBACK : getElementSize(target),
   );
 
   const ro = new ResizeObserver(([e]) => {
@@ -179,13 +181,19 @@ export function createElementSize(
   });
   onCleanup(() => ro.disconnect());
 
-  createEffect(() => {
-    const el = access(target);
-    if (el) {
-      ro.observe(el);
-      onCleanup(() => ro.unobserve(el));
-    }
-  });
+  if (isFn) {
+    createEffect(() => {
+      const el = target();
+      if (el) {
+        setSize(getElementSize(el));
+        ro.observe(el);
+        onCleanup(() => ro.unobserve(el));
+      }
+    });
+  } else {
+    ro.observe(target);
+    onCleanup(() => ro.unobserve(target));
+  }
 
   return size;
 }
