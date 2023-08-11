@@ -1,5 +1,11 @@
 # @solid-primitives/resize-observer
 
+## 2.0.20
+
+### Patch Changes
+
+- 39857e46: createElementSize: access signal target on mount
+
 ## 2.0.19
 
 ### Patch Changes
