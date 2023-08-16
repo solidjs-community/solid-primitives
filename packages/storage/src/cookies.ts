@@ -91,7 +91,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
       .match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")
       ?.pop() ?? null,
   setItem: (key: string, value: string, options?: CookieOptions) => {
-    const oldValue = cookieStorage.getItem(key);
+    const oldValue = isServer ? cookieStorage.getItem(key) : null;
     cookieStorage._write(key, value, options);
     if (!isServer) {
       // Storage events are only required on client when using multiple tabs
