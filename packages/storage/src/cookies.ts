@@ -30,8 +30,8 @@ const serializeCookieOptions = (options?: CookieOptions) => {
       value instanceof Date
         ? `; ${key}=${value.toUTCString()}`
         : typeof value === "boolean"
-        ? `; ${key}`
-        : `; ${key}=${value}`;
+          ? `; ${key}`
+          : `; ${key}=${value}`;
   }
   return memo;
 };
@@ -73,18 +73,18 @@ try {
 export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   _read: isServer
     ? (options?: CookieOptions) => {
-        const eventOrRequest = options?.getRequest?.() || useRequest();
-        const request =
-          eventOrRequest && ("request" in eventOrRequest ? eventOrRequest.request : eventOrRequest);
-        return request?.headers.get("Cookie") || "";
-      }
+      const eventOrRequest = options?.getRequest?.() || useRequest();
+      const request =
+        eventOrRequest && ("request" in eventOrRequest ? eventOrRequest.request : eventOrRequest);
+      return request?.headers.get("Cookie") || "";
+    }
     : () => document.cookie,
   _write: isServer
     ? (key: string, value: string, options?: CookieOptions) =>
-        options?.setCookie?.(key, value, options)
+      options?.setCookie?.(key, value, options)
     : (key: string, value: string, options?: CookieOptions) => {
-        document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
-      },
+      document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
+    },
   getItem: (key: string, options?: CookieOptions) =>
     cookieStorage
       ._read(options)
@@ -93,14 +93,17 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   setItem: (key: string, value: string, options?: CookieOptions) => {
     const oldValue = cookieStorage.getItem(key);
     cookieStorage._write(key, value, options);
-    const storageEvent = Object.assign(new Event("storage"), {
-      key,
-      oldValue,
-      newValue: value,
-      url: globalThis.document.URL,
-      storageArea: cookieStorage,
-    });
-    window.dispatchEvent(storageEvent);
+    if (!isServer) {
+      // Storage events are only required on client when using multiple tabs
+      const storageEvent = Object.assign(new Event("storage"), {
+        key,
+        oldValue,
+        newValue: value,
+        url: globalThis.document.URL,
+        storageArea: cookieStorage,
+      });
+      window.dispatchEvent(storageEvent);
+    }
   },
   removeItem: (key: string) => {
     cookieStorage._write(key, "deleted", { expires: new Date(0) });
