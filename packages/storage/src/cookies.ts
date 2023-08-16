@@ -1,10 +1,15 @@
-import { isServer } from "solid-js/web";
-import { StorageProps, StorageWithOptions, StorageSignalProps } from "./types.js";
-import { addClearMethod } from "./tools.js";
-import { createStorage, createStorageSignal } from "./storage.js";
-import type { PageEvent } from "solid-start";
+import {isServer} from "solid-js/web";
+import {StorageProps, StorageWithOptions, StorageSignalProps} from "./types.js";
+import {addClearMethod} from "./tools.js";
+import {createStorage, createStorageSignal} from "./storage.js";
+import type {PageEvent} from "solid-start";
 
-export type CookieOptions = {
+export type CookieOptions = CookieProperties & {
+  getRequest?: (() => Request) | (() => PageEvent);
+  setCookie?: (key: string, value: string, options: CookieOptions) => void;
+};
+
+type CookieProperties = {
   domain?: string;
   expires?: Date | number | String;
   path?: string;
@@ -12,11 +17,10 @@ export type CookieOptions = {
   httpOnly?: boolean;
   maxAge?: number;
   sameSite?: "None" | "Lax" | "Strict";
-  getRequest?: (() => Request) | (() => PageEvent);
-  setCookie?: (key: string, value: string, options: CookieOptions) => void;
-};
+}
 
-const serializeCookieOptions = (options?: CookieOptions) => {
+
+function serializeCookieOptions(options?: CookieOptions) {
   if (!options) {
     return "";
   }
@@ -25,7 +29,7 @@ const serializeCookieOptions = (options?: CookieOptions) => {
     if (!options.hasOwnProperty(key)) {
       continue;
     }
-    const value = options[key as keyof CookieOptions];
+    const value = options[key as keyof CookieProperties];
     memo +=
       value instanceof Date
         ? `; ${key}=${value.toUTCString()}`
@@ -34,7 +38,11 @@ const serializeCookieOptions = (options?: CookieOptions) => {
           : `; ${key}=${value}`;
   }
   return memo;
-};
+}
+
+function deserializeCookieOptions(cookie: string, key: string) {
+  return cookie.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop() ?? null;
+}
 
 let useRequest: () => PageEvent | undefined;
 try {
@@ -46,7 +54,7 @@ try {
       "It seems you attempt to use cookieStorage on the server without having solid-start installed",
     );
     return {
-      request: { headers: { get: () => "" } } as unknown as Request,
+      request: {headers: {get: () => ""}} as unknown as Request,
     } as unknown as PageEvent;
   };
 }
@@ -74,22 +82,29 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   _read: isServer
     ? (options?: CookieOptions) => {
       const eventOrRequest = options?.getRequest?.() || useRequest();
-      const request =
-        eventOrRequest && ("request" in eventOrRequest ? eventOrRequest.request : eventOrRequest);
+      const request = eventOrRequest && ("request" in eventOrRequest ? eventOrRequest.request : eventOrRequest);
       return request?.headers.get("Cookie") || "";
     }
     : () => document.cookie,
   _write: isServer
-    ? (key: string, value: string, options?: CookieOptions) =>
-      options?.setCookie?.(key, value, options)
+    ? (key: string, value: string, options?: CookieOptions) => {
+      if (options?.setCookie) {
+        options?.setCookie?.(key, value, options)
+        return
+      }
+      const pageEvent: PageEvent = options?.getRequest?.() || useRequest();
+      if (!("responseHeaders" in pageEvent)) // Check if we really got a pageEvent
+        return
+      const responseHeaders = pageEvent.responseHeaders as Headers;
+      const cookies = responseHeaders.get("Set-Cookie")?.split(",").filter((cookie) => deserializeCookieOptions(cookie, key) == null) ?? [];
+      cookies.push(`${key}=${value}${serializeCookieOptions(options)}`)
+      responseHeaders.set("Set-Cookie", cookies.join(","))
+    }
     : (key: string, value: string, options?: CookieOptions) => {
       document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
     },
   getItem: (key: string, options?: CookieOptions) =>
-    cookieStorage
-      ._read(options)
-      .match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)")
-      ?.pop() ?? null,
+    deserializeCookieOptions(cookieStorage._read(options), key),
   setItem: (key: string, value: string, options?: CookieOptions) => {
     const oldValue = isServer ? cookieStorage.getItem(key) : null;
     cookieStorage._write(key, value, options);
@@ -106,7 +121,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
     }
   },
   removeItem: (key: string) => {
-    cookieStorage._write(key, "deleted", { expires: new Date(0) });
+    cookieStorage._write(key, "deleted", {expires: new Date(0)});
   },
   key: (index: number) => {
     let key: string | null = null;
@@ -135,7 +150,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
  */
 export const createCookieStorage = <T, O = CookieOptions, A = StorageWithOptions<CookieOptions>>(
   props?: Omit<StorageProps<T, A, O>, "api">,
-) => createStorage<O, T>({ ...props, api: cookieStorage } as any);
+) => createStorage<O, T>({...props, api: cookieStorage} as any);
 
 /**
  * creates a reactive signal, but bound to document.cookie
@@ -149,4 +164,4 @@ export const createCookieStorageSignal = <
   key: string,
   initialValue?: T,
   props?: Omit<StorageSignalProps<T, A, O>, "api">,
-) => createStorageSignal<T, O>(key, initialValue, { ...props, api: cookieStorage } as any);
+) => createStorageSignal<T, O>(key, initialValue, {...props, api: cookieStorage} as any);
