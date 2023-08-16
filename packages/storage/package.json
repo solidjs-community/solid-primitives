@@ -63,7 +63,7 @@
   },
   "peerDependencies": {
     "solid-js": "^1.6.12",
-    "solid-start": "^0.2.26"
+    "solid-start": ">=0.2.26"
   },
   "peerDependenciesMeta": {
     "solid-start": {
@@ -72,6 +72,7 @@
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "1.7.9"
+    "solid-js": "^1.7.11",
+    "solid-start": "^0.3.3"
   }
 }

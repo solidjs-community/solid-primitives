@@ -55,7 +55,7 @@
   ],
   "devDependencies": {
     "@solid-primitives/range": "workspace:^",
-    "solid-js": "1.7.9"
+    "solid-js": "^1.7.11"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"
