@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 2.1.1
+
+### Patch Changes
+
+- a5f01c30: Loosen solid-start peer dependency
+
 ## 2.1.0
 
 ### Minor Changes
