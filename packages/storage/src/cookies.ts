@@ -50,9 +50,7 @@ try {
 } catch (e) {
   useRequest = () => {
     // eslint-disable-next-line no-console
-    console.warn(
-      "It seems you attempt to use cookieStorage on the server without having solid-start installed",
-    );
+    console.warn("It seems you attempt to use cookieStorage on the server without having solid-start installed or use vite.");
     return {
       request: {headers: {get: () => ""}} as unknown as Request,
     } as unknown as PageEvent;
@@ -72,7 +70,7 @@ try {
  *   httpOnly?: boolean;
  *   maxAge?: number;
  *   sameSite?: "None" | "Lax" | "Strict";
- *   getRequest?: () => Request | () => PageEvent // (useRequest from solid-start)
+ *   getRequest?: () => Request | () => PageEvent // useRequest from solid-start, vite users must pass the "useRequest" from "solid-start/server" function manually
  *   setCookie?: (key, value, options) => void // set cookie on the server
  * };
  * ```
