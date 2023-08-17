@@ -1,5 +1,5 @@
 import {isServer} from "solid-js/web";
-import {StorageProps, StorageWithOptions, StorageSignalProps} from "./types.js";
+import {StorageProps, StorageSignalProps, StorageWithOptions} from "./types.js";
 import {addClearMethod} from "./tools.js";
 import {createStorage, createStorageSignal} from "./storage.js";
 import type {PageEvent} from "solid-start";
@@ -19,6 +19,8 @@ type CookieProperties = {
   sameSite?: "None" | "Lax" | "Strict";
 }
 
+const cookiePropertyKeys: (keyof CookieProperties)[] = ["domain", "expires", "path", "secure", "httpOnly", "maxAge", "sameSite"];
+
 
 function serializeCookieOptions(options?: CookieOptions) {
   if (!options) {
@@ -26,9 +28,10 @@ function serializeCookieOptions(options?: CookieOptions) {
   }
   let memo = "";
   for (const key in options) {
-    if (!options.hasOwnProperty(key)) {
+    if (!options.hasOwnProperty(key) || !cookiePropertyKeys.includes(key as keyof CookieProperties)) {
       continue;
     }
+
     const value = options[key as keyof CookieProperties];
     memo +=
       value instanceof Date
@@ -81,7 +84,13 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
     ? (options?: CookieOptions) => {
       const eventOrRequest = options?.getRequest?.() || useRequest();
       const request = eventOrRequest && ("request" in eventOrRequest ? eventOrRequest.request : eventOrRequest);
-      return request?.headers.get("Cookie") || "";
+      let result = ""
+      if (eventOrRequest.responseHeaders) // Check if we really got a pageEvent
+      {
+        const responseHeaders = eventOrRequest.responseHeaders as Headers;
+        result += responseHeaders.get("Set-Cookie")?.split(",").map(cookie => !cookie.match(`\\w*\\s*=\\s*[^;]+`)).join(";") ?? "";
+      }
+      return `${result};${request?.headers?.get("Cookie") ?? ""}`; // because first cookie will be preferred we don't have to worry about duplicates
     }
     : () => document.cookie,
   _write: isServer
@@ -91,20 +100,22 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
         return
       }
       const pageEvent: PageEvent = options?.getRequest?.() || useRequest();
-      if (!("responseHeaders" in pageEvent)) // Check if we really got a pageEvent
+      if (!pageEvent.responseHeaders) // Check if we really got a pageEvent
         return
       const responseHeaders = pageEvent.responseHeaders as Headers;
-      const cookies = responseHeaders.get("Set-Cookie")?.split(",").filter((cookie) => deserializeCookieOptions(cookie, key) == null) ?? [];
+      const cookies = responseHeaders.get("Set-Cookie")?.split(",")
+        .filter((cookie) => !cookie.match(`\\s*${key}\\s*=`)) ?? [];
       cookies.push(`${key}=${value}${serializeCookieOptions(options)}`)
       responseHeaders.set("Set-Cookie", cookies.join(","))
     }
     : (key: string, value: string, options?: CookieOptions) => {
       document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
     },
-  getItem: (key: string, options?: CookieOptions) =>
-    deserializeCookieOptions(cookieStorage._read(options), key),
+  getItem: (key: string, options?: CookieOptions) => {
+    return deserializeCookieOptions(cookieStorage._read(options), key)
+  },
   setItem: (key: string, value: string, options?: CookieOptions) => {
-    const oldValue = isServer ? cookieStorage.getItem(key) : null;
+    const oldValue = isServer ? cookieStorage.getItem(key, options) : null;
     cookieStorage._write(key, value, options);
     if (!isServer) {
       // Storage events are only required on client when using multiple tabs
@@ -118,13 +129,13 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
       window.dispatchEvent(storageEvent);
     }
   },
-  removeItem: (key: string) => {
-    cookieStorage._write(key, "deleted", {expires: new Date(0)});
+  removeItem: (key: string, options?: CookieOptions) => {
+    cookieStorage._write(key, "deleted", {...options, expires: new Date(0)});
   },
-  key: (index: number) => {
+  key: (index: number, options?: CookieOptions) => {
     let key: string | null = null;
     let count = 0;
-    cookieStorage._read().replace(/(?:^|;)\s*(.+?)\s*=\s*[^;]+/g, (_: string, found: string) => {
+    cookieStorage._read(options).replace(/(?:^|;)\s*(.+?)\s*=\s*[^;]+/g, (_: string, found: string) => {
       if (!key && found && count++ === index) {
         key = found;
       }
@@ -132,14 +143,17 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
     });
     return key;
   },
-  get length() {
+  getLength: (options?: CookieOptions) => {
     let length = 0;
-    cookieStorage._read().replace(/(?:^|;)\s*.+?\s*=\s*[^;]+/g, (found: string) => {
+    cookieStorage._read(options).replace(/(?:^|;)\s*.+?\s*=\s*[^;]+/g, (found: string) => {
       length += found ? 1 : 0;
       return "";
     });
     return length;
   },
+  get length() {
+    throw new Error("CookieStorage.length is not supported, use CookieStorage.getLength() instead");
+  }
 });
 
 /**
