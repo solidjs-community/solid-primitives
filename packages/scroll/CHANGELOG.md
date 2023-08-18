@@ -1,5 +1,11 @@
 # @solid-primitives/scroll
 
+## 2.0.19
+
+### Patch Changes
+
+- fc659d33: Fix `useWindowScrollPosition` on the server. (fixes #494)
+
 ## 2.0.18
 
 ### Patch Changes
