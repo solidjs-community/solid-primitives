@@ -1,6 +1,6 @@
 import {createUniqueId, untrack} from "solid-js";
 import {reconcile} from "solid-js/store";
-import type {Accessor, Setter} from "solid-js";
+import type {Accessor, Setter, Signal} from "solid-js";
 import type {Store, SetStoreFunction} from "solid-js/store";
 import type {StorageWithOptions, AsyncStorage, AsyncStorageWithOptions} from "./types.js";
 
@@ -19,41 +19,132 @@ export type PersistenceOptions<T, O extends Record<string, any> = {}> = Persiste
     storageOptions: O;
   });
 
-/*
+/**
  * Persists a signal, store or similar API
- * ```ts
- * const [getter, setter] = makePersisted(createSignal("data"), options);
- * const options = {
- *   storage: cookieStorage,  // can be any synchronous or asynchronous storage
- *   storageOptions: { ... }, // for storages with options, otherwise not needed
- *   name: "solid-data",      // optional
- *   autoRemove: true,       // optional, removes key from storage when value is set to null or undefined
- *   serialize: (value: string) => value, // optional
- *   deserialize: (data: string) => data, // optional
- * };
- * ```
- * Can be used with `createSignal` or `createStore`. The initial value from the storage will overwrite the initial value of the signal or store unless overwritten. Overwriting a signal with `null` or `undefined` will remove the item from the storage.
+ *  ```ts
+ *  const [getter, setter] = makePersisted(createSignal("data"), options);
+ *  const options = {
+ *    storage: cookieStorage,  // can be any synchronous or asynchronous storage
+ *    storageOptions: { ... }, // for storages with options, otherwise not needed
+ *    name: "solid-data",      // optional
+ *    serialize: (value: string) => value, // optional
+ *    deserialize: (data: string) => data, // optional
+ *  };
+ *  ```
+ *  Can be used with `createSignal` or `createStore`. The initial value from the storage will overwrite the initial
+ *  value of the signal or store unless overwritten. Overwriting a signal with `null` or `undefined` will remove the
+ *  item from the storage.
+ *
+ * @param {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} signal - The signal or store to be persisted.
+ * @param {PersistenceOptions<T, O>} options - The options for persistence.
+ * @returns {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} - The persisted signal or store.
  */
 export function makePersisted<T>(
   signal: [Accessor<T>, Setter<T>],
   options?: PersistenceOptions<T>,
 ): [Accessor<T>, Setter<T>];
+
+
+/**
+ * Persists a signal, store or similar API
+ *  ```ts
+ *  const [getter, setter] = makePersisted(createSignal("data"), options);
+ *  const options = {
+ *    storage: cookieStorage,  // can be any synchronous or asynchronous storage
+ *    storageOptions: { ... }, // for storages with options, otherwise not needed
+ *    name: "solid-data",      // optional
+ *    serialize: (value: string) => value, // optional
+ *    deserialize: (data: string) => data, // optional
+ *  };
+ *  ```
+ *  Can be used with `createSignal` or `createStore`. The initial value from the storage will overwrite the initial
+ *  value of the signal or store unless overwritten. Overwriting a signal with `null` or `undefined` will remove the
+ *  item from the storage.
+ *
+ * @param {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} signal - The signal or store to be persisted.
+ * @param {PersistenceOptions<T, O>} options - The options for persistence.
+ * @returns {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} - The persisted signal or store.
+ */
 export function makePersisted<T, O extends Record<string, any>>(
-  signal: [Accessor<T>, Setter<T>],
+  signal: Signal<T>,
   options: PersistenceOptions<T, O>,
-): [Accessor<T>, Setter<T>];
+): Signal<T>;
+
+/**
+ * Persists a signal, store or similar API
+ *  ```ts
+ *  const [getter, setter] = makePersisted(createSignal("data"), options);
+ *  const options = {
+ *    storage: cookieStorage,  // can be any synchronous or asynchronous storage
+ *    storageOptions: { ... }, // for storages with options, otherwise not needed
+ *    name: "solid-data",      // optional
+ *    serialize: (value: string) => value, // optional
+ *    deserialize: (data: string) => data, // optional
+ *  };
+ *  ```
+ *  Can be used with `createSignal` or `createStore`. The initial value from the storage will overwrite the initial
+ *  value of the signal or store unless overwritten. Overwriting a signal with `null` or `undefined` will remove the
+ *  item from the storage.
+ *
+ * @param {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} signal - The signal or store to be persisted.
+ * @param {PersistenceOptions<T, O>} options - The options for persistence.
+ * @returns {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} - The persisted signal or store.
+ */
 export function makePersisted<T>(
-  signal: [Store<T>, SetStoreFunction<T>],
+  signal: [get: Store<T>, set: SetStoreFunction<T>],
   options?: PersistenceOptions<T>,
-): [Store<T>, SetStoreFunction<T>];
+): [get: Store<T>, set: SetStoreFunction<T>];
+
+/**
+ * Persists a signal, store or similar API
+ *  ```ts
+ *  const [getter, setter] = makePersisted(createSignal("data"), options);
+ *  const options = {
+ *    storage: cookieStorage,  // can be any synchronous or asynchronous storage
+ *    storageOptions: { ... }, // for storages with options, otherwise not needed
+ *    name: "solid-data",      // optional
+ *    serialize: (value: string) => value, // optional
+ *    deserialize: (data: string) => data, // optional
+ *  };
+ *  ```
+ *  Can be used with `createSignal` or `createStore`. The initial value from the storage will overwrite the initial
+ *  value of the signal or store unless overwritten. Overwriting a signal with `null` or `undefined` will remove the
+ *  item from the storage.
+ *
+ * @param {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} signal - The signal or store to be persisted.
+ * @param {PersistenceOptions<T, O>} options - The options for persistence.
+ * @returns {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} - The persisted signal or store.
+ */
 export function makePersisted<T, O extends Record<string, any>>(
-  signal: [Store<T>, SetStoreFunction<T>],
+  signal: [get: Store<T>, set: SetStoreFunction<T>],
   options: PersistenceOptions<T, O>,
-): [Store<T>, SetStoreFunction<T>];
+): [get: Store<T>, set: SetStoreFunction<T>];
+
+
+/**
+ * Persists a signal, store or similar API
+ *  ```ts
+ *  const [getter, setter] = makePersisted(createSignal("data"), options);
+ *  const options = {
+ *    storage: cookieStorage,  // can be any synchronous or asynchronous storage
+ *    storageOptions: { ... }, // for storages with options, otherwise not needed
+ *    name: "solid-data",      // optional
+ *    serialize: (value: string) => value, // optional
+ *    deserialize: (data: string) => data, // optional
+ *  };
+ *  ```
+ *  Can be used with `createSignal` or `createStore`. The initial value from the storage will overwrite the initial
+ *  value of the signal or store unless overwritten. Overwriting a signal with `null` or `undefined` will remove the
+ *  item from the storage.
+ *
+ * @param {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} signal - The signal or store to be persisted.
+ * @param {PersistenceOptions<T, O>} options - The options for persistence.
+ * @returns {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} - The persisted signal or store.
+ */
 export function makePersisted<T, O extends Record<string, any> = {}>(
-  signal: [Accessor<T>, Setter<T>] | [Store<T>, SetStoreFunction<T>],
+  signal: Signal<T> | [get: Store<T>, set: SetStoreFunction<T>],
   options: PersistenceOptions<T, O> = {},
-): [Accessor<T>, Setter<T>] | [Store<T>, SetStoreFunction<T>] {
+): Signal<T> | [get: Store<T>, set: SetStoreFunction<T>] {
   const storage = options.storage || globalThis.localStorage;
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!storage) {
@@ -81,7 +172,7 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
       ? (value?: T | ((prev: T) => T)) => {
         const output = (signal[1] as Setter<T>)(value as any);
 
-        if (value != null)
+        if (value)
           storage.setItem(name, serialize(output), storageOptions);
         else
           storage.removeItem(name, storageOptions);
