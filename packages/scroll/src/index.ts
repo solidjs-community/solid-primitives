@@ -1,8 +1,8 @@
+import { createEventListener } from "@solid-primitives/event-listener";
+import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
+import { createDerivedStaticStore } from "@solid-primitives/static-store";
 import { Accessor, createSignal, onMount, sharedConfig } from "solid-js";
 import { isServer } from "solid-js/web";
-import { createEventListener } from "@solid-primitives/event-listener";
-import { createDerivedStaticStore } from "@solid-primitives/static-store";
-import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 
 export function getScrollParent(node: Element | null): Element {
   if (isServer) {
@@ -104,5 +104,5 @@ export function createScrollPosition(
  * })
  */
 export const useWindowScrollPosition = /*#__PURE__*/ createHydratableSingletonRoot(() =>
-  createScrollPosition(window),
+  createScrollPosition(isServer ? () => undefined : window),
 );

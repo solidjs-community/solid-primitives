@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createScrollPosition, getScrollPosition } from "../src/index.js";
+import { createScrollPosition, getScrollPosition, useWindowScrollPosition } from "../src/index.js";
 
 describe("getScrollPosition", () => {
   it("returns null", () => {
@@ -10,5 +10,11 @@ describe("getScrollPosition", () => {
 describe("createScrollPosition", () => {
   it("returns null", () => {
     expect(createScrollPosition()).toEqual({ x: 0, y: 0 });
+  });
+});
+
+describe("useWindowScrollPosition", () => {
+  it("returns null", () => {
+    expect(useWindowScrollPosition()).toEqual({ x: 0, y: 0 });
   });
 });
