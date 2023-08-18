@@ -1,8 +1,8 @@
+import type {Setter, Signal} from "solid-js";
 import {createUniqueId, untrack} from "solid-js";
+import type {SetStoreFunction, Store} from "solid-js/store";
 import {reconcile} from "solid-js/store";
-import type {Accessor, Setter, Signal} from "solid-js";
-import type {Store, SetStoreFunction} from "solid-js/store";
-import type {StorageWithOptions, AsyncStorage, AsyncStorageWithOptions} from "./types.js";
+import type {AsyncStorage, AsyncStorageWithOptions, StorageWithOptions} from "./types.js";
 
 export type PersistenceBaseOptions<T> = {
   name?: string;
@@ -10,14 +10,13 @@ export type PersistenceBaseOptions<T> = {
   deserialize?: (data: string) => T;
 }
 
-export type PersistenceOptions<T, O extends Record<string, any> = {}> = PersistenceBaseOptions<T> & (
-  {
-    storage?: Storage | AsyncStorage;
-  } |
+export type PersistenceOptions<T, O extends Record<string, any>> =
+  PersistenceBaseOptions<T> & (
   {
     storage: StorageWithOptions<O> | AsyncStorageWithOptions<O>;
     storageOptions: O;
-  });
+  } |
+  { storage?: Storage | AsyncStorage; })
 
 /**
  * Persists a signal, store or similar API
