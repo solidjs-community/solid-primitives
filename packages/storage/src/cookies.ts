@@ -152,7 +152,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
     return length;
   },
   get length() {
-    throw new Error("CookieStorage.length is not supported, use CookieStorage.getLength() instead");
+    return this.getLength
   }
 });
 
