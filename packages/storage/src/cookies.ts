@@ -19,7 +19,7 @@ type CookieProperties = {
   sameSite?: "None" | "Lax" | "Strict";
 }
 
-const cookiePropertyKeys: (keyof CookieProperties)[] = ["domain", "expires", "path", "secure", "httpOnly", "maxAge", "sameSite"];
+const cookiePropertyKeys = ["domain", "expires", "path", "secure", "httpOnly", "maxAge", "sameSite"] as const;
 
 
 function serializeCookieOptions(options?: CookieOptions) {
@@ -28,9 +28,8 @@ function serializeCookieOptions(options?: CookieOptions) {
   }
   let memo = "";
   for (const key in options) {
-    if (!options.hasOwnProperty(key) || !cookiePropertyKeys.includes(key as keyof CookieProperties)) {
+    if (!cookiePropertyKeys.includes(key as keyof CookieProperties))
       continue;
-    }
 
     const value = options[key as keyof CookieProperties];
     memo +=
@@ -88,7 +87,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
       if (eventOrRequest.responseHeaders) // Check if we really got a pageEvent
       {
         const responseHeaders = eventOrRequest.responseHeaders as Headers;
-        result += responseHeaders.get("Set-Cookie")?.split(",").map(cookie => !cookie.match(`\\w*\\s*=\\s*[^;]+`)).join(";") ?? "";
+        result += responseHeaders.get("Set-Cookie")?.split(",").map(cookie => !cookie.match(/\\w*\\s*=\\s*[^;]+/)).join(";") ?? "";
       }
       return `${result};${request?.headers?.get("Cookie") ?? ""}`; // because first cookie will be preferred we don't have to worry about duplicates
     }
@@ -111,9 +110,8 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
     : (key: string, value: string, options?: CookieOptions) => {
       document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
     },
-  getItem: (key: string, options?: CookieOptions) => {
-    return deserializeCookieOptions(cookieStorage._read(options), key)
-  },
+  getItem: (key: string, options?: CookieOptions) =>
+    deserializeCookieOptions(cookieStorage._read(options), key),
   setItem: (key: string, value: string, options?: CookieOptions) => {
     const oldValue = isServer ? cookieStorage.getItem(key, options) : null;
     cookieStorage._write(key, value, options);

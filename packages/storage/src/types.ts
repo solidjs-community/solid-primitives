@@ -5,7 +5,7 @@ export type StorageWithOptions<O> = {
   setItem: (key: string, value: string, options?: O) => void;
   removeItem: (key: string, options?: O) => void;
   key: (index: number, options?: O) => string | null;
-  getLength: (options?: O) => number | undefined;
+  getLength?: (options?: O) => number | undefined;
   readonly length: number | undefined;
   [name: string]: any;
 };
