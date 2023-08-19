@@ -1,7 +1,7 @@
 import { createSignal, createEffect, Signal } from "solid-js";
 import { isServer } from "solid-js/web";
 import { parseCookie } from "solid-start";
-import { useRequest } from "solid-start/server/ServerContext.jsx";
+import { useRequest } from "solid-start/server";
 
 export type MaxAgeOptions = {
   /**
