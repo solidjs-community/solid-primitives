@@ -79,7 +79,6 @@ This is the main entry file for SolidStart demonstrating usage of the `createUse
 - Provides additional examples on using variant classes to style components.
 
 ```tsx
-// @refresh reload
 import { Suspense } from "solid-js";
 import {
   A,
@@ -95,7 +94,7 @@ import {
 } from "solid-start";
 import Counter from "./components/Counter";
 import "./root.css";
-import { createUserTheme } from "./start_primitive/index";
+import { createUserTheme } from '~/primitives/start';
 export default function Root() {
   const [theme, setTheme] = createUserTheme("dark-light-theme", "dark");
   const toggleTheme = () => setTheme(currentTheme => currentTheme === "dark" ? "light" : "dark");
@@ -107,16 +106,12 @@ export default function Root() {
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      <Body
-        classList={{
-          // Apply theme as css class to body:
-          [theme()]: true,
-        }}
-      >
+      // Apply theme as a class to the Body element:
+      <Body class={theme()}>
         <div>
           <Counter
             classList={{
-              // Within components conditionally apply css classes:
+              // Within components apply theme-dependent classes/variants:
               "dark-variant": theme() !== "light",
               "light-variant": theme() === "light",
             }}
