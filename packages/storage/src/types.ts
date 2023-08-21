@@ -7,7 +7,7 @@ export type StorageWithOptions<O> = {
   key: (index: number, options?: O) => string | null;
   getLength?: (options?: O) => number | undefined;
   readonly length: number | undefined;
-  [name: string]: any;
+  [key: string]: any;
 };
 
 export type StorageDeserializer<T, O> = (value: string, key: string, options?: O) => T;
