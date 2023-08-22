@@ -150,7 +150,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
     return length;
   },
   get length() {
-    return this.getLength
+    return this.getLength()
   }
 });
 
