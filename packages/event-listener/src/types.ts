@@ -5,6 +5,7 @@ export type EventListenerOptions = boolean | AddEventListenerOptions;
 export type TargetWithEventMap =
   | Window
   | Document
+  | XMLDocument
   | HTMLBodyElement
   | HTMLFrameSetElement
   | HTMLMediaElement
