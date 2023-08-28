@@ -1,5 +1,11 @@
 # @solid-primitives/event-listener
 
+## 2.3.0
+
+### Minor Changes
+
+- b4398ee0: Add more event target and event target map types.
+
 ## 2.2.14
 
 ### Patch Changes

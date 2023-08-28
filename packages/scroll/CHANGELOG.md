@@ -1,5 +1,12 @@
 # @solid-primitives/scroll
 
+## 2.0.20
+
+### Patch Changes
+
+- Updated dependencies [b4398ee0]
+  - @solid-primitives/event-listener@2.3.0
+
 ## 2.0.19
 
 ### Patch Changes
