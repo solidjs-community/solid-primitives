@@ -138,5 +138,9 @@ const App: Component = () => {
 export default function () {
   const [mounted, setMounted] = createSignal(false);
   onMount(() => setMounted(true));
-  return <Show when={mounted()}><App/></Show>
+  return (
+    <Show when={mounted()}>
+      <App />
+    </Show>
+  );
 }
