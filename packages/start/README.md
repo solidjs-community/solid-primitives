@@ -66,12 +66,12 @@ const [theme, setTheme] = createUserTheme("cookieName", {
 theme(); // => "light" | "dark"
 ```
 
-
 ## Examples
 
 ### `root.tsx`
 
 This is the main entry file for SolidStart demonstrating usage of the `createUserTheme` function.
+
 - Initializes the theme with the `createUserTheme` function.
 - Toggles between the "dark" and "light" themes using a button.
 - Sets the `data-theme` attribute adding compatibility between `createUserTheme` and libraries like [DaisyUI](https://daisyui.com/).
@@ -94,11 +94,11 @@ import {
 } from "solid-start";
 import Counter from "./components/Counter";
 import "./root.css";
-import { createUserTheme } from '~/primitives/start';
+import { createUserTheme } from "~/primitives/start";
 
 export default function Root() {
   const [theme, setTheme] = createUserTheme("dark-light-theme", { defaultValue: "dark" });
-  const toggleTheme = () => setTheme(currentTheme => currentTheme === "dark" ? "light" : "dark");
+  const toggleTheme = () => setTheme(currentTheme => (currentTheme === "dark" ? "light" : "dark"));
 
   return (
     // Set data-theme when using libraries like Daisyui:
@@ -127,20 +127,19 @@ export default function Root() {
     </Html>
   );
 }
-
 ```
 
 ### `root.css`
 
 Here is an absolute basic CSS file to demonstrate styling with the themes.
+
 - The `body` selector has general styles.
 - The `.dark` and `.light` classes provide specific styles for each theme.
 - The `.dark span` and `.light span` selectors show how to style specific elements based on the theme.
 
 ```css
 body {
-  font-family: Gordita, Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
-    "Helvetica Neue", sans-serif;
+  font-family: Gordita, Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   height: "100vh";
   width: "100vh";
 }
@@ -165,6 +164,7 @@ body.light {
 ### `Counter.css`
 
 Continuation of the basic CSS scoped to the component using variant classes.
+
 ```css
 .dark-variant {
   border: 2px solid #569cf3;
@@ -174,6 +174,7 @@ Continuation of the basic CSS scoped to the component using variant classes.
   border: 2px solid #05ff22;
 }
 ```
+
 ## Demo
 
 You can view a demo of this primitive here: <https://codesandbox.io/p/sandbox/amazing-easley-wqk38i?file=%2Fsrc%2Fstart_primitive%2Findex.ts%3A36%2C20>
