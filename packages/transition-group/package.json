@@ -47,8 +47,8 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "dev": "jiti ../../scripts/dev.ts",
-    "build": "jiti ../../scripts/build.ts",
+    "dev": "tsx ../../scripts/dev.ts",
+    "build": "tsx ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -59,7 +59,6 @@
   "devDependencies": {
     "@solid-primitives/refs": "workspace:^",
     "@solid-primitives/utils": "workspace:^",
-    "@solidjs/router": "^0.8.2",
     "solid-js": "^1.7.11"
   },
   "typesVersions": {}

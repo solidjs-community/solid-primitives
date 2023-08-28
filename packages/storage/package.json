@@ -45,8 +45,8 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "dev": "jiti ../../scripts/dev.ts",
-    "build": "jiti ../../scripts/build.ts",
+    "dev": "tsx ../../scripts/dev.ts",
+    "build": "tsx ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -73,6 +73,6 @@
   "typesVersions": {},
   "devDependencies": {
     "solid-js": "^1.7.11",
-    "solid-start": "^0.3.3"
+    "solid-start": "^0.3.4"
   }
 }

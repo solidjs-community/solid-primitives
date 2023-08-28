@@ -40,8 +40,8 @@
   },
   "scripts": {
     "gqlgen": "graphql-codegen --config dev/codegen.yml",
-    "dev": "jiti ../../scripts/dev.ts",
-    "build": "jiti ../../scripts/build.ts",
+    "dev": "tsx ../../scripts/dev.ts",
+    "build": "tsx ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -58,7 +58,7 @@
     "@graphql-codegen/typescript": "^4.0.1",
     "@graphql-codegen/typescript-operations": "^4.0.1",
     "@graphql-typed-document-node/core": "^3.2.0",
-    "graphql": "^16.7.1",
+    "graphql": "^16.8.0",
     "solid-js": "^1.7.11"
   },
   "dependencies": {

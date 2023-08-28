@@ -1,4 +1,4 @@
-import { Component, For, createSignal } from "solid-js";
+import { Component, For, Show, createSignal, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { type WSMessage, createReconnectingWS } from "../src/index.js";
 
@@ -61,4 +61,8 @@ const App: Component = () => {
   );
 };
 
-export default App;
+export default function () {
+  const [mounted, setMounted] = createSignal(false);
+  onMount(() => setMounted(true));
+  return <Show when={mounted()}><App/></Show>
+}

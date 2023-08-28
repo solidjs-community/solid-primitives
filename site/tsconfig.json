@@ -1,7 +1,6 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "Node16",
     "resolveJsonModule": true,
     "types": ["vite/client", "node"],
     "baseUrl": "./",

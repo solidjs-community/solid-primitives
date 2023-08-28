@@ -1,4 +1,4 @@
-import { Component, createResource, createSignal, For, onCleanup, Show } from "solid-js";
+import { Component, createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 
 import { makeAbortable, makeCache, makeRetrying } from "../src/index.js";
 
@@ -189,5 +189,8 @@ const App: Component = () => {
     </div>
   );
 };
-
-export default App;
+export default function () {
+  const [mounted, setMounted] = createSignal(false);
+  onMount(() => setMounted(true));
+  return <Show when={mounted()}><App/></Show>
+}
