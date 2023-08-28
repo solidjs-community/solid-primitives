@@ -95,9 +95,11 @@ import {
 import Counter from "./components/Counter";
 import "./root.css";
 import { createUserTheme } from '~/primitives/start';
+
 export default function Root() {
-  const [theme, setTheme] = createUserTheme("dark-light-theme", "dark");
+  const [theme, setTheme] = createUserTheme("dark-light-theme", { defaultValue: "dark" });
   const toggleTheme = () => setTheme(currentTheme => currentTheme === "dark" ? "light" : "dark");
+
   return (
     // Set data-theme when using libraries like Daisyui:
     <Html lang="en" data-theme={theme()}>
@@ -116,9 +118,7 @@ export default function Root() {
               "light-variant": theme() === "light",
             }}
           />
-          <button
-            onClick={toggleTheme}
-          >
+          <button onClick={toggleTheme}>
             <span>Toggle Theme</span>
           </button>
         </div>
@@ -149,7 +149,6 @@ body.dark {
   background-color: black;
   color: aliceblue;
 }
-
 body.light {
   background-color: aliceblue;
   color: black;
@@ -158,11 +157,9 @@ body.light {
 .dark span {
   color: #b1d4ff;
 }
-
 .light span {
   color: #003677;
 }
-
 ```
 
 ### `Counter.css`
