@@ -1,5 +1,12 @@
 # @solid-primitives/pointer
 
+## 0.2.16
+
+### Patch Changes
+
+- Updated dependencies [b4398ee0]
+  - @solid-primitives/event-listener@2.3.0
+
 ## 0.2.15
 
 ### Patch Changes

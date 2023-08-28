@@ -1,5 +1,12 @@
 # @solid-primitives/keyboard
 
+## 1.2.5
+
+### Patch Changes
+
+- Updated dependencies [b4398ee0]
+  - @solid-primitives/event-listener@2.3.0
+
 ## 1.2.4
 
 ### Patch Changes
