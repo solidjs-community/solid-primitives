@@ -53,8 +53,8 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "dev": "jiti ../../scripts/dev.ts",
-    "build": "jiti ../../scripts/build.ts --node",
+    "dev": "tsx ../../scripts/dev.ts",
+    "build": "tsx ../../scripts/build.ts --node",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
