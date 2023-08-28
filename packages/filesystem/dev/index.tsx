@@ -6,6 +6,7 @@ import {
   createResource,
   ErrorBoundary,
   createMemo,
+  onMount,
 } from "solid-js";
 
 import {
@@ -130,4 +131,8 @@ const App: Component = () => {
   );
 };
 
-export default App;
+export default function () {
+  const [mounted, setMounted] = createSignal(false);
+  onMount(() => setMounted(true));
+  return <Show when={mounted()}><App/></Show>
+}

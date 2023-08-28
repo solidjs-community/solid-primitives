@@ -1,4 +1,4 @@
-import { Component, createEffect, createSignal, For, on, Show } from "solid-js";
+import { Component, createEffect, createSignal, For, on, onMount, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 
 import { createBroadcastChannel, makeBroadcastChannel } from "../src/index.js";
@@ -135,4 +135,8 @@ const App: Component = () => {
   );
 };
 
-export default App;
+export default function () {
+  const [mounted, setMounted] = createSignal(false);
+  onMount(() => setMounted(true));
+  return <Show when={mounted()}><App/></Show>
+}
