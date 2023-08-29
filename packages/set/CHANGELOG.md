@@ -1,5 +1,11 @@
 # @solid-primitives/set
 
+## 0.4.8
+
+### Patch Changes
+
+- 379a56a9: Fix ReactiveSet iterators tracking
+
 ## 0.4.7
 
 ### Patch Changes
