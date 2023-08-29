@@ -1,5 +1,11 @@
 # @solid-primitives/map
 
+## 0.4.8
+
+### Patch Changes
+
+- 0d0640db: Fix ReactiveMap iterators tracking
+
 ## 0.4.7
 
 ### Patch Changes
