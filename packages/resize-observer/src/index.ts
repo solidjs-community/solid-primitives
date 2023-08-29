@@ -175,10 +175,7 @@ export function createElementSize(
     sharedConfig.context || isFn ? ELEMENT_SIZE_FALLBACK : getElementSize(target),
   );
 
-  const ro = new ResizeObserver(([e]) => {
-    const { width, height } = e!.contentRect;
-    setSize({ width, height });
-  });
+  const ro = new ResizeObserver(([e]) => setSize(getElementSize(e!.target)));
   onCleanup(() => ro.disconnect());
 
   if (isFn) {
