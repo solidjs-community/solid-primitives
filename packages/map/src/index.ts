@@ -43,19 +43,26 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     return super.size;
   }
 
-  keys(): IterableIterator<K> {
+  *keys(): IterableIterator<K> {
+    for (const key of super.keys()) {
+      this.#keyTriggers.track(key);
+      yield key;
+    }
     this.#keyTriggers.track($KEYS);
-    return super.keys();
   }
-  values(): IterableIterator<V> {
+  *values(): IterableIterator<V> {
+    for (const [key, v] of super.entries()) {
+      this.#valueTriggers.track(key);
+      yield v;
+    }
     this.#keyTriggers.track($KEYS);
-    for (const v of super.keys()) this.#valueTriggers.track(v);
-    return super.values();
   }
-  entries(): IterableIterator<[K, V]> {
+  *entries(): IterableIterator<[K, V]> {
+    for (const entry of super.entries()) {
+      this.#valueTriggers.track(entry[0]);
+      yield entry;
+    }
     this.#keyTriggers.track($KEYS);
-    for (const v of super.keys()) this.#valueTriggers.track(v);
-    return super.entries();
   }
 
   // writes
@@ -99,7 +106,10 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   // callback
   forEach(callbackfn: (value: V, key: K, map: this) => void) {
     this.#keyTriggers.track($KEYS);
-    super.forEach((value, key) => callbackfn(value, key, this));
+    for (const [key, v] of super.entries()) {
+      this.#valueTriggers.track(key);
+      callbackfn(v, key, this);
+    }
   }
 
   [Symbol.iterator](): IterableIterator<[K, V]> {

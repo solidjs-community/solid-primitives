@@ -1,6 +1,6 @@
 import { describe, test, it, expect, vi } from "vitest";
 import { ReactiveSet, ReactiveWeakSet } from "../src/index.js";
-import { createComputed, createRoot } from "solid-js";
+import { createComputed, createEffect, createRoot } from "solid-js";
 
 describe("ReactiveSet", () => {
   it("behaves like Set", () => {
@@ -80,6 +80,102 @@ describe("ReactiveSet", () => {
 
       dispose();
     }));
+
+  const iterators: Record<string, (set: ReactiveSet<number>) => IterableIterator<number>> = {
+    keys: set => set.keys(),
+    values: set => set.values(),
+    *entries(set) {
+      for (const [key] of set.entries()) {
+        yield key;
+      }
+    },
+  };
+
+  for (const [name, fn] of Object.entries(iterators)) {
+    test(name + " is reactive", () => {
+      const set = new ReactiveSet([1, 2, 3, 4]);
+
+      const captured: number[][] = [];
+
+      const dispose = createRoot(dispose => {
+        createEffect(() => {
+          const run: number[] = [];
+          let i = 0;
+          for (const key of fn(set)) {
+            run.push(key);
+            if (i === 2) break; // don't iterate over all keys
+            i += 1;
+          }
+          captured.push(run);
+        });
+        return dispose;
+      });
+
+      expect(captured).toHaveLength(1);
+      expect(captured[0]).toEqual([1, 2, 3]);
+
+      set.delete(4);
+      expect(captured, "deleted unseen key").toHaveLength(1);
+
+      set.delete(1);
+      expect(captured, "deleted seen").toHaveLength(2);
+      expect(captured[1]).toEqual([2, 3]);
+
+      set.add(4);
+      expect(captured, "added key in reach").toHaveLength(3);
+      expect(captured[2]).toEqual([2, 3, 4]);
+
+      set.add(5);
+      expect(captured, "added key out of reach").toHaveLength(3);
+
+      dispose();
+    });
+  }
+
+  test("forEach is reactive", () => {
+    const set = new ReactiveSet([1, 2, 3, 4]);
+
+    const captured: number[][] = [];
+
+    const dispose = createRoot(dispose => {
+      createEffect(() => {
+        const run: number[] = [];
+        set.forEach(key => {
+          run.push(key);
+        });
+        captured.push(run);
+      });
+      return dispose;
+    });
+
+    expect(captured).toHaveLength(1);
+    expect(captured[0]).toEqual([1, 2, 3, 4]);
+
+    set.delete(4);
+    expect(captured).toHaveLength(2);
+    expect(captured[1]).toEqual([1, 2, 3]);
+
+    set.delete(1);
+    expect(captured).toHaveLength(3);
+    expect(captured[2]).toEqual([2, 3]);
+
+    set.add(4);
+    expect(captured).toHaveLength(4);
+    expect(captured[3]).toEqual([2, 3, 4]);
+
+    set.add(5);
+    expect(captured).toHaveLength(5);
+    expect(captured[4]).toEqual([2, 3, 4, 5]);
+
+    set.add(5);
+    expect(captured).toHaveLength(5);
+
+    set.clear();
+    expect(captured).toHaveLength(6);
+    expect(captured[5]).toEqual([]);
+
+    dispose();
+  });
 });
 
 describe("ReactiveWeakSet", () => {
