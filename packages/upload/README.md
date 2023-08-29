@@ -72,7 +72,8 @@ const { setRef: dropzoneRef, files: droppedFiles } = createDropzone({
 
 ## Demo
 
-Working example: https://codesandbox.io/s/solid-primitives-upload-ry042x?file=/src/index.tsx
+Working example: https://primitives.solidjs.community/playground/upload
+Source code: https://github.com/solidjs-community/solid-primitives/blob/main/packages/upload/dev/index.tsx
 
 ## Changelog
 
