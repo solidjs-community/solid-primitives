@@ -6,6 +6,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT_DIR = path.join(__dirname, "..", "..");
 export const PACKAGES_DIR = path.join(ROOT_DIR, "packages");
 
+export const MODULE_PREFIX = "@solid-primitives/";
+
 // eslint-disable-next-line no-console
 export const logLine = (string: string) => console.log(`\x1b[34m${string}\x1b[0m`);
 

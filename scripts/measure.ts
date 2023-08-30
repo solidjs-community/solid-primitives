@@ -2,7 +2,7 @@ import {
   checkValidPackageName,
   formatBytes,
   getPackageBundlesize,
-  getPackagePackageJson,
+  getPackagePkg,
   logLine,
 } from "./utils/index.js";
 
@@ -57,7 +57,7 @@ class ConsoleTable {
   }
 }
 
-const pkg = getPackagePackageJson(name);
+const pkg = getPackagePkg(name);
 if (pkg instanceof Error) throw pkg;
 
 const primitives = (pkg.primitive as any).list as string[];

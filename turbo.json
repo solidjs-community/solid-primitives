@@ -5,11 +5,6 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**"],
       "inputs": ["src/**/*"]
-    },
-    "page": {
-      "dependsOn": ["^build"],
-      "outputs": ["dev/dist/**"],
-      "inputs": ["src/**/*", "dev/**/*", "!dev/dist/**/*"]
     }
   },
   "globalDependencies": ["tsconfig.json", "scripts/build"]

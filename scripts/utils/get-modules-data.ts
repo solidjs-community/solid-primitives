@@ -1,20 +1,8 @@
-import path from "path";
-import fs from "fs";
-import fsp from "fs/promises";
-import { PACKAGES_DIR, isNonNullable, logLine } from "./utils.js";
+import path from "node:path";
+import fs from "node:fs";
+import fsp from "node:fs/promises";
+import { MODULE_PREFIX, PACKAGES_DIR, isNonNullable, logLine } from "./utils.js";
 import * as vb from "valibot";
-
-export type ModuleData = {
-  name: string;
-  version: string;
-  description: string;
-  tags: string[];
-  category: string;
-  stage: number;
-  primitives: string[];
-  localDependencies: string[];
-  peerDependencies: string[];
-};
 
 const pkg_schema = vb.object({
   name: vb.string(),
@@ -36,7 +24,7 @@ const pkg_schema = vb.object({
 export type ModulePkgSchema = typeof pkg_schema;
 export type ModulePkg = vb.Output<ModulePkgSchema>;
 
-export function getPackagePackageJson(name: string): ModulePkg | Error {
+export function getPackagePkg(name: string): ModulePkg | Error {
   const pkg_path = path.join(PACKAGES_DIR, name, "package.json");
 
   if (!fs.existsSync(pkg_path)) {
@@ -54,15 +42,27 @@ export function getPackagePackageJson(name: string): ModulePkg | Error {
   return result.output;
 }
 
+export type ModuleData = {
+  name: string;
+  version: string;
+  description: string;
+  tags: string[];
+  category: string;
+  stage: number;
+  primitives: string[];
+  workspace_deps: string[];
+  peer_deps: string[];
+};
+
 export async function getModulesData(): Promise<ModuleData[]>;
 export async function getModulesData<T>(mapFn: (data: ModuleData) => T | Promise<T>): Promise<T[]>;
 export async function getModulesData<T = ModuleData>(
   mapFn: (data: ModuleData) => T = moduleData => moduleData as unknown as T,
 ): Promise<T[]> {
-  const packageNames = await fsp.readdir(PACKAGES_DIR);
+  const module_names = await fsp.readdir(PACKAGES_DIR);
 
-  const promises = packageNames.map(async name => {
-    const pkg = getPackagePackageJson(name);
+  const promises = module_names.map(async name => {
+    const pkg = getPackagePkg(name);
 
     if (pkg instanceof Error) {
       logLine(pkg.message);
@@ -70,8 +70,15 @@ export async function getModulesData<T = ModuleData>(
     }
 
     const dependencies = Object.keys(pkg.dependencies ?? {});
-    const peerDependencies = Object.keys(pkg.peerDependencies);
-    const localDependencies = dependencies.filter(dep => dep.startsWith("@solid-primitives/"));
+    const peer_deps = Object.keys(pkg.peerDependencies);
+    const workspace_deps: string[] = [];
+
+    for (const dep of dependencies) {
+      if (dep.startsWith(MODULE_PREFIX)) {
+        const dep_name = dep.slice(MODULE_PREFIX.length);
+        workspace_deps.push(dep_name);
+      }
+    }
 
     const excludedKeywords = ["primitive", "solid", pkg.name];
 
@@ -84,8 +91,8 @@ export async function getModulesData<T = ModuleData>(
         category: pkg.primitive.category,
         stage: pkg.primitive.stage,
         primitives: pkg.primitive.list,
-        localDependencies,
-        peerDependencies,
+        workspace_deps,
+        peer_deps,
       }),
     };
   });

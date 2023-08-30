@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from "fs";
 import path from "path";
 // @ts-expect-error ts-missing-module
 import tablemark from "json-to-markdown-table";
-import { insertTextBetweenComments, getModulesData, ROOT_DIR } from "./utils/index.js";
+import * as utils from "./utils/index.js";
 
 type PackageData = {
   Name: string;
@@ -31,12 +31,12 @@ const rootDependencies: string[] = [
 ];
 
 (async () => {
-  const modulesData = await getModulesData();
+  const modulesData = await utils.getModulesData();
 
-  for (const { name, category, primitives, stage, localDependencies } of modulesData) {
+  for (const { name, category, primitives, stage, workspace_deps } of modulesData) {
     const packageName = `@solid-primitives/${name}`;
 
-    if (localDependencies.length === 0) {
+    if (workspace_deps.length === 0) {
       rootDependencies.push(packageName);
     }
 
@@ -60,7 +60,7 @@ const rootDependencies: string[] = [
     categories[category] = cat ? [...cat, data] : [data];
   }
 
-  const pathToREADME = path.join(ROOT_DIR, "README.md");
+  const pathToREADME = path.join(utils.ROOT_DIR, "README.md");
   let readme = readFileSync(pathToREADME).toString();
 
   // Update Primitives Table
@@ -75,7 +75,7 @@ const rootDependencies: string[] = [
     return md;
   }, "|Name|Stage|Primitives|Size|NPM|\n|----|----|----|----|----|\n");
 
-  readme = insertTextBetweenComments(readme, table, "INSERT-PRIMITIVES-TABLE");
+  readme = utils.insertTextBetweenComments(readme, table, "INSERT-PRIMITIVES-TABLE");
 
   // Update Combined Downloads Badge
 
@@ -83,7 +83,11 @@ const rootDependencies: string[] = [
     ",",
   )})](https://dash.deno.com/playground/combined-npm-downloads)`;
 
-  readme = insertTextBetweenComments(readme, combinedDownloadsBadge, "INSERT-NPM-DOWNLOADS-BADGE");
+  readme = utils.insertTextBetweenComments(
+    readme,
+    combinedDownloadsBadge,
+    "INSERT-NPM-DOWNLOADS-BADGE",
+  );
 
   writeFileSync(pathToREADME, readme);
 })();
