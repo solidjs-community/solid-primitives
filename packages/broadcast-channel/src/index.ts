@@ -1,7 +1,7 @@
 import { createSignal, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 
-export type OnMessageCB = (e: MessageEvent<any>) => void;
+export type OnMessageCB = (e: MessageEvent) => void;
 
 export type TBroadcastChannelInstance = {
   onMessageCBList: { id: Symbol; cb: OnMessageCB }[];

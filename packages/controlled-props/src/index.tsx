@@ -80,7 +80,7 @@ const filterEnum = <O extends Record<string, any>>(
   return entries;
 };
 
-export const SelectProp = <T extends any>(
+export const SelectProp = <T,>(
   props: TestPropProps<T> & { options: TestPropObjectOptions<T> },
 ): JSX.Element => {
   const options = createMemo<[boolean | number | string, T][]>(() =>

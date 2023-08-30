@@ -2,7 +2,7 @@ import { createSignal, getOwner, onCleanup, ResourceFetcherInfo } from "solid-js
 import { isServer } from "solid-js/web";
 import { RequestContext } from "./fetch.js";
 
-export type RequestModifier = <Result extends unknown, FetcherArgs extends any[]>(
+export type RequestModifier = <Result, FetcherArgs extends any[]>(
   ...args: any[]
 ) => (requestContext: RequestContext<Result, FetcherArgs>) => void;
 
@@ -11,7 +11,7 @@ export type Fetcher<Result, FetcherArgs> = Exclude<
   undefined
 >;
 
-export const wrapFetcher = <Result extends unknown, FetcherArgs extends any[]>(
+export const wrapFetcher = <Result, FetcherArgs extends any[]>(
   requestContext: RequestContext<Result, FetcherArgs>,
   wrapper: (originalFetcher: Fetcher<Result, FetcherArgs>) => Fetcher<Result, FetcherArgs>,
 ) => {
@@ -38,7 +38,7 @@ export const wrapResource = <Result, FetcherArgs>(
 };
 
 export const withAbort: RequestModifier =
-  <Result extends unknown, FetcherArgs extends any[]>() =>
+  <Result, FetcherArgs extends any[]>() =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
     wrapFetcher(
       requestContext,
@@ -130,7 +130,7 @@ const defaultWait = (attempt: number) => Math.max(1000 << attempt, 30000);
  * default checks if response.ok is true.
  */
 export const withRetry: RequestModifier =
-  <Result extends unknown, FetcherArgs extends any[]>(
+  <Result, FetcherArgs extends any[]>(
     retries: number,
     wait: number | ((attempt: number) => number) = defaultWait,
     verify = (response?: Response) => response?.ok,
@@ -159,7 +159,7 @@ export const withRetry: RequestModifier =
     requestContext.wrapResource();
   };
 
-export type RefetchEventOptions<Result extends unknown, FetcherArgs extends any[]> = {
+export type RefetchEventOptions<Result, FetcherArgs extends any[]> = {
   on?: (keyof WindowEventMap)[];
   filter?: (requestData: FetcherArgs, data: Result | undefined, ev: Event) => boolean;
 };
@@ -168,9 +168,7 @@ export const withRefetchEvent: RequestModifier = isServer
   ? () => requestContext => {
       requestContext.wrapResource();
     }
-  : <Result extends unknown, FetcherArgs extends any[]>(
-        options: RefetchEventOptions<Result, FetcherArgs> = {},
-      ) =>
+  : <Result, FetcherArgs extends any[]>(options: RefetchEventOptions<Result, FetcherArgs> = {}) =>
       (requestContext: RequestContext<Result, FetcherArgs>) => {
         const lastRequestRef: { current: [requestData: FetcherArgs, data?: Result] | undefined } = {
           current: undefined,
@@ -200,7 +198,7 @@ export const withRefetchEvent: RequestModifier = isServer
       };
 
 export const withAggregation: RequestModifier =
-  <Result extends unknown, FetcherArgs extends any[]>(dataFilter?: (result: Result) => Result) =>
+  <Result, FetcherArgs extends any[]>(dataFilter?: (result: Result) => Result) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
     wrapFetcher<Result, FetcherArgs>(
       requestContext,

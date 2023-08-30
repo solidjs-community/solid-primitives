@@ -1,7 +1,7 @@
 import { Accessor, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
-import { createHydratableSignal } from "@solid-primitives/utils";
+import { createHydratableSignal, noop } from "@solid-primitives/utils";
 
 let serverRemSize = 16;
 
@@ -71,8 +71,8 @@ export const useRemSize: () => Accessor<number> =
 /**
  * Set the server fallback value for the rem size. {@link getRemSize}, {@link createRemSize} and {@link useRemSize} will return this value on the server.
  */
-export const setServerRemSize = isServer
+export const setServerRemSize: (size: number) => void = isServer
   ? (size: number) => {
       serverRemSize = size;
     }
-  : () => {};
+  : noop;

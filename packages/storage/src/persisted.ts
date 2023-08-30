@@ -35,7 +35,7 @@ export type PersistenceOptions<T, O extends Record<string, any> = {}> =
  */
 export function makePersisted<T>(
   signal: [Accessor<T>, Setter<T>],
-  options?: PersistenceOptions<T, {}>,
+  options?: PersistenceOptions<T>,
 ): [Accessor<T>, Setter<T>];
 export function makePersisted<T, O extends Record<string, any>>(
   signal: [Accessor<T>, Setter<T>],
@@ -43,7 +43,7 @@ export function makePersisted<T, O extends Record<string, any>>(
 ): [Accessor<T>, Setter<T>];
 export function makePersisted<T>(
   signal: [Store<T>, SetStoreFunction<T>],
-  options?: PersistenceOptions<T, {}>,
+  options?: PersistenceOptions<T>,
 ): [Store<T>, SetStoreFunction<T>];
 export function makePersisted<T, O extends Record<string, any>>(
   signal: [Store<T>, SetStoreFunction<T>],

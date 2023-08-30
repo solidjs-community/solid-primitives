@@ -7,13 +7,13 @@ export interface RelativeFormatMessages {
   justNow: string;
   past: string | MessageFormatter<string>;
   future: string | MessageFormatter<string>;
-  year: string | MessageFormatter<number>;
-  month: string | MessageFormatter<number>;
-  day: string | MessageFormatter<number>;
-  week: string | MessageFormatter<number>;
-  hour: string | MessageFormatter<number>;
-  minute: string | MessageFormatter<number>;
-  second: string | MessageFormatter<number>;
+  year: string | MessageFormatter;
+  month: string | MessageFormatter;
+  day: string | MessageFormatter;
+  week: string | MessageFormatter;
+  hour: string | MessageFormatter;
+  minute: string | MessageFormatter;
+  second: string | MessageFormatter;
 }
 
 export interface Unit {

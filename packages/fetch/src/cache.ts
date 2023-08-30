@@ -46,9 +46,7 @@ export const serializeRequest = <FetcherArgs extends any[]>(requestData: Fetcher
  * The RequestCache is a simple object.
  */
 export const withCache: RequestModifier =
-  <Result extends unknown, FetcherArgs extends any[]>(
-    options: CacheOptions = defaultCacheOptions,
-  ) =>
+  <Result, FetcherArgs extends any[]>(options: CacheOptions = defaultCacheOptions) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
     requestContext.cache = options.cache || requestContext.cache;
     requestContext.expires = options.expires;
@@ -92,7 +90,7 @@ export const withCache: RequestModifier =
     };
     Object.assign(requestContext.resource![1], {
       invalidate,
-      refetch: (info?: ResourceOptions<Result, unknown>) => {
+      refetch: (info?: ResourceOptions<Result>) => {
         invalidate();
         return originalRefetch(info);
       },
@@ -100,7 +98,7 @@ export const withCache: RequestModifier =
   };
 
 export const withRefetchOnExpiry: RequestModifier =
-  <Result extends unknown, FetcherArgs extends any[]>(pollDelayMs = 100) =>
+  <Result, FetcherArgs extends any[]>(pollDelayMs = 100) =>
   (requestContext: RequestContext<Result, FetcherArgs>) => {
     wrapFetcher<Result, FetcherArgs>(
       requestContext,

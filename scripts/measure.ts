@@ -1,13 +1,10 @@
-import path from "path";
-import fs from "fs";
 import {
-  PACKAGES_DIR,
   checkValidPackageName,
   formatBytes,
   getPackageBundlesize,
+  getPackagePackageJson,
   logLine,
 } from "./utils/index.js";
-import { PackageJson } from "type-fest";
 
 if (process.argv.length < 3)
   throw new Error(
@@ -18,8 +15,6 @@ const name = process.argv[2];
 
 if (!name || !checkValidPackageName(name))
   throw new Error(`Incorrect package name argument: "${name}"`);
-
-const packageDir = path.join(PACKAGES_DIR, name);
 
 class ConsoleTable {
   rows: string[][] = [];
@@ -62,54 +57,47 @@ class ConsoleTable {
   }
 }
 
-(async () => {
-  const pkg = JSON.parse(
-    await fs.readFileSync(path.join(packageDir, "package.json"), "utf8"),
-  ) as PackageJson;
+const pkg = getPackagePackageJson(name);
+if (pkg instanceof Error) throw pkg;
 
-  if (!pkg.primitive || !Array.isArray((pkg.primitive as any).list)) {
-    throw new Error(`Package ${name} does not have a valid primitive list.`);
-  }
+const primitives = (pkg.primitive as any).list as string[];
+const peerDependencies = Object.keys(pkg.peerDependencies);
 
-  const primitives = (pkg.primitive as any).list as string[];
-  const peerDependencies = Object.keys(pkg.peerDependencies || {});
+logLine(`Measuring "@solid-primitives/${name}"...\n`);
 
-  logLine(`Measuring "@solid-primitives/${name}"...\n`);
+const primitivesSizesPromises = primitives.map(primitive =>
+  getPackageBundlesize(name, { exportName: primitive, peerDependencies }),
+);
+const packageSizePromise = getPackageBundlesize(name, { peerDependencies });
 
-  const primitivesSizesPromises = primitives.map(primitive =>
-    getPackageBundlesize(name, { exportName: primitive, peerDependencies }),
-  );
-  const packageSizePromise = getPackageBundlesize(name, { peerDependencies });
+const [primitivesSizes, packageSize] = await Promise.all([
+  Promise.all(primitivesSizesPromises),
+  packageSizePromise,
+] as const);
 
-  const [primitivesSizes, packageSize] = await Promise.all([
-    Promise.all(primitivesSizesPromises),
-    packageSizePromise,
-  ] as const);
+const table = new ConsoleTable();
 
-  const table = new ConsoleTable();
+table.addRow(["Primitive", "Min", "Gzip"]);
+table.addSeparator();
 
-  table.addRow(["Primitive", "Min", "Gzip"]);
-  table.addSeparator();
-
-  primitivesSizes.forEach((size, i) => {
-    table.addRow([
-      primitives[i]!,
-      size ? formatBytes(size.min).join(" ") : "N/A",
-      size ? formatBytes(size.gzip).join(" ") : "N/A",
-    ]);
-  });
-  table.addSeparator();
-
+primitivesSizes.forEach((size, i) => {
   table.addRow([
-    "Total",
-    packageSize ? formatBytes(packageSize.min).join(" ") : "N/A",
-    packageSize ? formatBytes(packageSize.gzip).join(" ") : "N/A",
+    primitives[i]!,
+    size ? formatBytes(size.min).join(" ") : "N/A",
+    size ? formatBytes(size.gzip).join(" ") : "N/A",
   ]);
+});
+table.addSeparator();
 
-  table.log();
+table.addRow([
+  "Total",
+  packageSize ? formatBytes(packageSize.min).join(" ") : "N/A",
+  packageSize ? formatBytes(packageSize.gzip).join(" ") : "N/A",
+]);
 
-  logLine(`
-  ${primitivesSizes.every(size => size) ? "✅" : "❌"} All primitives measured successfully.
-  ${packageSize ? "✅" : "❌"} Measured the package successfully.
-  `);
-})();
+table.log();
+
+logLine(`
+${primitivesSizes.every(size => size) ? "✅" : "❌"} All primitives measured successfully.
+${packageSize ? "✅" : "❌"} Measured the package successfully.
+`);

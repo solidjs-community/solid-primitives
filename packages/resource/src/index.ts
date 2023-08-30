@@ -115,7 +115,9 @@ export function makeCache<T, S, R>(
   const save = () => {
     try {
       options?.storage?.setItem(key, serialize(localCache));
-    } catch (e) {}
+    } catch (e) {
+      /**/
+    }
   };
   const expireTimeout =
     typeof options?.expires === "function"
@@ -124,7 +126,9 @@ export function makeCache<T, S, R>(
   if (options?.storage) {
     try {
       Object.assign(localCache, deserialize(options.storage.getItem(key) || "{}"));
-    } catch (e) {}
+    } catch (e) {
+      /**/
+    }
   }
   const sourceHash = options?.sourceHash || serializer;
   return [

@@ -195,7 +195,7 @@ export const createAudio = (
         state: AudioState.READY,
         duration: player.duration,
       });
-      if (playing && playing() == true) {
+      if (playing && playing()) {
         play().catch((e: DOMException) => {
           if (e.name === "NotAllowedError") {
             setStore("state", AudioState.ERROR);
@@ -223,7 +223,7 @@ export const createAudio = (
     });
   }
   if (playing) {
-    createEffect(() => (playing() === true ? play() : pause()));
+    createEffect(() => (playing() ? play() : pause()));
   }
   if (volume) {
     createEffect(() => setVolume(volume()));

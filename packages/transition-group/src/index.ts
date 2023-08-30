@@ -10,7 +10,9 @@ import {
 } from "solid-js";
 import { isServer } from "solid-js/web";
 
-const noop = () => {};
+const noop = () => {
+  /* noop */
+};
 const noopTransition = (el: any, done: () => void) => done();
 
 export type TransitionMode = "out-in" | "in-out" | "parallel";

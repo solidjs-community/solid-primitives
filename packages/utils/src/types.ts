@@ -130,7 +130,7 @@ type RawNarrow<T> =
   | (T extends string | number | bigint | boolean ? T : never)
   | { [K in keyof T]: T[K] extends Function ? T[K] : RawNarrow<T[K]> };
 
-export type Narrow<T extends any> = T extends [] ? T : RawNarrow<T>;
+export type Narrow<T> = T extends [] ? T : RawNarrow<T>;
 
 // Magic type that when used at sites where generic types are inferred from, will prevent those sites from being involved in the inference.
 // https://github.com/microsoft/TypeScript/issues/14829

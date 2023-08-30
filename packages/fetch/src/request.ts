@@ -23,9 +23,7 @@ if (isServer && !fetchFallback) {
 
 export const fetchRequest: Request<[info: RequestInfo, init?: RequestInit]> =
   fetchFn => requestContext => {
-    requestContext.fetcher = <Result extends unknown>(
-      requestData: [info: RequestInfo, init?: RequestInit],
-    ) =>
+    requestContext.fetcher = <Result>(requestData: [info: RequestInfo, init?: RequestInit]) =>
       (fetchFn || fetchFallback)?.(...requestData).then((response: Response) => {
         requestContext.response = response;
         if (requestContext.responseHandler) {

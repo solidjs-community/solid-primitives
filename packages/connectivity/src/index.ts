@@ -1,6 +1,6 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
-import { createHydratableSignal, trueFn } from "@solid-primitives/utils";
+import { createHydratableSignal, trueFn, noop } from "@solid-primitives/utils";
 import { Accessor } from "solid-js";
 import { isServer } from "solid-js/web";
 
@@ -17,7 +17,7 @@ import { isServer } from "solid-js/web";
  */
 export function makeConnectivityListener(callback: (isOnline: boolean) => void): VoidFunction {
   if (isServer) {
-    return () => {};
+    return noop;
   }
   const clear1 = makeEventListener(window, "online", callback.bind(void 0, true));
   const clear2 = makeEventListener(window, "offline", callback.bind(void 0, false));
