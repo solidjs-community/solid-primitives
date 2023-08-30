@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import fsp from "fs/promises";
-import { PACKAGES_DIR, isNonNullable } from "./utils.js";
+import { PACKAGES_DIR, isNonNullable, logLine } from "./utils.js";
 import * as vb from "valibot";
 
 export type ModuleData = {
@@ -23,11 +23,14 @@ const pkg_schema = vb.object({
   keywords: vb.optional(vb.array(vb.string())),
   dependencies: vb.optional(vb.record(vb.string())),
   peerDependencies: vb.record(vb.string()),
-  primitive: vb.object({
-    list: vb.array(vb.string()),
-    category: vb.string(),
-    stage: vb.number(),
-  }),
+  primitive: vb.object(
+    {
+      list: vb.array(vb.string()),
+      category: vb.string(),
+      stage: vb.number(),
+    },
+    'package.json lacks "primitive" filed',
+  ),
 });
 
 export type ModulePkgSchema = typeof pkg_schema;
@@ -37,7 +40,7 @@ export function getPackagePackageJson(name: string): ModulePkg | Error {
   const pkg_path = path.join(PACKAGES_DIR, name, "package.json");
 
   if (!fs.existsSync(pkg_path)) {
-    return new Error(`package ${name} doesn't have package.json`);
+    return new Error(`package "${name}" doesn't have package.json`);
   }
 
   const pkg = JSON.parse(fs.readFileSync(pkg_path, "utf8")) as unknown;
@@ -45,7 +48,7 @@ export function getPackagePackageJson(name: string): ModulePkg | Error {
 
   if (!result.success) {
     const issue = result.issues[0];
-    return new Error(`package ${name} has invalid package.json: ${issue.message}`);
+    return new Error(`package "${name}" has invalid package.json: ${issue.message}`);
   }
 
   return result.output;
@@ -62,8 +65,7 @@ export async function getModulesData<T = ModuleData>(
     const pkg = getPackagePackageJson(name);
 
     if (pkg instanceof Error) {
-      // eslint-disable-next-line no-console
-      console.error(pkg);
+      logLine(pkg.message);
       return null;
     }
 
