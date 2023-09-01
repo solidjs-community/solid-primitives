@@ -6,6 +6,7 @@ export type Template<
   TAfter extends string = string,
 > = `${TBefore}{{${TArg}}}${TAfter}`;
 
+// TODO handle spaces
 export type TemplateArgs<T extends string> = T extends Template<string, infer A, infer R>
   ? { [K in A]: string } & TemplateArgs<R>
   : {};
