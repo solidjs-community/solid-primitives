@@ -55,6 +55,9 @@ const en_dict = {
   },
 };
 
+type Dict = typeof en_dict;
+type Locale = "en" | "pl";
+
 const pl_dict = {
   hello: "Cześć {{name}}!",
   numbers: {
@@ -76,7 +79,7 @@ const pl_dict = {
       return `${list.join(", ")} i ${last}`;
     },
   },
-} satisfies typeof en_dict;
+} satisfies Dict;
 
 describe("dict", () => {
   test("resolverDict", () => {
@@ -201,6 +204,47 @@ describe("reactive", () => {
 
       createEffect(() => {
         captured = t("hello", { name: "Tester", thing: "day" });
+      });
+
+      return dispose;
+    });
+
+    expect(captured).toBe("Hello Tester! How is your day?");
+
+    setLocale("pl");
+    await Promise.resolve();
+    expect(captured).toBe("Cześć Tester!");
+
+    dispose();
+  });
+
+  test("with cache", async () => {
+    const [locale, setLocale] = createSignal<Locale>("en");
+    let captured = "";
+
+    const cache = new i18n.SimpleCache((locale: Locale) => {
+      const dict = locale === "en" ? en_dict : pl_dict;
+      return i18n.resolverDict(dict);
+    });
+    const en_resolvers = i18n.resolverDict(en_dict);
+    cache.cache.set("en", en_resolvers);
+
+    const dispose = createRoot(dispose => {
+      const [dict] = createResource<i18n.ResolverDict<Dict> | undefined, Locale>(
+        locale,
+        (locale, info) => {
+          const res = cache.get(locale);
+          if (!res) return info.value;
+          if (res instanceof Promise) return res.then(res => res ?? info.value);
+          return res;
+        },
+        // { initialValue: en_resolvers },
+      );
+
+      const t = i18n.translator(dict);
+
+      createEffect(() => {
+        captured = t("hello", { name: "Tester", thing: "day" }) ?? "";
       });
 
       return dispose;
