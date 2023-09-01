@@ -121,11 +121,8 @@ describe("chained resolver", () => {
     const currency_to_usd = dict.data.currency["to.usd"]();
     expect(currency_to_usd).toBe(1);
 
-    const users_0_name = dict.data.users[0]!.name();
-    expect(users_0_name).toBe("John");
-
-    const users_69_resolver = dict.data.users[69];
-    expect(users_69_resolver).toBeUndefined();
+    const users = dict.data.users();
+    expect(users).toEqual(en_dict.data.users);
 
     const format_list = dict.data.formatList(["John", "Kate", "Tester"]);
     expect(format_list).toBe("John, Kate and Tester");

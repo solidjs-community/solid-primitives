@@ -75,6 +75,10 @@ function isDict(value: unknown): value is BaseDict {
   );
 }
 
+function isRecordDict(value: unknown): value is BaseRecordDict {
+  return value != null && Object.getPrototypeOf(value) === Object.prototype;
+}
+
 export type JoinPath<A, B> = A extends string | number
   ? B extends string | number
     ? `${A}.${B}`
@@ -111,16 +115,16 @@ export function resolverDict<T extends BaseDict>(dict: T): ResolverDict<T> {
   return flat_dict as any;
 }
 
-export type ChainedResolver<T extends BaseDict> = T extends (infer V)[]
-  ? { readonly [K in number]?: V extends BaseDict ? ChainedResolver<V> : ValueResolver<V> }
-  : {
-      readonly [K in keyof T]: T[K] extends BaseDict ? ChainedResolver<T[K]> : ValueResolver<T[K]>;
-    };
+export type ChainedResolver<T extends BaseRecordDict> = {
+  readonly [K in keyof T]: T[K] extends BaseRecordDict
+    ? ChainedResolver<T[K]>
+    : ValueResolver<T[K]>;
+};
 
-export function chainedResolver<T extends BaseDict>(dict: T): ChainedResolver<T> {
+export function chainedResolver<T extends BaseRecordDict>(dict: T): ChainedResolver<T> {
   const flat_dict: Record<string, unknown> = { ...dict };
   for (const [key, value] of Object.entries(dict)) {
-    flat_dict[key] = isDict(value) ? chainedResolver(value) : resolver(value);
+    flat_dict[key] = isRecordDict(value) ? chainedResolver(value) : resolver(value);
   }
   return flat_dict as any;
 }
