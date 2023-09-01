@@ -1,4 +1,4 @@
-import { UnionToIntersection, Simplify } from "@solid-primitives/utils";
+import { UnionToIntersection, Simplify, AnyFunction } from "@solid-primitives/utils";
 
 export type Template<
   TBefore extends string = string,
@@ -44,6 +44,7 @@ export function resolved(value: unknown, ...args: any[]): unknown {
   }
 }
 
+// TODO custom template resolver (different runtime, same type)
 export type ValueResolver<T> = T extends (...args: any[]) => any
   ? T
   : T extends Template
@@ -113,6 +114,23 @@ export function resolverDict<T extends BaseDict>(dict: T): ResolverDict<T> {
   const flat_dict: Record<string, unknown> = { ...dict };
   resolverVisitDict(flat_dict, dict, "");
   return flat_dict as any;
+}
+
+export type BaseResolverDict = {
+  readonly [K: string]: AnyFunction | BaseResolverDict | undefined;
+};
+
+export type Translator<T extends BaseResolverDict> = <K extends keyof T>(
+  path: K,
+  ...args: T[K] extends AnyFunction ? Parameters<T[K]> : []
+) => T[K] extends AnyFunction ? ReturnType<T[K]> : undefined;
+
+export function translator<T extends BaseResolverDict>(getResolverDict: () => T): Translator<T> {
+  return (path, ...args) => {
+    const resolverDict = getResolverDict();
+    const resolver = resolverDict[path];
+    return resolver ? (resolver as AnyFunction)(...args) : undefined;
+  };
 }
 
 export type ChainedResolver<T extends BaseRecordDict> = {

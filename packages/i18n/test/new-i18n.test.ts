@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import * as i18n from "../src/new-i18n.js";
+import { createEffect, createResource, createRoot, createSignal } from "solid-js";
 
 describe("resolved values", () => {
   test("function", () => {
@@ -178,5 +179,39 @@ describe("chainedResolver", () => {
 
     const format_list = dict.data.formatList(["John", "Kate", "Tester"]);
     expect(format_list).toBe("John, Kate i Tester");
+  });
+});
+
+describe("reactive", () => {
+  test("with translator", async () => {
+    const [locale, setLocale] = createSignal<"en" | "pl">("en");
+    let captured = "";
+
+    const dispose = createRoot(dispose => {
+      const [dict] = createResource(
+        locale,
+        async locale => {
+          const dict = locale === "en" ? en_dict : pl_dict;
+          return i18n.resolverDict(dict);
+        },
+        { initialValue: i18n.resolverDict(en_dict) },
+      );
+
+      const t = i18n.translator(dict);
+
+      createEffect(() => {
+        captured = t("hello", { name: "Tester", thing: "day" });
+      });
+
+      return dispose;
+    });
+
+    expect(captured).toBe("Hello Tester! How is your day?");
+
+    setLocale("pl");
+    await Promise.resolve();
+    expect(captured).toBe("Cześć Tester!");
+
+    dispose();
   });
 });
