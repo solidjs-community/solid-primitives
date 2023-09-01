@@ -59,7 +59,7 @@ const template = (
   str: string,
   params: Record<string, string>,
   reg: RegExp = /{{([^{}]+)}}/g,
-): any => str.replace(reg, (_, key) => deepReadObject(params, key, ""));
+): string => str.replace(reg, (_, key) => deepReadObject(params, key, ""));
 
 /**
  * This creates a I18nContext. It's extracted into a function to be able to type the Context

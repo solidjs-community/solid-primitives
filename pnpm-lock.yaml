@@ -433,6 +433,9 @@ importers:
       '@solid-primitives/context':
         specifier: workspace:^
         version: link:../context
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
     devDependencies:
       solid-js:
         specifier: ^1.7.11
