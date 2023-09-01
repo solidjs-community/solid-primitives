@@ -1,19 +1,20 @@
 import { UnionToIntersection, Simplify } from "@solid-primitives/utils";
 
-export type TemplateArgs<T extends string> = T extends `${string}{{${infer A}}}${infer R}`
+export type Template<
+  TBefore extends string = string,
+  TArg extends string = string,
+  TAfter extends string = string,
+> = `${TBefore}{{${TArg}}}${TAfter}`;
+
+export type TemplateArgs<T extends string> = T extends Template<string, infer A, infer R>
   ? { [K in A]: string } & TemplateArgs<R>
   : {};
 
 export function resolvedTemplate<T extends string>(string: T, args: TemplateArgs<T>): string {
-  const rgx = /{{([^}]+)}}/g;
-  let match: RegExpExecArray | null,
-    res = "",
-    last_index = 0;
-  while ((match = rgx.exec(string))) {
-    res += string.slice(last_index, match.index) + args[match[1] as never];
-    last_index = match.index + match[0].length;
+  for (const [key, value] of Object.entries(args)) {
+    string = string.replace(`{{${key}}}`, value as string) as T;
   }
-  return res + string.slice(last_index);
+  return string;
 }
 
 export type ResolvedValue<T> = T extends (...args: any[]) => infer R
@@ -22,18 +23,21 @@ export type ResolvedValue<T> = T extends (...args: any[]) => infer R
   ? string
   : T;
 
+export function resolved<T extends string>(
+  string: T,
+  ..._: T extends Template ? [args: TemplateArgs<T>] : [args?: {}]
+): string;
 export function resolved<T extends (...args: any[]) => any>(
   fn: T,
   ...args: Parameters<T>
 ): ReturnType<T>;
-export function resolved<T extends string>(string: T, args: TemplateArgs<T>): string;
-export function resolved<T>(value: T): T;
+export function resolved<T>(value: T extends string ? never : T): T;
 export function resolved(value: unknown, ...args: any[]): unknown {
   switch (typeof value) {
     case "function":
       return value(...args);
     case "string":
-      return resolvedTemplate(value, args[0]);
+      return resolvedTemplate(value, args[0] ?? {});
     default:
       return value;
   }
@@ -41,9 +45,9 @@ export function resolved(value: unknown, ...args: any[]): unknown {
 
 export type ValueResolver<T> = T extends (...args: any[]) => any
   ? T
-  : T extends string
+  : T extends Template
   ? (args: TemplateArgs<T>) => string
-  : T;
+  : (args?: {}) => T;
 
 export function resolver<T>(value: T): ValueResolver<T>;
 export function resolver(value: unknown): (...args: any[]) => unknown {
@@ -51,13 +55,15 @@ export function resolver(value: unknown): (...args: any[]) => unknown {
     case "function":
       return value as never;
     case "string":
-      return (args: TemplateArgs<string>) => resolvedTemplate(value, args);
+      return (args: TemplateArgs<string> = {}) => resolvedTemplate(value, args);
     default:
       return () => value;
   }
 }
 
-export type Dict = { readonly [K: string | number]: unknown } | readonly unknown[];
+export type RecordDict = { readonly [K: string | number]: unknown };
+export type ArrayDict = readonly unknown[];
+export type Dict = RecordDict | ArrayDict;
 
 export type JoinPath<A, B> = A extends string | number
   ? B extends string | number
@@ -106,4 +112,16 @@ export function flatDict<T extends Dict>(dict: T): FlatDict<T> {
     isDict(value) && visitDict(flat_dict, value, key);
   }
   return flat_dict as FlatDict<T>;
+}
+
+export type ResolverDict<T extends RecordDict> = {
+  [K in keyof T]: ValueResolver<T[K]>;
+};
+
+export function resolverDict<T extends RecordDict>(dict: T): ResolverDict<T> {
+  const resolvers: Record<string, unknown> = { ...dict };
+  for (const [key, value] of Object.entries(dict)) {
+    resolvers[key] = resolver(value);
+  }
+  return resolvers as ResolverDict<T>;
 }

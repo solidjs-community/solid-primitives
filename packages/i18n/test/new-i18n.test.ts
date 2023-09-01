@@ -14,6 +14,9 @@ describe("resolved values", () => {
     expect(i18n.resolved("hello {{name}} and {{extra}}!", { name: "Tester", extra: "John" })).toBe(
       "hello Tester and John!",
     );
+    expect(i18n.resolved("hello {{name}} and {{extra}}!" as string)).toBe(
+      "hello {{name}} and {{extra}}!",
+    );
   });
 
   test("other value", () => {
@@ -51,7 +54,7 @@ const en_dict = {
   },
 };
 
-describe("flatDict", () => {
+describe("dict", () => {
   test("flatDict", () => {
     const flat = i18n.flatDict(en_dict);
 
@@ -73,5 +76,52 @@ describe("flatDict", () => {
       "data.users.1.name": "Kate",
       "data.formatList": en_dict.data.formatList,
     } satisfies typeof flat);
+  });
+
+  test("resolverDict", () => {
+    const flat_dict = i18n.flatDict(en_dict);
+    const resolvers = i18n.resolverDict(flat_dict);
+
+    const hello = resolvers.hello({ name: "Tester", thing: "day" });
+    expect(hello).toBe("Hello Tester! How is your day?");
+
+    const numbers = resolvers.numbers();
+    expect(numbers).toEqual(en_dict.numbers);
+
+    const number1 = resolvers["numbers.1"]();
+    expect(number1).toBe("one");
+
+    const data = resolvers.data();
+    expect(data).toEqual(en_dict.data);
+
+    const data_class = resolvers["data.class"]();
+    expect(data_class).toBe(en_dict.data.class);
+
+    const currency = resolvers["data.currency"]();
+    expect(currency).toEqual(en_dict.data.currency);
+
+    const currency_name = resolvers["data.currency.name"]();
+    expect(currency_name).toBe("dollar");
+
+    const currency_to_usd = resolvers["data.currency.to.usd"]();
+    expect(currency_to_usd).toBe(1);
+
+    const users = resolvers["data.users"]();
+    expect(users).toEqual(en_dict.data.users);
+
+    const users_0 = resolvers["data.users.0"]!();
+    expect(users_0).toEqual(en_dict.data.users[0]);
+
+    const users_0_name = resolvers["data.users.0.name"]!();
+    expect(users_0_name).toBe("John");
+
+    const users_69_resolver = resolvers["data.users.69"];
+    expect(users_69_resolver).toBeUndefined();
+
+    const users_69_name_resolver = resolvers["data.users.69.name"];
+    expect(users_69_name_resolver).toBeUndefined();
+
+    const format_list = resolvers["data.formatList"](["John", "Kate", "Tester"]);
+    expect(format_list).toBe("John, Kate and Tester");
   });
 });
