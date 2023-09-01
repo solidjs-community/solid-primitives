@@ -121,10 +121,17 @@ export type ChainedResolver<T extends BaseRecordDict> = {
     : ValueResolver<T[K]>;
 };
 
-export function chainedResolver<T extends BaseRecordDict>(dict: T): ChainedResolver<T> {
-  const flat_dict: Record<string, unknown> = { ...dict };
-  for (const [key, value] of Object.entries(dict)) {
-    flat_dict[key] = isRecordDict(value) ? chainedResolver(value) : resolver(value);
+export function chainedResolver<T extends BaseRecordDict>(
+  init_dict: T,
+  resolvedValue: (path: string, ...args: unknown[]) => unknown,
+  path = "",
+): ChainedResolver<T> {
+  const flat_dict: Record<string, unknown> = { ...init_dict };
+  for (const [key, value] of Object.entries(init_dict)) {
+    const key_path = path ? `${path}.${key}` : key;
+    flat_dict[key] = isRecordDict(value)
+      ? chainedResolver(value, resolvedValue, key_path)
+      : (...args: any[]) => resolvedValue(key_path, ...args);
   }
   return flat_dict as any;
 }

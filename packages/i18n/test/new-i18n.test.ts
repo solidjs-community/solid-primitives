@@ -54,6 +54,29 @@ const en_dict = {
   },
 };
 
+const pl_dict = {
+  hello: "Cześć {{name}}!",
+  numbers: {
+    1: "jeden",
+    2: "dwa",
+    3: "trzy",
+  },
+  data: {
+    class: new MyClass("cześć"),
+    currency: {
+      name: "złoty",
+      symbol: "zł",
+      iso: "PLN",
+      "to.usd": 0.27,
+    },
+    users: [{ name: "Jan" }, { name: "Kasia" }, { name: "Tester" }],
+    formatList(list: string[]) {
+      const last = list.pop();
+      return `${list.join(", ")} i ${last}`;
+    },
+  },
+} satisfies typeof en_dict;
+
 describe("dict", () => {
   test("resolverDict", () => {
     const resolvers = i18n.resolverDict(en_dict);
@@ -102,10 +125,14 @@ describe("dict", () => {
   });
 });
 
-describe("chained resolver", () => {
-  test("chainedResolver", () => {
-    const dict = i18n.chainedResolver(en_dict);
+describe("chainedResolver", () => {
+  let resolvers = i18n.resolverDict(en_dict);
+  const dict = i18n.chainedResolver(en_dict, (path, ...args) =>
+    // @ts-expect-error
+    resolvers[path](...args),
+  );
 
+  test("initial", () => {
     const hello = dict.hello({ name: "Tester", thing: "day" });
     expect(hello).toBe("Hello Tester! How is your day?");
 
@@ -126,5 +153,30 @@ describe("chained resolver", () => {
 
     const format_list = dict.data.formatList(["John", "Kate", "Tester"]);
     expect(format_list).toBe("John, Kate and Tester");
+  });
+
+  test("after change", () => {
+    resolvers = i18n.resolverDict(pl_dict);
+
+    const hello = dict.hello({ name: "Tester", thing: "dzień" });
+    expect(hello).toBe("Cześć Tester!");
+
+    const number1 = dict.numbers[1]();
+    expect(number1).toBe("jeden");
+
+    const data_class = dict.data.class();
+    expect(data_class).toBe(pl_dict.data.class);
+
+    const currency_name = dict.data.currency.name();
+    expect(currency_name).toBe("złoty");
+
+    const currency_to_usd = dict.data.currency["to.usd"]();
+    expect(currency_to_usd).toBe(0.27);
+
+    const users = dict.data.users();
+    expect(users).toEqual(pl_dict.data.users);
+
+    const format_list = dict.data.formatList(["John", "Kate", "Tester"]);
+    expect(format_list).toBe("John, Kate i Tester");
   });
 });
