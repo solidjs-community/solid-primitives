@@ -1,20 +1,5 @@
 import { UnionToIntersection, Simplify } from "@solid-primitives/utils";
 
-export type DictValue =
-  | undefined
-  | null
-  | string
-  | number
-  | boolean
-  | bigint
-  | any[]
-  | ((...args: any[]) => any)
-  | Dict;
-
-export interface Dict {
-  [key: string | number]: DictValue;
-}
-
 export type TemplateArgs<T extends string> = T extends `${string}{{${infer A}}}${infer R}`
   ? { [K in A]: string } & TemplateArgs<R>
   : {};
@@ -31,7 +16,7 @@ export function resolvedTemplate<T extends string>(string: T, args: TemplateArgs
   return res + string.slice(last_index);
 }
 
-export type ResolvedValue<T extends DictValue> = T extends (...args: any[]) => infer R
+export type ResolvedValue<T> = T extends (...args: any[]) => infer R
   ? R
   : T extends string
   ? string
@@ -42,8 +27,8 @@ export function resolved<T extends (...args: any[]) => any>(
   ...args: Parameters<T>
 ): ReturnType<T>;
 export function resolved<T extends string>(string: T, args: TemplateArgs<T>): string;
-export function resolved<T extends DictValue>(value: T): T;
-export function resolved(value: DictValue, ...args: any[]): DictValue {
+export function resolved<T>(value: T): T;
+export function resolved(value: unknown, ...args: any[]): unknown {
   switch (typeof value) {
     case "function":
       return value(...args);
@@ -54,23 +39,25 @@ export function resolved(value: DictValue, ...args: any[]): DictValue {
   }
 }
 
-export type ValueResolver<T extends DictValue> = T extends (...args: any[]) => any
+export type ValueResolver<T> = T extends (...args: any[]) => any
   ? T
   : T extends string
   ? (args: TemplateArgs<T>) => string
   : T;
 
-export function resolver<T extends DictValue>(value: T): ValueResolver<T>;
-export function resolver(value: DictValue): (...args: any[]) => DictValue {
+export function resolver<T>(value: T): ValueResolver<T>;
+export function resolver(value: unknown): (...args: any[]) => unknown {
   switch (typeof value) {
     case "function":
-      return value;
+      return value as never;
     case "string":
       return (args: TemplateArgs<string>) => resolvedTemplate(value, args);
     default:
       return () => value;
   }
 }
+
+export type Dict = { readonly [K: string | number]: unknown } | readonly unknown[];
 
 export type JoinPath<A, B> = A extends string | number
   ? B extends string | number
@@ -81,31 +68,42 @@ export type JoinPath<A, B> = A extends string | number
   : "";
 
 export type FlatDict<TDict extends Dict, TPath = {}> = Simplify<
-  UnionToIntersection<
-    {
-      [K in keyof TDict]: TDict[K] extends Dict ? FlatDict<TDict[K], JoinPath<TPath, K>> : never;
-    }[keyof TDict]
-  > & {
-    [K in keyof TDict as JoinPath<TPath, K>]: TDict[K];
-  }
+  TDict extends (infer V)[]
+    ? { [K in JoinPath<TPath, number>]?: V } & (V extends Dict
+        ? Partial<FlatDict<V, JoinPath<TPath, number>>>
+        : {})
+    : UnionToIntersection<
+        {
+          [K in keyof TDict]: TDict[K] extends Dict
+            ? FlatDict<TDict[K], JoinPath<TPath, K>>
+            : never;
+        }[keyof TDict]
+      > & {
+        [K in keyof TDict as JoinPath<TPath, K>]: TDict[K];
+      }
 >;
 
-function visitDict(flat_dict: Record<string, unknown>, dict: object, path: string): void {
+function isDict(value: unknown): value is Dict {
+  let proto: any;
+  return (
+    value != null &&
+    ((proto = Object.getPrototypeOf(value)),
+    proto === Array.prototype || proto === Object.prototype)
+  );
+}
+
+function visitDict(flat_dict: Record<string, unknown>, dict: Dict, path: string): void {
   for (const [key, value] of Object.entries(dict)) {
     const key_path = `${path}.${key}`;
     flat_dict[key_path] = value;
-    if (value && typeof value === "object" && !Array.isArray(value)) {
-      visitDict(flat_dict, value, key_path);
-    }
+    isDict(value) && visitDict(flat_dict, value, key_path);
   }
 }
 
 export function flatDict<T extends Dict>(dict: T): FlatDict<T> {
   const flat_dict: Record<string, unknown> = { ...dict };
   for (const [key, value] of Object.entries(dict)) {
-    if (value && typeof value === "object" && !Array.isArray(value)) {
-      visitDict(flat_dict, value, key);
-    }
+    isDict(value) && visitDict(flat_dict, value, key);
   }
   return flat_dict as FlatDict<T>;
 }
