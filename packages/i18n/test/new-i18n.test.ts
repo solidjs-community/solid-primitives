@@ -55,32 +55,31 @@ const en_dict = {
 };
 
 describe("dict", () => {
-  test("flatDict", () => {
-    const flat = i18n.flatDict(en_dict);
+  // test("flatDict", () => {
+  //   const flat = i18n.flatDict(en_dict);
 
-    expect(flat).toEqual({
-      ...en_dict,
-      "numbers.1": "one",
-      "numbers.2": "two",
-      "numbers.3": "three",
-      "data.class": en_dict.data.class,
-      "data.currency": en_dict.data.currency,
-      "data.currency.name": "dollar",
-      "data.currency.symbol": "$",
-      "data.currency.iso": "USD",
-      "data.currency.to.usd": 1,
-      "data.users": en_dict.data.users,
-      "data.users.0": en_dict.data.users[0],
-      "data.users.0.name": "John",
-      "data.users.1": en_dict.data.users[1],
-      "data.users.1.name": "Kate",
-      "data.formatList": en_dict.data.formatList,
-    } satisfies typeof flat);
-  });
+  //   expect(flat).toEqual({
+  //     ...en_dict,
+  //     "numbers.1": "one",
+  //     "numbers.2": "two",
+  //     "numbers.3": "three",
+  //     "data.class": en_dict.data.class,
+  //     "data.currency": en_dict.data.currency,
+  //     "data.currency.name": "dollar",
+  //     "data.currency.symbol": "$",
+  //     "data.currency.iso": "USD",
+  //     "data.currency.to.usd": 1,
+  //     "data.users": en_dict.data.users,
+  //     "data.users.0": en_dict.data.users[0],
+  //     "data.users.0.name": "John",
+  //     "data.users.1": en_dict.data.users[1],
+  //     "data.users.1.name": "Kate",
+  //     "data.formatList": en_dict.data.formatList,
+  //   } satisfies typeof flat);
+  // });
 
   test("resolverDict", () => {
-    const flat_dict = i18n.flatDict(en_dict);
-    const resolvers = i18n.resolverDict(flat_dict);
+    const resolvers = i18n.resolverDict(en_dict);
 
     const hello = resolvers.hello({ name: "Tester", thing: "day" });
     expect(hello).toBe("Hello Tester! How is your day?");

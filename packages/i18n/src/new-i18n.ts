@@ -61,9 +61,18 @@ export function resolver(value: unknown): (...args: any[]) => unknown {
   }
 }
 
-export type RecordDict = { readonly [K: string | number]: unknown };
-export type ArrayDict = readonly unknown[];
-export type Dict = RecordDict | ArrayDict;
+export type BaseRecordDict = { readonly [K: string | number]: unknown };
+export type BaseArrayDict = readonly unknown[];
+export type BaseDict = BaseRecordDict | BaseArrayDict;
+
+function isDict(value: unknown): value is BaseDict {
+  let proto: any;
+  return (
+    value != null &&
+    ((proto = Object.getPrototypeOf(value)),
+    proto === Array.prototype || proto === Object.prototype)
+  );
+}
 
 export type JoinPath<A, B> = A extends string | number
   ? B extends string | number
@@ -73,55 +82,30 @@ export type JoinPath<A, B> = A extends string | number
   ? B
   : "";
 
-export type FlatDict<TDict extends Dict, TPath = {}> = Simplify<
-  TDict extends (infer V)[]
-    ? { [K in JoinPath<TPath, number>]?: V } & (V extends Dict
-        ? Partial<FlatDict<V, JoinPath<TPath, number>>>
-        : {})
-    : UnionToIntersection<
+export type ResolverDict<T extends BaseDict, TPath = {}> = Simplify<
+  T extends (infer V)[]
+    ? /* array */ {
+        readonly [K in JoinPath<TPath, number>]?: ValueResolver<V>;
+      } & (V extends BaseDict ? Partial<ResolverDict<V, JoinPath<TPath, number>>> : {})
+    : /* record */ {
+        readonly [K in keyof T as JoinPath<TPath, K>]: ValueResolver<T[K]>;
+      } & UnionToIntersection<
         {
-          [K in keyof TDict]: TDict[K] extends Dict
-            ? FlatDict<TDict[K], JoinPath<TPath, K>>
-            : never;
-        }[keyof TDict]
-      > & {
-        [K in keyof TDict as JoinPath<TPath, K>]: TDict[K];
-      }
+          [K in keyof T]: T[K] extends BaseDict ? ResolverDict<T[K], JoinPath<TPath, K>> : never;
+        }[keyof T]
+      >
 >;
 
-function isDict(value: unknown): value is Dict {
-  let proto: any;
-  return (
-    value != null &&
-    ((proto = Object.getPrototypeOf(value)),
-    proto === Array.prototype || proto === Object.prototype)
-  );
-}
-
-function visitDict(flat_dict: Record<string, unknown>, dict: Dict, path: string): void {
+function resolverVisitDict(flat_dict: Record<string, unknown>, dict: BaseDict, path: string): void {
   for (const [key, value] of Object.entries(dict)) {
-    const key_path = `${path}.${key}`;
-    flat_dict[key_path] = value;
-    isDict(value) && visitDict(flat_dict, value, key_path);
+    const key_path = path ? `${path}.${key}` : key;
+    flat_dict[key_path] = resolver(value);
+    isDict(value) && resolverVisitDict(flat_dict, value, key_path);
   }
 }
 
-export function flatDict<T extends Dict>(dict: T): FlatDict<T> {
+export function resolverDict<T extends BaseDict>(dict: T): ResolverDict<T> {
   const flat_dict: Record<string, unknown> = { ...dict };
-  for (const [key, value] of Object.entries(dict)) {
-    isDict(value) && visitDict(flat_dict, value, key);
-  }
-  return flat_dict as FlatDict<T>;
-}
-
-export type ResolverDict<T extends RecordDict> = {
-  [K in keyof T]: ValueResolver<T[K]>;
-};
-
-export function resolverDict<T extends RecordDict>(dict: T): ResolverDict<T> {
-  const resolvers: Record<string, unknown> = { ...dict };
-  for (const [key, value] of Object.entries(dict)) {
-    resolvers[key] = resolver(value);
-  }
-  return resolvers as ResolverDict<T>;
+  resolverVisitDict(flat_dict, dict, "");
+  return flat_dict as any;
 }

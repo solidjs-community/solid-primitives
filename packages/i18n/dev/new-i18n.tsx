@@ -21,7 +21,7 @@ const pl_dict = {
       return `${list.join(", ")} i ${last}`;
     },
   },
-} satisfies i18n.Dict;
+} satisfies i18n.BaseDict;
 
 type MyDict = typeof pl_dict;
 
