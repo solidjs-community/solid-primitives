@@ -124,3 +124,33 @@ describe("dict", () => {
     expect(format_list).toBe("John, Kate and Tester");
   });
 });
+
+describe("chained resolver", () => {
+  test("chainedResolver", () => {
+    const dict = i18n.chainedResolver(en_dict);
+
+    const hello = dict.hello({ name: "Tester", thing: "day" });
+    expect(hello).toBe("Hello Tester! How is your day?");
+
+    const number1 = dict.numbers[1]();
+    expect(number1).toBe("one");
+
+    const data_class = dict.data.class();
+    expect(data_class).toBe(en_dict.data.class);
+
+    const currency_name = dict.data.currency.name();
+    expect(currency_name).toBe("dollar");
+
+    const currency_to_usd = dict.data.currency["to.usd"]();
+    expect(currency_to_usd).toBe(1);
+
+    const users_0_name = dict.data.users[0]!.name();
+    expect(users_0_name).toBe("John");
+
+    const users_69_resolver = dict.data.users[69];
+    expect(users_69_resolver).toBeUndefined();
+
+    const format_list = dict.data.formatList(["John", "Kate", "Tester"]);
+    expect(format_list).toBe("John, Kate and Tester");
+  });
+});
