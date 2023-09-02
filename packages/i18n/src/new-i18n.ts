@@ -117,7 +117,7 @@ export function resolverDict<T extends BaseDict>(
 export class SimpleCache<TKey extends string, TValue extends {}> {
   constructor(public fetcher: (key: TKey) => Promise<TValue | undefined> | TValue | undefined) {}
 
-  map: Map<TKey, TValue | Promise<TValue | undefined>> = new Map();
+  map = new Map<TKey, TValue | Promise<TValue | undefined>>();
 
   get(key: TKey): Promise<TValue | undefined> | TValue | undefined {
     const cached = this.map.get(key);
@@ -129,7 +129,7 @@ export class SimpleCache<TKey extends string, TValue extends {}> {
     this.map.set(key, value);
     if (value instanceof Promise) {
       value.then(
-        resolved => resolved && this.map.get(key) === value && this.map.set(key, resolved),
+        res => this.map.get(key) === value && (res ? this.map.set(key, res) : this.map.delete(key)),
         () => this.map.get(key) === value && this.map.delete(key),
       );
     }
