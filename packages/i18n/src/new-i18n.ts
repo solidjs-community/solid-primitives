@@ -87,9 +87,9 @@ export type ResolverDict<T extends BaseDict, TPath = {}> = T extends (infer V)[]
       }[keyof T]
     >;
 
-export type BaseResolverDict = {
+export interface BaseResolverDict {
   readonly [K: string]: AnyFunction | BaseResolverDict | undefined;
-};
+}
 
 let _resolver_options!: ResolverOptions, _flat_dict!: Record<string, unknown>;
 
@@ -182,20 +182,25 @@ export function createI18n<TDict extends BaseDict, TLocale extends string>(
   return dict;
 }
 
-export type Translator<T, TDict extends BaseResolverDict> = <K extends keyof TDict>(
+export type Translator<T extends BaseResolverDict> = <K extends keyof T>(
   path: K,
-  ...args: TDict[K] extends AnyFunction ? Parameters<TDict[K]> : []
-) => TDict[K] extends AnyFunction
-  ? T extends undefined
-    ? ReturnType<TDict[K]> | undefined
-    : ReturnType<TDict[K]>
-  : undefined;
+  ...args: T[K] extends AnyFunction ? Parameters<T[K]> : []
+) => T[K] extends AnyFunction ? ReturnType<T[K]> : undefined;
 
-export function translator<T extends BaseResolverDict | undefined>(
-  resolverDict: () => T,
-): Translator<T, Exclude<T, undefined>> {
+export type NullableTranslator<T extends BaseResolverDict> = <K extends keyof T>(
+  path: K,
+  ...args: T[K] extends AnyFunction ? Parameters<T[K]> : []
+) => T[K] extends AnyFunction ? ReturnType<T[K]> | undefined : undefined;
+
+export function translator<T extends BaseResolverDict>(resolverDict: () => T): Translator<T>;
+export function translator<T extends BaseResolverDict>(
+  resolverDict: () => T | undefined,
+): NullableTranslator<T>;
+export function translator<T extends BaseResolverDict>(
+  resolverDict: () => T | undefined,
+): NullableTranslator<T> {
   return (path, ...args) => {
-    const resolver = resolverDict()?.[path as never];
+    const resolver = resolverDict()?.[path];
     return resolver ? (resolver as any)(...args) : undefined;
   };
 }
