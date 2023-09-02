@@ -1,5 +1,5 @@
-import { identity, type AnyFunction, type UnionToIntersection } from "@solid-primitives/utils";
-import { createResource, type Accessor, type InitializedResource } from "solid-js";
+import * as utils from "@solid-primitives/utils";
+import * as solid from "solid-js";
 
 export type BaseTemplateArgs = Record<string, string | number | boolean>;
 
@@ -19,11 +19,11 @@ export function resolvedTemplate(string: string, args: BaseTemplateArgs = {}): s
 }
 
 export interface ResolverOptions {
-  readonly resolvedTemplate: (template: string, args: BaseTemplateArgs) => string;
+  readonly resolvedTemplate?: (template: string, args: BaseTemplateArgs) => string;
 }
 
 export const default_resolver_options: ResolverOptions = {
-  resolvedTemplate: identity,
+  resolvedTemplate: utils.identity,
 };
 
 export type ValueResolver<T> = T extends (...args: any[]) => any
@@ -39,7 +39,7 @@ export function resolver(
   value: unknown,
   options: ResolverOptions = default_resolver_options,
 ): (...args: any[]) => unknown {
-  const { resolvedTemplate } = options;
+  const { resolvedTemplate = utils.identity } = options;
   switch (typeof value) {
     case "function":
       return value as never;
@@ -75,20 +75,22 @@ export type JoinPath<A, B> = A extends string | number
   ? B
   : "";
 
-export type ResolverDict<T extends BaseDict, TPath = {}> = T extends (infer V)[]
+export type ResolverDict<T extends BaseDict, TPath = {}> = string extends T
+  ? /* catch any */ BaseResolverDict
+  : T extends (infer V)[]
   ? /* array */ {
       readonly [K in JoinPath<TPath, number>]?: ValueResolver<V>;
     } & (V extends BaseDict ? Partial<ResolverDict<V, JoinPath<TPath, number>>> : {})
   : /* record */ {
       readonly [K in keyof T as JoinPath<TPath, K>]: ValueResolver<T[K]>;
-    } & UnionToIntersection<
+    } & utils.UnionToIntersection<
       {
         [K in keyof T]: T[K] extends BaseDict ? ResolverDict<T[K], JoinPath<TPath, K>> : never;
       }[keyof T]
     >;
 
 export interface BaseResolverDict {
-  readonly [K: string]: AnyFunction | BaseResolverDict | undefined;
+  readonly [K: string]: utils.AnyFunction | BaseResolverDict | undefined;
 }
 
 let _resolver_options!: ResolverOptions, _flat_dict!: Record<string, unknown>;
@@ -136,61 +138,63 @@ export class SimpleCache<TKey extends string, TValue extends {}> {
   }
 }
 
-export interface I18nOptions<TDict extends BaseDict, TLocale extends string> {
-  readonly init_dicts: Partial<Record<TLocale, TDict>>;
-  readonly locale: Accessor<TLocale>;
-  readonly fetcher: (locale: TLocale) => Promise<TDict | undefined> | TDict | undefined;
-  readonly resolver_options?: ResolverOptions;
-}
+export type I18nFetcher<T extends BaseDict, L extends string> = (
+  locale: L,
+) => Promise<T | undefined> | T | undefined;
 
-export function createI18n<TDict extends BaseDict, TLocale extends string>(
-  options: I18nOptions<TDict, TLocale>,
-): InitializedResource<ResolverDict<TDict>> {
-  const { init_dicts, locale, fetcher, resolver_options } = options;
+export function createI18n<T extends BaseDict, L extends string>(
+  locale: solid.Accessor<L>,
+  fetcher: I18nFetcher<T, L>,
+  options: solid.InitializedResourceOptions<T, L> & ResolverOptions,
+): solid.InitializedResourceReturn<ResolverDict<T>>;
 
-  const cache = new SimpleCache<TLocale, ResolverDict<TDict>>(locale => {
+export function createI18n<T extends BaseDict, L extends string>(
+  locale: solid.Accessor<L>,
+  fetcher: I18nFetcher<T, L>,
+  options?: solid.ResourceOptions<T, L> & ResolverOptions,
+): solid.ResourceReturn<ResolverDict<T>>;
+
+export function createI18n(
+  locale: solid.Accessor<string>,
+  fetcher: (locale: string) => Promise<BaseDict | undefined> | BaseDict | undefined,
+  options?: solid.ResourceOptions<BaseDict, string> & ResolverOptions,
+): solid.ResourceReturn<any> {
+  const cache = new SimpleCache<string, BaseResolverDict>(locale => {
     const dict = fetcher(locale);
     if (!dict) return;
     if (dict instanceof Promise)
       return dict.then(
-        dict => dict && resolverDict(dict, resolver_options),
+        dict => dict && resolverDict(dict, options),
         () => undefined,
       );
-    return resolverDict(dict, resolver_options);
+    return resolverDict(dict, options);
   });
 
-  let init_dict: ResolverDict<TDict> | undefined;
-  const init_locale = locale();
+  const init_dict = options?.initialValue;
+  let init_resolver_dict: BaseResolverDict | undefined;
+  init_dict && cache.map.set(locale(), (init_resolver_dict = resolverDict(init_dict, options)));
 
-  for (const [key, dict] of Object.entries(init_dicts) as [TLocale, TDict][]) {
-    const resolvers = resolverDict(dict, resolver_options);
-    cache.map.set(key, resolvers);
-    if (key === init_locale) init_dict = resolvers;
-  }
-
-  const [dict] = createResource<ResolverDict<TDict>, TLocale>(
+  return solid.createResource<BaseResolverDict | undefined, string>(
     locale,
     (locale, info) => {
       const res = cache.get(locale);
-      if (!res) return info.value!;
-      if (res instanceof Promise) return res.then(res => res ?? info.value!);
+      if (!res) return info.value;
+      if (res instanceof Promise) return res.then(res => res ?? info.value);
       return res;
     },
-    { initialValue: init_dict! },
+    { ...(options as any), initialValue: init_resolver_dict },
   );
-
-  return dict;
 }
 
 export type Translator<T extends BaseResolverDict> = <K extends keyof T>(
   path: K,
-  ...args: T[K] extends AnyFunction ? Parameters<T[K]> : []
-) => T[K] extends AnyFunction ? ReturnType<T[K]> : undefined;
+  ...args: T[K] extends utils.AnyFunction ? Parameters<T[K]> : []
+) => T[K] extends utils.AnyFunction ? ReturnType<T[K]> : undefined;
 
 export type NullableTranslator<T extends BaseResolverDict> = <K extends keyof T>(
   path: K,
-  ...args: T[K] extends AnyFunction ? Parameters<T[K]> : []
-) => T[K] extends AnyFunction ? ReturnType<T[K]> | undefined : undefined;
+  ...args: T[K] extends utils.AnyFunction ? Parameters<T[K]> : []
+) => T[K] extends utils.AnyFunction ? ReturnType<T[K]> | undefined : undefined;
 
 export function translator<T extends BaseResolverDict>(resolverDict: () => T): Translator<T>;
 export function translator<T extends BaseResolverDict>(

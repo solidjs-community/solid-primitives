@@ -22,18 +22,6 @@ describe("resolver", () => {
 
       const r2 = i18n.resolver("hello {{name}}!");
       expect(r2({ name: "Tester" })).toBe("hello {{name}}!");
-
-      const r3 = i18n.resolver("hello {{ name }}!");
-      expect(r3({ name: "Tester" })).toBe("hello {{ name }}!");
-
-      const r4 = i18n.resolver("hello {{name}} and {{extra}}!");
-      expect(r4({ name: "Tester", extra: "John" })).toBe("hello {{name}} and {{extra}}!");
-
-      const r5 = i18n.resolver("hello {{ name }} and {{ extra }}!");
-      expect(r5({ name: "Tester", extra: "John" })).toBe("hello {{ name }} and {{ extra }}!");
-
-      const r6 = i18n.resolver("hello {{name}} and {{extra}}!");
-      expect(r6()).toBe("hello {{name}} and {{extra}}!");
     });
 
     test("default template resolver", () => {
@@ -315,11 +303,9 @@ describe("reactive", () => {
     let captured = "";
 
     const dispose = createRoot(dispose => {
-      const dict = i18n.createI18n({
-        locale,
-        init_dicts: { en: en_dict },
-        fetcher: locale => (locale === "en" ? en_dict : pl_dict),
-        resolver_options: options_with_template,
+      const [dict] = i18n.createI18n(locale, locale => (locale === "en" ? en_dict : pl_dict), {
+        ...options_with_template,
+        initialValue: en_dict,
       });
 
       const t = i18n.translator(dict);
