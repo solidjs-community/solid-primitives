@@ -1,19 +1,18 @@
 import { type UnionToIntersection, type AnyFunction } from "@solid-primitives/utils";
 
-export type Template<
-  TBefore extends string = string,
-  TArg extends string = string,
-  TAfter extends string = string,
-> = `${TBefore}{{${TArg}}}${TAfter}` | `${TBefore}{{ ${TArg} }}${TAfter}`;
+export type BaseTemplateArgs = Record<string, string | number | boolean>;
 
-export type TemplateArgs<T extends string> = T extends Template<string, infer A, infer R>
-  ? { [K in A]: string } & TemplateArgs<R>
-  : {};
+export type Template<T extends BaseTemplateArgs> = string & { __template_args: T };
 
-// TODO handle spaces
-export function resolvedTemplate<T extends string>(string: T, args: TemplateArgs<T>): string {
+export type TemplateArgs<T extends Template<any>> = T extends Template<infer R> ? R : never;
+
+export const template = <T extends BaseTemplateArgs>(source: string): Template<T> => source as any;
+
+export function resolvedTemplate<T extends BaseTemplateArgs>(value: Template<T>, args: T): string;
+export function resolvedTemplate(string: string, args?: BaseTemplateArgs): string;
+export function resolvedTemplate(string: string, args: BaseTemplateArgs = {}): string {
   for (const [key, value] of Object.entries(args)) {
-    string = string.replace(`{{${key}}}`, value as string) as T;
+    string = string.replace(new RegExp(`{{\\s*${key}\\s*}}`, "g"), value as string);
   }
   return string;
 }
@@ -24,21 +23,19 @@ export type ResolvedValue<T> = T extends (...args: any[]) => infer R
   ? string
   : T;
 
-export function resolved<T extends string>(
-  string: T,
-  ..._: T extends Template ? [args: TemplateArgs<T>] : [args?: {}]
-): string;
 export function resolved<T extends (...args: any[]) => any>(
   fn: T,
   ...args: Parameters<T>
 ): ReturnType<T>;
-export function resolved<T>(value: T extends string ? never : T): T;
+export function resolved<T extends BaseTemplateArgs>(value: Template<T>, args: T): string;
+export function resolved(value: string, args?: BaseTemplateArgs): string;
+export function resolved<T>(value: T): T;
 export function resolved(value: unknown, ...args: any[]): unknown {
   switch (typeof value) {
     case "function":
       return value(...args);
     case "string":
-      return resolvedTemplate(value, args[0] ?? {});
+      return resolvedTemplate(value, args[0]);
     default:
       return value;
   }
@@ -47,9 +44,11 @@ export function resolved(value: unknown, ...args: any[]): unknown {
 // TODO custom template resolver (different runtime, same type)
 export type ValueResolver<T> = T extends (...args: any[]) => any
   ? T
-  : T extends Template
-  ? (args: TemplateArgs<T>) => string
-  : (args?: {}) => T;
+  : T extends Template<infer R>
+  ? (args: R) => string
+  : T extends string
+  ? (args?: BaseTemplateArgs) => string
+  : () => T;
 
 export function resolver<T>(value: T): ValueResolver<T>;
 export function resolver(value: unknown): (...args: any[]) => unknown {
@@ -57,7 +56,7 @@ export function resolver(value: unknown): (...args: any[]) => unknown {
     case "function":
       return value as never;
     case "string":
-      return (args: TemplateArgs<string> = {}) => resolvedTemplate(value, args);
+      return (args: BaseTemplateArgs = {}) => resolvedTemplate(value, args);
     default:
       return () => value;
   }
@@ -139,20 +138,20 @@ export function translator<T extends BaseResolverDict | undefined>(
 export class SimpleCache<TKey extends string, TValue extends {}> {
   constructor(public fetcher: (key: TKey) => Promise<TValue | undefined> | TValue | undefined) {}
 
-  cache: Map<TKey, TValue | Promise<TValue | undefined>> = new Map();
+  map: Map<TKey, TValue | Promise<TValue | undefined>> = new Map();
 
   get(key: TKey): Promise<TValue | undefined> | TValue | undefined {
-    const cached = this.cache.get(key);
+    const cached = this.map.get(key);
     if (cached) return cached;
 
     const value = this.fetcher(key);
     if (!value) return;
 
-    this.cache.set(key, value);
+    this.map.set(key, value);
     if (value instanceof Promise) {
       value.then(
-        resolved => resolved && this.cache.get(key) === value && this.cache.set(key, resolved),
-        () => this.cache.get(key) === value && this.cache.delete(key),
+        resolved => resolved && this.map.get(key) === value && this.map.set(key, resolved),
+        () => this.map.get(key) === value && this.map.delete(key),
       );
     }
 

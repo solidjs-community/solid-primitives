@@ -11,13 +11,17 @@ describe("resolved values", () => {
 
   test("string", () => {
     expect(i18n.resolved("hello!")).toBe("hello!");
+
     expect(i18n.resolved("hello {{name}}!", { name: "Tester" })).toBe("hello Tester!");
+    expect(i18n.resolved("hello {{ name }}!", { name: "Tester" })).toBe("hello Tester!");
+
     expect(i18n.resolved("hello {{name}} and {{extra}}!", { name: "Tester", extra: "John" })).toBe(
       "hello Tester and John!",
     );
-    expect(i18n.resolved("hello {{name}} and {{extra}}!" as string)).toBe(
-      "hello {{name}} and {{extra}}!",
-    );
+    expect(
+      i18n.resolved("hello {{ name }} and {{ extra }}!", { name: "Tester", extra: "John" }),
+    ).toBe("hello Tester and John!");
+    expect(i18n.resolved("hello {{name}} and {{extra}}!")).toBe("hello {{name}} and {{extra}}!");
   });
 
   test("other value", () => {
@@ -33,7 +37,7 @@ class MyClass {
 }
 
 const en_dict = {
-  hello: "Hello {{name}}! How is your {{thing}}?",
+  hello: i18n.template<{ name: string; thing: string }>("Hello {{name}}! How is your {{thing}}?"),
   numbers: {
     1: "one",
     2: "two",
@@ -59,7 +63,7 @@ type Dict = typeof en_dict;
 type Locale = "en" | "pl";
 
 const pl_dict = {
-  hello: "Cześć {{name}}!",
+  hello: i18n.template("Cześć {{name}}!"),
   numbers: {
     1: "jeden",
     2: "dwa",
@@ -227,7 +231,7 @@ describe("reactive", () => {
       return i18n.resolverDict(dict);
     });
     const en_resolvers = i18n.resolverDict(en_dict);
-    cache.cache.set("en", en_resolvers);
+    cache.map.set("en", en_resolvers);
 
     const dispose = createRoot(dispose => {
       const [dict] = createResource<i18n.ResolverDict<Dict> | undefined, Locale>(
