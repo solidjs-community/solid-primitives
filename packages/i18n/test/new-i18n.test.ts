@@ -309,4 +309,34 @@ describe("reactive", () => {
 
     dispose();
   });
+
+  test("createI18n", async () => {
+    const [locale, setLocale] = createSignal<Locale>("en");
+    let captured = "";
+
+    const dispose = createRoot(dispose => {
+      const dict = i18n.createI18n({
+        locale,
+        init_dicts: { en: en_dict },
+        fetcher: locale => (locale === "en" ? en_dict : pl_dict),
+        resolver_options: options_with_template,
+      });
+
+      const t = i18n.translator(dict);
+
+      createEffect(() => {
+        captured = t("hello", { name: "Tester", thing: "day" });
+      });
+
+      return dispose;
+    });
+
+    expect(captured).toBe("Hello Tester! How is your day?");
+
+    setLocale("pl");
+    await Promise.resolve();
+    expect(captured).toBe("Cześć Tester!");
+
+    dispose();
+  });
 });
