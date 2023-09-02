@@ -226,7 +226,7 @@ describe("chainedResolver", () => {
 
 describe("reactive", () => {
   test("with translator", async () => {
-    const [locale, setLocale] = createSignal<"en" | "pl">("en");
+    const [locale, setLocale] = createSignal<Locale>("en");
     let captured = "";
 
     const dispose = createRoot(dispose => {
@@ -238,75 +238,6 @@ describe("reactive", () => {
         },
         { initialValue: i18n.resolverDict(en_dict, options_with_template) },
       );
-
-      const t = i18n.translator(dict);
-
-      createEffect(() => {
-        captured = t("hello", { name: "Tester", thing: "day" });
-      });
-
-      return dispose;
-    });
-
-    expect(captured).toBe("Hello Tester! How is your day?");
-
-    setLocale("pl");
-    await Promise.resolve();
-    expect(captured).toBe("Cześć Tester!");
-
-    dispose();
-  });
-
-  test("with cache", async () => {
-    const [locale, setLocale] = createSignal<Locale>("en");
-    let captured = "";
-
-    const cache = new i18n.SimpleCache((locale: Locale) => {
-      const dict = locale === "en" ? en_dict : pl_dict;
-      return i18n.resolverDict(dict, options_with_template);
-    });
-    const en_resolvers = i18n.resolverDict(en_dict, options_with_template);
-    cache.map.set("en", en_resolvers);
-
-    const dispose = createRoot(dispose => {
-      const [dict] = createResource<i18n.ResolverDict<Dict> | undefined, Locale>(
-        locale,
-        (locale, info) => {
-          const res = cache.get(locale);
-          if (!res) return info.value;
-          if (res instanceof Promise) return res.then(res => res ?? info.value);
-          return res;
-        },
-        // { initialValue: en_resolvers },
-      );
-
-      const t = i18n.translator(dict);
-
-      createEffect(() => {
-        captured = t("hello", { name: "Tester", thing: "day" }) ?? "";
-      });
-
-      return dispose;
-    });
-
-    expect(captured).toBe("Hello Tester! How is your day?");
-
-    setLocale("pl");
-    await Promise.resolve();
-    expect(captured).toBe("Cześć Tester!");
-
-    dispose();
-  });
-
-  test("createI18n", async () => {
-    const [locale, setLocale] = createSignal<Locale>("en");
-    let captured = "";
-
-    const dispose = createRoot(dispose => {
-      const [dict] = i18n.createI18n(locale, locale => (locale === "en" ? en_dict : pl_dict), {
-        ...options_with_template,
-        initialValue: en_dict,
-      });
 
       const t = i18n.translator(dict);
 
