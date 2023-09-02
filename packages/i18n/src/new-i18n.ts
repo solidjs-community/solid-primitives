@@ -1,4 +1,4 @@
-import { type UnionToIntersection, type AnyFunction } from "@solid-primitives/utils";
+import { type UnionToIntersection, type AnyFunction, identity } from "@solid-primitives/utils";
 
 export type BaseTemplateArgs = Record<string, string | number | boolean>;
 
@@ -17,31 +17,14 @@ export function resolvedTemplate(string: string, args: BaseTemplateArgs = {}): s
   return string;
 }
 
-export type ResolvedValue<T> = T extends (...args: any[]) => infer R
-  ? R
-  : T extends string
-  ? string
-  : T;
-
-export function resolved<T extends (...args: any[]) => any>(
-  fn: T,
-  ...args: Parameters<T>
-): ReturnType<T>;
-export function resolved<T extends BaseTemplateArgs>(value: Template<T>, args: T): string;
-export function resolved(value: string, args?: BaseTemplateArgs): string;
-export function resolved<T>(value: T): T;
-export function resolved(value: unknown, ...args: any[]): unknown {
-  switch (typeof value) {
-    case "function":
-      return value(...args);
-    case "string":
-      return resolvedTemplate(value, args[0]);
-    default:
-      return value;
-  }
+export interface ResolverOptions {
+  readonly resolvedTemplate: (template: string, args: BaseTemplateArgs) => string;
 }
 
-// TODO custom template resolver (different runtime, same type)
+export const default_resolver_options: ResolverOptions = {
+  resolvedTemplate: identity,
+};
+
 export type ValueResolver<T> = T extends (...args: any[]) => any
   ? T
   : T extends Template<infer R>
@@ -50,8 +33,12 @@ export type ValueResolver<T> = T extends (...args: any[]) => any
   ? (args?: BaseTemplateArgs) => string
   : () => T;
 
-export function resolver<T>(value: T): ValueResolver<T>;
-export function resolver(value: unknown): (...args: any[]) => unknown {
+export function resolver<T>(value: T, options?: ResolverOptions): ValueResolver<T>;
+export function resolver(
+  value: unknown,
+  options: ResolverOptions = default_resolver_options,
+): (...args: any[]) => unknown {
+  const { resolvedTemplate } = options;
   switch (typeof value) {
     case "function":
       return value as never;
@@ -99,18 +86,25 @@ export type ResolverDict<T extends BaseDict, TPath = {}> = T extends (infer V)[]
       }[keyof T]
     >;
 
-function resolverVisitDict(flat_dict: Record<string, unknown>, dict: BaseDict, path: string): void {
+let _resolver_options!: ResolverOptions, _flat_dict!: Record<string, unknown>;
+
+function _resolverVisitDict(dict: BaseDict, path: string): void {
   for (const [key, value] of Object.entries(dict)) {
     const key_path = path ? `${path}.${key}` : key;
-    flat_dict[key_path] = resolver(value);
-    isDict(value) && resolverVisitDict(flat_dict, value, key_path);
+    _flat_dict[key_path] = resolver(value, _resolver_options);
+    isDict(value) && _resolverVisitDict(value, key_path);
   }
 }
 
-export function resolverDict<T extends BaseDict>(dict: T): ResolverDict<T> {
-  const flat_dict: Record<string, unknown> = { ...dict };
-  resolverVisitDict(flat_dict, dict, "");
-  return flat_dict as any;
+export function resolverDict<T extends BaseDict>(
+  dict: T,
+  options: ResolverOptions = default_resolver_options,
+): ResolverDict<T> {
+  const flat_dict: any = (_flat_dict = { ...dict });
+  _resolver_options = options;
+  _resolverVisitDict(dict, "");
+  _resolver_options = _flat_dict = undefined!;
+  return flat_dict;
 }
 
 export type BaseResolverDict = {
@@ -127,10 +121,10 @@ export type Translator<T, TDict extends BaseResolverDict> = <K extends keyof TDi
   : undefined;
 
 export function translator<T extends BaseResolverDict | undefined>(
-  getResolverDict: () => T,
+  resolverDict: () => T,
 ): Translator<T, Exclude<T, undefined>> {
   return (path, ...args) => {
-    const resolver = getResolverDict()?.[path as never];
+    const resolver = resolverDict()?.[path as never];
     return resolver ? (resolver as any)(...args) : undefined;
   };
 }

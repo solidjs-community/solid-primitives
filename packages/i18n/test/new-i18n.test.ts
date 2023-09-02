@@ -2,33 +2,73 @@ import { describe, expect, test } from "vitest";
 import * as i18n from "../src/new-i18n.js";
 import { createEffect, createResource, createRoot, createSignal } from "solid-js";
 
-describe("resolved values", () => {
+const options_with_template: i18n.ResolverOptions = {
+  resolvedTemplate: i18n.resolvedTemplate,
+};
+
+describe("resolver", () => {
   test("function", () => {
     const fn = (a: number, b: string, c: object): number => a + b.length + Object.keys(c).length;
-    const translated = i18n.resolved(fn, 1, "two", { foo: "bar" });
+    const resolver = i18n.resolver(fn);
+
+    const translated = resolver(1, "two", { foo: "bar" });
     expect(translated).toBe(5);
   });
 
-  test("string", () => {
-    expect(i18n.resolved("hello!")).toBe("hello!");
+  describe("string", () => {
+    test("no template resolver", () => {
+      const r1 = i18n.resolver("hello!");
+      expect(r1()).toBe("hello!");
 
-    expect(i18n.resolved("hello {{name}}!", { name: "Tester" })).toBe("hello Tester!");
-    expect(i18n.resolved("hello {{ name }}!", { name: "Tester" })).toBe("hello Tester!");
+      const r2 = i18n.resolver("hello {{name}}!");
+      expect(r2({ name: "Tester" })).toBe("hello {{name}}!");
 
-    expect(i18n.resolved("hello {{name}} and {{extra}}!", { name: "Tester", extra: "John" })).toBe(
-      "hello Tester and John!",
-    );
-    expect(
-      i18n.resolved("hello {{ name }} and {{ extra }}!", { name: "Tester", extra: "John" }),
-    ).toBe("hello Tester and John!");
-    expect(i18n.resolved("hello {{name}} and {{extra}}!")).toBe("hello {{name}} and {{extra}}!");
+      const r3 = i18n.resolver("hello {{ name }}!");
+      expect(r3({ name: "Tester" })).toBe("hello {{ name }}!");
+
+      const r4 = i18n.resolver("hello {{name}} and {{extra}}!");
+      expect(r4({ name: "Tester", extra: "John" })).toBe("hello {{name}} and {{extra}}!");
+
+      const r5 = i18n.resolver("hello {{ name }} and {{ extra }}!");
+      expect(r5({ name: "Tester", extra: "John" })).toBe("hello {{ name }} and {{ extra }}!");
+
+      const r6 = i18n.resolver("hello {{name}} and {{extra}}!");
+      expect(r6()).toBe("hello {{name}} and {{extra}}!");
+    });
+
+    test("default template resolver", () => {
+      const r1 = i18n.resolver("hello!", options_with_template);
+      expect(r1()).toBe("hello!");
+
+      const r2 = i18n.resolver("hello {{name}}!", options_with_template);
+      expect(r2({ name: "Tester" })).toBe("hello Tester!");
+
+      const r3 = i18n.resolver("hello {{ name }}!", options_with_template);
+      expect(r3({ name: "Tester" })).toBe("hello Tester!");
+
+      const r4 = i18n.resolver("hello {{name}} and {{extra}}!", options_with_template);
+      expect(r4({ name: "Tester", extra: "John" })).toBe("hello Tester and John!");
+
+      const r5 = i18n.resolver("hello {{ name }} and {{ extra }}!", options_with_template);
+      expect(r5({ name: "Tester", extra: "John" })).toBe("hello Tester and John!");
+
+      const r6 = i18n.resolver("hello {{name}} and {{extra}}!", options_with_template);
+      expect(r6()).toBe("hello {{name}} and {{extra}}!");
+    });
   });
 
   test("other value", () => {
-    expect(i18n.resolved(1)).toBe(1);
-    expect(i18n.resolved(true)).toBe(true);
-    expect(i18n.resolved(null)).toBe(null);
-    expect(i18n.resolved(undefined)).toBe(undefined);
+    const r1 = i18n.resolver(1);
+    expect(r1()).toBe(1);
+
+    const r2 = i18n.resolver(true);
+    expect(r2()).toBe(true);
+
+    const r3 = i18n.resolver(null);
+    expect(r3()).toBe(null);
+
+    const r4 = i18n.resolver(undefined);
+    expect(r4()).toBe(undefined);
   });
 });
 
@@ -90,7 +130,7 @@ describe("dict", () => {
     const resolvers = i18n.resolverDict(en_dict);
 
     const hello = resolvers.hello({ name: "Tester", thing: "day" });
-    expect(hello).toBe("Hello Tester! How is your day?");
+    expect(hello).toBe("Hello {{name}}! How is your {{thing}}?");
 
     const numbers = resolvers.numbers();
     expect(numbers).toEqual(en_dict.numbers);
@@ -131,10 +171,17 @@ describe("dict", () => {
     const format_list = resolvers["data.formatList"](["John", "Kate", "Tester"]);
     expect(format_list).toBe("John, Kate and Tester");
   });
+
+  test("resolver options", () => {
+    const resolvers = i18n.resolverDict(en_dict, options_with_template);
+
+    const hello = resolvers.hello({ name: "Tester", thing: "day" });
+    expect(hello).toBe("Hello Tester! How is your day?");
+  });
 });
 
 describe("chainedResolver", () => {
-  let resolvers = i18n.resolverDict(en_dict);
+  let resolvers = i18n.resolverDict(en_dict, options_with_template);
   const dict = i18n.chainedResolver(en_dict, (path, ...args) =>
     // @ts-expect-error
     resolvers[path](...args),
@@ -164,7 +211,7 @@ describe("chainedResolver", () => {
   });
 
   test("after change", () => {
-    resolvers = i18n.resolverDict(pl_dict);
+    resolvers = i18n.resolverDict(pl_dict, options_with_template);
 
     const hello = dict.hello({ name: "Tester", thing: "dzień" });
     expect(hello).toBe("Cześć Tester!");
@@ -199,9 +246,9 @@ describe("reactive", () => {
         locale,
         async locale => {
           const dict = locale === "en" ? en_dict : pl_dict;
-          return i18n.resolverDict(dict);
+          return i18n.resolverDict(dict, options_with_template);
         },
-        { initialValue: i18n.resolverDict(en_dict) },
+        { initialValue: i18n.resolverDict(en_dict, options_with_template) },
       );
 
       const t = i18n.translator(dict);
@@ -228,9 +275,9 @@ describe("reactive", () => {
 
     const cache = new i18n.SimpleCache((locale: Locale) => {
       const dict = locale === "en" ? en_dict : pl_dict;
-      return i18n.resolverDict(dict);
+      return i18n.resolverDict(dict, options_with_template);
     });
-    const en_resolvers = i18n.resolverDict(en_dict);
+    const en_resolvers = i18n.resolverDict(en_dict, options_with_template);
     cache.map.set("en", en_resolvers);
 
     const dispose = createRoot(dispose => {

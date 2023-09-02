@@ -38,6 +38,7 @@ export const isProd = !isDev;
 export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
+export const identity = <T>(v: T): T => v;
 
 /** @deprecated use {@link equalFn} from "solid-js" */
 export const defaultEquals = equalFn;
