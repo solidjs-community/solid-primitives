@@ -105,6 +105,7 @@ export type AnyFunction = (...args: any[]) => any;
 export type AnyClass = abstract new (...args: any) => any;
 
 export type PrimitiveValue = PropertyKey | boolean | bigint | null | undefined;
+
 export type FalsyValue = false | 0 | "" | null | undefined;
 export type Truthy<T> = Exclude<T, FalsyValue>;
 export type Falsy<T> = Extract<T, FalsyValue>;
