@@ -430,9 +430,6 @@ importers:
 
   packages/i18n:
     dependencies:
-      '@solid-primitives/context':
-        specifier: workspace:^
-        version: link:../context
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils

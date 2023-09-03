@@ -37,7 +37,7 @@ function visitDict(flat_dict: Record<string, unknown>, dict: BaseDict, path: str
   }
 }
 
-export function flatDict<T extends BaseDict>(dict: T): FlatDict<T> {
+export function flatten<T extends BaseDict>(dict: T): FlatDict<T> {
   const flat_dict: Record<string, unknown> = { ...dict };
   for (const [key, value] of Object.entries(dict)) {
     isDict(value) && visitDict(flat_dict, value, key);
@@ -67,14 +67,6 @@ export const resolveTemplate: TemplateResolver = (
 
 export const identityResolveTemplate = identity as TemplateResolver;
 
-export interface ResolverOptions {
-  readonly resolveTemplate: TemplateResolver;
-}
-
-export const default_resolver_options: ResolverOptions = {
-  resolveTemplate: identityResolveTemplate,
-};
-
 export type Resolved<T> = T extends (...args: any[]) => infer R ? R : T extends string ? string : T;
 
 export type ResolveArgs<T> = T extends (...args: infer A) => any
@@ -99,18 +91,16 @@ export type NullableTranslator<T extends BaseRecordDict> = <K extends keyof T>(
 
 export function translator<T extends BaseRecordDict>(
   dict: () => T,
-  options?: ResolverOptions,
+  resolveTemplate?: TemplateResolver,
 ): Translator<T>;
 export function translator<T extends BaseRecordDict>(
   dict: () => T | undefined,
-  options?: ResolverOptions,
+  resolveTemplate?: TemplateResolver,
 ): NullableTranslator<T>;
 export function translator<T extends BaseRecordDict>(
   dict: () => T | undefined,
-  options: ResolverOptions = default_resolver_options,
+  resolveTemplate: TemplateResolver = identityResolveTemplate,
 ): NullableTranslator<T> {
-  const { resolveTemplate } = options;
-
   return (path, ...args) => {
     const value = dict()?.[path];
 
