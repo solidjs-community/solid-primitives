@@ -97,10 +97,10 @@ export function translator<T extends BaseRecordDict>(
   dict: () => T | undefined,
   resolveTemplate?: TemplateResolver,
 ): NullableTranslator<T>;
-export function translator<T extends BaseRecordDict>(
-  dict: () => T | undefined,
+export function translator(
+  dict: () => BaseRecordDict | undefined,
   resolveTemplate: TemplateResolver = identityResolveTemplate,
-): NullableTranslator<T> {
+): NullableTranslator<BaseRecordDict> {
   return (path, ...args) => {
     const value = dict()?.[path];
 
@@ -114,6 +114,29 @@ export function translator<T extends BaseRecordDict>(
         return value;
     }
   };
+}
+
+export type Scopes<T extends string> = {
+  [K in T]: K extends `${infer S}.${infer R}` ? S | `${S}.${Scopes<R>}` : never;
+}[T];
+
+export type Scoped<T extends BaseRecordDict, S extends Scopes<keyof T & string>> = {
+  readonly [K in keyof T as K extends `${S}.${infer R}` ? R : never]: T[K];
+};
+
+export function scopedTranslator<T extends BaseRecordDict, S extends Scopes<keyof T & string>>(
+  translator: Translator<T>,
+  scope: S,
+): Translator<Scoped<T, S>>;
+export function scopedTranslator<T extends BaseRecordDict, S extends Scopes<keyof T & string>>(
+  translator: NullableTranslator<T>,
+  scope: S,
+): NullableTranslator<Scoped<T, S>>;
+export function scopedTranslator(
+  translator: Translator<BaseRecordDict>,
+  scope: string,
+): Translator<Scoped<BaseRecordDict, never>> {
+  return (path, ...args) => translator(`${scope}.${path}`, ...args);
 }
 
 export type Chained<T extends BaseRecordDict> = {

@@ -21,6 +21,7 @@
       "flatten",
       "resolveTemplate",
       "translator",
+      "scopedTranslator",
       "chained"
     ],
     "category": "Utilities"
@@ -46,6 +47,7 @@
   "scripts": {
     "dev": "tsx ../../scripts/dev.ts",
     "build": "tsx ../../scripts/build.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
