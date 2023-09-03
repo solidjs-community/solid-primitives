@@ -272,8 +272,8 @@ export function scopedTranslator(
   return (path, ...args) => translator(`${scope}.${path}`, ...args);
 }
 
-export type Chained<T extends BaseRecordDict> = {
-  readonly [K in keyof T]: T[K] extends BaseRecordDict ? Chained<T[K]> : Resolver<T[K]>;
+export type ChainedTranslator<T extends BaseRecordDict> = {
+  readonly [K in keyof T]: T[K] extends BaseRecordDict ? ChainedTranslator<T[K]> : Resolver<T[K]>;
 };
 
 /**
@@ -295,25 +295,25 @@ export type Chained<T extends BaseRecordDict> = {
  *
  * const t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
  *
- * const chained = i18n.chained(dict, t);
+ * const chained = i18n.chainedTranslator(dict, t);
  *
  * chained.greetings.hello({ name: "John" }) // => "hello John!"
  * chained.greetings.hi() // => "hi!"
  * chained.goodbye("John") // => "goodbye John!"
  * ```
  */
-export function chained<T extends BaseRecordDict>(
+export function chainedTranslator<T extends BaseRecordDict>(
   init_dict: T,
   translate: Translator<T>,
   path = "",
-): Chained<T> {
+): ChainedTranslator<T> {
   const result: any = { ...init_dict };
 
   for (const [key, value] of Object.entries(init_dict)) {
     const key_path = path ? `${path}.${key}` : key;
 
     result[key] = isRecordDict(value)
-      ? chained(value, translate, key_path)
+      ? chainedTranslator(value, translate, key_path)
       : (...args: any[]) =>
           translate(
             key_path,

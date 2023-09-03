@@ -116,7 +116,7 @@ describe("chainedResolver", () => {
 
   const t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
 
-  const chained = i18n.chained(en_dict, t);
+  const chained = i18n.chainedTranslator(en_dict, t);
 
   test("initial", () => {
     expect(chained.hello({ name: "Tester", thing: "day" })).toBe("Hello Tester! How is your day?");
@@ -158,7 +158,7 @@ describe("reactive", () => {
       );
 
       const t = i18n.translator(dict, i18n.resolveTemplate);
-      const chained = i18n.chained(en_dict, t);
+      const chained = i18n.chainedTranslator(en_dict, t);
 
       createEffect(() => {
         hello = t("hello", { name: "Tester", thing: "day" });

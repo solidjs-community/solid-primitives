@@ -48,7 +48,7 @@ describe("chainedResolver", () => {
     const flat_dict = i18n.flatten(en_dict);
     const t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
 
-    const chained = i18n.chained(en_dict, t);
+    const chained = i18n.chainedTranslator(en_dict, t);
     const hello = chained.hello({ name: "Tester", thing: "day" });
     expect(hello).toBe("Hello Tester! How is your day?");
 

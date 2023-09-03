@@ -22,7 +22,7 @@
       "resolveTemplate",
       "translator",
       "scopedTranslator",
-      "chained"
+      "chainedTranslator"
     ],
     "category": "Utilities"
   },

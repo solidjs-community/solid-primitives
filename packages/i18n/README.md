@@ -21,160 +21,235 @@ pnpm add @solid-primitives/i18n
 yarn add @solid-primitives/i18n
 ```
 
-## `createI18nContext`
+## How to use it
 
-Creates a method for internationalization support. This primitive set is largely inspired by [dlv](https://github.com/developit/dlv/blob/master/index.js) and passes all its tests.
+The library consists of multiple small and composable primitives that can be used together to create an internationalization solution that fits your needs.
 
-### How to use it
+### Defining dictionaries
 
-```tsx
-import { I18nContext, createI18nContext, useI18n } from "@solid-primitives/i18n";
+Dictionary is any plain js object that contains translations for a given language. It can be nested and contain functions.
 
-const App: Component = () => {
-  const [t, { add, locale, dict }] = useI18n();
-  const [name, setName] = createSignal("Greg");
-
-  const addLanguage = () => {
-    add("sw", { hello: "hej {{ name }}, hur mar du?" });
-    locale("sw");
-  };
-
-  return (
-    <>
-      <button onClick={() => locale("fr")}>fr</button>
-      <button onClick={() => locale("en")}>en</button>
-      <button onClick={() => locale("unknownLanguage")}>unknown language</button>
-      <button onClick={addLanguage}>add and set swedish</button>
-      <input value={name()} onInput={e => setName(e.target.value)} />
-      <hr />
-      <h1>{t("hello", { name: name() }, "Hello {{ name }}!")}!</h1>
-      <p>{locale()}</p>
-      <pre>
-        <code>{JSON.stringify(dict("sw"), null, 4)}</code>
-      </pre>
-    </>
-  );
-};
-
-const dict = {
-  fr: {
-    hello: "bonjour {{ name }}, comment vas-tu ?",
-  },
-  en: {
-    hello: "hello {{ name }}, how are you?",
-  },
-};
-const value = createI18nContext(dict, "fr");
-
-<I18nContext.Provider value={value}>
-  <App />
-</I18nContext.Provider>;
-```
-
-## `createChainedI18n`
-
-Creates a chained dictionary and manages the locale. Provides a proxy wrapper around translate so you can do chained calls that always returns with the current locale. IE t.hello()
-
-### How to use it
+Dictionaries can be defined in inline in js, or imported from json files.
 
 ```ts
-import { createChainedI18n } from "@solid-primitives/i18n";
-
-const dictionaries = {
-  fr: {
-    hello: "bonjour {{ name }}, comment vas-tu ?",
-    goodbye: ({ name }: { name: string }) => `au revoir ${name}`,
-  },
-  en: {
-    hello: "hello {{ name }}, how are you?",
-    goodbye: ({ name }: { name: string }) => `goodbye ${name}`,
+const en_dict = {
+  hello: "hello {{ name }}, how are you?",
+  goodbye: (name: string) => `goodbye ${name}`,
+  food: {
+    meat: "meat",
+    fruit: "fruit",
   },
 };
 
-const [t, { locale, setLocale, getDictionary }] = createChainedI18n({
-  dictionaries,
-  locale: "en", // Starting locale
-});
+type Dict = typeof en_dict;
 
-createEffect(() => {
-  t.hello({ name: "Mathiew" });
-});
+const fr_dict: Dict = {
+  hello: "bonjour {{ name }}, comment vas-tu ?",
+  goodbye: (name: string) => `au revoir ${name}`,
+  food: {
+    meat: "viande",
+    fruit: "fruit",
+  },
+};
 ```
 
-### `createChainedI18nContext`
+### With `createResource`
 
-Creates chained I18n state wrapped in a Context Provider to be shared with the app using the component tree.
+Example of using `@solid-primitives/i18n` with `createResource` to dynamically load directories for selected languages.
 
 ```tsx
-import { createChainedI18nContext } from "@solid-primitives/i18n";
+import * as i18n from "@solid-primitives/i18n";
 
-const { I18nProvider, useI18nContext } = makeChainedI18nContext({
-  dictionaries,
-  locale: "en", // Starting locale
-});
+/*
+Assuming the dictionaries are in the following structure:
+./i18n
+  en.ts
+  fr.ts
+  es.ts
+And all exports a `dict` object
+*/
 
-export const useI18n = () => {
-  const context = useI18nContext();
-  if (!context) throw new Error("useI18n must be used within an I18nProvider");
-  return context;
-};
+// use `type` to not include the actual dictionary in the bundle
+import type * as en from "./i18n/en.js";
+
+export type Locale = "en" | "fr" | "es";
+export type RawDictionary = typeof en.dict;
+export type Dictionary = i18n.Flatten<RawDictionary>;
+
+async function fetchDictionary(locale: Locale): Promise<Dictionary> {
+  const dict: RawDictionary = (await import(`./i18n/${locale}.ts`)).dict;
+  return i18n.flatten(dict);
+}
 
 const App: Component = () => {
-  const [t, { locale, setLocale, getDictionary }] = useI18n();
-  const [name, setName] = createSignal("Greg");
+  const [locale, setLocale] = createSignal<Locale>("en");
+
+  const [dict] = createResource(locale, fetchDictionary);
+
+  dict(); // => Dictionary | undefined
+  // (undefined when the dictionary is not loaded yet)
+
+  const t = i18n.translator(dict, i18n.resolveTemplate);
 
   return (
-    <>
-      <button onClick={() => setLocale("fr")}>fr</button>
-      <button onClick={() => setLocale("en")}>en</button>
-      <button onClick={addLanguage}>add and set swedish</button>
-      <input value={name()} onInput={e => setName(e.target.value)} />
-      <hr />
-      <h1>{t.hello({ name: name() })}!</h1>
-      <p>{locale()}</p>
-      <p>{t.goodbye({ name: name() })}</p>
-    </>
+    <Suspense>
+      <Show when={dict()}>
+        {dict => {
+          dict(); // => Dictionary (narrowed by Show)
+
+          const t = i18n.translator(dict, i18n.resolveTemplate);
+
+          return (
+            <div>
+              <p>Current locale: {locale()}</p>
+              <div>
+                <button onClick={() => setLocale("en")}>English</button>
+                <button onClick={() => setLocale("fr")}>French</button>
+                <button onClick={() => setLocale("es")}>Spanish</button>
+              </div>
+
+              <h4>{t("hello", { name: "John" })}</h4>
+              <h4>{t("goodbye", { name: "John" })}</h4>
+              <h4>{t("food.meat")}</h4>
+            </div>
+          );
+        }}
+      </Show>
+    </Suspense>
   );
 };
-
-<I18nContext.Provider value={value}>
-  <App />
-</I18nContext.Provider>;
 ```
 
-## `useScopedI18n`
+### With initial dictionary
 
-Use `useScopedI18n` to create a module-specific translate.
+Instead of narrowing the current dictionary with `Show`, you can also provide an initial dictionary to `createResource`.
+
+```ts
+// en dictionary will be included in the bundle
+import { dict as en_dict } from "./i18n/en.js";
+
+const [dict] = createResource(locale, fetchDictionary, {
+  initialValue: i18n.flatten(en_dict),
+});
+
+dict(); // => Dictionary
+```
+
+### With transitions
+
+Since the dictionary is a resource, you can use solid's transitions when switching the locale.
 
 ```tsx
+const [dict] = createResource(locale, fetchDictionary);
 
+const [duringTransition, startTransition] = useTransition();
+
+function switchLocale(locale: Locale) {
+  startTransition(() => setLocale(locale));
+}
+
+return (
+  <div style={{ opacity: duringTransition() ? 0.5 : 1 }}>
+    <Suspense>
+      <App />
+    </Suspense>
+  </div>
+);
+```
+
+### Static dictionaries
+
+If you don't need to load dictionaries dynamically, you can use `createMemo` instead of `createResource`.
+
+```tsx
+import * as en from "./i18n/en.js";
+import * as fr from "./i18n/fr.js";
+import * as es from "./i18n/es.js";
+
+const dictionaries = {
+  en: en.dict,
+  fr: fr.dict,
+  es: es.dict,
+};
+
+const [locale, setLocale] = createSignal<Locale>("en");
+
+const dict = createMemo(() => i18n.flatten(dictionaries[locale()]));
+
+const t = i18n.translator(dict);
+```
+
+### Templates
+
+Templates are strings that can contain placeholders. Placeholders are defined with double curly braces `{{ placeholder }}`.
+
+Templates can be resolved by calling `resolveTemplate` function. e.g.
+
+```ts
+i18n.resolveTemplate("hello {{ name }}!", { name: "John" }); // => 'hello John!'
+```
+
+By default, the `translator` function will not resolve templates. You can pass `resolveTemplate` as the second argument to `translator` to enable template resolution. Or use a custom template resolver.
+
+```ts
 const dict = {
-  en: {
-    login: {
-      username: 'User name',
-      password: 'Password',
-      login: 'Login'
+  hello: "hello {{ name }}!",
+};
+
+const t1 = i18n.translator(() => dict);
+
+t1("hello", { name: "John" }); // => 'hello {{ name }}!'
+
+const t2 = i18n.translator(() => dict, i18n.resolveTemplate);
+
+t2("hello", { name: "John" }); // => 'hello John!'
+```
+
+### Scoping translators
+
+To create a module-specific translate and avoid passing it's path to `translator` every time, you can use `scopedTranslator`.
+
+```ts
+const dict = {
+  "login.username": "User name",
+  "login.password": "Password",
+  "login.login": "Login",
+  // ...
+};
+
+const t = i18n.translator(() => dict);
+
+const loginT = i18n.scopedTranslator(t, "login");
+
+loginT("username"); // => 'User name'
+```
+
+### Nested objects syntax
+
+String paths passesd to the translator don't allow for taking advantage of TypeScript's "Go to definition" feature.
+
+If you prefer to use nested objects instead of dot notation, you can use `chainedTranslator` helper.
+
+```ts
+const dict = {
+  login: {
+    username: "User name",
+    password: "Password",
+    login: "Login",
   },
-  fr: {
-     ...
-  }
- }
-}
+};
+const flat_dict = i18n.flatten(dict);
 
-export const LoginView = () => {
-  const [t] = useScopedI18n('login');
-  return <>
-      <div>{t('username')}<input /></div>
-      <div>{t('password')}<input /></div>
-      <button>{t('login') }</button>
-  </>
-}
+const t = i18n.translator(() => flat_dict);
 
+const chained = i18n.chainedTranslator(dict, t);
+
+chained.login.username(); // => 'User name'
 ```
 
 ## Demo
 
-You may view a working example of createI18nContext here: https://codesandbox.io/s/use-i18n-rd7jq?file=/src/index.tsx
+[Live example](https://primitives.solidjs.community/playground/i18n) | [Source code](https://github.com/solidjs-community/solid-primitives/blob/main/packages/i18n/dev/index.tsx)
 
 ## Changelog
 
