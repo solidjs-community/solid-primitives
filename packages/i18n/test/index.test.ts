@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import * as i18n from "../src/new-i18n.js";
+import * as i18n from "../src/index.js";
 import { createEffect, createResource, createRoot, createSignal } from "solid-js";
 import { Locale, en_dict, pl_dict } from "./setup.js";
 

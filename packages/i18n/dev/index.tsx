@@ -1,10 +1,10 @@
 import { Component, createResource, createSignal, Suspense, useTransition } from "solid-js";
 import { dict as en_dict } from "./en.js";
-import * as i18n from "../src/new-i18n.js";
+import * as i18n from "../src/index.js";
 
 export type Locale = "en" | "fr" | "es";
 export type I18nDict = typeof en_dict;
-export type I18nFlatDict = i18n.FlatDict<I18nDict>;
+export type I18nFlatDict = i18n.Flatten<I18nDict>;
 
 const App: Component = () => {
   const [locale, setLocale] = createSignal<Locale>("en");

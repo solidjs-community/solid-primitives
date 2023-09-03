@@ -1,4 +1,4 @@
-import * as i18n from "../src/new-i18n.js";
+import * as i18n from "../src/index.js";
 
 export const dict = {
   hello: i18n.template<{ name: string }>("hello {{ name }}, how are you?"),
