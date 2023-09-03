@@ -3,60 +3,36 @@ import * as i18n from "../src/new-i18n.js";
 import { createEffect, createResource, createRoot, createSignal } from "solid-js";
 
 const options_with_template: i18n.ResolverOptions = {
-  resolvedTemplate: i18n.resolvedTemplate,
+  resolveTemplate: i18n.resolveTemplate,
 };
 
-describe("resolver", () => {
-  test("function", () => {
-    const fn = (a: number, b: string, c: object): number => a + b.length + Object.keys(c).length;
-    const resolver = i18n.resolver(fn);
+describe("template", () => {
+  test("identity template resolver", () => {
+    expect(i18n.identityResolveTemplate("hello!")).toBe("hello!");
 
-    const translated = resolver(1, "two", { foo: "bar" });
-    expect(translated).toBe(5);
+    expect(i18n.identityResolveTemplate("hello {{name}}!", { name: "Tester" })).toBe(
+      "hello {{name}}!",
+    );
   });
 
-  describe("string", () => {
-    test("no template resolver", () => {
-      const r1 = i18n.resolver("hello!");
-      expect(r1()).toBe("hello!");
+  test("default template resolver", () => {
+    expect(i18n.resolveTemplate("hello!")).toBe("hello!");
 
-      const r2 = i18n.resolver("hello {{name}}!");
-      expect(r2({ name: "Tester" })).toBe("hello {{name}}!");
-    });
+    expect(i18n.resolveTemplate("hello {{name}}!", { name: "Tester" })).toBe("hello Tester!");
 
-    test("default template resolver", () => {
-      const r1 = i18n.resolver("hello!", options_with_template);
-      expect(r1()).toBe("hello!");
+    expect(i18n.resolveTemplate("hello {{ name }}!", { name: "Tester" })).toBe("hello Tester!");
 
-      const r2 = i18n.resolver("hello {{name}}!", options_with_template);
-      expect(r2({ name: "Tester" })).toBe("hello Tester!");
+    expect(
+      i18n.resolveTemplate("hello {{name}} and {{extra}}!", { name: "Tester", extra: "John" }),
+    ).toBe("hello Tester and John!");
 
-      const r3 = i18n.resolver("hello {{ name }}!", options_with_template);
-      expect(r3({ name: "Tester" })).toBe("hello Tester!");
+    expect(
+      i18n.resolveTemplate("hello {{ name }} and {{ extra }}!", { name: "Tester", extra: "John" }),
+    ).toBe("hello Tester and John!");
 
-      const r4 = i18n.resolver("hello {{name}} and {{extra}}!", options_with_template);
-      expect(r4({ name: "Tester", extra: "John" })).toBe("hello Tester and John!");
-
-      const r5 = i18n.resolver("hello {{ name }} and {{ extra }}!", options_with_template);
-      expect(r5({ name: "Tester", extra: "John" })).toBe("hello Tester and John!");
-
-      const r6 = i18n.resolver("hello {{name}} and {{extra}}!", options_with_template);
-      expect(r6()).toBe("hello {{name}} and {{extra}}!");
-    });
-  });
-
-  test("other value", () => {
-    const r1 = i18n.resolver(1);
-    expect(r1()).toBe(1);
-
-    const r2 = i18n.resolver(true);
-    expect(r2()).toBe(true);
-
-    const r3 = i18n.resolver(null);
-    expect(r3()).toBe(null);
-
-    const r4 = i18n.resolver(undefined);
-    expect(r4()).toBe(undefined);
+    expect(i18n.resolveTemplate("hello {{name}} and {{extra}}!")).toBe(
+      "hello {{name}} and {{extra}}!",
+    );
   });
 });
 
@@ -113,113 +89,83 @@ const pl_dict = {
   },
 } satisfies Dict;
 
-describe("dict", () => {
-  test("resolverDict", () => {
-    const resolvers = i18n.resolverDict(en_dict);
+describe("flatDict", () => {
+  test("flatDict", () => {
+    const flat = i18n.flatDict(en_dict);
 
-    const hello = resolvers.hello({ name: "Tester", thing: "day" });
-    expect(hello).toBe("Hello {{name}}! How is your {{thing}}?");
-
-    const numbers = resolvers.numbers();
-    expect(numbers).toEqual(en_dict.numbers);
-
-    const number1 = resolvers["numbers.1"]();
-    expect(number1).toBe("one");
-
-    const data = resolvers.data();
-    expect(data).toEqual(en_dict.data);
-
-    const data_class = resolvers["data.class"]();
-    expect(data_class).toBe(en_dict.data.class);
-
-    const currency = resolvers["data.currency"]();
-    expect(currency).toEqual(en_dict.data.currency);
-
-    const currency_name = resolvers["data.currency.name"]();
-    expect(currency_name).toBe("dollar");
-
-    const currency_to_usd = resolvers["data.currency.to.usd"]();
-    expect(currency_to_usd).toBe(1);
-
-    const users = resolvers["data.users"]();
-    expect(users).toEqual(en_dict.data.users);
-
-    const users_0 = resolvers["data.users.0"]!();
-    expect(users_0).toEqual(en_dict.data.users[0]);
-
-    const users_0_name = resolvers["data.users.0.name"]!();
-    expect(users_0_name).toBe("John");
-
-    const users_69_resolver = resolvers["data.users.69"];
-    expect(users_69_resolver).toBeUndefined();
-
-    const users_69_name_resolver = resolvers["data.users.69.name"];
-    expect(users_69_name_resolver).toBeUndefined();
-
-    const format_list = resolvers["data.formatList"](["John", "Kate", "Tester"]);
-    expect(format_list).toBe("John, Kate and Tester");
-  });
-
-  test("resolver options", () => {
-    const resolvers = i18n.resolverDict(en_dict, options_with_template);
-
-    const hello = resolvers.hello({ name: "Tester", thing: "day" });
-    expect(hello).toBe("Hello Tester! How is your day?");
+    expect(flat).toEqual({
+      ...en_dict,
+      "numbers.1": "one",
+      "numbers.2": "two",
+      "numbers.3": "three",
+      "data.class": en_dict.data.class,
+      "data.currency": en_dict.data.currency,
+      "data.currency.name": "dollar",
+      "data.currency.symbol": "$",
+      "data.currency.iso": "USD",
+      "data.currency.to.usd": 1,
+      "data.users": en_dict.data.users,
+      "data.users.0": en_dict.data.users[0],
+      "data.users.0.name": "John",
+      "data.users.1": en_dict.data.users[1],
+      "data.users.1.name": "Kate",
+      "data.formatList": en_dict.data.formatList,
+    } satisfies typeof flat);
   });
 });
 
 describe("chainedResolver", () => {
-  let resolvers = i18n.resolverDict(en_dict, options_with_template);
-  const dict = i18n.chainedResolver(en_dict, (path, ...args) =>
-    // @ts-expect-error
-    resolvers[path](...args),
-  );
+  let flat_dict = i18n.flatDict(en_dict);
+
+  const t = i18n.translator(() => flat_dict, options_with_template);
+
+  const chained = i18n.chained(en_dict, t);
 
   test("initial", () => {
-    const hello = dict.hello({ name: "Tester", thing: "day" });
+    const hello = chained.hello({ name: "Tester", thing: "day" });
     expect(hello).toBe("Hello Tester! How is your day?");
 
-    const number1 = dict.numbers[1]();
+    const number1 = chained.numbers[1]();
     expect(number1).toBe("one");
 
-    const data_class = dict.data.class();
+    const data_class = chained.data.class();
     expect(data_class).toBe(en_dict.data.class);
 
-    const currency_name = dict.data.currency.name();
+    const currency_name = chained.data.currency.name();
     expect(currency_name).toBe("dollar");
 
-    const currency_to_usd = dict.data.currency["to.usd"]();
+    const currency_to_usd = chained.data.currency["to.usd"]();
     expect(currency_to_usd).toBe(1);
 
-    const users = dict.data.users();
+    const users = chained.data.users();
     expect(users).toEqual(en_dict.data.users);
 
-    const format_list = dict.data.formatList(["John", "Kate", "Tester"]);
+    const format_list = chained.data.formatList(["John", "Kate", "Tester"]);
     expect(format_list).toBe("John, Kate and Tester");
   });
 
   test("after change", () => {
-    resolvers = i18n.resolverDict(pl_dict, options_with_template);
+    flat_dict = i18n.flatDict(pl_dict);
 
-    const hello = dict.hello({ name: "Tester", thing: "dzień" });
+    const hello = chained.hello({ name: "Tester", thing: "dzień" });
     expect(hello).toBe("Cześć Tester!");
 
-    const number1 = dict.numbers[1]();
+    const number1 = chained.numbers[1]();
     expect(number1).toBe("jeden");
 
-    const data_class = dict.data.class();
+    const data_class = chained.data.class();
     expect(data_class).toBe(pl_dict.data.class);
 
-    const currency_name = dict.data.currency.name();
+    const currency_name = chained.data.currency.name();
     expect(currency_name).toBe("złoty");
 
-    const currency_to_usd = dict.data.currency["to.usd"]();
+    const currency_to_usd = chained.data.currency["to.usd"]();
     expect(currency_to_usd).toBe(0.27);
 
-    const users = dict.data.users();
+    const users = chained.data.users();
     expect(users).toEqual(pl_dict.data.users);
 
-    const format_list = dict.data.formatList(["John", "Kate", "Tester"]);
+    const format_list = chained.data.formatList(["John", "Kate", "Tester"]);
     expect(format_list).toBe("John, Kate i Tester");
   });
 });
@@ -227,32 +173,37 @@ describe("chainedResolver", () => {
 describe("reactive", () => {
   test("with translator", async () => {
     const [locale, setLocale] = createSignal<Locale>("en");
-    let captured = "";
+    let hello = "";
+    let to_usd = 0;
 
     const dispose = createRoot(dispose => {
       const [dict] = createResource(
         locale,
         async locale => {
           const dict = locale === "en" ? en_dict : pl_dict;
-          return i18n.resolverDict(dict, options_with_template);
+          return i18n.flatDict(dict);
         },
-        { initialValue: i18n.resolverDict(en_dict, options_with_template) },
+        { initialValue: i18n.flatDict(en_dict) },
       );
 
-      const t = i18n.translator(dict);
+      const t = i18n.translator(dict, options_with_template);
+      const chained = i18n.chained(en_dict, t);
 
       createEffect(() => {
-        captured = t("hello", { name: "Tester", thing: "day" });
+        hello = t("hello", { name: "Tester", thing: "day" });
+        to_usd = chained.data.currency["to.usd"]();
       });
 
       return dispose;
     });
 
-    expect(captured).toBe("Hello Tester! How is your day?");
+    expect(hello).toBe("Hello Tester! How is your day?");
+    expect(to_usd).toBe(1);
 
     setLocale("pl");
     await Promise.resolve();
-    expect(captured).toBe("Cześć Tester!");
+    expect(hello).toBe("Cześć Tester!");
+    expect(to_usd).toBe(0.27);
 
     dispose();
   });

@@ -104,6 +104,8 @@ export type AnyStatic = [] | any[] | AnyObject;
 export type AnyFunction = (...args: any[]) => any;
 export type AnyClass = abstract new (...args: any) => any;
 
+export type EmptyObject = Record<never, never>;
+
 export type NullableValue = null | undefined;
 export type PrimitiveValue = PropertyKey | boolean | bigint | NullableValue;
 export type FalsyValue = NullableValue | false;

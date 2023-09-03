@@ -21,6 +21,7 @@ import type {
   Noop,
   AnyObject,
   AnyFunction,
+  EmptyObject,
 } from "./types.js";
 
 export * from "./types.js";
@@ -39,6 +40,8 @@ export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 export const identity = <T>(v: T): T => v;
+
+export const emptyObject: EmptyObject = {};
 
 /** @deprecated use {@link equalFn} from "solid-js" */
 export const defaultEquals = equalFn;
