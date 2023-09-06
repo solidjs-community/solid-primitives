@@ -1,5 +1,11 @@
 # @solid-primitives/platform
 
+## 0.1.0
+
+### Minor Changes
+
+- 1b286ba4: Correct `isSafari`, add `isBrave`
+
 ## 0.0.105
 
 ### Patch Changes
