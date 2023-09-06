@@ -16,6 +16,8 @@ A set of const boolean variables identifying device and browser type.
 ```bash
 npm install @solid-primitives/platform
 # or
+pnpm add @solid-primitives/platform
+# or
 yarn add @solid-primitives/platform
 ```
 
@@ -32,6 +34,10 @@ if (isWebKit) {
   // run WebKit Engine specific code
 }
 ```
+
+> **Note:** This package is tree-shakable, all unused variables will be removed from the bundle.
+
+> **Note:** On the server, all variables will be `false`.
 
 ## List of variables
 
@@ -70,6 +76,8 @@ if (isWebKit) {
 - `isEdge` — Browser is Edge
 
 - `isChrome` — Browser is Chrome
+
+- `isBrave` — Browser is Brave
 
 ### Rendering Engine
 

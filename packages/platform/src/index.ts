@@ -2,7 +2,7 @@ import { isServer } from "solid-js/web";
 
 const w = isServer ? { document: {}, navigator: { userAgent: "" } } : (window as any);
 const n = w.navigator;
-const ua = isServer ? "" : n.userAgent;
+const ua = n.userAgent;
 
 //
 // Devices
@@ -48,8 +48,7 @@ export const isOpera: boolean =
 
 /** Browser is Safari */
 export const isSafari: boolean =
-  /*#__PURE__*/ /constructor/i.test(w.HTMLElement) ||
-  w.safari?.pushNotification + "" === "[object SafariRemoteNotification]";
+  n.vendor && n.vendor.includes("Apple") && ua && !ua.includes("CriOS") && !ua.includes("FxiOS");
 
 /** Browser is Internet Explorer 6-11 */
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -63,6 +62,9 @@ export const isEdge: boolean = /*#__PURE__*/ /Edg/.test(ua) && isChromium;
 
 /** Browser is Chrome */
 export const isChrome: boolean = isChromium && n.vendor === "Google Inc." && !isOpera && !isEdge;
+
+/** Browser is Brave */
+export const isBrave: boolean = n.brave && n.brave.isBrave && n.brave.isBrave.name === "isBrave";
 
 //
 // Rendering Engines

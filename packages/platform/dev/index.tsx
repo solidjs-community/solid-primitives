@@ -8,19 +8,14 @@ const App: Component = () => {
       <div class="wrapper-v">
         <h4>Platform:</h4>
         <ul>
-          {Object.entries(platform).map(([name, value]) => {
-            return (
-              <li>
-                <h5
-                  style={{
-                    color: value ? "green" : "red",
-                  }}
-                >
-                  {name.substring(2)}
-                </h5>
-              </li>
-            );
-          })}
+          {Object.entries(platform).map(([name, value]) => (
+            <li>
+              <h5
+                class={value ? "text-green-500" : "text-red-500"}
+                textContent={name.substring(2)}
+              />
+            </li>
+          ))}
         </ul>
       </div>
     </div>
