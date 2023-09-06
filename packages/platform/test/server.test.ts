@@ -28,6 +28,7 @@ describe("platform", () => {
     expect(platform.isChromium).toBe(false);
     expect(platform.isEdge).toBe(false);
     expect(platform.isChrome).toBe(false);
+    expect(platform.isBrave).toBe(false);
 
     //
     // Rendering Engines

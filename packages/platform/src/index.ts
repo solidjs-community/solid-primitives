@@ -48,7 +48,7 @@ export const isOpera: boolean =
 
 /** Browser is Safari */
 export const isSafari: boolean =
-  n.vendor && n.vendor.includes("Apple") && ua && !ua.includes("CriOS") && !ua.includes("FxiOS");
+  !!n.vendor && n.vendor.includes("Apple") && ua && !ua.includes("CriOS") && !ua.includes("FxiOS");
 
 /** Browser is Internet Explorer 6-11 */
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -64,7 +64,7 @@ export const isEdge: boolean = /*#__PURE__*/ /Edg/.test(ua) && isChromium;
 export const isChrome: boolean = isChromium && n.vendor === "Google Inc." && !isOpera && !isEdge;
 
 /** Browser is Brave */
-export const isBrave: boolean = n.brave && n.brave.isBrave && n.brave.isBrave.name === "isBrave";
+export const isBrave: boolean = !!n.brave && n.brave.isBrave && n.brave.isBrave.name === "isBrave";
 
 //
 // Rendering Engines
