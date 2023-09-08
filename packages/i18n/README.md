@@ -282,7 +282,7 @@ loginT("username"); // => 'User name'
 
 ### Nested objects syntax
 
-String paths passesd to the translator don't allow for taking advantage of TypeScript's "Go to definition" feature.
+String paths passesd to the translator don't allow for taking advantage of TypeScript's "Go to definition", and "Find all references", "Rename" features.
 
 If you prefer to use nested objects instead of dot notation, you can use `chainedTranslator` helper.
 
