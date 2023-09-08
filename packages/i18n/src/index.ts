@@ -99,6 +99,44 @@ export function flatten<T extends BaseDict>(dict: T): Flatten<T> {
   return flat_dict as Flatten<T>;
 }
 
+export type Prefixed<T extends BaseRecordDict, P extends string> = {
+  readonly [K in keyof T as `${P}.${K & (string | number)}`]: T[K];
+};
+
+/**
+ * Prefix all *(own)* keys in the dictionary with the provided prefix.
+ *
+ * Useful for namespacing a dictionary when combining multiple dictionaries.
+ *
+ * @example
+ * ```ts
+ * const dict = {
+ *   hello: "hello",
+ *   goodbye: "goodbye",
+ *   food: { meat: "meat" },
+ * }
+ *
+ * const prefixed_dict = prefix(dict, "greetings");
+ *
+ * prefixed_dict === {
+ *   "greetings.hello": "hello",
+ *   "greetings.goodbye": "goodbye",
+ *   "greetings.food": { meat: "meat" },
+ * }
+ * ```
+ */
+export const prefix: <T extends BaseRecordDict, P extends string>(
+  dict: T,
+  prefix: P,
+) => Prefixed<T, P> = (dict: BaseRecordDict, prefix: string): any => {
+  prefix += ".";
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(dict)) {
+    result[prefix + key] = value;
+  }
+  return result;
+};
+
 export type BaseTemplateArgs = Record<string, string | number | boolean>;
 
 /**

@@ -3,6 +3,46 @@ import * as i18n from "../src/index.js";
 import { createEffect, createResource, createRoot, createSignal } from "solid-js";
 import { Locale, en_dict, pl_dict } from "./setup.js";
 
+describe("dict", () => {
+  test("flatten", () => {
+    const flat = i18n.flatten(en_dict);
+
+    expect(flat).toEqual({
+      ...en_dict,
+      "numbers.1": "one",
+      "numbers.2": "two",
+      "numbers.3": "three",
+      "data.class": en_dict.data.class,
+      "data.currency": en_dict.data.currency,
+      "data.currency.name": "dollar",
+      "data.currency.symbol": "$",
+      "data.currency.iso": "USD",
+      "data.currency.to.usd": 1,
+      "data.users": en_dict.data.users,
+      "data.users.0": en_dict.data.users[0],
+      "data.users.0.name": "John",
+      "data.users.1": en_dict.data.users[1],
+      "data.users.1.name": "Kate",
+      "data.formatList": en_dict.data.formatList,
+    } satisfies typeof flat);
+  });
+
+  test("prefix", () => {
+    const dict = {
+      "data.a": 123,
+      "data.b": { foo: "bar" },
+      c: "d",
+    };
+    const prefixed = i18n.prefix(dict, "prefix");
+
+    expect(prefixed).toEqual({
+      "prefix.data.a": 123,
+      "prefix.data.b": { foo: "bar" },
+      "prefix.c": "d",
+    });
+  });
+});
+
 describe("template", () => {
   test("identity template resolver", () => {
     expect(i18n.identityResolveTemplate("hello!")).toBe("hello!");
@@ -30,31 +70,6 @@ describe("template", () => {
     expect(i18n.resolveTemplate("hello {{name}} and {{extra}}!")).toBe(
       "hello {{name}} and {{extra}}!",
     );
-  });
-});
-
-describe("flatDict", () => {
-  test("flatDict", () => {
-    const flat = i18n.flatten(en_dict);
-
-    expect(flat).toEqual({
-      ...en_dict,
-      "numbers.1": "one",
-      "numbers.2": "two",
-      "numbers.3": "three",
-      "data.class": en_dict.data.class,
-      "data.currency": en_dict.data.currency,
-      "data.currency.name": "dollar",
-      "data.currency.symbol": "$",
-      "data.currency.iso": "USD",
-      "data.currency.to.usd": 1,
-      "data.users": en_dict.data.users,
-      "data.users.0": en_dict.data.users[0],
-      "data.users.0.name": "John",
-      "data.users.1": en_dict.data.users[1],
-      "data.users.1.name": "Kate",
-      "data.formatList": en_dict.data.formatList,
-    } satisfies typeof flat);
   });
 });
 

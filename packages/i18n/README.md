@@ -78,7 +78,7 @@ export type Dictionary = i18n.Flatten<RawDictionary>;
 
 async function fetchDictionary(locale: Locale): Promise<Dictionary> {
   const dict: RawDictionary = (await import(`./i18n/${locale}.ts`)).dict;
-  return i18n.flatten(dict);
+  return i18n.flatten(dict); // flatten the dictionary to make all nested keys available top-level
 }
 
 const App: Component = () => {
@@ -89,7 +89,9 @@ const App: Component = () => {
   dict(); // => Dictionary | undefined
   // (undefined when the dictionary is not loaded yet)
 
-  const t = i18n.translator(dict, i18n.resolveTemplate);
+  const t = i18n.translator(dict);
+
+  t("hello"); // => string | undefined
 
   return (
     <Suspense>
@@ -97,7 +99,9 @@ const App: Component = () => {
         {dict => {
           dict(); // => Dictionary (narrowed by Show)
 
-          const t = i18n.translator(dict, i18n.resolveTemplate);
+          const t = i18n.translator(dict);
+
+          t("hello"); // => string
 
           return (
             <div>
@@ -205,9 +209,61 @@ const t2 = i18n.translator(() => dict, i18n.resolveTemplate);
 t2("hello", { name: "John" }); // => 'hello John!'
 ```
 
-### Scoping translators
+### Modules
 
-To create a module-specific translate and avoid passing it's path to `translator` every time, you can use `scopedTranslator`.
+Splitting the dictionary into multiple modules can be useful when you have a large dictionary and want to avoid loading the entire dictionary at once.
+
+For example if out app had a separate `login` and `dashboard` modules, we could split the dictionary into 3 modules: (`common`, `login` and `dashboard`).
+
+```
+i18n/
+  en.json
+  pl.json
+modules/
+  login/
+    i18n/
+      en.json
+      pl.json
+    login.ts
+  ...
+root.ts
+```
+
+Translations in `root.ts` would be available in all modules. Translations in `login.ts` would be available only in `login` module, and the same for other modules.
+
+```ts
+// root.ts
+
+const [locale, setLocale] = createSignal<Locale>("en");
+const [commonDict] = createResource(locale, fetchCommonDictionary);
+const t = i18n.translator(commonDict);
+
+// login/login.ts
+
+const [loginDict] = createResource(locale, fetchLoginDictionary);
+
+// translator only for login module
+const loginT = i18n.translator(loginDict);
+
+t("welcome"); // => 'Welcome from common translations!'
+loginT("welcome"); // => 'Welcome from login translations!'
+```
+
+Or combine multiple dictionaries into one. While prefixing the keys with the module name.
+
+```ts
+const combined_dict = createMemo(() => ({
+  ...i18n.prefix(commonDict(), "common"),
+  ...i18n.prefix(loginDict(), "login"),
+}));
+
+const t = i18n.translator(combined_dict);
+
+t("common.welcome"); // => 'Welcome from common translations!'
+t("login.welcome"); // => 'Welcome from login translations!'
+```
+
+To scope an existing translator to a module, you can use `scopedTranslator`.
 
 ```ts
 const dict = {
