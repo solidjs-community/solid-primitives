@@ -1,5 +1,12 @@
 # @solid-primitives/bounds
 
+## 0.0.118
+
+### Patch Changes
+
+- Updated dependencies [ddb20f12]
+  - @solid-primitives/resize-observer@2.0.22
+
 ## 0.0.117
 
 ### Patch Changes
