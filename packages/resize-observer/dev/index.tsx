@@ -39,7 +39,7 @@ const App: Component = () => {
       <div class="center-child min-h-82">
         <div
           ref={e => (ref = e)}
-          class="shadow-bg-gray-900 center-child h-24 w-24 rounded-md bg-orange-500 shadow-lg"
+          class="shadow-bg-gray-900 center-child h-24 w-24 rounded-md border-8 border-white bg-orange-500 shadow-lg"
           style={{
             width: `${width()}px`,
             height: `${height()}px`,

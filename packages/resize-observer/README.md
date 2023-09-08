@@ -144,6 +144,8 @@ If you want a reactive interface for media-queries, please checkout [the media p
 
 Creates a reactive store-like object of current width and height dimensions of html element.
 
+It uses `ResizeObserver` under the hood—to observe when the element size changes—and `getBoundingClientRect` to get the current size.
+
 ### How to use it
 
 `createElementSize` needs to be provided a target. It can be an HTML element, or a reactive signal returning one. Target also takes falsy values to disable tracking.
