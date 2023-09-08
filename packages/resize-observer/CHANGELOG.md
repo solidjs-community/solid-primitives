@@ -1,5 +1,11 @@
 # @solid-primitives/resize-observer
 
+## 2.0.22
+
+### Patch Changes
+
+- ddb20f12: Use `getBoundingClientRect` to get element size on resize
+
 ## 2.0.21
 
 ### Patch Changes
