@@ -320,7 +320,7 @@ proxy.goodbye("John"); // => "goodbye John!"
 Using a proxy will have a slight performance impact, so it's recommended to use `chainedTranslator` if possible. But it can be useful when you don't have access to the dictionary object. Or want to mock the translations in tests.
 
 ```ts
-const proxy = i18n.proxyTranslator((path) => path);
+const proxy = i18n.proxyTranslator(path => path);
 
 proxy.greetings.hello({ name: "John" }); // => "greetings.hello"
 proxy.greetings.hi(); // => "greetings.hi"
@@ -330,6 +330,8 @@ proxy.goodbye("John"); // => "goodbye"
 ## Demo
 
 [Live example](https://primitives.solidjs.community/playground/i18n) | [Source code](https://github.com/solidjs-community/solid-primitives/blob/main/packages/i18n/dev/index.tsx)
+
+the i18n package is also being used in solidjs.com, you can see the source code [here](https://github.com/solidjs/solid-site/blob/main/src/AppContext.tsx)
 
 ## Changelog
 
