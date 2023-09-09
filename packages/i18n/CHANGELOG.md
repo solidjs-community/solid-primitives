@@ -1,5 +1,13 @@
 # @solid-primitives/i18n
 
+## 2.0.0
+
+### Major Changes
+
+- 637f383c: BREAKING: Rework the API.
+
+  Please refer to the [README](https://github.com/solidjs-community/solid-primitives/tree/main/packages/i18n#readme) for the new API.
+
 ## 1.4.1
 
 ### Patch Changes
