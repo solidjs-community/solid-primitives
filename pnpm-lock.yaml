@@ -429,10 +429,6 @@ importers:
         version: 1.7.11
 
   packages/i18n:
-    dependencies:
-      '@solid-primitives/context':
-        specifier: workspace:^
-        version: link:../context
     devDependencies:
       solid-js:
         specifier: ^1.7.11
