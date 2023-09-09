@@ -248,15 +248,16 @@ export function translator<T extends BaseRecordDict>(
 export function translator(
   dict: () => BaseRecordDict | undefined,
   resolveTemplate: TemplateResolver = identityResolveTemplate,
-): NullableTranslator<BaseRecordDict> {
-  return (path, ...args) => {
+): any {
+  return (path: string, ...args: any[]) => {
+    if (path[0] === ".") path = path.slice(1);
+
     const value = dict()?.[path];
 
     switch (typeof value) {
       case "function":
         return value(...args);
       case "string":
-        // @ts-expect-error
         return resolveTemplate(value, args[0]);
       default:
         return value;
@@ -348,7 +349,7 @@ export function chainedTranslator<T extends BaseRecordDict>(
   const result: any = { ...init_dict };
 
   for (const [key, value] of Object.entries(init_dict)) {
-    const key_path = path ? `${path}.${key}` : key;
+    const key_path = `${path}.${key}`;
 
     result[key] = isRecordDict(value)
       ? chainedTranslator(value, translate, key_path)
@@ -361,4 +362,57 @@ export function chainedTranslator<T extends BaseRecordDict>(
   }
 
   return result;
+}
+
+/**
+ * Create an object-chained translator *(implemented using a Proxy)* that will resolve the path in the dictionary and return the value.
+ *
+ * @param translate {@link Translator} function that will resolve the path in the dictionary and return the value.
+ *
+ * @example
+ * ```ts
+ * const dict = {
+ *   greetings: {
+ *     hello: "hello {{ name }}!",
+ *     hi: "hi!",
+ *   },
+ *   goodbye: (name: string) => `goodbye ${name}!`,
+ * }
+ * const flat_dict = i18n.flatten(dict);
+ *
+ * const t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
+ *
+ * const proxy = i18n.proxyTranslator(t);
+ *
+ * proxy.greetings.hello({ name: "John" }) // => "hello John!"
+ * proxy.greetings.hi() // => "hi!"
+ * proxy.goodbye("John") // => "goodbye John!"
+ * ```
+ */
+export const proxyTranslator: <T extends BaseRecordDict>(
+  translate: Translator<T>,
+) => ChainedTranslator<T> = (translate: Translator<BaseRecordDict>, path = ""): any =>
+  new Proxy(translate.bind(void 0, path), new Traps(translate, path));
+
+class Traps {
+  constructor(
+    private readonly translate: Translator<BaseRecordDict>,
+    private readonly path: string,
+  ) {}
+
+  get(target: any, prop: PropertyKey): any {
+    if (typeof prop !== "string") return Reflect.get(target, prop);
+    return (proxyTranslator as any)(this.translate, `${this.path}.${prop}`);
+  }
+  has(target: any, prop: PropertyKey): boolean {
+    if (typeof prop !== "string") return Reflect.has(target, prop);
+    return (proxyTranslator as any)(this.translate, `${this.path}.${prop}`) !== undefined;
+  }
+  getOwnPropertyDescriptor(target: any, prop: PropertyKey): PropertyDescriptor | undefined {
+    if (typeof prop !== "string") return Reflect.getOwnPropertyDescriptor(target, prop);
+    return {
+      enumerable: true,
+      get: () => (proxyTranslator as any)(this.translate, `${this.path}.${prop}`),
+    };
+  }
 }

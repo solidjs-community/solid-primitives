@@ -126,33 +126,40 @@ describe("scopedTranslator", () => {
   });
 });
 
-describe("chainedResolver", () => {
-  let flat_dict = i18n.flatten(en_dict);
+Object.entries({
+  chained: i18n.chainedTranslator,
+  proxy: (_, t) => i18n.proxyTranslator(t),
+} satisfies Record<string, typeof i18n.chainedTranslator>).forEach(([name, fn]) => {
+  describe(name, () => {
+    let flat_dict = i18n.flatten(en_dict);
 
-  const t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
+    const t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
 
-  const chained = i18n.chainedTranslator(en_dict, t);
+    const chained = fn(en_dict, t);
 
-  test("initial", () => {
-    expect(chained.hello({ name: "Tester", thing: "day" })).toBe("Hello Tester! How is your day?");
-    expect(chained.numbers[1]()).toBe("one");
-    expect(chained.data.class()).toBe(en_dict.data.class);
-    expect(chained.data.currency.name()).toBe("dollar");
-    expect(chained.data.currency["to.usd"]()).toBe(1);
-    expect(chained.data.users()).toEqual(en_dict.data.users);
-    expect(chained.data.formatList(["John", "Kate", "Tester"])).toBe("John, Kate and Tester");
-  });
+    test("initial", () => {
+      expect(chained.hello({ name: "Tester", thing: "day" })).toBe(
+        "Hello Tester! How is your day?",
+      );
+      expect(chained.numbers[1]()).toBe("one");
+      expect(chained.data.class()).toBe(en_dict.data.class);
+      expect(chained.data.currency.name()).toBe("dollar");
+      expect(chained.data.currency["to.usd"]()).toBe(1);
+      expect(chained.data.users()).toEqual(en_dict.data.users);
+      expect(chained.data.formatList(["John", "Kate", "Tester"])).toBe("John, Kate and Tester");
+    });
 
-  test("after change", () => {
-    flat_dict = i18n.flatten(pl_dict);
+    test("after change", () => {
+      flat_dict = i18n.flatten(pl_dict);
 
-    expect(chained.hello({ name: "Tester", thing: "dzień" })).toBe("Cześć Tester!");
-    expect(chained.numbers[1]()).toBe("jeden");
-    expect(chained.data.class()).toBe(pl_dict.data.class);
-    expect(chained.data.currency.name()).toBe("złoty");
-    expect(chained.data.currency["to.usd"]()).toBe(0.27);
-    expect(chained.data.users()).toEqual(pl_dict.data.users);
-    expect(chained.data.formatList(["John", "Kate", "Tester"])).toBe("John, Kate i Tester");
+      expect(chained.hello({ name: "Tester", thing: "dzień" })).toBe("Cześć Tester!");
+      expect(chained.numbers[1]()).toBe("jeden");
+      expect(chained.data.class()).toBe(pl_dict.data.class);
+      expect(chained.data.currency.name()).toBe("złoty");
+      expect(chained.data.currency["to.usd"]()).toBe(0.27);
+      expect(chained.data.users()).toEqual(pl_dict.data.users);
+      expect(chained.data.formatList(["John", "Kate", "Tester"])).toBe("John, Kate i Tester");
+    });
   });
 });
 

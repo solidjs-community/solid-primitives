@@ -286,21 +286,45 @@ String paths passesd to the translator don't allow for taking advantage of TypeS
 
 If you prefer to use nested objects instead of dot notation, you can use `chainedTranslator` helper.
 
+It takes a dictionary _(not flattened)_ to map it's shape and a translator function for resolving the translations.
+
 ```ts
 const dict = {
-  login: {
-    username: "User name",
-    password: "Password",
-    login: "Login",
+  greetings: {
+    hello: "hello {{ name }}!",
+    hi: "hi!",
   },
+  goodbye: (name: string) => `goodbye ${name}!`,
 };
 const flat_dict = i18n.flatten(dict);
 
-const t = i18n.translator(() => flat_dict);
+const t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
 
 const chained = i18n.chainedTranslator(dict, t);
 
-chained.login.username(); // => 'User name'
+chained.greetings.hello({ name: "John" }); // => "hello John!"
+chained.greetings.hi(); // => "hi!"
+chained.goodbye("John"); // => "goodbye John!"
+```
+
+Alternatively you can use `proxyTranslator` that is implemented using `new Proxy` so it doesn't require a directory object to be passed as source.
+
+```ts
+const proxy = i18n.proxyTranslator(t);
+
+proxy.greetings.hello({ name: "John" }); // => "hello John!"
+proxy.greetings.hi(); // => "hi!"
+proxy.goodbye("John"); // => "goodbye John!"
+```
+
+Using a proxy will have a slight performance impact, so it's recommended to use `chainedTranslator` if possible. But it can be useful when you don't have access to the dictionary object. Or want to mock the translations in tests.
+
+```ts
+const proxy = i18n.proxyTranslator((path) => path);
+
+proxy.greetings.hello({ name: "John" }); // => "greetings.hello"
+proxy.greetings.hi(); // => "greetings.hi"
+proxy.goodbye("John"); // => "goodbye"
 ```
 
 ## Demo
