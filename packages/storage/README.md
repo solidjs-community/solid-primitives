@@ -27,7 +27,7 @@ yarn add @solid-primitives/storage
 const [signal, setSignal] = makePersisted(createSignal("initial"), { storage: sessionStorage });
 const [store, setStore] = makePersisted(createStore({ test: true }), { name: "testing" });
 type PersistedOptions<Type, StorageOptions> = {
-  // localStorage is defualt
+  // localStorage is default
   storage?: Storage | StorageWithOptions | AsyncStorage | AsyncStorageWithOptions,
   // only required for storage APIs with options
   storageOptions?: StorageOptions,
