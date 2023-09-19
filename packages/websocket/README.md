@@ -11,7 +11,7 @@ Primitive to help establish, maintain and operate a websocket connection.
 
 - `makeWS` - sets up a web socket connection with a buffered send
 - `createWS` - sets up a web socket connection that disconnects on cleanup
-- `craeteWSState` - creates a reactive signal containing the readyState of a websocket
+- `createWSState` - creates a reactive signal containing the readyState of a websocket
 - `makeReconnectingWS` - sets up a web socket connection that reconnects if involuntarily closed
 - `createReconnectingWS` - sets up a reconnecting web socket connection that disconnects on cleanup
 - `makeHeartbeatWS` - wraps a reconnecting web socket to send a heart beat and reconnect if the answer fails
