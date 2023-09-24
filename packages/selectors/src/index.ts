@@ -1,11 +1,10 @@
 import { createSelector } from "solid-js";
 
 /**
- * Solid's `createReaction` that is based on pure computation *(runs before render, and is non-batching)*
+ * Wrapper around `createSelector` to create a selector for an array.
  *
- * @param onInvalidate callback that runs when the tracked sources trigger update
+ * @param source source array signal to create the selector from
  * @param options set computation name for debugging pourposes
- * - `options.initial` — an array of functions to be run initially and tracked. *(useful for runing code before other pure computations)*
  * @returns selector for the array
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/selectors#createArraySelector
