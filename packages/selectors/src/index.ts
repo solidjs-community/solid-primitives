@@ -14,7 +14,10 @@ import { createSelector } from "solid-js";
  * const [selectedItems] = createSignal<string[]>([])
  * const isSelected = createArraySelector(selectedItems)
  * <For each={list}>
- *   {(item) => <li classList={{ active: isSelected(item) }}>{item}</li>}
+ *   {(item) => 
+ *    <li classList={{ active: isSelected(item) }}>
+ *      {item}
+ *    </li>}
  * </For>
  */
 export function createArraySelector<T>(
