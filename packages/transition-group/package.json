@@ -59,7 +59,7 @@
   "devDependencies": {
     "@solid-primitives/refs": "workspace:^",
     "@solid-primitives/utils": "workspace:^",
-    "solid-js": "^1.7.11"
+    "solid-js": "^1.7.12"
   },
   "typesVersions": {}
 }

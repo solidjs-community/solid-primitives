@@ -49,9 +49,9 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "devDependencies": {
-    "@types/leaflet": "^1.9.3",
+    "@types/leaflet": "^1.9.6",
     "leaflet": "^1.9.4",
-    "solid-js": "^1.7.11"
+    "solid-js": "^1.7.12"
   },
   "dependencies": {
     "@solid-primitives/static-store": "workspace:^",

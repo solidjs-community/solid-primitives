@@ -11,11 +11,11 @@
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",
-    "@tailwindcss/typography": "^0.5.9",
+    "@tailwindcss/typography": "^0.5.10",
     "@types/mark.js": "^8.11.8",
-    "autoprefixer": "^10.4.15",
-    "postcss": "^8.4.28",
-    "solid-start-static": "^0.3.4",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.30",
+    "solid-start-static": "^0.3.6",
     "tailwindcss": "^3.3.3",
     "tailwindcss-dir": "^4.0.0"
   },
@@ -45,13 +45,13 @@
     "remark-emoji": "^4.0.0",
     "remark-parse": "^10.0.2",
     "remark-rehype": "^10.1.0",
-    "sass": "^1.66.1",
+    "sass": "^1.68.0",
     "solid-dismiss": "^1.7.121",
-    "solid-icons": "^1.0.11",
+    "solid-icons": "^1.0.12",
     "solid-tippy": "^0.2.1",
     "tippy.js": "^6.3.7",
-    "undici": "^5.23.0",
-    "unified": "^11.0.2"
+    "undici": "^5.25.2",
+    "unified": "^11.0.3"
   },
   "engines": {
     "node": ">=18.0.0"
