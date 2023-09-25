@@ -1,31 +1,35 @@
 /* eslint-disable no-console */
+import fse from "fs-extra";
+import fsp from "fs/promises";
 import path from "path";
-import { copy, readFile, writeFile, pathExists } from "fs-extra";
+import url from "url";
 import { checkValidPackageName } from "./utils/index.js";
 
+const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const name = process.argv.pop();
 
 if (!name || !checkValidPackageName(name))
   throw new Error(`Incorrect package name argument: "${name}"`);
 
-const templateSrc = path.resolve(__dirname, "../template");
-const destSrc = path.resolve(__dirname, "../packages", name);
+const templateSrc = path.resolve(dirname, "../template");
+const destSrc = path.resolve(dirname, "../packages", name);
 const pkgPath = path.join(destSrc, "package.json");
 const readmePath = path.join(destSrc, "README.md");
 
 (async () => {
-  const alreadyExists = await pathExists(destSrc);
+  const alreadyExists = await fse.pathExists(destSrc);
   if (alreadyExists) throw `Package ${name} already exists.`;
 
   try {
     // copy /template -> /packages/{name}
-    await copy(templateSrc, destSrc);
+    await fse.copy(templateSrc, destSrc);
 
     // replace "template-primitive" -> {name} in package.json
-    readFile(pkgPath, "utf8")
+    fsp
+      .readFile(pkgPath, "utf8")
       .then(pkg => {
         pkg = pkg.replace(/template-primitive/g, name);
-        writeFile(pkgPath, pkg);
+        fsp.writeFile(pkgPath, pkg);
       })
       .catch(error => {
         console.log("replace package.json failed");
@@ -33,10 +37,11 @@ const readmePath = path.join(destSrc, "README.md");
       });
 
     // replace "template-primitive" -> {name} in README.md
-    readFile(readmePath, "utf8")
+    fsp
+      .readFile(readmePath, "utf8")
       .then(readme => {
         readme = readme.replace(/template-primitive/g, name);
-        writeFile(readmePath, readme);
+        fsp.writeFile(readmePath, readme);
       })
       .catch(error => {
         console.log("replace README.md failed");
