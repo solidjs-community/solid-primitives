@@ -7,7 +7,9 @@ const $NODE = Symbol("mutable-node"),
   $SELF = Symbol("mutable-self");
 
 type DataNode = {
+  /** READ */
   (): any;
+  /** WRITE */
   $(value?: any): void;
 };
 type DataNodes = Record<PropertyKey, DataNode | undefined>;
@@ -64,6 +66,7 @@ function setProperty(
   deleting: boolean = false,
 ): void {
   if (!deleting && state[property] === value) return;
+
   const prev = state[property],
     len = state.length;
 
@@ -78,34 +81,38 @@ function setProperty(
     state[property] = value;
     if (state[$HAS] && state[$HAS][property] && prev === undefined) state[$HAS][property].$();
   }
+
   // eslint-disable-next-line prefer-const
   let nodes = getNodes(state, $NODE),
     node: DataNode | undefined;
+
   if ((node = getNode(nodes, property, prev))) node.$(() => value);
 
   if (Array.isArray(state) && state.length !== len) {
     for (let i = state.length; i < len; i++) (node = nodes[i]) && node.$();
+
     (node = getNode(nodes, "length", len)) && node.$(state.length);
   }
+
   (node = nodes[$SELF]) && node.$();
 }
 
 function proxyDescriptor(target: solid_store.StoreNode, property: PropertyKey) {
   const desc = Reflect.getOwnPropertyDescriptor(target, property);
-  if (
-    !desc ||
-    desc.get ||
-    desc.set ||
-    !desc.configurable ||
-    property === solid.$PROXY ||
-    property === $NODE
-  )
-    return desc;
 
-  delete desc.value;
-  delete desc.writable;
-  desc.get = () => target[solid.$PROXY][property];
-  desc.set = v => (target[solid.$PROXY][property] = v);
+  if (
+    desc &&
+    !desc.get &&
+    !desc.set &&
+    desc.configurable &&
+    property !== solid.$PROXY &&
+    property !== $NODE
+  ) {
+    delete desc.value;
+    delete desc.writable;
+    desc.get = () => target[solid.$PROXY][property];
+    desc.set = v => (target[solid.$PROXY][property] = v);
+  }
 
   return desc;
 }
@@ -119,23 +126,19 @@ const proxyTraps: ProxyHandler<solid_store.StoreNode> = {
       return receiver;
     }
 
-    const nodes = getNodes(target, $NODE);
-    const tracked = nodes[property];
+    const nodes = getNodes(target, $NODE),
+      tracked = nodes[property];
     let value = tracked ? tracked() : target[property];
 
     if (property === $NODE || property === $HAS || property === "__proto__") return value;
 
     if (!tracked) {
-      const desc = Object.getOwnPropertyDescriptor(target, property);
-      const isFunction = typeof value === "function";
+      const desc = Object.getOwnPropertyDescriptor(target, property),
+        isFn = typeof value === "function";
 
-      if (
-        solid.getListener() &&
-        (!isFunction || target.hasOwnProperty(property)) &&
-        !(desc && desc.get)
-      )
+      if (solid.getListener() && (!isFn || target.hasOwnProperty(property)) && !(desc && desc.get))
         value = getNode(nodes, property, value)!();
-      else if (value != null && isFunction && value === Array.prototype[property as any])
+      else if (value != null && isFn && value === Array.prototype[property as any])
         return (...args: unknown[]) =>
           solid.batch(() => Array.prototype[property as any].apply(receiver, args));
     }
@@ -173,47 +176,49 @@ const proxyTraps: ProxyHandler<solid_store.StoreNode> = {
 };
 
 function wrap<T extends solid_store.StoreNode>(value: T): T {
-  let p = value[solid.$PROXY];
-  if (!p) {
-    Object.defineProperty(value, solid.$PROXY, { value: (p = new Proxy(value, proxyTraps)) });
-    const keys = Object.keys(value),
-      desc = Object.getOwnPropertyDescriptors(value);
-    for (let i = 0, l = keys.length; i < l; i++) {
-      const prop = keys[i]!;
-      if (desc[prop]!.get) {
-        const get = desc[prop]!.get!.bind(p);
-        Object.defineProperty(value, prop, {
-          get,
-        });
-      }
+  let proxy = value[solid.$PROXY];
+
+  if (!proxy) {
+    Object.defineProperty(value, solid.$PROXY, { value: (proxy = new Proxy(value, proxyTraps)) });
+
+    const desc = Object.getOwnPropertyDescriptors(value);
+
+    for (const prop of Object.values(value)) {
+      if (desc[prop]!.get)
+        Object.defineProperty(value, prop, { get: desc[prop]!.get!.bind(proxy) });
+
       if (desc[prop]!.set) {
-        const og = desc[prop]!.set!,
-          set = (v: T[keyof T]) => solid.batch(() => og.call(p, v));
-        Object.defineProperty(value, prop, {
-          set,
-        });
+        const og = desc[prop]!.set!;
+
+        Object.defineProperty(value, prop, { set: v => solid.batch(() => og.call(proxy, v)) });
       }
     }
   }
-  return p;
+
+  return proxy;
 }
+
+export type MutableOptions = { name?: string };
 
 export function createMutable<T extends solid_store.StoreNode>(
   state: T,
-  options?: { name?: string },
+  options?: MutableOptions,
 ): T {
   if (isServer) return state;
 
   // TODO: remove this later
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const unwrappedStore = solid_store.unwrap(state || {});
+
   if (isDev && typeof unwrappedStore !== "object" && typeof unwrappedStore !== "function")
     throw new Error(
       `Unexpected type ${typeof unwrappedStore} received when initializing 'createMutable'. Expected an object.`,
     );
 
   const wrappedStore = wrap(unwrappedStore);
+
   if (isDev) solid.DEV!.registerGraph({ value: unwrappedStore, name: options && options.name });
+
   return wrappedStore;
 }
 
