@@ -1,7 +1,26 @@
+/*
+Other issues with mutable:
+- `in` during produce
+https://github.com/solidjs/solid/issues/1469
+
+- `undefined deletes`, `defineProperty` is not supported, symbol marks
+https://github.com/solidjs/solid/issues/1392
+
+- wrapping classes
+https://github.com/solidjs/solid/issues/1746
+
+- too simple server noop
+https://github.com/solidjs/solid/issues/1733
+*/
+
 import * as solid from "solid-js";
 import * as solid_store from "solid-js/store";
 import { isDev, isServer } from "solid-js/web";
 
+/*
+  A WeakMap could avoid marking original objects with symbols
+  https://github.com/solidjs/solid/issues/1106
+*/
 const $NODE = Symbol("mutable-node"),
   $HAS = Symbol("mutable-has"),
   $SELF = Symbol("mutable-self");
@@ -74,6 +93,9 @@ function setProperty(
     solid_store.DEV!.hooks.onStoreNodeUpdate &&
       solid_store.DEV!.hooks.onStoreNodeUpdate(state, property, value, prev);
 
+  /*
+    TODO: setting to undefined should not delete the property
+  */
   if (value === undefined) {
     delete state[property];
     if (state[$HAS] && state[$HAS][property] && prev !== undefined) state[$HAS][property].$();
@@ -173,6 +195,11 @@ const proxyTraps: ProxyHandler<solid_store.StoreNode> = {
   ownKeys: ownKeys,
 
   getOwnPropertyDescriptor: proxyDescriptor,
+
+  /*
+  TODO: add defineProperty trap
+  https://github.com/solidjs/solid/issues/1392
+  */
 };
 
 function wrap<T extends solid_store.StoreNode>(value: T): T {
@@ -204,6 +231,10 @@ export function createMutable<T extends solid_store.StoreNode>(
   state: T,
   options?: MutableOptions,
 ): T {
+  /*
+    TODO: improve server noop
+    https://github.com/solidjs/solid/issues/1733
+  */
   if (isServer) return state;
 
   // TODO: remove this later
