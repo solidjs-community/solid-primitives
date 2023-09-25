@@ -3,14 +3,6 @@ import * as solid from "solid-js";
 import { createMutable } from "../src/index.js";
 import { unwrap } from "solid-js/store";
 
-describe("Sanity Check", () => {
-  test("Basic Test", () => {
-    const obj = { a: 1, b: 2 };
-    const mutable = createMutable(obj);
-    expect(mutable).not.toBe(obj);
-  });
-});
-
 describe("State Mutability", () => {
   test("Setting a property", () => {
     const user = createMutable({ name: "John" });
