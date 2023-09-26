@@ -1,8 +1,8 @@
 {
   "name": "@solid-primitives/mutable",
-  "version": "0.0.100",
-  "description": "A template primitive example.",
-  "author": "Your Name <you@youremail.com>",
+  "version": "1.0.0",
+  "description": "A primitive for creating a mutable store, an alternative to Solid's createStore.",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/mutable#readme",
@@ -15,15 +15,17 @@
   },
   "primitive": {
     "name": "mutable",
-    "stage": 0,
+    "stage": 3,
     "list": [
-      "createPrimitiveTemplate"
+      "createMutable",
+      "modifyMutable"
     ],
-    "category": "Display & Media"
+    "category": "Reactivity"
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "store"
   ],
   "private": false,
   "sideEffects": false,
