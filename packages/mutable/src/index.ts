@@ -27,13 +27,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-Further issues to address after version 2.0:
-
-- `in` during produce
-https://github.com/solidjs/solid/issues/1469
+Further issues to possibly address after version 2.0:
 
 - `undefined deletes`, `defineProperty` is not supported, symbol marks
 https://github.com/solidjs/solid/issues/1392
+
+- symbol marks (needs to be addressed in solid-js/store first)
+https://github.com/solidjs/solid/issues/1106
 
 - wrapping classes
 https://github.com/solidjs/solid/issues/1746
@@ -41,16 +41,16 @@ https://github.com/solidjs/solid/issues/1746
 - too simple server noop
 https://github.com/solidjs/solid/issues/1733
 
+- deleting a property doesn't clean the signals
+(arrays are the big concern here, objects are meant to be static)
+(it probably should be addressed in solid-js/store first)
+
 */
 
 import * as solid from "solid-js";
 import * as solid_store from "solid-js/store";
 import { isDev, isServer } from "solid-js/web";
 
-/*
-  A WeakMap could avoid marking original objects with symbols
-  https://github.com/solidjs/solid/issues/1106
-*/
 const $NODE = Symbol("mutable-node"),
   $HAS = Symbol("mutable-has"),
   $SELF = Symbol("mutable-self");
@@ -257,6 +257,29 @@ function wrap<T extends solid_store.StoreNode>(value: T): T {
 
 export type MutableOptions = { name?: string };
 
+/**
+ * Creates a new mutable Store proxy object. Stores only trigger updates on values changing
+ * Tracking is done by intercepting property access and automatically tracks deep nesting via proxy.
+ *
+ * Useful for integrating external systems or as a compatibility layer with MobX/Vue.
+ *
+ * @param state original object to be wrapped in a proxy (the object is not cloned)
+ * @param options Name of the store (used for debugging)
+ * @returns mutable proxy of the {@link state} object
+ *
+ * @example
+ * ```ts
+ * const state = createMutable(initialValue);
+ *
+ * // read value
+ * state.someValue;
+ *
+ * // set value
+ * state.someValue = 5;
+ *
+ * state.list.push(anotherValue);
+ * ```
+ */
 export function createMutable<T extends solid_store.StoreNode>(
   state: T,
   options?: MutableOptions,
@@ -283,6 +306,34 @@ export function createMutable<T extends solid_store.StoreNode>(
   return wrappedStore;
 }
 
-export function modifyMutable<T>(state: T, modifier: (state: T) => T) {
+/**
+ * Helper function that simplifies making multiple changes to a mutable Store in a single batch, so that dependant computations update just once instead of once per update.
+ *
+ * @param state The mutable Store to modify
+ * @param modifier a Store modifier such as those returned by `reconcile` or `produce` (from `"solid-js/store"`). *(If you pass in your own modifier function, beware that its argument is an unwrapped version of the Store.)*
+ *
+ * @example
+ * ```ts
+ * const state = createMutable({
+ *   user: {
+ *     firstName: "John",
+ *     lastName: "Smith",
+ *   },
+ * });
+ *
+ * // Replace state.user with the specified object (deleting any other fields)
+ * modifyMutable(state.user, reconcile({
+ *   firstName: "Jake",
+ *   lastName: "Johnson",
+ * });
+ *
+ * // Modify two fields in batch, triggering just one update
+ * modifyMutable(state.user, produce((u) => {
+ *   u.firstName = "Jake";
+ *   u.lastName = "Johnson";
+ * });
+ * ```
+ */
+export function modifyMutable<T>(state: T, modifier: (state: T) => T): void {
   solid.batch(() => modifier(solid_store.unwrap(state)));
 }
