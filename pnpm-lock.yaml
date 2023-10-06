@@ -620,6 +620,12 @@ importers:
         specifier: ^1.7.12
         version: 1.7.12
 
+  packages/mutable:
+    dependencies:
+      solid-js:
+        specifier: ^1.6.12
+        version: 1.7.12
+
   packages/mutation-observer:
     dependencies:
       '@solid-primitives/utils':

@@ -46,12 +46,6 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       conditions: testSSR ? ["node"] : ["browser", "development"],
-      // fix issues with stores and node@20:
-      ...(!testSSR && {
-        alias: {
-          "solid-js/store": "solid-js/store/dist/store.js",
-        },
-      }),
     },
   };
 });
