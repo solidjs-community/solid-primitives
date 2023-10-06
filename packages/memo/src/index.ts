@@ -20,7 +20,7 @@ import {
 } from "solid-js";
 import { isServer } from "solid-js/web";
 import { debounce, throttle } from "@solid-primitives/scheduled";
-import { noop, EffectOptions } from "@solid-primitives/utils";
+import { noop, EffectOptions, EQUALS_FALSE_OPTIONS } from "@solid-primitives/utils";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
@@ -106,7 +106,13 @@ export function createLatest<T extends readonly Accessor<any>[]>(
   options?: MemoOptions<ReturnType<T[number]>>,
 ): Accessor<ReturnType<T[number]>> {
   let index = 0;
-  const memos = sources.map((source, i) => createMemo(() => ((index = i), source())));
+  const memos = sources.map((source, i) =>
+    createMemo(
+      () => ((index = i), source()),
+      undefined,
+      DEV ? { name: i + 1 + ". source", equals: false } : EQUALS_FALSE_OPTIONS,
+    ),
+  );
   return createMemo(() => memos.map(m => m())[index]!, undefined, options);
 }
 
@@ -131,18 +137,25 @@ export function createLatestMany<T>(
   sources: readonly Accessor<T>[],
   options?: EffectOptions,
 ): Accessor<T[]> {
-  const mappedSources = sources.map(source => {
-    const obj: { dirty: boolean; memo: Accessor<T> } = { dirty: true, memo: null as any };
-    obj.memo = createMemo(() => ((obj.dirty = true), source()));
+  const memos = sources.map((source, i) => {
+    const obj = { dirty: true, get: null as any as Accessor<T> };
+
+    obj.get = createMemo(
+      () => ((obj.dirty = true), source()),
+      undefined,
+      DEV ? { name: i + 1 + ". source", equals: false } : EQUALS_FALSE_OPTIONS,
+    );
+
     return obj;
   });
+
   return createLazyMemo<T[]>(
     () =>
-      mappedSources.reduce((acc: T[], data) => {
+      memos.reduce((acc: T[], memo) => {
         // always track all memos to force updates
-        const v = data.memo();
-        if (data.dirty) {
-          data.dirty = false;
+        const v = memo.get();
+        if (memo.dirty) {
+          memo.dirty = false;
           acc.push(v);
         }
         return acc;
@@ -348,8 +361,6 @@ export function createAsyncMemo<T>(
   return state;
 }
 
-const EQUALS_FALSE = { equals: false } as const;
-
 /**
  * Lazily evaluated `createMemo`. Will run the calculation only if is being listened to.
  *
@@ -394,11 +405,11 @@ export function createLazyMemo<T>(
   let isReading = false,
     isStale: boolean | undefined = true;
 
-  const [track, trigger] = createSignal(void 0, EQUALS_FALSE),
+  const [track, trigger] = createSignal(void 0, EQUALS_FALSE_OPTIONS),
     memo = createMemo<T>(
       p => (isReading ? calc(p) : ((isStale = !track()), p)),
       value as T,
-      DEV ? { name: options?.name, equals: false } : EQUALS_FALSE,
+      DEV ? { name: options?.name, equals: false } : EQUALS_FALSE_OPTIONS,
     );
 
   return (): T => {
@@ -409,58 +420,6 @@ export function createLazyMemo<T>(
     return v;
   };
 }
-
-/*
-
-createCachedDerivation is a cool idea, but it has a n edgecase where it the value may get out of sync if read in a pure computation after it's sources.
-And probably more then that, considering that the calculation is executed where read.
-
-*/
-
-// /**
-//  * **! The value may get out of sync if read in a pure computation after it's sources !**
-//  * @param deps
-//  * @param fn
-//  * @param options
-//  * @returns
-//  */
-// export function createCachedDerivation<S, Next extends Prev, Prev = Next>(
-//   deps: AccessorArray<S> | Accessor<S>,
-//   fn: OnEffectFunction<S, undefined | NoInfer<Prev>, Next>,
-//   options?: EffectOptions
-// ): Accessor<Next> {
-//   let prevInput: S | undefined;
-//   let prev: undefined | NoInfer<Prev>;
-//   let stale = true;
-
-//   const track = createPureReaction(() => (stale = true), options);
-
-//   const trackDeps = Array.isArray(deps)
-//     ? () => {
-//         for (const fn of deps) fn();
-//       }
-//     : deps;
-
-//   const getInput = Array.isArray(deps)
-//     ? () => {
-//         const res = Array(deps.length);
-//         for (let i = 0; i < deps.length; i++) res[i] = deps[i]();
-//         return res as S;
-//       }
-//     : deps;
-
-//   return () => {
-//     if (stale) {
-//       let input!: S;
-//       track(() => (input = getInput()));
-//       prev = untrack(() => fn(input, prevInput, prev));
-//       prevInput = input;
-//       stale = false;
-//     }
-//     trackDeps();
-//     return prev as Next;
-//   };
-// }
 
 export type CacheCalculation<Key, Value> = (key: Key, prev: Value | undefined) => Value;
 export type CacheKeyAccessor<Key, Value> = (key: Key) => Value;
