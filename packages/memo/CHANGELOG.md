@@ -1,5 +1,11 @@
 # @solid-primitives/memo
 
+## 1.3.5
+
+### Patch Changes
+
+- 6aa53864: Correct `createLatest` and `createLatestMany` triggering on `equals: false` sources
+
 ## 1.3.4
 
 ### Patch Changes
