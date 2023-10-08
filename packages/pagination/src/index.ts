@@ -187,7 +187,7 @@ export const createPagination = (
     {
       disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
       children: { get: () => opts().nextContent, set: noop, enumerable: true },
-      page: { get: () => Math.max(opts().pages, page() + 1), enumerable: false },
+      page: { get: () => Math.min(opts().pages, page() + 1), enumerable: false },
     },
   );
   const last = Object.defineProperties(
