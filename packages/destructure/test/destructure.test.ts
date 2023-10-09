@@ -1,7 +1,8 @@
 import { describe, test, expect } from "vitest";
 import { createComputed, createRoot, createSignal } from "solid-js";
 import { destructure } from "../src/index.js";
-
+import { MaybeAccessor } from "@solid-primitives/utils";
+type Keys = "a" | "b" | "c";
 describe("destructure", () => {
   test("spread array", () =>
     createRoot(dispose => {
@@ -237,6 +238,56 @@ describe("destructure", () => {
           b: 6,
           c: 7,
         },
+      });
+      expect(a()).toBe(1);
+      expect(b()).toBe(6);
+      expect(c()).toBe(7);
+
+      expect(updates.a).toBe(1);
+      expect(updates.b).toBe(2);
+      expect(updates.c).toBe(2);
+
+      dispose();
+    }));
+  test("spread object is smart", () =>
+    createRoot(dispose => {
+      const [numbers, setNumbers] = createSignal<Record<Keys,MaybeAccessor<number>>>({
+        a: 1,
+        b: 2,
+        c: ()=>3,
+      });
+      const { a, b, c } = destructure(numbers,{smart:true});
+
+      const updates = {
+        a: 0,
+        b: 0,
+        c: 0,
+      };
+      createComputed(() => {
+        a();
+        updates.a++;
+      });
+      createComputed(() => {
+        b();
+        updates.b++;
+      });
+      createComputed(() => {
+        c();
+        updates.c++;
+      });
+
+      expect(a()).toBe(1);
+      expect(b()).toBe(2);
+      expect(c()).toBe(3);
+
+      expect(updates.a).toBe(1);
+      expect(updates.b).toBe(1);
+      expect(updates.c).toBe(1);
+
+      setNumbers({
+        a: 1,
+        b: 6,
+        c: 7,
       });
       expect(a()).toBe(1);
       expect(b()).toBe(6);
