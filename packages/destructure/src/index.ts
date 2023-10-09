@@ -1,56 +1,60 @@
-import { createMemo, Accessor, runWithOwner, getOwner, MemoOptions } from "solid-js";
-import { access, MaybeAccessor, AnyObject, Values, AnyFunction } from "@solid-primitives/utils";
+import { AnyFunction, AnyObject, MaybeAccessor, MaybeAccessorValue, Values, access } from "@solid-primitives/utils"
+import { Accessor, MemoOptions, createMemo, getOwner, runWithOwner } from "solid-js"
 
-type ReactiveSource = [] | any[] | AnyObject;
+type ReactiveSource = [] | any[] | AnyObject
 
 export type DestructureOptions<T extends ReactiveSource> = MemoOptions<Values<T>> & {
-  memo?: boolean;
-  lazy?: boolean;
-  deep?: boolean;
-};
+	memo?: boolean
+	lazy?: boolean
+	deep?: boolean
+	smart?: boolean
+}
 
 export type Spread<T extends ReactiveSource> = {
-  readonly [K in keyof T]: Accessor<T[K]>;
-};
+	readonly [K in keyof T]: Accessor<T[K]>
+}
+export type SpreadSmart<T extends ReactiveSource> = {
+	readonly [K in keyof T]: Accessor<MaybeAccessorValue<T[K]>>
+}
 export type DeepSpread<T extends ReactiveSource> = {
-  readonly [K in keyof T]: T[K] extends ReactiveSource
-    ? T[K] extends AnyFunction
-      ? Accessor<T[K]>
-      : DeepSpread<T[K]>
-    : Accessor<T[K]>;
-};
+	readonly [K in keyof T]: T[K] extends ReactiveSource
+		? T[K] extends AnyFunction
+			? Accessor<T[K]>
+			: DeepSpread<T[K]>
+		: Accessor<T[K]>
+}
 export type Destructure<T extends ReactiveSource> = {
-  readonly [K in keyof T]-?: Accessor<T[K]>;
-};
+	readonly [K in keyof T]-?: Accessor<T[K]>
+}
 export type DeepDestructure<T extends ReactiveSource> = {
-  readonly [K in keyof T]-?: T[K] extends ReactiveSource
-    ? T[K] extends AnyFunction
-      ? Accessor<T[K]>
-      : DeepDestructure<T[K]>
-    : Accessor<T[K]>;
-};
+	readonly [K in keyof T]-?: T[K] extends ReactiveSource
+		? T[K] extends AnyFunction
+			? Accessor<T[K]>
+			: DeepDestructure<T[K]>
+		: Accessor<T[K]>
+}
 
-const isReactiveObject = (value: any): boolean => typeof value === "object" && value !== null;
+const isReactiveObject = (value: any): boolean => typeof value === "object" && value !== null
 
 /**
  * Cashed object getters.
  * @description When a key is accessed for the first time, the `get` function is executed, later a cached value is used instead.
  */
 function createProxyCache(obj: object, get: (key: any) => any): any {
-  return new Proxy(
-    {},
-    {
-      get: (target, key) => {
-        if (key === Symbol.iterator || key === "length") return Reflect.get(obj, key);
-        const saved = Reflect.get(target, key);
-        if (saved) return saved;
-        const value = get(key);
-        Reflect.set(target, key, value);
-        return value;
-      },
-      set: () => false,
-    },
-  );
+	return new Proxy(
+		{},
+		{
+			get: (target, key) => {
+				if (key === Symbol.iterator || key === "length") return Reflect.get(obj, key)
+				const saved = Reflect.get(target, key)
+				if (saved) return saved
+				const value = get(key)
+				Reflect.set(target, key, value)
+				return value
+			},
+			set: () => false,
+		}
+	)
 }
 
 /**
@@ -71,42 +75,48 @@ function createProxyCache(obj: object, get: (key: any) => any): any {
  * name() // => "John"
  * age() // => 36
  */
-export function destructure<T extends ReactiveSource, O extends DestructureOptions<T>>(
-  source: MaybeAccessor<T>,
-  options?: O,
-): O extends { lazy: true; deep: true }
-  ? DeepDestructure<T>
-  : O["lazy"] extends true
-  ? Destructure<T>
-  : O["deep"] extends true
-  ? DeepSpread<T>
-  : Spread<T> {
-  const config: DestructureOptions<T> = options ?? {};
-  const memo = config.memo ?? typeof source === "function";
-  const getter =
-    typeof source === "function"
-      ? (key: any) => () => source()[key]
-      : (key: any) => () => source[key];
-  const obj = access(source);
+export function destructure<T extends ReactiveSource, K extends keyof T, O extends DestructureOptions<T>>(
+	source: MaybeAccessor<T>,
+	options?: O
+): O extends { lazy: true; deep: true; smart: true }
+	? DeepDestructure<T>
+	: O["lazy"] extends true
+	? Destructure<T>
+	: O["deep"] extends true
+	? DeepSpread<T>
+	: O["smart"] extends true
+	? SpreadSmart<T>
+	: Spread<T> {
+	const config: DestructureOptions<T> = options ?? {}
+	const memo = config.memo ?? typeof source === "function"
+	const getter =
+		typeof source === "function"
+			? (key: any) => () => config.smart ? access(source()[key]) : obj[key]
+			: (key: any) => () => config.smart ? access(source[key]) : obj[key]
+	const obj: T = access(source)
 
-  // lazy (use proxy)
-  if (config.lazy) {
-    const owner = getOwner()!;
-    return createProxyCache(obj, key => {
-      const calc = getter(key);
-      if (config.deep && isReactiveObject(obj[key]))
-        return runWithOwner(owner, () => destructure(calc, { ...config, memo }));
-      return memo ? runWithOwner(owner, () => createMemo(calc, undefined, options)) : calc;
-    });
-  }
+	// lazy (use proxy)
+	if (config.lazy) {
+		const owner = getOwner()!
+		return createProxyCache(obj, (key) => {
+			const calc = getter(key)
+			if (config.deep && isReactiveObject(obj[key]))
+				return runWithOwner(owner, () => destructure(calc, { ...config, memo }))
+			return memo ? runWithOwner(owner, () => createMemo(calc, undefined, options)) : calc
+		})
+	}
 
-  // eager (loop keys)
-  const result: any = Array.isArray(obj) ? [] : {};
-  for (const [key, value] of Object.entries(obj)) {
-    const calc = getter(key);
-    if (config.deep && isReactiveObject(value))
-      result[key] = destructure(calc, { ...config, memo });
-    else result[key] = memo ? createMemo(calc, undefined, options) : calc;
-  }
-  return result;
+	// eager (loop keys)
+	const result: any = Array.isArray(obj) ? [] : {}
+	for (const [key, value] of Object.entries(obj)) {
+		const calc = getter(key)
+
+		console.log({ isFN: typeof calc, isFNFN: typeof calc(), val: calc() })
+		if (config.deep && isReactiveObject(value)) {
+			result[key] = destructure(calc, { ...config, memo })
+		} else {
+			result[key] = memo ? createMemo(calc, undefined, options) : calc
+		}
+	}
+	return result
 }
