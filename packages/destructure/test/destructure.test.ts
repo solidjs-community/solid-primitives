@@ -251,12 +251,12 @@ describe("destructure", () => {
     }));
   test("spread object is smart", () =>
     createRoot(dispose => {
-      const [numbers, setNumbers] = createSignal<Record<Keys,MaybeAccessor<number>>>({
+      const [numbers, setNumbers] = createSignal<Record<Keys, MaybeAccessor<number>>>({
         a: 1,
         b: 2,
-        c: ()=>3,
+        c: () => 3,
       });
-      const { a, b, c } = destructure(numbers,{smart:true});
+      const { a, b, c } = destructure(numbers, { normalize: true });
 
       const updates = {
         a: 0,

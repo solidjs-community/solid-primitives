@@ -1,5 +1,12 @@
 import { createMemo, Accessor, runWithOwner, getOwner, MemoOptions } from "solid-js";
-import { access, MaybeAccessor, AnyObject, Values, AnyFunction, MaybeAccessorValue } from "@solid-primitives/utils";
+import {
+  access,
+  MaybeAccessor,
+  AnyObject,
+  Values,
+  AnyFunction,
+  MaybeAccessorValue,
+} from "@solid-primitives/utils";
 
 type ReactiveSource = [] | any[] | AnyObject;
 
@@ -7,13 +14,13 @@ export type DestructureOptions<T extends ReactiveSource> = MemoOptions<Values<T>
   memo?: boolean;
   lazy?: boolean;
   deep?: boolean;
-  smart?: boolean;
+  normalize?: boolean;
 };
 
 export type Spread<T extends ReactiveSource> = {
   readonly [K in keyof T]: Accessor<T[K]>;
 };
-export type SpreadSmart<T extends ReactiveSource> = {
+export type SpreadNormalize<T extends ReactiveSource> = {
   readonly [K in keyof T]: Accessor<MaybeAccessorValue<T[K]>>;
 };
 export type DeepSpread<T extends ReactiveSource> = {
@@ -64,6 +71,7 @@ function createProxyCache(obj: object, get: (key: any) => any): any {
  * - `memo` - wraps accessors in `createMemo`, making each property update independently. *(enabled by default for signal source)*
  * - `lazy` - property accessors are created on key read. enable if you want to only a subset of source properties, or use properties initially missing
  * - `deep` - destructure nested objects
+ * - `normalize` - turn all values to accessors (e.g. `{ a: 1 } => { a: () => 1 }` and `{ a: () => 1 } => { a: () => 1 }`
  * @returns object of the same keys as the source, but with values turned into accessors.
  * @example // spread tuples
  * const [first, second, third] = destructure(() => [1,2,3])
@@ -78,21 +86,21 @@ function createProxyCache(obj: object, get: (key: any) => any): any {
 export function destructure<T extends ReactiveSource, O extends DestructureOptions<T>>(
   source: MaybeAccessor<T>,
   options?: O,
-): O extends { lazy: true; deep: true; }
+): O extends { lazy: true; deep: true }
   ? DeepDestructure<T>
   : O["lazy"] extends true
   ? Destructure<T>
   : O["deep"] extends true
   ? DeepSpread<T>
-  : O["smart"] extends true
-  ? SpreadSmart<T>
+  : O["normalize"] extends true
+  ? SpreadNormalize<T>
   : Spread<T> {
   const config: DestructureOptions<T> = options ?? {};
   const memo = config.memo ?? typeof source === "function";
   const getter =
     typeof source === "function"
-      ? (key: any) => () => (config.smart ? access(source()[key]) : source()[key])
-      : (key: any) => () => (config.smart ? access(source[key]) : source[key]);
+      ? (key: any) => () => (config.normalize ? access(source()[key]) : source()[key])
+      : (key: any) => () => (config.normalize ? access(source[key]) : source[key]);
   const obj = access(source);
 
   // lazy (use proxy)
