@@ -55,7 +55,7 @@ Instead of wrapping the resource itself, it is far simpler to use the `storage` 
 persisted signal or [deep signal](../resource/#createdeepsignal):
 
 ```ts
-const [resource] = createResource(fetcher, {storage: makePersisted(createSignal())});
+const [resource] = createResource(fetcher, { storage: makePersisted(createSignal()) });
 ```
 
 If you are using an asynchronous storage to persist the state of a resource, it might receive an update due to being
@@ -246,7 +246,7 @@ cookieStorage._cookies = [CookieAbstraction, 'cookie'];
 access to the storage API:
 
 ```ts
-const [value, setValue] = createStorageSignal("value", {api: cookieStorage});
+const [value, setValue] = createStorageSignal("value", { api: cookieStorage });
 
 setValue("value");
 value(); // 'value'
