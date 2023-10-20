@@ -1,4 +1,4 @@
-import type {Setter, Signal} from "solid-js";
+import type {Accessor, Setter, Signal} from "solid-js";
 import {createUniqueId, untrack} from "solid-js";
 import type {SetStoreFunction, Store} from "solid-js/store";
 import {reconcile} from "solid-js/store";
@@ -40,7 +40,7 @@ export type PersistenceOptions<T, O extends Record<string, any>> =
  */
 export function makePersisted<T>(
   signal: [Accessor<T>, Setter<T>],
-  options?: PersistenceOptions<T>,
+  options?: PersistenceOptions<T,{}>,
 ): [Accessor<T>, Setter<T>];
 
 
@@ -91,7 +91,7 @@ export function makePersisted<T, O extends Record<string, any>>(
  */
 export function makePersisted<T>(
   signal: [get: Store<T>, set: SetStoreFunction<T>],
-  options?: PersistenceOptions<T>,
+  options?: PersistenceOptions<T,{}>,
 ): [get: Store<T>, set: SetStoreFunction<T>];
 
 /**
