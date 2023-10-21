@@ -72,7 +72,7 @@ const mapped = keyArray(source, (model, index) => {
 });
 ```
 
-Notice that both the value and index arguments are singlas. Items are identified only by keys, it means that the items could be copied, replaced, changed, but as long as the key is the same, `keyArray` will treat it as the same item.
+Notice that both the value and index arguments are signals. Items are identified only by keys, it means that the items could be copied, replaced, changed, but as long as the key is the same, `keyArray` will treat it as the same item.
 
 ## `<Key>`
 
