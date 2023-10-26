@@ -62,7 +62,7 @@ function createProxyCache(obj: object, get: (key: any) => any): any {
  * @param source reactive object or signal returning one
  * @param options memo options + primitive configuration:
  * - `memo` - if true: wraps accessors in `createMemo`, making each property update independently. *(enabled by default for signal source)*
- * - `memo` - if "normalize": turn all static values to accessors (e.g. `{ a: 1 } => { a: () => 1 }` but keep all functions and accessors as they are. Allowing for React like destructuring.
+ * - `memo` - if "normalize": turn all static values to accessors e.g. `{ a: 1 } => { a: () => 1 }` but keep all functions and accessors as they are. So after destructuring all destructured props are functions
  * - `lazy` - property accessors are created on key read. enable if you want to only a subset of source properties, or use properties initially missing
  * - `deep` - destructure nested objects
 

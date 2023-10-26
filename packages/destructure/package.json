@@ -3,6 +3,9 @@
   "version": "0.1.14",
   "description": "Primitives for destructuring reactive objects – like props or stores – or signals of them into a separate accessors updated individually.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
+  "contributors": [
+    "Martin Rapp @madaxen86 <mrapp86@freenet.de>"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/destructure#readme",
   "repository": {

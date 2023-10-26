@@ -33,7 +33,8 @@ import { destructure } from "@solid-primitives/destructure";
 
 `destructure` is an reactive primitive, hence needs to be used under an reactive root. Pass an reactive object or a signal as it's first argument, and configure it's behavior via options:
 
-- `memo` - wraps accessors in `createMemo`, making each property update independently. _(enabled by default for signal source)_
+- `memo` - if true: wraps accessors in `createMemo`, making each property update independently. _(enabled by default for signal source)_
+- `memo` - if "normalize": turn all static values to accessors e.g. `{ a: 1 } => { a: () => 1 }` but keep all functions and accessors as they are. So after destructuring all destructured props are functions.
 - `lazy` - property accessors are created on key read. enable if you want to only a subset of source properties, or use properties initially missing
 - `deep` - destructure nested objects
 
