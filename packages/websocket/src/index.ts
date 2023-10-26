@@ -195,12 +195,12 @@ export const makeHeartbeatWS = (
     clearTimers();
     pongtimer = setTimeout(ws.reconnect, options.wait || 1500);
   };
-  ws.addEventListener("close", clearTimers);
   const receiveMessage = () => {
     clearTimers();
     pingtimer = setTimeout(() => ws.send(options.message || "ping"), options.interval || 1000);
   };
+  ws.addEventListener("close", clearTimers);
   ws.addEventListener("message", receiveMessage);
-  setTimeout(receiveMessage, options.interval || 1000);
+  ws.addEventListener("open", () => setTimeout(receiveMessage, options.interval || 1000));
   return ws;
 };

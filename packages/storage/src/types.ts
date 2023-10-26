@@ -1,10 +1,11 @@
 export type StorageWithOptions<O> = {
-  clear: () => void;
+  clear: (options?: O) => void;
   getItem: (key: string, options?: O) => string | null;
-  getAll?: () => { [key: string]: any };
+  getAll?: (options?: O) => { [key: string]: any };
   setItem: (key: string, value: string, options?: O) => void;
-  removeItem: (key: string) => void;
-  key: (index: number) => string | null;
+  removeItem: (key: string, options?: O) => void;
+  key: (index: number, options?: O) => string | null;
+  getLength?: (options?: O) => number | undefined;
   readonly length: number | undefined;
   [key: string]: any;
 };

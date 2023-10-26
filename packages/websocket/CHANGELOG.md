@@ -1,5 +1,11 @@
 # @solid-primitives/websocket
 
+## 1.2.0
+
+### Minor Changes
+
+- a3fc4297: bugfix: setup heartbeat after reconnect
+
 ## 1.1.0
 
 ### Minor Changes

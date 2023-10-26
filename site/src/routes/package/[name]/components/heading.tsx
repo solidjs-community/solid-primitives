@@ -207,7 +207,7 @@ export const Heading: Component<{ name: string; formattedName: string }> = props
         </svg>
         {props.name && (
           <a
-            class="relative inline-block scale-90 transition-opacity hover:opacity-70 sm:scale-100"
+            class="relative inline-block scale-90 fill-current transition-opacity hover:opacity-70 sm:scale-100"
             href={`${GITHUB_REPO}/tree/main/packages/${props.name}`}
             target="_blank"
             rel="noopener"
