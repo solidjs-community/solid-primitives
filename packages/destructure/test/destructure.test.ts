@@ -1,8 +1,9 @@
-import { describe, test, expect } from "vitest";
 import { createComputed, createRoot, createSignal } from "solid-js";
+import { describe, expect, test } from "vitest";
 import { destructure } from "../src/index.js";
 import { MaybeAccessor } from "@solid-primitives/utils";
-type Keys = "a" | "b" | "c";
+import { normalize } from "path";
+
 describe("destructure", () => {
   test("spread array", () =>
     createRoot(dispose => {
@@ -249,14 +250,32 @@ describe("destructure", () => {
 
       dispose();
     }));
-  test("spread object is smart", () =>
+  test("spread object normalize and deep", () =>
     createRoot(dispose => {
-      const [numbers, setNumbers] = createSignal<Record<Keys, MaybeAccessor<number>>>({
-        a: 1,
-        b: 2,
-        c: () => 3,
+      const [toggle, setToggle] = createSignal(true);
+      const [_numbers, setNumbers] = createSignal({
+        a: 3,
+        b: () => (toggle() ? 2 : 3),
+        c: (a: number, b: number) => a * b,
+        d: toggle() ? 1 : 0, //intentionally wrongly not reactive
+        onClick: (_e: MouseEvent) => null,
+        nested: {
+          sum: (a: number, b: number) => a + b,
+        },
       });
-      const { a, b, c } = destructure(numbers, { normalize: true });
+
+      const {
+        a,
+        b,
+        c,
+        d,
+        onClick,
+        nested: { sum },
+      } = destructure(_numbers, {
+        // normalize: true,
+        memo: "normalize",
+        deep: true,
+      });
 
       const updates = {
         a: 0,
@@ -272,31 +291,32 @@ describe("destructure", () => {
         updates.b++;
       });
       createComputed(() => {
-        c();
+        c(a(), b());
         updates.c++;
       });
 
-      expect(a()).toBe(1);
+      expect(a()).toBe(3);
       expect(b()).toBe(2);
-      expect(c()).toBe(3);
+      expect(c(a(), b())).toBe(6);
+      expect(d()).toBe(1);
+      expect(onClick.length).toBe(1);
+      expect(sum.length).toBe(2);
+      expect(sum(1, 2)).toBe(3);
 
       expect(updates.a).toBe(1);
       expect(updates.b).toBe(1);
       expect(updates.c).toBe(1);
+      setToggle(false);
+      //@ts-ignore
+      setNumbers(prev => ({ ...prev, a: () => 4, b: 3 }));
 
-      setNumbers({
-        a: 1,
-        b: 6,
-        c: 7,
-      });
-      expect(a()).toBe(1);
-      expect(b()).toBe(6);
-      expect(c()).toBe(7);
-
-      expect(updates.a).toBe(1);
+      expect(b()).toBe(3);
+      //d is static.
+      expect(d()).toBe(1);
+      expect(c(a(), b())).toBe(12);
+      expect(updates.a).toBe(2);
       expect(updates.b).toBe(2);
-      expect(updates.c).toBe(2);
-
+      expect(updates.c).toBe(3); // as we change a and b we compute c 2x
       dispose();
     }));
 });
