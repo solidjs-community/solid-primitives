@@ -204,4 +204,3 @@ export const makeHeartbeatWS = (
   ws.addEventListener("open", () => setTimeout(receiveMessage, options.interval || 1000));
   return ws;
 };
-
