@@ -4,9 +4,10 @@ import { access, MaybeAccessor, AnyObject, Values, AnyFunction } from "@solid-pr
 type ReactiveSource = [] | any[] | AnyObject;
 
 export type DestructureOptions<T extends ReactiveSource> = MemoOptions<Values<T>> & {
-  memo?: boolean | "normalize";
+  memo?: boolean;
   lazy?: boolean;
   deep?: boolean;
+  normalize?: boolean;
 };
 
 type ReturnFunction<T> = T extends (...args: any[]) => any ? T : () => T;
@@ -81,24 +82,22 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
   source: MaybeAccessor<T>,
   options?: O,
 ): O extends { lazy: true; deep: true }
-  ? DeepDestructure<T, O["memo"] extends "normalize" ? true : false>
+  ? DeepDestructure<T, O["normalize"]>
   : O extends { lazy: true }
-  ? Destructure<T, O["memo"] extends "normalize" ? true : false>
+  ? Destructure<T, O["normalize"]>
   : O["deep"] extends true
-  ? DeepSpread<T, O["memo"] extends "normalize" ? true : false>
-  : Spread<T, O["memo"] extends "normalize" ? true : false> {
+  ? DeepSpread<T, O["normalize"]>
+  : Spread<T, O["normalize"]> {
   const config: DestructureOptions<T> = options ?? {};
   const memo = config.memo ?? typeof source === "function";
-  const getter = (key: any) => {
-    const value = () => (typeof source === "function" ? source()[key] : source[key]);
-    if (config.memo !== "normalize") return value;
-    //Normalize
-    const accessedValue = () => access(value());
-    //If value is a function with params return the original function
-    if (typeof accessedValue() === "function" && accessedValue().length) return value();
-    return createMemo(accessedValue, undefined, options);
-  };
 
+  const _source = createMemo(() => (typeof source === "function" ? source() : source));
+  const getter = (key: any) => {
+    const accessedValue = () => access(_source()[key]);
+    //If accessedValue() is a function with params return the original function
+    if (typeof accessedValue() === "function" && accessedValue().length) return accessedValue();
+    return accessedValue;
+  };
   const obj = access(source);
 
   // lazy (use proxy)
@@ -108,7 +107,7 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
       const calc = getter(key);
       if (config.deep && isReactiveObject(obj[key]))
         return runWithOwner(owner, () => destructure(calc, { ...config, memo }));
-      return memo && config.memo !== "normalize"
+      return memo && (!config.normalize || calc.length === 0)
         ? runWithOwner(owner, () => createMemo(calc, undefined, options))
         : calc;
     });
@@ -122,7 +121,9 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
       result[key] = destructure(calc, { ...config, memo });
     else
       result[key] =
-        memo && config.memo !== "normalize" ? createMemo(calc, undefined, options) : calc;
+        memo && (!config.normalize || calc.length === 0)
+          ? createMemo(calc, undefined, options)
+          : calc;
   }
   return result;
 }

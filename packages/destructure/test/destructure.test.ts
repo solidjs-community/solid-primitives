@@ -1,8 +1,7 @@
 import { createComputed, createRoot, createSignal } from "solid-js";
 import { describe, expect, test } from "vitest";
 import { destructure } from "../src/index.js";
-import { MaybeAccessor } from "@solid-primitives/utils";
-import { normalize } from "path";
+import { get } from "@solid-primitives/utils/immutable";
 
 describe("destructure", () => {
   test("spread array", () =>
@@ -253,14 +252,36 @@ describe("destructure", () => {
   test("spread object normalize and deep", () =>
     createRoot(dispose => {
       const [toggle, setToggle] = createSignal(true);
+      const [count, setCount] = createSignal(1);
+
+      const { x, y } = destructure(
+        {
+          get x() {
+            return count() > 5;
+          },
+          y: () => count() > 5,
+        },
+        { memo: true, normalize: true },
+      );
+      const { _x, _y } = destructure(
+        {
+          get _x() {
+            return count() > 5;
+          },
+          _y: () => count() > 5,
+        },
+        { normalize: true },
+      );
+
       const [_numbers, setNumbers] = createSignal({
         a: 3,
         b: () => (toggle() ? 2 : 3),
         c: (a: number, b: number) => a * b,
         d: toggle() ? 1 : 0, //intentionally wrongly not reactive
-        onClick: (_e: MouseEvent) => null,
+        onClick: (e: MouseEvent) => e.type,
         nested: {
           sum: (a: number, b: number) => a + b,
+          num: 1,
         },
       });
 
@@ -270,10 +291,10 @@ describe("destructure", () => {
         c,
         d,
         onClick,
-        nested: { sum },
+        nested: { sum, num },
       } = destructure(_numbers, {
-        // normalize: true,
-        memo: "normalize",
+        normalize: true,
+        memo: false,
         deep: true,
       });
 
@@ -281,6 +302,11 @@ describe("destructure", () => {
         a: 0,
         b: 0,
         c: 0,
+        d: 0,
+        x: 0,
+        y: 0,
+        _x: 0,
+        _y: 0,
       };
       createComputed(() => {
         a();
@@ -294,28 +320,68 @@ describe("destructure", () => {
         c(a(), b());
         updates.c++;
       });
+      createComputed(() => {
+        x();
+        updates.x++;
+      });
+      createComputed(() => {
+        y();
+        updates.y++;
+      });
+      createComputed(() => {
+        _x();
+        updates._x++;
+      });
+      createComputed(() => {
+        _y();
+        updates._y++;
+      });
 
+      //@thetarnav's stuff
+      expect(updates.x).toBe(1);
+      expect(updates.y).toBe(1);
+      expect(updates._x).toBe(1);
+      expect(updates._y).toBe(1);
+
+      setCount(2); // shouldn't rerun effects for x and y but for _x and _y
+      expect(updates.x).toBe(1);
+      expect(updates.y).toBe(1);
+      expect(updates._x).toBe(2);
+      expect(updates._y).toBe(2);
+
+      setCount(6); // should rerun effects for x,y,_x,_y
+      expect(updates.x).toBe(2);
+      expect(updates.y).toBe(2);
+      expect(updates._x).toBe(3);
+      expect(updates._y).toBe(3);
+
+      //@madaxen86's stuff
       expect(a()).toBe(3);
       expect(b()).toBe(2);
+      expect(c.length).toBe(2);
       expect(c(a(), b())).toBe(6);
       expect(d()).toBe(1);
       expect(onClick.length).toBe(1);
+      expect(onClick(new MouseEvent("click"))).toBe("click");
       expect(sum.length).toBe(2);
       expect(sum(1, 2)).toBe(3);
+      expect(num()).toBe(1);
 
       expect(updates.a).toBe(1);
       expect(updates.b).toBe(1);
       expect(updates.c).toBe(1);
       setToggle(false);
-      //@ts-ignore
-      setNumbers(prev => ({ ...prev, a: () => 4, b: 3 }));
-
+      expect(updates.b).toBe(2);
       expect(b()).toBe(3);
+      //@ts-ignore
+      setNumbers(prev => ({ ...prev, a: () => 4, b: 6 }));
+
+      expect(b()).toBe(6);
       //d is static.
       expect(d()).toBe(1);
-      expect(c(a(), b())).toBe(12);
+      expect(c(a(), b())).toBe(24);
       expect(updates.a).toBe(2);
-      expect(updates.b).toBe(2);
+      expect(updates.b).toBe(3);
       expect(updates.c).toBe(3); // as we change a and b we compute c 2x
       dispose();
     }));
