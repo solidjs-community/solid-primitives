@@ -1,5 +1,4 @@
-import { MaybeAccessor } from "@solid-primitives/utils";
-import { createComputed, createRoot, createSignal, mergeProps } from "solid-js";
+import { createComputed, createRoot, createSignal } from "solid-js";
 import { describe, expect, test } from "vitest";
 import { destructure } from "../src/index.js";
 
