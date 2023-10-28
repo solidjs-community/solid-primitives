@@ -9,8 +9,18 @@ export type DestructureOptions<T extends ReactiveSource> = MemoOptions<Values<T>
   deep?: boolean;
   normalize?: boolean;
 };
-
-type ReturnFunction<T> = T extends (...args: any[]) => any ? T : () => T;
+type FunctionWithParams<T> = T extends (...args: infer P) => infer R
+  ? P extends [] // Check if the parameter list is empty
+    ? never
+    : (...args: P) => R
+  : never;
+type ReturnFunction<T> = T extends (...args: infer P) => infer R
+  ? P extends [] // Check if the parameter list is empty
+    ? R extends FunctionWithParams<R> //if empty check if the returned value is a function with params
+      ? R //return the function with params e.g. passed prop "() => (foo) => bar" will return "(foo) => bar"
+      : T //no params and no returned function with params return original prop which is already a function / Accessor
+    : T // T is a funtion with params return that function e.g. "(foo) => bar" will stay "(foo) => bar"
+  : () => T; // prop was static value return function "foo" will return "()=> foo"
 type ReturnValue<T, N> = N extends true ? ReturnFunction<T> : Accessor<T>;
 
 export type Spread<T extends ReactiveSource, N = false> = {
@@ -91,11 +101,11 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
   const config: DestructureOptions<T> = options ?? {};
   const memo = config.memo ?? typeof source === "function";
 
-  const _source = createMemo(() => (typeof source === "function" ? source() : source));
+  const _source = () => (typeof source === "function" ? source() : source);
   const getter = (key: any) => {
     const accessedValue = () => access(_source()[key]);
     //If accessedValue() is a function with params return the original function
-    if (typeof accessedValue() === "function" && accessedValue().length) return accessedValue();
+    if (typeof accessedValue() === "function" && !!accessedValue().length) return accessedValue();
     return accessedValue;
   };
   const obj = access(source);

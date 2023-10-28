@@ -1,7 +1,7 @@
-import { createComputed, createRoot, createSignal } from "solid-js";
+import { MaybeAccessor } from "@solid-primitives/utils";
+import { createComputed, createRoot, createSignal, mergeProps } from "solid-js";
 import { describe, expect, test } from "vitest";
 import { destructure } from "../src/index.js";
-import { get } from "@solid-primitives/utils/immutable";
 
 describe("destructure", () => {
   test("spread array", () =>
@@ -252,6 +252,97 @@ describe("destructure", () => {
   test("spread object normalize and deep", () =>
     createRoot(dispose => {
       const [toggle, setToggle] = createSignal(true);
+
+      const [_numbers, setNumbers] = createSignal({
+        a: 3,
+        b: () => (toggle() ? 2 : 3),
+        c: (a: number, b: number) => a * b,
+        _c: (a: number, b: number) => a * b,
+        __c: () => () => (a: number, b: number) => a * b,
+        d: toggle() ? 1 : 0, //intentionally wrongly not reactive
+        onClick: (e: MouseEvent) => e.type,
+        nested: {
+          sum: (a: number, b: number) => a + b,
+          num: 1,
+        },
+      });
+
+      const {
+        a,
+        b,
+        c,
+        _c,
+        __c,
+        d,
+        onClick,
+        nested: { sum, num },
+      } = destructure(_numbers, {
+        normalize: true,
+        memo: false,
+        deep: true,
+      });
+
+      const updates = {
+        a: 0,
+        b: 0,
+        c: 0,
+        _c: 0,
+        d: 0,
+      };
+      createComputed(() => {
+        a();
+        updates.a++;
+      });
+      createComputed(() => {
+        b();
+        updates.b++;
+      });
+      createComputed(() => {
+        c(a(), b());
+        updates.c++;
+      });
+      createComputed(() => {
+        __c()()(a(), b());
+        updates._c++;
+      });
+
+      expect(a()).toBe(3);
+      expect(b()).toBe(2);
+      expect(c.length).toBe(2);
+      expect(c(a(), b())).toBe(6);
+      expect(_c.length).toBe(2);
+      expect(_c(a(), b())).toBe(6);
+      expect(__c()().length).toBe(2);
+      expect(__c()()(a(), b())).toBe(6);
+      expect(d()).toBe(1);
+      expect(onClick.length).toBe(1);
+      expect(onClick(new MouseEvent("click"))).toBe("click");
+      expect(sum.length).toBe(2);
+      expect(sum(1, 2)).toBe(3);
+      expect(num()).toBe(1);
+
+      expect(updates.a).toBe(1);
+      expect(updates.b).toBe(1);
+      expect(updates.c).toBe(1);
+      setToggle(false);
+      expect(updates.b).toBe(2);
+      expect(b()).toBe(3);
+      //@ts-ignore
+      setNumbers(prev => ({ ...prev, a: () => 4, b: 6 }));
+
+      expect(b()).toBe(6);
+      //d is static.
+      expect(d()).toBe(1);
+      expect(c(a(), b())).toBe(24);
+      expect(_c(a(), b())).toBe(24);
+      expect(__c()()(a(), b())).toBe(24);
+      expect(updates.a).toBe(2);
+      expect(updates.b).toBe(3);
+      expect(updates.c).toBe(3); // as we change a and b we compute c 2x
+      dispose();
+    }));
+  test("normalize - effects are triggered correctly", () =>
+    createRoot(dispose => {
       const [count, setCount] = createSignal(1);
 
       const { x, y } = destructure(
@@ -273,53 +364,13 @@ describe("destructure", () => {
         { normalize: true },
       );
 
-      const [_numbers, setNumbers] = createSignal({
-        a: 3,
-        b: () => (toggle() ? 2 : 3),
-        c: (a: number, b: number) => a * b,
-        d: toggle() ? 1 : 0, //intentionally wrongly not reactive
-        onClick: (e: MouseEvent) => e.type,
-        nested: {
-          sum: (a: number, b: number) => a + b,
-          num: 1,
-        },
-      });
-
-      const {
-        a,
-        b,
-        c,
-        d,
-        onClick,
-        nested: { sum, num },
-      } = destructure(_numbers, {
-        normalize: true,
-        memo: false,
-        deep: true,
-      });
-
       const updates = {
-        a: 0,
-        b: 0,
-        c: 0,
-        d: 0,
         x: 0,
         y: 0,
         _x: 0,
         _y: 0,
       };
-      createComputed(() => {
-        a();
-        updates.a++;
-      });
-      createComputed(() => {
-        b();
-        updates.b++;
-      });
-      createComputed(() => {
-        c(a(), b());
-        updates.c++;
-      });
+
       createComputed(() => {
         x();
         updates.x++;
@@ -355,34 +406,6 @@ describe("destructure", () => {
       expect(updates._x).toBe(3);
       expect(updates._y).toBe(3);
 
-      //@madaxen86's stuff
-      expect(a()).toBe(3);
-      expect(b()).toBe(2);
-      expect(c.length).toBe(2);
-      expect(c(a(), b())).toBe(6);
-      expect(d()).toBe(1);
-      expect(onClick.length).toBe(1);
-      expect(onClick(new MouseEvent("click"))).toBe("click");
-      expect(sum.length).toBe(2);
-      expect(sum(1, 2)).toBe(3);
-      expect(num()).toBe(1);
-
-      expect(updates.a).toBe(1);
-      expect(updates.b).toBe(1);
-      expect(updates.c).toBe(1);
-      setToggle(false);
-      expect(updates.b).toBe(2);
-      expect(b()).toBe(3);
-      //@ts-ignore
-      setNumbers(prev => ({ ...prev, a: () => 4, b: 6 }));
-
-      expect(b()).toBe(6);
-      //d is static.
-      expect(d()).toBe(1);
-      expect(c(a(), b())).toBe(24);
-      expect(updates.a).toBe(2);
-      expect(updates.b).toBe(3);
-      expect(updates.c).toBe(3); // as we change a and b we compute c 2x
       dispose();
     }));
 });
