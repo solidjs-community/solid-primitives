@@ -1,5 +1,12 @@
 import { createMemo, Accessor, runWithOwner, getOwner, MemoOptions } from "solid-js";
-import { access, MaybeAccessor, AnyObject, Values, AnyFunction } from "@solid-primitives/utils";
+import {
+  access,
+  MaybeAccessor,
+  AnyObject,
+  Values,
+  AnyFunction,
+  MaybeAccessorValue,
+} from "@solid-primitives/utils";
 
 type ReactiveSource = [] | any[] | AnyObject;
 
@@ -108,11 +115,16 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
 
   const _source = () => (typeof source === "function" ? source() : source);
   const getter = (key: any) => {
-    const accessedValue = () => access(_source()[key]);
+    const accessedValue = () => getNormalizedValue(_source()[key]);
     //If accessedValue() is a function with params return the original function
-    if (typeof accessedValue() === "function" && !!accessedValue().length) return accessedValue();
+    if (
+      typeof accessedValue() === "function" &&
+      (!!accessedValue().length || hasVariadicParams(accessedValue()))
+    )
+      return accessedValue();
     return accessedValue;
   };
+
   const obj = access(source);
 
   // lazy (use proxy)
@@ -136,9 +148,17 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
       result[key] = destructure(calc, { ...config, memo });
     else
       result[key] =
-        memo && (!config.normalize || calc.length === 0)
-          ? createMemo(calc, undefined, options)
-          : calc;
+        memo && (!config.normalize || !calc.length) ? createMemo(calc, undefined, options) : calc;
   }
   return result;
+}
+
+//access function plus check for variadic params
+const getNormalizedValue = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
+  typeof v === "function" && !v.length && !hasVariadicParams(v) ? v() : v;
+
+function hasVariadicParams(func: any) {
+  // Convert the function to a string and check if it includes "arguments"
+  const funcString = func.toString();
+  return funcString.includes("arguments") || /\(\s*\.\.\.\s*[^\)]+\)/.test(funcString);
 }
