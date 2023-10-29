@@ -387,7 +387,6 @@ describe("destructure", () => {
         updates._y++;
       });
 
-      //@thetarnav's stuff
       expect(updates.x).toBe(1);
       expect(updates.y).toBe(1);
       expect(updates._x).toBe(1);
@@ -416,10 +415,11 @@ describe("destructure", () => {
       function hasParams(func: any) {
         // Convert the function to a string and check if it includes "arguments" or for arrow functions test with regex for "..."
         const funcString = func.toString();
+        const paramsPos = funcString.match(/\(.*?\)/);
         return (
           func.length > 0 ||
           funcString.includes("arguments") ||
-          /\(\s*\.\.\.\s*[^\)]+\)/.test(funcString)
+          /\(\s*\.\.\.\s*[^\)]+\)/.test(paramsPos[0])
         );
       }
 
@@ -444,15 +444,21 @@ describe("destructure", () => {
       function np() {
         return null;
       }
+      function nvp() {
+        const t = [];
+        (...t: any) => null;
+        function foo(...t: any) {
+          return null;
+        }
+      }
       expect(hasParams(log)).toBe(true);
       expect(hasParams(vp)).toBe(true);
       expect(hasParams(np)).toBe(false);
+      expect(hasParams(nvp)).toBe(false);
       //  ts doen't mind
       const b = destructure({ handleClick: log }); // logs immediately - not anymore :-P
       expect(hasParams(b.handleClick)).toBe(true);
-      // b.handleClick(e);
 
-      // expect(b.handleClick(e)).toBe(e); // runtime error - tried to call undefined
       dispose();
     });
   });

@@ -117,11 +117,7 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
   const getter = (key: any) => {
     const accessedValue = () => getNormalizedValue(_source()[key]);
     //If accessedValue() is a function with params return the original function
-    if (
-      typeof accessedValue() === "function" &&
-      (!!accessedValue().length || hasVariadicParams(accessedValue()))
-    )
-      return accessedValue();
+    if (typeof accessedValue() === "function" && hasParams(accessedValue())) return accessedValue();
     return accessedValue;
   };
 
@@ -134,7 +130,7 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
       const calc = getter(key);
       if (config.deep && isReactiveObject(obj[key]))
         return runWithOwner(owner, () => destructure(calc, { ...config, memo }));
-      return memo && (!config.normalize || calc.length === 0)
+      return memo && (!config.normalize || hasParams(calc))
         ? runWithOwner(owner, () => createMemo(calc, undefined, options))
         : calc;
     });
@@ -148,17 +144,22 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
       result[key] = destructure(calc, { ...config, memo });
     else
       result[key] =
-        memo && (!config.normalize || !calc.length) ? createMemo(calc, undefined, options) : calc;
+        memo && (!config.normalize || !hasParams(calc))
+          ? createMemo(calc, undefined, options)
+          : calc;
   }
   return result;
 }
 
 //access function plus check for variadic params
 const getNormalizedValue = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
-  typeof v === "function" && !v.length && !hasVariadicParams(v) ? v() : v;
+  typeof v === "function" && !hasParams(v) ? v() : v;
 
-function hasVariadicParams(func: any) {
+function hasParams(func: any) {
   // Convert the function to a string and check if it includes "arguments"
+  if (typeof func !== "function") return false;
+  if (func.length > 0) return true;
   const funcString = func.toString();
-  return funcString.includes("arguments") || /\(\s*\.\.\.\s*[^\)]+\)/.test(funcString);
+  const paramsPos = funcString.match(/\(.*?\)/); //get pos of first parantethes
+  return funcString.includes("arguments") || /\(\s*\.\.\.\s*[^\)]+\)/.test(paramsPos[0]);
 }
