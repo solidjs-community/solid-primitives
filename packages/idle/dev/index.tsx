@@ -14,7 +14,7 @@ const divStyle = {
 };
 
 const App: Component = () => {
-  const { isIdle, isPrompted, start, stop, reset } = createIdleTimer({
+  const { isIdle, isPrompted, start, stop, reset, triggerIdle } = createIdleTimer({
     onActive: evt => console.log("this event re-activated me ⚡ => ", evt),
     onIdle: evt => console.log("last event before I went to sleep 😴 => ", evt),
     idleTimeout: 3_000,
@@ -28,6 +28,7 @@ const App: Component = () => {
           <button onClick={stop}>stop</button>
           <button onClick={start}>start</button>
           <button onClick={reset}>reset</button>
+          <button onClick={triggerIdle}>trigger idle</button>
         </>
       }
     >
