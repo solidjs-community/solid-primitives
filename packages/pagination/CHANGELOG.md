@@ -1,5 +1,11 @@
 # @solid-primitives/pagination
 
+## 0.2.9
+
+### Patch Changes
+
+- 0b589d42: Fix of back and next page values
+
 ## 0.2.8
 
 ### Patch Changes
