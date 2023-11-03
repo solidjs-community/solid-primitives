@@ -174,7 +174,7 @@ export const createPagination = (
     {
       disabled: { get: () => page() <= 1, set: noop, enumerable: true },
       children: { get: () => opts().prevContent, set: noop, enumerable: true },
-      page: { get: () => Math.min(1, page() - 1), enumerable: false },
+      page: { get: () => Math.max(1, page() - 1), enumerable: false },
     },
   );
   const next = Object.defineProperties(
@@ -187,7 +187,7 @@ export const createPagination = (
     {
       disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
       children: { get: () => opts().nextContent, set: noop, enumerable: true },
-      page: { get: () => Math.max(opts().pages, page() + 1), enumerable: false },
+      page: { get: () => Math.min(opts().pages, page() + 1), enumerable: false },
     },
   );
   const last = Object.defineProperties(

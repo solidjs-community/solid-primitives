@@ -80,6 +80,19 @@ describe("createPagination", () => {
       expect(updatedPages.every((page, index) => Object.is(page, initialPages[index]))).toBe(true);
       dispose();
     }));
+
+    test("createPagination next back", () => {
+      createRoot(dispose => {
+        const [paginationProps, page, setPage] = createPagination({ pages: 100, maxPages: 1, showFirst: false, initialPage: 3 });
+        var back = paginationProps()[0]
+        var next = paginationProps()[2]
+        
+        expect(back?.page, "back page should be 2").toStrictEqual(2)
+        expect(next?.page, "next page should be 4").toStrictEqual(4)
+        
+        dispose();
+      });
+    });
 });
 
 //@ts-ignore
