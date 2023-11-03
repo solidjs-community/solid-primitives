@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@solid-primitives/composites": "^1.1.1",
-    "solid-js": "^1.7.12"
+    "solid-js": "^1.8.5"
   },
   "dependencies": {
     "@solid-primitives/utils": "workspace:^"

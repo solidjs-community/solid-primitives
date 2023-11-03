@@ -2,10 +2,9 @@ import { createIntersectionObserver } from "@solid-primitives/intersection-obser
 import { isIOS, isSafari } from "@solid-primitives/platform";
 import { defer } from "@solid-primitives/utils";
 import { createEffect, createSignal, onMount, ParentComponent } from "solid-js";
-import { useLocation } from "solid-start";
-import { pageWidthClass } from "~/constants";
-import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
-import reflow from "~/utils/reflow";
+import { useLocation } from "solid-start/router";
+import { pageWidthClass } from "~/constants.js";
+import { doesPathnameMatchBase, reflow } from "~/utils.js";
 import * as Header from "./Header/Header.js";
 
 export const TR: ParentComponent = props => {
@@ -86,19 +85,7 @@ export const Table: ParentComponent = props => {
   let tableHeaderShadowStickyDiv!: HTMLDivElement;
   let tableBody!: HTMLElement;
   let tableVerticalScrollShadow!: HTMLDivElement;
-  const fakeTableRow = (
-    <>
-      <tr aria-hidden="true" style="visibility: hidden;">
-        <td aria-hidden="true" style="visibility: hidden;"></td>
-      </tr>
-      {/* To preserve odd/even row colors */}
-      <tr aria-hidden="true" style="display: none;">
-        <td aria-hidden="true"></td>
-      </tr>
-    </>
-  ) as HTMLElement[];
   let tableSameWidthAsParent = false;
-  let addedFakeTableRow = false;
   let prevY = 0;
   let prevTableWidth = 0;
   let prevTableContainerParentWidth = 0;
@@ -207,12 +194,12 @@ export const Table: ParentComponent = props => {
     // const tableWidth = tableEl.getBoundingClientRect().width;
     // const tableHeaderHeight = tableHeader.getBoundingClientRect().height;
     // const tableHeadersBCRs = tableHeaders.map(item => item.getBoundingClientRect());
-    tableHeaders.forEach((item, idx) => {
+    tableHeaders.forEach(item => {
       item.style.maxWidth = "";
       item.style.width = "";
       item.style.height = "";
     });
-    tableFirstTableRowCells.forEach((item, idx) => {
+    tableFirstTableRowCells.forEach(item => {
       item.style.minWidth = "";
     });
 
@@ -229,16 +216,6 @@ export const Table: ParentComponent = props => {
     tableHeaderRealTR.style.left = "";
     tableHeaderRealTR.style.width = "";
     tableContainerParent.style.overflow = "";
-
-    if (addedFakeTableRow) {
-      const tableChildren = tableBody.children;
-      const fakeRow = tableChildren[0];
-      const hiddenRow = tableChildren[1];
-      fakeRow.remove();
-      hiddenRow.remove();
-
-      addedFakeTableRow = false;
-    }
 
     reflow();
   };
@@ -269,15 +246,15 @@ export const Table: ParentComponent = props => {
 
     tableHeaders.forEach((item, idx) => {
       if (idx === 0) {
-        item.style.maxWidth = `${tableHeadersBCRs[idx].width!}px`;
+        item.style.maxWidth = `${tableHeadersBCRs[idx]!.width}px`;
       }
-      item.style.width = `${tableHeadersBCRs[idx].width!}px`;
+      item.style.width = `${tableHeadersBCRs[idx]!.width}px`;
       item.style.height = `${tableHeaderHeight}px`;
     });
     tableFirstTableRowCells.forEach((item, idx) => {
-      item.style.minWidth = `${tableHeadersBCRs[idx].width!}px`;
+      item.style.minWidth = `${tableHeadersBCRs[idx]!.width}px`;
     });
-    tableVerticalScrollShadow.style.left = `${tableHeadersBCRs[0].right}px`;
+    tableVerticalScrollShadow.style.left = `${tableHeadersBCRs[0]!.right}px`;
     tableHeader.style.position = "absolute";
     tableHeader.style.top = "0px";
     tableHeader.style.left = "0px";
@@ -294,13 +271,7 @@ export const Table: ParentComponent = props => {
     tableHeaderRealTR.style.left = "0px";
     tableHeaderRealTR.style.width = `${tableWidth + 8}px`;
     tableHeaderShadowTR.style.height = `${tableHeaderHeight - (tableSameWidthAsParent ? 2 : 0)}px`;
-    fakeTableRow[0].style.height = `${tableHeaderHeight}px`;
     tableContainerParent.style.overflow = "auto hidden";
-    if (!addedFakeTableRow) {
-      tableBody.insertAdjacentElement("afterbegin", fakeTableRow[1]);
-      tableBody.insertAdjacentElement("afterbegin", fakeTableRow[0]);
-      addedFakeTableRow = true;
-    }
 
     if (headerActive()) {
       showActiveHeader();
@@ -322,12 +293,7 @@ export const Table: ParentComponent = props => {
 
     const resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
-        const targetWidth = entry.contentBoxSize
-          ? entry.contentBoxSize[0]
-            ? entry.contentBoxSize[0].inlineSize
-            : // @ts-ignore
-              (entry.contentBoxSize.inlineSize as number)
-          : entry.contentRect.width;
+        const targetWidth = entry.contentRect.width;
 
         if (entry.target === tableContainerParent) {
           if (prevTableContainerParentWidth === targetWidth) {
@@ -358,11 +324,8 @@ export const Table: ParentComponent = props => {
       }
     });
 
-    const h4Els = tableEl.querySelectorAll("h4");
-    // setHeaders([...h4Els].map(item => ({ name: item.textContent!, active: false })));
-
     // TODO: resizing logic is broken in Safari
-    setTableRowTargets(() => [...h4Els]);
+    setTableRowTargets(() => [...tableEl.querySelectorAll("h4")]);
     setTableTarget(() => [tableEl]);
     requestAnimationFrame(() => {
       resizeObserver.observe(tableContainerParent);

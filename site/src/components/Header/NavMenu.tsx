@@ -1,7 +1,7 @@
 import { RefProps } from "@solid-primitives/refs";
 import { Component, For } from "solid-js";
-import { A, useLocation } from "solid-start";
-import { scrollIntoView } from "~/utils/scrollIntoView";
+import { A, useLocation } from "solid-start/router";
+import { scrollIntoView } from "~/utils.js";
 
 const NavMenu: Component<RefProps<HTMLDivElement> & { onClose: () => void }> = props => {
   const location = useLocation();

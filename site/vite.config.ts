@@ -15,14 +15,15 @@ const packages = await (async () => {
 export default defineConfig(() => {
   return {
     plugins: [
-      devtools({
-        autoname: true,
-        locator: {
-          componentLocation: true,
-          targetIDE: "vscode",
-        },
-      }),
+      // devtools({
+      //   autoname: true,
+      //   locator: {
+      //     componentLocation: true,
+      //     targetIDE: "vscode",
+      //   },
+      // }),
       solid({
+        hot: false,
         adapter: staticAdapter(),
         prerenderRoutes: [
           "/",

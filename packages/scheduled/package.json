@@ -63,7 +63,7 @@
   "devDependencies": {
     "@solid-primitives/event-listener": "workspace:^",
     "@solid-primitives/timer": "workspace:^",
-    "solid-js": "^1.7.12"
+    "solid-js": "^1.8.5"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"
