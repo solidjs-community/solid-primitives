@@ -86,3 +86,10 @@ export interface IdleTimer {
    */
   triggerIdle: () => void;
 }
+
+/**
+ * @deprecated 
+ * IdleTimerReturn has been renamed to IdleTimer for clarity and coherence. 
+ * Please use IdleTimer instead.
+ */
+export type IdleTimerReturn = IdleTimer;
