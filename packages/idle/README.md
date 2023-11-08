@@ -53,6 +53,7 @@ To interact with the timers, `createIdleTimer` provides:
 
 - **isIdle** and **isPrompted**: `Accessor<boolean>`; these two accessors report the user status. They do not concur.
 - **start**, **stop** and **reset**: `() => void`; allow rispectively to start and stop the timers, and to reset them. `start` and `reset`, create a custom `manualstart` and `manualreset` event, that will be passed to the `onIdle` and `onPrompt` callbacks if no oher activity occurs (there's another custom event, `mount`, created when timers start automatically). Finally `stop` and `reset` don't trigger `onActive`.
+- **triggerIdle**: `() => void`; manually sets `isIdle` to true, and triggers the `onIdle` callback, passing a custom `manualidle` event. It doesn't trigger `onActive` or `onPrompt`. 
 
 ### Configuration options
 
