@@ -52,7 +52,7 @@
   ],
   "devDependencies": {
     "solid-heroicons": "^3.2.4",
-    "solid-js": "^1.8.5"
+    "solid-js": "^1.8.6"
   },
   "dependencies": {
     "@solid-primitives/static-store": "workspace:^",

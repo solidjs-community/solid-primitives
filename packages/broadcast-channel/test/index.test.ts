@@ -199,9 +199,9 @@ describe("createBroadcastChannel", () => {
       return dispose;
     });
 
+    const promise = new Promise<void>(r => (resolve = r));
     mockedBCInstance.postMessage("hi");
-
-    await new Promise<void>(r => (resolve = r));
+    await promise;
 
     expect(captured).toEqual([null, "hi"]);
 

@@ -63,6 +63,6 @@
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.8.5"
+    "solid-js": "^1.8.6"
   }
 }

@@ -62,8 +62,8 @@
   },
   "devDependencies": {
     "@solid-primitives/mouse": "workspace:^",
-    "@solidjs/router": "^0.8.3",
-    "solid-js": "^1.8.5"
+    "@solidjs/router": "^0.8.4",
+    "solid-js": "^1.8.6"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"
