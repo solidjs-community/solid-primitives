@@ -1,8 +1,10 @@
-import { describe, test, expect, beforeEach, vi, afterAll } from "vitest";
+import { describe, test, expect, beforeEach, vi, afterAll, beforeAll } from "vitest";
 import { createRoot } from "solid-js";
 import { createIdleTimer } from "../src/index.js";
 
-vi.useFakeTimers();
+beforeAll(() => {
+  vi.useFakeTimers();
+});
 
 beforeEach(() => {
   vi.clearAllTimers();

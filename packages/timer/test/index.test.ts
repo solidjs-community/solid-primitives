@@ -1,8 +1,10 @@
 import { batch, createRoot, createSignal } from "solid-js";
-import { describe, test, expect, vi, beforeEach, afterAll } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterAll, beforeAll } from "vitest";
 import { createTimer } from "../src/index.js";
 
-vi.useFakeTimers();
+beforeAll(() => {
+  vi.useFakeTimers();
+});
 
 beforeEach(() => {
   vi.clearAllTimers();

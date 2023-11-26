@@ -1,5 +1,5 @@
 import { createEffect, createResource, createSignal, on } from "solid-js";
-import { describe, test, expect, vi, afterAll, beforeEach } from "vitest";
+import { describe, test, expect, vi, afterAll, beforeEach, beforeAll } from "vitest";
 import { testEffect } from "@solidjs/testing-library";
 import {
   makeAbortable,
@@ -10,7 +10,9 @@ import {
   createDeepSignal,
 } from "../src/index.js";
 
-vi.useFakeTimers();
+beforeAll(() => {
+  vi.useFakeTimers();
+});
 
 beforeEach(() => {
   vi.clearAllTimers();

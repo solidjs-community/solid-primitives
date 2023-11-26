@@ -1,8 +1,10 @@
-import { describe, it, expect, afterAll, beforeEach, vi } from "vitest";
+import { describe, it, expect, afterAll, beforeEach, vi, beforeAll } from "vitest";
 import { createEffect, createRoot } from "solid-js";
 import { createDateNow } from "../src/index.js";
 
-vi.useFakeTimers();
+beforeAll(() => {
+  vi.useFakeTimers();
+});
 
 beforeEach(() => {
   vi.clearAllTimers();
