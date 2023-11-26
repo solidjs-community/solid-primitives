@@ -1,9 +1,13 @@
-import { EventTypeName, IdleTimerOptions, IdleTimerReturn } from "./types.js";
+import { EventTypeName, IdleTimerOptions, IdleTimer } from "./types.js";
 import { batch, createSignal, onMount, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 
 const THROTTLE_DELAY: number = 250;
 const FIFTEEN_MINUTES: number = 900_000; // 15 minutes
+/**
+ *  @constant
+ *  @default
+ */
 const EVENTS: EventTypeName[] = [
   "mousemove",
   "keydown",
@@ -17,26 +21,32 @@ const EVENTS: EventTypeName[] = [
   "visibilitychange",
 ];
 /**
+ * @typedef {Object} IdleTimer
+ * @method isIdle - Shows when the user is idle.
+ * @method isPrompted - Tells whether onPrompt has been called or not, and consequently if the promptTimeout countdown has started
+ * @method reset - Resets timers, doesn't trigger onActive
+ * @method start - Adds listeners and starts timers, doesn't trigger onActive
+ * @method stop - Removes listeners and cleans up the timers, doesn't trigger onActive.
+ * @method triggerIdle - Set the idle status to idle and trigger the onIdle callback. Doesn't trigger onActive or onPrompt.
+ */
+
+/**
  * A primitive to observe the user's idle state and react to its changes.
- * @param - an objects that takes several variables and callbacks, all of them optionals
- * {
- *    @param params.events: EventTypeName[]`; a list of the DOM events that will be listened to in order to monitor the user's activity. The events must be of `ventTypeName type (that can be imported). It defaults to the events in the EVENTS constant.
- *    @param params.idleTimeout: number; time of user's inactivity in milliseconds before the idle status changes to idle. This time is extended by the promptTimeout option. It defaults to 15 minutes.
- *    @param params.promptTimeout: number; to meet the typical usecase when we want to prompt the user to check if we they are still active, an additional timer starts running right after the idleTimeout expires. In this time slot, the user is in the prompt phase, whose duration is decided by promptTimout. It defaults to 0.
- *    @param params.onActive: (evt: Event) => void; callback called when the user resumes activity after having been idle (resuming from prompt phase doesn't trigger `onActive`). The event that triggered the return to activity is passed as a parameter. It defaults to an empty function.
- *    @param params.onIdle: (evt: Event) => void; callback triggered when the user status passes to idle. When invoked, the last event fired before the prompt phase will be passed as parameter. Events fired in the prompt phase will not count. It defaults to an empty function.
- *    @param params.onPrompt: (evt: Event) => void; when the idleTimeout timer expires, before declaring the idle status, onPrompt callback is fired, starting the prompt timer. When invoked, the last event fired before the prompt phase will be passed as a parameter. It defaults to an empty function.
- *    @param params.element: HTMLElement; DOM element to which the event listeners will be attached. It defaults to document.
- *    @param params.startsManually: boolean; requires the event-listeners to be bound manually by using the start method (see @returns), instead of on mount. It defaults to false.
- * }
- * @returns - returns an object with several methods and accessors
- * {
- *    @returns.isIdle: Accessor<boolean>; shows when the user is idle
- *    @returns.isPrompted: Accessor<boolean>; tells whether params.onPrompt has been called or not, and consequently if the promptTimeout countdown has started
- *    @returns.reset: () => void; resets timers, doesn't trigger onActive.
- *    @returns.start: () => void; adds listeners and starts timers, doesn't trigger onActive.
- *    @returns.stop: () => void; removes listeners and cleans up the timers, doesn't trigger onActive.
- * }
+ * @param {Object} [params={}] {@link IdleTimerOptions} - An options object to initialize the timer.
+ * @param {string[]} [params.events=['mousemove', 'keydown', 'wheel', 'resize', 'mousedown', 'pointerdown', 'touchstart', 'touchmove', 'visibilitychange']] {@link EventTypeName}  - The DOM events that will be listened to in order to monitor the user's activity.
+ * @param {number} [params.idleTimeout=900000] - Time of user's inactivity in milliseconds before the idle status changes to idle. This time is extended by the promptTimeout option.
+ * @param {number} [params.promptTimeout=0] - To meet the typical use case when we want to prompt the user to check if they are still active, an additional timer starts running right after the idleTimeout expires. In this time slot, the user is in the prompt phase, whose duration is decided by promptTimeout. onActive is not fired in this phase, which cn only be interrupted by the methods {@link IdleTimer.reset}, {@link IdleTimer.stop}, {@link IdleTimer.pause}, {@link IdleTimer.triggerIdle}.
+ * @param {function(Event): void} [params.onActive=() => {}] - Callback called when the user resumes activity after having been idle (resuming from prompt phase doesn't trigger `onActive`). The event that triggered the return to activity is passed as a parameter.
+ * @param {function(Event): void} [params.onIdle=() => {}] - Callback triggered when the user status passes to idle. When invoked, the last event fired before the prompt phase will be passed as a parameter. Events fired in the prompt phase will not count.
+ * @param {function(Event): void} [params.onPrompt=() => {}] - When the idleTimeout timer expires, before declaring the idle status, onPrompt callback is fired, starting the prompt timer. When invoked, the last event fired before the prompt phase will be passed as a parameter.
+ * @param {HTMLElement} [params.element=document] - DOM element to which the event listeners will be attached.
+ * @param {boolean} [params.startManually=false] - Requires the event-listeners to be bound manually by using the start method (see {@link IdleTimer}), instead of on mount.
+ * @returns {IdleTimer} - The instance of the idle timer. It contains the following accessors and methods:
+ *    - isIdle: Accessor<boolean>; shows when the user is idle
+ *    - isPrompted: Accessor<boolean>; tells whether params.onPrompt has been called or not, and consequently if the promptTimeout countdown has started
+ *    - reset: () => void; resets timers, doesn't trigger onActive
+ *    - start: () => void; adds listeners and starts timers, doesn't trigger onActive
+ *    - stop: () => void; removes listeners and cleans up the timers, doesn't trigger onActive
  */
 export const createIdleTimer = ({
   element,
@@ -47,7 +57,7 @@ export const createIdleTimer = ({
   onIdle,
   onPrompt,
   startManually = false,
-}: IdleTimerOptions = {}): IdleTimerReturn => {
+}: IdleTimerOptions = {}): IdleTimer => {
   if (isServer) {
     return {
       isIdle: () => false,
@@ -55,6 +65,7 @@ export const createIdleTimer = ({
       reset: () => {},
       start: () => {},
       stop: () => {},
+      triggerIdle: () => {},
     };
   }
   let listenersAreOn = false;
@@ -153,6 +164,13 @@ export const createIdleTimer = ({
     listenersAreOn = false;
   }
 
+  function triggerIdle() {
+    stopListening();
+    setIsIdle(true);
+    onIdle?.(new CustomEvent("manualidle"));
+    addListeners();
+  }
+
   onMount(() => {
     if (startManually) return;
     startListening(new CustomEvent("mount"));
@@ -166,5 +184,6 @@ export const createIdleTimer = ({
     start: () => startListening(),
     reset: () => timerReset(new CustomEvent("manualreset")),
     stop: stopListening,
+    triggerIdle,
   };
 };
