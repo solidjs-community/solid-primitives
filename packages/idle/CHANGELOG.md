@@ -1,5 +1,11 @@
 # @solid-primitives/idle
 
+## 0.1.0
+
+### Minor Changes
+
+- 28d78412: Add triggerIdle function to manually trigger idle state - Fixes #503
+
 ## 0.0.105
 
 ### Patch Changes
