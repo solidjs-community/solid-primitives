@@ -1,5 +1,11 @@
 # @solid-primitives/fetch
 
+## 2.4.7
+
+### Patch Changes
+
+- eefd8a0a: Add missing `withAggregation` export
+
 ## 2.4.6
 
 ### Patch Changes
