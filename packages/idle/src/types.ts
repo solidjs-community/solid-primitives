@@ -17,17 +17,17 @@ export interface IdleTimerOptions {
    */
   element?: HTMLElement;
   /**
-   * Time of user's inactivity in milliseconds before the idle status changes to idle. 
+   * Time of user's inactivity in milliseconds before the idle status changes to idle.
    * This time is extended by the promptTimeout option.
    * @default 900000 (15 minutes)
    */
   idleTimeout?: number;
   /**
-   * To meet the typical use case when we want to prompt the user to check if they are still active, an additional timer starts running right after the idleTimeout expires. 
+   * To meet the typical use case when we want to prompt the user to check if they are still active, an additional timer starts running right after the idleTimeout expires.
    * In this time slot, the user is in the prompt phase, whose duration is decided by promptTimeout.
    * onActive is not fired in this phase, which cn only be interrupted by the methods reset, stop, pause, triggerIdle.
    * @default 0
-  */
+   */
   promptTimeout?: number;
   /**
    * Requires the event-listeners to be bound manually by using the start method, instead of on mount.
@@ -88,8 +88,8 @@ export interface IdleTimer {
 }
 
 /**
- * @deprecated 
- * IdleTimerReturn has been renamed to IdleTimer for clarity and coherence. 
+ * @deprecated
+ * IdleTimerReturn has been renamed to IdleTimer for clarity and coherence.
  * Please use IdleTimer instead.
  */
 export type IdleTimerReturn = IdleTimer;
