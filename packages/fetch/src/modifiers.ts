@@ -212,12 +212,12 @@ export const withAggregation: RequestModifier =
                 ? ([...current, ...next] as Result)
                 : ([...current, next] as Result)
               : typeof current === "object" && typeof next === "object"
-              ? ({ ...current, ...next } as Result)
-              : typeof current === "string" && typeof next === "string"
-              ? ((current + next) as Result)
-              : current != null
-              ? ([current, next] as Result)
-              : next;
+                ? ({ ...current, ...next } as Result)
+                : typeof current === "string" && typeof next === "string"
+                  ? ((current + next) as Result)
+                  : current != null
+                    ? ([current, next] as Result)
+                    : next;
           }),
     );
     requestContext.wrapResource();

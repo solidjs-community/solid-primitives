@@ -300,8 +300,8 @@ export function getOccurrence(
       ? Occurrence.Inside
       : Occurrence.Entering
     : prevIsIntersecting === true
-    ? Occurrence.Leaving
-    : Occurrence.Outside;
+      ? Occurrence.Leaving
+      : Occurrence.Outside;
 }
 
 /**

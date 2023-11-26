@@ -11,10 +11,10 @@ const App: Component = () => {
     node === null
       ? "null"
       : node instanceof Text
-      ? `[Text: "${node.data}"]`
-      : `<${node.nodeName.toLowerCase()}${Array.from((node as HTMLElement).attributes)
-          .map(attr => " " + attr.name + (attr.value === "" ? "" : '="' + attr.value + '"'))
-          .join("")}>`;
+        ? `[Text: "${node.data}"]`
+        : `<${node.nodeName.toLowerCase()}${Array.from((node as HTMLElement).attributes)
+            .map(attr => " " + attr.name + (attr.value === "" ? "" : '="' + attr.value + '"'))
+            .join("")}>`;
   createEffect(() => {
     const node: HTMLElement | null = document.querySelector(nodeSelector());
     const start = selectionStart();

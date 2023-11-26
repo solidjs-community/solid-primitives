@@ -15,8 +15,8 @@ const App: Component = () => {
           {shareStatus.status === undefined
             ? "Haven't started sharing yet."
             : shareStatus.status
-            ? "Sharing success"
-            : `Sharing failed, ${shareStatus.message}`}
+              ? "Sharing success"
+              : `Sharing failed, ${shareStatus.message}`}
         </p>
         <button class="btn" onClick={() => setData({ url: "https://solidjs.com" })}>
           Share

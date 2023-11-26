@@ -57,13 +57,13 @@ export const serializer = (req: any): string =>
       ? `"${req}"`
       : req + ""
     : // serializing the array items allows for string coercion: [1,2,3] == "[1,2,3]"
-    Array.isArray(req)
-    ? `[${req.map(serializer)}]`
-    : // Headers and maps support an entries method giving an entries iterator,
-      // otherwise use Object.entries()s
-      `{${mapEntries(
-        typeof req.entries === "function" ? [...req.entries()] : Object.entries(req),
-      )}}`;
+      Array.isArray(req)
+      ? `[${req.map(serializer)}]`
+      : // Headers and maps support an entries method giving an entries iterator,
+        // otherwise use Object.entries()s
+        `{${mapEntries(
+          typeof req.entries === "function" ? [...req.entries()] : Object.entries(req),
+        )}}`;
 
 export type CacheEntry<T, S> = {
   source: S;
@@ -236,14 +236,14 @@ export function createAggregated<R, I extends R | R[]>(res: Accessor<R>, initial
     return current == null && previous == null
       ? previous
       : Array.isArray(previous || current)
-      ? [...toArray(previous), ...toArray(current)]
-      : typeof (previous || current) === "object"
-      ? { ...previous, ...current }
-      : typeof previous === "string" || typeof current === "string"
-      ? (previous?.toString() || "") + (current || "")
-      : previous
-      ? [previous, current]
-      : [current];
+        ? [...toArray(previous), ...toArray(current)]
+        : typeof (previous || current) === "object"
+          ? { ...previous, ...current }
+          : typeof previous === "string" || typeof current === "string"
+            ? (previous?.toString() || "") + (current || "")
+            : previous
+              ? [previous, current]
+              : [current];
   }, initialValue);
 }
 

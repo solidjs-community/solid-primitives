@@ -76,8 +76,8 @@ const normalizeOption = (
   typeof value === "boolean"
     ? value
     : typeof value === "function"
-    ? value(page, pages)
-    : PAGINATION_DEFAULTS[key];
+      ? value(page, pages)
+      : PAGINATION_DEFAULTS[key];
 
 /**
  * Creates a reactive pagination to fill your layout with.
