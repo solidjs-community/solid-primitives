@@ -95,64 +95,55 @@ describe("makeBroadcastChannel", () => {
     const channelName = "channel-1";
     const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-    const { onMessage1, onMessage2, dispose } = createRoot(d => {
+    const data = createRoot(dispose => {
       const bc1 = makeBroadcastChannel<MsgType>(channelName);
       const bc2 = makeBroadcastChannel<MsgType>("channel-2");
 
-      return {
-        onMessage1: bc1.onMessage,
-        onMessage2: bc2.onMessage,
-        dispose: d,
-      };
+      return { bc1, bc2, dispose };
     });
 
     const captured: string[] = [];
+    let resolve: () => void;
 
-    onMessage1(e => {
+    data.bc1.onMessage(e => {
       captured.push(e.data + "1");
+      resolve();
     });
-    onMessage2(e => {
+    data.bc2.onMessage(e => {
       captured.push(e.data + "2");
+      resolve();
     });
 
+    const promise = new Promise<void>(r => (resolve = r));
     mockedBCInstance.postMessage("hi");
-
-    await new Promise<void>(r => setTimeout(r, 100));
+    await promise;
 
     expect(captured).toEqual(["hi1"]);
 
-    dispose();
+    data.dispose();
   });
 
   test("sending messages", async () => {
     const channelName = "channel-1";
 
     const data = createRoot(dispose => {
-      const { onMessage: onMessage1, postMessage: postMessage1 } =
-        makeBroadcastChannel<MsgType>(channelName);
-      const { onMessage: onMessage2, postMessage: postMessage2 } =
-        makeBroadcastChannel<MsgType>(channelName);
+      const bc1 = makeBroadcastChannel<MsgType>(channelName);
+      const bc2 = makeBroadcastChannel<MsgType>(channelName);
 
-      return {
-        onMessage1,
-        onMessage2,
-        postMessage1,
-        postMessage2,
-        dispose,
-      };
+      return { bc1, bc2, dispose };
     });
 
     let posted_message = "";
 
-    data.onMessage1(({ data }) => {
+    data.bc1.onMessage(({ data }) => {
       posted_message += `${data}1`;
     });
-    data.onMessage2(({ data }) => {
+    data.bc2.onMessage(({ data }) => {
       posted_message += `${data}2`;
     });
 
-    data.postMessage1("hi");
-    data.postMessage2("bye");
+    data.bc1.postMessage("hi");
+    data.bc2.postMessage("bye");
 
     await new Promise<void>(r => setTimeout(r, 100));
 
