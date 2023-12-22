@@ -51,7 +51,7 @@
   "devDependencies": {
     "@types/leaflet": "^1.9.8",
     "leaflet": "^1.9.4",
-    "solid-js": "^1.8.6"
+    "solid-js": "^1.8.7"
   },
   "dependencies": {
     "@solid-primitives/static-store": "workspace:^",

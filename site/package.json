@@ -14,9 +14,9 @@
     "@tailwindcss/typography": "^0.5.10",
     "@types/mark.js": "^8.11.12",
     "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.31",
+    "postcss": "^8.4.32",
     "solid-start-static": "^0.3.10",
-    "tailwindcss": "^3.3.5",
+    "tailwindcss": "^3.4.0",
     "tailwindcss-dir": "^4.0.0"
   },
   "dependencies": {
@@ -36,7 +36,7 @@
     "@solid-primitives/scroll": "workspace:^",
     "@solid-primitives/tween": "workspace:^",
     "@solid-primitives/utils": "workspace:^",
-    "@solidjs/meta": "^0.29.1",
+    "@solidjs/meta": "^0.29.3",
     "@solidjs/router": "^0.8.4",
     "clsx": "^2.0.0",
     "fuse.js": "^7.0.0",
@@ -50,7 +50,7 @@
     "solid-icons": "^1.1.0",
     "solid-tippy": "^0.2.1",
     "tippy.js": "^6.3.7",
-    "undici": "^5.28.0",
+    "undici": "^5.28.2",
     "unified": "^11.0.4"
   },
   "engines": {
