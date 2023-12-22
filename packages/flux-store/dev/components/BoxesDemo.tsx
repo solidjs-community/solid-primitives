@@ -20,7 +20,7 @@ export const BoxesDemo = (props: BoxesDemoArgs) => {
     <>
       <div
         {...props}
-        class="min-h-80 flex w-80 flex-row flex-wrap justify-around gap-3"
+        class="flex min-h-80 w-80 flex-row flex-wrap justify-around gap-3"
         style={{
           ...((props.style as JSX.CSSProperties) || []),
         }}

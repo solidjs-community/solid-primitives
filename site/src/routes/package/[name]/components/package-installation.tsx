@@ -85,7 +85,7 @@ const CopyPackage: Component<{ type: PackageManagerType; packageName: string }> 
       <div
         class="xs:text-sm flex h-full flex-grow items-center
         overflow-auto whitespace-nowrap rounded-r-lg border border-l-0 border-[#99999a] px-3
-      pr-3 font-mono text-[13px] font-semibold text-gray-700 dark:text-gray-300 sm:text-base"
+      pr-3 font-mono text-[13px] font-semibold text-gray-700 sm:text-base dark:text-gray-300"
       >
         {PM_CONTENT[props.type].text(props.packageName)}
       </div>

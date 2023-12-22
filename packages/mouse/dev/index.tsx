@@ -44,7 +44,7 @@ const App: Component = () => {
       <Show when={showContainer()}>
         <div
           ref={setRef}
-          class="top-25vh left-25vw w-50vw h-50vh bg-opacity-15 border-1 fixed z-10 overflow-hidden rounded-3xl border-gray-400 border-opacity-40 bg-gray-300 backdrop-blur backdrop-filter"
+          class="top-25vh left-25vw w-50vw h-50vh border-1 fixed z-10 overflow-hidden rounded-3xl border-gray-400 border-opacity-40 bg-gray-300 bg-opacity-15 backdrop-blur backdrop-filter"
         >
           <div
             class="pointer-events-none h-24 w-24 rounded-full bg-amber-500 bg-opacity-80"
