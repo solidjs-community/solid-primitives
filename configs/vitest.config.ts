@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
         // https://github.com/solidjs/solid-refresh/issues/29
         hot: false,
         // For testing SSR we need to do a SSR JSX transform
-        solid: { generate: testSSR ? "ssr" : "dom" },
+        solid: { generate: testSSR ? "ssr" : "dom", omitNestedClosingTags: false },
       }),
     ],
     test: {
@@ -22,7 +22,6 @@ export default defineConfig(({ mode }) => {
       isolate: false,
       passWithNoTests: true,
       environment: testSSR ? "node" : "jsdom",
-      deps: { registerNodeLoader: false },
       transformMode: {
         web: [/\.[jt]sx$/],
       },
