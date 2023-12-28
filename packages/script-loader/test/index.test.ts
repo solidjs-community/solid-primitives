@@ -1,8 +1,10 @@
 // @vitest-environment node
 import { createRoot, createSignal } from "solid-js";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 import { createScriptLoader } from "../src/index.js";
 import { JSDOM } from "jsdom";
+
+vi.useFakeTimers();
 
 const dom = new JSDOM("<!doctype html><title>.</title>", {
   resources: "usable",
@@ -45,6 +47,7 @@ describe("createScriptLoader", () => {
   it("will create a script tag with src", () =>
     createRoot(dispose => {
       createScriptLoader({ src: "http://127.0.0.1:12345/script.js" });
+      vi.runAllTimers();
       const script = document.querySelector('script[src="http://127.0.0.1:12345/script.js"]');
       expect(script).toBeInstanceOf(window.HTMLScriptElement);
       dispose();
@@ -54,6 +57,7 @@ describe("createScriptLoader", () => {
     createRoot(dispose => {
       const src = "!(function(){ window.test = true; })();";
       const script = createRoot(() => createScriptLoader({ src }));
+      vi.runAllTimers();
       expect(script).toBeInstanceOf(window.HTMLScriptElement);
       expect(script?.textContent).toBe(src);
       dispose();
@@ -68,6 +72,7 @@ describe("createScriptLoader", () => {
           loadCalled = true;
         },
       });
+      vi.runAllTimers();
       dispatchAndWait(script, "load");
       expect(loadCalled).toBe(true);
       dispose();
@@ -83,6 +88,7 @@ describe("createScriptLoader", () => {
           errorCalled = true;
         },
       });
+      vi.runAllTimers();
       dispatchAndWait(script, "error");
       expect(errorCalled).toBe(true);
       dispose();
@@ -98,6 +104,7 @@ describe("createScriptLoader", () => {
           src: src,
           onLoad: () => setSrc("http://127.0.0.1:12345/script2.js"),
         });
+        vi.runAllTimers();
         actualSrcUrls.push(script?.src);
         await dispatchAndWait(script, "load");
         queueMicrotask(() => {
@@ -116,6 +123,7 @@ describe("createScriptLoader", () => {
   it("will automatically remove the script tag on disposal", async () => {
     const script = createRoot(dispose => {
       const script = createScriptLoader({ src: "http://127.0.0.1:12345/script.js" });
+      vi.runAllTimers();
       dispose();
       return script;
     });
@@ -127,6 +135,7 @@ describe("createScriptLoader", () => {
 
   it("will actually load a script", () =>
     new Promise<void>((resolve, reject) => {
+      vi.useRealTimers();
       createRoot(dispose => {
         const teardown = () => {
           try {

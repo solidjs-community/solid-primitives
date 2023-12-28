@@ -4,6 +4,8 @@ import { spread, isServer } from "solid-js/web";
 export type ScriptProps = Omit<ComponentProps<"script">, "src" | "textContent"> & {
   /** URL or source of the script to load. */
   src: string | Accessor<string>;
+  /** arbitrary data attributes commonly used by tracking scripts */
+  [dataAttribute: `data-${string}`]: any;
 };
 
 const OMITTED_PROPS = ["src"] as const;
@@ -31,7 +33,7 @@ export function createScriptLoader(props: ScriptProps): HTMLScriptElement | unde
   }
   const script = document.createElement("script");
   const [local, scriptProps] = splitProps(props, OMITTED_PROPS);
-  spread(script, scriptProps, false, true);
+  setTimeout(() => spread(script, scriptProps, false, true));
   createRenderEffect(() => {
     const src = typeof local.src === "string" ? local.src : local.src();
     const prop = /^(https?:|\w[\.\w-_%]+|)\//.test(src) ? "src" : "textContent";
