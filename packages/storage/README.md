@@ -35,9 +35,9 @@ type PersistedOptions<Type, StorageOptions> = {
   // key in the storage API
   name?: "...",
   // JSON.stringify is the default
-  serializer?: (value: Type) => value.toString(),
+  serialize?: (value: Type) => value.toString(),
   // JSON.parse is the default
-  deserializer?: (value: string) => Type(value),
+  deserialize?: (value: string) => Type(value),
 };
 ```
 
