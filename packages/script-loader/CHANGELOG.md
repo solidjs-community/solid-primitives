@@ -1,5 +1,11 @@
 # @solid-primitives/script-loader
 
+## 2.1.0
+
+### Minor Changes
+
+- 50c8ab8: fix attributes in hydration
+
 ## 2.0.2
 
 ### Patch Changes
