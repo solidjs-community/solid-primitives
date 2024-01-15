@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/script-loader",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Primitive to load scripts dynamically",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
