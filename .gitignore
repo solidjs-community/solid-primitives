@@ -151,6 +151,9 @@ dist/
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
+# vscode settings
+.vscode/settings.json
+
 # Temporary folders
 tmp/
 temp/
