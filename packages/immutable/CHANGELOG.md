@@ -1,5 +1,11 @@
 # @solid-primitives/immutable
 
+## 1.0.5
+
+### Patch Changes
+
+- 13cf989: Support storing other class instances than plain objects.
+
 ## 1.0.4
 
 ### Patch Changes
