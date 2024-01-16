@@ -1,5 +1,11 @@
 # @solid-primitives/tween
 
+## 1.2.7
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 1.2.6
 
 ### Patch Changes

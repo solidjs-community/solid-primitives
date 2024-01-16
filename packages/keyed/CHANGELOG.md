@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.2.1
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 1.2.0
 
 ### Minor Changes

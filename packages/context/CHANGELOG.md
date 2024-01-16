@@ -1,5 +1,11 @@
 # @solid-primitives/context
 
+## 0.2.2
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 0.2.1
 
 ### Patch Changes

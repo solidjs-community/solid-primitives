@@ -1,5 +1,11 @@
 # @solid-primitives/fetch
 
+## 2.4.8
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 2.4.7
 
 ### Patch Changes

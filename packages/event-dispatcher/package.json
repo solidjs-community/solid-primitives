@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/event-dispatcher",
-  "version": "0.0.105",
+  "version": "0.0.106",
   "description": "A primitive to dispatch component events.",
   "author": "Aylo Srd <aylo.srd@gmail.com>",
   "contributors": [],

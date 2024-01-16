@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/pointer",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "description": "A collection of primitives, giving you a nicer API to handle pointer events in a reactive context.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",

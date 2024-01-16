@@ -1,5 +1,13 @@
 # @solid-primitives/refs
 
+## 1.0.6
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/utils@6.2.2
+
 ## 1.0.5
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/marker",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A reactive primitive for marking matching parts of a string.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],

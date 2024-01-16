@@ -1,5 +1,11 @@
 # @solid-primitives/share
 
+## 2.0.5
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 2.0.4
 
 ### Patch Changes

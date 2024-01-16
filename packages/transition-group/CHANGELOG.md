@@ -1,5 +1,11 @@
 # @solid-primitives/transition-group
 
+## 1.0.4
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 1.0.3
 
 ### Patch Changes

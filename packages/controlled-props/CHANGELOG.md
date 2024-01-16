@@ -1,5 +1,13 @@
 # @solid-primitives/controlled-props
 
+## 0.0.13
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/utils@6.2.2
+
 ## 0.0.12
 
 ### Patch Changes

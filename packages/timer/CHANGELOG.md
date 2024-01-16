@@ -1,5 +1,11 @@
 # @solid-primitives/timer
 
+## 1.3.8
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 1.3.7
 
 ### Patch Changes

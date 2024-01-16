@@ -1,5 +1,11 @@
 # @solid-primitives/selection
 
+## 0.0.7
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 0.0.6
 
 ### Patch Changes

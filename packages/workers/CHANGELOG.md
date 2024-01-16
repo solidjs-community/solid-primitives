@@ -1,5 +1,11 @@
 # @solid-primitives/workers
 
+## 0.2.6
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 0.2.5
 
 ### Patch Changes

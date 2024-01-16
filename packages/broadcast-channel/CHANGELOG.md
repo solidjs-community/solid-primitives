@@ -1,5 +1,11 @@
 # @solid-primitives/broadcast-channel
 
+## 0.0.104
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 0.0.103
 
 ### Patch Changes

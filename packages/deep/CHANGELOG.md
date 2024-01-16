@@ -1,5 +1,13 @@
 # @solid-primitives/deep
 
+## 0.2.5
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/memo@1.3.6
+
 ## 0.2.4
 
 ### Patch Changes
