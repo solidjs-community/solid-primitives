@@ -15,7 +15,7 @@
   },
   "primitive": {
     "name": "immutable",
-    "stage": 0,
+    "stage": 1,
     "list": [
       "createImmutable"
     ],
