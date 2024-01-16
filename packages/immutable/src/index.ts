@@ -15,7 +15,7 @@ import { $RAW, ReconcileOptions } from "solid-js/store";
 import { trueFn, arrayEquals, noop } from "@solid-primitives/utils";
 import { keyArray } from "@solid-primitives/keyed";
 
-export type ImmutablePrimitive = string | number | boolean | null | undefined;
+export type ImmutablePrimitive = string | number | boolean | null | undefined | object;
 export type ImmutableObject = { [key: string]: ImmutableValue };
 export type ImmutableArray = ImmutableValue[];
 export type ImmutableValue = ImmutablePrimitive | ImmutableObject | ImmutableArray;
@@ -28,7 +28,8 @@ type Config = {
 const $NO_KEY = Symbol("no-key");
 const ARRAY_EQUALS_OPTIONS = { equals: arrayEquals };
 
-const isObject = (v: unknown): v is Record<PropertyKey, any> => !!v && typeof v === "object";
+const isWrappable = (v: unknown): v is Record<PropertyKey, any> =>
+  !!v && (v.constructor === Object || Array.isArray(v));
 
 abstract class CommonTraps<T extends ImmutableObject | ImmutableArray> implements ProxyHandler<T> {
   o = getOwner()!;
@@ -98,7 +99,7 @@ class ObjectTraps extends CommonTraps<ImmutableObject> implements ProxyHandler<I
         () => {
           const v = valueAccessor();
           // memoize property access if it is an object limit traversal to one level
-          if (!memo && isObject(v)) {
+          if (!memo && isWrappable(v)) {
             runWithOwner(this.o, () => (valueAccessor = createMemo(valueAccessor)));
             memo = true;
             return valueAccessor();
@@ -114,7 +115,7 @@ class ObjectTraps extends CommonTraps<ImmutableObject> implements ProxyHandler<I
 }
 
 const getArrayItemKey = (item: unknown, index: number, { key, merge }: Config) =>
-  isObject(item) && key in item ? item[key as never] : merge ? index : item;
+  isWrappable(item) && key in item ? item[key as never] : merge ? index : item;
 
 class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<ImmutableArray> {
   #trackLength!: Accessor<number>;
@@ -178,14 +179,14 @@ class PropertyWrapper {
   #calc(): ImmutableValue {
     const v = this.s() as any;
 
-    if (!isObject(v)) {
+    if (!isWrappable(v)) {
       this.#lastId = undefined;
       this.#dispose();
       return (this.#prev = v);
     }
 
     const id = v[this.c.key];
-    if (id === this.#lastId && isObject(this.#prev)) return this.#prev;
+    if (id === this.#lastId && isWrappable(this.#prev)) return this.#prev;
 
     this.#lastId = id;
     this.#dispose();

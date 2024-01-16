@@ -162,4 +162,15 @@ describe("createImmutable", () => {
       expect(store.value).toBe(undefined);
     });
   });
+
+  test("Classes should be treated as primitives", () => {
+    class Test {
+      constructor(public value: string) {}
+    }
+    const [data, setData] = createSignal({ value: new Test("a") });
+    const store = createRoot(() => createImmutable(data));
+    expect(store.value).toBe(data().value);
+    setData({ value: new Test("b") });
+    expect(store.value).toBe(data().value);
+  });
 });
