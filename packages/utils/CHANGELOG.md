@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 6.2.2
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 6.2.1
 
 ### Patch Changes

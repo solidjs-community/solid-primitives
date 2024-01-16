@@ -1,5 +1,11 @@
 # @solid-primitives/permission
 
+## 1.2.5
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 1.2.4
 
 ### Patch Changes

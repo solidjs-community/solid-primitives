@@ -1,5 +1,14 @@
 # @solid-primitives/memo
 
+## 1.3.6
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/scheduled@1.4.2
+  - @solid-primitives/utils@6.2.2
+
 ## 1.3.5
 
 ### Patch Changes

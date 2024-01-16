@@ -1,5 +1,11 @@
 # @solid-primitives/i18n
 
+## 2.0.1
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 2.0.0
 
 ### Major Changes

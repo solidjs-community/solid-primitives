@@ -1,5 +1,11 @@
 # @solid-primitives/script-loader
 
+## 2.1.1
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 2.1.0
 
 ### Minor Changes

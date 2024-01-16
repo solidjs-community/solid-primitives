@@ -1,5 +1,14 @@
 # @solid-primitives/audio
 
+## 1.3.15
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/static-store@0.0.6
+  - @solid-primitives/utils@6.2.2
+
 ## 1.3.14
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @solid-primitives/storage
 
+## 2.1.2
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/utils@6.2.2
+
 ## 2.1.1
 
 ### Patch Changes

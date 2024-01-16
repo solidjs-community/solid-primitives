@@ -1,5 +1,13 @@
 # @solid-primitives/signal-builders
 
+## 0.1.15
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/utils@6.2.2
+
 ## 0.1.14
 
 ### Patch Changes

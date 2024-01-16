@@ -1,5 +1,15 @@
 # @solid-primitives/date
 
+## 2.0.19
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/memo@1.3.6
+  - @solid-primitives/timer@1.3.8
+  - @solid-primitives/utils@6.2.2
+
 ## 2.0.18
 
 ### Patch Changes

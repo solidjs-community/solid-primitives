@@ -1,5 +1,15 @@
 # @solid-primitives/connectivity
 
+## 0.3.18
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/event-listener@2.3.1
+  - @solid-primitives/rootless@1.4.3
+  - @solid-primitives/utils@6.2.2
+
 ## 0.3.17
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @solid-primitives/flux-store
 
+## 0.0.3
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 0.0.2
 
 ### Patch Changes

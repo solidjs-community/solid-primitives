@@ -1,5 +1,13 @@
 # @solid-primitives/set
 
+## 0.4.9
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/trigger@1.0.9
+
 ## 0.4.8
 
 ### Patch Changes

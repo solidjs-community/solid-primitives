@@ -1,5 +1,11 @@
 # @solid-primitives/gestures
 
+## 1.1.6
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 1.1.5
 
 ### Patch Changes

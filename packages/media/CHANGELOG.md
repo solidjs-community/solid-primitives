@@ -1,5 +1,16 @@
 # @solid-primitives/media
 
+## 2.2.6
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/event-listener@2.3.1
+  - @solid-primitives/rootless@1.4.3
+  - @solid-primitives/static-store@0.0.6
+  - @solid-primitives/utils@6.2.2
+
 ## 2.2.5
 
 ### Patch Changes
