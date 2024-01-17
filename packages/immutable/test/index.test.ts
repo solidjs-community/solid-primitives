@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createRoot, createSignal } from "solid-js";
+import { createMemo, createRoot, createSignal } from "solid-js";
 import { createImmutable } from "../src/index.js";
 import { unwrap } from "solid-js/store";
 
@@ -172,5 +172,16 @@ describe("createImmutable", () => {
     expect(store.value).toBe(data().value);
     setData({ value: new Test("b") });
     expect(store.value).toBe(data().value);
+  });
+
+  test("Array.join()", () => {
+    const [data, setData] = createSignal(["a", "b"]);
+    const joined = createRoot(() => {
+      const store = createImmutable(data);
+      return createMemo(() => store.join(","));
+    });
+    expect(joined()).toBe("a,b");
+    setData(["b", "a"]);
+    expect(joined()).toBe("b,a");
   });
 });

@@ -114,9 +114,6 @@ class ObjectTraps extends CommonTraps<ImmutableObject> implements ProxyHandler<I
   }
 }
 
-const getArrayItemKey = (item: unknown, index: number, { key, merge }: Config) =>
-  isWrappable(item) && key in item ? item[key as never] : merge ? index : item;
-
 class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<ImmutableArray> {
   #trackLength!: Accessor<number>;
 
@@ -128,7 +125,14 @@ class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<Imm
     this.#trackItems = createMemo(
       keyArray(
         source,
-        (item, index) => getArrayItemKey(item, index, config),
+        (item, index) =>
+          isWrappable(item)
+            ? config.key in item
+              ? item[config.key as never]
+              : config.merge
+                ? index
+                : item
+            : index,
         item => new PropertyWrapper(item, getOwner()!, config),
       ),
       [],
@@ -138,7 +142,7 @@ class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<Imm
     this.#trackLength = createMemo(() => this.#trackItems().length, 0);
   }
 
-  get(target: ImmutableArray, property: PropertyKey, receiver: unknown) {
+  get(_: ImmutableArray, property: PropertyKey, receiver: unknown) {
     if (property === $RAW) return untrack(this.s);
     if (property === $PROXY) return receiver;
     if (property === $TRACK) return this.#trackItems(), receiver;
@@ -150,16 +154,16 @@ class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<Imm
 
     if (property in Array.prototype) return Array.prototype[property as any].bind(receiver);
 
-    if (typeof property === "string") {
-      const num = Number(property);
-      if (isNaN(num)) return this.s()[property as any];
-      property = num;
-    }
+    const num = typeof property === "string" ? parseInt(property) : property;
 
-    if (property >= untrack(this.#trackLength))
-      return this.#trackLength(), this.s()[property as any];
+    // invalid index - treat as obj property
+    if (!Number.isInteger(num) || num < 0) return this.s()[property as any];
 
-    return untrack(this.#trackItems)[property]?.get();
+    // out of bounds
+    if (num >= untrack(this.#trackLength)) return this.#trackLength(), this.s()[num];
+
+    // valid index
+    return untrack(this.#trackItems)[num]?.get();
   }
 }
 
@@ -232,13 +236,13 @@ const wrap = (
  * // logs 2 3
  * ```
  */
-export function createImmutable<T extends ImmutableObject | ImmutableArray>(
+export function createImmutable<T extends object>(
   source: Accessor<T>,
   options: ReconcileOptions = {},
 ): T {
   const memo = createMemo(source);
   return untrack(() =>
-    wrap(memo(), memo, {
+    wrap(memo() as any, memo, {
       key: options.key === null ? $NO_KEY : options.key ?? "id",
       merge: options.merge,
     }),
