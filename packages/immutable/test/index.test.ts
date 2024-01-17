@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createMemo, createRoot, createSignal } from "solid-js";
-import { createImmutable } from "../src/index.js";
 import { unwrap } from "solid-js/store";
+import { createImmutable } from "../src/index.js";
 
 describe("createImmutable", () => {
   test("Reconcile a simple object", () => {
@@ -183,5 +183,14 @@ describe("createImmutable", () => {
     expect(joined()).toBe("a,b");
     setData(["b", "a"]);
     expect(joined()).toBe("b,a");
+  });
+
+  test("Correct .length property descriptor", () => {
+    /*
+    toEqual checks the not only the value but also the property descriptors
+    it should be the same as of normal array
+    */
+    const store = createRoot(() => createImmutable(() => ["a", "b"]));
+    expect(store).toEqual(["a", "b"]);
   });
 });

@@ -57,15 +57,30 @@ abstract class CommonTraps<T extends ImmutableObject | ImmutableArray> implement
 
     return this.#trackKeys ? this.#trackKeys() : Reflect.ownKeys(this.s());
   }
+
   abstract get(target: T, property: PropertyKey, receiver: unknown): unknown;
+
   getOwnPropertyDescriptor(target: T, property: PropertyKey): PropertyDescriptor | undefined {
-    return this.has(target, property)
-      ? {
-          enumerable: true,
-          get: () => this.get(target, property, this),
-          configurable: true,
-        }
-      : undefined;
+    let desc = Reflect.getOwnPropertyDescriptor(target, property) as any;
+
+    if (desc) {
+      if (desc.get) {
+        desc.get = this.get.bind(this, target, property, this);
+        delete desc.writable;
+      } else {
+        desc.value = this.get(target, property, this);
+      }
+    } else {
+      desc = this.has(target, property)
+        ? {
+            enumerable: true,
+            configurable: true,
+            get: this.get.bind(this, target, property, this),
+          }
+        : undefined;
+    }
+
+    return desc;
   }
   set = trueFn;
   deleteProperty = trueFn;
@@ -88,10 +103,10 @@ class ObjectTraps extends CommonTraps<ImmutableObject> implements ProxyHandler<I
     if (cached) return cached.get();
 
     let valueAccessor = () => {
-        const source = this.s() as unknown;
-        return source ? source[property as never] : undefined;
-      },
-      memo = false;
+      const source = this.s() as unknown;
+      return source ? source[property as never] : undefined;
+    };
+    let memo = false;
 
     this.#cache.set(
       property,
@@ -163,7 +178,7 @@ class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<Imm
     if (num >= untrack(this.#trackLength)) return this.#trackLength(), this.s()[num];
 
     // valid index
-    return untrack(this.#trackItems)[num]?.get();
+    return untrack(this.#trackItems)[num]!.get();
   }
 }
 
@@ -212,10 +227,9 @@ const wrap = (
   source: Accessor<ImmutableValue>,
   config: Config,
 ): ImmutableObject | ImmutableArray =>
-  new Proxy(
-    initialValue.constructor(),
-    new (Array.isArray(initialValue) ? ArrayTraps : ObjectTraps)(source as any, config),
-  );
+  Array.isArray(initialValue)
+    ? new Proxy([], new ArrayTraps(source as any, config))
+    : new Proxy({}, new ObjectTraps(source as any, config));
 
 /**
  * Creates a deeply nested reactive object derived from the given immutable source. The source can be any signal that is updated in an immutable fashion.
