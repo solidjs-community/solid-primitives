@@ -1,5 +1,11 @@
 # @solid-primitives/immutable
 
+## 1.0.6
+
+### Patch Changes
+
+- 1696655: Loosen createImmutable types. Fix tracking array indexes.
+
 ## 1.0.5
 
 ### Patch Changes
