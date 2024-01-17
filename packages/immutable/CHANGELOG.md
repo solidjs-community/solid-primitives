@@ -1,5 +1,11 @@
 # @solid-primitives/immutable
 
+## 1.0.7
+
+### Patch Changes
+
+- a632588: Correct getOwnPropertyDescriptor trap
+
 ## 1.0.6
 
 ### Patch Changes
