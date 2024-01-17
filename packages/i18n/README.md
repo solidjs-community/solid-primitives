@@ -213,7 +213,7 @@ t2("hello", { name: "John" }); // => 'hello John!'
 
 Splitting the dictionary into multiple modules can be useful when you have a large dictionary and want to avoid loading the entire dictionary at once.
 
-For example if out app had a separate `login` and `dashboard` modules, we could split the dictionary into 3 modules: (`common`, `login` and `dashboard`).
+For example if our app had a separate `login` and `dashboard` modules, we could split the dictionary into 3 modules: (`common`, `login` and `dashboard`).
 
 ```
 i18n/
