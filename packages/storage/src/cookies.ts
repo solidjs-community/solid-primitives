@@ -134,6 +134,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
     const oldValue = isServer ? cookieStorage.getItem(key, options) : null;
     cookieStorage._write(key, value, options);
     if (!isServer) {
+      // This will not be needed anymore after fully switching to makePersistent which handles this on its own
       // Storage events are only required on client when using multiple tabs
       const storageEvent = Object.assign(new Event("storage"), {
         key,

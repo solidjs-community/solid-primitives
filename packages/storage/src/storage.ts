@@ -55,9 +55,57 @@ export function createStorage<O>(
   setter: StorageSetter<string, O>,
   actions: StorageActions<string>,
 ];
+/**
+ * like createStore, but bound to a localStorage-like API
+ * ```typescript
+ * type StorageWithOptions<O> = Storage; // but with options added to setItem
+ * type StorageProps<T extends string, O> = {
+ *   api?: Storage | StorageWithOptions;
+ *   // or an array thereof, default will be localStorage
+ *   deserializer?: (value: string, key: string, options?: O) => T;
+ *   serializer?: (value: T, key: string, options?: O) => string;
+ *   options?: O; // options
+ *   prefix?: string // will be prefixed to the key
+ * };
+ * createStorage(props?: StorageProps) => [
+ *   store: StorageObject<T>, // basically like `Store<T>`
+ *   setter: StorageSetter<T>, // like `setStoreFunction<T>`
+ *   actions: {
+ *     remove: (key: string) => void;
+ *     clear: () => void;
+ *     toJSON: () => { [key: string]: T };
+ *   }
+ * ]
+ * ```
+ * @deprecated in favor of makePersisted
+ */
 export function createStorage<O, T>(
   props?: AnyStorageProps<Storage | StorageWithOptions<O>, O, T>,
 ): [store: StorageObject<T>, setter: StorageSetter<T, O>, actions: StorageActions<T>];
+/**
+ * like createStore, but bound to a localStorage-like API
+ * ```typescript
+ * type StorageWithOptions<O> = Storage; // but with options added to setItem
+ * type StorageProps<T extends string, O> = {
+ *   api?: Storage | StorageWithOptions;
+ *   // or an array thereof, default will be localStorage
+ *   deserializer?: (value: string, key: string, options?: O) => T;
+ *   serializer?: (value: T, key: string, options?: O) => string;
+ *   options?: O; // options
+ *   prefix?: string // will be prefixed to the key
+ * };
+ * createStorage(props?: StorageProps) => [
+ *   store: StorageObject<T>, // basically like `Store<T>`
+ *   setter: StorageSetter<T>, // like `setStoreFunction<T>`
+ *   actions: {
+ *     remove: (key: string) => void;
+ *     clear: () => void;
+ *     toJSON: () => { [key: string]: T };
+ *   }
+ * ]
+ * ```
+ * @deprecated in favor of makePersisted
+ */
 export function createStorage<O, T>(
   props?: StorageProps<T, Storage | StorageWithOptions<O>, O>,
 ): [store: StorageObject<T>, setter: StorageSetter<T, O>, actions: StorageActions<T>] {
@@ -250,6 +298,31 @@ export function createAsyncStorage<O>(
   setter: AsyncStorageSetter<string, O>,
   actions: AsyncStorageActions<string>,
 ];
+/**
+ * like createStore, but bound to an asynchronous localStorage-like API
+ * ```typescript
+ * type AsyncStorage = Storage // but returns everything wrapped in Promises
+ * type AsyncStorageWithOptions<O> = Storage; // but with options added to setItem
+ * type AsyncStorageProps<T extends string, O> = {
+ *   api?: AsyncStorage | AsyncStorageWithOptions;
+ *   // or an array thereof, default will be localStorage
+ *   deserializer?: (value: string, key: string, options?: O) => T;
+ *   serializer?: (value: T, key: string, options?: O) => string;
+ *   options?: O; // options
+ *   prefix?: string // will be prefixed to the key
+ * };
+ * createStorage(props?: AsyncStorageProps) => [
+ *   store: AsyncStorageObject<T>, // basically like `Store<T>`
+ *   setter: AsyncStorageSetter<T>, // like `setStoreFunction<T>`
+ *   actions: {
+ *     remove: (key: string) => Promise<void>;
+ *     clear: () => Promise<void>;
+ *     toJSON: () => Promise<{ [key: string]: T }>;
+ *   }
+ * ]
+ * ```
+ * @deprecated in favor of makePersisted
+ */
 export function createAsyncStorage<O, T>(
   props?: AnyStorageProps<T, AsyncStorage | AsyncStorageWithOptions<O>, O>,
 ): [
@@ -257,6 +330,31 @@ export function createAsyncStorage<O, T>(
   setter: AsyncStorageSetter<T, O>,
   actions: AsyncStorageActions<T>,
 ];
+/**
+ * like createStore, but bound to an asynchronous localStorage-like API
+ * ```typescript
+ * type AsyncStorage = Storage // but returns everything wrapped in Promises
+ * type AsyncStorageWithOptions<O> = Storage; // but with options added to setItem
+ * type AsyncStorageProps<T extends string, O> = {
+ *   api?: AsyncStorage | AsyncStorageWithOptions;
+ *   // or an array thereof, default will be localStorage
+ *   deserializer?: (value: string, key: string, options?: O) => T;
+ *   serializer?: (value: T, key: string, options?: O) => string;
+ *   options?: O; // options
+ *   prefix?: string // will be prefixed to the key
+ * };
+ * createStorage(props?: AsyncStorageProps) => [
+ *   store: AsyncStorageObject<T>, // basically like `Store<T>`
+ *   setter: AsyncStorageSetter<T>, // like `setStoreFunction<T>`
+ *   actions: {
+ *     remove: (key: string) => Promise<void>;
+ *     clear: () => Promise<void>;
+ *     toJSON: () => Promise<{ [key: string]: T }>;
+ *   }
+ * ]
+ * ```
+ * @deprecated in favor of makePersisted
+ */
 export function createAsyncStorage<O, T>(
   props?: StorageProps<T, AsyncStorage | AsyncStorageWithOptions<O>, O>,
 ): [

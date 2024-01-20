@@ -17,3 +17,11 @@ export const addClearMethod = <S extends Storage | StorageWithOptions<any>>(
   };
   return storage as S;
 };
+
+/**
+ * Generates a broadcast name which can be used for syncing storage change events between windows and tabs base on the `name`
+ * @param name Name of the storage item to be synced
+ */
+export const getSyncBroadcastName = (name: string) => {
+  return "storage-sync-" + name.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
+}
