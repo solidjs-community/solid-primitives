@@ -117,7 +117,7 @@ export const withCatchAll: RequestModifier = () => requestContext => {
   ] as typeof originalResource;
 };
 
-const defaultWait = (attempt: number) => Math.max(1000 << attempt, 30000);
+const defaultWait = (attempt: number) => Math.max((1000 << attempt), 30000);
 
 /**
  * Retries the request if it failed
