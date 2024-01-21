@@ -26,10 +26,10 @@ export function createEventDispatcher<Props>(props: Props): <
     ? // this will handle typing for callbacks with optional payloads like (e.g. onMyEvent: (evt?: CustomEvent<string> => void))
       [eventName: N, payload?: D | undefined, dispatcherOptions?: DispatcherOptions]
     : Handlers<Props>[N] extends undefined | ((evt: CustomEvent<infer D>) => any)
-      ? // this will handle typing where the payload is not nullable (e.g. onMyEvent: (evt: CustomEvent<string> => void))
-        [eventName: N, payload: D, dispatcherOptions?: DispatcherOptions]
-      : // this will handle callbacks with no arguments (e.g. onMyEvent: () => void)
-        [eventName: N, payload?: any, dispatcherOptions?: DispatcherOptions]
+    ? // this will handle typing where the payload is not nullable (e.g. onMyEvent: (evt: CustomEvent<string> => void))
+      [eventName: N, payload: D, dispatcherOptions?: DispatcherOptions]
+    : // this will handle callbacks with no arguments (e.g. onMyEvent: () => void)
+      [eventName: N, payload?: any, dispatcherOptions?: DispatcherOptions]
 ) => boolean {
   if (isServer) {
     return () => false;
@@ -41,10 +41,10 @@ export function createEventDispatcher<Props>(props: Props): <
       ? // this will handle typing for callbacks with optional payloads like (e.g. onMyEvent: (evt?: CustomEvent<string> => void))
         [eventName: N, payload?: D | undefined, dispatcherOptions?: DispatcherOptions]
       : Handlers<Props>[N] extends undefined | ((evt: CustomEvent<infer D>) => any)
-        ? // this will handle typing where the payload is not nullable (e.g. onMyEvent: (evt: CustomEvent<string> => void))
-          [eventName: N, payload: D, dispatcherOptions?: DispatcherOptions]
-        : // this will handle callbacks with no arguments (e.g. onMyEvent: () => void)
-          [eventName: N, payload?: any, dispatcherOptions?: DispatcherOptions]
+      ? // this will handle typing where the payload is not nullable (e.g. onMyEvent: (evt: CustomEvent<string> => void))
+        [eventName: N, payload: D, dispatcherOptions?: DispatcherOptions]
+      : // this will handle callbacks with no arguments (e.g. onMyEvent: () => void)
+        [eventName: N, payload?: any, dispatcherOptions?: DispatcherOptions]
   ): boolean {
     const [eventName, detail, { cancelable = false } = {}] = args;
     const propName = `${"on"}${eventName[0]!.toUpperCase()}${eventName.slice(1)}` as keyof Props;

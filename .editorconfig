@@ -6,3 +6,6 @@ indent_size = 2
 end_of_line = LF
 charset = utf-8
 insert_final_newline = true
+trim_trailing_whitespace = true
+ij_typescript_spaces_within_imports = true
+ij_javascript_spaces_within_imports = true

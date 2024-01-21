@@ -42,8 +42,8 @@ function serializeCookieOptions(options?: CookieOptions) {
       value instanceof Date
         ? `; ${key}=${value.toUTCString()}`
         : typeof value === "boolean"
-          ? `; ${key}`
-          : `; ${key}=${value}`;
+        ? `; ${key}`
+        : `; ${key}=${value}`;
   }
   return memo;
 }

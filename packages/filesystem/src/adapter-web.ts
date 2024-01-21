@@ -72,8 +72,8 @@ const _makeWebAccessFileSystem = async (
         index < parts.length - 1
           ? getNext(handle, part)
           : handle.kind === "directory"
-            ? handle.getFileHandle(part)
-            : undefined,
+          ? handle.getFileHandle(part)
+          : undefined,
       ).then(handle =>
         handle?.kind === "file"
           ? handle.getFile().then(file => file.text())
@@ -84,23 +84,23 @@ const _makeWebAccessFileSystem = async (
         index < parts.length - 1
           ? getNext(handle, part)
           : handle.kind === "directory"
-            ? handle.getFileHandle(part, { create: true }).then(fileHandle =>
-                fileHandle
-                  .createWritable()
-                  .then(writable => writable.write(data).then(() => writable.close()))
-                  .then(() => fileHandle),
-              )
-            : Promise.reject(
-                new Error(`could not write file ${path}, since path is no parent directory`),
-              ),
+          ? handle.getFileHandle(part, { create: true }).then(fileHandle =>
+              fileHandle
+                .createWritable()
+                .then(writable => writable.write(data).then(() => writable.close()))
+                .then(() => fileHandle),
+            )
+          : Promise.reject(
+              new Error(`could not write file ${path}, since path is no parent directory`),
+            ),
       )),
     rm: async (path: string) =>
       void (await walk(path, (handle, part, index, parts) =>
         index < parts.length - 1
           ? getNext(handle, part)
           : handle.kind === "directory"
-            ? handle.removeEntry(part, { recursive: true })
-            : Promise.reject(new Error(`${path} not found; could not be removed`)),
+          ? handle.removeEntry(part, { recursive: true })
+          : Promise.reject(new Error(`${path} not found; could not be removed`)),
       )),
   };
 };

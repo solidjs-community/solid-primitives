@@ -86,10 +86,10 @@ export const anyMaskToFn = (mask: InputMask, regexps?: Record<string, RegExp>) =
   typeof mask === "function"
     ? mask
     : typeof mask[1] === "function" && mask[0] instanceof RegExp
-      ? regexMaskToFn(mask[0], mask[1])
-      : maskArrayToFn(
-          Array.isArray(mask) ? (mask as InputMaskArray) : stringMaskToArray(mask, regexps),
-        );
+    ? regexMaskToFn(mask[0], mask[1])
+    : maskArrayToFn(
+        Array.isArray(mask) ? (mask as InputMaskArray) : stringMaskToArray(mask, regexps),
+      );
 
 export interface EventLike {
   target: EventTarget | null;

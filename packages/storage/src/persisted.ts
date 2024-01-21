@@ -1,9 +1,9 @@
-import {Accessor, onCleanup, onMount, Setter, Signal} from "solid-js";
-import {createUniqueId, untrack} from "solid-js";
-import type {SetStoreFunction, Store} from "solid-js/store";
-import {reconcile} from "solid-js/store";
-import type {AsyncStorage, AsyncStorageWithOptions, StorageWithOptions} from "./types.js";
-import {getSyncBroadcastName} from "./tools.js";
+import { Accessor, onCleanup, onMount, Setter, Signal } from "solid-js";
+import { createUniqueId, untrack } from "solid-js";
+import type { SetStoreFunction, Store } from "solid-js/store";
+import { reconcile } from "solid-js/store";
+import type { AsyncStorage, AsyncStorageWithOptions, StorageWithOptions } from "./types.js";
+import { getSyncBroadcastName } from "./tools.js";
 
 export type PersistenceBaseOptions<T> = {
   /**
@@ -36,9 +36,9 @@ export type PersistenceBaseOptions<T> = {
 
 export type PersistenceOptions<T, O extends Record<string, any>> = PersistenceBaseOptions<T> &
   (
-    | { storage: StorageWithOptions<O> | AsyncStorageWithOptions<O>; storageOptions: O; }
+    | { storage: StorageWithOptions<O> | AsyncStorageWithOptions<O>; storageOptions: O }
     | { storage?: Storage | AsyncStorage }
-    );
+  );
 
 /**
  * Persists a signal, store or similar API
@@ -182,34 +182,36 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
   function fetchFromStorage() {
     const value = storage.getItem(name, storageOptions);
     if (value)
-      if (typeof value === "object" && "then" in value) // Check if value is a promise
+      if (typeof value === "object" && "then" in value)
+        // Check if value is a promise
         value.then(data => unchanged && data && set(data));
       else set(value);
   }
 
-  fetchFromStorage() // Initialize the underlying signal
+  fetchFromStorage(); // Initialize the underlying signal
 
-  let broadcastChannel: BroadcastChannel | undefined
+  let broadcastChannel: BroadcastChannel | undefined;
 
   if (options.sync)
     onMount(() => {
-      broadcastChannel = new BroadcastChannel(getSyncBroadcastName(name))
+      broadcastChannel = new BroadcastChannel(getSyncBroadcastName(name));
       broadcastChannel.onmessage = async (event: MessageEvent) => {
-        if (event.type !== "message" && event.isTrusted)
-          return
-        const message = event.data as SyncBroadcastMessage
-        if (message.__sync_broadcast_message && message.name === name)
-          fetchFromStorage() // Update the value, because it changed
-      }
+        if (event.type !== "message" && event.isTrusted) return;
+        const message = event.data as SyncBroadcastMessage;
+        if (message.__sync_broadcast_message && message.name === name) fetchFromStorage(); // Update the value, because it changed
+      };
       onCleanup(() => {
         const tmp = broadcastChannel;
-        broadcastChannel = undefined
-        tmp?.close()
-      })
-    })
+        broadcastChannel = undefined;
+        tmp?.close();
+      });
+    });
 
   function onChanged() {
-    broadcastChannel?.postMessage({__sync_broadcast_message: true, name: name} as SyncBroadcastMessage)
+    broadcastChannel?.postMessage({
+      __sync_broadcast_message: true,
+      name: name,
+    } as SyncBroadcastMessage);
     unchanged = false;
   }
 
@@ -217,23 +219,22 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
     signal[0],
     typeof signal[0] === "function"
       ? (value?: T | ((prev: T) => T)) => {
-        const output = (signal[1] as Setter<T>)(value as any);
+          const output = (signal[1] as Setter<T>)(value as any);
 
-        if (value) storage.setItem(name, serialize(output), storageOptions);
-        else storage.removeItem(name, storageOptions);
-        onChanged()
-        return output;
-      }
+          if (value) storage.setItem(name, serialize(output), storageOptions);
+          else storage.removeItem(name, storageOptions);
+          onChanged();
+          return output;
+        }
       : (...args: any[]) => {
-        (signal[1] as any)(...args);
-        const value = serialize(untrack(() => signal[0] as any));
-        // @ts-ignore
-        storage.setItem(name, value, storageOptions);
-        onChanged()
-      },
+          (signal[1] as any)(...args);
+          const value = serialize(untrack(() => signal[0] as any));
+          // @ts-ignore
+          storage.setItem(name, value, storageOptions);
+          onChanged();
+        },
   ] as typeof signal;
 }
-
 
 interface SyncBroadcastMessage {
   /**

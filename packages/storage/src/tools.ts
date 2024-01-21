@@ -24,4 +24,4 @@ export const addClearMethod = <S extends Storage | StorageWithOptions<any>>(
  */
 export const getSyncBroadcastName = (name: string) => {
   return "storage-sync-" + name.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
-}
+};

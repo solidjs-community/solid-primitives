@@ -14,8 +14,8 @@ type JoinPath<A, B> = A extends string | number
     ? `${A}.${B}`
     : A
   : B extends string | number
-    ? B
-    : "";
+  ? B
+  : "";
 
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void
   ? I
@@ -49,12 +49,12 @@ type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
 export type Flatten<T extends BaseDict, P = {}> = number extends T
   ? /* catch any */ BaseRecordDict
   : T extends (infer V)[]
-    ? /* array */ { readonly [K in JoinPath<P, number>]?: V } & (V extends BaseDict
-        ? Partial<Flatten<V, JoinPath<P, number>>>
-        : {})
-    : /* record */ UnionToIntersection<
-        { [K in keyof T]: T[K] extends BaseDict ? Flatten<T[K], JoinPath<P, K>> : never }[keyof T]
-      > & { readonly [K in keyof T as JoinPath<P, K>]: T[K] };
+  ? /* array */ { readonly [K in JoinPath<P, number>]?: V } & (V extends BaseDict
+      ? Partial<Flatten<V, JoinPath<P, number>>>
+      : {})
+  : /* record */ UnionToIntersection<
+      { [K in keyof T]: T[K] extends BaseDict ? Flatten<T[K], JoinPath<P, K>> : never }[keyof T]
+    > & { readonly [K in keyof T as JoinPath<P, K>]: T[K] };
 
 function visitDict(flat_dict: Record<string, unknown>, dict: BaseDict, path: string): void {
   for (const [key, value] of Object.entries(dict)) {
@@ -190,10 +190,10 @@ export type Resolved<T> = T extends (...args: any[]) => infer R ? R : T extends 
 export type ResolveArgs<T> = T extends (...args: infer A) => any
   ? A
   : T extends Template<infer R>
-    ? [args: R]
-    : T extends string
-      ? [args?: BaseTemplateArgs]
-      : [];
+  ? [args: R]
+  : T extends string
+  ? [args?: BaseTemplateArgs]
+  : [];
 
 export type Resolver<T> = (...args: ResolveArgs<T>) => Resolved<T>;
 

@@ -145,8 +145,8 @@ class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<Imm
             ? config.key in item
               ? item[config.key as never]
               : config.merge
-                ? index
-                : item
+              ? index
+              : item
             : index,
         item => new PropertyWrapper(item, getOwner()!, config),
       ),
