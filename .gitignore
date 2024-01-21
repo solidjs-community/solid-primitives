@@ -178,3 +178,7 @@ _temp_*
 
 # Local Netlify folder
 .netlify
+
+# JetBrains IDE's
+.idea
+.fleet
