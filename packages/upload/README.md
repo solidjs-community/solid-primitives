@@ -64,7 +64,6 @@ const { setRef: dropzoneRef, files: droppedFiles } = createDropzone({
     await doStuff(2);
     files.forEach(f => console.log(f));
   },
-  onDragStart: files => console.log("drag start")
   onDragStart: files => files.forEach(f => console.log(f)),
   onDragOver: files => console.log("drag over")
 });
