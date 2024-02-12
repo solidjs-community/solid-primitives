@@ -35,7 +35,7 @@ export const THead: ParentComponent = props => {
       </tr>
       <tr
         id="header-real-tr"
-        class="text-[#49494B] dark:text-[#dee2e5] [&>th:first-child]:sticky [&>th:first-child]:left-[2px] [&>th:first-child]:overflow-clip [&>th:first-child]:text-ellipsis [&>th:first-child]:rounded-tl-[26px] [&>th:last-child]:rounded-tr-[26px]"
+        class="[&>th:first-child]:z-1 text-[#49494B] dark:text-[#dee2e5] [&>th:first-child>span]:static [&>th:first-child>span]:px-0 [&>th:first-child]:sticky [&>th:first-child]:left-[2px] [&>th:first-child]:text-ellipsis [&>th:first-child]:rounded-tl-[26px] [&>th:last-child]:rounded-tr-[26px]"
       >
         {props.children}
       </tr>
@@ -45,8 +45,8 @@ export const THead: ParentComponent = props => {
 
 export const TH: ParentComponent = props => {
   return (
-    <th class="dark:bg-page-main-bg overflow-hidden text-ellipsis whitespace-nowrap bg-white px-[2px] py-1 text-[12px] sm:px-5 sm:text-sm md:text-base">
-      {props.children}
+    <th class="dark:bg-page-main-bg overflow-clip text-ellipsis whitespace-nowrap bg-white px-[2px] py-1 text-[12px] sm:px-5 sm:text-sm md:text-base">
+      <span class="sticky left-[116px] right-6 px-2">{props.children}</span>
     </th>
   );
 };
