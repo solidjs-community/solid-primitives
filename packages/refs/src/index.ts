@@ -2,8 +2,6 @@ import { chain, arrayEquals } from "@solid-primitives/utils";
 import { Accessor, children, createComputed, createMemo, JSX, onCleanup, untrack } from "solid-js";
 import { isServer } from "solid-js/web";
 
-export type { ResolvedChildren, ResolvedJSXElement } from "@solid-primitives/utils";
-
 /**
  * Type for the `ref` prop
  */
