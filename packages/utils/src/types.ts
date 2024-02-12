@@ -2,12 +2,6 @@ import type { Accessor, Setter } from "solid-js";
 
 export type { EffectOptions, OnOptions } from "solid-js";
 
-// export types that aren't exported by solid-js main module
-export type {
-  ResolvedJSXElement,
-  ResolvedChildren,
-} from "../node_modules/solid-js/types/reactive/signal.js";
-
 /**
  * Can be single or in an array
  */
