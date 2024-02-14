@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import * as i18n from "../src/index.js";
-import { en_dict } from "./setup.js";
+import { en_dict } from "./setup.jsx";
 
 describe("template", () => {
   test("identity template resolver", () => {
@@ -69,5 +69,8 @@ describe("chainedResolver", () => {
 
     const format_list = chained.data.formatList(["John", "Kate", "Tester"]);
     expect(format_list).toBe("John, Kate and Tester");
+
+    const jsx = chained.jsx("Tester");
+    expect(jsx).toBeInstanceOf(Object);
   });
 });
