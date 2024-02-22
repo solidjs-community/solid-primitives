@@ -21,21 +21,32 @@ export default function createTween<T extends number>(
     return target;
   }
 
-  const [start, setStart] = createSignal(performance.now());
   const [current, setCurrent] = createSignal<T>(target());
-  createEffect(on(target, () => setStart(performance.now()), { defer: true }));
-  createEffect(
-    on([start, current], () => {
-      const cancelId = requestAnimationFrame(t => {
-        const elapsed = t - (start() || 0) + 1;
-        // @ts-ignore
-        setCurrent(c =>
-          elapsed < duration ? (target() - c) * ease((elapsed / duration) as T) + c : target(),
-        );
-      });
-      onCleanup(() => cancelAnimationFrame(cancelId));
-    }),
-  );
+  let startValue = target();
+  let start = 0;
+  let cancelId: number;
+
+  function tick(t: number) {
+    const elapsed = t - start;
+
+    if (elapsed < duration) {
+      // @ts-ignore
+      setCurrent(startValue + ease(elapsed / duration) * (target() - startValue));
+      cancelId = requestAnimationFrame(tick);
+    }
+    else {
+      // @ts-ignore
+      setCurrent(target());
+    }
+  }
+
+  createEffect(on(target, () => {
+    start = performance.now();
+    startValue = current();
+    cancelId = requestAnimationFrame(tick);
+    onCleanup(() => cancelAnimationFrame(cancelId));
+  }, { defer: true }));
+
   return current;
 }
 
