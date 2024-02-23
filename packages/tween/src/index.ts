@@ -1,6 +1,11 @@
 import { createSignal, createEffect, onCleanup, on } from "solid-js";
 import { isServer } from "solid-js/web";
 
+type TweenProps = {
+  duration?: number,
+  ease?: (t: number) => number,
+}
+
 /**
  * Creates a simple tween method.
  *
@@ -13,15 +18,15 @@ import { isServer } from "solid-js/web";
  * const tweenedValue = createTween(myNumber, { duration: 500 });
  * ```
  */
-export default function createTween<T extends number>(
-  target: () => T,
-  { ease = (t: T) => t, duration = 100 },
-): () => T {
+export default function createTween(
+  target: () => number,
+  { ease = (t: number) => t, duration = 100 }: TweenProps,
+): () => number {
   if (isServer) {
     return target;
   }
 
-  const [current, setCurrent] = createSignal<T>(target());
+  const [current, setCurrent] = createSignal(target());
   let startValue = target();
   let start = 0;
   let delta: number;
@@ -31,12 +36,10 @@ export default function createTween<T extends number>(
     const elapsed = t - start;
 
     if (elapsed < duration) {
-      // @ts-ignore
       setCurrent(startValue + ease(elapsed / duration) * delta);
       cancelId = requestAnimationFrame(tick);
     }
     else {
-      // @ts-ignore
       setCurrent(target());
     }
   }
