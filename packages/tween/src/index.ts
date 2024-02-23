@@ -15,7 +15,16 @@ type TweenProps = {
  *
  * @example
  * ```ts
- * const tweenedValue = createTween(myNumber, { duration: 500 });
+ * const [value, setValue] = createSignal(100);
+ * const tweenedValue = createTween(value, {
+ *   duration: 500,
+ *   ease: (t) => 0.5 - Math.cos(Math.PI * t) / 2
+ * });
+ * ```
+ * ```jsx
+ * <button onClick={() => setValue(value() === 0 ? 100 : 0)}>
+ *   {Math.round(tweenedValue())}
+ * </button>
  * ```
  */
 export default function createTween(
