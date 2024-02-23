@@ -2,7 +2,8 @@ import { chain, arrayEquals } from "@solid-primitives/utils";
 import { Accessor, children, createComputed, createMemo, JSX, onCleanup, untrack } from "solid-js";
 import { isServer } from "solid-js/web";
 
-export type { ResolvedChildren, ResolvedJSXElement } from "@solid-primitives/utils";
+// TODO delete in next major version
+export type { ResolvedChildren, ResolvedJSXElement } from "solid-js/types/reactive/signal.js";
 
 /**
  * Type for the `ref` prop
