@@ -2,7 +2,7 @@ import type { Accessor, Setter } from "solid-js";
 
 export type { EffectOptions, OnOptions } from "solid-js";
 
-// export types can be deleted in the next major
+// TODO delete in next major version
 export type {
   ResolvedJSXElement,
   ResolvedChildren,
