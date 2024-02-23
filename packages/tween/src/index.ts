@@ -27,8 +27,8 @@ export default function createTween(
   }
 
   const [current, setCurrent] = createSignal(target());
-  let startValue = target();
-  let start = 0;
+  let start: number;
+  let startValue: number;
   let delta: number;
   let cancelId: number;
 
