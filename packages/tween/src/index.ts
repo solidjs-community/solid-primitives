@@ -24,6 +24,7 @@ export default function createTween<T extends number>(
   const [current, setCurrent] = createSignal<T>(target());
   let startValue = target();
   let start = 0;
+  let delta: number;
   let cancelId: number;
 
   function tick(t: number) {
@@ -31,7 +32,7 @@ export default function createTween<T extends number>(
 
     if (elapsed < duration) {
       // @ts-ignore
-      setCurrent(startValue + ease(elapsed / duration) * (target() - startValue));
+      setCurrent(startValue + ease(elapsed / duration) * delta);
       cancelId = requestAnimationFrame(tick);
     }
     else {
@@ -43,6 +44,7 @@ export default function createTween<T extends number>(
   createEffect(on(target, () => {
     start = performance.now();
     startValue = current();
+    delta = target() - startValue;
     cancelId = requestAnimationFrame(tick);
     onCleanup(() => cancelAnimationFrame(cancelId));
   }, { defer: true }));
