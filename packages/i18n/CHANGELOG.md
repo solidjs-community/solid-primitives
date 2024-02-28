@@ -1,5 +1,11 @@
 # @solid-primitives/i18n
 
+## 2.1.0
+
+### Minor Changes
+
+- 0e684b5: Add support for Generic Template Resolvers
+
 ## 2.0.1
 
 ### Patch Changes

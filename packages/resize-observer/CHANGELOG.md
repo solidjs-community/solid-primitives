@@ -1,5 +1,15 @@
 # @solid-primitives/resize-observer
 
+## 2.0.24
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+  - @solid-primitives/event-listener@2.3.2
+  - @solid-primitives/rootless@1.4.4
+  - @solid-primitives/static-store@0.0.7
+
 ## 2.0.23
 
 ### Patch Changes

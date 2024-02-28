@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/connectivity",
-  "version": "0.3.18",
+  "version": "0.3.19",
   "description": "A navigator.onLine signal.",
   "author": "Klemen Slavič <krof.drakula@gmail.com>",
   "contributors": [

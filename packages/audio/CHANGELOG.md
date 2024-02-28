@@ -1,5 +1,13 @@
 # @solid-primitives/audio
 
+## 1.3.16
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+  - @solid-primitives/static-store@0.0.7
+
 ## 1.3.15
 
 ### Patch Changes
