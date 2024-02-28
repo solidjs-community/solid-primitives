@@ -1,5 +1,13 @@
 # @solid-primitives/jsx-tokenizer
 
+## 1.0.9
+
+### Patch Changes
+
+- 48d44c0: Remove unused type exports in utils (`ResolvedJSXElement` and `ResolvedChildren`)
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+
 ## 1.0.8
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/i18n",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Library of primitives for providing internationalization support.",
   "author": "Alexandre Mouton-Brady <amoutonbrady@gmail.com>",
   "contributors": [
