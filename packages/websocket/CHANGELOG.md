@@ -1,5 +1,11 @@
 # @solid-primitives/websocket
 
+## 1.2.2
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 1.2.1
 
 ### Patch Changes

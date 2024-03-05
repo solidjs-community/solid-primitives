@@ -1,5 +1,11 @@
 # @solid-primitives/until
 
+## 1.0.16
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 1.0.15
 
 ### Patch Changes

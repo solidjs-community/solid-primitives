@@ -1,5 +1,11 @@
 # @solid-primitives/jsx-tokenizer
 
+## 1.0.10
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 1.0.9
 
 ### Patch Changes

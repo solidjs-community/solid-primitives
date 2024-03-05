@@ -1,5 +1,11 @@
 # @solid-primitives/context
 
+## 0.2.3
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 0.2.2
 
 ### Patch Changes

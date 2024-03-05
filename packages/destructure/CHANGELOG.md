@@ -1,5 +1,11 @@
 # @solid-primitives/destructure
 
+## 0.1.17
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 0.1.16
 
 ### Patch Changes

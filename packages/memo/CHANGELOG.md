@@ -1,5 +1,13 @@
 # @solid-primitives/memo
 
+## 1.3.8
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/scheduled@1.4.3
+
 ## 1.3.7
 
 ### Patch Changes

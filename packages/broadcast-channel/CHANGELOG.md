@@ -1,5 +1,11 @@
 # @solid-primitives/broadcast-channel
 
+## 0.0.105
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 0.0.104
 
 ### Patch Changes

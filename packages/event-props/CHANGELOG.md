@@ -1,5 +1,11 @@
 # @solid-primitives/event-props
 
+## 0.2.7
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 0.2.6
 
 ### Patch Changes

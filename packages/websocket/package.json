@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/websocket",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Primitive to create a web socket connection",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [

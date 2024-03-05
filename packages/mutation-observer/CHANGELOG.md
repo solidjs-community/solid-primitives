@@ -1,5 +1,11 @@
 # @solid-primitives/mutation-observer
 
+## 1.1.17
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 1.1.16
 
 ### Patch Changes

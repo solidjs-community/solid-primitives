@@ -1,5 +1,11 @@
 # @solid-primitives/event-listener
 
+## 2.3.3
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 2.3.2
 
 ### Patch Changes

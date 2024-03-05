@@ -1,5 +1,11 @@
 # @solid-primitives/idle
 
+## 0.1.2
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 0.1.1
 
 ### Patch Changes

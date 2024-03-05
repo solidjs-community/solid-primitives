@@ -1,5 +1,11 @@
 # @solid-primitives/transition-group
 
+## 1.0.5
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 1.0.4
 
 ### Patch Changes
