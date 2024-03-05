@@ -4,7 +4,7 @@
   "description": "Primitive that creates tween functions",
   "author": "Ryan Carniato <ryancarniato@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/tween#readme",
+  "homepage": "https://primitives.solidjs.community/package/tween",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

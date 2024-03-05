@@ -8,7 +8,7 @@
     "Damian Tarnawski <gthetarnav@gmail.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#readme",
+  "homepage": "https://primitives.solidjs.community/package/raf",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
