@@ -8,7 +8,7 @@
     "Alex Ryapolov"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/graphql",
+  "homepage": "https://primitives.solidjs.community/package/graphql",
   "repository": {
     "type": "git",
     "url": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/graphql"

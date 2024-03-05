@@ -5,7 +5,7 @@
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/filesystem#readme",
+  "homepage": "https://primitives.solidjs.community/package/filesystem",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

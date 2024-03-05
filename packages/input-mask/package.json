@@ -5,7 +5,7 @@
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/input-mask#readme",
+  "homepage": "https://primitives.solidjs.community/package/input-mask",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

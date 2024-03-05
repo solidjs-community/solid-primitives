@@ -4,7 +4,7 @@
   "description": "Collection of reactive primitives and utility functions, providing easier ways to deal with dates in SolidJS",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/date",
+  "homepage": "https://primitives.solidjs.community/package/date",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

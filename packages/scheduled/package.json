@@ -8,7 +8,7 @@
     "Jonathan Frere <jonathan.frere@esveo.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme",
+  "homepage": "https://primitives.solidjs.community/package/scheduled",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

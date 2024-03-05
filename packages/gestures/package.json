@@ -4,6 +4,11 @@
   "description": "Directives to react to gestures",
   "author": "Moshe Uminer",
   "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/gestures#readme", 
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
   "keywords": [
     "gesture",
     "gestures",
