@@ -1,5 +1,13 @@
 # @solid-primitives/audio
 
+## 1.3.17
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/static-store@0.0.8
+
 ## 1.3.16
 
 ### Patch Changes

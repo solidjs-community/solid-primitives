@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/fetch",
-  "version": "2.4.8",
+  "version": "2.4.9",
   "description": "Primitive that wraps fetch requests",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",

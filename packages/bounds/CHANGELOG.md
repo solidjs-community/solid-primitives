@@ -1,5 +1,15 @@
 # @solid-primitives/bounds
 
+## 0.0.121
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/event-listener@2.3.3
+  - @solid-primitives/resize-observer@2.0.25
+  - @solid-primitives/static-store@0.0.8
+
 ## 0.0.120
 
 ### Patch Changes

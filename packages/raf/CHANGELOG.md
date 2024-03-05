@@ -1,5 +1,11 @@
 # @solid-primitives/raf
 
+## 2.1.16
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 2.1.15
 
 ### Patch Changes

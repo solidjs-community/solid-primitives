@@ -1,5 +1,11 @@
 # @solid-primitives/controlled-props
 
+## 0.0.15
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 0.0.14
 
 ### Patch Changes

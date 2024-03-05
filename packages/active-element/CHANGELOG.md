@@ -1,5 +1,13 @@
 # @solid-primitives/active-element
 
+## 2.0.20
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/event-listener@2.3.3
+
 ## 2.0.19
 
 ### Patch Changes

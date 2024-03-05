@@ -1,5 +1,11 @@
 # @solid-primitives/upload
 
+## 0.0.117
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 0.0.116
 
 ### Patch Changes

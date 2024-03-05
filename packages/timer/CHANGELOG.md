@@ -1,5 +1,11 @@
 # @solid-primitives/timer
 
+## 1.3.9
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 1.3.8
 
 ### Patch Changes

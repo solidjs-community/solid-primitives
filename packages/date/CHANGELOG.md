@@ -1,5 +1,14 @@
 # @solid-primitives/date
 
+## 2.0.21
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/memo@1.3.8
+  - @solid-primitives/timer@1.3.9
+
 ## 2.0.20
 
 ### Patch Changes

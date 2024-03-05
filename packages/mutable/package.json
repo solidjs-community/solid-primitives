@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/mutable",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A primitive for creating a mutable store, an alternative to Solid's createStore.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],

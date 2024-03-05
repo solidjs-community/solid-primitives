@@ -1,5 +1,11 @@
 # @solid-primitives/refs
 
+## 1.0.8
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 1.0.7
 
 ### Patch Changes

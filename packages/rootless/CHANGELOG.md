@@ -1,5 +1,11 @@
 # @solid-primitives/rootless
 
+## 1.4.5
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 1.4.4
 
 ### Patch Changes

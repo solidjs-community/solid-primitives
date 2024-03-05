@@ -1,5 +1,13 @@
 # @solid-primitives/styles
 
+## 0.0.114
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/rootless@1.4.5
+
 ## 0.0.113
 
 ### Patch Changes
