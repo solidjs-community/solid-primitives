@@ -2,6 +2,7 @@
   "name": "solid-primitives",
   "private": true,
   "description": "A collection of high-quality, community contributed building blocks.",
+  "homepage": "https://primitives.solidjs.community/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

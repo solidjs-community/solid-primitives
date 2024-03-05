@@ -7,7 +7,7 @@
     "Tom Pichaud <dev.tompichaud@icloud.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/storage",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/storage#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

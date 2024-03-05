@@ -5,7 +5,7 @@
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/controlled-props",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/controlled-props#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
