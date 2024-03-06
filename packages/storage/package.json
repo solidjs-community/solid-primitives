@@ -66,16 +66,17 @@
   },
   "peerDependencies": {
     "solid-js": "^1.6.12",
-    "solid-start": ">=0.2.26"
+    "@solidjs/start": "^0.6.0",
+    "vinxi": "^0.3.9"
   },
   "peerDependenciesMeta": {
-    "solid-start": {
-      "optional": true
-    }
+    "@solidjs/start": { "optional": true },
+    "vinxi": { "optional": true }
   },
-  "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.8.7",
-    "solid-start": "^0.3.10"
-  }
+    "solid-js": "^1.8.15",
+    "@solidjs/start": "^0.6.0",
+    "vinxi": "^0.3.9"
+  },
+  "typesVersions": {}
 }

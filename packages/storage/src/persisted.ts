@@ -1,21 +1,38 @@
 import type { Accessor, Setter, Signal } from "solid-js";
 import { createUniqueId, untrack } from "solid-js";
+import { isServer } from "solid-js/web";
 import type { SetStoreFunction, Store } from "solid-js/store";
 import { reconcile } from "solid-js/store";
 import type { AsyncStorage, AsyncStorageWithOptions, StorageWithOptions } from "./types.js";
+
+export type PersistenceSyncData = {
+  key: string;
+  newValue: string | null | undefined;
+  timeStamp: number;
+  url?: string;
+};
+
+export type PersistenceSyncCallback = (data: PersistenceSyncData) => void;
+
+export type PersistenceSyncAPI = [
+  /** subscribes to sync */
+  subscribe: (subscriber: PersistenceSyncCallback) => void,
+  update: (key: string, value: string | null | undefined) => void,
+];
 
 export type PersistenceBaseOptions<T> = {
   name?: string;
   serialize?: (data: T) => string;
   deserialize?: (data: string) => T;
+  sync?: PersistenceSyncAPI;
 };
 
 export type PersistenceOptions<T, O extends Record<string, any>> = PersistenceBaseOptions<T> &
   (
     | {
-        storage: StorageWithOptions<O> | AsyncStorageWithOptions<O>;
-        storageOptions: O;
-      }
+      storage: StorageWithOptions<O> | AsyncStorageWithOptions<O>;
+      storageOptions: O;
+    }
     | { storage?: Storage | AsyncStorage }
   );
 
@@ -162,23 +179,88 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
   if (init instanceof Promise) init.then(data => unchanged && data && set(data));
   else if (init) set(init);
 
+  if (typeof options.sync?.[0] === "function") {
+    options.sync[0]((data: PersistenceSyncData) => {
+      if (
+        data.key !== name ||
+        (!isServer && (data.url || globalThis.location.href) !== globalThis.location.href)
+      ) {
+        return;
+      }
+      set(data.newValue as string);
+    });
+  }
+
   return [
     signal[0],
     typeof signal[0] === "function"
       ? (value?: T | ((prev: T) => T)) => {
-          const output = (signal[1] as Setter<T>)(value as any);
-
-          if (value) storage.setItem(name, serialize(output), storageOptions);
-          else storage.removeItem(name, storageOptions);
-          unchanged = false;
-          return output;
-        }
+        const output = (signal[1] as Setter<T>)(value as any);
+        const serialized: string | null | undefined =
+          value != null ? (serialize(output) as string) : (value as null | undefined);
+        options.sync?.[1](name, serialized);
+        if (value != null) storage.setItem(name, serialized as string, storageOptions);
+        else storage.removeItem(name, storageOptions);
+        unchanged = false;
+        return output;
+      }
       : (...args: any[]) => {
-          (signal[1] as any)(...args);
-          const value = serialize(untrack(() => signal[0] as any));
-          // @ts-ignore
-          storage.setItem(name, value, storageOptions);
-          unchanged = false;
-        },
+        (signal[1] as any)(...args);
+        const value = serialize(untrack(() => signal[0] as any));
+        options.sync?.[1](name, value);
+        // @ts-ignore
+        storage.setItem(name, value, storageOptions);
+        unchanged = false;
+      },
   ] as typeof signal;
 }
+
+/**
+ * storageSync - synchronize localStorage
+ */
+export const storageSync: PersistenceSyncAPI = [
+  (subscriber: PersistenceSyncCallback) =>
+    window.addEventListener("storage", ev => subscriber(ev as PersistenceSyncData)),
+  () => {
+    /*storage already sends events fulfilling the PersistenceSyncData<T> conditions*/
+  },
+];
+
+/**
+ * postmessageSync - synchronize over post message API
+ */
+export const postmessageSync: PersistenceSyncAPI = [
+  (subscriber: PersistenceSyncCallback) =>
+    window.addEventListener("message", ev => subscriber(JSON.parse(ev.data))),
+  (key, newValue) =>
+    postMessage(
+      JSON.stringify({ key, newValue, timeStamp: +new Date(), url: location.href }),
+      location.origin,
+    ),
+];
+
+/**
+ * wsSync - syncronize persisted storage via web socket
+ */
+export const wsSync = (ws: WebSocket): PersistenceSyncAPI => [
+  (subscriber: PersistenceSyncCallback) =>
+    ws.addEventListener("message", (ev: MessageEvent) => {
+      try {
+        subscriber(JSON.parse(ev.data));
+      } catch (e) { }
+    }),
+  (key, newValue) =>
+    ws.send(
+      JSON.stringify({
+        key,
+        newValue,
+        timeStamp: +new Date(),
+        ...(isServer ? {} : { url: location.href }),
+      }),
+    ),
+];
+
+export const multiplexSync = (...syncAPIs: PersistenceSyncAPI[]): PersistenceSyncAPI => [
+  subscriber => syncAPIs.forEach(([subscribe]) => subscribe(subscriber)),
+  (key, value) => syncAPIs.forEach(([_, updater]) => updater(key, value)),
+];

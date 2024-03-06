@@ -2,11 +2,10 @@ import { isServer } from "solid-js/web";
 import { StorageProps, StorageSignalProps, StorageWithOptions } from "./types.js";
 import { addClearMethod } from "./tools.js";
 import { createStorage, createStorageSignal } from "./storage.js";
-import type { PageEvent } from "solid-start";
 
 export type CookieOptions = CookieProperties & {
-  getRequest?: (() => Request) | (() => PageEvent);
-  setCookie?: (key: string, value: string, options: CookieOptions) => void;
+  getRequestHeaders?: () => Headers;
+  setCookie?: (key: string, value: string, options: CookieProperties) => void;
 };
 
 type CookieProperties = {
@@ -52,19 +51,14 @@ function deserializeCookieOptions(cookie: string, key: string) {
   return cookie.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop() ?? null;
 }
 
-let useRequest: () => PageEvent | undefined;
-try {
-  useRequest = require("solid-start/server").useRequest;
-} catch (e) {
-  useRequest = () => {
-    // eslint-disable-next-line no-console
-    console.warn(
-      "It seems you attempt to use cookieStorage on the server without having solid-start installed or use vite.",
-    );
-    return {
-      request: { headers: { get: () => "" } } as unknown as Request,
-    } as unknown as PageEvent;
-  };
+let getRequestHeaders: () => Headers | undefined = isServer
+  ? () => new Headers() 
+  : () => undefined;
+let setCookie: (key: string, value: string, options: CookieProperties) => void = () => undefined;
+if (isServer) {
+  const vinxiHttp = await import("vinxi/http").catch(() => null);
+  getRequestHeaders = vinxiHttp?.getRequestHeaders ?? getRequestHeaders;
+  setCookie = vinxiHttp?.setCookie ?? setCookie;
 }
 
 /**
@@ -89,45 +83,16 @@ try {
 export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   _read: isServer
     ? (options?: CookieOptions) => {
-        const eventOrRequest = options?.getRequest?.() || useRequest();
-        const request =
-          eventOrRequest && ("request" in eventOrRequest ? eventOrRequest.request : eventOrRequest);
-        let result = "";
-        if (eventOrRequest.responseHeaders) {
-          // Check if we really got a pageEvent
-          const responseHeaders = eventOrRequest.responseHeaders as Headers;
-          result +=
-            responseHeaders
-              .get("Set-Cookie")
-              ?.split(",")
-              .map(cookie => !cookie.match(/\\w*\\s*=\\s*[^;]+/))
-              .join(";") ?? "";
-        }
-        return `${result};${request?.headers?.get("Cookie") ?? ""}`; // because first cookie will be preferred we don't have to worry about duplicates
-      }
+      const headers = options?.getRequestHeaders?.() || getRequestHeaders();
+      return headers?.get("Cookie") ?? "";
+    }
     : () => document.cookie,
   _write: isServer
-    ? (key: string, value: string, options?: CookieOptions) => {
-        if (options?.setCookie) {
-          options?.setCookie?.(key, value, options);
-          return;
-        }
-        const pageEvent: PageEvent = options?.getRequest?.() || useRequest();
-        if (!pageEvent.responseHeaders)
-          // Check if we really got a pageEvent
-          return;
-        const responseHeaders = pageEvent.responseHeaders as Headers;
-        const cookies =
-          responseHeaders
-            .get("Set-Cookie")
-            ?.split(",")
-            .filter(cookie => !cookie.match(`\\s*${key}\\s*=`)) ?? [];
-        cookies.push(`${key}=${value}${serializeCookieOptions(options)}`);
-        responseHeaders.set("Set-Cookie", cookies.join(","));
-      }
+    ? (key: string, value: string, options?: CookieOptions) =>
+      (options?.setCookie ?? setCookie)?.(key, value, options)
     : (key: string, value: string, options?: CookieOptions) => {
-        document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
-      },
+      document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
+    },
   getItem: (key: string, options?: CookieOptions) =>
     deserializeCookieOptions(cookieStorage._read(options), key),
   setItem: (key: string, value: string, options?: CookieOptions) => {
