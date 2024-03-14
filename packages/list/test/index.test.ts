@@ -1,17 +1,14 @@
 import { describe, test, expect } from "vitest";
 import { createRoot, createSignal } from "solid-js";
+import { listArray } from "../src/index.js";
 
-describe("createPrimitiveTemplate", () => {
-  test("createPrimitiveTemplate return values", () => {
-    const { value, setValue, dispose } = createRoot(dispose => {
-      const [value, setValue] = createSignal(true);
-      expect(value(), "initial value should be true").toBe(true);
-
-      return { value, setValue, dispose };
+describe("listArray", () => {
+  test("creates signal for value and index", () => {
+    const { setArr, dispose, list } = createRoot(dispose => {
+      const [arr, setArr] = createSignal<number[]>([]);
+      const list = listArray(arr, (v, i) => ({ v: v(), i: i() }));
+      return { setArr, dispose, list };
     });
-
-    setValue(false);
-    expect(value(), "value after change should be false").toBe(false);
 
     dispose();
   });

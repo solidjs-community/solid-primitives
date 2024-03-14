@@ -1,5 +1,5 @@
 import {
-  Component,
+  type Component,
   type JSX,
   createSignal,
   type Accessor,
@@ -36,20 +36,27 @@ const App: Component = () => {
     currentValue++,
   ]);
 
+  createEffect(() => {
+    signal();
+    console.log("signal changed -------------------");
+  });
+
   return (
     <>
       <List each={signal()}>
         {(v, i) => {
           onMount(() => console.log(`create ${i()}: ${v()}`));
           createEffect(last => {
+            const value = v();
             if (last) {
-              console.log(`set new value for index ${untrack(i)}: ${v()}`);
+              console.log(`new value at index ${untrack(i)}: ${value}`);
             }
             return true;
           }, false);
           createEffect((lastIndex: number | null) => {
+            const index = i();
             if (lastIndex !== null) {
-              console.log(`set new index from ${lastIndex} to ${i()}`);
+              console.log(`new index ${lastIndex} -> ${index}`);
             }
             return i();
           }, null);
@@ -106,6 +113,13 @@ const App: Component = () => {
         }}
       >
         Insert randomly
+      </button>
+      <button
+        onClick={() => {
+          setSignal(x => [...x]);
+        }}
+      >
+        Copy signal
       </button>
     </>
   );

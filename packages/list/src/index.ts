@@ -29,15 +29,14 @@ function disposeList(list: ListItem<any>[]) {
  * Reactively transforms an array with a callback function - underlying helper for the `<List>` control flow.
  *
  * Alternative to `mapArray` or `indexArray` that provides reactive value and index for array elements.
- *
  */
 export function listArray<T, U>(
   list: Accessor<readonly T[] | undefined | null | false>,
   mapFn: (v: Accessor<T>, i: Accessor<number>) => U,
   options: { fallback?: Accessor<any> } = {},
 ): () => U[] {
+  const items: ListItem<T>[] = [];
   let mapped: U[] = [],
-    items: ListItem<T>[] = [],
     searchTo: number,
     swap: ListItem<T>,
     i: number,
@@ -46,6 +45,7 @@ export function listArray<T, U>(
     oldValue: T,
     oldIndex: number,
     newValue: T,
+    fallback: U[] | undefined,
     fallbackDisposer: undefined | (() => void);
 
   onCleanup(() => {
@@ -60,22 +60,10 @@ export function listArray<T, U>(
       if (newItems.length > 0 && fallbackDisposer) {
         fallbackDisposer();
         fallbackDisposer = undefined;
+        fallback = undefined;
       }
 
       const temp: U[] = new Array(newItems.length);
-
-      // fast path for empty arrays
-      if (newItems.length === 0) {
-        if (items.length !== 0) {
-          disposeList(items);
-          items = [];
-          mapped = [];
-        }
-        if (options.fallback) {
-        }
-
-        return (mapped = temp);
-      }
 
       searchTo = items.length;
 
@@ -160,12 +148,15 @@ export function listArray<T, U>(
       disposeList(items.splice(0, searchTo));
 
       if (newItems.length === 0 && options.fallback) {
-        return [
-          createRoot(d => {
-            fallbackDisposer = d;
-            return options.fallback!();
-          }),
-        ];
+        if (!fallbackDisposer) {
+          fallback = [
+            createRoot(d => {
+              fallbackDisposer = d;
+              return options.fallback!();
+            }),
+          ];
+        }
+        return fallback!;
       }
 
       return (mapped = temp);
@@ -192,7 +183,7 @@ export function listArray<T, U>(
 
 /**
  * Iteration over a list creating elements from its items.
- * It avoids recreating elements, instead reorders existing and / or changes value whenever possible.
+ * It avoids recreating elements, instead reorders existing elements and / or changes reactive value whenever possible.
  *
  * To be used if you have a list with changing indexes and values.
  * ```typescript
@@ -200,7 +191,8 @@ export function listArray<T, U>(
  *   {(item, index) => <div data-index={index()}>{item()}</div>}
  * </List>
  * ```
- * If you have a list with changing indices, better use `<For>`.
+ * If you have a list with only changing indices, better use `<For>`.
+ * If you have a list with only changing values, better use `<Index>`.
  *
  */
 export function List<T extends readonly any[], U extends JSX.Element>(props: {
