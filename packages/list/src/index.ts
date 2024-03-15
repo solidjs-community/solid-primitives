@@ -103,8 +103,7 @@ export function listArray<T, U>(
 
       // #2 reduce unusedItems for matched items
       for (j = matchedItems.length - 1; j >= 0; --j) {
-        if (!matchedItems[j]) continue;
-        if (--unusedItems !== j) {
+        if (matchedItems[j] && --unusedItems !== j) {
           item = items[j]!;
           items[j] = items[unusedItems]!;
           items[unusedItems] = item;
@@ -128,7 +127,7 @@ export function listArray<T, U>(
       }
 
       // 4) change value & index when none matched
-      // 5) create new if no unused old items left
+      // 5) create new if no unused items left
       for (i = 0; i < newItems.length; ++i) {
         if (i in temp) continue;
         newValue = newItems[i]!;
@@ -155,7 +154,6 @@ export function listArray<T, U>(
         }
         return fallback!;
       }
-
       return (mapped = temp);
     });
   };

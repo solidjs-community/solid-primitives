@@ -25,7 +25,7 @@ const App: Component = () => {
   createEffect(() => {
     batch(() => {
       setChanges("");
-      addChange("signal change -------------------");
+      addChange("-------------------");
     });
     signal();
   });
@@ -57,7 +57,7 @@ const App: Component = () => {
             onMount(() => addChange(`create ${i()}: ${v()}`));
             createEffect(lastValue => {
               const value = v();
-              if (lastValue) {
+              if (lastValue != null) {
                 addChange(`${untrack(i)}: (${lastValue} -> ${value})`);
               }
               return v();
@@ -91,7 +91,7 @@ const App: Component = () => {
                 >
                   Insert before
                 </button>
-                <span style={{ "min-width": "2em" }}>{i()}:</span>
+                <span style={{ "min-width": "2em" }}>{i()}</span>
                 <input
                   value={v()}
                   onInput={e => {
@@ -140,10 +140,35 @@ const App: Component = () => {
         <div style={{ display: "flex", margin: "1em" }}>
           <button
             onClick={() => {
-              setSignal(x => [...x].sort(() => Math.random() - 0.5));
+              const x = signal();
+              for (let i = x.length - 1; i >= 0; --i) {
+                let j = ~~(Math.random() * i);
+                const v = x[j]!;
+                x[j] = x[i]!;
+                x[i] = v;
+              }
+              setSignal([...x]);
             }}
           >
             Shuffle
+          </button>
+          <button
+            onClick={() => {
+              setSignal(x => {
+                const el = x.pop();
+                el !== undefined && x.unshift(el);
+                return [...x];
+              });
+            }}
+          >
+            Roll
+          </button>
+          <button
+            onClick={() => {
+              setSignal(x => x.map(() => nextValue()));
+            }}
+          >
+            Replace all
           </button>
           <button
             onClick={() => {
