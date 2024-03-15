@@ -1,127 +1,203 @@
 import {
   type Component,
-  type JSX,
   createSignal,
-  type Accessor,
-  createMemo,
   createEffect,
   onCleanup,
   untrack,
   onMount,
+  batch,
 } from "solid-js";
-import { listArray } from "../src/index.js";
+import { List } from "../src/index.js";
 
-export function List<T extends readonly any[], U extends JSX.Element>(props: {
-  each: T | undefined | null | false;
-  fallback?: JSX.Element;
-  children: (item: Accessor<T[number]>, index: Accessor<number>) => U;
-}) {
-  const fallback = "fallback" in props && { fallback: () => props.fallback };
-  return ("_SOLID_DEV_"
-    ? createMemo(
-        listArray(() => props.each, props.children, fallback || undefined),
-        undefined,
-        { name: "value" },
-      )
-    : createMemo(
-        listArray(() => props.each, props.children, fallback || undefined),
-      )) as unknown as JSX.Element;
-}
-
-let currentValue = 1;
 const App: Component = () => {
-  const [signal, setSignal] = createSignal<(string | number)[]>([
-    currentValue++,
-    currentValue++,
-    currentValue++,
-  ]);
+  let currentValue = 0;
+  const nextValue = () => `${currentValue++}`;
+
+  const [signal, setSignal] = createSignal<(string | number)[]>(
+    Array.from({ length: 5 }).map(() => nextValue()),
+  );
+  const [changes, setChanges] = createSignal("");
+  const addChange = (description: string) => {
+    setChanges(old => old + "\n" + description);
+    console.log(description);
+  };
 
   createEffect(() => {
+    batch(() => {
+      setChanges("");
+      addChange("signal change -------------------");
+    });
     signal();
-    console.log("signal changed -------------------");
   });
 
+  let customArr: HTMLInputElement;
+
   return (
-    <>
-      <List each={signal()}>
-        {(v, i) => {
-          onMount(() => console.log(`create ${i()}: ${v()}`));
-          createEffect(last => {
-            const value = v();
-            if (last) {
-              console.log(`new value at index ${untrack(i)}: ${value}`);
-            }
-            return true;
-          }, false);
-          createEffect((lastIndex: number | null) => {
-            const index = i();
-            if (lastIndex !== null) {
-              console.log(`new index ${lastIndex} -> ${index}`);
-            }
-            return i();
-          }, null);
-          onCleanup(() => console.log(`remove ${i()}: ${v()}`));
-          return (
-            <pre>
-              {i()}:
-              <input
-                value={v()}
-                onInput={e => {
-                  setSignal(x => {
-                    const n = [...x];
-                    n[i()] = e.target.value;
-                    return n;
-                  });
-                }}
-              />
-              <button
-                onClick={() => {
-                  setSignal(x => x.filter((y, j) => j != i()));
-                }}
-              >
-                Delete
-              </button>
-              <button
-                onClick={() => {
-                  setSignal(x => {
-                    const n = [...x];
-                    n[i()] = currentValue++;
-                    return n;
-                  });
+    <div
+      style={{
+        margin: "2em",
+      }}
+    >
+      <div style={{ display: "flex", "flex-direction": "column", "align-items": "center" }}>
+        <List
+          each={signal()}
+          fallback={
+            <h1
+              style={{
+                "font-weight": "bold",
+                "font-size": "x-large",
+                color: "green",
+              }}
+            >
+              THE LIST IS EMPTY
+            </h1>
+          }
+        >
+          {(v, i) => {
+            onMount(() => addChange(`create ${i()}: ${v()}`));
+            createEffect(lastValue => {
+              const value = v();
+              if (lastValue) {
+                addChange(`${untrack(i)}: (${lastValue} -> ${value})`);
+              }
+              return v();
+            }, null);
+            createEffect((lastIndex: number | null) => {
+              const index = i();
+              if (lastIndex !== null) {
+                addChange(`(${lastIndex} -> ${index}): ${untrack(v)}`);
+              }
+              return i();
+            }, null);
+            onCleanup(() => setTimeout(() => addChange(`remove ${i()}: ${v()}`)));
+            return (
+              <div
+                style={{
+                  display: "flex",
+                  "align-items": "center",
+                  "font-weight": "bold",
+                  color: "magenta",
                 }}
               >
-                Replace
-              </button>
-            </pre>
-          );
-        }}
-      </List>
-      <button
-        onClick={() => {
-          setSignal(x => [...x].sort(() => Math.random() - 0.5));
+                <button
+                  style={{ "margin-right": "2em" }}
+                  onClick={() => {
+                    setSignal(x => {
+                      const n = [...x];
+                      n.splice(i(), 0, nextValue());
+                      return n;
+                    });
+                  }}
+                >
+                  Insert before
+                </button>
+                <span style={{ "min-width": "2em" }}>{i()}:</span>
+                <input
+                  value={v()}
+                  onInput={e => {
+                    setSignal(x => {
+                      const n = [...x];
+                      n[i()] = e.target.value;
+                      return n;
+                    });
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    setSignal(x => x.filter((y, j) => j != i()));
+                  }}
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => {
+                    setSignal(x => {
+                      const n = [...x];
+                      n[i()] = nextValue();
+                      return n;
+                    });
+                  }}
+                >
+                  Replace
+                </button>
+                <button
+                  style={{ "margin-left": "2em" }}
+                  onClick={() => {
+                    setSignal(x => {
+                      const n = [...x];
+                      n.splice(i() + 1, 0, nextValue());
+                      return n;
+                    });
+                  }}
+                >
+                  Insert after
+                </button>
+              </div>
+            );
+          }}
+        </List>
+
+        <div style={{ display: "flex", margin: "1em" }}>
+          <button
+            onClick={() => {
+              setSignal(x => [...x].sort(() => Math.random() - 0.5));
+            }}
+          >
+            Shuffle
+          </button>
+          <button
+            onClick={() => {
+              setSignal(x => {
+                const n = [...x];
+                n.splice(~~(Math.random() * x.length), 0, nextValue());
+                return n;
+              });
+            }}
+          >
+            Insert randomly
+          </button>
+          <button
+            onClick={() => {
+              setSignal(x => [...x]);
+            }}
+          >
+            Copy signal without changes
+          </button>
+        </div>
+      </div>
+      <div style={{ display: "flex" }}>
+        <input
+          style={{ "flex-grow": 1 }}
+          ref={x => (customArr = x)}
+          value={JSON.stringify(signal())}
+        />
+        <button
+          onClick={() => {
+            try {
+              const result = JSON.parse(customArr.value);
+              if (
+                Array.isArray(result) &&
+                result.every(x => typeof x === "number" || typeof x === "string")
+              )
+                setSignal(result);
+              else setChanges("Wrong input value");
+            } catch {
+              setChanges("Wrong input value");
+            }
+          }}
+        >
+          Set custom value
+        </button>
+      </div>
+      <pre
+        style={{
+          "font-weight": "bold",
+          color: "orange",
         }}
       >
-        Shuffle
-      </button>
-      <button
-        onClick={() => {
-          setSignal(x => {
-            const n = [...x];
-            n.splice(~~(Math.random() * x.length), 0, currentValue++);
-            return n;
-          });
-        }}
-      >
-        Insert randomly
-      </button>
-      <button
-        onClick={() => {
-          setSignal(x => [...x]);
-        }}
-      >
-        Copy signal
-      </button>
-    </>
+        {changes()}
+      </pre>
+    </div>
   );
 };
 

@@ -37,8 +37,7 @@ export function listArray<T, U>(
 ): () => U[] {
   const items: ListItem<T>[] = [];
   let mapped: U[] = [],
-    searchTo: number,
-    swap: ListItem<T>,
+    unusedItems: number,
     i: number,
     j: number,
     item: ListItem<T>,
@@ -63,80 +62,78 @@ export function listArray<T, U>(
         fallback = undefined;
       }
 
-      const temp: U[] = new Array(newItems.length);
+      const temp: U[] = new Array(newItems.length); // new mapped array
+      unusedItems = items.length;
 
-      searchTo = items.length;
+      // 1) no change when values & indexes match
+      for (j = unusedItems - 1; j >= 0; --j) {
+        item = items[j]!;
+        oldIndex = item[INDEX];
+        if (oldIndex < newItems.length && newItems[oldIndex] === item[VALUE]) {
+          temp[oldIndex] = mapped[oldIndex]!;
+          if (--unusedItems !== j) {
+            items[j] = items[unusedItems]!;
+            items[unusedItems] = item;
+          }
+        }
+      }
 
-      // no change when values & indexes match
+      // #2 prepare values matcher
+      const matcher = new Map<T, number[]>();
+      const matchedItems = new Uint8Array(unusedItems);
+      for (j = unusedItems - 1; j >= 0; --j) {
+        oldValue = items[j]![VALUE];
+        matcher.get(oldValue)?.push(j) ?? matcher.set(oldValue, [j]);
+      }
+
+      // 2) change indexes when values match
       for (i = 0; i < newItems.length; ++i) {
+        if (i in temp) continue;
         newValue = newItems[i]!;
-        for (j = searchTo - 1; j >= 0; --j) {
+        j = matcher.get(newValue)?.pop() ?? -1;
+        if (j >= 0) {
           item = items[j]!;
-          oldValue = item[VALUE];
           oldIndex = item[INDEX];
-          if (newValue === oldValue && oldIndex === i) {
-            temp[i] = mapped[i]!;
-            if (--searchTo !== j) {
-              swap = items[searchTo]!;
-              items[searchTo] = item;
-              items[j] = swap;
-            }
-            break;
-          }
+          temp[i] = mapped[oldIndex]!;
+          item[INDEX] = i;
+          item[INDEX_SETTER]?.(i);
+          matchedItems[j] = 1;
         }
       }
 
-      // change indexes when values match
-      for (i = 0; i < newItems.length; ++i) {
-        if (i in temp) continue;
-        newValue = newItems[i]!;
-        for (j = searchTo - 1; j >= 0; --j) {
+      // #2 reduce unusedItems for matched items
+      for (j = matchedItems.length - 1; j >= 0; --j) {
+        if (!matchedItems[j]) continue;
+        if (--unusedItems !== j) {
           item = items[j]!;
-          oldValue = item[VALUE];
-          if (newValue === oldValue) {
-            oldIndex = item[INDEX];
+          items[j] = items[unusedItems]!;
+          items[unusedItems] = item;
+        }
+      }
 
-            temp[i] = mapped[oldIndex]!;
-            item[INDEX] = i;
-            item[INDEX_SETTER]?.(i);
-
-            if (--searchTo !== j) {
-              swap = items[searchTo]!;
-              items[searchTo] = item;
-              items[j] = swap;
-            }
-            break;
+      // 3) change values when indexes match
+      for (j = unusedItems - 1; j >= 0; --j) {
+        item = items[j]!;
+        oldIndex = item[INDEX];
+        if (!(oldIndex in temp) && oldIndex < newItems.length) {
+          temp[oldIndex] = mapped[oldIndex]!;
+          newValue = newItems[oldIndex]!;
+          item[VALUE] = newValue;
+          item[VALUE_SETTER]?.(newValueGetter);
+          if (--unusedItems !== j) {
+            items[j] = items[unusedItems]!;
+            items[unusedItems] = item;
           }
         }
       }
 
-      // change values when indexes match
+      // 4) change value & index when none matched
+      // 5) create new if no unused old items left
       for (i = 0; i < newItems.length; ++i) {
         if (i in temp) continue;
         newValue = newItems[i]!;
-        for (j = searchTo - 1; j >= 0; --j) {
-          item = items[j]!;
-          if (item[INDEX] === i) {
-            temp[i] = mapped[i]!;
-            item[VALUE] = newValue;
-            item[VALUE_SETTER]?.(newValueGetter);
-
-            if (--searchTo !== j) {
-              swap = items[searchTo]!;
-              items[searchTo] = item;
-              items[j] = swap;
-            }
-            break;
-          }
-        }
-      }
-
-      // change value & index when none matched, create new if no unused old items left
-      for (i = 0; i < newItems.length; ++i) {
-        if (i in temp) continue;
-        newValue = newItems[i]!;
-        if (searchTo > 0) {
-          item = items[--searchTo]!;
+        if (unusedItems > 0) {
+          item = items[--unusedItems]!;
           temp[i] = mapped[item[INDEX]]!;
           batch(changeBoth);
         } else {
@@ -144,8 +141,8 @@ export function listArray<T, U>(
         }
       }
 
-      // delete any old unused items left
-      disposeList(items.splice(0, searchTo));
+      // 6) delete any old unused items left
+      disposeList(items.splice(0, unusedItems));
 
       if (newItems.length === 0 && options.fallback) {
         if (!fallbackDisposer) {
@@ -172,9 +169,17 @@ export function listArray<T, U>(
     item[VALUE_SETTER]?.(newValueGetter);
   }
   function mapper(disposer: () => void) {
+    if (mapFn.length === 0) {
+      items.push([newValue, undefined, i, undefined, disposer]);
+      return (mapFn as any)();
+    }
     const [sv, setV] = "_SOLID_DEV_"
       ? createSignal(newValue, { name: "value" })
       : createSignal(newValue);
+    if (mapFn.length === 1) {
+      items.push([newValue, setV, i, undefined, disposer]);
+      return (mapFn as any)(sv);
+    }
     const [si, setI] = "_SOLID_DEV_" ? createSignal(i, { name: "index" }) : createSignal(i);
     items.push([newValue, setV, i, setI, disposer]);
     return mapFn(sv, si);
