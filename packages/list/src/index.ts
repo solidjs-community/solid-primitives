@@ -11,17 +11,17 @@ import {
   createMemo,
 } from "solid-js";
 
-// Property indexes of `ListItem`
-const VALUE = 0,
-  VALUE_SETTER = 1,
-  INDEX = 2,
-  INDEX_SETTER = 3,
-  DISPOSER = 4;
-type ListItem<T> = [T, Setter<T> | undefined, number, Setter<number> | undefined, () => void];
+type ListItem<T> = {
+  value: T;
+  valueSetter?: Setter<T>;
+  index: number;
+  indexSetter?: Setter<number>;
+  disposer: () => void;
+};
 
 function disposeList(list: ListItem<any>[]) {
   for (let i = 0; i < list.length; i++) {
-    list[i]?.[DISPOSER]();
+    list[i]?.disposer();
   }
 }
 
@@ -68,8 +68,8 @@ export function listArray<T, U>(
       // 1) no change when values & indexes match
       for (j = unusedItems - 1; j >= 0; --j) {
         item = items[j]!;
-        oldIndex = item[INDEX];
-        if (oldIndex < newItems.length && newItems[oldIndex] === item[VALUE]) {
+        oldIndex = item.index;
+        if (oldIndex < newItems.length && newItems[oldIndex] === item.value) {
           temp[oldIndex] = mapped[oldIndex]!;
           if (--unusedItems !== j) {
             items[j] = items[unusedItems]!;
@@ -82,7 +82,7 @@ export function listArray<T, U>(
       const matcher = new Map<T, number[]>();
       const matchedItems = new Uint8Array(unusedItems);
       for (j = unusedItems - 1; j >= 0; --j) {
-        oldValue = items[j]![VALUE];
+        oldValue = items[j]!.value;
         matcher.get(oldValue)?.push(j) ?? matcher.set(oldValue, [j]);
       }
 
@@ -93,10 +93,10 @@ export function listArray<T, U>(
         j = matcher.get(newValue)?.pop() ?? -1;
         if (j >= 0) {
           item = items[j]!;
-          oldIndex = item[INDEX];
+          oldIndex = item.index;
           temp[i] = mapped[oldIndex]!;
-          item[INDEX] = i;
-          item[INDEX_SETTER]?.(i);
+          item.index = i;
+          item.indexSetter?.(i);
           matchedItems[j] = 1;
         }
       }
@@ -113,12 +113,12 @@ export function listArray<T, U>(
       // 3) change values when indexes match
       for (j = unusedItems - 1; j >= 0; --j) {
         item = items[j]!;
-        oldIndex = item[INDEX];
+        oldIndex = item.index;
         if (!(oldIndex in temp) && oldIndex < newItems.length) {
           temp[oldIndex] = mapped[oldIndex]!;
           newValue = newItems[oldIndex]!;
-          item[VALUE] = newValue;
-          item[VALUE_SETTER]?.(newValueGetter);
+          item.value = newValue;
+          item.valueSetter?.(newValueGetter);
           if (--unusedItems !== j) {
             items[j] = items[unusedItems]!;
             items[unusedItems] = item;
@@ -133,7 +133,7 @@ export function listArray<T, U>(
         newValue = newItems[i]!;
         if (unusedItems > 0) {
           item = items[--unusedItems]!;
-          temp[i] = mapped[item[INDEX]]!;
+          temp[i] = mapped[item.index]!;
           batch(changeBoth);
         } else {
           temp[i] = createRoot(mapper);
@@ -161,32 +161,32 @@ export function listArray<T, U>(
     return newValue;
   }
   function changeBoth() {
-    item[INDEX] = i;
-    item[INDEX_SETTER]?.(i);
-    item[VALUE] = newValue;
-    item[VALUE_SETTER]?.(newValueGetter);
+    item.index = i;
+    item.indexSetter?.(i);
+    item.value = newValue;
+    item.valueSetter?.(newValueGetter);
   }
   function mapper(disposer: () => void) {
-    if (mapFn.length === 0) {
-      items.push([newValue, undefined, i, undefined, disposer]);
-      return (mapFn as any)();
-    }
-    const [sv, setV] = "_SOLID_DEV_"
+    let sv: Accessor<T>, si: Accessor<number>;
+    const t: ListItem<T> = {
+      value: newValue,
+      index: i,
+      disposer,
+    };
+    items.push(t);
+    if (mapFn.length === 0) return (mapFn as any)();
+    [sv, t.valueSetter] = "_SOLID_DEV_"
       ? createSignal(newValue, { name: "value" })
       : createSignal(newValue);
-    if (mapFn.length === 1) {
-      items.push([newValue, setV, i, undefined, disposer]);
-      return (mapFn as any)(sv);
-    }
-    const [si, setI] = "_SOLID_DEV_" ? createSignal(i, { name: "index" }) : createSignal(i);
-    items.push([newValue, setV, i, setI, disposer]);
+    if (mapFn.length === 1) return (mapFn as any)(sv);
+    [si, t.indexSetter] = "_SOLID_DEV_" ? createSignal(i, { name: "index" }) : createSignal(i);
     return mapFn(sv, si);
   }
 }
 
 /**
  * Iteration over a list creating elements from its items.
- * It avoids recreating elements, instead reorders existing elements and / or changes reactive value whenever possible.
+ * It avoids recreating elements, instead reorders existing elements whenever possible and / or changes reactive value.
  *
  * To be used if you have a list with changing indexes and values.
  * ```typescript
@@ -194,8 +194,6 @@ export function listArray<T, U>(
  *   {(item, index) => <div data-index={index()}>{item()}</div>}
  * </List>
  * ```
- * If you have a list with only changing indices, better use `<For>`.
- * If you have a list with only changing values, better use `<Index>`.
  *
  */
 export function List<T extends readonly any[], U extends JSX.Element>(props: {
