@@ -1,15 +1,28 @@
 import { describe, test, expect } from "vitest";
-import { createRoot, createSignal } from "solid-js";
+import { createMemo, createRoot, createSignal } from "solid-js";
 import { listArray } from "../src/index.js";
 
 describe("listArray", () => {
-  test("creates signal for value and index", () => {
-    const { setArr, dispose, list } = createRoot(dispose => {
-      const [arr, setArr] = createSignal<number[]>([]);
-      const list = listArray(arr, (v, i) => ({ v: v(), i: i() }));
-      return { setArr, dispose, list };
+  test("simple listArray", () => {
+    createRoot(() => {
+      const [s] = createSignal([1, 2, 3, 4]),
+        r = listArray(s, v => v() * 2);
+      expect(r()).toEqual([2, 4, 6, 8]);
     });
+  });
 
-    dispose();
+  test("show fallback", () => {
+    createRoot(() => {
+      const [s, set] = createSignal([1, 2, 3, 4]),
+        double = listArray<number, number | string>(s, v => v() * 2, {
+          fallback: () => "Empty",
+        }),
+        r = createMemo(double);
+      expect(r()).toEqual([2, 4, 6, 8]);
+      set([]);
+      expect(r()).toEqual(["Empty"]);
+      set([3, 4, 5]);
+      expect(r()).toEqual([6, 8, 10]);
+    });
   });
 });

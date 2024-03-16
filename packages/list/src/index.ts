@@ -167,20 +167,29 @@ export function listArray<T, U>(
     item.valueSetter?.(newValueGetter);
   }
   function mapper(disposer: () => void) {
-    let sv: Accessor<T>, si: Accessor<number>;
     const t: ListItem<T> = {
       value: newValue,
       index: i,
       disposer,
     };
     items.push(t);
-    if (mapFn.length === 0) return (mapFn as any)();
-    [sv, t.valueSetter] = "_SOLID_DEV_"
-      ? createSignal(newValue, { name: "value" })
-      : createSignal(newValue);
-    if (mapFn.length === 1) return (mapFn as any)(sv);
-    [si, t.indexSetter] = "_SOLID_DEV_" ? createSignal(i, { name: "index" }) : createSignal(i);
-    return mapFn(sv, si);
+
+    // signal created when used
+    let sV: Accessor<T> = () => {
+        [sV, t.valueSetter] = "_SOLID_DEV_"
+          ? createSignal(newValue, { name: "value" })
+          : createSignal(newValue);
+        return sV();
+      },
+      sI: Accessor<number> = () => {
+        [sI, t.indexSetter] = "_SOLID_DEV_" ? createSignal(i, { name: "index" }) : createSignal(i);
+        return sI();
+      };
+
+    return mapFn(
+      () => sV(),
+      () => sI(),
+    );
   }
 }
 
@@ -194,7 +203,6 @@ export function listArray<T, U>(
  *   {(item, index) => <div data-index={index()}>{item()}</div>}
  * </List>
  * ```
- *
  */
 export function List<T extends readonly any[], U extends JSX.Element>(props: {
   each: T | undefined | null | false;
