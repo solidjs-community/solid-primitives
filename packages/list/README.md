@@ -12,7 +12,7 @@
 Package providing additional way to manage arrays. Alternative to `<For>` and `<Index>` that has reactive item value and reactive index. Focuses on avoiding recreation of mapped elements.
 
 [`List`](#List) - Component that provides reactive item value and reactive index.
-[`listArray`](#listArray) - Underlying helper for `<List>` control flow, similar to `mapArray` and `indexArray`.
+[`listArray`](#listArray) - Underlying helper for `<List>` unkeyed control flow, similar to `mapArray` and `indexArray`.
 
 ## Installation
 
@@ -46,11 +46,10 @@ Component similar to `<For>` and `<Index>`, but provides reactive item value and
 
 Every element is keyed by item reference and index, but item reference is prioritized. That means whenever element changes it's position in array, it's `index` signal will be updated and if element value is changed, it's `value` signal will be updated.
 
-> 
 
 ## listArray
 
-Underlying helper for `<List>` control flow. Returns array with elements mapped using provided mapping function. 
+Underlying helper for `<List>` unkeyed control flow. Returns array with elements mapped using provided mapping function. 
 
 Mapping function may use provided reactive value and reactive index, but signals for each of them are created only if they are used. Mapping function is ran only when original array has more elements than before. Elements are disposed only if original array has less elements than before.
 

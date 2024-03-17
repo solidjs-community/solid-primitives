@@ -26,7 +26,7 @@ function disposeList(list: ListItem<any>[]) {
 }
 
 /**
- * Reactively transforms an array with a callback function - underlying helper for the `<List>` control flow.
+ * Reactively transforms an array with a callback function - underlying helper for the `<List>` unkeyed control flow.
  *
  * Alternative to `mapArray` or `indexArray` that provides reactive value and index for array elements.
  */
@@ -168,21 +168,24 @@ export function listArray<T, U>(
   }
   function mapper(disposer: () => void) {
     const t: ListItem<T> = {
-      value: newValue,
-      index: i,
-      disposer,
-    };
+        value: newValue,
+        index: i,
+        disposer,
+      },
+      scopedV = newValue,
+      scopedI = i;
     items.push(t);
-
     // signal created when used
     let sV: Accessor<T> = () => {
         [sV, t.valueSetter] = "_SOLID_DEV_"
-          ? createSignal(newValue, { name: "value" })
-          : createSignal(newValue);
+          ? createSignal(scopedV, { name: "value" })
+          : createSignal(scopedV);
         return sV();
       },
       sI: Accessor<number> = () => {
-        [sI, t.indexSetter] = "_SOLID_DEV_" ? createSignal(i, { name: "index" }) : createSignal(i);
+        [sI, t.indexSetter] = "_SOLID_DEV_"
+          ? createSignal(scopedI, { name: "index" })
+          : createSignal(scopedI);
         return sI();
       };
 
