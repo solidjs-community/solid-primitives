@@ -69,7 +69,7 @@
     "@solidjs/start": ">=0.2.26"
   },
   "peerDependenciesMeta": {
-    "solid-start": {
+    "@solidjs/start": {
       "optional": true
     }
   },

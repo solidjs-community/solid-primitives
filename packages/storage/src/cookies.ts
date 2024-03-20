@@ -1,8 +1,8 @@
 import { getRequestEvent, isServer } from "solid-js/web";
+import type { PageEvent } from "@solidjs/start/server";
 import { StorageProps, StorageSignalProps, StorageWithOptions } from "./types.js";
 import { addClearMethod } from "./tools.js";
 import { createStorage, createStorageSignal } from "./storage.js";
-import type { PageEvent } from "solid-start";
 
 export type CookieOptions = CookieProperties & {
   getRequest?: (() => Request) | (() => PageEvent);
@@ -54,7 +54,7 @@ function deserializeCookieOptions(cookie: string, key: string) {
 
 let useRequest: () => PageEvent | undefined;
 try {
-  useRequest = () => getRequestEvent()?.request as unknown as PageEvent;
+  useRequest = () => getRequestEvent()?.request  as PageEvent;
 } catch (e) {
   useRequest = () => {
     // eslint-disable-next-line no-console
@@ -93,11 +93,10 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
       const request =
         eventOrRequest && ("request" in eventOrRequest ? eventOrRequest.request : eventOrRequest);
       let result = "";
-      if (eventOrRequest.responseHeaders) {
+      if (eventOrRequest.response.headers) {
         // Check if we really got a pageEvent
-        const responseHeaders = eventOrRequest.responseHeaders as Headers;
         result +=
-          responseHeaders
+          eventOrRequest.response.headers
             .get("Set-Cookie")
             ?.split(",")
             .map(cookie => !cookie.match(/\\w*\\s*=\\s*[^;]+/))
@@ -113,10 +112,10 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
         return;
       }
       const pageEvent: PageEvent = options?.getRequest?.() || useRequest();
-      if (!pageEvent.responseHeaders)
+      if (!pageEvent.response.headers)
         // Check if we really got a pageEvent
         return;
-      const responseHeaders = pageEvent.responseHeaders as Headers;
+      const responseHeaders = pageEvent.response.headers;
       const cookies =
         responseHeaders
           .get("Set-Cookie")
