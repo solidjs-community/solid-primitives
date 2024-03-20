@@ -187,23 +187,6 @@ await store.key; // 'value'
 
 It works exactly like a synchronous storage, with the exception that you have to `await` every single return value. Once
 the `CookieStore` API becomes more prevalent, we will integrate support out of the box.
-
-If you need to abstract an API yourself, you can use a getter and a setter:
-
-```ts
-const CookieAbstraction = {
-  get cookie() {
-    return myCookieJar.toString()
-  }
-  set cookie(cookie) {
-    const data = {};
-    cookie.replace(/([^=]+)=(?:([^;]+);?)/g, (_, key, value) => {
-      data[key] = value
-    });
-    myCookieJar.set(data);
-  }
-}
-cookieStorage._cookies = [CookieAbstraction, 'cookie'];
 ```
 
 ---
