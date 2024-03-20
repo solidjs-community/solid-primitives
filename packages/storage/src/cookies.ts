@@ -54,7 +54,7 @@ function deserializeCookieOptions(cookie: string, key: string) {
 
 let useRequest: () => PageEvent | undefined;
 try {
-  useRequest = () => getRequestEvent()?.request as PageEvent;
+  useRequest = () => getRequestEvent()?.request as unknown as PageEvent;
 } catch (e) {
   useRequest = () => {
     // eslint-disable-next-line no-console
