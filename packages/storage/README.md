@@ -55,7 +55,7 @@ Instead of wrapping the resource itself, it is far simpler to use the `storage` 
 persisted signal or [deep signal](../resource/#createdeepsignal):
 
 ```ts
-const [resource] = createResource(fetcher, { storage: makePersisted(createSignal()) });
+const [resource] = createResource(fetcher, {storage: makePersisted(createSignal())});
 ```
 
 If you are using an asynchronous storage to persist the state of a resource, it might receive an update due to being
@@ -74,20 +74,12 @@ the browser.
 
 As another storage, `cookieStorage` from this package can be used, which is a `localStorage`-like API to set cookies. It
 will work in the browser and on solid-start, by parsing the `Cookie` and `Set-Cookie` header and altering
-the `Set-Cookie` header. Using it in the server without solid-start will not cause errors (unless
-you are using stackblitz), but instead emit a warning message. You can also supply your own implementations
-of `cookieStorage._read(key, options)` and `cookieStorage._write(key, value, options)` if neither of those fit your
-need.
+the `Set-Cookie` header. Using it in the server without solid-start will not cause errors, but instead emit a warning
+message. You can also supply your own implementations of `cookieStorage._read(key, options)` and
+`cookieStorage._write(key, value, options)` if neither of those fit your need.
 
-If you are not using solid-start or are using stackblitz and want to use cookieStorage on the server, you can supply
-optional `getRequest` (either something like useRequest from solid-start or a function that returns the current request)
-and `setCookie` options.
-
-When you are using vite and solid-start you want to always provide the `useRequest` function from solid start to
-the `getRequest` option, because of a technical limitation of vite.
-
-> Please mind that `cookieStorage` **doesn't care** about the path and domain when reading cookies. This might cause issues when using
-> multiple cookies with the same key, but different path or domain.
+> Please mind that `cookieStorage` **doesn't care** about the path and domain when reading cookies. This might cause
+> issues when using multiple cookies with the same key, but different path or domain.
 
 #### IndexedDB, WebSQL
 
@@ -111,13 +103,10 @@ a [Solid Store](https://www.solidjs.com/docs/latest/api#createstore). The main d
 
 ```ts
 const [store, setStore, {
-  remove: (key: string) => void;
-  clear: () => void;
-  toJSON: () => ({[key: string]: string
-})
-;
-}]
-= createStorage({api: sessionStorage, prefix: 'my-app'});
+  remove: (key: string) => void,
+  clear: () => void,
+  toJSON: () => ({[key: string]: string})
+}] = createStorage({api: sessionStorage, prefix: 'my-app'});
 
 setStore('key', 'value');
 store.key; // 'value'
@@ -165,6 +154,7 @@ type CookieStoreOptions = {
   expires: DOMTimeStamp;
   sameSite: "None" | "Lax" | "Strict"
 }
+
 const CookieStoreAPI: AsyncStorageWithOptions<CookieStoreOptions> = {
   getItem: (key) => cookieStore.get(key),
   getAll: () => cookieStore.getAll(),
@@ -183,17 +173,13 @@ const CookieStoreAPI: AsyncStorageWithOptions<CookieStoreOptions> = {
     return Object.keys(all)[index];
   }
 }
-)
-;
+
 
 const [cookies, setCookie, {
-  remove: (key: string) => void;
-  clear: () => void;
-  toJSON: () => ({[key: string]: string
-})
-;
-}]
-= createAsyncStorage({api: CookieStoreAPI, prefix: 'my-app', sync: false});
+  remove: (key: string) => void,
+  clear: () => void,
+  toJSON: () => ({[key: string]: string})
+}] = createAsyncStorage({api: CookieStoreAPI, prefix: 'my-app', sync: false});
 
 await setStore('key', 'value');
 await store.key; // 'value'
@@ -201,26 +187,6 @@ await store.key; // 'value'
 
 It works exactly like a synchronous storage, with the exception that you have to `await` every single return value. Once
 the `CookieStore` API becomes more prevalent, we will integrate support out of the box.
-
-If you cannot use `document.cookie`, you can overwrite the entry point using the following tuple:
-
-```ts
-import {cookieStorage} from '@solid-primitives/storage';
-
-cookieStorage._cookies = [object
-:
-{
-  [name
-:
-  string
-]:
-  CookieProxy
-}
-,
-name: string
-]
-;
-```
 
 If you need to abstract an API yourself, you can use a getter and a setter:
 
@@ -246,7 +212,7 @@ cookieStorage._cookies = [CookieAbstraction, 'cookie'];
 access to the storage API:
 
 ```ts
-const [value, setValue] = createStorageSignal("value", { api: cookieStorage });
+const [value, setValue] = createStorageSignal("value", {api: cookieStorage});
 
 setValue("value");
 value(); // 'value'
