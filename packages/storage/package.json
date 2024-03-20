@@ -65,8 +65,8 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12",
-    "solid-start": ">=0.2.26"
+    "solid-js": "^1.8.16",
+    "@solidjs/start": ">=0.2.26"
   },
   "peerDependenciesMeta": {
     "solid-start": {
@@ -75,7 +75,7 @@
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.8.7",
-    "solid-start": "^0.3.10"
+    "solid-js": "^1.8.16",
+    "@solidjs/start": "^0.7.7"
   }
 }

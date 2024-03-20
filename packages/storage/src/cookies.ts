@@ -1,4 +1,4 @@
-import { isServer } from "solid-js/web";
+import { getRequestEvent, isServer } from "solid-js/web";
 import { StorageProps, StorageSignalProps, StorageWithOptions } from "./types.js";
 import { addClearMethod } from "./tools.js";
 import { createStorage, createStorageSignal } from "./storage.js";
@@ -54,7 +54,7 @@ function deserializeCookieOptions(cookie: string, key: string) {
 
 let useRequest: () => PageEvent | undefined;
 try {
-  useRequest = require("solid-start/server").useRequest;
+  useRequest = () => getRequestEvent()?.request as PageEvent;
 } catch (e) {
   useRequest = () => {
     // eslint-disable-next-line no-console
@@ -62,7 +62,7 @@ try {
       "It seems you attempt to use cookieStorage on the server without having solid-start installed or use vite.",
     );
     return {
-      request: { headers: { get: () => "" } } as unknown as Request,
+      request: {headers: {get: () => ""}} as unknown as Request,
     } as unknown as PageEvent;
   };
 }
@@ -89,45 +89,45 @@ try {
 export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   _read: isServer
     ? (options?: CookieOptions) => {
-        const eventOrRequest = options?.getRequest?.() || useRequest();
-        const request =
-          eventOrRequest && ("request" in eventOrRequest ? eventOrRequest.request : eventOrRequest);
-        let result = "";
-        if (eventOrRequest.responseHeaders) {
-          // Check if we really got a pageEvent
-          const responseHeaders = eventOrRequest.responseHeaders as Headers;
-          result +=
-            responseHeaders
-              .get("Set-Cookie")
-              ?.split(",")
-              .map(cookie => !cookie.match(/\\w*\\s*=\\s*[^;]+/))
-              .join(";") ?? "";
-        }
-        return `${result};${request?.headers?.get("Cookie") ?? ""}`; // because first cookie will be preferred we don't have to worry about duplicates
-      }
-    : () => document.cookie,
-  _write: isServer
-    ? (key: string, value: string, options?: CookieOptions) => {
-        if (options?.setCookie) {
-          options?.setCookie?.(key, value, options);
-          return;
-        }
-        const pageEvent: PageEvent = options?.getRequest?.() || useRequest();
-        if (!pageEvent.responseHeaders)
-          // Check if we really got a pageEvent
-          return;
-        const responseHeaders = pageEvent.responseHeaders as Headers;
-        const cookies =
+      const eventOrRequest = options?.getRequest?.() || useRequest();
+      const request =
+        eventOrRequest && ("request" in eventOrRequest ? eventOrRequest.request : eventOrRequest);
+      let result = "";
+      if (eventOrRequest.responseHeaders) {
+        // Check if we really got a pageEvent
+        const responseHeaders = eventOrRequest.responseHeaders as Headers;
+        result +=
           responseHeaders
             .get("Set-Cookie")
             ?.split(",")
-            .filter(cookie => !cookie.match(`\\s*${key}\\s*=`)) ?? [];
-        cookies.push(`${key}=${value}${serializeCookieOptions(options)}`);
-        responseHeaders.set("Set-Cookie", cookies.join(","));
+            .map(cookie => !cookie.match(/\\w*\\s*=\\s*[^;]+/))
+            .join(";") ?? "";
       }
+      return `${result};${request?.headers?.get("Cookie") ?? ""}`; // because first cookie will be preferred we don't have to worry about duplicates
+    }
+    : () => document.cookie,
+  _write: isServer
+    ? (key: string, value: string, options?: CookieOptions) => {
+      if (options?.setCookie) {
+        options?.setCookie?.(key, value, options);
+        return;
+      }
+      const pageEvent: PageEvent = options?.getRequest?.() || useRequest();
+      if (!pageEvent.responseHeaders)
+        // Check if we really got a pageEvent
+        return;
+      const responseHeaders = pageEvent.responseHeaders as Headers;
+      const cookies =
+        responseHeaders
+          .get("Set-Cookie")
+          ?.split(",")
+          .filter(cookie => !cookie.match(`\\s*${key}\\s*=`)) ?? [];
+      cookies.push(`${key}=${value}${serializeCookieOptions(options)}`);
+      responseHeaders.set("Set-Cookie", cookies.join(","));
+    }
     : (key: string, value: string, options?: CookieOptions) => {
-        document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
-      },
+      document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
+    },
   getItem: (key: string, options?: CookieOptions) =>
     deserializeCookieOptions(cookieStorage._read(options), key),
   setItem: (key: string, value: string, options?: CookieOptions) => {
@@ -146,7 +146,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
     }
   },
   removeItem: (key: string, options?: CookieOptions) => {
-    cookieStorage._write(key, "deleted", { ...options, expires: new Date(0) });
+    cookieStorage._write(key, "deleted", {...options, expires: new Date(0)});
   },
   key: (index: number, options?: CookieOptions) => {
     let key: string | null = null;
@@ -180,7 +180,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
  */
 export const createCookieStorage = <T, O = CookieOptions, A = StorageWithOptions<CookieOptions>>(
   props?: Omit<StorageProps<T, A, O>, "api">,
-) => createStorage<O, T>({ ...props, api: cookieStorage } as any);
+) => createStorage<O, T>({...props, api: cookieStorage} as any);
 
 /**
  * creates a reactive signal, but bound to document.cookie
@@ -194,4 +194,4 @@ export const createCookieStorageSignal = <
   key: string,
   initialValue?: T,
   props?: Omit<StorageSignalProps<T, A, O>, "api">,
-) => createStorageSignal<T, O>(key, initialValue, { ...props, api: cookieStorage } as any);
+) => createStorageSignal<T, O>(key, initialValue, {...props, api: cookieStorage} as any);
