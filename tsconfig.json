@@ -4,7 +4,7 @@
     "target": "ESNext",
     "newLine": "LF",
     "lib": ["DOM", "ESNext"],
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Node",
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,

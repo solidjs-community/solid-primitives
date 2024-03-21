@@ -1,8 +1,8 @@
 import { getRequestEvent, isServer } from "solid-js/web";
-import type { PageEvent } from "@solidjs/start/server";
 import { StorageProps, StorageSignalProps, StorageWithOptions } from "./types.js";
 import { addClearMethod } from "./tools.js";
 import { createStorage, createStorageSignal } from "./storage.js";
+import { PageEvent } from "@solidjs/start/dist/server";
 
 export type CookieOptions = CookieProperties & {
   getRequest?: (() => Request) | (() => PageEvent);
