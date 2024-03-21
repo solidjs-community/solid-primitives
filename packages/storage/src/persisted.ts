@@ -180,11 +180,12 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
   else if (init) set(init);
 
   if (typeof options.sync?.[0] === "function") {
+    const get: () => T = typeof signal[0] === 'function' ? signal[0] as () => T : () => (signal[0] as T);
     options.sync[0]((data: PersistenceSyncData) => {
       if (
         data.key !== name ||
         (!isServer && (data.url || globalThis.location.href) !== globalThis.location.href) ||
-        data.newValue === deserialize(untrack(typeof signal[0] === 'function' ? signal[0]() : signal[0]))
+        data.newValue === serialize(untrack(get))
       ) {
         return;
       }
