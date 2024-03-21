@@ -17,9 +17,7 @@ type Params = {
   name: string;
 };
 
-export function routeData() {
-
-}
+export function routeData() {}
 
 const Page: Component = () => {
   const params = useParams<Params>();

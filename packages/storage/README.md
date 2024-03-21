@@ -55,7 +55,7 @@ Instead of wrapping the resource itself, it is far simpler to use the `storage` 
 persisted signal or [deep signal](../resource/#createdeepsignal):
 
 ```ts
-const [resource] = createResource(fetcher, {storage: makePersisted(createSignal())});
+const [resource] = createResource(fetcher, { storage: makePersisted(createSignal()) });
 ```
 
 If you are using an asynchronous storage to persist the state of a resource, it might receive an update due to being
@@ -187,7 +187,8 @@ await store.key; // 'value'
 
 It works exactly like a synchronous storage, with the exception that you have to `await` every single return value. Once
 the `CookieStore` API becomes more prevalent, we will integrate support out of the box.
-```
+
+````
 
 ---
 
@@ -199,7 +200,7 @@ const [value, setValue] = createStorageSignal("value", {api: cookieStorage});
 
 setValue("value");
 value(); // 'value'
-```
+````
 
 As a convenient additional method, you can also use `createCookieStorageSignal(key, initialValue, options)`.
 

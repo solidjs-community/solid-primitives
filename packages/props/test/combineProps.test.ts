@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { createComputed, createRoot, createSignal, mergeProps } from "solid-js";
 import { spy } from "nanospy";
-import { combineProps } from "../src/index.js";
+import { combineProps } from "../src";
 
 describe("combineProps", () => {
   it("handles one argument", () =>
@@ -19,7 +19,7 @@ describe("combineProps", () => {
       dispose();
     }));
 
-  it("combines handlers", async () => {
+  it("combines handlers", () =>
     createRoot(async dispose => {
       const mockFn = spy();
       const message1 = "click1";
@@ -38,8 +38,7 @@ describe("combineProps", () => {
       expect(mockFn.calls).toEqual([[message1], [message2], [message3]]);
 
       dispose();
-    });
-  });
+    }));
 
   it("calls handlers in reverse", () => {
     createRoot(dispose => {
@@ -66,7 +65,7 @@ describe("combineProps", () => {
     });
   });
 
-  it("event handlers can be overwritten", async () => {
+  it("event handlers can be overwritten", () =>
     createRoot(async dispose => {
       const mockFn = spy();
       const message1 = "click1";
@@ -86,10 +85,9 @@ describe("combineProps", () => {
       expect(mockFn.calls).toEqual([[message3]]);
 
       dispose();
-    });
-  });
+    }));
 
-  it("last value overwrites the event-listeners", async () => {
+  it("last value overwrites the event-listeners", () =>
     createRoot(async dispose => {
       const mockFn = spy();
       const message1 = "click1";
@@ -105,8 +103,7 @@ describe("combineProps", () => {
       expect(combinedProps.onEvent).toBe("overwrites");
 
       dispose();
-    });
-  });
+    }));
 
   it("handles tuples as event handlers", () =>
     createRoot(dispose => {
@@ -129,7 +126,7 @@ describe("combineProps", () => {
       dispose();
     }));
 
-  it("merges props with different keys", async () => {
+  it("merges props with different keys", () =>
     createRoot(async dispose => {
       const mockFn = spy();
       const click1 = "click1";
@@ -159,10 +156,9 @@ describe("combineProps", () => {
       expect(combinedProps.styles.margin).toBe(margin);
 
       dispose();
-    });
-  });
+    }));
 
-  it("combines css classes", async () => {
+  it("combines css classes", () =>
     createRoot(async dispose => {
       const className1 = "primary";
       const className2 = "hover";
@@ -185,10 +181,9 @@ describe("combineProps", () => {
       expect(combinedProps2.className).toBe("primary hover focus");
 
       dispose();
-    });
-  });
+    }));
 
-  it("combines css classList", async () => {
+  it("combines css classList", () =>
     createRoot(async dispose => {
       const classList1 = {
         primary: true,
@@ -211,8 +206,7 @@ describe("combineProps", () => {
       });
 
       dispose();
-    });
-  });
+    }));
 
   it("combines styles", () =>
     createRoot(dispose => {
