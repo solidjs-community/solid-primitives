@@ -9,11 +9,11 @@ This is to avoid relying on promises and timeouts
 as those are flaky in CI
 */
 
-const _all_listeners: Record<string, ((message: MessageEvent) => void)[][]> = {}
+const _all_listeners: Record<string, ((message: MessageEvent) => void)[][]> = {};
 
 class BroadcastChannel {
-  listeners: ((message: MessageEvent) => void)[]
-  channel_name: string
+  listeners: ((message: MessageEvent) => void)[];
+  channel_name: string;
 
   constructor(channel_name: string) {
     this.channel_name = channel_name;
@@ -26,7 +26,7 @@ class BroadcastChannel {
   }
 
   postMessage(message: any) {
-    const event = new MessageEvent('message', {data: message});
+    const event = new MessageEvent("message", { data: message });
     for (const listeners of _all_listeners[this.channel_name]!) {
       if (listeners === this.listeners) continue;
       for (const l of listeners) {
@@ -35,12 +35,12 @@ class BroadcastChannel {
     }
   }
   addEventListener(type: string, listener: (message: MessageEvent) => void) {
-    if (type === 'message') {
+    if (type === "message") {
       this.listeners.push(listener);
     }
   }
   removeEventListener(type: string, listener: (message: MessageEvent) => void) {
-    if (type === 'message') {
+    if (type === "message") {
       const index = this.listeners.indexOf(listener);
       if (index >= 0) {
         this.listeners.splice(index, 1);
@@ -55,11 +55,10 @@ const _original_broadcast_channel = BroadcastChannel;
 
 beforeAll(() => {
   (global as any).BroadcastChannel = BroadcastChannel;
-})
+});
 afterAll(() => {
   (global as any).BroadcastChannel = _original_broadcast_channel;
-})
-
+});
 
 type MsgType = string;
 
@@ -96,10 +95,10 @@ describe("makeBroadcastChannel", () => {
     const channelName = "channel-1";
     const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-    const {bc, dispose} = createRoot(dispose => {
+    const { bc, dispose } = createRoot(dispose => {
       const bc = makeBroadcastChannel<MsgType>(channelName);
-      return {bc, dispose};
-    })
+      return { bc, dispose };
+    });
 
     let posted_message = "";
     bc.onMessage(({ data }) => {
@@ -130,10 +129,10 @@ describe("makeBroadcastChannel", () => {
     const captured: string[] = [];
 
     onMessage1(e => {
-      captured.push(e.data)
+      captured.push(e.data);
     });
     onMessage2(e => {
-      captured.push(e.data)
+      captured.push(e.data);
     });
 
     mockedBCInstance.postMessage("hi");
@@ -168,7 +167,7 @@ describe("makeBroadcastChannel", () => {
     data.dispose();
   });
 
-  test("sending messages", async (t) => {
+  test("sending messages", async t => {
     const channelName = "channel-1";
 
     const data = createRoot(dispose => {
@@ -249,11 +248,11 @@ describe("createBroadcastChannel", () => {
       const bc2 = createBroadcastChannel<MsgType>(channelName);
 
       createEffect(() => {
-        message1 += bc1.message() + ";"
+        message1 += bc1.message() + ";";
       });
 
       createEffect(() => {
-        message2 += bc2.message() + ";"
+        message2 += bc2.message() + ";";
       });
 
       return dispose;
