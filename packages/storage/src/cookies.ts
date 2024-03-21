@@ -1,4 +1,4 @@
-import { isServer } from "solid-js/web";
+import { isServer, getRequestEvent, type RequestEvent } from "solid-js/web";
 import { StorageProps, StorageSignalProps, StorageWithOptions } from "./types.js";
 import { addClearMethod } from "./tools.js";
 import { createStorage, createStorageSignal } from "./storage.js";
@@ -51,15 +51,25 @@ function deserializeCookieOptions(cookie: string, key: string) {
   return cookie.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop() ?? null;
 }
 
-let getRequestHeaders: () => Headers | undefined = isServer
-  ? () => new Headers() 
+const getRequestHeaders = isServer
+  ? () => getRequestEvent()?.request?.headers || new Headers()
+  : () => new Headers();
+const setCookie = isServer
+  ? (key: string, value: string, options: CookieProperties) => {
+    const responseHeaders = (
+      getRequestEvent() as unknown as RequestEvent & { response?: { headers: Headers } }
+    )?.response?.headers;
+    if (!responseHeaders) {
+      return;
+    }
+    const serializedOptions = serializeCookieOptions(options);
+    responseHeaders.set(
+      "Set-Cookie",
+      `${responseHeaders.get("Set-Cookie") ? ", " : ""}${key}=${value}${serializedOptions ? "; " : ""
+      }${serializedOptions}`,
+    );
+  }
   : () => undefined;
-let setCookie: (key: string, value: string, options: CookieProperties) => void = () => undefined;
-if (isServer) {
-  const vinxiHttp = await import("vinxi/http").catch(() => null);
-  getRequestHeaders = vinxiHttp?.getRequestHeaders ?? getRequestHeaders;
-  setCookie = vinxiHttp?.setCookie ?? setCookie;
-}
 
 /**
  * handle cookies exactly like you would handle localStorage
@@ -89,7 +99,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
     : () => document.cookie,
   _write: isServer
     ? (key: string, value: string, options?: CookieOptions) =>
-      (options?.setCookie ?? setCookie)?.(key, value, options)
+      (options?.setCookie ?? setCookie)?.(key, value, options as CookieProperties)
     : (key: string, value: string, options?: CookieOptions) => {
       document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
     },
