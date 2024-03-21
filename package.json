@@ -59,6 +59,7 @@
     "tsx": "^4.7.0",
     "turbo": "^1.12.5",
     "vinxi": "^0.3.10",
+    "vite-plugin-solid": "^2.10.2",
     "typescript": "~5.2.2",
     "valibot": "^0.20.1",
     "vite": "5.2.2",
