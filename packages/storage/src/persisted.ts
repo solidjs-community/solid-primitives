@@ -183,7 +183,8 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
     options.sync[0]((data: PersistenceSyncData) => {
       if (
         data.key !== name ||
-        (!isServer && (data.url || globalThis.location.href) !== globalThis.location.href)
+        (!isServer && (data.url || globalThis.location.href) !== globalThis.location.href) ||
+        data.newValue === deserialize(untrack(typeof signal[0] === 'function' ? signal[0]() : signal[0]))
       ) {
         return;
       }
