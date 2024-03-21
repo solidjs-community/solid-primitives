@@ -2,10 +2,10 @@ import { getRequestEvent, isServer } from "solid-js/web";
 import { StorageProps, StorageSignalProps, StorageWithOptions } from "./types.js";
 import { addClearMethod } from "./tools.js";
 import { createStorage, createStorageSignal } from "./storage.js";
-import { PageEvent } from "@solidjs/start/dist/server";
+import { FetchEvent } from "@solidjs/start/server";
 
 export type CookieOptions = CookieProperties & {
-  getRequest?: (() => Request) | (() => PageEvent);
+  getRequest?: (() => Request) | (() => FetchEvent);
   setCookie?: (key: string, value: string, options: CookieOptions) => void;
 };
 
@@ -52,9 +52,9 @@ function deserializeCookieOptions(cookie: string, key: string) {
   return cookie.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop() ?? null;
 }
 
-let useRequest: () => PageEvent | undefined;
+let useRequest: () => FetchEvent | undefined;
 try {
-  useRequest = () => getRequestEvent()?.request as PageEvent;
+  useRequest = () => getRequestEvent() as unknown as FetchEvent;
 } catch (e) {
   useRequest = () => {
     // eslint-disable-next-line no-console
@@ -63,7 +63,7 @@ try {
     );
     return {
       request: { headers: { get: () => "" } } as unknown as Request,
-    } as unknown as PageEvent;
+    } as unknown as FetchEvent;
   };
 }
 
@@ -80,7 +80,7 @@ try {
  *   httpOnly?: boolean;
  *   maxAge?: number;
  *   sameSite?: "None" | "Lax" | "Strict";
- *   getRequest?: () => Request | () => PageEvent // useRequest from solid-start, vite users must pass the "useRequest" from "solid-start/server" function manually
+ *   getRequest?: () => Request | () => FetchEvent // useRequest from solid-start, vite users must pass the "useRequest" from "solid-start/server" function manually
  *   setCookie?: (key, value, options) => void // set cookie on the server
  * };
  * ```
@@ -90,19 +90,21 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   _read: isServer
     ? (options?: CookieOptions) => {
         const eventOrRequest = options?.getRequest?.() || useRequest();
-        const request =
-          eventOrRequest && ("request" in eventOrRequest ? eventOrRequest.request : eventOrRequest);
         let result = "";
-        if (eventOrRequest.response.headers) {
-          // Check if we really got a pageEvent
-          result +=
-            eventOrRequest.response.headers
+        if (eventOrRequest) {
+          if ("response" in eventOrRequest) {
+            // Check if we really got a pageEvent
+            const setCookies = eventOrRequest.response.headers
               .get("Set-Cookie")
               ?.split(",")
               .map(cookie => !cookie.match(/\\w*\\s*=\\s*[^;]+/))
-              .join(";") ?? "";
+              .join(";");
+            if (setCookies) result += setCookies + ";";
+          }
+          const request = "request" in eventOrRequest ? eventOrRequest.request : eventOrRequest;
+          result += request.headers.get("Cookie") ?? "";
         }
-        return `${result};${request?.headers?.get("Cookie") ?? ""}`; // because first cookie will be preferred we don't have to worry about duplicates
+        return result; // because first cookie will be preferred we don't have to worry about duplicates
       }
     : () => document.cookie,
   _write: isServer
@@ -111,8 +113,8 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
           options?.setCookie?.(key, value, options);
           return;
         }
-        const pageEvent: PageEvent = options?.getRequest?.() || useRequest();
-        if (!pageEvent.response.headers)
+        const pageEvent = options?.getRequest?.() || useRequest();
+        if (!pageEvent || !("response" in pageEvent))
           // Check if we really got a pageEvent
           return;
         const responseHeaders = pageEvent.response.headers;
