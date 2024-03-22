@@ -129,12 +129,13 @@ With `storageSync`, you can use exactly this API in order to sync to external up
 const [state, setState] = makePersisted(createSignal(), { sync: storageSync });
 ```
 
-#### postMessageSync
+#### messageSync
 
-With `postMessageSync`, you can recreate the same functionality for other storages within the client.
+With `messageSync`, you can recreate the same functionality for other storages within the client using either the post message API
+or broadcast channel API. If no argument is given, it is using post message, otherwise provide the broadcast channel as argument
 
 ```ts
-const [state, setState] = makePersisted(createSignal(), { storage: customStorage, sync: postMessageSync });
+const [state, setState] = makePersisted(createSignal(), { storage: customStorage, sync: messageSync() });
 ```
 
 #### wsSync

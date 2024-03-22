@@ -229,11 +229,11 @@ export const storageSync: PersistenceSyncAPI = [
 ];
 
 /**
- * postmessageSync - synchronize over post message API
+ * messageSync - synchronize over post message or broadcast channel API
  */
-export const postmessageSync: PersistenceSyncAPI = [
+export const messageSync = (channel: Window | BroadcastChannel = window): PersistenceSyncAPI => [
   (subscriber: PersistenceSyncCallback) =>
-    window.addEventListener("message", ev => subscriber(JSON.parse(ev.data))),
+    channel.addEventListener("message", ev => subscriber(JSON.parse((ev as MessageEvent).data))),
   (key, newValue) =>
     postMessage(
       JSON.stringify({ key, newValue, timeStamp: +new Date(), url: location.href }),

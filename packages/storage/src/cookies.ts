@@ -63,9 +63,10 @@ const setCookie = isServer
       return;
     }
     const serializedOptions = serializeCookieOptions(options);
-    responseHeaders.append(
+    const cleanedCookies = responseHeaders.get("Set-Cookie").replace(new RegExp(`(^|, )${key}=[^,]+,?`, "g"), "$1");
+    responseHeaders.set(
       "Set-Cookie",
-      `${key}=${value}${serializedOptions ? "; " : ""}${serializedOptions}`,
+      `${cleanedCookies}, ${key}=${value}${serializedOptions ? "; " : ""}${serializedOptions}`,
     );
   }
   : () => undefined;
