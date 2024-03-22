@@ -77,7 +77,15 @@ the browser.
 As another storage, `cookieStorage` from this package can be used, which is a `localStorage`-like API to set cookies. It
 will work in the browser and on solid-start, by parsing the `Cookie` and `Set-Cookie` header and altering
 the `Set-Cookie` header. Using it in the server without solid-start will not cause errors, but reading and setting cookies
-will not work, unless you supply `getRequestHeaders() => Headers` and `setCookie(key, value, options) => void` to the options.
+will not work, unless you supply `getRequestHeaders() => Headers` and `getResponseHeaders => Headers` to the options.
+
+```ts
+// for example, in express.js request and response headers can usually be accessed like this:
+const cs = cookieStorage.withOptions({
+  getRequestHeaders: () => req.headers,
+  getResponseHeaders: () => res.headers
+});
+```
 
 > Please mind that `cookieStorage` **doesn't care** about the path and domain when reading cookies. This might cause issues
 > when using multiple cookies with the same key, but different path or domain.
