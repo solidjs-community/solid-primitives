@@ -1,10 +1,10 @@
 {
   "name": "@solid-primitives/upload",
-  "version": "0.0.115",
+  "version": "0.0.117",
   "description": "Primitives for uploading files.",
   "author": "Rustam Ashurmatov <rr.ashurmatov.21@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/upload",
+  "homepage": "https://primitives.solidjs.community/package/upload",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

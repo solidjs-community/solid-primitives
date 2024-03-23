@@ -1,5 +1,18 @@
 # @solid-primitives/raf
 
+## 2.1.16
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 2.1.15
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+
 ## 2.1.14
 
 ### Patch Changes

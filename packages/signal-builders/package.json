@@ -1,10 +1,10 @@
 {
   "name": "@solid-primitives/signal-builders",
-  "version": "0.1.15",
+  "version": "0.1.17",
   "description": "A collection of chainable and composable reactive signal calculations, aka Signal Builders.",
   "author": "Your Name <you@youremail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/signal-builders#readme",
+  "homepage": "https://primitives.solidjs.community/package/signal-builders",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

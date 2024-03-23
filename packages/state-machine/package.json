@@ -1,11 +1,11 @@
 {
   "name": "@solid-primitives/state-machine",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A primitive for creating reactive state machines.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/state-machine#readme",
+  "homepage": "https://primitives.solidjs.community/package/state-machine",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

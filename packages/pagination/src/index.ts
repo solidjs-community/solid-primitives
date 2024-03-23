@@ -300,7 +300,7 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
   const [contents] = createResource(page, fetcher);
 
   createComputed(() => {
-    const content = contents();
+    const content = contents.latest;
     if (!content) return;
     batch(() => {
       if (content.length === 0) setEnd(true);

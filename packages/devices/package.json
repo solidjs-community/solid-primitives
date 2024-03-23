@@ -1,13 +1,13 @@
 {
   "name": "@solid-primitives/devices",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Primitive that enumerates media devices",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
     "Mohan <mohanavel15@protonmail.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/devices#readme",
+  "homepage": "https://primitives.solidjs.community/package/devices",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

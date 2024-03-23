@@ -1,10 +1,10 @@
 {
   "name": "@solid-primitives/mutation-observer",
-  "version": "1.1.15",
+  "version": "1.1.17",
   "description": "Primitive providing the ability to watch for changes made to the DOM tree.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/mutation-observer",
+  "homepage": "https://primitives.solidjs.community/package/mutation-observer",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

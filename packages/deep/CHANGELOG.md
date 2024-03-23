@@ -1,5 +1,19 @@
 # @solid-primitives/deep
 
+## 0.2.7
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/memo@1.3.8
+
+## 0.2.6
+
+### Patch Changes
+
+- @solid-primitives/memo@1.3.7
+
 ## 0.2.5
 
 ### Patch Changes

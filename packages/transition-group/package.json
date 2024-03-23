@@ -1,11 +1,11 @@
 {
   "name": "@solid-primitives/transition-group",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Reactive primitives for implementing transition effects in SolidJS",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/transition-group#readme",
+  "homepage": "https://primitives.solidjs.community/package/transition-group",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

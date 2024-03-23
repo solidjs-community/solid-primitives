@@ -1,5 +1,11 @@
 # @solid-primitives/fullscreen
 
+## 1.2.6
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 1.2.5
 
 ### Patch Changes

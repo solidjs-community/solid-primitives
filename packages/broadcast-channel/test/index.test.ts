@@ -1,6 +1,64 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, beforeAll, afterAll } from "vitest";
 import { createEffect, createRoot } from "solid-js";
-import { OnMessageCB, createBroadcastChannel, makeBroadcastChannel } from "../src/index.js";
+import { createBroadcastChannel, makeBroadcastChannel } from "../src/index.js";
+
+/*
+Mock BroadcastChannel for testing
+postMessage is synchronous so we can test it immediately
+This is to avoid relying on promises and timeouts
+as those are flaky in CI
+*/
+
+const _all_listeners: Record<string, ((message: MessageEvent) => void)[][]> = {};
+
+class BroadcastChannel {
+  listeners: ((message: MessageEvent) => void)[];
+  channel_name: string;
+
+  constructor(channel_name: string) {
+    this.channel_name = channel_name;
+    this.listeners = [];
+    if (!_all_listeners[channel_name]) {
+      _all_listeners[channel_name] = [this.listeners];
+    } else {
+      _all_listeners[channel_name]!.push(this.listeners);
+    }
+  }
+
+  postMessage(message: any) {
+    const event = new MessageEvent("message", { data: message });
+    for (const listeners of _all_listeners[this.channel_name]!) {
+      if (listeners === this.listeners) continue;
+      for (const l of listeners) {
+        l(event);
+      }
+    }
+  }
+  addEventListener(type: string, listener: (message: MessageEvent) => void) {
+    if (type === "message") {
+      this.listeners.push(listener);
+    }
+  }
+  removeEventListener(type: string, listener: (message: MessageEvent) => void) {
+    if (type === "message") {
+      const index = this.listeners.indexOf(listener);
+      if (index >= 0) {
+        this.listeners.splice(index, 1);
+      }
+    }
+  }
+  close() {
+    this.listeners.length = 0;
+  }
+}
+const _original_broadcast_channel = BroadcastChannel;
+
+beforeAll(() => {
+  (global as any).BroadcastChannel = BroadcastChannel;
+});
+afterAll(() => {
+  (global as any).BroadcastChannel = _original_broadcast_channel;
+});
 
 type MsgType = string;
 
@@ -33,30 +91,27 @@ describe("makeBroadcastChannel", () => {
       dispose();
     }));
 
-  test("posting messages between pages", () =>
-    createRoot(async dispose => {
-      const channelName = "channel-1";
-      const mockedBCInstance = buildMockBroadcastChannel(channelName);
+  test("posting messages between pages", () => {
+    const channelName = "channel-1";
+    const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-      const { onMessage } = makeBroadcastChannel<MsgType>(channelName);
+    const { bc, dispose } = createRoot(dispose => {
+      const bc = makeBroadcastChannel<MsgType>(channelName);
+      return { bc, dispose };
+    });
 
-      const getPostMessage = () =>
-        new Promise<string>(resolve => {
-          onMessage(({ data }) => {
-            resolve(data);
-          });
+    let posted_message = "";
+    bc.onMessage(({ data }) => {
+      posted_message += data;
+    });
 
-          mockedBCInstance.postMessage("hi");
-        });
+    mockedBCInstance.postMessage("hi");
+    expect(posted_message).toBe("hi");
 
-      const postedMessage = await getPostMessage();
+    dispose();
+  });
 
-      expect(postedMessage).toBe("hi");
-
-      dispose();
-    }));
-
-  test("posting messages with single instance channel name but called makeBroadcastChannel multiple times", async () => {
+  test("posting messages with single instance channel name but called makeBroadcastChannel multiple times", () => {
     const channelName = "channel-1";
     const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
@@ -73,19 +128,14 @@ describe("makeBroadcastChannel", () => {
 
     const captured: string[] = [];
 
-    const promise = new Promise<void>(resolve => {
-      const handleMessage: OnMessageCB = e => {
-        captured.push(e.data);
-        if (captured.length === 2) resolve();
-      };
-      onMessage1(handleMessage);
-      onMessage2(handleMessage);
+    onMessage1(e => {
+      captured.push(e.data);
+    });
+    onMessage2(e => {
+      captured.push(e.data);
     });
 
     mockedBCInstance.postMessage("hi");
-
-    await promise;
-
     expect(captured).toEqual(["hi", "hi"]);
 
     dispose();
@@ -103,27 +153,21 @@ describe("makeBroadcastChannel", () => {
     });
 
     const captured: string[] = [];
-    let resolve: () => void;
 
     data.bc1.onMessage(e => {
       captured.push(e.data + "1");
-      resolve();
     });
     data.bc2.onMessage(e => {
       captured.push(e.data + "2");
-      resolve();
     });
 
-    const promise = new Promise<void>(r => (resolve = r));
     mockedBCInstance.postMessage("hi");
-    await promise;
-
     expect(captured).toEqual(["hi1"]);
 
     data.dispose();
   });
 
-  test("sending messages", async () => {
+  test("sending messages", async t => {
     const channelName = "channel-1";
 
     const data = createRoot(dispose => {
@@ -144,8 +188,6 @@ describe("makeBroadcastChannel", () => {
 
     data.bc1.postMessage("hi");
     data.bc2.postMessage("bye");
-
-    await new Promise<void>(r => setTimeout(r, 100));
 
     expect(posted_message).toBe("");
 
@@ -177,66 +219,48 @@ describe("createBroadcastChannel", () => {
     const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
     const captured: unknown[] = [];
-    let resolve: () => void;
 
     const dispose = createRoot(dispose => {
       const { message } = createBroadcastChannel<MsgType>(channelName);
 
       createEffect(() => {
         captured.push(message());
-        if (captured.length === 2) resolve();
       });
 
       return dispose;
     });
 
-    const promise = new Promise<void>(r => (resolve = r));
     mockedBCInstance.postMessage("hi");
-    await promise;
-
     expect(captured).toEqual([null, "hi"]);
 
     dispose();
   });
 
-  test("posting messages with single instance channel name but called makeBroadcastChannel multiple times", async () => {
+  test("posting messages with single instance channel name but called makeBroadcastChannel multiple times", () => {
     const channelName = "channel-1";
     const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
-    let resolve1: ((m: unknown) => void) | undefined, resolve2: ((m: unknown) => void) | undefined;
+    let message1 = "";
+    let message2 = "";
 
     const dispose = createRoot(dispose => {
-      const { message: message1 } = createBroadcastChannel<MsgType>(channelName);
-      const { message: message2 } = createBroadcastChannel<MsgType>(channelName);
+      const bc1 = createBroadcastChannel<MsgType>(channelName);
+      const bc2 = createBroadcastChannel<MsgType>(channelName);
 
       createEffect(() => {
-        const m = message1();
-        resolve1?.(m);
+        message1 += bc1.message() + ";";
       });
 
       createEffect(() => {
-        const m = message2();
-        resolve2?.(m);
+        message2 += bc2.message() + ";";
       });
 
       return dispose;
     });
 
     mockedBCInstance.postMessage("hi");
-
-    const captured: unknown[] = [];
-    await new Promise<void>(r => {
-      resolve1 = m => {
-        captured.push(m + "1");
-        if (captured.length === 2) r();
-      };
-      resolve2 = m => {
-        captured.push(m + "2");
-        if (captured.length === 2) r();
-      };
-    });
-
-    expect(captured).toEqual(["hi1", "hi2"]);
+    expect(message1).toBe("null;hi;");
+    expect(message2).toBe("null;hi;");
 
     dispose();
   });

@@ -1,11 +1,11 @@
 {
   "name": "@solid-primitives/trigger",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "description": "A set of primitives based on Solid signals, used to trigger computations.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/trigger#readme",
+  "homepage": "https://primitives.solidjs.community/package/trigger",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

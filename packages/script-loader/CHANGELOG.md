@@ -1,5 +1,11 @@
 # @solid-primitives/script-loader
 
+## 2.1.2
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 2.1.1
 
 ### Patch Changes

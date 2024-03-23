@@ -25,6 +25,11 @@ export const en_dict = {
       return `${list.join(", ")} and ${last}`;
     },
   },
+  jsx: (name: string) => (
+    <>
+      Hi <b>{name}!</b>
+    </>
+  ),
 };
 
 export type Dict = typeof en_dict;
@@ -51,4 +56,9 @@ export const pl_dict = {
       return `${list.join(", ")} i ${last}`;
     },
   },
+  jsx: (name: string) => (
+    <>
+      Cześć <b>{name}!</b>
+    </>
+  ),
 } satisfies Dict;

@@ -1,11 +1,11 @@
 {
   "name": "@solid-primitives/props",
-  "version": "3.1.9",
+  "version": "3.1.11",
   "description": "Library of primitives focused around component props.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/props",
+  "homepage": "https://primitives.solidjs.community/package/props",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

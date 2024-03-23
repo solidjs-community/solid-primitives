@@ -1,10 +1,10 @@
 {
   "name": "@solid-primitives/permission",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Primitive that wraps permission queries",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/permission",
+  "homepage": "https://primitives.solidjs.community/package/permission",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

@@ -1,11 +1,11 @@
 {
   "name": "@solid-primitives/broadcast-channel",
-  "version": "0.0.104",
+  "version": "0.0.105",
   "description": "Primitives to manage Broadcast Channel API",
   "author": "Caleb Taylor <aquaductape@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/broadcast-channel#readme",
+  "homepage": "https://primitives.solidjs.community/package/broadcast-channel",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

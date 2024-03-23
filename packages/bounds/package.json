@@ -1,11 +1,11 @@
 {
   "name": "@solid-primitives/bounds",
-  "version": "0.0.119",
+  "version": "0.0.121",
   "description": "Primitives for tracking HTML element size and position on screen as it changes.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/bounds#readme",
+  "homepage": "https://primitives.solidjs.community/package/bounds",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

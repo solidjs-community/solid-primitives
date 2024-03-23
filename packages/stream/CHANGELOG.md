@@ -1,5 +1,18 @@
 # @solid-primitives/stream
 
+## 0.6.14
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 0.6.13
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+
 ## 0.6.12
 
 ### Patch Changes

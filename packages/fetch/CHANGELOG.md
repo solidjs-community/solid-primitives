@@ -1,5 +1,11 @@
 # @solid-primitives/fetch
 
+## 2.4.9
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
 ## 2.4.8
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # @solid-primitives/history
 
+## 0.1.5
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+
 ## 0.1.3
 
 ### Patch Changes

@@ -1,10 +1,10 @@
 {
   "name": "@solid-primitives/rootless",
-  "version": "1.4.3",
+  "version": "1.4.5",
   "description": "A collection of helpers that aim to simplify using reactive primitives outside of reactive roots, and managing disposal of reactive roots.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#readme",
+  "homepage": "https://primitives.solidjs.community/package/rootless",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

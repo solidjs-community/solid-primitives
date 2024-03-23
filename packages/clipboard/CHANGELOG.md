@@ -1,5 +1,18 @@
 # @solid-primitives/clipboard
 
+## 1.5.10
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 1.5.9
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+
 ## 1.5.8
 
 ### Patch Changes

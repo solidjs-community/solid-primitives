@@ -1,5 +1,18 @@
 # @solid-primitives/storage
 
+## 2.1.4
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 2.1.3
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+
 ## 2.1.2
 
 ### Patch Changes

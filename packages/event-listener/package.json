@@ -1,13 +1,13 @@
 {
   "name": "@solid-primitives/event-listener",
-  "version": "2.3.1",
+  "version": "2.3.3",
   "description": "SolidJS Primitives to manage creating event listeners.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
     "Damian Tarnawski <gthetarnav@gmail.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-listener",
+  "homepage": "https://primitives.solidjs.community/package/event-listener",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

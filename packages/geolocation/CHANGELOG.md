@@ -1,5 +1,21 @@
 # @solid-primitives/geolocation
 
+## 1.4.14
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/static-store@0.0.8
+
+## 1.4.13
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+  - @solid-primitives/static-store@0.0.7
+
 ## 1.4.12
 
 ### Patch Changes

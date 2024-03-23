@@ -1,5 +1,18 @@
 # @solid-primitives/pagination
 
+## 0.2.12
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 0.2.11
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+
 ## 0.2.10
 
 ### Patch Changes

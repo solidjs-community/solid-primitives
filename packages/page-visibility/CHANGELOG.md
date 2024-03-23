@@ -1,5 +1,23 @@
 # @solid-primitives/page-visibility
 
+## 2.0.17
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/event-listener@2.3.3
+  - @solid-primitives/rootless@1.4.5
+
+## 2.0.16
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+  - @solid-primitives/event-listener@2.3.2
+  - @solid-primitives/rootless@1.4.4
+
 ## 2.0.15
 
 ### Patch Changes

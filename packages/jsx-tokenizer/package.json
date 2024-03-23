@@ -1,13 +1,13 @@
 {
   "name": "@solid-primitives/jsx-tokenizer",
-  "version": "1.0.8",
+  "version": "1.0.10",
   "description": "A primitive to tokenize your solid-components to enable custom parsing.",
   "author": "Vincent Van Dijck <vandijckv@gmail.com>",
   "contributors": [
     "Damian Tarnawski <gthetarnav@gmail.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/jsx-tokenizer#readme",
+  "homepage": "https://primitives.solidjs.community/package/jsx-tokenizer",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

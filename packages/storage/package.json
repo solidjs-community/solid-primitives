@@ -1,13 +1,13 @@
 {
   "name": "@solid-primitives/storage",
-  "version": "2.1.2",
+  "version": "2.1.4",
   "description": "Primitive that provides reactive wrappers for storage access",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
     "Tom Pichaud <dev.tompichaud@icloud.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/storage",
+  "homepage": "https://primitives.solidjs.community/package/storage",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

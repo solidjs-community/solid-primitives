@@ -1,11 +1,11 @@
 {
   "name": "@solid-primitives/masonry",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "Primitives for creating a reactive masonry layout.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/masonry#readme",
+  "homepage": "https://primitives.solidjs.community/package/masonry",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

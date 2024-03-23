@@ -1,11 +1,11 @@
 {
   "name": "@solid-primitives/idle",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A primitive to observe the user's idle status and react to its changes.",
   "author": "Aylo Srd <aylo.srd@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/idle#readme",
+  "homepage": "https://primitives.solidjs.community/package/idle",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

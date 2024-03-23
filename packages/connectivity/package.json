@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/connectivity",
-  "version": "0.3.18",
+  "version": "0.3.20",
   "description": "A navigator.onLine signal.",
   "author": "Klemen Slavič <krof.drakula@gmail.com>",
   "contributors": [
@@ -8,7 +8,7 @@
     "Tom Pichaud <dev.tompichaud@icloud.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/utils#readme",
+  "homepage": "https://primitives.solidjs.community/package/connectivity",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

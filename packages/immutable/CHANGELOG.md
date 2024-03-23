@@ -1,5 +1,21 @@
 # @solid-primitives/immutable
 
+## 1.0.9
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/keyed@1.2.2
+
+## 1.0.8
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+  - @solid-primitives/keyed@1.2.1
+
 ## 1.0.7
 
 ### Patch Changes

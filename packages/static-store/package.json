@@ -1,11 +1,11 @@
 {
   "name": "@solid-primitives/static-store",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "Primitives for creating small reactive objects that doesn't change their shape over time - don't need a proxy wrapper.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/static-store#readme",
+  "homepage": "https://primitives.solidjs.community/package/static-store",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"

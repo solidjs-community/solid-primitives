@@ -1,11 +1,11 @@
 {
   "name": "@solid-primitives/event-dispatcher",
-  "version": "0.0.106",
+  "version": "0.0.107",
   "description": "A primitive to dispatch component events.",
   "author": "Aylo Srd <aylo.srd@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-dispatcher#readme",
+  "homepage": "https://primitives.solidjs.community/package/event-dispatcher",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
