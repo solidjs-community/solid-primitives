@@ -1,5 +1,11 @@
 # @solid-primitives/tween
 
+## 1.3.0
+
+### Minor Changes
+
+- 606af1f: Change method used for tweening (#573)
+
 ## 1.2.8
 
 ### Patch Changes
