@@ -18,21 +18,20 @@ const PaginationDemo: Component = () => {
   const [paginationProps, page, setPage] = createPagination({ pages: 100 });
 
   return (
-      <div class="box-border flex w-1/2 flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
-        <div class="wrapper-v">
-          <h4>Pagination component</h4>
-          <p>Current page: {page()} / 100</p>
-          <nav class="flex flex-row">
-            <For each={paginationProps()}>{props => <button {...props} />}</For>
-          </nav>
-          <button onClick={() => setPage(Math.round(Math.random() * 100 + 1))}>
-            jump to random page
-          </button>
-        </div>
+    <div class="box-border flex w-1/2 flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
+      <div class="wrapper-v">
+        <h4>Pagination component</h4>
+        <p>Current page: {page()} / 100</p>
+        <nav class="flex flex-row">
+          <For each={paginationProps()}>{props => <button {...props} />}</For>
+        </nav>
+        <button onClick={() => setPage(Math.round(Math.random() * 100 + 1))}>
+          jump to random page
+        </button>
       </div>
+    </div>
   );
 };
-
 
 const InfiniteScrollDemo = () => {
   const [pages, infiniteScrollLoader, { end }] = createInfiniteScroll(fetcher);
@@ -50,7 +49,7 @@ const InfiniteScrollDemo = () => {
       </div>
     </div>
   );
-}
+};
 
 const App: Component = () => {
   return (
