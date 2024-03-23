@@ -16,14 +16,15 @@
     "name": "storage",
     "stage": 3,
     "list": [
-      "createStorage",
-      "createCookieStorage",
-      "createAsyncStorage",
-      "createStorageSignal",
-      "createLocalStorage",
-      "createSessionStorage",
+      "makePersisted",
       "cookieStorage",
-      "makePersisted"
+      "multiplexStorage",
+      "storageSync",
+      "messageSync",
+      "wsSync",
+      "multiplexSync",
+      "addClearMethod",
+      "addWithOptionsMethod"
     ],
     "category": "Browser APIs"
   },

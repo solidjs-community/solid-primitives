@@ -32,6 +32,7 @@ import {
   makePersisted,
   multiplexSync,
   storageSync,
+  messageSync,
   wsSync,
 } from "./persisted.js";
 export {
@@ -55,4 +56,5 @@ export {
   multiplexSync,
   storageSync,
   wsSync,
+  messageSync,
 };
