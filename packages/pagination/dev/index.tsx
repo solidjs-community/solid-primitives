@@ -14,12 +14,10 @@ async function fetcher(page: number) {
   return elements;
 }
 
-const App: Component = () => {
+const PaginationDemo: Component = () => {
   const [paginationProps, page, setPage] = createPagination({ pages: 100 });
-  const [pages, infiniteScrollLoader, { end }] = createInfiniteScroll(fetcher);
 
   return (
-    <div class="flex min-h-screen w-full">
       <div class="box-border flex w-1/2 flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
         <div class="wrapper-v">
           <h4>Pagination component</h4>
@@ -32,17 +30,33 @@ const App: Component = () => {
           </button>
         </div>
       </div>
-      <div class="flex max-h-screen w-1/2 flex-col bg-gray-800 text-white">
-        <div class="flex h-[10%] items-center justify-center overflow-scroll">
-          <h1>Infinite Scrolling:</h1>
-        </div>
-        <div class="h-[90%] overflow-scroll">
-          <For each={pages()}>{item => <p>{item}</p>}</For>
-          <Show when={!end()}>
-            <h1 use:infiniteScrollLoader>Loading...</h1>
-          </Show>
-        </div>
+  );
+};
+
+
+const InfiniteScrollDemo = () => {
+  const [pages, infiniteScrollLoader, { end }] = createInfiniteScroll(fetcher);
+  infiniteScrollLoader;
+  return (
+    <div class="flex max-h-screen w-1/2 flex-col bg-gray-800 text-white">
+      <div class="flex h-[10%] items-center justify-center overflow-scroll">
+        <h1>Infinite Scrolling:</h1>
       </div>
+      <div class="h-[90%] overflow-scroll">
+        <For each={pages()}>{item => <p>{item}</p>}</For>
+        <Show when={!end()}>
+          <h1 use:infiniteScrollLoader>Loading...</h1>
+        </Show>
+      </div>
+    </div>
+  );
+}
+
+const App: Component = () => {
+  return (
+    <div class="flex min-h-screen w-full">
+      <PaginationDemo />
+      <InfiniteScrollDemo />
     </div>
   );
 };
