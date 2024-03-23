@@ -30,9 +30,9 @@ export type PersistenceBaseOptions<T> = {
 export type PersistenceOptions<T, O extends Record<string, any>> = PersistenceBaseOptions<T> &
   (
     | {
-      storage: StorageWithOptions<O> | AsyncStorageWithOptions<O>;
-      storageOptions: O;
-    }
+        storage: StorageWithOptions<O> | AsyncStorageWithOptions<O>;
+        storageOptions: O;
+      }
     | { storage?: Storage | AsyncStorage }
   );
 
@@ -180,7 +180,8 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
   else if (init) set(init);
 
   if (typeof options.sync?.[0] === "function") {
-    const get: () => T = typeof signal[0] === 'function' ? signal[0] as () => T : () => (signal[0] as T);
+    const get: () => T =
+      typeof signal[0] === "function" ? (signal[0] as () => T) : () => signal[0] as T;
     options.sync[0]((data: PersistenceSyncData) => {
       if (
         data.key !== name ||
@@ -197,23 +198,23 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
     signal[0],
     typeof signal[0] === "function"
       ? (value?: T | ((prev: T) => T)) => {
-        const output = (signal[1] as Setter<T>)(value as any);
-        const serialized: string | null | undefined =
-          value != null ? (serialize(output) as string) : (value as null | undefined);
-        options.sync?.[1](name, serialized);
-        if (value != null) storage.setItem(name, serialized as string, storageOptions);
-        else storage.removeItem(name, storageOptions);
-        unchanged = false;
-        return output;
-      }
+          const output = (signal[1] as Setter<T>)(value as any);
+          const serialized: string | null | undefined =
+            value != null ? (serialize(output) as string) : (value as null | undefined);
+          options.sync?.[1](name, serialized);
+          if (value != null) storage.setItem(name, serialized as string, storageOptions);
+          else storage.removeItem(name, storageOptions);
+          unchanged = false;
+          return output;
+        }
       : (...args: any[]) => {
-        (signal[1] as any)(...args);
-        const value = serialize(untrack(() => signal[0] as any));
-        options.sync?.[1](name, value);
-        // @ts-ignore
-        storage.setItem(name, value, storageOptions);
-        unchanged = false;
-      },
+          (signal[1] as any)(...args);
+          const value = serialize(untrack(() => signal[0] as any));
+          options.sync?.[1](name, value);
+          // @ts-ignore
+          storage.setItem(name, value, storageOptions);
+          unchanged = false;
+        },
   ] as typeof signal;
 }
 
@@ -249,7 +250,7 @@ export const wsSync = (ws: WebSocket): PersistenceSyncAPI => [
     ws.addEventListener("message", (ev: MessageEvent) => {
       try {
         subscriber(JSON.parse(ev.data));
-      } catch (e) { }
+      } catch (e) {}
     }),
   (key, newValue) =>
     ws.send(

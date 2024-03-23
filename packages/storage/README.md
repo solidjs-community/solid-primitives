@@ -83,7 +83,7 @@ will not work, unless you supply `getRequestHeaders() => Headers` and `getRespon
 // for example, in express.js request and response headers can usually be accessed like this:
 const cs = cookieStorage.withOptions({
   getRequestHeaders: () => req.headers,
-  getResponseHeaders: () => res.headers
+  getResponseHeaders: () => res.headers,
 });
 ```
 
@@ -94,10 +94,9 @@ const cs = cookieStorage.withOptions({
 to use predefined options for your persisted state:
 
 ```ts
-const [state, setState] = makePersisted(
-  createSignal(),
-  { storage: cookieStorage.withOptions({ expires: new Date(+new Date()+3E10) }) }
-);
+const [state, setState] = makePersisted(createSignal(), {
+  storage: cookieStorage.withOptions({ expires: new Date(+new Date() + 3e10) }),
+});
 ```
 
 #### IndexedDB, WebSQL
@@ -114,10 +113,10 @@ works offline and on the server).
 In order to do so, you can use `multiplexStorage`:
 
 ```ts
-const [mode, setMode] = makePersisted(
-  createSignal('dark'),
-  { name: 'mode', storage: multiplexStorage(localStorage, cookieStorage) }
-);
+const [mode, setMode] = makePersisted(createSignal("dark"), {
+  name: "mode",
+  storage: multiplexStorage(localStorage, cookieStorage),
+});
 ```
 
 If none of your storage APIs is asynchronous, the resulting API is synchronous, otherwise it is async. For the getItem
@@ -143,7 +142,10 @@ With `messageSync`, you can recreate the same functionality for other storages w
 or broadcast channel API. If no argument is given, it is using post message, otherwise provide the broadcast channel as argument
 
 ```ts
-const [state, setState] = makePersisted(createSignal(), { storage: customStorage, sync: messageSync() });
+const [state, setState] = makePersisted(createSignal(), {
+  storage: customStorage,
+  sync: messageSync(),
+});
 ```
 
 #### wsSync
@@ -160,7 +162,9 @@ const [state, setState] = makePersisted(createSignal(), { sync: wsSync(makeWs(..
 You can also multiplex different synchronization APIs using multiplexSync:
 
 ```ts
-const [state, setState] = makePersisted(createSignal(), { sync: multiplexSync(storageSync, wsSync(ws)) });
+const [state, setState] = makePersisted(createSignal(), {
+  sync: multiplexSync(storageSync, wsSync(ws)),
+});
 ```
 
 #### Custom synchronization API
