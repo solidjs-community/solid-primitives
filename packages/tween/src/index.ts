@@ -2,9 +2,9 @@ import { createSignal, createEffect, onCleanup, on } from "solid-js";
 import { isServer } from "solid-js/web";
 
 export type TweenProps = {
-  duration?: number,
-  ease?: (t: number) => number,
-}
+  duration?: number;
+  ease?: (t: number) => number;
+};
 
 /**
  * Creates a simple tween method.
@@ -47,19 +47,24 @@ export default function createTween(
     if (elapsed < duration) {
       setCurrent(startValue + ease(elapsed / duration) * delta);
       cancelId = requestAnimationFrame(tick);
-    }
-    else {
+    } else {
       setCurrent(target());
     }
   }
 
-  createEffect(on(target, () => {
-    start = performance.now();
-    startValue = current();
-    delta = target() - startValue;
-    cancelId = requestAnimationFrame(tick);
-    onCleanup(() => cancelAnimationFrame(cancelId));
-  }, { defer: true }));
+  createEffect(
+    on(
+      target,
+      () => {
+        start = performance.now();
+        startValue = current();
+        delta = target() - startValue;
+        cancelId = requestAnimationFrame(tick);
+        onCleanup(() => cancelAnimationFrame(cancelId));
+      },
+      { defer: true },
+    ),
+  );
 
   return current;
 }
