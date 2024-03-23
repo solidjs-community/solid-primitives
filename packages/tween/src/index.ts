@@ -1,7 +1,7 @@
 import { createSignal, createEffect, onCleanup, on } from "solid-js";
 import { isServer } from "solid-js/web";
 
-type TweenProps = {
+export type TweenProps = {
   duration?: number,
   ease?: (t: number) => number,
 }

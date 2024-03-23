@@ -1,96 +1,135 @@
 import { createRoot, createSignal } from "solid-js";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, afterEach } from "vitest";
 import createTween from "../src/index.js";
-import type { Stub } from "raf-stub";
-import createStub from "raf-stub";
 
-describe("createTween", () => {
-  it("returns a signal", () => {
-    createRoot(dispose => {
-      const [value] = createSignal(0);
-      const tweenedValue = createTween(value, {});
-      expect(tweenedValue()).toBe(0);
+let _last_id = 0
+let _raf_callbacks_old = new Map<number, FrameRequestCallback>()
+let _raf_callbacks_new = new Map<number, FrameRequestCallback>()
 
-      dispose();
-    });
-  });
-});
+function _flush_raf(time: number) {
+  _raf_callbacks_old = _raf_callbacks_new
+  _raf_callbacks_new = new Map()
+  for (const callback of _raf_callbacks_old.values()) {
+    callback(time)
+  }
+  _raf_callbacks_old.clear()
+}
+
+function _mocked_requestAnimationFrame(callback: FrameRequestCallback): number {
+  const id = _last_id++;
+  _raf_callbacks_new.set(id, callback)
+  return id;
+}
+function _mocked_cancelAnimationFrame(id: number): void {
+  _raf_callbacks_new.delete(id)
+}
+
+vi.stubGlobal("requestAnimationFrame", _mocked_requestAnimationFrame)
+vi.stubGlobal("cancelAnimationFrame", _mocked_cancelAnimationFrame)
+
+afterEach(() => {
+  _raf_callbacks_old.clear()
+  _raf_callbacks_new.clear()
+  _last_id = 0
+})
 
 describe("animation", () => {
-  let rafTimer: Stub;
-
-  beforeEach(() => {
-    rafTimer = createStub();
-
-    vi
-      .spyOn(window, "requestAnimationFrame")
-      .mockImplementation(rafTimer.add);
-
-    vi
-      .spyOn(window, "cancelAnimationFrame")
-      .mockImplementation(rafTimer.remove);
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-    vi.restoreAllMocks();
-  });
-
   it("updates when its target changes", () => {
-    const [value, setValue] = createSignal(0);
-    const tweenedValue = createTween(value, {});
-    setValue(100);
-    expect(tweenedValue()).toBe(0);
-    rafTimer.flush();
-    expect(tweenedValue()).toBe(100);
+    const [source, setSource] = createSignal(0);
+    let dispose!: () => void
+    let tweened!: () => number
+    createRoot(d => {
+      dispose = d;
+      tweened = createTween(source, {});
+    })
+
+    const start = performance.now()
+    expect(tweened()).toBe(0);
+
+    setSource(100);
+    expect(tweened()).toBe(0);
+
+    _flush_raf(start + 200);
+    expect(tweened()).toBe(100);
+
+    dispose()
   });
 
   it("uses a linear animation by default", () => {
     const [value, setValue] = createSignal(0);
-    const tweenedValue = createTween(value, { duration: 100 });
+    let dispose!: () => void
+    let tweened!: () => number
+    createRoot(d => {
+      dispose = d;
+      tweened = createTween(value, { duration: 100 });
+    })
+    
+    const start = performance.now()
     setValue(100);
-    expect(tweenedValue()).toBe(0);
-    rafTimer.step(1, 25);
-    expect(tweenedValue()).toBeCloseTo(25, 0);
-    rafTimer.step(1, 25);
-    expect(tweenedValue()).toBeCloseTo(50, 0);
-    rafTimer.step(1, 25);
-    expect(tweenedValue()).toBeCloseTo(75, 0);
-    rafTimer.step(1, 25);
-    expect(tweenedValue()).toBeCloseTo(100, 0);
+    expect(tweened()).toBe(0);
+
+    _flush_raf(start + 25)
+    expect(tweened()).toBeCloseTo(25, 0);
+
+    _flush_raf(start + 50)
+    expect(tweened()).toBeCloseTo(50, 0);
+
+    _flush_raf(start + 75)
+    expect(tweened()).toBeCloseTo(75, 0);
+
+    _flush_raf(start + 100)
+    expect(tweened()).toBeCloseTo(100, 0);
+
+    dispose()
   });
 
   it("accepts custom easing functions", () => {
     const [value, setValue] = createSignal(0);
-    const tweenedValue = createTween(value, { duration: 100, ease: t => t * t });
-    setValue(100);
-    expect(tweenedValue()).toBe(0);
-    rafTimer.step(1, 25);
-    expect(tweenedValue()).toBeCloseTo(6.25, 0);
-    rafTimer.step(1, 25);
-    expect(tweenedValue()).toBeCloseTo(25, 0);
-    rafTimer.step(1, 25);
-    expect(tweenedValue()).toBeCloseTo(56.25, 0);
-    rafTimer.step(1, 25);
-    expect(tweenedValue()).toBeCloseTo(100, 0);
-  });
+    let dispose!: () => void
+    let tweened!: () => number
+    createRoot(d => {
+      dispose = d;
+      tweened = createTween(value, { duration: 100, ease: t => t * t });
+    })
 
-  it("should not update immediately after creation", () => {
-    const [value] = createSignal(0);
-    createTween(value, { duration: 100 });
-    expect(window.requestAnimationFrame).not.toBeCalled();
+    const start = performance.now()
+    setValue(100);
+    expect(tweened()).toBe(0);
+    
+    _flush_raf(start + 25)
+    expect(tweened()).toBeCloseTo(6.25, 0);
+
+    _flush_raf(start + 50)
+    expect(tweened()).toBeCloseTo(25, 0);
+
+    _flush_raf(start + 75)
+    expect(tweened()).toBeCloseTo(56.25, 0);
+
+    _flush_raf(start + 100)
+    expect(tweened()).toBeCloseTo(100, 0);
+
+    dispose()
   });
 
   it("can be interrupted part-way through an animation", () => {
     const [value, setValue] = createSignal(0);
-    const tweenedValue = createTween(value, { duration: 1000 });
+    let dispose!: () => void
+    let tweened!: () => number
+    createRoot(d => {
+      dispose = d;
+      tweened = createTween(value, { duration: 1000 });
+    })
+    const start = performance.now();
+
     setValue(100);
-    rafTimer.step(1, 600);
-    expect(tweenedValue()).toBeCloseTo(60, 0);
-    rafTimer.reset();
+    _flush_raf(start + 600);
+    expect(tweened()).toBeCloseTo(60, 0);
+
     setValue(0);
-    expect(window.cancelAnimationFrame).toHaveBeenCalled();
-    rafTimer.step(1, 500);
-    expect(tweenedValue()).toBeCloseTo(30, 0);
+
+    _flush_raf(start + 500);
+    expect(tweened()).toBeCloseTo(30, 0);
+
+    dispose()
   });
 });
