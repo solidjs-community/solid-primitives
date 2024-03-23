@@ -16,14 +16,15 @@
     "name": "storage",
     "stage": 3,
     "list": [
-      "createStorage",
-      "createCookieStorage",
-      "createAsyncStorage",
-      "createStorageSignal",
-      "createLocalStorage",
-      "createSessionStorage",
+      "makePersisted",
       "cookieStorage",
-      "makePersisted"
+      "multiplexStorage",
+      "storageSync",
+      "messageSync",
+      "wsSync",
+      "multiplexSync",
+      "addClearMethod",
+      "addWithOptionsMethod"
     ],
     "category": "Browser APIs"
   },
@@ -65,17 +66,10 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12",
-    "solid-start": ">=0.2.26"
+    "solid-js": "^1.6.12"
   },
-  "peerDependenciesMeta": {
-    "solid-start": {
-      "optional": true
-    }
-  },
-  "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.8.7",
-    "solid-start": "^0.3.10"
-  }
+    "solid-js": "^1.8.15"
+  },
+  "typesVersions": {}
 }
