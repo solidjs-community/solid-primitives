@@ -136,10 +136,7 @@ export const prefix: <Dict extends BaseRecordDict, P extends string>(
   return result;
 };
 
-type DefaultResolveArgs = string | number | boolean;
-type DefaultResolved = string
-
-export type BaseTemplateArgs<Args = DefaultResolveArgs> = Record<string, Args>;
+export type BaseTemplateArgs<Args = string | number | boolean> = Record<string, Args>;
 
 /**
  * A string branded with arguments needed to resolve the template.
@@ -166,7 +163,7 @@ export const template = <T extends BaseTemplateArgs>(source: string): Template<T
 /**
  * Resolve a {@link Template} with the provided {@link TemplateArgs}.
  */
-export type TemplateResolver<Out = DefaultResolved, Args = DefaultResolveArgs> = <Dict extends string>(
+export type TemplateResolver<Out = string, Args = string | number | boolean> = <Dict extends string>(
   template: Dict,
   ...args: ResolveArgs<Dict, Args>
 ) => Out;
@@ -194,7 +191,7 @@ export const identityResolveTemplate = (v => v) as TemplateResolver<any, any>;
 
 export type Resolved<Value, Out> = Value extends (...args: any[]) => infer R ? R : Value extends string ? Out : Value;
 
-export type ResolveArgs<Value, Args> = Value extends (...args: infer A) => any
+export type ResolveArgs<Value, Args = string | number | boolean> = Value extends (...args: infer A) => any
   ? A
   : Value extends Template<infer R>
     ? (R extends BaseTemplateArgs<Args> ? [args: R] : [`Translator resolver doesn't fully support the argument types used in this template`])
@@ -205,12 +202,12 @@ export type ResolveArgs<Value, Args> = Value extends (...args: infer A) => any
 export type Resolver<Value, Out, Args> = (...args: ResolveArgs<Value, Args>) => Resolved<Value, Out>;
 export type NullableResolver<T, Out, Args> = (...args: ResolveArgs<T, Args>) => Resolved<T, Out> | undefined;
 
-export type Translator<Dict extends BaseRecordDict, Out = DefaultResolved, Args = DefaultResolveArgs> = <K extends keyof Dict>(
+export type Translator<Dict extends BaseRecordDict, Out = string, Args = string | number | boolean> = <K extends keyof Dict>(
   path: K,
   ...args: ResolveArgs<Dict[K], Args>
 ) => Resolved<Dict[K], Out>;
 
-export type NullableTranslator<Dict extends BaseRecordDict, Out = DefaultResolved, Args = DefaultResolveArgs> = <K extends keyof Dict>(
+export type NullableTranslator<Dict extends BaseRecordDict, Out = string, Args = string | number | boolean> = <K extends keyof Dict>(
   path: K,
   ...args: ResolveArgs<Dict[K], Args>
 ) => Resolved<Dict[K], Out> | undefined;
@@ -245,15 +242,15 @@ export type NullableTranslator<Dict extends BaseRecordDict, Out = DefaultResolve
  * t("food.meat") // => "meat"
  * ```
  */
-export function translator<Dict extends BaseRecordDict, Out = DefaultResolved, Args = DefaultResolveArgs>(
+export function translator<Dict extends BaseRecordDict, Out = string, Args = string | number | boolean>(
   dict: () => Dict,
   resolveTemplate?: TemplateResolver<Out, Args>,
 ): Translator<Dict, Out, Args>;
-export function translator<Dict extends BaseRecordDict, Out = DefaultResolved, Args = DefaultResolveArgs>(
+export function translator<Dict extends BaseRecordDict, Out = string, Args = string | number | boolean>(
   dict: () => Dict | undefined,
   resolveTemplate?: TemplateResolver<Out, Args>,
 ): NullableTranslator<Dict, Out, Args>;
-export function translator<Dict extends BaseRecordDict, Out = DefaultResolved, Args = DefaultResolveArgs>(
+export function translator<Dict extends BaseRecordDict, Out = string, Args = string | number | boolean>(
   dict: () => Dict | undefined,
   resolveTemplate: TemplateResolver<Out, Args> = identityResolveTemplate,
 ): Translator<Dict, Out, Args> {
@@ -263,7 +260,9 @@ export function translator<Dict extends BaseRecordDict, Out = DefaultResolved, A
       case "function":
         return value(...args);
       case "string":
-        return resolveTemplate(value, ...args);
+        // @ts-expect-error: The types don't work out well, because of the template resolution,
+        // but it shouldn't matter, because in the implementation we don't care about that
+        return resolveTemplate(value, args[0])
       default:
         return value;
     }
@@ -328,13 +327,13 @@ export function scopedTranslator<Dict extends BaseRecordDict, Out, Args, Scope e
   return ((path, ...args) => translator(`${scope}.${path}` as keyof Dict, ...args));
 }
 
-export type ChainedTranslator<Dict extends BaseRecordDict, Out = DefaultResolved, Args = DefaultResolveArgs> = {
+export type ChainedTranslator<Dict extends BaseRecordDict, Out = string, Args = string | number | boolean> = {
   readonly [K in keyof Dict]: Dict[K] extends BaseRecordDict
     ? ChainedTranslator<Dict[K], Out, Args>
     : Resolver<Dict[K], Out, Args>;
 };
 
-export type NullableChainedTranslator<Dict extends BaseRecordDict, Out = DefaultResolved, Args = DefaultResolveArgs> = {
+export type NullableChainedTranslator<Dict extends BaseRecordDict, Out = string, Args = string | number | boolean> = {
   readonly [K in keyof Dict]: Dict[K] extends BaseRecordDict
     ? NullableChainedTranslator<Dict[K], Out, Args>
     : NullableResolver<Dict[K], Out, Args>;
