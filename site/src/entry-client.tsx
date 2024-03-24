@@ -1,5 +1,6 @@
+// @refresh reload
 import { debounce } from "@solid-primitives/scheduled";
-import { mount, StartClient } from "solid-start/entry-client";
+import { mount, StartClient } from "@solidjs/start/client";
 
 // import "solid-devtools";
 

@@ -68,6 +68,12 @@
   "peerDependencies": {
     "solid-js": "^1.6.12"
   },
+  "peerDependenciesMeta": {
+    "@solidjs/start": {
+      "optional": true
+    }
+  },
+  "typesVersions": {},
   "devDependencies": {
     "solid-js": "^1.8.15"
   },
