@@ -1,7 +1,8 @@
-import { A, Title } from "solid-start";
-import { HttpStatusCode } from "solid-start/server";
 import { pageWidthClass } from "~/constants";
 import { DocumentClass } from "~/primitives/document-class";
+import { Title } from "@solidjs/meta";
+import { HttpStatusCode } from "@solidjs/start";
+import { A } from "@solidjs/router";
 
 export default function NotFound() {
   return (
