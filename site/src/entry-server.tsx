@@ -1,3 +1,4 @@
-import { createHandler, renderAsync, StartServer } from "solid-start/entry-server";
+// @refresh reload
+import { createHandler, StartServer } from "@solidjs/start/server";
 
-export default createHandler(renderAsync(event => <StartServer event={event} />));
+export default createHandler(() => <StartServer document={(props) => props.children}/>, { mode: "async" });

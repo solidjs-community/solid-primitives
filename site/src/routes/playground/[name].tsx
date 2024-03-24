@@ -1,9 +1,10 @@
 import { Component, Suspense, createMemo, lazy } from "solid-js";
 import { Dynamic } from "solid-js/web";
-import { Title, useParams } from "solid-start";
 import { HEADER_HEIGHT } from "~/components/Header/Header.jsx";
 import "./playground.scss";
 import { kebabCaseToCapitalized } from "~/utils.js";
+import { Title } from "@solidjs/meta";
+import { useParams } from "@solidjs/router";
 
 const modules = Object.entries(import.meta.glob("~/../../packages/*/dev/index.tsx")).reduce(
   (acc, [path, fn]) => {

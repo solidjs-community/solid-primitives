@@ -1,13 +1,13 @@
 import { createMediaQuery } from "@solid-primitives/media";
 import { useWindowScrollPosition } from "@solid-primitives/scroll";
 import { createMarker, makeSearchRegex } from "@solid-primitives/marker";
-import { A } from "solid-start/router";
 import Fuse from "fuse.js";
 import { FiChevronLeft, FiSearch, FiX } from "solid-icons/fi";
 import { Component, createMemo, createResource, createSignal, For, Show } from "solid-js";
 import { fetchPackageList } from "~/api.js";
 import { PackageListItem } from "~/types.js";
 import { focusInputAndKeepVirtualKeyboardOpen } from "~/utils.js";
+import { A } from "@solidjs/router";
 
 let inputEl: HTMLInputElement | undefined;
 

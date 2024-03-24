@@ -2,10 +2,10 @@ import { createIntersectionObserver } from "@solid-primitives/intersection-obser
 import { isIOS, isSafari } from "@solid-primitives/platform";
 import { defer } from "@solid-primitives/utils";
 import { createEffect, createSignal, onMount, ParentComponent } from "solid-js";
-import { useLocation } from "solid-start/router";
 import { pageWidthClass } from "~/constants.js";
 import { doesPathnameMatchBase, reflow } from "~/utils.js";
 import * as Header from "./Header/Header.js";
+import { useLocation } from "@solidjs/router";
 
 export const TR: ParentComponent = props => {
   return (

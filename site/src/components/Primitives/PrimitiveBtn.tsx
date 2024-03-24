@@ -1,5 +1,5 @@
 import { ParentComponent } from "solid-js";
-import { A } from "solid-start";
+import { A } from "@solidjs/router";
 
 const PrimitiveBtn: ParentComponent<{ href: string }> = props => {
   return (
