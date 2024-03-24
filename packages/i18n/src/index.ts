@@ -47,7 +47,7 @@ type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
  * ```
  */
 export type Flatten<Dict extends BaseDict, P = {}> = number extends Dict
-  ? /* catch any */ {}
+  ? /* catch any */ BaseRecordDict
   : Dict extends (infer V)[]
     ? /* array */ { readonly [K in JoinPath<P, number>]?: V } & (V extends BaseDict
     ? Partial<Flatten<V, JoinPath<P, number>>>
