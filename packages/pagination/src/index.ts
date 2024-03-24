@@ -270,7 +270,7 @@ export type _E = JSX.Element;
  */
 export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
   pages: Accessor<T[]>,
-  loader: Directive,
+  loader: (el: Element) => void,
   options: {
     page: Accessor<number>;
     setPage: Setter<number>;
