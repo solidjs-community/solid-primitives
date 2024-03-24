@@ -13,7 +13,7 @@ export type Values<O extends Object> = O[keyof O];
 
 export type Noop = (...a: any[]) => void;
 
-export type Directive<P = true> = (el: Element, props?: Accessor<P>) => void;
+export type Directive<P = true> = (el: Element, props: Accessor<P>) => void;
 
 /**
  * Infers the type of the array elements
