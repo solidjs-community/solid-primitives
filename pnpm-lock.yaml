@@ -898,11 +898,8 @@ importers:
         version: link:../utils
     devDependencies:
       solid-js:
-        specifier: ^1.8.7
-        version: 1.8.7
-      solid-start:
-        specifier: ^0.3.10
-        version: 0.3.10(@solidjs/meta@0.29.3)(@solidjs/router@0.8.4)(solid-js@1.8.7)(vite@4.5.1)
+        specifier: ^1.8.15
+        version: 1.8.16
 
   packages/stream:
     dependencies:
