@@ -50,11 +50,11 @@ export type Flatten<T extends BaseDict, P = {}> = number extends T
   ? /* catch any */ BaseRecordDict
   : T extends (infer V)[]
     ? /* array */ { readonly [K in JoinPath<P, number>]?: V } & (V extends BaseDict
-    ? Partial<Flatten<V, JoinPath<P, number>>>
-    : {})
+        ? Partial<Flatten<V, JoinPath<P, number>>>
+        : {})
     : /* record */ UnionToIntersection<
-    { [K in keyof T]: T[K] extends BaseDict ? Flatten<T[K], JoinPath<P, K>> : never }[keyof T]
-  > & { readonly [K in keyof T as JoinPath<P, K>]: T[K] };
+        { [K in keyof T]: T[K] extends BaseDict ? Flatten<T[K], JoinPath<P, K>> : never }[keyof T]
+      > & { readonly [K in keyof T as JoinPath<P, K>]: T[K] };
 
 function visitDict(flat_dict: Record<string, unknown>, dict: BaseDict, path: string): void {
   for (const [key, value] of Object.entries(dict)) {
@@ -376,11 +376,11 @@ export function chainedTranslator<T extends BaseRecordDict, O>(
     result[key] = isRecordDict(value)
       ? chainedTranslator(value, translate, key_path)
       : (...args: any[]) =>
-        translate(
-          key_path,
-          // @ts-expect-error
-          ...args,
-        );
+          translate(
+            key_path,
+            // @ts-expect-error
+            ...args,
+          );
   }
 
   return result;
@@ -430,8 +430,7 @@ class Traps<O> {
   constructor(
     private readonly translate: Translator<BaseRecordDict, O>,
     private readonly path: string,
-  ) {
-  }
+  ) {}
 
   get(target: any, prop: PropertyKey): any {
     if (typeof prop !== "string") return Reflect.get(target, prop);
