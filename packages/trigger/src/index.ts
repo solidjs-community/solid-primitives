@@ -50,6 +50,11 @@ export class TriggerCache<T> {
     this.#map.get(key)?.$$();
   }
 
+  dirtyAll() {
+    if (isServer) return;
+    for (const trigger of this.#map.values()) trigger.$$();
+  }
+
   track(key: T) {
     if (!getListener()) return;
     let trigger = this.#map.get(key);
@@ -93,7 +98,7 @@ export class TriggerCache<T> {
  */
 export function createTriggerCache<T>(
   mapConstructor: WeakMapConstructor | MapConstructor = Map,
-): [track: (key: T) => void, dirty: (key: T) => void] {
+): [track: (key: T) => void, dirty: (key: T) => void, dirtyAll: () => void] {
   const map = new TriggerCache(mapConstructor);
-  return [map.track.bind(map), map.dirty.bind(map)];
+  return [map.track.bind(map), map.dirty.bind(map), map.dirtyAll.bind(map)];
 }
