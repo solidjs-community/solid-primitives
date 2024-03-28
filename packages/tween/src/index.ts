@@ -1,6 +1,11 @@
 import { createSignal, createEffect, onCleanup, on } from "solid-js";
 import { isServer } from "solid-js/web";
 
+export type TweenProps = {
+  duration?: number;
+  ease?: (t: number) => number;
+};
+
 /**
  * Creates a simple tween method.
  *
@@ -10,32 +15,57 @@ import { isServer } from "solid-js/web";
  *
  * @example
  * ```ts
- * const tweenedValue = createTween(myNumber, { duration: 500 });
+ * const [value, setValue] = createSignal(100);
+ * const tweenedValue = createTween(value, {
+ *   duration: 500,
+ *   ease: (t) => 0.5 - Math.cos(Math.PI * t) / 2
+ * });
+ * ```
+ * ```jsx
+ * <button onClick={() => setValue(value() === 0 ? 100 : 0)}>
+ *   {Math.round(tweenedValue())}
+ * </button>
  * ```
  */
-export default function createTween<T extends number>(
-  target: () => T,
-  { ease = (t: T) => t, duration = 100 },
-): () => T {
+export default function createTween(
+  target: () => number,
+  { ease = (t: number) => t, duration = 100 }: TweenProps,
+): () => number {
   if (isServer) {
     return target;
   }
 
-  const [start, setStart] = createSignal(performance.now());
-  const [current, setCurrent] = createSignal<T>(target());
-  createEffect(on(target, () => setStart(performance.now()), { defer: true }));
+  const [current, setCurrent] = createSignal(target());
+  let start: number;
+  let startValue: number;
+  let delta: number;
+  let cancelId: number;
+
+  function tick(t: number) {
+    const elapsed = t - start;
+
+    if (elapsed < duration) {
+      setCurrent(startValue + ease(elapsed / duration) * delta);
+      cancelId = requestAnimationFrame(tick);
+    } else {
+      setCurrent(target());
+    }
+  }
+
   createEffect(
-    on([start, current], () => {
-      const cancelId = requestAnimationFrame(t => {
-        const elapsed = t - (start() || 0) + 1;
-        // @ts-ignore
-        setCurrent(c =>
-          elapsed < duration ? (target() - c) * ease((elapsed / duration) as T) + c : target(),
-        );
-      });
-      onCleanup(() => cancelAnimationFrame(cancelId));
-    }),
+    on(
+      target,
+      () => {
+        start = performance.now();
+        startValue = current();
+        delta = target() - startValue;
+        cancelId = requestAnimationFrame(tick);
+        onCleanup(() => cancelAnimationFrame(cancelId));
+      },
+      { defer: true },
+    ),
   );
+
   return current;
 }
 

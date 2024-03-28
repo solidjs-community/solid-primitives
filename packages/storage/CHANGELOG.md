@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 3.0.0
+
+### Major Changes
+
+- bf7605c: storage: new sync API, multiplexing, cookieStorage fixes, withOptions
+
 ## 2.1.4
 
 ### Patch Changes

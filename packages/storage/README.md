@@ -38,6 +38,8 @@ type PersistedOptions<Type, StorageOptions> = {
   serialize?: (value: Type) => value.toString(),
   // JSON.parse is the default
   deserialize?: (value: string) => Type(value),
+  // sync API (see below)
+  sync?: PersistenceSyncAPI
 };
 ```
 
@@ -74,20 +76,28 @@ the browser.
 
 As another storage, `cookieStorage` from this package can be used, which is a `localStorage`-like API to set cookies. It
 will work in the browser and on solid-start, by parsing the `Cookie` and `Set-Cookie` header and altering
-the `Set-Cookie` header. Using it in the server without solid-start will not cause errors (unless
-you are using stackblitz), but instead emit a warning message. You can also supply your own implementations
-of `cookieStorage._read(key, options)` and `cookieStorage._write(key, value, options)` if neither of those fit your
-need.
+the `Set-Cookie` header. Using it in the server without solid-start will not cause errors, but reading and setting cookies
+will not work, unless you supply `getRequestHeaders() => Headers` and `getResponseHeaders => Headers` to the options.
 
-If you are not using solid-start or are using stackblitz and want to use cookieStorage on the server, you can supply
-optional `getRequest` (either something like useRequest from solid-start or a function that returns the current request)
-and `setCookie` options.
+```ts
+// for example, in express.js request and response headers can usually be accessed like this:
+const cs = cookieStorage.withOptions({
+  getRequestHeaders: () => req.headers,
+  getResponseHeaders: () => res.headers,
+});
+```
 
-When you are using vite and solid-start you want to always provide the `useRequest` function from solid start to
-the `getRequest` option, because of a technical limitation of vite.
+> Please mind that `cookieStorage` **doesn't care** about the path and domain when reading cookies. This might cause issues
+> when using multiple cookies with the same key, but different path or domain.
 
-> Please mind that `cookieStorage` **doesn't care** about the path and domain when reading cookies. This might cause issues when using
-> multiple cookies with the same key, but different path or domain.
+`cookieStorage` has been augmented with the `.withOptions` method that binds options to the other methods. This allows you
+to use predefined options for your persisted state:
+
+```ts
+const [state, setState] = makePersisted(createSignal(), {
+  storage: cookieStorage.withOptions({ expires: new Date(+new Date() + 3e10) }),
+});
+```
 
 #### IndexedDB, WebSQL
 
@@ -95,12 +105,113 @@ There is also [`localForage`](https://localforage.github.io/localForage/), which
 or `localStorage` to provide an asynchronous Storage API that can ideally store much more than the few Megabytes that
 are available in most browsers.
 
+#### Multiplexed storages
+
+You may want to persist your state to multiple storages as a fallback solution (e.g. localStorage vs. cookieStorage so it
+works offline and on the server).
+
+In order to do so, you can use `multiplexStorage`:
+
+```ts
+const [mode, setMode] = makePersisted(createSignal("dark"), {
+  name: "mode",
+  storage: multiplexStorage(localStorage, cookieStorage),
+});
+```
+
+If none of your storage APIs is asynchronous, the resulting API is synchronous, otherwise it is async. For the getItem
+operation, the first storage that returns a valid value will be the source of truth. So you need to await deletion and
+writing before you can rely on the result in case of asynchronous storages.
+
+### Sync API
+
+The storage API has an interesting functionality: if you set an item in one instance of the same page, other instances
+are notified of the change via the storage event so they can elect to automatically update.
+
+#### storageSync
+
+With `storageSync`, you can use exactly this API in order to sync to external updates to the same storage.
+
+```ts
+const [state, setState] = makePersisted(createSignal(), { sync: storageSync });
+```
+
+#### messageSync
+
+With `messageSync`, you can recreate the same functionality for other storages within the client using either the post message API
+or broadcast channel API. If no argument is given, it is using post message, otherwise provide the broadcast channel as argument
+
+```ts
+const [state, setState] = makePersisted(createSignal(), {
+  storage: customStorage,
+  sync: messageSync(),
+});
+```
+
+#### wsSync
+
+With `wsSync`, you can create your synchronization API based on a web socket connection (either created yourself or by our
+`@solid-primitives/websocket` package); this allows synchronization between client and server.
+
+```ts
+const [state, setState] = makePersisted(createSignal(), { sync: wsSync(makeWs(...)) });
+```
+
+#### multiplexSync
+
+You can also multiplex different synchronization APIs using multiplexSync:
+
+```ts
+const [state, setState] = makePersisted(createSignal(), {
+  sync: multiplexSync(storageSync, wsSync(ws)),
+});
+```
+
+#### Custom synchronization API
+
+If you want to create your own sync API, you can use the following pattern:
+
+```ts
+export type PersistenceSyncData = {
+  key: string;
+  newValue: string | null | undefined;
+  timeStamp: number;
+  url?: string;
+};
+
+export type PersistenceSyncCallback = (data: PersistenceSyncData) => void;
+
+export type PersistenceSyncAPI = [
+  /** subscribes to sync */
+  subscribe: (subscriber: PersistenceSyncCallback) => void,
+  update: (key: string, value: string | null | undefined) => void,
+];
+```
+
+You can use APIs like Pusher or a WebRTC data connection to synchronize your state.
+
+### Tools
+
+If you want to build your own Storage and don't want to do a `.clear()` method yourself:
+
+```ts
+const storageWithClearMethod = addClearMethod(storage_without_clear_method);
+```
+
+If your storage API supports options and you want to add predefined options so it behaves like an API without options,
+you can add a `.withOptions` method:
+
+```ts
+const customStorage = addWithOptionsMethod(storage_supporting_options);
+const boundCustomStorage = customStorage.withOptions(myOptions);
+```
+
 ---
 
 ### Deprecated primitives:
 
 The previous implementation proved to be confusing and cumbersome for most people who just wanted to persist their
-signals and stores, so they are now deprecated.
+signals and stores, so they are now deprecated and will soon be removed from this package.
 
 `createStorage` is meant to wrap any `localStorage`-like API to be as accessible as
 a [Solid Store](https://www.solidjs.com/docs/latest/api#createstore). The main differences are
@@ -113,9 +224,7 @@ a [Solid Store](https://www.solidjs.com/docs/latest/api#createstore). The main d
 const [store, setStore, {
   remove: (key: string) => void;
   clear: () => void;
-  toJSON: () => ({[key: string]: string
-})
-;
+  toJSON: () => ({[key: string]: string });
 }]
 = createStorage({api: sessionStorage, prefix: 'my-app'});
 
@@ -269,14 +378,6 @@ The properties of your `createStorage`/`createAsyncStorage`/`createStorageSignal
 - `prefix` (optional): a prefix for the Storage keys
 - `sync` (optional): if set to
   false, [event synchronization](https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent) is disabled
-
-### Tools
-
-If you want to build your own Storage and don't want to do a `.clear()` method yourself:
-
-```ts
-const storageWithClearMethod = addClearMethod(storage_without_clear_method);
-```
 
 ## Demo
 

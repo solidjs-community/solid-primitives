@@ -1,5 +1,11 @@
 # @solid-primitives/pagination
 
+## 0.3.0
+
+### Minor Changes
+
+- 7ba7e1d: infinite scolling: fix suspense
+
 ## 0.2.12
 
 ### Patch Changes

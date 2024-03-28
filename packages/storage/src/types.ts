@@ -7,6 +7,7 @@ export type StorageWithOptions<O> = {
   key: (index: number, options?: O) => string | null;
   getLength?: (options?: O) => number | undefined;
   readonly length: number | undefined;
+  withOptions?: (options: O) => Storage;
   [key: string]: any;
 };
 
@@ -66,6 +67,7 @@ export type AsyncStorageWithOptions<O> = {
   removeItem: (key: string) => Promise<void> | void;
   key: (index: number) => Promise<string | null> | string | null;
   readonly length: Promise<number> | number | undefined;
+  withOptions?: (options: O) => AsyncStorage;
   [key: string]: any;
 };
 
