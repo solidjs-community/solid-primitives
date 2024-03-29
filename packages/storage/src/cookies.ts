@@ -1,6 +1,6 @@
 import { isServer, getRequestEvent, type RequestEvent } from "solid-js/web";
 import { StorageProps, StorageSignalProps, StorageWithOptions } from "./types.js";
-import { addClearMethod } from "./tools.js";
+import { addClearMethod, addWithOptionsMethod } from "./tools.js";
 import { createStorage, createStorageSignal } from "./storage.js";
 
 export type CookieOptions = CookieProperties & {
@@ -79,7 +79,7 @@ const getResponseHeaders = isServer
  * ```
  * Also, you can use its _read and _write properties to change reading and writing
  */
-export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
+export const cookieStorage: StorageWithOptions<CookieOptions> = addWithOptionsMethod(addClearMethod({
   _read: isServer
     ? (options?: CookieOptions) => {
         const requestCookies = (options?.getRequestHeaders?.() || getRequestHeaders()).get(
@@ -144,7 +144,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addClearMethod({
   get length() {
     return this.getLength();
   },
-});
+}));
 
 /**
  * creates a reactive store but bound to document.cookie
