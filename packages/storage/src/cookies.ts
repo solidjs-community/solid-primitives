@@ -79,72 +79,74 @@ const getResponseHeaders = isServer
  * ```
  * Also, you can use its _read and _write properties to change reading and writing
  */
-export const cookieStorage: StorageWithOptions<CookieOptions> = addWithOptionsMethod(addClearMethod({
-  _read: isServer
-    ? (options?: CookieOptions) => {
-        const requestCookies = (options?.getRequestHeaders?.() || getRequestHeaders()).get(
-          "Cookie",
-        );
-        const responseCookies = (options?.getResponseHeaders?.() || getResponseHeaders()).get(
-          "Set-Cookie",
-        );
-        const cookies: Record<string, string> = {};
-        const addCookie = (_: string, key: string, val: string) => (cookies[key] = val);
-        requestCookies?.replace(/(?:^|;)([^=]+)=([^;]+)/g, addCookie);
-        responseCookies?.replace(/(?:^|, )([^=]+)=([^;]+)/g, addCookie);
-        return Object.entries(cookies)
-          .map(keyval => keyval.join("="))
-          .join("; ");
-      }
-    : () => document.cookie,
-  _write: isServer
-    ? (key: string, value: string, options?: CookieOptions) => {
-        const responseHeaders = getResponseHeaders();
-        responseHeaders.set(
-          "Set-Cookie",
-          (responseHeaders.get("Set-Cookie") || "").replace(
-            new RegExp(`(?:^|, )${key}=[^,]+`, "g"),
-            "",
-          ),
-        );
-        responseHeaders.append("Set-Cookie", `${key}=${value}${serializeCookieOptions(options)}`);
-      }
-    : (key: string, value: string, options?: CookieOptions) => {
-        document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
-      },
-  getItem: (key: string, options?: CookieOptions) =>
-    deserializeCookieOptions(cookieStorage._read(options), key),
-  setItem: (key: string, value: string, options?: CookieOptions) => {
-    cookieStorage._write(key, value, options);
-  },
-  removeItem: (key: string, options?: CookieOptions) => {
-    cookieStorage._write(key, "deleted", { ...options, expires: new Date(0) });
-  },
-  key: (index: number, options?: CookieOptions) => {
-    let key: string | null = null;
-    let count = 0;
-    cookieStorage
-      ._read(options)
-      .replace(/(?:^|;)\s*(.+?)\s*=\s*[^;]+/g, (_: string, found: string) => {
-        if (!key && found && count++ === index) {
-          key = found;
+export const cookieStorage: StorageWithOptions<CookieOptions> = addWithOptionsMethod(
+  addClearMethod({
+    _read: isServer
+      ? (options?: CookieOptions) => {
+          const requestCookies = (options?.getRequestHeaders?.() || getRequestHeaders()).get(
+            "Cookie",
+          );
+          const responseCookies = (options?.getResponseHeaders?.() || getResponseHeaders()).get(
+            "Set-Cookie",
+          );
+          const cookies: Record<string, string> = {};
+          const addCookie = (_: string, key: string, val: string) => (cookies[key] = val);
+          requestCookies?.replace(/(?:^|;)([^=]+)=([^;]+)/g, addCookie);
+          responseCookies?.replace(/(?:^|, )([^=]+)=([^;]+)/g, addCookie);
+          return Object.entries(cookies)
+            .map(keyval => keyval.join("="))
+            .join("; ");
         }
+      : () => document.cookie,
+    _write: isServer
+      ? (key: string, value: string, options?: CookieOptions) => {
+          const responseHeaders = getResponseHeaders();
+          responseHeaders.set(
+            "Set-Cookie",
+            (responseHeaders.get("Set-Cookie") || "").replace(
+              new RegExp(`(?:^|, )${key}=[^,]+`, "g"),
+              "",
+            ),
+          );
+          responseHeaders.append("Set-Cookie", `${key}=${value}${serializeCookieOptions(options)}`);
+        }
+      : (key: string, value: string, options?: CookieOptions) => {
+          document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
+        },
+    getItem: (key: string, options?: CookieOptions) =>
+      deserializeCookieOptions(cookieStorage._read(options), key),
+    setItem: (key: string, value: string, options?: CookieOptions) => {
+      cookieStorage._write(key, value, options);
+    },
+    removeItem: (key: string, options?: CookieOptions) => {
+      cookieStorage._write(key, "deleted", { ...options, expires: new Date(0) });
+    },
+    key: (index: number, options?: CookieOptions) => {
+      let key: string | null = null;
+      let count = 0;
+      cookieStorage
+        ._read(options)
+        .replace(/(?:^|;)\s*(.+?)\s*=\s*[^;]+/g, (_: string, found: string) => {
+          if (!key && found && count++ === index) {
+            key = found;
+          }
+          return "";
+        });
+      return key;
+    },
+    getLength: (options?: CookieOptions) => {
+      let length = 0;
+      cookieStorage._read(options).replace(/(?:^|;)\s*.+?\s*=\s*[^;]+/g, (found: string) => {
+        length += found ? 1 : 0;
         return "";
       });
-    return key;
-  },
-  getLength: (options?: CookieOptions) => {
-    let length = 0;
-    cookieStorage._read(options).replace(/(?:^|;)\s*.+?\s*=\s*[^;]+/g, (found: string) => {
-      length += found ? 1 : 0;
-      return "";
-    });
-    return length;
-  },
-  get length() {
-    return this.getLength();
-  },
-}));
+      return length;
+    },
+    get length() {
+      return this.getLength();
+    },
+  }),
+);
 
 /**
  * creates a reactive store but bound to document.cookie
