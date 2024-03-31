@@ -220,6 +220,8 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
 
 /**
  * storageSync - synchronize localStorage
+ * This does only work for { storage: localStorage }.
+ * If you wish to use e.g. cookieStorage, you may use a different sync method
  */
 export const storageSync: PersistenceSyncAPI = [
   (subscriber: PersistenceSyncCallback) =>
