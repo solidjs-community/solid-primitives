@@ -238,7 +238,9 @@ export const messageSync = (channel: Window | BroadcastChannel = window): Persis
   (subscriber: PersistenceSyncCallback) =>
     channel.addEventListener("message", ev => subscriber(JSON.parse((ev as MessageEvent).data))),
   (key, newValue) =>
-    channel.postMessage(JSON.stringify({ key, newValue, timeStamp: +new Date(), url: location.href })),
+    channel.postMessage(
+      JSON.stringify({ key, newValue, timeStamp: +new Date(), url: location.href }),
+    ),
 ];
 
 /**
