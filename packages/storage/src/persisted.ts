@@ -220,6 +220,8 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
 
 /**
  * storageSync - synchronize localStorage
+ * This does only work for { storage: localStorage }.
+ * If you wish to use e.g. cookieStorage, you may use a different sync method
  */
 export const storageSync: PersistenceSyncAPI = [
   (subscriber: PersistenceSyncCallback) =>
@@ -236,9 +238,8 @@ export const messageSync = (channel: Window | BroadcastChannel = window): Persis
   (subscriber: PersistenceSyncCallback) =>
     channel.addEventListener("message", ev => subscriber(JSON.parse((ev as MessageEvent).data))),
   (key, newValue) =>
-    postMessage(
+    channel.postMessage(
       JSON.stringify({ key, newValue, timeStamp: +new Date(), url: location.href }),
-      location.origin,
     ),
 ];
 

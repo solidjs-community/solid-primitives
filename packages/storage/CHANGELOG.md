@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 3.1.0
+
+### Minor Changes
+
+- 713cac6: add forgotten withOptions method to cookieStorage
+
 ## 3.0.0
 
 ### Major Changes
