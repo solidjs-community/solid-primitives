@@ -8,7 +8,7 @@ export type ScriptProps = Omit<ComponentProps<"script">, "src" | "textContent"> 
   [dataAttribute: `data-${string}`]: any;
 };
 
-const OMITTED_PROPS = ["src"] as const;
+const OMITTED_PROPS = ["src", "onload", "onLoad"] as const;
 
 /**
  * Creates a convenient script loader utility
@@ -39,6 +39,12 @@ export function createScriptLoader(props: ScriptProps): HTMLScriptElement | unde
     const prop = /^(https?:|\w[\.\w-_%]+|)\//.test(src) ? "src" : "textContent";
     if (script[prop] !== src) {
       script[prop] = src;
+      if (typeof local.onLoad === "function") {
+        script.addEventListener("load", local.onLoad as EventListener);
+      }
+      if (typeof local.onload === "function") {
+        script.addEventListener("load", local.onload as EventListener);
+      }
       document.head.appendChild(script);
     }
   });
