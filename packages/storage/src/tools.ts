@@ -34,8 +34,10 @@ export const addWithOptionsMethod = <
     methodKeys.reduce(
       (wrapped: Partial<S>, key: keyof S) => {
         if (typeof storage[key] === "function") {
-          (wrapped as any)[key] = (...args: Parameters<(typeof storage)[typeof key]>) =>
-            storage[key]([...args, options]);
+          (wrapped as any)[key] = (...args: Parameters<(typeof storage)[typeof key]>) => {
+            args[storage[key].length - 1] = options;
+            storage[key](...args);
+          }
         }
         return wrapped;
       },
