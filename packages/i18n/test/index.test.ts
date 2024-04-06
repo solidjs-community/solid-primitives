@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, expectTypeOf, test } from "vitest";
 import * as i18n from "../src/index.js";
 import { createEffect, createResource, createRoot, createSignal } from "solid-js";
 import { Locale, en_dict, pl_dict } from "./setup.jsx";
@@ -203,5 +203,26 @@ describe("reactive", () => {
     expect(to_usd).toBe(0.27);
 
     dispose();
+  });
+});
+
+describe("resolver custom result", () => {
+
+  const customResolve: i18n.TemplateResolver<number> = (value, ...args) => {
+    return value.length
+  }
+
+  test("with translator", () => {
+    const dict = i18n.flatten(en_dict)
+    const t = i18n.translator(() => dict, customResolve)
+
+    const dollar_length = t("data.currency.name")
+    const one_length = t("numbers.1")
+
+    expectTypeOf(dollar_length).toEqualTypeOf<number>()
+    expectTypeOf(one_length).toEqualTypeOf<number>()
+
+    expect(dollar_length).toBe(6)
+    expect(one_length).toBe(3)
   });
 });
