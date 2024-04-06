@@ -1,6 +1,6 @@
 import type { Accessor, Setter, Signal } from "solid-js";
 import { createUniqueId, untrack } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer, isDev } from "solid-js/web";
 import type { SetStoreFunction, Store } from "solid-js/store";
 import { reconcile } from "solid-js/store";
 import type { AsyncStorage, AsyncStorageWithOptions, StorageWithOptions } from "./types.js";
@@ -176,13 +176,17 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
         try {
           const value = deserialize(data);
           (signal[1] as any)(() => value);
-        } catch (e) { }
+        } catch (e) {
+          if (isDev) console.warn(e);
+        }
       }
       : (data: string) => {
         try {
           const value = deserialize(data);
           (signal[1] as any)(reconcile(value));
-        } catch (e) { }
+        } catch (e) {
+          if (isDev) console.warn(e);
+        }
       };
   let unchanged = true;
 
@@ -249,7 +253,9 @@ export const messageSync = (channel: Window | BroadcastChannel = window): Persis
     channel.addEventListener("message", ev => {
       try {
         subscriber(JSON.parse((ev as MessageEvent).data));
-      } catch (e) { }
+      } catch (e) {
+        if (isDev) console.warn(e);
+      }
     }),
   (key, newValue) =>
     channel.postMessage(
@@ -265,7 +271,9 @@ export const wsSync = (ws: WebSocket): PersistenceSyncAPI => [
     ws.addEventListener("message", (ev: MessageEvent) => {
       try {
         subscriber(JSON.parse(ev.data));
-      } catch (e) { }
+      } catch (e) {
+        if (isDev) console.warn(e);
+      }
     }),
   (key, newValue) =>
     ws.send(
