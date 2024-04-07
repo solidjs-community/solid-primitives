@@ -251,28 +251,25 @@ export const storageSync: PersistenceSyncAPI = [
 export const messageSync = (channel: Window | BroadcastChannel = window): PersistenceSyncAPI => [
   (subscriber: PersistenceSyncCallback) =>
     channel.addEventListener("message", ev => {
-      try {
-        subscriber(JSON.parse((ev as MessageEvent).data));
-      } catch (e) {
-        if (isDev) console.warn(e);
-      }
+      subscriber((ev as MessageEvent).data);
     }),
   (key, newValue) =>
-    channel.postMessage(
-      JSON.stringify({ key, newValue, timeStamp: +new Date(), url: location.href }),
-    ),
+    channel.postMessage({ key, newValue, timeStamp: +new Date(), url: location.href }, location.origin),
 ];
 
 /**
  * wsSync - syncronize persisted storage via web socket
  */
-export const wsSync = (ws: WebSocket): PersistenceSyncAPI => [
+export const wsSync = (ws: WebSocket, warnOnError: boolean = isDev): PersistenceSyncAPI => [
   (subscriber: PersistenceSyncCallback) =>
     ws.addEventListener("message", (ev: MessageEvent) => {
       try {
-        subscriber(JSON.parse(ev.data));
+        const data = JSON.parse(ev.data);
+        if (["key", "newValue", "timeStamp"].every(item => Object.hasOwn(data, item))) {
+          subscriber(data);
+        }
       } catch (e) {
-        if (isDev) console.warn(e);
+        if (warnOnError) console.warn(e);
       }
     }),
   (key, newValue) =>
