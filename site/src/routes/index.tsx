@@ -148,7 +148,6 @@ const PrimitivesTable: Component<{ packages: PackageListItem[] | undefined }> = 
   );
 };
 
-
 export default function Home() {
   const [content] = createResource(() => fetchHomeContent());
   const [packages] = createResource(() => fetchPackageList());
