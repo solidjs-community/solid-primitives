@@ -2,11 +2,21 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "resolveJsonModule": true,
-    "types": ["vite/client", "node"],
+    "types": [
+      "vinxi/client",
+      "vite/client",
+      "node"
+    ],
     "baseUrl": "./",
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": [
+        "./src/*"
+      ]
     }
   },
-  "include": ["./src", "./scripts", "./vite.config.ts"]
+  "include": [
+    "./src",
+    "./scripts",
+    "./app.config.ts"
+  ]
 }

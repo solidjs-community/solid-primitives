@@ -4,10 +4,12 @@
   "type": "module",
   "scripts": {
     "generate": "tsx ./scripts/generate.ts",
-    "dev": "solid-start dev --host",
-    "build": "solid-start build",
+    "dev": "vinxi dev",
+    "build": "vinxi build",
+    "start": "vinxi start",
+    "version": "vinxi version",
     "deploy": "pnpm generate && pnpm build",
-    "preview": "vite preview --outDir dist/public"
+    "preview": "node .output/server/index.mjs"
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",
@@ -15,8 +17,7 @@
     "@types/mark.js": "^8.11.12",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",
-    "solid-start-static": "^0.3.10",
-    "tailwindcss": "^3.4.0",
+    "tailwindcss": "3.3.3",
     "tailwindcss-dir": "^4.0.0"
   },
   "dependencies": {
@@ -37,7 +38,7 @@
     "@solid-primitives/tween": "workspace:^",
     "@solid-primitives/utils": "workspace:^",
     "@solidjs/meta": "^0.29.3",
-    "@solidjs/router": "^0.8.4",
+    "@solidjs/router": "^0.13.1",
     "clsx": "^2.0.0",
     "fuse.js": "^7.0.0",
     "rehype-sanitize": "^6.0.0",
@@ -45,7 +46,7 @@
     "remark-emoji": "^4.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.0.0",
-    "sass": "^1.69.5",
+    "sass": "^1.72.0",
     "solid-dismiss": "^1.7.121",
     "solid-icons": "^1.1.0",
     "solid-tippy": "^0.2.1",

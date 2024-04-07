@@ -1,6 +1,5 @@
 import { Component, createResource, Show, Suspense } from "solid-js";
 import { NoHydration } from "solid-js/web";
-import { Title, useRouteData } from "solid-start";
 import { fetchHomeContent, fetchPackageList } from "~/api";
 import { HEADER_HEIGHT } from "~/components/Header/Header";
 import PrimitiveBtn from "~/components/Primitives/PrimitiveBtn";
@@ -12,6 +11,7 @@ import { H2 } from "~/components/prose";
 import { StageContent } from "~/components/Stage/Stage";
 import * as Table from "~/components/table";
 import { PackageListItem } from "~/types";
+import { Title } from "@solidjs/meta";
 
 const Header: Component = () => {
   return (
@@ -148,15 +148,10 @@ const PrimitivesTable: Component<{ packages: PackageListItem[] | undefined }> = 
   );
 };
 
-export function routeData() {
-  const [content] = createResource(() => fetchHomeContent());
-  const [packages] = createResource(() => fetchPackageList());
-
-  return { content, packages };
-}
 
 export default function Home() {
-  const { content, packages } = useRouteData<typeof routeData>();
+  const [content] = createResource(() => fetchHomeContent());
+  const [packages] = createResource(() => fetchPackageList());
 
   return (
     <main style={{ "padding-top": `${HEADER_HEIGHT}px` }}>
