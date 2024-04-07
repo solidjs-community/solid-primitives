@@ -1,5 +1,13 @@
 # @solid-primitives/storage
 
+## 3.2.0
+
+### Minor Changes
+
+- 40380a2: safe sync deserialization
+- 407a630: Bugfix for newly introduced sync api. Now BroadcastChannel for `messageSync` should also work as expected.
+- c5145af: fix withOptions
+
 ## 3.1.0
 
 ### Minor Changes
