@@ -1,6 +1,6 @@
 import type { Accessor, Setter, Signal } from "solid-js";
 import { createUniqueId, untrack } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer, isDev } from "solid-js/web";
 import type { SetStoreFunction, Store } from "solid-js/store";
 import { reconcile } from "solid-js/store";
 import type { AsyncStorage, AsyncStorageWithOptions, StorageWithOptions } from "./types.js";
@@ -30,9 +30,9 @@ export type PersistenceBaseOptions<T> = {
 export type PersistenceOptions<T, O extends Record<string, any>> = PersistenceBaseOptions<T> &
   (
     | {
-        storage: StorageWithOptions<O> | AsyncStorageWithOptions<O>;
-        storageOptions: O;
-      }
+      storage: StorageWithOptions<O> | AsyncStorageWithOptions<O>;
+      storageOptions: O;
+    }
     | { storage?: Storage | AsyncStorage }
   );
 
@@ -172,8 +172,22 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
   const init = storage.getItem(name, storageOptions);
   const set =
     typeof signal[0] === "function"
-      ? (data: string) => (signal[1] as any)(() => deserialize(data))
-      : (data: string) => (signal[1] as any)(reconcile(deserialize(data)));
+      ? (data: string) => {
+        try {
+          const value = deserialize(data);
+          (signal[1] as any)(() => value);
+        } catch (e) {
+          if (isDev) console.warn(e);
+        }
+      }
+      : (data: string) => {
+        try {
+          const value = deserialize(data);
+          (signal[1] as any)(reconcile(value));
+        } catch (e) {
+          if (isDev) console.warn(e);
+        }
+      };
   let unchanged = true;
 
   if (init instanceof Promise) init.then(data => unchanged && data && set(data));
@@ -198,23 +212,23 @@ export function makePersisted<T, O extends Record<string, any> = {}>(
     signal[0],
     typeof signal[0] === "function"
       ? (value?: T | ((prev: T) => T)) => {
-          const output = (signal[1] as Setter<T>)(value as any);
-          const serialized: string | null | undefined =
-            value != null ? (serialize(output) as string) : (value as null | undefined);
-          options.sync?.[1](name, serialized);
-          if (value != null) storage.setItem(name, serialized as string, storageOptions);
-          else storage.removeItem(name, storageOptions);
-          unchanged = false;
-          return output;
-        }
+        const output = (signal[1] as Setter<T>)(value as any);
+        const serialized: string | null | undefined =
+          value != null ? (serialize(output) as string) : (value as null | undefined);
+        options.sync?.[1](name, serialized);
+        if (value != null) storage.setItem(name, serialized as string, storageOptions);
+        else storage.removeItem(name, storageOptions);
+        unchanged = false;
+        return output;
+      }
       : (...args: any[]) => {
-          (signal[1] as any)(...args);
-          const value = serialize(untrack(() => signal[0] as any));
-          options.sync?.[1](name, value);
-          // @ts-ignore
-          storage.setItem(name, value, storageOptions);
-          unchanged = false;
-        },
+        (signal[1] as any)(...args);
+        const value = serialize(untrack(() => signal[0] as any));
+        options.sync?.[1](name, value);
+        // @ts-ignore
+        storage.setItem(name, value, storageOptions);
+        unchanged = false;
+      },
   ] as typeof signal;
 }
 
@@ -236,22 +250,27 @@ export const storageSync: PersistenceSyncAPI = [
  */
 export const messageSync = (channel: Window | BroadcastChannel = window): PersistenceSyncAPI => [
   (subscriber: PersistenceSyncCallback) =>
-    channel.addEventListener("message", ev => subscriber(JSON.parse((ev as MessageEvent).data))),
+    channel.addEventListener("message", ev => {
+      subscriber((ev as MessageEvent).data);
+    }),
   (key, newValue) =>
-    channel.postMessage(
-      JSON.stringify({ key, newValue, timeStamp: +new Date(), url: location.href }),
-    ),
+    channel.postMessage({ key, newValue, timeStamp: +new Date(), url: location.href }, location.origin),
 ];
 
 /**
  * wsSync - syncronize persisted storage via web socket
  */
-export const wsSync = (ws: WebSocket): PersistenceSyncAPI => [
+export const wsSync = (ws: WebSocket, warnOnError: boolean = isDev): PersistenceSyncAPI => [
   (subscriber: PersistenceSyncCallback) =>
     ws.addEventListener("message", (ev: MessageEvent) => {
       try {
-        subscriber(JSON.parse(ev.data));
-      } catch (e) {}
+        const data = JSON.parse(ev.data);
+        if (["key", "newValue", "timeStamp"].every(item => Object.hasOwn(data, item))) {
+          subscriber(data);
+        }
+      } catch (e) {
+        if (warnOnError) console.warn(e);
+      }
     }),
   (key, newValue) =>
     ws.send(
@@ -264,6 +283,13 @@ export const wsSync = (ws: WebSocket): PersistenceSyncAPI => [
     ),
 ];
 
+/**
+ * multiplex arbitrary sync APIs
+ *
+ * ```ts
+ * makePersisted(createSignal(0), { sync: multiplexSync(messageSync(bc), wsSync(ws)) })
+ * ```
+ */
 export const multiplexSync = (...syncAPIs: PersistenceSyncAPI[]): PersistenceSyncAPI => [
   subscriber => syncAPIs.forEach(([subscribe]) => subscribe(subscriber)),
   (key, value) => syncAPIs.forEach(([_, updater]) => updater(key, value)),
