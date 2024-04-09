@@ -1,42 +1,12 @@
 import { Accessor } from "solid-js";
 import { isServer } from "solid-js/web";
-import { entries, noop, createHydratableSignal, tryOnCleanup } from "@solid-primitives/utils";
+import { makeEventListener } from "@solid-primitives/event-listener";
+import { entries, noop, createHydratableSignal } from "@solid-primitives/utils";
 import { createHydratableStaticStore } from "@solid-primitives/static-store";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 
 /**
- * Make listener helper to support binding events specifically for MQ.
- * This function doesn't use the standard makeEventListener as iOS 13
- * did not support addEventListener, hence this function checks for it
- * before binding addListener instead.
- * @param mq - ref to MediaQueryList
- * @param type - name of the handled event
- * @param handler - event handler
- * @param options - addEventListener options
- * @returns Function clearing all event listeners form targets
- */
-type EventHandler<T> = (event: T) => void;
-export function makeListener(
-  mq: MediaQueryList,
-  type: string,
-  handler: EventHandler<Event> | EventHandler<MediaQueryListEvent>,
-  options?: EventListenerOptions,
-): VoidFunction {
-  let rm;
-  if ('addEventListener' in mq) {
-    mq.addEventListener('change', handler);
-    rm = mq.removeEventListener.bind(mq, type, handler as EventHandler<Event>, options);
-  } else {
-    // @ts-expect-error deprecated API
-    mq.addListener(handler);
-    // @ts-expect-error deprecated API
-    rm = mq.removeListener.bind(mq, handler, options);
-  }
-  return tryOnCleanup(rm);
-}
-
-/**
- * Attaches a MediaQuery listener to window, listeneing to changes to provided query
+ * attaches a MediaQuery listener to window, listeneing to changes to provided query
  * @param query Media query to listen for
  * @param callback function called every time the media match changes
  * @returns function removing the listener
@@ -55,7 +25,7 @@ export function makeMediaQueryListener(
     return noop;
   }
   const mql = typeof query === "string" ? window.matchMedia(query) : query;
-  return makeListener(mql, "change", callback);
+  return makeEventListener(mql, "change", callback);
 }
 
 /**
@@ -78,7 +48,7 @@ export function createMediaQuery(query: string, serverFallback = false) {
   const mql = window.matchMedia(query);
   const [state, setState] = createHydratableSignal(serverFallback, () => mql.matches);
   const update = () => setState(mql.matches);
-  makeListener(mql, "change", update);
+  makeEventListener(mql, "change", update);
   return state;
 }
 
@@ -178,7 +148,7 @@ export function createBreakpoints<T extends Breakpoints>(
       const mql = window.matchMedia(`(${mediaFeature}: ${width})`);
       matches[token] = mql.matches;
       if (watchChange)
-        makeListener(mql, "change", (e: MediaQueryListEvent) =>
+        makeEventListener(mql, "change", (e: MediaQueryListEvent) =>
           setMatches(token, e.matches as any),
         );
     });

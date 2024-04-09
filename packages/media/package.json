@@ -66,6 +66,7 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "dependencies": {
+    "@solid-primitives/event-listener": "workspace:^",
     "@solid-primitives/rootless": "workspace:^",
     "@solid-primitives/static-store": "workspace:^",
     "@solid-primitives/utils": "workspace:^"

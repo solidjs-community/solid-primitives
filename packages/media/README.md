@@ -200,6 +200,20 @@ createEffect(() => {
 
 > Note: `usePrefersDark` will deopt to `createPrefersDark` if used during hydration. (see issue [#310](https://github.com/solidjs-community/solid-primitives/issues/310))
 
+## Deprecated `addListener` & iOS Support
+
+Due to older versions of [mobile Safari on iOS 13 not supporting](https://github.com/mdn/sprints/issues/858) `addEventListener` on the MediaQueryList API, this primitive will need to be polyfilled. If your application needs to support much older versions of the browser you should [use a polyfill utility](https://github.com/bigslycat/mq-polyfill) or patch the missing function like so:
+
+```ts
+if (!addEventListener in MediaQueryList) {
+  MediaQueryList.prototype.addEventListener = function(type, callback) {
+    if (type === "change") this.addListener(callback)
+  }
+  MediaQueryList.prototype.removeEventListener = function(type, callback) {
+    if (type === "change") this.removeListener(callback)
+  }
+}
+```
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
@@ -207,3 +221,4 @@ See [CHANGELOG.md](./CHANGELOG.md)
 ## Contributors
 
 Thanks to Aditya Agarwal for contributing createBreakpoints.
+
