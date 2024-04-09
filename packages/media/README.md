@@ -203,7 +203,7 @@ createEffect(() => {
 ## Notes
 ### iOS 13 Support & Deprecated `addListener`
 
-Due to older versions of [mobile Safari on iOS 13 not supporting](https://github.com/mdn/sprints/issues/858) `addEventListener` on the MediaQueryList API, this primitive will need to be polyfilled. If your application needs to support much older versions of the browser you should [use a polyfill utility](https://github.com/bigslycat/mq-polyfill) or patch the missing function like so:
+Due to older versions of [mobile Safari on iOS 13 not supporting](https://github.com/mdn/sprints/issues/858) `addEventListener` on the MediaQueryList API, this primitive will need to be polyfilled. If your application needs to support much older versions of the browser you should [use a polyfill utility](https://www.npmjs.com/package/matchmedia-polyfill) or patch the missing function like so:
 
 ```ts
 if (!addEventListener in MediaQueryList) {
