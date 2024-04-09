@@ -1,5 +1,11 @@
 # @solid-primitives/media
 
+## 2.2.9
+
+### Patch Changes
+
+- Added warning regarding iOS13 support and instruction on how to polyfill
+
 ## 2.2.8
 
 ### Patch Changes
@@ -257,5 +263,3 @@ Added `makeMediaQueryListener`, implementation improvements
 2.0.0
 
 Add `usePrefersDark`.
-
-Remove the default export. (`createMediaQuery` will only be available as named export)
