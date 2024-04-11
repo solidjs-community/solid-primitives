@@ -36,7 +36,7 @@ export const addWithOptionsMethod = <
         if (typeof storage[key] === "function") {
           (wrapped as any)[key] = (...args: Parameters<(typeof storage)[typeof key]>) => {
             args[storage[key].length - 1] = options;
-            storage[key](...args);
+            return storage[key](...args);
           };
         }
         return wrapped;
