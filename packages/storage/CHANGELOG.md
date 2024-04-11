@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 3.3.0
+
+### Minor Changes
+
+- 99c6e09: Add back the return statement to withOptions
+
 ## 3.2.0
 
 ### Minor Changes
