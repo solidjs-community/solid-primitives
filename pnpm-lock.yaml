@@ -896,6 +896,9 @@ importers:
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
+      '@tauri-apps/plugin-store':
+        specifier: '*'
+        version: 2.0.0-beta.2
     devDependencies:
       solid-js:
         specifier: ^1.8.15
@@ -5119,6 +5122,17 @@ packages:
     resolution: {integrity: sha512-zxnDjHHKjOsrIzZm6nO5Xapb/BxqUq1tc7cGkFXsFkGTsSWgCPH1D8mm0XS9weJY2OaR73I3k3S+b7eSzJDfqA==}
     engines: {node: '>= 14.6.0', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
     dev: true
+
+  /@tauri-apps/api@2.0.0-beta.4:
+    resolution: {integrity: sha512-Nxtj28NYUo5iwYkpYslxmOPkdI2WkELU2e3UH9nbJm9Ydki2CQwJVGQxx4EANtdZcMNsEsUzRqaDTvEUYH1l6w==}
+    engines: {node: '>= 18', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
+    dev: false
+
+  /@tauri-apps/plugin-store@2.0.0-beta.2:
+    resolution: {integrity: sha512-9TdMLLYEPqRSABRX3GtwFNWiulfW+SUHdi+5dVgdk73B8PtGf457gdtwvgrP/O2k9Vt/ET2X6Nurimx1185AzA==}
+    dependencies:
+      '@tauri-apps/api': 2.0.0-beta.4
+    dev: false
 
   /@testing-library/dom@9.3.4:
     resolution: {integrity: sha512-FlS4ZWlp97iiNWig0Muq8p+3rVDjRiYE+YKGbAqXOu9nwJFFOdL00kFpz42M+4huzYi86vAK1sOOfyOG45muIQ==}

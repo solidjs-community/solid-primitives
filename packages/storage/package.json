@@ -18,6 +18,7 @@
     "list": [
       "makePersisted",
       "cookieStorage",
+      "tauriStorage",
       "multiplexStorage",
       "storageSync",
       "messageSync",
@@ -66,10 +67,14 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "solid-js": "^1.6.12",
+    "@tauri-apps/plugin-store": "*"
   },
   "peerDependenciesMeta": {
     "solid-start": {
+      "optional": true
+    },
+    "@tauri-apps/plugin-store": {
       "optional": true
     }
   },
