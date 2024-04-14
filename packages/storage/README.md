@@ -99,6 +99,48 @@ const [state, setState] = makePersisted(createSignal(), {
 });
 ```
 
+#### TauriStorage
+
+[Tauri](https://tauri.app) is a lightweight run-time for desktop (and soon also mobile) applications utilizing web front-end frameworks. While it supports `localStorage` and `sessionStorage`, it also has its own store plugin with the benefit of improved stability. To use it, install the required modules both on the side of JavaScript and Rust after setting up the project with the help of their command-line interface:
+
+```bash
+npm run tauri add store
+```
+
+Also, it requires a few permissions in `capabilities/default.json`:
+
+```js
+{
+  // other defaults
+  "permissions": [
+    // other permissions
+    "store:allow-get",
+    "store:allow-set",
+    "store:allow-delete",
+    "store:allow-keys",
+    "store:allow-clear"
+  ]
+}
+```
+
+Lastly, initialize the plugin in the setup:
+
+```rs
+fn main() {
+    tauri::Builder::default()
+        // initialize store plugin:
+        .plugin(tauri_plugin_store::Builder::new().build())
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}
+```
+
+Once these preparations are finished, `tauriStorage(name?: string)` can be used as another storage option. To fallback to localStorage if the app does not run within tauri, you can check for `window.__TAURI_INTERNALS__`:
+
+```ts
+const storage = window.__TAURI_INTERNALS__ ? tauriStorage() : localStorage;
+```
+
 #### IndexedDB, WebSQL
 
 There is also [`localForage`](https://localforage.github.io/localForage/), which uses `IndexedDB`, `WebSQL`
