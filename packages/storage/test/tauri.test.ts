@@ -4,7 +4,7 @@ import { tauriStorage } from "../src/tauri.js";
 vi.mock("@tauri-apps/plugin-store", () => {
   class Store {
     private data = new Map<string, any>();
-    constructor(public name?: string) { }
+    constructor(public name?: string) {}
     public get(key: string) {
       return Promise.resolve(this.data.get(key));
     }
@@ -51,4 +51,3 @@ describe("tauriStorage", () => {
     expect(await storage.getItem("delete")).toBe(null);
   });
 });
-
