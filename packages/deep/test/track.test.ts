@@ -4,23 +4,23 @@ import { captureStoreUpdates, trackDeep, trackStore } from "../src/index.js";
 import { createStore, reconcile, unwrap } from "solid-js/store";
 
 const apis: {
-  name: string
-  fn  : (store: any) => () => void,
-  pojo: boolean,
+  name: string;
+  fn: (store: any) => () => void;
+  pojo: boolean;
 }[] = [
   {
     name: "trackDeep",
-    fn  : store => () => trackDeep(store),
+    fn: store => () => trackDeep(store),
     pojo: true,
   },
   {
     name: "trackStore",
-    fn  : store => () => trackStore(store),
+    fn: store => () => trackStore(store),
     pojo: false,
   },
   {
     name: "captureUpdates",
-    fn  : captureStoreUpdates,
+    fn: captureStoreUpdates,
     pojo: false,
   },
 ];
@@ -166,112 +166,112 @@ for (const api of apis) {
     });
 
     test("circular reference", () => {
-      type Ref = {ref: Ref, count: number};
-      const ref: Ref = {ref: null as any, count: 0}
-      ref.ref = ref
+      type Ref = { ref: Ref; count: number };
+      const ref: Ref = { ref: null as any, count: 0 };
+      ref.ref = ref;
 
-      const [sign, set] = createStore(ref)
-      const fn = api.fn(sign)
+      const [sign, set] = createStore(ref);
+      const fn = api.fn(sign);
 
-      let runs = 0
+      let runs = 0;
       createRoot(() => {
         createEffect(() => {
-          fn()
-          runs += 1
-        })
-      })
-      expect(runs).toBe(1)
+          fn();
+          runs += 1;
+        });
+      });
+      expect(runs).toBe(1);
 
-      set("count", 1)
-      expect(runs).toBe(2)
-    })
+      set("count", 1);
+      expect(runs).toBe(2);
+    });
 
     test("circular reference, two effects", () => {
-      type Ref = {ref: Ref, count: number};
-      const ref: Ref = {ref: null as any, count: 0}
-      ref.ref = ref
+      type Ref = { ref: Ref; count: number };
+      const ref: Ref = { ref: null as any, count: 0 };
+      ref.ref = ref;
 
-      const [sign, set] = createStore(ref)
-      const fn_root = api.fn(sign)
-      const fn_leaf = api.fn(sign.ref)
+      const [sign, set] = createStore(ref);
+      const fn_root = api.fn(sign);
+      const fn_leaf = api.fn(sign.ref);
 
-      let runs_root = 0
-      let runs_leaf = 0
+      let runs_root = 0;
+      let runs_leaf = 0;
 
       createRoot(() => {
         createEffect(() => {
-          fn_root()
-          runs_root += 1
-        })
+          fn_root();
+          runs_root += 1;
+        });
         createEffect(() => {
-          fn_leaf()
-          runs_leaf += 1
-        })
-      })
-      
-      expect(runs_root).toBe(1)
-      expect(runs_leaf).toBe(1)
+          fn_leaf();
+          runs_leaf += 1;
+        });
+      });
 
-      set("count", 1)
-      expect(runs_root).toBe(2)
-      expect(runs_leaf).toBe(2)
-    })
+      expect(runs_root).toBe(1);
+      expect(runs_leaf).toBe(1);
+
+      set("count", 1);
+      expect(runs_root).toBe(2);
+      expect(runs_leaf).toBe(2);
+    });
 
     test("multiple references", () => {
-      const obj = {count: 0}
-      const [sign, set] = createStore({a: obj, b: obj})
+      const obj = { count: 0 };
+      const [sign, set] = createStore({ a: obj, b: obj });
 
-      const fn = api.fn(sign)
+      const fn = api.fn(sign);
 
-      let runs = 0
+      let runs = 0;
       createRoot(() => {
         createEffect(() => {
-          fn()
-          runs++
-        })
-      })
+          fn();
+          runs++;
+        });
+      });
 
-      expect(runs).toBe(1)
+      expect(runs).toBe(1);
 
-      set("a", "count", 1)
-      expect(runs).toBe(2)
+      set("a", "count", 1);
+      expect(runs).toBe(2);
 
-      set("b", "count", 2)
-      expect(runs).toBe(3)
-    })
+      set("b", "count", 2);
+      expect(runs).toBe(3);
+    });
 
     test("multiple references, two effects", () => {
-      const obj = {count: 0}
-      const [sign, set] = createStore({a: obj, b: obj})
+      const obj = { count: 0 };
+      const [sign, set] = createStore({ a: obj, b: obj });
 
-      const fn_a = api.fn(sign.a)
-      const fn_b = api.fn(sign.b)
+      const fn_a = api.fn(sign.a);
+      const fn_b = api.fn(sign.b);
 
-      let runs_a = 0
-      let runs_b = 0
+      let runs_a = 0;
+      let runs_b = 0;
 
       createRoot(() => {
         createEffect(() => {
-          fn_a()
-          runs_a++
-        })
+          fn_a();
+          runs_a++;
+        });
         createEffect(() => {
-          fn_b()
-          runs_b++
-        })
-      })
+          fn_b();
+          runs_b++;
+        });
+      });
 
-      expect(runs_a).toBe(1)
-      expect(runs_b).toBe(1)
+      expect(runs_a).toBe(1);
+      expect(runs_b).toBe(1);
 
-      set("a", "count", 1)
-      expect(runs_a).toBe(2)
-      expect(runs_b).toBe(2)
+      set("a", "count", 1);
+      expect(runs_a).toBe(2);
+      expect(runs_b).toBe(2);
 
-      set("b", "count", 2)
-      expect(runs_a).toBe(3)
-      expect(runs_b).toBe(3)
-    })
+      set("b", "count", 2);
+      expect(runs_a).toBe(3);
+      expect(runs_b).toBe(3);
+    });
 
     test("doesn't trigger on unrelated changes", () => {
       const [sign, set] = createStore<any>({ a: { "a.b": "thoughts" } });

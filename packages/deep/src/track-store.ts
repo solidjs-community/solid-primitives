@@ -20,47 +20,48 @@ function getTrackStoreNode(node: StoreNode): VoidFunction | undefined {
       // custom lazy memo to support circular references
       // maybe it won't be needed in solid 2.0
 
-      let is_reading = false
-      let is_stale   = true
-      let version    = 0
+      let is_reading = false;
+      let is_stale = true;
+      let version = 0;
 
-      const [signal, trigger] = createSignal(undefined, EQUALS_FALSE)
+      const [signal, trigger] = createSignal(undefined, EQUALS_FALSE);
 
-      const memo = createMemo(() => {
+      const memo = createMemo(
+        () => {
+          if (is_reading) {
+            node[$TRACK]; // shallow track store node
 
-        if (is_reading) {
-
-          node[$TRACK] // shallow track store node
-  
-          // track each child node
-          for (const [key, child] of Object.entries(unwrapped)) {
-            let childNode: StoreNode;
-            if (
-              child != null && typeof child === "object" &&
-              ((childNode = child[$PROXY]) || $TRACK in (childNode = untrack(() => node[key])))
-            ) {
-              getTrackStoreNode(childNode)?.();
+            // track each child node
+            for (const [key, child] of Object.entries(unwrapped)) {
+              let childNode: StoreNode;
+              if (
+                child != null &&
+                typeof child === "object" &&
+                ((childNode = child[$PROXY]) || $TRACK in (childNode = untrack(() => node[key])))
+              ) {
+                getTrackStoreNode(childNode)?.();
+              }
             }
+          } else {
+            signal();
+            is_stale = true;
           }
-
-        } else {
-          signal()
-          is_stale = true
-        }
-
-      }, undefined, EQUALS_FALSE)
+        },
+        undefined,
+        EQUALS_FALSE,
+      );
 
       track = () => {
-        is_reading = true
+        is_reading = true;
         if (is_stale) {
-          trigger()
-          is_stale = false
+          trigger();
+          is_stale = false;
         }
-        const already_tracked = version === TrackVersion
-        version = TrackVersion
-        already_tracked || memo()
-        is_reading = false
-      }
+        const already_tracked = version === TrackVersion;
+        version = TrackVersion;
+        already_tracked || memo();
+        is_reading = false;
+      };
 
       TrackStoreCache.set(node, track);
     });
