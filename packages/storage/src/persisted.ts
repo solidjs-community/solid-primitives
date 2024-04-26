@@ -25,21 +25,15 @@ export type PersistenceOptions<T, O extends Record<string, any> | undefined> = {
   serialize?: (data: T) => string;
   deserialize?: (data: string) => T;
   sync?: PersistenceSyncAPI;
-} & (
-  undefined extends O 
+} & (undefined extends O
   ? { storage?: Storage | AsyncStorage }
-  : { 
-      storage: StorageWithOptions<O> | AsyncStorageWithOptions<O>, 
-      storageOptions?: O
-    } 
-);
+  : {
+      storage: StorageWithOptions<O> | AsyncStorageWithOptions<O>;
+      storageOptions?: O;
+    });
 
-export type SignalType<S extends Signal<any> | [Store<any>, SetStoreFunction<any>]> = 
-  S extends Signal<infer T>
-  ? T
-  : S extends [Store<infer T>, SetStoreFunction<infer T>]
-  ? T
-  : never;
+export type SignalType<S extends Signal<any> | [Store<any>, SetStoreFunction<any>]> =
+  S extends Signal<infer T> ? T : S extends [Store<infer T>, SetStoreFunction<infer T>] ? T : never;
 
 /**
  * Persists a signal, store or similar API
@@ -65,14 +59,15 @@ export function makePersisted<S extends Signal<any> | [Store<any>, SetStoreFunct
   signal: S,
   options?: PersistenceOptions<SignalType<S>, undefined>,
 ): S;
-export function makePersisted<S extends Signal<any> | [Store<any>, SetStoreFunction<any>], O extends Record<string, any>>(
-  signal: S,
-  options: PersistenceOptions<SignalType<S>, O>,
-): S;
-export function makePersisted<S extends Signal<any> | [Store<any>, SetStoreFunction<any>], O extends Record<string, any> | undefined, T = SignalType<S>>(
-  signal: S,
-  options: PersistenceOptions<T, O> = {} as PersistenceOptions<T, O>,
-): S {
+export function makePersisted<
+  S extends Signal<any> | [Store<any>, SetStoreFunction<any>],
+  O extends Record<string, any>,
+>(signal: S, options: PersistenceOptions<SignalType<S>, O>): S;
+export function makePersisted<
+  S extends Signal<any> | [Store<any>, SetStoreFunction<any>],
+  O extends Record<string, any> | undefined,
+  T = SignalType<S>,
+>(signal: S, options: PersistenceOptions<T, O> = {} as PersistenceOptions<T, O>): S {
   const storage = options.storage || globalThis.localStorage;
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!storage) {
