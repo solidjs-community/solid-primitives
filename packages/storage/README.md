@@ -138,6 +138,8 @@ fn main() {
 Once these preparations are finished, `tauriStorage(name?: string)` can be used as another storage option. To fallback to localStorage if the app does not run within tauri, you can check for `window.__TAURI_INTERNALS__`:
 
 ```ts
+import { tauriStorage } from "@solid-primitives/storage/tauri";
+
 const storage = window.__TAURI_INTERNALS__ ? tauriStorage() : localStorage;
 ```
 
