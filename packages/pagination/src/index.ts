@@ -9,7 +9,6 @@ import {
   createResource,
   createSignal,
   onCleanup,
-  type Ref,
 } from "solid-js";
 import { isServer } from "solid-js/web";
 
@@ -263,11 +262,9 @@ export type _E = JSX.Element;
  * @method `end` is a boolean indicator for end of the page
  * @method `setEnd` allows to manually change the end
  */
-export function createInfiniteScroll<T, E extends Element = Element>(
-  fetcher: (page: number) => Promise<T[]>,
-): [
+export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
   pages: Accessor<T[]>,
-  loader: Ref<E>,
+  loader: (el: Element) => void,
   options: {
     page: Accessor<number>;
     setPage: Setter<number>;
