@@ -26,6 +26,24 @@ const custom_entries: Record<string, preset.EntryOptions | preset.EntryOptions[]
   "controlled-props": {
     entry: "src/index.tsx",
   },
+  /*filesystem: [
+    {
+      entry: "src/index.ts",
+    },
+    {
+      entry: "src/tauri.ts",
+      name: "tauri",
+    },
+  ],*/
+  storage: [
+    {
+      entry: "src/index.ts",
+    },
+    {
+      entry: "src/tauri.ts",
+      name: "tauri",
+    },
+  ],
   utils: [
     {
       entry: "src/index.ts",

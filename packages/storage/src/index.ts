@@ -22,7 +22,6 @@ import {
   createSessionStorage,
 } from "./storage.js";
 import { type CookieOptions, cookieStorage, createCookieStorage } from "./cookies.js";
-import { tauriStorage } from "./tauri.js";
 import { addClearMethod, addWithOptionsMethod, multiplexStorage } from "./tools.js";
 import {
   type PersistenceOptions,
@@ -45,7 +44,6 @@ export {
   createSessionStorage,
   type CookieOptions,
   cookieStorage,
-  tauriStorage,
   addClearMethod,
   addWithOptionsMethod,
   multiplexStorage,
