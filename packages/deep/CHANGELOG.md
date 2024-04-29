@@ -1,5 +1,11 @@
 # @solid-primitives/deep
 
+## 0.2.8
+
+### Patch Changes
+
+- 016fe83: Fix `trackStore` tracking multiple same-object references. (Fixes #582)
+
 ## 0.2.7
 
 ### Patch Changes

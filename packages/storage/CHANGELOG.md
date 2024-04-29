@@ -1,5 +1,17 @@
 # @solid-primitives/storage
 
+## 3.5.0
+
+### Minor Changes
+
+- 72db58b: type fixes for makePersisted
+
+## 3.4.0
+
+### Minor Changes
+
+- 5d89290: add tauriStorage
+
 ## 3.3.0
 
 ### Minor Changes
