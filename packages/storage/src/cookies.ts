@@ -146,6 +146,7 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addWithOptionsMe
       return this.getLength();
     },
   }),
+  { path: "/" },
 );
 
 /**

@@ -29,13 +29,14 @@ export const addWithOptionsMethod = <
   W extends AsyncStorage | Storage = S extends AsyncStorageWithOptions<O> ? AsyncStorage : Storage,
 >(
   storage: S,
+  defaultOptions: Partial<O> = {}
 ): S & { withOptions: (options: O) => W } => {
   storage.withOptions = (options: O): W =>
     methodKeys.reduce(
       (wrapped: Partial<S>, key: keyof S) => {
         if (typeof storage[key] === "function") {
           (wrapped as any)[key] = (...args: Parameters<(typeof storage)[typeof key]>) => {
-            args[storage[key].length - 1] = options;
+            args[storage[key].length - 1] = { ...defaultOptions, ...options };
             return storage[key](...args);
           };
         }
