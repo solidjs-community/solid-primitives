@@ -21,7 +21,7 @@ export type E = JSX.Element;
  * createFullscreen - reactively toggle fullscreen
  * ```ts
  * const [fs, setFs] = createSignal(false);
- * 
+ *
  * // via ref signal
  * const [ref, setRef] = createSignal<HTMLElement>();
  * createFullscreen(ref, fs);
