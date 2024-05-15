@@ -11,7 +11,7 @@ export interface Task {
   promise: Promise<void>;
 }
 
-export interface TickContext<T> {
+export interface TickContext<T extends SpringTarget> {
   inv_mass: number;
   dt: number;
   opts: SpringOptions & { set: SpringSetter<T> };
@@ -99,7 +99,7 @@ export function loop(callback: TaskCallback): Task {
 // createSpring hook
 // ===========================================================================
 
-import { Accessor, createSignal } from "solid-js";
+import { Accessor, createEffect, createSignal, on } from "solid-js";
 
 export type SpringOptions = {
   /**
@@ -127,6 +127,21 @@ export type SpringOptions = {
   precision?: number;
 };
 
+type SpringTargetPrimitive = number | Date;
+type SpringTarget =
+  | SpringTargetPrimitive
+  | { [key: string]: SpringTargetPrimitive | SpringTarget }
+  | SpringTargetPrimitive[]
+  | SpringTarget[];
+
+/**
+ * "Widen" Utility Type so that number types are not converted to
+ * literal types when passed to `createSpring`.
+ *
+ * e.g. createSpring(0) returns `0`, not `number`.
+ */
+type WidenSpringTarget<T> = T extends number ? number : T extends Date ? Date : T;
+
 type SpringSetter<T> = (
   newValue: T,
   opts?: { hard?: boolean; soft?: boolean | number },
@@ -139,19 +154,20 @@ type SpringSetter<T> = (
  * depending on the physics paramters provided. This adds a level of realism to
  * the transitions and can enhance the user experience.
  *
- * `T` - The type of the signal. It works for any basic data types that can be interpolated
- * like `number`, a `Date`, or even a collection of them `Array<T>` or a nested object of T.
+ * `T` - The type of the signal. It works for the basic data types that can be
+ * interpolated: `number`, a `Date`, `Array<T>` or a nested object of T.
  *
  * @param initialValue The initial value of the signal.
  * @param options Options to configure the physics of the spring.
+ * @returns Returns the spring value and a setter.
  *
  * @example
  * const [progress, setProgress] = createSpring(0, { stiffness: 0.15, damping: 0.8 });
  */
-export function createSpring<T>(
+export function createSpring<T extends SpringTarget>(
   initialValue: T,
   options: SpringOptions = {},
-): [Accessor<T>, SpringSetter<T>] {
+): [Accessor<WidenSpringTarget<T>>, SpringSetter<WidenSpringTarget<T>>] {
   const [springValue, setSpringValue] = createSignal<T>(initialValue);
   const { stiffness = 0.15, damping = 0.8, precision = 0.01 } = options;
 
@@ -174,6 +190,7 @@ export function createSpring<T>(
     const token = current_token() ?? {};
     setCurrentToken(token);
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (springValue() == null || opts.hard || (stiffness >= 1 && damping >= 1)) {
       setCancelTask(true);
       setLastTime(raf.now());
@@ -236,7 +253,7 @@ export function createSpring<T>(
     });
   };
 
-  const tick_spring = <T>(
+  const tick_spring = <T extends SpringTarget>(
     ctx: TickContext<T>,
     last_value: T,
     current_value: T,
@@ -283,5 +300,40 @@ export function createSpring<T>(
     }
   };
 
-  return [springValue, set];
+  return [springValue as Accessor<WidenSpringTarget<T>>, set as SpringSetter<WidenSpringTarget<T>>];
+}
+
+// ===========================================================================
+// createDerivedSpring hook
+// ===========================================================================
+
+/**
+ * Creates a spring value that interpolates based on changes on a passed signal.
+ * Works similar to the `@solid-primitives/tween`
+ *
+ * @param target Target to be modified.
+ * @param options Options to configure the physics of the spring.
+ * @returns Returns the spring value only.
+ *
+ * @example
+ * const percent = createMemo(() => current() / total() * 100);
+ *
+ * const springedPercent = createDerivedSignal(percent, { stiffness: 0.15, damping: 0.8 });
+ */
+export function createDerivedSpring<T extends SpringTarget>(
+  target: Accessor<T>,
+  options?: SpringOptions,
+) {
+  const [springValue, setSpringValue] = createSpring(target(), options);
+
+  createEffect(
+    on(
+      () => target(),
+      () => {
+        setSpringValue(target() as WidenSpringTarget<T>);
+      },
+    ),
+  );
+
+  return springValue;
 }
