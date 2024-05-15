@@ -6,19 +6,19 @@ import { isServer } from "solid-js/web";
 
 // src/internal/client/types.d.ts
 
-export interface Task {
+type Task = {
   abort(): void;
   promise: Promise<void>;
-}
+};
 
-export interface TickContext<T extends SpringTarget> {
+type TickContext<T extends SpringTarget> = {
   inv_mass: number;
   dt: number;
   opts: SpringOptions & { set: SpringSetter<T> };
   settled: boolean;
-}
+};
 
-export type Raf = {
+type Raf = {
   /** Alias for `requestAnimationFrame`, exposed in such a way that we can override in tests */
   tick: (callback: (time: DOMHighResTimeStamp) => void) => any;
   /** Alias for `performance.now()`, exposed in such a way that we can override in tests */
@@ -27,9 +27,9 @@ export type Raf = {
   tasks: Set<TaskEntry>;
 };
 
-export type TaskCallback = (now: number) => boolean | void;
+type TaskCallback = (now: number) => boolean | void;
 
-export type TaskEntry = { c: TaskCallback; f: () => void };
+type TaskEntry = { c: TaskCallback; f: () => void };
 
 // src/internal/client/timing.js
 
@@ -39,7 +39,7 @@ const request_animation_frame = isServer ? () => {} : requestAnimationFrame;
 /** SSR-safe now getter. */
 const now = isServer ? () => Date.now() : () => performance.now();
 
-export const raf: Raf = {
+const raf: Raf = {
   tick: (_: any) => request_animation_frame(_),
   now: () => now(),
   tasks: new Set(),
@@ -51,7 +51,7 @@ export const raf: Raf = {
  * @param {any} obj
  * @returns {obj is Date}
  */
-export function is_date(obj: any): obj is Date {
+function is_date(obj: any): obj is Date {
   return Object.prototype.toString.call(obj) === "[object Date]";
 }
 
@@ -78,7 +78,7 @@ function run_tasks(now: number) {
  * Creates a new task that runs on each raf frame
  * until it returns a falsy value or is aborted
  */
-export function loop(callback: TaskCallback): Task {
+function loop(callback: TaskCallback): Task {
   let task: TaskEntry;
 
   if (raf.tasks.size === 0) {
@@ -127,8 +127,8 @@ export type SpringOptions = {
   precision?: number;
 };
 
-type SpringTargetPrimitive = number | Date;
-type SpringTarget =
+export type SpringTargetPrimitive = number | Date;
+export type SpringTarget =
   | SpringTargetPrimitive
   | { [key: string]: SpringTargetPrimitive | SpringTarget }
   | SpringTargetPrimitive[]
@@ -140,9 +140,9 @@ type SpringTarget =
  *
  * e.g. createSpring(0) returns `0`, not `number`.
  */
-type WidenSpringTarget<T> = T extends number ? number : T extends Date ? Date : T;
+export type WidenSpringTarget<T> = T extends number ? number : T extends Date ? Date : T;
 
-type SpringSetter<T> = (
+export type SpringSetter<T> = (
   newValue: T,
   opts?: { hard?: boolean; soft?: boolean | number },
 ) => Promise<void>;

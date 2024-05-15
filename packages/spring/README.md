@@ -13,9 +13,10 @@ A small SolidJS hook to interpolate signal changes with spring physics. Inspired
 
 With this primitive, you can easily animate values that can be interpolated like `number`, `date`, and collections (arrays or nested objects) of those datatypes.
 
-`createSpring` - Provides a getter and setter for the spring primitive.
+- `createSpring` - Provides a getter and setter for the spring primitive.
+- `createDerivedSpring` - Provides only a getter for the spring primitive deriving from an accessor parameter. Similar to the [@solid-primitives/tween](https://github.com/solidjs-community/solid-primitives/tree/main/packages/tween) API.
 
-The following options are available:
+The following physics options are available:
 
 - `stiffness` (number, default `0.15`) — a value between 0 and 1 where higher means a 'tighter' spring
 - `damping` (number, default `0.8`) — a value between 0 and 1 where lower means a 'springier' spring
@@ -45,6 +46,10 @@ const [xy, setXY] = createSpring(
   { x: 50, y: 50 },
   { stiffness: 0.08, damping: 0.2, precision: 0.01 },
 );
+
+// Example deriving from an existing signal.
+const [myNumber, myNumber] = createSignal(20);
+const springedValue = createDerivedSpring(myNumber, { stiffness: 0.03 });
 ```
 
 ## Demo
