@@ -9,15 +9,17 @@ import {
 import { createStore, reconcile, unwrap } from "solid-js/store";
 
 export type AbortableOptions = {
-  noAutoAbort?: true;
+  noAutoAbort?: boolean;
   timeout?: number;
 };
 
 /**
  * **Creates and handles an AbortSignal**
  * ```ts
- * const [signal, abort] = makeAbortable({ timeout: 10000 });
- * const fetcher = (url) => fetch(url, { signal: signal() });
+ * const [signal, abort, filterAbortError] =
+ *   makeAbortable({ timeout: 10000 });
+ * const fetcher = (url) => fetch(url, { signal: signal() })
+ *   .catch(filterAbortError); // filters abort errors
  * ```
  * Returns an accessor for the signal and the abort callback.
  *
@@ -26,25 +28,28 @@ export type AbortableOptions = {
  * - `noAutoAbort`: can be set to true to make a new source not automatically abort a previous request
  */
 export function makeAbortable(
-  options?: AbortableOptions,
-): [signal: () => AbortSignal, abort: () => void] {
+  options: AbortableOptions = {},
+): [signal: () => AbortSignal, abort: (reason?: string) => void, filterAbortError: (err: any) => void] {
   let controller: AbortController | undefined;
   let timeout: NodeJS.Timeout | number | undefined;
-  const abort = () => {
+  const abort = (reason?: string) => {
     timeout && clearTimeout(timeout);
-    controller?.abort();
+    controller?.abort(reason);
   };
   const signal = () => {
-    if (!options?.noAutoAbort && controller?.signal.aborted === false) {
-      abort();
+    if (!options.noAutoAbort && controller?.signal.aborted === false) {
+      abort('retry');
     }
     controller = new AbortController();
-    if (options?.timeout) {
-      timeout = setTimeout(abort, options.timeout);
+    if (options.timeout) {
+      timeout = setTimeout(() => abort('timeout'), options.timeout);
     }
     return controller.signal;
   };
-  return [signal, abort];
+  return [signal, abort, (err) => {
+    if (err.name === "AbortError") { return undefined; }
+    throw err;
+  }];
 }
 
 const mapEntries = (entries: [key: string, value: any][]) =>
