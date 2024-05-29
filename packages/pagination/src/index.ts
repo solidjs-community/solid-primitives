@@ -262,26 +262,29 @@ export type _E = JSX.Element;
  * @method `end` is a boolean indicator for end of the page
  * @method `setEnd` allows to manually change the end
  */
-export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
+export function createInfiniteScroll<T, C extends number | string>(
+  fetcher: (page: C) => Promise<T[]>,
+  getNextCursorValue: (pages: Accessor<T[]>, cursorValue?: C) => C,
+): [
   pages: Accessor<T[]>,
   loader: (el: Element) => void,
   options: {
-    page: Accessor<number>;
-    setPage: Setter<number>;
+    cursor: Accessor<C>;
+    setCursor: Setter<C>;
     setPages: Setter<T[]>;
     end: Accessor<boolean>;
     setEnd: Setter<boolean>;
   },
 ] {
   const [pages, setPages] = createSignal<T[]>([]);
-  const [page, setPage] = createSignal(0);
+  const [cursor, setCursor] = createSignal(getNextCursorValue(pages));
   const [end, setEnd] = createSignal(false);
 
   let add: (el: Element) => void = noop;
   if (!isServer) {
     const io = new IntersectionObserver(e => {
       if (e.length > 0 && e[0]!.isIntersecting && !end() && !contents.loading) {
-        setPage(p => p + 1);
+        setCursor(p => getNextCursorValue(pages, p));
       }
     });
     onCleanup(() => io.disconnect());
@@ -291,7 +294,7 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
     };
   }
 
-  const [contents] = createResource(page, fetcher);
+  const [contents] = createResource(cursor, fetcher);
 
   createComputed(() => {
     const content = contents.latest;
@@ -306,8 +309,8 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
     pages,
     add,
     {
-      page: page,
-      setPage: setPage,
+      cursor: cursor,
+      setCursor: setCursor,
       setPages: setPages,
       end: end,
       setEnd: setEnd,
