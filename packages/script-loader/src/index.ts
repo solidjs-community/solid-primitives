@@ -1,4 +1,11 @@
-import { Accessor, createRenderEffect, onCleanup, splitProps, type ComponentProps } from "solid-js";
+import {
+  Accessor,
+  createRenderEffect,
+  onCleanup,
+  splitProps,
+  type ComponentProps,
+  type JSX,
+} from "solid-js";
 import { spread, isServer } from "solid-js/web";
 
 export type ScriptProps = Omit<ComponentProps<"script">, "src" | "textContent"> & {
@@ -32,9 +39,33 @@ export function createScriptLoader(props: ScriptProps): HTMLScriptElement | unde
     return undefined;
   }
   const script = document.createElement("script");
-  const [local, scriptProps] = splitProps(props, OMITTED_PROPS);
+  const eventKeys: string[] = Object.keys(props).filter(p => p.startsWith("on"));
+  const [local, events, scriptProps] = splitProps(
+    props,
+    OMITTED_PROPS,
+    eventKeys as readonly (keyof typeof props)[],
+  );
   setTimeout(() => spread(script, scriptProps, false, true));
   createRenderEffect(() => {
+    Object.entries(events).forEach(
+      ([name, handler]: [string, JSX.EventHandlerUnion<HTMLScriptElement, Event>]) =>
+        script.addEventListener(
+          /^on:?(.*)/.test(name)
+            ? name.startsWith("on:")
+              ? RegExp.$1
+              : RegExp.$1.toLowerCase()
+            : name,
+          (ev: Event) => {
+            Object.defineProperties(ev, {
+              target: { value: script, enumerable: true },
+              currentTarget: { value: script, enumerable: true },
+            });
+            Array.isArray(handler)
+              ? handler[0](handler[1], ev)
+              : typeof handler === "function" && handler?.call(null, Object.assign(ev));
+          },
+        ),
+    );
     const src = typeof local.src === "string" ? local.src : local.src();
     const prop = /^(https?:|\w[\.\w-_%]+|)\//.test(src) ? "src" : "textContent";
     if (script[prop] !== src) {
