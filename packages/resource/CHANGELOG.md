@@ -1,5 +1,11 @@
 # @solid-primitives/resource
 
+## 0.2.0
+
+### Minor Changes
+
+- 313f7d5: abort reason, filter abort error
+
 ## 0.1.2
 
 ### Patch Changes

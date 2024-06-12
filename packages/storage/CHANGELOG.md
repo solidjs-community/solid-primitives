@@ -1,5 +1,12 @@
 # @solid-primitives/storage
 
+## 3.6.0
+
+### Minor Changes
+
+- bb4fc57: move tauri storage to submodule
+- 1382d8f: fix cookie serialization
+
 ## 3.5.0
 
 ### Minor Changes
