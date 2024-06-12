@@ -3,9 +3,11 @@ import { describe, test, expect, vi, afterAll, beforeEach, beforeAll } from "vit
 import { testEffect } from "@solidjs/testing-library";
 
 class AbortError extends Error {
-  constructor(msg: string) { super(msg); }
-  name = "AbortError"
-};
+  constructor(msg: string) {
+    super(msg);
+  }
+  name = "AbortError";
+}
 
 import {
   makeAbortable,
@@ -44,13 +46,13 @@ describe("makeAbortable", () => {
     const [_signal, _abort, filterAbortError] = makeAbortable();
     await Promise.reject(new AbortError("test"))
       .catch(filterAbortError)
-      .then((resolution) => expect(resolution).toBeUndefined())
-      .catch((err) => expect.fail(err.message || "failed with error"));
+      .then(resolution => expect(resolution).toBeUndefined())
+      .catch(err => expect.fail(err.message || "failed with error"));
     const noAbortError = new Error("not an AbortError");
     await Promise.reject(noAbortError)
       .catch(filterAbortError)
       .then(() => expect.fail("filtered error that was not an AbortError"))
-      .catch((err) => expect(err).toBe(noAbortError));
+      .catch(err => expect(err).toBe(noAbortError));
   });
 });
 

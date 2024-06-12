@@ -29,7 +29,11 @@ export type AbortableOptions = {
  */
 export function makeAbortable(
   options: AbortableOptions = {},
-): [signal: () => AbortSignal, abort: (reason?: string) => void, filterAbortError: (err: any) => void] {
+): [
+  signal: () => AbortSignal,
+  abort: (reason?: string) => void,
+  filterAbortError: (err: any) => void,
+] {
   let controller: AbortController | undefined;
   let timeout: NodeJS.Timeout | number | undefined;
   const abort = (reason?: string) => {
@@ -38,18 +42,24 @@ export function makeAbortable(
   };
   const signal = () => {
     if (!options.noAutoAbort && controller?.signal.aborted === false) {
-      abort('retry');
+      abort("retry");
     }
     controller = new AbortController();
     if (options.timeout) {
-      timeout = setTimeout(() => abort('timeout'), options.timeout);
+      timeout = setTimeout(() => abort("timeout"), options.timeout);
     }
     return controller.signal;
   };
-  return [signal, abort, (err) => {
-    if (err.name === "AbortError") { return undefined; }
-    throw err;
-  }];
+  return [
+    signal,
+    abort,
+    err => {
+      if (err.name === "AbortError") {
+        return undefined;
+      }
+      throw err;
+    },
+  ];
 }
 
 const mapEntries = (entries: [key: string, value: any][]) =>
