@@ -30,14 +30,18 @@ const cookiePropertyKeys = [
 
 function serializeCookieOptions(options?: CookieOptions) {
   if (!options) return "";
-  return Object.entries(options).map(([key, value]) => {
-    if (key === "maxAge") { key = "max-age"; }
-    return value instanceof Date
-      ? `; ${key}=${value.toUTCString()}`
-      : typeof value === "boolean"
-        ? `; ${key}`
-        : `; ${key}=${value}`;
-  }).join("");
+  return Object.entries(options)
+    .map(([key, value]) => {
+      if (key === "maxAge") {
+        key = "max-age";
+      }
+      return value instanceof Date
+        ? `; ${key}=${value.toUTCString()}`
+        : typeof value === "boolean"
+          ? `; ${key}`
+          : `; ${key}=${value}`;
+    })
+    .join("");
 }
 
 function deserializeCookieOptions(cookie: string, key: string) {

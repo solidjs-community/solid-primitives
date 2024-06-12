@@ -15,8 +15,15 @@ describe("cookieStorage", () => {
 
   it("serializes options correctly", () => {
     const set = vi.spyOn(document, "cookie", "set");
-    cookieStorage.setItem("test3", "good", { domain: "https://localhost:3000", path: "/", httpOnly: true, maxAge: 60 * 60 * 24 * 7 });
-    expect(set).toHaveBeenCalledWith("test3=good; domain=https://localhost:3000; path=/; httpOnly; max-age=604800");
+    cookieStorage.setItem("test3", "good", {
+      domain: "https://localhost:3000",
+      path: "/",
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    expect(set).toHaveBeenCalledWith(
+      "test3=good; domain=https://localhost:3000; path=/; httpOnly; max-age=604800",
+    );
   });
 });
 
