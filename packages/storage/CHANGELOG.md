@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 3.7.0
+
+### Minor Changes
+
+- 4ec7533: storage: fix exports
+
 ## 3.6.0
 
 ### Minor Changes
