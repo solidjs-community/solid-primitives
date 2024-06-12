@@ -29,22 +29,15 @@ const cookiePropertyKeys = [
 ] as const;
 
 function serializeCookieOptions(options?: CookieOptions) {
-  if (!options) {
-    return "";
-  }
-  let memo = "";
-  for (const key in options) {
-    if (!cookiePropertyKeys.includes(key as keyof CookieProperties)) continue;
-
-    const value = options[key as keyof CookieProperties];
-    memo +=
-      value instanceof Date
-        ? `; ${key}=${value.toUTCString()}`
-        : typeof value === "boolean"
-          ? `; ${key}`
-          : `; ${key}=${value}`;
-  }
-  return memo;
+  if (!options) return "";
+  return Object.entries(options).map(([key, value]) => {
+    if (key === "maxAge") { key = "max-age"; }
+    return value instanceof Date
+      ? `; ${key}=${value.toUTCString()}`
+      : typeof value === "boolean"
+        ? `; ${key}`
+        : `; ${key}=${value}`;
+  }).join("");
 }
 
 function deserializeCookieOptions(cookie: string, key: string) {

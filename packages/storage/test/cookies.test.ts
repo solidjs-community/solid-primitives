@@ -1,5 +1,5 @@
 import { createRoot } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { cookieStorage } from "../src/index.js";
 import { createCookieStorage, createCookieStorageSignal } from "../src/cookies.js";
@@ -11,6 +11,12 @@ describe("cookieStorage", () => {
     expect(cookieStorage.getItem("test")).toBe("1");
     cookieStorage.removeItem("test");
     expect(cookieStorage.getItem("test")).toBe(null);
+  });
+
+  it("serializes options correctly", () => {
+    const set = vi.spyOn(document, "cookie", "set");
+    cookieStorage.setItem("test3", "good", { domain: "https://localhost:3000", path: "/", httpOnly: true, maxAge: 60 * 60 * 24 * 7 });
+    expect(set).toHaveBeenCalledWith("test3=good; domain=https://localhost:3000; path=/; httpOnly; max-age=604800");
   });
 });
 
