@@ -32,9 +32,9 @@ const cookiePropertyMap = {
 
 function serializeCookieOptions(options?: CookieOptions) {
   if (!options) return "";
-  return Object.entries(options)
+  const result = Object.entries(options)
     .map(([key, value]) => {
-      const serializedKey = cookiePropertyMap[key as keyof typeof cookiePropertyMap];
+      const serializedKey = cookiePropertyMap[key as keyof CookiePropertyTypes];
       if (!serializedKey)
         return;
 
@@ -43,8 +43,11 @@ function serializeCookieOptions(options?: CookieOptions) {
       if (typeof value === "boolean")
         return value ? `${serializedKey}` : "";
       return `${serializedKey}=${value}`;
-    })
-    .join("; ");
+    });
+
+  return result.length != 0
+    ? `; ${result.join("; ")}`
+    : "";
 }
 
 function deserializeCookieOptions(cookie: string, key: string) {
