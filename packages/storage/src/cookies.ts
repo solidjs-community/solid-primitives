@@ -8,7 +8,7 @@ export type CookieOptions = CookieProperties & {
   getResponseHeaders?: () => Headers;
 };
 
-type CookieProperties = {
+type CookiePropertyTypes = {
   domain?: string;
   expires?: Date | number | String;
   path?: string;
@@ -18,32 +18,33 @@ type CookieProperties = {
   sameSite?: "None" | "Lax" | "Strict";
 };
 
-const cookiePropertyKeys = [
-  "domain",
-  "expires",
-  "path",
-  "secure",
-  "httpOnly",
-  "maxAge",
-  "sameSite",
-] as const;
+type CookieProperties = { [key in keyof CookiePropertyTypes]: CookiePropertyTypes[key]; }
+
+const cookiePropertyMap = {
+  "domain": "Domain",
+  "expires": "Expires",
+  "path": "Path",
+  "secure": "Secure",
+  "httpOnly": "HttpOnly",
+  "maxAge": "Max-Age",
+  "sameSite": "SameSite",
+} as const;
 
 function serializeCookieOptions(options?: CookieOptions) {
   if (!options) return "";
   return Object.entries(options)
     .map(([key, value]) => {
-      if (!cookiePropertyKeys.includes(key as any))
+      const serializedKey = cookiePropertyMap[key as keyof typeof cookiePropertyMap];
+      if (!serializedKey)
         return;
-      if (key === "maxAge") {
-        key = "max-age";
-      }
-      return value instanceof Date
-        ? `; ${key}=${value.toUTCString()}`
-        : typeof value === "boolean"
-          ? (value ? `; ${key}` : "")
-          : `; ${key}=${value}`;
+
+      if (value instanceof Date)
+        return `${serializedKey}=${value.toUTCString()}`;
+      if (typeof value === "boolean")
+        return value ? `${serializedKey}` : "";
+      return `${serializedKey}=${value}`;
     })
-    .join("");
+    .join("; ");
 }
 
 function deserializeCookieOptions(cookie: string, key: string) {
