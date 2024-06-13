@@ -32,13 +32,15 @@ function serializeCookieOptions(options?: CookieOptions) {
   if (!options) return "";
   return Object.entries(options)
     .map(([key, value]) => {
+      if (!cookiePropertyKeys.includes(key as any))
+        return;
       if (key === "maxAge") {
         key = "max-age";
       }
       return value instanceof Date
         ? `; ${key}=${value.toUTCString()}`
         : typeof value === "boolean"
-          ? `; ${key}`
+          ? (value ? `; ${key}` : "")
           : `; ${key}=${value}`;
     })
     .join("");
