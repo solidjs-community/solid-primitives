@@ -43,7 +43,7 @@ function serializeCookieOptions(options?: CookieOptions) {
       if (typeof value === "boolean")
         return value ? `${serializedKey}` : undefined;
       return `${serializedKey}=${value}`;
-    });
+    }).filter(v => !!v);
 
   return result.length != 0
     ? `; ${result.join("; ")}`
