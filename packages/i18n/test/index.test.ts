@@ -108,6 +108,7 @@ describe("scopedTranslator", () => {
 
   const _t = i18n.translator(() => flat_dict, i18n.resolveTemplate);
   const t = i18n.scopedTranslator(_t, "data");
+  const nt = i18n.scopedTranslator(_t, "data.currency");
 
   test("initial", () => {
     expect(t("class")).toBe(en_dict.data.class);
@@ -125,6 +126,13 @@ describe("scopedTranslator", () => {
     expect(t("currency.to.usd")).toBe(0.27);
     expect(t("users")).toEqual(pl_dict.data.users);
     expect(t("formatList", ["John", "Kate", "Tester"])).toBe("John, Kate i Tester");
+  });
+
+  test("nested", () => {
+    flat_dict = i18n.flatten(pl_dict);
+
+    expect(nt("name")).toBe("złoty");
+    expect(nt("to.usd")).toBe(0.27);
   });
 });
 
