@@ -36,12 +36,12 @@ function serializeCookieOptions(options?: CookieOptions) {
     .map(([key, value]) => {
       const serializedKey = cookiePropertyMap[key as keyof CookiePropertyTypes];
       if (!serializedKey)
-        return;
+        return undefined;
 
       if (value instanceof Date)
         return `${serializedKey}=${value.toUTCString()}`;
       if (typeof value === "boolean")
-        return value ? `${serializedKey}` : "";
+        return value ? `${serializedKey}` : undefined;
       return `${serializedKey}=${value}`;
     });
 
