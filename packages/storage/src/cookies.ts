@@ -1,4 +1,4 @@
-import { isServer, getRequestEvent, type RequestEvent } from "solid-js/web";
+import { getRequestEvent, isServer, type RequestEvent } from "solid-js/web";
 import { StorageProps, StorageSignalProps, StorageWithOptions } from "./types.js";
 import { addClearMethod, addWithOptionsMethod } from "./tools.js";
 import { createStorage, createStorageSignal } from "./storage.js";
@@ -98,13 +98,12 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addWithOptionsMe
     _write: isServer
       ? (key: string, value: string, options?: CookieOptions) => {
           const responseHeaders = getResponseHeaders();
-          responseHeaders.set(
-            "Set-Cookie",
-            (responseHeaders.get("Set-Cookie") || "").replace(
-              new RegExp(`(?:^|, )${key}=[^,]+`, "g"),
-              "",
-            ),
+          let oldHeader = (responseHeaders.get("Set-Cookie") || "").replace(
+            new RegExp(`((?:^|, )${key}=[^,]+)|^\\s*|\\s*$`, "g"),
+            "",
           );
+          if (oldHeader.length == 0) responseHeaders.delete("Set-Cookie");
+          else responseHeaders.set("Set-Cookie", oldHeader);
           responseHeaders.append("Set-Cookie", `${key}=${value}${serializeCookieOptions(options)}`);
         }
       : (key: string, value: string, options?: CookieOptions) => {

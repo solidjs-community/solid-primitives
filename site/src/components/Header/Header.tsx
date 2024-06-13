@@ -165,7 +165,7 @@ const Header: Component = () => {
             </div>
             <A href="/">
               <img
-                class="hidden h-[28px] dark:hidden sm:block sm:h-[40px]"
+                class="hidden h-[28px] sm:block sm:h-[40px] dark:hidden"
                 src="/img/solid-primitives-logo.svg"
                 alt=""
               />
@@ -175,12 +175,12 @@ const Header: Component = () => {
                 alt=""
               />
               <img
-                class="h-[28px] dark:hidden sm:hidden sm:h-[40px]"
+                class="h-[28px] sm:hidden sm:h-[40px] dark:hidden"
                 src="/img/solid-primitives-stacked-logo.svg"
                 alt=""
               />
               <img
-                class="hidden h-[28px] dark:block sm:!hidden sm:h-[40px]"
+                class="hidden h-[28px] sm:!hidden sm:h-[40px] dark:block"
                 src="/img/solid-primitives-stacked-dark-logo.svg"
                 alt=""
               />

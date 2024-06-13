@@ -67,7 +67,7 @@ const Page: Component = () => {
         style={{ "padding-top": `${PRIMITIVE_PAGE_PADDING_TOP}px` }}
       >
         <div class="bg-page-main-bg rounded-3xl p-3 sm:p-8">
-          <div class="mb-[90px] flex items-center justify-between gap-[30px] text-[#232324] dark:text-white sm:gap-[100px]">
+          <div class="mb-[90px] flex items-center justify-between gap-[30px] text-[#232324] sm:gap-[100px] dark:text-white">
             <Heading name={data.name} formattedName={formattedName()} />
           </div>
 
