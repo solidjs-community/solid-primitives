@@ -1,5 +1,14 @@
 # @solid-primitives/storage
 
+## 3.7.1
+
+### Patch Changes
+
+- bebccc1: Set-Cookie header will be sent with trailing `, ` in some cases which prefixes the name in the browser too
+
+  Don't append false boolean values from `cookieOptions`
+  Stability improvements: ignore unexpected `cookieOption` keys
+
 ## 3.7.0
 
 ### Minor Changes
