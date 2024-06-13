@@ -1,4 +1,4 @@
-import { isServer, getRequestEvent, type RequestEvent } from "solid-js/web";
+import { getRequestEvent, isServer, type RequestEvent } from "solid-js/web";
 import { StorageProps, StorageSignalProps, StorageWithOptions } from "./types.js";
 import { addClearMethod, addWithOptionsMethod } from "./tools.js";
 import { createStorage, createStorageSignal } from "./storage.js";
@@ -8,7 +8,7 @@ export type CookieOptions = CookieProperties & {
   getResponseHeaders?: () => Headers;
 };
 
-type CookieProperties = {
+type CookiePropertyTypes = {
   domain?: string;
   expires?: Date | number | String;
   path?: string;
@@ -18,30 +18,36 @@ type CookieProperties = {
   sameSite?: "None" | "Lax" | "Strict";
 };
 
-const cookiePropertyKeys = [
-  "domain",
-  "expires",
-  "path",
-  "secure",
-  "httpOnly",
-  "maxAge",
-  "sameSite",
-] as const;
+type CookieProperties = { [key in keyof CookiePropertyTypes]: CookiePropertyTypes[key]; }
+
+const cookiePropertyMap = {
+  "domain": "Domain",
+  "expires": "Expires",
+  "path": "Path",
+  "secure": "Secure",
+  "httpOnly": "HttpOnly",
+  "maxAge": "Max-Age",
+  "sameSite": "SameSite",
+} as const;
 
 function serializeCookieOptions(options?: CookieOptions) {
   if (!options) return "";
-  return Object.entries(options)
+  const result = Object.entries(options)
     .map(([key, value]) => {
-      if (key === "maxAge") {
-        key = "max-age";
-      }
-      return value instanceof Date
-        ? `; ${key}=${value.toUTCString()}`
-        : typeof value === "boolean"
-          ? `; ${key}`
-          : `; ${key}=${value}`;
-    })
-    .join("");
+      const serializedKey = cookiePropertyMap[key as keyof CookiePropertyTypes];
+      if (!serializedKey)
+        return undefined;
+
+      if (value instanceof Date)
+        return `${serializedKey}=${value.toUTCString()}`;
+      if (typeof value === "boolean")
+        return value ? `${serializedKey}` : undefined;
+      return `${serializedKey}=${value}`;
+    }).filter(v => !!v);
+
+  return result.length != 0
+    ? `; ${result.join("; ")}`
+    : "";
 }
 
 function deserializeCookieOptions(cookie: string, key: string) {
@@ -53,8 +59,8 @@ const getRequestHeaders = isServer
   : () => new Headers();
 const getResponseHeaders = isServer
   ? () =>
-      (getRequestEvent() as RequestEvent & { response: Response })?.response?.headers ||
-      new Headers()
+    (getRequestEvent() as RequestEvent & { response: Response })?.response?.headers ||
+    new Headers()
   : () => new Headers();
 
 /**
@@ -80,36 +86,36 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addWithOptionsMe
   addClearMethod({
     _read: isServer
       ? (options?: CookieOptions) => {
-          const requestCookies = (options?.getRequestHeaders?.() || getRequestHeaders()).get(
-            "Cookie",
-          );
-          const responseCookies = (options?.getResponseHeaders?.() || getResponseHeaders()).get(
-            "Set-Cookie",
-          );
-          const cookies: Record<string, string> = {};
-          const addCookie = (_: string, key: string, val: string) => (cookies[key] = val);
-          requestCookies?.replace(/(?:^|;)([^=]+)=([^;]+)/g, addCookie);
-          responseCookies?.replace(/(?:^|, )([^=]+)=([^;]+)/g, addCookie);
-          return Object.entries(cookies)
-            .map(keyval => keyval.join("="))
-            .join("; ");
-        }
+        const requestCookies = (options?.getRequestHeaders?.() || getRequestHeaders()).get(
+          "Cookie",
+        );
+        const responseCookies = (options?.getResponseHeaders?.() || getResponseHeaders()).get(
+          "Set-Cookie",
+        );
+        const cookies: Record<string, string> = {};
+        const addCookie = (_: string, key: string, val: string) => (cookies[key] = val);
+        requestCookies?.replace(/(?:^|;)([^=]+)=([^;]+)/g, addCookie);
+        responseCookies?.replace(/(?:^|, )([^=]+)=([^;]+)/g, addCookie);
+        return Object.entries(cookies)
+          .map(keyval => keyval.join("="))
+          .join("; ");
+      }
       : () => document.cookie,
     _write: isServer
       ? (key: string, value: string, options?: CookieOptions) => {
-          const responseHeaders = getResponseHeaders();
-          responseHeaders.set(
-            "Set-Cookie",
-            (responseHeaders.get("Set-Cookie") || "").replace(
-              new RegExp(`(?:^|, )${key}=[^,]+`, "g"),
-              "",
-            ),
-          );
-          responseHeaders.append("Set-Cookie", `${key}=${value}${serializeCookieOptions(options)}`);
-        }
+        const responseHeaders = getResponseHeaders();
+        const currentCookies = responseHeaders?.get("Set-Cookie")?.split(", ")
+          ?.filter((cookie) => cookie && !cookie.startsWith(`${key}=`)) ?? [];
+        responseHeaders.set("Set-Cookie",
+          [
+            ...currentCookies,
+            `${key}=${value}${serializeCookieOptions(options)}`,
+          ].join(", "),
+        );
+      }
       : (key: string, value: string, options?: CookieOptions) => {
-          document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
-        },
+        document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;
+      },
     getItem: (key: string, options?: CookieOptions) =>
       deserializeCookieOptions(cookieStorage._read(options), key),
     setItem: (key: string, value: string, options?: CookieOptions) => {
