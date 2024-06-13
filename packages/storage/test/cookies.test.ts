@@ -23,7 +23,9 @@ describe("cookieStorage", () => {
         secure: true,
         maxAge: 60 * 60 * 24 * 7,
       });
-      expect(set).toHaveBeenCalledWith("test3=good; Domain=https://localhost:3000; Path=/; HttpOnly; Secure; Max-Age=604800");
+      expect(set).toHaveBeenCalledWith(
+        "test3=good; Domain=https://localhost:3000; Path=/; HttpOnly; Secure; Max-Age=604800",
+      );
     });
     it("no options set", () => {
       const set = vi.spyOn(document, "cookie", "set");
