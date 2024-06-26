@@ -18,6 +18,7 @@
     "stage": 3,
     "list": [
       "createRAF",
+      "createMs",
       "targetFPS"
     ],
     "category": "Animation"

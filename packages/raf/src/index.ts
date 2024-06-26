@@ -87,4 +87,24 @@ function targetFPS(
   };
 }
 
-export { createRAF, createRAF as default, targetFPS };
+/**
+ * A primitive that creates a reactive milliseconds signal with a given frame rate to base your animations on.
+ *
+ * ```ts
+ * const ms = createMs(60);
+ * return <rect x="0" y="0" height="10" width={Math.min(100, ms() / 5000)} />
+ * ```
+ */
+function createMs(fps: MaybeAccessor<number>) {
+  const [ms, setMs] = createSignal(0);
+  let initialTs = 0;
+  const [_, start, stop] = createRAF(targetFPS((ts) => {
+    initialTs ||= ts;
+    setMs(ts - initialTs);
+  }, fps));
+  start();
+  onCleanup(stop);
+  return ms;
+}
+
+export { createMs, createRAF, createRAF as default, targetFPS };

@@ -84,6 +84,30 @@ function targetFPS(
 ): FrameRequestCallback;
 ```
 
+## createMs
+
+Using createRAF and targetFPS to create a reactive milliseconds counter with configurable frame rate.
+
+It takes the framerate as single argument, either as `number` or `Accessor<number>`.
+
+```ts
+import { createMs } from "@solid-primitives/raf";
+
+const ms = createMs(60);
+
+const MovingRect() {
+  return <rect x="0" y="0" width={1000 / 3000 * Math.min(ms(), 3000)} height="10" />;
+}
+```
+
+#### Defintion
+
+```ts
+function createMs(
+  fps: MaybeAccessor<number>,
+): Accessor<number>;
+```
+
 ## Demo
 
 You may view a working example here: https://codesandbox.io/s/solid-primitives-raf-demo-4xvmjd?file=/src/index.tsx
