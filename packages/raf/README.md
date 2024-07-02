@@ -109,8 +109,8 @@ const MovingRect() {
 ```ts
 function createMs(
   fps: MaybeAccessor<number>,
-  limit?: MaybeAccessor<number>
-): Accessor<number> & { 
+  limit?: MaybeAccessor<number>,
+): Accessor<number> & {
   reset: () => void;
   running: () => boolean;
   start: () => void;

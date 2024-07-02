@@ -69,9 +69,9 @@ function targetFPS(
     typeof fps === "function"
       ? createMemo(() => Math.floor(1000 / fps()))
       : (() => {
-        const newInterval = Math.floor(1000 / fps);
-        return () => newInterval;
-      })();
+          const newInterval = Math.floor(1000 / fps);
+          return () => newInterval;
+        })();
 
   let elapsed = 0;
   let lastRun = 0;
