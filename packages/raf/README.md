@@ -84,6 +84,40 @@ function targetFPS(
 ): FrameRequestCallback;
 ```
 
+## createMs
+
+Using createRAF and targetFPS to create a signal giving the passed milliseconds since it was called with a configurable frame rate, with some added methods for more control:
+
+- `reset()`: manually resetting the counter
+- `running()`: returns if the counter is currently setRunning
+- `start()`: restarts the counter if stopped
+- `stop()`: stops the counter if running
+
+It takes the framerate as single argument, either as `number` or `Accessor<number>`. It also accepts the limit as an optional second argument, either as `number` or `Accessor<number>`; the counter is reset if the limit is passed.
+
+```tsx
+import { createMs } from "@solid-primitives/raf";
+
+const MovingRect() {
+  const ms = createMs(60);
+  return <rect x="0" y="0" width={1000 / 3000 * Math.min(ms(), 3000)} height="10" />;
+}
+```
+
+#### Defintion
+
+```ts
+function createMs(
+  fps: MaybeAccessor<number>,
+  limit?: MaybeAccessor<number>
+): Accessor<number> & { 
+  reset: () => void;
+  running: () => boolean;
+  start: () => void;
+  stop: () => void;
+};
+```
+
 ## Demo
 
 You may view a working example here: https://codesandbox.io/s/solid-primitives-raf-demo-4xvmjd?file=/src/index.tsx
