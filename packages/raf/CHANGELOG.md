@@ -1,5 +1,11 @@
 # @solid-primitives/raf
 
+## 2.2.0
+
+### Minor Changes
+
+- b71cf00: add createMs primitive
+
 ## 2.1.16
 
 ### Patch Changes
