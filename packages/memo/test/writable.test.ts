@@ -87,4 +87,36 @@ describe("createWritableMemo", () => {
       dispose();
     });
   });
+
+  test("memo can be reassigned to default inner signal", () => {
+    createRoot(dispose => {
+      const [signal, setSignal] = createSignal(1);
+      const [memo, setMemo] = createWritableMemo<number | undefined>(() => signal() * 2);
+
+      setMemo(2);
+      expect(memo()).toBe(2);
+      setSignal(2);
+      expect(memo()).toBe(4);
+      setMemo(2);
+      expect(memo()).toBe(2);
+
+      dispose();
+    });
+  });
+
+  test("memo can be reassigned to previous inner signal value", () => {
+    createRoot(dispose => {
+      const [signal, setSignal] = createSignal(1);
+      const [memo, setMemo] = createWritableMemo<number | undefined>(() => signal() * 2);
+
+      setMemo(2);
+      expect(memo()).toBe(2);
+      setSignal(2);
+      expect(memo()).toBe(4);
+      setMemo(2);
+      expect(memo()).toBe(2);
+
+      dispose();
+    });
+  });
 });
