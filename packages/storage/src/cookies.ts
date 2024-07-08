@@ -1,4 +1,4 @@
-import { isServer, getRequestEvent, type RequestEvent } from "solid-js/web";
+import { getRequestEvent, isServer, type RequestEvent } from "solid-js/web";
 import { StorageProps, StorageSignalProps, StorageWithOptions } from "./types.js";
 import { addClearMethod, addWithOptionsMethod } from "./tools.js";
 import { createStorage, createStorageSignal } from "./storage.js";
@@ -8,7 +8,7 @@ export type CookieOptions = CookieProperties & {
   getResponseHeaders?: () => Headers;
 };
 
-type CookieProperties = {
+type CookiePropertyTypes = {
   domain?: string;
   expires?: Date | number | String;
   path?: string;
@@ -18,33 +18,32 @@ type CookieProperties = {
   sameSite?: "None" | "Lax" | "Strict";
 };
 
-const cookiePropertyKeys = [
-  "domain",
-  "expires",
-  "path",
-  "secure",
-  "httpOnly",
-  "maxAge",
-  "sameSite",
-] as const;
+type CookieProperties = { [key in keyof CookiePropertyTypes]: CookiePropertyTypes[key] };
+
+const cookiePropertyMap = {
+  domain: "Domain",
+  expires: "Expires",
+  path: "Path",
+  secure: "Secure",
+  httpOnly: "HttpOnly",
+  maxAge: "Max-Age",
+  sameSite: "SameSite",
+} as const;
 
 function serializeCookieOptions(options?: CookieOptions) {
-  if (!options) {
-    return "";
-  }
-  let memo = "";
-  for (const key in options) {
-    if (!cookiePropertyKeys.includes(key as keyof CookieProperties)) continue;
+  if (!options) return "";
+  const result = Object.entries(options)
+    .map(([key, value]) => {
+      const serializedKey = cookiePropertyMap[key as keyof CookiePropertyTypes];
+      if (!serializedKey) return undefined;
 
-    const value = options[key as keyof CookieProperties];
-    memo +=
-      value instanceof Date
-        ? `; ${key}=${value.toUTCString()}`
-        : typeof value === "boolean"
-          ? `; ${key}`
-          : `; ${key}=${value}`;
-  }
-  return memo;
+      if (value instanceof Date) return `${serializedKey}=${value.toUTCString()}`;
+      if (typeof value === "boolean") return value ? `${serializedKey}` : undefined;
+      return `${serializedKey}=${value}`;
+    })
+    .filter(v => !!v);
+
+  return result.length != 0 ? `; ${result.join("; ")}` : "";
 }
 
 function deserializeCookieOptions(cookie: string, key: string) {
@@ -101,14 +100,15 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addWithOptionsMe
     _write: isServer
       ? (key: string, value: string, options?: CookieOptions) => {
           const responseHeaders = getResponseHeaders();
+          const currentCookies =
+            responseHeaders
+              ?.get("Set-Cookie")
+              ?.split(", ")
+              ?.filter(cookie => cookie && !cookie.startsWith(`${key}=`)) ?? [];
           responseHeaders.set(
             "Set-Cookie",
-            (responseHeaders.get("Set-Cookie") || "").replace(
-              new RegExp(`(?:^|, )${key}=[^,]+`, "g"),
-              "",
-            ),
+            [...currentCookies, `${key}=${value}${serializeCookieOptions(options)}`].join(", "),
           );
-          responseHeaders.append("Set-Cookie", `${key}=${value}${serializeCookieOptions(options)}`);
         }
       : (key: string, value: string, options?: CookieOptions) => {
           document.cookie = `${key}=${value}${serializeCookieOptions(options)}`;

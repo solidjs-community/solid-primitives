@@ -1,5 +1,27 @@
 # @solid-primitives/storage
 
+## 3.7.1
+
+### Patch Changes
+
+- bebccc1: Set-Cookie header will be sent with trailing `, ` in some cases which prefixes the name in the browser too
+
+  Don't append false boolean values from `cookieOptions`
+  Stability improvements: ignore unexpected `cookieOption` keys
+
+## 3.7.0
+
+### Minor Changes
+
+- 4ec7533: storage: fix exports
+
+## 3.6.0
+
+### Minor Changes
+
+- bb4fc57: move tauri storage to submodule
+- 1382d8f: fix cookie serialization
+
 ## 3.5.0
 
 ### Minor Changes
