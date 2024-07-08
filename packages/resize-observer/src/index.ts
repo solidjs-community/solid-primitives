@@ -15,8 +15,8 @@ import { isServer } from "solid-js/web";
 
 type ResizeObserverEntryGeneric<T extends Element> = ResizeObserverEntry & { readonly target: T };
 type ResizeObserverCallbackGeneric<T extends Element> = (
-  entries: ResizeObserverEntryGeneric<T>[], 
-  observer: ResizeObserver
+  entries: ResizeObserverEntryGeneric<T>[],
+  observer: ResizeObserver,
 ) => void;
 export type ResizeHandler<T extends Element = Element> = (
   rect: DOMRectReadOnly,
