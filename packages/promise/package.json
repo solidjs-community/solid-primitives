@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/promise",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Promised one-time watch for changes. Await a reactive condition.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
