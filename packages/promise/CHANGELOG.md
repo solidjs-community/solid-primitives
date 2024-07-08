@@ -1,5 +1,11 @@
 # @solid-primitives/until
 
+## 1.0.17
+
+### Patch Changes
+
+- 7783479: Handle rejected promises with raceTimeout
+
 ## 1.0.16
 
 ### Patch Changes
