@@ -4,7 +4,8 @@
   "description": "A set of primitives for Solid Start",
   "author": "Thomas",
   "contributors": [
-    "Damian Tarnawski <gthetarnav@gmail.com>"
+    "Damian Tarnawski <gthetarnav@gmail.com>",
+    "Seth Murphy (https://github.com/eagerestwolf)"
   ],
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/start",
