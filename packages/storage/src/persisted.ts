@@ -69,12 +69,12 @@ export function makePersisted<
   T = SignalType<S>,
 >(signal: S, options: PersistenceOptions<T, O> = {} as PersistenceOptions<T, O>): S {
   const storage = options.storage || globalThis.localStorage;
+  const name = options.name || `storage-${createUniqueId()}`;
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!storage) {
     return signal;
   }
   const storageOptions = (options as unknown as { storageOptions: O }).storageOptions;
-  const name = options.name || `storage-${createUniqueId()}`;
   const serialize: (data: T) => string = options.serialize || JSON.stringify.bind(JSON);
   const deserialize: (data: string) => T = options.deserialize || JSON.parse.bind(JSON);
   const init = storage.getItem(name, storageOptions);
