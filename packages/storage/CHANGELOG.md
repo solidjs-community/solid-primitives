@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 3.8.0
+
+### Minor Changes
+
+- b9d7b28: fix ssr handling
+
 ## 3.7.1
 
 ### Patch Changes
