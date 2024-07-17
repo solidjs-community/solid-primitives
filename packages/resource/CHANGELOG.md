@@ -1,5 +1,11 @@
 # @solid-primitives/resource
 
+## 0.3.0
+
+### Minor Changes
+
+- d7d0d70: resource: new primitive createAbortable (makeAbortable + cleanup)
+
 ## 0.2.0
 
 ### Minor Changes
