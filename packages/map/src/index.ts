@@ -24,20 +24,15 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   #keyTriggers = new TriggerCache<K | typeof $KEYS>();
   #valueTriggers = new TriggerCache<K>();
 
-  constructor(initial?: Iterable<readonly [K, V]> | null) {
+  constructor(entries?: readonly (readonly [K, V])[] | null) {
     super();
-    if (initial) for (const v of initial) super.set(v[0], v[1]);
+    if (entries) for (const entry of entries) super.set(...entry);
   }
 
-  // reads
-  has(key: K): boolean {
-    this.#keyTriggers.track(key);
-    return super.has(key);
+  [Symbol.iterator](): IterableIterator<[K, V]> {
+    return this.entries();
   }
-  get(key: K): V | undefined {
-    this.#valueTriggers.track(key);
-    return super.get(key);
-  }
+
   get size(): number {
     this.#keyTriggers.track($KEYS);
     return super.size;
@@ -48,72 +43,89 @@ export class ReactiveMap<K, V> extends Map<K, V> {
       this.#keyTriggers.track(key);
       yield key;
     }
+
     this.#keyTriggers.track($KEYS);
   }
+
   *values(): IterableIterator<V> {
-    for (const [key, v] of super.entries()) {
+    for (const [key, value] of super.entries()) {
       this.#valueTriggers.track(key);
-      yield v;
+      yield value;
     }
+
     this.#keyTriggers.track($KEYS);
   }
+
   *entries(): IterableIterator<[K, V]> {
     for (const entry of super.entries()) {
+      this.#keyTriggers.track(entry[0]);
       this.#valueTriggers.track(entry[0]);
       yield entry;
     }
+
     this.#keyTriggers.track($KEYS);
   }
 
-  // writes
+  forEach(fn: (value: V, key: K, map: Map<K, V>) => void): void {
+    this.#keyTriggers.track($KEYS);
+
+    for (const [key, value] of super.entries()) {
+      this.#keyTriggers.track(key);
+      this.#valueTriggers.track(key);
+      fn(value, key, this);
+    }
+  }
+
+  has(key: K): boolean {
+    this.#keyTriggers.track(key);
+    return super.has(key);
+  }
+
+  get(key: K): V | undefined {
+    this.#valueTriggers.track(key);
+    return super.get(key);
+  }
+
   set(key: K, value: V): this {
+    const hasKey = super.has(key);
+    const currentValue = super.get(key);
+    const result = super.set(key, value);
+
     batch(() => {
-      if (super.has(key)) {
-        if (super.get(key)! === value) return;
-      } else {
+      if (!hasKey) {
         this.#keyTriggers.dirty(key);
         this.#keyTriggers.dirty($KEYS);
       }
-      this.#valueTriggers.dirty(key);
-      super.set(key, value);
+
+      if (value !== currentValue) this.#valueTriggers.dirty(key);
     });
-    return this;
+
+    return result;
   }
+
   delete(key: K): boolean {
-    const r = super.delete(key);
-    if (r) {
+    const currentValue = super.get(key);
+    const result = super.delete(key);
+
+    if (result) {
       batch(() => {
         this.#keyTriggers.dirty(key);
         this.#keyTriggers.dirty($KEYS);
-        this.#valueTriggers.dirty(key);
+        if (currentValue !== undefined) this.#valueTriggers.dirty(key);
       });
     }
-    return r;
+
+    return result;
   }
+
   clear(): void {
     if (super.size) {
+      super.clear();
       batch(() => {
-        for (const v of super.keys()) {
-          this.#keyTriggers.dirty(v);
-          this.#valueTriggers.dirty(v);
-        }
-        super.clear();
-        this.#keyTriggers.dirty($KEYS);
+        this.#keyTriggers.dirtyAll();
+        this.#valueTriggers.dirtyAll();
       });
     }
-  }
-
-  // callback
-  forEach(callbackfn: (value: V, key: K, map: this) => void) {
-    this.#keyTriggers.track($KEYS);
-    for (const [key, v] of super.entries()) {
-      this.#valueTriggers.track(key);
-      callbackfn(v, key, this);
-    }
-  }
-
-  [Symbol.iterator](): IterableIterator<[K, V]> {
-    return this.entries();
   }
 }
 
@@ -137,38 +149,46 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
   #keyTriggers = new TriggerCache<K>(WeakMap);
   #valueTriggers = new TriggerCache<K>(WeakMap);
 
-  constructor(initial?: Iterable<readonly [K, V]> | null) {
+  constructor(entries?: readonly [K, V][] | null) {
     super();
-    if (initial) for (const v of initial) super.set(v[0], v[1]);
+    if (entries) for (const entry of entries) super.set(...entry);
   }
 
   has(key: K): boolean {
     this.#keyTriggers.track(key);
     return super.has(key);
   }
+
   get(key: K): V | undefined {
     this.#valueTriggers.track(key);
     return super.get(key);
   }
+
   set(key: K, value: V): this {
+    const hasKey = super.has(key);
+    const currentValue = super.get(key);
+    const result = super.set(key, value);
+
     batch(() => {
-      if (super.has(key)) {
-        if (super.get(key)! === value) return;
-      } else this.#keyTriggers.dirty(key);
-      this.#valueTriggers.dirty(key);
-      super.set(key, value);
+      if (!hasKey) this.#keyTriggers.dirty(key);
+      if (value !== currentValue) this.#valueTriggers.dirty(key);
     });
-    return this;
+
+    return result;
   }
+
   delete(key: K): boolean {
-    const r = super.delete(key);
-    if (r) {
+    const currentValue = super.get(key);
+    const result = super.delete(key);
+
+    if (result) {
       batch(() => {
         this.#keyTriggers.dirty(key);
-        this.#valueTriggers.dirty(key);
+        if (currentValue !== undefined) this.#valueTriggers.dirty(key);
       });
     }
-    return r;
+
+    return result;
   }
 }
 
@@ -176,14 +196,16 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
 export type SignalMap<K, V> = Accessor<[K, V][]> & ReactiveMap<K, V>;
 
 /** @deprecated */
-export function createMap<K, V>(initial?: [K, V][]): SignalMap<K, V> {
-  const map = new ReactiveMap(initial);
+export function createMap<K, V>(entries?: readonly (readonly [K, V])[] | null): SignalMap<K, V> {
+  const map = new ReactiveMap(entries);
   return new Proxy(() => [...map], {
     get: (_, b) => map[b as keyof typeof map],
   }) as SignalMap<K, V>;
 }
 
 /** @deprecated */
-export function createWeakMap<K extends object, V>(initial?: [K, V][]): ReactiveWeakMap<K, V> {
-  return new ReactiveWeakMap(initial);
+export function createWeakMap<K extends object = object, V = any>(
+  entries?: readonly [K, V][] | null,
+): ReactiveWeakMap<K, V> {
+  return new ReactiveWeakMap(entries);
 }

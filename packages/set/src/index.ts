@@ -18,74 +18,84 @@ const $KEYS = Symbol("track-keys");
 export class ReactiveSet<T> extends Set<T> {
   #triggers = new TriggerCache<T | typeof $KEYS>();
 
-  constructor(values?: Iterable<T> | null) {
+  constructor(values?: readonly T[] | null) {
     super();
-    if (values) for (const v of values) super.add(v);
-  }
-
-  // reads
-  get size(): number {
-    this.#triggers.track($KEYS);
-    return super.size;
-  }
-  has(v: T): boolean {
-    this.#triggers.track(v);
-    return super.has(v);
-  }
-
-  *keys(): IterableIterator<T> {
-    for (const key of super.keys()) {
-      this.#triggers.track(key);
-      yield key;
-    }
-    this.#triggers.track($KEYS);
-  }
-  values(): IterableIterator<T> {
-    return this.keys();
-  }
-  *entries(): IterableIterator<[T, T]> {
-    for (const key of super.keys()) {
-      this.#triggers.track(key);
-      yield [key, key];
-    }
-    this.#triggers.track($KEYS);
+    if (values) for (const value of values) super.add(value);
   }
 
   [Symbol.iterator](): IterableIterator<T> {
     return this.values();
   }
-  forEach(callbackfn: (value: T, value2: T, set: this) => void) {
+
+  get size(): number {
     this.#triggers.track($KEYS);
-    super.forEach(callbackfn as any);
+    return super.size;
   }
 
-  // writes
-  add(v: T): this {
-    if (!super.has(v)) {
-      super.add(v);
+  keys(): IterableIterator<T> {
+    return this.values();
+  }
+
+  *values(): IterableIterator<T> {
+    for (const value of super.values()) {
+      this.#triggers.track(value);
+      yield value;
+    }
+    this.#triggers.track($KEYS);
+  }
+
+  *entries(): IterableIterator<[T, T]> {
+    for (const entry of super.entries()) {
+      this.#triggers.track(entry[0]);
+      yield entry;
+    }
+    this.#triggers.track($KEYS);
+  }
+
+  forEach(fn: (value1: T, value2: T, set: Set<T>) => void): void {
+    this.#triggers.track($KEYS);
+
+    for (const value of super.values()) {
+      this.#triggers.track(value);
+      fn(value, value, this);
+    }
+  }
+
+  has(value: T): boolean {
+    this.#triggers.track(value);
+    return super.has(value);
+  }
+
+  add(value: T): this {
+    if (!super.has(value)) {
+      super.add(value);
       batch(() => {
-        this.#triggers.dirty(v);
+        this.#triggers.dirty(value);
         this.#triggers.dirty($KEYS);
       });
     }
+
     return this;
   }
-  delete(v: T): boolean {
-    const r = super.delete(v);
-    if (r) {
+
+  delete(value: T): boolean {
+    const result = super.delete(value);
+
+    if (result) {
       batch(() => {
-        this.#triggers.dirty(v);
+        this.#triggers.dirty(value);
         this.#triggers.dirty($KEYS);
       });
     }
-    return r;
+
+    return result;
   }
+
   clear(): void {
     if (super.size) {
+      super.clear();
       batch(() => {
-        for (const v of super.keys()) this.#triggers.dirty(v);
-        super.clear();
-        this.#triggers.dirty($KEYS);
+        this.#triggers.dirtyAll();
       });
     }
   }
@@ -104,26 +114,30 @@ export class ReactiveSet<T> extends Set<T> {
 export class ReactiveWeakSet<T extends object> extends WeakSet<T> {
   #triggers = new TriggerCache<T>(WeakMap);
 
-  constructor(values?: Iterable<T> | null) {
+  constructor(values?: readonly T[] | null) {
     super();
-    if (values) for (const v of values) super.add(v);
+    if (values) for (const value of values) super.add(value);
   }
 
-  has(v: T): boolean {
-    this.#triggers.track(v);
-    return super.has(v);
+  has(value: T): boolean {
+    this.#triggers.track(value);
+    return super.has(value);
   }
-  add(v: T): this {
-    if (!super.has(v)) {
-      super.add(v);
-      this.#triggers.dirty(v);
+
+  add(value: T): this {
+    if (!super.has(value)) {
+      super.add(value);
+      this.#triggers.dirty(value);
     }
     return this;
   }
-  delete(v: T): boolean {
-    const deleted = super.delete(v);
-    deleted && this.#triggers.dirty(v);
-    return deleted;
+
+  delete(value: T): boolean {
+    const result = super.delete(value);
+
+    result && this.#triggers.dirty(value);
+
+    return result;
   }
 }
 
@@ -131,14 +145,16 @@ export class ReactiveWeakSet<T extends object> extends WeakSet<T> {
 export type SignalSet<T> = Accessor<T[]> & ReactiveSet<T>;
 
 /** @deprecated */
-export function createSet<T>(initial?: T[]): SignalSet<T> {
-  const set = new ReactiveSet(initial);
+export function createSet<T>(values?: readonly T[] | null): SignalSet<T> {
+  const set = new ReactiveSet(values);
   return new Proxy(() => [...set], {
     get: (_, b) => set[b as keyof ReactiveSet<T>],
   }) as SignalSet<T>;
 }
 
 /** @deprecated */
-export function createWeakSet<T extends object>(initial?: T[]): ReactiveWeakSet<T> {
-  return new ReactiveWeakSet(initial);
+export function createWeakSet<T extends object = object>(
+  values?: readonly T[] | null,
+): ReactiveWeakSet<T> {
+  return new ReactiveWeakSet(values);
 }
