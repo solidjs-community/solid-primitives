@@ -1,6 +1,8 @@
 import type { Component } from "solid-js";
 import { VirtualList } from "../src/index.jsx";
 
+const intl = new Intl.NumberFormat();
+
 const items = new Array(100_000).fill(0).map((_, i) => i);
 
 const App: Component = () => {
@@ -26,7 +28,7 @@ type VirtualListItemProps = {
 const VirtualListItem: Component<VirtualListItemProps> = (props: { item: number }) => {
   console.log("ran", props.item);
 
-  return <div>{props.item}</div>;
+  return <div>{intl.format(props.item)}</div>;
 };
 
 export default App;
