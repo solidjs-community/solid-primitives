@@ -86,10 +86,14 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
+    "localforage": "^1.10.0",
     "solid-js": "^1.6.12",
     "@tauri-apps/plugin-store": "*"
   },
   "peerDependenciesMeta": {
+    "localforage": {
+      "optional": true
+    },
     "solid-start": {
       "optional": true
     },

@@ -53,7 +53,7 @@ export type AsyncStorage = {
   clear?: () => Promise<void> | void;
   getItem: (key: string) => Promise<string | null> | string | null;
   getAll?: () => Promise<any>;
-  setItem: (key: string, value: string) => Promise<void> | void;
+  setItem: ((key: string, value: string) => Promise<void> | void);
   removeItem: (key: string) => Promise<void> | void;
   key: (index: number) => Promise<string | null> | string | null;
   readonly length: Promise<number> | number | undefined;
@@ -63,7 +63,7 @@ export type AsyncStorageWithOptions<O> = {
   clear?: () => Promise<void> | void;
   getItem: (key: string, options?: O) => Promise<string | null> | string | null;
   getAll?: () => Promise<any>;
-  setItem: (key: string, value: string, options?: O) => Promise<void> | void;
+  setItem: ((key: string, value: string, options?: O) => Promise<void> | void);
   removeItem: (key: string) => Promise<void> | void;
   key: (index: number) => Promise<string | null> | string | null;
   readonly length: Promise<number> | number | undefined;

@@ -29,7 +29,7 @@ const [signal, setSignal] = makePersisted(createSignal("initial"), {storage: ses
 const [store, setStore] = makePersisted(createStore({test: true}), {name: "testing"});
 type PersistedOptions<Type, StorageOptions> = {
   // localStorage is default
-  storage?: Storage | StorageWithOptions | AsyncStorage | AsyncStorageWithOptions,
+  storage?: Storage | StorageWithOptions | AsyncStorage | AsyncStorageWithOptions | LocalForage,
   // only required for storage APIs with options
   storageOptions?: StorageOptions,
   // key in the storage API
@@ -96,6 +96,20 @@ to use predefined options for your persisted state:
 ```ts
 const [state, setState] = makePersisted(createSignal(), {
   storage: cookieStorage.withOptions({ expires: new Date(+new Date() + 3e10) }),
+});
+```
+
+#### LocalForage
+
+LocalForage allows to use indexedDB among others to greatly increase the size of what can be stored. Just drop it in as a storage (only supported in the client):
+
+```ts
+import { isServer } from "solid-js/web";
+import { makePersisted } from "@solid-primtives/storage";
+import localforage from "localforage";
+
+const [state, setState] = makePersisted(createSignal(), {
+  storage: !isServer ? localforage : undefined
 });
 ```
 
