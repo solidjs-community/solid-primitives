@@ -22,12 +22,9 @@ describe("VirtualList", () => {
 
   test("renders a subset of the items", () => {
     render(() => (
-      <VirtualList
-        items={TEST_LIST}
-        renderRow={item => <VirtualListItem item={item} />}
-        rootHeight={20}
-        rowHeight={10}
-      />
+      <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10}>
+        {item => <VirtualListItem item={item} />}
+      </VirtualList>
     ));
 
     expect(screen.getByText(0)).not.toBeNull();
@@ -38,13 +35,9 @@ describe("VirtualList", () => {
 
   test("scrolling renders the correct subset of the items", () => {
     const { container } = render(() => (
-      <VirtualList
-        items={TEST_LIST}
-        renderRow={item => <VirtualListItem item={item} />}
-        rootHeight={20}
-        rowHeight={10}
-        class={SELECTOR_CLASS_NAME}
-      />
+      <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10} class={SELECTOR_CLASS_NAME}>
+        {item => <VirtualListItem item={item} />}
+      </VirtualList>
     ));
 
     const scrollList = createScrollList(container);
@@ -86,13 +79,9 @@ describe("VirtualList", () => {
 
   test("renders the correct subset of the items for the end of the list", () => {
     const { container } = render(() => (
-      <VirtualList
-        items={TEST_LIST}
-        renderRow={item => <VirtualListItem item={item} />}
-        rootHeight={20}
-        rowHeight={10}
-        class={SELECTOR_CLASS_NAME}
-      />
+      <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10} class={SELECTOR_CLASS_NAME}>
+        {item => <VirtualListItem item={item} />}
+      </VirtualList>
     ));
 
     createScrollList(container)(9_980);
@@ -106,13 +95,14 @@ describe("VirtualList", () => {
   test("renders `overScan` rows above and below the visible rendered items", () => {
     const { container } = render(() => (
       <VirtualList
-        items={TEST_LIST}
-        renderRow={item => <VirtualListItem item={item} />}
+        each={TEST_LIST}
         rootHeight={20}
         rowHeight={10}
         overscanCount={2}
         class={SELECTOR_CLASS_NAME}
-      />
+      >
+        {item => <VirtualListItem item={item} />}
+      </VirtualList>
     ));
 
     createScrollList(container)(100);
@@ -129,13 +119,9 @@ describe("VirtualList", () => {
 
   test("overscanCount defaults to 1 if undefined", () => {
     const { container } = render(() => (
-      <VirtualList
-        items={TEST_LIST}
-        renderRow={item => <VirtualListItem item={item} />}
-        rootHeight={20}
-        rowHeight={10}
-        class={SELECTOR_CLASS_NAME}
-      />
+      <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10} class={SELECTOR_CLASS_NAME}>
+        {item => <VirtualListItem item={item} />}
+      </VirtualList>
     ));
 
     createScrollList(container)(100);
@@ -151,13 +137,14 @@ describe("VirtualList", () => {
   test("overscanCount defaults to 1 if set to zero", () => {
     const { container } = render(() => (
       <VirtualList
-        items={TEST_LIST}
-        renderRow={item => <VirtualListItem item={item} />}
+        each={TEST_LIST}
         rootHeight={20}
         rowHeight={10}
         overscanCount={0}
         class={SELECTOR_CLASS_NAME}
-      />
+      >
+        {item => <VirtualListItem item={item} />}
+      </VirtualList>
     ));
 
     createScrollList(container)(100);

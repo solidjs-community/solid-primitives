@@ -7,13 +7,14 @@ const App: Component = () => {
   return (
     <div class="box-border flex min-h-screen w-full flex-col space-y-4 bg-gray-800 p-24 text-white">
       <VirtualList
-        items={items}
+        each={items}
         overscanCount={5}
-        renderRow={item => <VirtualListItem item={item} />}
         rootHeight={720}
         rowHeight={24}
         class="bg-white text-black"
-      />
+      >
+        {item => <VirtualListItem item={item} />}
+      </VirtualList>
     </div>
   );
 };

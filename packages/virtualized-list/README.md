@@ -26,9 +26,7 @@ pnpm add @solid-primitives/virtualized-list
 ```tsx
 <VirtualList
   // the list of items (of course, to for this component to be useful, the list would need to be much bigger than shown here)
-  items={[0, 1, 2, 3, 4, 5, 6, 7]}
-  // the component function that will be used to transform the items into rows in the table
-  renderRow={item => <VirtualListItem item={item} />}
+  each={[0, 1, 2, 3, 4, 5, 6, 7]}
   // the number of elements to render both before and after the visible section of the list, so passing 5 will render 5 items before the list, and 5 items after. Defaults to 1, cannot be set to zero. This is necessary to hide the blank space around list items when scrolling
   overscanCount={5}
   // the height of the root element of the virtualizedList itself
@@ -37,7 +35,12 @@ pnpm add @solid-primitives/virtualized-list
   rowHeight={10}
   // the class applied to the root element of the virtualizedList
   class={"my-class-name"}
-/>
+>
+  {
+    // the flowComponent that will be used to transform the items into rows in the list
+    item => <VirtualListItem item={item} />
+  }
+</VirtualList>
 ```
 
 The tests describe the component's exact behavior and how overscanCount handles the start/end of the list in more detail.
