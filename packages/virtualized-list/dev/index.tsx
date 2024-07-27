@@ -1,5 +1,6 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount, onCleanup } from "solid-js";
 import type { Component } from "solid-js";
+import { isServer } from "solid-js/web";
 import { VirtualList } from "../src/index.jsx";
 
 const intl = new Intl.NumberFormat();
@@ -59,6 +60,10 @@ const App: Component = () => {
         </div>
       </div>
 
+      <div class="w-full space-y-2 bg-white p-4 text-gray-800 shadow-md">
+        View the devtools console for log of items being added and removed from the visible list
+      </div>
+
       <VirtualList
         each={items.slice(0, listLength())}
         overscanCount={overscanCount()}
@@ -107,7 +112,13 @@ type VirtualListItemProps = {
 };
 
 const VirtualListItem: Component<VirtualListItemProps> = props => {
-  console.log("ran", props.item);
+  onMount(() => {
+    if (!isServer) console.log("item added:", props.item);
+  });
+
+  onCleanup(() => {
+    if (!isServer) console.log("item removed::", props.item);
+  });
 
   return (
     <div style={{ height: `${props.height}px` }} class="align-center flex">
