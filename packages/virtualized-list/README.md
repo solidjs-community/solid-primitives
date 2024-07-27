@@ -44,6 +44,10 @@ pnpm add @solid-primitives/virtualized-list
 ```
 
 The tests describe the component's exact behavior and how overscanCount handles the start/end of the list in more detail.
+Note that the component only handles vertical lists.
+
+To handle lists where the items do not have a known, fixed height, estimate the average height of an item and provide a generous `overscanCount` to prevent users from seeing whitespace around the first and last items as they scroll if the average size of the items in their viewport is smaller than the expected average.
+In these situations, the `overscanCount` must balance performance (the larger the count, the more items the list renders) and padding the list's visible items (the smaller the count, the greater the risk of scrolling into whitespace).
 
 ## Demo
 
