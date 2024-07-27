@@ -9,9 +9,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/virtualized-list?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/virtualized-list)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A sample primitive that is made up for templating with the following options:
-
-`createPrimitiveTemplate` - Provides a getter and setter for the primitive.
+A basic [virtualized list](https://www.patterns.dev/vanilla/virtual-lists/) component for improving performance when rendering very large lists
 
 ## Installation
 
@@ -25,9 +23,24 @@ pnpm add @solid-primitives/virtualized-list
 
 ## How to use it
 
-```ts
-const [value, setValue] = createPrimitiveTemplate(false);
+```tsx
+<VirtualList
+  // the list of items (of course, to for this component to be useful, the list would need to be much bigger than shown here)
+  items={[0, 1, 2, 3, 4, 5, 6, 7]}
+  // the component function that will be used to transform the items into rows in the table
+  renderRow={item => <VirtualListItem item={item} />}
+  // the number of elements to render both before and after the visible section of the list, so passing 5 will render 5 items before the list, and 5 items after. Defaults to 1, cannot be set to zero. This is necessary to hide the blank space around list items when scrolling
+  overscanCount={5}
+  // the height of the root element of the virtualizedList itself
+  rootHeight={20}
+  // the height of individual rows in the virtualizedList
+  rowHeight={10}
+  // the class applied to the root element of the virtualizedList
+  class={"my-class-name"}
+/>
 ```
+
+The tests describe the component's exact behavior and how overscanCount handles the start/end of the list in more detail.
 
 ## Demo
 

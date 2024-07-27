@@ -1,8 +1,8 @@
 {
   "name": "@solid-primitives/virtualized-list",
   "version": "0.0.100",
-  "description": "A template primitive example.",
-  "author": "Your Name <you@youremail.com>",
+  "description": "A virtualized list component for performantly rendering lists with many elements",
+  "author": "Spencer Whitehead <spencerwhitehead7@gmail.com>",
   "contributors": [],
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/virtualized-list",
@@ -17,13 +17,14 @@
     "name": "virtualized-list",
     "stage": 0,
     "list": [
-      "createPrimitiveTemplate"
+      "VirtualizedList"
     ],
     "category": "Display & Media"
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "virtualized"
   ],
   "private": false,
   "sideEffects": false,
