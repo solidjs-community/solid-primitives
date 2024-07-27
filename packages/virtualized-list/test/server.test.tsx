@@ -8,13 +8,14 @@ describe("VirtualList", () => {
   test("doesn't break in SSR", () => {
     const virtualListStr = renderToString(() => (
       <VirtualList
-        items={TEST_LIST}
+        each={TEST_LIST}
         overscanCount={1}
-        renderRow={item => <VirtualListItem item={item} />}
         rootHeight={20}
         rowHeight={10}
         class="classString"
-      />
+      >
+        {item => <VirtualListItem item={item} />}
+      </VirtualList>
     ));
 
     expect(virtualListStr).toEqual(
