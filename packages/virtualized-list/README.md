@@ -44,7 +44,7 @@ The tests describe the component's exact behavior and how overscanCount handles 
 
 ## Demo
 
-You can use this template for publishing your demo on CodeSandbox: https://codesandbox.io/s/solid-primitives-demo-template-sz95h
+You can see the VirtualizedList in action in the following sandbox: https://primitives.solidjs.community/playground/virtualized-list
 
 ## Changelog
 
