@@ -1,12 +1,11 @@
 import { getRequestEvent, isServer, type RequestEvent } from "solid-js/web";
-import { StorageProps, StorageSignalProps, StorageWithOptions } from "./types.js";
+import { SyncStorageWithOptions } from "./persisted.js";
 import { addClearMethod, addWithOptionsMethod } from "./tools.js";
-import { createStorage, createStorageSignal } from "./storage.js";
 
 export type CookieOptions = CookieProperties & {
   getRequestHeaders?: () => Headers;
   getResponseHeaders?: () => Headers;
-};
+} | undefined;
 
 type CookiePropertyTypes = {
   domain?: string;
@@ -78,7 +77,7 @@ const getResponseHeaders = isServer
  * ```
  * Also, you can use its _read and _write properties to change reading and writing
  */
-export const cookieStorage: StorageWithOptions<CookieOptions> = addWithOptionsMethod(
+export const cookieStorage: SyncStorageWithOptions<CookieOptions> = addWithOptionsMethod(
   addClearMethod({
     _read: isServer
       ? (options?: CookieOptions) => {
@@ -147,25 +146,3 @@ export const cookieStorage: StorageWithOptions<CookieOptions> = addWithOptionsMe
     },
   }),
 );
-
-/**
- * creates a reactive store but bound to document.cookie
- * @deprecated in favor of makePersisted
- */
-export const createCookieStorage = <T, O = CookieOptions, A = StorageWithOptions<CookieOptions>>(
-  props?: Omit<StorageProps<T, A, O>, "api">,
-) => createStorage<O, T>({ ...props, api: cookieStorage } as any);
-
-/**
- * creates a reactive signal, but bound to document.cookie
- * @deprecated in favor of makePersisted
- */
-export const createCookieStorageSignal = <
-  T,
-  O = CookieOptions,
-  A = StorageWithOptions<CookieOptions>,
->(
-  key: string,
-  initialValue?: T,
-  props?: Omit<StorageSignalProps<T, A, O>, "api">,
-) => createStorageSignal<T, O>(key, initialValue, { ...props, api: cookieStorage } as any);
