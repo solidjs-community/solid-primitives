@@ -4,7 +4,8 @@
   "description": "A set of primitives for Solid Start",
   "author": "Thomas",
   "contributors": [
-    "Damian Tarnawski <gthetarnav@gmail.com>"
+    "Damian Tarnawski <gthetarnav@gmail.com>",
+    "Seth Murphy (https://github.com/eagerestwolf)"
   ],
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/start",
@@ -59,11 +60,9 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12",
-    "solid-start": ">=0.2.26"
+    "solid-js": "^1.8.18"
   },
   "devDependencies": {
-    "solid-js": "^1.8.7",
-    "solid-start": "^0.3.10"
+    "solid-js": "^1.8.18"
   }
 }
