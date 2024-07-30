@@ -4,7 +4,7 @@ import { isServer, isDev } from "solid-js/web";
 import type { SetStoreFunction, Store } from "solid-js/store";
 import { reconcile } from "solid-js/store";
 
-export type SyncStorage = { 
+export type SyncStorage = {
   getItem: (key: string) => string | null;
   setItem: (key: string, value: string) => void;
   removeItem: (key: string) => void;
@@ -16,28 +16,32 @@ export type AsyncStorage = {
   removeItem: (key: string) => Promise<void>;
   [key: string]: any;
 };
-export type SyncStorageWithOptions<O> = undefined extends O ? { 
-  getItem: (key: string, options?: O) => string | null;
-  setItem: (key: string, value: string, options?: O) => void;
-  removeItem: (key: string, options?: O) => void;
-  [key: string]: any;
-} : { 
-  getItem: (key: string, options: O) => string | null;
-  setItem: (key: string, value: string, options: O) => void;
-  removeItem: (key: string, options: O) => void;
-  [key: string]: any;
-};
-export type AsyncStorageWithOptions<O> = undefined extends O ? { 
-  getItem: (key: string, options?: O) => Promise<string | null>;
-  setItem: (key: string, value: string, options?: O) => Promise<unknown>;
-  removeItem: (key: string, options?: O) => Promise<void>;
-  [key: string]: any;
-} : { 
-  getItem: (key: string, options: O) => Promise<string | null>;
-  setItem: (key: string, value: string, options: O) => Promise<unknown>;
-  removeItem: (key: string, options: O) => Promise<void>;
-  [key: string]: any;
-};
+export type SyncStorageWithOptions<O> = undefined extends O
+  ? {
+      getItem: (key: string, options?: O) => string | null;
+      setItem: (key: string, value: string, options?: O) => void;
+      removeItem: (key: string, options?: O) => void;
+      [key: string]: any;
+    }
+  : {
+      getItem: (key: string, options: O) => string | null;
+      setItem: (key: string, value: string, options: O) => void;
+      removeItem: (key: string, options: O) => void;
+      [key: string]: any;
+    };
+export type AsyncStorageWithOptions<O> = undefined extends O
+  ? {
+      getItem: (key: string, options?: O) => Promise<string | null>;
+      setItem: (key: string, value: string, options?: O) => Promise<unknown>;
+      removeItem: (key: string, options?: O) => Promise<void>;
+      [key: string]: any;
+    }
+  : {
+      getItem: (key: string, options: O) => Promise<string | null>;
+      setItem: (key: string, value: string, options: O) => Promise<unknown>;
+      removeItem: (key: string, options: O) => Promise<void>;
+      [key: string]: any;
+    };
 
 export type PersistenceSyncData = {
   key: string;

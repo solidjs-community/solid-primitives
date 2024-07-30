@@ -2,10 +2,12 @@ import { getRequestEvent, isServer, type RequestEvent } from "solid-js/web";
 import { SyncStorageWithOptions } from "./persisted.js";
 import { addClearMethod, addWithOptionsMethod } from "./tools.js";
 
-export type CookieOptions = CookieProperties & {
-  getRequestHeaders?: () => Headers;
-  getResponseHeaders?: () => Headers;
-} | undefined;
+export type CookieOptions =
+  | (CookieProperties & {
+      getRequestHeaders?: () => Headers;
+      getResponseHeaders?: () => Headers;
+    })
+  | undefined;
 
 type CookiePropertyTypes = {
   domain?: string;

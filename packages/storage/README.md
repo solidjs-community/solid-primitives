@@ -109,11 +109,11 @@ import { makePersisted } from "@solid-primtives/storage";
 import localforage from "localforage";
 
 const [state, setState] = makePersisted(createSignal(), {
-  storage: !isServer ? localforage : undefined
+  storage: !isServer ? localforage : undefined,
 });
 ```
 
-Keep in mind that it will only run on the client, so unless you have 
+Keep in mind that it will only run on the client, so unless you have
 
 #### TauriStorage
 
@@ -165,7 +165,7 @@ This package also provides a way to create a storage API wrapper for an object c
 
 ```ts
 const [state, setState] = createPersisted(createSignal(), {
-  storage: globalThis.localStorage ?? makeObjectStorage(session.userState)
+  storage: globalThis.localStorage ?? makeObjectStorage(session.userState),
 });
 ```
 

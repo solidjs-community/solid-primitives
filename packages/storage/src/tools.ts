@@ -1,9 +1,17 @@
-import { SyncStorage, AsyncStorage, AsyncStorageWithOptions, SyncStorageWithOptions } from "./index.js";
+import {
+  SyncStorage,
+  AsyncStorage,
+  AsyncStorageWithOptions,
+  SyncStorageWithOptions,
+} from "./index.js";
 
 /**
  * adds a `.clear` method to a Storage without one only using `.key`/`.removeItem`
  */
-export const addClearMethod = <S extends SyncStorage | SyncStorageWithOptions<any>, R extends S & { clear: () => void }>(
+export const addClearMethod = <
+  S extends SyncStorage | SyncStorageWithOptions<any>,
+  R extends S & { clear: () => void },
+>(
   storage: Omit<S, "clear"> & { clear?: () => void },
 ): R => {
   if (typeof storage.clear === "function") {
@@ -26,7 +34,9 @@ const methodKeys = ["clear", "getItem", "getAll", "setItem", "removeItem", "key"
 export const addWithOptionsMethod = <
   O,
   S extends SyncStorageWithOptions<O> | AsyncStorageWithOptions<O>,
-  W extends AsyncStorage | SyncStorage = S extends AsyncStorageWithOptions<O> ? AsyncStorage : SyncStorage,
+  W extends AsyncStorage | SyncStorage = S extends AsyncStorageWithOptions<O>
+    ? AsyncStorage
+    : SyncStorage,
 >(
   storage: S,
 ): S & { withOptions: (options: O) => W } => {
@@ -98,15 +108,23 @@ export const multiplexStorage: StorageMultiplexer = (...storages) => ({
   },
 });
 
-
 /**
  * Provides a minimal Storage API wrapper for an object
  */
 export const makeObjectStorage = (object: { [key: string]: string }) => ({
-  getItem: (key: string) => Object.hasOwn(object, key) && object[key] || null,
-  setItem: (key: string, value: string) => { object[key] = value; },
-  removeItem: (key: string) => { delete object[key]; },
+  getItem: (key: string) => (Object.hasOwn(object, key) && object[key]) || null,
+  setItem: (key: string, value: string) => {
+    object[key] = value;
+  },
+  removeItem: (key: string) => {
+    delete object[key];
+  },
   key: (index: number) => Object.keys(object)[index],
-  get length() { return Object.keys(object).length; },
-  clear: () => Object.keys(object).forEach((key) => { delete object[key]; }),
+  get length() {
+    return Object.keys(object).length;
+  },
+  clear: () =>
+    Object.keys(object).forEach(key => {
+      delete object[key];
+    }),
 });

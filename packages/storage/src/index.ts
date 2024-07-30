@@ -1,5 +1,10 @@
 import { type CookieOptions, cookieStorage } from "./cookies.js";
-import { addClearMethod, addWithOptionsMethod, multiplexStorage, makeObjectStorage } from "./tools.js";
+import {
+  addClearMethod,
+  addWithOptionsMethod,
+  multiplexStorage,
+  makeObjectStorage,
+} from "./tools.js";
 import {
   type SyncStorage,
   type SyncStorageWithOptions,
