@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 4.0.0
+
+### Major Changes
+
+- 94d1bcc: storage: remove deprecated primitives, simplify types, add makeObjectStorage
+
 ## 3.8.0
 
 ### Minor Changes
