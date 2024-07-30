@@ -38,7 +38,7 @@ pnpm add @solid-primitives/virtualized-list
 >
   {
     // the flowComponent that will be used to transform the items into rows in the list
-    item => <VirtualListItem item={item} />
+    item => <div>{item}</div>
   }
 </VirtualList>
 ```
