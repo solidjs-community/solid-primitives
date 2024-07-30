@@ -3,7 +3,41 @@ import { createUniqueId, untrack } from "solid-js";
 import { isServer, isDev } from "solid-js/web";
 import type { SetStoreFunction, Store } from "solid-js/store";
 import { reconcile } from "solid-js/store";
-import type { AsyncStorage, AsyncStorageWithOptions, StorageWithOptions } from "./types.js";
+
+export type SyncStorage = { 
+  getItem: (key: string) => string | null;
+  setItem: (key: string, value: string) => void;
+  removeItem: (key: string) => void;
+  [key: string]: any;
+};
+export type AsyncStorage = {
+  getItem: (key: string) => Promise<string | null>;
+  setItem: (key: string, value: string) => Promise<unknown>;
+  removeItem: (key: string) => Promise<void>;
+  [key: string]: any;
+};
+export type SyncStorageWithOptions<O> = undefined extends O ? { 
+  getItem: (key: string, options?: O) => string | null;
+  setItem: (key: string, value: string, options?: O) => void;
+  removeItem: (key: string, options?: O) => void;
+  [key: string]: any;
+} : { 
+  getItem: (key: string, options: O) => string | null;
+  setItem: (key: string, value: string, options: O) => void;
+  removeItem: (key: string, options: O) => void;
+  [key: string]: any;
+};
+export type AsyncStorageWithOptions<O> = undefined extends O ? { 
+  getItem: (key: string, options?: O) => Promise<string | null>;
+  setItem: (key: string, value: string, options?: O) => Promise<unknown>;
+  removeItem: (key: string, options?: O) => Promise<void>;
+  [key: string]: any;
+} : { 
+  getItem: (key: string, options: O) => Promise<string | null>;
+  setItem: (key: string, value: string, options: O) => Promise<unknown>;
+  removeItem: (key: string, options: O) => Promise<void>;
+  [key: string]: any;
+};
 
 export type PersistenceSyncData = {
   key: string;
@@ -26,9 +60,9 @@ export type PersistenceOptions<T, O extends Record<string, any> | undefined> = {
   deserialize?: (data: string) => T;
   sync?: PersistenceSyncAPI;
 } & (undefined extends O
-  ? { storage?: Storage | AsyncStorage }
+  ? { storage?: SyncStorage | AsyncStorage }
   : {
-      storage: StorageWithOptions<O> | AsyncStorageWithOptions<O>;
+      storage: SyncStorageWithOptions<O> | AsyncStorageWithOptions<O>;
       storageOptions?: O;
     });
 
@@ -77,6 +111,7 @@ export function makePersisted<
   const storageOptions = (options as unknown as { storageOptions: O }).storageOptions;
   const serialize: (data: T) => string = options.serialize || JSON.stringify.bind(JSON);
   const deserialize: (data: string) => T = options.deserialize || JSON.parse.bind(JSON);
+  // @ts-ignore
   const init = storage.getItem(name, storageOptions);
   const set =
     typeof signal[0] === "function"
@@ -98,7 +133,7 @@ export function makePersisted<
         };
   let unchanged = true;
 
-  if (init instanceof Promise) init.then(data => unchanged && data && set(data));
+  if (init instanceof Promise) init.then(data => unchanged && data && set(data as string));
   else if (init) set(init);
 
   if (typeof options.sync?.[0] === "function") {
@@ -124,7 +159,9 @@ export function makePersisted<
           const serialized: string | null | undefined =
             value != null ? (serialize(output) as string) : (value as null | undefined);
           options.sync?.[1](name, serialized);
+          // @ts-ignore
           if (value != null) storage.setItem(name, serialized as string, storageOptions);
+          // @ts-ignore
           else storage.removeItem(name, storageOptions);
           unchanged = false;
           return output;

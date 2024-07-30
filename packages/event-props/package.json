@@ -38,8 +38,6 @@
     }
   },
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
     "dev": "tsx ../../scripts/dev.ts",
     "build": "tsx ../../scripts/build.ts",
     "typecheck": "tsc --noEmit src/* test/*;",

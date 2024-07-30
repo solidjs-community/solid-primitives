@@ -25,7 +25,8 @@
       "wsSync",
       "multiplexSync",
       "addClearMethod",
-      "addWithOptionsMethod"
+      "addWithOptionsMethod",
+      "makeObjectStorage"
     ],
     "category": "Browser APIs"
   },
@@ -86,8 +87,8 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12",
-    "@tauri-apps/plugin-store": "*"
+    "@tauri-apps/plugin-store": "*",
+    "solid-js": "^1.6.12"
   },
   "peerDependenciesMeta": {
     "solid-start": {

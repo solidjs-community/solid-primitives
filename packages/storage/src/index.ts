@@ -1,29 +1,10 @@
-export type {
-  StorageWithOptions,
-  StorageDeserializer,
-  StorageSerializer,
-  StringStorageProps,
-  AnyStorageProps,
-  StorageProps,
-  StorageObject,
-  StorageSetter,
-  AsyncStorage,
-  AsyncStorageWithOptions,
-  AsyncStorageObject,
-  AsyncStorageSetter,
-  StorageSignalProps,
-} from "./types.js";
-
+import { type CookieOptions, cookieStorage } from "./cookies.js";
+import { addClearMethod, addWithOptionsMethod, multiplexStorage, makeObjectStorage } from "./tools.js";
 import {
-  createStorage,
-  createAsyncStorage,
-  createStorageSignal,
-  createLocalStorage,
-  createSessionStorage,
-} from "./storage.js";
-import { type CookieOptions, cookieStorage, createCookieStorage } from "./cookies.js";
-import { addClearMethod, addWithOptionsMethod, multiplexStorage } from "./tools.js";
-import {
+  type SyncStorage,
+  type SyncStorageWithOptions,
+  type AsyncStorage,
+  type AsyncStorageWithOptions,
   type PersistenceOptions,
   type PersistenceSyncAPI,
   type PersistenceSyncData,
@@ -35,17 +16,16 @@ import {
   wsSync,
 } from "./persisted.js";
 export {
-  createStorage,
-  createAsyncStorage,
-  createStorageSignal,
-  createLocalStorage,
-  createCookieStorage,
-  createSessionStorage,
   type CookieOptions,
   cookieStorage,
   addClearMethod,
   addWithOptionsMethod,
   multiplexStorage,
+  makeObjectStorage,
+  type SyncStorage,
+  type SyncStorageWithOptions,
+  type AsyncStorage,
+  type AsyncStorageWithOptions,
   type PersistenceOptions,
   type PersistenceSyncCallback,
   type PersistenceSyncData,
