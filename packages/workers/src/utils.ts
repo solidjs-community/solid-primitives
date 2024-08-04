@@ -1,3 +1,5 @@
+import type { WorkerSignal, WorkerCallbacks, WorkerMessage } from "./types.js";
+
 export const KILL: WorkerSignal = 0;
 export const RPC: WorkerSignal = 1;
 
