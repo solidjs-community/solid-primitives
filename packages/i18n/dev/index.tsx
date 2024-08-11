@@ -1,8 +1,16 @@
-import { Component, createResource, createSignal, onMount, Show, Suspense, useTransition } from "solid-js";
+import {
+  Component,
+  createResource,
+  createSignal,
+  onMount,
+  Show,
+  Suspense,
+  useTransition,
+} from "solid-js";
 import * as i18n from "../src/index.js";
-import * as en from "./en.js"
-import * as es from "./es.js"
-import * as fr from "./fr.js"
+import * as en from "./en.js";
+import * as es from "./es.js";
+import * as fr from "./fr.js";
 
 export type Locale = "en" | "fr" | "es";
 export type RawDictionary = typeof en.dict;
@@ -66,7 +74,7 @@ const App: Component = () => {
 };
 
 export default function () {
-  const [is_mounted, set_mounted] = createSignal(false)
-  onMount(() => set_mounted(true))
-  return <>{is_mounted() && <App/>}</>
+  const [is_mounted, set_mounted] = createSignal(false);
+  onMount(() => set_mounted(true));
+  return <>{is_mounted() && <App />}</>;
 }
