@@ -7,8 +7,11 @@ import {
   maskArrayToFn,
   Selection,
 } from "../src/index.js";
+import { isServer } from "solid-js/web";
 
 const App: Component = () => {
+  if (isServer) return;
+
   // ISO Date
   const isoDateHandler = createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD");
 
