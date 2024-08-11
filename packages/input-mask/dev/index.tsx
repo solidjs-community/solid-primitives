@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { Component, createSignal, onMount } from "solid-js";
 
 import {
   anyMaskToFn,
@@ -116,4 +116,8 @@ const App: Component = () => {
   );
 };
 
-export default App;
+export default function () {
+  const [is_mounted, set_mounted] = createSignal(false)
+  onMount(() => set_mounted(true))
+  return <>{is_mounted() && <App/>}</>
+}

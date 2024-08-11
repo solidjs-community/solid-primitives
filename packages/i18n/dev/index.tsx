@@ -1,15 +1,18 @@
-import { Component, createResource, createSignal, Show, Suspense, useTransition } from "solid-js";
-import type * as en from "./en.js";
+import { Component, createResource, createSignal, onMount, Show, Suspense, useTransition } from "solid-js";
 import * as i18n from "../src/index.js";
+import * as en from "./en.js"
+import * as es from "./es.js"
+import * as fr from "./fr.js"
 
 export type Locale = "en" | "fr" | "es";
 export type RawDictionary = typeof en.dict;
 export type Dictionary = i18n.Flatten<RawDictionary>;
+const locales = { en, es, fr };
 
 async function fetchDictionary(locale: Locale): Promise<Dictionary> {
   await new Promise(r => setTimeout(r, 600)); // to see the transition
 
-  const dict: RawDictionary = (await import(`./${locale}.ts`)).dict;
+  const dict: RawDictionary = locales[locale].dict;
   return i18n.flatten(dict);
 }
 
@@ -62,4 +65,8 @@ const App: Component = () => {
   );
 };
 
-export default App;
+export default function () {
+  const [is_mounted, set_mounted] = createSignal(false)
+  onMount(() => set_mounted(true))
+  return <>{is_mounted() && <App/>}</>
+}
