@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { Component, createSignal, onMount } from "solid-js";
 
 import {
   anyMaskToFn,
@@ -7,11 +7,8 @@ import {
   maskArrayToFn,
   Selection,
 } from "../src/index.js";
-import { isServer } from "solid-js/web";
 
 const App: Component = () => {
-  if (isServer) return;
-
   // ISO Date
   const isoDateHandler = createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD");
 
@@ -119,4 +116,8 @@ const App: Component = () => {
   );
 };
 
-export default App;
+export default function () {
+  const [is_mounted, set_mounted] = createSignal(false)
+  onMount(() => set_mounted(true))
+  return <>{is_mounted() && <App/>}</>
+}

@@ -1,9 +1,8 @@
-import { Component, createResource, createSignal, Show, Suspense, useTransition } from "solid-js";
+import { Component, createResource, createSignal, onMount, Show, Suspense, useTransition } from "solid-js";
 import * as i18n from "../src/index.js";
 import * as en from "./en.js"
 import * as es from "./es.js"
 import * as fr from "./fr.js"
-import { isServer } from "solid-js/web";
 
 export type Locale = "en" | "fr" | "es";
 export type RawDictionary = typeof en.dict;
@@ -18,7 +17,6 @@ async function fetchDictionary(locale: Locale): Promise<Dictionary> {
 }
 
 const App: Component = () => {
-  if (isServer) return;
   const [locale, setLocale] = createSignal<Locale>("en");
   const [name, setName] = createSignal("User");
 
@@ -67,4 +65,8 @@ const App: Component = () => {
   );
 };
 
-export default App;
+export default function () {
+  const [is_mounted, set_mounted] = createSignal(false)
+  onMount(() => set_mounted(true))
+  return <>{is_mounted() && <App/>}</>
+}
