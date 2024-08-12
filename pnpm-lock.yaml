@@ -1,4 +1,8 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 settings:
   autoInstallPeers: true
@@ -522,6 +526,12 @@ importers:
       solid-transition-group:
         specifier: ^0.2.3
         version: 0.2.3(solid-js@1.8.20)
+
+  packages/lenses:
+    dependencies:
+      solid-js:
+        specifier: ^1.6.12
+        version: 1.7.5
 
   packages/lifecycle:
     devDependencies:
