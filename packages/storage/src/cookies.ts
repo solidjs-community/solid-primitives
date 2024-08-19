@@ -142,7 +142,7 @@ export const cookieStorage: SyncStorageWithOptions<CookieOptions> =
       getItem: (key: string, options?: CookieOptions) =>
         deserializeCookieOptions(cookieStorage._read(options), key),
       setItem: (key: string, value: string, options?: CookieOptions) => {
-        cookieStorage._write(key, value.replace(/[\u00c0-\uffff]/g, (c) =>
+        cookieStorage._write(key, value.replace(/[\u00c0-\uffff\&;]/g, (c) =>
           encodeURIComponent(c)
         ), options);
       },
