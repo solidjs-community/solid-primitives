@@ -114,7 +114,7 @@ export type ScrollToOptions = {
 };
 
 /**
- * Returns a function to scroll the specified target element or window.
+ * Returns a function to scrolling the specified target element or window.
  *
  * @param target - element/window to scroll. Can be a reactive signal.
  * @returns a function that takes scroll options or x and y coordinates to scroll the target.
