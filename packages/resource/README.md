@@ -38,7 +38,7 @@ const [signal, abort] = makeAbortable({ timeout: 10000 });
 
 const fetcher = (url: string) => fetch(url, { signal: signal() }).then(r => r.json());
 
-// cached fetcher will only be called if `url` source changes, or gets invalidated
+// cached fetcher will not be called if something for the same URL is still in cache
 const [cachedFetcher, invalidate] = makeCache(fetcher, { storage: localStorage });
 
 // works with createResource, or any wrapping API with the same interface

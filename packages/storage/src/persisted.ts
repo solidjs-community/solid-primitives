@@ -1,4 +1,4 @@
-import type { Setter, Signal } from "solid-js";
+import type { Accessor, Setter, Signal } from "solid-js";
 import { createUniqueId, untrack } from "solid-js";
 import { isServer, isDev } from "solid-js/web";
 import type { SetStoreFunction, Store } from "solid-js/store";
@@ -73,6 +73,10 @@ export type PersistenceOptions<T, O extends Record<string, any> | undefined> = {
 export type SignalType<S extends Signal<any> | [Store<any>, SetStoreFunction<any>]> =
   S extends Signal<infer T> ? T : S extends [Store<infer T>, SetStoreFunction<infer T>] ? T : never;
 
+export type EnhancedSignalOrStore<T> =
+  | [get: Accessor<T>, set: Setter<T>, init: Promise<string> | string | null]
+  | [get: Store<T>, set: SetStoreFunction<T>, init: Promise<string> | string | null];
+
 /**
  * Persists a signal, store or similar API
  *  ```ts
@@ -91,31 +95,35 @@ export type SignalType<S extends Signal<any> | [Store<any>, SetStoreFunction<any
  *
  * @param {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} signal - The signal or store to be persisted.
  * @param {PersistenceOptions<T, O>} options - The options for persistence.
- * @returns {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} - The persisted signal or store.
+ * @returns {EnhancedSignalOrStore<T>} - The persisted signal or store.
  */
 export function makePersisted<S extends Signal<any> | [Store<any>, SetStoreFunction<any>]>(
   signal: S,
   options?: PersistenceOptions<SignalType<S>, undefined>,
-): S;
+): [S[0], S[1], init: Promise<string> | string | null];
 export function makePersisted<
   S extends Signal<any> | [Store<any>, SetStoreFunction<any>],
   O extends Record<string, any>,
->(signal: S, options: PersistenceOptions<SignalType<S>, O>): S;
+>(
+  signal: S,
+  options: PersistenceOptions<SignalType<S>, O>,
+): [S[0], S[1], init: Promise<string> | string | null];
 export function makePersisted<
   S extends Signal<any> | [Store<any>, SetStoreFunction<any>],
   O extends Record<string, any> | undefined,
   T = SignalType<S>,
->(signal: S, options: PersistenceOptions<T, O> = {} as PersistenceOptions<T, O>): S {
-  const storage = options.storage || globalThis.localStorage;
+>(
+  signal: S,
+  options: PersistenceOptions<T, O> = {} as PersistenceOptions<T, O>,
+): [S[0], S[1], init: Promise<string> | string | null] {
+  const storage = options.storage || (globalThis.localStorage as Storage | undefined);
   const name = options.name || `storage-${createUniqueId()}`;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!storage) {
-    return signal;
+    return [signal[0], signal[1], null];
   }
   const storageOptions = (options as unknown as { storageOptions: O }).storageOptions;
   const serialize: (data: T) => string = options.serialize || JSON.stringify.bind(JSON);
   const deserialize: (data: string) => T = options.deserialize || JSON.parse.bind(JSON);
-  // @ts-ignore
   const init = storage.getItem(name, storageOptions);
   const set =
     typeof signal[0] === "function"
@@ -163,9 +171,7 @@ export function makePersisted<
           const serialized: string | null | undefined =
             value != null ? (serialize(output) as string) : (value as null | undefined);
           options.sync?.[1](name, serialized);
-          // @ts-ignore
           if (value != null) storage.setItem(name, serialized as string, storageOptions);
-          // @ts-ignore
           else storage.removeItem(name, storageOptions);
           unchanged = false;
           return output;
@@ -174,11 +180,11 @@ export function makePersisted<
           (signal[1] as any)(...args);
           const value = serialize(untrack(() => signal[0] as any));
           options.sync?.[1](name, value);
-          // @ts-ignore
           storage.setItem(name, value, storageOptions);
           unchanged = false;
         },
-  ] as S;
+    init,
+  ] as [S[0], S[1], init: Promise<string> | string | null];
 }
 
 /**
