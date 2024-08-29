@@ -3,7 +3,7 @@ import {
   SyncStorageWithOptions,
   addClearMethod,
   addWithOptionsMethod,
-} from "@solid-primitives/storage";
+} from "./index.js";
 
 export type CookieOptions =
   | (CookieProperties & {
