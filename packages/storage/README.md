@@ -99,6 +99,10 @@ const [state, setState] = makePersisted(createSignal(), {
 });
 ```
 
+> HTTP headers are limited to 32kb, each header itself is limited to 16kb. So depending on your current headers, the space in `cookieStorage` is rather small. If the overall space is exceeded, subsequent requests will fail. We have no mechanism to prevent that, since we cannot infer all headers that the browser will set.
+
+> Browsers do not support most UTF8 and UTF16 characters in Cookies, so `cookieStorage` encodes those characters that are not supported using `encodeURIComponent`. To save space, only those characters not supported by all Browsers will be encoded.
+
 #### LocalForage
 
 LocalForage uses indexedDB or WebSQL if available to greatly increase the size of what can be stored. Just drop it in as a storage (only supported in the client):
