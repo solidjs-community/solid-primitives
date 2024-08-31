@@ -55,14 +55,12 @@ function deserializeCookieOptions(cookie: string, key: string) {
 }
 
 const getRequestHeaders = isServer
-  ? () =>
-      (getRequestEvent() as (Partial<RequestEvent> & { response?: Response }) | undefined)?.request
-        ?.headers || new Headers()
+  ? () => getRequestEvent()?.request.headers || new Headers()
   : () => new Headers();
 const getResponseHeaders = isServer
   ? () =>
-      (getRequestEvent() as (Partial<RequestEvent> & { response?: Response }) | undefined)?.response
-        ?.headers || new Headers()
+      (getRequestEvent() as (RequestEvent & { response: Response }) | undefined)?.response.headers ||
+      new Headers()
   : () => new Headers();
 
 /**

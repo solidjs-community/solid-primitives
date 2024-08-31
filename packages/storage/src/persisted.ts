@@ -73,7 +73,7 @@ export type PersistenceOptions<T, O extends Record<string, any> | undefined> = {
 export type SignalType<S extends Signal<any> | [Store<any>, SetStoreFunction<any>]> =
   S extends Signal<infer T> ? T : S extends [Store<infer T>, SetStoreFunction<infer T>] ? T : never;
 
-export type EnhancedSignalOrStore<T> =
+export type PersistedState<T> =
   | [get: Accessor<T>, set: Setter<T>, init: Promise<string> | string | null]
   | [get: Store<T>, set: SetStoreFunction<T>, init: Promise<string> | string | null];
 
@@ -95,19 +95,19 @@ export type EnhancedSignalOrStore<T> =
  *
  * @param {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} signal - The signal or store to be persisted.
  * @param {PersistenceOptions<T, O>} options - The options for persistence.
- * @returns {EnhancedSignalOrStore<T>} - The persisted signal or store.
+ * @returns {PersistedState<T>} - The persisted signal or store.
  */
 export function makePersisted<S extends Signal<any> | [Store<any>, SetStoreFunction<any>]>(
   signal: S,
   options?: PersistenceOptions<SignalType<S>, undefined>,
-): [S[0], S[1], init: Promise<string> | string | null];
+): PersistedState<SignalType<S>>;
 export function makePersisted<
   S extends Signal<any> | [Store<any>, SetStoreFunction<any>],
   O extends Record<string, any>,
 >(
   signal: S,
   options: PersistenceOptions<SignalType<S>, O>,
-): [S[0], S[1], init: Promise<string> | string | null];
+): PersistedState<SignalType<S>>;
 export function makePersisted<
   S extends Signal<any> | [Store<any>, SetStoreFunction<any>],
   O extends Record<string, any> | undefined,
@@ -115,7 +115,7 @@ export function makePersisted<
 >(
   signal: S,
   options: PersistenceOptions<T, O> = {} as PersistenceOptions<T, O>,
-): [S[0], S[1], init: Promise<string> | string | null] {
+): PersistedState<SignalType<S>> {
   const storage = options.storage || (globalThis.localStorage as Storage | undefined);
   const name = options.name || `storage-${createUniqueId()}`;
   if (!storage) {
@@ -145,7 +145,7 @@ export function makePersisted<
         };
   let unchanged = true;
 
-  if (init instanceof Promise) init.then(data => unchanged && data && set(data as string));
+  if (init instanceof Promise) init.then(data => unchanged && data && set(data));
   else if (init) set(init);
 
   if (typeof options.sync?.[0] === "function") {
@@ -169,22 +169,22 @@ export function makePersisted<
       ? (value?: T | ((prev: T) => T)) => {
           const output = (signal[1] as Setter<T>)(value as any);
           const serialized: string | null | undefined =
-            value != null ? (serialize(output) as string) : (value as null | undefined);
+            value != null ? (serialize(output)) : (value as null | undefined);
           options.sync?.[1](name, serialized);
-          if (value != null) storage.setItem(name, serialized as string, storageOptions);
+          if (serialized != null) storage.setItem(name, serialized, storageOptions);
           else storage.removeItem(name, storageOptions);
           unchanged = false;
           return output;
         }
       : (...args: any[]) => {
           (signal[1] as any)(...args);
-          const value = serialize(untrack(() => signal[0] as any));
+          const value = serialize(untrack(() => signal[0]));
           options.sync?.[1](name, value);
           storage.setItem(name, value, storageOptions);
           unchanged = false;
         },
     init,
-  ] as [S[0], S[1], init: Promise<string> | string | null];
+  ] as PersistedState<SignalType<S>>;
 }
 
 /**
