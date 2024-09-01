@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 4.1.0
+
+### Minor Changes
+
+- fd4e161: fixes utf8 escaping in cookieStorage
+
 ## 4.0.0
 
 ### Major Changes
