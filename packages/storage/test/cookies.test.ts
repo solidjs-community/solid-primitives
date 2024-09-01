@@ -40,9 +40,9 @@ describe("cookieStorage", () => {
     });
   });
 
-  it('(de)-serializes utf-8 characters correctly', () => {
+  it("(de)-serializes utf-8 characters correctly", () => {
     const set = vi.spyOn(document, "cookie", "set");
-    const umlaute = "äöüÄÖÜ"
+    const umlaute = "äöüÄÖÜ";
     cookieStorage.setItem("test4", umlaute);
     expect(set).toHaveBeenCalledWith("test4=" + encodeURIComponent(umlaute));
     expect(cookieStorage.getItem("test4")).toBe(umlaute);
