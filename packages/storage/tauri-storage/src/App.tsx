@@ -1,7 +1,8 @@
 import { createSignal, For, untrack } from "solid-js";
 import { createStore } from "solid-js/store";
 // this would usually be imported from "@solid-primitives/storage":
-import { makePersisted, tauriStorage } from "../../src/index.ts";
+import { makePersisted } from "../../src/index.js";
+import { tauriStorage } from "../../src/tauri.js";
 
 declare global {
   interface Window {

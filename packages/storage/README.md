@@ -25,8 +25,8 @@ yarn add @solid-primitives/storage
 `makePersisted` allows you to persist a signal or store in any synchronous or asynchronous Storage API:
 
 ```ts
-const [signal, setSignal] = makePersisted(createSignal("initial"), {storage: sessionStorage});
-const [store, setStore] = makePersisted(createStore({test: true}), {name: "testing"});
+const [signal, setSignal, init] = makePersisted(createSignal("initial"), {storage: sessionStorage});
+const [store, setStore, init] = makePersisted(createStore({test: true}), {name: "testing"});
 type PersistedOptions<Type, StorageOptions> = {
   // localStorage is default
   storage?: Storage | StorageWithOptions | AsyncStorage | AsyncStorageWithOptions | LocalForage,
@@ -63,6 +63,18 @@ const [resource] = createResource(fetcher, { storage: makePersisted(createSignal
 If you are using an asynchronous storage to persist the state of a resource, it might receive an update due to being
 initialized from the storage before or after the fetcher resolved. If the initialization resolves after the fetcher, its
 result is discarded not to overwrite more current data.
+
+### Using `makePersisted` with Suspense
+
+In case you are using an asynchronous storage and want the initialisation mesh into Suspense instead of mixing it with Show, we provide the output of the initialisation as third part of the returned tuple:
+
+```ts
+const [state, setState, init] = makePersisted(createStore({}), { name: "state", storage: localForage });
+// run the resource so it is triggered
+createResource(() => init)[0]();
+```
+
+Now Suspense should be blocked until the initialisation is resolved.
 
 ### Different storage APIs
 
