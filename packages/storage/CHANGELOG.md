@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 4.2.0
+
+### Minor Changes
+
+- 89117a6: storage: expose init promise/value, resource: docs clarification
+
 ## 4.1.0
 
 ### Minor Changes

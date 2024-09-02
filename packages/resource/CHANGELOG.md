@@ -1,5 +1,11 @@
 # @solid-primitives/resource
 
+## 0.3.1
+
+### Patch Changes
+
+- 89117a6: storage: expose init promise/value, resource: docs clarification
+
 ## 0.3.0
 
 ### Minor Changes
