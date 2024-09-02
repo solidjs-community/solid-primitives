@@ -135,8 +135,10 @@ describe("makePersisted", () => {
     const anotherMockAsyncStorage = { ...mockAsyncStorage };
     const promise = Promise.resolve("init");
     anotherMockAsyncStorage.getItem = () => promise;
-    const [_signal, _setSignal, init] = makePersisted(createSignal("default"),
-      { storage: anotherMockAsyncStorage, name: "test8" });
+    const [_signal, _setSignal, init] = makePersisted(createSignal("default"), {
+      storage: anotherMockAsyncStorage,
+      name: "test8",
+    });
     expect(init).toBe(promise);
   });
 });

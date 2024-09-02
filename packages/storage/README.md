@@ -69,7 +69,10 @@ result is discarded not to overwrite more current data.
 In case you are using an asynchronous storage and want the initialisation mesh into Suspense instead of mixing it with Show, we provide the output of the initialisation as third part of the returned tuple:
 
 ```ts
-const [state, setState, init] = makePersisted(createStore({}), { name: "state", storage: localForage });
+const [state, setState, init] = makePersisted(createStore({}), {
+  name: "state",
+  storage: localForage,
+});
 // run the resource so it is triggered
 createResource(() => init)[0]();
 ```

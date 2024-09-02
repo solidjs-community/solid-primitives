@@ -59,8 +59,8 @@ const getRequestHeaders = isServer
   : () => new Headers();
 const getResponseHeaders = isServer
   ? () =>
-      (getRequestEvent() as (RequestEvent & { response: Response }) | undefined)?.response.headers ||
-      new Headers()
+      (getRequestEvent() as (RequestEvent & { response: Response }) | undefined)?.response
+        .headers || new Headers()
   : () => new Headers();
 
 /**

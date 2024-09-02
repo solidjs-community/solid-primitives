@@ -104,10 +104,7 @@ export function makePersisted<S extends Signal<any> | [Store<any>, SetStoreFunct
 export function makePersisted<
   S extends Signal<any> | [Store<any>, SetStoreFunction<any>],
   O extends Record<string, any>,
->(
-  signal: S,
-  options: PersistenceOptions<SignalType<S>, O>,
-): PersistedState<SignalType<S>>;
+>(signal: S, options: PersistenceOptions<SignalType<S>, O>): PersistedState<SignalType<S>>;
 export function makePersisted<
   S extends Signal<any> | [Store<any>, SetStoreFunction<any>],
   O extends Record<string, any> | undefined,
@@ -169,7 +166,7 @@ export function makePersisted<
       ? (value?: T | ((prev: T) => T)) => {
           const output = (signal[1] as Setter<T>)(value as any);
           const serialized: string | null | undefined =
-            value != null ? (serialize(output)) : (value as null | undefined);
+            value != null ? serialize(output) : (value as null | undefined);
           options.sync?.[1](name, serialized);
           if (serialized != null) storage.setItem(name, serialized, storageOptions);
           else storage.removeItem(name, storageOptions);
