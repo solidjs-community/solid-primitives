@@ -1,5 +1,11 @@
 # @solid-primitives/workers
 
+## 0.3.0
+
+### Minor Changes
+
+- a4bb701: fix(workers): export missing types from definitions
+
 ## 0.2.7
 
 ### Patch Changes
