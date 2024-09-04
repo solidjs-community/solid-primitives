@@ -1,5 +1,11 @@
 # @solid-primitives/marker
 
+## 0.1.0
+
+### Minor Changes
+
+- a1f602d: fix memory leak
+
 ## 0.0.3
 
 ### Patch Changes
