@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 4.2.1
+
+### Patch Changes
+
+- 7e50e35: Fix `makePersisted` type narrowing
+
 ## 4.2.0
 
 ### Minor Changes
