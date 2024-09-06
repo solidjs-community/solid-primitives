@@ -1,8 +1,10 @@
 import { createRoot } from "solid-js";
-import { afterAll, beforeEach, describe, expect, test, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { debounce, leading, leadingAndTrailing } from "../src/index.js";
 
-vi.useFakeTimers();
+beforeAll(() => {
+  vi.useFakeTimers();
+});
 
 beforeEach(() => {
   vi.clearAllTimers();

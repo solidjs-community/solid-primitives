@@ -13,10 +13,15 @@ import {
 import { Accessor, createEffect, onCleanup, sharedConfig } from "solid-js";
 import { isServer } from "solid-js/web";
 
-export type ResizeHandler = (
+type ResizeObserverEntryGeneric<T extends Element> = ResizeObserverEntry & { readonly target: T };
+type ResizeObserverCallbackGeneric<T extends Element> = (
+  entries: ResizeObserverEntryGeneric<T>[],
+  observer: ResizeObserver,
+) => void;
+export type ResizeHandler<T extends Element = Element> = (
   rect: DOMRectReadOnly,
-  element: Element,
-  entry: ResizeObserverEntry,
+  element: T,
+  entry: ResizeObserverEntryGeneric<T>,
 ) => void;
 
 export type Size = { width: number; height: number };
@@ -30,7 +35,7 @@ export type NullableSize = { width: number; height: number } | { width: null; he
  * @returns `observe` and `unobserve` functions
  */
 export function makeResizeObserver<T extends Element>(
-  callback: ResizeObserverCallback,
+  callback: ResizeObserverCallbackGeneric<T>,
   options?: ResizeObserverOptions,
 ): {
   observe: (ref: T) => void;
@@ -39,7 +44,7 @@ export function makeResizeObserver<T extends Element>(
   if (isServer) {
     return { observe: noop, unobserve: noop };
   }
-  const observer = new ResizeObserver(callback);
+  const observer = new ResizeObserver(callback as ResizeObserverCallback);
   onCleanup(observer.disconnect.bind(observer));
   return {
     observe: ref => observer.observe(ref, options),
@@ -62,15 +67,15 @@ export function makeResizeObserver<T extends Element>(
  * <div ref={ref}/>
  * ```
  */
-export function createResizeObserver(
-  targets: MaybeAccessor<Many<Element | undefined | null>>,
-  onResize: ResizeHandler,
+export function createResizeObserver<T extends Element>(
+  targets: MaybeAccessor<Many<T | undefined | null>>,
+  onResize: ResizeHandler<T>,
   options?: ResizeObserverOptions,
 ): void {
   if (isServer) return;
 
-  const previousMap = new WeakMap<Element, Size>(),
-    { observe, unobserve } = makeResizeObserver(entries => {
+  const previousMap = new WeakMap<T, Size>(),
+    { observe, unobserve } = makeResizeObserver<T>(entries => {
       for (const entry of entries) {
         const { contentRect, target } = entry,
           width = Math.round(contentRect.width),
@@ -83,7 +88,7 @@ export function createResizeObserver(
       }
     }, options);
 
-  createEffect((prev: Element[]) => {
+  createEffect((prev: T[]) => {
     const refs = filterNonNullable(asArray(access(targets)));
     handleDiffArray(refs, prev, observe, unobserve);
     return refs;

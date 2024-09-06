@@ -1,5 +1,29 @@
 # @solid-primitives/script-loader
 
+## 2.2.0
+
+### Minor Changes
+
+- 7e47dbd: fix events in firefox
+
+## 2.1.2
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 2.1.1
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
+## 2.1.0
+
+### Minor Changes
+
+- 50c8ab8: fix attributes in hydration
+
 ## 2.0.2
 
 ### Patch Changes

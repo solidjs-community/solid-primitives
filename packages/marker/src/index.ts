@@ -16,7 +16,7 @@ export function makeSearchRegex(search: string): RegExp {
   return search
     ? new RegExp(
         // join words `|` to match any of them
-        search.replace(SPLIT_WORDS_REGEX, "|"),
+        search.trim().replace(SPLIT_WORDS_REGEX, "|"),
         "gi",
       )
     : NEVER_REGEX;

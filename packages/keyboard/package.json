@@ -1,11 +1,11 @@
 {
   "name": "@solid-primitives/keyboard",
-  "version": "1.2.5",
+  "version": "1.2.8",
   "description": "A library of reactive promitives helping handling user's keyboard input.",
   "author": "Damian Tarnwski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#readme",
+  "homepage": "https://primitives.solidjs.community/package/keyboard",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -47,7 +47,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "require": "./dist/index.cjs"
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
+    }
   },
   "scripts": {
     "dev": "tsx ../../scripts/dev.ts",
@@ -65,7 +68,7 @@
     "solid-js": "^1.6.12"
   },
   "devDependencies": {
-    "solid-js": "^1.7.12"
+    "solid-js": "^1.8.7"
   },
   "typesVersions": {}
 }

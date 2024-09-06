@@ -68,11 +68,9 @@ export function raceTimeout(
       !resolved && reject(e);
     });
     const race = Promise.race([...promises, timeout]);
-    race.then(e => {
-      resolved = true;
-      resolve(e);
-    });
+    race.then(resolve, reject);
     race.finally(() => {
+      resolved = true;
       promises.forEach(
         // inputted promises can have .dispose() method on them,
         // it will be called when the first promise resolves, to stop the rest

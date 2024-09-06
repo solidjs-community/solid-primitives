@@ -119,13 +119,13 @@ export function createSwitchTransition<T>(
       ? // exit -> enter
         prev => isExiting || exitTransition(prev, enterTransition)
       : options.mode === "in-out"
-      ? // enter -> exit
-        prev => enterTransition(() => exitTransition(prev))
-      : // exit & enter
-        prev => {
-          exitTransition(prev);
-          enterTransition();
-        };
+        ? // enter -> exit
+          prev => enterTransition(() => exitTransition(prev))
+        : // exit & enter
+          prev => {
+            exitTransition(prev);
+            enterTransition();
+          };
 
   createComputed(
     (prev: T | undefined) => {
@@ -246,8 +246,8 @@ export function createListTransition<T extends object>(
     options.exitMethod === "remove"
       ? noop
       : options.exitMethod === "keep-index"
-      ? (els, el, i) => els.splice(i, 0, el)
-      : (els, el) => els.push(el);
+        ? (els, el, i) => els.splice(i, 0, el)
+        : (els, el) => els.push(el);
 
   return createMemo(
     prev => {

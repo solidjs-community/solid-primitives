@@ -1,13 +1,13 @@
 {
   "name": "@solid-primitives/storage",
-  "version": "2.1.1",
+  "version": "4.2.1",
   "description": "Primitive that provides reactive wrappers for storage access",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
     "Tom Pichaud <dev.tompichaud@icloud.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/storage",
+  "homepage": "https://primitives.solidjs.community/package/storage",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -16,14 +16,17 @@
     "name": "storage",
     "stage": 3,
     "list": [
-      "createStorage",
-      "createCookieStorage",
-      "createAsyncStorage",
-      "createStorageSignal",
-      "createLocalStorage",
-      "createSessionStorage",
+      "makePersisted",
       "cookieStorage",
-      "makePersisted"
+      "tauriStorage",
+      "multiplexStorage",
+      "storageSync",
+      "messageSync",
+      "wsSync",
+      "multiplexSync",
+      "addClearMethod",
+      "addWithOptionsMethod",
+      "makeObjectStorage"
     ],
     "category": "Browser APIs"
   },
@@ -33,16 +36,38 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./dist/index/index.cjs",
+  "module": "./dist/index/index.js",
+  "types": "./dist/index/index.d.ts",
   "browser": {},
-  "types": "./dist/index.d.ts",
   "exports": {
-    "import": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+    ".": {
+      "import": {
+        "types": "./dist/index/index.d.ts",
+        "default": "./dist/index/index.js"
+      },
+      "require": {
+        "types": "./dist/index/index.d.cts",
+        "default": "./dist/index/index.cjs"
+      }
     },
-    "require": "./dist/index.cjs"
+    "./tauri": {
+      "import": {
+        "types": "./dist/tauri/index.d.ts",
+        "default": "./dist/tauri/index.js"
+      },
+      "require": {
+        "types": "./dist/tauri/index.d.cts",
+        "default": "./dist/tauri/index.cjs"
+      }
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "tauri": [
+        "./dist/tauri/index.d.ts"
+      ]
+    }
   },
   "scripts": {
     "dev": "tsx ../../scripts/dev.ts",
@@ -62,17 +87,18 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12",
-    "solid-start": ">=0.2.26"
+    "@tauri-apps/plugin-store": "*",
+    "solid-js": "^1.6.12"
   },
   "peerDependenciesMeta": {
     "solid-start": {
       "optional": true
+    },
+    "@tauri-apps/plugin-store": {
+      "optional": true
     }
   },
-  "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.7.12",
-    "solid-start": "^0.3.6"
+    "solid-js": "^1.8.15"
   }
 }

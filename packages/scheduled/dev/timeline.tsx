@@ -17,11 +17,17 @@ const headings: Record<TimelinesKeys, string> = {
   ltdeb: "Leading and Trailing Debounce",
   ltthr: "Leading and Trailing Throttle",
 };
+const COLORS = Array.from({ length: LENGTH }, (_, idx) => {
+  const h = 360 * (idx / LENGTH);
+  const s = 90;
+  const l = 60;
+  return `hsl(${h}, ${s}%, ${l}%)`;
+});
 
 const timelineKeys = Object.keys(headings) as TimelinesKeys[];
 
-const getEmptyTieline = () => Array.from({ length: LENGTH }, () => false);
-const getEmptyTimelines = (): Record<TimelinesKeys, boolean[]> => ({
+const getEmptyTieline = () => Array.from({ length: LENGTH }, () => -1);
+const getEmptyTimelines = (): Record<TimelinesKeys, number[]> => ({
   source: getEmptyTieline(),
   deb: getEmptyTieline(),
   ldeb: getEmptyTieline(),
@@ -50,18 +56,18 @@ const Timeline: Component = () => {
     setTimelines(getEmptyTimelines());
   }
 
-  const triggers: VoidFunction[] = [
-    debounce(() => setTimelines("deb", current(), true), TIMEOUT),
-    leading(debounce, () => setTimelines("ldeb", current(), true), TIMEOUT),
-    leadingAndTrailing(debounce, () => setTimelines("ltdeb", current(), true), TIMEOUT),
-    throttle(() => setTimelines("thr", current(), true), TIMEOUT),
-    leading(throttle, () => setTimelines("lthr", current(), true), TIMEOUT),
-    leadingAndTrailing(throttle, () => setTimelines("ltthr", current(), true), TIMEOUT),
+  const triggers: ((id: number) => void)[] = [
+    debounce(id => setTimelines("deb", current(), id), TIMEOUT),
+    leading(debounce, id => setTimelines("ldeb", current(), id), TIMEOUT),
+    leadingAndTrailing(debounce, id => setTimelines("ltdeb", current(), id), TIMEOUT),
+    throttle(id => setTimelines("thr", current(), id), TIMEOUT),
+    leading(throttle, id => setTimelines("lthr", current(), id), TIMEOUT),
+    leadingAndTrailing(throttle, id => setTimelines("ltthr", current(), id), TIMEOUT),
   ];
 
   function trigger() {
-    setTimelines("source", current(), true);
-    for (const cb of triggers) cb();
+    setTimelines("source", current(), current());
+    for (const cb of triggers) cb(current());
   }
 
   createEventListener(
@@ -94,9 +100,10 @@ const Timeline: Component = () => {
                 <Index each={timelines[name]}>
                   {(state, index) => (
                     <div
-                      class={`h-[10vh] rounded-sm bg-white transition-opacity duration-${TRANSITION}`}
+                      class={`h-[10vh] rounded-sm transition duration-${TRANSITION}`}
                       style={{
-                        opacity: state() ? 1 : isCurrent(index) ? 0.2 : 0.05,
+                        "background-color": state() >= 0 ? COLORS[state()] : "white",
+                        opacity: state() >= 0 ? 1 : isCurrent(index) ? 0.2 : 0.05,
                       }}
                     ></div>
                   )}

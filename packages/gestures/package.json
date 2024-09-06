@@ -1,9 +1,14 @@
 {
   "name": "@solid-primitives/gestures",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Directives to react to gestures",
   "author": "Moshe Uminer",
   "license": "MIT",
+  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/gestures#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
   "keywords": [
     "gesture",
     "gestures",
@@ -23,7 +28,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "require": "./dist/index.cjs"
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
+    }
   },
   "scripts": {
     "dev": "tsx ../../scripts/dev.ts",
@@ -37,6 +45,6 @@
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.7.12"
+    "solid-js": "^1.8.7"
   }
 }

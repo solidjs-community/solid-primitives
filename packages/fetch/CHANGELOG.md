@@ -1,5 +1,23 @@
 # @solid-primitives/fetch
 
+## 2.4.9
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 2.4.8
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
+## 2.4.7
+
+### Patch Changes
+
+- eefd8a0a: Add missing `withAggregation` export
+
 ## 2.4.6
 
 ### Patch Changes

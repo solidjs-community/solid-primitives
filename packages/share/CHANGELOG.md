@@ -1,5 +1,17 @@
 # @solid-primitives/share
 
+## 2.0.6
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 2.0.5
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 2.0.4
 
 ### Patch Changes

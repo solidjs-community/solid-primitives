@@ -1,5 +1,23 @@
 # @solid-primitives/tween
 
+## 1.3.0
+
+### Minor Changes
+
+- 606af1f: Change method used for tweening (#573)
+
+## 1.2.8
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 1.2.7
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 1.2.6
 
 ### Patch Changes

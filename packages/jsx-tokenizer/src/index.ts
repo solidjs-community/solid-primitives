@@ -1,6 +1,14 @@
-import { Accessor, Component, createComponent, createMemo, JSX, DEV } from "solid-js";
+import {
+  Accessor,
+  Component,
+  createComponent,
+  createMemo,
+  JSX,
+  DEV,
+  ResolvedJSXElement,
+} from "solid-js";
 import { isServer } from "solid-js/web";
-import type { ResolvedJSXElement, NoInfer, Many } from "@solid-primitives/utils";
+import type { NoInfer, Many } from "@solid-primitives/utils";
 import { asArray } from "@solid-primitives/utils";
 
 /** @internal $TYPE is only used for type inference */

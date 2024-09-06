@@ -1,7 +1,9 @@
-import { afterAll, beforeEach, describe, expect, test, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { debounce, leading, leadingAndTrailing, scheduleIdle, throttle } from "../src/index.js";
 
-vi.useFakeTimers();
+beforeAll(() => {
+  vi.useFakeTimers();
+});
 
 beforeEach(() => {
   vi.clearAllTimers();

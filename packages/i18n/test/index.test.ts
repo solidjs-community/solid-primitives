@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import * as i18n from "../src/index.js";
 import { createEffect, createResource, createRoot, createSignal } from "solid-js";
-import { Locale, en_dict, pl_dict } from "./setup.js";
+import { Locale, en_dict, pl_dict } from "./setup.jsx";
 
 describe("dict", () => {
   test("flatten", () => {
@@ -86,6 +86,7 @@ describe("translator", () => {
     expect(t("data.currency.to.usd")).toBe(1);
     expect(t("data.users")).toEqual(en_dict.data.users);
     expect(t("data.formatList", ["John", "Kate", "Tester"])).toBe("John, Kate and Tester");
+    expect(t("jsx", "Tester")).toEqual(en_dict.jsx("Tester"));
   });
 
   test("after change", () => {
@@ -98,6 +99,7 @@ describe("translator", () => {
     expect(t("data.currency.to.usd")).toBe(0.27);
     expect(t("data.users")).toEqual(pl_dict.data.users);
     expect(t("data.formatList", ["John", "Kate", "Tester"])).toBe("John, Kate i Tester");
+    expect(t("jsx", "Tester")).toEqual(pl_dict.jsx("Tester"));
   });
 });
 
@@ -147,6 +149,7 @@ Object.entries({
       expect(chained.data.currency["to.usd"]()).toBe(1);
       expect(chained.data.users()).toEqual(en_dict.data.users);
       expect(chained.data.formatList(["John", "Kate", "Tester"])).toBe("John, Kate and Tester");
+      expect(chained.jsx("Tester")).toEqual(en_dict.jsx("Tester"));
     });
 
     test("after change", () => {
@@ -159,6 +162,7 @@ Object.entries({
       expect(chained.data.currency["to.usd"]()).toBe(0.27);
       expect(chained.data.users()).toEqual(pl_dict.data.users);
       expect(chained.data.formatList(["John", "Kate", "Tester"])).toBe("John, Kate i Tester");
+      expect(chained.jsx("Tester")).toEqual(pl_dict.jsx("Tester"));
     });
   });
 });

@@ -7,7 +7,7 @@
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/immutable?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/immutable)
 [![version](https://img.shields.io/npm/v/@solid-primitives/immutable?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/immutable)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Primitive for rectifying immutable values and dealing with immutability in Solid.
 
@@ -55,7 +55,7 @@ setData({ a: 2, b: 3 });
 // logs 2 3
 ```
 
-### Usage with immutable state management libraries
+### Usage with Redux Toolkit
 
 There are many state management libraries that provide immutable data structures, such as [Immer](https://immerjs.github.io/immer/), [Redux Toolkit](https://redux-toolkit.js.org/), [XState](https://xstate.js.org/docs/), etc.
 
@@ -99,6 +99,45 @@ const todos = createImmutable(source);
     </div>
   )}
 </For>;
+```
+
+### Usage with XState
+
+`createImmutable` doesn't mutate the source objects, as opposed to `createStore` with `reconcile`. This makes it a good fit for XState, which uses relies on diffing the previous and next state to determine the changes.
+
+```tsx
+import { onCleanup, createSignal } from "solid-js";
+import { createMachine, createActor } from "xstate";
+import { createImmutable } from "@solid-primitives/immutable";
+
+const toggleMachine = createMachine({
+  id: "toggle",
+  initial: "inactive",
+  states: {
+    inactive: {
+      on: { TOGGLE: "active" },
+    },
+    active: {
+      on: { TOGGLE: "inactive" },
+    },
+  },
+});
+
+export const Toggler = () => {
+  const actor = x.createActor(toggleMachine).start();
+  onCleanup(() => actor.stop());
+
+  const [snapshot, setSnapshot] = createSignal(actor.getSnapshot());
+  actor.subscribe(setSnapshot);
+
+  const state = createImmutable(snapshot);
+
+  return (
+    <button onclick={() => actor.send({ type: "TOGGLE" })}>
+      {state.value === "inactive" ? "Click to activate" : "Active! Click to deactivate"}
+    </button>
+  );
+};
 ```
 
 ### Usage with `createResource`

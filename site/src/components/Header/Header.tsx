@@ -12,7 +12,6 @@ import { isMobile, isSafari } from "@solid-primitives/platform";
 import { createScrollPosition } from "@solid-primitives/scroll";
 import { defer } from "@solid-primitives/utils";
 import Dismiss from "solid-dismiss";
-import { A, useLocation } from "solid-start";
 import { pageWidthClass } from "~/constants";
 import Hamburger from "../Icons/Hamburger.js";
 import SearchBtn from "../Search/SearchBtn.js";
@@ -21,6 +20,7 @@ import ThemeBtn from "./ThemeBtn.js";
 import clsx from "clsx";
 import { createTween } from "@solid-primitives/tween";
 import SearchModal from "../Search/SearchModal.js";
+import { A, useLocation } from "@solidjs/router";
 
 export const [isScrollEnabled, setScrollEnabled] = createSignal(false);
 

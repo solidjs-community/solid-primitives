@@ -1,6 +1,5 @@
-import { Refs } from "@solid-primitives/refs";
 import { splice, update } from "@solid-primitives/utils/immutable";
-import { createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { Key } from "../src/index.js";
 import { TransitionGroup } from "solid-transition-group";
 
@@ -78,26 +77,25 @@ export default function App() {
       </div>
       <div class="wrapper-h flex-wrap">
         <TransitionGroup name="fade">
-          <Refs
-            onChange={({ added, removed }) =>
-              console.log("Added:", added.length, "| Removed:", removed.length)
-            }
+          <Key
+            each={list()}
+            by="id"
+            fallback={<p class="bg-yellow-500 p-1 transition-all">No items in the list.</p>}
           >
-            <Key
-              each={list()}
-              by="id"
-              fallback={<p class="bg-yellow-500 p-1 transition-all">No items in the list.</p>}
-            >
-              {(item, index) => (
+            {(item, index) => {
+              createEffect(() => {
+                console.log("Effect:", item().id, item().value);
+              });
+              return (
                 <div class="node relative transition-all duration-500">
                   {index()}. {item().value}
                   <div class="bg-dark-500 text-light-900 absolute -bottom-2 left-2 px-1">
                     ID: {item().id}
                   </div>
                 </div>
-              )}
-            </Key>
-          </Refs>
+              );
+            }}
+          </Key>
         </TransitionGroup>
       </div>
     </>

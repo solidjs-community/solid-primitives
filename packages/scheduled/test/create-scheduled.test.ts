@@ -1,8 +1,10 @@
 import { createComputed, createEffect, createRoot, createSignal } from "solid-js";
-import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createScheduled, debounce, leading } from "../src/index.js";
 
-vi.useFakeTimers();
+beforeAll(() => {
+  vi.useFakeTimers();
+});
 
 beforeEach(() => {
   vi.clearAllTimers();

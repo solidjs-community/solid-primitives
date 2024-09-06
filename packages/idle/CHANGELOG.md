@@ -1,5 +1,23 @@
 # @solid-primitives/idle
 
+## 0.1.2
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 0.1.1
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
+## 0.1.0
+
+### Minor Changes
+
+- 28d78412: Add triggerIdle function to manually trigger idle state - Fixes #503
+
 ## 0.0.105
 
 ### Patch Changes

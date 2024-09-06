@@ -112,35 +112,35 @@ export const throttle: ScheduleCallback = (callback, wait) => {
 export const scheduleIdle: ScheduleCallback = isServer
   ? () => Object.assign(() => void 0, { clear: () => void 0 })
   : // requestIdleCallback is not supported in Safari
-  (window.requestIdleCallback as typeof window.requestIdleCallback | undefined)
-  ? (callback, maxWait) => {
-      let isDeferred = false,
-        id: ReturnType<typeof requestIdleCallback>,
-        lastArgs: Parameters<typeof callback>;
+    (window.requestIdleCallback as typeof window.requestIdleCallback | undefined)
+    ? (callback, maxWait) => {
+        let isDeferred = false,
+          id: ReturnType<typeof requestIdleCallback>,
+          lastArgs: Parameters<typeof callback>;
 
-      const deferred: typeof callback = (...args) => {
-        lastArgs = args;
-        if (isDeferred) return;
-        isDeferred = true;
-        id = requestIdleCallback(
-          () => {
-            callback(...lastArgs);
-            isDeferred = false;
-          },
-          { timeout: maxWait },
-        );
-      };
+        const deferred: typeof callback = (...args) => {
+          lastArgs = args;
+          if (isDeferred) return;
+          isDeferred = true;
+          id = requestIdleCallback(
+            () => {
+              callback(...lastArgs);
+              isDeferred = false;
+            },
+            { timeout: maxWait },
+          );
+        };
 
-      const clear = () => {
-        cancelIdleCallback(id);
-        isDeferred = false;
-      };
-      if (getOwner()) onCleanup(clear);
+        const clear = () => {
+          cancelIdleCallback(id);
+          isDeferred = false;
+        };
+        if (getOwner()) onCleanup(clear);
 
-      return Object.assign(deferred, { clear });
-    }
-  : // fallback to setTimeout (throttle)
-    callback => throttle(callback);
+        return Object.assign(deferred, { clear });
+      }
+    : // fallback to setTimeout (throttle)
+      callback => throttle(callback);
 
 /**
  * Creates a scheduled and cancellable callback that will be called on **leading** edge.

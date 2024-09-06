@@ -1,5 +1,17 @@
 # @solid-primitives/selection
 
+## 0.0.8
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 0.0.7
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 0.0.6
 
 ### Patch Changes

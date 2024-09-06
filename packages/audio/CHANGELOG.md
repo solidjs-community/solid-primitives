@@ -1,5 +1,30 @@
 # @solid-primitives/audio
 
+## 1.3.17
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/static-store@0.0.8
+
+## 1.3.16
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+  - @solid-primitives/static-store@0.0.7
+
+## 1.3.15
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/static-store@0.0.6
+  - @solid-primitives/utils@6.2.2
+
 ## 1.3.14
 
 ### Patch Changes

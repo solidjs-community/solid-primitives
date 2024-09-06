@@ -83,7 +83,7 @@ const history = createUndoHistory(() => {
 });
 ```
 
-To use `stricturedClone` instead of `JSON.parse(JSON.stringify())`, you can use the [`trackStore` utility from `@solid-primitives/deep`](https://primitives.solidjs.community/package/deep#trackstore):
+To use `structuredClone` instead of `JSON.parse(JSON.stringify())`, you can use the [`trackStore` utility from `@solid-primitives/deep`](https://primitives.solidjs.community/package/deep#trackstore):
 
 ```ts
 import { trackStore } from "@solid-primitives/deep";
@@ -92,7 +92,7 @@ const history = createUndoHistory(() => {
   // track any update to the store
   trackStore(state);
   // clone the object underneath the store
-  const copy = stricturedClone(unwrap(state));
+  const copy = structuredClone(unwrap(state));
   // reconcile the state back to the tracked value
   return () => setState(reconcile(copy));
 });

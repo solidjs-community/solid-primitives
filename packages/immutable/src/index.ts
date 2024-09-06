@@ -15,7 +15,7 @@ import { $RAW, ReconcileOptions } from "solid-js/store";
 import { trueFn, arrayEquals, noop } from "@solid-primitives/utils";
 import { keyArray } from "@solid-primitives/keyed";
 
-export type ImmutablePrimitive = string | number | boolean | null | undefined;
+export type ImmutablePrimitive = string | number | boolean | null | undefined | object;
 export type ImmutableObject = { [key: string]: ImmutableValue };
 export type ImmutableArray = ImmutableValue[];
 export type ImmutableValue = ImmutablePrimitive | ImmutableObject | ImmutableArray;
@@ -28,7 +28,8 @@ type Config = {
 const $NO_KEY = Symbol("no-key");
 const ARRAY_EQUALS_OPTIONS = { equals: arrayEquals };
 
-const isObject = (v: unknown): v is Record<PropertyKey, any> => !!v && typeof v === "object";
+const isWrappable = (v: unknown): v is Record<PropertyKey, any> =>
+  !!v && (v.constructor === Object || Array.isArray(v));
 
 abstract class CommonTraps<T extends ImmutableObject | ImmutableArray> implements ProxyHandler<T> {
   o = getOwner()!;
@@ -56,15 +57,30 @@ abstract class CommonTraps<T extends ImmutableObject | ImmutableArray> implement
 
     return this.#trackKeys ? this.#trackKeys() : Reflect.ownKeys(this.s());
   }
+
   abstract get(target: T, property: PropertyKey, receiver: unknown): unknown;
+
   getOwnPropertyDescriptor(target: T, property: PropertyKey): PropertyDescriptor | undefined {
-    return this.has(target, property)
-      ? {
-          enumerable: true,
-          get: () => this.get(target, property, this),
-          configurable: true,
-        }
-      : undefined;
+    let desc = Reflect.getOwnPropertyDescriptor(target, property) as any;
+
+    if (desc) {
+      if (desc.get) {
+        desc.get = this.get.bind(this, target, property, this);
+        delete desc.writable;
+      } else {
+        desc.value = this.get(target, property, this);
+      }
+    } else {
+      desc = this.has(target, property)
+        ? {
+            enumerable: true,
+            configurable: true,
+            get: this.get.bind(this, target, property, this),
+          }
+        : undefined;
+    }
+
+    return desc;
   }
   set = trueFn;
   deleteProperty = trueFn;
@@ -87,10 +103,10 @@ class ObjectTraps extends CommonTraps<ImmutableObject> implements ProxyHandler<I
     if (cached) return cached.get();
 
     let valueAccessor = () => {
-        const source = this.s() as unknown;
-        return source ? source[property as never] : undefined;
-      },
-      memo = false;
+      const source = this.s() as unknown;
+      return source ? source[property as never] : undefined;
+    };
+    let memo = false;
 
     this.#cache.set(
       property,
@@ -98,7 +114,7 @@ class ObjectTraps extends CommonTraps<ImmutableObject> implements ProxyHandler<I
         () => {
           const v = valueAccessor();
           // memoize property access if it is an object limit traversal to one level
-          if (!memo && isObject(v)) {
+          if (!memo && isWrappable(v)) {
             runWithOwner(this.o, () => (valueAccessor = createMemo(valueAccessor)));
             memo = true;
             return valueAccessor();
@@ -113,9 +129,6 @@ class ObjectTraps extends CommonTraps<ImmutableObject> implements ProxyHandler<I
   }
 }
 
-const getArrayItemKey = (item: unknown, index: number, { key, merge }: Config) =>
-  isObject(item) && key in item ? item[key as never] : merge ? index : item;
-
 class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<ImmutableArray> {
   #trackLength!: Accessor<number>;
 
@@ -127,7 +140,14 @@ class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<Imm
     this.#trackItems = createMemo(
       keyArray(
         source,
-        (item, index) => getArrayItemKey(item, index, config),
+        (item, index) =>
+          isWrappable(item)
+            ? config.key in item
+              ? item[config.key as never]
+              : config.merge
+                ? index
+                : item
+            : index,
         item => new PropertyWrapper(item, getOwner()!, config),
       ),
       [],
@@ -137,7 +157,7 @@ class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<Imm
     this.#trackLength = createMemo(() => this.#trackItems().length, 0);
   }
 
-  get(target: ImmutableArray, property: PropertyKey, receiver: unknown) {
+  get(_: ImmutableArray, property: PropertyKey, receiver: unknown) {
     if (property === $RAW) return untrack(this.s);
     if (property === $PROXY) return receiver;
     if (property === $TRACK) return this.#trackItems(), receiver;
@@ -149,16 +169,16 @@ class ArrayTraps extends CommonTraps<ImmutableArray> implements ProxyHandler<Imm
 
     if (property in Array.prototype) return Array.prototype[property as any].bind(receiver);
 
-    if (typeof property === "string") {
-      const num = Number(property);
-      if (isNaN(num)) return this.s()[property as any];
-      property = num;
-    }
+    const num = typeof property === "string" ? parseInt(property) : property;
 
-    if (property >= untrack(this.#trackLength))
-      return this.#trackLength(), this.s()[property as any];
+    // invalid index - treat as obj property
+    if (!Number.isInteger(num) || num < 0) return this.s()[property as any];
 
-    return untrack(this.#trackItems)[property]?.get();
+    // out of bounds
+    if (num >= untrack(this.#trackLength)) return this.#trackLength(), this.s()[num];
+
+    // valid index
+    return untrack(this.#trackItems)[num]!.get();
   }
 }
 
@@ -178,14 +198,14 @@ class PropertyWrapper {
   #calc(): ImmutableValue {
     const v = this.s() as any;
 
-    if (!isObject(v)) {
+    if (!isWrappable(v)) {
       this.#lastId = undefined;
       this.#dispose();
       return (this.#prev = v);
     }
 
     const id = v[this.c.key];
-    if (id === this.#lastId && isObject(this.#prev)) return this.#prev;
+    if (id === this.#lastId && isWrappable(this.#prev)) return this.#prev;
 
     this.#lastId = id;
     this.#dispose();
@@ -207,10 +227,9 @@ const wrap = (
   source: Accessor<ImmutableValue>,
   config: Config,
 ): ImmutableObject | ImmutableArray =>
-  new Proxy(
-    initialValue.constructor(),
-    new (Array.isArray(initialValue) ? ArrayTraps : ObjectTraps)(source as any, config),
-  );
+  Array.isArray(initialValue)
+    ? new Proxy([], new ArrayTraps(source as any, config))
+    : new Proxy({}, new ObjectTraps(source as any, config));
 
 /**
  * Creates a deeply nested reactive object derived from the given immutable source. The source can be any signal that is updated in an immutable fashion.
@@ -231,14 +250,14 @@ const wrap = (
  * // logs 2 3
  * ```
  */
-export function createImmutable<T extends ImmutableObject | ImmutableArray>(
+export function createImmutable<T extends object>(
   source: Accessor<T>,
   options: ReconcileOptions = {},
 ): T {
   const memo = createMemo(source);
   return untrack(() =>
-    wrap(memo(), memo, {
-      key: options.key === null ? $NO_KEY : options.key ?? "id",
+    wrap(memo() as any, memo, {
+      key: options.key === null ? $NO_KEY : (options.key ?? "id"),
       merge: options.merge,
     }),
   ) as T;

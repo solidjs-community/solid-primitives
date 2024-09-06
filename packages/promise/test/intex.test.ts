@@ -1,8 +1,10 @@
 import { createRoot, createSignal, onCleanup } from "solid-js";
-import { describe, test, expect, vi, beforeEach, afterAll } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterAll, beforeAll } from "vitest";
 import { until, changed, promiseTimeout, raceTimeout } from "../src/index.js";
 
-vi.useFakeTimers();
+beforeAll(() => {
+  vi.useFakeTimers();
+});
 
 beforeEach(() => {
   vi.clearAllTimers();
@@ -73,6 +75,18 @@ describe("raceTimeout", () => {
     await vi.advanceTimersByTimeAsync(100);
     expect(done).toBe(reason);
   });
+
+  // test("rejects before timeout", async () => {
+  //   let done: unknown;
+  //   const reason = new Error("raceTimeout rejection reason");
+  //   const rejectetPromise = Promise.reject();  //vitest complains about unhandled promises, even though it is handled later
+  //   raceTimeout([rejectetPromise], 100).then(
+  //     () => (done = true),
+  //     r => (done = r),
+  //   );
+  //   await vi.advanceTimersByTimeAsync(50);
+  //   expect(done).toBe(reason);
+  // });
 });
 
 describe("until", () => {

@@ -1,5 +1,11 @@
 # @solid-primitives/analytics
 
+## 0.1.6
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 0.1.5
 
 ### Patch Changes

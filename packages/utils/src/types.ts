@@ -2,11 +2,8 @@ import type { Accessor, Setter } from "solid-js";
 
 export type { EffectOptions, OnOptions } from "solid-js";
 
-// export types that aren't exported by solid-js main module
-export type {
-  ResolvedJSXElement,
-  ResolvedChildren,
-} from "../node_modules/solid-js/types/reactive/signal.js";
+// TODO delete in next major version
+export type { ResolvedJSXElement, ResolvedChildren } from "solid-js/types/reactive/signal.js";
 
 /**
  * Can be single or in an array
@@ -66,8 +63,8 @@ export type ModifyDeep<A extends AnyObject, B extends DeepPartialAny<A>> = {
   [K in keyof A]: B[K] extends never
     ? A[K]
     : B[K] extends AnyObject
-    ? ModifyDeep<A[K], B[K]>
-    : B[K];
+      ? ModifyDeep<A[K], B[K]>
+      : B[K];
 } & (A extends AnyObject ? Omit<B, keyof A> : A);
 
 /** Makes each property optional and turns each leaf property into any, allowing for type overrides by narrowing any. */

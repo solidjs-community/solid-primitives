@@ -1,5 +1,17 @@
 # @solid-primitives/event-props
 
+## 0.2.7
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 0.2.6
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 0.2.5
 
 ### Patch Changes

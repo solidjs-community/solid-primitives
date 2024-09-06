@@ -1,6 +1,7 @@
 export { createFetch, type FetchReturn, type FetchOptions, type RequestContext } from "./fetch.js";
 export {
   withAbort,
+  withAggregation,
   withCatchAll,
   withTimeout,
   withRetry,

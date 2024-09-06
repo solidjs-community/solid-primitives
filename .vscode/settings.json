@@ -1,9 +1,0 @@
-{
-  "typescript.tsdk": "node_modules\\typescript\\lib",
-  "cSpell.words": ["Biase", "deopt", "gzipped", "rehype", "valibot"],
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": false
-  },
-  /* For allowing @apply and @tailwind custom rules in SCSS files */
-  "scss.lint.unknownAtRules": "ignore"
-}

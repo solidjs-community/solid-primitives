@@ -1,11 +1,11 @@
 {
   "name": "@solid-primitives/history",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "description": "Primitives for managing undo/redo history in Solid.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/history#readme",
+  "homepage": "https://primitives.solidjs.community/package/history",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -44,7 +44,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "require": "./dist/index.cjs"
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
+    }
   },
   "typesVersions": {},
   "scripts": {
@@ -62,6 +65,6 @@
   },
   "devDependencies": {
     "@solid-primitives/deep": "workspace:^",
-    "solid-js": "^1.7.12"
+    "solid-js": "^1.8.7"
   }
 }

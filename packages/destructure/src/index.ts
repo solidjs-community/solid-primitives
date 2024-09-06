@@ -77,10 +77,10 @@ export function destructure<T extends ReactiveSource, O extends DestructureOptio
 ): O extends { lazy: true; deep: true }
   ? DeepDestructure<T>
   : O["lazy"] extends true
-  ? Destructure<T>
-  : O["deep"] extends true
-  ? DeepSpread<T>
-  : Spread<T> {
+    ? Destructure<T>
+    : O["deep"] extends true
+      ? DeepSpread<T>
+      : Spread<T> {
   const config: DestructureOptions<T> = options ?? {};
   const memo = config.memo ?? typeof source === "function";
   const getter =

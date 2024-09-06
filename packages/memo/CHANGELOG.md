@@ -1,5 +1,36 @@
 # @solid-primitives/memo
 
+## 1.3.9
+
+### Patch Changes
+
+- 49416e8: Fix unable to set Writable Memos twice to the same value, when they changed in between
+
+## 1.3.8
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/scheduled@1.4.3
+
+## 1.3.7
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+  - @solid-primitives/scheduled@1.4.2
+
+## 1.3.6
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/scheduled@1.4.2
+  - @solid-primitives/utils@6.2.2
+
 ## 1.3.5
 
 ### Patch Changes

@@ -1,5 +1,5 @@
 import "./setup";
-import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createRoot } from "solid-js";
 import {
   createWS,
@@ -10,7 +10,9 @@ import {
   makeWS,
 } from "../src/index.js";
 
-vi.useFakeTimers();
+beforeAll(() => {
+  vi.useFakeTimers();
+});
 
 beforeEach(() => {
   vi.clearAllTimers();

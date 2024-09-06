@@ -1,5 +1,26 @@
 # @solid-primitives/autofocus
 
+## 0.0.111
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 0.0.110
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+
+## 0.0.109
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/utils@6.2.2
+
 ## 0.0.108
 
 ### Patch Changes

@@ -1,10 +1,4 @@
-import {
-  access,
-  tryOnCleanup,
-  type Directive,
-  noop,
-  type MaybeAccessor,
-} from "@solid-primitives/utils";
+import { access, tryOnCleanup, noop, type MaybeAccessor } from "@solid-primitives/utils";
 import {
   Accessor,
   batch,
@@ -76,8 +70,8 @@ const normalizeOption = (
   typeof value === "boolean"
     ? value
     : typeof value === "function"
-    ? value(page, pages)
-    : PAGINATION_DEFAULTS[key];
+      ? value(page, pages)
+      : PAGINATION_DEFAULTS[key];
 
 /**
  * Creates a reactive pagination to fill your layout with.
@@ -174,7 +168,7 @@ export const createPagination = (
     {
       disabled: { get: () => page() <= 1, set: noop, enumerable: true },
       children: { get: () => opts().prevContent, set: noop, enumerable: true },
-      page: { get: () => Math.min(1, page() - 1), enumerable: false },
+      page: { get: () => Math.max(1, page() - 1), enumerable: false },
     },
   );
   const next = Object.defineProperties(
@@ -187,7 +181,7 @@ export const createPagination = (
     {
       disabled: { get: () => page() >= opts().pages, set: noop, enumerable: true },
       children: { get: () => opts().nextContent, set: noop, enumerable: true },
-      page: { get: () => Math.max(opts().pages, page() + 1), enumerable: false },
+      page: { get: () => Math.min(opts().pages, page() + 1), enumerable: false },
     },
   );
   const last = Object.defineProperties(
@@ -270,7 +264,7 @@ export type _E = JSX.Element;
  */
 export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
   pages: Accessor<T[]>,
-  loader: Directive,
+  loader: (el: Element) => void,
   options: {
     page: Accessor<number>;
     setPage: Setter<number>;
@@ -300,7 +294,7 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
   const [contents] = createResource(page, fetcher);
 
   createComputed(() => {
-    const content = contents();
+    const content = contents.latest;
     if (!content) return;
     batch(() => {
       if (content.length === 0) setEnd(true);

@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
-import { createRoot, createSignal } from "solid-js";
-import { createImmutable } from "../src/index.js";
+import { createMemo, createRoot, createSignal } from "solid-js";
 import { unwrap } from "solid-js/store";
+import { createImmutable } from "../src/index.js";
 
 describe("createImmutable", () => {
   test("Reconcile a simple object", () => {
@@ -161,5 +161,36 @@ describe("createImmutable", () => {
       expect(store.id).toBe(undefined);
       expect(store.value).toBe(undefined);
     });
+  });
+
+  test("Classes should be treated as primitives", () => {
+    class Test {
+      constructor(public value: string) {}
+    }
+    const [data, setData] = createSignal({ value: new Test("a") });
+    const store = createRoot(() => createImmutable(data));
+    expect(store.value).toBe(data().value);
+    setData({ value: new Test("b") });
+    expect(store.value).toBe(data().value);
+  });
+
+  test("Array.join()", () => {
+    const [data, setData] = createSignal(["a", "b"]);
+    const joined = createRoot(() => {
+      const store = createImmutable(data);
+      return createMemo(() => store.join(","));
+    });
+    expect(joined()).toBe("a,b");
+    setData(["b", "a"]);
+    expect(joined()).toBe("b,a");
+  });
+
+  test("Correct .length property descriptor", () => {
+    /*
+    toEqual checks the not only the value but also the property descriptors
+    it should be the same as of normal array
+    */
+    const store = createRoot(() => createImmutable(() => ["a", "b"]));
+    expect(store).toEqual(["a", "b"]);
   });
 });

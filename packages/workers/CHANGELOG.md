@@ -1,5 +1,23 @@
 # @solid-primitives/workers
 
+## 0.3.0
+
+### Minor Changes
+
+- a4bb701: fix(workers): export missing types from definitions
+
+## 0.2.7
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 0.2.6
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 0.2.5
 
 ### Patch Changes

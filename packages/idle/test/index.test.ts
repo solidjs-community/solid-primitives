@@ -1,8 +1,10 @@
-import { describe, test, expect, beforeEach, vi, afterAll } from "vitest";
+import { describe, test, expect, beforeEach, vi, afterAll, beforeAll } from "vitest";
 import { createRoot } from "solid-js";
 import { createIdleTimer } from "../src/index.js";
 
-vi.useFakeTimers();
+beforeAll(() => {
+  vi.useFakeTimers();
+});
 
 beforeEach(() => {
   vi.clearAllTimers();
@@ -10,6 +12,7 @@ beforeEach(() => {
 
 afterAll(() => {
   vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 describe("createIdleTimer", () => {
@@ -75,6 +78,57 @@ describe("createIdleTimer", () => {
     ).toBe(false);
 
     timer.dispose();
+  });
+
+  test("triggerIdle should set isIdle to true, call onIdle, and attach the event listener", () => {
+    const element = document.createElement("div");
+    const handleIdle = vi.fn();
+    const handleActive = vi.fn();
+    const handlePrompt = vi.fn();
+
+    const timer = createRoot(dispose => {
+      const timer = createIdleTimer({
+        element,
+        events: ["click"],
+        idleTimeout: 10,
+        onActive: handleActive,
+        onIdle: handleIdle,
+        onPrompt: handlePrompt,
+        startManually: true,
+      });
+
+      return { ...timer, dispose };
+    });
+
+    expect(timer.isIdle(), "user is not idle yet").toBe(false);
+
+    timer.triggerIdle();
+
+    expect(timer.isIdle(), "user is now idle").toBe(true);
+    expect(handleIdle, "onIdle should have been called").toHaveBeenCalled();
+    expect(
+      handleIdle.mock.calls[0][0].type,
+      "onIdle's parmeter should be a custom manualidle event",
+    ).toEqual("manualidle");
+    expect(handlePrompt, "onPrompt should not have been called").not.toHaveBeenCalled();
+    expect(handleActive, "onActive should not have been called").not.toHaveBeenCalled();
+
+    element.click();
+    expect(timer.isIdle(), "listenes should still be working and user is not idle anymore").toBe(
+      false,
+    );
+    expect(handleActive, "onActive should have been called").toHaveBeenCalled();
+
+    vi.advanceTimersByTime(15);
+    expect(
+      timer.isIdle(),
+      "the primitive's flow has not changed, user is idle again after idle timeout expires",
+    ).toBe(true);
+
+    timer.stop();
+    timer.dispose();
+
+    [handleActive, handleIdle, handlePrompt].forEach(fn => fn.mockRestore());
   });
 
   test("configuration options shall work", () => {

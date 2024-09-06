@@ -1,5 +1,32 @@
 # @solid-primitives/until
 
+## 1.0.17
+
+### Patch Changes
+
+- 7783479: Handle rejected promises with raceTimeout
+
+## 1.0.16
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 1.0.15
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+
+## 1.0.14
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/utils@6.2.2
+
 ## 1.0.13
 
 ### Patch Changes

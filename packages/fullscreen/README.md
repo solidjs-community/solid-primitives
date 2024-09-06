@@ -26,15 +26,17 @@ yarn add @solid-primitives/fullscreen
 ```ts
 const MyComponent2: Component = () => {
   const [fs, setFs] = createSignal(false);
-  let ref!: HTMLDivElement;
+  let [ref, setRef] = createSignal<HTMLDivElement>();
   const active: Accessor<boolean> = createFullscreen(ref, fs);
   return (
-    <div ref={ref} onClick={() => setFs(fs => !fs)}>
+    <div ref={setRef} onClick={() => setFs(fs => !fs)}>
       {!active() ? "click to fullscreen" : "click to exit fullscreen"}
     </div>
   );
 };
 ```
+
+This variant requires the ref to be a signal, otherwise the not-yet-filled ref will be captured in the closure of the primitive.
 
 You can either put the options into the second argument accessor output (useful for the directive use case) or as a third argument.
 

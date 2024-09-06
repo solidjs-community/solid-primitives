@@ -1,5 +1,32 @@
 # @solid-primitives/raf
 
+## 2.2.0
+
+### Minor Changes
+
+- b71cf00: add createMs primitive
+
+## 2.1.16
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 2.1.15
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+
+## 2.1.14
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/utils@6.2.2
+
 ## 2.1.13
 
 ### Patch Changes

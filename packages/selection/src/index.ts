@@ -32,8 +32,8 @@ const getRangeArgs = (offset: number, texts: Node[]): [node: Node | null, offset
       node
         ? [node, pos]
         : pos <= (text as Text).data.length
-        ? [text, pos]
-        : [null, pos - (text as Text).data.length],
+          ? [text, pos]
+          : [null, pos - (text as Text).data.length],
     [null, offset] as [node: Node | null, pos: number],
   );
 

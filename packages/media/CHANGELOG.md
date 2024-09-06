@@ -1,5 +1,42 @@
 # @solid-primitives/media
 
+## 2.2.9
+
+### Patch Changes
+
+- Added warning regarding iOS13 support and instruction on how to polyfill
+
+## 2.2.8
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/event-listener@2.3.3
+  - @solid-primitives/rootless@1.4.5
+  - @solid-primitives/static-store@0.0.8
+
+## 2.2.7
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+  - @solid-primitives/event-listener@2.3.2
+  - @solid-primitives/rootless@1.4.4
+  - @solid-primitives/static-store@0.0.7
+
+## 2.2.6
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/event-listener@2.3.1
+  - @solid-primitives/rootless@1.4.3
+  - @solid-primitives/static-store@0.0.6
+  - @solid-primitives/utils@6.2.2
+
 ## 2.2.5
 
 ### Patch Changes
@@ -226,5 +263,3 @@ Added `makeMediaQueryListener`, implementation improvements
 2.0.0
 
 Add `usePrefersDark`.
-
-Remove the default export. (`createMediaQuery` will only be available as named export)

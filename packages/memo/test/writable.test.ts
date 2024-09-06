@@ -87,4 +87,18 @@ describe("createWritableMemo", () => {
       dispose();
     });
   });
+
+  test("value can be overwritten twice to the same value", () =>
+    createRoot(dispose => {
+      const [source, setSource] = createSignal(1);
+      const [memo, setMemo] = createWritableMemo(source, -2);
+      expect(memo()).toBe(source());
+      setMemo(-2);
+      expect(memo()).toBe(-2);
+      setSource(5);
+      expect(memo()).toBe(source());
+      setMemo(-2);
+      expect(memo()).toBe(-2);
+      dispose();
+    }));
 });

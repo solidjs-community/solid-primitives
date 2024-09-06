@@ -1,5 +1,35 @@
 # @solid-primitives/resource
 
+## 0.3.1
+
+### Patch Changes
+
+- 89117a6: storage: expose init promise/value, resource: docs clarification
+
+## 0.3.0
+
+### Minor Changes
+
+- d7d0d70: resource: new primitive createAbortable (makeAbortable + cleanup)
+
+## 0.2.0
+
+### Minor Changes
+
+- 313f7d5: abort reason, filter abort error
+
+## 0.1.2
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 0.1.1
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 0.1.0
 
 ### Minor Changes

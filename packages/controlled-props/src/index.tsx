@@ -153,8 +153,8 @@ export function createControlledProp<T>(
   options: T extends undefined
     ? never
     : T extends object
-    ? TestPropOptions<T>
-    : TestPropOptions<T> | T,
+      ? TestPropOptions<T>
+      : TestPropOptions<T> | T,
 ): TestPropReturn<T>;
 export function createControlledProp<T>(
   name: string,
@@ -164,19 +164,20 @@ export function createControlledProp<T>(
     options == null
       ? undefined
       : typeof options !== "object"
-      ? (options as T)
-      : ((options as TestPropOptions<T>).initialValue as T | undefined) ??
-        (defaultInitialValues[
-          ((options as TestPropOptions<T>).type as keyof typeof defaultInitialValues | undefined) ??
-            "object"
-        ] as T | undefined);
+        ? (options as T)
+        : (((options as TestPropOptions<T>).initialValue as T | undefined) ??
+          (defaultInitialValues[
+            ((options as TestPropOptions<T>).type as
+              | keyof typeof defaultInitialValues
+              | undefined) ?? "object"
+          ] as T | undefined));
 
   if (initialValue == null) {
     throw new Error(`cannot get type for Prop ${name}`);
   }
   const propType = (options as TestPropOptions<T>).options
     ? "object"
-    : (options as TestPropOptions<T>).type ?? (typeof initialValue as TestPropType);
+    : ((options as TestPropOptions<T>).type ?? (typeof initialValue as TestPropType));
 
   const [value, setValue] = createSignal<T>(initialValue, { name });
   return [
@@ -185,18 +186,20 @@ export function createControlledProp<T>(
     propType === "boolean"
       ? () => BoolProp({ name, value: value as any, setValue: setValue as any as Setter<boolean> })
       : propType === "number"
-      ? () => NumberProp({ name, value: value as any, setValue: setValue as any as Setter<number> })
-      : propType === "string"
-      ? () => StringProp({ name, value: value as any, setValue: setValue as any as Setter<string> })
-      : () =>
-          SelectProp<T>({
-            name,
-            value: value,
-            setValue: setValue,
-            options:
-              (options as TestPropOptions<T>).options ??
-              ([initialValue] as TestPropObjectOptions<T>),
-          }),
+        ? () =>
+            NumberProp({ name, value: value as any, setValue: setValue as any as Setter<number> })
+        : propType === "string"
+          ? () =>
+              StringProp({ name, value: value as any, setValue: setValue as any as Setter<string> })
+          : () =>
+              SelectProp<T>({
+                name,
+                value: value,
+                setValue: setValue,
+                options:
+                  (options as TestPropOptions<T>).options ??
+                  ([initialValue] as TestPropObjectOptions<T>),
+              }),
   ];
 }
 
@@ -214,8 +217,8 @@ export type CreateTestProps = <
           ? Props[name]["options"][keyof Props[name]["options"]]
           : Props[name]["initialValue"]
         : Props[name] extends boolean
-        ? boolean
-        : Props[name]
+          ? boolean
+          : Props[name]
     >;
   } & {
     [name in keyof Props as `set${Capitalize<name & string>}`]: Setter<
@@ -224,8 +227,8 @@ export type CreateTestProps = <
           ? Props[name]["options"][keyof Props[name]["options"]]
           : Props[name]["initialValue"]
         : Props[name] extends boolean
-        ? boolean
-        : Props[name]
+          ? boolean
+          : Props[name]
     >;
   },
   fields: JSX.Element[],

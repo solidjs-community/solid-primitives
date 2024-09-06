@@ -1,5 +1,17 @@
 # @solid-primitives/event-dispatcher
 
+## 0.0.107
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 0.0.106
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 0.0.105
 
 ### Patch Changes

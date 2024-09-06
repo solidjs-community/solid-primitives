@@ -1,5 +1,17 @@
 # @solid-primitives/utils
 
+## 6.2.3
+
+### Patch Changes
+
+- 48d44c0: Remove unused type exports in utils (`ResolvedJSXElement` and `ResolvedChildren`)
+
+## 6.2.2
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 6.2.1
 
 ### Patch Changes

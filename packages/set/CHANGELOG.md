@@ -1,5 +1,27 @@
 # @solid-primitives/set
 
+## 0.4.11
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/trigger@1.0.11
+
+## 0.4.10
+
+### Patch Changes
+
+- @solid-primitives/trigger@1.0.10
+
+## 0.4.9
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/trigger@1.0.9
+
 ## 0.4.8
 
 ### Patch Changes

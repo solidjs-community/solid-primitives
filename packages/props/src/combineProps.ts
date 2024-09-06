@@ -136,11 +136,11 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(
           typeof v === "function"
             ? v
             : // jsx event handlers can be tuples of [callback, arg]
-            Array.isArray(v)
-            ? v.length === 1
-              ? v[0]
-              : v[0].bind(void 0, v[1])
-            : void 0;
+              Array.isArray(v)
+              ? v.length === 1
+                ? v[0]
+                : v[0].bind(void 0, v[1])
+              : void 0;
 
         if (callback)
           listeners[name] ? listeners[name]!.push(callback) : (listeners[name] = [callback]);

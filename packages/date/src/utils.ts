@@ -15,8 +15,8 @@ export const getTime = (init: DateInit): number =>
   typeof init === "number"
     ? init
     : init instanceof Date
-    ? init.getTime()
-    : new Date(init).getTime();
+      ? init.getTime()
+      : new Date(init).getTime();
 
 /**
  * Get the time difference between two dates *[ms]*

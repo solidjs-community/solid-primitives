@@ -1,29 +1,32 @@
 import { Component, createMemo, createResource, onMount, Suspense } from "solid-js";
-import { Title, useParams, useRouteData } from "solid-start";
-import { fetchPackageData, getCachedPackageListItemData } from "~/api";
-import { PRIMITIVE_PAGE_PADDING_TOP } from "~/components/Header/Header";
-import InfoBar from "~/components/Primitives/InfoBar";
-import { H2 } from "~/components/prose";
-import { pageWidthClass } from "~/constants";
-import { DocumentClass } from "~/primitives/document-class";
-import { PackageData } from "~/types";
-import { kebabCaseToCapitalized } from "~/utils/utils";
+import { fetchPackageData, getCachedPackageListItemData } from "~/api.js";
+import { PRIMITIVE_PAGE_PADDING_TOP } from "~/components/Header/Header.jsx";
+import InfoBar from "~/components/Primitives/InfoBar.jsx";
+import { H2 } from "~/components/prose.jsx";
+import { pageWidthClass } from "~/constants.js";
+import { DocumentClass } from "~/primitives/document-class.jsx";
+import { PackageData } from "~/types.js";
+import { kebabCaseToCapitalized } from "~/utils.js";
 import { Heading } from "./components/heading.js";
 import { PackageInstallation } from "./components/package-installation.js";
 import { createPrimitiveNameTooltips } from "./components/primitive-name-tooltips.js";
+import { useParams } from "@solidjs/router";
+import { Title } from "@solidjs/meta";
 
 type Params = {
   name: string;
 };
 
-export function routeData() {
+export function routeData() {}
+
+const Page: Component = () => {
   const params = useParams<Params>();
 
   const cachedData = createMemo(() => getCachedPackageListItemData(params.name));
 
   const [dataResource] = createResource<PackageData, string>(() => params.name, fetchPackageData);
 
-  return {
+  const data = {
     get name() {
       return params.name;
     },
@@ -43,10 +46,6 @@ export function routeData() {
       return dataResource()?.readme;
     },
   };
-}
-
-const Page: Component = () => {
-  const data = useRouteData<typeof routeData>();
 
   const packageName = () => `@solid-primitives/${data.name}`;
   const formattedName = createMemo(() => kebabCaseToCapitalized(data.name));

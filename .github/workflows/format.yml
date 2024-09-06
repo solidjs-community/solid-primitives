@@ -9,12 +9,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2.2.4
+      - uses: pnpm/action-setup@v4
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: pnpm
@@ -22,11 +22,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Setup prettier cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.cache/prettier
+          key: prettier-${{ github.sha }}
+          restore-keys: |
+            prettier-
+
       - name: Format
         run: pnpm run format
 
       - name: Add, Commit and Push
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Format"
 
@@ -34,7 +42,7 @@ jobs:
         run: pnpm run update-readme
 
       - name: Add, Commit and Push
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Update Readme"
           file_pattern: README.md

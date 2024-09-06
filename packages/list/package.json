@@ -1,0 +1,61 @@
+{
+  "name": "@solid-primitives/list",
+  "version": "0.0.100",
+  "description": "A List component, an alternative to For and Index.",
+  "author": "Maciek50322 <34212298+maciek50322@users.noreply.github.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/list",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "list",
+    "stage": 0,
+    "list": [
+      "listArray",
+      "List"
+    ],
+    "category": "Control Flow"
+  },
+  "keywords": [
+    "solid",
+    "primitives",
+    "list"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
+    }
+  },
+  "typesVersions": {},
+  "scripts": {
+    "dev": "tsx ../../scripts/dev.ts",
+    "build": "tsx ../../scripts/build.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.12"
+  }
+}

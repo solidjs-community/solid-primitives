@@ -102,7 +102,7 @@ const [count, setCount] = createSignal(1);
 const [result, setResult] = createWritableMemo(() => count() * 2);
 result(); // => 2
 setResult(5); // overwrites calculation result
-result(); // => 10
+result(); // => 5
 ```
 
 ### Props derived signals

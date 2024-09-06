@@ -74,6 +74,7 @@ node_modules/
 jspm_packages/
 dist/
 
+
 # TypeScript v1 declaration files
 typings/
 
@@ -151,6 +152,9 @@ dist/
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
+# vscode settings
+.vscode/settings.json
+
 # Temporary folders
 tmp/
 temp/
@@ -175,3 +179,6 @@ _temp_*
 
 # Local Netlify folder
 .netlify
+
+# IntelliJ IDEA
+.idea

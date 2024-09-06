@@ -4,12 +4,11 @@ import { isIOS } from "@solid-primitives/platform";
 import { defer } from "@solid-primitives/utils";
 import Dismiss from "solid-dismiss";
 import { Component, createEffect, onMount } from "solid-js";
-import { useLocation } from "solid-start";
-import { createShortcut } from "~/primitives/createShortcut";
-import { doesPathnameMatchBase } from "~/utils/doesPathnameMatchBase";
-import { scrollIntoView } from "~/utils/scrollIntoView";
+import { createShortcut } from "~/primitives/createShortcut.js";
+import { doesPathnameMatchBase, scrollIntoView } from "~/utils.js";
 import * as Header from "../Header/Header.js";
 import Search from "./Search.js";
+import { useLocation } from "@solidjs/router";
 
 const ClientSearchModal: Component<{
   menuButton: HTMLElement;

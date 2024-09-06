@@ -1,5 +1,17 @@
 # @solid-primitives/scheduled
 
+## 1.4.3
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 1.4.2
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+
 ## 1.4.1
 
 ### Patch Changes

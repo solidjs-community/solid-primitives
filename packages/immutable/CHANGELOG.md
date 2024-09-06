@@ -1,5 +1,48 @@
 # @solid-primitives/immutable
 
+## 1.0.9
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/keyed@1.2.2
+
+## 1.0.8
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+  - @solid-primitives/keyed@1.2.1
+
+## 1.0.7
+
+### Patch Changes
+
+- a632588: Correct getOwnPropertyDescriptor trap
+
+## 1.0.6
+
+### Patch Changes
+
+- 1696655: Loosen createImmutable types. Fix tracking array indexes.
+
+## 1.0.5
+
+### Patch Changes
+
+- 13cf989: Support storing other class instances than plain objects.
+
+## 1.0.4
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/keyed@1.2.1
+  - @solid-primitives/utils@6.2.2
+
 ## 1.0.3
 
 ### Patch Changes

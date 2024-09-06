@@ -1,14 +1,14 @@
 {
   "name": "@solid-primitives/share",
-  "version": "2.0.4",
+  "version": "2.0.6",
   "description": "Primitives to help with sharing content on social media and beyond.",
-  "author": "David Di Biase <dave.dibiase@gmail.com",
+  "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
     "Omer Ma<mapinxue@qq.com>",
     "Tom Pichaud <dev.tompichaud@icloud.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/share",
+  "homepage": "https://primitives.solidjs.community/package/share",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -43,7 +43,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "require": "./dist/index.cjs"
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
+    }
   },
   "scripts": {
     "dev": "tsx ../../scripts/dev.ts",
@@ -57,6 +60,6 @@
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.7.12"
+    "solid-js": "^1.8.7"
   }
 }

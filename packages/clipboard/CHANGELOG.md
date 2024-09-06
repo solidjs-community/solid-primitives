@@ -1,5 +1,26 @@
 # @solid-primitives/clipboard
 
+## 1.5.10
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 1.5.9
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+
+## 1.5.8
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/utils@6.2.2
+
 ## 1.5.7
 
 ### Patch Changes

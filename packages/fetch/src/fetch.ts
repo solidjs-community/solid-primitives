@@ -77,8 +77,8 @@ const fetcherArgsFromArgs = <FetcherArgs extends any[]>(
     typeof args[1] === "function"
       ? (args[1] as Accessor<FetcherArgs[1]>)()
       : isOptions(args[1]) || Array.isArray(args[1])
-      ? undefined
-      : (args[1] as RequestInit);
+        ? undefined
+        : (args[1] as RequestInit);
   return [info, init] as FetcherArgs;
 };
 
@@ -217,11 +217,11 @@ export function createFetch<
   const urlAccessor: Accessor<FetcherArgs | undefined> = options.disable
     ? () => undefined
     : typeof args[0] === "function" || typeof args[1] === "function"
-    ? createMemo(() => fetcherArgsFromArgs(args))
-    : (
-        fetcherArgs => () =>
-          fetcherArgs
-      )(fetcherArgsFromArgs(args));
+      ? createMemo(() => fetcherArgsFromArgs(args))
+      : (
+          fetcherArgs => () =>
+            fetcherArgs
+        )(fetcherArgsFromArgs(args));
   const modifiers: (Request<FetcherArgs> | RequestModifier)[] = ((): RequestModifier[] => {
     for (let l = args.length - 1; l >= 1; l--) {
       if (Array.isArray(args[l])) {

@@ -1,5 +1,40 @@
 # @solid-primitives/deep
 
+## 0.2.9
+
+### Patch Changes
+
+- Updated dependencies [49416e8]
+  - @solid-primitives/memo@1.3.9
+
+## 0.2.8
+
+### Patch Changes
+
+- 016fe83: Fix `trackStore` tracking multiple same-object references. (Fixes #582)
+
+## 0.2.7
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/memo@1.3.8
+
+## 0.2.6
+
+### Patch Changes
+
+- @solid-primitives/memo@1.3.7
+
+## 0.2.5
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/memo@1.3.6
+
 ## 0.2.4
 
 ### Patch Changes

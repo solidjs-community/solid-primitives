@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach, afterAll } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterAll, beforeAll } from "vitest";
 import { createRoot, createSignal } from "solid-js";
 import { autofocus, createAutofocus } from "../src/index.js";
 
@@ -11,7 +11,9 @@ HTMLElement.prototype.focus = function (this) {
   focused = this;
 };
 
-vi.useFakeTimers();
+beforeAll(() => {
+  vi.useFakeTimers();
+});
 
 beforeEach(() => {
   vi.clearAllTimers();

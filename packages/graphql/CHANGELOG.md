@@ -1,5 +1,26 @@
 # @solid-primitives/graphql
 
+## 2.0.4
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+
+## 2.0.3
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+
+## 2.0.2
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/utils@6.2.2
+
 ## 2.0.1
 
 ### Patch Changes

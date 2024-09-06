@@ -285,6 +285,6 @@ export function createFileSystem(
   return fs instanceof Promise
     ? fs.then(fs => createAsyncFileSystem(fs, watcher))
     : fs.async
-    ? createAsyncFileSystem(fs, watcher)
-    : createSyncFileSystem(fs, watcher);
+      ? createAsyncFileSystem(fs, watcher)
+      : createSyncFileSystem(fs, watcher);
 }

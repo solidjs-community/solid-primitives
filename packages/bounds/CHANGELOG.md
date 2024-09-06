@@ -1,5 +1,43 @@
 # @solid-primitives/bounds
 
+## 0.0.122
+
+### Patch Changes
+
+- Updated dependencies [a7338e7]
+  - @solid-primitives/resize-observer@2.0.26
+
+## 0.0.121
+
+### Patch Changes
+
+- 74db287: Correct the "homepage" field in package.json
+- Updated dependencies [74db287]
+  - @solid-primitives/event-listener@2.3.3
+  - @solid-primitives/resize-observer@2.0.25
+  - @solid-primitives/static-store@0.0.8
+
+## 0.0.120
+
+### Patch Changes
+
+- Updated dependencies [48d44c0]
+  - @solid-primitives/utils@6.2.3
+  - @solid-primitives/event-listener@2.3.2
+  - @solid-primitives/resize-observer@2.0.24
+  - @solid-primitives/static-store@0.0.7
+
+## 0.0.119
+
+### Patch Changes
+
+- d23dd74: Add type exports for cjs
+- Updated dependencies [d23dd74]
+  - @solid-primitives/event-listener@2.3.1
+  - @solid-primitives/resize-observer@2.0.23
+  - @solid-primitives/static-store@0.0.6
+  - @solid-primitives/utils@6.2.2
+
 ## 0.0.118
 
 ### Patch Changes

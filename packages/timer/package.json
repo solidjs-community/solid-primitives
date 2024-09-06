@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/timer",
-  "version": "1.3.7",
+  "version": "1.3.9",
   "description": "Primitives to manage timeout and interval",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -8,7 +8,7 @@
     "Damian Tarnawski <gthetarnav@gmail.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/solidjs-community/solid-primitives/tree/main/packages/timer#readme",
+  "homepage": "https://primitives.solidjs.community/package/timer",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -40,7 +40,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "require": "./dist/index.cjs"
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
+    }
   },
   "files": [
     "dist"
@@ -64,6 +67,6 @@
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.7.12"
+    "solid-js": "^1.8.7"
   }
 }

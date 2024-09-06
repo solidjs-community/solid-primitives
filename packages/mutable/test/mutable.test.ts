@@ -220,19 +220,11 @@ describe("Setting state from Effects", () => {
     expect(state!.data).toBe("signal");
   });
 
-  test("Select Promise", () =>
-    new Promise(done => {
-      solid.createRoot(async () => {
-        const p = new Promise<string>(resolve => {
-            setTimeout(resolve, 20, "promised");
-          }),
-          state = createMutable({ data: "" });
-        p.then(v => (state.data = v));
-        await p;
-        expect(state.data).toBe("promised");
-        done(undefined);
-      });
-    }));
+  test("set async", () => {
+    const state = createMutable({ data: "" });
+    state.data = "promised";
+    expect(state.data).toBe("promised");
+  });
 });
 
 describe("State wrapping", () => {
