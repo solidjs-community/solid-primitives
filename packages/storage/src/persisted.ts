@@ -72,7 +72,7 @@ export type PersistenceOptions<T, O extends Record<string, any> | undefined> = {
 
 export type SignalInput = Signal<any> | [Store<any>, SetStoreFunction<any>];
 
-export type SignalType<S extends Signal<any> | [Store<any>, SetStoreFunction<any>]> =
+export type SignalType<S extends SignalInput> =
   S extends Signal<infer T> ? T : S extends [Store<infer T>, SetStoreFunction<infer T>] ? T : never;
 
 export type PersistedState<S extends SignalInput> =
