@@ -38,8 +38,6 @@
     }
   },
   "scripts": {
-    "prebuild": "npm run clean",
-    "clean": "rimraf dist/",
     "dev": "tsx ../../scripts/dev.ts",
     "build": "tsx ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
@@ -52,6 +50,9 @@
     "solid",
     "primitives"
   ],
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
   "peerDependencies": {
     "solid-js": "^1.6.12"
   },

@@ -1,5 +1,11 @@
 # @solid-primitives/script-loader
 
+## 2.2.0
+
+### Minor Changes
+
+- 7e47dbd: fix events in firefox
+
 ## 2.1.2
 
 ### Patch Changes

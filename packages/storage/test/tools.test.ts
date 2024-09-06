@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addClearMethod } from "../src/tools.js";
+import { addClearMethod, makeObjectStorage } from "../src/tools.js";
 
 describe("addClearMethod", () => {
   const data: Record<string, string> = {};
@@ -39,5 +39,19 @@ describe("addClearMethod", () => {
 
   it("returns storage that already has clear", () => {
     expect(mockStorageWithClear).toBe(addClearMethod(mockStorageWithClear));
+  });
+});
+
+describe("makeObjectStorage", () => {
+  it("provides a wrapper for an object", () => {
+    const obj: Record<string, string> = {};
+    const storage = makeObjectStorage(obj);
+    expect(obj.test).toBeUndefined();
+    storage.setItem("test", "works");
+    expect(obj.test).toBe("works");
+    expect(storage.getItem("test")).toBe("works");
+    storage.removeItem("test");
+    expect(obj).not.toHaveProperty("test");
+    expect(storage.getItem("test")).toBeNull();
   });
 });

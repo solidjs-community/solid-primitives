@@ -1,5 +1,11 @@
 # @solid-primitives/resize-observer
 
+## 2.0.26
+
+### Patch Changes
+
+- a7338e7: Use generics in `createResizeObserver`
+
 ## 2.0.25
 
 ### Patch Changes

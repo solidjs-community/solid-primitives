@@ -1,5 +1,11 @@
 # @solid-primitives/memo
 
+## 1.3.9
+
+### Patch Changes
+
+- 49416e8: Fix unable to set Writable Memos twice to the same value, when they changed in between
+
 ## 1.3.8
 
 ### Patch Changes

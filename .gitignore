@@ -74,6 +74,7 @@ node_modules/
 jspm_packages/
 dist/
 
+
 # TypeScript v1 declaration files
 typings/
 
@@ -178,3 +179,6 @@ _temp_*
 
 # Local Netlify folder
 .netlify
+
+# IntelliJ IDEA
+.idea

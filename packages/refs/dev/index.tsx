@@ -1,26 +1,34 @@
-import { Component, lazy } from "solid-js";
-
-import { Router, Routes, Route, Link } from "solid-app-router";
-
-const Key = lazy(() => import("./key"));
+import { Rerun } from "../../keyed/src/index.js";
+import { Component, createSignal } from "solid-js";
+import { Transition } from "solid-transition-group";
 
 const App: Component = () => {
+  const [count, setCount] = createSignal(0);
+
   return (
-    <Router>
-      <nav class="fixed left-2 top-2 flex space-x-4">
-        <a class="text-yellow-400" href="/">
-          reload
-        </a>
-        <Link class="text-yellow-400" href="/key">
-          /key
-        </Link>
-      </nav>
-      <div class="box-border min-h-screen w-full space-y-4 bg-gray-800 p-24 text-white">
-        <Routes>
-          <Route path="/key" element={<Key />} />
-        </Routes>
+    <>
+      <div class="wrapper-h">
+        <Transition
+          onEnter={(el, done) => {
+            el.animate([{ opacity: 0 }, { opacity: 1 }], {
+              duration: 600,
+            }).finished.then(done);
+          }}
+          onExit={(el, done) => {
+            el.animate([{ opacity: 1 }, { opacity: 0 }], {
+              duration: 600,
+            }).finished.then(done);
+          }}
+          mode="outin"
+        >
+          <Rerun on={count}>
+            <button class="btn" onClick={() => setCount(p => ++p)}>
+              {count()}
+            </button>
+          </Rerun>
+        </Transition>
       </div>
-    </Router>
+    </>
   );
 };
 export default App;

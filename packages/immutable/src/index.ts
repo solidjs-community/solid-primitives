@@ -257,7 +257,7 @@ export function createImmutable<T extends object>(
   const memo = createMemo(source);
   return untrack(() =>
     wrap(memo() as any, memo, {
-      key: options.key === null ? $NO_KEY : options.key ?? "id",
+      key: options.key === null ? $NO_KEY : (options.key ?? "id"),
       merge: options.merge,
     }),
   ) as T;

@@ -12,7 +12,6 @@ import { isMobile, isSafari } from "@solid-primitives/platform";
 import { createScrollPosition } from "@solid-primitives/scroll";
 import { defer } from "@solid-primitives/utils";
 import Dismiss from "solid-dismiss";
-import { A, useLocation } from "solid-start";
 import { pageWidthClass } from "~/constants";
 import Hamburger from "../Icons/Hamburger.js";
 import SearchBtn from "../Search/SearchBtn.js";
@@ -21,6 +20,7 @@ import ThemeBtn from "./ThemeBtn.js";
 import clsx from "clsx";
 import { createTween } from "@solid-primitives/tween";
 import SearchModal from "../Search/SearchModal.js";
+import { A, useLocation } from "@solidjs/router";
 
 export const [isScrollEnabled, setScrollEnabled] = createSignal(false);
 
@@ -165,7 +165,7 @@ const Header: Component = () => {
             </div>
             <A href="/">
               <img
-                class="hidden h-[28px] sm:block sm:h-[40px] dark:hidden"
+                class="hidden h-[28px] dark:hidden sm:block sm:h-[40px]"
                 src="/img/solid-primitives-logo.svg"
                 alt=""
               />
@@ -175,12 +175,12 @@ const Header: Component = () => {
                 alt=""
               />
               <img
-                class="h-[28px] sm:hidden sm:h-[40px] dark:hidden"
+                class="h-[28px] dark:hidden sm:hidden sm:h-[40px]"
                 src="/img/solid-primitives-stacked-logo.svg"
                 alt=""
               />
               <img
-                class="hidden h-[28px] sm:!hidden sm:h-[40px] dark:block"
+                class="hidden h-[28px] dark:block sm:!hidden sm:h-[40px]"
                 src="/img/solid-primitives-stacked-dark-logo.svg"
                 alt=""
               />

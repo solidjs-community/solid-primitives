@@ -108,7 +108,7 @@ const OneParentManyChildren: Component = () => {
         </For>
       </div>
       <p class="text-xs text-gray-500">using {"<For>"}</p>
-      <div ref={parent} class="max-w-42 flex min-h-24 flex-wrap content-start justify-center gap-4">
+      <div ref={parent} class="max-w-42 min-h-24 flex flex-wrap content-start justify-center gap-4">
         <For each={show()}>
           {(show, i) => (
             <Show when={show}>
@@ -165,7 +165,7 @@ const OneParentManyChildrenIndex: Component = () => {
         </For>
       </div>
       <p class="caption">using {"<Index>"}</p>
-      <div ref={parent} class="max-w-42 flex min-h-24 flex-wrap content-start justify-center gap-4">
+      <div ref={parent} class="max-w-42 min-h-24 flex flex-wrap content-start justify-center gap-4">
         <Index each={show()}>
           {(show, i) => (
             <Show when={show()}>

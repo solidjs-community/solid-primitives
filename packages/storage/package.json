@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/storage",
-  "version": "3.0.0",
+  "version": "4.2.1",
   "description": "Primitive that provides reactive wrappers for storage access",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
@@ -18,13 +18,15 @@
     "list": [
       "makePersisted",
       "cookieStorage",
+      "tauriStorage",
       "multiplexStorage",
       "storageSync",
       "messageSync",
       "wsSync",
       "multiplexSync",
       "addClearMethod",
-      "addWithOptionsMethod"
+      "addWithOptionsMethod",
+      "makeObjectStorage"
     ],
     "category": "Browser APIs"
   },
@@ -34,18 +36,37 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./dist/index/index.cjs",
+  "module": "./dist/index/index.js",
+  "types": "./dist/index/index.d.ts",
   "browser": {},
-  "types": "./dist/index.d.ts",
   "exports": {
-    "import": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+    ".": {
+      "import": {
+        "types": "./dist/index/index.d.ts",
+        "default": "./dist/index/index.js"
+      },
+      "require": {
+        "types": "./dist/index/index.d.cts",
+        "default": "./dist/index/index.cjs"
+      }
     },
-    "require": {
-      "types": "./dist/index.d.cts",
-      "default": "./dist/index.cjs"
+    "./tauri": {
+      "import": {
+        "types": "./dist/tauri/index.d.ts",
+        "default": "./dist/tauri/index.js"
+      },
+      "require": {
+        "types": "./dist/tauri/index.d.cts",
+        "default": "./dist/tauri/index.cjs"
+      }
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "tauri": [
+        "./dist/tauri/index.d.ts"
+      ]
     }
   },
   "scripts": {
@@ -66,10 +87,18 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
+    "@tauri-apps/plugin-store": "*",
     "solid-js": "^1.6.12"
+  },
+  "peerDependenciesMeta": {
+    "solid-start": {
+      "optional": true
+    },
+    "@tauri-apps/plugin-store": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "solid-js": "^1.8.15"
-  },
-  "typesVersions": {}
+  }
 }
