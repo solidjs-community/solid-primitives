@@ -70,12 +70,17 @@ export type PersistenceOptions<T, O extends Record<string, any> | undefined> = {
       storageOptions?: O;
     });
 
-export type SignalType<S extends Signal<any> | [Store<any>, SetStoreFunction<any>]> =
+export type SignalInput = Signal<any> | [Store<any>, SetStoreFunction<any>];
+
+export type SignalType<S extends SignalInput> =
   S extends Signal<infer T> ? T : S extends [Store<infer T>, SetStoreFunction<infer T>] ? T : never;
 
-export type PersistedState<T> =
-  | [get: Accessor<T>, set: Setter<T>, init: Promise<string> | string | null]
-  | [get: Store<T>, set: SetStoreFunction<T>, init: Promise<string> | string | null];
+export type PersistedState<S extends SignalInput> =
+  S extends Signal<infer T>
+    ? [get: Accessor<T>, set: Setter<T>, init: Promise<string> | string | null]
+    : S extends [Store<infer T>, SetStoreFunction<infer T>]
+      ? [get: Store<T>, set: SetStoreFunction<T>, init: Promise<string> | string | null]
+      : never;
 
 /**
  * Persists a signal, store or similar API
@@ -97,26 +102,26 @@ export type PersistedState<T> =
  * @param {PersistenceOptions<T, O>} options - The options for persistence.
  * @returns {PersistedState<T>} - The persisted signal or store.
  */
-export function makePersisted<S extends Signal<any> | [Store<any>, SetStoreFunction<any>]>(
+export function makePersisted<S extends SignalInput>(
   signal: S,
   options?: PersistenceOptions<SignalType<S>, undefined>,
-): PersistedState<SignalType<S>>;
+): PersistedState<S>;
+export function makePersisted<S extends SignalInput, O extends Record<string, any>>(
+  signal: S,
+  options: PersistenceOptions<SignalType<S>, O>,
+): PersistedState<S>;
 export function makePersisted<
-  S extends Signal<any> | [Store<any>, SetStoreFunction<any>],
-  O extends Record<string, any>,
->(signal: S, options: PersistenceOptions<SignalType<S>, O>): PersistedState<SignalType<S>>;
-export function makePersisted<
-  S extends Signal<any> | [Store<any>, SetStoreFunction<any>],
+  S extends SignalInput,
   O extends Record<string, any> | undefined,
   T = SignalType<S>,
 >(
   signal: S,
   options: PersistenceOptions<T, O> = {} as PersistenceOptions<T, O>,
-): PersistedState<SignalType<S>> {
+): PersistedState<S> {
   const storage = options.storage || (globalThis.localStorage as Storage | undefined);
   const name = options.name || `storage-${createUniqueId()}`;
   if (!storage) {
-    return [signal[0], signal[1], null];
+    return [signal[0], signal[1], null] as PersistedState<S>;
   }
   const storageOptions = (options as unknown as { storageOptions: O }).storageOptions;
   const serialize: (data: T) => string = options.serialize || JSON.stringify.bind(JSON);
@@ -181,7 +186,7 @@ export function makePersisted<
           unchanged = false;
         },
     init,
-  ] as PersistedState<SignalType<S>>;
+  ] as PersistedState<S>;
 }
 
 /**
