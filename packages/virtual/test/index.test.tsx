@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@solidjs/testing-library";
-import { VirtualList } from "../src/index.js";
+import { VirtualList } from "../src/index.jsx";
 
 import { TEST_LIST, VirtualListItem } from "./helpers.jsx";
 

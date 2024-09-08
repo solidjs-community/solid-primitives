@@ -1,14 +1,5 @@
 import { For, createSignal } from "solid-js";
-import type { Component, JSX } from "solid-js";
-
-type VirtualizedListProps<T, U extends JSX.Element> = {
-  children: (item: T) => U;
-  class?: string;
-  each: readonly T[];
-  overscanCount?: number;
-  rootHeight: number;
-  rowHeight: number;
-};
+import type { Accessor, JSX } from "solid-js";
 
 /**
  * A basic virtualized list (see https://www.patterns.dev/vanilla/virtual-lists/) component for improving performance when rendering very large lists
@@ -21,19 +12,26 @@ type VirtualizedListProps<T, U extends JSX.Element> = {
  * @param rowHeight the height of individual rows in the virtualizedList
  * @return virtualized list component
  */
-export const VirtualList: Component<VirtualizedListProps<any, any>> = <T, U extends JSX.Element>(
-  props: VirtualizedListProps<T, U>,
-) => {
+export function VirtualList<T extends readonly any[], U extends JSX.Element>(props: {
+  children: (item: T[number], index: Accessor<number>) => U;
+  fallback?: JSX.Element;
+  class?: string;
+  each: T | undefined | null | false;
+  overscanCount?: number;
+  rootHeight: number;
+  rowHeight: number;
+}): JSX.Element {
   let rootElement!: HTMLDivElement;
 
   const [offset, setOffset] = createSignal(0);
+  const items = () => props.each || ([] as any as T)
 
   const getFirstIdx = () =>
     Math.max(0, Math.floor(offset() / props.rowHeight) - (props.overscanCount || 1));
 
   const getLastIdx = () =>
     Math.min(
-      props.each.length,
+      items().length,
       Math.floor(offset() / props.rowHeight) +
         Math.ceil(props.rootHeight / props.rowHeight) +
         (props.overscanCount || 1),
@@ -55,7 +53,7 @@ export const VirtualList: Component<VirtualizedListProps<any, any>> = <T, U exte
         style={{
           position: "relative",
           width: "100%",
-          height: `${props.each.length * props.rowHeight}px`,
+          height: `${items().length * props.rowHeight}px`,
         }}
       >
         <div
@@ -64,7 +62,7 @@ export const VirtualList: Component<VirtualizedListProps<any, any>> = <T, U exte
             top: `${getFirstIdx() * props.rowHeight}px`,
           }}
         >
-          <For each={props.each.slice(getFirstIdx(), getLastIdx())}>{props.children}</For>
+          <For fallback={props.fallback} each={items().slice(getFirstIdx(), getLastIdx()) as any as T}>{props.children}</For>
         </div>
       </div>
     </div>

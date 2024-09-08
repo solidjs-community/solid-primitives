@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { VirtualList } from "../src/index.js";
+import { VirtualList } from "../src/index.jsx";
 
 import { TEST_LIST, VirtualListItem } from "./helpers.jsx";
 import { renderToString } from "solid-js/web";

@@ -1,12 +1,12 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=virtualized-list" alt="Solid Primitives virtualized-list">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=virtual" alt="Solid Primitives virtual">
 </p>
 
-# @solid-primitives/virtualized-list
+# @solid-primitives/virtual
 
 [![turborepo](https://img.shields.io/badge/built%20with-turborepo-cc00ff.svg?style=for-the-badge&logo=turborepo)](https://turborepo.org/)
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/virtualized-list?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/virtualized-list)
-[![version](https://img.shields.io/npm/v/@solid-primitives/virtualized-list?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/virtualized-list)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/virtual?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/virtual)
+[![version](https://img.shields.io/npm/v/@solid-primitives/virtual?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/virtual)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A basic [virtualized list](https://www.patterns.dev/vanilla/virtual-lists/) component for improving performance when rendering very large lists
@@ -14,11 +14,11 @@ A basic [virtualized list](https://www.patterns.dev/vanilla/virtual-lists/) comp
 ## Installation
 
 ```bash
-npm install @solid-primitives/virtualized-list
+npm install @solid-primitives/virtual
 # or
-yarn add @solid-primitives/virtualized-list
+yarn add @solid-primitives/virtual
 # or
-pnpm add @solid-primitives/virtualized-list
+pnpm add @solid-primitives/virtual
 ```
 
 ## How to use it
@@ -48,7 +48,7 @@ Note that the component only handles vertical lists where the number of items is
 
 ## Demo
 
-You can see the VirtualizedList in action in the following sandbox: https://primitives.solidjs.community/playground/virtualized-list
+You can see the VirtualizedList in action in the following sandbox: https://primitives.solidjs.community/playground/virtual
 
 ## Changelog
 
