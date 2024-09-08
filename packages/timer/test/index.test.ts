@@ -129,4 +129,21 @@ describe("createPolled", () => {
     vi.advanceTimersByTime(100)
     expect(polled()).toBe(2)
   })
+
+  test("is reactive", () => {
+    const [source, setSource] = createSignal(0)
+
+    const {polled, dispose} = createRoot(dispose => ({
+      polled: createPolled(source, 100),
+      dispose,
+    }))
+    expect(polled()).toBe(0)
+
+    setSource(1)
+    expect(polled()).toBe(1)
+
+    dispose()
+    setSource(2)
+    expect(polled()).toBe(1)
+  })
 })
