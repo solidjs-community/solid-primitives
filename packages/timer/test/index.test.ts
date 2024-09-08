@@ -1,6 +1,6 @@
 import { batch, createRoot, createSignal } from "solid-js";
 import { describe, test, expect, vi, beforeEach, afterAll, beforeAll } from "vitest";
-import { createTimer } from "../src/index.js";
+import { createPolled, createTimer } from "../src/index.js";
 
 beforeAll(() => {
   vi.useFakeTimers();
@@ -110,3 +110,23 @@ describe("createTimes", () => {
     dispose();
   });
 });
+
+describe("createPolled", () => {
+  test("fn called initially and after timeout", () => {
+    let n = 0
+    const {polled, dispose} = createRoot(dispose => ({
+      polled: createPolled(() => ++n, 100),
+      dispose,
+    }))
+    expect(polled()).toBe(1)
+
+    vi.advanceTimersByTime(100)
+    expect(polled()).toBe(2)
+
+    dispose()
+    expect(polled()).toBe(2)
+
+    vi.advanceTimersByTime(100)
+    expect(polled()).toBe(2)
+  })
+})
