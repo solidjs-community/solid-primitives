@@ -26,6 +26,9 @@ const custom_entries: Record<string, preset.EntryOptions | preset.EntryOptions[]
   "controlled-props": {
     entry: "src/index.tsx",
   },
+  "virtualized-list": {
+    entry: "src/index.tsx",
+  },
   /*filesystem: [
     {
       entry: "src/index.ts",
