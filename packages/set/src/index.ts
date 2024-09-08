@@ -23,15 +23,18 @@ export class ReactiveSet<T> extends Set<T> {
     if (values) for (const v of values) super.add(v);
   }
 
-  // reads
+  [Symbol.iterator](): IterableIterator<T> {
+    return this.values();
+  }
+
   get size(): number {
     this.#triggers.track($KEYS);
     return super.size;
   }
 
-  has(v: T): boolean {
-    this.#triggers.track(v);
-    return super.has(v);
+  has(value: T): boolean {
+    this.#triggers.track(value);
+    return super.has(value);
   }
 
   keys(): IterableIterator<T> {
@@ -54,36 +57,36 @@ export class ReactiveSet<T> extends Set<T> {
     }
   }
 
-  [Symbol.iterator](): IterableIterator<T> {
-    return this.values();
-  }
-
   forEach(callbackfn: (value1: T, value2: T, set: Set<T>) => void, thisArg?: any): void {
     this.#triggers.track($KEYS);
     super.forEach(callbackfn, thisArg);
   }
 
-  // writes
-  add(v: T): this {
-    if (!super.has(v)) {
-      super.add(v);
+  add(value: T): this {
+    if (!super.has(value)) {
+      super.add(value);
       batch(() => {
-        this.#triggers.dirty(v);
+        this.#triggers.dirty(value);
         this.#triggers.dirty($KEYS);
       });
     }
+
     return this;
   }
-  delete(v: T): boolean {
-    const r = super.delete(v);
-    if (r) {
+
+  delete(value: T): boolean {
+    const result = super.delete(value);
+
+    if (result) {
       batch(() => {
-        this.#triggers.dirty(v);
+        this.#triggers.dirty(value);
         this.#triggers.dirty($KEYS);
       });
     }
-    return r;
+
+    return result;
   }
+
   clear(): void {
     if (super.size) {
       super.clear();
@@ -113,21 +116,25 @@ export class ReactiveWeakSet<T extends object> extends WeakSet<T> {
     if (values) for (const v of values) super.add(v);
   }
 
-  has(v: T): boolean {
-    this.#triggers.track(v);
-    return super.has(v);
+  has(value: T): boolean {
+    this.#triggers.track(value);
+    return super.has(value);
   }
-  add(v: T): this {
-    if (!super.has(v)) {
-      super.add(v);
-      this.#triggers.dirty(v);
+
+  add(value: T): this {
+    if (!super.has(value)) {
+      super.add(value);
+      this.#triggers.dirty(value);
     }
     return this;
   }
-  delete(v: T): boolean {
-    const deleted = super.delete(v);
-    deleted && this.#triggers.dirty(v);
-    return deleted;
+
+  delete(value: T): boolean {
+    const result = super.delete(value);
+
+    result && this.#triggers.dirty(value);
+
+    return result;
   }
 }
 
