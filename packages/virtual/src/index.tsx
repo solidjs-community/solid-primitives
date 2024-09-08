@@ -24,7 +24,7 @@ export function VirtualList<T extends readonly any[], U extends JSX.Element>(pro
   let rootElement!: HTMLDivElement;
 
   const [offset, setOffset] = createSignal(0);
-  const items = () => props.each || ([] as any as T)
+  const items = () => props.each || ([] as any as T);
 
   const getFirstIdx = () =>
     Math.max(0, Math.floor(offset() / props.rowHeight) - (props.overscanCount || 1));
@@ -62,9 +62,14 @@ export function VirtualList<T extends readonly any[], U extends JSX.Element>(pro
             top: `${getFirstIdx() * props.rowHeight}px`,
           }}
         >
-          <For fallback={props.fallback} each={items().slice(getFirstIdx(), getLastIdx()) as any as T}>{props.children}</For>
+          <For
+            fallback={props.fallback}
+            each={items().slice(getFirstIdx(), getLastIdx()) as any as T}
+          >
+            {props.children}
+          </For>
         </div>
       </div>
     </div>
   );
-};
+}
