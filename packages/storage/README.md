@@ -25,8 +25,8 @@ yarn add @solid-primitives/storage
 `makePersisted` allows you to persist a signal or store in any synchronous or asynchronous Storage API:
 
 ```ts
-const [signal, setSignal] = makePersisted(createSignal("initial"), {storage: sessionStorage});
-const [store, setStore] = makePersisted(createStore({test: true}), {name: "testing"});
+const [signal, setSignal, init] = makePersisted(createSignal("initial"), {storage: sessionStorage});
+const [store, setStore, init] = makePersisted(createStore({test: true}), {name: "testing"});
 type PersistedOptions<Type, StorageOptions> = {
   // localStorage is default
   storage?: Storage | StorageWithOptions | AsyncStorage | AsyncStorageWithOptions | LocalForage,
@@ -64,6 +64,21 @@ If you are using an asynchronous storage to persist the state of a resource, it 
 initialized from the storage before or after the fetcher resolved. If the initialization resolves after the fetcher, its
 result is discarded not to overwrite more current data.
 
+### Using `makePersisted` with Suspense
+
+In case you are using an asynchronous storage and want the initialisation mesh into Suspense instead of mixing it with Show, we provide the output of the initialisation as third part of the returned tuple:
+
+```ts
+const [state, setState, init] = makePersisted(createStore({}), {
+  name: "state",
+  storage: localForage,
+});
+// run the resource so it is triggered
+createResource(() => init)[0]();
+```
+
+Now Suspense should be blocked until the initialisation is resolved.
+
 ### Different storage APIs
 
 #### LocalStorage, SessionStorage
@@ -98,6 +113,10 @@ const [state, setState] = makePersisted(createSignal(), {
   storage: cookieStorage.withOptions({ expires: new Date(+new Date() + 3e10) }),
 });
 ```
+
+> HTTP headers are limited to 32kb, each header itself is limited to 16kb. So depending on your current headers, the space in `cookieStorage` is rather small. If the overall space is exceeded, subsequent requests will fail. We have no mechanism to prevent that, since we cannot infer all headers that the browser will set.
+
+> Browsers do not support most UTF8 and UTF16 characters in Cookies, so `cookieStorage` encodes those characters that are not supported using `encodeURIComponent`. To save space, only those characters not supported by all Browsers will be encoded.
 
 #### LocalForage
 

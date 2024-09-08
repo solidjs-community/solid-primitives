@@ -1,6 +1,6 @@
 import { getRequestEvent, isServer, type RequestEvent } from "solid-js/web";
-import { SyncStorageWithOptions } from "./persisted.js";
-import { addClearMethod, addWithOptionsMethod } from "./tools.js";
+import { SyncStorageWithOptions } from "./index.js";
+import { addWithOptionsMethod, addClearMethod } from "./tools.js";
 
 export type CookieOptions =
   | (CookieProperties & {
@@ -19,7 +19,9 @@ type CookiePropertyTypes = {
   sameSite?: "None" | "Lax" | "Strict";
 };
 
-type CookieProperties = { [key in keyof CookiePropertyTypes]: CookiePropertyTypes[key] };
+type CookieProperties = {
+  [key in keyof CookiePropertyTypes]: CookiePropertyTypes[key];
+};
 
 const cookiePropertyMap = {
   domain: "Domain",
@@ -35,7 +37,7 @@ function serializeCookieOptions(options?: CookieOptions) {
   if (!options) return "";
   const result = Object.entries(options)
     .map(([key, value]) => {
-      const serializedKey = cookiePropertyMap[key as keyof CookiePropertyTypes];
+      const serializedKey: string | undefined = cookiePropertyMap[key as keyof CookiePropertyTypes];
       if (!serializedKey) return undefined;
 
       if (value instanceof Date) return `${serializedKey}=${value.toUTCString()}`;
@@ -48,16 +50,17 @@ function serializeCookieOptions(options?: CookieOptions) {
 }
 
 function deserializeCookieOptions(cookie: string, key: string) {
-  return cookie.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop() ?? null;
+  const found = cookie.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop();
+  return found != null ? decodeURIComponent(found) : null;
 }
 
 const getRequestHeaders = isServer
-  ? () => getRequestEvent()?.request?.headers || new Headers()
+  ? () => getRequestEvent()?.request.headers || new Headers()
   : () => new Headers();
 const getResponseHeaders = isServer
   ? () =>
-      (getRequestEvent() as RequestEvent & { response: Response })?.response?.headers ||
-      new Headers()
+      (getRequestEvent() as (RequestEvent & { response: Response }) | undefined)?.response
+        .headers || new Headers()
   : () => new Headers();
 
 /**
@@ -103,9 +106,9 @@ export const cookieStorage: SyncStorageWithOptions<CookieOptions> = addWithOptio
           const responseHeaders = getResponseHeaders();
           const currentCookies =
             responseHeaders
-              ?.get("Set-Cookie")
+              .get("Set-Cookie")
               ?.split(", ")
-              ?.filter(cookie => cookie && !cookie.startsWith(`${key}=`)) ?? [];
+              .filter(cookie => cookie && !cookie.startsWith(`${key}=`)) ?? [];
           responseHeaders.set(
             "Set-Cookie",
             [...currentCookies, `${key}=${value}${serializeCookieOptions(options)}`].join(", "),
@@ -117,10 +120,17 @@ export const cookieStorage: SyncStorageWithOptions<CookieOptions> = addWithOptio
     getItem: (key: string, options?: CookieOptions) =>
       deserializeCookieOptions(cookieStorage._read(options), key),
     setItem: (key: string, value: string, options?: CookieOptions) => {
-      cookieStorage._write(key, value, options);
+      cookieStorage._write(
+        key,
+        value.replace(/[\u00c0-\uffff\&;]/g, c => encodeURIComponent(c)),
+        options,
+      );
     },
     removeItem: (key: string, options?: CookieOptions) => {
-      cookieStorage._write(key, "deleted", { ...options, expires: new Date(0) });
+      cookieStorage._write(key, "deleted", {
+        ...options,
+        expires: new Date(0),
+      });
     },
     key: (index: number, options?: CookieOptions) => {
       let key: string | null = null;

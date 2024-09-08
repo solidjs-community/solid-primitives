@@ -1,8 +1,8 @@
-declare type WorkerSignal = number;
+export type WorkerSignal = number;
 
-declare type WorkerCallbacks = Map<string, [succes: Function, error: Function]>;
+export type WorkerCallbacks = Map<string, [succes: Function, error: Function]>;
 
-declare type WorkerMessage = {
+export type WorkerMessage = {
   type: WorkerSignal;
   id?: string;
   error?: string;
@@ -12,13 +12,13 @@ declare type WorkerMessage = {
   params?: any;
 };
 
-declare type WorkerExports = [
+export type WorkerExports = [
   worker: Worker,
   start: () => void,
   stop: () => void,
   exports?: Set<string>,
 ];
 
-declare interface PostMessageOptions {
+export interface PostMessageOptions {
   transfer?: any[] | undefined;
 }
