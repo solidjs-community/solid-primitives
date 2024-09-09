@@ -113,37 +113,37 @@ describe("createTimes", () => {
 
 describe("createPolled", () => {
   test("fn called initially and after timeout", () => {
-    let n = 0
-    const {polled, dispose} = createRoot(dispose => ({
+    let n = 0;
+    const { polled, dispose } = createRoot(dispose => ({
       polled: createPolled(() => ++n, 100),
       dispose,
-    }))
-    expect(polled()).toBe(1)
+    }));
+    expect(polled()).toBe(1);
 
-    vi.advanceTimersByTime(100)
-    expect(polled()).toBe(2)
+    vi.advanceTimersByTime(100);
+    expect(polled()).toBe(2);
 
-    dispose()
-    expect(polled()).toBe(2)
+    dispose();
+    expect(polled()).toBe(2);
 
-    vi.advanceTimersByTime(100)
-    expect(polled()).toBe(2)
-  })
+    vi.advanceTimersByTime(100);
+    expect(polled()).toBe(2);
+  });
 
   test("is reactive", () => {
-    const [source, setSource] = createSignal(0)
+    const [source, setSource] = createSignal(0);
 
-    const {polled, dispose} = createRoot(dispose => ({
+    const { polled, dispose } = createRoot(dispose => ({
       polled: createPolled(source, 100),
       dispose,
-    }))
-    expect(polled()).toBe(0)
+    }));
+    expect(polled()).toBe(0);
 
-    setSource(1)
-    expect(polled()).toBe(1)
+    setSource(1);
+    expect(polled()).toBe(1);
 
-    dispose()
-    setSource(2)
-    expect(polled()).toBe(1)
-  })
-})
+    dispose();
+    setSource(2);
+    expect(polled()).toBe(1);
+  });
+});
