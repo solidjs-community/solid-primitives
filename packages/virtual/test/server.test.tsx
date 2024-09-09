@@ -1,8 +1,8 @@
 import { describe, test, expect } from "vitest";
+import { renderToString } from "solid-js/web";
 import { VirtualList } from "../src/index.jsx";
 
-import { TEST_LIST, VirtualListItem } from "./helpers.jsx";
-import { renderToString } from "solid-js/web";
+const TEST_LIST = Array.from({ length: 1000 }, (_, i) => i);
 
 describe("VirtualList", () => {
   test("doesn't break in SSR", () => {
@@ -14,7 +14,7 @@ describe("VirtualList", () => {
         rowHeight={10}
         class="classString"
       >
-        {item => <VirtualListItem item={item} />}
+        {item => <div style={{ height: "100px" }}>{item}</div>}
       </VirtualList>
     ));
 
