@@ -2,7 +2,7 @@ import { describe, test, expect } from "vitest";
 import { renderToString } from "solid-js/web";
 import { VirtualList } from "../src/index.jsx";
 
-const TEST_LIST = Array.from({length: 1000}, (_, i) => i)
+const TEST_LIST = Array.from({ length: 1000 }, (_, i) => i);
 
 describe("VirtualList", () => {
   test("doesn't break in SSR", () => {
