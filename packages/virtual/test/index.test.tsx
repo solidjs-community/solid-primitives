@@ -1,159 +1,195 @@
-import { describe, test, expect, beforeEach } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@solidjs/testing-library";
+import { describe, test, expect } from "vitest";
 import { VirtualList } from "../src/index.jsx";
+import { render } from "solid-js/web";
 
-import { TEST_LIST, VirtualListItem } from "./helpers.jsx";
+const TEST_LIST = Array.from({length: 1000}, (_, i) => i)
+
+const SELECTOR_CLASS_NAME = "scroll-container-selector"
+
+const SCROLL_EVENT = new Event('scroll')
+
+let root = document.createElement("div")
+
+function get_scroll_continer() {
+  const scroll_container = root.querySelector("."+SELECTOR_CLASS_NAME)
+  if (scroll_container == null) {
+    throw "."+SELECTOR_CLASS_NAME+" was not found"
+  }
+  return scroll_container
+}
 
 describe("VirtualList", () => {
-  const SELECTOR_CLASS_NAME = "scroll-container-selector";
-
-  const createScrollList = (container: HTMLElement) => (distance: number) => {
-    const scrollContainer = container.querySelector(`.${SELECTOR_CLASS_NAME}`);
-    expect(scrollContainer).not.toBeNull();
-
-    fireEvent.scroll(scrollContainer!, {
-      target: { scrollTop: scrollContainer!.scrollTop + distance },
-    });
-  };
-
-  beforeEach(() => {
-    cleanup();
-  });
 
   test("renders a subset of the items", () => {
-    render(() => (
-      <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10}>
-        {item => <VirtualListItem item={item} />}
-      </VirtualList>
-    ));
 
-    expect(screen.getByText(0)).not.toBeNull();
-    expect(screen.getByText(1)).not.toBeNull();
-    expect(screen.getByText(2)).not.toBeNull();
-    expect(screen.queryByText(3)).toBeNull();
+    let root = document.createElement("div")
+    const dispose = render(() => (
+      <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10}>
+        {item => <div id={"item-"+item} style={{ height: "100px" }}/>}
+      </VirtualList>
+    ), root)
+
+    expect(root.querySelector("#item-0")).not.toBeNull();
+    expect(root.querySelector("#item-1")).not.toBeNull();
+    expect(root.querySelector("#item-2")).not.toBeNull();
+    expect(root.querySelector("#item-3")).toBeNull();
+
+    dispose()
   });
 
   test("scrolling renders the correct subset of the items", () => {
-    const { container } = render(() => (
+
+    const dispose = render(() => (
       <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10} class={SELECTOR_CLASS_NAME}>
-        {item => <VirtualListItem item={item} />}
+        {item => <div id={"item-"+item} style={{ height: "100px" }}/>}
       </VirtualList>
-    ));
+    ), root)
+    const scroll_container = get_scroll_continer()
 
-    const scrollList = createScrollList(container);
+    scroll_container.dispatchEvent(SCROLL_EVENT)
 
-    scrollList(0);
-    expect(screen.getByText(0)).not.toBeNull();
-    expect(screen.getByText(1)).not.toBeNull();
-    expect(screen.getByText(2)).not.toBeNull();
-    expect(screen.queryByText(3)).toBeNull();
+    expect(root.querySelector("#item-0")).not.toBeNull();
+    expect(root.querySelector("#item-1")).not.toBeNull();
+    expect(root.querySelector("#item-2")).not.toBeNull();
+    expect(root.querySelector("#item-3")).toBeNull();
 
-    scrollList(10);
-    expect(screen.getByText(0)).not.toBeNull();
-    expect(screen.getByText(1)).not.toBeNull();
-    expect(screen.getByText(2)).not.toBeNull();
-    expect(screen.getByText(3)).not.toBeNull();
-    expect(screen.queryByText(4)).toBeNull();
+    scroll_container.scrollTop += 10
+    scroll_container.dispatchEvent(SCROLL_EVENT)
 
-    scrollList(10);
-    expect(screen.queryByText(0)).toBeNull();
-    expect(screen.getByText(1)).not.toBeNull();
-    expect(screen.getByText(2)).not.toBeNull();
-    expect(screen.getByText(3)).not.toBeNull();
-    expect(screen.getByText(4)).not.toBeNull();
-    expect(screen.queryByText(5)).toBeNull();
+    expect(root.querySelector("#item-0")).not.toBeNull();
+    expect(root.querySelector("#item-1")).not.toBeNull();
+    expect(root.querySelector("#item-2")).not.toBeNull();
+    expect(root.querySelector("#item-3")).not.toBeNull();
+    expect(root.querySelector("#item-4")).toBeNull();
 
-    scrollList(-10);
-    expect(screen.getByText(0)).not.toBeNull();
-    expect(screen.getByText(1)).not.toBeNull();
-    expect(screen.getByText(2)).not.toBeNull();
-    expect(screen.getByText(3)).not.toBeNull();
-    expect(screen.queryByText(4)).toBeNull();
+    scroll_container.scrollTop += 10
+    scroll_container.dispatchEvent(SCROLL_EVENT)
 
-    scrollList(-10);
-    expect(screen.getByText(0)).not.toBeNull();
-    expect(screen.getByText(1)).not.toBeNull();
-    expect(screen.getByText(2)).not.toBeNull();
-    expect(screen.queryByText(3)).toBeNull();
+    expect(root.querySelector("#item-0")).toBeNull();
+    expect(root.querySelector("#item-1")).not.toBeNull();
+    expect(root.querySelector("#item-2")).not.toBeNull();
+    expect(root.querySelector("#item-3")).not.toBeNull();
+    expect(root.querySelector("#item-4")).not.toBeNull();
+    expect(root.querySelector("#item-5")).toBeNull();
+
+    scroll_container.scrollTop -= 10
+    scroll_container.dispatchEvent(SCROLL_EVENT)
+
+    expect(root.querySelector("#item-0")).not.toBeNull();
+    expect(root.querySelector("#item-1")).not.toBeNull();
+    expect(root.querySelector("#item-2")).not.toBeNull();
+    expect(root.querySelector("#item-3")).not.toBeNull();
+    expect(root.querySelector("#item-4")).toBeNull();
+
+    scroll_container.scrollTop -= 10
+    scroll_container.dispatchEvent(SCROLL_EVENT)
+
+    expect(root.querySelector("#item-0")).not.toBeNull();
+    expect(root.querySelector("#item-1")).not.toBeNull();
+    expect(root.querySelector("#item-2")).not.toBeNull();
+    expect(root.querySelector("#item-3")).toBeNull();
+
+    dispose()
   });
 
   test("renders the correct subset of the items for the end of the list", () => {
-    const { container } = render(() => (
+
+    const dispose = render(() => (
       <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10} class={SELECTOR_CLASS_NAME}>
-        {item => <VirtualListItem item={item} />}
+        {item => <div id={"item-"+item} style={{ height: "100px" }}/>}
       </VirtualList>
-    ));
+    ), root)
+    const scroll_container = get_scroll_continer()
 
-    createScrollList(container)(9_980);
+    scroll_container.scrollTop += 9_980
+    scroll_container.dispatchEvent(SCROLL_EVENT)
 
-    expect(screen.queryByText(996)).toBeNull();
-    expect(screen.getByText(997)).not.toBeNull();
-    expect(screen.getByText(998)).not.toBeNull();
-    expect(screen.getByText(999)).not.toBeNull();
+    expect(root.querySelector("#item-996")).toBeNull();
+    expect(root.querySelector("#item-997")).not.toBeNull();
+    expect(root.querySelector("#item-998")).not.toBeNull();
+    expect(root.querySelector("#item-999")).not.toBeNull();
+    expect(root.querySelector("#item-1000")).toBeNull();
+
+    dispose()
   });
 
   test("renders `overScan` rows above and below the visible rendered items", () => {
-    const { container } = render(() => (
-      <VirtualList
+
+    const dispose = render(() => (
+      <VirtualList 
         each={TEST_LIST}
         rootHeight={20}
         rowHeight={10}
         overscanCount={2}
         class={SELECTOR_CLASS_NAME}
       >
-        {item => <VirtualListItem item={item} />}
+        {item => <div id={"item-"+item} style={{ height: "100px" }}/>}
       </VirtualList>
-    ));
+    ), root)
+    const scroll_container = get_scroll_continer()
+    
+    scroll_container.scrollTop += 100
+    scroll_container.dispatchEvent(SCROLL_EVENT)
 
-    createScrollList(container)(100);
+    expect(root.querySelector("#item-7")).toBeNull();
+    expect(root.querySelector("#item-8")).not.toBeNull();
+    expect(root.querySelector("#item-9")).not.toBeNull();
+    expect(root.querySelector("#item-10")).not.toBeNull();
+    expect(root.querySelector("#item-11")).not.toBeNull();
+    expect(root.querySelector("#item-12")).not.toBeNull();
+    expect(root.querySelector("#item-13")).not.toBeNull();
+    expect(root.querySelector("#item-14")).toBeNull();
 
-    expect(screen.queryByText(7)).toBeNull();
-    expect(screen.getByText(8)).not.toBeNull();
-    expect(screen.getByText(9)).not.toBeNull();
-    expect(screen.getByText(10)).not.toBeNull();
-    expect(screen.getByText(11)).not.toBeNull();
-    expect(screen.getByText(12)).not.toBeNull();
-    expect(screen.getByText(13)).not.toBeNull();
-    expect(screen.queryByText(14)).toBeNull();
+    dispose()
   });
 
   test("overscanCount defaults to 1 if undefined", () => {
-    const { container } = render(() => (
+
+    const dispose = render(() => (
       <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10} class={SELECTOR_CLASS_NAME}>
-        {item => <VirtualListItem item={item} />}
+        {item => <div id={"item-"+item} style={{ height: "100px" }}/>}
       </VirtualList>
-    ));
+    ), root)
+    const scroll_container = get_scroll_continer()
+    
+    scroll_container.scrollTop += 100
+    scroll_container.dispatchEvent(SCROLL_EVENT)
 
-    createScrollList(container)(100);
+    expect(root.querySelector("#item-8")).toBeNull();
+    expect(root.querySelector("#item-9")).not.toBeNull();
+    expect(root.querySelector("#item-10")).not.toBeNull();
+    expect(root.querySelector("#item-11")).not.toBeNull();
+    expect(root.querySelector("#item-12")).not.toBeNull();
+    expect(root.querySelector("#item-13")).toBeNull();
 
-    expect(screen.queryByText(8)).toBeNull();
-    expect(screen.getByText(9)).not.toBeNull();
-    expect(screen.getByText(10)).not.toBeNull();
-    expect(screen.getByText(11)).not.toBeNull();
-    expect(screen.getByText(12)).not.toBeNull();
-    expect(screen.queryByText(13)).toBeNull();
+    dispose()
   });
 
   test("overscanCount defaults to 1 if set to zero", () => {
-    const { container } = render(() => (
-      <VirtualList
+
+    const dispose = render(() => (
+      <VirtualList 
         each={TEST_LIST}
         rootHeight={20}
         rowHeight={10}
         overscanCount={0}
         class={SELECTOR_CLASS_NAME}
       >
-        {item => <VirtualListItem item={item} />}
+        {item => <div id={"item-"+item} style={{ height: "100px" }}/>}
       </VirtualList>
-    ));
+    ), root)
+    const scroll_container = get_scroll_continer()
+    
+    scroll_container.scrollTop += 100
+    scroll_container.dispatchEvent(SCROLL_EVENT)
 
-    createScrollList(container)(100);
+    expect(root.querySelector("#item-8")).toBeNull();
+    expect(root.querySelector("#item-9")).not.toBeNull();
+    expect(root.querySelector("#item-10")).not.toBeNull();
+    expect(root.querySelector("#item-11")).not.toBeNull();
+    expect(root.querySelector("#item-12")).not.toBeNull();
+    expect(root.querySelector("#item-13")).toBeNull();
 
-    expect(screen.queryByText(8)).toBeNull();
-    expect(screen.getByText(9)).not.toBeNull();
-    expect(screen.getByText(10)).not.toBeNull();
-    expect(screen.getByText(11)).not.toBeNull();
-    expect(screen.getByText(12)).not.toBeNull();
-    expect(screen.queryByText(13)).toBeNull();
+    dispose()
   });
 });
