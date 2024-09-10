@@ -4,11 +4,11 @@ import { renderToString } from "solid-js/web";
 import { createContextProvider, MultiProvider } from "../src/index.js";
 
 type TestContextValue = {
-  message: string,
-  children: JSX.Element,
-}
+  message: string;
+  children: JSX.Element;
+};
 
-const TEST_MESSAGE = "Hello, Context!"
+const TEST_MESSAGE = "Hello, Context!";
 const FALLBACK: TestContextValue = { message: "FALLBACK", children: undefined };
 
 const [TestProvider, useTestContext] = createContextProvider(
