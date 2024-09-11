@@ -1,10 +1,11 @@
 import child_process from "node:child_process";
 import * as utils from "./utils/index.js";
-import path from "path";
 
-const cwd = process.cwd();
 const args = process.argv.slice(2);
-const package_name = path.basename(cwd);
+const package_name = utils.getPackageNameFromCWD()
+if (package_name == null) {
+  throw "this script should be ran from one of the pacakges"
+}
 
 utils.logLine(
   `Starting dev server for the ${package_name} package...\n

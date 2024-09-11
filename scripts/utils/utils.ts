@@ -4,10 +4,22 @@ import * as url from "node:url";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
+export const CWD = process.cwd()
+
 export const ROOT_DIR = path.join(__dirname, "..", "..");
 export const PACKAGES_DIR = path.join(ROOT_DIR, "packages");
 
 export const MODULE_PREFIX = "@solid-primitives/";
+
+export function getPackageNameFromCWD(): string | null {
+  if (CWD.startsWith(PACKAGES_DIR)) {
+    let name = CWD.slice(PACKAGES_DIR.length+path.sep.length).split(path.sep)[0]
+    if (name !== undefined && name.length > 0) {
+      return name
+    }
+  }
+  return null
+}
 
 // eslint-disable-next-line no-console
 export const logLine = (string: string) => console.log(`\x1b[34m${string}\x1b[0m`);
