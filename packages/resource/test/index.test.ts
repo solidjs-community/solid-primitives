@@ -1,5 +1,13 @@
 import { catchError, createEffect, createResource, createRoot, createSignal, on } from "solid-js";
 import { describe, test, expect, vi, afterAll, beforeEach, beforeAll } from "vitest";
+import {
+  makeAbortable,
+  createAggregated,
+  serializer,
+  makeCache,
+  makeRetrying,
+  createDeepSignal,
+} from "../src/index.js";
 
 export function testEffect<T extends any = void>(
   fn: (done: (result: T) => void) => void
@@ -27,15 +35,6 @@ class AbortError extends Error {
   }
   name = "AbortError";
 }
-
-import {
-  makeAbortable,
-  createAggregated,
-  serializer,
-  makeCache,
-  makeRetrying,
-  createDeepSignal,
-} from "../src/index.js";
 
 beforeAll(() => {
   vi.useFakeTimers();
