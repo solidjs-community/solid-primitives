@@ -10,7 +10,7 @@ import {
 } from "../src/index.js";
 
 export function testEffect<T extends any = void>(
-  fn: (done: (result: T) => void) => void
+  fn: (done: (result: T) => void) => void,
 ): Promise<T> {
   let done: (result: T) => void;
   let fail: (error: any) => void;
@@ -24,9 +24,9 @@ export function testEffect<T extends any = void>(
         done(result);
         dispose();
       });
-    }, fail)
+    }, fail);
   });
-  return promise
+  return promise;
 }
 
 class AbortError extends Error {

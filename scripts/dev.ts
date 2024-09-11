@@ -2,9 +2,9 @@ import child_process from "node:child_process";
 import * as utils from "./utils/index.js";
 
 const args = process.argv.slice(2);
-const package_name = utils.getPackageNameFromCWD()
+const package_name = utils.getPackageNameFromCWD();
 if (package_name == null) {
-  throw "this script should be ran from one of the pacakges"
+  throw "this script should be ran from one of the pacakges";
 }
 
 utils.logLine(

@@ -11,9 +11,9 @@ if (!name || !utils.checkValidPackageName(name))
   throw new Error(`Incorrect package name argument: "${name}"`);
 
 const template_path = path.resolve(dirname, "../template");
-const dst_path      = path.resolve(dirname, "../packages", name);
-const pkg_path      = path.join(dst_path, "package.json");
-const readme_path   = path.join(dst_path, "README.md");
+const dst_path = path.resolve(dirname, "../packages", name);
+const pkg_path = path.join(dst_path, "package.json");
+const readme_path = path.join(dst_path, "README.md");
 
 (async () => {
   const alreadyExists = await utils.pathExists(dst_path);

@@ -4,7 +4,7 @@ import * as url from "node:url";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
-export const CWD = process.cwd()
+export const CWD = process.cwd();
 
 export const ROOT_DIR = path.join(__dirname, "..", "..");
 export const PACKAGES_DIR = path.join(ROOT_DIR, "packages");
@@ -13,12 +13,12 @@ export const MODULE_PREFIX = "@solid-primitives/";
 
 export function getPackageNameFromCWD(): string | null {
   if (CWD.startsWith(PACKAGES_DIR)) {
-    let name = CWD.slice(PACKAGES_DIR.length+path.sep.length).split(path.sep)[0]
+    let name = CWD.slice(PACKAGES_DIR.length + path.sep.length).split(path.sep)[0];
     if (name !== undefined && name.length > 0) {
-      return name
+      return name;
     }
   }
-  return null
+  return null;
 }
 
 // eslint-disable-next-line no-console
@@ -64,8 +64,8 @@ export function insertTextBetweenComments(file: string, text: string, comment: s
 export const isNonNullable = <T>(i: T): i is NonNullable<T> => i != null;
 
 export async function copyDirectory(src: string, dst: string): Promise<void> {
-  await fsp.mkdir(dst, {recursive: true});
-  const entries = await fsp.readdir(src, {withFileTypes: true});
+  await fsp.mkdir(dst, { recursive: true });
+  const entries = await fsp.readdir(src, { withFileTypes: true });
 
   for (let entry of entries) {
     const src_path = path.join(src, entry.name);
@@ -82,8 +82,8 @@ export async function copyDirectory(src: string, dst: string): Promise<void> {
 export async function pathExists(target: string): Promise<boolean> {
   try {
     await fsp.access(target);
-    return true
+    return true;
   } catch (err) {
-    return false
+    return false;
   }
 }

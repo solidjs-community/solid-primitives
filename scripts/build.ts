@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import * as tsup from "tsup";
 import * as preset from "tsup-preset-solid";
-import * as utils from "./utils/index.js"
+import * as utils from "./utils/index.js";
 
 /*
 
@@ -65,9 +65,9 @@ const custom_tsup_options: Record<string, (options: tsup.Options) => void> = {
   },
 };
 
-const package_name = utils.getPackageNameFromCWD()
+const package_name = utils.getPackageNameFromCWD();
 if (package_name == null) {
-  throw "this script should be ran from one of the pacakges"
+  throw "this script should be ran from one of the pacakges";
 }
 
 const parsed_options = preset.parsePresetOptions({

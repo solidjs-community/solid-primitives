@@ -8,7 +8,10 @@ import {
   focus,
 } from "../src/index.js";
 
-const dispatchFocusEvent = (target: Element | Window = window, event: "focus" | "blur" = "focus") => {
+const dispatchFocusEvent = (
+  target: Element | Window = window,
+  event: "focus" | "blur" = "focus",
+) => {
   target.dispatchEvent(new FocusEvent(event));
 };
 
