@@ -1,6 +1,5 @@
-import { createEffect, createResource, createSignal, on } from "solid-js";
+import { createEffect, createResource, createRoot, createSignal, on } from "solid-js";
 import { describe, test, expect, vi, afterAll, beforeEach, beforeAll } from "vitest";
-import { testEffect } from "@solidjs/testing-library";
 
 class AbortError extends Error {
   constructor(msg: string) {
@@ -58,7 +57,7 @@ describe("makeAbortable", () => {
 
 describe("makeAggregated", () => {
   test("aggregates arrays", () =>
-    testEffect(done => {
+    createRoot(done => {
       const [data, addData] = createSignal<string[]>();
       const [resource] = createResource(data, item => Promise.resolve(item));
       const aggregated = createAggregated(resource);
@@ -85,7 +84,7 @@ describe("makeAggregated", () => {
       });
     }));
   test("aggregates objects", () =>
-    testEffect(done => {
+    createRoot(done => {
       const [data, addData] = createSignal<Record<string, string>>();
       const [resource] = createResource(data, item => Promise.resolve(item));
       const aggregated = createAggregated(resource);
@@ -115,7 +114,7 @@ describe("makeAggregated", () => {
       });
     }));
   test("aggregates strings", () =>
-    testEffect(done => {
+    createRoot(done => {
       const [data, addData] = createSignal<string>();
       const [resource] = createResource(data, item => Promise.resolve(item));
       const aggregated = createAggregated(resource);
@@ -137,7 +136,7 @@ describe("makeAggregated", () => {
       });
     }));
   test("aggregates numbers", () =>
-    testEffect(done => {
+    createRoot(done => {
       const [data, addData] = createSignal<number>();
       const [resource] = createResource(data, item => Promise.resolve(item));
       const aggregated = createAggregated(resource);
@@ -156,7 +155,7 @@ describe("makeAggregated", () => {
       });
     }));
   test("an initial value [] allows to aggregate objects into arrays", () =>
-    testEffect(done => {
+    createRoot(done => {
       const [data, addData] = createSignal<Record<string, string>>();
       const [resource] = createResource(data, item => Promise.resolve(item));
       const aggregated = createAggregated(resource, []);
@@ -209,7 +208,7 @@ describe("serializer", () => {
 
 describe("makeCache", () => {
   test("caches results", () =>
-    testEffect(done => {
+    createRoot(done => {
       const fetcher = vi.fn(data => Promise.resolve(data));
       const [url, setUrl] = createSignal();
       const cache = {};
@@ -236,7 +235,7 @@ describe("makeCache", () => {
       });
     }));
   test("persists cache", () =>
-    testEffect(done => {
+    createRoot(done => {
       const now = +new Date();
       const storageMock = {
         getItem: () =>
@@ -268,7 +267,7 @@ describe("makeCache", () => {
       });
     }));
   test("invalidates cache", () =>
-    testEffect(done => {
+    createRoot(done => {
       const cache = {};
       const getData = vi.fn(() => Promise.resolve("data"));
       const [fetcher, invalidate] = makeCache(getData, { cache, expires: 1000 });
@@ -294,7 +293,7 @@ describe("makeCache", () => {
       });
     }));
   test("provides an accessor for automatically invalidated results", () =>
-    testEffect(done => {
+    createRoot(done => {
       const cache = {};
       const getData = () => Promise.resolve(Math.random());
       const [fetcher, _, invalidated] = makeCache(getData, { cache, expires: 1000 });
@@ -317,7 +316,7 @@ describe("makeCache", () => {
 
 describe("makeRetrying", () => {
   test("retries the request after a delay", () =>
-    testEffect(done => {
+    createRoot(done => {
       const responses = [
         Promise.reject(new Error("1")),
         Promise.reject(new Error("2")),
@@ -339,7 +338,7 @@ describe("makeRetrying", () => {
       });
     }));
   test("throws after the configured number of retries", () =>
-    testEffect(done => {
+    createRoot(done => {
       const responses = [
         Promise.reject(new Error("1")),
         Promise.reject(new Error("2")),
@@ -363,7 +362,7 @@ describe("makeRetrying", () => {
 
 describe("createDeepSignal", () => {
   test("provides resources with fine-grained reactivity", () =>
-    testEffect(done => {
+    createRoot(done => {
       const responses = [
         { x: "test", y: "test" },
         { x: "test2", y: "test" },

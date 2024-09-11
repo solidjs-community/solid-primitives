@@ -1,85 +1,87 @@
 import { describe, expect, it } from "vitest";
-
-import { render } from "@solidjs/testing-library";
-
+import { render } from "solid-js/web";
 import { createInputMask, createMaskPattern } from "../src/index.js";
 
-const dispatchInputEvent = (node: HTMLElement) =>
-  new Promise<void>(resolve => {
-    node.addEventListener("input", () => resolve(), { once: true });
-    node.dispatchEvent(new Event("input", { bubbles: true, cancelable: false }));
-  });
+const dispatchInputEvent = (node: HTMLElement) => {
+  node.dispatchEvent(new Event("input", { bubbles: true, cancelable: false }));
+}
 
 describe("createInputMask", () => {
-  it("adds placeholder (e.g. to an iso date)", async () => {
-    const { container } = render(() => <input onInput={createInputMask("9999-99-99")} />);
-    const input = container.querySelector("input") as HTMLInputElement;
+  it("adds placeholder (e.g. to an iso date)", () => {
+    let input!: HTMLInputElement;
+    let dispose = render(() => <input ref={input} onInput={createInputMask("9999-99-99")} />, document.body)
     input.value = "11111";
-    await dispatchInputEvent(input);
+    dispatchInputEvent(input);
     expect(input.value).toBe("1111-1");
     input.value = "1111-11";
-    await dispatchInputEvent(input);
+    dispatchInputEvent(input);
     expect(input.value).toBe("1111-11");
     input.value = "1111-111";
-    await dispatchInputEvent(input);
+    dispatchInputEvent(input);
     expect(input.value).toBe("1111-11-1");
     input.value = "1111-11-11";
-    await dispatchInputEvent(input);
+    dispatchInputEvent(input);
     expect(input.value).toBe("1111-11-11");
     input.value = "1111-11-111";
-    await dispatchInputEvent(input);
+    dispatchInputEvent(input);
     expect(input.value).toBe("1111-11-11");
+    dispose()
   });
 
-  it("removes wrongful input (e.g. from iso-date)", async () => {
-    const { container } = render(() => <input onInput={createInputMask("9999-99-99")} />);
-    const input = container.querySelector("input") as HTMLInputElement;
+  it("removes wrongful input (e.g. from iso-date)", () => {
+    let input!: HTMLInputElement;
+    let dispose = render(() => <input ref={input} onInput={createInputMask("9999-99-99")} />, document.body)
     input.value = "a";
-    await dispatchInputEvent(input);
+    dispatchInputEvent(input);
     expect(input.value).toBe("");
     input.value = "-";
-    await dispatchInputEvent(input);
+    dispatchInputEvent(input);
     expect(input.value).toBe("");
+    dispose()
   });
 
-  it("works with regex mask", async () => {
-    const { container } = render(() => (
+  it("works with regex mask", () => {
+    let input!: HTMLInputElement;
+    let dispose = render(() => (
       <input
+        ref={input}
         onInput={createInputMask([
           /[^0-9a-zäöüß\-_/]|^(https?:\/\/|)(meet\.goto\.com|gotomeet\.me|)\/?/gi,
           () => "",
         ])}
       />
-    ));
-    const input = container.querySelector("input") as HTMLInputElement;
+    ), document.body)
     input.value = "https://meet.goto.com/test";
-    await dispatchInputEvent(input);
+    dispatchInputEvent(input);
     expect(input.value).toBe("test");
+    dispose()
   });
 });
 
 describe("createMaskPattern", () => {
-  it("adds data-mask-value and data-mask-pattern to the previous element", async () => {
-    const { container } = render(() => (
+  it("adds data-mask-value and data-mask-pattern to the previous element", () => {
+    let input!: HTMLInputElement;
+    let label!: HTMLLabelElement;
+    let dispose = render(() => (
       <div>
-        <label></label>
+        <label ref={label}></label>
         <input
+          ref={input}
           placeholder="YYYY-MM-DD"
           onInput={createMaskPattern(createInputMask("9999-99-99"), () => "YYYY-MM-DD")}
         />
       </div>
-    ));
-    const label = container.querySelector("label")!;
-    const input = container.querySelector("input")!;
+    ), document.body)
     expect(label.hasAttribute("data-mask-value")).toBe(false);
     expect(label.hasAttribute("data-mask-pattern")).toBe(false);
     input.value = "1";
-    await dispatchInputEvent(input);
+    dispatchInputEvent(input);
     expect(label.getAttribute("data-mask-value")).toBe("1");
     expect(label.getAttribute("data-mask-pattern")).toBe("YYY-MM-DD");
     input.value = "20771";
-    await dispatchInputEvent(input);
+    dispatchInputEvent(input);
     expect(label.getAttribute("data-mask-value")).toBe("2077-1");
     expect(label.getAttribute("data-mask-pattern")).toBe("M-DD");
+    dispose()
   });
 });
