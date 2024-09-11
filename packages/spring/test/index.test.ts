@@ -1,10 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { createRoot, createSignal } from "solid-js";
+import { describe, expect, it } from "vitest";
 import { createDerivedSpring, createSpring } from "../src/index.js";
-
-// ===========================================================================
-// Tests
-// ===========================================================================
 
 describe("createSpring", () => {
   it("returns values", () => {
@@ -20,16 +16,9 @@ describe("createSpring", () => {
   });
 
   it("updates toward target", async () => {
-    let dispose!: () => void;
-    let setSpringed!: (
-      newValue: number,
-      opts?: { hard?: boolean; soft?: boolean },
-    ) => Promise<void>;
-    let springed!: () => number;
-
-    createRoot(d => {
-      dispose = d;
-      [springed, setSpringed] = createSpring(0);
+    const { dispose, springed, setSpringed } = createRoot(dispose => {
+      const [springed, setSpringed] = createSpring(0);
+      return { dispose, springed, setSpringed };
     });
 
     expect(springed()).toBe(0);

@@ -4,7 +4,7 @@ import { isServer } from "solid-js/web";
 // Internals
 // ===========================================================================
 
-// src/internal/client/types.d.ts
+// https://github.com/sveltejs/svelte/blob/main/packages/svelte/src/internal/client/types.d.ts
 
 type Task = {
   abort(): void;
@@ -18,49 +18,33 @@ type TickContext<T extends SpringTarget> = {
   settled: boolean;
 };
 
-type Raf = {
+type TaskCallback = (now: number) => boolean | void;
+
+type TaskEntry = { c: TaskCallback; f: () => void };
+
+// https://github.com/sveltejs/svelte/blob/main/packages/svelte/src/internal/client/timing.js
+
+const raf: {
   /** Alias for `requestAnimationFrame`, exposed in such a way that we can override in tests */
   tick: (callback: (time: DOMHighResTimeStamp) => void) => any;
   /** Alias for `performance.now()`, exposed in such a way that we can override in tests */
   now: () => number;
   /** A set of tasks that will run to completion, unless aborted */
   tasks: Set<TaskEntry>;
-};
-
-type TaskCallback = (now: number) => boolean | void;
-
-type TaskEntry = { c: TaskCallback; f: () => void };
-
-// src/internal/client/timing.js
-
-/** SSR-safe RAF function. */
-const request_animation_frame = isServer ? () => {} : requestAnimationFrame;
-
-/** SSR-safe now getter. */
-const now = isServer ? () => Date.now() : () => performance.now();
-
-const raf: Raf = {
-  tick: (_: any) => request_animation_frame(_),
-  now: () => now(),
+} = {
+  tick: (_: any) => (isServer ? () => {} : requestAnimationFrame(_)), // SSR-safe RAF function.
+  now: () => performance.now(), // Getter for now() using performance in browser and Date in server. Although both are available in node and browser.
   tasks: new Set(),
 };
 
-// src/motion/utils.js
+// https://github.com/sveltejs/svelte/blob/main/packages/svelte/src/motion/utils.js
 
-/**
- * @param {any} obj
- * @returns {obj is Date}
- */
 function is_date(obj: any): obj is Date {
   return Object.prototype.toString.call(obj) === "[object Date]";
 }
 
-// src/internal/client/loop.js
+// https://github.com/sveltejs/svelte/blob/main/packages/svelte/src/internal/client/loop.js
 
-/**
- * @param {number} now
- * @returns {void}
- */
 function run_tasks(now: number) {
   raf.tasks.forEach(task => {
     if (!task.c(now)) {
@@ -99,7 +83,7 @@ function loop(callback: TaskCallback): Task {
 // createSpring hook
 // ===========================================================================
 
-import { Accessor, createEffect, createSignal, on } from "solid-js";
+import { Accessor, createEffect, createSignal, untrack } from "solid-js";
 
 export type SpringOptions = {
   /**
@@ -143,7 +127,7 @@ export type SpringTarget =
 export type WidenSpringTarget<T> = T extends number ? number : T extends Date ? Date : T;
 
 export type SpringSetter<T> = (
-  newValue: T,
+  newValue: T | ((prev: T) => T),
   opts?: { hard?: boolean; soft?: boolean | number },
 ) => Promise<void>;
 
@@ -171,52 +155,59 @@ export function createSpring<T extends SpringTarget>(
   const [springValue, setSpringValue] = createSignal<T>(initialValue);
   const { stiffness = 0.15, damping = 0.8, precision = 0.01 } = options;
 
-  const [lastTime, setLastTime] = createSignal<number>(0);
+  let lastTime = 0;
+  let task: Task | null = null;
+  let current_token: object | undefined = undefined;
+  let lastValue: T = initialValue;
+  let targetValue: T | undefined;
+  let inv_mass = 1;
+  let inv_mass_recovery_rate = 0;
+  let cancelTask = false;
 
-  const [task, setTask] = createSignal<Task | null>(null);
+  /**
+   * Gets `newValue` from the SpringSetter's first argument.
+   */
+  function getNewValue(newValue: T | ((prev: T) => T)) {
+    if (typeof newValue === "function") {
+      return newValue(lastValue);
+    }
 
-  const [current_token, setCurrentToken] = createSignal<object>();
+    return newValue;
+  }
 
-  const [lastValue, setLastValue] = createSignal<T>(initialValue);
-  const [targetValue, setTargetValue] = createSignal<T | undefined>();
+  const set: SpringSetter<T> = untrack(() => (newValue, opts = {}) => {
+    targetValue = getNewValue(newValue);
 
-  const [inv_mass, setInvMass] = createSignal<number>(1);
-  const [inv_mass_recovery_rate, setInvMassRecoveryRate] = createSignal<number>(0);
-  const [cancelTask, setCancelTask] = createSignal<boolean>(false);
-
-  const set: SpringSetter<T> = (newValue, opts = {}) => {
-    setTargetValue(_ => newValue);
-
-    const token = current_token() ?? {};
-    setCurrentToken(token);
+    const token = current_token ?? {};
+    current_token = token;
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (springValue() == null || opts.hard || (stiffness >= 1 && damping >= 1)) {
-      setCancelTask(true);
-      setLastTime(raf.now());
-      setLastValue(_ => newValue);
-      setSpringValue(_ => newValue);
+      cancelTask = true;
+      lastTime = raf.now();
+      lastValue = getNewValue(newValue);
+      setSpringValue(_ => getNewValue(newValue));
       return Promise.resolve();
     } else if (opts.soft) {
       const rate = opts.soft === true ? 0.5 : +opts.soft;
-      setInvMassRecoveryRate(1 / (rate * 60));
-      setInvMass(0); // Infinite mass, unaffected by spring forces.
+      inv_mass_recovery_rate = 1 / (rate * 60);
+      inv_mass = 0; // Infinite mass, unaffected by spring forces.
     }
-    if (!task()) {
-      setLastTime(raf.now());
-      setCancelTask(false);
+    if (!task) {
+      lastTime = raf.now();
+      cancelTask = false;
 
       const _loop = loop(now => {
-        if (cancelTask()) {
-          setCancelTask(false);
-          setTask(null);
+        if (cancelTask) {
+          cancelTask = false;
+          task = null;
           return false;
         }
 
-        setInvMass(_inv_mass => Math.min(_inv_mass + inv_mass_recovery_rate(), 1));
+        inv_mass = Math.min(inv_mass + inv_mass_recovery_rate, 1);
 
         const ctx: TickContext<T> = {
-          inv_mass: inv_mass(),
+          inv_mass: inv_mass,
           opts: {
             set: set,
             damping: damping,
@@ -224,34 +215,27 @@ export function createSpring<T extends SpringTarget>(
             stiffness: stiffness,
           },
           settled: true,
-          dt: ((now - lastTime()) * 60) / 1000,
+          dt: ((now - lastTime) * 60) / 1000,
         };
-        // @ts-ignore
-        const next_value = tick_spring(
-          ctx,
-          lastValue(),
-          springValue(),
-          // @ts-ignore
-          targetValue(),
-        );
-        setLastTime(now);
-        setLastValue(_ => springValue());
+        const next_value = tick_spring(ctx, lastValue, springValue(), targetValue!);
+        lastTime = now;
+        lastValue = springValue();
         setSpringValue(_ => next_value);
         if (ctx.settled) {
-          setTask(null);
+          task = null;
         }
 
         return !ctx.settled;
       });
 
-      setTask(_loop);
+      task = _loop;
     }
     return new Promise<void>(fulfil => {
-      task()?.promise.then(() => {
-        if (token === current_token()) fulfil();
+      task?.promise.then(() => {
+        if (token === current_token) fulfil();
       });
     });
-  };
+  });
 
   const tick_spring = <T extends SpringTarget>(
     ctx: TickContext<T>,
@@ -300,7 +284,10 @@ export function createSpring<T extends SpringTarget>(
     }
   };
 
-  return [springValue as Accessor<WidenSpringTarget<T>>, set as SpringSetter<WidenSpringTarget<T>>];
+  return [
+    springValue as Accessor<WidenSpringTarget<T>>,
+    set as unknown as SpringSetter<WidenSpringTarget<T>>,
+  ];
 }
 
 // ===========================================================================
@@ -326,14 +313,7 @@ export function createDerivedSpring<T extends SpringTarget>(
 ) {
   const [springValue, setSpringValue] = createSpring(target(), options);
 
-  createEffect(
-    on(
-      () => target(),
-      () => {
-        setSpringValue(target() as WidenSpringTarget<T>);
-      },
-    ),
-  );
+  createEffect(() => setSpringValue(target() as WidenSpringTarget<T>));
 
   return springValue;
 }
