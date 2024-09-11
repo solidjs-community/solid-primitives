@@ -1,35 +1,34 @@
 /* eslint-disable no-console */
-import fse from "fs-extra";
-import fsp from "fs/promises";
-import path from "path";
-import url from "url";
-import { checkValidPackageName } from "./utils/index.js";
+import * as fsp from "node:fs/promises";
+import * as path from "node:path";
+import * as url from "node:url";
+import * as utils from "./utils/index.js";
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const name = process.argv.pop();
 
-if (!name || !checkValidPackageName(name))
+if (!name || !utils.checkValidPackageName(name))
   throw new Error(`Incorrect package name argument: "${name}"`);
 
-const templateSrc = path.resolve(dirname, "../template");
-const destSrc = path.resolve(dirname, "../packages", name);
-const pkgPath = path.join(destSrc, "package.json");
-const readmePath = path.join(destSrc, "README.md");
+const template_path = path.resolve(dirname, "../template");
+const dst_path      = path.resolve(dirname, "../packages", name);
+const pkg_path      = path.join(dst_path, "package.json");
+const readme_path   = path.join(dst_path, "README.md");
 
 (async () => {
-  const alreadyExists = await fse.pathExists(destSrc);
+  const alreadyExists = await utils.pathExists(dst_path);
   if (alreadyExists) throw `Package ${name} already exists.`;
 
   try {
     // copy /template -> /packages/{name}
-    await fse.copy(templateSrc, destSrc);
+    await utils.copyDirectory(template_path, dst_path);
 
     // replace "template-primitive" -> {name} in package.json
     fsp
-      .readFile(pkgPath, "utf8")
+      .readFile(pkg_path, "utf8")
       .then(pkg => {
         pkg = pkg.replace(/template-primitive/g, name);
-        fsp.writeFile(pkgPath, pkg);
+        fsp.writeFile(pkg_path, pkg);
       })
       .catch(error => {
         console.log("replace package.json failed");
@@ -38,10 +37,10 @@ const readmePath = path.join(destSrc, "README.md");
 
     // replace "template-primitive" -> {name} in README.md
     fsp
-      .readFile(readmePath, "utf8")
+      .readFile(readme_path, "utf8")
       .then(readme => {
         readme = readme.replace(/template-primitive/g, name);
-        fsp.writeFile(readmePath, readme);
+        fsp.writeFile(readme_path, readme);
       })
       .catch(error => {
         console.log("replace README.md failed");
