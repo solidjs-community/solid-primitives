@@ -4,7 +4,7 @@ import { createDerivedSpring, createSpring } from "../src/index.js";
 
 describe("createSpring", () => {
   it("returns values", () => {
-    const { value, setValue, dispose } = createRoot(dispose => {
+    const { setValue, dispose } = createRoot(dispose => {
       const [value, setValue] = createSpring({ progress: 0 });
       expect(value().progress, "initial value should be { progress: 0 }").toBe(0);
 
@@ -22,7 +22,7 @@ describe("createSpring", () => {
     });
 
     expect(springed()).toBe(0);
-    setSpringed(50); // Set to 100 here.
+    setSpringed(50);
 
     // Not sure if this will be erratic.
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -37,20 +37,14 @@ describe("createSpring", () => {
     const start = 0;
     const end = 50;
 
-    let dispose!: () => void;
-    let setSpringed!: (
-      newValue: number,
-      opts?: { hard?: boolean; soft?: boolean },
-    ) => Promise<void>;
-    let springed!: () => number;
+    const { springed, setSpringed, dispose } = createRoot(dispose => {
+      const [springed, setSpringed] = createSpring(start);
 
-    createRoot(d => {
-      dispose = d;
-      [springed, setSpringed] = createSpring(start);
+      return { springed, setSpringed, dispose };
     });
 
     expect(springed()).toBe(start);
-    setSpringed(end, { hard: true }); // Set to 100 here.
+    setSpringed(end, { hard: true });
 
     expect(springed()).toBe(end);
 
@@ -61,13 +55,10 @@ describe("createSpring", () => {
     const start = new Date("2024-04-14T00:00:00.000Z");
     const end = new Date("2024-04-14T00:00:00.000Z");
 
-    let dispose!: () => void;
-    let setSpringed!: (newValue: Date, opts?: { hard?: boolean; soft?: boolean }) => Promise<void>;
-    let springed!: () => Date;
+    const { springed, setSpringed, dispose } = createRoot(dispose => {
+      const [springed, setSpringed] = createSpring(start);
 
-    createRoot(d => {
-      dispose = d;
-      [springed, setSpringed] = createSpring(start);
+      return { springed, setSpringed, dispose };
     });
 
     expect(springed().getDate()).toBe(start.getDate());
@@ -78,20 +69,14 @@ describe("createSpring", () => {
     dispose();
   });
 
-  it("instantly updates `{ progress: 1}` when set with hard.", () => {
+  it("instantly updates `{ progress: 1 }` when set with hard.", () => {
     const start = { progress: 1 };
     const end = { progress: 100 };
 
-    let dispose!: () => void;
-    let setSpringed!: (
-      newValue: { progress: number },
-      opts?: { hard?: boolean; soft?: boolean },
-    ) => Promise<void>;
-    let springed!: () => { progress: number };
+    const { springed, setSpringed, dispose } = createRoot(dispose => {
+      const [springed, setSpringed] = createSpring(start);
 
-    createRoot(d => {
-      dispose = d;
-      [springed, setSpringed] = createSpring(start);
+      return { springed, setSpringed, dispose };
     });
 
     expect(springed()).toMatchObject(start);
@@ -106,16 +91,10 @@ describe("createSpring", () => {
     const start = [1, 2, 3];
     const end = [20, 15, 20];
 
-    let dispose!: () => void;
-    let setSpringed!: (
-      newValue: number[],
-      opts?: { hard?: boolean; soft?: boolean },
-    ) => Promise<void>;
-    let springed!: () => number[];
+    const { springed, setSpringed, dispose } = createRoot(dispose => {
+      const [springed, setSpringed] = createSpring(start);
 
-    createRoot(d => {
-      dispose = d;
-      [springed, setSpringed] = createSpring(start);
+      return { springed, setSpringed, dispose };
     });
 
     expect(springed()).toMatchObject(start);
@@ -125,18 +104,52 @@ describe("createSpring", () => {
 
     dispose();
   });
+
+  it("instantly updates `number` when set with hard using a function as an argument.", () => {
+    const start = 0;
+    const end = 50;
+
+    const { springed, setSpringed, dispose } = createRoot(dispose => {
+      const [springed, setSpringed] = createSpring(start);
+
+      return { springed, setSpringed, dispose };
+    });
+
+    expect(springed()).toBe(start);
+    setSpringed(_ => end, { hard: true }); // Using a function as an argument.
+
+    expect(springed()).toBe(end);
+
+    dispose();
+  });
+
+  it("instantly updates `{ progress: 1 }` when set with hard using a function as an argument.", () => {
+    const start = { progress: 1 };
+    const end = { progress: 100 };
+
+    const { springed, setSpringed, dispose } = createRoot(dispose => {
+      const [springed, setSpringed] = createSpring({ progress: 1 });
+
+      return { springed, setSpringed, dispose };
+    });
+
+    expect(springed()).toMatchObject(start);
+    setSpringed(_ => ({ progress: 100 }), { hard: true }); // Using a function as an argument.
+
+    expect(springed()).toMatchObject(end);
+
+    dispose();
+  });
 });
 
 describe("createDerivedSpring", () => {
   it("updates toward accessor target", async () => {
-    let dispose!: () => void;
-
-    let springed!: () => number;
     const [signal, setSignal] = createSignal(0);
 
-    createRoot(d => {
-      dispose = d;
-      springed = createDerivedSpring(signal);
+    const { springed, dispose } = createRoot(dispose => {
+      const springed = createDerivedSpring(signal);
+
+      return { springed, dispose };
     });
 
     expect(springed()).toBe(0);
