@@ -127,9 +127,6 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
-      solid-heroicons:
-        specifier: ^3.2.4
-        version: 3.2.4(solid-js@1.8.20)
       solid-js:
         specifier: ^1.8.7
         version: 1.8.20
@@ -6412,11 +6409,6 @@ packages:
     resolution: {integrity: sha512-fQeI+X5eVZWVRpkwnNHHXGrTkF3NzCOEKDTle7CCmsV4X0legjD2/rnnzVfWMFqCMJd7byfdrlMVVqjoZAuBDQ==}
     peerDependencies:
       solid-js: '1'
-
-  solid-heroicons@3.2.4:
-    resolution: {integrity: sha512-u6BMdFLvkJnvUGYzdFcWp1wvJ4hb9Y1zd3AbZ9D3bUmmiy9jBzNZX+RcqBCI2EKRvdQwAb1UB9bkESfqfhayDg==}
-    peerDependencies:
-      solid-js: '>= ^1.2.5'
 
   solid-icons@1.1.0:
     resolution: {integrity: sha512-IesTfr/F1ElVwH2E1110s2RPXH4pujKfSs+koT8rwuTAdleO5s26lNSpqJV7D1+QHooJj18mcOiz2PIKs0ic+A==}
@@ -13518,10 +13510,6 @@ snapshots:
       tslib: 2.6.3
 
   solid-dismiss@1.8.2(solid-js@1.8.20):
-    dependencies:
-      solid-js: 1.8.20
-
-  solid-heroicons@3.2.4(solid-js@1.8.20):
     dependencies:
       solid-js: 1.8.20
 
