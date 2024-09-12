@@ -11,12 +11,12 @@
 
 A library of reactive promitives helping handling user's keyboard input.
 
-- [`useKeyDownEvent`](#useKeyDownEvent) — Provides a signal with the last keydown event.
-- [`useKeyDownList`](#useKeyDownList) — Provides a signal with the list of currently held keys
-- [`useCurrentlyHeldKey`](#useCurrentlyHeldKey) — Provides a signal with the currently held single key.
-- [`useKeyDownSequence`](#useKeyDownSequence) — Provides a signal with a sequence of currently held keys, as they were pressed down and up.
-- [`createKeyHold`](#createKeyHold) — Provides a signal indicating if provided key is currently being held down.
-- [`createShortcut`](#createShortcut) — Creates a keyboard shotcut observer.
+- [`useKeyDownEvent`](#usekeydownevent) — Provides a signal with the last keydown event.
+- [`useKeyDownList`](#usekeydownlist) — Provides a signal with the list of currently held keys
+- [`useCurrentlyHeldKey`](#usecurrentlyheldkey) — Provides a signal with the currently held single key.
+- [`useKeyDownSequence`](#usekeydownsequence) — Provides a signal with a sequence of currently held keys, as they were pressed down and up.
+- [`createKeyHold`](#createkeyhold) — Provides a signal indicating if provided key is currently being held down.
+- [`createShortcut`](#createshortcut) — Creates a keyboard shotcut observer.
 
 ## Installation
 

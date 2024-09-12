@@ -11,13 +11,13 @@
 
 Collection of custom `createMemo` primitives. They extend it's functionality while keeping the usage similar.
 
-- [`createLatest`](#createLatest) - A combined memo of a list of sources, returns the value of last updated one.
-- [`createLatestMany`](#createLatestMany) - A combined memo of a list of sources, returns the value of all last updated ones.
-- [`createWritableMemo`](#createWritableMemo) - Solid's `createMemo` which value can be overwritten by a setter.
-- [`createLazyMemo`](#createLazyMemo) - Lazily evaluated memo. Will run the calculation only if is being listened to.
-- [`createPureReaction`](#createPureReaction) - A `createReaction` that runs before render _(non-batching)_.
-- [`createMemoCache`](#createMemoCache) - Custom, lazily-evaluated, memo, with caching based on keys.
-- [`createReducer`](#createReducer) - Primitive for updating signal in a predictable way.
+- [`createLatest`](#createlatest) - A combined memo of a list of sources, returns the value of last updated one.
+- [`createLatestMany`](#createlatestmany) - A combined memo of a list of sources, returns the value of all last updated ones.
+- [`createWritableMemo`](#createwritablememo) - Solid's `createMemo` which value can be overwritten by a setter.
+- [`createLazyMemo`](#createlazymemo) - Lazily evaluated memo. Will run the calculation only if is being listened to.
+- [`createPureReaction`](#createpurereaction) - A `createReaction` that runs before render _(non-batching)_.
+- [`createMemoCache`](#creatememocache) - Custom, lazily-evaluated, memo, with caching based on keys.
+- [`createReducer`](#createreducer) - Primitive for updating signal in a predictable way.
 
 ## Installation
 

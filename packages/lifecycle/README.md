@@ -11,9 +11,9 @@
 
 Package providing extra layer of lifecycle primitives for Solid.
 
-- [`createIsMounted`](#createIsMounted) - Returns a boolean signal indicating whether the component is mounted or not.
-- [`isHydrated`](#isHydrated) - A signal with the same behavior as [`isHydrating`](#isHydrating) but this one focused only on client-side updates.
-- [`onElementConnect`](#onElementConnect) - Calls the given callback when the target element is connected to the DOM.
+- [`createIsMounted`](#createismounted) - Returns a boolean signal indicating whether the component is mounted or not.
+- [`isHydrated`](#ishydrated) - A signal with the same behavior as [`isHydrating`](#ishydrating) but this one focused only on client-side updates.
+- [`onElementConnect`](#onelementconnect) - Calls the given callback when the target element is connected to the DOM.
 
 ## Installation
 

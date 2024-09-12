@@ -11,10 +11,10 @@
 
 Collection of reactive primitives to deal with media queries.
 
-- [`makeMediaQueryListener`](#makeMediaQueryListener) - Listen for changes to provided Media Query.
-- [`createMediaQuery`](#createMediaQuery) - Creates a very simple and straightforward media query monitor.
-- [`createBreakpoints`](#createBreakpoints) - Creates a multi-breakpoint monitor to make responsive components easily.
-- [`createPrefersDark`](#createPrefersDark) - Provides a signal indicating if the user has requested dark color theme.
+- [`makeMediaQueryListener`](#makemediaquerylistener) - Listen for changes to provided Media Query.
+- [`createMediaQuery`](#createmediaquery) - Creates a very simple and straightforward media query monitor.
+- [`createBreakpoints`](#createbreakpoints) - Creates a multi-breakpoint monitor to make responsive components easily.
+- [`createPrefersDark`](#createprefersdark) - Provides a signal indicating if the user has requested dark color theme.
 
 ## Installation
 

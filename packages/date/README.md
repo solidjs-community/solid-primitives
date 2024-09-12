@@ -11,13 +11,13 @@
 
 Collection of reactive primitives and utility functions, providing easier ways to deal with dates in SolidJS.
 
-- [`createDate`](#createDate) - Creates a reactive `Date` signal.
-- [`createDateNow`](#createDateNow) - Creates an autoupdating and reactive `new Date()`.
-- [`createTimeDifference`](#createTimeDifference) - Provides a reactive time difference _(in ms)_ signal.
-- [`createTimeDifferenceFromNow`](#createTimeDifferenceFromNow) - Provides a autoupdating, reactive time difference _(in ms)_ from **now** as a signal.
-- [`createTimeAgo`](#createTimeAgo) - Provides a reactive, formatted, autoupdating date difference in relation to **now**.
-- [`createCountdown`](#createCountdown) - Provides a reactive broken down time remaining Store.
-- [`createCountdownFromNow`](#createCountdownFromNow) - Provides a reactive, autoupdating _(from **now**)_, broken down "time remaining" as a Store.
+- [`createDate`](#createdate) - Creates a reactive `Date` signal.
+- [`createDateNow`](#createdatenow) - Creates an autoupdating and reactive `new Date()`.
+- [`createTimeDifference`](#createtimedifference) - Provides a reactive time difference _(in ms)_ signal.
+- [`createTimeDifferenceFromNow`](#createtimedifferencefromnow) - Provides a autoupdating, reactive time difference _(in ms)_ from **now** as a signal.
+- [`createTimeAgo`](#createtimeago) - Provides a reactive, formatted, autoupdating date difference in relation to **now**.
+- [`createCountdown`](#createcountdown) - Provides a reactive broken down time remaining Store.
+- [`createCountdownFromNow`](#createcountdownfromnow) - Provides a reactive, autoupdating _(from **now**)_, broken down "time remaining" as a Store.
 - \+ [some non-reactive date-related utility functions](#utility-functions).
 
 ## Installation

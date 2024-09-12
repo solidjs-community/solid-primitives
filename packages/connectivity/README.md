@@ -11,8 +11,8 @@
 
 A [`navigator.onLine`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/Online_and_offline_events) signal that tells you when the browser _thinks_ you're online. Connectivity is determined by your browser, which is a best-effort process.
 
-- [`makeConnectivityListener`](#makeConnectivityListener) - Attaches event listeners and fires callback whenever `window.onLine` changes.
-- [`createConnectivitySignal`](#createConnectivitySignal) - A signal representing the browser's interpretation of whether it is on- or offline.
+- [`makeConnectivityListener`](#makeconnectivitylistener) - Attaches event listeners and fires callback whenever `window.onLine` changes.
+- [`createConnectivitySignal`](#createconnectivitysignal) - A signal representing the browser's interpretation of whether it is on- or offline.
 
 ## Installation
 
@@ -57,7 +57,7 @@ isOnline(); // T: boolean
 
 This primitive provides a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) variant that will reuse event listeners and signals across dependents.
 
-It's behavior is the same as [`createConnectivitySignal`](#createConnectivitySignal).
+It's behavior is the same as [`createConnectivitySignal`](#createconnectivitysignal).
 
 ```ts
 import { useConnectivitySignal } from "@solid-primitives/connectivity";
