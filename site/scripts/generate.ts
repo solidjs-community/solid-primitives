@@ -229,4 +229,3 @@ async function generatePackageSize(module: ModuleData) {
 
   await fsp.writeFile(distPath, html);
 })();
-
