@@ -34,10 +34,10 @@ describe("combineProps", () => {
 
       combinedProps.onEvent();
 
-      expect(mockFn).toBeCalledTimes(3)
-      expect(mockFn).toHaveBeenNthCalledWith(1, message1)
-      expect(mockFn).toHaveBeenNthCalledWith(2, message2)
-      expect(mockFn).toHaveBeenNthCalledWith(3, message3)
+      expect(mockFn).toBeCalledTimes(3);
+      expect(mockFn).toHaveBeenNthCalledWith(1, message1);
+      expect(mockFn).toHaveBeenNthCalledWith(2, message2);
+      expect(mockFn).toHaveBeenNthCalledWith(3, message3);
 
       dispose();
     });
@@ -61,10 +61,10 @@ describe("combineProps", () => {
 
       combinedProps.onEvent();
 
-      expect(mockFn).toBeCalledTimes(3)
-      expect(mockFn).toHaveBeenNthCalledWith(1, message3)
-      expect(mockFn).toHaveBeenNthCalledWith(2, message2)
-      expect(mockFn).toHaveBeenNthCalledWith(3, message1)
+      expect(mockFn).toBeCalledTimes(3);
+      expect(mockFn).toHaveBeenNthCalledWith(1, message3);
+      expect(mockFn).toHaveBeenNthCalledWith(2, message2);
+      expect(mockFn).toHaveBeenNthCalledWith(3, message1);
 
       dispose();
     });
@@ -86,8 +86,8 @@ describe("combineProps", () => {
 
       combinedProps.onEvent();
 
-      expect(mockFn).toBeCalledTimes(1)
-      expect(mockFn).toHaveBeenNthCalledWith(1, message3)
+      expect(mockFn).toBeCalledTimes(1);
+      expect(mockFn).toHaveBeenNthCalledWith(1, message3);
 
       dispose();
     });
@@ -127,10 +127,10 @@ describe("combineProps", () => {
 
       (combinedProps as any).onClick();
 
-      expect(mockFn).toBeCalledTimes(3)
-      expect(mockFn).toHaveBeenNthCalledWith(1, message1)
-      expect(mockFn).toHaveBeenNthCalledWith(2, message2)
-      expect(mockFn).toHaveBeenNthCalledWith(3, message3)
+      expect(mockFn).toBeCalledTimes(3);
+      expect(mockFn).toHaveBeenNthCalledWith(1, message1);
+      expect(mockFn).toHaveBeenNthCalledWith(2, message2);
+      expect(mockFn).toHaveBeenNthCalledWith(3, message3);
 
       dispose();
     }));
@@ -152,18 +152,18 @@ describe("combineProps", () => {
 
       combinedProps.onClick();
 
-      expect(mockFn).toBeCalledTimes(2)
-      expect(mockFn).toHaveBeenNthCalledWith(1, click1)
-      expect(mockFn).toHaveBeenNthCalledWith(2, click2)
+      expect(mockFn).toBeCalledTimes(2);
+      expect(mockFn).toHaveBeenNthCalledWith(1, click1);
+      expect(mockFn).toHaveBeenNthCalledWith(2, click2);
 
       combinedProps.onFocus();
 
-      expect(mockFn).toHaveBeenLastCalledWith(focus)
+      expect(mockFn).toHaveBeenLastCalledWith(focus);
 
       combinedProps.onHover();
 
-      expect(mockFn).toHaveBeenLastCalledWith(hover)
-      expect(mockFn).toBeCalledTimes(4)
+      expect(mockFn).toHaveBeenLastCalledWith(hover);
+      expect(mockFn).toBeCalledTimes(4);
       expect(combinedProps.styles.margin).toBe(margin);
 
       dispose();
