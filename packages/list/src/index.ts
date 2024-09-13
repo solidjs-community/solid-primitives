@@ -10,7 +10,7 @@ import {
   type JSX,
   createMemo,
 } from "solid-js";
-import {isDev} from "solid-js/web"
+import { isDev } from "solid-js/web";
 
 type ListItem<T> = {
   value: T;

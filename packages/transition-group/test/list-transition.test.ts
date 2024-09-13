@@ -177,7 +177,10 @@ describe("createListTransition", () => {
     const [children, setChildren] = createSignal<Element[]>([el1, el2, el3]);
     const fn = vi.fn();
 
-    const [result, dispose] = createRoot(dispose => [createListTransition(children, {onChange: fn, exitMethod: "keep-index"}), dispose]);
+    const [result, dispose] = createRoot(dispose => [
+      createListTransition(children, { onChange: fn, exitMethod: "keep-index" }),
+      dispose,
+    ]);
 
     expect(result()).toHaveLength(3);
 
