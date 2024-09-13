@@ -705,9 +705,6 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
-      nanospy:
-        specifier: ^1.0.0
-        version: 1.0.0
       solid-js:
         specifier: ^1.8.7
         version: 1.8.20
@@ -5456,10 +5453,6 @@ packages:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
-
-  nanospy@1.0.0:
-    resolution: {integrity: sha512-wvmmALNstRRhLhy7RV11NCRY2k1zxstImiju4VyyKNNRIKDVjyBtmEd/Q4G82/3dN4VSTe+0PRR3DUAASSbEEQ==}
-    engines: {node: ^8.0.0 || ^10.0.0 || ^12.0.0 || ^14.0.0 || ^16.0.0 || ^18.0.0 || >=20.0.0}
 
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
@@ -12369,8 +12362,6 @@ snapshots:
       thenify-all: 1.6.0
 
   nanoid@3.3.7: {}
-
-  nanospy@1.0.0: {}
 
   natural-compare@1.4.0: {}
 

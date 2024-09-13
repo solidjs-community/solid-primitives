@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { createComputed, createRoot, createSignal, mergeProps } from "solid-js";
-import { spy } from "nanospy";
+import { createComputed, createRoot, createSignal, mergeProps, ValidComponent } from "solid-js";
+import { DynamicProps, Dynamic } from "solid-js/web";
 import { combineProps } from "../src/index.js";
 
 describe("combineProps", () => {
@@ -21,7 +21,7 @@ describe("combineProps", () => {
 
   it("combines handlers", async () => {
     createRoot(async dispose => {
-      const mockFn = spy();
+      const mockFn = vi.fn();
       const message1 = "click1";
       const message2 = "click2";
       const message3 = "click3";
@@ -34,8 +34,10 @@ describe("combineProps", () => {
 
       combinedProps.onEvent();
 
-      expect(mockFn.callCount).toBe(3);
-      expect(mockFn.calls).toEqual([[message1], [message2], [message3]]);
+      expect(mockFn).toBeCalledTimes(3)
+      expect(mockFn).toHaveBeenNthCalledWith(1, message1)
+      expect(mockFn).toHaveBeenNthCalledWith(2, message2)
+      expect(mockFn).toHaveBeenNthCalledWith(3, message3)
 
       dispose();
     });
@@ -43,7 +45,7 @@ describe("combineProps", () => {
 
   it("calls handlers in reverse", () => {
     createRoot(dispose => {
-      const mockFn = spy();
+      const mockFn = vi.fn();
       const message1 = "click1";
       const message2 = "click2";
       const message3 = "click3";
@@ -59,8 +61,10 @@ describe("combineProps", () => {
 
       combinedProps.onEvent();
 
-      expect(mockFn.callCount).toBe(3);
-      expect(mockFn.calls).toEqual([[message3], [message2], [message1]]);
+      expect(mockFn).toBeCalledTimes(3)
+      expect(mockFn).toHaveBeenNthCalledWith(1, message3)
+      expect(mockFn).toHaveBeenNthCalledWith(2, message2)
+      expect(mockFn).toHaveBeenNthCalledWith(3, message1)
 
       dispose();
     });
@@ -68,7 +72,7 @@ describe("combineProps", () => {
 
   it("event handlers can be overwritten", async () => {
     createRoot(async dispose => {
-      const mockFn = spy();
+      const mockFn = vi.fn();
       const message1 = "click1";
       const message2 = "click2";
       const message3 = "click3";
@@ -82,8 +86,8 @@ describe("combineProps", () => {
 
       combinedProps.onEvent();
 
-      expect(mockFn.callCount).toBe(1);
-      expect(mockFn.calls).toEqual([[message3]]);
+      expect(mockFn).toBeCalledTimes(1)
+      expect(mockFn).toHaveBeenNthCalledWith(1, message3)
 
       dispose();
     });
@@ -91,7 +95,7 @@ describe("combineProps", () => {
 
   it("last value overwrites the event-listeners", async () => {
     createRoot(async dispose => {
-      const mockFn = spy();
+      const mockFn = vi.fn();
       const message1 = "click1";
       const message2 = "click2";
 
@@ -110,7 +114,7 @@ describe("combineProps", () => {
 
   it("handles tuples as event handlers", () =>
     createRoot(dispose => {
-      const mockFn = spy();
+      const mockFn = vi.fn();
       const message1 = "click1";
       const message2 = "click2";
       const message3 = "click3";
@@ -123,15 +127,17 @@ describe("combineProps", () => {
 
       (combinedProps as any).onClick();
 
-      expect(mockFn.callCount).toBe(3);
-      expect(mockFn.calls).toEqual([[message1], [message2], [message3]]);
+      expect(mockFn).toBeCalledTimes(3)
+      expect(mockFn).toHaveBeenNthCalledWith(1, message1)
+      expect(mockFn).toHaveBeenNthCalledWith(2, message2)
+      expect(mockFn).toHaveBeenNthCalledWith(3, message3)
 
       dispose();
     }));
 
   it("merges props with different keys", async () => {
     createRoot(async dispose => {
-      const mockFn = spy();
+      const mockFn = vi.fn();
       const click1 = "click1";
       const click2 = "click2";
       const hover = "hover";
@@ -146,16 +152,18 @@ describe("combineProps", () => {
 
       combinedProps.onClick();
 
-      expect(mockFn.calls).toEqual([[click1], [click2]]);
+      expect(mockFn).toBeCalledTimes(2)
+      expect(mockFn).toHaveBeenNthCalledWith(1, click1)
+      expect(mockFn).toHaveBeenNthCalledWith(2, click2)
 
       combinedProps.onFocus();
 
-      expect(mockFn.calls[2]).toEqual([focus]);
+      expect(mockFn).toHaveBeenLastCalledWith(focus)
 
       combinedProps.onHover();
 
-      expect(mockFn.calls[3]).toEqual([hover]);
-      expect(mockFn.callCount).toEqual(4);
+      expect(mockFn).toHaveBeenLastCalledWith(hover)
+      expect(mockFn).toBeCalledTimes(4)
       expect(combinedProps.styles.margin).toBe(margin);
 
       dispose();
