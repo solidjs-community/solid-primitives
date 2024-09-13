@@ -43,21 +43,21 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     return super.size;
   }
 
-  *keys(): IterableIterator<K> {
+  *keys(): MapIterator<K> {
     for (const key of super.keys()) {
       this.#keyTriggers.track(key);
       yield key;
     }
     this.#keyTriggers.track($KEYS);
   }
-  *values(): IterableIterator<V> {
+  *values(): MapIterator<V> {
     for (const [key, v] of super.entries()) {
       this.#valueTriggers.track(key);
       yield v;
     }
     this.#keyTriggers.track($KEYS);
   }
-  *entries(): IterableIterator<[K, V]> {
+  *entries(): MapIterator<[K, V]> {
     for (const entry of super.entries()) {
       this.#valueTriggers.track(entry[0]);
       yield entry;
@@ -112,7 +112,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     }
   }
 
-  [Symbol.iterator](): IterableIterator<[K, V]> {
+  [Symbol.iterator](): MapIterator<[K, V]> {
     return this.entries();
   }
 }
