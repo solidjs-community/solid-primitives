@@ -1,5 +1,11 @@
 # @solid-primitives/map
 
+## 0.4.12
+
+### Patch Changes
+
+- 1ea2a09: Use new Map/SetIterator types
+
 ## 0.4.11
 
 ### Patch Changes
