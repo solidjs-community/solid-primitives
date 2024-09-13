@@ -4,18 +4,27 @@ import { destructure } from "../src/index.js";
 
 describe("destructure", () => {
   test("props", () => {
-    const [get_count, set_count] = createSignal(0)
-    const [get_label, set_label] = createSignal("foo")
-    const [get_highlight, set_highlight] = createSignal(false)
+    const [get_count, set_count] = createSignal(0);
+    const [get_label, set_label] = createSignal("foo");
+    const [get_highlight, set_highlight] = createSignal(false);
 
     const props: { count: number; label: string; highlight: boolean } = {
-      get count()     {return get_count()},
-      get label()     {return get_label()},
-      get highlight() {return get_highlight()},
-    }
+      get count() {
+        return get_count();
+      },
+      get label() {
+        return get_label();
+      },
+      get highlight() {
+        return get_highlight();
+      },
+    };
 
-    const [{count, label, highlight}, dispose] = createRoot(dispose => [destructure(props), dispose])
-    
+    const [{ count, label, highlight }, dispose] = createRoot(dispose => [
+      destructure(props),
+      dispose,
+    ]);
+
     expect(count()).toBe(0);
     expect(label()).toBe("foo");
     expect(highlight()).toBe(false);
@@ -29,7 +38,7 @@ describe("destructure", () => {
     expect(highlight()).toBe(true);
 
     dispose();
-  })
+  });
 
   test("spread array", () =>
     createRoot(dispose => {
