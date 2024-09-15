@@ -1,5 +1,11 @@
 # @solid-primitives/mouse
 
+## 2.0.20
+
+### Patch Changes
+
+- 7e7888a: Add `SVGSVGElement` to allowed target types.
+
 ## 2.0.19
 
 ### Patch Changes
