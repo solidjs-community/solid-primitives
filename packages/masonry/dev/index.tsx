@@ -41,8 +41,7 @@ const App: Component = () => {
       const l = Math.random() * 50 + 25;
       return (
         <div
-          class="center-child cursor-pointer rounded outline-dashed 
-          hover:z-10 hover:scale-105 hover:shadow-lg"
+          class="center-child cursor-pointer rounded outline-dashed hover:z-10 hover:scale-105 hover:shadow-lg"
           style={{
             height: `${item.source.height() + item.margin()}px`,
             // "margin-bottom": `${item.margin()}px`,

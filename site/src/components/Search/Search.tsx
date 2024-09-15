@@ -134,7 +134,7 @@ const Search: Component<{
             classList={{ hidden: !result().length }}
           >
             <div
-              class="-z-1 absolute left-4 right-4 top-[-16px]  h-[16px] shadow-lg shadow-[#24405966] transition dark:shadow-[#05121dbf]"
+              class="-z-1 absolute left-4 right-4 top-[-16px] h-[16px] shadow-lg shadow-[#24405966] transition dark:shadow-[#05121dbf]"
               classList={{
                 "opacity-0": !showShadow(),
                 "opacity-100": showShadow(),

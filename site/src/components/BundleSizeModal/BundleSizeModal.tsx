@@ -185,7 +185,7 @@ const BundleSizeModal: Component<{
       </div>
       <p>
         <a
-          class=" anchor-tag text-sm hover:opacity-100 dark:opacity-60"
+          class="anchor-tag text-sm hover:opacity-100 dark:opacity-60"
           href="https://jvns.ca/blog/2013/10/23/day-15-how-gzip-works/"
           target="_blank"
           rel="noopener"
