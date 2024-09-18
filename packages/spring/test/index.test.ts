@@ -1,35 +1,65 @@
 import { createRoot, createSignal } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, afterAll, beforeAll, beforeEach } from "vitest";
 import { createDerivedSpring, createSpring } from "../src/index.js";
 
+let _raf_last_id = 0;
+let _raf_callbacks_old = new Map<number, FrameRequestCallback>();
+let _raf_callbacks_new = new Map<number, FrameRequestCallback>();
+
+function _progress_time(by: number) {
+  const start = performance.now();
+  vi.advanceTimersByTime(by);
+
+  _raf_callbacks_old = _raf_callbacks_new;
+  _raf_callbacks_new = new Map();
+  _raf_callbacks_old.forEach(c => c(start + by));
+  _raf_callbacks_old.clear();
+}
+
+vi.stubGlobal("requestAnimationFrame", function (callback: FrameRequestCallback): number {
+  const id = _raf_last_id++;
+  _raf_callbacks_new.set(id, callback);
+  return id;
+});
+vi.stubGlobal("cancelAnimationFrame", function (id: number): void {
+  _raf_callbacks_new.delete(id);
+});
+
+beforeAll(() => {
+  vi.useFakeTimers();
+});
+
+beforeEach(() => {
+  vi.clearAllTimers();
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+  _raf_callbacks_old.clear();
+  _raf_callbacks_new.clear();
+  _raf_last_id = 0;
+});
+
 describe("createSpring", () => {
+
   it("returns values", () => {
-    const { setValue, dispose } = createRoot(dispose => {
-      const [value, setValue] = createSpring({ progress: 0 });
-      expect(value().progress, "initial value should be { progress: 0 }").toBe(0);
-
-      return { value, setValue, dispose };
-    });
-
-    setValue({ progress: 100 });
+    const [[spring, setSpring], dispose] = createRoot(d => [createSpring({ progress: 0 }), d]);
+    expect(spring().progress).toBe(0);
     dispose();
   });
 
-  it("updates toward target", async () => {
-    const { dispose, springed, setSpringed } = createRoot(dispose => {
-      const [springed, setSpringed] = createSpring(0);
-      return { dispose, springed, setSpringed };
-    });
+  it("updates toward target", () => {
+    const [[spring, setSpring], dispose] = createRoot(d => [createSpring(0), d]);
 
-    expect(springed()).toBe(0);
-    setSpringed(50);
+    expect(spring()).toBe(0);
+    setSpring(50);
+    expect(spring()).toBe(0);
 
-    // Not sure if this will be erratic.
-    await new Promise(resolve => setTimeout(resolve, 300));
+    _progress_time(300)
 
     // spring() should move towards 50 but not 50 after 300ms. (This is estimated spring interpolation is hard to pinpoint exactly)
-    expect(springed()).not.toBe(50);
-    expect(springed()).toBeGreaterThan(50 / 2);
+    expect(spring()).not.toBe(50);
+    expect(spring()).toBeGreaterThan(50 / 2);
     dispose();
   });
 
@@ -37,16 +67,12 @@ describe("createSpring", () => {
     const start = 0;
     const end = 50;
 
-    const { springed, setSpringed, dispose } = createRoot(dispose => {
-      const [springed, setSpringed] = createSpring(start);
+    const [[spring, setSpring], dispose] = createRoot(d => [createSpring(start), d]);
 
-      return { springed, setSpringed, dispose };
-    });
+    expect(spring()).toBe(start);
+    setSpring(end, { hard: true });
 
-    expect(springed()).toBe(start);
-    setSpringed(end, { hard: true });
-
-    expect(springed()).toBe(end);
+    expect(spring()).toBe(end);
 
     dispose();
   });
@@ -55,16 +81,12 @@ describe("createSpring", () => {
     const start = new Date("2024-04-14T00:00:00.000Z");
     const end = new Date("2024-04-14T00:00:00.000Z");
 
-    const { springed, setSpringed, dispose } = createRoot(dispose => {
-      const [springed, setSpringed] = createSpring(start);
+    const [[spring, setSpring], dispose] = createRoot(d => [createSpring(start), d]);
 
-      return { springed, setSpringed, dispose };
-    });
+    expect(spring().getDate()).toBe(start.getDate());
+    setSpring(end, { hard: true }); // Set to 100 here.
 
-    expect(springed().getDate()).toBe(start.getDate());
-    setSpringed(end, { hard: true }); // Set to 100 here.
-
-    expect(springed().getDate()).toBe(end.getDate());
+    expect(spring().getDate()).toBe(end.getDate());
 
     dispose();
   });
@@ -73,16 +95,12 @@ describe("createSpring", () => {
     const start = { progress: 1 };
     const end = { progress: 100 };
 
-    const { springed, setSpringed, dispose } = createRoot(dispose => {
-      const [springed, setSpringed] = createSpring(start);
+    const [[spring, setSpring], dispose] = createRoot(d => [createSpring(start), d]);
 
-      return { springed, setSpringed, dispose };
-    });
+    expect(spring()).toMatchObject(start);
+    setSpring(end, { hard: true }); // Set to 100 here.
 
-    expect(springed()).toMatchObject(start);
-    setSpringed(end, { hard: true }); // Set to 100 here.
-
-    expect(springed()).toMatchObject(end);
+    expect(spring()).toMatchObject(end);
 
     dispose();
   });
@@ -91,16 +109,12 @@ describe("createSpring", () => {
     const start = [1, 2, 3];
     const end = [20, 15, 20];
 
-    const { springed, setSpringed, dispose } = createRoot(dispose => {
-      const [springed, setSpringed] = createSpring(start);
+    const [[spring, setSpring], dispose] = createRoot(d => [createSpring(start), d]);
 
-      return { springed, setSpringed, dispose };
-    });
+    expect(spring()).toMatchObject(start);
+    setSpring(end, { hard: true }); // Set to 100 here.
 
-    expect(springed()).toMatchObject(start);
-    setSpringed(end, { hard: true }); // Set to 100 here.
-
-    expect(springed()).toMatchObject(end);
+    expect(spring()).toMatchObject(end);
 
     dispose();
   });
@@ -109,16 +123,12 @@ describe("createSpring", () => {
     const start = 0;
     const end = 50;
 
-    const { springed, setSpringed, dispose } = createRoot(dispose => {
-      const [springed, setSpringed] = createSpring(start);
+    const [[spring, setSpring], dispose] = createRoot(d => [createSpring(start), d]);
 
-      return { springed, setSpringed, dispose };
-    });
+    expect(spring()).toBe(start);
+    setSpring(_ => end, { hard: true }); // Using a function as an argument.
 
-    expect(springed()).toBe(start);
-    setSpringed(_ => end, { hard: true }); // Using a function as an argument.
-
-    expect(springed()).toBe(end);
+    expect(spring()).toBe(end);
 
     dispose();
   });
@@ -127,40 +137,31 @@ describe("createSpring", () => {
     const start = { progress: 1 };
     const end = { progress: 100 };
 
-    const { springed, setSpringed, dispose } = createRoot(dispose => {
-      const [springed, setSpringed] = createSpring({ progress: 1 });
+    const [[spring, setSpring], dispose] = createRoot(d => [createSpring(start), d]);
 
-      return { springed, setSpringed, dispose };
-    });
+    expect(spring()).toMatchObject(start);
+    setSpring(_ => ({ progress: 100 }), { hard: true }); // Using a function as an argument.
 
-    expect(springed()).toMatchObject(start);
-    setSpringed(_ => ({ progress: 100 }), { hard: true }); // Using a function as an argument.
-
-    expect(springed()).toMatchObject(end);
+    expect(spring()).toMatchObject(end);
 
     dispose();
   });
 });
 
 describe("createDerivedSpring", () => {
-  it("updates toward accessor target", async () => {
+  it("updates toward accessor target", () => {
     const [signal, setSignal] = createSignal(0);
+    const [spring, dispose] = createRoot(d => [createDerivedSpring(signal), d]);
 
-    const { springed, dispose } = createRoot(dispose => {
-      const springed = createDerivedSpring(signal);
-
-      return { springed, dispose };
-    });
-
-    expect(springed()).toBe(0);
+    expect(spring()).toBe(0);
     setSignal(50); // Set to 100 here.
+    expect(spring()).toBe(0);
 
-    // Not sure if this will be erratic.
-    await new Promise(resolve => setTimeout(resolve, 300));
+    _progress_time(300)
 
     // spring() should move towards 50 but not 50 after 300ms. (This is estimated spring interpolation is hard to pinpoint exactly)
-    expect(springed()).not.toBe(50);
-    expect(springed()).toBeGreaterThan(50 / 2);
+    expect(spring()).not.toBe(50);
+    expect(spring()).toBeGreaterThan(50 / 2);
     dispose();
   });
 });
