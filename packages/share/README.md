@@ -11,9 +11,9 @@
 
 Primitives for supporting sharing of resources on social media and beyond.
 
-- [`createSocialShare`](#createSocialShare) - A primitive for sharing on social media and beyond.
-- [`makeWebShare`](#makeWebShare) - Generates a simple non-reactive WebShare primitive for sharing.
-- [`createWebShare`](#createWebShare) - Creates a reactive status about web share.
+- [`createSocialShare`](#createsocialshare) - A primitive for sharing on social media and beyond.
+- [`makeWebShare`](#makewebshare) - Generates a simple non-reactive WebShare primitive for sharing.
+- [`createWebShare`](#createwebshare) - Creates a reactive status about web share.
 
 ## Installation
 

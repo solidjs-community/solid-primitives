@@ -11,7 +11,7 @@
 
 Primitive for rectifying immutable values and dealing with immutability in Solid.
 
-- [`createImmutable`](#createImmutable) - Creates a store derived from the given immutable source.
+- [`createImmutable`](#createimmutable) - Creates a store derived from the given immutable source.
 
 ## Installation
 

@@ -33,17 +33,17 @@ export class ReactiveSet<T> extends Set<T> {
     return super.has(v);
   }
 
-  *keys(): IterableIterator<T> {
+  *keys(): SetIterator<T> {
     for (const key of super.keys()) {
       this.#triggers.track(key);
       yield key;
     }
     this.#triggers.track($KEYS);
   }
-  values(): IterableIterator<T> {
+  values(): SetIterator<T> {
     return this.keys();
   }
-  *entries(): IterableIterator<[T, T]> {
+  *entries(): SetIterator<[T, T]> {
     for (const key of super.keys()) {
       this.#triggers.track(key);
       yield [key, key];
@@ -51,7 +51,7 @@ export class ReactiveSet<T> extends Set<T> {
     this.#triggers.track($KEYS);
   }
 
-  [Symbol.iterator](): IterableIterator<T> {
+  [Symbol.iterator](): SetIterator<T> {
     return this.values();
   }
   forEach(callbackfn: (value: T, value2: T, set: this) => void) {

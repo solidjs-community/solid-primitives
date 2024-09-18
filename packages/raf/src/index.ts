@@ -87,4 +87,48 @@ function targetFPS(
   };
 }
 
-export { createRAF, createRAF as default, targetFPS };
+export type MsCounter = (() => number) & {
+  reset: () => void;
+  running: () => boolean;
+  start: () => void;
+  stop: () => void;
+};
+
+/**
+ * A primitive that creates a signal counting up milliseconds with a given frame rate to base your animations on.
+ *
+ * @param fps the frame rate, either as Accessor or number
+ * @param limit an optional limit, either as Accessor or number, after which the counter is reset
+ *
+ * @returns an Accessor returning the current number of milliseconds and the following methods:
+ * - `reset()`: manually resetting the counter
+ * - `running()`: returns if the counter is currently setRunning
+ * - `start()`: restarts the counter if stopped
+ * - `stop()`: stops the counter if running
+ *
+ * ```ts
+ * const ms = createMs(60);
+ * createEffect(() => ms() > 500000 ? ms.stop());
+ * return <rect x="0" y="0" height="10" width={Math.min(100, ms() / 5000)} />
+ * ```
+ */
+function createMs(fps: MaybeAccessor<number>, limit?: MaybeAccessor<number>): MsCounter {
+  const [ms, setMs] = createSignal(0);
+  let initialTs = 0;
+  const reset = () => {
+    initialTs = 0;
+  };
+  const [running, start, stop] = createRAF(
+    targetFPS(ts => {
+      initialTs ||= ts;
+      const ms = ts - initialTs;
+      setMs(ts - initialTs);
+      if (ms === (typeof limit === "function" ? limit() : limit)) reset();
+    }, fps),
+  );
+  start();
+  onCleanup(stop);
+  return Object.assign(ms, { reset, running, start, stop });
+}
+
+export { createMs, createRAF, createRAF as default, targetFPS };

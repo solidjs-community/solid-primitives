@@ -11,11 +11,11 @@
 
 A collection of helpers that aim to simplify using reactive primitives outside of reactive roots, and managing disposal of reactive roots.
 
-- [`createSubRoot`](#createSubRoot) - Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
-- [`createCallback`](#createCallback) - A wrapper for creating callbacks with `runWithOwner`.
-- [`createDisposable`](#createDisposable) - For disposing computations early – before the root cleanup.
-- [`createSingletonRoot`](#createSingletonRoot) - Share "global primitives" across multiple reactive scopes.
-- [`createRootPool`](#createRootPool) - Creates a pool of reactive roots, that can be reused.
+- [`createSubRoot`](#createsubroot) - Creates a reactive **sub root**, that will be automatically disposed when it's owner does.
+- [`createCallback`](#createcallback) - A wrapper for creating callbacks with `runWithOwner`.
+- [`createDisposable`](#createdisposable) - For disposing computations early – before the root cleanup.
+- [`createSingletonRoot`](#createsingletonroot) - Share "global primitives" across multiple reactive scopes.
+- [`createRootPool`](#createrootpool) - Creates a pool of reactive roots, that can be reused.
 
 ## Installation
 
@@ -98,7 +98,7 @@ For disposing computations early – before the root cleanup.
 
 ### How to use it
 
-Executes provided function in a [`createSubRoot`](#createSubRoot) _(auto-disposing root)_, and returns a dispose function, to dispose computations used inside before automatic cleanup.
+Executes provided function in a [`createSubRoot`](#createsubroot) _(auto-disposing root)_, and returns a dispose function, to dispose computations used inside before automatic cleanup.
 
 ```ts
 const dispose = createDisposable(dispose => {

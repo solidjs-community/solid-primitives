@@ -50,7 +50,7 @@ export interface PositionToElementOptions extends UseTouchOptions, FollowTouchOp
  * })
  */
 export function createMousePosition(
-  target?: MaybeAccessor<Window | Document | HTMLElement>,
+  target?: MaybeAccessor<SVGSVGElement | HTMLElement | Window | Document>,
   options: MousePositionOptions = {},
 ): MousePositionInside {
   const fallback: MousePositionInside = {
@@ -64,7 +64,7 @@ export function createMousePosition(
 
   const [state, setState] = createStaticStore(fallback);
 
-  const attachListeners = (el: Window | Document | HTMLElement | undefined) => {
+  const attachListeners = (el: SVGSVGElement | HTMLElement | Window | Document | undefined) => {
     makeMousePositionListener(el, setState, options);
     makeMouseInsideListener(el, setState.bind(void 0, "isInside"), options);
   };

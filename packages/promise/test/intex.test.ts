@@ -75,6 +75,18 @@ describe("raceTimeout", () => {
     await vi.advanceTimersByTimeAsync(100);
     expect(done).toBe(reason);
   });
+
+  // test("rejects before timeout", async () => {
+  //   let done: unknown;
+  //   const reason = new Error("raceTimeout rejection reason");
+  //   const rejectetPromise = Promise.reject();  //vitest complains about unhandled promises, even though it is handled later
+  //   raceTimeout([rejectetPromise], 100).then(
+  //     () => (done = true),
+  //     r => (done = r),
+  //   );
+  //   await vi.advanceTimersByTimeAsync(50);
+  //   expect(done).toBe(reason);
+  // });
 });
 
 describe("until", () => {

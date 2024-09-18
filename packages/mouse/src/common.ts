@@ -34,14 +34,14 @@ export const DEFAULT_RELATIVE_ELEMENT_POSITION: PositionRelativeToElement = {
  * Attaches event listeners to provided targat, listeneing for changes to the mouse/touch position.
  * @param target
  * ```ts
- * HTMLElement | Window | Document
+ * SVGSVGElement | HTMLElement | Window | Document
  * ```
  * @param callback function fired on every position change
  * @param options {@link UseTouchOptions} & {@link FollowTouchOptions}
  * @returns function removing all event listeners
  */
 export function makeMousePositionListener(
-  target: HTMLElement | Window | Document = window,
+  target: SVGSVGElement | HTMLElement | Window | Document = window,
   callback: (position: MousePosition) => void,
   options: UseTouchOptions & FollowTouchOptions = {},
 ): VoidFunction {
@@ -71,14 +71,14 @@ export function makeMousePositionListener(
  * Attaches event listeners to provided targat, listening for mouse/touch entering/leaving the element.
  * @param target
  * ```ts
- * HTMLElement | Window | Document
+ * SVGSVGElement | HTMLElement | Window | Document
  * ```
  * @param callback function fired on mouse leaving or entering the element
  * @param options {@link UseTouchOptions}
  * @returns function removing all event listeners
  */
 export function makeMouseInsideListener(
-  target: HTMLElement | Window | Document = window,
+  target: SVGSVGElement | HTMLElement | Window | Document = window,
   callback: (isInside: boolean) => void,
   options: UseTouchOptions = {},
 ): VoidFunction {

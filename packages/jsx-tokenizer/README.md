@@ -7,14 +7,14 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/jsx-tokenizer?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/jsx-tokenizer)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A set of primitives that help safely pass data through JSX to the parent component using [token components](#createToken).
+A set of primitives that help safely pass data through JSX to the parent component using [token components](#createtoken).
 
 This pattern is very useful when you want to use JSX to create a declarative API for your components. It lets you resolve the JSX structure and pass the data to the parent component without triggering rendering of the children - it puts the parent in control over what getting rendered.
 
-- [`createTokenizer`](#createTokenizer) — Creates a JSX Tokenizer that can be used to create multiple token components with the same id.
-- [`createToken`](#createToken) — Creates a token component for passing custom data through JSX structure.
-- [`resolveTokens`](#resolveTokens) — Resolves passed JSX structure, searching for tokens with the given tokenizer id.
-- [`isToken`](#isToken) — Checks if passed value is a token created by the corresponding jsx-tokenizer.
+- [`createTokenizer`](#createtokenizer) — Creates a JSX Tokenizer that can be used to create multiple token components with the same id.
+- [`createToken`](#createtoken) — Creates a token component for passing custom data through JSX structure.
+- [`resolveTokens`](#resolvetokens) — Resolves passed JSX structure, searching for tokens with the given tokenizer id.
+- [`isToken`](#istoken) — Checks if passed value is a token created by the corresponding jsx-tokenizer.
 
 ## Installation
 
@@ -149,7 +149,7 @@ A function similar to Solid's [`children()`](https://www.solidjs.com/docs/latest
 
 `resolveTokens` takes three parameters:
 
-- `tokenizer` - identity object returned by [`createTokenizer`](#createTokenizer) or a token component. An array of multiple tokenizers can be passed.
+- `tokenizer` - identity object returned by [`createTokenizer`](#createtokenizer) or a token component. An array of multiple tokenizers can be passed.
 - `fn` accessor that returns a JSX Element (e.g. `() => props.children`)
 - `options` options for the resolver:
   - `includeJSXElements` - if `true`, other JSX Elements will be included in the result array (default: `false`)

@@ -1,5 +1,57 @@
 # @solid-primitives/storage
 
+## 4.2.1
+
+### Patch Changes
+
+- 7e50e35: Fix `makePersisted` type narrowing
+
+## 4.2.0
+
+### Minor Changes
+
+- 89117a6: storage: expose init promise/value, resource: docs clarification
+
+## 4.1.0
+
+### Minor Changes
+
+- fd4e161: fixes utf8 escaping in cookieStorage
+
+## 4.0.0
+
+### Major Changes
+
+- 94d1bcc: storage: remove deprecated primitives, simplify types, add makeObjectStorage
+
+## 3.8.0
+
+### Minor Changes
+
+- b9d7b28: fix ssr handling
+
+## 3.7.1
+
+### Patch Changes
+
+- bebccc1: Set-Cookie header will be sent with trailing `, ` in some cases which prefixes the name in the browser too
+
+  Don't append false boolean values from `cookieOptions`
+  Stability improvements: ignore unexpected `cookieOption` keys
+
+## 3.7.0
+
+### Minor Changes
+
+- 4ec7533: storage: fix exports
+
+## 3.6.0
+
+### Minor Changes
+
+- bb4fc57: move tauri storage to submodule
+- 1382d8f: fix cookie serialization
+
 ## 3.5.0
 
 ### Minor Changes

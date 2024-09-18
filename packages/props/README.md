@@ -11,8 +11,8 @@
 
 Library of primitives focused around component props.
 
-- [`combineProps`](#combineProps) - Reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
-- [`filterProps`](#filterProps) - Create a new props object with only the property names that match the predicate.
+- [`combineProps`](#combineprops) - Reactively merges multiple props objects together while smartly combining some of Solid's JSX/DOM attributes.
+- [`filterProps`](#filterprops) - Create a new props object with only the property names that match the predicate.
 
 ## Installation
 

@@ -38,7 +38,7 @@ const App: Component = () => {
             step="0.1"
             max={audio.duration}
             value={audio.currentTime}
-            class="form-range w-40 cursor-pointer appearance-none rounded-3xl bg-gray-200 transition hover:bg-gray-300 focus:outline-none focus:ring-0 "
+            class="form-range w-40 cursor-pointer appearance-none rounded-3xl bg-gray-200 transition hover:bg-gray-300 focus:outline-none focus:ring-0"
           />
           <div class="flex px-2">
             <Icon class="w-6 text-blue-600" path={speakerWave} />

@@ -53,7 +53,7 @@ export function createServerCookie<T>(
 
   const [cookie, setCookie] = createSignal(
     deserialize(
-      parseCookie(isServer ? useRequest().request.headers.get("cookie") ?? "" : document.cookie)[
+      parseCookie(isServer ? (useRequest().request.headers.get("cookie") ?? "") : document.cookie)[
         name
       ],
     ),

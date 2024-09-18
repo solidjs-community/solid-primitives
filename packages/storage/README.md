@@ -25,11 +25,11 @@ yarn add @solid-primitives/storage
 `makePersisted` allows you to persist a signal or store in any synchronous or asynchronous Storage API:
 
 ```ts
-const [signal, setSignal] = makePersisted(createSignal("initial"), {storage: sessionStorage});
-const [store, setStore] = makePersisted(createStore({test: true}), {name: "testing"});
+const [signal, setSignal, init] = makePersisted(createSignal("initial"), {storage: sessionStorage});
+const [store, setStore, init] = makePersisted(createStore({test: true}), {name: "testing"});
 type PersistedOptions<Type, StorageOptions> = {
   // localStorage is default
-  storage?: Storage | StorageWithOptions | AsyncStorage | AsyncStorageWithOptions,
+  storage?: Storage | StorageWithOptions | AsyncStorage | AsyncStorageWithOptions | LocalForage,
   // only required for storage APIs with options
   storageOptions?: StorageOptions,
   // key in the storage API
@@ -63,6 +63,21 @@ const [resource] = createResource(fetcher, { storage: makePersisted(createSignal
 If you are using an asynchronous storage to persist the state of a resource, it might receive an update due to being
 initialized from the storage before or after the fetcher resolved. If the initialization resolves after the fetcher, its
 result is discarded not to overwrite more current data.
+
+### Using `makePersisted` with Suspense
+
+In case you are using an asynchronous storage and want the initialisation mesh into Suspense instead of mixing it with Show, we provide the output of the initialisation as third part of the returned tuple:
+
+```ts
+const [state, setState, init] = makePersisted(createStore({}), {
+  name: "state",
+  storage: localForage,
+});
+// run the resource so it is triggered
+createResource(() => init)[0]();
+```
+
+Now Suspense should be blocked until the initialisation is resolved.
 
 ### Different storage APIs
 
@@ -98,6 +113,26 @@ const [state, setState] = makePersisted(createSignal(), {
   storage: cookieStorage.withOptions({ expires: new Date(+new Date() + 3e10) }),
 });
 ```
+
+> HTTP headers are limited to 32kb, each header itself is limited to 16kb. So depending on your current headers, the space in `cookieStorage` is rather small. If the overall space is exceeded, subsequent requests will fail. We have no mechanism to prevent that, since we cannot infer all headers that the browser will set.
+
+> Browsers do not support most UTF8 and UTF16 characters in Cookies, so `cookieStorage` encodes those characters that are not supported using `encodeURIComponent`. To save space, only those characters not supported by all Browsers will be encoded.
+
+#### LocalForage
+
+LocalForage uses indexedDB or WebSQL if available to greatly increase the size of what can be stored. Just drop it in as a storage (only supported in the client):
+
+```ts
+import { isServer } from "solid-js/web";
+import { makePersisted } from "@solid-primtives/storage";
+import localforage from "localforage";
+
+const [state, setState] = makePersisted(createSignal(), {
+  storage: !isServer ? localforage : undefined,
+});
+```
+
+Keep in mind that it will only run on the client, so unless you have
 
 #### TauriStorage
 
@@ -138,14 +173,20 @@ fn main() {
 Once these preparations are finished, `tauriStorage(name?: string)` can be used as another storage option. To fallback to localStorage if the app does not run within tauri, you can check for `window.__TAURI_INTERNALS__`:
 
 ```ts
+import { tauriStorage } from "@solid-primitives/storage/tauri";
+
 const storage = window.__TAURI_INTERNALS__ ? tauriStorage() : localStorage;
 ```
 
-#### IndexedDB, WebSQL
+#### Object storage
 
-There is also [`localForage`](https://localforage.github.io/localForage/), which uses `IndexedDB`, `WebSQL`
-or `localStorage` to provide an asynchronous Storage API that can ideally store much more than the few Megabytes that
-are available in most browsers.
+This package also provides a way to create a storage API wrapper for an object called `makeObjectStorage(object)`. This is especially useful as a server fallback if you want to store the data in your user session or database object:
+
+```ts
+const [state, setState] = createPersisted(createSignal(), {
+  storage: globalThis.localStorage ?? makeObjectStorage(session.userState),
+});
+```
 
 #### Multiplexed storages
 
@@ -247,179 +288,6 @@ you can add a `.withOptions` method:
 const customStorage = addWithOptionsMethod(storage_supporting_options);
 const boundCustomStorage = customStorage.withOptions(myOptions);
 ```
-
----
-
-### Deprecated primitives:
-
-The previous implementation proved to be confusing and cumbersome for most people who just wanted to persist their
-signals and stores, so they are now deprecated and will soon be removed from this package.
-
-`createStorage` is meant to wrap any `localStorage`-like API to be as accessible as
-a [Solid Store](https://www.solidjs.com/docs/latest/api#createstore). The main differences are
-
-- that this store is persisted in whatever API is used,
-- that you can only use the topmost layer of the object and
-- that you have additional methods in an object as the third part of the returned tuple:
-
-```ts
-const [store, setStore, {
-  remove: (key: string) => void;
-  clear: () => void;
-  toJSON: () => ({[key: string]: string });
-}]
-= createStorage({api: sessionStorage, prefix: 'my-app'});
-
-setStore('key', 'value');
-store.key; // 'value'
-```
-
-The props object support the following parameters:
-
-`api`
-: An array of or a single `localStorage`-like storage API; default will be `localStorage` if it exists; an empty array
-or no API will not throw an error, but only ever get `null` and not actually persist anything
-
-`prefix`
-: A string that will be prefixed every key inside the API on set and get operations
-
-`serializer / deserializer`
-: A set of function to filter the input and output; the `serializer` takes an arbitrary object and returns a string,
-e.g. `JSON.stringify`, whereas the `deserializer` takes a string and returns the requested object again.
-
-`options`
-: For APIs that support options as third argument in the `getItem` and `setItem` method (see helper
-type `StorageWithOptions<O>`), you can add options they will receive on every operation.
-
----
-
-There are a number of convenience Methods primed with common storage APIs and our own version to use cookies:
-
-```ts
-createLocalStorage();
-createSessionStorage();
-createCookieStorage();
-```
-
----
-
-#### Asynchronous storage APIs
-
-In case you have APIs that persist data on the server or via `ServiceWorker` in
-a [`CookieStore`](https://wicg.github.io/cookie-store/#CookieStore), you can wrap them into an asynchronous
-storage (`AsyncStorage` or `AsyncStorageWithOptions` API) and use them with `createAsyncStorage`:
-
-```ts
-type CookieStoreOptions = {
-  path: string;
-  domain: string;
-  expires: DOMTimeStamp;
-  sameSite: "None" | "Lax" | "Strict"
-}
-const CookieStoreAPI: AsyncStorageWithOptions<CookieStoreOptions> = {
-  getItem: (key) => cookieStore.get(key),
-  getAll: () => cookieStore.getAll(),
-  setItem: (key: string, value: string, options: CookieStoreOptions = {}) => cookieStore.set({
-    ...options, name, value
-  }),
-  removeItem: (key) => cookieStore.delete(key),
-  clear: async () => {
-    const all = await cookieStore.getAll();
-    for (const key of all) {
-      await cookieStore.delete(key);
-    }
-  },
-  key: async (index: number) => {
-    const all = await cookieStore.getAll();
-    return Object.keys(all)[index];
-  }
-}
-)
-;
-
-const [cookies, setCookie, {
-  remove: (key: string) => void;
-  clear: () => void;
-  toJSON: () => ({[key: string]: string
-})
-;
-}]
-= createAsyncStorage({api: CookieStoreAPI, prefix: 'my-app', sync: false});
-
-await setStore('key', 'value');
-await store.key; // 'value'
-```
-
-It works exactly like a synchronous storage, with the exception that you have to `await` every single return value. Once
-the `CookieStore` API becomes more prevalent, we will integrate support out of the box.
-
-If you cannot use `document.cookie`, you can overwrite the entry point using the following tuple:
-
-```ts
-import {cookieStorage} from '@solid-primitives/storage';
-
-cookieStorage._cookies = [object
-:
-{
-  [name
-:
-  string
-]:
-  CookieProxy
-}
-,
-name: string
-]
-;
-```
-
-If you need to abstract an API yourself, you can use a getter and a setter:
-
-```ts
-const CookieAbstraction = {
-  get cookie() {
-    return myCookieJar.toString()
-  }
-  set cookie(cookie) {
-    const data = {};
-    cookie.replace(/([^=]+)=(?:([^;]+);?)/g, (_, key, value) => {
-      data[key] = value
-    });
-    myCookieJar.set(data);
-  }
-}
-cookieStorage._cookies = [CookieAbstraction, 'cookie'];
-```
-
----
-
-`createStorageSignal` is meant for those cases when you only need to conveniently access a single value instead of full
-access to the storage API:
-
-```ts
-const [value, setValue] = createStorageSignal("value", { api: cookieStorage });
-
-setValue("value");
-value(); // 'value'
-```
-
-As a convenient additional method, you can also use `createCookieStorageSignal(key, initialValue, options)`.
-
----
-
-### Options
-
-The properties of your `createStorage`/`createAsyncStorage`/`createStorageSignal` props are:
-
-- `api`: the (synchronous or
-  asynchronous) [Storage-like API](https://developer.mozilla.org/de/docs/Web/API/Web_Storage_API), default
-  is `localStorage`
-- `deserializer` (optional): a `deserializer` or parser for the stored data
-- `serializer` (optional): a `serializer` or string converter for the stored data
-- `options` (optional): default options for the set-call of Storage-like API, if supported
-- `prefix` (optional): a prefix for the Storage keys
-- `sync` (optional): if set to
-  false, [event synchronization](https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent) is disabled
 
 ## Demo
 

@@ -165,19 +165,19 @@ export function createControlledProp<T>(
       ? undefined
       : typeof options !== "object"
         ? (options as T)
-        : ((options as TestPropOptions<T>).initialValue as T | undefined) ??
+        : (((options as TestPropOptions<T>).initialValue as T | undefined) ??
           (defaultInitialValues[
             ((options as TestPropOptions<T>).type as
               | keyof typeof defaultInitialValues
               | undefined) ?? "object"
-          ] as T | undefined);
+          ] as T | undefined));
 
   if (initialValue == null) {
     throw new Error(`cannot get type for Prop ${name}`);
   }
   const propType = (options as TestPropOptions<T>).options
     ? "object"
-    : (options as TestPropOptions<T>).type ?? (typeof initialValue as TestPropType);
+    : ((options as TestPropOptions<T>).type ?? (typeof initialValue as TestPropType));
 
   const [value, setValue] = createSignal<T>(initialValue, { name });
   return [

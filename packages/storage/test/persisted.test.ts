@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import { makePersisted } from "../src/persisted.js";
-import { AsyncStorage } from "../src/types.js";
+import { AsyncStorage } from "../src/index.js";
 
 describe("makePersisted", () => {
   let data: Record<string, string> = {};
@@ -127,9 +127,18 @@ describe("makePersisted", () => {
     });
     expect(signal()).toBe("init");
     setSignal("overwritten");
-    if (resolve) {
-      resolve("persisted");
-    }
+    resolve("persisted");
     expect(signal()).toBe("overwritten");
+  });
+
+  it("exposes the initial value as third part of the return tuple", () => {
+    const anotherMockAsyncStorage = { ...mockAsyncStorage };
+    const promise = Promise.resolve("init");
+    anotherMockAsyncStorage.getItem = () => promise;
+    const [_signal, _setSignal, init] = makePersisted(createSignal("default"), {
+      storage: anotherMockAsyncStorage,
+      name: "test8",
+    });
+    expect(init).toBe(promise);
   });
 });

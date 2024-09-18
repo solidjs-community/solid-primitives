@@ -11,8 +11,8 @@
 
 The Javascript built-in `Set` & `WeakSet` data structures as a reactive signals.
 
-- **[`ReactiveSet`](#ReactiveSet)** - A reactive version of a Javascript built-in `Set` class.
-- **[`ReactiveWeakSet`](#ReactiveWeakSet)** - A reactive version of a Javascript built-in `WeakSet` class.
+- **[`ReactiveSet`](#reactiveset)** - A reactive version of a Javascript built-in `Set` class.
+- **[`ReactiveWeakSet`](#reactiveweakset)** - A reactive version of a Javascript built-in `WeakSet` class.
 
 ## Installation
 

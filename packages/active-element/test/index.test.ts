@@ -1,4 +1,3 @@
-import { fireEvent, createEvent } from "@solidjs/testing-library";
 import { createRoot } from "solid-js";
 import { describe, test, expect } from "vitest";
 import {
@@ -9,8 +8,12 @@ import {
   focus,
 } from "../src/index.js";
 
-const dispatchFocusEvent = (target: Element | Window = window, event: "focus" | "blur" = "focus") =>
-  fireEvent(target, createEvent(event, window));
+const dispatchFocusEvent = (
+  target: Element | Window = window,
+  event: "focus" | "blur" = "focus",
+) => {
+  target.dispatchEvent(new FocusEvent(event));
+};
 
 describe("makeActiveElementListener", () => {
   test("works properly", () =>

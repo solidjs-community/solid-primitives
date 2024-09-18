@@ -11,10 +11,10 @@
 
 A collection of SolidJS primitives providing various features of a pubsub/event-emitter/event-bus:
 
-- [`createEventBus`](#createEventBus) - Provides a simple way to listen to and emit events.
-- [`createEmitter`](#createEmitter) - Creates an emitter with which you can listen to and emit various events.
-- [`createEventHub`](#createEventHub) - Provides helpers for using a group of buses.
-- [`createEventStack`](#createEventStack) - Provides the emitted events as list/history, with tools to manage it.
+- [`createEventBus`](#createeventbus) - Provides a simple way to listen to and emit events.
+- [`createEmitter`](#createemitter) - Creates an emitter with which you can listen to and emit various events.
+- [`createEventHub`](#createeventhub) - Provides helpers for using a group of buses.
+- [`createEventStack`](#createeventstack) - Provides the emitted events as list/history, with tools to manage it.
 
 ## Installation
 
@@ -189,7 +189,7 @@ hub.myBus.value();
 
 ## `createEventStack`
 
-Extends [`createEmitter`](#createEmitter). Provides the emitted events in a list/history form, with tools to manage it.
+Extends [`createEmitter`](#createemitter). Provides the emitted events in a list/history form, with tools to manage it.
 
 ### How to use it
 

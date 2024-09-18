@@ -55,9 +55,7 @@ const Page: Component = () => {
       <Title>{formattedName()} — Solid Primitives</Title>
       <DocumentClass class="primitives-page-main" />
       <div
-        class="-z-1 absolute left-0 right-0 top-0 h-[95vh]
-        bg-[linear-gradient(to_bottom,#fff_var(--primitive-padding-top-gr),transparent)]
-        dark:bg-[linear-gradient(to_bottom,#293843_var(--primitive-padding-top-gr),transparent)]"
+        class="-z-1 absolute left-0 right-0 top-0 h-[95vh] bg-[linear-gradient(to_bottom,#fff_var(--primitive-padding-top-gr),transparent)] dark:bg-[linear-gradient(to_bottom,#293843_var(--primitive-padding-top-gr),transparent)]"
         style={{
           "--primitive-padding-top-gr": `${PRIMITIVE_PAGE_PADDING_TOP + 300}px`,
         }}

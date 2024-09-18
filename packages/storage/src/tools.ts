@@ -1,21 +1,29 @@
-import { AsyncStorage, AsyncStorageWithOptions, StorageWithOptions } from "./index.js";
+import {
+  SyncStorage,
+  AsyncStorage,
+  AsyncStorageWithOptions,
+  SyncStorageWithOptions,
+} from "./index.js";
 
 /**
  * adds a `.clear` method to a Storage without one only using `.key`/`.removeItem`
  */
-export const addClearMethod = <S extends Storage | StorageWithOptions<any>>(
+export const addClearMethod = <
+  S extends SyncStorage | SyncStorageWithOptions<any>,
+  R extends S & { clear: () => void },
+>(
   storage: Omit<S, "clear"> & { clear?: () => void },
-): S => {
+): R => {
   if (typeof storage.clear === "function") {
-    return storage as S;
+    return storage as R;
   }
-  (storage as S).clear = () => {
+  (storage as R).clear = () => {
     let key;
     while ((key = storage.key!(0))) {
       storage.removeItem!(key);
     }
   };
-  return storage as S;
+  return storage as R;
 };
 
 const methodKeys = ["clear", "getItem", "getAll", "setItem", "removeItem", "key", "getLength"];
@@ -25,14 +33,16 @@ const methodKeys = ["clear", "getItem", "getAll", "setItem", "removeItem", "key"
  */
 export const addWithOptionsMethod = <
   O,
-  S extends StorageWithOptions<O> | AsyncStorageWithOptions<O>,
-  W extends AsyncStorage | Storage = S extends AsyncStorageWithOptions<O> ? AsyncStorage : Storage,
+  S extends SyncStorageWithOptions<O> | AsyncStorageWithOptions<O>,
+  W extends AsyncStorage | SyncStorage = S extends AsyncStorageWithOptions<O>
+    ? AsyncStorage
+    : SyncStorage,
 >(
   storage: S,
 ): S & { withOptions: (options: O) => W } => {
   storage.withOptions = (options: O): W =>
     methodKeys.reduce(
-      (wrapped: Partial<S>, key: keyof S) => {
+      (wrapped, key: keyof S) => {
         if (typeof storage[key] === "function") {
           (wrapped as any)[key] = (...args: Parameters<(typeof storage)[typeof key]>) => {
             args[storage[key].length - 1] = options;
@@ -46,7 +56,7 @@ export const addWithOptionsMethod = <
           return storage.length;
         },
         withOptions: (options: O) => storage.withOptions!(options),
-      } as Partial<S>,
+      } as unknown as W,
     ) as unknown as W;
   return storage as S & { withOptions: (options: O) => W };
 };
@@ -74,7 +84,7 @@ const isNumber = (n: any): n is number => typeof n === "number";
 
 export type StorageMultiplexer = <S extends any[]>(
   ...storages: S
-) => AsyncStorage extends S[number] ? AsyncStorage : Storage;
+) => AsyncStorage extends S[number] ? AsyncStorage : SyncStorage;
 
 /**
  * combines multiple storages to a single storage
@@ -96,4 +106,25 @@ export const multiplexStorage: StorageMultiplexer = (...storages) => ({
       ? Promise.all(lengths).then(lens => Math.max(...lens.filter(isNumber)))
       : Math.max(...lengths.filter(isNumber))) as unknown as number;
   },
+});
+
+/**
+ * Provides a minimal Storage API wrapper for an object
+ */
+export const makeObjectStorage = (object: { [key: string]: string }) => ({
+  getItem: (key: string) => (Object.hasOwn(object, key) && object[key]) || null,
+  setItem: (key: string, value: string) => {
+    object[key] = value;
+  },
+  removeItem: (key: string) => {
+    delete object[key];
+  },
+  key: (index: number) => Object.keys(object)[index],
+  get length() {
+    return Object.keys(object).length;
+  },
+  clear: () =>
+    Object.keys(object).forEach(key => {
+      delete object[key];
+    }),
 });

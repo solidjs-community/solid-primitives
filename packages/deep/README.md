@@ -11,9 +11,9 @@
 
 Primitives for tracking and observing nested reactive objects in Solid.
 
-- [`trackDeep`](#trackDeep) - Tracks all properties of a store by iterating over them recursively.
-- [`trackStore`](#trackStore) - A more performant alternative to `trackDeep` utilizing specific store implementations.
-- [`captureStoreUpdates`](#captureStoreUpdates) - A utility function that captures all updates to a store and returns them as an array.
+- [`trackDeep`](#trackdeep) - Tracks all properties of a store by iterating over them recursively.
+- [`trackStore`](#trackstore) - A more performant alternative to `trackDeep` utilizing specific store implementations.
+- [`captureStoreUpdates`](#capturestoreupdates) - A utility function that captures all updates to a store and returns them as an array.
 
 ## Installation
 
@@ -121,7 +121,7 @@ setState("todos", ["foo"]);
 getDelta(); // [{ path: ["todos"], value: ["foo"] }]
 ```
 
-The returned function will track all updates to a store (just like [`trackStore`](#trackStore)), so it can be used inside a tracking scope.
+The returned function will track all updates to a store (just like [`trackStore`](#trackstore)), so it can be used inside a tracking scope.
 
 ```ts
 const [state, setState] = createStore({ todos: [] });

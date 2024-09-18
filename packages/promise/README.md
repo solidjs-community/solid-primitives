@@ -11,8 +11,8 @@
 
 A library of reactive primitives and helpers for handling promises.
 
-- [`promiseTimeout`](#promiseTimeout) — Creates a promise that resolves _(or rejects)_ after given time.
-- [`raceTimeout`](#raceTimeout) — Combination of `Promise.race()` and `promiseTimeout`.
+- [`promiseTimeout`](#promisetimeout) — Creates a promise that resolves _(or rejects)_ after given time.
+- [`raceTimeout`](#racetimeout) — Combination of `Promise.race()` and `promiseTimeout`.
 - [`until`](#until) — Promised one-time watch for changes. Await a reactive condition.
 
 ## Installation

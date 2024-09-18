@@ -11,8 +11,8 @@
 
 A library for creating Solid stores with implementing state management through explicit getters for reads and actions for writes.
 
-- [`createFluxStore`](#createFluxStore) — Creates a store instance with explicit getters and actions.
-- [`createFluxStoreFactory`](#createFluxStoreFactory) — Create a `FluxStore` encapsulated in a factory function for reusable store implementation.
+- [`createFluxStore`](#createfluxstore) — Creates a store instance with explicit getters and actions.
+- [`createFluxStoreFactory`](#createfluxstorefactory) — Create a `FluxStore` encapsulated in a factory function for reusable store implementation.
 
 ## Installation
 
