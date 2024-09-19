@@ -1,40 +1,5 @@
+import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
-
-// ===========================================================================
-// Internals
-// ===========================================================================
-
-// https://github.com/sveltejs/svelte/blob/main/packages/svelte/src/internal/client/types.d.ts
-
-type Task = {
-  abort(): void;
-  promise: Promise<void>;
-};
-
-type TickContext = {
-  inv_mass: number;
-  dt: number;
-  settled: boolean;
-};
-
-type TaskCallback = (now: number) => boolean | void;
-
-type TaskEntry = { c: TaskCallback; f: () => void };
-
-// https://github.com/sveltejs/svelte/blob/main/packages/svelte/src/internal/client/timing.js
-
-const raf: {
-  /** Alias for `requestAnimationFrame`, exposed in such a way that we can override in tests */
-  tick: (callback: (time: DOMHighResTimeStamp) => void) => any;
-  /** Alias for `performance.now()`, exposed in such a way that we can override in tests */
-  now: () => number;
-  /** A set of tasks that will run to completion, unless aborted */
-  tasks: Set<TaskEntry>;
-} = {
-  tick: (_: any) => (isServer ? () => {} : requestAnimationFrame(_)), // SSR-safe RAF function.
-  now: () => performance.now(), // Getter for now() using performance in browser and Date in server. Although both are available in node and browser.
-  tasks: new Set(),
-};
 
 // https://github.com/sveltejs/svelte/blob/main/packages/svelte/src/motion/utils.js
 
@@ -42,47 +7,9 @@ function is_date(obj: any): obj is Date {
   return Object.prototype.toString.call(obj) === "[object Date]";
 }
 
-// https://github.com/sveltejs/svelte/blob/main/packages/svelte/src/internal/client/loop.js
-
-function run_tasks(now: number) {
-  raf.tasks.forEach(task => {
-    if (!task.c(now)) {
-      raf.tasks.delete(task);
-      task.f();
-    }
-  });
-
-  if (raf.tasks.size !== 0) {
-    raf.tick(run_tasks);
-  }
-}
-
-/**
- * Creates a new task that runs on each raf frame
- * until it returns a falsy value or is aborted
- */
-function loop(callback: TaskCallback): Task {
-  let task: TaskEntry;
-
-  if (raf.tasks.size === 0) {
-    raf.tick(run_tasks);
-  }
-
-  return {
-    promise: new Promise((fulfill: any) => {
-      raf.tasks.add((task = { c: callback, f: fulfill }));
-    }),
-    abort() {
-      raf.tasks.delete(task);
-    },
-  };
-}
-
 // ===========================================================================
 // createSpring hook
 // ===========================================================================
-
-import { Accessor, createEffect, createSignal, untrack } from "solid-js";
 
 export type SpringOptions = {
   /**
@@ -114,8 +41,8 @@ export type SpringTarget =
   | number
   | Date
   | { [key: string]: number | Date | SpringTarget }
-  | (number | Date)[]
-  | SpringTarget[];
+  | readonly (number | Date)[]
+  | readonly SpringTarget[];
 
 /**
  * "Widen" Utility Type so that number types are not converted to
@@ -125,9 +52,10 @@ export type SpringTarget =
  */
 export type WidenSpringTarget<T> = T extends number ? number : T;
 
+export type SpringSetterOptions = { hard?: boolean; soft?: boolean | number }
 export type SpringSetter<T> = (
   newValue: T | ((prev: T) => T),
-  opts?: { hard?: boolean; soft?: boolean | number },
+  opts?: SpringSetterOptions,
 ) => Promise<void>;
 
 /**
@@ -151,113 +79,111 @@ export function createSpring<T extends SpringTarget>(
   initialValue: T,
   options: SpringOptions = {},
 ): [Accessor<WidenSpringTarget<T>>, SpringSetter<WidenSpringTarget<T>>] {
-  const [springValue, setSpringValue] = createSignal(initialValue);
+  const [signal, setSignal] = createSignal(initialValue);
   const { stiffness = 0.15, damping = 0.8, precision = 0.01 } = options;
 
-  let last_time = 0;
-  let task: Task | null = null;
-  let current_token: object | undefined = undefined;
-  let current_value = initialValue
-  let last_value = initialValue;
-  let target_value = initialValue;
+  if (isServer) {
+    return [signal as any, ((param: any, opts: SpringSetterOptions = {}) => {
+      if (opts.hard || signal() == null || (stiffness >= 1 && damping >= 1)) {
+        setSignal(param);
+        return Promise.resolve();
+      }
+      return new Promise(() => {});
+    }) as any]
+  }
+
+  let value_current = initialValue;
+  let value_last = initialValue;
+  let value_target = initialValue;
   let inv_mass = 1;
   let inv_mass_recovery_rate = 0;
-  let cancel_task = false;
+  let raf_id = 0
+  let settled = true
+  let time_last = 0;
+  let time_delta = 0
+  let resolve = () => {}
+
+  const cleanup = onCleanup(() => {
+    cancelAnimationFrame(raf_id)
+    raf_id = 0
+    resolve()
+  })
+
+  const frame: FrameRequestCallback = time => {
+    time_delta = (time - time_last) * 60 / 1000
+    time_last = time
+
+    inv_mass = Math.min(inv_mass + inv_mass_recovery_rate, 1)
+    settled = true
+
+    let new_value = tick(value_last, value_current, value_target)
+    value_last = value_current
+    setSignal(value_current = new_value)
+
+    if (settled) {
+      cleanup()
+    } else {
+      raf_id = requestAnimationFrame(frame)
+    }
+  }
 
   const set: SpringSetter<T> = (param, opts = {}) => {
-    target_value = typeof param === "function" ? param(current_value) : param;
+    value_target = typeof param === "function" ? param(value_current) : param;
 
-    const token = current_token ?? {};
-    current_token = token;
-
-    if (current_value == null || opts.hard || (stiffness >= 1 && damping >= 1)) {
-      cancel_task = true;
-      last_time = raf.now();
-      setSpringValue(_ => current_value = last_value = target_value);
+    if (opts.hard || (stiffness >= 1 && damping >= 1)) {
+      cleanup()
+      setSignal(_ => value_current = value_last = value_target);
       return Promise.resolve();
-    } else if (opts.soft) {
-      const rate = opts.soft === true ? 0.5 : +opts.soft;
-      inv_mass_recovery_rate = 1 / (rate * 60);
+    }
+
+    if (opts.soft) {
+      inv_mass_recovery_rate = 1 / (typeof opts.soft === "number" ? opts.soft * 60 : 30);
       inv_mass = 0; // Infinite mass, unaffected by spring forces.
     }
-    if (!task) {
-      last_time = raf.now();
-      cancel_task = false;
 
-      const _loop = loop(now => {
-        if (cancel_task) {
-          cancel_task = false;
-          task = null;
-          return false;
-        }
-
-        inv_mass = Math.min(inv_mass + inv_mass_recovery_rate, 1);
-
-        const ctx: TickContext = {
-          inv_mass: inv_mass,
-          settled: true,
-          dt: ((now - last_time) * 60) / 1000,
-        };
-        let new_value = tick_spring(ctx, last_value, current_value, target_value)
-        last_time = now;
-        last_value = current_value;
-        setSpringValue(current_value = new_value);
-        if (ctx.settled) {
-          task = null;
-        }
-
-        return !ctx.settled;
-      });
-
-      task = _loop;
+    if (raf_id === 0) {
+      time_last = performance.now()
+      raf_id = requestAnimationFrame(frame)
     }
-    return new Promise<void>(fulfil => {
-      task?.promise.then(() => {
-        if (token === current_token) fulfil();
-      });
-    });
+    
+    return new Promise<void>(r => resolve = r);
   };
 
-  const tick_spring = (
-    ctx: TickContext,
-    last_value: T,
-    current_value: T,
-    target_value: T,
-  ): any => {
-    if (typeof current_value === "number" || is_date(current_value)) {
-      const delta = +target_value - +current_value;
-      const velocity = (+current_value - +last_value) / (ctx.dt || 1 / 60); // guard div by 0
+  const tick = (last: T, current: T, target: T): any => {
+    if (typeof current === "number" || is_date(current)) {
+      const delta = +target - +current;
+      const velocity = (+current - +last) / (time_delta || 1 / 60); // guard div by 0
       const spring = stiffness * delta;
       const damper = damping * velocity;
-      const acceleration = (spring - damper) * ctx.inv_mass;
-      const d = (velocity + acceleration) * ctx.dt;
+      const acceleration = (spring - damper) * inv_mass;
+      const d = (velocity + acceleration) * time_delta;
+
       if (Math.abs(d) < precision && Math.abs(delta) < precision) {
-        return target_value; // settled
+        return target; // settled
       }
-      ctx.settled = false; // signal loop to keep ticking
-      return typeof current_value === "number" ? current_value + d : new Date(+current_value + d);
+
+      settled = false; // signal loop to keep ticking
+      return typeof current === "number" ? current + d : new Date(+current + d);
     }
-    if (Array.isArray(current_value)) {
-      return current_value.map((_, i) =>
-        // @ts-expect-error
-        tick_spring(ctx, last_value[i], current_value[i], target_value[i]),
-      );
+
+    if (Array.isArray(current)) {
+      // @ts-expect-error
+      return current.map((_, i) => tick(last[i], current[i], target[i]));
     }
-    if (typeof current_value === "object") {
-      const next_value = {...current_value};
-      for (const k in current_value) {
+
+    if (typeof current === "object") {
+      const next = {...current};
+      for (const k in current) {
         // @ts-expect-error
-        next_value[k] = tick_spring(ctx, last_value[k], current_value[k], target_value[k]);
+        next[k] = tick(last[k], current[k], target[k]);
       }
-      return next_value;
+      return next;
     }
-    throw new Error(`Cannot spring ${typeof current_value} values`);
+
+    throw new Error(`Cannot spring ${typeof current} values`);
   };
 
-  return [
-    springValue as Accessor<WidenSpringTarget<T>>,
-    set as unknown as SpringSetter<WidenSpringTarget<T>>,
-  ];
+  return [signal as any, set as any];
 }
 
 // ===========================================================================

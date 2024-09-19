@@ -48,18 +48,31 @@ describe("createSpring", () => {
     dispose();
   });
 
-  it("updates toward target", () => {
-    const [[spring, setSpring], dispose] = createRoot(d => [createSpring(0), d]);
+  it("Setter does not subscribe to self", () => {
+    let runs = 0
+    const [signal, setSignal] = createSignal(0)
+    
+    const [setSpring, dispose] = createRoot(dispose => {
+      const [, setSpring] = createSpring(0)
 
-    expect(spring()).toBe(0);
-    setSpring(50);
-    expect(spring()).toBe(0);
+      createEffect(() => {
+        runs++
+        setSpring(p => {
+          signal() // this one should be tracked
+          return p+1
+        }, { hard: true })
+      })
 
-    _progress_time(300)
+      return [setSpring, dispose]
+    });
+    expect(runs).toBe(1)
 
-    // spring() should move towards 50 but not 50 after 300ms. (This is estimated spring interpolation is hard to pinpoint exactly)
-    expect(spring()).not.toBe(50);
-    expect(spring()).toBeGreaterThan(50 / 2);
+    setSpring(p => p+1, { hard: true })
+    expect(runs).toBe(1)
+
+    setSignal(1)
+    expect(runs).toBe(2)
+
     dispose();
   });
 
@@ -119,34 +132,6 @@ describe("createSpring", () => {
     dispose();
   });
 
-  it("Setter does not subscribe to self", () => {
-    let runs = 0
-    const [signal, setSignal] = createSignal(0)
-    
-    const [setSpring, dispose] = createRoot(dispose => {
-      const [, setSpring] = createSpring(0)
-
-      createEffect(() => {
-        runs++
-        setSpring(p => {
-          signal() // this one should be tracked
-          return p+1
-        }, { hard: true })
-      })
-
-      return [setSpring, dispose]
-    });
-    expect(runs).toBe(1)
-
-    setSpring(p => p+1, { hard: true })
-    expect(runs).toBe(1)
-
-    setSignal(1)
-    expect(runs).toBe(2)
-
-    dispose();
-  });
-
   it("instantly updates `number` when set with hard using a function as an argument.", () => {
     const start = 0;
     const end = 50;
@@ -171,6 +156,38 @@ describe("createSpring", () => {
     setSpring(_ => ({ progress: 100 }), { hard: true }); // Using a function as an argument.
 
     expect(spring()).toMatchObject(end);
+
+    dispose();
+  });
+
+  it("updates toward target", () => {
+    const [[spring, setSpring], dispose] = createRoot(d => [createSpring(0), d]);
+
+    expect(spring()).toBe(0);
+    setSpring(50);
+    expect(spring()).toBe(0);
+
+    _progress_time(300)
+
+    // spring() should move towards 50 but not 50 after 300ms. (This is estimated spring interpolation is hard to pinpoint exactly)
+    expect(spring()).not.toBe(50);
+    expect(spring()).toBeGreaterThan(50 / 2);
+    dispose();
+  });
+
+  it("updates array of objects toward target", () => {
+    const start = [{foo: 1},  {foo: 2},  {foo: 3}];
+    const end   = [{foo: 20}, {foo: 15}, {foo: 20}];
+
+    const [[spring, setSpring], dispose] = createRoot(d => [createSpring(start), d]);
+
+    expect(spring()).toMatchObject(start);
+    setSpring(end);
+
+    _progress_time(300)
+    for (let i = 0; i < start.length; i++) {
+      expect(spring()[i]!.foo).toBeGreaterThan(end[i]!.foo/2);
+    }
 
     dispose();
   });
