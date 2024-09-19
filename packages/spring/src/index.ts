@@ -11,10 +11,9 @@ type Task = {
   promise: Promise<void>;
 };
 
-type TickContext<T extends SpringTarget> = {
+type TickContext = {
   inv_mass: number;
   dt: number;
-  opts: SpringOptions & { set: SpringSetter<T> };
   settled: boolean;
 };
 
@@ -111,11 +110,11 @@ export type SpringOptions = {
   precision?: number;
 };
 
-export type SpringTargetPrimitive = number | Date;
 export type SpringTarget =
-  | SpringTargetPrimitive
-  | { [key: string]: SpringTargetPrimitive | SpringTarget }
-  | SpringTargetPrimitive[]
+  | number
+  | Date
+  | { [key: string]: number | Date | SpringTarget }
+  | (number | Date)[]
   | SpringTarget[];
 
 /**
@@ -152,41 +151,29 @@ export function createSpring<T extends SpringTarget>(
   initialValue: T,
   options: SpringOptions = {},
 ): [Accessor<WidenSpringTarget<T>>, SpringSetter<WidenSpringTarget<T>>] {
-  const [springValue, setSpringValue] = createSignal<T>(initialValue);
+  const [springValue, setSpringValue] = createSignal(initialValue);
   const { stiffness = 0.15, damping = 0.8, precision = 0.01 } = options;
 
-  let lastTime = 0;
+  let last_time = 0;
   let task: Task | null = null;
   let current_token: object | undefined = undefined;
-  let lastValue: T = initialValue;
-  let targetValue: T | undefined;
+  let current_value = initialValue
+  let last_value = initialValue;
+  let target_value = initialValue;
   let inv_mass = 1;
   let inv_mass_recovery_rate = 0;
-  let cancelTask = false;
+  let cancel_task = false;
 
-  /**
-   * Gets `newValue` from the SpringSetter's first argument.
-   */
-  function getNewValue(newValue: T | ((prev: T) => T)) {
-    if (typeof newValue === "function") {
-      return newValue(lastValue);
-    }
-
-    return newValue;
-  }
-
-  const set: SpringSetter<T> = untrack(() => (newValue, opts = {}) => {
-    targetValue = getNewValue(newValue);
+  const set: SpringSetter<T> = (param, opts = {}) => {
+    target_value = typeof param === "function" ? param(current_value) : param;
 
     const token = current_token ?? {};
     current_token = token;
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (springValue() == null || opts.hard || (stiffness >= 1 && damping >= 1)) {
-      cancelTask = true;
-      lastTime = raf.now();
-      lastValue = getNewValue(newValue);
-      setSpringValue(_ => getNewValue(newValue));
+    if (current_value == null || opts.hard || (stiffness >= 1 && damping >= 1)) {
+      cancel_task = true;
+      last_time = raf.now();
+      setSpringValue(_ => current_value = last_value = target_value);
       return Promise.resolve();
     } else if (opts.soft) {
       const rate = opts.soft === true ? 0.5 : +opts.soft;
@@ -194,33 +181,27 @@ export function createSpring<T extends SpringTarget>(
       inv_mass = 0; // Infinite mass, unaffected by spring forces.
     }
     if (!task) {
-      lastTime = raf.now();
-      cancelTask = false;
+      last_time = raf.now();
+      cancel_task = false;
 
       const _loop = loop(now => {
-        if (cancelTask) {
-          cancelTask = false;
+        if (cancel_task) {
+          cancel_task = false;
           task = null;
           return false;
         }
 
         inv_mass = Math.min(inv_mass + inv_mass_recovery_rate, 1);
 
-        const ctx: TickContext<T> = {
+        const ctx: TickContext = {
           inv_mass: inv_mass,
-          opts: {
-            set: set,
-            damping: damping,
-            precision: precision,
-            stiffness: stiffness,
-          },
           settled: true,
-          dt: ((now - lastTime) * 60) / 1000,
+          dt: ((now - last_time) * 60) / 1000,
         };
-        const next_value = tick_spring(ctx, lastValue, springValue(), targetValue!);
-        lastTime = now;
-        lastValue = springValue();
-        setSpringValue(_ => next_value);
+        let new_value = tick_spring(ctx, last_value, current_value, target_value)
+        last_time = now;
+        last_value = current_value;
+        setSpringValue(current_value = new_value);
         if (ctx.settled) {
           task = null;
         }
@@ -235,53 +216,42 @@ export function createSpring<T extends SpringTarget>(
         if (token === current_token) fulfil();
       });
     });
-  });
+  };
 
-  const tick_spring = <T extends SpringTarget>(
-    ctx: TickContext<T>,
+  const tick_spring = (
+    ctx: TickContext,
     last_value: T,
     current_value: T,
     target_value: T,
-  ): T => {
+  ): any => {
     if (typeof current_value === "number" || is_date(current_value)) {
-      // @ts-ignore
-      const delta = target_value - current_value;
-      // @ts-ignore
-      const velocity = (current_value - last_value) / (ctx.dt || 1 / 60); // guard div by 0
-      const spring = ctx.opts.stiffness! * delta;
-      const damper = ctx.opts.damping! * velocity;
+      const delta = +target_value - +current_value;
+      const velocity = (+current_value - +last_value) / (ctx.dt || 1 / 60); // guard div by 0
+      const spring = stiffness * delta;
+      const damper = damping * velocity;
       const acceleration = (spring - damper) * ctx.inv_mass;
       const d = (velocity + acceleration) * ctx.dt;
-      if (Math.abs(d) < ctx.opts.precision! && Math.abs(delta) < ctx.opts.precision!) {
+      if (Math.abs(d) < precision && Math.abs(delta) < precision) {
         return target_value; // settled
-      } else {
-        ctx.settled = false; // signal loop to keep ticking
-        // @ts-ignore
-        return is_date(current_value) ? new Date(current_value.getTime() + d) : current_value + d;
       }
-    } else if (Array.isArray(current_value)) {
-      // @ts-ignore
+      ctx.settled = false; // signal loop to keep ticking
+      return typeof current_value === "number" ? current_value + d : new Date(+current_value + d);
+    }
+    if (Array.isArray(current_value)) {
       return current_value.map((_, i) =>
-        // @ts-ignore
+        // @ts-expect-error
         tick_spring(ctx, last_value[i], current_value[i], target_value[i]),
       );
-    } else if (typeof current_value === "object") {
-      const next_value = {};
-      for (const k in current_value) {
-        // @ts-ignore
-        next_value[k] = tick_spring(
-          ctx,
-          // @ts-ignore
-          last_value[k],
-          current_value[k],
-          target_value[k],
-        );
-      }
-      // @ts-ignore
-      return next_value;
-    } else {
-      throw new Error(`Cannot spring ${typeof current_value} values`);
     }
+    if (typeof current_value === "object") {
+      const next_value = {...current_value};
+      for (const k in current_value) {
+        // @ts-expect-error
+        next_value[k] = tick_spring(ctx, last_value[k], current_value[k], target_value[k]);
+      }
+      return next_value;
+    }
+    throw new Error(`Cannot spring ${typeof current_value} values`);
   };
 
   return [

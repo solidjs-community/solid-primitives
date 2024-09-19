@@ -1,4 +1,4 @@
-import { createRoot, createSignal } from "solid-js";
+import { createEffect, createRoot, createSignal } from "solid-js";
 import { describe, expect, it, vi, afterAll, beforeAll, beforeEach } from "vitest";
 import { createDerivedSpring, createSpring } from "../src/index.js";
 
@@ -115,6 +115,34 @@ describe("createSpring", () => {
     setSpring(end, { hard: true }); // Set to 100 here.
 
     expect(spring()).toMatchObject(end);
+
+    dispose();
+  });
+
+  it("Setter does not subscribe to self", () => {
+    let runs = 0
+    const [signal, setSignal] = createSignal(0)
+    
+    const [setSpring, dispose] = createRoot(dispose => {
+      const [, setSpring] = createSpring(0)
+
+      createEffect(() => {
+        runs++
+        setSpring(p => {
+          signal() // this one should be tracked
+          return p+1
+        }, { hard: true })
+      })
+
+      return [setSpring, dispose]
+    });
+    expect(runs).toBe(1)
+
+    setSpring(p => p+1, { hard: true })
+    expect(runs).toBe(1)
+
+    setSignal(1)
+    expect(runs).toBe(2)
 
     dispose();
   });
