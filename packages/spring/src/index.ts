@@ -124,7 +124,7 @@ export type SpringTarget =
  *
  * e.g. createSpring(0) returns `0`, not `number`.
  */
-export type WidenSpringTarget<T> = T extends number ? number : T extends Date ? Date : T;
+export type WidenSpringTarget<T> = T extends number ? number : T;
 
 export type SpringSetter<T> = (
   newValue: T | ((prev: T) => T),
