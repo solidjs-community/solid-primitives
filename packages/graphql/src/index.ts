@@ -33,7 +33,7 @@ export class GraphQLError extends Error {
   constructor(
     message: string,
     public locations?: { line: number; column: number }[],
-    public extensions?: Record<string, any>
+    public extensions?: Record<string, any>,
   ) {
     super(message);
   }
@@ -118,15 +118,19 @@ export async function request<T = any, V extends object = {}>(
     method,
     body: JSON.stringify({ query: query_string, variables }),
     headers: {
-    "content-type": "application/json",
-    ...options.headers,
+      "content-type": "application/json",
+      ...options.headers,
     },
-  })
-  const data = await res.json()
+  });
+  const data = await res.json();
   if (data.errors && data.errors.length) {
-    throw new GraphQLError(data.errors[0].message, data.errors[0].locations, data.errors[0].extensions)
+    throw new GraphQLError(
+      data.errors[0].message,
+      data.errors[0].locations,
+      data.errors[0].extensions,
+    );
   }
-  return data.data
+  return data.data;
 }
 
 /**
@@ -155,12 +159,16 @@ export async function multipartRequest<T = any, V extends object = {}>(
       "content-type": "multipart/form-data",
       ...options.headers,
     },
-  })
-  const data = await res.json()
+  });
+  const data = await res.json();
   if (data.errors && data.errors.length) {
-    throw new GraphQLError(data.errors[0].message, data.errors[0].locations, data.errors[0].extensions)
+    throw new GraphQLError(
+      data.errors[0].message,
+      data.errors[0].locations,
+      data.errors[0].extensions,
+    );
   }
-  return data.data
+  return data.data;
 }
 
 /**
