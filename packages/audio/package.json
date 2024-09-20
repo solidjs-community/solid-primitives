@@ -54,7 +54,6 @@
     "primitives"
   ],
   "devDependencies": {
-    "solid-heroicons": "^3.2.4",
     "solid-js": "^1.8.7"
   },
   "dependencies": {
