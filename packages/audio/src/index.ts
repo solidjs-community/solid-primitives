@@ -28,11 +28,11 @@ export type AudioEventHandlers = {
 // Helper for producing the audio source
 const unwrapSource = (src: AudioSource) => {
   if (src instanceof HTMLAudioElement) {
-    return src
+    return src;
   }
   const player = new Audio();
-  setAudioSrc(player, src)
-  return player
+  setAudioSrc(player, src);
+  return player;
 };
 
 function setAudioSrc(el: HTMLAudioElement, src: AudioSource) {
@@ -58,15 +58,15 @@ export const makeAudio = (
 
   onMount(() => {
     for (const [name, handler] of Object.entries(handlers)) {
-      player.addEventListener(name, handler as any)
+      player.addEventListener(name, handler as any);
     }
   });
   onCleanup(() => {
     player.pause();
     for (const [name, handler] of Object.entries(handlers)) {
-      player.removeEventListener(name, handler as any)
+      player.removeEventListener(name, handler as any);
     }
-  })
+  });
 
   return player;
 };
@@ -194,7 +194,12 @@ export const createAudio = (
     volume: 0,
   });
 
-  const { play, pause, setVolume: _setVolume, seek } = makeAudioPlayer(store.player, {
+  const {
+    play,
+    pause,
+    setVolume: _setVolume,
+    seek,
+  } = makeAudioPlayer(store.player, {
     loadeddata: () => {
       setStore({
         state: AudioState.READY,
@@ -217,9 +222,9 @@ export const createAudio = (
   });
 
   const setVolume = (volume: number) => {
-    setStore("volume", volume)
-    _setVolume(volume)
-  }
+    setStore("volume", volume);
+    _setVolume(volume);
+  };
 
   // Bind reactive properties as needed
   if (src instanceof Function) {
@@ -228,7 +233,7 @@ export const createAudio = (
       if (newSrc instanceof HTMLAudioElement) {
         setStore("player", newSrc);
       } else {
-        setAudioSrc(store.player, newSrc)
+        setAudioSrc(store.player, newSrc);
       }
       seek(0);
     });

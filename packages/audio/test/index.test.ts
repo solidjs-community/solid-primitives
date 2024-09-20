@@ -74,12 +74,12 @@ describe("createAudio", () => {
     }));
 
   it("should set the COMPLETE state when audio ends", () => {
-    const [[audio], dispose] = createRoot(dispose => [createAudio({} as MediaSource), dispose])
-    expect(audio.state).toBe(AudioState.LOADING)
+    const [[audio], dispose] = createRoot(dispose => [createAudio({} as MediaSource), dispose]);
+    expect(audio.state).toBe(AudioState.LOADING);
 
     audio.player.dispatchEvent(new Event("ended"));
-    expect(audio.state).toBe(AudioState.COMPLETE)
+    expect(audio.state).toBe(AudioState.COMPLETE);
 
     dispose();
-  })
+  });
 });
