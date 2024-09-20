@@ -1,5 +1,13 @@
 # @solid-primitives/audio
 
+## 1.3.18
+
+### Patch Changes
+
+- b993fff: Set "COMPLETE" state on "ended"
+
+  Improved ssr support by setting the initial duration and volume to zero for `createAudio` to match the server state.
+
 ## 1.3.17
 
 ### Patch Changes

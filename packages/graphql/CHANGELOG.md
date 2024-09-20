@@ -1,5 +1,11 @@
 # @solid-primitives/graphql
 
+## 2.1.0
+
+### Minor Changes
+
+- c4e992a: Add a `GraphQLError` error class, and throw it in case of a request error, instead of thowing an errors array
+
 ## 2.0.4
 
 ### Patch Changes
