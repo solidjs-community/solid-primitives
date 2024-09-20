@@ -10,6 +10,7 @@ import {
   type JSX,
   createMemo,
 } from "solid-js";
+import { isDev } from "solid-js/web";
 
 type ListItem<T> = {
   value: T;
@@ -177,13 +178,13 @@ export function listArray<T, U>(
     items.push(t);
     // signal created when used
     let sV: Accessor<T> = () => {
-        [sV, t.valueSetter] = "_SOLID_DEV_"
+        [sV, t.valueSetter] = isDev
           ? createSignal(scopedV, { name: "value" })
           : createSignal(scopedV);
         return sV();
       },
       sI: Accessor<number> = () => {
-        [sI, t.indexSetter] = "_SOLID_DEV_"
+        [sI, t.indexSetter] = isDev
           ? createSignal(scopedI, { name: "index" })
           : createSignal(scopedI);
         return sI();
@@ -213,7 +214,7 @@ export function List<T extends readonly any[], U extends JSX.Element>(props: {
   children: (item: Accessor<T[number]>, index: Accessor<number>) => U;
 }) {
   const fallback = "fallback" in props && { fallback: () => props.fallback };
-  return ("_SOLID_DEV_"
+  return (isDev
     ? createMemo(
         listArray(() => props.each, props.children, fallback || undefined),
         undefined,

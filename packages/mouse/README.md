@@ -32,6 +32,8 @@ A collection of primitives, capturing current mouse cursor position, and helping
 ```bash
 npm install @solid-primitives/mouse
 # or
+pnpm add @solid-primitives/mouse
+# or
 yarn add @solid-primitives/mouse
 ```
 
@@ -84,7 +86,7 @@ createEffect(() => {
 
 ```ts
 function createMousePosition(
-  target?: MaybeAccessor<Window | Document | HTMLElement>,
+  target?: MaybeAccessor<SVGSVGElement | HTMLElement | Window | Document>,
   options?: MousePositionOptions,
 ): MousePositionInside;
 ```

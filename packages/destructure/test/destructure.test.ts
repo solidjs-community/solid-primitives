@@ -3,6 +3,43 @@ import { createComputed, createRoot, createSignal } from "solid-js";
 import { destructure } from "../src/index.js";
 
 describe("destructure", () => {
+  test("props", () => {
+    const [get_count, set_count] = createSignal(0);
+    const [get_label, set_label] = createSignal("foo");
+    const [get_highlight, set_highlight] = createSignal(false);
+
+    const props: { count: number; label: string; highlight: boolean } = {
+      get count() {
+        return get_count();
+      },
+      get label() {
+        return get_label();
+      },
+      get highlight() {
+        return get_highlight();
+      },
+    };
+
+    const [{ count, label, highlight }, dispose] = createRoot(dispose => [
+      destructure(props),
+      dispose,
+    ]);
+
+    expect(count()).toBe(0);
+    expect(label()).toBe("foo");
+    expect(highlight()).toBe(false);
+
+    set_count(10);
+    set_label("bar");
+    set_highlight(true);
+
+    expect(count()).toBe(10);
+    expect(label()).toBe("bar");
+    expect(highlight()).toBe(true);
+
+    dispose();
+  });
+
   test("spread array", () =>
     createRoot(dispose => {
       const [numbers, setNumbers] = createSignal([1, 2, 3] as [number, number, number]);

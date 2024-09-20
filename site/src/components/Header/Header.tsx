@@ -144,9 +144,7 @@ const Header: Component = () => {
             class={`${pageWidthClass} mx-auto flex h-full w-full items-center justify-between gap-2 px-4 sm:px-8`}
           >
             <div
-              class={`${pageWidthClass} box-shadow-[var(--header-box-shadow)] -z-1 
-              absolute bottom-0 left-0 right-0 top-0 mx-auto w-full opacity-0 transition-opacity
-              duration-200`}
+              class={`${pageWidthClass} box-shadow-[var(--header-box-shadow)] -z-1 absolute bottom-0 left-0 right-0 top-0 mx-auto w-full opacity-0 transition-opacity duration-200`}
               classList={{
                 // show the shadow when scrolled down or when the nav menu is open,
                 // but not when the search modal is open or when the table-sub-nav is shown
@@ -212,9 +210,7 @@ const Header: Component = () => {
           ref={headerOpaqueBgContainer}
         >
           <div
-            class="absolute inset-0 translate-y-[calc(-100%+60px)]
-            bg-white/50 backdrop-blur-md
-            dark:bg-[#293843]/70"
+            class="absolute inset-0 translate-y-[calc(-100%+60px)] bg-white/50 backdrop-blur-md dark:bg-[#293843]/70"
             ref={headerOpaqueBg}
           />
         </div>

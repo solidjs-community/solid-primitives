@@ -74,7 +74,7 @@ import { createLatestMany } from "@solid-primitives/memo";
 const [count, setCount] = createSignal(1);
 const [text, setText] = createSignal("hello");
 
-const lastUpdated = createLatest([count, text]);
+const lastUpdated = createLatestMany([count, text]);
 
 lastUpdated(); // => [1, "hello"]
 setCount(4);
