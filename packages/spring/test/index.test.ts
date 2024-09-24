@@ -1,20 +1,25 @@
 import { createEffect, createRoot, createSignal } from "solid-js";
-import { describe, expect, it, vi, afterAll, beforeAll, beforeEach } from "vitest";
+import { describe, expect, it, vi, afterAll, } from "vitest";
 import { createDerivedSpring, createSpring } from "../src/index.js";
 
+let _time = 0
 let _raf_last_id = 0;
 let _raf_callbacks_old = new Map<number, FrameRequestCallback>();
 let _raf_callbacks_new = new Map<number, FrameRequestCallback>();
 
 function _progress_time(by: number) {
-  const start = performance.now();
-  vi.advanceTimersByTime(by);
-
+  _time += by
   _raf_callbacks_old = _raf_callbacks_new;
   _raf_callbacks_new = new Map();
-  _raf_callbacks_old.forEach(c => c(start + by));
+  _raf_callbacks_old.forEach(c => c(_time));
   _raf_callbacks_old.clear();
 }
+
+let _now = performance.now
+performance.now = () => _time
+afterAll(() => {
+  performance.now = _now
+})
 
 vi.stubGlobal("requestAnimationFrame", function (callback: FrameRequestCallback): number {
   const id = _raf_last_id++;
@@ -23,21 +28,6 @@ vi.stubGlobal("requestAnimationFrame", function (callback: FrameRequestCallback)
 });
 vi.stubGlobal("cancelAnimationFrame", function (id: number): void {
   _raf_callbacks_new.delete(id);
-});
-
-beforeAll(() => {
-  vi.useFakeTimers();
-});
-
-beforeEach(() => {
-  vi.clearAllTimers();
-});
-
-afterAll(() => {
-  vi.useRealTimers();
-  _raf_callbacks_old.clear();
-  _raf_callbacks_new.clear();
-  _raf_last_id = 0;
 });
 
 describe("createSpring", () => {

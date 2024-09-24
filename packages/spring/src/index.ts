@@ -110,7 +110,7 @@ export function createSpring<T extends SpringTarget>(
   })
 
   const frame: FrameRequestCallback = time => {
-    time_delta = (time - time_last) * 60 / 1000
+    time_delta = Math.max(0, time - time_last) * 60 / 1000
     time_last = time
 
     inv_mass = Math.min(inv_mass + inv_mass_recovery_rate, 1)
