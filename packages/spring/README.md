@@ -54,7 +54,9 @@ const springedValue = createDerivedSpring(myNumber, { stiffness: 0.03 });
 
 ## Demo
 
-- [CodeSandbox - Basic Example](https://codesandbox.io/p/devbox/ecstatic-borg-k2wqfr)
+- **[Playground](https://primitives.solidjs.community/playground/spring)** - [source code](https://github.com/solidjs-community/solid-primitives/blob/main/packages/spring/dev/index.tsx)
+
+- **[CodeSandbox - Basic Example](https://codesandbox.io/p/devbox/ecstatic-borg-k2wqfr)**
 
 ## Changelog
 
