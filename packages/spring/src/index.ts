@@ -110,7 +110,7 @@ export function createSpring<T extends SpringTarget>(
   })
 
   const frame: FrameRequestCallback = time => {
-    time_delta = Math.max(0, time - time_last) * 60 / 1000
+    time_delta = Math.max(1 / 60, (time - time_last) * 60 / 1000) // guard against d<=0
     time_last = time
 
     inv_mass = Math.min(inv_mass + inv_mass_recovery_rate, 1)
@@ -152,7 +152,7 @@ export function createSpring<T extends SpringTarget>(
   const tick = (last: T, current: T, target: T): any => {
     if (typeof current === "number" || is_date(current)) {
       const delta = +target - +current;
-      const velocity = (+current - +last) / (time_delta || 1 / 60); // guard div by 0
+      const velocity = (+current - +last) / time_delta;
       const spring = stiffness * delta;
       const damper = damping * velocity;
       const acceleration = (spring - damper) * inv_mass;
