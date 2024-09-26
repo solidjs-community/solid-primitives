@@ -1,25 +1,25 @@
 import { createEffect, createRoot, createSignal } from "solid-js";
-import { describe, expect, it, vi, afterAll, } from "vitest";
+import { describe, expect, it, vi, afterAll } from "vitest";
 import { createDerivedSpring, createSpring } from "../src/index.js";
 
-let _time = 0
+let _time = 0;
 let _raf_last_id = 0;
 let _raf_callbacks_old = new Map<number, FrameRequestCallback>();
 let _raf_callbacks_new = new Map<number, FrameRequestCallback>();
 
 function _progress_time(by: number) {
-  _time += by
+  _time += by;
   _raf_callbacks_old = _raf_callbacks_new;
   _raf_callbacks_new = new Map();
   _raf_callbacks_old.forEach(c => c(_time));
   _raf_callbacks_old.clear();
 }
 
-let _now = performance.now
-performance.now = () => _time
+let _now = performance.now;
+performance.now = () => _time;
 afterAll(() => {
-  performance.now = _now
-})
+  performance.now = _now;
+});
 
 vi.stubGlobal("requestAnimationFrame", function (callback: FrameRequestCallback): number {
   const id = _raf_last_id++;
@@ -31,7 +31,6 @@ vi.stubGlobal("cancelAnimationFrame", function (id: number): void {
 });
 
 describe("createSpring", () => {
-
   it("returns values", () => {
     const [[spring, setSpring], dispose] = createRoot(d => [createSpring({ progress: 0 }), d]);
     expect(spring().progress).toBe(0);
@@ -39,29 +38,32 @@ describe("createSpring", () => {
   });
 
   it("Setter does not subscribe to self", () => {
-    let runs = 0
-    const [signal, setSignal] = createSignal(0)
-    
+    let runs = 0;
+    const [signal, setSignal] = createSignal(0);
+
     const [setSpring, dispose] = createRoot(dispose => {
-      const [, setSpring] = createSpring(0)
+      const [, setSpring] = createSpring(0);
 
       createEffect(() => {
-        runs++
-        setSpring(p => {
-          signal() // this one should be tracked
-          return p+1
-        }, { hard: true })
-      })
+        runs++;
+        setSpring(
+          p => {
+            signal(); // this one should be tracked
+            return p + 1;
+          },
+          { hard: true },
+        );
+      });
 
-      return [setSpring, dispose]
+      return [setSpring, dispose];
     });
-    expect(runs).toBe(1)
+    expect(runs).toBe(1);
 
-    setSpring(p => p+1, { hard: true })
-    expect(runs).toBe(1)
+    setSpring(p => p + 1, { hard: true });
+    expect(runs).toBe(1);
 
-    setSignal(1)
-    expect(runs).toBe(2)
+    setSignal(1);
+    expect(runs).toBe(2);
 
     dispose();
   });
@@ -157,7 +159,7 @@ describe("createSpring", () => {
     setSpring(50);
     expect(spring()).toBe(0);
 
-    _progress_time(300)
+    _progress_time(300);
 
     // spring() should move towards 50 but not 50 after 300ms. (This is estimated spring interpolation is hard to pinpoint exactly)
     expect(spring()).not.toBe(50);
@@ -166,17 +168,17 @@ describe("createSpring", () => {
   });
 
   it("updates array of objects toward target", () => {
-    const start = [{foo: 1},  {foo: 2},  {foo: 3}];
-    const end   = [{foo: 20}, {foo: 15}, {foo: 20}];
+    const start = [{ foo: 1 }, { foo: 2 }, { foo: 3 }];
+    const end = [{ foo: 20 }, { foo: 15 }, { foo: 20 }];
 
     const [[spring, setSpring], dispose] = createRoot(d => [createSpring(start), d]);
 
     expect(spring()).toMatchObject(start);
     setSpring(end);
 
-    _progress_time(300)
+    _progress_time(300);
     for (let i = 0; i < start.length; i++) {
-      expect(spring()[i]!.foo).toBeGreaterThan(end[i]!.foo/2);
+      expect(spring()[i]!.foo).toBeGreaterThan(end[i]!.foo / 2);
     }
 
     dispose();
@@ -192,7 +194,7 @@ describe("createDerivedSpring", () => {
     setSignal(50); // Set to 100 here.
     expect(spring()).toBe(0);
 
-    _progress_time(300)
+    _progress_time(300);
 
     // spring() should move towards 50 but not 50 after 300ms. (This is estimated spring interpolation is hard to pinpoint exactly)
     expect(spring()).not.toBe(50);

@@ -52,7 +52,7 @@ export type SpringTarget =
  */
 export type WidenSpringTarget<T> = T extends number ? number : T;
 
-export type SpringSetterOptions = { hard?: boolean; soft?: boolean | number }
+export type SpringSetterOptions = { hard?: boolean; soft?: boolean | number };
 export type SpringSetter<T> = (
   newValue: T | ((prev: T) => T),
   opts?: SpringSetterOptions,
@@ -83,13 +83,16 @@ export function createSpring<T extends SpringTarget>(
   const { stiffness = 0.15, damping = 0.8, precision = 0.01 } = options;
 
   if (isServer) {
-    return [signal as any, ((param: any, opts: SpringSetterOptions = {}) => {
-      if (opts.hard || signal() == null || (stiffness >= 1 && damping >= 1)) {
-        setSignal(param);
-        return Promise.resolve();
-      }
-      return new Promise(() => {});
-    }) as any]
+    return [
+      signal as any,
+      ((param: any, opts: SpringSetterOptions = {}) => {
+        if (opts.hard || signal() == null || (stiffness >= 1 && damping >= 1)) {
+          setSignal(param);
+          return Promise.resolve();
+        }
+        return new Promise(() => {});
+      }) as any,
+    ];
   }
 
   let value_current = initialValue;
@@ -97,42 +100,42 @@ export function createSpring<T extends SpringTarget>(
   let value_target = initialValue;
   let inv_mass = 1;
   let inv_mass_recovery_rate = 0;
-  let raf_id = 0
-  let settled = true
+  let raf_id = 0;
+  let settled = true;
   let time_last = 0;
-  let time_delta = 0
-  let resolve = () => {}
+  let time_delta = 0;
+  let resolve = () => {};
 
   const cleanup = onCleanup(() => {
-    cancelAnimationFrame(raf_id)
-    raf_id = 0
-    resolve()
-  })
+    cancelAnimationFrame(raf_id);
+    raf_id = 0;
+    resolve();
+  });
 
   const frame: FrameRequestCallback = time => {
-    time_delta = Math.max(1 / 60, (time - time_last) * 60 / 1000) // guard against d<=0
-    time_last = time
+    time_delta = Math.max(1 / 60, ((time - time_last) * 60) / 1000); // guard against d<=0
+    time_last = time;
 
-    inv_mass = Math.min(inv_mass + inv_mass_recovery_rate, 1)
-    settled = true
+    inv_mass = Math.min(inv_mass + inv_mass_recovery_rate, 1);
+    settled = true;
 
-    let new_value = tick(value_last, value_current, value_target)
-    value_last = value_current
-    setSignal(value_current = new_value)
+    let new_value = tick(value_last, value_current, value_target);
+    value_last = value_current;
+    setSignal((value_current = new_value));
 
     if (settled) {
-      cleanup()
+      cleanup();
     } else {
-      raf_id = requestAnimationFrame(frame)
+      raf_id = requestAnimationFrame(frame);
     }
-  }
+  };
 
   const set: SpringSetter<T> = (param, opts = {}) => {
     value_target = typeof param === "function" ? param(value_current) : param;
 
     if (opts.hard || (stiffness >= 1 && damping >= 1)) {
-      cleanup()
-      setSignal(_ => value_current = value_last = value_target);
+      cleanup();
+      setSignal(_ => (value_current = value_last = value_target));
       return Promise.resolve();
     }
 
@@ -142,11 +145,11 @@ export function createSpring<T extends SpringTarget>(
     }
 
     if (raf_id === 0) {
-      time_last = performance.now()
-      raf_id = requestAnimationFrame(frame)
+      time_last = performance.now();
+      raf_id = requestAnimationFrame(frame);
     }
-    
-    return new Promise<void>(r => resolve = r);
+
+    return new Promise<void>(r => (resolve = r));
   };
 
   const tick = (last: T, current: T, target: T): any => {
@@ -172,7 +175,7 @@ export function createSpring<T extends SpringTarget>(
     }
 
     if (typeof current === "object") {
-      const next = {...current};
+      const next = { ...current };
       for (const k in current) {
         // @ts-expect-error
         next[k] = tick(last[k], current[k], target[k]);

@@ -1,9 +1,10 @@
-import { createSpring } from "../src/index.js"
+import { createSpring } from "../src/index.js";
 
 export default function App() {
   const [progress, setProgress] = createSpring(0);
   const [radialProgress, setRadialProgress] = createSpring(0, {
-    stiffness: 0.1, damping: 0.3
+    stiffness: 0.1,
+    damping: 0.3,
   });
   const [xy, setXY] = createSpring({ x: 50, y: 50 }, { stiffness: 0.1, damping: 0.3 });
   const [date, setDate] = createSpring(new Date());
@@ -16,9 +17,9 @@ export default function App() {
     if (radialProgress() === 0) setRadialProgress(1);
     else setRadialProgress(0);
   }
-  let d = false
+  let d = false;
   function toggleXY() {
-    if (d = !d) setXY({ x: 200, y: 200 });
+    if ((d = !d)) setXY({ x: 200, y: 200 });
     else setXY({ x: 50, y: 50 });
   }
   function toggleDate() {
@@ -26,8 +27,9 @@ export default function App() {
     else setDate(new Date("2024-12-01"));
   }
 
-  return <>
-  <style>{`
+  return (
+    <>
+      <style>{`
 progress {
   color: #a3e635;
 }
@@ -69,53 +71,50 @@ progress::-moz-progress-bar {
   stroke: #a3e635;
 }
 `}</style>
-    <div class="flex flex-col items-center justify-center gap-8">
-      <div class="flex gap-3 p-2">
-        <button onClick={toggleProgress}>Toggle progress</button>
-        <button onClick={toggleRadialProgress}>Toggle Radial progress</button>
-        <button onClick={toggleXY}>Toggle XY</button>
-        <button onClick={toggleDate}>Toggle Date</button>
-      </div>
+      <div class="flex flex-col items-center justify-center gap-8">
+        <div class="flex gap-3 p-2">
+          <button onClick={toggleProgress}>Toggle progress</button>
+          <button onClick={toggleRadialProgress}>Toggle Radial progress</button>
+          <button onClick={toggleXY}>Toggle XY</button>
+          <button onClick={toggleDate}>Toggle Date</button>
+        </div>
 
-      {/* Progress */}
-      <div class="flex flex-col items-center">
-        <progress
-          class="progress w-56"
-          value={progress() * 100}
-          max="100"
-        ></progress>
+        {/* Progress */}
+        <div class="flex flex-col items-center">
+          <progress class="progress w-56" value={progress() * 100} max="100"></progress>
 
-        <p class="text-white">{(progress() * 100).toFixed(0)}%</p>
-      </div>
+          <p class="text-white">{(progress() * 100).toFixed(0)}%</p>
+        </div>
 
-      {/* Radial progress */}
-      <div class="flex flex-col items-center gap-4">
-        <svg
-          width="120"
-          height="120"
-          viewBox="0 0 250 250"
-          class="circular-progress"
-          style={`--progress:${radialProgress() * 100};`}
+        {/* Radial progress */}
+        <div class="flex flex-col items-center gap-4">
+          <svg
+            width="120"
+            height="120"
+            viewBox="0 0 250 250"
+            class="circular-progress"
+            style={`--progress:${radialProgress() * 100};`}
+          >
+            <circle class="bg"></circle>
+            <circle class="fg"></circle>
+          </svg>
+          <span class="text-white">{(radialProgress() * 100).toFixed(0)}%</span>
+        </div>
+
+        {/* XY */}
+        <div
+          class="flex items-center justify-center whitespace-nowrap rounded-lg bg-lime-400 text-sm font-bold text-black"
+          style={{
+            width: xy().x + "px",
+            height: 100 + "px",
+          }}
         >
-          <circle class="bg"></circle>
-          <circle class="fg"></circle>
-        </svg>
-        <span class="text-white">{(radialProgress() * 100).toFixed(0)}%</span>
-      </div>
+          {xy().x.toFixed(0)}x{xy().y.toFixed(0)}
+        </div>
 
-      {/* XY */}
-      <div
-        class="bg-lime-400 rounded-lg flex items-center justify-center whitespace-nowrap text-black text-sm font-bold"
-        style={{
-          width: xy().x + "px",
-          height: 100 + "px",
-        }}
-      >
-        {xy().x.toFixed(0)}x{xy().y.toFixed(0)}
+        {/* Date */}
+        <div>{date() + ""}</div>
       </div>
-
-      {/* Date */}
-      <div>{date()+""}</div>
-    </div>
-  </>
-};
+    </>
+  );
+}

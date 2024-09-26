@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "description": "Primitive that creates spring physics functions.",
   "author": "Carlo Taleon <carloantonioct@gmail.com>",
-  "contributors": ["Damian Tarnawski <gthetarnav@gmail.com>"],
+  "contributors": [
+    "Damian Tarnawski <gthetarnav@gmail.com>"
+  ],
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/spring",
   "repository": {
