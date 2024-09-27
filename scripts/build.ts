@@ -8,7 +8,7 @@ import * as utils from "./utils/index.js"
 
 let begin = performance.now()
 
-let dts_dist_dir = path.join(utils.ROOT_DIR, "dist")
+let root_dist_dir = path.join(utils.ROOT_DIR, "dist")
 
 let module_names = await fsp.readdir(utils.PACKAGES_DIR)
 
@@ -23,14 +23,18 @@ for (let name of module_names) {
   case "virtual":
     tsc_entries.push(path.join(src_dir, "index.tsx"))
     esb_entries.push(path.join(src_dir, "index.tsx"))
+    break
   case "storage":
     tsc_entries.push(path.join(src_dir, "index.ts"))
     tsc_entries.push(path.join(src_dir, "tauri.ts"))
+    break
   case "utils":
     tsc_entries.push(path.join(src_dir, "index.ts"))
     tsc_entries.push(path.join(src_dir, "immutable/index.ts"))
+    break
   default:
     tsc_entries.push(path.join(src_dir, "index.ts"))
+    break
   }
 }
 
@@ -39,7 +43,7 @@ for (let name of module_names) {
 let esb_promise = esb.build({
   plugins: [esb_solid.solidPlugin()],
   entryPoints: esb_entries,
-  outdir: dts_dist_dir,
+  outdir: root_dist_dir,
   format: "esm",
   platform: "browser",
   target: ["esnext"]
@@ -55,7 +59,7 @@ ts.createProgram(tsc_entries, {
   ...base_config.options,
   noEmit     : false,
   declaration: true,
-  outDir     : dts_dist_dir,
+  outDir     : root_dist_dir,
 }).emit()
 
 await esb_promise
@@ -63,12 +67,11 @@ await esb_promise
 // Copy declarations to /packages/*/dist/
 
 await Promise.all(module_names.map(async name => {
-  let module_dist_dir = path.join(dts_dist_dir, name, "src")
+  let module_dist_dir = path.join(root_dist_dir, name, "src")
   let target_dist_dir = path.join(utils.PACKAGES_DIR, name, "dist")
-  
   return utils.copyDirectory(module_dist_dir, target_dist_dir)
 }))
 
-await fsp.rm(dts_dist_dir, {recursive: true, force: true})
+await fsp.rm(root_dist_dir, {recursive: true, force: true})
 
 utils.logLine(`Built ${module_names.length} packages in ${Math.ceil(performance.now() - begin)}ms`)
