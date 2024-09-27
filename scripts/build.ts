@@ -1,94 +1,74 @@
-import * as path from "node:path";
-import * as tsup from "tsup";
-import * as preset from "tsup-preset-solid";
-import * as utils from "./utils/index.js";
+import * as fs from "node:fs"
+import * as fsp from "node:fs/promises"
+import * as path from "node:path"
+import ts from "typescript"
+import * as esb from "esbuild"
+import * as esb_solid from "esbuild-plugin-solid"
+import * as utils from "./utils/index.js"
 
-/*
+let begin = performance.now()
 
-Toggle additional entries as needed.
+let dts_dist_dir = path.join(utils.ROOT_DIR, "dist")
 
-`--write` or `-w` will write the exports configuration to package.json instead of to the console.
-The exports configuration is taken from the solid-js package.json.
+let module_names = await fsp.readdir(utils.PACKAGES_DIR)
 
-*/
+let tsc_entries: string[] = []
+let esb_entries: string[] = []
 
-const { env, argv } = process;
-const write_exports = argv.includes("--write") || argv.includes("-w");
+for (let name of module_names) {
+  let src_dir = path.join(utils.PACKAGES_DIR, name, "src")
 
-export const CI =
-  env["CI"] === "true" ||
-  env["CI"] === '"1"' ||
-  env["GITHUB_ACTIONS"] === "true" ||
-  env["GITHUB_ACTIONS"] === '"1"' ||
-  !!env["TURBO_HASH"];
-
-const custom_entries: Record<string, preset.EntryOptions | preset.EntryOptions[]> = {
-  "controlled-props": {
-    entry: "src/index.tsx",
-  },
-  virtual: {
-    entry: "src/index.tsx",
-  },
-  /*filesystem: [
-    {
-      entry: "src/index.ts",
-    },
-    {
-      entry: "src/tauri.ts",
-      name: "tauri",
-    },
-  ],*/
-  storage: [
-    {
-      entry: "src/index.ts",
-    },
-    {
-      entry: "src/tauri.ts",
-      name: "tauri",
-    },
-  ],
-  utils: [
-    {
-      entry: "src/index.ts",
-    },
-    {
-      name: "immutable",
-      entry: "src/immutable/index.ts",
-    },
-  ],
-};
-
-const custom_tsup_options: Record<string, (options: tsup.Options) => void> = {
-  filesystem(options) {
-    // by default, the platform is "browser" - it'll prevent using node builtins
-    options.platform = "node";
-  },
-};
-
-const package_name = utils.getPackageNameFromCWD();
-if (package_name == null) {
-  throw "this script should be ran from one of the pacakges";
-}
-
-const parsed_options = preset.parsePresetOptions({
-  entries: custom_entries[package_name] ?? { entry: `src/index.ts` },
-  cjs: true,
-});
-
-if (!CI) {
-  const package_fields = preset.generatePackageExports(parsed_options);
-
-  if (write_exports) {
-    preset.writePackageJson(package_fields);
-  } else {
-    // eslint-disable-next-line no-console
-    console.log("Package json exports:", JSON.stringify(package_fields, null, 2));
+  switch (name) {
+  case "controlled-props":
+  case "virtual":
+    tsc_entries.push(path.join(src_dir, "index.tsx"))
+    esb_entries.push(path.join(src_dir, "index.tsx"))
+  case "storage":
+    tsc_entries.push(path.join(src_dir, "index.ts"))
+    tsc_entries.push(path.join(src_dir, "tauri.ts"))
+  case "utils":
+    tsc_entries.push(path.join(src_dir, "index.ts"))
+    tsc_entries.push(path.join(src_dir, "immutable/index.ts"))
+  default:
+    tsc_entries.push(path.join(src_dir, "index.ts"))
   }
 }
 
-const tsup_options = preset.generateTsupOptions(parsed_options);
+// Emit .js files for packages with jsx
 
-const modifyOptions = custom_tsup_options[package_name];
-if (modifyOptions) for (const option of tsup_options) modifyOptions(option);
+let esb_promise = esb.build({
+  plugins: [esb_solid.solidPlugin()],
+  entryPoints: esb_entries,
+  outdir: dts_dist_dir,
+  format: "esm",
+  platform: "browser",
+  target: ["esnext"]
+})
 
-tsup_options.forEach(tsup.build);
+// Emit d.ts and .js(x) files
+
+let base_config_path = path.join(utils.ROOT_DIR, "tsconfig.json")
+let base_config_file = JSON.parse(fs.readFileSync(base_config_path, "utf-8"))
+let base_config      = ts.parseJsonConfigFileContent(base_config_file, ts.sys, utils.ROOT_DIR)
+
+ts.createProgram(tsc_entries, {
+  ...base_config.options,
+  noEmit     : false,
+  declaration: true,
+  outDir     : dts_dist_dir,
+}).emit()
+
+await esb_promise
+
+// Copy declarations to /packages/*/dist/
+
+await Promise.all(module_names.map(async name => {
+  let module_dist_dir = path.join(dts_dist_dir, name, "src")
+  let target_dist_dir = path.join(utils.PACKAGES_DIR, name, "dist")
+  
+  return utils.copyDirectory(module_dist_dir, target_dist_dir)
+}))
+
+await fsp.rm(dts_dist_dir, {recursive: true, force: true})
+
+utils.logLine(`Built ${module_names.length} packages in ${Math.ceil(performance.now() - begin)}ms`)
