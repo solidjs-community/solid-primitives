@@ -7,6 +7,7 @@ import type { Accessor, JSX } from "solid-js";
  * @param children the flowComponent that will be used to transform the items into rows in the list
  * @param class the class applied to the root element of the virtualizedList
  * @param each the list of items
+ * @param fallback the optional fallback to display if the list of items to display is empty
  * @param overscanCount the number of elements to render both before and after the visible section of the list, so passing 5 will render 5 items before the list, and 5 items after. Defaults to 1, cannot be set to zero. This is necessary to hide the blank space around list items when scrolling
  * @param rootHeight the height of the root element of the virtualizedList itself
  * @param rowHeight the height of individual rows in the virtualizedList
@@ -14,9 +15,9 @@ import type { Accessor, JSX } from "solid-js";
  */
 export function VirtualList<T extends readonly any[], U extends JSX.Element>(props: {
   children: (item: T[number], index: Accessor<number>) => U;
-  fallback?: JSX.Element;
   class?: string;
   each: T | undefined | null | false;
+  fallback?: JSX.Element;
   overscanCount?: number;
   rootHeight: number;
   rowHeight: number;

@@ -27,6 +27,8 @@ pnpm add @solid-primitives/virtual
 <VirtualList
   // the list of items (of course, to for this component to be useful, the list would need to be much bigger than shown here)
   each={[0, 1, 2, 3, 4, 5, 6, 7]}
+  // the optional fallback to display if the list of items is empty
+  fallback={<div>No items</div>}
   // the number of elements to render both before and after the visible section of the list, so passing 5 will render 5 items before the list, and 5 items after. Defaults to 1, cannot be set to zero. This is necessary to hide the blank space around list items when scrolling
   overscanCount={5}
   // the height of the root element of the virtualizedList itself
@@ -48,7 +50,7 @@ Note that the component only handles vertical lists where the number of items is
 
 ## Demo
 
-You can see the VirtualizedList in action in the following sandbox: https://primitives.solidjs.community/playground/virtual
+You can see the VirtualList in action in the following sandbox: https://primitives.solidjs.community/playground/virtual
 
 ## Changelog
 

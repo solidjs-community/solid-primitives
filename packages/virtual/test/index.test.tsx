@@ -207,4 +207,42 @@ describe("VirtualList", () => {
 
     dispose();
   });
+
+  test("renders when list is empty", () => {
+    const dispose = render(
+      () => (
+        <VirtualList each={[]} rootHeight={20} rowHeight={10} class={SELECTOR_CLASS_NAME}>
+          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
+        </VirtualList>
+      ),
+      root,
+    );
+
+    expect(getScrollContainer()).not.toBeNull();
+
+    dispose();
+  });
+
+  test("renders when list is empty with optional fallback", () => {
+    const dispose = render(
+      () => (
+        <VirtualList
+          each={[]}
+          fallback={<div id="fallback" />}
+          rootHeight={20}
+          rowHeight={10}
+          class={SELECTOR_CLASS_NAME}
+        >
+          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
+        </VirtualList>
+      ),
+      root,
+    );
+
+    expect(getScrollContainer()).not.toBeNull();
+
+    expect(root.querySelector("#fallback")).not.toBeNull();
+
+    dispose();
+  });
 });
