@@ -22,7 +22,7 @@ const App: Component = () => {
           <DemoControl
             label="Number of rows"
             max={100_000}
-            min={1}
+            min={0}
             name="rowCount"
             setValue={setListLength}
             value={listLength()}
@@ -66,6 +66,7 @@ const App: Component = () => {
 
       <VirtualList
         each={items.slice(0, listLength())}
+fallback={<div>no items</div>}
         overscanCount={overscanCount()}
         rootHeight={rootHeight()}
         rowHeight={rowHeight()}
