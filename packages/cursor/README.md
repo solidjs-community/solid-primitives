@@ -11,8 +11,8 @@
 
 Two simple primitives for setting cursor css property reactively.
 
-- [`createElementCursor`](#createElementCursor) - Set provided cursor to given HTML Element styles reactively.
-- [`createBodyCursor`](#createBodyCursor) - Set selected cursor to body element styles reactively.
+- [`createElementCursor`](#createelementcursor) - Set provided cursor to given HTML Element styles reactively.
+- [`createBodyCursor`](#createbodycursor) - Set selected cursor to body element styles reactively.
 
 ## Installation
 

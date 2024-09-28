@@ -13,9 +13,9 @@ Control Flow Primitives for displaying a number range or given number of element
 
 - [`repeat`](#repeat) - Primitive for mapping a number of elements. Underlying helper for the [`<Repeat>`](#repeat-1) control flow.
 - [`<Repeat>`](#repeat-1) - Control Flow Component for displaying a number of elements.
-- [`mapRange`](#mapRange) - Primitive for mapping a number range of given start, end, and step values. Underlying helper for the [`<Range>`](#range) control flow.
+- [`mapRange`](#maprange) - Primitive for mapping a number range of given start, end, and step values. Underlying helper for the [`<Range>`](#range) control flow.
 - [`<Range>`](#range) - Control Flow Component for displaying a number range of elements.
-- [`indexRange`](#indexRange) - Primitive for mapping a number range while keeping previous elements of the same index. Underlying helper for the [`<IndexRange>`](#indexrange-1) control flow.
+- [`indexRange`](#indexrange) - Primitive for mapping a number range while keeping previous elements of the same index. Underlying helper for the [`<IndexRange>`](#indexrange-1) control flow.
 - [`<IndexRange>`](#indexrange-1) - Control Flow Component for displaying a number range of elements, where elements receive a number value as signal.
 
 ## Installation

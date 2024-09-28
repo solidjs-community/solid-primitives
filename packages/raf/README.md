@@ -11,8 +11,8 @@
 
 Reactive primitives providing support to `window.requestAnimationFrame`.
 
-- [`createRAF`](#createRAF) - Creates an auto-disposing requestAnimationFrame loop.
-- [`targetFPS`](#targetFPS) - Used to limit the FPS of [`createRAF`](#createRAF)
+- [`createRAF`](#createraf) - Creates an auto-disposing requestAnimationFrame loop.
+- [`targetFPS`](#targetfps) - Used to limit the FPS of [`createRAF`](#createraf)
 
 ## Installation
 

@@ -1,5 +1,11 @@
 # @solid-primitives/timer
 
+## 1.3.10
+
+### Patch Changes
+
+- 8dfd42d: Fix createPolled firing twice initially (#632)
+
 ## 1.3.9
 
 ### Patch Changes

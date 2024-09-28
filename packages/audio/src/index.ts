@@ -27,15 +27,17 @@ export type AudioEventHandlers = {
 
 // Helper for producing the audio source
 const unwrapSource = (src: AudioSource) => {
-  let player: HTMLAudioElement;
   if (src instanceof HTMLAudioElement) {
-    player = src;
-  } else {
-    player = new Audio();
-    player[typeof src === "string" ? "src" : "srcObject"] = src as string & MediaSource;
+    return src;
   }
+  const player = new Audio();
+  setAudioSrc(player, src);
   return player;
 };
+
+function setAudioSrc(el: HTMLAudioElement, src: AudioSource) {
+  el[typeof src === "string" ? "src" : "srcObject"] = src as string & MediaSource;
+}
 
 /**
  * Generates a basic audio instance with limited functionality.
@@ -51,20 +53,21 @@ export const makeAudio = (
   if (isServer) {
     return {} as HTMLAudioElement;
   }
+
   const player = unwrapSource(src);
-  const listeners = (enabled: boolean) => {
-    Object.entries(handlers).forEach(([evt, handler]) =>
-      player[enabled ? "addEventListener" : "removeEventListener"](
-        evt,
-        handler as EventListenerOrEventListenerObject,
-      ),
-    );
-  };
-  onMount(() => listeners(true));
+
+  onMount(() => {
+    for (const [name, handler] of Object.entries(handlers)) {
+      player.addEventListener(name, handler as any);
+    }
+  });
   onCleanup(() => {
     player.pause();
-    listeners(false);
+    for (const [name, handler] of Object.entries(handlers)) {
+      player.removeEventListener(name, handler as any);
+    }
   });
+
   return player;
 };
 
@@ -82,7 +85,7 @@ export const makeAudio = (
  *
  * @example
  * ```ts
- * const { start, seek } = makeAudioPlayer('./example1.mp3);
+ * const { start, seek } = makeAudioPlayer('./example1.mp3');
  * ```
  */
 export const makeAudioPlayer = (
@@ -105,13 +108,16 @@ export const makeAudioPlayer = (
     };
   }
   const player = makeAudio(src, handlers);
-  const play = () => player.play();
-  const pause = () => player.pause();
-  const seek = (time: number) =>
+  return {
+    player,
+    play: () => player.play(),
+    pause: () => player.pause(),
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    player.fastSeek ? player.fastSeek(time) : (player.currentTime = time);
-  const setVolume = (volume: number) => (player.volume = volume);
-  return { play, pause, seek, setVolume, player };
+    seek: player.fastSeek
+      ? (time: number) => player.fastSeek(time)
+      : (time: number) => (player.currentTime = time),
+    setVolume: (volume: number) => (player.volume = volume),
+  };
 };
 
 /**
@@ -177,19 +183,23 @@ export const createAudio = (
       },
     ];
   }
+
   const player = unwrapSource(access(src));
+
   const [store, setStore] = createStaticStore({
     state: AudioState.LOADING,
     player,
     currentTime: 0,
-    get duration() {
-      return this.player.duration;
-    },
-    get volume() {
-      return this.player.volume;
-    },
+    duration: 0,
+    volume: 0,
   });
-  const { play, pause, setVolume, seek } = makeAudioPlayer(store.player, {
+
+  const {
+    play,
+    pause,
+    setVolume: _setVolume,
+    seek,
+  } = makeAudioPlayer(store.player, {
     loadeddata: () => {
       setStore({
         state: AudioState.READY,
@@ -208,20 +218,27 @@ export const createAudio = (
     playing: () => setStore("state", AudioState.PLAYING),
     pause: () => setStore("state", AudioState.PAUSED),
     error: () => setStore("state", AudioState.ERROR),
+    ended: () => setStore("state", AudioState.COMPLETE),
   });
+
+  const setVolume = (volume: number) => {
+    setStore("volume", volume);
+    _setVolume(volume);
+  };
+
   // Bind reactive properties as needed
   if (src instanceof Function) {
     createEffect(() => {
-      const newSrc = access(src);
+      const newSrc = src();
       if (newSrc instanceof HTMLAudioElement) {
-        setStore("player", () => newSrc);
+        setStore("player", newSrc);
       } else {
-        store.player[typeof newSrc === "string" ? "src" : "srcObject"] = newSrc as string &
-          MediaSource;
+        setAudioSrc(store.player, newSrc);
       }
       seek(0);
     });
   }
+
   if (playing) {
     createEffect(() => (playing() ? play() : pause()));
   }
@@ -229,5 +246,6 @@ export const createAudio = (
     createEffect(() => setVolume(volume()));
     setVolume(volume());
   }
+
   return [store, { seek, play, pause, setVolume }];
 };

@@ -9,8 +9,8 @@
 [![size](https://img.shields.io/npm/v/@solid-primitives/page-visibility?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/page-visibility)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-3.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-- [`createPageVisibility`](#createPageVisibility) - Creates a signal with a boolean value identifying the page visibility state
-- [`usePageVisibility`](#usePageVisibility) - A [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) alternative.
+- [`createPageVisibility`](#createpagevisibility) - Creates a signal with a boolean value identifying the page visibility state
+- [`usePageVisibility`](#usepagevisibility) - A [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) alternative.
 
 ## Installation
 

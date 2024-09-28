@@ -1,7 +1,7 @@
 import "./setup";
 import { createRoot, createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
-import { makeAudio, makeAudioPlayer, createAudio } from "../src/index.js";
+import { makeAudio, makeAudioPlayer, createAudio, AudioState } from "../src/index.js";
 
 const testPath =
   "https://github.com/solidjs-community/solid-primitives/blob/audio/packages/audio/dev/sample1.mp3?raw=true";
@@ -47,7 +47,7 @@ describe("makeAudioPlayer", () => {
     }));
 });
 
-describe("createAudioPlayer", () => {
+describe("createAudio", () => {
   it("test srcObject value path", () =>
     createRoot(dispose => {
       const media = {} as MediaSource;
@@ -72,4 +72,14 @@ describe("createAudioPlayer", () => {
       expect(audio.player.volume).toBe(0.5);
       dispose();
     }));
+
+  it("should set the COMPLETE state when audio ends", () => {
+    const [[audio], dispose] = createRoot(dispose => [createAudio({} as MediaSource), dispose]);
+    expect(audio.state).toBe(AudioState.LOADING);
+
+    audio.player.dispatchEvent(new Event("ended"));
+    expect(audio.state).toBe(AudioState.COMPLETE);
+
+    dispose();
+  });
 });

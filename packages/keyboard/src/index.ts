@@ -86,12 +86,14 @@ type OldPressedKeys = [Accessor<string[]>, { event: Accessor<KeyboardEvent | nul
 export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[]>>(() => {
   if (isServer) {
     const keys = () => [];
+    // this is for backwards compatibility
+    // TODO remove in the next major version
     (keys as any as OldPressedKeys)[0] = keys;
     (keys as any as OldPressedKeys)[1] = { event: () => null };
     (keys as any as OldPressedKeys)[Symbol.iterator] = function* () {
       yield (keys as any as OldPressedKeys)[0];
       yield (keys as any as OldPressedKeys)[1];
-    };
+    } as any;
     return keys;
   }
 
@@ -148,7 +150,7 @@ export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[
   (pressedKeys as any as OldPressedKeys)[Symbol.iterator] = function* () {
     yield (pressedKeys as any as OldPressedKeys)[0];
     yield (pressedKeys as any as OldPressedKeys)[1];
-  };
+  } as any;
 
   return pressedKeys;
 });

@@ -23,8 +23,8 @@ pnpm add @solid-primitives/broadcast-channel
 
 ## Available primitives
 
-- [`makeBroadcastChannel`](#makeBroadcastChannel)
-- [`createBroadcastChannel`](#createBroadcastChannel)
+- [`makeBroadcastChannel`](#makebroadcastchannel)
+- [`createBroadcastChannel`](#createbroadcastchannel)
 
 ### `makeBroadcastChannel`
 
@@ -97,7 +97,7 @@ const App = () => {
 
 ### `createBroadcastChannel`
 
-Provedes the same functionality as [`makeBroadcastChannel`](#makeBroadcastChannel) but instead of returning `onMessage` function, it returns a `message` signal accessor that updates when postMessage is fired from other contexts.
+Provedes the same functionality as [`makeBroadcastChannel`](#makebroadcastchannel) but instead of returning `onMessage` function, it returns a `message` signal accessor that updates when postMessage is fired from other contexts.
 
 ```ts
 const { postMessage } = createBroadcastChannel("test_channel");

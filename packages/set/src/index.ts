@@ -23,7 +23,7 @@ export class ReactiveSet<T> extends Set<T> {
     if (values) for (const v of values) super.add(v);
   }
 
-  [Symbol.iterator](): IterableIterator<T> {
+  [Symbol.iterator](): SetIterator<T> {
     return this.values();
   }
 
@@ -37,11 +37,11 @@ export class ReactiveSet<T> extends Set<T> {
     return super.has(value);
   }
 
-  keys(): IterableIterator<T> {
+  keys(): SetIterator<T> {
     return this.values();
   }
 
-  *values(): IterableIterator<T> {
+  *values(): SetIterator<T> {
     this.#triggers.track($KEYS);
 
     for (const value of super.values()) {
@@ -49,7 +49,7 @@ export class ReactiveSet<T> extends Set<T> {
     }
   }
 
-  *entries(): IterableIterator<[T, T]> {
+  *entries(): SetIterator<[T, T]> {
     this.#triggers.track($KEYS);
 
     for (const entry of super.entries()) {

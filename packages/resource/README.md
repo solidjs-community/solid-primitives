@@ -14,7 +14,7 @@ A collection of composable primitives to augment [`createResource`](https://www.
 - [`createAggregated`](#createaggregated) - wraps the resource to aggregate data instead of overwriting it
 - [`createDeepSignal`](#createdeepsignal) - provides a fine-grained signal for the [resource storage option](https://docs.solidjs.com/reference/basic-reactivity/create-resource#options)
 - [`makeAbortable`](#makeabortable) - sets up an AbortSignal with auto-abort on re-fetch or timeout
-- [`createAbortable`](#createAbortable) - like `makeAbortable`, but with automatic abort on cleanup
+- [`createAbortable`](#createabortable) - like `makeAbortable`, but with automatic abort on cleanup
 - [`makeCache`](#makecache) - wraps the fetcher to cache the responses for a certain amount of time
 - [`makeRetrying`](#makeretrying) - wraps the fetcher to retry requests after a delay
 

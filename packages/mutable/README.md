@@ -11,8 +11,8 @@
 
 A primitive for creating a mutable store proxy object. An alternative to `createStore` from `"solid-js/store"`.
 
-- [`createMutable`](#createMutable) - Creates a mutable store proxy object.
-- [`modifyMutable`](#modifyMutable) - Helper for applying store mutation utilities - like `produce` or `reconcile` from `"solid-js/store"` - to a mutable store.
+- [`createMutable`](#createmutable) - Creates a mutable store proxy object.
+- [`modifyMutable`](#modifymutable) - Helper for applying store mutation utilities - like `produce` or `reconcile` from `"solid-js/store"` - to a mutable store.
 
 ## Installation
 

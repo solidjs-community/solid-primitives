@@ -1,7 +1,16 @@
 import { defineConfig } from "vitest/config";
 import solidPlugin from "vite-plugin-solid";
+import * as utils from "../scripts/utils/index.js"
 
-const fromRoot = process.env.CI === "true";
+const package_name = utils.getPackageNameFromCWD()
+
+if (package_name == null) {
+  utils.logLine("Testing ALL packages...")
+} else {
+  utils.logLine("Testing "+package_name+" package...")
+}
+
+const from_root = package_name == null
 
 export default defineConfig(({ mode }) => {
   // test in server environment
@@ -25,7 +34,7 @@ export default defineConfig(({ mode }) => {
       transformMode: {
         web: [/\.[jt]sx$/],
       },
-      ...(fromRoot
+      ...(from_root
         ? // Testing all packages from root
           {
             ...(testSSR && { include: ["packages/*/test/server.test.{ts,tsx}"] }),
