@@ -24,7 +24,7 @@ describe("VirtualList", () => {
     const dispose = render(
       () => (
         <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10}>
-          {item => <div id={"item-" + item} style={{ height: "100px" }} />}
+          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
         </VirtualList>
       ),
       root,
@@ -42,7 +42,7 @@ describe("VirtualList", () => {
     const dispose = render(
       () => (
         <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10} class={SELECTOR_CLASS_NAME}>
-          {item => <div id={"item-" + item} style={{ height: "100px" }} />}
+          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
         </VirtualList>
       ),
       root,
@@ -99,7 +99,7 @@ describe("VirtualList", () => {
     const dispose = render(
       () => (
         <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10} class={SELECTOR_CLASS_NAME}>
-          {item => <div id={"item-" + item} style={{ height: "100px" }} />}
+          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
         </VirtualList>
       ),
       root,
@@ -128,7 +128,7 @@ describe("VirtualList", () => {
           overscanCount={2}
           class={SELECTOR_CLASS_NAME}
         >
-          {item => <div id={"item-" + item} style={{ height: "100px" }} />}
+          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
         </VirtualList>
       ),
       root,
@@ -154,7 +154,7 @@ describe("VirtualList", () => {
     const dispose = render(
       () => (
         <VirtualList each={TEST_LIST} rootHeight={20} rowHeight={10} class={SELECTOR_CLASS_NAME}>
-          {item => <div id={"item-" + item} style={{ height: "100px" }} />}
+          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
         </VirtualList>
       ),
       root,
@@ -184,7 +184,7 @@ describe("VirtualList", () => {
           overscanCount={0}
           class={SELECTOR_CLASS_NAME}
         >
-          {item => <div id={"item-" + item} style={{ height: "100px" }} />}
+          {item => <div id={"item-" + item} style={{ height: "10px" }} />}
         </VirtualList>
       ),
       root,
