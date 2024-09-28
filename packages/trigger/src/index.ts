@@ -82,7 +82,7 @@ export class TriggerCache<T> {
  * Trigger signals added to the cache only when tracked under a computation,
  * and get deleted from the cache when they are no longer tracked.
  *
- * @returns an array of `[track, dirty, dirtyAll]` functions
+ * @returns a tuple of `[track, dirty, dirtyAll]` functions
  *
  * `track` and `dirty` are called with a `key` so that each tracker will trigger an update only when his individual `key` would get marked as dirty.
  * `dirtyAll` will mark all keys as dirty and trigger an update for all of them.
