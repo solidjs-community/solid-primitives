@@ -1,4 +1,5 @@
 import * as path from "node:path";
+import * as fs from "node:fs";
 import * as fsp from "node:fs/promises";
 import * as url from "node:url";
 
@@ -88,4 +89,20 @@ export async function pathExists(target: string): Promise<boolean> {
   } catch (err) {
     return false;
   }
+}
+
+export function getDirLastModifiedTimeSync(dir: string): number {
+  let latest_time = 0
+  
+  try {
+    for (let entry of fs.readdirSync(dir, {withFileTypes: true})) {
+      let full_path = path.join(dir, entry.name)
+      let time = entry.isDirectory() ? getDirLastModifiedTimeSync(full_path) : fs.statSync(full_path).mtimeMs
+      if (time > latest_time) {
+        latest_time = time
+      }
+    }
+  } catch {}
+
+  return latest_time;
 }
