@@ -1,7 +1,7 @@
 import path from "node:path";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
-import { MODULE_PREFIX, PACKAGES_DIR, isNonNullable, logLine } from "./utils.js";
+import { MODULE_PREFIX, PACKAGES_DIR, isNonNullable, log_info } from "./utils.js";
 import * as vb from "valibot";
 
 const pkg_schema = vb.object({
@@ -65,7 +65,7 @@ export async function getModulesData<T = ModuleData>(
     const pkg = getPackagePkg(name);
 
     if (pkg instanceof Error) {
-      logLine(pkg.message);
+      log_info(pkg.message);
       return null;
     }
 

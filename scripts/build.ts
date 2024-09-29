@@ -6,11 +6,21 @@ import * as esb from "esbuild"
 import * as esb_solid from "esbuild-plugin-solid"
 import * as utils from "./utils/index.js"
 
-let begin = performance.now()
+const ROOT_DIST_DIR = path.join(utils.ROOT_DIR, "dist")
 
-let root_dist_dir = path.join(utils.ROOT_DIR, "dist")
+let cwd_module_name = utils.getPackageNameFromCWD()
+let module_names = cwd_module_name ? [cwd_module_name] : await fsp.readdir(utils.PACKAGES_DIR)
 
-let module_names = await fsp.readdir(utils.PACKAGES_DIR)
+if (module_names.length === 0) {
+  utils.log_info("No packages to build")
+  process.exit(0)
+}
+
+let build_target_title = module_names.length > 1
+  ? `${module_names.length} packages`
+  : module_names[0]
+
+utils.log_info(`Building ${build_target_title}...`)
 
 let tsc_entries: string[] = []
 let esb_entries: string[] = []
@@ -38,40 +48,58 @@ for (let name of module_names) {
   }
 }
 
-// Emit .js files for packages with jsx
-
-let esb_promise = esb.build({
-  plugins: [esb_solid.solidPlugin()],
-  entryPoints: esb_entries,
-  outdir: root_dist_dir,
-  format: "esm",
-  platform: "browser",
-  target: ["esnext"]
-})
-
 // Emit d.ts and .js(x) files
+try {
+  let base_config_path = path.join(utils.ROOT_DIR, "tsconfig.json")
+  let base_config_file = JSON.parse(fs.readFileSync(base_config_path, "utf-8"))
+  let base_config      = ts.parseJsonConfigFileContent(base_config_file, ts.sys, utils.ROOT_DIR)
 
-let base_config_path = path.join(utils.ROOT_DIR, "tsconfig.json")
-let base_config_file = JSON.parse(fs.readFileSync(base_config_path, "utf-8"))
-let base_config      = ts.parseJsonConfigFileContent(base_config_file, ts.sys, utils.ROOT_DIR)
+  ts.createProgram(tsc_entries, {
+    ...base_config.options,
+    noEmit: false,
+    declaration: true,
+    outDir: ROOT_DIST_DIR,
+    rootDir: utils.PACKAGES_DIR,
+  }).emit()
+  
+  utils.log_info(`TSC step done.`)
+} catch (err) {
+  utils.log_error("TSC step failed.")
+  throw err
+}
 
-ts.createProgram(tsc_entries, {
-  ...base_config.options,
-  noEmit     : false,
-  declaration: true,
-  outDir     : root_dist_dir,
-}).emit()
-
-await esb_promise
+// Emit .js files for packages with jsx
+try {
+  if (esb_entries.length > 0) {
+    await esb.build({
+      plugins: [esb_solid.solidPlugin()],
+      entryPoints: esb_entries,
+      outdir: ROOT_DIST_DIR,
+      format: "esm",
+      platform: "browser",
+      target: ["esnext"]
+    })
+    utils.log_info(`esbuild step done.`)
+  }
+} catch (err) {
+  utils.log_error("esbuild step failed.")
+  throw err
+}
 
 // Copy declarations to /packages/*/dist/
+try {
+  await Promise.all(module_names.map(async name => {
+    let module_dist_dir = path.join(ROOT_DIST_DIR, name, "src")
+    let target_dist_dir = path.join(utils.PACKAGES_DIR, name, "dist")
+    return utils.copyDirectory(module_dist_dir, target_dist_dir)
+  }))
+  
+  await fsp.rm(ROOT_DIST_DIR, {recursive: true, force: true})
 
-await Promise.all(module_names.map(async name => {
-  let module_dist_dir = path.join(root_dist_dir, name, "src")
-  let target_dist_dir = path.join(utils.PACKAGES_DIR, name, "dist")
-  return utils.copyDirectory(module_dist_dir, target_dist_dir)
-}))
+  utils.log_info(`Output copied.`)
+} catch (err) {
+  utils.log_error("Copying output failed.")
+  throw err
+}
 
-await fsp.rm(root_dist_dir, {recursive: true, force: true})
-
-utils.logLine(`Built ${module_names.length} packages in ${Math.ceil(performance.now() - begin)}ms`)
+utils.log_info(`Built ${build_target_title} in ${Math.ceil(performance.now())}ms`)

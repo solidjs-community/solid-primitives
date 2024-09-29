@@ -3,7 +3,7 @@ import {
   formatBytes,
   getPackageBundlesize,
   getPackagePkg,
-  logLine,
+  log_info,
 } from "./utils/index.js";
 
 if (process.argv.length < 3)
@@ -39,7 +39,7 @@ class ConsoleTable {
     const separator = columnWidths.map(columnWidth => "—".repeat(columnWidth)).join(" + ");
 
     for (const row of this.rows) {
-      logLine(
+      log_info(
         row.length === 0
           ? separator
           : columnWidths
@@ -63,7 +63,7 @@ if (pkg instanceof Error) throw pkg;
 const primitives = (pkg.primitive as any).list as string[];
 const peerDependencies = Object.keys(pkg.peerDependencies);
 
-logLine(`Measuring "@solid-primitives/${name}"...\n`);
+log_info(`Measuring "@solid-primitives/${name}"...\n`);
 
 const primitivesSizesPromises = primitives.map(primitive =>
   getPackageBundlesize(name, { exportName: primitive, peerDependencies }),
@@ -97,7 +97,7 @@ table.addRow([
 
 table.log();
 
-logLine(`
+log_info(`
 ${primitivesSizes.every(size => size) ? "✅" : "❌"} All primitives measured successfully.
 ${packageSize ? "✅" : "❌"} Measured the package successfully.
 `);
