@@ -1,4 +1,5 @@
 import * as path from "node:path";
+import * as fs from "node:fs";
 import * as fsp from "node:fs/promises";
 import * as url from "node:url";
 
@@ -22,7 +23,9 @@ export function getPackageNameFromCWD(): string | null {
 }
 
 // eslint-disable-next-line no-console
-export const logLine = (string: string) => console.log(`\x1b[34m${string}\x1b[0m`);
+export const log_info = (string: string) => console.log(`\x1b[34m${string}\x1b[0m`);
+// eslint-disable-next-line no-console
+export const log_error = (string: string) => console.log(`\x1b[31m${string}\x1b[0m`);
 
 export const checkValidPackageName = (name: string) =>
   /[a-z0-9\-]+/.test(name) && name.match(/[a-z0-9\-]+/)![0].length === name.length;
@@ -86,4 +89,20 @@ export async function pathExists(target: string): Promise<boolean> {
   } catch (err) {
     return false;
   }
+}
+
+export function getDirLastModifiedTimeSync(dir: string): number {
+  let latest_time = 0
+  
+  try {
+    for (let entry of fs.readdirSync(dir, {withFileTypes: true})) {
+      let full_path = path.join(dir, entry.name)
+      let time = entry.isDirectory() ? getDirLastModifiedTimeSync(full_path) : fs.statSync(full_path).mtimeMs
+      if (time > latest_time) {
+        latest_time = time
+      }
+    }
+  } catch {}
+
+  return latest_time;
 }
