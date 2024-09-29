@@ -8,8 +8,22 @@ import * as utils from "./utils/index.js"
 
 const ROOT_DIST_DIR = path.join(utils.ROOT_DIR, "dist")
 
+// get packages to build based on cwd
 let cwd_module_name = utils.getPackageNameFromCWD()
 let module_names = cwd_module_name ? [cwd_module_name] : await fsp.readdir(utils.PACKAGES_DIR)
+
+// Don't rebuild packages which source haven't changed
+for (let i = module_names.length-1; i >= 0; i--) {
+  let name = module_names[i]!
+  let last_modified_src  = utils.getDirLastModifiedTimeSync(path.join(utils.PACKAGES_DIR, name, "src"))
+  let last_modified_dist = utils.getDirLastModifiedTimeSync(path.join(utils.PACKAGES_DIR, name, "dist"))
+  if (last_modified_dist > last_modified_src) {
+    module_names.splice(i, 1)
+    utils.log_info(`"${name}" skipped`)
+  } else {
+    utils.log_info(`"${name}" needs rebuild`)
+  }
+}
 
 if (module_names.length === 0) {
   utils.log_info("No packages to build")
@@ -18,13 +32,13 @@ if (module_names.length === 0) {
 
 let build_target_title = module_names.length > 1
   ? `${module_names.length} packages`
-  : module_names[0]
-
+  : `"${module_names[0]}"`
 utils.log_info(`Building ${build_target_title}...`)
 
 let tsc_entries: string[] = []
 let esb_entries: string[] = []
 
+// Handle packages with custom entries
 for (let name of module_names) {
   let src_dir = path.join(utils.PACKAGES_DIR, name, "src")
 
@@ -56,10 +70,10 @@ try {
 
   ts.createProgram(tsc_entries, {
     ...base_config.options,
-    noEmit: false,
+    noEmit:      false,
     declaration: true,
-    outDir: ROOT_DIST_DIR,
-    rootDir: utils.PACKAGES_DIR,
+    outDir:      ROOT_DIST_DIR,
+    rootDir:     utils.PACKAGES_DIR,
   }).emit()
   
   utils.log_info(`TSC step done.`)
@@ -72,12 +86,12 @@ try {
 try {
   if (esb_entries.length > 0) {
     await esb.build({
-      plugins: [esb_solid.solidPlugin()],
+      plugins:     [esb_solid.solidPlugin()],
       entryPoints: esb_entries,
-      outdir: ROOT_DIST_DIR,
-      format: "esm",
-      platform: "browser",
-      target: ["esnext"]
+      outdir:      ROOT_DIST_DIR,
+      format:      "esm",
+      platform:    "browser",
+      target:      ["esnext"]
     })
     utils.log_info(`esbuild step done.`)
   }
