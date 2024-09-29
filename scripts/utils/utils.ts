@@ -22,7 +22,9 @@ export function getPackageNameFromCWD(): string | null {
 }
 
 // eslint-disable-next-line no-console
-export const logLine = (string: string) => console.log(`\x1b[34m${string}\x1b[0m`);
+export const log_info = (string: string) => console.log(`\x1b[34m${string}\x1b[0m`);
+// eslint-disable-next-line no-console
+export const log_error = (string: string) => console.log(`\x1b[31m${string}\x1b[0m`);
 
 export const checkValidPackageName = (name: string) =>
   /[a-z0-9\-]+/.test(name) && name.match(/[a-z0-9\-]+/)![0].length === name.length;
