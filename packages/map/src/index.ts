@@ -24,48 +24,59 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   #keyTriggers = new TriggerCache<K | typeof $KEYS>();
   #valueTriggers = new TriggerCache<K>();
 
-  constructor(initial?: Iterable<readonly [K, V]> | null) {
-    super();
-    if (initial) for (const v of initial) super.set(v[0], v[1]);
+  [Symbol.iterator](): MapIterator<[K, V]> {
+    return this.entries();
   }
 
-  // reads
-  has(key: K): boolean {
-    this.#keyTriggers.track(key);
-    return super.has(key);
+  constructor(entries?: Iterable<readonly [K, V]> | null) {
+    super();
+    if (entries) for (const entry of entries) super.set(...entry);
   }
-  get(key: K): V | undefined {
-    this.#valueTriggers.track(key);
-    return super.get(key);
-  }
+
   get size(): number {
     this.#keyTriggers.track($KEYS);
     return super.size;
   }
 
   *keys(): MapIterator<K> {
+    this.#keyTriggers.track($KEYS);
+
     for (const key of super.keys()) {
-      this.#keyTriggers.track(key);
       yield key;
     }
-    this.#keyTriggers.track($KEYS);
-  }
-  *values(): MapIterator<V> {
-    for (const [key, v] of super.entries()) {
-      this.#valueTriggers.track(key);
-      yield v;
-    }
-    this.#keyTriggers.track($KEYS);
-  }
-  *entries(): MapIterator<[K, V]> {
-    for (const entry of super.entries()) {
-      this.#valueTriggers.track(entry[0]);
-      yield entry;
-    }
-    this.#keyTriggers.track($KEYS);
   }
 
-  // writes
+  *values(): MapIterator<V> {
+    this.#keyTriggers.track($KEYS);
+
+    for (const value of super.values()) {
+      yield value;
+    }
+  }
+
+  *entries(): MapIterator<[K, V]> {
+    this.#keyTriggers.track($KEYS);
+
+    for (const entry of super.entries()) {
+      yield entry;
+    }
+  }
+
+  forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void {
+    this.#keyTriggers.track($KEYS);
+    super.forEach(callbackfn, thisArg);
+  }
+
+  has(key: K): boolean {
+    this.#keyTriggers.track(key);
+    return super.has(key);
+  }
+
+  get(key: K): V | undefined {
+    this.#valueTriggers.track(key);
+    return super.get(key);
+  }
+
   set(key: K, value: V): this {
     batch(() => {
       if (super.has(key)) {
@@ -79,6 +90,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     });
     return this;
   }
+
   delete(key: K): boolean {
     const r = super.delete(key);
     if (r) {
@@ -90,6 +102,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     }
     return r;
   }
+
   clear(): void {
     if (super.size) {
       batch(() => {
@@ -101,19 +114,6 @@ export class ReactiveMap<K, V> extends Map<K, V> {
         this.#keyTriggers.dirty($KEYS);
       });
     }
-  }
-
-  // callback
-  forEach(callbackfn: (value: V, key: K, map: this) => void) {
-    this.#keyTriggers.track($KEYS);
-    for (const [key, v] of super.entries()) {
-      this.#valueTriggers.track(key);
-      callbackfn(v, key, this);
-    }
-  }
-
-  [Symbol.iterator](): MapIterator<[K, V]> {
-    return this.entries();
   }
 }
 
