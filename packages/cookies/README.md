@@ -32,7 +32,7 @@ pnpm add @solid-primitives/cookies
 A primitive for creating a cookie that can be accessed isomorphically on the client, or the server.
 
 ```ts
-import { createServerCookie } from "@solid-primitives/cookies"
+import { createServerCookie } from "@solid-primitives/cookies";
 
 const [cookie, setCookie] = createServerCookie("cookieName");
 
@@ -44,7 +44,7 @@ cookie(); // => string | undefined
 Custom cookie serializers and deserializers can also be implemented
 
 ```ts
-import { createServerCookie } from "@solid-primitives/cookies"
+import { createServerCookie } from "@solid-primitives/cookies";
 
 const [serverCookie, setServerCookie] = createServerCookie("coolCookie", {
   deserialize: str => (str ? str.split(" ") : []), // Deserializes cookie into a string[]
@@ -59,7 +59,7 @@ serverCookie(); // => string[]
 Composes `createServerCookie` to provide a type safe way to store a theme and access it on the server or client.
 
 ```ts
-import { createUserTheme } from "@solid-primitives/cookies"
+import { createUserTheme } from "@solid-primitives/cookies";
 
 const [theme, setTheme] = createUserTheme("cookieName");
 
@@ -79,12 +79,11 @@ A primitive that allows for the cookie string to be accessed isomorphically on t
 Uses `getRequestEvent` on the server and `document.cookie` on the client.
 
 ```ts
-import { getCookiesString, parseCookie } from "@solid-primitives/cookies"
+import { getCookiesString, parseCookie } from "@solid-primitives/cookies";
 
-const string = getCookiesString()
-const cookie = parseCookie(string, "cookie_name")
+const string = getCookiesString();
+const cookie = parseCookie(string, "cookie_name");
 ```
-
 
 ## Examples
 

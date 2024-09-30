@@ -21,9 +21,9 @@ export function parseCookie(cookie: string, key: string): string | undefined {
  */
 export function getCookiesString(): string {
   if (isServer) {
-    return getRequestEvent()?.request.headers.get("cookie") ?? ""
+    return getRequestEvent()?.request.headers.get("cookie") ?? "";
   }
-  return document.cookie
+  return document.cookie;
 }
 
 export type MaxAgeOptions = {
@@ -101,7 +101,7 @@ export function createUserTheme(
   options?: UserThemeOptions,
 ): Signal<Theme | undefined>;
 export function createUserTheme(name = "theme", options: UserThemeOptions = {}): Signal<any> {
-  const {defaultValue, cookieMaxAge} = options;
+  const { defaultValue, cookieMaxAge } = options;
   return createServerCookie(name, {
     cookieMaxAge,
     deserialize: str => (str === "light" || str === "dark" ? str : defaultValue),
