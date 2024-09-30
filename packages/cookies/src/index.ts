@@ -1,7 +1,5 @@
 import { createSignal, createEffect, Signal } from "solid-js";
-import { isServer } from "solid-js/web";
-import { parseCookie } from "solid-start";
-import { useRequest } from "solid-start/server/ServerContext.jsx";
+import { getRequestEvent, isServer } from "solid-js/web";
 
 export type MaxAgeOptions = {
   /**
@@ -22,6 +20,18 @@ export type ServerCookieOptions<T = string> = MaxAgeOptions & {
 };
 
 const YEAR = 365 * 24 * 60 * 60;
+
+/*
+ Original code by Chakra UI
+ MIT Licensed, Copyright (c) 2019 Segun Adebayo.
+
+ Credits to the Chakra UI team:
+ https://github.com/chakra-ui/chakra-ui/blob/%40chakra-ui/toast%401.2.0/packages/color-mode/src/storage-manager.ts
+*/
+
+export function parseCookie(cookie: string, key: string): string | undefined {
+  return cookie.match(new RegExp(`(^| )${key}=([^;]+)`))?.[2];
+}
 
 /**
  * A primitive for creating a cookie that can be accessed isomorphically on the client, or the server
@@ -53,9 +63,10 @@ export function createServerCookie<T>(
 
   const [cookie, setCookie] = createSignal(
     deserialize(
-      parseCookie(isServer ? (useRequest().request.headers.get("cookie") ?? "") : document.cookie)[
-        name
-      ],
+      parseCookie(
+        isServer ? getRequestEvent()?.request.headers.get("cookie") ?? "" : document.cookie,
+        name,
+      ),
     ),
   );
 
