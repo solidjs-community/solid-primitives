@@ -21,7 +21,8 @@
     "stage": 0,
     "list": [
       "createServerCookie",
-      "createUserTheme"
+      "createUserTheme",
+      "getUserAgent"
     ],
     "category": "Solid Start"
   },

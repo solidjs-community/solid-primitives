@@ -34,6 +34,17 @@ export function parseCookie(cookie: string, key: string): string | undefined {
 }
 
 /**
+ * A primitive that allows for the user agent string to be accessed isomorphically on the client, or on the server
+ * @return Returns the user agent string, or null
+ */
+export function getUserAgent(): string | null {
+  if (isServer) {
+    return getRequestEvent()?.request.headers.get("user-agent") ?? null
+  }
+  return navigator.userAgent
+}
+
+/**
  * A primitive for creating a cookie that can be accessed isomorphically on the client, or the server
  *
  * @param name The name of the cookie to be set
