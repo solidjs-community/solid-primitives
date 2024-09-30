@@ -22,7 +22,7 @@
     "list": [
       "createServerCookie",
       "createUserTheme",
-      "getUserAgent"
+      "getCookiesString"
     ],
     "category": "Solid Start"
   },
