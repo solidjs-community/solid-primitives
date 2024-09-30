@@ -1,5 +1,29 @@
 # @solid-primitives/storage
 
+## 4.2.1
+
+### Patch Changes
+
+- 7e50e35: Fix `makePersisted` type narrowing
+
+## 4.2.0
+
+### Minor Changes
+
+- 89117a6: storage: expose init promise/value, resource: docs clarification
+
+## 4.1.0
+
+### Minor Changes
+
+- fd4e161: fixes utf8 escaping in cookieStorage
+
+## 4.0.0
+
+### Major Changes
+
+- 94d1bcc: storage: remove deprecated primitives, simplify types, add makeObjectStorage
+
 ## 3.8.0
 
 ### Minor Changes

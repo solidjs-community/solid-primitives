@@ -11,7 +11,7 @@
 
 Primitives for tracking HTML element size and position on screen as it changes.
 
-- [`createElementBounds`](#createElementBounds) - Creates a reactive store-like object of current element bounds — position on the screen, and size dimensions.
+- [`createElementBounds`](#createelementbounds) - Creates a reactive store-like object of current element bounds — position on the screen, and size dimensions.
 
 ## Installation
 

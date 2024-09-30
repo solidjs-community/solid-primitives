@@ -1,8 +1,6 @@
-import { createRoot } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import { cookieStorage } from "../src/index.js";
-import { createCookieStorage, createCookieStorageSignal } from "../src/cookies.js";
 
 describe("cookieStorage", () => {
   it("adds/gets/removes an item", () => {
@@ -41,33 +39,12 @@ describe("cookieStorage", () => {
       expect(set).toHaveBeenCalledWith("test3=good");
     });
   });
-});
 
-describe("createCookieStorage", () => {
-  it("creates a storage", () =>
-    createRoot(dispose => {
-      cookieStorage.clear();
-      const [storage, setStorage, { remove, clear }] = createCookieStorage();
-      setStorage("test", "1");
-      cookieStorage.setItem("test2", "2");
-      expect(storage.test).toBe(cookieStorage.getItem("test"));
-      expect(storage.test).toBe("1");
-      expect(storage.test2).toBe("2");
-      remove("test2");
-      expect(storage.test2).toBe(null);
-      clear();
-      expect(cookieStorage.length).toBe(0);
-      dispose();
-    }));
-});
-
-describe("createCookieSignal", () => {
-  it("creates a signal", () =>
-    createRoot(dispose => {
-      const [getter, setter] = createCookieStorageSignal("test3");
-      expect(getter()).toBe(undefined);
-      setter("3");
-      expect(getter()).toBe("3");
-      dispose();
-    }));
+  it("(de)-serializes utf-8 characters correctly", () => {
+    const set = vi.spyOn(document, "cookie", "set");
+    const umlaute = "äöüÄÖÜ";
+    cookieStorage.setItem("test4", umlaute);
+    expect(set).toHaveBeenCalledWith("test4=" + encodeURIComponent(umlaute));
+    expect(cookieStorage.getItem("test4")).toBe(umlaute);
+  });
 });

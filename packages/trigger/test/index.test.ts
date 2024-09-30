@@ -22,6 +22,21 @@ describe("createTriggerCache", () => {
       dispose();
     }));
 
+  test("dirtyAll", () =>
+    createRoot(dispose => {
+      const [track, , dirtyAll] = createTriggerCache(Map);
+      let runs = -1;
+      createComputed(() => {
+        track(1);
+        runs++;
+      });
+      expect(runs).toBe(0);
+      dirtyAll();
+      expect(runs).toBe(1);
+
+      dispose();
+    }));
+
   test("weak trigger cache", () =>
     createRoot(dispose => {
       const [track, dirty] = createTriggerCache();

@@ -11,8 +11,8 @@
 
 Reactive primitives to react to element/window scrolling.
 
-- [`createScrollPosition`](#createScrollPosition) - Reactive primitive providing a store-like object with current scroll position of specified target.
-- [`useWindowScrollPosition`](#useWindowScrollPosition) - Returns a reactive object with current window scroll position.
+- [`createScrollPosition`](#createscrollposition) - Reactive primitive providing a store-like object with current scroll position of specified target.
+- [`useWindowScrollPosition`](#usewindowscrollposition) - Returns a reactive object with current window scroll position.
 
 ## Installation
 

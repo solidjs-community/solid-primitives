@@ -1,12 +1,25 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import * as path from "node:path";
+import * as fsp from "node:fs/promises";
+import * as url from "node:url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+
+export const CWD = process.cwd();
 
 export const ROOT_DIR = path.join(__dirname, "..", "..");
 export const PACKAGES_DIR = path.join(ROOT_DIR, "packages");
 
 export const MODULE_PREFIX = "@solid-primitives/";
+
+export function getPackageNameFromCWD(): string | null {
+  if (CWD.startsWith(PACKAGES_DIR)) {
+    let name = CWD.slice(PACKAGES_DIR.length + path.sep.length).split(path.sep)[0];
+    if (name !== undefined && name.length > 0) {
+      return name;
+    }
+  }
+  return null;
+}
 
 // eslint-disable-next-line no-console
 export const logLine = (string: string) => console.log(`\x1b[34m${string}\x1b[0m`);
@@ -49,3 +62,28 @@ export function insertTextBetweenComments(file: string, text: string, comment: s
 }
 
 export const isNonNullable = <T>(i: T): i is NonNullable<T> => i != null;
+
+export async function copyDirectory(src: string, dst: string): Promise<void> {
+  await fsp.mkdir(dst, { recursive: true });
+  const entries = await fsp.readdir(src, { withFileTypes: true });
+
+  for (let entry of entries) {
+    const src_path = path.join(src, entry.name);
+    const dst_path = path.join(dst, entry.name);
+
+    if (entry.isDirectory()) {
+      await copyDirectory(src_path, dst_path);
+    } else {
+      await fsp.copyFile(src_path, dst_path);
+    }
+  }
+}
+
+export async function pathExists(target: string): Promise<boolean> {
+  try {
+    await fsp.access(target);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}

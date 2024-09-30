@@ -5,6 +5,7 @@ import {
   type ResourceFetcher,
   type ResourceFetcherInfo,
   type Signal,
+  onCleanup,
 } from "solid-js";
 import { createStore, reconcile, unwrap } from "solid-js/store";
 
@@ -60,6 +61,27 @@ export function makeAbortable(
       throw err;
     },
   ];
+}
+
+/**
+ * **Creates and handles an AbortSignal with automated cleanup**
+ * ```ts
+ * const [signal, abort, filterAbortError] =
+ *   createAbortable();
+ * const fetcher = (url) => fetch(url, { signal: signal() })
+ *   .catch(filterAbortError); // filters abort errors
+ * ```
+ * Returns an accessor for the signal and the abort callback.
+ *
+ * Options are optional and include:
+ * - `timeout`: time in Milliseconds after which the fetcher aborts automatically
+ * - `noAutoAbort`: can be set to true to make a new source not automatically abort a previous request
+ */
+
+export function createAbortable(options?: AbortableOptions) {
+  const [signal, abort, filterAbortError] = makeAbortable(options);
+  onCleanup(abort);
+  return [signal, abort, filterAbortError];
 }
 
 const mapEntries = (entries: [key: string, value: any][]) =>

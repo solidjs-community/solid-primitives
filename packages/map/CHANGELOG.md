@@ -1,5 +1,18 @@
 # @solid-primitives/map
 
+## 0.4.13
+
+### Patch Changes
+
+- Updated dependencies [32fcb81]
+  - @solid-primitives/trigger@1.1.0
+
+## 0.4.12
+
+### Patch Changes
+
+- 1ea2a09: Use new Map/SetIterator types
+
 ## 0.4.11
 
 ### Patch Changes

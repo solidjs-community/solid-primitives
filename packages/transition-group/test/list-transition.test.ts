@@ -171,32 +171,31 @@ describe("createListTransition", () => {
 
       dispose();
     });
+  });
 
-    it("keeps index if removed elements if enabled", () => {
-      createRoot(dispose => {
-        const [children, setChildren] = createSignal<Element[]>([el1, el2, el3]);
-        const fn = vi.fn();
+  it("keeps index if removed elements if enabled", () => {
+    const [children, setChildren] = createSignal<Element[]>([el1, el2, el3]);
+    const fn = vi.fn();
 
-        const result = createListTransition(children, {
-          onChange: fn,
-          exitMethod: "keep-index",
-        });
-        expect(result()).toHaveLength(2);
+    const [result, dispose] = createRoot(dispose => [
+      createListTransition(children, { onChange: fn, exitMethod: "keep-index" }),
+      dispose,
+    ]);
 
-        setChildren([el1, el3]);
-        expect(result()).toHaveLength(3);
-        expect(fn).toHaveBeenCalledOnce();
-        expect(fn).toHaveBeenCalledWith({
-          list: [el1, el2, el3],
-          added: [el3],
-          removed: [el1],
-          unchanged: [el2],
-          finishRemoved: expect.any(Function),
-        } satisfies OnChangeParams);
+    expect(result()).toHaveLength(3);
 
-        dispose();
-      });
-    });
+    setChildren([el1, el3]);
+    expect(result()).toHaveLength(3);
+    expect(fn).toHaveBeenCalledOnce();
+    expect(fn).toHaveBeenCalledWith({
+      list: [el1, el2, el3],
+      added: [],
+      removed: [el2],
+      unchanged: [el1, el3],
+      finishRemoved: expect.any(Function),
+    } satisfies OnChangeParams);
+
+    dispose();
   });
 
   /*

@@ -11,9 +11,9 @@
 
 A range of IntersectionObserver API utilities great for different types of use cases:
 
-- [`createIntersectionObserver`](#createIntersectionObserver) - A reactive observer primitive.
-- [`createViewportObserver`](#createViewportObserver) - More advanced tracker that creates a store of element signals.
-- [`createVisibilityObserver`](#createVisibilityObserver) - Basic visibility observer using a signal.
+- [`createIntersectionObserver`](#createintersectionobserver) - A reactive observer primitive.
+- [`createViewportObserver`](#createviewportobserver) - More advanced tracker that creates a store of element signals.
+- [`createVisibilityObserver`](#createvisibilityobserver) - Basic visibility observer using a signal.
 
 ## Installation
 

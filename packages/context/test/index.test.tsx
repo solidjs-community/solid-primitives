@@ -3,19 +3,24 @@ import { createContext, createRoot, FlowComponent, JSX, untrack, useContext } fr
 import { render } from "solid-js/web";
 import { createContextProvider, MultiProvider } from "../src/index.js";
 
-const context = { message: "Hello, Context!" };
-const fallback = { message: "FALLBACK", children: undefined };
+type TestContextValue = {
+  message: string;
+  children: JSX.Element;
+};
+
+const TEST_MESSAGE = "Hello, Context!";
+const FALLBACK: TestContextValue = { message: "FALLBACK", children: undefined };
 
 const [TestProvider, useTestContext] = createContextProvider(
-  (props: { text?: string; children: JSX.Element }) => {
+  (props: { text?: string; children: JSX.Element }): TestContextValue => {
     return {
-      message: props.text ?? context.message,
+      message: props.text ?? TEST_MESSAGE,
       get children() {
         return props.children;
       },
     };
   },
-  fallback,
+  FALLBACK,
 );
 const TestChild = () => <div>{useTestContext().message}</div>;
 
@@ -32,61 +37,57 @@ describe("createContextProvider", () => {
       container,
     );
 
-    expect(container.innerHTML, "Not correctly rendered").toBe(`<div>${context.message}</div>`);
+    expect(container.innerHTML, "Not correctly rendered").toBe(`<div>${TEST_MESSAGE}</div>`);
 
     unmount();
     document.body.removeChild(container);
   });
 
   test("returns fallback if context is not provided", () => {
-    let capture;
+    let ctx!: TestContextValue;
     const unmount = render(() => {
-      const ctx = useTestContext();
-      capture = ctx.message;
+      ctx = useTestContext();
       return "";
     }, document.createElement("div"));
-    expect(capture).toBe(fallback.message);
+    expect(ctx.message).toBe(FALLBACK.message);
     unmount();
   });
 
   test("returns fallback if context is not provided", () => {
-    let capture;
-    let captureChildren;
+    let ctx!: TestContextValue;
 
     const TextComp = () => {
-      const ctx = useTestContext();
-      capture = ctx.message;
-      captureChildren = ctx.children;
+      ctx = useTestContext();
       return "";
     };
 
     const unmount = render(
-      () => <TestProvider text="REPLACE">{TextComp}</TestProvider>,
+      () => <TestProvider text="REPLACE">{TextComp as any}</TestProvider>,
       document.createElement("div"),
     );
-    expect(capture).toBe("REPLACE");
-    expect(captureChildren).toBe(TextComp);
+    expect(ctx.message).toBe("REPLACE");
+    expect(ctx.children).toBe(TextComp);
     unmount();
   });
 });
 
 describe("MultiProvider", () => {
   test("provides multiple contexts", () => {
+    const Ctx1 = createContext<string>();
+    const Ctx2 = createContext<string>();
+
+    let runs = 0;
+    let capture1;
+    let capture2;
+    let capture3;
+
+    const BoundProvider: FlowComponent = props => {
+      expect(useContext(Ctx1)).toBe("Hello");
+      expect(useContext(Ctx2)).toBe("World");
+      return <TestProvider>{props.children}</TestProvider>;
+    };
+
     createRoot(() => {
-      const Ctx1 = createContext<string>();
-      const Ctx2 = createContext<string>();
-
-      let runs = 0;
-      let capture1;
-      let capture2;
-      let capture3;
-
-      const BoundProvider: FlowComponent = props => {
-        expect(useContext(Ctx1)).toBe("Hello");
-        expect(useContext(Ctx2)).toBe("World");
-        return <TestProvider>{props.children}</TestProvider>;
-      };
-
       <MultiProvider
         values={[[Ctx1, "Ignored"], [Ctx1, "Hello"], [Ctx2.Provider, "World"], BoundProvider]}
       >
@@ -98,11 +99,11 @@ describe("MultiProvider", () => {
           return "";
         })}
       </MultiProvider>;
-
-      expect(runs).toBe(1);
-      expect(capture1).toBe("Hello");
-      expect(capture2).toBe("World");
-      expect(capture3).toBe(context.message);
     });
+
+    expect(runs).toBe(1);
+    expect(capture1).toBe("Hello");
+    expect(capture2).toBe("World");
+    expect(capture3).toBe(TEST_MESSAGE);
   });
 });

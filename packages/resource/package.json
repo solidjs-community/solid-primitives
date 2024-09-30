@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/resource",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "A template primitive example.",
   "author": "Alex <alex.lohr@goto.com>",
   "contributors": [],
@@ -20,6 +20,7 @@
       "createAggregated",
       "createDeepSignal",
       "makeAbortable",
+      "createAbortable",
       "makeCache",
       "makeRetrying"
     ],

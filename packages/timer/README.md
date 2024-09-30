@@ -11,11 +11,11 @@
 
 Timer primitives related to [`setInterval`](https://developer.mozilla.org/en-US/docs/Web/API/setInterval) and [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/setTimeout):
 
-- [`makeTimer`](#makeTimer) - Makes an automatically cleaned up timer.
-- [`createTimer`](#createTimer) - [makeTimer](#maketimer), but with a fully reactive delay
-- [`createTimeoutLoop`](#createTimeoutLoop) - Like createInterval, except the delay only updates between executions.
-- [`createPolled`](#createPolled) - Polls a function periodically. Returns an to the latest polled value.
-- [`createIntervalCounter`](#createIntervalCounter) - Creates a counter which increments periodically.
+- [`makeTimer`](#maketimer) - Makes an automatically cleaned up timer.
+- [`createTimer`](#createtimer) - [makeTimer](#maketimer), but with a fully reactive delay
+- [`createTimeoutLoop`](#createtimeoutloop) - Like createInterval, except the delay only updates between executions.
+- [`createPolled`](#createpolled) - Polls a function periodically. Returns an to the latest polled value.
+- [`createIntervalCounter`](#createintervalcounter) - Creates a counter which increments periodically.
 
 ## Installation
 

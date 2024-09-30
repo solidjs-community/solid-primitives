@@ -11,13 +11,13 @@
 
 ##### Non-reactive primitives:
 
-- [`makeActiveElementListener`](#makeActiveElementListener) - Listen for changes to the `document.activeElement`.
-- [`makeFocusListener`](#makeFocusListener) - Attaches "blur" and "focus" event listeners to the element.
+- [`makeActiveElementListener`](#makeactiveelementlistener) - Listen for changes to the `document.activeElement`.
+- [`makeFocusListener`](#makefocuslistener) - Attaches "blur" and "focus" event listeners to the element.
 
 ##### Reactive primitives:
 
-- [`createActiveElement`](#createActiveElement) - Provides reactive signal of `document.activeElement`.
-- [`createFocusSignal`](#createFocusSignal) - Provides a signal representing element's focus state.
+- [`createActiveElement`](#createactiveelement) - Provides reactive signal of `document.activeElement`.
+- [`createFocusSignal`](#createfocussignal) - Provides a signal representing element's focus state.
 
 ##### Directives:
 

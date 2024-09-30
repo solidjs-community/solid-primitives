@@ -11,8 +11,8 @@
 
 Primitives for creating small reactive objects that doesn't change their shape over time - don't need a proxy wrapper.
 
-- [`createStaticStore`](#createStaticStore) - Creates a writable static store object.
-- [`createDerivedStaticStore`](#createDerivedStaticStore) - Creates a static store that is derived from a source function.
+- [`createStaticStore`](#createstaticstore) - Creates a writable static store object.
+- [`createDerivedStaticStore`](#createderivedstaticstore) - Creates a static store that is derived from a source function.
 
 ## Installation
 
@@ -57,7 +57,7 @@ setSize("new-property", "value");
 
 ## `createDerivedStaticStore`
 
-A derived version of the [`createStaticStore`](#createStaticStore). It will use the update function to derive the value of the store. It will only update when the dependencies of the update function change.
+A derived version of the [`createStaticStore`](#createstaticstore). It will use the update function to derive the value of the store. It will only update when the dependencies of the update function change.
 
 ### How to use it
 
@@ -82,7 +82,7 @@ el.addEventListener("resize", () => {
 
 ## `createHydratableStaticStore`
 
-A "hydratable" version of the [`createStaticStore`](#createStaticStore) - it will use the `serverValue` on the server and the `update` function on the client. If initialized during hydration it will use `serverValue` as the initial value and update it once hydration is complete.
+A "hydratable" version of the [`createStaticStore`](#createstaticstore) - it will use the `serverValue` on the server and the `update` function on the client. If initialized during hydration it will use `serverValue` as the initial value and update it once hydration is complete.
 
 > **Warning** This primitive version is experimental, and mostly used internally by other primitives. It is not recommended to use it directly.
 

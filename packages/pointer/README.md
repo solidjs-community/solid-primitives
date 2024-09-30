@@ -11,11 +11,11 @@
 
 A collection of primitives, giving you a nicer API to handle pointer events in a reactive context.
 
-- [`createPointerListeners`](#createPointerListeners) - Setups event listeners for pointer events, that will get automatically removed on cleanup,
-- [`createPerPointerListeners`](#createPerPointerListeners) - Setup pointer event listeners, while following the pointers individually, from when they appear, until they're gone,
-- [`createPointerPosition`](#createPointerPosition) - Returns a signal with autoupdating Pointer position,
-- [`createPointerList`](#createPointerList) - Provides a signal of current pointers on screen
-- [`pointerHover`](#pointerHover) - A directive for checking if the element is being hovered by at least one pointer.
+- [`createPointerListeners`](#createpointerlisteners) - Setups event listeners for pointer events, that will get automatically removed on cleanup,
+- [`createPerPointerListeners`](#createperpointerlisteners) - Setup pointer event listeners, while following the pointers individually, from when they appear, until they're gone,
+- [`createPointerPosition`](#createpointerposition) - Returns a signal with autoupdating Pointer position,
+- [`createPointerList`](#createpointerlist) - Provides a signal of current pointers on screen
+- [`pointerHover`](#pointerhover) - A directive for checking if the element is being hovered by at least one pointer.
 
 ## Installation
 

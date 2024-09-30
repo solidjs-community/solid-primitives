@@ -13,7 +13,7 @@ Primitives for creating scheduled — throttled or debounced — callbacks.
 
 - [`debounce`](#debounce) - Creates a callback that is **debounced** and cancellable.
 - [`throttle`](#throttle) - Creates a callback that is **throttled** and cancellable.
-- [`scheduleIdle`](#scheduleIdle) - Creates a callback throttled using `window.requestIdleCallback()`.
+- [`scheduleIdle`](#scheduleidle) - Creates a callback throttled using `window.requestIdleCallback()`.
 - [`leading`](#leading) - Creates a scheduled and cancellable callback that will be called on **leading** edge.
 - [`createScheduled`](#createscheduled) - Creates a signal used for scheduling execution of solid computations by tracking.
 - [Scheduling explanation](#scheduling-explanation)

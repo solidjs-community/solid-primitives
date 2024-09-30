@@ -154,6 +154,7 @@ dist/
 
 # vscode settings
 .vscode/settings.json
+.vscode/launch.json
 
 # Temporary folders
 tmp/

@@ -1,38 +1,42 @@
 import { createSignal, createEffect, Signal } from "solid-js";
 import { getRequestEvent, isServer } from "solid-js/web";
 
+const YEAR = 365 * 24 * 60 * 60;
+
+/*
+ Original code by Chakra UI
+ MIT Licensed, Copyright (c) 2019 Segun Adebayo.
+
+ Credits to the Chakra UI team:
+ https://github.com/chakra-ui/chakra-ui/blob/%40chakra-ui/toast%401.2.0/packages/color-mode/src/storage-manager.ts
+*/
+
+export function parseCookie(cookie: string, key: string): string | undefined {
+  return cookie.match(new RegExp(`(^| )${key}=([^;]+)`))?.[2];
+}
+
+/**
+ * A primitive that allows for the cookie string to be accessed isomorphically on the client, or on the server
+ * @return Returns the cookie string
+ */
+export function getCookiesString(): string {
+  if (isServer) {
+    return getRequestEvent()?.request.headers.get("cookie") ?? ""
+  }
+  return document.cookie
+}
+
 export type MaxAgeOptions = {
-  /**
-   * The maximum age of the cookie in seconds. Defaults to 1 year.
-   */
+  /** The maximum age of the cookie in seconds. Defaults to 1 year. */
   cookieMaxAge?: number;
 };
 
 export type ServerCookieOptions<T = string> = MaxAgeOptions & {
-  /**
-   * A function to deserialize the cookie value to be used as signal value
-   */
+  /** A function to deserialize the cookie value to be used as signal value */
   deserialize?: (str: string | undefined) => T;
-  /**
-   * A function to serialize the signal value to be used as cookie value
-   */
+  /** A function to serialize the signal value to be used as cookie value */
   serialize?: (value: T) => string;
 };
-
-const YEAR = 365 * 24 * 60 * 60;
-
-/*
- * Original code by Chakra UI
- * MIT Licensed, Copyright (c) 2019 Segun Adebayo.
- *
- * Credits to the Chakra UI team:
- * https://github.com/chakra-ui/chakra-ui/blob/main/packages/color-mode/src/storage-manager.ts
- */
-
-function parseCookie(cookie: string, key: string): string | undefined {
-  const match = cookie.match(new RegExp(`(^| )${key}=([^;]+)`));
-  return match?.[2];
-}
 
 /**
  * A primitive for creating a cookie that can be accessed isomorphically on the client, or the server
@@ -62,14 +66,7 @@ export function createServerCookie<T>(
     cookieMaxAge = YEAR,
   } = options ?? {};
 
-  const [cookie, setCookie] = createSignal(
-    deserialize(
-      parseCookie(
-        isServer ? getRequestEvent()?.request.headers.get("cookie") ?? "" : document.cookie,
-        name,
-      ),
-    ),
-  );
+  const [cookie, setCookie] = createSignal(deserialize(parseCookie(getCookiesString(), name)));
 
   createEffect(p => {
     const string = serialize(cookie());
@@ -103,10 +100,10 @@ export function createUserTheme(
   name?: string,
   options?: UserThemeOptions,
 ): Signal<Theme | undefined>;
-export function createUserTheme(name = "theme", options?: UserThemeOptions): Signal<any> {
-  const defaultValue = options?.defaultValue;
+export function createUserTheme(name = "theme", options: UserThemeOptions = {}): Signal<any> {
+  const {defaultValue, cookieMaxAge} = options;
   return createServerCookie(name, {
-    ...options,
+    cookieMaxAge,
     deserialize: str => (str === "light" || str === "dark" ? str : defaultValue),
     serialize: String,
   });
