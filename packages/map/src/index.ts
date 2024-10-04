@@ -30,7 +30,12 @@ export class ReactiveMap<K, V> extends Map<K, V> {
 
   constructor(entries?: Iterable<readonly [K, V]> | null) {
     super();
-    if (entries) for (const entry of entries) super.set(...entry);
+
+    if (entries) {
+      batch(() => {
+        for (const entry of entries) super.set(...entry);
+      });
+    }
   }
 
   get size(): number {
@@ -137,9 +142,14 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
   #keyTriggers = new TriggerCache<K>(WeakMap);
   #valueTriggers = new TriggerCache<K>(WeakMap);
 
-  constructor(initial?: Iterable<readonly [K, V]> | null) {
+  constructor(entries?: Iterable<readonly [K, V]> | null) {
     super();
-    if (initial) for (const v of initial) super.set(v[0], v[1]);
+
+    if (entries) {
+      batch(() => {
+        for (const entry of entries) super.set(...entry);
+      });
+    }
   }
 
   has(key: K): boolean {
