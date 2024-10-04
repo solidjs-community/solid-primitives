@@ -164,14 +164,18 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
     return super.get(key);
   }
   set(key: K, value: V): this {
-    batch(() => {
-      if (super.has(key)) {
-        if (super.get(key)! === value) return;
-      } else this.#keyTriggers.dirty(key);
-      this.#valueTriggers.dirty(key);
-      super.set(key, value);
-    });
-    return this;
+    const hadNoKey = !super.has(key);
+    const hasChanged = super.get(key) !== value;
+    const result = super.set(key, value);
+
+    if (hasChanged || hadNoKey) {
+      batch(() => {
+        if (hadNoKey) this.#keyTriggers.dirty(key);
+        if (hasChanged) this.#valueTriggers.dirty(key);
+      });
+    }
+
+    return result;
   }
   delete(key: K): boolean {
     const r = super.delete(key);
