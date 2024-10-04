@@ -1,7 +1,7 @@
 import { Accessor, batch } from "solid-js";
 import { TriggerCache } from "@solid-primitives/trigger";
 
-const $KEYS = Symbol("track-keys");
+const $OBJECT = Symbol("track-object");
 
 /**
  * A reactive version of `Map` data structure. All the reads (like `get` or `has`) are signals, and all the writes (`delete` or `set`) will cause updates to appropriate signals.
@@ -21,8 +21,8 @@ const $KEYS = Symbol("track-keys");
  * userPoints.set(user1, { foo: "bar" });
  */
 export class ReactiveMap<K, V> extends Map<K, V> {
-  #keyTriggers = new TriggerCache<K | typeof $KEYS>();
-  #valueTriggers = new TriggerCache<K>();
+  #keyTriggers = new TriggerCache<K | typeof $OBJECT>();
+  #valueTriggers = new TriggerCache<K | typeof $OBJECT>();
 
   [Symbol.iterator](): MapIterator<[K, V]> {
     return this.entries();
@@ -34,12 +34,12 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   }
 
   get size(): number {
-    this.#keyTriggers.track($KEYS);
+    this.#keyTriggers.track($OBJECT);
     return super.size;
   }
 
   *keys(): MapIterator<K> {
-    this.#keyTriggers.track($KEYS);
+    this.#keyTriggers.track($OBJECT);
 
     for (const key of super.keys()) {
       yield key;
@@ -47,7 +47,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   }
 
   *values(): MapIterator<V> {
-    this.#keyTriggers.track($KEYS);
+    this.#valueTriggers.track($OBJECT);
 
     for (const value of super.values()) {
       yield value;
@@ -55,7 +55,8 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   }
 
   *entries(): MapIterator<[K, V]> {
-    this.#keyTriggers.track($KEYS);
+    this.#keyTriggers.track($OBJECT);
+    this.#valueTriggers.track($OBJECT);
 
     for (const entry of super.entries()) {
       yield entry;
@@ -63,7 +64,8 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   }
 
   forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void {
-    this.#keyTriggers.track($KEYS);
+    this.#keyTriggers.track($OBJECT);
+    this.#valueTriggers.track($OBJECT);
     super.forEach(callbackfn, thisArg);
   }
 
@@ -84,9 +86,14 @@ export class ReactiveMap<K, V> extends Map<K, V> {
 
     if (hasChanged || hadNoKey) {
       batch(() => {
-        this.#keyTriggers.dirty($KEYS);
-        if (hadNoKey) this.#keyTriggers.dirty(key);
-        if (hasChanged) this.#valueTriggers.dirty(key);
+        if (hadNoKey) {
+          this.#keyTriggers.dirty($OBJECT);
+          this.#keyTriggers.dirty(key);
+        }
+        if (hasChanged) {
+          this.#valueTriggers.dirty($OBJECT);
+          this.#valueTriggers.dirty(key);
+        }
       });
     }
 
@@ -99,9 +106,13 @@ export class ReactiveMap<K, V> extends Map<K, V> {
 
     if (result) {
       batch(() => {
-        this.#keyTriggers.dirty($KEYS);
+        this.#keyTriggers.dirty($OBJECT);
         this.#keyTriggers.dirty(key);
-        if (isDefined) this.#valueTriggers.dirty(key);
+
+        if (isDefined) {
+          this.#valueTriggers.dirty($OBJECT);
+          this.#valueTriggers.dirty(key);
+        }
       });
     }
 
