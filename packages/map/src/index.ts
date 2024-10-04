@@ -178,14 +178,17 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
     return result;
   }
   delete(key: K): boolean {
-    const r = super.delete(key);
-    if (r) {
+    const isDefined = super.get(key) !== undefined;
+    const result = super.delete(key);
+
+    if (result) {
       batch(() => {
         this.#keyTriggers.dirty(key);
-        this.#valueTriggers.dirty(key);
+        if (isDefined) this.#valueTriggers.dirty(key);
       });
     }
-    return r;
+
+    return result;
   }
 }
 
