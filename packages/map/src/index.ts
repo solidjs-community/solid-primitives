@@ -83,17 +83,19 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   }
 
   set(key: K, value: V): this {
-    batch(() => {
-      if (super.has(key)) {
-        if (super.get(key)! === value) return;
-      } else {
-        this.#keyTriggers.dirty(key);
+    const hadNoKey = !super.has(key);
+    const hasChanged = super.get(key) !== value;
+    const result = super.set(key, value);
+
+    if (hasChanged || hadNoKey) {
+      batch(() => {
         this.#keyTriggers.dirty($KEYS);
-      }
-      this.#valueTriggers.dirty(key);
-      super.set(key, value);
-    });
-    return this;
+        if (hadNoKey) this.#keyTriggers.dirty(key);
+        if (hasChanged) this.#valueTriggers.dirty(key);
+      });
+    }
+
+    return result;
   }
 
   delete(key: K): boolean {
