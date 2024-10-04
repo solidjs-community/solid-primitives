@@ -107,10 +107,10 @@ export class ReactiveMap<K, V> extends Map<K, V> {
     if (result) {
       batch(() => {
         this.#keyTriggers.dirty($OBJECT);
+        this.#valueTriggers.dirty($OBJECT);
         this.#keyTriggers.dirty(key);
 
         if (isDefined) {
-          this.#valueTriggers.dirty($OBJECT);
           this.#valueTriggers.dirty(key);
         }
       });
