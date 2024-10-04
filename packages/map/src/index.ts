@@ -99,15 +99,18 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   }
 
   delete(key: K): boolean {
-    const r = super.delete(key);
-    if (r) {
+    const isDefined = super.get(key) !== undefined;
+    const result = super.delete(key);
+
+    if (result) {
       batch(() => {
-        this.#keyTriggers.dirty(key);
         this.#keyTriggers.dirty($KEYS);
-        this.#valueTriggers.dirty(key);
+        this.#keyTriggers.dirty(key);
+        if (isDefined) this.#valueTriggers.dirty(key);
       });
     }
-    return r;
+
+    return result;
   }
 
   clear(): void {
