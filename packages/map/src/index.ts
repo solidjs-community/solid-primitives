@@ -30,12 +30,7 @@ export class ReactiveMap<K, V> extends Map<K, V> {
 
   constructor(entries?: Iterable<readonly [K, V]> | null) {
     super();
-
-    if (entries) {
-      batch(() => {
-        for (const entry of entries) super.set(...entry);
-      });
-    }
+    if (entries) for (const entry of entries) super.set(...entry);
   }
 
   get size(): number {
@@ -147,12 +142,7 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
 
   constructor(entries?: Iterable<readonly [K, V]> | null) {
     super();
-
-    if (entries) {
-      batch(() => {
-        for (const entry of entries) super.set(...entry);
-      });
-    }
+    if (entries) for (const entry of entries) super.set(...entry);
   }
 
   has(key: K): boolean {
