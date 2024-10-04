@@ -115,13 +115,11 @@ export class ReactiveMap<K, V> extends Map<K, V> {
 
   clear(): void {
     if (super.size) {
+      super.clear();
+
       batch(() => {
-        for (const v of super.keys()) {
-          this.#keyTriggers.dirty(v);
-          this.#valueTriggers.dirty(v);
-        }
-        super.clear();
-        this.#keyTriggers.dirty($KEYS);
+        this.#keyTriggers.dirtyAll();
+        this.#valueTriggers.dirtyAll();
       });
     }
   }
