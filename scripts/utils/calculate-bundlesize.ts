@@ -1,17 +1,23 @@
-import fs from "fs";
-import fsp from "fs/promises";
-import path from "path";
+import * as fs from "node:fs";
+import * as fsp from "node:fs/promises";
+import * as path from "node:path";
+import * as zlib from 'node:zlib';
 import { build } from "esbuild";
-import { gzipSize } from "gzip-size";
 import { fileURLToPath } from "url";
 import { PACKAGES_DIR } from "./utils.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const GZIP_HEADERS_AND_METADATA_SIZE = 20; // around 20 bytes
-
 export type Bundlesize = { min: number; gzip: number };
+
+export async function gzipSize(input: zlib.InputType): Promise<number> {
+  return new Promise((res, rej) => {
+    zlib.gzip(input, (err, val) =>
+      err ? rej(err) : res(val.length - 20) // around 20 bytes of gzip header
+    )
+  })
+}
 
 export const getPackageBundlesize = async (
   packageName: string,
@@ -80,25 +86,10 @@ export const getPackageBundlesize = async (
   const buffer = await fsp.readFile(outFilepath);
   const minifiedSize = buffer.toString().length;
 
-  const gzippedSize = (await gzipSize(buffer)) - GZIP_HEADERS_AND_METADATA_SIZE;
+  const gzippedSize = await gzipSize(buffer);
 
   fs.existsSync(exportFilepath) && (await fsp.rm(exportFilepath));
   fs.existsSync(outFilepath) && (await fsp.rm(outFilepath));
-
-  // if (minifiedSize <= 0) {
-  //   if (recursive) {
-  //     recursive = false;
-  //     return result;
-  //   }
-  //   recursive = true;
-
-  //   return await getExportBundlesize({
-  //     packageName,
-  //     type,
-  //     exportName,
-  //     isExportDefault: !isExportDefault,
-  //   });
-  // }
 
   return {
     min: minifiedSize,

@@ -38,9 +38,6 @@ importers:
       eslint-plugin-no-only-tests:
         specifier: ^3.3.0
         version: 3.3.0
-      gzip-size:
-        specifier: ^7.0.0
-        version: 7.0.0
       jsdom:
         specifier: ^25.0.0
         version: 25.0.0
@@ -878,7 +875,7 @@ importers:
         version: link:../utils
       '@tauri-apps/plugin-store':
         specifier: '*'
-        version: 2.0.0-rc.1
+        version: 2.0.0
     devDependencies:
       solid-js:
         specifier: ^1.8.15
@@ -2703,11 +2700,11 @@ packages:
     resolution: {integrity: sha512-rqI++FWClU5I2UBp4HXFvl+sBWkdigBkxnpJDQUWttNyG7IZP4FwQGhTNL5EOw0vI8i6eSAJ5frLqO7n7jbJdg==}
     engines: {node: '>= 14.6.0', npm: '>= 6.6.0', yarn: '>= 1.19.1'}
 
-  '@tauri-apps/api@2.0.0-rc.4':
-    resolution: {integrity: sha512-UNiIhhKG08j4ooss2oEEVexffmWkgkYlC2M3GcX3VPtNsqFgVNL8Mcw/4Y7rO9M9S+ffAMnLOF5ypzyuyb8tyg==}
+  '@tauri-apps/api@2.0.1':
+    resolution: {integrity: sha512-eoQWT+Tq1qSwQpHV+nw1eNYe5B/nm1PoRjQCRiEOS12I1b+X4PUcREfXVX8dPcBT6GrzWGDtaecY0+1p0Rfqlw==}
 
-  '@tauri-apps/plugin-store@2.0.0-rc.1':
-    resolution: {integrity: sha512-rW71Tkr7OifxoL8NkWgPy5Os4Gn3oJTbv/j/nJ03HDuYsq+F4+8kU8o4epRFJnr6VKmgB/2CtiacSC3dnSSRnA==}
+  '@tauri-apps/plugin-store@2.0.0':
+    resolution: {integrity: sha512-l4xsbxAXrKGdBdYNNswrLfcRv3v1kOatdycOcVPYW+jKwkznCr1HEOrPXkPhXsZLSLyYmNXpgfOmdSZNmcykDg==}
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -8306,11 +8303,11 @@ snapshots:
 
   '@tauri-apps/api@1.6.0': {}
 
-  '@tauri-apps/api@2.0.0-rc.4': {}
+  '@tauri-apps/api@2.0.1': {}
 
-  '@tauri-apps/plugin-store@2.0.0-rc.1':
+  '@tauri-apps/plugin-store@2.0.0':
     dependencies:
-      '@tauri-apps/api': 2.0.0-rc.4
+      '@tauri-apps/api': 2.0.1
 
   '@types/babel__core@7.20.5':
     dependencies:
