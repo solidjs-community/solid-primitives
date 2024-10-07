@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as fsp from "node:fs/promises";
 import * as path from "node:path";
-import * as zlib from 'node:zlib';
+import * as zlib from "node:zlib";
 import { build } from "esbuild";
 import { fileURLToPath } from "url";
 import { PACKAGES_DIR } from "./utils.js";
@@ -13,10 +13,11 @@ export type Bundlesize = { min: number; gzip: number };
 
 export async function gzipSize(input: zlib.InputType): Promise<number> {
   return new Promise((res, rej) => {
-    zlib.gzip(input, (err, val) =>
-      err ? rej(err) : res(val.length - 20) // around 20 bytes of gzip header
-    )
-  })
+    zlib.gzip(
+      input,
+      (err, val) => (err ? rej(err) : res(val.length - 20)), // around 20 bytes of gzip header
+    );
+  });
 }
 
 export const getPackageBundlesize = async (
