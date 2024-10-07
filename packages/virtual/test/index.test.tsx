@@ -1,14 +1,16 @@
 import { describe, test, expect } from "vitest";
 import { render } from "solid-js/web";
-import { createSignal } from "solid-js";
+import { DOMElement } from "solid-js/jsx-runtime";
 
 import { createVirtualList, VirtualList } from "../src/index.jsx";
 
 const TEST_LIST = Array.from({ length: 1000 }, (_, i) => i);
 
+const ROOT = document.createElement("div");
+
 const SCROLL_EVENT = new Event("scroll");
 
-const ROOT = document.createElement("div");
+const TARGETED_SCROLL_EVENT = (el: DOMElement) => ({ ...SCROLL_EVENT, target: el });
 
 function getScrollContainer() {
   const scrollContainer = ROOT.querySelector("div");
@@ -19,11 +21,8 @@ function getScrollContainer() {
 }
 
 describe("createVirtualList", () => {
-  const [rootElement] = createSignal(ROOT);
-
   test("returns containerHeight representing the size of the list container element within the root", () => {
-    const { containerHeight } = createVirtualList({
-      rootElement,
+    const [{ containerHeight }] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
@@ -33,8 +32,7 @@ describe("createVirtualList", () => {
   });
 
   test("returns viewerTop representing the location of the list viewer element within the list container", () => {
-    const { viewerTop } = createVirtualList({
-      rootElement,
+    const [{ viewerTop }] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
@@ -44,8 +42,7 @@ describe("createVirtualList", () => {
   });
 
   test("returns visibleList representing the subset of items to render", () => {
-    const { visibleItems } = createVirtualList({
-      rootElement,
+    const [{ visibleItems }] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
@@ -56,10 +53,8 @@ describe("createVirtualList", () => {
 
   test("returns onScroll which sets viewerTop and visibleItems based on rootElement's scrolltop", () => {
     const el = document.createElement("div");
-    const [rootElement] = createSignal(el);
 
-    const { onScroll, viewerTop, visibleItems } = createVirtualList({
-      rootElement,
+    const [{ viewerTop, visibleItems }, onScroll] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
@@ -74,25 +69,25 @@ describe("createVirtualList", () => {
     expect(visibleItems()).toEqual([0, 1, 2]);
     expect(viewerTop()).toEqual(0);
 
-    onScroll();
+    onScroll(TARGETED_SCROLL_EVENT(el));
 
     expect(visibleItems()).toEqual([0, 1, 2, 3]);
     expect(viewerTop()).toEqual(0);
 
     el.scrollTop += 10;
-    onScroll();
+    onScroll(TARGETED_SCROLL_EVENT(el));
 
     expect(visibleItems()).toEqual([1, 2, 3, 4]);
     expect(viewerTop()).toEqual(10);
 
     el.scrollTop -= 10;
-    onScroll();
+    onScroll(TARGETED_SCROLL_EVENT(el));
 
     expect(visibleItems()).toEqual([0, 1, 2, 3]);
     expect(viewerTop()).toEqual(0);
 
     el.scrollTop -= 10;
-    onScroll();
+    onScroll(TARGETED_SCROLL_EVENT(el));
 
     expect(visibleItems()).toEqual([0, 1, 2]);
     expect(viewerTop()).toEqual(0);
@@ -100,10 +95,8 @@ describe("createVirtualList", () => {
 
   test("onScroll handles reaching the bottom of the list", () => {
     const el = document.createElement("div");
-    const [rootElement] = createSignal(el);
 
-    const { onScroll, viewerTop, visibleItems } = createVirtualList({
-      rootElement,
+    const [{ viewerTop, visibleItems }, onScroll] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
@@ -113,7 +106,7 @@ describe("createVirtualList", () => {
     expect(viewerTop()).toEqual(0);
 
     el.scrollTop += 9_980;
-    onScroll();
+    onScroll(TARGETED_SCROLL_EVENT(el));
 
     expect(visibleItems()).toEqual([997, 998, 999]);
     expect(viewerTop()).toEqual(9_970);
@@ -121,10 +114,8 @@ describe("createVirtualList", () => {
 
   test("visibleList takes `overscanCount` into account", () => {
     const el = document.createElement("div");
-    const [rootElement] = createSignal(el);
 
-    const { visibleItems, onScroll } = createVirtualList({
-      rootElement,
+    const [{ visibleItems }, onScroll] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
@@ -132,14 +123,13 @@ describe("createVirtualList", () => {
     });
 
     el.scrollTop += 100;
-    onScroll();
+    onScroll(TARGETED_SCROLL_EVENT(el));
 
     expect(visibleItems()).toEqual([8, 9, 10, 11, 12, 13]);
   });
 
   test("overscanCount defaults to 1 if undefined or zero", () => {
-    const { visibleItems: visibleItemsUndefined } = createVirtualList({
-      rootElement,
+    const [{ visibleItems: visibleItemsUndefined }] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
@@ -147,8 +137,7 @@ describe("createVirtualList", () => {
 
     expect(visibleItemsUndefined()).toEqual([0, 1, 2]);
 
-    const { visibleItems: visibleItemsZero } = createVirtualList({
-      rootElement,
+    const [{ visibleItems: visibleItemsZero }] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
@@ -159,8 +148,7 @@ describe("createVirtualList", () => {
   });
 
   test("handles empty list", () => {
-    const { containerHeight, viewerTop, visibleItems } = createVirtualList({
-      rootElement,
+    const [{ containerHeight, viewerTop, visibleItems }] = createVirtualList({
       items: [],
       rootHeight: 20,
       rowHeight: 10,

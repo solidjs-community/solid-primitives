@@ -956,6 +956,9 @@ importers:
 
   packages/virtual:
     dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
       solid-js:
         specifier: ^1.6.12
         version: 1.8.20
