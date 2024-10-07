@@ -1,36 +1,48 @@
 import { For, createSignal } from "solid-js";
-import type { Accessor, JSX, Signal } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
+import type { DOMElement } from "solid-js/jsx-runtime";
+import { access } from "@solid-primitives/utils";
+import type { MaybeAccessor } from "@solid-primitives/utils";
+
+type VirtualListConfig<T extends readonly any[]> = {
+  items: MaybeAccessor<T | undefined | null | false>;
+  rootHeight: MaybeAccessor<number>;
+  rowHeight: MaybeAccessor<number>;
+  overscanCount?: MaybeAccessor<number>;
+};
+
+type VirtualListReturn<T extends readonly any[]> = [
+  {
+    containerHeight: Accessor<number>;
+    viewerTop: Accessor<number>;
+    visibleItems: Accessor<readonly T[]>;
+  },
+  onScroll: (
+    e: Event & {
+      target: DOMElement;
+    },
+  ) => void,
+];
 
 /**
  * A headless virtualized list (see https://www.patterns.dev/vanilla/virtual-lists/) utility for constructing your own virtualized list components with maximum flexibility.
  *
- * @param rootElement accessor for the element to use as the root of the virtualized list
  * @param items the list of items
  * @param rootHeight the height of the root element of the virtualizedList
  * @param rowHeight the height of individual rows in the virtualizedList
  * @param overscanCount the number of elements to render both before and after the visible section of the list, so passing 5 will render 5 items before the list, and 5 items after. Defaults to 1, cannot be set to zero. This is necessary to hide the blank space around list items when scrolling
- * @returns an object whose properties are used by the list's components
+ * @returns {VirtualListReturn} to use in the list's jsx
  */
 export function createVirtualList<T extends readonly any[]>({
-  rootElement,
   items,
   rootHeight,
   rowHeight,
   overscanCount,
-}: {
-  rootElement: Accessor<Element>;
-  items: T | undefined | null | false;
-  rootHeight: number;
-  rowHeight: number;
-  overscanCount?: number;
-}): {
-  onScroll: VoidFunction;
-  containerHeight: () => number;
-  viewerTop: () => number;
-  visibleItems: () => readonly T[];
-} {
-  items = items || ([] as any as T);
-  overscanCount = overscanCount || 1;
+}: VirtualListConfig<T>): VirtualListReturn<T> {
+  items = access(items) || ([] as any as T);
+  rootHeight = access(rootHeight);
+  rowHeight = access(rowHeight);
+  overscanCount = access(overscanCount) || 1;
 
   const [offset, setOffset] = createSignal(0);
 
@@ -42,15 +54,26 @@ export function createVirtualList<T extends readonly any[]>({
       Math.floor(offset() / rowHeight) + Math.ceil(rootHeight / rowHeight) + overscanCount,
     );
 
-  return {
-    onScroll: () => {
-      setOffset(rootElement().scrollTop);
+  return [
+    {
+      containerHeight: () => items.length * rowHeight,
+      viewerTop: () => getFirstIdx() * rowHeight,
+      visibleItems: () => items.slice(getFirstIdx(), getLastIdx()),
     },
-    containerHeight: () => items.length * rowHeight,
-    viewerTop: () => getFirstIdx() * rowHeight,
-    visibleItems: () => items.slice(getFirstIdx(), getLastIdx()),
-  };
+    e => {
+      setOffset(e.target.scrollTop);
+    },
+  ];
 }
+
+type VirtualListProps<T extends readonly any[], U extends JSX.Element> = {
+  children: (item: T[number], index: Accessor<number>) => U;
+  each: T | undefined | null | false;
+  fallback?: JSX.Element;
+  overscanCount?: number;
+  rootHeight: number;
+  rowHeight: number;
+};
 
 /**
  * A basic, unstyled virtualized list (see https://www.patterns.dev/vanilla/virtual-lists/) component you can drop into projects without modification
@@ -63,18 +86,10 @@ export function createVirtualList<T extends readonly any[]>({
  * @param rowHeight the height of individual rows in the virtualizedList
  * @returns virtualized list component
  */
-export function VirtualList<T extends readonly any[], U extends JSX.Element>(props: {
-  children: (item: T[number], index: Accessor<number>) => U;
-  each: T | undefined | null | false;
-  fallback?: JSX.Element;
-  overscanCount?: number;
-  rootHeight: number;
-  rowHeight: number;
-}): JSX.Element {
-  const [rootElement, setRootElement] = createSignal() as Signal<HTMLDivElement>;
-
-  const { onScroll, containerHeight, viewerTop, visibleItems } = createVirtualList({
-    rootElement,
+export function VirtualList<T extends readonly any[], U extends JSX.Element>(
+  props: VirtualListProps<T, U>,
+): JSX.Element {
+  const [{ containerHeight, viewerTop, visibleItems }, onScroll] = createVirtualList({
     items: props.each,
     rootHeight: props.rootHeight,
     rowHeight: props.rowHeight,
@@ -83,7 +98,6 @@ export function VirtualList<T extends readonly any[], U extends JSX.Element>(pro
 
   return (
     <div
-      ref={setRootElement}
       style={{
         overflow: "auto",
         height: `${props.rootHeight}px`,
