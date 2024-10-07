@@ -17,6 +17,7 @@
     "name": "virtual",
     "stage": 0,
     "list": [
+      "createVirutalList",
       "VirtualList"
     ],
     "category": "UI Patterns"
@@ -53,6 +54,9 @@
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"

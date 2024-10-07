@@ -24,34 +24,30 @@ pnpm add @solid-primitives/virtual
 
 ## How to use it
 
+### `createVirtualList`
+
 `createVirtualList` is a headless utility for constructing your own virtualized list components with maximum flexibility.
 
 ```tsx
 function MyComp(): JSX.Element {
-  const [rootElement, setRootElement] = createSignal() as Signal<HTMLDivElement>;
-
   const items = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   const rootHeight = 20;
   const rowHeight = 10;
   const overscanCount = 5;
 
-  const { onScroll, containerHeight, viewerTop, visibleItems } = createVirtualList({
-    // accessor for the element to use as the root of the virtualized list
-    rootElement,
-    // the list of items
+  const [{ containerHeight, viewerTop, visibleItems }, onScroll] = createVirtualList({
+    // the list of items - can be a signal
     items,
-    // the height of the root element of the virtualizedList
+    // the height of the root element of the virtualizedList - can be a signal
     rootHeight,
-    // the height of individual rows in the virtualizedList
+    // the height of individual rows in the virtualizedList - can be a signal
     rowHeight,
-    // the number of elements to render both before and after the visible section of the list, so passing 5 will render 5 items before the list, and 5 items after. Defaults to 1, cannot be set to zero. This is necessary to hide the blank space around list items when scrolling
+    // the number of elements to render both before and after the visible section of the list, so passing 5 will render 5 items before the list, and 5 items after. Defaults to 1, cannot be set to zero. This is necessary to hide the blank space around list items when scrolling - can be a signal
     overscanCount,
   });
 
   return (
     <div
-      // outermost container must be set as the root
-      ref={setRootElement}
       style={{
         overflow: "auto",
         // root element's height must be rootHeight
@@ -85,6 +81,8 @@ function MyComp(): JSX.Element {
   );
 }
 ```
+
+### `<VirtualList />`
 
 `<VirtualList />` is a basic, unstyled virtual list component you can drop into projects without modification.
 
