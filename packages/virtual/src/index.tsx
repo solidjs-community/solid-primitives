@@ -15,7 +15,7 @@ type VirtualListReturn<T extends readonly any[]> = [
   {
     containerHeight: Accessor<number>;
     viewerTop: Accessor<number>;
-    visibleItems: Accessor<readonly T[]>;
+    visibleItems: Accessor<T>;
   },
   onScroll: (
     e: Event & {
@@ -58,7 +58,7 @@ export function createVirtualList<T extends readonly any[]>({
     {
       containerHeight: () => items.length * rowHeight,
       viewerTop: () => getFirstIdx() * rowHeight,
-      visibleItems: () => items.slice(getFirstIdx(), getLastIdx()),
+      visibleItems: () => items.slice(getFirstIdx(), getLastIdx()) as unknown as T,
     },
     e => {
       setOffset(e.target.scrollTop);
@@ -117,7 +117,7 @@ export function VirtualList<T extends readonly any[], U extends JSX.Element>(
             top: `${viewerTop()}px`,
           }}
         >
-          <For fallback={props.fallback} each={visibleItems() as unknown as T}>
+          <For fallback={props.fallback} each={visibleItems()}>
             {props.children}
           </For>
         </div>
