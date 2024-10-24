@@ -42,7 +42,7 @@ const App: Component = () => {
 
   const moveSelection = (sel: Selection, pos: number, dist: number): Selection => [
     sel[0] > pos ? sel[0] + dist : sel[0],
-    sel[1] > pos ? sel[1] + dist : sel[1]
+    sel[1] > pos ? sel[1] + dist : sel[1],
   ];
   // Monetary amount
   const moneyMask = (value: string, sel: Selection): [string, Selection] => {
