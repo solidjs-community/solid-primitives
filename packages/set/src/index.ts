@@ -20,7 +20,7 @@ export class ReactiveSet<T> extends Set<T> {
 
   constructor(values?: Iterable<T> | null) {
     super();
-    if (values) for (const v of values) super.add(v);
+    if (values) for (const value of values) super.add(value);
   }
 
   [Symbol.iterator](): SetIterator<T> {
@@ -113,7 +113,7 @@ export class ReactiveWeakSet<T extends object> extends WeakSet<T> {
 
   constructor(values?: Iterable<T> | null) {
     super();
-    if (values) for (const v of values) super.add(v);
+    if (values) for (const value of values) super.add(value);
   }
 
   has(value: T): boolean {
