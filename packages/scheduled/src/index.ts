@@ -112,7 +112,7 @@ export const throttle: ScheduleCallback = (callback, wait) => {
 export const scheduleIdle: ScheduleCallback = isServer
   ? () => Object.assign(() => void 0, { clear: () => void 0 })
   : // requestIdleCallback is not supported in Safari
-    (typeof requestIdleCallback !== 'undefined')
+    typeof requestIdleCallback !== "undefined"
     ? (callback, maxWait) => {
         let isDeferred = false,
           id: ReturnType<typeof requestIdleCallback>,
