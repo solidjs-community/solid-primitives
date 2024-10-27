@@ -1,5 +1,11 @@
 # @solid-primitives/scheduled
 
+## 1.4.4
+
+### Patch Changes
+
+- 57a3078: Add check for typeof window, fallback to throttle if undefined
+
 ## 1.4.3
 
 ### Patch Changes
