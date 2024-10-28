@@ -12,11 +12,11 @@ type VirtualListConfig<T extends readonly any[]> = {
 };
 
 type VirtualListReturn<T extends readonly any[]> = [
-  {
-    containerHeight: Accessor<number>;
-    viewerTop: Accessor<number>;
-    visibleItems: Accessor<T>;
-  },
+  Accessor<{
+    containerHeight: number;
+    viewerTop: number;
+    visibleItems: T;
+  }>,
   onScroll: (
     e: Event & {
       target: DOMElement;
@@ -55,11 +55,11 @@ export function createVirtualList<T extends readonly any[]>({
     );
 
   return [
-    {
-      containerHeight: () => items.length * rowHeight,
-      viewerTop: () => getFirstIdx() * rowHeight,
-      visibleItems: () => items.slice(getFirstIdx(), getLastIdx()) as unknown as T,
-    },
+    () => ({
+      containerHeight: items.length * rowHeight,
+      viewerTop: getFirstIdx() * rowHeight,
+      visibleItems: items.slice(getFirstIdx(), getLastIdx()) as unknown as T,
+    }),
     e => {
       setOffset(e.target.scrollTop);
     },
@@ -89,7 +89,7 @@ type VirtualListProps<T extends readonly any[], U extends JSX.Element> = {
 export function VirtualList<T extends readonly any[], U extends JSX.Element>(
   props: VirtualListProps<T, U>,
 ): JSX.Element {
-  const [{ containerHeight, viewerTop, visibleItems }, onScroll] = createVirtualList({
+  const [virtual, onScroll] = createVirtualList({
     items: props.each,
     rootHeight: props.rootHeight,
     rowHeight: props.rowHeight,
@@ -108,16 +108,16 @@ export function VirtualList<T extends readonly any[], U extends JSX.Element>(
         style={{
           position: "relative",
           width: "100%",
-          height: `${containerHeight()}px`,
+          height: `${virtual().containerHeight}px`,
         }}
       >
         <div
           style={{
             position: "absolute",
-            top: `${viewerTop()}px`,
+            top: `${virtual().viewerTop}px`,
           }}
         >
-          <For fallback={props.fallback} each={visibleItems()}>
+          <For fallback={props.fallback} each={virtual().visibleItems}>
             {props.children}
           </For>
         </div>

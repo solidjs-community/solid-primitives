@@ -22,100 +22,100 @@ function getScrollContainer() {
 
 describe("createVirtualList", () => {
   test("returns containerHeight representing the size of the list container element within the root", () => {
-    const [{ containerHeight }] = createVirtualList({
+    const [virtual] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
     });
 
-    expect(containerHeight()).toEqual(10_000);
+    expect(virtual().containerHeight).toEqual(10_000);
   });
 
   test("returns viewerTop representing the location of the list viewer element within the list container", () => {
-    const [{ viewerTop }] = createVirtualList({
+    const [virtual] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
     });
 
-    expect(viewerTop()).toEqual(0);
+    expect(virtual().viewerTop).toEqual(0);
   });
 
   test("returns visibleList representing the subset of items to render", () => {
-    const [{ visibleItems }] = createVirtualList({
+    const [virtual] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
     });
 
-    expect(visibleItems()).toEqual([0, 1, 2]);
+    expect(virtual().visibleItems).toEqual([0, 1, 2]);
   });
 
   test("returns onScroll which sets viewerTop and visibleItems based on rootElement's scrolltop", () => {
     const el = document.createElement("div");
 
-    const [{ viewerTop, visibleItems }, onScroll] = createVirtualList({
+    const [virtual, onScroll] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
     });
 
-    expect(visibleItems()).toEqual([0, 1, 2]);
-    expect(viewerTop()).toEqual(0);
+    expect(virtual().visibleItems).toEqual([0, 1, 2]);
+    expect(virtual().viewerTop).toEqual(0);
 
     el.scrollTop += 10;
 
     // no change until onScroll is called
-    expect(visibleItems()).toEqual([0, 1, 2]);
-    expect(viewerTop()).toEqual(0);
+    expect(virtual().visibleItems).toEqual([0, 1, 2]);
+    expect(virtual().viewerTop).toEqual(0);
 
     onScroll(TARGETED_SCROLL_EVENT(el));
 
-    expect(visibleItems()).toEqual([0, 1, 2, 3]);
-    expect(viewerTop()).toEqual(0);
+    expect(virtual().visibleItems).toEqual([0, 1, 2, 3]);
+    expect(virtual().viewerTop).toEqual(0);
 
     el.scrollTop += 10;
     onScroll(TARGETED_SCROLL_EVENT(el));
 
-    expect(visibleItems()).toEqual([1, 2, 3, 4]);
-    expect(viewerTop()).toEqual(10);
+    expect(virtual().visibleItems).toEqual([1, 2, 3, 4]);
+    expect(virtual().viewerTop).toEqual(10);
 
     el.scrollTop -= 10;
     onScroll(TARGETED_SCROLL_EVENT(el));
 
-    expect(visibleItems()).toEqual([0, 1, 2, 3]);
-    expect(viewerTop()).toEqual(0);
+    expect(virtual().visibleItems).toEqual([0, 1, 2, 3]);
+    expect(virtual().viewerTop).toEqual(0);
 
     el.scrollTop -= 10;
     onScroll(TARGETED_SCROLL_EVENT(el));
 
-    expect(visibleItems()).toEqual([0, 1, 2]);
-    expect(viewerTop()).toEqual(0);
+    expect(virtual().visibleItems).toEqual([0, 1, 2]);
+    expect(virtual().viewerTop).toEqual(0);
   });
 
   test("onScroll handles reaching the bottom of the list", () => {
     const el = document.createElement("div");
 
-    const [{ viewerTop, visibleItems }, onScroll] = createVirtualList({
+    const [virtual, onScroll] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
     });
 
-    expect(visibleItems()).toEqual([0, 1, 2]);
-    expect(viewerTop()).toEqual(0);
+    expect(virtual().visibleItems).toEqual([0, 1, 2]);
+    expect(virtual().viewerTop).toEqual(0);
 
     el.scrollTop += 9_980;
     onScroll(TARGETED_SCROLL_EVENT(el));
 
-    expect(visibleItems()).toEqual([997, 998, 999]);
-    expect(viewerTop()).toEqual(9_970);
+    expect(virtual().visibleItems).toEqual([997, 998, 999]);
+    expect(virtual().viewerTop).toEqual(9_970);
   });
 
   test("visibleList takes `overscanCount` into account", () => {
     const el = document.createElement("div");
 
-    const [{ visibleItems }, onScroll] = createVirtualList({
+    const [virtual, onScroll] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
@@ -125,39 +125,39 @@ describe("createVirtualList", () => {
     el.scrollTop += 100;
     onScroll(TARGETED_SCROLL_EVENT(el));
 
-    expect(visibleItems()).toEqual([8, 9, 10, 11, 12, 13]);
+    expect(virtual().visibleItems).toEqual([8, 9, 10, 11, 12, 13]);
   });
 
   test("overscanCount defaults to 1 if undefined or zero", () => {
-    const [{ visibleItems: visibleItemsUndefined }] = createVirtualList({
+    const [virtualUndefined] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
     });
 
-    expect(visibleItemsUndefined()).toEqual([0, 1, 2]);
+    expect(virtualUndefined().visibleItems).toEqual([0, 1, 2]);
 
-    const [{ visibleItems: visibleItemsZero }] = createVirtualList({
+    const [virtualZero] = createVirtualList({
       items: TEST_LIST,
       rootHeight: 20,
       rowHeight: 10,
       overscanCount: 0,
     });
 
-    expect(visibleItemsZero()).toEqual([0, 1, 2]);
+    expect(virtualZero().visibleItems).toEqual([0, 1, 2]);
   });
 
   test("handles empty list", () => {
-    const [{ containerHeight, viewerTop, visibleItems }] = createVirtualList({
+    const [virtual] = createVirtualList({
       items: [],
       rootHeight: 20,
       rowHeight: 10,
       overscanCount: 0,
     });
 
-    expect(containerHeight()).toEqual(0);
-    expect(viewerTop()).toEqual(0);
-    expect(visibleItems()).toEqual([]);
+    expect(virtual().containerHeight).toEqual(0);
+    expect(virtual().viewerTop).toEqual(0);
+    expect(virtual().visibleItems).toEqual([]);
   });
 });
 
