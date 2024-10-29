@@ -1,6 +1,5 @@
 import { For, createSignal } from "solid-js";
 import type { Accessor, JSX } from "solid-js";
-import type { DOMElement } from "solid-js/jsx-runtime";
 import { access } from "@solid-primitives/utils";
 import type { MaybeAccessor } from "@solid-primitives/utils";
 
@@ -58,7 +57,7 @@ export function createVirtualList<T extends readonly any[]>({
     }),
     e => {
       // @ts-expect-error
-      setOffset(e.target?.scrollTop);
+      if (e.target?.scrollTop !== undefined) setOffset(e.target.scrollTop);
     },
   ];
 }
