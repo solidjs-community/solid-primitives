@@ -64,9 +64,9 @@ export class TriggerCache<T> {
     } else trigger.n++;
     onCleanup(() => {
       // remove the trigger when no one is listening to it
-      if (trigger!.n-- === 1)
+      if (--trigger.n === 0)
         // microtask is to avoid removing the trigger used by a single listener
-        queueMicrotask(() => trigger!.n === 0 && this.#map.delete(key));
+        queueMicrotask(() => trigger.n === 0 && this.#map.delete(key));
     });
     trigger.$();
   }
