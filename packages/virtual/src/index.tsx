@@ -17,11 +17,7 @@ type VirtualListReturn<T extends readonly any[]> = [
     viewerTop: number;
     visibleItems: T;
   }>,
-  onScroll: (
-    e: Event & {
-      target: DOMElement;
-    },
-  ) => void,
+  onScroll: (e: Event) => void,
 ];
 
 /**
@@ -61,7 +57,8 @@ export function createVirtualList<T extends readonly any[]>({
       visibleItems: items.slice(getFirstIdx(), getLastIdx()) as unknown as T,
     }),
     e => {
-      setOffset(e.target.scrollTop);
+      // @ts-expect-error
+      setOffset(e.target?.scrollTop);
     },
   ];
 }
@@ -90,10 +87,10 @@ export function VirtualList<T extends readonly any[], U extends JSX.Element>(
   props: VirtualListProps<T, U>,
 ): JSX.Element {
   const [virtual, onScroll] = createVirtualList({
-    items: props.each,
-    rootHeight: props.rootHeight,
-    rowHeight: props.rowHeight,
-    overscanCount: props.overscanCount,
+    items: () => props.each,
+    rootHeight: () => props.rootHeight,
+    rowHeight: () => props.rowHeight,
+    overscanCount: () => props.overscanCount || 1,
   });
 
   return (
