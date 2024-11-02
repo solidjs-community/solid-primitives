@@ -100,7 +100,7 @@ export const multiplexStorage: StorageMultiplexer = (...storages) => ({
       storage => storage.length,
     );
     const isAsync = lengths.some(
-      len => len && typeof len === "object" && typeof len?.then === "function",
+      len => len && typeof len === "object" && typeof len.then === "function",
     );
     return (isAsync
       ? Promise.all(lengths).then(lens => Math.max(...lens.filter(isNumber)))

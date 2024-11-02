@@ -75,6 +75,22 @@ map.dirty(1);
 map.dirty(2);
 ```
 
+### Triggering all keys
+
+`dirtyAll` will trigger all keys in the cache.
+
+```ts
+const [track, _dirty, dirtyAll] = createTriggerCache<number>();
+
+createEffect(() => {
+  track(1);
+  //  ...
+});
+
+// later (will trigger the update)
+dirtyAll();
+```
+
 ### Weak version
 
 `createTriggerCache` constructor can take a `WeakMap` constructor as an argument. This will create a `WeakMap` of triggers instead of a `Map`.

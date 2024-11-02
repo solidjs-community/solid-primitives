@@ -143,7 +143,7 @@ export function combineProps<T extends MaybeAccessor<PropsInput>[]>(
               : void 0;
 
         if (callback)
-          listeners[name] ? listeners[name]!.push(callback) : (listeners[name] = [callback]);
+          listeners[name] ? listeners[name].push(callback) : (listeners[name] = [callback]);
         else delete listeners[name];
       }
     }

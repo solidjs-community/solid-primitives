@@ -1,5 +1,11 @@
 # @solid-primitives/trigger
 
+## 1.1.0
+
+### Minor Changes
+
+- 32fcb81: Add `dirtyAll` to `createTriggerCache`
+
 ## 1.0.11
 
 ### Patch Changes

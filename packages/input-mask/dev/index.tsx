@@ -40,6 +40,37 @@ const App: Component = () => {
   const hexMask = maskArrayToFn(["#", /[0-9a-f]{0,6}/i]);
   const hexHandler = createMaskPattern(createInputMask(hexMask), () => "#000000");
 
+  const moveSelection = (sel: Selection, pos: number, dist: number): Selection => [
+    sel[0] > pos ? sel[0] + dist : sel[0],
+    sel[1] > pos ? sel[1] + dist : sel[1],
+  ];
+  // Monetary amount
+  const moneyMask = (value: string, sel: Selection): [string, Selection] => {
+    value = value
+      .replace(/\D/g, (_: string, pos: number) => {
+        sel = moveSelection(sel, pos, -1);
+        return "";
+      })
+      .replace(/^0+/, "");
+    if (value.length < 3) {
+      sel = moveSelection(sel, 0, 3 - value.length);
+      value = value.padStart(3, "0");
+    }
+    for (let i = value.length - 1; i >= 0; i--) {
+      if (value.length - i === 2) {
+        value = `${value.slice(0, i)},${value.slice(i)}`;
+        sel = moveSelection(sel, i, 1);
+      }
+      if (value.length > 6 && (value.length - i - 6) % 4 === 1) {
+        value = `${value.slice(0, i + 1)}.${value.slice(i + 1)}`;
+        sel = moveSelection(sel, i + 1, 1);
+      }
+    }
+    sel = [Math.min(sel[0], value.length), Math.min(sel[1], value.length)];
+    return [value + " €", sel];
+  };
+  const moneyInputHandler = createInputMask(moneyMask);
+
   return (
     <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
       <div class="wrapper-v items-start">
@@ -108,6 +139,18 @@ const App: Component = () => {
             placeholder="#000000"
             onInput={hexHandler}
             onPaste={hexHandler}
+          />
+        </div>
+        <br />
+        <label for="money">money:</label>
+        <div>
+          <label for="money"></label>
+          <input
+            type="text"
+            id="money"
+            placeholder="00,00 €"
+            onInput={moneyInputHandler}
+            onPaste={moneyInputHandler}
           />
         </div>
         <br />

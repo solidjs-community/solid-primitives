@@ -3,9 +3,12 @@ import noOnlyTests from "eslint-plugin-no-only-tests";
 import eslintComments from "eslint-plugin-eslint-comments";
 import tsParser from "@typescript-eslint/parser";
 
-export default [{
-  ignores: ["packages/*/dist/**/*", "packages/*/dev/**/*", "**/*/__snapshots__/**/*"],
-}, {
+/** @type {import("eslint").Linter.Config} */
+export default {
+
+  files: ["**/*.{js,mjs,jsx,ts,tsx}"],
+  ignores: ["**/{dist,node_modules,__snapshots__}/**/*", "packages/*/dev/**/*", "site/**/*"],
+
   plugins: {
     "@typescript-eslint": typescriptEslint,
     "no-only-tests": noOnlyTests,
@@ -44,4 +47,4 @@ export default [{
     "eslint-comments/no-unused-disable": "warn",
     "no-only-tests/no-only-tests": "warn",
   },
-}];
+};
