@@ -1,7 +1,7 @@
 import { Accessor, batch } from "solid-js";
 import { TriggerCache } from "@solid-primitives/trigger";
 
-const $KEYS = Symbol("track-keys");
+const $OBJECT = Symbol("track-object");
 
 /**
  * A reactive version of `Map` data structure. All the reads (like `get` or `has`) are signals, and all the writes (`delete` or `set`) will cause updates to appropriate signals.
@@ -21,99 +21,113 @@ const $KEYS = Symbol("track-keys");
  * userPoints.set(user1, { foo: "bar" });
  */
 export class ReactiveMap<K, V> extends Map<K, V> {
-  #keyTriggers = new TriggerCache<K | typeof $KEYS>();
-  #valueTriggers = new TriggerCache<K>();
+  #keyTriggers = new TriggerCache<K | typeof $OBJECT>();
+  #valueTriggers = new TriggerCache<K | typeof $OBJECT>();
 
-  constructor(initial?: Iterable<readonly [K, V]> | null) {
+  [Symbol.iterator](): MapIterator<[K, V]> {
+    return this.entries();
+  }
+
+  constructor(entries?: Iterable<readonly [K, V]> | null) {
     super();
-    if (initial) for (const v of initial) super.set(v[0], v[1]);
+    if (entries) for (const entry of entries) super.set(...entry);
   }
 
-  // reads
-  has(key: K): boolean {
-    this.#keyTriggers.track(key);
-    return super.has(key);
-  }
-  get(key: K): V | undefined {
-    this.#valueTriggers.track(key);
-    return super.get(key);
-  }
   get size(): number {
-    this.#keyTriggers.track($KEYS);
+    this.#keyTriggers.track($OBJECT);
     return super.size;
   }
 
   *keys(): MapIterator<K> {
+    this.#keyTriggers.track($OBJECT);
+
     for (const key of super.keys()) {
-      this.#keyTriggers.track(key);
       yield key;
     }
-    this.#keyTriggers.track($KEYS);
   }
+
   *values(): MapIterator<V> {
-    for (const [key, v] of super.entries()) {
-      this.#valueTriggers.track(key);
-      yield v;
+    this.#valueTriggers.track($OBJECT);
+
+    for (const value of super.values()) {
+      yield value;
     }
-    this.#keyTriggers.track($KEYS);
   }
+
   *entries(): MapIterator<[K, V]> {
+    this.#keyTriggers.track($OBJECT);
+    this.#valueTriggers.track($OBJECT);
+
     for (const entry of super.entries()) {
-      this.#valueTriggers.track(entry[0]);
       yield entry;
     }
-    this.#keyTriggers.track($KEYS);
   }
 
-  // writes
-  set(key: K, value: V): this {
-    batch(() => {
-      if (super.has(key)) {
-        if (super.get(key)! === value) return;
-      } else {
-        this.#keyTriggers.dirty(key);
-        this.#keyTriggers.dirty($KEYS);
-      }
-      this.#valueTriggers.dirty(key);
-      super.set(key, value);
-    });
-    return this;
+  forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void {
+    this.#keyTriggers.track($OBJECT);
+    this.#valueTriggers.track($OBJECT);
+    super.forEach(callbackfn, thisArg);
   }
-  delete(key: K): boolean {
-    const r = super.delete(key);
-    if (r) {
+
+  has(key: K): boolean {
+    this.#keyTriggers.track(key);
+    return super.has(key);
+  }
+
+  get(key: K): V | undefined {
+    this.#valueTriggers.track(key);
+    return super.get(key);
+  }
+
+  set(key: K, value: V): this {
+    const hadNoKey = !super.has(key);
+    const hasChanged = super.get(key) !== value;
+    const result = super.set(key, value);
+
+    if (hasChanged || hadNoKey) {
       batch(() => {
-        this.#keyTriggers.dirty(key);
-        this.#keyTriggers.dirty($KEYS);
-        this.#valueTriggers.dirty(key);
+        if (hadNoKey) {
+          this.#keyTriggers.dirty($OBJECT);
+          this.#keyTriggers.dirty(key);
+        }
+        if (hasChanged) {
+          this.#valueTriggers.dirty($OBJECT);
+          this.#valueTriggers.dirty(key);
+        }
       });
     }
-    return r;
+
+    return result;
   }
+
+  delete(key: K): boolean {
+    const isDefined = super.get(key) !== undefined;
+    const result = super.delete(key);
+
+    if (result) {
+      batch(() => {
+        this.#keyTriggers.dirty($OBJECT);
+        this.#valueTriggers.dirty($OBJECT);
+        this.#keyTriggers.dirty(key);
+
+        if (isDefined) {
+          this.#valueTriggers.dirty(key);
+        }
+      });
+    }
+
+    return result;
+  }
+
   clear(): void {
     if (super.size) {
+      super.clear();
+
       batch(() => {
-        for (const v of super.keys()) {
-          this.#keyTriggers.dirty(v);
-          this.#valueTriggers.dirty(v);
-        }
-        super.clear();
-        this.#keyTriggers.dirty($KEYS);
+        this.#keyTriggers.dirtyAll();
+        this.#valueTriggers.dirtyAll();
       });
     }
-  }
-
-  // callback
-  forEach(callbackfn: (value: V, key: K, map: this) => void) {
-    this.#keyTriggers.track($KEYS);
-    for (const [key, v] of super.entries()) {
-      this.#valueTriggers.track(key);
-      callbackfn(v, key, this);
-    }
-  }
-
-  [Symbol.iterator](): MapIterator<[K, V]> {
-    return this.entries();
   }
 }
 
@@ -137,9 +151,9 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
   #keyTriggers = new TriggerCache<K>(WeakMap);
   #valueTriggers = new TriggerCache<K>(WeakMap);
 
-  constructor(initial?: Iterable<readonly [K, V]> | null) {
+  constructor(entries?: Iterable<readonly [K, V]> | null) {
     super();
-    if (initial) for (const v of initial) super.set(v[0], v[1]);
+    if (entries) for (const entry of entries) super.set(...entry);
   }
 
   has(key: K): boolean {
@@ -151,24 +165,31 @@ export class ReactiveWeakMap<K extends object, V> extends WeakMap<K, V> {
     return super.get(key);
   }
   set(key: K, value: V): this {
-    batch(() => {
-      if (super.has(key)) {
-        if (super.get(key)! === value) return;
-      } else this.#keyTriggers.dirty(key);
-      this.#valueTriggers.dirty(key);
-      super.set(key, value);
-    });
-    return this;
-  }
-  delete(key: K): boolean {
-    const r = super.delete(key);
-    if (r) {
+    const hadNoKey = !super.has(key);
+    const hasChanged = super.get(key) !== value;
+    const result = super.set(key, value);
+
+    if (hasChanged || hadNoKey) {
       batch(() => {
-        this.#keyTriggers.dirty(key);
-        this.#valueTriggers.dirty(key);
+        if (hadNoKey) this.#keyTriggers.dirty(key);
+        if (hasChanged) this.#valueTriggers.dirty(key);
       });
     }
-    return r;
+
+    return result;
+  }
+  delete(key: K): boolean {
+    const isDefined = super.get(key) !== undefined;
+    const result = super.delete(key);
+
+    if (result) {
+      batch(() => {
+        this.#keyTriggers.dirty(key);
+        if (isDefined) this.#valueTriggers.dirty(key);
+      });
+    }
+
+    return result;
   }
 }
 
