@@ -21,7 +21,7 @@ export const makeVirtualFileSystem = (
   const storageValue = storage?.getItem(key);
   try {
     storedValue = JSON.parse(typeof storageValue === "string" ? storageValue : "null");
-  } catch (e) {}
+  } catch (_) {}
   let fs = storedValue || initial || {};
   if ((storageValue as unknown) instanceof Promise) {
     (storageValue as unknown as Promise<string>).then(storedValue => {
@@ -57,7 +57,7 @@ export const makeVirtualFileSystem = (
       typeof ref === "object" &&
         Object.keys(ref).forEach((item: string) =>
           typeof ref[item] === "string"
-            ? files.push(filter(`${path}${item}`, ref[item] as string))
+            ? files.push(filter(`${path}${item}`, ref[item]))
             : walker(ref[item], `${path}${item}/`),
         );
     };
@@ -181,7 +181,7 @@ export const makeVirtualFileSystem = (
         get: path => {
           try {
             return ofs.readFile(path);
-          } catch (e) {}
+          } catch (_) {}
         },
         has: path => ofs.getType(path) === "file",
         keys: () => getFiles(path => path)[Symbol.iterator](),

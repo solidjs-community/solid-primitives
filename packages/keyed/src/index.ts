@@ -176,10 +176,14 @@ export function Key<T>(props: {
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#Entries
  */
-export function Entries<V>(props: {
-  of: Record<string, V> | ArrayLike<V> | undefined | null | false;
+export function Entries<K extends string | number, V>(props: {
+  of: Record<K, V> | ArrayLike<V> | undefined | null | false;
   fallback?: JSX.Element;
-  children: (key: string, v: Accessor<V>, i: Accessor<number>) => JSX.Element;
+  children: (
+    key: K extends number ? string : K,
+    v: Accessor<V>,
+    i: Accessor<number>,
+  ) => JSX.Element;
 }): JSX.Element {
   const mapFn = props.children;
   return createMemo(
@@ -191,7 +195,7 @@ export function Entries<V>(props: {
               key,
               () => props.of![key as never],
             )
-        : (key, i) => mapFn(key, () => props.of![key as never], i),
+        : (key, i) => mapFn(key as never, () => props.of![key as never], i),
       "fallback" in props ? { fallback: () => props.fallback } : undefined,
     ),
   ) as unknown as JSX.Element;

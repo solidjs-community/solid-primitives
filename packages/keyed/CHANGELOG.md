@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.2.3
+
+### Patch Changes
+
+- 9749071: Makes Entries take key's type as a generic
+
 ## 1.2.2
 
 ### Patch Changes

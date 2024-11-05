@@ -29,10 +29,10 @@ const constraintsFromDevice = (
 };
 
 const stop = (stream: MediaStream | undefined) =>
-  stream?.getTracks()?.forEach(track => track.stop());
+  stream?.getTracks().forEach(track => track.stop());
 
 const mute = (stream: MediaStream | undefined, muted?: boolean) =>
-  stream?.getTracks()?.forEach(track => {
+  stream?.getTracks().forEach(track => {
     track.enabled = muted === false;
   });
 

@@ -241,11 +241,10 @@ function wrap<T extends solid_store.StoreNode>(value: T): T {
     const desc = Object.getOwnPropertyDescriptors(value);
 
     for (const prop of Object.keys(value)) {
-      if (desc[prop]!.get)
-        Object.defineProperty(value, prop, { get: desc[prop]!.get!.bind(proxy) });
+      if (desc[prop]!.get) Object.defineProperty(value, prop, { get: desc[prop]!.get.bind(proxy) });
 
       if (desc[prop]!.set) {
-        const og = desc[prop]!.set!;
+        const og = desc[prop]!.set;
 
         Object.defineProperty(value, prop, { set: v => solid.batch(() => og.call(proxy, v)) });
       }

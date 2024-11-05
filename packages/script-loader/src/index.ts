@@ -62,7 +62,7 @@ export function createScriptLoader(props: ScriptProps): HTMLScriptElement | unde
             });
             Array.isArray(handler)
               ? handler[0](handler[1], ev)
-              : typeof handler === "function" && handler?.call(null, Object.assign(ev));
+              : typeof handler === "function" && handler.call(null, Object.assign(ev));
           },
         ),
     );

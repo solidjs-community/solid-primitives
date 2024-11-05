@@ -134,6 +134,7 @@ export function makePersisted<
             const value = deserialize(data);
             (signal[1] as any)(() => value);
           } catch (e) {
+            // eslint-disable-next-line no-console
             if (isDev) console.warn(e);
           }
         }
@@ -142,6 +143,7 @@ export function makePersisted<
             const value = deserialize(data);
             (signal[1] as any)(reconcile(value));
           } catch (e) {
+            // eslint-disable-next-line no-console
             if (isDev) console.warn(e);
           }
         };
@@ -229,6 +231,7 @@ export const wsSync = (ws: WebSocket, warnOnError: boolean = isDev): Persistence
           subscriber(data);
         }
       } catch (e) {
+        // eslint-disable-next-line no-console
         if (warnOnError) console.warn(e);
       }
     }),

@@ -86,7 +86,7 @@ export function createSpring<T extends SpringTarget>(
     return [
       signal as any,
       ((param: any, opts: SpringSetterOptions = {}) => {
-        if (opts.hard || signal() == null || (stiffness >= 1 && damping >= 1)) {
+        if (opts.hard || (stiffness >= 1 && damping >= 1)) {
           setSignal(param);
           return Promise.resolve();
         }
@@ -119,10 +119,11 @@ export function createSpring<T extends SpringTarget>(
     inv_mass = Math.min(inv_mass + inv_mass_recovery_rate, 1);
     settled = true;
 
-    let new_value = tick(value_last, value_current, value_target);
+    const new_value = tick(value_last, value_current, value_target);
     value_last = value_current;
     setSignal((value_current = new_value));
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (settled) {
       cleanup();
     } else {

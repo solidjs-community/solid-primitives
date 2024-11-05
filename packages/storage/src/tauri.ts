@@ -15,6 +15,7 @@ export function tauriStorage(name = "solid-storage.dat") {
   const api: AsyncStorage = {
     _store: null,
     _getStore: async () =>
+      // @ts-ignore
       api._store || (api._store = new (await import("@tauri-apps/plugin-store")).Store(name)),
     getItem: async (key: string) => (await (await api._getStore()).get(key)) ?? null,
     setItem: async (key: string, value: string) => await (await api._getStore()).set(key, value),

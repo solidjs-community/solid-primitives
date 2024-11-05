@@ -22,7 +22,7 @@ const App: Component = () => {
           <DemoControl
             label="Number of rows"
             max={100_000}
-            min={1}
+            min={0}
             name="rowCount"
             setValue={setListLength}
             value={listLength()}
@@ -64,15 +64,17 @@ const App: Component = () => {
         View the devtools console for log of items being added and removed from the visible list
       </div>
 
-      <VirtualList
-        each={items.slice(0, listLength())}
-        overscanCount={overscanCount()}
-        rootHeight={rootHeight()}
-        rowHeight={rowHeight()}
-        class="bg-white text-gray-800"
-      >
-        {item => <VirtualListItem item={item} height={rowHeight()} />}
-      </VirtualList>
+      <div class="bg-white text-gray-800">
+        <VirtualList
+          each={items.slice(0, listLength())}
+          fallback={<div>no items</div>}
+          overscanCount={overscanCount()}
+          rootHeight={rootHeight()}
+          rowHeight={rowHeight()}
+        >
+          {item => <VirtualListItem item={item} height={rowHeight()} />}
+        </VirtualList>
+      </div>
     </div>
   );
 };
