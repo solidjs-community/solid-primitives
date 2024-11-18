@@ -1,5 +1,26 @@
 # @solid-primitives/set
 
+## 0.5.0
+
+### Minor Changes
+
+- aa596ec: Fixes for ReactiveSet (#688):
+  - Iterators and `.forEach()` no longer track specific keys.
+  - Added support for `thisArg` as per `forEach` spec
+  - `super.clear()` now called before dirtying signals
+  - Uses new `dirtyAll` form trigger package
+
+### Patch Changes
+
+- Updated dependencies [32fcb81]
+  - @solid-primitives/trigger@1.1.0
+
+## 0.4.12
+
+### Patch Changes
+
+- 1ea2a09: Use new Map/SetIterator types
+
 ## 0.4.11
 
 ### Patch Changes

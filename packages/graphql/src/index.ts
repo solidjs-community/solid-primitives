@@ -26,6 +26,20 @@ export type GraphQLResourceSource<V extends object = {}> = {
 };
 
 /**
+ A GraphQLError describes an Error found during the parse, validate,
+ or execute phases of performing a GraphQL operation.
+*/
+export class GraphQLError extends Error {
+  constructor(
+    message: string,
+    public locations?: { line: number; column: number }[],
+    public extensions?: Record<string, any>,
+  ) {
+    super(message);
+  }
+}
+
+/**
  * A function returned by {@link createGraphQLClient}.
  * It wraps {@link createResource} and performs a GraphQL fetch to endpoint form the client.
  *
@@ -96,23 +110,27 @@ export async function request<T = any, V extends object = {}>(
   query: string | DocumentNode | TypedDocumentNode<T, V>,
   options: RequestOptions<V> = {},
 ): Promise<T> {
-  const { fetcher = fetch, variables = {}, headers = {}, method = "POST" } = options;
-  const query_ = typeof query == "string" ? query : print(query);
+  const { fetcher = fetch, variables = {}, method = "POST" } = options;
+  const query_string = typeof query == "string" ? query : print(query);
 
-  return fetcher(url, {
+  const res = await fetcher(url, {
     ...options,
     method,
-    body: JSON.stringify({ query: query_, variables }),
+    body: JSON.stringify({ query: query_string, variables }),
     headers: {
       "content-type": "application/json",
-      ...headers,
+      ...options.headers,
     },
-  })
-    .then((r: any) => r.json())
-    .then(({ data, errors }: any) => {
-      if (errors) throw errors;
-      return data;
-    });
+  });
+  const data = await res.json();
+  if (data.errors && data.errors.length) {
+    throw new GraphQLError(
+      data.errors[0].message,
+      data.errors[0].locations,
+      data.errors[0].extensions,
+    );
+  }
+  return data.data;
 }
 
 /**
@@ -130,23 +148,27 @@ export async function multipartRequest<T = any, V extends object = {}>(
   query: string | DocumentNode | TypedDocumentNode<T, V>,
   options: Omit<RequestOptions<V>, "method"> = {},
 ): Promise<T> {
-  const { fetcher = fetch, variables = {}, headers = {} } = options;
-  const query_ = typeof query == "string" ? query : print(query);
+  const { fetcher = fetch, variables = {} } = options;
+  const query_string = typeof query == "string" ? query : print(query);
 
-  return fetcher(url, {
+  const res = await fetcher(url, {
     ...options,
     method: "POST",
-    body: makeMultipartBody(query_, variables),
+    body: makeMultipartBody(query_string, variables),
     headers: {
       "content-type": "multipart/form-data",
-      ...headers,
+      ...options.headers,
     },
-  })
-    .then((r: any) => r.json())
-    .then(({ data, errors }: any) => {
-      if (errors) throw errors;
-      return data;
-    });
+  });
+  const data = await res.json();
+  if (data.errors && data.errors.length) {
+    throw new GraphQLError(
+      data.errors[0].message,
+      data.errors[0].locations,
+      data.errors[0].extensions,
+    );
+  }
+  return data.data;
 }
 
 /**
@@ -156,7 +178,7 @@ export async function multipartRequest<T = any, V extends object = {}>(
  * @param variables variables used in the mutation (File and Blob instances can be used as values).
  * @returns a FormData object, ready to be POSTed
  */
-export function makeMultipartBody(query: string, variables: object) {
+export function makeMultipartBody(query: string, variables: object): FormData {
   const parts: { blob: Blob; path: string }[] = [];
 
   // We don't want to modify the variables passed in as arguments

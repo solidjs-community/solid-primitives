@@ -16,12 +16,7 @@ const MessageStack: Component<{
   props.messageTrigger(addMessage);
 
   return (
-    <ul
-      class="
-        fixed right-4 top-4
-        flex flex-col items-end
-        "
-    >
+    <ul class="fixed right-4 top-4 flex flex-col items-end">
       <For each={messages()}>
         {({ text }) => <li class="border-b border-b-red-700 bg-red-500 p-2 text-white">{text}</li>}
       </For>

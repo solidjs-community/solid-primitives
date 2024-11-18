@@ -11,10 +11,10 @@
 
 Collection of reactive primitives to deal with media queries.
 
-- [`makeMediaQueryListener`](#makeMediaQueryListener) - Listen for changes to provided Media Query.
-- [`createMediaQuery`](#createMediaQuery) - Creates a very simple and straightforward media query monitor.
-- [`createBreakpoints`](#createBreakpoints) - Creates a multi-breakpoint monitor to make responsive components easily.
-- [`createPrefersDark`](#createPrefersDark) - Provides a signal indicating if the user has requested dark color theme.
+- [`makeMediaQueryListener`](#makemediaquerylistener) - Listen for changes to provided Media Query.
+- [`createMediaQuery`](#createmediaquery) - Creates a very simple and straightforward media query monitor.
+- [`createBreakpoints`](#createbreakpoints) - Creates a multi-breakpoint monitor to make responsive components easily.
+- [`createPrefersDark`](#createprefersdark) - Provides a signal indicating if the user has requested dark color theme.
 
 ## Installation
 
@@ -199,6 +199,23 @@ createEffect(() => {
 ```
 
 > Note: `usePrefersDark` will deopt to `createPrefersDark` if used during hydration. (see issue [#310](https://github.com/solidjs-community/solid-primitives/issues/310))
+
+## Notes
+
+### iOS 13 Support & Deprecated `addListener`
+
+Due to older versions of [mobile Safari on iOS 13 not supporting](https://github.com/mdn/sprints/issues/858) `addEventListener` on the MediaQueryList API, this primitive will need to be polyfilled. If your application needs to support much older versions of the browser you should [use a polyfill utility](https://www.npmjs.com/package/matchmedia-polyfill) or patch the missing function like so:
+
+```ts
+if ((!"addEventListener") in MediaQueryList) {
+  MediaQueryList.prototype.addEventListener = function (type, callback) {
+    if (type === "change") this.addListener(callback);
+  };
+  MediaQueryList.prototype.removeEventListener = function (type, callback) {
+    if (type === "change") this.removeListener(callback);
+  };
+}
+```
 
 ## Changelog
 

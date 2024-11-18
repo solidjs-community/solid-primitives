@@ -50,7 +50,7 @@ const Content = (props: { page: TPage; channelName: string }) => {
           <span class="font-normal opacity-90">BroadcastChannel name:</span> {props.channelName}
         </h3>
         <button
-          class="btn flex gap-2 "
+          class="btn flex gap-2"
           classList={{
             ["cursor-default"]: !hasMultiplePages(),
             ["hover:bg-teal-600"]: !hasMultiplePages(),

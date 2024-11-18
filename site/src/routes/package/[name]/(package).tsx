@@ -1,6 +1,4 @@
 import { Component, createMemo, createResource, onMount, Suspense } from "solid-js";
-import { useRouteData } from "solid-start/router";
-import { Title, useParams } from "solid-start";
 import { fetchPackageData, getCachedPackageListItemData } from "~/api.js";
 import { PRIMITIVE_PAGE_PADDING_TOP } from "~/components/Header/Header.jsx";
 import InfoBar from "~/components/Primitives/InfoBar.jsx";
@@ -12,19 +10,23 @@ import { kebabCaseToCapitalized } from "~/utils.js";
 import { Heading } from "./components/heading.js";
 import { PackageInstallation } from "./components/package-installation.js";
 import { createPrimitiveNameTooltips } from "./components/primitive-name-tooltips.js";
+import { useParams } from "@solidjs/router";
+import { Title } from "@solidjs/meta";
 
 type Params = {
   name: string;
 };
 
-export function routeData() {
+export function routeData() {}
+
+const Page: Component = () => {
   const params = useParams<Params>();
 
   const cachedData = createMemo(() => getCachedPackageListItemData(params.name));
 
   const [dataResource] = createResource<PackageData, string>(() => params.name, fetchPackageData);
 
-  return {
+  const data = {
     get name() {
       return params.name;
     },
@@ -44,10 +46,6 @@ export function routeData() {
       return dataResource()?.readme;
     },
   };
-}
-
-const Page: Component = () => {
-  const data = useRouteData<typeof routeData>();
 
   const packageName = () => `@solid-primitives/${data.name}`;
   const formattedName = createMemo(() => kebabCaseToCapitalized(data.name));
@@ -57,9 +55,7 @@ const Page: Component = () => {
       <Title>{formattedName()} — Solid Primitives</Title>
       <DocumentClass class="primitives-page-main" />
       <div
-        class="-z-1 absolute left-0 right-0 top-0 h-[95vh]
-        bg-[linear-gradient(to_bottom,#fff_var(--primitive-padding-top-gr),transparent)]
-        dark:bg-[linear-gradient(to_bottom,#293843_var(--primitive-padding-top-gr),transparent)]"
+        class="-z-1 absolute left-0 right-0 top-0 h-[95vh] bg-[linear-gradient(to_bottom,#fff_var(--primitive-padding-top-gr),transparent)] dark:bg-[linear-gradient(to_bottom,#293843_var(--primitive-padding-top-gr),transparent)]"
         style={{
           "--primitive-padding-top-gr": `${PRIMITIVE_PAGE_PADDING_TOP + 300}px`,
         }}
@@ -69,7 +65,7 @@ const Page: Component = () => {
         style={{ "padding-top": `${PRIMITIVE_PAGE_PADDING_TOP}px` }}
       >
         <div class="bg-page-main-bg rounded-3xl p-3 sm:p-8">
-          <div class="mb-[90px] flex items-center justify-between gap-[30px] text-[#232324] sm:gap-[100px] dark:text-white">
+          <div class="mb-[90px] flex items-center justify-between gap-[30px] text-[#232324] dark:text-white sm:gap-[100px]">
             <Heading name={data.name} formattedName={formattedName()} />
           </div>
 

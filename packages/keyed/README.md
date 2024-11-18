@@ -11,10 +11,10 @@
 
 Control Flow primitives and components that require specifying explicit keys to identify or rerender elements.
 
-- [`keyArray`](#keyArray) - Reactively maps an array by specified key with a callback function - underlying helper for the `<Key>` control flow.
-- [`Key`](#Key) - Creates a list of elements by mapping items by provided key.
-- [`Entries`](#Entries) - Creates a list of elements by mapping object entries.
-- [`Rerun`](#Rerun) - Causes the children to rerender when the `on` changes.
+- [`keyArray`](#keyarray) - Reactively maps an array by specified key with a callback function - underlying helper for the `<Key>` control flow.
+- [`Key`](#key) - Creates a list of elements by mapping items by provided key.
+- [`Entries`](#entries) - Creates a list of elements by mapping object entries.
+- [`Rerun`](#rerun) - Causes the children to rerender when the `on` changes.
 
 ## Installation
 
@@ -26,7 +26,7 @@ yarn add @solid-primitives/keyed
 
 ## `keyArray`
 
-Reactively maps an array by specified key with a callback function - underlying helper for the [`<Key>`](#Key) control flow.
+Reactively maps an array by specified key with a callback function - underlying helper for the [`<Key>`](#key) control flow.
 
 ### How to use it
 

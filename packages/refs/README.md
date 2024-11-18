@@ -13,9 +13,9 @@ Collection of primitives, components and directives that help managing reference
 
 ##### Primitives:
 
-- [`mergeRefs`](#mergeRefs) - Utility for chaining multiple `ref` assignments with `props.ref` forwarding.
-- [`resolveElements`](#resolveElements) - Utility for resolving recursively nested JSX children to a single element or an array of elements.
-- [`resolveFirst`](#resolveFirst) - Utility for resolving recursively nested JSX children in search of the first element that matches a predicate.
+- [`mergeRefs`](#mergerefs) - Utility for chaining multiple `ref` assignments with `props.ref` forwarding.
+- [`resolveElements`](#resolveelements) - Utility for resolving recursively nested JSX children to a single element or an array of elements.
+- [`resolveFirst`](#resolvefirst) - Utility for resolving recursively nested JSX children in search of the first element that matches a predicate.
 - [`<Refs>`](#refs) - Get up-to-date references of the multiple children elements.
 - [`<Ref>`](#ref) - Get up-to-date reference to a single child element.
 
@@ -111,7 +111,7 @@ Utility for resolving recursively nested JSX children in search of the first ele
 
 ### How to use it
 
-`resolveFirst` matches the API of [`resolveElements`](#resolveElements) but returns only the first element that matches the predicate.
+`resolveFirst` matches the API of [`resolveElements`](#resolveelements) but returns only the first element that matches the predicate.
 
 ```tsx
 function Button(props: ParentProps) {

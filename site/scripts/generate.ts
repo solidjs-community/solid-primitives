@@ -138,7 +138,7 @@ async function generatePrimitiveSizes(module: ModuleData) {
   const sizes = module.primitives.map(async primitive => {
     const result = await getPackageBundlesize(module.name, {
       exportName: primitive,
-      peerDependencies: module.peerDependencies,
+      peerDependencies: module.peer_deps,
     });
     if (!result) return null;
     return {
@@ -153,7 +153,7 @@ async function generatePrimitiveSizes(module: ModuleData) {
 
 async function generatePackageSize(module: ModuleData) {
   const result = await getPackageBundlesize(module.name, {
-    peerDependencies: module.peerDependencies,
+    peerDependencies: module.peer_deps,
   });
   if (!result) return null;
   return {

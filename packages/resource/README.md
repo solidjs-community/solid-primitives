@@ -12,8 +12,9 @@
 A collection of composable primitives to augment [`createResource`](https://www.solidjs.com/docs/latest/api#createresource)
 
 - [`createAggregated`](#createaggregated) - wraps the resource to aggregate data instead of overwriting it
-- [`createDeepSignal`](#createdeepsignal) - provides a fine-grained signal for the [resource storage option](https://www.solidjs.com/docs/latest/api#createresource:~:text=Resources%20can%20be%20set%20with%20custom%20defined%20storage)
-- [`makeAbortable`](#makeabortable) - wraps the fetcher to be abortable and auto-abort on re-fetch or timeout
+- [`createDeepSignal`](#createdeepsignal) - provides a fine-grained signal for the [resource storage option](https://docs.solidjs.com/reference/basic-reactivity/create-resource#options)
+- [`makeAbortable`](#makeabortable) - sets up an AbortSignal with auto-abort on re-fetch or timeout
+- [`createAbortable`](#createabortable) - like `makeAbortable`, but with automatic abort on cleanup
 - [`makeCache`](#makecache) - wraps the fetcher to cache the responses for a certain amount of time
 - [`makeRetrying`](#makeretrying) - wraps the fetcher to retry requests after a delay
 
@@ -37,7 +38,7 @@ const [signal, abort] = makeAbortable({ timeout: 10000 });
 
 const fetcher = (url: string) => fetch(url, { signal: signal() }).then(r => r.json());
 
-// cached fetcher will only be called if `url` source changes, or gets invalidated
+// cached fetcher will not be called if something for the same URL is still in cache
 const [cachedFetcher, invalidate] = makeCache(fetcher, { storage: localStorage });
 
 // works with createResource, or any wrapping API with the same interface
@@ -68,7 +69,7 @@ Objects and Arrays are re-created on each operation, but the values will be left
 
 ### createDeepSignal
 
-Usually resources in Solid.js are immutable. Every time the resource updates, every subscriber of it is updated. Starting with Solid.js 1.5, `createResource` allows to receive a function returning something akin to a signal in [`options.storage`](https://www.solidjs.com/docs/latest/api#createresource:~:text=Resources%20can%20be%20set%20with%20custom%20defined%20storage). This allows to provide the underlying storage for the resource in order to change its reactivity. This allows to add fine-grained reactivity to resources so that you can subscribe to nested properties and only trigger updates as they actually occur:
+Usually resources in Solid.js are immutable. Every time the resource updates, every subscriber of it is updated. Starting with Solid.js 1.5, `createResource` allows to receive a function returning something akin to a signal in [`options.storage`](https://docs.solidjs.com/reference/basic-reactivity/create-resource#options). This allows to provide the underlying storage for the resource in order to change its reactivity. This allows to add fine-grained reactivity to resources so that you can subscribe to nested properties and only trigger updates as they actually occur:
 
 ```ts
 // this adds fine-grained reactivity to the contents of data():
@@ -91,7 +92,11 @@ Orchestrates AbortController creation and aborting of abortable fetchers, either
 
 ```ts
 // definition
-const [signal: AbortSignal, abort: () => void] = makeAbortable({
+const [
+  signal: AbortSignal,
+  abort: () => void,
+  filterErrors: <E>(err: E) => E instanceof AbortError ? void : E
+] = makeAbortable({
   timeout?: 10000,
   noAutoAbort?: true,
 });
@@ -99,12 +104,17 @@ const [signal: AbortSignal, abort: () => void] = makeAbortable({
 // usage
 const fetcher = (url: string) => fetch(
   url, { signal: signal() }
-).then(r => r.json());
+).then(r => r.json(), filterErrors);
 ```
 
-- The signal function always returns an unaborted signal; if `noAutoAbort` is not set to true, calling it will also abort a previous signal, if present
-- The abort callback will always abort the current signal
+- The `signal` function always returns a signal that is not yet aborted; if `noAutoAbort` is not set to true, calling it will also abort a previous signal, if present
+- The `abort` callback will always abort the current signal
 - If `timeout` is set, the signal will be aborted after that many Milliseconds
+- The `filterErrors` function can be used to filter out abort errors
+
+### createAbortable
+
+This function does exactly the same as `makeAbortable`, but also automatically aborts on cleanup. Only use within a reactive scope.
 
 ### makeCache
 
@@ -240,7 +250,7 @@ const addTodo = todo => {
 
 #### Scroll Restoration
 
-This is already covered in [solid-router](https://github.com/solidjs/solid-router).
+This is already covered in [@solidjs/router](https://github.com/solidjs/solid-router).
 
 #### Polling
 
@@ -248,7 +258,7 @@ Just use an interval with refetch; ideally, also use [`makeAbortable`](#makeabor
 
 ## Demo
 
-You may view a working example of createFileSystem/makeVirtualFileSystem/makeWebAccessFileSystem here:
+You may view a working example of our resource primitives here:
 https://primitives.solidjs.community/playground/resource/
 
 ## Changelog

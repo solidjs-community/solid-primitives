@@ -13,24 +13,26 @@ A collection of primitives, capturing current mouse cursor position, and helping
 
 ##### Reactive primitives:
 
-- [`createMousePosition`](#createMousePosition) - Listens to the mouse events, providing a reactive up-to-date position of the cursor on the page.
-- [`createPositionToElement`](#createPositionToElement) - Provides an auto-updating position relative to a provided element.
+- [`createMousePosition`](#createmouseposition) - Listens to the mouse events, providing a reactive up-to-date position of the cursor on the page.
+- [`createPositionToElement`](#createpositiontoelement) - Provides an auto-updating position relative to a provided element.
 
 ##### Non-reactive primitives:
 
-- [`makeMousePositionListener`](#makeMousePositionListener) - Attaches event listeners to provided target, listening for changes to the mouse/touch position.
-- [`makeMouseInsideListener`](#makeMouseInsideListener) - Attaches event listeners to provided target, listening for mouse/touch entering/leaving the element.
+- [`makeMousePositionListener`](#makemousepositionlistener) - Attaches event listeners to provided target, listening for changes to the mouse/touch position.
+- [`makeMouseInsideListener`](#makemouseinsidelistener) - Attaches event listeners to provided target, listening for mouse/touch entering/leaving the element.
 
 ##### Calculations:
 
-- [`getPositionToElement`](#getPositionToElement) - Turn position relative to the page, into position relative to an element.
-- [`getPositionInElement`](#getPositionInElement) - Turn position relative to the page, into position relative to an element. Clamped to the element bounds.
-- [`getPositionToScreen`](#getPositionToScreen) - Turn position relative to the page, into position relative to the screen.
+- [`getPositionToElement`](#getpositiontoelement) - Turn position relative to the page, into position relative to an element.
+- [`getPositionInElement`](#getpositioninelement) - Turn position relative to the page, into position relative to an element. Clamped to the element bounds.
+- [`getPositionToScreen`](#getpositiontoscreen) - Turn position relative to the page, into position relative to the screen.
 
 ## Installation
 
 ```bash
 npm install @solid-primitives/mouse
+# or
+pnpm add @solid-primitives/mouse
 # or
 yarn add @solid-primitives/mouse
 ```
@@ -84,7 +86,7 @@ createEffect(() => {
 
 ```ts
 function createMousePosition(
-  target?: MaybeAccessor<Window | Document | HTMLElement>,
+  target?: MaybeAccessor<SVGSVGElement | HTMLElement | Window | Document>,
   options?: MousePositionOptions,
 ): MousePositionInside;
 ```

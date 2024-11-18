@@ -1,6 +1,5 @@
-import { createEffect, createResource, createSignal, on } from "solid-js";
+import { catchError, createEffect, createResource, createRoot, createSignal, on } from "solid-js";
 import { describe, test, expect, vi, afterAll, beforeEach, beforeAll } from "vitest";
-import { testEffect } from "@solidjs/testing-library";
 import {
   makeAbortable,
   createAggregated,
@@ -9,6 +8,33 @@ import {
   makeRetrying,
   createDeepSignal,
 } from "../src/index.js";
+
+export function testEffect<T extends any = void>(
+  fn: (done: (result: T) => void) => void,
+): Promise<T> {
+  let done: (result: T) => void;
+  let fail: (error: any) => void;
+  let promise = new Promise<T>((resolve, reject) => {
+    done = resolve;
+    fail = reject;
+  });
+  createRoot(dispose => {
+    catchError(() => {
+      fn(result => {
+        done(result);
+        dispose();
+      });
+    }, fail);
+  });
+  return promise;
+}
+
+class AbortError extends Error {
+  constructor(msg: string) {
+    super(msg);
+  }
+  name = "AbortError";
+}
 
 beforeAll(() => {
   vi.useFakeTimers();
@@ -33,6 +59,18 @@ describe("makeAbortable", () => {
     expect(signal2.aborted, "second signal should not be initially aborted").toBeFalsy();
     abort();
     expect(signal2.aborted, "signal should be aborted when calling abort()").toBeTruthy();
+  });
+  test("filters (only) abort errors", async () => {
+    const [_signal, _abort, filterAbortError] = makeAbortable();
+    await Promise.reject(new AbortError("test"))
+      .catch(filterAbortError)
+      .then(resolution => expect(resolution).toBeUndefined())
+      .catch(err => expect.fail(err.message || "failed with error"));
+    const noAbortError = new Error("not an AbortError");
+    await Promise.reject(noAbortError)
+      .catch(filterAbortError)
+      .then(() => expect.fail("filtered error that was not an AbortError"))
+      .catch(err => expect(err).toBe(noAbortError));
   });
 });
 

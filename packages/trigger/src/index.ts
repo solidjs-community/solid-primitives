@@ -50,6 +50,11 @@ export class TriggerCache<T> {
     this.#map.get(key)?.$$();
   }
 
+  dirtyAll() {
+    if (isServer) return;
+    for (const trigger of this.#map.values()) trigger.$$();
+  }
+
   track(key: T) {
     if (!getListener()) return;
     let trigger = this.#map.get(key);
@@ -59,9 +64,9 @@ export class TriggerCache<T> {
     } else trigger.n++;
     onCleanup(() => {
       // remove the trigger when no one is listening to it
-      if (trigger!.n-- === 1)
+      if (--trigger.n === 0)
         // microtask is to avoid removing the trigger used by a single listener
-        queueMicrotask(() => trigger!.n === 0 && this.#map.delete(key));
+        queueMicrotask(() => trigger.n === 0 && this.#map.delete(key));
     });
     trigger.$();
   }
@@ -77,11 +82,12 @@ export class TriggerCache<T> {
  * Trigger signals added to the cache only when tracked under a computation,
  * and get deleted from the cache when they are no longer tracked.
  *
- * @returns a tuple of `[track, dirty]` functions
+ * @returns a tuple of `[track, dirty, dirtyAll]` functions
  *
  * `track` and `dirty` are called with a `key` so that each tracker will trigger an update only when his individual `key` would get marked as dirty.
+ * `dirtyAll` will mark all keys as dirty and trigger an update for all of them.
  * @example
- * const [track, dirty] = createTriggerCache()
+ * const [track, dirty, dirtyAll] = createTriggerCache()
  * createEffect(() => {
  *    track(1)
  *    ...
@@ -90,10 +96,12 @@ export class TriggerCache<T> {
  * dirty(1)
  * // this won't cause an update:
  * dirty(2)
+ * // this will cause an update to all keys:
+ * dirtyAll()
  */
 export function createTriggerCache<T>(
   mapConstructor: WeakMapConstructor | MapConstructor = Map,
-): [track: (key: T) => void, dirty: (key: T) => void] {
+): [track: (key: T) => void, dirty: (key: T) => void, dirtyAll: () => void] {
   const map = new TriggerCache(mapConstructor);
-  return [map.track.bind(map), map.dirty.bind(map)];
+  return [map.track.bind(map), map.dirty.bind(map), map.dirtyAll.bind(map)];
 }

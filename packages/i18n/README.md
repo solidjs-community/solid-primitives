@@ -53,6 +53,8 @@ const fr_dict: Dict = {
 };
 ```
 
+When using large dictionary files, JSON files are [faster to load](https://www.youtube.com/watch?v=ff4fgQxPaO0). Additionally, we recommend keeping a flat JSON structure so you don't need to flatten the object on the client for best performance.
+
 ### With `createResource`
 
 Example of using `@solid-primitives/i18n` with `createResource` to dynamically load directories for selected languages.

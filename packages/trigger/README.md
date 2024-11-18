@@ -11,8 +11,8 @@
 
 A set of primitives based on Solid signals, used to trigger computations.
 
-- [`createTrigger`](#createTrigger) - Set listeners in reactive computations and then trigger them when you want.
-- [`createTriggerCache`](#createTriggerCache) - Creates a cache of triggers that can be used to mark dirty only specific keys.
+- [`createTrigger`](#createtrigger) - Set listeners in reactive computations and then trigger them when you want.
+- [`createTriggerCache`](#createtriggercache) - Creates a cache of triggers that can be used to mark dirty only specific keys.
 
 ## Installation
 
@@ -73,6 +73,22 @@ createEffect(() => {
 map.dirty(1);
 // this won't cause an update:
 map.dirty(2);
+```
+
+### Triggering all keys
+
+`dirtyAll` will trigger all keys in the cache.
+
+```ts
+const [track, _dirty, dirtyAll] = createTriggerCache<number>();
+
+createEffect(() => {
+  track(1);
+  //  ...
+});
+
+// later (will trigger the update)
+dirtyAll();
 ```
 
 ### Weak version

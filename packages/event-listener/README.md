@@ -13,25 +13,25 @@ A set of primitives that help with listening to DOM and Custom Events.
 
 ##### Non-reactive primitives:
 
-- [`makeEventListener`](#makeEventListener) — Non-reactive primitive for adding event listeners that gets removed onCleanup.
-- [`makeEventListenerStack`](#makeEventListenerStack) — Creates a stack of event listeners, that will be automatically disposed on cleanup.
+- [`makeEventListener`](#makeeventlistener) — Non-reactive primitive for adding event listeners that gets removed onCleanup.
+- [`makeEventListenerStack`](#makeeventlistenerstack) — Creates a stack of event listeners, that will be automatically disposed on cleanup.
 
 ##### Reactive primitives:
 
-- [`createEventListener`](#createEventListener) — Reactive version of [`makeEventListener`](#makeEventListener), that takes signal arguments to apply new listeners once changed.
-- [`createEventSignal`](#createEventListener) — Like [`createEventListener`](#createEventListener), but captured events are stored in a returned signal.
-- [`createEventListenerMap`](#createEventListenerMap) — A helpful primitive that listens to a map of events. Handle them by individual callbacks.
+- [`createEventListener`](#createeventlistener) — Reactive version of [`makeEventListener`](#makeeventlistener), that takes signal arguments to apply new listeners once changed.
+- [`createEventSignal`](#createeventlistener) — Like [`createEventListener`](#createeventlistener), but captured events are stored in a returned signal.
+- [`createEventListenerMap`](#createeventlistenermap) — A helpful primitive that listens to a map of events. Handle them by individual callbacks.
 
 ##### Component global listeners:
 
-- [`WindowEventListener`](#WindowEventListener) — Listen to the `window` DOM Events, using a component.
-- [`DocumentEventListener`](#DocumentEventListener) — Listen to the `document` DOM Events, using a component.
+- [`WindowEventListener`](#windoweventlistener) — Listen to the `window` DOM Events, using a component.
+- [`DocumentEventListener`](#documenteventlistener) — Listen to the `document` DOM Events, using a component.
 
 ##### Callback Wrappers
 
-- [`preventDefault`](#preventDefault) — Wraps event handler with `e.preventDefault()` call.
-- [`stopPropagation`](#stopPropagation) — Wraps event handler with `e.stopPropagation()` call.
-- [`stopImmediatePropagation`](#stopImmediatePropagation) — Wraps event handler with `e.stopImmediatePropagation()` call.
+- [`preventDefault`](#preventdefault) — Wraps event handler with `e.preventDefault()` call.
+- [`stopPropagation`](#stoppropagation) — Wraps event handler with `e.stopPropagation()` call.
+- [`stopImmediatePropagation`](#stopimmediatepropagation) — Wraps event handler with `e.stopImmediatePropagation()` call.
 
 ## Installation
 
@@ -108,7 +108,7 @@ clear();
 
 ## `createEventListener`
 
-Reactive version of [`makeEventListener`](#makeEventListener), that can take signal `target` and `type` arguments to apply new listeners once changed.
+Reactive version of [`makeEventListener`](#makeeventlistener), that can take signal `target` and `type` arguments to apply new listeners once changed.
 
 ### How to use it
 
@@ -197,7 +197,7 @@ eventListener;
 
 ## `createEventSignal`
 
-Like [`createEventListener`](#createEventListener), but events are handled with the returned signal, instead of with a callback.
+Like [`createEventListener`](#createeventlistener), but events are handled with the returned signal, instead of with a callback.
 
 ### How to use it
 
@@ -268,7 +268,7 @@ import { WindowEventListener } from "@solid-primitives/event-listener";
 
 ## `DocumentEventListener`
 
-The same as [`WindowEventListener`](#WindowEventListener), but listens to `document` events.
+The same as [`WindowEventListener`](#windoweventlistener), but listens to `document` events.
 
 ### How to use it
 

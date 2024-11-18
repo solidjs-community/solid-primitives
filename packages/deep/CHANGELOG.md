@@ -1,5 +1,24 @@
 # @solid-primitives/deep
 
+## 0.2.10
+
+### Patch Changes
+
+- @solid-primitives/memo@1.3.10
+
+## 0.2.9
+
+### Patch Changes
+
+- Updated dependencies [49416e8]
+  - @solid-primitives/memo@1.3.9
+
+## 0.2.8
+
+### Patch Changes
+
+- 016fe83: Fix `trackStore` tracking multiple same-object references. (Fixes #582)
+
 ## 0.2.7
 
 ### Patch Changes

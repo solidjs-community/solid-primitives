@@ -1,13 +1,13 @@
 import { createMediaQuery } from "@solid-primitives/media";
 import { useWindowScrollPosition } from "@solid-primitives/scroll";
 import { createMarker, makeSearchRegex } from "@solid-primitives/marker";
-import { A } from "solid-start/router";
 import Fuse from "fuse.js";
 import { FiChevronLeft, FiSearch, FiX } from "solid-icons/fi";
 import { Component, createMemo, createResource, createSignal, For, Show } from "solid-js";
 import { fetchPackageList } from "~/api.js";
 import { PackageListItem } from "~/types.js";
 import { focusInputAndKeepVirtualKeyboardOpen } from "~/utils.js";
+import { A } from "@solidjs/router";
 
 let inputEl: HTMLInputElement | undefined;
 
@@ -134,7 +134,7 @@ const Search: Component<{
             classList={{ hidden: !result().length }}
           >
             <div
-              class="-z-1 absolute left-4 right-4 top-[-16px]  h-[16px] shadow-lg shadow-[#24405966] transition dark:shadow-[#05121dbf]"
+              class="-z-1 absolute left-4 right-4 top-[-16px] h-[16px] shadow-lg shadow-[#24405966] transition dark:shadow-[#05121dbf]"
               classList={{
                 "opacity-0": !showShadow(),
                 "opacity-100": showShadow(),
@@ -168,7 +168,7 @@ const Search: Component<{
                               <li>
                                 <A
                                   href={`/package/${match.name.toLowerCase()}#${primitive.toLowerCase()}`}
-                                  class="[&>mark]:background-[linear-gradient(0deg,#ffaf1d,#ffaf1d)_center_/_100%_75%_no-repeat] inline-block rounded-md bg-[#e6f0ff] px-2 py-[2px] text-[14px] font-semibold text-[#063983] transition-colors hover:text-black sm:text-base dark:bg-[#30455b] dark:text-[#b9d6ff] dark:hover:text-[#fff]"
+                                  class="[&>mark]:background-[linear-gradient(0deg,#ffaf1d,#ffaf1d)_center_/_100%_75%_no-repeat] inline-block rounded-md bg-[#e6f0ff] px-2 py-[2px] text-[14px] font-semibold text-[#063983] transition-colors hover:text-black dark:bg-[#30455b] dark:text-[#b9d6ff] dark:hover:text-[#fff] sm:text-base"
                                 >
                                   {highlight(primitive)}
                                 </A>
@@ -205,7 +205,7 @@ const Search: Component<{
                         <For each={match.tags}>
                           {item => (
                             <li>
-                              <span class="text-[12px] text-slate-500 sm:text-[14px] dark:text-slate-400">
+                              <span class="text-[12px] text-slate-500 dark:text-slate-400 sm:text-[14px]">
                                 <span class="opacity-50">{"#"}</span>
                                 {highlight(item)}
                               </span>

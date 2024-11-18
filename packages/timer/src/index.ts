@@ -4,8 +4,8 @@ import {
   createEffect,
   untrack,
   Accessor,
-  createComputed,
   SignalOptions,
+  createMemo,
 } from "solid-js";
 import { isServer } from "solid-js/web";
 
@@ -178,11 +178,9 @@ export function createPolled<T>(
   if (isServer) {
     return fn as Accessor<T>;
   }
-  const [polled, setPolled] = createSignal(untrack(fn.bind(void 0, value)), options);
-  const update = () => setPolled(fn);
-  createTimer(update, timeout, setInterval);
-  createComputed(update);
-  return polled;
+  const memo = createMemo(() => createSignal(fn(value), options), options);
+  createTimer(() => memo()[1](fn), timeout, setInterval);
+  return () => memo()[0]();
 }
 
 /**

@@ -11,7 +11,7 @@
 
 Primitives for creating a reactive masonry layout.
 
-- [`createMasonry`](#createMasonry) - Creates a reactive masonry layout data from a reactive source array.
+- [`createMasonry`](#createmasonry) - Creates a reactive masonry layout data from a reactive source array.
 
 ## Installation
 

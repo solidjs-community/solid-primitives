@@ -1,5 +1,25 @@
 # @solid-primitives/date
 
+## 2.0.24
+
+### Patch Changes
+
+- @solid-primitives/memo@1.3.10
+
+## 2.0.23
+
+### Patch Changes
+
+- Updated dependencies [8dfd42d]
+  - @solid-primitives/timer@1.3.10
+
+## 2.0.22
+
+### Patch Changes
+
+- Updated dependencies [49416e8]
+  - @solid-primitives/memo@1.3.9
+
 ## 2.0.21
 
 ### Patch Changes
