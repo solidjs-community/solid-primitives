@@ -1,5 +1,5 @@
-import type { Accessor, Setter, Signal } from "solid-js";
-import { createUniqueId, untrack } from "solid-js";
+import type { Accessor, Setter, Signal, Owner } from "solid-js";
+import { createUniqueId, untrack, getOwner, runWithOwner } from "solid-js";
 import { isServer, isDev } from "solid-js/web";
 import type { SetStoreFunction, Store } from "solid-js/store";
 import { reconcile } from "solid-js/store";
@@ -60,6 +60,7 @@ export type PersistenceSyncAPI = [
 
 export type PersistenceOptions<T, O extends Record<string, any> | undefined> = {
   name?: string;
+  owner?: Owner;
   serialize?: (data: T) => string;
   deserialize?: (data: string) => T;
   sync?: PersistenceSyncAPI;
@@ -123,6 +124,7 @@ export function makePersisted<
   if (!storage) {
     return [signal[0], signal[1], null] as PersistedState<S>;
   }
+  const owner = options.owner || getOwner();
   const storageOptions = (options as unknown as { storageOptions: O }).storageOptions;
   const serialize: (data: T) => string = options.serialize || JSON.stringify.bind(JSON);
   const deserialize: (data: string) => T = options.deserialize || JSON.parse.bind(JSON);
@@ -132,7 +134,7 @@ export function makePersisted<
       ? (data: string) => {
           try {
             const value = deserialize(data);
-            (signal[1] as any)(() => value);
+            runWithOwner(owner, () => (signal[1] as any)(() => value));
           } catch (e) {
             // eslint-disable-next-line no-console
             if (isDev) console.warn(e);
@@ -141,7 +143,7 @@ export function makePersisted<
       : (data: string) => {
           try {
             const value = deserialize(data);
-            (signal[1] as any)(reconcile(value));
+            runWithOwner(owner, () => (signal[1] as any)(reconcile(value)));
           } catch (e) {
             // eslint-disable-next-line no-console
             if (isDev) console.warn(e);
