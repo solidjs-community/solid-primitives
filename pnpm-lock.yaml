@@ -492,6 +492,9 @@ importers:
 
   packages/keyed:
     devDependencies:
+      '@solid-primitives/map':
+        specifier: workspace:^
+        version: link:../map
       '@solid-primitives/refs':
         specifier: workspace:^
         version: link:../refs
