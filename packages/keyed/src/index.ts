@@ -207,7 +207,7 @@ export function Entries<K extends string | number, V>(props: {
  * @param props
  * @param props.of map to iterate entries of (`myMap.entries()`)
  * @param props.children
- * a map render function that receives an Map key, **value signal** and **index signal** and returns a JSX-Element; if the list is empty, an optional fallback is returned:
+ * a map render function that receives a Map key, **value signal** and **index signal** and returns a JSX-Element; if the list is empty, an optional fallback is returned:
  * ```tsx
  * <MapEntries of={map()} fallback={<div>No items</div>}>
  *   {(key, value, index) => <div data-index={index()}>{key}: {value()}</div>}
