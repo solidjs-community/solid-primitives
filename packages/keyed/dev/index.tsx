@@ -2,6 +2,7 @@ import { Component } from "solid-js";
 
 import Key from "./key.js";
 import Entries from "./entries.js";
+import MapEntries from "./mapEntries.js";
 
 const App: Component = () => {
   return (
@@ -13,6 +14,10 @@ const App: Component = () => {
       <div class="wrapper-v">
         <h4>Entries</h4>
         <Entries />
+      </div>
+      <div class="wrapper-v">
+        <h4>MapEntries</h4>
+        <MapEntries />
       </div>
     </div>
   );
