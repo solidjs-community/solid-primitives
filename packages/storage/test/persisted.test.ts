@@ -3,6 +3,7 @@ import { createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import { makePersisted } from "../src/persisted.js";
 import { AsyncStorage } from "../src/index.js";
+import * as localforage from "localforage";
 
 describe("makePersisted", () => {
   let data: Record<string, string> = {};
@@ -133,12 +134,73 @@ describe("makePersisted", () => {
 
   it("exposes the initial value as third part of the return tuple", () => {
     const anotherMockAsyncStorage = { ...mockAsyncStorage };
-    const promise = Promise.resolve("init");
+    const promise = Promise.resolve('"init"');
     anotherMockAsyncStorage.getItem = () => promise;
     const [_signal, _setSignal, init] = makePersisted(createSignal("default"), {
       storage: anotherMockAsyncStorage,
       name: "test8",
     });
     expect(init).toBe(promise);
+  });
+});
+
+describe("makePersisted and localforage", () => {
+  it("saves into a signal and reads from localforage", async () => {
+    const [test, setTest] = makePersisted(createSignal("initial"), {
+      storage: localforage,
+      name: "test9",
+    });
+    expect(test()).toBe("initial");
+    setTest("overwritten");
+    let count = 0;
+    while (test() === "initial" && count++ < 10) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+    const [test2] = makePersisted(
+      createSignal("initial"),
+      { storage: localforage, name: "test9" }
+    );
+    count = 0;
+    while (test2() === "initial" && count++ < 10) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+    expect(test2()).toBe("overwritten");
+  });
+
+  it("saves into a store with getters and reads from localforage", async () => {
+    localforage.setItem("test10", '{"x":"foo","y":"foobar"}');
+    const [test, setTest] = makePersisted(
+      createStore({
+        x: "foo",
+        get y() {
+          return this.x + "bar";
+        },
+      }),
+      { storage: localforage, name: "test10" },
+    );
+    setTest("x", "boo");
+    let count = 0;
+    while (test.y === "foobar" && count++ < 10) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+    expect(test.y).toBe("boobar");
+  });
+
+  it("reads into a store from previously saved data from localforage", async () => {
+    localforage.setItem("test11", JSON.stringify({ x: "zoo", y: "zoobar" }));
+    const [test] = makePersisted(
+      createStore({
+        x: "foo",
+        get y() {
+          return this.x + "bar";
+        },
+      }),
+      { storage: localforage, name: "test11" },
+    );
+    let count = 0;
+    while (test.y === "foobar" && count++ < 10) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+    expect(test.y).toBe("zoobar");
   });
 });

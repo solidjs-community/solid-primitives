@@ -99,6 +99,7 @@
     }
   },
   "devDependencies": {
-    "solid-js": "^1.8.15"
+    "solid-js": "^1.8.15",
+    "localforage": "^1.10.0"
   }
 }
