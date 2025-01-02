@@ -2,8 +2,6 @@ import { Component } from "solid-js";
 
 import Key from "./key.js";
 import Entries from "./entries.js";
-import MapEntries from "./mapEntries.js";
-import ReactiveMapEntries from "./reactiveMapEntries.js";
 
 const App: Component = () => {
   return (
@@ -15,14 +13,6 @@ const App: Component = () => {
       <div class="wrapper-v">
         <h4>Entries</h4>
         <Entries />
-      </div>
-      <div class="wrapper-v">
-        <h4>MapEntries</h4>
-        <MapEntries />
-      </div>
-      <div class="wrapper-v">
-        <h4>MapEntries with ReactiveMap</h4>
-        <ReactiveMapEntries />
       </div>
     </div>
   );

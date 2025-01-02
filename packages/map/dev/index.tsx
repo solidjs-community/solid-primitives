@@ -5,6 +5,9 @@ import { ReactiveMap } from "../src/index.js";
 import { onCleanup } from "solid-js";
 import { createEffect } from "solid-js";
 
+import MapEntries from "./mapEntries.js";
+import ReactiveMapEntries from "./reactiveMapEntries.js";
+
 const App: Component = () => {
   const map = new ReactiveMap<Element, number>();
 
@@ -43,6 +46,14 @@ const App: Component = () => {
         </For>
       </div>
       <p>size: {map.size}</p>
+      <div class="wrapper-v">
+        <h4>MapEntries</h4>
+        <MapEntries />
+      </div>
+      <div class="wrapper-v">
+        <h4>MapEntries with ReactiveMap</h4>
+        <ReactiveMapEntries />
+      </div>
     </div>
   );
 };

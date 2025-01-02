@@ -152,38 +152,6 @@ Third argument of the map function is an index signal.
 </Entries>
 ```
 
-## `<MapEntries>`
-
-Creates a list of elements by mapping Map entries. Similar to Solid's `<For>` and `<Index>`, but here, render function takes three arguments, and both value and index arguments are signals.
-
-### How to use it
-
-```tsx
-import { MapEntries } from "@solid-primitives/keyed";
-
-<MapEntries of={map()} fallback={<div>No items</div>}>
-  {(key, value) => (
-    <div>
-      {key}: {value()}
-    </div>
-  )}
-</MapEntries>;
-```
-
-### Index argument
-
-Third argument of the map function is an index signal.
-
-```tsx
-<MapEntries of={map()} fallback={<div>No items</div>}>
-  {(key, value, index) => (
-    <div data-index={index()}>
-      {key}: {value()}
-    </div>
-  )}
-</MapEntries>
-```
-
 ## `<Rerun>`
 
 Causes the children to rerender when the `on` key changes. Equivalent of `v-key` in vue, and `{#key}` in svelte.

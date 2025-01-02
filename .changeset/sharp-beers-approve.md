@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/keyed": minor
+"@solid-primitives/map": minor
 ---
 
 Add `MapEntries` control flow component.

@@ -54,7 +54,6 @@
   },
   "devDependencies": {
     "@solid-primitives/refs": "workspace:^",
-    "@solid-primitives/map": "workspace:^",
     "@solid-primitives/utils": "workspace:^",
     "solid-js": "^1.8.7",
     "solid-transition-group": "^0.2.3"

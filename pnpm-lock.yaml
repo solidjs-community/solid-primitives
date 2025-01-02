@@ -492,9 +492,6 @@ importers:
 
   packages/keyed:
     devDependencies:
-      '@solid-primitives/map':
-        specifier: workspace:^
-        version: link:../map
       '@solid-primitives/refs':
         specifier: workspace:^
         version: link:../refs
@@ -529,6 +526,9 @@ importers:
       solid-js:
         specifier: ^1.8.7
         version: 1.8.20
+      solid-transition-group:
+        specifier: ^0.2.3
+        version: 0.2.3(solid-js@1.8.20)
 
   packages/marker:
     devDependencies:
