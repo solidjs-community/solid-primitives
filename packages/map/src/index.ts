@@ -1,4 +1,4 @@
-import { type JSX, Accessor, batch, createMemo, mapArray } from "solid-js";
+import { Accessor, batch } from "solid-js";
 import { TriggerCache } from "@solid-primitives/trigger";
 
 const $KEYS = Symbol("track-keys");
@@ -186,41 +186,4 @@ export function createMap<K, V>(initial?: [K, V][]): SignalMap<K, V> {
 /** @deprecated */
 export function createWeakMap<K extends object, V>(initial?: [K, V][]): ReactiveWeakMap<K, V> {
   return new ReactiveWeakMap(initial);
-}
-
-/**
- * Creates a list of elements from the entries of provided Map
- *
- * @param props
- * @param props.of map to iterate entries of (`myMap.entries()`)
- * @param props.children
- * a map render function that receives a Map key, **value signal** and **index signal** and returns a JSX-Element; if the list is empty, an optional fallback is returned:
- * ```tsx
- * <MapEntries of={map()} fallback={<div>No items</div>}>
- *   {(key, value, index) => <div data-index={index()}>{key}: {value()}</div>}
- * </MapEntries>
- * ```
- *
- * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/map#mapentries
- */
-export function MapEntries<K, V>(props: {
-  of: Map<K, V> | undefined | null | false;
-  fallback?: JSX.Element;
-  children: (key: K, v: Accessor<V>, i: Accessor<number>) => JSX.Element;
-}): JSX.Element {
-  // changes to this function may be applicable to similar functions - grep 4A29BECD-767A-4CC0-AEBB-3543D7B444C6
-  const mapFn = props.children;
-  return createMemo(
-    mapArray(
-      () => props.of && Array.from(props.of.keys()),
-      mapFn.length < 3
-        ? key =>
-            (mapFn as (key: K, v: Accessor<V>) => JSX.Element)(
-              key,
-              () => (props.of as Map<K, V>).get(key)!,
-            )
-        : (key, i) => mapFn(key, () => (props.of as Map<K, V>).get(key)!, i),
-      "fallback" in props ? { fallback: () => props.fallback } : undefined,
-    ),
-  ) as unknown as JSX.Element;
 }

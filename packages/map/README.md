@@ -9,11 +9,10 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/map?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/map)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-The reactive versions of `Map` & `WeakMap` built-in data structures and control flow component.
+The reactive versions of `Map` & `WeakMap` built-in data structures.
 
 - **[`ReactiveMap`](#reactivemap-and-reactiveweakmap)** - A reactive `Map`.
 - **[`ReactiveWeakMap`](#reactivemap-and-reactiveweakmap)** - A reactive `WeakMap`.
-- **[`MapEntries`](#mapentries)** - Creates a list of elements by mapping Map entries.
 
 ## Installation
 
@@ -82,38 +81,6 @@ map.get("John").age = 35;
 
 // this will:
 map.set("John", { age: 35 });
-```
-
-## `<MapEntries>`
-
-Creates a list of elements by mapping Map entries. Similar to Solid's `<For>` and `<Index>`, but here, render function takes three arguments, and both value and index arguments are signals.
-
-### How to use it
-
-```tsx
-import { MapEntries } from "@solid-primitives/map";
-
-<MapEntries of={map()} fallback={<div>No items</div>}>
-  {(key, value) => (
-    <div>
-      {key}: {value()}
-    </div>
-  )}
-</MapEntries>;
-```
-
-### Index argument
-
-Third argument of the map function is an index signal.
-
-```tsx
-<MapEntries of={map()} fallback={<div>No items</div>}>
-  {(key, value, index) => (
-    <div data-index={index()}>
-      {key}: {value()}
-    </div>
-  )}
-</MapEntries>
 ```
 
 ## Changelog
