@@ -162,6 +162,8 @@ Creates a list of elements by mapping Map entries. Similar to Solid's `<For>` an
 ```tsx
 import { MapEntries } from "@solid-primitives/keyed";
 
+const [map, setMap] = createSignal(new Map());
+
 <MapEntries of={map()} fallback={<div>No items</div>}>
   {(key, value) => (
     <div>
@@ -174,6 +176,8 @@ import { MapEntries } from "@solid-primitives/keyed";
 ### Index argument
 
 Third argument of the map function is an index signal.
+
+`MapEntries` is using [`Map#key()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/keys) so the index and resulting JSX will follow the insertion order.
 
 ```tsx
 <MapEntries of={map()} fallback={<div>No items</div>}>
