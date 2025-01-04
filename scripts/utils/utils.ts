@@ -14,7 +14,7 @@ export const MODULE_PREFIX = "@solid-primitives/";
 
 export function getPackageNameFromCWD(): string | null {
   if (CWD.startsWith(PACKAGES_DIR)) {
-    let name = CWD.slice(PACKAGES_DIR.length + path.sep.length).split(path.sep)[0];
+    const name = CWD.slice(PACKAGES_DIR.length + path.sep.length).split(path.sep)[0];
     if (name !== undefined && name.length > 0) {
       return name;
     }
@@ -70,7 +70,7 @@ export async function copyDirectory(src: string, dst: string): Promise<void> {
   await fsp.mkdir(dst, { recursive: true });
   const entries = await fsp.readdir(src, { withFileTypes: true });
 
-  for (let entry of entries) {
+  for (const entry of entries) {
     const src_path = path.join(src, entry.name);
     const dst_path = path.join(dst, entry.name);
 
@@ -86,7 +86,7 @@ export async function pathExists(target: string): Promise<boolean> {
   try {
     await fsp.access(target);
     return true;
-  } catch (err) {
+  } catch (_) {
     return false;
   }
 }
@@ -95,9 +95,9 @@ export function getDirLastModifiedTimeSync(dir: string): number {
   let latest_time = 0
   
   try {
-    for (let entry of fs.readdirSync(dir, {withFileTypes: true})) {
-      let full_path = path.join(dir, entry.name)
-      let time = entry.isDirectory() ? getDirLastModifiedTimeSync(full_path) : fs.statSync(full_path).mtimeMs
+    for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
+      const full_path = path.join(dir, entry.name)
+      const time = entry.isDirectory() ? getDirLastModifiedTimeSync(full_path) : fs.statSync(full_path).mtimeMs
       if (time > latest_time) {
         latest_time = time
       }

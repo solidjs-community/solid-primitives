@@ -9,14 +9,14 @@ import * as utils from "./utils/index.js"
 const ROOT_DIST_DIR = path.join(utils.ROOT_DIR, "dist")
 
 // get packages to build based on cwd
-let cwd_module_name = utils.getPackageNameFromCWD()
-let module_names = cwd_module_name ? [cwd_module_name] : await fsp.readdir(utils.PACKAGES_DIR)
+const cwd_module_name = utils.getPackageNameFromCWD()
+const module_names = cwd_module_name ? [cwd_module_name] : await fsp.readdir(utils.PACKAGES_DIR)
 
 // Don't rebuild packages which source haven't changed
 for (let i = module_names.length-1; i >= 0; i--) {
-  let name = module_names[i]!
-  let last_modified_src  = utils.getDirLastModifiedTimeSync(path.join(utils.PACKAGES_DIR, name, "src"))
-  let last_modified_dist = utils.getDirLastModifiedTimeSync(path.join(utils.PACKAGES_DIR, name, "dist"))
+  const name = module_names[i]!
+  const last_modified_src  = utils.getDirLastModifiedTimeSync(path.join(utils.PACKAGES_DIR, name, "src"))
+  const last_modified_dist = utils.getDirLastModifiedTimeSync(path.join(utils.PACKAGES_DIR, name, "dist"))
   if (last_modified_dist > last_modified_src) {
     module_names.splice(i, 1)
     utils.log_info(`"${name}" skipped`)
@@ -30,17 +30,17 @@ if (module_names.length === 0) {
   process.exit(0)
 }
 
-let build_target_title = module_names.length > 1
+const build_target_title = module_names.length > 1
   ? `${module_names.length} packages`
   : `"${module_names[0]}"`
 utils.log_info(`Building ${build_target_title}...`)
 
-let tsc_entries: string[] = []
-let esb_entries: string[] = []
+const tsc_entries: string[] = []
+const esb_entries: string[] = []
 
 // Handle packages with custom entries
-for (let name of module_names) {
-  let src_dir = path.join(utils.PACKAGES_DIR, name, "src")
+for (const name of module_names) {
+  const src_dir = path.join(utils.PACKAGES_DIR, name, "src")
 
   switch (name) {
   case "controlled-props":
@@ -64,9 +64,9 @@ for (let name of module_names) {
 
 // Emit d.ts and .js(x) files
 try {
-  let base_config_path = path.join(utils.ROOT_DIR, "tsconfig.json")
-  let base_config_file = JSON.parse(fs.readFileSync(base_config_path, "utf-8"))
-  let base_config      = ts.parseJsonConfigFileContent(base_config_file, ts.sys, utils.ROOT_DIR)
+  const base_config_path = path.join(utils.ROOT_DIR, "tsconfig.json")
+  const base_config_file = JSON.parse(fs.readFileSync(base_config_path, "utf-8"))
+  const base_config      = ts.parseJsonConfigFileContent(base_config_file, ts.sys, utils.ROOT_DIR)
 
   ts.createProgram(tsc_entries, {
     ...base_config.options,
@@ -103,8 +103,8 @@ try {
 // Copy declarations to /packages/*/dist/
 try {
   await Promise.all(module_names.map(async name => {
-    let module_dist_dir = path.join(ROOT_DIST_DIR, name, "src")
-    let target_dist_dir = path.join(utils.PACKAGES_DIR, name, "dist")
+    const module_dist_dir = path.join(ROOT_DIST_DIR, name, "src")
+    const target_dist_dir = path.join(utils.PACKAGES_DIR, name, "dist")
     return utils.copyDirectory(module_dist_dir, target_dist_dir)
   }))
   
