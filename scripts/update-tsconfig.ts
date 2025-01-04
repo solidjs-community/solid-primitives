@@ -22,7 +22,7 @@ for (const data of modulesData) {
     compilerOptions: {
       composite: true,
       outDir: "dist",
-      rootDir: "."
+      rootDir: "src"
     },
     references: data.workspace_deps.map(dep => ({path: `../${dep}`})),
   }
