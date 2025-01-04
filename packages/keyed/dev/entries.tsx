@@ -40,28 +40,20 @@ const randomKey = (record: Record<string, string>): string => {
 };
 
 export default function App() {
-  const [store, setStore] = createStore<{ entries: Record<string, string> }>({
-    entries: {
-      [Math.random()]: "bread",
-      [Math.random()]: "milk",
-      [Math.random()]: "honey",
-      [Math.random()]: "chips",
-      [Math.random()]: "cookie",
-    },
+  const [store, setStore] = createStore<Record<string, string>>({
+    [Math.random()]: "bread",
+    [Math.random()]: "milk",
+    [Math.random()]: "honey",
+    [Math.random()]: "chips",
+    [Math.random()]: "cookie",
   });
 
   const addRandom = () => {
-    setStore("entries", Math.random().toString(), getRandomFood());
+    setStore(Math.random().toString(), getRandomFood());
   };
-  const removeRandom = () =>
-    setStore(
-      "entries",
-      produce(p => {
-        delete p[randomKey(p)];
-      }),
-    );
+  const removeRandom = () => setStore(p => ({ [randomKey(p)]: undefined }));
   const clone = () => setStore("entries", p => JSON.parse(JSON.stringify(p)));
-  const changeRandomValue = () => setStore("entries", p => ({ [randomKey(p)]: getRandomFood() }));
+  const changeRandomValue = () => setStore(p => ({ [randomKey(p)]: getRandomFood() }));
 
   return (
     <>
@@ -81,10 +73,7 @@ export default function App() {
       </div>
       <div class="wrapper-h flex-wrap">
         <TransitionGroup name="fade">
-          <Entries
-            of={store.entries}
-            fallback={<p class="bg-yellow-500 p-1 transition-all">No items.</p>}
-          >
+          <Entries of={store} fallback={<p class="bg-yellow-500 p-1 transition-all">No items.</p>}>
             {(key, value, index) => {
               createEffect(() => {
                 console.log("Effect:", key, value());
