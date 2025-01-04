@@ -3,7 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "."
   },
   "references": [
     {
@@ -12,5 +12,8 @@
     {
       "path": "../utils"
     }
+  ],
+  "include": [
+    "src"
   ]
 }

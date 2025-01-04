@@ -13,6 +13,7 @@ type TsconfigJson = {
     rootDir?: string
   }
   references?: {path: string}[]
+  include?: string[]
 }
 
 for (const data of modulesData) {
@@ -22,9 +23,10 @@ for (const data of modulesData) {
     compilerOptions: {
       composite: true,
       outDir: "dist",
-      rootDir: "src"
+      rootDir: "."
     },
     references: data.workspace_deps.map(dep => ({path: `../${dep}`})),
+    include: ['src']
   }
   await fsp.writeFile(tsconfig_path, JSON.stringify(tsconfig, null, 2))
 }
