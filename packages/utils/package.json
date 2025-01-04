@@ -27,6 +27,7 @@
   "browser": {},
   "exports": {
     ".": {
+      "@solid-primitives/source": "./src/index.ts",
       "import": {
         "types": "./dist/index/index.d.ts",
         "default": "./dist/index/index.js"
@@ -37,6 +38,7 @@
       }
     },
     "./immutable": {
+      "@solid-primitives/source": "./src/immutable/index.ts",
       "import": {
         "types": "./dist/immutable/index.d.ts",
         "default": "./dist/immutable/index.js"

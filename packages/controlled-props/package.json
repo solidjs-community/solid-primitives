@@ -30,6 +30,7 @@
   "browser": {},
   "typesVersions": {},
   "exports": {
+    "@solid-primitives/source": "./src/index.tsx",
     "solid": "./dist/index.jsx",
     "import": {
       "types": "./dist/index.d.ts",
