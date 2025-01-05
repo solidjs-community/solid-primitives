@@ -1,5 +1,11 @@
 # @solid-primitives/map
 
+## 0.5.0
+
+### Minor Changes
+
+- 46e4379: Fix and optimize ReactiveMap and ReactiveWeakMap (https://github.com/solidjs-community/solid-primitives/pull/704)
+
 ## 0.4.13
 
 ### Patch Changes
