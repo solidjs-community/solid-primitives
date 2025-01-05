@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.3.0
+
+### Minor Changes
+
+- cf11535: Add `MapEntries` control flow component.
+
 ## 1.2.3
 
 ### Patch Changes
