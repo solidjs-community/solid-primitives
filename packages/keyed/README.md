@@ -14,6 +14,7 @@ Control Flow primitives and components that require specifying explicit keys to 
 - [`keyArray`](#keyarray) - Reactively maps an array by specified key with a callback function - underlying helper for the `<Key>` control flow.
 - [`Key`](#key) - Creates a list of elements by mapping items by provided key.
 - [`Entries`](#entries) - Creates a list of elements by mapping object entries.
+- [`MapEntries`](#mapentries) - Creates a list of elements by mapping Map entries.
 - [`Rerun`](#rerun) - Causes the children to rerender when the `on` changes.
 
 ## Installation
@@ -150,6 +151,42 @@ Third argument of the map function is an index signal.
     </div>
   )}
 </Entries>
+```
+
+## `<MapEntries>`
+
+Creates a list of elements by mapping Map entries. Similar to Solid's `<For>` and `<Index>`, but here, render function takes three arguments, and both value and index arguments are signals.
+
+### How to use it
+
+```tsx
+import { MapEntries } from "@solid-primitives/keyed";
+
+const [map, setMap] = createSignal(new Map());
+
+<MapEntries of={map()} fallback={<div>No items</div>}>
+  {(key, value) => (
+    <div>
+      {key}: {value()}
+    </div>
+  )}
+</MapEntries>;
+```
+
+### Index argument
+
+Third argument of the map function is an index signal.
+
+`MapEntries` is using [`Map#key()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/keys) so the index and resulting JSX will follow the insertion order.
+
+```tsx
+<MapEntries of={map()} fallback={<div>No items</div>}>
+  {(key, value, index) => (
+    <div data-index={index()}>
+      {key}: {value()}
+    </div>
+  )}
+</MapEntries>
 ```
 
 ## `<Rerun>`

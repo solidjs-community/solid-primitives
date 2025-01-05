@@ -15,7 +15,8 @@
     "list": [
       "keyArray",
       "Key",
-      "Entries"
+      "Entries",
+      "MapEntries"
     ],
     "category": "Control Flow"
   },
