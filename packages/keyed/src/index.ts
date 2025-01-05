@@ -189,14 +189,8 @@ export function Entries<K extends string | number, V>(props: {
   const mapFn = props.children;
   return createMemo(
     mapArray(
-      () => props.of && Object.keys(props.of),
-      mapFn.length < 3
-        ? key =>
-            (mapFn as (key: string, v: Accessor<V>) => JSX.Element)(
-              key,
-              () => props.of![key as never],
-            )
-        : (key, i) => mapFn(key as never, () => props.of![key as never], i),
+      () => props.of && (Object.keys(props.of) as never[]),
+      (key, i) => mapFn(key, () => props.of![key], i),
       "fallback" in props ? { fallback: () => props.fallback } : undefined,
     ),
   ) as unknown as JSX.Element;
@@ -227,13 +221,7 @@ export function MapEntries<K, V>(props: {
   return createMemo(
     mapArray(
       () => props.of && Array.from(props.of.keys()),
-      mapFn.length < 3
-        ? key =>
-            (mapFn as (key: K, v: Accessor<V>) => JSX.Element)(
-              key,
-              () => (props.of as Map<K, V>).get(key)!,
-            )
-        : (key, i) => mapFn(key, () => (props.of as Map<K, V>).get(key)!, i),
+      (key, i) => mapFn(key, () => (props.of as Map<K, V>).get(key)!, i),
       "fallback" in props ? { fallback: () => props.fallback } : undefined,
     ),
   ) as unknown as JSX.Element;

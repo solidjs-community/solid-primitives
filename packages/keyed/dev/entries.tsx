@@ -1,6 +1,6 @@
 // changes to this file might be applicable to similar files - grep 95DB7339-BB2A-4F06-A34A-25DDF8BF7AF7
 
-import { createStore, produce } from "solid-js/store";
+import { createStore } from "solid-js/store";
 import { createEffect } from "solid-js";
 import { Entries } from "../src/index.js";
 import { TransitionGroup } from "solid-transition-group";
