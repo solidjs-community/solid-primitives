@@ -15,6 +15,7 @@ Control Flow primitives and components that require specifying explicit keys to 
 - [`Key`](#key) - Creates a list of elements by mapping items by provided key.
 - [`Entries`](#entries) - Creates a list of elements by mapping object entries.
 - [`MapEntries`](#mapentries) - Creates a list of elements by mapping Map entries.
+- [`SetValues`](#setvalues) - Creates a list of elements by mapping Set values.
 - [`Rerun`](#rerun) - Causes the children to rerender when the `on` changes.
 
 ## Installation
@@ -177,7 +178,7 @@ const [map, setMap] = createSignal(new Map());
 
 Third argument of the map function is an index signal.
 
-`MapEntries` is using [`Map#key()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/keys) so the index and resulting JSX will follow the insertion order.
+`MapEntries` is using [`Map#keys()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/keys) so the index and resulting JSX will follow the insertion order.
 
 ```tsx
 <MapEntries of={map()} fallback={<div>No items</div>}>
@@ -187,6 +188,42 @@ Third argument of the map function is an index signal.
     </div>
   )}
 </MapEntries>
+```
+
+## `<SetValues>`
+
+Creates a list of elements by mapping Set values. Similar to Solid's `<For>` and `<Index>`, but here, render function takes two arguments, the value and the index argument as a signal.
+
+### How to use it
+
+```tsx
+import { SetValues } from "@solid-primitives/keyed";
+
+const [set, setSet] = createSignal(new Set());
+
+<SetValues of={set()} fallback={<div>No items</div>}>
+  {(value) => (
+    <div>
+      {value}
+    </div>
+  )}
+</SetValues>;
+```
+
+### Index argument
+
+Second argument of the map function is an index signal.
+
+`SetValues` is using [`Set#values()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set/values) so the index and resulting JSX will follow the insertion order.
+
+```tsx
+<SetValues of={set()} fallback={<div>No items</div>}>
+  {(value, index) => (
+    <div data-index={index()}>
+      {value}
+    </div>
+  )}
+</SetValues>
 ```
 
 ## `<Rerun>`
