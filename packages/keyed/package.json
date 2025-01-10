@@ -16,7 +16,8 @@
       "keyArray",
       "Key",
       "Entries",
-      "MapEntries"
+      "MapEntries",
+      "SetValues"
     ],
     "category": "Control Flow"
   },

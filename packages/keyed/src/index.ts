@@ -239,6 +239,37 @@ export function MapEntries<K, V>(props: {
   ) as unknown as JSX.Element;
 }
 
+/**
+ * Creates a list of elements from the values of provided Set
+ *
+ * @param props
+ * @param props.of set to iterate values of (`mySet.values()`)
+ * @param props.children
+ * a map render function that receives a Set value and **index signal** and returns a JSX-Element; if the list is empty, an optional fallback is returned:
+ * ```tsx
+ * <SetValues of={set()} fallback={<div>No items</div>}>
+ *   {(value, index) => <div data-index={index()}>{value)}</div>}
+ * </SetValues>
+ * ```
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#setvalues
+ */
+export function SetValues<T>(props: {
+  of: Set<T> | undefined | null | false;
+  fallback?: JSX.Element;
+  children: (value: T, i: Accessor<number>) => JSX.Element;
+}): JSX.Element {
+  // changes to this function may be applicable to similar functions - grep 4A29BECD-767A-4CC0-AEBB-3543D7B444C6
+  const mapFn = props.children;
+  return createMemo(
+    mapArray(
+      () => props.of && Array.from(props.of.values()),
+      mapFn.length < 2 ? value => (mapFn as (value: T) => JSX.Element)(value) : mapFn,
+      "fallback" in props ? { fallback: () => props.fallback } : undefined,
+    ),
+  ) as unknown as JSX.Element;
+}
+
 export type RerunChildren<T> = ((input: T, prevInput: T | undefined) => JSX.Element) | JSX.Element;
 
 /**

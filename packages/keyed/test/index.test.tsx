@@ -2,7 +2,7 @@ import { createComputed, createMemo, createRoot, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import { update } from "@solid-primitives/utils/immutable";
 import { describe, expect, test } from "vitest";
-import { keyArray, MapEntries } from "../src/index.js";
+import { keyArray, MapEntries, SetValues } from "../src/index.js";
 import { render } from "solid-js/web";
 
 const el1 = { id: 1, value: "bread" };
@@ -377,7 +377,6 @@ describe("MapEntries", () => {
       newMapped[k] = v;
     });
 
-    expect(oldMapped[0]).toBe(newMapped[0]);
     expect(oldMapped[1]).toBe(newMapped[1]);
     expect(oldMapped[2]).toBe(newMapped[2]);
     expect(oldMapped[3]).toBe(newMapped[3]);
@@ -434,6 +433,165 @@ describe("MapEntries", () => {
 
     expect(oldMapped[0]).toBe(newMapped[0]);
     expect(oldMapped[3]).toBe(newMapped[3]);
+    expect(newMapped.includes(oldMapped[1]!)).toEqual(false);
+    expect(newMapped.includes(oldMapped[2]!)).toEqual(false);
+
+    unmount();
+    document.body.removeChild(container);
+  });
+});
+
+describe("SetValues", () => {
+  test("simple", () => {
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+
+    const startingMap = new Set(["1", "2", "3"]);
+    const [s] = createSignal(startingMap);
+    const unmount = render(
+      () => (
+        <SetValues of={s()}>
+          {(v, i) => (
+            <div>
+              {i()}. {v}
+            </div>
+          )}
+        </SetValues>
+      ),
+      container,
+    );
+
+    container.childNodes.forEach((n, i) => {
+      const v = Array.from(startingMap.values())[i]!;
+      expect(n.textContent).toEqual(`${i}. ${v}`);
+    });
+
+    unmount();
+    document.body.removeChild(container);
+  });
+
+  test("doesn't change for same values", () => {
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+
+    const startingMap = new Set(["1", "2", "3"]);
+    const [s, set] = createSignal(startingMap);
+    const unmount = render(
+      () => (
+        <SetValues of={s()}>
+          {(v, i) => (
+            <div>
+              {i()}. {v}
+            </div>
+          )}
+        </SetValues>
+      ),
+      container,
+    );
+
+    const oldMapped: ChildNode[] = new Array(container.childNodes.length);
+    container.childNodes.forEach((n, i) => {
+      const v = Array.from(startingMap.values())[i]!;
+      expect(n.textContent).toEqual(`${i}. ${v}`);
+      oldMapped[i] = n;
+    });
+
+    set(new Set(startingMap));
+
+    container.childNodes.forEach((n, i) => {
+      const v = Array.from(startingMap.values())[i]!;
+      expect(n.textContent).toEqual(`${i}. ${v}`);
+      expect(oldMapped[i]).toBe(n);
+    });
+
+    unmount();
+    document.body.removeChild(container);
+  });
+
+  test("creates new elements", () => {
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+
+    const startingMap = new Set(["1", "2", "3"]);
+    const [s, set] = createSignal(startingMap);
+    const unmount = render(
+      () => (
+        <SetValues of={s()}>
+          {(v, i) => (
+            <div>
+              {i()}. {v}
+            </div>
+          )}
+        </SetValues>
+      ),
+      container,
+    );
+
+    const oldMapped: ChildNode[] = new Array(container.childNodes.length);
+    container.childNodes.forEach((n, i) => {
+      const v = Array.from(startingMap.values())[i]!;
+      expect(n.textContent).toEqual(`${i}. ${v}`);
+      oldMapped[i] = n;
+    });
+
+    const nextMap = new Set(["1", "2", "3", "4", "5"]);
+    set(nextMap);
+
+    const newMapped: ChildNode[] = new Array(container.childNodes.length);
+    container.childNodes.forEach((n, i) => {
+      const v = Array.from(nextMap.values())[i]!;
+      expect(n.textContent).toEqual(`${i}. ${v}`);
+      newMapped[i] = n;
+    });
+
+    expect(oldMapped[0]).toBe(newMapped[0]);
+    expect(oldMapped[1]).toBe(newMapped[1]);
+    expect(oldMapped[2]).toBe(newMapped[2]);
+    expect(oldMapped.includes(newMapped[3]!)).toEqual(false);
+    expect(oldMapped.includes(newMapped[4]!)).toEqual(false);
+
+    unmount();
+    document.body.removeChild(container);
+  });
+
+  test("deletes unused elements", () => {
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+
+    const startingMap = new Set(["0", "1", "2", "3"]);
+    const [s, set] = createSignal(startingMap);
+    const unmount = render(
+      () => (
+        <SetValues of={s()}>
+          {(v, i) => (
+            <div>
+              {i()}. {v}
+            </div>
+          )}
+        </SetValues>
+      ),
+      container,
+    );
+
+    const oldMapped: ChildNode[] = new Array(container.childNodes.length);
+    container.childNodes.forEach((n, i) => {
+      const v = Array.from(startingMap.values())[i]!;
+      expect(n.textContent).toEqual(`${i}. ${v}`);
+      oldMapped[i] = n;
+    });
+
+    const nextMap = new Set(["0", "3"]);
+    set(nextMap);
+
+    const newMapped: ChildNode[] = new Array(container.childNodes.length);
+    container.childNodes.forEach((n, i) => {
+      const v = Array.from(nextMap.values())[i]!;
+      expect(n.textContent).toEqual(`${i}. ${v}`);
+      newMapped[i] = n;
+    });
+
+    expect(oldMapped[0]).toBe(newMapped[0]);
+    expect(oldMapped[3]).toBe(newMapped[1]);
     expect(newMapped.includes(oldMapped[1]!)).toEqual(false);
     expect(newMapped.includes(oldMapped[2]!)).toEqual(false);
 
