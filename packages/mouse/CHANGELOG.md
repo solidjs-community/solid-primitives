@@ -1,5 +1,12 @@
 # @solid-primitives/mouse
 
+## 2.0.21
+
+### Patch Changes
+
+- Updated dependencies [56d9511]
+  - @solid-primitives/static-store@0.0.9
+
 ## 2.0.20
 
 ### Patch Changes

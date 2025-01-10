@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.4.0
+
+### Minor Changes
+
+- e82cb70: Add `SetValues` control flow component.
+
 ## 1.3.0
 
 ### Minor Changes
