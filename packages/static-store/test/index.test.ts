@@ -32,6 +32,9 @@ describe("createStaticStore", () => {
         d: [0, 1, 2],
       });
 
+      setState('a', prev => prev + 1);
+      expect(state.a).toBe(10);
+
       createEffect(() => {
         state.a;
         aUpdates++;
