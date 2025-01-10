@@ -1,5 +1,12 @@
 # @solid-primitives/media
 
+## 2.2.10
+
+### Patch Changes
+
+- Updated dependencies [56d9511]
+  - @solid-primitives/static-store@0.0.9
+
 ## 2.2.9
 
 ### Patch Changes
