@@ -202,11 +202,7 @@ import { SetValues } from "@solid-primitives/keyed";
 const [set, setSet] = createSignal(new Set());
 
 <SetValues of={set()} fallback={<div>No items</div>}>
-  {(value) => (
-    <div>
-      {value}
-    </div>
-  )}
+  {value => <div>{value}</div>}
 </SetValues>;
 ```
 
@@ -218,11 +214,7 @@ Second argument of the map function is an index signal.
 
 ```tsx
 <SetValues of={set()} fallback={<div>No items</div>}>
-  {(value, index) => (
-    <div data-index={index()}>
-      {value}
-    </div>
-  )}
+  {(value, index) => <div data-index={index()}>{value}</div>}
 </SetValues>
 ```
 
