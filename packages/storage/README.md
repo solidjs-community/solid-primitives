@@ -40,6 +40,8 @@ type PersistedOptions<Type, StorageOptions> = {
   deserialize?: (value: string) => Type(value),
   // sync API (see below)
   sync?: PersistenceSyncAPI
+  // isHydrated from @solid-primitives/lifecycle
+  isHydrated?: () => boolean
 };
 ```
 
@@ -48,8 +50,8 @@ type PersistedOptions<Type, StorageOptions> = {
 - initial values of signals or stores are not persisted, so they can be safely changed
 - values persisted in asynchronous storage APIs will not overwrite already changed signals or stores
 - setting a persisted signal to undefined or null will remove the item from the storage
-- to use `makePersisted` with other state management APIs, you need some adapter that will project your API to either
-  the output of `createSignal` or `createStore`
+- to use `makePersisted` with other state management APIs, you need some adapter that will project your API to either the output of `createSignal` or `createStore`
+- if you experience hydration mismatch issues, add `isHydrated` from the [lifecycles package](../lifecycle/) to your options to delay the initialization until the parent component is hydrated
 
 ### Using `makePersisted` with resources
 
