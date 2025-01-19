@@ -1,5 +1,5 @@
 import type { Accessor, Setter, Signal } from "solid-js";
-import { createEffect, createRoot, createUniqueId, untrack } from "solid-js";
+import { onMount, createUniqueId, untrack } from "solid-js";
 import { isServer, isDev } from "solid-js/web";
 import type { SetStoreFunction, Store } from "solid-js/store";
 import { reconcile } from "solid-js/store";
@@ -67,8 +67,8 @@ export type PersistenceOptions<T, O extends Record<string, any> | undefined> = {
   deserialize?: (data: string) => T;
   /** Add one of the existing Sync APIs to sync storages over boundaries or provide your own */
   sync?: PersistenceSyncAPI;
-  /** If you experience hydration mismatch issues, add `isHydrated` from `@solid-primitives/lifecycle` here */
-  isHydrated?: () => boolean;
+  /** If you experience hydration mismatch issues, set this to true to defer initial loading from store until after onMount */
+  deferInit?: boolean;
 } & (undefined extends O
   ? { storage?: SyncStorage | AsyncStorage }
   : {
@@ -161,8 +161,8 @@ export function makePersisted<
     if (init instanceof Promise) init.then(data => unchanged && data && set(data));
     else if (init) set(init);
   };
-  if (typeof options.isHydrated === "function") {
-    createRoot(dispose => createEffect(() => options.isHydrated?.() && (initialize(), dispose())));
+  if (options.deferInit) {
+    onMount(initialize);
   } else {
     initialize();
   }

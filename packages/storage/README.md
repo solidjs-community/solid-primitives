@@ -51,7 +51,7 @@ type PersistedOptions<Type, StorageOptions> = {
 - values persisted in asynchronous storage APIs will not overwrite already changed signals or stores
 - setting a persisted signal to undefined or null will remove the item from the storage
 - to use `makePersisted` with other state management APIs, you need some adapter that will project your API to either the output of `createSignal` or `createStore`
-- if you experience hydration mismatch issues, add `isHydrated` from the [lifecycles package](../lifecycle/) to your options to delay the initialization until the parent component is hydrated
+- if you experience hydration mismatch issues, set `deferInit` to true to delay the initialization from storage until the parent component is hydrated - this way, client and server will use the same initial data and avoid hydration conflicts
 
 ### Using `makePersisted` with resources
 
@@ -68,7 +68,7 @@ result is discarded not to overwrite more current data.
 
 ### Using `makePersisted` with Suspense
 
-In case you are using an asynchronous storage and want the initialisation mesh into Suspense instead of mixing it with Show, we provide the output of the initialisation as third part of the returned tuple:
+In case you are using an asynchronous storage and want the initialization mesh into Suspense instead of mixing it with Show, we provide the output of the initialization as third part of the returned tuple:
 
 ```ts
 const [state, setState, init] = makePersisted(createStore({}), {
