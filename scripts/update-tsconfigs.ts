@@ -1,4 +1,11 @@
-import * as fs from "node:fs"
+/*
+
+npm run update-tsconfigs
+
+(also runs after each pnpm install)
+
+*/
+
 import * as fsp from "node:fs/promises"
 import * as path from "node:path"
 import * as utils from "./utils/index.js";
@@ -26,7 +33,7 @@ for (const data of modulesData) {
       rootDir: "src",
     },
     references: data.workspace_deps.map(dep => ({path: `../${dep}`})),
-    include: ['src']
+    include: ["src"]
   }
   await fsp.writeFile(tsconfig_path, JSON.stringify(tsconfig, null, 2))
 }

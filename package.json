@@ -22,9 +22,11 @@
     "build": "tsx ./scripts/build.ts",
     "new-package": "tsx ./scripts/new-package.ts",
     "update-readme": "tsx ./scripts/update-readme.ts",
+    "update-tsconfigs": "tsx ./scripts/update-tsconfigs.ts",
     "measure": "tsx ./scripts/measure.ts",
     "version": "changeset version && pnpm i --no-frozen-lockfile && git add .",
-    "release": "pnpm build && changeset publish"
+    "release": "pnpm build && changeset publish",
+    "prepare": "pnpm update-tsconfigs"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.8",
