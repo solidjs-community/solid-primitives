@@ -92,8 +92,8 @@ async function generateReadme(module: ModuleData, primitiveData: PrimitiveData) 
       /<p>(?=[^]*?<img(?=[^>]+?src="https:\/\/assets\.solidjs\.com\/banner[^"]+")[^>]*?>)[^]*?<\/p>/,
       "",
     )
-    // remove turborepo, size, version, stage ect... img banners
-    .replace(/^\[!\[(?:turborepo|size|version|stage|lerna)\].+$/gm, "")
+    // remove size, version, stage ect... img banners
+    .replace(/^\[!\[(?:size|version|stage|lerna)\].+$/gm, "")
     // replace changelog relative url to github repo changelog
     .replace(/(\[CHANGELOG\.md\])(\(\.\/CHANGELOG\.md\))/i, (_, p1, p2) => {
       if (!p2) return _;
