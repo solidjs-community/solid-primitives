@@ -12,7 +12,7 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm -dir site run dev",
-    "format": "prettier --cache -w {site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html} --ignore-path .gitignore",
+    "format": "prettier --cache -w {site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html}",
     "lint:packages": "eslint --max-warnings 0 \"packages/*/src/**/*\"",
     "lint:tests": "eslint \"packages/*/test/**\" --rule \"no-only-tests/no-only-tests: error\"",
     "lint": "pnpm run \"/^lint:.*/\"",  
