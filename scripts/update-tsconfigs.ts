@@ -4,6 +4,9 @@ npm run update-tsconfigs
 
 (also runs after each pnpm install)
 
+Updates ./packages/<all_packages>/tsconfig.json files
+based on dependencies in package.json
+
 */
 
 import * as fsp from "node:fs/promises"
