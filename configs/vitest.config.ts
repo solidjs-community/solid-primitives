@@ -53,7 +53,9 @@ export default defineConfig(({ mode }) => {
           }),
     },
     resolve: {
-      conditions: testSSR ? ["node"] : ["browser", "development"],
+      conditions: testSSR
+        ? ["@solid-primitives/source", "node"]
+        : ["@solid-primitives/source", "browser", "development"],
     },
   };
 });

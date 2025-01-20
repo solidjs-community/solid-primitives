@@ -14,7 +14,11 @@
     "skipLibCheck": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["node"]
+    "types": ["node"],
+    /*
+     Use source files locally
+    */
+    "customConditions": ["@solid-primitives/source"]
   },
   "exclude": ["node_modules", "dist"]
 }

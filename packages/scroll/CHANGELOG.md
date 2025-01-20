@@ -1,5 +1,12 @@
 # @solid-primitives/scroll
 
+## 2.0.24
+
+### Patch Changes
+
+- Updated dependencies [56d9511]
+  - @solid-primitives/static-store@0.0.9
+
 ## 2.0.23
 
 ### Patch Changes

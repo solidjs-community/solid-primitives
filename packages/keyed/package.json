@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/keyed",
-  "version": "1.2.3",
+  "version": "1.4.0",
   "description": "Control Flow primitives and components that require specifying explicit keys to identify or rerender elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -15,7 +15,9 @@
     "list": [
       "keyArray",
       "Key",
-      "Entries"
+      "Entries",
+      "MapEntries",
+      "SetValues"
     ],
     "category": "Control Flow"
   },
@@ -35,6 +37,7 @@
   "types": "./dist/index.d.ts",
   "browser": {},
   "exports": {
+    "@solid-primitives/source": "./src/index.ts",
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"

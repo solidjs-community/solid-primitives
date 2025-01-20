@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/virtual",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A virtualized list component for performantly rendering lists with many elements",
   "author": "Spencer Whitehead <spencerwhitehead7@gmail.com>",
   "contributors": [],
@@ -37,6 +37,8 @@
   "types": "./dist/index.d.ts",
   "browser": {},
   "exports": {
+    "@solid-primitives/source": "./src/index.tsx",
+    "solid": "./dist/index.jsx",
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"

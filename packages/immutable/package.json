@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/immutable",
-  "version": "1.0.10",
+  "version": "1.0.12",
   "description": "Primitive for rectifying immutable values and dealing with immutability in Solid.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -37,6 +37,7 @@
   "types": "./dist/index.d.ts",
   "browser": {},
   "exports": {
+    "@solid-primitives/source": "./src/index.ts",
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"

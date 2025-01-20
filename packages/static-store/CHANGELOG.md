@@ -1,5 +1,11 @@
 # @solid-primitives/static-store
 
+## 0.0.9
+
+### Patch Changes
+
+- 56d9511: fix: static-store setValue with setterFn has correct arguments
+
 ## 0.0.8
 
 ### Patch Changes
