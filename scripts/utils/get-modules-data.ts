@@ -9,16 +9,16 @@ export type PackageJson = {
   description: string;
   primitive?: PrimitiveData;
   keywords?: string[];
-  peerDependencies?: {[x: string]: string};
-  devDependencies?: {[x: string]: string};
-  dependencies?: {[x: string]: string};
-}
+  peerDependencies?: { [x: string]: string };
+  devDependencies?: { [x: string]: string };
+  dependencies?: { [x: string]: string };
+};
 
 export type PrimitiveData = {
   list: string[];
   category: string;
   stage: number;
-}
+};
 
 export type ModuleData = {
   name: string;
@@ -31,7 +31,6 @@ export type ModuleData = {
 };
 
 export async function getModuleData(name: string): Promise<ModuleData | Error> {
-
   const pkg_path = path.join(PACKAGES_DIR, name, "package.json");
 
   if (!fs.existsSync(pkg_path)) {
@@ -65,19 +64,18 @@ export async function getModuleData(name: string): Promise<ModuleData | Error> {
 }
 
 export async function getModulesData(): Promise<ModuleData[]> {
-
   const module_names = await fsp.readdir(PACKAGES_DIR);
 
   const promises = module_names.map(async name => {
-    const module = await getModuleData(name)
+    const module = await getModuleData(name);
 
     if (module instanceof Error) {
       log_info(module.message);
       return null;
     }
 
-    return module
+    return module;
   });
 
-  return (await Promise.all(promises)).filter(isNonNullable)
+  return (await Promise.all(promises)).filter(isNonNullable);
 }

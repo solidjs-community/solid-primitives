@@ -51,11 +51,12 @@ class ConsoleTable {
   }
 }
 
-const module = await utils.getModuleData(name)
+const module = await utils.getModuleData(name);
 if (module instanceof Error) throw module;
-if (module.primitive == null) throw Error(`Package ${name} doesn't have primitive data in package.json`);
+if (module.primitive == null)
+  throw Error(`Package ${name} doesn't have primitive data in package.json`);
 
-const primitives = module.primitive.list
+const primitives = module.primitive.list;
 const peerDependencies = module.peer_deps;
 
 utils.log_info(`Measuring "@solid-primitives/${name}"...\n`);

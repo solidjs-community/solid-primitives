@@ -34,7 +34,7 @@ const rootDependencies: string[] = [
   const modulesData = await utils.getModulesData();
 
   for (const module of modulesData) {
-    if (module.primitive == null) continue
+    if (module.primitive == null) continue;
 
     const packageName = `@solid-primitives/${name}`;
 

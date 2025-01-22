@@ -92,14 +92,16 @@ export async function pathExists(target: string): Promise<boolean> {
 }
 
 export function getDirLastModifiedTimeSync(dir: string): number {
-  let latest_time = 0
-  
+  let latest_time = 0;
+
   try {
-    for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
-      const full_path = path.join(dir, entry.name)
-      const time = entry.isDirectory() ? getDirLastModifiedTimeSync(full_path) : fs.statSync(full_path).mtimeMs
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full_path = path.join(dir, entry.name);
+      const time = entry.isDirectory()
+        ? getDirLastModifiedTimeSync(full_path)
+        : fs.statSync(full_path).mtimeMs;
       if (time > latest_time) {
-        latest_time = time
+        latest_time = time;
       }
     }
   } catch {}

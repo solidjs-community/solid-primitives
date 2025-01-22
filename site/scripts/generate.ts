@@ -174,26 +174,26 @@ async function generatePackageSize(module: ModuleData) {
     await fsp.mkdir(packagesDirDist);
   }
 
-  const packages = [] as PackageListItem[]
-  
+  const packages = [] as PackageListItem[];
+
   for (let module of await getModulesData()) {
-    if (module.primitive == null) continue
-  
+    if (module.primitive == null) continue;
+
     const [readme, primitives, packageSize] = await Promise.all([
       generateReadme(module, module.primitive),
       generatePrimitiveSizes(module, module.primitive),
       generatePackageSize(module),
     ] as const);
-  
+
     const itemData: PackageListItem = { ...module, primitives, packageSize };
-  
+
     const data: PackageData = { ...itemData, readme };
-  
+
     // write data to individual json file
     const outputFilename = path.join(packagesDirDist, `${module.name}.json`);
     await fsp.writeFile(outputFilename, JSON.stringify(data, null, 2));
-  
-    packages.push(itemData)
+
+    packages.push(itemData);
   }
 
   // gather all module names into one json file
