@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/state-machine",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "A primitive for creating reactive state machines.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/keyed",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Control Flow primitives and components that require specifying explicit keys to identify or rerender elements.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",

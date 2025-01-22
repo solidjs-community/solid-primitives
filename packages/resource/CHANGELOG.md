@@ -1,5 +1,11 @@
 # @solid-primitives/resource
 
+## 0.4.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
 ## 0.3.1
 
 ### Patch Changes

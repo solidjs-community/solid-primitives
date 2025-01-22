@@ -1,5 +1,11 @@
 # @solid-primitives/timer
 
+## 1.4.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
 ## 1.3.10
 
 ### Patch Changes

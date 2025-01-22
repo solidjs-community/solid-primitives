@@ -1,5 +1,18 @@
 # @solid-primitives/scroll
 
+## 2.1.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
+### Patch Changes
+
+- Updated dependencies [ea09f71]
+  - @solid-primitives/event-listener@2.4.0
+  - @solid-primitives/static-store@0.1.0
+  - @solid-primitives/rootless@1.5.0
+
 ## 2.0.24
 
 ### Patch Changes
