@@ -11,6 +11,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
+    "generate": "pnpm run build && pnpm -dir site run generate",
     "dev": "pnpm -dir site run dev",
     "format": "prettier --cache -w {site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html}",
     "lint:packages": "eslint --max-warnings 0 \"packages/*/src/**/*\"",
