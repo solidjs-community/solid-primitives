@@ -10,6 +10,12 @@ const packages = await (async () => {
 })();
 
 export default defineConfig({
+  vite: {
+    resolve: {
+      // use files in packages src dir
+      conditions: ["@solid-primitives/source"],
+    }
+  },
   server: {
     prerender: {
       routes: [

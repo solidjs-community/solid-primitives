@@ -969,53 +969,53 @@ importers:
   site:
     dependencies:
       '@solid-primitives/clipboard':
-        specifier: latest
-        version: 1.5.10(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/clipboard
       '@solid-primitives/event-bus':
-        specifier: latest
-        version: 1.0.11(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/event-bus
       '@solid-primitives/event-listener':
-        specifier: latest
-        version: 2.3.3(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/event-listener
       '@solid-primitives/intersection-observer':
-        specifier: latest
-        version: 2.1.6(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/intersection-observer
       '@solid-primitives/keyboard':
-        specifier: latest
-        version: 1.2.8(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/keyboard
       '@solid-primitives/marker':
-        specifier: latest
-        version: 0.1.0(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/marker
       '@solid-primitives/media':
-        specifier: latest
-        version: 2.2.10(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/media
       '@solid-primitives/mutation-observer':
-        specifier: latest
-        version: 1.1.17(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/mutation-observer
       '@solid-primitives/platform':
-        specifier: latest
-        version: 0.1.2(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/platform
       '@solid-primitives/refs':
-        specifier: latest
-        version: 1.0.8(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/refs
       '@solid-primitives/resize-observer':
-        specifier: latest
-        version: 2.0.27(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/resize-observer
       '@solid-primitives/rootless':
-        specifier: latest
-        version: 1.4.5(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/rootless
       '@solid-primitives/scheduled':
-        specifier: latest
-        version: 1.4.4(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/scheduled
       '@solid-primitives/scroll':
-        specifier: latest
-        version: 2.0.24(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/scroll
       '@solid-primitives/tween':
-        specifier: latest
-        version: 1.3.0(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/tween
       '@solid-primitives/utils':
-        specifier: latest
-        version: 6.2.3(solid-js@1.8.22)
+        specifier: workspace:^
+        version: link:../packages/utils
       '@solidjs/meta':
         specifier: ^0.29.3
         version: 0.29.4(solid-js@1.8.22)
@@ -2642,11 +2642,6 @@ packages:
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
 
-  '@solid-primitives/clipboard@1.5.10':
-    resolution: {integrity: sha512-ohwlrBP4j+Qjksg01CFWaP/USpzX78dBNVA1DPRZkf/vJgytX0T6KMc2YxF6o8fs6ePIYSI8Nt3sKxF0sh1q+Q==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
   '@solid-primitives/composites@1.1.1':
     resolution: {integrity: sha512-eNi1jnUJehBjcVQvod8N1uz91Cn3KvJn/HJIPHUVpnpDj8dFhu5eHJtsiEdNBFJFOR/pPmf9RhJG0pKoTdPz6g==}
     peerDependencies:
@@ -2658,73 +2653,8 @@ packages:
     peerDependencies:
       solid-js: '>=1.0.0'
 
-  '@solid-primitives/event-bus@1.0.11':
-    resolution: {integrity: sha512-bSwVA4aI2aNHomSbEroUnisMSyDDXJbrw4U8kFEvrcYdlLrJX5i6QeCFx+vj/zdQQw62KAllrEIyWP8KMpPVnQ==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/event-listener@2.3.3':
-    resolution: {integrity: sha512-DAJbl+F0wrFW2xmcV8dKMBhk9QLVLuBSW+TR4JmIfTaObxd13PuL7nqaXnaYKDWOYa6otB00qcCUIGbuIhSUgQ==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/intersection-observer@2.1.6':
-    resolution: {integrity: sha512-SeiCmN/R46Z+o9+5HhIQzSor0DqVPyo4ROLQMvCI8AsGZl/5nHlWzHTTbWPeukVUXTgb04wfC3DUo9IzF/XloA==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/keyboard@1.2.8':
-    resolution: {integrity: sha512-pJtcbkjozS6L1xvTht9rPpyPpX55nAkfBzbFWdf3y0Suwh6qClTibvvObzKOf7uzQ+8aZRDH4LsoGmbTKXtJjQ==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/marker@0.1.0':
-    resolution: {integrity: sha512-vRbqZ1z0qVYXLg5UmG4q5zAZeT6rOl2FcTyis7lnrp7WtY/WynsqIbiDEmnE9LJJPWdAz6HGZBgsOXeWkbPelw==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/media@2.2.10':
-    resolution: {integrity: sha512-zICx9lXvevycyHmzUp1AfrxmUsF27JGvDygf51mHUpvy/Y2SmxkM6UHKstBDlRSpLUhPTnF0iHCfdfne6g4Fow==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/mutation-observer@1.1.17':
-    resolution: {integrity: sha512-01skkiHtNWl2PQ0ugFzZHBMsHk870+bZSNK8Gvjcj3mZwBzAJPaUPzFswfM/V8Io1Cko86vfXl73vl9ddRYb5A==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/platform@0.1.2':
-    resolution: {integrity: sha512-sSxcZfuUrtxcwV0vdjmGnZQcflACzMfLriVeIIWXKp8hzaS3Or3tO6EFQkTd3L8T5dTq+kTtLvPscXIpL0Wzdg==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
   '@solid-primitives/refs@1.0.8':
     resolution: {integrity: sha512-+jIsWG8/nYvhaCoG2Vg6CJOLgTmPKFbaCrNQKWfChalgUf9WrVxWw0CdJb3yX15n5lUcQ0jBo6qYtuVVmBLpBw==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/resize-observer@2.0.27':
-    resolution: {integrity: sha512-RmusjHqoA4U6MKI/T9yBJVDttASHpWBki1+YwM9zGXEDBqbysTa3lZpnlB244LzphQmobgeXVS78v0KtXVsF9g==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/rootless@1.4.5':
-    resolution: {integrity: sha512-GFJE9GC3ojx0aUKqAUZmQPyU8fOVMtnVNrkdk2yS4kd17WqVSpXpoTmo9CnOwA+PG7FTzdIkogvfLQSLs4lrww==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/scheduled@1.4.4':
-    resolution: {integrity: sha512-BTGdFP7t+s7RSak+s1u0eTix4lHP23MrbGkgQTFlt1E+4fmnD/bEx3ZfNW7Grylz3GXgKyXrgDKA7jQ/wuWKgA==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/scroll@2.0.24':
-    resolution: {integrity: sha512-Aqi4YIrecPRlypPeOcXjuqOz4DlOm2heJ5cPJtfumkonJFttWEFrYbfq1PKiEFBinPf5D9gxq4gYpx1Dxo2Z0g==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/static-store@0.0.9':
-    resolution: {integrity: sha512-8zaTXTEnQFqdwfkqWmGVb/OYgSTbRgxJSWQNfLuA+KnuW4RzTRQE2jzgnNJjJjaloruv9EHGvikmJzQJ5aOrEw==}
     peerDependencies:
       solid-js: ^1.6.12
 
@@ -2736,11 +2666,6 @@ packages:
 
   '@solid-primitives/transition-group@1.0.5':
     resolution: {integrity: sha512-G3FuqvL13kQ55WzWPX2ewiXdZ/1iboiX53195sq7bbkDbXqP6TYKiadwEdsaDogW5rPnPYAym3+xnsNplQJRKQ==}
-    peerDependencies:
-      solid-js: ^1.6.12
-
-  '@solid-primitives/tween@1.3.0':
-    resolution: {integrity: sha512-APS/C++t0DY0KoWkDbFX7yqykpQ0rdmmv/A42+7zwxy0X0uxgVC3kYqH8gP5eh6HVrDbgtguTTBsb1irhbNjHg==}
     peerDependencies:
       solid-js: ^1.6.12
 
@@ -8180,11 +8105,6 @@ snapshots:
 
   '@sindresorhus/merge-streams@2.3.0': {}
 
-  '@solid-primitives/clipboard@1.5.10(solid-js@1.8.22)':
-    dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.22)
-      solid-js: 1.8.22
-
   '@solid-primitives/composites@1.1.1(solid-js@1.8.20)':
     dependencies:
       '@solid-primitives/debounce': 1.3.0(solid-js@1.8.20)
@@ -8195,87 +8115,10 @@ snapshots:
     dependencies:
       solid-js: 1.8.20
 
-  '@solid-primitives/event-bus@1.0.11(solid-js@1.8.22)':
-    dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.22)
-      solid-js: 1.8.22
-
-  '@solid-primitives/event-listener@2.3.3(solid-js@1.8.22)':
-    dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.22)
-      solid-js: 1.8.22
-
-  '@solid-primitives/intersection-observer@2.1.6(solid-js@1.8.22)':
-    dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.22)
-      solid-js: 1.8.22
-
-  '@solid-primitives/keyboard@1.2.8(solid-js@1.8.22)':
-    dependencies:
-      '@solid-primitives/event-listener': 2.3.3(solid-js@1.8.22)
-      '@solid-primitives/rootless': 1.4.5(solid-js@1.8.22)
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.22)
-      solid-js: 1.8.22
-
-  '@solid-primitives/marker@0.1.0(solid-js@1.8.22)':
-    dependencies:
-      solid-js: 1.8.22
-
-  '@solid-primitives/media@2.2.10(solid-js@1.8.22)':
-    dependencies:
-      '@solid-primitives/event-listener': 2.3.3(solid-js@1.8.22)
-      '@solid-primitives/rootless': 1.4.5(solid-js@1.8.22)
-      '@solid-primitives/static-store': 0.0.9(solid-js@1.8.22)
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.22)
-      solid-js: 1.8.22
-
-  '@solid-primitives/mutation-observer@1.1.17(solid-js@1.8.22)':
-    dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.22)
-      solid-js: 1.8.22
-
-  '@solid-primitives/platform@0.1.2(solid-js@1.8.22)':
-    dependencies:
-      solid-js: 1.8.22
-
   '@solid-primitives/refs@1.0.8(solid-js@1.8.20)':
     dependencies:
       '@solid-primitives/utils': 6.2.3(solid-js@1.8.20)
       solid-js: 1.8.20
-
-  '@solid-primitives/refs@1.0.8(solid-js@1.8.22)':
-    dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.22)
-      solid-js: 1.8.22
-
-  '@solid-primitives/resize-observer@2.0.27(solid-js@1.8.22)':
-    dependencies:
-      '@solid-primitives/event-listener': 2.3.3(solid-js@1.8.22)
-      '@solid-primitives/rootless': 1.4.5(solid-js@1.8.22)
-      '@solid-primitives/static-store': 0.0.9(solid-js@1.8.22)
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.22)
-      solid-js: 1.8.22
-
-  '@solid-primitives/rootless@1.4.5(solid-js@1.8.22)':
-    dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.22)
-      solid-js: 1.8.22
-
-  '@solid-primitives/scheduled@1.4.4(solid-js@1.8.22)':
-    dependencies:
-      solid-js: 1.8.22
-
-  '@solid-primitives/scroll@2.0.24(solid-js@1.8.22)':
-    dependencies:
-      '@solid-primitives/event-listener': 2.3.3(solid-js@1.8.22)
-      '@solid-primitives/rootless': 1.4.5(solid-js@1.8.22)
-      '@solid-primitives/static-store': 0.0.9(solid-js@1.8.22)
-      solid-js: 1.8.22
-
-  '@solid-primitives/static-store@0.0.9(solid-js@1.8.22)':
-    dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.22)
-      solid-js: 1.8.22
 
   '@solid-primitives/throttle@1.2.0(solid-js@1.8.20)':
     dependencies:
@@ -8285,17 +8128,9 @@ snapshots:
     dependencies:
       solid-js: 1.8.20
 
-  '@solid-primitives/tween@1.3.0(solid-js@1.8.22)':
-    dependencies:
-      solid-js: 1.8.22
-
   '@solid-primitives/utils@6.2.3(solid-js@1.8.20)':
     dependencies:
       solid-js: 1.8.20
-
-  '@solid-primitives/utils@6.2.3(solid-js@1.8.22)':
-    dependencies:
-      solid-js: 1.8.22
 
   '@solidjs/meta@0.29.4(solid-js@1.8.22)':
     dependencies:
