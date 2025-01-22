@@ -29,13 +29,13 @@
     "postinstall": "pnpm update-tsconfigs"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.8",
+    "@changesets/cli": "^2.27.11",
     "@solidjs/start": "^1.0.6",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.5.4",
     "@typescript-eslint/eslint-plugin": "^8.5.0",
     "@typescript-eslint/parser": "^8.5.0",
-    "esbuild": "^0.19.11",
+    "esbuild": "^0.24.2",
     "esbuild-plugin-solid": "^0.6.0",
     "eslint": "^9.10.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
