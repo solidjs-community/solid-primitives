@@ -1,5 +1,11 @@
 # @solid-primitives/i18n
 
+## 2.2.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
 ## 2.1.1
 
 ### Patch Changes

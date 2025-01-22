@@ -1,5 +1,19 @@
 # @solid-primitives/bounds
 
+## 0.1.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
+### Patch Changes
+
+- Updated dependencies [ea09f71]
+  - @solid-primitives/resize-observer@2.1.0
+  - @solid-primitives/event-listener@2.4.0
+  - @solid-primitives/static-store@0.1.0
+  - @solid-primitives/utils@6.3.0
+
 ## 0.0.123
 
 ### Patch Changes

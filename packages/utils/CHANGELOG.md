@@ -1,5 +1,11 @@
 # @solid-primitives/utils
 
+## 6.3.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
 ## 6.2.3
 
 ### Patch Changes

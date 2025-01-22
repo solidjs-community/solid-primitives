@@ -1,5 +1,16 @@
 # @solid-primitives/map
 
+## 0.6.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
+### Patch Changes
+
+- Updated dependencies [ea09f71]
+  - @solid-primitives/trigger@1.2.0
+
 ## 0.5.0
 
 ### Minor Changes
