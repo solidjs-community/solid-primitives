@@ -14,7 +14,7 @@ export default defineConfig({
     resolve: {
       // use files in packages src dir
       conditions: ["@solid-primitives/source"],
-    }
+    },
   },
   server: {
     prerender: {
