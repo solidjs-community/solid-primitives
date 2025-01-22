@@ -36,7 +36,7 @@ const rootDependencies: string[] = [
   for (const module of modulesData) {
     if (module.primitive == null) continue;
 
-    const packageName = `@solid-primitives/${name}`;
+    const packageName = `@solid-primitives/${module.name}`;
 
     if (module.workspace_deps.length === 0) {
       rootDependencies.push(packageName);
@@ -44,7 +44,7 @@ const rootDependencies: string[] = [
 
     const data = {} as PackageData;
 
-    data.Name = `[${name}](${githubURL}${name}#readme)`;
+    data.Name = `[${module.name}](${githubURL}${module.name}#readme)`;
     // Detect the stage and build size/version only if needed
     if (data.Stage == "X" || data.Stage == 0) {
       data.Size = "";
@@ -55,7 +55,7 @@ const rootDependencies: string[] = [
     }
     data.Stage = `[![STAGE](${stageShieldBaseURL}${module.primitive.stage}.json)](${stageShieldLink})`;
     data.Primitives = module.primitive.list
-      .map(prim => `[${prim}](${githubURL}${name}#${prim.replace(/ /g, "-").toLowerCase()})`)
+      .map(prim => `[${prim}](${githubURL}${module.name}#${prim.replace(/ /g, "-").toLowerCase()})`)
       .join("<br />");
     // Merge the package into the correct category
     const cat = categories[module.primitive.category];
