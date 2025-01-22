@@ -67,7 +67,6 @@
 "@solid-primitives/props": minor
 "@solid-primitives/range": minor
 "@solid-primitives/share": minor
-"@solid-primitives/start": minor
 "@solid-primitives/timer": minor
 "@solid-primitives/tween": minor
 "@solid-primitives/utils": minor
