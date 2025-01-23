@@ -40,14 +40,15 @@
   "types": "./dist/index.d.ts",
   "browser": {},
   "exports": {
-    "@solid-primitives/source": "./src/index.ts",
     ".": {
+      "@solid-primitives/source": "./src/index.ts",
       "import": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       }
     },
     "./tauri": {
+      "@solid-primitives/source": "./src/tauri.ts",
       "import": {
         "types": "./dist/tauri.d.ts",
         "default": "./dist/tauri.js"
