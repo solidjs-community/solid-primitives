@@ -1,5 +1,11 @@
 # @solid-primitives/storage
 
+## 4.3.1
+
+### Patch Changes
+
+- e2e290e: Correct package.json exports.
+
 ## 4.3.0
 
 ### Minor Changes
