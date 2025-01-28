@@ -29,14 +29,14 @@ pnpm add @solid-primitives/share
 ### How to use it
 
 ```ts
-import { createSocialShare, TWITTER } from "@solid-primitives/share";
+import { createSocialShare, BLUESKY } from "@solid-primitives/share";
 
 const [share, close] = createSocialShare(() => ({
   title: "SolidJS.com",
   url: "https://www.solidjs.com",
   description: "Simple and well-behaved reactivity!",
 }));
-share(TWITTER);
+share(BLUESKY);
 ```
 
 ### Definition
@@ -67,6 +67,7 @@ The following are a list of supported networks that may be imported from the sha
 | ------------- | ------------------ | ------------------ | ------------------ | ----------------------------------------------------------------------------------------------------------- |
 | Baidu         | :heavy_check_mark: | :heavy_check_mark: | :x:                |                                                                                                             |
 | Buffer        | :heavy_check_mark: | :heavy_check_mark: | :x:                |                                                                                                             |
+| Bluesky       | :heavy_check_mark: | :heavy_check_mark: | :x:                |                                                                                                              |
 | Email         | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |                                                                                                             |
 | EverNote      | :heavy_check_mark: | :heavy_check_mark: | :x:                |                                                                                                             |
 | Facebook      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | `hashtags` A list of comma-separated hashtags, only the first one will be used.<br/>`quote` Facebook quote. |
@@ -86,6 +87,7 @@ The following are a list of supported networks that may be imported from the sha
 | Telegram      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |                                                                                                             |
 | Tumblr        | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |                                                                                                             |
 | Twitter       | :heavy_check_mark: | :heavy_check_mark: | :x:                | `hashtags` A list of comma-separated hashtags.<br/>`twitter-user` Twitter user to mention.                  |
+| X             | :heavy_check_mark: | :heavy_check_mark: | :x:                | `hashtags` A list of comma-separated hashtags.<br/>`twitter-user` X user to mention.                  |
 | Viber         | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |                                                                                                             |
 | VK            | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | `media` URL of an image describing the content.                                                             |
 | Weibo         | :heavy_check_mark: | :heavy_check_mark: | :x:                | `media` URL of an image describing the content.                                                             |
@@ -94,7 +96,7 @@ The following are a list of supported networks that may be imported from the sha
 | Xing          | :heavy_check_mark: | :heavy_check_mark: | :x:                |                                                                                                             |
 | Yammer        | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |                                                                                                             |
 
-For the networks: `Line`, `Skype`, `SMS`, `Telegram`, `Viber`, `WhatsApp` and `Yammer`; the shared content is a string of the form: "`$title` `$url` `$description`"
+For the networks: `Bluesky`, `Line`, `Skype`, `SMS`, `Telegram`, `Viber`, `WhatsApp` and `Yammer`; the shared content is a string of the form: "`$title` `$url` `$description`"
 
 Note that you can also provide your own custom network by formatting the input string into the share function. The following is a list of properties that will be replaced by the utility:
 
@@ -104,12 +106,12 @@ Note that you can also provide your own custom network by formatting the input s
 - `@q`: Quote
 - `@h`: Hashtags
 - `@m`: Media
-- `@tu`: TwitterUser (Twitter specific)
+- `@tu`: X User (X specific)
 
-The following is an example of Twitter's share string:
+The following is an example of X's share string:
 
 ```ts
-const twitter: Network = "https://twitter.com/intent/tweet?text=@t&url=@u&hashtags=@h@tu";
+const x: Network = "https://www.x.com/intent/tweet?text=@t&url=@u&hashtags=@h@tu";
 ```
 
 ### Demo
