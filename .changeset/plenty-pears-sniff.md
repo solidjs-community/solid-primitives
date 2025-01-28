@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/share": major
+"@solid-primitives/share": minor
 ---
 
 Added Bluesky and X networks
