@@ -67,7 +67,7 @@ The following are a list of supported networks that may be imported from the sha
 | ------------- | ------------------ | ------------------ | ------------------ | ----------------------------------------------------------------------------------------------------------- |
 | Baidu         | :heavy_check_mark: | :heavy_check_mark: | :x:                |                                                                                                             |
 | Buffer        | :heavy_check_mark: | :heavy_check_mark: | :x:                |                                                                                                             |
-| Bluesky       | :heavy_check_mark: | :heavy_check_mark: | :x:                |                                                                                                              |
+| Bluesky       | :heavy_check_mark: | :heavy_check_mark: | :x:                |                                                                                                             |
 | Email         | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |                                                                                                             |
 | EverNote      | :heavy_check_mark: | :heavy_check_mark: | :x:                |                                                                                                             |
 | Facebook      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | `hashtags` A list of comma-separated hashtags, only the first one will be used.<br/>`quote` Facebook quote. |
@@ -87,7 +87,7 @@ The following are a list of supported networks that may be imported from the sha
 | Telegram      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |                                                                                                             |
 | Tumblr        | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |                                                                                                             |
 | Twitter       | :heavy_check_mark: | :heavy_check_mark: | :x:                | `hashtags` A list of comma-separated hashtags.<br/>`twitter-user` Twitter user to mention.                  |
-| X             | :heavy_check_mark: | :heavy_check_mark: | :x:                | `hashtags` A list of comma-separated hashtags.<br/>`twitter-user` X user to mention.                  |
+| X             | :heavy_check_mark: | :heavy_check_mark: | :x:                | `hashtags` A list of comma-separated hashtags.<br/>`twitter-user` X user to mention.                        |
 | Viber         | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |                                                                                                             |
 | VK            | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | `media` URL of an image describing the content.                                                             |
 | Weibo         | :heavy_check_mark: | :heavy_check_mark: | :x:                | `media` URL of an image describing the content.                                                             |
