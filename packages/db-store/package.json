@@ -1,0 +1,63 @@
+{
+  "name": "@solid-primitives/db-store",
+  "version": "0.0.100",
+  "description": "A template primitive example.",
+  "author": "Your Name <you@youremail.com>",
+  "contributors": [],
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/db-store",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solidjs-community/solid-primitives/issues"
+  },
+  "primitive": {
+    "name": "db-store",
+    "stage": 0,
+    "list": [
+      "createDbStore",
+      "supabaseAdapter"
+    ],
+    "category": "Reactivity"
+  },
+  "keywords": [
+    "solid",
+    "primitives"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "@solid-primitives/source": "./src/index.ts",
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "typesVersions": {},
+  "scripts": {
+    "dev": "tsx ../../scripts/dev.ts",
+    "build": "tsx ../../scripts/build.ts",
+    "vitest": "vitest -c ../../configs/vitest.config.ts",
+    "test": "pnpm run vitest",
+    "test:ssr": "pnpm run vitest --mode ssr"
+  },
+  "dependencies": {
+    "@solid-primitives/resource": "workspace:^"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.12",
+    "@supabase/supabase-js": "2.*"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.48.1"
+  }
+}
