@@ -560,7 +560,7 @@ describe("createDbStore", () => {
         }),
     );
   });
-  
+
   it.skip("deletes from the store from the database", () => {
     return createRoot(
       dispose =>
@@ -599,7 +599,7 @@ describe("createDbStore", () => {
         }),
     );
   });
-  
+
   it.skip("handles error during deletion", () => {
     const originalResponse = mockSupabaseResponses.delete;
     const errorCause = { message: "server connection lost" };

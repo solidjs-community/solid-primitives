@@ -28,7 +28,7 @@ pnpm add @solid-primitives/db-store
 ```ts
 const [dbStore, setDbStore] = createDbStore({
   adapter: supabaseAdapter(client),
-  table: 'todos',
+  table: "todos",
   filter: ({ userid }) => userid === user.id,
   onError: handleErrors,
 });
@@ -55,17 +55,16 @@ If any change could not be successfully committed to the database, the `onError`
 Your adapter must have the following properties:
 
 ```tsx
-export type DbAdapterUpdate<Row extends DbRow> =
-  { old?: Partial<Row>, new?: Partial<Row> };
+export type DbAdapterUpdate<Row extends DbRow> = { old?: Partial<Row>; new?: Partial<Row> };
 
 export type DbAdapter<Row> = {
-  insertSignal: () => DbAdapterUpdate<Row> | undefined,
-  updateSignal: () => DbAdapterUpdate<Row> | undefined,
-  deleteSignal: () => DbAdapterUpdate<Row> | undefined,
-  init: () => Promise<Row[]>,
-  insert: (data: DbAdapterUpdate<Row>) => PromiseLike<any>,
-  update: (data: DbAdapterUpdate<Row>) => PromiseLike<any>,
-  delete: (data: DbAdapterUpdate<Row>) => PromiseLike<any>
+  insertSignal: () => DbAdapterUpdate<Row> | undefined;
+  updateSignal: () => DbAdapterUpdate<Row> | undefined;
+  deleteSignal: () => DbAdapterUpdate<Row> | undefined;
+  init: () => Promise<Row[]>;
+  insert: (data: DbAdapterUpdate<Row>) => PromiseLike<any>;
+  update: (data: DbAdapterUpdate<Row>) => PromiseLike<any>;
+  delete: (data: DbAdapterUpdate<Row>) => PromiseLike<any>;
 };
 ```
 
@@ -80,5 +79,3 @@ See [CHANGELOG.md](./CHANGELOG.md)
 ## Plans
 
 This is an early draft; in the future, more adapters are planned: mongodb, prism, firebase, aws?
-
-

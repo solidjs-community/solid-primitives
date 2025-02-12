@@ -14,47 +14,62 @@ const TodoList = (props: { client: SupabaseClient }) => {
   const add = (task: string) => setTodos(todos.length, { task });
   return (
     <>
-    <Show when={error()} keyed>
-      {(err) => <p class="text-red-600">{`Error: ${err.message} Cause: ${err.cause} Action: ${err.action} Data: ${JSON.stringify(err.data)}`} ${err.server ? 'server' : 'client'} <button onClick={() => setError()}>ok</button></p>}
-    </Show>
-    <ul>
-      <For
-        each={Array.from(todos).toSorted((a, b) => Number(a.id) - Number(b.id))}
-        fallback={<li>No to-dos yet</li>}
-      >
-        {item => (
-          <li class="flex flex-row items-center" data-id={item.id}>
-            <Show when={item === edit()} fallback={<span onClick={() => setEdit(item)}>{item.task}</span>}>
-              <input name="update" value={item.task} /><button onClick={() => {
-                const updated = (document.querySelector('[name="update"]') as HTMLInputElement).value;
-                const index = todos.indexOf(item);
-                if (updated && index > -1) setTodos(index, 'task', updated);
-                setEdit(undefined);
-              }}>update</button><button onClick={() => setEdit(undefined)}>cancel</button>
-            </Show>{" "}
-            <span role="button" class="p-2" onClick={() => done(item)} title="Done">
-              x
-            </span>
-          </li>
+      <Show when={error()} keyed>
+        {err => (
+          <p class="text-red-600">
+            {`Error: ${err.message} Cause: ${err.cause} Action: ${err.action} Data: ${JSON.stringify(err.data)}`}{" "}
+            ${err.server ? "server" : "client"} <button onClick={() => setError()}>ok</button>
+          </p>
         )}
-      </For>
-      <li class="flex flex-row items-center">
-        <label>
-          new task: <input name="task" />
-        </label>{" "}
-        <button
-          onClick={() => {
-            const task = (document.querySelector('[name="task"]') as HTMLInputElement).value;
-            if (task) {
-              add(task);
-              (document.querySelector('[name="task"]') as HTMLInputElement).value = "";
-            }
-          }}
+      </Show>
+      <ul>
+        <For
+          each={Array.from(todos).toSorted((a, b) => Number(a.id) - Number(b.id))}
+          fallback={<li>No to-dos yet</li>}
         >
-          do it!
-        </button>
-      </li>
-    </ul>
+          {item => (
+            <li class="flex flex-row items-center" data-id={item.id}>
+              <Show
+                when={item === edit()}
+                fallback={<span onClick={() => setEdit(item)}>{item.task}</span>}
+              >
+                <input name="update" value={item.task} />
+                <button
+                  onClick={() => {
+                    const updated = (document.querySelector('[name="update"]') as HTMLInputElement)
+                      .value;
+                    const index = todos.indexOf(item);
+                    if (updated && index > -1) setTodos(index, "task", updated);
+                    setEdit(undefined);
+                  }}
+                >
+                  update
+                </button>
+                <button onClick={() => setEdit(undefined)}>cancel</button>
+              </Show>{" "}
+              <span role="button" class="p-2" onClick={() => done(item)} title="Done">
+                x
+              </span>
+            </li>
+          )}
+        </For>
+        <li class="flex flex-row items-center">
+          <label>
+            new task: <input name="task" />
+          </label>{" "}
+          <button
+            onClick={() => {
+              const task = (document.querySelector('[name="task"]') as HTMLInputElement).value;
+              if (task) {
+                add(task);
+                (document.querySelector('[name="task"]') as HTMLInputElement).value = "";
+              }
+            }}
+          >
+            do it!
+          </button>
+        </li>
+      </ul>
     </>
   );
 };
@@ -86,10 +101,11 @@ const App: Component = () => {
                     Create a new database and note down the url and the key (that usually go into an
                     environment)
                   </li>
-                  <li>Within the database, create a table and configure it to be public, promote changes in realtime and has no row protection:
-
-                    <pre><code>{
-`-- Create table
+                  <li>
+                    Within the database, create a table and configure it to be public, promote
+                    changes in realtime and has no row protection:
+                    <pre>
+                      <code>{`-- Create table
 create table todos (
   id serial primary key,
   task text
@@ -102,8 +118,8 @@ create policy "Allow anonymous access"
 on todos
 for select
 to anon
-using (true);`
-          }</code></pre>
+using (true);`}</code>
+                    </pre>
                   </li>
                   <li>Fill in the url and key in the fields below and press "connect".</li>
                 </ul>
