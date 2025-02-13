@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/presence",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "Utility to animate the presence of an element based on the existence of data or lack thereof.",
   "author": "Ethan Standel <ethan@standel.io>",
   "license": "MIT",
@@ -23,18 +23,14 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "browser": {},
   "exports": {
+    "@solid-primitives/source": "./src/index.ts",
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "require": {
-      "types": "./dist/index.d.cts",
-      "default": "./dist/index.cjs"
     }
   },
   "keywords": [

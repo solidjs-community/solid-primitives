@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/idle",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "A primitive to observe the user's idle status and react to its changes.",
   "author": "Aylo Srd <aylo.srd@gmail.com>",
   "contributors": [],
@@ -27,18 +27,14 @@
     "dist"
   ],
   "type": "module",
-  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "browser": {},
   "types": "./dist/index.d.ts",
   "exports": {
+    "@solid-primitives/source": "./src/index.ts",
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "require": {
-      "types": "./dist/index.d.cts",
-      "default": "./dist/index.cjs"
     }
   },
   "scripts": {

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/controlled-props",
-  "version": "0.0.15",
+  "version": "0.1.0",
   "description": "The primitives in this package allow you to create controlls for component props.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [],
@@ -24,20 +24,16 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "browser": {},
   "typesVersions": {},
   "exports": {
+    "@solid-primitives/source": "./src/index.tsx",
     "solid": "./dist/index.jsx",
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "require": {
-      "types": "./dist/index.d.cts",
-      "default": "./dist/index.cjs"
     }
   },
   "scripts": {

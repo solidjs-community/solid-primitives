@@ -1,5 +1,16 @@
 # @solid-primitives/deep
 
+## 0.3.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
+### Patch Changes
+
+- Updated dependencies [ea09f71]
+  - @solid-primitives/memo@1.4.0
+
 ## 0.2.10
 
 ### Patch Changes

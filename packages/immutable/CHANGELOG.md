@@ -1,5 +1,31 @@
 # @solid-primitives/immutable
 
+## 1.1.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
+### Patch Changes
+
+- Updated dependencies [ea09f71]
+  - @solid-primitives/keyed@1.5.0
+  - @solid-primitives/utils@6.3.0
+
+## 1.0.12
+
+### Patch Changes
+
+- Updated dependencies [e82cb70]
+  - @solid-primitives/keyed@1.4.0
+
+## 1.0.11
+
+### Patch Changes
+
+- Updated dependencies [cf11535]
+  - @solid-primitives/keyed@1.3.0
+
 ## 1.0.10
 
 ### Patch Changes

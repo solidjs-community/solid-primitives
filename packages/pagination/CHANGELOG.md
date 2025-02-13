@@ -1,5 +1,16 @@
 # @solid-primitives/pagination
 
+## 0.4.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
+### Patch Changes
+
+- Updated dependencies [ea09f71]
+  - @solid-primitives/utils@6.3.0
+
 ## 0.3.0
 
 ### Minor Changes

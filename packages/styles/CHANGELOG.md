@@ -1,5 +1,17 @@
 # @solid-primitives/styles
 
+## 0.1.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
+### Patch Changes
+
+- Updated dependencies [ea09f71]
+  - @solid-primitives/rootless@1.5.0
+  - @solid-primitives/utils@6.3.0
+
 ## 0.0.114
 
 ### Patch Changes

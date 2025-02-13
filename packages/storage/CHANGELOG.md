@@ -1,5 +1,22 @@
 # @solid-primitives/storage
 
+## 4.3.1
+
+### Patch Changes
+
+- e2e290e: Correct package.json exports.
+
+## 4.3.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
+### Patch Changes
+
+- Updated dependencies [ea09f71]
+  - @solid-primitives/utils@6.3.0
+
 ## 4.2.1
 
 ### Patch Changes

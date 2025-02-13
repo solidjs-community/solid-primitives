@@ -185,6 +185,7 @@ export function Entries<K extends string | number, V>(props: {
     i: Accessor<number>,
   ) => JSX.Element;
 }): JSX.Element {
+  // changes to this function may be applicable to similar functions - grep 4A29BECD-767A-4CC0-AEBB-3543D7B444C6
   const mapFn = props.children;
   return createMemo(
     mapArray(
@@ -196,6 +197,74 @@ export function Entries<K extends string | number, V>(props: {
               () => props.of![key as never],
             )
         : (key, i) => mapFn(key as never, () => props.of![key as never], i),
+      "fallback" in props ? { fallback: () => props.fallback } : undefined,
+    ),
+  ) as unknown as JSX.Element;
+}
+
+/**
+ * Creates a list of elements from the entries of provided Map
+ *
+ * @param props
+ * @param props.of map to iterate entries of (`myMap.entries()`)
+ * @param props.children
+ * a map render function that receives a Map key, **value signal** and **index signal** and returns a JSX-Element; if the list is empty, an optional fallback is returned:
+ * ```tsx
+ * <MapEntries of={map()} fallback={<div>No items</div>}>
+ *   {(key, value, index) => <div data-index={index()}>{key}: {value()}</div>}
+ * </MapEntries>
+ * ```
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#mapentries
+ */
+export function MapEntries<K, V>(props: {
+  of: Map<K, V> | undefined | null | false;
+  fallback?: JSX.Element;
+  children: (key: K, v: Accessor<V>, i: Accessor<number>) => JSX.Element;
+}): JSX.Element {
+  // changes to this function may be applicable to similar functions - grep 4A29BECD-767A-4CC0-AEBB-3543D7B444C6
+  const mapFn = props.children;
+  return createMemo(
+    mapArray(
+      () => props.of && Array.from(props.of.keys()),
+      mapFn.length < 3
+        ? key =>
+            (mapFn as (key: K, v: Accessor<V>) => JSX.Element)(
+              key,
+              () => (props.of as Map<K, V>).get(key)!,
+            )
+        : (key, i) => mapFn(key, () => (props.of as Map<K, V>).get(key)!, i),
+      "fallback" in props ? { fallback: () => props.fallback } : undefined,
+    ),
+  ) as unknown as JSX.Element;
+}
+
+/**
+ * Creates a list of elements from the values of provided Set
+ *
+ * @param props
+ * @param props.of set to iterate values of (`mySet.values()`)
+ * @param props.children
+ * a map render function that receives a Set value and **index signal** and returns a JSX-Element; if the list is empty, an optional fallback is returned:
+ * ```tsx
+ * <SetValues of={set()} fallback={<div>No items</div>}>
+ *   {(value, index) => <div data-index={index()}>{value)}</div>}
+ * </SetValues>
+ * ```
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyed#setvalues
+ */
+export function SetValues<T>(props: {
+  of: Set<T> | undefined | null | false;
+  fallback?: JSX.Element;
+  children: (value: T, i: Accessor<number>) => JSX.Element;
+}): JSX.Element {
+  // changes to this function may be applicable to similar functions - grep 4A29BECD-767A-4CC0-AEBB-3543D7B444C6
+  const mapFn = props.children;
+  return createMemo(
+    mapArray(
+      () => props.of && Array.from(props.of.values()),
+      mapFn.length < 2 ? value => (mapFn as (value: T) => JSX.Element)(value) : mapFn,
       "fallback" in props ? { fallback: () => props.fallback } : undefined,
     ),
   ) as unknown as JSX.Element;

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/permission",
-  "version": "1.2.6",
+  "version": "1.3.0",
   "description": "Primitive that wraps permission queries",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "license": "MIT",
@@ -23,18 +23,14 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "browser": {},
   "exports": {
+    "@solid-primitives/source": "./src/index.ts",
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "require": {
-      "types": "./dist/index.d.cts",
-      "default": "./dist/index.cjs"
     }
   },
   "scripts": {

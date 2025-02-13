@@ -68,7 +68,7 @@ export function createStaticStore<T extends object>(
   const setValue = (key: keyof T, value: SetterParam<any>): void => {
     const signal = cache[key];
     if (signal) return signal[1](value);
-    if (key in copy) copy[key] = accessWith(value, [copy[key]]);
+    if (key in copy) copy[key] = accessWith(value, copy[key]);
   };
 
   return [

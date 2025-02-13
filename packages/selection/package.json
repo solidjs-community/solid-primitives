@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/selection",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "description": "selection primitive.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [],
@@ -23,18 +23,14 @@
   },
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "browser": {},
   "types": "./dist/index.d.ts",
   "exports": {
+    "@solid-primitives/source": "./src/index.ts",
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "require": {
-      "types": "./dist/index.d.cts",
-      "default": "./dist/index.cjs"
     }
   },
   "files": [

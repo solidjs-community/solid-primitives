@@ -1,5 +1,22 @@
 # @solid-primitives/static-store
 
+## 0.1.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
+### Patch Changes
+
+- Updated dependencies [ea09f71]
+  - @solid-primitives/utils@6.3.0
+
+## 0.0.9
+
+### Patch Changes
+
+- 56d9511: fix: static-store setValue with setterFn has correct arguments
+
 ## 0.0.8
 
 ### Patch Changes

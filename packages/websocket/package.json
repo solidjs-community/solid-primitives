@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/websocket",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "Primitive to create a web socket connection",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -27,18 +27,14 @@
   },
   "private": false,
   "type": "module",
-  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "browser": {},
   "types": "./dist/index.d.ts",
   "exports": {
+    "@solid-primitives/source": "./src/index.ts",
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "require": {
-      "types": "./dist/index.d.cts",
-      "default": "./dist/index.cjs"
     }
   },
   "files": [

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/media",
-  "version": "2.2.9",
+  "version": "2.3.0",
   "description": "Primitives for media query and device features",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "contributors": [
@@ -44,18 +44,14 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "browser": {},
   "exports": {
+    "@solid-primitives/source": "./src/index.ts",
     "import": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "require": {
-      "types": "./dist/index.d.cts",
-      "default": "./dist/index.cjs"
     }
   },
   "scripts": {

@@ -1,5 +1,24 @@
 # @solid-primitives/audio
 
+## 1.4.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
+### Patch Changes
+
+- Updated dependencies [ea09f71]
+  - @solid-primitives/static-store@0.1.0
+  - @solid-primitives/utils@6.3.0
+
+## 1.3.19
+
+### Patch Changes
+
+- Updated dependencies [56d9511]
+  - @solid-primitives/static-store@0.0.9
+
 ## 1.3.18
 
 ### Patch Changes

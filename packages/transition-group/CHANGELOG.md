@@ -1,5 +1,11 @@
 # @solid-primitives/transition-group
 
+## 1.1.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
 ## 1.0.5
 
 ### Patch Changes

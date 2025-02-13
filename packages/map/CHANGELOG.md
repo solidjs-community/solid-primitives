@@ -1,5 +1,22 @@
 # @solid-primitives/map
 
+## 0.6.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
+### Patch Changes
+
+- Updated dependencies [ea09f71]
+  - @solid-primitives/trigger@1.2.0
+
+## 0.5.0
+
+### Minor Changes
+
+- 46e4379: Fix and optimize ReactiveMap and ReactiveWeakMap (https://github.com/solidjs-community/solid-primitives/pull/704)
+
 ## 0.4.13
 
 ### Patch Changes

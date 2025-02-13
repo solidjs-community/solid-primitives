@@ -1,5 +1,11 @@
 # @solid-primitives/fetch
 
+## 2.5.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
 ## 2.4.9
 
 ### Patch Changes

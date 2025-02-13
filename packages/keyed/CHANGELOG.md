@@ -1,5 +1,23 @@
 # @solid-primitives/keyed
 
+## 1.5.0
+
+### Minor Changes
+
+- ea09f71: Remove CJS support. The package is ESM only now.
+
+## 1.4.0
+
+### Minor Changes
+
+- e82cb70: Add `SetValues` control flow component.
+
+## 1.3.0
+
+### Minor Changes
+
+- cf11535: Add `MapEntries` control flow component.
+
 ## 1.2.3
 
 ### Patch Changes

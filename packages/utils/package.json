@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/utils",
-  "version": "6.2.3",
+  "version": "6.3.0",
   "description": "A bunch of reactive utility types and functions, for building primitives with Solid.js",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "contributors": [
@@ -21,29 +21,22 @@
     "dist"
   ],
   "type": "module",
-  "main": "./dist/index/index.cjs",
-  "module": "./dist/index/index.js",
-  "types": "./dist/index/index.d.ts",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "browser": {},
   "exports": {
     ".": {
+      "@solid-primitives/source": "./src/index.ts",
       "import": {
-        "types": "./dist/index/index.d.ts",
-        "default": "./dist/index/index.js"
-      },
-      "require": {
-        "types": "./dist/index/index.d.cts",
-        "default": "./dist/index/index.cjs"
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
       }
     },
     "./immutable": {
+      "@solid-primitives/source": "./src/immutable/index.ts",
       "import": {
         "types": "./dist/immutable/index.d.ts",
         "default": "./dist/immutable/index.js"
-      },
-      "require": {
-        "types": "./dist/immutable/index.d.cts",
-        "default": "./dist/immutable/index.cjs"
       }
     }
   },

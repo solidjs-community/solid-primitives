@@ -16,6 +16,7 @@ export const BAIDU: Network = "http://cang.baidu.com/do/add?iu=@u&it=@t";
 export const BUFFER: Network = "https://bufferapp.com/add?text=@t&url=@u";
 export const EMAIL: Network = "mailto:?subject=@t&body=@u%0D%0A@d";
 export const EVERNOTE: Network = "https://www.evernote.com/clip.action?url=@u&title=@t";
+export const BLUESKY: Network = "https://bsky.app/intent/compose?text=@t%0D%0A@u%0D%0A@d";
 export const FACEBOOK: Network =
   "https://www.facebook.com/sharer/sharer.php?u=@u&title=@t&description=@d&quote=@q&hashtag=@h";
 export const FLIPBOARD: Network =
@@ -38,6 +39,7 @@ export const STUMBLEUPON: Network = "https://www.stumbleupon.com/submit?url=@u&t
 export const TELEGRAM: Network = "https://t.me/share/url?url=@u&text=@t%0D%0A@d";
 export const TUMBLR: Network = "https://www.tumblr.com/share/link?url=@u&name=@t&description=@d";
 export const TWITTER: Network = "https://twitter.com/intent/tweet?text=@t&url=@u&hashtags=@h@tu";
+export const X: Network = "https://www.x.com/intent/tweet?text=@t&url=@u&hashtags=@h@tu";
 export const VIBER: Network = "viber://forward?text=@t%0D%0A@u%0D%0A@d";
 export const VK: Network =
   "https://vk.com/share.php?url=@u&title=@t&description=@d&image=@m&noparse=true";
