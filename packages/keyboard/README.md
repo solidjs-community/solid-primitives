@@ -74,7 +74,7 @@ createEffect(() => {
 });
 
 <For each={keys()}>
-  {key => <kbd>{key}</kdb>}
+  {key => <kbd>{key}</kbd>}
 </For>
 ```
 
