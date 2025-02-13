@@ -73,9 +73,7 @@ createEffect(() => {
   console.log(keys()); // => string[] — list of currently held keys
 });
 
-<For each={keys()}>
-  {key => <kbd>{key}</kbd>}
-</For>
+<For each={keys()}>{key => <kbd>{key}</kbd>}</For>;
 ```
 
 ## `useCurrentlyHeldKey`
