@@ -34,6 +34,11 @@ const App: Component = () => {
         <div contentEditable>
           t<b>e</b>
           <i>s</i>t
+          <ul>
+            <li>first item</li>
+            <li>second item</li>
+            <li>third item</li>
+          </ul>
         </div>
       </div>
       <div>
