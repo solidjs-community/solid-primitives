@@ -1,5 +1,11 @@
 # @solid-primitives/selection
 
+## 0.1.1
+
+### Patch Changes
+
+- 4ddea69: fix: selection contenteditable node detection
+
 ## 0.1.0
 
 ### Minor Changes
