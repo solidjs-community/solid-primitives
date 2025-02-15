@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createContext, createRoot, FlowComponent, JSX, untrack, useContext } from "solid-js";
 import { render } from "solid-js/web";
-import { createContextProvider, MultiProvider } from "../src/index.js";
+import { ConsumeContext, createContextProvider, MultiProvider } from "../src/index.js";
 
 type TestContextValue = {
   message: string;
@@ -105,5 +105,28 @@ describe("MultiProvider", () => {
     expect(capture1).toBe("Hello");
     expect(capture2).toBe("World");
     expect(capture3).toBe(TEST_MESSAGE);
+  });
+});
+
+describe("ConsumeContext", () => {
+  test("consumes a context", () => {
+    const Ctx = createContext<string>("Hello");
+
+    function useCtx() {
+      return useContext(Ctx);
+    }
+
+    let capture;
+    createRoot(() => {
+      <Ctx.Provider value="World">
+        <ConsumeContext useFn={useCtx}>
+          {value => (
+            capture = value
+          )}
+        </ConsumeContext>
+      </Ctx.Provider>;
+    });
+
+    expect(capture).toBe("World");
   });
 });
