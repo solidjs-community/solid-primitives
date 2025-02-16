@@ -108,7 +108,7 @@ const PrimitivesTable: Component<{ packages: PackageListItem[] | undefined }> = 
                         <PrimitiveBtn href={pkg.name}>{pkg.name}</PrimitiveBtn>
                       </Table.TD>
                       <Table.TD>
-                        <StageBadge value={pkg.stage} />
+                        <StageBadge value={pkg.primitive.stage} />
                       </Table.TD>
                       <Table.TD>
                         {pkg.primitives.map(primitive => (

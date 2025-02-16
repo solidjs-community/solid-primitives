@@ -17,7 +17,7 @@ export const getTextNodes = (startNode: Node) => {
 const addNodeLength = (length: number, node: Node) => length + (node as Text).data.length;
 
 const getRangePos = (container: Node, offset: number, texts: Node[]) => {
-  const index = texts.indexOf(container);
+  const index = texts.findIndex(text => text === container || text.parentElement === container);
   return index === -1 ? NaN : texts.slice(0, index).reduce(addNodeLength, 0) + offset;
 };
 
