@@ -109,7 +109,7 @@ describe("MultiProvider", () => {
 });
 
 describe("ConsumeContext", () => {
-  test("consumes a context", () => {
+  test("consumes a context via use-function", () => {
     const Ctx = createContext<string>("Hello");
 
     function useCtx() {
@@ -120,6 +120,23 @@ describe("ConsumeContext", () => {
     createRoot(() => {
       <Ctx.Provider value="World">
         <ConsumeContext useFn={useCtx}>
+          {value => (
+            capture = value
+          )}
+        </ConsumeContext>
+      </Ctx.Provider>;
+    });
+
+    expect(capture).toBe("World");
+  });
+
+  test("consumes a context via context object", () => {
+    const Ctx = createContext<string>("Hello");
+
+    let capture;
+    createRoot(() => {
+      <Ctx.Provider value="World">
+        <ConsumeContext context={Ctx}>
           {value => (
             capture = value
           )}

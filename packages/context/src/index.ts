@@ -124,7 +124,19 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
  * A component that allows you to consume a context without extracting the children into a separate function.
  * This is particularly useful when the context needs to be used within the same JSX where it is provided.
  *
- * @param useFn A function that returns the context value. Preferably the `use...` function returned from `createContextProvider`.
+ * The `ConsumeContext` component is equivalent to the following code and solely exists as syntactic sugar:
+ *
+ * ```tsx
+ * <CounterProvider>
+ *   {untrack(() => {
+ *     const context = useContext(counterContext); // or useCounter()
+ *     return children(context);
+ *   })}
+ * </CounterProvider>
+ * ```
+ *
+ * @param useFn A function that returns the context value. Preferably the `use...()` function returned from `createContextProvider()`.
+ * @param context The context object itself returned by `createContext()`. If `useFn` is provided, this will be ignored.
  *
  * @example
  * ```tsx
@@ -140,9 +152,14 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
  * ```
  */
 export function ConsumeContext<T>(props: {
-  useFn: () => T | undefined,
   children: (value: T | undefined) => JSX.Element
-}): JSX.Element {
-  const context = props.useFn();
+} & ({
+  useFn: () => T | undefined,
+  context?: never;
+} | {
+  useFn?: never;
+  context: Context<T>;
+})): JSX.Element {
+  const context = props.useFn ? props.useFn() : useContext(props.context);
   return props.children(context);
 }

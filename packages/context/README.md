@@ -135,11 +135,13 @@ import { MultiProvider } from "@solid-primitives/context";
 
 Inspired by React's `Context.Consumer` component, `ConsumeContext` allows using contexts directly within JSX without the needing to extract the content JSX into a separate function.
 
-This is particularly useful when you want to use the context in the same JSX block where you're providing it and directly bind the context value to HTML.
+This is particularly useful when you want to use the context in the same JSX block where you're providing it and directly bind the context value to the frontend.
+
+Note that this component solely serves as syntactic sugar and doesn't provide any additional functionality over inlining SolidJS's `useContext` hook within JSX.
 
 ### How to use it
 
-`ConsumeContext` takes a `useFn` prop with the context's `use...` function and a `children` prop that will receive the context value. The use function may directly come from `createContextProvider`.
+`ConsumeContext` takes a `useFn` prop with the context's `use...()` function and a `children` prop that will receive the context value. The use function may directly come from `createContextProvider()`.
 
 ```tsx
 import { createContextProvider, ConsumeContext } from "@solid-primitives/context";
@@ -164,7 +166,21 @@ const [CounterProvider, useCounter] = createContextProvider(() => {
 </CounterProvider>;
 ```
 
+Alternatively, you may also pass the raw SolidJS context over `context` in case you have created a context using `createContext()`.
+
 ```tsx
+import { ConsumeContext } from "@solid-primitives/context";
+
+// Create a context
+const CounterContext = createContext(/*...*/);
+
+// Consume it using the raw context
+<ConsumeContext context={CounterContext}>
+  {({ count, increment }) => {
+    // ...
+  }}
+</ConsumeContext>
+```
 
 ## Changelog
 
