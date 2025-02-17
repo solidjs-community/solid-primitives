@@ -135,31 +135,49 @@ export function MultiProvider<T extends readonly [unknown?, ...unknown[]]>(props
  * </CounterProvider>
  * ```
  *
- * @param useFn A function that returns the context value. Preferably the `use...()` function returned from `createContextProvider()`.
- * @param context The context object itself returned by `createContext()`. If `useFn` is provided, this will be ignored.
+ * @param use Either one of the following:
+ *  - A function that returns the context value. Preferably the `use...()` function returned from `createContextProvider()`.
+ *  - The context itself returned from `createContext()`.
+ *  - A inline function that returns the context value.
  *
  * @example
  * ```tsx
  * // create the context
  * const [CounterProvider, useCounter] // = createContextProvider(...)
  *
- * // use the context
- * <ConsumeContext useFn={useCounter}>
- *   {({ count }) => (
- *     <div>Count: {count()}</div>
- *   )}
- * </ConsumeContext>
+ * // provide and use the context
+ * <CounterProvider count={1}>
+ *   <ConsumeContext use={useCounter}>
+ *     {({ count }) => (
+ *       <div>Count: {count()}</div>
+ *     )}
+ *   </ConsumeContext>
+ * </CounterProvider>
+ * ```
+ *
+ * ```tsx
+ * // create the context
+ * const counterContext = createContext({ count: 0 });
+ *
+ * // provide and use the context
+ * <counterContext.Provider value={{ count: 1 }}>
+ *   <ConsumeContext use={counterContext}>
+ *     {({ count }) => (
+ *       <div>Count: {count}</div>
+ *     )}
+ *   </ConsumeContext>
+ * </counterContext.Provider>
  * ```
  */
 export function ConsumeContext<T>(props: {
-  children: (value: T | undefined) => JSX.Element
-} & ({
-  useFn: () => T | undefined,
-  context?: never;
-} | {
-  useFn?: never;
-  context: Context<T>;
-})): JSX.Element {
-  const context = props.useFn ? props.useFn() : useContext(props.context);
+  children: (value: T | undefined) => JSX.Element,
+  use: (() => T | undefined) | Context<T>,
+}): JSX.Element {
+  let context: T | undefined;
+  if (typeof props.use === "function") {
+    context = props.use();
+  } else {
+    context = useContext(props.use);
+  }
   return props.children(context);
 }

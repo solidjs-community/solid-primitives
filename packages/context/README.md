@@ -141,7 +141,9 @@ Note that this component solely serves as syntactic sugar and doesn't provide an
 
 ### How to use it
 
-`ConsumeContext` takes a `useFn` prop with the context's `use...()` function and a `children` prop that will receive the context value. The use function may directly come from `createContextProvider()`.
+`ConsumeContext` takes a `use` prop that can be either one of the following:
+* A `use...()` function returned by `createContextProvider` or a inline function that returns the context value like `() => useContext(MyContext)`.
+* A `context` prop that takes a raw SolidJS context created by `createContext()`.
 
 ```tsx
 import { createContextProvider, ConsumeContext } from "@solid-primitives/context";
@@ -155,7 +157,7 @@ const [CounterProvider, useCounter] = createContextProvider(() => {
 
 // Provide it, consume it and use it in the same JSX block
 <CounterProvider>
-  <ConsumeContext useFn={useCounter}>
+  <ConsumeContext use={useCounter}>
     {({ count, increment }) => (
       <div>
         <button onClick={increment}>Increment</button>
@@ -163,19 +165,19 @@ const [CounterProvider, useCounter] = createContextProvider(() => {
       </div>
     )}
   </ConsumeContext>
-</CounterProvider>;
+</CounterProvider>
 ```
 
-Alternatively, you may also pass the raw SolidJS context over `context` in case you have created a context using `createContext()`.
+With the raw SolidJS context returned by `createContext()`:
 
 ```tsx
 import { ConsumeContext } from "@solid-primitives/context";
 
 // Create a context
-const CounterContext = createContext(/*...*/);
+const counterContext = createContext(/*...*/);
 
 // Consume it using the raw context
-<ConsumeContext context={CounterContext}>
+<ConsumeContext use={counterContext}>
   {({ count, increment }) => {
     // ...
   }}
