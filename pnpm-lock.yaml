@@ -81,7 +81,7 @@ importers:
         specifier: 5.4.4
         version: 5.4.4(@types/node@22.5.4)(sass@1.77.8)(terser@5.31.5)
       vite-plugin-solid:
-        specifier: ^2.11.0
+        specifier: ^2.10.2
         version: 2.11.0(solid-js@1.8.22)(vite@5.4.4(@types/node@22.5.4)(sass@1.77.8)(terser@5.31.5))
       vitest:
         specifier: ^2.1.0
