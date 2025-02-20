@@ -13,7 +13,7 @@ It is recommended that `createAsync` be used in favor of `createResource` specia
 
 
 
-```tsx title="component.tsx" {6,10}
+```tsx
 import { createAsync } from "@solid-primitives/async";
 import { Suspense } from "solid-js";
 import { getUser } from "./api";
