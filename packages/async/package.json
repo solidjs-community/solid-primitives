@@ -1,10 +1,9 @@
 {
   "name": "@solid-primitives/async",
-  "version": "0.0.117",
+  "version": "0.0.1",
   "description": "Primitives for async files.",
-  "author": "Rustam Ashurmatov <rr.ashurmatov.21@gmail.com>",
   "license": "MIT",
-  "homepage": "https://primitives.solidjs.community/package/upload",
+  "homepage": "https://primitives.solidjs.community/package/async",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
