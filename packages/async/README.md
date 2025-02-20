@@ -26,6 +26,7 @@ export function Component () => {
 			<p>{user()}</p>
 		</Suspense>
 	);
+}
 ```
 
 ## Options
