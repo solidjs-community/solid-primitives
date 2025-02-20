@@ -4,10 +4,9 @@ An asynchronous primitive with a function that tracks similar to `createMemo`.
 `createAsync` expects a promise back that is then turned into a Signal.
 Reading it before it is ready causes Suspense/Transitions to trigger.
 
-<Callout type="caution">
-	Using `query` in `createResource` directly will not work since the fetcher is
-	not reactive. This means that it will not invalidate properly.
-</Callout>
+> [!WARNING]
+> Using `query` in `createResource` directly will not work since the fetcher is
+> not reactive. This means that it will not invalidate properly.
 
 This is light wrapper over [`createResource`](https://docs.solidjs.com/reference/basic-reactivity/create-resource) which serves as a stand-in for a future primitive being brought to Solid core in 2.0. 
 It is recommended that `createAsync` be used in favor of `createResource` specially when in a **SolidStart** app because `createAsync` works better in conjunction with the [cache](https://docs.solidjs.com/solid-router/reference/data-apis/cache) helper.
