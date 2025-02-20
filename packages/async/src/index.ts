@@ -1,3 +1,13 @@
+/*
+
+Primitive copied from @solidjs/router: https://github.com/solidjs/solid-router/blob/3c214ce2ceb9b7d9d39d143229a8c6145e83e681/src/data/createAsync.ts
+
+MIT License
+
+Copyright Ryan Carniato
+
+*/
+
 /**
  * This is mock of the eventual Solid 2.0 primitive. It is not fully featured.
  */
