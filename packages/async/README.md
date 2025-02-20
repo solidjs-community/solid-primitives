@@ -9,8 +9,8 @@ Reading it before it is ready causes Suspense/Transitions to trigger.
 	not reactive. This means that it will not invalidate properly.
 </Callout>
 
-This is light wrapper over [`createResource`](/reference/basic-reactivity/create-resource) which serves as a stand-in for a future primitive being brought to Solid core in 2.0. 
-It is recommended that `createAsync` be used in favor of `createResource` specially when in a **SolidStart** app because `createAsync` works better in conjunction with the [cache](/solid-router/reference/data-apis/cache) helper.
+This is light wrapper over [`createResource`](https://docs.solidjs.com/reference/basic-reactivity/create-resource) which serves as a stand-in for a future primitive being brought to Solid core in 2.0. 
+It is recommended that `createAsync` be used in favor of `createResource` specially when in a **SolidStart** app because `createAsync` works better in conjunction with the [cache](https://docs.solidjs.com/solid-router/reference/data-apis/cache) helper.
 
 
 
@@ -39,3 +39,12 @@ export function Component () => {
 | onHydrated   | `function`              | `undefined`    | A callback that is called when the resource is hydrated.                                                                                                      |
 | ssrLoadFrom  | `"server" \| "initial"` | `"server"`     | The source of the initial value for SSR. If set to `"initial"`, the resource will use the `initialValue` option instead of the value returned by the fetcher. |
 | storage      | `function`              | `createSignal` | A function that returns a signal. This can be used to create a custom storage for the resource. This is still experimental     
+
+
+# createAsyncStore
+
+Similar to createAsync except it uses a deeply reactive store. Perfect for applying fine-grained changes to large model data that updates.
+
+```jsx
+const todos = createAsyncStore(() => getTodos());
+```
