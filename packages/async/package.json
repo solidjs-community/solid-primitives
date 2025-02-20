@@ -1,0 +1,51 @@
+{
+  "name": "@solid-primitives/async",
+  "version": "0.0.117",
+  "description": "Primitives for async files.",
+  "author": "Rustam Ashurmatov <rr.ashurmatov.21@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://primitives.solidjs.community/package/upload",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solidjs-community/solid-primitives.git"
+  },
+  "primitive": {
+    "name": "async",
+    "stage": 0,
+    "list": [
+      "createAsync"
+    ],
+    "category": "Reactivity"
+  },
+  "files": [
+    "dist"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "tsx ../../scripts/dev.ts",
+    "build": "tsx ../../scripts/build.ts"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.6.12"
+  },
+  "typesVersions": {},
+  "devDependencies": {
+    "solid-js": "^1.8.7"
+  }
+}
