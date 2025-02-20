@@ -1,4 +1,4 @@
-# @solid-primitives/set
+# @solid-primitives/async
 
 ## 0.0.1
 
