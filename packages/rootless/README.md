@@ -114,7 +114,7 @@ dispose()
 export function createDisposable(
   fn: (dispose: VoidFunction) => void,
   ...owners: (Owner | null)[]
-): VoidFunction
+): VoidFunction;
 ```
 
 ## `createSingletonRoot`
