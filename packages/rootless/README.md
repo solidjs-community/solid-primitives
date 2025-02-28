@@ -111,10 +111,10 @@ dispose()
 ### Definition
 
 ```ts
-type runWithRootReturn<T> = T extends void | undefined | null
-  ? Dispose
-  : [returns: T, dispose: Dispose];
-const createDisposable = <T>(fn: () => T, detachedOwner?: Owner): runWithRootReturn<T>
+export function createDisposable(
+  fn: (dispose: VoidFunction) => void,
+  ...owners: (Owner | null)[]
+): VoidFunction
 ```
 
 ## `createSingletonRoot`
