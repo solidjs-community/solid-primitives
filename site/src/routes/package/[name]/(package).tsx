@@ -40,7 +40,7 @@ const Page: Component = () => {
       return cachedData()?.primitives ?? dataResource()?.primitives;
     },
     get stage() {
-      return cachedData()?.stage ?? dataResource()?.stage;
+      return cachedData()?.primitive?.stage ?? dataResource()?.primitive?.stage;
     },
     get readme() {
       return dataResource()?.readme;
