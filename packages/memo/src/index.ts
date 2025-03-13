@@ -191,10 +191,12 @@ export function createWritableMemo<T>(
   options?: MemoOptions<T | undefined>,
 ): [signal: Accessor<T>, setter: Setter<T>] {
   let combined: Accessor<T> = () => value as T;
+  
   const [signal, setSignal] = createSignal(value as T, EQUALS_FALSE_OPTIONS),
     memo = createMemo(
       callbackWith(fn, () => combined()),
       value,
+      EQUALS_FALSE_OPTIONS,
     );
 
   return [
