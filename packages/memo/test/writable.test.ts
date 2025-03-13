@@ -32,7 +32,10 @@ describe("createWritableMemo", () => {
     const [count, setCount] = createSignal(1);
     let prevCb: number | undefined;
     const { result, setResult, dispose } = createRoot(dispose => {
-      const [result, setResult] = createWritableMemo((p?: number) => ((prevCb = p), count() * 2), -2);
+      const [result, setResult] = createWritableMemo(
+        (p?: number) => ((prevCb = p), count() * 2),
+        -2,
+      );
       expect(prevCb).toBe(-2);
       expect(result()).toBe(2);
       return { result, dispose, setResult };
@@ -105,19 +108,22 @@ describe("createWritableMemo", () => {
   // https://github.com/solidjs-community/solid-primitives/issues/772
   test("issue 772", () => {
     const [source, setSource] = createSignal(0);
-    const [[value, setValue], dispose] = createRoot(dispose => [createWritableMemo(() => !!source()), dispose])
+    const [[value, setValue], dispose] = createRoot(dispose => [
+      createWritableMemo(() => !!source()),
+      dispose,
+    ]);
 
-    expect(value()).toBe(false)
+    expect(value()).toBe(false);
 
     setSource(1);
-    expect(value()).toBe(true)
+    expect(value()).toBe(true);
 
     setValue(false);
-    expect(value()).toBe(false)
+    expect(value()).toBe(false);
 
     setSource(2);
-    expect(value()).toBe(true)
+    expect(value()).toBe(true);
 
-    dispose()
-  })
+    dispose();
+  });
 });
