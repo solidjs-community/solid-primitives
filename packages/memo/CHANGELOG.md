@@ -1,5 +1,11 @@
 # @solid-primitives/memo
 
+## 1.4.1
+
+### Patch Changes
+
+- d86e65d: fix createWritableMemo (fixes #772)
+
 ## 1.4.0
 
 ### Minor Changes
