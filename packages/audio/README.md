@@ -78,7 +78,7 @@ The audio primitive exports an reactive properties that provides you access to s
 _Note:_ Initializing the primitive with `playing` as true works, however note that the user has to interact with the page first (on a fresh page load).
 
 ```ts
-function makeAudioPlayer(
+function createAudio(
   src: AudioSource | Accessor<AudioSource>,
   playing?: Accessor<boolean>,
   volume?: Accessor<number>,
