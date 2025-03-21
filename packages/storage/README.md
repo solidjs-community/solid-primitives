@@ -123,7 +123,7 @@ LocalForage uses indexedDB or WebSQL if available to greatly increase the size o
 
 ```ts
 import { isServer } from "solid-js/web";
-import { makePersisted } from "@solid-primtives/storage";
+import { makePersisted } from "@solid-primitives/storage";
 import localforage from "localforage";
 
 const [state, setState] = makePersisted(createSignal(), {
