@@ -11,7 +11,7 @@ import {
 import { createStore, reconcile, SetStoreFunction, Store, unwrap } from "solid-js/store";
 import { RealtimePostgresChangesPayload, SupabaseClient } from "@supabase/supabase-js";
 
-export type DbRow = Record<string, any> & { id: number | string };
+export type DbRow = Record<string, any>;
 
 export type DbAdapterUpdate<Row extends DbRow> = { old?: Partial<Row>; new?: Partial<Row> };
 
@@ -21,11 +21,11 @@ export type DbAdapterFilter<Row extends DbRow> = (
   ev: { action: DbAdapterAction } & DbAdapterUpdate<Row>,
 ) => boolean;
 
-export type DbAdapterOptions<Row extends DbRow> = {
+export type DbAdapterOptions<Row extends DbRow, Extras extends Record<string, any> = {}> = {
   client: SupabaseClient;
   filter?: DbAdapterFilter<Row>;
   table: string;
-};
+} & Extras;
 
 export type DbAdapter<Row extends DbRow> = {
   insertSignal: () => DbAdapterUpdate<Row> | undefined;
@@ -69,7 +69,7 @@ const supabaseHandleError =
         )
       : Promise.resolve();
 
-export const supabaseAdapter = <Row extends DbRow>(opts: DbAdapterOptions<Row>): DbAdapter<Row> => {
+export const supabaseAdapter = <Row extends DbRow>(opts: DbAdapterOptions<Row, { schema?: string }>): DbAdapter<Row> => {
   const [insertSignal, setInsertSignal] = createSignal<DbAdapterUpdate<Row>>();
   const [updateSignal, setUpdateSignal] = createSignal<DbAdapterUpdate<Row>>();
   const [deleteSignal, setDeleteSignal] = createSignal<DbAdapterUpdate<Row>>();
@@ -84,7 +84,7 @@ export const supabaseAdapter = <Row extends DbRow>(opts: DbAdapterOptions<Row>):
   };
   const channel = opts.client
     .channel("schema-db-changes")
-    .on("postgres_changes", { event: "*", schema: "public" }, updateHandler)
+    .on("postgres_changes", { event: "*", schema: opts.schema || "public" }, updateHandler)
     .subscribe();
   onCleanup(() => channel.unsubscribe());
   return {
@@ -119,6 +119,7 @@ export const supabaseAdapter = <Row extends DbRow>(opts: DbAdapterOptions<Row>):
 export type DbStoreOptions<Row extends DbRow> = {
   adapter: DbAdapter<Row>;
   init?: Row[];
+  defaultFields?: readonly string[]; 
   equals?: (a: unknown, b: unknown) => boolean;
   onError?: (err: DbStoreError<Row>) => void;
 };
@@ -130,6 +131,7 @@ export const createDbStore = <Row extends DbRow>(
   const [dbStore, setDbStore] = createStore<Row[]>(opts.init || []);
   const [dbInit, { refetch }] = createResource(opts.adapter.init);
   const equals = opts.equals || ((a, b) => a === b);
+  const defaultFields = opts.defaultFields || ['id'];
   const onError = (error: DbStoreError<Row>) => {
     if (typeof opts.onError === "function") {
       opts.onError(error);
@@ -150,16 +152,16 @@ export const createDbStore = <Row extends DbRow>(
     on(opts.adapter.insertSignal, inserted => {
       if (!inserted?.new?.id) return;
       for (const row of insertions.values()) {
-        if (Object.entries(inserted.new).some(([key, value]) => key !== "id" && row[key] !== value))
+        if (Object.entries(inserted.new).some(([key, value]) => !defaultFields.includes(key) && row[key] !== value))
           continue;
         const index = untrack(() =>
           dbStore.findIndex(cand =>
-            Object.entries(cand).every(([key, value]) => key === "id" || row[key] == value),
+            Object.entries(cand).every(([key, value]) => defaultFields.includes(key) || row[key] == value),
           ),
         );
         if (index !== -1) {
           // @ts-ignore
-          setDbStore(index, "id", inserted.new.id);
+          setDbStore(index, inserted.new);
           insertions.delete(row);
           return;
         }
