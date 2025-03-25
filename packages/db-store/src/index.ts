@@ -9,7 +9,7 @@ import {
   DEV,
 } from "solid-js";
 import { createStore, reconcile, SetStoreFunction, Store, unwrap } from "solid-js/store";
-import { createClient, RealtimePostgresChangesPayload, SupabaseClient } from "@supabase/supabase-js";
+import { RealtimePostgresChangesPayload, SupabaseClient } from "@supabase/supabase-js";
 
 export type DbRow = Record<string, any>;
 
