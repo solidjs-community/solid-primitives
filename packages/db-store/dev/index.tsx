@@ -1,19 +1,22 @@
-import { Component, createSignal, For, Show } from "solid-js";
+import { Component, createSignal, onMount, For, Show } from "solid-js";
 import { createDbStore, supabaseAdapter, DbRow, DbStoreError } from "../src/index.js";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { AuthResponse, createClient, Session, SupabaseClient } from "@supabase/supabase-js";
 import { reconcile } from "solid-js/store";
 
-const TodoList = (props: { client: SupabaseClient }) => {
+const TodoList = (props: { client: SupabaseClient, logout: () => void }) => {
   const [error, setError] = createSignal<DbStoreError<DbRow>>();
+  (globalThis as any).supabaseClient = props.client;
   const [todos, setTodos] = createDbStore({
     adapter: supabaseAdapter({ client: props.client, table: "todos" }),
+    defaultFields: ['id', 'user_id'],
     onError: setError,
   });
   const [edit, setEdit] = createSignal<DbRow>();
   const done = (task: DbRow) => setTodos(reconcile(todos.filter(todo => todo !== task)));
   const add = (task: string) => setTodos(todos.length, { task });
   return (
-    <>
+    <div>
+      <button onclick={props.logout}>logout</button>
       <Show when={error()} keyed>
         {err => (
           <p class="text-red-600">
@@ -70,85 +73,74 @@ const TodoList = (props: { client: SupabaseClient }) => {
           </button>
         </li>
       </ul>
-    </>
+    </div>
   );
 };
 
 const App: Component = () => {
-  const [client, setClient] = createSignal<SupabaseClient<any, "public", any>>();
-  const connect = () => {
-    const url = (document.querySelector('[type="url"]') as HTMLInputElement | null)?.value;
-    const key = (document.querySelector('[type="password"]') as HTMLInputElement | null)?.value;
-    url && key && setClient(createClient(url, key));
+  // these are public keys that will end up in the client in any case:
+  const client = 
+    createClient(
+      import.meta.env.VITE_SUPABASE_URL,
+      import.meta.env.VITE_SUPABASE_KEY  
+    );
+  const [session, setSession] = createSignal<Session>();
+  const [error, setError] = createSignal('');
+  const handleAuthPromise = ({ error, data }: AuthResponse) => {
+    if (error) {
+      setError(error.toString())
+    } else {
+      setSession(data.session ?? undefined);
+    }
   };
+  onMount(() => client.auth.refreshSession().then(handleAuthPromise));
+  const login = () => {
+    const email = (document.querySelector('[type="email"]') as HTMLInputElement | null)?.value;
+    const password = (document.querySelector('[type="password"]') as HTMLInputElement | null)?.value;
+    if (!email || !password) {
+      setError('please provide an email and password');
+      return;
+    }
+    client.auth.signInWithPassword({ email, password }).then(handleAuthPromise);
+  };
+  const register = () => {
+    const email = (document.querySelector('[type="email"]') as HTMLInputElement | null)?.value;
+    const password = (document.querySelector('[type="password"]') as HTMLInputElement | null)?.value;
+    if (!email || !password) {
+      setError('please provide an email and password');
+      return;
+    }
+    client.auth.signUp({ email, password }).then(handleAuthPromise);
+  }
 
   return (
     <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
       <div class="wrapper-v">
         <h4>db-store-backed to-do list</h4>
         <Show
-          when={client()}
-          keyed
+          when={session()}
           fallback={
             <>
-              <details>
-                <summary>To configure your own database,</summary>
-                <ul class="list-disc">
-                  <li>
-                    Register with <a href="https://supabase.com">Supabase</a>.
-                  </li>
-                  <li>
-                    Create a new database and note down the url and the key (that usually go into an
-                    environment)
-                  </li>
-                  <li>
-                    Within the database, create a table and configure it to be public, promote
-                    changes in realtime and has no row protection:
-                    <pre>
-                      <code>{`-- Create table
-create table todos (
-  id serial primary key,
-  task text
-);
--- Turn off row-level security
-alter table "todos"
-disable row level security;
--- Allow anonymous access
-create policy "Allow anonymous access"
-on todos
-for select
-to anon
-using (true);`}</code>
-                    </pre>
-                  </li>
-                  <li>Fill in the url and key in the fields below and press "connect".</li>
-                </ul>
-              </details>
+              <Show when={error()}><p>{error()}</p></Show>
               <p>
                 <label>
-                  DB
-                  <select>
-                    <option value="supabase">SupaBase</option>
-                  </select>
+                  Email <input type="email" onInput={() => setError('')} />
                 </label>
               </p>
               <p>
                 <label>
-                  Client URL <input type="url" />
+                  Password <input type="password" />
                 </label>
               </p>
-              <p>
-                <label>
-                  Client Key <input type="password" />
-                </label>
-              </p>
-              <button class="btn" onClick={connect}>
-                Connect
-              </button>
+              <button class="btn" onClick={login}>sign in</button>
+              <button class="btn" onClick={register}>sign up</button>
             </>
           }
         >
-          {(client: SupabaseClient) => <TodoList client={client} />}
+          <TodoList
+            client={client}
+            logout={() => { setSession(undefined); client.auth.signOut(); }}
+          />
         </Show>
       </div>
     </div>

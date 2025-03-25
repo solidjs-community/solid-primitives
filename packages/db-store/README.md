@@ -29,6 +29,7 @@ pnpm add @solid-primitives/db-store
 const [dbStore, setDbStore] = createDbStore({
   adapter: supabaseAdapter(client),
   table: "todos",
+  defaultFields: ['id', 'userid']
   filter: ({ userid }) => userid === user.id,
   onError: handleErrors,
 });
@@ -42,9 +43,11 @@ The store is automatically initialized and optimistically updated both ways. Due
 > [!NOTE]
 > It can take some time for the database editor to show updates. They are processed a lot faster.
 
-### Setting preliminary IDs
+### Handling default fields
 
-The `id` field needs to be set by the database, so even if you set it, it needs to be overwritten in any case. It is not required to set it for your fields manually; one can also treat its absence as a sign that an insertion is not yet done in the database.
+The `id` field needs to be set by the database, so even if you set it, it needs to be overwritten in any case. There might be other fields that the server sets by default, e.g. a user ID. It is not required to set those for your rows manually; one can also treat its absence as a sign that an insertion is not yet done in the database.
+
+By default, only 'id' is handled as default field. If you have additional default fields, you need to use the `defaultField` option to convey them; otherwise default fields not set by the client might break the reconciliation of newly added fields.
 
 ### Handling errors
 
