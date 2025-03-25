@@ -164,5 +164,5 @@ export const getPositionToScreen = isServer
   ? (): Position => DEFAULT_MOUSE_POSITION
   : (pageX: number, pageY: number): Position => ({
       x: pageX - window.scrollX,
-      y: pageY - window.screenY,
+      y: pageY - window.scrollY,
     });
