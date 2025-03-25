@@ -3,12 +3,12 @@ import { createDbStore, supabaseAdapter, DbRow, DbStoreError } from "../src/inde
 import { AuthResponse, createClient, Session, SupabaseClient } from "@supabase/supabase-js";
 import { reconcile } from "solid-js/store";
 
-const TodoList = (props: { client: SupabaseClient, logout: () => void }) => {
+const TodoList = (props: { client: SupabaseClient; logout: () => void }) => {
   const [error, setError] = createSignal<DbStoreError<DbRow>>();
   (globalThis as any).supabaseClient = props.client;
   const [todos, setTodos] = createDbStore({
     adapter: supabaseAdapter({ client: props.client, table: "todos" }),
-    defaultFields: ['id', 'user_id'],
+    defaultFields: ["id", "user_id"],
     onError: setError,
   });
   const [edit, setEdit] = createSignal<DbRow>();
@@ -79,16 +79,12 @@ const TodoList = (props: { client: SupabaseClient, logout: () => void }) => {
 
 const App: Component = () => {
   // these are public keys that will end up in the client in any case:
-  const client = 
-    createClient(
-      import.meta.env.VITE_SUPABASE_URL,
-      import.meta.env.VITE_SUPABASE_KEY  
-    );
+  const client = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_KEY);
   const [session, setSession] = createSignal<Session>();
-  const [error, setError] = createSignal('');
+  const [error, setError] = createSignal("");
   const handleAuthPromise = ({ error, data }: AuthResponse) => {
     if (error) {
-      setError(error.toString())
+      setError(error.toString());
     } else {
       setSession(data.session ?? undefined);
     }
@@ -96,22 +92,24 @@ const App: Component = () => {
   onMount(() => client.auth.refreshSession().then(handleAuthPromise));
   const login = () => {
     const email = (document.querySelector('[type="email"]') as HTMLInputElement | null)?.value;
-    const password = (document.querySelector('[type="password"]') as HTMLInputElement | null)?.value;
+    const password = (document.querySelector('[type="password"]') as HTMLInputElement | null)
+      ?.value;
     if (!email || !password) {
-      setError('please provide an email and password');
+      setError("please provide an email and password");
       return;
     }
     client.auth.signInWithPassword({ email, password }).then(handleAuthPromise);
   };
   const register = () => {
     const email = (document.querySelector('[type="email"]') as HTMLInputElement | null)?.value;
-    const password = (document.querySelector('[type="password"]') as HTMLInputElement | null)?.value;
+    const password = (document.querySelector('[type="password"]') as HTMLInputElement | null)
+      ?.value;
     if (!email || !password) {
-      setError('please provide an email and password');
+      setError("please provide an email and password");
       return;
     }
     client.auth.signUp({ email, password }).then(handleAuthPromise);
-  }
+  };
 
   return (
     <div class="box-border flex min-h-screen w-full flex-col items-center justify-center space-y-4 bg-gray-800 p-24 text-white">
@@ -121,10 +119,12 @@ const App: Component = () => {
           when={session()}
           fallback={
             <>
-              <Show when={error()}><p>{error()}</p></Show>
+              <Show when={error()}>
+                <p>{error()}</p>
+              </Show>
               <p>
                 <label>
-                  Email <input type="email" onInput={() => setError('')} />
+                  Email <input type="email" onInput={() => setError("")} />
                 </label>
               </p>
               <p>
@@ -132,14 +132,21 @@ const App: Component = () => {
                   Password <input type="password" />
                 </label>
               </p>
-              <button class="btn" onClick={login}>sign in</button>
-              <button class="btn" onClick={register}>sign up</button>
+              <button class="btn" onClick={login}>
+                sign in
+              </button>
+              <button class="btn" onClick={register}>
+                sign up
+              </button>
             </>
           }
         >
           <TodoList
             client={client}
-            logout={() => { setSession(undefined); client.auth.signOut(); }}
+            logout={() => {
+              setSession(undefined);
+              client.auth.signOut();
+            }}
           />
         </Show>
       </div>

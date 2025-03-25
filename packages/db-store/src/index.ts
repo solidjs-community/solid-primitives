@@ -69,7 +69,9 @@ const supabaseHandleError =
         )
       : Promise.resolve();
 
-export const supabaseAdapter = <Row extends DbRow>(opts: DbAdapterOptions<Row, { schema?: string }>): DbAdapter<Row> => {
+export const supabaseAdapter = <Row extends DbRow>(
+  opts: DbAdapterOptions<Row, { schema?: string }>,
+): DbAdapter<Row> => {
   const [insertSignal, setInsertSignal] = createSignal<DbAdapterUpdate<Row>>();
   const [updateSignal, setUpdateSignal] = createSignal<DbAdapterUpdate<Row>>();
   const [deleteSignal, setDeleteSignal] = createSignal<DbAdapterUpdate<Row>>();
@@ -119,7 +121,7 @@ export const supabaseAdapter = <Row extends DbRow>(opts: DbAdapterOptions<Row, {
 export type DbStoreOptions<Row extends DbRow> = {
   adapter: DbAdapter<Row>;
   init?: Row[];
-  defaultFields?: readonly string[]; 
+  defaultFields?: readonly string[];
   equals?: (a: unknown, b: unknown) => boolean;
   onError?: (err: DbStoreError<Row>) => void;
 };
@@ -131,7 +133,7 @@ export const createDbStore = <Row extends DbRow>(
   const [dbStore, setDbStore] = createStore<Row[]>(opts.init || []);
   const [dbInit, { refetch }] = createResource(opts.adapter.init);
   const equals = opts.equals || ((a, b) => a === b);
-  const defaultFields = opts.defaultFields || ['id'];
+  const defaultFields = opts.defaultFields || ["id"];
   const onError = (error: DbStoreError<Row>) => {
     if (typeof opts.onError === "function") {
       opts.onError(error);
@@ -152,11 +154,17 @@ export const createDbStore = <Row extends DbRow>(
     on(opts.adapter.insertSignal, inserted => {
       if (!inserted?.new?.id) return;
       for (const row of insertions.values()) {
-        if (Object.entries(inserted.new).some(([key, value]) => !defaultFields.includes(key) && row[key] !== value))
+        if (
+          Object.entries(inserted.new).some(
+            ([key, value]) => !defaultFields.includes(key) && row[key] !== value,
+          )
+        )
           continue;
         const index = untrack(() =>
           dbStore.findIndex(cand =>
-            Object.entries(cand).every(([key, value]) => defaultFields.includes(key) || row[key] == value),
+            Object.entries(cand).every(
+              ([key, value]) => defaultFields.includes(key) || row[key] == value,
+            ),
           ),
         );
         if (index !== -1) {
