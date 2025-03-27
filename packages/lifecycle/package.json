@@ -19,7 +19,7 @@
     "list": [
       "createIsMounted",
       "isHydrated",
-      "onConnect"
+      "onElementConnect"
     ],
     "category": "Reactivity"
   },
