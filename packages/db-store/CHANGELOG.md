@@ -1,5 +1,12 @@
 # @solid-primitives/db-store
 
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies [9914bfc]
+  - @solid-primitives/resource@0.4.1
+
 ## 1.1.0
 
 ### Minor Changes
