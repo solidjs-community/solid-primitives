@@ -298,7 +298,8 @@ export function createDeepSignal<T>(v?: T): Signal<T> {
   return [
     () => store[0],
     (update: T) => (
-      setStore(0, reconcile(typeof update === "function" ? update(unwrap(store[0])) : v)), store[0]
+      setStore(0, reconcile(typeof update === "function" ? update(unwrap(store[0])) : update)),
+      store[0]
     ),
   ] as Signal<T>;
 }

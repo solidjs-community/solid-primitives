@@ -419,4 +419,26 @@ describe("createDeepSignal", () => {
         return run + 1;
       });
     }));
+  test("mutates the resource with callback", () =>
+    testEffect(done => {
+      const [data, { mutate }] = createResource(() => ({ counter: 1 }), {
+        storage: createDeepSignal,
+      });
+      mutate(() => ({ counter: 2 }));
+      createEffect(() => {
+        expect(data()?.counter).toBe(2);
+        done();
+      });
+    }));
+  test("mutates the resource with plain object", () =>
+    testEffect(done => {
+      const [data, { mutate }] = createResource(() => ({ counter: 1 }), {
+        storage: createDeepSignal,
+      });
+      mutate({ counter: 2 });
+      createEffect(() => {
+        expect(data()?.counter).toBe(2);
+        done();
+      });
+    }));
 });
