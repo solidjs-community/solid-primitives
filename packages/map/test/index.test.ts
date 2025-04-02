@@ -378,6 +378,45 @@ describe("ReactiveMap", () => {
 
     dispose();
   });
+  test(".clear() notifies only listeners of existing members", () =>
+    createRoot(dispose => {
+      const map = new ReactiveMap([
+        [1, "a"],
+        [2, "b"],
+        [3, "c"],
+      ]);
+
+      const existingKey = vi.fn();
+      createComputed(() => existingKey(map.has(2)));
+
+      const existingValue = vi.fn();
+      createComputed(() => existingValue(map.get(2)));
+
+      const nonexistingKey = vi.fn();
+      createComputed(() => nonexistingKey(map.has(4)));
+
+      const nonexistingValue = vi.fn();
+      createComputed(() => nonexistingValue(map.get(4)));
+
+      expect(existingKey).toHaveBeenNthCalledWith(1, true);
+      expect(existingValue).toHaveBeenNthCalledWith(1, "b");
+
+      expect(nonexistingKey).toHaveBeenNthCalledWith(1, false);
+      expect(nonexistingValue).toHaveBeenNthCalledWith(1, undefined);
+
+      map.clear();
+
+      expect(existingKey).toHaveBeenCalledTimes(2);
+      expect(existingKey).toHaveBeenNthCalledWith(2, false);
+
+      expect(existingValue).toHaveBeenCalledTimes(2);
+      expect(existingValue).toHaveBeenNthCalledWith(2, undefined);
+
+      expect(nonexistingKey).toHaveBeenCalledTimes(1);
+      expect(nonexistingValue).toHaveBeenCalledTimes(1);
+
+      dispose();
+    }));
 });
 
 describe("ReactiveWeakMap", () => {
