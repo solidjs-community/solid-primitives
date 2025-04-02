@@ -120,14 +120,17 @@ export class ReactiveMap<K, V> extends Map<K, V> {
   }
 
   clear(): void {
-    if (super.size) {
-      super.clear();
+    if (super.size === 0) return;
+    batch(() => {
+      this.#keyTriggers.dirty($OBJECT);
+      this.#valueTriggers.dirty($OBJECT);
+      for (const key of super.keys()) {
+        this.#keyTriggers.dirty(key);
+        this.#valueTriggers.dirty(key);
+      }
 
-      batch(() => {
-        this.#keyTriggers.dirtyAll();
-        this.#valueTriggers.dirtyAll();
-      });
-    }
+      super.clear();
+    });
   }
 }
 

@@ -88,13 +88,14 @@ export class ReactiveSet<T> extends Set<T> {
   }
 
   clear(): void {
-    if (super.size) {
+    if (!super.size) return;
+    batch(() => {
+      this.#triggers.dirty($KEYS);
+      for (const member of super.values()) {
+        this.#triggers.dirty(member);
+      }
       super.clear();
-
-      batch(() => {
-        this.#triggers.dirtyAll();
-      });
-    }
+    });
   }
 }
 
