@@ -1,6 +1,6 @@
 import { expect, describe, it } from "vitest";
 import { createComputed, createRoot, createSignal, onCleanup } from "solid-js";
-import { repeat } from "../src/index.js";
+import { Repeat, repeat } from "../src/index.js";
 
 describe("repeat", () => {
   it("maps only added items", () =>
@@ -82,4 +82,41 @@ describe("repeat", () => {
       setLength(3);
       expect(mapped(), "mapped after dispose").toEqual(["fb"]);
     }));
+});
+
+describe("<Repeat/>", () => {
+  it("notifies observers on length change", () => {
+    const [length, setLength] = createSignal(3);
+
+    const [dispose, accessor] = createRoot(dispose => {
+      const accessor = Repeat({
+        get times() {
+          return length();
+        },
+        fallback: () => 0,
+        children: () => 1,
+      }) as never as () => {};
+      return [dispose, accessor];
+    });
+
+    let notifications = 0;
+    createComputed(() => {
+      accessor();
+      notifications++;
+    });
+
+    expect(notifications).toEqual(1);
+    setLength(4);
+    expect(notifications).toEqual(2);
+    setLength(0);
+    expect(notifications).toEqual(3);
+    setLength(2);
+    expect(notifications).toEqual(4);
+    setLength(1);
+    expect(notifications).toEqual(5);
+    setLength(1.5);
+    expect(notifications).toEqual(5);
+
+    dispose();
+  });
 });
