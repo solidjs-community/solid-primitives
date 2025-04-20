@@ -54,7 +54,7 @@ export function repeat<T>(
       const diff = prevLen - len;
       if (diff > 0) {
         for (let i = prevLen - 1; i >= len; i--) disposers[i]!();
-        items.splice(len, diff);
+        items = items.slice(0, len);
         disposers.splice(len, diff);
         return items;
       }
