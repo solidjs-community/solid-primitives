@@ -182,6 +182,29 @@ describe("ReactiveSet", () => {
 
     dispose();
   });
+
+  test("clear notifies only listeners of existing members", () =>
+    createRoot(dispose => {
+      const set = new ReactiveSet([1, 2, 3, 4]);
+
+      const existing = vi.fn();
+      createComputed(() => existing(set.has(2)));
+
+      const nonexisting = vi.fn();
+      createComputed(() => nonexisting(set.has(5)));
+
+      expect(existing).toHaveBeenNthCalledWith(1, true);
+      expect(nonexisting).toHaveBeenNthCalledWith(1, false);
+
+      set.clear();
+
+      expect(existing).toHaveBeenCalledTimes(2);
+      expect(existing).toHaveBeenNthCalledWith(2, false);
+
+      expect(nonexisting).toHaveBeenCalledTimes(1);
+
+      dispose();
+    }));
 });
 
 describe("ReactiveWeakSet", () => {
