@@ -24,7 +24,7 @@ export function repeat<T>(
   options: { fallback?: Accessor<T> } = {},
 ): Accessor<T[]> {
   let prev: readonly T[] = [];
-  let prevLen = 0;
+  let prevLen: number | undefined;
   const disposers: (() => void)[] = [];
   onCleanup(() => {
     for (let index = 0; index < disposers.length; index++) {
@@ -75,7 +75,7 @@ export function repeat<T>(
     const next = prev.slice(0, len);
 
     // Create new elements as needed
-    for (let index = prevLen; index < len; index++) {
+    for (let index = prevLen ?? 0; index < len; index++) {
       next[index] = createRoot(dispose => {
         disposers[index] = dispose;
         return mapFn(index);

@@ -82,6 +82,17 @@ describe("repeat", () => {
       setLength(3);
       expect(mapped(), "mapped after dispose").toEqual(["fb"]);
     }));
+
+  it("uses fallback when length is initially 0", () =>
+    createRoot(disposer => {
+      const map = repeat(
+        () => 0,
+        i => i,
+        { fallback: () => NaN },
+      );
+      expect(map()).toEqual([NaN]);
+      disposer();
+    }));
 });
 
 describe("<Repeat/>", () => {
