@@ -26,12 +26,9 @@ export function tauriStorage(
       }
       return api._store;
     },
-    getItem: async (key: string) =>
-      (await (await api._getStore()).get(key)) ?? null,
-    setItem: async (key: string, value: string) =>
-      await (await api._getStore()).set(key, value),
-    removeItem: async (key: string) =>
-      await (await api._getStore()).delete(key),
+    getItem: async (key: string) => (await (await api._getStore()).get(key)) ?? null,
+    setItem: async (key: string, value: string) => await (await api._getStore()).set(key, value),
+    removeItem: async (key: string) => await (await api._getStore()).delete(key),
     clear: async () => await (await api._getStore()).clear(),
     key: async (index: number) => (await (await api._getStore()).keys())[index],
     getLength: async () => (await api._getStore()).length(),
