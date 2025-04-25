@@ -14,7 +14,7 @@ import { AsyncStorage } from "@solid-primitives/storage";
  */
 export function tauriStorage(
   name = "solid-storage.dat",
-  options: StoreOptions,
+  options: StoreOptions = {},
 ) {
   const api: AsyncStorage = {
     _store: null,
