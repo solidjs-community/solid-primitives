@@ -1,9 +1,10 @@
-import { AsyncStorage } from "./persisted.js";
+import type { StoreOptions } from "@tauri-apps/plugin-store";
+import { AsyncStorage } from "@solid-primitives/storage";
 
 /**
  * tauriStorage: an asynchronous Storage API based on tauri-plugin-store
  *
- * requires store permissions to be set: https://beta.tauri.app/features/store/
+ * requires store permissions to be set: https://tauri.app/plugin/store/
  *
  * In order to use in a isomorphic setting (web/tauri), use:
  * ```ts
@@ -11,15 +12,26 @@ import { AsyncStorage } from "./persisted.js";
  * const storage = isFallback ? localStorage : tauriStorage();
  * ````
  */
-export function tauriStorage(name = "solid-storage.dat") {
+export function tauriStorage(
+  name = "solid-storage.dat",
+  options: StoreOptions,
+) {
   const api: AsyncStorage = {
     _store: null,
-    _getStore: async () =>
-      // @ts-ignore
-      api._store || (api._store = new (await import("@tauri-apps/plugin-store")).Store(name)),
-    getItem: async (key: string) => (await (await api._getStore()).get(key)) ?? null,
-    setItem: async (key: string, value: string) => await (await api._getStore()).set(key, value),
-    removeItem: async (key: string) => await (await api._getStore()).delete(key),
+    _getStore: async () => {
+      if (!api._store) {
+        // @ts-ignore
+        const store = await import("@tauri-apps/plugin-store");
+        api._store = await store.load(name, options);
+      }
+      return api._store;
+    },
+    getItem: async (key: string) =>
+      (await (await api._getStore()).get(key)) ?? null,
+    setItem: async (key: string, value: string) =>
+      await (await api._getStore()).set(key, value),
+    removeItem: async (key: string) =>
+      await (await api._getStore()).delete(key),
     clear: async () => await (await api._getStore()).clear(),
     key: async (index: number) => (await (await api._getStore()).keys())[index],
     getLength: async () => (await api._getStore()).length(),
