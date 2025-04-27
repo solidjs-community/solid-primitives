@@ -1,5 +1,11 @@
 # @solid-primitives/resource
 
+## 0.4.1
+
+### Patch Changes
+
+- 9914bfc: Fix setter input value in `createDeepSignal`.
+
 ## 0.4.0
 
 ### Minor Changes

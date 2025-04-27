@@ -1,5 +1,11 @@
 # @solid-primitives/mouse
 
+## 2.1.1
+
+### Patch Changes
+
+- 8fe4e2a: Use `scrollY` not `screenY` in `getPositionToScreen`
+
 ## 2.1.0
 
 ### Minor Changes
