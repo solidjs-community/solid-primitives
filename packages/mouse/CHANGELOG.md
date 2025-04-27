@@ -1,5 +1,17 @@
 # @solid-primitives/mouse
 
+## 2.1.2
+
+### Patch Changes
+
+- 53f08cc: fix: Move `"@solid-primitives/source"` export condition under import in package.json
+  (Fixes #774, Fixes #749)
+- Updated dependencies [53f08cc]
+  - @solid-primitives/event-listener@2.4.1
+  - @solid-primitives/static-store@0.1.1
+  - @solid-primitives/rootless@1.5.1
+  - @solid-primitives/utils@6.3.1
+
 ## 2.1.1
 
 ### Patch Changes

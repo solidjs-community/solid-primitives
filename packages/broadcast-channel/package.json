@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/broadcast-channel",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Primitives to manage Broadcast Channel API",
   "author": "Caleb Taylor <aquaductape@gmail.com>",
   "contributors": [],

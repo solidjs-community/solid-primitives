@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/transition-group",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Reactive primitives for implementing transition effects in SolidJS",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],

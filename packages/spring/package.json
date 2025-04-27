@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/spring",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Primitive that creates spring physics functions.",
   "author": "Carlo Taleon <carloantonioct@gmail.com>",
   "contributors": [
