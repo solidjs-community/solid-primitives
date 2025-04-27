@@ -1,4 +1,4 @@
-import { Accessor, JSX, createMemo, createRoot, onCleanup, untrack } from "solid-js";
+import { Accessor, JSX, createMemo, createRoot, onCleanup } from "solid-js";
 import { toFunction } from "./common.js";
 
 /**
@@ -23,60 +23,68 @@ export function repeat<T>(
   mapFn: (i: number) => T,
   options: { fallback?: Accessor<T> } = {},
 ): Accessor<T[]> {
-  let disposers: (() => void)[] = [],
-    items: T[] = [],
-    prevLen = 0;
-
-  onCleanup(() => disposers.forEach(f => f()));
-
-  const mapLength = (len: number): T[] => {
-    if (len === 0) {
-      disposers.forEach(f => f());
-
-      if (options.fallback)
-        return createRoot(dispose => {
-          disposers = [dispose];
-          return (items = [options.fallback!()]);
-        });
-
-      disposers = [];
-      return (items = []);
+  let prev: readonly T[] = [];
+  let prevLen: number | undefined;
+  const disposers: (() => void)[] = [];
+  onCleanup(() => {
+    for (let index = 0; index < disposers.length; index++) {
+      disposers[index]!();
     }
+  });
 
-    if (prevLen === 0) {
-      // after fallback case:
-      if (disposers[0]) disposers[0]();
-      for (let i = 0; i < len; i++) items[i] = createRoot(mapper.bind(void 0, i));
-      return items;
-    }
+  // Truncate toward zero and force positive
+  const memoLen = createMemo(() => Math.max(times() | 0, 0));
 
-    {
-      const diff = prevLen - len;
-      if (diff > 0) {
-        for (let i = prevLen - 1; i >= len; i--) disposers[i]!();
-        items.splice(len, diff);
-        disposers.splice(len, diff);
-        return items;
+  return function mapLength(): T[] {
+    const len = memoLen();
+    if (len === prevLen) return prev as T[];
+
+    // Dispose of fallback or unnecessarry elements
+    if (prevLen === 0) disposers[0]?.();
+    else {
+      for (let index = len; index < disposers.length; index++) {
+        disposers[index]!();
       }
     }
 
-    for (let i = prevLen; i < len; i++) items[i] = createRoot(mapper.bind(void 0, i));
-    return items;
-  };
+    // The following prefers to use `prev.slice` to
+    // preserve any array element kind optimizations
+    // the runtime has made.
 
-  const mapper = (index: number, dispose: () => void): T => {
-    disposers[index] = dispose;
-    return mapFn(index);
-  };
+    if (len === 0) {
+      const fallback = options.fallback;
+      if (fallback) {
+        // Show fallback if available
+        const next = prev.slice(0, 1);
+        next[0] = createRoot(dispose => {
+          disposers[0] = dispose;
+          return fallback();
+        });
 
-  const memoLen = createMemo(() => Math.floor(Math.max(times(), 0)));
-  return () => {
-    const len = memoLen();
-    return untrack(() => {
-      const newItems = mapLength(len);
-      prevLen = len;
-      return newItems;
-    });
+        disposers.length = 1;
+        prevLen = 0;
+        return (prev = next);
+      } else {
+        // Show empty array, otherwise
+        disposers.length = 0;
+        prevLen = 0;
+        return (prev = prev.slice(0, 0));
+      }
+    }
+
+    const next = prev.slice(0, len);
+
+    // Create new elements as needed
+    for (let index = prevLen ?? 0; index < len; index++) {
+      next[index] = createRoot(dispose => {
+        disposers[index] = dispose;
+        return mapFn(index);
+      });
+    }
+
+    disposers.length = len;
+    prevLen = len;
+    return (prev = next);
   };
 }
 
