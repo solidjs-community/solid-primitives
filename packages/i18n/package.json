@@ -36,8 +36,8 @@
   "browser": {},
   "types": "./dist/index.d.ts",
   "exports": {
-    "@solid-primitives/source": "./src/index.ts",
     "import": {
+      "@solid-primitives/source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }

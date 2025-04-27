@@ -29,9 +29,9 @@
   "browser": {},
   "typesVersions": {},
   "exports": {
-    "@solid-primitives/source": "./src/index.tsx",
-    "solid": "./dist/index.jsx",
     "import": {
+      "@solid-primitives/source": "./src/index.tsx",
+      "solid": "./dist/index.jsx",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
