@@ -1,5 +1,11 @@
 # @solid-primitives/map
 
+## 0.7.0
+
+### Minor Changes
+
+- 1d1c686: Avoid notifying non-existent members on Map.clear()
+
 ## 0.6.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @solid-primitives/set
 
+## 0.7.0
+
+### Minor Changes
+
+- 4de408a: Avoid notifying non-existent members on Set.clear()
+
 ## 0.6.0
 
 ### Minor Changes

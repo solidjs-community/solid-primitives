@@ -1,5 +1,11 @@
 # @solid-primitives/range
 
+## 0.2.1
+
+### Patch Changes
+
+- b3d3815: repeat now returns clones of its result instead of mutating
+
 ## 0.2.0
 
 ### Minor Changes
