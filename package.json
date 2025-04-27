@@ -16,7 +16,7 @@
     "format": "prettier --cache -w {site,packages,scripts,template}/**/*.{js,ts,json,css,tsx,jsx,md,html}",
     "lint:packages": "eslint --max-warnings 0 \"packages/*/src/**/*\"",
     "lint:tests": "eslint \"packages/*/test/**\" --rule \"no-only-tests/no-only-tests: error\"",
-    "lint": "pnpm run \"/^lint:.*/\"",  
+    "lint": "pnpm run \"/^lint:.*/\"",
     "test:client": "vitest -c ./configs/vitest.config.ts",
     "test:ssr": "pnpm run test:client --mode ssr",
     "test": "pnpm run test:client && pnpm run test:ssr",
@@ -57,7 +57,7 @@
     "vite-plugin-solid": "^2.10.2",
     "vitest": "^2.1.0"
   },
-  "packageManager": "pnpm@9.9.0",
+  "packageManager": "pnpm@10.9.0",
   "engines": {
     "node": ">=20.0.0"
   }
