@@ -1,5 +1,12 @@
 # @solid-primitives/utils
 
+## 6.3.1
+
+### Patch Changes
+
+- 53f08cc: fix: Move `"@solid-primitives/source"` export condition under import in package.json
+  (Fixes #774, Fixes #749)
+
 ## 6.3.0
 
 ### Minor Changes

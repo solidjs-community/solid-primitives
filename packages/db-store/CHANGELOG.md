@@ -1,5 +1,14 @@
 # @solid-primitives/db-store
 
+## 1.1.2
+
+### Patch Changes
+
+- 53f08cc: fix: Move `"@solid-primitives/source"` export condition under import in package.json
+  (Fixes #774, Fixes #749)
+- Updated dependencies [53f08cc]
+  - @solid-primitives/resource@0.4.2
+
 ## 1.1.1
 
 ### Patch Changes

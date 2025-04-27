@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/cookies",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A set of primitives for handling cookies in solid",
   "author": "Thomas Beer (https://github.com/Tommypop2)",
   "contributors": [

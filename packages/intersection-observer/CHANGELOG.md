@@ -1,5 +1,14 @@
 # @solid-primitives/intersection-observer
 
+## 2.2.1
+
+### Patch Changes
+
+- 53f08cc: fix: Move `"@solid-primitives/source"` export condition under import in package.json
+  (Fixes #774, Fixes #749)
+- Updated dependencies [53f08cc]
+  - @solid-primitives/utils@6.3.1
+
 ## 2.2.0
 
 ### Minor Changes

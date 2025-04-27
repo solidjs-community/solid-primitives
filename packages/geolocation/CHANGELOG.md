@@ -1,5 +1,15 @@
 # @solid-primitives/geolocation
 
+## 1.5.1
+
+### Patch Changes
+
+- 53f08cc: fix: Move `"@solid-primitives/source"` export condition under import in package.json
+  (Fixes #774, Fixes #749)
+- Updated dependencies [53f08cc]
+  - @solid-primitives/static-store@0.1.1
+  - @solid-primitives/utils@6.3.1
+
 ## 1.5.0
 
 ### Minor Changes
