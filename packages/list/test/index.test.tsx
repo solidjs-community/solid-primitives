@@ -302,4 +302,45 @@ describe("List", () => {
     unmount();
     document.body.removeChild(container);
   });
+
+  test("later used signal reports correct values", () => {
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+
+    const startingArray = [1, 2, 3];
+    const [s, set] = createSignal(startingArray);
+    const callbacks: (() => { v: number; i: number })[] = [];
+    const unmount = render(
+      () => (
+        <List each={s()}>
+          {(v, i) => {
+            // this could be event callback (eg. onClick), v & i read only later
+            function futureAction() {
+              return {
+                v: v(),
+                i: i(),
+              };
+            }
+            callbacks.push(() => futureAction());
+
+            return <div>No signals used in this fn</div>;
+          }}
+        </List>
+      ),
+      container,
+    );
+
+    set([2, 1, 4]); // swap 1,2 & replace 3 with 4 (swap for index update, replace for value update)
+
+    // get entries, sort by index & check values in order
+    const values = callbacks
+      .map(x => x())
+      .sort((a, b) => a.i - b.i)
+      .map(x => x.v);
+
+    expect(values).toStrictEqual([2, 1, 4]);
+
+    unmount();
+    document.body.removeChild(container);
+  });
 });
