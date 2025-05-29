@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/list",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A List component, an alternative to For and Index.",
   "author": "Maciek50322 <34212298+maciek50322@users.noreply.github.com>",
   "contributors": [],
