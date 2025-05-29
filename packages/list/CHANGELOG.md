@@ -1,5 +1,11 @@
 # @solid-primitives/list
 
+## 0.1.2
+
+### Patch Changes
+
+- Fix signal reporting wrong value when used only after changes.
+
 ## 0.1.1
 
 ### Patch Changes
