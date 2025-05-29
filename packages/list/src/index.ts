@@ -168,32 +168,20 @@ export function listArray<T, U>(
     item.valueSetter?.(newValueGetter);
   }
   function mapper(disposer: () => void) {
-    const t: ListItem<T> = {
-        value: newValue,
-        index: i,
-        disposer,
-      },
-      scopedV = newValue,
-      scopedI = i;
-    items.push(t);
-    // signal created when used
-    let sV: Accessor<T> = () => {
-        [sV, t.valueSetter] = isDev
-          ? createSignal(scopedV, { name: "value" })
-          : createSignal(scopedV);
-        return sV();
-      },
-      sI: Accessor<number> = () => {
-        [sI, t.indexSetter] = isDev
-          ? createSignal(scopedI, { name: "index" })
-          : createSignal(scopedI);
-        return sI();
-      };
+    const [sV, valueSetter] = isDev
+        ? createSignal(newValue, { name: "value" })
+        : createSignal(newValue),
+      [sI, indexSetter] = isDev ? createSignal(i, { name: "index" }) : createSignal(i);
 
-    return mapFn(
-      () => sV(),
-      () => sI(),
-    );
+    items.push({
+      value: newValue,
+      index: i,
+      disposer,
+      valueSetter,
+      indexSetter,
+    });
+
+    return mapFn(sV, sI);
   }
 }
 
