@@ -1,5 +1,11 @@
 # @solid-primitives/list
 
+## 0.1.2
+
+### Patch Changes
+
+- 2f06d07: Fix for `<List>` "unused" signal returning wrong values when read only after changes. (#791)
+
 ## 0.1.1
 
 ### Patch Changes
