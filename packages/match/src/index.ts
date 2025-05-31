@@ -25,18 +25,35 @@ export function Match<
 	T extends {[k in Tag]: PropertyKey},
 	Tag extends PropertyKey,
 >(props: {
-	on:   T,
+	on:   T | null | undefined,
 	tag:  Tag,
 	case: {[K in T[Tag]]: (v: Accessor<T & {[k in Tag]: K}>) => JSX.Element},
+  partial?: false,
 }): JSX.Element
 export function Match<
 	T extends {kind: PropertyKey},
 >(props: {
-	on:   T,
+	on:   T | null | undefined,
 	case: {[K in T['kind']]: (v: Accessor<T & {[k in 'kind']: K}>) => JSX.Element},
+  partial?: false,
+}): JSX.Element
+export function Match<
+	T extends {[k in Tag]: PropertyKey},
+	Tag extends PropertyKey,
+>(props: {
+	on:   T | null | undefined,
+	tag:  Tag,
+	case: {[K in T[Tag]]?: (v: Accessor<T & {[k in Tag]: K}>) => JSX.Element},
+  partial: true,
+}): JSX.Element
+export function Match<
+	T extends {kind: PropertyKey},
+>(props: {
+	on:   T | null | undefined,
+	case: {[K in T['kind']]?: (v: Accessor<T & {[k in 'kind']: K}>) => JSX.Element},
+  partial: true,
 }): JSX.Element
 export function Match(props: any): any {
-	const kind = createMemo(() => props.on[props.tag ?? 'kind'])
-	return createMemo(() => props.case[kind()](() => props.on))
+	const kind = createMemo(() => props.on?.[props.tag ?? 'kind'])
+	return createMemo(() => props.case[kind()]?.(() => props.on))
 }
-
