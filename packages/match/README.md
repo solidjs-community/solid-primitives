@@ -28,16 +28,35 @@ Control-flow component for matching discriminated union (tagged union) members.
 
 ```tsx
 type MyUnion = {
-  kind: 'foo',
-  foo:  'foo-value',
+  kind: "foo",
+  foo:  "foo-value",
 } | {
-  kind: 'bar',
-  bar:  'bar-value',
+  kind: "bar",
+  bar:  "bar-value",
 }
 
-const [value, setValue] = s.createSignal<MyUnion>({kind: 'foo', foo: 'foo-value'})
+const [value, setValue] = createSignal<MyUnion>({kind: "foo", foo: "foo-value"})
  
 <Match on={value()} case={{
+  foo: v => <>{v().foo}</>,
+  bar: v => <>{v().bar}</>,
+}} />
+```
+
+### Changing the tag key
+
+The default tag key is `"kind"`, but it can be changed with the `tag` prop:
+
+```tsx
+type MyUnion = {
+  type: "foo",
+  foo:  "foo-value",
+} | {
+  type: "bar",
+  bar:  "bar-value",
+}
+ 
+<Match on={value()} tag="type" case={{
   foo: v => <>{v().foo}</>,
   bar: v => <>{v().bar}</>,
 }} />
