@@ -31,20 +31,11 @@ describe("listArray", () => {
 describe("List", () => {
   test("simple", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s] = createSignal(startingArray);
     const unmount = render(
-      () => (
-        <List each={s()}>
-          {(v, i) => (
-            <div>
-              {i()}: {v() * 2}
-            </div>
-          )}
-        </List>
-      ),
+      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
       container,
     );
 
@@ -53,25 +44,15 @@ describe("List", () => {
     });
 
     unmount();
-    document.body.removeChild(container);
   });
 
   test("doesn't change for same values", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
     const unmount = render(
-      () => (
-        <List each={s()}>
-          {(v, i) => (
-            <div>
-              {i()}: {v() * 2}
-            </div>
-          )}
-        </List>
-      ),
+      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
       container,
     );
 
@@ -89,25 +70,15 @@ describe("List", () => {
     });
 
     unmount();
-    document.body.removeChild(container);
   });
 
   test("reorders elements", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
     const unmount = render(
-      () => (
-        <List each={s()}>
-          {(v, i) => (
-            <div>
-              {i()}: {v() * 2}
-            </div>
-          )}
-        </List>
-      ),
+      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
       container,
     );
 
@@ -132,25 +103,15 @@ describe("List", () => {
     expect(oldMapped[3]).toBe(newMapped[3]);
 
     unmount();
-    document.body.removeChild(container);
   });
 
   test("changes value of elements", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
     const unmount = render(
-      () => (
-        <List each={s()}>
-          {(v, i) => (
-            <div>
-              {i()}: {v() * 2}
-            </div>
-          )}
-        </List>
-      ),
+      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
       container,
     );
 
@@ -169,25 +130,15 @@ describe("List", () => {
     });
 
     unmount();
-    document.body.removeChild(container);
   });
 
   test("reorders elements with value change", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
     const unmount = render(
-      () => (
-        <List each={s()}>
-          {(v, i) => (
-            <div>
-              {i()}: {v() * 2}
-            </div>
-          )}
-        </List>
-      ),
+      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
       container,
     );
 
@@ -212,25 +163,15 @@ describe("List", () => {
     expect(oldMapped[3]).toBe(newMapped[2]);
 
     unmount();
-    document.body.removeChild(container);
   });
 
   test("creates new elements", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
     const unmount = render(
-      () => (
-        <List each={s()}>
-          {(v, i) => (
-            <div>
-              {i()}: {v() * 2}
-            </div>
-          )}
-        </List>
-      ),
+      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
       container,
     );
 
@@ -257,25 +198,15 @@ describe("List", () => {
     expect(oldMapped.includes(newMapped[3]!)).toEqual(false);
 
     unmount();
-    document.body.removeChild(container);
   });
 
   test("deletes unused elements", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
     const unmount = render(
-      () => (
-        <List each={s()}>
-          {(v, i) => (
-            <div>
-              {i()}: {v() * 2}
-            </div>
-          )}
-        </List>
-      ),
+      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
       container,
     );
 
@@ -300,32 +231,22 @@ describe("List", () => {
     expect(newMapped.includes(oldMapped[2]!)).toEqual(false);
 
     unmount();
-    document.body.removeChild(container);
   });
 
   test("later used signal reports correct values", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3];
     const [s, set] = createSignal(startingArray);
     const callbacks: (() => { v: number; i: number })[] = [];
     const unmount = render(
       () => (
-        <List each={s()}>
-          {(v, i) => {
-            // this could be event callback (eg. onClick), v & i read only later
-            function futureAction() {
-              return {
-                v: v(),
-                i: i(),
-              };
-            }
-            callbacks.push(() => futureAction());
+        <List each={s()}>{(v, i) => {
+          // this could be event callback (eg. onClick), v & i read only later
+          callbacks.push(() => ({ v: v(), i: i() }))
 
-            return <div>No signals used in this fn</div>;
-          }}
-        </List>
+          return null
+        }}</List>
       ),
       container,
     );
@@ -341,6 +262,5 @@ describe("List", () => {
     expect(values).toStrictEqual([2, 1, 4]);
 
     unmount();
-    document.body.removeChild(container);
   });
 });
