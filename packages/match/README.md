@@ -36,7 +36,7 @@ type MyUnion = {
 }
 
 const [value, setValue] = createSignal<MyUnion>({kind: "foo", foo: "foo-value"})
- 
+
 <Match on={value()} case={{
   foo: v => <>{v().foo}</>,
   bar: v => <>{v().bar}</>,
@@ -60,6 +60,28 @@ type MyUnion = {
   foo: v => <>{v().foo}</>,
   bar: v => <>{v().bar}</>,
 }} />
+```
+
+### Partial matching
+
+Use the `partial` prop to only handle some of the union members:
+
+```tsx
+<Match partial on={value()} case={{
+  foo: v => <>{v().foo}</>,
+  // bar case is not handled
+}} />
+```
+
+### Fallback
+
+Provide a fallback element when no match is found or the value is `null`/`undefined`:
+
+```tsx
+<Match on={value()} case={{
+  foo: v => <>{v().foo}</>,
+  bar: v => <>{v().bar}</>,
+}} fallback={<div>No match found</div>} />
 ```
 
 ## Demo
