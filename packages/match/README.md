@@ -41,6 +41,7 @@ const [value, setValue] = s.createSignal<MyUnion>({kind: 'foo', foo: 'foo-value'
   foo: v => <>{v().foo}</>,
   bar: v => <>{v().bar}</>,
 }} />
+```
 
 ## Demo
 
