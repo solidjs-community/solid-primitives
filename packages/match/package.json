@@ -17,13 +17,14 @@
     "name": "match",
     "stage": 0,
     "list": [
-      "createPrimitiveTemplate"
+      "Match"
     ],
-    "category": "Display & Media"
+    "category": "Control Flow"
   },
   "keywords": [
     "solid",
-    "primitives"
+    "primitives",
+    "union"
   ],
   "private": false,
   "sideEffects": false,
