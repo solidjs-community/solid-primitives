@@ -6,14 +6,14 @@ import { type Accessor, type JSX, createMemo } from "solid-js"
  * @example
  * ```tsx
  * type MyUnion = {
- *   kind: 'foo',
+ *   type: 'foo',
  *   foo:  'foo-value',
  * } | {
- *   kind: 'bar',
+ *   type: 'bar',
  *   bar:  'bar-value',
  * }
  * 
- * const [value, setValue] = createSignal<MyUnion>({kind: 'foo', foo: 'foo-value'})
+ * const [value, setValue] = createSignal<MyUnion>({type: 'foo', foo: 'foo-value'})
  * 
  * <Match on={value()} case={{
  *   foo: v => <>{v().foo}</>,
@@ -32,10 +32,10 @@ export function Match<
   partial?: false,
 }): JSX.Element
 export function Match<
-	T extends {kind: PropertyKey},
+	T extends {type: PropertyKey},
 >(props: {
 	on:   T | null | undefined,
-	case: {[K in T['kind']]: (v: Accessor<T & {[k in 'kind']: K}>) => JSX.Element},
+	case: {[K in T['type']]: (v: Accessor<T & {[k in 'type']: K}>) => JSX.Element},
   fallback?: JSX.Element,
   partial?: false,
 }): JSX.Element
@@ -50,14 +50,14 @@ export function Match<
   partial: true,
 }): JSX.Element
 export function Match<
-	T extends {kind: PropertyKey},
+	T extends {type: PropertyKey},
 >(props: {
 	on:   T | null | undefined,
-	case: {[K in T['kind']]?: (v: Accessor<T & {[k in 'kind']: K}>) => JSX.Element},
+	case: {[K in T['type']]?: (v: Accessor<T & {[k in 'type']: K}>) => JSX.Element},
   fallback?: JSX.Element,
   partial: true,
 }): JSX.Element
 export function Match(props: any): any {
-	const kind = createMemo(() => props.on?.[props.tag ?? 'kind'])
+	const kind = createMemo(() => props.on?.[props.tag ?? 'type'])
 	return createMemo(() => props.case[kind()]?.(() => props.on) ?? props.fallback)
 }
