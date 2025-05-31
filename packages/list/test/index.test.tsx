@@ -35,7 +35,15 @@ describe("List", () => {
     const startingArray = [1, 2, 3, 4];
     const [s] = createSignal(startingArray);
     const unmount = render(
-      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
+      () => (
+        <List each={s()}>
+          {(v, i) => (
+            <div>
+              {i()}: {v() * 2}
+            </div>
+          )}
+        </List>
+      ),
       container,
     );
 
@@ -52,7 +60,15 @@ describe("List", () => {
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
     const unmount = render(
-      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
+      () => (
+        <List each={s()}>
+          {(v, i) => (
+            <div>
+              {i()}: {v() * 2}
+            </div>
+          )}
+        </List>
+      ),
       container,
     );
 
@@ -78,7 +94,15 @@ describe("List", () => {
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
     const unmount = render(
-      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
+      () => (
+        <List each={s()}>
+          {(v, i) => (
+            <div>
+              {i()}: {v() * 2}
+            </div>
+          )}
+        </List>
+      ),
       container,
     );
 
@@ -111,7 +135,15 @@ describe("List", () => {
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
     const unmount = render(
-      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
+      () => (
+        <List each={s()}>
+          {(v, i) => (
+            <div>
+              {i()}: {v() * 2}
+            </div>
+          )}
+        </List>
+      ),
       container,
     );
 
@@ -138,7 +170,15 @@ describe("List", () => {
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
     const unmount = render(
-      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
+      () => (
+        <List each={s()}>
+          {(v, i) => (
+            <div>
+              {i()}: {v() * 2}
+            </div>
+          )}
+        </List>
+      ),
       container,
     );
 
@@ -171,7 +211,15 @@ describe("List", () => {
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
     const unmount = render(
-      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
+      () => (
+        <List each={s()}>
+          {(v, i) => (
+            <div>
+              {i()}: {v() * 2}
+            </div>
+          )}
+        </List>
+      ),
       container,
     );
 
@@ -206,7 +254,15 @@ describe("List", () => {
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
     const unmount = render(
-      () => <List each={s()}>{(v, i) => <div>{i()}: {v() * 2}</div>}</List>,
+      () => (
+        <List each={s()}>
+          {(v, i) => (
+            <div>
+              {i()}: {v() * 2}
+            </div>
+          )}
+        </List>
+      ),
       container,
     );
 
@@ -241,12 +297,14 @@ describe("List", () => {
     const callbacks: (() => { v: number; i: number })[] = [];
     const unmount = render(
       () => (
-        <List each={s()}>{(v, i) => {
-          // this could be event callback (eg. onClick), v & i read only later
-          callbacks.push(() => ({ v: v(), i: i() }))
+        <List each={s()}>
+          {(v, i) => {
+            // this could be event callback (eg. onClick), v & i read only later
+            callbacks.push(() => ({ v: v(), i: i() }));
 
-          return null
-        }}</List>
+            return null;
+          }}
+        </List>
       ),
       container,
     );
