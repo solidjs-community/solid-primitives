@@ -31,6 +31,7 @@ export default function createTween(
   target: () => number,
   { ease = (t: number) => t, duration = 100 }: TweenProps,
 ): () => number {
+  console.log('createTween invoke')
   if (isServer) {
     return target;
   }
@@ -42,6 +43,7 @@ export default function createTween(
   let cancelId: number;
 
   function tick(t: number) {
+    console.log('createTween tick', t)
     const elapsed = t - start;
 
     if (elapsed < duration) {
@@ -52,10 +54,19 @@ export default function createTween(
     }
   }
 
+
+  // effect doesn't refire when target signal updates
+  createEffect(
+    () => {
+      console.log('createTween effect on target: ', target())
+    },
+  );
+
   createEffect(
     on(
       target,
       () => {
+        console.log('createTween deferred effect')
         start = performance.now();
         startValue = current();
         delta = target() - startValue;

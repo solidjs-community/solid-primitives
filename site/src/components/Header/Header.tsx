@@ -115,11 +115,13 @@ const Header: Component = () => {
         headerOpaqueBg.style.top = "-1px";
         headerOpaqueBgContainer.style.top = "1px";
 
+        console.log("setFrom", { navMenuHeight });
         requestAnimationFrame(() => {
           setFrom(navMenuHeight);
         });
         return;
       }
+      console.log("setFrom", { navMenuHeight });
       setFrom(0);
     }),
   );
