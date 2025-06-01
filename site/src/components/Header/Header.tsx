@@ -12,7 +12,7 @@ import { isMobile, isSafari } from "@solid-primitives/platform";
 import { createScrollPosition } from "@solid-primitives/scroll";
 import { defer } from "@solid-primitives/utils";
 import Dismiss from "solid-dismiss";
-import { pageWidthClass } from "~/constants";
+import { pageWidthClass } from "~/constants.js";
 import Hamburger from "../Icons/Hamburger.js";
 import SearchBtn from "../Search/SearchBtn.js";
 import NavMenu from "./NavMenu.js";
