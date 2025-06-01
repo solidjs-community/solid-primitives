@@ -41,7 +41,7 @@ export const createSelection = (): [Accessor<HTMLSelection>, Setter<HTMLSelectio
   if (isServer) {
     return [
       () => [null, NaN, NaN],
-      sel => (typeof sel === "function" ? sel([null, NaN, NaN]) : sel),
+      sel => (typeof sel === "function" ? (sel as any)([null, NaN, NaN]) : sel),
     ];
   }
   const [getSelection, setSelection] = createSignal<HTMLSelection>([null, NaN, NaN]);

@@ -57,7 +57,7 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "devDependencies": {
-    "solid-js": "^1.8.7",
+    "solid-js": "^1.9.7",
     "solid-transition-group": "^0.2.3"
   },
   "dependencies": {

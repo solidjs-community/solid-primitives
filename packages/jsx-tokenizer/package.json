@@ -62,6 +62,6 @@
     "solid-js": "^1.6.12"
   },
   "devDependencies": {
-    "solid-js": "^1.8.7"
+    "solid-js": "^1.9.7"
   }
 }
