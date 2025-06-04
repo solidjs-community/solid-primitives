@@ -263,7 +263,7 @@ export type _E = JSX.Element;
  * @method `setEnd` allows to manually change the end
  */
 export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
-  pages: Accessor<T[]>,
+  pages: Accessor<T[]> & { loading: boolean; error: any },
   loader: (el: Element) => void,
   options: {
     page: Accessor<number>;
@@ -302,8 +302,19 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
     });
   });
 
+  const pagesWithProps = Object.defineProperties(pages, {
+    loading: {
+      get: () => contents.loading,
+      enumerable: true,
+    },
+    error: {
+      get: () => contents.error,
+      enumerable: true,
+    },
+  }) as Accessor<T[]> & { loading: boolean; error: any };
+
   return [
-    pages,
+    pagesWithProps,
     add,
     {
       page: page,
