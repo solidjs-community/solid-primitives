@@ -245,6 +245,8 @@ declare module "solid-js" {
 
 export type _E = JSX.Element;
 
+import { Accessor, batch, createComputed, createResource, createSignal, onCleanup, Resource, Setter } from 'solid-js'
+import { isServer, noop, tryOnCleanup } from '@solid-primitives/utils'
 /**
  * Provides an easy way to implement infinite scrolling.
  *
@@ -253,75 +255,75 @@ export type _E = JSX.Element;
  * ```
  * @param fetcher `(page: number) => Promise<T[]>`
  * @return `pages()` is an accessor contains array of contents
- * @property `pages.loading` is a boolean indicator for the loading state
- * @property `pages.error` contains any error encountered
  * @return `infiniteScrollLoader` is a directive used to set the loader element
  * @method `page` is an accessor that contains page number
  * @method `setPage` allows to manually change the page number
  * @method `setPages` allows to manually change the contents of the page
  * @method `end` is a boolean indicator for end of the page
+ * @method `error` contains any error encountered
  * @method `setEnd` allows to manually change the end
  */
 export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
-  pages: Accessor<T[]> & { loading: boolean; error: any },
-  loader: (el: Element) => void,
-  options: {
-    page: Accessor<number>;
-    setPage: Setter<number>;
-    setPages: Setter<T[]>;
-    end: Accessor<boolean>;
-    setEnd: Setter<boolean>;
-  },
+    pages: Accessor<T[]>,
+    loader: (el: Element) => void,
+    options: {
+        page: Accessor<number>
+        setPage: Setter<number>
+        setPages: Setter<T[]>
+        end: Accessor<boolean>
+        setEnd: Setter<boolean>
+        error: Accessor<any>
+    }
 ] {
-  const [pages, setPages] = createSignal<T[]>([]);
-  const [page, setPage] = createSignal(0);
-  const [end, setEnd] = createSignal(false);
+    const [pages, setPages] = createSignal<T[]>([])
+    const [page, setPage] = createSignal(0)
+    const [end, setEnd] = createSignal(false)
+    const [error, setError] = createSignal<any>(null)
 
-  let add: (el: Element) => void = noop;
-  if (!isServer) {
-    const io = new IntersectionObserver(e => {
-      if (e.length > 0 && e[0]!.isIntersecting && !end() && !contents.loading) {
-        setPage(p => p + 1);
-      }
-    });
-    onCleanup(() => io.disconnect());
-    add = (el: Element) => {
-      io.observe(el);
-      tryOnCleanup(() => io.unobserve(el));
-    };
-  }
+    const [contents] = createResource(page, async (p) => {
+        setError(null)
+        try {
+            const result = await fetcher(p)
+            return result
+        } catch (e) {
+            setError(e)
+            return []
+        }
+    })
 
-  const [contents] = createResource(page, fetcher);
+    createComputed(() => {
+        const content = contents()
+        if (!content) return
+        batch(() => {
+            if (content.length === 0) setEnd(true)
+            setPages((prev) => [...prev, ...content])
+        })
+    })
 
-  createComputed(() => {
-    const content = contents.latest;
-    if (!content) return;
-    batch(() => {
-      if (content.length === 0) setEnd(true);
-      setPages(p => [...p, ...content]);
-    });
-  });
+    let add: (el: Element) => void = () => {}
+    if (!isServer) {
+        const io = new IntersectionObserver((entries) => {
+            if (entries[0]?.isIntersecting && !end()) {
+                setPage((p) => p + 1)
+            }
+        })
+        onCleanup(() => io.disconnect())
+        add = (el: Element) => {
+            io.observe(el)
+            tryOnCleanup(() => io.unobserve(el))
+        }
+    }
 
-  const pagesWithProps = Object.defineProperties(pages, {
-    loading: {
-      get: () => contents.loading,
-      enumerable: true,
-    },
-    error: {
-      get: () => contents.error,
-      enumerable: true,
-    },
-  }) as Accessor<T[]> & { loading: boolean; error: any };
-
-  return [
-    pagesWithProps,
-    add,
-    {
-      page: page,
-      setPage: setPage,
-      setPages: setPages,
-      end: end,
-      setEnd: setEnd,
-    },
-  ];
+    return [
+        pages,
+        add,
+        {
+            page,
+            setPage,
+            setPages,
+            end,
+            setEnd,
+            error,
+        },
+    ]
 }
