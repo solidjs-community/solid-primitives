@@ -245,8 +245,6 @@ declare module "solid-js" {
 
 export type _E = JSX.Element;
 
-import { Accessor, batch, createComputed, createResource, createSignal, onCleanup, Resource, Setter } from 'solid-js'
-import { isServer, noop, tryOnCleanup } from '@solid-primitives/utils'
 /**
  * Provides an easy way to implement infinite scrolling.
  *
