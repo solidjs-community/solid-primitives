@@ -20,17 +20,18 @@
     "test:client": "vitest -c ./configs/vitest.config.ts",
     "test:ssr": "pnpm run test:client --mode ssr",
     "test": "pnpm run test:client && pnpm run test:ssr",
-    "build": "tsx ./scripts/build.ts",
-    "new-package": "tsx ./scripts/new-package.ts",
-    "update-readme": "tsx ./scripts/update-readme.ts",
-    "update-tsconfigs": "tsx ./scripts/update-tsconfigs.ts",
-    "measure": "tsx ./scripts/measure.ts",
+    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/build.ts",
+    "new-package": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/new-package.ts",
+    "update-readme": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/update-readme.ts",
+    "update-tsconfigs": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/update-tsconfigs.ts",
+    "measure": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/measure.ts",
     "version": "changeset version && pnpm i --no-frozen-lockfile && git add .",
     "release": "pnpm build && changeset publish",
     "postinstall": "pnpm update-tsconfigs"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.4",
+    "@nothing-but/node-resolve-ts": "^1.0.1",
     "@solidjs/start": "^1.1.4",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.15.31",
@@ -50,7 +51,6 @@
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1",
     "solid-js": "^1.9.7",
-    "tsx": "^4.20.2",
     "typescript": "^5.8.3",
     "vinxi": "^0.5.7",
     "vite": "^6.3.5",
@@ -59,6 +59,6 @@
   },
   "packageManager": "pnpm@10.12.1",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   }
 }
