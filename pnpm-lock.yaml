@@ -553,8 +553,8 @@ importers:
   packages/match:
     devDependencies:
       solid-js:
-        specifier: ^1.8.7
-        version: 1.8.22
+        specifier: ^1.9.7
+        version: 1.9.7
 
   packages/media:
     dependencies:
