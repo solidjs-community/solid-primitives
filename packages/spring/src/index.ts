@@ -62,7 +62,7 @@ export type SpringSetter<T> = (
  * Creates a signal and a setter that uses spring physics when interpolating from
  * one value to another. This means when the value changes, instead of
  * transitioning at a steady rate, it "bounces" like a spring would,
- * depending on the physics paramters provided. This adds a level of realism to
+ * depending on the physics parameters provided. This adds a level of realism to
  * the transitions and can enhance the user experience.
  *
  * `T` - The type of the signal. It works for the basic data types that can be
@@ -196,12 +196,12 @@ export function createSpring<T extends SpringTarget>(
 // ===========================================================================
 
 /**
- * Creates a spring value that interpolates based on changes on a passed signal.
+ * Creates a spring value that interpolates based on changes to the passed signal.
  * Works similar to the `@solid-primitives/tween`
  *
  * @param target Target to be modified.
  * @param options Options to configure the physics of the spring.
- * @returns Returns the spring value only.
+ * @returns Returns the spring value accessor only.
  *
  * @example
  * const percent = createMemo(() => current() / total() * 100);
