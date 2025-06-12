@@ -1,9 +1,9 @@
 import { Component, createSignal } from "solid-js";
 import { Match } from "../src/index.js"
 
-type AnimalDog = {kind: 'dog', breed: string};
-type AnimalCat = {kind: 'cat', lives: number};
-type AnimalBird = {kind: 'bird', canFly: boolean};
+type AnimalDog = {type: 'dog', breed: string};
+type AnimalCat = {type: 'cat', lives: number};
+type AnimalBird = {type: 'bird', canFly: boolean};
 
 type Animal = AnimalDog | AnimalCat | AnimalBird;
 
@@ -42,9 +42,9 @@ const App: Component = () => {
 
   const animals: (Animal | null)[] = [
     null,
-    { kind: 'dog', breed: 'Golden Retriever' },
-    { kind: 'cat', lives: 9 },
-    { kind: 'bird', canFly: true },
+    { type: 'dog', breed: 'Golden Retriever' },
+    { type: 'cat', lives: 9 },
+    { type: 'bird', canFly: true },
   ];
 
   return (
