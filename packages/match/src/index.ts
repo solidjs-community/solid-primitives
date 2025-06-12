@@ -13,7 +13,7 @@ import { type Accessor, type JSX, createMemo } from "solid-js"
  *   bar:  'bar-value',
  * }
  * 
- * const [value, setValue] = s.createSignal<MyUnion>({kind: 'foo', foo: 'foo-value'})
+ * const [value, setValue] = createSignal<MyUnion>({kind: 'foo', foo: 'foo-value'})
  * 
  * <Match on={value()} case={{
  *   foo: v => <>{v().foo}</>,
