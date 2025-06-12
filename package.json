@@ -57,7 +57,7 @@
     "vite-plugin-solid": "^2.10.2",
     "vitest": "^2.1.0"
   },
-  "packageManager": "pnpm@10.9.0",
+  "packageManager": "pnpm@10.12.1",
   "engines": {
     "node": ">=20.0.0"
   }
