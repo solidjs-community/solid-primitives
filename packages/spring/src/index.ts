@@ -71,6 +71,7 @@ export type SpringSetter<T> = (
  * @param initialValue The initial value of the signal.
  * @param options Options to configure the physics of the spring.
  * @returns Returns the spring value and a setter.
+ * The setter optionally accepts options object of type `{ ?hard: boolean; soft?: boolean | number }`
  *
  * @example
  * const [progress, setProgress] = createSpring(0, { stiffness: 0.15, damping: 0.8 });
@@ -205,7 +206,7 @@ export function createSpring<T extends SpringTarget>(
  * @example
  * const percent = createMemo(() => current() / total() * 100);
  *
- * const springedPercent = createDerivedSignal(percent, { stiffness: 0.15, damping: 0.8 });
+ * const springedPercent = createDerivedSpring(percent, { stiffness: 0.15, damping: 0.8 });
  */
 export function createDerivedSpring<T extends SpringTarget>(
   target: Accessor<T>,
