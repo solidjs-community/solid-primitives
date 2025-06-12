@@ -1,5 +1,5 @@
 import { Component, createSignal } from "solid-js";
-import { Match } from "../src/index.js"
+import { MatchTag, MatchValue } from "../src/index.js";
 
 type AnimalDog = {type: 'dog', breed: string};
 type AnimalCat = {type: 'cat', lives: number};
@@ -75,7 +75,7 @@ const App: Component = () => {
             <h2 class="text-xl font-semibold mb-1">Complete Match</h2>
             <p class="text-sm mb-4">Handles all union members with fallback</p>
             <div class="border border-gray-500 border-2 rounded p-4 min-h-[100px] flex items-center justify-center">
-              <Match on={animal()} case={{
+              <MatchTag on={animal()} case={{
                 dog: v => <DogDisplay animal={v()} />,
                 cat: v => <CatDisplay animal={v()} />,
                 bird: v => <BirdDisplay animal={v()} />,
@@ -87,11 +87,23 @@ const App: Component = () => {
             <h2 class="text-xl font-semibold mb-1">Partial Match</h2>
             <p class="text-sm mb-4">Only handles dogs and cats</p>
             <div class="border border-gray-500 border-2 rounded p-4 min-h-[100px] flex items-center justify-center">
-              <Match partial on={animal()} case={{
+              <MatchTag partial on={animal()} case={{
                 dog: v => <DogDisplay animal={v()} />,
                 cat: v => <CatDisplay animal={v()} />,
               }} fallback={<FallbackDisplay />} />
             </div>
+          </div>
+        </div>
+
+        <div class="mt-8 border border-gray-500 border-2 rounded-lg p-6">
+          <h2 class="text-xl font-semibold mb-1">Value Match</h2>
+          <p class="text-sm mb-4">Match on union literals</p>
+          <div class="border border-gray-500 border-2 rounded p-4 min-h-[100px] flex items-center justify-center">
+            <MatchValue on={animal()?.type} case={{
+              dog:  () => <p>🐕</p>,
+              cat:  () => <p>🐱</p>,
+              bird: () => <p>🐦</p>,
+            }} fallback={<FallbackDisplay />} />
           </div>
         </div>
       </div>

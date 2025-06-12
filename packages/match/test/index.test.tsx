@@ -1,6 +1,6 @@
 import * as v from "vitest";
 import * as s from "solid-js";
-import { Match } from "../src/index.js";
+import { MatchTag, MatchValue } from "../src/index.js";
 
 v.describe("Match", () => {
   v.test("match on type field", () => {
@@ -19,7 +19,7 @@ v.describe("Match", () => {
       return {
         dispose,
         result: s.children(() => <>
-          <Match on={value()} case={{
+          <MatchTag on={value()} case={{
             foo: v => <>{v().foo}</>,
             bar: v => <>{v().bar}</>,
           }} />
@@ -54,7 +54,7 @@ v.describe("Match", () => {
       return {
         dispose,
         result: s.children(() => <>
-          <Match on={value()} tag='kind' case={{
+          <MatchTag on={value()} tag='kind' case={{
             foo: v => <>{v().foo}</>,
             bar: v => <>{v().bar}</>,
           }} />
@@ -89,7 +89,7 @@ v.describe("Match", () => {
       return {
         dispose,
         result: s.children(() => <>
-          <Match partial on={value()} case={{
+          <MatchTag partial on={value()} case={{
             foo: v => <>{v().foo}</>,
           }} />
         </>)
@@ -123,7 +123,7 @@ v.describe("Match", () => {
       return {
         dispose,
         result: s.children(() => <>
-          <Match on={value()} case={{
+          <MatchTag on={value()} case={{
             foo: v => <>{v().foo}</>,
             bar: v => <>{v().bar}</>,
           }} fallback={<>fallback</>} />
@@ -142,3 +142,64 @@ v.describe("Match", () => {
     data.dispose();
   });
 });
+
+v.describe("MatchValue", () => {
+  v.test("match on union literal", () => {
+    type MyUnion = 'foo' | 'bar'
+    const [value, setValue] = s.createSignal<MyUnion>()
+    const data = s.createRoot(dispose => ({
+      dispose,
+      result: s.children(() => <>
+        <MatchValue on={value()} case={{
+          foo: () => <p>foo</p>,
+          bar: () => <p>bar</p>,
+        }} />
+      </>)
+    }))
+    v.expect(data.result()).toEqual(undefined)
+    setValue('foo')
+    v.expect(data.result()).toEqual(<><p>foo</p></>)
+    setValue('bar')
+    v.expect(data.result()).toEqual(<><p>bar</p></>)
+    data.dispose()
+  })
+
+  v.test("partial match", () => {
+    type MyUnion = 'foo' | 'bar'
+    const [value, setValue] = s.createSignal<MyUnion>()
+    const data = s.createRoot(dispose => ({
+      dispose,
+      result: s.children(() => <>
+        <MatchValue partial on={value()} case={{
+          foo: () => <p>foo</p>,
+        }} />
+      </>)
+    }))
+    v.expect(data.result()).toEqual(undefined)
+    setValue('foo')
+    v.expect(data.result()).toEqual(<><p>foo</p></>)
+    setValue('bar')
+    v.expect(data.result()).toEqual(undefined)
+    data.dispose()
+  })
+
+  v.test("fallback", () => {
+    type MyUnion = 'foo' | 'bar'
+    const [value, setValue] = s.createSignal<MyUnion>()
+    const data = s.createRoot(dispose => ({
+      dispose,
+      result: s.children(() => <>
+        <MatchValue on={value()} case={{
+          foo: () => <p>foo</p>,
+          bar: () => <p>bar</p>,
+        }} fallback={<p>fallback</p>} />
+      </>)
+    }))
+    v.expect(data.result()).toEqual(<><p>fallback</p></>)
+    setValue('foo')
+    v.expect(data.result()).toEqual(<><p>foo</p></>)
+    setValue(undefined)
+    v.expect(data.result()).toEqual(<><p>fallback</p></>)
+    data.dispose()
+  })
+})

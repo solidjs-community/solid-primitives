@@ -8,7 +8,7 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/match?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/match)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Control-flow component for matching discriminated union (tagged union) members.
+Control-flow components for matching discriminated union (tagged union) members and union literals.
 
 ## Installation
 
@@ -20,10 +20,10 @@ yarn add @solid-primitives/match
 pnpm add @solid-primitives/match
 ```
 
-## `Match`
+## `MatchTag`
 
 Control-flow component for matching discriminated union (tagged union) members.
- 
+
 ### How to use it
 
 ```tsx
@@ -37,7 +37,7 @@ type MyUnion = {
 
 const [value, setValue] = createSignal<MyUnion>({type: "foo", foo: "foo-value"})
 
-<Match on={value()} case={{
+<MatchTag on={value()} case={{
   foo: v => <>{v().foo}</>,
   bar: v => <>{v().bar}</>,
 }} />
@@ -56,7 +56,7 @@ type MyUnion = {
   bar:  "bar-value",
 }
  
-<Match on={value()} tag="kind" case={{
+<MatchTag on={value()} tag="kind" case={{
   foo: v => <>{v().foo}</>,
   bar: v => <>{v().bar}</>,
 }} />
@@ -67,7 +67,7 @@ type MyUnion = {
 Use the `partial` prop to only handle some of the union members:
 
 ```tsx
-<Match partial on={value()} case={{
+<MatchTag partial on={value()} case={{
   foo: v => <>{v().foo}</>,
   // bar case is not handled
 }} />
@@ -78,9 +78,48 @@ Use the `partial` prop to only handle some of the union members:
 Provide a fallback element when no match is found or the value is `null`/`undefined`:
 
 ```tsx
-<Match on={value()} case={{
+<MatchTag on={value()} case={{
   foo: v => <>{v().foo}</>,
   bar: v => <>{v().bar}</>,
+}} fallback={<div>No match found</div>} />
+```
+
+## `MatchValue`
+
+Control-flow component for matching union literals.
+
+### How to use it
+
+```tsx
+type MyUnion = "foo" | "bar";
+
+const [value, setValue] = createSignal<MyUnion>("foo");
+
+<MatchValue on={value()} case={{
+  foo: () => <p>foo</p>,
+  bar: () => <p>bar</p>,
+}} />
+```
+
+### Partial matching
+
+Use the `partial` prop to only handle some of the union members:
+
+```tsx
+<MatchValue partial on={value()} case={{
+  foo: () => <p>foo</p>,
+  // bar case is not handled
+}} />
+```
+
+### Fallback
+
+Provide a fallback element when no match is found or the value is `null`/`undefined`:
+
+```tsx
+<MatchValue on={value()} case={{
+  foo: () => <p>foo</p>,
+  bar: () => <p>bar</p>,
 }} fallback={<div>No match found</div>} />
 ```
 
