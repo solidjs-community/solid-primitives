@@ -104,7 +104,7 @@ export const clamp = (n: number, min: number, max: number) => Math.min(Math.max(
  * ```
  */
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
-  typeof v === "function" && !v.length ? v() : v as any;
+  typeof v === "function" && !v.length ? v() : (v as any);
 
 export const asArray = <T>(value: T): (T extends any[] ? T[number] : NonNullable<T>)[] =>
   Array.isArray(value) ? (value as any) : value ? [value as any] : [];
@@ -142,7 +142,7 @@ export function accessWith<T>(
   valueOrFn: T,
   ...args: T extends AnyFunction ? Parameters<T> : never
 ): T extends AnyFunction ? ReturnType<T> : T {
-  return typeof valueOrFn === "function" ? valueOrFn(...args) : valueOrFn as any;
+  return typeof valueOrFn === "function" ? valueOrFn(...args) : (valueOrFn as any);
 }
 
 /**
