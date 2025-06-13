@@ -246,48 +246,90 @@ declare module "solid-js" {
 export type _E = JSX.Element;
 
 /**
- * Provides an easy way to implement infinite scrolling.
+ * A SolidJS utility to create an infinite scrolling experience with IntersectionObserver and reactivity.
  *
+ * This function handles page fetching, auto-incrementing on scroll, error tracking, and supports
+ * dynamic parameters for API requests. It returns an accessor for the loaded pages, a directive
+ * to attach to a loader DOM element, and control state for pagination.
+ *
+ * ### Usage Example:
  * ```ts
- * const [pages, loader, { page, setPage, setPages, end, setEnd }] = createInfiniteScroll(fetcher);
+ * const [pages, loader, { page, setPage, setPages, end, setEnd }] = createInfiniteScroll(fetcher, {
+ *   params: () => ({ query: 'search-term' }),
+ *   resetOnParamsChange: true
+ * });
  * ```
- * @param fetcher `(page: number) => Promise<T[]>`
- * @return `pages()` is an accessor contains array of contents
- * @return `infiniteScrollLoader` is a directive used to set the loader element
- * @method `page` is an accessor that contains page number
- * @method `setPage` allows to manually change the page number
- * @method `setPages` allows to manually change the contents of the page
- * @method `end` is a boolean indicator for end of the page
- * @method `error` contains any error encountered
- * @method `setEnd` allows to manually change the end
+ *
+ * @template T - The type of individual page items (e.g., object, string).
+ * @template E - (Optional) The error type. Defaults to `unknown`.
+ * @template P - (Optional) The type of dynamic fetcher parameters.
+ *
+ * @param {function(page: number, params: P): Promise<T[]>} fetcher
+ *    A function that takes a page number and optional parameters and returns a Promise resolving to an array of items.
+ *
+ * @param {Object} [options] - Optional configuration object.
+ * @param {() => P} [options.params] - A reactive accessor for dynamic fetcher parameters.
+ * @param {boolean} [options.resetOnParamsChange=true] - Whether to reset state (pages, page, end) when parameters change.
+ *
+ * @returns {[Accessor<T[]>, (el: Element) => void, {
+ *   page: Accessor<number>,
+ *   setPage: Setter<number>,
+ *   setPages: Setter<T[]>,
+ *   end: Accessor<boolean>,
+ *   setEnd: Setter<boolean>,
+ *   error: Accessor<Error | null>,
+ *   loading: Accessor<boolean>
+ * }]} A tuple:
+ * - `pages`: an accessor for the full list of loaded items.
+ * - `loader`: a directive function that should be attached to the DOM element used as the intersection trigger (e.g., a loading spinner).
+ * - `state`: an object with methods and accessors for managing pagination state.
+ *
+ * @property {Accessor<number>} page - Current page number accessor.
+ * @property {Setter<number>} setPage - Function to manually set the current page number.
+ * @property {Setter<T[]>} setPages - Function to manually set the entire list of loaded items.
+ * @property {Accessor<boolean>} end - Accessor that indicates if the end of available content has been reached.
+ * @property {Setter<boolean>} setEnd - Function to manually set the end state.
+ * @property {Accessor<Error | null>} error - Accessor for any error encountered during fetching.
+ * @property {Accessor<boolean>} loading - Accessor for the current loading state.
  */
-export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
+export function createInfiniteScroll<T, E = unknown, P = unknown>(
+    fetcher: (page: number, params: P) => Promise<T[]>,
+    options?: InfiniteScrollOptions<P>
+): [
     pages: Accessor<T[]>,
     loader: (el: Element) => void,
-    options: {
+    state: {
         page: Accessor<number>
         setPage: Setter<number>
         setPages: Setter<T[]>
         end: Accessor<boolean>
         setEnd: Setter<boolean>
-        error: Accessor<any>
+        error: Accessor<Error | null>
+        loading: Accessor<boolean>
     }
 ] {
     const [pages, setPages] = createSignal<T[]>([])
     const [page, setPage] = createSignal(0)
     const [end, setEnd] = createSignal(false)
-    const [error, setError] = createSignal<any>(null)
+    const [error, setError] = createSignal<Error | null>(null)
 
-    const [contents] = createResource(page, async (p) => {
-        setError(null)
-        try {
-            const result = await fetcher(p)
-            return result
-        } catch (e) {
-            setError(e)
-            return []
+    // Fix: Handle undefined options by providing defaults
+    const { params, resetOnParamsChange = true } = options || {}
+
+    const [contents] = createResource(
+        () => [page(), params?.()] as const,
+        async ([p, param]) => {
+            setError(null)
+            try {
+                const result = await fetcher(p, param)
+                return result
+            } catch (e) {
+                setError(e as Error)
+                console.error(e)
+                return []
+            }
         }
-    })
+    )
 
     createComputed(() => {
         const content = contents()
@@ -298,17 +340,58 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
         })
     })
 
-    let add: (el: Element) => void = () => {}
-    if (!isServer) {
-        const io = new IntersectionObserver((entries) => {
-            if (entries[0]?.isIntersecting && !end()) {
-                setPage((p) => p + 1)
+    // Reset state if params change
+    createComputed(() => {
+        if (params) {
+            params()
+            if (resetOnParamsChange) {
+                batch(() => {
+                    setPages([])
+                    setPage(0)
+                    setEnd(false)
+                })
             }
-        })
+        }
+    })
+
+    let add: (el: Element) => void = () => {}
+    let currentObservedElement: Element | null = null
+
+    if (!isServer) {
+        const io = new IntersectionObserver(
+            (entries) => {
+                const entry = entries[0]
+                if (
+                    entry?.isIntersecting &&
+                    !end() &&
+                    !contents.loading
+                ) {
+                    setPage((p) => p + 1)
+                }
+            },
+            {
+                rootMargin: '50px'
+            }
+        )
+
         onCleanup(() => io.disconnect())
+
         add = (el: Element) => {
+            // Unobserve the previous element if it exists
+            if (currentObservedElement) {
+                io.unobserve(currentObservedElement)
+            }
+
+            // Observe the new last element
             io.observe(el)
-            tryOnCleanup(() => io.unobserve(el))
+            currentObservedElement = el
+
+            tryOnCleanup(() => {
+                io.unobserve(el)
+                if (currentObservedElement === el) {
+                    currentObservedElement = null
+                }
+            })
         }
     }
 
@@ -322,6 +405,7 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
             end,
             setEnd,
             error,
+            loading: () => contents.loading
         },
     ]
 }
