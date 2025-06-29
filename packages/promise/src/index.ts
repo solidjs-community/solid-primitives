@@ -1,4 +1,11 @@
-import { type Accessor, createComputed, createMemo, createRoot, getOwner, onCleanup } from "solid-js";
+import {
+  type Accessor,
+  createComputed,
+  createMemo,
+  createRoot,
+  getOwner,
+  onCleanup,
+} from "solid-js";
 import { asArray, type Truthy } from "@solid-primitives/utils";
 
 /**

@@ -1,6 +1,10 @@
 import { type Accessor, JSX } from "solid-js";
 import { isServer } from "solid-js/web";
-import { type MaybeAccessor, type Directive, createHydratableSignal } from "@solid-primitives/utils";
+import {
+  type MaybeAccessor,
+  type Directive,
+  createHydratableSignal,
+} from "@solid-primitives/utils";
 import { makeEventListener, createEventListener } from "@solid-primitives/event-listener";
 
 declare module "solid-js" {
