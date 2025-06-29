@@ -1,8 +1,8 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { createResizeObserver } from "@solid-primitives/resize-observer";
 import { createDerivedStaticStore } from "@solid-primitives/static-store";
-import { access, FalsyValue } from "@solid-primitives/utils";
-import { Accessor, createSignal, onCleanup, onMount, sharedConfig } from "solid-js";
+import { access, type FalsyValue } from "@solid-primitives/utils";
+import { type Accessor, createSignal, onCleanup, onMount, sharedConfig } from "solid-js";
 import { isServer } from "solid-js/web";
 
 export type Bounds = {

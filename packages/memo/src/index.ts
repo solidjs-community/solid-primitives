@@ -1,5 +1,5 @@
 import {
-  Accessor,
+  type Accessor,
   createSignal,
   createComputed,
   untrack,
@@ -7,20 +7,20 @@ import {
   onCleanup,
   createMemo,
   runWithOwner,
-  Setter,
+  type Setter,
   on,
   createRoot,
-  AccessorArray,
-  EffectFunction,
-  MemoOptions,
-  NoInfer,
-  Owner,
-  SignalOptions,
+  type AccessorArray,
+  type EffectFunction,
+  type MemoOptions,
+  type NoInfer,
+  type Owner,
+  type SignalOptions,
   DEV,
 } from "solid-js";
 import { isServer } from "solid-js/web";
 import { debounce, throttle } from "@solid-primitives/scheduled";
-import { noop, EffectOptions, EQUALS_FALSE_OPTIONS } from "@solid-primitives/utils";
+import { noop, type EffectOptions, EQUALS_FALSE_OPTIONS } from "@solid-primitives/utils";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;

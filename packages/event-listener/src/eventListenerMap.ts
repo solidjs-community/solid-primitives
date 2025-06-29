@@ -1,6 +1,6 @@
-import { AnyFunction, entries, Many, MaybeAccessor } from "@solid-primitives/utils";
+import { type AnyFunction, entries, type Many, type MaybeAccessor } from "@solid-primitives/utils";
 import { createEventListener } from "./eventListener.js";
-import { EventMapOf, TargetWithEventMap, EventListenerOptions } from "./types.js";
+import type { EventMapOf, TargetWithEventMap, EventListenerOptions } from "./types.js";
 import { isServer } from "solid-js/web";
 
 export type EventHandlersMap<EventMap> = {

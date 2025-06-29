@@ -1,8 +1,8 @@
 import {
-  SyncStorage,
-  AsyncStorage,
-  AsyncStorageWithOptions,
-  SyncStorageWithOptions,
+  type SyncStorage,
+  type AsyncStorage,
+  type AsyncStorageWithOptions,
+  type SyncStorageWithOptions,
 } from "./index.js";
 
 /**

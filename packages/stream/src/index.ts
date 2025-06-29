@@ -1,15 +1,15 @@
 import {
-  Accessor,
+  type Accessor,
   createEffect,
   createMemo,
   createResource,
   createSignal,
   onCleanup,
-  Resource,
-  ResourceReturn,
-  ResourceFetcherInfo,
+  type Resource,
+  type ResourceReturn,
+  type ResourceFetcherInfo,
   untrack,
-  Setter,
+  type Setter,
 } from "solid-js";
 import { isServer } from "solid-js/web";
 import { access, noop, type FalsyValue, type MaybeAccessor } from "@solid-primitives/utils";

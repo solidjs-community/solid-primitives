@@ -1,4 +1,4 @@
-import { Accessor, onCleanup } from "solid-js";
+import { type Accessor, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createHydratableSignal, noop } from "@solid-primitives/utils";

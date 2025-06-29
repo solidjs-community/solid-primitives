@@ -8,8 +8,8 @@ import {
   untrack,
   DEV,
 } from "solid-js";
-import { createStore, reconcile, SetStoreFunction, Store, unwrap } from "solid-js/store";
-import { RealtimePostgresChangesPayload, SupabaseClient } from "@supabase/supabase-js";
+import { createStore, reconcile, type SetStoreFunction, type Store, unwrap } from "solid-js/store";
+import { type RealtimePostgresChangesPayload, SupabaseClient } from "@supabase/supabase-js";
 
 export type DbRow = Record<string, any>;
 

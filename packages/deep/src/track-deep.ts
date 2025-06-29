@@ -1,5 +1,5 @@
 import { $PROXY } from "solid-js";
-import { Store } from "solid-js/store";
+import { type Store } from "solid-js/store";
 
 /**
  * Tracks all properties of a {@link store} by iterating over them recursively.

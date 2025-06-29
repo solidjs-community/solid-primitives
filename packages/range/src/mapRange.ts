@@ -1,6 +1,6 @@
-import { Accessor, createRoot, onCleanup, untrack, DEV, JSX, createMemo } from "solid-js";
+import { type Accessor, createRoot, onCleanup, untrack, DEV, type JSX, createMemo } from "solid-js";
 import { isServer } from "solid-js/web";
-import { abs, accessor, ceil, floor, min, RangeProps, toFunction } from "./common.js";
+import { abs, accessor, ceil, floor, min, type RangeProps, toFunction } from "./common.js";
 
 /**
  * Reactively maps a number range of specified `stop`, `to` and `step`, with a callback function - underlying helper for the `<Range>` control flow.

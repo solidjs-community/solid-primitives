@@ -1,6 +1,6 @@
-import { ModifyValue, UpdateSetter, update as _update } from "@solid-primitives/utils/immutable";
-import { accessArray, MaybeAccessor, MaybeAccessorValue } from "@solid-primitives/utils";
-import { Accessor, createMemo } from "solid-js";
+import { type ModifyValue, type UpdateSetter, update as _update } from "@solid-primitives/utils/immutable";
+import { accessArray, type MaybeAccessor, type MaybeAccessorValue } from "@solid-primitives/utils";
+import { type Accessor, createMemo } from "solid-js";
 
 export type Update = {
   <

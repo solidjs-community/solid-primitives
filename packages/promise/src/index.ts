@@ -1,5 +1,5 @@
-import { Accessor, createComputed, createMemo, createRoot, getOwner, onCleanup } from "solid-js";
-import { asArray, Truthy } from "@solid-primitives/utils";
+import { type Accessor, createComputed, createMemo, createRoot, getOwner, onCleanup } from "solid-js";
+import { asArray, type Truthy } from "@solid-primitives/utils";
 
 /**
  * Creates a promise that resolves *(or rejects)* after given time.

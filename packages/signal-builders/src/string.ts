@@ -1,5 +1,5 @@
-import { access, MaybeAccessor } from "@solid-primitives/utils";
-import { Accessor, createMemo, on } from "solid-js";
+import { access, type MaybeAccessor } from "@solid-primitives/utils";
+import { type Accessor, createMemo, on } from "solid-js";
 
 /**
  * Signal builder: `String.prototype.toLowerCase()`

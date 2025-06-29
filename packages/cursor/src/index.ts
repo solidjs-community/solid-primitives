@@ -1,6 +1,6 @@
-import { Accessor, createEffect, onCleanup } from "solid-js";
+import { type Accessor, createEffect, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
-import { access, FalsyValue, MaybeAccessor } from "@solid-primitives/utils";
+import { access, type FalsyValue, type MaybeAccessor } from "@solid-primitives/utils";
 
 export type CursorProperty =
   | "-moz-grab"

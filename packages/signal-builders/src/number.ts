@@ -1,6 +1,6 @@
-import { access, accessArray, MaybeAccessor } from "@solid-primitives/utils";
+import { access, accessArray, type MaybeAccessor } from "@solid-primitives/utils";
 import * as _ from "@solid-primitives/utils/immutable";
-import { Accessor, createMemo } from "solid-js";
+import { type Accessor, createMemo } from "solid-js";
 
 /** signal-builder `a + b + c + ...` */
 export function add(...a: MaybeAccessor<number>[]): Accessor<number>;

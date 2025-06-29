@@ -1,4 +1,4 @@
-import { Accessor, Setter } from "solid-js";
+import { type Accessor, type Setter } from "solid-js";
 
 /**
  * @property `source` - DOMString containing a URL representing the object given in the parameter

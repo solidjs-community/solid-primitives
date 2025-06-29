@@ -1,4 +1,4 @@
-import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
+import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 
 // https://github.com/sveltejs/svelte/blob/main/packages/svelte/src/motion/utils.js

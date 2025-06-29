@@ -1,15 +1,15 @@
 import {
-  Accessor,
+  type Accessor,
   createMemo,
   createResource,
-  Resource,
-  ResourceActions,
-  ResourceFetcherInfo,
-  ResourceOptions,
-  ResourceReturn,
+  type Resource,
+  type ResourceActions,
+  type ResourceFetcherInfo,
+  type ResourceOptions,
+  type ResourceReturn,
 } from "solid-js";
-import { RequestModifier } from "./modifiers.js";
-import { fetchRequest, Request } from "./request.js";
+import { type RequestModifier } from "./modifiers.js";
+import { fetchRequest, type Request } from "./request.js";
 
 export type FetchArgs = [info: RequestInfo] | [info: RequestInfo, init?: RequestInit];
 

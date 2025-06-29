@@ -1,4 +1,4 @@
-import { Operation, Watcher } from "./types.js";
+import type { Operation, Watcher } from "./types.js";
 
 export const makeChokidarWatcher = (basePath: string = "/"): Watcher => {
   let subscriber: ((operation: Operation, path: string) => void) | undefined;

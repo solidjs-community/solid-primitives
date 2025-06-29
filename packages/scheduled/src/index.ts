@@ -1,4 +1,4 @@
-import { Accessor, createSignal, getListener, getOwner, onCleanup } from "solid-js";
+import { type Accessor, createSignal, getListener, getOwner, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 
 export type ScheduleCallback = <Args extends unknown[]>(

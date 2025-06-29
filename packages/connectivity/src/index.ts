@@ -1,7 +1,7 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createHydratableSignal, trueFn, noop } from "@solid-primitives/utils";
-import { Accessor } from "solid-js";
+import { type Accessor } from "solid-js";
 import { isServer } from "solid-js/web";
 
 /**
