@@ -1,5 +1,11 @@
 # @solid-primitives/permission
 
+## 1.3.2
+
+### Patch Changes
+
+- 396812d: Enable verbatimModuleSyntax -> add `type` keyword to all type imports.
+
 ## 1.3.1
 
 ### Patch Changes

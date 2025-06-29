@@ -1,5 +1,14 @@
 # @solid-primitives/audio
 
+## 1.4.2
+
+### Patch Changes
+
+- 396812d: Enable verbatimModuleSyntax -> add `type` keyword to all type imports.
+- Updated dependencies [396812d]
+  - @solid-primitives/static-store@0.1.2
+  - @solid-primitives/utils@6.3.2
+
 ## 1.4.1
 
 ### Patch Changes

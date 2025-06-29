@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/context",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Primitives simplifying or extending the SolidJS Context API",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",

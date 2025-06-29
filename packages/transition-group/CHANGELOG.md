@@ -1,5 +1,11 @@
 # @solid-primitives/transition-group
 
+## 1.1.2
+
+### Patch Changes
+
+- 396812d: Enable verbatimModuleSyntax -> add `type` keyword to all type imports.
+
 ## 1.1.1
 
 ### Patch Changes
