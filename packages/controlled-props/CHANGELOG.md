@@ -1,5 +1,12 @@
 # @solid-primitives/controlled-props
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [396812d]
+  - @solid-primitives/utils@6.3.2
+
 ## 0.1.1
 
 ### Patch Changes

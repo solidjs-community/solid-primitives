@@ -1,5 +1,12 @@
 # @solid-primitives/virtual
 
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies [396812d]
+  - @solid-primitives/utils@6.3.2
+
 ## 0.2.1
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @solid-primitives/event-listener
 
+## 2.4.2
+
+### Patch Changes
+
+- 396812d: Enable verbatimModuleSyntax -> add `type` keyword to all type imports.
+- Updated dependencies [396812d]
+  - @solid-primitives/utils@6.3.2
+
 ## 2.4.1
 
 ### Patch Changes

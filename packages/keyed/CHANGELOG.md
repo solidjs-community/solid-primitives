@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.5.2
+
+### Patch Changes
+
+- 396812d: Enable verbatimModuleSyntax -> add `type` keyword to all type imports.
+
 ## 1.5.1
 
 ### Patch Changes
