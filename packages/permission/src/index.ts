@@ -18,7 +18,7 @@ export const createPermission = (
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (navigator) {
     navigator.permissions
-      .query(typeof name === "string" ? { name: name as PermissionName } : name)
+      .query(typeof name === "string" ? { name } : name)
       .then(setStatus)
       .catch(error => {
         if (error.name !== "TypeError" || (name !== "microphone" && name !== "camera")) {
