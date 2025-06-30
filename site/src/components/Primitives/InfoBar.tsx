@@ -1,5 +1,5 @@
-import { Component } from "solid-js";
-import { PackageData } from "~/types";
+import { type Component } from "solid-js";
+import { type PackageData } from "~/types.js";
 import { SizeBadgePill } from "./SizeBadge.js";
 import { StageBadgePill } from "./StageBadge.js";
 import { VersionBadgePill } from "./VersionBadge.js";

@@ -1,5 +1,5 @@
 // @refresh reload
-import { ErrorBoundary, ParentProps, Suspense } from "solid-js";
+import { ErrorBoundary, type ParentProps, Suspense } from "solid-js";
 
 import "./app.scss";
 

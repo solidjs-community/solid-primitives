@@ -1,5 +1,5 @@
 import { createMutationObserver, mutationObserver } from "../src/index.js";
-import { Component, createSignal, For, Index, onMount, Show } from "solid-js";
+import { type Component, createSignal, For, Index, onMount, Show } from "solid-js";
 
 import { DisplayRecord, LogMutationRecord, TestingNode, ToggleBtn } from "./components.js";
 import { toggleItems, updateItem } from "./utils.js";

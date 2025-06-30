@@ -1,12 +1,12 @@
-import { Accessor, createEffect, untrack, createSignal } from "solid-js";
-import { BundlesizeItem } from "~/types";
+import { type Accessor, createEffect, untrack, createSignal } from "solid-js";
+import type { BundlesizeItem } from "~/types.js";
 
 export function createPrimitiveNameTooltips(
   target: HTMLElement,
   primitives: Accessor<BundlesizeItem[] | undefined>,
 ) {
   const [fn, setFn] =
-    createSignal<typeof import("./primitive-name-tooltip.client").createPrimitiveNameTooltips>();
+    createSignal<typeof import("./primitive-name-tooltip.client.jsx").createPrimitiveNameTooltips>();
 
   createEffect(() => {
     const fnValue = fn();
@@ -18,7 +18,7 @@ export function createPrimitiveNameTooltips(
     }
   });
 
-  import("./primitive-name-tooltip.client").then(({ createPrimitiveNameTooltips }) =>
+  import("./primitive-name-tooltip.client.jsx").then(({ createPrimitiveNameTooltips }) =>
     setFn(() => createPrimitiveNameTooltips),
   );
 }

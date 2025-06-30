@@ -1,17 +1,17 @@
 import {
-  Component,
+  type Component,
   createRenderEffect,
   createResource,
   createSignal,
-  JSX,
+  type JSX,
   onCleanup,
-  ParentProps,
+  type ParentProps,
   Show,
   Suspense,
   untrack,
 } from "solid-js";
 import { resolveFirst } from "@solid-primitives/refs";
-import { createSwitchTransition, TransitionMode } from "../src/index.js";
+import { createSwitchTransition, type TransitionMode } from "../src/index.js";
 
 // const appear = localStorage.getItem("transition-group-appear") === "true";
 const appear = true;

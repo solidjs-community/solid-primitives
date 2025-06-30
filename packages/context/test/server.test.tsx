@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createContext, FlowComponent, JSX, untrack, useContext } from "solid-js";
+import { createContext, type FlowComponent, type JSX, untrack, useContext } from "solid-js";
 import { renderToString } from "solid-js/web";
 import { createContextProvider, MultiProvider } from "../src/index.js";
 

@@ -1,4 +1,4 @@
-import { createSignal, JSX } from "solid-js";
+import { createSignal, type JSX } from "solid-js";
 import { isServer } from "solid-js/web";
 import { noop } from "@solid-primitives/utils";
 import { transformFiles, createInputComponent } from "./helpers.js";

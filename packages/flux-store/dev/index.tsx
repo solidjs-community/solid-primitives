@@ -1,4 +1,4 @@
-import { Component, createMemo } from "solid-js";
+import { type Component, createMemo } from "solid-js";
 import { For, render } from "solid-js/web";
 import { counterStore } from "./stores/counter-store.js";
 import { getPeople, getWizards } from "./stores/ages-store.js";

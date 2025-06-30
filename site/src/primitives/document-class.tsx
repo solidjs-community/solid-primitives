@@ -1,4 +1,4 @@
-import { Component, onCleanup } from "solid-js";
+import { type Component, onCleanup } from "solid-js";
 import { isServer, NoHydration } from "solid-js/web";
 
 export const DocumentClass: Component<{ class: string }> = props => {

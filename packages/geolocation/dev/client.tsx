@@ -1,4 +1,4 @@
-import { Component, createEffect, onMount, Show } from "solid-js";
+import { type Component, createEffect, onMount, Show } from "solid-js";
 import { createGeolocation } from "../src/index.js";
 
 import * as L from "leaflet";

@@ -1,4 +1,4 @@
-import { createEffect, onMount, JSX, type Accessor } from "solid-js";
+import { createEffect, onMount, type JSX, type Accessor } from "solid-js";
 import { type FalsyValue } from "@solid-primitives/utils";
 
 declare module "solid-js" {

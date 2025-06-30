@@ -1,5 +1,5 @@
 import { createPointerListeners, pointerHover, createPointerList } from "../src/index.js";
-import { Component, createSignal, For } from "solid-js";
+import { type Component, createSignal, For } from "solid-js";
 
 pointerHover;
 

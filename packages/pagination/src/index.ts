@@ -2,7 +2,7 @@ import { access, tryOnCleanup, noop, type MaybeAccessor } from "@solid-primitive
 import {
   type Accessor,
   batch,
-  JSX,
+  type JSX,
   type Setter,
   createComputed,
   createMemo,

@@ -1,6 +1,6 @@
 import { createEventListener } from "@solid-primitives/event-listener";
 import {
-  Component,
+  type Component,
   createComputed,
   createEffect,
   createMemo,

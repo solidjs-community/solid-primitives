@@ -1,4 +1,4 @@
-import { Component, createSignal, Show, createEffect } from "solid-js";
+import { type Component, createSignal, Show, createEffect } from "solid-js";
 
 import RAF from "./raf.js";
 

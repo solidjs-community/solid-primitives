@@ -1,5 +1,4 @@
-import { createSignal, onMount, onCleanup } from "solid-js";
-import type { Component } from "solid-js";
+import { createSignal, onMount, onCleanup, type Component } from "solid-js";
 import { isServer } from "solid-js/web";
 import { VirtualList } from "../src/index.jsx";
 

@@ -1,5 +1,5 @@
 import { useMousePosition, createPositionToElement } from "../src/index.js";
-import { Component, createMemo, createSignal, Show } from "solid-js";
+import { type Component, createMemo, createSignal, Show } from "solid-js";
 
 import createRAF from "@solid-primitives/raf";
 import { lerp } from "./utils.js";

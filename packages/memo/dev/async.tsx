@@ -1,5 +1,5 @@
 import { createAsyncMemo } from "../src/index.js";
-import { Component, createSignal } from "solid-js";
+import { type Component, createSignal } from "solid-js";
 
 const Async: Component = () => {
   const [id, setId] = createSignal(1);

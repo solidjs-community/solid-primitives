@@ -1,5 +1,5 @@
-import { Component, createSignal } from "solid-js";
-import { CursorProperty, createBodyCursor, createElementCursor } from "../src/index.js";
+import { type Component, createSignal } from "solid-js";
+import { type CursorProperty, createBodyCursor, createElementCursor } from "../src/index.js";
 
 const CURSORS = [
   "alias",

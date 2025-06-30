@@ -1,4 +1,4 @@
-import { ParentComponent } from "solid-js";
+import { type ParentComponent } from "solid-js";
 
 const PrimitiveBtnLineWrapper: ParentComponent<{ primitiveName: string }> = props => {
   return (
