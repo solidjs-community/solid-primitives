@@ -1,4 +1,11 @@
-import { createMemo, createSignal, type FlowComponent, type JSX, onMount, sharedConfig } from "solid-js";
+import {
+  createMemo,
+  createSignal,
+  type FlowComponent,
+  type JSX,
+  onMount,
+  sharedConfig,
+} from "solid-js";
 import { isServer } from "solid-js/web";
 
 // https://github.com/solidjs/solid/pull/1592

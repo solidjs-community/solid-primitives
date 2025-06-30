@@ -1,4 +1,12 @@
-import { type Component, createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js";
+import {
+  type Component,
+  createResource,
+  createSignal,
+  For,
+  onCleanup,
+  onMount,
+  Show,
+} from "solid-js";
 
 import { makeAbortable, makeCache, makeRetrying } from "../src/index.js";
 

@@ -1,6 +1,13 @@
 import { createResizeObserver } from "@solid-primitives/resize-observer";
 import { createMutationObserver } from "@solid-primitives/mutation-observer";
-import { type Accessor, type Component, createRoot, createSignal, type JSX, onMount } from "solid-js";
+import {
+  type Accessor,
+  type Component,
+  createRoot,
+  createSignal,
+  type JSX,
+  onMount,
+} from "solid-js";
 import { useTippy } from "solid-tippy";
 import { type Content } from "tippy.js";
 import { BASE } from "~/constants.js";
