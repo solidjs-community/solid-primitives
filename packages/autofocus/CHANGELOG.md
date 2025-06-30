@@ -1,5 +1,11 @@
 # @solid-primitives/autofocus
 
+## 0.1.3
+
+### Patch Changes
+
+- 48d890d: Add missing type keyword to type imports.
+
 ## 0.1.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @solid-primitives/event-listener
 
+## 2.4.3
+
+### Patch Changes
+
+- 48d890d: Add missing type keyword to type imports.
+
 ## 2.4.2
 
 ### Patch Changes
