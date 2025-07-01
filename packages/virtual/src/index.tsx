@@ -54,6 +54,7 @@ export function createVirtualList<T extends readonly any[]>({
     });
   });
 
+  // Binary Search for performance
   const findRowIndexAtOffset = (offset: number) => {
     const offsets = rowOffsets();
 
