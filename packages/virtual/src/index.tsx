@@ -1,4 +1,4 @@
-import { For, createSignal } from "solid-js";
+import { For, createMemo, createSignal } from "solid-js";
 import type { Accessor, JSX } from "solid-js";
 import { access } from "@solid-primitives/utils";
 import type { MaybeAccessor } from "@solid-primitives/utils";
@@ -6,8 +6,8 @@ import type { MaybeAccessor } from "@solid-primitives/utils";
 type VirtualListConfig<T extends readonly any[]> = {
   items: MaybeAccessor<T | undefined | null | false>;
   rootHeight: MaybeAccessor<number>;
-  rowHeight: MaybeAccessor<number>;
   overscanCount?: MaybeAccessor<number>;
+  rowHeight: MaybeAccessor<number | ((row: T[number], index: number) => number)>;
 };
 
 type VirtualListReturn<T extends readonly any[]> = [
@@ -17,6 +17,7 @@ type VirtualListReturn<T extends readonly any[]> = [
     visibleItems: T;
   }>,
   onScroll: (e: Event) => void,
+  { scrollToItem: (itemIndex: number, scrollContainer: HTMLElement) => void },
 ];
 
 /**
@@ -39,25 +40,64 @@ export function createVirtualList<T extends readonly any[]>({
   rowHeight = access(rowHeight);
   overscanCount = access(overscanCount) || 1;
 
+  const resolveRowHeight =
+    typeof rowHeight === "function" ? rowHeight : (_: T[number], _i: number) => rowHeight;
+
   const [offset, setOffset] = createSignal(0);
 
-  const getFirstIdx = () => Math.max(0, Math.floor(offset() / rowHeight) - overscanCount);
+  const rowOffsets = createMemo(() => {
+    let offset = 0;
+    return items.map((item, i) => {
+      const current = offset;
+      offset += resolveRowHeight(item, i);
+      return current;
+    });
+  });
+
+  const findRowIndexAtOffset = (offset: number) => {
+    const offsets = rowOffsets();
+
+    let lo = 0,
+      hi = offsets.length - 1,
+      mid: number;
+    while (lo <= hi) {
+      mid = (lo + hi) >>> 1;
+      if (offsets[mid]! > offset) {
+        hi = mid - 1;
+      } else {
+        lo = mid + 1;
+      }
+    }
+    return lo;
+  };
+
+  const getFirstIdx = () => Math.max(0, findRowIndexAtOffset(offset()) - overscanCount);
+
+  // const getFirstIdx = () => Math.max(0, Math.floor(offset() / rowHeight) - overscanCount);
 
   const getLastIdx = () =>
-    Math.min(
-      items.length,
-      Math.floor(offset() / rowHeight) + Math.ceil(rootHeight / rowHeight) + overscanCount,
-    );
+    Math.min(items.length, findRowIndexAtOffset(offset() + rootHeight) + overscanCount);
+
+  // const getLastIdx = () =>
+  //   Math.min(
+  //     items.length,
+  //     Math.floor(offset() / rowHeight) + Math.ceil(rootHeight / rowHeight) + overscanCount,
+  //   );
 
   return [
     () => ({
-      containerHeight: items.length * rowHeight,
-      viewerTop: getFirstIdx() * rowHeight,
+      containerHeight: items.length !== 0 ? rowOffsets()[items.length - 1]! : 0,
+      viewerTop: rowOffsets()[getFirstIdx()]!,
       visibleItems: items.slice(getFirstIdx(), getLastIdx()) as unknown as T,
     }),
     e => {
       // @ts-expect-error
       if (e.target?.scrollTop !== undefined) setOffset(e.target.scrollTop);
+    },
+    {
+      scrollToItem: (itemIndex: number, scrollContainer: HTMLElement) => {
+        scrollContainer.scrollTop = rowOffsets()[itemIndex]!;
+      },
     },
   ];
 }
@@ -67,8 +107,9 @@ type VirtualListProps<T extends readonly any[], U extends JSX.Element> = {
   each: T | undefined | null | false;
   fallback?: JSX.Element;
   overscanCount?: number;
+  rowHeight: number | ((row: T[number], index: number) => number);
   rootHeight: number;
-  rowHeight: number;
+  setScrollToItem: (scrollToItem: (itemIndex: number) => void) => void;
 };
 
 /**
@@ -85,15 +126,20 @@ type VirtualListProps<T extends readonly any[], U extends JSX.Element> = {
 export function VirtualList<T extends readonly any[], U extends JSX.Element>(
   props: VirtualListProps<T, U>,
 ): JSX.Element {
-  const [virtual, onScroll] = createVirtualList({
+  const [virtual, onScroll, { scrollToItem }] = createVirtualList({
     items: () => props.each,
     rootHeight: () => props.rootHeight,
     rowHeight: () => props.rowHeight,
     overscanCount: () => props.overscanCount || 1,
   });
 
+  props.setScrollToItem((itemIndex: number) => scrollToItem(itemIndex, scrollContainer));
+
+  let scrollContainer!: HTMLDivElement;
+
   return (
     <div
+      ref={scrollContainer}
       style={{
         overflow: "auto",
         height: `${props.rootHeight}px`,
