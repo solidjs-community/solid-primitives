@@ -120,7 +120,7 @@ type VirtualListProps<T extends readonly any[], U extends JSX.Element> = {
  * @param fallback the optional fallback to display if the list of items to display is empty
  * @param overscanCount the number of elements to render both before and after the visible section of the list, so passing 5 will render 5 items before the list, and 5 items after. Defaults to 1, cannot be set to zero. This is necessary to hide the blank space around list items when scrolling
  * @param rootHeight the height of the root element of the virtualizedList itself
- * @param rowHeight the height of individual rows in the virtualizedList
+ * @param rowHeight the height of individual rows in the virtualizedList—can be static if just a number is provided, or dynamic if a callback is passed
  * @returns virtualized list component
  */
 export function VirtualList<T extends readonly any[], U extends JSX.Element>(
