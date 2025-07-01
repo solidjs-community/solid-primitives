@@ -29,27 +29,21 @@ type VirtualListReturn<T extends readonly any[]> = [
  * @param overscanCount the number of elements to render both before and after the visible section of the list, so passing 5 will render 5 items before the list, and 5 items after. Defaults to 1, cannot be set to zero. This is necessary to hide the blank space around list items when scrolling
  * @returns {VirtualListReturn} to use in the list's jsx
  */
-export function createVirtualList<T extends readonly any[]>({
-  items,
-  rootHeight,
-  rowHeight,
-  overscanCount,
-}: VirtualListConfig<T>): VirtualListReturn<T> {
-  items = access(items) || ([] as any as T);
-  rootHeight = access(rootHeight);
-  rowHeight = access(rowHeight);
-  overscanCount = access(overscanCount) || 1;
-
-  const resolveRowHeight =
-    typeof rowHeight === "function" ? rowHeight : (_: T[number], _i: number) => rowHeight;
+export function createVirtualList<T extends readonly any[]>(
+  cfg: VirtualListConfig<T>,
+): VirtualListReturn<T> {
+  const items = () => access(cfg.items) || ([] as any as T);
+  const overscanCount = () => access(cfg.overscanCount) || 1;
 
   const [offset, setOffset] = createSignal(0);
 
   const rowOffsets = createMemo(() => {
     let offset = 0;
-    return items.map((item, i) => {
+    return items().map((item, i) => {
       const current = offset;
-      offset += resolveRowHeight(item, i);
+      const rowHeight = access(cfg.rowHeight);
+
+      offset += typeof rowHeight === "function" ? rowHeight(item, i) : rowHeight;
       return current;
     });
   });
@@ -72,12 +66,15 @@ export function createVirtualList<T extends readonly any[]>({
     return lo;
   };
 
-  const getFirstIdx = () => Math.max(0, findRowIndexAtOffset(offset()) - overscanCount);
+  const getFirstIdx = () => Math.max(0, findRowIndexAtOffset(offset()) - overscanCount());
 
   // const getFirstIdx = () => Math.max(0, Math.floor(offset() / rowHeight) - overscanCount);
 
   const getLastIdx = () =>
-    Math.min(items.length, findRowIndexAtOffset(offset() + rootHeight) + overscanCount);
+    Math.min(
+      items().length,
+      findRowIndexAtOffset(offset() + access(cfg.rootHeight)) + overscanCount(),
+    );
 
   // const getLastIdx = () =>
   //   Math.min(
@@ -87,9 +84,9 @@ export function createVirtualList<T extends readonly any[]>({
 
   return [
     () => ({
-      containerHeight: items.length !== 0 ? rowOffsets()[items.length - 1]! : 0,
+      containerHeight: items().length !== 0 ? rowOffsets()[items().length - 1]! : 0,
       viewerTop: rowOffsets()[getFirstIdx()]!,
-      visibleItems: items.slice(getFirstIdx(), getLastIdx()) as unknown as T,
+      visibleItems: items().slice(getFirstIdx(), getLastIdx()) as unknown as T,
     }),
     e => {
       // @ts-expect-error
