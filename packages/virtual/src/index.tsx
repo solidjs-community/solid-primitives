@@ -17,7 +17,11 @@ type VirtualListReturn<T extends readonly any[]> = [
     visibleItems: T;
   }>,
   onScroll: (e: Event) => void,
-  { scrollToItem: (itemIndex: number, scrollContainer: HTMLElement) => void },
+  {
+    getFirstIdx: () => number;
+    getLastIdx: () => number;
+    scrollToItem: (itemIndex: number, scrollContainer: HTMLElement) => void;
+  },
 ];
 
 /**
@@ -93,6 +97,8 @@ export function createVirtualList<T extends readonly any[]>(
       if (e.target?.scrollTop !== undefined) setOffset(e.target.scrollTop);
     },
     {
+      getFirstIdx,
+      getLastIdx,
       scrollToItem: (itemIndex: number, scrollContainer: HTMLElement) => {
         scrollContainer.scrollTop = rowOffsets()[itemIndex]!;
       },
@@ -101,7 +107,7 @@ export function createVirtualList<T extends readonly any[]>(
 }
 
 type VirtualListProps<T extends readonly any[], U extends JSX.Element> = {
-  children: (item: T[number], index: Accessor<number>) => U;
+  children: (item: T[number], index: Accessor<number>, rawIndex: Accessor<number>) => U;
   each: T | undefined | null | false;
   fallback?: JSX.Element;
   overscanCount?: number;
@@ -124,7 +130,7 @@ type VirtualListProps<T extends readonly any[], U extends JSX.Element> = {
 export function VirtualList<T extends readonly any[], U extends JSX.Element>(
   props: VirtualListProps<T, U>,
 ): JSX.Element {
-  const [virtual, onScroll, { scrollToItem }] = createVirtualList({
+  const [virtual, onScroll, { scrollToItem, getFirstIdx }] = createVirtualList({
     items: () => props.each,
     rootHeight: () => props.rootHeight,
     rowHeight: () => props.rowHeight,
@@ -155,10 +161,11 @@ export function VirtualList<T extends readonly any[], U extends JSX.Element>(
           style={{
             position: "absolute",
             top: `${virtual().viewerTop}px`,
+            width: "inherit",
           }}
         >
           <For fallback={props.fallback} each={virtual().visibleItems}>
-            {props.children}
+            {(item, index) => props.children(item, () => getFirstIdx() + index(), index)}
           </For>
         </div>
       </div>
