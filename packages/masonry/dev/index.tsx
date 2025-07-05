@@ -1,4 +1,4 @@
-import { Component, createMemo, createSignal } from "solid-js";
+import { type Component, createMemo, createSignal } from "solid-js";
 
 import { createBreakpoints } from "@solid-primitives/media";
 import { createMasonry } from "../src/index.js";

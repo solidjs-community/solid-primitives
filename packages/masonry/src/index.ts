@@ -1,5 +1,5 @@
-import { Accessor, createMemo, createSignal, mapArray } from "solid-js";
-import { MaybeAccessor, asAccessor } from "@solid-primitives/utils";
+import { type Accessor, createMemo, createSignal, mapArray } from "solid-js";
+import { type MaybeAccessor, asAccessor } from "@solid-primitives/utils";
 
 const $SET_ITEM = Symbol("set-item");
 

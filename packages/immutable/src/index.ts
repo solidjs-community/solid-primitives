@@ -8,10 +8,10 @@ import {
   $PROXY,
   onCleanup,
   getListener,
-  Owner,
-  Accessor,
+  type Owner,
+  type Accessor,
 } from "solid-js";
-import { $RAW, ReconcileOptions } from "solid-js/store";
+import { $RAW, type ReconcileOptions } from "solid-js/store";
 import { trueFn, arrayEquals, noop } from "@solid-primitives/utils";
 import { keyArray } from "@solid-primitives/keyed";
 

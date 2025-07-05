@@ -1,4 +1,4 @@
-import { Component, createSignal, untrack } from "solid-js";
+import { type Component, createSignal, untrack } from "solid-js";
 import { makePersisted } from "../src/index.js";
 
 const App: Component = () => {

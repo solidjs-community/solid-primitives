@@ -1,5 +1,15 @@
 # @solid-primitives/date
 
+## 2.1.3
+
+### Patch Changes
+
+- 396812d: Enable verbatimModuleSyntax -> add `type` keyword to all type imports.
+- Updated dependencies [396812d]
+  - @solid-primitives/timer@1.4.2
+  - @solid-primitives/utils@6.3.2
+  - @solid-primitives/memo@1.4.3
+
 ## 2.1.2
 
 ### Patch Changes

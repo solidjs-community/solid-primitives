@@ -1,6 +1,6 @@
-import { Accessor, createSignal } from "solid-js";
+import { type Accessor, createSignal } from "solid-js";
 import { isServer } from "solid-js/web";
-import { Network } from "./networks.js";
+import { type Network } from "./networks.js";
 
 export type SharePopupOptions = {
   height?: number;

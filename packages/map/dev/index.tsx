@@ -1,4 +1,4 @@
-import { Component, For, createSignal } from "solid-js";
+import { type Component, For, createSignal } from "solid-js";
 
 import { ReactiveMap } from "../src/index.js";
 

@@ -1,5 +1,13 @@
 # @solid-primitives/deep
 
+## 0.3.3
+
+### Patch Changes
+
+- 396812d: Enable verbatimModuleSyntax -> add `type` keyword to all type imports.
+- Updated dependencies [396812d]
+  - @solid-primitives/memo@1.4.3
+
 ## 0.3.2
 
 ### Patch Changes

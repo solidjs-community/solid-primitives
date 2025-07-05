@@ -1,4 +1,4 @@
-import { Component, Suspense, createMemo, lazy } from "solid-js";
+import { type Component, Suspense, createMemo, lazy } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { HEADER_HEIGHT } from "~/components/Header/Header.jsx";
 import "./playground.scss";

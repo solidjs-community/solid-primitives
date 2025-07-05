@@ -1,6 +1,6 @@
-import { Accessor } from "solid-js";
-import { EmitterEmit, EmitterListen, EmitterOn } from "./emitter.js";
-import { createEventBus, Emit, Listen } from "./eventBus.js";
+import { type Accessor } from "solid-js";
+import { type EmitterEmit, type EmitterListen, type EmitterOn } from "./emitter.js";
+import { createEventBus, type Emit, type Listen } from "./eventBus.js";
 
 export type EventHubPayloadMap<M> = {
   [K in keyof M]: M[K] extends { emit: Emit<infer T> } ? T : never;

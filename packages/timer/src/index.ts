@@ -3,8 +3,8 @@ import {
   onCleanup,
   createEffect,
   untrack,
-  Accessor,
-  SignalOptions,
+  type Accessor,
+  type SignalOptions,
   createMemo,
 } from "solid-js";
 import { isServer } from "solid-js/web";

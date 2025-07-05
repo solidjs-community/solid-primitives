@@ -1,6 +1,6 @@
 import { makeEventListenerStack } from "@solid-primitives/event-listener";
-import { Position, clamp, noop } from "@solid-primitives/utils";
-import {
+import { type Position, clamp, noop } from "@solid-primitives/utils";
+import type {
   FollowTouchOptions,
   MousePosition,
   MousePositionInside,

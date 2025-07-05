@@ -1,4 +1,4 @@
-import { Accessor, createEffect, createSignal, onCleanup, Setter } from "solid-js";
+import { type Accessor, createEffect, createSignal, onCleanup, type Setter } from "solid-js";
 import { isServer } from "solid-js/web";
 
 export type HTMLSelection = [node: HTMLElement | null, start: number, end: number];

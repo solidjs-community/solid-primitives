@@ -1,5 +1,5 @@
 import { Rerun } from "../../keyed/src/index.js";
-import { Component, createSignal } from "solid-js";
+import { type Component, createSignal } from "solid-js";
 import { Transition } from "solid-transition-group";
 
 const App: Component = () => {

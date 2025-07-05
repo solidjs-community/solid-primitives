@@ -1,5 +1,5 @@
-import { Accessor, Component, For, batch, createSignal } from "solid-js";
-import { StoreSetter, createStore, unwrap } from "solid-js/store";
+import { type Accessor, type Component, For, batch, createSignal } from "solid-js";
+import { type StoreSetter, createStore, unwrap } from "solid-js/store";
 import { createRootPool } from "../src/index.js";
 
 type TodoItem = { title: string; done: boolean };

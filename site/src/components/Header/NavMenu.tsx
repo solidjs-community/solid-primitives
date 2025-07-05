@@ -1,5 +1,5 @@
-import { RefProps } from "@solid-primitives/refs";
-import { Component, For } from "solid-js";
+import { type RefProps } from "@solid-primitives/refs";
+import { type Component, For } from "solid-js";
 import { scrollIntoView } from "~/utils.js";
 import { A, useLocation } from "@solidjs/router";
 

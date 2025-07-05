@@ -1,4 +1,4 @@
-import { createSignal, ParentComponent } from "solid-js";
+import { createSignal, type ParentComponent } from "solid-js";
 import SlideModal from "../Modal/SlideModal.js";
 import Stage from "../Stage/Stage.js";
 

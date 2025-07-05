@@ -1,5 +1,18 @@
 # @solid-primitives/fullscreen
 
+## 1.3.3
+
+### Patch Changes
+
+- 48d890d: Add missing type keyword to type imports.
+
+## 1.3.2
+
+### Patch Changes
+
+- Updated dependencies [396812d]
+  - @solid-primitives/utils@6.3.2
+
 ## 1.3.1
 
 ### Patch Changes

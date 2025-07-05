@@ -1,4 +1,4 @@
-import { Component, createEffect, createSignal } from "solid-js";
+import { type Component, createEffect, createSignal } from "solid-js";
 
 import { createWebShare } from "../src/index.js";
 

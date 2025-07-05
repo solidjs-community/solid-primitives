@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup, JSX, getOwner } from "solid-js";
+import { createEffect, createSignal, onCleanup, type JSX, getOwner } from "solid-js";
 import { isServer } from "solid-js/web";
 import type { Accessor } from "solid-js";
 import { access } from "@solid-primitives/utils";

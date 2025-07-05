@@ -1,4 +1,4 @@
-import { Countdown, DateInit, RelativeFormatMessages, Unit } from "./types.js";
+import type { Countdown, DateInit, RelativeFormatMessages, Unit } from "./types.js";
 import { DAY, DEFAULT_MESSAGES, HOUR, MINUTE, SECOND, UNITS } from "./variables.js";
 
 /**

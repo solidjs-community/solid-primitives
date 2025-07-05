@@ -1,5 +1,5 @@
 import {
-  Component,
+  type Component,
   createResource,
   createSignal,
   onMount,

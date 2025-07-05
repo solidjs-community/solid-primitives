@@ -1,4 +1,4 @@
-import { Component, createMemo, createResource, onMount, Suspense } from "solid-js";
+import { type Component, createMemo, createResource, onMount, Suspense } from "solid-js";
 import { fetchPackageData, getCachedPackageListItemData } from "~/api.js";
 import { PRIMITIVE_PAGE_PADDING_TOP } from "~/components/Header/Header.jsx";
 import InfoBar from "~/components/Primitives/InfoBar.jsx";

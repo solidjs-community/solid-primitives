@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { type Component } from "solid-js";
 
 const Hamburger: Component<{ ref: HTMLButtonElement; active: boolean }> = props => {
   return (

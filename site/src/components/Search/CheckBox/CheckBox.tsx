@@ -1,4 +1,4 @@
-import { ParentComponent } from "solid-js";
+import { type ParentComponent } from "solid-js";
 import s from "./checkbox.module.scss.js";
 
 const CheckBox: ParentComponent<{

@@ -1,5 +1,11 @@
 # @solid-primitives/fetch
 
+## 2.5.2
+
+### Patch Changes
+
+- 396812d: Enable verbatimModuleSyntax -> add `type` keyword to all type imports.
+
 ## 2.5.1
 
 ### Patch Changes

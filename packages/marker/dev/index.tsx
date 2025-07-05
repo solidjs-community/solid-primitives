@@ -1,4 +1,4 @@
-import { Component, createMemo, createSignal } from "solid-js";
+import { type Component, createMemo, createSignal } from "solid-js";
 
 import { createMarker, makeSearchRegex } from "../src/index.js";
 

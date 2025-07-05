@@ -1,11 +1,11 @@
 import {
   access,
   accessArray,
-  MaybeAccessor,
-  MaybeAccessorValue,
-  Modify,
+  type MaybeAccessor,
+  type MaybeAccessorValue,
+  type Modify,
 } from "@solid-primitives/utils";
-import { Accessor, createMemo } from "solid-js";
+import { type Accessor, createMemo } from "solid-js";
 import * as _ from "@solid-primitives/utils/immutable";
 
 /**

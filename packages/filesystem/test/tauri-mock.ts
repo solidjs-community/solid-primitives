@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { makeVirtualFileSystem } from "../src/index.js";
-import { FileEntry, FsDirOptions } from "@tauri-apps/api/fs";
+import { type FileEntry, type FsDirOptions } from "@tauri-apps/api/fs";
 
 const vfs = makeVirtualFileSystem();
 

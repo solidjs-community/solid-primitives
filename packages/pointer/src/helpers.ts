@@ -1,6 +1,6 @@
 import { pick } from "@solid-primitives/utils/immutable";
-import { Position } from "@solid-primitives/utils";
-import {
+import { type Position } from "@solid-primitives/utils";
+import type {
   AnyOnEventName,
   ParsedEventHandlers,
   PointerState,

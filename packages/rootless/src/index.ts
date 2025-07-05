@@ -3,17 +3,17 @@ import {
   getOwner,
   onCleanup,
   runWithOwner,
-  Owner,
+  type Owner,
   sharedConfig,
-  Accessor,
+  type Accessor,
   createSignal,
-  Signal,
+  type Signal,
   batch,
-  Setter,
+  type Setter,
 } from "solid-js";
 import { isServer } from "solid-js/web";
 import {
-  AnyFunction,
+  type AnyFunction,
   asArray,
   access,
   noop,

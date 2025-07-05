@@ -1,5 +1,5 @@
 /* @refresh reload */
-import { Component, createSignal, For } from "solid-js";
+import { type Component, createSignal, For } from "solid-js";
 
 import { useKeyDownList, createKeyHold, createShortcut } from "../src/index.js";
 

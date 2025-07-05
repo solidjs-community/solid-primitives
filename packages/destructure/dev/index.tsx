@@ -1,5 +1,5 @@
 import { destructure } from "../src/index.js";
-import { Component, createEffect, createSignal } from "solid-js";
+import { type Component, createEffect, createSignal } from "solid-js";
 
 const Inner: Component<{ seconds: number; count: number; list: { n?: number }[] }> = props => {
   const { seconds, count } = destructure(props, { lazy: true });

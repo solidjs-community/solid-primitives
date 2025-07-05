@@ -1,5 +1,5 @@
-import { MaybeAccessor, noop } from "@solid-primitives/utils";
-import { createSignal, createMemo, Accessor, onCleanup } from "solid-js";
+import { type MaybeAccessor, noop } from "@solid-primitives/utils";
+import { createSignal, createMemo, type Accessor, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 
 /**

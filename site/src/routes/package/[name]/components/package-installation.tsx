@@ -1,12 +1,12 @@
 import { writeClipboard } from "@solid-primitives/clipboard";
 import { debounce } from "@solid-primitives/scheduled";
-import { Component, createSignal, JSX } from "solid-js";
-import NpmLogo from "~/components/Icons/NpmLogo";
-import NpmMonochrome from "~/components/Icons/NpmMonochrome";
-import PnpmLogo from "~/components/Icons/PnpmLogo";
-import PnpmMonochrome from "~/components/Icons/PnpmMonochrome";
-import YarnLogo from "~/components/Icons/YarnLogo";
-import YarnMonochrome from "~/components/Icons/YarnMonochrome";
+import { type Component, createSignal, type JSX } from "solid-js";
+import NpmLogo from "~/components/Icons/NpmLogo.jsx";
+import NpmMonochrome from "~/components/Icons/NpmMonochrome.jsx";
+import PnpmLogo from "~/components/Icons/PnpmLogo.jsx";
+import PnpmMonochrome from "~/components/Icons/PnpmMonochrome.jsx";
+import YarnLogo from "~/components/Icons/YarnLogo.jsx";
+import YarnMonochrome from "~/components/Icons/YarnMonochrome.jsx";
 
 const PACKAGE_MANAGER_TYPES = ["npm", "yarn", "pnpm"] as const;
 type PackageManagerType = (typeof PACKAGE_MANAGER_TYPES)[number];

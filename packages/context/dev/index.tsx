@@ -1,9 +1,9 @@
 import { createContextProvider, MultiProvider } from "../src/index.js";
 import {
-  Component,
+  type Component,
   createContext,
   createSignal,
-  FlowComponent,
+  type FlowComponent,
   untrack,
   useContext,
 } from "solid-js";

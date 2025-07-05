@@ -1,5 +1,22 @@
 # @solid-primitives/connectivity
 
+## 0.4.3
+
+### Patch Changes
+
+- Updated dependencies [48d890d]
+  - @solid-primitives/event-listener@2.4.3
+
+## 0.4.2
+
+### Patch Changes
+
+- 396812d: Enable verbatimModuleSyntax -> add `type` keyword to all type imports.
+- Updated dependencies [396812d]
+  - @solid-primitives/event-listener@2.4.2
+  - @solid-primitives/rootless@1.5.2
+  - @solid-primitives/utils@6.3.2
+
 ## 0.4.1
 
 ### Patch Changes

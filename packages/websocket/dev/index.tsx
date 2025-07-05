@@ -1,4 +1,4 @@
-import { Component, For, Show, createSignal, onMount } from "solid-js";
+import { type Component, For, Show, createSignal, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { type WSMessage, createReconnectingWS } from "../src/index.js";
 

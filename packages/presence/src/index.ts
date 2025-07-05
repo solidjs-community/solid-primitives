@@ -14,7 +14,7 @@ import {
   createMemo,
   untrack,
 } from "solid-js";
-import { MaybeAccessor, asAccessor } from "@solid-primitives/utils";
+import { type MaybeAccessor, asAccessor } from "@solid-primitives/utils";
 
 export type SharedTransitionConfig = {
   /** Duration in milliseconds used both for enter and exit transitions. */

@@ -1,11 +1,11 @@
 import { createEventListener } from "@solid-primitives/event-listener";
 import { remove, split } from "@solid-primitives/utils/immutable";
 import { createSubRoot } from "@solid-primitives/rootless";
-import { Directive, entries, Many, MaybeAccessor } from "@solid-primitives/utils";
-import { Accessor, createSignal, getOwner, DEV } from "solid-js";
+import { type Directive, entries, type Many, type MaybeAccessor } from "@solid-primitives/utils";
+import { type Accessor, createSignal, getOwner, DEV } from "solid-js";
 import { isServer } from "solid-js/web";
 import { DEFAULT_STATE, parseHandlersMap, toState, toStateActive } from "./helpers.js";
-import {
+import type {
   Handler,
   OnEventRecord,
   PointerEventNames,

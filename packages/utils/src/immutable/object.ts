@@ -1,5 +1,5 @@
 import { withObjectCopy, shallowObjectCopy } from "./copy.js";
-import { Modify } from "../index.js";
+import { type Modify } from "../index.js";
 
 /**
  * Create a new subset object without the provided keys

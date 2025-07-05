@@ -1,4 +1,4 @@
-import { Component, createEffect, createMemo, createSignal } from "solid-js";
+import { type Component, createEffect, createMemo, createSignal } from "solid-js";
 import { createScheduled, debounce, leading, leadingAndTrailing, throttle } from "../src/index.js";
 
 const Reactive: Component = props => {

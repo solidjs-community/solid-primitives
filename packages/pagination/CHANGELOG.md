@@ -1,5 +1,19 @@
 # @solid-primitives/pagination
 
+## 0.4.3
+
+### Patch Changes
+
+- 48d890d: Add missing type keyword to type imports.
+
+## 0.4.2
+
+### Patch Changes
+
+- 396812d: Enable verbatimModuleSyntax -> add `type` keyword to all type imports.
+- Updated dependencies [396812d]
+  - @solid-primitives/utils@6.3.2
+
 ## 0.4.1
 
 ### Patch Changes
