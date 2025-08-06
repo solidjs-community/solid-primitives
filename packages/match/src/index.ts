@@ -61,6 +61,7 @@ export function MatchTag(props: any): any {
   const kind = createMemo(() => props.on?.[props.tag ?? 'type'])
   return createMemo(() => props.case[kind()]?.(() => props.on) ?? props.fallback)
 }
+export {MatchTag as MatchField}
 
 /**
  * Control-flow component for matching union literals.
