@@ -17,7 +17,8 @@
     "name": "match",
     "stage": 0,
     "list": [
-      "Match"
+      "MatchTag",
+      "MatchValue"
     ],
     "category": "Control Flow"
   },
