@@ -1,9 +1,9 @@
-import { access, MaybeAccessor } from "@solid-primitives/utils";
+import { access, type MaybeAccessor } from "@solid-primitives/utils";
 import {
-  Accessor,
+  type Accessor,
   createEffect,
   createResource,
-  InitializedResource,
+  type InitializedResource,
   on,
   onCleanup,
 } from "solid-js";

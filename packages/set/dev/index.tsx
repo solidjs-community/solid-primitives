@@ -1,4 +1,4 @@
-import { Component, createEffect, For } from "solid-js";
+import { type Component, createEffect, For } from "solid-js";
 
 import { ReactiveSet } from "../src/index.js";
 

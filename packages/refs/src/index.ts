@@ -1,5 +1,13 @@
 import { chain, arrayEquals } from "@solid-primitives/utils";
-import { Accessor, children, createComputed, createMemo, JSX, onCleanup, untrack } from "solid-js";
+import {
+  type Accessor,
+  children,
+  createComputed,
+  createMemo,
+  type JSX,
+  onCleanup,
+  untrack,
+} from "solid-js";
 import { isServer } from "solid-js/web";
 
 // TODO delete in next major version

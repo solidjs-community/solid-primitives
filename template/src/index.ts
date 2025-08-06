@@ -1,4 +1,4 @@
-import { Accessor, Setter, createSignal, JSX } from "solid-js";
+import { type Accessor, type Setter, createSignal, type JSX } from "solid-js";
 import { isServer } from "solid-js/web";
 
 /**

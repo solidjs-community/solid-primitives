@@ -1,18 +1,18 @@
-import { accessWith, isObject, SetterParam } from "@solid-primitives/utils";
+import { accessWith, isObject, type SetterParam } from "@solid-primitives/utils";
 import {
-  Accessor,
+  type Accessor,
   batch,
   createMemo,
   createSignal,
-  EffectFunction,
+  type EffectFunction,
   getListener,
   getOwner,
-  MemoOptions,
-  NoInfer,
+  type MemoOptions,
+  type NoInfer,
   onMount,
   runWithOwner,
   sharedConfig,
-  Signal,
+  type Signal,
   untrack,
 } from "solid-js";
 import { isServer } from "solid-js/web";

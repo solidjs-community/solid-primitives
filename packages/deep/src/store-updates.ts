@@ -1,5 +1,5 @@
 import { createLazyMemo } from "@solid-primitives/memo";
-import { $PROXY, $TRACK, Accessor, createRoot, untrack } from "solid-js";
+import { $PROXY, $TRACK, type Accessor, createRoot, untrack } from "solid-js";
 import { unwrap } from "solid-js/store";
 import { isDev, isServer } from "solid-js/web";
 

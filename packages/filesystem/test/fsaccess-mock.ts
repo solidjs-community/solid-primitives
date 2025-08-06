@@ -1,4 +1,4 @@
-import { ObjectFileSystem } from "../src/index.js";
+import { type ObjectFileSystem } from "../src/index.js";
 
 export class FileSystemHandle {
   get kind(): "file" | "directory" {

@@ -1,8 +1,8 @@
-import { access, MaybeAccessor, accessWith } from "@solid-primitives/utils";
+import { access, type MaybeAccessor, accessWith } from "@solid-primitives/utils";
 import { createWritableMemo } from "@solid-primitives/memo";
-import { createPolled, TimeoutSource } from "@solid-primitives/timer";
-import { Accessor, createComputed, createMemo, createSignal } from "solid-js";
-import { createStore, Store } from "solid-js/store";
+import { createPolled, type TimeoutSource } from "@solid-primitives/timer";
+import { type Accessor, createComputed, createMemo, createSignal } from "solid-js";
+import { createStore, type Store } from "solid-js/store";
 import { DEFAULT_MESSAGES, HOUR, MINUTE } from "./variables.js";
 import {
   formatDate,

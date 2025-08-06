@@ -1,6 +1,6 @@
 import { isIOS, isWindows } from "@solid-primitives/platform";
 import { FiSearch } from "solid-icons/fi";
-import { Component, Show } from "solid-js";
+import { type Component, Show } from "solid-js";
 import { focusSearchInput } from "./Search.js";
 
 const SearchBtn: Component<{ ref: HTMLButtonElement }> = props => {

@@ -1,11 +1,11 @@
-import { Component, createSignal, onMount } from "solid-js";
+import { type Component, createSignal, onMount } from "solid-js";
 
 import {
   anyMaskToFn,
   createInputMask,
   createMaskPattern,
   maskArrayToFn,
-  Selection,
+  type Selection,
 } from "../src/index.js";
 
 const App: Component = () => {

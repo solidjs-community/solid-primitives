@@ -1,14 +1,14 @@
 import {
-  Many,
-  MaybeAccessor,
+  type Many,
+  type MaybeAccessor,
   access,
   asArray,
-  Directive,
+  type Directive,
   tryOnCleanup,
 } from "@solid-primitives/utils";
-import { Accessor, createEffect, createRenderEffect, createSignal } from "solid-js";
+import { type Accessor, createEffect, createRenderEffect, createSignal } from "solid-js";
 import { isServer } from "solid-js/web";
-import {
+import type {
   EventListenerDirectiveProps,
   EventMapOf,
   TargetWithEventMap,

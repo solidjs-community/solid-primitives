@@ -1,4 +1,4 @@
-import { Component, Switch, Match } from "solid-js";
+import { type Component, Switch, Match } from "solid-js";
 
 import { createIdleTimer } from "../src/index.js";
 

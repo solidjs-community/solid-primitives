@@ -1,12 +1,12 @@
 import {
   createEventHub,
-  Listen,
+  type Listen,
   createEventStack,
-  EventStack,
-  Emit,
+  type EventStack,
+  type Emit,
   createEventBus,
 } from "../src/index.js";
-import { Component, createSignal, For, onMount } from "solid-js";
+import { type Component, createSignal, For, onMount } from "solid-js";
 
 const App: Component = () => {
   return (

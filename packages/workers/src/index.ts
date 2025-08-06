@@ -1,4 +1,4 @@
-import { Accessor, Setter, createEffect, on, onCleanup } from "solid-js";
+import { type Accessor, type Setter, createEffect, on, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 import type { PostMessageOptions, WorkerCallbacks, WorkerExports, WorkerMessage } from "./types.js";
 import { KILL, RPC, cjs, setup } from "./utils.js";

@@ -5,12 +5,12 @@ import {
   access,
   asArray,
   handleDiffArray,
-  Many,
-  MaybeAccessor,
+  type Many,
+  type MaybeAccessor,
   noop,
   filterNonNullable,
 } from "@solid-primitives/utils";
-import { Accessor, createEffect, onCleanup, sharedConfig } from "solid-js";
+import { type Accessor, createEffect, onCleanup, sharedConfig } from "solid-js";
 import { isServer } from "solid-js/web";
 
 type ResizeObserverEntryGeneric<T extends Element> = ResizeObserverEntry & { readonly target: T };

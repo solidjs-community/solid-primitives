@@ -1,6 +1,6 @@
 import { isServer } from "solid-js/web";
 import { keys } from "@solid-primitives/utils";
-import { Component } from "solid-js";
+import { type Component } from "solid-js";
 import { makeEventListener } from "./eventListener.js";
 
 export type WindowEventProps = {

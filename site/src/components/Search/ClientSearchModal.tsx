@@ -3,7 +3,7 @@ import { createMediaQuery } from "@solid-primitives/media";
 import { isIOS } from "@solid-primitives/platform";
 import { defer } from "@solid-primitives/utils";
 import Dismiss from "solid-dismiss";
-import { Component, createEffect, onMount } from "solid-js";
+import { type Component, createEffect, onMount } from "solid-js";
 import { createShortcut } from "~/primitives/createShortcut.js";
 import { doesPathnameMatchBase, scrollIntoView } from "~/utils.js";
 import * as Header from "../Header/Header.js";

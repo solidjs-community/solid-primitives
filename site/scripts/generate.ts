@@ -13,15 +13,15 @@ import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { fileURLToPath } from "url";
 import {
-  ModuleData,
-  PrimitiveData,
+  type ModuleData,
+  type PrimitiveData,
   formatBytes,
   getModulesData,
   getPackageBundlesize,
   isNonNullable,
 } from "../../scripts/utils/index.js";
 import { GITHUB_REPO } from "../src/constants.js";
-import { PackageData, PackageListItem } from "../src/types.js";
+import type { PackageData, PackageListItem } from "../src/types.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -1,5 +1,5 @@
 import {
-  Accessor,
+  type Accessor,
   batch,
   createSignal,
   untrack,

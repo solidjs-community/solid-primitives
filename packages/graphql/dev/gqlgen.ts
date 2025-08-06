@@ -1,4 +1,4 @@
-import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
+import * as gql_doc from "@graphql-typed-document-node/core";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -177,7 +177,7 @@ export const CountryQueryDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<CountryQueryQuery, CountryQueryQueryVariables>;
+} as unknown as gql_doc.TypedDocumentNode<CountryQueryQuery, CountryQueryQueryVariables>;
 export const CountriesQueryDocument = {
   kind: "Document",
   definitions: [
@@ -203,4 +203,4 @@ export const CountriesQueryDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<CountriesQueryQuery, CountriesQueryQueryVariables>;
+} as unknown as gql_doc.TypedDocumentNode<CountriesQueryQuery, CountriesQueryQueryVariables>;

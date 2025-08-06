@@ -1,4 +1,4 @@
-import { Accessor } from "solid-js";
+import { type Accessor } from "solid-js";
 
 export type EventTypeName = keyof HTMLElementEventMap | keyof DocumentEventMap;
 

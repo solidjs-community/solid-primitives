@@ -8,7 +8,7 @@ import {
   useTransition,
 } from "solid-js";
 import { resolveElements } from "@solid-primitives/refs";
-import { Component, createSignal, For, Show } from "solid-js";
+import { type Component, createSignal, For, Show } from "solid-js";
 import { createListTransition } from "../src/index.js";
 
 const grayOutOnDispose = (el: HTMLElement) => {

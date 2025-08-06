@@ -1,7 +1,7 @@
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createDerivedStaticStore, createStaticStore } from "@solid-primitives/static-store";
-import { asAccessor, MaybeAccessor, Position } from "@solid-primitives/utils";
-import { Accessor, createEffect, createSignal, onMount, sharedConfig } from "solid-js";
+import { asAccessor, type MaybeAccessor, type Position } from "@solid-primitives/utils";
+import { type Accessor, createEffect, createSignal, onMount, sharedConfig } from "solid-js";
 import { isServer } from "solid-js/web";
 import {
   DEFAULT_MOUSE_POSITION,
@@ -10,7 +10,7 @@ import {
   makeMouseInsideListener,
   makeMousePositionListener,
 } from "./common.js";
-import {
+import type {
   FollowTouchOptions,
   MousePositionInside,
   PositionRelativeToElement,

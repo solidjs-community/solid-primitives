@@ -1,4 +1,4 @@
-import { Component, createSignal, JSX } from "solid-js";
+import { type Component, createSignal, type JSX } from "solid-js";
 
 import { createControlledProps } from "../src/index.js";
 

@@ -1,16 +1,16 @@
-import { Component, createResource, Show, Suspense } from "solid-js";
+import { type Component, createResource, Show, Suspense } from "solid-js";
 import { NoHydration } from "solid-js/web";
-import { fetchHomeContent, fetchPackageList } from "~/api";
-import { HEADER_HEIGHT } from "~/components/Header/Header";
-import PrimitiveBtn from "~/components/Primitives/PrimitiveBtn";
-import PrimitiveBtnLineWrapper from "~/components/Primitives/PrimitiveBtnLineWrapper";
-import { SizeBadgeWrapper, SizeBadge } from "~/components/Primitives/SizeBadge";
-import StageBadge from "~/components/Primitives/StageBadge";
-import { VersionBadge } from "~/components/Primitives/VersionBadge";
-import { H2 } from "~/components/prose";
-import { StageContent } from "~/components/Stage/Stage";
-import * as Table from "~/components/table";
-import { PackageListItem } from "~/types";
+import { fetchHomeContent, fetchPackageList } from "~/api.js";
+import { HEADER_HEIGHT } from "~/components/Header/Header.jsx";
+import PrimitiveBtn from "~/components/Primitives/PrimitiveBtn.jsx";
+import PrimitiveBtnLineWrapper from "~/components/Primitives/PrimitiveBtnLineWrapper.jsx";
+import { SizeBadgeWrapper, SizeBadge } from "~/components/Primitives/SizeBadge.jsx";
+import StageBadge from "~/components/Primitives/StageBadge.jsx";
+import { VersionBadge } from "~/components/Primitives/VersionBadge.jsx";
+import { H2 } from "~/components/prose.jsx";
+import { StageContent } from "~/components/Stage/Stage.jsx";
+import * as Table from "~/components/table.jsx";
+import type { PackageListItem } from "~/types.js";
 import { Title } from "@solidjs/meta";
 
 const Header: Component = () => {

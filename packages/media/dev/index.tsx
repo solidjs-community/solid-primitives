@@ -1,4 +1,4 @@
-import { Component, createEffect, Match, Switch } from "solid-js";
+import { type Component, createEffect, Match, Switch } from "solid-js";
 
 import { createBreakpoints } from "../src/index.js";
 import "./style.css";

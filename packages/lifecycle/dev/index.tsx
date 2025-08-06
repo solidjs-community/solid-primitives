@@ -1,4 +1,4 @@
-import { children, createSignal, JSX, onMount } from "solid-js";
+import { children, createSignal, type JSX, onMount } from "solid-js";
 
 import { onElementConnect } from "../src/index.js";
 

@@ -1,12 +1,13 @@
+import "./fsaccess-mock.js";
+
 import { describe, test, expect, vi } from "vitest";
-import "./fsaccess-mock";
 import {
   createFileSystem,
   makeNoFileSystem,
   makeNoAsyncFileSystem,
   makeVirtualFileSystem,
   makeNodeFileSystem,
-  FileSystemAdapter,
+  type FileSystemAdapter,
   makeWebAccessFileSystem,
   makeTauriFileSystem,
   rsync,

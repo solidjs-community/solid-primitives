@@ -1,4 +1,4 @@
-import { Component, createSignal, Suspense, For, Switch, Match } from "solid-js";
+import { type Component, createSignal, Suspense, For, Switch, Match } from "solid-js";
 import { createClipboard, copyToClipboard, newClipboardItem, input } from "../src/index.js";
 
 // @ts-ignore

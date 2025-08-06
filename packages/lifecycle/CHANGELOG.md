@@ -1,5 +1,11 @@
 # @solid-primitives/lifecycle
 
+## 0.1.2
+
+### Patch Changes
+
+- 396812d: Enable verbatimModuleSyntax -> add `type` keyword to all type imports.
+
 ## 0.1.1
 
 ### Patch Changes

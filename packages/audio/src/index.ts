@@ -1,4 +1,4 @@
-import { Accessor, onMount, onCleanup, createEffect } from "solid-js";
+import { type Accessor, onMount, onCleanup, createEffect } from "solid-js";
 import { isServer } from "solid-js/web";
 import { access, noop } from "@solid-primitives/utils";
 import { createStaticStore } from "@solid-primitives/static-store";

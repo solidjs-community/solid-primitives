@@ -1,4 +1,4 @@
-import { Component, createSignal, Setter } from "solid-js";
+import { type Component, createSignal, type Setter } from "solid-js";
 
 import { createElementSize, createWindowSize, createResizeObserver } from "../src/index.js";
 

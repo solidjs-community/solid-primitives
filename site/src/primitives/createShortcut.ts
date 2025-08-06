@@ -1,7 +1,15 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { createSharedRoot } from "@solid-primitives/rootless";
 import { arrayEquals } from "@solid-primitives/utils";
-import { Accessor, batch, createEffect, createMemo, createSignal, on, untrack } from "solid-js";
+import {
+  type Accessor,
+  batch,
+  createEffect,
+  createMemo,
+  createSignal,
+  on,
+  untrack,
+} from "solid-js";
 import { isServer } from "solid-js/web";
 
 export type ModifierKey = "Alt" | "Control" | "Meta" | "Shift";

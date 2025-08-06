@@ -1,4 +1,4 @@
-import { Position } from "@solid-primitives/utils";
+import { type Position } from "@solid-primitives/utils";
 
 export type MouseSourceType = "mouse" | "touch" | null;
 

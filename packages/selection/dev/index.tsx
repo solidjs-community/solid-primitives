@@ -1,4 +1,4 @@
-import { Component, createEffect, createSignal } from "solid-js";
+import { type Component, createEffect, createSignal } from "solid-js";
 
 import { createSelection } from "../src/index.js";
 

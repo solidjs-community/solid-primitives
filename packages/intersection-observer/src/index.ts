@@ -1,7 +1,20 @@
-import { onMount, onCleanup, createSignal, createEffect, untrack, Setter, DEV } from "solid-js";
+import {
+  onMount,
+  onCleanup,
+  createSignal,
+  createEffect,
+  untrack,
+  type Setter,
+  DEV,
+} from "solid-js";
 import type { JSX, Accessor } from "solid-js";
 import { isServer } from "solid-js/web";
-import { access, FalsyValue, MaybeAccessor, handleDiffArray } from "@solid-primitives/utils";
+import {
+  access,
+  type FalsyValue,
+  type MaybeAccessor,
+  handleDiffArray,
+} from "@solid-primitives/utils";
 
 export type AddIntersectionObserverEntry = (el: Element) => void;
 export type RemoveIntersectionObserverEntry = (el: Element) => void;

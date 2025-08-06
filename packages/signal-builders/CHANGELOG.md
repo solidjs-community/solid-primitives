@@ -1,5 +1,13 @@
 # @solid-primitives/signal-builders
 
+## 0.2.2
+
+### Patch Changes
+
+- 396812d: Enable verbatimModuleSyntax -> add `type` keyword to all type imports.
+- Updated dependencies [396812d]
+  - @solid-primitives/utils@6.3.2
+
 ## 0.2.1
 
 ### Patch Changes

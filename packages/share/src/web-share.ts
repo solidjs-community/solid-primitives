@@ -1,4 +1,4 @@
-import { Accessor, createEffect, createSignal, on, OnOptions } from "solid-js";
+import { type Accessor, createEffect, createSignal, on, type OnOptions } from "solid-js";
 import { isServer } from "solid-js/web";
 
 /**

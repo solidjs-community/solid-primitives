@@ -1,5 +1,5 @@
 /* @refresh reload */
-import { Component, lazy } from "solid-js";
+import { type Component, lazy } from "solid-js";
 
 import { Router, Routes, Route, Link } from "@solidjs/router";
 
