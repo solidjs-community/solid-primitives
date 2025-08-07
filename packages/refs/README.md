@@ -13,6 +13,7 @@ Collection of primitives, components and directives that help managing reference
 ##### Primitives:
 
 - [`mergeRefs`](#mergerefs) - Utility for chaining multiple `ref` assignments with `props.ref` forwarding.
+- [`createRef`](#createref) - Reactive callback-ref with listeners, element accessor and cleanup.
 - [`resolveElements`](#resolveelements) - Utility for resolving recursively nested JSX children to a single element or an array of elements.
 - [`resolveFirst`](#resolvefirst) - Utility for resolving recursively nested JSX children in search of the first element that matches a predicate.
 - [`<Refs>`](#refs) - Get up-to-date references of the multiple children elements.
@@ -187,6 +188,45 @@ Component properties with types for `ref` prop
 ```ts
 interface RefProps<T> {
   ref?: Ref<T>;
+}
+```
+
+## `createRef`
+
+A reactive callback-ref that **stores the element**, lets you add/remove
+mount-and-update listeners, and cleans itself up when the owner disposes.
+
+### How to use it
+
+```tsx
+import { createRef, RefRef } from "@solid-primitives/refs";
+import { onCleanup } from "solid-js";
+
+function ripple(e: MouseEvent) {
+  const btn = e.currentTarget as HTMLElement;
+  // … ripple-effect code …
+}
+
+export function RippleButton(props: { children: string }) {
+  // create the ref and attach the ripple listener on first mount
+  const {
+    setter: internalRef,      // JSX callback-ref
+    element,                  // () => HTMLElement | undefined
+    addEventOnChange,         // add more listeners later
+  } = createRef<HTMLButtonElement>(el => el.addEventListener("click", ripple), true);
+
+  // (optional) forward the ref to a parent
+  const forwardedRef = (el: HTMLButtonElement | undefined) => console.log("parent got", el);
+  const ref = RefRef(internalRef, forwardedRef); // combine both refs
+
+  // manual cleanup that runs in addition to createRef’s auto-cleanup
+  onCleanup(() => element()?.removeEventListener("click", ripple));
+
+  return (
+    <button ref={ref} class="btn ripple">
+      {props.children}
+    </button>
+  );
 }
 ```
 
