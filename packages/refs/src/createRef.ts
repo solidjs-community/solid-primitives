@@ -4,7 +4,7 @@ import { onCleanup } from "solid-js";
  * Types
 \* ---------------------------------------------------------------- */
 
-export type RefSetter<T extends HTMLElement = HTMLElement> = (el: T | undefined) => void;
+export type RefSetter<T extends HTMLElement = HTMLElement> = (el: T | undefined) => void | (() => void);
 export type RawRef<T extends HTMLElement = HTMLElement> = T | RefSetter<T> | undefined;
 
 export interface ReturnCreateRef<T extends HTMLElement = HTMLElement> {
@@ -47,34 +47,38 @@ export function createRef<T extends HTMLElement = HTMLElement>(
   initialOnChange?: RefSetter<T>,
   once: boolean = false
 ): ReturnCreateRef<T> {
-  /* ----------  SSR fallback : return no-op impl  -------------------- */
-  if (typeof window === "undefined") {
-    const noop = () => {};
-    const undef = () => undefined as unknown as T;
-    return {
-      setter: noop,
-      element: undef,
-      addEventOnChange: noop,
-      removeEventOnChange: () => false,
-      cleanup: noop,
-    };
-  }
 
   /* ----------  Internal state  ------------------------------------- */
-  let element_: T | undefined;
+  type EventData = {
+    func: RefSetter<T>;
+    once: boolean;
+    cleanupFn?: () => void;
+  };
 
-  type Listener = { func: RefSetter<T>; once: boolean };
-  let listeners: Map<string, Listener> | undefined = initialOnChange
+  let element_: T | undefined;
+  let listeners: Map<string, EventData> | undefined = initialOnChange
     ? new Map([["default", { func: initialOnChange, once }]])
     : undefined;
 
   /* ----------  JSX ref callback  ----------------------------------- */
   const setter: RefSetter<T> = (el) => {
+    if (el === element_ || !globalThis.document) return;
+
+    if (element_ && listeners) {
+      for (const data of listeners.values()) data.cleanupFn?.();
+    }
+
     element_ = el;
     if (!listeners) return;
-    for (const [key, data] of listeners) {
-      data.func(el);
-      if (data.once) listeners.delete(key);
+
+    for (const [key, data] of listeners.entries()) {
+      const maybeCleanup = data.func(el);
+      if (typeof maybeCleanup === "function") data.cleanupFn = maybeCleanup;
+
+      if (data.once) {
+        data.cleanupFn?.();
+        listeners.delete(key);
+      }
     }
   };
 
@@ -86,12 +90,41 @@ export function createRef<T extends HTMLElement = HTMLElement>(
     key: string = "default",
     once: boolean = false
   ): void {
-    if (listeners) listeners.set(key, { func: onChange, once });
-    else listeners = new Map([[key, { func: onChange, once }]]);
+    listeners?.get(key)?.cleanupFn?.();
+
+    const data: EventData = { func: onChange, once };
+    if (listeners) listeners.set(key, data);
+    else listeners = new Map([[key, data]]);
   }
 
-  const removeEventOnChange = (key: string) =>
-    listeners ? listeners.delete(key) : false;
+  const removeEventOnChange = (key: string) => {
+    listeners?.get(key)?.cleanupFn?.();
+    return listeners ? listeners.delete(key) : false;
+  };
+
+  function purgeEvents(
+    events: Map<string, EventData>,
+    clearEvents: boolean,
+    clearDefaultEvent: boolean
+  ): Map<string, EventData> | undefined {
+    for (const [key, data] of events) {
+      if (clearEvents || (clearDefaultEvent && key === "default")) {
+        data.cleanupFn?.();
+      }
+    }
+
+    if (clearEvents && clearDefaultEvent) return undefined;
+
+    if (clearEvents && !clearDefaultEvent) {
+      const def = events.get("default");
+      return def ? new Map([["default", { ...def }]]) : undefined;
+    }
+
+    if (clearDefaultEvent) {
+      events.delete("default");
+    }
+    return events;
+  }
 
   function cleanup(
     clearEvents: boolean = true,
@@ -103,17 +136,13 @@ export function createRef<T extends HTMLElement = HTMLElement>(
         "Incompatible parameters: 'eventsOnly=true' requires either 'clearEvents=true' OR 'clearDefaultEvent=true'"
       );
 
-    if (!eventsOnly) element_ = undefined;
+    if (listeners) listeners = purgeEvents(listeners, clearEvents, clearDefaultEvent);
 
-    const defaultL = listeners?.get("default");
-    if (clearEvents && clearDefaultEvent) listeners = undefined;
-    else if (clearEvents && !clearDefaultEvent && defaultL)
-      listeners = new Map([["default", { func: defaultL.func, once: defaultL.once }]]);
-    else if (clearDefaultEvent && defaultL && listeners) listeners.delete("default");
+    if (!eventsOnly) element_ = undefined;
   }
 
   /* ----------  Auto-cleanup when owner disposes  -------------------- */
-  onCleanup(cleanup);
+  onCleanup(() => cleanup());
 
   return {
     setter,
