@@ -1,5 +1,12 @@
 # @solid-primitives/date
 
+## 2.1.4
+
+### Patch Changes
+
+- Updated dependencies [3eec5eb]
+  - @solid-primitives/timer@1.4.3
+
 ## 2.1.3
 
 ### Patch Changes
