@@ -112,6 +112,10 @@ export const createSyncFileSystem = (
           getTypeMap.delete(item);
         }
       });
+      if (readFileMap.has(path)) {
+        readFileMap.get(path)?.[1](undefined);
+        readFileMap.delete(path);
+      }
       readdirMap.get(getParentDir(path))?.[1](
         (items = []) => items.filter(item => item === getItemName(path)) as [] | DirEntries,
       );
