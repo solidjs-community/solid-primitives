@@ -134,8 +134,18 @@ describe("getWindowSize", () => {
 
 describe("getElementSize", () => {
   test("returns window size", () => {
-    expect(getElementSize(document.createElement("div"))).toEqual({ width: 0, height: 0 });
-    expect(getElementSize(undefined)).toEqual({ width: null, height: null });
+    expect(getElementSize(document.createElement("div"))).toEqual({
+      width: 0,
+      height: 0,
+      clientWidth: 0,
+      clientHeight: 0,
+    });
+    expect(getElementSize(undefined)).toEqual({
+      width: null,
+      height: null,
+      clientWidth: null,
+      clientHeight: null,
+    });
   });
 });
 
