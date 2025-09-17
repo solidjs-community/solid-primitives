@@ -26,6 +26,8 @@ export const INSTAPAPER: Network = "http://www.instapaper.com/edit?url=@u&title=
 export const LINE: Network = "http://line.me/R/msg/text/?@t%0D%0A@u%0D%0A@d";
 export const LINKEDIN: Network = "https://www.linkedin.com/sharing/share-offsite/?url=@u";
 export const MESSANGER: Network = "fb-messenger://share/?link=@u";
+/** @deprecated Use MESSENGER instead - this will be removed in a future version */
+export const MESSANGER: Network = MESSENGER;
 export const ODNOKLASSNIKI: Network =
   "https://connect.ok.ru/dk?st.cmd=WidgetSharePreview&st.shareUrl=@u&st.comments=@t";
 export const PINTEREST: Network =
