@@ -1,8 +1,8 @@
-import { Component, createEffect, createSignal, For, on, onMount, Show } from "solid-js";
+import { type Component, createEffect, createSignal, For, on, onMount, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 
 import { createBroadcastChannel, makeBroadcastChannel } from "../src/index.js";
-import { TPage, useTrackPages } from "./hooks/useTrackPages.js";
+import { type TPage, useTrackPages } from "./hooks/useTrackPages.js";
 
 const Content = (props: { page: TPage; channelName: string }) => {
   const hasMultiplePages = () => props.page.count > 1;

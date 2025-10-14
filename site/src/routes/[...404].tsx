@@ -1,5 +1,5 @@
-import { pageWidthClass } from "~/constants";
-import { DocumentClass } from "~/primitives/document-class";
+import { pageWidthClass } from "~/constants.js";
+import { DocumentClass } from "~/primitives/document-class.jsx";
 import { Title } from "@solidjs/meta";
 import { HttpStatusCode } from "@solidjs/start";
 import { A } from "@solidjs/router";

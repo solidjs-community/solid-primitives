@@ -3,8 +3,8 @@ import {
   onCleanup,
   createEffect,
   untrack,
-  Accessor,
-  SignalOptions,
+  type Accessor,
+  type SignalOptions,
   createMemo,
 } from "solid-js";
 import { isServer } from "solid-js/web";
@@ -178,7 +178,7 @@ export function createPolled<T>(
   if (isServer) {
     return fn as Accessor<T>;
   }
-  const memo = createMemo(() => createSignal(fn(value), options), options);
+  const memo = createMemo(() => createSignal(fn(value), options));
   createTimer(() => memo()[1](fn), timeout, setInterval);
   return () => memo()[0]();
 }

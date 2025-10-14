@@ -1,4 +1,4 @@
-import { Accessor } from "solid-js";
+import { type Accessor } from "solid-js";
 import { isServer } from "solid-js/web";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createHydratableSignal, trueFn } from "@solid-primitives/utils";

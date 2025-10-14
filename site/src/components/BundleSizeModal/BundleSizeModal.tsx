@@ -1,8 +1,8 @@
 import { createVisibilityObserver } from "@solid-primitives/intersection-observer";
 import { isIOS, isSafari } from "@solid-primitives/platform";
 import { createResizeObserver } from "@solid-primitives/resize-observer";
-import { Component, createSignal, For, onMount } from "solid-js";
-import { Bundlesize, BundlesizeItem } from "~/types";
+import { type Component, createSignal, For, onMount } from "solid-js";
+import { Bundlesize, BundlesizeItem } from "~/types.js";
 
 const SHARED_HEADERS = ["Minified", "Minified + GZipped"] as const;
 const PACKAGE_TH_HEADERS = ["Package", ...SHARED_HEADERS] as const;

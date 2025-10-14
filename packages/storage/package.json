@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/storage",
-  "version": "4.3.2",
+  "version": "4.3.3",
   "description": "Primitive that provides reactive wrappers for storage access",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
@@ -63,8 +63,8 @@
     }
   },
   "scripts": {
-    "dev": "tsx ../../scripts/dev.ts",
-    "build": "tsx ../../scripts/build.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -92,6 +92,6 @@
     }
   },
   "devDependencies": {
-    "solid-js": "^1.8.15"
+    "solid-js": "^1.9.7"
   }
 }

@@ -1,7 +1,7 @@
 import type { FormattedBytes } from "../../scripts/utils/calculate-bundlesize.js";
 import type { ModuleData } from "../../scripts/utils/get-modules-data.js";
 
-export { FormattedBytes, ModuleData };
+export type { FormattedBytes, ModuleData };
 
 export type Bundlesize = {
   min: FormattedBytes;

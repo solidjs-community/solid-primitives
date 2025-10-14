@@ -1,4 +1,4 @@
-import { Component, JSX, ParentComponent } from "solid-js";
+import { type Component, type JSX, type ParentComponent } from "solid-js";
 
 import { createTokenizer, createToken, isToken, resolveTokens } from "../src/index.js";
 

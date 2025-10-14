@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { type Component } from "solid-js";
 
 const BundleSizeWrapper: Component<{ value: number; unit: string }> = ({ unit, value }) => {
   return (

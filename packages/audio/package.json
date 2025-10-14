@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/audio",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Primitives to manage audio and single sounds.",
   "author": "David Di Biase <dave.dibiase@gmail.com>",
   "license": "MIT",
@@ -38,8 +38,8 @@
   "typesVersions": {},
   "scripts": {
     "start": "vite serve dev",
-    "dev": "tsx ../../scripts/dev.ts",
-    "build": "tsx ../../scripts/build.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -50,7 +50,7 @@
     "primitives"
   ],
   "devDependencies": {
-    "solid-js": "^1.8.7"
+    "solid-js": "^1.9.7"
   },
   "dependencies": {
     "@solid-primitives/static-store": "workspace:^",

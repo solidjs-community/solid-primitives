@@ -1,4 +1,4 @@
-import { Accessor, createEffect, createSignal, onCleanup, Setter } from "solid-js";
+import { type Accessor, createEffect, createSignal, onCleanup, type Setter } from "solid-js";
 import { isServer } from "solid-js/web";
 
 export type HTMLSelection = [node: HTMLElement | null, start: number, end: number];
@@ -41,7 +41,7 @@ export const createSelection = (): [Accessor<HTMLSelection>, Setter<HTMLSelectio
   if (isServer) {
     return [
       () => [null, NaN, NaN],
-      sel => (typeof sel === "function" ? sel([null, NaN, NaN]) : sel),
+      sel => (typeof sel === "function" ? (sel as any)([null, NaN, NaN]) : sel),
     ];
   }
   const [getSelection, setSelection] = createSignal<HTMLSelection>([null, NaN, NaN]);

@@ -1,4 +1,4 @@
-import { Component, Suspense, createSignal, lazy, onMount } from "solid-js";
+import { type Component, Suspense, createSignal, lazy, onMount } from "solid-js";
 
 const Client = lazy(() => import("./client.jsx"));
 

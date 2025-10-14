@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import { makePersisted } from "../src/persisted.js";
-import { AsyncStorage } from "../src/index.js";
+import { type AsyncStorage } from "../src/index.js";
 
 describe("makePersisted", () => {
   let data: Record<string, string> = {};

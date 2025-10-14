@@ -1,7 +1,7 @@
 import { createEventListener } from "@solid-primitives/event-listener";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createDerivedStaticStore } from "@solid-primitives/static-store";
-import { Accessor, createSignal, onMount, sharedConfig } from "solid-js";
+import { type Accessor, createSignal, onMount, sharedConfig } from "solid-js";
 import { isServer } from "solid-js/web";
 
 export function getScrollParent(node: Element | null): Element {

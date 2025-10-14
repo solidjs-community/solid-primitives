@@ -31,7 +31,6 @@ describe("listArray", () => {
 describe("List", () => {
   test("simple", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s] = createSignal(startingArray);
@@ -53,12 +52,10 @@ describe("List", () => {
     });
 
     unmount();
-    document.body.removeChild(container);
   });
 
   test("doesn't change for same values", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
@@ -89,12 +86,10 @@ describe("List", () => {
     });
 
     unmount();
-    document.body.removeChild(container);
   });
 
   test("reorders elements", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
@@ -132,12 +127,10 @@ describe("List", () => {
     expect(oldMapped[3]).toBe(newMapped[3]);
 
     unmount();
-    document.body.removeChild(container);
   });
 
   test("changes value of elements", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
@@ -169,12 +162,10 @@ describe("List", () => {
     });
 
     unmount();
-    document.body.removeChild(container);
   });
 
   test("reorders elements with value change", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
@@ -212,12 +203,10 @@ describe("List", () => {
     expect(oldMapped[3]).toBe(newMapped[2]);
 
     unmount();
-    document.body.removeChild(container);
   });
 
   test("creates new elements", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
@@ -257,12 +246,10 @@ describe("List", () => {
     expect(oldMapped.includes(newMapped[3]!)).toEqual(false);
 
     unmount();
-    document.body.removeChild(container);
   });
 
   test("deletes unused elements", () => {
     const container = document.createElement("div");
-    document.body.appendChild(container);
 
     const startingArray = [1, 2, 3, 4];
     const [s, set] = createSignal(startingArray);
@@ -300,6 +287,38 @@ describe("List", () => {
     expect(newMapped.includes(oldMapped[2]!)).toEqual(false);
 
     unmount();
-    document.body.removeChild(container);
+  });
+
+  test("later used signal reports correct values", () => {
+    const container = document.createElement("div");
+
+    const startingArray = [1, 2, 3];
+    const [s, set] = createSignal(startingArray);
+    const callbacks: (() => { v: number; i: number })[] = [];
+    const unmount = render(
+      () => (
+        <List each={s()}>
+          {(v, i) => {
+            // this could be event callback (eg. onClick), v & i read only later
+            callbacks.push(() => ({ v: v(), i: i() }));
+
+            return null;
+          }}
+        </List>
+      ),
+      container,
+    );
+
+    set([2, 1, 4]); // swap 1,2 & replace 3 with 4 (swap for index update, replace for value update)
+
+    // get entries, sort by index & check values in order
+    const values = callbacks
+      .map(x => x())
+      .sort((a, b) => a.i - b.i)
+      .map(x => x.v);
+
+    expect(values).toStrictEqual([2, 1, 4]);
+
+    unmount();
   });
 });

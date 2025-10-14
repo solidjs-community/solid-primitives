@@ -1,6 +1,6 @@
 import { sendEmailDefault, sendEmailAlternative } from "./utils.js";
 import { createEventDispatcher } from "../src/index.js";
-import { Component, createSignal } from "solid-js";
+import { type Component, createSignal } from "solid-js";
 
 const App: Component = () => {
   const [count, setCount] = createSignal(0);

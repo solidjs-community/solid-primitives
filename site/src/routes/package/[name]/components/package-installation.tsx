@@ -1,12 +1,12 @@
 import { writeClipboard } from "@solid-primitives/clipboard";
 import { debounce } from "@solid-primitives/scheduled";
-import { Component, createSignal, JSX } from "solid-js";
-import NpmLogo from "~/components/Icons/NpmLogo";
-import NpmMonochrome from "~/components/Icons/NpmMonochrome";
-import PnpmLogo from "~/components/Icons/PnpmLogo";
-import PnpmMonochrome from "~/components/Icons/PnpmMonochrome";
-import YarnLogo from "~/components/Icons/YarnLogo";
-import YarnMonochrome from "~/components/Icons/YarnMonochrome";
+import { type Component, createSignal, type JSX } from "solid-js";
+import NpmLogo from "~/components/Icons/NpmLogo.jsx";
+import NpmMonochrome from "~/components/Icons/NpmMonochrome.jsx";
+import PnpmLogo from "~/components/Icons/PnpmLogo.jsx";
+import PnpmMonochrome from "~/components/Icons/PnpmMonochrome.jsx";
+import YarnLogo from "~/components/Icons/YarnLogo.jsx";
+import YarnMonochrome from "~/components/Icons/YarnMonochrome.jsx";
 
 const PACKAGE_MANAGER_TYPES = ["npm", "yarn", "pnpm"] as const;
 type PackageManagerType = (typeof PACKAGE_MANAGER_TYPES)[number];
@@ -82,7 +82,7 @@ const CopyPackage: Component<{ type: PackageManagerType; packageName: string }> 
 
         <div class="group-hover:box-shadow-[0_5px_0_0_#c5d4e4] dark:group-hover:box-shadow-[0_5px_0_0_#3f5d73] pointer-events-none absolute bottom-0 left-0 right-0 top-0 rounded-lg border border-transparent transition-[border-color_box-shadow] group-hover:border-[#0030b1] dark:group-hover:border-[#b1bfe4]" />
       </button>
-      <div class="xs:text-sm flex h-full flex-grow items-center overflow-auto whitespace-nowrap rounded-r-lg border border-l-0 border-[#99999a] px-3 pr-3 font-mono text-[13px] font-semibold text-gray-700 dark:text-gray-300 sm:text-base">
+      <div class="xs:text-sm flex h-full flex-grow items-center overflow-auto whitespace-nowrap rounded-r-lg border border-l-0 border-[#99999a] px-3 pr-3 font-mono text-[13px] font-semibold text-gray-700 sm:text-base dark:text-gray-300">
         {PM_CONTENT[props.type].text(props.packageName)}
       </div>
     </div>

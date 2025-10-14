@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "generate": "tsx ./scripts/generate.ts",
+    "generate": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ./scripts/generate.ts",
     "dev": "vinxi dev",
     "build": "vinxi build",
     "start": "vinxi start",
@@ -55,6 +55,6 @@
     "unified": "^11.0.4"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   }
 }

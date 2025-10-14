@@ -1,4 +1,4 @@
-import { createSignal, ParentComponent } from "solid-js";
+import { createSignal, type ParentComponent } from "solid-js";
 import SlideModal from "../Modal/SlideModal.js";
 import Stage from "../Stage/Stage.js";
 
@@ -81,7 +81,7 @@ const StageBadge: ParentComponent<{
       <button
         data-stage
         class={
-          "flex h-[28px] w-[25px] items-center justify-center rounded-md border-2 border-[rgba(0,0,0,0.15)] font-sans transition-[border-color,filter] hover:border-black/40 hover:brightness-110 dark:border-black/20 dark:hover:border-black/60 sm:w-[32.25px] " +
+          "flex h-[28px] w-[25px] items-center justify-center rounded-md border-2 border-[rgba(0,0,0,0.15)] font-sans transition-[border-color,filter] hover:border-black/40 hover:brightness-110 sm:w-[32.25px] dark:border-black/20 dark:hover:border-black/60 " +
           classStageColor(level)
         }
         ref={menuButton}

@@ -1,4 +1,4 @@
-import { Component, For, JSX, Show, createSignal, splitProps } from "solid-js";
+import { type Component, For, type JSX, Show, createSignal, splitProps } from "solid-js";
 import { createAudio, AudioState } from "../src/index.js";
 
 // import { Icon } from "solid-heroicons";

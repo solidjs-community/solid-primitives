@@ -36,8 +36,7 @@ function Component() {
       {(value, index) => {
         return (
           <div>
-            {" "}
-            {index()}: {value()}{" "}
+            {index()}: {value()}
           </div>
         );
       }}
@@ -54,7 +53,7 @@ Every element is keyed by item reference and index, but item reference is priori
 
 Underlying helper for `<List>` unkeyed control flow. Returns array with elements mapped using provided mapping function.
 
-Mapping function may use provided reactive value and reactive index, but signals for each of them are created only if they are used. Mapping function is ran only when original array has more elements than before. Elements are disposed only if original array has less elements than before.
+Mapping function may use provided reactive value and reactive index. Mapping function is ran only when original array has more elements than before. Elements are disposed only if original array has less elements than before.
 
 ## Demo
 

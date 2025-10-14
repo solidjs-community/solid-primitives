@@ -1,8 +1,8 @@
 import Dismiss from "solid-dismiss";
 import { FiX } from "solid-icons/fi";
-import { Accessor, onMount, ParentComponent } from "solid-js";
+import { type Accessor, onMount, type ParentComponent } from "solid-js";
 import * as Header from "../Header/Header.js";
-import * as Table from "~/components/table";
+import * as Table from "~/components/table.jsx";
 import { NoHydration } from "solid-js/web";
 
 const SlideModal: ParentComponent<{

@@ -1,6 +1,6 @@
-import { EventTypeName, IdleTimerOptions, IdleTimer } from "./types.js";
 import { batch, createSignal, onMount, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
+import type { EventTypeName, IdleTimerOptions, IdleTimer } from "./types.js";
 
 const THROTTLE_DELAY: number = 250;
 const FIFTEEN_MINUTES: number = 900_000; // 15 minutes

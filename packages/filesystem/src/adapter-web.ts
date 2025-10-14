@@ -1,10 +1,20 @@
 ///<reference path="../node_modules/@types/wicg-file-system-access/index.d.ts" />
 import { isServer } from "solid-js/web";
-import { DirEntries } from "./types.js";
+import { type DirEntries } from "./types.js";
 
-const _makeWebAccessFileSystem = async (
+/**
+ * Adapter that provides access to the actual filesystem in the browser using a directory picker
+ * receives the options for showDirectoryPicker(options: DirectoryPickerOptions) as optional argument
+ *
+ * relies on https://wicg.github.io/file-system-access/ - basic api (https://caniuse.com/native-filesystem-api)
+ */
+export const makeWebAccessFileSystem = async (
   options?: DirectoryPickerOptions | { webkitEntry: FileSystemDirectoryHandle } | undefined,
 ) => {
+  if (isServer || typeof globalThis.showDirectoryPicker !== "function") {
+    return null;
+  }
+
   const handle =
     options && "webkitEntry" in options
       ? options.webkitEntry
@@ -104,14 +114,3 @@ const _makeWebAccessFileSystem = async (
       )),
   };
 };
-
-/**
- * Adapter that provides access to the actual filesystem in the browser using a directory picker
- * receives the options for showDirectoryPicker(options: DirectoryPickerOptions) as optional argument
- *
- * relies on https://wicg.github.io/file-system-access/ - basic api (https://caniuse.com/native-filesystem-api)
- */
-export const makeWebAccessFileSystem =
-  isServer || typeof globalThis.showDirectoryPicker !== "function"
-    ? () => Promise.resolve(null)
-    : _makeWebAccessFileSystem;

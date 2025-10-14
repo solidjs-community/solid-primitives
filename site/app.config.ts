@@ -15,6 +15,9 @@ export default defineConfig({
       // use files in packages src dir
       conditions: ["@solid-primitives/source"],
     },
+    build: {
+      sourcemap: true,
+    },
   },
   server: {
     prerender: {

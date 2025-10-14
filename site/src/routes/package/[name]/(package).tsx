@@ -1,4 +1,4 @@
-import { Component, createMemo, createResource, onMount, Suspense } from "solid-js";
+import { type Component, createMemo, createResource, onMount, Suspense } from "solid-js";
 import { fetchPackageData, getCachedPackageListItemData } from "~/api.js";
 import { PRIMITIVE_PAGE_PADDING_TOP } from "~/components/Header/Header.jsx";
 import InfoBar from "~/components/Primitives/InfoBar.jsx";
@@ -40,7 +40,7 @@ const Page: Component = () => {
       return cachedData()?.primitives ?? dataResource()?.primitives;
     },
     get stage() {
-      return cachedData()?.stage ?? dataResource()?.stage;
+      return cachedData()?.primitive?.stage ?? dataResource()?.primitive?.stage;
     },
     get readme() {
       return dataResource()?.readme;
@@ -65,7 +65,7 @@ const Page: Component = () => {
         style={{ "padding-top": `${PRIMITIVE_PAGE_PADDING_TOP}px` }}
       >
         <div class="bg-page-main-bg rounded-3xl p-3 sm:p-8">
-          <div class="mb-[90px] flex items-center justify-between gap-[30px] text-[#232324] dark:text-white sm:gap-[100px]">
+          <div class="mb-[90px] flex items-center justify-between gap-[30px] text-[#232324] sm:gap-[100px] dark:text-white">
             <Heading name={data.name} formattedName={formattedName()} />
           </div>
 

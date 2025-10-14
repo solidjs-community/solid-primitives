@@ -1,4 +1,4 @@
-import { createSignal, createEffect, Signal } from "solid-js";
+import { createSignal, createEffect, type Signal } from "solid-js";
 import { getRequestEvent, isServer } from "solid-js/web";
 
 const YEAR = 365 * 24 * 60 * 60;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addClearMethod, makeObjectStorage } from "../src/tools.js";
+import { addClearMethod, makeObjectStorage } from "../src/index.js";
 
 describe("addClearMethod", () => {
   const data: Record<string, string> = {};

@@ -1,4 +1,4 @@
-import { Component, createSignal, onMount } from "solid-js";
+import { type Component, createSignal, onMount } from "solid-js";
 
 import { createWorker, createWorkerPool, createSignaledWorker } from "../src/index.js";
 

@@ -1,4 +1,4 @@
-import { Component, createSignal, Switch, Match } from "solid-js";
+import { type Component, createSignal, Switch, Match } from "solid-js";
 import { autofocus, createAutofocus } from "../src/index.js";
 
 autofocus;

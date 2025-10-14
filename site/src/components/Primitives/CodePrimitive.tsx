@@ -1,4 +1,4 @@
-import { createSignal, ParentComponent } from "solid-js";
+import { createSignal, type ParentComponent } from "solid-js";
 import { useTippy } from "solid-tippy";
 
 const CodePrimitive: ParentComponent = props => {

@@ -1,11 +1,11 @@
 import {
-  Accessor,
-  Component,
+  type Accessor,
+  type Component,
   createComponent,
   createMemo,
-  JSX,
+  type JSX,
   DEV,
-  ResolvedJSXElement,
+  type ResolvedJSXElement,
 } from "solid-js";
 import { isServer } from "solid-js/web";
 import type { NoInfer, Many } from "@solid-primitives/utils";

@@ -8,7 +8,7 @@ import {
   YEAR,
   createCountdown,
 } from "../src/index.js";
-import { Component, createMemo, createSignal } from "solid-js";
+import { type Component, createMemo, createSignal } from "solid-js";
 
 import { format, formatRelative } from "date-fns";
 import { Slider } from "./lib.js";

@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/pointer",
-  "version": "0.3.1",
+  "version": "0.3.3",
   "description": "A collection of primitives, giving you a nicer API to handle pointer events in a reactive context.",
   "author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
   "license": "MIT",
@@ -46,8 +46,8 @@
     }
   },
   "scripts": {
-    "dev": "tsx ../../scripts/dev.ts",
-    "build": "tsx ../../scripts/build.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
@@ -62,6 +62,6 @@
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.8.7"
+    "solid-js": "^1.9.7"
   }
 }

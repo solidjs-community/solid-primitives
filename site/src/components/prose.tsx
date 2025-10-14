@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { type Component } from "solid-js";
 
 export const H2: Component<{ text: string }> = props => {
   const id = () => props.text.toLowerCase().replace(/ /g, "-");

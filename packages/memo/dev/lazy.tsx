@@ -1,5 +1,5 @@
 import { createLazyMemo } from "../src/index.js";
-import { Component, createRoot, createSignal, Show, createEffect } from "solid-js";
+import { type Component, createRoot, createSignal, Show, createEffect } from "solid-js";
 
 const [count, setCount] = createSignal(0);
 const [runs, setRuns] = createSignal(0);

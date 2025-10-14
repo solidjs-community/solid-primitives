@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/list",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A List component, an alternative to For and Index.",
   "author": "Maciek50322 <34212298+maciek50322@users.noreply.github.com>",
   "contributors": [],
@@ -45,13 +45,16 @@
   },
   "typesVersions": {},
   "scripts": {
-    "dev": "tsx ../../scripts/dev.ts",
-    "build": "tsx ../../scripts/build.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"
+  },
+  "devDependencies": {
+    "solid-js": "^1.9.7"
   }
 }

@@ -1,6 +1,11 @@
-import { Component, createSignal, onMount, For, Show } from "solid-js";
-import { createDbStore, supabaseAdapter, DbRow, DbStoreError } from "../src/index.js";
-import { AuthResponse, createClient, Session, SupabaseClient } from "@supabase/supabase-js";
+import { type Component, createSignal, onMount, For, Show } from "solid-js";
+import { createDbStore, supabaseAdapter, type DbRow, type DbStoreError } from "../src/index.js";
+import {
+  type AuthResponse,
+  createClient,
+  type Session,
+  SupabaseClient,
+} from "@supabase/supabase-js";
 import { reconcile } from "solid-js/store";
 
 const TodoList = (props: { client: SupabaseClient; logout: () => void }) => {

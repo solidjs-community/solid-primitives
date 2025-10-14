@@ -1,6 +1,6 @@
 import {
-  Accessor,
-  Component,
+  type Accessor,
+  type Component,
   createEffect,
   createMemo,
   createSignal,
@@ -12,7 +12,7 @@ import { isMobile, isSafari } from "@solid-primitives/platform";
 import { createScrollPosition } from "@solid-primitives/scroll";
 import { defer } from "@solid-primitives/utils";
 import Dismiss from "solid-dismiss";
-import { pageWidthClass } from "~/constants";
+import { pageWidthClass } from "~/constants.js";
 import Hamburger from "../Icons/Hamburger.js";
 import SearchBtn from "../Search/SearchBtn.js";
 import NavMenu from "./NavMenu.js";
@@ -163,7 +163,7 @@ const Header: Component = () => {
             </div>
             <A href="/">
               <img
-                class="hidden h-[28px] dark:hidden sm:block sm:h-[40px]"
+                class="hidden h-[28px] sm:block sm:h-[40px] dark:hidden"
                 src="/img/solid-primitives-logo.svg"
                 alt=""
               />
@@ -173,12 +173,12 @@ const Header: Component = () => {
                 alt=""
               />
               <img
-                class="h-[28px] dark:hidden sm:hidden sm:h-[40px]"
+                class="h-[28px] sm:hidden sm:h-[40px] dark:hidden"
                 src="/img/solid-primitives-stacked-logo.svg"
                 alt=""
               />
               <img
-                class="hidden h-[28px] dark:block sm:!hidden sm:h-[40px]"
+                class="hidden h-[28px] sm:!hidden sm:h-[40px] dark:block"
                 src="/img/solid-primitives-stacked-dark-logo.svg"
                 alt=""
               />

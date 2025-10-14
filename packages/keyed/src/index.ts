@@ -1,16 +1,16 @@
 import {
-  Accessor,
+  type Accessor,
   createMemo,
   createRoot,
   createSignal,
-  JSX,
+  type JSX,
   on,
   onCleanup,
-  Setter,
+  type Setter,
   untrack,
   $TRACK,
   mapArray,
-  AccessorArray,
+  type AccessorArray,
 } from "solid-js";
 import { isServer } from "solid-js/web";
 

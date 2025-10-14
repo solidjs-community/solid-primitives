@@ -1,4 +1,4 @@
-import { createSignal, getListener, onCleanup, SignalOptions, DEV } from "solid-js";
+import { createSignal, getListener, onCleanup, type SignalOptions, DEV } from "solid-js";
 import { isServer } from "solid-js/web";
 import { noop } from "@solid-primitives/utils";
 

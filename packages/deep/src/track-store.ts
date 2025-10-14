@@ -1,5 +1,5 @@
 import { $PROXY, $TRACK, createMemo, createRoot, createSignal, untrack } from "solid-js";
-import { Store, unwrap } from "solid-js/store";
+import { type Store, unwrap } from "solid-js/store";
 
 const EQUALS_FALSE = { equals: false } as const;
 

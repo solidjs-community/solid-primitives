@@ -4,7 +4,7 @@ import {
   createEventListener,
   createEventSignal,
 } from "../src/index.js";
-import { Component, createSignal, For, Show } from "solid-js";
+import { type Component, createSignal, For, Show } from "solid-js";
 
 import { DisplayRecord } from "./components.js";
 

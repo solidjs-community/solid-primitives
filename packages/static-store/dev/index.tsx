@@ -1,4 +1,4 @@
-import { Component, createSignal } from "solid-js";
+import { type Component, createSignal } from "solid-js";
 
 const App: Component = () => {
   const [count, setCount] = createSignal(0);

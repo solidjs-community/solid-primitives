@@ -2,7 +2,7 @@ import {
   createSignal,
   Show,
   For,
-  Component,
+  type Component,
   createResource,
   ErrorBoundary,
   createMemo,
@@ -10,11 +10,11 @@ import {
 } from "solid-js";
 
 import {
-  AsyncFileSystem,
+  type AsyncFileSystem,
   createFileSystem,
   makeVirtualFileSystem,
   makeWebAccessFileSystem,
-  SyncFileSystem,
+  type SyncFileSystem,
   getItemName,
 } from "../src/index.js";
 

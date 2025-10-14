@@ -1,7 +1,7 @@
-import { JSX, onCleanup, onMount } from "solid-js";
+import { type JSX, onCleanup, onMount } from "solid-js";
 import { isServer } from "solid-js/web";
 import { transformFiles } from "./helpers.js";
-import { FileUploaderDirective } from "./types.js";
+import { type FileUploaderDirective } from "./types.js";
 
 declare module "solid-js" {
   namespace JSX {

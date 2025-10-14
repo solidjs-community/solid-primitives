@@ -1,4 +1,4 @@
-import { Component, createSignal, Show, For, Suspense } from "solid-js";
+import { type Component, createSignal, Show, For, Suspense } from "solid-js";
 
 import { gql, createGraphQLClient, request, multipartRequest } from "../src/index.js";
 import { CountryQueryDocument } from "./gqlgen.js";

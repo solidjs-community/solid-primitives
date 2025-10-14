@@ -43,12 +43,16 @@
   },
   "typesVersions": {},
   "scripts": {
-    "dev": "tsx ../../scripts/dev.ts",
+    "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
+    "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
     "vitest": "vitest -c ../../configs/vitest.config.ts",
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
     "solid-js": "^1.6.12"
+  },
+  "devDependencies": {
+    "solid-js": "^1.9.7"
   }
 }

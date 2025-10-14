@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { type Component } from "solid-js";
 
 import Key from "./key.js";
 import Entries from "./entries.js";

@@ -1,4 +1,4 @@
-import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
+import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 
 // https://github.com/sveltejs/svelte/blob/main/packages/svelte/src/motion/utils.js
@@ -62,7 +62,7 @@ export type SpringSetter<T> = (
  * Creates a signal and a setter that uses spring physics when interpolating from
  * one value to another. This means when the value changes, instead of
  * transitioning at a steady rate, it "bounces" like a spring would,
- * depending on the physics paramters provided. This adds a level of realism to
+ * depending on the physics parameters provided. This adds a level of realism to
  * the transitions and can enhance the user experience.
  *
  * `T` - The type of the signal. It works for the basic data types that can be
@@ -71,6 +71,7 @@ export type SpringSetter<T> = (
  * @param initialValue The initial value of the signal.
  * @param options Options to configure the physics of the spring.
  * @returns Returns the spring value and a setter.
+ * The setter optionally accepts options object of type `{ ?hard: boolean; soft?: boolean | number }`
  *
  * @example
  * const [progress, setProgress] = createSpring(0, { stiffness: 0.15, damping: 0.8 });
@@ -195,17 +196,17 @@ export function createSpring<T extends SpringTarget>(
 // ===========================================================================
 
 /**
- * Creates a spring value that interpolates based on changes on a passed signal.
+ * Creates a spring value that interpolates based on changes to the passed signal.
  * Works similar to the `@solid-primitives/tween`
  *
  * @param target Target to be modified.
  * @param options Options to configure the physics of the spring.
- * @returns Returns the spring value only.
+ * @returns Returns the spring value accessor only.
  *
  * @example
  * const percent = createMemo(() => current() / total() * 100);
  *
- * const springedPercent = createDerivedSignal(percent, { stiffness: 0.15, damping: 0.8 });
+ * const springedPercent = createDerivedSpring(percent, { stiffness: 0.15, damping: 0.8 });
  */
 export function createDerivedSpring<T extends SpringTarget>(
   target: Accessor<T>,

@@ -1,4 +1,4 @@
-import { Accessor, batch } from "solid-js";
+import { type Accessor, batch } from "solid-js";
 import { TriggerCache } from "@solid-primitives/trigger";
 
 const $OBJECT = Symbol("track-object");

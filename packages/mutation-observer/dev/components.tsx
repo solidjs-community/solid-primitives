@@ -1,4 +1,4 @@
-import { Component, createSignal, For, JSX, Show, splitProps } from "solid-js";
+import { type Component, createSignal, For, type JSX, Show, splitProps } from "solid-js";
 
 export const TestingNode: Component<{ output?: JSX.Element; heading?: string }> = props => {
   return (

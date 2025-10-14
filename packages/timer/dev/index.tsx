@@ -1,4 +1,4 @@
-import { Component, createSignal, createEffect } from "solid-js";
+import { type Component, createSignal, createEffect } from "solid-js";
 
 import { createTimer } from "../src/index.js";
 

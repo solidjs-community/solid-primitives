@@ -1,14 +1,14 @@
 import {
   access,
   accessArray,
-  AnyClass,
-  ItemsOf,
-  MaybeAccessor,
-  MaybeAccessorValue,
+  type AnyClass,
+  type ItemsOf,
+  type MaybeAccessor,
+  type MaybeAccessorValue,
   ofClass,
 } from "@solid-primitives/utils";
 import * as _ from "@solid-primitives/utils/immutable";
-import { Accessor, createMemo } from "solid-js";
+import { type Accessor, createMemo } from "solid-js";
 import type { MappingFn, Predicate, FlattenArray } from "@solid-primitives/utils/immutable";
 
 /**

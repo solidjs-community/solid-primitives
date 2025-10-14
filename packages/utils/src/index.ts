@@ -2,12 +2,12 @@ import {
   getOwner,
   onCleanup,
   createSignal,
-  Accessor,
+  type Accessor,
   untrack,
-  AccessorArray,
-  EffectFunction,
-  NoInfer,
-  SignalOptions,
+  type AccessorArray,
+  type EffectFunction,
+  type NoInfer,
+  type SignalOptions,
   sharedConfig,
   onMount,
   DEV,
@@ -104,10 +104,10 @@ export const clamp = (n: number, min: number, max: number) => Math.min(Math.max(
  * ```
  */
 export const access = <T extends MaybeAccessor<any>>(v: T): MaybeAccessorValue<T> =>
-  typeof v === "function" && !v.length ? v() : v;
+  typeof v === "function" && !v.length ? v() : (v as any);
 
 export const asArray = <T>(value: T): (T extends any[] ? T[number] : NonNullable<T>)[] =>
-  Array.isArray(value) ? (value as any) : value ? [value] : [];
+  Array.isArray(value) ? (value as any) : value ? [value as any] : [];
 
 /**
  * Access an array of MaybeAccessors
@@ -135,14 +135,14 @@ export const withAccess = <T, A extends MaybeAccessor<T>, V = MaybeAccessorValue
 
 export const asAccessor = <A extends MaybeAccessor<unknown>>(
   v: A,
-): Accessor<MaybeAccessorValue<A>> => (typeof v === "function" ? (v as any) : () => v);
+): Accessor<MaybeAccessorValue<A>> => (typeof v === "function" ? (v as any) : () => v as any);
 
 /** If value is a function – call it with a given arguments – otherwise get the value as is */
 export function accessWith<T>(
   valueOrFn: T,
   ...args: T extends AnyFunction ? Parameters<T> : never
 ): T extends AnyFunction ? ReturnType<T> : T {
-  return typeof valueOrFn === "function" ? valueOrFn(...args) : valueOrFn;
+  return typeof valueOrFn === "function" ? valueOrFn(...args) : (valueOrFn as any);
 }
 
 /**
