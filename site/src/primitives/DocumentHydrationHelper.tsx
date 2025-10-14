@@ -1,5 +1,5 @@
 import { getRequestEvent, HydrationScript, NoHydration } from "solid-js/web";
-import { Asset, PageEvent } from "@solidjs/start/server";
+import type { Asset, PageEvent } from "@solidjs/start/server";
 import type { JSX } from "solid-js";
 
 const assetMap = {
