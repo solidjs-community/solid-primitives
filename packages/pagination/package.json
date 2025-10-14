@@ -21,6 +21,7 @@
     "stage": 0,
     "list": [
       "createPagination",
+      "createSegment",
       "createInfiniteScroll"
     ],
     "category": "UI Patterns"

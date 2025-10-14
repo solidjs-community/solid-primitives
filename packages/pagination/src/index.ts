@@ -9,8 +9,42 @@ import {
   createResource,
   createSignal,
   onCleanup,
+  untrack,
 } from "solid-js";
 import { isServer } from "solid-js/web";
+
+/**
+ * createSegment - create a reactive segment out of an array of items
+ * @param {MaybeAccessor<any[]>} items - array of items
+ * @param {MaybeAccessor<number>} limit - limit of items per segment
+ * @param {Accessor<number>} page - segment number starting with 1
+ *
+ * ```ts
+ * const [limit, setLimit] = createSignal(10);
+ * const [paginationProps, page, setPage] = createPagination(() => ({
+ *   pages: Math.ceil(items().length / limit())
+ * }));
+ * const segment = createSegment(items, limit, page);
+ * ```
+ */
+export const createSegment = <T>(
+  items: MaybeAccessor<T[]>,
+  limit: MaybeAccessor<number>,
+  page: Accessor<number>
+): Accessor<T[]> => {
+  let previousStart = NaN, previousEnd = NaN;
+  return createMemo((previous) => {
+    const currentItems = access(items);
+    const start = (page() - 1) * access(limit);
+    const end = Math.min(start + access(limit), currentItems.length);
+    if (previous && (previous.length === 0 && end <= start || start === previousStart && end === previousEnd)) {
+      return previous;
+    }
+    previousStart = start;
+    previousEnd = end;
+    return currentItems.slice(start, end);
+  });
+}
 
 export type PaginationOptions = {
   /** the overall number of pages */
@@ -35,6 +69,8 @@ export type PaginationOptions = {
   nextContent?: JSX.Element;
   /** content for the last page element, e.g. an SVG icon, default is ">|" */
   lastContent?: JSX.Element;
+  /** number of pages a large jump, if it should exist, should skip */
+  jumpPages?: number;
 };
 
 export type PaginationProps = {
@@ -98,22 +134,42 @@ export const createPagination = (
 ): [props: Accessor<PaginationProps>, page: Accessor<number>, setPage: Setter<number>] => {
   const opts = createMemo(() => Object.assign({}, PAGINATION_DEFAULTS, access(options)));
   const [page, _setPage] = createSignal(opts().initialPage || 1);
+
+  // do not allow pages beyond the number of pages in case the latter changes
   const setPage = (p: number | ((_p: number) => number)) => {
     if (typeof p === "function") {
       p = p(page());
     }
-    return p >= 1 && p <= opts().pages ? _setPage(p) : page();
+    if (p < 1) {
+      return _setPage(1);
+    }
+    const pages = opts().pages;
+    if (p > pages) {
+      return _setPage(pages);
+    }
+    return _setPage(p);
   };
+
+  // normalize in case the number of pages changes, do not run the first time
+  createComputed((previous) => {
+    opts().pages;
+    return previous ? setPage(untrack(page)) : true;
+  });
+
+  const goPage = (p: number | ((p: number) => number), ev: KeyboardEvent) => {
+    setPage(p);
+    ev.currentTarget?.parentNode.querySelector('[aria-current="true"]').focus();
+  }
 
   const onKeyUp = (pageNo: number, ev: KeyboardEvent) =>
     (
       ({
-        ArrowLeft: () => setPage(p => p - 1),
-        ArrowRight: () => setPage(p => p + 1),
-        Home: () => setPage(1),
-        End: () => setPage(opts().pages),
-        Space: () => setPage(pageNo),
-        Return: () => setPage(pageNo),
+        ArrowLeft: () => goPage(p => p - 1, ev),
+        ArrowRight: () => goPage(p => p + 1, ev),
+        Home: () => goPage(1, ev),
+        End: () => goPage(opts().pages, ev),
+        Space: () => goPage(pageNo, ev),
+        Return: () => goPage(pageNo, ev),
       })[ev.key] || noop
     )();
 
@@ -197,6 +253,32 @@ export const createPagination = (
       page: { get: () => opts().pages, enumerable: false },
     },
   );
+  const jumpBack = Object.defineProperties(
+    isServer
+      ? ({} as PaginationProps[number])
+      : ({
+        onClick: () => setPage(Math.max(1, page() - (opts().jumpPages || Infinity))),
+        onKeyUp: (ev: KeyboardEvent) => onKeyUp(page() - (opts().jumpPages || Infinity), ev),
+      } as unknown as PaginationProps[number]),
+    {
+      disabled: { get: () => page() - (opts().jumpPages || Infinity) < 0, set: noop, enumerable: true },
+      children: { get: () => `-${opts().jumpPages}`, set: noop, enumerable: true },
+      page: { get: () => Math.max(1, page() - (opts().jumpPages || Infinity)), enumerable: false },
+    }
+  );
+  const jumpForth = Object.defineProperties(
+    isServer
+      ? ({} as PaginationProps[number])
+      : ({
+        onClick: () => setPage(Math.min(opts().pages, page() + (opts().jumpPages || Infinity))),
+        onKeyUp: (ev: KeyboardEvent) => onKeyUp(Math.min(opts().pages, page() + (opts().jumpPages || Infinity)), ev),
+      } as unknown as PaginationProps[number]),
+    {
+      disabled: { get: () => page() + (opts().jumpPages || Infinity) > opts().pages, set: noop, enumerable: true },
+      children: { get: () => `+${opts().jumpPages}`, set: noop, enumerable: true },
+      page: { get: () => Math.min(opts().pages, page() + (opts().jumpPages || Infinity)), enumerable: false },
+    }
+  )
 
   const start = createMemo(() =>
     Math.min(opts().pages - maxPages(), Math.max(1, page() - (maxPages() >> 1)) - 1),
@@ -219,12 +301,18 @@ export const createPagination = (
     if (showFirst()) {
       props.push(first);
     }
+    if (opts().jumpPages) {
+      props.push(jumpBack);
+    }
     if (showPrev()) {
       props.push(back);
     }
     props.push(...pages().slice(start(), start() + maxPages()));
     if (showNext()) {
       props.push(next);
+    }
+    if (opts().jumpPages) {
+      props.push(jumpForth);
     }
     if (showLast()) {
       props.push(last);
