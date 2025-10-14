@@ -59,7 +59,7 @@ describe("makeVirtualFileSystem", () => {
     expect(() => fs.readFile("src/nonexistent.ts")).toThrow('"src/nonexistent.ts" is not a file');
   });
   test("fs.readFile throws on attempting to read from a non-existing directory", () => {
-    expect(() => fs.readFile("nonexistent/test.ts")).toThrow('"nonexistent" is not a directory')
+    expect(() => fs.readFile("nonexistent/test.ts")).toThrow('"nonexistent" is not a directory');
   });
   test("fs.writeFile creates and overwrites file", () => {
     expect(fs.readdir("src")).toHaveLength(1);
@@ -125,17 +125,21 @@ describe("createFileSystem (sync) calls the underlying fs", () => {
 });
 
 describe("createFileSystem (sync) relays file system errors", () => {
-  test("a deleted file stored in a signal throws an error", () => new Promise<void>((done, fail) => {
-    setTimeout(() => fail(new Error('did not throw')), 100);
-    const fs = createFileSystem(makeVirtualFileSystem({ 'test.json': '{}' }));
-    catchError(() => {
-      createEffect(() => fs.readFile("test.json"));
-      setTimeout(() => fs.rm("test.json"), 30);
-    }, (error) => {
-      expect(error).toEqual(new Error('"test.json" is not a file'));
-      done();
-    });
-  }));
+  test("a deleted file stored in a signal throws an error", () =>
+    new Promise<void>((done, fail) => {
+      setTimeout(() => fail(new Error("did not throw")), 100);
+      const fs = createFileSystem(makeVirtualFileSystem({ "test.json": "{}" }));
+      catchError(
+        () => {
+          createEffect(() => fs.readFile("test.json"));
+          setTimeout(() => fs.rm("test.json"), 30);
+        },
+        error => {
+          expect(error).toEqual(new Error('"test.json" is not a file'));
+          done();
+        },
+      );
+    }));
 });
 
 describe("createFileSystem (async) calls the underlying fs", () => {
