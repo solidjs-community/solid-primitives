@@ -158,7 +158,8 @@ export const createPagination = (
 
   const goPage = (p: number | ((p: number) => number), ev: KeyboardEvent) => {
     setPage(p);
-    ev.currentTarget?.parentNode.querySelector('[aria-current="true"]').focus();
+    if ('currentTarget' in ev)
+      (ev.currentTarget as HTMLElement).parentNode?.querySelector<HTMLElement>('[aria-current="true"]')?.focus();
   }
 
   const onKeyUp = (pageNo: number, ev: KeyboardEvent) =>
