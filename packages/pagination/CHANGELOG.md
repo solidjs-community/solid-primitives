@@ -1,5 +1,11 @@
 # @solid-primitives/pagination
 
+## 0.5.0
+
+### Minor Changes
+
+- b9d71b4: new segmentation primitive, jump pages, fix set page to non-existent page, fix demo
+
 ## 0.4.3
 
 ### Patch Changes
