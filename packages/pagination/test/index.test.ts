@@ -1,6 +1,11 @@
 import { describe, test, expect } from "vitest";
 import { createMemo, createRoot, createSignal } from "solid-js";
-import { createInfiniteScroll, createPagination, createSegment, PaginationOptions } from "../src/index.js";
+import {
+  createInfiniteScroll,
+  createPagination,
+  createSegment,
+  PaginationOptions,
+} from "../src/index.js";
 import { testEffect } from "../../resource/test/index.test.js";
 
 describe("createPagination", () => {
@@ -104,7 +109,7 @@ describe("createPagination", () => {
     createRoot(dispose => {
       const [paginationProps, page, setPage] = createPagination({
         pages: 10,
-        maxPages: 5
+        maxPages: 5,
       });
 
       expect(page()).toBe(1);
@@ -114,7 +119,7 @@ describe("createPagination", () => {
       expect(page()).toBe(1);
 
       dispose();
-    })
+    });
   });
 
   test("setting page beyond the number pages will yield the last page", () => {
@@ -122,7 +127,7 @@ describe("createPagination", () => {
       const [paginationProps, page, setPage] = createPagination({
         pages: 10,
         maxPages: 5,
-        initialPage: 10
+        initialPage: 10,
       });
 
       expect(page()).toBe(10);
@@ -137,7 +142,11 @@ describe("createPagination", () => {
 
   test("lowering the number of pages will not make the page go beyond it", () => {
     createRoot(dispose => {
-      const [options, setOptions] = createSignal<PaginationOptions>({ pages: 10, maxPages: 5, initialPage: 10 });
+      const [options, setOptions] = createSignal<PaginationOptions>({
+        pages: 10,
+        maxPages: 5,
+        initialPage: 10,
+      });
       const [paginationProps, page, setPage] = createPagination(options);
 
       expect(page()).toBe(10);
@@ -193,7 +202,7 @@ describe("createSegment", () => {
       const items = createMemo(() => Array.from({ length: length() }, (_, i) => i + 1));
       const [page, setPage] = createSignal(6);
       const segment = createSegment(items, 10, page);
-      
+
       const seg1 = segment();
       expect(seg1).toEqual([51, 52, 53, 54, 55]);
       setLength(57);
@@ -203,7 +212,7 @@ describe("createSegment", () => {
 
       dispose();
     });
-  })
+  });
 });
 
 //@ts-ignore

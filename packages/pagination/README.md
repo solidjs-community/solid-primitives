@@ -119,21 +119,17 @@ It is a common requirement to put multiple items on a single page, which exactly
 ```tsx
 const segment = createSegment(items, limit, page);
 
-return (
-  <For each={segment()}>{(item) => <Item item={item} />}</For>
-)
+return <For each={segment()}>{item => <Item item={item} />}</For>;
 ```
 
-* `items` can be any array of items or an accessor with an array of items; even if the array increases in size, the segment will only change if the growth brings an actual change
-* `limit` is the limit for the number of items within a segment; this can be a number or an accessor containing a number
-* `page` is an accessor with the number or the segment page, starting with 1
-
+- `items` can be any array of items or an accessor with an array of items; even if the array increases in size, the segment will only change if the growth brings an actual change
+- `limit` is the limit for the number of items within a segment; this can be a number or an accessor containing a number
+- `page` is an accessor with the number or the segment page, starting with 1
 
 ### Demo
 
 You may view a working example here:
 https://primitives.solidjs.community/playground/pagination/
-
 
 ## `createInfiniteScroll`
 

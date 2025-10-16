@@ -30,21 +30,25 @@ import { isServer } from "solid-js/web";
 export const createSegment = <T>(
   items: MaybeAccessor<T[]>,
   limit: MaybeAccessor<number>,
-  page: Accessor<number>
+  page: Accessor<number>,
 ): Accessor<T[]> => {
-  let previousStart = NaN, previousEnd = NaN;
-  return createMemo((previous) => {
+  let previousStart = NaN,
+    previousEnd = NaN;
+  return createMemo(previous => {
     const currentItems = access(items);
     const start = (page() - 1) * access(limit);
     const end = Math.min(start + access(limit), currentItems.length);
-    if (previous && (previous.length === 0 && end <= start || start === previousStart && end === previousEnd)) {
+    if (
+      previous &&
+      ((previous.length === 0 && end <= start) || (start === previousStart && end === previousEnd))
+    ) {
       return previous;
     }
     previousStart = start;
     previousEnd = end;
     return currentItems.slice(start, end);
   });
-}
+};
 
 export type PaginationOptions = {
   /** the overall number of pages */
@@ -151,16 +155,18 @@ export const createPagination = (
   };
 
   // normalize in case the number of pages changes, do not run the first time
-  createComputed((previous) => {
+  createComputed(previous => {
     opts().pages;
     return previous ? setPage(untrack(page)) : true;
   });
 
   const goPage = (p: number | ((p: number) => number), ev: KeyboardEvent) => {
     setPage(p);
-    if ('currentTarget' in ev)
-      (ev.currentTarget as HTMLElement).parentNode?.querySelector<HTMLElement>('[aria-current="true"]')?.focus();
-  }
+    if ("currentTarget" in ev)
+      (ev.currentTarget as HTMLElement).parentNode
+        ?.querySelector<HTMLElement>('[aria-current="true"]')
+        ?.focus();
+  };
 
   const onKeyUp = (pageNo: number, ev: KeyboardEvent) =>
     (
@@ -258,28 +264,40 @@ export const createPagination = (
     isServer
       ? ({} as PaginationProps[number])
       : ({
-        onClick: () => setPage(Math.max(1, page() - (opts().jumpPages || Infinity))),
-        onKeyUp: (ev: KeyboardEvent) => onKeyUp(page() - (opts().jumpPages || Infinity), ev),
-      } as unknown as PaginationProps[number]),
+          onClick: () => setPage(Math.max(1, page() - (opts().jumpPages || Infinity))),
+          onKeyUp: (ev: KeyboardEvent) => onKeyUp(page() - (opts().jumpPages || Infinity), ev),
+        } as unknown as PaginationProps[number]),
     {
-      disabled: { get: () => page() - (opts().jumpPages || Infinity) < 0, set: noop, enumerable: true },
+      disabled: {
+        get: () => page() - (opts().jumpPages || Infinity) < 0,
+        set: noop,
+        enumerable: true,
+      },
       children: { get: () => `-${opts().jumpPages}`, set: noop, enumerable: true },
       page: { get: () => Math.max(1, page() - (opts().jumpPages || Infinity)), enumerable: false },
-    }
+    },
   );
   const jumpForth = Object.defineProperties(
     isServer
       ? ({} as PaginationProps[number])
       : ({
-        onClick: () => setPage(Math.min(opts().pages, page() + (opts().jumpPages || Infinity))),
-        onKeyUp: (ev: KeyboardEvent) => onKeyUp(Math.min(opts().pages, page() + (opts().jumpPages || Infinity)), ev),
-      } as unknown as PaginationProps[number]),
+          onClick: () => setPage(Math.min(opts().pages, page() + (opts().jumpPages || Infinity))),
+          onKeyUp: (ev: KeyboardEvent) =>
+            onKeyUp(Math.min(opts().pages, page() + (opts().jumpPages || Infinity)), ev),
+        } as unknown as PaginationProps[number]),
     {
-      disabled: { get: () => page() + (opts().jumpPages || Infinity) > opts().pages, set: noop, enumerable: true },
+      disabled: {
+        get: () => page() + (opts().jumpPages || Infinity) > opts().pages,
+        set: noop,
+        enumerable: true,
+      },
       children: { get: () => `+${opts().jumpPages}`, set: noop, enumerable: true },
-      page: { get: () => Math.min(opts().pages, page() + (opts().jumpPages || Infinity)), enumerable: false },
-    }
-  )
+      page: {
+        get: () => Math.min(opts().pages, page() + (opts().jumpPages || Infinity)),
+        enumerable: false,
+      },
+    },
+  );
 
   const start = createMemo(() =>
     Math.min(opts().pages - maxPages(), Math.max(1, page() - (maxPages() >> 1)) - 1),
