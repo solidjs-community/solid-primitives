@@ -1,5 +1,11 @@
 # @solid-primitives/filesystem
 
+## 1.3.3
+
+### Patch Changes
+
+- f3f4784: fix: removing a file deletes its signal correctly
+
 ## 1.3.2
 
 ### Patch Changes
