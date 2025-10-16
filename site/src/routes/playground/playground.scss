@@ -18,6 +18,9 @@ Styles applied in the package playgrounds.
   button {
     @apply border-1 flex cursor-pointer select-none items-center justify-center rounded border-teal-500 bg-teal-600 p-3 py-2 font-semibold text-white hover:bg-teal-500 disabled:cursor-not-allowed disabled:bg-teal-700 disabled:saturate-50 disabled:hover:bg-teal-700;
   }
+  button[aria-current="true"] {
+    @apply bg-teal-300 text-gray-600;
+  }
 
   .wrapper-h {
     @apply flex items-center justify-center space-x-4 space-y-0 rounded-2xl bg-gray-700 p-6;
