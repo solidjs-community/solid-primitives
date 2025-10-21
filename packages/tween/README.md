@@ -28,7 +28,7 @@ import { createTween } from "@solid-primitives/tween";
 const [value, setValue] = createSignal(0);
 const tweenedValue = createTween(value, { duration: 500 });
 
-setMyNumber(100);
+setValue(100);
 // tweenedValue will now smoothly transition from 0 to 100 over 500 ms
 ```
 

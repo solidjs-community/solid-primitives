@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/pagination",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "description": "A primitive that creates all the reactive data to manage your pagination.",
   "author": "Alex Lohr <alex.lohr@logmein.com>",
   "contributors": [
@@ -21,6 +21,7 @@
     "stage": 0,
     "list": [
       "createPagination",
+      "createSegment",
       "createInfiniteScroll"
     ],
     "category": "UI Patterns"

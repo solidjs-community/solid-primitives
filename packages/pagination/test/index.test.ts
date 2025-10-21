@@ -1,6 +1,12 @@
 import { describe, test, expect } from "vitest";
-import { createRoot, createSignal } from "solid-js";
-import { createInfiniteScroll, createPagination } from "../src/index.js";
+import { createMemo, createRoot, createSignal } from "solid-js";
+import {
+  createInfiniteScroll,
+  createPagination,
+  createSegment,
+  PaginationOptions,
+} from "../src/index.js";
+import { testEffect } from "../../resource/test/index.test.js";
 
 describe("createPagination", () => {
   test("createPagination returns page getter and setter", () =>
@@ -94,6 +100,115 @@ describe("createPagination", () => {
 
       expect(back?.page, "back page should be 2").toStrictEqual(2);
       expect(next?.page, "next page should be 4").toStrictEqual(4);
+
+      dispose();
+    });
+  });
+
+  test("setting page below one will yield the first page", () => {
+    createRoot(dispose => {
+      const [paginationProps, page, setPage] = createPagination({
+        pages: 10,
+        maxPages: 5,
+      });
+
+      expect(page()).toBe(1);
+      setPage(0);
+      expect(page()).toBe(1);
+      setPage(-1);
+      expect(page()).toBe(1);
+
+      dispose();
+    });
+  });
+
+  test("setting page beyond the number pages will yield the last page", () => {
+    createRoot(dispose => {
+      const [paginationProps, page, setPage] = createPagination({
+        pages: 10,
+        maxPages: 5,
+        initialPage: 10,
+      });
+
+      expect(page()).toBe(10);
+      setPage(11);
+      expect(page()).toBe(10);
+      setPage(Infinity);
+      expect(page()).toBe(10);
+
+      dispose();
+    });
+  });
+
+  test("lowering the number of pages will not make the page go beyond it", () => {
+    createRoot(dispose => {
+      const [options, setOptions] = createSignal<PaginationOptions>({
+        pages: 10,
+        maxPages: 5,
+        initialPage: 10,
+      });
+      const [paginationProps, page, setPage] = createPagination(options);
+
+      expect(page()).toBe(10);
+      setOptions({ pages: 8, maxPages: 5 });
+      expect(page()).toBe(8);
+
+      dispose();
+    });
+  });
+});
+
+describe("createSegment", () => {
+  test("creates valid segments", () => {
+    createRoot(dispose => {
+      const items = createMemo(() => Array.from({ length: 50 }, (_, i) => i + 1));
+      const [page, setPage] = createSignal(1);
+      const segment = createSegment(items, 10, page);
+
+      expect(segment()).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+      setPage(5);
+      expect(segment()).toEqual([41, 42, 43, 44, 45, 46, 47, 48, 49, 50]);
+      setPage(6);
+      expect(segment()).toEqual([]);
+
+      dispose();
+    });
+  });
+
+  test("does not create the same segment twice", () => {
+    createRoot(dispose => {
+      const [length, setLength] = createSignal(50);
+      const items = createMemo(() => Array.from({ length: length() }, (_, i) => i + 1));
+      const [page, setPage] = createSignal(1);
+      const segment = createSegment(items, 10, page);
+
+      const seg1 = segment();
+      setLength(10);
+      const seg2 = segment();
+      expect(seg1).toBe(seg2);
+      setPage(2);
+      const seg3 = segment();
+      setPage(3);
+      const seg4 = segment();
+      expect(seg3).toBe(seg4);
+
+      dispose();
+    });
+  });
+
+  test("creates a new segment if new items are added", () => {
+    createRoot(dispose => {
+      const [length, setLength] = createSignal(55);
+      const items = createMemo(() => Array.from({ length: length() }, (_, i) => i + 1));
+      const [page, setPage] = createSignal(6);
+      const segment = createSegment(items, 10, page);
+
+      const seg1 = segment();
+      expect(seg1).toEqual([51, 52, 53, 54, 55]);
+      setLength(57);
+      const seg2 = segment();
+      expect(seg2).toEqual([51, 52, 53, 54, 55, 56, 57]);
+      expect(seg1).not.toBe(seg2);
 
       dispose();
     });

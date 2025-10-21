@@ -1,14 +1,11 @@
 {
-  "name": "@solid-primitives/timer",
-  "version": "1.4.3",
-  "description": "Primitives to manage timeout and interval",
-  "author": "David Di Biase <dave.dibiase@gmail.com>",
-  "contributors": [
-    "Xavier Loh <xavier.loh.yz@gmail.com>",
-    "Damian Tarnawski <gthetarnav@gmail.com>"
-  ],
+  "name": "@solid-primitives/match",
+  "version": "0.0.100",
+  "description": "A template primitive example.",
+  "author": "Damian Tarnawski <gthetarnav@gmail.com>",
+  "contributors": [],
   "license": "MIT",
-  "homepage": "https://primitives.solidjs.community/package/timer",
+  "homepage": "https://primitives.solidjs.community/package/match",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -17,33 +14,36 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "timer",
-    "stage": 3,
+    "name": "match",
+    "stage": 0,
     "list": [
-      "makeTimer",
-      "createTimer",
-      "createTimeoutLoop",
-      "createPolled",
-      "createIntervalCounter"
+      "MatchTag",
+      "MatchValue"
     ],
-    "category": "Browser APIs"
+    "category": "Control Flow"
   },
+  "keywords": [
+    "solid",
+    "primitives",
+    "union"
+  ],
   "private": false,
   "sideEffects": false,
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "module": "./dist/index.js",
-  "browser": {},
   "types": "./dist/index.d.ts",
+  "browser": {},
   "exports": {
+    "@solid-primitives/source": "./src/index.ts",
     "import": {
-      "@solid-primitives/source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "typesVersions": {},
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
@@ -51,17 +51,9 @@
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
-  "keywords": [
-    "setInterval",
-    "setTimeout",
-    "timer",
-    "solid",
-    "primitives"
-  ],
   "peerDependencies": {
     "solid-js": "^1.6.12"
   },
-  "typesVersions": {},
   "devDependencies": {
     "solid-js": "^1.9.7"
   }
