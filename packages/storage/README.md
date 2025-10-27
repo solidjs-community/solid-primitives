@@ -56,12 +56,16 @@ Instead of wrapping the resource itself, it is far simpler to use the `storage` 
 persisted signal or [deep signal](../resource/#createdeepsignal):
 
 ```ts
-const [resource] = createResource(fetcher, { storage: makePersisted(createSignal()) });
+const [resource] = createResource(fetcher, {
+  storage: value => makePersisted(createSignal(value)),
+});
 ```
 
 If you are using an asynchronous storage to persist the state of a resource, it might receive an update due to being
 initialized from the storage before or after the fetcher resolved. If the initialization resolves after the fetcher, its
 result is discarded not to overwrite more current data.
+
+If instead of a signal you want to use a store, consider using the `makeDeepSignal` primitive from the `resource` package.
 
 ### Using `makePersisted` with Suspense
 
