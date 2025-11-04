@@ -78,7 +78,9 @@ export function makeAbortable(
  * - `noAutoAbort`: can be set to true to make a new source not automatically abort a previous request
  */
 
-export function createAbortable(options?: AbortableOptions) {
+export function createAbortable(
+  options?: AbortableOptions
+): [() => AbortSignal, () => void, (err: any) => void] {
   const [signal, abort, filterAbortError] = makeAbortable(options);
   onCleanup(abort);
   return [signal, abort, filterAbortError];
