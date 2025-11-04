@@ -79,7 +79,7 @@ export function makeAbortable(
  */
 
 export function createAbortable(
-  options?: AbortableOptions
+  options?: AbortableOptions,
 ): [() => AbortSignal, () => void, (err: any) => void] {
   const [signal, abort, filterAbortError] = makeAbortable(options);
   onCleanup(abort);
