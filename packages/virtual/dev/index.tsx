@@ -4,19 +4,25 @@ import { VirtualList } from "../src/index.jsx";
 
 const intl = new Intl.NumberFormat();
 
-const items = new Array(100_000).fill(0).map((_, i) => i);
-
+const items = new Array(100_000).fill(0).map((_, i) => [i, Math.random() * 72 + 24]);
 const clampRange = (min: number, max: number, v: number) => (v < min ? min : v > max ? max : v);
 
 const App: Component = () => {
+  const [dynamicSize, setDynamicSize] = createSignal(true);
   const [listLength, setListLength] = createSignal(100_000);
   const [overscanCount, setOverscanCount] = createSignal(5);
   const [rootHeight, setRootHeight] = createSignal(240);
   const [rowHeight, setRowHeight] = createSignal(24);
+  let scrollToItem!: (itemIndex: number) => void;
 
   return (
     <div class="box-border flex min-h-screen w-full flex-col space-y-4 bg-gray-800 p-24 text-white">
       <div class="grid w-full grid-cols-4 bg-white p-4 text-gray-800 shadow-md">
+        <div>
+          <button onClick={() => setDynamicSize(!dynamicSize())}>
+            {dynamicSize() ? "Dynamic Mode" : "Static Mode"}
+          </button>
+        </div>
         <div>
           <DemoControl
             label="Number of rows"
@@ -69,9 +75,12 @@ const App: Component = () => {
           fallback={<div>no items</div>}
           overscanCount={overscanCount()}
           rootHeight={rootHeight()}
-          rowHeight={rowHeight()}
+          rowHeight={dynamicSize() ? item => item[1]! : rowHeight()}
+          setScrollToItem={fn => (scrollToItem = fn)}
         >
-          {item => <VirtualListItem item={item} height={rowHeight()} />}
+          {item => (
+            <VirtualListItem item={item[0]!} height={dynamicSize() ? item[1]! : rowHeight()} />
+          )}
         </VirtualList>
       </div>
     </div>
@@ -122,7 +131,13 @@ const VirtualListItem: Component<VirtualListItemProps> = props => {
   });
 
   return (
-    <div style={{ height: `${props.height}px` }} class="align-center flex">
+    <div
+      style={{
+        height: `${props.height}px`,
+        "background-color": `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`,
+      }}
+      class="align-center flex"
+    >
       {intl.format(props.item)}
     </div>
   );
