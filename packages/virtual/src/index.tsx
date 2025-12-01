@@ -16,7 +16,6 @@ type VirtualListReturn<T extends readonly any[]> = [
     viewerTop: number;
     visibleItems: T;
     firstIndex: number;
-    lastIndex: number;
   }>,
   onScroll: (e: Event) => void,
 ];
@@ -51,13 +50,12 @@ export function createVirtualList<T extends readonly any[]>({
         Math.floor(offset() / rowHeight) + Math.ceil(rootHeight / rowHeight) + overscanCount,
       );
 
-      return ({
+      return {
         containerHeight: items.length * rowHeight,
         viewerTop: firstIndex * rowHeight,
         visibleItems: items.slice(firstIndex, lastIndex) as unknown as T,
         firstIndex,
-        lastIndex
-      })
+      };
     },
     e => {
       // @ts-expect-error
