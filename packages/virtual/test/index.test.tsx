@@ -51,6 +51,27 @@ describe("createVirtualList", () => {
     expect(virtual().visibleItems).toEqual([0, 1, 2]);
   });
 
+  test("returns firstIndex representing the index of the visibleList", () => {
+    const [virtual] = createVirtualList({
+      items: TEST_LIST,
+      rootHeight: 20,
+      rowHeight: 10,
+    });
+
+    expect(virtual().firstIndex).toEqual(0);
+  });
+
+  test("returns lastIndex representing the index of the visibleList", () => {
+    const [virtual] = createVirtualList({
+      items: TEST_LIST,
+      rootHeight: 20,
+      rowHeight: 10,
+    });
+
+    expect(virtual().lastIndex).toEqual(2);
+  });
+
+
   test("returns onScroll which sets viewerTop and visibleItems based on rootElement's scrolltop", () => {
     const el = document.createElement("div");
 
@@ -62,35 +83,47 @@ describe("createVirtualList", () => {
 
     expect(virtual().visibleItems).toEqual([0, 1, 2]);
     expect(virtual().viewerTop).toEqual(0);
+    expect(virtual().firstIndex).toEqual(0);
+    expect(virtual().lastIndex).toEqual(2);
 
     el.scrollTop += 10;
 
     // no change until onScroll is called
     expect(virtual().visibleItems).toEqual([0, 1, 2]);
     expect(virtual().viewerTop).toEqual(0);
+    expect(virtual().firstIndex).toEqual(0);
+    expect(virtual().lastIndex).toEqual(2);
 
     onScroll(TARGETED_SCROLL_EVENT(el));
 
     expect(virtual().visibleItems).toEqual([0, 1, 2, 3]);
     expect(virtual().viewerTop).toEqual(0);
+    expect(virtual().firstIndex).toEqual(0);
+    expect(virtual().lastIndex).toEqual(3);
 
     el.scrollTop += 10;
     onScroll(TARGETED_SCROLL_EVENT(el));
 
     expect(virtual().visibleItems).toEqual([1, 2, 3, 4]);
     expect(virtual().viewerTop).toEqual(10);
+    expect(virtual().firstIndex).toEqual(1);
+    expect(virtual().lastIndex).toEqual(4);
 
     el.scrollTop -= 10;
     onScroll(TARGETED_SCROLL_EVENT(el));
 
     expect(virtual().visibleItems).toEqual([0, 1, 2, 3]);
     expect(virtual().viewerTop).toEqual(0);
+    expect(virtual().firstIndex).toEqual(1);
+    expect(virtual().lastIndex).toEqual(3);
 
     el.scrollTop -= 10;
     onScroll(TARGETED_SCROLL_EVENT(el));
 
     expect(virtual().visibleItems).toEqual([0, 1, 2]);
     expect(virtual().viewerTop).toEqual(0);
+    expect(virtual().firstIndex).toEqual(1);
+    expect(virtual().lastIndex).toEqual(2);
   });
 
   test("onScroll handles reaching the bottom of the list", () => {
@@ -126,6 +159,8 @@ describe("createVirtualList", () => {
     onScroll(TARGETED_SCROLL_EVENT(el));
 
     expect(virtual().visibleItems).toEqual([8, 9, 10, 11, 12, 13]);
+    expect(virtual().firstIndex).toEqual(8);
+    expect(virtual().lastIndex).toEqual(13);
   });
 
   test("overscanCount defaults to 1 if undefined or zero", () => {
