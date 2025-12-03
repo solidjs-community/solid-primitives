@@ -54,6 +54,8 @@
     "primitives"
   ],
   "dependencies": {
+    "@solid-primitives/rootless": "workspace:^",
+    "@solid-primitives/set": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
