@@ -117,6 +117,129 @@ function createMs(
 };
 ```
 
+## createCallbacksSet
+
+A primitive for executing multiple callbacks at once, intended for usage in conjunction with primitives like `createRAF`, where you want to execute multiple callbacks in the same `window.requestAnimationFrame` (sharing the timestamp).
+
+#### Definition
+
+```ts
+function createCallbacksSet<T extends (...args: any) => void>(...initialCallbacks: Array<T>): [callback: T, callbacksSet: ReactiveSet<T>]
+```
+
+## useGlobalRAF
+
+A singleton root that returns a function similar to `createRAF` that batches multiple `window.requestAnimationFrame` executions within the same same timestamp (same RAF cycle) instead of skipping requests in separate frames. This is done by using a single `createRAF` in a [singleton root](https://github.com/solidjs-community/solid-primitives/tree/main/packages/rootless#createSingletonRoot) in conjuction with [`createCallbacksSet`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#createCallbacksSet)
+
+Returns a factory function that works like `createRAF` with an additional parameter to start the global RAF loop when adding the callback to the callbacks set. This function return is also similar to `createRAF`, but it's first three elements of the tuple are related to the presence of the callback in the callbacks set, while the next three are the same as `createRAF`, but for the global loop that executes all the callbacks present in the callbacks set.
+
+```ts
+import { useGlobalRAF } from "@solid-primitives/raf";
+
+const createScheduledLoop = useGlobalRAF()
+const [hasAddedManual, addManual, removeManual, isRunningManual] = createScheduledLoop(
+  timeStamp => console.log("Time stamp is", timeStamp)
+);
+const [hasAddedAuto, addAuto, removeAuto, isRunningAuto] = createScheduledLoop(
+  timeStamp => console.log("Time stamp is", timeStamp),
+  true
+);
+
+hasAddedManual() // false
+addManual()
+hasAddedManual() // true
+isRunningManual() // false
+
+hasAddedAuto() // false
+addAuto()
+hasAddedAuto() // true
+// Both are running on the same global loop
+isRunningAuto() // true
+isRunningManual() // true
+```
+
+#### Example
+
+```ts
+import { targetFPS, useGlobalRAF } from "@solid-primitives/raf";
+
+const createScheduledLoop = useGlobalRAF()
+
+const [hasAddedLowFramerate, addLowFramerate, removeLowFramerate] = createScheduledLoop(
+  targetFPS(
+    () => {
+      /* Low framerate loop, for example for video / webcam sampling where the framerate can be capped by external sources  */
+    },
+    30
+  ),
+  true
+);
+const [hasAddedHighFramerate, addHighFramerate, removeHighFramerate] = createScheduledLoop(
+  targetFPS(
+    () => {
+      /* High framerate loop for an animation / drawing to a canvas */
+    },
+    60
+  ),
+  true
+);
+```
+
+#### Definition
+
+```ts
+function useGlobalRAF(): (callback: FrameRequestCallback, startWhenAdded?: MaybeAccessor<boolean>) => [
+  added: Accessor<boolean>, 
+  add: VoidFunction,     
+  remove: VoidFunction,
+  running: Accessor<boolean>, 
+  start: VoidFunction, 
+  stop: VoidFunction
+];
+```
+
+#### Warning
+
+Only use this when you absolutely need to schedule animations on the same frame and stick to quick executions trying not to overload the amount of work performed in the current animation frame. If you need to ensure multiple things run on the same request but you also want to schedule multiple requests, you can use [`createCallbacksSet`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/raf#createCallbacksSet) and a singleton `createRAF` to compose something similar to this primitive.
+
+## createScheduledLoop
+
+A primitive for creating reactive interactions with external frameloop related functions (for example using [motion's frame util](https://motion.dev/docs/frame)) that are automatically disposed onCleanup.
+
+```ts
+import { cancelFrame, frame } from "motion";
+
+const createMotionFrameRender = createScheduledLoop(
+  callback => frame.render(callback, true),
+  cancelFrame,
+);
+const [running, start, stop] = createMotionFrameRender(
+   data => element.style.transform = "translateX(...)"
+);
+
+// Alternative syntax (for a single execution in place):
+import { cancelFrame, frame } from "motion";
+
+const [running, start, stop] = createScheduledLoop(
+  callback => frame.render(callback, true),
+  cancelFrame,
+)(
+   data => element.style.transform = "translateX(...)"
+);
+```
+
+#### Definition
+
+```ts
+function createScheduledLoop<
+  RequestID extends NonNullable<unknown>,
+  Callback extends (...args: Array<any>) => any,
+>(
+  schedule: (callback: Callback) => RequestID,
+  cancel: (requestID: RequestID) => void,
+): (callback: Callback) => [running: Accessor<boolean>, start: VoidFunction, stop: VoidFunction]
+```
+
 ## Demo
 
 You may view a working example here: https://codesandbox.io/s/solid-primitives-raf-demo-4xvmjd?file=/src/index.tsx

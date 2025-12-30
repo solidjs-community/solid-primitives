@@ -1,11 +1,5 @@
 import { describe, it, expect, vi, type Mock, beforeEach, afterEach } from "vitest";
-import {
-  createMs,
-  createRAF,
-  createScheduledFrameloop,
-  targetFPS,
-  useFrameloop,
-} from "../src/index.js";
+import { createMs, createRAF, createScheduledLoop, targetFPS, useGlobalRAF } from "../src/index.js";
 import { createRoot } from "solid-js";
 
 describe("createRAF", () => {
@@ -45,18 +39,18 @@ describe("createRAF", () => {
   });
 });
 
-describe("createScheduledFrameloop", () => {
+describe("createScheduledLoop", () => {
   it("frameloop created with requestAnimationFrame calls requestAnimationFrame after start", () => {
     const raf = vi.spyOn(window, "requestAnimationFrame");
     const caf = vi.spyOn(window, "cancelAnimationFrame");
     createRoot(() => {
-      const [running, start, stop] = createScheduledFrameloop(
+      // TODO add better test
+      const [running, start, stop] = createScheduledLoop(
         window.requestAnimationFrame,
         window.cancelAnimationFrame,
-        ts => {
-          expect(typeof ts === "number");
-        },
-      );
+      )(ts => {
+        expect(typeof ts === "number");
+      });
       expect(running()).toBe(false);
       expect(raf).not.toHaveBeenCalled();
       expect(caf).not.toHaveBeenCalled();
@@ -102,30 +96,30 @@ describe("targetFPS", () => {
   });
 });
 
-describe("useFrameloop", () => {
-  // Note: All frameloop roots need to be disposed before each test due to the underlying reactive set not working properly if not used like that
+describe("useGlobalRAF", () => {
+  // Note: All roots need to be disposed before each test due to the underlying reactive set not working properly if we don't
   beforeEach(() => {
     vi.useFakeTimers();
   });
   afterEach(() => {
     vi.restoreAllMocks();
   });
-  it("(Manual execution) frameloop singleton calls rafs with the same timestamp", () => {
+  it("(Manual start) global RAF singleton calls rafs with the same timestamp", () => {
     // Note on this test: For some reason, the raf is being called twice, once when started (but id doesn't invoke the callback for some strange reason) and once after the timers advance (and the callback is properly invoked).
     const raf = vi.spyOn(window, "requestAnimationFrame");
     const caf = vi.spyOn(window, "cancelAnimationFrame");
     createRoot(dispose => {
       const timestamps = new Set<number>();
-      const createScheduledFrame = useFrameloop();
+      const createGlobalRAFCallback = useGlobalRAF();
       const callback1: Mock<FrameRequestCallback> = vi.fn(ts => timestamps.add(ts));
-      const [queued1, queue1, dequeue1, running1, start1, stop1] = createScheduledFrame(callback1);
+      const [added1, add1, remove1, running1, start1, stop1] = createGlobalRAFCallback(callback1);
       const callback2: Mock<FrameRequestCallback> = vi.fn(ts => timestamps.add(ts));
-      const [queued2, queue2, dequeue2, running2, start2, stop2] = createScheduledFrame(callback2);
+      const [added2, add2, remove2, running2, start2, stop2] = createGlobalRAFCallback(callback2);
 
       // Queue functions should not be equal
-      expect(queued1).not.toEqual(queued2);
-      expect(queue1).not.toEqual(queue2);
-      expect(dequeue1).not.toEqual(dequeue2);
+      expect(added1).not.toEqual(added2);
+      expect(add1).not.toEqual(add2);
+      expect(remove1).not.toEqual(remove2);
       expect(callback1).not.toHaveBeenCalled();
       expect(callback2).not.toHaveBeenCalled();
 
@@ -139,10 +133,10 @@ describe("useFrameloop", () => {
       const start = start1;
       const stop = stop1;
 
-      expect(queued1()).toBe(false);
-      queue1();
-      expect(queued1()).toBe(true);
-      expect(queued2()).toBe(false);
+      expect(added1()).toBe(false);
+      add1();
+      expect(added1()).toBe(true);
+      expect(added2()).toBe(false);
       expect(running()).toBe(false);
       start();
       vi.advanceTimersToNextFrame();
@@ -153,8 +147,8 @@ describe("useFrameloop", () => {
       stop();
       expect(running()).toBe(false);
       expect(caf).toHaveBeenCalledTimes(1);
-      queue2();
-      expect(queued2()).toBe(true);
+      add2();
+      expect(added2()).toBe(true);
       start();
       vi.advanceTimersToNextFrame();
       expect(raf).toHaveBeenCalledTimes(4);
@@ -164,15 +158,15 @@ describe("useFrameloop", () => {
       dispose();
     });
   });
-  it("(Manual execution) frameloop singleton skips calls when not queued / dequeued", () => {
+  it("(Manual start) global RAF singleton skips callbacks when not added", () => {
     // Note on this test: For some reason, the raf is being called twice, once when started (but id doesn't invoke the callback for some strange reason) and once after the timers advance (and the callback is properly invoked).
     // Running the timer guarantees that the callback is properly tested for invokation
     const raf = vi.spyOn(window, "requestAnimationFrame");
     const caf = vi.spyOn(window, "cancelAnimationFrame");
     createRoot(dispose => {
-      const createScheduledFrame = useFrameloop();
+      const createGlobalRAFCallback = useGlobalRAF();
       const callback: Mock<FrameRequestCallback> = vi.fn();
-      const [queued, queue, dequeue, running, start, stop] = createScheduledFrame(callback);
+      const [added, add, remove, running, start, stop] = createGlobalRAFCallback(callback);
 
       function runFrame() {
         expect(running()).toBe(false);
@@ -184,11 +178,11 @@ describe("useFrameloop", () => {
       }
 
       runFrame();
-      queue();
-      expect(queued()).toBe(true);
+      add();
+      expect(added()).toBe(true);
       expect(running()).toBe(false);
-      dequeue();
-      expect(queued()).toBe(false);
+      remove();
+      expect(added()).toBe(false);
       runFrame();
       expect(raf).toHaveBeenCalledTimes(4);
       expect(caf).toHaveBeenCalledTimes(2);
@@ -196,28 +190,28 @@ describe("useFrameloop", () => {
       dispose();
     });
   });
-  it("(Automatic execution) frameloop singleton calls rafs with the same timestamp", () => {
+  it("(Automatic start) global RAF singleton calls rafs with the same timestamp", () => {
     // Note on this test: For some reason, the raf is being called twice, once when started (but id doesn't invoke the callback for some strange reason) and once after the timers advance (and the callback is properly invoked).
     const raf = vi.spyOn(window, "requestAnimationFrame");
     const caf = vi.spyOn(window, "cancelAnimationFrame");
     createRoot(dispose => {
       const timestamps = new Set<number>();
-      const createScheduledFrame = useFrameloop();
+      const createGlobalRAFCallback = useGlobalRAF();
       const callback1: Mock<FrameRequestCallback> = vi.fn(ts => timestamps.add(ts));
-      const [queued1, queue1, dequeue1, running1, start1, stop1] = createScheduledFrame(
+      const [added1, add1, remove1, running1, start1, stop1] = createGlobalRAFCallback(
         callback1,
         true,
       );
       const callback2: Mock<FrameRequestCallback> = vi.fn(ts => timestamps.add(ts));
-      const [queued2, queue2, dequeue2, running2, start2, stop2] = createScheduledFrame(
+      const [added2, add2, remove2, running2, start2, stop2] = createGlobalRAFCallback(
         callback2,
         true,
       );
 
       // Queue functions should not be equal
-      expect(queued1).not.toEqual(queued2);
-      expect(queue1).not.toEqual(queue2);
-      expect(dequeue1).not.toEqual(dequeue2);
+      expect(added1).not.toEqual(added2);
+      expect(add1).not.toEqual(add2);
+      expect(remove1).not.toEqual(remove2);
       expect(callback1).not.toHaveBeenCalled();
       expect(callback2).not.toHaveBeenCalled();
 
@@ -230,10 +224,10 @@ describe("useFrameloop", () => {
       const running = running1;
       const stop = stop1;
 
-      expect(queued1()).toBe(false);
-      queue1();
-      expect(queued1()).toBe(true);
-      expect(queued2()).toBe(false);
+      expect(added1()).toBe(false);
+      add1();
+      expect(added1()).toBe(true);
+      expect(added2()).toBe(false);
       expect(running()).toBe(true);
       vi.advanceTimersToNextFrame();
       expect(raf).toHaveBeenCalledTimes(2);
@@ -242,14 +236,14 @@ describe("useFrameloop", () => {
       stop();
       expect(running()).toBe(false);
       expect(caf).toHaveBeenCalledTimes(1);
-      queue2();
-      expect(queued2()).toBe(true);
+      add2();
+      expect(added2()).toBe(true);
       expect(running()).toBe(true);
       vi.advanceTimersToNextFrame();
       expect(raf).toHaveBeenCalledTimes(4);
       expect(timestamps.size).toEqual(2);
-      dequeue1();
-      dequeue2();
+      remove1();
+      remove2();
       vi.waitUntil(() => {
         expect(running()).toBe(false);
         expect(caf).toHaveBeenCalledTimes(2);
@@ -257,17 +251,14 @@ describe("useFrameloop", () => {
       dispose();
     });
   });
-  it("(Automatic execution) frameloop singleton skips calls when not queued / dequeued", () => {
+  it("(Automatic start) global RAF singleton skips callbacks when not added", () => {
     // Running the timer guarantees that the callback is properly tested for invokation
     const raf = vi.spyOn(window, "requestAnimationFrame");
     const caf = vi.spyOn(window, "cancelAnimationFrame");
     createRoot(() => {
-      const createScheduledFrame = useFrameloop();
+      const createGlobalRAFCallback = useGlobalRAF();
       const callback: Mock<FrameRequestCallback> = vi.fn();
-      const [_queued, _queue, _dequeue, running, start, stop] = createScheduledFrame(
-        callback,
-        true,
-      );
+      const [_added, _add, _remove, running, start, stop] = createGlobalRAFCallback(callback, true);
 
       expect(running()).toBe(false);
       start();
@@ -280,20 +271,20 @@ describe("useFrameloop", () => {
       expect(callback).not.toHaveBeenCalled();
     });
   });
-  it("(All) frameloop dispose stops the execution and dequeues", () => {
+  it("(All) frameloop dispose stops the execution and cancels all callbacks", () => {
     // Note on this test: For some reason, the raf is being called twice, once when started (but id doesn't invoke the callback for some strange reason) and once after the timers advance (and the callback is properly invoked).
     const raf = vi.spyOn(window, "requestAnimationFrame");
     const caf = vi.spyOn(window, "cancelAnimationFrame");
 
     // Manual
     createRoot(dispose => {
-      const createScheduledFrame = useFrameloop();
+      const createGlobalRAFCallback = useGlobalRAF();
       const callback: Mock<FrameRequestCallback> = vi.fn();
-      const [queued, queue, _dequeue, running, start, _stop] = createScheduledFrame(callback);
+      const [added, add, _remove, running, start, _stop] = createGlobalRAFCallback(callback);
 
-      expect(queued()).toBe(false);
-      queue();
-      expect(queued()).toBe(true);
+      expect(added()).toBe(false);
+      add();
+      expect(added()).toBe(true);
       expect(raf).not.toHaveBeenCalled();
       expect(caf).not.toHaveBeenCalled();
       expect(callback).not.toHaveBeenCalled();
