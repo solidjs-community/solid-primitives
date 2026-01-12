@@ -48,7 +48,7 @@ The `keyArray` primitive takes 4 arguments:
 
 ```ts
 const mapped = keyArray(source, 
-  (model) => checksum(`${model().name}|${model().description}`), 
+  (model) => model.id, 
   (model, index) => {
     const [name, setName] = createSignal(model().name);
     const [description, setDescription] = createSignal(model().description);
