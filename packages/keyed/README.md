@@ -47,8 +47,9 @@ The `keyArray` primitive takes 4 arguments:
 - `options` - a fallback for when the input list is empty or missing _(Optional)_
 
 ```ts
-const mapped = keyArray(source, 
-  (model) => model.id, 
+const mapped = keyArray(
+  source,
+  model => model.id,
   (model, index) => {
     const [name, setName] = createSignal(model().name);
     const [description, setDescription] = createSignal(model().description);
@@ -72,7 +73,8 @@ const mapped = keyArray(source,
       setName,
       setDescription,
     };
-  });
+  },
+);
 ```
 
 Notice that both the value and index arguments are signals. Items are identified only by keys, it means that the items could be copied, replaced, changed, but as long as the key is the same, `keyArray` will treat it as the same item.
