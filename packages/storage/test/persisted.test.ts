@@ -133,7 +133,7 @@ describe("makePersisted", () => {
 
   it("exposes the initial value as third part of the return tuple", () => {
     const anotherMockAsyncStorage = { ...mockAsyncStorage };
-    const promise = Promise.resolve("init");
+    const promise = Promise.resolve('"init"');
     anotherMockAsyncStorage.getItem = () => promise;
     const [_signal, _setSignal, init] = makePersisted(createSignal("default"), {
       storage: anotherMockAsyncStorage,
