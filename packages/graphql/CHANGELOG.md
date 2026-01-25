@@ -1,5 +1,12 @@
 # @solid-primitives/graphql
 
+## 2.2.3
+
+### Patch Changes
+
+- f5abdc3: @solid-primitives/graphql: Fix a build issue occurring during the bundling process.
+  @solid-primitives/share: Fix a typo for Facebook Messenger
+
 ## 2.2.2
 
 ### Patch Changes
