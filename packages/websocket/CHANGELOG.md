@@ -1,5 +1,11 @@
 # @solid-primitives/websocket
 
+## 1.3.2
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+
 ## 1.3.1
 
 ### Patch Changes

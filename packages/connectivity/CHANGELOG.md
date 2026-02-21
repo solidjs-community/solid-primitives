@@ -1,5 +1,12 @@
 # @solid-primitives/connectivity
 
+## 0.4.4
+
+### Patch Changes
+
+- Updated dependencies [f32f209]
+  - @solid-primitives/event-listener@2.4.4
+
 ## 0.4.3
 
 ### Patch Changes

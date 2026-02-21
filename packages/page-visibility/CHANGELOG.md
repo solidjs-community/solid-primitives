@@ -1,5 +1,13 @@
 # @solid-primitives/page-visibility
 
+## 2.1.4
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+- Updated dependencies [f32f209]
+  - @solid-primitives/event-listener@2.4.4
+
 ## 2.1.3
 
 ### Patch Changes
