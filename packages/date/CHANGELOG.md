@@ -1,5 +1,13 @@
 # @solid-primitives/date
 
+## 2.1.5
+
+### Patch Changes
+
+- Updated dependencies [f32f209]
+  - @solid-primitives/timer@1.4.4
+  - @solid-primitives/memo@1.4.4
+
 ## 2.1.4
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @solid-primitives/intersection-observer
 
+## 2.2.3
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+
 ## 2.2.2
 
 ### Patch Changes

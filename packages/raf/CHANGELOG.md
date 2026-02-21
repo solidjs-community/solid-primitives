@@ -1,5 +1,11 @@
 # @solid-primitives/raf
 
+## 2.3.3
+
+### Patch Changes
+
+- f32f209: Update author email for David Di Biase.
+
 ## 2.3.2
 
 ### Patch Changes
