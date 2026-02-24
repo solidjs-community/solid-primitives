@@ -1,4 +1,9 @@
-import { SSEReadyState, type SSEReadyStateValue, type SSEOptions, type SSESourceFn } from "./sse.js";
+import {
+  SSEReadyState,
+  type SSEReadyStateValue,
+  type SSEOptions,
+  type SSESourceFn,
+} from "./sse.js";
 
 // ─── Protocol types ───────────────────────────────────────────────────────────
 
