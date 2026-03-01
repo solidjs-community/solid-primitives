@@ -286,4 +286,23 @@ describe("createSSE", () => {
         dispose();
       }),
     ));
+
+  it("readyState is CLOSED after owner disposal", () =>
+    createRoot(dispose => {
+      const { readyState } = createSSE("https://example.com/events");
+      vi.advanceTimersByTime(20);
+      expect(readyState()).toBe(SSEReadyState.OPEN);
+      dispose();
+      expect(readyState()).toBe(SSEReadyState.CLOSED);
+    }));
+
+  it("readyState updates to CONNECTING when server drops connection", () =>
+    createRoot(dispose => {
+      const { readyState, source } = createSSE("https://example.com/events");
+      vi.advanceTimersByTime(20);
+      expect(readyState()).toBe(SSEReadyState.OPEN);
+      (source() as unknown as MockEventSource).simulateTransientError();
+      expect(readyState()).toBe(SSEReadyState.CONNECTING);
+      dispose();
+    }));
 });

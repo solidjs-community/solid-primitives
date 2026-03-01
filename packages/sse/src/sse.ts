@@ -341,6 +341,7 @@ export const createSSE = <T = string>(
   onCleanup(() => {
     clearReconnectTimer();
     teardown();
+    setReadyState(SSEReadyState.CLOSED);
   });
 
   return { source, data, error, readyState, close: disconnect, reconnect: manualReconnect };
