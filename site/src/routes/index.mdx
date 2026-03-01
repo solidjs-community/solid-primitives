@@ -1,43 +1,47 @@
 ---
 title: Solid Primitives
 description: High-quality, community contributed SolidJS primitives
+layout: home
+sidebar: false
+hero:
+  text: The building blocks of Solid
+  tagline: High-quality, community-contributed, tree-shakable primitives for every use case.
+  actions:
+    - theme: brand
+      text: Browse Packages
+      link: /packages
+    - theme: alt
+      text: GitHub
+      link: https://github.com/solidjs-community/solid-primitives
+features:
+  - icon: 📦
+    title: Tree-Shakable
+    details: Each primitive is its own package. Install only what you use — no bloat.
+  - icon: 🔄
+    title: Isomorphic
+    details: Works on both client and server. Fully compatible with SSR and SolidStart.
+  - icon: 🧩
+    title: Composable
+    details: Primitives build on each other, making complex behaviors easy to assemble.
+  - icon: ✅
+    title: Well-Tested
+    details: Every package ships with a comprehensive test suite for reliability.
+  - icon: 🏗️
+    title: Stage Process
+    details: TC39-inspired maturity stages keep you informed of each primitive's stability.
+  - icon: 💙
+    title: Community-Driven
+    details: Built and maintained by the SolidJS community for the SolidJS community.
+  - icon: 🔷
+    title: TypeScript-First
+    details: Every primitive is authored in TypeScript with precise, ergonomic types throughout.
+  - icon: ⚡
+    title: Truly Reactive
+    details: Idiomatic SolidJS — primitives are reactive wrappers, not hooks ported from other frameworks.
 ---
 
 import PrimitivesTable from "~/components/PrimitivesTable";
 
-# Solid Primitives
-
-A project that strives to develop high-quality, community contributed SolidJS **primitives**.
-
-**Small** — aggregate tree-shaking benefits
-**Isomorphic** — client and server side functionality
-**Stable** — consistent and managed testing + maintenance
-
 ## All Primitives
 
 <PrimitivesTable />
-
-## Contribution Process
-
-Solid Primitives uses a **stage process** inspired by [TC39](https://tc39.es/process-document/) to manage primitive maturity.
-
-| Stage | Color | Description |
-|-------|-------|-------------|
-| 0 | 🔴 | Proposal — idea or early draft, not ready for use |
-| 1 | 🟠 | Experimental — usable but API may change |
-| 2 | 🟡 | Stable — API is settled, minor changes possible |
-| 3 | 🟢 | Polished — production-ready, well-tested |
-| 4 | 🔵 | Completed — locked API, considered complete |
-
-## Philosophy
-
-Solid Primitives aims to be the go-to collection of SolidJS utilities, filling in the gaps that SolidJS's core reactivity system intentionally leaves open. Each primitive is:
-
-- **Focused** — does one thing and does it well
-- **Composable** — primitives build on each other
-- **Tested** — all packages include comprehensive test suites
-- **Typed** — full TypeScript support
-
-## Contributing
-
-We welcome contributions! Check out [CONTRIBUTING.md](https://github.com/solidjs-community/solid-primitives/blob/main/CONTRIBUTING.md) to learn about the design maxims and how to submit a primitive.
