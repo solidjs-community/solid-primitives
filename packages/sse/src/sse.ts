@@ -260,6 +260,11 @@ export const createSSE = <T = string>(
       if (es.readyState === SSEReadyState.CLOSED && retriesLeft > 0) {
         retriesLeft--;
         reconnectTimer = setTimeout(() => _open(resolvedUrl), reconnectConfig.delay ?? 3000);
+      } else if (es.readyState === SSEReadyState.CLOSED) {
+        // Retries exhausted — clean up fully to avoid memory/listener leaks.
+        currentCleanup?.();
+        currentCleanup = undefined;
+        setSource(undefined);
       }
     };
 

@@ -181,12 +181,31 @@ describe("createSSE", () => {
       const first = source();
       (first as unknown as MockEventSource).simulateError();
       vi.advanceTimersByTime(100); // first retry
-      const second = source();
+      const second = source() as unknown as MockEventSource;
       expect(second).not.toBe(first);
       vi.advanceTimersByTime(20); // second opens
-      (second as unknown as MockEventSource).simulateError();
+      const closeSpy = vi.spyOn(second, "close");
+      second.simulateError();
       vi.advanceTimersByTime(200); // no more retries
-      expect(source()).toBe(second); // still the same source
+      // retries exhausted: close() was called and source signal is cleared
+      expect(closeSpy).toHaveBeenCalledOnce();
+      expect(source()).toBeUndefined();
+      dispose();
+    }));
+
+  it("cleans up source and listeners when retries are exhausted", () =>
+    createRoot(dispose => {
+      const { source, readyState } = createSSE("https://example.com/events", {
+        reconnect: { retries: 0, delay: 50 },
+      });
+      vi.advanceTimersByTime(20);
+      const es = source() as unknown as MockEventSource;
+      const closeSpy = vi.spyOn(es, "close");
+      es.simulateError();
+      // retries exhausted immediately — cleanup must have run
+      expect(closeSpy).toHaveBeenCalledOnce();
+      expect(source()).toBeUndefined();
+      expect(readyState()).toBe(SSEReadyState.CLOSED);
       dispose();
     }));
 
