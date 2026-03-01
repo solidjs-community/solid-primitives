@@ -22,7 +22,7 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
-import { getModulesData, type ModuleData } from "../../scripts/utils/index.js";
+import { getModulesData, getPackageBundlesize, type ModuleData } from "../../scripts/utils/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -113,6 +113,7 @@ export type PackageListItem = ModuleData & {
   category: string;
   stage: number;
   lastUpdated: number;
+  gzip?: number;
 };
 
 export type SidebarSection = {
@@ -128,6 +129,26 @@ export type SidebarSection = {
 (async () => {
   const modules = await getModulesData();
 
+  // Pre-calculate all bundle sizes in parallel
+  const primitiveModules = modules.filter(m => m.primitive != null);
+  console.log(`\nCalculating bundle sizes for ${primitiveModules.length} packages...`);
+  const bundleSizeResults = await Promise.allSettled(
+    primitiveModules.map(m =>
+      getPackageBundlesize(m.name, {
+        peerDependencies: [
+          ...m.peer_deps,
+          ...m.workspace_deps.map(d => `@solid-primitives/${d}`),
+        ],
+      }).then(result => ({ name: m.name, gzip: result?.gzip })),
+    ),
+  );
+  const gzipByName: Record<string, number | undefined> = {};
+  for (const result of bundleSizeResults) {
+    if (result.status === "fulfilled") {
+      gzipByName[result.value.name] = result.value.gzip;
+    }
+  }
+
   const packages: PackageListItem[] = [];
   const categoryMap: Record<string, { title: string; link: string }[]> = {};
 
@@ -138,9 +159,10 @@ export type SidebarSection = {
     const category = primitive.category;
     const stage = primitive.stage;
     const lastUpdated = getPackageLastUpdated(path.join(packagesPath, name));
+    const gzip = gzipByName[name];
 
     // Build PackageListItem
-    const item: PackageListItem = { ...module, category, stage, lastUpdated };
+    const item: PackageListItem = { ...module, category, stage, lastUpdated, gzip };
     packages.push(item);
 
     // Build sidebar entries grouped by category

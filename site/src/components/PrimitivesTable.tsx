@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import type { Component } from "solid-js";
 import { Link } from "@kobalte/core";
 import StageBadge from "./StageBadge.js";
@@ -11,12 +11,18 @@ type PackageListItem = {
   description: string;
   category: string;
   stage: number;
+  gzip?: number;
   primitive: {
     list: string[];
     category: string;
     stage: number;
   } | null;
 };
+
+function formatGzip(bytes: number): string {
+  if (bytes < 1000) return `${bytes} B`;
+  return `${(bytes / 1000).toFixed(1)} kB`;
+}
 
 const packages = packagesData as PackageListItem[];
 
@@ -51,6 +57,7 @@ const PrimitivesTable: Component = () => {
             <th style={{ padding: "8px 12px", width: "60px", "text-align": "center" }}>Stage</th>
             <th style={{ padding: "8px 12px" }}>Exports</th>
             <th style={{ padding: "8px 12px", width: "80px" }}>NPM</th>
+            <th style={{ padding: "8px 12px", width: "70px" }}>Size</th>
           </tr>
         </thead>
         <tbody>
@@ -59,7 +66,7 @@ const PrimitivesTable: Component = () => {
               <>
                 <tr>
                   <td
-                    colspan={4}
+                    colspan={5}
                     style={{
                       padding: "14px 12px 6px",
                       "font-weight": "700",
@@ -134,6 +141,15 @@ const PrimitivesTable: Component = () => {
                         >
                           v{pkg.version}
                         </Link.Root>
+                      </td>
+                      <td style={{ padding: "8px 12px" }}>
+                        <Show when={pkg.gzip != null} fallback={
+                          <span style={{ "font-size": "12px", color: "var(--sb-decoration-color)", opacity: "0.4" }}>—</span>
+                        }>
+                          <span style={{ "font-size": "12px", color: "var(--sb-decoration-color)" }}>
+                            {formatGzip(pkg.gzip!)}
+                          </span>
+                        </Show>
                       </td>
                     </tr>
                   )}
