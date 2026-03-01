@@ -1,27 +1,28 @@
-import fs from "fs";
-import fsp from "fs/promises";
-import path from "path";
+/**
+ * Generate script for the SolidBase site.
+ *
+ * Outputs:
+ *   - src/_generated/packages.json       — full list of PackageListItem (for the home table)
+ *   - src/_generated/sidebar.json        — SolidBase sidebar config (grouped by category)
+ *   - src/_generated/readme/<name>.html  — pre-rendered README HTML per package
+ *   - src/routes/packages/<name>.mdx     — thin MDX wrapper per package
+ */
+
+import fs from "node:fs";
+import fsp from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeHighlight from "rehype-highlight";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeSlug from "rehype-slug";
 import rehypeStringify from "rehype-stringify";
-import remarkEmoji from "remark-emoji";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
-import { fileURLToPath } from "url";
-import {
-  type ModuleData,
-  type PrimitiveData,
-  formatBytes,
-  getModulesData,
-  getPackageBundlesize,
-  isNonNullable,
-} from "../../scripts/utils/index.js";
-import { GITHUB_REPO } from "../src/constants.js";
-import type { PackageData, PackageListItem } from "../src/types.js";
+import { getModulesData, type ModuleData } from "../../scripts/utils/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,208 +30,181 @@ const __dirname = path.dirname(__filename);
 const rootPath = path.join(__dirname, "..", "..");
 const packagesPath = path.join(rootPath, "packages");
 const generatedDirPath = path.join(__dirname, "..", "src", "_generated");
+const readmeDirPath = path.join(generatedDirPath, "readme");
+const packageRoutesDirPath = path.join(__dirname, "..", "src", "routes", "packages");
 
-if (!fs.existsSync(generatedDirPath)) {
-  fs.mkdirSync(generatedDirPath);
+// Ensure output dirs exist
+for (const dir of [generatedDirPath, readmeDirPath, packageRoutesDirPath]) {
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
-const PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES: ReadonlySet<string> = new Set([
-  "signal-builders",
-  "platform",
-]);
+// ---------------------------------------------------------------------------
+// Markdown → HTML processor
+// ---------------------------------------------------------------------------
 
 const markdownProcessor = unified()
-  .use(remarkEmoji)
   .use(remarkParse)
-  .use(remarkRehype)
-  // support GitHub Flavored Markdown
   .use(remarkGfm)
+  .use(remarkRehype, { allowDangerousHtml: true })
   .use(rehypeSanitize, {
     ...defaultSchema,
     attributes: {
       ...defaultSchema.attributes,
-      // https://github.com/rehypejs/rehype-highlight#example-sanitation
       code: [
-        ...(defaultSchema.attributes?.code || []),
+        ...(defaultSchema.attributes?.code ?? []),
         [
           "className",
-          // List of all allowed languages:
-          ...["js", "jsx", "ts", "tsx", "css", "md", "html", "json", "diff", "bash"].map(
-            lang => `language-${lang}`,
+          ...["js", "jsx", "ts", "tsx", "css", "md", "html", "json", "diff", "bash", "sh"].map(
+            l => `language-${l}`,
           ),
         ],
       ],
     },
   })
-  // highlight code blocks
   .use(rehypeHighlight)
-  // add id to headings
   .use(rehypeSlug)
-  // add # to headings
   .use(rehypeAutolinkHeadings, {
     properties: { class: "header-anchor" },
     content: { type: "text", value: "#" },
   })
   .use(rehypeStringify);
 
-/**
- * Parse README.md of each package and generate HTML
- */
-async function generateReadme(module: ModuleData, primitiveData: PrimitiveData) {
-  const primitiveCodeElRegex = new RegExp(
-    `<(code)>((?:&#x3C;|<)?(?:${primitiveData.list.join("|")})>?)<\/(code)>`,
-    "g",
-  );
-  const readmePath = path.join(packagesPath, module.name, "README.md");
-  let readme = await fsp.readFile(readmePath, "utf8");
+// ---------------------------------------------------------------------------
+// README cleanup
+// ---------------------------------------------------------------------------
 
-  readme = readme
-    // remove heading-1
-    .replace(/#\s+.+\n*/, "")
-    // remove solid img banner
-    .replace(
-      /<p>(?=[^]*?<img(?=[^>]+?src="https:\/\/assets\.solidjs\.com\/banner[^"]+")[^>]*?>)[^]*?<\/p>/,
-      "",
-    )
-    // remove size, version, stage ect... img banners
-    .replace(/^\[!\[(?:size|version|stage|lerna)\].+$/gm, "")
-    // replace changelog relative url to github repo changelog
-    .replace(/(\[CHANGELOG\.md\])(\(\.\/CHANGELOG\.md\))/i, (_, p1, p2) => {
-      if (!p2) return _;
-      return `${p1}(${GITHUB_REPO}/blob/main/packages/${module.name}/CHANGELOG.md)`;
-    })
-    // remove Installation section
-    .replace(/##\s+installation[\r\n]+```[^`]+```/gi, "")
-    // replace Demo links with Live Site, Codesandbox/Stackblitz, Dev Source Code
-    .replace(/(?<!#)(##\s+demo\n)((.|\n)+?)(?=(\n##\s))/i, (_, p1, p2) => {
-      if (p2) {
-        p2 = p2.replace(/https?:\/\/[^\s]+/, (match: string) => {
-          const url = new URL(match);
-          const origin = url.origin;
-          if (origin.match(/codesandbox/i)) {
-            return `[CodeSandbox](${match})`;
-          }
-          if (origin.match(/stackblitz/i)) {
-            return `[StackBlitz](${match})`;
-          }
-          return origin;
-        });
-        p2 = `[Live Site](https://primitives.solidjs.community/playground/${module.name}/)\n\n${p2}`;
-        return `${p1}${p2}`;
-      }
-      return _;
-    });
-
+function cleanReadme(readme: string, moduleName: string): string {
   return (
-    String(await markdownProcessor.process(readme))
-      // update code tag that contains primitives to have attribute
-      .replace(primitiveCodeElRegex, (_, p1, p2, p3) => {
-        if (!p2) return _;
-        return `<${p1} data-code-primitive-name="${p2.replace(/\<|\>|&#x3C;/g, "")}">${p2}</${p3}>`;
+    readme
+      // remove heading-1
+      .replace(/#\s+.+\n*/, "")
+      // remove solid img banner
+      .replace(
+        /<p>(?=[^]*?<img(?=[^>]+?src="https:\/\/assets\.solidjs\.com\/banner[^"]+")[^>]*?>)[^]*?<\/p>/,
+        "",
+      )
+      // remove size, version, stage, lerna img badge lines
+      .replace(/^\[!\[(?:size|version|stage|lerna)\].+$/gm, "")
+      // replace changelog relative url to github
+      .replace(/(\[CHANGELOG\.md\])(\(\.\/CHANGELOG\.md\))/gi, (_, p1) => {
+        return `${p1}(https://github.com/solidjs-community/solid-primitives/blob/main/packages/${moduleName}/CHANGELOG.md)`;
       })
+      // remove Installation section (heading + code block)
+      .replace(/##\s+installation[\r\n]+```[^`]+```/gi, "")
+      .trim()
   );
 }
 
-async function generatePrimitiveSizes(module: ModuleData, primitiveData: PrimitiveData) {
-  if (PACKAGE_COLLAPSED_LIST_OF_PRIMITIVES.has(module.name)) {
-    return [];
-  }
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
-  const sizes = primitiveData.list.map(async primitive => {
-    const result = await getPackageBundlesize(module.name, {
-      exportName: primitive,
-      peerDependencies: module.peer_deps,
-    });
-    if (!result) return null;
-    return {
-      name: primitive,
-      min: formatBytes(result.min),
-      gzip: formatBytes(result.gzip),
-    };
+/** Returns Unix timestamp in ms for the last commit touching the given directory, or 0. */
+function getPackageLastUpdated(pkgDir: string): number {
+  const result = spawnSync("git", ["log", "-1", "--pretty=%at", "--", pkgDir], {
+    encoding: "utf8",
+    cwd: rootPath,
   });
-
-  return (await Promise.all(sizes)).filter(isNonNullable);
+  const raw = result.stdout?.trim();
+  return raw ? Number(raw) * 1000 : 0;
 }
 
-async function generatePackageSize(module: ModuleData) {
-  const result = await getPackageBundlesize(module.name, {
-    peerDependencies: module.peer_deps,
-  });
-  if (!result) return null;
-  return {
-    min: formatBytes(result.min),
-    gzip: formatBytes(result.gzip),
-  };
-}
+export type PackageListItem = ModuleData & {
+  category: string;
+  stage: number;
+  lastUpdated: number;
+};
 
-/**
- * Generate data for all packages
- */
+export type SidebarSection = {
+  title: string;
+  collapsed: boolean;
+  items: { title: string; link: string }[];
+};
+
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
+
 (async () => {
-  const packagesDirDist = path.join(generatedDirPath, "packages");
-  const packagesDist = path.join(generatedDirPath, "packages.json");
+  const modules = await getModulesData();
 
-  if (!fs.existsSync(packagesDirDist)) {
-    await fsp.mkdir(packagesDirDist);
-  }
+  const packages: PackageListItem[] = [];
+  const categoryMap: Record<string, { title: string; link: string }[]> = {};
 
-  const packages = [] as PackageListItem[];
-
-  for (let module of await getModulesData()) {
+  for (const module of modules) {
     if (module.primitive == null) continue;
 
-    const [readme, primitives, packageSize] = await Promise.all([
-      generateReadme(module, module.primitive),
-      generatePrimitiveSizes(module, module.primitive),
-      generatePackageSize(module),
-    ] as const);
+    const { name, primitive } = module;
+    const category = primitive.category;
+    const stage = primitive.stage;
+    const lastUpdated = getPackageLastUpdated(path.join(packagesPath, name));
 
-    const itemData: PackageListItem = { ...module, primitives, packageSize };
+    // Build PackageListItem
+    const item: PackageListItem = { ...module, category, stage, lastUpdated };
+    packages.push(item);
 
-    const data: PackageData = { ...itemData, readme };
+    // Build sidebar entries grouped by category
+    if (!categoryMap[category]) categoryMap[category] = [];
+    categoryMap[category]!.push({ title: name, link: `/${name}` });
 
-    // write data to individual json file
-    const outputFilename = path.join(packagesDirDist, `${module.name}.json`);
-    await fsp.writeFile(outputFilename, JSON.stringify(data, null, 2));
+    // Process README → HTML
+    const readmePath = path.join(packagesPath, name, "README.md");
+    if (!fs.existsSync(readmePath)) continue;
 
-    packages.push(itemData);
+    const rawReadme = await fsp.readFile(readmePath, "utf8");
+    const cleanedMarkdown = cleanReadme(rawReadme, name);
+    const html = String(await markdownProcessor.process(cleanedMarkdown));
+
+    // Write per-package HTML file
+    await fsp.writeFile(path.join(readmeDirPath, `${name}.html`), html);
+
+    // Write thin MDX route file — each page imports its own HTML statically
+    const mdxContent = `---
+title: "@solid-primitives/${name}"
+description: ${JSON.stringify(module.description || `SolidJS ${name} primitives`)}
+packageLastUpdated: ${lastUpdated}
+---
+
+import PackageMeta from "~/components/PackageMeta";
+import readmeHtml from "~/_generated/readme/${name}.html?raw";
+
+# @solid-primitives/${name}
+
+<PackageMeta
+  name="${name}"
+  stage={${stage}}
+  category="${category}"
+  version="${module.version}"
+  primitives={${JSON.stringify(primitive.list)}}
+  lastUpdated={${lastUpdated}}
+/>
+
+<div class="readme-content" innerHTML={readmeHtml} />
+`;
+
+    await fsp.writeFile(path.join(packageRoutesDirPath, `${name}.mdx`), mdxContent);
   }
 
-  // gather all module names into one json file
-  await fsp.writeFile(packagesDist, JSON.stringify(packages, null, 2));
+  // Sort packages alphabetically within each category
+  for (const items of Object.values(categoryMap)) {
+    items.sort((a, b) => a.title.localeCompare(b.title));
+  }
 
-  // eslint-disable-next-line no-console
+  // Build sidebar array (sorted categories)
+  const sidebar: SidebarSection[] = Object.entries(categoryMap)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([title, items]) => ({ title, items, collapsed: false }));
+
+  // Write outputs
+  await fsp.writeFile(
+    path.join(generatedDirPath, "packages.json"),
+    JSON.stringify(packages, null, 2),
+  );
+
+  await fsp.writeFile(
+    path.join(generatedDirPath, "sidebar.json"),
+    JSON.stringify(sidebar, null, 2),
+  );
+
   console.log(`\nGenerated data for ${packages.length} packages.\n`);
-})();
-
-/**
- * Parse root README.md and CONTRIBUTING.md to generate HTML content for the home page (home-content.html)
- */
-(async () => {
-  const readmeMD = await fsp.readFile(path.join(rootPath, "README.md"), "utf8");
-  const contributingMD = await fsp.readFile(path.join(rootPath, "CONTRIBUTING.md"), "utf8");
-  const distPath = path.join(generatedDirPath, "home-content.html");
-
-  const headings: [string, string[]][] = [
-    [readmeMD, ["Philosophy"]],
-    [
-      contributingMD,
-      ["Design Maxims", "Basic and Compound Primitives", "Managing Primitive Complexity"],
-    ],
-  ];
-
-  const sections = headings.reduce((acc, [file, headings]) => {
-    for (const heading of headings) {
-      const regex = new RegExp(
-        `(?<!#)(##\\s+${heading}[\\r\\n])((.|[\\r\\n])+?)(?=([\\r\\n]##\\s))`,
-      );
-      const match = file.match(regex);
-      if (match) acc += `${match[0]}\n`;
-    }
-    return acc;
-  }, "");
-
-  const html = String(await markdownProcessor.process(sections));
-
-  await fsp.writeFile(distPath, html);
 })();

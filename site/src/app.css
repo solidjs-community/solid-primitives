@@ -1,0 +1,292 @@
+/* ============================================================
+   Prose styles for .readme-content (rendered README HTML)
+   ============================================================ */
+
+.readme-content {
+  line-height: 1.7;
+  color: var(--sb-text-color);
+}
+
+.readme-content h1,
+.readme-content h2,
+.readme-content h3,
+.readme-content h4,
+.readme-content h5,
+.readme-content h6 {
+  color: var(--sb-heading-color);
+  font-family: var(--sb-font-headings);
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 1.8em 0 0.6em;
+}
+
+.readme-content h2 {
+  font-size: 1.4em;
+  border-bottom: 1px solid color-mix(in srgb, var(--sb-decoration-color) 40%, transparent);
+  padding-bottom: 0.3em;
+}
+
+.readme-content h3 {
+  font-size: 1.15em;
+}
+
+.readme-content h4 {
+  font-size: 1em;
+}
+
+.readme-content p {
+  margin: 0.75em 0;
+}
+
+.readme-content a {
+  color: var(--sb-active-link-color);
+  text-decoration: underline;
+  text-decoration-color: var(--sb-link-underline-color);
+  text-underline-offset: 2px;
+}
+
+.readme-content a:hover {
+  text-decoration-color: var(--sb-active-link-color);
+}
+
+/* Header anchor links */
+.readme-content .header-anchor {
+  text-decoration: none;
+  color: var(--sb-active-link-color);
+  margin-right: 0.3em;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.readme-content h2:hover .header-anchor,
+.readme-content h3:hover .header-anchor,
+.readme-content h4:hover .header-anchor {
+  opacity: 1;
+}
+
+/* Inline code */
+.readme-content :not(pre) > code {
+  font-family: var(--sb-font-mono);
+  font-size: 0.875em;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  background: var(--sb-code-background-color);
+  color: var(--sb-code-text-color);
+  border: 1px solid color-mix(in srgb, var(--sb-decoration-color) 40%, transparent);
+}
+
+/* Code blocks */
+.readme-content pre {
+  margin: 1.4em 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--sb-decoration-color) 40%, transparent);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--sb-decoration-color) 15%, transparent);
+  padding: 1.25em 1.5em;
+}
+
+.readme-content pre code.hljs {
+  font-family: var(--sb-font-mono);
+  font-size: 0.875em;
+  line-height: 1.75;
+  padding: 0;
+  background: transparent;
+}
+
+/* Lists */
+.readme-content ul,
+.readme-content ol {
+  padding-left: 1.5em;
+  margin: 0.75em 0;
+}
+
+.readme-content li {
+  margin: 0.3em 0;
+}
+
+.readme-content li > p {
+  margin: 0.4em 0;
+}
+
+/* Blockquotes */
+.readme-content blockquote {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 3px solid var(--sb-active-link-color);
+  background: var(--sb-highlight-background-color);
+  border-radius: 0 6px 6px 0;
+  color: var(--sb-text-color);
+}
+
+.readme-content blockquote p {
+  margin: 0;
+}
+
+/* Tables */
+.readme-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+  margin: 1.2em 0;
+  overflow-x: auto;
+  display: block;
+}
+
+.readme-content th {
+  background: var(--sb-code-background-color);
+  color: var(--sb-heading-color);
+  font-weight: 600;
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 2px solid color-mix(in srgb, var(--sb-decoration-color) 60%, transparent);
+}
+
+.readme-content td {
+  padding: 7px 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--sb-decoration-color) 30%, transparent);
+}
+
+.readme-content tr:last-child td {
+  border-bottom: none;
+}
+
+/* Horizontal rule */
+.readme-content hr {
+  border: none;
+  border-top: 1px solid color-mix(in srgb, var(--sb-decoration-color) 40%, transparent);
+  margin: 2em 0;
+}
+
+/* Images */
+.readme-content img {
+  max-width: 100%;
+  border-radius: 6px;
+}
+
+/* Strong / em */
+.readme-content strong {
+  color: var(--sb-heading-color);
+  font-weight: 600;
+}
+
+/* ============================================================
+   Highlight.js – GitHub theme (light mode)
+   ============================================================ */
+
+[data-theme*="light"] .hljs {
+  color: #24292e;
+  background: #f6f8fa;
+}
+
+[data-theme*="light"] .hljs-doctag,
+[data-theme*="light"] .hljs-keyword,
+[data-theme*="light"] .hljs-meta .hljs-keyword,
+[data-theme*="light"] .hljs-template-tag,
+[data-theme*="light"] .hljs-template-variable,
+[data-theme*="light"] .hljs-type,
+[data-theme*="light"] .hljs-variable.language_ { color: #d73a49 }
+
+[data-theme*="light"] .hljs-title,
+[data-theme*="light"] .hljs-title.class_,
+[data-theme*="light"] .hljs-title.class_.inherited__,
+[data-theme*="light"] .hljs-title.function_ { color: #6f42c1 }
+
+[data-theme*="light"] .hljs-attr,
+[data-theme*="light"] .hljs-attribute,
+[data-theme*="light"] .hljs-literal,
+[data-theme*="light"] .hljs-meta,
+[data-theme*="light"] .hljs-number,
+[data-theme*="light"] .hljs-operator,
+[data-theme*="light"] .hljs-variable,
+[data-theme*="light"] .hljs-selector-attr,
+[data-theme*="light"] .hljs-selector-class,
+[data-theme*="light"] .hljs-selector-id { color: #005cc5 }
+
+[data-theme*="light"] .hljs-regexp,
+[data-theme*="light"] .hljs-string,
+[data-theme*="light"] .hljs-meta .hljs-string { color: #032f62 }
+
+[data-theme*="light"] .hljs-built_in,
+[data-theme*="light"] .hljs-symbol { color: #e36209 }
+
+[data-theme*="light"] .hljs-comment,
+[data-theme*="light"] .hljs-code,
+[data-theme*="light"] .hljs-formula { color: #6a737d }
+
+[data-theme*="light"] .hljs-name,
+[data-theme*="light"] .hljs-quote,
+[data-theme*="light"] .hljs-selector-tag,
+[data-theme*="light"] .hljs-selector-pseudo { color: #22863a }
+
+[data-theme*="light"] .hljs-subst { color: #24292e }
+
+[data-theme*="light"] .hljs-addition {
+  color: #22863a;
+  background-color: #f0fff4;
+}
+
+[data-theme*="light"] .hljs-deletion {
+  color: #b31d28;
+  background-color: #ffeef0;
+}
+
+/* ============================================================
+   Highlight.js – GitHub Dark theme (dark mode)
+   ============================================================ */
+
+[data-theme*="dark"] .hljs {
+  color: #c9d1d9;
+  background: #161b22;
+}
+
+[data-theme*="dark"] .hljs-doctag,
+[data-theme*="dark"] .hljs-keyword,
+[data-theme*="dark"] .hljs-meta .hljs-keyword,
+[data-theme*="dark"] .hljs-template-tag,
+[data-theme*="dark"] .hljs-template-variable,
+[data-theme*="dark"] .hljs-type,
+[data-theme*="dark"] .hljs-variable.language_ { color: #ff7b72 }
+
+[data-theme*="dark"] .hljs-title,
+[data-theme*="dark"] .hljs-title.class_,
+[data-theme*="dark"] .hljs-title.class_.inherited__,
+[data-theme*="dark"] .hljs-title.function_ { color: #d2a8ff }
+
+[data-theme*="dark"] .hljs-attr,
+[data-theme*="dark"] .hljs-attribute,
+[data-theme*="dark"] .hljs-literal,
+[data-theme*="dark"] .hljs-meta,
+[data-theme*="dark"] .hljs-number,
+[data-theme*="dark"] .hljs-operator,
+[data-theme*="dark"] .hljs-variable,
+[data-theme*="dark"] .hljs-selector-attr,
+[data-theme*="dark"] .hljs-selector-class,
+[data-theme*="dark"] .hljs-selector-id { color: #79c0ff }
+
+[data-theme*="dark"] .hljs-regexp,
+[data-theme*="dark"] .hljs-string,
+[data-theme*="dark"] .hljs-meta .hljs-string { color: #a5d6ff }
+
+[data-theme*="dark"] .hljs-built_in,
+[data-theme*="dark"] .hljs-symbol { color: #ffa657 }
+
+[data-theme*="dark"] .hljs-comment,
+[data-theme*="dark"] .hljs-code,
+[data-theme*="dark"] .hljs-formula { color: #8b949e }
+
+[data-theme*="dark"] .hljs-name,
+[data-theme*="dark"] .hljs-quote,
+[data-theme*="dark"] .hljs-selector-tag,
+[data-theme*="dark"] .hljs-selector-pseudo { color: #7ee787 }
+
+[data-theme*="dark"] .hljs-subst { color: #c9d1d9 }
+
+[data-theme*="dark"] .hljs-addition {
+  color: #aff5b4;
+  background-color: #033a16;
+}
+
+[data-theme*="dark"] .hljs-deletion {
+  color: #ffdcd7;
+  background-color: #67060c;
+}
