@@ -144,7 +144,7 @@ describe("createSSE", () => {
       dispose();
     }));
 
-  it("does not app-reconnect on transient errors (browser handles those)", () =>
+  it("does not open a new connection on transient errors (browser retries natively)", () =>
     createRoot(dispose => {
       const initialCount = SSEInstances.length;
       const { source } = createSSE("https://example.com/events", {
@@ -153,7 +153,41 @@ describe("createSSE", () => {
       vi.advanceTimersByTime(20);
       (source() as unknown as MockEventSource).simulateTransientError();
       vi.advanceTimersByTime(300);
-      // readyState stayed CONNECTING → no new EventSource was created
+      // readyState stayed CONNECTING → no new EventSource was created, but
+      // the retry budget was decremented by 1 (from 5 to 4).
+      expect(SSEInstances.length).toBe(initialCount + 1);
+      dispose();
+    }));
+
+  it("stops browser retry loop when reconnect budget is exhausted via transient errors", () =>
+    createRoot(dispose => {
+      const { source, readyState } = createSSE("https://example.com/events", {
+        reconnect: { retries: 2, delay: 50 },
+      });
+      vi.advanceTimersByTime(20);
+      const es = source() as unknown as MockEventSource;
+      const closeSpy = vi.spyOn(es, "close");
+      // Two transient errors consume the full budget (2→1→0).
+      es.simulateTransientError(); // retries: 2→1
+      es.simulateTransientError(); // retries: 1→0
+      // A third transient error exhausts the budget → connection must be stopped.
+      es.simulateTransientError();
+      expect(closeSpy).toHaveBeenCalledOnce();
+      expect(source()).toBeUndefined();
+      expect(readyState()).toBe(SSEReadyState.CLOSED);
+      dispose();
+    }));
+
+  it("does not affect transient errors when reconnect is not configured", () =>
+    createRoot(dispose => {
+      const initialCount = SSEInstances.length;
+      const { source } = createSSE("https://example.com/events");
+      vi.advanceTimersByTime(20);
+      const es = source() as unknown as MockEventSource;
+      // Transient errors with no reconnect config should not kill the connection.
+      es.simulateTransientError();
+      es.simulateTransientError();
+      expect(source()).toBe(es);
       expect(SSEInstances.length).toBe(initialCount + 1);
       dispose();
     }));
