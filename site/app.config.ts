@@ -18,6 +18,7 @@ export default defineConfig(
   createWithSolidBase(defaultTheme)(
     {
       ssr: true,
+      serialization: { mode: "json" },
       server: {
         preset: "static",
         prerender: {
