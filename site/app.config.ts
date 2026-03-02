@@ -10,9 +10,7 @@ const sidebar = {
 };
 
 // Explicitly prerender all package routes
-const packageRoutes = (packagesData as Array<{ name: string }>).map(
-  pkg => `/packages/${pkg.name}`,
-);
+const packageRoutes = (packagesData as Array<{ name: string }>).map(pkg => `/packages/${pkg.name}`);
 
 export default defineConfig(
   createWithSolidBase(defaultTheme)(
