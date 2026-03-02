@@ -1007,9 +1007,6 @@ importers:
       '@nothing-but/node-resolve-ts':
         specifier: ^1.0.1
         version: 1.0.1
-      '@solid-primitives/utils':
-        specifier: workspace:^
-        version: link:../packages/utils
       '@solidjs/meta':
         specifier: ^0.29.4
         version: 0.29.4(solid-js@1.9.11)
