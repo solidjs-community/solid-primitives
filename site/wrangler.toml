@@ -3,3 +3,5 @@ compatibility_date = "2026-02-24"
 
 [assets]
 directory = ".output/public"
+html_handling = "auto-trailing-slash"
+not_found_handling = "single-page-application"
