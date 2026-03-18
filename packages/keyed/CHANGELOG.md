@@ -1,5 +1,11 @@
 # @solid-primitives/keyed
 
+## 1.5.3
+
+### Patch Changes
+
+- 00af88d: docs: add missing keyfn to example
+
 ## 1.5.2
 
 ### Patch Changes

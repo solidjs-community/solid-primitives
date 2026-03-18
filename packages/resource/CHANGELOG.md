@@ -1,5 +1,11 @@
 # @solid-primitives/resource
 
+## 0.4.3
+
+### Patch Changes
+
+- 2b765df: fix createAbortable return type
+
 ## 0.4.2
 
 ### Patch Changes

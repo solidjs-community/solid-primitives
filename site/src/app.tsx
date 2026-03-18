@@ -6,7 +6,7 @@ import "./app.scss";
 import Header from "./components/Header/Header.js";
 import SolidBlocksHeaderClusterDefs from "./components/Icons/SolidBlocksHeaderClusterDefs.js";
 import Footer from "./components/Footer/Footer.js";
-import { MetaProvider } from "@solidjs/meta";
+import { MetaProvider, Title } from "@solidjs/meta";
 import { Router } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
 import DocumentHydrationHelper from "./primitives/DocumentHydrationHelper.jsx";
@@ -31,7 +31,7 @@ function RootContent(props: ParentProps) {
   return (
     <html lang="en" data-html>
       <head>
-        <title>Solid Primitives</title>
+        <Title>Solid Primitives</Title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="og:url" content={SITE_URL} />
