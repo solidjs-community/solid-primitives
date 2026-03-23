@@ -8,7 +8,7 @@
     "build": "vite build",
     "start": "vite preview",
     "deploy": "pnpm generate && pnpm build",
-    "preview": "node .output/server/index.mjs"
+    "preview": "node dist/server/index.mjs"
   },
   "dependencies": {
     "@kobalte/core": "^0.13.11",
