@@ -29,7 +29,8 @@
     "seroval-plugins": "1.5.0",
     "solid-js": "^1.9.11",
     "unified": "^11.0.4",
-    "vite": "^7.0.0"
+    "resolve": "^1.22.10",
+    "vite": "^8.0.1"
   },
   "devDependencies": {
     "@iconify-json/ri": "^1.2.10",
