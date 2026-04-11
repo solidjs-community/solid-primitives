@@ -16,6 +16,7 @@
     "@types/mark.js": "^8.11.12",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",
+    "react": "^19.2.5",
     "tailwindcss": "3.3.3",
     "tailwindcss-dir": "^4.0.0",
     "vite": "^8.0.8",
