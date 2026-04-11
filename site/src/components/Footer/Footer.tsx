@@ -11,7 +11,7 @@ const Footer: Component = () => {
           </a>
           ,{" "}
           <a class="text-link" href="https://tanstack.com/start/latest/docs/framework/solid/overview" target="_blank">
-            TanStack Start for Solid
+            TanStack Start
           </a>
           , and best of all ...{" "}
           <span class="whitespace-nowrap">
