@@ -1,6 +1,7 @@
 import { createMemo, onMount } from "solid-js";
-import { createFileRoute } from "@tanstack/solid-router";
+import { createFileRoute, notFound } from "@tanstack/solid-router";
 import { fetchPackageData } from "~/api.js";
+import NotFound from "~/components/NotFound.jsx";
 import { PRIMITIVE_PAGE_PADDING_TOP } from "~/components/Header/Header.jsx";
 import InfoBar from "~/components/Primitives/InfoBar.jsx";
 import { H2 } from "~/components/prose.jsx";
@@ -13,9 +14,26 @@ import { createPrimitiveNameTooltips } from "./-components/primitive-name-toolti
 
 export const Route = createFileRoute("/package/$name/")({
   component: PackagePage,
-  loader: async ({ params }) => fetchPackageData(params.name),
-  head: ({ params }) => ({
-    meta: [{ title: `${kebabCaseToCapitalized(params.name)} — Solid Primitives` }],
+  // Handle unknown package names (e.g. /package/wefwe) with the same 404 page
+  // as any other missing route. We throw `notFound()` from the loader when the
+  // dynamic JSON import fails, and a route-level `notFoundComponent` catches
+  // it so TanStack doesn't need to walk up to the (absent) root handler.
+  notFoundComponent: NotFound,
+  loader: async ({ params }) => {
+    try {
+      return await fetchPackageData(params.name);
+    } catch {
+      throw notFound();
+    }
+  },
+  head: ({ params, loaderData }) => ({
+    meta: [
+      {
+        title: loaderData
+          ? `${kebabCaseToCapitalized(params.name)} — Solid Primitives`
+          : "Not Found — Solid Primitives",
+      },
+    ],
   }),
 });
 
