@@ -8,7 +8,7 @@
     "build": "vite build",
     "start": "node .output/server/index.mjs",
     "deploy": "pnpm generate && pnpm build",
-    "preview": "node .output/server/index.mjs"
+    "preview": "vite preview"
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",
