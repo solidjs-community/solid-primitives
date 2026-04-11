@@ -59,7 +59,7 @@ const Client: Component = () => {
               </div>
             </Suspense>
           </Show>
-          <div class="w-100 h-100" ref={el => (ref = el)} />
+          <div class="h-100 w-100" ref={el => (ref = el)} />
         </div>
       </div>
     </div>
