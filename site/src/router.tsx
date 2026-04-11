@@ -1,5 +1,5 @@
 import { createRouter } from "@tanstack/solid-router";
-import { routeTree } from "./routeTree.gen";
+import { routeTree } from "./routeTree.gen.js";
 
 export function getRouter() {
   return createRouter({
