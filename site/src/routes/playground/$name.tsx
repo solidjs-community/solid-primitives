@@ -1,7 +1,8 @@
 import { type Component, Suspense, lazy } from "solid-js";
 import { Dynamic } from "solid-js/web";
-import { createFileRoute } from "@tanstack/solid-router";
+import { createFileRoute, notFound } from "@tanstack/solid-router";
 import { HEADER_HEIGHT } from "~/components/Header/Header.jsx";
+import NotFound from "~/components/NotFound.jsx";
 import { ClientOnly } from "~/primitives/client-only.js";
 import { kebabCaseToCapitalized } from "~/utils.js";
 import "./-playground.scss";
@@ -24,8 +25,23 @@ const modules = Object.entries(
 
 export const Route = createFileRoute("/playground/$name")({
   component: PlaygroundPage,
-  head: ({ params }) => ({
-    meta: [{ title: `${kebabCaseToCapitalized(params.name)} — Playground` }],
+  // Render the 404 page for unknown package names (e.g. /playground/wefwe)
+  // instead of an empty playground. The loader checks the glob-generated
+  // `modules` map and throws `notFound()` when there's no match.
+  notFoundComponent: NotFound,
+  loader: ({ params }) => {
+    if (!(params.name in modules)) throw notFound();
+    return null;
+  },
+  head: ({ params, loaderData }) => ({
+    meta: [
+      {
+        title:
+          loaderData === null
+            ? `${kebabCaseToCapitalized(params.name)} — Playground`
+            : "Not Found — Solid Primitives",
+      },
+    ],
   }),
 });
 
