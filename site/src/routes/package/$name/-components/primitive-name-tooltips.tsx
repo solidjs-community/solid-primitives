@@ -7,7 +7,7 @@ export function createPrimitiveNameTooltips(
 ) {
   const [fn, setFn] =
     createSignal<
-      typeof import("./primitive-name-tooltip.client.jsx").createPrimitiveNameTooltips
+      typeof import("./primitive-name-tooltip-impl.jsx").createPrimitiveNameTooltips
     >();
 
   createEffect(() => {
@@ -20,7 +20,7 @@ export function createPrimitiveNameTooltips(
     }
   });
 
-  import("./primitive-name-tooltip.client.jsx").then(({ createPrimitiveNameTooltips }) =>
+  import("./primitive-name-tooltip-impl.jsx").then(({ createPrimitiveNameTooltips }) =>
     setFn(() => createPrimitiveNameTooltips),
   );
 }

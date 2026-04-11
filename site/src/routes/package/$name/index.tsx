@@ -1,58 +1,33 @@
-import { type Component, createMemo, createResource, onMount, Suspense } from "solid-js";
-import { fetchPackageData, getCachedPackageListItemData } from "~/api.js";
+import { createMemo, onMount, Suspense } from "solid-js";
+import { createFileRoute } from "@tanstack/solid-router";
+import { fetchPackageData } from "~/api.js";
 import { PRIMITIVE_PAGE_PADDING_TOP } from "~/components/Header/Header.jsx";
 import InfoBar from "~/components/Primitives/InfoBar.jsx";
 import { H2 } from "~/components/prose.jsx";
 import { pageWidthClass } from "~/constants.js";
 import { DocumentClass } from "~/primitives/document-class.jsx";
-import { PackageData } from "~/types.js";
 import { kebabCaseToCapitalized } from "~/utils.js";
-import { Heading } from "./components/heading.js";
-import { PackageInstallation } from "./components/package-installation.js";
-import { createPrimitiveNameTooltips } from "./components/primitive-name-tooltips.js";
-import { useParams } from "@solidjs/router";
-import { Title } from "@solidjs/meta";
+import { Heading } from "./-components/heading.js";
+import { PackageInstallation } from "./-components/package-installation.js";
+import { createPrimitiveNameTooltips } from "./-components/primitive-name-tooltips.js";
 
-type Params = {
-  name: string;
-};
+export const Route = createFileRoute("/package/$name/")({
+  component: PackagePage,
+  loader: async ({ params }) => fetchPackageData(params.name),
+  head: ({ params }) => ({
+    meta: [{ title: `${kebabCaseToCapitalized(params.name)} — Solid Primitives` }],
+  }),
+});
 
-export function routeData() {}
+function PackagePage() {
+  const params = Route.useParams();
+  const data = Route.useLoaderData();
 
-const Page: Component = () => {
-  const params = useParams<Params>();
-
-  const cachedData = createMemo(() => getCachedPackageListItemData(params.name));
-
-  const [dataResource] = createResource<PackageData, string>(() => params.name, fetchPackageData);
-
-  const data = {
-    get name() {
-      return params.name;
-    },
-    get version() {
-      return cachedData()?.version ?? dataResource()?.version;
-    },
-    get packageSize() {
-      return cachedData()?.packageSize ?? dataResource()?.packageSize;
-    },
-    get primitives() {
-      return cachedData()?.primitives ?? dataResource()?.primitives;
-    },
-    get stage() {
-      return cachedData()?.primitive?.stage ?? dataResource()?.primitive?.stage;
-    },
-    get readme() {
-      return dataResource()?.readme;
-    },
-  };
-
-  const packageName = () => `@solid-primitives/${data.name}`;
-  const formattedName = createMemo(() => kebabCaseToCapitalized(data.name));
+  const formattedName = createMemo(() => kebabCaseToCapitalized(params().name));
+  const packageName = () => `@solid-primitives/${params().name}`;
 
   return (
     <>
-      <Title>{formattedName()} — Solid Primitives</Title>
       <DocumentClass class="primitives-page-main" />
       <div
         class="-z-1 absolute left-0 right-0 top-0 h-[95vh] bg-[linear-gradient(to_bottom,#fff_var(--primitive-padding-top-gr),transparent)] dark:bg-[linear-gradient(to_bottom,#293843_var(--primitive-padding-top-gr),transparent)]"
@@ -66,17 +41,17 @@ const Page: Component = () => {
       >
         <div class="bg-page-main-bg rounded-3xl p-3 sm:p-8">
           <div class="mb-[90px] flex items-center justify-between gap-[30px] text-[#232324] sm:gap-[100px] dark:text-white">
-            <Heading name={data.name} formattedName={formattedName()} />
+            <Heading name={params().name} formattedName={formattedName()} />
           </div>
 
           <div class="my-8">
             <InfoBar
-              name={data.name}
-              version={data.version}
+              name={params().name}
+              version={data().version}
               packageName={packageName()}
-              packageSize={data.packageSize}
-              primitives={data.primitives}
-              stage={data.stage}
+              packageSize={data().packageSize}
+              primitives={data().primitives}
+              stage={data().primitive?.stage}
             />
           </div>
 
@@ -99,9 +74,9 @@ const Page: Component = () => {
                     });
                   }
 
-                  createPrimitiveNameTooltips(el, () => data.primitives);
+                  createPrimitiveNameTooltips(el, () => data().primitives);
                 }}
-                innerHTML={data.readme}
+                innerHTML={data().readme}
               />
             </Suspense>
           </div>
@@ -109,6 +84,4 @@ const Page: Component = () => {
       </main>
     </>
   );
-};
-
-export default Page;
+}
