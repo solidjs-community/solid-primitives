@@ -1,4 +1,4 @@
-import { createMemo, onMount, Suspense } from "solid-js";
+import { createMemo, onMount } from "solid-js";
 import { createFileRoute } from "@tanstack/solid-router";
 import { fetchPackageData } from "~/api.js";
 import { PRIMITIVE_PAGE_PADDING_TOP } from "~/components/Header/Header.jsx";
@@ -60,25 +60,24 @@ function PackagePage() {
             <PackageInstallation packageName={packageName()} />
 
             <H2 text="Readme" />
-            <Suspense fallback={<div style={{ height: "300px" }} />}>
-              <div
-                ref={el => {
-                  // displaying readme is under suspense, so the router doesn't wait for it to be ready
-                  // it will be rendered after the page is already visible,
-                  // so we fade it in, but only during client-side navigation
-                  if (!el.isConnected) {
-                    el.style.opacity = "0";
-                    el.style.transition = "opacity 0.3s ease-in-out";
-                    onMount(() => {
-                      requestAnimationFrame(() => (el.style.opacity = ""));
-                    });
-                  }
+            <div
+              ref={el => {
+                // Fade the readme in during client-side navigation. `el.isConnected`
+                // is false when the element is being created fresh (SPA nav) and
+                // true when hydrating SSR'd HTML — we only animate the former so
+                // the initial page load doesn't flash.
+                if (!el.isConnected) {
+                  el.style.opacity = "0";
+                  el.style.transition = "opacity 0.3s ease-in-out";
+                  onMount(() => {
+                    requestAnimationFrame(() => (el.style.opacity = ""));
+                  });
+                }
 
-                  createPrimitiveNameTooltips(el, () => data().primitives);
-                }}
-                innerHTML={data().readme}
-              />
-            </Suspense>
+                createPrimitiveNameTooltips(el, () => data().primitives);
+              }}
+              innerHTML={data().readme}
+            />
           </div>
         </div>
       </main>
