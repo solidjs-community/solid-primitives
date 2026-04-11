@@ -1,5 +1,14 @@
 # @solid-primitives/geolocation
 
+## 2.0.0
+
+### Major Changes
+
+- Updated to Solid.js 2.0 API:
+  - Replaced `createResource` with async `createMemo` + version signal for refetch
+  - Replaced `createComputed` with `createEffect`
+  - Updated peer dependency to `solid-js@^2.0.0`
+
 ## 1.5.4
 
 ### Patch Changes

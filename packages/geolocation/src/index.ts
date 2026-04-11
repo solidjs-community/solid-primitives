@@ -1,7 +1,6 @@
 import { createStaticStore } from "@solid-primitives/static-store";
 import { access, type MaybeAccessor } from "@solid-primitives/utils";
-import type { Resource } from "solid-js";
-import { createComputed, createResource, onCleanup } from "solid-js";
+import { type Accessor, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 
 const geolocationDefaults: PositionOptions = {
@@ -11,60 +10,61 @@ const geolocationDefaults: PositionOptions = {
 };
 
 /**
- * Generates a basic primitive to perform unary geolocation querying and updating.
+ * Generates a primitive to perform a one-time geolocation query.
+ * Returns an async memo that suspends until the position resolves,
+ * integrating with `<Suspense>` / `<Loading>` boundaries.
  *
- * @param options - @type PositionOptions
- * @param options.enableHighAccuracy - Enable if the locator should be very accurate
- * @param options.maximumAge - Maximum cached position age
- * @param options.timeout - Amount of time before the error callback is evoked, if 0 then never
- * @return Returns a `Resource` and refetch option resolving the location coordinates, refetch function and loading value.
+ * @param options - Position options (accuracy, timeout, maximum age)
+ * @returns Tuple of `[location, refetch]`
  *
  * @example
  * ```ts
- * const [location, refetch, loading] = createGeolocation();
+ * const [location, refetch] = createGeolocation();
+ * // In JSX:
+ * // <Suspense fallback="Locating...">
+ * //   <div>{location().latitude}</div>
+ * // </Suspense>
  * ```
  */
 export const createGeolocation = (
   options?: MaybeAccessor<PositionOptions>,
-): [location: Resource<GeolocationCoordinates | undefined>, refetch: VoidFunction] => {
+): [location: Accessor<GeolocationCoordinates | undefined>, refetch: VoidFunction] => {
   if (isServer) {
-    return [
-      Object.assign(() => {}, { error: undefined, loading: true }) as Resource<undefined>,
-      () => {
-        /* noop */
-      },
-    ];
+    return [() => undefined, () => {}];
   }
-  const [location, { refetch }] = createResource(
-    () => Object.assign(geolocationDefaults, access(options)),
-    options =>
+
+  const [version, bump] = createSignal(0);
+
+  const location = createMemo(
+    () =>
       new Promise<GeolocationCoordinates>((resolve, reject) => {
+        version(); // track for manual refetch
         if (!("geolocation" in navigator)) {
-          return reject("Geolocation is not supported.");
+          return reject(new Error("Geolocation is not supported."));
         }
         navigator.geolocation.getCurrentPosition(
           res => resolve(res.coords),
           error => reject(Object.assign(new Error(error.message), error)),
-          options,
+          Object.assign({}, geolocationDefaults, access(options)),
         );
       }),
-  );
-  return [location, refetch];
+  ) as Accessor<GeolocationCoordinates | undefined>;
+
+  return [location, () => bump(v => v + 1)];
 };
 
 /**
- * Creates a primitive that allows for real-time geolocation watching.
+ * Creates a primitive that watches geolocation in real-time.
+ * The watcher can be toggled on/off reactively via the `enabled` parameter.
  *
- * @param enabled - Specify if the location should be updated periodically (used to temporarily disable location watching)
- * @param options - @type PositionOptions
- * @param options.enableHighAccuracy - Enable if the locator should be very accurate
- * @param options.maximumAge - Maximum cached position age
- * @param options.timeout - Amount of time before the error callback is evoked, if 0 then never
- * @return Returns a location signal
+ * @param enabled - Whether the watcher should be active
+ * @param options - Position options (accuracy, timeout, maximum age)
+ * @returns Object with reactive `location` and `error` properties
  *
  * @example
  * ```ts
- * const [location, error] = createGeolocationWatcher();
+ * const [enabled, setEnabled] = createSignal(true);
+ * const { location, error } = createGeolocationWatcher(enabled);
  * ```
  */
 export const createGeolocationWatcher = (
@@ -77,6 +77,7 @@ export const createGeolocationWatcher = (
   if (isServer) {
     return { location: null, error: null };
   }
+
   const [store, setStore] = createStaticStore<{
     location: null | GeolocationCoordinates;
     error: null | GeolocationPositionError;
@@ -84,20 +85,30 @@ export const createGeolocationWatcher = (
     location: null,
     error: null,
   });
-  let registeredHandlerID: number | null;
-  const clearGeolocator = () =>
-    registeredHandlerID && navigator.geolocation.clearWatch(registeredHandlerID);
-  // Implement as an effect to allow switching locator on/off
-  createComputed(() => {
+
+  let watchId: number | null = null;
+
+  const clearWatch = () => {
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+  };
+
+  // createEffect tracks `enabled` and `options`, starts/stops the watcher reactively.
+  createEffect(() => {
     if (access(enabled)) {
-      return (registeredHandlerID = navigator.geolocation.watchPosition(
+      watchId = navigator.geolocation.watchPosition(
         res => setStore({ location: res.coords, error: null }),
         error => setStore({ location: null, error }),
-        Object.assign(geolocationDefaults, access(options)),
-      ));
+        Object.assign({}, geolocationDefaults, access(options)),
+      );
+    } else {
+      clearWatch();
     }
-    clearGeolocator();
   });
-  onCleanup(clearGeolocator);
+
+  onCleanup(clearWatch);
+
   return store;
 };
