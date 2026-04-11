@@ -31,6 +31,10 @@ export default defineConfig({
   plugins: [
     tanstackStart({
       pages: prerenderPages,
+      // Custom client entry installs a dev-mode `console.warn` interceptor that
+      // batches the noisy "Unable to find DOM nodes for hydration key" warnings
+      // emitted by the primitives table.
+      client: { entry: "./src/client.tsx" },
       prerender: {
         enabled: true,
         // README content contains relative/anchor links; avoid following them.
