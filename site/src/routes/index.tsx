@@ -1,4 +1,4 @@
-import { type Component, Show, Suspense } from "solid-js";
+import { type Component, Show } from "solid-js";
 import { NoHydration } from "solid-js/web";
 import { createFileRoute } from "@tanstack/solid-router";
 import { fetchHomeContent, fetchPackageList } from "~/api.js";
@@ -179,9 +179,7 @@ function Home() {
             <H2 text="Contribution Process" />
             <br />
             <StageContent />
-            <Suspense>
-              <div innerHTML={data().content} />
-            </Suspense>
+            <div innerHTML={data().content} />
           </div>
         </NoHydration>
       </div>
