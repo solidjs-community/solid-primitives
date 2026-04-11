@@ -13,6 +13,8 @@
     "name": "geolocation",
     "stage": 3,
     "list": [
+      "makeGeolocation",
+      "makeGeolocationWatcher",
       "createGeolocation",
       "createGeolocationWatcher"
     ],
