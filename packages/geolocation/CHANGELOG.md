@@ -4,8 +4,12 @@
 
 ### Major Changes
 
-- Updated to Solid.js 2.0 API:
-  - Replaced `createResource` with async `createMemo` + version signal for refetch
+- Updated to Solid.js 2.0 API and full primitive redesign:
+  - Added `makeGeolocation(options?)` — non-reactive one-shot query returning `[query, cleanup]` tuple, no Solid owner required
+  - Added `makeGeolocationWatcher(options?)` — non-reactive continuous watcher returning `[store, cleanup]` tuple, no Solid owner required
+  - `createGeolocation` now returns `[Accessor<GeolocationCoordinates>, refetch]` — async memo that suspends with `<Suspense>`, re-queries when reactive `options` change or `refetch()` is called. Supports `isPending()` for background re-query indicators
+  - `createGeolocationWatcher` now returns `{ location: Accessor<GeolocationCoordinates>, error: Accessor<GeolocationPositionError | null> }` — `location` suspends until the first GPS fix then updates reactively; `error` is a signal for recoverable in-component error handling
+  - Replaced `createResource` with async `createMemo` + version signal
   - Replaced `createComputed` with `createEffect`
   - Updated peer dependency to `solid-js@^2.0.0`
 
