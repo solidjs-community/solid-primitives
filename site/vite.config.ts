@@ -1,6 +1,11 @@
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
 import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/solid-start/plugin/vite";
 import viteSolid from "vite-plugin-solid";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const packages = await (async () => {
   try {
@@ -12,9 +17,21 @@ const packages = await (async () => {
   }
 })();
 
+// A package only gets a prerendered `/playground/<name>` page if it has a
+// runnable dev harness at `packages/<name>/dev/index.tsx`. `filesystem` is
+// additionally excluded because its dev harness imports Node-only chokidar
+// (mirrors the glob exclusion in src/routes/playground/$name.tsx).
+const hasPlayground = (name: string) =>
+  name !== "filesystem" &&
+  existsSync(resolve(__dirname, "..", "packages", name, "dev", "index.tsx"));
+
 const prerenderPages = [
   "/",
-  ...packages.flatMap(({ name }) => [`/package/${name}`, `/playground/${name}`]),
+  ...packages.flatMap(({ name }) => {
+    const paths = [`/package/${name}`];
+    if (hasPlayground(name)) paths.push(`/playground/${name}`);
+    return paths;
+  }),
 ].map(path => ({ path, prerender: { enabled: true, crawlLinks: false } }));
 
 export default defineConfig({
