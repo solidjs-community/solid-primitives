@@ -44,8 +44,16 @@ describe("makeAudioPlayer", () => {
 
   it("test srcObject value path", () =>
     createRoot(dispose => {
-      const { player } = makeAudioPlayer({} as MediaSource);
+      const { player } = makeAudioPlayer({} as MediaProvider);
       expect(typeof player.srcObject).toBe("object");
+      dispose();
+    }));
+
+  it("accepts MediaStream as source (issue #721)", () =>
+    createRoot(dispose => {
+      const stream = {} as MediaStream;
+      const { player } = makeAudioPlayer(stream);
+      expect(player.srcObject).toBe(stream);
       dispose();
     }));
 });
@@ -53,7 +61,7 @@ describe("makeAudioPlayer", () => {
 describe("createAudio", () => {
   it("test srcObject value path", () =>
     createRoot(dispose => {
-      const media = {} as MediaSource;
+      const media = {} as MediaProvider;
       let [audio] = createAudio(media);
       expect(typeof audio.player.srcObject).toBe("object");
       [audio] = createAudio(() => media);
@@ -79,7 +87,7 @@ describe("createAudio", () => {
     }));
 
   it("should set the COMPLETE state when audio ends", () => {
-    const [[audio], dispose] = createRoot(dispose => [createAudio({} as MediaSource), dispose]);
+    const [[audio], dispose] = createRoot(dispose => [createAudio({} as MediaProvider), dispose]);
     expect(audio.state).toBe(AudioState.LOADING);
 
     audio.player.dispatchEvent(new Event("ended"));
