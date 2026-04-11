@@ -50,13 +50,13 @@
     "primitives"
   ],
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "solid-js": "^2.0.0-beta.6"
   },
   "dependencies": {
     "@solid-primitives/static-store": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "solid-js": "^2.0.0-beta.6"
   }
 }

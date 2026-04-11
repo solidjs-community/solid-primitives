@@ -6,6 +6,9 @@ import { makeAudio, makeAudioPlayer, createAudio, AudioState } from "../src/inde
 const testPath =
   "https://github.com/solidjs-community/solid-primitives/blob/audio/packages/audio/dev/sample1.mp3?raw=true";
 
+/** Yield to the microtask queue twice — enough for Solid 2.0's split compute/apply effect model. */
+const tick = () => Promise.resolve().then(() => Promise.resolve());
+
 describe("makeAudio", () => {
   it("test static string path", () =>
     createRoot(dispose => {
@@ -65,10 +68,12 @@ describe("createAudio", () => {
       const [audio] = createAudio("test.mp3", playing, volume);
       audio.player._mock._load(audio.player);
       expect(audio.player._mock.paused).toBe(true);
-      await setPlaying(true);
+      setPlaying(true);
+      await tick();
       expect(audio.player._mock.paused).toBe(false);
       expect(audio.player.volume).toBe(0.25);
-      await setVolume(0.5);
+      setVolume(0.5);
+      await tick();
       expect(audio.player.volume).toBe(0.5);
       dispose();
     }));
@@ -82,4 +87,23 @@ describe("createAudio", () => {
 
     dispose();
   });
+
+  it("initial volume is applied synchronously", () =>
+    createRoot(dispose => {
+      const [volume] = createSignal(0.5);
+      const [audio] = createAudio("test.mp3", undefined, volume);
+      expect(audio.player.volume).toBe(0.5);
+      dispose();
+    }));
+
+  it("src signal change updates player source", () =>
+    createRoot(async dispose => {
+      const [src, setSrc] = createSignal("track1.mp3");
+      const [audio] = createAudio(src);
+      expect(audio.player.src).toBe("track1.mp3");
+      setSrc("track2.mp3");
+      await tick();
+      expect(audio.player.src).toBe("track2.mp3");
+      dispose();
+    }));
 });

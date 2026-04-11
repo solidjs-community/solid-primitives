@@ -18,6 +18,9 @@ export default defineConfig({
     build: {
       sourcemap: true,
     },
+    optimizeDeps: {
+      exclude: ["fsevents"],
+    },
   },
   server: {
     prerender: {

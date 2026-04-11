@@ -1,4 +1,4 @@
-import { type Accessor, onMount, onCleanup, createEffect } from "solid-js";
+import { type Accessor, onSettled, createEffect } from "solid-js";
 import { isServer } from "solid-js/web";
 import { access, noop } from "@solid-primitives/utils";
 import { createStaticStore } from "@solid-primitives/static-store";
@@ -56,16 +56,16 @@ export const makeAudio = (
 
   const player = unwrapSource(src);
 
-  onMount(() => {
+  onSettled(() => {
     for (const [name, handler] of Object.entries(handlers)) {
       player.addEventListener(name, handler as any);
     }
-  });
-  onCleanup(() => {
-    player.pause();
-    for (const [name, handler] of Object.entries(handlers)) {
-      player.removeEventListener(name, handler as any);
-    }
+    return () => {
+      player.pause();
+      for (const [name, handler] of Object.entries(handlers)) {
+        player.removeEventListener(name, handler as any);
+      }
+    };
   });
 
   return player;
@@ -228,22 +228,30 @@ export const createAudio = (
 
   // Bind reactive properties as needed
   if (src instanceof Function) {
-    createEffect(() => {
-      const newSrc = src();
-      if (newSrc instanceof HTMLAudioElement) {
-        setStore("player", newSrc);
-      } else {
-        setAudioSrc(store.player, newSrc);
-      }
-      seek(0);
-    });
+    createEffect(
+      () => src(),
+      (newSrc) => {
+        if (newSrc instanceof HTMLAudioElement) {
+          setStore("player", newSrc);
+        } else {
+          setAudioSrc(store.player, newSrc);
+        }
+        seek(0);
+      },
+    );
   }
 
   if (playing) {
-    createEffect(() => (playing() ? play() : pause()));
+    createEffect(
+      () => playing(),
+      (isPlaying) => (isPlaying ? play() : pause()),
+    );
   }
   if (volume) {
-    createEffect(() => setVolume(volume()));
+    createEffect(
+      () => volume(),
+      (vol) => setVolume(vol),
+    );
     setVolume(volume());
   }
 
