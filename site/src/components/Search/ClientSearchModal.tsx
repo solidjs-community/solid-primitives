@@ -8,7 +8,7 @@ import { createShortcut } from "~/primitives/createShortcut.js";
 import { doesPathnameMatchBase, scrollIntoView } from "~/utils.js";
 import * as Header from "../Header/Header.js";
 import Search from "./Search.js";
-import { useLocation } from "@solidjs/router";
+import { useLocation } from "@tanstack/solid-router";
 
 const ClientSearchModal: Component<{
   menuButton: HTMLElement;
@@ -47,22 +47,23 @@ const ClientSearchModal: Component<{
     rootApp.style.right = "";
 
     if (
-      !doesPathnameMatchBase(location.pathname) &&
-      !location.hash &&
-      prevPathname !== location.pathname
+      !doesPathnameMatchBase(location().pathname) &&
+      !location().hash &&
+      prevPathname !== location().pathname
     ) {
-      prevPathname = location.pathname;
+      prevPathname = location().pathname;
       prevScrollY = 1;
     }
     window.scrollTo({ top: prevScrollY });
   };
 
   const scrollToLink = () => {
-    if (!location.hash) return;
-    if (location.hash === prevHash) return;
-    prevHash = location.hash;
+    const hash = location().hash;
+    if (!hash) return;
+    if (hash === prevHash) return;
+    prevHash = hash;
 
-    scrollIntoView(`[href="${location.hash}"]`, { behavior: "auto", offset: 70 });
+    scrollIntoView(`[href="#${hash}"]`, { behavior: "auto", offset: 70 });
   };
 
   const onClickClose = () => {
@@ -84,15 +85,15 @@ const ClientSearchModal: Component<{
       () => props.open,
       open => {
         if (!open) return;
-        prevPathname = location.pathname;
-        prevHash = location.hash;
+        prevPathname = location().pathname;
+        prevHash = location().hash;
       },
     ),
   );
 
   createEffect(
     defer(
-      () => location.pathname,
+      () => location().pathname,
       (currentPathname, prevPathname) => {
         if (prevPathname === currentPathname) return;
         props.setOpen(false);

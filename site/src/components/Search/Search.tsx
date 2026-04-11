@@ -7,7 +7,7 @@ import { type Component, createMemo, createResource, createSignal, For, Show } f
 import { fetchPackageList } from "~/api.js";
 import { type PackageListItem } from "~/types.js";
 import { focusInputAndKeepVirtualKeyboardOpen } from "~/utils.js";
-import { A } from "@solidjs/router";
+import { Link } from "@tanstack/solid-router";
 
 let inputEl: HTMLInputElement | undefined;
 
@@ -156,7 +156,9 @@ const Search: Component<{
                       class="text-lg font-semibold text-[#49494B] dark:text-[#bec5cf]"
                       data-ignore-mark-title
                     >
-                      <A href={`/package/${match.name.toLowerCase()}`}>{highlight(match.name)}</A>
+                      <Link to={`/package/${match.name.toLowerCase()}` as any}>
+                        {highlight(match.name)}
+                      </Link>
                     </h4>
                     <p class="my-[6px] text-[14px]">{highlight(match.description)}</p>
 
@@ -166,12 +168,12 @@ const Search: Component<{
                           {(primitive, idx) => (
                             <Show when={showRest() || idx() < MAX_PRIMITIVES_COUNT}>
                               <li>
-                                <A
-                                  href={`/package/${match.name.toLowerCase()}#${primitive.toLowerCase()}`}
+                                <Link
+                                  to={`/package/${match.name.toLowerCase()}#${primitive.toLowerCase()}` as any}
                                   class="[&>mark]:background-[linear-gradient(0deg,#ffaf1d,#ffaf1d)_center_/_100%_75%_no-repeat] inline-block rounded-md bg-[#e6f0ff] px-2 py-[2px] text-[14px] font-semibold text-[#063983] transition-colors hover:text-black sm:text-base dark:bg-[#30455b] dark:text-[#b9d6ff] dark:hover:text-[#fff]"
                                 >
                                   {highlight(primitive)}
-                                </A>
+                                </Link>
                               </li>
                             </Show>
                           )}
