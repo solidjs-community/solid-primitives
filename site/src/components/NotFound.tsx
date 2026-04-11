@@ -1,24 +1,8 @@
-import { onCleanup, onMount } from "solid-js";
-import { isServer } from "solid-js/web";
 import { Link } from "@tanstack/solid-router";
 import { pageWidthClass } from "~/constants.js";
 import { DocumentClass } from "~/primitives/document-class.jsx";
 
 export default function NotFound() {
-  // TanStack Router has no per-component `head` for `notFoundComponent`, so the
-  // root route's static title ("Solid Primitives") would otherwise stay in the
-  // tab. Override it imperatively on the client.
-  if (!isServer) {
-    let prevTitle = "";
-    onMount(() => {
-      prevTitle = document.title;
-      document.title = "Not Found — Solid Primitives";
-    });
-    onCleanup(() => {
-      if (prevTitle) document.title = prevTitle;
-    });
-  }
-
   return (
     <main
       class={`${pageWidthClass} mx-auto min-h-[calc(100vh-250px)] w-full p-4 pt-[100px] lg:pt-[150px]`}

@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlaygroundNameRouteImport } from './routes/playground/$name'
 import { Route as PackageNameIndexRouteImport } from './routes/package/$name/index'
 
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,36 +37,47 @@ const PackageNameIndexRoute = PackageNameIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/playground/$name': typeof PlaygroundNameRoute
   '/package/$name/': typeof PackageNameIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/playground/$name': typeof PlaygroundNameRoute
   '/package/$name': typeof PackageNameIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/playground/$name': typeof PlaygroundNameRoute
   '/package/$name/': typeof PackageNameIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/playground/$name' | '/package/$name/'
+  fullPaths: '/' | '/$' | '/playground/$name' | '/package/$name/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/playground/$name' | '/package/$name'
-  id: '__root__' | '/' | '/playground/$name' | '/package/$name/'
+  to: '/' | '/$' | '/playground/$name' | '/package/$name'
+  id: '__root__' | '/' | '/$' | '/playground/$name' | '/package/$name/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SplatRoute: typeof SplatRoute
   PlaygroundNameRoute: typeof PlaygroundNameRoute
   PackageNameIndexRoute: typeof PackageNameIndexRoute
 }
 
 declare module '@tanstack/solid-router' {
   interface FileRoutesByPath {
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,6 +104,7 @@ declare module '@tanstack/solid-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SplatRoute: SplatRoute,
   PlaygroundNameRoute: PlaygroundNameRoute,
   PackageNameIndexRoute: PackageNameIndexRoute,
 }

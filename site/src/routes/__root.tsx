@@ -13,7 +13,6 @@ import "../app.scss";
 import Header from "../components/Header/Header.js";
 import SolidBlocksHeaderClusterDefs from "../components/Icons/SolidBlocksHeaderClusterDefs.js";
 import Footer from "../components/Footer/Footer.js";
-import NotFound from "../components/NotFound.js";
 
 const SITE_URL = import.meta.env.VITE_SITE_URL;
 
@@ -66,7 +65,6 @@ export const Route = createRootRoute({
     ],
   }),
   component: RootComponent,
-  notFoundComponent: NotFound,
 });
 
 function RootComponent() {
