@@ -1,7 +1,7 @@
 import "./setup";
 import { createRoot, createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
-import { makeAudio, makeAudioPlayer, createAudio, AudioState } from "../src/index.js";
+import { makeAudio, makeAudioPlayer, createAudio } from "../src/index.js";
 
 const testPath =
   "https://github.com/solidjs-community/solid-primitives/blob/audio/packages/audio/dev/sample1.mp3?raw=true";
@@ -9,109 +9,167 @@ const testPath =
 /** Yield to the microtask queue twice — enough for Solid 2.0's split compute/apply effect model. */
 const tick = () => Promise.resolve().then(() => Promise.resolve());
 
+// ── makeAudio ─────────────────────────────────────────────────────────────────
+
 describe("makeAudio", () => {
-  it("test static string path", () =>
-    createRoot(dispose => {
-      const player = makeAudio(testPath);
-      expect(player._mock.paused).toBe(true);
-      expect(player.src).toBe(testPath);
-      dispose();
-    }));
-});
-
-describe("makeAudioPlayer", () => {
-  it("test play pause", () =>
-    createRoot(async dispose => {
-      const { player, play, pause } = makeAudioPlayer(testPath);
-      expect(player.src).toBe(testPath);
-      expect(player._mock.paused).toBe(true);
-      await play();
-      expect(player._mock.paused).toBe(false);
-      await pause();
-      expect(player.paused).toBe(true);
-      dispose();
-    }));
-
-  it("test seek and volume", () =>
-    createRoot(async dispose => {
-      const { player, seek, setVolume } = makeAudioPlayer(testPath);
-      seek(500);
-      expect(player.currentTime).toBe(500);
-      setVolume(0.75);
-      expect(player.volume).toBe(0.75);
-      dispose();
-    }));
-
-  it("test srcObject value path", () =>
-    createRoot(dispose => {
-      const { player } = makeAudioPlayer({} as MediaProvider);
-      expect(typeof player.srcObject).toBe("object");
-      dispose();
-    }));
-
-  it("accepts MediaStream as source (issue #721)", () =>
-    createRoot(dispose => {
-      const stream = {} as MediaStream;
-      const { player } = makeAudioPlayer(stream);
-      expect(player.srcObject).toBe(stream);
-      dispose();
-    }));
-});
-
-describe("createAudio", () => {
-  it("test srcObject value path", () =>
-    createRoot(dispose => {
-      const media = {} as MediaProvider;
-      let [audio] = createAudio(media);
-      expect(typeof audio.player.srcObject).toBe("object");
-      [audio] = createAudio(() => media);
-      expect(typeof audio.player.srcObject).toBe("object");
-      dispose();
-    }));
-
-  it("test basic reactive controls", () =>
-    createRoot(async dispose => {
-      const [playing, setPlaying] = createSignal(false);
-      const [volume, setVolume] = createSignal(0.25);
-      const [audio] = createAudio("test.mp3", playing, volume);
-      audio.player._mock._load(audio.player);
-      expect(audio.player._mock.paused).toBe(true);
-      setPlaying(true);
-      await tick();
-      expect(audio.player._mock.paused).toBe(false);
-      expect(audio.player.volume).toBe(0.25);
-      setVolume(0.5);
-      await tick();
-      expect(audio.player.volume).toBe(0.5);
-      dispose();
-    }));
-
-  it("should set the COMPLETE state when audio ends", () => {
-    const [[audio], dispose] = createRoot(dispose => [createAudio({} as MediaProvider), dispose]);
-    expect(audio.state).toBe(AudioState.LOADING);
-
-    audio.player.dispatchEvent(new Event("ended"));
-    expect(audio.state).toBe(AudioState.COMPLETE);
-
-    dispose();
+  it("returns a player and cleanup tuple", () => {
+    const [player, cleanup] = makeAudio(testPath);
+    expect(player.src).toBe(testPath);
+    expect(player._mock.paused).toBe(true);
+    cleanup();
   });
 
-  it("initial volume is applied synchronously", () =>
+  it("cleanup pauses the player and removes listeners", () => {
+    let fired = false;
+    const [player, cleanup] = makeAudio(testPath, { play: () => (fired = true) });
+    cleanup();
+    player.dispatchEvent(new Event("play"));
+    expect(fired).toBe(false); // listener was removed
+  });
+
+  it("can be called outside a Solid owner (no lifecycle dependency)", () => {
+    expect(() => {
+      const [, cleanup] = makeAudio(testPath);
+      cleanup();
+    }).not.toThrow();
+  });
+
+  it("accepts MediaProvider as source (issue #721)", () => {
+    const [player, cleanup] = makeAudio({} as MediaProvider);
+    expect(typeof player.srcObject).toBe("object");
+    cleanup();
+  });
+
+  it("accepts MediaStream as source (issue #721)", () => {
+    const stream = {} as MediaStream;
+    const [player, cleanup] = makeAudio(stream);
+    expect(player.srcObject).toBe(stream);
+    cleanup();
+  });
+});
+
+// ── makeAudioPlayer ───────────────────────────────────────────────────────────
+
+describe("makeAudioPlayer", () => {
+  it("returns controls and cleanup tuple", () => {
+    const [controls, cleanup] = makeAudioPlayer(testPath);
+    expect(controls.player.src).toBe(testPath);
+    cleanup();
+  });
+
+  it("play and pause work", async () => {
+    const [{ player, play, pause }, cleanup] = makeAudioPlayer(testPath);
+    expect(player._mock.paused).toBe(true);
+    await play();
+    expect(player._mock.paused).toBe(false);
+    pause();
+    expect(player.paused).toBe(true);
+    cleanup();
+  });
+
+  it("seek and setVolume work", () => {
+    const [{ player, seek, setVolume }, cleanup] = makeAudioPlayer(testPath);
+    seek(500);
+    expect(player.currentTime).toBe(500);
+    setVolume(0.75);
+    expect(player.volume).toBe(0.75);
+    cleanup();
+  });
+
+  it("accepts MediaProvider as source", () => {
+    const [{ player }, cleanup] = makeAudioPlayer({} as MediaProvider);
+    expect(typeof player.srcObject).toBe("object");
+    cleanup();
+  });
+});
+
+// ── createAudio ───────────────────────────────────────────────────────────────
+
+describe("createAudio", () => {
+  it("returns flat object with expected shape", () =>
     createRoot(dispose => {
-      const [volume] = createSignal(0.5);
-      const [audio] = createAudio("test.mp3", undefined, volume);
-      expect(audio.player.volume).toBe(0.5);
+      const audio = createAudio(testPath);
+      expect(typeof audio.playing).toBe("function");
+      expect(typeof audio.setPlaying).toBe("function");
+      expect(typeof audio.volume).toBe("function");
+      expect(typeof audio.setVolume).toBe("function");
+      expect(typeof audio.currentTime).toBe("function");
+      expect(typeof audio.duration).toBe("function");
+      expect(typeof audio.seek).toBe("function");
+      expect(audio.player).toBeInstanceOf(HTMLAudioElement);
       dispose();
     }));
 
-  it("src signal change updates player source", () =>
+  it("initial playing state is false", () =>
+    createRoot(dispose => {
+      const audio = createAudio(testPath);
+      expect(audio.playing()).toBe(false);
+      dispose();
+    }));
+
+  it("setPlaying(true) plays the audio", () =>
+    createRoot(async dispose => {
+      const audio = createAudio(testPath);
+      audio.setPlaying(true);
+      await tick();
+      expect(audio.player._mock.paused).toBe(false);
+      expect(audio.playing()).toBe(true);
+      dispose();
+    }));
+
+  it("setPlaying(false) pauses the audio", () =>
+    createRoot(async dispose => {
+      const audio = createAudio(testPath);
+      audio.setPlaying(true);
+      await tick();
+      audio.setPlaying(false);
+      await tick();
+      expect(audio.player.paused).toBe(true);
+      expect(audio.playing()).toBe(false);
+      dispose();
+    }));
+
+  it("setVolume updates volume signal via volumechange event", () =>
+    createRoot(dispose => {
+      const audio = createAudio(testPath);
+      audio.setVolume(0.4);
+      audio.player.dispatchEvent(new Event("volumechange"));
+      expect(audio.volume()).toBe(0.4);
+      dispose();
+    }));
+
+  it("duration resolves after loadeddata fires", () =>
+    createRoot(async dispose => {
+      const audio = createAudio(testPath);
+      audio.player._mock._load(audio.player);
+      const dur = await audio.duration();
+      expect(typeof dur).toBe("number");
+      dispose();
+    }));
+
+  it("src signal change updates player source and seeks to 0", () =>
     createRoot(async dispose => {
       const [src, setSrc] = createSignal("track1.mp3");
-      const [audio] = createAudio(src);
+      const audio = createAudio(src);
       expect(audio.player.src).toBe("track1.mp3");
       setSrc("track2.mp3");
       await tick();
       expect(audio.player.src).toBe("track2.mp3");
+      expect(audio.player.currentTime).toBe(0);
       dispose();
+    }));
+
+  it("accepts MediaProvider as source (issue #721)", () =>
+    createRoot(dispose => {
+      const audio = createAudio({} as MediaProvider);
+      expect(typeof audio.player.srcObject).toBe("object");
+      dispose();
+    }));
+
+  it("cleanup via dispose pauses the player", () =>
+    createRoot(dispose => {
+      const audio = createAudio(testPath);
+      dispose();
+      expect(audio.player._mock.paused).toBe(true);
     }));
 });
