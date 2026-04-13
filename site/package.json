@@ -49,10 +49,9 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.0.0",
     "sass": "^1.72.0",
+    "@floating-ui/dom": "^1.7.6",
     "solid-dismiss": "^1.7.121",
     "solid-icons": "^1.1.0",
-    "solid-tippy": "^0.2.1",
-    "tippy.js": "^6.3.7",
     "undici": "^5.28.2",
     "unified": "^11.0.4"
   },
