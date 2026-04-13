@@ -1,15 +1,16 @@
+import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
+import { makeEventListener } from "@solid-primitives/event-listener";
 import { createResizeObserver } from "@solid-primitives/resize-observer";
-import { createMutationObserver } from "@solid-primitives/mutation-observer";
 import {
   type Accessor,
   type Component,
   createRoot,
   createSignal,
   type JSX,
+  onCleanup,
   onMount,
 } from "solid-js";
-import { useTippy } from "solid-tippy";
-import { type Content } from "tippy.js";
+import { render } from "solid-js/web";
 import { BASE } from "~/constants.js";
 import type { BundlesizeItem } from "~/types.js";
 
@@ -55,33 +56,20 @@ const TypeDescriptionContentMap: Record<PrimitiveType, Accessor<JSX.Element>> = 
   utility: () => "Utility Function",
 };
 
-function createTooltipContent(el: HTMLElement, data: BundlesizeItem, type: PrimitiveType): Content {
+const TooltipBody: Component<{
+  data: BundlesizeItem;
+  type: PrimitiveType;
+  placement: Accessor<"top" | "bottom">;
+}> = props => {
   const [target, setTarget] = createSignal<HTMLDivElement>();
   const [elSize, setElSize] = createSignal({ height: 0, width: 0 });
-  const [placement, setPlacement] = createSignal("top");
 
   createResizeObserver(
     () => (target() ? [target()!] : []),
     () => {
       const { height, width } = target()!.getBoundingClientRect();
       if (!(height > 0 && width > 0)) return;
-
       setElSize({ height, width });
-    },
-  );
-
-  createMutationObserver(
-    () => {
-      const el = target()?.parentElement?.parentElement;
-      return el ? [el] : [];
-    },
-    { attributes: true, attributeFilter: ["data-placement"], attributeOldValue: true },
-    records => {
-      records.forEach(record => {
-        if (!(record.target instanceof Element) || !record.attributeName) return;
-        const dataPlacement = record.target.getAttribute(record.attributeName);
-        dataPlacement && setPlacement(dataPlacement);
-      });
     },
   );
 
@@ -92,16 +80,16 @@ function createTooltipContent(el: HTMLElement, data: BundlesizeItem, type: Primi
     >
       <div class="mb-2">
         <h2 class="font-semibold opacity-80">Type</h2>
-        <div class="text-[14px]">{TypeDescriptionContentMap[type]()}</div>
+        <div class="text-[14px]">{TypeDescriptionContentMap[props.type]()}</div>
       </div>
       <div>
         <h2 class="font-semibold opacity-80">Size</h2>
         <div class="w-min">
           <div class="flex justify-between gap-2 whitespace-nowrap text-[14px]">
-            Minified <span>{data.min}</span>
+            Minified <span>{props.data.min}</span>
           </div>
           <div class="flex justify-between gap-2 whitespace-nowrap text-[14px]">
-            GZipped <span>{data.gzip}</span>
+            GZipped <span>{props.data.gzip}</span>
           </div>
         </div>
       </div>
@@ -109,11 +97,11 @@ function createTooltipContent(el: HTMLElement, data: BundlesizeItem, type: Primi
       <TooltipSVG
         width={elSize().width}
         height={elSize().height}
-        placement={placement() as "top"}
+        placement={props.placement()}
       />
     </div>
-  ) as Content;
-}
+  );
+};
 
 const TooltipSVG: Component<{
   width: number;
@@ -140,14 +128,11 @@ const TooltipSVG: Component<{
         <defs>
           <clipPath id="clipPath3434">
             <path
-              // d="m-5.6602-6.5625v65.502h22.66v-18.697h16v18.697h22.164v-65.502z"
-              // d="m -4.1602,-6.638771 v 65.502 h 22.66 v -18.697 h 16 v 18.697 h 22.164 v -65.502 z"
               d={`M -3,-0 v ${
                 props.height + 3
               } h ${halfedWidthSection()} v -20 h ${widthOfArrow} v 20 h ${halfedWidthSection()} v -${
                 props.height + 3
               } z`}
-              //
               stop-color="#000000"
             />
           </clipPath>
@@ -215,6 +200,106 @@ const TooltipSVG: Component<{
   );
 };
 
+const HOVER_OPEN_DELAY = 100;
+const HOVER_CLOSE_DELAY = 150;
+
+/**
+ * Attach a Floating UI–powered tooltip to `reference`. Lazily creates the
+ * floating element on first hover, mounts a Solid root into it, disposes
+ * everything on close. "Interactive" — won't close while the cursor is over
+ * the floating element, so the user can click links inside the tooltip.
+ */
+function attachTooltip(
+  reference: HTMLElement,
+  data: BundlesizeItem,
+  type: PrimitiveType,
+): () => void {
+  let floating: HTMLDivElement | undefined;
+  let dispose: (() => void) | undefined;
+  let stopAutoUpdate: (() => void) | undefined;
+  let openTimer: ReturnType<typeof setTimeout> | undefined;
+  let closeTimer: ReturnType<typeof setTimeout> | undefined;
+
+  const [placement, setPlacement] = createSignal<"top" | "bottom">("top");
+
+  const update = () => {
+    if (!floating) return;
+    computePosition(reference, floating, {
+      placement: "top",
+      middleware: [offset(8), flip({ fallbackPlacements: ["bottom"] }), shift({ padding: 8 })],
+    }).then(({ x, y, placement: p }) => {
+      if (!floating) return;
+      Object.assign(floating.style, { left: `${x}px`, top: `${y}px` });
+      setPlacement(p === "bottom" ? "bottom" : "top");
+    });
+  };
+
+  const cancelClose = () => {
+    if (closeTimer) clearTimeout(closeTimer);
+    closeTimer = undefined;
+  };
+
+  const close = () => {
+    stopAutoUpdate?.();
+    stopAutoUpdate = undefined;
+    dispose?.();
+    dispose = undefined;
+    floating?.remove();
+    floating = undefined;
+  };
+
+  const scheduleClose = () => {
+    cancelClose();
+    closeTimer = setTimeout(close, HOVER_CLOSE_DELAY);
+  };
+
+  const open = () => {
+    if (floating) return;
+    floating = document.createElement("div");
+    floating.style.cssText = "position:absolute;top:0;left:0;z-index:9999;";
+    document.body.appendChild(floating);
+
+    dispose = render(
+      () => <TooltipBody data={data} type={type} placement={placement} />,
+      floating,
+    );
+    stopAutoUpdate = autoUpdate(reference, floating, update);
+
+    // Track hover over the floating element too so "interactive" mode works —
+    // moving the cursor from the reference into the tooltip must not close it.
+    floating.addEventListener("mouseenter", cancelClose);
+    floating.addEventListener("mouseleave", scheduleClose);
+  };
+
+  const cancelOpen = () => {
+    if (openTimer) clearTimeout(openTimer);
+    openTimer = undefined;
+  };
+
+  const scheduleOpen = () => {
+    cancelClose();
+    if (floating || openTimer) return;
+    openTimer = setTimeout(() => {
+      openTimer = undefined;
+      open();
+    }, HOVER_OPEN_DELAY);
+  };
+
+  const stopEnter = makeEventListener(reference, "mouseenter", scheduleOpen);
+  const stopLeave = makeEventListener(reference, "mouseleave", () => {
+    cancelOpen();
+    if (floating) scheduleClose();
+  });
+
+  return () => {
+    stopEnter();
+    stopLeave();
+    cancelOpen();
+    cancelClose();
+    close();
+  };
+}
+
 export function createPrimitiveNameTooltips(props: {
   target: HTMLElement;
   primitives: BundlesizeItem[];
@@ -232,21 +317,14 @@ export function createPrimitiveNameTooltips(props: {
 
       const type = getTypeOfPrimitive(data.name);
 
-      let dispose: () => void;
-
-      useTippy(() => el, {
-        props: {
-          onMount(instance) {
-            createRoot(_dispose => {
-              dispose = _dispose;
-              instance.setContent(createTooltipContent(el, data, type));
-            });
-          },
-          onHidden: () => dispose(),
-          interactive: true,
-          appendTo: () => document.body,
-        },
-        hidden: true,
+      // Each tooltip lives in its own root so it can be torn down independently
+      // when the surrounding readme element is removed (e.g. on route change).
+      createRoot(disposeRoot => {
+        const detach = attachTooltip(el, data, type);
+        onCleanup(() => {
+          detach();
+          disposeRoot();
+        });
       });
     }
   });
