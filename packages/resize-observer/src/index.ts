@@ -163,12 +163,14 @@ export function getElementSize(target: Element | false | undefined | null): Null
  *   console.log(size.width, size.height)
  * })
  */
-export function createElementSize(target: Element): Readonly<Size>;
+export function createElementSize(target: Element, boxModel?: ResizeObserverBoxOptions): Readonly<Size>;
 export function createElementSize(
   target: Accessor<Element | false | undefined | null>,
+  boxModel?: ResizeObserverBoxOptions,
 ): Readonly<NullableSize>;
 export function createElementSize(
   target: Accessor<Element | false | undefined | null> | Element,
+  boxModel?: ResizeObserverBoxOptions,
 ): Readonly<NullableSize> {
   if (isServer) {
     return ELEMENT_SIZE_FALLBACK;
@@ -188,12 +190,12 @@ export function createElementSize(
       const el = target();
       if (el) {
         setSize(getElementSize(el));
-        ro.observe(el);
+        ro.observe(el, { box: boxModel });
         onCleanup(() => ro.unobserve(el));
       }
     });
   } else {
-    ro.observe(target);
+    ro.observe(target, { box: boxModel });
     onCleanup(() => ro.unobserve(target));
   }
 
