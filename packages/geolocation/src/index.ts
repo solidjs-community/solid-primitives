@@ -1,5 +1,5 @@
-import { isServer } from "solid-js/web";
-import { type Accessor, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
+import { isServer } from "@solidjs/web";
+import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 import { access, noop, type MaybeAccessor } from "@solid-primitives/utils";
 
 const geolocationDefaults: PositionOptions = {
@@ -107,7 +107,7 @@ export const makeGeolocationWatcher = (
  */
 export const createGeolocation = (
   options?: MaybeAccessor<PositionOptions>,
-): [location: Accessor<GeolocationCoordinates>, refetch: VoidFunction] => {
+): [location: () => Promise<GeolocationCoordinates>, refetch: VoidFunction] => {
   if (isServer) {
     const stub = () => {
       throw new Error("Geolocation is not available on the server.");
@@ -117,10 +117,9 @@ export const createGeolocation = (
 
   const [version, bump] = createSignal(0);
 
-  const location = createMemo(() => {
-    version(); // invalidated by refetch()
-    access(options); // invalidated when options change reactively
-
+  const location = (): Promise<GeolocationCoordinates> => {
+    version(); // tracked: invalidated by refetch() in reactive contexts
+    const opts = access(options); // tracked: invalidated when options change reactively
     return new Promise<GeolocationCoordinates>((resolve, reject) => {
       if (!("geolocation" in navigator)) {
         return reject(new Error("Geolocation is not supported."));
@@ -128,10 +127,10 @@ export const createGeolocation = (
       navigator.geolocation.getCurrentPosition(
         res => resolve(res.coords),
         error => reject(Object.assign(new Error(error.message), error)),
-        mergeOptions(access(options)),
+        mergeOptions(opts),
       );
     });
-  }) as unknown as Accessor<GeolocationCoordinates>;
+  };
 
   return [location, () => bump(v => v + 1)];
 };
@@ -186,22 +185,25 @@ export const createGeolocationWatcher = (
     }
   };
 
-  createEffect(() => {
-    if (access(enabled)) {
-      watchId = navigator.geolocation.watchPosition(
-        res => {
-          setLocation(() => res.coords);
-          setError(null);
-        },
-        err => {
-          setError(err);
-        },
-        mergeOptions(access(options)),
-      );
-    } else {
-      clearWatch();
-    }
-  });
+  createEffect(
+    () => access(enabled),
+    (isEnabled) => {
+      if (isEnabled) {
+        watchId = navigator.geolocation.watchPosition(
+          res => {
+            setLocation(res.coords);
+            setError(null);
+          },
+          err => {
+            setError(err);
+          },
+          mergeOptions(access(options)),
+        );
+      } else {
+        clearWatch();
+      }
+    },
+  );
 
   onCleanup(clearWatch);
 

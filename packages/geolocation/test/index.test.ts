@@ -1,6 +1,6 @@
 import "./setup";
 import { mockCoordinates } from "./setup.js";
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -31,12 +31,13 @@ describe("makeGeolocation", () => {
   });
 
   it("rejects when geolocation fails", async () => {
-    navigator.geolocation.getCurrentPosition = (_, reject: (error: any) => void) => {
-      reject({ code: 1, message: "Permission denied" });
-    };
+    const spy = vi
+      .spyOn(navigator.geolocation, "getCurrentPosition")
+      .mockImplementation((_: any, reject: any) => reject({ code: 1, message: "Permission denied" }));
     const [query, cleanup] = makeGeolocation();
     await expect(query()).rejects.toThrow("Permission denied");
     cleanup();
+    spy.mockRestore();
   });
 });
 
@@ -112,6 +113,7 @@ describe("createGeolocation", () => {
       await location();
       expect(lastOptions?.enableHighAccuracy).toBe(false);
       setOpts({ enableHighAccuracy: true });
+      flush();
       await location();
       expect(lastOptions?.enableHighAccuracy).toBe(true);
       dispose();
