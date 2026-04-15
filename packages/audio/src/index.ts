@@ -1,5 +1,5 @@
-import { type Accessor, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
-import { isServer } from "solid-js/web";
+import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
+import { isServer } from "@solidjs/web";
 import { access, noop } from "@solid-primitives/utils";
 
 export type AudioSource = string | undefined | MediaProvider;
@@ -182,27 +182,15 @@ export const createAudio = (src: AudioSource | Accessor<AudioSource>): AudioRetu
   player.addEventListener("volumechange", () => setVolumeSignal(player.volume));
   const setVolume = (v: number) => (player.volume = v);
 
-  // duration — async: resolves when loadeddata fires, re-resolves on src change
-  // Returns a Promise so it integrates with <Suspense>/<Loading> boundaries
-  const [loadVersion, setLoadVersion] = createSignal(0);
-  player.addEventListener("loadstart", () => setLoadVersion(v => v + 1));
-
-  const duration = createMemo(
-    () =>
-      new Promise<number>(resolve => {
-        loadVersion(); // track for invalidation on src change
-        if (!isNaN(player.duration) && player.duration > 0) {
-          resolve(player.duration);
-        } else {
-          player.addEventListener("loadeddata", () => resolve(player.duration), { once: true });
-        }
-      }),
-  );
+  // duration — signal updated when audio loads; NaN until loadeddata fires or when src changes
+  const [duration, setDuration] = createSignal<number>(player.duration);
+  player.addEventListener("loadeddata", () => setDuration(player.duration));
+  player.addEventListener("loadstart", () => setDuration(NaN));
 
   // Reactive src — update player source when signal changes
   if (src instanceof Function) {
-    createEffect(() => {
-      setAudioSrc(player, src());
+    createEffect(src, (newSrc: AudioSource) => {
+      setAudioSrc(player, newSrc);
       controls.seek(0);
     });
   }
@@ -214,7 +202,7 @@ export const createAudio = (src: AudioSource | Accessor<AudioSource>): AudioRetu
     volume,
     setVolume,
     currentTime,
-    duration: duration as unknown as Accessor<number>,
+    duration,
     seek: controls.seek,
   };
 };

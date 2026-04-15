@@ -50,6 +50,7 @@
     "primitives"
   ],
   "devDependencies": {
+    "@solidjs/web": "^2.0.0-experimental.16",
     "solid-js": "^2.0.0-beta.6"
   },
   "dependencies": {
@@ -57,6 +58,7 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
+    "@solidjs/web": "^2.0.0-experimental.16",
     "solid-js": "^2.0.0-beta.6"
   }
 }

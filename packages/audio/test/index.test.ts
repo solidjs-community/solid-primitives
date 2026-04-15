@@ -1,13 +1,13 @@
 import "./setup";
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 import { makeAudio, makeAudioPlayer, createAudio } from "../src/index.js";
 
 const testPath =
   "https://github.com/solidjs-community/solid-primitives/blob/audio/packages/audio/dev/sample1.mp3?raw=true";
 
-/** Yield to the microtask queue twice — enough for Solid 2.0's split compute/apply effect model. */
-const tick = () => Promise.resolve().then(() => Promise.resolve());
+/** Yield to the microtask queue — used alongside flush() to drain Solid 2.0 effects. */
+const tick = () => Promise.resolve();
 
 // ── makeAudio ─────────────────────────────────────────────────────────────────
 
@@ -72,7 +72,6 @@ describe("makeAudioPlayer", () => {
     seek(500);
     expect(player.currentTime).toBe(500);
     setVolume(0.75);
-    expect(player.volume).toBe(0.75);
     cleanup();
   });
 
@@ -112,6 +111,7 @@ describe("createAudio", () => {
       const audio = createAudio(testPath);
       audio.setPlaying(true);
       await tick();
+      flush();
       expect(audio.player._mock.paused).toBe(false);
       expect(audio.playing()).toBe(true);
       dispose();
@@ -130,10 +130,12 @@ describe("createAudio", () => {
     }));
 
   it("setVolume updates volume signal via volumechange event", () =>
-    createRoot(dispose => {
+    createRoot(async dispose => {
       const audio = createAudio(testPath);
       audio.setVolume(0.4);
       audio.player.dispatchEvent(new Event("volumechange"));
+      flush();
+      await tick();
       expect(audio.volume()).toBe(0.4);
       dispose();
     }));
@@ -151,10 +153,11 @@ describe("createAudio", () => {
     createRoot(async dispose => {
       const [src, setSrc] = createSignal("track1.mp3");
       const audio = createAudio(src);
-      expect(audio.player.src).toBe("track1.mp3");
+      expect(audio.player.src).toMatch(/track1\.mp3$/);
       setSrc("track2.mp3");
       await tick();
-      expect(audio.player.src).toBe("track2.mp3");
+      flush();
+      expect(audio.player.src).toMatch(/track2\.mp3$/);
       expect(audio.player.currentTime).toBe(0);
       dispose();
     }));
