@@ -3,9 +3,10 @@ import {
   onCleanup,
   createEffect,
   untrack,
-  type Accessor,
-  type SignalOptions,
   createMemo,
+  type Accessor,
+  type Setter,
+  type SignalOptions,
 } from "solid-js";
 import { isServer } from "@solidjs/web";
 
@@ -138,7 +139,7 @@ export const createTimeoutLoop = (handler: VoidFunction, timeout: TimeoutSource)
       if (currTimeout === false) return;
       const id = setInterval(() => {
         handler();
-        setCurrentTimeout((timeout as Accessor<number | false>)());
+        setCurrentTimeout(timeout());
       }, currTimeout);
       return () => clearInterval(id);
     },
@@ -182,9 +183,18 @@ export function createPolled<T>(
   if (isServer) {
     return fn as Accessor<T>;
   }
-  const memo = createMemo(() => createSignal(fn(value), options));
-  createTimer(() => memo()[1](fn), timeout, setInterval);
-  return () => memo()[0]();
+  // Capture the current signal's setter in a closure. When fn's reactive deps change,
+  // createMemo re-runs, creating a fresh signal and updating `set` to its new setter.
+  // This avoids memo()[1] being undefined in production (issue #808).
+  let set!: Setter<T>;
+  const memo = createMemo(() => {
+    const [get, _set] = createSignal<T>(fn(value) as Exclude<T, Function>, options);
+    set = _set;
+    return get;
+  });
+  untrack(memo); // Force initial evaluation so `set` is defined before the timer fires.
+  createTimer(() => set(prev => fn(prev)), timeout, setInterval);
+  return () => memo()();
 }
 
 /**

@@ -337,6 +337,28 @@ describe("createPolled", () => {
 
     dispose();
   });
+
+  // Regression test for issue #808: memo()[1] is not a function
+  // The old implementation used createMemo(() => createSignal(...)) which caused
+  // memo()[1] (the setter) to be undefined in production builds.
+  test("timer fires correctly before polled accessor is ever read (issue #808)", () => {
+    let n = 0;
+    const { polled, dispose } = createRoot(dispose => ({
+      polled: createPolled(() => ++n, 100),
+      dispose,
+    }));
+
+    // Advance time without ever calling polled() first — this was the failure mode
+    vi.advanceTimersByTime(100);
+    flush();
+    vi.advanceTimersByTime(100);
+    flush();
+
+    // Now read — should reflect the timer-driven updates
+    expect(polled()).toBe(3); // initial + 2 timer fires
+
+    dispose();
+  });
 });
 
 // ---------------------------------------------------------------------------

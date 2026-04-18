@@ -63,9 +63,13 @@ createTimer(() => console.log("interval"), 1000, setInterval);
 const [paused, setPaused] = createSignal(false);
 const [delay, setDelay] = createSignal(1000);
 
-createTimer(() => console.log("tick"), () => !paused() && delay(), setInterval);
+createTimer(
+  () => console.log("tick"),
+  () => !paused() && delay(),
+  setInterval,
+);
 
-setDelay(500);   // change interval
+setDelay(500); // change interval
 setPaused(true); // pause
 setPaused(false); // resume
 ```
@@ -98,7 +102,7 @@ import { createPolled } from "@solid-primitives/timer";
 
 // Poll current time every second
 const date = createPolled(() => new Date(), 1000);
-<span>The time is: {date()}</span>
+<span>The time is: {date()}</span>;
 
 // Reactive source — updates on interval AND when source changes
 const [id, setId] = createSignal(1);
@@ -119,7 +123,7 @@ import { createSignal } from "solid-js";
 import { createIntervalCounter } from "@solid-primitives/timer";
 
 const count = createIntervalCounter(1000);
-<span>Count: {count()}</span>
+<span>Count: {count()}</span>;
 
 // Reactive delay
 const [delay, setDelay] = createSignal(1000);
