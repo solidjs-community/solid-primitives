@@ -1,5 +1,4 @@
 import {
-  onMount,
   onCleanup,
   createSignal,
   createEffect,
@@ -8,7 +7,7 @@ import {
   DEV,
 } from "solid-js";
 import type { JSX, Accessor } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 import {
   access,
   type FalsyValue,
@@ -64,9 +63,6 @@ function observe(el: Element, instance: IntersectionObserver): void {
   instance.observe(el);
 }
 
-/**
- * @deprecated Please use native {@link IntersectionObserver}, or {@link createIntersectionObserver} instead.
- */
 export function makeIntersectionObserver(
   elements: Element[],
   onChange: IntersectionObserverCallback,
@@ -125,16 +121,13 @@ export function createIntersectionObserver(
   const io = new IntersectionObserver(onChange, options);
   onCleanup(() => io.disconnect());
 
-  createEffect((p: Element[]) => {
-    const list = elements();
-    handleDiffArray(
-      list,
-      p,
-      el => observe(el, io),
-      el => io.unobserve(el),
-    );
-    return list;
-  }, []);
+  createEffect(
+    () => elements(),
+    (list: Element[], prev: Element[] = []) => {
+      handleDiffArray(list, prev, el => observe(el, io), el => io.unobserve(el));
+    },
+    [] as Element[],
+  );
 }
 
 /**
@@ -206,7 +199,8 @@ export function createViewportObserver(...a: any) {
     remove(el);
   };
   const start = () => initial.forEach(([el, cb]) => addEntry(el, cb));
-  onMount(start);
+  // onMount equivalent: run start() once after the reactive scope initialises
+  createEffect(() => {}, () => { start(); });
   return [addEntry, { remove: removeEntry, start, stop, instance }];
 }
 
@@ -276,13 +270,15 @@ export function createVisibilityObserver(
     let prevEl: Element | FalsyValue;
 
     if (!(element instanceof Element)) {
-      createEffect(() => {
-        const el = element();
-        if (el === prevEl) return;
-        if (prevEl) removeEntry(prevEl);
-        if (el) addEntry(el, callback);
-        prevEl = el;
-      });
+      createEffect(
+        () => element(),
+        (el: Element | FalsyValue) => {
+          if (el === prevEl) return;
+          if (prevEl) removeEntry(prevEl);
+          if (el) addEntry(el, callback);
+          prevEl = el;
+        },
+      );
     } else addEntry(element, callback);
 
     onCleanup(() => prevEl && removeEntry(prevEl));

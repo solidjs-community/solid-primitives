@@ -10,6 +10,7 @@
 
 A range of IntersectionObserver API utilities great for different types of use cases:
 
+- [`makeIntersectionObserver`](#makeintersectionobserver) - A non-reactive, imperative wrapper around the IntersectionObserver API.
 - [`createIntersectionObserver`](#createintersectionobserver) - A reactive observer primitive.
 - [`createViewportObserver`](#createviewportobserver) - More advanced tracker that creates a store of element signals.
 - [`createVisibilityObserver`](#createvisibilityobserver) - Basic visibility observer using a signal.
@@ -22,6 +23,43 @@ npm install @solid-primitives/intersection-observer
 pnpm add @solid-primitives/intersection-observer
 # or
 yarn add @solid-primitives/intersection-observer
+```
+
+## `makeIntersectionObserver`
+
+A non-reactive, imperative wrapper around the native IntersectionObserver API. Useful when you need full manual control over observation lifecycle without integrating into a Solid reactive scope.
+
+```ts
+import { makeIntersectionObserver } from "@solid-primitives/intersection-observer";
+
+const { add, remove, start, stop, reset, instance } = makeIntersectionObserver(
+  [el1, el2],
+  entries => {
+    entries.forEach(e => console.log(e.isIntersecting));
+  },
+  { threshold: 0.5 },
+);
+
+add(el3);
+remove(el1);
+stop(); // disconnects the observer
+```
+
+### Definition
+
+```ts
+function makeIntersectionObserver(
+  elements: Element[],
+  onChange: IntersectionObserverCallback,
+  options?: IntersectionObserverInit,
+): {
+  add: (el: Element) => void;
+  remove: (el: Element) => void;
+  start: () => void;
+  reset: () => void;
+  stop: () => void;
+  instance: IntersectionObserver;
+};
 ```
 
 ## `createIntersectionObserver`

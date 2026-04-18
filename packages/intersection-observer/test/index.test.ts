@@ -1,4 +1,4 @@
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { describe, test, expect, beforeEach } from "vitest";
 
 import {
@@ -434,8 +434,9 @@ describe("createViewportObserver", () => {
 
       let cbEntry: any;
 
-      // the correct usage
-      const [props] = createSignal((e: any) => (cbEntry = e));
+      // the correct usage (plain accessor, since createSignal(fn) is the compute overload in Solid 2.0)
+      const callback = (e: any) => (cbEntry = e);
+      const props = () => callback;
       observe(el, props);
 
       // the incorrect usage (just shouldn't cause an error)
@@ -512,10 +513,12 @@ describe("createVisibilityObserver", () => {
       const instance = _getLastIOInstance();
 
       instance.__TEST__onChange({ isIntersecting: true });
+      flush();
 
       expect(isVisible(), "signal returns incorrect value").toBe(true);
 
       instance.__TEST__onChange({ isIntersecting: false });
+      flush();
 
       expect(isVisible(), "signal returns incorrect value").toBe(false);
 
@@ -531,14 +534,17 @@ describe("createVisibilityObserver", () => {
       const instance = _getLastIOInstance();
 
       instance.__TEST__onChange();
+      flush();
       expect(isVisible()).toBe(true);
 
       instance.__TEST__onChange();
+      flush();
       expect(isVisible()).toBe(true);
 
       goalValue = false;
 
       instance.__TEST__onChange();
+      flush();
       expect(isVisible()).toBe(false);
 
       dispose();
