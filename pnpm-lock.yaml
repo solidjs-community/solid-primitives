@@ -16,7 +16,7 @@ importers:
         version: 1.0.1
       '@solidjs/start':
         specifier: ^1.1.4
-        version: 1.1.4(solid-js@1.9.7)(vinxi@0.5.7(@types/node@22.15.31)(db0@0.3.2)(ioredis@5.6.1)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))
+        version: 1.1.4(solid-js@2.0.0-experimental.16)(vinxi@0.5.7(@types/node@22.15.31)(db0@0.3.2)(ioredis@5.6.1)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))
       '@types/jsdom':
         specifier: ^21.1.7
         version: 21.1.7
@@ -34,7 +34,7 @@ importers:
         version: 0.25.5
       esbuild-plugin-solid:
         specifier: ^0.6.0
-        version: 0.6.0(esbuild@0.25.5)(solid-js@1.9.7)
+        version: 0.6.0(esbuild@0.25.5)(solid-js@2.0.0-experimental.16)
       eslint:
         specifier: ^9.28.0
         version: 9.28.0(jiti@2.4.2)
@@ -69,8 +69,8 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-experimental.16
+        version: 2.0.0-experimental.16
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -82,7 +82,7 @@ importers:
         version: 6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0)
       vite-plugin-solid:
         specifier: ^2.11.6
-        version: 2.11.6(solid-js@1.9.7)(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))
+        version: 2.11.6(solid-js@2.0.0-experimental.16)(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))
       vitest:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@22.15.31)(jsdom@25.0.1)(sass@1.77.8)(terser@5.42.0)
@@ -926,9 +926,12 @@ importers:
 
   packages/timer:
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-experimental.16
+        version: 2.0.0-experimental.16(solid-js@2.0.0-experimental.16)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-experimental.16
+        version: 2.0.0-experimental.16
 
   packages/transition-group:
     devDependencies:
@@ -1048,10 +1051,10 @@ importers:
         version: link:../packages/utils
       '@solidjs/meta':
         specifier: ^0.29.3
-        version: 0.29.4(solid-js@1.9.7)
+        version: 0.29.4(solid-js@2.0.0-experimental.16)
       '@solidjs/router':
         specifier: ^0.13.1
-        version: 0.13.6(solid-js@1.9.7)
+        version: 0.13.6(solid-js@2.0.0-experimental.16)
       clsx:
         specifier: ^2.0.0
         version: 2.1.1
@@ -1078,13 +1081,13 @@ importers:
         version: 1.77.8
       solid-dismiss:
         specifier: ^1.7.121
-        version: 1.8.2(solid-js@1.9.7)
+        version: 1.8.2(solid-js@2.0.0-experimental.16)
       solid-icons:
         specifier: ^1.1.0
-        version: 1.1.0(solid-js@1.9.7)
+        version: 1.1.0(solid-js@2.0.0-experimental.16)
       solid-tippy:
         specifier: ^0.2.1
-        version: 0.2.1(solid-js@1.9.7)(tippy.js@6.3.7)
+        version: 0.2.1(solid-js@2.0.0-experimental.16)(tippy.js@6.3.7)
       tippy.js:
         specifier: ^6.3.7
         version: 6.3.7
@@ -2587,10 +2590,18 @@ packages:
     peerDependencies:
       solid-js: ^1.5.3
 
+  '@solidjs/signals@0.11.3':
+    resolution: {integrity: sha512-udMfutYPOlcxKUmc5+n1QtarsxOiAlC6LJY2TqFyaMwdXgo+reiYUcYGDlOiAPXfCLE0lavZHQ/6GT5pJbXKBA==}
+
   '@solidjs/start@1.1.4':
     resolution: {integrity: sha512-ma1TBYqoTju87tkqrHExMReM5Z/+DTXSmi30CCTavtwuR73Bsn4rVGqm528p4sL2koRMfAuBMkrhuttjzhL68g==}
     peerDependencies:
       vinxi: ^0.5.3
+
+  '@solidjs/web@2.0.0-experimental.16':
+    resolution: {integrity: sha512-TcgvLKOYN2cIExX307SRxvd1aXj5eLaQUlGDLdQoQBqDHhuDdeZUfKLYrn/JOzWs1u5DYNOc+gR0SaG17vYsng==}
+    peerDependencies:
+      solid-js: ^2.0.0-experimental.16
 
   '@speed-highlight/core@1.2.7':
     resolution: {integrity: sha512-0dxmVj4gxg3Jg879kvFS/msl4s9F3T9UXC1InxgOf7t5NvcPD97u/WTA5vL/IxWHMn7qSxBozqrnnE2wvl1m8g==}
@@ -5892,8 +5903,18 @@ packages:
     peerDependencies:
       seroval: ^1.0
 
+  seroval-plugins@1.5.2:
+    resolution: {integrity: sha512-qpY0Cl+fKYFn4GOf3cMiq6l72CpuVaawb6ILjubOQ+diJ54LfOWaSSPsaswN8DRPIPW4Yq+tE1k5aKd7ILyaFg==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      seroval: ^1.0
+
   seroval@1.3.2:
     resolution: {integrity: sha512-RbcPH1n5cfwKrru7v7+zrZvjLurgHhGyso3HTyGtRivGWgYjbOmGuivCQaORNELjNONoK35nj28EoWul9sb1zQ==}
+    engines: {node: '>=10'}
+
+  seroval@1.5.2:
+    resolution: {integrity: sha512-xcRN39BdsnO9Tf+VzsE7b3JyTJASItIV1FVFewJKCFcW4s4haIKS3e6vj8PGB9qBwC7tnuOywQMdv5N4qkzi7Q==}
     engines: {node: '>=10'}
 
   serve-placeholder@2.0.2:
@@ -6000,6 +6021,9 @@ packages:
 
   solid-js@1.9.7:
     resolution: {integrity: sha512-/saTKi8iWEM233n5OSi1YHCCuh66ZIQ7aK2hsToPe4tqGm7qAejU1SwNuTPivbWAYq7SjuHVVYxxuZQNRbICiw==}
+
+  solid-js@2.0.0-experimental.16:
+    resolution: {integrity: sha512-zZ1dU7cR0EnvLnrYiRLQbCFiDw5blLdlqmofgLzKUYE1TCMWDcisBlSwz0Ez8l4yXB4adbdhtaYCuynH4xSq9A==}
 
   solid-refresh@0.6.3:
     resolution: {integrity: sha512-F3aPsX6hVw9ttm5LYlth8Q15x6MlI/J3Dn+o3EQyRTtTxidepSTwAYdozt01/YA+7ObcciagGEyXIopGZzQtbA==}
@@ -8576,19 +8600,21 @@ snapshots:
     dependencies:
       solid-js: 1.9.7
 
-  '@solidjs/meta@0.29.4(solid-js@1.9.7)':
+  '@solidjs/meta@0.29.4(solid-js@2.0.0-experimental.16)':
     dependencies:
-      solid-js: 1.9.7
+      solid-js: 2.0.0-experimental.16
 
-  '@solidjs/router@0.13.6(solid-js@1.9.7)':
+  '@solidjs/router@0.13.6(solid-js@2.0.0-experimental.16)':
     dependencies:
-      solid-js: 1.9.7
+      solid-js: 2.0.0-experimental.16
 
   '@solidjs/router@0.8.4(solid-js@1.9.7)':
     dependencies:
       solid-js: 1.9.7
 
-  '@solidjs/start@1.1.4(solid-js@1.9.7)(vinxi@0.5.7(@types/node@22.15.31)(db0@0.3.2)(ioredis@5.6.1)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))':
+  '@solidjs/signals@0.11.3': {}
+
+  '@solidjs/start@1.1.4(solid-js@2.0.0-experimental.16)(vinxi@0.5.7(@types/node@22.15.31)(db0@0.3.2)(ioredis@5.6.1)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))':
     dependencies:
       '@tanstack/server-functions-plugin': 1.121.0(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))
       '@vinxi/plugin-directives': 0.5.1(vinxi@0.5.7(@types/node@22.15.31)(db0@0.3.2)(ioredis@5.6.1)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))
@@ -8601,15 +8627,21 @@ snapshots:
       seroval-plugins: 1.3.2(seroval@1.3.2)
       shiki: 1.29.2
       source-map-js: 1.2.1
-      terracotta: 1.0.6(solid-js@1.9.7)
+      terracotta: 1.0.6(solid-js@2.0.0-experimental.16)
       tinyglobby: 0.2.14
       vinxi: 0.5.7(@types/node@22.15.31)(db0@0.3.2)(ioredis@5.6.1)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0)
-      vite-plugin-solid: 2.11.6(solid-js@1.9.7)(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))
+      vite-plugin-solid: 2.11.6(solid-js@2.0.0-experimental.16)(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))
     transitivePeerDependencies:
       - '@testing-library/jest-dom'
       - solid-js
       - supports-color
       - vite
+
+  '@solidjs/web@2.0.0-experimental.16(solid-js@2.0.0-experimental.16)':
+    dependencies:
+      seroval: 1.3.2
+      seroval-plugins: 1.3.2(seroval@1.3.2)
+      solid-js: 2.0.0-experimental.16
 
   '@speed-highlight/core@1.2.7': {}
 
@@ -9975,13 +10007,13 @@ snapshots:
       has-tostringtag: 1.0.2
       hasown: 2.0.2
 
-  esbuild-plugin-solid@0.6.0(esbuild@0.25.5)(solid-js@1.9.7):
+  esbuild-plugin-solid@0.6.0(esbuild@0.25.5)(solid-js@2.0.0-experimental.16):
     dependencies:
       '@babel/core': 7.27.4
       '@babel/preset-typescript': 7.27.1(@babel/core@7.27.4)
       babel-preset-solid: 1.9.6(@babel/core@7.27.4)
       esbuild: 0.25.5
-      solid-js: 1.9.7
+      solid-js: 2.0.0-experimental.16
     transitivePeerDependencies:
       - supports-color
 
@@ -12441,7 +12473,13 @@ snapshots:
     dependencies:
       seroval: 1.3.2
 
+  seroval-plugins@1.5.2(seroval@1.5.2):
+    dependencies:
+      seroval: 1.5.2
+
   seroval@1.3.2: {}
+
+  seroval@1.5.2: {}
 
   serve-placeholder@2.0.2:
     dependencies:
@@ -12557,13 +12595,13 @@ snapshots:
       dot-case: 3.0.4
       tslib: 2.8.1
 
-  solid-dismiss@1.8.2(solid-js@1.9.7):
+  solid-dismiss@1.8.2(solid-js@2.0.0-experimental.16):
     dependencies:
-      solid-js: 1.9.7
+      solid-js: 2.0.0-experimental.16
 
-  solid-icons@1.1.0(solid-js@1.9.7):
+  solid-icons@1.1.0(solid-js@2.0.0-experimental.16):
     dependencies:
-      solid-js: 1.9.7
+      solid-js: 2.0.0-experimental.16
 
   solid-js@1.9.7:
     dependencies:
@@ -12571,18 +12609,25 @@ snapshots:
       seroval: 1.3.2
       seroval-plugins: 1.3.2(seroval@1.3.2)
 
-  solid-refresh@0.6.3(solid-js@1.9.7):
+  solid-js@2.0.0-experimental.16:
+    dependencies:
+      '@solidjs/signals': 0.11.3
+      csstype: 3.1.3
+      seroval: 1.5.2
+      seroval-plugins: 1.5.2(seroval@1.5.2)
+
+  solid-refresh@0.6.3(solid-js@2.0.0-experimental.16):
     dependencies:
       '@babel/generator': 7.27.5
       '@babel/helper-module-imports': 7.27.1
       '@babel/types': 7.27.6
-      solid-js: 1.9.7
+      solid-js: 2.0.0-experimental.16
     transitivePeerDependencies:
       - supports-color
 
-  solid-tippy@0.2.1(solid-js@1.9.7)(tippy.js@6.3.7):
+  solid-tippy@0.2.1(solid-js@2.0.0-experimental.16)(tippy.js@6.3.7):
     dependencies:
-      solid-js: 1.9.7
+      solid-js: 2.0.0-experimental.16
       tippy.js: 6.3.7
 
   solid-transition-group@0.2.3(solid-js@1.9.7):
@@ -12591,9 +12636,9 @@ snapshots:
       '@solid-primitives/transition-group': 1.0.5(solid-js@1.9.7)
       solid-js: 1.9.7
 
-  solid-use@0.9.1(solid-js@1.9.7):
+  solid-use@0.9.1(solid-js@2.0.0-experimental.16):
     dependencies:
-      solid-js: 1.9.7
+      solid-js: 2.0.0-experimental.16
 
   source-map-js@1.2.1: {}
 
@@ -12814,10 +12859,10 @@ snapshots:
 
   term-size@2.2.1: {}
 
-  terracotta@1.0.6(solid-js@1.9.7):
+  terracotta@1.0.6(solid-js@2.0.0-experimental.16):
     dependencies:
-      solid-js: 1.9.7
-      solid-use: 0.9.1(solid-js@1.9.7)
+      solid-js: 2.0.0-experimental.16
+      solid-use: 0.9.1(solid-js@2.0.0-experimental.16)
 
   terser@5.42.0:
     dependencies:
@@ -13244,14 +13289,14 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-solid@2.11.6(solid-js@1.9.7)(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0)):
+  vite-plugin-solid@2.11.6(solid-js@2.0.0-experimental.16)(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0)):
     dependencies:
       '@babel/core': 7.27.4
       '@types/babel__core': 7.20.5
       babel-preset-solid: 1.9.6(@babel/core@7.27.4)
       merge-anything: 5.1.7
-      solid-js: 1.9.7
-      solid-refresh: 0.6.3(solid-js@1.9.7)
+      solid-js: 2.0.0-experimental.16
+      solid-refresh: 0.6.3(solid-js@2.0.0-experimental.16)
       vite: 6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0)
       vitefu: 1.0.6(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))
     transitivePeerDependencies:
