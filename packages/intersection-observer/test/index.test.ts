@@ -1,8 +1,9 @@
-import { createRoot, createSignal, flush } from "solid-js";
+import { createRoot, createSignal, createEffect, flush } from "solid-js";
 import { describe, test, expect, beforeEach } from "vitest";
 
 import {
   makeIntersectionObserver,
+  createIntersectionObserver,
   createViewportObserver,
   createVisibilityObserver,
   withOccurrence,
@@ -224,6 +225,88 @@ describe("makeIntersectionObserver", () => {
 
       (instance as IntersectionObserver).__TEST__onChange();
 
+      dispose();
+    });
+  });
+});
+
+describe("createIntersectionObserver", () => {
+  let div!: HTMLDivElement;
+  let img!: HTMLImageElement;
+
+  beforeEach(() => {
+    div = document.createElement("div");
+    img = document.createElement("img");
+  });
+
+  test("creates a new IntersectionObserver instance", () => {
+    const previousInstanceCount = intersectionObserverInstances.length;
+    createRoot(dispose => {
+      createIntersectionObserver(() => [div]);
+      dispose();
+    });
+    expect(intersectionObserverInstances.length).toBe(previousInstanceCount + 1);
+  });
+
+  test("returns a store array of entries", () => {
+    createRoot(dispose => {
+      const entries = createIntersectionObserver(() => [div, img]);
+      expect(Array.isArray(entries)).toBe(true);
+      dispose();
+    });
+  });
+
+  test("store is updated when IO fires", () => {
+    createRoot(dispose => {
+      const [els] = createSignal([div]);
+      const entries = createIntersectionObserver(els);
+      const instance = _getLastIOInstance();
+
+      // flush() lets the deferred element effect run so div is actually observed
+      flush();
+
+      instance.__TEST__onChange({ isIntersecting: true });
+      flush();
+
+      expect(entries.length).toBe(1);
+      expect(entries[0]?.isIntersecting).toBe(true);
+
+      instance.__TEST__onChange({ isIntersecting: false });
+      flush();
+
+      expect(entries[0]?.isIntersecting).toBe(false);
+
+      dispose();
+    });
+  });
+
+  test("each element occupies its own store slot", () => {
+    createRoot(dispose => {
+      const entries = createIntersectionObserver(() => [div, img]);
+      const instance = _getLastIOInstance();
+
+      flush(); // let the element effect observe both elements
+
+      instance.__TEST__onChange({ isIntersecting: true });
+      flush();
+
+      expect(entries.length).toBe(2);
+      expect(entries[0]?.target).toBe(div);
+      expect(entries[1]?.target).toBe(img);
+      // Each slot tracks its own element independently
+      expect(entries[0]?.isIntersecting).toBe(true);
+      expect(entries[1]?.isIntersecting).toBe(true);
+
+      dispose();
+    });
+  });
+
+  test("options are passed to IntersectionObserver", () => {
+    createRoot(dispose => {
+      const options: IntersectionObserverInit = { threshold: 0.5 };
+      createIntersectionObserver(() => [div], options);
+      const instance = _getLastIOInstance();
+      expect(instance.options).toBe(options);
       dispose();
     });
   });
@@ -462,8 +545,7 @@ describe("createVisibilityObserver", () => {
   test("creates a new IntersectionObserver instance", () => {
     const previousInstanceCount = intersectionObserverInstances.length;
     createRoot(dispose => {
-      const useVisibilityObserver = createVisibilityObserver();
-      useVisibilityObserver(div);
+      createVisibilityObserver(div);
       dispose();
     });
     const newInstanceCount = intersectionObserverInstances.length;
@@ -477,8 +559,7 @@ describe("createVisibilityObserver", () => {
         root: div,
         rootMargin: "10px 10px 10px 10px",
       };
-      const useVisibilityObserver = createVisibilityObserver(options);
-      useVisibilityObserver(div);
+      createVisibilityObserver(div, options);
       const instance = _getLastIOInstance();
 
       expect(instance.options, "options in IntersectionObserver don't match").toBe(options);
@@ -489,16 +570,11 @@ describe("createVisibilityObserver", () => {
 
   test("returns signal", () => {
     createRoot(dispose => {
-      const useVisibilityObserver = createVisibilityObserver();
-      const isVisible = useVisibilityObserver(div);
+      const isVisible = createVisibilityObserver(div);
 
       expect(isVisible(), "signal doesn't return default initialValue").toBe(false);
 
-      const options = {
-        initialValue: true,
-      };
-      const useVisibilityObserver2 = createVisibilityObserver(options);
-      const isVisible2 = useVisibilityObserver2(div);
+      const isVisible2 = createVisibilityObserver(div, { initialValue: true });
 
       expect(isVisible2(), "signal doesn't return custom initialValue").toBe(true);
 
@@ -508,8 +584,7 @@ describe("createVisibilityObserver", () => {
 
   test("signal changes state when intersection changes", () => {
     createRoot(dispose => {
-      const useVisibilityObserver = createVisibilityObserver();
-      const isVisible = useVisibilityObserver(div);
+      const isVisible = createVisibilityObserver(div);
       const instance = _getLastIOInstance();
 
       instance.__TEST__onChange({ isIntersecting: true });
@@ -529,8 +604,7 @@ describe("createVisibilityObserver", () => {
   test("setter callback dictates the signal value", () =>
     createRoot(dispose => {
       let goalValue = true;
-      const useVisibilityObserver = createVisibilityObserver({}, _ => goalValue);
-      const isVisible = useVisibilityObserver(div);
+      const isVisible = createVisibilityObserver(div, {}, _ => goalValue);
       const instance = _getLastIOInstance();
 
       instance.__TEST__onChange();
@@ -561,14 +635,14 @@ describe("withOccurrence", () => {
   test("returns correct occurrence value", () =>
     createRoot(dispose => {
       let lastOccurrence: any;
-      const useVisibilityObserver = createVisibilityObserver(
+      createVisibilityObserver(
+        div,
         {},
         withOccurrence((e, { occurrence }) => {
           lastOccurrence = occurrence;
           return e.isIntersecting;
         }),
       );
-      useVisibilityObserver(div);
       const instance = _getLastIOInstance();
 
       instance.__TEST__onChange({ isIntersecting: false });
@@ -599,7 +673,8 @@ describe("withDirection", () => {
       let lastDirectionX: any;
       let lastDirectionY: any;
 
-      const useVisibilityObserver = createVisibilityObserver(
+      createVisibilityObserver(
+        div,
         {},
         withDirection((e, { directionX, directionY }) => {
           lastDirectionX = directionX;
@@ -607,7 +682,6 @@ describe("withDirection", () => {
           return e.isIntersecting;
         }),
       );
-      useVisibilityObserver(div);
       const instance = _getLastIOInstance();
 
       instance.__TEST__onChange({

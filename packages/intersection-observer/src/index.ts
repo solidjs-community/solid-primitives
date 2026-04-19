@@ -2,8 +2,10 @@ import {
   onCleanup,
   createSignal,
   createEffect,
+  createStore,
   untrack,
-  type Setter,
+  getOwner,
+  runWithOwner,
   DEV,
 } from "solid-js";
 import type { JSX, Accessor } from "solid-js";
@@ -95,39 +97,85 @@ export function makeIntersectionObserver(
 }
 
 /**
- * Creates a reactive Intersection Observer primitive.
+ * Creates a reactive Intersection Observer primitive. Returns a store array of
+ * {@link IntersectionObserverEntry} objects — one slot per element, updated in
+ * place whenever that element's intersection state changes. Because the return
+ * value is a store, reading `entries[i].isIntersecting` only re-runs the
+ * computation that reads it, not every computation that reads the array.
  *
- * @param elements - A list of elements to watch
- * @param onChange - An event handler that returns an array of observer entires
- * @param options - IntersectionObserver constructor options:
+ * @param elements - A reactive list of elements to watch
+ * @param options - IntersectionObserver constructor options (may be a reactive
+ *   accessor; changing it disconnects and recreates the observer):
  * - `root` — The Element or Document whose bounds are used as the bounding box when testing for intersection.
- * - `rootMargin` — A string which specifies a set of offsets to add to the root's bounding_box when calculating intersections, effectively shrinking or growing the root for calculation purposes.
- * - `threshold` — Either a single number or an array of numbers between 0.0 and 1.0, specifying a ratio of intersection area to total bounding box area for the observed target.
+ * - `rootMargin` — A string which specifies a set of offsets to add to the root's bounding_box when calculating intersections.
+ * - `threshold` — Either a single number or an array of numbers between 0.0 and 1.0.
  *
  * @example
  * ```tsx
- * const createIntersectionObserver(els, entries =>
- *   console.log(entries)
- * );
+ * const entries = createIntersectionObserver(elements);
+ * createEffect(() => console.log(entries[0]?.isIntersecting));
  * ```
  */
 export function createIntersectionObserver(
   elements: Accessor<Element[]>,
-  onChange: IntersectionObserverCallback,
-  options?: IntersectionObserverInit,
-): void {
-  if (isServer) return;
+  options?: MaybeAccessor<IntersectionObserverInit>,
+): readonly IntersectionObserverEntry[] {
+  if (isServer) return [];
 
-  const io = new IntersectionObserver(onChange, options);
+  const [entries, setEntries] = createStore<IntersectionObserverEntry[]>([]);
+  const indexMap = new Map<Element, number>();
+  let nextIdx = 0;
+  let trackedEls: Element[] = [];
+
+  // Stable callback — never recreated, safe to share across IO instances.
+  // Store writes (setEntries) are applied synchronously and do not need
+  // runWithOwner — that is only needed for signal writes from external callbacks.
+  const ioCallback: IntersectionObserverCallback = newEntries => {
+    for (const entry of newEntries) {
+      let idx = indexMap.get(entry.target);
+      if (idx === undefined) {
+        idx = nextIdx++;
+        indexMap.set(entry.target, idx);
+      }
+      // Freeze the entry so Solid's store does not recursively proxy it —
+      // isWrappable returns false for frozen objects, which keeps DOM element
+      // references (entry.target) unwrapped and referentially stable.
+      // Also update length explicitly: Solid 2.0 tracks array length in an
+      // override map, so a bare index assignment does not advance it on its own.
+      const frozen = Object.freeze({ ...entry });
+      setEntries(draft => {
+        draft[idx] = frozen as any;
+        if (idx >= (draft.length as number)) draft.length = idx + 1;
+      });
+    }
+  };
+
+  // Create the initial IO synchronously so the element effect below can use it
+  // immediately on its first deferred run.
+  let io = new IntersectionObserver(ioCallback, untrack(() => access(options)));
   onCleanup(() => io.disconnect());
+
+  if (typeof options === "function") {
+    // Reactive options: recreate the IO whenever options change and re-observe
+    // all currently tracked elements. `io` is a closure variable so the effect
+    // always disconnects whichever instance is current before replacing it.
+    createEffect(options, (opts: IntersectionObserverInit) => {
+      io.disconnect();
+      io = new IntersectionObserver(ioCallback, opts);
+      trackedEls.forEach(el => observe(el, io));
+    });
+  }
 
   createEffect(
     () => elements(),
     (list: Element[], prev: Element[] = []) => {
       handleDiffArray(list, prev, el => observe(el, io), el => io.unobserve(el));
+      trackedEls = list;
     },
     [] as Element[],
   );
+
+  return entries;
 }
 
 /**
@@ -210,81 +258,68 @@ export type VisibilitySetter<Ctx extends {} = {}> = (
 ) => boolean;
 
 /**
- * Creates reactive signal that changes when a single element's visibility changes.
+ * Creates a reactive signal that changes when a single element's visibility changes.
  *
- * @param options - A Primitive and IntersectionObserver constructor options:
- * - `root` — The Element or Document whose bounds are used as the bounding box when testing for intersection.
- * - `rootMargin` — A string which specifies a set of offsets to add to the root's bounding_box when calculating intersections, effectively shrinking or growing the root for calculation purposes.
- * - `threshold` — Either a single number or an array of numbers between 0.0 and 1.0, specifying a ratio of intersection area to total bounding box area for the observed target.
- * - `initialValue` — Initial value of the signal *(default: false)*
+ * Takes the element to observe directly, removing the curried factory pattern of
+ * the previous API. The element may be a reactive accessor or a plain DOM element.
  *
- * @returns A configured *"use"* function for creating a visibility signal for a single element. The passed element can be a **reactive signal** or a DOM element. Returning a falsy value will remove the element from the observer.
- * ```ts
- * (element: Accessor<Element | FalsyValue> | Element) => Accessor<boolean>
- * ```
+ * Signal writes from the IntersectionObserver callback are wrapped in
+ * `runWithOwner` to avoid "Signal written to an owned scope" warnings in
+ * Solid 2.0 when the IO fires outside the reactive owner.
+ *
+ * @param element - The element to observe; may be `Accessor<Element | FalsyValue>` or a plain `Element`.
+ * @param options - IntersectionObserver constructor options plus `initialValue` for the signal.
+ * @param setter - Optional custom setter callback that controls the signal value.
  *
  * @example
  * ```tsx
  * let el: HTMLDivElement | undefined
- * const useVisibilityObserver = createVisibilityObserver({ threshold: 0.8 })
- * const visible = useVisibilityObserver(() => el)
+ * const visible = createVisibilityObserver(() => el, { threshold: 0.8 })
  * <div ref={el}>{ visible() ? "Visible" : "Hidden" }</div>
  * ```
  */
 export function createVisibilityObserver(
-  options?: IntersectionObserverInit & {
-    initialValue?: boolean;
-  },
+  element: Accessor<Element | FalsyValue> | Element,
+  options?: IntersectionObserverInit & { initialValue?: boolean },
   setter?: MaybeAccessor<VisibilitySetter>,
-): (element: Accessor<Element | FalsyValue> | Element) => Accessor<boolean> {
-  if (isServer) {
-    return () => () => false;
-  }
+): Accessor<boolean> {
+  if (isServer) return () => options?.initialValue ?? false;
 
-  const callbacks = new WeakMap<Element, EntryCallback>();
+  const owner = getOwner()!;
+  const [isVisible, setVisible] = createSignal(options?.initialValue ?? false);
 
-  const io = new IntersectionObserver((entries, instance) => {
-    for (const entry of entries) callbacks.get(entry.target)?.(entry, instance);
+  // access(setter) is called once here — for factory setters like withOccurrence,
+  // this creates the per-element closure (with prevIntersecting etc.) exactly once.
+  const setterFn = setter ? access(setter) : null;
+  const entryCallback: EntryCallback = setterFn
+    ? entry => runWithOwner(owner, () => setVisible(setterFn(entry, { visible: untrack(isVisible) })))
+    : entry => runWithOwner(owner, () => setVisible(entry.isIntersecting));
+
+  const io = new IntersectionObserver((newEntries, instance) => {
+    for (const entry of newEntries) entryCallback(entry, instance);
   }, options);
   onCleanup(() => io.disconnect());
 
-  function removeEntry(el: Element) {
-    io.unobserve(el);
-    callbacks.delete(el);
+  let prevEl: Element | FalsyValue;
+
+  if (!(element instanceof Element)) {
+    createEffect(
+      () => element(),
+      (el: Element | FalsyValue) => {
+        if (el === prevEl) return;
+        if (prevEl) { io.unobserve(prevEl); }
+        if (el) observe(el, io);
+        prevEl = el;
+      },
+    );
+  } else {
+    observe(element, io);
+    prevEl = element;
   }
-  function addEntry(el: Element, callback: EntryCallback) {
-    observe(el, io);
-    callbacks.set(el, callback);
-  }
 
-  const getCallback: (get: Accessor<boolean>, set: Setter<boolean>) => EntryCallback = setter
-    ? (get, set) => {
-        const setterRef = access(setter);
-        return entry => set(setterRef(entry, { visible: untrack(get) }));
-      }
-    : (_, set) => entry => set(entry.isIntersecting);
+  onCleanup(() => { if (prevEl) io.unobserve(prevEl); });
 
-  return element => {
-    const [isVisible, setVisible] = createSignal(options?.initialValue ?? false);
-    const callback = getCallback(isVisible, setVisible);
-    let prevEl: Element | FalsyValue;
-
-    if (!(element instanceof Element)) {
-      createEffect(
-        () => element(),
-        (el: Element | FalsyValue) => {
-          if (el === prevEl) return;
-          if (prevEl) removeEntry(prevEl);
-          if (el) addEntry(el, callback);
-          prevEl = el;
-        },
-      );
-    } else addEntry(element, callback);
-
-    onCleanup(() => prevEl && removeEntry(prevEl));
-
-    return isVisible;
-  };
+  return isVisible;
 }
 
 export enum Occurrence {
