@@ -1,6 +1,6 @@
 import "./setup";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { makeSSE, createSSE, SSEReadyState } from "../src/index.js";
 import { MockEventSource } from "./setup.js";
 
@@ -83,17 +83,43 @@ describe("createSSE", () => {
     createRoot(dispose => {
       const { readyState } = createSSE("https://example.com/events");
       vi.advanceTimersByTime(20);
+      flush();
       expect(readyState()).toBe(SSEReadyState.OPEN);
       dispose();
     }));
 
-  it("provides latest message via data signal", () =>
+  it("data is pending before first message arrives", () =>
+    createRoot(dispose => {
+      const { data, pending } = createSSE("https://example.com/events");
+      expect(pending()).toBe(true);
+      expect(() => data()).toThrow();
+      dispose();
+    }));
+
+  it("provides latest message via data signal after first message", () =>
+    createRoot(dispose => {
+      const { data, source, pending } = createSSE("https://example.com/events");
+      vi.advanceTimersByTime(20);
+      flush();
+      (source() as unknown as MockEventSource).simulateMessage("hello");
+      flush();
+      expect(pending()).toBe(false);
+      expect(data()).toBe("hello");
+      dispose();
+    }));
+
+  it("updates data on subsequent messages", () =>
     createRoot(dispose => {
       const { data, source } = createSSE("https://example.com/events");
-      expect(data()).toBeUndefined();
       vi.advanceTimersByTime(20);
-      (source() as unknown as MockEventSource).simulateMessage("hello");
-      expect(data()).toBe("hello");
+      flush();
+      const mock = source() as unknown as MockEventSource;
+      mock.simulateMessage("first");
+      flush();
+      expect(data()).toBe("first");
+      mock.simulateMessage("second");
+      flush();
+      expect(data()).toBe("second");
       dispose();
     }));
 
@@ -103,16 +129,19 @@ describe("createSSE", () => {
         transform: JSON.parse,
       });
       vi.advanceTimersByTime(20);
+      flush();
       (source() as unknown as MockEventSource).simulateMessage(JSON.stringify({ value: 42 }));
+      flush();
       expect(data()).toEqual({ value: 42 });
       dispose();
     }));
 
-  it("returns initialValue before any message arrives", () =>
+  it("returns initialValue before any message arrives (no pending state)", () =>
     createRoot(dispose => {
-      const { data } = createSSE("https://example.com/events", {
+      const { data, pending } = createSSE("https://example.com/events", {
         initialValue: "loading",
       });
+      expect(pending()).toBe(false);
       expect(data()).toBe("loading");
       dispose();
     }));
@@ -123,11 +152,15 @@ describe("createSSE", () => {
         reconnect: { retries: 1, delay: 50 },
       });
       vi.advanceTimersByTime(20);
+      flush();
       (source() as unknown as MockEventSource).simulateError();
+      flush();
       expect(error()).toBeTruthy();
       // reconnect fires after delay; new source opens
       vi.advanceTimersByTime(100);
+      flush();
       vi.advanceTimersByTime(20); // new source opens
+      flush();
       expect(error()).toBeUndefined();
       dispose();
     }));
@@ -138,7 +171,9 @@ describe("createSSE", () => {
         reconnect: false,
       });
       vi.advanceTimersByTime(20);
+      flush();
       (source() as unknown as MockEventSource).simulateError();
+      flush();
       expect(readyState()).toBe(SSEReadyState.CLOSED);
       expect(error()).toBeTruthy();
       dispose();
@@ -151,8 +186,11 @@ describe("createSSE", () => {
         reconnect: { retries: 5, delay: 50 },
       });
       vi.advanceTimersByTime(20);
+      flush();
       (source() as unknown as MockEventSource).simulateTransientError();
+      flush();
       vi.advanceTimersByTime(300);
+      flush();
       // readyState stayed CONNECTING → no new EventSource was created
       expect(SSEInstances.length).toBe(initialCount + 1);
       dispose();
@@ -164,10 +202,13 @@ describe("createSSE", () => {
         reconnect: { retries: 1, delay: 100 },
       });
       vi.advanceTimersByTime(20);
+      flush();
       const first = source();
       (first as unknown as MockEventSource).simulateError();
+      flush();
       expect(source()).toBe(first); // no change yet
       vi.advanceTimersByTime(150);
+      flush();
       expect(source()).not.toBe(first); // new connection opened
       dispose();
     }));
@@ -178,14 +219,20 @@ describe("createSSE", () => {
         reconnect: { retries: 1, delay: 50 },
       });
       vi.advanceTimersByTime(20);
+      flush();
       const first = source();
       (first as unknown as MockEventSource).simulateError();
+      flush();
       vi.advanceTimersByTime(100); // first retry
+      flush();
       const second = source();
       expect(second).not.toBe(first);
       vi.advanceTimersByTime(20); // second opens
+      flush();
       (second as unknown as MockEventSource).simulateError();
+      flush();
       vi.advanceTimersByTime(200); // no more retries
+      flush();
       expect(source()).toBe(second); // still the same source
       dispose();
     }));
@@ -194,30 +241,44 @@ describe("createSSE", () => {
     createRoot(dispose => {
       const { readyState, close } = createSSE("https://example.com/events");
       vi.advanceTimersByTime(20);
+      flush();
       expect(readyState()).toBe(SSEReadyState.OPEN);
       close();
+      flush();
       expect(readyState()).toBe(SSEReadyState.CLOSED);
       dispose();
     }));
 
-  it("reconnect() opens a fresh connection", () =>
+  it("reconnect() opens a fresh connection and resets data to pending", () =>
     createRoot(dispose => {
-      const { source, reconnect } = createSSE("https://example.com/events");
+      const { data, source, pending, reconnect } = createSSE("https://example.com/events");
       vi.advanceTimersByTime(20);
+      flush();
       const first = source();
+      (first as unknown as MockEventSource).simulateMessage("hello");
+      flush();
+      expect(data()).toBe("hello");
       reconnect();
+      flush();
+      expect(pending()).toBe(true); // pending again after reconnect
       expect(source()).not.toBe(first);
       expect(first?.readyState).toBe(SSEReadyState.CLOSED); // old one closed
       dispose();
     }));
 
-  it("reconnects when the URL signal changes", () =>
+  it("reconnects when the URL signal changes and resets data to pending", () =>
     createRoot(dispose => {
       const [url, setUrl] = createSignal("https://example.com/v1/events");
-      const { source } = createSSE(url);
+      const { data, source, pending } = createSSE(url);
       vi.advanceTimersByTime(20);
+      flush();
       const first = source();
+      (first as unknown as MockEventSource).simulateMessage("v1 data");
+      flush();
+      expect(data()).toBe("v1 data");
       setUrl("https://example.com/v2/events");
+      flush();
+      expect(pending()).toBe(true); // pending for new URL
       expect(source()).not.toBe(first);
       expect(first?.readyState).toBe(SSEReadyState.CLOSED);
       dispose();
@@ -228,6 +289,7 @@ describe("createSSE", () => {
       createRoot(dispose => {
         const { source } = createSSE("https://example.com/events");
         vi.advanceTimersByTime(20);
+        flush();
         const es = source();
         vi.spyOn(es as unknown as MockEventSource, "close").mockImplementation(() => resolve());
         dispose();

@@ -1,8 +1,7 @@
-import { type Accessor, createComputed, createSignal, onCleanup, untrack } from "solid-js";
+import { onCleanup, createSignal, createTrackedEffect, untrack, NotReadyError } from "solid-js";
+import type { Accessor } from "solid-js";
 import { isServer } from "solid-js/web";
 import { access, type MaybeAccessor } from "@solid-primitives/utils";
-
-// ─── ReadyState ───────────────────────────────────────────────────────────────
 
 /**
  * Named constants for the SSE connection state, mirroring the `EventSource`
@@ -23,8 +22,6 @@ export const SSEReadyState = {
 
 /** The numeric type of a valid SSE ready-state value (`0 | 1 | 2`). */
 export type SSEReadyStateValue = (typeof SSEReadyState)[keyof typeof SSEReadyState];
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 /**
  * Options shared between `makeSSE` and `createSSE`.
@@ -69,7 +66,13 @@ export type SSESourceFn = (
 ) => [source: SSESourceHandle, cleanup: VoidFunction];
 
 export type CreateSSEOptions<T> = SSEOptions & {
-  /** Initial value of the `data` signal before any message arrives */
+  /**
+   * Initial value of the `data` signal before any message arrives.
+   *
+   * When provided, `data()` returns this value immediately (no pending state).
+   * When omitted, `data()` throws `NotReadyError` until the first message
+   * arrives, integrating with Solid's `<Suspense>` for a loading fallback.
+   */
   initialValue?: T;
   /**
    * Transform raw string data from each message event.
@@ -98,7 +101,17 @@ export type CreateSSEOptions<T> = SSEOptions & {
 export type SSEReturn<T> = {
   /** The underlying source instance. `undefined` on SSR or before first connect. */
   source: Accessor<SSESourceHandle | undefined>;
-  /** The latest message data, parsed through `transform` if provided. */
+  /**
+   * The latest message data, parsed through `transform` if provided.
+   *
+   * **Pending until the first message arrives** (unless `initialValue` is set).
+   * Reading this inside a component wrapped with `<Suspense>` will show the
+   * fallback while the connection is establishing. After the first message the
+   * signal updates reactively on every subsequent message.
+   *
+   * Use `pending()` to check the pending state imperatively, and
+   * `onSettled(() => ...)` to react when the first value arrives.
+   */
   data: Accessor<T | undefined>;
   /** The latest error event, `undefined` when no error has occurred. */
   error: Accessor<Event | undefined>;
@@ -109,13 +122,27 @@ export type SSEReturn<T> = {
    * - `SSEReadyState.CLOSED` (2)
    */
   readyState: Accessor<SSEReadyStateValue>;
-  /** Close the connection. */
+  /**
+   * `true` until the first message arrives (or after `reconnect()` / URL
+   * change until the next message). Use this for imperative pending checks;
+   * use `<Suspense>` for declarative loading UI (it catches the `NotReadyError`
+   * that `data()` throws while pending).
+   */
+  pending: Accessor<boolean>;
+  /** Close the connection. Resets `data` to pending on the next `reconnect()`. */
   close: VoidFunction;
-  /** Force-close the current connection and open a new one. */
+  /**
+   * Force-close the current connection and open a new one.
+   * Resets `data` to pending until the next message arrives.
+   */
   reconnect: VoidFunction;
 };
 
-// ─── makeSSE ─────────────────────────────────────────────────────────────────
+// Internal sentinel marking "no message received yet". When rawData holds this
+// value, the data accessor throws NotReadyError so Solid's Suspense boundary
+// can show a fallback while the connection is establishing.
+const NOT_SET: unique symbol = Symbol();
+type NotSet = typeof NOT_SET;
 
 /**
  * Creates a raw `EventSource` connection without Solid lifecycle management.
@@ -162,15 +189,17 @@ export const makeSSE = (
   return [source, cleanup];
 };
 
-// ─── createSSE ───────────────────────────────────────────────────────────────
-
 /**
  * Creates a reactive SSE (Server-Sent Events) connection that integrates with
- * the Solid reactive system and owner lifecycle.
+ * Solid async reactivity system and owner lifecycle.
  *
- * - Accepts a reactive URL — reconnects automatically when the URL signal changes
- * - Closes the connection on owner disposal via `onCleanup`
- * - SSR-safe: returns static stubs on the server
+ * - `data` is **pending** (throws `NotReadyError`) until the first message
+ *   arrives, enabling `<Suspense>` to show a loading fallback. Provide
+ *   `initialValue` to start with a settled value instead.
+ * - Accepts a reactive URL — reconnects automatically when the URL signal
+ *   changes, resetting `data` to pending.
+ * - Closes the connection on owner disposal via `onCleanup`.
+ * - SSR-safe: returns static stubs on the server.
  *
  * ```ts
  * const { data, readyState, error, close, reconnect } = createSSE<{ msg: string }>(
@@ -178,7 +207,12 @@ export const makeSSE = (
  *   { transform: JSON.parse, reconnect: { retries: 3, delay: 2000 } },
  * );
  *
- * return <p>{data()?.msg}</p>;
+ * // In JSX — Suspense shows fallback while connecting:
+ * return (
+ *   <Suspense fallback={<p>Connecting…</p>}>
+ *     <p>{data()?.msg}</p>
+ *   </Suspense>
+ * );
  * ```
  *
  * @param url Static URL string or reactive `Accessor<string>`
@@ -195,6 +229,7 @@ export const createSSE = <T = string>(
       data: () => options.initialValue,
       error: () => undefined,
       readyState: () => SSEReadyState.CLOSED,
+      pending: () => options.initialValue === undefined,
       close: () => void 0,
       reconnect: () => void 0,
     };
@@ -202,11 +237,35 @@ export const createSSE = <T = string>(
 
   // ── Reactive state ────────────────────────────────────────────────────────
   const [source, setSource] = createSignal<SSESourceHandle | undefined>(undefined);
-  const [data, setData] = createSignal<T | undefined>(options.initialValue);
+
+  // rawData holds either the latest message value or the NOT_SET sentinel.
+  // The cast to `Exclude<T, Function> | typeof NOT_SET` selects overload 2 of
+  // createSignal (plain value, not compute function). NOT_SET is a unique symbol
+  // so it's never a Function; for initialValue, SSE data types are never functions.
+  const [rawData, setRawData] = createSignal<T | NotSet>(
+    (options.initialValue !== undefined ? options.initialValue : NOT_SET) as
+      | Exclude<T, Function>
+      | typeof NOT_SET,
+  );
+
+  // A computed signal: throws NotReadyError when rawData is NOT_SET so that
+  // <Suspense> shows a fallback while awaiting the first message. After the
+  // first message it updates reactively on every subsequent message.
+  const [data] = createSignal<T | undefined>(() => {
+    const val = rawData();
+    if (val === NOT_SET) throw new NotReadyError("SSE awaiting first message");
+    return val as T | undefined;
+  });
+
   const [error, setError] = createSignal<Event | undefined>(undefined);
   const [readyState, setReadyState] = createSignal<SSEReadyStateValue>(SSEReadyState.CONNECTING);
 
-  // ── Reconnect config ──────────────────────────────────────────────────────
+  // Explicit pending flag — true until the first message arrives (or after
+  // reconnect). The `data` computed throws NotReadyError for <Suspense>, but
+  // Solid isPending() can't detect the initial STATUS_UNINITIALIZED
+  // state, so we expose this for imperative checks.
+  const [pending, setPending] = createSignal(options.initialValue === undefined);
+
   const reconnectConfig: SSEReconnectOptions =
     options.reconnect === true
       ? { retries: Infinity, delay: 3000 }
@@ -245,7 +304,8 @@ export const createSSE = <T = string>(
 
     const handleMessage = (e: MessageEvent) => {
       const value = options.transform ? options.transform(e.data as string) : (e.data as T);
-      setData(() => value);
+      setRawData(() => value);
+      setPending(false);
       options.onMessage?.(e);
     };
 
@@ -277,7 +337,7 @@ export const createSSE = <T = string>(
     currentCleanup = cleanup;
   };
 
-  const disconnect = () => {
+  const close = () => {
     clearReconnectTimer();
     retriesLeft = 0;
     currentCleanup?.();
@@ -286,44 +346,43 @@ export const createSSE = <T = string>(
     setReadyState(SSEReadyState.CLOSED);
   };
 
-  const manualReconnect = () => {
+  const reconnect = () => {
     const currentUrl = untrack(() => access(url));
-    disconnect();
+    close();
+    // Reset to pending so Suspense shows a fallback during reconnect.
+    setRawData(NOT_SET);
+    setPending(true);
     connect(currentUrl);
   };
 
-  // ── Initial connection (synchronous) ─────────────────────────────────────
-  // createEffect is deferred until after the current synchronous code block,
-  // so we connect immediately here to ensure signals are populated as soon as
-  // createSSE returns.
   connect(untrack(() => access(url)));
 
-  // ── Reactive URL handling ─────────────────────────────────────────────────
-  // Only needed when url is an accessor. `createComputed` runs synchronously
-  // on creation (unlike `createEffect`, which is deferred), so the reactive
-  // subscription to `url` is established immediately. The `prevUrl` guard
-  // prevents a redundant reconnect on the first pass (we already connected).
+  // createTrackedEffect runs synchronously so the reactive subscription
+  // to `url` is established immediately. The prevUrl guard prevents a
+  // redundant reconnect on the first pass.
   if (typeof url === "function") {
     let prevUrl = untrack(url);
-    createComputed(() => {
+    createTrackedEffect(() => {
       const resolvedUrl = url();
       if (resolvedUrl !== prevUrl) {
         prevUrl = resolvedUrl;
         untrack(() => {
           currentCleanup?.();
           currentCleanup = undefined;
+          // Reset to pending — new connection, new loading state.
+          setRawData(NOT_SET);
+          setPending(true);
+          connect(resolvedUrl);
         });
-        connect(resolvedUrl);
       }
     });
   }
 
-  // ── Lifecycle cleanup ─────────────────────────────────────────────────────
   onCleanup(() => {
     clearReconnectTimer();
     currentCleanup?.();
     currentCleanup = undefined;
   });
 
-  return { source, data, error, readyState, close: disconnect, reconnect: manualReconnect };
+  return { source, data, error, readyState, pending, close, reconnect };
 };

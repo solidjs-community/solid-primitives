@@ -7,9 +7,10 @@ describe("SSR", () => {
     createRoot(dispose => {
       const sse = createSSE("https://example.com/events");
       expect(sse.source()).toBeUndefined();
-      expect(sse.data()).toBeUndefined();
+      expect(sse.data()).toBeUndefined(); // SSR returns undefined, not pending
       expect(sse.error()).toBeUndefined();
       expect(sse.readyState()).toBe(2);
+      expect(sse.pending()).toBe(true); // no initialValue → pending
       expect(() => sse.close()).not.toThrow();
       expect(() => sse.reconnect()).not.toThrow();
       dispose();
@@ -17,10 +18,11 @@ describe("SSR", () => {
 
   it("exposes initialValue in SSR data stub", () =>
     createRoot(dispose => {
-      const { data } = createSSE("https://example.com/events", {
+      const { data, pending } = createSSE("https://example.com/events", {
         initialValue: "loading",
       });
       expect(data()).toBe("loading");
+      expect(pending()).toBe(false);
       dispose();
     }));
 });

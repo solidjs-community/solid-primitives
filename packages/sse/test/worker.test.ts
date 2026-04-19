@@ -1,6 +1,6 @@
 import "./setup";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import { createSSE, SSEReadyState } from "../src/sse.js";
 import { makeSSEWorker, type SSEWorkerMessage, type SSEWorkerTarget } from "../src/worker.js";
 
@@ -227,6 +227,7 @@ describe("createSSE with worker source", () => {
       });
       const id = (target.sent[0] as Extract<SSEWorkerMessage, { type: "connect" }>).id;
       target.respond({ type: "open", id });
+      flush();
       expect(readyState()).toBe(SSEReadyState.OPEN);
       dispose();
     }));
@@ -240,6 +241,7 @@ describe("createSSE with worker source", () => {
       const id = (target.sent[0] as Extract<SSEWorkerMessage, { type: "connect" }>).id;
       target.respond({ type: "open", id });
       target.respond({ type: "message", id, data: "world", eventType: "message" });
+      flush();
       expect(data()).toBe("world");
       dispose();
     }));
@@ -254,6 +256,7 @@ describe("createSSE with worker source", () => {
       const id = (target.sent[0] as Extract<SSEWorkerMessage, { type: "connect" }>).id;
       target.respond({ type: "open", id });
       target.respond({ type: "message", id, data: JSON.stringify({ n: 7 }), eventType: "message" });
+      flush();
       expect(data()).toEqual({ n: 7 });
       dispose();
     }));
@@ -288,12 +291,15 @@ describe("createSSE with worker source", () => {
       });
       const id1 = (target.sent[0] as Extract<SSEWorkerMessage, { type: "connect" }>).id;
       target.respond({ type: "open", id: id1 });
+      flush();
       target.respond({ type: "error", id: id1, readyState: SSEReadyState.CLOSED });
+      flush();
 
       // Before the reconnect timer fires, only 1 connect
       expect(target.sent.filter(m => m.type === "connect")).toHaveLength(1);
 
       vi.advanceTimersByTime(150);
+      flush();
 
       // After the delay, a new connect should have been sent
       expect(target.sent.filter(m => m.type === "connect")).toHaveLength(2);
@@ -308,8 +314,10 @@ describe("createSSE with worker source", () => {
       });
       const id = (target.sent[0] as Extract<SSEWorkerMessage, { type: "connect" }>).id;
       target.respond({ type: "open", id });
+      flush();
       expect(readyState()).toBe(SSEReadyState.OPEN);
       close();
+      flush();
       expect(readyState()).toBe(SSEReadyState.CLOSED);
       expect(target.sent.some(m => m.type === "disconnect")).toBe(true);
       dispose();
