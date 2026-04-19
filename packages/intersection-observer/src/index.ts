@@ -123,7 +123,7 @@ export function createIntersectionObserver(
   if (isServer) return [];
 
   const [entries, setEntries] = createStore<IntersectionObserverEntry[]>([]);
-  const indexMap = new Map<Element, number>();
+  const indexMap = new WeakMap<Element, number>();
   let nextIdx = 0;
   let trackedEls: Element[] = [];
 
