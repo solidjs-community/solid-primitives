@@ -110,7 +110,7 @@ const ws = makeHeartbeatWS(
 
 ## Async message primitives *(planned for next minor)*
 
-These three primitives leverage Solid 2.0's async reactivity — `createMemo` with `AsyncIterable`, `<Loading>` boundaries, `isPending`, and `latest` — to provide a more powerful and correct model for WebSocket data.
+These three primitives leverage Solid's async reactivity — `createMemo` with `AsyncIterable`, `<Loading>` boundaries, `isPending`, and `latest` — to provide a more powerful and correct model for WebSocket data.
 
 ### `wsMessageIterable` *(planned)*
 
