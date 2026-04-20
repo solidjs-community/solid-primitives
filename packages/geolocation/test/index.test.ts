@@ -141,10 +141,10 @@ describe("createGeolocationWatcher", () => {
       dispose();
     }));
 
-  it("location is undefined (suspending) before first fix when disabled", () =>
+  it("location throws NotReadyError (pending) before first fix", () =>
     createRoot(dispose => {
       const { location } = createGeolocationWatcher(false);
-      expect(location()).toBeUndefined();
+      expect(() => location()).toThrow();
       dispose();
     }));
 

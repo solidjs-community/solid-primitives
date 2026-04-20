@@ -12,15 +12,13 @@ Primitives to query and watch geolocation information from within the browser.
 
 ## Installation
 
-```
+```bash
 npm install @solid-primitives/geolocation
 # or
-yarn add @solid-primitives/geolocation
+pnpm add @solid-primitives/geolocation
 ```
 
-## How to use it
-
-### `makeGeolocation`
+## `makeGeolocation`
 
 A non-reactive one-shot query. No Solid owner required — can be used outside components. Returns a `[query, cleanup]` tuple.
 
@@ -30,7 +28,7 @@ const coords = await query();
 cleanup();
 ```
 
-#### Definition
+### Definition
 
 ```ts
 makeGeolocation(
@@ -40,7 +38,7 @@ makeGeolocation(
 
 ---
 
-### `makeGeolocationWatcher`
+## `makeGeolocationWatcher`
 
 A non-reactive continuous watcher. No Solid owner required. Returns a `[store, cleanup]` tuple.
 
@@ -51,7 +49,7 @@ console.log(store.error);    // GeolocationPositionError | null
 cleanup();
 ```
 
-#### Definition
+### Definition
 
 ```ts
 makeGeolocationWatcher(
@@ -64,9 +62,9 @@ makeGeolocationWatcher(
 
 ---
 
-### `createGeolocation`
+## `createGeolocation`
 
-A reactive one-shot query. Returns an async accessor that integrates with `<Suspense>` / `<Loading>` boundaries — the component subtree suspends until the position resolves. Re-queries automatically when reactive `options` change, or manually via `refetch()`.
+A reactive one-shot query. Returns an async accessor that integrates with `<Loading>` boundaries — the component subtree suspends until the position resolves. Re-queries automatically when reactive `options` change, or manually via `refetch()`.
 
 ```ts
 const [location, refetch] = createGeolocation();
@@ -74,9 +72,9 @@ const [location, refetch] = createGeolocation();
 
 ```tsx
 // Suspends until first fix:
-<Suspense fallback="Locating...">
+<Loading fallback="Locating...">
   <div>{location().latitude}, {location().longitude}</div>
-</Suspense>
+</Loading>
 
 // Show a subtle indicator while re-querying in the background:
 <Show when={isPending(() => location())}>Updating position...</Show>
@@ -90,19 +88,19 @@ const [location, refetch] = createGeolocation(opts);
 // Automatically re-queries when opts() changes
 ```
 
-#### Definition
+### Definition
 
 ```ts
 createGeolocation(
   options?: MaybeAccessor<PositionOptions>
-): [location: Accessor<GeolocationCoordinates>, refetch: VoidFunction]
+): [location: () => Promise<GeolocationCoordinates>, refetch: VoidFunction]
 ```
 
 ---
 
-### `createGeolocationWatcher`
+## `createGeolocationWatcher`
 
-A reactive continuous watcher. `location` suspends until the first GPS fix, then updates reactively without re-suspending. `error` is a signal accessor for recoverable in-component error handling. The watcher starts and stops reactively based on `enabled`.
+A reactive continuous watcher. `location` throws `NotReadyError` (integrating with `<Loading>`) until the first GPS fix, then updates reactively without re-suspending. `error` is a signal accessor for recoverable in-component error handling. The watcher starts and stops reactively based on `enabled`. Reactive `options` restarts the watcher when the enabled state is active.
 
 ```ts
 const [enabled, setEnabled] = createSignal(true);
@@ -116,12 +114,12 @@ const { location, error } = createGeolocationWatcher(enabled);
 </Show>
 
 // Suspends until first GPS fix, then updates live:
-<Suspense fallback="Acquiring GPS fix...">
+<Loading fallback="Acquiring GPS fix...">
   <Map lat={location().latitude} lng={location().longitude} />
-</Suspense>
+</Loading>
 ```
 
-#### Definition
+### Definition
 
 ```ts
 createGeolocationWatcher(

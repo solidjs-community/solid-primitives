@@ -4,6 +4,7 @@ import {
   createGeolocation,
   createGeolocationWatcher,
 } from "../src/index.js";
+import { NotReadyError } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 describe("API doesn't break in SSR", () => {
@@ -20,15 +21,15 @@ describe("API doesn't break in SSR", () => {
     expect(cleanup).toBeInstanceOf(Function);
   });
 
-  it("createGeolocation() - SSR", () => {
+  it("createGeolocation() - SSR throws NotReadyError (integrates with <Loading>)", () => {
     const [location, refetch] = createGeolocation();
-    expect(() => location()).toThrow();
+    expect(() => location()).toThrow(NotReadyError);
     expect(refetch).toBeInstanceOf(Function);
   });
 
-  it("createGeolocationWatcher() - SSR", () => {
+  it("createGeolocationWatcher() - SSR throws NotReadyError (integrates with <Loading>)", () => {
     const { location, error } = createGeolocationWatcher(true);
-    expect(() => location()).toThrow();
+    expect(() => location()).toThrow(NotReadyError);
     expect(error()).toBe(null);
   });
 });

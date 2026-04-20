@@ -361,6 +361,9 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-experimental.16
+        version: 2.0.0-experimental.16(solid-js@2.0.0-experimental.16)
       '@types/leaflet':
         specifier: ^1.9.8
         version: 1.9.12
@@ -368,7 +371,7 @@ importers:
         specifier: ^1.9.4
         version: 1.9.4
       solid-js:
-        specifier: ^2.0.0-beta.6
+        specifier: 2.0.0-experimental.16
         version: 2.0.0-experimental.16
 
   packages/gestures:

@@ -1,5 +1,5 @@
-import { isServer } from "@solidjs/web";
-import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
+import { type Accessor, createEffect, createSignal, NotReadyError, onCleanup } from "solid-js";
 import { access, noop, type MaybeAccessor } from "@solid-primitives/utils";
 
 const geolocationDefaults: PositionOptions = {
@@ -10,6 +10,9 @@ const geolocationDefaults: PositionOptions = {
 
 const mergeOptions = (options?: PositionOptions): PositionOptions =>
   Object.assign({}, geolocationDefaults, options);
+
+// Sentinel for the "not yet observed" pending state.
+const NOT_SET: unique symbol = Symbol();
 
 /**
  * Performs a single geolocation query. Non-reactive — no Solid owner required.
@@ -88,7 +91,7 @@ export const makeGeolocationWatcher = (
 
 /**
  * Reactive one-shot geolocation query. Returns an async accessor that suspends
- * until the position resolves, integrating with `<Suspense>` / `<Loading>` boundaries.
+ * until the position resolves, integrating with `<Loading>` boundaries.
  * Re-queries when `options` changes or when `refetch` is called.
  *
  * @param options - Reactive position options
@@ -98,9 +101,9 @@ export const makeGeolocationWatcher = (
  * ```ts
  * const [location, refetch] = createGeolocation();
  * // In JSX — suspends until first fix:
- * // <Suspense fallback="Locating...">
+ * // <Loading fallback="Locating...">
  * //   <div>{location().latitude}, {location().longitude}</div>
- * // </Suspense>
+ * // </Loading>
  * // Check if re-querying in the background:
  * // <Show when={isPending(() => location())}>Updating...</Show>
  * ```
@@ -110,7 +113,7 @@ export const createGeolocation = (
 ): [location: () => Promise<GeolocationCoordinates>, refetch: VoidFunction] => {
   if (isServer) {
     const stub = () => {
-      throw new Error("Geolocation is not available on the server.");
+      throw new NotReadyError("Geolocation is not available on the server.");
     };
     return [stub as Accessor<GeolocationCoordinates>, noop];
   }
@@ -137,8 +140,9 @@ export const createGeolocation = (
 
 /**
  * Watches geolocation in real-time. Returns signal accessors for `location` and `error`.
- * `location` suspends on the first fix — subsequent updates flow reactively without re-suspending.
- * The watcher starts and stops reactively based on the `enabled` parameter.
+ * `location` throws `NotReadyError` (integrating with `<Loading>`) until the first GPS fix
+ * arrives — subsequent updates flow reactively without re-suspending. The watcher starts
+ * and stops reactively based on `enabled`. Reactive `options` restarts the watcher.
  *
  * @param enabled - Whether the watcher should be active
  * @param options - Reactive position options
@@ -149,9 +153,9 @@ export const createGeolocation = (
  * const [enabled, setEnabled] = createSignal(true);
  * const { location, error } = createGeolocationWatcher(enabled);
  * // Suspends until first GPS fix, then updates reactively:
- * // <Suspense fallback="Acquiring GPS fix...">
+ * // <Loading fallback="Acquiring GPS fix...">
  * //   <Map lat={location().latitude} lng={location().longitude} />
- * // </Suspense>
+ * // </Loading>
  * // Show recoverable errors without an error boundary:
  * // <Show when={error()}>Permission denied — <button onClick={retry}>retry</button></Show>
  * ```
@@ -166,15 +170,25 @@ export const createGeolocationWatcher = (
   if (isServer) {
     return {
       location: () => {
-        throw new Error("Geolocation is not available on the server.");
+        throw new NotReadyError("Geolocation is not available on the server.");
       },
       error: () => null,
     };
   }
 
-  // Undefined initial state causes <Suspense> to hold until the first fix arrives.
-  const [location, setLocation] = createSignal<GeolocationCoordinates | undefined>(undefined);
+  // NOT_SET causes location() to throw NotReadyError until the first fix —
+  // integrates with <Loading> for a natural pending state.
+  const [rawLocation, setLocation] = createSignal<GeolocationCoordinates | typeof NOT_SET>(NOT_SET);
   const [error, setError] = createSignal<GeolocationPositionError | null>(null);
+
+  // Plain wrapper: throws NotReadyError when pending, returns coordinates when set.
+  // Using a plain function (not a computed signal) avoids caching issues outside
+  // a reactive scope between state transitions.
+  const location = (): GeolocationCoordinates => {
+    const val = rawLocation();
+    if (val === NOT_SET) throw new NotReadyError("Waiting for first GPS fix");
+    return val;
+  };
 
   let watchId: number | null = null;
 
@@ -186,9 +200,12 @@ export const createGeolocationWatcher = (
   };
 
   createEffect(
-    () => access(enabled),
-    (isEnabled) => {
-      if (isEnabled) {
+    // Track both enabled and options. When enabled is false, options is not
+    // evaluated (short-circuit) — so option changes only re-run when active.
+    () => (access(enabled) ? access(options) : (false as const)),
+    (optsOrFalse) => {
+      clearWatch();
+      if (optsOrFalse !== false) {
         watchId = navigator.geolocation.watchPosition(
           res => {
             setLocation(res.coords);
@@ -197,19 +214,13 @@ export const createGeolocationWatcher = (
           err => {
             setError(err);
           },
-          mergeOptions(access(options)),
+          mergeOptions(optsOrFalse),
         );
-      } else {
-        clearWatch();
       }
     },
   );
 
   onCleanup(clearWatch);
 
-  // Cast: undefined initial value causes suspension until first position update.
-  return {
-    location: location as Accessor<GeolocationCoordinates>,
-    error,
-  };
+  return { location, error };
 };
