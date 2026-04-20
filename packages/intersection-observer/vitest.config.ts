@@ -19,8 +19,12 @@ export default defineConfig(({ mode }) => {
         ? ["@solid-primitives/source", "node"]
         : ["@solid-primitives/source", "browser", "development"],
       alias: {
-        "solid-js/web": new URL("./node_modules/@solidjs/web/dist/web.js", import.meta.url)
-          .pathname,
+        "solid-js/web": new URL(
+          testSSR
+            ? "./node_modules/@solidjs/web/dist/server.js"
+            : "./node_modules/@solidjs/web/dist/web.js",
+          import.meta.url,
+        ).pathname,
       },
     },
     test: {

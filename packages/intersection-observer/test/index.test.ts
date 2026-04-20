@@ -250,7 +250,7 @@ describe("createIntersectionObserver", () => {
 
   test("returns a store array of entries", () => {
     createRoot(dispose => {
-      const entries = createIntersectionObserver(() => [div, img]);
+      const [entries] = createIntersectionObserver(() => [div, img]);
       expect(Array.isArray(entries)).toBe(true);
       dispose();
     });
@@ -259,7 +259,7 @@ describe("createIntersectionObserver", () => {
   test("store is updated when IO fires", () => {
     createRoot(dispose => {
       const [els] = createSignal([div]);
-      const entries = createIntersectionObserver(els);
+      const [entries] = createIntersectionObserver(els);
       const instance = _getLastIOInstance();
 
       // flush() lets the deferred element effect run so div is actually observed
@@ -282,7 +282,7 @@ describe("createIntersectionObserver", () => {
 
   test("each element occupies its own store slot", () => {
     createRoot(dispose => {
-      const entries = createIntersectionObserver(() => [div, img]);
+      const [entries] = createIntersectionObserver(() => [div, img]);
       const instance = _getLastIOInstance();
 
       flush(); // let the element effect observe both elements
@@ -307,6 +307,29 @@ describe("createIntersectionObserver", () => {
       createIntersectionObserver(() => [div], options);
       const instance = _getLastIOInstance();
       expect(instance.options).toBe(options);
+      dispose();
+    });
+  });
+
+  test("isVisible throws before first observation, returns boolean after", () => {
+    createRoot(dispose => {
+      const [, isVisible] = createIntersectionObserver(() => [div]);
+      const instance = _getLastIOInstance();
+
+      flush(); // let the element effect observe div
+
+      expect(() => isVisible(div), "should throw NotReadyError before first IO").toThrow();
+
+      instance.__TEST__onChange({ isIntersecting: true });
+      flush();
+
+      expect(isVisible(div), "should return true after intersecting").toBe(true);
+
+      instance.__TEST__onChange({ isIntersecting: false });
+      flush();
+
+      expect(isVisible(div), "should return false when not intersecting").toBe(false);
+
       dispose();
     });
   });
@@ -533,6 +556,31 @@ describe("createViewportObserver", () => {
       dispose();
     });
   });
+
+  test("add(callback) returns a ref callback for JSX ref usage", () => {
+    createRoot(dispose => {
+      const [add, { instance }] = createViewportObserver();
+      let cbEntry: IntersectionObserverEntry | undefined;
+
+      // curried form: add(callback) → (el) => void — used as ref={add(e => ...)}
+      const refCb = add((e: IntersectionObserverEntry) => {
+        cbEntry = e;
+      });
+      refCb(div); // simulate JSX ref binding
+
+      expect(
+        (instance as IntersectionObserver).elements[0],
+        "element wasn't observed via ref callback",
+      ).toBe(div);
+
+      (instance as IntersectionObserver).__TEST__onChange({ isIntersecting: true });
+
+      expect(cbEntry?.target, "callback should fire with correct target").toBe(div);
+      expect(cbEntry?.isIntersecting).toBe(true);
+
+      dispose();
+    });
+  });
 });
 
 describe("createVisibilityObserver", () => {
@@ -568,15 +616,20 @@ describe("createVisibilityObserver", () => {
     });
   });
 
-  test("returns signal", () => {
+  test("returns signal — pending until first observation", () => {
     createRoot(dispose => {
       const isVisible = createVisibilityObserver(div);
 
-      expect(isVisible(), "signal doesn't return default initialValue").toBe(false);
+      expect(
+        () => isVisible(),
+        "should throw NotReadyError before first observation",
+      ).toThrow();
 
-      const isVisible2 = createVisibilityObserver(div, { initialValue: true });
+      const isVisibleFalse = createVisibilityObserver(div, { initialValue: false });
+      expect(isVisibleFalse(), "should return false with initialValue: false").toBe(false);
 
-      expect(isVisible2(), "signal doesn't return custom initialValue").toBe(true);
+      const isVisibleTrue = createVisibilityObserver(div, { initialValue: true });
+      expect(isVisibleTrue(), "should return true with initialValue: true").toBe(true);
 
       dispose();
     });
