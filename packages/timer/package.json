@@ -59,12 +59,12 @@
     "primitives"
   ],
   "peerDependencies": {
-    "@solidjs/web": "2.0.0-experimental.16",
-    "solid-js": "2.0.0-experimental.16"
+    "@solidjs/web": "2.0.0-beta.7",
+    "solid-js": "2.0.0-beta.7"
   },
   "typesVersions": {},
   "devDependencies": {
-    "@solidjs/web": "2.0.0-experimental.16",
-    "solid-js": "2.0.0-experimental.16"
+    "@solidjs/web": "2.0.0-beta.7",
+    "solid-js": "2.0.0-beta.7"
   }
 }
