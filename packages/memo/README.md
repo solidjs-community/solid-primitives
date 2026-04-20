@@ -156,7 +156,7 @@ The lazy memo, as it is implemented now, doesn't allow for setting a `equals` fu
 
 ### Not ownerless
 
-Lazy memos in Solid 2.0 will be ownerless — the reactive context of the callback will depend of the place of read, not creation.
+Lazy memos in Solid will be ownerless — the reactive context of the callback will depend of the place of read, not creation.
 
 This implementation will always execute it's callback with the context of owner it was created under. So ti won't work with [Suspense](https://www.solidjs.com/docs/latest/api#<suspense>) the way you might expect — meaning that it won't activate any Suspense that is below place of creation.
 
