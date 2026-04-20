@@ -307,6 +307,7 @@ export function createVisibilityObserver(
   // rawVisible tracks the actual observed value; NOT_SET means "first IO hasn't fired yet".
   const [rawVisible, setRawVisible] = createSignal<boolean | typeof NOT_SET>(
     options?.initialValue !== undefined ? options.initialValue : NOT_SET,
+    { ownedWrite: true },
   );
 
   // Plain accessor — reading rawVisible() inside a reactive scope is tracked normally.
