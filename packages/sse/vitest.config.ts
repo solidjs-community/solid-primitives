@@ -17,14 +17,14 @@ export default defineConfig(({ mode }) => {
       alias: {
         "solid-js/web": new URL(
           testSSR
-            ? "../../node_modules/.pnpm/@solidjs+web@2.0.0-experimental.16_solid-js@2.0.0-experimental.16/node_modules/@solidjs/web/dist/server.js"
-            : "../../node_modules/.pnpm/@solidjs+web@2.0.0-experimental.16_solid-js@2.0.0-experimental.16/node_modules/@solidjs/web/dist/web.js",
+            ? "../../node_modules/.pnpm/@solidjs+web@2.0.0-beta.7_@solidjs+signals@2.0.0-beta.7_solid-js@2.0.0-beta.7/node_modules/@solidjs/web/dist/server.js"
+            : "../../node_modules/.pnpm/@solidjs+web@2.0.0-beta.7_@solidjs+signals@2.0.0-beta.7_solid-js@2.0.0-beta.7/node_modules/@solidjs/web/dist/web.js",
           import.meta.url,
         ).pathname,
         "@solidjs/web": new URL(
           testSSR
-            ? "../../node_modules/.pnpm/@solidjs+web@2.0.0-experimental.16_solid-js@2.0.0-experimental.16/node_modules/@solidjs/web/dist/server.js"
-            : "../../node_modules/.pnpm/@solidjs+web@2.0.0-experimental.16_solid-js@2.0.0-experimental.16/node_modules/@solidjs/web/dist/web.js",
+            ? "../../node_modules/.pnpm/@solidjs+web@2.0.0-beta.7_@solidjs+signals@2.0.0-beta.7_solid-js@2.0.0-beta.7/node_modules/@solidjs/web/dist/server.js"
+            : "../../node_modules/.pnpm/@solidjs+web@2.0.0-beta.7_@solidjs+signals@2.0.0-beta.7_solid-js@2.0.0-beta.7/node_modules/@solidjs/web/dist/web.js",
           import.meta.url,
         ).pathname,
       },

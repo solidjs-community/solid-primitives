@@ -242,16 +242,21 @@ export const createSSE = <T = string>(
     };
   }
 
-  const [source, setSource] = createSignal<SSESourceHandle | undefined>(undefined);
+  const [source, setSource] = createSignal<SSESourceHandle | undefined>(undefined, {
+    ownedWrite: true,
+  });
 
   // rawData holds either the latest message value or the NOT_SET sentinel.
   const [rawData, setRawData] = createSignal<T | NotSet>(
     options.initialValue !== undefined ? options.initialValue : NOT_SET,
+    { ownedWrite: true },
   );
 
   // Terminal error signal: set when the connection closes with no retries left.
   // data() re-throws this so <Errored> can catch it — single error path.
-  const [terminalError, setTerminalError] = createSignal<Event | undefined>(undefined);
+  const [terminalError, setTerminalError] = createSignal<Event | undefined>(undefined, {
+    ownedWrite: true,
+  });
 
   // Computed data signal: throws terminal error (→ Errored boundary) or
   // NotReadyError (→ Loading boundary) when not ready.
@@ -263,7 +268,9 @@ export const createSSE = <T = string>(
     return val;
   });
 
-  const [readyState, setReadyState] = createSignal<SSEReadyStateValue>(SSEReadyState.CONNECTING);
+  const [readyState, setReadyState] = createSignal<SSEReadyStateValue>(SSEReadyState.CONNECTING, {
+    ownedWrite: true,
+  });
 
   const reconnectConfig: SSEReconnectOptions =
     options.reconnect === true
@@ -511,8 +518,10 @@ export const createSSEStream = <T = string>(
     };
   }
 
-  const [rawData, setRawData] = createSignal<T | NotSet>(NOT_SET);
-  const [terminalError, setTerminalError] = createSignal<Event | undefined>(undefined);
+  const [rawData, setRawData] = createSignal<T | NotSet>(NOT_SET, { ownedWrite: true });
+  const [terminalError, setTerminalError] = createSignal<Event | undefined>(undefined, {
+    ownedWrite: true,
+  });
 
   const [data] = createSignal<T>(() => {
     const err = terminalError();

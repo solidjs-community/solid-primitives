@@ -268,7 +268,7 @@ describe("createSSE", () => {
 
   it("reconnects when the URL signal changes and resets data to pending", () =>
     createRoot(dispose => {
-      const [url, setUrl] = createSignal("https://example.com/v1/events");
+      const [url, setUrl] = createSignal("https://example.com/v1/events", { ownedWrite: true });
       const { data, source } = createSSE(url);
       vi.advanceTimersByTime(20);
       flush();
