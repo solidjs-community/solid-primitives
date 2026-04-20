@@ -10,6 +10,7 @@
 
 A range of IntersectionObserver API utilities great for different types of use cases:
 
+- [`makeIntersectionObserver`](#makeintersectionobserver) - A non-reactive, imperative wrapper around the IntersectionObserver API.
 - [`createIntersectionObserver`](#createintersectionobserver) - A reactive observer primitive.
 - [`createViewportObserver`](#createviewportobserver) - More advanced tracker that creates a store of element signals.
 - [`createVisibilityObserver`](#createvisibilityobserver) - Basic visibility observer using a signal.
@@ -24,44 +25,100 @@ pnpm add @solid-primitives/intersection-observer
 yarn add @solid-primitives/intersection-observer
 ```
 
+## `makeIntersectionObserver`
+
+A non-reactive, imperative wrapper around the native IntersectionObserver API. Useful when you need full manual control over observation lifecycle without integrating into a Solid reactive scope.
+
+```ts
+import { makeIntersectionObserver } from "@solid-primitives/intersection-observer";
+
+const { add, remove, start, stop, reset, instance } = makeIntersectionObserver(
+  [el1, el2],
+  entries => {
+    entries.forEach(e => console.log(e.isIntersecting));
+  },
+  { threshold: 0.5 },
+);
+
+add(el3);
+remove(el1);
+stop(); // disconnects the observer
+```
+
+### Definition
+
+```ts
+function makeIntersectionObserver(
+  elements: Element[],
+  onChange: IntersectionObserverCallback,
+  options?: IntersectionObserverInit,
+): {
+  add: (el: Element) => void;
+  remove: (el: Element) => void;
+  start: () => void;
+  reset: () => void;
+  stop: () => void;
+  instance: IntersectionObserver;
+};
+```
+
 ## `createIntersectionObserver`
+
+Returns a tuple of:
+
+- A **store array** of `IntersectionObserverEntry` objects — one slot per element, updated in place when that element's intersection state changes. Reading `entries[i].isIntersecting` only re-runs the computation that reads slot `i`.
+- **`isVisible(el)`** — a pending-aware helper that throws `NotReadyError` until the first observation fires for that element, then returns `entry.isIntersecting` reactively. Integrates with `<Loading>` for a natural loading fallback.
 
 ```tsx
 import { createIntersectionObserver } from "@solid-primitives/intersection-observer";
 
-const [targets, setTargets] = createSignal<Element[]>([some_element]);
+const [targets, setTargets] = createSignal<Element[]>([]);
 
-createIntersectionObserver(els, entries => {
+const [entries, isVisible] = createIntersectionObserver(targets, { threshold: 0.5 });
+
+// entries — reactive store, fine-grained per-element tracking:
+createEffect(() => {
   entries.forEach(e => console.log(e.isIntersecting));
 });
 
+// isVisible — integrates with <Loading> for pending state:
+<Loading fallback={<p>Checking…</p>}>
+  <Show when={isVisible(el)}><p>Visible!</p></Show>
+</Loading>
+
 <div ref={el => setTargets(p => [...p, el])} />;
 ```
+
+`options` may be a reactive accessor — if the options object changes, the observer is disconnected and recreated with the new options, and all currently tracked elements are re-observed.
 
 ### Definition
 
 ```ts
 function createIntersectionObserver(
   elements: Accessor<Element[]>,
-  onChange: IntersectionObserverCallback,
-  options?: IntersectionObserverInit,
-): void;
+  options?: MaybeAccessor<IntersectionObserverInit>,
+): readonly [entries: readonly IntersectionObserverEntry[], isVisible: (el: Element) => boolean];
 ```
 
 ## `createViewportObserver`
 
 This primitive comes with a number of flexible options. You can specify a callback at the root with an array of elements or individual callbacks for individual elements.
 
+The `add` function has two forms:
+
+- `add(el, callback)` — imperative: register an element with its callback directly.
+- `add(callback)` — curried ref form: returns a `(el) => void` ref callback for use as `ref={add(e => ...)}` in JSX.
+
 ```tsx
 import { createViewportObserver } from '@solid-primitives/intersection-observer';
 
 // Basic usage:
 const [add, { remove, start, stop, instance }] = createViewportObserver(els, e => {...});
-add(el, e => console.log(e.isIntersecting))
+add(el, e => console.log(e.isIntersecting));
 
-// Directive usage:
-const [intersectionObserver] = createViewportObserver()
-<div use:intersectionObserver={(e) => console.log(e.isIntersecting)}></div>
+// Ref usage (replaces old use: directive):
+const [add] = createViewportObserver();
+<div ref={add(e => console.log(e.isIntersecting))}></div>
 ```
 
 ### Definition
@@ -83,63 +140,69 @@ function createViewportObserver(
 
 ## `createVisibilityObserver`
 
-Creates reactive signal that changes when a single element's visibility changes.
+Creates a reactive signal that changes when a single element's visibility changes. Takes the element to observe directly — the previous curried factory pattern has been removed.
 
-### How to use it
+The element may be a reactive accessor (`() => el`) or a plain DOM element. Passing a falsy accessor value removes the element from the observer.
 
-`createVisibilityObserver` takes a `IntersectionObserverInit` object as the first argument. Use it to set thresholds, margins, and other options.
-
-- `root` — The Element or Document whose bounds are used as the bounding box when testing for intersection.
-- `rootMargin` — A string which specifies a set of offsets to add to the root's bounding_box when calculating intersections, effectively shrinking or growing the root for calculation purposes.
-- `threshold` — Either a single number or an array of numbers between 0.0 and 1.0, specifying a ratio of intersection area to total bounding box area for the observed target.
-- `initialValue` — Initial value of the signal _(default: false)_
-
-It returns a configured _"use"_ function for creating a visibility signal for a single element. The passed element can be a **reactive signal** or a DOM element. Returning a falsy value will remove the element from the observer.
+When `initialValue` is omitted, `visible()` throws `NotReadyError` until the first `IntersectionObserver` callback fires — integrating naturally with `<Loading>` for a loading fallback:
 
 ```tsx
 import { createVisibilityObserver } from "@solid-primitives/intersection-observer";
 
 let el: HTMLDivElement | undefined;
 
-const useVisibilityObserver = createVisibilityObserver({ threshold: 0.8 });
+const visible = createVisibilityObserver(() => el, { threshold: 0.8 });
 
-// make sure that you pass the element reference in a thunk if it is undefined initially
-const visible = useVisibilityObserver(() => el);
-
-<div ref={el}>{visible() ? "Visible" : "Hidden"}</div>;
+// Pending until first IO fires — shows fallback in the meantime:
+<Loading fallback={<p>Checking…</p>}>
+  <Show when={visible()} fallback={<p>Hidden</p>}>
+    <p>Visible!</p>
+  </Show>
+</Loading>;
 ```
 
-You can use this shorthand when creating a visibility signal for a single element:
+Provide `initialValue` to opt out of the pending state and start with a known value:
 
 ```tsx
-let el: HTMLDivElement | undefined;
-
-const visible = createVisibilityObserver({ threshold: 0.8 })(() => el);
-
-<div ref={el}>{visible() ? "Visible" : "Hidden"}</div>;
+const visible = createVisibilityObserver(() => el, { initialValue: false });
+// visible() === false immediately, no pending state
+<div>{visible() ? "Visible" : "Hidden"}</div>;
 ```
+
+Options accepted in addition to `IntersectionObserverInit`:
+
+- `initialValue` — Opt-in initial value; when omitted, `visible()` throws `NotReadyError` until the first observation.
 
 ### Setter callback
 
-`createVisibilityObserver` takes a setter callback as the second argument. It is called when the element's intersection changes. The callback should return a boolean value indicating whether the element is visible — it'll be assigned to the signal.
+`createVisibilityObserver` accepts an optional setter callback as the third argument. It is called when the element's intersection changes and should return a boolean indicating whether the element is visible.
 
 ```ts
-const useVisibilityObserver = createVisibilityObserver({ threshold: 0.8 }, entry => {
-  // do some calculations on the intersection entry
-  return entry.isIntersecting;
-});
+let el: HTMLDivElement | undefined;
+
+const visible = createVisibilityObserver(
+  () => el,
+  { threshold: 0.8 },
+  entry => {
+    // do some calculations on the intersection entry
+    return entry.isIntersecting;
+  },
+);
 ```
 
 **Exported modifiers**
 
 #### `withOccurrence`
 
-It provides information about element occurrence in the viewport — `"Entering"`, `"Leaving"`, `"Inside"` or `"Outside"`.
+Provides information about element occurrence in the viewport — `"Entering"`, `"Leaving"`, `"Inside"` or `"Outside"`.
 
 ```tsx
 import { createVisibilityObserver, withOccurrence } from "@solid-primitives/intersection-observer";
 
-const useVisibilityObserver = createVisibilityObserver(
+let el: HTMLDivElement | undefined;
+
+const visible = createVisibilityObserver(
+  () => el,
   { threshold: 0.8 },
   withOccurrence((entry, { occurrence }) => {
     console.log(occurrence); // => "Entering" | "Leaving" | "Inside" | "Outside"
@@ -150,12 +213,15 @@ const useVisibilityObserver = createVisibilityObserver(
 
 #### `withDirection`
 
-It provides information about element direction on the screen — `"Left"`, `"Right"`, `"Top"`, `"Bottom"` or `"None"`.
+Provides information about element direction on the screen — `"Left"`, `"Right"`, `"Top"`, `"Bottom"` or `"None"`.
 
 ```ts
 import { createVisibilityObserver, withDirection } from "@solid-primitives/intersection-observer";
 
-const useVisibilityObserver = createVisibilityObserver(
+let el: HTMLDivElement | undefined;
+
+const visible = createVisibilityObserver(
+  () => el,
   { threshold: 0.8 },
   withDirection((entry, { directionY, directionX, visible }) => {
     if (!entry.isIntersecting && directionY === "Top" && visible) {
@@ -169,11 +235,11 @@ const useVisibilityObserver = createVisibilityObserver(
 ### Definition
 
 ```ts
-function createViewportObserver(
-  elements: MaybeAccessor<Element[]>,
-  callback: EntryCallback,
-  options?: IntersectionObserverInit,
-): CreateViewportObserverReturnValue;
+function createVisibilityObserver(
+  element: Accessor<Element | FalsyValue> | Element,
+  options?: IntersectionObserverInit & { initialValue?: boolean },
+  setter?: MaybeAccessor<VisibilitySetter>,
+): Accessor<boolean>;
 ```
 
 ## Demo
