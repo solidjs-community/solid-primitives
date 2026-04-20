@@ -65,6 +65,7 @@ function makeIntersectionObserver(
 ## `createIntersectionObserver`
 
 Returns a tuple of:
+
 - A **store array** of `IntersectionObserverEntry` objects — one slot per element, updated in place when that element's intersection state changes. Reading `entries[i].isIntersecting` only re-runs the computation that reads slot `i`.
 - **`isVisible(el)`** — a pending-aware helper that throws `NotReadyError` until the first observation fires for that element, then returns `entry.isIntersecting` reactively. Integrates with `<Loading>` for a natural loading fallback.
 
@@ -96,10 +97,7 @@ createEffect(() => {
 function createIntersectionObserver(
   elements: Accessor<Element[]>,
   options?: MaybeAccessor<IntersectionObserverInit>,
-): readonly [
-  entries: readonly IntersectionObserverEntry[],
-  isVisible: (el: Element) => boolean,
-];
+): readonly [entries: readonly IntersectionObserverEntry[], isVisible: (el: Element) => boolean];
 ```
 
 ## `createViewportObserver`
@@ -107,6 +105,7 @@ function createIntersectionObserver(
 This primitive comes with a number of flexible options. You can specify a callback at the root with an array of elements or individual callbacks for individual elements.
 
 The `add` function has two forms:
+
 - `add(el, callback)` — imperative: register an element with its callback directly.
 - `add(callback)` — curried ref form: returns a `(el) => void` ref callback for use as `ref={add(e => ...)}` in JSX.
 
@@ -159,7 +158,7 @@ const visible = createVisibilityObserver(() => el, { threshold: 0.8 });
   <Show when={visible()} fallback={<p>Hidden</p>}>
     <p>Visible!</p>
   </Show>
-</Loading>
+</Loading>;
 ```
 
 Provide `initialValue` to opt out of the pending state and start with a known value:
@@ -167,7 +166,7 @@ Provide `initialValue` to opt out of the pending state and start with a known va
 ```tsx
 const visible = createVisibilityObserver(() => el, { initialValue: false });
 // visible() === false immediately, no pending state
-<div>{visible() ? "Visible" : "Hidden"}</div>
+<div>{visible() ? "Visible" : "Hidden"}</div>;
 ```
 
 Options accepted in addition to `IntersectionObserverInit`:
