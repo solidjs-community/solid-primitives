@@ -8,10 +8,12 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/sse?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/sse)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-2.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Primitives for [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) using the browser's built-in `EventSource` API.
+Primitives for [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) using the browser's built-in `EventSource` API. Designed for Solid 2.0's async reactivity model.
 
 - [`makeSSE`](#makesse) — Base non-reactive primitive. Creates an `EventSource` and returns a cleanup function. No Solid lifecycle.
-- [`createSSE`](#createsse) — Reactive primitive. Accepts a reactive URL, integrates with Solid's owner lifecycle, and returns signals for `data`, `error`, and `readyState`.
+- [`createSSE`](#createsse) — Reactive primitive. Accepts a reactive URL, integrates with Solid's owner lifecycle, and returns signals for `data` and `readyState`.
+- [`makeSSEAsyncIterable`](#makesseasynciterable) — Wraps an SSE endpoint as an `AsyncIterable<T>`. Non-reactive foundation.
+- [`createSSEStream`](#createssesstream) — Minimal reactive stream: just a `data` accessor backed by an async iterable.
 - [`makeSSEWorker`](#running-sse-in-a-worker) — Runs the SSE connection inside a Web Worker or SharedWorker.
 - [Built-in transformers](#built-in-transformers) — `json`, `ndjson`, `lines`, `number`, `safe`, `pipe`.
 
@@ -70,42 +72,87 @@ Reactive SSE primitive. Connects on creation, closes when the owner is disposed,
 ```ts
 import { createSSE, SSEReadyState } from "@solid-primitives/sse";
 
-const { data, readyState, error, close, reconnect } = createSSE<{ message: string }>(
+const { data, readyState, close, reconnect } = createSSE<{ message: string }>(
   "https://api.example.com/events",
   {
     transform: JSON.parse,
     reconnect: { retries: 3, delay: 2000 },
   },
 );
+```
+
+### Loading and error boundaries
+
+`data()` integrates with Solid 2.0's async reactivity:
+
+- **`<Loading>`** — shows fallback while `data()` is pending (before the first message arrives).
+- **`<Errored>`** — catches terminal errors (connection CLOSED with no retries left) thrown through `data()`.
+
+```tsx
+import { Loading, Errored } from "solid-js";
+import { createSSE } from "@solid-primitives/sse";
+
+const { data, close, reconnect } = createSSE<{ message: string }>(
+  "https://api.example.com/events",
+  { transform: JSON.parse },
+);
 
 return (
-  <div>
-    <Show when={readyState() === SSEReadyState.OPEN} fallback={<p>Connecting…</p>}>
-      <p>Latest: {data()?.message ?? "—"}</p>
-    </Show>
-    <Show when={error()}>
-      <p style="color:red">Connection error</p>
-    </Show>
-    <button onClick={close}>Disconnect</button>
-    <button onClick={reconnect}>Reconnect</button>
-  </div>
+  <Errored fallback={err => <p style="color:red">Connection failed</p>}>
+    <Loading fallback={<p>Connecting…</p>}>
+      <p>Latest: {data().message}</p>
+    </Loading>
+  </Errored>
 );
 ```
 
-### Reactive URL
+Non-terminal errors (while the browser is reconnecting automatically) are surfaced via the `onError` callback only — they don't interrupt the reactive graph.
 
-When the URL is a signal accessor, the connection is replaced whenever the URL changes:
+### Stale-while-revalidating with `isPending`
 
-```ts
+After the first message has arrived, subsequent reconnects (URL change, `reconnect()` call) put the connection back into a pending state. Use `isPending` from Solid to show a subtle "refreshing" indicator without replacing the whole subtree:
+
+```tsx
+import { isPending } from "solid-js";
+import { createSSE } from "@solid-primitives/sse";
+
+const { data } = createSSE<{ msg: string }>(url, { transform: JSON.parse });
+
+return (
+  <>
+    <Show when={isPending(() => data())}>
+      <p>Refreshing…</p>
+    </Show>
+    <Loading fallback={<p>Connecting…</p>}>
+      <p>{data().msg}</p>
+    </Loading>
+  </>
+);
+```
+
+> **Note:** `isPending` is `false` during the initial `<Loading>` fallback (no stale value yet). It becomes `true` only when a stale value exists and new data is pending — i.e., after a URL change or reconnect.
+
+### Reactive URL with `<Loading on=…>`
+
+When the URL is a signal accessor, the connection is replaced whenever the URL changes. Use `<Loading>`'s `on` prop to re-show the fallback on each URL change:
+
+```tsx
 const [userId, setUserId] = createSignal("user-1");
 
 const { data } = createSSE<Notification>(
   () => `https://api.example.com/notifications/${userId()}`,
   { transform: JSON.parse },
 );
+
+return (
+  // on={userId()} re-shows the fallback each time userId changes while pending
+  <Loading on={userId()} fallback={<p>Connecting…</p>}>
+    <p>{data().message}</p>
+  </Loading>
+);
 ```
 
-Changing `userId()` will close the existing connection and open a new one to the updated URL.
+Without `on`, `<Loading>` keeps showing stale content during revalidation. With `on`, it re-shows the fallback whenever the key changes and a new connection is establishing.
 
 ### Options
 
@@ -114,7 +161,7 @@ Changing `userId()` will close the existing connection and open a new one to the
 | `withCredentials` | `boolean`                                   | `false`     | Send credentials with the request        |
 | `onOpen`          | `(e: Event) => void`                        | —           | Called when the connection opens         |
 | `onMessage`       | `(e: MessageEvent) => void`                 | —           | Called on each unnamed `message` event   |
-| `onError`         | `(e: Event) => void`                        | —           | Called on error                          |
+| `onError`         | `(e: Event) => void`                        | —           | Called on error (terminal and transient) |
 | `events`          | `Record<string, (e: MessageEvent) => void>` | —           | Handlers for named SSE event types       |
 | `initialValue`    | `T`                                         | `undefined` | Initial value of the `data` signal       |
 | `transform`       | `(raw: string) => T`                        | identity    | Parse raw string data, e.g. `JSON.parse` |
@@ -129,14 +176,22 @@ Changing `userId()` will close the existing connection and open a new one to the
 
 ### Return value
 
-| Property     | Type                                     | Description                                      |
-| ------------ | ---------------------------------------- | ------------------------------------------------ |
-| `source`     | `Accessor<SSESourceHandle \| undefined>` | Underlying source instance; `undefined` on SSR   |
-| `data`       | `Accessor<T \| undefined>`               | Latest message data                              |
-| `error`      | `Accessor<Event \| undefined>`           | Latest error event                               |
-| `readyState` | `Accessor<SSEReadyState>`                | `SSEReadyState.CONNECTING` / `.OPEN` / `.CLOSED` |
-| `close`      | `VoidFunction`                           | Close the connection                             |
-| `reconnect`  | `VoidFunction`                           | Force-close and reopen                           |
+| Property     | Type                                     | Description                                                                              |
+| ------------ | ---------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `source`     | `Accessor<SSESourceHandle \| undefined>` | Underlying source instance; `undefined` on SSR                                           |
+| `data`       | `Accessor<T>`                            | Latest message data; throws `NotReadyError` until first message, terminal errors thereafter |
+| `readyState` | `Accessor<SSEReadyState>`                | `SSEReadyState.CONNECTING` / `.OPEN` / `.CLOSED`                                         |
+| `close`      | `VoidFunction`                           | Close the connection                                                                     |
+| `reconnect`  | `VoidFunction`                           | Force-close and reopen; resets `data` to pending                                         |
+
+### Initial value
+
+Provide `initialValue` to skip the pending state entirely — `data()` returns it immediately with no `<Loading>` fallback needed:
+
+```ts
+const { data } = createSSE(url, { initialValue: [] as string[] });
+// data() === []  immediately, no Loading needed
+```
 
 ### `SSEReadyState`
 
@@ -153,6 +208,80 @@ SSEReadyState.CLOSED; // 2
 ### A note on reconnection
 
 `EventSource` has native browser-level reconnection built in. For transient network drops the browser automatically retries. The `reconnect` option in `createSSE` is for _application-level_ reconnection — it fires only when `readyState` becomes `SSEReadyState.CLOSED`, meaning the browser has given up entirely. You generally do not need `reconnect: true` for normal usage.
+
+## `makeSSEAsyncIterable`
+
+Wraps an SSE endpoint as a standard `AsyncIterable<T>`. Each SSE message becomes one yielded value; terminal errors (connection CLOSED) are thrown by the iterator. Cleanup runs automatically when the iterator is abandoned via `return()`.
+
+Use this as a non-reactive building block: integrate it with a `for await…of` loop, pass it to your own `createMemo`, or compose it with other async utilities.
+
+```ts
+import { makeSSEAsyncIterable } from "@solid-primitives/sse";
+
+const iterable = makeSSEAsyncIterable<string>("https://api.example.com/events");
+
+for await (const msg of iterable) {
+  console.log(msg);
+}
+```
+
+### Definition
+
+```ts
+function makeSSEAsyncIterable<T = string>(
+  url: string | URL,
+  options?: CreateSSEStreamOptions<T>,
+): AsyncIterable<T>;
+
+type CreateSSEStreamOptions<T> = {
+  withCredentials?: boolean;
+  onOpen?: (event: Event) => void;
+  onError?: (event: Event) => void;
+  transform?: (raw: string) => T;
+  events?: Record<string, (event: MessageEvent) => void>;
+  source?: SSESourceFn;
+};
+```
+
+## `createSSEStream`
+
+A minimal reactive alternative to `createSSE` that returns only a `data` accessor. Internally it drives an `AsyncIterable` produced by `makeSSEAsyncIterable`, giving the same `<Loading>` / `<Errored>` integration with less API surface.
+
+Use this when you only need the stream values and don't need access to `source`, `readyState`, `close`, or `reconnect`.
+
+```ts
+import { createSSEStream } from "@solid-primitives/sse";
+
+const data = createSSEStream<{ msg: string }>(url, { transform: JSON.parse });
+
+return (
+  <Errored fallback={err => <p>Connection failed</p>}>
+    <Loading fallback={<p>Connecting…</p>}>
+      <p>{data().msg}</p>
+    </Loading>
+  </Errored>
+);
+```
+
+Reactive URL is supported — the stream reconnects automatically when the URL signal changes:
+
+```ts
+const [userId, setUserId] = createSignal("user-1");
+
+const data = createSSEStream<Notification>(
+  () => `https://api.example.com/notifications/${userId()}`,
+  { transform: JSON.parse },
+);
+```
+
+### Definition
+
+```ts
+function createSSEStream<T = string>(
+  url: MaybeAccessor<string>,
+  options?: CreateSSEStreamOptions<T>,
+): Accessor<T>;
+```
 
 ## Integration with `@solid-primitives/event-bus`
 
@@ -214,7 +343,7 @@ return <For each={messages}>{msg => <p>{msg}</p>}</For>;
 
 ## Built-in transformers
 
-Ready-made `transform` functions for the most common SSE data formats. Pass one as the `transform` option to `createSSE`:
+Ready-made `transform` functions for the most common SSE data formats. Pass one as the `transform` option to `createSSE` or `createSSEStream`:
 
 ```ts
 import { createSSE, json } from "@solid-primitives/sse";
@@ -357,7 +486,7 @@ const worker = new Worker(new URL("@solid-primitives/sse/worker-handler", import
   type: "module",
 });
 
-const { data, readyState, error, close, reconnect } = createSSE<{ msg: string }>(
+const { data, readyState, close, reconnect } = createSSE<{ msg: string }>(
   "https://api.example.com/events",
   {
     source: makeSSEWorker(worker),

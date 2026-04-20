@@ -1,6 +1,8 @@
 export {
   makeSSE,
   createSSE,
+  makeSSEAsyncIterable,
+  createSSEStream,
   SSEReadyState,
   type SSEOptions,
   type SSEReconnectOptions,
@@ -9,12 +11,13 @@ export {
   type SSEReadyStateValue,
   type CreateSSEOptions,
   type SSEReturn,
+  type CreateSSEStreamOptions,
 } from "./sse.js";
 
 export { json, ndjson, lines, number, safe, pipe } from "./transform.js";
 
-// Re-export Solid 2.0 async primitives commonly used with createSSE:
-// - isPending(data) — true while awaiting the first SSE message
+// Re-export Solid 2.0 async primitives commonly used with SSE primitives:
+// - isPending(() => data()) — true during stale-while-revalidating (not initial load)
 // - onSettled(() => ...) — runs when the first message arrives
-// - NotReadyError — thrown by data() while pending (caught by <Suspense>)
+// - NotReadyError — thrown by data() while pending (caught by <Loading>)
 export { isPending, onSettled, NotReadyError } from "solid-js";

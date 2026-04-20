@@ -33,7 +33,13 @@ export type SSEOptions = {
   onOpen?: (event: Event) => void;
   /** Called on every unnamed `"message"` event */
   onMessage?: (event: MessageEvent) => void;
-  /** Called on error */
+  /**
+   * Called on error. For non-terminal errors (browser is reconnecting,
+   * `readyState` is still `CONNECTING`) this is purely informational.
+   * For terminal errors (`readyState` is `CLOSED` with no retries left),
+   * the error also propagates through the reactive graph so `<Errored>`
+   * can catch it without any extra wiring.
+   */
   onError?: (event: Event) => void;
   /** Handlers for custom named SSE event types, e.g. `{ update: handler }` */
   events?: Record<string, (event: MessageEvent) => void>;
@@ -71,7 +77,7 @@ export type CreateSSEOptions<T> = SSEOptions & {
    *
    * When provided, `data()` returns this value immediately (no pending state).
    * When omitted, `data()` throws `NotReadyError` until the first message
-   * arrives, integrating with Solid's `<Suspense>` for a loading fallback.
+   * arrives, integrating with Solid's `<Loading>` for a loading fallback.
    */
   initialValue?: T;
   /**
@@ -105,16 +111,18 @@ export type SSEReturn<T> = {
    * The latest message data, parsed through `transform` if provided.
    *
    * **Pending until the first message arrives** (unless `initialValue` is set).
-   * Reading this inside a component wrapped with `<Suspense>` will show the
+   * Reading this inside a component wrapped with `<Loading>` will show the
    * fallback while the connection is establishing. After the first message the
    * signal updates reactively on every subsequent message.
    *
-   * Use `pending()` to check the pending state imperatively, and
-   * `onSettled(() => ...)` to react when the first value arrives.
+   * For stale-while-revalidating UI (after reconnect or URL change), use
+   * `isPending(() => data())` — it is `false` during initial load (handled by
+   * `<Loading>`) and `true` only once a stale value exists and new data is pending.
+   *
+   * Terminal errors (connection CLOSED with no retries left) are thrown through
+   * `data()` so `<Errored>` can catch them without any extra wiring.
    */
-  data: Accessor<T | undefined>;
-  /** The latest error event, `undefined` when no error has occurred. */
-  error: Accessor<Event | undefined>;
+  data: Accessor<T>;
   /**
    * The current connection state. Use `SSEReadyState` for named comparisons:
    * - `SSEReadyState.CONNECTING` (0)
@@ -122,14 +130,7 @@ export type SSEReturn<T> = {
    * - `SSEReadyState.CLOSED` (2)
    */
   readyState: Accessor<SSEReadyStateValue>;
-  /**
-   * `true` until the first message arrives (or after `reconnect()` / URL
-   * change until the next message). Use this for imperative pending checks;
-   * use `<Suspense>` for declarative loading UI (it catches the `NotReadyError`
-   * that `data()` throws while pending).
-   */
-  pending: Accessor<boolean>;
-  /** Close the connection. Resets `data` to pending on the next `reconnect()`. */
+  /** Close the connection. */
   close: VoidFunction;
   /**
    * Force-close the current connection and open a new one.
@@ -139,7 +140,7 @@ export type SSEReturn<T> = {
 };
 
 // Internal sentinel marking "no message received yet". When rawData holds this
-// value, the data accessor throws NotReadyError so Solid's Suspense boundary
+// value, the data accessor throws NotReadyError so Solid's Loading boundary
 // can show a fallback while the connection is establishing.
 const NOT_SET: unique symbol = Symbol();
 type NotSet = typeof NOT_SET;
@@ -191,27 +192,31 @@ export const makeSSE = (
 
 /**
  * Creates a reactive SSE (Server-Sent Events) connection that integrates with
- * Solid async reactivity system and owner lifecycle.
+ * Solid's async reactivity system and owner lifecycle.
  *
  * - `data` is **pending** (throws `NotReadyError`) until the first message
- *   arrives, enabling `<Suspense>` to show a loading fallback. Provide
+ *   arrives, enabling `<Loading>` to show a loading fallback. Provide
  *   `initialValue` to start with a settled value instead.
+ * - Terminal errors (CLOSED with no retries) are thrown through `data()` so
+ *   `<Errored>` can catch them. Non-terminal errors call `onError` only.
  * - Accepts a reactive URL — reconnects automatically when the URL signal
  *   changes, resetting `data` to pending.
  * - Closes the connection on owner disposal via `onCleanup`.
  * - SSR-safe: returns static stubs on the server.
  *
  * ```ts
- * const { data, readyState, error, close, reconnect } = createSSE<{ msg: string }>(
+ * const { data, readyState, close, reconnect } = createSSE<{ msg: string }>(
  *   "https://api.example.com/events",
  *   { transform: JSON.parse, reconnect: { retries: 3, delay: 2000 } },
  * );
  *
- * // In JSX — Suspense shows fallback while connecting:
+ * // In JSX — Loading shows fallback while connecting, Errored catches terminal failures:
  * return (
- *   <Suspense fallback={<p>Connecting…</p>}>
- *     <p>{data()?.msg}</p>
- *   </Suspense>
+ *   <Errored fallback={err => <p>Connection failed</p>}>
+ *     <Loading fallback={<p>Connecting…</p>}>
+ *       <p>{data()?.msg}</p>
+ *     </Loading>
+ *   </Errored>
  * );
  * ```
  *
@@ -222,49 +227,43 @@ export const createSSE = <T = string>(
   url: MaybeAccessor<string>,
   options: CreateSSEOptions<T> = {},
 ): SSEReturn<T> => {
-  // ── SSR stub ──────────────────────────────────────────────────────────────
   if (isServer) {
     return {
       source: () => undefined,
-      data: () => options.initialValue,
-      error: () => undefined,
+      data:
+        options.initialValue !== undefined
+          ? () => options.initialValue!
+          : () => {
+              throw new NotReadyError("SSE awaiting first message");
+            },
       readyState: () => SSEReadyState.CLOSED,
-      pending: () => options.initialValue === undefined,
       close: () => void 0,
       reconnect: () => void 0,
     };
   }
 
-  // ── Reactive state ────────────────────────────────────────────────────────
   const [source, setSource] = createSignal<SSESourceHandle | undefined>(undefined);
 
   // rawData holds either the latest message value or the NOT_SET sentinel.
-  // The cast to `Exclude<T, Function> | typeof NOT_SET` selects overload 2 of
-  // createSignal (plain value, not compute function). NOT_SET is a unique symbol
-  // so it's never a Function; for initialValue, SSE data types are never functions.
   const [rawData, setRawData] = createSignal<T | NotSet>(
-    (options.initialValue !== undefined ? options.initialValue : NOT_SET) as
-      | Exclude<T, Function>
-      | typeof NOT_SET,
+    options.initialValue !== undefined ? options.initialValue : NOT_SET,
   );
 
-  // A computed signal: throws NotReadyError when rawData is NOT_SET so that
-  // <Suspense> shows a fallback while awaiting the first message. After the
-  // first message it updates reactively on every subsequent message.
-  const [data] = createSignal<T | undefined>(() => {
+  // Terminal error signal: set when the connection closes with no retries left.
+  // data() re-throws this so <Errored> can catch it — single error path.
+  const [terminalError, setTerminalError] = createSignal<Event | undefined>(undefined);
+
+  // Computed data signal: throws terminal error (→ Errored boundary) or
+  // NotReadyError (→ Loading boundary) when not ready.
+  const [data] = createSignal<T>(() => {
+    const err = terminalError();
+    if (err !== undefined) throw err;
     const val = rawData();
     if (val === NOT_SET) throw new NotReadyError("SSE awaiting first message");
-    return val as T | undefined;
+    return val;
   });
 
-  const [error, setError] = createSignal<Event | undefined>(undefined);
   const [readyState, setReadyState] = createSignal<SSEReadyStateValue>(SSEReadyState.CONNECTING);
-
-  // Explicit pending flag — true until the first message arrives (or after
-  // reconnect). The `data` computed throws NotReadyError for <Suspense>, but
-  // Solid isPending() can't detect the initial STATUS_UNINITIALIZED
-  // state, so we expose this for imperative checks.
-  const [pending, setPending] = createSignal(options.initialValue === undefined);
 
   const reconnectConfig: SSEReconnectOptions =
     options.reconnect === true
@@ -283,12 +282,12 @@ export const createSSE = <T = string>(
     }
   };
 
-  // ── Connection management ─────────────────────────────────────────────────
   let currentCleanup: VoidFunction | undefined;
 
-  /** Open a fresh connection, resetting the retry counter. */
+  /** Open a fresh connection, resetting the retry counter and terminal error. */
   const connect = (resolvedUrl: string) => {
     retriesLeft = reconnectConfig.retries ?? 0;
+    setTerminalError(undefined);
     _open(resolvedUrl);
   };
 
@@ -298,28 +297,29 @@ export const createSSE = <T = string>(
 
     const handleOpen = (e: Event) => {
       setReadyState(SSEReadyState.OPEN);
-      setError(undefined);
       options.onOpen?.(e);
     };
 
     const handleMessage = (e: MessageEvent) => {
       const value = options.transform ? options.transform(e.data as string) : (e.data as T);
       setRawData(() => value);
-      setPending(false);
       options.onMessage?.(e);
     };
 
     const handleError = (e: Event) => {
       const es = e.target as SSESourceHandle;
       setReadyState(es.readyState as SSEReadyStateValue);
-      setError(() => e);
       options.onError?.(e);
 
-      // Only app-level reconnect when the browser has given up (CLOSED).
-      // When readyState is still CONNECTING the browser is handling retries.
-      if (es.readyState === SSEReadyState.CLOSED && retriesLeft > 0) {
-        retriesLeft--;
-        reconnectTimer = setTimeout(() => _open(resolvedUrl), reconnectConfig.delay ?? 3000);
+      if (es.readyState === SSEReadyState.CLOSED) {
+        if (retriesLeft > 0) {
+          // Browser gave up but we have retries: schedule app-level reconnect.
+          retriesLeft--;
+          reconnectTimer = setTimeout(() => _open(resolvedUrl), reconnectConfig.delay ?? 3000);
+        } else {
+          // Terminal: no more retries — propagate through Errored boundary.
+          setTerminalError(() => e);
+        }
       }
     };
 
@@ -349,9 +349,8 @@ export const createSSE = <T = string>(
   const reconnect = () => {
     const currentUrl = untrack(() => access(url));
     close();
-    // Reset to pending so Suspense shows a fallback during reconnect.
     setRawData(NOT_SET);
-    setPending(true);
+    setTerminalError(undefined);
     connect(currentUrl);
   };
 
@@ -369,9 +368,8 @@ export const createSSE = <T = string>(
         untrack(() => {
           currentCleanup?.();
           currentCleanup = undefined;
-          // Reset to pending — new connection, new loading state.
           setRawData(NOT_SET);
-          setPending(true);
+          setTerminalError(undefined);
           connect(resolvedUrl);
         });
       }
@@ -384,5 +382,191 @@ export const createSSE = <T = string>(
     currentCleanup = undefined;
   });
 
-  return { source, data, error, readyState, pending, close, reconnect };
+  return { source, data, readyState, close, reconnect };
+};
+
+/** Options for `makeSSEAsyncIterable` and `createSSEStream`. */
+export type CreateSSEStreamOptions<T> = SSEOptions & {
+  /** Transform raw string data from each message event. */
+  transform?: (raw: string) => T;
+  /** Custom source factory (defaults to `makeSSE`). */
+  source?: SSESourceFn;
+};
+
+/**
+ * Wraps an SSE endpoint as an `AsyncIterable<T>`. Each SSE message becomes
+ * one yielded value. Terminal errors (connection CLOSED) are thrown by the
+ * iterator. Cleanup (closing the `EventSource`) runs automatically when the
+ * iterator is abandoned via `return()`.
+ *
+ * This is the non-reactive foundation primitive. Use `createSSEStream` if you
+ * want Solid reactivity, or pass this directly to a `createMemo` that accepts
+ * async iterables.
+ *
+ * ```ts
+ * const iterable = makeSSEAsyncIterable<string>("https://api.example.com/events");
+ * for await (const msg of iterable) {
+ *   console.log(msg);
+ * }
+ * ```
+ *
+ * @param url The SSE endpoint URL
+ * @param options Event handlers and transform
+ */
+export const makeSSEAsyncIterable = <T = string>(
+  url: string | URL,
+  options: CreateSSEStreamOptions<T> = {},
+): AsyncIterable<T> => ({
+  [Symbol.asyncIterator](): AsyncIterator<T> {
+    const queue: T[] = [];
+    let notify: (() => void) | undefined;
+    let done = false;
+    let terminalErr: Event | undefined;
+
+    const sourceFn: SSESourceFn = options.source ?? makeSSE;
+    const [, cleanup] = sourceFn(String(url), {
+      withCredentials: options.withCredentials,
+      onOpen: options.onOpen,
+      onError: (e: Event) => {
+        const es = e.target as SSESourceHandle;
+        if (es.readyState === SSEReadyState.CLOSED) {
+          terminalErr = e;
+          done = true;
+          notify?.();
+          notify = undefined;
+        }
+        options.onError?.(e);
+      },
+      onMessage: (e: MessageEvent) => {
+        const value = options.transform ? options.transform(e.data as string) : (e.data as T);
+        queue.push(value);
+        notify?.();
+        notify = undefined;
+      },
+      events: options.events,
+    });
+
+    return {
+      async next(): Promise<IteratorResult<T>> {
+        while (!done && queue.length === 0) {
+          await new Promise<void>(r => {
+            notify = r;
+          });
+        }
+        if (queue.length > 0) return { value: queue.shift()!, done: false };
+        if (terminalErr) throw terminalErr;
+        return { value: undefined as unknown as T, done: true };
+      },
+      return(): Promise<IteratorResult<T>> {
+        done = true;
+        notify?.();
+        notify = undefined;
+        cleanup();
+        return Promise.resolve({ value: undefined as unknown as T, done: true });
+      },
+      throw(err?: unknown): Promise<IteratorResult<T>> {
+        done = true;
+        cleanup();
+        return Promise.reject(err);
+      },
+    };
+  },
+});
+
+/**
+ * Creates a reactive SSE stream using Solid's async computation model.
+ * Returns a single `Accessor<T>` backed by an `AsyncIterable` of SSE data values.
+ *
+ * Compared to `createSSE`, this is a minimal API: no `source`, `readyState`,
+ * `close`, or `reconnect` — just the data stream. Use it when you only need
+ * the values and want the simplest possible integration with `<Loading>`.
+ *
+ * - Suspends (`<Loading>`) until the first message arrives.
+ * - Reactively reconnects when `url` changes (closes old iterator, starts new one).
+ * - Terminal errors propagate through the accessor to `<Errored>`.
+ * - Owner disposal closes the underlying `EventSource` via `onCleanup`.
+ *
+ * ```ts
+ * const data = createSSEStream<{ msg: string }>(url, { transform: JSON.parse });
+ *
+ * return (
+ *   <Errored fallback={err => <p>Connection failed</p>}>
+ *     <Loading fallback={<p>Connecting…</p>}>
+ *       <p>{data().msg}</p>
+ *     </Loading>
+ *   </Errored>
+ * );
+ * ```
+ *
+ * @param url Static URL string or reactive `Accessor<string>`
+ * @param options Transform and event handler options
+ */
+export const createSSEStream = <T = string>(
+  url: MaybeAccessor<string>,
+  options: CreateSSEStreamOptions<T> = {},
+): Accessor<T> => {
+  if (isServer) {
+    return () => {
+      throw new NotReadyError("SSE not available on server");
+    };
+  }
+
+  const [rawData, setRawData] = createSignal<T | NotSet>(NOT_SET);
+  const [terminalError, setTerminalError] = createSignal<Event | undefined>(undefined);
+
+  const [data] = createSignal<T>(() => {
+    const err = terminalError();
+    if (err !== undefined) throw err;
+    const val = rawData();
+    if (val === NOT_SET) throw new NotReadyError("SSE stream awaiting first message");
+    return val;
+  });
+
+  let currentReturn: (() => void) | undefined;
+
+  const startStream = (resolvedUrl: string) => {
+    const iter = makeSSEAsyncIterable<T>(resolvedUrl, options)[Symbol.asyncIterator]();
+    currentReturn = () => {
+      iter.return?.();
+    };
+
+    const consume = async () => {
+      try {
+        let result = await iter.next();
+        while (!result.done) {
+          setRawData(() => result.value);
+          result = await iter.next();
+        }
+      } catch (e) {
+        setTerminalError(() => e as Event);
+      }
+    };
+    void consume();
+  };
+
+  startStream(untrack(() => access(url)));
+
+  if (typeof url === "function") {
+    let prevUrl = untrack(url);
+    createTrackedEffect(() => {
+      const resolvedUrl = (url as Accessor<string>)();
+      if (resolvedUrl !== prevUrl) {
+        prevUrl = resolvedUrl;
+        untrack(() => {
+          currentReturn?.();
+          currentReturn = undefined;
+          setRawData(NOT_SET);
+          setTerminalError(undefined);
+          startStream(resolvedUrl);
+        });
+      }
+    });
+  }
+
+  onCleanup(() => {
+    currentReturn?.();
+    currentReturn = undefined;
+  });
+
+  return data;
 };
