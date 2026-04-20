@@ -1,6 +1,9 @@
-import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
-import { isServer } from "@solidjs/web";
+import { type Accessor, createEffect, createSignal, NotReadyError, onCleanup } from "solid-js";
+import { isServer } from "solid-js/web";
 import { access, noop } from "@solid-primitives/utils";
+
+// Sentinel for the "audio not yet loaded" pending state.
+const NOT_SET: unique symbol = Symbol();
 
 export type AudioSource = string | undefined | MediaProvider;
 
@@ -23,6 +26,11 @@ export type AudioReturn = {
   volume: Accessor<number>;
   setVolume: (v: number) => void;
   currentTime: Accessor<number>;
+  /**
+   * Throws `NotReadyError` until the audio metadata has loaded (integrates with
+   * `<Loading>`). After the first `loadeddata` event, returns the duration in
+   * seconds reactively. Resets to pending whenever the source changes.
+   */
   duration: Accessor<number>;
   seek: (time: number) => void;
 };
@@ -127,8 +135,8 @@ export const makeAudioPlayer = (
  * A reactive audio primitive.
  *
  * Returns a flat object with writable derived signals for `playing` and `volume`,
- * a reactive `currentTime`, and an async `duration` that suspends until the audio
- * is loaded (integrates with `<Suspense>` / `<Loading>`).
+ * a reactive `currentTime`, and a `duration` that throws `NotReadyError` until the
+ * audio metadata loads — integrating with `<Loading>` for a natural pending state.
  *
  * @param src Audio file path, MediaProvider, or a reactive accessor returning either
  *
@@ -142,9 +150,13 @@ export const makeAudioPlayer = (
  * audio.setPlaying(true) // plays
  * audio.volume()         // 0–1
  * audio.setVolume(0.5)
- * audio.duration()       // suspends until loaded
  * audio.currentTime()
  * audio.seek(30)
+ *
+ * // duration() throws NotReadyError until metadata loads:
+ * <Loading fallback={<p>Loading...</p>}>
+ *   <p>{audio.duration()}s</p>
+ * </Loading>
  * ```
  */
 export const createAudio = (src: AudioSource | Accessor<AudioSource>): AudioReturn => {
@@ -154,7 +166,9 @@ export const createAudio = (src: AudioSource | Accessor<AudioSource>): AudioRetu
       playing: () => false,
       volume: () => 1,
       currentTime: () => 0,
-      duration: () => 0,
+      duration: () => {
+        throw new NotReadyError("Audio duration not available on the server");
+      },
       setPlaying: noop,
       setVolume: noop,
       seek: noop,
@@ -167,25 +181,34 @@ export const createAudio = (src: AudioSource | Accessor<AudioSource>): AudioRetu
   onCleanup(cleanup);
 
   // currentTime — updated on timeupdate
-  const [currentTime, setCurrentTime] = createSignal(0);
+  const [currentTime, setCurrentTime] = createSignal(0, { ownedWrite: true });
   player.addEventListener("timeupdate", () => setCurrentTime(player.currentTime));
 
   // playing — writable derived signal; DOM events keep it in sync
-  const [playing, setPlayingSignal] = createSignal(!player.paused);
+  const [playing, setPlayingSignal] = createSignal(!player.paused, { ownedWrite: true });
   player.addEventListener("playing", () => setPlayingSignal(true));
   player.addEventListener("pause", () => setPlayingSignal(false));
   player.addEventListener("ended", () => setPlayingSignal(false));
   const setPlaying = (v: boolean) => (v ? controls.play() : controls.pause());
 
   // volume — writable derived signal; volumechange event keeps it in sync
-  const [volume, setVolumeSignal] = createSignal(player.volume);
+  const [volume, setVolumeSignal] = createSignal(player.volume, { ownedWrite: true });
   player.addEventListener("volumechange", () => setVolumeSignal(player.volume));
   const setVolume = (v: number) => (player.volume = v);
 
-  // duration — signal updated when audio loads; NaN until loadeddata fires or when src changes
-  const [duration, setDuration] = createSignal<number>(player.duration);
-  player.addEventListener("loadeddata", () => setDuration(player.duration));
-  player.addEventListener("loadstart", () => setDuration(NaN));
+  // duration — NOT_SET until loadeddata fires; resets to NOT_SET on loadstart
+  // (new source). Plain wrapper throws NotReadyError when pending — integrates
+  // with <Loading> without the caching issues of createSignal(fn).
+  const [rawDuration, setRawDuration] = createSignal<number | typeof NOT_SET>(NOT_SET, {
+    ownedWrite: true,
+  });
+  player.addEventListener("loadeddata", () => setRawDuration(player.duration));
+  player.addEventListener("loadstart", () => setRawDuration(NOT_SET));
+  const duration = (): number => {
+    const val = rawDuration();
+    if (val === NOT_SET) throw new NotReadyError("Audio duration not yet available");
+    return val;
+  };
 
   // Reactive src — update player source when signal changes
   if (src instanceof Function) {

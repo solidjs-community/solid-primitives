@@ -1,5 +1,5 @@
 import "./setup";
-import { createRoot, createSignal, flush } from "solid-js";
+import { createRoot, createSignal, flush, untrack } from "solid-js";
 import { describe, expect, it } from "vitest";
 import { makeAudio, makeAudioPlayer, createAudio } from "../src/index.js";
 
@@ -140,18 +140,19 @@ describe("createAudio", () => {
       dispose();
     }));
 
-  it("duration resolves after loadeddata fires", () =>
-    createRoot(async dispose => {
+  it("duration throws NotReadyError before load, returns number after", () =>
+    createRoot(dispose => {
       const audio = createAudio(testPath);
+      expect(() => audio.duration(), "should throw before loadeddata").toThrow();
       audio.player._mock._load(audio.player);
-      const dur = await audio.duration();
-      expect(typeof dur).toBe("number");
+      flush();
+      expect(typeof audio.duration()).toBe("number");
       dispose();
     }));
 
   it("src signal change updates player source and seeks to 0", () =>
     createRoot(async dispose => {
-      const [src, setSrc] = createSignal("track1.mp3");
+      const [src, setSrc] = createSignal("track1.mp3", { ownedWrite: true });
       const audio = createAudio(src);
       expect(audio.player.src).toMatch(/track1\.mp3$/);
       setSrc("track2.mp3");

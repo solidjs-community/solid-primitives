@@ -90,12 +90,12 @@ audio.currentTime()    // seconds
 audio.seek(30)
 ```
 
-The `duration` accessor returns a Promise, so wrap it in `<Suspense>`:
+The `duration` accessor throws `NotReadyError` until the audio metadata has loaded, making it work naturally with Solid 2.0's `<Loading>` boundary. After the first `loadeddata` event it returns the duration in seconds reactively. The pending state resets whenever the source changes.
 
 ```tsx
-<Suspense fallback="Loading...">
+<Loading fallback="Loading...">
   <span>{audio.duration()}s</span>
-</Suspense>
+</Loading>
 ```
 
 The `src` argument can be a reactive accessor — switching sources replaces the track and seeks to the start:
