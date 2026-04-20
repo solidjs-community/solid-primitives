@@ -4,6 +4,7 @@ import { createRoot } from "solid-js";
 import {
   createWS,
   createWSState,
+  createWSMessage,
   createReconnectingWS,
   makeReconnectingWS,
   makeHeartbeatWS,
@@ -70,6 +71,38 @@ describe("createWSState", () => {
         dispose();
         resolve();
       });
+    }));
+});
+
+describe("createWSMessage", () => {
+  it("is undefined before any messages arrive", () =>
+    createRoot(dispose => {
+      const ws = createWS("ws://localhost:5000");
+      const message = createWSMessage<string>(ws);
+      expect(message()).toBeUndefined();
+      dispose();
+    }));
+
+  it("reflects the latest received message", () =>
+    createRoot(dispose => {
+      const ws = createWS("ws://localhost:5000");
+      const message = createWSMessage<string>(ws);
+      vi.advanceTimersByTime(20); // wait for open
+      ws.dispatchEvent(new MessageEvent("message", { data: "hello" }));
+      expect(message()).toBe("hello");
+      ws.dispatchEvent(new MessageEvent("message", { data: "world" }));
+      expect(message()).toBe("world");
+      dispose();
+    }));
+
+  it("removes the event listener on disposal", () =>
+    createRoot(dispose => {
+      const ws = makeWS("ws://localhost:5000");
+      const spy = vi.spyOn(ws, "removeEventListener");
+      createWSMessage(ws);
+      dispose();
+      expect(spy).toHaveBeenCalledWith("message", expect.any(Function));
+      ws.close();
     }));
 });
 

@@ -6,148 +6,113 @@
 
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-Primitive to help establish, maintain and operate a websocket connection.
+Primitives to help establish, maintain, and operate a WebSocket connection.
 
-- `makeWS` - sets up a web socket connection with a buffered send
-- `createWS` - sets up a web socket connection that disconnects on cleanup
-- `createWSState` - creates a reactive signal containing the readyState of a websocket
-- `makeReconnectingWS` - sets up a web socket connection that reconnects if involuntarily closed
-- `createReconnectingWS` - sets up a reconnecting web socket connection that disconnects on cleanup
-- `makeHeartbeatWS` - wraps a reconnecting web socket to send a heart beat and reconnect if the answer fails
-
-All of them return a WebSocket instance extended with a `message` prop containing an accessor for the last received message for convenience and the ability to receive messages to send before the connection is opened.
+- `makeWS` - sets up a WebSocket connection with a buffered send (manual cleanup)
+- `createWS` - sets up a WebSocket connection that closes on owner disposal
+- `createWSState` - reactive signal for the WebSocket's `readyState`
+- `createWSMessage` - reactive signal containing the latest received message
+- `makeReconnectingWS` - WebSocket that reconnects automatically on involuntary close (manual cleanup)
+- `createReconnectingWS` - reconnecting WebSocket that closes on owner disposal
+- `makeHeartbeatWS` - wraps a reconnecting WebSocket with a heartbeat/pong watchdog
 
 ## How to use it
+
+### Basic connection with reactive state and messages
 
 ```ts
 const ws = createWS("ws://localhost:5000");
 const state = createWSState(ws);
-const states = ["Connecting", "Connected", "Disconnecting", "Disconnected"];
+const message = createWSMessage<string>(ws);
+
+const states = ["Connecting", "Open", "Closing", "Closed"] as const;
+
 ws.send("it works");
-createEffect(on(ws.message, msg => console.log(msg), { defer: true }));
-return <p>Connection: {states[state()]}</p>;
 
-const socket = makeHeartbeatWS(
-  makeReconnectingWS(`ws://${location.hostName}/api/ws`, undefined, { timeout: 500 }),
-  { message: "👍" },
+// Solid 2.0: createEffect takes separate compute and effect callbacks
+createEffect(
+  () => message(),
+  (msg) => msg !== undefined && console.log("received:", msg),
 );
-// with the primitives starting with `make...`, one needs to manually clean up:
-socket.send("this will reconnect if connection fails");
+
+return <p>Connection: {states[state()]}</p>;
 ```
 
-### Definitions
+### Heartbeat + reconnecting WebSocket
 
 ```ts
-/** Arguments of the primitives */
-type WSProps = [url: string, protocols?: string | string[]];
-type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
-type WSReadyState = WebSocket.CONNECTING | WebSocket.OPEN | WebSocket.CLOSING | WebSocket.CLOSED;
-type WSEventMap = {
-  close: CloseEvent;
-  error: Event;
-  message: MessageEvent;
-  open: Event;
-};
-type ReconnectingWebSocket = WebSocket & {
-  reconnect: () => void;
-  // ws.send.before is meant to be used by heartbeat
-  send: ((msg: WSMessage) => void) & { before: () => void };
-};
-type WSHeartbeatOptions = {
-  /**
-   * Heartbeat message being sent to the server in order to validate the connection
-   * @default "ping"
-   */
-  message?: WSMessage;
-  /**
-   * The time between messages being sent in milliseconds
-   * @default 1000
-   */
-  interval?: number;
-  /**
-   * The time after the heartbeat message being sent to wait for the next message in milliseconds
-   * @default 1500
-   */
-  wait?: number;
-};
+const ws = makeHeartbeatWS(
+  makeReconnectingWS(`ws://${location.hostname}/api/ws`, undefined, { delay: 500 }),
+  { message: "ping" },
+);
+
+createEffect(
+  () => serverMessage(),
+  (msg) => ws.send(msg),
+);
+
+// Primitives starting with `make` require manual cleanup:
+onCleanup(() => ws.close());
 ```
 
-If you want to use the messages as a signal, have a look at the [`event-listener`](../event-listener/README.md) package:
+### Reacting to each new message
 
 ```ts
-import { createWS } from "@solid-primitives/websocket";
-import { createEventSignal } from "@solid-primitives/event-listener";
-
 const ws = createWS("ws://localhost:5000");
-const messageEvent = createEventSignal(ws, "message");
-const message = () => messageEvent().data;
+const message = createWSMessage<{ type: string; payload: unknown }>(ws);
+
+// Split-effect form: compute phase tracks the signal, effect phase does the work
+createEffect(
+  () => message(),
+  (msg) => {
+    if (msg?.type === "update") handleUpdate(msg.payload);
+  },
+);
 ```
 
-Otherwise, you can simply use the message event to get message.data:
+### Accumulating messages into a store
 
 ```ts
 import { createStore } from "solid-js/store";
-import { createReconnectingWS, WSMessage } from "@solid-primitives/websocket";
+import { createReconnectingWS, type WSMessage } from "@solid-primitives/websocket";
 
 const ws = createReconnectingWS("ws://localhost:5000");
-const [messages, setMessages] = createStore<WSMessage[]>();
-ws.addEventListener("message", (ev) => setMessages(messages.length, ev.data));
+const [messages, setMessages] = createStore<WSMessage[]>([]);
 
-<For each={() => messages}>
-  {(message) => ...}
-</For>
-```
+ws.addEventListener("message", (ev) => setMessages(prev => [...prev, ev.data]));
 
-## Setting up a websocket server
-
-While you can use this primitive with solid-start, it already provides a package for websockets that handles both the server and the client side:
-
-```ts
-import { createWebSocketServer } from "solid-start/websocket";
-import server$ from "solid-start/server";
-
-const pingPong = createWebSocketServer(
-  server$(function (webSocket) {
-    webSocket.addEventListener("message", async msg => {
-      try {
-        // Parse the incoming message
-        let incomingMessage = JSON.parse(msg.data);
-        console.log(incomingMessage);
-
-        switch (incomingMessage.type) {
-          case "ping":
-            webSocket.send(
-              JSON.stringify([
-                {
-                  type: "pong",
-                  data: {
-                    id: incomingMessage.data.id,
-                    time: Date.now(),
-                  },
-                },
-              ]),
-            );
-            break;
-        }
-      } catch (err: any) {
-        // Report any exceptions directly back to the client. As with our handleErrors() this
-        // probably isn't what you'd want to do in production, but it's convenient when testing.
-        webSocket.send(JSON.stringify({ error: err.stack }));
-      }
-    });
-  }),
+return (
+  <For each={messages}>
+    {(msg) => <p>{String(msg)}</p>}
+  </For>
 );
 ```
 
-Otherwise, in order to set up your own production-use websocket server, we recommend packages like
+## Definitions
 
-- nodejs: [`ws`](https://github.com/websockets/ws)
-- rust: [`websocket`](https://docs.rs/websocket/latest/websocket/)
+```ts
+type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
 
-## Demo
+type WSReconnectOptions = {
+  delay?: number;   // ms between reconnect attempts (default: 3000)
+  retries?: number; // max reconnect attempts (default: Infinity)
+};
 
-You may view a working example here:
-https://primitives.solidjs.community/playground/websocket/
+type ReconnectingWebSocket = WebSocket & {
+  reconnect: () => void;
+  // ws.send.before is used internally by makeHeartbeatWS
+  send: ((msg: WSMessage) => void) & { before?: () => void };
+};
+
+type WSHeartbeatOptions = {
+  /** Heartbeat message sent to validate the connection. Default: "ping" */
+  message?: WSMessage;
+  /** Interval between heartbeat messages in ms. Default: 1000 */
+  interval?: number;
+  /** Time to wait for a response before reconnecting in ms. Default: 1500 */
+  wait?: number;
+};
+```
 
 ## Changelog
 
