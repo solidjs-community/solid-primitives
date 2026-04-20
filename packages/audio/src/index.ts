@@ -1,114 +1,123 @@
-import { type Accessor, onMount, onCleanup, createEffect } from "solid-js";
+import { type Accessor, createEffect, createSignal, NotReadyError, onCleanup } from "solid-js";
 import { isServer } from "solid-js/web";
 import { access, noop } from "@solid-primitives/utils";
-import { createStaticStore } from "@solid-primitives/static-store";
 
-// Set of control enums
-export enum AudioState {
-  LOADING = "loading",
-  PLAYING = "playing",
-  PAUSED = "paused",
-  COMPLETE = "complete",
-  STOPPED = "stopped",
-  READY = "ready",
-  ERROR = "error",
-}
+// Sentinel for the "audio not yet loaded" pending state.
+const NOT_SET: unique symbol = Symbol();
 
-export type AudioSource =
-  | string
-  | undefined
-  | HTMLAudioElement
-  | MediaSource
-  | (string & MediaSource);
+export type AudioSource = string | undefined | MediaProvider;
 
 export type AudioEventHandlers = {
   [K in keyof HTMLMediaElementEventMap]?: (event: HTMLMediaElementEventMap[K]) => void;
 };
 
-// Helper for producing the audio source
-const unwrapSource = (src: AudioSource) => {
-  if (src instanceof HTMLAudioElement) {
-    return src;
-  }
-  const player = new Audio();
-  setAudioSrc(player, src);
-  return player;
-};
-
-function setAudioSrc(el: HTMLAudioElement, src: AudioSource) {
-  el[typeof src === "string" ? "src" : "srcObject"] = src as string & MediaSource;
-}
-
-/**
- * Generates a basic audio instance with limited functionality.
- *
- * @param src Audio file path or MediaSource to be played
- * @param handlers An array of handlers to bind against the player
- * @return A basic audio player instance
- */
-export const makeAudio = (
-  src: AudioSource,
-  handlers: AudioEventHandlers = {},
-): HTMLAudioElement => {
-  if (isServer) {
-    return {} as HTMLAudioElement;
-  }
-
-  const player = unwrapSource(src);
-
-  onMount(() => {
-    for (const [name, handler] of Object.entries(handlers)) {
-      player.addEventListener(name, handler as any);
-    }
-  });
-  onCleanup(() => {
-    player.pause();
-    for (const [name, handler] of Object.entries(handlers)) {
-      player.removeEventListener(name, handler as any);
-    }
-  });
-
-  return player;
-};
-
-/**
- * Generates a basic audio player with simple control mechanisms.
- *
- * @param src Audio file path or MediaSource to be played
- * @return options - @type Object
- * @return options.start - Start playing
- * @return options.pause - Pause playing
- * @return options.seek - Seeks to a location in the playhead
- * @return options.setVolume - Sets the volume of the player
- * @return options.player - Raw player instance
- * @return Returns a location signal and one-off async query callback
- *
- * @example
- * ```ts
- * const { start, seek } = makeAudioPlayer('./example1.mp3');
- * ```
- */
-export const makeAudioPlayer = (
-  src: AudioSource,
-  handlers: AudioEventHandlers = {},
-): {
+export type AudioControls = {
   play: () => Promise<void>;
   pause: VoidFunction;
   seek: (time: number) => void;
   setVolume: (volume: number) => void;
   player: HTMLAudioElement;
-} => {
-  if (isServer) {
-    return {
-      pause: noop,
-      play: async () => noop(),
-      player: {} as HTMLAudioElement,
-      seek: noop,
-      setVolume: noop,
-    };
+};
+
+export type AudioReturn = {
+  player: HTMLAudioElement;
+  playing: Accessor<boolean>;
+  setPlaying: (v: boolean) => void;
+  volume: Accessor<number>;
+  setVolume: (v: number) => void;
+  currentTime: Accessor<number>;
+  /**
+   * Throws `NotReadyError` until the audio metadata has loaded (integrates with
+   * `<Loading>`). After the first `loadeddata` event, returns the duration in
+   * seconds reactively. Resets to pending whenever the source changes.
+   */
+  duration: Accessor<number>;
+  seek: (time: number) => void;
+};
+
+function setAudioSrc(el: HTMLAudioElement, src: AudioSource) {
+  if (typeof src === "string") {
+    el.src = src;
+  } else {
+    el.srcObject = src as MediaProvider | null;
   }
-  const player = makeAudio(src, handlers);
-  return {
+}
+
+const unwrapSource = (src: AudioSource | HTMLAudioElement) => {
+  if (src instanceof HTMLAudioElement) return src;
+  const player = new Audio();
+  setAudioSrc(player, src);
+  return player;
+};
+
+/**
+ * Generates a basic audio instance with limited functionality.
+ * Non-reactive — no Solid owner required. Returns a cleanup function.
+ *
+ * @param src Audio file path, MediaProvider, or existing HTMLAudioElement
+ * @param handlers Event handlers to bind against the player
+ * @returns Tuple of `[player, cleanup]`
+ *
+ * @example
+ * ```ts
+ * const [player, cleanup] = makeAudio('./example1.mp3');
+ * ```
+ */
+export const makeAudio = (
+  src: AudioSource | HTMLAudioElement,
+  handlers: AudioEventHandlers = {},
+): [player: HTMLAudioElement, cleanup: VoidFunction] => {
+  if (isServer) return [{} as HTMLAudioElement, noop];
+
+  const player = unwrapSource(src);
+
+  for (const [name, handler] of Object.entries(handlers)) {
+    player.addEventListener(name, handler as EventListener);
+  }
+
+  const cleanup = () => {
+    player.pause();
+    for (const [name, handler] of Object.entries(handlers)) {
+      player.removeEventListener(name, handler as EventListener);
+    }
+  };
+
+  return [player, cleanup];
+};
+
+/**
+ * Generates a basic audio player with simple control mechanisms.
+ * Non-reactive — no Solid owner required. Returns a cleanup function.
+ *
+ * @param src Audio file path, MediaProvider, or existing HTMLAudioElement
+ * @param handlers Event handlers to bind against the player
+ * @returns Tuple of `[controls, cleanup]`
+ *
+ * @example
+ * ```ts
+ * const [{ play, seek }, cleanup] = makeAudioPlayer('./example1.mp3');
+ * ```
+ */
+export const makeAudioPlayer = (
+  src: AudioSource | HTMLAudioElement,
+  handlers: AudioEventHandlers = {},
+): [controls: AudioControls, cleanup: VoidFunction] => {
+  if (isServer) {
+    return [
+      {
+        play: async () => noop(),
+        pause: noop,
+        seek: noop,
+        setVolume: noop,
+        player: {} as HTMLAudioElement,
+      },
+      noop,
+    ];
+  }
+
+  const [player, cleanup] = makeAudio(src, handlers);
+
+  const controls: AudioControls = {
     player,
     play: () => player.play(),
     pause: () => player.pause(),
@@ -118,134 +127,105 @@ export const makeAudioPlayer = (
       : (time: number) => (player.currentTime = time),
     setVolume: (volume: number) => (player.volume = volume),
   };
+
+  return [controls, cleanup];
 };
 
 /**
- * A reactive audio primitive with basic control actions.
+ * A reactive audio primitive.
  *
- * @param src Audio source path or MediaSource to be played or an accessor
- * @param playing A signal for controlling the player
- * @param volume A signal for controlling the volume
- * @return [store] - @type Store
- * @return [store.state] - Current state of the player
- * @return [store.currentTime] - Current time of the playhead
- * @return [store.duration] - Duration of the loaded file
- * @return [store.volume] - Current volume of the audio player
- * @return [store.player] - Raw player instance
- * @return [controls] - Controls for the audio player @type Object
- * @return [controls.seek] - Seeks to a specified location
- * @return [controls.play] - Start playing
- * @return [controls.pause] - Pause playing
- * @return [controls.setVolume] - Sets the volume of the player, from 0 to 1
+ * Returns a flat object with writable derived signals for `playing` and `volume`,
+ * a reactive `currentTime`, and a `duration` that throws `NotReadyError` until the
+ * audio metadata loads — integrating with `<Loading>` for a natural pending state.
  *
+ * @param src Audio file path, MediaProvider, or a reactive accessor returning either
  *
  * @example
  * ```ts
- * const [playing, setPlaying] = createSignal(false);
- * const [volume, setVolume] = createSignal(1);
- * const [audio, controls] = createAudio('./example1.mp3', playing, volume);
- * console.log(audio.duration);
+ * const audio = createAudio('./example1.mp3');
+ * // or reactive source:
+ * const audio = createAudio(() => trackUrl());
+ *
+ * audio.playing()        // boolean
+ * audio.setPlaying(true) // plays
+ * audio.volume()         // 0–1
+ * audio.setVolume(0.5)
+ * audio.currentTime()
+ * audio.seek(30)
+ *
+ * // duration() throws NotReadyError until metadata loads:
+ * <Loading fallback={<p>Loading...</p>}>
+ *   <p>{audio.duration()}s</p>
+ * </Loading>
  * ```
  */
-export const createAudio = (
-  src: AudioSource | Accessor<AudioSource>,
-  playing?: Accessor<boolean>,
-  volume?: Accessor<number>,
-): [
-  {
-    state: AudioState;
-    currentTime: number;
-    duration: number;
-    volume: number;
-    player: HTMLAudioElement;
-  },
-  {
-    seek: (time: number) => void;
-    setVolume: (volume: number) => void;
-    play: () => Promise<void>;
-    pause: VoidFunction;
-  },
-] => {
+export const createAudio = (src: AudioSource | Accessor<AudioSource>): AudioReturn => {
   if (isServer) {
-    return [
-      {
-        state: AudioState.LOADING,
-        currentTime: 0,
-        duration: 0,
-        volume: 0,
-        player: {} as HTMLAudioElement,
+    return {
+      player: {} as HTMLAudioElement,
+      playing: () => false,
+      volume: () => 1,
+      currentTime: () => 0,
+      duration: () => {
+        throw new NotReadyError("Audio duration not available on the server");
       },
-      {
-        seek: noop,
-        setVolume: noop,
-        play: async () => noop(),
-        pause: noop,
-      },
-    ];
+      setPlaying: noop,
+      setVolume: noop,
+      seek: noop,
+    };
   }
 
   const player = unwrapSource(access(src));
 
-  const [store, setStore] = createStaticStore({
-    state: AudioState.LOADING,
-    player,
-    currentTime: 0,
-    duration: 0,
-    volume: 0,
-  });
+  const [controls, cleanup] = makeAudioPlayer(player);
+  onCleanup(cleanup);
 
-  const {
-    play,
-    pause,
-    setVolume: _setVolume,
-    seek,
-  } = makeAudioPlayer(store.player, {
-    loadeddata: () => {
-      setStore({
-        state: AudioState.READY,
-        duration: player.duration,
-      });
-      if (playing && playing()) {
-        play().catch((e: DOMException) => {
-          if (e.name === "NotAllowedError") {
-            setStore("state", AudioState.ERROR);
-          }
-        });
-      }
-    },
-    timeupdate: () => setStore("currentTime", player.currentTime),
-    loadstart: () => setStore("state", AudioState.LOADING),
-    playing: () => setStore("state", AudioState.PLAYING),
-    pause: () => setStore("state", AudioState.PAUSED),
-    error: () => setStore("state", AudioState.ERROR),
-    ended: () => setStore("state", AudioState.COMPLETE),
-  });
+  // currentTime — updated on timeupdate
+  const [currentTime, setCurrentTime] = createSignal(0, { ownedWrite: true });
+  player.addEventListener("timeupdate", () => setCurrentTime(player.currentTime));
 
-  const setVolume = (volume: number) => {
-    setStore("volume", volume);
-    _setVolume(volume);
+  // playing — writable derived signal; DOM events keep it in sync
+  const [playing, setPlayingSignal] = createSignal(!player.paused, { ownedWrite: true });
+  player.addEventListener("playing", () => setPlayingSignal(true));
+  player.addEventListener("pause", () => setPlayingSignal(false));
+  player.addEventListener("ended", () => setPlayingSignal(false));
+  const setPlaying = (v: boolean) => (v ? controls.play() : controls.pause());
+
+  // volume — writable derived signal; volumechange event keeps it in sync
+  const [volume, setVolumeSignal] = createSignal(player.volume, { ownedWrite: true });
+  player.addEventListener("volumechange", () => setVolumeSignal(player.volume));
+  const setVolume = (v: number) => (player.volume = v);
+
+  // duration — NOT_SET until loadeddata fires; resets to NOT_SET on loadstart
+  // (new source). Plain wrapper throws NotReadyError when pending — integrates
+  // with <Loading> without the caching issues of createSignal(fn).
+  const [rawDuration, setRawDuration] = createSignal<number | typeof NOT_SET>(NOT_SET, {
+    ownedWrite: true,
+  });
+  player.addEventListener("loadeddata", () => setRawDuration(player.duration));
+  player.addEventListener("loadstart", () => setRawDuration(NOT_SET));
+  const duration = (): number => {
+    const val = rawDuration();
+    if (val === NOT_SET) throw new NotReadyError("Audio duration not yet available");
+    return val;
   };
 
-  // Bind reactive properties as needed
+  // Reactive src — update player source when signal changes
   if (src instanceof Function) {
-    createEffect(() => {
-      const newSrc = src();
-      if (newSrc instanceof HTMLAudioElement) {
-        setStore("player", newSrc);
-      } else {
-        setAudioSrc(store.player, newSrc);
-      }
-      seek(0);
+    createEffect(src, (newSrc: AudioSource) => {
+      setAudioSrc(player, newSrc);
+      controls.seek(0);
     });
   }
 
-  if (playing) {
-    createEffect(() => (playing() ? play() : pause()));
-  }
-  if (volume) {
-    createEffect(() => setVolume(volume()));
-    setVolume(volume());
-  }
-
-  return [store, { seek, play, pause, setVolume }];
+  return {
+    player,
+    playing,
+    setPlaying,
+    volume,
+    setVolume,
+    currentTime,
+    duration,
+    seek: controls.seek,
+  };
 };
