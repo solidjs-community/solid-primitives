@@ -20,10 +20,10 @@ export type FileUploaderOptions = {
 };
 
 export type UserCallback = (files: UploadFile[]) => void | Promise<void>;
-export type UserCallback2 = () => void | Promise<void>;
 
 export interface FileUploader {
   files: Accessor<UploadFile[]>;
+  error: Accessor<unknown>;
   selectFiles: (callback: (files: UploadFile[]) => void | Promise<void>) => void;
   removeFile: (fileName: string) => void;
   clearFiles: () => void;
@@ -32,11 +32,13 @@ export interface FileUploader {
 export type FileUploaderDirective = {
   userCallback: (files: UploadFile[]) => void | Promise<void>;
   setFiles: Setter<UploadFile[]>;
+  onError?: (error: unknown) => void;
 };
 
 export interface Dropzone<T extends HTMLElement = HTMLElement> {
   setRef: (ref: T) => void;
   files: Accessor<UploadFile[]>;
+  error: Accessor<unknown>;
   isDragging: Accessor<boolean>;
   removeFile: (fileName: string) => void;
   clearFiles: () => void;

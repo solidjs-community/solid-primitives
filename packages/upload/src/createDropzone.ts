@@ -1,6 +1,5 @@
-import { createSignal, type JSX, onCleanup, onMount } from "solid-js";
-import { isServer } from "solid-js/web";
-import { noop } from "@solid-primitives/utils";
+import { createSignal, type JSX, getOwner, onCleanup, runWithOwner } from "solid-js";
+import { isServer } from "@solidjs/web";
 import { transformFiles } from "./helpers.js";
 import type { UploadFile, Dropzone, DropzoneOptions } from "./types.js";
 
@@ -9,19 +8,18 @@ import type { UploadFile, Dropzone, DropzoneOptions } from "./types.js";
  *
  * @returns `setRef`
  * @returns `files`
+ * @returns `error` - Reactive error from the last drag callback, cleared on next drop
  * @returns `isDragging`
  * @returns `removeFile`
  * @returns `clearFiles`
  *
  * @example
  * ```ts
- * // run async user callback
- * const { setRef: dropzoneRef1, files: droppedFiles1 } = createDropzone({
+ * const { setRef: dropzoneRef, files: droppedFiles, error } = createDropzone({
  *   onDrop: async files => {
  *     await doStuff(2);
  *     files.forEach(f => console.log(f));
  *   },
- *   onDragStart: files => console.log("drag start")
  *   onDragStart: files => files.forEach(f => console.log(f)),
  *   onDragOver: files => console.log("drag over")
  * });
@@ -32,58 +30,64 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
 ): Dropzone<T> {
   if (isServer) {
     return {
-      setRef: noop,
+      setRef: () => {},
       files: () => [],
+      error: () => null,
       isDragging: () => false,
-      removeFile: noop,
-      clearFiles: noop,
+      removeFile: () => {},
+      clearFiles: () => {},
     };
   }
   const [files, setFiles] = createSignal<UploadFile[]>([]);
+  const [error, setError] = createSignal<unknown>(null);
   const [isDragging, setIsDragging] = createSignal(false);
 
-  let ref: T | undefined = undefined;
+  // Capture owner in the Phase-1 (owned) scope so cleanup can be registered later
+  const owner = getOwner();
 
-  const setRef = (r: T) => {
-    ref = r;
+  const runCallback = async (
+    callback: ((files: UploadFile[]) => void | Promise<void>) | undefined,
+    parsedFiles: UploadFile[],
+  ) => {
+    try {
+      await callback?.(parsedFiles);
+    } catch (err) {
+      setError(err);
+    }
   };
 
   const onDragStart: JSX.EventHandler<T, DragEvent> = event => {
     setIsDragging(true);
-    Promise.resolve(options?.onDragStart?.(transformFiles(event.dataTransfer?.files || null)));
+    void runCallback(options?.onDragStart, transformFiles(event.dataTransfer?.files || null));
   };
   const onDragEnd: JSX.EventHandler<T, DragEvent> = event => {
     setIsDragging(false);
-    Promise.resolve(options?.onDragEnd?.(transformFiles(event.dataTransfer?.files || null)));
+    void runCallback(options?.onDragEnd, transformFiles(event.dataTransfer?.files || null));
   };
-
   const onDragEnter: JSX.EventHandler<T, DragEvent> = event => {
-    Promise.resolve(options?.onDragEnter?.(transformFiles(event.dataTransfer?.files || null)));
+    void runCallback(options?.onDragEnter, transformFiles(event.dataTransfer?.files || null));
   };
   const onDragLeave: JSX.EventHandler<T, DragEvent> = event => {
-    Promise.resolve(options?.onDragLeave?.(transformFiles(event.dataTransfer?.files || null)));
+    void runCallback(options?.onDragLeave, transformFiles(event.dataTransfer?.files || null));
   };
   const onDragOver: JSX.EventHandler<T, DragEvent> = event => {
     event.preventDefault();
-    Promise.resolve(options?.onDragOver?.(transformFiles(event.dataTransfer?.files || null)));
+    void runCallback(options?.onDragOver, transformFiles(event.dataTransfer?.files || null));
   };
   const onDrag: JSX.EventHandler<T, DragEvent> = event => {
-    Promise.resolve(options?.onDrag?.(transformFiles(event.dataTransfer?.files || null)));
+    void runCallback(options?.onDrag, transformFiles(event.dataTransfer?.files || null));
   };
-
   const onDrop: JSX.EventHandler<T, DragEvent> = event => {
     event.preventDefault();
-
     const parsedFiles = transformFiles(event.dataTransfer?.files || null);
     setFiles(parsedFiles);
-
-    Promise.resolve(options?.onDrop?.(parsedFiles));
+    setError(null);
+    void runCallback(options?.onDrop, parsedFiles);
   };
 
-  onMount(() => {
-    if (!ref) return;
-
-    // TODO: Should event.stopPropagation() or event.preventDefault() in handlers below?
+  // setRef is the Phase-2 ref callback: called synchronously when the element is created.
+  // Listeners are attached immediately; cleanup is registered back in the owner scope.
+  const setRef = (ref: T) => {
     ref.addEventListener("dragstart", onDragStart as any);
     ref.addEventListener("dragenter", onDragEnter as any);
     ref.addEventListener("dragend", onDragEnd as any);
@@ -92,16 +96,18 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
     ref.addEventListener("drag", onDrag as any);
     ref.addEventListener("drop", onDrop as any);
 
-    onCleanup(() => {
-      ref?.removeEventListener("dragstart", onDragStart as any);
-      ref?.removeEventListener("dragenter", onDragEnter as any);
-      ref?.removeEventListener("dragend", onDragEnd as any);
-      ref?.removeEventListener("dragleave", onDragLeave as any);
-      ref?.removeEventListener("dragover", onDragOver as any);
-      ref?.removeEventListener("drag", onDrag as any);
-      ref?.removeEventListener("drop", onDrop as any);
+    runWithOwner(owner, () => {
+      onCleanup(() => {
+        ref.removeEventListener("dragstart", onDragStart as any);
+        ref.removeEventListener("dragenter", onDragEnter as any);
+        ref.removeEventListener("dragend", onDragEnd as any);
+        ref.removeEventListener("dragleave", onDragLeave as any);
+        ref.removeEventListener("dragover", onDragOver as any);
+        ref.removeEventListener("drag", onDrag as any);
+        ref.removeEventListener("drop", onDrop as any);
+      });
     });
-  });
+  };
 
   const removeFile = (fileName: string) => {
     setFiles(prev => prev.filter(f => f.name !== fileName));
@@ -114,6 +120,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
   return {
     setRef,
     files,
+    error,
     isDragging,
     removeFile,
     clearFiles,
