@@ -5,7 +5,6 @@ import { doStuff } from "../src/helpers.js";
 
 import type { UploadFile } from "../src/types.js";
 
-
 const SingleFileUpload: Component = () => {
   const { files, selectFiles } = createFileUploader();
   const { files: filesAsync, selectFiles: selectFilesAsync } = createFileUploader();

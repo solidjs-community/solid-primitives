@@ -40,13 +40,13 @@ selectFiles(files => files.forEach(file => console.log(file)));
 
 **Returns:**
 
-| Name          | Type                                      | Description                                                        |
-| ------------- | ----------------------------------------- | ------------------------------------------------------------------ |
-| `files`       | `Accessor<UploadFile[]>`                  | Reactive list of selected files                                    |
-| `error`       | `Accessor<unknown>`                       | Error thrown by the last `selectFiles` callback; `null` if none    |
-| `selectFiles` | `(callback?: UserCallback) => void`       | Opens file-picker and runs optional callback                       |
-| `removeFile`  | `(fileName: string) => void`              | Removes a file by name from the list                               |
-| `clearFiles`  | `() => void`                              | Clears all selected files                                          |
+| Name          | Type                                | Description                                                     |
+| ------------- | ----------------------------------- | --------------------------------------------------------------- |
+| `files`       | `Accessor<UploadFile[]>`            | Reactive list of selected files                                 |
+| `error`       | `Accessor<unknown>`                 | Error thrown by the last `selectFiles` callback; `null` if none |
+| `selectFiles` | `(callback?: UserCallback) => void` | Opens file-picker and runs optional callback                    |
+| `removeFile`  | `(fileName: string) => void`        | Removes a file by name from the list                            |
+| `clearFiles`  | `() => void`                        | Clears all selected files                                       |
 
 ### [fileUploader](#fileuploader-ref-callback)
 
@@ -77,7 +77,11 @@ If `onError` is omitted, a rejection from `userCallback` propagates as an unhand
 A reactive primitive for drag-and-drop file targets.
 
 ```tsx
-const { setRef: dropzoneRef, files: droppedFiles, isDragging } = createDropzone({
+const {
+  setRef: dropzoneRef,
+  files: droppedFiles,
+  isDragging,
+} = createDropzone({
   onDrop: async files => {
     await doStuff(2);
     files.forEach(f => console.log(f));
@@ -88,21 +92,22 @@ const { setRef: dropzoneRef, files: droppedFiles, isDragging } = createDropzone(
 
 <div
   ref={dropzoneRef}
-  style={{ width: "100px", height: "100px", background: isDragging() ? "green" : "red" }}>
+  style={{ width: "100px", height: "100px", background: isDragging() ? "green" : "red" }}
+>
   Dropzone
-</div>
+</div>;
 ```
 
 **Returns:**
 
-| Name          | Type                          | Description                                                        |
-| ------------- | ----------------------------- | ------------------------------------------------------------------ |
-| `setRef`      | `(el: T) => void`             | Ref callback — pass to the `ref` prop of an element                |
-| `files`       | `Accessor<UploadFile[]>`      | Reactive list of dropped files                                     |
-| `error`       | `Accessor<unknown>`           | Error thrown by the last drag callback; `null` if none             |
-| `isDragging`  | `Accessor<boolean>`           | `true` while a drag is in progress                                 |
-| `removeFile`  | `(fileName: string) => void`  | Removes a file by name from the list                               |
-| `clearFiles`  | `() => void`                  | Clears all dropped files                                           |
+| Name         | Type                         | Description                                            |
+| ------------ | ---------------------------- | ------------------------------------------------------ |
+| `setRef`     | `(el: T) => void`            | Ref callback — pass to the `ref` prop of an element    |
+| `files`      | `Accessor<UploadFile[]>`     | Reactive list of dropped files                         |
+| `error`      | `Accessor<unknown>`          | Error thrown by the last drag callback; `null` if none |
+| `isDragging` | `Accessor<boolean>`          | `true` while a drag is in progress                     |
+| `removeFile` | `(fileName: string) => void` | Removes a file by name from the list                   |
+| `clearFiles` | `() => void`                 | Clears all dropped files                               |
 
 **DropzoneOptions:**
 

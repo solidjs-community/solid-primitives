@@ -236,7 +236,11 @@ describe("createDropzone", () => {
   it("error() captures a thrown onDrop callback", async () => {
     const boom = new Error("drop failed");
     const { error, setRef, dispose } = createRoot(dispose => ({
-      ...createDropzone({ onDrop: async () => { throw boom; } }),
+      ...createDropzone({
+        onDrop: async () => {
+          throw boom;
+        },
+      }),
       dispose,
     }));
 
@@ -317,7 +321,9 @@ describe("fileUploader", () => {
 
     const ref = createRoot(dispose => {
       const r = fileUploader({
-        userCallback: async () => { throw boom; },
+        userCallback: async () => {
+          throw boom;
+        },
         setFiles: vi.fn(),
         onError,
       });
