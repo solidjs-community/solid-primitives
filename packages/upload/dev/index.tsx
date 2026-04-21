@@ -5,7 +5,6 @@ import { doStuff } from "../src/helpers.js";
 
 import type { UploadFile } from "../src/types.js";
 
-fileUploader;
 
 const SingleFileUpload: Component = () => {
   const { files, selectFiles } = createFileUploader();
@@ -99,10 +98,10 @@ const FileUploaderDirective: Component = () => {
       <input
         type="file"
         multiple
-        use:fileUploader={{
+        ref={fileUploader({
           userCallback: fs => fs.forEach(f => console.log(f)),
           setFiles,
-        }}
+        })}
       />
       <For each={files()}>{file => <p>{file.name}</p>}</For>
     </div>

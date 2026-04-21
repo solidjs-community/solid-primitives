@@ -1,6 +1,5 @@
 import { createSignal, type JSX } from "solid-js";
-import { isServer } from "solid-js/web";
-import { noop } from "@solid-primitives/utils";
+import { isServer } from "@solidjs/web";
 import { transformFiles, createInputComponent } from "./helpers.js";
 import type { FileUploader, FileUploaderOptions, UploadFile, UserCallback } from "./types.js";
 
@@ -27,9 +26,9 @@ function createFileUploader(options?: FileUploaderOptions): FileUploader {
   if (isServer) {
     return {
       files: () => [],
-      selectFiles: noop,
-      removeFile: noop,
-      clearFiles: noop,
+      selectFiles: () => {},
+      removeFile: () => {},
+      clearFiles: () => {},
     };
   }
   const [files, setFiles] = createSignal<UploadFile[]>([]);

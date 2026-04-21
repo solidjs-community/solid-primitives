@@ -1,41 +1,36 @@
-import { type JSX, onCleanup, onMount } from "solid-js";
-import { isServer } from "solid-js/web";
+import { onCleanup } from "solid-js";
+import { isServer } from "@solidjs/web";
 import { transformFiles } from "./helpers.js";
 import { type FileUploaderDirective } from "./types.js";
 
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      fileUploader: FileUploaderDirective;
+/**
+ * Ref callback factory for `<input type="file">` elements.
+ *
+ * Usage: `<input type="file" ref={fileUploader({ userCallback, setFiles })} />`
+ */
+export const fileUploader = (options: FileUploaderDirective) => {
+  if (isServer) return (_el: HTMLInputElement) => {};
+
+  const { userCallback, setFiles } = options;
+  let element: HTMLInputElement | undefined;
+
+  const onChange = async (event: Event) => {
+    const target = event.currentTarget as HTMLInputElement;
+    const parsedFiles = transformFiles(target.files);
+    setFiles(parsedFiles);
+    try {
+      await userCallback(parsedFiles);
+    } catch (error) {
+      console.error(error);
     }
-  }
-}
+  };
 
-export const fileUploader = (element: HTMLInputElement, options: () => FileUploaderDirective) => {
-  if (isServer) {
-    return;
-  }
-  const { userCallback, setFiles } = options();
+  onCleanup(() => element?.removeEventListener("change", onChange));
 
-  onMount(() => {
-    const onChange: JSX.EventHandler<HTMLInputElement, Event> = async event => {
-      const parsedFiles = transformFiles(event.currentTarget.files);
-
-      setFiles(parsedFiles);
-
-      try {
-        await userCallback(parsedFiles);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(error);
-      }
-      return;
-    };
-
-    onCleanup(() => element.removeEventListener("change", onChange as any));
-
-    element.addEventListener("change", onChange as any);
-  });
+  return (el: HTMLInputElement) => {
+    element = el;
+    el.addEventListener("change", onChange);
+  };
 };
 
 export { createFileUploader } from "./createFileUploader.js";

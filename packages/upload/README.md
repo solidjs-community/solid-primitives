@@ -16,49 +16,63 @@ Primitive to make uploading files and making dropzones easier.
 npm install @solid-primitives/upload
 # or
 yarn add @solid-primitives/upload
+# or
+pnpm add @solid-primitives/upload
 ```
+
+> **Requires Solid.js 2.0 and `@solidjs/web` 2.0.**
 
 ## How to use it
 
 ### [createFileUploader](#createfileuploader)
 
-```ts
-// single files
-const { files, selectFiles } = createFileUploader();
-selectFiles([file] => console.log(file));
+A reactive primitive that opens the OS file-picker dialog and exposes the selected files as a signal.
 
-// multiple files
+```ts
+// single file
+const { files, selectFiles } = createFileUploader();
+selectFiles(([file]) => console.log(file));
+
+// multiple files with accept filter
 const { files, selectFiles } = createFileUploader({ multiple: true, accept: "image/*" });
 selectFiles(files => files.forEach(file => console.log(file)));
 ```
 
-### use:fileUploader directive
+**Returns:**
 
-```ts
+| Name          | Type                                      | Description                                 |
+| ------------- | ----------------------------------------- | ------------------------------------------- |
+| `files`       | `Accessor<UploadFile[]>`                  | Reactive list of selected files             |
+| `selectFiles` | `(callback?: UserCallback) => void`       | Opens file-picker and runs optional callback|
+| `removeFile`  | `(fileName: string) => void`              | Removes a file by name from the list        |
+| `clearFiles`  | `() => void`                              | Clears all selected files                   |
+
+### [fileUploader](#fileuploader-ref-callback)
+
+A **ref callback factory** for `<input type="file">` elements (replaces the Solid 1.x `use:fileUploader` directive).
+
+```tsx
 const [files, setFiles] = createSignal<UploadFile[]>([]);
 
 <input
   type="file"
   multiple
-  use:fileUploader={{
+  ref={fileUploader({
     userCallback: fs => fs.forEach(f => console.log(f)),
     setFiles,
-  }}
+  })}
 />;
 ```
 
+> **Migration note (Solid 2.0):** The `use:fileUploader` directive syntax has been removed.
+> Replace `use:fileUploader={opts}` with `ref={fileUploader(opts)}`.
+
 ### [createDropzone](#createdropzone)
 
-```html
-<div
-  ref={dropzoneRef}
-  style={{ width: "100px", height: "100px", background: "red" }}>
-  Dropzone
-</div>
-```
+A reactive primitive for drag-and-drop file targets.
 
-```ts
-const { setRef: dropzoneRef, files: droppedFiles } = createDropzone({
+```tsx
+const { setRef: dropzoneRef, files: droppedFiles, isDragging } = createDropzone({
   onDrop: async files => {
     await doStuff(2);
     files.forEach(f => console.log(f));
@@ -66,6 +80,57 @@ const { setRef: dropzoneRef, files: droppedFiles } = createDropzone({
   onDragStart: files => files.forEach(f => console.log(f)),
   onDragOver: files => console.log("drag over"),
 });
+
+<div
+  ref={dropzoneRef}
+  style={{ width: "100px", height: "100px", background: isDragging() ? "green" : "red" }}>
+  Dropzone
+</div>
+```
+
+**Returns:**
+
+| Name          | Type                          | Description                                   |
+| ------------- | ----------------------------- | --------------------------------------------- |
+| `setRef`      | `(el: T) => void`             | Ref callback — pass to the `ref` prop of an element |
+| `files`       | `Accessor<UploadFile[]>`      | Reactive list of dropped files                |
+| `isDragging`  | `Accessor<boolean>`           | `true` while a drag is in progress            |
+| `removeFile`  | `(fileName: string) => void`  | Removes a file by name from the list          |
+| `clearFiles`  | `() => void`                  | Clears all dropped files                      |
+
+**DropzoneOptions:**
+
+| Callback      | Type           | Description                            |
+| ------------- | -------------- | -------------------------------------- |
+| `onDrop`      | `UserCallback` | Fired when files are dropped           |
+| `onDragStart` | `UserCallback` | Fired when a drag starts               |
+| `onDragEnter` | `UserCallback` | Fired when dragged item enters element |
+| `onDragEnd`   | `UserCallback` | Fired when drag ends                   |
+| `onDragLeave` | `UserCallback` | Fired when dragged item leaves element |
+| `onDragOver`  | `UserCallback` | Fired continuously while dragging over |
+| `onDrag`      | `UserCallback` | Fired on drag events                   |
+
+## Types
+
+```ts
+type UploadFile = {
+  source: string; // blob URL (URL.createObjectURL)
+  name: string;
+  size: number;
+  file: File;
+};
+
+type UserCallback = (files: UploadFile[]) => void | Promise<void>;
+
+type FileUploaderOptions = {
+  accept?: string;
+  multiple?: boolean;
+};
+
+type FileUploaderDirective = {
+  userCallback: UserCallback;
+  setFiles: Setter<UploadFile[]>;
+};
 ```
 
 ## Demo

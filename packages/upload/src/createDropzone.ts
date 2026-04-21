@@ -1,6 +1,5 @@
-import { createSignal, type JSX, onCleanup, onMount } from "solid-js";
-import { isServer } from "solid-js/web";
-import { noop } from "@solid-primitives/utils";
+import { createSignal, type JSX, onSettled } from "solid-js";
+import { isServer } from "@solidjs/web";
 import { transformFiles } from "./helpers.js";
 import type { UploadFile, Dropzone, DropzoneOptions } from "./types.js";
 
@@ -32,11 +31,11 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
 ): Dropzone<T> {
   if (isServer) {
     return {
-      setRef: noop,
+      setRef: () => {},
       files: () => [],
       isDragging: () => false,
-      removeFile: noop,
-      clearFiles: noop,
+      removeFile: () => {},
+      clearFiles: () => {},
     };
   }
   const [files, setFiles] = createSignal<UploadFile[]>([]);
@@ -80,10 +79,9 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
     Promise.resolve(options?.onDrop?.(parsedFiles));
   };
 
-  onMount(() => {
+  onSettled(() => {
     if (!ref) return;
 
-    // TODO: Should event.stopPropagation() or event.preventDefault() in handlers below?
     ref.addEventListener("dragstart", onDragStart as any);
     ref.addEventListener("dragenter", onDragEnter as any);
     ref.addEventListener("dragend", onDragEnd as any);
@@ -92,7 +90,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
     ref.addEventListener("drag", onDrag as any);
     ref.addEventListener("drop", onDrop as any);
 
-    onCleanup(() => {
+    return () => {
       ref?.removeEventListener("dragstart", onDragStart as any);
       ref?.removeEventListener("dragenter", onDragEnter as any);
       ref?.removeEventListener("dragend", onDragEnd as any);
@@ -100,7 +98,7 @@ function createDropzone<T extends HTMLElement = HTMLElement>(
       ref?.removeEventListener("dragover", onDragOver as any);
       ref?.removeEventListener("drag", onDrag as any);
       ref?.removeEventListener("drop", onDrop as any);
-    });
+    };
   });
 
   const removeFile = (fileName: string) => {
