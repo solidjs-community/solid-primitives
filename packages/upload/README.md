@@ -40,12 +40,13 @@ selectFiles(files => files.forEach(file => console.log(file)));
 
 **Returns:**
 
-| Name          | Type                                      | Description                                 |
-| ------------- | ----------------------------------------- | ------------------------------------------- |
-| `files`       | `Accessor<UploadFile[]>`                  | Reactive list of selected files             |
-| `selectFiles` | `(callback?: UserCallback) => void`       | Opens file-picker and runs optional callback|
-| `removeFile`  | `(fileName: string) => void`              | Removes a file by name from the list        |
-| `clearFiles`  | `() => void`                              | Clears all selected files                   |
+| Name          | Type                                      | Description                                                        |
+| ------------- | ----------------------------------------- | ------------------------------------------------------------------ |
+| `files`       | `Accessor<UploadFile[]>`                  | Reactive list of selected files                                    |
+| `error`       | `Accessor<unknown>`                       | Error thrown by the last `selectFiles` callback; `null` if none    |
+| `selectFiles` | `(callback?: UserCallback) => void`       | Opens file-picker and runs optional callback                       |
+| `removeFile`  | `(fileName: string) => void`              | Removes a file by name from the list                               |
+| `clearFiles`  | `() => void`                              | Clears all selected files                                          |
 
 ### [fileUploader](#fileuploader-ref-callback)
 
@@ -53,6 +54,7 @@ A **ref callback factory** for `<input type="file">` elements (replaces the Soli
 
 ```tsx
 const [files, setFiles] = createSignal<UploadFile[]>([]);
+const [uploadError, setUploadError] = createSignal<unknown>(null);
 
 <input
   type="file"
@@ -60,9 +62,12 @@ const [files, setFiles] = createSignal<UploadFile[]>([]);
   ref={fileUploader({
     userCallback: fs => fs.forEach(f => console.log(f)),
     setFiles,
+    onError: err => setUploadError(err),
   })}
 />;
 ```
+
+If `onError` is omitted, a rejection from `userCallback` propagates as an unhandled promise rejection.
 
 > **Migration note (Solid 2.0):** The `use:fileUploader` directive syntax has been removed.
 > Replace `use:fileUploader={opts}` with `ref={fileUploader(opts)}`.
@@ -90,13 +95,14 @@ const { setRef: dropzoneRef, files: droppedFiles, isDragging } = createDropzone(
 
 **Returns:**
 
-| Name          | Type                          | Description                                   |
-| ------------- | ----------------------------- | --------------------------------------------- |
-| `setRef`      | `(el: T) => void`             | Ref callback — pass to the `ref` prop of an element |
-| `files`       | `Accessor<UploadFile[]>`      | Reactive list of dropped files                |
-| `isDragging`  | `Accessor<boolean>`           | `true` while a drag is in progress            |
-| `removeFile`  | `(fileName: string) => void`  | Removes a file by name from the list          |
-| `clearFiles`  | `() => void`                  | Clears all dropped files                      |
+| Name          | Type                          | Description                                                        |
+| ------------- | ----------------------------- | ------------------------------------------------------------------ |
+| `setRef`      | `(el: T) => void`             | Ref callback — pass to the `ref` prop of an element                |
+| `files`       | `Accessor<UploadFile[]>`      | Reactive list of dropped files                                     |
+| `error`       | `Accessor<unknown>`           | Error thrown by the last drag callback; `null` if none             |
+| `isDragging`  | `Accessor<boolean>`           | `true` while a drag is in progress                                 |
+| `removeFile`  | `(fileName: string) => void`  | Removes a file by name from the list                               |
+| `clearFiles`  | `() => void`                  | Clears all dropped files                                           |
 
 **DropzoneOptions:**
 
@@ -130,6 +136,7 @@ type FileUploaderOptions = {
 type FileUploaderDirective = {
   userCallback: UserCallback;
   setFiles: Setter<UploadFile[]>;
+  onError?: (error: unknown) => void;
 };
 ```
 
