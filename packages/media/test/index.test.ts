@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach, beforeAll, afterAll } from "vitest";
-import { createRoot, onMount } from "solid-js";
+import { createRoot } from "solid-js";
 import { createBreakpoints, sortBreakpoints } from "../src/index.js";
 
 describe("createBreakpoints", () => {
@@ -217,11 +217,8 @@ describe("createBreakpoints", () => {
       createBreakpoints(breakpoints, {
         watchChange: false,
       });
-
-      onMount(() => {
-        expect(addListenerMock).not.toBeCalled();
-        dispose();
-      });
+      expect(addListenerMock).not.toBeCalled();
+      dispose();
     });
     expect(removeListenerMock).not.toBeCalled();
   });
@@ -230,11 +227,8 @@ describe("createBreakpoints", () => {
     window.matchMedia = undefined as unknown as typeof window.matchMedia;
     createRoot(dispose => {
       createBreakpoints(breakpoints);
-
-      onMount(() => {
-        expect(addListenerMock).not.toBeCalled();
-        dispose();
-      });
+      expect(addListenerMock).not.toBeCalled();
+      dispose();
     });
     expect(removeListenerMock).not.toBeCalled();
   });

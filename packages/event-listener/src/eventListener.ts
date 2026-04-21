@@ -7,7 +7,7 @@ import {
   tryOnCleanup,
 } from "@solid-primitives/utils";
 import { type Accessor, createEffect, createRenderEffect, createSignal } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 import type {
   EventListenerDirectiveProps,
   EventMapOf,
@@ -110,17 +110,28 @@ export function createEventListener(
 ): void {
   if (isServer) return;
 
-  const attachListeners = () => {
-    asArray(access(targets)).forEach(el => {
-      if (el) asArray(access(type)).forEach(type => makeEventListener(el, type, handler, options));
-    });
+  type State = { els: EventTarget[]; types: string[] };
+
+  const compute = (): State => ({
+    els: asArray(access(targets)).filter(Boolean) as EventTarget[],
+    types: asArray(access(type)) as string[],
+  });
+
+  const apply = ({ els, types }: State) => {
+    const cleanups: VoidFunction[] = [];
+    for (const el of els)
+      for (const t of types) {
+        el.addEventListener(t, handler, options);
+        cleanups.push(el.removeEventListener.bind(el, t, handler, options));
+      }
+    return () => cleanups.forEach(c => c());
   };
 
-  // if the target is an accessor the listeners will be added on the first effect (onMount)
-  // so that when passed a jsx ref it will be availabe
-  if (typeof targets === "function") createEffect(attachListeners);
+  // if the target is an accessor the listeners will be added on the first effect (after mount)
+  // so that when passed a jsx ref it will be available
+  if (typeof targets === "function") createEffect(compute, apply);
   // if the target prop is NOT an accessor, the event listeners can be added right away
-  else createRenderEffect(attachListeners);
+  else createRenderEffect(compute, apply);
 }
 
 // Possible targets prop shapes:
@@ -192,9 +203,9 @@ export function createEventSignal(
  * <button use:eventListener={["click", () => {...}]}>Click me!</button>
  */
 export const eventListener: Directive<EventListenerDirectiveProps> = (target, props) => {
-  createEffect(() => {
-    const [type, handler, options] = props();
-    makeEventListener(target, type, handler, options);
+  createEffect(props, ([type, handler, options]) => {
+    target.addEventListener(type, handler, options);
+    return () => target.removeEventListener(type, handler, options);
   });
 };
 

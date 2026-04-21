@@ -1,5 +1,5 @@
 import type { Signal, StoreSetter, Store } from "solid-js";
-import { createUniqueId, latest, untrack, reconcile, DEV } from "solid-js";
+import { action, createUniqueId, latest, untrack, reconcile, DEV } from "solid-js";
 
 export type SyncStorage = {
   getItem: (key: string) => string | null;
@@ -55,11 +55,16 @@ export type PersistenceSyncAPI = [
   update: (key: string, value: string | null | undefined) => void,
 ];
 
-export type PersistenceOptions<T, O extends Record<string, any> | undefined> = {
+export type PersistenceOptions<
+  S extends Signal<any> | [Store<any>, StoreSetter<any>],
+  O extends Record<string, any> | undefined,
+  T = S extends Signal<infer T> ? T : S extends [Store<infer T>, StoreSetter<infer T>] ? T : never
+> = {
   name?: string;
   serialize?: (data: T) => string;
   deserialize?: (data: string) => T;
   sync?: PersistenceSyncAPI;
+  action?: (signal: S) => Parameters<typeof action>[0];
 } & (undefined extends O
   ? { storage?: SyncStorage | AsyncStorage }
   : {
@@ -79,6 +84,7 @@ export type PersistedState<S> = S extends [any, any] ? [...S, Promise<string> | 
  *    name: "solid-data",      // optional
  *    serialize: (value: string) => value, // optional
  *    deserialize: (data: string) => data, // optional
+ *    action: (setter: Setter<T>) => Setter<T> // optional, to be put inside action
  *  };
  *  ```
  *  Can be used with `createSignal` or `createStore`. The initial value from the storage will overwrite the initial
@@ -89,32 +95,38 @@ export type PersistedState<S> = S extends [any, any] ? [...S, Promise<string> | 
  * @param {PersistenceOptions<T, O>} options - The options for persistence.
  * @returns {PersistedState<T>} - The persisted signal or store.
  */
-export function makePersisted<T>(
-  signal: Signal<T>,
-  options?: PersistenceOptions<T, undefined>,
-): PersistedState<Signal<T>>;
-export function makePersisted<T>(
-  signal: [Store<T>, StoreSetter<T>],
-  options?: PersistenceOptions<T, undefined>,
-): PersistedState<[Store<T>, StoreSetter<T>]>;
+export function makePersisted<T, S extends Signal<T>>(
+  signal: S,
+  options?: PersistenceOptions<S, undefined>,
+): PersistedState<S>;
+export function makePersisted<T, S extends [Store<T>, StoreSetter<T>]>(
+  signal: S,
+  options?: PersistenceOptions<S, undefined>,
+): PersistedState<S>;
 export function makePersisted<
   T,
   O extends Record<string, any>,
->(signal: Signal<T>, options: PersistenceOptions<T, O>): PersistedState<Signal<T>>;
+  S extends Signal<T>
+>(signal: S, options: PersistenceOptions<S, O>): PersistedState<S>;
 export function makePersisted<
   T,
   O extends Record<string, any>,
->(signal: [Store<T>, StoreSetter<T>], options: PersistenceOptions<T, O>): PersistedState<[Store<T>, StoreSetter<T>]>;
+  S extends [Store<T>, StoreSetter<T>]
+>(signal: S, options: PersistenceOptions<S, O>): PersistedState<S>;
 export function makePersisted<
   T,
   O extends Record<string, any> | undefined,
   S extends Signal<T> | [Store<T>, StoreSetter<T>],
 >(
   signal: S,
-  options: PersistenceOptions<T, O> = {} as PersistenceOptions<T, O>,
+  options: PersistenceOptions<S, O> = {} as PersistenceOptions<S, O>,
 ): PersistedState<S> {
   const storage = options.storage || (globalThis.localStorage as Storage | undefined);
   const name = options.name || `storage-${createUniqueId()}`;
+  const actionFn = options.action && options.action(signal);
+  if (actionFn) {
+    signal[1] = action(actionFn) as unknown as S[1];
+  }
   if (!storage) {
     return [signal[0], signal[1], null] as unknown as PersistedState<S>;
   }
@@ -163,21 +175,24 @@ export function makePersisted<
   }
 
   const getter = typeof signal[0] === "function" ? signal[0] as () => T : () => signal[0] as T;
+  const persist = () => {
+    const next = latest(getter);
+    if (next == null) {
+      storage.removeItem(name, storageOptions);
+      options.sync?.[1](name, null);
+    } else {
+      const serialized = serialize(next);
+      storage.setItem(name, serialized, storageOptions);
+      options.sync?.[1](name, serialized);
+    }
+  };
   return [
     signal[0], 
     (value: any) => untrack(() => {
       const output = signal[1](value);
-      const next = latest(getter);
-      if (value == null) {
-        storage.removeItem(name, storageOptions);
-        options.sync?.[1](name, null);
-      } else {
-        const serialized = serialize(next);
-        storage.setItem(name, serialized, storageOptions);
-        options.sync?.[1](name, serialized);
-      } 
+      persist();
       unchanged = false;
-      return output;
+      return output instanceof Promise ? output.then((result) => (persist(), result)) : output;
     }),
     init,
   ] as unknown as PersistedState<S>;

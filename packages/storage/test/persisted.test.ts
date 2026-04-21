@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { action, createSignal, createStore, createOptimistic, latest, refresh, type Signal } from "solid-js";
+import { createSignal, createStore, createOptimistic, flush, latest, refresh, type Signal } from "solid-js";
 import { makePersisted } from "../src/persisted.js";
 import { type AsyncStorage } from "../src/index.js";
 
@@ -63,22 +63,26 @@ describe("makePersisted", () => {
   });
   
   // currently, optimistic is broken
-  it.skip("persists an optimistic signal", async () => {
+  it.only("persists an optimistic signal", async () => {
     const DataServer = {
       data: "server",
       get: () => Promise.resolve(DataServer.data),
       set: (next: string) => new Promise((res) => setTimeout(() => res(DataServer.data = next), 50)),
     };
-    const [optimistic, updateOptimistic] = createOptimistic(() => DataServer.get(), "initial");
-    const setOptimistic = action(function*(data) {
-      updateOptimistic(data);
-      yield DataServer.set(data);
-    });
     const [signal, setSignal] = makePersisted(
-      [optimistic, setOptimistic],
-      { storage: mockStorage, name: "test1" }
+      createOptimistic(() => DataServer.get()),
+      { 
+        storage: mockStorage, 
+        name: "test1", 
+        action: ([getter, setter]) => function*(next) { 
+          setter(next);
+          yield DataServer.set(next);
+          refresh(getter);
+        }
+      }
     );
     await setSignal("persisted");
+    flush();
     expect(mockStorage.getItem("test1")).toBe('"persisted"');
     expect(latest(signal)).toBe("persisted")
   })
