@@ -1,8 +1,5 @@
-import type { Accessor, Setter, Signal } from "solid-js";
-import { createUniqueId, untrack } from "solid-js";
-import { isServer, isDev } from "solid-js/web";
-import type { SetStoreFunction, Store } from "solid-js/store";
-import { reconcile } from "solid-js/store";
+import type { Signal, StoreSetter, Store } from "solid-js";
+import { createUniqueId, latest, untrack, reconcile, DEV } from "solid-js";
 
 export type SyncStorage = {
   getItem: (key: string) => string | null;
@@ -70,17 +67,7 @@ export type PersistenceOptions<T, O extends Record<string, any> | undefined> = {
       storageOptions?: O;
     });
 
-export type SignalInput = Signal<any> | [Store<any>, SetStoreFunction<any>];
-
-export type SignalType<S extends SignalInput> =
-  S extends Signal<infer T> ? T : S extends [Store<infer T>, SetStoreFunction<infer T>] ? T : never;
-
-export type PersistedState<S extends SignalInput> =
-  S extends Signal<infer T>
-    ? [get: Accessor<T>, set: Setter<T>, init: Promise<string> | string | null]
-    : S extends [Store<infer T>, SetStoreFunction<infer T>]
-      ? [get: Store<T>, set: SetStoreFunction<T>, init: Promise<string> | string | null]
-      : never;
+export type PersistedState<S> = S extends [any, any] ? [...S, Promise<string> | string | null] : never;   
 
 /**
  * Persists a signal, store or similar API
@@ -98,22 +85,30 @@ export type PersistedState<S extends SignalInput> =
  *  value of the signal or store unless overwritten. Overwriting a signal with `null` or `undefined` will remove the
  *  item from the storage.
  *
- * @param {Signal<T> | [get: Store<T>, set: SetStoreFunction<T>]} signal - The signal or store to be persisted.
+ * @param {Signal<T> | [get: Store<T>, set: St<T>]} signal - The signal or store to be persisted.
  * @param {PersistenceOptions<T, O>} options - The options for persistence.
  * @returns {PersistedState<T>} - The persisted signal or store.
  */
-export function makePersisted<S extends SignalInput>(
-  signal: S,
-  options?: PersistenceOptions<SignalType<S>, undefined>,
-): PersistedState<S>;
-export function makePersisted<S extends SignalInput, O extends Record<string, any>>(
-  signal: S,
-  options: PersistenceOptions<SignalType<S>, O>,
-): PersistedState<S>;
+export function makePersisted<T>(
+  signal: Signal<T>,
+  options?: PersistenceOptions<T, undefined>,
+): PersistedState<Signal<T>>;
+export function makePersisted<T>(
+  signal: [Store<T>, StoreSetter<T>],
+  options?: PersistenceOptions<T, undefined>,
+): PersistedState<[Store<T>, StoreSetter<T>]>;
 export function makePersisted<
-  S extends SignalInput,
+  T,
+  O extends Record<string, any>,
+>(signal: Signal<T>, options: PersistenceOptions<T, O>): PersistedState<Signal<T>>;
+export function makePersisted<
+  T,
+  O extends Record<string, any>,
+>(signal: [Store<T>, StoreSetter<T>], options: PersistenceOptions<T, O>): PersistedState<[Store<T>, StoreSetter<T>]>;
+export function makePersisted<
+  T,
   O extends Record<string, any> | undefined,
-  T = SignalType<S>,
+  S extends Signal<T> | [Store<T>, StoreSetter<T>],
 >(
   signal: S,
   options: PersistenceOptions<T, O> = {} as PersistenceOptions<T, O>,
@@ -121,7 +116,7 @@ export function makePersisted<
   const storage = options.storage || (globalThis.localStorage as Storage | undefined);
   const name = options.name || `storage-${createUniqueId()}`;
   if (!storage) {
-    return [signal[0], signal[1], null] as PersistedState<S>;
+    return [signal[0], signal[1], null] as unknown as PersistedState<S>;
   }
   const storageOptions = (options as unknown as { storageOptions: O }).storageOptions;
   const serialize: (data: T) => string = options.serialize || JSON.stringify.bind(JSON);
@@ -135,16 +130,16 @@ export function makePersisted<
             (signal[1] as any)(() => value);
           } catch (e) {
             // eslint-disable-next-line no-console
-            if (isDev) console.warn(e);
+            if (DEV) console.warn(e);
           }
         }
       : (data: string) => {
           try {
             const value = deserialize(data);
-            (signal[1] as any)(reconcile(value));
+            (signal[1] as any)(reconcile(value, () => undefined));
           } catch (e) {
             // eslint-disable-next-line no-console
-            if (isDev) console.warn(e);
+            if (DEV) console.warn(e);
           }
         };
   let unchanged = true;
@@ -158,7 +153,7 @@ export function makePersisted<
     options.sync[0]((data: PersistenceSyncData) => {
       if (
         data.key !== name ||
-        (!isServer && (data.url || globalThis.location.href) !== globalThis.location.href) ||
+        (!globalThis.window && (data.url || globalThis.location.href) !== globalThis.location.href) ||
         data.newValue === serialize(untrack(get))
       ) {
         return;
@@ -167,28 +162,25 @@ export function makePersisted<
     });
   }
 
+  const getter = typeof signal[0] === "function" ? signal[0] as () => T : () => signal[0] as T;
   return [
-    signal[0],
-    typeof signal[0] === "function"
-      ? (value?: T | ((prev: T) => T)) => {
-          const output = (signal[1] as Setter<T>)(value as any);
-          const serialized: string | null | undefined =
-            value != null ? serialize(output) : (value as null | undefined);
-          options.sync?.[1](name, serialized);
-          if (serialized != null) storage.setItem(name, serialized, storageOptions);
-          else storage.removeItem(name, storageOptions);
-          unchanged = false;
-          return output;
-        }
-      : (...args: any[]) => {
-          (signal[1] as any)(...args);
-          const value = serialize(untrack(() => signal[0]));
-          options.sync?.[1](name, value);
-          storage.setItem(name, value, storageOptions);
-          unchanged = false;
-        },
+    signal[0], 
+    (value: any) => untrack(() => {
+      const output = signal[1](value);
+      const next = latest(getter);
+      if (value == null) {
+        storage.removeItem(name, storageOptions);
+        options.sync?.[1](name, null);
+      } else {
+        const serialized = serialize(next);
+        storage.setItem(name, serialized, storageOptions);
+        options.sync?.[1](name, serialized);
+      } 
+      unchanged = false;
+      return output;
+    }),
     init,
-  ] as PersistedState<S>;
+  ] as unknown as PersistedState<S>;
 }
 
 /**
@@ -222,7 +214,7 @@ export const messageSync = (channel: Window | BroadcastChannel = window): Persis
 /**
  * wsSync - syncronize persisted storage via web socket
  */
-export const wsSync = (ws: WebSocket, warnOnError: boolean = isDev): PersistenceSyncAPI => [
+export const wsSync = (ws: WebSocket, warnOnError: boolean = !!DEV): PersistenceSyncAPI => [
   (subscriber: PersistenceSyncCallback) =>
     ws.addEventListener("message", (ev: MessageEvent) => {
       try {
@@ -241,7 +233,7 @@ export const wsSync = (ws: WebSocket, warnOnError: boolean = isDev): Persistence
         key,
         newValue,
         timeStamp: +new Date(),
-        ...(isServer ? {} : { url: location.href }),
+        ...(globalThis.window ? { url: location.href } : {}),
       }),
     ),
 ];
