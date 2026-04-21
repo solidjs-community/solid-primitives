@@ -1,5 +1,9 @@
 import type { Signal, StoreSetter, Store } from "solid-js";
+<<<<<<< HEAD
 import { action, createUniqueId, latest, untrack, reconcile, DEV } from "solid-js";
+=======
+import { createUniqueId, latest, untrack, reconcile, DEV } from "solid-js";
+>>>>>>> 4e72f48b (upgrade: storage package upgrade for Solid 2.0)
 
 export type SyncStorage = {
   getItem: (key: string) => string | null;
@@ -95,6 +99,7 @@ export type PersistedState<S> = S extends [any, any] ? [...S, Promise<string> | 
  * @param {PersistenceOptions<T, O>} options - The options for persistence.
  * @returns {PersistedState<T>} - The persisted signal or store.
  */
+<<<<<<< HEAD
 export function makePersisted<T, S extends Signal<T>>(
   signal: S,
   options?: PersistenceOptions<S, undefined>,
@@ -113,6 +118,24 @@ export function makePersisted<
   O extends Record<string, any>,
   S extends [Store<T>, StoreSetter<T>]
 >(signal: S, options: PersistenceOptions<S, O>): PersistedState<S>;
+=======
+export function makePersisted<T>(
+  signal: Signal<T>,
+  options?: PersistenceOptions<T, undefined>,
+): PersistedState<Signal<T>>;
+export function makePersisted<T>(
+  signal: [Store<T>, StoreSetter<T>],
+  options?: PersistenceOptions<T, undefined>,
+): PersistedState<[Store<T>, StoreSetter<T>]>;
+export function makePersisted<
+  T,
+  O extends Record<string, any>,
+>(signal: Signal<T>, options: PersistenceOptions<T, O>): PersistedState<Signal<T>>;
+export function makePersisted<
+  T,
+  O extends Record<string, any>,
+>(signal: [Store<T>, StoreSetter<T>], options: PersistenceOptions<T, O>): PersistedState<[Store<T>, StoreSetter<T>]>;
+>>>>>>> 4e72f48b (upgrade: storage package upgrade for Solid 2.0)
 export function makePersisted<
   T,
   O extends Record<string, any> | undefined,
@@ -175,6 +198,7 @@ export function makePersisted<
   }
 
   const getter = typeof signal[0] === "function" ? signal[0] as () => T : () => signal[0] as T;
+<<<<<<< HEAD
   const persist = () => {
     const next = latest(getter);
     if (next == null) {
@@ -186,13 +210,29 @@ export function makePersisted<
       options.sync?.[1](name, serialized);
     }
   };
+=======
+>>>>>>> 4e72f48b (upgrade: storage package upgrade for Solid 2.0)
   return [
     signal[0], 
     (value: any) => untrack(() => {
       const output = signal[1](value);
+<<<<<<< HEAD
       persist();
       unchanged = false;
       return output instanceof Promise ? output.then((result) => (persist(), result)) : output;
+=======
+      const next = latest(getter);
+      if (value == null) {
+        storage.removeItem(name, storageOptions);
+        options.sync?.[1](name, null);
+      } else {
+        const serialized = serialize(next);
+        storage.setItem(name, serialized, storageOptions);
+        options.sync?.[1](name, serialized);
+      } 
+      unchanged = false;
+      return output;
+>>>>>>> 4e72f48b (upgrade: storage package upgrade for Solid 2.0)
     }),
     init,
   ] as unknown as PersistedState<S>;

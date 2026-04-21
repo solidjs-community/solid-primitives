@@ -81,8 +81,13 @@
   },
   "peerDependencies": {
     "@tauri-apps/plugin-store": "*",
+<<<<<<< HEAD
     "@solidjs/web": "^2.0.0-beta.11",
     "solid-js": "^2.0.0-beta.11"
+=======
+    "@solidjs/web": "^2.0.0-beta.7",
+    "solid-js": "^2.0.0-beta.7"
+>>>>>>> 4e72f48b (upgrade: storage package upgrade for Solid 2.0)
   },
   "peerDependenciesMeta": {
     "solid-start": {
@@ -93,7 +98,12 @@
     }
   },
   "devDependencies": {
+<<<<<<< HEAD
     "solid-js": "2.0.0-beta.11",
     "@solidjs/web": "2.0.0-beta.11"
+=======
+    "solid-js": "2.0.0-beta.7",
+    "@solidjs/web": "2.0.0-beta.7"
+>>>>>>> 4e72f48b (upgrade: storage package upgrade for Solid 2.0)
   }
 }

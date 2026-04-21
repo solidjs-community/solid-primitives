@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
+<<<<<<< HEAD
 import { createSignal, createStore, createOptimistic, flush, latest, refresh, type Signal } from "solid-js";
+=======
+import { action, createSignal, createStore, createOptimistic, latest, refresh, type Signal } from "solid-js";
+>>>>>>> 4e72f48b (upgrade: storage package upgrade for Solid 2.0)
 import { makePersisted } from "../src/persisted.js";
 import { type AsyncStorage } from "../src/index.js";
 
@@ -63,12 +67,17 @@ describe("makePersisted", () => {
   });
   
   // currently, optimistic is broken
+<<<<<<< HEAD
   it.only("persists an optimistic signal", async () => {
+=======
+  it.skip("persists an optimistic signal", async () => {
+>>>>>>> 4e72f48b (upgrade: storage package upgrade for Solid 2.0)
     const DataServer = {
       data: "server",
       get: () => Promise.resolve(DataServer.data),
       set: (next: string) => new Promise((res) => setTimeout(() => res(DataServer.data = next), 50)),
     };
+<<<<<<< HEAD
     const [signal, setSignal] = makePersisted(
       createOptimistic(() => DataServer.get()),
       { 
@@ -83,6 +92,18 @@ describe("makePersisted", () => {
     );
     await setSignal("persisted");
     flush();
+=======
+    const [optimistic, updateOptimistic] = createOptimistic(() => DataServer.get(), "initial");
+    const setOptimistic = action(function*(data) {
+      updateOptimistic(data);
+      yield DataServer.set(data);
+    });
+    const [signal, setSignal] = makePersisted(
+      [optimistic, setOptimistic],
+      { storage: mockStorage, name: "test1" }
+    );
+    await setSignal("persisted");
+>>>>>>> 4e72f48b (upgrade: storage package upgrade for Solid 2.0)
     expect(mockStorage.getItem("test1")).toBe('"persisted"');
     expect(latest(signal)).toBe("persisted")
   })
