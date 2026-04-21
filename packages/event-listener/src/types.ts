@@ -7,7 +7,6 @@ export type TargetWithEventMap =
   | Document
   | XMLDocument
   | HTMLBodyElement
-  | HTMLFrameSetElement
   | HTMLMediaElement
   | HTMLVideoElement
   | HTMLElement
@@ -64,9 +63,7 @@ export type EventMapOf<Target> = Target extends Window
     ? DocumentEventMap
     : Target extends HTMLBodyElement
       ? HTMLBodyElementEventMap
-      : Target extends HTMLFrameSetElement
-        ? HTMLFrameSetElementEventMap
-        : Target extends HTMLMediaElement
+      : Target extends HTMLMediaElement
           ? HTMLMediaElementEventMap
           : Target extends HTMLVideoElement
             ? HTMLVideoElementEventMap
