@@ -81,7 +81,8 @@
   },
   "peerDependencies": {
     "@tauri-apps/plugin-store": "*",
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.7",
+    "solid-js": "^2.0.0-beta.7"
   },
   "peerDependenciesMeta": {
     "solid-start": {
@@ -92,6 +93,7 @@
     }
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "solid-js": "2.0.0-beta.7",
+    "@solidjs/web": "2.0.0-beta.7"
   }
 }
