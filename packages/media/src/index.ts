@@ -1,5 +1,5 @@
 import { type Accessor } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { entries, noop, createHydratableSignal } from "@solid-primitives/utils";
 import { createHydratableStaticStore } from "@solid-primitives/static-store";
