@@ -3,10 +3,13 @@ import { type Accessor, onCleanup, createSignal } from "solid-js";
 export type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
 
 /**
- * opens a web socket connection with a queued send
+ * Opens a web socket connection with a queued send.
  * ```ts
  * const ws = makeWS("ws://localhost:5000");
- * createEffect(() => ws.send(serverMessage()));
+ * createEffect(
+ *   () => serverMessage(),
+ *   (msg) => ws.send(msg),
+ * );
  * onCleanup(() => ws.close());
  * ```
  * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
@@ -28,10 +31,13 @@ export const makeWS = (
 };
 
 /**
- * opens a web socket connection with a queued send that closes on cleanup
+ * Opens a web socket connection with a queued send that closes on cleanup.
  * ```ts
- * const ws = makeWS("ws://localhost:5000");
- * createEffect(() => ws.send(serverMessage()));
+ * const ws = createWS("ws://localhost:5000");
+ * createEffect(
+ *   () => serverMessage(),
+ *   (msg) => ws.send(msg),
+ * );
  * ```
  * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
  */
@@ -42,12 +48,12 @@ export const createWS = (url: string, protocols?: string | string[]): WebSocket 
 };
 
 /**
- * Returns a reactive state signal for the web socket's readyState:
+ * Returns a reactive signal for the WebSocket's `readyState`:
  *
- * WebSocket.CONNECTING = 0
- * WebSocket.OPEN = 1
- * WebSocket.CLOSING = 2
- * WebSocket.CLOSED = 3
+ * - `0` — CONNECTING
+ * - `1` — OPEN
+ * - `2` — CLOSING
+ * - `3` — CLOSED
  *
  * ```ts
  * const ws = createWS('ws://localhost:5000');
@@ -57,7 +63,10 @@ export const createWS = (url: string, protocols?: string | string[]): WebSocket 
  * ```
  */
 export const createWSState = (ws: WebSocket): Accessor<0 | 1 | 2 | 3> => {
-  const [state, setState] = createSignal(ws.readyState as 0 | 1 | 2 | 3);
+  // ownedWrite: true — setState may be called from ws.close(), which the user
+  // could invoke inside a component or effect. This suppresses the dev-mode
+  // owned-scope write warning for this intentionally internal signal.
+  const [state, setState] = createSignal(ws.readyState as 0 | 1 | 2 | 3, { ownedWrite: true });
   const _close = ws.close.bind(ws);
   ws.addEventListener("open", () => setState(1));
   ws.close = (...args) => {
@@ -66,6 +75,33 @@ export const createWSState = (ws: WebSocket): Accessor<0 | 1 | 2 | 3> => {
   };
   ws.addEventListener("close", () => setState(3));
   return state;
+};
+
+/**
+ * Returns a reactive signal containing the latest message received from the WebSocket.
+ * Starts as `undefined` until the first message arrives.
+ *
+ * ```ts
+ * const ws = createWS("ws://localhost:5000");
+ * const message = createWSMessage<string>(ws);
+ * return <p>Last message: {message()}</p>;
+ * ```
+ *
+ * The signal updates on every incoming message. Pair it with `createEffect` to
+ * react to each new value:
+ * ```ts
+ * createEffect(
+ *   () => message(),
+ *   (msg) => msg !== undefined && console.log("received:", msg),
+ * );
+ * ```
+ */
+export const createWSMessage = <T = string>(ws: WebSocket): Accessor<T | undefined> => {
+  const [message, setMessage] = createSignal<T | undefined>(undefined);
+  const handler = (e: MessageEvent) => setMessage(() => e.data as T);
+  ws.addEventListener("message", handler);
+  onCleanup(() => ws.removeEventListener("message", handler));
+  return message;
 };
 
 export type WSReconnectOptions = {
@@ -83,7 +119,10 @@ export type ReconnectingWebSocket = WebSocket & {
  * Returns a WebSocket-like object that under the hood opens new connections on disconnect:
  * ```ts
  * const ws = makeReconnectingWS("ws:localhost:5000");
- * createEffect(() => ws.send(serverMessage()));
+ * createEffect(
+ *   () => serverMessage(),
+ *   (msg) => ws.send(msg),
+ * );
  * onCleanup(() => ws.close());
  * ```
  * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
@@ -148,8 +187,11 @@ export const makeReconnectingWS = (
 /**
  * Returns a WebSocket-like object that under the hood opens new connections on disconnect and closes on cleanup:
  * ```ts
- * const ws = makeReconnectingWS("ws:localhost:5000");
- * createEffect(() => ws.send(serverMessage()));
+ * const ws = createReconnectingWS("ws:localhost:5000");
+ * createEffect(
+ *   () => serverMessage(),
+ *   (msg) => ws.send(msg),
+ * );
  * ```
  * Will not throw if you attempt to send messages before the connection opened; instead, it will enqueue the message to be sent when the connection opens.
  */
@@ -178,7 +220,7 @@ export type WSHeartbeatOptions = {
 };
 
 /**
- * Wraps a reconnecting WebSocket to send a heartbeat to check the connection
+ * Wraps a reconnecting WebSocket to send a heartbeat to check the connection.
  * ```ts
  * const ws = makeHeartbeatWS(createReconnectingWS('ws://localhost:5000'))
  * ```
