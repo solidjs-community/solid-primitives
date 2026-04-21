@@ -1,6 +1,6 @@
 import { dispatchFakeEvent, event_target } from "./setup.js";
 import { describe, test, expect } from "vitest";
-import { createRoot, createSignal, onMount } from "solid-js";
+import { createRoot, createSignal, flush, onSettled } from "solid-js";
 import {
   createEventListener,
   createEventSignal,
@@ -124,14 +124,17 @@ describe("createEventListener", () => {
       return dispose;
     });
 
+    flush();
     dispatchFakeEvent("test", testEvent);
     expect(captured_times).toBe(1);
+
     setTarget([]);
-
+    flush();
     dispatchFakeEvent("test", testEvent);
     expect(captured_times).toBe(1);
-    setTarget(event_target);
 
+    setTarget(event_target);
+    flush();
     dispatchFakeEvent("test", testEvent);
     expect(captured_times).toBe(2);
     dispose();
@@ -177,7 +180,7 @@ describe("createEventListener", () => {
         count++;
       });
 
-      onMount(() => {
+      onSettled(() => {
         dispatchFakeEvent("test3", testEvent);
         expect(count, "captured count on mount should be 1").toBe(1);
 
@@ -197,7 +200,7 @@ describe("createEventSignal", () => {
       expect(lastEvent, "returned value is an accessor").toBeTypeOf("function");
       expect(lastEvent(), "returned value is undefined").toBeTypeOf("undefined");
 
-      onMount(() => {
+      onSettled(() => {
         dispatchFakeEvent("sig_test", testEvent);
         expect(lastEvent()).toBe(testEvent);
         dispose();
@@ -221,16 +224,16 @@ describe("eventListener directive", () => {
       dispatchFakeEvent("load", testEvent);
       expect(captured.length, "event are not listened before the first effect").toBe(0);
 
-      onMount(() => {
-        dispatchFakeEvent("load", testEvent);
-        expect(captured.length, "one event after mounted should be captured").toBe(1);
-        expect(captured[0], "event after mounted should be captured").toBe(testEvent);
-      });
-
       return dispose;
     });
 
+    flush(); // run effect phase → adds event listener
+    dispatchFakeEvent("load", testEvent);
+    expect(captured.length, "one event after mounted should be captured").toBe(1);
+    expect(captured[0], "event after mounted should be captured").toBe(testEvent);
+
     setProps(["load", e => captured2.push(e)]);
+    flush(); // re-run effect → removes old listener, adds new one
 
     dispatchFakeEvent("load", testEvent);
     expect(captured.length, "events should no longer be captured by the previous handler").toBe(1);

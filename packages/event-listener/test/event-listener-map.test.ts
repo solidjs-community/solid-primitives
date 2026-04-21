@@ -1,6 +1,6 @@
 import { dispatchFakeEvent, event_target } from "./setup.js";
 import { describe, test, expect } from "vitest";
-import { createRoot, onMount } from "solid-js";
+import { createRoot, onSettled } from "solid-js";
 import { createEventListenerMap } from "../src/index.js";
 
 describe("createEventListenerMap", () => {
@@ -34,7 +34,7 @@ describe("createEventListenerMap", () => {
         map_1: e => (captured1 = e),
       });
 
-      onMount(() => {
+      onSettled(() => {
         dispatchFakeEvent("map_0", testEvent);
         dispatchFakeEvent("map_1", testEvent1);
 
@@ -55,7 +55,7 @@ describe("createEventListenerMap", () => {
         map_1: e => (captured1 = e),
       });
 
-      onMount(() => {
+      onSettled(() => {
         dispose();
 
         dispatchFakeEvent("map_0", testEvent);
@@ -74,7 +74,7 @@ describe("createEventListenerMap", () => {
         map_0: e => (captured = e),
       });
 
-      onMount(() => {
+      onSettled(() => {
         dispatchFakeEvent("map_0", testEvent);
         expect(captured).toBe(testEvent);
         dispose();

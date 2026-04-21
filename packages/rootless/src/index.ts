@@ -18,6 +18,7 @@ import {
   noop,
   createMicrotask,
   trueFn,
+  INTERNAL_OPTIONS,
 } from "@solid-primitives/utils";
 
 /**
@@ -134,7 +135,9 @@ export function createSingletonRoot<T>(
     });
 
     if (!disposeRoot) {
-      createRoot(dispose => (value = factory((disposeRoot = dispose))), detachedOwner);
+      runWithOwner(detachedOwner, () =>
+        createRoot(dispose => (value = factory((disposeRoot = dispose)))),
+      );
     }
 
     return value!;
@@ -255,7 +258,7 @@ export function createRootPool<TArg, TResult>(
     mapRoot: (dispose: VoidFunction, signal: Signal<TArg>) => Root =
       factory.length > 1
         ? (dispose, [args, set]) => {
-            const [active, setA] = createSignal(true);
+            const [active, setA] = createSignal(true, INTERNAL_OPTIONS);
             const root: Root = {
               dispose,
               set,
@@ -291,9 +294,10 @@ export function createRootPool<TArg, TResult>(
     disposeRoot = (root: Root) => {
       root.dispose();
       root.dispose = noop;
-      if (root.active()) root.setA(false);
+      const idx = pool.indexOf(root);
+      if (idx === -1) root.setA(false);
       else {
-        pool[pool.indexOf(root)] = pool[--length]!;
+        pool[idx] = pool[--length]!;
         pool[length] = undefined!;
       }
     };
@@ -311,7 +315,10 @@ export function createRootPool<TArg, TResult>(
       pool[length] = undefined!;
       root.set(() => arg);
       root.setA(true);
-    } else root = createRoot(dispose => mapRoot(dispose, createSignal(arg)), owner);
+    } else
+      root = runWithOwner(owner, () =>
+        createRoot(dispose => mapRoot(dispose, createSignal(arg, INTERNAL_OPTIONS))),
+      );
 
     onCleanup(() => cleanupRoot(root));
 

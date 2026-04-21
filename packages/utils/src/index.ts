@@ -42,7 +42,7 @@ export const falseFn: () => boolean = () => false;
 export const defaultEquals = isEqual;
 
 export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
-export const INTERNAL_OPTIONS = { pureWrite: true } as const satisfies SignalOptions<unknown>;
+export const INTERNAL_OPTIONS = { ownedWrite: true } as const satisfies SignalOptions<unknown>;
 
 /**
  * Check if the value is an instance of ___
