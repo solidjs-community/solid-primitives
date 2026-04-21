@@ -153,7 +153,7 @@ export function createDerivedStaticStore<T extends object>(
       get() {
         let keyMemo = cache[key];
         if (!keyMemo) {
-          if (!getListener()) return fnMemo()[key];
+          if (!getObserver()) return fnMemo()[key];
           runWithOwner(o, () => (cache[key] = keyMemo = createMemo(() => fnMemo()[key])));
         }
         return keyMemo!();
