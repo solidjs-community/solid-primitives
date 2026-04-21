@@ -163,9 +163,12 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.7
+        version: 2.0.0-beta.7(@solidjs/signals@2.0.0-beta.7)(solid-js@2.0.0-beta.7)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.7
+        version: 2.0.0-beta.7
 
   packages/connectivity:
     dependencies:
@@ -1048,10 +1051,10 @@ importers:
         version: link:../packages/utils
       '@solidjs/meta':
         specifier: ^0.29.3
-        version: 0.29.4(solid-js@1.9.7)
+        version: 0.29.4(solid-js@2.0.0-beta.7)
       '@solidjs/router':
         specifier: ^0.13.1
-        version: 0.13.6(solid-js@1.9.7)
+        version: 0.13.6(solid-js@2.0.0-beta.7)
       clsx:
         specifier: ^2.0.0
         version: 2.1.1
@@ -1078,13 +1081,13 @@ importers:
         version: 1.77.8
       solid-dismiss:
         specifier: ^1.7.121
-        version: 1.8.2(solid-js@1.9.7)
+        version: 1.8.2(solid-js@2.0.0-beta.7)
       solid-icons:
         specifier: ^1.1.0
-        version: 1.1.0(solid-js@1.9.7)
+        version: 1.1.0(solid-js@2.0.0-beta.7)
       solid-tippy:
         specifier: ^0.2.1
-        version: 0.2.1(solid-js@1.9.7)(tippy.js@6.3.7)
+        version: 0.2.1(solid-js@2.0.0-beta.7)(tippy.js@6.3.7)
       tippy.js:
         specifier: ^6.3.7
         version: 6.3.7
@@ -2042,6 +2045,7 @@ packages:
   '@graphql-tools/prisma-loader@8.0.4':
     resolution: {integrity: sha512-hqKPlw8bOu/GRqtYr0+dINAI13HinTVYBDqhwGAPIFmLr5s+qKskzgCiwbsckdrb5LWVFmVZc+UXn80OGiyBzg==}
     engines: {node: '>=16.0.0'}
+    deprecated: 'This package was intended to be used with an older versions of Prisma.\nThe newer versions of Prisma has a different approach to GraphQL integration.\nTherefore, this package is no longer needed and has been deprecated and removed.\nLearn more: https://www.prisma.io/graphql'
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
@@ -2587,10 +2591,19 @@ packages:
     peerDependencies:
       solid-js: ^1.5.3
 
+  '@solidjs/signals@2.0.0-beta.7':
+    resolution: {integrity: sha512-SgK6oQlQZofz82LiEJ2RzT3sbs1lWTqFEtLoWjLsUo/dk1v9EoIFpJJlmvgkXvNugASWG+l1yOHa1a8lPamxug==}
+
   '@solidjs/start@1.1.4':
     resolution: {integrity: sha512-ma1TBYqoTju87tkqrHExMReM5Z/+DTXSmi30CCTavtwuR73Bsn4rVGqm528p4sL2koRMfAuBMkrhuttjzhL68g==}
     peerDependencies:
       vinxi: ^0.5.3
+
+  '@solidjs/web@2.0.0-beta.7':
+    resolution: {integrity: sha512-m5VjmDBufrOX0ZKGbhvwkT0CPK0TbMxDbxVPDB1PH2evGbWXQZcUlrpFM1N8RBO5md3aR/T1PgMfnOjleJbrRg==}
+    peerDependencies:
+      '@solidjs/signals': ^2.0.0-beta.7
+      solid-js: ^2.0.0-beta.7
 
   '@speed-highlight/core@1.2.7':
     resolution: {integrity: sha512-0dxmVj4gxg3Jg879kvFS/msl4s9F3T9UXC1InxgOf7t5NvcPD97u/WTA5vL/IxWHMn7qSxBozqrnnE2wvl1m8g==}
@@ -3513,6 +3526,7 @@ packages:
 
   dax-sh@0.43.2:
     resolution: {integrity: sha512-uULa1sSIHgXKGCqJ/pA0zsnzbHlVnuq7g8O2fkHokWFNwEGIhh5lAJlxZa1POG5En5ba7AU4KcBAvGQWMMf8rg==}
+    deprecated: This package has moved to simply be 'dax' instead of 'dax-sh'
 
   db0@0.3.2:
     resolution: {integrity: sha512-xzWNQ6jk/+NtdfLyXEipbX55dmDSeteLFt/ayF+wZUU5bzKgmrDOxmInUTbyVRp46YwnJdkDA1KhB7WIXFofJw==}
@@ -4164,11 +4178,12 @@ packages:
 
   glob@10.4.5:
     resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   globals@11.12.0:
     resolution: {integrity: sha512-WOBp/EEGUiIsJSp7wcv/y6MO+lV9UoncWqxuFfm8eBwzWNgyfBd6Gz+IeKQ9jCmyhoH99g15M3T+QaVHFjizVA==}
@@ -5892,8 +5907,18 @@ packages:
     peerDependencies:
       seroval: ^1.0
 
+  seroval-plugins@1.5.2:
+    resolution: {integrity: sha512-qpY0Cl+fKYFn4GOf3cMiq6l72CpuVaawb6ILjubOQ+diJ54LfOWaSSPsaswN8DRPIPW4Yq+tE1k5aKd7ILyaFg==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      seroval: ^1.0
+
   seroval@1.3.2:
     resolution: {integrity: sha512-RbcPH1n5cfwKrru7v7+zrZvjLurgHhGyso3HTyGtRivGWgYjbOmGuivCQaORNELjNONoK35nj28EoWul9sb1zQ==}
+    engines: {node: '>=10'}
+
+  seroval@1.5.2:
+    resolution: {integrity: sha512-xcRN39BdsnO9Tf+VzsE7b3JyTJASItIV1FVFewJKCFcW4s4haIKS3e6vj8PGB9qBwC7tnuOywQMdv5N4qkzi7Q==}
     engines: {node: '>=10'}
 
   serve-placeholder@2.0.2:
@@ -6000,6 +6025,9 @@ packages:
 
   solid-js@1.9.7:
     resolution: {integrity: sha512-/saTKi8iWEM233n5OSi1YHCCuh66ZIQ7aK2hsToPe4tqGm7qAejU1SwNuTPivbWAYq7SjuHVVYxxuZQNRbICiw==}
+
+  solid-js@2.0.0-beta.7:
+    resolution: {integrity: sha512-7JHs+BhLeZXoU+u9dG+eKnyxxfZyGpOuJEBbN/1XbHKO/WhxecdplOAurlg/YDllNWPhsbXqmLR1H2paqSu62g==}
 
   solid-refresh@0.6.3:
     resolution: {integrity: sha512-F3aPsX6hVw9ttm5LYlth8Q15x6MlI/J3Dn+o3EQyRTtTxidepSTwAYdozt01/YA+7ObcciagGEyXIopGZzQtbA==}
@@ -6195,6 +6223,7 @@ packages:
   tar@7.4.3:
     resolution: {integrity: sha512-5S7Va8hKfV7W5U6g3aYxXmlPoZVAwUMy9AOKyF2fVuZa2UD3qZjg578OrLRt8PcNN1PleVaL/5/yYATNL0ICUw==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   term-size@2.2.1:
     resolution: {integrity: sha512-wK0Ri4fOGjv/XPy8SBHZChl8CM7uMc5VML7SqiQ0zG7+J5Vr+RMQDoHa2CNT6KHUnTGIXH34UDMkPzAUyapBZg==}
@@ -6710,6 +6739,7 @@ packages:
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-mimetype@4.0.0:
     resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
@@ -8576,17 +8606,19 @@ snapshots:
     dependencies:
       solid-js: 1.9.7
 
-  '@solidjs/meta@0.29.4(solid-js@1.9.7)':
+  '@solidjs/meta@0.29.4(solid-js@2.0.0-beta.7)':
     dependencies:
-      solid-js: 1.9.7
+      solid-js: 2.0.0-beta.7
 
-  '@solidjs/router@0.13.6(solid-js@1.9.7)':
+  '@solidjs/router@0.13.6(solid-js@2.0.0-beta.7)':
     dependencies:
-      solid-js: 1.9.7
+      solid-js: 2.0.0-beta.7
 
   '@solidjs/router@0.8.4(solid-js@1.9.7)':
     dependencies:
       solid-js: 1.9.7
+
+  '@solidjs/signals@2.0.0-beta.7': {}
 
   '@solidjs/start@1.1.4(solid-js@1.9.7)(vinxi@0.5.7(@types/node@22.15.31)(db0@0.3.2)(ioredis@5.6.1)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))(vite@6.3.5(@types/node@22.15.31)(jiti@2.4.2)(sass@1.77.8)(terser@5.42.0)(tsx@4.20.2)(yaml@2.5.0))':
     dependencies:
@@ -8610,6 +8642,13 @@ snapshots:
       - solid-js
       - supports-color
       - vite
+
+  '@solidjs/web@2.0.0-beta.7(@solidjs/signals@2.0.0-beta.7)(solid-js@2.0.0-beta.7)':
+    dependencies:
+      '@solidjs/signals': 2.0.0-beta.7
+      seroval: 1.5.2
+      seroval-plugins: 1.5.2(seroval@1.5.2)
+      solid-js: 2.0.0-beta.7
 
   '@speed-highlight/core@1.2.7': {}
 
@@ -12441,7 +12480,13 @@ snapshots:
     dependencies:
       seroval: 1.3.2
 
+  seroval-plugins@1.5.2(seroval@1.5.2):
+    dependencies:
+      seroval: 1.5.2
+
   seroval@1.3.2: {}
+
+  seroval@1.5.2: {}
 
   serve-placeholder@2.0.2:
     dependencies:
@@ -12557,19 +12602,26 @@ snapshots:
       dot-case: 3.0.4
       tslib: 2.8.1
 
-  solid-dismiss@1.8.2(solid-js@1.9.7):
+  solid-dismiss@1.8.2(solid-js@2.0.0-beta.7):
     dependencies:
-      solid-js: 1.9.7
+      solid-js: 2.0.0-beta.7
 
-  solid-icons@1.1.0(solid-js@1.9.7):
+  solid-icons@1.1.0(solid-js@2.0.0-beta.7):
     dependencies:
-      solid-js: 1.9.7
+      solid-js: 2.0.0-beta.7
 
   solid-js@1.9.7:
     dependencies:
       csstype: 3.1.3
       seroval: 1.3.2
       seroval-plugins: 1.3.2(seroval@1.3.2)
+
+  solid-js@2.0.0-beta.7:
+    dependencies:
+      '@solidjs/signals': 2.0.0-beta.7
+      csstype: 3.1.3
+      seroval: 1.5.2
+      seroval-plugins: 1.5.2(seroval@1.5.2)
 
   solid-refresh@0.6.3(solid-js@1.9.7):
     dependencies:
@@ -12580,9 +12632,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  solid-tippy@0.2.1(solid-js@1.9.7)(tippy.js@6.3.7):
+  solid-tippy@0.2.1(solid-js@2.0.0-beta.7)(tippy.js@6.3.7):
     dependencies:
-      solid-js: 1.9.7
+      solid-js: 2.0.0-beta.7
       tippy.js: 6.3.7
 
   solid-transition-group@0.2.3(solid-js@1.9.7):

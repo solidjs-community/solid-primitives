@@ -13,7 +13,9 @@ import {
   DEV,
   equalFn,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+// isServer moved from solid-js/web (1.x) to @solidjs/web (2.x).
+// typeof window is a universal fallback compatible with both versions.
+const isServer = typeof window === "undefined";
 import type {
   AnyClass,
   MaybeAccessor,
