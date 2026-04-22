@@ -3,6 +3,7 @@ import {
   type Accessor,
   batch,
   type JSX,
+  type Resource,
   type Setter,
   createComputed,
   createMemo,
@@ -350,14 +351,6 @@ declare module "solid-js" {
   }
 }
 
-export type _E = JSX.Element;
-
-/** Function-shaped accessor with live .loading / .error properties */
-export type PagesAccessor<T> = (() => T[]) & {
-    readonly loading: boolean;
-    readonly error: unknown;
-};
-
 /**
  * Provides an easy way to implement infinite scrolling.
  *
@@ -366,120 +359,105 @@ export type PagesAccessor<T> = (() => T[]) & {
  *   createInfiniteScroll(fetcher);
  * ```
  * @param fetcher `(page: number) => Promise<T[]>`
- * @return `pages()` is an accessor that returns the concatenated items array
- * @property `pages.loading` live boolean for loading state
- * @property `pages.error` last error (if any)
- * @return `loader` is a ref-callback for your sentinel element (e.g. <div ref={loader} />)
- * @method `page` current page index accessor
- * @method `setPage` manually change the page
- * @method `setPages` replace the entire concatenated items array
- * @method `end` whether we've reached the end (fetch returned empty)
- * @method `setEnd` manually set end
- * @method `refetch` imperatively refetch data
+ * @return `pages` an accessor over the concatenated items array. The accessor
+ *   also carries reactive `loading` and `error` fields forwarded from the
+ *   underlying `solid-js` `Resource`, so their behavior matches any other
+ *   resource in a Solid app.
+ * @return `loader` ref-callback for your sentinel element (e.g. `<div ref={loader} />`).
+ * @method `page` current page index accessor.
+ * @method `setPage` manually change the page.
+ * @method `setPages` replace the entire concatenated items array.
+ * @method `end` whether we've reached the end (fetch returned empty).
+ * @method `setEnd` manually set end.
+ * @method `refetch` imperatively refetch data.
  */
 type Resp<T> = { page: number; items: T[] };
-export function createInfiniteScroll<T>(
-    fetcher: (page: number) => Promise<T[]>
-): [
-    pages: PagesAccessor<T>,
-    loader: (el: Element | null) => void,
-    options: {
-        page: Accessor<number>;
-        setPage: Setter<number>;
-        setPages: Setter<T[]>;
-        end: Accessor<boolean>;
-        setEnd: Setter<boolean>;
-        refetch: (
-            info?: unknown
-        ) => Resp<T> | Promise<Resp<T> | undefined> | null | undefined;
-    }
+export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
+  pages: Accessor<T[]> & Pick<Resource<T[]>, "loading" | "error">,
+  loader: (el: Element | null) => void,
+  options: {
+    page: Accessor<number>;
+    setPage: Setter<number>;
+    setPages: Setter<T[]>;
+    end: Accessor<boolean>;
+    setEnd: Setter<boolean>;
+    refetch: (info?: unknown) => Resp<T> | Promise<Resp<T> | undefined> | null | undefined;
+  },
 ] {
-    const [items, setItems] = createSignal<T[]>([]);
-    const [page, setPage] = createSignal(0);
-    const [end, setEnd] = createSignal(false);
+  const [items, setItems] = createSignal<T[]>([]);
+  const [page, setPage] = createSignal(0);
+  const [end, setEnd] = createSignal(false);
 
-    // Wrap fetcher so we know which page the data is for
+  // Tag each response with the page it came from so we can ignore stale/duplicate appends
+  const wrapped = async (p: number): Promise<Resp<T>> => ({
+    page: p,
+    items: await fetcher(p),
+  });
 
-    const wrapped = async (p: number): Promise<Resp<T>> => ({
-        page: p,
-        items: await fetcher(p),
+  const [res, { refetch }] = createResource<Resp<T>, number>(page, wrapped);
+
+  let lastAppended = -1;
+  createComputed(() => {
+    // Read via `.latest` so a changing source signal doesn't propagate
+    // suspense to an enclosing <Suspense> boundary on every page change.
+    const r = res.latest;
+    if (!r) return;
+    batch(() => {
+      if (r.items.length === 0) {
+        setEnd(true);
+        return;
+      }
+      if (r.page !== lastAppended) {
+        setItems(prev => [...prev, ...r.items]);
+        lastAppended = r.page;
+      }
     });
+  });
 
-    // Note the generic order: <Return, Source>
-    const [res, { refetch }] = createResource<Resp<T>, number>(page, wrapped);
-
-    let lastAppended = -1;
-    createComputed(() => {
-        const r = res();
-        if (!r) return;
-
-        const { page: respPage, items: data } = r;
-
-        batch(() => {
-            if (data.length === 0) {
-                setEnd(true);
-                return;
-            }
-            if (respPage !== lastAppended) {
-                setItems((prev: T[]) => [...prev, ...data]);
-                lastAppended = respPage;
-            }
-        });
-    });
-
-    let io: IntersectionObserver | null = null;
-    let observed: Element | null = null;
-    const loader = (el: Element | null) => {
-        if (isServer) return;
-
-        if (observed && io) {
-            io.unobserve(observed);
-            observed = null;
-        }
-        if (!io) {
-            io = new IntersectionObserver(
-                (entries) => {
-                    if (!entries.some((e) => e.isIntersecting)) return;
-                    if (end() || res.loading) return; // don't advance
-                    setPage((p: number) => p + 1);
-                },
-                {
-                    root: null,
-                    rootMargin: "0px 0px 400px 0px", 
-                    threshold: 0,
-                }
-            );
-            onCleanup(() => {
-                io?.disconnect();
-                io = null;
-            });
-        }
-        if (el) {
-            io.observe(el);
-            observed = el;
-            onCleanup(() => {
-                if (io && el) io.unobserve(el);
-                if (observed === el) observed = null;
-            });
-        }
-    };
-
-    const pages = (() => items()) as PagesAccessor<T>;
-    Object.defineProperties(pages, {
-        loading: { get: () => res.loading },
-        error: { get: () => res.error },
-    });
-
-    return [
-        pages,
-        loader,
-        {
-            page,
-            setPage,
-            setPages: setItems,
-            end,
-            setEnd,
-            refetch,
+  let io: IntersectionObserver | null = null;
+  let observed: Element | null = null;
+  const loader = (el: Element | null) => {
+    if (isServer) return;
+    if (observed && io) {
+      io.unobserve(observed);
+      observed = null;
+    }
+    if (!io) {
+      io = new IntersectionObserver(
+        entries => {
+          if (!entries.some(e => e.isIntersecting)) return;
+          if (end() || res.loading) return;
+          setPage(p => p + 1);
         },
-    ];
+        { root: null, rootMargin: "0px 0px 50px 0px", threshold: 0 },
+      );
+      onCleanup(() => {
+        io?.disconnect();
+        io = null;
+      });
+    }
+    if (el) {
+      io.observe(el);
+      observed = el;
+    }
+  };
+
+  const pages = (() => items()) as Accessor<T[]> & Pick<Resource<T[]>, "loading" | "error">;
+  Object.defineProperties(pages, {
+    loading: { get: () => res.loading, enumerable: true },
+    error: { get: () => res.error, enumerable: true },
+  });
+
+  return [
+    pages,
+    loader,
+    {
+      page,
+      setPage,
+      setPages: setItems,
+      end,
+      setEnd,
+      refetch,
+    },
+  ];
 }
