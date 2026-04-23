@@ -1,7 +1,6 @@
 packages:
   - packages/*
   - site
-  - ../testing-pagination
 
 onlyBuiltDependencies:
   - esbuild
