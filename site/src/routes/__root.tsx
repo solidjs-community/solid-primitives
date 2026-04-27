@@ -1,12 +1,7 @@
 /// <reference types="vite/client" />
 import { ErrorBoundary, type ParentProps, Suspense } from "solid-js";
 import { HydrationScript } from "solid-js/web";
-import {
-  createRootRoute,
-  HeadContent,
-  Outlet,
-  Scripts,
-} from "@tanstack/solid-router";
+import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/solid-router";
 
 import "../app.scss";
 

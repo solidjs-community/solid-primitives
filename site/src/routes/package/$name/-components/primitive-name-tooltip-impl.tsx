@@ -94,11 +94,7 @@ const TooltipBody: Component<{
         </div>
       </div>
 
-      <TooltipSVG
-        width={elSize().width}
-        height={elSize().height}
-        placement={props.placement()}
-      />
+      <TooltipSVG width={elSize().width} height={elSize().height} placement={props.placement()} />
     </div>
   );
 };
@@ -259,10 +255,7 @@ function attachTooltip(
     floating.style.cssText = "position:absolute;top:0;left:0;z-index:9999;";
     document.body.appendChild(floating);
 
-    dispose = render(
-      () => <TooltipBody data={data} type={type} placement={placement} />,
-      floating,
-    );
+    dispose = render(() => <TooltipBody data={data} type={type} placement={placement} />, floating);
     stopAutoUpdate = autoUpdate(reference, floating, update);
 
     // Track hover over the floating element too so "interactive" mode works —
