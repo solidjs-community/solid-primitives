@@ -59,8 +59,7 @@ const ClientSearchModal: Component<{
 
   const scrollToLink = () => {
     const hash = location().hash;
-    if (!hash) return;
-    if (hash === prevHash) return;
+    if (!hash || hash === prevHash) return;
     prevHash = hash;
 
     scrollIntoView(`[href="#${hash}"]`, { behavior: "auto", offset: 70 });
