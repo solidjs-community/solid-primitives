@@ -169,7 +169,9 @@ const Search: Component<{
                             <Show when={showRest() || idx() < MAX_PRIMITIVES_COUNT}>
                               <li>
                                 <Link
-                                  to={`/package/${match.name.toLowerCase()}#${primitive.toLowerCase()}` as any}
+                                  to={
+                                    `/package/${match.name.toLowerCase()}#${primitive.toLowerCase()}` as any
+                                  }
                                   class="[&>mark]:background-[linear-gradient(0deg,#ffaf1d,#ffaf1d)_center_/_100%_75%_no-repeat] inline-block rounded-md bg-[#e6f0ff] px-2 py-[2px] text-[14px] font-semibold text-[#063983] transition-colors hover:text-black sm:text-base dark:bg-[#30455b] dark:text-[#b9d6ff] dark:hover:text-[#fff]"
                                 >
                                   {highlight(primitive)}
