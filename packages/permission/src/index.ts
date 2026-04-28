@@ -1,5 +1,4 @@
-import { type Accessor, createEffect, createSignal, on, onCleanup } from "solid-js";
-import { isServer } from "solid-js/web";
+import { type Accessor, createEffect, createSignal } from "solid-js";
 
 /**
  * Querying the permission API
@@ -10,7 +9,7 @@ import { isServer } from "solid-js/web";
 export const createPermission = (
   name: PermissionDescriptor | PermissionName | "microphone" | "camera",
 ): Accessor<PermissionState | "unknown"> => {
-  if (isServer) {
+  if (globalThis.window !== globalThis) {
     return () => "unknown";
   }
   const [permission, setPermission] = createSignal<PermissionState | "unknown">("unknown");
@@ -43,14 +42,15 @@ export const createPermission = (
             : getUserMedia(constraints);
       });
     createEffect(
-      on(status, status => {
+      status, 
+      (status?: PermissionStatus) => {
         if (status) {
           setPermission(status.state);
           const listener = () => setPermission(status.state);
           status.addEventListener("change", listener);
-          onCleanup(() => status.removeEventListener("change", listener));
+          return () => status.removeEventListener("change", listener);
         }
-      }),
+      }
     );
   }
   return permission;
