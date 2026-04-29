@@ -115,7 +115,7 @@ export const createGeolocation = (
     const stub = () => {
       throw new NotReadyError("Geolocation is not available on the server.");
     };
-    return [stub as Accessor<GeolocationCoordinates>, noop];
+    return [stub as () => Promise<GeolocationCoordinates>, noop];
   }
 
   const [version, bump] = createSignal(0);
