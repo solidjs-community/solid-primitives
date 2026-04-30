@@ -17,6 +17,7 @@ import {
   type Owner,
   type SignalOptions,
   DEV,
+  getListener,
 } from "solid-js";
 import { isServer } from "solid-js/web";
 import { debounce, throttle } from "@solid-primitives/scheduled";
@@ -420,6 +421,109 @@ export function createLazyMemo<T>(
     const v = memo();
     isReading = false;
     return v;
+  };
+}
+
+/**
+ * Reference counted `createMemo`. The memo calculation will only run when there is at least one listener.
+ *
+ * Once the number of listeners drops to zero, the internal memo will be disposed after a microtask.
+ * If a new listener is added later, the memo will be re-constructed.
+ *
+ * Unlike `createLazyMemo`, the internal memo's lifetime is managed by the number of listeners,
+ * and it will stop updating when there are no listeners.
+ *
+ * @param calc pure reactive calculation returning some value
+ * @param value initial value for the calculation
+ * @param options computation options
+ * @returns accessor of the calculated value
+ *
+ * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/memo#createRcMemo
+ *
+ * @example
+ * ```ts
+ * const double = createRcMemo(() => count() * 2)
+ * ```
+ */
+export function createRcMemo<T>(
+  calc: (prev: T) => T,
+  value: T,
+  options?: EffectOptions,
+): Accessor<T>;
+
+export function createRcMemo<T>(
+  calc: (prev: T | undefined) => T,
+  value?: undefined,
+  options?: EffectOptions,
+): Accessor<T>;
+
+export function createRcMemo<T>(
+  calc: (prev: T | undefined) => T,
+  value?: T,
+  options?: EffectOptions,
+): Accessor<T> {
+  if (isServer) {
+    let calculated = false;
+    return () => {
+      if (!calculated) {
+        calculated = true;
+        value = calc(value);
+      }
+      return value as T;
+    };
+  }
+  let existing: {
+    memo: Accessor<T>,
+    dispose: () => void,
+    refCount: number,
+  } | undefined = undefined;
+  let lastSeenValue: T | undefined = value;
+  // For capturing context
+  const owner = getOwner();
+  //
+  return () => {
+    if (getListener() == null) {
+      if (existing === undefined) {
+        return calc(undefined);
+      } else {
+        return existing.memo();
+      }
+    } else {
+      if (existing == undefined) {
+        runWithOwner(owner, () => {
+          existing = createRoot((dispose) => {
+            return {
+              memo: createMemo(
+                (prev) => {
+                  let result = calc(prev);
+                  lastSeenValue = result;
+                  return result;
+                },
+                lastSeenValue,
+                options,
+              ),
+              dispose,
+              refCount: 1,
+            };
+          });
+        });
+      } else {
+        existing.refCount++;
+      }
+      let existing2 = existing!;
+      onCleanup(() => {
+        existing2.refCount--;
+        if (existing2.refCount == 0) {
+          queueMicrotask(() => {
+            if (existing2.refCount == 0) {
+              existing2.dispose();
+              existing = undefined;
+            }
+          });
+        }
+      });
+      return existing2.memo();
+    }
   };
 }
 
