@@ -436,6 +436,8 @@ export function createLazyMemo<T>(
  * It can be created outside of a reactive root, as it manages its own internal owner.
  * If it is created inside a reactive root, it will carry the context of that root.
  *
+ * On the server, it will calculate the value lazily when first accessed and then cache it.
+ *
  * **Note:** Because the internal memo is disposed when there are no listeners, the `prev` value in the calculation function will become stale if the internal memo is reconstructed.
  *
  * @param calc pure reactive calculation returning some value

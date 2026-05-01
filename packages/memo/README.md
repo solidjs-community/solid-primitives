@@ -208,6 +208,10 @@ double(); // T: number
 
 Because the internal memo is disposed when there are no listeners, the `prev` value in the calculation function will become stale if the internal memo is reconstructed.
 
+### Server-side behavior
+
+On the server, `createRcMemo` will calculate the value lazily when first accessed and then cache it for subsequent calls.
+
 ## `createDebouncedMemo`
 
 `createDebouncedMemo` is deprecated. Please use `createSchedule` from [`@solid-primitives/schedule`](https://github.com/solidjs-community/solid-primitives/tree/main/packages/scheduled#readme) instead.
