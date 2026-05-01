@@ -14,6 +14,7 @@ Collection of custom `createMemo` primitives. They extend it's functionality whi
 - [`createLatestMany`](#createlatestmany) - A combined memo of a list of sources, returns the value of all last updated ones.
 - [`createWritableMemo`](#createwritablememo) - Solid's `createMemo` which value can be overwritten by a setter.
 - [`createLazyMemo`](#createlazymemo) - Lazily evaluated memo. Will run the calculation only if is being listened to.
+- [`createRcMemo`](#creatercmemo) - Reference counted memo. Calculation runs only when there is at least one listener.
 - [`createPureReaction`](#createpurereaction) - A `createReaction` that runs before render _(non-batching)_.
 - [`createMemoCache`](#creatememocache) - Custom, lazily-evaluated, memo, with caching based on keys.
 - [`createReducer`](#createreducer) - Primitive for updating signal in a predictable way.
@@ -182,6 +183,30 @@ const double = createMemo(() => getDouble(count()));
 ### Demo
 
 https://codesandbox.io/s/solid-primitives-memo-demo-3w0oz?file=/index.tsx
+
+## `createRcMemo`
+
+Reference counted `createMemo`. The memo calculation will only run when there is at least one listener.
+
+Once the number of listeners drops to zero, the internal memo will be disposed after a microtask. If a new listener is added later, the internal memo will be re-constructed.
+
+Unlike `createLazyMemo`, the internal memo's lifetime is managed by the number of listeners, and it will stop updating when there are no listeners.
+
+### How to use it
+
+It's usage is almost the same as Solid's `createMemo`. However, it doesn't need to be placed inside a reactive root, as it manages its own internal owner. If it is created inside a reactive root, it will carry the context of that root.
+
+```ts
+import { createRcMemo } from "@solid-primitives/memo";
+
+// use like a createMemo
+const double = createRcMemo(() => count() * 2);
+double(); // T: number
+```
+
+### Note on `prev` value
+
+Because the internal memo is disposed when there are no listeners, the `prev` value in the calculation function will become stale if the internal memo is reconstructed.
 
 ## `createDebouncedMemo`
 

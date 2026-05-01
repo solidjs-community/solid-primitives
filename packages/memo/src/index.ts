@@ -428,10 +428,15 @@ export function createLazyMemo<T>(
  * Reference counted `createMemo`. The memo calculation will only run when there is at least one listener.
  *
  * Once the number of listeners drops to zero, the internal memo will be disposed after a microtask.
- * If a new listener is added later, the memo will be re-constructed.
+ * If a new listener is added later, the internal memo will be re-constructed.
  *
  * Unlike `createLazyMemo`, the internal memo's lifetime is managed by the number of listeners,
  * and it will stop updating when there are no listeners.
+ *
+ * It can be created outside of a reactive root, as it manages its own internal owner.
+ * If it is created inside a reactive root, it will carry the context of that root.
+ *
+ * **Note:** Because the internal memo is disposed when there are no listeners, the `prev` value in the calculation function will become stale if the internal memo is reconstructed.
  *
  * @param calc pure reactive calculation returning some value
  * @param value initial value for the calculation
@@ -482,14 +487,14 @@ export function createRcMemo<T>(
   const owner = getOwner();
   //
   return () => {
-    if (getListener() == null) {
+    if (getListener() === null) {
       if (existing === undefined) {
         return calc(undefined);
       } else {
         return existing.memo();
       }
     } else {
-      if (existing == undefined) {
+      if (existing === undefined) {
         runWithOwner(owner, () => {
           existing = createRoot((dispose) => {
             return {
@@ -513,9 +518,9 @@ export function createRcMemo<T>(
       let existing2 = existing!;
       onCleanup(() => {
         existing2.refCount--;
-        if (existing2.refCount == 0) {
+        if (existing2.refCount === 0) {
           queueMicrotask(() => {
-            if (existing2.refCount == 0) {
+            if (existing2.refCount === 0) {
               existing2.dispose();
               existing = undefined;
             }
