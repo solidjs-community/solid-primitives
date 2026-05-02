@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/media",
-  "version": "2.3.5",
+  "version": "3.0.0",
   "description": "Primitives for media query and device features",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
@@ -68,10 +68,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.10",
+    "solid-js": "^2.0.0-beta.10"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.10",
+    "solid-js": "2.0.0-beta.10"
   }
 }
