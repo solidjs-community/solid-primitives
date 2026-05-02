@@ -82,12 +82,12 @@ A reactive audio primitive. Returns a flat object with writable signal accessors
 ```ts
 const audio = createAudio("example.mp3");
 
-audio.playing()        // boolean
-audio.setPlaying(true) // plays
-audio.volume()         // 0–1
-audio.setVolume(0.5)
-audio.currentTime()    // seconds
-audio.seek(30)
+audio.playing(); // boolean
+audio.setPlaying(true); // plays
+audio.volume(); // 0–1
+audio.setVolume(0.5);
+audio.currentTime(); // seconds
+audio.seek(30);
 ```
 
 The `duration` accessor throws `NotReadyError` until the audio metadata has loaded, making it work naturally with Solid 2.0's `<Loading>` boundary. After the first `loadeddata` event it returns the duration in seconds reactively. The pending state resets whenever the source changes.
