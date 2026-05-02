@@ -1,6 +1,5 @@
 import { createSignal, type JSX } from "solid-js";
-import { isServer } from "solid-js/web";
-import { noop } from "@solid-primitives/utils";
+import { isServer } from "@solidjs/web";
 import { transformFiles, createInputComponent } from "./helpers.js";
 import type { FileUploader, FileUploaderOptions, UploadFile, UserCallback } from "./types.js";
 
@@ -8,6 +7,7 @@ import type { FileUploader, FileUploaderOptions, UploadFile, UserCallback } from
  * Primitive to make uploading files easier.
  *
  * @returns `files`
+ * @returns `error` - Reactive error from the last `selectFiles` callback, cleared on next selection
  * @returns `selectFiles` - Open file picker, set files and run user callback
  * @returns `removeFile`
  * @returns `clearFiles`
@@ -15,11 +15,11 @@ import type { FileUploader, FileUploaderOptions, UploadFile, UserCallback } from
  * @example
  * ```ts
  * // multiple files
- * const {files, selectFiles} = createFileUploader({ multiple: true, accept: "image/*" });
+ * const { files, error, selectFiles } = createFileUploader({ multiple: true, accept: "image/*" });
  * selectFiles(files => files.forEach(file => console.log(file)));
  *
  * // single file
- * const {file, selectFile} = createFileUploader();
+ * const { files, error, selectFiles } = createFileUploader();
  * selectFiles(([{ source, name, size, file }]) => console.log({ source, name, size, file }));
  * ```
  */
@@ -27,12 +27,14 @@ function createFileUploader(options?: FileUploaderOptions): FileUploader {
   if (isServer) {
     return {
       files: () => [],
-      selectFiles: noop,
-      removeFile: noop,
-      clearFiles: noop,
+      error: () => null,
+      selectFiles: () => {},
+      removeFile: () => {},
+      clearFiles: () => {},
     };
   }
   const [files, setFiles] = createSignal<UploadFile[]>([]);
+  const [error, setError] = createSignal<unknown>(null);
 
   let userCallback: UserCallback = () => {};
 
@@ -51,14 +53,13 @@ function createFileUploader(options?: FileUploaderOptions): FileUploader {
     target.remove();
 
     setFiles(parsedFiles);
+    setError(null);
 
     try {
       await userCallback(parsedFiles);
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error);
+    } catch (err) {
+      setError(err);
     }
-    return;
   };
 
   const selectFiles = (callback?: UserCallback) => {
@@ -82,6 +83,7 @@ function createFileUploader(options?: FileUploaderOptions): FileUploader {
 
   return {
     files,
+    error,
     selectFiles,
     removeFile,
     clearFiles,
