@@ -1,21 +1,20 @@
 import { accessWith, isObject, type SetterParam } from "@solid-primitives/utils";
 import {
   type Accessor,
-  batch,
   createMemo,
   createSignal,
   type EffectFunction,
-  getListener,
+  getObserver,
   getOwner,
   type MemoOptions,
   type NoInfer,
-  onMount,
+  onSettled,
   runWithOwner,
   sharedConfig,
   type Signal,
   untrack,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 export type StaticStoreSetter<T extends object> = {
   (setter: (prev: T) => Partial<T>): T;
@@ -54,8 +53,8 @@ export function createStaticStore<T extends object>(
   const getValue = (key: keyof T): T[keyof T] => {
     let signal = cache[key];
     if (!signal) {
-      if (!getListener()) return copy[key];
-      cache[key] = signal = createSignal(copy[key], { internal: true });
+      if (!getObserver()) return copy[key];
+      cache[key] = signal = createSignal(copy[key], { pureWrite: true });
       delete copy[key];
     }
     return signal[0]();
@@ -78,9 +77,7 @@ export function createStaticStore<T extends object>(
         const entries = untrack(
           () => Object.entries(accessWith(a, store) as Partial<T>) as [any, any][],
         );
-        batch(() => {
-          for (const [key, value] of entries) setValue(key, () => value);
-        });
+        for (const [key, value] of entries) setValue(key, () => value);
       } else setValue(a, b);
       return store;
     },
@@ -104,9 +101,9 @@ export function createHydratableStaticStore<T extends object>(
 ): ReturnType<typeof createStaticStore<T>> {
   if (isServer) return createStaticStore(serverValue);
 
-  if (sharedConfig.context) {
+  if (sharedConfig.hydrating) {
     const [state, setState] = createStaticStore(serverValue);
-    onMount(() => setState(update()));
+    onSettled(() => setState(update()));
     return [state, setState];
   }
 
@@ -156,7 +153,7 @@ export function createDerivedStaticStore<T extends object>(
       get() {
         let keyMemo = cache[key];
         if (!keyMemo) {
-          if (!getListener()) return fnMemo()[key];
+          if (!getObserver()) return fnMemo()[key];
           runWithOwner(o, () => (cache[key] = keyMemo = createMemo(() => fnMemo()[key])));
         }
         return keyMemo!();

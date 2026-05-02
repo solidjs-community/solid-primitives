@@ -23,6 +23,8 @@ npm install @solid-primitives/media
 yarn add @solid-primitives/media
 ```
 
+> **Requires Solid.js v2.0 (beta.7+)**
+
 ## `makeMediaQueryListener`
 
 Attaches a MediaQuery listener to window, listeneing to changes to provided query
@@ -77,20 +79,23 @@ const breakpoints = {
 const Example: Component = () => {
   const matches = createBreakpoints(breakpoints);
 
-  createEffect(() => {
-    console.log(matches.sm); // true when screen width >= 640px
-    console.log(matches.lg); // true when screen width >= 1024px
-    console.log(matches.xl); // true when screen width >= 1280px
-  });
+  createEffect(
+    () => [matches.sm, matches.lg, matches.xl],
+    ([sm, lg, xl]) => {
+      console.log(sm); // true when screen width >= 640px
+      console.log(lg); // true when screen width >= 1024px
+      console.log(xl); // true when screen width >= 1280px
+    },
+  );
 
   return (
     <div
-      classList={{
-        "text-tiny flex flex-column": true, // tiny text with flex column layout
-        "text-small": matches.sm, // small text with flex column layout
-        "text-base flex-row": matches.lg, // base text with flex row layout
-        "text-huge": matches.xl, // huge text with flex row layout
-      }}
+      class={[
+        "text-tiny flex-column flex", // tiny text with flex column layout
+        matches.sm && "text-small", // small text with flex column layout
+        matches.lg && "flex-row text-base", // base text with flex row layout
+        matches.xl && "text-huge", // huge text with flex row layout
+      ]}
     >
       <Switch fallback={<div>Smallest</div>}>
         <Match when={matches.xl}>Extra Large</Match>
@@ -169,9 +174,7 @@ Provides a signal indicating if the user has requested dark color theme. The set
 import { createPrefersDark } from "@solid-primitives/media";
 
 const prefersDark = createPrefersDark();
-createEffect(() => {
-  prefersDark(); // => boolean
-});
+createEffect(prefersDark, dark => console.log("prefers dark:", dark));
 ```
 
 ### Server fallback
@@ -192,9 +195,7 @@ This primitive provides a [singleton root](https://github.com/solidjs-community/
 import { usePrefersDark } from "@solid-primitives/media";
 
 const prefersDark = usePrefersDark();
-createEffect(() => {
-  prefersDark(); // => boolean
-});
+createEffect(prefersDark, dark => console.log("prefers dark:", dark));
 ```
 
 > Note: `usePrefersDark` will deopt to `createPrefersDark` if used during hydration. (see issue [#310](https://github.com/solidjs-community/solid-primitives/issues/310))
