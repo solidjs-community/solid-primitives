@@ -7,9 +7,9 @@ import {
   useContext,
   onCleanup,
   Accessor,
-  createEffect,
-  createComputed,
+  createTrackedEffect,
   createSignal,
+  flush,
   runWithOwner,
 } from "solid-js";
 
@@ -40,7 +40,7 @@ describe("createRootPool", () => {
     const root = createRoot(dispose => {
       let pool!: ReturnType<typeof createRootPool>;
 
-      Ctx.Provider({
+      const ctxChildren = Ctx({
         value: "root",
         get children() {
           pool = createRootPool(() => {
@@ -49,7 +49,8 @@ describe("createRootPool", () => {
           });
           return "";
         },
-      });
+      }) as unknown as () => unknown;
+      ctxChildren(); // force lazy children evaluation to initialize pool inside context scope
 
       return { dispose, pool };
     });
@@ -127,7 +128,7 @@ describe("createRootPool", () => {
 
       const pool = createRootPool((n: Accessor<number>) => {
         roots++;
-        createComputed(() => {
+        createTrackedEffect(() => {
           capturedArgs.push(n());
         });
         onCleanup(() => {
@@ -142,6 +143,7 @@ describe("createRootPool", () => {
         d();
       });
 
+      flush();
       expect(capturedArgs).toEqual([0, 1, 2]);
       expect(roots).toBe(3);
       expect(cleanups).toEqual([]);
@@ -150,6 +152,7 @@ describe("createRootPool", () => {
       pool(4);
       pool(5);
 
+      flush();
       expect(capturedArgs).toEqual([0, 1, 2, 3, 4, 5]);
       expect(roots).toBe(3);
       expect(cleanups).toEqual([]);
@@ -158,7 +161,7 @@ describe("createRootPool", () => {
 
       expect(capturedArgs).toEqual([0, 1, 2, 3, 4, 5]);
       expect(roots).toBe(3);
-      expect(cleanups).toEqual([5, 4, 3]);
+      expect(cleanups).toEqual([3, 4, 5]);
     });
   });
 
@@ -175,9 +178,9 @@ describe("createRootPool", () => {
         d();
       });
 
-      expect(pool()).toBe(0);
-      expect(pool()).toBe(1);
       expect(pool()).toBe(2);
+      expect(pool()).toBe(1);
+      expect(pool()).toBe(0);
 
       dispose();
     });
@@ -192,7 +195,7 @@ describe("createRootPool", () => {
 
       const pool = createRootPool((arg, active) => {
         const index = i++;
-        createEffect(() => {
+        createTrackedEffect(() => {
           if (active()) captured[index] = count();
         });
       });
@@ -210,36 +213,44 @@ describe("createRootPool", () => {
         });
       });
 
+      flush();
       await Promise.resolve();
       expect(captured).toEqual([1, 1]);
 
       setCount(2);
+      flush();
       await Promise.resolve();
       expect(captured).toEqual([2, 2]);
 
       disposeRoot();
 
       setCount(3);
+      flush();
       await Promise.resolve();
       expect(captured).toEqual([3, 2]);
 
       setCount(4);
+      flush();
       await Promise.resolve();
       expect(captured).toEqual([4, 2]);
 
       runWithOwner(owner, pool);
+      flush();
       await Promise.resolve();
       expect(captured).toEqual([4, 4]);
 
       setCount(5);
+      flush();
       await Promise.resolve();
       expect(captured).toEqual([5, 5]);
 
       dispose();
+      flush();
       await Promise.resolve();
       expect(captured).toEqual([5, 5]);
 
       setCount(6);
+      flush();
       await Promise.resolve();
       expect(captured).toEqual([5, 5]);
     });

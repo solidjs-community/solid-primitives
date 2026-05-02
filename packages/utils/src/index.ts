@@ -4,14 +4,13 @@ import {
   createSignal,
   type Accessor,
   untrack,
-  type AccessorArray,
   type EffectFunction,
   type NoInfer,
   type SignalOptions,
   sharedConfig,
-  onMount,
+  onSettled,
   DEV,
-  equalFn,
+  isEqual,
 } from "solid-js";
 import { isServer } from "@solidjs/web";
 import type {
@@ -39,11 +38,11 @@ export const noop = (() => void 0) as Noop;
 export const trueFn: () => boolean = () => true;
 export const falseFn: () => boolean = () => false;
 
-/** @deprecated use {@link equalFn} from "solid-js" */
-export const defaultEquals = equalFn;
+/** @deprecated use {@link isEqual} from "solid-js" */
+export const defaultEquals = isEqual;
 
 export const EQUALS_FALSE_OPTIONS = { equals: false } as const satisfies SignalOptions<unknown>;
-export const INTERNAL_OPTIONS = { internal: true } as const satisfies SignalOptions<unknown>;
+export const INTERNAL_OPTIONS = { ownedWrite: true } as const satisfies SignalOptions<unknown>;
 
 /**
  * Check if the value is an instance of ___
@@ -153,17 +152,17 @@ export function accessWith<T>(
  * @param initialValue
  */
 export function defer<S, Next extends Prev, Prev = Next>(
-  deps: AccessorArray<S> | Accessor<S>,
+  deps: Accessor<S>[] | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
   initialValue: Next,
 ): EffectFunction<undefined | NoInfer<Next>, NoInfer<Next>>;
 export function defer<S, Next extends Prev, Prev = Next>(
-  deps: AccessorArray<S> | Accessor<S>,
+  deps: Accessor<S>[] | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
   initialValue?: undefined,
 ): EffectFunction<undefined | NoInfer<Next>>;
 export function defer<S, Next extends Prev, Prev = Next>(
-  deps: AccessorArray<S> | Accessor<S>,
+  deps: Accessor<S>[] | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
   initialValue?: Next,
 ): EffectFunction<undefined | NoInfer<Next>> {
@@ -256,9 +255,9 @@ export function createHydratableSignal<T>(
   if (isServer) {
     return createSignal(serverValue, options);
   }
-  if (sharedConfig.context) {
+  if (sharedConfig.hydrating) {
     const [state, setState] = createSignal(serverValue, options);
-    onMount(() => setState(() => update()));
+    onSettled(() => setState(() => update()));
     return [state, setState];
   }
   return createSignal(update(), options);
