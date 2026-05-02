@@ -20,9 +20,9 @@ Primitives to help establish, maintain, and operate WebSocket connections in Sol
 ### Message primitives
 
 - [`createWSMessage`](#createwsmessage) — reactive signal for the **latest** received message
-- [`wsMessageIterable`](#wsmessageiterable-planned) — buffered `AsyncIterable` over WS messages *(planned)*
-- [`createWSData`](#createwsdata-planned) — async memo compatible with `<Loading>`, `isPending`, and `latest` *(planned)*
-- [`createWSStore`](#createwsstore-planned) — reactive store driven by WS message patches *(planned)*
+- [`wsMessageIterable`](#wsmessageiterable-planned) — buffered `AsyncIterable` over WS messages _(planned)_
+- [`createWSData`](#createwsdata-planned) — async memo compatible with `<Loading>`, `isPending`, and `latest` _(planned)_
+- [`createWSStore`](#createwsstore-planned) — reactive store driven by WS message patches _(planned)_
 
 ---
 
@@ -36,7 +36,7 @@ Sets up a WebSocket with a buffered send queue. Messages sent before the connect
 const ws = makeWS("ws://localhost:5000");
 createEffect(
   () => serverMessage(),
-  (msg) => ws.send(msg),
+  msg => ws.send(msg),
 );
 onCleanup(() => ws.close());
 ```
@@ -49,7 +49,7 @@ Same as `makeWS`, but registers `ws.close()` with `onCleanup`.
 const ws = createWS("ws://localhost:5000");
 createEffect(
   () => serverMessage(),
-  (msg) => ws.send(msg),
+  msg => ws.send(msg),
 );
 ```
 
@@ -86,7 +86,7 @@ Returns a `WebSocket`-shaped proxy that transparently opens a new underlying con
 const ws = makeReconnectingWS("ws://localhost:5000", undefined, { delay: 3000, retries: Infinity });
 createEffect(
   () => serverMessage(),
-  (msg) => ws.send(msg),
+  msg => ws.send(msg),
 );
 onCleanup(() => ws.close());
 ```
@@ -100,19 +100,20 @@ Same as `makeReconnectingWS`, but closes on owner disposal.
 Wraps a `ReconnectingWebSocket` to send a periodic heartbeat. If no response arrives within `wait` ms the connection is force-reconnected.
 
 ```ts
-const ws = makeHeartbeatWS(
-  createReconnectingWS("ws://localhost:5000"),
-  { message: "ping", interval: 1000, wait: 1500 },
-);
+const ws = makeHeartbeatWS(createReconnectingWS("ws://localhost:5000"), {
+  message: "ping",
+  interval: 1000,
+  wait: 1500,
+});
 ```
 
 ---
 
-## Async message primitives *(planned for next minor)*
+## Async message primitives _(planned for next minor)_
 
 These three primitives leverage Solid's async reactivity — `createMemo` with `AsyncIterable`, `<Loading>` boundaries, `isPending`, and `latest` — to provide a more powerful and correct model for WebSocket data.
 
-### `wsMessageIterable` *(planned)*
+### `wsMessageIterable` _(planned)_
 
 The foundational building block. Returns a buffered `AsyncIterable<T>` over a WebSocket's message stream. Cleanup (`ws.removeEventListener`) happens automatically when the iterator is returned (Solid calls `it.return()` on memo disposal).
 
@@ -131,7 +132,7 @@ Works correctly with `makeReconnectingWS` — event listeners are re-attached to
 
 **Why this doesn't drop messages:** Unlike `createWSMessage`, each yielded value triggers its own `flush()` inside the Solid runtime. Messages that arrive while an earlier one is being processed are buffered and drained synchronously, so no message is skipped by reactive effects.
 
-### `createWSData` *(planned)*
+### `createWSData` _(planned)_
 
 An async memo wrapping `wsMessageIterable`. Suspends the nearest `<Loading>` boundary until the first message arrives; subsequent updates work with `isPending` and `latest`.
 
@@ -150,16 +151,16 @@ return (
 
 Comparison with `createWSMessage`:
 
-| | `createWSMessage` | `createWSData` |
-|---|---|---|
-| Drops burst messages | Yes | No |
-| Works with `<Loading>` | No | Yes |
-| `isPending()` support | No | Yes |
-| `latest()` support | No | Yes |
-| Returns `undefined` before first message | Yes | No — throws (suspends) |
-| Best for | Simple last-value display | State-source WS, real-time feeds |
+|                                          | `createWSMessage`         | `createWSData`                   |
+| ---------------------------------------- | ------------------------- | -------------------------------- |
+| Drops burst messages                     | Yes                       | No                               |
+| Works with `<Loading>`                   | No                        | Yes                              |
+| `isPending()` support                    | No                        | Yes                              |
+| `latest()` support                       | No                        | Yes                              |
+| Returns `undefined` before first message | Yes                       | No — throws (suspends)           |
+| Best for                                 | Simple last-value display | State-source WS, real-time feeds |
 
-### `createWSStore` *(planned)*
+### `createWSStore` _(planned)_
 
 A reactive store driven by WebSocket messages as incremental patches. Uses Solid `createStore(fn, seed)` form — each message is applied as a draft mutation.
 
@@ -184,7 +185,9 @@ For protocols with correlated request/response over a shared WebSocket, Solid `a
 const queryServer = action(function* (payload: RequestPayload) {
   const id = crypto.randomUUID();
 
-  setOptimisticState(draft => { draft.loading = true; });
+  setOptimisticState(draft => {
+    draft.loading = true;
+  });
 
   ws.send(JSON.stringify({ ...payload, id }));
 
@@ -212,7 +215,7 @@ const queryServer = action(function* (payload: RequestPayload) {
 type WSMessage = string | ArrayBufferLike | ArrayBufferView | Blob;
 
 type WSReconnectOptions = {
-  delay?: number;   // ms between reconnect attempts — default: 3000
+  delay?: number; // ms between reconnect attempts — default: 3000
   retries?: number; // max reconnect attempts — default: Infinity
 };
 
@@ -222,9 +225,9 @@ type ReconnectingWebSocket = WebSocket & {
 };
 
 type WSHeartbeatOptions = {
-  message?: WSMessage;  // default: "ping"
-  interval?: number;   // ms between heartbeats — default: 1000
-  wait?: number;       // ms to wait for pong before reconnecting — default: 1500
+  message?: WSMessage; // default: "ping"
+  interval?: number; // ms between heartbeats — default: 1000
+  wait?: number; // ms to wait for pong before reconnecting — default: 1500
 };
 ```
 

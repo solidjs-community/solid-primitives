@@ -97,7 +97,7 @@ export const createWSState = (ws: WebSocket): Accessor<0 | 1 | 2 | 3> => {
  * ```
  */
 export const createWSMessage = <T = string>(ws: WebSocket): Accessor<T | undefined> => {
-  const [message, setMessage] = createSignal<T | undefined>(undefined);
+  const [message, setMessage] = createSignal<T | undefined>(undefined, { ownedWrite: true });
   const handler = (e: MessageEvent) => setMessage(() => e.data as T);
   ws.addEventListener("message", handler);
   onCleanup(() => ws.removeEventListener("message", handler));

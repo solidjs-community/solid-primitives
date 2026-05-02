@@ -1,6 +1,6 @@
 import "./setup";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import {
   createWS,
   createWSState,
@@ -62,11 +62,14 @@ describe("createWSState", () => {
         const state = createWSState(ws);
         expect(state()).toEqual(ws.CONNECTING);
         vi.advanceTimersByTime(20);
+        flush();
         expect(state()).toEqual(ws.OPEN);
         vi.advanceTimersByTime(100);
         ws.close();
+        flush();
         expect(state()).toEqual(ws.CLOSING);
         vi.advanceTimersByTime(80);
+        flush();
         expect(state()).toEqual(ws.CLOSED);
         dispose();
         resolve();
@@ -89,8 +92,10 @@ describe("createWSMessage", () => {
       const message = createWSMessage<string>(ws);
       vi.advanceTimersByTime(20); // wait for open
       ws.dispatchEvent(new MessageEvent("message", { data: "hello" }));
+      flush();
       expect(message()).toBe("hello");
       ws.dispatchEvent(new MessageEvent("message", { data: "world" }));
+      flush();
       expect(message()).toBe("world");
       dispose();
     }));
