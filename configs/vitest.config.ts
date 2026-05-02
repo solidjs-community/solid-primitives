@@ -53,6 +53,9 @@ export default defineConfig(({ mode }) => {
           }),
     },
     resolve: {
+      alias: {
+        "solid-js/web": "@solidjs/web",
+      },
       conditions: testSSR
         ? ["@solid-primitives/source", "node"]
         : ["@solid-primitives/source", "browser", "development"],

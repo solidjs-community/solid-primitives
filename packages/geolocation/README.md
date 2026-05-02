@@ -12,68 +12,128 @@ Primitives to query and watch geolocation information from within the browser.
 
 ## Installation
 
-```
+```bash
 npm install @solid-primitives/geolocation
 # or
-yarn add @solid-primitives/geolocation
+pnpm add @solid-primitives/geolocation
 ```
 
-## How to use it
+## `makeGeolocation`
 
-### createGeolocation
+A non-reactive one-shot query. No Solid owner required — can be used outside components. Returns a `[query, cleanup]` tuple.
 
-Used to fetch current geolocation data as a resource. This primitive uses `createResource` to return a location, so `loading`, `error`
+```ts
+const [query, cleanup] = makeGeolocation({ enableHighAccuracy: true });
+const coords = await query();
+cleanup();
+```
+
+### Definition
+
+```ts
+makeGeolocation(
+  options?: PositionOptions
+): [query: () => Promise<GeolocationCoordinates>, cleanup: VoidFunction]
+```
+
+---
+
+## `makeGeolocationWatcher`
+
+A non-reactive continuous watcher. No Solid owner required. Returns a `[store, cleanup]` tuple.
+
+```ts
+const [store, cleanup] = makeGeolocationWatcher();
+console.log(store.location); // GeolocationCoordinates | null
+console.log(store.error); // GeolocationPositionError | null
+cleanup();
+```
+
+### Definition
+
+```ts
+makeGeolocationWatcher(
+  options?: PositionOptions
+): [
+  store: { location: GeolocationCoordinates | null; error: GeolocationPositionError | null },
+  cleanup: VoidFunction
+]
+```
+
+---
+
+## `createGeolocation`
+
+A reactive one-shot query. Returns an async accessor that integrates with `<Loading>` boundaries — the component subtree suspends until the position resolves. Re-queries automatically when reactive `options` change, or manually via `refetch()`.
 
 ```ts
 const [location, refetch] = createGeolocation();
 ```
 
-or with options:
+```tsx
+// Suspends until first fix:
+<Loading fallback="Locating...">
+  <div>{location().latitude}, {location().longitude}</div>
+</Loading>
 
-```ts
-const [location, refetch] = createGeolocation({
-  enableHighAccuracy: false,
-  maximumAge: 0,
-  timeout: 200,
-});
+// Show a subtle indicator while re-querying in the background:
+<Show when={isPending(() => location())}>Updating position...</Show>
 ```
 
-#### Definition
+With reactive options:
+
+```ts
+const [opts, setOpts] = createSignal<PositionOptions>({ enableHighAccuracy: false });
+const [location, refetch] = createGeolocation(opts);
+// Automatically re-queries when opts() changes
+```
+
+### Definition
 
 ```ts
 createGeolocation(
-  options: MaybeAccessor<PositionOptions> // these override basic defaults (see Types section)
-): [
-  location: Resource<GeolocationCoordinates | undefined>,
-  refetch: Accessor<void>
-]
+  options?: MaybeAccessor<PositionOptions>
+): [location: () => Promise<GeolocationCoordinates>, refetch: VoidFunction]
 ```
 
-### createGeolocationWatcher
+---
 
-Creates a geolocation watcher and updates a signal with the latest coordinates. This primitive returns two reactive getters: `location` and `error`.
+## `createGeolocationWatcher`
+
+A reactive continuous watcher. `location` throws `NotReadyError` (integrating with `<Loading>`) until the first GPS fix, then updates reactively without re-suspending. `error` is a signal accessor for recoverable in-component error handling. The watcher starts and stops reactively based on `enabled`. Reactive `options` restarts the watcher when the enabled state is active.
 
 ```ts
-const watcher = createGeolocationWatcher(true);
-console.log(watcher.location);
-console.log(watcher.error);
+const [enabled, setEnabled] = createSignal(true);
+const { location, error } = createGeolocationWatcher(enabled);
 ```
 
-#### Definition
+```tsx
+// Show error inline (recoverable — no error boundary needed):
+<Show when={error()}>
+  Permission denied — <button onClick={retry}>retry</button>
+</Show>
+
+// Suspends until first GPS fix, then updates live:
+<Loading fallback="Acquiring GPS fix...">
+  <Map lat={location().latitude} lng={location().longitude} />
+</Loading>
+```
+
+### Definition
 
 ```ts
 createGeolocationWatcher(
   enabled: MaybeAccessor<boolean>,
-  options: MaybeAccessor<PositionOptions>
+  options?: MaybeAccessor<PositionOptions>
 ): {
-  location: GeolocationCoordinates | null,
-  error: GeolocationPositionError | null
+  location: Accessor<GeolocationCoordinates>;
+  error: Accessor<GeolocationPositionError | null>;
 }
 ```
 
-#### Types
+---
 
-The values returned in the location property are as follows:
+## Types
 
 ```ts
 interface GeolocationCoordinates {
@@ -87,7 +147,7 @@ interface GeolocationCoordinates {
 }
 ```
 
-The options property defaults to the following value unless overwritten:
+Default position options (overridden by anything you pass):
 
 ```ts
 const geolocationDefaults: PositionOptions = {
@@ -103,10 +163,8 @@ You may view a working example here: https://stackblitz.com/edit/vitejs-vite-dvk
 
 ## Primitive Ideas
 
-We're always looking to enhance our primitives. Some ideas:
-
-- `createDistance` (supply a lat/lng and reactively calculate the difference in km/m)
-- `createWithinRadius` (a signal for tracking if a user is within a radius boundary)
+- `createDistance` — supply a lat/lng and reactively calculate the distance in km/m
+- `createWithinRadius` — a signal for tracking if a user is within a radius boundary
 
 ## Changelog
 
