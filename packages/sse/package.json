@@ -75,9 +75,9 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "2.0.0-beta.7"
+    "solid-js": "2.0.0-beta.10"
   },
   "devDependencies": {
-    "solid-js": "2.0.0-beta.7"
+    "solid-js": "2.0.0-beta.10"
   }
 }
