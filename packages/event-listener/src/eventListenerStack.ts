@@ -2,7 +2,7 @@ import { createCallbackStack } from "@solid-primitives/utils";
 import { onCleanup } from "solid-js";
 import { makeEventListener } from "./eventListener.js";
 import type { EventMapOf, TargetWithEventMap, EventListenerOptions } from "./types.js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 export type EventListenerStackOn<EventMap extends Record<string, any>> = {
   <T extends keyof EventMap>(
