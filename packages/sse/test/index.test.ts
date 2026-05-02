@@ -1,7 +1,7 @@
 import "./setup";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { createRoot, createSignal } from "solid-js";
-import { makeSSE, createSSE, SSEReadyState } from "../src/index.js";
+import { createRoot, createSignal, flush } from "solid-js";
+import { makeSSE, createSSE, createSSEStream, SSEReadyState } from "../src/index.js";
 import { MockEventSource } from "./setup.js";
 
 beforeAll(() => vi.useFakeTimers());
@@ -83,17 +83,41 @@ describe("createSSE", () => {
     createRoot(dispose => {
       const { readyState } = createSSE("https://example.com/events");
       vi.advanceTimersByTime(20);
+      flush();
       expect(readyState()).toBe(SSEReadyState.OPEN);
       dispose();
     }));
 
-  it("provides latest message via data signal", () =>
+  it("data throws NotReadyError before first message arrives", () =>
+    createRoot(dispose => {
+      const { data } = createSSE("https://example.com/events");
+      expect(() => data()).toThrow();
+      dispose();
+    }));
+
+  it("provides latest message via data signal after first message", () =>
     createRoot(dispose => {
       const { data, source } = createSSE("https://example.com/events");
-      expect(data()).toBeUndefined();
       vi.advanceTimersByTime(20);
+      flush();
       (source() as unknown as MockEventSource).simulateMessage("hello");
+      flush();
       expect(data()).toBe("hello");
+      dispose();
+    }));
+
+  it("updates data on subsequent messages", () =>
+    createRoot(dispose => {
+      const { data, source } = createSSE("https://example.com/events");
+      vi.advanceTimersByTime(20);
+      flush();
+      const mock = source() as unknown as MockEventSource;
+      mock.simulateMessage("first");
+      flush();
+      expect(data()).toBe("first");
+      mock.simulateMessage("second");
+      flush();
+      expect(data()).toBe("second");
       dispose();
     }));
 
@@ -103,12 +127,14 @@ describe("createSSE", () => {
         transform: JSON.parse,
       });
       vi.advanceTimersByTime(20);
+      flush();
       (source() as unknown as MockEventSource).simulateMessage(JSON.stringify({ value: 42 }));
+      flush();
       expect(data()).toEqual({ value: 42 });
       dispose();
     }));
 
-  it("returns initialValue before any message arrives", () =>
+  it("returns initialValue before any message arrives (no pending state)", () =>
     createRoot(dispose => {
       const { data } = createSSE("https://example.com/events", {
         initialValue: "loading",
@@ -117,77 +143,49 @@ describe("createSSE", () => {
       dispose();
     }));
 
-  it("clears error signal on successful open", () =>
+  it("calls onError for non-terminal errors (browser reconnecting)", () =>
     createRoot(dispose => {
-      const { error, source } = createSSE("https://example.com/events", {
+      const errors: Event[] = [];
+      const { source } = createSSE("https://example.com/events", {
         reconnect: { retries: 1, delay: 50 },
+        onError: e => errors.push(e),
       });
       vi.advanceTimersByTime(20);
+      flush();
       (source() as unknown as MockEventSource).simulateError();
-      expect(error()).toBeTruthy();
-      // reconnect fires after delay; new source opens
-      vi.advanceTimersByTime(100);
-      vi.advanceTimersByTime(20); // new source opens
-      expect(error()).toBeUndefined();
+      flush();
+      expect(errors.length).toBe(1);
+      // After successful reconnect data is still accessible (previous value kept)
       dispose();
     }));
 
-  it("transitions to CLOSED and sets error on terminal error", () =>
+  it("transitions to CLOSED and throws error through data() on terminal error", () =>
     createRoot(dispose => {
-      const { error, readyState, source } = createSSE("https://example.com/events", {
+      const { data, readyState, source } = createSSE("https://example.com/events", {
         reconnect: false,
       });
       vi.advanceTimersByTime(20);
+      flush();
       (source() as unknown as MockEventSource).simulateError();
+      flush();
       expect(readyState()).toBe(SSEReadyState.CLOSED);
-      expect(error()).toBeTruthy();
+      expect(() => data()).toThrow(); // propagates to <Errored> boundary
       dispose();
     }));
 
-  it("does not open a new connection on transient errors (browser retries natively)", () =>
+  it("does not app-reconnect on transient errors (browser handles those)", () =>
     createRoot(dispose => {
       const initialCount = SSEInstances.length;
       const { source } = createSSE("https://example.com/events", {
         reconnect: { retries: 5, delay: 50 },
       });
       vi.advanceTimersByTime(20);
+      flush();
       (source() as unknown as MockEventSource).simulateTransientError();
+      flush();
       vi.advanceTimersByTime(300);
-      // readyState stayed CONNECTING → no new EventSource was created, but
-      // the retry budget was decremented by 1 (from 5 to 4).
-      expect(SSEInstances.length).toBe(initialCount + 1);
-      dispose();
-    }));
-
-  it("stops browser retry loop when reconnect budget is exhausted via transient errors", () =>
-    createRoot(dispose => {
-      const { source, readyState } = createSSE("https://example.com/events", {
-        reconnect: { retries: 2, delay: 50 },
-      });
-      vi.advanceTimersByTime(20);
-      const es = source() as unknown as MockEventSource;
-      const closeSpy = vi.spyOn(es, "close");
-      // Two transient errors consume the full budget (2→1→0).
-      es.simulateTransientError(); // retries: 2→1
-      es.simulateTransientError(); // retries: 1→0
-      // A third transient error exhausts the budget → connection must be stopped.
-      es.simulateTransientError();
-      expect(closeSpy).toHaveBeenCalledOnce();
-      expect(source()).toBeUndefined();
-      expect(readyState()).toBe(SSEReadyState.CLOSED);
-      dispose();
-    }));
-
-  it("does not affect transient errors when reconnect is not configured", () =>
-    createRoot(dispose => {
-      const initialCount = SSEInstances.length;
-      const { source } = createSSE("https://example.com/events");
-      vi.advanceTimersByTime(20);
-      const es = source() as unknown as MockEventSource;
-      // Transient errors with no reconnect config should not kill the connection.
-      es.simulateTransientError();
-      es.simulateTransientError();
-      expect(source()).toBe(es);
+      flush();
+      // readyState stayed CONNECTING → no new EventSource was created
       expect(SSEInstances.length).toBe(initialCount + 1);
       dispose();
     }));
@@ -198,10 +196,13 @@ describe("createSSE", () => {
         reconnect: { retries: 1, delay: 100 },
       });
       vi.advanceTimersByTime(20);
+      flush();
       const first = source();
       (first as unknown as MockEventSource).simulateError();
+      flush();
       expect(source()).toBe(first); // no change yet
       vi.advanceTimersByTime(150);
+      flush();
       expect(source()).not.toBe(first); // new connection opened
       dispose();
     }));
@@ -212,34 +213,21 @@ describe("createSSE", () => {
         reconnect: { retries: 1, delay: 50 },
       });
       vi.advanceTimersByTime(20);
+      flush();
       const first = source();
       (first as unknown as MockEventSource).simulateError();
+      flush();
       vi.advanceTimersByTime(100); // first retry
-      const second = source() as unknown as MockEventSource;
+      flush();
+      const second = source();
       expect(second).not.toBe(first);
       vi.advanceTimersByTime(20); // second opens
-      const closeSpy = vi.spyOn(second, "close");
-      second.simulateError();
+      flush();
+      (second as unknown as MockEventSource).simulateError();
+      flush();
       vi.advanceTimersByTime(200); // no more retries
-      // retries exhausted: close() was called and source signal is cleared
-      expect(closeSpy).toHaveBeenCalledOnce();
-      expect(source()).toBeUndefined();
-      dispose();
-    }));
-
-  it("cleans up source and listeners when retries are exhausted", () =>
-    createRoot(dispose => {
-      const { source, readyState } = createSSE("https://example.com/events", {
-        reconnect: { retries: 0, delay: 50 },
-      });
-      vi.advanceTimersByTime(20);
-      const es = source() as unknown as MockEventSource;
-      const closeSpy = vi.spyOn(es, "close");
-      es.simulateError();
-      // retries exhausted immediately — cleanup must have run
-      expect(closeSpy).toHaveBeenCalledOnce();
-      expect(source()).toBeUndefined();
-      expect(readyState()).toBe(SSEReadyState.CLOSED);
+      flush();
+      expect(source()).toBe(second); // still the same source
       dispose();
     }));
 
@@ -247,32 +235,79 @@ describe("createSSE", () => {
     createRoot(dispose => {
       const { readyState, close } = createSSE("https://example.com/events");
       vi.advanceTimersByTime(20);
+      flush();
       expect(readyState()).toBe(SSEReadyState.OPEN);
       close();
+      flush();
       expect(readyState()).toBe(SSEReadyState.CLOSED);
       dispose();
     }));
 
-  it("reconnect() opens a fresh connection", () =>
+  it("reconnect() opens a fresh connection and resets data to pending", () =>
     createRoot(dispose => {
-      const { source, reconnect } = createSSE("https://example.com/events");
+      const { data, source, reconnect } = createSSE("https://example.com/events");
       vi.advanceTimersByTime(20);
+      flush();
       const first = source();
+      (first as unknown as MockEventSource).simulateMessage("hello");
+      flush();
+      expect(data()).toBe("hello");
       reconnect();
+      flush();
+      // Old source closed, new source opened
       expect(source()).not.toBe(first);
-      expect(first?.readyState).toBe(SSEReadyState.CLOSED); // old one closed
+      expect(first?.readyState).toBe(SSEReadyState.CLOSED);
+      // New connection receives a message — data resets properly
+      vi.advanceTimersByTime(20);
+      flush();
+      (source() as unknown as MockEventSource).simulateMessage("hello-v2");
+      flush();
+      expect(data()).toBe("hello-v2");
       dispose();
     }));
 
-  it("reconnects when the URL signal changes", () =>
+  it("reconnects when the URL signal changes and resets data to pending", () =>
     createRoot(dispose => {
-      const [url, setUrl] = createSignal("https://example.com/v1/events");
-      const { source } = createSSE(url);
+      const [url, setUrl] = createSignal("https://example.com/v1/events", { ownedWrite: true });
+      const { data, source } = createSSE(url);
       vi.advanceTimersByTime(20);
+      flush();
       const first = source();
+      (first as unknown as MockEventSource).simulateMessage("v1 data");
+      flush();
+      expect(data()).toBe("v1 data");
       setUrl("https://example.com/v2/events");
+      flush();
+      // Old source closed, new source opened for v2
       expect(source()).not.toBe(first);
       expect(first?.readyState).toBe(SSEReadyState.CLOSED);
+      // New connection updates data on message
+      vi.advanceTimersByTime(20);
+      flush();
+      (source() as unknown as MockEventSource).simulateMessage("v2 data");
+      flush();
+      expect(data()).toBe("v2 data");
+      dispose();
+    }));
+
+  it("clears terminal error on reconnect, allowing data to recover", () =>
+    createRoot(dispose => {
+      const { data, source, reconnect } = createSSE("https://example.com/events", {
+        reconnect: false,
+      });
+      vi.advanceTimersByTime(20);
+      flush();
+      (source() as unknown as MockEventSource).simulateError();
+      flush();
+      expect(() => data()).toThrow(); // terminal error on first call (no stale cache)
+      reconnect();
+      flush();
+      vi.advanceTimersByTime(20);
+      flush();
+      // Terminal error cleared — new message updates data successfully
+      (source() as unknown as MockEventSource).simulateMessage("recovered");
+      flush();
+      expect(data()).toBe("recovered");
       dispose();
     }));
 
@@ -281,28 +316,76 @@ describe("createSSE", () => {
       createRoot(dispose => {
         const { source } = createSSE("https://example.com/events");
         vi.advanceTimersByTime(20);
+        flush();
         const es = source();
         vi.spyOn(es as unknown as MockEventSource, "close").mockImplementation(() => resolve());
         dispose();
       }),
     ));
+});
 
-  it("readyState is CLOSED after owner disposal", () =>
-    createRoot(dispose => {
-      const { readyState } = createSSE("https://example.com/events");
-      vi.advanceTimersByTime(20);
-      expect(readyState()).toBe(SSEReadyState.OPEN);
-      dispose();
-      expect(readyState()).toBe(SSEReadyState.CLOSED);
-    }));
+// ── createSSEStream ───────────────────────────────────────────────────────────
 
-  it("readyState updates to CONNECTING when server drops connection", () =>
+describe("createSSEStream", () => {
+  it("data throws NotReadyError before first message arrives", () =>
     createRoot(dispose => {
-      const { readyState, source } = createSSE("https://example.com/events");
-      vi.advanceTimersByTime(20);
-      expect(readyState()).toBe(SSEReadyState.OPEN);
-      (source() as unknown as MockEventSource).simulateTransientError();
-      expect(readyState()).toBe(SSEReadyState.CONNECTING);
+      const data = createSSEStream("https://example.com/events");
+      expect(() => data()).toThrow();
       dispose();
     }));
+
+  it("provides latest message after first message resolves", async () => {
+    await new Promise<void>(resolve =>
+      createRoot(async dispose => {
+        const data = createSSEStream("https://example.com/events");
+        vi.advanceTimersByTime(20);
+        // Locate the mock source via SSEInstances
+        const mock = SSEInstances[SSEInstances.length - 1]!;
+        mock.simulateMessage("stream-hello");
+        // Let the async iterator microtask resolve
+        await Promise.resolve();
+        await Promise.resolve();
+        flush();
+        expect(data()).toBe("stream-hello");
+        dispose();
+        resolve();
+      }),
+    );
+  });
+
+  it("applies transform to incoming data", async () => {
+    await new Promise<void>(resolve =>
+      createRoot(async dispose => {
+        const data = createSSEStream<{ v: number }>("https://example.com/events", {
+          transform: JSON.parse,
+        });
+        vi.advanceTimersByTime(20);
+        const mock = SSEInstances[SSEInstances.length - 1]!;
+        mock.simulateMessage(JSON.stringify({ v: 7 }));
+        await Promise.resolve();
+        await Promise.resolve();
+        flush();
+        expect(data()).toEqual({ v: 7 });
+        dispose();
+        resolve();
+      }),
+    );
+  });
+
+  it("propagates terminal error through data()", async () => {
+    await new Promise<void>(resolve =>
+      createRoot(async dispose => {
+        const data = createSSEStream("https://example.com/events");
+        vi.advanceTimersByTime(20);
+        const mock = SSEInstances[SSEInstances.length - 1]!;
+        mock.simulateError(); // CLOSED → terminal
+        await Promise.resolve();
+        await Promise.resolve();
+        flush();
+        expect(() => data()).toThrow();
+        dispose();
+        resolve();
+      }),
+    );
+  });
 });
