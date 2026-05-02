@@ -50,6 +50,7 @@
     "rehype-highlight": "^7.0.2",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1",
+    "@solidjs/web": "2.0.0-beta.10",
     "solid-js": "2.0.0-beta.10",
     "typescript": "^5.8.3",
     "vinxi": "^0.5.7",

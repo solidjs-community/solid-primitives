@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/audio",
-  "version": "1.4.4",
+  "version": "2.0.0",
   "description": "Primitives to manage audio and single sounds.",
   "author": "David Di Biase <dave@solidjs.com>",
   "license": "MIT",
@@ -50,13 +50,15 @@
     "primitives"
   ],
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.10",
+    "solid-js": "2.0.0-beta.10"
   },
   "dependencies": {
     "@solid-primitives/static-store": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "2.0.0-beta.10",
+    "solid-js": "2.0.0-beta.10"
   }
 }

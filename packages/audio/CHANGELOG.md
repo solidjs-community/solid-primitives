@@ -1,5 +1,14 @@
 # @solid-primitives/audio
 
+## 2.0.0
+
+### Major Changes
+
+- Updated to Solid.js 2.0 API:
+  - Replaced `onMount` + `onCleanup` with `onSettled` (returning cleanup function)
+  - Migrated `createEffect` calls to the split compute/apply model
+  - Updated peer dependency to `solid-js@^2.0.0`
+
 ## 1.4.4
 
 ### Patch Changes
