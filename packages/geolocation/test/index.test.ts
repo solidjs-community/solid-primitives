@@ -33,7 +33,9 @@ describe("makeGeolocation", () => {
   it("rejects when geolocation fails", async () => {
     const spy = vi
       .spyOn(navigator.geolocation, "getCurrentPosition")
-      .mockImplementation((_: any, reject: any) => reject({ code: 1, message: "Permission denied" }));
+      .mockImplementation((_: any, reject: any) =>
+        reject({ code: 1, message: "Permission denied" }),
+      );
     const [query, cleanup] = makeGeolocation();
     await expect(query()).rejects.toThrow("Permission denied");
     cleanup();

@@ -203,7 +203,7 @@ export const createGeolocationWatcher = (
     // Track both enabled and options. When enabled is false, options is not
     // evaluated (short-circuit) — so option changes only re-run when active.
     () => (access(enabled) ? access(options) : (false as const)),
-    (optsOrFalse) => {
+    optsOrFalse => {
       clearWatch();
       if (optsOrFalse !== false) {
         watchId = navigator.geolocation.watchPosition(

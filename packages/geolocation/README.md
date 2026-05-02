@@ -45,7 +45,7 @@ A non-reactive continuous watcher. No Solid owner required. Returns a `[store, c
 ```ts
 const [store, cleanup] = makeGeolocationWatcher();
 console.log(store.location); // GeolocationCoordinates | null
-console.log(store.error);    // GeolocationPositionError | null
+console.log(store.error); // GeolocationPositionError | null
 cleanup();
 ```
 
