@@ -3,6 +3,7 @@ import {
   createSignal,
   createEffect,
   createStore,
+  runWithOwner,
   untrack,
   NotReadyError,
   DEV,
@@ -134,9 +135,11 @@ export function createIntersectionObserver(
         indexMap.set(entry.target, idx);
       }
       const frozen = Object.freeze({ ...entry });
-      setEntries(draft => {
-        draft[idx] = frozen as any;
-        if (idx >= draft.length) draft.length = idx + 1;
+      runWithOwner(null as any, () => {
+        setEntries(draft => {
+          draft[idx] = frozen as any;
+          if (idx >= draft.length) draft.length = idx + 1;
+        });
       });
     }
   };
