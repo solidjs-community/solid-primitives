@@ -95,7 +95,7 @@ No `<Suspense>` needed — `clipboard()` never suspends before the first `refetc
 ```tsx
 import { isPending } from "solid-js";
 
-<p>{isPending(() => clipboard()) ? "Reading…" : `${clipboard().length} items`}</p>
+<p>{isPending(() => clipboard()) ? "Reading…" : `${clipboard().length} items`}</p>;
 ```
 
 ## `copyToClipboard`

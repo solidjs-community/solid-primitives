@@ -138,7 +138,10 @@ export const createClipboard = (
     createEffect(
       () => data(),
       value => {
-        if (skip) { skip = false; return; }
+        if (skip) {
+          skip = false;
+          return;
+        }
         writeClipboard(value);
       },
     );
