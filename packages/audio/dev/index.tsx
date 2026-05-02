@@ -76,7 +76,7 @@ const App: Component = () => {
       <div class="flex flex-col items-center">
         <div class="flex items-center justify-center space-x-4 rounded-full bg-white p-1 shadow">
           <button
-            class="scale-200 flex cursor-pointer border-none bg-transparent"
+            class="flex scale-200 cursor-pointer border-none bg-transparent"
             disabled={audio.state == AudioState.ERROR}
             onClick={() => setPlaying(audio.state == AudioState.PLAYING ? false : true)}
           >
@@ -97,7 +97,7 @@ const App: Component = () => {
             step="0.1"
             max={audio.duration}
             value={audio.currentTime}
-            class="form-range w-40 cursor-pointer appearance-none rounded-3xl bg-gray-200 transition hover:bg-gray-300 focus:outline-none focus:ring-0"
+            class="form-range w-40 cursor-pointer appearance-none rounded-3xl bg-gray-200 transition hover:bg-gray-300 focus:ring-0 focus:outline-none"
           />
           <div class="flex px-2">
             <Icon class="w-6 text-blue-600" path={speakerWave} />

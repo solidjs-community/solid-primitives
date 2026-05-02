@@ -20,7 +20,9 @@ describe("createSubRoot", () => {
     const captured: any[] = [];
     const [count, setCount] = createSignal(0);
     const dispose = createSubRoot(dispose => {
-      createTrackedEffect(() => { captured.push(count()); });
+      createTrackedEffect(() => {
+        captured.push(count());
+      });
       return dispose;
     });
     flush();
@@ -39,7 +41,9 @@ describe("createSubRoot", () => {
     const [count, setCount] = createSignal(0);
     const dispose = createRoot(dispose => {
       createSubRoot(() => {
-        createTrackedEffect(() => { captured.push(count()); });
+        createTrackedEffect(() => {
+          captured.push(count());
+        });
       });
       return dispose;
     });
@@ -68,7 +72,9 @@ describe("createSubRoot", () => {
 
     createSubRoot(
       () => {
-        createTrackedEffect(() => { captured.push(count()); });
+        createTrackedEffect(() => {
+          captured.push(count());
+        });
       },
       o1,
       o2,
@@ -110,7 +116,9 @@ describe("createDisposable", () => {
     const [count, setCount] = createSignal(0);
     const captured: any[] = [];
     const dispose = createDisposable(() =>
-      createTrackedEffect(() => { captured.push(count()); }),
+      createTrackedEffect(() => {
+        captured.push(count());
+      }),
     );
     flush();
     expect(captured).toEqual([0]);
@@ -127,7 +135,11 @@ describe("createDisposable", () => {
     const [count, setCount] = createSignal(0);
     const captured: any[] = [];
     const dispose = createRoot(dispose => {
-      createDisposable(() => createTrackedEffect(() => { captured.push(count()); }));
+      createDisposable(() =>
+        createTrackedEffect(() => {
+          captured.push(count());
+        }),
+      );
       return dispose;
     });
     flush();

@@ -82,19 +82,19 @@ const Example: Component = () => {
   createEffect(
     () => [matches.sm, matches.lg, matches.xl],
     ([sm, lg, xl]) => {
-      console.log(sm);  // true when screen width >= 640px
-      console.log(lg);  // true when screen width >= 1024px
-      console.log(xl);  // true when screen width >= 1280px
-    }
+      console.log(sm); // true when screen width >= 640px
+      console.log(lg); // true when screen width >= 1024px
+      console.log(xl); // true when screen width >= 1280px
+    },
   );
 
   return (
     <div
       class={[
-        "text-tiny flex flex-column",               // tiny text with flex column layout
-        matches.sm && "text-small",                  // small text with flex column layout
-        matches.lg && "text-base flex-row",          // base text with flex row layout
-        matches.xl && "text-huge",                   // huge text with flex row layout
+        "text-tiny flex-column flex", // tiny text with flex column layout
+        matches.sm && "text-small", // small text with flex column layout
+        matches.lg && "flex-row text-base", // base text with flex row layout
+        matches.xl && "text-huge", // huge text with flex row layout
       ]}
     >
       <Switch fallback={<div>Smallest</div>}>
@@ -174,10 +174,7 @@ Provides a signal indicating if the user has requested dark color theme. The set
 import { createPrefersDark } from "@solid-primitives/media";
 
 const prefersDark = createPrefersDark();
-createEffect(
-  prefersDark,
-  dark => console.log("prefers dark:", dark)
-);
+createEffect(prefersDark, dark => console.log("prefers dark:", dark));
 ```
 
 ### Server fallback
@@ -198,10 +195,7 @@ This primitive provides a [singleton root](https://github.com/solidjs-community/
 import { usePrefersDark } from "@solid-primitives/media";
 
 const prefersDark = usePrefersDark();
-createEffect(
-  prefersDark,
-  dark => console.log("prefers dark:", dark)
-);
+createEffect(prefersDark, dark => console.log("prefers dark:", dark));
 ```
 
 > Note: `usePrefersDark` will deopt to `createPrefersDark` if used during hydration. (see issue [#310](https://github.com/solidjs-community/solid-primitives/issues/310))

@@ -46,7 +46,7 @@ const Client: Component = () => {
               </div>
             </div>
           </Show>
-          <div class="w-100 h-100" ref={el => (ref = el)} />
+          <div class="h-100 w-100" ref={el => (ref = el)} />
           <div class="p-4">
             {location()?.latitude}, {location()?.longitude}
           </div>
