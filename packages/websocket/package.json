@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/websocket",
-  "version": "1.3.2",
+  "version": "2.0.0-beta.0",
   "description": "Primitive to create a web socket connection",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
@@ -19,6 +19,7 @@
       "makeWS",
       "createWS",
       "createWSState",
+      "createWSMessage",
       "makeReconnectingWS",
       "createReconnectingWS",
       "makeHeartbeatWS"
@@ -55,10 +56,10 @@
     "primitives"
   ],
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "solid-js": "^2.0.0-beta.10"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "solid-js": "2.0.0-beta.10"
   }
 }

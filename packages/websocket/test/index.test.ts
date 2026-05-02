@@ -1,9 +1,10 @@
 import "./setup";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import {
   createWS,
   createWSState,
+  createWSMessage,
   createReconnectingWS,
   makeReconnectingWS,
   makeHeartbeatWS,
@@ -61,15 +62,52 @@ describe("createWSState", () => {
         const state = createWSState(ws);
         expect(state()).toEqual(ws.CONNECTING);
         vi.advanceTimersByTime(20);
+        flush();
         expect(state()).toEqual(ws.OPEN);
         vi.advanceTimersByTime(100);
         ws.close();
+        flush();
         expect(state()).toEqual(ws.CLOSING);
         vi.advanceTimersByTime(80);
+        flush();
         expect(state()).toEqual(ws.CLOSED);
         dispose();
         resolve();
       });
+    }));
+});
+
+describe("createWSMessage", () => {
+  it("is undefined before any messages arrive", () =>
+    createRoot(dispose => {
+      const ws = createWS("ws://localhost:5000");
+      const message = createWSMessage<string>(ws);
+      expect(message()).toBeUndefined();
+      dispose();
+    }));
+
+  it("reflects the latest received message", () =>
+    createRoot(dispose => {
+      const ws = createWS("ws://localhost:5000");
+      const message = createWSMessage<string>(ws);
+      vi.advanceTimersByTime(20); // wait for open
+      ws.dispatchEvent(new MessageEvent("message", { data: "hello" }));
+      flush();
+      expect(message()).toBe("hello");
+      ws.dispatchEvent(new MessageEvent("message", { data: "world" }));
+      flush();
+      expect(message()).toBe("world");
+      dispose();
+    }));
+
+  it("removes the event listener on disposal", () =>
+    createRoot(dispose => {
+      const ws = makeWS("ws://localhost:5000");
+      const spy = vi.spyOn(ws, "removeEventListener");
+      createWSMessage(ws);
+      dispose();
+      expect(spy).toHaveBeenCalledWith("message", expect.any(Function));
+      ws.close();
     }));
 });
 
