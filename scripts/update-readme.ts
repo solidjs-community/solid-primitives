@@ -7,9 +7,10 @@ import * as utils from "./utils/index.js";
 type PackageData = {
   Name: string;
   Stage: string | number;
+  Primitives: string;
   Size: string;
   NPM: string;
-  Primitives: string;
+  "Solid 2": string;
 };
 
 // eslint-disable-next-line no-console
@@ -57,6 +58,7 @@ const rootDependencies: string[] = [
     data.Primitives = module.primitive.list
       .map(prim => `[${prim}](${githubURL}${module.name}#${prim.replace(/ /g, "-").toLowerCase()})`)
       .join("<br />");
+    data["Solid 2"] = parseInt(module.version.split(".")[0]!) >= 2 ? "✓" : "";
     // Merge the package into the correct category
     const cat = categories[module.primitive.category];
     categories[module.primitive.category] = cat ? [...cat, data] : [data];
@@ -71,11 +73,11 @@ const rootDependencies: string[] = [
     // Some MD jousting to get the table to render nicely
     // with consistent columns
     md += `|<h4>*${category}*</h4>|\n`;
-    md += tablemark(items, ["Name", "Stage", "Primitives", "Size", "NPM"])
-      .replace("|Name|Stage|Primitives|Size|NPM|\n", "")
-      .replace("|----|----|----|----|----|\n", "");
+    md += tablemark(items, ["Name", "Stage", "Primitives", "Size", "NPM", "Solid 2"])
+      .replace("|Name|Stage|Primitives|Size|NPM|Solid 2|\n", "")
+      .replace("|----|----|----|----|----|----|\n", "");
     return md;
-  }, "|Name|Stage|Primitives|Size|NPM|\n|----|----|----|----|----|\n");
+  }, "|Name|Stage|Primitives|Size|NPM|Solid 2|\n|----|----|----|----|----|----|\n");
 
   readme = utils.insertTextBetweenComments(readme, table, "INSERT-PRIMITIVES-TABLE");
 
