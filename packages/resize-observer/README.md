@@ -75,8 +75,8 @@ import { createResizeObserver } from "@solid-primitives/resize-observer";
 
 let ref!: HTMLDivElement;
 
-// can in onMount if the target variable isn't yet populated
-onMount(() => {
+// can use onSettled if the target variable isn't yet populated
+onSettled(() => {
   createResizeObserver(ref, ({ width, height }, el) => {
     if (el === ref) console.log(width, height);
   });
@@ -95,10 +95,10 @@ createResizeObserver(targets, ({ width, height }, el) => {});
 // updating the signal will unobserve removed elements and observe added ones
 setTargets(p => [...p, element]);
 
-// createResizeObserver supports top-lever store arrays too
+// createResizeObserver supports top-level store arrays too
 const [targets, setTargets] = createStore([document.body]);
 createResizeObserver(targets, ({ width, height }, el) => {});
-setTargets(targets.length, element);
+setTargets(prev => [...prev, element]);
 ```
 
 ## `createWindowSize`

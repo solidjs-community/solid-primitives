@@ -11,7 +11,7 @@ import {
   filterNonNullable,
 } from "@solid-primitives/utils";
 import { type Accessor, createEffect, onCleanup, sharedConfig } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 type ResizeObserverEntryGeneric<T extends Element> = ResizeObserverEntry & { readonly target: T };
 type ResizeObserverCallbackGeneric<T extends Element> = (
@@ -88,11 +88,12 @@ export function createResizeObserver<T extends Element>(
       }
     }, options);
 
-  createEffect((prev: T[]) => {
-    const refs = filterNonNullable(asArray(access(targets)));
-    handleDiffArray(refs, prev, observe, unobserve);
-    return refs;
-  }, []);
+  createEffect(
+    () => filterNonNullable(asArray(access(targets))),
+    (refs: T[], prev?: T[]) => {
+      handleDiffArray(refs, prev ?? [], observe, unobserve);
+    },
+  );
 }
 
 const WINDOW_SIZE_FALLBACK = { width: 0, height: 0 } as const satisfies Size;
@@ -177,21 +178,25 @@ export function createElementSize(
   const isFn = typeof target === "function";
 
   const [size, setSize] = createStaticStore(
-    sharedConfig.context || isFn ? ELEMENT_SIZE_FALLBACK : getElementSize(target),
+    sharedConfig.hydrating || isFn ? ELEMENT_SIZE_FALLBACK : getElementSize(target),
   );
 
   const ro = new ResizeObserver(([e]) => setSize(getElementSize(e!.target)));
   onCleanup(() => ro.disconnect());
 
   if (isFn) {
-    createEffect(() => {
-      const el = target();
-      if (el) {
-        setSize(getElementSize(el));
-        ro.observe(el);
-        onCleanup(() => ro.unobserve(el));
-      }
-    });
+    createEffect(
+      () => (target as Accessor<Element | false | undefined | null>)(),
+      (el: Element | false | null | undefined) => {
+        if (el) {
+          setSize(getElementSize(el));
+          ro.observe(el);
+          return () => ro.unobserve(el);
+        } else {
+          setSize(ELEMENT_SIZE_FALLBACK);
+        }
+      },
+    );
   } else {
     ro.observe(target);
     onCleanup(() => ro.unobserve(target));
