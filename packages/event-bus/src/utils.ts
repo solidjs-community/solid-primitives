@@ -1,6 +1,6 @@
 import { push } from "@solid-primitives/utils/immutable";
 import { type AnyFunction } from "@solid-primitives/utils";
-import { batch, createEffect, createSignal, on } from "solid-js";
+import { createEffect, createSignal, getOwner, runWithOwner } from "solid-js";
 import type { Listen, Listener, Emit } from "./eventBus.js";
 
 /**
@@ -62,25 +62,25 @@ export function once<T>(subscribe: Listen<T>, listener: Listener<T>): VoidFuncti
  * emitInEffect() // listener will log an owner object
  */
 export function toEffect<T>(emit: Emit<T>): Emit<T> {
+  const owner = getOwner();
   const [stack, setStack] = createSignal<T[]>([]);
   createEffect(
-    on(stack, stack => {
+    () => stack(),
+    stack => {
       if (!stack.length) return;
       setStack([]);
-      stack.forEach(emit as Emit<any>);
-    }),
+      runWithOwner(owner, () => stack.forEach(emit as Emit<any>));
+    },
   );
   return (payload?: any) => void setStack(p => push(p, payload));
 }
 
 /**
- * Wraps `emit` calls inside a `batch` call. It causes that listeners execute in a single batch, so they are not executed in sepatate queue ticks.
+ * In Solid 2.0 all signal writes are automatically batched via microtask. This function
+ * is kept for backwards compatibility but is now a no-op — it simply returns the bus unchanged.
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#batchEmits
  */
 export function batchEmits<T extends { emit: AnyFunction }>(bus: T): T {
-  return {
-    ...bus,
-    emit: (...args) => batch(() => bus.emit(...args)),
-  };
+  return bus;
 }

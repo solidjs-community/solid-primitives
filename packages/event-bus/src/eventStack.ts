@@ -25,11 +25,11 @@ export type EventStackConfig<E, V = E> = {
 /**
  * Provides all the base functions of an event-emitter, functions for managing listeners, it's behavior could be customized with an config object.
  * Additionally it provides the emitted events in a list/history form, with tools to manage it.
- * 
+ *
  * @returns event stack: `{listen, emit, remove, clear, value, setValue}`
- * 
+ *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/event-bus#createEventStack
- * 
+ *
  * @example
 const bus = createEventStack<{ message: string }>();
 // can be destructured:
@@ -61,19 +61,22 @@ export function createEventStack<E, V>(
 ): EventStack<E, V> {
   const { toValue = (e: any) => e as V, length = 0 } = config;
 
-  const [stack, setValue] = /*#__PURE__*/ createSignal<V[]>([]);
+  const [stack, setValue] = /*#__PURE__*/ createSignal<V[]>([], { ownedWrite: true });
   const eventEventBus = createEventBus<E>();
   const valueEventBus = createEventBus<EventStackPayload<V>>();
 
   eventEventBus.listen(event => {
     const value = toValue(event, stack());
+    // Capture the new stack inside the setter because signal reads are deferred
+    // in Solid — stack() after setValue() still returns the old committed value.
+    let newStack: V[];
     setValue(prev => {
       const list = push(prev, value);
-      return length && list.length > length ? drop(list) : list;
+      return (newStack = length && list.length > length ? drop(list) : list);
     });
     valueEventBus.emit({
       event: value,
-      stack: stack(),
+      stack: newStack!,
       remove: () => remove(value),
     });
   });
