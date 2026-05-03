@@ -1,6 +1,5 @@
 import { describe, test, expect, afterAll } from "vitest";
-import { createRoot, createSignal, onMount } from "solid-js";
-import { createStore } from "solid-js/store";
+import { createRoot, createSignal, createStore, flush, onSettled } from "solid-js";
 import {
   Size,
   createElementSize,
@@ -64,6 +63,7 @@ describe("createResizeObserver", () => {
       createResizeObserver(div1, () => {});
       return dispose;
     });
+    flush();
 
     expect(targets.size).toBe(1);
     expect(targets.has(div1)).toBeTruthy();
@@ -77,6 +77,7 @@ describe("createResizeObserver", () => {
       createResizeObserver([div1, div2], () => {});
       return dispose;
     });
+    flush();
     expect(targets.size).toBe(2);
     expect(targets.has(div1)).toBeTruthy();
     expect(targets.has(div2)).toBeTruthy();
@@ -92,11 +93,13 @@ describe("createResizeObserver", () => {
       expect(targets.size, "targets shouldn't be connected synchronously").toBe(0);
       return { dispose, setRefs };
     });
+    flush();
 
     expect(targets.size).toBe(1);
     expect(targets.has(div1)).toBeTruthy();
 
     setRefs([div2, div3]);
+    flush();
     expect(targets.size).toBe(2);
     expect(targets.has(div2)).toBeTruthy();
     expect(targets.has(div3)).toBeTruthy();
@@ -112,11 +115,13 @@ describe("createResizeObserver", () => {
       expect(targets.size, "targets shouldn't be connected synchronously").toBe(0);
       return { dispose, setRefs };
     });
+    flush();
 
     expect(targets.size).toBe(1);
     expect(targets.has(div1)).toBeTruthy();
 
-    setRefs([div2, div3]);
+    setRefs(() => [div2, div3]);
+    flush();
     expect(targets.size).toBe(2);
     expect(targets.has(div2)).toBeTruthy();
     expect(targets.has(div3)).toBeTruthy();
@@ -158,7 +163,7 @@ describe("createElementSize", () => {
       expect(size.width).toBe(null);
       expect(size.height).toBe(null);
 
-      onMount(() => {
+      onSettled(() => {
         expect(size.width).toBe(100);
         expect(size.height).toBe(200);
         dispose();
