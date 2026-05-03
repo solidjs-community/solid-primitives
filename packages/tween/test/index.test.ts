@@ -1,4 +1,4 @@
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { describe, expect, it, vi, afterEach } from "vitest";
 import createTween from "../src/index.js";
 
@@ -47,9 +47,11 @@ describe("animation", () => {
     expect(tweened()).toBe(0);
 
     setSource(100);
-    expect(tweened()).toBe(0);
+    flush(); // run the effect, register RAF
+    expect(tweened()).toBe(0); // RAF hasn't fired yet
 
-    _flush_raf(start + 200);
+    _flush_raf(start + 200); // elapsed >= duration(100), setCurrent(target())
+    flush(); // commit the signal write
     expect(tweened()).toBe(100);
 
     dispose();
@@ -66,18 +68,23 @@ describe("animation", () => {
 
     const start = performance.now();
     setValue(100);
+    flush(); // run the effect
     expect(tweened()).toBe(0);
 
     _flush_raf(start + 25);
+    flush();
     expect(tweened()).toBeCloseTo(25, 0);
 
     _flush_raf(start + 50);
+    flush();
     expect(tweened()).toBeCloseTo(50, 0);
 
     _flush_raf(start + 75);
+    flush();
     expect(tweened()).toBeCloseTo(75, 0);
 
     _flush_raf(start + 100);
+    flush();
     expect(tweened()).toBeCloseTo(100, 0);
 
     dispose();
@@ -94,18 +101,23 @@ describe("animation", () => {
 
     const start = performance.now();
     setValue(100);
+    flush(); // run the effect
     expect(tweened()).toBe(0);
 
     _flush_raf(start + 25);
+    flush();
     expect(tweened()).toBeCloseTo(6.25, 0);
 
     _flush_raf(start + 50);
+    flush();
     expect(tweened()).toBeCloseTo(25, 0);
 
     _flush_raf(start + 75);
+    flush();
     expect(tweened()).toBeCloseTo(56.25, 0);
 
     _flush_raf(start + 100);
+    flush();
     expect(tweened()).toBeCloseTo(100, 0);
 
     dispose();
@@ -122,12 +134,15 @@ describe("animation", () => {
     const start = performance.now();
 
     setValue(100);
+    flush(); // run the effect, register RAF
     _flush_raf(start + 600);
+    flush();
     expect(tweened()).toBeCloseTo(60, 0);
 
     setValue(0);
-
+    flush(); // cleanup old RAF, run effect with new target, register RAF
     _flush_raf(start + 500);
+    flush();
     expect(tweened()).toBeCloseTo(30, 0);
 
     dispose();
