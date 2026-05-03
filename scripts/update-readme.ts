@@ -58,7 +58,7 @@ const rootDependencies: string[] = [
     data.Primitives = module.primitive.list
       .map(prim => `[${prim}](${githubURL}${module.name}#${prim.replace(/ /g, "-").toLowerCase()})`)
       .join("<br />");
-    data["Solid 2"] = parseInt(module.version.split(".")[0]!) >= 2 ? "✓" : "";
+    data["Solid 2"] = /^[\^~]?2\./.test(module.solid_peer_version ?? "") ? "✓" : "";
     // Merge the package into the correct category
     const cat = categories[module.primitive.category];
     categories[module.primitive.category] = cat ? [...cat, data] : [data];
