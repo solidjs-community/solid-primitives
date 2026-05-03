@@ -43,7 +43,7 @@ interface ButtonProps {
 
 function Button(props: ButtonProps) {
   let ref: HTMLButtonElement | undefined;
-  onMount(() => {
+  onSettled(() => {
     // use the local ref
   });
 

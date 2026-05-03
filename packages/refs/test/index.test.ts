@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { removeItems } from "@solid-primitives/utils/immutable";
 import { getResolvedElements, resolveElements } from "../src/index.js";
 
@@ -41,15 +41,17 @@ describe("resolveElements", () => {
   test("returned signals reflect changes to source", () => {
     createRoot(dispose => {
       const _source = [undefined, el2, el1, "HELLO", el3];
-      const [source, setSource] = createSignal(_source);
+      const [source, setSource] = createSignal(_source, { ownedWrite: true });
 
       const els = resolveElements(source);
       expect(els()).toEqual([el2, el1, el3]);
 
       setSource(p => [...p, el4]);
+      flush();
       expect(els()).toEqual([el2, el1, el3, el4]);
 
       setSource(p => removeItems(p, el1, el2, undefined));
+      flush();
       expect(els(), "3 1").toEqual([el3, el4]);
 
       dispose();

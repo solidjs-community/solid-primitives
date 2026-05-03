@@ -754,12 +754,15 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
       solid-transition-group:
         specifier: ^0.2.3
-        version: 0.2.3(solid-js@1.9.7)
+        version: 0.2.3(solid-js@2.0.0-beta.10)
 
   packages/resize-observer:
     dependencies:
@@ -8605,6 +8608,11 @@ snapshots:
       '@solid-primitives/utils': 6.2.3(solid-js@1.9.7)
       solid-js: 1.9.7
 
+  '@solid-primitives/refs@1.0.8(solid-js@2.0.0-beta.10)':
+    dependencies:
+      '@solid-primitives/utils': 6.2.3(solid-js@2.0.0-beta.10)
+      solid-js: 2.0.0-beta.10
+
   '@solid-primitives/throttle@1.2.0(solid-js@1.9.7)':
     dependencies:
       solid-js: 1.9.7
@@ -8613,9 +8621,17 @@ snapshots:
     dependencies:
       solid-js: 1.9.7
 
+  '@solid-primitives/transition-group@1.0.5(solid-js@2.0.0-beta.10)':
+    dependencies:
+      solid-js: 2.0.0-beta.10
+
   '@solid-primitives/utils@6.2.3(solid-js@1.9.7)':
     dependencies:
       solid-js: 1.9.7
+
+  '@solid-primitives/utils@6.2.3(solid-js@2.0.0-beta.10)':
+    dependencies:
+      solid-js: 2.0.0-beta.10
 
   '@solidjs/meta@0.29.4(solid-js@2.0.0-beta.10)':
     dependencies:
@@ -12652,6 +12668,12 @@ snapshots:
       '@solid-primitives/refs': 1.0.8(solid-js@1.9.7)
       '@solid-primitives/transition-group': 1.0.5(solid-js@1.9.7)
       solid-js: 1.9.7
+
+  solid-transition-group@0.2.3(solid-js@2.0.0-beta.10):
+    dependencies:
+      '@solid-primitives/refs': 1.0.8(solid-js@2.0.0-beta.10)
+      '@solid-primitives/transition-group': 1.0.5(solid-js@2.0.0-beta.10)
+      solid-js: 2.0.0-beta.10
 
   solid-use@0.9.1(solid-js@2.0.0-beta.10):
     dependencies:
