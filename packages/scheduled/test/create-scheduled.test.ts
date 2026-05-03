@@ -38,8 +38,13 @@ describe("createScheduled", () => {
       const [track, trigger] = createSignal(undefined, { equals: false, ownedWrite: true });
 
       createEffect(
-        () => { track(); return scheduled(); },
-        val => { vals.push(val); },
+        () => {
+          track();
+          return scheduled();
+        },
+        val => {
+          vals.push(val);
+        },
       );
 
       flush(); // run 1: subscribed, not yet dirty
@@ -65,8 +70,13 @@ describe("createScheduled", () => {
       const scheduled = createScheduled(fn => debounce(fn, 20));
 
       createEffect(
-        () => { track(); return scheduled(); },
-        val => { vals.push(val); },
+        () => {
+          track();
+          return scheduled();
+        },
+        val => {
+          vals.push(val);
+        },
       );
 
       return dispose;
@@ -94,8 +104,13 @@ describe("createScheduled", () => {
       const scheduled = createScheduled(fn => leading(debounce, fn, 20));
 
       createEffect(
-        () => { track(); return scheduled(); },
-        val => { vals.push(val); },
+        () => {
+          track();
+          return scheduled();
+        },
+        val => {
+          vals.push(val);
+        },
       );
 
       return dispose;
@@ -133,13 +148,23 @@ describe("createScheduled", () => {
       const [track, trigger] = createSignal(undefined, { equals: false, ownedWrite: true });
 
       createEffect(
-        () => { track(); return scheduled(); },
-        val => { vals_a.push(val); },
+        () => {
+          track();
+          return scheduled();
+        },
+        val => {
+          vals_a.push(val);
+        },
       );
 
       createEffect(
-        () => { track(); return scheduled(); },
-        val => { vals_b.push(val); },
+        () => {
+          track();
+          return scheduled();
+        },
+        val => {
+          vals_b.push(val);
+        },
       );
 
       flush(); // initial runs
