@@ -1,4 +1,4 @@
-import { renderToString } from "solid-js/web";
+import { renderToString } from "@solidjs/web";
 import { describe, expect, test } from "vitest";
 import { resolveElements, resolveFirst } from "../src/index.js";
 

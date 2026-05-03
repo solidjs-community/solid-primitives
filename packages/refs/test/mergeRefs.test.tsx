@@ -1,23 +1,31 @@
 import { describe, test, expect } from "vitest";
-import { createRoot, onMount } from "solid-js";
-import { mergeRefs, RefProps } from "../src/index.js";
+import { mergeRefs } from "../src/index.js";
 
 describe("mergeRefs", () => {
-  test("passes ref to props and local var", () =>
-    createRoot(dispose => {
-      let local!: HTMLButtonElement;
-      let forwared!: HTMLButtonElement;
+  test("chains multiple ref callbacks", () => {
+    let local: HTMLButtonElement | undefined;
+    let forwarded: HTMLButtonElement | undefined;
+    const el = document.createElement("button") as HTMLButtonElement;
 
-      const Button = (props: RefProps<HTMLButtonElement>) => {
-        return <button ref={mergeRefs(el => (local = el), props.ref)} />;
-      };
+    const merged = mergeRefs<HTMLButtonElement>(
+      e => (local = e),
+      e => (forwarded = e),
+    );
+    merged(el);
 
-      <Button ref={forwared} />;
+    expect(local).instanceOf(HTMLButtonElement);
+    expect(forwarded).instanceOf(HTMLButtonElement);
+    expect(local).toBe(el);
+    expect(forwarded).toBe(el);
+  });
 
-      onMount(() => {
-        expect(local).instanceOf(HTMLButtonElement);
-        expect(forwared).instanceOf(HTMLButtonElement);
-        dispose();
-      });
-    }));
+  test("ignores undefined refs", () => {
+    const el = document.createElement("button") as HTMLButtonElement;
+    let called = false;
+    const merged = mergeRefs<HTMLButtonElement>(undefined, e => {
+      called = true;
+    });
+    merged(el);
+    expect(called).toBe(true);
+  });
 });
