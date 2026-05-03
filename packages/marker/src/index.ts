@@ -1,4 +1,4 @@
-import { type Accessor, createRoot, createSignal, getOwner, onCleanup } from "solid-js";
+import { type Accessor, createRoot, createSignal, getOwner, onCleanup, runWithOwner } from "solid-js";
 
 const SANITIZE_REGEX = /[^\w\s]/g,
   SPLIT_WORDS_REGEX = /\s+/g,
@@ -79,10 +79,16 @@ export function createMarker<T>(
         reuseIndex++;
         reusable.set(matchText);
       } else {
-        createRoot(dispose => {
-          const [text, set] = createSignal(matchText);
-          reusable = { el: mapMatch(text), set, dispose };
-        }, owner);
+        // In Solid 2.0 createRoot's second param changed from `owner` to `options`.
+        // runWithOwner parents the new root to the marker's creation-time owner.
+        runWithOwner(owner, () => {
+          createRoot(dispose => {
+            // ownedWrite: true so set() can be called from reactive contexts
+            // (createRoot callbacks, component bodies, effect compute phases).
+            const [text, set] = createSignal(matchText, { ownedWrite: true });
+            reusable = { el: mapMatch(text), set, dispose };
+          });
+        });
       }
       lastIndex !== match.index && parts.push(string.slice(lastIndex, match.index));
       parts.push(reusable!.el);

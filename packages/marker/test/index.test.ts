@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import { createMarker, makeSearchRegex } from "../src/index.js";
 
 describe("makeSearchRegex", () => {
@@ -125,6 +125,8 @@ describe("createMarker", () => {
       });
       createRoot(dispose => {
         const result = mark("Hello solid!", /\w+/g);
+        // Reused signals have deferred writes in Solid 2.0 — flush before reading.
+        flush();
         expect(result).toEqual([expect.any(Function), " ", expect.any(Function), "!"]);
         expect((result[0] as Function)()).toBe("Hello");
         expect((result[2] as Function)()).toBe("solid");
