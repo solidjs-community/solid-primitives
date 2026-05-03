@@ -9,14 +9,14 @@
 [![version](https://img.shields.io/npm/v/@solid-primitives/keyboard?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/keyboard)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
-A library of reactive promitives helping handling user's keyboard input.
+A library of reactive primitives for handling user keyboard input.
 
 - [`useKeyDownEvent`](#usekeydownevent) — Provides a signal with the last keydown event.
-- [`useKeyDownList`](#usekeydownlist) — Provides a signal with the list of currently held keys
+- [`useKeyDownList`](#usekeydownlist) — Provides a signal with the list of currently held keys.
 - [`useCurrentlyHeldKey`](#usecurrentlyheldkey) — Provides a signal with the currently held single key.
 - [`useKeyDownSequence`](#usekeydownsequence) — Provides a signal with a sequence of currently held keys, as they were pressed down and up.
 - [`createKeyHold`](#createkeyhold) — Provides a signal indicating if provided key is currently being held down.
-- [`createShortcut`](#createshortcut) — Creates a keyboard shotcut observer.
+- [`createShortcut`](#createshortcut) — Creates a keyboard shortcut observer.
 
 ## Installation
 
@@ -62,7 +62,7 @@ This is a [singleton root](https://github.com/solidjs-community/solid-primitives
 
 ### How to use it
 
-`useKeyDownList` takes no arguments, and returns a signal with the list of currently held keys
+`useKeyDownList` takes no arguments and returns a signal with the list of currently held keys.
 
 ```tsx
 import { useKeyDownList } from "@solid-primitives/keyboard";
@@ -143,7 +143,7 @@ const pressing = createKeyHold("Alt", { preventDefault: false });
 
 ## `createShortcut`
 
-Creates a keyboard shotcut observer. The provided callback will be called when the specified keys are pressed.
+Creates a keyboard shortcut observer. The provided callback will be called when the specified keys are pressed.
 
 ### How to use it
 
