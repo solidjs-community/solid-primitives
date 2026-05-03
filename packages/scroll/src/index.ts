@@ -1,8 +1,8 @@
 import { createEventListener } from "@solid-primitives/event-listener";
 import { createHydratableSingletonRoot } from "@solid-primitives/rootless";
 import { createDerivedStaticStore } from "@solid-primitives/static-store";
-import { type Accessor, createSignal, onMount, sharedConfig } from "solid-js";
-import { isServer } from "solid-js/web";
+import { type Accessor, createSignal, onSettled, sharedConfig } from "solid-js";
+import { isServer } from "@solidjs/web";
 
 export function getScrollParent(node: Element | null): Element {
   if (isServer) {
@@ -71,21 +71,27 @@ export function createScrollPosition(
 
   target = target || window;
 
-  const isFn = typeof target === "function",
-    isHydrating = sharedConfig.context,
-    getTargetPos = isFn
-      ? () => getScrollPosition((target as Extract<typeof target, Function>)())
-      : () => getScrollPosition(target as Element | Window),
-    // changing the calc signal will trigger the derived store to update
-    [calc, setCalc] = createSignal(isHydrating ? () => FALLBACK_SCROLL_POSITION : getTargetPos, {
-      equals: false,
-    }),
-    trigger = () => setCalc(() => getTargetPos),
-    pos = createDerivedStaticStore(() => calc()());
+  const isFn = typeof target === "function";
+  const isHydrating = sharedConfig.hydrating;
 
-  // update the position on mount if we are hydrating (initial pos is null)
-  // or if target is a function (which means it could be a ref that will be populated onMount)
-  if (isHydrating || isFn) onMount(trigger);
+  const getPos = (): Position =>
+    getScrollPosition(
+      isFn ? (target as Accessor<Element | Window | undefined>)() : (target as Element | Window),
+    );
+
+  // Plain integer counter — avoids Solid 2.0 createSignal(fn) derived-signal semantics.
+  // ownedWrite allows writes from DOM event handlers inside reactive scopes.
+  let tick = 1;
+  const [version, setVersion] = createSignal(0, { ownedWrite: true });
+  const trigger = () => void setVersion(tick++);
+
+  const pos = createDerivedStaticStore<Position>(() => {
+    const v = version();
+    return isHydrating && v === 0 ? { ...FALLBACK_SCROLL_POSITION } : getPos();
+  });
+
+  // Refs aren't populated until mount; also refreshes position post-hydration.
+  if (isHydrating || isFn) onSettled(trigger);
 
   createEventListener(target, "scroll", trigger, { passive: true });
 
