@@ -1,4 +1,4 @@
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 const w = isServer ? { document: {}, navigator: { userAgent: "" } } : (window as any);
 const n = w.navigator;
