@@ -6,7 +6,7 @@
 
 [![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/platform?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/platform)
 [![version](https://img.shields.io/npm/v/@solid-primitives/platform?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/platform)
-[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-0.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
+[![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 A set of const boolean variables identifying device and browser type.
 
@@ -19,6 +19,8 @@ pnpm add @solid-primitives/platform
 # or
 yarn add @solid-primitives/platform
 ```
+
+> **Note:** Requires Solid.js v2 (`solid-js@^2.0.0-beta.10`) and `@solidjs/web@^2.0.0-beta.10`.
 
 ## How to use it
 
