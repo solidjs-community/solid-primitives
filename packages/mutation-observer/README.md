@@ -16,7 +16,11 @@ Primitive providing the ability to watch for changes made to the DOM tree. A wra
 npm install @solid-primitives/mutation-observer
 # or
 yarn add @solid-primitives/mutation-observer
+# or
+pnpm add @solid-primitives/mutation-observer
 ```
+
+**Requires** `solid-js` and `@solidjs/web` >= `2.0.0-beta.10` as peer dependencies.
 
 ## How to use it
 
@@ -49,12 +53,14 @@ createMutationObserver(
   e => {...}
 );
 
-// Primitive return usefull values:
+// Primitive return useful values:
 const [observe, {start, stop, instance}] = createMutationObserver(el, options, handler)
 
 observe(el1, { childList: true })
 stop()
 ```
+
+The primitive automatically starts observing after the component settles (via `onSettled`) and disconnects on cleanup. You can also control observation manually with `start()` and `stop()`.
 
 ### Directive Usage
 
@@ -73,7 +79,7 @@ import { mutationObserver } from "@solid-primitives/mutation-observer";
 // has to be used in code to avoid tree-shaking it:
 mutationObserver;
 
-<div use:mutationObserver={[{ childList: true }, e => {...}]}>...</div>
+<div use:mutationObserver={[{ childList: true }, e => {...}]}></div>
 ```
 
 ### Types
