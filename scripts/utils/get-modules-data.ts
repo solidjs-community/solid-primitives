@@ -28,6 +28,7 @@ export type ModuleData = {
   primitive: PrimitiveData | null;
   workspace_deps: string[];
   peer_deps: string[];
+  solid_peer_version: string | null;
 };
 
 export async function getModuleData(name: string): Promise<ModuleData | Error> {
@@ -60,6 +61,7 @@ export async function getModuleData(name: string): Promise<ModuleData | Error> {
     primitive: pkg.primitive ?? null,
     workspace_deps,
     peer_deps,
+    solid_peer_version: pkg.peerDependencies?.["solid-js"] ?? null,
   };
 }
 
