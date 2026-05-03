@@ -1,8 +1,8 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { createSingletonRoot } from "@solid-primitives/rootless";
-import { arrayEquals } from "@solid-primitives/utils";
-import { type Accessor, createEffect, createMemo, createSignal, on, untrack } from "solid-js";
-import { isServer } from "solid-js/web";
+import { arrayEquals, INTERNAL_OPTIONS } from "@solid-primitives/utils";
+import { type Accessor, createMemo, createSignal, untrack } from "solid-js";
+import { isServer } from "@solidjs/web";
 
 export type ModifierKey = "Alt" | "Control" | "Meta" | "Shift";
 export type KbdKey = ModifierKey | (string & {});
@@ -37,8 +37,8 @@ function equalsKeyHoldSequence(sequence: string[][], model: string[]): boolean {
  *   console.log(e) // => KeyboardEvent | null
  *
  *   if (e) {
- *     console.log(e.key) // => "Q" | "ALT" | ... or null
- *     e.preventDefault(); // prevent default behavior or last keydown event
+ *     console.log(e.key) // => "Q" | "ALT" | ...
+ *     e.preventDefault();
  *   }
  * })
  * ```
@@ -49,7 +49,7 @@ export const useKeyDownEvent = /*#__PURE__*/ createSingletonRoot<Accessor<Keyboa
       return () => null;
     }
 
-    const [event, setEvent] = createSignal<KeyboardEvent | null>(null);
+    const [event, setEvent] = createSignal<KeyboardEvent | null>(null, INTERNAL_OPTIONS);
 
     makeEventListener(window, "keydown", e => {
       setEvent(e);
@@ -59,8 +59,6 @@ export const useKeyDownEvent = /*#__PURE__*/ createSingletonRoot<Accessor<Keyboa
     return event;
   },
 );
-
-type OldPressedKeys = [Accessor<string[]>, { event: Accessor<KeyboardEvent | null> }];
 
 /**
  * Provides a signal with the list of currently held keys, ordered from least recent to most recent.
@@ -85,21 +83,11 @@ type OldPressedKeys = [Accessor<string[]>, { event: Accessor<KeyboardEvent | nul
  */
 export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[]>>(() => {
   if (isServer) {
-    const keys = () => [];
-    // this is for backwards compatibility
-    // TODO remove in the next major version
-    (keys as any as OldPressedKeys)[0] = keys;
-    (keys as any as OldPressedKeys)[1] = { event: () => null };
-    (keys as any as OldPressedKeys)[Symbol.iterator] = function* () {
-      yield (keys as any as OldPressedKeys)[0];
-      yield (keys as any as OldPressedKeys)[1];
-    } as any;
-    return keys;
+    return () => [];
   }
 
-  const [pressedKeys, setPressedKeys] = createSignal<string[]>([]),
-    reset = () => setPressedKeys([]),
-    event = useKeyDownEvent();
+  const [pressedKeys, setPressedKeys] = createSignal<string[]>([], INTERNAL_OPTIONS);
+  const reset = () => setPressedKeys([]);
 
   makeEventListener(window, "keydown", e => {
     // e.key may be undefined when used with <datalist> el
@@ -141,16 +129,6 @@ export const useKeyDownList = /*#__PURE__*/ createSingletonRoot<Accessor<string[
   makeEventListener(window, "contextmenu", e => {
     e.defaultPrevented || reset();
   });
-
-  // this is for backwards compatibility
-  // TODO remove in the next major version
-  (pressedKeys as any as OldPressedKeys)[0] = pressedKeys;
-  (pressedKeys as any as OldPressedKeys)[1] = { event };
-
-  (pressedKeys as any as OldPressedKeys)[Symbol.iterator] = function* () {
-    yield (pressedKeys as any as OldPressedKeys)[0];
-    yield (pressedKeys as any as OldPressedKeys)[1];
-  } as any;
 
   return pressedKeys;
 });
@@ -222,10 +200,12 @@ export const useKeyDownSequence = /*#__PURE__*/ createSingletonRoot<Accessor<str
 
   const keys = useKeyDownList();
 
-  return createMemo(prev => {
+  // createMemo's second arg is options (not initialValue). The prev
+  // parameter starts as undefined; handle it with a fallback.
+  return createMemo((prev: string[][] | undefined) => {
     if (keys().length === 0) return [];
-    return [...prev, keys()];
-  }, []);
+    return [...(prev ?? []), keys()];
+  });
 });
 
 /**
@@ -235,8 +215,8 @@ export const useKeyDownSequence = /*#__PURE__*/ createSingletonRoot<Accessor<str
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#createKeyHold
  *
  * @param key The key to check for.
- * @options The options for the key hold.
- * - `preventDefault` — Controlls in the keydown event should have it's default action prevented. Enabled by default.
+ * @param options The options for the key hold.
+ * - `preventDefault` — Controls if the keydown event should have its default action prevented. Enabled by default.
  * @returns
  * ```ts
  * Accessor<boolean>
@@ -259,22 +239,31 @@ export function createKeyHold(
   }
 
   key = key.toUpperCase();
-  const { preventDefault = true } = options,
-    event = useKeyDownEvent(),
-    heldKey = useCurrentlyHeldKey();
+  const { preventDefault = true } = options;
+  const heldKey = useCurrentlyHeldKey();
 
-  return createMemo(() => heldKey() === key && (preventDefault && event()?.preventDefault(), true));
+  if (preventDefault) {
+    // Use a direct event listener for synchronous preventDefault — signal reads in event
+    // listeners return the pre-batch committed value, so we check e.key directly.
+    makeEventListener(window, "keydown", (e: KeyboardEvent) => {
+      if (e.key.toUpperCase() === key) {
+        e.preventDefault();
+      }
+    });
+  }
+
+  return createMemo(() => heldKey() === key);
 }
 
 /**
- * Creates a keyboard shotcut observer. The provided {@link callback} will be called when the specified {@link keys} are pressed.
+ * Creates a keyboard shortcut observer. The provided {@link callback} will be called when the specified {@link keys} are pressed.
  *
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/keyboard#createShortcut
  *
  * @param keys The sequence of keys to watch for.
  * @param callback The callback to call when the keys are pressed.
- * @options The options for the shortcut.
- * - `preventDefault` — Controlls in the keydown event should have it's default action prevented. Enabled by default.
+ * @param options The options for the shortcut.
+ * - `preventDefault` — Controls if the keydown event should have its default action prevented. Enabled by default.
  * - `requireReset` — If `true`, the shortcut will only be triggered once until all of the keys stop being pressed. Disabled by default.
  *
  * @example
@@ -297,56 +286,97 @@ export function createShortcut(
   }
 
   keys = keys.map(key => key.toUpperCase());
-  const { preventDefault = true } = options,
-    event = useKeyDownEvent(),
-    sequence = useKeyDownSequence();
+  const { preventDefault = true, requireReset = false } = options;
 
+  // Track pressed keys and sequence locally with plain JS state rather than
+  // reactive signals. A signal reads from event listeners return
+  // the pre-batch committed value, so synchronous shortcut checking requires
+  // imperative state that's updated in the same event listener tick.
+  let pressedKeys: string[] = [];
+  let sequence: string[][] = [];
   let reset = false;
-  // allow to check the sequence only once the user has released all keys
-  const handleSequenceWithReset = (sequence: string[][]) => {
-    if (!sequence.length) return (reset = false);
-    if (reset) return;
-    const e = event();
 
-    if (sequence.length < keys.length) {
-      // optimistically preventDefault behavior if we yet don't have enough keys
-      if (equalsKeyHoldSequence(sequence, keys.slice(0, sequence.length))) {
-        preventDefault && e && e.preventDefault();
+  const resetAll = () => {
+    pressedKeys = [];
+    sequence = [];
+    reset = false;
+  };
+
+  makeEventListener(window, "keydown", (e: KeyboardEvent) => {
+    if (e.repeat || typeof e.key !== "string") return;
+    const key = e.key.toUpperCase();
+
+    if (!pressedKeys.includes(key)) {
+      const newKeys = [...pressedKeys];
+      // Detect modifiers pressed before listener attached
+      if (
+        pressedKeys.length === 0 &&
+        key !== "ALT" &&
+        key !== "CONTROL" &&
+        key !== "META" &&
+        key !== "SHIFT"
+      ) {
+        if (e.shiftKey && !newKeys.includes("SHIFT")) newKeys.unshift("SHIFT");
+        if (e.altKey && !newKeys.includes("ALT")) newKeys.unshift("ALT");
+        if (e.ctrlKey && !newKeys.includes("CONTROL")) newKeys.unshift("CONTROL");
+        if (e.metaKey && !newKeys.includes("META")) newKeys.unshift("META");
+      }
+      newKeys.push(key);
+      pressedKeys = newKeys;
+      sequence = [...sequence, [...pressedKeys]];
+    }
+
+    if (requireReset) {
+      if (reset) return;
+      if (sequence.length < keys.length) {
+        if (equalsKeyHoldSequence(sequence, keys.slice(0, sequence.length))) {
+          preventDefault && e.preventDefault();
+        } else {
+          reset = true;
+        }
       } else {
         reset = true;
+        if (equalsKeyHoldSequence(sequence, keys)) {
+          preventDefault && e.preventDefault();
+          callback(e);
+        }
       }
     } else {
-      reset = true;
-      if (equalsKeyHoldSequence(sequence, keys)) {
-        preventDefault && e && e.preventDefault();
-        callback(e);
+      const last = sequence.at(-1);
+      if (!last) return;
+
+      if (preventDefault && last.length < keys.length) {
+        if (arrayEquals(last, keys.slice(0, keys.length - 1))) {
+          e.preventDefault();
+        }
+        return;
+      }
+      if (arrayEquals(last, keys)) {
+        const prev = sequence.at(-2);
+        if (!prev || arrayEquals(prev, keys.slice(0, keys.length - 1))) {
+          preventDefault && e.preventDefault();
+          callback(e);
+        }
       }
     }
-  };
+  });
 
-  // allow checking the sequence even if the user is still holding down keys
-  const handleSequenceWithoutReset = (sequence: string[][]) => {
-    const last = sequence.at(-1);
-    if (!last) return;
-    const e = event();
-
-    // optimistically preventDefault behavior if we yet don't have enough keys
-    if (preventDefault && last.length < keys.length) {
-      if (arrayEquals(last, keys.slice(0, keys.length - 1))) {
-        e && e.preventDefault();
-      }
-      return;
+  makeEventListener(window, "keyup", (e: KeyboardEvent) => {
+    if (typeof e.key !== "string") return;
+    const key = e.key.toUpperCase();
+    pressedKeys = pressedKeys.filter(k => k !== key);
+    if (pressedKeys.length === 0) {
+      sequence = [];
+      reset = false;
+    } else {
+      // Reset sequence to remaining held keys so repeated presses of the last
+      // key can re-trigger the shortcut while modifier keys stay held.
+      sequence = [[...pressedKeys]];
     }
-    if (arrayEquals(last, keys)) {
-      const prev = sequence.at(-2);
-      if (!prev || arrayEquals(prev, keys.slice(0, keys.length - 1))) {
-        preventDefault && e && e.preventDefault();
-        callback(e);
-      }
-    }
-  };
+  });
 
-  createEffect(
-    on(sequence, options.requireReset ? handleSequenceWithReset : handleSequenceWithoutReset),
-  );
+  makeEventListener(window, "blur", resetAll);
+  makeEventListener(window, "contextmenu", (e: MouseEvent) => {
+    e.defaultPrevented || resetAll();
+  });
 }

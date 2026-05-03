@@ -1,7 +1,9 @@
-import { createComputed, createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import { describe, test, expect } from "vitest";
 import {
   createKeyHold,
+  createShortcut,
+  useKeyDownEvent,
   useKeyDownList,
   useCurrentlyHeldKey,
   useKeyDownSequence,
@@ -16,44 +18,49 @@ const dispatchKeyEvent = (key: string, type: "keydown" | "keyup") => {
 describe("useKeyDownList", () => {
   test("returns a list of currently held keys", () =>
     createRoot(dispose => {
-      let captured: any;
-      const [keys] = useKeyDownList();
-      createComputed(() => (captured = keys()));
-      expect(captured).toEqual([]);
+      const keys = useKeyDownList();
+      expect(keys()).toEqual([]);
 
       dispatchKeyEvent("a", "keydown");
-      expect(captured).toEqual(["A"]);
+      flush();
+      expect(keys()).toEqual(["A"]);
 
       dispatchKeyEvent("a", "keyup");
-      expect(captured).toEqual([]);
+      flush();
+      expect(keys()).toEqual([]);
 
       dispatchKeyEvent("Alt", "keydown");
+      flush();
       dispatchKeyEvent("q", "keydown");
-      expect(captured).toEqual(["ALT", "Q"]);
+      flush();
+      expect(keys()).toEqual(["ALT", "Q"]);
 
       dispatchKeyEvent("Alt", "keyup");
+      flush();
       dispatchKeyEvent("q", "keyup");
-      expect(captured).toEqual([]);
+      flush();
+      expect(keys()).toEqual([]);
 
       dispose();
     }));
 
-  test("returns a last keydown event", () =>
+  test("useKeyDownEvent tracks the last keydown event", () =>
     createRoot(dispose => {
-      let captured: any;
-      const [, { event }] = useKeyDownList();
-      createComputed(() => (captured = event()));
+      const event = useKeyDownEvent();
 
       dispatchKeyEvent("a", "keydown");
-      expect(captured).instanceOf(Event);
-      expect(captured.key).toBe("a");
+      flush();
+      expect(event()).instanceOf(Event);
+      expect(event()!.key).toBe("a");
 
       dispatchKeyEvent("Alt", "keydown");
-      expect(captured.key).toBe("Alt");
+      flush();
+      expect(event()!.key).toBe("Alt");
 
       dispatchKeyEvent("Alt", "keyup");
       dispatchKeyEvent("a", "keyup");
-      expect(captured.key).toBe("Alt");
+      flush();
+      expect(event()!.key).toBe("Alt");
 
       dispose();
     }));
@@ -62,26 +69,30 @@ describe("useKeyDownList", () => {
 describe("useCurrentlyHeldKey", () => {
   test("returns currently held key", () =>
     createRoot(dispose => {
-      let captured: any;
       const key = useCurrentlyHeldKey();
-      createComputed(() => (captured = key()));
-      expect(captured).toBe(null);
+      expect(key()).toBe(null);
 
       dispatchKeyEvent("a", "keydown");
-      expect(captured).toBe("A");
+      flush();
+      expect(key()).toBe("A");
 
       dispatchKeyEvent("a", "keyup");
-      expect(captured).toBe(null);
+      flush();
+      expect(key()).toBe(null);
 
       dispatchKeyEvent("Alt", "keydown");
-      expect(captured).toBe("ALT");
+      flush();
+      expect(key()).toBe("ALT");
       dispatchKeyEvent("q", "keydown");
-      expect(captured).toBe(null);
+      flush();
+      expect(key()).toBe(null);
 
       dispatchKeyEvent("Alt", "keyup");
-      expect(captured).toBe(null);
+      flush();
+      expect(key()).toBe(null);
       dispatchKeyEvent("q", "keyup");
-      expect(captured).toBe(null);
+      flush();
+      expect(key()).toBe(null);
 
       dispose();
     }));
@@ -90,26 +101,30 @@ describe("useCurrentlyHeldKey", () => {
 describe("useKeyDownSequence", () => {
   test("returns sequence of pressing currently held keys", () =>
     createRoot(dispose => {
-      let captured: any;
       const sequence = useKeyDownSequence();
-      createComputed(() => (captured = sequence()));
-      expect(captured).toEqual([]);
+      expect(sequence()).toEqual([]);
 
       dispatchKeyEvent("a", "keydown");
-      expect(captured).toEqual([["A"]]);
+      flush();
+      expect(sequence()).toEqual([["A"]]);
 
       dispatchKeyEvent("a", "keyup");
-      expect(captured).toEqual([]);
+      flush();
+      expect(sequence()).toEqual([]);
 
       dispatchKeyEvent("Alt", "keydown");
-      expect(captured).toEqual([["ALT"]]);
+      flush();
+      expect(sequence()).toEqual([["ALT"]]);
       dispatchKeyEvent("q", "keydown");
-      expect(captured).toEqual([["ALT"], ["ALT", "Q"]]);
+      flush();
+      expect(sequence()).toEqual([["ALT"], ["ALT", "Q"]]);
 
       dispatchKeyEvent("Alt", "keyup");
-      expect(captured).toEqual([["ALT"], ["ALT", "Q"], ["Q"]]);
+      flush();
+      expect(sequence()).toEqual([["ALT"], ["ALT", "Q"], ["Q"]]);
       dispatchKeyEvent("q", "keyup");
-      expect(captured).toEqual([]);
+      flush();
+      expect(sequence()).toEqual([]);
 
       dispose();
     }));
@@ -118,17 +133,67 @@ describe("useKeyDownSequence", () => {
 describe("createKeyHold", () => {
   test("returns a boolean of is the wanted key pressed", () =>
     createRoot(dispose => {
-      let captured: any;
       const isHeld = createKeyHold("ALT");
-      createComputed(() => (captured = isHeld()));
-      expect(captured).toBe(false);
+      expect(isHeld()).toBe(false);
 
       dispatchKeyEvent("ALT", "keydown");
-
-      expect(captured).toBe(true);
+      flush();
+      expect(isHeld()).toBe(true);
 
       dispatchKeyEvent("a", "keyup");
-      expect(captured).toEqual(false);
+      flush();
+      expect(isHeld()).toBe(false);
+
+      dispose();
+    }));
+});
+
+describe("createShortcut", () => {
+  test("fires callback when shortcut keys are pressed", () =>
+    createRoot(dispose => {
+      let fired = 0;
+      createShortcut(["Control", "Shift", "A"], () => fired++);
+
+      dispatchKeyEvent("Control", "keydown");
+      dispatchKeyEvent("Shift", "keydown");
+      dispatchKeyEvent("a", "keydown");
+      expect(fired).toBe(1);
+
+      dispatchKeyEvent("a", "keyup");
+      dispatchKeyEvent("Shift", "keyup");
+      dispatchKeyEvent("Control", "keyup");
+
+      dispose();
+    }));
+
+  test("does not fire for partial key combinations", () =>
+    createRoot(dispose => {
+      let fired = 0;
+      createShortcut(["Control", "A"], () => fired++);
+
+      dispatchKeyEvent("Control", "keydown");
+      expect(fired).toBe(0);
+
+      dispatchKeyEvent("Control", "keyup");
+
+      dispose();
+    }));
+
+  test("requireReset — fires only once until keys are released", () =>
+    createRoot(dispose => {
+      let fired = 0;
+      createShortcut(["Control", "A"], () => fired++, { requireReset: false });
+
+      dispatchKeyEvent("Control", "keydown");
+      dispatchKeyEvent("a", "keydown");
+      expect(fired).toBe(1);
+
+      dispatchKeyEvent("a", "keyup");
+      dispatchKeyEvent("a", "keydown");
+      expect(fired).toBe(2);
+
+      dispatchKeyEvent("Control", "keyup");
+      dispatchKeyEvent("a", "keyup");
 
       dispose();
     }));
