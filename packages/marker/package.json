@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/marker",
-  "version": "0.2.2",
+  "version": "1.0.0",
   "description": "A reactive primitive for marking matching parts of a string.",
   "author": "Damian Tarnawski <gthetarnav@gmail.com>",
   "contributors": [],
@@ -53,9 +53,9 @@
     "test:ssr": "pnpm run vitest --mode ssr"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "solid-js": "^2.0.0-beta.10"
   },
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "solid-js": "2.0.0-beta.10"
   }
 }

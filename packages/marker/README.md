@@ -20,6 +20,8 @@ yarn add @solid-primitives/marker
 pnpm add @solid-primitives/marker
 ```
 
+Requires `solid-js` `^2.0.0-beta.10`.
+
 ## How to use it
 
 `createMarker` creates a function for marking parts of a string that match a regex. Each match will be mapped by `mapMatch` callback and returned as an array of strings and mapped values.
@@ -42,20 +44,24 @@ const highlight = createMarker(matchedText => {
 
 The `mapMatch` callback is **not** reactive. The value returned by it is cached and reused between marker calls. This is useful for performance reasons, but it also means that the callback should handle the matched text as an accessor.
 
-It behaves similarly to the `mapFn` param of `indexArray`, where the returned element is reused for different values.
+It behaves similarly to the `mapFn` param of `mapArray`, where the returned element is reused for different values.
 
 Any computations created in that callback will be disposed when `createMarker` gets disposed, not on each marker call, because the results are cached between calls.
 
 ```tsx
 const mark = createMarker(text => {
   // you can safely create computations here
-  createEffect(() => {
-    console.log(text());
-  });
+  createEffect(
+    () => text(),
+    t => console.log(t),
+  );
 
   return <mark>{text()}</mark>;
 });
 ```
+
+> **Note:** In Solid 2.0, `createEffect` requires a split `(compute, apply)` signature.
+> Reading `text()` in JSX is reactive — it updates automatically when the match text changes.
 
 ## Caching
 
