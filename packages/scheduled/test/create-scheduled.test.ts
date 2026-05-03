@@ -1,4 +1,4 @@
-import { createComputed, createEffect, createRoot, createSignal } from "solid-js";
+import { createEffect, createRoot, createSignal, flush } from "solid-js";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createScheduled, debounce, leading } from "../src/index.js";
 
@@ -33,85 +33,89 @@ describe("createScheduled", () => {
         invalidate = fn;
         return () => {};
       });
-      let i = 0;
-      const [track, trigger] = createSignal(undefined, { equals: false });
-      createComputed(() => {
-        i++;
-        track();
-        expect(scheduled()).toBe(i === 3);
-        if (i === 1) return trigger();
-        if (i === 2) return invalidate();
-        dispose();
-      });
+      const vals: boolean[] = [];
+      // ownedWrite: true because trigger() is called inside the createRoot scope
+      const [track, trigger] = createSignal(undefined, { equals: false, ownedWrite: true });
+
+      createEffect(
+        () => { track(); return scheduled(); },
+        val => { vals.push(val); },
+      );
+
+      flush(); // run 1: subscribed, not yet dirty
+      expect(vals).toEqual([false]);
+
+      trigger();
+      flush(); // run 2: re-run due to user signal, call() is noop here
+      expect(vals).toEqual([false, false]);
+
+      invalidate(); // sets isDirty + writes track signal
+      flush(); // run 3: dirty → returns true
+      expect(vals).toEqual([false, false, true]);
+
+      dispose();
     });
   });
 
   it("debounces", () => {
     const [track, trigger] = createSignal(undefined, { equals: false });
-
-    let i = 0;
-    let value: boolean | undefined;
+    const vals: boolean[] = [];
 
     const dispose = createRoot(dispose => {
       const scheduled = createScheduled(fn => debounce(fn, 20));
 
-      createEffect(() => {
-        track();
-        i++;
-        value = scheduled();
-      });
+      createEffect(
+        () => { track(); return scheduled(); },
+        val => { vals.push(val); },
+      );
 
       return dispose;
     });
 
-    expect(value).toBe(false);
-    expect(i).toBe(1);
+    flush(); // initial run
+    expect(vals).toEqual([false]);
 
     trigger();
+    flush(); // re-run, debounce timer started
+    expect(vals).toEqual([false, false]);
 
-    expect(value).toBe(false);
-    expect(i).toBe(2);
+    vi.advanceTimersByTime(50); // debounce fires → isDirty=true, dirty()
+    flush(); // re-run after invalidation
+    expect(vals).toEqual([false, false, true]);
 
-    vi.advanceTimersByTime(50);
-
-    expect(value).toBe(true);
-    expect(i).toBe(3);
-
-    if (i === 1) return trigger();
-    if (i === 2) return;
     dispose();
   });
 
   it("debounces with leading", () => {
     const [track, trigger] = createSignal(undefined, { equals: false });
-
-    let i = 0;
-    let value: boolean | undefined;
+    const vals: boolean[] = [];
 
     const dispose = createRoot(dispose => {
       const scheduled = createScheduled(fn => leading(debounce, fn, 20));
 
-      createEffect(() => {
-        track();
-        i++;
-        value = scheduled();
-      });
+      createEffect(
+        () => { track(); return scheduled(); },
+        val => { vals.push(val); },
+      );
 
       return dispose;
     });
 
-    expect(value).toBe(true);
-    expect(i).toBe(1);
+    // Leading fires fn() synchronously in Run 1: isDirty=true → returns true, isDirty=false.
+    // dirty() write is deferred until the next flush (Solid 2.0 prevents same-flush loops).
+    flush();
+    expect(vals).toEqual([true]);
 
+    // trigger() causes a new flush. The effect re-runs: leading already scheduled (isScheduled=true)
+    // so fn is NOT re-fired → returns false.
     trigger();
+    flush();
+    expect(vals).toEqual([true, false]);
 
-    expect(value).toBe(false);
-    expect(i).toBe(2);
-
+    // The debounce trailing edge resets isScheduled but does NOT call fn → no dirty() call.
     vi.advanceTimersByTime(50);
-
-    expect(value).toBe(false);
-    expect(i).toBe(2);
+    flush();
+    expect(vals).toEqual([true, false]);
 
     dispose();
   });
@@ -123,23 +127,35 @@ describe("createScheduled", () => {
         invalidate = fn;
         return () => {};
       });
-      let i = 0;
-      const [track, trigger] = createSignal(undefined, { equals: false });
-      createComputed(() => {
-        i++;
-        track();
-        expect(scheduled(), `(a) run ${i}`).toBe(i === 3);
-        if (i === 1) return;
-        if (i === 2) return;
-      });
-      let j = 0;
-      createComputed(() => {
-        j++;
-        track();
-        expect(scheduled(), `(b) run ${j}`).toBe(j === 3);
-        if (j === 1) return trigger();
-        if (j === 2) return invalidate();
-      });
+      const vals_a: boolean[] = [];
+      const vals_b: boolean[] = [];
+      // ownedWrite: true because trigger() is called inside the createRoot scope
+      const [track, trigger] = createSignal(undefined, { equals: false, ownedWrite: true });
+
+      createEffect(
+        () => { track(); return scheduled(); },
+        val => { vals_a.push(val); },
+      );
+
+      createEffect(
+        () => { track(); return scheduled(); },
+        val => { vals_b.push(val); },
+      );
+
+      flush(); // initial runs
+      expect(vals_a).toEqual([false]);
+      expect(vals_b).toEqual([false]);
+
+      trigger();
+      flush(); // re-runs after user trigger
+      expect(vals_a).toEqual([false, false]);
+      expect(vals_b).toEqual([false, false]);
+
+      invalidate();
+      flush(); // both re-run after invalidation
+      expect(vals_a).toEqual([false, false, true]);
+      expect(vals_b).toEqual([false, false, true]);
+
       dispose();
     });
   });
