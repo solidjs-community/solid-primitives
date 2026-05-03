@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from "vitest";
-import { createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import { createEventBus, createEventHub, createEventStack } from "../src/index.js";
 
 const syncTest = (name: string, fn: (dispose: () => void) => void) =>
@@ -57,6 +57,7 @@ describe("createEventHub", () => {
 
     hub.emit("busA");
     hub.emit("busB", { text: "bar" });
+    flush();
 
     expect(hub.value.busA).toBe(undefined);
     expect(hub.value.busB).toEqual([{ text: "bar" }]);
