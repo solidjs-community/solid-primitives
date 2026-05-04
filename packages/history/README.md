@@ -118,11 +118,10 @@ const history = createUndoHistory(() => {
   };
 });
 
-// set them both at the same time, to only create one point in history
-batch(() => {
-  setA(1);
-  setB(1);
-});
+// Note: updates are batched by default in Solid 2.0 — both
+// changes create a single history entry
+setA(1);
+setB(1);
 ```
 
 ### Observing multiple independent sources
