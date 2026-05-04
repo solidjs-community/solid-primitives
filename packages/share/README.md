@@ -152,9 +152,10 @@ import { createWebShare } from "@solid-primitives/share";
 const [data, setData] = createSignal<ShareData>({});
 const shareStatus = createWebShare(data);
 
-createEffect(() => {
-  console.log(shareStatus.status, shareStatus.message);
-});
+createEffect(
+  () => shareStatus.status,
+  status => console.log("Share status:", status, shareStatus.message),
+);
 ```
 
 ## Changelog
