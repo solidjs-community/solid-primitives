@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import * as i18n from "../src/index.js";
-import { createEffect, createResource, createRoot, createSignal } from "solid-js";
-import { Locale, en_dict, pl_dict } from "./setup.jsx";
+import { createEffect, createMemo, createRoot, createSignal, flush } from "solid-js";
+import { Locale, en_dict, pl_dict } from "./setup.js";
 
 describe("dict", () => {
   test("flatten", () => {
@@ -168,37 +168,39 @@ Object.entries({
 });
 
 describe("reactive", () => {
-  test("with translator", async () => {
+  test("with translator", () => {
     const [locale, setLocale] = createSignal<Locale>("en");
     let hello = "";
     let to_usd = 0;
 
     const dispose = createRoot(dispose => {
-      const [dict] = createResource(
-        locale,
-        async locale => {
-          const dict = locale === "en" ? en_dict : pl_dict;
-          return i18n.flatten(dict);
-        },
-        { initialValue: i18n.flatten(en_dict) },
+      const dict = createMemo(() =>
+        i18n.flatten(locale() === "en" ? en_dict : pl_dict),
       );
 
       const t = i18n.translator(dict, i18n.resolveTemplate);
       const chained = i18n.chainedTranslator(en_dict, t);
 
-      createEffect(() => {
-        hello = t("hello", { name: "Tester", thing: "day" });
-        to_usd = chained.data.currency["to.usd"]();
-      });
+      createEffect(
+        () => ({
+          hello: t("hello", { name: "Tester", thing: "day" }),
+          to_usd: chained.data.currency["to.usd"](),
+        }),
+        ({ hello: h, to_usd: u }) => {
+          hello = h;
+          to_usd = u;
+        },
+      );
 
       return dispose;
     });
 
+    flush();
     expect(hello).toBe("Hello Tester! How is your day?");
     expect(to_usd).toBe(1);
 
     setLocale("pl");
-    await Promise.resolve();
+    flush();
     expect(hello).toBe("Cześć Tester!");
     expect(to_usd).toBe(0.27);
 

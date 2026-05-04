@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import * as i18n from "../src/index.js";
-import { en_dict } from "./setup.jsx";
+import { en_dict } from "./setup.js";
 
 describe("template", () => {
   test("identity template resolver", () => {
