@@ -3,7 +3,7 @@ import { FiX } from "solid-icons/fi";
 import { type Accessor, onMount, type ParentComponent } from "solid-js";
 import * as Header from "../Header/Header.js";
 import * as Table from "~/components/table.jsx";
-import { NoHydration } from "solid-js/web";
+import { NoHydration } from "@solidjs/web";
 
 const SlideModal: ParentComponent<{
   menuButton: Element;

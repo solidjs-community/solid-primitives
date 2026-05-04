@@ -1,5 +1,5 @@
 import { debounce } from "@solid-primitives/scheduled";
-import { hydrate } from "solid-js/web";
+import { hydrate } from "@solidjs/web";
 import { hydrateStart, StartClient } from "@tanstack/solid-start/client";
 
 // Primitives/Table.tsx produces a lot of hydration warnings in development mode.
