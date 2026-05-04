@@ -79,17 +79,7 @@ function RootDocument(props: ParentProps) {
       </head>
       <body class="dark:text-[#F1F0F2]">
         <Loading>
-          <Errored fallback={err => {
-            const e = err as any;
-            const dump = JSON.stringify({
-              message: e?.message,
-              stack: e?.stack,
-              causeMsg: e?.cause?.message,
-              causeStack: e?.cause?.stack,
-              causeCauseStack: e?.cause?.cause?.stack,
-            }, null, 2);
-            return <pre>{dump}</pre>;
-          }}>
+          <Errored fallback={err => <div>Error: {String(err)}</div>}>
             <div id="root">
               <Header />
               <div id="root-subcontainer" class="md:overflow-x-clip">
