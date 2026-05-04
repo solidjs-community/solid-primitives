@@ -174,9 +174,7 @@ describe("reactive", () => {
     let to_usd = 0;
 
     const dispose = createRoot(dispose => {
-      const dict = createMemo(() =>
-        i18n.flatten(locale() === "en" ? en_dict : pl_dict),
-      );
+      const dict = createMemo(() => i18n.flatten(locale() === "en" ? en_dict : pl_dict));
 
       const t = i18n.translator(dict, i18n.resolveTemplate);
       const chained = i18n.chainedTranslator(en_dict, t);
