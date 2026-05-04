@@ -1,8 +1,14 @@
-import { access, type MaybeAccessor, accessWith } from "@solid-primitives/utils";
-import { createWritableMemo } from "@solid-primitives/memo";
-import { createPolled, type TimeoutSource } from "@solid-primitives/timer";
-import { type Accessor, createComputed, createMemo, createSignal } from "solid-js";
-import { createStore, type Store } from "solid-js/store";
+import { access, type MaybeAccessor, accessWith, noop } from "@solid-primitives/utils";
+import { isServer } from "@solidjs/web";
+import {
+  type Accessor,
+  createEffect,
+  createMemo,
+  createRenderEffect,
+  createSignal,
+  createStore,
+  type Store,
+} from "solid-js";
 import { DEFAULT_MESSAGES, HOUR, MINUTE } from "./variables.js";
 import {
   formatDate,
@@ -15,8 +21,9 @@ import type {
   Countdown,
   DateInit,
   DateSetter,
-  TimeAgoOptions,
   GetUpdateInterval,
+  TimeAgoOptions,
+  TimeoutSource,
 } from "./types.js";
 
 /**
@@ -26,8 +33,8 @@ import type {
  * @returns [`Date` signal, setter function]
  */
 export const createDate = (init: MaybeAccessor<DateInit>): [Accessor<Date>, DateSetter] => {
-  const [date, setDate] = createWritableMemo(() => getDate(access(init)));
-  const setter: DateSetter = input => setDate(prev => getDate(accessWith(input, prev)));
+  const [date, setDate] = createSignal<Date>(() => getDate(access(init)));
+  const setter: DateSetter = input => setDate((prev: Date) => getDate(accessWith(input, prev)));
   return [date, setter];
 };
 
@@ -56,17 +63,26 @@ export const createDate = (init: MaybeAccessor<DateInit>): [Accessor<Date>, Date
 export function createDateNow(
   interval: TimeoutSource = MINUTE / 2,
 ): [Accessor<Date>, VoidFunction] {
-  const [track, trigger] = createSignal(undefined, { equals: false });
-  const memo = createPolled(
-    () => {
-      track();
-      return new Date();
+  if (isServer) {
+    const d = new Date();
+    return [() => d, noop];
+  }
+
+  const [now, setNow] = createSignal(new Date(), {
+    equals: (a, b) => a.getTime() === b.getTime(),
+  });
+  const update = () => setNow(new Date());
+
+  createEffect(
+    () => (typeof interval === "function" ? interval() : interval),
+    ms => {
+      if (ms === false) return;
+      const id = setInterval(update, ms);
+      return () => clearInterval(id);
     },
-    interval,
-    undefined,
-    { equals: (a, b) => a.getTime() === b.getTime() },
   );
-  return [memo, trigger];
+
+  return [now, update];
 }
 
 /**
@@ -213,7 +229,10 @@ export function createCountdown(
   if (b !== undefined) difference = createTimeDifference(a, b)[0];
   else difference = a as Accessor<number>;
   const [countdown, setCountdown] = createStore<Countdown>(getCountdown(difference()));
-  createComputed(() => setCountdown(getCountdown(difference())));
+  createRenderEffect(
+    () => difference(),
+    diff => setCountdown(getCountdown(diff)),
+  );
   return countdown;
 }
 
