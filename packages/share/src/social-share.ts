@@ -1,5 +1,5 @@
 import { type Accessor, createSignal } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 import { type Network } from "./networks.js";
 
 export type SharePopupOptions = {

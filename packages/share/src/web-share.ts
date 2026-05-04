@@ -1,5 +1,5 @@
-import { type Accessor, createEffect, createSignal, on, type OnOptions } from "solid-js";
-import { isServer } from "solid-js/web";
+import { type Accessor, createEffect, createSignal } from "solid-js";
+import { isServer } from "@solidjs/web";
 
 /**
  * Generates a simple non-reactive WebShare primitive for sharing.
@@ -67,24 +67,26 @@ export type ShareStatus = {
  */
 export const createWebShare = (
   data: Accessor<ShareData>,
-  deferInitial: boolean = false,
+  deferInitial = false,
 ): ShareStatus => {
   if (isServer) {
     return {};
   }
   const [status, setStatus] = createSignal<ShareStatus>({});
   const share = makeWebShare();
+  let skipFirst = deferInitial;
   createEffect(
-    on(
-      data,
-      dataValue => {
-        setStatus({});
-        share(dataValue)
-          .then(() => setStatus({ status: true }))
-          .catch(e => setStatus({ status: false, message: e.toString() }));
-      },
-      { defer: deferInitial } satisfies OnOptions as any,
-    ),
+    () => data(),
+    dataValue => {
+      if (skipFirst) {
+        skipFirst = false;
+        return;
+      }
+      setStatus({});
+      share(dataValue)
+        .then(() => setStatus({ status: true }))
+        .catch(e => setStatus({ status: false, message: e.toString() }));
+    },
   );
 
   return {
