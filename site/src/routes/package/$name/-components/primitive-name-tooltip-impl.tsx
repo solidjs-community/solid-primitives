@@ -10,7 +10,7 @@ import {
   onCleanup,
   onMount,
 } from "solid-js";
-import { render } from "solid-js/web";
+import { render } from "@solidjs/web";
 import { BASE } from "~/constants.js";
 import type { BundlesizeItem } from "~/types.js";
 

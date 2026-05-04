@@ -10,7 +10,7 @@ import {
   on,
   untrack,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 export type ModifierKey = "Alt" | "Control" | "Meta" | "Shift";
 export type KbdKey = ModifierKey | (string & {});

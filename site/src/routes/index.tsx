@@ -1,5 +1,5 @@
 import { type Component, Show } from "solid-js";
-import { NoHydration } from "solid-js/web";
+import { NoHydration } from "@solidjs/web";
 import { createFileRoute } from "@tanstack/solid-router";
 import { fetchHomeContent, fetchPackageList } from "~/api.js";
 import { HEADER_HEIGHT } from "~/components/Header/Header.jsx";

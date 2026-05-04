@@ -6,7 +6,7 @@ import {
   onMount,
   sharedConfig,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 // https://github.com/solidjs/solid/pull/1592
 
