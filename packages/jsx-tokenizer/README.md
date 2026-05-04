@@ -124,7 +124,7 @@ function Tabs<T>(props: { children: (Tab: Component<{ value: T }>) => JSX.Elemen
   return (
     <ul>
       <For each={tokens()}>
-        {token => <li classList={{ active: token.data === props.active }}>{token.data}</li>}
+        {token => <li class={{ active: token.data === props.active }}>{token.data}</li>}
       </For>
     </ul>
   );
@@ -163,13 +163,14 @@ import { resolveTokens } from "@solid-primitives/jsx-tokenizer";
 
 const tokens = resolveTokens(tokenizer, () => props.children);
 
-createEffect(() => {
-  tokens().forEach(token => {
+createEffect(
+  () => tokens(),
+  tokens => {
     // token is a function that returns the JSX Element fallback
     // token.data is the data returned by the tokenData function
-    console.log(token.data);
-  });
-});
+    tokens.forEach(token => console.log(token.data));
+  }
+);
 
 // the return value of resolveTokens can be used in JSX (will render the fallback JSX Elements)
 return <>{els()}</>;
@@ -188,17 +189,20 @@ const els = resolveTokens(tokenizer, () => props.children, {
   includeJSXElements: true,
 });
 
-createEffect(() => {
-  els().forEach(el => {
-    if (!isToken(tokenizer, el)) {
-      // el is a normal JSX Element
-      return;
-    }
-    // token is a function that returns the JSX Element fallback
-    // token.data is the data returned by the tokenData function
-    console.log(token.data);
-  });
-});
+createEffect(
+  () => els(),
+  els => {
+    els.forEach(el => {
+      if (!isToken(tokenizer, el)) {
+        // el is a normal JSX Element
+        return;
+      }
+      // token is a function that returns the JSX Element fallback
+      // token.data is the data returned by the tokenData function
+      console.log(el.data);
+    });
+  }
+);
 
 // the return value of resolveTokens can be used in JSX
 return <>{els()}</>;
@@ -221,7 +225,7 @@ Since `resolveTokens` is eagerly resolving the JSX structure, if you want to pro
 ```tsx
 function ParentComponent(props) {
   return (
-    <MyContext.Provider value={{} /* some value */}>
+    <MyContext value={{} /* some value */}>
       {untrack(() => {
         const tokens = resolveTokens(tokenizer, () => props.children);
 
@@ -229,7 +233,7 @@ function ParentComponent(props) {
 
         return <>{tokens()}</>;
       })}
-    </MyContext.Provider>
+    </MyContext>
   );
 }
 ```
@@ -243,13 +247,13 @@ For example, [`@solidjs/router`](https://github.com/solidjs/solid-router) which 
 function App() {
   return (
     <Routes>
-      <MyContext.Provider value={{} /* some value */}>
+      <MyContext value={{} /* some value */}>
         {/*
           <Route> component prop is not rendered immediately, it is rendered within <Routes>
           as later time, so the context will not be available in Home component
         */}
         <Route path="/" component={Home} />
-      </MyContext.Provider>
+      </MyContext>
     </Routes>
   );
 }
@@ -262,11 +266,11 @@ function Home() {
 // do this instead
 function App() {
   return (
-    <MyContext.Provider value={{} /* some value */}>
+    <MyContext value={{} /* some value */}>
       <Routes>
         <Route path="/" component={Home} />
       </Routes>
-    </MyContext.Provider>
+    </MyContext>
   );
 }
 ```
