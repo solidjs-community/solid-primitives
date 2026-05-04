@@ -1,4 +1,7 @@
-import { type TimeoutSource } from "@solid-primitives/timer";
+import type { TimeoutSource } from "@solid-primitives/timer";
+import type { Accessor } from "solid-js";
+
+export type { TimeoutSource };
 
 export type MessageFormatter<T = number> = (value: T, isPast: boolean) => string;
 export type RelativeFormatter = (now: Date, target: Date, diff: number) => string;

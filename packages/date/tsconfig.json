@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../memo"
-    },
-    {
       "path": "../timer"
     },
     {
