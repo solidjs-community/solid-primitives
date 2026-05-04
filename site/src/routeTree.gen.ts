@@ -8,97 +8,97 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as SplatRouteImport } from "./routes/$";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as PlaygroundNameRouteImport } from "./routes/playground/$name";
-import { Route as PackageNameIndexRouteImport } from "./routes/package/$name/index";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as SplatRouteImport } from './routes/$'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlaygroundNameRouteImport } from './routes/playground/$name'
+import { Route as PackageNameIndexRouteImport } from './routes/package/$name/index'
 
 const SplatRoute = SplatRouteImport.update({
-  id: "/$",
-  path: "/$",
+  id: '/$',
+  path: '/$',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const PlaygroundNameRoute = PlaygroundNameRouteImport.update({
-  id: "/playground/$name",
-  path: "/playground/$name",
+  id: '/playground/$name',
+  path: '/playground/$name',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const PackageNameIndexRoute = PackageNameIndexRouteImport.update({
-  id: "/package/$name/",
-  path: "/package/$name/",
+  id: '/package/$name/',
+  path: '/package/$name/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/$": typeof SplatRoute;
-  "/playground/$name": typeof PlaygroundNameRoute;
-  "/package/$name/": typeof PackageNameIndexRoute;
+  '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/playground/$name': typeof PlaygroundNameRoute
+  '/package/$name/': typeof PackageNameIndexRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/$": typeof SplatRoute;
-  "/playground/$name": typeof PlaygroundNameRoute;
-  "/package/$name": typeof PackageNameIndexRoute;
+  '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/playground/$name': typeof PlaygroundNameRoute
+  '/package/$name': typeof PackageNameIndexRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/$": typeof SplatRoute;
-  "/playground/$name": typeof PlaygroundNameRoute;
-  "/package/$name/": typeof PackageNameIndexRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/playground/$name': typeof PlaygroundNameRoute
+  '/package/$name/': typeof PackageNameIndexRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/$" | "/playground/$name" | "/package/$name/";
-  fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/$" | "/playground/$name" | "/package/$name";
-  id: "__root__" | "/" | "/$" | "/playground/$name" | "/package/$name/";
-  fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/$' | '/playground/$name' | '/package/$name/'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/$' | '/playground/$name' | '/package/$name'
+  id: '__root__' | '/' | '/$' | '/playground/$name' | '/package/$name/'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  SplatRoute: typeof SplatRoute;
-  PlaygroundNameRoute: typeof PlaygroundNameRoute;
-  PackageNameIndexRoute: typeof PackageNameIndexRoute;
+  IndexRoute: typeof IndexRoute
+  SplatRoute: typeof SplatRoute
+  PlaygroundNameRoute: typeof PlaygroundNameRoute
+  PackageNameIndexRoute: typeof PackageNameIndexRoute
 }
 
-declare module "@tanstack/solid-router" {
+declare module '@tanstack/solid-router' {
   interface FileRoutesByPath {
-    "/$": {
-      id: "/$";
-      path: "/$";
-      fullPath: "/$";
-      preLoaderRoute: typeof SplatRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/playground/$name": {
-      id: "/playground/$name";
-      path: "/playground/$name";
-      fullPath: "/playground/$name";
-      preLoaderRoute: typeof PlaygroundNameRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/package/$name/": {
-      id: "/package/$name/";
-      path: "/package/$name";
-      fullPath: "/package/$name/";
-      preLoaderRoute: typeof PackageNameIndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/$name': {
+      id: '/playground/$name'
+      path: '/playground/$name'
+      fullPath: '/playground/$name'
+      preLoaderRoute: typeof PlaygroundNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/package/$name/': {
+      id: '/package/$name/'
+      path: '/package/$name'
+      fullPath: '/package/$name/'
+      preLoaderRoute: typeof PackageNameIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,16 +107,16 @@ const rootRouteChildren: RootRouteChildren = {
   SplatRoute: SplatRoute,
   PlaygroundNameRoute: PlaygroundNameRoute,
   PackageNameIndexRoute: PackageNameIndexRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from "./router.tsx";
-import type { createStart } from "@tanstack/solid-start";
-declare module "@tanstack/solid-start" {
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/solid-start'
+declare module '@tanstack/solid-start' {
   interface Register {
-    ssr: true;
-    router: Awaited<ReturnType<typeof getRouter>>;
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
   }
 }
