@@ -1,6 +1,6 @@
 import { type MaybeAccessor, noop } from "@solid-primitives/utils";
 import { createSignal, createMemo, type Accessor, onCleanup } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 /**
  * A primitive creating reactive `window.requestAnimationFrame`, that is automatically disposed onCleanup.
@@ -22,7 +22,7 @@ function createRAF(
   if (isServer) {
     return [() => false, noop, noop];
   }
-  const [running, setRunning] = createSignal(false);
+  const [running, setRunning] = createSignal(false, { ownedWrite: true });
   let requestID = 0;
 
   const loop: FrameRequestCallback = timeStamp => {

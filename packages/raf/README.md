@@ -19,6 +19,8 @@ Reactive primitives providing support to `window.requestAnimationFrame`.
 npm install @solid-primitives/raf
 # or
 yarn add @solid-primitives/raf
+# or
+pnpm add @solid-primitives/raf
 ```
 
 ## `createRAF`
@@ -69,7 +71,7 @@ const [running, start, stop] = createRAF(
   targetFPS(timeStamp => console.log("Time stamp is", timeStamp), 60)
 );
 
-// the target fps value can be a reactive sigmal
+// the target fps value can be a reactive signal
 const [fps, setFps] = createSignal(60);
 createRAF(targetFPS((timestamp) => {...}, fps));
 ```
@@ -103,7 +105,7 @@ const MovingRect() {
 }
 ```
 
-#### Defintion
+#### Definition
 
 ```ts
 function createMs(
