@@ -1,6 +1,6 @@
 {
   "name": "@solid-primitives/raf",
-  "version": "2.3.4",
+  "version": "3.0.0",
   "description": "Primitive that facilitates RAF functionality",
   "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [
@@ -57,10 +57,12 @@
     "@solid-primitives/utils": "workspace:^"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.12"
+    "@solidjs/web": "^2.0.0-beta.10",
+    "solid-js": "^2.0.0-beta.10"
   },
   "typesVersions": {},
   "devDependencies": {
-    "solid-js": "^1.9.7"
+    "@solidjs/web": "2.0.0-beta.10",
+    "solid-js": "2.0.0-beta.10"
   }
 }
