@@ -1,4 +1,4 @@
-import { createComputed, createEffect, createRoot, createSignal } from "solid-js";
+import { createEffect, createRoot, createSignal, flush } from "solid-js";
 import { describe, test, expect } from "vitest";
 import { createTriggerCache } from "../src/index.js";
 
@@ -9,14 +9,17 @@ describe("createTriggerCache", () => {
       let runs = -1;
       const key1 = {};
       const key2 = {};
-      createComputed(() => {
-        track(key1);
-        runs++;
-      });
+      createEffect(
+        () => { track(key1); },
+        () => { runs++; },
+      );
+      flush();
       expect(runs).toBe(0);
       dirty(key2);
+      flush();
       expect(runs).toBe(0);
       dirty(key1);
+      flush();
       expect(runs).toBe(1);
 
       dispose();
@@ -26,38 +29,43 @@ describe("createTriggerCache", () => {
     createRoot(dispose => {
       const [track, , dirtyAll] = createTriggerCache(Map);
       let runs = -1;
-      createComputed(() => {
-        track(1);
-        runs++;
-      });
+      createEffect(
+        () => { track(1); },
+        () => { runs++; },
+      );
+      flush();
       expect(runs).toBe(0);
       dirtyAll();
+      flush();
       expect(runs).toBe(1);
 
       dispose();
     }));
 
-  test("weak trigger cache", () =>
+  test("map trigger cache", () =>
     createRoot(dispose => {
       const [track, dirty] = createTriggerCache();
       let runs1 = -1;
       let runs2 = -1;
       const key1 = "key1";
       const key2 = "key2";
-      createComputed(() => {
-        track(key1);
-        runs1++;
-      });
-      createComputed(() => {
-        track(key2);
-        runs2++;
-      });
+      createEffect(
+        () => { track(key1); },
+        () => { runs1++; },
+      );
+      createEffect(
+        () => { track(key2); },
+        () => { runs2++; },
+      );
+      flush();
       expect(runs1).toBe(0);
       expect(runs2).toBe(0);
       dirty(key2);
+      flush();
       expect(runs1).toBe(0);
       expect(runs2).toBe(1);
       dirty(key1);
+      flush();
       expect(runs1).toBe(1);
       expect(runs2).toBe(1);
 
@@ -73,17 +81,19 @@ describe("createTriggerCache", () => {
         return map;
       } as any);
 
-      createEffect(() => {
-        track(key);
-      });
+      createEffect(
+        () => { track(key); },
+        () => {},
+      );
 
       return { dirty, dispose };
     });
 
+    flush();
     expect(map.size).toBe(1);
 
     dirty(key);
-
+    flush();
     expect(map.size).toBe(1);
 
     dispose();
@@ -105,42 +115,44 @@ describe("createTriggerCache", () => {
         return map;
       } as any);
 
-      createComputed(() => {
-        if (enabled1()) track(key);
-      });
-      createComputed(() => {
-        if (enabled2()) track(key);
-      });
+      createEffect(
+        () => { if (enabled1()) track(key); },
+        () => {},
+      );
+      createEffect(
+        () => { if (enabled2()) track(key); },
+        () => {},
+      );
 
       return { dirty, dispose };
     });
 
+    flush();
     expect(map.size).toBe(1);
 
     dirty(key);
-
+    flush();
     expect(map.size).toBe(1);
 
     setEnabled1(false);
-
+    flush();
     await Promise.resolve();
     expect(map.size).toBe(1);
 
     setEnabled2(false);
-
+    flush();
     await Promise.resolve();
     expect(map.size).toBe(0);
 
     setEnabled1(true);
-
+    flush();
     await Promise.resolve();
     expect(map.size).toBe(1);
 
     setEnabled2(true);
     setEnabled1(false);
-
+    flush();
     await Promise.resolve();
-
     expect(map.size).toBe(1);
 
     dispose();
