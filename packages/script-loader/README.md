@@ -20,6 +20,8 @@ yarn add @solid-primitives/script-loader
 pnpm add @solid-primitives/script-loader
 ```
 
+Requires `solid-js` and `@solidjs/web` as peer dependencies.
+
 ## How to use it
 
 createScriptLoader expects a props object with a `src` property. All the other props will be spread to the script element.
