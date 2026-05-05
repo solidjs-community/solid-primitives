@@ -47,7 +47,7 @@ to force the items to wrap.
 - `mapHeight` - A function that maps the source item to a numeric height value.
 
   This function is not reactive, it will be called only once for each item. The value may relate to any unit of your choosing.
-  To provede a reactice height, return an accessor.
+  To provide a reactive height, return an accessor.
 
 - `mapElement` - A function that maps the source item to an element to render.
 
