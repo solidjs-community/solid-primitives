@@ -1,59 +1,67 @@
-import { createEffect, onMount, type JSX, type Accessor } from "solid-js";
+import { createEffect, onSettled, type Accessor } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import { type FalsyValue } from "@solid-primitives/utils";
 
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      autofocus: boolean;
-    }
-  }
-}
-
 /**
- * Directive to autofocus the element on render. Uses the native `autofocus` attribute to decided whether to focus.
+ * Ref callback factory to autofocus an element on render.
+ * Uses the native `autofocus` attribute to determine whether to focus.
  *
- * @param element - Element to focus.
- * @param autofocus - Should this directive be enabled. defaults to false.
+ * @param enabled - Whether to enable autofocus. Defaults to `true`.
+ * @returns Ref callback to attach to the element.
  *
  * @example
- * ```ts
- * <button autofocus use:autofocus>Autofocused</button>;
+ * ```tsx
+ * <button ref={autofocus()} autofocus>Autofocused</button>
  *
- * // or with ref
- * <button autofocus ref={autofocus}>Autofocused</button>;
+ * // Disable autofocus
+ * <button ref={autofocus(false)} autofocus>Not autofocused</button>
  * ```
  */
-export const autofocus = (element: HTMLElement, autofocus?: Accessor<boolean>) => {
-  if (autofocus?.() === false) {
-    return;
-  }
+export const autofocus = (enabled?: boolean) => {
+  if (enabled === false) return (_el: HTMLElement) => {};
 
-  onMount(() => {
-    // Using a timeout makes it consistent
-    if (element.hasAttribute("autofocus")) setTimeout(() => element.focus());
+  let el: HTMLElement | undefined;
+
+  onSettled(() => {
+    if (!el?.hasAttribute("autofocus")) return;
+    const id = setTimeout(() => el?.focus());
+    return () => clearTimeout(id);
   });
+
+  return (element: HTMLElement) => {
+    el = element;
+  };
 };
 
 /**
  * Creates a new reactive primitive for autofocusing the element on render.
  *
  * @param ref - Element to focus.
- * @param autofocus - Whether the element should be autofocused. defaults to true.
  *
  * @example
  * ```ts
  * let ref!: HTMLButtonElement;
  *
- * createAutofocus(() => ref); // Or using a signal accessor.
+ * createAutofocus(() => ref);
  *
  * <button ref={ref}>Autofocused</button>;
+ *
+ * // Using ref signal
+ * const [ref, setRef] = createSignal<HTMLButtonElement>();
+ * createAutofocus(ref);
+ *
+ * <button ref={setRef}>Autofocused</button>;
  * ```
  */
 export const createAutofocus = (ref: Accessor<HTMLElement | FalsyValue>) => {
-  createEffect(() => {
-    const el = ref();
-    el && setTimeout(() => el.focus());
-  });
+  createEffect(
+    () => ref(),
+    el => {
+      if (!el) return;
+      const id = setTimeout(() => el.focus());
+      return () => clearTimeout(id);
+    },
+  );
 };
 
 // only here so the `JSX` import won't be shaken off the tree:
