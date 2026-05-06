@@ -1,4 +1,4 @@
-import type { JSX } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 export type PointerType = "mouse" | "touch" | "pen";
 export type EventTarget = Window | Document | HTMLElement;
