@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeAll, afterAll } from "vitest";
-import { createEffect, createRoot } from "solid-js";
+import { createEffect, createRoot, flush } from "solid-js";
 import { createBroadcastChannel, makeBroadcastChannel } from "../src/index.js";
 
 /*
@@ -223,20 +223,25 @@ describe("createBroadcastChannel", () => {
     const dispose = createRoot(dispose => {
       const { message } = createBroadcastChannel<MsgType>(channelName);
 
-      createEffect(() => {
-        captured.push(message());
-      });
+      createEffect(
+        () => message(),
+        msg => {
+          captured.push(msg);
+        },
+      );
 
       return dispose;
     });
 
+    flush(); // run initial apply with null
     mockedBCInstance.postMessage("hi");
+    flush(); // run apply with updated value
     expect(captured).toEqual([null, "hi"]);
 
     dispose();
   });
 
-  test("posting messages with single instance channel name but called makeBroadcastChannel multiple times", () => {
+  test("posting messages with single instance channel name but called createBroadcastChannel multiple times", () => {
     const channelName = "channel-1";
     const mockedBCInstance = buildMockBroadcastChannel(channelName);
 
@@ -247,18 +252,26 @@ describe("createBroadcastChannel", () => {
       const bc1 = createBroadcastChannel<MsgType>(channelName);
       const bc2 = createBroadcastChannel<MsgType>(channelName);
 
-      createEffect(() => {
-        message1 += bc1.message() + ";";
-      });
+      createEffect(
+        () => bc1.message(),
+        msg => {
+          message1 += msg + ";";
+        },
+      );
 
-      createEffect(() => {
-        message2 += bc2.message() + ";";
-      });
+      createEffect(
+        () => bc2.message(),
+        msg => {
+          message2 += msg + ";";
+        },
+      );
 
       return dispose;
     });
 
+    flush(); // run initial apply with null
     mockedBCInstance.postMessage("hi");
+    flush(); // run apply with updated value
     expect(message1).toBe("null;hi;");
     expect(message2).toBe("null;hi;");
 

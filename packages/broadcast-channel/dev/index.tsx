@@ -101,7 +101,7 @@ const App: Component = () => {
 
   return (
     <div class="flex min-h-screen justify-between gap-4 bg-gray-800 p-5 pt-[80px] text-white">
-      <header class="fixed left-0 top-0 z-10 flex h-[60px] w-full items-center gap-8 bg-gray-800 px-5">
+      <header class="fixed top-0 left-0 z-10 flex h-[60px] w-full items-center gap-8 bg-gray-800 px-5">
         <h1>
           Page Id: <span class="font-mono">{page.id}</span>
         </h1>
@@ -115,7 +115,7 @@ const App: Component = () => {
             <For each={Object.keys(page.pages)}>
               {item => (
                 <li
-                  class="whitespace-nowrap font-mono"
+                  class="font-mono whitespace-nowrap"
                   classList={{ "color-blue-400": page.id === item }}
                 >
                   id: {item}
@@ -125,7 +125,7 @@ const App: Component = () => {
           </ul>
         </div>
       </div>
-      <div class="flex-grow-1 flex flex-col gap-4 [@media(min-width:825px)]:flex-row">
+      <div class="flex flex-grow-1 flex-col gap-4 [@media(min-width:825px)]:flex-row">
         <MessageContainer page={page} channelName="the_matrix" />
         {/* Example of using same channel name where it uses same instance instead of creating new one */}
         <MessageContainer page={page} channelName="sc2" />
