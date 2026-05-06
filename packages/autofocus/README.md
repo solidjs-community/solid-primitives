@@ -29,39 +29,24 @@ pnpm add @solid-primitives/autofocus
 
 ### How to use it
 
-The `autofocus` directive uses the native `autofocus` attribute to determine it should focus the element or not.
-Using this directive without `autofocus={true}` (or the shorthand `autofocus`) will not perform anything.
-
-As a directive:
+`autofocus` is a ref callback factory. It uses the native `autofocus` attribute to determine whether to focus the element.
 
 ```tsx
 import { autofocus } from "@solid-primitives/autofocus";
-// prevents from being tree-shaken by TS
-autofocus
 
-<button use:autofocus autofocus>
+<button ref={autofocus()} autofocus>
   Autofocused
 </button>;
 
-// Autofocus directive can be disabled if `false` is passed as option
-<button use:autofocus={false} autofocus>
+// Autofocus can be disabled by passing false
+<button ref={autofocus(false)} autofocus>
   Not Autofocused
-</button>;
-```
-
-Or with `ref`
-
-```tsx
-import { autofocus } from "@solid-primitives/autofocus";
-
-<button ref={autofocus} autofocus>
-  Autofocused
 </button>;
 ```
 
 ### `createAutofocus`
 
-`createAutofocus` reactively autofocuses an element passid in as a signal.
+`createAutofocus` reactively autofocuses an element passed in as a signal.
 
 ```tsx
 import { createAutofocus } from "@solid-primitives/autofocus";
