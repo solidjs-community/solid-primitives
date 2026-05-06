@@ -45,10 +45,10 @@ createEffect(() => {
 ```tsx
 let ref: HTMLDivElement | undefined;
 
-// pass as function
+// pass as function — preferred, handles ref population automatically
 const scroll = createScrollPosition(() => ref);
-// or wrap with onMount
-onMount(() => {
+// or wrap with onSettled
+onSettled(() => {
   const scroll = createScrollPosition(ref!);
 });
 
