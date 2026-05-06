@@ -1,9 +1,7 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
-import { createResizeObserver } from "@solid-primitives/resize-observer";
-import { createDerivedStaticStore } from "@solid-primitives/static-store";
 import { access, type FalsyValue } from "@solid-primitives/utils";
-import { type Accessor, createSignal, onCleanup, onMount, sharedConfig } from "solid-js";
-import { isServer } from "solid-js/web";
+import { type Accessor, createEffect, createMemo, createSignal, onCleanup, onSettled, sharedConfig } from "solid-js";
+import { isServer } from "@solidjs/web";
 
 export type Bounds = {
   top: number;
@@ -94,29 +92,46 @@ export function createElementBounds(
     [track, trigger] = createSignal(void 0, { equals: false }) as [() => void, () => void];
 
   let calc: () => NullableBounds;
-  // during hydration we need to make sure the initial state is the same as the server
-  if (sharedConfig.context) {
+  // during hydration we need to match the server-rendered state initially
+  if (sharedConfig.hydrating) {
     calc = () => NULLED_BOUNDS;
-    onMount(() => {
+    onSettled(() => {
       calc = () => getElementBounds(access(target));
       trigger();
     });
   }
-  // a function target might be a jsx ref, so it may not be reactive - retrigger manually on mount
+  // a function target might be a jsx ref, so it may not be reactive — retrigger manually on settle
   else if (isFn) {
     calc = () => getElementBounds(target());
-    onMount(trigger);
+    onSettled(trigger);
   }
-  // otherwise we can just use the target directly - it will never change
+  // otherwise the target is static and will never change
   else calc = () => getElementBounds(target);
 
-  const bounds = createDerivedStaticStore(() => (track(), calc()));
+  const memo = createMemo<NullableBounds>(() => (track(), calc()));
+  const bounds = {} as NullableBounds;
+  (Object.keys(NULLED_BOUNDS) as (keyof NullableBounds)[]).forEach(key => {
+    Object.defineProperty(bounds, key, { get: () => memo()[key], enumerable: true });
+  });
 
   if (trackResize) {
-    createResizeObserver(
-      isFn ? () => target() || [] : target,
+    const ro = new ResizeObserver(
       typeof trackResize === "function" ? trackResize(trigger) : trigger,
     );
+    if (isFn) {
+      createEffect(
+        () => (target as Accessor<Element | FalsyValue>)() || null,
+        el => {
+          if (el) ro.observe(el as Element);
+          return () => {
+            if (el) ro.unobserve(el as Element);
+          };
+        },
+      );
+    } else {
+      ro.observe(target as Element);
+    }
+    onCleanup(() => ro.disconnect());
   }
 
   if (trackScroll) {
