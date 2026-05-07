@@ -1,5 +1,5 @@
 import { type Accessor, createEffect, createSignal, NotReadyError, onCleanup } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 import { access, noop } from "@solid-primitives/utils";
 
 // Sentinel for the "audio not yet loaded" pending state.
