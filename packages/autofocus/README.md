@@ -37,12 +37,18 @@ import { autofocus } from "@solid-primitives/autofocus";
 <button ref={autofocus()} autofocus>
   Autofocused
 </button>;
+```
 
-// Autofocus can be disabled by passing false
-<button ref={autofocus(false)} autofocus>
-  Not Autofocused
+To conditionally enable autofocus, control the `autofocus` attribute directly — the `autofocus()` ref only focuses when the attribute is present, so removing it is sufficient to opt out:
+
+```tsx
+// Conditionally autofocus by toggling the attribute
+<button ref={autofocus()} autofocus={shouldFocus()}>
+  Maybe Autofocused
 </button>;
 ```
+
+> **Note:** The `enabled` parameter was removed because it was redundant — the same effect is achieved by omitting the `autofocus` attribute. Previously, Solid directives always received an accessor argument whether you used it or not, which gave the impression an explicit toggle was necessary.
 
 ### `createAutofocus`
 

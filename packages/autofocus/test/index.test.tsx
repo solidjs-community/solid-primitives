@@ -61,23 +61,6 @@ describe("autofocus", () => {
     dispose();
   });
 
-  test("doesn't focus when enabled is false", () => {
-    const el = document.createElement("button");
-    el.setAttribute("autofocus", "");
-
-    const dispose = createRoot(dispose => {
-      const ref = autofocus(false);
-      ref(el);
-      return dispose;
-    });
-
-    flush();
-    expect(focused).toBe(null);
-    vi.runAllTimers();
-    expect(focused).toBe(null);
-
-    dispose();
-  });
 });
 
 describe("createAutofocus", () => {

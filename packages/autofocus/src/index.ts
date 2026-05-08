@@ -6,20 +6,17 @@ import { type FalsyValue } from "@solid-primitives/utils";
  * Ref callback factory to autofocus an element on render.
  * Uses the native `autofocus` attribute to determine whether to focus.
  *
- * @param enabled - Whether to enable autofocus. Defaults to `true`.
+ * To disable autofocus, simply omit the `autofocus` attribute on the element —
+ * no `enabled` parameter is needed or provided.
+ *
  * @returns Ref callback to attach to the element.
  *
  * @example
  * ```tsx
  * <button ref={autofocus()} autofocus>Autofocused</button>
- *
- * // Disable autofocus
- * <button ref={autofocus(false)} autofocus>Not autofocused</button>
  * ```
  */
-export const autofocus = (enabled?: boolean) => {
-  if (enabled === false) return (_el: HTMLElement) => {};
-
+export const autofocus = () => {
   let el: HTMLElement | undefined;
 
   onSettled(() => {
