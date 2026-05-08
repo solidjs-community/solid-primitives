@@ -133,7 +133,81 @@ createGeolocationWatcher(
 
 ---
 
+## `createDistance`
+
+Reactively calculates the distance from the user's current GPS location to a target coordinate using the [Haversine formula](https://en.wikipedia.org/wiki/Haversine_formula). Returns `null` until the first GPS fix arrives.
+
+```ts
+const distance = createDistance({ latitude: 48.8566, longitude: 2.3522 });
+```
+
+```tsx
+<Show when={distance() !== null} fallback="Locating...">
+  {distance()!.toFixed(1)} km from the Eiffel Tower
+</Show>
+```
+
+With a reactive target and metre units:
+
+```ts
+const [target, setTarget] = createSignal({ latitude: 48.8566, longitude: 2.3522 });
+const distance = createDistance(target, { unit: "m" });
+```
+
+### Definition
+
+```ts
+createDistance(
+  target: MaybeAccessor<GeolocationCoord>,
+  options?: {
+    unit?: "km" | "m";            // default "km"
+    enabled?: MaybeAccessor<boolean>;
+    watcherOptions?: MaybeAccessor<PositionOptions>;
+  }
+): Accessor<number | null>
+```
+
+---
+
+## `createWithinRadius`
+
+Reactively tracks whether the user's GPS location is within a given radius (in **metres**) of a centre coordinate. Returns `false` until the first GPS fix arrives.
+
+```ts
+const nearby = createWithinRadius({ latitude: 48.8566, longitude: 2.3522 }, 500);
+```
+
+```tsx
+<Show when={nearby()}>You are near the Eiffel Tower!</Show>
+```
+
+With a reactive radius:
+
+```ts
+const [radius, setRadius] = createSignal(500);
+const nearby = createWithinRadius({ latitude: 48.8566, longitude: 2.3522 }, radius);
+```
+
+### Definition
+
+```ts
+createWithinRadius(
+  center: MaybeAccessor<GeolocationCoord>,
+  radius: MaybeAccessor<number>,  // in metres
+  options?: {
+    enabled?: MaybeAccessor<boolean>;
+    watcherOptions?: MaybeAccessor<PositionOptions>;
+  }
+): Accessor<boolean>
+```
+
+---
+
 ## Types
+
+```ts
+type GeolocationCoord = { latitude: number; longitude: number };
+```
 
 ```ts
 interface GeolocationCoordinates {
@@ -160,11 +234,6 @@ const geolocationDefaults: PositionOptions = {
 ## Demo
 
 You may view a working example here: https://stackblitz.com/edit/vitejs-vite-dvk4m4
-
-## Primitive Ideas
-
-- `createDistance` — supply a lat/lng and reactively calculate the distance in km/m
-- `createWithinRadius` — a signal for tracking if a user is within a radius boundary
 
 ## Changelog
 

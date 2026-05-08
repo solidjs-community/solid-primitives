@@ -16,7 +16,9 @@
       "makeGeolocation",
       "makeGeolocationWatcher",
       "createGeolocation",
-      "createGeolocationWatcher"
+      "createGeolocationWatcher",
+      "createDistance",
+      "createWithinRadius"
     ],
     "category": "Browser APIs"
   },

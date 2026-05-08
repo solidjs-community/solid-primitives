@@ -8,6 +8,8 @@ import {
   makeGeolocationWatcher,
   createGeolocation,
   createGeolocationWatcher,
+  createDistance,
+  createWithinRadius,
 } from "../src/index.js";
 
 // ── makeGeolocation ───────────────────────────────────────────────────────────
@@ -160,17 +162,17 @@ describe("createGeolocationWatcher", () => {
 
   it("error() is set when watchPosition fails", () =>
     createRoot(async dispose => {
-      navigator.geolocation.watchPosition = (
-        _: PositionCallback,
-        errorCallback: PositionErrorCallback,
-      ) => {
-        errorCallback({ code: 1, message: "Denied" } as GeolocationPositionError);
-        return 0;
-      };
+      const spy = vi
+        .spyOn(navigator.geolocation, "watchPosition")
+        .mockImplementation((_: any, errorCallback: any) => {
+          errorCallback({ code: 1, message: "Denied" } as GeolocationPositionError);
+          return 0;
+        });
       const { error } = createGeolocationWatcher(true);
       await Promise.resolve();
       await Promise.resolve();
       expect(error()?.message).toBe("Denied");
+      spy.mockRestore();
       dispose();
     }));
 
@@ -184,6 +186,116 @@ describe("createGeolocationWatcher", () => {
       await Promise.resolve();
       expect(clearWatch).toHaveBeenCalled();
       clearWatch.mockRestore();
+      dispose();
+    }));
+});
+
+// ── createDistance ────────────────────────────────────────────────────────────
+
+describe("createDistance", () => {
+  it("returns null before first GPS fix", () =>
+    createRoot(dispose => {
+      const distance = createDistance(mockCoordinates, { enabled: false });
+      expect(distance()).toBe(null);
+      dispose();
+    }));
+
+  it("returns 0 when target matches user location", () =>
+    createRoot(async dispose => {
+      const distance = createDistance(mockCoordinates);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(distance()).toBe(0);
+      dispose();
+    }));
+
+  it("returns a positive km distance for a different target", () =>
+    createRoot(async dispose => {
+      // ~1 degree north of mockCoordinates ≈ 111 km away
+      const distance = createDistance({ latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude });
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(distance()).toBeGreaterThan(100);
+      expect(distance()).toBeLessThan(120);
+      dispose();
+    }));
+
+  it("converts to metres with unit: 'm'", () =>
+    createRoot(async dispose => {
+      const distanceKm = createDistance(mockCoordinates);
+      const distanceM = createDistance(mockCoordinates, { unit: "m" });
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(distanceM()).toBe((distanceKm() ?? 0) * 1000);
+      dispose();
+    }));
+
+  it("reacts when target changes", () =>
+    createRoot(async dispose => {
+      const [target, setTarget] = createSignal<{ latitude: number; longitude: number }>(mockCoordinates);
+      const distance = createDistance(target);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(distance()).toBe(0);
+      setTarget({ latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude });
+      flush();
+      expect(distance()).toBeGreaterThan(0);
+      dispose();
+    }));
+});
+
+// ── createWithinRadius ────────────────────────────────────────────────────────
+
+describe("createWithinRadius", () => {
+  it("returns false before first GPS fix", () =>
+    createRoot(dispose => {
+      const within = createWithinRadius(mockCoordinates, 1000, { enabled: false });
+      expect(within()).toBe(false);
+      dispose();
+    }));
+
+  it("returns true when user is at the centre (radius 0)", () =>
+    createRoot(async dispose => {
+      const within = createWithinRadius(mockCoordinates, 0);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(within()).toBe(true);
+      dispose();
+    }));
+
+  it("returns true when user is within radius", () =>
+    createRoot(async dispose => {
+      // User is at mockCoordinates; centre is same point; 1 km radius
+      const within = createWithinRadius(mockCoordinates, 1000);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(within()).toBe(true);
+      dispose();
+    }));
+
+  it("returns false when user is outside radius", () =>
+    createRoot(async dispose => {
+      // Centre is ~111 km away; radius is only 1 km
+      const farCenter = { latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude };
+      const within = createWithinRadius(farCenter, 1000);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(within()).toBe(false);
+      dispose();
+    }));
+
+  it("reacts when radius changes", () =>
+    createRoot(async dispose => {
+      // Centre is ~111 km away; start with small radius then expand
+      const farCenter = { latitude: mockCoordinates.latitude + 1, longitude: mockCoordinates.longitude };
+      const [radius, setRadius] = createSignal(1000);
+      const within = createWithinRadius(farCenter, radius);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(within()).toBe(false);
+      setRadius(200_000); // 200 km
+      flush();
+      expect(within()).toBe(true);
       dispose();
     }));
 });

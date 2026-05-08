@@ -1,6 +1,14 @@
 import { isServer } from "solid-js/web";
-import { type Accessor, createEffect, createSignal, NotReadyError, onCleanup } from "solid-js";
+import {
+  type Accessor,
+  createEffect,
+  createSignal,
+  NotReadyError,
+  onCleanup,
+} from "solid-js";
 import { access, noop, type MaybeAccessor } from "@solid-primitives/utils";
+
+export type GeolocationCoord = { latitude: number; longitude: number };
 
 const geolocationDefaults: PositionOptions = {
   enableHighAccuracy: false,
@@ -223,4 +231,88 @@ export const createGeolocationWatcher = (
   onCleanup(clearWatch);
 
   return { location, error };
+};
+
+const toRad = (deg: number): number => (deg * Math.PI) / 180;
+
+const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
+
+/**
+ * Reactively calculates the distance from the user's current GPS location to a target
+ * coordinate using the Haversine formula. Returns `null` until the first GPS fix arrives.
+ *
+ * @param target - Target coordinate (static or reactive)
+ * @param options - `unit` ("km" | "m", default "km"), `enabled`, `watcherOptions`
+ * @returns Signal accessor for the distance, or `null` while pending
+ *
+ * @example
+ * ```ts
+ * const distance = createDistance({ latitude: 48.8566, longitude: 2.3522 });
+ * // <Show when={distance() !== null}>{distance()!.toFixed(1)} km</Show>
+ * ```
+ */
+export const createDistance = (
+  target: MaybeAccessor<GeolocationCoord>,
+  options?: {
+    unit?: "km" | "m";
+    enabled?: MaybeAccessor<boolean>;
+    watcherOptions?: MaybeAccessor<PositionOptions>;
+  },
+): Accessor<number | null> => {
+  if (isServer) return () => null;
+
+  const { unit = "km", enabled = true, watcherOptions } = options ?? {};
+  const { location } = createGeolocationWatcher(enabled, watcherOptions);
+
+  return (): number | null => {
+    let coords: GeolocationCoordinates;
+    try {
+      coords = location();
+    } catch {
+      return null;
+    }
+    const t = access(target);
+    const km = haversineKm(coords.latitude, coords.longitude, t.latitude, t.longitude);
+    return unit === "m" ? km * 1000 : km;
+  };
+};
+
+/**
+ * Reactively tracks whether the user's current GPS location is within a given radius
+ * (in metres) of a centre coordinate. Returns `false` until the first GPS fix arrives.
+ *
+ * @param center - Centre coordinate (static or reactive)
+ * @param radius - Radius in metres (static or reactive)
+ * @param options - `enabled`, `watcherOptions`
+ * @returns Signal accessor that is `true` when inside the radius
+ *
+ * @example
+ * ```ts
+ * const nearby = createWithinRadius({ latitude: 48.8566, longitude: 2.3522 }, 500);
+ * // <Show when={nearby()}>You are near the Eiffel Tower!</Show>
+ * ```
+ */
+export const createWithinRadius = (
+  center: MaybeAccessor<GeolocationCoord>,
+  radius: MaybeAccessor<number>,
+  options?: {
+    enabled?: MaybeAccessor<boolean>;
+    watcherOptions?: MaybeAccessor<PositionOptions>;
+  },
+): Accessor<boolean> => {
+  if (isServer) return () => false;
+
+  const distance = createDistance(center, { unit: "m", ...options });
+  return (): boolean => {
+    const d = distance();
+    return d !== null && d <= access(radius);
+  };
 };
