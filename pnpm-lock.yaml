@@ -137,9 +137,6 @@ importers:
       '@solid-primitives/event-listener':
         specifier: workspace:^
         version: link:../event-listener
-      '@solid-primitives/static-store':
-        specifier: workspace:^
-        version: link:../static-store
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
@@ -999,6 +996,19 @@ importers:
         version: 1.9.7
 
   packages/utils:
+    devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
+      solid-js:
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
+
+  packages/vibrate:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
     devDependencies:
       '@solidjs/web':
         specifier: 2.0.0-beta.10
