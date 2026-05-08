@@ -115,6 +115,41 @@ const { data } = createSSE<Event>(url, { transform: safe(json) });
 - **`safe(transform, fallback?)`** - Wrap any transform in a `try/catch`; returns `fallback` instead of throwing
 - **`pipe(a, b)`** - Compose two transforms into one
 
+## wrapSetter
+
+It is a typical use case to react on setting a new value; this is especially cumbersome for stores, where you otherwise need the `deep` package to make effects subscribe to all changes. A more performant and simple approach is to wrap the setter of your signal or store. To simplify this approach, we provide a `wrapSetter` function:
+
+```ts
+import { createStore } from "solid-js";
+import { wrapSetter } from "@solid-primitives/utils";
+
+const [state, setState] = wrapSetter(
+  createStore(
+    localStorage.getItem('persistedState')
+    ? JSON.parse(localStorage.getItem('persistedState')) 
+    : initialState
+  ),
+  (setter) => { 
+    const output = setState();
+    localStorage.setItem('persistedState', latest(() => JSON.stringify(state)));
+    return output;
+  }
+);
+```
+
+If the signal or store is destructured into a tuple and augmented with additional values, those are left intact in the output. For the TS types to work, you need to `as const` the new tuple:
+
+```ts
+import { createSignal } from "solid-js";
+import { wrapSetter } from "@solid-primitives/utils";
+
+const augmentedSignal = [...createSignal(0), { extra: "data" }] as const;
+const [count, setCount, data] = wrapSetter(
+  augmented,
+  (setter) => (next) => (console.log(next), setter(next))
+);
+```
+
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md)
