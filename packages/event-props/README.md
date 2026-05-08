@@ -15,7 +15,11 @@ A helpful primitive that creates the event props and a reactive store with the l
 npm install @solid-primitives/event-props
 # or
 yarn add @solid-primitives/event-props
+# or
+pnpm add @solid-primitives/event-props
 ```
+
+**Peer dependency**: `solid-js@^2.0.0-beta.10`
 
 ## How to use it
 
@@ -28,11 +32,14 @@ const [events, eventProps] = createEventProps('mousedown', 'mousemove', 'mouseup
 
 const isMouseDown = createMemo(() => (events.mousedown?.ts ?? 0) > (events.mouseup?.ts ?? 1));
 
-createEffect(() => {
-  if (isMouseDown()) {
-    console.log(events.mousemove?.clientX, events.mousemove?.clientY);
-  }
-})
+createEffect(
+  () => isMouseDown() && events.mousemove,
+  mousemove => {
+    if (mousemove) {
+      console.log(mousemove.clientX, mousemove.clientY);
+    }
+  },
+);
 
 <div {...eventProps}>Click and drag on me</div>
 ```
