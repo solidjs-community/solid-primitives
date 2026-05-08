@@ -223,12 +223,9 @@ describe("createBroadcastChannel", () => {
     const dispose = createRoot(dispose => {
       const { message } = createBroadcastChannel<MsgType>(channelName);
 
-      createEffect(
-        () => message(),
-        msg => {
-          captured.push(msg);
-        },
-      );
+      createEffect(message, (msg: MsgType | null) => {
+        captured.push(msg);
+      });
 
       return dispose;
     });
@@ -254,14 +251,14 @@ describe("createBroadcastChannel", () => {
 
       createEffect(
         () => bc1.message(),
-        msg => {
+        (msg: MsgType | null) => {
           message1 += msg + ";";
         },
       );
 
       createEffect(
         () => bc2.message(),
-        msg => {
+        (msg: MsgType | null) => {
           message2 += msg + ";";
         },
       );
