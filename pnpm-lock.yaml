@@ -137,9 +137,6 @@ importers:
       '@solid-primitives/event-listener':
         specifier: workspace:^
         version: link:../event-listener
-      '@solid-primitives/resize-observer':
-        specifier: workspace:^
-        version: link:../resize-observer
       '@solid-primitives/static-store':
         specifier: workspace:^
         version: link:../static-store
@@ -150,9 +147,12 @@ importers:
       '@solid-primitives/scheduled':
         specifier: workspace:^
         version: link:../scheduled
+      '@solidjs/web':
+        specifier: ^2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: ^2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/broadcast-channel:
     devDependencies:
@@ -311,8 +311,8 @@ importers:
   packages/event-props:
     devDependencies:
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/fetch:
     dependencies:
@@ -694,9 +694,12 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/presence:
     dependencies:
@@ -734,9 +737,12 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/range:
     dependencies:
@@ -935,9 +941,12 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/timer:
     devDependencies:
@@ -963,9 +972,12 @@ importers:
         specifier: workspace:^
         version: link:../utils
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/tween:
     devDependencies:
