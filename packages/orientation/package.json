@@ -1,11 +1,11 @@
 {
-  "name": "@solid-primitives/input-mask",
-  "version": "0.3.1",
-  "description": "input masking event primitive.",
-  "author": "Alex Lohr <alex.lohr@logmein.com>",
+  "name": "@solid-primitives/orientation",
+  "version": "0.0.100",
+  "description": "Primitives to track screen orientation using the Screen Orientation API",
+  "author": "David Di Biase <dave@solidjs.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://primitives.solidjs.community/package/input-mask",
+  "homepage": "https://primitives.solidjs.community/package/orientation",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -14,19 +14,30 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "input-mask",
-    "stage": 1,
+    "name": "orientation",
+    "stage": 0,
     "list": [
-      "createInputMask",
-      "createMaskPattern"
+      "makeOrientation",
+      "createOrientation"
     ],
-    "category": "Inputs"
+    "category": "Sensors"
   },
+  "keywords": [
+    "solid",
+    "orientation",
+    "screen",
+    "device",
+    "primitives"
+  ],
+  "private": false,
   "sideEffects": false,
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "module": "./dist/index.js",
-  "browser": {},
   "types": "./dist/index.d.ts",
+  "browser": {},
   "exports": {
     "import": {
       "@solid-primitives/source": "./src/index.ts",
@@ -34,9 +45,7 @@
       "default": "./dist/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "typesVersions": {},
   "scripts": {
     "dev": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/dev.ts",
     "build": "node --import=@nothing-but/node-resolve-ts --experimental-transform-types ../../scripts/build.ts",
@@ -44,15 +53,15 @@
     "test": "pnpm run vitest",
     "test:ssr": "pnpm run vitest --mode ssr"
   },
-  "keywords": [
-    "solid",
-    "primitives"
-  ],
   "peerDependencies": {
+    "@solidjs/web": "^2.0.0-beta.10",
     "solid-js": "^2.0.0-beta.10"
   },
-  "typesVersions": {},
+  "dependencies": {
+    "@solid-primitives/utils": "workspace:^"
+  },
   "devDependencies": {
+    "@solidjs/web": "2.0.0-beta.10",
     "solid-js": "2.0.0-beta.10"
   }
 }
