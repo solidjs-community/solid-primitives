@@ -53,10 +53,13 @@ import { createEffect } from "solid-js";
 
 const { angle, type } = createOrientation();
 
-createEffect(() => {
-  console.log(angle()); // 0 | 90 | 180 | 270
-  console.log(type());  // "portrait-primary" | "landscape-primary" | ...
-});
+createEffect(
+  () => ({ angle: angle(), type: type() }),
+  ({ angle, type }) => {
+    console.log(angle); // 0 | 90 | 180 | 270
+    console.log(type);  // "portrait-primary" | "landscape-primary" | ...
+  }
+);
 ```
 
 ## Types

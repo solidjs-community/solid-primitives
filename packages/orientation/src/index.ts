@@ -87,9 +87,12 @@ export function makeOrientation(onChange: (state: OrientationState) => void): Vo
  * ```ts
  * const { angle, type } = createOrientation();
  *
- * createEffect(() => {
- *   console.log(angle(), type());
- * });
+ * createEffect(
+ *   () => ({ angle: angle(), type: type() }),
+ *   ({ angle, type }) => {
+ *     console.log(angle, type);
+ *   }
+ * );
  * ```
  */
 export function createOrientation(): {
