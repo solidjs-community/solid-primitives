@@ -137,9 +137,6 @@ importers:
       '@solid-primitives/event-listener':
         specifier: workspace:^
         version: link:../event-listener
-      '@solid-primitives/static-store':
-        specifier: workspace:^
-        version: link:../static-store
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
@@ -461,8 +458,8 @@ importers:
   packages/input-mask:
     devDependencies:
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/intersection-observer:
     dependencies:
