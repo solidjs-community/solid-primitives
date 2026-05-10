@@ -1020,6 +1020,19 @@ importers:
         specifier: 2.0.0-beta.10
         version: 2.0.0-beta.10
 
+  packages/vibrate:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
+    devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
+      solid-js:
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
+
   packages/virtual:
     dependencies:
       '@solid-primitives/utils':
