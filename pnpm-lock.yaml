@@ -1020,8 +1020,8 @@ importers:
         specifier: 2.0.0-beta.10
         version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
       babel-preset-solid:
-        specifier: 2.0.0-experimental.16
-        version: 2.0.0-experimental.16(@babel/core@7.29.0)(solid-js@2.0.0-beta.10)
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(@babel/core@7.29.0)(solid-js@2.0.0-beta.10)
       solid-js:
         specifier: 2.0.0-beta.10
         version: 2.0.0-beta.10
@@ -1236,10 +1236,6 @@ packages:
 
   '@babel/helper-module-imports@7.18.6':
     resolution: {integrity: sha512-0NFvs3VkuSYbFi1x2Vd6tKrywq+z/cLeYC/RJNFrIX/30Bf5aiGYbtvGXolEktzJH8o5E5KJ3tT+nkxuuZFVlA==}
-    engines: {node: '>=6.9.0'}
-
-  '@babel/helper-module-imports@7.27.1':
-    resolution: {integrity: sha512-0gSFWUPNXNopqtIPQvlD5WgXYI5GY2kP2cCvoT8kczjbfcfuIljTbcWrulD1CIPIX2gt1wghbDy08yE1p+/r3w==}
     engines: {node: '>=6.9.0'}
 
   '@babel/helper-module-imports@7.28.6':
@@ -3528,8 +3524,8 @@ packages:
     peerDependencies:
       '@babel/core': ^7.20.12
 
-  babel-plugin-jsx-dom-expressions@0.41.0-next.20:
-    resolution: {integrity: sha512-lx/CJGRTNhVv3jpC1zIz0qS0H3OUxCRxQFrgCzdvxwInimGjIJ62GodD3Ls4z31BmDCY/HzJkCjP0qKFslpkgg==}
+  babel-plugin-jsx-dom-expressions@0.50.0-next.6:
+    resolution: {integrity: sha512-D7SSrMu1EupiCFT3hBhWJj0EWzaI27HV1ysbLSKFcH1ROZe61DmnNVchrnr5QeAw5O8bqSdlMDLdEqMYzi4tTA==}
     peerDependencies:
       '@babel/core': ^7.20.12
 
@@ -3546,11 +3542,11 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0
 
-  babel-preset-solid@2.0.0-experimental.16:
-    resolution: {integrity: sha512-I8UfX7Er2i3XaqC8pr7klEHl/AWUUFmpgWDvzipQofthcBwrlWUk8pVbQZ6PuBOnr4XRBVF3ijzOicfzmj4uBA==}
+  babel-preset-solid@2.0.0-beta.10:
+    resolution: {integrity: sha512-lzGgPsh1fVtBJDl+UWLTCgimzPMda7X2Xzq7asCCOq/zHRwiF5vF3Eb3xj65dGyi7YpgVROTwJEpj+XiroKaww==}
     peerDependencies:
       '@babel/core': ^7.0.0
-      solid-js: 2.0.0-experimental.16
+      solid-js: ^2.0.0-beta.10
     peerDependenciesMeta:
       solid-js:
         optional: true
@@ -7737,13 +7733,6 @@ snapshots:
     dependencies:
       '@babel/types': 7.29.0
 
-  '@babel/helper-module-imports@7.27.1':
-    dependencies:
-      '@babel/traverse': 7.29.0
-      '@babel/types': 7.29.0
-    transitivePeerDependencies:
-      - supports-color
-
   '@babel/helper-module-imports@7.28.6':
     dependencies:
       '@babel/traverse': 7.29.0
@@ -7797,7 +7786,7 @@ snapshots:
 
   '@babel/parser@7.27.5':
     dependencies:
-      '@babel/types': 7.27.6
+      '@babel/types': 7.29.0
 
   '@babel/parser@7.29.3':
     dependencies:
@@ -8023,7 +8012,7 @@ snapshots:
       '@babel/generator': 7.27.5
       '@babel/parser': 7.27.5
       '@babel/template': 7.27.2
-      '@babel/types': 7.27.6
+      '@babel/types': 7.29.0
       debug: 4.4.1
       globals: 11.12.0
     transitivePeerDependencies:
@@ -9686,7 +9675,7 @@ snapshots:
       '@babel/code-frame': 7.26.2
       '@babel/core': 7.29.0
       '@babel/traverse': 7.27.4
-      '@babel/types': 7.27.6
+      '@babel/types': 7.29.0
       '@tanstack/router-utils': 1.121.0
       babel-dead-code-elimination: 1.0.10
       tiny-invariant: 1.3.3
@@ -9903,7 +9892,7 @@ snapshots:
   '@types/babel__core@7.20.5':
     dependencies:
       '@babel/parser': 7.27.5
-      '@babel/types': 7.27.6
+      '@babel/types': 7.29.0
       '@types/babel__generator': 7.27.0
       '@types/babel__template': 7.4.4
       '@types/babel__traverse': 7.20.7
@@ -10458,7 +10447,7 @@ snapshots:
       '@babel/core': 7.29.0
       '@babel/parser': 7.27.5
       '@babel/traverse': 7.27.4
-      '@babel/types': 7.27.6
+      '@babel/types': 7.29.0
     transitivePeerDependencies:
       - supports-color
 
@@ -10481,7 +10470,7 @@ snapshots:
       parse5: 7.3.0
       validate-html-nesting: 1.2.2
 
-  babel-plugin-jsx-dom-expressions@0.41.0-next.20(@babel/core@7.29.0):
+  babel-plugin-jsx-dom-expressions@0.50.0-next.6(@babel/core@7.29.0):
     dependencies:
       '@babel/core': 7.29.0
       '@babel/helper-module-imports': 7.18.6
@@ -10531,10 +10520,10 @@ snapshots:
       '@babel/core': 7.29.0
       babel-plugin-jsx-dom-expressions: 0.39.8(@babel/core@7.29.0)
 
-  babel-preset-solid@2.0.0-experimental.16(@babel/core@7.29.0)(solid-js@2.0.0-beta.10):
+  babel-preset-solid@2.0.0-beta.10(@babel/core@7.29.0)(solid-js@2.0.0-beta.10):
     dependencies:
       '@babel/core': 7.29.0
-      babel-plugin-jsx-dom-expressions: 0.41.0-next.20(@babel/core@7.29.0)
+      babel-plugin-jsx-dom-expressions: 0.50.0-next.6(@babel/core@7.29.0)
     optionalDependencies:
       solid-js: 2.0.0-beta.10
 
@@ -12419,7 +12408,7 @@ snapshots:
   magicast@0.2.11:
     dependencies:
       '@babel/parser': 7.27.5
-      '@babel/types': 7.27.6
+      '@babel/types': 7.29.0
       recast: 0.23.11
 
   magicast@0.3.5:
@@ -13987,8 +13976,8 @@ snapshots:
   solid-refresh@0.6.3(solid-js@2.0.0-beta.10):
     dependencies:
       '@babel/generator': 7.27.5
-      '@babel/helper-module-imports': 7.27.1
-      '@babel/types': 7.27.6
+      '@babel/helper-module-imports': 7.28.6
+      '@babel/types': 7.29.0
       solid-js: 2.0.0-beta.10
     transitivePeerDependencies:
       - supports-color
