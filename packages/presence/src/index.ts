@@ -6,15 +6,8 @@ See https://github.com/amannn/react-hooks/tree/main/packages/use-presence
 
 */
 
-import {
-  createSignal,
-  createEffect,
-  onCleanup,
-  type Accessor,
-  createMemo,
-  untrack,
-} from "solid-js";
-import { type MaybeAccessor, asAccessor } from "@solid-primitives/utils";
+import { createSignal, createEffect, type Accessor, createMemo, untrack } from "solid-js";
+import { type MaybeAccessor, asAccessor, INTERNAL_OPTIONS } from "@solid-primitives/utils";
 
 export type SharedTransitionConfig = {
   /** Duration in milliseconds used both for enter and exit transitions. */
@@ -56,53 +49,50 @@ function createPresenceBase(
 
   const initialSource = untrack(source);
   const initialState = options.initialEnter ? false : initialSource;
-  const [isVisible, setIsVisible] = createSignal(initialState);
-  const [isMounted, setIsMounted] = createSignal(initialSource);
-  const [hasEntered, setHasEntered] = createSignal(initialState);
+  const [isVisible, setIsVisible] = createSignal(initialState, INTERNAL_OPTIONS);
+  const [isMounted, setIsMounted] = createSignal(initialSource, INTERNAL_OPTIONS);
+  const [hasEntered, setHasEntered] = createSignal(initialState, INTERNAL_OPTIONS);
 
   const isExiting = createMemo(() => isMounted() && !source());
   const isEntering = createMemo(() => source() && !hasEntered());
   const isAnimating = createMemo(() => isEntering() || isExiting());
 
-  createEffect(() => {
-    if (source()) {
-      // `animateVisible` needs to be set to `true` in a second step, as
-      // when both flags would be flipped at the same time, there would
-      // be no transition. See the second effect below.
-      setIsMounted(true);
-    } else {
-      setHasEntered(false);
-      setIsVisible(false);
+  createEffect(
+    () => source(),
+    isActive => {
+      if (isActive) {
+        setIsMounted(true);
+      } else {
+        setHasEntered(false);
+        setIsVisible(false);
+        const timeoutId = setTimeout(() => setIsMounted(false), exitDuration());
+        return () => clearTimeout(timeoutId);
+      }
+    },
+  );
 
-      const timeoutId = setTimeout(() => {
-        setIsMounted(false);
-      }, exitDuration());
+  createEffect(
+    () => source() && isMounted() && !isVisible(),
+    shouldAnimate => {
+      if (shouldAnimate) {
+        // Force reflow so the initial invisible state is painted before
+        // isVisible becomes true, enabling CSS transitions to fire.
+        document.body.offsetHeight;
+        const animationFrameId = requestAnimationFrame(() => setIsVisible(true));
+        return () => cancelAnimationFrame(animationFrameId);
+      }
+    },
+  );
 
-      onCleanup(() => clearTimeout(timeoutId));
-    }
-  });
-
-  createEffect(() => {
-    if (source() && isMounted() && !isVisible()) {
-      document.body.offsetHeight; // force reflow
-
-      const animationFrameId = requestAnimationFrame(() => {
-        setIsVisible(true);
-      });
-
-      onCleanup(() => cancelAnimationFrame(animationFrameId));
-    }
-  });
-
-  createEffect(() => {
-    if (isVisible() && !hasEntered()) {
-      const timeoutId = setTimeout(() => {
-        setHasEntered(true);
-      }, enterDuration());
-
-      onCleanup(() => clearTimeout(timeoutId));
-    }
-  });
+  createEffect(
+    () => isVisible() && !hasEntered(),
+    shouldTrackEnter => {
+      if (shouldTrackEnter) {
+        const timeoutId = setTimeout(() => setHasEntered(true), enterDuration());
+        return () => clearTimeout(timeoutId);
+      }
+    },
+  );
 
   return {
     isMounted,
@@ -154,24 +144,33 @@ export function createPresence<TItem>(
   options: Options,
 ): PresenceResult<TItem> {
   const initial = untrack(item);
-  const [mountedItem, setMountedItem] = createSignal(initial);
-  const [shouldBeMounted, setShouldBeMounted] = createSignal(itemShouldBeMounted(initial));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mountedItem, setMountedItem] = createSignal<TItem | undefined>(initial as any, INTERNAL_OPTIONS);
+  const [shouldBeMounted, setShouldBeMounted] = createSignal(itemShouldBeMounted(initial), INTERNAL_OPTIONS);
   const { isMounted, ...rest } = createPresenceBase(shouldBeMounted, options);
 
-  createEffect(() => {
-    if (mountedItem() !== item()) {
-      if (isMounted()) {
+  createEffect(
+    () => ({
+      currentItem: item(),
+      mounted: mountedItem(),
+      isM: isMounted(),
+    }),
+    ({ currentItem, mounted, isM }) => {
+      if (mounted !== currentItem) {
+        if (isM) {
+          setShouldBeMounted(false);
+        } else if (itemShouldBeMounted(currentItem)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          setMountedItem(currentItem as any);
+          setShouldBeMounted(true);
+        }
+      } else if (!itemShouldBeMounted(currentItem)) {
         setShouldBeMounted(false);
-      } else if (itemShouldBeMounted(item())) {
-        setMountedItem(() => item());
+      } else if (itemShouldBeMounted(currentItem)) {
         setShouldBeMounted(true);
       }
-    } else if (!itemShouldBeMounted(item())) {
-      setShouldBeMounted(false);
-    } else if (itemShouldBeMounted(item())) {
-      setShouldBeMounted(true);
-    }
-  });
+    },
+  );
 
   return {
     ...rest,

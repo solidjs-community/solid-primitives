@@ -553,8 +553,8 @@ importers:
         specifier: workspace:^
         version: link:../media
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/match:
     devDependencies:
@@ -708,8 +708,8 @@ importers:
         version: link:../utils
     devDependencies:
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: ^2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/promise:
     dependencies:
@@ -822,9 +822,12 @@ importers:
 
   packages/script-loader:
     devDependencies:
+      '@solidjs/web':
+        specifier: ^2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: ^2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/scroll:
     dependencies:
