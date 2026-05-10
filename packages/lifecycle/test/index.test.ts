@@ -1,20 +1,19 @@
 import { describe, test, expect } from "vitest";
-import { createEffect, createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 import { createIsMounted, isHydrated } from "../src/index.js";
 
 describe("createIsMounted", () => {
   test("createIsMounted", () => {
-    createRoot(dispose => {
-      const isMounted = createIsMounted();
+    let isMounted!: () => boolean;
+    const dispose = createRoot(d => {
+      isMounted = createIsMounted();
       expect(isMounted()).toBe(false);
-
-      createEffect(() => {
-        expect(isMounted()).toBe(true);
-        dispose();
-      });
+      return d;
     });
 
-    expect(createIsMounted()()).toBe(true);
+    flush();
+    expect(isMounted()).toBe(true);
+    dispose();
   });
 });
 
