@@ -129,8 +129,8 @@ const [state, setState] = wrapSetter(
     ? JSON.parse(localStorage.getItem('persistedState')) 
     : initialState
   ),
-  (setter) => { 
-    const output = setState();
+  (setter) => (next) => { 
+    const output = setState(next);
     localStorage.setItem('persistedState', latest(() => JSON.stringify(state)));
     return output;
   }
