@@ -12,6 +12,7 @@ import {
   createRoot,
   type AccessorArray,
   type EffectFunction,
+  type EffectOptions,
   type MemoOptions,
   type NoInfer,
   type Owner,
@@ -20,7 +21,7 @@ import {
 } from "solid-js";
 import { isServer } from "solid-js/web";
 import { debounce, throttle } from "@solid-primitives/scheduled";
-import { noop, type EffectOptions, EQUALS_FALSE_OPTIONS } from "@solid-primitives/utils";
+import { noop, EQUALS_FALSE_OPTIONS } from "@solid-primitives/utils";
 
 export type MemoOptionsWithValue<T> = MemoOptions<T> & { value?: T };
 export type AsyncMemoCalculation<T, Init = undefined> = (prev: T | Init) => Promise<T> | T;
