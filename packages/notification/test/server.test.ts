@@ -33,9 +33,9 @@ describe("createNotification (SSR)", () => {
 });
 
 describe("createNotificationPermission (SSR)", () => {
-  test("returns denied permission without throwing", async () => {
+  test("returns unknown permission and resolves denied without throwing", async () => {
     const { permission, requestPermission } = createNotificationPermission();
-    expect(permission()).toBe("denied");
+    expect(permission()).toBe("unknown");
     const result = await requestPermission();
     expect(result).toBe("denied");
   });

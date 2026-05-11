@@ -60,6 +60,7 @@
     "solid-js": "^2.0.0-beta.10"
   },
   "dependencies": {
+    "@solid-primitives/permission": "workspace:^",
     "@solid-primitives/utils": "workspace:^"
   },
   "devDependencies": {

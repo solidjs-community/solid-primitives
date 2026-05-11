@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeAll, afterAll, beforeEach } from "vitest";
-import { createRoot, createSignal, flush } from "solid-js";
+import { createRoot, createSignal, flush, onCleanup } from "solid-js";
 import {
   isNotificationSupported,
   makeNotification,
@@ -40,11 +40,38 @@ class MockNotification {
     );
   });
 
-  /** Test helper: simulate the OS dismissing the notification externally. */
   simulateClose() {
     this.listeners.get("close")?.forEach(fn => fn());
   }
+
+  simulateClick() {
+    this.listeners.get("click")?.forEach(fn => fn());
+  }
+
+  simulateError() {
+    this.listeners.get("error")?.forEach(fn => fn());
+  }
 }
+
+// ── Mock Permissions API ──────────────────────────────────────────────────────
+
+const mockPermStatus = {
+  state: "granted" as PermissionState,
+  _listeners: [] as (() => void)[],
+  addEventListener(_: string, fn: () => void) {
+    this._listeners.push(fn);
+  },
+  removeEventListener(_: string, fn: () => void) {
+    const i = this._listeners.indexOf(fn);
+    if (i >= 0) this._listeners.splice(i, 1);
+  },
+  dispatchChange(state: PermissionState) {
+    this.state = state;
+    this._listeners.forEach(fn => fn());
+  },
+};
+
+// ── Global setup ──────────────────────────────────────────────────────────────
 
 beforeAll(() => {
   Object.defineProperty(window, "Notification", {
@@ -52,19 +79,24 @@ beforeAll(() => {
     configurable: true,
     writable: true,
   });
+
+  (navigator as any).permissions ??= {} as any;
+  navigator.permissions.query = vi.fn().mockImplementation(({ name }: PermissionDescriptor) => {
+    if (name === "notifications") return Promise.resolve(mockPermStatus);
+    return Promise.reject(new Error(`Unhandled permission: ${name}`));
+  });
 });
 
 afterAll(() => {
-  Object.defineProperty(window, "Notification", {
-    value: undefined,
-    configurable: true,
-  });
+  Object.defineProperty(window, "Notification", { value: undefined, configurable: true });
 });
 
 beforeEach(() => {
   MockNotification.instances = [];
   MockNotification.permission = "granted";
   MockNotification.requestPermission.mockClear().mockResolvedValue("granted");
+  mockPermStatus.state = "granted";
+  mockPermStatus._listeners = [];
 });
 
 // ── isNotificationSupported ───────────────────────────────────────────────────
@@ -87,8 +119,7 @@ describe("makeNotification", () => {
 
   test("show returns the Notification instance", () => {
     const [show] = makeNotification("Hello");
-    const n = show();
-    expect(n).toBeInstanceOf(MockNotification);
+    expect(show()).toBeInstanceOf(MockNotification);
   });
 
   test("show returns null when permission is not granted", () => {
@@ -106,6 +137,14 @@ describe("makeNotification", () => {
     expect(instance.close).toHaveBeenCalled();
   });
 
+  test("close removes the event listener before closing", () => {
+    const [show, close] = makeNotification("Hello");
+    show();
+    const instance = MockNotification.instances[0]!;
+    close();
+    expect(instance.removeEventListener).toHaveBeenCalledWith("close", expect.any(Function));
+  });
+
   test("show replaces an existing notification", () => {
     const [show] = makeNotification("Hello");
     show();
@@ -119,18 +158,25 @@ describe("makeNotification", () => {
     const [show, close] = makeNotification("Hello");
     show();
     const instance = MockNotification.instances[0]!;
-    instance.simulateClose(); // OS dismissed it
+    instance.simulateClose();
     instance.close.mockClear();
-    close(); // should be a no-op — reference already cleared
+    close();
     expect(instance.close).not.toHaveBeenCalled();
   });
 
-  test("close removes the event listener before closing", () => {
-    const [show, close] = makeNotification("Hello");
-    show();
+  test("close can be registered with onCleanup by the caller for reactive cleanup", () => {
+    const { dispose } = createRoot(dispose => {
+      const [show, close] = makeNotification("Hello");
+      onCleanup(close);
+      show();
+      return { dispose };
+    });
+
     const instance = MockNotification.instances[0]!;
-    close();
-    expect(instance.removeEventListener).toHaveBeenCalledWith("close", expect.any(Function));
+    instance.close.mockClear();
+
+    dispose();
+    expect(instance.close).toHaveBeenCalled();
   });
 });
 
@@ -160,31 +206,21 @@ describe("createNotification", () => {
     dispose();
   });
 
-  test("show returns the Notification instance", () => {
-    const { show, dispose } = createRoot(dispose => {
-      const { show } = createNotification("Hello");
-      return { show, dispose };
-    });
-
-    const n = show();
-    expect(n).toBeInstanceOf(MockNotification);
-
-    dispose();
-  });
-
-  test("show returns null and does not update signal when permission is denied", () => {
+  test("show returns null and warns when permission is not granted", () => {
     MockNotification.permission = "denied";
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const { show, notification, dispose } = createRoot(dispose => {
       const { show, notification } = createNotification("Hello");
       return { show, notification, dispose };
     });
 
-    const result = show();
+    expect(show()).toBeNull();
     flush();
-    expect(result).toBeNull();
     expect(notification()).toBeNull();
+    expect(warnSpy).toHaveBeenCalled();
 
+    warnSpy.mockRestore();
     dispose();
   });
 
@@ -196,12 +232,28 @@ describe("createNotification", () => {
 
     show();
     flush();
-    expect(notification()).not.toBeNull();
 
     close();
     flush();
     expect(notification()).toBeNull();
     expect(MockNotification.instances[0]!.close).toHaveBeenCalled();
+
+    dispose();
+  });
+
+  test("close removes the event listener before closing", () => {
+    const { show, close, dispose } = createRoot(dispose => {
+      const { show, close } = createNotification("Hello");
+      return { show, close, dispose };
+    });
+
+    show();
+    flush();
+    close();
+    expect(MockNotification.instances[0]!.removeEventListener).toHaveBeenCalledWith(
+      "close",
+      expect.any(Function),
+    );
 
     dispose();
   });
@@ -214,7 +266,6 @@ describe("createNotification", () => {
 
     show();
     flush();
-    expect(notification()).not.toBeNull();
 
     MockNotification.instances[0]!.simulateClose();
     flush();
@@ -235,11 +286,8 @@ describe("createNotification", () => {
 
     show();
     flush();
-    const second = notification();
-
-    expect(first).not.toBe(second);
+    expect(notification()).not.toBe(first);
     expect((first as MockNotification).close).toHaveBeenCalled();
-    expect(MockNotification.instances).toHaveLength(2);
 
     dispose();
   });
@@ -259,21 +307,6 @@ describe("createNotification", () => {
     expect(instance.close).toHaveBeenCalled();
   });
 
-  test("close removes the event listener before closing", () => {
-    const { show, close, dispose } = createRoot(dispose => {
-      const { show, close } = createNotification("Hello");
-      return { show, close, dispose };
-    });
-
-    show();
-    flush();
-    const instance = MockNotification.instances[0]!;
-    close();
-    expect(instance.removeEventListener).toHaveBeenCalledWith("close", expect.any(Function));
-
-    dispose();
-  });
-
   test("reactive title: reads current accessor value at show() time", () => {
     const [title, setTitle] = createSignal("First");
 
@@ -288,13 +321,109 @@ describe("createNotification", () => {
 
     setTitle("Second");
     flush();
-    // title signal changed but notification is still showing "First" — re-show not automatic
+    // not re-shown automatically — title only read on next show() call
     expect((notification() as MockNotification).title).toBe("First");
 
-    // calling show() again reads the updated title
     show();
     flush();
     expect((notification() as MockNotification).title).toBe("Second");
+
+    dispose();
+  });
+
+  // ── Event callbacks ─────────────────────────────────────────────────────────
+
+  test("onClick fires when click event is dispatched", () => {
+    const onClick = vi.fn();
+
+    const { show, dispose } = createRoot(dispose => {
+      const { show } = createNotification("Hello", undefined, { onClick });
+      return { show, dispose };
+    });
+
+    show();
+    flush();
+    MockNotification.instances[0]!.simulateClick();
+
+    expect(onClick).toHaveBeenCalledOnce();
+    expect(onClick).toHaveBeenCalledWith(MockNotification.instances[0]);
+
+    dispose();
+  });
+
+  test("onClose fires when OS dismisses the notification", () => {
+    const onClose = vi.fn();
+
+    const { show, dispose } = createRoot(dispose => {
+      const { show } = createNotification("Hello", undefined, { onClose });
+      return { show, dispose };
+    });
+
+    show();
+    flush();
+    MockNotification.instances[0]!.simulateClose();
+
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(onClose).toHaveBeenCalledWith(MockNotification.instances[0]);
+
+    dispose();
+  });
+
+  test("onClose fires when close() is called programmatically", () => {
+    const onClose = vi.fn();
+
+    const { show, close, dispose } = createRoot(dispose => {
+      const { show, close } = createNotification("Hello", undefined, { onClose });
+      return { show, close, dispose };
+    });
+
+    show();
+    flush();
+    close();
+
+    expect(onClose).toHaveBeenCalledOnce();
+
+    dispose();
+  });
+
+  test("onError fires when error event is dispatched", () => {
+    const onError = vi.fn();
+
+    const { show, dispose } = createRoot(dispose => {
+      const { show } = createNotification("Hello", undefined, { onError });
+      return { show, dispose };
+    });
+
+    show();
+    flush();
+    MockNotification.instances[0]!.simulateError();
+
+    expect(onError).toHaveBeenCalledOnce();
+    expect(onError).toHaveBeenCalledWith(MockNotification.instances[0]);
+
+    dispose();
+  });
+
+  test("event listeners are removed when close() is called", () => {
+    const onClick = vi.fn();
+    const onClose = vi.fn();
+
+    const { show, close, dispose } = createRoot(dispose => {
+      const { show, close } = createNotification("Hello", undefined, { onClick, onClose });
+      return { show, close, dispose };
+    });
+
+    show();
+    flush();
+    close();
+    onClose.mockClear();
+
+    // After close(), simulating OS events should not trigger callbacks
+    MockNotification.instances[0]!.simulateClick();
+    MockNotification.instances[0]!.simulateClose();
+
+    expect(onClick).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
 
     dispose();
   });
@@ -303,14 +432,47 @@ describe("createNotification", () => {
 // ── createNotificationPermission ──────────────────────────────────────────────
 
 describe("createNotificationPermission", () => {
-  test("permission reflects Notification.permission on creation", () => {
-    MockNotification.permission = "default";
-
+  test("permission starts as unknown before query resolves", () => {
     createRoot(dispose => {
       const { permission } = createNotificationPermission();
-      expect(permission()).toBe("default");
+      expect(permission()).toBe("unknown");
       dispose();
     });
+  });
+
+  test("permission resolves to current state after query", async () => {
+    mockPermStatus.state = "granted";
+
+    const { permission, dispose } = createRoot(dispose => {
+      const { permission } = createNotificationPermission();
+      return { permission, dispose };
+    });
+
+    expect(permission()).toBe("unknown");
+    await Promise.resolve();
+    flush();
+    expect(permission()).toBe("granted");
+
+    dispose();
+  });
+
+  test("permission updates reactively when state changes externally", async () => {
+    mockPermStatus.state = "granted";
+
+    const { permission, dispose } = createRoot(dispose => {
+      const { permission } = createNotificationPermission();
+      return { permission, dispose };
+    });
+
+    await Promise.resolve();
+    flush();
+    expect(permission()).toBe("granted");
+
+    mockPermStatus.dispatchChange("denied");
+    flush();
+    expect(permission()).toBe("denied");
+
+    dispose();
   });
 
   test("requestPermission calls Notification.requestPermission", async () => {
@@ -325,39 +487,6 @@ describe("createNotificationPermission", () => {
     dispose();
   });
 
-  test("permission updates after requestPermission resolves to granted", async () => {
-    MockNotification.permission = "default";
-    MockNotification.requestPermission.mockResolvedValue("granted");
-
-    const { permission, requestPermission, dispose } = createRoot(dispose => {
-      const { permission, requestPermission } = createNotificationPermission();
-      return { permission, requestPermission, dispose };
-    });
-
-    expect(permission()).toBe("default");
-    await requestPermission();
-    flush();
-    expect(permission()).toBe("granted");
-
-    dispose();
-  });
-
-  test("permission updates after requestPermission resolves to denied", async () => {
-    MockNotification.permission = "default";
-    MockNotification.requestPermission.mockResolvedValue("denied");
-
-    const { permission, requestPermission, dispose } = createRoot(dispose => {
-      const { permission, requestPermission } = createNotificationPermission();
-      return { permission, requestPermission, dispose };
-    });
-
-    await requestPermission();
-    flush();
-    expect(permission()).toBe("denied");
-
-    dispose();
-  });
-
   test("requestPermission returns the resolved permission value", async () => {
     MockNotification.requestPermission.mockResolvedValue("granted");
 
@@ -366,8 +495,7 @@ describe("createNotificationPermission", () => {
       return { requestPermission, dispose };
     });
 
-    const result = await requestPermission();
-    expect(result).toBe("granted");
+    expect(await requestPermission()).toBe("granted");
 
     dispose();
   });

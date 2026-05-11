@@ -646,6 +646,9 @@ importers:
 
   packages/notification:
     dependencies:
+      '@solid-primitives/permission':
+        specifier: workspace:^
+        version: link:../permission
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
@@ -698,9 +701,12 @@ importers:
 
   packages/permission:
     devDependencies:
+      '@solidjs/web':
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/platform:
     devDependencies:

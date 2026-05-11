@@ -13,7 +13,7 @@ Primitives for the browser [Notifications API](https://developer.mozilla.org/en-
 - **`isNotificationSupported`** — SSR-safe check for Notifications API availability.
 - **`makeNotification`** — Non-reactive helper returning `[show, close]`. No Solid lifecycle dependency.
 - **`createNotification`** — Reactive primitive that tracks the live `Notification` instance and cleans up on owner disposal.
-- **`createNotificationPermission`** — Reactive permission manager that exposes a signal and a `requestPermission` function.
+- **`createNotificationPermission`** — Reactive permission manager that exposes a live permission signal and a `requestPermission` function.
 
 ## Installation
 
@@ -47,16 +47,24 @@ Non-reactive helper with no Solid lifecycle dependency. Both returned functions 
 
 `show()` returns `null` when `Notification.permission` is not `"granted"` — use `createNotificationPermission` to request permission first.
 
+Because `makeNotification` has no reactive owner, **cleanup is the caller's responsibility**. Inside a reactive scope, register `close` with `onCleanup`:
+
 ```ts
+import { onCleanup } from "solid-js";
 import { makeNotification } from "@solid-primitives/notification";
 
 const [show, close] = makeNotification("New message", { body: "Hello!" });
 
+// Register cleanup with the current reactive owner
+onCleanup(close);
+
 button.addEventListener("click", () => show());
 
-// Close programmatically at any time
+// Or close programmatically at any time
 close();
 ```
+
+Outside a reactive scope (e.g. in plain event handlers), call `close()` directly when done.
 
 ---
 
@@ -67,6 +75,7 @@ Reactive primitive tied to the current reactive owner.
 - `title` and `options` can be plain values **or** reactive accessors — their current values are read each time `show()` is called.
 - `notification` is a reactive `Accessor<Notification | null>` that reflects the live instance, updating to `null` when the notification is dismissed (either programmatically or by the OS).
 - The notification is automatically closed when the reactive owner is disposed.
+- Pass an optional `handlers` object to respond to notification events.
 
 ```ts
 import { createNotification } from "@solid-primitives/notification";
@@ -74,6 +83,11 @@ import { createNotification } from "@solid-primitives/notification";
 const { show, close, notification, supported } = createNotification(
   () => `You have ${unread()} messages`,
   { icon: "/icon.png" },
+  {
+    onClick: n => { window.focus(); },
+    onClose: n => { console.log("dismissed"); },
+    onError: n => { console.error("notification failed"); },
+  },
 );
 
 // Show a notification (reads reactive title at call time)
@@ -93,9 +107,13 @@ close();
 
 ### `createNotificationPermission`
 
-Reactive permission manager. The `permission` accessor updates after each `requestPermission()` call.
+Reactive permission manager built on the browser [Permissions API](https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API).
 
-On the server or when the API is unavailable, `permission` always returns `"denied"` and `requestPermission` resolves immediately to `"denied"`.
+The `permission` accessor reflects the **live** permission state and updates automatically whenever it changes — including after `requestPermission()` resolves or the user edits their browser settings directly.
+
+Permission values follow Permissions API vocabulary: `"granted"`, `"denied"`, `"prompt"` (not yet asked), or `"unknown"` while the initial async query is still resolving. Note that the Notifications API uses `"default"` for the same concept that the Permissions API calls `"prompt"`.
+
+On the server or when the API is unavailable, `permission` always returns `"unknown"` and `requestPermission` resolves immediately to `"denied"`.
 
 ```ts
 import { createNotificationPermission } from "@solid-primitives/notification";
@@ -107,7 +125,7 @@ const { permission, requestPermission } = createNotificationPermission();
   <button onClick={requestPermission}>Enable notifications</button>
 </Show>
 
-// Await the result
+// Await the result (returns the raw NotificationPermission value)
 const result = await requestPermission();
 // result: "granted" | "denied" | "default"
 ```
@@ -125,9 +143,11 @@ import {
 
 const NotificationDemo: Component = () => {
   const { permission, requestPermission } = createNotificationPermission();
-  const { show, close, notification } = createNotification("Solid Primitives", {
-    body: "Hello from SolidJS!",
-  });
+  const { show, close, notification } = createNotification(
+    "Solid Primitives",
+    { body: "Hello from SolidJS!" },
+    { onClick: () => window.focus() },
+  );
 
   return (
     <Show when={isNotificationSupported()} fallback={<p>Not supported</p>}>
@@ -146,13 +166,20 @@ const NotificationDemo: Component = () => {
 ## Types
 
 ```ts
-// Standard DOM type re-exported for convenience
-type NotificationPermission = "granted" | "denied" | "default";
+/** Event handler callbacks for `createNotification`. */
+type NotificationEventHandlers = {
+  /** Called when the user clicks the notification. */
+  onClick?: (notification: Notification) => void;
+  /** Called when the notification is dismissed, whether by the user, the OS, or `close()`. */
+  onClose?: (notification: Notification) => void;
+  /** Called when the notification fails to display. */
+  onError?: (notification: Notification) => void;
+};
 ```
 
 ## Browser Support
 
-The [Notifications API](https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API#browser_compatibility) is supported in all modern browsers. It is not available in iOS Safari (as of 2025) or on the server. All primitives degrade gracefully — `show()` returns `null`, `close()` is a no-op.
+The [Notifications API](https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API#browser_compatibility) is supported in all modern browsers. It is not available in iOS Safari (as of 2025) or on the server. All primitives degrade gracefully — `show()` returns `null`, `close()` is a no-op, and `permission()` returns `"unknown"`.
 
 ## Changelog
 

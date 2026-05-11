@@ -1,6 +1,7 @@
 import { createSignal, onCleanup, type Accessor } from "solid-js";
 import { isServer } from "@solidjs/web";
-import { INTERNAL_OPTIONS, noop, access, type MaybeAccessor } from "@solid-primitives/utils";
+import { INTERNAL_OPTIONS, isDev, noop, access, type MaybeAccessor } from "@solid-primitives/utils";
+import { createPermission } from "@solid-primitives/permission";
 
 /**
  * Returns `true` when the [Notifications API](https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API)
@@ -45,7 +46,13 @@ export function makeNotification(
   };
 
   const show = (): Notification | null => {
-    if (Notification.permission !== "granted") return null;
+    if (Notification.permission !== "granted") {
+      // eslint-disable-next-line no-console
+      if (isDev) console.warn(
+          `[@solid-primitives/notification] show() called with Notification.permission "${Notification.permission}" — must be "granted".`,
+        );
+      return null;
+    }
     close();
     const n = new Notification(title, options);
     current = n;
@@ -62,6 +69,16 @@ export function makeNotification(
   return [show, close];
 }
 
+/** Event handler callbacks for `createNotification`. */
+export type NotificationEventHandlers = {
+  /** Called when the user clicks the notification. */
+  onClick?: (notification: Notification) => void;
+  /** Called when the notification is dismissed, whether by the user, the OS, or `close()`. */
+  onClose?: (notification: Notification) => void;
+  /** Called when the notification fails to display. */
+  onError?: (notification: Notification) => void;
+};
+
 /**
  * Reactive notification primitive tied to the current reactive owner.
  *
@@ -75,6 +92,7 @@ export function makeNotification(
  *
  * @param title Notification title, or a reactive accessor returning one.
  * @param options Standard `NotificationOptions`, or a reactive accessor.
+ * @param handlers Optional event callbacks (`onClick`, `onClose`, `onError`).
  * @returns `{ show, close, notification, supported }`
  *
  * @example
@@ -82,16 +100,14 @@ export function makeNotification(
  * const { show, close, notification } = createNotification(
  *   () => `You have ${unread()} messages`,
  *   { icon: "/icon.png" },
+ *   { onClick: () => window.focus() },
  * );
- *
- * createEffect(() => {
- *   if (notification()) console.log("notification is visible");
- * });
  * ```
  */
 export function createNotification(
   title: MaybeAccessor<string>,
   options?: MaybeAccessor<NotificationOptions>,
+  handlers?: NotificationEventHandlers,
 ): {
   show: () => Notification | null;
   close: VoidFunction;
@@ -106,31 +122,56 @@ export function createNotification(
 
   const [notification, setNotification] = createSignal<Notification | null>(null, INTERNAL_OPTIONS);
   let current: Notification | null = null;
-  let closeHandler: VoidFunction | undefined;
+  let currentCleanup: VoidFunction | undefined;
 
   const close: VoidFunction = () => {
-    if (current && closeHandler) {
-      current.removeEventListener("close", closeHandler);
-      closeHandler = undefined;
-    }
-    current?.close();
+    const n = current;
+    currentCleanup?.();
+    currentCleanup = undefined;
+    n?.close();
     current = null;
     setNotification(null);
+    if (n) handlers?.onClose?.(n);
   };
 
   const show = (): Notification | null => {
-    if (Notification.permission !== "granted") return null;
+    if (Notification.permission !== "granted") {
+      // eslint-disable-next-line no-console
+      if (isDev) console.warn(
+          `[@solid-primitives/notification] show() called with Notification.permission "${Notification.permission}" — must be "granted".`,
+        );
+      return null;
+    }
     close();
     const n = new Notification(access(title), access(options));
     current = n;
-    closeHandler = () => {
+
+    const onCloseEvent = () => {
       if (current === n) {
+        currentCleanup?.();
+        currentCleanup = undefined;
         current = null;
-        closeHandler = undefined;
         setNotification(null);
+        handlers?.onClose?.(n);
       }
     };
-    n.addEventListener("close", closeHandler);
+
+    n.addEventListener("close", onCloseEvent);
+    const cleanups: VoidFunction[] = [() => n.removeEventListener("close", onCloseEvent)];
+
+    if (handlers?.onClick) {
+      const h = () => handlers.onClick!(n);
+      n.addEventListener("click", h);
+      cleanups.push(() => n.removeEventListener("click", h));
+    }
+
+    if (handlers?.onError) {
+      const h = () => handlers.onError!(n);
+      n.addEventListener("error", h);
+      cleanups.push(() => n.removeEventListener("error", h));
+    }
+
+    currentCleanup = () => cleanups.forEach(fn => fn());
     setNotification(n);
     return n;
   };
@@ -141,14 +182,17 @@ export function createNotification(
 }
 
 /**
- * Reactive notification permission manager.
+ * Reactive notification permission manager built on `createPermission`.
  *
- * The `permission` accessor reflects the current `Notification.permission`
- * value and updates after each `requestPermission()` call. Use this to
- * reactively gate UI controls or notification logic on permission state.
+ * The `permission` accessor reflects the live state from the browser
+ * [Permissions API](https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API)
+ * and updates automatically whenever permission changes — including after
+ * `requestPermission()` resolves or the user edits browser settings.
  *
- * On the server or when the Notifications API is unavailable, `permission`
- * always returns `"denied"` and `requestPermission` resolves to `"denied"`.
+ * Permission values follow the Permissions API vocabulary: `"granted"`,
+ * `"denied"`, `"prompt"` (not yet asked), or `"unknown"` while the query
+ * is still resolving. Note that the Notifications API uses `"default"` for
+ * the same concept that the Permissions API calls `"prompt"`.
  *
  * @returns `{ permission, requestPermission }`
  *
@@ -156,34 +200,27 @@ export function createNotification(
  * ```ts
  * const { permission, requestPermission } = createNotificationPermission();
  *
- * createEffect(() => {
- *   if (permission() === "granted") showWelcomeNotification();
- * });
- *
- * <button onClick={requestPermission}>Enable notifications</button>
+ * <Show when={permission() !== "granted"}>
+ *   <button onClick={requestPermission}>Enable notifications</button>
+ * </Show>
  * ```
  */
 export function createNotificationPermission(): {
-  permission: Accessor<NotificationPermission>;
+  permission: Accessor<PermissionState | "unknown">;
   requestPermission: () => Promise<NotificationPermission>;
 } {
   if (!isNotificationSupported()) {
     return {
-      permission: () => "denied" as NotificationPermission,
+      permission: () => "unknown" as const,
       requestPermission: () => Promise.resolve("denied" as NotificationPermission),
     };
   }
 
-  const [permission, setPermission] = createSignal<NotificationPermission>(
-    Notification.permission,
-    INTERNAL_OPTIONS,
-  );
+  const permission = createPermission("notifications");
 
-  const requestPermission = async (): Promise<NotificationPermission> => {
-    const result = await Notification.requestPermission();
-    setPermission(result);
-    return result;
-  };
+  // createPermission tracks state via the change event — no manual update needed
+  const requestPermission = async (): Promise<NotificationPermission> =>
+    Notification.requestPermission();
 
   return { permission, requestPermission };
 }
