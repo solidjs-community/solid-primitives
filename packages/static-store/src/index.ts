@@ -3,18 +3,21 @@ import {
   type Accessor,
   createMemo,
   createSignal,
-  type EffectFunction,
+  type ComputeFunction,
   getObserver,
   getOwner,
-  type MemoOptions,
   type NoInfer,
   onSettled,
   runWithOwner,
   sharedConfig,
   type Signal,
+  type SignalOptions,
   untrack,
 } from "solid-js";
 import { isServer } from "@solidjs/web";
+
+type Defined<T> = T extends undefined ? never : T;
+export type MemoOptions<T> = Defined<Parameters<typeof createMemo<T>>[1]>;
 
 export type StaticStoreSetter<T extends object> = {
   (setter: (prev: T) => Partial<T>): T;
@@ -43,7 +46,7 @@ export type StaticStoreSetter<T extends object> = {
  * })
  * ```
  */
-export function createStaticStore<T extends object>(
+export function createStaticStore<T extends Record<string, Exclude<unknown, Function>>>(
   init: T,
 ): [access: T, write: StaticStoreSetter<T>] {
   const copy = { ...init },
@@ -54,7 +57,7 @@ export function createStaticStore<T extends object>(
     let signal = cache[key];
     if (!signal) {
       if (!getObserver()) return copy[key];
-      cache[key] = signal = createSignal(copy[key], { pureWrite: true });
+      cache[key] = signal = createSignal(copy[key] as Exclude<T[keyof T], Function>, { pureWrite: true } as SignalOptions<T[keyof T]>);
       delete copy[key];
     }
     return signal[0]();
@@ -95,7 +98,7 @@ export function createStaticStore<T extends object>(
  * ```
  * @see https://github.com/solidjs-community/solid-primitives/tree/main/packages/static-store#createHydratableStaticStore
  */
-export function createHydratableStaticStore<T extends object>(
+export function createHydratableStaticStore<T extends Record<string, Exclude<unknown, Function>>>(
   serverValue: T,
   update: () => T,
 ): ReturnType<typeof createStaticStore<T>> {
@@ -103,7 +106,7 @@ export function createHydratableStaticStore<T extends object>(
 
   if (sharedConfig.hydrating) {
     const [state, setState] = createStaticStore(serverValue);
-    onSettled(() => setState(update()));
+    onSettled(() => { setState(update()); });
     return [state, setState];
   }
 
@@ -131,20 +134,20 @@ export function createHydratableStaticStore<T extends object>(
  * ```
  */
 export function createDerivedStaticStore<Next extends Prev & object, Prev = Next>(
-  fn: EffectFunction<undefined | NoInfer<Prev>, Next>,
+  fn: ComputeFunction<undefined | NoInfer<Prev>, Next>,
 ): Next;
 export function createDerivedStaticStore<Next extends Prev & object, Init = Next, Prev = Next>(
-  fn: EffectFunction<Init | Prev, Next>,
+  fn: ComputeFunction<Init | Prev, Next>,
   value: Init,
   options?: MemoOptions<Next>,
 ): Next;
-export function createDerivedStaticStore<T extends object>(
-  fn: EffectFunction<T | undefined, T>,
+export function createDerivedStaticStore<T extends Record<string, Exclude<unknown, Function>>>(
+  fn: ComputeFunction<T | undefined, T>,
   value?: T,
   options?: MemoOptions<T>,
 ): T {
   const o = getOwner(),
-    fnMemo = createMemo(fn, value, options),
+    fnMemo = createMemo((prev = value) => fn(prev), options),
     store = { ...untrack(fnMemo) },
     cache: Partial<Record<keyof T, Accessor<T[keyof T]>>> = {};
 
