@@ -1,10 +1,5 @@
 import type { Accessor, Setter } from "solid-js";
 
-export type { EffectOptions, OnOptions } from "solid-js";
-
-// TODO delete in next major version
-export type { ResolvedJSXElement, ResolvedChildren } from "solid-js/types/reactive/signal.js";
-
 /**
  * Can be single or in an array
  */

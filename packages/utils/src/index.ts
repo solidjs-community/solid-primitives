@@ -169,11 +169,11 @@ export function defer<S, Next extends Prev, Prev = Next>(
   const isArray = Array.isArray(deps);
   let prevInput: S;
   let shouldDefer = true;
-  return prevValue => {
+  return ((prevValue: Prev | undefined) => {
     let input: S;
     if (isArray) {
       input = Array(deps.length) as S;
-      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]();
+      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]?.();
     } else input = deps();
     if (shouldDefer) {
       shouldDefer = false;
@@ -183,7 +183,7 @@ export function defer<S, Next extends Prev, Prev = Next>(
     const result = untrack(() => fn(input, prevInput, prevValue));
     prevInput = input;
     return result;
-  };
+  }) as unknown as EffectFunction<NoInfer<Next> | undefined>;
 }
 
 /**
@@ -253,14 +253,14 @@ export function createHydratableSignal<T>(
   options?: SignalOptions<T>,
 ): ReturnType<typeof createSignal<T>> {
   if (isServer) {
-    return createSignal(serverValue, options);
+    return createSignal(serverValue as Exclude<T, Function>, options);
   }
   if (sharedConfig.hydrating) {
-    const [state, setState] = createSignal(serverValue, options);
-    onSettled(() => setState(() => update()));
+    const [state, setState] = createSignal(serverValue as Exclude<T, Function>, options);
+    onSettled(() => setState(() => update() as any));
     return [state, setState];
   }
-  return createSignal(update(), options);
+  return createSignal(update() as Exclude<T, Function>, options);
 }
 
 /** @deprecated use {@link createHydratableSignal} instead */
