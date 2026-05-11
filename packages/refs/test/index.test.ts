@@ -29,7 +29,7 @@ describe("resolveElements", () => {
           el1,
           () => undefined,
           () => () => el2,
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+           
           [el3, () => el4, () => 123, ((_: number) => el5) as any],
           el6,
         ],

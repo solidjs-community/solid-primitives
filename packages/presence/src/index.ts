@@ -144,8 +144,7 @@ export function createPresence<TItem>(
   options: Options,
 ): PresenceResult<TItem> {
   const initial = untrack(item);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mountedItem, setMountedItem] = createSignal<TItem | undefined>(initial as any, INTERNAL_OPTIONS);
+  const [mountedItem, setMountedItem] = createSignal<TItem | undefined>(initial as Exclude<TItem, Function>, INTERNAL_OPTIONS);
   const [shouldBeMounted, setShouldBeMounted] = createSignal(itemShouldBeMounted(initial), INTERNAL_OPTIONS);
   const { isMounted, ...rest } = createPresenceBase(shouldBeMounted, options);
 
@@ -160,8 +159,7 @@ export function createPresence<TItem>(
         if (isM) {
           setShouldBeMounted(false);
         } else if (itemShouldBeMounted(currentItem)) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          setMountedItem(currentItem as any);
+          setMountedItem(currentItem as Exclude<TItem, Function>);
           setShouldBeMounted(true);
         }
       } else if (!itemShouldBeMounted(currentItem)) {

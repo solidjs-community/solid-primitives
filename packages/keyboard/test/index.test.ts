@@ -8,7 +8,7 @@ import {
 } from "../src/index.js";
 
 const dispatchKeyEvent = (key: string, type: "keydown" | "keyup") => {
-  let ev = new Event(type) as any;
+  const ev = new Event(type) as any;
   ev.key = key;
   window.dispatchEvent(ev);
 };
