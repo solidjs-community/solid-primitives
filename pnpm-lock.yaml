@@ -859,10 +859,23 @@ importers:
         version: 1.9.7
 
   packages/selection:
+    dependencies:
+      '@solid-primitives/utils':
+        specifier: workspace:^
+        version: link:../utils
     devDependencies:
+      '@babel/core':
+        specifier: ^7.27.0
+        version: 7.29.0
+      '@solidjs/web':
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
+      babel-preset-solid:
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(@babel/core@7.29.0)(solid-js@2.0.0-beta.10)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/set:
     dependencies:
