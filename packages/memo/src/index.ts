@@ -70,7 +70,7 @@ export function createPureReaction(
       createReaction(() => {
         if (--trackers === 0) untrack(onInvalidate);
       }, options),
-    )!;
+    );
     r(tracking);
   };
 }
@@ -241,7 +241,7 @@ export function createLazyMemo<T>(
       return prevValue;
     },
     DEV ? { lazy: true, name: options?.name, equals: false } : { lazy: true, equals: false },
-  ) as Accessor<T>;
+  );
 }
 
 export type CacheCalculation<Key, Value> = (key: Key, prev: Value | undefined) => Value;
@@ -303,7 +303,7 @@ export function createMemoCache<Key, Value>(
         prevVal = v;
         return v;
       }, options),
-    )!;
+    );
     if (options.size === undefined || cache.size < options.size) cache.set(key, memo);
     return memo();
   };
