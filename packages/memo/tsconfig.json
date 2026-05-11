@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../scheduled"
-    },
-    {
       "path": "../utils"
     }
   ],

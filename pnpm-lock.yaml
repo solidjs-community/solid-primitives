@@ -270,8 +270,8 @@ importers:
         version: link:../utils
     devDependencies:
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/devices:
     devDependencies:
@@ -586,22 +586,16 @@ importers:
 
   packages/memo:
     dependencies:
-      '@solid-primitives/scheduled':
-        specifier: workspace:^
-        version: link:../scheduled
       '@solid-primitives/utils':
         specifier: workspace:^
         version: link:../utils
     devDependencies:
-      '@solid-primitives/mouse':
-        specifier: workspace:^
-        version: link:../mouse
-      '@solidjs/router':
-        specifier: ^0.8.4
-        version: 0.8.4(solid-js@1.9.7)
+      '@solidjs/web':
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10(solid-js@2.0.0-beta.10)
       solid-js:
-        specifier: ^1.9.7
-        version: 1.9.7
+        specifier: 2.0.0-beta.10
+        version: 2.0.0-beta.10
 
   packages/mouse:
     dependencies:
@@ -2923,11 +2917,6 @@ packages:
     resolution: {integrity: sha512-zdIWBGpR9zGx1p1bzIPqF5Gs+Ks/BH8R6fWhmUa/dcK1L2rUC8BAcZJzNRYBQv74kScf1TSOs0EY//Vd/I0V8g==}
     peerDependencies:
       solid-js: '>=1.8.4'
-
-  '@solidjs/router@0.8.4':
-    resolution: {integrity: sha512-Gi/WVoVseGMKS1DBdT3pNAMgOzEOp6Q3dpgNd2mW9GUEnVocPmtyBjDvXwN6m7tjSGsqqfqJFXk7bm1hxabSRw==}
-    peerDependencies:
-      solid-js: ^1.5.3
 
   '@solidjs/signals@2.0.0-beta.10':
     resolution: {integrity: sha512-McdmbLNiSlz616zcykS8Rb1t9QTOTKdNAoaWd4/OjXEbcAUrPqRX1CWgR+caiWUk4qn0a+LesTTV4jZhFFPaSg==}
@@ -9604,10 +9593,6 @@ snapshots:
   '@solidjs/meta@0.29.4(solid-js@2.0.0-beta.10)':
     dependencies:
       solid-js: 2.0.0-beta.10
-
-  '@solidjs/router@0.8.4(solid-js@1.9.7)':
-    dependencies:
-      solid-js: 1.9.7
 
   '@solidjs/signals@2.0.0-beta.10': {}
 
