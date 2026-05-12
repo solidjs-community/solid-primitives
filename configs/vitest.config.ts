@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
         // https://github.com/solidjs/solid-refresh/issues/29
         hot: false,
         // For testing SSR we need to do a SSR JSX transform
-        solid: { generate: testSSR ? "ssr" : "dom", omitNestedClosingTags: false },
+        solid: { generate: testSSR ? "ssr" : "dom", omitNestedClosingTags: false, moduleName: "@solidjs/web" },
       }),
     ],
     test: {
