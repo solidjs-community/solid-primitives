@@ -1,17 +1,15 @@
 import { access, tryOnCleanup, noop, type MaybeAccessor } from "@solid-primitives/utils";
 import {
   type Accessor,
-  batch,
   type JSX,
   type Setter,
-  createComputed,
+  createEffect,
   createMemo,
-  createResource,
   createSignal,
   onCleanup,
   untrack,
 } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 
 /**
  * createSegment - create a reactive segment out of an array of items
@@ -34,15 +32,15 @@ export const createSegment = <T>(
 ): Accessor<T[]> => {
   let previousStart = NaN,
     previousEnd = NaN;
-  return createMemo(previous => {
+  return createMemo(prev => {
     const currentItems = access(items);
     const start = (page() - 1) * access(limit);
     const end = Math.min(start + access(limit), currentItems.length);
     if (
-      previous &&
-      ((previous.length === 0 && end <= start) || (start === previousStart && end === previousEnd))
+      prev &&
+      ((prev.length === 0 && end <= start) || (start === previousStart && end === previousEnd))
     ) {
-      return previous;
+      return prev;
     }
     previousStart = start;
     previousEnd = end;
@@ -137,28 +135,25 @@ export const createPagination = (
   options?: MaybeAccessor<PaginationOptions>,
 ): [props: Accessor<PaginationProps>, page: Accessor<number>, setPage: Setter<number>] => {
   const opts = createMemo(() => Object.assign({}, PAGINATION_DEFAULTS, access(options)));
-  const [page, _setPage] = createSignal(opts().initialPage || 1);
+  // ownedWrite allows setPage to be called from event handlers and reactive scopes
+  const [rawPage, setRawPage] = createSignal(opts().initialPage || 1, { ownedWrite: true });
 
-  // do not allow pages beyond the number of pages in case the latter changes
   const setPage = (p: number | ((_p: number) => number)) => {
     if (typeof p === "function") {
       p = p(page());
     }
     if (p < 1) {
-      return _setPage(1);
+      return setRawPage(1);
     }
     const pages = opts().pages;
     if (p > pages) {
-      return _setPage(pages);
+      return setRawPage(pages);
     }
-    return _setPage(p);
+    return setRawPage(p);
   };
 
-  // normalize in case the number of pages changes, do not run the first time
-  createComputed(previous => {
-    opts().pages;
-    return previous ? setPage(untrack(page)) : true;
-  });
+  // Clamp page to valid range reactively — handles page count decreasing below current page
+  const page = createMemo(() => Math.max(1, Math.min(rawPage(), opts().pages)));
 
   const goPage = (p: number | ((p: number) => number), ev: KeyboardEvent) => {
     setPage(p);
@@ -182,31 +177,29 @@ export const createPagination = (
 
   const maxPages = createMemo(() => Math.min(opts().maxPages, opts().pages));
 
-  const pages = createMemo<PaginationProps>(
-    previous =>
-      [...Array(opts().pages)].map(
-        (_, i) =>
-          previous[i] ||
-          ((pageNo: number) =>
-            Object.defineProperties(
-              isServer
-                ? { children: pageNo.toString() }
-                : {
-                    children: pageNo.toString(),
-                    onClick: [setPage, pageNo] as const,
-                    onKeyUp: [onKeyUp, pageNo] as const,
-                  },
-              {
-                "aria-current": {
-                  get: () => (page() === pageNo ? "true" : undefined),
-                  set: noop,
-                  enumerable: true,
+  const pages = createMemo<PaginationProps>(prev =>
+    [...Array(opts().pages)].map(
+      (_, i) =>
+        (prev ?? [])[i] ||
+        ((pageNo: number) =>
+          Object.defineProperties(
+            isServer
+              ? { children: pageNo.toString() }
+              : {
+                  children: pageNo.toString(),
+                  onClick: [setPage, pageNo] as const,
+                  onKeyUp: [onKeyUp, pageNo] as const,
                 },
-                page: { value: pageNo, enumerable: false },
+            {
+              "aria-current": {
+                get: () => (page() === pageNo ? "true" : undefined),
+                set: noop,
+                enumerable: true,
               },
-            ))(i + 1),
-      ),
-    [],
+              page: { value: pageNo, enumerable: false },
+            },
+          ))(i + 1),
+    ),
   );
   const first = Object.defineProperties(
     isServer
@@ -359,15 +352,13 @@ export type _E = JSX.Element;
  * const [pages, loader, { page, setPage, setPages, end, setEnd }] = createInfiniteScroll(fetcher);
  * ```
  * @param fetcher `(page: number) => Promise<T[]>`
- * @return `pages()` is an accessor contains array of contents
- * @property `pages.loading` is a boolean indicator for the loading state
- * @property `pages.error` contains any error encountered
- * @return `infiniteScrollLoader` is a directive used to set the loader element
- * @method `page` is an accessor that contains page number
+ * @return `pages()` is an accessor that contains the accumulated array of all fetched items
+ * @return `loader` is a ref function to attach to the sentinel element that triggers loading
+ * @method `page` is an accessor that contains the current page number
  * @method `setPage` allows to manually change the page number
- * @method `setPages` allows to manually change the contents of the page
- * @method `end` is a boolean indicator for end of the page
- * @method `setEnd` allows to manually change the end
+ * @method `setPages` allows to manually replace the accumulated items
+ * @method `end` is a boolean indicator for end of the content
+ * @method `setEnd` allows to manually change the end state
  */
 export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
   pages: Accessor<T[]>,
@@ -380,14 +371,16 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
     setEnd: Setter<boolean>;
   },
 ] {
-  const [pages, setPages] = createSignal<T[]>([]);
-  const [page, setPage] = createSignal(0);
-  const [end, setEnd] = createSignal(false);
+  // ownedWrite allows setters to be called from reactive scopes and event handlers
+  const [pages, setPages] = createSignal<T[]>([], { ownedWrite: true });
+  const [page, setPage] = createSignal(0, { ownedWrite: true });
+  const [end, setEnd] = createSignal(false, { ownedWrite: true });
+  const [fetching, setFetching] = createSignal(false, { ownedWrite: true });
 
   let add: (el: Element) => void = noop;
   if (!isServer) {
     const io = new IntersectionObserver(e => {
-      if (e.length > 0 && e[0]!.isIntersecting && !end() && !contents.loading) {
+      if (e.length > 0 && e[0]!.isIntersecting && !end() && !fetching()) {
         setPage(p => p + 1);
       }
     });
@@ -396,28 +389,34 @@ export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>)
       io.observe(el);
       tryOnCleanup(() => io.unobserve(el));
     };
+
+    createEffect(
+      () => page(),
+      currentPage => {
+        let cancelled = false;
+        setFetching(true);
+        fetcher(currentPage).then(content => {
+          if (cancelled) return;
+          if (content.length === 0) setEnd(true);
+          setPages(p => [...p, ...content]);
+          setFetching(false);
+        });
+        return () => {
+          cancelled = true;
+        };
+      },
+    );
   }
-
-  const [contents] = createResource(page, fetcher);
-
-  createComputed(() => {
-    const content = contents.latest;
-    if (!content) return;
-    batch(() => {
-      if (content.length === 0) setEnd(true);
-      setPages(p => [...p, ...content]);
-    });
-  });
 
   return [
     pages,
     add,
     {
-      page: page,
-      setPage: setPage,
-      setPages: setPages,
-      end: end,
-      setEnd: setEnd,
+      page,
+      setPage,
+      setPages,
+      end,
+      setEnd,
     },
   ];
 }

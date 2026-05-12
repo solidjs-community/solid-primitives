@@ -24,6 +24,8 @@ yarn add @solid-primitives/pagination
 pnpm add @solid-primitives/pagination
 ```
 
+> **Peer dependencies:** `solid-js@^2.0.0-beta.10` and `@solidjs/web@^2.0.0-beta.10`
+
 ## `createPagination`
 
 Provides an array with the properties to fill your pagination with and a page setter/getter.
@@ -133,7 +135,7 @@ https://primitives.solidjs.community/playground/pagination/
 
 ## `createInfiniteScroll`
 
-Combines [`createResource`](https://www.solidjs.com/docs/latest/api#createresource) with [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) to provide an easy way to implement infinite scrolling.
+Combines [`IntersectionObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) with a page-based fetcher to provide an easy way to implement infinite scrolling. Browser-only: the loader and fetching are skipped on the server.
 
 ### How to use it
 
@@ -171,7 +173,7 @@ return (
 ```ts
 function createInfiniteScroll<T>(fetcher: (page: number) => Promise<T[]>): [
   pages: Accessor<T[]>,
-  loader: Directive<true>,
+  loader: (el: Element) => void,
   options: {
     page: Accessor<number>;
     setPage: Setter<number>;
