@@ -1,9 +1,14 @@
 {
   "name": "@solid-primitives/focus",
   "version": "0.2.0",
-  "description": "Primitives for autofocusing HTML elements",
+  "description": "Primitives for autofocusing HTML elements and trapping focus within a container",
   "author": "jer3m01 <jer3m01@jer3m01.com>",
-  "contributors": [],
+  "contributors": [
+    {
+      "name": "Jasmin Noetzli",
+      "url": "https://github.com/GiyoMoon"
+    }
+  ],
   "license": "MIT",
   "homepage": "https://primitives.solidjs.community/package/focus",
   "repository": {
@@ -18,7 +23,8 @@
     "stage": 1,
     "list": [
       "autofocus",
-      "createAutofocus"
+      "createAutofocus",
+      "createFocusTrap"
     ],
     "category": "Inputs"
   },
@@ -26,7 +32,11 @@
     "solid",
     "primitives",
     "focus",
-    "autofocus"
+    "autofocus",
+    "focus-trap",
+    "trap",
+    "accessibility",
+    "a11y"
   ],
   "private": false,
   "sideEffects": false,

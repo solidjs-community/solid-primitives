@@ -311,6 +311,16 @@ export function handleDiffArray<T>(
   }
 }
 
+/**
+ * Schedules `fn` to run after the browser has painted by nesting two
+ * requestAnimationFrame calls. No-op in non-browser environments.
+ */
+export const afterPaint = (fn: () => void): void => {
+  if (typeof requestAnimationFrame === "function") {
+    requestAnimationFrame(() => requestAnimationFrame(fn));
+  }
+};
+
 // ─── String transforms ────────────────────────────────────────────────────────
 
 /**
