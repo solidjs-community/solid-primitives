@@ -16,8 +16,7 @@
     "name": "active-element",
     "stage": 3,
     "list": [
-      "createActiveElement",
-      "createFocusSignal"
+      "createActiveElement"
     ],
     "category": "Inputs"
   },
