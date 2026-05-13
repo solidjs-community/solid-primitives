@@ -1,5 +1,5 @@
 import type { Signal, StoreSetter, Store } from "solid-js";
-import { action, createUniqueId, latest, untrack, reconcile, DEV } from "solid-js";
+import { action, createUniqueId, latest, untrack, reconcile, snapshot, DEV } from "solid-js";
 
 export type SyncStorage = {
   getItem: (key: string) => string | null;
@@ -175,9 +175,10 @@ export function makePersisted<
     });
   }
 
-  const getter = typeof signal[0] === "function" ? signal[0] as () => T : () => signal[0] as T;
+  const getter = typeof signal[0] === "function" ? signal[0] as () => T : () => snapshot(signal[0] as T);
   const persist = () => {
     const next = untrack(() => latest(getter));
+    console.log({next})
     if (next == null) {
       storage.removeItem(name, storageOptions);
       options.sync?.[1](name, null);

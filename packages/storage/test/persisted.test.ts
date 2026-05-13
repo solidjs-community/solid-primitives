@@ -117,6 +117,7 @@ describe("makePersisted", () => {
       name: "test4",
     });
     setStore((s) => { s.test = "persisted" });
+    flush();
     expect(store.test).toBe("persisted");
     expect(mockStorage.getItem("test4")).toBe(JSON.stringify({ test: "persisted" }));
   });
