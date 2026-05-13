@@ -1,5 +1,5 @@
 import { type Accessor, type JSX } from "solid-js";
-import { isServer } from "solid-js/web";
+import { isServer } from "@solidjs/web";
 import { type Directive, createHydratableSignal } from "@solid-primitives/utils";
 import { makeEventListener } from "@solid-primitives/event-listener";
 
@@ -11,7 +11,7 @@ declare module "solid-js" {
   }
 }
 // This ensures the `JSX` import won't fall victim to tree shaking
-export type E = JSX.Element;
+export type E = JSX.Directives;
 
 const getActiveElement = () =>
   document.activeElement === document.body ? null : document.activeElement;
