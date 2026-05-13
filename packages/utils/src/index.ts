@@ -5,7 +5,7 @@ import {
   createStore,
   type Accessor,
   untrack,
-  type EffectFunction,
+  type ComputeFunction,
   type NoInfer,
   type Setter,
   type SignalOptions,
@@ -160,17 +160,17 @@ export function defer<S, Next extends Prev, Prev = Next>(
   deps: Accessor<S>[] | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
   initialValue: Next,
-): EffectFunction<undefined | NoInfer<Next>, NoInfer<Next>>;
+): ComputeFunction<undefined | NoInfer<Next>, NoInfer<Next>>;
 export function defer<S, Next extends Prev, Prev = Next>(
   deps: Accessor<S>[] | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
   initialValue?: undefined,
-): EffectFunction<undefined | NoInfer<Next>>;
+): ComputeFunction<undefined | NoInfer<Next>>;
 export function defer<S, Next extends Prev, Prev = Next>(
   deps: Accessor<S>[] | Accessor<S>,
   fn: (input: S, prevInput: S, prev: undefined | NoInfer<Prev>) => Next,
   initialValue?: Next,
-): EffectFunction<undefined | NoInfer<Next>> {
+): ComputeFunction<undefined | NoInfer<Next>> {
   const isArray = Array.isArray(deps);
   let prevInput: S;
   let shouldDefer = true;
@@ -178,7 +178,7 @@ export function defer<S, Next extends Prev, Prev = Next>(
     let input: S;
     if (isArray) {
       input = Array(deps.length) as S;
-      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]();
+      for (let i = 0; i < deps.length; i++) (input as any[])[i] = deps[i]!();
     } else input = deps();
     if (shouldDefer) {
       shouldDefer = false;
@@ -258,14 +258,14 @@ export function createHydratableSignal<T>(
   options?: SignalOptions<T>,
 ): ReturnType<typeof createSignal<T>> {
   if (isServer) {
-    return createSignal(serverValue, options);
+    return createSignal(serverValue as Exclude<T, Function>, options);
   }
   if (sharedConfig.hydrating) {
-    const [state, setState] = createSignal(serverValue, options);
-    onSettled(() => setState(() => update()));
+    const [state, setState] = createSignal(serverValue as Exclude<T, Function>, options);
+    onSettled(() => { setState(() => update()); });
     return [state, setState];
   }
-  return createSignal(update(), options);
+  return createSignal(update() as Exclude<T, Function>, options);
 }
 
 /** @deprecated use {@link createHydratableSignal} instead */
