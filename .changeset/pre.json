@@ -5,7 +5,7 @@
     "@solid-primitives/active-element": "2.1.5",
     "@solid-primitives/analytics": "0.2.1",
     "@solid-primitives/audio": "1.4.4",
-    "@solid-primitives/autofocus": "0.1.4",
+    "@solid-primitives/focus": "0.1.4",
     "@solid-primitives/bounds": "0.1.5",
     "@solid-primitives/broadcast-channel": "0.1.1",
     "@solid-primitives/clipboard": "1.6.4",

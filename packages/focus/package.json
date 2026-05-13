@@ -1,11 +1,11 @@
 {
-  "name": "@solid-primitives/autofocus",
+  "name": "@solid-primitives/focus",
   "version": "0.2.0",
   "description": "Primitives for autofocusing HTML elements",
   "author": "jer3m01 <jer3m01@jer3m01.com>",
   "contributors": [],
   "license": "MIT",
-  "homepage": "https://primitives.solidjs.community/package/autofocus",
+  "homepage": "https://primitives.solidjs.community/package/focus",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solidjs-community/solid-primitives.git"
@@ -14,7 +14,7 @@
     "url": "https://github.com/solidjs-community/solid-primitives/issues"
   },
   "primitive": {
-    "name": "autofocus",
+    "name": "focus",
     "stage": 1,
     "list": [
       "autofocus",

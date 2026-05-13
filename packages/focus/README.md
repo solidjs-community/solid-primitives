@@ -1,11 +1,11 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=autofocus" alt="Solid Primitives Autofocus">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=Primitives&background=tiles&project=focus" alt="Solid Primitives Focus">
 </p>
 
-# @solid-primitives/autofocus
+# @solid-primitives/focus
 
-[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/autofocus?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/autofocus)
-[![version](https://img.shields.io/npm/v/@solid-primitives/autofocus?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/autofocus)
+[![size](https://img.shields.io/bundlephobia/minzip/@solid-primitives/focus?style=for-the-badge&label=size)](https://bundlephobia.com/package/@solid-primitives/focus)
+[![version](https://img.shields.io/npm/v/@solid-primitives/focus?style=for-the-badge)](https://www.npmjs.com/package/@solid-primitives/focus)
 [![stage](https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolidjs-community%2Fsolid-primitives%2Fmain%2Fassets%2Fbadges%2Fstage-1.json)](https://github.com/solidjs-community/solid-primitives#contribution-process)
 
 Primitives for autofocusing HTML elements.
@@ -18,11 +18,11 @@ The native autofocus attribute only works on page load, which makes it incompati
 ## Installation
 
 ```bash
-npm install @solid-primitives/autofocus
+npm install @solid-primitives/focus
 # or
-yarn add @solid-primitives/autofocus
+yarn add @solid-primitives/focus
 # or
-pnpm add @solid-primitives/autofocus
+pnpm add @solid-primitives/focus
 ```
 
 ## `autofocus`
@@ -32,7 +32,7 @@ pnpm add @solid-primitives/autofocus
 `autofocus` is a ref callback factory. It uses the native `autofocus` attribute to determine whether to focus the element.
 
 ```tsx
-import { autofocus } from "@solid-primitives/autofocus";
+import { autofocus } from "@solid-primitives/focus";
 
 <button ref={autofocus()} autofocus>
   Autofocused
@@ -55,7 +55,7 @@ To conditionally enable autofocus, control the `autofocus` attribute directly â€
 `createAutofocus` reactively autofocuses an element passed in as a signal.
 
 ```tsx
-import { createAutofocus } from "@solid-primitives/autofocus";
+import { createAutofocus } from "@solid-primitives/focus";
 
 // Using ref
 let ref!: HTMLButtonElement;
@@ -72,9 +72,9 @@ createAutofocus(ref);
 
 ## Demo
 
-You may see the working example here: https://primitives.solidjs.community/playground/autofocus/
+You may see the working example here: https://primitives.solidjs.community/playground/focus/
 
-Source code: https://github.com/solidjs-community/solid-primitives/blob/main/packages/autofocus/dev/index.tsx
+Source code: https://github.com/solidjs-community/solid-primitives/blob/main/packages/focus/dev/index.tsx
 
 ## Changelog
 

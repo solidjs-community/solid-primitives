@@ -1,5 +1,5 @@
 ---
-"@solid-primitives/autofocus": major
+"@solid-primitives/focus": major
 ---
 
 Migrate to Solid.js v2.0 (beta.10)
