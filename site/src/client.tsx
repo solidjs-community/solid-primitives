@@ -1,10 +1,9 @@
-// @refresh reload
 import { debounce } from "@solid-primitives/scheduled";
-import { mount, StartClient } from "@solidjs/start/client";
-
-// import "solid-devtools";
+import { hydrate } from "solid-js/web";
+import { hydrateStart, StartClient } from "@tanstack/solid-start/client";
 
 // Primitives/Table.tsx produces a lot of hydration warnings in development mode.
+// Batch them into a single collapsed group so the dev console stays usable.
 if (import.meta.env.MODE === "development") {
   const keys: string[] = [];
   // eslint-disable-next-line no-console
@@ -26,4 +25,6 @@ if (import.meta.env.MODE === "development") {
   }, 1000);
 }
 
-mount(() => <StartClient />, document);
+hydrateStart().then(router => {
+  hydrate(() => <StartClient router={router} />, document);
+});

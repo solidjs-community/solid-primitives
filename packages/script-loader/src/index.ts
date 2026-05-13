@@ -1,12 +1,5 @@
-import {
-  type Accessor,
-  createRenderEffect,
-  onCleanup,
-  splitProps,
-  type ComponentProps,
-  type JSX,
-} from "solid-js";
-import { spread, isServer } from "solid-js/web";
+import { type Accessor, createRenderEffect, onCleanup } from "solid-js";
+import { assign, isServer, type ComponentProps, type JSX } from "@solidjs/web";
 
 export type ScriptProps = Omit<ComponentProps<"script">, "src" | "textContent"> & {
   /** URL or source of the script to load. */
@@ -14,8 +7,6 @@ export type ScriptProps = Omit<ComponentProps<"script">, "src" | "textContent"> 
   /** arbitrary data attributes commonly used by tracking scripts */
   [dataAttribute: `data-${string}`]: any;
 };
-
-const OMITTED_PROPS = ["src"] as const;
 
 /**
  * Creates a convenient script loader utility
@@ -40,39 +31,46 @@ export function createScriptLoader(props: ScriptProps): HTMLScriptElement | unde
   }
   const script = document.createElement("script");
   const eventKeys: string[] = Object.keys(props).filter(p => p.startsWith("on"));
-  const [local, events, scriptProps] = splitProps(
-    props,
-    OMITTED_PROPS,
-    eventKeys as readonly (keyof typeof props)[],
+  const { src: srcProp } = props;
+
+  const staticProps: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(props as Record<string, unknown>)) {
+    if (k !== "src" && !eventKeys.includes(k)) staticProps[k] = v;
+  }
+  assign(script, staticProps, true);
+
+  for (const name of eventKeys) {
+    const handler = props[name as keyof ScriptProps] as JSX.EventHandlerUnion<
+      HTMLScriptElement,
+      Event
+    >;
+    const eventName = /^on:?(.*)/.test(name)
+      ? name.startsWith("on:")
+        ? RegExp.$1
+        : RegExp.$1.toLowerCase()
+      : name;
+    script.addEventListener(eventName, (ev: Event) => {
+      Object.defineProperties(ev, {
+        target: { value: script, enumerable: true },
+        currentTarget: { value: script, enumerable: true },
+      });
+      Array.isArray(handler)
+        ? handler[0](handler[1], ev)
+        : typeof handler === "function" && handler.call(null, Object.assign(ev));
+    });
+  }
+
+  createRenderEffect(
+    () => (typeof srcProp === "string" ? srcProp : srcProp()),
+    (src: string) => {
+      const prop = /^(https?:|\w[\.\w-_%]+|)\//.test(src) ? "src" : "textContent";
+      if (script[prop] !== src) {
+        script[prop] = src;
+        document.head.appendChild(script);
+      }
+    },
   );
-  setTimeout(() => spread(script, scriptProps, false, true));
-  createRenderEffect(() => {
-    Object.entries(events).forEach(
-      ([name, handler]: [string, JSX.EventHandlerUnion<HTMLScriptElement, Event>]) =>
-        script.addEventListener(
-          /^on:?(.*)/.test(name)
-            ? name.startsWith("on:")
-              ? RegExp.$1
-              : RegExp.$1.toLowerCase()
-            : name,
-          (ev: Event) => {
-            Object.defineProperties(ev, {
-              target: { value: script, enumerable: true },
-              currentTarget: { value: script, enumerable: true },
-            });
-            Array.isArray(handler)
-              ? handler[0](handler[1], ev)
-              : typeof handler === "function" && handler.call(null, Object.assign(ev));
-          },
-        ),
-    );
-    const src = typeof local.src === "string" ? local.src : local.src();
-    const prop = /^(https?:|\w[\.\w-_%]+|)\//.test(src) ? "src" : "textContent";
-    if (script[prop] !== src) {
-      script[prop] = src;
-      document.head.appendChild(script);
-    }
-  });
+
   onCleanup(() => document.head.contains(script) && document.head.removeChild(script));
   return script;
 }
