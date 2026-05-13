@@ -56,7 +56,7 @@ export type PersistenceSyncAPI = [
 ];
 
 export type PersistenceOptions<
-  S extends Signal<any> | [Store<any>, StoreSetter<any>],
+  S extends Signal<any> | [Store<any>, StoreSetter<any>] | readonly [Store<any>, StoreSetter<any>],
   O extends Record<string, any> | undefined,
   T = S extends Signal<infer T> ? T : S extends [Store<infer T>, StoreSetter<infer T>] ? T : never
 > = {
@@ -73,6 +73,8 @@ export type PersistenceOptions<
     });
 
 export type PersistedState<S> = S extends [any, any] ? [...S, Promise<string> | string | null] : never;
+
+export type StoreTuple<T> = [Store<T>, StoreSetter<T>];
 
 /**
  * Persists a signal, store or similar API
@@ -96,28 +98,26 @@ export type PersistedState<S> = S extends [any, any] ? [...S, Promise<string> | 
  * @param {PersistenceOptions<Signal<T> | [get: Store<T>, set StoreSetter<T>], O>} options - The options for persistence.
  * @returns {PersistedState<T>} - The persisted signal or store.
  */
-export function makePersisted<T, S extends Signal<T>>(
-  signal: S,
-  options?: PersistenceOptions<S, undefined>,
-): PersistedState<S>;
-export function makePersisted<T, S extends [Store<T>, StoreSetter<T>]>(
-  signal: S,
-  options?: PersistenceOptions<S, undefined>,
-): PersistedState<S>;
+export function makePersisted<T>(
+  signal: Signal<T>,
+  options?: PersistenceOptions<Signal<T>, undefined>,
+): PersistedState<Signal<T>>;
+export function makePersisted<T>(
+  signal: StoreTuple<T>,
+  options?: PersistenceOptions<StoreTuple<T>, undefined>,
+): PersistedState<StoreTuple<T>>;
 export function makePersisted<
   T,
-  O extends Record<string, any>,
-  S extends Signal<T>
->(signal: S, options: PersistenceOptions<S, O>): PersistedState<S>;
+  O extends Record<string, any>
+>(signal: Signal<T>, options: PersistenceOptions<Signal<T>, O>): PersistedState<Signal<T>>;
 export function makePersisted<
   T,
-  O extends Record<string, any>,
-  S extends [Store<T>, StoreSetter<T>]
->(signal: S, options: PersistenceOptions<S, O>): PersistedState<S>;
+  O extends Record<string, any>
+>(signal: StoreTuple<T>, options: PersistenceOptions<StoreTuple<T>, O>): PersistedState<StoreTuple<T>>;
 export function makePersisted<
   T,
   O extends Record<string, any> | undefined,
-  S extends Signal<T> | [Store<T>, StoreSetter<T>],
+  S extends Signal<T> | StoreTuple<T>,
 >(
   signal: S,
   options: PersistenceOptions<S, O> = {} as PersistenceOptions<S, O>,
@@ -126,7 +126,7 @@ export function makePersisted<
   const name = options.name || `storage-${createUniqueId()}`;
   const actionFn = options.action && options.action(signal);
   if (actionFn) {
-    signal[1] = action(actionFn) as unknown as S[1];
+    (signal as any)[1] = action(actionFn) as unknown as S[1];
   }
   if (!storage) {
     return [signal[0], signal[1], null] as unknown as PersistedState<S>;
@@ -178,7 +178,6 @@ export function makePersisted<
   const getter = typeof signal[0] === "function" ? signal[0] as () => T : () => snapshot(signal[0] as T);
   const persist = () => {
     const next = untrack(() => latest(getter));
-    console.log({next})
     if (next == null) {
       storage.removeItem(name, storageOptions);
       options.sync?.[1](name, null);

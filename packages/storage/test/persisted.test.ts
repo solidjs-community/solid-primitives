@@ -72,8 +72,8 @@ describe("makePersisted", () => {
   it("persists an optimistic signal", async () => {
     const DataServer = {
       data: "server",
-      get: () => { console.log(+new Date(), 'get'); return Promise.resolve(DataServer.data) },
-      set: (next: string) => new Promise((res) => (console.log(+new Date(), 'set', DataServer.data = next), setTimeout(() => res(DataServer.data = next), 50))),
+      get: () => Promise.resolve(DataServer.data),
+      set: (next: string) => new Promise((res) => setTimeout(() => res(DataServer.data = next), 50)),
     };
     const [signal, setSignal] = makePersisted(
       createOptimistic(() => DataServer.get()),
