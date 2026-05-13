@@ -2,11 +2,16 @@ import {
   getOwner,
   onCleanup,
   createSignal,
+  createStore,
   type Accessor,
   untrack,
   type ComputeFunction,
   type NoInfer,
+  type Setter,
   type SignalOptions,
+  type Signal,
+  type Store,
+  type StoreSetter,
   sharedConfig,
   onSettled,
   DEV,
@@ -414,3 +419,30 @@ export const contains = (wrapper: HTMLElement, target: HTMLElement): boolean => 
   }
   return false;
 };
+/**
+ * Wraps a setter function of any signal or store
+ *
+ * ```ts
+ * const [data, setData] = wrapSetter(
+ *   createSignal(initialData), 
+ *   (setter) => (next) => { console.log(next); return setter(next); },
+ * );
+ * ```
+ * If you destructure signal or store in a longer tuple, you need to use a const assertion for the types to work.
+ */
+export function wrapSetter<T>(signal: Signal<T>, wrapper: (setter: Setter<T>) => Setter<T>): Signal<T>;
+export function wrapSetter<T>(store: [Store<T>, StoreSetter<T>], wrapper: (setter: StoreSetter<T>) => StoreSetter<T>): [Store<T>, StoreSetter<T>];
+export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | [...Signal<T>, ...any[]] | [Store<T>, StoreSetter<T>, ...any[]]>(
+  signalOrStore: S,
+  wrapper: (setter: S[1]) => S[1]
+): S;
+export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | readonly [...Signal<T>, ...any[]] | readonly [Store<T>, StoreSetter<T>, ...any[]]>(
+  signalOrStore: S,
+  wrapper: (setter: S[1]) => S[1]
+): S;
+export function wrapSetter<T, S extends Signal<T> | [Store<T>, StoreSetter<T>] | [...Signal<T>, ...any[]] | [Store<T>, StoreSetter<T>, ...any[]]>(
+  signalOrStore: S,
+  wrapper: (setter: S[1]) => S[1]
+): S {
+  return [signalOrStore[0], wrapper(signalOrStore[1]), ...signalOrStore.slice(2)] as S;
+}
