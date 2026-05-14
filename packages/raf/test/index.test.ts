@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { createMs, createRAF, targetFPS } from "../src/index.js";
-import { createRoot } from "solid-js";
+import { createRoot, flush } from "solid-js";
 
 describe("createRAF", () => {
   it("calls requestAnimationFrame after start", () => {
@@ -12,6 +12,7 @@ describe("createRAF", () => {
       expect(running()).toBe(false);
       expect(raf).not.toHaveBeenCalled();
       start();
+      flush();
       expect(running()).toBe(true);
       expect(raf).toHaveBeenCalled();
       stop();

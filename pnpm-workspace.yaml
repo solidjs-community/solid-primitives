@@ -3,4 +3,5 @@ packages:
   - site
 
 onlyBuiltDependencies:
+  - "@parcel/watcher"
   - esbuild

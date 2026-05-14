@@ -1,16 +1,12 @@
+import { Link } from "@tanstack/solid-router";
 import { pageWidthClass } from "~/constants.js";
 import { DocumentClass } from "~/primitives/document-class.jsx";
-import { Title } from "@solidjs/meta";
-import { HttpStatusCode } from "@solidjs/start";
-import { A } from "@solidjs/router";
 
 export default function NotFound() {
   return (
     <main
       class={`${pageWidthClass} mx-auto min-h-[calc(100vh-250px)] w-full p-4 pt-[100px] lg:pt-[150px]`}
     >
-      <Title>Not Found</Title>
-      <HttpStatusCode code={404} />
       <DocumentClass class="full-page" />
       <h1 class="mb-12 text-center text-xl">Primitive not Found</h1>
       <div class="flex justify-center overflow-x-clip">
@@ -87,7 +83,7 @@ export default function NotFound() {
         </div>
       </div>
       <div class="mt-24 flex justify-center">
-        <A href="/" class="flex items-center gap-4 px-4 py-2 hover:opacity-70">
+        <Link to="/" class="flex items-center gap-4 px-4 py-2 hover:opacity-70">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -104,7 +100,7 @@ export default function NotFound() {
             <polyline points="12 19 5 12 12 5" />
           </svg>
           <span>Back to Main</span>
-        </A>
+        </Link>
       </div>
     </main>
   );
